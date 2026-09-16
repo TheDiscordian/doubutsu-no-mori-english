@@ -53,6 +53,8 @@ CATEGORIES = (
 )
 DISPATCH = ((0x808BE658,2),(0x808DD8D0,2),(0x808DD9F4,2),
             (0x808DDAFC,25),(0x808DDBB0,2))
+HELD_CATEGORIES=((0x173B38,0x808BF410,0x808BF424,0x808DF7F8,4),
+                 (0x173BCC,0x808BF494,0x808BF4AC,0x808DF84C,4))
 # This address is also the exclusive end of the PRECEDING eight-float array.
 # The spatial-search loop compares its incrementing pointer against this end;
 # moving that boundary to the new action table would overrun its stack buffer.
@@ -166,6 +168,85 @@ def refresh_frame_flow(base,prior,blob,core,original,output):
     return report,{}
 
 
+def refresh_held_dispatch(base,prior,blob,core,original,output):
+    """Use the shared callback-table format for complete held-item categories."""
+    old=prior['equipment_resources'];actions=old['player_actions'];at=old['blob_offset']
+    module=bytearray(blob[at:at+old['bytes']]);files=by_vrom(base)
+    owner=files[PLAYER_VROM].extract(base);reloc=files[PLAYER_RELOC].extract(base)
+    if (old['bytes']!=MODULE_SIZE or sha256(module)!=old['sha256']
+            or actions.get('held_dispatch') or actions['enabled_imported_actions']
+            or sha256(owner)!=actions['owner_sha256'] or sha256(reloc)!=actions['relocation_sha256']):
+        raise ValueError('Held dispatch requires the checked complete action module')
+    source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+                  (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    bindings=control_bindings(source,owner,core,original,old)
+    start=(TABLE_OFFSET+actions['table_bytes']+15)&-16
+    data,tables,patches,removed,records,locations=expanded_tables(source,owner,reloc,
+        categories=HELD_CATEGORIES,native_count=21,count=24,table_offset=start,
+        magic=0x41465049,complete_bound_scan=False)
+    native=by_vrom(original)[PLAYER_VROM].extract(original)
+    for row,end in zip(tables,(0x808BF494,0x808BF6C8)):
+        begin=row['native_entry']
+        if owner[begin-PLAYER_RAM:end-PLAYER_RAM]!=native[begin-PLAYER_RAM:end-PLAYER_RAM]:
+            raise ValueError('Changed complete native held-item dispatcher')
+        row.update(native_end=end,native_consumer_sha256=sha256(owner[begin-PLAYER_RAM:end-PLAYER_RAM]))
+    n=actions['code']['bytes']
+    if (sha256(module[CODE_OFFSET:CODE_OFFSET+n])!=actions['code']['sha256']
+            or any(module[CODE_OFFSET+n:TABLE_OFFSET]) or any(module[start:start+len(data)])):
+        raise ValueError('Shared held-code/table reservation is not empty and verified')
+    pointer=old['code']['symbols']['af_v3_equipment_pointer']
+    sid=actions['fan_frame_flow']['native_sound_id']
+    code,compiled=compile_part('player_actions',output/'player_actions',
+        primary_source='overlays/v3/player_actions.S',extra_sources=('overlays/v3/player_actions.c',),
+        defines=(f'AF_V3_FAN_SOUND=0x{sid:04X}',f'AF_V3_HELD_POINTER=0x{pointer:08X}u'))
+    if len(code)>TABLE_OFFSET-CODE_OFFSET or code[:68]!=module[CODE_OFFSET:CODE_OFFSET+68]:
+        raise ValueError('Held dispatcher changes installed action entry points')
+    # A fan has no independent equipment animation update. Reuse the verified
+    # original zero-return callback, not another item's gameplay behaviour.
+    no_update=u32(owner,tables[0]['native_table']-PLAYER_RAM+4)
+    noop=owner[no_update-PLAYER_RAM:no_update-PLAYER_RAM+20]
+    if noop!=bytes.fromhex('afa40000afa500040000102503e0000800000000'):
+        raise ValueError('Original static held-item callback is no longer a no-op')
+    extra=[source.function(x)[1] for x in (0x173A7C,0x173A84,0x17150C)]
+    ro=source.sections[4][0];angles=source.rel[ro+27744:ro+27750]
+    if (angles!=native[0x808DF598-PLAYER_RAM:0x808DF59E-PLAYER_RAM]
+            or source.rel[ro+27752:ro+27756]!=struct.pack('>f',0.2)
+            or owner[0x808BE140-PLAYER_RAM:0x808BE184-PLAYER_RAM]!=native[0x808BE140-PLAYER_RAM:0x808BE184-PLAYER_RAM]):
+        raise ValueError('Fan net-angle reset does not match the original native reset')
+    for row,callback in zip(tables,(no_update,compiled['symbols']['af_v3_player_draw_static_item'])):
+        index=row['offset']-start
+        struct.pack_into('>I',data,index+23*4,callback)
+        row.update(sha256=sha256(data[index:index+row['bytes']]),enabled_imported_indices=[23])
+    for entry,register,name in ((0x808BF470,3,'af_v3_player_action_v1'),
+                                (0x808BF66C,25,'af_v3_player_action_t9')):
+        offset=entry-PLAYER_RAM;before=u32(owner,offset)
+        if before!=register<<21|0xF809 or offset in locations:
+            raise ValueError('Changed held-item indirect call')
+        patches.append(dict(offset=offset,before=before,after=jump(compiled['symbols'][name],link=True)))
+    patched=bytearray(owner)
+    for row in patches:
+        if u32(patched,row['offset'])!=row['before']:raise ValueError('Changed held-item patch input')
+        struct.pack_into('>I',patched,row['offset'],row['after'])
+    kept=[r for r in records if r not in {locations[x] for x in removed}]
+    fixed=bytearray(reloc);struct.pack_into('>I',fixed,16,len(kept))
+    fixed[20:-4]=struct.pack('>'+str(len(kept))+'I',*kept)+bytes(len(fixed)-24-len(kept)*4)
+    module[CODE_OFFSET:TABLE_OFFSET]=code+bytes(TABLE_OFFSET-CODE_OFFSET-len(code))
+    module[start:start+len(data)]=data;blob[at:at+len(module)]=module
+    report=copy.deepcopy(old);report.update(sha256=sha256(module),crc32=zlib.crc32(module))
+    report['player_motion'].update(owner_sha256=sha256(patched),reloc_sha256=sha256(fixed))
+    report['player_actions'].update(code=compiled,fan_control_flow=bindings,
+        owner_sha256=sha256(patched),relocation_sha256=sha256(fixed),
+        patches=actions['patches']+patches,removed_relocations=actions['removed_relocations']+len(removed),
+        held_dispatch=dict(format='AFV3-HELD-CALLBACK-TABLES-1',native_count=21,count=24,
+            table_offset=start,table_bytes=len(data),tables=tables,source_functions=extra,
+            native_zero_callback=no_update,native_zero_callback_sha256=sha256(noop),
+            equipment_pointer=pointer,source_rod_flag_cleared=True,
+            balloon_state_installed=False,net_reset=dict(entry=0x808BE140,angles_hex=angles.hex(),
+                sha256=sha256(native[0x808BE140-PLAYER_RAM:0x808BE184-PLAYER_RAM]),installed=False),
+            enabled_imported_indices=[23],disabled_indices=[21,22],ordinary_equipped_fan_tested=False))
+    return report,{PLAYER_VROM:bytes(patched),PLAYER_RELOC:bytes(fixed)}
+
+
 def refresh_controls(base,prior,blob,core,original,output):
     """Extend the existing action code in place; keep incomplete actions off."""
     old=prior['equipment_resources'];actions=old['player_actions'];at=old['blob_offset']
@@ -200,7 +281,7 @@ def refresh_controls(base,prior,blob,core,original,output):
     return report,{}
 
 
-def source_tables(source):
+def source_tables(source,categories=CATEGORIES,count=COUNT):
     """Resolve complete action tables through their actual donor consumers."""
     spans = {}
     for name,at,n in re.findall(
@@ -208,14 +289,14 @@ def source_tables(source):
             source.symbols,re.M):
         spans.setdefault(int(at,16),[]).append((name,int(n,16)))
     result=[]
-    for donor,entry,bound,table,width in CATEGORIES:
+    for donor,entry,bound,table,width in categories:
         raw,receipt=source.function(donor)
         if raw!=source.rel[source.sections[1][0]+donor:source.sections[1][0]+donor+receipt['bytes']]:
             raise ValueError('Action consumer does not match the checked donor')
         targets={r[3] for r in receipt['relocations'].values() if r[:3] in ((6,1,4),(4,1,4))
-                 and len(spans.get(r[3],[]))==1 and spans[r[3]][0][1]==COUNT*width}
+                 and len(spans.get(r[3],[]))==1 and spans[r[3]][0][1]==count*width}
         if len(targets)!=1:raise ValueError('Missing or ambiguous complete donor action table')
-        target=targets.pop();n=COUNT*width;base=source.sections[4][0]+target
+        target=targets.pop();n=count*width;base=source.sections[4][0]+target
         value=source.rel[base:base+n]
         references={k:v for k,v in receipt['relocations'].items() if v[1:]==(1,4,target)}
         if (len(value)!=n or {v[0] for v in references.values()}!={4,6}
@@ -260,17 +341,19 @@ def native_references(owner,reloc):
     return groups,absolute,rows,locations,slots
 
 
-def expanded_tables(source,owner,reloc):
+def expanded_tables(source,owner,reloc,*,categories=CATEGORIES,native_count=NATIVE_COUNT,
+                    count=COUNT,table_offset=TABLE_OFFSET,magic=0x41465041,complete_bound_scan=True):
     """Build full-capacity tables; unimplemented extra actions cannot dispatch."""
     groups,absolute,rows,locations,slots=native_references(owner,reloc)
     observed={PLAYER_RAM+i for i in range(0,TEXT_SIZE,4)
-              if u32(owner,i)>>26 in (10,11) and u32(owner,i)&65535==NATIVE_COUNT}
-    if observed!={r[2] for r in CATEGORIES}:
+              if u32(owner,i)>>26 in (10,11) and u32(owner,i)&65535==native_count}
+    if complete_bound_scan and observed!={r[2] for r in categories}:
         raise ValueError('Player action bound inventory changed')
-    tables=source_tables(source);data=bytearray(struct.pack('>4I',0x41465041,1,COUNT,len(tables)))
+    if not {r[2] for r in categories}<=observed:raise ValueError('Changed category callback limit')
+    tables=source_tables(source,categories,count);data=bytearray(struct.pack('>4I',magic,1,count,len(tables)))
     removed=set();patches=[]
     for table in tables:
-        target,width=table['native_table'],table['width'];n=NATIVE_COUNT*width
+        target,width=table['native_table'],table['width'];n=native_count*width
         old=owner[target-PLAYER_RAM:target-PLAYER_RAM+n]
         if len(old)!=n:raise ValueError('Truncated original action table')
         pairs=[]
@@ -290,17 +373,17 @@ def expanded_tables(source,owner,reloc):
         if (len(pairs)!=(2 if table['native_entry']==0x808DDA18 else 1)
                 or any(target<=v<target+n for v in absolute.values())):
             raise ValueError('Changed complete native action reference inventory')
-        data.extend(bytes(-len(data)%4));offset=TABLE_OFFSET+len(data);address=RAM+offset
+        data.extend(bytes(-len(data)%4));offset=table_offset+len(data);address=RAM+offset
         if width==1:
-            value=old+bytes.fromhex(table['source_hex'])[NATIVE_COUNT:]
+            value=old+bytes.fromhex(table['source_hex'])[native_count:]
         else:
-            for at,pointer in enumerate(struct.unpack('>'+str(NATIVE_COUNT)+'I',old)):
+            for at,pointer in enumerate(struct.unpack('>'+str(native_count)+'I',old)):
                 location=target-PLAYER_RAM+4*at
                 if pointer:
                     if not PLAYER_RAM<=pointer<PLAYER_RAM+TEXT_SIZE or pointer%4 or location not in slots:
                         raise ValueError('Unrelocated or external original action callback')
                 elif location in slots:raise ValueError('Relocated null original action callback')
-            value=old+bytes((COUNT-NATIVE_COUNT)*4)
+            value=old+bytes((count-native_count)*4)
         data.extend(value)
         for hi,lo in pairs:
             for at,part in ((hi,(address+0x8000)>>16),(lo,address&65535)):
@@ -309,16 +392,18 @@ def expanded_tables(source,owner,reloc):
                 removed.add(at)
         at=table['native_bound']-PLAYER_RAM;before=u32(owner,at)
         if at in slots:raise ValueError('Relocated action limit instruction')
-        patches.append(dict(offset=at,before=before,after=before&0xFFFF0000|COUNT))
+        patches.append(dict(offset=at,before=before,after=before&0xFFFF0000|count))
         table.update(offset=offset,ram=address,bytes=len(value),sha256=sha256(value),
             native_sha256=sha256(old),references=[(PLAYER_RAM+a,PLAYER_RAM+b) for a,b in pairs])
-    if TABLE_OFFSET+len(data)>MODULE_SIZE-16:raise ValueError('Action tables exceed their reservation')
+    if table_offset+len(data)>MODULE_SIZE-16:raise ValueError('Action tables exceed their reservation')
     return data,tables,patches,removed,rows,locations
 
 
 def install(base,prior,blob,core,original,output):
     old=prior.get('equipment_resources',{})
     if old.get('player_actions'):
+        if old['player_actions'].get('fan_frame_flow'):
+            return refresh_held_dispatch(base,prior,blob,core,original,output)
         if old['player_actions'].get('fan_control_flow'):
             return refresh_frame_flow(base,prior,blob,core,original,output)
         return refresh_controls(base,prior,blob,core,original,output)

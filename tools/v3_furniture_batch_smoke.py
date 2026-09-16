@@ -585,6 +585,58 @@ def player_motion(debug,rom_path,record):
         check('actual game-loaded player code and relocations',owner,expected[:sections[0]])
         record(dict(game_loaded_player_owner=f'{owner:08X}',constructor=f'{constructor:08X}'))
         actions=resources.get('player_actions')
+        if actions and actions.get('held_dispatch'):
+            held=actions['held_dispatch'];symbols=actions['code']['symbols']
+            bridge=allocation+0x1400;game=allocation+0x2000;graph=allocation+0x2300;commands=allocation+0x2800
+            for row in held['tables']:
+                check('complete held-item callback category',row['ram'],
+                      blob[at+row['offset']:at+row['offset']+row['bytes']])
+            actor=bytearray(0x12D8);debug.write_memory(target,actor)
+            real_game=struct.unpack('>I',debug.read_memory(0x8010EF90,4))[0]
+            if real_game&3 or not 0x80000400<=real_game<=0x80400000-0x1E00:
+                raise ValueError('Held dispatcher requires the live game for original common callbacks')
+            main=held['tables'][0];address=owner+main['native_entry']-equipment.PLAYER_RAM
+            proof=(address,expected[address-owner:main['native_end']-equipment.PLAYER_RAM])
+            # The original static callback and imported static category use
+            # the same full common path and the new v1 relocation thunk.
+            for index in (1,20,21,22,23,24,0xFFFFFFFF):
+                debug.write_memory(target+0xCFC,struct.pack('>I',index))
+                call(address,[target,real_game],0,proof)
+            debug.write_memory(game,struct.pack('>I',graph))
+            debug.write_memory(graph,bytes(0x300))
+            for p in (bridge-16,bridge+8,commands-16,commands+16):debug.write_memory(p,edge)
+            stub=struct.pack('>2I',equipment.jump(symbols['af_v3_player_draw_static_item']),0)
+            debug.write_memory(bridge,stub);call(0x8002FE00,[bridge,8]);call(0x80034CE0,[bridge,8])
+            for bank in (0,1):
+                kind=next(r for r in resources['kind_readers']['rows'] if r['native_kind']==107+bank)
+                shape=kind['fields'][2];model=next(r for r in resources['records'] if r['index']==shape)
+                debug.write_memory(target+0xDEC,struct.pack('>I',bank))
+                debug.write_memory(target+0xDDC+bank*4,struct.pack('>I',shape))
+                debug.write_memory(target+0xF44,struct.pack('>I',1))
+                debug.write_memory(graph+0x298,struct.pack('>I',commands));debug.write_memory(commands,edge)
+                call(bridge,[target,game],proof=(bridge,stub))
+                check('static held model command and untouched following bytes',commands,
+                      struct.pack('>2I',0xDE000000,model['pointer'])+edge[8:])
+                check('opaque draw cursor advances once',graph+0x298,struct.pack('>I',commands+8))
+                check('static held draw clears rod-tip flag',target+0xF44,bytes(4))
+            for bank,shape in ((0,0x7FFF),(2,0),(0xFFFFFFFF,0)):
+                debug.write_memory(target+0xDEC,struct.pack('>I',bank))
+                debug.write_memory(target+0xDDC,struct.pack('>I',shape))
+                debug.write_memory(target+0xF44,struct.pack('>I',1))
+                debug.write_memory(graph+0x298,struct.pack('>I',commands));debug.write_memory(commands,edge)
+                call(bridge,[target,game],proof=(bridge,stub))
+                check('missing model or bank emits no command',commands,edge)
+                check('missing model or bank preserves draw cursor',graph+0x298,struct.pack('>I',commands))
+                check('missing model or bank still clears rod-tip flag',target+0xF44,bytes(4))
+            for p in (bridge-16,bridge+8,commands-16,commands+16,allocation,end,allocation+size-16):
+                check('held dispatcher private-memory guard',p,edge)
+            check('held dispatcher saved profile unchanged',0x8046C000,saved)
+            check('held dispatcher has no CPU fault',0x8003CE34,bytes(4))
+            check('translation guard',0x8019C8D0,bytes.fromhex('AF32C0DE')*4)
+            check('equipment module footer',equipment.RAM+resources['bytes']-16,struct.pack('>4I',*([equipment.GUARD]*4)))
+            return dict(native_held_main_dispatch=True,native_static_held_draw_callback=True,
+                assertions=assertions,full_scene_render_tested=False,ordinary_equipped_fan_tested=False,
+                hardware_tested=False,flash_written=False,requires_checkpoint_restore=True)
         if controls:
             # Exercise new control/setup code in this same category probe.
             # The fake game owns an isolated full-size actor, two native-sized

@@ -1,6 +1,6 @@
 {
-  "directory": "build/v3-player-frame-sound-01",
-  "runtime_abi": 102,
-  "rom_sha256": "92bffc4eced4cf170922db9080510d347212d65255538f8c8d828cceaf779cc7",
-  "report_sha256": "fb8a8256883c9640c999290cde48465e6c5a7dad8adf39bc43ba22dab0660a31"
+  "directory": "build/v3-held-item-dispatch-02",
+  "runtime_abi": 103,
+  "rom_sha256": "d9c84c537a1565986de459667e4428d9d0dadcf79a1f1ea7a1904eb03fd99f0b",
+  "report_sha256": "de2265f41d8d0a54ab2db52452dc0e51e501e30d929eef907ff0a90eeb7f5842"
 }

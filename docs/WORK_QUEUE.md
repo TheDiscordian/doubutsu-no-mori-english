@@ -2,6 +2,22 @@
 
 ## Active: V3 optional GameCube imports
 
+Current ABI 103 is `build/v3-held-item-dispatch-02/`. The shared table converter
+handles both held-item dispatchers and all original tools. Fan category 23 has
+main/draw callbacks; balloon/pinwheel entries remain null. Static draw uses the
+actual held resource and existing native hand-matrix/scale/segment setup. The
+four focused checks and 58-record/40-assertion silent native run pass. Preserve
+those results and the unchanged audio evidence; do not replay either batch.
+All twelve current composition checks pass, including no-import V2 and ABI 103.
+See the [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-held-item-dispatch).
+
+Next, finish the outside-owner action audit, register fan action 109's installed
+setup/main and equivalent native net reset, and connect the four ordinary input
+poll sites. Add profile-aware native equipment selection and parent inventory/
+acquisition/catalogue/persistence before offering fans as choices. The current
+native item selector still rejects their IDs. Keep full scene rendering and
+ordinary equipped-fan use explicit; direct callback execution is not that proof.
+
 ABI 102 at `build/v3-player-frame-sound-01/` contains the complete fan per-frame
 callback and shared sound-program converter. Its actual `0167` program retains
 the pitch sweep, custom envelope, duration, and priority while reusing native
@@ -13,12 +29,9 @@ Twelve current optional-composition checks pass, including the unchanged V2 path
 Retain those results; no historical rerun or further sound harness is needed.
 See the [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-sound-programs-and-per-frame-actions).
 
-Next, extend the complete native held-item main/draw tables for category 23
-without changing original entries; connect source fan drawing and net-angle
-reset. Complete the four wait/walk/run/dash poll calls, native selected
-equipment/profile/acquisition, and outside-owner action audit before enabling
-ordinary fan use. All new action callback entries and poll hooks remain disabled.
-The eight fans share code and source-derived records, not per-item installers.
+The complete native held-item main/draw tables and source static fan drawing are
+installed above. The eight fans share code and source-derived records, not
+per-item installers. Fan action callbacks and input-poll hooks remain disabled.
 
 All 105 native actions retain their original
 metadata and callbacks; the complete donor metadata covers sixteen reserved

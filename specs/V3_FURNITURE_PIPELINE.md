@@ -68,6 +68,11 @@ sound-program conversion, retaining the source pitch sweep/envelope and reusing
 an equivalent native instrument/sample. Native frame speed and braking use the
 corresponding N64 timing. Incomplete action callbacks and polling hooks remain
 disabled until their remaining gameplay dependencies are implemented.
+The table converter also extends the two held-item main/draw tables, preserving
+all original tools. Source static-held drawing uses the existing equipment
+resources and native outer draw setup. Unimplemented rig categories retain null
+callbacks. Refreshes account for changed uncompressed owners already stored
+inside the blob before computing the complete blob receipt.
 
 `--category` selects a discovered shared category without maintaining an item
 list. `convert --assets-only` prepares complete artwork while retaining missing

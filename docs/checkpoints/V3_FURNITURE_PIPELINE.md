@@ -1,5 +1,65 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared held-item dispatch
+
+The callback converter handles the two complete donor held-item tables using the
+same format/reference/relocation rules as player actions. Native main/draw tables
+grow from 21 to 24 entries without changing any original callback. Category 23
+contains the source fan's static main/draw behaviour; categories 21 and 22 remain
+null until balloon and pinwheel rigs are implemented. This does not select an
+item, enable action 109, or add a browser choice.
+
+The original zero-return callback supplies the source fan's empty item update.
+Its complete 20-byte native body is checked. Drawing emits the checked model's
+display list from either active equipment bank and clears the native rod-tip
+flag. Missing resources and invalid banks emit no command. The original outer
+drawer retains the hand matrix, scale, opaque stream, and segment-six binding.
+The donor balloon-start flag has no native storage; no unrelated field is used.
+The source net-angle reset is bound to the equivalent native `808BE140` routine,
+but its action-table registration remains pending.
+
+### Build and verification
+
+- ABI 103: `build/v3-held-item-dispatch-02/animal-forest-v3-asset-loader.z64`.
+- ROM SHA-256: `d9c84c537a1565986de459667e4428d9d0dadcf79a1f1ea7a1904eb03fd99f0b`.
+- UPS SHA-256: `b094874d1378dae030b81ea676792453da85e6fe67b3b483dc2fce742c1964a8`.
+- Receipt SHA-256: `de2265f41d8d0a54ab2db52452dc0e51e501e30d929eef907ff0a90eeb7f5842`.
+- Code: 1,908 bytes in the unchanged 8-KiB reservation. Both existing dispatch
+  entries and their 68-byte prefix remain; a `v1` variant supports native held
+  main calls. The 208-byte table block starts at `804A8430` inside the module.
+- Four held-table address relocations are removed, retaining original callbacks,
+  owner dimensions, and other relocations. Current total removals are 60.
+  The existing 17,584-byte player-relocation resource is updated in place inside
+  the blob; complete blob checksums include those changes before emission.
+- No allocations move or grow. Blob remains 3,517,632 bytes, with 611,136 free.
+  Startup remains 952 bytes. Sound programs, complete models/motions, 104 choices,
+  and saved format 2 are unchanged. Same-profile ABI-102/103 compatibility is
+  expected both ways and the actual codec passes; ordinary save/restart and
+  hardware are not newly tested. V3 saves are not for V2. Both patchers remain V2.
+
+Four focused checks pass in 5.822 seconds, including host sanitizers, both model
+banks, rejected missing/invalid resources, full source/callback tables,
+relocated owner references at two bases, resource retention, checksum accounting,
+and reconstructible patch. The existing shared native scenario takes the new
+held-category branch instead of repeating the unchanged sound/control tests.
+Twelve current optional-composition checks pass in 9.120 seconds, including exact
+no-import V2, all-import ABI 103, sparse profiles, dependencies, and the real codec.
+The native check's single attempt passes 58 records and 40 assertions. Results at
+`build/smoke-v3-held-item-dispatch-01/results.json` have SHA-256
+`86e2281bedc2fa7694f181f5f38de9a0cde5e9e3a1334e30212c2e261059fa54`;
+probe SHA-256 is `315ab11ef745f66b99a42c8605a51104a4114c61151c73f731d3a9c0b7eac2d5`.
+Verified: original/imported main dispatch, null/out-of-range results, complete
+tables, actual static draw commands in both banks, invalid-resource rejection,
+guards, unchanged profile, and checkpoint restoration. FlashRAM remains all
+`FF`, SHA-256 `b5a41c3758763bbec72769fab4a2533bf2db0b6312d93d25a695f9e4b9e02260`.
+No audio is played. Full scene rendering and ordinary equipped fan use remain
+unverified; the direct draw callback is not presented as either result.
+
+Continue outside-owner action checks, action 109 registration, four ordinary
+polling sites, profile-aware equipment selection, parent inventory/acquisition,
+catalogue identity, and persistence. Reuse current category records and passing
+evidence; do not add per-item installers or replay the unchanged sound batch.
+
 ## Shared sound programs and per-frame actions
 
 The existing player-action refresh adapter installs the fan's complete per-frame

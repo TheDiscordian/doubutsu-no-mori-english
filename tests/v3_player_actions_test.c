@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #define AF_V3_FAN_SOUND 0x167
+#define AF_V3_HELD_POINTER 0x804A3000u
 #include "../overlays/v3/player_actions.c"
 
 static u32 storage[0x12D8/4], backup[0x12D8/4];
@@ -9,6 +10,8 @@ static void *actor = storage, *game = (void *)0x1234;
 static int kind, demo, trigger_a, held_a, allowed, requests, settled, bee;
 static int walk_requests, wait_requests, polls, setup_calls, eye;
 static int sound_calls, stopped;
+static u32 model_pointer;
+static int model_shape;
 static s8 demo_controller[64];
 static float move_x, move_y, frames[4];
 static int init_args[4], events[32], event_count;
@@ -89,6 +92,7 @@ static void recover(void *a) { assert(a == actor); event(16); }
 static void correct(void *a, void *g) { assert(a == actor && g == game); event(17); }
 static void background(void *a) { assert(a == actor); event(18); }
 static void item(void *a, void *g) { assert(a == actor && g == game); event(19); }
+static u32 model(int shape) { model_shape = shape; return model_pointer; }
 void *af_test_player_function(u32 at) {
     switch (at) {
     case 0x800B1C84: return get_player;
@@ -119,6 +123,7 @@ void *af_test_player_function(u32 at) {
     case 0x808B4DAC: return correct;
     case 0x808B5FB0: return background;
     case 0x808BF410: return item;
+    case AF_V3_HELD_POINTER: return model;
     default: assert(!"Unexpected native player API"); return NULL;
     }
 }
@@ -195,6 +200,23 @@ int main(void) {
     assert(REAL(actor, 0x184) == 8 && bee == 1 && settled == 1 && !sound_calls);
     event_count = 0; af_v3_player_fan_main(actor, game);
     assert(wait_requests == 1 && WORD(actor, 0xD00) == 7);
+    struct { u8 padding[0x298]; u32 *cursor; } graph;
+    struct { void *graph; } draw_game = { &graph };
+    u32 display[6] = { 0x12345678, 0, 0, 0x87654321, 0, 0 };
+    graph.cursor = display+1; reset(); model_pointer = 0x06001230;
+    WORD(actor, 0xDEC) = 1; WORD(actor, 0xDE0) = 40; WORD(actor, 0xF44) = 1;
+    af_v3_player_draw_static_item(actor, &draw_game);
+    assert(model_shape == 40 && graph.cursor == display+3 && !WORD(actor, 0xF44));
+    assert(display[0] == 0x12345678 && display[1] == 0xDE000000 && display[2] == model_pointer);
+    assert(display[3] == 0x87654321);
+    model_pointer = 0; WORD(actor, 0xF44) = 1;
+    af_v3_player_draw_static_item(actor, &draw_game);
+    assert(graph.cursor == display+3 && !WORD(actor, 0xF44));
+    for (int bank = -1; bank <= 2; bank += 3) {
+        WORD(actor, 0xDEC) = bank; WORD(actor, 0xF44) = 1; model_shape = -1;
+        af_v3_player_draw_static_item(actor, &draw_game);
+        assert(model_shape == -1 && graph.cursor == display+3 && !WORD(actor, 0xF44));
+    }
     puts("shared player fan controls, native timing, per-frame flow, and sound pass");
     return 0;
 }

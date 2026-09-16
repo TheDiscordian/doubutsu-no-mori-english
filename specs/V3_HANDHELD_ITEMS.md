@@ -289,7 +289,7 @@ sound, and end-of-swing transitions. `overlays/v3/player_actions.c` resolves eac
 the currently loaded constructor; no heap address is captured at build time.
 The complete donor functions and every called native API are recorded and
 checked. The installed dispatch entries and all action tables stay unchanged.
-The code occupies 1,772 bytes of the existing 8-KiB code reservation. In-place
+The code occupies 1,908 bytes of the existing 8-KiB code reservation. In-place
 code refresh preserves animation banks, actor size, and save profile. The sound
 adapter appends a relocated complete sequence, retaining existing banks/samples.
 It adds no selectable items.
@@ -335,7 +335,7 @@ input, animation, frame-event sound, lean recovery, standing-object correction,
 background collision, held-item update, and end-of-swing requests. Sound triggers
 at frame `1.5` only when animation advances; a frozen frame cannot retrigger it.
 These functions are installed dependencies, not an enabled main action.
-Net-angle reset, drawing, ordinary polling, native item selection, and
+Net-angle reset registration, ordinary polling, native item selection, and
 profile/acquisition integration remain required. The action tables still reject
 every unfinished imported action.
 
@@ -358,6 +358,37 @@ The sequence grows by 32 bytes to 20,208 bytes; complete permanent-resource
 accounting leaves 224 bytes spare without enlarging the audio heap. Silent native
 verification covers loading, triggering, sample transfers, and the live per-frame
 callback. No listening, ordinary equipped-fan, or hardware result is claimed.
+
+### Held-item callback tables
+
+The same callback-table converter also handles the two held-item categories:
+main/update and drawing. It resolves the complete 24-entry donor tables through
+their real consumers and expands the native 21-entry tables without changing
+any original callback. The 208-byte table block lives at `804A8430`, inside the
+existing module, and does not enlarge any allocation. Four table-reference
+relocations are removed; native callback addresses remain linked and use the
+current-owner resolver. The main dispatcher needs a `v1` variant in addition to
+the existing `v0`/`t9` variants; all existing entry addresses remain unchanged.
+
+Index 23 provides fan main/draw. The source main returns zero; the checked native
+zero-return callback provides exactly that operation. Static held drawing emits
+one complete model display list using the selected equipment bank and shared
+resource getter. The original outer drawer retains hand matrix, item scale,
+opaque stream, and temporary segment-six setup/restoration. Invalid bank or
+missing model emits nothing. The native rod-tip flag at `F44` is cleared; the
+donor's separate balloon-start flag has no native storage and is not invented.
+Balloon and pinwheel indices 21 and 22 remain null pending their actual rigs.
+
+The donor fan net reset matches native `808BE140`: angles `(0, 182, -7281)`,
+fraction `0.2`, minimum `2730`, maximum `100`. The dependency is bound but not
+registered in action 109 yet. Main/draw availability is not item selection or
+fan-action activation. Ordinary polling, full scene rendering, profile-aware
+inventory, acquisition, and persistence still need integration.
+
+The refresh updates an already resident player relocation resource in place
+inside the import blob. Its reported blob checksum includes that change; it
+must not write the new relocation bytes only after computing the blob receipt.
+No owner, table, or audio allocation moves for this update.
 
 The current native player equipment selector is `808BD3F8..808BD583` in owner
 VROM `007AC420`, linked at `808B2D50`. Its 396 bytes have SHA-256
@@ -390,7 +421,7 @@ action entries are `.text:1962B0` and `.text:1965A4`; the controller check is
 `.text:164628`. The full player wait/swing animation descriptors are
 `.data:16A2A8` and `.data:16A49C`. Those animations, the split-body fan mask,
 per-frame callback, drawing, and sound define the action's dependencies. The
-callback and sound are installed as described above; drawing remains work. The complete
+callback, sound, and held drawing are installed as described above. The complete
 wait/swing and tumble/get-up data is installed through the shared animation readers; it is not
 connected to dispatched player actions yet. Prepared controls and setup do not
 make the complete handheld item selectable or playable.

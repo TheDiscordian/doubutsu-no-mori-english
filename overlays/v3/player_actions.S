@@ -30,3 +30,13 @@ af_v3_player_action_t9:
     jr $t9
     nop
 .end af_v3_player_action_v0
+
+/* Held-item main dispatch uses v1; retain both existing entry addresses. */
+.section .text.af_v3_player_action_v1,"ax",@progbits
+.globl af_v3_player_action_v1
+.ent af_v3_player_action_v1
+af_v3_player_action_v1:
+    move $t9, $v1
+    j af_v3_player_action_t9
+    nop
+.end af_v3_player_action_v1

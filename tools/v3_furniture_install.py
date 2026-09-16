@@ -450,7 +450,7 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             or struct.unpack_from('>4I',blob,0xF0)!=(BLOB+PACKAGE,PACKAGE_SIZE,zlib.crc32(package),PACKAGE_RAM)):
         raise ValueError('Changed shared runtime package')
     output.mkdir(parents=True)
-    moved=[];equipment_report=None;reused=None;owner_changes={};owner_moves=[]
+    moved=[];equipment_report=None;reused=None;owner_changes={};owner_moves=[];owner_updates=[]
     if sum((equipment_art is not None,player_motion,equipment_kinds,player_actions))>1:
         raise ValueError('Install equipment resources, player motion, and kind readers in dependency order')
     if equipment_art is not None or player_motion or equipment_kinds or player_actions:
@@ -481,6 +481,16 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
                 owner_moves.append(dict(vrom=vrom,blob_offset=at,bytes=len(data),
                     physical=files[BLOB].pstart+at,sha256=sha256(data),
                     original_sha256=sha256(entry.extract(base))))
+            elif files[BLOB].pstart<=entry.pstart<files[BLOB].pstart+len(blob):
+                # An earlier refresh can already own uncompressed overlay
+                # relocations inside the import blob. Update that same copy so
+                # startup/report checksums describe the actual emitted bytes.
+                at=entry.pstart-files[BLOB].pstart
+                if blob[at:at+len(data)]!=entry.extract(base):
+                    raise ValueError('In-place owner update overlaps another changed resource')
+                blob[at:at+len(data)]=data
+                owner_updates.append(dict(vrom=vrom,blob_offset=at,bytes=len(data),
+                    sha256=sha256(data),original_sha256=sha256(entry.extract(base))))
         for row in sorted(reused['retired_resources'],key=lambda r:r['blob_offset']):
             data=files[row['vrom']].extract(base)
             blob.extend(bytes(-len(blob)%16));at=len(blob);blob.extend(data)
@@ -555,6 +565,7 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             resource_allocations_changed=bool(owner_moves or len(blob)!=len(old_blob)
                 or any(row['physical']!=files[row['vrom']].pstart for row in moved)),resource_tail_reuse=reused,
             unchanged_owner_moves=moved,changed_owner_moves=owner_moves,
+            in_place_owner_updates=owner_updates,
             additional_resident_bytes=equipment_report['bytes']-prior.get('equipment_resources',{}).get('bytes',0))
         if player_motion:
             report['shared_runtime_refresh']['adapters'].append('player_motion')

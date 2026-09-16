@@ -2,6 +2,20 @@
 
 ## Active development
 
+ABI 103 extends the shared callback converter to the held-item main/draw tables.
+All 21 original entries remain intact; fan category 23 uses complete static
+held-model drawing, and balloon/pinwheel entries remain disabled. The existing
+module holds the 208-byte tables and 1,908-byte code without growing or moving
+allocations. Four focused checks pass, including sanitizer-covered draw bounds,
+source tables, owner relocation, complete blob checksums, and patch reconstruction.
+The silent native run passes 58 records with 40 passing assertions, including
+actual main dispatch, both draw banks, invalid-model/bank rejection, memory
+guards, saved-profile retention, and checkpoint restoration. Full scene rendering
+and ordinary equipped-fan gameplay remain untested. See the
+[checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-held-item-dispatch).
+Twelve current composition checks pass, including exact no-import V2 and
+all-import ABI 103, dependencies, sparse profiles, and the real save codec.
+
 ABI 102 adds the complete fan per-frame callback and a reusable single-layer
 sound-program converter. Source pitch sweep, envelope, timing, and priority are
 retained; the complete instrument/sample already exists in N64. Registration
@@ -19,7 +33,7 @@ No speakers/headphones or user saves are used. See the
 Twelve current optional-composition checks also pass, including exact no-import
 V2, all-import ABI 102, sparse profiles, dependencies, and the real save codec.
 
-Fan callbacks and polling hooks remain disabled until drawing, net-angle reset,
+Fan action callbacks and polling hooks remain disabled until net-angle reset,
 selected inventory, and acquisition are connected. No new selectable items are
 added. Continue those shared dependencies and the outside-owner action audit;
 do not repeat passing component checks or create per-item scripts. Ordinary
@@ -109,10 +123,10 @@ including all rotations, English names, prices, native footprints, independent
 selection rejection, original fallbacks, restored state, and guards. See the
 [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md).
 
-Current development uses ABI 102 at
-`build/v3-player-frame-sound-01/animal-forest-v3-asset-loader.z64`, pinned by
+Current development uses ABI 103 at
+`build/v3-held-item-dispatch-02/animal-forest-v3-asset-loader.z64`, pinned by
 `config/v3-import-build.json`. The 104 choices and saved format 2 are unchanged.
-Same-profile compatibility with ABI 101 is expected in both directions; this
+Same-profile compatibility with ABI 102 is expected in both directions; this
 batch does not claim another ordinary save/restart or hardware playthrough.
 The 48 additional donor aliases still need native parent support and integration;
 prepared artwork alone is not a completed import. Both served patchers remain V2.

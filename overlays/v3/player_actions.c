@@ -21,6 +21,29 @@ extern void *af_test_player_function(u32 address);
 #define WORD(p, at) (*(int *)((u8 *)(p) + (at)))
 #define REAL(p, at) (*(float *)((u8 *)(p) + (at)))
 
+#ifdef AF_V3_HELD_POINTER
+/* The common native draw dispatcher supplies the hand matrix, scale, opaque
+   stream, and temporary segment-six binding. A static held fan only emits its
+   complete model; it does not borrow an axe/shovel's collision-point update. */
+void af_v3_player_draw_static_item(void *actor, void *game) {
+    int bank = WORD(actor, 0xDEC);
+    if ((u32)bank < 2u) {
+        int shape = WORD(actor, 0xDDC + bank * 4);
+        u32 model = FN(AF_V3_HELD_POINTER, u32, int)(shape);
+        if (model) {
+            void *graph = *(void **)game;
+            u32 **cursor = (u32 **)((u8 *)graph + 0x298);
+            u32 *command = *cursor;
+            command[0] = 0xDE000000u;
+            command[1] = model;
+            *cursor = command + 2;
+        }
+    }
+    /* N64 has the rod-tip flag but no balloon-start flag. Balloon ownership
+       and its additional rig/state are a separate unimplemented category. */
+    WORD(actor, 0xF44) = 0;
+}
+#endif
 enum { FAN_ACTION = 109, FAN_FIRST_KIND = 107, FAN_KINDS = 8 };
 
 int af_v3_player_fan_controller(void *game, int trigger) {
