@@ -433,7 +433,7 @@ def build(output, art_path, lock=LOCK):
     return report
 
 
-def refresh_runtime(output, lock=LOCK, *, equipment_art=None):
+def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=False):
     """Update shared readers; optionally install the shared held-resource adapter."""
     output=output.resolve()
     if output.exists() or not output.is_relative_to(ROOT/'build'):
@@ -449,8 +449,10 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None):
             or struct.unpack_from('>4I',blob,0xF0)!=(BLOB+PACKAGE,PACKAGE_SIZE,zlib.crc32(package),PACKAGE_RAM)):
         raise ValueError('Changed shared runtime package')
     output.mkdir(parents=True)
-    moved=[];equipment_report=None;reused=None
-    if equipment_art is not None:
+    moved=[];equipment_report=None;reused=None;owner_changes={}
+    if equipment_art is not None and player_motion:
+        raise ValueError('Install held resources before extending player motion')
+    if equipment_art is not None or player_motion:
         blob,reused=reuse_resource_tail(base,prior,old_blob)
         if not reused['reused_bytes']:
             raise ValueError('Equipment integration requires the checked shared resource tail')
@@ -458,6 +460,10 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None):
     if equipment_art is not None:
         import v3_equipment_runtime as equipment
         equipment_report=equipment.install(prior,blob,core,original,output,equipment_art)
+    elif player_motion:
+        import v3_equipment_runtime as equipment
+        equipment_report,owner_changes=equipment.install_player_motion(base,prior,blob,core,original,output)
+    if equipment_report:
         for row in sorted(reused['retired_resources'],key=lambda r:r['blob_offset']):
             data=files[row['vrom']].extract(base)
             blob.extend(bytes(-len(blob)%16));at=len(blob);blob.extend(data)
@@ -469,6 +475,7 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None):
     defines=tuple(f[2:] if not f.startswith('-DAF_V3_ABI=') else f'AF_V3_ABI={abi}'
         for f in old['flags'] if f.startswith('-D'))
     if equipment_report:
+        defines=tuple(f for f in defines if not f.startswith(('AF_V3_EQUIPMENT_VROM=','AF_V3_EQUIPMENT_CRC=')))
         defines+=(f'AF_V3_EQUIPMENT_VROM=0x{equipment_report["vrom"]:08X}u',
                   f'AF_V3_EQUIPMENT_CRC=0x{equipment_report["crc32"]:08X}u')
     startup,startup_report=compile_part('startup',output/'startup',defines=defines)
@@ -486,7 +493,7 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None):
                 or any(e.vstart<BLOB+len(blob) and BLOB+len(old_blob)<e.vend
                        for v,e in files.items() if v!=BLOB)):
             raise ValueError('Equipment resource growth overlaps live cartridge data')
-    for vrom,data in ((BLOB,blob),(CODE_VROM,core),(MODULE,module)):
+    for vrom,data in ((BLOB,blob),(CODE_VROM,core),(MODULE,module),*owner_changes.items()):
         entry=files[vrom]
         if entry.pend or entry.size!=len(data) and not (equipment_report and vrom==BLOB):
             raise ValueError('Runtime update changes an undeclared resource allocation')
@@ -526,7 +533,9 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None):
         report['import_storage']['remaining_bytes']=END-BLOB-len(blob)
         report['shared_runtime_refresh'].update(adapters=['display_aliases','equipment_resources'],
             resource_allocations_changed=True,resource_tail_reuse=reused,
-            unchanged_owner_moves=moved,additional_resident_bytes=equipment_report['bytes'])
+            unchanged_owner_moves=moved,additional_resident_bytes=equipment_report['additional_resident_bytes'])
+        if player_motion:
+            report['shared_runtime_refresh']['adapters'].append('player_motion')
         report['sources'].update({p:sha256((ROOT/p).read_bytes()) for p in equipment.SOURCES})
         report['native_test']='pending shared equipment resource DMA/readers'
     write_new(output/'animal-forest-v3-asset-loader.z64',result)
@@ -548,8 +557,11 @@ if __name__=='__main__':
     parser.add_argument('--base-lock',type=Path,default=LOCK)
     parser.add_argument('--equipment-art',type=Path,
         help='With --refresh-runtime, install prepared shared held models and source-derived motion resources')
+    parser.add_argument('--player-motion',action='store_true',
+        help='With --refresh-runtime, extend the installed held module with complete player motions and split-body masks')
     args=parser.parse_args()
     if args.equipment_art and not args.refresh_runtime:parser.error('--equipment-art requires --refresh-runtime')
-    result=(refresh_runtime(args.output,args.base_lock,equipment_art=args.equipment_art)
+    if args.player_motion and not args.refresh_runtime:parser.error('--player-motion requires --refresh-runtime')
+    result=(refresh_runtime(args.output,args.base_lock,equipment_art=args.equipment_art,player_motion=args.player_motion)
             if args.refresh_runtime else build(args.output,args.art,args.base_lock))
     print(json.dumps({k:result[k] for k in ('runtime_abi','output_sha256','patch_sha256')},indent=2))

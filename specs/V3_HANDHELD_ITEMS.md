@@ -125,7 +125,7 @@ sixteen independently packed animations occupy 31,584 bytes. Their indices are
 `17 + source resource index`; native indices `0..16` keep their original
 meanings. Fifty fixed source slots preserve holes for unsupported skeletons.
 This installs no new inventory identity, equipment kind, action, or choice.
-Player holding/swing animations remain prepared separately, not installed here.
+Player holding/swing animations use the additional shared adapter below.
 
 Five native resource getters at `800B12C8`, `800B12F4`, `800B131C`, `800B1614`,
 and `800B1650` delegate to shared readers. They supply model/animation pointers,
@@ -153,12 +153,47 @@ flush covering the complete accessory package keep startup at 952 bytes inside
 the unchanged 992-byte reservation. The linker still rejects overlaps; no guard,
 configuration, or call-return scratch space is repurposed.
 
+### Player motion and split-body masks
+
+The existing importer extends an installed held-resource module with
+`--refresh-runtime --player-motion`. Eight complete player animations occupy
+2,256 additional ROM bytes: the equipment holding poses, pinwheel holding,
+fan idle, and fan swing. They use stable indices `130 + source animation index`;
+native indices `0..129` are unchanged. Sparse slots preserve the donor's complete
+157-index namespace. Every object has 26 joints and fits the existing 3,848-byte
+player-animation buffer; no actor size or permanent allocation grows.
+
+`AFPM` version-one records live at module offset `1340`, using the same
+16-byte resource format with `type` holding the source's default part-mask index.
+The extra donor mask's 27 bytes live at offset `1FD0`. The source's complete
+part-index function/table and mask-copy function are verified. All four native
+masks equal their donor counterparts; native copying is retained through a
+guarded prologue bridge at module offset `FE0`. Only mask index four uses the
+new donor data. **The fan swing explicitly requests mask four in its action
+initializer; its generic animation-to-part lookup returns three.** Preserve this
+distinction when implementing the action, rather than changing the default table.
+
+Core size/origin/VROM readers at `800B11B0`, `800B1264`, and `800B1D68` support
+the sparse imported records. The existing animation DMA and segment-bias
+functions stay intact. Mask copying at `800B1DE8` preserves the original path
+for indices `0..3`; invalid indices remain no-ops. The player owner's pointer
+getter `808B468C` and default-part getter `808B5B38` retain their native tables
+and every HI/LO relocation. Their out-of-native-range paths delegate to the
+shared module. No animation index limit is raised over an unchanged short table.
+
+The complete module has 1,304 code bytes inside its existing reservation.
+Original equipment hooks are rebound to the compiled symbols; existing models,
+motions, and native table meanings stay intact. Footstep/event readers whose
+native limit is 130 continue to reject imported animations; action-specific
+sound needs its explicit donor timing, not an unrelated original sound table.
+This installs resource readers and masks, not player actions or selectable fans.
+
 ### Player ownership and actions
 
 The current native player equipment selector is `808BD3F8..808BD583` in owner
 VROM `007AC420`, linked at `808B2D50`. Its 396 bytes have SHA-256
 `3e1e9584685cef3dcb81e6fe99ef412ddc49fd4a8df74901f55b1742f234258b` in both the
-original and current ABI-97 cartridge. It reads ordinary saved equipment at
+original and current ABI-98 cartridge. It reads ordinary saved equipment at
 player-private offset `3EC`, or title-demo equipment at controller offset `3C`.
 It accepts only `2200..2223`, using a 36-entry jump table at `808E0274` with
 SHA-256 `b46dbe4b89cb5647022dddcf27baa8e2ca8ea5ffc73c02a249f32b3c695c6af1`.
@@ -186,8 +221,9 @@ action entries are `.text:1962B0` and `.text:1965A4`; the controller check is
 `.text:164628`. The full player wait/swing animation descriptors are
 `.data:16A2A8` and `.data:16A49C`. Those animations, the split-body fan mask,
 button/timing behaviour, and sound still need native integration. The complete
-wait/swing data is in the prepared motion bundle; it is not connected to native
-player actions yet. Prepared held graphics and motion data do not implement them.
+wait/swing data is installed through the shared animation readers; it is not
+connected to native player actions yet. Held graphics and motion data do not
+implement the controller/request/action flow on their own.
 
 Inventory/ground readers, official names and prices, acquisition, context-correct
 catalogue/collection integration, optional selection, and save/profile handling

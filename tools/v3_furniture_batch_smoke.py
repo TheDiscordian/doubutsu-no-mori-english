@@ -29,6 +29,7 @@ def representatives(rows):
 
 def exercise(debug, rom_path, record, *, section='automatic_furniture'):
     if section=='equipment_resources':return equipment_resources(debug,rom_path,record)
+    if section=='player_motion':return player_motion(debug,rom_path,record)
     path = Path(rom_path)
     image = path.read_bytes()
     report = json.loads((path.parent / 'build.json').read_bytes())
@@ -478,4 +479,89 @@ def equipment_resources(debug,rom_path,record):
     finally:call(0x8009C040,[allocation])
     return dict(native_equipment_resources=True,representative_transfers=len(rows),assertions=assertions,
         imported_categories=len(selected),ordinary_menu_reload_tested=False,player_actions_tested=False,
+        hardware_tested=False,flash_written=False,requires_checkpoint_restore=True)
+
+
+def player_motion(debug,rom_path,record):
+    """Load the actual player owner and exercise its shared animation category."""
+    import v3_equipment_runtime as equipment
+    path=Path(rom_path);image=path.read_bytes();report=json.loads((path.parent/'build.json').read_bytes())
+    if sha256(image)!=report['output_sha256']:raise ValueError('Changed player-motion cartridge')
+    resources=report['equipment_resources'];motion=resources['player_motion']
+    files=by_vrom(image);blob=files[runtime.BLOB].extract(image);boot=boot_proofs(image);assertions=0
+    def check(label,at,want):
+        nonlocal assertions
+        got=debug.read_memory(at,len(want));passed=got==want
+        record(dict(player_motion_check=label,address=f'{at:08X}',bytes=len(want),
+            assertion='passed' if passed else 'failed',observed_sha256=sha256(got),expected_sha256=sha256(want)))
+        if not passed:raise ValueError('Player motion mismatch: '+label)
+        assertions+=1
+    def call(at,args=(),want=None,proof=None):
+        nonlocal assertions
+        result=debug.call(f'{at:08X}',list(args),return_address=MODULE_RAM+0x6480,verified_code=proof or boot.get(at))
+        if want is not None:
+            result['assertion']='passed' if result['return_value']==want else 'failed';assertions+=1
+        record(result)
+        if want is not None and result['return_value']!=want:raise ValueError(f'Player motion call {at:08X} mismatch')
+        return result['return_value']
+    at=resources['blob_offset'];check('complete extended resident module',equipment.RAM,blob[at:at+equipment.SIZE])
+    saved=debug.read_memory(0x8046C000,864)
+    constructor=struct.unpack('>I',debug.read_memory(0x80143900,4))[0]
+    owner=constructor-(0x808DD748-equipment.PLAYER_RAM)
+    data=files[equipment.PLAYER_VROM].extract(image);reloc=files[equipment.PLAYER_RELOC].extract(image)
+    if owner&15 or not MODULE_RAM+0x8000<=owner<=0x80400000-len(data):
+        raise ValueError('Native player constructor does not identify a loaded owner')
+    size=0x1100;allocation=call(0x8009BFC0,[size]);target=allocation+16
+    if allocation&15 or not MODULE_RAM+0x8000<=allocation<=0x80400000-size:
+        raise ValueError('Player-motion allocation outside native heap')
+    sections=struct.unpack_from('>5I',reloc)
+    spec=SimpleNamespace(ram=equipment.PLAYER_RAM,resident_bytes=len(data),sections=sections)
+    expected=relocate_verified_data(spec,data,reloc,owner)
+    edge=b'V3PM'*4;end=target+equipment.PLAYER_CAPACITY
+    for address in (allocation,target-16,end,allocation+size-16):debug.write_memory(address,edge)
+    try:
+        check('actual game-loaded player code and relocations',owner,expected[:sections[0]])
+        record(dict(game_loaded_player_owner=f'{owner:08X}',constructor=f'{constructor:08X}'))
+        pointer=owner+0x808B468C-equipment.PLAYER_RAM;part=owner+0x808B5B38-equipment.PLAYER_RAM
+        pointer_proof=(pointer,expected[pointer-owner:pointer-owner+56])
+        part_proof=(part,expected[part-owner:part-owner+40])
+        # Distinct constant holding, toy holding, fan idle, and fan waving data.
+        selected={}
+        for row in motion['records']:
+            key=(bool(row['source']['keyed_channels']),row['type'],row['source']['duration'])
+            selected.setdefault(key,row)
+        rows=list(selected.values());native=files[0x00B36000].extract(image)
+        for index in (0,129):
+            origin=motion['bounds'][index]-0x06000000+8;n=motion['bounds'][index+1]-motion['bounds'][index]-8
+            rows.append(dict(index=index,origin=origin,bytes=n,vrom=0x00B36000+origin,
+                pointer=struct.unpack_from('>I',data,0x808DE268-equipment.PLAYER_RAM+4*index)[0],
+                type=data[0x808DE4C4-equipment.PLAYER_RAM+index],expected=native[origin:origin+n]))
+        for row in rows:
+            index=row['index'];origin=row.get('origin',0)
+            call(pointer,[index],row['pointer'],pointer_proof);call(part,[index],row['type'],part_proof)
+            for address,want in ((0x800B11B0,row['bytes']),(0x800B1264,origin),(0x800B1D68,row['vrom'])):
+                call(address,[index],want)
+            fill=bytes([0xA5])*equipment.PLAYER_CAPACITY;debug.write_memory(target,fill)
+            call(0x800B1D94,[target,index])
+            wanted=row.get('expected')
+            if wanted is None:wanted=blob[row['blob_offset']:row['blob_offset']+row['bytes']]
+            check('complete player animation DMA and untouched tail',target,wanted+fill[len(wanted):])
+            call(0x800B12A0,[index,target],target-origin)
+        masks=files[0x00B8A000].extract(image)
+        for index in range(5):
+            debug.write_memory(target,bytes([0xA5])*32);call(0x800B1DE8,[target,index])
+            mask=masks[index*28:index*28+27] if index<4 else bytes.fromhex(motion['mask_hex'])
+            check('native or donor split-body mask',target,mask+bytes([0xA5])*5)
+        for index in (0xFFFFFFFF,130,287):
+            call(pointer,[index],0,pointer_proof);call(part,[index],0xFFFFFFFF,part_proof);call(0x800B11B0,[index],0)
+        for row in (resources['records'][0],):
+            call(0x800B12C8,[row['index']],row['pointer']);call(0x800B131C,[row['index']],row['bytes'])
+        call(0x800B12C8,[0],resources['native_contract']['pointers'][0])
+        for address in (allocation,target-16,end,allocation+size-16):check('private owner or animation guard',address,edge)
+        check('saved profile unchanged',0x8046C000,saved)
+        check('no CPU fault',0x8003CE34,bytes(4));check('translation guard',0x8019C8D0,bytes.fromhex('AF32C0DE')*4)
+        check('equipment guard',equipment.RAM+equipment.SIZE-16,struct.pack('>4I',*([equipment.GUARD]*4)))
+    finally:call(0x8009C040,[allocation])
+    return dict(native_player_motion_resources=True,representative_transfers=len(rows),part_masks=5,
+        assertions=assertions,player_actions_tested=False,ordinary_menu_reload_tested=False,
         hardware_tested=False,flash_written=False,requires_checkpoint_restore=True)

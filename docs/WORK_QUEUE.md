@@ -2,19 +2,21 @@
 
 ## Active: V3 optional GameCube imports
 
-ABI 97 installs shared held-resource loading: fourteen complete models and
-sixteen equipment animations, 31,584 resource bytes plus an 8-KiB resident module.
-The checked current build is `build/v3-equipment-resources-runtime-03/`.
-Eighteen focused host/cartridge/composition checks and the first silent native
-run pass; nine representative transfers cover static models, four animation
-types, and original equipment. Reuse those results. No item is enabled by this
-resource batch. Next connect native equipment-kind selection and indexed
-readers, player holding/action animations, proper fan waving, and selected-only
-inventory/acquisition/profile handling. Audit combined model/animation sizes
+ABI 98 installs the eight complete player holding/action animations and the fan
+split-body mask through the existing shared module. The checked current build
+is `build/v3-player-motion-runtime-01/`. Seventeen focused checks pass, as does
+the corrected native run: 102 records and 79 assertions using the actual loaded
+player owner. Reuse these results and the retained held-resource evidence;
+fourteen models and sixteen equipment animations remain intact. No item is
+enabled by loading its resources. Next connect native equipment-kind selection
+and indexed readers, proper fan controller/request/action flow, source-timed
+sound, and selected-only inventory/acquisition/profile handling. The fan action
+explicitly uses mask four, while its generic animation-part lookup returns
+three; preserve the donor's explicit initializer argument. Audit combined model/animation sizes
 and joint work buffers before enabling rigs; the native actor has seven vectors,
 where the donor has eight. Do not flatten animated models or borrow unrelated
 actions. The 104 existing choices, saved format 2, and both V2 patchers remain
-unchanged. See the [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#native-held-resource-loading).
+unchanged. See the [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#native-player-motion-and-part-masks).
 
 Reuse `build/v3-held-motion-prepared-01/held-motion.n64obj.bin` for native
 motion integration. Its complete twenty-four animations occupy 7,760 bytes;
@@ -29,7 +31,7 @@ Pinwheel graphics preflight succeeds, but complete rig/model packing and action
 ownership remain work. Keep real inventory/readers/acquisition/profile and
 context-correct catalogue dependencies; motion data alone enables no item.
 Fourteen focused source/packing checks pass. Equipment resource loading uses
-the native adapter above; player motions and complete rigs remain integration work.
+the native adapters above; actual player actions and complete rigs remain work.
 
 Continue native equipment integration using the
 [shared handheld records](../specs/V3_HANDHELD_ITEMS.md), not per-item scripts.

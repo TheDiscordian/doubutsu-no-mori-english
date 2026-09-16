@@ -4,6 +4,7 @@ This installs resources, not inventory identities or player action support.
 All item choices and saved profiles remain unchanged.
 """
 import json
+import copy
 import struct
 import zlib
 
@@ -12,7 +13,7 @@ from v3_asset_loader import BLOB, ROOT, compile_part
 from v3_import_storage import PACKAGE_RAM, END, jump
 from v3_campsite_calendar import PACKAGE_SIZE
 from v3_furniture_pipeline import Source, prepare_models
-from v3_handheld_items import scan, descriptor, motion
+from v3_handheld_items import scan, descriptor, motion, selector_tables
 from v3_keyframes import compile_animations
 from v3_npc_clothing import guard_incoming
 
@@ -28,6 +29,50 @@ ENTRIES = (
     (0x800B1614,0x800B1650,'af_v3_equipment_origin'),
     (0x800B1650,0x800B167C,'af_v3_equipment_vrom'),
 )
+PLAYER_VROM, PLAYER_RELOC, PLAYER_RAM = 0x007AC420, 0x007D9BA0, 0x808B2D50
+PLAYER_TABLE, PLAYER_MASK, PLAYER_BRIDGE = 0x1340, 0x1FD0, 0xFE0
+PLAYER_FIRST, PLAYER_COUNT, PLAYER_CAPACITY = 130, 157, 3848
+PLAYER_ENTRIES = (
+    (0x800B11B0,0x800B11F8,'af_v3_player_animation_size'),
+    (0x800B1264,0x800B12A0,'af_v3_player_animation_origin'),
+    (0x800B1D68,0x800B1D94,'af_v3_player_animation_vrom'),
+    (0x800B1DE8,0x800B1E94,'af_v3_player_part_copy'),
+)
+
+
+def player_resources(source, original):
+    """Complete holding/action motions and the donor's actual split-body masks."""
+    description=motion(source)
+    functions,tables,values=selector_tables(source,{
+        'player_part':(0x68A9C,'mPlib_Get_BasicPartTableIndex_fromAnimeIndex',44,
+            'b86a74a6d599ce78aab4e428b83f87f14124396a953d3d3b5b3fd11b5f7b50bf',4,0x16),
+    })
+    raw,copy_function=source.function(0x69564)
+    if (copy_function['symbol']!='mPlib_DMA_player_Part_Table' or len(raw)!=72
+            or sha256(raw)!='d43cd9bfc9489ee7958373c5b3a0cf1e91f370882fe91357dff62eef7a297425'
+            or copy_function['relocations']!={0x34:(10,0,4,0x8005D01C),
+                0x22:(6,1,5,0x188A60),0x2A:(4,1,5,0x188A60)}):
+        raise ValueError('Changed complete player part-mask consumer')
+    masks=source.raw('BOY_part_data')
+    if len(masks)!=135 or sha256(masks)!='550af4a04ef29a6fc44c0741264230eff559c65d7b3a02456b1fb15cd305ae87':
+        raise ValueError('Changed complete player part masks')
+    native=by_vrom(original)[0x00B8A000].extract(original)
+    if len(native)!=112 or any(native[i*28:i*28+27]!=masks[i*27:i*27+27] for i in range(4)):
+        raise ValueError('Native and donor split-body conventions disagree')
+    records=[];assets={}
+    for index,row in description['player_animations'].items():
+        asset,compiled=compile_animations(source,[row]);part=values['player_part'][index]
+        if (not 0<=index<PLAYER_COUNT or not 0<len(asset)<=PLAYER_CAPACITY
+                or len(asset)%16 or part>=5 or row['joints']!=26):
+            raise ValueError('Player animation exceeds native buffer/rig or part table')
+        assets[index]=asset
+        records.append(dict(source_index=index,index=PLAYER_FIRST+index,bytes=len(asset),
+            pointer=0x06000000+compiled['headers'][0]['native_offset'],type=part,
+            sha256=sha256(asset),source=row,compiled=compiled))
+    return assets,records,masks[108:],dict(functions=functions,tables=tables,
+        copy_function=copy_function,masks_sha256=sha256(masks),native_masks_sha256=sha256(native),
+        native_masks_retained=True,animation_capacity=PLAYER_CAPACITY,
+        source_rel_sha256=sha256(source.rel),source_symbols_sha256=sha256(source.symbols.encode()))
 
 
 def prepared_resources(source, art_path):
@@ -142,3 +187,94 @@ def install(prior, blob, core, original, output, art_path):
         additional_resident_bytes=SIZE,saved_format_changed=False,saved_profile_changed=False,
         item_bank_bytes_changed=False,logical_imports_added=0,player_actions_installed=False,
         ordinary_menu_reload_tested=False,web_patcher_enabled=False)
+
+
+def install_player_motion(base,prior,blob,core,original,output):
+    """Extend the existing category module and the native player's readers."""
+    from v3_npc_draw import relocation_offsets
+    old=prior.get('equipment_resources')
+    if not old or old.get('player_motion'):
+        raise ValueError('Player motion needs one complete, not-yet-extended held-resource module')
+    at=old['blob_offset'];module=bytearray(blob[at:at+SIZE])
+    if (len(module)!=SIZE or sha256(module)!=old['sha256'] or old['ram']!=RAM
+            or old['vrom']!=BLOB+at or old['bytes']!=SIZE
+            or any(module[PLAYER_BRIDGE:TABLE]) or any(module[PLAYER_TABLE:SIZE-16])):
+        raise ValueError('Changed equipment module or occupied player reservations')
+    source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+                  (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    assets,records,mask,evidence=player_resources(source,original)
+    native=by_vrom(original);files=by_vrom(base);native_core=native[CODE_VROM].extract(original)
+    ranges=[(a,b) for a,b,_ in PLAYER_ENTRIES]+[(0x800B11F8,0x800B1264),
+        (0x800B12A0,0x800B12C8),(0x800B1D94,0x800B1DE8),(0x8010BD20,0x8010BF30)]
+    for a,b in ranges:
+        if core[a-CODE_RAM:b-CODE_RAM]!=native_core[a-CODE_RAM:b-CODE_RAM]:
+            raise ValueError('Changed native player animation consumer/table')
+    bounds=struct.unpack_from('>131I',native_core,0x8010BD20-CODE_RAM)
+    if max(b-a-8 for a,b in zip(bounds,bounds[1:]))!=PLAYER_CAPACITY:
+        raise ValueError('Changed native player animation buffer capacity')
+    for row in records:
+        blob.extend(bytes(-len(blob)%16));position=len(blob);blob.extend(assets[row['source_index']])
+        row.update(vrom=BLOB+position,blob_offset=position)
+    code,compiled=compile_part('equipment_resources',output/'equipment_resources',defines=('AF_V3_PLAYER_MOTION=1',))
+    if len(code)>PLAYER_BRIDGE:raise ValueError('Player resource helper exceeds code reservation')
+    module[:TABLE]=code+bytes(TABLE-len(code))
+    struct.pack_into('>4I',module,PLAYER_TABLE,0x4146504D,1,PLAYER_COUNT,16)
+    for row in records:
+        struct.pack_into('>4I',module,PLAYER_TABLE+16+16*row['source_index'],
+                         row['vrom'],row['bytes'],row['pointer'],row['type'])
+    module[PLAYER_MASK:PLAYER_MASK+27]=mask
+    # The native part-copy prologue contains no PC-relative instructions.
+    bridge=core[0x800B1DE8-CODE_RAM:0x800B1DF0-CODE_RAM]
+    if bridge!=bytes.fromhex('27BDFF80AFBF001C'):raise ValueError('Changed native part-copy prologue')
+    module[PLAYER_BRIDGE:PLAYER_BRIDGE+16]=bridge+struct.pack('>II',jump(0x800B1DF0),0)
+    hooks=[]
+    old_hooks={r['entry']:r for r in old['hooks']}
+    guard_incoming(bytes(core),len(core),CODE_RAM,[(a-CODE_RAM,8) for a,_,_ in PLAYER_ENTRIES])
+    for entry,end,name in (*ENTRIES,*PLAYER_ENTRIES):
+        offset=entry-CODE_RAM;before=bytes(core[offset:offset+8])
+        if entry in old_hooks and before.hex()!=old_hooks[entry]['after']:
+            raise ValueError('Changed installed held-resource hook')
+        target=compiled['symbols'][name]
+        if not RAM<=target<RAM+PLAYER_BRIDGE:raise ValueError('Player resource hook exceeds code reservation')
+        after=struct.pack('>II',jump(target),0);core[offset:offset+8]=after
+        hooks.append(dict(entry=entry,end=end,helper=name,target=target,before=before.hex(),after=after.hex()))
+    owner=bytearray(files[PLAYER_VROM].extract(base));native_owner=native[PLAYER_VROM].extract(original)
+    reloc=files[PLAYER_RELOC].extract(base)
+    if reloc!=native[PLAYER_RELOC].extract(original):raise ValueError('Changed player relocation resource')
+    slots=relocation_offsets(reloc,len(owner));owner_hooks=[]
+    specs=((0x808B468C,0x808B46C4,'af_v3_player_animation_pointer',(16,24)),
+           (0x808B5B38,0x808B5B60,'af_v3_player_animation_part',(12,24)))
+    guard_incoming(owner,struct.unpack_from('>I',reloc)[0],PLAYER_RAM,
+                   [(a-PLAYER_RAM,b-a) for a,b,_,_ in specs])
+    for start,end,name,retained in specs:
+        off=start-PLAYER_RAM;n=end-start;before=bytes(owner[off:off+n])
+        if (before!=native_owner[off:off+n]
+                or slots & set(range(off,off+n,4))!={off+i for i in retained}):
+            raise ValueError('Changed player animation getter/relocations')
+        words=list(struct.unpack('>'+str(n//4)+'I',before))
+        if name.endswith('pointer'):
+            # Native pointer HI/LO remain at offsets 16 and 24.
+            patch=[0x2C810082,0x10200008,0x00047080,0,*words[4:7],
+                   0x03E00008,0x00601025,0,jump(compiled['symbols'][name]),0,0,0]
+        else:
+            # Native part-table HI/LO remain at offsets 12 and 24.
+            patch=[0x2C810082,0x10200006,0,*words[3:7],0,jump(compiled['symbols'][name]),0]
+        after=struct.pack('>'+str(len(patch))+'I',*patch)
+        if len(after)!=n or any(after[i:i+4]!=before[i:i+4] for i in retained):
+            raise ValueError('Player getter changed its relocated native table binding')
+        owner[off:off+n]=after
+        owner_hooks.append(dict(entry=start,end=end,helper=name,before=before.hex(),after=after.hex(),
+                                retained_relocations=list(retained)))
+    blob[at:at+SIZE]=module
+    if BLOB+len(blob)>END:raise ValueError('Player motions exceed import ROM storage')
+    report=copy.deepcopy(old)
+    report.update(code=compiled,hooks=hooks[:len(ENTRIES)],sha256=sha256(module),crc32=zlib.crc32(module),
+                  additional_resident_bytes=0)
+    report['player_motion']=dict(records=records,evidence=evidence,hooks=hooks[len(ENTRIES):],
+        owner_hooks=owner_hooks,owner_vrom=PLAYER_VROM,owner_reloc=PLAYER_RELOC,owner_ram=PLAYER_RAM,
+        owner_sha256=sha256(owner),owner_bytes=len(owner),reloc_sha256=sha256(reloc),
+        bounds=list(bounds),native_ranges=[dict(start=a,end=b,sha256=sha256(native_core[a-CODE_RAM:b-CODE_RAM])) for a,b in ranges],
+        mask_hex=mask.hex(),table_offset=PLAYER_TABLE,mask_offset=PLAYER_MASK,
+        bridge_offset=PLAYER_BRIDGE,first_index=PLAYER_FIRST,source_slots=PLAYER_COUNT,
+        animation_buffer_bytes_changed=False,player_actions_installed=False)
+    return report,{PLAYER_VROM:bytes(owner)}

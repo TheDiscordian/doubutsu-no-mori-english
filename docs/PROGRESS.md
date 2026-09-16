@@ -2,15 +2,21 @@
 
 ## Active development
 
-ABI 97 contains the shared held-resource loader: fourteen complete models and
-sixteen equipment animations, with 31,584 resource bytes and an 8-KiB resident
-module. Startup, five shared native readers, and actual item DMA pass bounded
-verification. Eighteen host/cartridge/composition checks pass; the first silent
-native run passes 115 records with 96 assertions across nine representative
-transfers, retained original equipment, guards, and restored isolated state.
-There are no new selectable items yet: native kinds/actions, player animations,
-combined bank and rig buffers, inventory/acquisition, and optional profiles still
-need integration. See the [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#native-held-resource-loading).
+ABI 98 adds complete player holding/action motion and the donor's fan split-body
+mask to the shared held-resource loader. Eight player animations occupy 2,256
+additional ROM bytes without growing resident RAM, player actors, or animation
+buffers. Seventeen focused host/cartridge/composition checks pass. The corrected
+silent native run uses the actual game-loaded player overlay and passes 102
+records with 79 assertions: seven representative animation transfers, all five
+masks, original fallbacks, guards, and restored isolated state. The initial
+probe's second-overlay allocation exceeded the title-scene heap; reusing the
+real owner resolves that test setup issue.
+
+Fourteen held models and sixteen equipment animations retain their complete
+31,584 bytes and the passing shared-loader evidence. There are no new selectable
+items yet: native kind selection, actual actions/controllers, combined bank and
+rig buffers, inventory/acquisition, and optional profiles still need integration.
+See the [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#native-player-motion-and-part-masks).
 
 The shared handheld pipeline prepares a complete 7,760-byte motion bundle:
 sixteen equipment animations, six constant player poses, fan idle, and fan
@@ -20,8 +26,8 @@ selectors connect all 79 equipment identities/states to their real holding
 animations. The shared keyframe format preserves every constant, frame, value,
 velocity, hierarchy, and relocated pointer without resampling. Fourteen focused
 checks pass across the initial run and one corrected mutation fixture. The
-player motions remain prepared-only; the equipment motions use the shared loader
-above. Continue native player ownership and action/animation binding using these
+player and equipment motions use the shared loaders above. Continue native
+player ownership and action/animation binding using these
 resources. See the [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#held-motion-dependencies).
 
 The [shared handheld adapter](../specs/V3_HANDHELD_ITEMS.md) discovers all 79
@@ -63,10 +69,10 @@ including all rotations, English names, prices, native footprints, independent
 selection rejection, original fallbacks, restored state, and guards. See the
 [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md).
 
-Current development uses ABI 97 at
-`build/v3-equipment-resources-runtime-03/animal-forest-v3-asset-loader.z64`, pinned by
+Current development uses ABI 98 at
+`build/v3-player-motion-runtime-01/animal-forest-v3-asset-loader.z64`, pinned by
 `config/v3-import-build.json`. The 104 choices and saved format 2 are unchanged.
-Same-profile compatibility with ABI 96 is expected in both directions; this
+Same-profile compatibility with ABI 97 is expected in both directions; this
 batch does not claim another ordinary save/restart or hardware playthrough.
 The 48 additional donor aliases still need native parent support and integration;
 prepared artwork alone is not a completed import. Both served patchers remain V2.

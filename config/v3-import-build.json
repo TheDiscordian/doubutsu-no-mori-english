@@ -1,6 +1,6 @@
 {
-  "directory": "build/v3-equipment-resources-runtime-03",
-  "runtime_abi": 97,
-  "rom_sha256": "2ae396a32a1fbd86411c2dec5420fb45c702fdfb048828b8ddabce84185a4e3a",
-  "report_sha256": "90068e8fa585961789f63638827f624039c837ebfe78e9538fd9b3d06dc74580"
+  "directory": "build/v3-player-motion-runtime-01",
+  "runtime_abi": 98,
+  "rom_sha256": "88106989dc341f554ba0979079539c96b05bba60550be2999994bf7b1eb0739c",
+  "report_sha256": "13050814fc10d39b25cd124df74c07f39b3bda66f4cc2bc8ab91b9ebcf9aaaae"
 }

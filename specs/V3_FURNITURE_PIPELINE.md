@@ -45,6 +45,10 @@ unchanged terminal catalogue/shop owners; see [held equipment](V3_HANDHELD_ITEMS
 Both paths preserve profiles and saved identities and emit a new build lock and
 reconstructible patch. This is a shared runtime update, not a separate installer
 for each item.
+`--refresh-runtime --player-motion` extends that same resident module with the
+complete source-derived player motions and split-body masks. It retains the
+native player owner's table relocations and all original animation meanings;
+resource availability does not enable item actions or add profile choices.
 
 `--category` selects a discovered shared category without maintaining an item
 list. `convert --assets-only` prepares complete artwork while retaining missing

@@ -1,5 +1,91 @@
 # Automatic furniture pipeline checkpoint
 
+## Native player motion and part masks
+
+The existing importer's `--refresh-runtime --player-motion` mode extends the
+shared held module with eight complete player motions: six equipment holding
+poses, fan idle, and fan swing. Each is independently packed for the native
+player-animation DMA. Their 2,256 bytes fit the existing 3,848-byte banks.
+Indices are `130 + donor animation index`; all 130 original indices and tables
+remain intact. No per-item installer or alternate simplified motion is used.
+
+The source-derived default-part table and complete mask-copy function bind the
+split-body conventions. All four original masks match their donor equivalents.
+The fifth mask is copied from the donor, preserving all 27 entries. The fan's
+action initializer explicitly selects mask four; its default animation-to-part
+table returns three. The implementation retains both facts rather than
+rewriting the default table to impersonate the action.
+
+Output: `build/v3-player-motion-runtime-01/`, ABI 98, pinned by
+`config/v3-import-build.json`.
+
+- ROM SHA-256:
+  `88106989dc341f554ba0979079539c96b05bba60550be2999994bf7b1eb0739c`.
+- UPS SHA-256:
+  `01a85334ad6c9ca80875065857e2bcf29cd9630d9a780492d75ff327455ddecf`.
+- Build receipt SHA-256:
+  `13050814fc10d39b25cd124df74c07f39b3bda66f4cc2bc8ab91b9ebcf9aaaae`.
+- Shared module code: 1,304 bytes; module allocation remains 8,192 bytes at
+  `804A3000`, VROM `02537DC0`. Startup remains 952 bytes.
+- Import blob: 3,449,520 bytes; 679,248 bytes remain before English choices.
+
+Core size/origin/VROM getters and mask copying support the additions. The
+native player owner's pointer and default-part getters retain every original
+HI/LO relocation and delegate only non-native indices. Actual DMA, segment
+bias, native mask copying, player actor size, and bank allocations remain
+unchanged. The guarded native mask-copy prologue bridge occupies module offset
+`FE0`; the sparse `AFPM` table and extra mask use previously empty data space.
+Existing held models/motions retain their exact resource locations and data.
+Only the three unchanged terminal catalogue/shop owners move to make ROM space.
+
+### Verification and remaining work
+
+Risk: the new readers must preserve relocated native tables, animation banks,
+mask lengths, and original equipment. The bounded checks cover actual C under
+sanitizers, full source objects, two host relocation bases, cartridge ownership,
+checksums/patch reconstruction, current optional composition, and one corrected
+native category run. Player actions and ordinary graphical animation playback
+are not inferred from these resource checks.
+
+Seventeen distinct focused tests pass: five current motion/owner checks and
+twelve existing optional-composition checks bound to ABI 98. The initial host
+run passes three and exposes two fixture issues: comparing JSON-normalised
+relocation dictionaries against Python tuples/integer keys, and directly
+indexing an optional absent receipt field. Both corrected fixture checks pass
+on their focused retry; production data/code are unchanged by that correction.
+Empty/full/subset composition and saved-profile requirements pass.
+
+The first native attempt verifies the resident module, then fails its test-only
+221,184-byte allocation for a second player overlay. It does not enter an
+animation test. The corrected probe derives the real loaded owner from
+`Player_actor_ct_func`, verifies all 175,872 code bytes against expected
+relocation, and allocates only 4,352 bytes for guarded animation scratch. Getter
+calls use independently checked, function-sized code proofs. The live owner is
+`80394490`, constructor `803BEE88`; the probe never overwrites that owner.
+
+`build/smoke-v3-player-motion-02/results.json` passes 102 records with 79
+assertions, SHA-256
+`10c13dbdfb0f028b28f9695bb655f8b4491adb83785e58268f72e6cca3e98ba5`.
+Seven representative transfers cover source-derived constant/animated categories
+and original animation indices. All five masks, original equipment fallbacks,
+invalid indices, untouched transfer tails, guards, and saved-profile retention
+pass. Checkpoint restoration, fault status, and graceful shutdown pass; isolated
+FlashRAM remains blank. No user save is used and no hardware test is claimed.
+
+The 104 choices and saved format 2 remain unchanged. Same-profile ABI-97
+compatibility is expected in both directions; no additional ordinary save/reload
+cycle is claimed. V3 saves remain unsuitable for V2 and profiles must include
+saved imported identities. Neither served patcher changes.
+
+Next: native kind selection and dependent readers, real fan controller/request/
+action flow and its explicit part mask/timing/sound, take-out/put-away/drawing,
+inventory/acquisition, and optional profile selection. Net/rod joint matrices,
+balloon textures and joint-work capacity, pinwheel rig packing, and combined
+model/animation bank bounds remain actual dependencies. Imported animation
+indices remain outside original footstep/event tables; new actions need their
+own source timing, not enlarged bounds over short native tables. No new item
+becomes playable or selectable solely from this batch.
+
 ## Native held-resource loading
 
 `--refresh-runtime --equipment-art` installs one source-derived category through

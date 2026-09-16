@@ -1,5 +1,6 @@
 OUTPUT_ARCH(mips)
 ENTRY(af_v3_equipment_pointer)
+af_v3_native_player_part = 0x804A3FE0;
 SECTIONS
 {
     . = 0x804A3000;
@@ -7,7 +8,7 @@ SECTIONS
     .rodata : { *(.rodata .rodata.*) }
     .data : { *(.data .data.*) }
     .bss (NOLOAD) : { *(.bss .bss.* COMMON) }
-    ASSERT(. <= 0x804A4000, "Equipment code overlaps resource records")
+    ASSERT(. <= 0x804A3FE0, "Equipment code overlaps native part-copy bridge")
     ASSERT(SIZEOF(.data) == 0 && SIZEOF(.bss) == 0, "Unexpected equipment state")
     /DISCARD/ : { *(.comment .note.* .reginfo .MIPS.abiflags .pdr .gnu.attributes) }
 }
