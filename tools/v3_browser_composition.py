@@ -26,6 +26,7 @@ def rules(image, report):
             json.loads(pinned) != report):
         raise ValueError('Browser rules require the complete pinned cartridge and report')
     catalog = composition.catalogue(image, report)
+    stable_path, stable_sha, _ = composition.stable_reference(report)
     files = by_vrom(image)
     blob = files[composition.BLOB]
     module = files[composition.MODULE]
@@ -130,7 +131,7 @@ def rules(image, report):
     return {'format': 'AFV3-BROWSER-COMPOSITION-1', 'donor': 'GAFE01-r0',
             'runtime_abi': report['runtime_abi'], 'base_sha256': sha256(image), 'base_size': len(image),
             'base_report_sha256': composition.REPORT_SHA,
-            'stable_sha256': composition.STABLE_SHA, 'stable_size': composition.STABLE.stat().st_size,
+            'stable_sha256': stable_sha, 'stable_size': stable_path.stat().st_size,
             'experimental': True, 'web_patcher_enabled': False,
             'options': entries, 'profile': field(blob.pstart + 0x20, 192), 'tables': packed,
             'crc32': crcs, 'header': field(0x10, 8)}
@@ -196,8 +197,9 @@ def build(output, *, recipes=False, disc=None):
         from build_portal import donor_resources, make_recipe, SAVE_NOTE
         native = verified_rom((ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes())
         resources, donors = donor_resources(disc or ROOT/'local/gamecube/Animal Crossing (USA, Canada).ciso')
-        stable = composition.STABLE.read_bytes()
-        if sha256(stable) != composition.STABLE_SHA:
+        stable_path, stable_sha, stable_build = composition.stable_reference(report)
+        stable = stable_path.read_bytes()
+        if sha256(stable) != stable_sha:
             raise ValueError('Changed no-import V2 baseline')
         for label, target in (('v2', stable), ('v3', image)):
             recipe, stats = make_recipe(native, target, donors)
@@ -205,7 +207,7 @@ def build(output, *, recipes=False, disc=None):
             folder = data/label
             folder.mkdir()
             (folder/'patch.afwp.gz').write_bytes(compressed)
-            manifest[label] = {'format': 1, 'build': 'V2-11' if label == 'v2' else f'V3-ABI-{plan["runtime_abi"]}',
+            manifest[label] = {'format': 1, 'build': stable_build if label == 'v2' else f'V3-ABI-{plan["runtime_abi"]}',
                 'public_release': False, 'source_sha256': sha256(native), 'source_size': len(native),
                 'output_sha256': sha256(target), 'output_size': len(target),
                 'output_name': 'Animal Crossing N64 - Development.z64',

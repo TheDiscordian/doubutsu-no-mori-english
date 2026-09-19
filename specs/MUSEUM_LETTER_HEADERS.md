@@ -54,6 +54,29 @@ use the corrected display. This does not establish a new ordinary save/reload
 or original-hardware test. Actual evidence and remaining visual verification are
 recorded in `docs/checkpoints/MUSEUM_LETTER_HEADERS.md`.
 
-V3's locked development ROM and exact no-import V2 reference remain unchanged.
-Carry this correction into V3 through its checked installer/composition process;
-do not silently replace a locked base or either served patcher.
+## V3 integration
+
+The shared installer's `--refresh-runtime --translation-updates` mode carries
+these corrections into an explicit V3 proposal. The editor uses the same C
+implementation with `AF_LETTER_NPC_COUNT=238`; the default remains 216 for V2.
+Both the retained editor and appended corrected header preserve V3's expanded
+name limit. The ordinary/snapshot reader also expands its previously missed
+bound at `80198548` from 216 to 238. Name resolution still uses the selected-only
+V3 resolver, with original player and unsupported-name fallbacks.
+
+`tools/v3_translation_updates.py` checks the complete original reader, unused
+resident padding, prior editor change, relocation, and owner row. The resized
+editor and relocation are stored before the shared catalogue/shop resource
+tail. The existing 2,560-byte unused letter reservation accommodates the
+1,536-byte growth; no resident heap, profile bit, or saved format grows.
+The common installer regenerates startup checksums and a proposed build lock.
+
+The report explicitly pins `translation_baseline` to corrected V2-12. Both
+offline composition and private browser exports consume that pin, including
+empty selection and its recipe/manifest. Unknown pins and changed input hashes
+are rejected. Older locks retain their original V2-11 baseline. Installing a
+proposal does not replace the main lock or either served patcher.
+
+Focused native name-reader checks and complete overlay loading/relocation have
+passing V3 evidence. Rendering and ordinary mail interaction are not established
+by that component fixture; retain the visual/hardware limits in the checkpoint.

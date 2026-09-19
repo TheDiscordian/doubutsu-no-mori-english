@@ -1281,7 +1281,7 @@ def main():
                 if not (out/'test.bs1').is_file():
                     raise ValueError('Museum header probes require an isolated checkpoint')
                 needs_checkpoint_restore = True
-                results.append(exercise(debug, action['test_museum_header'], record))
+                results.append(exercise(debug, action['test_museum_header'], record, rom_path=args.rom))
             if 'test_v2_performance' in action:
                 from v2_performance_smoke import exercise
                 if not (out/'test.bs1').is_file():

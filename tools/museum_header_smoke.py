@@ -16,14 +16,20 @@ def words(*values): return struct.pack('>'+'I'*len(values), *values)
 def floating(value): return struct.unpack('>I', struct.pack('>f', value))[0]
 
 
-def exercise(debug, request, record):
+def exercise(debug, request, record, *, rom_path=None):
     directory = (ROOT/request['build']).resolve()
     if not directory.is_relative_to(ROOT/'build'):
         raise ValueError('Museum header probe requires an ignored build')
-    rom = (directory/'Animal Forest English V2.z64').read_bytes()
     report = json.loads((directory/'build.json').read_text())
-    if sha256(rom) != ROM_SHA or report['output_sha256'] != ROM_SHA:
+    v3 = bool(report.get('translation_updates'))
+    path = directory/('animal-forest-v3-asset-loader.z64' if v3 else 'Animal Forest English V2.z64')
+    rom = path.read_bytes()
+    if (sha256(rom) != report['output_sha256'] or not v3 and sha256(rom) != ROM_SHA or
+            rom_path is not None and path.resolve() != rom_path.resolve()):
         raise ValueError('Changed museum header test ROM')
+    readers_only = bool(request.get('reader_names_only'))
+    if readers_only and not v3:
+        raise ValueError('Focused expanded-name mode requires the corrected V3 cartridge')
     files = by_vrom(rom); read, write = debug.read_memory, debug.write_memory
     assertions = calls = 0
     def check(label, actual, expected):
@@ -67,6 +73,10 @@ def exercise(debug, request, record):
     cases = ((2, 0, bytes.fromhex('1907F81105C3'), b'Museum'),
              (0, 0, b'Player', b'Player'), (7, 0, b'Custom', b'Custom'),
              (1, 132, b'Native', name_table[32+132*8:40+132*8].rstrip(b' ')))
+    if v3:
+        for row in (report['villager_text']['imports'][0],report['villager_text']['imports'][-1]):
+            cases += ((1,int(row['actor_id'],16)&255,b'Native',row['name'].encode('ascii')),)
+        cases += ((1,238,b'Native',b'Native'),)
     for kind, index, original, english in cases:
         identity = bytearray(18); identity[:6] = original; identity[12] = index; identity[16] = kind
         write(scratch, identity); write(scratch+32, b'?'*10)
@@ -99,7 +109,7 @@ def exercise(debug, request, record):
             raise ValueError('Museum header draw exceeds the owned graphics arena')
         check('draw retains the entire saved letter and editing state', read(board, 192), state)
         return read(vertex_start, front-vertex_start), read(back, vertex_end-back)
-    for status, reader in ((1, False), (0, False), (3, False), (4, False), (1, True)):
+    for status, reader in (() if readers_only else ((1, False), (0, False), (3, False), (4, False), (1, True))):
         actual = drawing(status, 2, bytes.fromhex('1907F81105C3'), reader)
         reference = drawing(status, 0, b'Museum', reader)
         check('museum renders the complete English header, mode '+str((status, reader)), actual, reference)
@@ -110,4 +120,5 @@ def exercise(debug, request, record):
     call(0x8009C040, [allocation])
     return {'native_museum_header_calls': calls, 'assertions': assertions,
             'save_unchanged': True, 'code_uploaded': False, 'requires_checkpoint_restore': True,
+            'expanded_villager_names_tested': v3, 'drawing_tested': not readers_only,
             'hardware_acceptance': False}

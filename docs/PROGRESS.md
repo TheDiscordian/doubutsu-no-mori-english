@@ -12,10 +12,30 @@ Focused host and cartridge checks pass. Native museum/villager/player name
 resolution, bounded writes, and code relocation pass; the native rendering
 comparison remains incomplete after two fixture-setup failures. Original-hardware
 appearance still needs confirmation. See the [checkpoint](checkpoints/MUSEUM_LETTER_HEADERS.md)
-for exact checks, limits, hashes, and the pending V3 integration. V3's current
-locked ROM is tracked below; this V2 fix does not replace its no-import baseline.
+for exact checks, limits, and hashes. The explicit V3 proposal below includes
+this correction and pins its no-import output to V2-12; the main lock and both
+served patchers retain their existing builds.
 
 ## Active development
+
+The explicit ABI-116 proposal in `build/v3-translation-headers-02/` includes
+the Museum-header correction in both reading and editing, and fixes the ordinary
+reader's missed imported-villager bound. It preserves all 112 experimental
+choices, selected profiles, saved formats, acquisition code, and artwork. Empty
+selection returns exact corrected V2-12 through both composition paths.
+The native component check passes complete cartridge-loaded overlay relocation,
+Museum/player/original/imported/fallback names, saved-data retention, guards,
+and checkpoint restoration. Seventeen focused checks pass; fourteen browser/
+offline composition profiles match. The actual silent browser worker reconstructs
+matching empty, all-installed, mixed, and equipment outputs from both supplied
+games. Ordinary letter appearance and hardware remain
+unverified; the older rendering fixture is not relabelled as passed.
+
+Continue from `build/v3-translation-headers-02/build-lock.json` explicitly.
+The inherited seasonal-copy failure still prevents main-lock promotion or a
+playable handoff. Next finish ordinary acquisition and order/delivery using the
+shared category paths. Both served patchers remain unchanged. See the
+[translation checkpoint](checkpoints/MUSEUM_LETTER_HEADERS.md#v3-integration).
 
 The two-fan ABI-115 profile has ordinary inventory/equip, put-away, ground-drop,
 and same-profile game-save/restart/load evidence for parent `2255`. The English
@@ -31,8 +51,8 @@ Pickup remains unverified: the house forces the dropped item away from the
 player, and the bounded navigation retry stops about 21 units from it before
 issuing pickup. The corrected limit/radius is unexecuted; do not replay that
 failed setup. Ten focused observation/navigation checks pass. Next pursue
-ordinary reward acquisition/catalogue delivery and carry the Museum-header fix
-into V3, retaining the independent seasonal-copy issue as unresolved. The main
+ordinary reward acquisition/catalogue delivery, retaining the independent
+seasonal-copy issue as unresolved. The main
 lock stays ABI 109; this evidence is for one copied town/profile, not every
 parent, cross-profile migration, or hardware. See the
 [persistence checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#ordinary-equipment-put-away-drop-and-persistence).
@@ -55,8 +75,8 @@ successful downloads instead of replaying the full setup. The prior catalogue's
 104-record/70-assertion native result applies to unchanged runtime code.
 
 Next classify the inherited seasonal-copy failure and complete ordinary
-acquisition/equip/use/drop/order/save gameplay on the current selected build.
-Use the explicit proposal lock; the main lock remains ABI 109. Do not hand over
+acquisition, pickup, and order/delivery gameplay on the current selected build.
+Use the ABI-116 proposal lock; the main lock remains ABI 109. Do not hand over
 this proposal as validated. Saves containing fan selections require those bits;
 older profiles reject them. Codec acceptance of equal/superset profiles is tested,
 but ordinary cross-build reload and hardware are not. Both served V2 patchers
@@ -143,9 +163,10 @@ equip/put-away gameplay, persistence, and hardware remain unverified. See the
 
 Source fan category 43 is distinct
 from the donor menu's ID-derived tool category two; do not use it as an unchecked
-native menu index. Acquisition, context-correct collection/catalogue, optional
-composition, ordinary take-out/put-away, and persistence remain work. Carry the
-museum-header correction into V3 before a handoff; both V2 patchers stay unchanged.
+native menu index. The fan profile includes the shared category, collection,
+catalogue, and composition adapters described above. Ordinary acquisition,
+pickup, and ordering/delivery remain work. The corrected-header proposal includes
+the Museum fix; both served V2 patchers stay unchanged.
 
 The shared category converter prepares all nine ground/police/handover artwork
 categories used by 43 extra equipment parent/state records in

@@ -62,4 +62,80 @@ V2-11 ↔ V2-12 compatibility is expected without migration, including existing
 museum letters; a new cross-version save/reload cycle is not claimed.
 The user can confirm the museum name while composing and reading a letter.
 Existing V2 builds and saves are preserved. Neither served patcher, GitHub Pages,
-nor the V3 lock is changed. Carry the fix into V3 before its next tested handoff.
+nor the main V3 lock is changed. The explicit V3 proposal below includes the fix.
+
+## V3 integration
+
+The shared installer consumes the complete ABI-115 lock and emits ABI 116 at
+`build/v3-translation-headers-02/`. The Museum correction and ordinary/snapshot
+reader's missed imported-name bound are installed without replacing any
+imported item, artwork, behaviour, profile bit, or saved format. Both composition
+paths use the report's explicit corrected V2-12 pin for empty selections.
+The main ABI-109 lock and both served V2 patchers remain unchanged.
+
+- ROM SHA-256: `eb54b77ffcb15095f356c6ae94d241d472dc70f08289099b05ef6067acd25850`.
+- Report SHA-256: `dc18227d25731e5d24cc51a8c4808fb2497bab6c23b566b950fd03addd752c61`.
+- UPS SHA-256: `23ede226d256e51d3fe7c50edae917306c1fc7e0e994260be08bd3208f7b6884`.
+- Explicit lock: `build/v3-translation-headers-02/build-lock.json`.
+
+The editor gains 1,536 bytes within its existing unused reservation. Its complete
+output equals the corrected V2 editor except for the two expected 216-to-238
+name bounds, including the retained old header and newly appended header.
+The common resource-tail builder preserves all existing resource identities and
+keeps the catalogue/shop tail reusable by subsequent imports. The resident
+reader retains every V3 change and fixed export address. Its only additions are
+the checked Museum adapter/entry and bound at `80198548`.
+
+Seventeen focused checks pass: five translation-specific checks and twelve
+existing composition checks targeted at ABI 116. Host sanitizer checks cover
+the complete 216- and 238-index editor ranges, Museum editing/animation states,
+fallbacks, geometry, and immutable state. Cartridge checks cover complete
+unrelated resource retention, allocation bounds, rejected reader/baseline
+damage, original-ROM UPS reconstruction, future resource-tail reuse, and
+correct empty/all/subset composition. The first new cartridge assertion wrongly
+looked for a literal `Museum` string; the compiler uses immediate stores. The
+corrected assertion compares the entire editor against the fixed V2 code with
+only the two expected bounds changed, and passes. Fourteen representative
+browser/offline profiles match through the existing Node comparison.
+
+`build/smoke-v3-translation-readers-01/` passes on its first attempt: 57 result
+records, 35 component assertions, and four final fault/memory-guard assertions.
+It loads and relocates the complete new board from the actual cartridge, checks
+the resident adapter and complete reader, and executes Museum, player,
+unsupported-type, original villager, first/last imported villager, and
+out-of-range name cases. Source identities, destination guards, and live save
+memory remain intact. The fixture frees its allocation, restores its checkpoint,
+resumes, and verifies zero fault plus resident/equipment/save-state guards.
+No code is uploaded; the isolated emulator is silent and exits successfully.
+Results SHA-256:
+`27adab94f21c5667038ac21ea8ab01165e7ee4d920691522a29826b1c560c3f2`.
+This focused V3 component run deliberately does not execute graphics comparison;
+it does not turn the older V2 rendering fixture into a passing test.
+
+The private export `build/v3-translation-browser-01/` contains 112 choices and
+both updated reconstruction recipes. The existing silent real-worker check at
+`build/check-v3-translation-browser-01/` reads both original games as browser
+File inputs and matches the offline result for:
+
+- Empty selection: exact corrected V2-12.
+- All installed choices: exact ABI-116 ROM above.
+- Punchy plus camping selection:
+  `5a62afa645c9d3a45ca912a3c58685aad88b8f7b8a579b634184f180c566c996`.
+- Two-fan subset:
+  `b489decf5bb4500f9cc579aa0e0112475d89f5b15ce64d62ef81f4d35252d027`.
+
+Worker termination, unknown-option rejection, corrupt-plan rejection, no page
+errors, and local GET-only requests also pass. The temporary server shuts down;
+the export is not a served patcher. Results SHA-256:
+`8fc0467be6bb04947c0df2273eec9c9f58e7ed4ef9d70c1740e08d6ae853c0f5`.
+The full interface's prior invalidation-fixture issue is not retested or closed
+by these worker results.
+
+Imported save compatibility retains format 2: keep matching/equal-or-larger
+profiles, do not load imported saves in V2, and do not treat removing imports as
+migration. Ordinary cross-profile reload, mail appearance, and hardware remain
+unverified. Reuse the completed equipment same-profile persistence evidence for
+unchanged save code; no historical-build replay is needed. The independent
+seasonal-copy failure remains unresolved and prevents main-lock promotion or a
+playable V3 handoff. Continue ordinary acquisition and ordering/delivery on this
+explicit proposal, preserving that blocker.

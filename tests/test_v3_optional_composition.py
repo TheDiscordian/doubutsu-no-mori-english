@@ -113,7 +113,7 @@ class OptionalCompositionTests(unittest.TestCase):
         self.assertEqual(writes,[])
         self.assertEqual(full['profile_hex'],self.report['save_runtime']['profile_hex'])
         result,writes,blob = composer.compose(self.base,self.report,self.catalog,self.select())
-        self.assertEqual(sha256(result),composer.STABLE_SHA)
+        self.assertEqual(sha256(result),composer.stable_reference(self.report)[1])
         self.assertEqual(writes,[])
         self.assertIsNone(blob)
 

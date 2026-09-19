@@ -9,9 +9,11 @@ are off by default. Existing N64 villagers, items, locations, and the translatio
 remain available; importing means adding content, not silently replacing an
 existing villager or painting a new name onto an unrelated item.
 
-The stable baseline is V2-11, SHA-256
+The main ABI-109 lock retains V2-11, SHA-256
 `8bbd1955536a2a3ac9f76d6f323842f5ce25c037e1ff5fd3da9f28d6dfe20507`.
-The import-free path reproduces the pinned translation baseline exactly.
+The corrected-header proposal pins V2-12, SHA-256
+`a09373b051cbcd93991e5dd6cb17a238a2afb1e2e2d7694d75408d24a55d4eee`.
+The import-free path reproduces its build's pinned translation baseline exactly.
 V3 development uses `v3/optional-imports`; the public V2 patcher, deployment
 recipe, local V2 service, and published trailer remain unchanged.
 V3 source and development work may be version-tracked on GitHub. Updating the
@@ -356,7 +358,8 @@ The [optional composer](V3_OPTIONAL_COMPOSITION.md) resolves per-entry
 selections for twenty installed villagers and eighty-four installed logical items,
 including required outfits, house furnishings, and mannequin representations.
 It updates actual native enable fields, resource CRCs, catalogue rows/counts, and
-save profiles without new allocations. Empty selections reproduce V2-11; all installed selections reproduce
+save profiles without new allocations. Empty selections reproduce the explicitly
+pinned translation-only cartridge; all installed selections reproduce
 the pinned complete integration cartridge. The private browser interface uses
 generated records for the same choices, not a separate maintained item list.
 These are experimental development profiles,

@@ -435,7 +435,7 @@ def build(output, art_path, lock=LOCK):
 
 def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=False, equipment_kinds=False,
                     player_actions=False, item_category_art=None, ground_categories=False, event_acquisition=False,
-                    held_collection=False, held_catalogue_art=None, held_selection=False):
+                    held_collection=False, held_catalogue_art=None, held_selection=False, translation_updates=False):
     """Update shared readers; optionally install the shared held-resource adapter."""
     output=output.resolve()
     if output.exists() or not output.is_relative_to(ROOT/'build'):
@@ -446,6 +446,7 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
     original=verified_rom((ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes())
     old_blob=files[BLOB].extract(base);blob=bytearray(old_blob)
     core=bytearray(files[CODE_VROM].extract(base))
+    module=bytearray(files[MODULE].extract(base))
     package=blob[PACKAGE:PACKAGE+PACKAGE_SIZE]
     if (sha256(blob)!=prior['blob_sha256'] or sha256(package)!=prior['import_storage']['package_sha256']
             or struct.unpack_from('>4I',blob,0xF0)!=(BLOB+PACKAGE,PACKAGE_SIZE,zlib.crc32(package),PACKAGE_RAM)):
@@ -454,16 +455,22 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
     moved=[];equipment_report=None;reused=None;owner_changes={};owner_moves=[];owner_updates=[];report_updates={}
     equipment_mode=any((equipment_art is not None,player_motion,equipment_kinds,player_actions,
                         item_category_art is not None,ground_categories,event_acquisition,held_collection,held_catalogue_art is not None,held_selection))
+    resource_mode=equipment_mode or translation_updates
     if sum((equipment_art is not None,player_motion,equipment_kinds,player_actions,
-            item_category_art is not None,ground_categories,event_acquisition,held_collection,held_catalogue_art is not None,held_selection))>1:
-        raise ValueError('Install equipment resources, player motion, and kind readers in dependency order')
-    if equipment_mode:
+            item_category_art is not None,ground_categories,event_acquisition,held_collection,held_catalogue_art is not None,held_selection,translation_updates))>1:
+        raise ValueError('Install shared runtime updates in dependency order')
+    if resource_mode:
         blob,reused=reuse_resource_tail(base,prior,old_blob)
         if not reused['reused_bytes']:
             raise ValueError('Equipment integration requires the checked shared resource tail')
     parent_readers=bool(player_actions and prior.get('equipment_resources',{}).get('player_actions',{}).get('equipment_selection'))
-    display_report,alias_report=display_aliases.install(prior,blob,core,output,held_items=parent_readers,
-        held_collection=held_collection)
+    if translation_updates:
+        import v3_translation_updates as translation
+        display_report,alias_report=prior['clothing']['display'],prior['display_aliases']
+        owner_changes,report_updates=translation.install(base,prior,module,output)
+    else:
+        display_report,alias_report=display_aliases.install(prior,blob,core,output,held_items=parent_readers,
+            held_collection=held_collection)
     if equipment_art is not None:
         import v3_equipment_runtime as equipment
         equipment_report=equipment.install(prior,blob,core,original,output,equipment_art)
@@ -499,6 +506,7 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             attribution=provenance_patch(equipment_report['parent_readers']['rows'])
             if attribution:write_new(output/'provenance.patch',attribution.encode())
             equipment_report['parent_readers']['provenance_complete']=not bool(attribution)
+    if resource_mode:
         # Changed compressed owners keep their logical DMA identity/size but
         # receive checked uncompressed storage before the ordinary resource tail.
         for vrom,data in owner_changes.items():
@@ -507,8 +515,9 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
                 if vrom not in {r['vrom'] for r in reused['retired_resources']}:
                     raise ValueError('Resized catalogue is not owned by the reusable tail')
                 continue
-            if len(data)!=entry.size:raise ValueError('Runtime update changes owner dimensions')
-            if entry.pend:
+            resized=translation_updates and vrom in (0x3B60000,0x3B70000)
+            if len(data)!=entry.size and not resized:raise ValueError('Runtime update changes owner dimensions')
+            if entry.pend or resized:
                 blob.extend(bytes(-len(blob)%16));at=len(blob);blob.extend(data)
                 owner_moves.append(dict(vrom=vrom,blob_offset=at,bytes=len(data),
                     physical=files[BLOB].pstart+at,sha256=sha256(data),
@@ -530,7 +539,7 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
                               physical=files[BLOB].pstart+at,sha256=sha256(data)))
     abi=prior['runtime_abi']+1; struct.pack_into('>I',blob,4,abi)
     package=blob[PACKAGE:PACKAGE+PACKAGE_SIZE]; struct.pack_into('>I',blob,0xF8,zlib.crc32(package))
-    module=bytearray(files[MODULE].extract(base)); old=prior['startup']
+    old=prior['startup']
     defines=tuple(f[2:] if not f.startswith('-DAF_V3_ABI=') else f'AF_V3_ABI={abi}'
         for f in old['flags'] if f.startswith('-D'))
     if equipment_report:
@@ -546,7 +555,7 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
     module[STARTUP:CONFIG]=startup+bytes(CONFIG-STARTUP-len(startup))
     struct.pack_into('>4I',module,CONFIG,BLOB,0xC000,zlib.crc32(blob[:0xC000]),abi)
     result=bytearray(base)
-    if equipment_report:
+    if resource_mode:
         start=files[BLOB].pstart+len(old_blob);end=files[BLOB].pstart+len(blob)
         if (len(blob)<len(old_blob) or BLOB+len(blob)>END or end>len(base) or any(base[start:end])
                 or any(e.pstart<end and start<(e.pend or e.pstart+e.size)
@@ -557,16 +566,16 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
     for vrom,data in ((BLOB,blob),(CODE_VROM,core),(MODULE,module),*owner_changes.items()):
         entry=files[vrom]
         if any(row['vrom']==vrom for row in owner_moves+moved):continue
-        if entry.pend or entry.size!=len(data) and not (equipment_report and vrom==BLOB):
+        if entry.pend or entry.size!=len(data) and not (resource_mode and vrom==BLOB):
             raise ValueError('Runtime update changes an undeclared resource allocation')
         result[entry.pstart:entry.pstart+len(data)]=data
-    if equipment_report:
+    if resource_mode:
         struct.pack_into('>I',result,DMA_START+files[BLOB].index*16+4,BLOB+len(blob))
         for row in moved+owner_moves:
             struct.pack_into('>4I',result,DMA_START+files[row['vrom']].index*16,
                              row['vrom'],row['vrom']+row['bytes'],row['physical'],0)
     expected=bytearray(base[DMA_START:DMA_END])
-    if equipment_report:
+    if resource_mode:
         struct.pack_into('>I',expected,files[BLOB].index*16+4,BLOB+len(blob))
         for row in moved+owner_moves:
             struct.pack_into('>4I',expected,files[row['vrom']].index*16,
@@ -593,6 +602,15 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         artwork_changed=False,resource_allocations_changed=False,saved_format_changed=False,
         saved_profile_changed=False,web_patcher_enabled=False)
     report['sources'].update({p:sha256((ROOT/p).read_bytes()) for p in ('tools/v3_furniture_install.py',)+display_aliases.SOURCES})
+    if translation_updates:
+        report['automatic_furniture']['resource_moves']=moved
+        report['import_storage']['remaining_bytes']=END-BLOB-len(blob)
+        report['shared_runtime_refresh'].update(adapters=['translation_headers'],
+            resource_allocations_changed=True,resource_tail_reuse=reused,
+            unchanged_owner_moves=moved,changed_owner_moves=owner_moves,
+            in_place_owner_updates=owner_updates,additional_resident_bytes=0)
+        report['sources'].update(report['translation_updates']['sources'])
+        report['native_test']='pending changed translation headers; inherited gameplay limits retained'
     if equipment_report:
         report['equipment_resources']=equipment_report
         report['automatic_furniture']['resource_moves']=moved
@@ -665,6 +683,8 @@ if __name__=='__main__':
         help='With --refresh-runtime, connect prepared parent display models to their actual catalogue category')
     parser.add_argument('--held-selection',action='store_true',
         help='With --refresh-runtime, enable installed parents in the full experimental composition reference')
+    parser.add_argument('--translation-updates',action='store_true',
+        help='With --refresh-runtime, carry corrected translation headers and the pinned import-free baseline')
     args=parser.parse_args()
     if args.equipment_art and not args.refresh_runtime:parser.error('--equipment-art requires --refresh-runtime')
     if args.player_motion and not args.refresh_runtime:parser.error('--player-motion requires --refresh-runtime')
@@ -676,10 +696,12 @@ if __name__=='__main__':
     if args.held_collection and not args.refresh_runtime:parser.error('--held-collection requires --refresh-runtime')
     if args.held_catalogue_art and not args.refresh_runtime:parser.error('--held-catalogue-art requires --refresh-runtime')
     if args.held_selection and not args.refresh_runtime:parser.error('--held-selection requires --refresh-runtime')
+    if args.translation_updates and not args.refresh_runtime:parser.error('--translation-updates requires --refresh-runtime')
     result=(refresh_runtime(args.output,args.base_lock,equipment_art=args.equipment_art,player_motion=args.player_motion,
                             equipment_kinds=args.equipment_kinds,player_actions=args.player_actions,
                             item_category_art=args.item_category_art,ground_categories=args.ground_categories,
                             event_acquisition=args.event_acquisition,held_collection=args.held_collection,
-                            held_catalogue_art=args.held_catalogue_art,held_selection=args.held_selection)
+                            held_catalogue_art=args.held_catalogue_art,held_selection=args.held_selection,
+                            translation_updates=args.translation_updates)
             if args.refresh_runtime else build(args.output,args.art,args.base_lock))
     print(json.dumps({k:result[k] for k in ('runtime_abi','output_sha256','patch_sha256')},indent=2))

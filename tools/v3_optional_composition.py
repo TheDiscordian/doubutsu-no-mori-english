@@ -65,6 +65,15 @@ def inputs():
     return image, report
 
 
+def stable_reference(report):
+    if 'translation_baseline' in report:
+        from v3_translation_updates import stable_reference as corrected_reference
+        return corrected_reference(report)
+    if sha256(STABLE.read_bytes()) != STABLE_SHA:
+        raise ValueError('Changed import-free V2 baseline')
+    return STABLE, STABLE_SHA, 'V2-11'
+
+
 def held_options(blob,report):
     equipment=report.get('equipment_resources',{})
     enabled=equipment.get('optional_selection')
@@ -289,8 +298,9 @@ def compose(image, report, catalog, selection):
     if selection != resolve(catalog, selection['requested']):
         raise ValueError('Selection receipt does not match its dependency resolution')
     if not selection['enabled']:
-        stable = STABLE.read_bytes()
-        if sha256(stable) != STABLE_SHA:
+        path, checksum, _ = stable_reference(report)
+        stable = path.read_bytes()
+        if sha256(stable) != checksum:
             raise ValueError('Changed import-free V2 baseline')
         return stable, [], None
     if sha256(image)!=BASE_SHA:
@@ -387,7 +397,7 @@ def build(output, selected=(), *, select_all=False):
     patch = make_ups(native, result)
     if apply_ups(native, patch) != result:
         raise ValueError('Optional cartridge patch reconstruction failed')
-    receipt = {**selection, 'base_sha256':BASE_SHA if blob is not None else STABLE_SHA,
+    receipt = {**selection, 'base_sha256':BASE_SHA if blob is not None else stable_reference(report)[1],
         'base_report_sha256':REPORT_SHA, 'converter_sources_sha256':sha256(canonical(report['sources'])),
         'composer_sha256':sha256(Path(__file__).read_bytes()), 'output_sha256':sha256(result),
         'patch_sha256':sha256(patch), 'rom_bytes':len(result), 'writes':writes,

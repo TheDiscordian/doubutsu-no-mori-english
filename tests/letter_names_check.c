@@ -1,6 +1,9 @@
 #include <assert.h>
 #include <string.h>
 #include <stdint.h>
+#ifndef AF_LETTER_NPC_COUNT
+#define AF_LETTER_NPC_COUNT 216u
+#endif
 
 extern void af_letter_header(void *, void *, void *, float, float, const unsigned char *);
 extern void af_letter_cursor(void *, void *, float, float);
@@ -19,7 +22,7 @@ unsigned char *af_letter_test_state(void *sub, unsigned int at) {
     return at == 0x106E4 ? board : editor;
 }
 int af_load_display_name(unsigned char *out, unsigned int capacity, unsigned int id) {
-    assert(capacity == 8 && id >= 0xE000 && id <= 0xE0D7); last_id=id; ++loads;
+    assert(capacity == 8 && id >= 0xE000 && id < 0xE000+AF_LETTER_NPC_COUNT); last_id=id; ++loads;
     if (!available) return 0;
     memcpy(out,full,8); return 1;
 }
@@ -68,12 +71,18 @@ int main(void) {
         if (kind == 0) available=0;
         if (kind == 1) board[0x18]=0;
         if (kind == 2) board[0x18]=7;
-        if (kind == 3) board[0x14]=216;
+        if (kind == 3) board[0x14]=AF_LETTER_NPC_COUNT;
         if (kind == 4) board[0x14]=255;
         snapshot();af_letter_header((void *)1,(void *)2,menu,64,36,colour);unchanged();
         assert(loads == (kind == 0) && span[1].length == 6 && !memcmp(span[1].text,"Native",6));
     }
     /* Museum identity remains canonical in every editing/animation state. */
+    for (unsigned int id=0;id<AF_LETTER_NPC_COUNT;++id) {
+        setup();board[0x14]=(unsigned char)id;snapshot();
+        af_letter_header((void *)1,(void *)2,menu,64,36,colour);unchanged();
+        assert(loads == 1 && last_id == (0xE000u|id));
+        assert(span[1].length == 8 && !memcmp(span[1].text,full,8));
+    }
     for (unsigned int status=0;status<=4;++status) {
         for (unsigned int field=0;field<3;++field) {
             setup();menu[1]=status;board[0]=(unsigned char)field;board[0x18]=2;

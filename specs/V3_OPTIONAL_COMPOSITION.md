@@ -17,8 +17,13 @@ development content, not completed gameplay acceptance. Select-all means the
 installed catalogue, not every entry on the donor disc. Unimplemented identities
 are rejected rather than given substitutes.
 
-An empty selection returns the exact V2-11 cartridge, SHA-256
+An empty selection returns the exact translation cartridge pinned by the
+complete build's `translation_baseline`. The corrected-header proposal pins
+V2-12, SHA-256 `a09373b051cbcd93991e5dd6cb17a238a2afb1e2e2d7694d75408d24a55d4eee`.
+Older locks without that field retain V2-11, SHA-256
 `8bbd1955536a2a3ac9f76d6f323842f5ce25c037e1ff5fd3da9f28d6dfe20507`.
+The offline selector and browser plan/recipes validate the same supported pin;
+neither silently substitutes the baseline of a different proposal.
 A nonempty selection retains the shared import engine and compiled resources,
 but enables only the chosen identities and required dependencies. Object slots,
 saved identities, house layers, allocations, and audio resources do not depend

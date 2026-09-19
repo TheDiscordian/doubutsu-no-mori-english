@@ -2,6 +2,19 @@
 
 ## Active: V3 optional GameCube imports
 
+Continue from the explicit ABI-116 lock at
+`build/v3-translation-headers-02/build-lock.json`. The Museum-header correction
+and ordinary reader's expanded villager-name bound are installed. Empty selection
+uses exact V2-12 in offline/browser composition. Current native component checks
+pass complete overlay loading/relocation, representative names, saved-state
+retention, guards, and checkpoint restoration. Do not repeat passing component
+checks. Seventeen focused checks and fourteen browser/offline profiles pass;
+actual worker reconstruction also matches empty, all, mixed, and equipment
+outputs. The full interface's separate prior invalidation check remains partial;
+the worker result does not close it. Ordinary mail appearance and hardware
+remain unverified. The separate
+seasonal-copy failure remains unresolved, so the main lock stays ABI 109.
+
 The two-fan profile in `build/v3-held-subset-01/` passes normal equipping,
 putting away, dropping with correct ground artwork, and an ordinary gyroid
 Save & Quit followed by fresh-process reload. The equipped `2255` identity,
@@ -10,8 +23,7 @@ equipped checkpoint: `build/v3-equipment-reload-01/`. Actual completed game
 save: `build/v3-equipment-save-01/test.flash`. Do not replay these successful
 paths. The copied original town and both V2 patchers remain untouched.
 
-Next pursue ordinary reward acquisition/catalogue delivery and integrate the
-Museum-header correction through the checked V3 pipeline. Pickup remains
+Next pursue ordinary reward acquisition/catalogue delivery. Pickup remains
 partial: `build/v3-equipment-drop-pickup-01/` retains the dropped checkpoint,
 and the single navigation retry stops 20.575 units from the item before pickup.
 The corrected limit/radius is unexecuted. Its setup retry is spent; do not
@@ -29,14 +41,13 @@ leaves the complete UI check partial; the genuine-change correction is unexecute
 This batch's setup retry is spent. Do not replay the successful downloads.
 See the [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-held-parent-selections).
 
-Next use `build/v3-held-selection-02/build-lock.json` explicitly. Classify the
+Use the corrected-header proposal above for new builds. Classify the
 inherited seasonal-copy continuation/stack mismatch before promotion, and finish
 ordinary acquisition, pickup, and order/delivery gameplay. The existing two-fan
 profile at `build/v3-held-subset-01/` is suitable for isolated developer checks,
 not a validated player handoff. Reuse installed artwork/readers and passing
 category evidence; no per-item scripts or reconversion. The main lock remains
-ABI 109, and neither served V2 patcher changes. Carry the Museum-header fix
-before a handoff. Imported fan saves require the matching parent profile bits;
+ABI 109, and neither served V2 patcher changes. Imported fan saves require the matching parent profile bits;
 removing imports is not a save migration.
 
 The proposed ABI 112 in `build/v3-event-menu-06/` contains shared event selection,
@@ -122,8 +133,8 @@ optional composition through the same descriptors. Keep ordinary take-out/
 put-away, full scene drawing, persistence, and equipped-fan use explicit;
 native direct-reader checks do not establish ordinary inventory gameplay.
 No further selector/name/price native replay is needed without a relevant change.
-Carry the V2 museum letter-header correction into V3 through checked composition
-before its next handoff; the current lock and import-free path retain V2-11.
+The corrected-header proposal carries the Museum fix and its V2-12 import-free
+pin; the main lock retains V2-11 until the unresolved native issue is classified.
 
 ABI 102 at `build/v3-player-frame-sound-01/` contains the complete fan per-frame
 callback and shared sound-program converter. Its actual `0167` program retains

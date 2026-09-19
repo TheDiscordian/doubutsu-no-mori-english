@@ -61,6 +61,11 @@ unchanged terminal catalogue/shop owners; see [held equipment](V3_HANDHELD_ITEMS
 Both paths preserve profiles and saved identities and emit a new build lock and
 reconstructible patch. This is a shared runtime update, not a separate installer
 for each item.
+`--refresh-runtime --translation-updates` carries the checked Museum-header
+correction, expanded letter-name bounds, and an explicit corrected import-free
+translation pin through the same resource-tail, startup, checksum, and lock
+machinery. Existing imported artwork, profiles, and behaviour code stay intact.
+See [translation integration](MUSEUM_LETTER_HEADERS.md#v3-integration).
 `--refresh-runtime --event-acquisition` consumes the donor's shared event stock
 categories and adds separate selected-only stock while preserving native wares.
 It requires the ground-enabled base explicitly and does not enable imports.

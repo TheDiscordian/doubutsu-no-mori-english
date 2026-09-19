@@ -93,7 +93,7 @@ class BrowserCompositionTests(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix='v3-browser-equivalence-') as directory:
             path = Path(directory)/'fixture.json'
             path.write_bytes(composer.canonical({'plan': self.plan, 'cases': cases,
-                'base': str(composer.BASE/'animal-forest-v3-asset-loader.z64'), 'stable': str(composer.STABLE)}))
+                'base': str(composer.BASE/'animal-forest-v3-asset-loader.z64'), 'stable': str(composer.stable_reference(self.report)[0])}))
             result = subprocess.run(['node', '--experimental-global-webcrypto',
                 str(ROOT/'tests/v3_browser_equivalence.mjs'), str(path)], check=True,
                 capture_output=True, text=True, timeout=90)

@@ -1,4 +1,7 @@
 /* Display-only English recipients and matching header editing geometry. */
+#ifndef AF_LETTER_NPC_COUNT
+#define AF_LETTER_NPC_COUNT 216u
+#endif
 extern int af_load_display_name(unsigned char *, unsigned int, unsigned int);
 extern int af_letter_code_width(unsigned int, int);
 extern void af_mail_draw(void *, const unsigned char *, unsigned int, float, float, const unsigned char *);
@@ -52,7 +55,7 @@ void af_letter_header(void *submenu, void *game, void *menu, float x, float y,
         for (i = 0; i < size; ++i) name[i] = museum[i];
     } else
 #endif
-    if (board[0x18] == 1u && board[0x14] < 216u
+    if (board[0x18] == 1u && board[0x14] < AF_LETTER_NPC_COUNT
             && af_load_display_name(name, 8, 0xE000u|board[0x14])) {
         size = 8;
         if (board[0] || !playing) while (size && name[size-1u] == ' ') --size;
