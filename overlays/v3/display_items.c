@@ -8,6 +8,10 @@ extern int af_v3_base_item_name(u8 *, u32, u32);
 extern int af_v3_base_item_type(u32);
 extern int af_v3_base_item_place(u32, int, int, void *);
 extern u32 af_v3_base_item_price(u32);
+#ifdef AF_V3_HELD_COLLECTION
+#define af_v3_prior_catalogue_record af_v3_held_catalogue_record
+#define af_v3_prior_catalogue_owned af_v3_held_catalogue_owned
+#endif
 extern void af_v3_prior_catalogue_record(u32);
 extern int af_v3_prior_catalogue_owned(const u8 *, u32);
 #ifdef AF_V3_HELD_ITEMS

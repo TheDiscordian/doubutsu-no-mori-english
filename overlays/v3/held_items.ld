@@ -12,6 +12,9 @@ SECTIONS
         . = 0x200;
         *(.text.af_v3_held_item_icon)
         *(.text .text.*)
+        ASSERT(. <= 0x804A6600, "Held readers overlap collection identity entry");
+        . = DEFINED(af_v3_held_item_collection) ? 0x600 : .;
+        *(.held_collection)
     }
     .rodata : { *(.rodata .rodata.*) }
     .data : { *(.data .data.*) }

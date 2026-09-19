@@ -1,5 +1,80 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared held-parent collection
+
+The proposed ABI 113 is `build/v3-held-collection-02/`, built explicitly from
+`build/v3-event-menu-06/build-lock.json` with the shared runtime refresh's
+`--held-collection` option. ROM SHA-256:
+`95abb54f9c1d5ab77931d2f8d1f14dde2c170d8938286a1679a3e1e69986322b`.
+Build report SHA-256:
+`6c1e20eff8b998aaf622e55dc744290f897e5916903aa9223b0fa633d4b6d010`.
+UPS SHA-256:
+`f45dbb290919eca76a506084a733b29f74c828436371d289fd9204c5bc17f669`.
+
+One 488-byte adapter connects every installed parent record to native collection
+and the existing imported ownership query. Parent IDs and rotated display IDs
+share the actual canonical bit, with exact resident-slot lookup, selected-item
+checks, existing save guards, and retained native/clothing fallbacks. The
+identity helper uses the existing parent reader's checked metadata/selection.
+Its original 1,284 bytes remain unchanged; the extended reader totals 1,716
+bytes. Both helpers fit the existing 52-KiB reservation. No artwork, original
+acquisition function, room conversion, profile bit, or saved format changes.
+
+The source audit corrects an incomplete interpretation of the donor catalogue:
+fans do not occur in its furniture list, but all eight occur at umbrella-list
+positions 32–39. The complete 64-entry umbrella list also includes pinwheels
+and balloons. Source receipts bind all nine category lists, pointer/count
+relationships, and the actual collection/room context functions. Parent records
+retain their real catalogue category and position for the next shared adapter.
+No catalogue entry or preview is installed by this collection-only batch.
+
+Four focused tests pass across the initial run and one corrected JSON tuple/key
+comparison. Actual C selection, collection, and save-codec implementations run
+under AddressSanitizer/UBSan: all eight parents, all four resident slots, rotations,
+idempotence, disabled/malformed inputs, invalid private pointers, player clearing,
+native/clothing fallback, format-2 pack/readback, and missing-profile rejection
+without destination writes. Cartridge checks cover complete unchanged resources,
+all previous held instructions, new compiled code, source bindings, complete
+startup CRCs, unchanged profile bytes, and UPS reconstruction. The first build
+stopped at a missing compiler-part registration; the second builds successfully.
+Python syntax and diff checks pass.
+
+Twelve optional-composition tests pass in 8.698 seconds against this proposal,
+without changing the main lock. Empty selection retains exact V2-11; all current
+selections reconstruct ABI 113. Current sparse profiles and actual codec
+compatibility checks remain intact. No handheld selection is added yet.
+
+The first silent native attempt verifies startup but rejects the fixture's
+direct Expansion RAM code proof before executing the reset function. The
+existing debugger deliberately limits that API to lower RAM. The justified
+retry reuses the menu fixture's allocated, checked lower-RAM jump bridge;
+no cartridge change or debugger restriction change is needed.
+`build/smoke-v3-held-collection-02/results.json` passes 138 records and 58
+assertions, SHA-256
+`91ab4410d092e38b5a973fbe50dcd27e561389127648a3483897a4638af24a45`.
+It executes actual native pocket insertion for all four resident slots, verifies
+separate imported ownership and untouched original furniture bits, rotated
+queries and repeated collection, wrapped-condition exclusion, disabled-parent
+rejection, invalid-private queries, save/equipment/stack/bridge guards, restored
+globals, complete checkpoint reload, and no CPU fault. The emulator exits
+successfully. No user save or audible playback is used; no test FlashRAM write
+is requested. This batch's native setup retry is spent; retain this passing run.
+
+These are component calls with isolated resident records, not ordinary vendor
+conversation, visible catalogue construction, equip/put-away, played save/reload,
+or original-hardware evidence. Same-profile compatibility with ABI 112 is
+expected in both directions without migration, not established by another
+ordinary cross-build reload. Imported V3 saves remain unsuitable for V2.
+The inherited seasonal-copy continuation/stack issue remains unresolved; the
+main lock stays ABI 109, and both served V2 patchers remain unchanged.
+
+Next install the prepared display models and umbrella-category catalogue readers
+from these source-derived records, then optional composition and ordinary
+gameplay. Use this proposal lock explicitly. Do not create per-item installers,
+reconvert unchanged artwork, or confuse a catalogue representation with an
+ordinary room-drop conversion. Carry the separate V2 Museum-header correction
+into V3 before its next private handoff.
+
 ## Shared event menu and transactions
 
 The proposed ABI 112 is `build/v3-event-menu-06/`, built explicitly from

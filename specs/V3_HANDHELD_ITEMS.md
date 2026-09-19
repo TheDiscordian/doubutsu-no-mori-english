@@ -219,6 +219,22 @@ vendor conversation or animation, saved-event persistence, or hardware support.
 See the [menu checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-event-menu-and-transactions)
 for executed checks and the inherited seasonal-copy issue.
 
+### Shared collection and catalogue identity
+
+The [held-parent collection adapter](V3_COLLECTION.md#shared-held-parent-collection)
+connects the actual native acquisition path and existing four-player save state.
+Generated parent and rotated-display queries use the same selected canonical
+bit without changing pocket IDs or ordinary room drops. No new saved format or
+memory allocation is required; unimplemented parent choices remain disabled.
+
+The donor's umbrella catalogue list contains 64 indices, including all eight
+fans at positions 32–39, pinwheels, and balloons. Checking only its 601-row
+furniture list misses these entries. The shared source receipt binds all nine
+category lists and records each installed parent's actual category and position.
+Its prepared furniture-style model is used for the umbrella-tab preview, not as
+an ordinary room-drop replacement. Preview/list installation and optional
+composition remain required before playable handheld selection.
+
 ### Shared resource loader
 
 The existing importer accepts the complete checked static-held category:

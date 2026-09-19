@@ -69,6 +69,12 @@ purchase/payment/handover code, and source-correct dialogue without replacing
 original merchandise. The same handheld scan records acquisition on the existing
 parent identities. Collection/catalogue and ordinary gameplay remain required. See
 [event stock](V3_HANDHELD_ITEMS.md#shared-event-stock).
+`--refresh-runtime --held-collection` connects those installed parent records to
+native acquisition, the four-player collection query, and existing saved
+ownership without another allocation or enabled choice. Its complete donor-list
+audit records the actual umbrella-tab membership and position; prepared display
+models still need that category's preview/list integration. See
+[held collection](V3_COLLECTION.md#shared-held-parent-collection).
 `--refresh-runtime --player-motion` extends that same resident module with the
 complete source-derived player motions and split-body masks. It retains the
 native player owner's table relocations and all original animation meanings;

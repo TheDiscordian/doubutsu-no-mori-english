@@ -588,7 +588,96 @@ def event_menu(debug,rom_path,record):
                 catalogue_ownership_tested=False,save_reload_tested=False,requires_checkpoint_restore=True)
 
 
+def held_collection(debug,rom_path,record):
+    """Actual acquisition/collection with four isolated resident records; no Flash writes."""
+    from runtime_layout import TEST_STACK
+    path=Path(rom_path);image=path.read_bytes();report=json.loads((path.parent/'build.json').read_bytes())
+    if sha256(image)!=report['output_sha256']:raise ValueError('Changed collection cartridge')
+    equipment=report['equipment_resources'];receipt=equipment['collection']
+    files=by_vrom(image);blob=files[runtime.BLOB].extract(image)
+    at=equipment['blob_offset'];module=blob[at:at+equipment['bytes']]
+    boot=boot_proofs(image)
+    bridge=None
+    def check(label,address,want):
+        actual=debug.read_memory(address,len(want));passed=actual==want
+        record(dict(held_collection_check=label,address=f'{address:08X}',bytes=len(want),
+            assertion='passed' if passed else 'failed',expected_sha256=sha256(want),actual_sha256=sha256(actual)))
+        if not passed:raise ValueError('Held collection mismatch: '+label)
+    def call(address,args=(),expected=None):
+        target=address;proof=boot.get(address)
+        if address>=0x80400000:
+            if bridge is None:raise ValueError('Missing upper-memory call bridge')
+            # Reuse the checked lower-memory jump bridge used by the menu
+            # fixture; debugger code proofs intentionally exclude Expansion RAM.
+            stub=struct.pack('>2I',0x08000000|((address>>2)&0x3FFFFFF),0)
+            debug.write_memory(bridge,stub)
+            call(0x8002FE00,[bridge,8]);call(0x80034CE0,[bridge,8])
+            target=bridge;proof=(bridge,stub)
+        result=debug.call(f'{target:08X}',list(args),return_address=MODULE_RAM+0x6480,verified_code=proof)
+        record(result)
+        if expected is not None:
+            passed=result['return_value']==expected
+            record(dict(held_collection_return=f'{address:08X}',expected=expected,
+                actual=result['return_value'],assertion='passed' if passed else 'failed'))
+            if not passed:raise ValueError('Held collection return mismatch')
+        return result['return_value']
+    check('complete startup equipment module',0x804A3000,module)
+    saved={a:debug.read_memory(a,n) for a,n in ((0x80460020,192),(0x8046C000,864),
+        (0x80136FD8,4),(0x80126EC0,4*0xBD0),(TEST_STACK-0x800,16),(TEST_STACK+0x40,16))}
+    edge=b'V3HC'*4
+    allocation=call(0x8009BFC0,[64])
+    if allocation&15 or not MODULE_RAM+0x8000<=allocation<=0x803FFFC0:
+        raise ValueError('Collection call bridge outside native heap')
+    bridge=allocation+16
+    debug.write_memory(allocation,edge+bytes(32)+edge)
+    selected=bytearray(saved[0x80460020])
+    for row in receipt['rows']:selected[row['profile_byte']]|=row['profile_mask']
+    try:
+        debug.write_memory(0x80460020,selected);call(0x80469200,expected=1)
+        debug.write_memory(0x80126EC0,bytes(4*0xBD0))
+        for address in (TEST_STACK-0x800,TEST_STACK+0x40):debug.write_memory(address,edge)
+        wanted=bytearray(640)
+        first,last=receipt['rows'][0],receipt['rows'][-1]
+        for p in range(4):
+            private=0x80126EC0+p*0xBD0
+            debug.write_memory(0x80136FD8,struct.pack('>I',private))
+            row=(first,last)[p%2];item=int(row['item_id'],16);display=int(row['display_item_id'],16)
+            call(0x80469AD4,[private,item],0)
+            call(0x800B8B8C,[private,item,0])
+            check('actual native pocket insertion',private+0x14,struct.pack('>H',item)+bytes(28))
+            wanted[p*128+row['profile_byte']-32]|=row['profile_mask']
+            check('only correct resident ownership changes',0x8046C0D0,wanted)
+            call(0x80469AD4,[private,item],1);call(0x80469AD4,[private,display+3],1)
+            call(0x800B88EC,[display+1]);check('rotation shares one bit',0x8046C0D0,wanted)
+            other=(last,first)[p%2];other_item=int(other['item_id'],16)
+            call(0x800B8B8C,[private,other_item,1])
+            check('wrapped condition does not collect',0x8046C0D0,wanted)
+            call(0x80469AD4,[private,other_item],0)
+            check('original native furniture collection untouched',private+0xAF0,bytes(120))
+        call(0x80469AD4,[0x80126EC1,int(first['item_id'],16)],0)
+        # Disable a selected parent in both live profile copies without clearing
+        # its owned bits. Queries and recording must not credit or mutate it.
+        selected[first['profile_byte']]&=~first['profile_mask']
+        debug.write_memory(0x80460020,selected);debug.write_memory(0x8046C010,selected)
+        call(0x80469AD4,[0x80126EC0,int(first['item_id'],16)],0)
+        call(0x800B88EC,[int(first['item_id'],16)])
+        check('disabled parent leaves ownership intact',0x8046C0D0,wanted)
+        for address in (TEST_STACK-0x800,TEST_STACK+0x40):check('test stack guard',address,edge)
+        check('save-state guard',0x8046C350,bytes.fromhex('AF53C0DE')*4)
+        check('equipment guard',0x804A3000+equipment['bytes']-16,bytes.fromhex('AF48C0DE')*4)
+        check('no CPU fault',0x8003CE34,bytes(4))
+        check('translation guard',0x8019C8D0,bytes.fromhex('AF32C0DE')*4)
+        check('call bridge leading guard',allocation,edge);check('call bridge trailing guard',allocation+48,edge)
+    finally:
+        for address,value in saved.items():debug.write_memory(address,value)
+        call(0x8009C040,[allocation])
+    for address,value in saved.items():check('restored isolated state',address,value)
+    return dict(native_held_collection=True,players=4,flash_written=False,
+        ordinary_gameplay_tested=False,catalogue_screen_tested=False,requires_checkpoint_restore=True)
+
+
 def exercise(debug, rom_path, record, *, section='automatic_furniture'):
+    if section=='held_collection':return held_collection(debug,rom_path,record)
     if section=='event_menu':return event_menu(debug,rom_path,record)
     if section=='event_acquisition':return event_stock(debug,rom_path,record)
     if section=='ground_categories':

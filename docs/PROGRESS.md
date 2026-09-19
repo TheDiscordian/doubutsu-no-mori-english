@@ -17,6 +17,34 @@ locked ROM is tracked below; this V2 fix does not replace its no-import baseline
 
 ## Active development
 
+The proposed ABI 113 in `build/v3-held-collection-02/` connects all eight
+installed fan parents to native acquisition and the existing four-player
+collection/save state through shared records. Parent IDs and rotated display
+IDs share their actual donor collection bit. Original furniture/clothing,
+wrapped-item rules, ordinary room drops, saved formats, and profile selections
+remain unchanged. The 488-byte adapter and expanded identity reader fit the
+existing 52-KiB equipment reservation.
+
+Four focused checks pass across the initial run and corrected JSON-receipt
+comparison. Twelve current optional-composition checks pass without changing
+the main lock. Host sanitizers cover all eight parents and four players, actual
+codec persistence, missing-profile rejection, clearing, invalid pointers,
+disabled/malformed records, and native/clothing fallbacks. Cartridge checks
+preserve unrelated code/resources, all existing held reader instructions,
+profile bytes, startup checksums, and complete UPS reconstruction. The corrected
+silent native run passes 138 records with 58 assertions: actual pocket insertion,
+four-player ownership, rotation aliases, wrapped/disabled rejection, guards,
+and restored state/checkpoint. Ordinary gameplay, visible catalogue previews,
+FlashRAM save/reload, and hardware remain unverified for these parents.
+
+The complete donor catalogue audit puts fans in the **umbrella** category,
+positions 32–39 of its 64-entry list. They are absent from the furniture list,
+not absent from the catalogue. Next install their prepared display models into
+that category's shared preview/list readers and connect optional selection.
+Use the proposal lock explicitly; the main lock remains ABI 109 until the
+inherited seasonal-copy issue is resolved. Both served V2 patchers remain
+unchanged. See the [collection specification](../specs/V3_COLLECTION.md#shared-held-parent-collection).
+
 The proposed ABI 112 in `build/v3-event-menu-06/` connects the shared fireworks
 stock to an explicit original/imported-wares selector, English item pages,
 native pocket/payment checks, actual insertion/debit, and handover requests.

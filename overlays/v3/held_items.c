@@ -38,6 +38,25 @@ u32 af_v3_held_item_price(u32 item) {
     return row ? row->price : 0;
 }
 
+#ifdef AF_V3_HELD_COLLECTION
+/* Collection uses the display identity; ordinary drops do not. The same
+   checked parent records and selector govern direct and rotated display IDs. */
+u32 __attribute__((section(".held_collection"))) af_v3_held_item_collection(u32 item) {
+    const HeldItem *row;
+    if (item > 65535u) return 0;
+    if (item-0x2224u < 56u) {
+        row=find(item);
+        return row ? row->display : 0;
+    }
+    if ((item>>12)!=3u) return 0;
+    for (u32 i=0;i<56u;++i) {
+        row=find(0x2224u+i);
+        if (row && row->display==(item&0xFFFCu)) return row->display;
+    }
+    return 0;
+}
+#endif
+
 #ifdef AF_V3_POCKET_ICONS
 #ifdef __mips__
 #define icons ((const u32 *)0x804A6800u)

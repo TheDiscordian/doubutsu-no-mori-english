@@ -126,3 +126,45 @@ Focused collection verification is recorded in
 function fixtures do not establish an ordinary shop/reward route or hardware
 acceptance. Ordinary catalogue ordering/delivery, item scoring, acquisition and
 placement, houses/move-in, and Controller Pak support remain required.
+
+## Shared held-parent collection
+
+`--refresh-runtime --held-collection` on the shared installer connects installed
+equipment-parent records to the existing collection entry and owned-item query.
+It requires the event-equipped proposal and adds no per-item installer or item
+list. `v3_held_collection.source_records` verifies the actual donor conversion
+contexts, installed parent/selection records, and all nine catalogue lists with
+their pointer/count bindings. Fans occupy umbrella-list positions 32–39; their
+absence from `mCL_furniture_list` does not justify removing catalogue support.
+The same generated records retain category/position for preview integration.
+
+The selected parent reader exposes `af_v3_held_item_collection` at `804A6600`.
+It validates the same metadata, readiness, and selected-profile bit as names,
+prices, and icons. Parent IDs and all four display rotations resolve to one
+collection identity. Unknown or disabled parents do not enter native tool
+tables. Original IDs and clothing keep their existing collection implementation.
+This function changes no room-placement conversion or saved pocket identity.
+
+The 488-byte record/query adapter starts at `804AFA00`, with the query fixed
+at `804AFB00`. Both fit before the existing equipment guard at `804AFFF0`.
+The parent reader occupies 1,716 bytes at `804A6000`; its original 1,284 bytes
+and public name/price/icon/assembly entries remain unchanged. The display
+wrapper retains its 696-byte reservation and redirects only its collection
+calls. Existing prior-collection bridges remain at `80466F00`/`80466F10`.
+No allocation grows, and startup checksums cover the complete changed module.
+
+Ownership uses the actual canonical display's existing profile bit and the
+correct resident's 128-byte collection. The original native pocket setters
+still determine whether the acquired condition records ownership. Queries are
+read-only, all rotations share one bit, repeated acquisition is idempotent,
+and the existing resident-clear hook clears these bits too. Selected imports
+acquired by a visiting private record retain the existing safety warning;
+Controller Pak transport is not implemented by this adapter. Save format 2,
+the current selection profile, and all codec entry addresses are unchanged.
+
+No parent choice is enabled by collection installation. The umbrella category's
+list, actual display models, canonical name/price readers, and selected preview
+construction still need installation before optional selection and ordinary
+gameplay/persistence checks. Both served patchers stay V2. See the
+[checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-held-parent-collection)
+for exact tests and the inherited seasonal-copy restriction.

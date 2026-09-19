@@ -2,6 +2,26 @@
 
 ## Active: V3 optional GameCube imports
 
+The proposed ABI 113 in `build/v3-held-collection-02/` adds shared handheld
+collection recording/querying through actual native acquisition. Four focused
+checks and twelve optional-composition checks pass. The corrected silent native
+run passes 138 records/58 assertions, including native acquisition, all four
+players, wrapped/disabled rejection, guards, and restored state/checkpoint.
+The existing four-player saved format, all profile bits,
+52-KiB equipment allocation, original acquisition conditions, and ordinary room
+drops remain unchanged. No handheld choice is enabled yet.
+
+Next connect the **umbrella catalogue category**, not the furniture list:
+the donor's complete nine-list inventory puts fans at positions 32–39 in
+`mCL_umbrella_idx_list`. Collection records already carry each parent's exact
+category, position, canonical display ID, and saved-profile bit. Reuse the
+prepared `build/v3-furniture-indexed-sequence-prepared-01/` display models and
+`build/v3-held-collection-02/build-lock.json`. Extend shared preview/list/profile
+consumers without per-item installers, repeated conversion, or changing ordinary
+room-drop semantics. Then connect optional selection and ordinary gameplay.
+The main lock remains ABI 109 pending the inherited seasonal-copy issue;
+neither served V2 patcher changes.
+
 The proposed ABI 112 in `build/v3-event-menu-06/` contains shared event selection,
 English pages, native pocket/payment handling, and handover requests. Four
 focused and twelve composition checks pass. The corrected silent native run
@@ -12,13 +32,9 @@ original merchandise, guards, and restored globals/checkpoint. The module is
 disabled. The main lock stays ABI 109 because the inherited seasonal-copy
 check is unresolved. See the [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-event-menu-and-transactions).
 
-Next connect context-correct collection/catalogue and optional selection to
-the installed parent/category/acquisition records. The native pocket insertion
-currently does not credit a fan's catalogue representation; use the source
-collection conversion while retaining the parent ID on ordinary room drops.
-Reuse the complete `build/v3-furniture-indexed-sequence-prepared-01/` display
-models and `build/v3-event-menu-06/build-lock.json` explicitly; do not reconvert
-artwork, write per-item installers, or promote the unresolved ground dependency.
+The shared collection proposal above extends these transactions without changing
+the menu/payment code. Do not reconvert artwork, write per-item installers, or
+promote the unresolved ground dependency.
 Keep disabled categories explicit and finish ordinary take-out/put-away,
 conversation/handover appearance, and persistence before a playable handoff.
 Do not replay passing stock/menu component checks without a relevant change.

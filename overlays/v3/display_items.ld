@@ -9,6 +9,8 @@ af_v3_prior_catalogue_record = 0x80466F00;
 af_v3_prior_catalogue_owned = 0x80466F10;
 af_v3_held_item_name = 0x804A6000;
 af_v3_held_item_price = 0x804A6100;
+af_v3_held_catalogue_record = 0x804AFA00;
+af_v3_held_catalogue_owned = 0x804AFB00;
 SECTIONS
 {
     . = 0x80466C00;
