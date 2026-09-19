@@ -649,11 +649,54 @@ The donor fan ground/handover artwork is distinct from both pocket icons and
 equipped models. Complete source lists `obj_item_utiwaT_mat_model` at
 `.data+8902E0` (72 bytes) and `obj_item_utiwaT_gfx_model` at `.data+890328`
 (24 bytes) reference one 32-byte palette, one 32×32 CI4 texture, and four
-vertices. Shared model preflight accepts the complete ordered pair: 608 resource
-bytes and 200 command bytes, without resizing or simplified graphics. This is
-preflight evidence, not installed ground/handover support.
+vertices. The split-list converter retains 608 resource bytes, a 184-byte
+material list, and a 24-byte geometry list, without resizing or simplified
+graphics. These are prepared assets, not installed ground/handover support.
 
 Discover the category dependencies through the complete source draw tables,
 including all four ground variants and handover/police tables. Feed those
 records into the existing converter and shared installer. Preserve material /
 matrix / geometry order in handover and avoid creating another per-item list.
+
+### Shared category preparation
+
+`tools/v3_item_categories.py` discovers all extra handheld parents and states
+from the actual equipment selector and item-type table, then groups them by
+source category. It checks both complete handover/police material and geometry
+tables and all four seasonal ground descriptor chains. Each supported ground
+descriptor has exactly one ordinary list, no shadow dependency, and the real
+source callback with material/geometry indices zero and one. Changed callback
+code, additional shadows/lists, conflicting artwork, ambiguous dependencies,
+and incomplete owners reject rather than being omitted.
+
+```sh
+python3 tools/v3_furniture_pipeline.py convert --representation handheld \
+  --assets-only --category item-category-art --output build/item-category-art
+```
+
+The nine categories cover 43 parent/state records, not 43 newly selectable
+items. Worn axes and catalogue representations do not become independent
+imports. `--select` narrows the prepared categories by parent identity; each
+shared resource retains every source parent using it. The prepared format is
+`AFV3-ITEM-CATEGORY-PREPARED-ASSETS-1`; both furniture and held-equipment
+installers reject it. A native category adapter must consume it explicitly.
+
+`prepare_material_pair` uses the ordinary shared complete-model parser on the
+ordered material/geometry pair. It then splits the validated command rows at
+the actual source boundary, accounting for the paired Dolphin texture/tile
+instruction. Material fragments cannot contain vertices, triangles, or nested
+calls, and geometry fragments cannot change material state. There is no
+fragment-parser mode that bypasses complete triangle/dependency checks.
+The geometry emitter preserves inherited texture state, adding no texture-LUT
+reset or preamble. Original full-model emission stays unchanged. Removing the
+material list's return and concatenating the geometry list reproduces the
+complete joined-model commands; the real renderer can insert its matrix
+between the separate lists without moving the vertex load before that matrix.
+
+Each category produces a complete 816-byte object. The nine-resource batch
+contains 7,344 bytes, 9,216 CI4 texels, 144 palette entries, 36 vertices, and
+18 triangles. Ground descriptors retain each source variant's real base:
+the first three use 68, and the fourth uses 70. Do not impose one assumed
+season-independent category offset. Installation still requires native owner
+tables, their pointers/relocations, police array capacities, and item-type
+selection. Preparation changes neither the cartridge nor any saved/profile ID.

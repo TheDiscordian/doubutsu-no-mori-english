@@ -24,9 +24,13 @@ loading and appearance need the combined gameplay pass once category support is 
 Category discovery identifies all four seasonal ground owners, lost-and-found,
 and handover as direct native item-type consumers. Their table indices and the
 police local array must be extended together, not just the ordinary ground
-owner. The donor's separate fan ground/handover graphic passes complete shared
-model preflight. Reuse that converter; install source-derived category records
-and verify consumer bounds before enabling the parent items. Exact owners,
+owner. Complete category artwork is prepared at `build/v3-item-category-art-02/`:
+nine shared material/geometry pairs for 43 parent/state records, with seven
+focused checks passing. Reuse those complete assets and the generated six-owner
+descriptors; do not reconvert models or add per-item installers. Install native
+source-derived category records and verify consumer bounds before enabling the
+parent items. The source ground variants do not all share a category base;
+three use 68 and the fourth uses 70. Exact owners,
 calls, source roots, and remaining discovery limits are in the
 [category integration notes](../specs/V3_HANDHELD_ITEMS.md#ground-and-handover-category-integration).
 

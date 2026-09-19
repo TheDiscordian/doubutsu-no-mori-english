@@ -442,6 +442,9 @@ def scan(source):
 
 def convert(source,output,selected=(),*,category=None):
     from v3_furniture_pipeline import prepare_models,compile_models
+    if category == 'item-category-art':
+        from v3_item_categories import convert as convert_categories
+        return convert_categories(source,output,selected)
     if category == 'held-motion':
         if selected:raise ValueError('Held-motion preparation uses the complete source dependency bundle')
         return convert_motion(source,output)

@@ -565,6 +565,48 @@ def prepare_models(source, descriptor):
     return descriptor, bytes(body), resources, offsets, models, commands, sections
 
 
+def prepare_material_pair(source, parts):
+    """Validate a full material/geometry pair, then retain its separate lists.
+
+    Ground and handover renderers insert per-instance matrices between these
+    lists. Never weaken complete-model parsing to accept an arbitrary fragment.
+    """
+    if len(parts)!=2:raise ReviewRequired('Material pair requires exactly two complete lists')
+    descriptor=dict(models={'opaque':parts[0]},callback_adapter=dict(
+        category='split-material-geometry',model_sequences={'opaque':parts}))
+    _,body,resources,offsets,joined,_,_=prepare_models(source,descriptor)
+    material=source.data[parts[0][1]:parts[0][1]+parts[0][2]]
+    geometry=source.data[parts[1][1]:parts[1][1]+parts[1][2]]
+    if any(material[i] in (0x01,0x0A,0xDE) for i in range(0,len(material)-8,8)):
+        raise ReviewRequired('Material pair has geometry or a nested call in its material list')
+    rows=joined['opaque']['rows'];split=cursor=0
+    # One decoded texture row consumes both FD and its paired Dolphin D2
+    # command. Counting eight-byte words would move the vertex load before the
+    # caller's matrix, so follow the validated material instruction boundaries.
+    while cursor<len(material)-8:
+        words=struct.unpack_from('>II',material,cursor)
+        if split>=len(rows) or rows[split]['words']!=words:
+            raise ReviewRequired('Material pair boundary disagrees with complete decoding')
+        cursor+=16 if rows[split]['opcode']==0xFD else 8
+        split+=1
+    if cursor!=len(material)-8:raise ReviewRequired('Material pair splits a texture/tile command')
+    if (split<=0 or len(rows)<=split or
+            any(r['opcode'] not in (0x01,0x0A,0xDF) for r in rows[split:])):
+        raise ReviewRequired('Material pair geometry changes material or uses unsupported commands')
+    groups=(rows[:split]+[dict(words=(0xDF000000,0),opcode=0xDF)],rows[split:])
+    models={}
+    for label,part,raw,group in zip(('material','geometry'),parts,(material,geometry),groups):
+        name,at,n=part
+        models[label]=dict(symbol=name,donor_offset=at,source_sha256=sha256(raw),
+            source_parts=[dict(symbol=name,donor_offset=at,bytes=n,sha256=sha256(raw),joined_offset=0)],
+            rows=group,**({'inherited_material':True} if label=='geometry' else {}))
+    commands,sections=command_source(models,offsets)
+    descriptor.update(kind='split-material-geometry',models=dict(zip(('material','geometry'),parts)))
+    descriptor['callback_adapter']=dict(category='split-material-geometry',
+        model_order=['material','matrix','geometry'],complete_pair_sha256=sha256(material+geometry))
+    return descriptor,body,resources,offsets,models,commands,sections
+
+
 def compile_models(directory, prepared):
     """Emit a complete native object from the shared preflight description."""
     profile, body, resources, offsets, models, commands, sections = prepared

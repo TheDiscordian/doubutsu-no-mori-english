@@ -36,6 +36,14 @@ are available until player integration is implemented. Its distinct prepared
 format cannot enter the furniture installer. Catalogue/collection previews
 never substitute for the actual held model or its gameplay.
 
+Within the handheld representation, `--category item-category-art` prepares
+the separate ground/police/handover graphics through shared material/geometry
+conversion. All extra equipment parents are grouped from actual source type
+tables, not an item list. Complete six-owner source relationships and split
+lists are retained; neither furniture nor equipment-resource installation
+accepts this distinct prepared format as gameplay support. See
+[category preparation](V3_HANDHELD_ITEMS.md#shared-category-preparation).
+
 Shared reader changes use the same installer's `--refresh-runtime` mode. It
 updates the checked current cartridge without reconverting or reinstalling any
 existing artwork. Ordinary reader refreshes retain the complete DMA directory

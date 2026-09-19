@@ -39,6 +39,17 @@ native menu index. Acquisition, context-correct collection/catalogue, optional
 composition, ordinary take-out/put-away, and persistence remain work. Carry the
 museum-header correction into V3 before a handoff; both V2 patchers stay unchanged.
 
+The shared category converter prepares all nine ground/police/handover artwork
+categories used by 43 extra equipment parent/state records in
+`build/v3-item-category-art-02/`. Complete textures, palettes, vertices, and
+separate material/geometry lists occupy 7,344 bytes. Seven focused checks pass,
+including every texel/colour/vertex/triangle, all six source-owner relationships,
+source mutation rejection, matrix-safe list splitting, and unchanged ordinary
+model emission. These are prepared assets, not 43 new playable items. Native
+category tables, police array capacities, and runtime selection remain work;
+the cartridge stays ABI 108. See the
+[checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-ground-and-handover-artwork).
+
 ABI 104 registers fan action 109's complete setup/main/net-reset group and its
 four ordinary input polls through the shared importer. A complete core-bound
 audit preserves unrelated native limits and umbrella repeat behaviour. Native

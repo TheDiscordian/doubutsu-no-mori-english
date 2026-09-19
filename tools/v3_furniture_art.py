@@ -595,10 +595,14 @@ def command_source(models, offsets):
             values.append('    ' + value + ',')
             count += commands
 
-        emit('gsDPPipeSync()')
+        inherited=model.get('inherited_material',False)
+        if inherited and any(row['opcode'] not in (0x01,0x0A,0xDF) for row in model['rows']):
+            raise ValueError('Inherited material is limited to validated geometry lists')
+        if not inherited:emit('gsDPPipeSync()')
         direct = next((bool(row.get('intensity') or row.get('rgba16'))
                        for row in model['rows'] if row['opcode']==0xFD),False)
-        emit('gsDPSetTextureLUT(G_TT_NONE)' if direct else 'gsDPSetTextureLUT(G_TT_RGBA16)')
+        if not inherited:
+            emit('gsDPSetTextureLUT(G_TT_NONE)' if direct else 'gsDPSetTextureLUT(G_TT_RGBA16)')
         for row in model['rows']:
             op = row['opcode']
             if op == 0xD7:

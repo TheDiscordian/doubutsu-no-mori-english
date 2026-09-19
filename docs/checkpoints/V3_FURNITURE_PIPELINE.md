@@ -1,5 +1,62 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared ground and handover artwork
+
+The `item-category-art` category prepares all nine complete ground/police/
+handover representations used by the donor's 43 extra handheld parent/state
+records. Source category tables select the artwork; no per-item model list or
+new native scenario is introduced. Worn axes remain states, and shared resources
+do not create multiple logical imports. Source categories are `19`, `33`,
+`37..43`; the receipt records every parent identity and official name locator.
+
+Each complete object contains a 32-byte palette, a 512-byte 32×32 CI4 texture,
+four vertices, and separately callable material/geometry lists. Nine objects
+occupy 7,344 bytes with 9,216 texels, 144 palette entries, 36 vertices, and
+18 triangles. Discovery verifies both complete handover/police table pairs,
+all four ground descriptor chains, and twelve complete consumer functions.
+It retains the source variant-specific ground bases `68/68/68/70` rather than
+assuming every seasonal table is identical.
+
+Artifacts:
+
+- Prepared build: `build/v3-item-category-art-02/`.
+- Art receipt SHA-256: `ad60ba447b1ab62f7d996bbae8610b874aad56a95cf34f4e473c72563f4bc21e`.
+- Inventory receipt SHA-256: `1abc0d0486e63c416dc7c43465bb849a186adcbec4bbf98d988bbaf3d8661284`.
+- Format: `AFV3-ITEM-CATEGORY-PREPARED-ASSETS-1`. Existing furniture and held
+  resource installers explicitly reject it; native integration is not implied.
+
+The shared converter first validates the complete joined source model, then
+splits its decoded commands into material and geometry lists. The source's
+paired texture/tile command consumes two words but one decoded row. The initial
+`-01` preparation counts raw words instead, incorrectly moving the vertex load
+into the material list before the caller's matrix. The independent geometry
+test catches that actual converter defect. The corrected decoder-boundary walk
+keeps the vertex load with geometry; `-01` is not suitable for installation.
+No version of these prepared objects has been installed in a ROM.
+
+Six focused category checks pass in 3.368 seconds on the corrected `-02`
+preparation. They cover every source pixel, palette colour, vertex field,
+triangle, retained graphics command, all parent/category/owner relationships,
+rejection of changed consumers, shadows, callbacks, mismatched tables, and
+unsupported selections. Joining the emitted lists after removing only the
+intermediate return exactly reproduces the ordinary full-model conversion.
+A seventh focused check passes in 0.350 seconds, retaining the installed
+ordinary furniture batch's generated commands and rejecting material commands
+in a geometry-only inherited-state list.
+
+The initial test command also discovers unrelated imported test classes and
+uses an incorrect held-installer function name. Its full result is not a pass.
+The corrected test module imports the shared checks as a module, calls the real
+installer entry, and explicitly selects only the intended category classes.
+No emulator or hardware test is claimed for this converter-only batch.
+
+The promoted cartridge stays ABI 108 and all prior preview/runtime evidence is
+retained. Saved formats, profile bits, selectable choices, and both served V2
+patchers remain unchanged. Next integrate the prepared category records across
+all native ground variants, lost-and-found, and handover, including table
+relocations and police array capacities, before enabling the item-type reader.
+Do not substitute existing tool-bag artwork for the source fan representation.
+
 ## Shared inventory equipment previews
 
 ABI 108 installs source-derived preview records for all eight fan parents
