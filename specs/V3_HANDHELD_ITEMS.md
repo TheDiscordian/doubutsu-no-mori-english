@@ -651,7 +651,8 @@ equipped models. Complete source lists `obj_item_utiwaT_mat_model` at
 (24 bytes) reference one 32-byte palette, one 32×32 CI4 texture, and four
 vertices. The split-list converter retains 608 resource bytes, a 184-byte
 material list, and a 24-byte geometry list, without resizing or simplified
-graphics. These are prepared assets, not installed ground/handover support.
+graphics. The police/handover adapter installs these assets; ground support
+remains a required integration step.
 
 Discover the category dependencies through the complete source draw tables,
 including all four ground variants and handover/police tables. Feed those
@@ -697,6 +698,72 @@ Each category produces a complete 816-byte object. The nine-resource batch
 contains 7,344 bytes, 9,216 CI4 texels, 144 palette entries, 36 vertices, and
 18 triangles. Ground descriptors retain each source variant's real base:
 the first three use 68, and the fourth uses 70. Do not impose one assumed
-season-independent category offset. Installation still requires native owner
-tables, their pointers/relocations, police array capacities, and item-type
-selection. Preparation changes neither the cartridge nor any saved/profile ID.
+season-independent category offset. Preparation changes neither the cartridge
+nor any saved/profile ID. The runtime adapter below supplies police/handover
+tables and capacities; seasonal ground integration remains required.
+
+### Shared police and handover runtime
+
+`tools/v3_category_runtime.py` runs through the existing shared installer:
+
+```sh
+python3 tools/v3_furniture_install.py --refresh-runtime \
+  --item-category-art build/v3-item-category-art-02 --output build/category-runtime
+```
+
+The category adapter checks the complete prepared source relationships,
+resources, split lists, and generated commands. It installs all nine complete
+objects in the equipment module. Only vertex, palette, and texture pointers
+change: segment-six references become physical segment-zero addresses within
+their permanent reservation. Resource contents and all other commands remain
+unchanged. Callers do not need to replace their current segment-six binding.
+Material and geometry remain separate so the native renderer inserts matrices
+before vertex loading.
+
+Native categories `0..26` retain their exact values and graphics. Added category
+IDs use `27 + donor category`, independently of selected parents or conversion
+order. Fan category 43 therefore uses native category 70. The current 71-entry
+material and geometry tables share their original 27 values between both
+owners; unused extended slots are zero. This is a transient drawing category,
+not a saved item identity or an ID-derived action-menu index.
+
+`AFCT` at `804AA200` has four header words: magic `41464354`, version one,
+native capacity 71, and source-map width 53. Its 53 byte entries map supported
+source categories; other entries are zero. The 344-byte reader at `804AA000`
+requires valid installed parent metadata, a matching selected/ready equipment
+kind, and a supported map entry. Unsupported or disabled extra parent IDs
+return zero without reaching the original short equipment table. Other items
+delegate to the existing translated item-type entry, preserving furniture and
+original category decisions.
+
+Material and geometry tables start at `804AA300` and `804AA41C`; each is
+284 bytes. The nine objects occupy 7,344 bytes starting at `804AA600`.
+The complete equipment reservation is 40 KiB, ending at `804AD000`, with guard
+`804ACFF0`. The prior 28-KiB module prefix stays unchanged. Startup transfers,
+checks, and flushes the complete module; its existing 952-byte code allocation
+does not grow. All ordinary model/animation banks remain unchanged.
+
+Police owner `007E4DF0`, linked at `808EB720`, receives matching capacity
+changes: 70 start indices, a 184-byte setter stack frame, and an 18,060-byte
+actor (88 bytes larger). The draw-position offset within the draw table becomes
+`90`; all 257 68-byte matrix nodes remain. The following item-table offset within
+the actor becomes `4648`. Allocation size, all matrix/item-table consumers,
+clear/copy bounds, and drawing limit change together. Capacity remains three
+modulo four to preserve the native two-plus-four-way unrolled copy. The output
+helper uses an unsigned range check, rejecting negative and out-of-range indices
+before any array access.
+
+Handover owner `00858A50`, linked at `80963DC0`, retains its actor size,
+animation, and drawing body. Both owners redirect their existing category call
+and two complete table-reference pairs. Each drops exactly four obsolete HI/LO
+relocations; all other owner code/data, relocation records, and resource sizes
+remain unchanged. The changed compressed resources use the existing checked
+uncompressed blob storage and preserve their logical DMA identities.
+
+The global item-type entry and all four seasonal ground consumers still need
+integration. The adapter enables no parent/profile bit, creates no browser
+choice, and changes no saved format. Do not enable handheld imports until the
+remaining consumers, acquisition, collection/catalogue, and optional composition
+are connected. Ordinary police/handover gameplay, GPU appearance, and persistence
+are distinct from the focused native component checks recorded in the
+[checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-police-and-handover-runtime).

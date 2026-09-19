@@ -268,11 +268,144 @@ def inventory_preview(debug, rom_path, record):
                 requires_checkpoint_restore=True)
 
 
+def item_categories(debug,rom_path,record):
+    """Loaded police capacity/drawing and handover category/table windows."""
+    import v3_category_runtime as category
+    from v3_furniture_room_smoke import extend
+    from runtime_layout import TEST_STACK
+    path=Path(rom_path);image=path.read_bytes();report=json.loads((path.parent/'build.json').read_bytes())
+    if sha256(image)!=report['output_sha256']:raise ValueError('Category probe requires the current cartridge')
+    equipment=report['equipment_resources'];receipt=equipment['item_categories']
+    files=by_vrom(image);blob=files[runtime.BLOB].extract(image);boot=boot_proofs(image)
+    at=equipment['blob_offset'];module=blob[at:at+equipment['bytes']]
+    def check(label,at,want):
+        observed=debug.read_memory(at,len(want));passed=observed==want
+        record(dict(item_category_check=label,address=f'{at:08X}',bytes=len(want),
+                    assertion='passed' if passed else 'failed'))
+        if not passed:raise ValueError('Category mismatch: '+label)
+    def call(at,args=(),want=None,proof=None):
+        result=debug.call(f'{at:08X}',list(args),return_address=MODULE_RAM+0x6480,
+                          verified_code=proof or boot.get(at))
+        if want is not None:result['assertion']='passed' if result['return_value']==want else 'failed'
+        record(result)
+        if want is not None and result['return_value']!=want:raise ValueError('Category return mismatch')
+        return result['return_value']
+    def put(at,*words):debug.write_memory(at,struct.pack('>'+str(len(words))+'I',*words))
+    check('complete startup module including all artwork',category.RAM,module)
+    saved_profile=debug.read_memory(0x80460020,192)
+    size=0x10000;allocation=call(0x8009BFC0,[size])
+    if allocation&15 or not MODULE_RAM+0x8000<=allocation<=0x80400000-size:
+        raise ValueError('Category fixture allocation outside native heap')
+    root,actor,block,items,game,graph,gfx,bridge,stack=(allocation+n for n in
+        (16,0x3000,0x7800,0x7900,0x7C00,0x8000,0x8500,0xA000,0xF000))
+    debug.write_memory(allocation,bytes(size));edge=b'V3CT'*4
+    guards=(allocation,actor-16,actor+receipt['owners'][0]['capacity']['actor_bytes'],
+            block-16,items-16,game-16,graph-16,gfx-16,gfx+0x1000,bridge-16,
+            bridge+16,stack-0x800,stack+0x200,allocation+size-16,TEST_STACK-0x800,TEST_STACK+0x40)
+    for at in guards:debug.write_memory(at,edge)
+    parents=equipment['parent_readers']['rows'];parent=parents[-1];item=int(parent['item_id'],16)
+    art=next(r for r in receipt['objects'] if item in [int(p,16) for p in r['parent_item_ids']])
+    def select(enabled):
+        profile=bytearray(saved_profile)
+        for p in parents:profile[p['profile_byte']]&=~p['profile_mask']
+        if enabled:profile[parent['profile_byte']]|=parent['profile_mask']
+        debug.write_memory(0x80460020,profile)
+    def load(spec):
+        data,rel=(files[spec[k]].extract(image) for k in ('vrom','reloc'))
+        sections=struct.unpack_from('>5I',rel);resident=sum(sections[:4])
+        loaded=relocate_verified_data(SimpleNamespace(ram=spec['ram'],resident_bytes=resident,sections=sections),data,rel,root)
+        call(0x800262D0,[spec['vrom'],spec['vrom']+len(data),spec['ram'],spec['ram']+resident,
+                        root,root+resident,len(rel)])
+        check(spec['role']+' actual loaded owner and BSS',root,loaded)
+        return loaded,(root,loaded[:sections[0]])
+    def window(start,end,updates):
+        before=debug.command('g');regs=[int(before[i:i+16],16) for i in range(0,len(before),16)]
+        if len(regs)!=71 or regs[37]&0xFFFFFFFF!=0x800D334C:
+            raise ValueError('Category native window requires paused game frame')
+        regs[29]=extend(stack);regs[37]=extend(start)
+        for r,v in updates.items():regs[r]=extend(v)
+        bp=f'0,{end:x},4'
+        if debug.command('Z'+bp)!='OK':raise ValueError('Category breakpoint refused')
+        try:
+            if debug.command('G'+''.join(f'{r:016x}' for r in regs))!='OK':raise ValueError('Category registers refused')
+            stopped=debug.command('c');raw=debug.command('g')
+            actual=[int(raw[i:i+16],16) for i in range(0,len(raw),16)]
+            passed=(stopped[:3] in ('T05','S05') and actual[37]&0xFFFFFFFF==end and actual[29]==regs[29]
+                    and actual[16:24]==regs[16:24] and actual[30]==regs[30])
+            record(dict(item_category_window=f'{start:08X}',assertion='passed' if passed else 'failed'))
+            if not passed:raise ValueError('Category window continuation/register mismatch')
+            return actual
+        finally:debug.command('z'+bp);debug.command('G'+before)
+    try:
+        stub=struct.pack('>II',category.jump(receipt['code']['symbols']['af_v3_equipment_category']),0)
+        debug.write_memory(bridge,stub);call(0x8002FE00,[bridge,8]);call(0x80034CE0,[bridge,8])
+        native_type=call(0x800A5630,[0x2200])
+        for value,enabled,want in ((item,False,0),(item,True,art['native_category']),
+                                   (0x2224,True,0),(0x2200,False,native_type)):
+            select(enabled);call(bridge,[value],want,(bridge,stub))
+        police=receipt['owners'][0];loaded,proof=load(police);capacity=police['capacity']
+        tbl=actor+0x174;put(block+12,items)
+        debug.write_memory(tbl+4,b'\xA5'*(capacity['start_indices']*2))
+        # The real native setter clears/copies every extended slot and initialises
+        # all 257 matrix nodes; an empty field avoids unrelated terrain queries.
+        call(root+0x808EB954-police['ram'],[actor,tbl,block],proof=proof)
+        check('all extended police start indices',tbl+4,bytes(capacity['start_indices']*2))
+        positions=tbl+capacity['draw_positions_offset']
+        check('all 257 native matrix-list sentinels',positions,(struct.pack('>I',256)+bytes(64))*257)
+        check('police draw flag',tbl,struct.pack('>I',1))
+        for invalid in (capacity['start_indices'],0xFFFFFFFF):
+            call(root,[tbl+4,block+0x20,block+0x28,invalid,block,0],proof=proof)
+        check('invalid categories do not index the start array',tbl+4,bytes(capacity['start_indices']*2))
+        # Draw the last extended category and an original category through the
+        # actual expanded native loop, material setup, matrix, and geometry.
+        native=1;imported=art['native_category']
+        for category_id,index in ((imported,1),(native,2)):
+            debug.write_memory(tbl+4+2*(category_id-1),struct.pack('>H',index))
+            matrix=struct.pack('>16f',*[1.0 if i%5==0 else 0.0 for i in range(16)])
+            debug.write_memory(positions+index*68,struct.pack('>i',-index)+matrix)
+        put(game,graph);put(graph+0x298,gfx,gfx+0x1000)
+        put(root+0x7C0,game,graph,tbl,0,0,0,0)
+        call(root+0x808EBC7C-police['ram'],proof=proof)
+        head,tail=struct.unpack('>2I',debug.read_memory(graph+0x298,8))
+        if not gfx<=head<tail<=gfx+0x1000:raise ValueError('Police graphics exceeded its private arena')
+        commands=debug.read_memory(gfx,head-gfx)
+        lists=[b for a,b in struct.iter_unpack('>2I',commands) if a==0xDE000000]
+        values=[struct.unpack_from('>'+str(receipt['count'])+'I',module,t['offset']) for t in receipt['tables']]
+        expected=[values[0][native],values[1][native],values[0][imported],values[1][imported]]
+        # Graphics setup can also call shared lists; retained item lists must occur once, in order.
+        observed=[p for p in lists if p in expected]
+        passed=observed==expected
+        record(dict(police_category_draw_lists=observed,expected=expected,assertion='passed' if passed else 'failed'))
+        if not passed:raise ValueError('Police material/matrix/geometry dispatch mismatch')
+        handover=receipt['owners'][1];loaded,proof=load(handover)
+        put(block,0,0,0);debug.write_memory(block+14,struct.pack('>H',item))
+        for enabled,want in ((False,0),(True,imported)):
+            select(enabled)
+            window(root+handover['call'],root+handover['call']+12,{16:actor,24:block})
+            check('native handover category assignment',actor+0x1E2,bytes([want]))
+        for value in (0,native,imported):
+            debug.write_memory(actor+0x1E2,bytes([value]))
+            registers=window(root+0x809647FC-handover['ram'],root+0x80964828-handover['ram'],{16:actor})
+            check('handover material lookup',stack+0x64,struct.pack('>I',values[0][value]))
+            if registers[8]&0xFFFFFFFF!=values[1][value]:raise ValueError('Handover geometry lookup mismatch')
+        check('complete equipment module retained',category.RAM,module)
+        for at in guards:check('category fixture guard',at,edge)
+        check('no faulted thread',0x8003CE34,bytes(4))
+    finally:
+        debug.write_memory(0x80460020,saved_profile);call(0x8009C040,[allocation])
+    check('restored selected profile',0x80460020,saved_profile)
+    return dict(native_category_cases=4,police_start_indices=capacity['start_indices'],
+        police_matrix_nodes=257,police_draw_categories=2,handover_windows=5,
+        ground_tested=False,gpu_rendered=False,ordinary_gameplay_tested=False,
+        save_reload_tested=False,requires_checkpoint_restore=True)
+
+
 def exercise(debug, rom_path, record, *, section='automatic_furniture'):
     if section=='equipment_resources':return equipment_resources(debug,rom_path,record)
     if section=='player_motion':return player_motion(debug,rom_path,record)
     if section=='pocket_icons':return pocket_icons(debug,rom_path,record)
     if section=='inventory_preview':return inventory_preview(debug,rom_path,record)
+    if section=='item_categories':return item_categories(debug,rom_path,record)
     path = Path(rom_path)
     image = path.read_bytes()
     report = json.loads((path.parent / 'build.json').read_bytes())

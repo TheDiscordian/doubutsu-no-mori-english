@@ -44,6 +44,14 @@ lists are retained; neither furniture nor equipment-resource installation
 accepts this distinct prepared format as gameplay support. See
 [category preparation](V3_HANDHELD_ITEMS.md#shared-category-preparation).
 
+`--refresh-runtime --item-category-art <prepared-directory>` on the shared
+installer consumes the complete category bundle explicitly. It installs the
+actual artwork and selected-parent lookup, shares extended police/handover
+tables, and grows the police stack and actor capacities together. It retains
+original categories and does not enable imports before seasonal ground and
+acquisition support are ready. See
+[category runtime](V3_HANDHELD_ITEMS.md#shared-police-and-handover-runtime).
+
 Shared reader changes use the same installer's `--refresh-runtime` mode. It
 updates the checked current cartridge without reconverting or reinstalling any
 existing artwork. Ordinary reader refreshes retain the complete DMA directory

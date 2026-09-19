@@ -17,7 +17,28 @@ locked ROM is tracked below; this V2 fix does not replace its no-import baseline
 
 ## Active development
 
-Current ABI 108 at `build/v3-inventory-equipment-03/` connects the inventory
+Current ABI 109 at `build/v3-category-runtime-03/` installs the nine complete
+equipment category graphics, shared police/handover tables, and selected-parent
+category lookup. Native categories remain unchanged; added categories use
+`27 + donor category`, so fans use native category 70. Police start arrays,
+stack storage, actor allocation, matrix-list offsets, and drawing bounds expand
+together. The shared equipment module is 40 KiB; police actors grow by 88 bytes.
+
+Five focused tests and twelve current-composition tests pass. The first silent
+native run passes 63 records with 44 assertions: complete startup resources,
+selected/disabled categories, both loaded owners, all 70 police start indices,
+257 matrix nodes, original/imported police drawing, five handover windows,
+guards, and restored profile/checkpoint. This is component execution, not GPU
+appearance, ordinary acquisition, or save/reload verification. See the
+[checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-police-and-handover-runtime).
+
+Next extend all four seasonal ground consumers and their category capacities,
+using these installed resources and the source-derived descriptors. The global
+item-type wrapper and ground readers still need that integration. All added
+handheld choices stay disabled. Saved formats, the 104 experimental choices,
+the import-free V2 baseline, and both served patchers remain unchanged.
+
+The retained ABI 108 integration connects the inventory
 screen's separate equipment selector, all eight shape/animation/draw tables,
 and owner-relative callbacks through shared source-derived records. All eight
 fans reuse their complete installed models and holding poses. Original tools
@@ -33,7 +54,7 @@ and restored profile/checkpoint. Ordinary inventory appearance, full constructio
 equip/put-away gameplay, persistence, and hardware remain unverified. See the
 [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-inventory-equipment-previews).
 
-Next connect the remaining inventory/ground category consumers. Source fan category 43 is distinct
+Source fan category 43 is distinct
 from the donor menu's ID-derived tool category two; do not use it as an unchecked
 native menu index. Acquisition, context-correct collection/catalogue, optional
 composition, ordinary take-out/put-away, and persistence remain work. Carry the
@@ -45,9 +66,8 @@ categories used by 43 extra equipment parent/state records in
 separate material/geometry lists occupy 7,344 bytes. Seven focused checks pass,
 including every texel/colour/vertex/triangle, all six source-owner relationships,
 source mutation rejection, matrix-safe list splitting, and unchanged ordinary
-model emission. These are prepared assets, not 43 new playable items. Native
-category tables, police array capacities, and runtime selection remain work;
-the cartridge stays ABI 108. See the
+model emission. The police/handover adapter installs these assets as described
+above; seasonal ground integration remains. They are not 43 new playable items. See the
 [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-ground-and-handover-artwork).
 
 ABI 104 registers fan action 109's complete setup/main/net-reset group and its

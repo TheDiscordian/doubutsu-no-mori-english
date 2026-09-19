@@ -434,7 +434,7 @@ def build(output, art_path, lock=LOCK):
 
 
 def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=False, equipment_kinds=False,
-                    player_actions=False):
+                    player_actions=False, item_category_art=None):
     """Update shared readers; optionally install the shared held-resource adapter."""
     output=output.resolve()
     if output.exists() or not output.is_relative_to(ROOT/'build'):
@@ -451,9 +451,9 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         raise ValueError('Changed shared runtime package')
     output.mkdir(parents=True)
     moved=[];equipment_report=None;reused=None;owner_changes={};owner_moves=[];owner_updates=[]
-    if sum((equipment_art is not None,player_motion,equipment_kinds,player_actions))>1:
+    if sum((equipment_art is not None,player_motion,equipment_kinds,player_actions,item_category_art is not None))>1:
         raise ValueError('Install equipment resources, player motion, and kind readers in dependency order')
-    if equipment_art is not None or player_motion or equipment_kinds or player_actions:
+    if equipment_art is not None or player_motion or equipment_kinds or player_actions or item_category_art is not None:
         blob,reused=reuse_resource_tail(base,prior,old_blob)
         if not reused['reused_bytes']:
             raise ValueError('Equipment integration requires the checked shared resource tail')
@@ -471,6 +471,9 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
     elif player_actions:
         import v3_player_actions as equipment
         equipment_report,owner_changes=equipment.install(base,prior,blob,core,original,output)
+    elif item_category_art is not None:
+        import v3_category_runtime as equipment
+        equipment_report,owner_changes=equipment.install(base,prior,blob,core,original,output,item_category_art)
     if equipment_report:
         if equipment_report.get('parent_readers'):
             attribution=provenance_patch(equipment_report['parent_readers']['rows'])
@@ -578,6 +581,9 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             report['shared_runtime_refresh']['adapters'].append('equipment_kinds')
         if player_actions:
             report['shared_runtime_refresh']['adapters'].append('player_actions')
+        if item_category_art is not None:
+            report['shared_runtime_refresh']['adapters'].append('item_categories')
+            report['shared_runtime_refresh']['artwork_changed']=True
         report['sources'].update({p:sha256((ROOT/p).read_bytes()) for p in equipment.SOURCES})
         if equipment_report.get('parent_readers'):
             report['sources']['translations/provenance.json']=sha256((ROOT/'translations/provenance.json').read_bytes())
@@ -607,12 +613,16 @@ if __name__=='__main__':
         help='With --refresh-runtime, connect shared kind-indexed readers and complete tumble/get-up motions')
     parser.add_argument('--player-actions',action='store_true',
         help='With --refresh-runtime, extend shared player action tables and native dispatch')
+    parser.add_argument('--item-category-art',type=Path,
+        help='With --refresh-runtime, install prepared shared category artwork and police/handover consumers')
     args=parser.parse_args()
     if args.equipment_art and not args.refresh_runtime:parser.error('--equipment-art requires --refresh-runtime')
     if args.player_motion and not args.refresh_runtime:parser.error('--player-motion requires --refresh-runtime')
     if args.equipment_kinds and not args.refresh_runtime:parser.error('--equipment-kinds requires --refresh-runtime')
     if args.player_actions and not args.refresh_runtime:parser.error('--player-actions requires --refresh-runtime')
+    if args.item_category_art and not args.refresh_runtime:parser.error('--item-category-art requires --refresh-runtime')
     result=(refresh_runtime(args.output,args.base_lock,equipment_art=args.equipment_art,player_motion=args.player_motion,
-                            equipment_kinds=args.equipment_kinds,player_actions=args.player_actions)
+                            equipment_kinds=args.equipment_kinds,player_actions=args.player_actions,
+                            item_category_art=args.item_category_art)
             if args.refresh_runtime else build(args.output,args.art,args.base_lock))
     print(json.dumps({k:result[k] for k in ('runtime_abi','output_sha256','patch_sha256')},indent=2))

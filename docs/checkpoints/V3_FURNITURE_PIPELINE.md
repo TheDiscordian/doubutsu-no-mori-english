@@ -1,5 +1,59 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared police and handover runtime
+
+ABI 109 at `build/v3-category-runtime-03/` installs all nine complete category
+objects through the shared importer. Two 71-entry material/geometry tables keep
+all 27 original categories, with imported indices derived as `27 + source type`.
+The selected-parent reader keeps disabled/missing extended IDs out of the native
+36-entry tool table. Police and handover use the new reader and shared tables;
+all four seasonal ground consumers remain required work before enabling imports.
+
+The 40-KiB equipment module grows by 12 KiB, with the previous prefix intact.
+Police actors grow by 88 bytes; stack capacity, all 70 start indices, 257 matrix
+nodes, trailing item-table offsets, actor allocation, and drawing bounds agree.
+The handover actor stays unchanged. Every resource sample, vertex, and command
+is retained except the three checked physical-resource pointer relocations per
+object. Native material/matrix/geometry ordering remains intact.
+
+- ROM SHA-256: `a55c7ebf3d4c59e0987892536e1ba3565b6a50c73c6aecf743b602015b6e0ca0`.
+- UPS SHA-256: `3f5bf4eb38e2aedb87780ec641350ae81a1822e2cf674b6a9cddecc16b0aa1cb`.
+- Five focused host/cartridge checks pass in 5.510 seconds: sanitizer-backed
+  selected/disabled/malformed category lookup, complete artwork retention,
+  fixed source numbering, original table preservation, complete owner changes,
+  relocation at two heap locations, allocation bounds, UPS reconstruction,
+  checksum/startup, unchanged prior equipment, unrelated resources, and profiles.
+- Twelve optional-composition checks pass in 8.940 seconds against this exact
+  proposed build lock: import-free V2, select-all, dependencies, sparse choices,
+  deterministic output, and the real profile/save codec remain intact.
+- Native `build/smoke-v3-item-categories-01/results.json` passes on its first
+  invocation: 63 records, 44 passing assertions, no failures. Results SHA-256:
+  `3708ae8b02336f0d3a72fb9ed71657a497f7307ee17601e21371b91522efcb5a`.
+
+The silent native run checks the complete startup-loaded module, selected and
+disabled categories, original fallback, both actual relocated owners, all 70
+police start indices and 257 matrix sentinels, rejection of invalid indices,
+original and imported material/geometry dispatch through the real drawing loop,
+two handover assignment windows and three table-lookup windows. Memory guards,
+profile restoration, full checkpoint restoration, and graceful shutdown pass.
+The FlashRAM remains erased and no user save is used. The fixture deliberately
+uses an empty field for police classification: terrain queries and full item
+acquisition are not claimed. It supplies representative linked matrix records
+for drawing, not an ordinary lost-and-found playthrough or GPU image comparison.
+
+Build attempts `-01` and `-02` stop before producing a ROM: the first catches a
+transfer-width/texture-format distinction while rebasing CI4 pointers, and the
+second catches a duplicated Python receipt keyword. The corrected `-03` build
+and focused checks use the actual complete assets and consumer paths.
+
+Saved formats, saved identities, all 104 experimental choices, and both served
+V2 patchers remain unchanged. V3 cross-version/profile save compatibility and
+original-hardware behaviour are not established by these component tests.
+Next integrate all four seasonal ground category tables/arrays and the global
+type route, using these installed objects. Then finish acquisition,
+collection/catalogue, selection, and ordinary gameplay/persistence. Carry the
+V2 Museum header correction into V3 before its next private handoff.
+
 ## Shared ground and handover artwork
 
 The `item-category-art` category prepares all nine complete ground/police/
@@ -32,7 +86,8 @@ paired texture/tile command consumes two words but one decoded row. The initial
 into the material list before the caller's matrix. The independent geometry
 test catches that actual converter defect. The corrected decoder-boundary walk
 keeps the vertex load with geometry; `-01` is not suitable for installation.
-No version of these prepared objects has been installed in a ROM.
+The initial preparation does not install these objects in a ROM; ABI 109's
+police/handover integration above installs the corrected `-02` output.
 
 Six focused category checks pass in 3.368 seconds on the corrected `-02`
 preparation. They cover every source pixel, palette colour, vertex field,
@@ -50,11 +105,10 @@ The corrected test module imports the shared checks as a module, calls the real
 installer entry, and explicitly selects only the intended category classes.
 No emulator or hardware test is claimed for this converter-only batch.
 
-The promoted cartridge stays ABI 108 and all prior preview/runtime evidence is
-retained. Saved formats, profile bits, selectable choices, and both served V2
-patchers remain unchanged. Next integrate the prepared category records across
-all native ground variants, lost-and-found, and handover, including table
-relocations and police array capacities, before enabling the item-type reader.
+The preparation leaves ABI 108 unchanged; the later runtime batch above retains
+its preview/runtime evidence. Saved formats, profile bits, selectable choices,
+and both served V2 patchers remain unchanged. Remaining integration covers all
+native ground variants before enabling the item-type reader globally.
 Do not substitute existing tool-bag artwork for the source fan representation.
 
 ## Shared inventory equipment previews

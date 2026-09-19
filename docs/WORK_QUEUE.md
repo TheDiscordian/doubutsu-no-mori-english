@@ -2,8 +2,26 @@
 
 ## Active: V3 optional GameCube imports
 
-Current ABI 108 is `build/v3-inventory-equipment-03/`, pinned by the main build
-lock. The shared importer connects the inventory's selected equipment kinds,
+Current ABI 109 is `build/v3-category-runtime-03/`, pinned by the main build
+lock. The shared importer installs all nine equipment category graphics,
+71-entry police/handover material and geometry tables, selected-parent lookup,
+and matching police stack/actor capacities. Five focused and twelve composition
+checks pass. The first silent native run passes 63 records/44 assertions,
+including all 70 start indices, 257 matrix nodes, original/imported police
+drawing, actual handover windows, memory guards, and restored checkpoint.
+The equipment reservation is 40 KiB; police actors grow by 88 bytes. No new
+choice, saved identity, profile bit, or served patcher changes.
+See the [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-police-and-handover-runtime).
+
+Next extend all four seasonal ground category consumers together. Reuse the
+installed category graphics and native mapping `27 + source category`, not a
+new asset conversion or per-item installer. Audit each owner's draw tables,
+category-indexed arrays, loop bounds, allocation, and relocated callbacks.
+The global item-type wrapper remains unchanged until these consumers are safe.
+Then connect acquisition, collection/catalogue, optional selection, and ordinary
+gameplay/persistence. All imported handheld choices remain disabled.
+
+The retained inventory integration connects selected equipment kinds,
 all eight shape/animation/draw tables, and owner-relative callbacks for the
 installed fan category. Four focused and twelve composition checks pass.
 The silent native run passes 104 records/79 assertions, including inventory
@@ -14,7 +32,7 @@ memory does not change ordinary banks, saved formats, profile bits, or choices.
 Preserve existing selector/name/price/action/draw/sound evidence. See the
 [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-inventory-equipment-previews).
 
-Next connect the remaining inventory/ground category consumers. Source fan category 43 belongs
+Source fan category 43 belongs
 to the item-type reader, not the action menu; the donor menu uses ID-derived
 tool category two. Native `mNT_get_itemTableNo` still has only 36 equipment
 entries. Do not insert source 43 into unrelated native tables or use umbrella
@@ -22,13 +40,13 @@ artwork. The inventory-preview adapter is installed; full ordinary inventory
 loading and appearance need the combined gameplay pass once category support is ready.
 
 Category discovery identifies all four seasonal ground owners, lost-and-found,
-and handover as direct native item-type consumers. Their table indices and the
-police local array must be extended together, not just the ordinary ground
-owner. Complete category artwork is prepared at `build/v3-item-category-art-02/`:
+and handover as direct native item-type consumers. Police/handover integration
+is installed; do not mistake that for completed seasonal ground integration.
+Complete category artwork is prepared at `build/v3-item-category-art-02/`:
 nine shared material/geometry pairs for 43 parent/state records, with seven
 focused checks passing. Reuse those complete assets and the generated six-owner
-descriptors; do not reconvert models or add per-item installers. Install native
-source-derived category records and verify consumer bounds before enabling the
+descriptors; do not reconvert models or add per-item installers. Complete the
+remaining native category records and consumer bounds before enabling the
 parent items. The source ground variants do not all share a category base;
 three use 68 and the fourth uses 70. Exact owners,
 calls, source roots, and remaining discovery limits are in the
