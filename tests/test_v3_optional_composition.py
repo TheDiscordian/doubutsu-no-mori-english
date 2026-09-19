@@ -41,7 +41,8 @@ class OptionalCompositionTests(unittest.TestCase):
     def test_actual_house_and_outfit_dependencies_not_just_names(self):
         self.assertEqual(len(self.catalog),
             len(self.report['furniture']['imports'])+1+len(self.report['clothing']['imports'])+
-            len(self.report['villager_text']['imports']))
+            len(self.report['villager_text']['imports'])+
+            len(self.report.get('equipment_resources',{}).get('optional_selection',{}).get('identities',[])))
         self.assertEqual(self.select(PUNCHY)['required'],
                          ['GAFE01-r0/item/24BF','GAFE01-r0/item/3350'])
         self.assertEqual(self.select(CHERI)['required'],

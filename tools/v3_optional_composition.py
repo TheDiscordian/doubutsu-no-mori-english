@@ -24,6 +24,17 @@ PREFIX_SIZE, ABI, PACKAGE_SIZE = 0xC000, BUILD_PIN['runtime_abi'], 0x30000
 from v3_import_storage import PACKAGE, PACKAGE_RAM, ROWS as STATIC_ROWS, SLOTS as STATIC_COUNT
 
 
+def use_build_lock(path):
+    """Select an explicitly pinned full proposal without changing the main lock."""
+    from v3_furniture_install import inputs as checked_inputs
+    image,report=checked_inputs(path)
+    pin=json.loads(path.read_bytes())
+    if sha256(image)!=pin['rom_sha256'] or report['runtime_abi']!=pin['runtime_abi']:
+        raise ValueError('Build lock changed during selection')
+    global BASE,BASE_SHA,REPORT_SHA,ABI
+    BASE=ROOT/pin['directory'];BASE_SHA=pin['rom_sha256'];REPORT_SHA=pin['report_sha256'];ABI=pin['runtime_abi']
+
+
 def resident_offset(blob, address, size):
     if 0x80460000 <= address <= 0x80460000 + PREFIX_SIZE - size:
         return address - 0x80460000
@@ -52,6 +63,41 @@ def inputs():
     if report['output_sha256'] != BASE_SHA or report['runtime_abi'] != ABI:
         raise ValueError('Mismatching optional-composition base report')
     return image, report
+
+
+def held_options(blob,report):
+    equipment=report.get('equipment_resources',{})
+    enabled=equipment.get('optional_selection')
+    if enabled is None:return {}
+    if (enabled.get('format')!='AFV3-HELD-SELECTION-1' or not enabled.get('experimental') or
+            enabled.get('playable_handoff') is not False or enabled.get('web_patcher_enabled') is not False):
+        raise ValueError('Changed experimental parent selection contract')
+    start=equipment['blob_offset']
+    if sha256(blob[start:start+equipment['bytes']])!=equipment['sha256']:
+        raise ValueError('Changed complete parent readers')
+    parents={r['item_id']:r for r in equipment['parent_readers']['rows']}
+    result={}
+    from v3_import_storage import ITEMS
+    for row in equipment['catalogue']['imports']:
+        parent=parents[row['parent_item_id']];item=int(row['item_id'],16);index=row['runtime_index']
+        at=resident_offset(blob,int(row['profile_ram'],16)-8,80);slot=(item-0x3000)//4
+        art=int(row['object_vrom'],16)-BLOB
+        if (not 0<=slot<1024 or index!=1024+slot or parent['display_item_id']!=row['item_id'] or
+                struct.unpack_from('>HHI',blob,at)!=(index,item,1) or
+                struct.unpack_from('>I',blob,at+76)[0]!=1 or sha256(blob[at+8:at+76])!=row['profile_sha256'] or
+                sha256(blob[ITEMS+slot*32:ITEMS+(slot+1)*32])!=row['metadata_sha256'] or
+                sha256(blob[art:art+row['object_bytes']])!=row['object_sha256'] or
+                (parent['profile_byte'],parent['profile_mask'])!=(32+slot//8,1<<(slot&7)) or
+                not blob[0x20+parent['profile_byte']]&parent['profile_mask']):
+            raise ValueError('Changed installed parent/catalogue selection binding')
+        key=item_key(int(parent['item_id'],16))
+        if key in result or key!=parent['id']:raise ValueError('Duplicate or changed parent identity')
+        result[key]=dict(id=key,name=parent['name'],kind='equipment',item_id=parent['item_id'],
+            dependencies=[],enable_offset=at+4,enable_bytes=4,enable_ram=int(row['profile_ram'],16)-4,
+            display_item_id=row['item_id'],display_runtime_index=index)
+    if sorted(result)!=enabled['identities'] or len(result)!=enabled['profile_bits_enabled']:
+        raise ValueError('Incomplete installed parent choices')
+    return result
 
 
 def catalogue(image, report):
@@ -95,6 +141,9 @@ def catalogue(image, report):
             'item_id':row['item_id'], 'dependencies':[], 'enable_offset':at+10, 'enable_bytes':1,
             'display_item_id':f'{display_item:04X}', 'display_runtime_index':display_index,
             'display_enable_offset':display_at+4, 'source_record':row}
+    held=held_options(blob,report)
+    if result.keys()&held.keys():raise ValueError('Parent identity collides with another import')
+    result.update(held)
     for row in report['villager_text']['imports']:
         donor = int(row['id'].rsplit('/', 1)[1], 16)
         actor = villager_actor(donor)
@@ -128,8 +177,8 @@ def catalogue(image, report):
     # installs them. Its catalogue must cover its actual installed records only.
     expected = ({row['id'] for row in report['villager_text']['imports']} |
                 {row['id'] for row in furniture_rows} |
-                {item_key(int(row['donor_item_id'], 16)) for row in report['clothing']['imports']})
-    if (set(result) != expected or len(result) != len(VILLAGERS)+len(furniture_rows)+len(CLOTHING)):
+                {item_key(int(row['donor_item_id'], 16)) for row in report['clothing']['imports']} | held.keys())
+    if (set(result) != expected or len(result) != len(VILLAGERS)+len(furniture_rows)+len(CLOTHING)+len(held)):
         raise ValueError('Incomplete or duplicated installed development catalogue')
     return dict(sorted(result.items()))
 
@@ -155,7 +204,7 @@ def resolve(catalog, selected):
     furniture = [catalog[key] for key in sorted(enabled) if catalog[key]['kind']=='furniture']
     shirts = [catalog[key] for key in sorted(enabled) if catalog[key]['kind']=='clothing']
     displays = [{'item_id':row['display_item_id'], 'runtime_index':row['display_runtime_index']}
-                for row in shirts]
+                for row in catalog.values() if row['id'] in enabled and row['kind'] in ('clothing','equipment')]
     profile = profile_bytes(villagers, furniture+displays, [row['source_record'] for row in shirts])
     return {'format':'AFV3-LOCAL-SELECTION-1', 'donor':'GAFE01-r0',
         'registry_versions':{'villagers':1, 'furniture':1, 'clothing':1, 'displays':1},
@@ -220,8 +269,19 @@ def catalogue_selection(image, report, enabled):
                struct.pack('>I', opcode | furniture_count), 'selected furniture iteration/search/completion count')
     change(COUNT, struct.pack('>I', cat['clothing']['total_rows']), struct.pack('>I', clothing_count),
            'selected clothing iteration/completion count')
-    return writes, {'imports': rows, 'total_rows': furniture_count,
-                    'clothing_imports': clothes, 'clothing_total_rows': clothing_count}
+    receipt={'imports':rows,'total_rows':furniture_count,'clothing_imports':clothes,'clothing_total_rows':clothing_count}
+    if report.get('equipment_resources',{}).get('optional_selection'):
+        from v3_catalogue import UMBRELLA_COUNT
+        held=cat['handheld'];original=held['imports']
+        selected=[r for r in original if item_key(int(r['parent_item_id'],16)) in enabled]
+        address=held['table_address'];at=address-RAM;prefix=data[at:at+64]
+        before=prefix+b''.join(struct.pack('>H',r['catalogue_index']) for r in original)
+        after=prefix+b''.join(struct.pack('>H',r['catalogue_index']) for r in selected)+bytes(2*(len(original)-len(selected)))
+        change(address,before,after,'selected equipment ordering')
+        change(UMBRELLA_COUNT,struct.pack('>I',held['total_rows']),struct.pack('>I',32+len(selected)),
+            'selected equipment iteration/completion count')
+        receipt.update(equipment_imports=selected,equipment_total_rows=32+len(selected))
+    return writes,receipt
 
 
 def compose(image, report, catalog, selection):
@@ -375,12 +435,20 @@ def build(output, selected=(), *, select_all=False):
         cat.update(imports=selected_cat['imports'], total_rows=selected_cat['total_rows'])
         cat['clothing']['installed_total_rows'] = cat['clothing']['total_rows']
         cat['clothing'].update(imports=selected_cat['clothing_imports'], total_rows=selected_cat['clothing_total_rows'])
+        if 'equipment_imports' in selected_cat:
+            cat['handheld']['installed_total_rows']=cat['handheld']['total_rows']
+            cat['handheld'].update(imports=selected_cat['equipment_imports'],total_rows=selected_cat['equipment_total_rows'])
+            current['equipment_resources']['optional_selection']['selected_identities']=[
+                key for key in selection['enabled'] if catalog[key]['kind']=='equipment']
         data = by_vrom(result)[VROM].extract(result)
         cat['output_sha256'] = sha256(data)
         at = cat['code']['symbols']['af_v3_catalogue_bit'] - RAM
         cat['code']['sha256'] = sha256(data[at:at + cat['code']['bytes']])
         at = cat['clothing']['table_address'] - RAM
         cat['clothing']['table_sha256'] = sha256(data[at:at + cat['clothing']['total_rows'] * 2])
+        if 'equipment_imports' in selected_cat:
+            at=cat['handheld']['table_address']-RAM
+            cat['handheld']['table_sha256']=sha256(data[at:at+cat['handheld']['total_rows']*2])
         package_sha = sha256(blob[PACKAGE:PACKAGE + PACKAGE_SIZE])
         for section, count in (('construction', 9), ('garden', 15), ('western', 22), ('western_large', 25)):
             records = current['furniture']['imports'][:count]
@@ -430,6 +498,8 @@ if __name__ == '__main__':
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--select', action='append', default=[], help='Fixed GAFE01-r0 identity; repeat as needed')
     parser.add_argument('--all', action='store_true', help='All installed experimental entries, not the whole donor disc')
+    parser.add_argument('--base-lock',type=Path,help='Explicit checked proposal lock; leave the main development lock unchanged')
     args = parser.parse_args()
+    if args.base_lock:use_build_lock(args.base_lock)
     result = build(args.output, args.select, select_all=args.all)
     print(json.dumps({key:result[key] for key in ('requested','required','output_sha256','save_compatibility')}, indent=2))

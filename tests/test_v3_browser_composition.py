@@ -49,23 +49,25 @@ class BrowserCompositionTests(unittest.TestCase):
         review = browser.review_catalogue(self.plan, self.report)
         candidates = {composer.item_key(item) for item in pipeline.identity_rows(ROOT/'build/item-identity-megasheet.xlsx')}
         unavailable = {row['id']: row for row in review['unavailable']}
-        self.assertEqual(set(unavailable), candidates - set(self.catalog))
+        represented={composer.item_key(int(row['display_item_id'],16)) for row in self.catalog.values()
+            if row['kind']=='equipment'}
+        self.assertEqual(set(unavailable), candidates - set(self.catalog) - represented)
         self.assertEqual(len(unavailable), len(review['unavailable']))
         self.assertEqual(review['base_sha256'], composer.BASE_SHA)
         self.assertEqual(review['pipeline_version'], pipeline.VERSION)
         self.assertTrue(all(row['selectable'] is False and row['reason'] for row in unavailable.values()))
         # A converted item may leave the review queue as later batches install
         # it; inspect an actual unresolved alias, not a historical item example.
-        alias = unavailable['GAFE01-r0/item/314C']
-        self.assertEqual(alias['room_alias']['parent_id'], 'GAFE01-r0/item/2254')
+        alias = next(row for row in unavailable.values() if 'room_alias' in row)
+        self.assertNotIn(alias['room_alias']['parent_id'],self.catalog)
         self.assertIn('parent-item support', alias['reason'])
-        self.assertEqual(sum('room_alias' in row for row in unavailable.values()), 44)
+        self.assertEqual(sum('room_alias' in row for row in unavailable.values()), 44-len(represented))
         self.assertNotIn('GAFE01-r0/item/3350', unavailable)  # Installed animated import is not downgraded.
 
     def test_browser_output_matches_authoritative_composition_for_representative_profiles(self):
         keys = list(self.catalog)
         grouped = {kind: [key for key, row in self.catalog.items() if row['kind'] == kind]
-                   for kind in ('furniture', 'clothing', 'villager')}
+                   for kind in ('furniture', 'clothing', 'equipment', 'villager')}
         # These cases exercise shared selection structures, not one test per
         # donor item. Reward categories use the same generated enable records.
         profiles = [
@@ -77,6 +79,10 @@ class BrowserCompositionTests(unittest.TestCase):
             ('sparse-categories', ['GAFE01-r0/item/31A8', 'GAFE01-r0/item/31E0', 'GAFE01-r0/item/322C']),
             ('mixed', random.Random(93).sample(keys, 17)),
         ]
+        if grouped['equipment']:
+            profiles.extend([('equipment',grouped['equipment']),
+                ('sparse-equipment',[grouped['equipment'][1],grouped['equipment'][-1]]),
+                ('equipment-and-house',[grouped['equipment'][0],'GAFE01-r0/villager/00EB'])])
         cases = []
         for name, requested in profiles:
             selection = composer.resolve(self.catalog, requested)

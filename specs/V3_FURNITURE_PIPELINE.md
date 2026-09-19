@@ -81,6 +81,12 @@ aliases provide its full name/price without changing ordinary room drops. The
 shared catalogue rebuilder retains this category in subsequent furniture batches.
 No standalone representation choices or new profile bits are introduced. See
 [held catalogue](V3_CATALOGUE.md#shared-handheld-representations).
+`--refresh-runtime --held-selection` prepares the full experimental parent profile
+after these adapters are installed. Offline/browser composition derives each
+equipment choice and its representation from the checked records, including
+selected umbrella counts. Use an explicit proposal lock; this does not promote
+an unresolved build or update either patcher. See
+[equipment selections](V3_OPTIONAL_COMPOSITION.md#shared-equipment-selections).
 `--refresh-runtime --player-motion` extends that same resident module with the
 complete source-derived player motions and split-body masks. It retains the
 native player owner's table relocations and all original animation meanings;

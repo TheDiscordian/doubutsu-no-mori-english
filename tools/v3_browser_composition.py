@@ -53,6 +53,8 @@ def rules(image, report):
                               'runtime_index': row['display_runtime_index']})
             shirts.append(row['source_record'])
             off.append(disable(blob.pstart + row['display_enable_offset'], 4))
+        elif row['kind']=='equipment':
+            furniture.append({'item_id':row['display_item_id'],'runtime_index':row['display_runtime_index']})
         for item in furniture:
             index = item['runtime_index']
             if index in slots:
@@ -84,11 +86,15 @@ def rules(image, report):
     table_writes, _ = composition.catalogue_selection(image, report, set())
     packed = []
     cat = report['catalogue']
-    for kind, width, rows, ordering, count_label in (
+    categories=[
             ('furniture', 4, cat['imports'], 'selected furniture ordering',
              'selected furniture iteration/search/completion count'),
             ('clothing', 2, cat['clothing']['imports'], 'selected clothing ordering',
-             'selected clothing iteration/completion count')):
+             'selected clothing iteration/completion count')]
+    if report.get('equipment_resources',{}).get('optional_selection'):
+        categories.append(('equipment',2,cat['handheld']['imports'],'selected equipment ordering',
+            'selected equipment iteration/completion count'))
+    for kind, width, rows, ordering, count_label in categories:
         table = next(row for row in table_writes if row['purpose'] == ordering)
         before, empty = bytes.fromhex(table['before']), bytes.fromhex(table['after'])
         start = len(before) - len(rows) * width
@@ -96,7 +102,7 @@ def rules(image, report):
             raise ValueError('Changed selected catalogue suffix contract')
         members = []
         for i, row in enumerate(rows):
-            donor = row['donor_item_id'] if kind == 'clothing' else row['item_id']
+            donor = row['donor_item_id'] if kind == 'clothing' else row['parent_item_id'] if kind=='equipment' else row['item_id']
             key = composition.item_key(int(donor, 16))
             if catalog[key]['kind'] != kind:
                 raise ValueError('Catalogue option has the wrong item class')
@@ -146,7 +152,7 @@ def review_catalogue(plan, report):
     unavailable = []
     for row in scan['rows']:
         key = composition.item_key(int(row['item_id'], 16))
-        if key in options:
+        if key in options or row.get('room_alias',{}).get('parent_id') in options:
             continue
         if row['installed']:
             raise ValueError('Installed furniture is missing from the composition plan')
@@ -224,5 +230,7 @@ if __name__ == '__main__':
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--recipes', action='store_true', help='Include two-game reconstruction recipes in the unserved export')
     parser.add_argument('--disc', type=Path)
+    parser.add_argument('--base-lock',type=Path,help='Explicit checked proposal lock; never changes the served patchers')
     args = parser.parse_args()
+    if args.base_lock:composition.use_build_lock(args.base_lock)
     print(json.dumps(build(args.output, recipes=args.recipes, disc=args.disc), indent=2))

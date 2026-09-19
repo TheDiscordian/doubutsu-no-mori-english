@@ -2,24 +2,24 @@
 
 ## Active: V3 optional GameCube imports
 
-The proposed ABI 114 in `build/v3-held-catalogue-02/` installs all eight fan
-representations into the shared umbrella catalogue. Four focused checks and
-twelve optional-composition checks pass. The first silent native run passes
-104 records/70 assertions, including actual category lists, complete first/last
-model previews, full names/prices/framing, inverse parent conversion, unchanged
-ordinary drops, disabled filtering, original fallbacks, guards, and restored
-state/checkpoint. No resident allocation, profile bit, or saved format changes.
-No handheld choice is enabled yet. See the
-[checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-held-parent-catalogue).
+The proposed ABI 115 in `build/v3-held-selection-02/` adds eight equipment-parent
+choices to the shared composers, for 112 experimental choices. Nineteen focused
+checks and nine JavaScript checks pass; fourteen profiles match between browser
+and offline composition. Actual silent-browser downloads match the two-fan,
+mixed villager/item, and exact no-import outputs. A later file-change assertion
+leaves the complete UI check partial; the genuine-change correction is unexecuted.
+This batch's setup retry is spent. Do not replay the successful downloads.
+See the [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-held-parent-selections).
 
-Next use `build/v3-held-catalogue-02/build-lock.json` for optional composition:
-derive parent choices and dependencies from the installed shared records, pack
-the selected umbrella table/count for correct completion, and keep representations
-out of the standalone furniture choices. Preserve the exact import-free baseline.
-Then complete ordinary acquisition/equip/use/drop/order/save gameplay. Reuse the
-installed art/readers and passing category evidence; do not reconvert models or
-add per-item scripts. The main lock remains ABI 109 pending the inherited
-seasonal-copy issue; neither served V2 patcher changes.
+Next use `build/v3-held-selection-02/build-lock.json` explicitly. Classify the
+inherited seasonal-copy continuation/stack mismatch before promotion, and finish
+ordinary acquisition/equip/use/drop/order/save gameplay. The existing two-fan
+profile at `build/v3-held-subset-01/` is suitable for isolated developer checks,
+not a validated player handoff. Reuse installed artwork/readers and passing
+category evidence; no per-item scripts or reconversion. The main lock remains
+ABI 109, and neither served V2 patcher changes. Carry the Museum-header fix
+before a handoff. Imported fan saves require the matching parent profile bits;
+removing imports is not a save migration.
 
 The proposed ABI 112 in `build/v3-event-menu-06/` contains shared event selection,
 English pages, native pocket/payment handling, and handover requests. Four
@@ -27,8 +27,8 @@ focused and twelve composition checks pass. The corrected silent native run
 passes 178 records/73 assertions, including actual pocket insertion/debit,
 rejected full pockets/short funds, single-order sales, sold-out retention,
 original merchandise, guards, and restored globals/checkpoint. The module is
-52 KiB, and the vendor gains four unsaved bytes. All handheld choices remain
-disabled. The main lock stays ABI 109 because the inherited seasonal-copy
+52 KiB, and the vendor gains four unsaved bytes. Handheld choices are confined
+to the explicit experimental proposal. The main lock stays ABI 109 because the inherited seasonal-copy
 check is unresolved. See the [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-event-menu-and-transactions).
 
 The shared collection proposal above extends these transactions without changing

@@ -20,6 +20,49 @@ SOURCES=('tools/v3_held_catalogue.py','tools/v3_held_collection.py',
     'overlays/v3/catalogue.ld','overlays/v3/catalogue_bridge.S')
 
 
+def select_installed(prior,blob):
+    """Prepare the full experimental reference; selectors remove parent choices."""
+    equipment=copy.deepcopy(prior['equipment_resources'])
+    required=('catalogue','collection','parent_readers','event_acquisition',
+              'ground_categories','inventory_preview','player_actions','item_categories')
+    if (any(not equipment.get(k) for k in required) or equipment.get('optional_selection') or
+            equipment['catalogue']['imports']!=prior['catalogue']['handheld']['imports']):
+        raise ValueError('Parent selection requires the complete installed shared adapters')
+    start=equipment['blob_offset']
+    if sha256(blob[start:start+equipment['bytes']])!=equipment['sha256']:
+        raise ValueError('Changed complete installed equipment module')
+    saved=copy.deepcopy(prior['save_runtime']);profile=bytearray.fromhex(saved['profile_hex'])
+    if len(profile)!=192 or blob[0x20:0xE0]!=profile or sha256(profile)!=saved['profile_sha256']:
+        raise ValueError('Changed complete saved profile')
+    parents={r['item_id']:r for r in equipment['parent_readers']['rows']}
+    collections={r['item_id']:r for r in equipment['collection']['rows']}
+    seen=set();identities=[]
+    for row in equipment['catalogue']['imports']:
+        parent=parents[row['parent_item_id']];collected=collections[row['parent_item_id']]
+        item=int(row['item_id'],16);index=slot(item);at=ROWS+index*80
+        art=int(row['object_vrom'],16)-BLOB
+        if (parent['item_id'] in seen or row['runtime_index']!=1024+index or
+                parent['display_item_id']!=row['item_id'] or collected['display_item_id']!=row['item_id'] or
+                (parent['profile_byte'],parent['profile_mask'])!=(32+index//8,1<<(index&7)) or
+                struct.unpack_from('>HHI',blob,at)!=(row['runtime_index'],item,1) or
+                u32(blob,at+76)!=1 or sha256(blob[at+8:at+76])!=row['profile_sha256'] or
+                sha256(blob[ITEMS+index*32:ITEMS+(index+1)*32])!=row['metadata_sha256'] or
+                sha256(blob[art:art+row['object_bytes']])!=row['object_sha256'] or
+                profile[parent['profile_byte']]&parent['profile_mask']):
+            raise ValueError('Changed parent selection identity, installed model, or profile binding')
+        seen.add(parent['item_id']);identities.append(parent['id'])
+        profile[parent['profile_byte']]|=parent['profile_mask']
+    if not seen or seen!=set(parents) or seen!=set(collections):
+        raise ValueError('Incomplete installed parent selection inventory')
+    blob[0x20:0xE0]=profile
+    saved.update(profile_hex=profile.hex(),profile_sha256=sha256(profile))
+    equipment['optional_selection']=dict(format='AFV3-HELD-SELECTION-1',
+        identities=sorted(identities),profile_bits_enabled=len(identities),
+        experimental=True,playable_handoff=False,web_patcher_enabled=False,
+        save_compatibility='Older profiles lacking these imports reject saves using them; retain separate test saves.')
+    return equipment,{},dict(save_runtime=saved)
+
+
 def assets(source,equipment,directory):
     """Check the prepared complete assets; never run another graphics compiler."""
     directory=directory.resolve();raw=(directory/'art.json').read_bytes();art=json.loads(raw)

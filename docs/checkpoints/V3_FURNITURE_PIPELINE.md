@@ -1,5 +1,93 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared held-parent selections
+
+The proposed ABI 115 is `build/v3-held-selection-02/`, produced by the existing
+runtime refresh with `--held-selection` and the ABI-114 proposal lock. The
+initial requested output name already belonged to an earlier preserved selector
+build; the fresh `02` directory avoids overwriting it. ROM SHA-256:
+`6d34371f15cd05eaca304faa051941e99c5a78b2531f7aab4cf85eec2181b4d2`.
+Report SHA-256:
+`f0e7bb7358afd747f1cb55b7a662297c42682384856e1e492758d1879b8af416`.
+UPS SHA-256:
+`5881c5835805739a6fcab77c0010aafc47ad991b040df2f6328123b589ab1e22`.
+
+The shared stage verifies complete installed adapters, model/profile/inverse
+records, parent correspondence, and unoccupied canonical bits, then enables
+the eight parent bits in a full experimental reference. Other than the ABI,
+profile, and startup checksum/ABI configuration, every cartridge resource is
+unchanged. There is no new gameplay code, artwork conversion, saved format, or
+allocation. The known seasonal-copy issue still prevents promotion/handoff.
+
+Offline and browser composition derive Equipment choices from these same
+records. The 112 choices are twenty villagers, 81 furnishings, three shirts,
+and eight equipment parents. Displays are not independently selectable. Each
+parent owns its representation's enable field and single canonical saved bit.
+Selected umbrella entries pack after all 32 original rows, with unused suffix
+slots cleared and the native iteration/completion count updated. Names, IDs,
+models, and selection ordering remain stable. Both CLIs and the isolated browser
+check accept an explicit checked `--base-lock`; the main lock is unchanged.
+The private UI adds an Equipment filter and keeps all choices off by default.
+Completed representations leave the unavailable-furniture queue in favour of
+their actual parent choice. Neither served V2 patcher changes.
+
+Nineteen focused checks pass across the initial combined invocation and the
+corrected codec test. The initial combined run had eighteen passes and a fixture
+argument error: it called the existing two-argument reference encoder with three
+arguments. The corrected check passes, and all three dedicated selection tests
+subsequently pass in 6.607 seconds. Checks cover actual installed identities,
+non-prefix subsets, count packing, request order/duplicates, rejected display
+choices, exact all/empty output, dependencies, changed-source/overlap rejection,
+unchanged complete resources, guarded activation, UPS reconstruction, and the
+actual format-2 codec's four-player ownership retention and missing-bit rejection
+without destination writes. Nine JavaScript unit tests pass. The existing
+browser/offline comparison matches complete ROMs for fourteen representative
+profiles, including all equipment, sparse equipment, and equipment with a house.
+
+The real CLI builds `build/v3-held-subset-01/` with parents `2255` and `225B`.
+ROM SHA-256:
+`ce436916f18097cb2ba0b8ae7617489521f563df4e5b79e85bbeda62befafe60`.
+The unserved export `build/v3-held-selection-browser-01/` contains the 112-option
+plan and both two-game reconstruction recipes. Export receipt SHA-256:
+`82866c8ac0144d3131858363f58978d229503406365ec76951f7ad32776aabc8`.
+No ongoing server or V3 patcher service is installed.
+
+The first silent Chromium interface attempt stops on a stale fixture assumption
+that Lady Liberty belongs in the unavailable list; it is already an installed
+import. The justified retry selects a real current review entry instead. It
+passes Equipment select/clear, dependencies, cancellation/late-result rejection,
+and three actual ROM/profile downloads in
+`build/check-v3-held-selection-browser-02/`:
+
+- Equipment subset: `ce436916f18097cb2ba0b8ae7617489521f563df4e5b79e85bbeda62befafe60`.
+- Villager/seasonal subset: `21082037bc1d8ff6b2a0018fdfb758121fc5f499c308b12df88988b7277fd519`.
+- No imports: exact V2-11 `8bbd1955536a2a3ac9f76d6f323842f5ce25c037e1ff5fd3da9f28d6dfe20507`.
+
+The equipment profile requests exactly `GAFE01-r0/item/2255` and
+`GAFE01-r0/item/225B`, with no extra dependencies. Its downloaded JSON SHA-256 is
+`8c19e4c182ef26d6cf85b68108567e33b4fb6af197f88c8a8fc5735cb1f6bc03`.
+Each downloaded ROM matches the offline output and the worker's reported hash.
+
+The retry then stops at file-change invalidation after re-selecting the identical
+disc file. This does not demonstrate that the native input value changed. The
+fixture now clears and restores the field to exercise an actual change, but it
+has not been rerun: the setup retry is spent. Full file-change invalidation,
+later lifecycle checks, final request/error assertions, and complete UI-pass
+status remain unverified. No passing final `results.json` is claimed. The server
+uses its existing `finally` shutdown path. Do not replay the successful downloads
+as another setup attempt. Python syntax and diff checks pass.
+
+The previous catalogue native result applies to unchanged catalogue/equipment
+code; no unchanged emulator batch is replayed. Ordinary acquisition, equipped
+use/put-away, ground drawing, order payment/delivery, save/restart, and hardware
+remain required gameplay evidence. Codec tests accept equal/larger selections
+and reject missing bits, but no ordinary cross-profile reload is claimed. Fan
+profiles are not backward-compatible with older profiles lacking those bits;
+retain separate test saves and never use imported V3 saves with V2. The main
+lock remains ABI 109. Next classify the existing seasonal-copy failure and
+exercise the current selected build's ordinary gameplay, retaining the separate
+Museum-header integration before handoff.
+
 ## Shared held-parent catalogue
 
 The proposed ABI 114 is `build/v3-held-catalogue-02/`, built with the shared

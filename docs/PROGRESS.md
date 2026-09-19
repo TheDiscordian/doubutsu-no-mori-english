@@ -17,29 +17,31 @@ locked ROM is tracked below; this V2 fix does not replace its no-import baseline
 
 ## Active development
 
-The proposed ABI 114 in `build/v3-held-catalogue-02/` connects all eight installed
-fan parents to their actual umbrella catalogue category. It reuses the complete
-prepared display models, preserves all 32 original umbrella rows, and uses the
-donor's order, framing, and parent price. Tagged profiles require the parent's
-selection. Full names and inverse order conversion share existing parent readers;
-ordinary room drops retain the parent ID. No new choice, profile bit, saved format,
-or resident/model allocation is introduced.
+The proposed ABI 115 in `build/v3-held-selection-02/` connects individual
+equipment choices through the shared offline/browser composers. Its 112
+experimental choices include eight fan parents; catalogue representations are
+not extra choices. Selected umbrella rows/counts follow the parents, while
+empty selection retains exact V2-11. The private Equipment filter supports
+individual and group selection. The full reference enables eight profile bits;
+gameplay code, artwork, saved format, and allocations remain unchanged.
 
-Four focused host/cartridge checks and twelve current optional-composition checks
-pass. The first silent native run passes 104 records and 70 assertions: actual
-list construction, all eight collected entries, first/last preview selection,
-complete model transfers, full English names, prices/framing, disabled-owned
-filtering, original rows and preview fallback, memory guards, restored state, and
-checkpoint reload. GPU appearance, ordinary order payment/delivery, full equipped
-gameplay, save/reload, and hardware remain unverified. The existing collection,
-event-menu, and equipment-reader evidence applies to their unchanged code.
+Nineteen focused checks pass across the combined run and corrected codec fixture;
+nine JavaScript checks pass. Browser/offline ROM equality covers fourteen
+representative profiles. Actual silent-browser downloads match for a two-fan
+subset, mixed villager/item selection, and no imports. The complete interface
+check remains partial: a later same-file invalidation assertion failed, and
+the corrected genuine-input-change fixture is unexecuted. Preserve these
+successful downloads instead of replaying the full setup. The prior catalogue's
+104-record/70-assertion native result applies to unchanged runtime code.
 
-Next connect optional parent choices and selected-category counts through the
-shared composer, then complete ordinary gameplay. Use this proposal lock
-explicitly; the main lock remains ABI 109 until the inherited seasonal-copy
-issue is resolved. Both served V2 patchers remain unchanged. See the
-[catalogue specification](../specs/V3_CATALOGUE.md#shared-handheld-representations)
-and [exact checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-held-parent-catalogue).
+Next classify the inherited seasonal-copy failure and complete ordinary
+acquisition/equip/use/drop/order/save gameplay on the current selected build.
+Use the explicit proposal lock; the main lock remains ABI 109. Do not hand over
+this proposal as validated. Saves containing fan selections require those bits;
+older profiles reject them. Codec acceptance of equal/superset profiles is tested,
+but ordinary cross-build reload and hardware are not. Both served V2 patchers
+remain unchanged. See the [selection specification](../specs/V3_OPTIONAL_COMPOSITION.md#shared-equipment-selections)
+and [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-held-parent-selections).
 
 The proposed ABI 112 in `build/v3-event-menu-06/` connects the shared fireworks
 stock to an explicit original/imported-wares selector, English item pages,
@@ -60,9 +62,9 @@ Four source-tracked messages correct the original route's merchandise/prices
 and provide its route question; all 12,007 existing messages remain unchanged.
 Official GameCube introductions remain on the matching imported route. The
 single provenance catalogue credits every adaptation and new label. All
-handheld choices stay disabled pending collection/catalogue, optional selection,
-and ordinary gameplay. Continue those shared consumers using the existing
-prepared display models, not per-item installers or repeated artwork conversion.
+handheld choices remain absent from the served patchers. The current explicit
+proposal connects collection/catalogue and optional selection; ordinary gameplay
+is still required. Reuse the installed shared consumers and prepared models.
 The main lock stays ABI 109 because the inherited seasonal-copy check remains
 unresolved. See the [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-event-menu-and-transactions).
 

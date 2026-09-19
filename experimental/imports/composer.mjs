@@ -36,7 +36,7 @@ export function validatePlan(plan) {
   for (const option of plan.options) {
     require(typeof option.id === 'string' && /^GAFE01-r0\/(item|villager)\/[0-9A-F]{4}$/.test(option.id) &&
       !options.has(option.id), 'Invalid or repeated import identity.');
-    require(['furniture', 'clothing', 'villager'].includes(option.kind) &&
+    require(['furniture', 'clothing', 'equipment', 'villager'].includes(option.kind) &&
       option.id.includes(option.kind === 'villager' ? '/villager/' : '/item/'), 'Invalid import kind.');
     require(typeof option.name === 'string' && option.name.length > 0 && option.name.length <= 128,
       'Invalid import name.');

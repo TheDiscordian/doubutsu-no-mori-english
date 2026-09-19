@@ -435,7 +435,7 @@ def build(output, art_path, lock=LOCK):
 
 def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=False, equipment_kinds=False,
                     player_actions=False, item_category_art=None, ground_categories=False, event_acquisition=False,
-                    held_collection=False, held_catalogue_art=None):
+                    held_collection=False, held_catalogue_art=None, held_selection=False):
     """Update shared readers; optionally install the shared held-resource adapter."""
     output=output.resolve()
     if output.exists() or not output.is_relative_to(ROOT/'build'):
@@ -453,9 +453,9 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
     output.mkdir(parents=True)
     moved=[];equipment_report=None;reused=None;owner_changes={};owner_moves=[];owner_updates=[];report_updates={}
     equipment_mode=any((equipment_art is not None,player_motion,equipment_kinds,player_actions,
-                        item_category_art is not None,ground_categories,event_acquisition,held_collection,held_catalogue_art is not None))
+                        item_category_art is not None,ground_categories,event_acquisition,held_collection,held_catalogue_art is not None,held_selection))
     if sum((equipment_art is not None,player_motion,equipment_kinds,player_actions,
-            item_category_art is not None,ground_categories,event_acquisition,held_collection,held_catalogue_art is not None))>1:
+            item_category_art is not None,ground_categories,event_acquisition,held_collection,held_catalogue_art is not None,held_selection))>1:
         raise ValueError('Install equipment resources, player motion, and kind readers in dependency order')
     if equipment_mode:
         blob,reused=reuse_resource_tail(base,prior,old_blob)
@@ -491,6 +491,9 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
     elif held_catalogue_art is not None:
         import v3_held_catalogue as equipment
         equipment_report,owner_changes,report_updates=equipment.install(base,prior,blob,core,original,output,held_catalogue_art)
+    elif held_selection:
+        import v3_held_catalogue as equipment
+        equipment_report,owner_changes,report_updates=equipment.select_installed(prior,blob)
     if equipment_report:
         if equipment_report.get('parent_readers'):
             attribution=provenance_patch(equipment_report['parent_readers']['rows'])
@@ -618,6 +621,9 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         if held_catalogue_art is not None:
             report['shared_runtime_refresh']['adapters'].append('held_catalogue')
             report['shared_runtime_refresh']['artwork_changed']=True
+        if held_selection:
+            report['shared_runtime_refresh']['adapters'].append('held_selection')
+            report['shared_runtime_refresh']['saved_profile_changed']=True
         report['sources'].update({p:sha256((ROOT/p).read_bytes()) for p in equipment.SOURCES})
         if equipment_report.get('parent_readers'):
             report['sources']['translations/provenance.json']=sha256((ROOT/'translations/provenance.json').read_bytes())
@@ -657,6 +663,8 @@ if __name__=='__main__':
         help='With --refresh-runtime, connect selected handheld ownership using source collection identities')
     parser.add_argument('--held-catalogue-art',type=Path,
         help='With --refresh-runtime, connect prepared parent display models to their actual catalogue category')
+    parser.add_argument('--held-selection',action='store_true',
+        help='With --refresh-runtime, enable installed parents in the full experimental composition reference')
     args=parser.parse_args()
     if args.equipment_art and not args.refresh_runtime:parser.error('--equipment-art requires --refresh-runtime')
     if args.player_motion and not args.refresh_runtime:parser.error('--player-motion requires --refresh-runtime')
@@ -667,10 +675,11 @@ if __name__=='__main__':
     if args.event_acquisition and not args.refresh_runtime:parser.error('--event-acquisition requires --refresh-runtime')
     if args.held_collection and not args.refresh_runtime:parser.error('--held-collection requires --refresh-runtime')
     if args.held_catalogue_art and not args.refresh_runtime:parser.error('--held-catalogue-art requires --refresh-runtime')
+    if args.held_selection and not args.refresh_runtime:parser.error('--held-selection requires --refresh-runtime')
     result=(refresh_runtime(args.output,args.base_lock,equipment_art=args.equipment_art,player_motion=args.player_motion,
                             equipment_kinds=args.equipment_kinds,player_actions=args.player_actions,
                             item_category_art=args.item_category_art,ground_categories=args.ground_categories,
                             event_acquisition=args.event_acquisition,held_collection=args.held_collection,
-                            held_catalogue_art=args.held_catalogue_art)
+                            held_catalogue_art=args.held_catalogue_art,held_selection=args.held_selection)
             if args.refresh_runtime else build(args.output,args.art,args.base_lock))
     print(json.dumps({k:result[k] for k in ('runtime_abi','output_sha256','patch_sha256')},indent=2))

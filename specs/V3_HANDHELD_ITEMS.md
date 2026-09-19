@@ -232,8 +232,12 @@ fans at positions 32–39, pinwheels, and balloons. Checking only its 601-row
 furniture list misses these entries. The shared source receipt binds all nine
 category lists and records each installed parent's actual category and position.
 Its prepared furniture-style model is used for the umbrella-tab preview, not as
-an ordinary room-drop replacement. Preview/list installation and optional
-composition remain required before playable handheld selection.
+an ordinary room-drop replacement. The
+[shared catalogue adapter](V3_CATALOGUE.md#shared-handheld-representations)
+installs these previews, and
+[optional composition](V3_OPTIONAL_COMPOSITION.md#shared-equipment-selections)
+connects parent choices in an explicit experimental proposal. Ordinary gameplay,
+the unresolved seasonal-copy check, persistence, and hardware remain unverified.
 
 ### Shared resource loader
 
@@ -555,9 +559,11 @@ room aliases, implemented action/held categories, and installed resource-size
 checks. It generates all eight fan records without an item list. Their inventory
 IDs are `2254..225B`, extended kinds `107..114`, and canonical collection-display
 IDs `314C..3168`. Each uses its display's existing furniture-profile bit, not a
-second bit or a selection-order ID. Current profiles leave those bits clear;
-these are prepared equipment records, not enabled inventory items or web choices.
-The importer rejects collisions with an already selected profile identity.
+second bit or a selection-order ID. Resource-only profiles leave those bits clear;
+the checked optional-selection stage enables them in its full experimental
+reference. Selected subsets clear unused parent bits and representation fields.
+The importer rejects collisions with an already selected profile identity;
+neither served patcher exposes these choices.
 
 The visibility hook at `808BD638` runs only on the native passive-item branch.
 It retains the native umbrella rule and adds selected source-category records.

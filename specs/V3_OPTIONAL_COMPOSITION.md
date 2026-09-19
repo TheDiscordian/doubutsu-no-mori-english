@@ -9,9 +9,10 @@ browser's data-only selection plan from those same checked records. Neither
 selector maintains another item list. A newly installed supported item therefore
 needs no browser item definition, checkbox-order identity, or bespoke patch path.
 
-The current installed development catalogue contains 104 choices: 81 furniture
-items, three shirts, and twenty villagers. A shirt's mannequin is a required
-representation, not another selectable choice. This catalogue describes installed
+The main locked catalogue contains 104 choices: 81 furniture items, three shirts,
+and twenty villagers. The explicit held-selection proposal contains 112, adding
+eight equipment parents. A shirt's mannequin and a handheld's catalogue model
+are required representations, not extra selectable choices. This catalogue describes installed
 development content, not completed gameplay acceptance. Select-all means the
 installed catalogue, not every entry on the donor disc. Unimplemented identities
 are rejected rather than given substitutes.
@@ -27,6 +28,44 @@ The experimental browser modules live under `experimental/imports/`, outside
 the deployed `web/` tree. Exports go to a fresh ignored `build/` directory and
 remain unserved. Both V2 patchers, recipes, services, and the Pages allowlist
 stay unchanged until the user tests V3 and explicitly approves the switch.
+
+## Shared equipment selections
+
+`--refresh-runtime --held-selection` prepares a complete experimental reference
+only after the shared equipment, inventory, ground, acquisition, collection, and
+catalogue adapters are installed. It binds the complete equipment module,
+prepared models, tagged profiles, inverse metadata, and canonical profile bits.
+It enables the actual installed parent bits without changing gameplay code,
+artwork, catalogue contents, allocations, or saved format. This is an explicit
+development step, not a playable-handoff or publication claim.
+
+Both composition CLIs and the isolated browser check accept `--base-lock` for a
+checked proposal. This does not replace the main lock. The lock must bind the
+full ROM, report, and ABI, and cannot point to a selected-only result. Input
+verification remains mandatory after choosing a proposal.
+
+Equipment choices come from installed parent/representation records. Their
+canonical IDs are the actual pocket parents, while their single saved-profile
+bit is the established collection-display bit. The composer verifies the parent
+reader module and full prepared model, sparse profile, inverse metadata, and
+bit correspondence before offering a choice. A display ID cannot be requested
+as furniture. Disabled choices clear both the profile bit and representation
+enable word. Collection/name/price/action readers already use the parent bit.
+
+The umbrella list retains its 32 native entries, packs selected appended models
+in donor order, zeros unused slots, and updates the shared iteration/completion
+count. The browser generator consumes those same checked writes. Its Equipment
+category supports individual selection, select/clear visible, and select all;
+default selection remains empty. Implemented representations are omitted from
+the unavailable-furniture queue because their parent is the user-facing choice.
+
+All choices reproduce the full proposal; no choices reproduce the exact pinned
+translation-only cartridge. The existing format-2 codec accepts equal or larger
+profiles and rejects a missing equipment bit without modifying destination state.
+Saves using these choices must not be loaded in V2 or an older profile without
+them. A codec check does not establish ordinary cross-build save/reload. The
+inherited seasonal-copy issue still prevents promotion or a playable handoff;
+both served V2 patchers stay unchanged.
 
 ## Dependency resolution
 

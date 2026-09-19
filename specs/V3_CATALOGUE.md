@@ -29,9 +29,11 @@ updated in the full hash-checked room owner.
 The common catalogue rebuilder retains this category table during later furniture
 batches. Its pointer/count relocation, parent allocation, complete suffix, shared
 pool bound, and terminal ROM-resource mappings remain checked. Installation adds
-no selected profile bits and changes no saved format. Optional parent choices,
-ordinary ordering/delivery, rendered appearance, and gameplay/persistence remain
-separate work. Both served patchers stay V2. Exact verification evidence and the
+no selected profile bits and changes no saved format. The separate
+[selection stage](V3_OPTIONAL_COMPOSITION.md#shared-equipment-selections) connects
+experimental parent choices and selected category counts. Ordinary ordering/
+delivery, rendered appearance, and gameplay/persistence remain separate work.
+Both served patchers stay V2. Exact verification evidence and the
 inherited seasonal-copy restriction are in the
 [checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-held-parent-catalogue).
 

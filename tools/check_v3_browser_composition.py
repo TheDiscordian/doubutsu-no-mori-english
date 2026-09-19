@@ -15,7 +15,7 @@ ROOT = composer.ROOT
 PROBE = b'<!doctype html><meta charset="utf-8"><title>Private worker check</title><input id="n64" type="file"><input id="disc" type="file">'
 
 
-def check_interface(page, origin, out, expected, catalog):
+def check_interface(page, origin, out, expected, catalog, review):
     """Exercise the actual UI; keep native gameplay checks out of this batch."""
     results = {}
     page.add_init_script('''(() => {
@@ -46,11 +46,21 @@ def check_interface(page, origin, out, expected, catalog):
     assert page.locator('.option input:checked').count() == 3
     page.locator('#clear-visible').click()
     assert page.locator('.option input:checked').count() == 0
+    equipment=[key for key,row in catalog.items() if row['kind']=='equipment']
+    if equipment:
+        page.locator('#kind').select_option('equipment')
+        assert page.locator('.option:visible').count()==len(equipment)
+        page.locator('#select-visible').click()
+        assert page.locator('.option input:checked').count()==len(equipment)
+        page.locator('#clear-visible').click()
+        assert page.locator('.option input:checked').count()==0
+        results['equipment_category_select_and_clear']=len(equipment)
     page.locator('#kind').select_option('all')
-    page.locator('#search').fill('Lady Liberty')
+    pending=review['unavailable'][0]
+    page.locator('#search').fill(pending['id'])
     page.locator('#review summary').click()
     assert page.locator('.unavailable:visible').count() == 1
-    assert 'callbacks' in page.locator('.unavailable:visible').inner_text()
+    assert pending['reason'] in page.locator('.unavailable:visible').inner_text()
     assert page.locator('.unavailable input, .unavailable button').count() == 0
     results['search_category_all_clear_and_review_reasons'] = True
 
@@ -114,12 +124,26 @@ def check_interface(page, origin, out, expected, catalog):
     assert set(old_urls) <= set(page.evaluate('window.__lifecycle.revoked'))
     assert page.locator('#save-warning').is_hidden()
     results['selection_change_revokes_downloads'] = True
+    if equipment:
+        page.locator('#search').fill('')
+        page.locator('#kind').select_option('equipment')
+        for key in (equipment[1],equipment[-1]):
+            page.locator(f'[data-id="{key}"] input').check()
+        assert page.locator('.option input:checked').count()==2
+        assert page.locator('#dependencies').is_hidden()
+        page.locator('#save-ack').check()
+        build_and_download('equipment-subset')
+        page.locator('#clear-all').click()
+        page.locator('#kind').select_option('all')
     build_and_download('no-imports')
     old_urls = page.evaluate('window.__lifecycle.created.slice()')
-    page.locator('#gamecube').set_input_files(str(disc))
+    # Actually change the input. Re-selecting the identical file can leave the
+    # native file-input value unchanged and does not prove a change-event path.
+    page.locator('#gamecube').set_input_files([])
     assert page.locator('#success').is_hidden() and not page.locator('#receipt').get_attribute('href')
     assert set(old_urls) <= set(page.evaluate('window.__lifecycle.revoked'))
     results['file_change_revokes_downloads'] = True
+    page.locator('#gamecube').set_input_files(str(disc))
 
     page.locator('#search').fill('')
     page.locator('#build').click()
@@ -214,6 +238,8 @@ def check(export, output, *, interface=False):
     catalog = composer.catalogue(base, report)
     profiles = [('no-imports', []), ('all-installed', list(catalog)),
                 ('villager-and-seasonal-subset', ['GAFE01-r0/villager/00EB', 'GAFE01-r0/item/31D4'])]
+    equipment=[key for key,row in catalog.items() if row['kind']=='equipment']
+    if equipment:profiles.append(('equipment-subset',[equipment[1],equipment[-1]]))
     expected = {}
     for name, selected in profiles:
         if interface and name == 'all-installed': continue
@@ -259,7 +285,8 @@ def check(export, output, *, interface=False):
                     })''', {'selected': selected, 'cancel': cancel, 'plan_sha256': manifest['plan']['sha256']})
 
                 if interface:
-                    results['interface'] = check_interface(page, origin, out, expected, catalog)
+                    results['interface'] = check_interface(page, origin, out, expected, catalog,
+                        json.loads(resources['data/review.json']))
                 else:
                     cancelled = worker(profiles[-1][1], cancel=True)
                     assert cancelled['type'] == 'cancelled', cancelled
@@ -298,5 +325,7 @@ if __name__ == '__main__':
     parser.add_argument('--export', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--interface', action='store_true', help='Check the real selection page and downloads instead of the worker probe')
+    parser.add_argument('--base-lock',type=Path,help='Explicit checked proposal lock for this isolated test')
     args = parser.parse_args()
+    if args.base_lock:composer.use_build_lock(args.base_lock)
     print(json.dumps(check(args.export, args.output, interface=args.interface), indent=2))
