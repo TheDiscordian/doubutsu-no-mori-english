@@ -89,6 +89,12 @@ artwork, and connects the selected-only native tool-icon reader. It preserves
 gift/umbrella priority and original descriptors without growing any allocation.
 Source category 43 is distinct from the ID-derived tool menu category two;
 remaining category consumers and acquisition still require integration.
+The same refresh connects the separate inventory-screen equipment owner through
+source-derived preview records, preserving all original tool kinds and the
+native empty sentinel. Shared model/pose tables and owner-relative draw dispatch
+reuse installed resources; the complete module grows by 4 KiB without enlarging
+ordinary model/animation banks. No fan is enabled by that integration. See
+[inventory previews](V3_HANDHELD_ITEMS.md#shared-inventory-equipment-previews).
 The table converter also extends the two held-item main/draw tables, preserving
 all original tools. Source static-held drawing uses the existing equipment
 resources and native outer draw setup. Unimplemented rig categories retain null

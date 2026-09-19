@@ -24,6 +24,89 @@ ACTIVE=ROOT/os.environ.get('V3_FAN_ACTION_BUILD','build/v3-fan-action-dispatch-0
 SELECTION=ROOT/os.environ.get('V3_HELD_SELECTION_BUILD','build/v3-held-selection-01')
 PARENTS=ROOT/os.environ.get('V3_HELD_PARENTS_BUILD','build/v3-held-parent-readers-01')
 ICONS=ROOT/os.environ.get('V3_POCKET_ICONS_BUILD','build/v3-held-pocket-icons-01')
+INVENTORY=ROOT/os.environ.get('V3_INVENTORY_EQUIPMENT_BUILD','build/v3-inventory-equipment-03')
+
+
+@unittest.skipUnless((INVENTORY/'build.json').is_file(),'Current inventory-preview cartridge required')
+class InventoryPreviewTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.rom=(INVENTORY/'animal-forest-v3-asset-loader.z64').read_bytes()
+        cls.report=json.loads((INVENTORY/'build.json').read_bytes())
+        cls.base,cls.prior=inputs(INVENTORY/'base-lock.json')
+        cls.files,cls.before=by_vrom(cls.rom),by_vrom(cls.base)
+        cls.e=cls.report['equipment_resources'];cls.preview=cls.e['inventory_preview']
+        cls.blob=cls.files[BLOB].extract(cls.rom)
+        at=cls.e['blob_offset'];cls.module=cls.blob[at:at+cls.e['bytes']]
+
+    def test_actual_source_relationships_and_complete_native_tables(self):
+        from v3_inventory_equipment import records,SELECTOR,COUNT,VROM,OWNER_RAM
+        source=actions.Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+            (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+        selector,receipt=records(source,self.prior['equipment_resources'])
+        self.assertEqual(self.module[SELECTOR:SELECTOR+len(selector)],selector)
+        for k,v in receipt.items():self.assertEqual(self.preview[k],json.loads(json.dumps(v)))
+        self.assertEqual(len(receipt['rows']),8)
+        native=self.before[VROM].extract(self.base)
+        for table in self.preview['tables']:
+            at=table['offset'];values=struct.unpack_from('>'+str(COUNT)+'I',self.module,at)
+            self.assertEqual(self.module[at:at+20],native[table['native']-OWNER_RAM:table['native']-OWNER_RAM+20])
+            self.assertEqual(values[5],0)
+            for row in receipt['rows']:
+                expected=(self.preview['code']['symbols']['af_v3_inventory_static_draw']
+                          if table['role']=='draw' else row['fields'][table['role']])
+                self.assertEqual(values[row['preview_kind']],expected)
+                self.assertFalse(self.blob[0x20+self.prior['equipment_resources']['parent_readers']['rows'][0]['profile_byte']]
+                                 &self.prior['equipment_resources']['parent_readers']['rows'][0]['profile_mask'])
+            self.assertEqual(sha256(self.module[at:at+table['bytes']]),table['sha256'])
+        import copy
+        bad=copy.deepcopy(self.prior['equipment_resources'])
+        next(r for r in bad['records'] if r['index']==59)['type']=1
+        with self.assertRaises(ValueError):records(source,bad)
+
+    def test_declared_owner_edits_relocation_and_unchanged_prior_equipment(self):
+        from v3_inventory_equipment import VROM,RELOC,OWNER_RAM,SECTIONS,CODE
+        old=self.before[VROM].extract(self.base);new=self.files[VROM].extract(self.rom)
+        restored=bytearray(new)
+        for row in self.preview['patches']:
+            at=row['address']-OWNER_RAM
+            self.assertEqual(struct.unpack_from('>I',old,at)[0],row['before'])
+            self.assertEqual(struct.unpack_from('>I',new,at)[0],row['after'])
+            struct.pack_into('>I',restored,at,row['before'])
+        self.assertEqual(restored,old)
+        rel=self.files[RELOC].extract(self.rom);prior=self.before[RELOC].extract(self.base)
+        self.assertEqual(len(rel),len(prior));self.assertEqual(struct.unpack_from('>5I',rel),(*SECTIONS,144))
+        rows=struct.unpack_from('>160I',prior,20)
+        self.assertEqual(list(struct.unpack_from('>144I',rel,20)),[r for r in rows if r not in self.preview['removed_relocations']])
+        for base in (0x80200010,0x80378010):
+            spec=SimpleNamespace(ram=OWNER_RAM,resident_bytes=sum(SECTIONS),sections=(*SECTIONS,144))
+            loaded=relocate_verified_data(spec,new,rel,base)
+            for row in self.preview['patches']:
+                at=row['address']-OWNER_RAM
+                self.assertEqual(struct.unpack_from('>I',loaded,at)[0],row['after'])
+        before_blob=self.before[BLOB].extract(self.base);e=self.prior['equipment_resources'];at=e['blob_offset']
+        self.assertEqual(before_blob[at:at+CODE],self.module[:CODE])
+        self.assertEqual(self.e['records'],e['records']);self.assertEqual(self.e['player_motion'],e['player_motion'])
+        self.assertEqual(self.e['player_actions'],e['player_actions'])
+        self.assertEqual(sha256(self.module),self.e['sha256']);self.assertEqual(zlib.crc32(self.module),self.e['crc32'])
+        self.assertEqual(self.e['bytes'],0x7000)
+
+    def test_current_patch_profile_startup_and_unrelated_resources(self):
+        native=(ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes()
+        self.assertEqual(apply_ups(native,(INVENTORY/'asset-loader.ups').read_bytes()),self.rom)
+        self.assertEqual(struct.unpack_from('>2I',self.rom,16),n64_checksum(self.rom))
+        changed={CODE_VROM,BLOB,MODULE,0x785700,0x7898C0}
+        self.assertEqual(self.before.keys(),self.files.keys())
+        # The native directory records the new physical owner locations.
+        # Check its declared entries instead of expecting its bytes unchanged.
+        for v,file in self.before.items():
+            self.assertEqual(file.index,self.files[v].index)
+            if v not in changed|{0x19D40}:
+                self.assertEqual(file.extract(self.base),self.files[v].extract(self.rom),hex(v))
+        self.assertEqual(self.blob[0x20:0xE0],self.before[BLOB].extract(self.base)[0x20:0xE0])
+        self.assertIn('-DAF_V3_EQUIPMENT_BYTES=0x7000u',self.report['startup']['flags'])
+        self.assertLessEqual(self.report['startup']['bytes'],CONFIG-STARTUP)
+        self.assertFalse(self.report['shared_runtime_refresh']['saved_format_changed'])
 
 
 @unittest.skipUnless((ICONS/'build.json').is_file(),'Current shared pocket-icon cartridge required')
@@ -106,6 +189,9 @@ class SelectionHostTests(unittest.TestCase):
 
     def test_parent_names_prices_and_bounded_writes(self):
         self.sanitized('v3_held_items_test.c')
+
+    def test_inventory_preview_selection_and_drawing(self):
+        self.sanitized('v3_inventory_equipment_test.c')
 
     def test_native_probe_uses_original_switch_and_actual_permission_values(self):
         from v3_furniture_batch_smoke import original_equipment_kinds

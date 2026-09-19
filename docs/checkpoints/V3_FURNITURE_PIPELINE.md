@@ -1,5 +1,71 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared inventory equipment previews
+
+ABI 108 installs source-derived preview records for all eight fan parents
+through the existing shared refresh. The separate inventory owner retains its
+five original kinds and empty sentinel. Eight expanded tables reuse complete
+models and holding poses, and a shared dispatcher resolves original tool
+callbacks against the currently loaded inventory owner. No per-item installer,
+new profile bit, selectable choice, or saved-format change is introduced.
+
+The 540-byte adapter and its immutable tables extend the equipment reservation
+from 24 to 28 KiB. Startup remains 952 bytes. Existing model/animation banks,
+all earlier equipment-module bytes, source artwork, and player actions remain.
+Exactly sixteen obsolete table relocations are removed; the complete owner and
+relocation allocations stay unchanged. The specification records the source,
+native ownership, entry points, and bounded layout.
+
+Artifacts:
+
+- Build: `build/v3-inventory-equipment-03/`, promoted in the development lock.
+- ROM SHA-256: `25f0ee69193c75230b86b1a96e3d760c1cdc469fedc2a4ec39b3cafe7206122c`.
+- UPS SHA-256: `57f84c4c11a52b8c5613f3a873a40beb7c00378cabf70e0cf80a2fa1fb63c4ca`.
+- Receipt SHA-256: `0a0f83dcf853beab3f87507ebca4ae2f1be2008d5a1afe401d331fcf19377d35`.
+
+Four focused checks pass across the host/source/cartridge commands. The
+ASan/UBSan host check passes in 0.261 seconds. Two of three cartridge checks
+pass in the initial 4.195-second invocation; the third incorrectly treats the
+ROM file directory as immutable when installing relocated resources. Its
+corrected focused invocation passes in 4.681 seconds. No cartridge change is
+needed. These checks cover source/table relationships, retained owner bytes,
+relocation at two bases, selected-only bounds, preserved resources/profiles,
+startup, checksums, and original-ROM patch reconstruction.
+
+Twelve candidate-bound composition checks pass in 8.758 seconds. All selected
+imports reproduce ABI 108; empty selections reproduce V2-11. Dependencies,
+sparse profiles, catalogue packing, and the actual saved-profile codec pass.
+These are component checks, not ordinary save/restart evidence.
+
+The first silent native run at `build/smoke-v3-inventory-equipment-01/` passes
+104 records and 79 assertions with no failures. It executes eleven actual
+inventory selector cases, two complete model transfers, the complete holding
+pose transfer, and four native draw-table/dispatch windows: two imported fans,
+the original axe, and the original shovel. Loaded owner/BSS, full equipment
+module, private memory guards, no-fault status, restored player/profile, and
+checkpoint restoration pass.
+
+The same current-cartridge run completes the prior pocket-icon fixture's
+unfinished controls. All seven selected/disabled/wrapped/native cases pass,
+alongside full-width register preservation, correct resolved artwork pointers,
+guards, unchanged module/owner/segments, and restored state. No old cartridge
+is replayed. The combined results SHA-256 is
+`f8dc835d59c5803c6ad7436973683093a7fbb57d5cedff1a911e8a3654aa3ea6`.
+The isolated run shuts down gracefully with erased FlashRAM; it uses no user
+save and plays no audio.
+
+Full inventory construction, outer matrix/segment setup, GPU appearance,
+ordinary equip/put-away, acquisition, and persistence remain unverified. No fan
+is offered as playable. Next connect the remaining category consumers and
+source acquisition, context-correct catalogue/collection, and optional profiles.
+No more standalone preview or pocket-icon harness work is required without a
+concrete changed dependency or observed defect.
+
+Same-profile ABI 107 saves are expected to remain compatible in both directions;
+no new ordinary cross-version reload is claimed. Import-enabled V3 saves remain
+unsuitable for V2. Both served V2 patchers are unchanged; carry the museum-header
+correction into checked V3 composition before the next handoff.
+
 ## Shared pocket icons
 
 ABI 107 installs complete donor pocket artwork and a selected-parent reader

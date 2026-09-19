@@ -150,10 +150,129 @@ def pocket_icons(debug, rom_path, record):
                 ordinary_inventory_tested=False,save_reload_tested=False,requires_checkpoint_restore=True)
 
 
+def inventory_preview(debug, rom_path, record):
+    """Loaded inventory selection, complete resource DMA, and actual draw dispatch."""
+    from v3_inventory_equipment import VROM,RELOC,OWNER_RAM,SECTIONS
+    from v3_furniture_room_smoke import extend
+    from runtime_layout import TEST_STACK
+    path=Path(rom_path);image=path.read_bytes()
+    report=json.loads((path.parent/'build.json').read_bytes())
+    if sha256(image)!=report['output_sha256']:
+        raise ValueError('Inventory preview requires the exact current cartridge')
+    equipment=report['equipment_resources'];preview=equipment['inventory_preview']
+    files=by_vrom(image);blob=files[runtime.BLOB].extract(image);boot=boot_proofs(image)
+    start=equipment['blob_offset'];module=blob[start:start+equipment['bytes']]
+    def check(label,at,want):
+        actual=debug.read_memory(at,len(want));passed=actual==want
+        record(dict(inventory_preview_check=label,address=f'{at:08X}',bytes=len(want),
+                    assertion='passed' if passed else 'failed'))
+        if not passed:raise ValueError('Inventory-preview mismatch: '+label)
+    def call(at,args=(),want=None,proof=None):
+        result=debug.call(f'{at:08X}',list(args),return_address=MODULE_RAM+0x6480,
+                          verified_code=proof or boot.get(at))
+        if want is not None:result['assertion']='passed' if result['return_value']==want else 'failed'
+        record(result)
+        if want is not None and result['return_value']!=want:
+            raise ValueError('Inventory-preview return mismatch')
+        return result['return_value']
+    def put(at,*words):debug.write_memory(at,struct.pack('>'+str(len(words))+'I',*words))
+    check('complete startup equipment module',0x804A3000,module)
+    check('original profile',0x80460020,blob[0x20:0xE0])
+    saved={at:debug.read_memory(at,n) for at,n in ((0x80136FD8,4),(0x80460020,192))}
+    size=0x1A000;allocation=call(0x8009BFC0,[size])
+    if allocation&15 or not MODULE_RAM+0x8000<=allocation<=0x80400000-size:
+        raise ValueError('Inventory-preview allocation outside native heap')
+    root,overlay,player,submenu,graph,game,gfx,buffer,stack=(allocation+n for n in
+        (16,0x5000,0x15800,0x16000,0x16100,0x16500,0x16600,0x17000,0x19800))
+    debug.write_memory(allocation,bytes(size));edge=b'V3IV'*4
+    guards=(allocation,overlay-16,player-16,submenu-16,graph-16,game-16,gfx-16,
+            gfx+0x100,buffer-16,buffer+0x1200,stack-0x800,stack+0x200,
+            allocation+size-16,TEST_STACK-0x800,TEST_STACK+0x40)
+    for at in guards:debug.write_memory(at,edge)
+    data,rel=(files[v].extract(image) for v in (VROM,RELOC));resident=sum(SECTIONS)
+    spec=SimpleNamespace(ram=OWNER_RAM,resident_bytes=resident,sections=struct.unpack_from('>5I',rel))
+    loaded=relocate_verified_data(spec,data,rel,root);proof=(root,loaded[:SECTIONS[0]])
+    parents={r['item_id']:r for r in equipment['parent_readers']['rows']}
+    models={r['index']:r for r in equipment['records']}
+    motions={r['index']:r for r in equipment['player_motion']['records']}
+    first,second=preview['rows'][0],preview['rows'][-1]
+    def select(row):
+        profile=bytearray(saved[0x80460020])
+        for p in parents.values():profile[p['profile_byte']]&=~p['profile_mask']
+        if row:
+            p=parents[row['item_id']];profile[p['profile_byte']]|=p['profile_mask']
+        debug.write_memory(0x80460020,profile)
+    try:
+        call(0x800262D0,[VROM,VROM+len(data),OWNER_RAM,OWNER_RAM+resident,root,root+resident,len(rel)])
+        check('complete relocated inventory owner and BSS',root,loaded)
+        put(0x80136FD8,player);put(submenu+0x2C,overlay)
+        put(overlay+0x106DC,root+preview['native_bss_address']-OWNER_RAM)
+        put(game,graph)
+        cases=[(0x2200,1,None),(0x2201,0,None),(0x2202,4,None),(0x2203,3,None),
+               (0x2223,2,None),(0,5,None),(0xFFFF,5,None),
+               (int(first['item_id'],16),5,None),
+               (int(first['item_id'],16),first['preview_kind'],first),
+               (int(second['item_id'],16),5,first),
+               (int(second['item_id'],16),second['preview_kind'],second)]
+        for item,want,enabled in cases:
+            select(enabled);debug.write_memory(player+0x3EC,struct.pack('>H',item))
+            call(root+0x8087D51C-OWNER_RAM,want=want,proof=proof)
+        for row in (first,second):
+            model=models[row['fields']['shape']]
+            fill=bytes([0xA5])*0x1200;debug.write_memory(buffer,fill)
+            call(0x800B167C,[buffer,model['index']])
+            raw=blob[model['blob_offset']:model['blob_offset']+model['bytes']]
+            check('complete selected inventory model and untouched tail',buffer,raw+fill[len(raw):])
+        motion=motions[first['fields']['player_animation']]
+        debug.write_memory(buffer,fill);call(0x800B1D94,[buffer,motion['index']])
+        raw=blob[motion['blob_offset']:motion['blob_offset']+motion['bytes']]
+        check('complete inventory holding pose and untouched tail',buffer,raw+fill[len(raw):])
+        # Run the native table lookup and callback call, after the outer matrix/
+        # segment setup. This checks dispatch, not full scene or GPU rendering.
+        draws=[(r['preview_kind'],models[r['fields']['shape']]['pointer']) for r in (first,second)]
+        draws.extend(((0,0x06000228),(4,0x06003420)))
+        for kind,pointer in draws:
+            debug.write_memory(overlay+0x10016,struct.pack('>H',kind))
+            debug.write_memory(gfx,bytes(0x100));put(graph+0x298,gfx,gfx+0x100)
+            put(stack+0x30,submenu,game)
+            before=debug.command('g');regs=[int(before[i:i+16],16) for i in range(0,len(before),16)]
+            if len(regs)!=71 or regs[37]&0xFFFFFFFF!=0x800D334C:
+                raise ValueError('Inventory drawing requires paused native game frame')
+            regs[6]=extend(overlay+0x10000);regs[29]=extend(stack)
+            regs[37]=extend(root+0x8087E5F4-OWNER_RAM)
+            target=root+0x8087E618-OWNER_RAM;bp=f'0,{target:x},4'
+            if debug.command('Z'+bp)!='OK':raise ValueError('Inventory draw breakpoint refused')
+            try:
+                if debug.command('G'+''.join(f'{r:016x}' for r in regs))!='OK':
+                    raise ValueError('Inventory draw registers refused')
+                stopped=debug.command('c');raw=debug.command('g')
+                actual=[int(raw[i:i+16],16) for i in range(0,len(raw),16)]
+                passed=(stopped[:3] in ('T05','S05') and actual[37]&0xFFFFFFFF==target
+                        and actual[29]==regs[29] and actual[16:24]==regs[16:24] and actual[30]==regs[30])
+                record(dict(inventory_preview_draw_kind=kind,assertion='passed' if passed else 'failed'))
+                if not passed:raise ValueError('Inventory draw continuation or preserved register mismatch')
+            finally:
+                debug.command('z'+bp);debug.command('G'+before)
+            check('complete draw command and unchanged tail',gfx,struct.pack('>2I',0xDE000000,pointer)+bytes(0xF8))
+            check('native graphics pointer advance',graph+0x298,struct.pack('>I',gfx+8))
+        check('inventory code and BSS retained',root,loaded)
+        check('equipment module retained',0x804A3000,module)
+        for at in guards:check('private memory guard',at,edge)
+        check('no faulted thread',0x8003CE34,bytes(4))
+    finally:
+        for at,value in saved.items():debug.write_memory(at,value)
+        call(0x8009C040,[allocation])
+    for at,value in saved.items():check('restored player/profile',at,value)
+    return dict(native_inventory_preview_cases=len(cases),draw_windows=len(draws),
+                gpu_rendered=False,ordinary_inventory_tested=False,save_reload_tested=False,
+                requires_checkpoint_restore=True)
+
+
 def exercise(debug, rom_path, record, *, section='automatic_furniture'):
     if section=='equipment_resources':return equipment_resources(debug,rom_path,record)
     if section=='player_motion':return player_motion(debug,rom_path,record)
     if section=='pocket_icons':return pocket_icons(debug,rom_path,record)
+    if section=='inventory_preview':return inventory_preview(debug,rom_path,record)
     path = Path(rom_path)
     image = path.read_bytes()
     report = json.loads((path.parent / 'build.json').read_bytes())

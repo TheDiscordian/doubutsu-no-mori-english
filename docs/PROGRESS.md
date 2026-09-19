@@ -17,25 +17,23 @@ locked ROM is tracked below; this V2 fix does not replace its no-import baseline
 
 ## Active development
 
-Current ABI 107 at `build/v3-held-pocket-icons-01/` connects shared pocket icons
-for all eight installed fan parent records. Complete source artwork, palette,
-and native drawing are used without resizing or substitute icons. Names/prices,
-equipment relationships, and official credits remain installed. No item-specific
-installer or option list is added. No fan profile bit or browser choice is enabled.
+Current ABI 108 at `build/v3-inventory-equipment-03/` connects the inventory
+screen's separate equipment selector, all eight shape/animation/draw tables,
+and owner-relative callbacks through shared source-derived records. All eight
+fans reuse their complete installed models and holding poses. Original tools
+and the empty-item sentinel remain intact. The equipment module is 28 KiB;
+ordinary model/animation banks and saved formats are unchanged. No fan profile
+bit or browser choice is enabled.
 
-Four focused checks and twelve current composition checks pass, including
-complete icon pixels/colours, sanitizer bounds, relocations, patch reconstruction,
-saved-profile selection, and exact no-import V2 output. Native loaded-owner
-relocation, full-register preservation, and independent selected/disabled fan
-drawing pass. The native run is incomplete: a fixture address comparison stops
-at an unchanged gift icon after nine passing assertions. Its correction is
-retained without another retry. Native control cases, final guards/checkpoint,
-ordinary inventory appearance, and hardware remain unverified. See the
-[checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-pocket-icons).
+Four focused checks and twelve current composition checks pass. The silent
+native run passes 104 records with 79 assertions: loaded-owner relocation,
+selected/disabled kinds, complete model/pose transfers, actual imported and
+original axe/shovel draw dispatch, all pocket-icon control cases, memory guards,
+and restored profile/checkpoint. Ordinary inventory appearance, full construction,
+equip/put-away gameplay, persistence, and hardware remain unverified. See the
+[checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-inventory-equipment-previews).
 
-Next integrate the inventory screen's separate player-item selector, resource
-ownership, shape/animation tables, and draw callback. Remaining inventory/ground
-category consumers still require support. Source fan category 43 is distinct
+Next connect the remaining inventory/ground category consumers. Source fan category 43 is distinct
 from the donor menu's ID-derived tool category two; do not use it as an unchecked
 native menu index. Acquisition, context-correct collection/catalogue, optional
 composition, ordinary take-out/put-away, and persistence remain work. Carry the

@@ -2,24 +2,24 @@
 
 ## Active: V3 optional GameCube imports
 
-Current ABI 107 is `build/v3-held-pocket-icons-01/`, pinned by the main build
-lock. The shared importer connects complete donor pocket artwork for all eight
-fan parent records. Four focused and twelve current composition checks pass.
-Native imported selection/drawing and full-register preservation pass; native
-gift/tool/umbrella controls and end-of-fixture guards/restoration remain
-unverified after the bounded fixture attempts. The address-comparison correction
-is retained, not rerun. No allocation, saved format, profile bit, or selectable
-identity changes. Preserve existing selector/name/price/action/draw/sound evidence.
-See the [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-pocket-icons).
+Current ABI 108 is `build/v3-inventory-equipment-03/`, pinned by the main build
+lock. The shared importer connects the inventory's selected equipment kinds,
+all eight shape/animation/draw tables, and owner-relative callbacks for the
+installed fan category. Four focused and twelve composition checks pass.
+The silent native run passes 104 records/79 assertions, including inventory
+selection, complete model/pose transfers, original/imported draw dispatch,
+pocket-icon controls, guards, and checkpoint restoration. Full inventory
+construction and appearance remain unverified. The extra 4 KiB of equipment
+memory does not change ordinary banks, saved formats, profile bits, or choices.
+Preserve existing selector/name/price/action/draw/sound evidence. See the
+[checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-inventory-equipment-previews).
 
-Next, extend the separate inventory-screen equipment owner from donor category
-records: its item selector, kind/shape/animation tables, resource ownership, and
-static held draw callback. Reuse the complete held resources. Then connect the
-remaining inventory/ground category consumers. Source fan category 43 belongs
+Next connect the remaining inventory/ground category consumers. Source fan category 43 belongs
 to the item-type reader, not the action menu; the donor menu uses ID-derived
 tool category two. Native `mNT_get_itemTableNo` still has only 36 equipment
 entries. Do not insert source 43 into unrelated native tables or use umbrella
-artwork. The world-player adapter does not update inventory preview automatically.
+artwork. The inventory-preview adapter is installed; full ordinary inventory
+loading and appearance need the combined gameplay pass once category support is ready.
 
 Then connect source acquisition, context-correct catalogue/collection, and
 optional composition through the same descriptors. Keep ordinary take-out/

@@ -515,12 +515,13 @@ menu index. The native `mNT_get_itemTableNo` has a 36-entry equipment table and
 still needs explicit support for extended IDs and its actual consumers. The
 separate pocket-icon reader is connected below. Do not replace fan artwork with
 umbrellas or furniture leaves. The inventory-screen player model
-also has its own item selector, kind tables, and draw callback: source
+also has its own item selector, kind tables, and draw callback, connected by the
+shared inventory-preview adapter below: source
 `m_inventory_ovl.c` functions `mIV_Get_player_item_shape_index` and
 `mIV_pl_shape_item_draw_fan`. The world-player action/draw adapter does not
 automatically update that owner.
 
-Inventory/ground categories and menus, inventory-screen equipment drawing,
+Inventory/ground categories and menus, ordinary inventory-screen appearance,
 acquisition, context-correct catalogue/collection, optional selection, and
 ordinary persistence remain required before enabling new handheld items.
 Original tools must not be duplicated as imports. Preserve existing ROMs/saves
@@ -560,3 +561,60 @@ uses its existing startup checksum/DMA. No allocation, action table, model,
 animation, saved format, or profile bit changes. No fan becomes selectable here.
 See the [checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-pocket-icons)
 for component evidence and the remaining native control/guard/render checks.
+
+## Shared inventory equipment previews
+
+`tools/v3_inventory_equipment.py` extends the separate inventory owner through
+the same `--refresh-runtime --player-actions` importer. Its records join the
+installed parent identities, equipment kinds, complete models, and player
+motions to the actual donor inventory-kind and drawing tables. Complete donor
+consumers and all table relocations are checked; there is no per-item list.
+Unsupported drawing categories reject instead of inheriting a fan callback.
+
+Native preview kinds `0..4` retain their original tools; `5` remains the empty
+sentinel. Supported donor kinds use `source preview kind + 1`, so the eight fans
+occupy `26..33`. The `AFIV` selector at `804A9C00` contains magic `41464956`,
+version one, count 56, and stride four, followed by fixed records for parent IDs
+`2224..225B`: a 16-bit item identity, an 8-bit preview kind, and an 8-bit world
+equipment kind. Empty slots stay zero. The runtime requires the same selected,
+ready parent used by the world selector; disabled or invalid parents return the
+unchanged empty sentinel.
+
+Eight 41-entry word tables start at `804A9400`, occupying 1,312 bytes. They hold
+player-animation indices/pointers, item-animation indices/pointers, shapes,
+skeletons, split-body parts, and draw callbacks. Each retains its first five
+native values. Fan records use installed shapes `59..66`, full holding pose
+269, and part three. Their null skeleton means the native loader skips item
+animation, matching the donor static-model route. The complete existing
+15,584-byte item bank and player-animation banks remain unchanged.
+
+The inventory owner is VROM `00785700`, linked at `8087D480`, with relocation
+resource `007898C0`. Installation redirects all eight table references and
+removes exactly sixteen corresponding HI/LO relocations. Section lengths
+`15664/1008/160/1504` and the 672-byte relocation allocation remain unchanged.
+The item-selector entry at `8087D51C` delegates to the resident selector;
+the callback call at `8087E610` delegates to the shared dispatcher. All other
+owner instructions and tables stay intact.
+
+Original callbacks retain their linked addresses in the immutable table. The
+dispatcher resolves them against the currently loaded inventory owner using
+its BSS pointer at `submenu->overlay + 106DC`, minus the native BSS offset
+`41C0`. It does not use a cached heap address or the world-player owner. Imported
+static drawing uses the existing held-resource pointer reader and appends one
+native display-list call. The surrounding inventory renderer retains matrix,
+segment, timing, and graphics-arena ownership.
+
+The 540-byte adapter starts at `804A9000`; code is bounded below `804A9400`.
+The complete equipment reservation is 28 KiB, ending at `804AA000`, with its new
+guard at `804A9FF0` and all preceding module bytes retained. Startup transfers
+and checks the complete module; its code remains 952 bytes. The extra 4 KiB
+fits below the existing furniture banks at `80500000`. No ordinary heap,
+model/animation bank, saved field, profile bit, or logical choice grows.
+
+The shared native probe exercises loaded-owner relocation, selected/disabled
+kinds, complete model/pose transfers, and the native draw-table/dispatch window.
+Its original axe/shovel cases verify callbacks resolve to the loaded inventory
+owner. It does not run full inventory construction, outer matrix setup, GPU
+rendering, ordinary equip/put-away, or a save/reload cycle. Those remain required
+gameplay checks before claiming playable imports. See the
+[checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-inventory-equipment-previews).

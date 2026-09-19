@@ -70,7 +70,9 @@ SOURCES = ('tools/v3_player_actions.py','tools/v3_furniture_pipeline.py',
            'overlays/v3/player_actions.ld','overlays/v3/held_selection.c',
            'overlays/v3/held_items.c','overlays/v3/held_items.ld',
            'overlays/v3/held_icon.S',
-           'tools/v3_handheld_items.py') + sound_programs.SOURCES
+           'tools/v3_handheld_items.py','tools/v3_inventory_equipment.py',
+           'overlays/v3/inventory_equipment.c','overlays/v3/inventory_equipment.S',
+           'overlays/v3/inventory_equipment.ld') + sound_programs.SOURCES
 
 SELECTION_OFFSET=0x5500
 PARENT_CODE_OFFSET,PARENT_TABLE_OFFSET=0x3000,0x57F0
@@ -641,10 +643,10 @@ def source_tables(source,categories=CATEGORIES,count=COUNT):
     return result
 
 
-def native_references(owner,reloc):
+def native_references(owner,reloc,*,expected_sections=(TEXT_SIZE,9488,880,0)):
     """Resolve all native table references, including multiple low consumers."""
     slots=relocation_offsets(reloc,len(owner));sections=struct.unpack_from('>5I',reloc)
-    if sections[:4]!=(TEXT_SIZE,9488,880,0):raise ValueError('Changed complete player owner dimensions')
+    if sections[:4]!=expected_sections:raise ValueError('Changed complete owner dimensions')
     rows=list(struct.unpack_from('>'+str(sections[4])+'I',reloc,20))
     high={};groups={};absolute={};locations={}
     for record in rows:
@@ -724,6 +726,9 @@ def expanded_tables(source,owner,reloc,*,categories=CATEGORIES,native_count=NATI
 def install(base,prior,blob,core,original,output):
     old=prior.get('equipment_resources',{})
     if old.get('player_actions'):
+        if old.get('pocket_icons'):
+            from v3_inventory_equipment import install as inventory_equipment
+            return inventory_equipment(base,prior,blob,core,original,output)
         if old.get('parent_readers'):
             return refresh_pocket_icons(base,prior,blob,core,original,output)
         if old['player_actions'].get('equipment_selection'):
