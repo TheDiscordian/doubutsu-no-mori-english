@@ -2,22 +2,26 @@
 
 ## Active: V3 optional GameCube imports
 
-The proposed ABI 111 in `build/v3-event-stock-01/` contains separate source-derived
-event stock on top of the ground proposal. Six focused and twelve composition
-checks pass; its first silent native run passes 68 records/29 assertions.
-Complete module/owner loading, actual event lookup/initialisation, sparse stock,
-official prices, consumed slots, sold-out state, guards, and restoration pass.
-The 48-KiB equipment module changes no saved structure sizes or profile bits.
-The main lock stays ABI 109; the underlying seasonal copy check remains open.
-See the [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-event-stock).
+The proposed ABI 112 in `build/v3-event-menu-06/` contains shared event selection,
+English pages, native pocket/payment handling, and handover requests. Four
+focused and twelve composition checks pass. The corrected silent native run
+passes 178 records/73 assertions, including actual pocket insertion/debit,
+rejected full pockets/short funds, single-order sales, sold-out retention,
+original merchandise, guards, and restored globals/checkpoint. The module is
+52 KiB, and the vendor gains four unsaved bytes. All handheld choices remain
+disabled. The main lock stays ABI 109 because the inherited seasonal-copy
+check is unresolved. See the [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-event-menu-and-transactions).
 
-Next connect an explicit imported-wares menu, source-correct introductory text,
-normal pocket/payment checks, and handover to these shared stock functions.
-Keep all original N64 wares accessible. Donor category two is consumable balloon
-stock, not the native unlimited-fruit branch. Use the existing stock records and
-name/provenance machinery, not per-variant installers. Continue collection/
-catalogue and optional composition afterwards. Do not replay unchanged stock
-component checks or enable any handheld choice before its gameplay path works.
+Next connect context-correct collection/catalogue and optional selection to
+the installed parent/category/acquisition records. The native pocket insertion
+currently does not credit a fan's catalogue representation; use the source
+collection conversion while retaining the parent ID on ordinary room drops.
+Reuse the complete `build/v3-furniture-indexed-sequence-prepared-01/` display
+models and `build/v3-event-menu-06/build-lock.json` explicitly; do not reconvert
+artwork, write per-item installers, or promote the unresolved ground dependency.
+Keep disabled categories explicit and finish ordinary take-out/put-away,
+conversation/handover appearance, and persistence before a playable handoff.
+Do not replay passing stock/menu component checks without a relevant change.
 
 Current ABI 109 is `build/v3-category-runtime-03/`, pinned by the main build
 lock. The shared importer installs all nine equipment category graphics,

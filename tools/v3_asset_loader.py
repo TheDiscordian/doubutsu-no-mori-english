@@ -109,6 +109,7 @@ def compile_part(part, out, extra_sources=(), defines=(), primary_source=None):
                        'item_categories': ('af_v3_equipment_category', 0x804AA000),
                        'ground_categories': ('af_v3_ground_prepare', 0x804AD000),
                        'event_acquisition': ('af_v3_event_stock_construct', 0x804AE000),
+                       'event_menu': ('af_v3_event_menu_start', 0x804AF000),
                        'room': ('af_v3_room_value', BLOB_RAM + 0x8000),
                        'identity': ('af_v3_identity_item', BLOB_RAM + 0x9D00),
                        'fields': ('af_v3_field_shop', BLOB_RAM + 0xA400),

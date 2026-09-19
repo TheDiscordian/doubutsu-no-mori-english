@@ -154,16 +154,70 @@ transaction. They do not insert inventory items or debit Bells. The quotation
 must still match before its slot can be consumed. Null arguments, invalid slots,
 changed profile readiness, and malformed stock fail without writes.
 
-The player-facing route is incomplete. Add an explicit way to browse imported
-wares while keeping all original wares accessible, connect the donor introduction
-and purchase messages, and retain the normal inventory-space, payment, and
-handover flow. Do not reinterpret donor category two as the N64 unlimited-fruit
-branch: donor category two is balloon stock and must be consumed. Both versions
-use some identical message IDs for different merchandise; choose wording by the
-actual route, not ID equality, and keep any adaptation in the one provenance
-catalogue. The added-stock helpers are not completed acquisition or permission
-to enable the parent choices. Full save/reload and original-hardware appearance
-remain unverified. See the [checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-event-stock).
+The shared menu adapter below connects this stock to selection/payment/handover.
+Donor category two is finite balloon stock, not the original unlimited-fruit
+branch. Collection/catalogue, parent selection, ordinary conversations,
+save/reload, and original-hardware appearance remain unfinished. Stock and menu
+implementation alone do not permit enabling the parent choices. See the
+[checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-event-stock).
+
+### Shared event menus
+
+On a stock-enabled base, the same `--refresh-runtime --event-acquisition` adapter
+installs one category-independent vendor menu. All original N64 callbacks,
+merchandise, prices, and unlimited-fruit behaviour remain available through
+`Original wares`. `Festival items` uses the separate selected stock, full English
+parent names, source prices, and three-item pages. Empty selections bypass the
+route chooser. Empty initialized imported stock stays sold out without closing
+the original stall or replenishing purchased goods.
+
+The shared runtime reuses native choice/order/message functions, pocket-space
+and money checks, pocket insertion, payment, and item-handover requests. The
+order flag is consumed once, so repeated updates do not repeat purchases.
+Stock is consumed only after the item is inserted and payment completes.
+Pocket insertion failure never charges money or consumes stock. There is no
+yield between quotation, insertion, payment, and stock commitment. Three source
+categories share this implementation; unimplemented pinwheels/balloons do not
+become enabled because the menu can represent their stock.
+
+The 2,385-byte module starts at `804AF000`; its linker limit is `804AFFF0`.
+The complete equipment reservation becomes 52 KiB, ending at `804B0000` with
+the usual sixteen-byte guard. All previous module bytes remain intact, and the
+same startup checksum/cache transfer covers the full reservation. The vendor
+allocation grows from `954` to `958` hexadecimal bytes to append a transient
+route field. This field is not saved. Original actor fields stay at their
+existing offsets, and native callbacks resolve through the loaded owner.
+
+The installer changes the request callback and native action-setup entry,
+removing exactly four obsolete HI/LO relocations. Original actions retain
+their relocated callbacks; imported selection, purchase, and handover use the
+resident implementation. The new route-choice action is six. No original action
+table is indexed beyond its six entries, and invalid action requests end safely.
+
+Original native introductions describe K.K. music at 980 Bells, gyroids at
+1,000 Bells, and fruit at 1,280 Bells. The supplied GameCube and legacy English
+messages instead describe fans, pinwheels, and balloons. Keep those official
+messages for the matching imported stock. Messages `2EE7..2EE9` adapt only the
+merchandise/price pages for the original route, retaining official greetings,
+final questions, page boundaries, and unaffected control/timing commands.
+Message `2EEA` reuses the donor's complete final menu question. These four
+messages and the two assistant-written route labels have individual entries in
+the single `translations/provenance.json` catalogue, including authored fragments
+and source hashes. Human wording review remains explicit.
+
+The text bank grows by 1,024 bytes and its directory by sixteen bytes. All
+12,007 previous message entries and both choice resources remain unchanged.
+The installer repacks only the four existing physical text files, preserving
+their virtual identities and directory slots; no new DMA entry or duplicated
+two-MiB text bank enters the import blob. It checks complete source/resource
+hashes, virtual/physical overlaps, zero growth padding, message termination,
+the 1,024-byte expanded-buffer bound, and both native message-count limits.
+
+The proposed cartridge is experimental, not a playable handheld release.
+Installed transaction code does not establish catalogue ownership, ordinary
+vendor conversation or animation, saved-event persistence, or hardware support.
+See the [menu checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-event-menu-and-transactions)
+for executed checks and the inherited seasonal-copy issue.
 
 ### Shared resource loader
 

@@ -1,7 +1,7 @@
 """Source-derived category stock for additive event acquisition.
 
 One record covers every variant in a donor category. The native constructor
-initialises separate stock; menu/payment integration remains explicitly pending.
+initialises separate stock; the following refresh installs its menu transaction.
 """
 import copy
 import json
@@ -9,6 +9,7 @@ import struct
 import zlib
 
 from aflib import CODE_RAM, CODE_VROM, by_vrom, sha256, u32
+from apply_translation import write_new
 from v3_asset_loader import ROOT, BLOB, compile_part
 from v3_equipment_runtime import RAM, GUARD
 from v3_furniture_pipeline import Source
@@ -18,7 +19,8 @@ from v3_player_actions import native_references
 CODE, TABLE, SIZE = 0xB000, 0xBF00, 0xC000
 OWNER, RELOC, OWNER_RAM, SLOT = 0x3990000, 0x3998000, 0x80A728C0, 0x80101BC0
 SOURCES = ('tools/v3_event_acquisition.py', 'tools/v3_asset_loader.py',
-           'overlays/v3/event_acquisition.c', 'overlays/v3/event_acquisition.ld')
+           'overlays/v3/event_acquisition.c', 'overlays/v3/event_acquisition.ld',
+           'tools/v3_event_text.py','overlays/v3/event_menu.c','overlays/v3/event_menu.ld')
 EMPTY_RELOCS = '44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a'
 FUNCTIONS = (
     (0x1B6168, 40, 'da5348b783c4a4f42f9a8eab7495855403a04df187416561057b45f41e54e871', EMPTY_RELOCS),
@@ -123,6 +125,8 @@ def native_contract(base, core):
 
 
 def install(base, prior, blob, core, original, output):
+    if prior.get('equipment_resources',{}).get('event_acquisition'):
+        return install_menu(base,prior,blob,core,output)
     old = prior['equipment_resources']; position = old['blob_offset']
     module = bytearray(blob[position:position+old['bytes']])
     if (old.get('event_acquisition') or old['bytes'] != CODE or not old.get('ground_categories') or
@@ -168,3 +172,68 @@ def install(base, prior, blob, core, original, output):
     report.update(bytes=SIZE,vrom=BLOB+position,blob_offset=position,sha256=sha256(module),
                   crc32=zlib.crc32(module),additional_resident_bytes=SIZE-old['bytes'])
     return report,{OWNER:bytes(owner),RELOC:bytes(relocation)}
+
+
+def install_menu(base,prior,blob,core,output):
+    from v3_event_text import prepare,patch_bounds,FIRST
+    old=prior['equipment_resources'];stock=old['event_acquisition'];files=by_vrom(base)
+    if old['bytes']!=SIZE or stock.get('menu') or not stock['stock_initialization_installed']:
+        raise ValueError('Changed event menu dependency/allocation')
+    position=old['blob_offset'];module=bytearray(blob[position:position+old['bytes']])
+    if sha256(module)!=old['sha256'] or RAM+0xD000>prior['furniture']['bank_pool']['start']:
+        raise ValueError('Changed complete stock module or menu reservation')
+    text=prepare(base,output)
+    if text['provenance_missing']:
+        write_new(output/'provenance-missing.json',(json.dumps(text['provenance_missing'],indent=2)+'\n').encode())
+        raise ValueError('Add generated event entries to the single provenance catalogue before building')
+    code,compiled=compile_part('event_menu',output/'event_menu',defines=(
+        f'AF_V3_EVENT_ROUTE_MESSAGE={FIRST+3}u',f'AF_V3_EVENT_NATIVE_FIRST={FIRST}u',
+        f'AF_V3_HELD_SELECTED=0x{old["player_actions"]["code"]["symbols"]["af_v3_player_selected_equipment"]:08X}u',
+        *(f'AF_V3_STOCK_{name.upper()}=0x{stock["code"]["symbols"]["af_v3_event_stock_"+name]:08X}u'
+          for name in ('init','count','index','quote','commit'))))
+    data,rel=(files[v].extract(base) for v in (OWNER,RELOC))
+    if sha256(data)!=stock['owner_sha256'] or sha256(rel)!=stock['reloc_sha256']:
+        raise ValueError('Changed complete stock-enabled vendor')
+    native_references(data,rel,expected_sections=(4528,192,0,0))
+    owner=bytearray(data);patches=[];removed=set()
+    def patch(at,before,after):
+        if u32(owner,at)!=before:raise ValueError('Changed vendor menu hook')
+        struct.pack_into('>I',owner,at,after);patches.append(dict(offset=at,before=before,after=after))
+    patch(0x11BC,0x954,0x958)
+    entry=compiled['symbols']['af_v3_event_menu_start']
+    patch(0x1038,0x3C0680A7,0x3C060000|((entry+0x8000)>>16))
+    patch(0x1040,0x24C637F8,0x24C60000|(entry&65535))
+    removed.update((0x45001038,0x46001040))
+    before=bytes.fromhex('000570803c0f80a7ac85093c01ee78218def3af0ac8f093803e0000800000000')
+    if data[0x1158:0x1178]!=before:raise ValueError('Changed complete native action setup')
+    for offset in range(0,32,4):
+        patch(0x1158+offset,u32(before,offset),jump(compiled['symbols']['af_v3_event_menu_setup']) if offset==0 else 0)
+    removed.update((0x4500115C,0x46001168))
+    if data[0x1220:0x1226]!=struct.pack('>3H',0x1758,0x1759,0x175A):
+        raise ValueError('Changed native merchandise introduction table')
+    owner[0x1220:0x1226]=struct.pack('>3H',FIRST,FIRST+1,FIRST+2)
+    n=u32(rel,16);rows=list(struct.unpack_from('>'+str(n)+'I',rel,20))
+    if any(rows.count(row)!=1 for row in removed):raise ValueError('Incomplete menu relocation removal')
+    kept=[row for row in rows if row not in removed];relocation=bytearray(rel)
+    struct.pack_into('>I',relocation,16,len(kept))
+    relocation[20:20+n*4]=struct.pack('>'+str(n)+'I',*kept,*([0]*len(removed)))
+    bounds=patch_bounds(core)
+    module.extend(bytes(0xD000-len(module)));module[SIZE:SIZE+len(code)]=code
+    struct.pack_into('>4I',module,0xD000-16,*([GUARD]*4))
+    blob.extend(bytes(-len(blob)%16));position=len(blob);blob.extend(module)
+    if BLOB+len(blob)>END:raise ValueError('Event menu exceeds import storage')
+    report=copy.deepcopy(old);r=report['event_acquisition']
+    r.update(menu=dict(code=compiled,code_offset=SIZE,patches=patches,removed_relocations=sorted(removed),
+        text=text,message_bounds=bounds,actor_bytes=0x958,actor_mode_offset=0x954,
+        owner_sha256=sha256(owner),reloc_sha256=sha256(relocation),native_validation='pending'),
+        purchase_menu_installed=True,acquisition_installed=True)
+    report.update(bytes=0xD000,vrom=BLOB+position,blob_offset=position,sha256=sha256(module),
+                  crc32=zlib.crc32(module),additional_resident_bytes=0x1000)
+    return report,{OWNER:bytes(owner),RELOC:bytes(relocation)}
+
+
+def finish(image,base,output,report):
+    if 'menu' in report['event_acquisition']:
+        from v3_event_text import install as install_text
+        install_text(image,base,output,report['event_acquisition']['menu']['text'])
+    return image

@@ -1,5 +1,100 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared event menu and transactions
+
+The proposed ABI 112 is `build/v3-event-menu-06/`, built explicitly from
+`build/v3-event-stock-01/build-lock.json`. ROM SHA-256:
+`df4113112c3f9838ebbe62438fd337a39256374e143bf5eb6db7554870eccaed`.
+Report SHA-256:
+`fd3baac1d6de93fb7e7a8c77de27e38d34f49beef74b8e6226d422eeec7bc2e6`.
+UPS SHA-256:
+`77eca9170865cc3aea36f11cd0557c0fa263e4f0719af4ca95dfaebe8760dcd5`.
+The main lock remains ABI 109; this batch does not resolve the inherited
+seasonal setter-copy failure or establish a playable handheld handoff.
+
+The existing shared acquisition adapter adds the original/imported stock-route
+menu, three-item English pages, native pocket capacity and funds checks,
+actual pocket insertion/payment, one-slot consumption, and handover requests.
+Every original vendor callback remains available. Native category two keeps
+unlimited fruit, while every imported category consumes finite stock. Empty
+selections bypass the route selector; sold-out imports do not close the
+original stall or refill on re-entry. No item-specific importer is added.
+
+Compiled menu code/labels occupy 2,385 bytes. The equipment reservation becomes
+52 KiB with full startup checking and all previous bytes retained. The vendor
+gains four transient bytes, from `954` to `958` hexadecimal; saved event data,
+profile IDs, and all 104 existing experimental choices remain unchanged.
+The request callback and action-setup hook remove exactly four obsolete
+relocations. Original owner code, merchandise, prices, and callbacks otherwise
+remain intact, apart from the original introduction IDs and actor size.
+
+The original Japanese introductions describe music/gyroids/fruit at
+980/1,000/1,280 Bells. The supplied legacy English and official GameCube
+introductions describe different goods. Four appended messages retain the
+GameCube greeting/question/control structure while adapting the original
+merchandise/price pages and adding a source-derived route question. The old
+introductions remain for matching imports. Six entries in the one provenance
+catalogue credit those messages and both new route labels; authored fragments
+are explicit, and human review remains pending. All 12,007 prior messages and
+both choice resources are retained. Four existing physical text files move
+within their checked region; message/table growth totals 1,040 bytes, without
+duplicating the text bank in import storage. Maximum new expanded text is
+367 bytes within the existing 1,024-byte buffer.
+
+### Verification
+
+The four focused tests in `tests/test_v3_event_menu.py` pass across the combined
+run and one corrected cartridge assertion. Host ASan/UBSan execution links the
+actual stock module with the new menu, covering all three category prices,
+sparse pages, original delegation, no-selection handling, failed transactions,
+single-order purchases, finite balloon stock, handover state, and sold-out
+retention. Cartridge checks cover all retained owner bytes, two relocation
+bases, allocation/bounds, complete module/startup resources, unchanged profiles,
+every old message, new control structure/provenance, unrelated DMA resources,
+N64 checksum, and exact UPS reconstruction. Python syntax and diff checks pass.
+The initial relocation assertion incorrectly treated the resident no-op action
+as owner-relative; the corrected check preserves that resident pointer.
+
+Twelve optional-composition tests pass in 8.721 seconds against this proposal,
+without editing the main lock. Actual save-codec profiles, sparse dependencies,
+all-selection output, and exact import-free V2 output remain intact.
+
+The first silent native run reaches both routes and imported selection, then
+fails its comparison of unused choice-row padding. The native length helper
+trims spaces and the row copier retains unused tail bytes. The fixture is
+corrected to compare the full visible name and actual length instead; no
+cartridge change is needed. The justified retry is
+`build/smoke-v3-event-menu-02/results.json`, SHA-256
+`4339656f0d8eb763242b75b155f3ece998701fedea10e23c64fb12a9a4263c89`.
+It passes all 178 records and 73 assertions, including complete startup/owner
+loading, original/imported routes, names/prices, full-pocket and insufficient-
+funds rejection, two actual native pocket insertions and payments, repeat-order
+rejection, consumed stock slots, handover requests, sold-out state, preserved
+original wares, scratch/stack guards, restored globals, full checkpoint reload,
+no-fault status, and the resident guard. The emulator exits successfully. No
+user save or audible playback is used.
+
+These are direct component calls against isolated event/pocket data, not an
+ordinary conversation or played handover animation. The native collection route
+does not yet credit imported fan ownership. Do not infer working catalogue
+collection, outdoor/room appearance, equip/put-away, save/restart, or hardware
+verification. The new-harness setup retry is spent; retain the passing result
+instead of replaying it without a relevant implementation change.
+
+### Next work and compatibility
+
+Continue context-correct parent collection/catalogue, using prepared display
+models and the existing selected-parent records. Ordinary fan room drops must
+retain the parent ID; collection uses its furniture representation. Integrate
+optional selection afterwards, and keep unsupported rigs/actions disabled.
+Resolve the inherited ground-copy check before promotion or handoff. Carry the
+separate V2 Museum header correction into V3 before its next handoff.
+
+Saved format 2 does not change. The appended route field is transient and no
+handheld profile bit is enabled. Imports retain their incompatible-with-V2 save
+warning; unchanged layouts are not a new save/reload test. Existing ROMs/saves,
+the main lock, and both served V2 patchers remain unchanged.
+
 ## Shared event stock
 
 The proposed ABI 111 is `build/v3-event-stock-01/`, built explicitly from the

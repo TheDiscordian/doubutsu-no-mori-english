@@ -550,7 +550,6 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         for row in moved+owner_moves:
             struct.pack_into('>4I',result,DMA_START+files[row['vrom']].index*16,
                              row['vrom'],row['vrom']+row['bytes'],row['physical'],0)
-    fix_checksum(result);result=bytes(result)
     expected=bytearray(base[DMA_START:DMA_END])
     if equipment_report:
         struct.pack_into('>I',expected,files[BLOB].index*16+4,BLOB+len(blob))
@@ -558,6 +557,9 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             struct.pack_into('>4I',expected,files[row['vrom']].index*16,
                              row['vrom'],row['vrom']+row['bytes'],row['physical'],0)
     if result[DMA_START:DMA_END]!=expected:raise ValueError('Undeclared DMA-directory change')
+    if event_acquisition and equipment_report:
+        result=equipment.finish(result,base,output,equipment_report)
+    fix_checksum(result);result=bytes(result)
     patch=make_ups(original,result)
     if apply_ups(original,patch)!=result: raise ValueError('Runtime patch reconstruction failed')
     report=copy.deepcopy(prior)

@@ -17,23 +17,30 @@ locked ROM is tracked below; this V2 fix does not replace its no-import baseline
 
 ## Active development
 
-The proposed ABI 111 in `build/v3-event-stock-01/` adds shared, source-derived
-fireworks-stall stock on top of the ground-enabled proposal. It keeps original
-wares in the first 20 bytes of the native event record and added wares in the
-remaining 20. Sparse selections, donor vendor prices, stable slots, and sold-out
-state are supported without changing saved structure sizes. The shared equipment
-module is 48 KiB. All handheld choices remain disabled; purchase-menu and
-handover integration are still required. The main lock remains ABI 109 because
-the underlying ground-copy check is unresolved.
+The proposed ABI 112 in `build/v3-event-menu-06/` connects the shared fireworks
+stock to an explicit original/imported-wares selector, English item pages,
+native pocket/payment checks, actual insertion/debit, and handover requests.
+Original merchandise and unlimited-fruit behaviour remain intact; imported
+categories use finite, selected-only stock. The equipment module is 52 KiB,
+and the vendor gains four transient bytes without changing saved formats.
 
-Six focused tests and twelve optional-composition tests pass. The first silent
-native run passes 68 records with 29 assertions, including complete startup and
-owner loading, real event lookup/initialisation, separate selected stock,
-quotations/consumption, sold-out persistence across owner initialisation, memory
-guards, and restored event/profile/checkpoint. This does not establish an ordinary
-purchase or save/reload. Continue the shared menu/payment/handover route, not
-another stock converter or per-item installer. See the
-[checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-event-stock).
+Four focused checks and twelve optional-composition tests pass. The corrected
+silent native run passes 178 records with 73 assertions, including loaded-owner
+callbacks, both routes, full names, full-pocket/short-money rejection, actual
+pocket insertion and payment, single-sale consumption, handover requests,
+sold-out retention, memory guards, and restored globals/checkpoint. Ordinary
+conversation, rendered animation, catalogue ownership, and save/reload are not
+established by this component check.
+
+Four source-tracked messages correct the original route's merchandise/prices
+and provide its route question; all 12,007 existing messages remain unchanged.
+Official GameCube introductions remain on the matching imported route. The
+single provenance catalogue credits every adaptation and new label. All
+handheld choices stay disabled pending collection/catalogue, optional selection,
+and ordinary gameplay. Continue those shared consumers using the existing
+prepared display models, not per-item installers or repeated artwork conversion.
+The main lock stays ABI 109 because the inherited seasonal-copy check remains
+unresolved. See the [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-event-menu-and-transactions).
 
 The proposed ABI 110 at `build/v3-ground-categories-02/` implements the shared
 seasonal ground adapter: all four renderers, their complete category tables,
