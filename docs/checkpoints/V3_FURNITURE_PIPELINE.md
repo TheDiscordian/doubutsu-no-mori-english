@@ -1,5 +1,104 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared animated equipment banks
+
+The shared runtime importer consumes the complete prepared rig category with
+`--refresh-runtime --equipment-rigs`, adding all eight pinwheel models without
+reconversion or per-item installers. All thirty existing model/animation records
+are retained, yielding 38 equipment resources. The eight actual kind records gain
+their shape/motion indices; actions, previews, and optional selections remain off.
+
+The native maximum-size function only considered original models. Its real
+callers register two 4,376-byte banks, aligned to 4,384 bytes. Both now receive
+5,248 bytes. The scene allocator's request and end calculation both grow from
+`93400` to `93AC0`, adding exactly 1,728 bytes, so the remaining object arena
+does not shrink. Inventory already owns 15,584 bytes and does not grow. Native
+DMA, double-bank ownership/indexing, and menu-return reload remain in place.
+The equipment module remains 53,248 bytes; no persistent profile field changes.
+
+Code inspection also identifies a real integration defect: the native loader
+can change a model while retaining an equal animation index. Different-sized
+models move or overwrite that cached animation. The checked model-DMA call at
+`808B5A68` now uses a sixteen-byte assembly adapter to invalidate that bank's
+animation index before native DMA. Native code then reloads and re-biases the
+animation. It retains the original return path and all overlay relocations.
+
+### Current proposal
+
+- Explicit lock: `build/v3-equipment-rigs-02/build-lock.json`, ABI 117.
+- ROM SHA-256:
+  `ae0d3c4e9d717e42dc11e6c4b2e34c76adcd9620abe4590a0c03845f42d5b3ae`.
+- UPS SHA-256:
+  `370176d13295146e5141286508e343f7477e7620f92f2c4d4dfc57c1b30e7e40`.
+- Build receipt SHA-256:
+  `44199433db54eec5297fc1262c202377b2e7fd846f7277c767657bb60c176ecb`.
+- Lock SHA-256:
+  `18ab03166db743efc49c3c4c0ea72472212ee80d23579ab9a5c60bce921384c2`.
+- Equipment module SHA-256:
+  `33cc6e4aa0f71b3eda460dd3e1db09457196414ec2aadad9b72ffcca7a912960`.
+- Shared reader/adapter code: 1,480 bytes, below the existing 2,816-byte limit.
+- Complete models: 26,272 additional bytes; no reduced or omitted variants.
+
+Both builds succeed on their first invocation. The first proposal,
+`build/v3-equipment-rigs-01/`, lacks model-change cache invalidation; it is
+preserved as test evidence, not the development continuation point. Its ROM
+hash is `968f5df1d9f087b79f0df0794955c937069ae3adf539cd7d7b16441cad731a15`.
+
+### Focused verification
+
+Five host/current-cartridge checks pass on the final proposal in 7.481 seconds.
+They cover sanitized original and expanded readers, eight complete prepared
+rigs, all thirty original resources, actual default-motion/kind bindings,
+allocation arithmetic, all rebound core/owner references, unrelated DMA resource
+retention, unchanged module capacity/guards, original-ROM UPS reconstruction,
+future tail reuse, the same 112 optional choices/profile, exact full output,
+and exact corrected V2-12 import-free output. The same five checks also pass on
+the first proposal; the final invocation is justified by the actual loader fix.
+
+`build/smoke-v3-equipment-rigs-01/results.json` passes on its first attempt:
+146 records and 120 assertions (117 component assertions). It executes ten
+representative original/imported transfers, including the complete largest rig,
+the actual native two-bank registration, both banks' sizes/pointers, complete
+model-plus-motion transfers, invalid resource rejection, saved-state retention,
+memory guards, checkpoint restoration, and a clean emulator exit. Results hash:
+`4e4de15fcce2c6133f5c5659fd9e88620f12e4bf1af82f7b9a23c9fa253c9520`.
+The final proposal retains those resources/allocation instructions. The changed
+cache path has its separate current-build check rather than replaying this pass.
+
+`build/smoke-v3-equipment-bank-switch-01/results.json` passes on its first attempt
+against the current proposal: 85 records and 69 assertions (65 component
+assertions). It verifies the complete actual game-loaded player owner and
+equipment module, then calls native `Change_ItemBank` on an isolated actor.
+Six alternating small/small/large/large/small/small loads preserve the shared
+animation index while moving its actual data and segment pointers correctly.
+Complete model/motion contents, both banks, surrounding guards, saved state,
+restored checkpoint, final fault/translation/equipment guards, and clean exit
+pass. Results hash:
+`34845df0b59b277c1d3bce47e85a5dfd7d9100018bb3d0031915c0a423ab8b2d`.
+No setup retry is used. Emulation is silent and uses disposable saves.
+
+The final input guard permits at most six joints in the native seven-vector
+work areas, reserving the root translation vector. All installed rigs have
+three joints. This guard tightens source preflight only; it does not change
+the compiled cartridge or the retained native test evidence.
+
+### Remaining work and compatibility
+
+Next connect complete native rig initialization/drawing and pinwheel behaviour
+through the shared action/category machinery, then inventory previews,
+acquisition, catalogue, and selected ownership. Do not reconvert these models or
+write per-item installers. GPU appearance, ordinary equipping/menu-return,
+the larger scene's gameplay/heap behaviour, and hardware remain unverified.
+Component transfers do not establish playable pinwheels.
+
+The 112 existing choices, format-2 save/profile, Museum-header correction, and
+exact import-free V2-12 remain intact. Same-profile compatibility with ABI 116
+is expected both ways, not a newly executed ordinary cross-build reload. Keep
+matching/equal-or-larger imported profiles; do not load imported saves in V2
+or treat removing imports as migration. No original ROM/save is modified.
+The independent seasonal-copy failure stays unresolved, the main lock remains
+ABI 109, and both served V2 patchers remain unchanged.
+
 ## Complete animated-held preparation
 
 `tools/v3_furniture_pipeline.py convert --representation handheld --assets-only

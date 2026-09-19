@@ -41,8 +41,12 @@ supported rigs through the same graphics compiler and checked skeleton packer.
 It preserves every joint/model binding, uses the actual motion dependencies,
 and records combined model/animation sizes. All eight pinwheel rigs convert;
 the two oversized variants require shared native-bank work, not reduced art.
-The separate prepared-rig format is rejected by both existing installers until
-the native rig/allocation adapter consumes it explicitly. See
+The separate prepared-rig format is rejected by the static/furniture consumers.
+The same shared runtime installer accepts it explicitly through
+`--refresh-runtime --equipment-rigs <prepared-directory>`, retains complete
+artwork, expands both native banks and their containing scene allocation, and
+invalidates cached animations when a model change moves their addresses.
+This installs resources, not selectable pinwheel gameplay. See
 [animated-held preparation](V3_HANDHELD_ITEMS.md#complete-animated-held-preparation).
 
 Within the handheld representation, `--category item-category-art` prepares

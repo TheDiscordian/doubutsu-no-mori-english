@@ -2,6 +2,9 @@
 typedef unsigned int u32;
 typedef unsigned char u8;
 typedef struct { u32 vrom, bytes, pointer, type; } Resource;
+#ifndef AF_V3_EQUIPMENT_CAPACITY
+#define AF_V3_EQUIPMENT_CAPACITY 4376u
+#endif
 #ifdef __mips__
 #define native_pointers ((const u32 *)0x8010BF30u)
 #define native_types ((const u8 *)0x8010BF74u)
@@ -46,11 +49,14 @@ static const Resource *imported(int index) {
     const Resource *row = (const Resource *)(header+4)+slot;
     if (row->vrom < 0x02200000u || row->vrom >= 0x025F0000u
             || (row->vrom & 15u) || !row->bytes || (row->bytes & 15u)
-            || row->bytes > 4376u || row->bytes > 0x025F0000u-row->vrom
-            || row->type > 5u || row->type == 1u
-            || row->bytes < (row->type ? 20u : 8u)
+            || row->bytes > AF_V3_EQUIPMENT_CAPACITY || row->bytes > 0x025F0000u-row->vrom
+            || row->type > 5u
+#ifndef AF_V3_EQUIPMENT_RIGS
+            || row->type == 1u
+#endif
+            || row->bytes < (row->type > 1u ? 20u : 8u)
             || row->pointer < 0x06000000u || (row->pointer & 3u)
-            || row->pointer-0x06000000u > row->bytes-(row->type ? 20u : 8u)) return 0;
+            || row->pointer-0x06000000u > row->bytes-(row->type > 1u ? 20u : 8u)) return 0;
     return row;
 }
 

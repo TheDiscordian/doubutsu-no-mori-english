@@ -21,7 +21,8 @@ RAM, SIZE, TABLE, MAGIC, GUARD = 0x804A3000, 0x2000, 0x1000, 0x41464852, 0xAF48C
 FIRST, COUNT, CAPACITY = 17, 50, 4376
 SOURCES = ('tools/v3_equipment_runtime.py','tools/v3_handheld_items.py','tools/v3_keyframes.py',
     'tools/v3_furniture_pipeline.py','tools/v3_asset_loader.py',
-    'overlays/v3/equipment_resources.c','overlays/v3/equipment_resources.ld','overlays/v3/startup.c')
+    'overlays/v3/equipment_resources.c','overlays/v3/equipment_resources.S',
+    'overlays/v3/equipment_resources.ld','overlays/v3/startup.c')
 ENTRIES = (
     (0x800B12C8,0x800B12F4,'af_v3_equipment_pointer'),
     (0x800B12F4,0x800B131C,'af_v3_equipment_type'),
@@ -155,6 +156,203 @@ def native_contract(original, core):
         item_bank_bytes=CAPACITY, native_joint_work_vectors=7,
         native_animation_loader=0x800B167C, native_bank_change=0x808B5A10,
         menu_reload='mSM_load_player_anime', buffer_sizes_changed=False)
+
+
+def prepared_rigs(source, art_path):
+    """Validate the complete prepared category without recompiling its artwork."""
+    from v3_handheld_items import rig_descriptor
+    from v3_keyframes import compile_skeleton
+    art_path=art_path.resolve();raw=(art_path/'art.json').read_bytes();art=json.loads(raw)
+    if (not art_path.is_relative_to(ROOT/'build') or art['format']!='AFV3-ANIMATED-HELD-PREPARED-1'
+            or art['version']!=1 or art['source_rel_sha256']!=sha256(source.rel)
+            or art['source_symbols_sha256']!=sha256(source.symbols.encode())):
+        raise ValueError('Changed prepared equipment rig source/format')
+    description=motion(source);inventory=scan(source)
+    parents=[r for r in inventory['rows'] if r['category']=='animated-held-model' and r['asset_ready']]
+    roots={r['shape_index'] for r in parents};assets={};records=[]
+    for row in art['objects']:
+        index=row['shape_index'];matches=[r for r in parents if r['shape_index']==index]
+        if index not in roots or index in assets:raise ValueError('Duplicate or unsupported equipment rig')
+        rig=description['skeletons'][index]
+        profile,body,resources,_,models,commands,sections=prepare_models(source,rig_descriptor(matches[0],rig))
+        file=(art_path/row['object_file']).resolve()
+        if file.parent!=art_path:raise ValueError('Equipment rig escapes prepared directory')
+        asset=file.read_bytes();offsets=row['model_offsets'];at=(len(body)+7)&~7
+        if (row['profile']!=json.loads(json.dumps(profile)) or row['resources']!=resources
+                or row['parent_item_ids']!=[r['item_id'] for r in matches]
+                or row['motion_bindings']!=[r['motion_binding'] for r in matches]
+                or row['resource_type']!=1 or len(asset)!=row['object_bytes']
+                or len(asset)!=matches[0]['object_bytes'] or sha256(asset)!=row['object_sha256']
+                or asset[:len(body)]!=body or any(asset[len(body):at])
+                or set(offsets)!=set(models) or len(row['models'])!=len(models)
+                or (art_path/f'data-{index:04X}'/'commands.c').read_text()!=commands):
+            raise ValueError('Changed complete equipment rig artwork/bindings')
+        for compiled,(label,n) in zip(row['models'],sections):
+            if (offsets[label]!=at or compiled['native_offset']!=at or compiled['bytes']!=n
+                    or compiled['source_sha256']!=models[label]['source_sha256']
+                    or compiled['output_sha256']!=sha256(asset[at:at+n])):
+                raise ValueError('Changed compiled joint graphics')
+            at+=n
+        aligned=(at+15)&~15
+        targets={root[1]:offsets[label] for label,root in profile['models'].items()}
+        suffix,compiled=compile_skeleton(source,rig,targets,start=aligned)
+        if (any(asset[at:aligned]) or row['artwork_bytes']!=aligned or asset[aligned:]!=suffix
+                or row['skeleton']!=json.loads(json.dumps(compiled))
+                or row['root_offset']!=compiled['header']['native_offset']
+                or not 0<rig['joints']<7 or rig['shown_joints']>7
+                or row['maximum_animation_bytes']!=matches[0]['maximum_animation_bytes']
+                or row['maximum_model_animation_bytes']!=matches[0]['maximum_model_animation_bytes']):
+            raise ValueError('Changed complete joint hierarchy or native work-vector capacity')
+        assets[index]=asset
+        records.append(dict(source_index=index,index=FIRST+index,kind='animated-model',type=1,
+            pointer=0x06000000+row['root_offset'],bytes=len(asset),sha256=sha256(asset),source=row))
+    if set(assets)!=roots:raise ValueError('Incomplete prepared equipment rig category')
+    return assets,records,dict(art_directory=str(art_path.relative_to(ROOT)),art_report_sha256=sha256(raw),
+        source_rel_sha256=sha256(source.rel),source_symbols_sha256=sha256(source.symbols.encode()))
+
+
+def grow_banks(original, core, owner, capacity):
+    """Grow both real outdoor banks and their containing scene arena together."""
+    native=by_vrom(original);old=native[CODE_VROM].extract(original)
+    native_owner=native[PLAYER_VROM].extract(original)
+    ranges=((0x800B1364,0x800B1614),(0x800B167C,0x800B16F8),
+            (0x800B1838,0x800B190C),(0x800B1A28,0x800B1A60),
+            (0x800C5C30,0x800C5CC4),(0x800C4440,0x800C453C),(0x800C65E4,0x800C6678),
+            (0x8010BF30,0x8010C0D0),(0x8010DDD0+35*8,0x8010DDD0+36*8))
+    for a,b in ranges:
+        if core[a-CODE_RAM:b-CODE_RAM]!=old[a-CODE_RAM:b-CODE_RAM]:
+            raise ValueError('Changed native equipment bank owner or reload consumer')
+    first,last=0x808B59C0-PLAYER_RAM,0x808B5B38-PLAYER_RAM
+    if owner[first:last]!=native_owner[first:last]:raise ValueError('Changed native double-bank loader')
+    bounds=struct.unpack_from('>18I',old,0x8010BF88-CODE_RAM)
+    sizes=[b-a-8 for a,b in zip(bounds,bounds[1:])]
+    types=old[0x8010BF74-CODE_RAM:0x8010BF74-CODE_RAM+17]
+    starts=struct.unpack_from('>32I',old,0x8010BFD0-CODE_RAM)
+    ends=struct.unpack_from('>32I',old,0x8010C050-CODE_RAM)
+    maximum=max(sizes[0],sizes[1]+max(n for n,t in zip(sizes,types) if t==2),
+                sizes[9]+max(n for n,t in zip(sizes,types) if t==3),sizes[16],
+                max(b-a for a,b in zip(starts,ends) if a and b))
+    menu_bounds=struct.unpack_from('>2I',old,0x8010DDD0+35*8-CODE_RAM)
+    if maximum!=CAPACITY or not CAPACITY<capacity<32768 or capacity%16 or capacity>menu_bounds[1]-menu_bounds[0]:
+        raise ValueError('Invalid shared equipment-bank growth')
+    growth=2*(capacity-((maximum+15)&~15));arena=0x93400+growth
+    if arena>>16!=9:raise ValueError('Scene arena growth exceeds audited immediate pair')
+    guard_incoming(bytes(core),len(core),CODE_RAM,[(0x800B1590-CODE_RAM,8)])
+    patches=[]
+    for address,data in ((0x800B1590,struct.pack('>2I',0x03E00008,0x24020000|capacity)),
+                         (0x800C6618,struct.pack('>I',0x34A50000|(arena&65535))),
+                         (0x800C6628,struct.pack('>I',0x34210000|(arena&65535)))):
+        at=address-CODE_RAM;before=bytes(core[at:at+len(data)]);core[at:at+len(data)]=data
+        patches.append(dict(address=address,before=before.hex(),after=data.hex()))
+    return dict(previous_bank_bytes=maximum,bank_bytes=capacity,banks=2,
+        previous_aligned_bank_bytes=(maximum+15)&~15,additional_scene_bytes=growth,
+        previous_scene_arena_bytes=0x93400,scene_arena_bytes=arena,
+        inventory_bank_bytes=menu_bounds[1]-menu_bounds[0],inventory_bank_changed=False,
+        native_joint_work_vectors=7,patches=patches,
+        native_consumers=[dict(start=a,end=b,sha256=sha256(old[a-CODE_RAM:b-CODE_RAM])) for a,b in ranges],
+        double_bank_loader_sha256=sha256(owner[first:last]),
+        ordinary_reload_tested=False,hardware_tested=False)
+
+
+def install_rigs(base, prior, blob, core, original, output, art_path):
+    """Add checked rigs to the same resource/kind namespace and native owners."""
+    old=prior['equipment_resources'];position=old['blob_offset']
+    module=bytearray(blob[position:position+old['bytes']]);files=by_vrom(base)
+    owner=bytearray(files[PLAYER_VROM].extract(base))
+    if (old.get('animated_rigs') or not old.get('kind_readers') or not old.get('inventory_preview')
+            or sha256(module)!=old['sha256'] or old['ram']!=RAM
+            or RAM+len(module)>prior['furniture']['bank_pool']['start']
+            or struct.unpack_from('>4I',module,len(module)-16)!=(GUARD,)*4):
+        raise ValueError('Changed shared equipment module or rig dependency')
+    source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+                  (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    assets,records,evidence=prepared_rigs(source,art_path)
+    motion_description=motion(source);installed={r['source_index']:r for r in old['records']}
+    capacity=CAPACITY
+    for row in records:
+        for binding in row['source']['motion_bindings']:
+            for index in binding['animation_resources']:
+                animation_row=installed.get(index)
+                desc={k:v for k,v in motion_description['equipment_animations'][index].items() if k!='resource_type'}
+                data,_=compile_animations(source,[desc])
+                if (not animation_row or animation_row['kind']!='animation' or
+                        animation_row['sha256']!=sha256(data) or
+                        blob[animation_row['blob_offset']:animation_row['blob_offset']+len(data)]!=data):
+                    raise ValueError('Prepared rig lacks its complete installed animation')
+                capacity=max(capacity,row['bytes']+len(data))
+    capacity=(capacity+15)&~15
+    allocation=grow_banks(original,core,owner,capacity)
+    report=copy.deepcopy(old)
+    for row in records:
+        slot=TABLE+16+row['source_index']*16
+        if row['source_index'] in installed or any(module[slot:slot+16]):
+            raise ValueError('Rig would overwrite an installed resource')
+        blob.extend(bytes(-len(blob)%16));at=len(blob);blob.extend(assets[row['source_index']])
+        row.update(vrom=BLOB+at,blob_offset=at)
+        struct.pack_into('>4I',module,slot,row['vrom'],row['bytes'],row['pointer'],row['type'])
+        report['records'].append(row);installed[row['source_index']]=row
+    report['records'].sort(key=lambda r:r['index'])
+    for row in report['kind_readers']['rows']:
+        shape=installed.get(row['shape']);anim=installed.get(row['animation'])
+        if not shape or shape['type']!=1:continue
+        combined=shape['bytes']+(anim['bytes'] if anim else 0)
+        if not anim or combined>capacity:raise ValueError('Rig kind exceeds its complete bank')
+        row['fields'][2:4]=[shape['index'],anim['index']]
+        row.update(combined_bank_bytes=combined,shape_installed=True,resource_ready=True)
+        struct.pack_into('>6h',module,KIND_TABLE+16+row['source_kind']*KIND_STRIDE,*row['fields'])
+    flags=('AF_V3_PLAYER_MOTION=1','AF_V3_EQUIPMENT_KINDS=1','AF_V3_EQUIPMENT_RIGS=1',
+           f'AF_V3_EQUIPMENT_CAPACITY={capacity}u')
+    code,compiled=compile_part('equipment_resources',output/'equipment_resources',defines=flags,
+        extra_sources=('overlays/v3/equipment_resources.S',))
+    if len(code)>KIND_TABLE or compiled['symbols']['af_v3_equipment_pointer']!=RAM:
+        raise ValueError('Equipment readers exceed code or move the held draw entry')
+    module[:KIND_TABLE]=code+bytes(KIND_TABLE-len(code))
+    for hooks in (report['hooks'],report['player_motion']['hooks']):
+        for hook in hooks:
+            off=hook['entry']-CODE_RAM;before=bytes(core[off:off+8])
+            if before.hex()!=hook['after']:raise ValueError('Changed installed equipment resource hook')
+            target=compiled['symbols'][hook['helper']];after=struct.pack('>II',jump(target),0)
+            core[off:off+8]=after;hook.update(before=before.hex(),after=after.hex(),target=target)
+    for hooks in (report['player_motion']['owner_hooks'],report['kind_readers']['owner_hooks']):
+        for hook in hooks:
+            off=hook['entry']-PLAYER_RAM;n=hook['end']-hook['entry'];before=bytes(owner[off:off+n])
+            helper=hook.get('helper','af_v3_equipment_kind_field')
+            if before.hex()!=hook['after']:raise ValueError('Changed installed equipment owner hook')
+            old_jump=struct.pack('>I',jump(old['code']['symbols'][helper]))
+            points=[i for i in range(0,n,4) if before[i:i+4]==old_jump]
+            if len(points)!=1:raise ValueError('Ambiguous installed equipment helper reference')
+            at=points[0];after=before[:at]+struct.pack('>I',jump(compiled['symbols'][helper]))+before[at+4:]
+            owner[off:off+n]=after;hook.update(before=before.hex(),after=after.hex())
+    from v3_npc_draw import relocation_offsets
+    address=0x808B5A68;off=address-PLAYER_RAM;before=bytes(owner[off:off+4])
+    if (before!=struct.pack('>I',jump(0x800B167C,link=True))
+            or off in relocation_offsets(files[PLAYER_RELOC].extract(base),len(owner))):
+        raise ValueError('Changed native model transfer call or relocation')
+    after=struct.pack('>I',jump(compiled['symbols']['af_v3_equipment_model_dma'],link=True))
+    owner[off:off+4]=after
+    model_hook=dict(address=address,before=before.hex(),after=after.hex(),
+        helper='af_v3_equipment_model_dma',target=compiled['symbols']['af_v3_equipment_model_dma'])
+    # Existing action drawing calls the fixed first entry; no other code may
+    # retain a direct jump into a helper that moved during recompilation.
+    for data in (module[KIND_TABLE:],owner):
+        for at in range(0,len(data)-3,4):
+            word=struct.unpack_from('>I',data,at)[0]
+            if word>>26 not in (2,3):continue
+            target=0x80000000|((word&0x3FFFFFF)<<2)
+            if RAM<=target<RAM+KIND_TABLE and target not in compiled['symbols'].values():
+                raise ValueError('Unbound direct reference to replaced equipment code')
+    blob.extend(bytes(-len(blob)%16));at=len(blob);blob.extend(module)
+    if BLOB+len(blob)>END:raise ValueError('Equipment rigs exceed shared ROM storage')
+    report.update(code=compiled,vrom=BLOB+at,blob_offset=at,sha256=sha256(module),
+        crc32=zlib.crc32(module),additional_resident_bytes=0,item_bank_bytes_changed=True)
+    report['player_motion']['owner_sha256']=sha256(owner)
+    report['kind_readers']['item_bank_bytes_changed']=True
+    report['animated_rigs']=dict(format='AFV3-EQUIPMENT-RIGS-1',evidence=evidence,
+        resource_indices=[r['index'] for r in records],allocation=allocation,
+        owner_patches=[model_hook],animation_cache_invalidated_on_model_change=True,
+        model_bytes=sum(len(a) for a in assets.values()),logical_imports_added=0,
+        player_actions_installed=False,inventory_previews_installed=False,profile_changed=False)
+    return report,{PLAYER_VROM:bytes(owner)}
 
 
 def install(prior, blob, core, original, output, art_path):

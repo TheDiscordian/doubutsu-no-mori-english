@@ -18,21 +18,23 @@ served patchers retain their existing builds.
 
 ## Active development
 
-The shared animated-held converter prepares all eight complete pinwheel rigs in
-`build/v3-handheld-animated-prepared-01/`: 26,272 bytes, 560 vertices, and 396
-triangles, with three joints and two shown models per parent. Complete animation
-bindings remain separate resources. Seven new checks and the existing static
-selection-rejection check pass. A legacy artwork-snapshot check encounters old
-acquisition metadata; its corrected comparison is unexecuted after the setup
-retry limit. The independent current-cartridge check retains all thirty installed
-equipment resources. These are prepared assets, not usable imports.
+The explicit ABI-117 proposal at `build/v3-equipment-rigs-02/` installs all
+eight complete pinwheel rigs through the shared importer. Both outdoor banks
+hold 5,248 bytes, including the largest complete rig/animation; their containing
+scene allocation grows by 1,728 bytes. Inventory retains its sufficient existing
+bank. Changed models invalidate cached animation addresses, including when two
+models share the same animation. The resident module remains 52 KiB.
 
-Next extend shared equipment-bank allocation and native rig loading/drawing.
-Two variants need 5,248 and 4,928 bytes with animation, beyond the current
-4,376-byte contract; keep their full artwork. Native actions and item consumers
-must precede selection. No cartridge/save/profile or patcher changes in this
-preparation batch. See the
-[rig checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#complete-animated-held-preparation).
+Five focused checks pass on the current cartridge. Native bank registration and
+complete resource transfers pass on the first proposal; the current proposal's
+six small/large transitions pass through the actual loaded player owner, with
+intact guards, saved state, and checkpoint restoration. These are resource and
+bank-loading checks, not rendered/gameplay pinwheels. All 112 existing choices,
+the saved profile, original equipment, and exact import-free V2-12 remain.
+Next connect native rig initialization/drawing and pinwheel behaviour, then
+inventory/acquisition/catalogue and selection. The main lock and both served
+patchers remain unchanged. See the
+[bank checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-animated-equipment-banks).
 
 The current ABI-116 two-fan profile has an isolated festival-night fixture with
 no seeded item or ownership. Normal town entry, original inventory, the festival

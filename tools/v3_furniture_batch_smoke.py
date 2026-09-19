@@ -687,6 +687,7 @@ def exercise(debug, rom_path, record, *, section='automatic_furniture'):
         from v3_ground_categories_smoke import exercise as ground_categories
         return ground_categories(debug,rom_path,record)
     if section=='equipment_resources':return equipment_resources(debug,rom_path,record)
+    if section=='equipment_bank_switch':return equipment_bank_switch(debug,rom_path,record)
     if section=='player_motion':return player_motion(debug,rom_path,record)
     if section=='pocket_icons':return pocket_icons(debug,rom_path,record)
     if section=='inventory_preview':return inventory_preview(debug,rom_path,record)
@@ -1098,7 +1099,7 @@ def equipment_resources(debug,rom_path,record):
         if want is not None and result['return_value']!=want:raise ValueError(f'Equipment call {at:08X} mismatch')
         return result['return_value']
     at=resources['blob_offset']
-    check('complete startup-loaded code and resource table',equipment.RAM,blob[at:at+equipment.SIZE])
+    check('complete startup-loaded code and resource table',equipment.RAM,blob[at:at+resources['bytes']])
     saved=debug.read_memory(0x8046C000,864)
     # Largest transfer in each distinct category, plus original native categories.
     selected={}
@@ -1111,24 +1112,56 @@ def equipment_resources(debug,rom_path,record):
         origin=contract['bounds'][i]-0x06000000+8;n=contract['sizes'][i]
         rows.append(dict(index=i,pointer=contract['pointers'][i],type=contract['types'][i],bytes=n,
             vrom=0x00B8B000+origin,origin=origin,expected=original[origin:origin+n]))
-    size=0x1200;allocation=call(0x8009BFC0,[size]);target=allocation+16
+    rigs=resources.get('animated_rigs')
+    capacity=rigs['allocation']['bank_bytes'] if rigs else equipment.CAPACITY
+    size=0x2000+capacity*2+32;allocation=call(0x8009BFC0,[size]);target=allocation+0x2000
     if allocation&15 or not MODULE_RAM+0x8000<=allocation<=0x80400000-size:
         raise ValueError('Equipment scratch allocation outside native heap')
-    edge=b'V3HR'*4;end=target+equipment.CAPACITY
+    edge=b'V3HR'*4;end=target+capacity
     debug.write_memory(allocation,edge);debug.write_memory(end,edge)
+    debug.write_memory(target-16,edge);debug.write_memory(target+capacity*2,edge)
     try:
         for row in rows:
             index=row['index'];origin=row.get('origin',0)
             for address,want in ((0x800B12C8,row['pointer']),(0x800B12F4,row['type']),
                     (0x800B131C,row['bytes']),(0x800B1614,origin),(0x800B1650,row['vrom'])):
                 call(address,[index],want)
-            fill=bytes([0xA5])*equipment.CAPACITY;debug.write_memory(target,fill)
+            fill=bytes([0xA5])*capacity;debug.write_memory(target,fill)
             call(0x800B167C,[target,index])
             expected=row.get('expected')
             if expected is None:expected=blob[row['blob_offset']:row['blob_offset']+row['bytes']]
             check('complete held resource DMA',target,expected+fill[len(expected):])
             call(0x800B16D0,[index,target],target-origin)
             check('resource DMA left guard',allocation,edge);check('resource DMA right guard',end,edge)
+        if rigs:
+            # Actual native bank registration, not a guessed buffer-size limit.
+            # The scratch Game_Play is isolated from the current scene/save.
+            game=allocation+16;debug.write_memory(game,bytes(0x1FE0))
+            put=lambda at,*v:debug.write_memory(at,struct.pack('>'+str(len(v))+'I',*v))
+            put(game+0x1910,target,target+capacity*2+16)
+            call(0x800B1590,[],capacity)
+            call(0x800B1A28,[game]);call(0x800B1A28,[game])
+            check('both real native bank records registered',game+0x1904,struct.pack('>I',2))
+            check('both complete banks reserved',game+0x1910,struct.pack('>I',target+capacity*2))
+            for i in range(2):
+                status=game+0x110+i*0x54;bank=target+i*capacity
+                check('native equipment bank identity',status,struct.pack('>H',35))
+                check('native equipment bank pointers',status+4,struct.pack('>2I',bank,bank))
+                check('native equipment bank capacity',status+16,struct.pack('>I',capacity))
+            model=selected[('animated-model',1)]
+            binding=model['source']['motion_bindings'][0]
+            animation=next(r for r in resources['records'] if r['source_index']==binding['default_animation'])
+            expected=b''.join(blob[r['blob_offset']:r['blob_offset']+r['bytes']] for r in (model,animation))
+            for i in range(2):
+                bank=target+i*capacity;debug.write_memory(bank,b'\xA5'*capacity)
+                call(0x800B167C,[bank,model['index']])
+                call(0x800B167C,[bank+model['bytes'],animation['index']])
+                check('complete largest rig and motion in native bank',bank,expected+b'\xA5'*(capacity-len(expected)))
+            check('double-bank left guard',allocation,edge)
+            check('double-bank data left guard',target-16,edge)
+            check('double-bank data right guard',target+capacity*2,edge)
+            # This boundary is distinct from the old single-bank guard.
+            check('double-bank end remains owned',game+0x1914,struct.pack('>I',target+capacity*2+16))
         missing=next(i for i in range(equipment.COUNT) if equipment.FIRST+i not in {r['index'] for r in resources['records']})
         for index in (0xFFFFFFFF,equipment.FIRST+equipment.COUNT,equipment.FIRST+missing):
             call(0x800B131C,[index],0);call(0x800B12C8,[index],0)
@@ -1136,11 +1169,78 @@ def equipment_resources(debug,rom_path,record):
         check('no faulted CPU thread',0x8003CE34,bytes(4))
         check('translation guard',0x8019C8D0,bytes.fromhex('AF32C0DE')*4)
         check('resident package guard',0x804A2FF0,bytes.fromhex('AFACC0DE')*4)
-        check('equipment module guard',equipment.RAM+equipment.SIZE-16,struct.pack('>4I',*([equipment.GUARD]*4)))
+        check('equipment module guard',equipment.RAM+resources['bytes']-16,struct.pack('>4I',*([equipment.GUARD]*4)))
     finally:call(0x8009C040,[allocation])
     return dict(native_equipment_resources=True,representative_transfers=len(rows),assertions=assertions,
         imported_categories=len(selected),ordinary_menu_reload_tested=False,player_actions_tested=False,
         hardware_tested=False,flash_written=False,requires_checkpoint_restore=True)
+
+
+def equipment_bank_switch(debug,rom_path,record):
+    """Switch complete rigs of different sizes through the loaded native owner."""
+    import v3_equipment_runtime as equipment
+    path=Path(rom_path);image=path.read_bytes();report=json.loads((path.parent/'build.json').read_bytes())
+    if sha256(image)!=report['output_sha256']:raise ValueError('Changed equipment-switch cartridge')
+    resources=report['equipment_resources'];rigs=resources['animated_rigs'];files=by_vrom(image)
+    if not rigs.get('animation_cache_invalidated_on_model_change'):
+        raise ValueError('Equipment-switch probe requires model-change invalidation')
+    blob=files[runtime.BLOB].extract(image);assertions=0
+    def check(label,at,want):
+        nonlocal assertions
+        got=debug.read_memory(at,len(want));passed=got==want
+        record(dict(equipment_switch_check=label,address=f'{at:08X}',bytes=len(want),
+                    assertion='passed' if passed else 'failed',observed_sha256=sha256(got),expected_sha256=sha256(want)))
+        if not passed:raise ValueError('Equipment switch mismatch: '+label)
+        assertions+=1
+    def call(at,args=(),proof=None):
+        result=debug.call(f'{at:08X}',list(args),return_address=MODULE_RAM+0x6480,verified_code=proof)
+        record(result);return result['return_value']
+    def put(at,*values):debug.write_memory(at,struct.pack('>'+str(len(values))+'I',*values))
+    constructor=struct.unpack('>I',debug.read_memory(0x80143900,4))[0]
+    owner=constructor-(0x808DD748-equipment.PLAYER_RAM)
+    data=files[equipment.PLAYER_VROM].extract(image);rel=files[equipment.PLAYER_RELOC].extract(image)
+    if owner&15 or not MODULE_RAM+0x8000<=owner<=0x80400000-len(data):
+        raise ValueError('Equipment switch requires the actual loaded player owner')
+    sections=struct.unpack_from('>5I',rel)
+    expected=relocate_verified_data(SimpleNamespace(ram=equipment.PLAYER_RAM,resident_bytes=len(data),
+                                                  sections=sections),data,rel,owner)
+    check('complete current player owner',owner,expected[:sections[0]])
+    at=resources['blob_offset'];check('complete current shared equipment code',equipment.RAM,blob[at:at+resources['bytes']])
+    saved=debug.read_memory(0x8046C000,864)
+    capacity=rigs['allocation']['bank_bytes'];size=0x1400+capacity*2+32
+    allocation=call(0x8009BFC0,[size]);actor=allocation+16;bank0=allocation+0x1400
+    if allocation&15 or not MODULE_RAM+0x8000<=allocation<=0x80400000-size:
+        raise ValueError('Equipment switch scratch escapes native heap')
+    edge=b'V3RS'*4;guards=(allocation,actor+0x12D8,bank0-16,bank0+capacity*2)
+    debug.write_memory(actor,bytes(0x12D8))
+    for at in guards:debug.write_memory(at,edge)
+    put(actor+0xDBC,bank0,bank0+capacity)
+    put(actor+0xDDC,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF)
+    models=[r for r in resources['records'] if r['type']==1]
+    small,large=min(models,key=lambda r:r['bytes']),max(models,key=lambda r:r['bytes'])
+    animations={r['source_index']:r for r in resources['records'] if r['kind']=='animation'}
+    entry=owner+0x808B5A10-equipment.PLAYER_RAM
+    proof=(entry,expected[0x808B5A10-equipment.PLAYER_RAM:0x808B5B38-equipment.PLAYER_RAM])
+    try:
+        for step,model in enumerate((small,small,large,large,small,small)):
+            animation=animations[model['source']['motion_bindings'][0]['default_animation']]
+            index=(step+1)%2;bank=bank0+index*capacity
+            call(entry,[actor,model['index'],animation['index']],proof)
+            check('native alternating bank index',actor+0xDEC,struct.pack('>I',index))
+            check('native model index',actor+0xDDC+index*4,struct.pack('>I',model['index']))
+            check('native animation index',actor+0xDE4+index*4,struct.pack('>I',animation['index']))
+            check('native animation address follows current model',actor+0xDC4+index*4,struct.pack('>I',bank+model['bytes']))
+            check('native animation segment bias follows current model',actor+0xDD4+index*4,struct.pack('>I',bank+model['bytes']))
+            wanted=b''.join(blob[r['blob_offset']:r['blob_offset']+r['bytes']] for r in (model,animation))
+            check('complete actual model and animation after switch',bank,wanted)
+            for at in guards:check('native bank-switch memory guard',at,edge)
+        check('saved state retained',0x8046C000,saved)
+        check('no CPU fault',0x8003CE34,bytes(4))
+        check('equipment module guard',equipment.RAM+resources['bytes']-16,struct.pack('>4I',*([equipment.GUARD]*4)))
+    finally:call(0x8009C040,[allocation])
+    return dict(native_equipment_bank_switch=True,assertions=assertions,transitions=6,
+        unchanged_animation_index=True,ordinary_gameplay_tested=False,hardware_tested=False,
+        flash_written=False,requires_checkpoint_restore=True)
 
 
 def sound_programs_probe(debug,image,resources,check,call,record):

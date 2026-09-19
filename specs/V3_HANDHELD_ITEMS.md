@@ -173,10 +173,9 @@ and all compatible source animation variants. Animation arrays remain in the
 shared motion resources, not duplicated or shortened inside a model object.
 
 Six objects require 2,896 bytes together with their largest animation. The two
-larger objects require 5,248 and 4,928 bytes, exceeding the current 4,376-byte
-equipment-bank contract. Preserve these complete variants and extend the shared
-allocation/reader contracts before installation; do not drop them or resize
-their artwork. Required native skeleton loading/drawing, player actions,
+larger objects require 5,248 and 4,928 bytes. The shared rig installer below
+extends the native equipment banks to retain these complete variants.
+Required native skeleton initialization/drawing, player actions,
 inventory/acquisition/catalogue, and selected save ownership remain explicit.
 
 The output format is `AFV3-ANIMATED-HELD-PREPARED-1`. Both the static equipment
@@ -189,6 +188,54 @@ No cartridge, allocation, saved profile, or served patcher changes during
 preparation. See the [conversion evidence](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#complete-animated-held-preparation).
 
 ## Native integration work
+
+### Shared rig resources and equipment banks
+
+```sh
+python3 tools/v3_furniture_install.py --refresh-runtime \
+  --equipment-rigs build/v3-handheld-animated-prepared-01 \
+  --base-lock build/v3-translation-headers-02/build-lock.json \
+  --output build/held-rig-runtime
+```
+
+The shared equipment adapter validates the complete prepared rig category,
+joint graphics, source transforms, animation bindings, compiled artwork, and
+remaining native work vectors. Native animation needs a translation vector in
+addition to one rotation vector per joint; the seven-vector work areas admit
+at most six joints. The eight pinwheels have three. No object is reconverted.
+Each model occupies its existing reserved resource slot `17 + source_index`.
+The thirty installed static/animation records keep their identities and data.
+The eight corresponding kind records receive their actual shape and motion
+indices, without enabling actions, parent selections, or saved profile bits.
+
+`AF_V3_EQUIPMENT_RIGS` permits checked type-one skeleton headers. Their minimum
+size is eight bytes; animation headers remain twenty bytes. The compiled
+resource bound matches the largest complete model-plus-motion combination:
+5,248 bytes. The native capacity function at `800B1590` supplies that value to
+both real bank registrations through `800B1A28` and `800B1838`. Native bank
+indexing, ownership, DMA, and menu-return reload code retain their layout.
+
+The scene allocator's request and end calculation at `800C6618` and `800C6628`
+both use `93400 + 2 * (5248 - ALIGN16(4376)) = 93AC0`. This adds 1,728 bytes
+while retaining the remaining object-arena capacity. Inventory already reserves
+15,584 bytes for its item bank; it needs no size change. The resident equipment
+module remains 52 KiB, and the ordinary player-animation banks remain 3,848 bytes.
+
+At native model-DMA call `808B5A68`, a sixteen-byte assembly adapter invalidates
+the destination bank's cached animation index. A changed model can move the
+animation even when its animation index is unchanged; native code must reload
+the animation and recompute its pointers. The adapter preserves the original
+DMA, native return path, bank alternation, and all relocation records. It does
+not force a transfer when the model itself remains cached.
+
+All nine core reader hooks and both player-motion/six kind-reader owner hooks
+are rebound together after compilation. Static drawing keeps its fixed entry.
+The complete startup CRC covers the updated module. Native shared allocation,
+complete resource transfers, and alternating small/large model changes have
+focused evidence. GPU drawing, rig initialization, pinwheel actions, inventory
+previews, acquisition, catalogue, ordinary reload, and hardware remain open.
+The [bank checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-animated-equipment-banks)
+owns exact build and test evidence. Neither served patcher changes.
 
 ### Shared event stock
 

@@ -113,7 +113,9 @@ int main(void) {
     Resource *rows=(Resource *)(af_equipment_header+4);
     for (int type=0;type<=5;++type) {
         rows[49]=(Resource){0x02500000,32,0x06000008,type};
+#ifndef AF_V3_EQUIPMENT_RIGS
         if(type==1) { invalid(66);continue; }
+#endif
         assert(af_v3_equipment_pointer(66)==0x06000008);
         assert(af_v3_equipment_type(66)==(u32)type);
         assert(af_v3_equipment_size(66)==32 && !af_v3_equipment_origin(66));
@@ -125,13 +127,23 @@ int main(void) {
         {0x021FFFF0,32,0x06000008,2},{0x025F0000,32,0x06000008,2},
         {0x025EFFF0,32,0x06000008,2},{0x02500001,32,0x06000008,2},
         {0x02500000,0,0x06000008,2},{0x02500000,16,0x06000008,2},
-        {0x02500000,31,0x06000008,2},{0x02500000,4384,0x06000008,2},
+        {0x02500000,31,0x06000008,2},{0x02500000,(AF_V3_EQUIPMENT_CAPACITY+16u)&~15u,0x06000008,2},
         {0x02500000,32,0x05000008,2},{0x02500000,32,0x06000009,2},
         {0x02500000,32,0x06000010,2},{0x02500000,32,0x06000008,6},
     };
     for(unsigned i=0;i<sizeof(bad)/sizeof(bad[0]);++i) { rows[49]=bad[i];invalid(66); }
     rows[49]=good;
     for(int i=0;i<4;++i) {af_equipment_header[i]^=1;invalid(66);af_equipment_header[i]^=1;}
+#ifdef AF_V3_EQUIPMENT_RIGS
+    /* Skeleton headers are eight bytes, not twenty-byte animation headers. */
+    rows[33]=(Resource){0x02500000,5088,0x060013D8,1};
+    assert(af_v3_equipment_size(50)==5088 && af_v3_equipment_type(50)==1);
+    assert(af_v3_equipment_pointer(50)==0x060013D8);
+    rows[33].pointer+=4;invalid(50);
+    rows[33]=(Resource){0x02500000,16,0x06000008,1};
+    assert(af_v3_equipment_pointer(50)==0x06000008);
+    rows[33].pointer+=4;invalid(50);
+#endif
 #ifdef AF_V3_PLAYER_MOTION
     player_tests();
 #endif

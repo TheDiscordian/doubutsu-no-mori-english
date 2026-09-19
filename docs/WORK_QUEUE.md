@@ -2,22 +2,24 @@
 
 ## Active: V3 optional GameCube imports
 
-Next implementation: extend shared equipment-buffer allocation and native rig
-loading/drawing for the complete prepared pinwheel category. Reuse
-`build/v3-handheld-animated-prepared-01/`; all eight rigs, joint bindings, and
-graphics are converted. Keep the two complete 5,248-/4,928-byte model/animation
-combinations, rather than restricting the category to the six smaller variants.
-The current 4,376-byte bank and type-one rejection must change together with
-their actual owners/readers. Native actions, inventory/acquisition/catalogue,
-and selected ownership remain required before enabling imports. Keep missing
-balloon texture/net-and-rod matrix support explicit; do not flatten equipment or
-create per-item installers. See the
-[rig checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#complete-animated-held-preparation).
+Next implementation: native rig initialization/drawing and pinwheel behaviour
+through the shared action adapter. Use the explicit ABI-117 lock at
+`build/v3-equipment-rigs-02/build-lock.json`. All eight complete rigs are installed
+with type-one readers, their actual motion dependencies, 5,248-byte outdoor
+banks, and a matching 1,728-byte scene-arena increase. Model changes invalidate
+the old animation cache, preserving correct pointers for different model sizes.
+Inventory's existing 15,584-byte bank is sufficient and unchanged.
 
-Seven new converter/current-resource checks and an existing selection-rejection
-check pass. The legacy artwork comparison's acquisition-metadata correction is
-unexecuted after the setup retry limit; do not replay that archived test batch.
-Neither cartridge, save/profile, main lock, nor served patcher changes.
+Five current-cartridge/host checks pass. Native bank registration and complete
+resource transfers pass on the first proposal. Six small/large transitions pass
+on the current proposal through its actual loaded player owner, including guards,
+unchanged saved state, and checkpoint restoration. Retain those checks; do not
+reconvert models or replay passing transfer tests. The existing 112 choices and
+profile are unchanged; no pinwheel is selectable yet. Native actions,
+inventory/acquisition/catalogue, and selected ownership remain required.
+Keep balloon texture/net-and-rod matrix dependencies explicit and retain the
+separate seasonal-copy issue. See the
+[bank checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-animated-equipment-banks).
 
 The ABI-116 festival fixture has no seeded fan or ownership. Town entry and the
 actual vendor/visitor scene load successfully. The ordinary purchase attempt
@@ -28,9 +30,8 @@ the route or boot prefix. Keep ordinary acquisition and catalogue delivery open,
 and keep the independent seasonal-copy assertion unresolved. See the
 [festival checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#ordinary-festival-acquisition-setup).
 
-Continue from the explicit ABI-116 lock at
-`build/v3-translation-headers-02/build-lock.json`. The Museum-header correction
-and ordinary reader's expanded villager-name bound are installed. Empty selection
+The ABI-117 proposal retains the ABI-116 Museum-header correction
+and ordinary reader's expanded villager-name bound. Empty selection
 uses exact V2-12 in offline/browser composition. Current native component checks
 pass complete overlay loading/relocation, representative names, saved-state
 retention, guards, and checkpoint restoration. Do not repeat passing component
