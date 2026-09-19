@@ -1237,6 +1237,12 @@ def main():
                     raise ValueError('Resident-word probes require a saved emulator checkpoint')
                 needs_checkpoint_restore = True
                 results.append(exercise(debug,action['test_resident_words'],record))
+            if 'test_museum_header' in action:
+                from museum_header_smoke import exercise
+                if not (out/'test.bs1').is_file():
+                    raise ValueError('Museum header probes require an isolated checkpoint')
+                needs_checkpoint_restore = True
+                results.append(exercise(debug, action['test_museum_header'], record))
             if 'test_v2_performance' in action:
                 from v2_performance_smoke import exercise
                 if not (out/'test.bs1').is_file():

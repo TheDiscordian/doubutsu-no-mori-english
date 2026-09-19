@@ -1,0 +1,10 @@
+[
+  {"wait": 8},
+  {"save_state": true},
+  {"pause_game_thread": true},
+  {"test_museum_header": {"build": "build/v2-museum-header-12-final"}},
+  {"load_state": true},
+  {"resume": true},
+  {"wait": 2},
+  {"read": ["8019B000", 4], "expect": "00000000"}
+]

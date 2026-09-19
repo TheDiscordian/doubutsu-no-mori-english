@@ -1,5 +1,20 @@
 # Current progress
 
+## Local V2 museum-header correction
+
+V2-12 at `build/v2-museum-header-12-final/Animal Forest English V2.z64` corrects
+the missed museum name in letter headers, both editing and reading. It uses the
+official GameCube `Museum` wording while preserving the saved Japanese identity,
+fossil delivery, and all saved formats. Existing V2-11 saves are expected to work
+in both directions without migration. Neither served patcher is changed.
+
+Focused host and cartridge checks pass. Native museum/villager/player name
+resolution, bounded writes, and code relocation pass; the native rendering
+comparison remains incomplete after two fixture-setup failures. Original-hardware
+appearance still needs confirmation. See the [checkpoint](checkpoints/MUSEUM_LETTER_HEADERS.md)
+for exact checks, limits, hashes, and the pending V3 integration. V3's current
+locked ROM remains ABI 106; this V2 fix does not replace its no-import baseline.
+
 ## Active development
 
 Current ABI 106 at `build/v3-held-parent-readers-01/` connects shared parent
@@ -1164,7 +1179,7 @@ verified. Both patchers remain V2.
 
 ## Stable V2 deliverable
 
-The current cartridge is **V2-11** at
+The served patchers' current cartridge is **V2-11** at
 `build/v2-keyboard-fit-11/Animal Forest English V2.z64`.
 The [compact keyboard layout](../specs/KEYBOARD_V2_LAYOUT.md) uses a key-only
 grey tray with separate attached N64-style shoulders and grips, native coloured

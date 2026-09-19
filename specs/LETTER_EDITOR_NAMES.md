@@ -2,13 +2,15 @@
 
 ## Implementation contract
 
-The installed resident header shim at `80194CB4` uses the complete recipient
-renderer only in read mode. Its non-read branch derives the original header
-entry, `80889CD8`, from the board call's return address. The letter-writing
-screen therefore still reads the six-byte saved recipient name.
+The resident header shim at `80194CB4` uses the resident recipient renderer
+in read mode. Its non-read branch derives the original header entry,
+`80889CD8`, from the board call's return address; that entry redirects to the
+owned editing-header adapter.
 
-The display adapter resolves only packed NPC recipient type one, index below
-216, through the existing eight-byte English resource. Unsupported identities,
+The display adapter resolves packed NPC recipient type one, index below
+216, through the existing eight-byte English resource. The
+[museum-header extension](MUSEUM_LETTER_HEADERS.md) resolves type two to the
+official English museum name in both editing and reading. Unsupported identities,
 players, and unavailable resources retain fresh saved-name fallback. Saved
 identity fields and the ten-byte editable header remain unchanged. Opening and
 closing animation compose an eighteen-byte temporary from the current board,

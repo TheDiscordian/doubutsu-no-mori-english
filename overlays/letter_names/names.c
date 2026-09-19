@@ -44,6 +44,14 @@ void af_letter_header(void *submenu, void *game, void *menu, float x, float y,
     }
     size = playing && !board[0] ? 6u : board[3];
     for (i = 0; i < 8u; ++i) name[i] = i < 6u ? board[8+i] : ' ';
+#ifdef AF_MUSEUM_HEADER
+    /* Enabled by the current incremental installer; keep baseline ABI builds reproducible. */
+    if (board[0x18] == 2u) {
+        static const unsigned char museum[] = "Museum";
+        size = 6;
+        for (i = 0; i < size; ++i) name[i] = museum[i];
+    } else
+#endif
     if (board[0x18] == 1u && board[0x14] < 216u
             && af_load_display_name(name, 8, 0xE000u|board[0x14])) {
         size = 8;

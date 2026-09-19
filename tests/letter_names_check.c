@@ -67,11 +67,28 @@ int main(void) {
         setup();
         if (kind == 0) available=0;
         if (kind == 1) board[0x18]=0;
-        if (kind == 2) board[0x18]=2;
+        if (kind == 2) board[0x18]=7;
         if (kind == 3) board[0x14]=216;
         if (kind == 4) board[0x14]=255;
         snapshot();af_letter_header((void *)1,(void *)2,menu,64,36,colour);unchanged();
         assert(loads == (kind == 0) && span[1].length == 6 && !memcmp(span[1].text,"Native",6));
+    }
+    /* Museum identity remains canonical in every editing/animation state. */
+    for (unsigned int status=0;status<=4;++status) {
+        for (unsigned int field=0;field<3;++field) {
+            setup();menu[1]=status;board[0]=(unsigned char)field;board[0x18]=2;
+            memcpy(board+8,"\x19\x07\xF8\x11\x05\xC3",6);snapshot();
+            af_letter_header((void *)1,(void *)2,menu,64,36,colour);unchanged();
+            assert(!loads);
+            if (status == 1) {
+                assert(draws == 3 && span[1].length == 6);
+                assert(!memcmp(span[1].text,"Museum",6));
+                assert(span[1].colour[0] == 185 && span[2].x == 166);
+            } else {
+                assert(draws == 1 && span[0].length == 16);
+                assert(!memcmp(span[0].text,"Hi, Museum!     ",16));
+            }
+        }
     }
     setup();board[0x14]=215;board[0x2F]=10;snapshot();
     af_letter_header((void *)1,(void *)2,menu,64,36,colour);unchanged();assert(draws == 2 && last_id == 0xE0D7);

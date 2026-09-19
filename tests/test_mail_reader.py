@@ -36,7 +36,7 @@ class MailReaderTests(unittest.TestCase):
         verify_registered(cls.catalog)
         cls.temporary = tempfile.TemporaryDirectory()
         library = Path(cls.temporary.name)/'mail-reader.so'
-        subprocess.run(['gcc','-std=c99','-Wall','-Wextra','-Werror','-O2','-shared','-fPIC',
+        subprocess.run(['gcc','-std=c99','-Wall','-Wextra','-Werror','-O2','-shared','-fPIC','-DAF_MUSEUM_HEADER',
                         '-I'+str(ROOT/'runtime'),str(ROOT/'runtime/display_name.c'),
                         str(ROOT/'tests/display_name_mock.c'),
                         *(str(ROOT/'runtime/mail'/name) for name in ('record.c','format.c','catalog.c','view.c','page.c','reader.c')),
@@ -128,7 +128,7 @@ class MailReaderTests(unittest.TestCase):
         record = self.record(0)
         letter = format_letter(record,templates(self.catalog,record))
         expected = letter.header[:letter.header_split]+b'READER'+letter.header[letter.header_split:]
-        for recipient_type,index in ((0,0),(2,0),(255,0),(1,216),(1,255)):
+        for recipient_type,index in ((0,0),(255,0),(1,216),(1,255)):
             self.open(record,recipient_type=recipient_type,recipient_index=index)
             self.assertEqual(bytes(self.state.header[:self.state.lengths[0]]),expected)
         self.assertEqual(C.c_uint.in_dll(self.lib,'af_display_dma_calls').value,0)
@@ -142,6 +142,28 @@ class MailReaderTests(unittest.TestCase):
         for kind in (2,3,5):
             self.open(record,kind=kind,recipient_type=1)
             self.assertEqual(bytes(self.state.header[:self.state.lengths[0]]),letter.header)
+
+    def test_museum_headers_translate_without_rewriting_mail_or_museum_replies(self):
+        record = self.record(0)
+        letter = format_letter(record, templates(self.catalog, record))
+        self.open(record, recipient_type=2)
+        expected = letter.header[:letter.header_split]+b'Museum'+letter.header[letter.header_split:]
+        self.assertEqual(bytes(self.state.header[:self.state.lengths[0]]), expected)
+        self.open(record, wire=b' '*122, marker=3, recipient_type=2)
+        self.board[8:14] = bytes.fromhex('1907F81105C3')
+        self.board[3], self.board[5], self.board[0x2F] = 6, 3, 3
+        self.board[0x32:0x35] = b'To '
+        saved = bytes(self.board)
+        self.assertEqual(self.draw(), [(b'To Museum', 64, 36)])
+        self.assertEqual(bytes(self.board), saved)
+        # Incoming museum replies address the player, not the sender.
+        self.board[0x18] = 0
+        self.board[8:14] = b'Player'
+        self.board[0x2A] = 2  # Sender type is independent of recipient type.
+        saved = bytes(self.board)
+        self.assertEqual(self.draw(), [(b'To Player', 64, 36)])
+        self.assertEqual(bytes(self.board), saved)
+        self.assertEqual(C.c_uint.in_dll(self.lib, 'af_display_dma_calls').value, 0)
 
     def draw(self):
         self.calls.value = 0

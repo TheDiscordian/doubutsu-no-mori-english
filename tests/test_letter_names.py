@@ -39,7 +39,7 @@ class LetterHostTests(unittest.TestCase):
     def test_host_names_colours_cursor_fallback_and_unchanged_state(self):
         with tempfile.TemporaryDirectory(prefix='af-letter-names-') as directory:
             target = str(Path(directory)/'check')
-            subprocess.run(['gcc', '-std=c11', '-Wall', '-Wextra', '-Werror', '-O1', '-g',
+            subprocess.run(['gcc', '-std=c11', '-Wall', '-Wextra', '-Werror', '-O1', '-g', '-DAF_MUSEUM_HEADER',
                 '-fsanitize=address,undefined', '-fno-omit-frame-pointer', str(ROOT/'overlays/letter_names/names.c'),
                 str(ROOT/'tests/letter_names_check.c'), '-o', target], check=True, capture_output=True, timeout=30)
             subprocess.run([target], check=True, capture_output=True, timeout=10)
