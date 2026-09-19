@@ -2,6 +2,20 @@
 
 ## Active: V3 optional GameCube imports
 
+Continue ordinary equipment gameplay from the same-ROM equipped checkpoint
+`build/v3-equipment-gameplay-02/`, using the two-fan ROM/profile in
+`build/v3-held-subset-01/`. Cold loading, English inventory presentation,
+normal equipping, miniature/outdoor artwork, held-button artwork, release to
+idle, and fault/reservation guards pass. Do not repeat that successful prefix.
+The copied-town fixture sets the first pocket and its ownership; it does not
+establish acquisition or an ordinary save. Next check putting away, dropping/
+picking up, catalogue ordering/delivery, and a real save/restart. The first
+input attempt was corrected by moving the grabbed item onto the miniature
+player; this batch's setup retry is spent. Actual game defects remain fix work.
+The seasonal-copy continuation assertion is still unexplained; static inspection
+of the current cartridge alone does not close it. Neither the main lock nor
+either V2 patcher is promoted. See the [evidence](checkpoints/V3_FURNITURE_PIPELINE.md#ordinary-equipment-gameplay).
+
 The proposed ABI 115 in `build/v3-held-selection-02/` adds eight equipment-parent
 choices to the shared composers, for 112 experimental choices. Nineteen focused
 checks and nine JavaScript checks pass; fourteen profiles match between browser

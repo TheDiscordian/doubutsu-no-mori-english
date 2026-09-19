@@ -19,6 +19,8 @@ class ReadOnlyMemory(RSP):
         struct.pack_into(">bb", state, 8, 2, -1)
         struct.pack_into(">3f", state, 0x28, 120.5, 0, -50.25)
         self.memory[self.actor] = bytes(state)
+        self.memory[self.actor+0xCF0] = struct.pack('>II', 109, 0)
+        self.memory[self.actor+0x1110] = bytes(7)+b'\x6C'
 
     def command(self, command):
         if not command.startswith("m"):
@@ -32,7 +34,13 @@ class PlayerSnapshotTests(unittest.TestCase):
         snapshot = player_snapshot(ReadOnlyMemory())
         self.assertEqual(snapshot["world_position"], {"x": 120.5, "y": 0, "z": -50.25})
         self.assertEqual((snapshot["block_x"], snapshot["block_z"]), (2, -1))
+        self.assertEqual((snapshot['action'], snapshot['equipment_kind']), (109, 108))
         self.assertTrue(snapshot["read_only"])
+
+    def test_empty_equipment_kind_remains_signed(self):
+        debug = ReadOnlyMemory()
+        debug.memory[debug.actor+0x1110] = bytes(7)+b'\xFF'
+        self.assertEqual(player_snapshot(debug)['equipment_kind'], -1)
 
     def test_bad_pointers_part_coordinates_and_short_reads_fail(self):
         for address, data in ((0x8010EF90, bytes(8)),

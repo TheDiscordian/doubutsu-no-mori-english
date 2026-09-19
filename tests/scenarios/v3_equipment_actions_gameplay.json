@@ -1,0 +1,22 @@
+[
+  {"wait":1},
+  {"key":"a","duration":0.12},
+  {"wait":1},
+  {"key":"w","duration":0.12},
+  {"wait":1},
+  {"key":"a","duration":0.12},
+  {"wait":4},
+  {"capture":"equipment-inventory-equipped.png","hide_cursor":true},
+  {"key":"b","duration":0.12},
+  {"wait":3},
+  {"capture":"equipment-in-hand.png","hide_cursor":true},
+  {"snapshot_player":true,"expect_player":{"equipment_kind":108}},
+  {"snapshot_inventory":true},
+  {"capture":"equipment-use.png","capture_keys":"a","hide_cursor":true},
+  {"wait":4},
+  {"snapshot_player":true,"expect_player":{"equipment_kind":108,"action":7}},
+  {"read":["8003CE34",4],"expect":"00000000"},
+  {"read":["8019C8D0",16],"expect":"AF32C0DEAF32C0DEAF32C0DEAF32C0DE"},
+  {"read":["804AFFF0",16],"expect":"AF48C0DEAF48C0DEAF48C0DEAF48C0DE"},
+  {"save_state":true}
+]

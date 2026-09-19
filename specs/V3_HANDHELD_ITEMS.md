@@ -7,6 +7,31 @@ are distinct representations. Use the donor's actual selectors for each one.
 The room/collection context records in [the shared pipeline](V3_FURNITURE_PIPELINE.md)
 govern drop semantics; a prepared catalogue model is not a usable handheld item.
 
+### Ordinary gameplay checks
+
+The existing copied-town fixture accepts `--equipment-item` and resolves its
+installed parent records, selection bit, collection identity, and complete
+module hash. It writes only a fresh test save: the first pocket, its normal
+condition, the corresponding first-player ownership bit, and the checked
+format-2 envelope. It rejects absent/disabled parents and attempts to substitute
+shop stock for the actual equipment acquisition route. The preserved source
+town, all other pockets, villagers, and live game state stay unchanged.
+
+`tests/scenarios/v3_equipment_gameplay.json` exercises the ordinary inventory
+controller path for a representative selected parent. The companion actions
+scenario resumes a matching-ROM menu checkpoint; it does not replay startup.
+The shared read-only player snapshot records the action and signed equipment
+kind, including the native `-1` sentinel. ROM checks, copied saves, silent
+isolated emulation, and bounded runs remain mandatory. Screen captures establish
+the sampled appearance, not all animation frames or hardware behaviour.
+
+An emulator checkpoint is not a game save. A seeded pocket is not ordinary
+acquisition. Keep putting away, drop/pickup, delivery, actual save/restart,
+other categories, and hardware separate from an inventory/equip result. See
+the [actual gameplay evidence](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#ordinary-equipment-gameplay).
+
+## Shared source discovery
+
 `tools/v3_handheld_items.py` discovers equipment dependencies from five complete
 GAFE01-r0 functions: item-to-equipment-kind, kind-to-shape, kind-to-animation,
 resource-pointer lookup, and resource-type lookup. Function code, paired table

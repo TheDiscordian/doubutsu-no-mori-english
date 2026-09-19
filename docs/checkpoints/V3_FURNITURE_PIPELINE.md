@@ -1,5 +1,72 @@
 # Automatic furniture pipeline checkpoint
 
+## Ordinary equipment gameplay
+
+The target is the current ABI-115 two-parent subset,
+`build/v3-held-subset-01/animal-forest-v3-asset-loader.z64`, SHA-256
+`ce436916f18097cb2ba0b8ae7617489521f563df4e5b79e85bbeda62befafe60`.
+This batch changes no cartridge code, artwork, profile, or served patcher. The
+preceding shared selection batch is committed as `1972def` and pushed on the
+experimental branch.
+
+The existing copied-town fixture now accepts an equipment parent from installed
+records, not a per-item fixture list. `--equipment-item 2255` generates
+`build/v3-equipment-gameplay-seed-01/`, with save SHA-256
+`a9e282e7b0301f29b305464aa37684c88a58c82c3f4feafe0ad7446089f11ad8`.
+It changes only the first pocket/condition and checked format-2 profile/ownership
+envelope in each bank. The source save SHA-256 remains
+`d489736e39abc7eff1c5b5085bf52e679186f2882a0247339e11603799b80b60`.
+The fixture rejects unavailable parents, changed bindings, and shop-stock use.
+Neither a seeded item nor seeded ownership counts as ordinary acquisition.
+
+Five focused checks pass: the new equipment-fixture check covers two non-prefix
+parents, both complete save banks, unchanged unrelated saved fields, native
+checksums, and actual codec acceptance with only the intended ownership bit;
+three read-only player-observation checks cover action/equipment and signed
+empty equipment; the existing clothing-stock fixture check passes against the
+current full ABI-115 cartridge. No historical ROM is executed. The fixture
+test passes in 0.580 seconds, and the other four in 0.178 seconds.
+
+The initial ordinary-controller run, `build/v3-equipment-gameplay-01/`, cold
+loads the copied subset town, retains every expected pocket, opens inventory,
+and displays `plum fan` with its imported icon and native Grab/Drop/Quit menu.
+Its sequence then incorrectly expects Grab alone to equip the fan. Grab puts
+the item in the inventory hand; it must be moved onto the miniature player and
+confirmed. That assertion fails with equipment kind `-1`. The menu checkpoint
+is retained before the failed interaction, so the successful boot is not rerun.
+Initial results SHA-256:
+`0a7b4227c20a893b14e90f4b5a6d3a720a5ddd7b7086f9c1ac4abe6bdd322a0a`.
+
+The justified corrected run, `build/v3-equipment-gameplay-02/`, resumes that
+matching-ROM checkpoint and performs Grab, up, confirm, and close through normal
+buttons. It passes 14 result records and exits gracefully. Both player samples
+report equipment kind 108; the first pocket is empty and the remaining fourteen
+pockets and clothing are unchanged. Captures show the actual plum fan on the
+inventory player and outdoor player, including a held-A pose. After release,
+the player returns to native idle action 7 without losing the equipped item.
+The fault pointer is zero, and the resident/equipment reservation guards remain
+intact. No debugger call or live-memory write is used by these scenarios.
+
+Successful results SHA-256:
+`1a8d8cf02dba82a7d056847620741f4d4d0b7757506e3709e6c754d89e615dd0`.
+Equipped checkpoint SHA-256:
+`690802f049b7fcb6b88f6130bb8ba4fc3ea4a4fef079437eabe40b4102eec00f`.
+The runs use disabled audio, an isolated X display, copied saves, and an
+Expansion Pak. The checkpoint is not ordinary game-save/restart evidence, and
+the held-A screenshot is not a complete trace of every animation frame. No
+hardware, ordinary purchase/reward, putting-away/drop/pickup, or catalogue
+delivery claim follows. The setup retry for this batch is spent; retain the
+successful checkpoint and continue the next interactions without replaying boot.
+
+The separate seasonal-copy assertion is still unresolved. Static disassembly
+of the current ABI-115 owners confirms the 264-byte frame, 108-entry ordinary
+copy, 107-entry winter copy with its three-entry prefix, caller-argument offsets,
+and return instructions. This inspection alone does not explain the prior
+native stop or prove the whole ground path safe; no further old probe is run.
+The main lock remains ABI 109. Carry the Museum-header fix through checked V3
+integration before a handoff. Both V2 patchers and all original saves remain
+unchanged; imported saves still require their selected profile and are not for V2.
+
 ## Shared held-parent selections
 
 The proposed ABI 115 is `build/v3-held-selection-02/`, produced by the existing

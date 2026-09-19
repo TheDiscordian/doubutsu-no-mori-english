@@ -1,4 +1,4 @@
-"""Create a copied-town clothing playtest fixture, never changing the source save."""
+"""Create a copied-town item playtest fixture, never changing the source save."""
 import argparse
 from datetime import datetime
 import importlib.util
@@ -51,19 +51,44 @@ def snapshot(debug, rom_path):
         'assertion': 'passed', 'read_only': True}}
 
 
-def create(source, rom, report, *, shop_stock=False):
+def create(source, rom, report, *, shop_stock=False, equipment_item=None):
     if len(source) != 2*BANK or sha256(source) != SOURCE_SHA:
         raise ValueError('Clothing fixture requires the preserved copied source town')
-    if sha256(rom) != report['output_sha256'] or not report['clothing'].get('wearing'):
-        raise ValueError('Clothing fixture requires current installed wearing support')
+    if sha256(rom) != report['output_sha256']:
+        raise ValueError('Item fixture requires its exact checked cartridge')
     profile = bytes.fromhex(report['save_runtime']['profile_hex'])
-    if len(profile) != PROFILE or not profile[183] & 0x80:
-        raise ValueError('Current profile does not include the full imported garment')
+    if len(profile) != PROFILE:
+        raise ValueError('Invalid item fixture profile')
+    item = 0x34BF
+    parent = None
+    if equipment_item is None:
+        if not report['clothing'].get('wearing') or not profile[183] & 0x80:
+            raise ValueError('Current profile does not include the full imported garment')
+    else:
+        from aflib import by_vrom
+        from v3_asset_loader import BLOB
+        equipment = report.get('equipment_resources', {})
+        if shop_stock or not equipment.get('optional_selection'):
+            raise ValueError('Equipment fixture needs installed parent selection and a pocket, not shop stock')
+        rows = equipment['parent_readers']['rows']
+        parent = next((r for r in rows if int(r['item_id'], 16) == equipment_item), None)
+        blob = by_vrom(rom)[BLOB].extract(rom)
+        at = equipment['blob_offset']
+        if (parent is None or blob[0x20:0x20+PROFILE] != profile or
+                sha256(blob[at:at+equipment['bytes']]) != equipment['sha256'] or
+                not profile[parent['profile_byte']] & parent['profile_mask']):
+            raise ValueError('Equipment parent is absent, disabled, or has changed installed bindings')
+        item = equipment_item
     spec = importlib.util.spec_from_file_location('v3_clothing_save_reference', ROOT/'tests/test_v3_save_clothing.py')
     reference = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(reference)
     state = bytearray(profile+bytes(STATE-PROFILE))
-    if not shop_stock:
+    if parent is not None:
+        index = (int(parent['display_item_id'], 16)-0x3000)//4
+        if not 0 <= index < 1024 or (parent['profile_byte'], parent['profile_mask']) != (32+index//8, 1 << (index & 7)):
+            raise ValueError('Equipment collection/profile identity mismatch')
+        state[PROFILE+index//8] |= 1 << (index & 7)
+    elif not shop_stock:
         state[PROFILE+512+23] = 0x80
     output, records = bytearray(), []
     for number in range(2):
@@ -77,7 +102,7 @@ def create(source, rom, report, *, shop_stock=False):
             before = bytes(bank[slot:slot+2])
             if before != bytes.fromhex('2474'):
                 raise ValueError('Unexpected original shop clothing entry')
-            bank[slot:slot+2] = bytes.fromhex('34BF')
+            bank[slot:slot+2] = struct.pack('>H', item)
             records.append({'bank': number, 'shop_goods_index': 2, 'saved_offset': slot,
                             'before': before.hex(), 'after': '34bf'})
             wallet = 0x20+0x38
@@ -89,15 +114,15 @@ def create(source, rom, report, *, shop_stock=False):
             slot, conditions = 0x20+0x14, 0x20+0x34
             before = bytes(bank[slot:slot+2])
             condition_before = struct.unpack_from('>I', bank, conditions)[0]
-            bank[slot:slot+2] = bytes.fromhex('34BF')
+            bank[slot:slot+2] = struct.pack('>H', item)
             struct.pack_into('>I', bank, conditions, condition_before & ~3)
-            records.append({'bank': number, 'pocket_offset': slot, 'before': before.hex(), 'after': '34bf',
+            records.append({'bank': number, 'pocket_offset': slot, 'before': before.hex(), 'after': f'{item:04x}',
                             'condition_before': condition_before, 'condition_after': condition_before & ~3})
         output.extend(reference.reference_pack(bank, state))
     return bytes(output), {'source_save_sha256': SOURCE_SHA, 'rom_sha256': sha256(rom),
         'fixture_save_sha256': sha256(output), 'player_slot': 0,
         'pocket_slot': None if shop_stock else 0, 'seeded_shop_stock': shop_stock,
-        'item': '34BF', 'seeded_ownership': not shop_stock, 'save_format': 2, 'field_changes': records,
+        'item': f'{item:04X}', 'seeded_ownership': not shop_stock, 'save_format': 2, 'field_changes': records,
         'villagers_and_other_items_retained': True, 'ordinary_acquisition_tested': False,
         'source_save_modified': False}
 
@@ -108,10 +133,13 @@ def main():
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--shop-stock', action='store_true',
                         help='Seed shop clothing and 1,000 Bells; preserve pockets and zero imported ownership')
+    parser.add_argument('--equipment-item', type=lambda value: int(value, 16),
+                        help='Seed this selected equipment parent in the first pocket using its installed records')
     args = parser.parse_args()
     source = ROOT/'local/rc2-save-report-g3O4lU/test.flash'
     image, receipt = create(source.read_bytes(), args.rom.read_bytes(),
-                            json.loads((args.rom.parent/'build.json').read_text()), shop_stock=args.shop_stock)
+                            json.loads((args.rom.parent/'build.json').read_text()), shop_stock=args.shop_stock,
+                            equipment_item=args.equipment_item)
     rtc = (ROOT/'build/v3-identity-arrival-01/test.rtc').read_bytes()
     if args.shop_stock:
         # Same calendar day as the source town's current stock timestamp.

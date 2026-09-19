@@ -106,5 +106,36 @@ class HeldSelectionTests(unittest.TestCase):
             if mutate=='missing':receipt['equipment_resources'].pop('ground_categories')
             with self.assertRaises(ValueError):select_installed(receipt,damaged)
 
+    def test_copied_town_equipment_fixture_retains_other_saved_fields(self):
+        from v3_clothing_gameplay_fixture import create
+        from v3_save_codec import BANK, PAYLOAD
+        source=(ROOT/'local/rc2-save-report-g3O4lU/test.flash').read_bytes()
+        initial=sha256(source)
+        rows=self.report['equipment_resources']['parent_readers']['rows']
+        for row in (rows[1],rows[-1]):
+            item=int(row['item_id'],16)
+            data,receipt=create(source,self.base,self.report,equipment_item=item)
+            self.assertEqual(receipt['item'],row['item_id'])
+            self.assertFalse(receipt['ordinary_acquisition_tested'])
+            self.assertFalse(receipt['source_save_modified'])
+            self.assertEqual(len(data),len(source))
+            for number in range(2):
+                old=source[number*BANK:(number+1)*BANK];bank=data[number*BANK:(number+1)*BANK]
+                self.assertEqual(bank[0x34:0x36],struct.pack('>H',item))
+                self.assertEqual(sum(struct.unpack('>'+str(PAYLOAD//2)+'H',bank[:PAYLOAD]))&65535,0)
+                allowed=set(range(4,8))|set(range(0x12,0x14))|{0x34,0x35}|set(range(0x54,0x58))
+                self.assertTrue(all(a==b or i in allowed for i,(a,b) in enumerate(zip(old[:PAYLOAD],bank[:PAYLOAD]))))
+                state=c.create_string_buffer(STATE)
+                profile=bytes.fromhex(self.report['save_runtime']['profile_hex'])
+                self.assertEqual(self.codec.af_v3_save_check(c.create_string_buffer(bank),BANK,
+                    c.create_string_buffer(profile),state),1)
+                ownership=bytearray(STATE-PROFILE)
+                index=(int(row['display_item_id'],16)-0x3000)//4
+                ownership[index//8]|=1<<(index&7)
+                self.assertEqual(state.raw,profile+ownership)
+        self.assertEqual(sha256(source),initial)
+        for item,shop in ((0x2200,False),(int(rows[0]['item_id'],16),True)):
+            with self.assertRaises(ValueError):create(source,self.base,self.report,equipment_item=item,shop_stock=shop)
+
 
 if __name__=='__main__':unittest.main()

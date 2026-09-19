@@ -17,6 +17,23 @@ locked ROM is tracked below; this V2 fix does not replace its no-import baseline
 
 ## Active development
 
+The two-fan ABI-115 profile now has ordinary inventory/equip evidence in
+`build/v3-equipment-gameplay-02/`. A copied town loads parent `2255`, shows
+the official `plum fan` name and icon, equips it through the normal inventory
+hand controls, and renders its model on both the miniature and outdoor player.
+Held-A artwork is captured, and release returns to idle with equipment kind
+108 retained. Fault and resident/equipment guards pass, and the emulator exits
+normally. No live game memory is edited. The source save remains untouched.
+
+The first attempt omitted moving the grabbed item onto the miniature player;
+the corrected run resumes its same-ROM menu checkpoint rather than repeating
+the successful boot. Five focused fixture/read-only observation checks pass.
+This verifies copied format-2 loading and the equip path, not ordinary reward
+acquisition, drop/pickup, catalogue delivery, a new game save/restart, every fan,
+or hardware. Next continue those interactions from the retained equipped
+checkpoint. Keep the separate seasonal-copy issue unresolved and the main
+lock at ABI 109. See the [gameplay checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#ordinary-equipment-gameplay).
+
 The proposed ABI 115 in `build/v3-held-selection-02/` connects individual
 equipment choices through the shared offline/browser composers. Its 112
 experimental choices include eight fan parents; catalogue representations are

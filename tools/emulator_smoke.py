@@ -445,7 +445,7 @@ def player_snapshot(debug):
             raise ValueError("No valid loaded player/game pointer")
         return value
     game = pointer(0x8010EF90, 0x1C94)
-    player = pointer(game+0x1C90, 0x3C)
+    player = pointer(game+0x1C90, 0x12D8)
     state = read(player, 0x3C)
     if state[2] != 2:
         raise ValueError("Loaded actor is not the player")
@@ -455,6 +455,8 @@ def player_snapshot(debug):
     return {"game_pointer": f"{game:08X}", "player_pointer": f"{player:08X}",
             "block_x": struct.unpack_from(">b", state, 8)[0],
             "block_z": struct.unpack_from(">b", state, 9)[0],
+            "action": int.from_bytes(read(player+0xCF0, 4), 'big'),
+            "equipment_kind": struct.unpack('>b', read(player+0x1117, 1))[0],
             "world_position": dict(zip(("x", "y", "z"), position)), "read_only": True}
 
 
@@ -1856,7 +1858,11 @@ def main():
                 if "expect_message" in action and snapshot.get("message_id") != action["expect_message"]:
                     raise ValueError(f"Unexpected message: {snapshot.get('message_id')}")
             if action.get("snapshot_player"):
-                results.append(player_snapshot(debug))
+                snapshot = player_snapshot(debug)
+                results.append(snapshot)
+                for field, expected in action.get('expect_player', {}).items():
+                    if snapshot.get(field) != expected:
+                        raise ValueError(f'Player {field}: {snapshot.get(field)!r}, expected {expected!r}')
             if action.get('snapshot_campsite'):
                 from v3_campsite_gameplay import snapshot as campsite_snapshot
                 results.append({'campsite_snapshot':campsite_snapshot(debug)})
