@@ -13,13 +13,24 @@ The equipment reservation is 40 KiB; police actors grow by 88 bytes. No new
 choice, saved identity, profile bit, or served patcher changes.
 See the [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-police-and-handover-runtime).
 
-Next extend all four seasonal ground category consumers together. Reuse the
-installed category graphics and native mapping `27 + source category`, not a
-new asset conversion or per-item installer. Audit each owner's draw tables,
-category-indexed arrays, loop bounds, allocation, and relocated callbacks.
-The global item-type wrapper remains unchanged until these consumers are safe.
-Then connect acquisition, collection/catalogue, optional selection, and ordinary
-gameplay/persistence. All imported handheld choices remain disabled.
+The proposed ABI 110 in `build/v3-ground-categories-02/` connects all four
+seasonal renderers and the global category reader through the shared installer.
+Its six host/cartridge and twelve composition tests pass. It retains all artwork,
+adds owner-local tables and actor-tail index arrays, and preserves Christmas
+lights and the original no-draw sentinel. Do not repeat conversion or create
+per-item installers. The main lock remains ABI 109 pending native verification.
+
+The bounded native run stops at the cherry setter-copy window with an unresolved
+continuation/stack mismatch. Do not assume a fixture cause or mark it passed.
+Startup, category lookup, complete loaded cherry tables, four constructor index
+pointers/counts, and array clearing pass. PC/SP failure diagnostics are now
+present but unexecuted. Classify the copy-window failure before promotion;
+retain the other three seasons, drawing, guards, and restoration as unverified.
+See the [exact stopping point](checkpoints/V3_FURNITURE_PIPELINE.md#shared-seasonal-ground-runtime).
+The setup retry and new-harness budget for this batch are spent. Continue shared
+source acquisition and collection/catalogue/selection implementation, reusing
+the installed category resources. No test setup failure permits shipping a
+possible memory defect. All imported handheld choices remain disabled.
 
 The retained inventory integration connects selected equipment kinds,
 all eight shape/animation/draw tables, and owner-relative callbacks for the
@@ -41,7 +52,7 @@ loading and appearance need the combined gameplay pass once category support is 
 
 Category discovery identifies all four seasonal ground owners, lost-and-found,
 and handover as direct native item-type consumers. Police/handover integration
-is installed; do not mistake that for completed seasonal ground integration.
+is promoted; seasonal integration is implemented but not yet validated/promoted.
 Complete category artwork is prepared at `build/v3-item-category-art-02/`:
 nine shared material/geometry pairs for 43 parent/state records, with seven
 focused checks passing. Reuse those complete assets and the generated six-owner

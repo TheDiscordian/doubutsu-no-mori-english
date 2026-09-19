@@ -401,6 +401,9 @@ def item_categories(debug,rom_path,record):
 
 
 def exercise(debug, rom_path, record, *, section='automatic_furniture'):
+    if section=='ground_categories':
+        from v3_ground_categories_smoke import exercise as ground_categories
+        return ground_categories(debug,rom_path,record)
     if section=='equipment_resources':return equipment_resources(debug,rom_path,record)
     if section=='player_motion':return player_motion(debug,rom_path,record)
     if section=='pocket_icons':return pocket_icons(debug,rom_path,record)

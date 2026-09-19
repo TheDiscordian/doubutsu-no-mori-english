@@ -6,10 +6,13 @@ typedef unsigned int u32;
 typedef struct { u16 item, price, display; u8 kind, source_type; u8 name[16]; } Parent;
 _Static_assert(sizeof(Parent)==24, "Equipment parent stride");
 #ifdef __mips__
+#ifndef AF_V3_CATEGORY_ORIGINAL
+#define AF_V3_CATEGORY_ORIGINAL 0x800A5630u
+#endif
 #define parents ((const u32 *)0x804A87F0u)
 #define categories ((const u32 *)0x804AA200u)
 #define selected ((int (*)(u32))AF_V3_HELD_SELECTED)
-#define original ((int (*)(u32))0x800A5630u)
+#define original ((int (*)(u32))AF_V3_CATEGORY_ORIGINAL)
 #else
 extern u32 af_test_category_parents[340], af_test_categories[32];
 extern int af_test_category_selected(u32), af_test_category_original(u32);

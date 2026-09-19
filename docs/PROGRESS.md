@@ -17,6 +17,21 @@ locked ROM is tracked below; this V2 fix does not replace its no-import baseline
 
 ## Active development
 
+The proposed ABI 110 at `build/v3-ground-categories-02/` implements the shared
+seasonal ground adapter: all four renderers, their complete category tables,
+loaded-owner constructors, appended actor indices, expanded setter stacks,
+and twelve furniture-type windows. The global category reader preserves its
+original fallback without recursion. The module is 44 KiB; no artwork is
+reconverted, and no handheld choice or saved format changes.
+
+Six focused tests and twelve composition tests pass. Native startup, selected/
+disabled/original categories, the complete cherry owner/table, four constructor
+index pointers/counts, and local-array clearing pass. The setter-copy window
+has an unresolved continuation/stack assertion. Remaining seasonal execution,
+drawing, final guards, and checkpoint restoration are not established. The
+main lock remains ABI 109; do not hand over the proposed build as validated.
+See the [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-seasonal-ground-runtime).
+
 Current ABI 109 at `build/v3-category-runtime-03/` installs the nine complete
 equipment category graphics, shared police/handover tables, and selected-parent
 category lookup. Native categories remain unchanged; added categories use
@@ -32,11 +47,12 @@ guards, and restored profile/checkpoint. This is component execution, not GPU
 appearance, ordinary acquisition, or save/reload verification. See the
 [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-police-and-handover-runtime).
 
-Next extend all four seasonal ground consumers and their category capacities,
-using these installed resources and the source-derived descriptors. The global
-item-type wrapper and ground readers still need that integration. All added
-handheld choices stay disabled. Saved formats, the 104 experimental choices,
-the import-free V2 baseline, and both served patchers remain unchanged.
+The proposed adapter above connects all four seasonal consumers and the global
+item-type wrapper, but its outstanding native copy check prevents promotion.
+Continue shared acquisition, collection/catalogue, and optional selection while
+retaining that unresolved check. All added handheld choices stay disabled.
+Saved formats, the 104 experimental choices, the import-free V2 baseline, and
+both served patchers remain unchanged.
 
 The retained ABI 108 integration connects the inventory
 screen's separate equipment selector, all eight shape/animation/draw tables,

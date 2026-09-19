@@ -1,5 +1,90 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared seasonal ground runtime
+
+The proposed ABI 110 is `build/v3-ground-categories-02/`. Its ROM SHA-256 is
+`6a74b1d25eebb647674cf016305051fe0608d47cd0daae911ac197677fc1cc51`,
+report SHA-256 is
+`9716d233fb4bd829b186dc748a3b48d279987b7d3fdaf830c69adbf55d627e2b`,
+and UPS SHA-256 is
+`591eb69b927d6164252c9c49a63ac664ee1360261a6698c03cc1082ecad6e1c1`.
+The main build lock stays at ABI 109; this proposal is not a validated handoff.
+
+The shared installer integrates all four seasonal ground owners together,
+without another artwork conversion or per-item script. Each receives its full
+expanded table, nine complete native descriptors, relocated callbacks,
+constructor entry, actor-tail index arrays, and matching setter capacity.
+The native global category entry resolves installed, selected parents and
+delegates other items directly to the existing translated wrapper, avoiding
+recursion. All twelve furniture-type windows now resolve the correct seasonal
+loaded owner. Saved format 2, all 104 experimental choices, parent profile bits,
+ordinary banks, and both served V2 patchers stay unchanged.
+
+The module is 44 KiB with 1,612 bytes of new code and 144 bytes of configuration;
+startup remains 952 bytes. Cherry/ordinary/Christmas gain 1,376 bytes of overlay
+BSS and 864 bytes of actor indices; winter gains 1,360 and 856 bytes respectively.
+Existing common state, matrix nodes, and Christmas light records do not move.
+All four setter frames are 264 bytes. Expanded categories number 108, or 107 in
+winter. Source numbering and physical artwork pointers are unchanged.
+
+### Defect found and corrected
+
+The initial proposal `build/v3-ground-categories-01/` faulted before the native
+probe reached its game-frame breakpoint. The saved checkpoint independently
+showed faulted thread `80145630`, PC `80262D84`, and bad address `00000004`.
+The live cherry owner was at `8025BCE0`; its native draw-body instruction at
+offset `70A4` dereferenced a null part. The native classification had populated
+start index 64 with 118. That is the original `NONE` sentinel, previously outside
+the copied/drawn range but now inside the extended arrays.
+
+The correction gives every unused extended slot a real 32-byte no-draw
+descriptor. It preserves original sentinel values and comparisons, with zero
+ordinary/shadow lists rather than borrowed artwork. Host tests check every
+unused row and descriptor. Both subsequent corrected-build runs report no
+faulted thread and reach the normal game-frame context. Do not use the first
+proposal; it is retained only as local failure evidence.
+
+### Verification and exact remaining check
+
+Six focused tests pass in 5.150 seconds: sanitized complete table construction
+and reloaded-owner pointers, category bounds/selection, every native edit,
+two relocation locations, all allocation/stack contracts, source mutations,
+retained artwork/resources, startup bounds, cartridge checksums, and full UPS
+reconstruction. Twelve optional-composition tests pass in 10.601 seconds against
+the proposed lock, including the exact no-import V2 output and actual save codec.
+The first proposal's earlier passing checks are not evidence for its startup bug.
+
+`build/smoke-v3-ground-categories-02/` verified corrected startup and the entire
+44-KiB module, then could not allocate the probe's 212,992-byte scratch block.
+This was a test-fixture allocation, not a production allocation failure. The
+justified setup retry uses 53,248 bytes of native heap for executable owner data,
+plus a checked, saved/restored unowned Expansion Pak gap for fixture data.
+
+`build/smoke-v3-ground-categories-03/results.json` contains 31 records,
+16 passing assertions, and one failing assertion. Its SHA-256 is
+`ccf951700e8cfc1d3102c1a9cf848e72ef0bc94c525c8c26e67fffeaa914b87f`.
+It executes selected/disabled/original categories, loads and relocates the full
+cherry owner, builds and compares every original/imported table row and part,
+executes the four constructor pointer/count writes, and clears the entire
+expanded setter array. The matrix-sentinel comparison also succeeds before
+the stopping point. It then fails the setter-copy continuation/stack assertion
+at loaded entry `802E3598` (owner offset `5E78`).
+
+That record does not include the observed PC/SP, so the cause is unresolved,
+not established as a fixture error. The probe now records PC, SP, stop reply,
+and expected values on this failure, but that addition has not been rerun.
+The native setup retry and 30-minute harness allowance are spent. Do not repeat
+the complete prefix or claim that copy/drawing passes. The other seasonal
+execution, complete copy, native graphics lists, final guards, verified scratch
+restoration, and checkpoint restoration remain unverified. No user save or
+hardware audio was used. Keep the potential copy/memory defect open and the
+proposal unpromoted while continuing unrelated shared acquisition work.
+
+Saved formats are unchanged from ABI 109; same-profile compatibility is expected
+but has no new ordinary save/reload evidence. Import-enabled saves remain
+unsuitable for V2. Carry the separate V2 museum-header fix into V3 before its
+next handoff, and preserve both V2 patchers.
+
 ## Shared police and handover runtime
 
 ABI 109 at `build/v3-category-runtime-03/` installs all nine complete category

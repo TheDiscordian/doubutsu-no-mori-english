@@ -621,9 +621,10 @@ gameplay checks before claiming playable imports. See the
 
 ## Ground and handover category integration
 
-The remaining item-type reader is native `mNT_get_itemTableNo` at `800A5630`,
-already wrapped by `af_v3_item_type`. Its non-furniture fallback still reaches
-the original 36-byte equipment table; it does not supply imported fan types.
+The item-type reader is native `mNT_get_itemTableNo` at `800A5630`.
+The seasonal category adapter supplies selected imported types and delegates
+other items directly to translated `af_v3_item_type` at `8046744C`, bypassing the
+core entry to avoid recursion. The original equipment table retains 36 entries.
 Do not simply return donor category 43: each native consumer owns smaller
 draw-index tables, and the police renderer also indexes a local start array.
 
@@ -651,8 +652,8 @@ equipped models. Complete source lists `obj_item_utiwaT_mat_model` at
 (24 bytes) reference one 32-byte palette, one 32×32 CI4 texture, and four
 vertices. The split-list converter retains 608 resource bytes, a 184-byte
 material list, and a 24-byte geometry list, without resizing or simplified
-graphics. The police/handover adapter installs these assets; ground support
-remains a required integration step.
+graphics. The police/handover adapter installs these assets; the seasonal adapter
+below reuses them for ground rendering.
 
 Discover the category dependencies through the complete source draw tables,
 including all four ground variants and handover/police tables. Feed those
@@ -760,10 +761,68 @@ relocations; all other owner code/data, relocation records, and resource sizes
 remain unchanged. The changed compressed resources use the existing checked
 uncompressed blob storage and preserve their logical DMA identities.
 
-The global item-type entry and all four seasonal ground consumers still need
-integration. The adapter enables no parent/profile bit, creates no browser
-choice, and changes no saved format. Do not enable handheld imports until the
+The seasonal adapter below connects the global item-type entry and all four
+ground consumers. Neither adapter enables a parent/profile bit, creates a browser
+choice, or changes a saved format. Do not enable handheld imports until the
 remaining consumers, acquisition, collection/catalogue, and optional composition
 are connected. Ordinary police/handover gameplay, GPU appearance, and persistence
 are distinct from the focused native component checks recorded in the
 [checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-police-and-handover-runtime).
+
+### Shared seasonal ground runtime
+
+`tools/v3_ground_categories.py` uses the shared installer with
+`--refresh-runtime --ground-categories`. It consumes the installed category map
+and complete material/geometry resources, without repeated conversion or per-item
+definitions. Each seasonal renderer has complete source hashes, relocation
+inventories, and allocation contracts.
+
+The 1,612-byte adapter starts at `804AD000`. Four 36-byte records at `804ADC00`
+contain loaded-owner slots, native constructor offsets, original tables/counts,
+expanded counts, new table/part offsets, callback offsets, and category bases.
+The full module is 44 KiB, ends at `804AE000`, and has guard `804ADFF0`. Startup
+remains 952 bytes and transfers/checks/flushes the entire module. Existing
+artwork, player models, motions, sounds, and inventory tables remain unchanged.
+
+Each overlay gains owner-local BSS, preserving every old BSS offset. Its
+constructor wrapper copies the original relocated scenery rows and builds nine
+category descriptors against that loaded owner. Four HI/LO pairs redirect table
+consumers while retaining their native relocations. Only the actor profile's
+constructor pointer loses its obsolete relocation; the replacement is resident.
+The core allocation descriptor and relocation BSS size agree on the new bounds.
+
+| Renderer | Categories | Category base | Overlay growth | Actor growth |
+| --- | ---: | ---: | ---: | ---: |
+| Cherry season | 108 | 37 | 1,376 bytes | 864 bytes |
+| Winter | 107 | 36 | 1,360 bytes | 856 bytes |
+| Christmas | 108 | 37 | 1,376 bytes | 864 bytes |
+| Ordinary | 108 | 37 | 1,376 bytes | 864 bytes |
+
+The original `NONE` value remains 64, or 63 in winter. It can receive a nonzero
+start index during native classification. Because the expanded copy includes
+that formerly excluded slot, every unassigned extended row points to a real
+32-byte descriptor with zero ordinary/shadow drawing lists, not a null pointer.
+Existing single-item `NONE` comparisons remain unchanged. Assigned categories
+have one ordinary list, their actual native callback, complete material/geometry
+pointers, and no shadow.
+
+Four expanded index arrays are appended after each actor's original allocation.
+Native constructor windows install their pointers/counts. The common state and
+all 257 matrix nodes per block keep their offsets. Christmas's interleaved light
+records retain their original `484` stride and matrix-node references; only the
+independent index-array stride changes. Native setters use 264-byte frames,
+expand every incoming argument offset, and retain each variant's two-byte index
+format and four-way copy remainder.
+
+All twelve ground furniture-type windows use the same selected-item query and
+resolve continuations through their respective loaded-owner slots. Original
+furniture, scenery, and equipment retain their values. Native category numbering
+remains `27 + donor category`; saved identities never depend on season or order.
+
+The adapter is implemented in a proposed build, not yet the promoted lock.
+Focused host/cartridge and optional-composition checks pass; native validation
+is incomplete at the setter-copy window. See the exact evidence and unresolved
+check in the [checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-seasonal-ground-runtime).
+Full outdoor gameplay, acquisition, collection/catalogue, optional parent
+selection, persistence, and original hardware remain required before completed
+handheld imports can be claimed. Both V2 patchers stay unchanged.
