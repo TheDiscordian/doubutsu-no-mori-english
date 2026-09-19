@@ -18,14 +18,30 @@ served patchers retain their existing builds.
 
 ## Active development
 
+The shared animated-held converter prepares all eight complete pinwheel rigs in
+`build/v3-handheld-animated-prepared-01/`: 26,272 bytes, 560 vertices, and 396
+triangles, with three joints and two shown models per parent. Complete animation
+bindings remain separate resources. Seven new checks and the existing static
+selection-rejection check pass. A legacy artwork-snapshot check encounters old
+acquisition metadata; its corrected comparison is unexecuted after the setup
+retry limit. The independent current-cartridge check retains all thirty installed
+equipment resources. These are prepared assets, not usable imports.
+
+Next extend shared equipment-bank allocation and native rig loading/drawing.
+Two variants need 5,248 and 4,928 bytes with animation, beyond the current
+4,376-byte contract; keep their full artwork. Native actions and item consumers
+must precede selection. No cartridge/save/profile or patcher changes in this
+preparation batch. See the
+[rig checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#complete-animated-held-preparation).
+
 The current ABI-116 two-fan profile has an isolated festival-night fixture with
 no seeded item or ownership. Normal town entry, original inventory, the festival
 vendor/visitors, and stall scene loading are observed. The generic NPC approach
 stops at the counter before opening dialogue, so an ordinary purchase, payment,
 handover, and earned ownership are not established. The usable pre-interaction
 checkpoint is `build/v3-festival-near-stall-01/`. The navigation batch's setup
-retry is spent; do not replay it. Continue shared animated-held conversion and
-remaining acquisition implementation, retaining the ordinary transaction and
+retry is spent; do not replay it. Continue shared animated-held native integration
+and remaining acquisition implementation, retaining the ordinary transaction and
 catalogue-delivery checks as open. See the
 [festival checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#ordinary-festival-acquisition-setup).
 

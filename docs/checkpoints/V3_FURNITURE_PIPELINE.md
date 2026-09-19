@@ -1,5 +1,69 @@
 # Automatic furniture pipeline checkpoint
 
+## Complete animated-held preparation
+
+`tools/v3_furniture_pipeline.py convert --representation handheld --assets-only
+--category animated-held-model` converts supported complete rigs as one category.
+Source discovery, the existing material/geometry compiler, and the shared
+keyframe module supply the implementation; there are no per-item installers or
+model definitions. Default handheld conversion remains explicitly static.
+
+`build/v3-handheld-animated-prepared-01/` contains all eight pinwheel parents
+`224C..2253`, using source resource slots 33 through 40. Every object retains
+three joints, two shown joint models, null roots, translations, children, draw
+streams, and actual animation bindings. The joint table and skeleton header are
+appended after complete artwork; only their pointers change. Shared graphics
+remain separate joint lists, never one flattened model.
+
+- Complete object bytes: 26,272; vertices: 560; triangles: 396.
+- Six model objects: 2,736 bytes each; the two larger objects: 5,088 and 4,768.
+- Maximum matching animation: 160 bytes per parent.
+- Combined banks: six at 2,896 bytes, then 5,248 and 4,928 bytes. The two larger
+  variants exceed the current 4,376-byte native equipment-bank contract.
+- Art receipt SHA-256:
+  `82a5b4e31ba342edb9e0670e3df29d348b3306be206969df0a86556162a8f143`.
+- Inventory SHA-256:
+  `3995f06a716e95620095576dc10385a231631488c7b1b01e2ce51b41f178f863`.
+
+The source scan exposes 22 prepared roots: fourteen static and eight animated.
+Net/rod roots retain their unsupported joint-matrix command; balloon roots retain
+their unsupported texture format. The complete source motion descriptions and
+animations are reused. The output has a separate
+`AFV3-ANIMATED-HELD-PREPARED-1` format, rejected by both existing installers.
+Neither an artwork-ready row nor these receipts enables an item/profile bit.
+
+The actual Docker graphics build succeeds for all eight objects on its first
+invocation. Seven new focused checks pass: complete source categories, every
+joint field and pointer across all twenty described rigs, rejected stale or
+unbounded bindings, category/selection rejection before output creation, every
+converted pinwheel texel/vertex/triangle/material and rig, installer isolation,
+and retention of all thirty installed model/animation resources on exact
+ABI 116. Source-to-native animation sizes/bindings and object limits agree.
+An existing default-static selection-rejection check also passes.
+
+The first test invocation accidentally imports the reusable donor TestCase
+class into the new module, so unittest discovers unrelated donor tests after
+the seven intended checks. That process is stopped during the extra cases.
+The helper import now references its module instead; collection alone verifies
+exactly seven tests without executing the suite again.
+
+The corrected explicit invocation runs nine checks in 4.460 seconds: eight pass,
+and the older static-artwork snapshot comparison fails because it predates
+source acquisition annotation. That field was already added before this batch;
+it is not changed graphics. The comparison now checks all static-artwork fields
+while excluding acquisition metadata on both sides. This final legacy-fixture
+correction is **unexecuted**: the batch's setup retry is spent. Do not claim a
+clean nine-test run or replay the archived batch. The new current-cartridge
+resource-retention check passes independently. Syntax and diff checks pass.
+
+No cartridge, runtime allocation, save/profile, main lock, or served patcher
+changes. No emulator or hardware claim is made for these prepared rigs.
+Next extend the shared model/animation allocation and resource readers, retain
+both oversized variants, and connect actual skeleton initialization/drawing and
+player behaviour before inventory, acquisition, catalogue, or optional selection
+can enable these parents. Use the explicit ABI-116 lock for integration; keep
+the independent seasonal-copy failure and ordinary acquisition test limits open.
+
 ## Ordinary festival acquisition setup
 
 The current target is the ABI-116 two-parent subset at

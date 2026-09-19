@@ -83,8 +83,9 @@ python3 tools/v3_furniture_pipeline.py convert --representation handheld \
 ```
 
 `--select` filters by donor inventory ID. Shared model roots are converted once;
-each output records every selected parent/state that uses it. The supported
-category is `static-held-model`. Unknown or unsupported selections reject before
+each output records every selected parent/state that uses it. Default conversion
+prepares `static-held-model`; `--category animated-held-model` selects complete
+supported rigs instead. Unknown or unsupported selections reject before
 creating output. `import` and conversion without `--assets-only` reject because
 native player integration remains unfinished.
 
@@ -144,12 +145,48 @@ animations retain 84 arrays in 7,760 bytes: sixteen equipment motions, six
 constant player poses, fan idle, and fan swing. Fan idle has seventeen frames;
 fan swing has nine. Neither timing is inferred from a catalogue model.
 
-Skeleton descriptions preserve actual model dependencies but do not convert
-those graphics or install draw callbacks. Net/rod joint-matrix commands and
-balloon texture formats still require shared graphics support. Pinwheel model
-preflight accepts its existing material commands, but complete rig/model
-packing and native player ownership remain unfinished. No animated model is
-flattened to pass the static converter.
+Skeleton descriptions preserve actual model dependencies. The complete-rig
+category below converts supported graphics without installing draw callbacks.
+Net/rod joint-matrix commands and balloon texture formats still require shared
+graphics support. No animated model is flattened to pass the static converter.
+
+### Complete animated-held preparation
+
+```sh
+python3 tools/v3_furniture_pipeline.py convert --representation handheld \
+  --assets-only --category animated-held-model --output build/held-rigs
+```
+
+The same source scan follows each shown joint's actual model root through
+`prepare_models` and `compile_models`. Repeated roots share one compiled list;
+different joints keep their own transforms and draw streams. It appends the
+complete `JointElemR` table and `BaseSkeletonR` header to the artwork. Only
+model pointers and the header's table pointer change to segment-six addresses.
+Null joints, children, translations, flags, and original ordering are retained.
+Rig descriptions are revalidated against the donor before packing. Missing,
+extra, misaligned, duplicate-target, or out-of-object model bindings reject.
+
+All eight pinwheel parents `224C..2253` use this category, with three joints and
+two shown joints each. The complete objects total 26,272 bytes, 560 vertices,
+and 396 triangles. Each parent retains its actual default equipment animation
+and all compatible source animation variants. Animation arrays remain in the
+shared motion resources, not duplicated or shortened inside a model object.
+
+Six objects require 2,896 bytes together with their largest animation. The two
+larger objects require 5,248 and 4,928 bytes, exceeding the current 4,376-byte
+equipment-bank contract. Preserve these complete variants and extend the shared
+allocation/reader contracts before installation; do not drop them or resize
+their artwork. Required native skeleton loading/drawing, player actions,
+inventory/acquisition/catalogue, and selected save ownership remain explicit.
+
+The output format is `AFV3-ANIMATED-HELD-PREPARED-1`. Both the static equipment
+consumer and furniture installer reject it. `asset_ready` means conversion is
+complete, not that the item is usable or selectable. The common scan exposes
+22 prepared roots (14 static and eight rigs), while retaining explicit graphics
+dependencies for the other twelve animated roots. The static consumer filters
+by representation and retains its existing thirty model/animation resources.
+No cartridge, allocation, saved profile, or served patcher changes during
+preparation. See the [conversion evidence](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#complete-animated-held-preparation).
 
 ## Native integration work
 

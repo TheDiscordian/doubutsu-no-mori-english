@@ -2,11 +2,22 @@
 
 ## Active: V3 optional GameCube imports
 
-Next implementation: extend the shared animated-held conversion category using
-the existing complete skeleton/motion bundle and graphics converter. Start with
-the pinwheel roots whose material preflight is supported, preserve complete rigs
-and model layers, and keep missing balloon texture/native ownership dependencies
-explicit. Do not flatten animated equipment or create per-item installers.
+Next implementation: extend shared equipment-buffer allocation and native rig
+loading/drawing for the complete prepared pinwheel category. Reuse
+`build/v3-handheld-animated-prepared-01/`; all eight rigs, joint bindings, and
+graphics are converted. Keep the two complete 5,248-/4,928-byte model/animation
+combinations, rather than restricting the category to the six smaller variants.
+The current 4,376-byte bank and type-one rejection must change together with
+their actual owners/readers. Native actions, inventory/acquisition/catalogue,
+and selected ownership remain required before enabling imports. Keep missing
+balloon texture/net-and-rod matrix support explicit; do not flatten equipment or
+create per-item installers. See the
+[rig checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#complete-animated-held-preparation).
+
+Seven new converter/current-resource checks and an existing selection-rejection
+check pass. The legacy artwork comparison's acquisition-metadata correction is
+unexecuted after the setup retry limit; do not replay that archived test batch.
+Neither cartridge, save/profile, main lock, nor served patcher changes.
 
 The ABI-116 festival fixture has no seeded fan or ownership. Town entry and the
 actual vendor/visitor scene load successfully. The ordinary purchase attempt

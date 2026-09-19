@@ -125,3 +125,41 @@ def compile_animations(source, descriptions):
         raise ValueError('Animation object exceeds a segmented address range')
     return bytes(output), dict(arrays=arrays, headers=headers, relocations=relocations,
                               segment=SEGMENT, runtime_installed=False)
+
+
+def compile_skeleton(source, description, model_offsets, *, start):
+    """Append a complete rig after shared artwork, retaining each joint binding.
+
+    Model offsets refer to complete lists already emitted in the same object.
+    The returned suffix does not move that artwork or bake joint transforms.
+    """
+    at = description['header']['donor_offset']
+    if description != skeleton(source, at):
+        raise ValueError('Changed skeleton description')
+    roots = {r['model']['donor_offset'] for r in description['rows'] if 'model' in r}
+    if (type(start) is not int or not 0 <= start < 0x1000000 or start % 16 or set(model_offsets) != roots or
+            len(set(model_offsets.values())) != len(model_offsets) or
+            any(type(p) is not int or p % 8 or not 0 <= p <= start-8 for p in model_offsets.values())):
+        raise ValueError('Skeleton models do not bind complete preceding artwork')
+    table = description['joint_table']; size = table['bytes']
+    output = bytearray(source.data[table['donor_offset']:table['donor_offset']+size])
+    relocations = []
+    for row in description['rows']:
+        if 'model' not in row:
+            continue
+        target = model_offsets[row['model']['donor_offset']]
+        offset = row['index']*12
+        struct.pack_into('>I', output, offset, SEGMENT+target)
+        relocations.append(dict(offset=start+offset, target_offset=target))
+    header = bytearray(source.data[at:at+8])
+    struct.pack_into('>I', header, 4, SEGMENT+start)
+    output.extend(header)
+    relocations.append(dict(offset=start+size+4, target_offset=start))
+    output.extend(bytes(-len(output)%16))
+    if start+len(output) >= 0x1000000:
+        raise ValueError('Skeleton object exceeds a segmented address range')
+    return bytes(output), dict(segment=SEGMENT, joints=description['joints'],
+        shown_joints=description['shown_joints'], relocations=relocations,
+        joint_table=dict(**table, native_offset=start, output_sha256=sha256(output[:size])),
+        header=dict(**description['header'], native_offset=start+size,
+                    output_sha256=sha256(header)), runtime_installed=False)

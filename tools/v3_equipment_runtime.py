@@ -92,7 +92,8 @@ def prepared_resources(source, art_path):
             or art['source_symbols_sha256']!=sha256(source.symbols.encode())):
         raise ValueError('Changed handheld artwork source/format')
     inventory=scan(source)
-    rows={r['shape_index']:r for r in inventory['rows'] if r['asset_ready']}
+    rows={r['shape_index']:r for r in inventory['rows']
+          if r['asset_ready'] and r['category']=='static-held-model'}
     assets={};receipts=[]
     for row in art['objects']:
         index=row['shape_index']

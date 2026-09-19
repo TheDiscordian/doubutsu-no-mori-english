@@ -416,29 +416,109 @@ def descriptor(row):
                 models={'opaque':(model['symbol'],model['offset'],model['bytes'])})
 
 
+def rig_descriptor(row, rig):
+    """Follow every shown joint, deduplicating shared roots without flattening."""
+    root = row['model_root']
+    if (row['category'] != 'animated-held-model' or row.get('data_type') != 1 or
+            (root['symbol'], root['offset'], root['bytes']) !=
+            (rig['header']['symbol'], rig['header']['donor_offset'], rig['header']['bytes'])):
+        raise ValueError('Animated handheld root does not match its complete skeleton')
+    models, labels, bindings = {}, {}, []
+    for joint in rig['rows']:
+        if 'model' not in joint:
+            continue
+        model = joint['model']; at = model['donor_offset']
+        if at not in labels:
+            label = 'joint'+str(joint['index']); labels[at] = label
+            models[label] = model['symbol'], at, model['bytes']
+        bindings.append(dict(joint_index=joint['index'], model_label=labels[at]))
+    return dict(kind='animated-held-model', shape_index=row['shape_index'],
+                skeleton=rig, joint_models=bindings, models=models)
+
+
 def scan(source):
     from v3_furniture_pipeline import prepare_models
     from v3_event_acquisition import annotate
+    from v3_keyframes import compile_animations
     report=discover(source)
     annotate(report,source)
+    motions=motion(source)
+    animation_sizes={i:len(compile_animations(source,[{k:v for k,v in r.items() if k!='resource_type'}])[0])
+                     for i,r in motions['equipment_animations'].items()}
+    motion_parents={r['item_id']:r for r in motions['parents']}
     prepared={}
     for row in report['rows']:
         row['asset_ready']=False
-        if row['category']!='static-held-model':continue
+        if row['category'] not in ('static-held-model','animated-held-model'):continue
         index=row['shape_index']
         if index not in prepared:
             try:
-                _,body,resources,_,models,_,sections=prepare_models(source,descriptor(row))
-                prepared[index]=dict(asset_ready=True,object_bytes=(len(body)+sum(n for _,n in sections)+15)&~15,
+                rig = motions['skeletons'][index] if row['data_type']==1 else None
+                desc = rig_descriptor(row,rig) if rig else descriptor(row)
+                _,body,resources,_,models,_,sections=prepare_models(source,desc)
+                artwork_bytes=(len(body)+sum(n for _,n in sections)+15)&~15
+                total=artwork_bytes+((rig['joint_table']['bytes']+8+15)&~15 if rig else 0)
+                prepared[index]=dict(asset_ready=True,object_bytes=total,
                     vertices=sum(r['bytes']//16 for r in resources if r['kind']=='vertices'),
                     triangles=sum(len(r.get('triangles',[])) for m in models.values() for r in m['rows']),
                     reason=PENDING)
+                if rig:
+                    variants=motion_parents[row['item_id']]['animation_resources']
+                    maximum=max(animation_sizes[i] for i in variants)
+                    prepared[index].update(joints=rig['joints'],shown_joints=rig['shown_joints'],
+                        artwork_bytes=artwork_bytes,maximum_animation_bytes=maximum,
+                        maximum_model_animation_bytes=total+maximum)
             except ValueError as error:
                 prepared[index]=dict(asset_ready=False,reason=str(error))
         row.update(prepared[index])
+        if row['category']=='animated-held-model':row['motion_binding']=motion_parents[row['item_id']]
     report['counts']=dict(Counter(r['category'] for r in report['rows']))
     report['counts']['prepared_model_roots']=sum(r['asset_ready'] for r in prepared.values())
     report['counts']['usable_imports']=0
+    return report
+
+
+def convert_rigs(source,output,selected=()):
+    """Compile the supported animated category through shared graphics and rigs."""
+    from v3_furniture_pipeline import prepare_models,compile_models
+    from v3_keyframes import compile_skeleton
+    inventory=scan(source);requested=set(selected)
+    candidates=[r for r in inventory['rows'] if r['category']=='animated-held-model'
+                and (not requested or r['item_id'] in requested)]
+    if requested and (requested!={r['item_id'] for r in candidates} or
+                      any(not r['asset_ready'] for r in candidates)):
+        raise ValueError('Unsupported or unknown selected animated handheld item')
+    candidates=[r for r in candidates if r['asset_ready']]
+    if not candidates:raise ValueError('No supported animated handheld models')
+    motions=motion(source)
+    # Preflight every complete object before creating an output directory.
+    prepared={i:prepare_models(source,rig_descriptor(next(r for r in candidates if r['shape_index']==i),
+        motions['skeletons'][i])) for i in sorted({r['shape_index'] for r in candidates})}
+    output.mkdir(parents=True,exist_ok=False);objects=[]
+    for index,part in prepared.items():
+        parents=[r for r in candidates if r['shape_index']==index]
+        key=f'data-{index:04X}';directory=output/key;directory.mkdir()
+        artwork,locations,models,sequence=compile_models(directory,part)
+        if sequence is not None:raise ValueError('Animated joints cannot use a flattened draw sequence')
+        roots={root[1]:locations[label] for label,root in part[0]['models'].items()}
+        suffix,rig=compile_skeleton(source,motions['skeletons'][index],roots,start=len(artwork))
+        asset=artwork+suffix
+        if len(asset)!=parents[0]['object_bytes']:
+            raise ValueError('Animated compilation differs from shared preflight')
+        filename=key+'.n64obj.bin';write_new(output/filename,asset)
+        objects.append(dict(shape_index=index,resource_type=1,parent_item_ids=[r['item_id'] for r in parents],
+            profile=part[0],resources=part[2],models=models,model_offsets=locations,
+            artwork_bytes=len(artwork),skeleton=rig,root_offset=rig['header']['native_offset'],
+            motion_bindings=[r['motion_binding'] for r in parents],
+            maximum_animation_bytes=parents[0]['maximum_animation_bytes'],
+            maximum_model_animation_bytes=parents[0]['maximum_model_animation_bytes'],
+            object_file=filename,object_bytes=len(asset),object_sha256=sha256(asset)))
+        print(json.dumps(dict(converted=key,parents=[r['item_id'] for r in parents],bytes=len(asset))),flush=True)
+    report=dict(format='AFV3-ANIMATED-HELD-PREPARED-1',version=1,
+        source_rel_sha256=inventory['source_rel_sha256'],source_symbols_sha256=inventory['source_symbols_sha256'],
+        objects=objects,runtime_installed=False,selectable=False,pending_reason=PENDING)
+    write_new(output/'inventory.json',(json.dumps(inventory,indent=2)+'\n').encode())
+    write_new(output/'art.json',(json.dumps(report,indent=2)+'\n').encode())
     return report
 
 
@@ -450,11 +530,14 @@ def convert(source,output,selected=(),*,category=None):
     if category == 'held-motion':
         if selected:raise ValueError('Held-motion preparation uses the complete source dependency bundle')
         return convert_motion(source,output)
+    if category == 'animated-held-model':
+        return convert_rigs(source,output,selected)
     if category not in (None,'static-held-model'):
         raise ValueError('Unsupported handheld conversion category')
     inventory=scan(source)
     requested=set(selected)
-    candidates=[r for r in inventory['rows'] if not requested or r['item_id'] in requested]
+    candidates=[r for r in inventory['rows'] if r['category']=='static-held-model'
+                and (not requested or r['item_id'] in requested)]
     if requested and (requested!={r['item_id'] for r in candidates} or
                       any(not r['asset_ready'] for r in candidates)):
         raise ValueError('Unsupported or unknown selected handheld item')
