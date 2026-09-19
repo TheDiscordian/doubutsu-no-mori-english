@@ -13,32 +13,33 @@ resolution, bounded writes, and code relocation pass; the native rendering
 comparison remains incomplete after two fixture-setup failures. Original-hardware
 appearance still needs confirmation. See the [checkpoint](checkpoints/MUSEUM_LETTER_HEADERS.md)
 for exact checks, limits, hashes, and the pending V3 integration. V3's current
-locked ROM remains ABI 106; this V2 fix does not replace its no-import baseline.
+locked ROM is tracked below; this V2 fix does not replace its no-import baseline.
 
 ## Active development
 
-Current ABI 106 at `build/v3-held-parent-readers-01/` connects shared parent
-names/prices and selected equipment for all eight fan records. The same importer
-derives official names, prices, source categories, and canonical collection
-identities from checked donor tables. All eight names have official credits in
-the single provenance catalogue. No item-specific installer or option list is
-added. No fan profile bit or browser choice is enabled.
+Current ABI 107 at `build/v3-held-pocket-icons-01/` connects shared pocket icons
+for all eight installed fan parent records. Complete source artwork, palette,
+and native drawing are used without resizing or substitute icons. Names/prices,
+equipment relationships, and official credits remain installed. No item-specific
+installer or option list is added. No fan profile bit or browser choice is enabled.
 
-Four focused checks pass across the recorded commands, including sanitizer
-coverage of the parent readers and existing display wrapper. The combined silent
-native check passes 112 records with 98 assertions: actual native item selection,
-independent enabled/disabled fan bits, complete English names, donor prices,
-bounded name writes, passive/scene/hidden/force-visible rules, restored state,
-guards, and checkpoint. Twelve current composition checks pass, including exact
-no-import V2 output. The [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-parent-name-and-price-readers)
-records the initial harness failure and corrected retry; no game-code retry or
-old-build replay is required.
+Four focused checks and twelve current composition checks pass, including
+complete icon pixels/colours, sanitizer bounds, relocations, patch reconstruction,
+saved-profile selection, and exact no-import V2 output. Native loaded-owner
+relocation, full-register preservation, and independent selected/disabled fan
+drawing pass. The native run is incomplete: a fixture address comparison stops
+at an unchanged gift icon after nine passing assertions. Its correction is
+retained without another retry. Native control cases, final guards/checkpoint,
+ordinary inventory appearance, and hardware remain unverified. See the
+[checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-pocket-icons).
 
-Next integrate inventory/ground categories, menu/icon readers, and the inventory
-screen's separate player-item model selector/draw tables. The donor fan category
-is 43, absent from the native equipment table; it must not be substituted with
-generic tools or umbrellas. Acquisition, context-correct collection/catalogue,
-optional composition, ordinary take-out/put-away, and persistence remain work.
+Next integrate the inventory screen's separate player-item selector, resource
+ownership, shape/animation tables, and draw callback. Remaining inventory/ground
+category consumers still require support. Source fan category 43 is distinct
+from the donor menu's ID-derived tool category two; do not use it as an unchecked
+native menu index. Acquisition, context-correct collection/catalogue, optional
+composition, ordinary take-out/put-away, and persistence remain work. Carry the
+museum-header correction into V3 before a handoff; both V2 patchers stay unchanged.
 
 ABI 104 registers fan action 109's complete setup/main/net-reset group and its
 four ordinary input polls through the shared importer. A complete core-bound

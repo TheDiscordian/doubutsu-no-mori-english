@@ -69,10 +69,80 @@ SOURCES = ('tools/v3_player_actions.py','tools/v3_furniture_pipeline.py',
            'overlays/v3/player_actions.S','overlays/v3/player_actions.c',
            'overlays/v3/player_actions.ld','overlays/v3/held_selection.c',
            'overlays/v3/held_items.c','overlays/v3/held_items.ld',
+           'overlays/v3/held_icon.S',
            'tools/v3_handheld_items.py') + sound_programs.SOURCES
 
 SELECTION_OFFSET=0x5500
 PARENT_CODE_OFFSET,PARENT_TABLE_OFFSET=0x3000,0x57F0
+POCKET_ICON_OFFSET=0x3800
+
+
+def refresh_pocket_icons(base,prior,blob,core,original,output):
+    """Install shared source-discovered pocket artwork and its native reader."""
+    from v3_handheld_items import pocket_icons
+    from v3_npc_clothing import guard_incoming
+    import v3_furniture_icon as icon
+    old=prior['equipment_resources'];at=old['blob_offset']
+    module=bytearray(blob[at:at+old['bytes']])
+    if old.get('pocket_icons') or sha256(module)!=old['sha256']:
+        raise ValueError('Pocket icon readers already installed or module changed')
+    parents=old['parent_readers'];existing=parents['code']
+    if (sha256(module[PARENT_CODE_OFFSET:PARENT_CODE_OFFSET+existing['bytes']])!=existing['sha256']
+            or any(module[PARENT_CODE_OFFSET+existing['bytes']:TABLE_OFFSET])):
+        raise ValueError('Pocket icon reservation overlaps existing equipment code/data')
+    source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+                  (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    data,receipt=pocket_icons(source,old,RAM+POCKET_ICON_OFFSET,TABLE_OFFSET-POCKET_ICON_OFFSET)
+    files,native=by_vrom(base),by_vrom(original)
+    owner=bytearray(files[icon.VROM].extract(base));rel=files[icon.RELOC].extract(base)
+    sections=struct.unpack_from('>5I',rel)
+    if sections!=icon.SECTIONS or sha256(rel)!=icon.RELOC_SHA:
+        raise ValueError('Changed native pocket icon owner relocations')
+    restored=bytearray(owner)
+    if struct.unpack_from('>2I',restored,icon.START-icon.RAM)!=(jump(0x8046AB00),0):
+        raise ValueError('Changed installed furniture icon reader')
+    struct.pack_into('>2I',restored,icon.START-icon.RAM,0x00194B03,0x24010001)
+    first,last=0x8085C7B8-icon.RAM,0x8085CE18-icon.RAM
+    native_owner=native[icon.VROM].extract(original)
+    if restored[first:last]!=native_owner[first:last]:
+        raise ValueError('Changed complete native inventory icon selection/drawing')
+    hook=0x8085C954-icon.RAM
+    if struct.unpack_from('>2I',owner,hook)!=(0x3C0F8086,0x25EFDD68):
+        raise ValueError('Changed native tool descriptor lookup')
+    guard_incoming(bytes(owner),sections[0],icon.RAM,[(hook,8)])
+    records=list(struct.unpack_from('>'+str(sections[4])+'I',rel,20))
+    removed=[0x45000000|hook,0x46000000|(hook+4)]
+    if any(records.count(word)!=1 for word in removed):
+        raise ValueError('Missing native tool descriptor HI/LO relocations')
+    code,compiled=compile_part('held_items',output/'held_items',
+        extra_sources=('overlays/v3/held_icon.S',),defines=('AF_V3_POCKET_ICONS',
+            f'AF_V3_HELD_SELECTED=0x{old["player_actions"]["code"]["symbols"]["af_v3_player_selected_equipment"]:08X}u'))
+    if (len(code)>POCKET_ICON_OFFSET-PARENT_CODE_OFFSET
+            or compiled['symbols']['af_v3_held_item_price']!=RAM+PARENT_CODE_OFFSET+0x100
+            or compiled['symbols']['af_v3_held_item_icon']!=RAM+PARENT_CODE_OFFSET+0x200):
+        raise ValueError('Pocket icon code exceeds its fixed parent-reader allocation')
+    target=compiled['symbols']['af_v3_held_icon_hook']
+    before=bytes(owner[hook:hook+8]);struct.pack_into('>2I',owner,hook,jump(target),0)
+    kept=[word for word in records if word not in removed]
+    relocation=struct.pack('>5I',*sections[:4],len(kept))+struct.pack('>'+str(len(kept))+'I',*kept)
+    relocation+=bytes(len(rel)-len(relocation)-4)+struct.pack('>I',len(rel))
+    module[PARENT_CODE_OFFSET:PARENT_CODE_OFFSET+existing['bytes']]=bytes(existing['bytes'])
+    module[PARENT_CODE_OFFSET:PARENT_CODE_OFFSET+len(code)]=code
+    module[POCKET_ICON_OFFSET:POCKET_ICON_OFFSET+len(data)]=data
+    receipt.update(code=compiled,code_offset=PARENT_CODE_OFFSET,table_offset=POCKET_ICON_OFFSET,
+        owner_vrom=icon.VROM,owner_ram=icon.RAM,owner_sha256=sha256(owner),
+        native_consumer_sha256=sha256(native_owner[first:last]),
+        previous_owner_sha256=sha256(files[icon.VROM].extract(base)),
+        relocation_vrom=icon.RELOC,relocation_sha256=sha256(relocation),
+        removed_relocations=removed,hook=dict(address=icon.RAM+hook,target=target,
+            before=before.hex(),after=owner[hook:hook+8].hex()),
+        original_umbrella_branch_retained=True,missing_imports_draw_nothing=True,
+        saved_format_changed=False,additional_resident_bytes=0,native_tested=False)
+    report=copy.deepcopy(old);report['pocket_icons']=receipt
+    report['parent_readers']['code']=compiled
+    report.update(sha256=sha256(module),crc32=zlib.crc32(module))
+    blob[at:at+len(module)]=module
+    return report,{icon.VROM:bytes(owner),icon.RELOC:relocation}
 
 
 def refresh_parent_readers(base,prior,blob,core,original,output):
@@ -654,6 +724,8 @@ def expanded_tables(source,owner,reloc,*,categories=CATEGORIES,native_count=NATI
 def install(base,prior,blob,core,original,output):
     old=prior.get('equipment_resources',{})
     if old.get('player_actions'):
+        if old.get('parent_readers'):
+            return refresh_pocket_icons(base,prior,blob,core,original,output)
         if old['player_actions'].get('equipment_selection'):
             return refresh_parent_readers(base,prior,blob,core,original,output)
         if old['player_actions'].get('fan_activation'):

@@ -83,7 +83,12 @@ descriptors. It uses the existing metadata wrapper and reserved equipment memory
 without shifting action callbacks or creating item-specific scripts. Official
 name credits retain their actual donor table/index in the single provenance
 catalogue. The source inventory category is recorded but is not installed as an
-unchecked native menu/icon index; those consumers and acquisition remain work.
+unchecked native category index. The same refresh discovers complete pocket
+icons from those installed parent records, deduplicates and converts their donor
+artwork, and connects the selected-only native tool-icon reader. It preserves
+gift/umbrella priority and original descriptors without growing any allocation.
+Source category 43 is distinct from the ID-derived tool menu category two;
+remaining category consumers and acquisition still require integration.
 The table converter also extends the two held-item main/draw tables, preserving
 all original tools. Source static-held drawing uses the existing equipment
 resources and native outer draw setup. Unimplemented rig categories retain null

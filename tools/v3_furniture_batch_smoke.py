@@ -27,9 +27,133 @@ def representatives(rows):
     return result
 
 
+def pocket_icons(debug, rom_path, record):
+    """Actual loaded submenu drawing for one shared imported icon category."""
+    from v3_furniture_icon import VROM, RELOC, RAM, RESIDENT
+    from runtime_layout import TEST_STACK
+    from v3_furniture_room_smoke import extend
+    path=Path(rom_path);image=path.read_bytes()
+    report=json.loads((path.parent/'build.json').read_bytes())
+    equipment=report['equipment_resources'];icons=equipment['pocket_icons']
+    if sha256(image)!=report['output_sha256']:
+        raise ValueError('Pocket-icon probe requires its exact current cartridge')
+    files,boot=by_vrom(image),boot_proofs(image)
+    blob=files[runtime.BLOB].extract(image);start=equipment['blob_offset']
+    module=blob[start:start+equipment['bytes']]
+    def check(label,at,expected):
+        actual=debug.read_memory(at,len(expected))
+        record(dict(pocket_icon_check=label,address=f'{at:08X}',bytes=len(expected),
+                    assertion='passed' if actual==expected else 'failed'))
+        if actual!=expected:raise ValueError('Pocket-icon mismatch: '+label)
+    def call(at,args=(),proof=None):
+        result=debug.call(f'{at:08X}',list(args),return_address=MODULE_RAM+0x6480,
+                          verified_code=proof or boot.get(at))
+        record(result);return result['return_value']
+    def put(at,*words):debug.write_memory(at,struct.pack('>'+str(len(words))+'I',*words))
+    check('complete equipment module and resources',0x804A3000,module)
+    check('original selected profile',0x80460020,blob[0x20:0xE0])
+    saved={at:debug.read_memory(at,n) for at,n in ((0x8010DCEC,4),(0x80460020,192))}
+    size=0x18000;allocation=call(0x8009BFC0,[size])
+    if allocation&15 or not MODULE_RAM+0x8000<=allocation<=0x80400000-size:
+        raise ValueError('Pocket-icon fixture allocation outside native heap')
+    root,graph,gfx,stack=(allocation+n for n in (16,0x14000,0x14600,0x16800))
+    debug.write_memory(allocation,bytes(size))
+    guards=(allocation,graph-16,gfx-16,gfx+0x1000,stack-0x800,stack+0x200,
+            allocation+size-16,TEST_STACK-0x800,TEST_STACK+0x40)
+    edge=b'V3PI'*4
+    for at in guards:debug.write_memory(at,edge)
+    data,rel=(files[v].extract(image) for v in (VROM,RELOC))
+    if sha256(data)!=icons['owner_sha256'] or sha256(rel)!=icons['relocation_sha256']:
+        raise ValueError('Changed pocket-icon parent binding')
+    sections=struct.unpack_from('>5I',rel)
+    loaded=relocate_verified_data(SimpleNamespace(ram=RAM,resident_bytes=RESIDENT,sections=sections),
+                                 data,rel,root,address_constants=(RAM+RESIDENT,))
+    call(0x800262D0,[VROM,VROM+len(data),RAM,RAM+RESIDENT,root,root+RESIDENT,len(rel)])
+    check('complete actual loaded parent and BSS',root,loaded)
+    proof=(root,loaded[:sections[0]])
+    selection={r['item_id']:r for r in equipment['parent_readers']['rows']}
+    rows=icons['rows'];first,second=rows[0],rows[-1]
+    def selected(row):
+        profile=bytearray(saved[0x80460020])
+        for p in selection.values():profile[p['profile_byte']]&=~p['profile_mask']
+        if row:
+            p=selection[row['item_id']];profile[p['profile_byte']]|=p['profile_mask']
+        debug.write_memory(0x80460020,profile)
+    try:
+        put(0x8010DCEC,root);selected(first)
+        # Exercise the installed hook with live upper GPR halves and HI/LO.
+        before=debug.command('g')
+        regs=[int(before[i:i+16],16) for i in range(0,len(before),16)]
+        if len(regs)!=71 or regs[37]&0xFFFFFFFF!=0x800D334C:
+            raise ValueError('Pocket-icon hook requires paused native game frame')
+        for i in range(1,32):
+            if i not in (26,27):regs[i]=(0x13579000+i)<<32|(0x2468A000+i)
+        item=int(first['item_id'],16)
+        regs[16],regs[14]=item,(item&255)*8
+        regs[29],regs[37]=extend(stack),extend(root+icons['hook']['address']-RAM)
+        regs[33],regs[34]=0x123456789ABCDEF0,0xFEDCBA9876543210
+        target=root+0x8085C95C-RAM;bp=f'0,{target:x},4'
+        if debug.command('Z'+bp)!='OK':raise ValueError('Pocket-icon breakpoint refused')
+        try:
+            if debug.command('G'+''.join(f'{r:016x}' for r in regs))!='OK':
+                raise ValueError('Pocket-icon register write refused')
+            stopped=debug.command('c');raw=debug.command('g')
+            actual=[int(raw[i:i+16],16) for i in range(0,len(raw),16)]
+            wanted=regs.copy();wanted[15]=extend(first['descriptor_ram']-regs[14])
+            changed={str(i):[f'{wanted[i]:016X}',f'{actual[i]:016X}']
+                     for i in (*range(26),28,29,30,31,33,34,*range(38,70)) if wanted[i]!=actual[i]}
+            passed=not changed and stopped[:3] in ('T05','S05') and actual[37]&0xFFFFFFFF==target
+            record(dict(pocket_icon_register_window=first['item_id'],differences=changed,
+                        assertion='passed' if passed else 'failed'))
+            if not passed:raise ValueError('Pocket-icon hook changed unrelated registers or continuation')
+        finally:
+            debug.command('z'+bp);debug.command('G'+before)
+        cases=((first,first,0),(second,first,0),(second,second,0),(first,None,0),
+               (first,None,1),(0x2200,None,0),(0x2223,None,0))
+        segments=debug.read_memory(0x801458A0,64)
+        segment_bases=struct.unpack('>16I',segments)
+        for row,enabled,wrapped in cases:
+            selected(enabled);item=int(row['item_id'],16) if isinstance(row,dict) else row
+            debug.write_memory(gfx,bytes(0x1000));put(graph+0x298,gfx,gfx+0x1000)
+            call(root+0x8085C7B8-RAM,[graph,0,0,0x3F800000,item,wrapped,1,wrapped,0],proof)
+            end=int.from_bytes(debug.read_memory(graph+0x298,4),'big')
+            if not gfx<=end<=gfx+0x1000 or (end-gfx)%8:
+                raise ValueError('Pocket icon escaped its private graphics arena')
+            commands=debug.read_memory(gfx,end-gfx) if end!=gfx else b''
+            pointers=[b&0x1FFFFFFF for a,b in struct.iter_unpack('>2I',commands) if a>>24==0xFD]
+            if isinstance(row,dict) and not wrapped:
+                expected=([row['palette']&0x1FFFFFFF,row['texture']&0x1FFFFFFF]
+                          if enabled==row else [])
+            else:
+                # Native gifts take priority; original tools/umbrellas retain their table.
+                descriptor=0x8085DD18 if wrapped else 0x8085DD68 if item==0x2200 else 0x8085DD88
+                # Lib_SegmentedToVirtual resolves original artwork through its
+                # segment; a segmented 0Cxxxxxx pointer is not a physical one.
+                expected=[((v&0xFFFFFF)+segment_bases[(v>>24)&15])&0x1FFFFFFF
+                          for v in struct.unpack_from('>2I',loaded,descriptor-RAM)]
+            passed=pointers==expected and (bool(commands)==bool(expected))
+            record(dict(pocket_icon_draw=f'{item:04X}',selected=enabled['item_id'] if enabled else None,
+                        wrapped=wrapped,commands=len(commands)//8,texture_pointers=pointers,
+                        expected_pointers=expected,assertion='passed' if passed else 'failed'))
+            if not passed:raise ValueError('Pocket icon drew an incorrect resource or disabled item')
+        check('complete parent retained',root,loaded)
+        check('equipment resources retained',0x804A3000,module)
+        check('native segment bases retained',0x801458A0,segments)
+        for at in guards:check('private memory guard',at,edge)
+        check('translation guard',0x8019C8D0,bytes.fromhex('AF32C0DE')*4)
+        check('no faulted thread',0x8003CE34,bytes(4))
+    finally:
+        for at,value in saved.items():debug.write_memory(at,value)
+        call(0x8009C040,[allocation])
+    for at,value in saved.items():check('restored current parent/profile',at,value)
+    return dict(native_pocket_icon_cases=len(cases),register_windows=1,gpu_rendered=False,
+                ordinary_inventory_tested=False,save_reload_tested=False,requires_checkpoint_restore=True)
+
+
 def exercise(debug, rom_path, record, *, section='automatic_furniture'):
     if section=='equipment_resources':return equipment_resources(debug,rom_path,record)
     if section=='player_motion':return player_motion(debug,rom_path,record)
+    if section=='pocket_icons':return pocket_icons(debug,rom_path,record)
     path = Path(rom_path)
     image = path.read_bytes()
     report = json.loads((path.parent / 'build.json').read_bytes())

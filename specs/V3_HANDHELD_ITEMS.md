@@ -404,11 +404,11 @@ No owner, table, or audio allocation moves for this update.
 
 ### Selected equipment and visibility
 
-This implementation is in unpromoted ABI 105 at `build/v3-held-selection-01/`.
-The checked main lock remains ABI 104. Host/cartridge checks pass, but the native
-probe stops on two independently identified fixture errors before imported
-selection/visibility executes. The fixture corrections are retained for the next
-meaningful inventory integration batch; neither missing result is claimed passed.
+Selected equipment is installed in the current locked development cartridge.
+Host/cartridge checks and the combined parent-reader native check establish
+actual selection, independent profile bits, and passive/scene/visibility rules.
+The checkpoint retains the exact tested builds and initial fixture failures.
+Ordinary inventory gameplay is separate from these component checks.
 
 The native player selector at `808BD3F8..808BD583` reads ordinary saved equipment
 at player-private offset `3EC`, or title-demo equipment at controller offset
@@ -500,17 +500,21 @@ Name writes require a non-null destination with at least sixteen bytes; wider
 item-name arguments reject. Prices retain the native sixteen-bit argument rule.
 
 Shared reader entry points are `804A6000` for names and `804A6100` for prices.
-Their 512-byte image uses existing unused action-module space. Player action
-code is bounded below `804A6000`; parent-reader code is bounded below the action
-tables at `804A7000`. Existing action callbacks and owner relocation do not move.
+Their entries share the 1,284-byte parent/icon image in existing action-module
+space. Player action code is bounded below `804A6000`; parent/icon code is bounded
+below the icon data at `804A6800`. Existing action callbacks and player-owner
+relocation do not move.
 The 696-byte display wrapper delegates only the new parent range to these
 entries, keeping native items and existing furniture/clothing paths intact.
 No permanent allocation, model/animation resource, or saved field grows.
 
-The donor gives fans item category 43. The native `mNT_get_itemTableNo` has a
-36-entry equipment table, and its menu/icon consumers need explicit category
-support before fans become inventory choices. Do not substitute generic tools,
-umbrellas, or furniture leaves for that work. The inventory-screen player model
+The donor gives fans item category 43. This is not the ID-derived menu category:
+`mTG_select_tag_decide_item_normal` uses `(item >> 8) & 15`, so fans use tool
+menu category two. Retain that source menu behaviour; do not install 43 as a
+menu index. The native `mNT_get_itemTableNo` has a 36-entry equipment table and
+still needs explicit support for extended IDs and its actual consumers. The
+separate pocket-icon reader is connected below. Do not replace fan artwork with
+umbrellas or furniture leaves. The inventory-screen player model
 also has its own item selector, kind tables, and draw callback: source
 `m_inventory_ovl.c` functions `mIV_Get_player_item_shape_index` and
 `mIV_pl_shape_item_draw_fan`. The world-player action/draw adapter does not
@@ -521,3 +525,38 @@ acquisition, context-correct catalogue/collection, optional selection, and
 ordinary persistence remain required before enabling new handheld items.
 Original tools must not be duplicated as imports. Preserve existing ROMs/saves
 and both V2 patchers.
+
+## Shared pocket icons
+
+`pocket_icons` consumes the installed parent records and complete donor
+`tool_tex_table$765`, including every palette/texture relocation and its
+category-table binding. Full drawing consumers are source-bound. All eight fans
+point to the same source icon: `inv_mwin_utiwa_pal` and `inv_mwin_utiwa_tex`.
+The converter deduplicates by source address and resource kind, preserving all
+1,024 CI4 indices and sixteen colours. GX tiles become linear N64 CI4 and RGB5A3
+becomes RGBA5551 through the existing converters. Partial alpha and incomplete
+resources reject; there is no resizing or placeholder artwork.
+
+`AFIC` version one starts at `804A6800`: four header words contain magic
+`41464943`, version, count 56, and stride eight. Descriptors cover `2224..225B`,
+with zero records for absent parents. Each contains an absolute palette pointer
+and texture pointer. Deduplicated resources follow on 32-byte boundaries; the
+complete block occupies 1,024 bytes within the existing 2-KiB reservation.
+The reader at `804A6200` requires the same selected/ready parent as names/prices,
+valid header, eight-byte alignment, and complete resources within the reservation.
+
+The native submenu hook replaces the two tool-table address instructions at
+`8085C954..8085C958`. It removes only their HI/LO relocations, retaining the
+560-byte relocation allocation and all other owner bytes. Native tools retain
+their descriptors, and earlier umbrella, gift, fossil, and gyroid branches keep
+priority. Selected imports return the source icon; missing/disabled parents
+skip drawing instead of indexing past the short native table. Full-width GPRs,
+HI/LO, floating-point state, and the existing drawing arguments are retained.
+Continuation addresses resolve against the currently loaded submenu owner.
+
+The shared parent/icon code occupies 1,284 bytes below `804A6800`; name and price
+entry addresses stay fixed. The complete equipment module remains 24 KiB and
+uses its existing startup checksum/DMA. No allocation, action table, model,
+animation, saved format, or profile bit changes. No fan becomes selectable here.
+See the [checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-pocket-icons)
+for component evidence and the remaining native control/guard/render checks.

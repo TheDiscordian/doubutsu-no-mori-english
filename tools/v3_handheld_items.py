@@ -28,6 +28,61 @@ PENDING = ('Prepared held artwork only; native equipment selection, player actio
            'inventory/ground readers, acquisition, catalogue/collection, and saved-profile integration remain.')
 
 
+def pocket_icons(source, equipment, address, capacity):
+    """Resolve complete donor tool icons for the installed parent category records."""
+    from title_assets import pack4, untile
+    from v3_villager_art import native_palette
+    _, parents = parent_records(source, equipment)
+    if not equipment.get('parent_readers') or parents['rows'] != equipment['parent_readers']['rows']:
+        raise ValueError('Pocket icons require the installed source-derived parents')
+    functions = []
+    for at, size, digest in (
+            (0x27DDCC,1364,'6d4d8f5f7c64617bb068d63f77b0b776010670245f113ef466e9494b712c7738'),
+            (0x27E320,672,'e357f68f7a995bf8f989c6fb7da6ad47f803b151b1ab9c34662eae8f0b9f1814')):
+        raw, receipt = source.function(at)
+        if len(raw) != size or sha256(raw) != digest:
+            raise ValueError('Changed complete donor pocket icon consumer')
+        functions.append(receipt)
+    at, size = source.symbol('tool_tex_table$765')
+    pointers = source.pointers(at, size)
+    owner, owner_size = source.symbol('item_tex_data_table$779')
+    if (size != 92*8 or source.raw('tool_tex_table$765') != bytes(size)
+            or set(pointers) != set(range(at, at+size, 4)) or owner_size != 64
+            or source.pointers(owner, owner_size).get(owner+8) != at):
+        raise ValueError('Changed complete tool pocket icon table or category binding')
+    data = bytearray(struct.pack('>4I',0x41464943,1,56,8)+bytes(56*8))
+    resources, offsets, rows = [], {}, []
+    for parent in parents['rows']:
+        item = int(parent['item_id'],16); index = item-0x2200
+        pair = []
+        for lane, kind, n in ((0,'palette',32),(4,'texture',512)):
+            target = pointers[at+index*8+lane]
+            symbol, begin, length = source.containing(target, exact=True)
+            if begin != target or length != n or source.pointers(target,n):
+                raise ValueError('Pocket icon resource is not a complete CI4 icon')
+            key = (target,kind)
+            if key not in offsets:
+                raw = source.data[target:target+n]
+                converted = native_palette(raw) if kind == 'palette' else pack4(untile(raw,32,32,4))
+                data.extend(bytes(-len(data)%32)); offset = len(data)
+                offsets[key] = offset; data.extend(converted)
+                resources.append(dict(symbol=symbol,donor_offset=target,kind=kind,bytes=n,
+                    offset=offset,ram=address+offset,source_sha256=sha256(raw),sha256=sha256(converted)))
+            pair.append(address+offsets[key])
+        slot = item-0x2224
+        struct.pack_into('>2I',data,16+slot*8,*pair)
+        rows.append(dict(id=parent['id'],item_id=parent['item_id'],source_index=index,
+            descriptor_ram=address+16+slot*8,palette=pair[0],texture=pair[1],
+            menu_category=(item>>8)&15,source_type=parent['source_type'],selectable=False))
+    if address & 31 or len(data)>capacity:
+        raise ValueError('Pocket icon resources exceed the shared reservation')
+    return bytes(data),dict(format='AFV3-POCKET-ICONS-1',rows=rows,resources=resources,
+        source_functions=functions,source_table=dict(symbol='tool_tex_table$765',offset=at,bytes=size,
+            pointers=pointers),ram=address,bytes=len(data),sha256=sha256(data),
+        width=32,height=32,format_native='CI4/RGBA5551',profile_bits_enabled=0,
+        original_tools_retained=36,ordinary_inventory_tested=False)
+
+
 def parent_records(source, equipment):
     """Names/prices for implemented equipment categories; never enable an item."""
     _,selection=selection_records(source,equipment)

@@ -2,26 +2,32 @@
 
 ## Active: V3 optional GameCube imports
 
-Current ABI 106 is `build/v3-held-parent-readers-01/`, pinned by the main build
-lock. The shared importer connects source-derived parent names/prices and the
-eight fan equipment/profile relationships. Four focused checks, the combined
-112-record/98-assertion native run, and twelve current composition checks pass.
-No allocation, saved format, profile bit, or selectable identity changes.
-Preserve the unchanged action/held-draw/sound evidence. See the
-[checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-parent-name-and-price-readers).
+Current ABI 107 is `build/v3-held-pocket-icons-01/`, pinned by the main build
+lock. The shared importer connects complete donor pocket artwork for all eight
+fan parent records. Four focused and twelve current composition checks pass.
+Native imported selection/drawing and full-register preservation pass; native
+gift/tool/umbrella controls and end-of-fixture guards/restoration remain
+unverified after the bounded fixture attempts. The address-comparison correction
+is retained, not rerun. No allocation, saved format, profile bit, or selectable
+identity changes. Preserve existing selector/name/price/action/draw/sound evidence.
+See the [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-pocket-icons).
 
-Next, extend the shared inventory category/menu/icon consumers and the separate
-inventory-screen equipment owner from donor category records. Source fans have
-category 43; native `mNT_get_itemTableNo` has only 36 equipment entries. Do not
-map fans to generic tools or umbrellas. The donor inventory owner also uses its
-own item/shape/animation tables and static fan draw callback; the world-player
-adapter does not update those automatically. Reuse the complete held resources.
+Next, extend the separate inventory-screen equipment owner from donor category
+records: its item selector, kind/shape/animation tables, resource ownership, and
+static held draw callback. Reuse the complete held resources. Then connect the
+remaining inventory/ground category consumers. Source fan category 43 belongs
+to the item-type reader, not the action menu; the donor menu uses ID-derived
+tool category two. Native `mNT_get_itemTableNo` still has only 36 equipment
+entries. Do not insert source 43 into unrelated native tables or use umbrella
+artwork. The world-player adapter does not update inventory preview automatically.
 
 Then connect source acquisition, context-correct catalogue/collection, and
 optional composition through the same descriptors. Keep ordinary take-out/
 put-away, full scene drawing, persistence, and equipped-fan use explicit;
 native direct-reader checks do not establish ordinary inventory gameplay.
 No further selector/name/price native replay is needed without a relevant change.
+Carry the V2 museum letter-header correction into V3 through checked composition
+before its next handoff; the current lock and import-free path retain V2-11.
 
 ABI 102 at `build/v3-player-frame-sound-01/` contains the complete fan per-frame
 callback and shared sound-program converter. Its actual `0167` program retains

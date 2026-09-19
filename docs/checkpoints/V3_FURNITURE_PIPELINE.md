@@ -1,5 +1,91 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared pocket icons
+
+ABI 107 installs complete donor pocket artwork and a selected-parent reader
+through the existing `--refresh-runtime --player-actions` path. Discovery
+consumes the installed parent records and complete relocated tool-icon table,
+not a maintained item list. All eight fans share one actual donor palette and
+texture. Existing conversion retains all 1,024 indices and sixteen colours;
+the descriptor table and deduplicated resources occupy 1,024 bytes at `804A6800`.
+The combined parent/icon code is 1,284 bytes, with fixed name/price entries.
+
+One native submenu detour replaces the tool-table HI/LO pair and removes only
+those two relocations. The 560-byte relocation allocation, owner allocation,
+24-KiB equipment module, startup size, models, motions, callbacks, sound, and
+saved format 2 remain unchanged. The hook preserves full-width registers and
+HI/LO, resolves the currently loaded owner, retains original descriptor paths,
+and emits no drawing commands for a disabled extended parent. No fan profile
+bit or logical import is enabled; the optional composer still has 104 choices.
+
+Source category 43 is distinct from the menu's ID-derived tool category two.
+The source `mTG_select_tag_decide_item_normal` uses the latter for normal action
+menus. The native short item-type table and its actual consumers remain work;
+they must not be confused with the now-connected pocket-icon lookup.
+
+Artifacts:
+
+- Build: `build/v3-held-pocket-icons-01/`, promoted in the development build lock.
+- ROM SHA-256: `66205bfbf644fbfc7bc6e356d3a24d859e4676162e1b4bd3dc04dad5b21c0781`.
+- UPS SHA-256: `bc0f44b421e06034c075f6ce89b90ce8c6a396d038b4bea89c262493b4064cdf`.
+- Receipt SHA-256: `a906fb48102cc8dc227ad33c1c50c2a10d98897b59579ec77ee3db2f26054590`.
+
+### Verification and bounded follow-up
+
+Four focused checks pass in 5.713 seconds. They cover complete source artwork,
+all pixels/colours, shared identities, bad-pointer rejection, selected-only
+bounds under ASan/UBSan, exact declared owner edits, relocations, retained module
+regions/profile/resources, startup checksum, native ROM checksum, and original
+ROM UPS reconstruction. The initial invocation has two fixture errors: a wrong
+patch filename and a mutation removing a cached relocation key. Correcting the
+filename and changing the mutation to an invalid relocation section produces
+the passing invocation without changing the cartridge.
+
+Twelve current optional-composition checks pass in 8.947 seconds, with the
+candidate lock bound inside the test process. All selections reproduce ABI 107;
+empty selections reproduce exact V2-11. Sparse choices, actual save codec,
+dependencies, catalogue packing, and retained identities pass. Neither patcher
+is changed. Python syntax compilation and `git diff --check` pass.
+
+The first silent native run, `build/smoke-v3-pocket-icons-01/`, records fifteen
+entries and six passing assertions. Actual parent relocation, imported-hook
+register preservation, and the first selected fan's complete 27-command drawing
+pass. The disabled fan correctly produces no commands, but the fixture attempts
+a zero-length debugger read; the debugger rejects that request. This is a
+classified fixture failure, not an observed game fault. Result SHA-256:
+`ba4583ce2ab0d10b82846bf194aaabb86bf5c69042060f14d398eb0a99edab82`.
+
+The single corrected retry, `build/smoke-v3-pocket-icons-02/`, records 22 entries,
+nine passing assertions, and one failed assertion. Complete loaded code/BSS,
+equipment resources, profile, full GPR/HI/LO/floating-point preservation, two
+independently enabled fan identities, and disabled drawing pass. The unchanged
+gift case emits 27 commands, but the fixture incorrectly expects segmented
+`0C012400/0C012420` pointers instead of the emitted resolved `00012400/00012420`.
+The original drawing consumer calls native `Lib_SegmentedToVirtual` at
+`8009ADA8` for both resources; its source uses `SegmentBaseAddress` at
+`801458A0`, not a physical-address mask alone. The gift branch is outside the
+modified instructions. This establishes a comparison error, not substituted
+gift artwork. Result SHA-256:
+`8238a2890f9df5d8c1d406eb456b9585c021c0a50a41d3034f76ac674a5ab78d`.
+
+The fixture now resolves original descriptors through the actual segment table
+and retains the correct zero-command case. It is not rerun: the setup retry
+allowance is exhausted. Native gift/tool/umbrella comparisons, final guards,
+restoration assertions, and checkpoint completion remain unverified. The
+`finally` cleanup executes on both failed attempts, but that does not substitute
+for the omitted full restoration checks. No display list is submitted to the
+GPU, no audio plays, no user save is loaded, and no FlashRAM write is requested.
+Do not report either partial run as a complete native pass or hardware evidence.
+
+Continue inventory-screen player-item ownership/selection/drawing and remaining
+category/acquisition/catalogue/persistence integration. Reuse passing component
+evidence and carry the outstanding native control checks into the next relevant
+inventory batch; do not repeat standalone harness attempts here. Same-profile
+ABI 106 compatibility is expected in both directions because saved formats and
+profile requirements are unchanged, not established by a new ordinary reload.
+Import-enabled V3 saves remain unsuitable for V2. The V2 museum-header correction
+still needs checked V3 integration before a handoff; both served patchers stay V2.
+
 ## Shared parent name and price readers
 
 ABI 106 connects the eight implemented fan equipment records to the existing

@@ -37,3 +37,21 @@ u32 af_v3_held_item_price(u32 item) {
     const HeldItem *row=find((u16)item);
     return row ? row->price : 0;
 }
+
+#ifdef AF_V3_POCKET_ICONS
+#ifdef __mips__
+#define icons ((const u32 *)0x804A6800u)
+#else
+extern u32 af_test_pocket_icons[512];
+#define icons af_test_pocket_icons
+#endif
+
+const u32 *af_v3_held_item_icon(u32 item) {
+    if (!find(item) || icons[0]!=0x41464943u || icons[1]!=1u ||
+            icons[2]!=56u || icons[3]!=8u) return 0;
+    const u32 *row=icons+4+2*(item-0x2224u);
+    if (row[0]<0x804A69D0u || row[0]>0x804A6FE0u || (row[0]&7u) ||
+        row[1]<0x804A69D0u || row[1]>0x804A6E00u || (row[1]&7u)) return 0;
+    return row;
+}
+#endif

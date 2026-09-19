@@ -23,6 +23,79 @@ HELD=ROOT/os.environ.get('V3_HELD_DISPATCH_BUILD','build/v3-held-item-dispatch-0
 ACTIVE=ROOT/os.environ.get('V3_FAN_ACTION_BUILD','build/v3-fan-action-dispatch-03')
 SELECTION=ROOT/os.environ.get('V3_HELD_SELECTION_BUILD','build/v3-held-selection-01')
 PARENTS=ROOT/os.environ.get('V3_HELD_PARENTS_BUILD','build/v3-held-parent-readers-01')
+ICONS=ROOT/os.environ.get('V3_POCKET_ICONS_BUILD','build/v3-held-pocket-icons-01')
+
+
+@unittest.skipUnless((ICONS/'build.json').is_file(),'Current shared pocket-icon cartridge required')
+class PocketIconTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.rom=(ICONS/'animal-forest-v3-asset-loader.z64').read_bytes()
+        cls.report=json.loads((ICONS/'build.json').read_bytes())
+        cls.base,cls.prior=inputs(ICONS/'base-lock.json')
+        cls.files,cls.before=by_vrom(cls.rom),by_vrom(cls.base)
+        cls.blob=cls.files[BLOB].extract(cls.rom);cls.e=cls.report['equipment_resources']
+        cls.icons=cls.e['pocket_icons'];at=cls.e['blob_offset'];cls.module=cls.blob[at:at+cls.e['bytes']]
+
+    def test_source_discovery_complete_pixels_and_selected_parent_relationships(self):
+        from v3_handheld_items import pocket_icons
+        from title_assets import untile,rgb5a3
+        from texture_preview import rgba5551
+        source=actions.Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+            (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+        data,receipt=pocket_icons(source,self.prior['equipment_resources'],0x804A6800,0x800)
+        self.assertEqual(data,self.module[0x3800:0x3800+len(data)])
+        for key,value in receipt.items():self.assertEqual(self.icons[key],json.loads(json.dumps(value)))
+        self.assertEqual(len(receipt['rows']),8);self.assertEqual(len(receipt['resources']),2)
+        palette,texture=receipt['resources']
+        self.assertEqual([r['kind'] for r in receipt['resources']],['palette','texture'])
+        native_pixels=bytes(v for b in data[texture['offset']:texture['offset']+512] for v in (b>>4,b&15))
+        self.assertEqual(native_pixels,untile(source.raw(texture['symbol']),32,32,4))
+        native_colours=[rgba5551(v) for (v,) in struct.iter_unpack('>H',data[palette['offset']:palette['offset']+32])]
+        donor_colours=[rgb5a3(v) for (v,) in struct.iter_unpack('>H',source.raw(palette['symbol']))]
+        self.assertEqual(native_colours,donor_colours)
+        for row in receipt['rows']:
+            self.assertEqual(row['menu_category'],2);self.assertEqual(row['source_type'],43)
+            self.assertFalse(row['selectable'])
+        slot=source.symbol('tool_tex_table$765')[0]+84*8
+        source.relocations[slot]=(1,True,1,source.relocations[slot][3])
+        with self.assertRaises(ValueError):pocket_icons(source,self.prior['equipment_resources'],0x804A6800,0x800)
+
+    def test_only_declared_owner_words_relocations_and_module_region_change(self):
+        from v3_furniture_icon import VROM,RELOC,RAM
+        old=self.before[VROM].extract(self.base);new=self.files[VROM].extract(self.rom)
+        at=self.icons['hook']['address']-RAM
+        self.assertEqual(new[:at],old[:at]);self.assertEqual(new[at+8:],old[at+8:])
+        self.assertEqual(new[at:at+8].hex(),self.icons['hook']['after'])
+        rel=self.files[RELOC].extract(self.rom);prior=self.before[RELOC].extract(self.base)
+        self.assertEqual(len(rel),len(prior))
+        self.assertEqual(struct.unpack_from('>5I',rel),(8720,3232,64,67376,132))
+        rows=struct.unpack_from('>134I',prior,20)
+        self.assertEqual(list(struct.unpack_from('>132I',rel,20)),[r for r in rows if r not in self.icons['removed_relocations']])
+        for base in (0x80200010,0x80378010):
+            spec=SimpleNamespace(ram=RAM,resident_bytes=79392,sections=struct.unpack_from('>5I',rel))
+            relocated=relocate_verified_data(spec,new,rel,base)
+            self.assertEqual(relocated[at:at+8],new[at:at+8])
+        before_blob=self.before[BLOB].extract(self.base);start=self.e['blob_offset']
+        old_module=before_blob[start:start+self.e['bytes']]
+        self.assertEqual(old_module[:0x3000],self.module[:0x3000])
+        self.assertEqual(old_module[0x4000:],self.module[0x4000:])
+        self.assertEqual(sha256(self.module),self.e['sha256'])
+        self.assertEqual(zlib.crc32(self.module),self.e['crc32'])
+        self.assertEqual(self.e['records'],self.prior['equipment_resources']['records'])
+        self.assertEqual(self.e['bytes'],self.prior['equipment_resources']['bytes'])
+
+    def test_patch_startup_crc_profile_and_unrelated_resources(self):
+        native=(ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes()
+        self.assertEqual(apply_ups(native,(ICONS/'asset-loader.ups').read_bytes()),self.rom)
+        self.assertEqual(struct.unpack_from('>2I',self.rom,16),n64_checksum(self.rom))
+        for v,file in self.before.items():
+            self.assertEqual(file.index,self.files[v].index)
+            if v not in (0x19D40,BLOB,MODULE,0x7749C0,0x7778B0):
+                self.assertEqual(file.extract(self.base),self.files[v].extract(self.rom),hex(v))
+        self.assertEqual(self.blob[0x20:0xE0],self.before[BLOB].extract(self.base)[0x20:0xE0])
+        self.assertIn('-DAF_V3_EQUIPMENT_CRC=0x%08Xu'%self.e['crc32'],self.report['startup']['flags'])
+        self.assertFalse(self.report['shared_runtime_refresh']['saved_format_changed'])
 
 
 class SelectionHostTests(unittest.TestCase):
