@@ -1,0 +1,14 @@
+[
+  {"key_frames":"w","frames":40},
+  {"key_frames":"f","frames":120},
+  {"key_frames":"f","frames":120},
+  {"key_frames":"s","frames":120},
+  {"key_frames":"s","frames":60},
+  {"wait":2},
+  {"snapshot_player":true},
+  {"snapshot_npc_actors":true},
+  {"snapshot_message":true},
+  {"read":["8003CE34",4],"expect":"00000000"},
+  {"capture":"festival-vendor.png","hide_cursor":true},
+  {"save_state":true}
+]

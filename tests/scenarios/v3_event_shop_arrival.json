@@ -1,0 +1,14 @@
+[
+  {"wait":16},
+  {"key":"Return","duration":0.15},
+  {"wait":8},
+  {"repeat":16,"actions":[{"key":"a","duration":0.12},{"wait":3}]},
+  {"wait":14},
+  {"snapshot_player":true},
+  {"snapshot_inventory":true,"expect_inventory":{"wallet":10000,"pockets":["2406","1DA4","201B","2617","0000","0000","0000","0000","0000","0000","0000","0000","0000","0000","0000"]}},
+  {"snapshot_npc_actors":true},
+  {"read":["80101BC0",4]},
+  {"read":["8003CE34",4],"expect":"00000000"},
+  {"capture":"festival-arrival.png","hide_cursor":true},
+  {"save_state":true}
+]

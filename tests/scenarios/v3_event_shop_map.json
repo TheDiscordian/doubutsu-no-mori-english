@@ -1,0 +1,9 @@
+[
+  {"wait":1},
+  {"key":"r","duration":0.12},
+  {"wait":3},
+  {"capture":"festival-map.png","hide_cursor":true},
+  {"key":"b","duration":0.12},
+  {"wait":2},
+  {"save_state":true}
+]

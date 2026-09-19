@@ -137,5 +137,30 @@ class HeldSelectionTests(unittest.TestCase):
         for item,shop in ((0x2200,False),(int(rows[0]['item_id'],16),True)):
             with self.assertRaises(ValueError):create(source,self.base,self.report,equipment_item=item,shop_stock=shop)
 
+    def test_event_purchase_fixture_does_not_seed_goods_or_ownership(self):
+        from v3_clothing_gameplay_fixture import create
+        from v3_save_codec import BANK,PAYLOAD
+        source=(ROOT/'local/rc2-save-report-g3O4lU/test.flash').read_bytes()
+        data,receipt=create(source,self.base,self.report,event_shop=True)
+        self.assertIsNone(receipt['item'])
+        self.assertIsNone(receipt['pocket_slot'])
+        self.assertFalse(receipt['seeded_ownership'])
+        self.assertFalse(receipt['seeded_shop_stock'])
+        self.assertFalse(receipt['ordinary_acquisition_tested'])
+        profile=bytes.fromhex(self.report['save_runtime']['profile_hex'])
+        for number in range(2):
+            old=source[number*BANK:(number+1)*BANK];bank=data[number*BANK:(number+1)*BANK]
+            self.assertEqual(bank[0x34:0x54],old[0x34:0x54])
+            self.assertEqual(bank[0xED22:0xED32],old[0xED22:0xED32])
+            self.assertEqual(struct.unpack_from('>I',bank,0x58)[0],10000)
+            allowed=set(range(4,8))|set(range(0x12,0x14))|set(range(0x58,0x5C))
+            self.assertTrue(all(a==b or i in allowed for i,(a,b) in enumerate(zip(old[:PAYLOAD],bank[:PAYLOAD]))))
+            state=c.create_string_buffer(STATE)
+            self.assertEqual(self.codec.af_v3_save_check(c.create_string_buffer(bank),BANK,
+                c.create_string_buffer(profile),state),1)
+            self.assertEqual(state.raw,profile+bytes(STATE-PROFILE))
+        for kwargs in (dict(event_shop=True,shop_stock=True),dict(event_shop=True,equipment_item=0x2255)):
+            with self.assertRaises(ValueError):create(source,self.base,self.report,**kwargs)
+
 
 if __name__=='__main__':unittest.main()

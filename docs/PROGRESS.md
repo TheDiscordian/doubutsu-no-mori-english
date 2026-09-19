@@ -18,6 +18,17 @@ served patchers retain their existing builds.
 
 ## Active development
 
+The current ABI-116 two-fan profile has an isolated festival-night fixture with
+no seeded item or ownership. Normal town entry, original inventory, the festival
+vendor/visitors, and stall scene loading are observed. The generic NPC approach
+stops at the counter before opening dialogue, so an ordinary purchase, payment,
+handover, and earned ownership are not established. The usable pre-interaction
+checkpoint is `build/v3-festival-near-stall-01/`. The navigation batch's setup
+retry is spent; do not replay it. Continue shared animated-held conversion and
+remaining acquisition implementation, retaining the ordinary transaction and
+catalogue-delivery checks as open. See the
+[festival checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#ordinary-festival-acquisition-setup).
+
 The explicit ABI-116 proposal in `build/v3-translation-headers-02/` includes
 the Museum-header correction in both reading and editing, and fixes the ordinary
 reader's missed imported-villager bound. It preserves all 112 experimental
@@ -33,8 +44,9 @@ unverified; the older rendering fixture is not relabelled as passed.
 
 Continue from `build/v3-translation-headers-02/build-lock.json` explicitly.
 The inherited seasonal-copy failure still prevents main-lock promotion or a
-playable handoff. Next finish ordinary acquisition and order/delivery using the
-shared category paths. Both served patchers remain unchanged. See the
+playable handoff. Ordinary acquisition and order/delivery remain open; continue
+shared category implementation without replaying exhausted navigation batches.
+Both served patchers remain unchanged. See the
 [translation checkpoint](checkpoints/MUSEUM_LETTER_HEADERS.md#v3-integration).
 
 The two-fan ABI-115 profile has ordinary inventory/equip, put-away, ground-drop,

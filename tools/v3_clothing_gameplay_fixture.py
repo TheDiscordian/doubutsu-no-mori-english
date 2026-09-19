@@ -51,7 +51,7 @@ def snapshot(debug, rom_path):
         'assertion': 'passed', 'read_only': True}}
 
 
-def create(source, rom, report, *, shop_stock=False, equipment_item=None):
+def create(source, rom, report, *, shop_stock=False, equipment_item=None, event_shop=False):
     if len(source) != 2*BANK or sha256(source) != SOURCE_SHA:
         raise ValueError('Clothing fixture requires the preserved copied source town')
     if sha256(rom) != report['output_sha256']:
@@ -61,7 +61,19 @@ def create(source, rom, report, *, shop_stock=False, equipment_item=None):
         raise ValueError('Invalid item fixture profile')
     item = 0x34BF
     parent = None
-    if equipment_item is None:
+    if event_shop:
+        from aflib import by_vrom
+        from v3_asset_loader import BLOB
+        equipment = report.get('equipment_resources', {})
+        if (shop_stock or equipment_item is not None or not equipment.get('optional_selection') or
+                not equipment.get('event_acquisition', {}).get('acquisition_installed')):
+            raise ValueError('Event fixture requires complete selected acquisition, not seeded goods')
+        blob = by_vrom(rom)[BLOB].extract(rom); at = equipment['blob_offset']
+        if (blob[0x20:0x20+PROFILE] != profile or sha256(blob[at:at+equipment['bytes']]) != equipment['sha256'] or
+                not any(profile[r['profile_byte']] & r['profile_mask'] for r in equipment['parent_readers']['rows'])):
+            raise ValueError('Event fixture has no selected complete parent or changed reader bindings')
+        item = None
+    elif equipment_item is None:
         if not report['clothing'].get('wearing') or not profile[183] & 0x80:
             raise ValueError('Current profile does not include the full imported garment')
     else:
@@ -88,14 +100,20 @@ def create(source, rom, report, *, shop_stock=False, equipment_item=None):
         if not 0 <= index < 1024 or (parent['profile_byte'], parent['profile_mask']) != (32+index//8, 1 << (index & 7)):
             raise ValueError('Equipment collection/profile identity mismatch')
         state[PROFILE+index//8] |= 1 << (index & 7)
-    elif not shop_stock:
+    elif not shop_stock and not event_shop:
         state[PROFILE+512+23] = 0x80
     output, records = bytearray(), []
     for number in range(2):
         bank = bytearray(source[number*BANK:(number+1)*BANK])
         if bank[4:8] != b'NAFJ' or sum(struct.unpack('>'+str(PAYLOAD//2)+'H', bank[:PAYLOAD])) & 0xFFFF:
             raise ValueError('Source town bank is invalid')
-        if shop_stock:
+        if event_shop:
+            wallet = 0x20+0x38
+            balance = struct.unpack_from('>I', bank, wallet)[0]
+            struct.pack_into('>I', bank, wallet, 10000)
+            records.append({'bank': number, 'saved_offset': wallet,
+                            'wallet_before': balance, 'wallet_after': 10000})
+        elif shop_stock:
             # Native shop goods start at saved ED22 / live 80135BC2. The
             # preserved town's third entry is its clothing slot, not a pocket.
             slot = 0xED26
@@ -121,8 +139,9 @@ def create(source, rom, report, *, shop_stock=False, equipment_item=None):
         output.extend(reference.reference_pack(bank, state))
     return bytes(output), {'source_save_sha256': SOURCE_SHA, 'rom_sha256': sha256(rom),
         'fixture_save_sha256': sha256(output), 'player_slot': 0,
-        'pocket_slot': None if shop_stock else 0, 'seeded_shop_stock': shop_stock,
-        'item': f'{item:04X}', 'seeded_ownership': not shop_stock, 'save_format': 2, 'field_changes': records,
+        'pocket_slot': None if shop_stock or event_shop else 0, 'seeded_shop_stock': shop_stock,
+        'event_shop': event_shop, 'item': f'{item:04X}' if item is not None else None,
+        'seeded_ownership': not shop_stock and not event_shop, 'save_format': 2, 'field_changes': records,
         'villagers_and_other_items_retained': True, 'ordinary_acquisition_tested': False,
         'source_save_modified': False}
 
@@ -135,16 +154,20 @@ def main():
                         help='Seed shop clothing and 1,000 Bells; preserve pockets and zero imported ownership')
     parser.add_argument('--equipment-item', type=lambda value: int(value, 16),
                         help='Seed this selected equipment parent in the first pocket using its installed records')
+    parser.add_argument('--event-shop', action='store_true',
+                        help='Set up an isolated festival-night town with money, no imported items, and no ownership')
     args = parser.parse_args()
     source = ROOT/'local/rc2-save-report-g3O4lU/test.flash'
     image, receipt = create(source.read_bytes(), args.rom.read_bytes(),
                             json.loads((args.rom.parent/'build.json').read_text()), shop_stock=args.shop_stock,
-                            equipment_item=args.equipment_item)
+                            equipment_item=args.equipment_item, event_shop=args.event_shop)
     rtc = (ROOT/'build/v3-identity-arrival-01/test.rtc').read_bytes()
-    if args.shop_stock:
-        # Same calendar day as the source town's current stock timestamp.
-        # Ares's disposable RTC only; never change the host clock.
-        staged = datetime(2026, 9, 10, 12, 0, 0)
+    if args.shop_stock or args.event_shop:
+        # Clothing uses the source stock's calendar day; the event uses a
+        # festival Saturday. Change only Ares's disposable RTC, not the host.
+        staged = datetime(2026, 8, 29, 20, 0, 0) if args.event_shop else datetime(2026, 9, 10, 12, 0, 0)
+        if args.event_shop and staged.weekday() != 5:
+            raise ValueError('Festival clock must be a Saturday in August')
         def bcd(value): return (value//10)*16+value%10
         rtc = bytearray(b'\xff'*32)
         rtc[16:24] = bytes([bcd(staged.second), bcd(staged.minute), bcd(staged.hour)|0x80,

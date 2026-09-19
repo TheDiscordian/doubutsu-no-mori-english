@@ -1,0 +1,12 @@
+[
+  {"key_frames":"w","frames":120},
+  {"key_frames":"w","frames":80},
+  {"key_frames":"f","frames":120},
+  {"key_frames":"f","frames":20},
+  {"wait":2},
+  {"snapshot_player":true},
+  {"snapshot_npc_actors":true},
+  {"read":["8003CE34",4],"expect":"00000000"},
+  {"capture":"festival-bridge.png","hide_cursor":true},
+  {"save_state":true}
+]

@@ -2,6 +2,21 @@
 
 ## Active: V3 optional GameCube imports
 
+Next implementation: extend the shared animated-held conversion category using
+the existing complete skeleton/motion bundle and graphics converter. Start with
+the pinwheel roots whose material preflight is supported, preserve complete rigs
+and model layers, and keep missing balloon texture/native ownership dependencies
+explicit. Do not flatten animated equipment or create per-item installers.
+
+The ABI-116 festival fixture has no seeded fan or ownership. Town entry and the
+actual vendor/visitor scene load successfully. The ordinary purchase attempt
+stops at the stall counter before dialogue; no payment, handover, or new catalogue
+ownership is proven. Preserve `build/v3-festival-near-stall-01/` for a later
+meaningful gameplay batch or human check. The setup retry is spent; do not replay
+the route or boot prefix. Keep ordinary acquisition and catalogue delivery open,
+and keep the independent seasonal-copy assertion unresolved. See the
+[festival checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#ordinary-festival-acquisition-setup).
+
 Continue from the explicit ABI-116 lock at
 `build/v3-translation-headers-02/build-lock.json`. The Museum-header correction
 and ordinary reader's expanded villager-name bound are installed. Empty selection
@@ -23,7 +38,7 @@ equipped checkpoint: `build/v3-equipment-reload-01/`. Actual completed game
 save: `build/v3-equipment-save-01/test.flash`. Do not replay these successful
 paths. The copied original town and both V2 patchers remain untouched.
 
-Next pursue ordinary reward acquisition/catalogue delivery. Pickup remains
+Ordinary reward acquisition/catalogue delivery remain open. Pickup remains
 partial: `build/v3-equipment-drop-pickup-01/` retains the dropped checkpoint,
 and the single navigation retry stops 20.575 units from the item before pickup.
 The corrected limit/radius is unexecuted. Its setup retry is spent; do not

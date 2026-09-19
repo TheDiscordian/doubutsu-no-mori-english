@@ -17,6 +17,15 @@ format-2 envelope. It rejects absent/disabled parents and attempts to substitute
 shop stock for the actual equipment acquisition route. The preserved source
 town, all other pockets, villagers, and live game state stay unchanged.
 
+The same fixture's `--event-shop` mode preserves every pocket and the original
+shop/event stock in both banks. It gives the copied first player 10,000 Bells, starts
+with no imported ownership, and sets only the disposable emulator RTC to an
+August Saturday evening. It requires selected equipment and its installed
+event-acquisition adapter, and rejects combinations with seeded equipment or
+shop stock. Independent format-2 decoding checks both saved banks; the only
+native payload changes are the wallet, format signature, and checksum. This
+prepares an ordinary festival purchase, not evidence that one has occurred.
+
 `tests/scenarios/v3_equipment_gameplay.json` exercises the ordinary inventory
 controller path for a representative selected parent. The companion actions
 scenario resumes a matching-ROM menu checkpoint; it does not replay startup.

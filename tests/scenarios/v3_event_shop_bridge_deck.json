@@ -1,0 +1,8 @@
+[
+  {"key_frames":"w","frames":40},
+  {"key_frames":"f","frames":120},
+  {"snapshot_player":true},
+  {"read":["8003CE34",4],"expect":"00000000"},
+  {"capture":"festival-bridge-deck.png","hide_cursor":true},
+  {"save_state":true}
+]

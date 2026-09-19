@@ -1,0 +1,12 @@
+[
+  {"key_frames":"f","frames":120},
+  {"key_frames":"f","frames":40},
+  {"repeat":4,"actions":[{"key_frames":"s","frames":120}]},
+  {"snapshot_player":true},
+  {"snapshot_npc_actors":true},
+  {"read":["8046C0DA",1],"expect":"00"},
+  {"read":["8019C8D0",16],"expect":"AF32C0DEAF32C0DEAF32C0DEAF32C0DE"},
+  {"read":["8003CE34",4],"expect":"00000000"},
+  {"capture":"festival-west-bank.png","hide_cursor":true},
+  {"save_state":true}
+]

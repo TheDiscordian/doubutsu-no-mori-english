@@ -1,5 +1,69 @@
 # Automatic furniture pipeline checkpoint
 
+## Ordinary festival acquisition setup
+
+The current target is the ABI-116 two-parent subset at
+`build/v3-festival-subset-01/animal-forest-v3-asset-loader.z64`, SHA-256
+`b489decf5bb4500f9cc579aa0e0112475d89f5b15ce64d62ef81f4d35252d027`.
+It selects `2255` and `225B` through the existing offline composer and the
+explicit corrected-header lock. No new game code or item records are installed
+by this batch; the main lock and both served patchers remain unchanged.
+
+The shared copied-town fixture's `--event-shop` mode creates
+`build/v3-festival-save-01/`, with 10,000 Bells, the source town's original
+pockets/stock, and zero imported ownership. Its isolated clock starts at
+2026-08-29 20:00, a festival Saturday. The fixture does not seed a fan or
+pre-credit its catalogue entry. The independent reference writer encodes both
+banks, and the actual C save codec verifies both complete ownership states.
+Native payload comparisons permit only signature, checksum, and wallet changes.
+The focused fixture test passes on the
+ABI-116 build; Python syntax and diff checks pass. The source save remains
+`d489736e39abc7eff1c5b5085bf52e679186f2882a0247339e11603799b80b60`;
+the fixture save is
+`ff7aa2b89733181c8d92f3993d3fa8af67d01cf583b7a92ded1ba7a58e0053c5`.
+
+Normal boot and the player's original inventory/wallet pass in
+`build/v3-festival-arrival-01/` (11 records, results SHA-256
+`960c5e773026d5de1034408d4cbcba1e3fbe691367694444a238237879e6bee4`).
+The pond scene loads vendor `D02C` at `(1420, 160, 2420)` and four original
+festival visitors; the vendor's loaded-owner pointer is nonzero and the fault
+pointer is zero. These are actual scene actors, not injected component calls.
+The bridge/west-bank route uses only ordinary controller buttons, saves matching
+emulator checkpoints, and never writes live position, time, schedules, or items.
+The west-bank observation confirms ownership byte `8046C0DA` is still zero and
+the resident guard is intact.
+
+One navigation script requests a 140-frame hold, exceeding the existing
+120-frame limit. It stops at that guard, not a game crash. Splitting that hold
+into 120 and 20 frames is the single justified setup retry, recorded in
+`build/v3-festival-crossing-02/`. Later route segments reach the actual stall.
+The useful pre-interaction checkpoint is `build/v3-festival-near-stall-01/`,
+SHA-256 `122573d1e3abbb734b3c3b525f49d8cf3743be3243882d6a5a9f9a194fa765c8`.
+Its results contain 11 records, SHA-256
+`3092f16a12b22dae15e168aed2a4d2c1bb0ca060c20dc0cd15559e1b433b89c9`.
+The player is at `(1298, 160, 2523.1619)` and the vendor/scene render normally.
+
+`build/v3-festival-purchase-01/` remains **incomplete**. The ordinary NPC
+approacher stops after 15 observations at roughly `(1365.4568, 2470.9128)`,
+74.6129 units from the vendor, with `navigation_stalled`. Twelve bounded A
+presses then fail to open a choice: the message stays unloaded and the choice
+state stays zero. Its 29-record results SHA-256 is
+`a02654d2ec031f6d8df28e9399aa4f627748e135250cbff5a0c496da8c4b7b46`.
+The route/item/payment assertions, final guards, handover capture, and final
+checkpoint action are not reached. The copied `test.bs1` in that failed run
+is its input checkpoint, not a newly saved post-purchase state.
+
+This establishes arrival and scene loading, not a successful purchase or an
+identified runtime purchase defect. Do not infer that the menu failed after
+activation; activation itself is unobserved. The generic approach targets the
+actor centre and does not account for the stall counter. A later meaningful
+gameplay batch or human test must approach the actual interaction position and
+verify the full transaction. The setup retry is spent; do not repeat this route
+under another batch name. Continue shared import implementation, retaining
+ordinary payment/handover/earned ownership and catalogue delivery as open.
+The independent seasonal-copy assertion remains unresolved. Save format 2
+requires the matching/equal-or-larger profile; do not load imported saves in V2.
+
 ## Ordinary equipment put-away, drop, and persistence
 
 The target remains the ABI-115 subset at `build/v3-held-subset-01/`, ROM SHA-256
