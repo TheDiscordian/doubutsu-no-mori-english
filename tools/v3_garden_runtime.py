@@ -223,7 +223,7 @@ def extend_letters(source, module, report, rel, symbols, *, theme=56):
 
 def install_catalogue(base, stable, prior, imports, output, rel, symbols, *, western=False,
                       western_large=False, camping=False, tent_model=False, fire=False, school_desks=False,
-                      reviewed_rows=None):
+                      reviewed_rows=None, handheld=None):
     from v3_catalogue_capacity import GROWTH, shifted
     files = by_vrom(base)
     old = files[catalogue.VROM].extract(base)
@@ -241,6 +241,14 @@ def install_catalogue(base, stable, prior, imports, output, rel, symbols, *, wes
         'af_v3_catalogue_order:\n.byte ' + ','.join(map(str, ordering)) + '\n'
         '.balign 2\n.globl af_v3_catalogue_clothing_order\naf_v3_catalogue_clothing_order:\n.byte ' +
         ','.join(map(str, cloth)) + '\n')
+    if handheld is None and prior['catalogue'].get('handheld'):
+        held=copy.deepcopy(prior['catalogue']['handheld']);start=held['table_address']-catalogue.RAM
+        table=old[start:start+held['total_rows']*2]
+        if sha256(table)!=held['table_sha256']:raise ValueError('Changed retained handheld catalogue')
+        handheld=(table,held)
+    if handheld is not None:
+        assembly+=('.balign 2\n.globl af_v3_catalogue_handheld_order\naf_v3_catalogue_handheld_order:\n.byte '+
+            ','.join(map(str,handheld[0]))+'\n')
     write_new(output / 'catalogue_tables.S', assembly.encode())
     defines = (tuple(f[2:] for f in prior['catalogue']['linked_code']['flags'] if f.startswith('-D'))
                + ('AF_V3_CATALOGUE_RECORDS=1','AF_V3_CATALOGUE_PREVIEW_RECORDS=1')) if reviewed_rows is not None else (
@@ -253,7 +261,7 @@ def install_catalogue(base, stable, prior, imports, output, rel, symbols, *, wes
         + (('AF_V3_FIRE=1',) if fire else ()))
     suffix, compiled = compile_part('catalogue', output / 'catalogue',
         extra_sources=('overlays/v3/catalogue_bridge.S', str((output / 'catalogue_tables.S').relative_to(ROOT))),
-        defines=tuple(dict.fromkeys(defines)))
+        defines=tuple(dict.fromkeys(defines+(('AF_V3_HELD_CATALOGUE=1',) if handheld is not None else ()))))
     parent = bytearray(files[catalogue.PARENT].extract(base))
     _, _, native_parent = catalogue.sources(stable)
     expected = bytearray(native_parent[catalogue.OWNER:catalogue.OWNER + 32])
@@ -264,7 +272,7 @@ def install_catalogue(base, stable, prior, imports, output, rel, symbols, *, wes
     parent[catalogue.OWNER:catalogue.OWNER + 32] = native_parent[catalogue.OWNER:catalogue.OWNER + 32]
     changes, report = catalogue.install(stable, parent, suffix, compiled, ordering, rows,
         prior['collection']['code'], prior['save_runtime']['code'], prior['furniture_room']['code'],
-        clothing=(cloth, clothes), expanded=True)
+        clothing=(cloth, clothes), expanded=True,handheld=handheld)
     rebuilt_code = changes.pop(CODE_VROM)
     current_code = files[CODE_VROM].extract(base)
     for address in (0x800C4AFC, 0x800C4B10):

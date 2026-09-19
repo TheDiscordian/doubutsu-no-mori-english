@@ -2,25 +2,24 @@
 
 ## Active: V3 optional GameCube imports
 
-The proposed ABI 113 in `build/v3-held-collection-02/` adds shared handheld
-collection recording/querying through actual native acquisition. Four focused
-checks and twelve optional-composition checks pass. The corrected silent native
-run passes 138 records/58 assertions, including native acquisition, all four
-players, wrapped/disabled rejection, guards, and restored state/checkpoint.
-The existing four-player saved format, all profile bits,
-52-KiB equipment allocation, original acquisition conditions, and ordinary room
-drops remain unchanged. No handheld choice is enabled yet.
+The proposed ABI 114 in `build/v3-held-catalogue-02/` installs all eight fan
+representations into the shared umbrella catalogue. Four focused checks and
+twelve optional-composition checks pass. The first silent native run passes
+104 records/70 assertions, including actual category lists, complete first/last
+model previews, full names/prices/framing, inverse parent conversion, unchanged
+ordinary drops, disabled filtering, original fallbacks, guards, and restored
+state/checkpoint. No resident allocation, profile bit, or saved format changes.
+No handheld choice is enabled yet. See the
+[checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-held-parent-catalogue).
 
-Next connect the **umbrella catalogue category**, not the furniture list:
-the donor's complete nine-list inventory puts fans at positions 32–39 in
-`mCL_umbrella_idx_list`. Collection records already carry each parent's exact
-category, position, canonical display ID, and saved-profile bit. Reuse the
-prepared `build/v3-furniture-indexed-sequence-prepared-01/` display models and
-`build/v3-held-collection-02/build-lock.json`. Extend shared preview/list/profile
-consumers without per-item installers, repeated conversion, or changing ordinary
-room-drop semantics. Then connect optional selection and ordinary gameplay.
-The main lock remains ABI 109 pending the inherited seasonal-copy issue;
-neither served V2 patcher changes.
+Next use `build/v3-held-catalogue-02/build-lock.json` for optional composition:
+derive parent choices and dependencies from the installed shared records, pack
+the selected umbrella table/count for correct completion, and keep representations
+out of the standalone furniture choices. Preserve the exact import-free baseline.
+Then complete ordinary acquisition/equip/use/drop/order/save gameplay. Reuse the
+installed art/readers and passing category evidence; do not reconvert models or
+add per-item scripts. The main lock remains ABI 109 pending the inherited
+seasonal-copy issue; neither served V2 patcher changes.
 
 The proposed ABI 112 in `build/v3-event-menu-06/` contains shared event selection,
 English pages, native pocket/payment handling, and handover requests. Four

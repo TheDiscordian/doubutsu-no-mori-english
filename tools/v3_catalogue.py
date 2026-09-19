@@ -25,6 +25,8 @@ IMPORTS = {'af_v3_native_catalogue_bit': 0x808A931C,
            'af_v3_catalogue_owned': 0x80469AD4,
            'af_v3_furniture_import_profile': 0x80465000,
            'af_v3_save_halt': 0x80469270}
+HELD_IMPORTS={'af_v3_held_item_collection':0x804A6600,'af_v3_catalogue_item_price':0x80467574}
+UMBRELLA_POINTER, UMBRELLA_COUNT, UMBRELLA_TABLE = 0x808AF7C4, 0x808AF7C8, 0x808AF540
 PREVIEW_TABLE, PREVIEW_FIRST, PREVIEW_END = 0x80474A40, 0x80474A30, 0x80474BA0
 PREVIEW_COUNT = 41
 PREVIEW_SHA = 'fa6592f8af1ebb2ddb984e59b39649c36afeb85bdd4f9127dbcae26ba62a2a98'
@@ -235,7 +237,8 @@ def table(base, rel, donor_symbols, furniture, *, expanded=False, garden=False, 
     return b''.join(struct.pack('>HH', *row) for row in rows), records
 
 
-def install(base, parent, suffix, compiled, ordering, records, collection, runtime, room, *, clothing=None, expanded=False):
+def install(base, parent, suffix, compiled, ordering, records, collection, runtime, room, *, clothing=None, expanded=False,
+            handheld=None):
     old, reloc, source_parent = sources(base)
     symbols = compiled['symbols']
     if any(row.get('preview_override') for row in records) and (
@@ -245,12 +248,13 @@ def install(base, parent, suffix, compiled, ordering, records, collection, runti
     if any(row.get('preview_override') and '-D' + row.get('preview_define', 'AF_V3_WESTERN_LARGE') + '=1'
            not in compiled['flags'] for row in records):
         raise ValueError('Catalogue preview lacks its reviewed item-family override')
-    limit = 0xE50 if '-DAF_V3_WESTERN_LARGE=1' in compiled['flags'] else 0xC50
+    imports={**IMPORTS,**(HELD_IMPORTS if handheld is not None else {})}
+    limit = 0xF50 if handheld is not None else (0xE50 if '-DAF_V3_WESTERN_LARGE=1' in compiled['flags'] else 0xC50)
     if (len(suffix) != compiled['bytes'] or not suffix or len(suffix) > limit or len(suffix) % 16
             or collection['symbols']['af_v3_catalogue_owned'] != IMPORTS['af_v3_catalogue_owned']
             or runtime['symbols']['af_v3_save_halt'] != IMPORTS['af_v3_save_halt']
             or room['symbols']['af_v3_room_query'] != IMPORTS['af_v3_room_query']
-            or any(symbols[name] != value for name, value in IMPORTS.items())
+            or any(symbols[name] != value for name, value in imports.items())
             or parent[OWNER:OWNER + 32] != source_parent[OWNER:OWNER + 32]):
         raise ValueError('Changed catalogue helper dependencies or parent descriptor')
     data = bytearray(old + suffix)
@@ -277,6 +281,20 @@ def install(base, parent, suffix, compiled, ordering, records, collection, runti
     def jump(target, call=True):
         return (0x0C000000 if call else 0x08000000) | (target >> 2 & 0x3FFFFFF)
 
+    handheld_report = None
+    if handheld is not None:
+        held_table,handheld_report=handheld
+        held_address=symbols['af_v3_catalogue_handheld_order'];held_at=held_address-RAM
+        count_held=handheld_report['total_rows']
+        if ('-DAF_V3_HELD_CATALOGUE=1' not in compiled['flags'] or clothing is None or
+                count_held!=32+len(handheld_report['imports']) or count_held>64 or
+                len(held_table)!=count_held*2 or held_table[:64]!=old[UMBRELLA_TABLE-RAM:UMBRELLA_TABLE-RAM+64] or
+                not SIZE<=held_at<=len(data)-len(held_table) or
+                data[held_at:held_at+len(held_table)]!=held_table or slots.get(UMBRELLA_POINTER-RAM)!=2):
+            raise ValueError('Changed handheld catalogue table or category binding')
+        word(UMBRELLA_POINTER,UMBRELLA_TABLE,held_address)
+        word(UMBRELLA_COUNT,32,count_held)
+        handheld_report={**handheld_report,'table_address':held_address,'table_sha256':sha256(held_table)}
     clothing_report = None
     if clothing is not None:
         from v3_clothing_catalogue import POINTER, COUNT, TABLE as CLOTH_TABLE, NATIVE_COUNT
@@ -339,13 +357,15 @@ def install(base, parent, suffix, compiled, ordering, records, collection, runti
             raise ValueError('Catalogue suffix relocation escapes appended code')
         if RAM <= target < RAM + len(data):
             rows.append(0x40000000 | kind << 24 | at)
-        elif IMPORTS.get(name) != target or kind != 4:
+        elif imports.get(name) != target or kind != 4:
             raise ValueError('Unbound catalogue external target')
     if len({row & 0xFFFFFF for row in rows}) != len(rows):
         raise ValueError('Duplicate catalogue relocation')
     capacity_report = None
     if expanded:
         data, rows, capacity_report = expand(data, rows)
+        if handheld_report is not None:
+            handheld_report={**handheld_report,'table_address':shifted(handheld_report['table_address'])}
         if clothing_report is not None:
             clothing_report = {**clothing_report, 'table_address': shifted(clothing_report['table_address'])}
             for key in ('initializer_target', 'initializer_bridge'):
@@ -394,4 +414,5 @@ def install(base, parent, suffix, compiled, ordering, records, collection, runti
         'additional_pool_allocation': POOL_EXTRA if expanded else 0, 'save_format_changed': False,
         'native_preview_tested': False, 'ordinary_order_delivery_tested': False,
         **({'clothing': clothing_report} if clothing_report is not None else {}),
+        **({'handheld': handheld_report} if handheld_report is not None else {}),
         **({'capacity_expansion': capacity_report} if capacity_report is not None else {})}

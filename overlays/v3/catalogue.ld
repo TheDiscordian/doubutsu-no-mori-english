@@ -9,6 +9,8 @@ af_v3_native_catalogue_available = 0x800C0490;
 af_v3_catalogue_owned = 0x80469AD4;
 af_v3_furniture_import_profile = 0x80465000;
 af_v3_save_halt = 0x80469270;
+af_v3_held_item_collection = 0x804A6600;
+af_v3_catalogue_item_price = 0x80467574;
 SECTIONS
 {
     . = 0x808B32B0;
@@ -20,7 +22,7 @@ SECTIONS
     .bss (NOLOAD) : { *(.bss .bss.* COMMON) }
     /* Another 512 bytes fit the existing expanded menu reservation. The
        builder checks the full image, relocation DMA, and all menu owners. */
-    ASSERT(. <= 0x808B4100, "V3 catalogue suffix exceeds its bounded pool allowance")
+    ASSERT(. <= 0x808B4200, "V3 catalogue suffix exceeds its bounded pool allowance")
     ASSERT(SIZEOF(.data) == 0 && SIZEOF(.bss) == 0, "Unexpected V3 catalogue state")
     /DISCARD/ : { *(.comment .note.* .reginfo .MIPS.abiflags .pdr .gnu.attributes) }
 }

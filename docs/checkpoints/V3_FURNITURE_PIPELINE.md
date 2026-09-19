@@ -1,5 +1,73 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared held-parent catalogue
+
+The proposed ABI 114 is `build/v3-held-catalogue-02/`, built with the shared
+runtime refresh's `--held-catalogue-art` option from
+`build/v3-held-collection-02/build-lock.json`. The prepared directory is
+`build/v3-furniture-indexed-sequence-prepared-01/`; no artwork is reconverted.
+ROM SHA-256:
+`423404df91fa84dd2faef1a4d7ca8dc5367a112885c88acf8f307ae9223bdf3b`.
+Build report SHA-256:
+`66081a151bd5046b335a34f4ff37f179f07a10f37b86fe413d59abe55dcf253b`.
+UPS SHA-256:
+`ab709aa4f0f7d748d0f89f38d7097681a327300a08c9202876ea11c50b4e3159`.
+
+One category adapter installs all eight complete fan catalogue models from the
+existing parent/collection records. They occupy 11,136 ROM bytes and canonical
+sparse profiles; tag one makes each profile conditional on the selected parent.
+Inverse metadata resolves the English name, price, collection, and order pickup
+to that parent. No forward room alias is added. The umbrella descriptor points
+to all 32 native entries followed by eight imported entries in donor order.
+Furniture and clothing lists remain unchanged. Subsequent common catalogue
+rebuilds retain the new category table and its actual relocation.
+
+The native initializer performs ordinary construction, model DMA, lighting, and
+timer setup, then the checked donor branch supplies scale 1, model Y 0, viewing
+height 36, and the parent price. The catalogue is 62,912 bytes with 736 bytes of
+relocation; its conservative requirement is 280,512 of the existing 280,704-byte
+pool. The expanded furniture reader occupies 1,960 of its 2,048-byte reservation.
+No resident/model allocation or saved format grows. The original 52-KiB equipment
+module, all profile bits, and 104 existing experimental choices remain unchanged.
+
+Build one stopped because the bank-owner receipt predates later shared placement
+patches. The actual bank call matched. Build two binds the complete current
+placement-owner/relocation hashes, checks the exact bank instructions, updates
+that one call to the new helper, and carries current owner hashes forward.
+No hash or instruction safeguard is removed.
+
+Four focused checks pass in 5.053 seconds. AddressSanitizer/UBSan exercise shared
+profile gating, all eight representations and rotations, collected/disabled cases,
+full preview-field retention, framing/prices, native fallbacks, and rejected
+indices. Cartridge checks compare every complete prepared model, sparse profile,
+inverse alias, native/category order, three relocation destinations, unchanged
+unrelated resources, exact room-call change, equipment retention, current source
+receipts, pool bounds, and UPS reconstruction. Python syntax/diff checks pass.
+Twelve optional-composition checks pass in 8.907 seconds against this proposal
+without changing the main lock; empty selections still reproduce V2-11 exactly.
+
+The first silent native run, `build/smoke-v3-held-catalogue-01/results.json`,
+passes 104 records and 70 assertions. Results SHA-256:
+`fb738a4a527a0659bd43806f189929b0fe0144cc7fa15d1ea9c9846833312257`.
+The shared catalogue fixture loads/relocates the actual complete owner, collects
+all eight parent items, constructs their real category list, and selects the
+first and last entries through native scrolling/selection. Complete model DMA,
+untouched bank tails, full English names, parent prices, source framing, disabled
+owned-item filtering, all original umbrella rows, original preview fallback,
+allocation/stack/runtime guards, restored globals, checkpoint reload, no CPU
+fault, and graceful exit pass. All eight ordinary forward drops retain parent
+IDs, while their rotated display inverses return the correct parent. No user
+save or audible playback is used, and no test FlashRAM write is requested.
+
+This does not establish GPU appearance, ordinary catalogue payment/delivery,
+full equipped gameplay, a save/restart cycle, or original-hardware compatibility.
+Same-profile compatibility with ABI 113 is expected in both directions without
+migration, not newly demonstrated by cross-build reload. Imported V3 saves remain
+unsuitable for V2. Optional parent choices and selected-category count packing
+are next; no fan choice is exposed yet. The main lock remains ABI 109 because
+the inherited seasonal-copy continuation/stack issue is unresolved. Neither V2
+patcher changes. Carry the separate Museum-header correction before handoff.
+
 ## Shared held-parent collection
 
 The proposed ABI 113 is `build/v3-held-collection-02/`, built explicitly from

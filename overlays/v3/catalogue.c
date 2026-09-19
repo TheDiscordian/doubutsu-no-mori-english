@@ -29,6 +29,10 @@ extern void af_v3_save_halt(int) __attribute__((noreturn));
 extern int af_v3_native_catalogue_bit(const u32 *, int);
 extern void af_v3_original_catalogue_program(struct Preview *);
 extern int af_v3_native_catalogue_available(u32, int, int, void *);
+#ifdef AF_V3_HELD_CATALOGUE
+extern u32 af_v3_held_item_collection(u32);
+extern u32 af_v3_catalogue_item_price(u32);
+#endif
 #ifdef AF_V3_CATALOGUE_PREVIEW_RECORDS
 #define AF_V3_PREVIEW_COUNT 41u
 struct PreviewFraming { float scale, model_y; };
@@ -69,6 +73,16 @@ static u32 display_pocket(u32 item) {
 
 void af_v3_catalogue_furniture_init(struct Preview *preview, u32 argument) {
     af_v3_original_catalogue_furniture_init(preview, argument);
+#ifdef AF_V3_HELD_CATALOGUE
+    if (af_v3_held_item_collection((u16)argument)) {
+        /* Source shared handheld branch; price resolves the actual parent. */
+        preview->model_y=0.0f;
+        preview->scale=1.0f;
+        preview->height=36.0f;
+        preview->price=af_v3_catalogue_item_price((u16)argument);
+        return;
+    }
+#endif
     if (
 #ifdef AF_V3_ALOHA_DISPLAY
             display_pocket((u16)argument) && af_v3_furniture_import_profile(1024u+((argument&0xFFFu)>>2))

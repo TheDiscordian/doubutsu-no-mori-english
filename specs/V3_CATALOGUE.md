@@ -1,5 +1,40 @@
 # V3 imported furniture catalogue
 
+## Shared handheld representations
+
+The shared runtime installer's `--held-catalogue-art <prepared-directory>` option
+consumes installed parent/collection records and complete prepared display models.
+It uses `v3_held_catalogue` as a category adapter, not an item-specific installer.
+The complete donor collection/list audit determines umbrella-tab membership and
+ordering. All 32 original umbrella entries remain; eight fan representations
+follow in donor order. Ordinary furniture and clothing lists remain separate.
+
+Each representation occupies its canonical sparse profile and inverse-alias slot.
+Profile tag one requires the selected parent identity through
+`af_v3_held_item_collection`; it is never independently selectable. The shared
+name/price/order conversion resolves the display back to its actual parent.
+No forward room alias is added: ordinary fan drops retain the parent item ID.
+The installer refuses occupied slots, selected bits, incomplete prepared assets,
+changed collection contexts, and changed donor framing code/constants.
+
+The native preview initializer retains model DMA, geometry, lighting, and timer
+setup. Its shared handheld branch then applies the donor's scale 1.0, model Y 0,
+viewing height 36, and actual parent price. The eight complete models occupy
+11,136 ROM bytes; no resident/model bank grows. The checked catalogue image is
+62,912 bytes plus 736 bytes of relocation. Its conservative pool requirement is
+280,512 of the existing 280,704 bytes. The expanded furniture reader occupies
+1,960 of its reserved 2,048 bytes; only its changed bank-initializer call is
+updated in the full hash-checked room owner.
+
+The common catalogue rebuilder retains this category table during later furniture
+batches. Its pointer/count relocation, parent allocation, complete suffix, shared
+pool bound, and terminal ROM-resource mappings remain checked. Installation adds
+no selected profile bits and changes no saved format. Optional parent choices,
+ordinary ordering/delivery, rendered appearance, and gameplay/persistence remain
+separate work. Both served patchers stay V2. Exact verification evidence and the
+inherited seasonal-copy restriction are in the
+[checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-held-parent-catalogue).
+
 ## Implemented scope
 
 The [capacity-expanded construction variant](V3_CATALOGUE_CAPACITY.md) installs

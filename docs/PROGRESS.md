@@ -17,33 +17,29 @@ locked ROM is tracked below; this V2 fix does not replace its no-import baseline
 
 ## Active development
 
-The proposed ABI 113 in `build/v3-held-collection-02/` connects all eight
-installed fan parents to native acquisition and the existing four-player
-collection/save state through shared records. Parent IDs and rotated display
-IDs share their actual donor collection bit. Original furniture/clothing,
-wrapped-item rules, ordinary room drops, saved formats, and profile selections
-remain unchanged. The 488-byte adapter and expanded identity reader fit the
-existing 52-KiB equipment reservation.
+The proposed ABI 114 in `build/v3-held-catalogue-02/` connects all eight installed
+fan parents to their actual umbrella catalogue category. It reuses the complete
+prepared display models, preserves all 32 original umbrella rows, and uses the
+donor's order, framing, and parent price. Tagged profiles require the parent's
+selection. Full names and inverse order conversion share existing parent readers;
+ordinary room drops retain the parent ID. No new choice, profile bit, saved format,
+or resident/model allocation is introduced.
 
-Four focused checks pass across the initial run and corrected JSON-receipt
-comparison. Twelve current optional-composition checks pass without changing
-the main lock. Host sanitizers cover all eight parents and four players, actual
-codec persistence, missing-profile rejection, clearing, invalid pointers,
-disabled/malformed records, and native/clothing fallbacks. Cartridge checks
-preserve unrelated code/resources, all existing held reader instructions,
-profile bytes, startup checksums, and complete UPS reconstruction. The corrected
-silent native run passes 138 records with 58 assertions: actual pocket insertion,
-four-player ownership, rotation aliases, wrapped/disabled rejection, guards,
-and restored state/checkpoint. Ordinary gameplay, visible catalogue previews,
-FlashRAM save/reload, and hardware remain unverified for these parents.
+Four focused host/cartridge checks and twelve current optional-composition checks
+pass. The first silent native run passes 104 records and 70 assertions: actual
+list construction, all eight collected entries, first/last preview selection,
+complete model transfers, full English names, prices/framing, disabled-owned
+filtering, original rows and preview fallback, memory guards, restored state, and
+checkpoint reload. GPU appearance, ordinary order payment/delivery, full equipped
+gameplay, save/reload, and hardware remain unverified. The existing collection,
+event-menu, and equipment-reader evidence applies to their unchanged code.
 
-The complete donor catalogue audit puts fans in the **umbrella** category,
-positions 32–39 of its 64-entry list. They are absent from the furniture list,
-not absent from the catalogue. Next install their prepared display models into
-that category's shared preview/list readers and connect optional selection.
-Use the proposal lock explicitly; the main lock remains ABI 109 until the
-inherited seasonal-copy issue is resolved. Both served V2 patchers remain
-unchanged. See the [collection specification](../specs/V3_COLLECTION.md#shared-held-parent-collection).
+Next connect optional parent choices and selected-category counts through the
+shared composer, then complete ordinary gameplay. Use this proposal lock
+explicitly; the main lock remains ABI 109 until the inherited seasonal-copy
+issue is resolved. Both served V2 patchers remain unchanged. See the
+[catalogue specification](../specs/V3_CATALOGUE.md#shared-handheld-representations)
+and [exact checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-held-parent-catalogue).
 
 The proposed ABI 112 in `build/v3-event-menu-06/` connects the shared fireworks
 stock to an explicit original/imported-wares selector, English item pages,

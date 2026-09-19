@@ -72,9 +72,15 @@ parent identities. Collection/catalogue and ordinary gameplay remain required. S
 `--refresh-runtime --held-collection` connects those installed parent records to
 native acquisition, the four-player collection query, and existing saved
 ownership without another allocation or enabled choice. Its complete donor-list
-audit records the actual umbrella-tab membership and position; prepared display
-models still need that category's preview/list integration. See
+audit records the actual umbrella-tab membership and position. See
 [held collection](V3_COLLECTION.md#shared-held-parent-collection).
+`--refresh-runtime --held-catalogue-art <prepared-directory>` consumes those same
+records and the complete prepared models to extend the umbrella list and native
+preview readers. Tagged sparse profiles require the parent's selection; inverse
+aliases provide its full name/price without changing ordinary room drops. The
+shared catalogue rebuilder retains this category in subsequent furniture batches.
+No standalone representation choices or new profile bits are introduced. See
+[held catalogue](V3_CATALOGUE.md#shared-handheld-representations).
 `--refresh-runtime --player-motion` extends that same resident module with the
 complete source-derived player motions and split-body masks. It retains the
 native player owner's table relocations and all original animation meanings;

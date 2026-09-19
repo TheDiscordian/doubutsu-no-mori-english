@@ -12,6 +12,126 @@ from v3_catalogue import RAM, RELOC, SIZE, VROM
 from v3_npc_draw_smoke import boot_proofs
 
 
+def held_previews(debug, rom_path, record):
+    """Shared parent category: real list/selection, names, models, and prices."""
+    path=Path(rom_path);rom=path.read_bytes();report=json.loads((path.parent/'build.json').read_bytes())
+    cat=report['catalogue'];equipment=report['equipment_resources'];category=cat['handheld']
+    if sha256(rom)!=report['output_sha256'] or category['category']!='umbrella':
+        raise ValueError('Shared parent catalogue requires its checked cartridge/category')
+    files,boot=by_vrom(rom),boot_proofs(rom);blob=files[BLOB].extract(rom)
+    rows=category['imports'];parents={r['item_id']:r for r in equipment['parent_readers']['rows']}
+    bridge=None
+    def check(label,address,want):
+        actual=debug.read_memory(address,len(want));passed=actual==want
+        record(dict(held_catalogue_check=label,address=f'{address:08X}',bytes=len(want),
+            assertion='passed' if passed else 'failed',expected_sha256=sha256(want),actual_sha256=sha256(actual)))
+        if not passed:raise ValueError('Shared parent catalogue mismatch: '+label)
+    def call(address,args=(),proof=None,expected=None):
+        target=address;proof=proof or boot.get(address)
+        if address>=0x80400000:
+            if bridge is None:raise ValueError('Missing upper-memory call bridge')
+            stub=struct.pack('>2I',0x08000000|((address>>2)&0x3FFFFFF),0)
+            debug.write_memory(bridge,stub)
+            call(0x8002FE00,[bridge,8]);call(0x80034CE0,[bridge,8])
+            target=bridge;proof=(bridge,stub)
+        result=debug.call(f'{target:08X}',list(args),return_address=MODULE_RAM+0x6480,verified_code=proof)
+        if expected is not None:result['assertion']='passed' if result['return_value']==expected else 'failed'
+        record(result)
+        if expected is not None and result['return_value']!=expected:
+            raise ValueError('Shared parent catalogue returned an unexpected value')
+        return result['return_value']
+    def put(address,*values):debug.write_memory(address,struct.pack('>'+'I'*len(values),*values))
+    check('complete startup prefix',BLOB_RAM,blob[:0xC000])
+    at=equipment['blob_offset'];check('complete equipment readers',0x804A3000,blob[at:at+equipment['bytes']])
+    size=0x20000;allocation=call(0x8009BFC0,[size])
+    if allocation&15 or not MODULE_RAM+RESERVATION<=allocation<=0x80400000-size:
+        raise ValueError('Shared catalogue fixture allocation failed')
+    root,submenu,stub,bridge=(allocation+n for n in (16,0x11000,0x11100,0x11120))
+    banks=[allocation+0x13000,allocation+0x17C00]
+    programs=[allocation+0x15800,allocation+0x1A400]
+    capacity=cat['capacity_expansion'];state=root+capacity['state_offset']
+    page=state+0xEC8+4*capacity['page_bytes']
+    data,reloc=(files[v].extract(rom) for v in (VROM,RELOC))
+    if (sha256(data),sha256(reloc))!=(cat['output_sha256'],cat['relocation_sha256']):
+        raise ValueError('Changed complete catalogue image or relocation')
+    if root+len(data)+len(reloc)>=allocation+0x10628:
+        raise ValueError('Shared catalogue fixture overlaps owner callbacks')
+    loaded=relocate_verified_data(Image(RAM,len(data),struct.unpack_from('>5I',reloc)),data,reloc,root)
+    debug.write_memory(allocation,bytes(size))
+    call(0x800262D0,[VROM,VROM+len(data),RAM,RAM+len(data),root,root+len(data),len(reloc)])
+    check('complete actual loaded catalogue',root,loaded);proof=(root,loaded[:14048])
+    # Existing catalogue fixture replaces only entry-animation movement.
+    debug.write_memory(stub,bytes.fromhex('03E0000800000000'))
+    call(0x8002FE00,[stub,8]);call(0x80034CE0,[stub,8])
+    put(submenu+0x2C,allocation);put(allocation+0x106B0,stub);put(allocation+0x10720,state)
+    player=0x80126EC0
+    saved={a:debug.read_memory(a,n) for a,n in ((player,0xBD0),(0x80136FD8,4),
+        (0x80460020,192),(0x8046C000,864),(0x801458B8,4),(0x8010FD60,4),
+        (TEST_STACK-0x800,16),(TEST_STACK+0x40,16))}
+    edge=b'V3HC'*4;guards=[allocation,allocation+size-16,TEST_STACK-0x800,TEST_STACK+0x40]
+    for bank,program in zip(banks,programs):guards += [bank-16,bank+0x2400,program-16,program+0x2000]
+    for address in guards:debug.write_memory(address,edge)
+    init,name_at=(APPROVED['symbols'][k]+capacity['insert_bytes'] for k in ('af_catalog_init','af_catalog_name'))
+    selected=bytearray(saved[0x80460020])
+    for row in parents.values():selected[row['profile_byte']]|=row['profile_mask']
+    def initialize():
+        debug.write_memory(state,bytes(capacity['state_bytes']))
+        for n,(program,bank) in enumerate(zip(programs,banks)):
+            put(state+8+n*0x760+0x740,program,bank);debug.write_memory(bank,b'\xA5'*0x2400)
+        call(root+init,[submenu],(root+init,loaded[init:init+40]))
+    try:
+        debug.write_memory(0x80460020,selected);call(0x80469200,expected=1)
+        put(0x80136FD8,player);put(0x8010FD60,0);debug.write_memory(player,bytes(0xBD0))
+        initialize();check('uncollected parents stay absent',page,bytes(2))
+        for row in rows:
+            parent=int(row['parent_item_id'],16);display=int(row['item_id'],16)
+            call(0x800B88EC,[parent])
+            call(0x800BEFCC,[parent],expected=parent)
+            call(0x800BF10C,[display+3],expected=parent)
+        initialize()
+        check('all collected parent entries',page,struct.pack('>H',len(rows)))
+        check('actual donor category ordering',page+8,b''.join(bytes.fromhex(r['item_id']) for r in rows))
+        check('partial category indicator',page+6,bytes(1))
+        for position in (0,len(rows)-1):
+            # Native seven-name page cache: scroll the last record into slot zero.
+            debug.write_memory(page+2,struct.pack('>HH',position,0))
+            call(root+0x808A6A8C-RAM,[submenu,4],proof)
+            buffer=debug.read_memory(state,1)[0]
+            if buffer not in (0,1):raise ValueError('Invalid native preview buffer')
+            row=rows[position];parent=parents[row['parent_item_id']];preview=state+8+buffer*0x760
+            check('selected display identity',preview,struct.pack('>H',row['catalogue_index']))
+            check('actual resident profile',preview+0x748,bytes.fromhex(row['profile_ram']))
+            check('actual parent price',preview+0x754,struct.pack('>I',parent['price']))
+            check('complete donor framing',preview+0x758,struct.pack('>ff',1,36))
+            check('centred model height',preview+12,struct.pack('>f',0))
+            at=int(row['object_vrom'],16)-BLOB;asset=blob[at:at+row['object_bytes']]
+            check('complete prepared model transfer',banks[buffer],asset)
+            check('unchanged model buffer tail',banks[buffer]+len(asset),b'\xA5'*(0x2400-len(asset)))
+            name=call(root+name_at,[page+capacity['name_offset']],(root+name_at,loaded[name_at:name_at+92]))
+            check('full English parent name',name,parent['name'].encode().ljust(16,b' '))
+        # Profile removal hides an owned item without clearing its collection.
+        parent=parents[rows[0]['parent_item_id']]
+        selected[parent['profile_byte']]&=~parent['profile_mask']
+        debug.write_memory(0x80460020,selected);debug.write_memory(0x8046C010,selected)
+        initialize();check('disabled owned parent hidden',page,struct.pack('>H',len(rows)-1))
+        call(0x80465000,[rows[0]['runtime_index']],expected=0)
+        debug.write_memory(player+0xAF0,b'\xFF'*120)
+        initialize();check('original umbrella rows retained',page,struct.pack('>H',32+len(rows)-1))
+        call(root+0x808A627C-RAM,[state+8,0x1004],proof)
+        check('original preview fallback',state+8,bytes.fromhex('0001'))
+        for address in guards:check('allocation or stack guard',address,edge)
+        check('no CPU fault',0x8003CE34,bytes(4))
+        check('equipment guard',0x804A3000+equipment['bytes']-16,bytes.fromhex('AF48C0DE')*4)
+        check('translation guard',0x8019C8D0,bytes.fromhex('AF32C0DE')*4)
+    finally:
+        for address,value in saved.items():debug.write_memory(address,value)
+        call(0x8009C040,[allocation])
+    for address,value in saved.items():check('restored fixture state',address,value)
+    return dict(native_parent_catalogue=True,category_rows=len(rows),complete_preview_models=2,
+        gpu_rendered=False,ordinary_order_delivery_tested=False,saved_data_written=False,
+        requires_checkpoint_restore=True)
+
+
 def exercise(debug, rom_path, record):
     path = Path(rom_path)
     rom, report = path.read_bytes(), json.loads((path.parent / 'build.json').read_text())

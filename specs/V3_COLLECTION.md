@@ -162,9 +162,10 @@ acquired by a visiting private record retain the existing safety warning;
 Controller Pak transport is not implemented by this adapter. Save format 2,
 the current selection profile, and all codec entry addresses are unchanged.
 
-No parent choice is enabled by collection installation. The umbrella category's
-list, actual display models, canonical name/price readers, and selected preview
-construction still need installation before optional selection and ordinary
-gameplay/persistence checks. Both served patchers stay V2. See the
+No parent choice is enabled by collection installation. The
+[shared catalogue adapter](V3_CATALOGUE.md#shared-handheld-representations)
+installs the umbrella list, complete display models, canonical name/price readers,
+and selected preview construction. Optional selection and ordinary gameplay/
+persistence remain required. Both served patchers stay V2. See the
 [checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-held-parent-collection)
 for exact tests and the inherited seasonal-copy restriction.

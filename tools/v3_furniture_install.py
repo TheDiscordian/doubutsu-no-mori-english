@@ -435,7 +435,7 @@ def build(output, art_path, lock=LOCK):
 
 def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=False, equipment_kinds=False,
                     player_actions=False, item_category_art=None, ground_categories=False, event_acquisition=False,
-                    held_collection=False):
+                    held_collection=False, held_catalogue_art=None):
     """Update shared readers; optionally install the shared held-resource adapter."""
     output=output.resolve()
     if output.exists() or not output.is_relative_to(ROOT/'build'):
@@ -451,11 +451,11 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             or struct.unpack_from('>4I',blob,0xF0)!=(BLOB+PACKAGE,PACKAGE_SIZE,zlib.crc32(package),PACKAGE_RAM)):
         raise ValueError('Changed shared runtime package')
     output.mkdir(parents=True)
-    moved=[];equipment_report=None;reused=None;owner_changes={};owner_moves=[];owner_updates=[]
+    moved=[];equipment_report=None;reused=None;owner_changes={};owner_moves=[];owner_updates=[];report_updates={}
     equipment_mode=any((equipment_art is not None,player_motion,equipment_kinds,player_actions,
-                        item_category_art is not None,ground_categories,event_acquisition,held_collection))
+                        item_category_art is not None,ground_categories,event_acquisition,held_collection,held_catalogue_art is not None))
     if sum((equipment_art is not None,player_motion,equipment_kinds,player_actions,
-            item_category_art is not None,ground_categories,event_acquisition,held_collection))>1:
+            item_category_art is not None,ground_categories,event_acquisition,held_collection,held_catalogue_art is not None))>1:
         raise ValueError('Install equipment resources, player motion, and kind readers in dependency order')
     if equipment_mode:
         blob,reused=reuse_resource_tail(base,prior,old_blob)
@@ -488,6 +488,9 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
     elif held_collection:
         import v3_held_collection as equipment
         equipment_report,owner_changes=equipment.install(base,prior,blob,core,original,output)
+    elif held_catalogue_art is not None:
+        import v3_held_catalogue as equipment
+        equipment_report,owner_changes,report_updates=equipment.install(base,prior,blob,core,original,output,held_catalogue_art)
     if equipment_report:
         if equipment_report.get('parent_readers'):
             attribution=provenance_patch(equipment_report['parent_readers']['rows'])
@@ -497,6 +500,10 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         # receive checked uncompressed storage before the ordinary resource tail.
         for vrom,data in owner_changes.items():
             entry=files[vrom]
+            if held_catalogue_art is not None and vrom in (catalogue.VROM,catalogue.RELOC):
+                if vrom not in {r['vrom'] for r in reused['retired_resources']}:
+                    raise ValueError('Resized catalogue is not owned by the reusable tail')
+                continue
             if len(data)!=entry.size:raise ValueError('Runtime update changes owner dimensions')
             if entry.pend:
                 blob.extend(bytes(-len(blob)%16));at=len(blob);blob.extend(data)
@@ -514,7 +521,7 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
                 owner_updates.append(dict(vrom=vrom,blob_offset=at,bytes=len(data),
                     sha256=sha256(data),original_sha256=sha256(entry.extract(base))))
         for row in sorted(reused['retired_resources'],key=lambda r:r['blob_offset']):
-            data=files[row['vrom']].extract(base)
+            data=owner_changes.get(row['vrom'],files[row['vrom']].extract(base))
             blob.extend(bytes(-len(blob)%16));at=len(blob);blob.extend(data)
             moved.append(dict(vrom=row['vrom'],blob_offset=at,bytes=len(data),
                               physical=files[BLOB].pstart+at,sha256=sha256(data)))
@@ -546,7 +553,7 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             raise ValueError('Equipment resource growth overlaps live cartridge data')
     for vrom,data in ((BLOB,blob),(CODE_VROM,core),(MODULE,module),*owner_changes.items()):
         entry=files[vrom]
-        if any(row['vrom']==vrom for row in owner_moves):continue
+        if any(row['vrom']==vrom for row in owner_moves+moved):continue
         if entry.pend or entry.size!=len(data) and not (equipment_report and vrom==BLOB):
             raise ValueError('Runtime update changes an undeclared resource allocation')
         result[entry.pstart:entry.pstart+len(data)]=data
@@ -568,6 +575,7 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
     patch=make_ups(original,result)
     if apply_ups(original,patch)!=result: raise ValueError('Runtime patch reconstruction failed')
     report=copy.deepcopy(prior)
+    report.update(report_updates)
     report.update(build='v3-shared-item-runtime',runtime_abi=abi,input_build_sha256=sha256(base),
         output_sha256=sha256(result),patch_sha256=sha256(patch),blob_sha256=sha256(blob),
         blob_bytes=len(blob),blob_file_bytes=len(blob),
@@ -577,6 +585,7 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
     for section in report.values():
         if isinstance(section,dict) and 'package_sha256' in section: section['package_sha256']=sha256(package)
     report['import_storage']['item_rows_sha256']=sha256(blob[ITEMS:TABLE_END])
+    report['import_storage']['profile_rows_sha256']=sha256(blob[ROWS:ITEMS])
     report['shared_runtime_refresh']=dict(base=base_pin,adapters=['display_aliases'],
         artwork_changed=False,resource_allocations_changed=False,saved_format_changed=False,
         saved_profile_changed=False,web_patcher_enabled=False)
@@ -606,6 +615,9 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             report['shared_runtime_refresh']['adapters'].append('event_acquisition')
         if held_collection:
             report['shared_runtime_refresh']['adapters'].append('held_collection')
+        if held_catalogue_art is not None:
+            report['shared_runtime_refresh']['adapters'].append('held_catalogue')
+            report['shared_runtime_refresh']['artwork_changed']=True
         report['sources'].update({p:sha256((ROOT/p).read_bytes()) for p in equipment.SOURCES})
         if equipment_report.get('parent_readers'):
             report['sources']['translations/provenance.json']=sha256((ROOT/'translations/provenance.json').read_bytes())
@@ -643,6 +655,8 @@ if __name__=='__main__':
         help='With --refresh-runtime, install separate source-derived event stock for selected handhelds')
     parser.add_argument('--held-collection',action='store_true',
         help='With --refresh-runtime, connect selected handheld ownership using source collection identities')
+    parser.add_argument('--held-catalogue-art',type=Path,
+        help='With --refresh-runtime, connect prepared parent display models to their actual catalogue category')
     args=parser.parse_args()
     if args.equipment_art and not args.refresh_runtime:parser.error('--equipment-art requires --refresh-runtime')
     if args.player_motion and not args.refresh_runtime:parser.error('--player-motion requires --refresh-runtime')
@@ -652,9 +666,11 @@ if __name__=='__main__':
     if args.ground_categories and not args.refresh_runtime:parser.error('--ground-categories requires --refresh-runtime')
     if args.event_acquisition and not args.refresh_runtime:parser.error('--event-acquisition requires --refresh-runtime')
     if args.held_collection and not args.refresh_runtime:parser.error('--held-collection requires --refresh-runtime')
+    if args.held_catalogue_art and not args.refresh_runtime:parser.error('--held-catalogue-art requires --refresh-runtime')
     result=(refresh_runtime(args.output,args.base_lock,equipment_art=args.equipment_art,player_motion=args.player_motion,
                             equipment_kinds=args.equipment_kinds,player_actions=args.player_actions,
                             item_category_art=args.item_category_art,ground_categories=args.ground_categories,
-                            event_acquisition=args.event_acquisition,held_collection=args.held_collection)
+                            event_acquisition=args.event_acquisition,held_collection=args.held_collection,
+                            held_catalogue_art=args.held_catalogue_art)
             if args.refresh_runtime else build(args.output,args.art,args.base_lock))
     print(json.dumps({k:result[k] for k in ('runtime_abi','output_sha256','patch_sha256')},indent=2))

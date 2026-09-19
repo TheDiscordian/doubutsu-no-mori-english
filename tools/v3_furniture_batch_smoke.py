@@ -677,6 +677,9 @@ def held_collection(debug,rom_path,record):
 
 
 def exercise(debug, rom_path, record, *, section='automatic_furniture'):
+    if section=='held_catalogue':
+        from v3_catalogue_smoke import held_previews
+        return held_previews(debug,rom_path,record)
     if section=='held_collection':return held_collection(debug,rom_path,record)
     if section=='event_menu':return event_menu(debug,rom_path,record)
     if section=='event_acquisition':return event_stock(debug,rom_path,record)

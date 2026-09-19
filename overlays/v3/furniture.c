@@ -24,6 +24,9 @@ typedef __UINTPTR_TYPE__ uptr;
 enum { NATIVE = 947, CAPACITY = AF_V3_FURNITURE_CAPACITY, BANKS = 100, BANK_BYTES = AF_V3_BANK_BYTES };
 struct Import { u16 index, item; u32 enabled; u32 profile[17]; u32 pad; };
 _Static_assert(sizeof(struct Import) == 80, "Furniture import row");
+#ifdef AF_V3_HELD_CATALOGUE
+extern u32 af_v3_held_item_collection(u32);
+#endif
 #ifdef __mips__
 #define imports ((const struct Import *)AF_V3_STATIC_IMPORT_RAM)
 #define profiles ((const u32 *)AF_V3_FURNITURE_PROFILES)
@@ -107,7 +110,14 @@ static const struct Import *find(u32 argument) {
     u32 i = n - AF_V3_SPARSE_FIRST;
     const struct Import *row = imports + i;
     if (row->enabled == 1 && row->index == n && row->item == 0x3000u + i * 4u &&
-            profiles[n] == AF_V3_STATIC_IMPORT_RAM + 8u + i * 80u) return row;
+            profiles[n] == AF_V3_STATIC_IMPORT_RAM + 8u + i * 80u) {
+#ifdef AF_V3_HELD_CATALOGUE
+        /* Representation tag one shares its parent's independent selection.
+           It is not another selectable or ordinarily dropped furniture item. */
+        if (row->pad && (row->pad!=1u || af_v3_held_item_collection(row->item)!=row->item)) return 0;
+#endif
+        return row;
+    }
 #else
     for (u32 i = 0; i < AF_V3_STATIC_IMPORT_COUNT; ++i) {
         const struct Import *row = imports + i;
