@@ -2,6 +2,23 @@
 
 ## Active: V3 optional GameCube imports
 
+The proposed ABI 111 in `build/v3-event-stock-01/` contains separate source-derived
+event stock on top of the ground proposal. Six focused and twelve composition
+checks pass; its first silent native run passes 68 records/29 assertions.
+Complete module/owner loading, actual event lookup/initialisation, sparse stock,
+official prices, consumed slots, sold-out state, guards, and restoration pass.
+The 48-KiB equipment module changes no saved structure sizes or profile bits.
+The main lock stays ABI 109; the underlying seasonal copy check remains open.
+See the [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-event-stock).
+
+Next connect an explicit imported-wares menu, source-correct introductory text,
+normal pocket/payment checks, and handover to these shared stock functions.
+Keep all original N64 wares accessible. Donor category two is consumable balloon
+stock, not the native unlimited-fruit branch. Use the existing stock records and
+name/provenance machinery, not per-variant installers. Continue collection/
+catalogue and optional composition afterwards. Do not replay unchanged stock
+component checks or enable any handheld choice before its gameplay path works.
+
 Current ABI 109 is `build/v3-category-runtime-03/`, pinned by the main build
 lock. The shared importer installs all nine equipment category graphics,
 71-entry police/handover material and geometry tables, selected-parent lookup,
@@ -27,8 +44,8 @@ pointers/counts, and array clearing pass. PC/SP failure diagnostics are now
 present but unexecuted. Classify the copy-window failure before promotion;
 retain the other three seasons, drawing, guards, and restoration as unverified.
 See the [exact stopping point](checkpoints/V3_FURNITURE_PIPELINE.md#shared-seasonal-ground-runtime).
-The setup retry and new-harness budget for this batch are spent. Continue shared
-source acquisition and collection/catalogue/selection implementation, reusing
+The setup retry and new-harness budget for this batch are spent. Continue the
+shared acquisition menu and collection/catalogue/selection implementation, reusing
 the installed category resources. No test setup failure permits shipping a
 possible memory defect. All imported handheld choices remain disabled.
 

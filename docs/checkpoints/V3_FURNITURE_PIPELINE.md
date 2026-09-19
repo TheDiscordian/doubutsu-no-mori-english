@@ -1,5 +1,89 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared event stock
+
+The proposed ABI 111 is `build/v3-event-stock-01/`, built explicitly from the
+ground-enabled ABI 110 proposal. ROM SHA-256:
+`373602d0fa380440d1a2766dd06a011d826c54ca5e9cb562871fba13512da48b`.
+Report SHA-256:
+`be5c6116624af2df62176508a41d924a7aae05697010845c15c20ca0d08bfbd8`.
+UPS SHA-256:
+`a04b2ba8c8f8287a0b99c89e9e2877d1a961176b6bd8b4976890add0cb53d631`.
+The main lock remains ABI 109. This stock check does not resolve the inherited
+seasonal setter-copy failure, and the proposal is not a playtest handoff.
+
+Six complete donor functions and their relocation dependencies provide the
+stock/price/message semantics. The source records cover all eight fans,
+pinwheels, and balloons, using their actual vendor prices (780/680/480 Bells).
+The shared handheld scan annotates these 24 existing identities and still
+reports 79 equipment identities/states, fourteen prepared static model roots,
+and no newly usable imports. The generated inventory is
+`build/v3-event-stock-01/held-inventory.json`.
+
+The compiled shared helper uses 1,680 bytes plus 24 bytes of category records.
+The equipment reservation grows to 48 KiB; startup remains inside its existing
+bound. The native vendor owner stays 4,720 bytes with its English sixteen-byte
+choices intact. Only its constructor's save-initialisation call changes; one
+local JAL relocation is removed. All existing owner fields, code, stock, and
+allocation metadata remain. The wrapper resolves the live owner before calling
+the original save initializer and actual native event getter.
+
+The native event record has a forty-byte payload. Added stock uses its trailing
+twenty bytes, not a second event slot or replacement of original goods. Selected
+variants retain their slots, empty categories are excluded, and the initialized
+count marker prevents sold-out stock from refilling. Unselected imports cause
+no tail writes or RNG use. Shared bounded count/index/quote/commit functions
+provide the menu contract. They do not grant items or charge money.
+
+### Verification
+
+`python3 -m unittest tests.test_v3_event_acquisition -v` passes six checks in
+6.103 seconds. Sanitized host execution covers all three source categories,
+sparse pages, prices, complete depletion, repeated initialization, invalid/null
+arguments, malformed state/configuration, invalid RNG values, readiness changes,
+stale quotes, and protected original event data. Cartridge checks cover the
+entire retained owner, two relocation locations, allocation/lookup contracts,
+all source mutations, complete module transfer/checksum, unchanged resources,
+and exact UPS reconstruction. Python syntax and `git diff --check` pass.
+
+Twelve optional-composition tests pass in 9.229 seconds against the explicitly
+pinned proposal, without editing the main lock. They include the actual save
+codec, sparse/dependency profiles, all 104 experimental choices, and exact
+no-import V2 output. Existing choices and profile bits do not change.
+
+The first silent native run, `build/smoke-v3-event-stock-01/results.json`, passes
+68 records with 29 assertions. Results SHA-256:
+`a5f4b66c5d24ac5233e6ebeb866fc531d0cc4433496125da76921be76fdaa9d5`.
+It checks the complete 48-KiB startup module and relocated vendor, executes the
+real original initializer/getter with an isolated existing event record, and
+verifies both disabled and sparse-selected stock. Native count, page-index,
+quote, consumption, repeated-sale rejection, reinitialisation without restock,
+and complete sell-out pass. All scratch guards, original event/profile/owner
+restoration, checkpoint reload, no-fault status, and resident guard pass. The
+emulator shuts down gracefully. No user save or audible playback is used.
+
+This is component execution, not ordinary vendor interaction, a purchase into
+the player's actual pocket, an event rollover, disk save/reload, GPU appearance,
+or original-hardware evidence. The constructor wrapper is invoked directly;
+cartridge/relocation checks establish its call binding, not a full NPC spawn.
+
+### Remaining integration and compatibility
+
+Connect an explicit imported-wares menu while preserving original merchandise,
+source-correct introductions, the native pocket/payment checks, and handover.
+Keep source category two separate from the native unlimited-fruit branch.
+Source and native introduction IDs overlap despite differing merchandise;
+review actual identities and record any text adaptation in the one provenance
+catalogue. Do not count the stock helper as completed acquisition or enable
+unfinished balloons/pinwheels merely because their stock records exist.
+
+Saved format 2 and all profile identities remain unchanged. The unused event
+tail gains stock semantics when imports are selected; its initialized marker
+survives owner reload, but ordinary save/restart persistence is not yet tested.
+No handheld profile bits are enabled in the emitted cartridge. Import-enabled
+V3 saves remain unsuitable for V2. Both served patchers are unchanged. Carry
+the separate museum-header fix into V3 before its next handoff.
+
 ## Shared seasonal ground runtime
 
 The proposed ABI 110 is `build/v3-ground-categories-02/`. Its ROM SHA-256 is

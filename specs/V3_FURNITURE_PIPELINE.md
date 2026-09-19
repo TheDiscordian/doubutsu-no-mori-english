@@ -61,6 +61,12 @@ unchanged terminal catalogue/shop owners; see [held equipment](V3_HANDHELD_ITEMS
 Both paths preserve profiles and saved identities and emit a new build lock and
 reconstructible patch. This is a shared runtime update, not a separate installer
 for each item.
+`--refresh-runtime --event-acquisition` consumes the donor's shared event stock
+categories and adds separate selected-only stock while preserving native wares.
+It requires the ground-enabled base explicitly and does not enable imports or
+claim that the unfinished player-facing purchase menu is installed. The same
+handheld scan records acquisition on the existing parent identities. See
+[event stock](V3_HANDHELD_ITEMS.md#shared-event-stock).
 `--refresh-runtime --player-motion` extends that same resident module with the
 complete source-derived player motions and split-body masks. It retains the
 native player owner's table relocations and all original animation meanings;

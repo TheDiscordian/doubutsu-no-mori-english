@@ -418,7 +418,9 @@ def descriptor(row):
 
 def scan(source):
     from v3_furniture_pipeline import prepare_models
+    from v3_event_acquisition import annotate
     report=discover(source)
+    annotate(report,source)
     prepared={}
     for row in report['rows']:
         row['asset_ready']=False

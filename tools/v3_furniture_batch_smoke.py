@@ -400,7 +400,86 @@ def item_categories(debug,rom_path,record):
         save_reload_tested=False,requires_checkpoint_restore=True)
 
 
+def event_stock(debug,rom_path,record):
+    """Execute the shared stock routines and real relocated initializer once."""
+    import v3_event_acquisition as event
+    from runtime_layout import TEST_STACK
+    path=Path(rom_path);image=path.read_bytes();report=json.loads((path.parent/'build.json').read_bytes())
+    if sha256(image)!=report['output_sha256']:raise ValueError('Event stock probe requires its exact cartridge')
+    equipment=report['equipment_resources'];receipt=equipment['event_acquisition']
+    files=by_vrom(image);blob=files[runtime.BLOB].extract(image);boot=boot_proofs(image)
+    at=equipment['blob_offset'];module=blob[at:at+equipment['bytes']]
+    def check(label,at,want):
+        actual=debug.read_memory(at,len(want));passed=actual==want
+        record(dict(event_stock_check=label,address=f'{at:08X}',bytes=len(want),
+                    assertion='passed' if passed else 'failed'))
+        if not passed:raise ValueError('Event stock mismatch: '+label)
+    def call(at,args=(),want=None,proof=None):
+        result=debug.call(f'{at:08X}',list(args),return_address=MODULE_RAM+0x6480,
+                          verified_code=proof or boot.get(at))
+        if want is not None:result['assertion']='passed' if result['return_value']==want else 'failed'
+        record(result)
+        if want is not None and result['return_value']!=want:raise ValueError('Event stock return mismatch')
+        return result['return_value']
+    def put(at,*words):debug.write_memory(at,struct.pack('>'+str(len(words))+'I',*words))
+    check('complete startup equipment module',event.RAM,module)
+    saved={at:debug.read_memory(at,n) for at,n in ((event.SLOT,4),(0x80460020,192),(0x80135CF4,244))}
+    size=0x3000;allocation=call(0x8009BFC0,[size])
+    if allocation&15 or not MODULE_RAM+0x8000<=allocation<=0x80400000-size:
+        raise ValueError('Event probe allocation outside native heap')
+    root,bridge,offer=allocation+16,allocation+0x2000,allocation+0x2100
+    debug.write_memory(allocation,bytes(size));edge=b'V3ES'*4
+    guards=(allocation,bridge-16,bridge+16,offer-16,offer+16,allocation+size-16,
+            TEST_STACK-0x800,TEST_STACK+0x40)
+    for at in guards:debug.write_memory(at,edge)
+    parents=equipment['parent_readers']['rows']
+    def select(rows):
+        profile=bytearray(saved[0x80460020])
+        for row in parents:profile[row['profile_byte']]&=~row['profile_mask']
+        for row in rows:profile[row['profile_byte']]|=row['profile_mask']
+        debug.write_memory(0x80460020,profile)
+    def routine(name,args=(),want=None):
+        stub=struct.pack('>2I',event.jump(receipt['code']['symbols']['af_v3_event_stock_'+name]),0)
+        debug.write_memory(bridge,stub);call(0x8002FE00,[bridge,8]);call(0x80034CE0,[bridge,8])
+        return call(bridge,args,want,(bridge,stub))
+    try:
+        data,rel=(files[v].extract(image) for v in (event.OWNER,event.RELOC))
+        sections=struct.unpack_from('>5I',rel)
+        loaded=relocate_verified_data(SimpleNamespace(ram=event.OWNER_RAM,resident_bytes=len(data),sections=sections),data,rel,root)
+        call(0x800262D0,[event.OWNER,event.OWNER+len(data),event.OWNER_RAM,
+                        event.OWNER_RAM+len(data),root,root+len(data),len(rel)])
+        check('complete loaded night-stall owner',root,loaded);put(event.SLOT,root)
+        # Existing event record avoids synthesising the full calendar/NPC scene.
+        # Both the original save initializer and the real getter execute.
+        native=struct.pack('>10H',*range(0x2600,0x2608),8,0)
+        put(0x80135CF4,1);debug.write_memory(0x80135CF8,b'\x0B\0'+bytes(6)+native+bytes(20))
+        area,stock=0x80135D00,0x80135D14
+        select([]);routine('construct');check('disabled imports preserve all forty event bytes',area,native+bytes(20))
+        chosen=(parents[0],parents[-1]);select(chosen);routine('construct')
+        expected=bytearray(20)
+        for row in chosen:struct.pack_into('>H',expected,(int(row['item_id'],16)-0x2254)*2,int(row['item_id'],16))
+        struct.pack_into('>2H',expected,16,8,0)
+        check('source-selected sparse stock and original wares',area,native+expected)
+        routine('count',[stock,0],2);routine('index',[stock,0,1],7)
+        routine('quote',[stock,7,offer],1);check('official item, price, message, and slot',offer,struct.pack('>4H',0x225B,780,0x1758,7))
+        routine('commit',[stock,offer],1);routine('commit',[stock,offer],0)
+        struct.pack_into('>H',expected,14,0)
+        routine('construct');check('constructor retains purchases instead of refilling',area,native+expected)
+        routine('quote',[stock,0,offer],1);routine('commit',[stock,offer],1)
+        struct.pack_into('>H',expected,0,0)
+        routine('construct');routine('count',[stock,0],0)
+        check('sold-out marker persists across owner initialisation',area,native+expected)
+        for at in guards:check('memory guard',at,edge)
+    finally:
+        for at,raw in saved.items():debug.write_memory(at,raw)
+        call(0x8009C0F0,[allocation])
+    for at,raw in saved.items():check('restored event/profile/owner',at,raw)
+    return dict(event_stock_native=True,ordinary_purchase_tested=False,save_reload_tested=False,
+                requires_checkpoint_restore=True)
+
+
 def exercise(debug, rom_path, record, *, section='automatic_furniture'):
+    if section=='event_acquisition':return event_stock(debug,rom_path,record)
     if section=='ground_categories':
         from v3_ground_categories_smoke import exercise as ground_categories
         return ground_categories(debug,rom_path,record)

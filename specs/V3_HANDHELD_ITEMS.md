@@ -110,6 +110,61 @@ flattened to pass the static converter.
 
 ## Native integration work
 
+### Shared event stock
+
+`tools/v3_event_acquisition.py` derives fireworks-stall stock from six complete
+donor implementations, their relocation dependencies, and the three actual
+stock/price/message tables. The records cover eight fans at 780 Bells, eight
+pinwheels at 680 Bells, and eight balloons at 480 Bells. These are the vendor's
+prices, not the ordinary item price table. The shared handheld scan attaches
+these acquisition records to the existing 24 identities; it creates no new
+identities or selectable imports. Official names remain bound to their existing
+`itemName_tool` records and provenance.
+
+The N64 vendor's stock differs from the donor's. Replacing its generator would
+remove original merchandise. Its native event payload is 40 bytes; its stock
+uses the first 20. The added stock occupies the second 20, retaining eight
+`u16` slots, the count marker, and the donor category. No saved structure grows,
+and no additional event slot is reserved. The native event allocator/lookup,
+complete translated owner, relocation data, and allocation descriptor are
+checked before installation. The existing initializer and original first 20
+bytes remain intact. A direct-call scan of the original cartridge finds the
+literal event-11 save getter and reservation calls only in this vendor; this is
+not a claim to have proved every indirect event access.
+
+The shared installer supports `--refresh-runtime --event-acquisition` with an
+explicit base lock that includes seasonal ground integration. It appends one
+shared 1,680-byte implementation and three eight-byte category records to the
+equipment module, growing it from 44 to 48 KiB. The constructor's one local call
+targets the resident wrapper, and its obsolete local relocation is removed.
+The wrapper resolves the currently loaded vendor before calling its original
+save initializer. It does not retain a relocated heap pointer.
+
+Selected, implemented equipment alone enters added stock. Categories without
+eligible variants are excluded before the donor-style random category choice;
+selection within the surviving categories is uniform. Variant slots remain
+stable with zero holes for disabled imports. No eligible category means no stock
+write and no random-number consumption. The initialized count remains eight
+after sales, preventing an empty stock list from being replenished on re-entry.
+Unexpected existing data is rejected without clearing it.
+
+The shared functions supply bounded stock counts, three-choice page indices,
+item/price/message quotations, and checked consumption after a successful
+transaction. They do not insert inventory items or debit Bells. The quotation
+must still match before its slot can be consumed. Null arguments, invalid slots,
+changed profile readiness, and malformed stock fail without writes.
+
+The player-facing route is incomplete. Add an explicit way to browse imported
+wares while keeping all original wares accessible, connect the donor introduction
+and purchase messages, and retain the normal inventory-space, payment, and
+handover flow. Do not reinterpret donor category two as the N64 unlimited-fruit
+branch: donor category two is balloon stock and must be consumed. Both versions
+use some identical message IDs for different merchandise; choose wording by the
+actual route, not ID equality, and keep any adaptation in the one provenance
+catalogue. The added-stock helpers are not completed acquisition or permission
+to enable the parent choices. Full save/reload and original-hardware appearance
+remain unverified. See the [checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-event-stock).
+
 ### Shared resource loader
 
 The existing importer accepts the complete checked static-held category:

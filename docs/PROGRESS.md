@@ -17,6 +17,24 @@ locked ROM is tracked below; this V2 fix does not replace its no-import baseline
 
 ## Active development
 
+The proposed ABI 111 in `build/v3-event-stock-01/` adds shared, source-derived
+fireworks-stall stock on top of the ground-enabled proposal. It keeps original
+wares in the first 20 bytes of the native event record and added wares in the
+remaining 20. Sparse selections, donor vendor prices, stable slots, and sold-out
+state are supported without changing saved structure sizes. The shared equipment
+module is 48 KiB. All handheld choices remain disabled; purchase-menu and
+handover integration are still required. The main lock remains ABI 109 because
+the underlying ground-copy check is unresolved.
+
+Six focused tests and twelve optional-composition tests pass. The first silent
+native run passes 68 records with 29 assertions, including complete startup and
+owner loading, real event lookup/initialisation, separate selected stock,
+quotations/consumption, sold-out persistence across owner initialisation, memory
+guards, and restored event/profile/checkpoint. This does not establish an ordinary
+purchase or save/reload. Continue the shared menu/payment/handover route, not
+another stock converter or per-item installer. See the
+[checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-event-stock).
+
 The proposed ABI 110 at `build/v3-ground-categories-02/` implements the shared
 seasonal ground adapter: all four renderers, their complete category tables,
 loaded-owner constructors, appended actor indices, expanded setter stacks,

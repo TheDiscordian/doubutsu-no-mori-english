@@ -434,7 +434,7 @@ def build(output, art_path, lock=LOCK):
 
 
 def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=False, equipment_kinds=False,
-                    player_actions=False, item_category_art=None, ground_categories=False):
+                    player_actions=False, item_category_art=None, ground_categories=False, event_acquisition=False):
     """Update shared readers; optionally install the shared held-resource adapter."""
     output=output.resolve()
     if output.exists() or not output.is_relative_to(ROOT/'build'):
@@ -451,9 +451,12 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         raise ValueError('Changed shared runtime package')
     output.mkdir(parents=True)
     moved=[];equipment_report=None;reused=None;owner_changes={};owner_moves=[];owner_updates=[]
-    if sum((equipment_art is not None,player_motion,equipment_kinds,player_actions,item_category_art is not None,ground_categories))>1:
+    equipment_mode=any((equipment_art is not None,player_motion,equipment_kinds,player_actions,
+                        item_category_art is not None,ground_categories,event_acquisition))
+    if sum((equipment_art is not None,player_motion,equipment_kinds,player_actions,
+            item_category_art is not None,ground_categories,event_acquisition))>1:
         raise ValueError('Install equipment resources, player motion, and kind readers in dependency order')
-    if equipment_art is not None or player_motion or equipment_kinds or player_actions or item_category_art is not None or ground_categories:
+    if equipment_mode:
         blob,reused=reuse_resource_tail(base,prior,old_blob)
         if not reused['reused_bytes']:
             raise ValueError('Equipment integration requires the checked shared resource tail')
@@ -476,6 +479,9 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         equipment_report,owner_changes=equipment.install(base,prior,blob,core,original,output,item_category_art)
     elif ground_categories:
         import v3_ground_categories as equipment
+        equipment_report,owner_changes=equipment.install(base,prior,blob,core,original,output)
+    elif event_acquisition:
+        import v3_event_acquisition as equipment
         equipment_report,owner_changes=equipment.install(base,prior,blob,core,original,output)
     if equipment_report:
         if equipment_report.get('parent_readers'):
@@ -589,6 +595,8 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             report['shared_runtime_refresh']['artwork_changed']=True
         if ground_categories:
             report['shared_runtime_refresh']['adapters'].append('ground_categories')
+        if event_acquisition:
+            report['shared_runtime_refresh']['adapters'].append('event_acquisition')
         report['sources'].update({p:sha256((ROOT/p).read_bytes()) for p in equipment.SOURCES})
         if equipment_report.get('parent_readers'):
             report['sources']['translations/provenance.json']=sha256((ROOT/'translations/provenance.json').read_bytes())
@@ -622,6 +630,8 @@ if __name__=='__main__':
         help='With --refresh-runtime, install prepared shared category artwork and police/handover consumers')
     parser.add_argument('--ground-categories',action='store_true',
         help='With --refresh-runtime, integrate installed categories in all four seasonal ground owners')
+    parser.add_argument('--event-acquisition',action='store_true',
+        help='With --refresh-runtime, install separate source-derived event stock for selected handhelds')
     args=parser.parse_args()
     if args.equipment_art and not args.refresh_runtime:parser.error('--equipment-art requires --refresh-runtime')
     if args.player_motion and not args.refresh_runtime:parser.error('--player-motion requires --refresh-runtime')
@@ -629,8 +639,10 @@ if __name__=='__main__':
     if args.player_actions and not args.refresh_runtime:parser.error('--player-actions requires --refresh-runtime')
     if args.item_category_art and not args.refresh_runtime:parser.error('--item-category-art requires --refresh-runtime')
     if args.ground_categories and not args.refresh_runtime:parser.error('--ground-categories requires --refresh-runtime')
+    if args.event_acquisition and not args.refresh_runtime:parser.error('--event-acquisition requires --refresh-runtime')
     result=(refresh_runtime(args.output,args.base_lock,equipment_art=args.equipment_art,player_motion=args.player_motion,
                             equipment_kinds=args.equipment_kinds,player_actions=args.player_actions,
-                            item_category_art=args.item_category_art,ground_categories=args.ground_categories)
+                            item_category_art=args.item_category_art,ground_categories=args.ground_categories,
+                            event_acquisition=args.event_acquisition)
             if args.refresh_runtime else build(args.output,args.art,args.base_lock))
     print(json.dumps({k:result[k] for k in ('runtime_abi','output_sha256','patch_sha256')},indent=2))
