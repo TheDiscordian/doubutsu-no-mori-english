@@ -618,3 +618,42 @@ owner. It does not run full inventory construction, outer matrix setup, GPU
 rendering, ordinary equip/put-away, or a save/reload cycle. Those remain required
 gameplay checks before claiming playable imports. See the
 [checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-inventory-equipment-previews).
+
+## Ground and handover category integration
+
+The remaining item-type reader is native `mNT_get_itemTableNo` at `800A5630`,
+already wrapped by `af_v3_item_type`. Its non-furniture fallback still reaches
+the original 36-byte equipment table; it does not supply imported fan types.
+Do not simply return donor category 43: each native consumer owns smaller
+draw-index tables, and the police renderer also indexes a local start array.
+
+Current-cartridge aligned direct-call discovery identifies these consumers:
+
+| Native owner | VROM | Call offsets within owner |
+| --- | --- | --- |
+| Lost-and-found | `007E4DF0` | `01C8` |
+| Cherry-season ground | `007E5880` | `4900`, `4938` |
+| Winter ground | `007F0350` | `4900`, `4938` |
+| Christmas ground | `007FAEB0` | `4900`, `4938` |
+| Ordinary ground | `00805E30` | `4900`, `4938` |
+| Item handover | `00858A50` | `07B4` |
+
+This identifies direct calls, not a proof that indirect references are absent.
+The shared ground source `fg_no2fg_type` supplies the type index; the donor
+police path subtracts one before indexing its draw-start array, while handover
+uses the category directly in separate material/geometry tables. Retain native
+gift/mail priority, table bounds, actual owner lifetimes, and original categories.
+Extend these consumers together before enabling the extended category.
+
+The donor fan ground/handover artwork is distinct from both pocket icons and
+equipped models. Complete source lists `obj_item_utiwaT_mat_model` at
+`.data+8902E0` (72 bytes) and `obj_item_utiwaT_gfx_model` at `.data+890328`
+(24 bytes) reference one 32-byte palette, one 32×32 CI4 texture, and four
+vertices. Shared model preflight accepts the complete ordered pair: 608 resource
+bytes and 200 command bytes, without resizing or simplified graphics. This is
+preflight evidence, not installed ground/handover support.
+
+Discover the category dependencies through the complete source draw tables,
+including all four ground variants and handover/police tables. Feed those
+records into the existing converter and shared installer. Preserve material /
+matrix / geometry order in handover and avoid creating another per-item list.

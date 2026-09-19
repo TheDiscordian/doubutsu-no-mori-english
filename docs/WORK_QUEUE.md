@@ -21,6 +21,15 @@ entries. Do not insert source 43 into unrelated native tables or use umbrella
 artwork. The inventory-preview adapter is installed; full ordinary inventory
 loading and appearance need the combined gameplay pass once category support is ready.
 
+Category discovery identifies all four seasonal ground owners, lost-and-found,
+and handover as direct native item-type consumers. Their table indices and the
+police local array must be extended together, not just the ordinary ground
+owner. The donor's separate fan ground/handover graphic passes complete shared
+model preflight. Reuse that converter; install source-derived category records
+and verify consumer bounds before enabling the parent items. Exact owners,
+calls, source roots, and remaining discovery limits are in the
+[category integration notes](../specs/V3_HANDHELD_ITEMS.md#ground-and-handover-category-integration).
+
 Then connect source acquisition, context-correct catalogue/collection, and
 optional composition through the same descriptors. Keep ordinary take-out/
 put-away, full scene drawing, persistence, and equipped-fan use explicit;
