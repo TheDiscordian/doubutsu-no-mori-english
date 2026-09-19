@@ -27,8 +27,17 @@ the sampled appearance, not all animation frames or hardware behaviour.
 
 An emulator checkpoint is not a game save. A seeded pocket is not ordinary
 acquisition. Keep putting away, drop/pickup, delivery, actual save/restart,
-other categories, and hardware separate from an inventory/equip result. See
-the [actual gameplay evidence](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#ordinary-equipment-gameplay).
+other categories, and hardware separate from an inventory/equip result. The
+shared inventory snapshot also reads the full saved equipment ID at private
+offset `3EC`, independently of the player's current animation kind.
+
+Ordinary navigation can use a bounded target point. It observes position and
+active dialogue, presses only direction buttons, and stops on arrival, lack of
+movement, or its step limit. It never writes position or schedules. The supplied
+equipment scenarios target the reviewed copied town; their coordinates are not
+a general pathfinder for arbitrary saves. Preserve failed setup evidence rather
+than extending movement loops indefinitely. See the
+[actual gameplay evidence](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#ordinary-equipment-put-away-drop-and-persistence).
 
 ## Shared source discovery
 
@@ -261,8 +270,11 @@ an ordinary room-drop replacement. The
 [shared catalogue adapter](V3_CATALOGUE.md#shared-handheld-representations)
 installs these previews, and
 [optional composition](V3_OPTIONAL_COMPOSITION.md#shared-equipment-selections)
-connects parent choices in an explicit experimental proposal. Ordinary gameplay,
-the unresolved seasonal-copy check, persistence, and hardware remain unverified.
+connects parent choices in an explicit experimental proposal. A representative
+two-parent profile has inventory/equip, put-away/drop, and ordinary same-profile
+save/restart evidence. Actual reward acquisition, pickup, catalogue delivery,
+other parent/season combinations, the unresolved seasonal-copy check, and
+hardware remain open; component and representative checks do not cover them all.
 
 ### Shared resource loader
 

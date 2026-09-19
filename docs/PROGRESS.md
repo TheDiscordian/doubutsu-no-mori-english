@@ -17,22 +17,25 @@ locked ROM is tracked below; this V2 fix does not replace its no-import baseline
 
 ## Active development
 
-The two-fan ABI-115 profile now has ordinary inventory/equip evidence in
-`build/v3-equipment-gameplay-02/`. A copied town loads parent `2255`, shows
-the official `plum fan` name and icon, equips it through the normal inventory
-hand controls, and renders its model on both the miniature and outdoor player.
-Held-A artwork is captured, and release returns to idle with equipment kind
-108 retained. Fault and resident/equipment guards pass, and the emulator exits
-normally. No live game memory is edited. The source save remains untouched.
+The two-fan ABI-115 profile has ordinary inventory/equip, put-away, ground-drop,
+and same-profile game-save/restart/load evidence for parent `2255`. The English
+`plum fan` name, icon, miniature/outdoor held model, and dropped artwork display.
+`build/v3-equipment-save-01/` completes gyroid Save & Quit; both actual FlashRAM
+banks match independent format-2 re-encoding. A fresh process in
+`build/v3-equipment-reload-01/` restores the equipped parent, all expected
+pockets, and its collection bit. Fault and resident/equipment/save-state guards
+pass. These scenarios use normal buttons and read-only observations, never
+live-memory edits. The source save remains untouched.
 
-The first attempt omitted moving the grabbed item onto the miniature player;
-the corrected run resumes its same-ROM menu checkpoint rather than repeating
-the successful boot. Five focused fixture/read-only observation checks pass.
-This verifies copied format-2 loading and the equip path, not ordinary reward
-acquisition, drop/pickup, catalogue delivery, a new game save/restart, every fan,
-or hardware. Next continue those interactions from the retained equipped
-checkpoint. Keep the separate seasonal-copy issue unresolved and the main
-lock at ABI 109. See the [gameplay checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#ordinary-equipment-gameplay).
+Pickup remains unverified: the house forces the dropped item away from the
+player, and the bounded navigation retry stops about 21 units from it before
+issuing pickup. The corrected limit/radius is unexecuted; do not replay that
+failed setup. Ten focused observation/navigation checks pass. Next pursue
+ordinary reward acquisition/catalogue delivery and carry the Museum-header fix
+into V3, retaining the independent seasonal-copy issue as unresolved. The main
+lock stays ABI 109; this evidence is for one copied town/profile, not every
+parent, cross-profile migration, or hardware. See the
+[persistence checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#ordinary-equipment-put-away-drop-and-persistence).
 
 The proposed ABI 115 in `build/v3-held-selection-02/` connects individual
 equipment choices through the shared offline/browser composers. Its 112

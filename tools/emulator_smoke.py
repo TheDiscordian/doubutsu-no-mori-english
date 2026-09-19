@@ -473,6 +473,7 @@ def inventory_snapshot(debug):
     cloth_id, cloth_item = struct.unpack_from(">2H", data, 0xA76)
     return {"private_pointer": f"{pointer:08X}", "pockets": [f"{item:04X}" for item in pockets],
             "item_conditions": [(conditions >> (slot*2)) & 3 for slot in range(15)],
+            "equipment_item": data[0x3EC:0x3EE].hex().upper(),
             "wallet": wallet, "loan": loan, "cloth_id": f"{cloth_id:04X}",
             "cloth_item": f"{cloth_item:04X}", "read_only": True}
 
@@ -594,6 +595,42 @@ def approach_npc(debug, keyboard, npc_id, max_steps=80):
             time.sleep(0.12)
     return {"normal_controller_navigation": target, "outcome": outcome,
             "observations": observations, "position_or_schedule_writes": False}
+
+
+def approach_world(debug, keyboard, target, *, max_steps=40, radius=14):
+    """Walk to a checked outdoor point with ordinary inputs, never teleport."""
+    if (not isinstance(target, (list, tuple)) or len(target) != 2 or
+            any(type(v) not in (int, float) or not math.isfinite(v) for v in target) or
+            not 0 <= target[0] <= 4480 or not 0 <= target[1] <= 5120 or
+            type(max_steps) is not int or not 1 <= max_steps <= 80 or
+            type(radius) not in (int, float) or not 8 <= radius <= 40):
+        raise ValueError('Invalid bounded outdoor navigation request')
+    observations, positions = [], []
+    outcome = 'step_limit'
+    for step in range(max_steps+1):
+        if message_snapshot(debug).get('loaded'):
+            outcome = 'dialogue_active'
+            break
+        player = player_snapshot(debug)['world_position']
+        dx, dz = target[0]-player['x'], target[1]-player['z']
+        distance = math.hypot(dx, dz)
+        positions.append((player['x'], player['z']))
+        observations.append(dict(step=step, player=player, distance=distance))
+        if distance <= radius:
+            outcome = 'arrived'
+            break
+        if len(positions) >= 9 and math.dist(positions[-1], positions[-9]) < 4:
+            outcome = 'navigation_stalled'
+            break
+        if step == max_steps:
+            break
+        key = ('g' if dx > 0 else 'f') if abs(dx) >= abs(dz) else ('s' if dz > 0 else 'w')
+        duration = 0.025 if distance < 80 else 0.06
+        observations[-1].update(key=key, duration=duration)
+        keyboard.press(key, duration)
+        time.sleep(0.12)
+    return dict(normal_world_navigation=list(target), outcome=outcome,
+                observations=observations, position_or_schedule_writes=False)
 
 
 def keyboard_snapshot(debug):
@@ -1890,6 +1927,12 @@ def main():
                     raise ValueError('Expected native house actor is not loaded')
             if "approach_npc" in action:
                 results.append(approach_npc(debug, keyboard, action["approach_npc"], action.get("max_steps", 80)))
+            if 'approach_world' in action:
+                result = approach_world(debug, keyboard, action['approach_world'],
+                                        max_steps=action.get('max_steps', 40), radius=action.get('radius', 14))
+                record(result)
+                if result['outcome'] != 'arrived':
+                    raise ValueError('Ordinary navigation did not reach its target: '+result['outcome'])
             if action.get("snapshot_keyboard"):
                 snapshot = keyboard_snapshot(debug)
                 if action.get('snapshot_keyboard_grid'):

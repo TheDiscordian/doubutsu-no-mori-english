@@ -1,5 +1,89 @@
 # Automatic furniture pipeline checkpoint
 
+## Ordinary equipment put-away, drop, and persistence
+
+The target remains the ABI-115 subset at `build/v3-held-subset-01/`, ROM SHA-256
+`ce436916f18097cb2ba0b8ae7617489521f563df4e5b79e85bbeda62befafe60`.
+Its selected parents are `2255` and `225B`; this representative plays with
+`2255`. No cartridge code, profile, artwork, allocations, or patchers change.
+The completed preceding inventory/equip batch is committed as `042ae89`.
+
+`build/v3-equipment-drop-pickup-01/` resumes the equipped checkpoint. Normal
+inventory inputs remove the fan, restore it to pocket zero, then drop it
+outdoors. Every other pocket is retained, equipment kind becomes `-1`, the
+fault pointer stays zero, and the ground renderer displays the fan category
+artwork. The drop stores the real parent `2255`, not its catalogue alias.
+
+The initial immediate B press does not recover the item: native placement near
+the house chooses a more distant free unit. The preserved dropped checkpoint,
+SHA-256 `094fa8ca0bd96d8bfc51b4ba08cdf8fa1537f9bc4ef10787c7e2eb2987a37eb4`,
+contains the player at `(2128, 1488)` and `2255` in acre `(3, 2)`, unit `(6, 6)`,
+world `(2180, 1540)`, field address `8012E014`. Read-only checkpoint inspection
+locates RDRAM from the resident guard/header and verifies the eight-MiB memory
+size; the current state stores RDRAM at offset 37,972. An initial diagnostic
+using an older state-layout offset is rejected and supplies no game-fault
+evidence. The actual current checkpoint's fault pointer is zero, and its loaded
+ordinary ground owner is at `80253960`.
+
+The justified retry, `build/v3-equipment-recover-01/`, adds bounded ordinary
+walking toward that verified point without position writes. It stops at its
+24-step limit at `(2164.8132, 1526.1180)`, distance 20.5754, before sending B.
+Pickup is therefore **unverified**, not a passed interaction or a demonstrated
+game defect. The scenario's corrected 40-step/24-unit limit is unexecuted; the
+setup retry is spent. Do not repeat the boot/equip/drop prefix or replay this
+retry under another batch name. The retained dropped checkpoint remains the
+useful state for a later meaningful gameplay batch or human verification.
+
+Drop-run results SHA-256:
+`6b014976043062b8dee418968ee82e33550a38693238fc94f456ed3ad045526e`.
+Navigation-retry results SHA-256:
+`e309cc554a4edfa24252a95f69b2e2aa122d352f41b58c499acb70d86eff543f`.
+
+The separate persistence path resumes the already verified equipped checkpoint,
+not the failed pickup branch. `build/v3-equipment-save-01/` uses normal walking,
+gyroid dialogue, Save, house entry, and Save & Quit, and returns to the title
+screen. It passes 18 result records, the fault/resident/save-state guards, and
+graceful shutdown. Results SHA-256:
+`1ddf92c098d294e0d3a1c85a307c6b0e7de3b686a3148bc5e313f7cb368fb4d2`.
+
+The actual 128-KiB FlashRAM save SHA-256 is
+`c0afba918a9d6800b1400f6ff3d36d100317425967d38a736c6c368662b652d0`.
+Both 64-KiB banks have SHA-256
+`df164fcfd1587121391d112c2706a9c3deecf644ea89919c283bd0805d1c630b`.
+Each complete bank equals independent format-2 reference re-encoding, covering
+the native checksum and payload/extension CRCs. Both contain equipped parent
+`2255` at saved offset `40C`, the expected fifteen pockets, the exact selected
+profile SHA-256 `ecd2ef57c7f485fbc0cb66d91f84d08a7f9458dd33431d2780a5357c40ed7dbb`,
+and only the seeded imported collection bit 84. Ownership is retained, not
+newly earned through ordinary reward acquisition.
+
+`build/v3-equipment-reload-01/` starts a new emulator process with that actual
+game save through `--seed-save`, without a save-state input. It passes 13 result
+records: equipped parent `2255`, player equipment kind 108, all fifteen expected
+pockets, collection byte `10` at `8046C0DA`, zero fault pointer, and complete
+save-state/resident/equipment guards. The captured outdoor model is visible,
+and the process exits gracefully. Results SHA-256:
+`32ed5e4bdd3ebbb5d8b2f19cfc4c3ec7a4b151ba3cf8d8ad092c75495858b66c`.
+The new equipped checkpoint SHA-256 is
+`90eb8ac9f1ad0b3039ad37b41bce4c8ce46bb2d62aaaf3c4bc1265e0b7ea6046`.
+This establishes ordinary save/quit/restart/load for this copied town and the
+same two-parent profile, not cross-profile migration or every imported item.
+
+Ten focused checks pass across navigation and read-only player/inventory tests.
+They cover bounded arrival/stall/dialogue handling, rejected targets/limits,
+direction-only input, complete equipment identity, pointer checks, and signed
+empty equipment. Python syntax and diff checks pass. Every emulator run is
+silent and isolated; no scenario edits live memory. The source save remains
+`d489736e39abc7eff1c5b5085bf52e679186f2882a0247339e11603799b80b60`.
+
+Actual reward acquisition, complete pickup, catalogue ordering/delivery,
+additional categories/seasons, and original hardware remain open. This ordinary
+ground result does not explain the separate cherry setter-copy assertion; keep
+that issue unresolved and the main lock at ABI 109. Carry the Museum-header
+fix through checked V3 integration before a handoff. Both V2 patchers stay
+unchanged. Imported saves require the recorded selected profile; do not use
+them in V2 or remove dependencies without a supported migration.
+
 ## Ordinary equipment gameplay
 
 The target is the current ABI-115 two-parent subset,

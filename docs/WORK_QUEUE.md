@@ -2,19 +2,23 @@
 
 ## Active: V3 optional GameCube imports
 
-Continue ordinary equipment gameplay from the same-ROM equipped checkpoint
-`build/v3-equipment-gameplay-02/`, using the two-fan ROM/profile in
-`build/v3-held-subset-01/`. Cold loading, English inventory presentation,
-normal equipping, miniature/outdoor artwork, held-button artwork, release to
-idle, and fault/reservation guards pass. Do not repeat that successful prefix.
-The copied-town fixture sets the first pocket and its ownership; it does not
-establish acquisition or an ordinary save. Next check putting away, dropping/
-picking up, catalogue ordering/delivery, and a real save/restart. The first
-input attempt was corrected by moving the grabbed item onto the miniature
-player; this batch's setup retry is spent. Actual game defects remain fix work.
-The seasonal-copy continuation assertion is still unexplained; static inspection
-of the current cartridge alone does not close it. Neither the main lock nor
-either V2 patcher is promoted. See the [evidence](checkpoints/V3_FURNITURE_PIPELINE.md#ordinary-equipment-gameplay).
+The two-fan profile in `build/v3-held-subset-01/` passes normal equipping,
+putting away, dropping with correct ground artwork, and an ordinary gyroid
+Save & Quit followed by fresh-process reload. The equipped `2255` identity,
+all expected pockets, collection bit, and memory guards survive. Current
+equipped checkpoint: `build/v3-equipment-reload-01/`. Actual completed game
+save: `build/v3-equipment-save-01/test.flash`. Do not replay these successful
+paths. The copied original town and both V2 patchers remain untouched.
+
+Next pursue ordinary reward acquisition/catalogue delivery and integrate the
+Museum-header correction through the checked V3 pipeline. Pickup remains
+partial: `build/v3-equipment-drop-pickup-01/` retains the dropped checkpoint,
+and the single navigation retry stops 20.575 units from the item before pickup.
+The corrected limit/radius is unexecuted. Its setup retry is spent; do not
+replay it under a renamed batch. These scenarios do not establish all equipment,
+cross-profile save migration, or hardware. Keep the separate seasonal-copy
+continuation assertion unresolved; the main lock remains ABI 109. See the
+[persistence evidence](checkpoints/V3_FURNITURE_PIPELINE.md#ordinary-equipment-put-away-drop-and-persistence).
 
 The proposed ABI 115 in `build/v3-held-selection-02/` adds eight equipment-parent
 choices to the shared composers, for 112 experimental choices. Nineteen focused
@@ -27,7 +31,7 @@ See the [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-held-parent-sel
 
 Next use `build/v3-held-selection-02/build-lock.json` explicitly. Classify the
 inherited seasonal-copy continuation/stack mismatch before promotion, and finish
-ordinary acquisition/equip/use/drop/order/save gameplay. The existing two-fan
+ordinary acquisition, pickup, and order/delivery gameplay. The existing two-fan
 profile at `build/v3-held-subset-01/` is suitable for isolated developer checks,
 not a validated player handoff. Reuse installed artwork/readers and passing
 category evidence; no per-item scripts or reconversion. The main lock remains

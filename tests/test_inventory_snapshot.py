@@ -17,6 +17,7 @@ class InventoryMemory(RSP):
         struct.pack_into(">15H", self.data, 0x14, *range(0x2200, 0x220F))
         struct.pack_into(">3I", self.data, 0x34, sum((i % 4) << (2*i) for i in range(15)), 12, 18800)
         struct.pack_into(">2H", self.data, 0xA76, 16, 0x2410)
+        struct.pack_into('>H', self.data, 0x3EC, 0x2255)
 
     def command(self, command):
         if not command.startswith("m"):
@@ -35,6 +36,7 @@ class InventorySnapshotTests(unittest.TestCase):
         self.assertEqual(result["pockets"], [f"{item:04X}" for item in range(0x2200, 0x220F)])
         self.assertEqual(result["item_conditions"], [i % 4 for i in range(15)])
         self.assertEqual((result["wallet"], result["loan"], result["cloth_item"]), (12, 18800, "2410"))
+        self.assertEqual(result['equipment_item'], '2255')
 
     def test_invalid_pointers_identity_and_short_reads_fail(self):
         for pointer in (0, 0x803FFFF0, 0x80126EC1):
