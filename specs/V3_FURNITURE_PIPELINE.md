@@ -33,8 +33,11 @@ banks, descriptors, palette updates, and classification to all four native
 renderers. The subsequent `--refresh-runtime --scenery-gameplay` stage connects
 shared source-table growth/stump helpers and selected shovel planting conversion
 to all four seasons, with lazy code loading before a seasonal actor exists.
-Daily-growth eligibility/death, planting effects, full cutting/shaking/drop, and
-world collision remain required. See
+Its next shared stage connects the daily owner, growth/death, cross-acre neighbours,
+sapling records, and source-priority thinning. Native routines/house protections
+remain; only the shared code reservation grows by 4 KiB. Hidden-content
+replenishment, planting effects, full cutting/shaking/drop, and world collision
+remain required. See
 [seasonal scenery](V3_SCENERY.md).
 
 The shared flying-balloon category installs one complete donor state machine

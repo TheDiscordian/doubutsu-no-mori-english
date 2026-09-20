@@ -34,6 +34,11 @@ u32 af_v3_tree_stump_dispatch(u32 item,int flag) {
     if (!load()) return item;
     return ((u32 (*)(u32,int))AF_SCENERY_STUMP)(item,flag);
 }
+#ifdef AF_V3_SCENERY_DAILY
+void af_v3_tree_renew_dispatch(void *time,int *gyroids) {
+    if (load()) ((void (*)(void *,int *))AF_SCENERY_RENEW)(time,gyroids);
+}
+#endif
 /* The original prologues are leaf instructions; no relocated operands or
    incoming interior references may exist. Source bytes are checked at build. */
 __asm__(".set noreorder\n"

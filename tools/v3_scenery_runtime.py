@@ -21,6 +21,7 @@ SOURCES = ('tools/v3_scenery_runtime.py', 'tools/v3_scenery.py',
            'overlays/v3/scenery.ld', 'overlays/v3/scenery_bootstrap.c',
            'overlays/v3/scenery_bootstrap.ld', 'overlays/v3/scenery_palette.c',
            'overlays/v3/scenery_trees.c', 'overlays/v3/scenery_trees.h',
+           'overlays/v3/scenery_daily.c',
            'tools/v3_asset_loader.py', 'translations/provenance.json')
 
 
@@ -392,6 +393,8 @@ def install_gameplay(base,prior,blob,core,original,output):
     from v3_player_actions import native_references
     from v3_npc_clothing import guard_incoming
     old=prior['equipment_resources'];previous=old['scenery'];position=old['blob_offset']
+    if previous.get('tree_states'):
+        return install_daily(base,prior,blob,core,original,output)
     module=bytearray(blob[position:position+old['bytes']])
     if (previous.get('tree_states') or old['bytes']!=0x12000 or sha256(module)!=old['sha256']
             or previous['ram']!=RUNTIME_RAM or previous['additional_fixed_resident_bytes']!=4096
@@ -493,4 +496,159 @@ def install_gameplay(base,prior,blob,core,original,output):
     current['reservations'][0]['used_bytes']=start+len(code)-reservation['blob_offset']
     result=copy.deepcopy(old);result['scenery']=current
     result.update(sha256=sha256(module),crc32=zlib.crc32(module),additional_resident_bytes=0)
+    return result,changes
+
+
+DAILY_DONOR={
+    'mAGrw_KillTree':(88,'7f267745be95ce99ac5076282d0acadc226ef08d18212b9c9aa2470ae0675b83'),
+    'mAGrw_CheckNearTree':(944,'9db649d9a8d186980156d17f53ce40306232eaf51b9db5d6148823fba656e4ba'),
+    'mAGrw_CheckGoldTree':(32,'3897bda5f11a6fc1aae082fd0e77fdb94577c837df85a3240e95d50bcb1357f6'),
+    'mAGrw_GrowTree':(324,'74d640617aaa4c0a829ceac720e05dbb0f2f0c7309bc65edd5c95eca1246bcb2'),
+    'mAGrw_GrowPlant':(428,'886427f98f89b4d293d33ce93c21e054d863ec48272de02db6db3f93f37713d1'),
+    'mAGrw_SetTree0Info':(232,'969f1a3a820f006b36d5221ec9fbc5e4ea4126fb6e0b94e439eaf79ef13d79f4'),
+    'mAGrw_ResetTree0Info':(196,'d79b6bbcf4f05a1b3a04d3ae0ccfb1deddce19e2a4df288b8603a467b583452b'),
+    'mAGrw_KillTree0':(320,'1daa4bc17dde08e2dadb313dfbf77aaa24e48625d6db479d1def49ec6df414f4'),
+    'mAGrw_ThinTree':(300,'753ba275cb451a0e93f5300e6d6d0db15d5c6632a599ed833d5bc1fa4bfa675f'),
+}
+DAILY_NATIVE=(
+    ('near',0x398,764,'b81bf642c642221868b2971399d3ab226dc6b04d85beaedc43a1d41828dc4e0f'),
+    ('plant',0x910,368,'b552a920c7096e2a682cab4e9b38d40d1e25a58ab42f1beaa00c41ed8e1b49d2'),
+    ('set_info',0x14A0,364,'c001b64f1378c6cd1a658f4485d70357cea6ca41d1b34d59a5f618e01cacd599'),
+    ('reset_info',0x160C,308,'73fd7f748d268bc9dd9f6084c28df31d91000ab9f736ecdfafa16fc696b44b30'),
+    ('kill_info',0x1740,276,'1b4cc9a70c0ae9366bb057aeffaa77b0d4498a6f8916e824c3bb632688022cf9'),
+    ('thin',0x1854,376,'165dbafc3f476eef73cf8301679c1a84cb4e6babbc94a20dcb75a79577cc64ce'),
+    ('renew',0x475C,692,'0f84891a0dd782361ed0ab687fc81b0b8775b59b26514f9735ee358afb6a1651'),
+)
+
+
+def daily_contract(source,owner,rel,core):
+    from aflib import CODE_RAM
+    from v3_player_actions import native_references
+    from v3_import_storage import jump
+    donor={}
+    for name,(size,digest) in DAILY_DONOR.items():
+        offsets=[at for at,rows in source.functions.items() if any(n==name for n,_ in rows)]
+        if len(offsets)!=1:raise ValueError('Missing unique daily tree consumer')
+        raw,receipt=source.function(offsets[0])
+        if len(raw)!=size or sha256(raw)!=digest:raise ValueError('Changed complete daily tree source rule')
+        donor[name]=receipt
+    native=[]
+    for name,at,n,digest in DAILY_NATIVE:
+        if sha256(owner[at:at+n])!=digest:raise ValueError('Changed native daily tree consumer: '+name)
+        native.append(dict(name=name,offset=at,bytes=n,sha256=digest))
+    # The original loader establishes the exact owner pointer before invoking
+    # renewal and keeps both loaded dimensions intact throughout this extension.
+    loader=core[0x8005615C-CODE_RAM:0x80056234-CODE_RAM]
+    expected=bytes.fromhex('27bdffc83c03801224636ea0afbf001cafa400388c6e001424010007246f7fff15c100293c0280ab91ef78b23c1880ab27185760244207c003022023afa200280c026ff0afaf002c3c08801025080c5c1040001bad0200003c0400973c0500973c0680ab3c0780ab24e7576024c607c024a554a0248409200c0098f0afa200103c1980108f390c5c8fab00283c0980ab25294f1c03295021014b10238fa400380040f80927a5002c8fac002c3c0180133c0480108c840c5c0c027010a02c67510c0156e1000000008fbf001c27bd003803e0000800000000')
+    if loader!=expected:raise ValueError('Changed complete daily owner loading/lifetime')
+    hi,absolute,records,locations,slots=native_references(owner,rel,expected_sections=(18960,368,0,1056))
+    bindings=((0x830,0x398,'af_v3_tree_near',True),(0x4ABC,0x910,'af_v3_tree_daily_plant',False),
+        (0x28E0,0x14A0,'af_v3_tree_set_info',True),(0x296C,0x160C,'af_v3_tree_reset_info',True),
+        (0x2980,0x1854,'af_v3_tree_thin',True))
+    for at,target,_,link in bindings:
+        address=0x80AB07C0+target
+        calls=[i for i in range(0,18960,4) if u32(owner,i)==jump(address,link=True)]
+        pointers=[i for i,v in absolute.items() if v==address]
+        splits=[h for h,ls in hi.items() if any(v==address for _,v in ls)]
+        if (calls!=([at] if link else []) or pointers!=([] if link else [at]) or splits
+                or at not in slots or locations[at]>>24!=(0x44 if link else 0x82)):
+            raise ValueError('Changed complete daily callback references')
+    return dict(donor=donor,native=native,loader_sha256=sha256(loader)),bindings,records,locations
+
+
+def install_daily(base,prior,blob,core,original,output):
+    """Connect shared daily eligibility, death, neighbours, and acre thinning."""
+    from aflib import CODE_RAM,by_vrom
+    from apply_translation import write_new
+    from v3_asset_loader import ROOT,BLOB,compile_part
+    from v3_import_storage import jump
+    from v3_npc_clothing import guard_incoming
+    old=prior['equipment_resources'];previous=old['scenery'];position=old['blob_offset']
+    module=bytearray(blob[position:position+old['bytes']]);files=by_vrom(base)
+    if (previous.get('daily_growth') or not previous.get('tree_states') or old['bytes']!=0x12000
+            or sha256(module)!=old['sha256'] or previous['additional_fixed_resident_bytes']!=4096
+            or RUNTIME_RAM+8192>prior['furniture']['bank_pool']['start']):
+        raise ValueError('Changed daily-growth runtime dependency')
+    source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+                  (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    rules=tree_rules(source)
+    owner,rel=(files[v].extract(base) for v in (0x970920,0x9754A0))
+    evidence,bindings,records,locations=daily_contract(source,owner,rel,core)
+    guard_incoming(owner,18960,0x80AB07C0,[(0x475C,8)])
+    include='../'*len(output.relative_to(ROOT).parts)+'overlays/v3/scenery_trees.h'
+    configuration=f'#include "{include}"\nconst Scenery af_v3_scenery_config[4]={{\n'
+    configuration+=''.join(' {'+','.join(f'0x{v:X}u' for v in row['config'])+'},\n' for row in previous['owners'])+'};\n'
+    fields=[rules[k] for k in ('first','count','hidden_first','hidden_count','selected_item','plant_item','hole')]+[0]
+    configuration+='const TreeRule af_v3_tree_rule={'+','.join(f'0x{v:X}' for v in fields)+',\n {'
+    configuration+=','.join('{'+','.join(str(v) for v in stage)+'}' for stage in rules['growth'])+'},\n {'
+    configuration+=','.join(str(v) for v in rules['stumps'])+'}};\n'
+    configuration+='const u32 af_v3_tree_bury_offsets[4]={0x19A4,0x19A4,0x19A4,0x19A4};\n'
+    config=[0x80100C5C,0x398,0x910,0x14A0,0x160C,0x1854,0x869,0x84E,32]
+    configuration+='const TreeDaily af_v3_tree_daily_config={'+','.join(f'0x{v:X}' for v in config)+'};\n'
+    path=output/'scenery-config.c';write_new(path,configuration.encode())
+    code,compiled=compile_part('scenery',output/'scenery',extra_sources=(
+        'overlays/v3/scenery_trees.c','overlays/v3/scenery_daily.c',str(path.relative_to(ROOT))))
+    start=previous['blob_offset'];reservation=previous['reservations'][0]
+    if (sha256(blob[start:start+previous['bytes']])!=previous['sha256'] or len(code)>8192
+            or start+len(code)>reservation['blob_offset']+reservation['bytes']):
+        raise ValueError('Daily tree packet exceeds owned cartridge or memory')
+    boot,bootstrap=compile_part('scenery_bootstrap',output/'scenery_bootstrap',defines=(
+        'AF_V3_SCENERY_TREES','AF_V3_SCENERY_DAILY',f'AF_SCENERY_VROM=0x{BLOB+start:X}u',
+        f'AF_SCENERY_BYTES={len(code)}u',f'AF_SCENERY_CRC=0x{zlib.crc32(code):X}u',
+        f'AF_SCENERY_GROW=0x{compiled["symbols"]["af_v3_tree_grow"]:X}u',
+        f'AF_SCENERY_STUMP=0x{compiled["symbols"]["af_v3_tree_stump"]:X}u',
+        f'AF_SCENERY_RENEW=0x{compiled["symbols"]["af_v3_tree_renew_native"]:X}u'))
+    a,b=BOOT_RAM-old['ram'],BOOT_END-old['ram'];n=previous['bootstrap']['bytes']
+    if (sha256(module[a:a+n])!=previous['bootstrap']['sha256'] or any(module[a+n:b])
+            or len(boot)>b-a-4 or bootstrap['symbols']['af_v3_native_tree_grow']!=0x804ADFC0
+            or bootstrap['symbols']['af_v3_native_tree_stump']!=0x804ADFD0):
+        raise ValueError('Changed daily bootstrap/cache/fallback reservation')
+    module[a:b]=boot+bytes(b-a-len(boot));blob[start:start+len(code)]=code
+    changes={};owners=[]
+    for variant,row in enumerate(previous['owners']):
+        data=bytearray(files[row['vrom']].extract(base));orel=files[row['reloc']].extract(base)
+        if sha256(data)!=row['output_sha256'] or sha256(orel)!=row['output_reloc_sha256']:
+            raise ValueError('Changed complete seasonal tree consumer')
+        patches=[]
+        edits=[(u32(orel,0)+16,bootstrap['symbols']['af_v3_scenery_'+row['role']],
+                previous['bootstrap']['symbols']['af_v3_scenery_'+row['role']]),
+            (0x47A8,jump(compiled['symbols'][f'af_v3_scenery_type{variant}']),
+                jump(previous['code']['symbols'][f'af_v3_scenery_type{variant}']))]
+        edits += [(at,jump(compiled['symbols'][f'af_v3_tree_bury{variant}'],link=True),
+            jump(previous['code']['symbols'][f'af_v3_tree_bury{variant}'],link=True))
+            for at in previous['tree_states']['planting'][variant]['calls']]
+        for at,after,before in edits:
+            if u32(data,at)!=before:raise ValueError('Changed seasonal tree dispatch')
+            patches.append(dict(offset=at,before=before,after=after));struct.pack_into('>I',data,at,after)
+        new=copy.deepcopy(row);new.update(before_sha256=row['output_sha256'],before_reloc_sha256=row['output_reloc_sha256'],
+            output_sha256=sha256(data),patches=patches);owners.append(new);changes[row['vrom']]=bytes(data)
+    core_hooks=[]
+    for row in previous['tree_states']['core_consumers']:
+        at=row['start']-CODE_RAM;before=bytes(core[at:at+8])
+        if before.hex()!=row['after']:raise ValueError('Changed core tree-state dispatch')
+        after=struct.pack('>2I',jump(bootstrap['symbols']['af_v3_tree_'+row['name']+'_dispatch']),0)
+        core[at:at+8]=after;core_hooks.append(dict(offset=at,before=before.hex(),after=after.hex()))
+    data=bytearray(owner);relocation=bytearray(rel);patches=[];removed=set()
+    for at,_,name,link in bindings:
+        target=compiled['symbols'][name];after=jump(target,link=True) if link else target
+        patches.append(dict(offset=at,before=u32(data,at),after=after));struct.pack_into('>I',data,at,after)
+        removed.add(locations[at])
+    for at,after in ((0x475C,jump(bootstrap['symbols']['af_v3_tree_renew_dispatch'])),(0x4760,0)):
+        patches.append(dict(offset=at,before=u32(data,at),after=after));struct.pack_into('>I',data,at,after)
+    kept=[v for v in records if v not in removed];struct.pack_into('>I',relocation,16,len(kept))
+    relocation[20:-4]=struct.pack('>'+str(len(kept))+'I',*kept)+bytes(len(relocation)-24-4*len(kept))
+    changes[0x970920]=bytes(data);changes[0x9754A0]=bytes(relocation)
+    blob[position:position+len(module)]=module
+    current=copy.deepcopy(previous);current.update(owners=owners,code=compiled,bytes=len(code),sha256=sha256(code),
+        crc32=zlib.crc32(code),bootstrap=bootstrap,config_sha256=sha256(configuration.encode()),additional_fixed_resident_bytes=8192)
+    current['reservations'][0]['used_bytes']=start+len(code)-reservation['blob_offset']
+    current['tree_states'].update(daily_growth_owner_installed=True,shared_packet_bytes=len(code))
+    for row,hook in zip(current['tree_states']['core_consumers'],core_hooks,strict=True):row['after']=hook['after']
+    current['daily_growth']=dict(**evidence,config=config,vrom=0x970920,reloc=0x9754A0,ram=0x80AB07C0,
+        resident_bytes=sum(struct.unpack_from('>4I',rel)),previous_sha256=sha256(owner),previous_reloc_sha256=sha256(rel),
+        sha256=sha256(data),reloc_sha256=sha256(relocation),patches=patches,removed_relocations=sorted(removed),
+        core_hooks=core_hooks,additional_resident_bytes=4096,additional_scene_resident_bytes=0,
+        hidden_content_refresh_installed=False,ordinary_gameplay_tested=False,native_test='pending')
+    result=copy.deepcopy(old);result['scenery']=current
+    result.update(sha256=sha256(module),crc32=zlib.crc32(module),additional_resident_bytes=4096)
     return result,changes

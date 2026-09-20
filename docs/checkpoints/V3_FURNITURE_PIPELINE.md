@@ -1,5 +1,83 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared daily tree growth
+
+The ABI-151 proposal is `build/v3-shared-tree-daily-01/build-lock.json`. The shared
+scenery gameplay stage connects the actual daily-growth owner without changing
+its loaded size, layout, or existing imported-house protections. Complete donor
+contracts supply gold growth/death, four-direction and cross-acre neighbours,
+sapling recording/counting, and source-priority thinning at the 32-tree acre cap.
+Original native families retain their original growth/environment/flower routines.
+Selected gold trees participate in neighbour blocking in both directions.
+Dead gold saplings are removed from the thinning candidates and clear on the
+next applicable daily update. Source counter widths and random selection remain.
+
+- ROM SHA-256:
+  `598ba67b71b479e549a56581feea7faa94a156d74fd154724e937fca729be01d`.
+- Report SHA-256:
+  `654c73f736d4e858dd5b4f39642e8f2e60abdf753e90a25b8900626f22c86688`.
+- UPS SHA-256:
+  `43ae31830681a36bb1dcf327ab954545709fde80c3f2564db168cc58878446f4`.
+
+Daily owner VROM `00970920`, relocation `009754A0`, linked RAM `80AB07C0`, and
+loaded pointer `80100C5C` retain their native allocation and lifetime. Five
+existing call/table references use shared callbacks: neighbour checking,
+ordinary plant processing, initial sapling bits, candidate counting, and thinning.
+Only those references' relocation rows are removed. The native renewal entry
+loads and verifies the shared code before resuming its displaced prologue.
+The complete core loader remains unchanged, as do all original helper routines.
+Seven complete native and nine complete donor consumers are bound by hashes;
+the callback inventory rejects unexpected references.
+
+The packet is 5,948 bytes, requiring an 8,192-byte reservation at
+`804B5000..804B6FFF`, a 4-KiB increase. Its full data remains in the existing
+retired-module cartridge reservation. The bootstrap/fallback image remains
+848 bytes; the existing cache word and guards retain their addresses. All three
+complete seasonal banks, seasonal owners, equipment module, save/profile fields,
+and 128 choices remain. The import blob and scene allocations do not grow.
+
+Four focused checks pass in 6.992 seconds on their first invocation. Host
+AddressSanitizer/UBSan covers growth/cap/day boundaries, dead clearing, every
+neighbour direction and cross-acre edge, parity rules, native/unselected
+fallbacks, sapling bookkeeping, native-first removal priority, random selection,
+eight-bit full-acre wrap, and write bounds. Cartridge checks bind complete
+source/native contracts, unchanged original helpers/house protections, actual
+relocations at two addresses, packet/cache/guard storage, complete UPS
+reconstruction, retained choices/save fields, and exact V2-12 empty output.
+No new player-facing text or diagnostic source credit is required.
+
+The first silent native run, `build/smoke-v3-tree-daily-01/`, passes 97 records
+and 75 assertions, restores state/checkpoint, and exits cleanly. The real patched
+renewal entry loads the complete packet and executes the original non-field
+early return; this deliberately prevents renewal of the live town. The actual
+daily consumers then run on isolated acre arrays. They cover day/cap growth,
+death/clearing, mature/spent stability, native and gold neighbours in both
+directions, cross-acre sapling parity, actual native RNG removal priority,
+candidate recording/counting/dead exclusion, unselected fallback, unchanged
+neighbour identities and loaded owner code, memory guards, and zero fault.
+The owner pointer, packet, cache, profile, scene selector, RNG state, test stack,
+and complete equipment module are restored. No user save or ROM is used as a
+mutable test file, and no speaker/headphone output is emitted.
+
+- Results SHA-256:
+  `7d4526df0ef43d6b2c65484ebcecde8fc57cf05a3f556ab156f144c6d03304f6`.
+
+This is not a full live-town renewal, ordinary planting/acquisition, GPU
+appearance, save/restart, or original-hardware result. Reuse prior component
+evidence for unchanged planting, growth-table, and seasonal-rendering behaviour.
+Next connect world collision, full cutting/shaking and the selected shovel drop,
+planting sparkle, and daily hidden-content recording/replenishment for spent
+gold trees. All four golden-tool choices stay disabled until their source routes
+are complete. No placeholder acquisition route or replacement native identity
+is introduced.
+
+Format 3 keeps matching/equal-or-larger profile requirements. Imported saves
+must not be loaded in V2 or older format-1/2 V3 builds; preserve backups.
+No new cross-version reload claim is made. The main ABI-109 lock remains
+`f69d44334f40335c687816ece1abf0f0d1d213ccfb52bbb433f889ff606428ef`;
+both served patchers and existing ROMs/saves remain unchanged.
+See [the daily-growth design](../../specs/V3_SCENERY.md#daily-growth-death-and-overcrowding).
+
 ## Shared planting and tree-state runtime
 
 The ABI-150 proposal is `build/v3-shared-tree-states-02/build-lock.json`.

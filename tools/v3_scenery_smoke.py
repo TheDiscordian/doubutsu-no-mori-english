@@ -12,6 +12,110 @@ from v3_import_storage import jump
 from v3_npc_draw_smoke import boot_proofs
 
 
+def daily_growth(debug,rom_path,record):
+    """Native daily consumers on isolated acres, preserving live town state."""
+    path=Path(rom_path);image=path.read_bytes();report=json.loads((path.parent/'build.json').read_bytes())
+    if sha256(image)!=report['output_sha256']:raise ValueError('Changed daily-growth cartridge')
+    e=report['equipment_resources'];r=e['scenery'];d=r['daily_growth'];files=by_vrom(image)
+    blob=files[BLOB].extract(image);boot=boot_proofs(image);assertions=0
+    def check(label,at,want):
+        nonlocal assertions
+        got=debug.read_memory(at,len(want));passed=got==want
+        record(dict(daily_tree_check=label,address=f'{at:08X}',bytes=len(want),
+            expected_sha256=sha256(want),observed_sha256=sha256(got),assertion='passed' if passed else 'failed'))
+        if not passed:raise ValueError('Daily-growth mismatch: '+label)
+        assertions+=1
+    def call(at,args=(),proof=None,want=None):
+        result=debug.call(f'{at:08X}',[v&0xFFFFFFFF for v in args],
+            return_address=MODULE_RAM+0x6480,verified_code=proof or boot.get(at))
+        if want is not None:result['assertion']='passed' if result['return_value']==want else 'failed'
+        record(result)
+        if want is not None and result['return_value']!=want:raise ValueError('Daily-growth native return mismatch')
+        return result['return_value']
+    def put(at,*values):debug.write_memory(at,struct.pack('>'+'I'*len(values),*[v&0xFFFFFFFF for v in values]))
+    def short(at,value):debug.write_memory(at,struct.pack('>H',value))
+    regions=[(0x80100C5C,4),(r['ram'],8192),(r['tree_states']['cache_word'],4),
+        (0x80460020,192),(0x80126EB4,4),(0x8003C590,4),(0x800419F0,4),(TEST_STACK-0x800,16),(TEST_STACK+0x40,16)]
+    saved={at:debug.read_memory(at,n) for at,n in regions};module=debug.read_memory(e['ram'],e['bytes'])
+    size=0x7000;allocation=call(0x8009BFC0,[size])
+    if allocation&15 or not MODULE_RAM+0x8000<=allocation<=0x80400000-size:
+        raise ValueError('Daily-growth fixture allocation failed')
+    root=allocation+16;bridge=allocation+0x5800;info=allocation+0x5900;cells=allocation+0x5A00
+    adjacent=allocation+0x5D00;bits=allocation+0x6000;counts=allocation+0x6040
+    edge=b'AFDT'*4;guards=[allocation,bridge-16,info-16,info+0x44,cells-16,cells+512,
+        adjacent-16,adjacent+512,bits-16,bits+32,allocation+size-16,TEST_STACK-0x800,TEST_STACK+0x40]
+    debug.write_memory(allocation,bytes(size))
+    for at in guards:debug.write_memory(at,edge)
+    helpers=['af_v3_tree_daily_plant','af_v3_tree_near','af_v3_tree_set_info','af_v3_tree_reset_info','af_v3_tree_thin']
+    stubs=b''.join(struct.pack('>2I',jump(r['code']['symbols'][name]),0) for name in helpers)
+    debug.write_memory(bridge,stubs);call(0x8002FE00,[bridge,len(stubs)]);call(0x80034CE0,[bridge,len(stubs)])
+    def resident(name,args=(),want=None):return call(bridge+8*helpers.index(name),args,(bridge,stubs),want)
+    parent=next(row for row in e['player_actions']['equipment_selection']['rows'] if row['item_id']=='223B')
+    def select(enabled):
+        profile=bytearray(saved[0x80460020]);profile[parent['profile_byte']]&=~parent['profile_mask']
+        if enabled:profile[parent['profile_byte']]|=parent['profile_mask']
+        debug.write_memory(0x80460020,profile)
+    def field(item,cap=4,days=1,x=8,z=8):
+        debug.write_memory(cells,bytes(512));debug.write_memory(info,bytes(0x44))
+        put(info+0x10,cap,days,0);put(info+0x28,x,z)
+        at=cells+2*(x+16*z);short(at,item);return at
+    try:
+        data,rel=(files[d[k]].extract(image) for k in ('vrom','reloc'))
+        n=d['resident_bytes'];sections=struct.unpack_from('>5I',rel)
+        if root+n+len(rel)>=bridge-16:raise ValueError('Daily owner overlaps fixture')
+        loaded=relocate_verified_data(SimpleNamespace(ram=d['ram'],resident_bytes=n,sections=sections),data,rel,root)
+        call(0x800262D0,[d['vrom'],d['vrom']+len(data),d['ram'],d['ram']+n,root,root+n,len(rel)])
+        check('complete cartridge-loaded daily owner and BSS',root,loaded);put(0x80100C5C,root)
+        proof=(root,loaded[:sections[0]])
+        # Execute real renewal dispatch and displaced prologue with its native
+        # non-field early return, so no live town renewal can run in this fixture.
+        put(0x80126EB4,0);put(r['tree_states']['cache_word'],0);debug.write_memory(r['ram'],bytes(8192))
+        call(0x8002FE00,[r['ram'],8192]);call(0x80034CE0,[r['ram'],8192])
+        call(root+0x475C,[info,counts],proof)
+        code=blob[r['blob_offset']:r['blob_offset']+r['bytes']]
+        check('daily entry loads and verifies the entire shared packet',r['ram'],code)
+        check('daily packet CRC cache',r['tree_states']['cache_word'],struct.pack('>I',r['crc32']))
+        debug.write_memory(0x80126EB4,saved[0x80126EB4])
+        check('registered daily plant callback',root+0x4ABC,struct.pack('>I',r['code']['symbols']['af_v3_tree_daily_plant']))
+        select(True)
+        for item,cap,days,want in ((0x863,4,0,0x863),(0x863,4,1,0x864),(0x864,4,3,0x867),
+                (0x863,2,5,0x865),(0x868,4,5,0x868),(0x863,0,1,0x869),(0x869,4,1,0),
+                (0x863,-1,1,0),(0x800,4,1,0x801)):
+            at=field(item,cap,days);resident('af_v3_tree_daily_plant',[at,info],1)
+            check('daily plant outcome',at,struct.pack('>H',want))
+        for current,near,want in ((0x863,0x804,0x869),(0x800,0x864,0x84E),(0x800,0x804,0x84E)):
+            at=field(current);short(at-2,near);resident('af_v3_tree_daily_plant',[at,info],1)
+            check('native/imported neighbours interact',at,struct.pack('>H',want))
+            check('neighbour identity never changed',at-2,struct.pack('>H',near))
+        for z,neighbour_value,present,want in ((1,0x863,True,0x869),(0,0x863,True,0x864),(1,0x867,False,0x864)):
+            at=field(0x863,x=0,z=z);debug.write_memory(adjacent,bytes(512))
+            short(adjacent+2*(z*16+15),neighbour_value);put(info+8,adjacent if present else 0)
+            resident('af_v3_tree_daily_plant',[at,info],1);check('cross-acre sapling rule',at,struct.pack('>H',want))
+        # Source thinning counts adult gold trees and removes native saplings
+        # first, then gold saplings, using the actual native RNG.
+        acre=[0x867]*32+[0x800,0x863]+[0]*222
+        debug.write_memory(cells,struct.pack('>256H',*acre));debug.write_memory(bits,bytes(32));put(counts,0)
+        resident('af_v3_tree_set_info',[bits,cells]);wanted=bytes(4)+b'\x00\x03'+bytes(26)
+        check('gold/native saplings recorded together',bits,wanted)
+        resident('af_v3_tree_reset_info',[bits,counts,counts+1,cells]);check('native and imported candidate counts',counts,b'\x01\x01\x00\x00')
+        resident('af_v3_tree_thin',[cells,bits,1,1]);acre[32:34]=[0x84E,0x869]
+        check('complete acre after two source-priority removals',cells,struct.pack('>256H',*acre));check('removed candidate flags',bits,bytes(32))
+        debug.write_memory(bits,wanted);put(counts,0);resident('af_v3_tree_reset_info',[bits,counts,counts+1,cells])
+        check('both dead sapling types leave the candidate set',bits,bytes(32));check('dead saplings are not counted',counts,bytes(4))
+        select(False);at=field(0x863);resident('af_v3_tree_daily_plant',[at,info],0)
+        check('unselected imported tree retains native fallback',at,struct.pack('>H',0x863))
+        check('complete loaded owner remains unchanged',root,loaded);check('shared packet remains unchanged',r['ram'],code)
+        for at in guards:check('fixture guard',at,edge)
+        check('no faulted thread',0x8003CE34,bytes(4))
+    finally:
+        for at,data in saved.items():debug.write_memory(at,data)
+        call(0x8002FE00,[r['ram'],8192]);call(0x80034CE0,[r['ram'],8192]);call(0x8009C040,[allocation])
+    for at,want in saved.items():check('restored original state',at,want)
+    check('complete equipment module restored',e['ram'],module)
+    return dict(assertions=assertions,daily_entry_lazy_load=True,actual_native_rng=True,
+        isolated_acres=True,full_town_renewal=False,ordinary_acquisition_tested=False,requires_checkpoint_restore=True)
+
+
 def tree_states(debug,rom_path,record):
     """Actual lazy loading and shared helpers, not an ordinary world playthrough."""
     path=Path(rom_path);image=path.read_bytes();report=json.loads((path.parent/'build.json').read_bytes())

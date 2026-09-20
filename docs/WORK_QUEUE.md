@@ -2,8 +2,8 @@
 
 ## Active: V3 optional GameCube imports
 
-The current explicit proposal is ABI 150,
-`build/v3-shared-tree-states-02/build-lock.json`. All eight balloons are
+The current explicit proposal is ABI 151,
+`build/v3-shared-tree-daily-01/build-lock.json`. All eight balloons are
 connected through shared source-derived parent records, room profiles, indoor
 conversion/pickup, collection/catalogue, complete icons, and optional selection.
 There are 128 experimental choices, with 24 equipment parents. Neither served
@@ -37,7 +37,7 @@ gold-tree growth/drop, event/NPC completion rewards, and perfect-town acquisitio
 The complete gold-tree scenery dependency is installed through the shared
 seasonal renderer: fourteen states, complete models/shadows/positions, all
 palettes, owner-local lifetime, native fallbacks, and reserved descriptor slots.
-Each loaded seasonal owner adds 32,864 bytes; shared code owns 4,096 fixed bytes.
+Each loaded seasonal owner adds 32,864 bytes; shared code owns 8,192 fixed bytes.
 Four focused checks pass. The first native run passes 237 records and 122
 assertions for all four loaders, 56 type cases, actual body drawing, guards,
 restored state/checkpoint, and clean exit. It does not prove GPU appearance or
@@ -50,10 +50,16 @@ checks pass; the first silent native run passes 150 records and 100 assertions,
 including actual core dispatch, all four loaded burial helpers, native fallbacks,
 guards, restored state/checkpoint, and clean exit. Reuse this component evidence;
 it is not ordinary planting or daily-growth verification.
-Next connect the daily-growth owner at VROM `00970920` (linked `80AB07C0`, loaded
-pointer `80100C5C`), retaining imported-house protections. Add gold-tree eligibility,
-neighbour/death rules, native world collision, full cutting/shaking, the planting
-sparkle, and the selected shovel drop. Preserve
+The daily-growth owner at VROM `00970920` (linked `80AB07C0`, loaded pointer
+`80100C5C`) connects gold-tree eligibility, neighbour/death rules, sapling tracking,
+and overcrowding removal. It retains imported-house protections and native
+families, adds 4 KiB shared code reservation, and changes no saves/choices or
+scene/owner allocations. Four focused checks and the first silent native
+component run pass (97 records, 75 assertions), with actual daily-entry loading, isolated acres, native RNG,
+guards, restored state/checkpoint, and clean exit. Reuse that evidence; a full
+live-town renewal is not tested. Next connect world collision, full cutting/
+shaking, planting sparkle, selected shovel drop, and daily hidden-content
+recording/replenishment for spent gold trees. Preserve
 native scenery and the actual donor route; no arbitrary acquisition substitute.
 See [shared scenery](../specs/V3_SCENERY.md).
 Keep all four golden choices disabled pending those complete ordinary routes.
