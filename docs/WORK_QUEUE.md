@@ -12,11 +12,14 @@ After the primary importing work, finish gold-tree leaf/cut effects and the full
 golden-shovel acquisition route. This is deferred required V3 work, not a dropped
 feature or a separate release goal.
 
-The current explicit proposal is ABI 171 at
-`build/v3-scrolling-materials-runtime-02/build-lock.json`. Five complete scrolling
-objects share an installed renderer and an 8-KiB extension at `804BA000`.
-Four focused current-build checks pass, including sanitizer execution, complete
-resources, split-arena bounds, retained records/saves, and all/empty composition.
+The current explicit proposal is ABI 172 at
+`build/v3-scrolling-materials-runtime-04/build-lock.json`. Seven complete scrolling
+objects share an installed renderer and the existing 8-KiB extension at `804BA000`.
+Layered translucent models, native debug colour registers, and scaled actor alpha
+are supported without additional RAM. Five focused checks pass, including
+sanitizer execution, complete resources, split-arena bounds, retained
+records/saves, and all/empty composition. One invalid-alpha fixture selected a
+debug-colour record; its corrected focused retry passes.
 Native execution/GPU appearance remain unverified; do not replay the failed
 title-screen large-arena fixture. The source bodies and new legacy destinations
 are complete, but lifecycle/audio and acquisition still need integration before
@@ -29,10 +32,12 @@ Complete scrolling-material resources are prepared at
 current batch compiles backyard pool and lawn mower together and reuses the five
 existing objects. Four focused resource checks pass. EVW two-tile tables and
 the shared parameterised scroll helper are decoded with complete dependencies.
-Extend the shared renderer for multiple translucent models, explicit colour
-commands, scaled actor alpha, and preview inputs before installing these two
-objects. Preserve the pool's actual debug-register colour dependencies and the
-mower's contact/floor-driven grass lifecycle; neither is an enabled import.
+The shared renderer supports multiple translucent models, native debug colour
+commands, scaled actor alpha, and safe preview inputs; both objects are installed.
+Connect the no-op lifecycle category through shared ordinary-profile integration:
+the pool's only move callback is a complete `blr`, with no create/destroy callback.
+Retain the mower's required contact/floor-driven grass lifecycle; neither is an
+enabled import. The current renderer record does not by itself enable gameplay.
 Continue general rigged material and lifecycle/acquisition categories, reusing
 complete models rather than reconverting individual items. Source draw records retain OPA/XLU order, one/two texture
 layers, dimensions/rates, segment bindings, and runtime colour inputs. Their
@@ -201,7 +206,7 @@ The ordinary bulk importer's chair-sound check accepts the expanded dispatch
 tables/fonts by verifying actual complete programs/instruments, not stale
 addresses. Its positive/negative check passes; reuse this machinery.
 The shared import reservation extends to `02800000`; the current proposal has
-1,894,896 bytes free.
+1,884,672 bytes free.
 English choices/general strings retain
 their content and physical locations through checked virtual relocation. The
 final general string has three checked padding bytes for rounded native DMA.

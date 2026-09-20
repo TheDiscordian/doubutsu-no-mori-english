@@ -12,7 +12,7 @@ from aflib import sha256, u32
 
 CATEGORY = 'scrolling-material-assets'
 RAM,TABLE,BYTES,CAPACITY,VTABLE = 0x804BA000,0x804BB000,8192,64,0x804B1E30
-MAGIC = 0x41464331
+MAGIC = 0x41464332
 # Complete normalized draw code, paired model relocations in submission order,
 # scroll helper call, matrix calls, external save/restore addresses, and runtime
 # parameters. These are implementation shapes, never item or artwork selectors.
@@ -256,29 +256,52 @@ def runtime_record(row):
     a=row['profile']['callback_adapter'];binding=bindings(a)
     if not binding:raise ValueError('Missing complete scrolling resource category')
     source=a['scrolling'];colour=source['colour'];mode=word_a=word_b=preview=state=0
-    if source.get('draw_features'):
-        raise ValueError('Scrolling draw features need runtime adapters: '+', '.join(source['draw_features']))
+    second_a=second_b=debug=0;adaptations=[]
+    arenas=[a['model_arenas'][label] for label in a['model_order']];opaque=arenas.count('opaque')
+    features=set(source.get('draw_features',[]))
+    if features-{'multiple-translucent-models','debug-register-colours','play-frame-preview',
+                 'scaled-state-alpha','state-alpha-preview'}:
+        raise ValueError('Scrolling draw features need runtime adapters')
     if colour:
-        if colour.get('multiplier',1)!=1 or type(colour['preview']) is not int:
-            raise ValueError('Scrolling state scaling or preview needs a runtime adapter')
         if colour['room_f32_offset']!=0x834:raise ValueError('Changed source colour state')
         mode=2 if colour['field']=='lod_fraction' else 1
+        if colour.get('multiplier',1)!=1 or type(colour['preview']) is not int:
+            if (colour.get('multiplier')!=255.0 or colour['preview']!='actor-state' or mode!=1 or
+                    features!={'scaled-state-alpha','state-alpha-preview'} or source.get('source_frame_offset')!=0):
+                raise ValueError('Scrolling state scaling or preview needs a runtime adapter')
+            mode=3
         if colour['command']=='environment':word_a=0xFB000000
         elif colour['command']=='primitive':word_a=0xFA000000|colour.get('lod_fraction',0)
         else:raise ValueError('Unknown complete source colour command')
         components=colour['rgba'] if mode==2 else (*colour['rgb'],0)
-        word_b=int.from_bytes(bytes(components),'big');preview=colour['preview'];state=0x1A4
+        word_b=int.from_bytes(bytes(components),'big');preview=0 if mode==3 else colour['preview'];state=0x1A4
+    if source.get('colours'):
+        prim,env=source['colours'];owner=source['debug_owner']
+        if (colour or features!={'multiple-translucent-models','debug-register-colours','play-frame-preview'} or
+                owner!=dict(section=6,offset=0x39840,kind='pointer-to-debug-mode',register_bank='CRV') or
+                prim['command']!='primitive' or env['command']!='environment' or prim['minimum_level']!=0 or
+                prim['fields']!=['lod_fraction','r','g','b','a'] or env['fields']!=['r','g','b','a'] or
+                any(c['before_model']!=a['model_order'][opaque] for c in (prim,env)) or
+                prim['debug_indices']+env['debug_indices']!=list(range(47,56))):
+            raise ValueError('Unsupported complete debug colour sequence')
+        mode=4;word_a=0xFA000000|prim['base'][0];word_b=int.from_bytes(bytes(prim['base'][1:]),'big')
+        second_a=0xFB000000;second_b=int.from_bytes(bytes(env['base']),'big');debug=0x14+2*(11*96+47)
+    if source['input']=='play-frame':
+        if mode!=4:raise ValueError('Unmapped play-only scrolling context')
+        adaptations.append('Use generic preview frame when no native room owner is supplied; retain play frame in rooms')
+    if mode not in (3,4) and features:raise ValueError('Unused scrolling draw features')
     index,item=furniture_identity(int(row['item_id'],16))
     dimensions=[(r['width'],r['height']) for r in source['tiles'] if r['width']]
     rates=[r['rate'] for r in source['tiles'] if r['width']]
     models=[row['model_offsets'][label] for label in a['model_order']]
     if (a['model_order']!=list(row['model_offsets']) or
-            list(a['model_arenas'].values())!=['opaque']*(len(models)-1)+['translucent'] or
-            source['input']!='room-or-preview-frame' or source['source_coordinate_shift']!=1):
+            not 1<=opaque<len(models) or arenas!=['opaque']*opaque+['translucent']*(len(models)-opaque) or
+            source['input'] not in ('room-or-preview-frame','play-frame') or source['source_coordinate_shift']!=1):
         raise ValueError('Changed complete source scroll draw contract')
     result=dict(source_item_id=row['item_id'],item_id=f'{item:04X}',runtime_index=index,
         bytes=row['object_bytes'],sha256=row['object_sha256'],segment=source['segment_address']>>24,
         model_offsets=models,dimensions=dimensions,rates=rates,colour_mode=mode,colour_a=word_a,colour_b=word_b,
+        opaque_models=opaque,colour2_a=second_a,colour2_b=second_b,debug_offset=debug,adaptations=adaptations,
         state_offset=state,preview=preview,source=row,renderer_installed=True,lifecycle_installed=False,
         profile_installed=False,parent_selectable=False)
     encode([result]);return result
@@ -287,24 +310,29 @@ def runtime_record(row):
 def encode(rows):
     if not rows or len(rows)>CAPACITY or [r['runtime_index'] for r in rows]!=sorted({r['runtime_index'] for r in rows}):
         raise ValueError('Unordered, duplicate, or excessive scroll records')
-    out=bytearray(struct.pack('>4I',MAGIC,len(rows),36,0))
+    out=bytearray(struct.pack('>4I',MAGIC,len(rows),48,0))
     for r in rows:
         index,n,models,dimensions,rates=r['runtime_index'],r['bytes'],r['model_offsets'],r['dimensions'],r['rates']
         mode,a,b,state,preview=r['colour_mode'],r['colour_a'],r['colour_b'],r['state_offset'],r['preview']
+        opaque=r.get('opaque_models',len(models)-1);a2=r.get('colour2_a',0);b2=r.get('colour2_b',0);debug=r.get('debug_offset',0)
         if (not 1024<=index<2048 or not 32<=n<=9216 or n&15 or not 2<=len(models)<=4 or
                 any(type(p) is not int or p&7 or not 0<=p<=n-8 for p in models) or
                 r['segment'] not in (8,9) or not 1<=len(dimensions)<=2 or len(dimensions)!=len(rates) or
                 any(len(d)!=2 or any(type(v) is not int or v<8 or v>64 or v&(v-1) for v in d) for d in dimensions) or
                 any(len(d)!=2 or any(type(v) is not int or not -16<=v<=16 for v in d) for d in rates) or
-                mode not in (0,1,2) or not 0<=a<=0xFFFFFFFF or not 0<=b<=0xFFFFFFFF or not 0<=preview<=255 or
-                mode==0 and (a or b or state or preview) or mode!=0 and state!=0x1A4 or
-                mode==1 and (a!=0xFB000000 and a&0xFFFFFF00!=0xFA000000 or b&255) or
-                mode==2 and a!=0xFA000000):
+                type(opaque) is not int or not 1<=opaque<len(models) or mode not in (0,1,2,3,4) or
+                any(type(v) is not int or not 0<=v<=0xFFFFFFFF for v in (a,b,a2,b2)) or not 0<=preview<=255 or
+                mode==0 and (a or b or state or preview) or mode in (1,2,3) and state!=0x1A4 or
+                mode in (1,3) and (a!=0xFB000000 and a&0xFFFFFF00!=0xFA000000 or b&255) or
+                mode==2 and a!=0xFA000000 or mode==3 and preview or
+                mode!=4 and (a2 or b2 or debug) or
+                mode==4 and (state or preview or a&0xFFFFFF00!=0xFA000000 or a2!=0xFB000000 or
+                             debug&1 or not 0x14<=debug<=0x1C94-18)):
             raise ValueError('Invalid complete scrolling record or native bounds')
         d=[v for pair in dimensions for v in pair]+[0]*(4-len(dimensions)*2)
         rates=[v for pair in rates for v in pair]+[0]*(4-len(rates)*2)
-        out.extend(struct.pack('>HH4B4H4B4bIIHBB',index,n,len(models),r['segment'],len(dimensions),mode,
-            *(models+[0]*(4-len(models))),*d,*rates,a,b,state,preview,0))
+        out.extend(struct.pack('>HH4B4H4B4bIIHBBIIHH',index,n,len(models),r['segment'],len(dimensions),mode,
+            *(models+[0]*(4-len(models))),*d,*rates,a,b,state,preview,opaque,a2,b2,debug,0))
     return bytes(out)
 
 
@@ -322,13 +350,13 @@ def publish(equipment,blob,output):
     if len(code)>TABLE-RAM or len(data)!=BYTES or entry!=RAM or not zlib.crc32(data):
         raise ValueError('Scroll code/records exceed reservation')
     blob[at:at+BYTES]=data;packet.update(sha256=sha256(data),crc32=zlib.crc32(data))
-    runtime.update(code=compiled,table_sha256=sha256(table),capacity=CAPACITY,table_ram=TABLE)
+    runtime.update(format='AFV3-ROOM-SCROLL-2',code=compiled,table_sha256=sha256(table),capacity=CAPACITY,table_ram=TABLE)
     return (f'AF_ROOM_SCROLL_DW=0x{entry:X}u',f'AF_ROOM_SCROLL_VROM=0x{BLOB+at:X}u',
             f'AF_ROOM_SCROLL_BYTES={BYTES}u',f'AF_ROOM_SCROLL_CRC=0x{zlib.crc32(data):X}u')
 
 
 def install(base,prior,blob,core,original,output,directories):
-    from aflib import by_vrom
+    from aflib import by_vrom,CODE_VROM,CODE_RAM
     from v3_asset_loader import ROOT,BLOB
     from v3_equipment_runtime import RAM as EQUIPMENT_RAM
     from v3_furniture_pipeline import Source,PreparedAssets,prepare,identity_rows
@@ -345,6 +373,13 @@ def install(base,prior,blob,core,original,output,directories):
             packet['ram']+packet['bytes']>RAM or RAM+BYTES>prior['furniture']['bank_pool']['start']):
         raise ValueError('Changed shared material runtime or overlapping scroll reservation')
     contract=native_contract(original,base,expected_sha=sha256(base))
+    debug_at=0x8007A0C0-CODE_RAM
+    debug_code=by_vrom(original)[CODE_VROM].extract(original)[debug_at:debug_at+0x90]
+    if (sha256(debug_code)!='8ff8f035c40cae35db40b0f6e33422620870608e15a4356ca2ed08e512fb09ed' or
+            core[debug_at:debug_at+0x90]!=debug_code):
+        raise ValueError('Changed native debug-register allocation or zero initialization')
+    contract.update(debug_owner_ram=0x80138E50,debug_bytes=0x1C94,debug_register_offset=0x14,
+                    debug_initializer_sha256=sha256(debug_code))
     old_catalogue=by_vrom(original)[0x7A28F0].extract(original)
     catalogue=by_vrom(base)[0x3970000].extract(base);at=0x808A7814-0x808A6100
     if (sha256(old_catalogue[at:at+0xD0])!='aa1cd409237c29058fb12a0b15225172d7e25c3cbde53509bf87231fa3a790c1' or
@@ -359,7 +394,14 @@ def install(base,prior,blob,core,original,output,directories):
     directories=[d.resolve() for d in directories];cache=PreparedAssets(source,directories)
     identities=identity_rows(ROOT/'build/item-identity-megasheet.xlsx',include_unmapped_legacy=True)
     installed=runtime.get('scrolling',dict(format='AFV3-ROOM-SCROLL-1',rows=[],sources=[]))
-    if installed['format']!='AFV3-ROOM-SCROLL-1':raise ValueError('Unknown scrolling runtime format')
+    if installed['format'] not in ('AFV3-ROOM-SCROLL-1','AFV3-ROOM-SCROLL-2'):
+        raise ValueError('Unknown scrolling runtime format')
+    for old in installed['rows']:
+        regenerated=json.loads(json.dumps(runtime_record(old['source'])))
+        if any(value!=regenerated[key] for key,value in old.items() if key not in ('blob_offset','vrom')):
+            raise ValueError('Changed installed scroll source contract')
+        old.update(regenerated)
+    retained={r['source_item_id']:r for r in installed['rows']};reused=[]
     occupied={r['item_id'] for r in runtime['rows']+runtime.get('sound_rows',[])+
               runtime.get('material_rows',[])+installed['rows']}
     assets={};rows=[];evidence=[]
@@ -378,10 +420,19 @@ def install(base,prior,blob,core,original,output,directories):
                 raise ValueError('Incomplete, changed, or unreviewed scrolling resources')
             path=(directory/row['object_file']).resolve()
             if path.parent!=directory:raise ValueError('Scroll artwork escapes its prepared directory')
-            data=path.read_bytes();record=runtime_record(row);i=slot(int(record['item_id'],16))
-            if (len(data)!=record['bytes'] or sha256(data)!=record['sha256'] or record['item_id'] in occupied or
+            data=path.read_bytes();record=json.loads(json.dumps(runtime_record(row)));i=slot(int(record['item_id'],16))
+            if (len(data)!=record['bytes'] or sha256(data)!=record['sha256'] or
                     any(blob[ROWS+i*80:ROWS+(i+1)*80]) or any(blob[ITEMS+i*32:ITEMS+(i+1)*32]) or
                     blob[0x40+i//8]&(1<<(i&7))):raise ValueError('Changed scroll art or occupied destination')
+            if donor in retained:
+                old=retained[donor]
+                if ({k:v for k,v in record.items() if k!='source'}!=
+                        {k:v for k,v in old.items() if k not in ('blob_offset','vrom','source')} or
+                        {k:v for k,v in record['source'].items() if k!='reused_artwork'}!=
+                        {k:v for k,v in old['source'].items() if k!='reused_artwork'} or donor in reused):
+                    raise ValueError('Changed or duplicate retained scrolling resources')
+                reused.append(donor);continue
+            if record['item_id'] in occupied:raise ValueError('Occupied scrolling destination')
             occupied.add(record['item_id']);rows.append(record);assets[donor]=data
     if not rows:raise ValueError('Empty scrolling material batch')
     all_rows=sorted(installed['rows']+rows,key=lambda r:r['runtime_index']);encode(all_rows)
@@ -396,7 +447,8 @@ def install(base,prior,blob,core,original,output,directories):
         installed['packet']=dict(ram=RAM,bytes=BYTES,blob_offset=len(blob),vrom=BLOB+len(blob));blob.extend(bytes(BYTES))
     for r in rows:
         at=len(blob);blob.extend(assets[r['source_item_id']]);r.update(blob_offset=at,vrom=BLOB+at)
-    installed.update(rows=all_rows,native_contract=contract,additional_fixed_resident_bytes=BYTES)
+    installed.update(rows=all_rows,native_contract=contract,additional_fixed_resident_bytes=BYTES,
+                     batch=dict(added=len(rows),retained=len(reused),compiled_artwork=0))
     installed['sources'].extend(evidence);runtime['scrolling']=installed
     runtime['artwork_bytes']+=sum(len(d) for d in assets.values())
     room.publish_packet(result,blob,output)

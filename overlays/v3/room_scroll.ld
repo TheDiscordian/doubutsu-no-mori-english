@@ -2,6 +2,7 @@ OUTPUT_ARCH(mips)
 ENTRY(af_v3_room_scroll_dw)
 _Matrix_to_Mtx = 0x800E139C;
 osWritebackDCache = 0x8002FE00;
+af_v3_room_debug = 0x80138E50;
 SECTIONS {
     . = 0x804BA000;
     .text : { *(.text.af_v3_room_scroll_dw) *(.text .text.*) }

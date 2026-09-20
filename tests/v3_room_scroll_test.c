@@ -3,6 +3,8 @@
 #include <string.h>
 #include "../overlays/v3/room_scroll.c"
 RoomScrollTable af_v3_test_room_scroll;
+static _Alignas(8) u8 debug_registers[0x1C94];
+u8 *af_v3_room_debug=debug_registers;
 static unsigned matrices,flushes;
 static void *flushed;
 static int flushed_bytes;
@@ -18,7 +20,7 @@ int main(int argc,char **argv) {
     RoomScrollTable *table=&af_v3_test_room_scroll;
     table->magic=word(input,4);table->count=word(input,4);
     table->stride=word(input,4);table->reserved=word(input,4);
-    assert(table->count==5);
+    assert(table->count==7 && table->stride==48);
     for (u32 i=0;i<table->count;++i) {
         RoomScrollRecord *r=table->rows+i;
         r->index=word(input,2);r->bytes=word(input,2);
@@ -27,7 +29,9 @@ int main(int argc,char **argv) {
         for (unsigned j=0;j<2;++j)for (unsigned k=0;k<2;++k)r->dimensions[j][k]=word(input,1);
         for (unsigned j=0;j<2;++j)for (unsigned k=0;k<2;++k)r->rates[j][k]=(signed char)word(input,1);
         r->colour_a=word(input,4);r->colour_b=word(input,4);r->state_offset=word(input,2);
-        r->preview=word(input,1);r->reserved=word(input,1);
+        r->preview=word(input,1);r->opaque_models=word(input,1);
+        r->colour2_a=word(input,4);r->colour2_b=word(input,4);
+        r->debug_offset=word(input,2);r->reserved=word(input,2);
     }
     assert(fgetc(input)==EOF);fclose(input);
     _Alignas(16) u8 data[9216],opa[256],xlu[128];memset(data,0x91,sizeof(data));
@@ -39,8 +43,11 @@ int main(int argc,char **argv) {
         for (unsigned tick=0;tick<13;++tick) {
             u32 frame=tick==12 ? 0xFFFFFFFFu : tick==11 ? 0x80000000u : tick*997u;
             memset(&guarded,0xA7,sizeof(guarded));actor->index=r->index+(room ? 0 : 1024);
-            float level=(float)(tick*17)+0.75f;
-            if (r->colour_mode)memcpy((u8 *)actor+r->state_offset,&level,4);
+            float level=r->colour_mode==3 ? (float)tick/12.0f : (float)(tick*17)+0.75f;
+            if (r->state_offset)memcpy((u8 *)actor+r->state_offset,&level,4);
+            s16 adjustments[9];
+            for (unsigned j=0;j<9;++j)adjustments[j]=(s16)(((int)tick-6)*89+(int)j*17);
+            if (r->colour_mode==4)memcpy(debug_registers+r->debug_offset,adjustments,sizeof(adjustments));
             play.play_frame=frame+13;play.game.frame=7;preview.frame=frame;
             u32 native_frame=room ? play.play_frame : preview.frame;
             gfx.head=(RoomCommand *)opa;gfx.tail=opa+sizeof(opa)-(tick&1)*8;
@@ -49,24 +56,35 @@ int main(int argc,char **argv) {
             u8 *end=gfx.tail;unsigned before_count=matrices;RoomRig before=*actor;
             af_v3_room_scroll_dw(actor,room ? actor : NULL,room ? &play.game : &preview,data);
             assert(matrices==before_count+1 && matrices==flushes);
-            assert(gfx.head==(RoomCommand *)opa+r->models);
-            assert(gfx.xlu_head==(RoomCommand *)xlu+3+(r->colour_mode!=0));
+            assert(gfx.head==(RoomCommand *)opa+1+r->opaque_models);
+            assert(gfx.xlu_head==(RoomCommand *)xlu+2+r->models-r->opaque_models+
+                                 (r->colour_mode!=0)+(r->colour_mode==4));
             unsigned scratch=64+(2*r->tiles+1)*8;
             assert(gfx.tail==opa+(((uptr)(end-opa)-scratch)&~(uptr)15));
             assert(flushed==gfx.tail && flushed_bytes==(int)scratch);
             RoomCommand *o=(RoomCommand *)opa,*x=(RoomCommand *)xlu,*scroll=(RoomCommand *)(gfx.tail+64);
             assert(o[0].a==0xDA380003 && o[0].b==(u32)(uptr)gfx.tail);
-            for (unsigned j=0;j<r->models-1u;++j) {
+            for (unsigned j=0;j<r->opaque_models;++j) {
                 assert(o[j+1].a==0xDE000000 && o[j+1].b==0x06000000u+r->model_offsets[j]);
             }
             assert(x[0].a==o[0].a && x[0].b==o[0].b);++x;
-            if (r->colour_mode) {
-                unsigned c=room ? (unsigned)level : r->preview;
+            if (r->colour_mode==4) {
+                assert(x->a==((r->colour_a&0xFFFFFF00u)|((r->colour_a+adjustments[0])&255u)));
+                assert(x[1].a==r->colour2_a);
+                for (unsigned j=0;j<4;++j) {
+                    unsigned shift=24-j*8;
+                    assert((u8)(x->b>>shift)==(u8)((r->colour_b>>shift)+adjustments[j+1]));
+                    assert((u8)(x[1].b>>shift)==(u8)((r->colour2_b>>shift)+adjustments[j+5]));
+                }
+                x+=2;
+            } else if (r->colour_mode) {
+                unsigned c=r->colour_mode==3 ? (unsigned)(level*255.0f) : room ? (unsigned)level : r->preview;
                 assert(x->a==(r->colour_a|(r->colour_mode==2 ? c : 0)));
-                assert(x->b==(r->colour_b|(r->colour_mode==1 ? c : 0)));++x;
+                assert(x->b==(r->colour_b|(r->colour_mode!=2 ? c : 0)));++x;
             }
             assert(x->a==0xDB060000u+4*r->segment && x->b==((u32)(uptr)scroll&0x1FFFFFFFu));++x;
-            assert(x->a==0xDE000000 && x->b==0x06000000u+r->model_offsets[r->models-1]);
+            for (unsigned j=r->opaque_models;j<r->models;++j,++x)
+                assert(x->a==0xDE000000 && x->b==0x06000000u+r->model_offsets[j]);
             for (unsigned j=0;j<r->tiles;++j) {
                 /* Independent signed 64-bit reference retains modular origins
                    across negative rates and both native/source wrap points. */
@@ -86,7 +104,9 @@ int main(int argc,char **argv) {
         }
     }
     /* Use a coloured record so malformed state and command paths are covered. */
-    unsigned coloured=0;while (!table->rows[coloured].colour_mode)++coloured;
+    unsigned coloured=0;
+    while (coloured<table->count && table->rows[coloured].colour_mode!=1 && table->rows[coloured].colour_mode!=2)++coloured;
+    assert(coloured<table->count);
     for (unsigned bad=0;bad<24;++bad) {
         RoomScrollTable original=*table;RoomScrollRecord *r=table->rows+coloured;
         actor->index=r->index;float level=77;memcpy((u8 *)actor+0x1A4,&level,4);
@@ -100,12 +120,12 @@ int main(int argc,char **argv) {
         if (bad==5)r->models=5;
         if (bad==6)r->segment=7;
         if (bad==7)r->tiles=3;
-        if (bad==8)r->colour_mode=3;
+        if (bad==8)r->colour_mode=5;
         if (bad==9)r->model_offsets[0]=r->bytes;
         if (bad==10)r->dimensions[0][0]=7;
         if (bad==11)r->rates[0][0]=17;
         if (bad==12)r->state_offset=0x834;
-        if (bad==13)r->reserved=1;
+        if (bad==13)r->opaque_models=0;
         if (bad==14)gfx.tail=opa+64;
         if (bad==15)gfx.xlu_tail=xlu+16;
         if (bad==16)gfx.head=NULL;
@@ -124,6 +144,32 @@ int main(int argc,char **argv) {
         for (unsigned i=0;i<sizeof(opa);++i)assert(opa[i]==0x42);
         for (unsigned i=0;i<sizeof(xlu);++i)assert(xlu[i]==0x43);
         *table=original;
+    }
+    /* Changed scaled-alpha/colour-owner paths must reject before any command
+       or arena write, including the small generic preview context. */
+    for (unsigned n=0;n<table->count;++n) {
+        RoomScrollRecord *r=table->rows+n;
+        if (r->colour_mode<3)continue;
+        for (unsigned bad=0;bad<3;++bad) {
+            u16 offset=r->debug_offset;actor->index=r->index;
+            if (r->colour_mode==3) {
+                FloatWord value={.bits=bad==0 ? 0x7FC00000u : bad==1 ? 0xBF800000u : 0x3F800001u};
+                memcpy((u8 *)actor+r->state_offset,&value,4);
+            } else {
+                if (bad==0)af_v3_room_debug=NULL;
+                if (bad==1)af_v3_room_debug=debug_registers+1;
+                if (bad==2)r->debug_offset=0x1C94;
+            }
+            gfx.head=(RoomCommand *)opa;gfx.tail=opa+sizeof(opa);
+            gfx.xlu_head=(RoomCommand *)xlu;gfx.xlu_tail=xlu+sizeof(xlu);
+            memset(opa,0x42,sizeof(opa));memset(xlu,0x43,sizeof(xlu));
+            RoomRigGraphics before=gfx;unsigned count=matrices;
+            af_v3_room_scroll_dw(actor,NULL,&preview,data);
+            assert(matrices==count && !memcmp(&before,&gfx,sizeof(gfx)));
+            for (unsigned i=0;i<sizeof(opa);++i)assert(opa[i]==0x42);
+            for (unsigned i=0;i<sizeof(xlu);++i)assert(xlu[i]==0x43);
+            r->debug_offset=offset;af_v3_room_debug=debug_registers;
+        }
     }
     unsigned count=matrices;
     af_v3_room_scroll_dw(NULL,NULL,&preview,data);

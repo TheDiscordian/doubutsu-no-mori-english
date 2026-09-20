@@ -20,8 +20,8 @@ import v3_furniture_scroll as scroll
 import v3_room_rig_runtime as room
 import v3_optional_composition as composer
 
-OUT=ROOT/'build/v3-scrolling-materials-runtime-02'
-ART=ROOT/'build/v3-scrolling-materials-prepared-02'
+OUT=ROOT/'build/v3-scrolling-materials-runtime-04'
+ART=ROOT/'build/v3-scrolling-materials-prepared-03'
 
 
 class ScrollingRuntimeTests(unittest.TestCase):
@@ -36,12 +36,16 @@ class ScrollingRuntimeTests(unittest.TestCase):
             (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
 
     def test_complete_assets_records_packet_and_additive_destinations(self):
-        self.assertEqual(len(self.scroll['rows']),5)
-        self.assertEqual(sum(r['bytes'] for r in self.scroll['rows']),28112)
+        self.assertEqual(len(self.scroll['rows']),7)
+        self.assertEqual(sum(r['bytes'] for r in self.scroll['rows']),38336)
+        self.assertEqual(self.scroll['batch'],dict(added=2,retained=5,compiled_artwork=0))
         for row in self.scroll['rows']:
             art=next(r for r in self.art['objects'] if r['item_id']==row['source_item_id'])
-            self.assertEqual({k:v for k,v in row.items() if k not in ('blob_offset','vrom')},
-                             json.loads(json.dumps(scroll.runtime_record(art))))
+            expected=json.loads(json.dumps(scroll.runtime_record(art)))
+            self.assertEqual({k:v for k,v in row.items() if k not in ('blob_offset','vrom','source')},
+                             {k:v for k,v in expected.items() if k!='source'})
+            self.assertEqual({k:v for k,v in row['source'].items() if k!='reused_artwork'},
+                             {k:v for k,v in expected['source'].items() if k!='reused_artwork'})
             self.assertEqual(self.blob[row['blob_offset']:row['blob_offset']+row['bytes']],(ART/art['object_file']).read_bytes())
             self.assertTrue(row['renderer_installed'])
             self.assertFalse(any(row[k] for k in ('lifecycle_installed','profile_installed','parent_selectable')))
@@ -59,7 +63,7 @@ class ScrollingRuntimeTests(unittest.TestCase):
         self.assertEqual(sha256(raw),packet['sha256']);self.assertLessEqual(len(code),4096)
         self.assertEqual(packet['ram'],room.PACKET_RAM+room.PACKET_BYTES)
         self.assertLessEqual(packet['ram']+packet['bytes'],self.report['furniture']['bank_pool']['start'])
-        self.assertEqual(self.report['shared_runtime_refresh']['additional_resident_bytes'],8192)
+        self.assertEqual(self.report['shared_runtime_refresh']['additional_resident_bytes'],0)
         e=self.report['equipment_resources'];module=self.blob[e['blob_offset']:e['blob_offset']+e['bytes']]
         self.assertEqual(module[scroll.VTABLE-EQUIPMENT_RAM:scroll.VTABLE-EQUIPMENT_RAM+20],
             struct.pack('>5I',0,0,self.runtime['bootstrap']['symbols']['af_v3_room_boot_scroll_dw'],0,0))
@@ -79,8 +83,9 @@ class ScrollingRuntimeTests(unittest.TestCase):
 
     def test_bad_records_and_incomplete_lifecycles_remain_rejected(self):
         rows=self.scroll['rows']
-        for key,value in (('bytes',9217),('segment',7),('colour_mode',3),('model_offsets',[65528]),
-                          ('dimensions',[[0,0]]),('rates',[[17,0]]),('state_offset',0x834)):
+        for key,value in (('bytes',9217),('segment',7),('colour_mode',5),('model_offsets',[65528]),
+                          ('dimensions',[[0,0]]),('rates',[[17,0]]),('state_offset',0x834),
+                          ('opaque_models',0),('debug_offset',1),('colour2_a',0xFB000000)):
             bad=copy.deepcopy(rows);bad[0][key]=value
             with self.assertRaises(ValueError):scroll.encode(bad)
         with self.assertRaises(ValueError):scroll.encode(rows+rows)
@@ -92,6 +97,13 @@ class ScrollingRuntimeTests(unittest.TestCase):
             self.assertEqual(self.blob[ROWS+i*80:ROWS+(i+1)*80],bytes(80))
             self.assertEqual(self.blob[ITEMS+i*32:ITEMS+(i+1)*32],bytes(32))
         self.assertEqual(len(room.bind_profiles(self.source,self.image,self.report)),26)
+        extended={r['source_item_id']:r for r in rows}
+        self.assertEqual((extended['3258']['opaque_models'],extended['3258']['colour_mode'],
+                          extended['3258']['debug_offset']),(1,4,0x8B2))
+        self.assertEqual((extended['33A0']['opaque_models'],extended['33A0']['colour_mode']),(1,3))
+        for source in ('3258','33A0'):
+            invalid=copy.deepcopy(extended[source]);invalid['debug_offset']=0x1C94
+            with self.assertRaises(ValueError):scroll.encode([invalid])
 
     def test_existing_runtime_saves_and_optional_composition_are_retained(self):
         prior=self.prior['equipment_resources'];current=self.report['equipment_resources']
@@ -100,6 +112,12 @@ class ScrollingRuntimeTests(unittest.TestCase):
         packet=self.runtime['packet'];at=packet['blob_offset'];n=packet['bytes']
         self.assertEqual(self.blob[at:at+n],self.old[at:at+n])
         self.assertEqual(self.blob[ROWS:TABLE_END],self.old[ROWS:TABLE_END])
+        for old in prior['room_rigs']['scrolling']['rows']:
+            new=next(r for r in self.scroll['rows'] if r['source_item_id']==old['source_item_id'])
+            for key,value in old.items():self.assertEqual(new[key],value)
+            self.assertEqual(self.blob[new['blob_offset']:new['blob_offset']+new['bytes']],
+                             self.old[old['blob_offset']:old['blob_offset']+old['bytes']])
+        self.assertEqual(self.scroll['packet']['blob_offset'],prior['room_rigs']['scrolling']['packet']['blob_offset'])
         for key in ('furniture_audio','scenery','bytes'):self.assertEqual(current[key],prior[key])
         for key in ('staged_furniture','save_runtime'):self.assertEqual(self.report[key],self.prior[key])
         pin=composer.BASE,composer.BASE_SHA,composer.REPORT_SHA,composer.ABI

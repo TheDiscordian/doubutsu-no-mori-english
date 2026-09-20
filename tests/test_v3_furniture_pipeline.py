@@ -931,12 +931,16 @@ class ExtendedScrollingResourceTests(unittest.TestCase):
         struct.pack_into('>f',changed.rel,changed.sections[4][0]+multiplier['offset'],128.0)
         with self.assertRaisesRegex(ValueError,'alpha multiplier'):changed.profile(0x33A0)
 
-    def test_pending_drawing_and_gameplay_cannot_be_silently_installed(self):
+    def test_drawing_records_do_not_enable_pending_gameplay(self):
         from v3_furniture_scroll import runtime_record
         for item,row in self.new.items():
             self.assertFalse(row['import_ready'])
             self.assertIn('need runtime adapters',row['pending_reason'])
-            with self.assertRaisesRegex(ValueError,'draw features need runtime adapters'):runtime_record(row)
+            record=runtime_record(row)
+            self.assertTrue(record['renderer_installed']);self.assertFalse(record['lifecycle_installed'])
+            self.assertFalse(record['profile_installed']);self.assertFalse(record['parent_selectable'])
+            forged=copy.deepcopy(row);forged['profile']['callback_adapter']['scrolling']['draw_features'].append('unknown')
+            with self.assertRaisesRegex(ValueError,'draw features need runtime adapters'):runtime_record(forged)
             forged=copy.deepcopy(row);forged['profile']['callback_adapter']['runtime_installed']=True
             with self.assertRaisesRegex(ValueError,'no implemented native lifecycle'):install.profile(forged,0x02500000)
             with self.assertRaisesRegex(ValueError,'Scrolling artwork'):

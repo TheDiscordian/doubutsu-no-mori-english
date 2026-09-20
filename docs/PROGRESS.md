@@ -18,6 +18,24 @@ served patchers retain their existing builds.
 
 ## Active development
 
+The current explicit proposal is ABI 172 at
+`build/v3-scrolling-materials-runtime-04/build-lock.json`. All seven scrolling
+objects use one renderer, including the pool's three layers/native colour
+registers and the mower's scaled grass alpha in room and preview contexts.
+Both new objects reuse complete prepared artwork; five existing objects keep
+their original storage. No RAM reservation grows. Five focused checks pass,
+including actual renderer C under memory-safety sanitizers, complete installed
+resources, malformed-input rejection, and unchanged save-profile/composition
+behaviour. One existing test fixture required a correction before its focused
+retry passed. Native execution, GPU appearance, and ordinary gameplay remain
+unverified. The 136 choices and 26 staged profiles are unchanged. See the
+[extended-renderer checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-layered-scroll-renderer).
+
+Next connect complete no-op lifecycles through shared profile integration, then
+remaining lifecycle/acquisition categories. The mower's floor/contact-driven
+grass update still needs implementation. Gold-tree completion remains after
+primary imports; neither website deployment changes.
+
 The shared scrolling converter also prepares complete backyard pool and lawn
 mower artwork. `build/v3-scrolling-materials-prepared-03/` contains seven objects
 (38,336 bytes): two newly compiled together, five reused without compilation.
@@ -26,12 +44,12 @@ same graphics pipeline. All pool layers, water rates, debug colour dependencies,
 and the mower's scaled actor alpha remain explicit. Four focused resource checks
 pass, including complete graphics comparisons and rejection of unsupported
 runtime installation. Names are credited to the official donor in the single
-provenance catalogue. This is preparation, not two new playable imports; their
-additional drawing contracts and lifecycles remain pending. No ROM, saved
-profile, or website deployment changes. See the
+provenance catalogue. Native drawing support is installed above; lifecycle and
+profile/acquisition integration remain required before playable imports. The
+resource preparation itself changes no cartridge or saved profile. See the
 [EVW/parameter-scroll checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-evw-and-parameter-scroll-resources).
 
-The current explicit proposal is ABI 171 at
+The retained initial scrolling renderer is ABI 171 at
 `build/v3-scrolling-materials-runtime-02/build-lock.json`. The shared renderer
 installs all five complete prepared scrolling objects, with separate opaque and
 translucent draws, both texture layers, frame-owned commands, and mapped colour

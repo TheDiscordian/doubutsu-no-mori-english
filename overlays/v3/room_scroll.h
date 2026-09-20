@@ -1,7 +1,7 @@
 #ifndef AF_V3_ROOM_SCROLL_H
 #define AF_V3_ROOM_SCROLL_H
 #include "room_materials.h"
-#define ROOM_SCROLL_MAGIC 0x41464331u
+#define ROOM_SCROLL_MAGIC 0x41464332u
 #define ROOM_SCROLL_CAPACITY 64u
 typedef struct {
     u16 index,bytes;
@@ -11,13 +11,15 @@ typedef struct {
     signed char rates[2][2];
     u32 colour_a,colour_b;
     u16 state_offset;
-    u8 preview,reserved;
+    u8 preview,opaque_models;
+    u32 colour2_a,colour2_b;
+    u16 debug_offset,reserved;
 } RoomScrollRecord;
 typedef struct {
     u32 magic,count,stride,reserved;
     RoomScrollRecord rows[ROOM_SCROLL_CAPACITY];
 } RoomScrollTable;
-_Static_assert(sizeof(RoomScrollRecord)==36,"Scroll record size");
+_Static_assert(sizeof(RoomScrollRecord)==48,"Scroll record size");
 #ifdef __mips__
 #define room_scroll_table ((const RoomScrollTable *)0x804BB000u)
 #else
@@ -26,4 +28,6 @@ extern RoomScrollTable af_v3_test_room_scroll;
 #endif
 extern void *_Matrix_to_Mtx(void *);
 extern void osWritebackDCache(void *,int);
+/* Existing native Debug_mode owner, not new shared writable renderer state. */
+extern u8 *af_v3_room_debug;
 #endif

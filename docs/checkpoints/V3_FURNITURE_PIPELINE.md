@@ -1,5 +1,73 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared layered-scroll renderer
+
+ABI 172 at `build/v3-scrolling-materials-runtime-04/` installs the complete pool
+and mower artwork through the shared importer: seven scrolling records and
+38,336 bytes of artwork. Five prior objects retain their original bytes and
+locations; both additions reuse the prepared bundle without artwork compilation.
+Mixed prepared batches may now include installed members. Their records and
+resources must match, while differing validated cache receipts do not cause a
+duplicate installation. The initial `runtime-03` build stopped at that comparison;
+the corrected comparison preserves all substantive fields and permits receipt
+differences only. No previous build is overwritten.
+
+The `AFC2` table uses 48-byte records with an opaque-model count, second colour
+command, and debug-register offset. Pool drawing retains one opaque and two
+translucent models, the actual EVW water rates, primitive/environment colours,
+and native CRV 47–55 reads. The existing debug owner is `80138E50`; its complete
+`8007A0C0..8007A14F` allocator/initializer matches the original ROM, SHA-256
+`8ff8f035c40cae35db40b0f6e33422620870608e15a4356ca2ed08e512fb09ed`.
+The register layout matches the donor, and signed adjustments wrap individual
+eight-bit components. Missing/misaligned/out-of-RAM owners reject safely.
+
+Scaled-alpha records consume finite `0..1` actor state, multiply by 255, and use
+that state in previews too. Pool preview timing explicitly adapts the source's
+play-only counter to the generic native counter when the room pointer is null;
+room timing keeps the play counter. The drawer reserves both command streams
+and frame scratch before any write. Models, actor state, and earlier resources
+remain immutable. The current 2,132-byte MIPS renderer fits its existing 4-KiB
+code half, with 64-byte stack usage. No RAM reservation or heap allocation grows.
+
+The five focused current-build checks pass: complete records/resources/storage,
+actual C execution under address/undefined-behaviour sanitizers, malformed-state
+and pending-lifecycle gates, retained native resources/profiles/saves, all/empty
+composition, and UPS reconstruction. Four checks pass on the first invocation;
+the sanitizer fixture initially chose the newly earlier-sorted debug-colour row
+for an invalid actor-alpha test. Restricting that fixture to its intended
+actor-alpha category fixes the test; its single focused retry passes in
+1.017 seconds. This is not a renderer/game failure. The changed drawer exercises
+all seven records across room/preview timing, signed/debug colour wraps, both
+translucent models, scaled-alpha endpoints, short preview state, guarded arenas,
+and six additional invalid-alpha/debug-owner cases.
+
+No native execution, GPU appearance, ordinary gameplay, or hardware verification
+is claimed. No failed large-arena emulator fixture is replayed. Source no-op
+lifecycle/profile integration is the next shared step; floor/contact updates,
+other real lifecycle/audio effects, and acquisition remain required. All seven
+objects remain outside ordinary profiles and selection in this proposal.
+
+The 136 choices, 26 staged profiles, saved format/profile 3, old room packet,
+audio, scenery, main ABI-109 lock, and stable website deployments remain unchanged.
+Imported saves still require equal/superset selections and cannot use older/V2
+builds lacking their IDs. This renderer batch adds no new saved dependencies.
+The blob is 4,406,784 bytes, leaving 1,884,672 bytes before VROM `02800000`.
+
+```sh
+python3 tools/v3_furniture_install.py --refresh-runtime \
+  --base-lock build/v3-scrolling-materials-runtime-02/build-lock.json \
+  --scrolling-materials-art build/v3-scrolling-materials-prepared-03 \
+  --output build/scrolling-layered-reproduction
+PYTHONPATH=tests python3 -m unittest test_v3_room_scroll.ScrollingRuntimeTests \
+  test_v3_furniture_pipeline.ExtendedScrollingResourceTests.test_drawing_records_do_not_enable_pending_gameplay -v
+```
+
+- ROM SHA-256: `efe6fc613177eec561eb53418339f7e4bebce170b55487d070dfc8c0608e6c46`.
+- UPS SHA-256: `2ff8677fc3cd93407ee4c638b066fa5710c1f9f2edd967708e45397a530c9f42`.
+- Report SHA-256: `71d94268925b0d6fcda2e92dd5d6cebaa7ebfcf8b9f4315a13637e1aeb296468`.
+- Scroll packet SHA-256: `e6b470fa7dfe6686cb2bbff08a06f332f10dfa5bb594a14fdbc171b0bcaa8cb0`.
+- Scroll code SHA-256: `701961badb3a0f92dd9082ee1842af7abc5e44c98d23eb95263f3e051f1113cc`.
+
 ## Shared EVW and parameter-scroll resources
 
 `build/v3-scrolling-materials-prepared-03/` extends the existing shared resource

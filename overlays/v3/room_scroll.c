@@ -12,12 +12,21 @@ static const RoomScrollRecord *scroll_find(u32 index) {
         if (r->index!=index) continue;
         if (index<1024 || index>=2048 || r->bytes<32 || r->bytes>9216 || (r->bytes&15) ||
                 r->models<2 || r->models>4 || (r->segment!=8 && r->segment!=9) ||
-                !r->tiles || r->tiles>2 || r->colour_mode>2 || r->reserved) return 0;
-        if (r->colour_mode ? (r->state_offset!=0x1A4 ||
-                (r->colour_mode==1 ? ((r->colour_a!=0xFB000000u &&
-                    (r->colour_a&0xFFFFFF00u)!=0xFA000000u) || (r->colour_b&255u))
-                    : r->colour_a!=0xFA000000u))
-                : (r->colour_a || r->colour_b || r->state_offset || r->preview)) return 0;
+                !r->tiles || r->tiles>2 || r->colour_mode>4 || r->reserved ||
+                !r->opaque_models || r->opaque_models>=r->models) return 0;
+        if (r->colour_mode==4) {
+            if (r->state_offset || r->preview || (r->colour_a&0xFFFFFF00u)!=0xFA000000u ||
+                    r->colour2_a!=0xFB000000u || (r->debug_offset&1) ||
+                    r->debug_offset<0x14 || r->debug_offset>0x1C94-18) return 0;
+        } else {
+            if (r->colour2_a || r->colour2_b || r->debug_offset) return 0;
+            if (r->colour_mode ? (r->state_offset!=0x1A4 ||
+                    (r->colour_mode!=2 ? ((r->colour_a!=0xFB000000u &&
+                        (r->colour_a&0xFFFFFF00u)!=0xFA000000u) || (r->colour_b&255u))
+                        : r->colour_a!=0xFA000000u))
+                    : (r->colour_a || r->colour_b || r->state_offset || r->preview)) return 0;
+            if (r->colour_mode==3 && r->preview) return 0;
+        }
         for (u32 j=0;j<4;++j)
             if (j<r->models ? ((r->model_offsets[j]&7) || r->model_offsets[j]>r->bytes-8u)
                             : r->model_offsets[j]!=0) return 0;
@@ -36,27 +45,45 @@ void af_v3_room_scroll_dw(RoomRig *actor,void *room,RoomRigGame *game,u8 *data) 
     if (!actor || !game || !game->gfx || !data || ((uptr)data&7)) return;
     const RoomScrollRecord *r=scroll_find(actor->index);
     if (!r) return;
-    u32 colour=r->preview;
-    if (room && r->colour_mode) {
+    u32 colour=r->preview,a=r->colour_a,b=r->colour_b,environment=r->colour2_b;
+    if ((room && (r->colour_mode==1 || r->colour_mode==2)) || r->colour_mode==3) {
         FloatWord value;
         u8 *to=(u8 *)&value;const u8 *from=(u8 *)actor+r->state_offset;
         to[0]=from[0];to[1]=from[1];to[2]=from[2];to[3]=from[3];
         /* Reject NaNs and unsafe float-to-integer conversions as well as
            uninitialised lifecycle state. Source fades stay in this interval. */
-        if (!(value.f>=0.0f && value.f<=255.0f)) return;
-        colour=(u32)value.f;
+        float maximum=r->colour_mode==3 ? 1.0f : 255.0f;
+        if (!(value.f>=0.0f && value.f<=maximum)) return;
+        colour=(u32)(r->colour_mode==3 ? value.f*255.0f : value.f);
+    }
+    if (r->colour_mode==4) {
+        uptr debug=(uptr)af_v3_room_debug;
+        if (!debug || (debug&1)) return;
+#ifdef __mips__
+        if (debug<0x80000000u || debug>0x80800000u-0x1C94u) return;
+#endif
+        const s16 *registers=(const s16 *)(debug+r->debug_offset);
+        a=(a&0xFFFFFF00u)|((a+(u32)(int)registers[0])&255u);
+        b=environment=0;
+        for (u32 i=0;i<4;++i) {
+            u32 shift=24u-8u*i;
+            b|=(((r->colour_b>>shift)+(u32)(int)registers[i+1])&255u)<<shift;
+            environment|=(((r->colour2_b>>shift)+(u32)(int)registers[i+5])&255u)<<shift;
+        }
     }
     RoomRigGraphics *gfx=game->gfx;
     uptr opa=(uptr)gfx->head,end=(uptr)gfx->tail;
     uptr xlu=(uptr)gfx->xlu_head,xend=(uptr)gfx->xlu_tail;
-    u32 xcommands=3u+(r->colour_mode!=0),scratch=64u+(2u*r->tiles+1u)*8u;
+    u32 ocommands=1u+r->opaque_models;
+    u32 xcommands=2u+r->models-r->opaque_models+(r->colour_mode!=0)+(r->colour_mode==4);
+    u32 scratch=64u+(2u*r->tiles+1u)*8u;
     if (!opa || !end || !xlu || !xend || ((opa|end|xlu|xend)&7) || end<opa || xend<xlu ||
-            end-opa<scratch+8u*r->models || xend-xlu<8u*xcommands) return;
+            end-opa<scratch+8u*ocommands || xend-xlu<8u*xcommands) return;
     uptr allocation=(end-scratch)&~(uptr)15;
-    if (allocation<opa+8u*r->models) return;
+    if (allocation<opa+8u*ocommands) return;
     /* Reserve both draw streams and all temporary state before any write. */
     RoomCommand *o=gfx->head,*x=gfx->xlu_head;
-    gfx->tail=(u8 *)allocation;gfx->head+=r->models;gfx->xlu_head+=xcommands;
+    gfx->tail=(u8 *)allocation;gfx->head+=ocommands;gfx->xlu_head+=xcommands;
     RoomCommand *scroll=(RoomCommand *)(allocation+64);
     u32 frame=(room ? ((RoomMaterialPlay *)game)->play_frame : game->frame)*2u;
     for (u32 i=0;i<r->tiles;++i) {
@@ -73,13 +100,15 @@ void af_v3_room_scroll_dw(RoomRig *actor,void *room,RoomRigGame *game,u8 *data) 
     scroll[r->tiles*2]=(RoomCommand){0xDF000000,0};
     _Matrix_to_Mtx((void *)allocation);
     *o++=(RoomCommand){0xDA380003,(u32)allocation};
-    for (u32 i=0;i<r->models-1u;++i)
+    for (u32 i=0;i<r->opaque_models;++i)
         *o++=(RoomCommand){0xDE000000,0x06000000u+r->model_offsets[i]};
     *x++=(RoomCommand){0xDA380003,(u32)allocation};
     if (r->colour_mode)
-        *x++=(RoomCommand){r->colour_a|(r->colour_mode==2 ? colour : 0),
-                          r->colour_b|(r->colour_mode==1 ? colour : 0)};
+        *x++=(RoomCommand){a|(r->colour_mode==2 ? colour : 0),
+                          b|(r->colour_mode==1 || r->colour_mode==3 ? colour : 0)};
+    if (r->colour_mode==4) *x++=(RoomCommand){r->colour2_a,environment};
     *x++=(RoomCommand){0xDB060000u+4u*r->segment,(u32)(uptr)scroll&0x1FFFFFFFu};
-    *x=(RoomCommand){0xDE000000,0x06000000u+r->model_offsets[r->models-1]};
+    for (u32 i=r->opaque_models;i<r->models;++i)
+        *x++=(RoomCommand){0xDE000000,0x06000000u+r->model_offsets[i]};
     osWritebackDCache((void *)allocation,(int)scratch);
 }

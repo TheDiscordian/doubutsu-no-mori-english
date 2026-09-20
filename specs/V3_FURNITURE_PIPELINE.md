@@ -142,12 +142,22 @@ register dependencies; constants are not substituted for unresolved state.
 The mower retains two independent texture layers and actor alpha multiplied by
 the verified source `255.0` constant, including actor-state alpha in previews.
 
-These additional draw features remain explicit pending runtime work. The
-36-byte renderer record refuses them rather than discarding secondary models,
-changing preview semantics, or losing state scaling. The current renderer serves
-the original five records only. Prepared artwork is reusable after the shared
-renderer and lifecycles support these contracts. Pipeline/installer version 17
-and graphics converter version 12 retain validated earlier artwork caches.
+The shared renderer supports these additional draw features through 48-byte
+records. Ordered opaque and translucent spans preserve every model, including
+a scrolling consumer before a later translucent model. Scaled alpha uses actor
+state in both room and preview contexts and requires a finite value in `0..1`.
+Pool colours read the existing native `Debug_mode` owner at `80138E50`, with the
+same register layout, signed additions, and eight-bit component wrapping as the
+donor. The complete native allocation/zero-initialization code is checked before
+installation. This adds neither a new debug allocation nor shared renderer state.
+
+EVW room animation retains the play counter. A recorded preview adaptation uses
+the generic preview counter when the native draw caller supplies no room owner;
+the renderer never reads a play-only field from a shorter preview context.
+Both colour commands and all remaining translucent models follow the same
+frame-owned matrix/scroll allocation. Lifecycle and acquisition dependencies
+remain separate requirements. Pipeline/installer version 17 and graphics
+converter version 12 retain validated earlier artwork caches.
 
 Preparation does not imply native drawing, lifecycle colour/sound transitions,
 or acquisition. `--refresh-runtime --scrolling-materials-art` installs complete
@@ -160,9 +170,15 @@ native correspondence for either source. Membership does not enable gameplay.
 
 The scroll extension owns `804BA000..804BBFFF`, after the unchanged 8-KiB room
 packet and below furniture banks at `80500000`. Code has 4 KiB; the remaining
-4 KiB contains `AFC1`, count, stride 36, zero, and up to 64 complete records.
+4 KiB contains `AFC2`, count, stride 48, zero, and up to 64 complete records.
 Records carry identity/size, model order, segment, one/two dimensions and signed
 rates, source colour commands, preview colour, and private native state offset.
+An explicit opaque-model count, second colour command, and bounded debug-register
+offset cover the extended draw forms. Earlier installed records are regenerated
+from their source descriptors; every original field and asset is retained.
+Prepared bundles may include already installed objects: complete record/resource
+identity is checked, and only new objects are appended. Different cache receipts
+do not trigger duplicate installation or artwork recompilation.
 The bootstrap uses cache word `804B1E04` and vtable `804B1E30`. DMA, CRC,
 writeback/invalidation, and startup-reset cache semantics match the existing
 room packet, but the extension has its own checked code/data identity. Further
