@@ -41,12 +41,14 @@ def install_profiles(base,prior,blob,core,original,output,directories):
     from v3_furniture_install import profile,provenance_patch
     from v3_furniture_pipeline import identity_rows,name_metadata
     from v3_import_storage import ROWS_RAM
+    from v3_furniture_materials import CATEGORY as MATERIAL_CATEGORY
+    from v3_sound_programs import furniture_trigger
     result=copy.deepcopy(prior['equipment_resources']);runtime=result['room_rigs']
     source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
         (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
     directories=[d.resolve() for d in directories]
     cache=PreparedAssets(source,directories)
-    identities=identity_rows(ROOT/'build/item-identity-megasheet.xlsx')
+    identities=identity_rows(ROOT/'build/item-identity-megasheet.xlsx',include_unmapped_legacy=True)
     module=blob[result['blob_offset']:result['blob_offset']+result['bytes']]
     packet=runtime['packet'];at=packet['blob_offset']
     if (sha256(module)!=result['sha256'] or sha256(blob[at:at+packet['bytes']])!=packet['sha256'] or
@@ -55,9 +57,10 @@ def install_profiles(base,prior,blob,core,original,output,directories):
         raise ValueError('Changed complete shared room category runtime')
     rigs={r['source_item_id']:r for r in runtime['rows']}
     sounds={r['source_item_id']:r for r in runtime.get('sound_rows',[])}
+    materials={r['source_item_id']:r for r in runtime.get('material_rows',[])}
     old=copy.deepcopy(prior.get('staged_furniture',dict(format='AFV3-STAGED-FURNITURE-PROFILES-1',rows=[],sources=[])))
     if old['format']!='AFV3-STAGED-FURNITURE-PROFILES-1':raise ValueError('Unknown staged furniture format')
-    occupied={r['item_id'] for r in old['rows']};staged=[];evidence=[]
+    occupied={r['item_id'] for r in old['rows']};staged=[];evidence=[];deferred=[]
     limit=checked_limit(base,prior)
     for directory in directories:
         if not directory.is_relative_to(ROOT/'build'):raise ValueError('Profiles require ignored prepared artwork')
@@ -67,7 +70,7 @@ def install_profiles(base,prior,blob,core,original,output,directories):
         for row in art['objects']:
             donor=row['item_id'];item=int(donor,16);prepared_row=prepare(source,item)
             descriptor=prepared_row[0];category=descriptor.get('callback_adapter',{}).get('category')
-            if (category not in (CLOCK_CATEGORY,STORAGE_CATEGORY,'switch-trigger-sound') or
+            if (category not in (CLOCK_CATEGORY,STORAGE_CATEGORY,'switch-trigger-sound',MATERIAL_CATEGORY) or
                     donor in occupied or item not in identities or
                     row['profile']!=json.loads(json.dumps(descriptor)) or
                     row['native_profile_scalar_hex']!=descriptor['scalar_hex']):
@@ -77,6 +80,11 @@ def install_profiles(base,prior,blob,core,original,output,directories):
             data=(directory/row['object_file']).read_bytes()
             if len(data)!=row['object_bytes'] or sha256(data)!=row['object_sha256']:
                 raise ValueError('Changed complete prepared profile object')
+            if category==MATERIAL_CATEGORY:
+                installed=materials.get(donor)
+                if not installed or not installed.get('lifecycle_installed'):
+                    deferred.append(dict(source_item_id=donor,reason='Material lifecycle remains incomplete'))
+                    continue
             index,destination=furniture_representation_identity(item);i=slot(destination)
             if destination!=item or index!=1024+i:
                 raise ValueError('Parent/display aliases require their shared parent adapter')
@@ -99,9 +107,21 @@ def install_profiles(base,prior,blob,core,original,output,directories):
                         not all(audio.get(k) for k in ('runtime_installed','dispatch_and_priority_installed',
                             'allocation_installed','callback_installed'))):
                     raise ValueError('Sound furniture lacks its complete installed audio/callback')
-                blob.extend(bytes(-len(blob)%16));vrom=BLOB+len(blob);blob.extend(data)
-                if vrom+len(data)>limit:raise ValueError('Complete sound models exceed checked import reservation')
-                vtable=SOUND_VTABLE;reused_asset=False
+                if category==MATERIAL_CATEGORY:
+                    installed=materials[donor]
+                    trigger=furniture_trigger(source,descriptor)
+                    if (trigger is None or installed.get('move_category')!='switch-trigger-sound' or
+                            installed['profile_installed'] or installed['source']!=row or
+                            installed['bytes']!=len(data) or installed['sha256']!=sha256(data) or
+                            blob[installed['blob_offset']:installed['blob_offset']+len(data)]!=data or
+                            sounds[donor]['source_sound_word']!=trigger['sound_word']):
+                        raise ValueError('Material profile lacks its complete drawing/trigger lifecycle')
+                    vrom=installed['vrom'];vtable=MATERIAL_VTABLE;reused_asset=True
+                    sounds[donor]['profile_installed']=True
+                else:
+                    blob.extend(bytes(-len(blob)%16));vrom=BLOB+len(blob);blob.extend(data)
+                    if vrom+len(data)>limit:raise ValueError('Complete sound models exceed checked import reservation')
+                    vtable=SOUND_VTABLE;reused_asset=False
                 installed.update(blob_offset=vrom-BLOB,vrom=vrom,bytes=len(data),sha256=sha256(data),source=row)
             generated=copy.deepcopy(row);generated['room_runtime']=dict(vtable=vtable,vrom=vrom)
             native=profile(generated,vrom,limit=limit)
@@ -123,6 +143,7 @@ def install_profiles(base,prior,blob,core,original,output,directories):
     if not staged:raise ValueError('Empty complete furniture profile batch')
     old['rows']=sorted(old['rows']+staged,key=lambda r:r['runtime_index']);old['sources'].extend(evidence)
     old.update(profile_bits_changed=False,additional_resident_bytes=0)
+    if deferred:old['deferred_resources']=deferred
     patch=provenance_patch(staged)
     if patch:write_new(output/'provenance.patch',patch.encode())
     return result,{},dict(staged_furniture=old)
@@ -135,6 +156,8 @@ def bind_profiles(source,base,report):
     normal acquisition, catalogue, scoring, and selection checks still apply.
     """
     from v3_furniture_install import profile
+    from v3_furniture_materials import CATEGORY as MATERIAL_CATEGORY
+    from v3_sound_programs import furniture_trigger
     source.runtime_profiles={}
     staged=report.get('staged_furniture',{})
     activated=[r for r in report['furniture']['imports'] if r.get('room_runtime')]
@@ -153,7 +176,7 @@ def bind_profiles(source,base,report):
     if runtime.get('material_rows') and module[MATERIAL_VTABLE-EQUIPMENT_RAM:MATERIAL_VTABLE-EQUIPMENT_RAM+20].hex()!=runtime['material_vtable_hex']:
         raise ValueError('Changed installed material draw dispatch')
     limit=checked_limit(base,report)
-    bindings={r['source_item_id']:r for r in runtime['rows']+runtime['sound_rows']}
+    bindings={r['source_item_id']:r for r in runtime['rows']+runtime['sound_rows']+runtime.get('material_rows',[])}
     for row,enabled in [(r,False) for r in staged.get('rows',[])]+[(r,True) for r in activated]:
         item=int(row['item_id'],16);i=slot(item);binding=bindings.get(row['item_id'])
         if (row['item_id'] in source.runtime_profiles or not binding or not binding['profile_installed'] or
@@ -161,7 +184,15 @@ def bind_profiles(source,base,report):
                 bool(blob[0x40+i//8]&(1<<(i&7)))!=enabled):
             raise ValueError('Changed furniture profile identity or activation')
         descriptor=prepare(source,item)[0];art=copy.deepcopy(binding['source']);vrom=binding['vrom']
-        expected_vtable=SOUND_VTABLE if descriptor['callback_adapter']['category']=='switch-trigger-sound' else VTABLE
+        category=descriptor['callback_adapter']['category']
+        expected_vtable=MATERIAL_VTABLE if category==MATERIAL_CATEGORY else SOUND_VTABLE if category=='switch-trigger-sound' else VTABLE
+        if category==MATERIAL_CATEGORY:
+            trigger=furniture_trigger(source,descriptor)
+            sound=next((r for r in runtime['sound_rows'] if r['source_item_id']==row['item_id']),None)
+            if (not binding.get('lifecycle_installed') or binding.get('move_category')!='switch-trigger-sound' or
+                    trigger is None or sound is None or not sound['profile_installed'] or
+                    sound['source_sound_word']!=trigger['sound_word']):
+                raise ValueError('Incomplete installed material/trigger lifecycle')
         art['room_runtime']=dict(vtable=expected_vtable,vrom=vrom)
         at=vrom-BLOB;n=art['object_bytes'];native=profile(art,vrom,limit=limit)
         current=blob[ROWS+i*80:ROWS+(i+1)*80];record=blob[ITEMS+i*32:ITEMS+(i+1)*32]

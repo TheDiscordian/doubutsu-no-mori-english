@@ -67,10 +67,11 @@ def profile(row, vrom, *, limit=END):
     sound = adapter.get('category') == 'switch-trigger-sound'
     from v3_furniture_rigs import RIG_CATEGORIES,FIXED_CATEGORY
     from v3_furniture_materials import CATEGORY as MATERIAL_CATEGORY
-    if adapter.get('category') in (FIXED_CATEGORY,PENDING_MOVE_CATEGORY,MATERIAL_CATEGORY):
+    material=adapter.get('category')==MATERIAL_CATEGORY
+    if adapter.get('category') in (FIXED_CATEGORY,PENDING_MOVE_CATEGORY):
         raise ValueError('Prepared resources have no implemented native lifecycle')
     rigged = adapter.get('category') in RIG_CATEGORIES
-    layers = tuple(offsets) if rigged else tuple(adapter['model_order']) if fading or sequence else LAYERS
+    layers = tuple(offsets) if rigged else tuple(adapter['model_order']) if fading or sequence or material else LAYERS
     if (limit not in (END,capacity.LIMIT) or not 0 < n <= 9216 or n%16 or vrom%16 or vrom+n > limit or len(scalar) != 16
             or not offsets or set(offsets)-set(layers) or (fading or sequence) and set(offsets)!=set(layers)
             or any(type(at) is not int or at%8 or not 0 <= at <= n-8 for at in offsets.values())):
@@ -91,8 +92,14 @@ def profile(row, vrom, *, limit=END):
         from v3_room_rig_runtime import SOUND_VTABLE
         if row.get('room_runtime')!={'vtable':SOUND_VTABLE,'vrom':vrom}:
             raise ValueError('Sound profile requires its complete installed room lifecycle')
+    if material:
+        from v3_room_rig_runtime import MATERIAL_VTABLE
+        if (row.get('room_runtime')!={'vtable':MATERIAL_VTABLE,'vrom':vrom} or
+                set(adapter['functions'])!={'move','draw'} or set(offsets)!=set(layers)):
+            raise ValueError('Prepared resources have no implemented native material lifecycle')
+        pointers=[0,0,0,0]
     return (struct.pack('>12I', vrom, vrom+n, 0x06000000, 0x06000000+n, *pointers, 0,0,0,0)+scalar+
-            struct.pack('>I',VTABLE if rigged else SOUND_VTABLE if sound else palette_fade.VTABLE if fading else 0))
+            struct.pack('>I',VTABLE if rigged else SOUND_VTABLE if sound else MATERIAL_VTABLE if material else palette_fade.VTABLE if fading else 0))
 
 
 def catalogue_record(row):

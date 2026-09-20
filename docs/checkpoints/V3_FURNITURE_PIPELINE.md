@@ -1,5 +1,55 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared material-trigger profile integration
+
+ABI 170 at `build/v3-material-trigger-profiles-02/` stages three complete
+ordinary records through the shared furniture-profile installer: coin `3314`,
+? block `3318`, and fire flower `332C`. Their actual installed material renderer,
+switch-trigger moves, complete artwork, official names, and prices are bound
+together. No per-item installation script or graphics recompilation is added.
+The existing six-object prepared bundle is the input; the three other objects
+are explicitly deferred because their lifecycles remain incomplete.
+
+The first build rejects the mixed bundle because the profile inventory omitted
+legacy `1xxx` resources. The shared inventory now includes unmapped legacy source
+rows, allowing full validation and an explicit pending result for Mouth of Truth.
+This does not enable its destination or bypass its unfinished behaviour. The
+second build succeeds without changing any prior candidate or input.
+
+The three new native profiles have null generic model/rig fields and point to
+the shared material vtable. Their sound/material records agree on identity and
+installed lifecycle. Profile flags and saved selection bits remain zero.
+The ordinary importer checks these bindings before moving on to the real missing
+acquisition route. A renderer-only record, missing move binding, or absent sound
+profile flag still fails. Source artwork descriptors stay reusable and unchanged.
+
+Three `MaterialProfileIntegrationTests` pass on the first invocation in 16.737
+seconds. They verify complete profiles, official names/prices, inactive bits,
+unchanged old tables, exact artwork/runtime reuse, pending lifecycle refusal,
+metadata reaching acquisition, unchanged saves, all/empty composition, and UPS
+reconstruction. There is no new emulator run: the complete equipment module,
+shared packet, artwork, and audio are identical to ABI 169, whose passing native
+audio/relocation evidence is retained. This is not a new native GPU or ordinary
+furniture-interaction result.
+
+There are 26 staged profiles and 136 selectable choices. Import blob size stays
+4,360,256 bytes; free space stays 1,931,200 bytes. RAM, saved format 3, selection
+requirements, main ABI-109 lock, and both served V2 patchers are unchanged.
+Acquisition, the other pending lifecycles, and ordinary gameplay remain required.
+Primary import support still precedes required gold-tree completion.
+
+```sh
+python3 tools/v3_furniture_install.py --refresh-runtime \
+  --base-lock build/v3-material-trigger-runtime-04/build-lock.json \
+  --furniture-profiles build/v3-material-frames-prepared-01 \
+  --output build/material-profile-reproduction
+PYTHONPATH=tests python3 -m unittest test_v3_room_materials.MaterialProfileIntegrationTests -v
+```
+
+- ROM SHA-256: `c903f37ddc6165f9dec0bcf2f1c9483d7472c5e252a1e80f04aecdb6df05c253`.
+- UPS SHA-256: `d303d24f507071b32002a85cd050215aa268b9d490d5350f50009084df2fbccf`.
+- Report SHA-256: `b64a6a6d606db64e9366ee18f87bbb61a5c65c126150d2fbc234559ad67c7f66`.
+
 ## Incremental shared furniture audio
 
 ABI 169 at `build/v3-material-trigger-runtime-04/` connects the existing

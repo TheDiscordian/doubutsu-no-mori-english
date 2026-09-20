@@ -123,4 +123,74 @@ class MaterialRuntimeTests(unittest.TestCase):
             (OUT/'asset-loader.ups').read_bytes()),self.image)
 
 
+class MaterialProfileIntegrationTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.out=ROOT/'build/v3-material-trigger-profiles-02'
+        cls.image,cls.report=inputs(cls.out/'build-lock.json')
+        cls.base,cls.prior=inputs(cls.out/'base-lock.json')
+        cls.blob=by_vrom(cls.image)[BLOB].extract(cls.image)
+        cls.old=by_vrom(cls.base)[BLOB].extract(cls.base)
+        cls.source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+            (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+        cls.rows=[r for r in cls.report['staged_furniture']['rows'] if r['category']==materials.CATEGORY]
+
+    def test_complete_profiles_reuse_existing_artwork_runtime_and_names(self):
+        from v3_import_storage import ITEMS,slot
+        self.assertEqual({r['item_id'] for r in self.rows},{'3314','3318','332C'})
+        self.assertEqual(len(self.report['staged_furniture']['rows']),26)
+        self.assertEqual({r['source_item_id'] for r in self.report['staged_furniture']['deferred_resources']},
+            {'1FD8','3298','331C'})
+        self.assertEqual(self.report['blob_bytes'],self.prior['blob_bytes'])
+        e=self.report['equipment_resources'];old_e=self.prior['equipment_resources']
+        a=e['blob_offset'];self.assertEqual(self.blob[a:a+e['bytes']],self.old[a:a+e['bytes']])
+        p=e['room_rigs']['packet'];a=p['blob_offset'];self.assertEqual(p,old_e['room_rigs']['packet'])
+        self.assertEqual(self.blob[a:a+p['bytes']],self.old[a:a+p['bytes']])
+        expected=bytearray(self.old[ROWS:TABLE_END])
+        for row in self.rows:
+            i=slot(int(row['item_id'],16));a=row['object_vrom']-BLOB;n=row['object_bytes']
+            self.assertEqual(self.blob[a:a+n],self.old[a:a+n]);self.assertTrue(row['reused_asset'])
+            self.assertFalse(self.blob[0x40+i//8]&(1<<(i&7)))
+            profile=self.blob[ROWS+i*80:ROWS+(i+1)*80];item=self.blob[ITEMS+i*32:ITEMS+(i+1)*32]
+            self.assertEqual(profile[:8],struct.pack('>HHI',row['runtime_index'],int(row['item_id'],16),0))
+            self.assertEqual(profile[24:56],bytes(32))  # No engine rig or generic model duplicates.
+            self.assertEqual(struct.unpack_from('>I',profile,72)[0],runtime.MATERIAL_VTABLE)
+            self.assertEqual(item[8:24],row['name'].encode().ljust(16,b' '));self.assertEqual(item[7],0)
+            expected[i*80:(i+1)*80]=profile;expected[ITEMS-ROWS+i*32:ITEMS-ROWS+(i+1)*32]=item
+        self.assertEqual(self.blob[ROWS:TABLE_END],expected)
+        self.assertEqual(self.report['save_runtime'],self.prior['save_runtime'])
+        self.assertEqual(e['furniture_audio'],old_e['furniture_audio'])
+
+    def test_verified_bindings_advance_to_acquisition_and_reject_missing_lifecycle(self):
+        ids=identity_rows(ROOT/'build/item-identity-megasheet.xlsx')
+        bindings=runtime.bind_profiles(self.source,self.image,self.report)
+        self.assertEqual(len(bindings),26)
+        for row in self.rows:
+            item=int(row['item_id'],16)
+            with self.assertRaisesRegex(ValueError,'^acquisition needs an adapter:'):
+                metadata(self.source,item,prepare(self.source,item)[0],ids[item])
+        for key,value in (('lifecycle_installed',False),('move_category','unknown')):
+            bad=copy.deepcopy(self.report)
+            next(r for r in bad['equipment_resources']['room_rigs']['material_rows'] if r['source_item_id']=='3314')[key]=value
+            with self.assertRaisesRegex(ValueError,'Incomplete installed material/trigger lifecycle'):
+                runtime.bind_profiles(self.source,self.image,bad)
+        bad=copy.deepcopy(self.report)
+        next(r for r in bad['equipment_resources']['room_rigs']['sound_rows'] if r['source_item_id']=='3314')['profile_installed']=False
+        with self.assertRaisesRegex(ValueError,'Incomplete installed material/trigger lifecycle'):
+            runtime.bind_profiles(self.source,self.image,bad)
+        runtime.bind_profiles(self.source,self.image,self.report)
+
+    def test_no_new_choices_and_exact_translation_only_and_patch_outputs(self):
+        pin=composer.BASE,composer.BASE_SHA,composer.REPORT_SHA,composer.ABI
+        try:
+            composer.use_build_lock(self.out/'build-lock.json');catalog=composer.catalogue(self.image,self.report)
+            self.assertEqual(len(catalog),136);self.assertFalse({r['id'] for r in self.rows}&set(catalog))
+            self.assertEqual(composer.compose(self.image,self.report,catalog,composer.resolve(catalog,list(catalog)))[0],self.image)
+            self.assertEqual(sha256(composer.compose(self.image,self.report,catalog,composer.resolve(catalog,[]))[0]),
+                self.report['translation_baseline']['sha256'])
+        finally:composer.BASE,composer.BASE_SHA,composer.REPORT_SHA,composer.ABI=pin
+        self.assertEqual(apply_ups((ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes(),
+            (self.out/'asset-loader.ups').read_bytes()),self.image)
+
+
 if __name__=='__main__':unittest.main()

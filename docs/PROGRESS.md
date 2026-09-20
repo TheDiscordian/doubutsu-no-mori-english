@@ -18,15 +18,26 @@ served patchers retain their existing builds.
 
 ## Active development
 
-The current explicit proposal is ABI 169 at
+The current explicit proposal is ABI 170 at
+`build/v3-material-trigger-profiles-02/build-lock.json`. The shared profile
+importer stages coin, ? block, and fire flower with their complete material/sound
+callbacks, official names, prices, and ordinary records. All graphics and runtime
+bytes are reused in place. Three focused current-build checks pass; metadata now
+reaches the missing source acquisition route. The other three material objects
+retain explicit incomplete lifecycle dependencies. There are 26 staged profiles;
+none of this batch is enabled for selection. The 136 existing choices, allocations,
+saved format/profile, main lock, and both served patchers are unchanged. See the
+[profile checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-material-trigger-profile-integration).
+
+The shared incremental-audio integration is retained from ABI 169 at
 `build/v3-material-trigger-runtime-04/build-lock.json`. Shared audio installation
 accepts incremental batches, preserves previous sound identities and complete
 instruments/samples, and connects the existing switch-trigger callback to coin,
 ? block, and fire flower's installed material renderer. Their three full sound
 programs/instruments are installed alongside the five previous sound objects.
 All 82 instruments fit the existing audio allocation, with 352 bytes of
-conservative permanent headroom. Ordinary profiles and acquisition remain pending;
-this batch does not add selectable choices.
+conservative permanent headroom. Ordinary profiles are staged above; acquisition
+remains pending, and this batch does not add selectable choices.
 
 The shared allocator relocates the complete wave archive into verified empty
 cartridge space when an in-place append encounters occupied or unclaimed data.

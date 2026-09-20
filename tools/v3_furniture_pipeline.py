@@ -1012,7 +1012,8 @@ def name_metadata(source, item, identity):
 def metadata(source, item, profile, identity):
     from v3_furniture_rigs import FIXED_CATEGORY
     from v3_furniture_materials import CATEGORY as MATERIAL_CATEGORY
-    if profile.get('callback_adapter',{}).get('category')==MATERIAL_CATEGORY:
+    binding=getattr(source,'runtime_profiles',{}).get(f'{item:04X}')
+    if profile.get('callback_adapter',{}).get('category')==MATERIAL_CATEGORY and not binding:
         raise ReviewRequired('Material-frame artwork is prepared; drawing, lifecycle behaviour, and acquisition need runtime adapters')
     if profile.get('callback_adapter',{}).get('category')==PENDING_MOVE_CATEGORY:
         raise ReviewRequired('Static artwork is prepared; move behaviour, profile interactions, and spawned effects need runtime adapters')
@@ -1023,7 +1024,6 @@ def metadata(source, item, profile, identity):
         raise ReviewRequired(room_alias_reason(alias))
     if item<0x3000 and item not in LEGACY_FURNITURE:
         raise ReviewRequired('legacy donor identity needs native correspondence review and an additive import mapping')
-    binding=getattr(source,'runtime_profiles',{}).get(f'{item:04X}')
     if binding and (binding['source_profile_sha256']!=profile['profile_sha256'] or
             binding['category']!=profile.get('callback_adapter',{}).get('category')):
         raise ReviewRequired('Installed lifecycle differs from the current source profile')

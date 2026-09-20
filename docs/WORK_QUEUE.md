@@ -12,7 +12,24 @@ After the primary importing work, finish gold-tree leaf/cut effects and the full
 golden-shovel acquisition route. This is deferred required V3 work, not a dropped
 feature or a separate release goal.
 
-The current ABI-169 proposal is
+The current ABI-170 proposal is
+`build/v3-material-trigger-profiles-02/build-lock.json`. Coin, ? block, and fire
+flower have complete inactive ordinary profiles, official names/prices, and
+shared material/sound bindings. The importer reuses all existing artwork and
+runtime bytes and now reports their actual missing acquisition route. Three
+current-build checks pass; there are 26 staged profiles, with no new choices,
+save/profile change, or RAM growth. Reuse the passing ABI-169 native sound and
+relocated-wave evidence for its unchanged code/data. Ordinary GPU interaction
+and acquisition remain unverified.
+
+Continue remaining shared conversion/runtime and acquisition categories.
+Mouth of Truth, festive candle, and starman retain their real pending lifecycles;
+the profile batch records these omissions rather than enabling them. Implemented
+material/trigger records still need the source Mario-item delivery route. Do not
+substitute shop stock or claim the category playable merely because profiles exist.
+Gold-tree effects and full golden-shovel acquisition follow primary imports.
+
+The shared incremental-audio integration is retained at
 `build/v3-material-trigger-runtime-04/build-lock.json`. Incremental audio batches
 preserve complete existing programs/instruments and sound IDs. Coin, ? block,
 and fire flower now use the shared switch-trigger callback with their complete
@@ -21,11 +38,9 @@ no additional RAM or selected profile is needed. Four current-build checks and
 the first focused silent native run pass (75 records, 50 assertions). Reuse this
 evidence; ordinary interactions, listening, and hardware are not established.
 
-Next stage the three implemented material/trigger lifecycles through the shared
-ordinary-profile importer, reusing their existing artwork and sound rows. Keep
-Mouth of Truth, festive candle, and starman's actual remaining lifecycle work
-explicit; do not promote all material rows based on drawing alone. Acquisition
-remains required, including the missing original Mario-item delivery route.
+The three implemented material/trigger lifecycles are staged above through the
+shared ordinary-profile importer, reusing their existing artwork and sound rows.
+Acquisition remains required, including the missing original Mario-item delivery route.
 The shared wave allocator handles blocked in-place growth by relocating the
 complete archive into verified zero cartridge space and adjusting every header
 and the native base. Old copies and external waves remain intact. The main lock,

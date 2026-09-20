@@ -155,9 +155,11 @@ Complete frame bounds, eight-byte alignment, segment eight/nine, model order,
 and packet limits are validated before any graphics writes. Drawing reserves
 one matrix and all commands together, binds an immutable complete palette or
 texture, then submits every model in donor order. Crowded or malformed arenas
-produce no partial draw. The ordinary profile writer still refuses this resource
-category: installing its renderer does not imply implemented lifecycle or
-acquisition. Mouth of Truth's reviewed legacy source `1FD8` has the append-only
+produce no partial draw. Ordinary profiles require a checked complete lifecycle
+binding, not just an installed renderer or a forged readiness annotation.
+Material objects with complete installed switch-trigger moves use the shared
+profile staging path; other lifecycles remain refused. Acquisition stays
+independent. Mouth of Truth's reviewed legacy source `1FD8` has the append-only
 destination `3C30`, runtime index 1804; the native worksheet correspondence and
 approved translation map contain no existing native identity for that source.
 
@@ -1328,13 +1330,20 @@ and resources are installed.
 ### Shared ordinary profile staging
 
 `--refresh-runtime --furniture-profiles <prepared-directory>` accepts repeated
-complete prepared bundles for implemented clock, storage, and sound categories.
+complete prepared bundles for implemented clock, storage, sound, and
+material/trigger categories.
 Source identity, complete artwork, callback bindings, and installed audio are
 checked before writing ordinary 80-byte profile and 32-byte item records into
 their fixed canonical slots. Official English names retain individual entries
 in `translations/provenance.json`. Existing rig assets are reused at their
 original VROMs; complete sound models are appended within the checked reservation.
-No additional resident memory or saved fields are needed.
+No additional resident memory or saved fields are needed. Material/trigger
+profiles reuse their installed objects and the shared material vtable, leaving
+the native engine's generic model/rig fields null to avoid duplicate drawing.
+Both the material and sound rows retain the profile binding. The complete move
+category and sound word are checked again when the ordinary importer resolves
+runtime readiness. Prepared material objects without an installed lifecycle
+remain explicitly deferred in the staging receipt, not silently promoted.
 
 Both enabled flags remain zero, along with the saved selection bit at
 `blob[0x20 + 32 + slot/8]`. The native profile-table initializer consequently
