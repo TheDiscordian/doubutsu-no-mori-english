@@ -91,7 +91,7 @@ The equipment module retains its size and guards. Its
 `804ADC90..804ADFEF` range contains an 848-byte bootstrap and native fallback
 stubs, bounded before the retained guard at `804ADFF0`. A four-byte cache word
 at `804ADFEC` starts clear in the startup-loaded module. The bootstrap transfers
-and verifies the 9,296-byte shared code packet into the reserved
+and verifies the 9,788-byte shared code packet into the reserved
 `804B5000..804B7FFF` range, flushes the instruction cache, and records the verified
 CRC. Constructors then prepare the native/held table and load the active scenery
 bank. Tree queries can load the same packet before any seasonal actor exists;
@@ -126,7 +126,7 @@ held-category hooks. Disabled imported foreground IDs resolve the native empty
 row rather than indexing beyond a native table. Save/profile restrictions still
 apply; this fallback does not authorise removing imports from a saved world.
 
-The explicit ABI-157 proposal is `build/v3-shared-tree-field-01/build-lock.json`.
+The explicit ABI-158 proposal is `build/v3-shared-tree-sparkle-02/build-lock.json`.
 It uses a 12,288-byte fixed reservation and 32,864 bytes per loaded seasonal owner.
 All existing 128 experimental choices and format-3 saves remain unchanged.
 The main ABI-109 lock and both served V2 patchers stay unchanged. Component tests
@@ -352,7 +352,7 @@ Reuse the installed renderer, planting conversion, tree-state helpers, and daily
 growth/death/neighbour/thinning, hidden-content, and world-query consumers.
 Seasonal drop/cut counts and player targeting/shaking/bee predicates are installed.
 Final stump acceptance, conversation-camera, field clearing, and insect-habitat
-consumers are connected. Planting sparkle and complete gold-tree leaf/cut effects
+consumers and planting sparkle are connected. Complete gold-tree leaf/cut effects
 still precede full ordinary acquisition. The final axe routine accepts selected
 gold stumps without changing their real saved identity. The donor
 effect owner has gold-specific variants, status, resources, and leaf types;
@@ -469,6 +469,39 @@ foreground, complete installed consumers, relocation at two bases, existing
 resources/saves, full UPS reconstruction, and exact translation-only output.
 The [field checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-field-clearing-and-insect-habitats)
 records native evidence and remaining ordinary-gameplay limits.
+
+## Planting completion sparkle
+
+The shared gameplay refresh replaces only each seasonal planting routine's
+foreground-commit call with a wrapper. Complete donor functions supply offsets:
+cherry `(12,27,10)`, winter/Xmas/ordinary `(13,33,10)`. A selected gold sapling
+requests the native KIGAE_LIGHT effect before the original commit. Other items,
+disabled profiles, or missing effect context retain the original commit without
+an added effect. Real identity, position, flag, and cleanup remain unchanged.
+
+The N64 effect ID is 87; the donor's 86 identifies another native effect. The
+complete native effect owner at `008F98E0`, its relocation, controller row,
+dispatcher, and clip initializer are verified and retained. The native effect's
+15-frame lifetime corresponds to the donor's 30 frames. Its `-1` argument avoids
+clothing offsets and gravity. Existing graphics and effect-pool ownership stay
+native; no new effect asset or scene allocation is required.
+
+The original native planting function keeps its bounce multiplier `0.4`, phase
+acceleration `3000`, and completion threshold `0.02`. Do not substitute the
+donor's `0.2`/`1500` values while adding the sparkle. Code occupies 9,788 bytes
+in the existing 12-KiB reservation; all previous packet consumers rebind to the
+current addresses. Field/insect refresh verifies and reverses its cumulative
+patches before checking the original contract, retaining relocation ordering.
+
+Nine focused checks cover source/native bindings, both relocation bases,
+selected/unselected identities, missing context, exact argument forwarding,
+existing memory/resources/saves, complete patch reconstruction, and optional
+composition. Native component evidence covers all four original completion
+callbacks, normal/unselected/unfinished fallbacks, actual bounce timing, and
+native effect initialization. Foreground commits and effect creation use
+explicit recorders, not a live town or rendered effect. The
+[planting checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-planting-sparkle)
+separates the initial partial run from its focused corrected retry.
 
 The [checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-seasonal-scenery-preparation)
 records resources and focused checks. Component checks do not establish

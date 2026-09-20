@@ -58,8 +58,10 @@ same reservation and adds no item-specific installer. The field/insect refresh
 extends the existing clearing helper and both native tree-habitat consumers,
 preserving the N64 entrance layout, original ranges, candidate selection, and
 bee-tree exclusion. It also fits existing memory and uses complete category
-rules. Complete gold-tree effects and planting sparkle still precede ordinary
-acquisition. See
+rules. The planting-completion refresh adds all four source-positioned sapling
+sparkles through the native effect and unchanged bounce/cleanup timing. It
+rebinds existing field/insect consumers without repeating their relocation.
+Complete gold-tree leaf/cut effects still precede ordinary acquisition. See
 [seasonal scenery](V3_SCENERY.md).
 
 The shared flying-balloon category installs one complete donor state machine

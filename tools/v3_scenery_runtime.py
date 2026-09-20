@@ -25,6 +25,7 @@ SOURCES = ('tools/v3_scenery_runtime.py', 'tools/v3_scenery.py',
            'overlays/v3/scenery_interactions.c', 'overlays/v3/scenery_player.c',
            'tools/v3_scenery_player.py',
            'tools/v3_scenery_field.py', 'overlays/v3/scenery_field.c',
+           'tools/v3_scenery_effects.py', 'overlays/v3/scenery_effects.c',
            'tools/v3_asset_loader.py', 'translations/provenance.json')
 
 
@@ -775,9 +776,10 @@ def install_daily(base,prior,blob,core,original,output):
     player=bool(previous.get('interactions'))
     felling=bool(previous.get('player_queries'))
     field=bool(previous.get('felling_camera'))
+    planting=bool(previous.get('field_insects'))
     capacity=12288 if interactions else 8192
     added=capacity-previous['additional_fixed_resident_bytes']
-    if (previous.get('field_insects') or not previous.get('tree_states') or old['bytes']!=0x12000
+    if (previous.get('planting_sparkle') or not previous.get('tree_states') or old['bytes']!=0x12000
             or sha256(module)!=old['sha256'] or previous['additional_fixed_resident_bytes']!=(12288 if player else 8192 if contents else 4096)
             or RUNTIME_RAM+capacity>prior['furniture']['bank_pool']['start']):
         raise ValueError('Changed daily-growth runtime dependency')
@@ -820,7 +822,10 @@ def install_daily(base,prior,blob,core,original,output):
     camera=player_adapter.camera_contract(source,base,original,previous) if felling else None
     if field:
         import v3_scenery_field as field_adapter
-        field_evidence,field_owner,field_rel,field_records=field_adapter.contract(source,base,original)
+        field_evidence,field_owner,field_rel,field_records=field_adapter.contract(source,base,original,previous.get('field_insects'))
+    if planting:
+        from v3_scenery_effects import planting_contract
+        plant_evidence=planting_contract(source,base,original,previous)
     guard_incoming(owner,18960,0x80AB07C0,[(0x475C,8)])
     include='../'*len(output.relative_to(ROOT).parts)+'overlays/v3/scenery_trees.h'
     configuration=f'#include "{include}"\nconst Scenery af_v3_scenery_config[4]={{\n'
@@ -846,6 +851,9 @@ def install_daily(base,prior,blob,core,original,output):
     if camera:
         configuration+='const u32 af_v3_tree_talk_offsets[4]={'+','.join(
             f'0x{row["entry"]:X}u' for row in camera['owners'])+'};\n'
+    if planting:
+        configuration+='const TreePosition af_v3_tree_sparkle_offsets[4]={'+','.join(
+            '{'+','.join(f'{v:.1f}f' for v in row['position'])+'}' for row in plant_evidence['owners'])+'};\n'
     path=output/'scenery-config.c';write_new(path,configuration.encode())
     sources=['overlays/v3/scenery_trees.c','overlays/v3/scenery_daily.c']
     if contents:sources.append('overlays/v3/scenery_contents.c')
@@ -853,6 +861,7 @@ def install_daily(base,prior,blob,core,original,output):
     if interactions:sources.append('overlays/v3/scenery_interactions.c')
     if player:sources.append('overlays/v3/scenery_player.c')
     if field:sources.append('overlays/v3/scenery_field.c')
+    if planting:sources.append('overlays/v3/scenery_effects.c')
     code,compiled=compile_part('scenery',output/'scenery',extra_sources=(*sources,str(path.relative_to(ROOT))),
                                defines=('AF_V3_TREE_FELLING',) if felling else ())
     start=previous['blob_offset'];reservation=previous['reservations'][0]
@@ -886,6 +895,9 @@ def install_daily(base,prior,blob,core,original,output):
         edits += [(at,jump(compiled['symbols'][f'af_v3_tree_bury{variant}'],link=True),
             jump(previous['code']['symbols'][f'af_v3_tree_bury{variant}'],link=True))
             for at in previous['tree_states']['planting'][variant]['calls']]
+        if planting:
+            edits.append((plant_evidence['owners'][variant]['call'],
+                jump(compiled['symbols'][f'af_v3_tree_plant_commit{variant}'],link=True),jump(0x8008AA24,link=True)))
         for at,after,before in edits:
             if u32(data,at)!=before:raise ValueError('Changed seasonal tree dispatch')
             patches.append(dict(offset=at,before=before,after=after));struct.pack_into('>I',data,at,after)
@@ -978,6 +990,9 @@ def install_daily(base,prior,blob,core,original,output):
     if camera:
         current['felling_camera']=dict(camera,additional_resident_bytes=0,additional_scene_resident_bytes=0,
             ordinary_gameplay_tested=False,native_test='pending')
+    if planting:
+        current['planting_sparkle']=plant_evidence
+        current['tree_states']['planting_effect_installed']=True
     if field:
         updates,receipt=field_adapter.install(field_evidence,field_owner,field_rel,field_records,
                                               core,bootstrap,compiled['symbols'])

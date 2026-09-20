@@ -15,9 +15,27 @@ DONOR=((0x7DE98,'14de1a74aba0aebaa04c32f1be1200149e28f1bcbb293a3b42895281cad4a87
     (0x12BE14,'4ad86dea8a1728f22369b4ea512534c8a8ef4815ce10f81bf0358fa9f740b56f'))
 
 
-def contract(source,base,original):
+def contract(source,base,original,installed=None):
     files=by_vrom(base);retail=by_vrom(original)
-    data,rel=(files[v].extract(base) for v in (VROM,RELOC));core=files[CODE_VROM].extract(base)
+    owner,oldrel=(files[v].extract(base) for v in (VROM,RELOC))
+    data=bytearray(owner);rel=bytearray(oldrel);core=bytearray(files[CODE_VROM].extract(base))
+    if installed:
+        if sha256(owner)!=installed['sha256'] or sha256(oldrel)!=installed['reloc_sha256']:
+            raise ValueError('Changed installed field/insect consumer')
+        for p in installed.get('native_patches',installed['patches']):
+            at=p['offset']
+            if u32(data,at)!=p['after']:raise ValueError('Changed installed insect instruction')
+            struct.pack_into('>I',data,at,p['before'])
+        rows=list(struct.unpack_from('>'+str(u32(rel,16))+'I',rel,20))
+        for entry in installed['added_relocations']:
+            if rows.count(entry)!=1:raise ValueError('Changed installed insect relocation')
+            rows.remove(entry)
+        struct.pack_into('>I',rel,16,len(rows))
+        rel[20:-4]=struct.pack('>'+str(len(rows))+'I',*rows)+bytes(len(rel)-24-4*len(rows))
+        for p in installed['core_hooks']:
+            at=p['offset'];n=len(bytes.fromhex(p['after']))
+            if core[at:at+n].hex()!=p['after']:raise ValueError('Changed installed clearing entry')
+            core[at:at+n]=retail[CODE_VROM].extract(original)[at:at+n]
     if data!=retail[VROM].extract(original) or rel!=retail[RELOC].extract(original):
         raise ValueError('Changed complete native insect owner')
     sources=[]
@@ -48,9 +66,10 @@ def contract(source,base,original):
     if callers!=[0x800C33EC,0x800C3494,0x800C34A0,0x800C34AC,0x800C34B8]:
         raise ValueError('Changed native edge/entrance clearing callers')
     return dict(sources=sources,functions=functions,sections=sections,resident_bytes=sum(sections[:4]),
-        ram=RAM,vrom=VROM,reloc=RELOC,previous_sha256=sha256(data),previous_reloc_sha256=sha256(rel),
+        ram=RAM,vrom=VROM,reloc=RELOC,previous_sha256=sha256(owner),previous_reloc_sha256=sha256(oldrel),
         clear_entry=0x800C3398,clear_sha256=sha256(core[a:b]),clear_callers=callers,
-        native_entrance_cells=[7,8,23,24],spans=spans),data,rel,records
+        native_entrance_cells=[7,8,23,24],spans=spans,
+        retained_native_patches=installed.get('native_patches',installed['patches']) if installed else []),owner,oldrel,records
 
 
 def dispatch(target,bootstrap):
@@ -80,7 +99,12 @@ def install(evidence,owner,rel,records,core,bootstrap,symbols):
     at=evidence['clear_entry']-CODE_RAM;before=bytes(core[at:at+12])
     after=struct.pack('>3I',*dispatch(symbols['af_v3_tree_clear'],shared));core[at:at+12]=after
     patches=[dict(offset=p,before=u32(owner,p),after=u32(data,p)) for p in range(0,len(data),4) if u32(owner,p)!=u32(data,p)]
+    restored=bytearray(owner)
+    for p in evidence['retained_native_patches']:struct.pack_into('>I',restored,p['offset'],p['before'])
+    native_patches=[dict(offset=p,before=u32(restored,p),after=u32(data,p)) for p in range(0,len(data),4)
+        if u32(restored,p)!=u32(data,p)]
     receipt=dict(evidence,sha256=sha256(data),reloc_sha256=sha256(relocation),patches=patches,
+        native_patches=native_patches,
         gate_ram=GATE,gate_bytes=len(gate)*4,added_relocations=added,
         core_hooks=[dict(offset=at,before=before.hex(),after=after.hex())],additional_resident_bytes=0,
         additional_scene_resident_bytes=0,ordinary_gameplay_tested=False,native_test='pending')

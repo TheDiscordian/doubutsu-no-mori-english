@@ -1,5 +1,62 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared planting sparkle
+
+ABI 158 at `build/v3-shared-tree-sparkle-02/build-lock.json` connects gold-sapling
+planting effects through all four seasonal callers. The original N64 KIGAE_LIGHT
+owner, native bounce timing, foreground commit, and callback cleanup remain.
+The complete donor functions provide each season's effect position. The native
+effect ID is 87, not the donor's 86, and its native lifetime is 15 frames.
+
+- ROM SHA-256:
+  `3c450cd665e79c372a94d30ee77aed0480086968268d2bf64bf9f0c8d8bae443`.
+- Report SHA-256:
+  `6f8a4c4822358b2f291ad2598d80466a8064ea945849f53614055d687e9c7433`.
+- UPS SHA-256:
+  `36370a1bf31740afbdd39b4e90676964a2afbcc5b1f2f82e7a81e486875fb346`.
+
+The shared refresh consumes the ABI-157 field lock. Packet code occupies 9,788
+of the existing 12,288 bytes; bootstrap, equipment, seasonal banks, owners,
+allocations, saved formats, and 128 experimental choices stay unchanged. The
+field/insect adapter now validates cumulative installed patches when rebinding.
+
+Nine focused checks passed in 8.077 seconds on `sparkle-01`, including sanitized
+selected/unselected rules and missing context, complete source/native functions,
+seasonal relocation, existing consumers/resources/saves, UPS reconstruction,
+all choices, and the exact V2-12 import-free output. `sparkle-02` corrects only
+the report's inherited `planting_effect_installed` flag; its complete ROM and UPS
+match the tested build. No native replay is needed for that report correction.
+
+The first silent native run, `build/smoke-v3-tree-sparkle-01/`, passes 39 assertions
+before one incorrect fixture timing expectation. It executes all four seasonal
+completion functions with exact effect positions and original commit arguments,
+checks callback cleanup, and verifies ordinary-item, disabled-profile, and
+unfinished-bounce fallbacks. The fixture then expects amplitude `0.09` to complete
+after a boundary crossing. Retail N64 damping is `0.4`, so the actual result
+`0.036` correctly exceeds the `0.02` threshold. The mistaken fixture used the
+GameCube's `0.2` damping assumption. No game code is changed to satisfy it.
+
+The single focused retry at `build/smoke-v3-tree-sparkle-remaining-01/` uses
+amplitude `0.04` and runs only the remaining timing/effect/restoration checks.
+It passes 67 records and 43 assertions. The original bounce retains phase
+acceleration `3000`; actual native effect initialization retains position,
+priority, lifetime, and the no-clothing-offset/no-gravity argument. Complete
+code, saved import data, guards, restored state/checkpoint, and clean exit pass.
+Foreground commits and effect creation are explicit argument-recording doubles.
+No live-town mutation, rendered effect, ordinary acquisition, or hardware result
+is claimed. No user save is opened or modified.
+
+- Initial partial results SHA-256:
+  `d3b30b40b3e36361cd505761e3bfb4bb02e13d0af8176ac100c35e4e62687378`.
+- Focused retry results SHA-256:
+  `1416176317a25f91ce38ba4d3bf42474f1693238b603c099bfc1166c695c8ef6`.
+
+Complete gold-tree leaf/cut effects and ordinary acquisition remain unfinished;
+all four golden choices stay disabled. The next priority is shared bulk-import
+categories rather than further golden-tool detail work. Keep both served V2
+patchers and the main ABI-109 lock unchanged. Format-3 imported saves require
+matching or equal-or-larger profiles and must not be loaded in V2 or format-1/2 V3.
+
 ## Shared field clearing and insect habitats
 
 The ABI-157 proposal is `build/v3-shared-tree-field-01/build-lock.json`.

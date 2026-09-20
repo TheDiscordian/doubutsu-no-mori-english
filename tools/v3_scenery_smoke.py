@@ -12,6 +12,126 @@ from v3_import_storage import jump
 from v3_npc_draw_smoke import boot_proofs
 
 
+def planting_sparkle(debug,rom_path,record,*,remaining_only=False):
+    """Real seasonal completion and native sparkle setup, isolated from town.
+
+    Effect creation and the foreground setter are argument-recording doubles.
+    Native timing/cleanup, MIPS calls, and the original effect initializer run.
+    """
+    from v3_scenery_effects import EFFECT_VROM,EFFECT_RELOC,EFFECT_RAM
+    path=Path(rom_path);image=path.read_bytes();report=json.loads((path.parent/'build.json').read_bytes())
+    if sha256(image)!=report['output_sha256']:raise ValueError('Changed planting-sparkle cartridge')
+    e=report['equipment_resources'];r=e['scenery'];p=r['planting_sparkle'];files=by_vrom(image)
+    boot=boot_proofs(image);assertions=0
+    def check(label,okay,**detail):
+        nonlocal assertions
+        record(dict(planting_sparkle_check=label,**detail,assertion='passed' if okay else 'failed'))
+        if not okay:raise ValueError('Planting-sparkle mismatch: '+label)
+        assertions+=1
+    def memory(label,at,want):
+        got=debug.read_memory(at,len(want));check(label,got==want,address=f'{at:08X}',
+            expected_sha256=sha256(want),observed_sha256=sha256(got),
+            mismatch_hex=None if got==want or len(want)>64 else dict(expected=want.hex(),actual=got.hex()))
+    def call(at,args=(),proof=None,want=None):
+        result=debug.call(f'{at:08X}',[v&0xffffffff for v in args],return_address=MODULE_RAM+0x6480,
+            verified_code=proof or boot.get(at));record(result)
+        if want is not None:check('native result',result['return_value']==want,entry=f'{at:08X}')
+        return result['return_value']
+    def put(at,*values):debug.write_memory(at,struct.pack('>'+'I'*len(values),*[v&0xffffffff for v in values]))
+    def flush(at,n):call(0x8002FE00,[at,n]);call(0x80034CE0,[at,n])
+    regions=[(r['ram'],r['additional_fixed_resident_bytes']),(r['tree_states']['cache_word'],4),
+        (0x80460020,192),(0x80136F3C,4),(0x8008AA24,8),(TEST_STACK-0x800,16),(TEST_STACK+0x40,16)]
+    saved={at:debug.read_memory(at,n) for at,n in regions};module=debug.read_memory(e['ram'],e['bytes'])
+    save_data=debug.read_memory(0x8046C000,864);game=u32(debug.read_memory(0x8010EF90,4),0)
+    check('actual game pointer available',0x80000400<=game<0x80400000)
+    extent=(max(o['resident_bytes']+len(files[o['reloc']].extract(image)) for o in r['owners'])+31)&~15
+    size=extent+0x600;allocation=call(0x8009BFC0,[size])
+    if allocation&15 or not MODULE_RAM+0x8000<=allocation<=0x80400000-size:
+        raise ValueError('Planting fixture allocation failed')
+    root=allocation+16;bridge=allocation+extent+0x40;out=bridge+0x200
+    committed=out+0x40;clip=out+0x80;drop=out+0x100;effect=out+0x1B0
+    guards=sorted({allocation,bridge-16,out-16,out+0x30,committed-16,committed+0x20,
+        clip-16,clip+0x40,drop-16,drop+0x90,effect-16,effect+0x60,allocation+size-16,
+        TEST_STACK-0x800,TEST_STACK+0x40})
+    spans=sorted([(root,extent-16),(bridge,0x180),(out,44),(committed,20),(clip,0x40),
+        (drop,0x90),(effect,0x60)]+[(at,16) for at in guards if allocation<=at<allocation+size])
+    if any(a+n>b for (a,n),(b,_) in zip(spans,spans[1:])):raise ValueError('Planting fixture buffers overlap')
+    edge=b'AFPS'*4;debug.write_memory(allocation,bytes(size))
+    for at in guards:debug.write_memory(at,edge)
+    def capture(at,destination,words):
+        code=[0x3C080000|destination>>16,0x35080000|destination&65535,
+            0xAD040000,0xAD050004,0xAD060008,0xAD07000C]
+        for index in range(4,words):code.extend((0x8FA90000|4*index,0xAD090000|4*index))
+        code.extend((0x03E00008,0x00001025));put(at,*code)
+    capture(bridge,out,11);capture(bridge+0x100,committed,5);flush(bridge,0x200)
+    parent=next(row for row in e['player_actions']['equipment_selection']['rows'] if row['item_id']=='223B')
+    def select(enabled):
+        profile=bytearray(saved[0x80460020]);profile[parent['profile_byte']]&=~parent['profile_mask']
+        if enabled:profile[parent['profile_byte']]|=parent['profile_mask']
+        debug.write_memory(0x80460020,profile)
+    pos=(10.5,-12.,50.25);pos_bytes=struct.pack('>3f',*pos);sentinels=struct.pack('>3I',0x12345678,0x23456789,0x34567890)
+    try:
+        put(r['tree_states']['cache_word'],0);call(0x800A5970,[0x800,0,4],want=0x801)
+        blob=files[BLOB].extract(image);packet=blob[r['blob_offset']:r['blob_offset']+r['bytes']]
+        memory('complete current packet loaded',r['ram'],packet)
+        put(clip,bridge);put(clip+0x28,bridge);put(0x80136F3C,clip)
+        put(0x8008AA24,jump(bridge+0x100),0);flush(0x8008AA24,8)
+        for variant,(o,binding) in enumerate(zip(r['owners'],p['owners'],strict=True)):
+            if remaining_only and variant!=3:continue
+            data,rel=(files[o[k]].extract(image) for k in ('vrom','reloc'));n=o['resident_bytes'];sections=struct.unpack_from('>5I',rel)
+            loaded=relocate_verified_data(SimpleNamespace(ram=o['ram'],resident_bytes=n,sections=sections),data,rel,root)
+            call(0x800262D0,[o['vrom'],o['vrom']+len(data),o['ram'],o['ram']+n,root,root+n,len(rel)])
+            memory(o['role']+' complete actual seasonal owner',root,loaded);proof=(root,loaded[:sections[0]])
+            # Retail N64 damping is 0.4, not the donor's 0.2. Keep native
+            # timing: 0.04 * 0.4 completes; the old 0.09 fixture did not.
+            boundary=(0x863,True,.04,32760,16,True)
+            cases=[boundary] if remaining_only else [(0x863,True,.01,0,0,True)]
+            if variant==3 and not remaining_only:cases.extend(((0x863,False,.01,0,0,True),(0x800,True,.01,0,0,True),
+                (0x863,True,.03,0,0,False),boundary))
+            for item,enabled,amplitude,phase,step,complete in cases:
+                select(enabled);debug.write_memory(out,bytes(44));debug.write_memory(committed,bytes(20))
+                state=bytearray(0x90);state[:12]=sentinels;struct.pack_into('>H',state,0xE,item)
+                state[0x14:0x20]=pos_bytes;struct.pack_into('>fhh',state,0x50,amplitude,phase,step)
+                debug.write_memory(drop,state);call(root+binding['entry'],[drop],proof)
+                if complete:
+                    memory('actual original commit arguments',committed,struct.pack('>I',item)+pos_bytes+struct.pack('>I',1))
+                    memory('native completion clears all callbacks',drop,bytes(12))
+                else:
+                    memory('unfinished bounce does not commit',committed,bytes(20))
+                    memory('unfinished bounce retains all callbacks',drop,sentinels)
+                if complete and enabled and item==0x863:
+                    xyz=[a+b for a,b in zip(pos,binding['position'],strict=True)]
+                    memory(o['role']+' exact effect arguments',out,struct.pack('>I3f6I',87,*xyz,2,0,game,65535,0xffffffff,0))
+                else:memory('native/unselected/unfinished planting has no gold effect',out,bytes(44))
+                memory('planting preserves foreground identity and position',drop+0xE,bytes(state[0xE:0x20]))
+                if step:memory('native bounce acceleration retained',drop+0x54,struct.pack('>hh',-32760,3016))
+            memory('complete seasonal text retained',root,loaded[:sections[0]])
+        data,rel=(files[v].extract(image) for v in (EFFECT_VROM,EFFECT_RELOC));sections=struct.unpack_from('>5I',rel);n=sum(sections[:4])
+        loaded=relocate_verified_data(SimpleNamespace(ram=EFFECT_RAM,resident_bytes=n,sections=sections),data,rel,root)
+        call(0x800262D0,[EFFECT_VROM,EFFECT_VROM+len(data),EFFECT_RAM,EFFECT_RAM+n,root,root+n,len(rel)])
+        memory('complete native sparkle owner',root,loaded);proof=(root,loaded[:sections[0]])
+        position_words=struct.unpack('>3I',pos_bytes);debug.write_memory(out,bytes(44))
+        call(root,[*position_words,2,0,game,65535,0xffffffff,0],proof)
+        memory('actual native effect initializer retains position and arguments',out,
+            struct.pack('>11I',87,*position_words,0,game,0,65535,2,0xffffffff,0))
+        put(effect+4,0x0000FFFF);call(root+0x1D0,[effect,game,0],proof)
+        memory('native sparkle lifetime',effect,struct.pack('>H',15))
+        memory('planting sparkle has no clothing gravity or initial scale',effect+0x1C,bytes(36))
+        memory('saved import data unchanged',0x8046C000,save_data)
+        memory('complete packet unchanged',r['ram'],packet)
+        for at in guards:memory('fixture guard',at,edge)
+        memory('no faulted thread',0x8003CE34,bytes(4))
+    finally:
+        for at,value in saved.items():debug.write_memory(at,value)
+        flush(r['ram'],r['additional_fixed_resident_bytes']);flush(0x8008AA24,8);call(0x8009C040,[allocation])
+    for at,value in saved.items():memory('restored state',at,value)
+    memory('equipment unchanged',e['ram'],module)
+    return dict(assertions=assertions,actual_seasonal_planting_consumers=1 if remaining_only else 4,
+        focused_remaining_cases=remaining_only,actual_native_effect_setup=True,
+        foreground_commit_and_effect_creation_recorders=True,ordinary_acquisition_tested=False,
+        rendered_effect_tested=False,requires_checkpoint_restore=True)
+
+
 def field_insects(debug,rom_path,record):
     """Actual clearing callers and complete insect scan/candidate selection.
 

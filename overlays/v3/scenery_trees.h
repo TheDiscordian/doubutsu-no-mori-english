@@ -3,6 +3,7 @@
 #include "scenery.h"
 typedef unsigned short u16;
 typedef signed short s16;
+typedef struct { float x,y,z; } TreePosition;
 typedef struct {
     u16 first, count, hidden_first, hidden_count, selected_item, plant_item, hole, unused;
     s16 growth[6][2];

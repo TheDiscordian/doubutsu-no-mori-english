@@ -17,12 +17,13 @@ import v3_scenery_runtime as scenery
 import v3_scenery_player as player
 import v3_scenery_field as field
 import tests.test_v3_equipment_runtime as shared
-OUTPUT=ROOT/os.environ.get('V3_TREE_PLAYER_BUILD','build/v3-shared-tree-field-01')
+OUTPUT=ROOT/os.environ.get('V3_TREE_PLAYER_BUILD','build/v3-shared-tree-sparkle-02')
 
 class HostTests(unittest.TestCase):
     sanitized=shared.HostTests.sanitized
     def test_all_native_and_imported_predicates(self):self.sanitized('v3_tree_player_test.c',defines=('-DAF_V3_TREE_FELLING',))
     def test_field_clearing_and_insect_habitats(self):self.sanitized('v3_tree_field_test.c')
+    def test_planting_effect_and_native_commit(self):self.sanitized('v3_tree_effects_test.c')
 
 @unittest.skipUnless((OUTPUT/'build.json').is_file(),'Current player-tree cartridge required')
 class CartridgeTests(unittest.TestCase):
@@ -89,7 +90,7 @@ class CartridgeTests(unittest.TestCase):
     def test_complete_field_consumers_and_relocated_insect_predicate(self):
         source=scenery.Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
             (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
-        evidence,data,rel,records=field.contract(source,self.base,self.original)
+        evidence,data,rel,records=field.contract(source,self.base,self.original,self.prior['equipment_resources']['scenery'].get('field_insects'))
         core=bytearray(self.before[CODE_VROM].extract(self.base))
         changes,receipt=field.install(evidence,data,rel,records,core,self.r['bootstrap'],self.r['code']['symbols'])
         self.assertEqual(json.loads(json.dumps(receipt)),self.r['field_insects'])
@@ -109,6 +110,30 @@ class CartridgeTests(unittest.TestCase):
                              changes[field.VROM][field.GATE-field.RAM:field.GATE-field.RAM+receipt['gate_bytes']])
         for key in ('sections','resident_bytes'):
             self.assertEqual(evidence[key],receipt[key])
+
+    def test_complete_planting_consumers_and_original_sparkle(self):
+        from v3_scenery_effects import planting_contract,EFFECT_VROM,EFFECT_RELOC
+        source=scenery.Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+            (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+        evidence=planting_contract(source,self.base,self.original,self.prior['equipment_resources']['scenery'])
+        self.assertEqual(json.loads(json.dumps(evidence)),self.r['planting_sparkle'])
+        self.assertTrue(self.r['tree_states']['planting_effect_installed'])
+        code=(OUTPUT/'scenery/code.bin').read_bytes()
+        at=self.r['code']['symbols']['af_v3_tree_sparkle_offsets']-self.r['ram']
+        self.assertEqual(code[at:at+48],struct.pack('>12f',*(v for row in evidence['owners'] for v in row['position'])))
+        for index,(owner,binding) in enumerate(zip(self.r['owners'],evidence['owners'],strict=True)):
+            data=self.files[owner['vrom']].extract(self.rom);rel=self.files[owner['reloc']].extract(self.rom)
+            wanted=jump(self.r['code']['symbols'][f'af_v3_tree_plant_commit{index}'],link=True)
+            before=self.before[owner['vrom']].extract(self.base)
+            span=bytearray(data[binding['entry']:binding['end']]);offset=binding['call']-binding['entry']
+            self.assertEqual(u32(span,offset),wanted);struct.pack_into('>I',span,offset,jump(0x8008AA24,link=True))
+            self.assertEqual(span,before[binding['entry']:binding['end']])
+            for ram in (0x80200010,0x80300010):
+                moved=relocate_verified_data(SimpleNamespace(ram=owner['ram'],resident_bytes=owner['resident_bytes'],
+                    sections=struct.unpack_from('>5I',rel)),data,rel,ram)
+                self.assertEqual(u32(moved,binding['call']),wanted)
+        for v in (EFFECT_VROM,EFFECT_RELOC,0x8E0A30,0x8E4170):
+            self.assertEqual(self.before[v].extract(self.base),self.files[v].extract(self.rom))
 
     def test_retained_allocations_resources_and_rebound_shared_consumers(self):
         old=self.prior['equipment_resources'];a=scenery.BOOT_RAM-old['ram'];b=scenery.BOOT_END-old['ram'];start=old['blob_offset']

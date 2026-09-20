@@ -13,6 +13,9 @@ af_scenery_native_change = 0x80055EF8;
 af_v3_native_tree_grow = 0x804ADFC0;
 af_v3_native_tree_stump = 0x804ADFD0;
 af_tree_field_units = 0x8008A410;
+af_scenery_effect_clip = 0x80136F3C;
+af_scenery_game = 0x8010EF90;
+af_scenery_commit = 0x8008AA24;
 SECTIONS
 {
     . = 0x804B5000;

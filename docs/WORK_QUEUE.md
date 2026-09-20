@@ -2,8 +2,18 @@
 
 ## Active: V3 optional GameCube imports
 
-The current explicit proposal is ABI 157,
-`build/v3-shared-tree-field-01/build-lock.json`. All eight balloons are
+Priority: complete general extraction/conversion/integration pipelines, then
+bulk-import supported categories. Group outstanding records by shared dependency;
+do not finish individual golden-tool effects while broadly useful category work
+is available. Unique behaviour follows general support. Reuse completed checks
+and run bounded verification only for changed category machinery. Unfinished
+gameplay remains explicit and cannot be enabled merely because artwork converts.
+After the primary importing work, finish gold-tree leaf/cut effects and the full
+golden-shovel acquisition route. This is deferred required V3 work, not a dropped
+feature or a separate release goal.
+
+The current explicit proposal is ABI 158,
+`build/v3-shared-tree-sparkle-02/build-lock.json`. All eight balloons are
 connected through shared source-derived parent records, room profiles, indoor
 conversion/pickup, collection/catalogue, complete icons, and optional selection.
 There are 128 experimental choices, with 24 equipment parents. Neither served
@@ -104,10 +114,16 @@ Seven focused checks pass. The first silent native run passes 106 records and
 three native candidate selections, guards, restored state/checkpoint, and clean
 exit. It does not create an insect actor or prove ordinary spawning/acquisition.
 The 9,296-byte packet fits the existing reservation; no owner, asset, allocation,
-save, or choice changes. Reuse these components and do not replay them. Next
-connect complete source gold-tree leaf/cut effects and planting sparkle before
-exercising ordinary acquisition. See the
+save, or choice changes. Reuse these components and do not replay them. See the
 [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-field-clearing-and-insect-habitats).
+The planting sparkle is connected across all four seasons, using complete source
+positions and the original N64 effect. Nine focused checks pass. Native evidence
+covers seasonal completion/cleanup and original effect setup; a focused retry
+corrects only the fixture's donor-versus-native bounce expectation and completes
+guards/restoration. Code occupies 9,788 bytes in the same reservation. Do not
+replay completed components. Next connect complete source gold-tree leaf/cut
+effects, then exercise ordinary acquisition. See the
+[planting checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-planting-sparkle).
 Do not feed GameCube gold effect-variant indices into the unextended native
 effect owner, or substitute ordinary-green effects for the gold source artwork.
 The donor reuses ordinary seasonal tree motion/model families with a gold status

@@ -93,6 +93,12 @@ Developer verification and a private playtest handoff do not satisfy that approv
   unchanged evidence. The local Xvfb executable is
   `/home/discordian/Games/OpenRSC/headless/vendor/usr/bin/Xvfb`; pass it explicitly
   when it is absent from PATH.
+- Prioritise completing general import pipelines and bulk category coverage
+  before unique-item behaviour or visual detail. Prepare supported artwork and
+  shared records even when a separate behaviour is unfinished; retain explicit
+  readiness and keep incomplete gameplay out of selectable imports. Extend a
+  shared category once for all matching records. Reuse passing tests for
+  unchanged components and defer unique-item verification to its implementation.
 - Use existing focused checks once per meaningful change. Reuse passing native
   evidence for unchanged code/resources; do not add exhaustive per-record or
   all-combinations harnesses without a concrete uncovered risk. For a testing-

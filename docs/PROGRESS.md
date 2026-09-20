@@ -18,8 +18,21 @@ served patchers retain their existing builds.
 
 ## Active development
 
-The current explicit proposal is ABI 157 at
-`build/v3-shared-tree-field-01/build-lock.json`. Shared field clearing and both
+The current explicit proposal is ABI 158 at
+`build/v3-shared-tree-sparkle-02/build-lock.json`. All four seasonal planting
+callbacks add the donor's gold-sapling sparkle at its actual source position.
+The existing N64 effect, planting timing, foreground arguments, and callback
+cleanup remain intact. Nine focused checks pass. Native checks cover all four
+seasonal consumers; the focused retry closes a fixture-only timing expectation,
+verifies original effect setup, and passes guards, restoration, and clean exit.
+No ordinary planting, GPU appearance, or hardware claim is made. Code occupies
+9,788 of the existing 12,288 bytes, with no added allocation, save field, or choice.
+Primary import pipelines and bulk category coverage take priority. Afterwards,
+finish gold-tree leaf/cut effects and ordinary acquisition; these remain required
+V3 work, and golden choices remain disabled meanwhile. See the
+[planting checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-planting-sparkle).
+
+Shared field clearing and both
 insect-habitat consumers include selected gold trees while preserving the N64's
 four-cell entrance layout, original habitats, and bee-tree exclusion. Seven
 focused checks pass. The first silent native check passes 106 records and 69
@@ -28,8 +41,7 @@ three real candidate selections, guards, restored state/checkpoint, and clean
 exit. No insect actor is created; ordinary spawning/acquisition and hardware
 remain unverified. The 9,296-byte packet fits the existing 12-KiB reservation.
 No owner allocation, artwork, saved format, choice, main lock, or patcher changes.
-Reuse these components. Next connect gold-tree leaf/cut effects and planting
-sparkle; golden choices stay disabled until their ordinary routes work. See the
+Reuse these components. Golden choices stay disabled until their ordinary routes work. See the
 [field checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-field-clearing-and-insect-habitats).
 
 The final axe predicate accepts
@@ -62,7 +74,7 @@ The packet occupies 8,544 bytes within the existing 12-KiB reservation. The
 364-byte player gate reuses a replaced inline predicate; owner sizes, allocations,
 saves, choices, the main lock, and both patchers remain unchanged. Final stump
 acceptance and seasonal camera checks are connected. Next connect complete
-source gold-tree effects and planting sparkle. Field/insect consumers are
+source gold-tree leaf/cut effects. Planting sparkle and field/insect consumers are
 connected. The native and donor stump-height lookups already agree and remain
 unchanged. Golden choices stay
 disabled. See the [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-player-tree-queries).

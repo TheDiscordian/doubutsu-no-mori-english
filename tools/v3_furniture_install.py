@@ -726,7 +726,7 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             interaction=equipment_report['scenery'].get('interactions')
             player_tree=equipment_report['scenery'].get('player_queries')
             added=(player_tree or interaction or world or contents or daily or equipment_report['scenery']['tree_states'])['additional_resident_bytes']
-            adapter='scenery_field_insects' if equipment_report['scenery'].get('field_insects') else 'scenery_felling_camera' if equipment_report['scenery'].get('felling_camera') else 'scenery_player_queries' if player_tree else 'scenery_interactions' if interaction else 'scenery_world_queries' if world else 'scenery_hidden_contents' if contents else 'scenery_daily_growth' if daily else 'scenery_tree_states'
+            adapter='scenery_planting_sparkle' if equipment_report['scenery'].get('planting_sparkle') else 'scenery_field_insects' if equipment_report['scenery'].get('field_insects') else 'scenery_felling_camera' if equipment_report['scenery'].get('felling_camera') else 'scenery_player_queries' if player_tree else 'scenery_interactions' if interaction else 'scenery_world_queries' if world else 'scenery_hidden_contents' if contents else 'scenery_daily_growth' if daily else 'scenery_tree_states'
             report['shared_runtime_refresh']['adapters'].append(adapter)
             report['shared_runtime_refresh'].update(resource_allocations_changed=bool(added),
                 additional_resident_bytes=added,

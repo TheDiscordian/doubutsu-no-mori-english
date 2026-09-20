@@ -1561,6 +1561,9 @@ def tool_controls(debug,rom_path,record,*,transitions=False,capture=False,rod=Fa
 
 
 def exercise(debug, rom_path, record, *, section='automatic_furniture'):
+    if section in ('scenery_planting_sparkle','scenery_planting_sparkle_remaining'):
+        from v3_scenery_smoke import planting_sparkle
+        return planting_sparkle(debug,rom_path,record,remaining_only=section.endswith('_remaining'))
     if section=='scenery_field_insects':
         from v3_scenery_smoke import field_insects
         return field_insects(debug,rom_path,record)
