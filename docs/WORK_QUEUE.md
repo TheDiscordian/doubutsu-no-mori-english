@@ -2,8 +2,8 @@
 
 ## Active: V3 optional GameCube imports
 
-The current explicit proposal is ABI 146,
-`build/v3-shared-balloon-actor-04/build-lock.json`. All eight balloons are
+The current explicit proposal is ABI 147,
+`build/v3-shared-balloon-release-04/build-lock.json`. All eight balloons are
 connected through shared source-derived parent records, room profiles, indoor
 conversion/pickup, collection/catalogue, complete icons, and optional selection.
 There are 128 experimental choices, with 24 equipment parents. Neither served
@@ -19,12 +19,19 @@ The current focused selection run passes 41 records and 26 assertions, including
 rejection/acceptance, restored state/checkpoint, final guards, and clean exit.
 Do not replay those completed components; the checkpoint records the two actual
 bugs corrected during implementation and the interrupted full fixtures.
-Next connect ordinary/exchange release and look/continuation, then fall/get-up
-handoff. Do not clear held items until the matching flying actor is available,
-and retain native fish/insect behaviour plus the deferred reward flag. Keep all
-four golden choices disabled pending these consumers and source acquisition.
+Shared release/look/continuation, inventory exchange, and fall/get-up handoff
+are installed. Five host/cartridge checks pass. Native release/fall checks pass
+114 records and 78 assertions; focused exchange passes 86 records and 57
+assertions. Reuse unchanged flight, Look, and fall evidence. Both runs restore
+live state/checkpoint, pass memory guards, and exit cleanly; they do not prove
+ordinary gameplay, menu interaction, or hardware appearance.
+Next connect the ordinary outdoor `Let Go` menu from the donor tag category,
+preserving indoor placement and present/quest priority. Use the existing queue
+at `804B1680`, guard actor availability before pocket removal, and credit the
+official label once in the provenance catalogue. Keep all four golden choices
+disabled pending the complete ordinary routes and source acquisition.
 See the [flight specification](../specs/V3_BALLOON_RELEASE.md) and
-[checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-flying-balloon-actor).
+[checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-balloon-release-exchange-and-fall).
 
 The shared exchange/deferred stage connects normal-drop, empty-hand, burying,
 and fish/insect release reward endings. Two sanitizer and three cartridge/
@@ -34,10 +41,9 @@ ordinary flag clearing, priority rejection, native setup, timing boundaries,
 guards, restored state/checkpoint, and clean exit. Retain those results. The
 fixture's close callback, empty bury item, and existing release actor deliberately
 limit its scope; ordinary world placement/release and hardware remain unproven.
-Next connect the complete source flying-balloon actor to release/look/
-continuation rules, including exchange and tumble loss. The exchange currently
-retains the existing placement path for balloons; do not label that as source
-release behaviour or merely clear the held item. Keep gold-tree growth/drop,
+The shared flight consumer replaces balloon exchange placement with release,
+source continuation, and tumble loss. Ordinary inventory `Let Go` selection
+remains required. Keep gold-tree growth/drop,
 event director/NPC collection rewards, and perfect-town acquisition as required
 work, with all four golden choices disabled. Save/profile restrictions remain
 format 3; no new migration is added. See the
@@ -53,7 +59,7 @@ requests, guards, restored state/checkpoint, and clean exit. Retain these result
 they are component calls, not ordinary acquisition or hardware proof.
 The exchange stage carries the golden-shovel condition through normal drop,
 empty hand, buried items, and fish/insect release, with native timing and the
-deferred flag. Balloon release remains required. Native Putaway is action 62 and
+deferred flag. Ordinary balloon menu selection remains required. Native Putaway is action 62 and
 Putin is 63, unlike donor ordering. Reuse the shared completion query at
 `804B2764` and registered submenu action 118. Keep gold-tree,
 collection-completion event/NPC, and perfect-town acquisition required; golden

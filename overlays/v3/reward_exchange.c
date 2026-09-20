@@ -25,6 +25,9 @@ extern u8 *af_test_exchange_game, *af_test_exchange_active;
 #define FN(at,result,...) ((result (*)(__VA_ARGS__))native(at,context))
 extern int af_v3_reward_completed(u32),af_v3_player_selected_equipment(u32);
 extern u32 af_v3_present_encode(u32,u32);
+#ifdef AF_V3_BALLOON_RELEASE
+extern int af_v3_balloon_queue(void *,u32,int);
+#endif
 
 static int reward(u32 incoming,u32 outgoing) {
     return incoming==0x223Bu && outgoing!=0x223Bu &&
@@ -48,6 +51,13 @@ void af_v3_reward_exchange(void *submenu,void *menu,u32 context) {
         } else if (raw>>12==2u && (raw>>8&15u)==13u) {
             FN(0x80873968u,void,u32)(item);
             WORD(change,0x20)=flag;
+#ifdef AF_V3_BALLOON_RELEASE
+        } else if (item-0x2244u<8u) {
+            if (!af_v3_balloon_queue(game,item,flag)) {
+                FN(0x80871570u,void,void *,void *,int)(submenu,menu,11);
+                return;
+            }
+#endif
         } else {
             Pos pos;
             if (FN(0x80870C6Cu,int,void *,Pos *,int)(actor,&pos,0) &&

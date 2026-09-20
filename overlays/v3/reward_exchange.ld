@@ -4,6 +4,7 @@ af_v3_reward_completed = 0x804B2764;
 af_v3_player_selected_equipment = 0x804A5828;
 /* Bound to the current complete wrapped-parent implementation by the installer. */
 af_v3_present_encode = 0x804B415C;
+af_v3_balloon_queue = 0x804B1680;
 SECTIONS
 {
     . = 0x804AD650;

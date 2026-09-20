@@ -57,6 +57,15 @@ int af_v3_reward_completed(u32 type) { assert(type==3);return completed; }
 int af_v3_player_selected_equipment(u32 item) { assert(item==0x223B);return selected?90:-1; }
 u32 af_v3_present_encode(u32 item,u32 condition) { return item==0x223B && condition==1?0x2521:item; }
 static void exchange(void) { af_v3_reward_exchange(submenu,menu,0x80873AEC); }
+#ifdef AF_V3_BALLOON_RELEASE
+static int queue_allowed=1;
+int af_v3_balloon_queue(void *game,u32 item,int flag) {
+    assert(game==game_data && item-0x2244u<8u);log_call('Q');
+    if(!queue_allowed)return 0;
+    WORD(change,0)=81;WORD(change,4)=1;WORD(change,8)=2;WORD(change,12)=(int)item-0x2244;WORD(change,0x20)=flag;
+    return 1;
+}
+#endif
 int main(void) {
     position_ok=drop_ok=1;HALF(menu,0x46)=(u16)-123;
     for(int incoming=0;incoming<2;incoming++) for(selected=0;selected<2;selected++) for(completed=0;completed<2;completed++) {
@@ -79,5 +88,13 @@ int main(void) {
         else for(u32 i=0;i<sizeof(change);i++) assert(change[i]==0xA5);
     }
     reset();af_v3_reward_exchange(0,menu,0x80873AEC);af_v3_reward_exchange(submenu,0,0x80873AEC);assert(!calls);
+#ifdef AF_V3_BALLOON_RELEASE
+    for(int shape=0;shape<8;shape++) for(int incoming=0;incoming<2;incoming++) for(queue_allowed=0;queue_allowed<2;queue_allowed++) {
+        HALF(hand,0x23C)=(u16)(0x2244+shape);WORD(menu,0x3C)=incoming?0x223B:0x1234;reset();exchange();
+        assert(!strcmp(events,queue_allowed?"QMS":"QX"));
+        if(queue_allowed) assert(WORD(change,0)==81 && WORD(change,8)==2 && WORD(change,12)==shape && WORD(change,0x20)==incoming);
+        else for(u32 i=0;i<sizeof(change);i++)assert(change[i]==0xA5);
+    }
+#endif
     puts("pass: source reward conditions, native exchange/drop/empty-hand/bury/creature routes and warning/sound semantics");
 }

@@ -1561,6 +1561,8 @@ def tool_controls(debug,rom_path,record,*,transitions=False,capture=False,rod=Fa
 
 
 def exercise(debug, rom_path, record, *, section='automatic_furniture'):
+    if section=='balloon_release':return balloon_release(debug,rom_path,record)
+    if section=='balloon_exchange':return reward_exchange(debug,rom_path,record,balloons=True)
     if section=='balloon_actor':return balloon_actor(debug,rom_path,record)
     if section=='balloon_selection':return balloon_actor(debug,rom_path,record,selection_only=True)
     if section=='reward_actions':return reward_actions(debug,rom_path,record)
@@ -2759,7 +2761,139 @@ def balloon_actor(debug,rom_path,record,*,selection_only=False):
         ordinary_release_tested=False,hardware_tested=False,flash_written=False,requires_checkpoint_restore=True)
 
 
-def reward_exchange(debug,rom_path,record):
+def balloon_release(debug,rom_path,record):
+    """Current cartridge callbacks, source pose, head tracking and fall handoff."""
+    from runtime_layout import TEST_STACK
+    from v3_import_storage import jump
+    import v3_equipment_runtime as equipment
+    path=Path(rom_path);image=path.read_bytes();report=json.loads((path.parent/'build.json').read_bytes())
+    if sha256(image)!=report['output_sha256']:raise ValueError('Changed balloon release cartridge')
+    resources=report['equipment_resources'];r=resources['player_actions']['balloon_release']
+    flying=resources['player_actions']['balloon_actor'];files=by_vrom(image)
+    blob=files[runtime.BLOB].extract(image);boot=boot_proofs(image);assertions=0
+    def check(label,at,want):
+        nonlocal assertions
+        got=debug.read_memory(at,len(want));passed=got==want
+        record(dict(balloon_release_check=label,address=f'{at:08X}',bytes=len(want),
+            assertion='passed' if passed else 'failed',observed_sha256=sha256(got),expected_sha256=sha256(want)))
+        if not passed:raise ValueError('Balloon release mismatch: '+label)
+        assertions+=1
+    def call(at,args=(),proof=None):
+        result=debug.call(f'{at:08X}',list(args),return_address=MODULE_RAM+0x6480,verified_code=proof or boot.get(at))
+        record(result);return result['return_value']
+    def put(at,*words):debug.write_memory(at,struct.pack('>'+str(len(words))+'I',*words))
+    def scalar(at):return int.from_bytes(debug.read_memory(at,4),'big')
+    def pointer(at,n):
+        p=scalar(at)
+        if p&3 or not MODULE_RAM+0x8000<=p<=0x80400000-n:raise ValueError('Missing live release pointer')
+        return p
+    module=blob[resources['blob_offset']:resources['blob_offset']+resources['bytes']];symbols={}
+    for row in r['codes'].values():
+        a,n=row['offset'],row['code']['bytes'];check('complete installed consumer code',equipment.RAM+a,module[a:a+n])
+        symbols.update(row['code']['symbols'])
+    constructor=scalar(0x80143900);owner=constructor-(0x808DD748-equipment.PLAYER_RAM)
+    data,rel=(files[v].extract(image) for v in (equipment.PLAYER_VROM,equipment.PLAYER_RELOC))
+    sections=struct.unpack_from('>5I',rel)
+    expected=relocate_verified_data(SimpleNamespace(ram=equipment.PLAYER_RAM,resident_bytes=len(data),sections=sections),data,rel,owner)
+    check('complete relocated player code',owner,expected[:sections[0]])
+    def native(entry,args):
+        at=entry-equipment.PLAYER_RAM
+        return call(owner+at,args,(owner+at,expected[at:at+8]))
+    game=pointer(0x8010EF90,0x1E00);actor=pointer(game+0x1C90,0x13B0)
+    balloon=pointer(actor+0x13A0,flying['actor_bytes'])
+    actor_before=debug.read_memory(actor,0x13B0);balloon_before=debug.read_memory(balloon,flying['actor_bytes'])
+    saved={at:debug.read_memory(at,n) for at,n in ((0x80460020,192),(0x8046C000,report['save_runtime']['state_bytes']),
+        (0x80126EA0,0xF980),(0x80136FD8,4),(0x8013767D,2),(0x80143910,0x50),(0x80123E10,0x154),
+        (0x801458A0,64),(0x80104F94,4),(TEST_STACK-0x800,16),(TEST_STACK+0x40,16))}
+    banks={}
+    for index in struct.unpack_from('>2h',actor_before,0xDA0):
+        if not 0<=index<8:raise ValueError('Invalid player animation bank')
+        p=pointer(game+0x114+84*index,equipment.PLAYER_CAPACITY);banks[p]=debug.read_memory(p,equipment.PLAYER_CAPACITY)
+    size=0x200;allocation=call(0x8009BFC0,[size]);bridge=allocation+16;args=allocation+0x120
+    if allocation&15 or not MODULE_RAM+0x8000<=allocation<=0x80400000-size:raise ValueError('Balloon release fixture allocation failed')
+    names=('request','submenu','release_setup','look','release_transition','getup','getup_transition')
+    raw=b''.join(struct.pack('>2I',jump(symbols['af_v3_balloon_'+name]),0) for name in names)
+    debug.write_memory(bridge,raw);call(0x8002FE00,[bridge,len(raw)]);call(0x80034CE0,[bridge,len(raw)])
+    def resident(name,values):return call(bridge+names.index(name)*8,values,(bridge,raw))
+    edge=b'V3BR'*4;guards=(allocation,allocation+size-16,TEST_STACK-0x800,TEST_STACK+0x40)
+    for at in guards:debug.write_memory(at,edge)
+    for row in r['callbacks']:check('actual registered creature callback',equipment.RAM+row['offset'],struct.pack('>I',row['after']))
+    def prepare():
+        put(actor+0xCF0,7);put(actor+0xD00,7,0,0,0);put(actor+0xD70,77)
+        debug.write_memory(actor+0xE64,b'\1')
+    try:
+        put(0x80136FD8,0x80126EC0);put(0x80104F94,0);debug.write_memory(0x8013767D,bytes(2))
+        debug.write_memory(0x80127908,b'\0');debug.write_memory(0x80126EC0+0x3EC,bytes(2))
+        for shape in (0,7):
+            prepare();put(0x80143910,81,1,2,shape,0,0,0,0,0)
+            resident('submenu',[actor,game])
+            check('submenu accepts selected balloon and native priority',actor+0xD00,struct.pack('>3I',81,31,1))
+            check('request carries complete shape union',actor+0xD58,struct.pack('>6I',2,shape,0,0,0,0))
+            check('ordinary release clears reward flag',actor+0xD70,bytes(4))
+            debug.write_memory(actor+0xDE,bytes(2));position=struct.unpack('>3f',debug.read_memory(actor+0x28,12))
+            resident('release_setup',[actor,game])
+            check('native base installs release action',actor+0xCF0,struct.pack('>I',81))
+            check('setup owns flying actor and clears timer',actor+0xD10,struct.pack('>5I',2,balloon,0,1,0))
+            check('flight request retains source angle and shape',balloon+0x450,struct.pack('>2I4h',1,shape,0,0,0,0))
+            check('ordinary flight frame and speed',balloon+0x460,struct.pack('>2f',-1,7))
+            check('source world offset',balloon+0x468,struct.pack('>3f',position[0]+10,position[1]+17.5,position[2]+10))
+            # Pending flight prevents completion, including after the minimum timer.
+            put(actor+0xD00,7,0,0,0);debug.write_memory(actor+0xD18,struct.pack('>f',41))
+            resident('look',[actor]);native(0x808D7814,[actor,game])
+            check('live balloon keeps release action at timing boundary',actor+0xD08,bytes(4))
+            check('pending flight continuation is false',actor+0x13A4,bytes(4))
+            put(balloon+0x448,0,shape,0xFFFFFFFF);resident('look',[actor]);native(0x808D7814,[actor,game])
+            check('hidden balloon permits ordinary wait',actor+0xD00,struct.pack('>3I',7,1,1))
+            check('finished release clamps native timer',actor+0xD18,struct.pack('>f',42))
+            check('finished release clears tracked actor',actor+0xD14,bytes(4))
+        # Native smoothing must use the source balloon limits, not native insect ones.
+        put(actor+0xD10,2,balloon,0,0,0);put(balloon+0x448,1,0,0xFFFFFFFF)
+        debug.write_memory(actor+0xDC,bytes(6));debug.write_memory(actor+0x48,struct.pack('>3f',0,0,0))
+        debug.write_memory(balloon+0x28,struct.pack('>3f',100,50,0));debug.write_memory(actor+0x1136,bytes(6))
+        resident('look',[actor]);check('two donor head substeps with 500 limits',actor+0x1136,struct.pack('>2h',1000,1000))
+        debug.write_memory(actor+0xD18,struct.pack('>f',30));resident('look',[actor])
+        check('post-tracking recovery uses smaller pitch limit',actor+0x1136,struct.pack('>2h',501,600))
+        for shape in (0,7):
+            prepare();debug.write_memory(0x80126EC0+0x3EC,struct.pack('>H',0x2244+shape))
+            debug.write_memory(actor+0x1370,struct.pack('>4h',100,-10,80,-70));debug.write_memory(actor+0x1388,struct.pack('>h',20))
+            debug.write_memory(actor+0xDE,struct.pack('>h',80));debug.write_memory(actor+0x103C,struct.pack('>3f',14,25,36))
+            debug.write_memory(actor+0xA28,struct.pack('>f',12.5))
+            native(0x808C320C,[actor,game,91+shape,0xC0A00000])
+            check('fall records correct shape',actor+0x13A8,struct.pack('>I',shape))
+            check('fall clears equipped item',0x80126EC0+0x3EC,bytes(2))
+            check('fall carries complete current hand pose',balloon+0x450,
+                struct.pack('>2I4h5f',1,shape,110,80,0,-70,12.5,7,14,25,36))
+            check('native get-up now has empty hand',actor+0x1117,b'\xFF')
+            native(0x808C33A0,[actor,game,0]);check('get-up waits for animation end',actor+0xD08,bytes(4))
+            native(0x808C33A0,[actor,game,1])
+            check('get-up requests source release priority',actor+0xD00,struct.pack('>3I',81,30,1))
+            check('get-up reuses flying actor',actor+0xD6C,struct.pack('>I',balloon))
+            resident('release_setup',[actor,game]);check('existing flight retains frame',balloon+0x460,struct.pack('>f',12.5))
+            check('existing flight not treated as new birth',actor+0xD1C,bytes(4))
+        prepare();put(actor+0x13A0,0);debug.write_memory(0x80126EC0+0x3EC,struct.pack('>H',0x2244))
+        native(0x808C320C,[actor,game,91,0xC0A00000])
+        check('missing actor retains equipped balloon',0x80126EC0+0x3EC,struct.pack('>H',0x2244))
+        check('missing actor records ordinary recovery',actor+0x13A8,b'\xFF'*4)
+        put(actor+0x13A0,balloon);prepare();put(actor+0xD00,7,40,1);put(args,0,0,0,0)
+        if resident('request',[game,2,1,args,0,31])!=0:raise ValueError('Priority rejection bypassed')
+        check('rejected request retains pending flag',actor+0xD70,struct.pack('>I',77))
+        check('save extension untouched',0x8046C000,saved[0x8046C000])
+        for at in guards:check('bounded actor handoff and stack',at,edge)
+        check('no CPU fault',0x8003CE34,bytes(4))
+    finally:
+        debug.write_memory(actor,actor_before);debug.write_memory(balloon,balloon_before)
+        for at,value in banks.items():debug.write_memory(at,value)
+        for at,value in saved.items():debug.write_memory(at,value)
+        call(0x8009C040,[allocation])
+    check('complete player restored',actor,actor_before);check('complete flying actor restored',balloon,balloon_before)
+    for at,value in saved.items():check('restored live state',at,value)
+    return dict(native_balloon_release=True,assertions=assertions,actual_registered_callbacks=2,
+        actual_release_getup_hooks=True,source_timing_sampled=True,test_jump_bridges=True,
+        ordinary_menu_release_tested=False,ordinary_gameplay_tested=False,hardware_tested=False,
+        flash_written=False,requires_checkpoint_restore=True)
+
+
+def reward_exchange(debug,rom_path,record,*,balloons=False):
     """Loaded tag routing and actual native deferred request/setup/completion paths."""
     import v3_equipment_runtime as equipment
     from runtime_layout import TEST_STACK
@@ -2782,7 +2916,11 @@ def reward_exchange(debug,rom_path,record):
         value=int.from_bytes(debug.read_memory(at,4),'big')
         if value&3 or not MODULE_RAM+0x8000<=value<=0x80400000-size:raise ValueError('Invalid deferred fixture pointer')
         return value
-    start=resources['blob_offset'];module=blob[start:start+resources['bytes']]
+    start=resources['blob_offset'];module=bytearray(blob[start:start+resources['bytes']])
+    if balloons:
+        packet=resources['player_actions']['balloon_actor']['packet_offset']
+        check('one live flying actor instance',equipment.RAM+packet+0x1E,b'\1')
+        module[packet+0x1E]=1
     check('complete installed module',equipment.RAM,module)
     constructor=int.from_bytes(debug.read_memory(0x80143900,4),'big');owner=constructor-(0x808DD748-equipment.PLAYER_RAM)
     data,rel=(files[v].extract(image) for v in (equipment.PLAYER_VROM,equipment.PLAYER_RELOC))
@@ -2798,6 +2936,9 @@ def reward_exchange(debug,rom_path,record):
     actor=pointer(game+0x1C90,actor_bytes);actor_before=debug.read_memory(actor,actor_bytes)
     saved={at:debug.read_memory(at,size) for at,size in ((0x80460020,192),(0x8046C000,report['save_runtime']['state_bytes']),
         (0x80126EA0,0xF980),(0x80136FD8,4),(0x8013767D,2),(0x80143910,0x50),(0x80123E10,0x154),(0x801458A0,64))}
+    if balloons:
+        balloon=pointer(actor+0x13A0,0x2080);saved[balloon]=debug.read_memory(balloon,0x2080)
+        saved[0x80104F94]=debug.read_memory(0x80104F94,4)
     banks={}
     for index in struct.unpack_from('>2h',actor_before,0xDA0):
         if not 0<=index<8:raise ValueError('Invalid native animation bank')
@@ -2815,6 +2956,8 @@ def reward_exchange(debug,rom_path,record):
     check('complete cartridge-loaded tag owner',tag,tag_loaded)
     raw=bytearray();entries={}
     for row in receipt['callbacks']:
+        if balloons and row['action']==81:
+            row=next(r for r in resources['player_actions']['balloon_release']['callbacks'] if r['consumer']==row['consumer'])
         key=(row['consumer'],row['action']);target=int.from_bytes(debug.read_memory(equipment.RAM+row['offset'],4),'big')
         if target!=row['after']:raise ValueError('Changed actual deferred callback')
         entries[key]=bridge+len(raw);raw.extend(struct.pack('>4I',0x08000000|(target>>2&0x3FFFFFF),0,0,0))
@@ -2839,13 +2982,13 @@ def reward_exchange(debug,rom_path,record):
     try:
         put(0x80136FD8,0x80126EC0);debug.write_memory(0x8013767D,bytes(2));debug.write_memory(0x80127908,b'\0')
         debug.write_memory(actor+0xE64,b'\1');profile(True)
-        for action in (7,63,81,118):
+        for action in (() if balloons else (7,63,81,118)):
             prepare();player(0x808B3334,[game,action,31])
             check('ordinary request clears flag only for deferred actions',actor+0xD70,bytes(4) if action in (63,81) else b'\xA5'*4)
-        for entry,args in ((0x800B2008,[pos,0]),(0x800B2060,[123,0x2301]),(0x800B20A8,[1])):
+        for entry,args in (() if balloons else ((0x800B2008,[pos,0]),(0x800B2060,[123,0x2301]),(0x800B20A8,[1]))):
             debug.write_memory(0x80143910,b'\xA5'*0x50);call(entry,args)
             check('ordinary submenu request clears deferred flag',0x80143930,bytes(4))
-        for enabled,done in ((True,False),(True,True),(False,False)):
+        for enabled,done in (() if balloons else ((True,False),(True,True),(False,False))):
             profile(enabled,done);flag=enabled and not done
             for item in (0,0x2301,0x2D01):
                 debug.write_memory(hand+0x23C,struct.pack('>H',item));put(menu+0x3C,0x223B);put(counts,0,0,0)
@@ -2856,7 +2999,7 @@ def reward_exchange(debug,rom_path,record):
                 check('tag route carries reward only to deferred action',0x80143930,struct.pack('>I',int(flag and bool(item))))
                 check('test close callback receives native menu and direction',counts,struct.pack('>3I',1,menu,0))
         profile(True)
-        for index,entry,transition in ((63,0x800B2008,0x808D2774),(81,0x800B2060,0x808D7814)):
+        for index,entry,transition in (() if balloons else ((63,0x800B2008,0x808D2774),(81,0x800B2060,0x808D7814))):
             for flag in (0,1):
                 prepare();call(entry,[pos,0] if index==63 else [123,0x2301]);put(0x80143930,flag)
                 callback(0x808DD874,index)
@@ -2879,6 +3022,24 @@ def reward_exchange(debug,rom_path,record):
                 if flag:check('deferred reward type',actor+0xD58,struct.pack('>I',3))
             prepare();put(actor+0xD00,7,40,1);put(actor+0xD70,77);callback(0x808DD874,index)
             check('rejected submenu does not overwrite requested flag',actor+0xD70,struct.pack('>I',77))
+        if balloons:
+            put(0x80104F94,0);debug.write_memory(0x80126EC0+0x3EC,bytes(2))
+            for shape in (0,7):
+                for flag in (0,1):
+                    prepare();debug.write_memory(hand+0x23C,struct.pack('>H',0x2244+shape));put(hand+0x2E4,0)
+                    put(menu+0x3C,0x223B if flag else 0x1234);put(counts,0,0,0)
+                    debug.write_memory(0x80143910,b'\xA5'*0x50)
+                    a,b=0x80873ADC-0x8086F310,0x80873C88-0x8086F310
+                    call(tag+a,[submenu,menu],(tag+a,tag_loaded[a:b]))
+                    check('tag exchange queues complete selected balloon union',0x80143910,struct.pack('>9I',81,1,2,shape,0,0,0,0,flag))
+                    check('successful flight exchange closes native menu',counts,struct.pack('>3I',1,menu,0))
+                    callback(0x808DD874,81);callback(0x808DDA18,81)
+                    check('exchange reaches real release action',actor+0xCF0,struct.pack('>I',81))
+                    check('exchange starts the owned flying actor',balloon+0x450,struct.pack('>2I',1,shape))
+                    check('exchange setup preserves deferred reward',actor+0xD20,struct.pack('>I',flag))
+                    put(actor+0xD00,7,0,0,0);put(actor+0x13A4,1)
+                    debug.write_memory(actor+0xD18,struct.pack('>f',41));player(0x808D7814,[actor,game])
+                    check('finished balloon exchange selects continuation',actor+0xD00,struct.pack('>3I',118 if flag else 7,34 if flag else 1,1))
         check('reward completion remains unset until settlement',0x8046C000,state)
         check('module remains unchanged',equipment.RAM,module)
         for at in guards:check('deferred reward guard',at,edge)
@@ -2891,10 +3052,11 @@ def reward_exchange(debug,rom_path,record):
     check('live actor restored',actor,actor_before)
     for at,value in banks.items():check('live bank restored',at,value)
     for at,value in saved.items():check('live state restored',at,value)
-    return dict(native_reward_exchange=True,assertions=assertions,actual_tag_empty_fish_insect=True,
-        actual_registered_callbacks=4,test_only_jump_bridges=True,test_only_close_callback=True,
-        bury_item_zero=True,release_existing_actor=True,ordinary_placement_tested=False,
-        ordinary_gameplay_tested=False,balloon_release_tested=False,hardware_tested=False,
+    return dict(native_reward_exchange=True,native_balloon_exchange=balloons,assertions=assertions,actual_tag_empty_fish_insect=not balloons,
+        actual_registered_callbacks=2 if balloons else 4,registered_callbacks_verified=4,
+        test_only_jump_bridges=True,test_only_close_callback=True,
+        bury_item_zero=not balloons,release_existing_actor=not balloons,ordinary_placement_tested=False,
+        ordinary_gameplay_tested=False,balloon_release_tested=balloons,hardware_tested=False,
         flash_written=False,requires_checkpoint_restore=True)
 
 

@@ -113,12 +113,12 @@ Do not identify an old native action by the same-numbered donor callback.
 
 See the [collection checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-reward-collection-consumers)
 for exact tests and their scope. Ordinary gameplay, complete source acquisition,
-balloon release, and hardware remain required.
+ordinary balloon menu selection, and hardware remain required.
 
 ### Inventory exchange and deferred completion
 
 The shared exchange stage connects normal-drop and empty-hand reward requests,
-plus deferred completion after burying or fish/insect release. It preserves
+plus deferred completion after burying or fish/insect/balloon release. It preserves
 the original N64 placement search, field insertion, insect-index conversion,
 warning, menu-close, and sound APIs. The pending incoming item must be selected
 golden shovel `223B`, the outgoing item must not itself be `223B`, and the active
@@ -164,7 +164,7 @@ updates, equivalent to 84 donor updates. Completion settles priority, requests
 idle or the celebration, and clamps the timer to that boundary. Rejection retries
 on subsequent updates without bypassing request permissions.
 
-The exchange group is 760 bytes at `804AD650..804AD947`, after the 1,612-byte
+The exchange group is 868 bytes at `804AD650..804AD9B3`, after the 1,612-byte
 ground adapter. The deferred group is 944 bytes at `804AE690..804AEA3F`, after
 the 1,680-byte event-stock adapter. Both fit checked unused code reservations.
 Their neighbouring linker limits prevent future growth from overwriting the
@@ -173,13 +173,13 @@ grows; four callback values, seven instruction windows, and their checked code
 reservations change. The installer binds ten complete donor functions, complete
 native consumers/APIs, prior wrapped conversion, and actual callback identities.
 
-Balloon release remains unfinished: the [separate flying actor](V3_BALLOON_RELEASE.md)
-is installed, but its source branch still needs balloon-dependent release,
-look, and continuation rules. The installed exchange
-retains its existing placement path for balloons; that is not a completed donor
-release implementation. Source island-only restrictions have no N64 island
-counterpart. The four golden-tool choices remain disabled until full ordinary
-acquisition and required release paths are connected. See the
+The [shared balloon consumers](V3_BALLOON_RELEASE.md) connect the separate flying
+actor, native action 81, source head tracking/continuation, fall/get-up, and
+inventory exchange. Selected outgoing balloons queue flight rather than ground
+placement. Queue rejection retains the warning and open menu. The ordinary
+inventory `Let Go` option remains required. Source island-only restrictions have
+no N64 island counterpart. The four golden-tool choices remain disabled until
+full ordinary acquisition and required release paths are connected. See the
 [exchange checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-reward-inventory-exchange)
 for actual test coverage and fixture limitations.
 
@@ -203,7 +203,8 @@ reach cartridge-loaded code. Live state and the emulator checkpoint are restored
 Ordinary acquisition still requires the source collection-completion event
 director/NPC support, perfect-town reward conversation, and gold-tree growth/drop
 route. Collection and normal-drop/empty-hand/bury/fish/insect exchange consumers
-are installed. Balloon release still requires its actor and continuation rules.
+are installed, along with balloon exchange and fall/release continuation.
+The ordinary balloon inventory option remains required.
 These are required gameplay integration, not replaced
 with shop stock or arbitrary letters. The four golden-tool choices remain
 disabled. This stage adds no English text; existing source credits remain in

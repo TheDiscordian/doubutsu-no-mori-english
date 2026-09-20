@@ -11,6 +11,7 @@ import struct
 import zlib
 import v3_save_rewards
 import v3_balloon_actor
+import v3_balloon_release
 
 from aflib import CODE_RAM, CODE_VROM, by_vrom, sha256, u32
 from v3_asset_loader import BLOB, ROOT, compile_part
@@ -93,6 +94,7 @@ SOURCES+=('tools/v3_event_text.py','tools/v3_camper_text.py',
           'overlays/v3/player_rewards.c','overlays/v3/player_rewards.ld')
 SOURCES+=v3_save_rewards.SOURCES
 SOURCES+=v3_balloon_actor.SOURCES
+SOURCES+=v3_balloon_release.SOURCES
 SOURCES+=('overlays/v3/reward_requests.c','overlays/v3/reward_requests.ld',
           'overlays/v3/reward_wait.c','overlays/v3/reward_wait.ld',
           'overlays/v3/reward_pickup.c','overlays/v3/reward_pickup.ld',
@@ -2149,6 +2151,8 @@ def expanded_tables(source,owner,reloc,*,categories=CATEGORIES,native_count=NATI
 
 def install(base,prior,blob,core,original,output):
     old=prior.get('equipment_resources',{})
+    if old.get('player_actions',{}).get('balloon_actor') and not old['player_actions'].get('balloon_release'):
+        return v3_balloon_release.install(base,prior,blob,core,original,output)
     if old.get('player_actions',{}).get('reward_exchange') and not old['player_actions'].get('balloon_actor'):
         return v3_balloon_actor.install(base,prior,blob,core,original,output)
     if old.get('player_actions',{}).get('reward_pickup') and not old['player_actions'].get('reward_exchange'):

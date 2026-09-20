@@ -71,24 +71,71 @@ is separately bound for animation and model consumers and restored after calls.
 Opaque/translucent display-list segments are restored after drawing. The drawer
 checks arena capacity before emitting anything and balances the matrix stack.
 
-## Required consumers
+## Release, exchange, and fall consumers
 
-The actor and its player lifetime are installed. Ordinary balloon release,
-exchange release, and loss during a fall are **not yet connected**. Continue
-through the shared release category, retaining native fish/insect behaviour:
+`tools/v3_balloon_release.py` is the next shared `--player-actions` stage. It
+binds the complete donor release/get-up groups, submenu setter, exchange, and
+equipment setter to the checked native APIs. All eight shapes share one action;
+there are no per-item scripts or new choices. The native fish/insect setup,
+tracking, and deferred reward implementation remain the fallback.
 
-- Balloon release setup uses the owned actor, source position/angle/frame rules,
-  and optional existing actor pointer.
-- Balloon look/head tracking returns the source continuation result; completion
-  waits for both the native time boundary and that result. Preserve the deferred
-  golden-shovel reward flag and original request permissions.
-- Fall/get-up transfers the actual hand position, gathered frame, and balloon
-  angles before clearing the equipped item. A missing actor must not lose the
-  item. The get-up transition uses the source balloon release continuation.
-- Ordinary and inventory-exchange actions release the correct selected shape;
-  dropping its room representation is not equivalent to flight.
+Request type two uses native action 81 and its actual permission/priority checks.
+Invalid/unselected shapes, missing owned actors, and a foreign existing-actor
+pointer reject without changing requested state. Successful requests preserve
+the deferred reward flag at `D70`; setup transfers it to `D20`.
+The registered submenu and setup callback slots for action 81 select the new
+shared implementation, with ordinary native fish/insect paths delegated.
+
+New flight uses the donor's exact position offsets, player yaw, frame `-1`, and
+speed seven. Existing flight is reused without resetting its pose. The native
+held-item, body-animation, and base-action setup still run, at native speed one.
+Head tracking uses the balloon's position plus fifty vertical units, native
+distance/angle readers, donor yaw/pitch limits, and two donor smoothing substeps.
+The first thirty native updates track the actor. Thereafter the head returns to
+neutral, but release still waits while flight is active or a mode is pending.
+Completion requires both forty-two native updates and a true continuation result.
+It then requests ordinary wait or the deferred golden-shovel celebration.
+
+The actual get-up item callback transfers the current right-hand position,
+gathered animation frame, combined pitch, yaw, and lean into the owned actor.
+Only an accepted flight request clears equipment; no actor or an unselected
+shape retains the held item. The donor title-demo exception retains the saved
+equipment. Other tools delegate to the complete existing shared recovery helper.
+The completed get-up animation requests action 81 at source priority thirty,
+reusing the already flying actor; ordinary get-up retains settlement and wait.
+
+The exchange callback uses the converted outgoing item identity and queues
+selected balloons through this same action. It does not place a room model on
+the ground. Failed queueing uses the existing warning path without closing the
+menu. Successful queueing retains the source close/sound sequence and deferred
+reward condition. No new item is awarded by this adapter.
+
+The release/queue group occupies `804B1100..804B1778`; the public queue entry is
+`804B1680`. Head tracking occupies `804AEAA0..804AEDD4`, and fall/get-up occupies
+`804ACBE0..804ACE08`. The extended exchange uses `804AD650..804AD9B4`.
+All ranges fit checked existing reservations. Continuation and fallen-shape
+state use player words `13A4` and `13A8`; the player stays `13B0` bytes, and
+neither scene allocations nor saved formats grow. The native Look call loses
+its one internal relocation. Other original callbacks, instructions, and
+relocations remain apart from the explicit get-up and completion entry jumps.
+
+## Remaining ordinary menu route
+
+The inventory's ordinary balloon menu still needs its donor `Let Go` option and
+handler. Source `mTG_tag_word_fly` at REL data `00082A50` contains the official
+sixteen-byte label; `mTG_field_balloon` selects grab, let go, and cancel outdoors.
+`mTG_get_item_tag_type` retains room placement indoors and the source restricted
+menu in other fields. Its present/quest conditions precede balloon classification.
+The source handler `mTG_fly_proc` sets the selected slot/item, performs the
+ordinary or exchange pocket transfer, returns/closes the menu, and queues flight.
+Validate actor availability before consuming the item. Reuse public queue entry
+`804B1680`; do not duplicate flight, fall, or deferred reward code. Credit the
+new displayed label in `translations/provenance.json` when installing it.
+
+Ordinary menu interaction, full gameplay flight, GPU appearance, and original
+hardware remain unverified. Focused native component results do not close these.
 
 The four golden-tool choices remain disabled. Saved format three, selected
 profile requirements, and existing incompatibility warnings remain unchanged.
 Neither served V2 patcher nor the main V3 lock is switched. Native component
-results and limits belong in the [checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-flying-balloon-actor).
+results and limits belong in the [checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-balloon-release-exchange-and-fall).

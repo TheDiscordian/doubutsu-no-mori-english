@@ -18,8 +18,8 @@ served patchers retain their existing builds.
 
 ## Active development
 
-The current explicit ABI-146 proposal is
-`build/v3-shared-balloon-actor-04/build-lock.json`. All eight balloons are
+The current explicit ABI-147 proposal is
+`build/v3-shared-balloon-release-04/build-lock.json`. All eight balloons are
 connected through the shared parent-category installer: official names/prices,
 complete pocket icons, held/inventory animation, source acquisition records,
 collection/catalogue, animated room profiles, indoor conversion, and inverse
@@ -36,13 +36,20 @@ banks, two representative drawers, movement/hiding, and memory guards. The
 focused current-build selection check passes 41 records and 26 assertions,
 including restored state/checkpoint and clean exit. Interrupted full fixtures
 are not claimed as passes; the checkpoint records corrections and reused evidence.
-Release/look/exchange and fall/get-up consumers remain unfinished; the four
-golden-tool choices stay disabled. No saved format, choice, main lock, or served
-patcher changes. See the
+Release/look, inventory exchange, and fall/get-up consumers are installed.
+The release action retains source positions, poses, head tracking, disappearance
+and timing rules, native fish/insect behaviour, and deferred rewards. Missing
+actors cannot consume a held balloon. Five focused host/cartridge checks pass.
+Native release/fall and exchange checks pass, with preserved/restored live data,
+memory guards, checkpoint restoration, and clean exits. Ordinary `Let Go` menu
+selection and gameplay/hardware verification remain; the four golden-tool choices
+stay disabled. No saved format, choice, main lock, or served patcher changes.
+See the [consumer checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-balloon-release-exchange-and-fall)
+and the
 [flight checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-flying-balloon-actor).
 
 Shared inventory exchange carries the golden-shovel reward condition through
-normal drop, empty hand, burying, and fish/insect release. Three existing
+normal drop, empty hand, burying, and fish/insect/balloon release. Three existing
 transient unions hold the deferred flag; ordinary requests clear it, rejected
 requests do not overwrite it, and actual native setup/animation precedes the
 reward. Two code groups fit unused ground/event reservations without module,
@@ -53,7 +60,7 @@ request clearing/rejection, setup, sampled release timing, guards, restored stat
 checkpoint, and clean exit. Its menu-close callback is a test stub; bury setup
 uses item zero, and release setup uses an existing actor. Ordinary world
 placement/release and hardware remain unverified. Next implement
-the balloon release/look/continuation consumers and source acquisition
+the ordinary balloon `Let Go` menu and source acquisition
 events. Golden choices remain disabled. See the
 [exchange checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-reward-inventory-exchange).
 
@@ -67,7 +74,7 @@ collection entries, first/repeated/unselected items, rejected requests, all four
 players' completion queries, original exchange requests, guards, restored state/
 checkpoint, and clean exit. These are component calls, not ordinary acquisition
 or a hardware playthrough. The exchange stage connects normal/bury/fish/insect
-endings; balloon release and source scene/NPC/tree acquisition remain required.
+endings; ordinary balloon menu selection and source scene/NPC/tree acquisition remain required.
 Golden-tool choices remain disabled. See
 the [collection checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-reward-collection-consumers).
 

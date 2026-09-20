@@ -1,5 +1,115 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared balloon release, exchange, and fall
+
+The ABI-147 proposal is `build/v3-shared-balloon-release-04/build-lock.json`.
+It connects all eight balloon shapes to the native creature action, donor
+tracking/continuation, fall/get-up handoff, and inventory exchange. Ordinary
+inventory `Let Go` selection remains unfinished. The four golden-tool choices,
+main ABI-109 lock, and both served V2 patchers remain unchanged. This is not a
+playable V3 handoff or original-hardware verification.
+
+- ROM SHA-256:
+  `0fc8b305c38e1a6b971552a519f5a811af928d3ba16c764d8aaa2e8a58343479`.
+- Report SHA-256:
+  `2d706106ab5d401384133fe164f18fe54733ad5e708070311c44f4f92d8c0666`.
+- UPS SHA-256:
+  `98bd56c5d30f16cdfbf659186671ef8e6c6259b3ff7ebe05264f852f12807bd7`.
+
+`tools/v3_balloon_release.py` extends the shared category installer, binding
+complete donor release/get-up, equipment setter, submenu setter, and exchange
+functions plus checked native APIs. Two actual action-81 callback values and
+four native instruction windows connect the consumers. Only the displaced
+Look JAL loses its internal relocation. Unrelated owners, resources, callbacks,
+save/profile data, and 128 experimental options remain intact. The actor's
+unused player-extension words hold continuation and fallen shape, so the
+player remains `13B0` bytes with no further scene or permanent allocation.
+
+The request/setup/transition/queue group occupies 1,656 bytes at `804B1100`;
+the public queue is `804B1680`. Look occupies 820 bytes at `804AEAA0`, and
+fall/get-up 552 bytes at `804ACBE0`. Exchange grows from 760 to 868 bytes at
+`804AD650`. All fit previously unused reserved suffixes. Existing actor,
+descriptor, category/held/room artwork, deferred rewards, and end guards retain
+checked bounds. Native fish/insect setup and Look remain the fallback.
+
+### Verification and build work
+
+Five focused tests pass in 8.903 seconds:
+`python3 -m unittest tests.test_v3_balloon_release -v`.
+Two sanitizer fixtures cover all shapes, exact source pose offsets, deferred
+flags, rejected/foreign requests, source head limits and angle wrapping,
+pending/hidden flight, minimum timing and continued waiting, get-up pose loss,
+missing/unselected actor retention, title-demo equipment protection, native
+creature fallbacks, and all-shape exchange queue/warning routing. Cartridge
+checks bind complete source/native functions, every installed code/hook/table
+change, one removed relocation, resource retention, unchanged saved formats,
+all/empty optional composition, 128 choices, UPS reconstruction, and tail reuse.
+Syntax checks and `git diff --check` pass.
+
+Build `01` contains release/look/fall. Build `02` stops before output because
+the new fixed queue-entry linker assertion lacks its required in-section
+semicolon. Build `03` stops before output because dependency validation also
+compares a private static helper's address. The corrected installer checks
+public shared symbols only; it retains exact code/size/source checks. Build `04`
+adds the queue and balloon exchange. No failed proposal is handed off.
+
+### Native evidence
+
+`build/smoke-v3-balloon-release-01/` on build `01` passes on its first attempt:
+114 records, 74 component assertions, and four startup/final assertions.
+The cartridge-loaded callbacks and actual relocated player hooks execute new
+release setup for first/last shapes, complete union/flag transfer, native body
+setup, source position/frame/speed, pending/hidden continuation, exact two-step
+head smoothing, source fall pose, equipment clearing, no-loss missing-actor
+recovery, source-priority get-up handoff, and native priority rejection.
+The full player and flying actor, animation banks, live save/profile data, and
+other touched state are restored. Stack/memory guards pass; the checkpoint
+restores, resumes, and exits cleanly without a CPU fault. Results SHA-256:
+`b00a41b3f8b4f787841f4559a22a754297d06cfe2c89528ca31d354198cb46d7`.
+
+Look and fall binaries are unchanged in final build `04`, with SHA-256
+`f7f2fe8eeadd044f3b2d26e468e5030a59363d67ee9175db66fbf0279ef27cf8`
+and `7ba78eecb0090738312f2278d1b8c233b7b1d2d7acd1c345cce0196b28804984`.
+Reuse that evidence; do not replay the completed prefix for the added queue.
+
+`build/smoke-v3-balloon-exchange-01/` uses final build `04` and passes on its
+first attempt: 86 records, 53 component assertions, and four startup/final
+assertions. It loads the complete actual tag owner, verifies the complete
+equipment module with its one live actor count, and executes the installed
+exchange entry for first/last shapes with and without the deferred reward.
+The queue, complete request fields, source menu-close direction, two changed
+registered callbacks, current release setup, flying-actor request, and idle or
+reward continuation all pass. It restores the player, flying actor, banks,
+live state, and checkpoint; fault/guards pass and the emulator exits cleanly.
+Results SHA-256:
+`50e32adb523e4829127e0f28eff91cce8c5018640d0c322e44804b7407d36dd5`.
+The result's legacy `actual_registered_callbacks: 4` field counts four verified
+slots; this focused variant executes only the two release callbacks. The fixture
+now distinguishes verified slots from executed callbacks without rerunning it.
+
+These are silent, isolated component checks with test-only jump bridges. The
+exchange fixture stubs menu close and supplies the completed-flight condition;
+the separate release fixture verifies the actual pending/hidden Look decision.
+No user save, physical audio, or FlashRAM write is used. Ordinary menu interaction,
+a full real-time release/fall sequence, GPU appearance, and hardware remain
+unverified. Retain the existing actor/model/physics evidence; no replay of those
+unchanged components is needed.
+
+### Next work and compatibility
+
+Install the donor outdoor `Let Go` tag row and pocket-transfer handler, retaining
+room placement indoors and present/quest priority. Reuse the public queue; check
+actor availability before removing an item. The official label is in donor
+`mTG_tag_word_fly`, REL data `00082A50`; add its locator to the single provenance
+catalogue when the label is installed. Continue source gold-tree, event/NPC
+completion, and perfect-town acquisition afterward; do not enable golden tools
+before their complete paths work.
+
+No new save migration is introduced. Format-3 imported saves still require
+matching/equal-or-larger selected profiles and must not be loaded in V2 or older
+format-1/2 V3 builds. Preserve backups. Empty selection remains exact corrected
+V2-12. No ordinary save/restart or hardware claim is added by this batch.
+
 ## Shared flying-balloon actor
 
 The ABI-146 proposal is `build/v3-shared-balloon-actor-04/build-lock.json`.
