@@ -3,7 +3,7 @@
   {"read":["8019ACD0",4],"expect":"00000001"},
   {"save_state":true},
   {"pause_game_thread":true},
-  {"test_v3_furniture_batch":true,"item_batch_section":"player_motion"},
+  {"test_v3_furniture_batch":true,"item_batch_section":"reward_motion"},
   {"load_state":true},
   {"wait":1},
   {"read":["8003CE34",4],"expect":"00000000"},

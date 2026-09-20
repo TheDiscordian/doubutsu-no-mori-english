@@ -18,13 +18,27 @@ served patchers retain their existing builds.
 
 ## Active development
 
-The current explicit ABI-138 proposal is
-`build/v3-shared-present-names-03/build-lock.json`. All eight balloons are
+The current explicit ABI-139 proposal is
+`build/v3-shared-reward-motion-03/build-lock.json`. All eight balloons are
 connected through the shared parent-category installer: official names/prices,
 complete pocket icons, held/inventory animation, source acquisition records,
 collection/catalogue, animated room profiles, indoor conversion, and inverse
 pickup. The local composer has 128 experimental choices, including 24 equipment
 parents. These are not a public or hardware-ready handoff.
+
+The shared player-animation category includes both complete golden-tool reward
+motions and source eye/mouth timelines for all installed player motions. The
+53-frame celebration motions fit the existing 3,848-byte banks. A 200-byte reader,
+1,272-byte table, and 213 bytes of deduplicated complete face timelines fit the
+existing 72-KiB module. Checked retired-resource storage limits ROM-blob growth
+to 3,072 bytes; native tables, existing resources, and saved formats remain.
+One sanitizer check and four cartridge/composition checks pass. The first silent
+native run passes 165 records and 123 assertions, including both full transfers,
+30 actual native facial frames, segment restoration, guards, restored checkpoint,
+and clean exit. Skeletal playback and ordinary reward events are not established
+by this check. Golden-tool choices remain disabled pending celebration callbacks
+and ordinary acquisition. See the
+[reward-motion checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-reward-motions-and-player-faces).
 
 Both wrapped-item name readers use the official GameCube `present` label with
 their original ten- and sixteen-byte output limits. Selected aliases share the

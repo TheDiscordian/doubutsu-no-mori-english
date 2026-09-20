@@ -7,6 +7,39 @@ u32 af_equipment_native_pointers[17], af_equipment_native_bounds[18];
 u8 af_equipment_native_types[17];
 u32 af_equipment_header[2048];
 
+#ifdef AF_V3_PLAYER_FACES
+#include "../overlays/v3/player_faces.c"
+u32 af_test_native_eye[130],af_test_native_mouth[130],af_test_player_faces[318];
+static void face_tests(void) {
+    for(int i=0;i<130;++i) {
+        af_test_native_eye[i]=0x80110000+i*4;
+        af_test_native_mouth[i]=0x80120000+i*4;
+        assert(af_v3_player_eye_sequence(i)==af_test_native_eye[i]);
+        assert(af_v3_player_mouth_sequence(i)==af_test_native_mouth[i]);
+    }
+    faces[0]=0x41465046;faces[1]=1;faces[2]=157;faces[3]=8;
+    for(int i=0;i<157;++i) {
+        faces[4+i*2]=0x804B4C00+i;faces[5+i*2]=0x804B4E00+i;
+        assert(af_v3_player_eye_sequence(i+130)==faces[4+i*2]);
+        assert(af_v3_player_mouth_sequence(i+130)==faces[5+i*2]);
+    }
+    const int invalid[]={INT_MIN,-1,287,INT_MAX};
+    for(unsigned i=0;i<sizeof(invalid)/sizeof(*invalid);++i) {
+        assert(!af_v3_player_eye_sequence(invalid[i]));
+        assert(!af_v3_player_mouth_sequence(invalid[i]));
+    }
+    const u32 bad[]={0,0x804B4BFF,0x804B4F00,UINT_MAX};
+    for(unsigned i=0;i<sizeof(bad)/sizeof(*bad);++i) {
+        faces[4]=faces[5]=bad[i];
+        assert(!af_v3_player_eye_sequence(130));assert(!af_v3_player_mouth_sequence(130));
+    }
+    for(int i=0;i<4;++i) {
+        faces[i]^=1;assert(!af_v3_player_eye_sequence(258));assert(!af_v3_player_mouth_sequence(258));
+        assert(af_v3_player_eye_sequence(129)==af_test_native_eye[129]);faces[i]^=1;
+    }
+}
+#endif
+
 #ifdef AF_V3_EQUIPMENT_KINDS
 u32 af_equipment_kind_header[241];
 static void kind_tests(void) {
@@ -153,6 +186,9 @@ int main(void) {
 #endif
 #ifdef AF_V3_EQUIPMENT_KINDS
     kind_tests();
+#endif
+#ifdef AF_V3_PLAYER_FACES
+    face_tests();
 #endif
     puts("pass: native fallback, shared static/motion readers, invalid indices and records");
 }

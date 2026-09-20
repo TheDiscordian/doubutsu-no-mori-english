@@ -5,6 +5,7 @@ All item choices and saved profiles remain unchanged.
 """
 import json
 import copy
+import re
 import struct
 import zlib
 
@@ -48,6 +49,163 @@ PLAYER_ENTRIES = (
     (0x800B1D68,0x800B1D94,'af_v3_player_animation_vrom'),
     (0x800B1DE8,0x800B1E94,'af_v3_player_part_copy'),
 )
+
+FACE_CODE, FACE_TABLE, FACE_DATA, FACE_END = 0x11540, 0x11700, 0x11C00, 0x11F00
+
+
+def reward_animation_sources(source):
+    """Discover the complete celebration motions through the actual donor setup."""
+    raw,setup=source.function(0x198334)
+    if (setup['symbol']!='Player_actor_setup_main_Demo_get_golden_item' or len(raw)!=280
+            or sha256(raw)!='5954e79412efe934cb5f528e87fa3d3434677dc4aafc08c47e4ce53763c19041'
+            or u32(raw,0x5C)!=0x38800080 or u32(raw,0x88)!=0x38000082 or u32(raw,0x8C)!=0x3B600082):
+        raise ValueError('Changed complete source reward animation setup')
+    functions,tables,values=selector_tables(source,{
+        'player_data':(0x68A44,'mPlib_Get_Pointer_Animation',48,
+            '869d78d47d9b401bab78a6b6c6ede7327e07c65aec23380d7927258b7b59ebc1',5,0x1A),
+        'player_part':(0x68A9C,'mPlib_Get_BasicPartTableIndex_fromAnimeIndex',44,
+            'b86a74a6d599ce78aab4e428b83f87f14124396a953d3d3b5b3fd11b5f7b50bf',4,0x16)})
+    indices=sorted({u32(raw,0x5C)&65535,u32(raw,0x88)&65535});assets={};records=[]
+    if any(t['count']!=PLAYER_COUNT for t in tables.values()):raise ValueError('Changed complete reward motion tables')
+    for index in indices:
+        desc=animation(source,tables['player_data']['pointers'][index*4][3],joints=26)
+        asset,compiled=compile_animations(source,[desc]);part=values['player_part'][index]
+        if not 0<len(asset)<=PLAYER_CAPACITY or part>=5:raise ValueError('Complete reward motion exceeds native bank/mask')
+        assets[index]=asset
+        records.append(dict(source_index=index,index=PLAYER_FIRST+index,bytes=len(asset),
+            pointer=0x06000000+compiled['headers'][0]['native_offset'],type=part,
+            sha256=sha256(asset),source=desc,compiled=compiled))
+    return assets,records,dict(setup=setup,functions=functions,tables=tables,source_indices=indices)
+
+
+def player_face_sources(source,records):
+    """Source pointer tables supply complete eye/mouth timelines for installed motions."""
+    tables=[];pointers=[]
+    for column,at in enumerate((0x69E7C,0x69EA8)):
+        raw,reader=source.function(at);target=reader['relocations'].get(0x12)
+        if (len(raw)!=44 or sha256(raw)!='1ce7679a0375b6e838f3ee94643ec7f29afc5c6e0172482a98db28170c1918ce'
+                or target is None or target[:3]!=(6,1,4)
+                or reader['relocations']!={0x12:target,0x1A:(4,1,4,target[3])}):
+            raise ValueError('Changed complete face sequence selector')
+        start=target[3];n=PLAYER_COUNT*4
+        matches=re.findall(r'^([^ ]+) = \.rodata:0x%08X;[^\n]* size:0x([0-9A-Fa-f]+) ' % start,source.symbols,re.M)
+        begin=source.sections[4][0]+start
+        linked={offset-start:row for (section,offset),row in source.section_relocations.items()
+                if section==4 and start<=offset<start+n}
+        if (len(matches)!=1 or int(matches[0][1],16)!=n or source.rel[begin:begin+n]!=bytes(n)
+                or any(offset%4 or row[:3]!=(1,1,5) for offset,row in linked.items())):
+            raise ValueError('Changed complete face pointer table')
+        tables.append(dict(column=column,symbol=matches[0][0],section=4,offset=start,bytes=n,
+                           sha256=sha256(bytes(n)),pointers=linked,reader=reader));pointers.append(linked)
+    data=bytearray();table=bytearray(struct.pack('>4I',0x41465046,1,PLAYER_COUNT,8)+bytes(PLAYER_COUNT*8))
+    arrays=[];rows=[];allocated={};seen=set()
+    for motion in sorted(records,key=lambda r:r['source_index']):
+        index=motion['source_index'];duration=motion['source']['duration'];pair=[]
+        if not 0<=index<PLAYER_COUNT or index in seen:raise ValueError('Duplicate or invalid installed player motion')
+        seen.add(index)
+        for column,links in enumerate(pointers):
+            link=links.get(index*4)
+            if link is None:pair.append(0);continue
+            name,at,n=source.containing(link[3],exact=True);raw=source.data[at:at+n]
+            if (n!=duration or source.pointers(at,n) or not raw or max(raw)>=(8 if column==0 else 6)):
+                raise ValueError('Face timeline does not match complete motion/frame format')
+            if raw not in allocated:
+                data.extend(bytes(-len(data)%4));allocated[raw]=RAM+FACE_DATA+len(data);data.extend(raw)
+            address=allocated[raw];pair.append(address)
+            arrays.append(dict(source_index=index,column=column,symbol=name,donor_offset=at,bytes=n,
+                               sha256=sha256(raw),ram=address))
+        struct.pack_into('>2I',table,16+index*8,*pair)
+        rows.append(dict(source_index=index,index=PLAYER_FIRST+index,duration=duration,pointers=pair))
+    if len(table)>FACE_DATA-FACE_TABLE or len(data)>FACE_END-FACE_DATA:
+        raise ValueError('Complete face timelines exceed reserved storage')
+    return bytes(table),bytes(data),dict(tables=tables,rows=rows,arrays=arrays,
+        table_bytes=len(table),table_sha256=sha256(table),data_bytes=len(data),data_sha256=sha256(data))
+
+
+def store_player_assets(base,old,blob,core,assets,records):
+    """Reuse verified retired sequence tail for complete resources, then append."""
+    import v3_sound_programs as sound
+    moved=old['held_rig_actions']['balloon']['sequence_relocation'];retired=moved['previous']
+    current=old['sound_programs']['sequence'];files=by_vrom(base)
+    raw,header,physical=sound.installed_resource(base,core,'seq',current['index'])
+    first=old['blob_offset']+old['bytes'];last=retired['blob_offset']+retired['bytes']
+    if (current!=moved['current'] or retired['blob_offset']!=old['blob_offset']+0xE000
+            or retired['bytes']!=20240 or retired['sha256']!=current['sha256']
+            or len(raw)!=current['bytes'] or sha256(raw)!=current['sha256'] or header.hex()!=current['header_after']
+            or physical!=files[BLOB].pstart+current['blob_offset']
+            or blob[current['blob_offset']:current['blob_offset']+len(raw)]!=raw
+            or not 0<=first<=last<=len(blob)):
+        raise ValueError('Player resources require the checked retired sequence tail')
+    occupied=[(r['blob_offset'],r['blob_offset']+r['bytes']) for r in
+              old['records']+old['player_motion']['records']]
+    occupied.append((current['blob_offset'],current['blob_offset']+current['bytes']))
+    for row in records:
+        asset=assets[row['source_index']];position=(first+15)&~15
+        for lo,hi in sorted(occupied):
+            if position<hi and lo<position+len(asset):position=(hi+15)&~15
+        recycled=position+len(asset)<=last
+        if recycled:
+            a,b=files[BLOB].pstart+position,files[BLOB].pstart+position+len(asset)
+            if (any(blob[position:position+len(asset)]) or any(e.pstart<b and a<(e.pend or e.pstart+e.size)
+                    for v,e in files.items() if v!=BLOB and e.pstart!=0xFFFFFFFF)):
+                raise ValueError('Retired resource destination is occupied')
+            blob[position:position+len(asset)]=asset
+        else:
+            blob.extend(bytes(-len(blob)%16));position=len(blob);blob.extend(asset)
+        occupied.append((position,position+len(asset)))
+        row.update(vrom=BLOB+position,blob_offset=position,
+                   storage='retired-sequence-tail' if recycled else 'appended')
+    if BLOB+len(blob)>END:raise ValueError('Player resources exceed protected import range')
+    return dict(first=first,end=last,retired_sequence=copy.deepcopy(retired),
+                current_sequence=copy.deepcopy(current))
+
+
+def install_reward_motion(base,prior,blob,core,original,output):
+    """Shared complete reward motions and face readers; acquisition stays disabled."""
+    old=prior['equipment_resources'];start=old['blob_offset'];module=bytearray(blob[start:start+old['bytes']])
+    if (len(module)!=0x12000 or sha256(module)!=old['sha256']
+            or old['player_motion'].get('reward_motion') or any(module[FACE_CODE:FACE_END])):
+        raise ValueError('Reward motions require unused checked face storage')
+    source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+                  (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    assets,records,evidence=reward_animation_sources(source);report=copy.deepcopy(old);motion=report['player_motion']
+    if {r['source_index'] for r in records}&{r['source_index'] for r in motion['records']}:
+        raise ValueError('Reward motion would replace an installed resource')
+    storage=store_player_assets(base,old,blob,core,assets,records)
+    for row in records:
+        at=PLAYER_TABLE+16+16*row['source_index']
+        if any(module[at:at+16]):raise ValueError('Reward motion overwrites a live table row')
+        struct.pack_into('>4I',module,at,row['vrom'],row['bytes'],row['pointer'],row['type'])
+    motion['records']=sorted(motion['records']+records,key=lambda r:r['source_index'])
+    table,data,faces=player_face_sources(source,motion['records'])
+    code,compiled=compile_part('player_faces',output/'player_faces')
+    if len(code)>FACE_TABLE-FACE_CODE:raise ValueError('Player face readers overlap their table')
+    module[FACE_CODE:FACE_CODE+len(code)]=code
+    module[FACE_TABLE:FACE_TABLE+len(table)]=table;module[FACE_DATA:FACE_DATA+len(data)]=data
+    native=by_vrom(original)[CODE_VROM].extract(original);hooks=[];retained=[]
+    # Resident face addresses resolve through segment zero. Retain the native
+    # resolver and original segment-six face tables unchanged.
+    for entry,n in ((0x8010C0E8,130*4*2),(0x8009ADA8,56)):
+        at=entry-CODE_RAM;before=bytes(core[at:at+n])
+        if before!=native[at:at+n]:raise ValueError('Changed native face tables or segment resolver')
+        retained.append(dict(entry=entry,bytes=n,sha256=sha256(before)))
+    for entry,name,digest in ((0x800B22A4,'af_v3_player_eye_sequence',
+            '70d9aca381aa556d8da1ad22b3081d44831c29c62bc396b9a92ccd48416deb1d'),
+            (0x800B22D0,'af_v3_player_mouth_sequence',
+            'f33e02766a055de072972121e249782a91680e2ed9b4e56af3e6a6356a831ce1')):
+        at=entry-CODE_RAM;before=bytes(core[at:at+44])
+        if before!=native[at:at+44] or sha256(before)!=digest:raise ValueError('Changed native face getter')
+        target=compiled['symbols'][name];core[at:at+8]=struct.pack('>2I',jump(target),0)
+        hooks.append(dict(entry=entry,target=target,before=before[:8].hex(),after=core[at:at+8].hex(),
+                          native_bytes=44,native_sha256=digest))
+    faces.update(code=compiled,code_offset=FACE_CODE,table_offset=FACE_TABLE,data_offset=FACE_DATA,
+                 hooks=hooks,retained_native=retained,original_tables_retained=True)
+    motion['reward_motion']=dict(source=evidence,records=records,storage=storage,
+        animation_bytes=sum(len(x) for x in assets.values()),celebration_action_installed=False)
+    motion['faces']=faces
+    blob[start:start+len(module)]=module
+    report.update(sha256=sha256(module),crc32=zlib.crc32(module),additional_resident_bytes=0)
+    return report,{}
 
 
 def player_resources(source, original):

@@ -85,6 +85,7 @@ SOURCES+=('overlays/v3/held_presents.c','overlays/v3/held_presents.S',
           'overlays/v3/held_presents.ld','overlays/v3/item_categories.c',
           'overlays/v3/item_categories.ld','overlays/v3/held_present_names.c',
           'overlays/v3/held_present_names.S','overlays/v3/held_present_names.ld')
+SOURCES+=('tools/v3_equipment_runtime.py','overlays/v3/player_faces.c','overlays/v3/player_faces.ld')
 
 SELECTION_OFFSET=0x5500
 PARENT_CODE_OFFSET,PARENT_TABLE_OFFSET=0x3000,0x57F0
@@ -122,7 +123,7 @@ def equipment_extension(base,prior,blob,core,previous_size,new_size):
     if any(e.pstart<physical_last and physical_first<(e.pend or e.pstart+e.size)
            for v,e in files.items() if v!=BLOB and e.pstart!=0xFFFFFFFF):
         raise ValueError('Equipment extension overlaps another live resource')
-    for record in old['records']:
+    for record in old['records']+old.get('player_motion',{}).get('records',[]):
         if record['blob_offset']<last and first<record['blob_offset']+record['bytes']:
             raise ValueError('Equipment extension overlaps equipment artwork')
     return dict(first=first,end=last,bytes=last-first,retired_sequence=copy.deepcopy(retired),
@@ -1648,6 +1649,9 @@ def expanded_tables(source,owner,reloc,*,categories=CATEGORIES,native_count=NATI
 
 def install(base,prior,blob,core,original,output):
     old=prior.get('equipment_resources',{})
+    if old.get('wrapped_presents',{}).get('name_readers') and not old['player_motion'].get('reward_motion'):
+        from v3_equipment_runtime import install_reward_motion
+        return install_reward_motion(base,prior,blob,core,original,output)
     if old.get('wrapped_presents') and not old['wrapped_presents'].get('name_readers'):
         return refresh_present_names(base,prior,blob,core,original,output)
     if old.get('optional_selection',{}).get('pending') and not old.get('wrapped_presents'):

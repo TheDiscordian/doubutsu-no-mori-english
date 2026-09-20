@@ -18,6 +18,122 @@ import v3_equipment_runtime as runtime
 import tests.test_v3_equipment_runtime as shared_tests
 
 OUTPUT=ROOT/os.environ.get('V3_PLAYER_MOTION_BUILD','build/v3-equipment-kinds-runtime-01')
+REWARD=ROOT/os.environ.get('V3_REWARD_MOTION_BUILD','build/v3-shared-reward-motion-03')
+
+
+class FaceHostTests(unittest.TestCase):
+    sanitized=shared_tests.HostTests.sanitized
+    def test_shared_face_sequence_bounds_and_native_fallback(self):
+        self.sanitized('v3_equipment_resources_test.c',defines=('-DAF_V3_PLAYER_FACES=1',))
+
+
+@unittest.skipUnless((REWARD/'build-lock.json').is_file(),'Current reward-motion proposal required')
+class RewardMotionTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.rom,cls.report=inputs(REWARD/'build-lock.json');cls.base,cls.prior=inputs(REWARD/'base-lock.json')
+        cls.files,cls.before=by_vrom(cls.rom),by_vrom(cls.base)
+        cls.e=cls.report['equipment_resources'];cls.old=cls.prior['equipment_resources']
+        cls.motion=cls.e['player_motion'];cls.reward=cls.motion['reward_motion'];cls.faces=cls.motion['faces']
+        cls.blob=cls.files[BLOB].extract(cls.rom);cls.oldblob=cls.before[BLOB].extract(cls.base)
+        at=cls.e['blob_offset'];cls.module=cls.blob[at:at+cls.e['bytes']]
+        cls.oldmodule=cls.oldblob[at:at+cls.old['bytes']]
+        cls.source=runtime.Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+            (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+
+    def test_complete_source_motions_and_face_timelines(self):
+        from unittest.mock import patch
+        assets,rows,evidence=runtime.reward_animation_sources(self.source)
+        self.assertEqual(json.loads(json.dumps(evidence)),self.reward['source'])
+        self.assertEqual([r['source_index'] for r in rows],[128,130])
+        for expected,row in zip(rows,self.reward['records']):
+            self.assertEqual(expected,{k:v for k,v in row.items() if k not in ('vrom','blob_offset','storage')})
+            self.assertEqual(self.blob[row['blob_offset']:row['blob_offset']+row['bytes']],assets[row['source_index']])
+            self.assertEqual(row['source']['duration'],53);self.assertLessEqual(row['bytes'],runtime.PLAYER_CAPACITY)
+            self.assertEqual(struct.unpack_from('>4I',self.module,runtime.PLAYER_TABLE+16+16*row['source_index']),
+                             (row['vrom'],row['bytes'],row['pointer'],row['type']))
+        table,data,faces=runtime.player_face_sources(self.source,self.motion['records'])
+        for key,value in json.loads(json.dumps(faces)).items():self.assertEqual(value,self.faces[key])
+        self.assertEqual(self.module[runtime.FACE_TABLE:runtime.FACE_TABLE+len(table)],table)
+        self.assertEqual(self.module[runtime.FACE_DATA:runtime.FACE_DATA+len(data)],data)
+        self.assertEqual((len(table),len(data)),(1272,213))
+        for row in faces['arrays']:
+            at=row['ram']-runtime.RAM
+            raw=self.source.data[row['donor_offset']:row['donor_offset']+row['bytes']]
+            self.assertEqual(self.module[at:at+len(raw)],raw)
+        original=self.source.function
+        for at in (0x198334,0x69E7C,0x69EA8):
+            def changed(entry):
+                data,receipt=original(entry)
+                return (bytes([data[0]^1])+data[1:],receipt) if entry==at else (data,receipt)
+            with patch.object(self.source,'function',side_effect=changed),self.assertRaises(ValueError):
+                if at==0x198334:runtime.reward_animation_sources(self.source)
+                else:runtime.player_face_sources(self.source,self.motion['records'])
+
+    def test_checked_reclaimed_storage_and_complete_existing_resources(self):
+        import copy
+        assets,rows,_=runtime.reward_animation_sources(self.source)
+        core=self.before[CODE_VROM].extract(self.base)
+        blob,_=reuse_resource_tail(self.base,self.prior,self.oldblob)
+        actual=bytearray(blob)
+        storage=runtime.store_player_assets(self.base,self.old,actual,core,assets,rows)
+        self.assertEqual(storage,self.reward['storage']);self.assertEqual(rows,self.reward['records'])
+        self.assertEqual([r['storage'] for r in rows],['retired-sequence-tail','appended'])
+        self.assertEqual(len(self.blob)-len(self.oldblob),3072)
+        for row in self.old['records']+self.old['player_motion']['records']:
+            at=row['blob_offset'];self.assertEqual(self.blob[at:at+row['bytes']],self.oldblob[at:at+row['bytes']])
+        for mutation in ('occupied','sequence'):
+            altered=bytearray(blob);old=copy.deepcopy(self.old)
+            if mutation=='occupied':altered[storage['first']]=1
+            if mutation=='sequence':altered[old['sound_programs']['sequence']['blob_offset']]^=1
+            with self.assertRaises(ValueError):
+                runtime.store_player_assets(self.base,old,altered,core,assets,copy.deepcopy(rows))
+        occupied=copy.deepcopy(self.old);occupied['player_motion']['records'].append(
+            dict(blob_offset=storage['first'],bytes=1024))
+        safe=bytearray(blob);moved=copy.deepcopy(rows)
+        runtime.store_player_assets(self.base,occupied,safe,core,assets,moved)
+        self.assertEqual(safe[storage['first']:storage['first']+1024],blob[storage['first']:storage['first']+1024])
+        for row in moved:
+            self.assertFalse(row['blob_offset']<storage['first']+1024 and storage['first']<row['blob_offset']+row['bytes'])
+        retained=bytearray(self.module)
+        retained[runtime.FACE_CODE:runtime.FACE_END]=self.oldmodule[runtime.FACE_CODE:runtime.FACE_END]
+        for row in rows:
+            at=runtime.PLAYER_TABLE+16+16*row['source_index'];retained[at:at+16]=self.oldmodule[at:at+16]
+        self.assertEqual(retained,self.oldmodule)
+        self.assertEqual(self.e['bytes'],self.old['bytes']);self.assertEqual(self.e['additional_resident_bytes'],0)
+
+    def test_only_face_hooks_change_and_original_tables_are_retained(self):
+        core=bytearray(self.files[CODE_VROM].extract(self.rom));old=self.before[CODE_VROM].extract(self.base)
+        for row in self.faces['hooks']:
+            at=row['entry']-CODE_RAM
+            self.assertEqual(core[at:at+8].hex(),row['after']);self.assertEqual(old[at:at+8].hex(),row['before'])
+            self.assertEqual(sha256(old[at:at+row['native_bytes']]),row['native_sha256'])
+            core[at:at+8]=old[at:at+8]
+        self.assertEqual(core,old)
+        for row in self.faces['retained_native']:
+            at=row['entry']-CODE_RAM;self.assertEqual(sha256(core[at:at+row['bytes']]),row['sha256'])
+        self.assertEqual(self.module[runtime.FACE_CODE:runtime.FACE_CODE+self.faces['code']['bytes']],
+                         (REWARD/'player_faces/code.bin').read_bytes())
+        for v in self.files.keys()-{BLOB,MODULE,CODE_VROM,0x19D40}:
+            self.assertEqual(self.files[v].extract(self.rom),self.before[v].extract(self.base),hex(v))
+        for key in ('save_runtime','furniture','catalogue'):
+            self.assertEqual(self.report[key],self.prior[key])
+        self.assertEqual(self.e['optional_selection'],self.old['optional_selection'])
+        self.assertFalse(self.reward['celebration_action_installed'])
+
+    def test_exact_patch_and_optional_profiles(self):
+        import v3_optional_composition as composer
+        original=(ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes()
+        self.assertEqual(apply_ups(original,(REWARD/'asset-loader.ups').read_bytes()),self.rom)
+        self.assertEqual(struct.unpack_from('>2I',self.rom,0x10),n64_checksum(self.rom))
+        pin=composer.BASE,composer.BASE_SHA,composer.REPORT_SHA,composer.ABI
+        try:
+            composer.use_build_lock(REWARD/'build-lock.json');choices=composer.catalogue(self.rom,self.report)
+            self.assertEqual(len(choices),128)
+            self.assertEqual(composer.compose(self.rom,self.report,choices,composer.resolve(choices,list(choices)))[0],self.rom)
+            self.assertEqual(sha256(composer.compose(self.rom,self.report,choices,composer.resolve(choices,[]))[0]),
+                             self.report['translation_baseline']['sha256'])
+        finally:composer.BASE,composer.BASE_SHA,composer.REPORT_SHA,composer.ABI=pin
 
 
 class HostTests(unittest.TestCase):

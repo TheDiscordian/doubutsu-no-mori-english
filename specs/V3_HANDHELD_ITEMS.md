@@ -1361,11 +1361,55 @@ The native acquisition gap includes engine content, not only item substitutions:
   and `golden_items_collected` celebration state are separate from item catalogue
   ownership. Preserve that distinction when extending persistent reward state.
 
-Next implement the shared reward celebration and its source animation/text/
+The complete reward motions and shared facial sequences are installed as
+described below. Next implement the shared celebration callbacks and their text/
 fanfare dependencies, then connect the event actors and acquisition conditions.
 Use the shared category installer and complete source records. Keep all four
 choices disabled until their full paths are connected; do not substitute a
 shop purchase, arbitrary letter, or unrelated NPC for a missing donor event.
+
+#### Shared reward motions and player faces
+
+The shared `--refresh-runtime --player-actions` stage discovers animation indices
+128 and 130 from the complete donor golden-reward setup at `.text:198334`,
+280 bytes, SHA-256
+`5954e79412efe934cb5f528e87fa3d3434677dc4aafc08c47e4ce53763c19041`.
+These are YATTA1 and YATTA3, installed at native extended indices 258 and 260.
+YATTA2 is not used by that setup. Both complete 26-joint, 53-frame conversions
+fit the existing 3,848-byte animation banks: 3,136 and 3,072 bytes respectively.
+Do not shorten the motions, reduce joint data, or substitute native celebrations.
+
+The generic face adapter follows the actual donor eye/mouth selector relocations
+and complete 157-row pointer tables. For every installed imported player motion,
+retain the full per-frame arrays, exact duration, valid eye/mouth indices, null
+sequences, and source attribution in the conversion receipt. Identical complete
+arrays share storage without losing their separate source records. This also
+connects the installed fall/get-up motions' expressions.
+
+`player_faces.c` preserves original indices 0–129 through their native tables.
+Extended indices 130–286 use a bounded `AFPF` table; absent/invalid indices or
+pointers return null. The 200-byte reader at `804B4540`, 1,272-byte table at
+`804B4700`, and 213-byte timeline data at `804B4C00` fit before `804B4F00` inside
+the existing 72-KiB module. Native getters `800B22A4` and `800B22D0` jump to these
+readers. Their original tables and segment resolver stay unchanged. Resident
+pointers use native segment zero; the actual player face consumer still checks
+frame bounds, reads the complete sequence, and restores segment six.
+
+The shared player-resource allocator uses verified, zero, unreferenced space
+after the module in a relocated audio sequence's retired range, then appends
+when necessary. It verifies the current live sequence, complete header, physical
+ownership, and all installed equipment/player resource extents. The first motion
+uses 3,136 bytes of the 3,856-byte retired tail; the second appends 3,072 bytes.
+The protected English-choice region is not consumed. Future equipment growth
+also treats player resources as occupied. No resident allocation, saved format,
+profile bit, or selectable choice changes.
+
+Focused checks cover complete source conversion, malformed-source rejection,
+bounded C readers under sanitizers, storage collisions, unchanged native data,
+exact UPS reconstruction, all 128 choices, and exact translation-only output.
+The reusable player-motion scenario checks actual cartridge loading and native
+facial consumption, not event acquisition or GPU/skeletal appearance. See the
+[checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-reward-motions-and-player-faces).
 
 Wrapped representations `251F..2522` correspond in order to parents `2239..223C`.
 They are transport/field representations, not additional imports or pocket IDs.

@@ -1,5 +1,82 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared reward motions and player faces
+
+The ABI-139 proposal is `build/v3-shared-reward-motion-03/build-lock.json`.
+It installs both complete donor golden-tool celebration motions and generic
+per-frame eye/mouth sequences for all installed imported player motions. The
+128 experimental choices, saved format, existing resource addresses, and main
+ABI-109 lock remain unchanged. The four golden tools remain pending/disabled;
+neither served V2 patcher changes.
+
+- ROM SHA-256:
+  `d31cde847e46f7dd69c457cd9cba10e60c7d001dfd7a488d9e3c515027472025`.
+- Report SHA-256:
+  `00594008f0d7ad40f645ecfe30785283013e93744de559899a4adbb966695103`.
+- UPS SHA-256:
+  `c14e34f9ca3fd961999e19810a03a912c80f19251c3ffa87a4b7a82088d1b2d7`.
+
+The donor setup selects YATTA1 or YATTA3, not YATTA2. Complete resources are
+3,136/3,072 bytes with 26 joints and 53 frames, fitting the unchanged 3,848-byte
+native banks. The source selector/pointer tables supply all face arrays. Complete
+identical arrays deduplicate to 213 bytes, preserving the fall/get-up and reward
+timelines. The generic 200-byte reader and 1,272-byte table fit unused space in
+the existing 72-KiB module. The native segment resolver accepts resident segment-
+zero pointers, verified through the actual player face consumer.
+
+The checked retired audio-sequence tail holds the first motion; the second
+appends. The import blob grows 3,072 bytes rather than 6,208, retaining the live
+audio sequence and protected English-choice region. Existing player/equipment
+resource intervals prevent future reclamation from overwriting motion data.
+
+One sanitizer check and four cartridge/composition checks pass:
+
+```sh
+python3 -m unittest \
+  tests.test_v3_player_motion_runtime.FaceHostTests \
+  tests.test_v3_player_motion_runtime.RewardMotionTests -v
+```
+
+They cover both complete converted motions, exact donor timelines, native bounds,
+null/malformed inputs, changed-source rejection, retained original resources and
+hooks, reclaimed-storage collisions, no save/profile change, exact UPS, all 128
+choices, and exact empty-selection V2-12. The first storage fixture incorrectly
+expected a live interval to reject the whole operation; the allocator safely
+appended elsewhere. The corrected check verifies retention and non-overlap, and
+passes. Only that affected check is rerun; the other three passed originally.
+The three build outputs have the same ROM hash; later builds bind refined source
+guards/comments without changing the installed machine code.
+
+The first silent native run `build/smoke-v3-reward-motion-01/` passes **165
+records and 123 assertions**, SHA-256
+`70a157f22bae3f9ddf677c1b42b5558960a7779b81a61c1ccdaf44aa33f298c5`.
+It uses the actual game-loaded player owner and cartridge readers, verifies both
+complete motion transfers and untouched bank tails, and executes 30 native face
+frames covering distinct timelines, expression pairs, and frame boundaries.
+Only eye/mouth fields change; all segment bases, module contents, allocation
+guards, and saved-profile memory remain intact. Calls restore the stack; the
+fixture restores its checkpoint, resumes with zero faults, and exits cleanly.
+No code is uploaded, user save used, or audible output produced. No retry is
+needed; native fixture work is within the 30-minute batch limit.
+
+```sh
+python3 tools/emulator_smoke.py \
+  --rom build/v3-shared-reward-motion-03/animal-forest-v3-asset-loader.z64 \
+  --output build/smoke-v3-reward-motion-01 \
+  --scenario tests/v3-player-motion-scenario.json \
+  --xvfb /home/discordian/Games/OpenRSC/headless/vendor/usr/bin/Xvfb \
+  --seconds 180 --expansion-pak --no-initial-screenshot
+```
+
+The actual invocation uses an identical ignored copy of this scenario inside
+the proposal directory. Skeletal playback, ordinary reward acquisition,
+rendered appearance, and hardware are not established by this component run.
+Unchanged browser JavaScript and the ABI-137 worker evidence are retained, not
+reported as a fresh ABI-139 browser run. Continue with shared celebration
+setup/main/settlement, official message/fanfare support, and persistent reward
+flags, followed by the required scene/NPC/tree events. Imported saves require
+matching/equal-or-larger profiles and must not load in V2.
+
 ## Shared wrapped-gift names
 
 The ABI-138 proposal is `build/v3-shared-present-names-03/build-lock.json`.

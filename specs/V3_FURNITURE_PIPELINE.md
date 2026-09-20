@@ -22,6 +22,14 @@ hand owner; its tag owner remains an in-place update.
 
 ### Shared runtime categories
 
+The player-action refresh installs complete reward motions and generic eye/mouth
+timelines through the existing player-resource category. It discovers source
+indices from the donor setup, preserves complete animation/frame arrays, retains
+the native banks and module size, and uses checked unreferenced retired storage
+before appending. Native indices and tables remain intact; resource installation
+does not enable reward actions or item choices. See
+[reward motions](V3_HANDHELD_ITEMS.md#shared-reward-motions-and-player-faces).
+
 For installed handheld categories, the shared `--refresh-runtime --player-actions`
 stages also connect source behaviour. The golden-net capture stage preserves the
 native candidate/forced-capture algorithms and supplies the donor's normal or

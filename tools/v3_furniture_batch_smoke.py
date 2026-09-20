@@ -1561,6 +1561,7 @@ def tool_controls(debug,rom_path,record,*,transitions=False,capture=False,rod=Fa
 
 
 def exercise(debug, rom_path, record, *, section='automatic_furniture'):
+    if section=='reward_motion':return reward_motion(debug,rom_path,record)
     if section=='held_names':return held_names(debug,rom_path,record)
     if section=='shovel_effects':return tool_controls(debug,rom_path,record,shovel=True)
     if section=='rod_effects':return tool_controls(debug,rom_path,record,rod=True)
@@ -2622,6 +2623,111 @@ def original_equipment_kinds(original):
         result.append(kind)
     if sorted(result)!=list(range(36)):raise ValueError('Original equipment switch is incomplete')
     return result
+
+
+def reward_motion(debug,rom_path,record):
+    """Complete new motion DMA and native per-frame facial animation; no event claim."""
+    from aflib import CODE_RAM,CODE_VROM
+    import v3_equipment_runtime as equipment
+    path=Path(rom_path);image=path.read_bytes();report=json.loads((path.parent/'build.json').read_bytes())
+    if sha256(image)!=report['output_sha256']:raise ValueError('Changed reward-motion cartridge')
+    resources=report['equipment_resources'];motion=resources['player_motion'];faces=motion['faces']
+    files=by_vrom(image);blob=files[runtime.BLOB].extract(image);core=files[CODE_VROM].extract(image)
+    boot=boot_proofs(image);assertions=0
+    def check(label,at,want):
+        nonlocal assertions
+        actual=debug.read_memory(at,len(want));passed=actual==want
+        record(dict(reward_motion_check=label,address=f'{at:08X}',bytes=len(want),
+            assertion='passed' if passed else 'failed',observed_sha256=sha256(actual),expected_sha256=sha256(want)))
+        if not passed:raise ValueError('Reward motion mismatch: '+label)
+        assertions+=1
+    def call(at,args=(),want=None,proof=None):
+        nonlocal assertions
+        result=debug.call(f'{at:08X}',list(args),return_address=MODULE_RAM+0x6480,verified_code=proof or boot.get(at))
+        if want is not None:
+            result['assertion']='passed' if result['return_value']==want else 'failed';assertions+=1
+        record(result)
+        if want is not None and result['return_value']!=want:raise ValueError(f'Reward motion call {at:08X} mismatch')
+        return result['return_value']
+    def core_call(at,n,args=(),want=None):return call(at,args,want,(at,core[at-CODE_RAM:at-CODE_RAM+n]))
+    at=resources['blob_offset'];check('complete installed module',equipment.RAM,blob[at:at+resources['bytes']])
+    saved=debug.read_memory(0x8046C000,864);segments=debug.read_memory(0x801458A0,64)
+    check('native segment zero remains absolute',0x801458A0,bytes(4))
+    constructor=struct.unpack('>I',debug.read_memory(0x80143900,4))[0]
+    owner=constructor-(0x808DD748-equipment.PLAYER_RAM)
+    data=files[equipment.PLAYER_VROM].extract(image);rel=files[equipment.PLAYER_RELOC].extract(image)
+    if owner&15 or not MODULE_RAM+0x8000<=owner<=0x80400000-len(data):
+        raise ValueError('Reward motions need the actual game-loaded player owner')
+    sections=struct.unpack_from('>5I',rel)
+    expected=relocate_verified_data(SimpleNamespace(ram=equipment.PLAYER_RAM,resident_bytes=len(data),sections=sections),data,rel,owner)
+    check('complete actual loaded player code',owner,expected[:sections[0]])
+    def owner_call(first,last,args=(),want=None):
+        address=owner+first-equipment.PLAYER_RAM
+        return call(address,args,want,(address,expected[first-equipment.PLAYER_RAM:last-equipment.PLAYER_RAM]))
+    size=0x2600;allocation=call(0x8009BFC0,[size]);actor=allocation+16;target=allocation+0x1600
+    if allocation&15 or not MODULE_RAM+0x8000<=allocation<=0x80400000-size:
+        raise ValueError('Reward-motion fixture allocation outside native heap')
+    edge=b'V3RM'*4;guards=(allocation,actor+0x1400,target-16,target+equipment.PLAYER_CAPACITY,allocation+size-16)
+    for address in guards:debug.write_memory(address,edge)
+    frames_checked=0
+    try:
+        for row in motion['reward_motion']['records']:
+            index=row['index'];fill=b'\xA5'*equipment.PLAYER_CAPACITY;debug.write_memory(target,fill)
+            owner_call(0x808B468C,0x808B46C4,[index],row['pointer'])
+            owner_call(0x808B5B38,0x808B5B60,[index],row['type'])
+            for entry,want in ((0x800B11B0,row['bytes']),(0x800B1264,0),(0x800B1D68,row['vrom'])):
+                call(entry,[index],want)
+            call(0x800B1D94,[target,index])
+            asset=blob[row['blob_offset']:row['blob_offset']+row['bytes']]
+            check('complete motion DMA and untouched bank tail',target,asset+fill[len(asset):])
+            call(0x800B12A0,[index,target],target)
+        face_rows={r['source_index']:r for r in faces['rows']}
+        # Distinct actual facial timelines, including already installed fall/getup.
+        selected={}
+        for row in faces['rows']:
+            if any(row['pointers']):selected.setdefault(tuple(row['pointers']),row)
+        for row in selected.values():
+            arrays=[]
+            for column,pointer in enumerate(row['pointers']):
+                entry=0x800B22A4+column*44;core_call(entry,44,[row['index']],pointer)
+                if pointer:
+                    offset=at+pointer-equipment.RAM;raw=blob[offset:offset+row['duration']]
+                    check('complete resident facial sequence',pointer,raw)
+                    core_call(0x8009ADA8,56,[pointer],pointer);arrays.append(raw)
+                else:arrays.append(None)
+            frames={0,1,row['duration'],row['duration']+1}
+            seen=set()
+            for frame in range(row['duration']):
+                pair=tuple(raw[frame] if raw else None for raw in arrays)
+                if pair not in seen:seen.add(pair);frames.add(frame+1)
+            for frame in sorted(frames):
+                value=bytearray(0x1400)
+                struct.pack_into('>f',value,0x17C,float(row['duration']))
+                struct.pack_into('>f',value,0x184,float(frame))
+                struct.pack_into('>2I',value,0xCE8,7,5)
+                struct.pack_into('>I',value,0xDA4,target);struct.pack_into('>I',value,0xDAC,row['index'])
+                debug.write_memory(actor,value)
+                owner_call(0x808B3828,0x808B3960,[actor])
+                wanted=bytearray(value)
+                if 1<=frame<=row['duration']:
+                    for column,raw in enumerate(arrays):
+                        if raw:struct.pack_into('>I',wanted,0xCE8+4*column,raw[frame-1])
+                check('native facial frame writes only eye/mouth fields',actor,wanted);frames_checked+=1
+                check('native consumer restores all segment bases',0x801458A0,segments)
+        for index in (0,129,130,258,260,286,287,0xFFFFFFFF):
+            for column,entry in enumerate((0x800B22A4,0x800B22D0)):
+                if index<130:
+                    table=0x8010C0E8+column*520;want=struct.unpack_from('>I',core,table-CODE_RAM+4*index)[0]
+                else:want=face_rows.get(index-130,dict(pointers=[0,0]))['pointers'][column]
+                core_call(entry,44,[index],want)
+        for address in guards:check('fixture allocation guard',address,edge)
+        check('unchanged complete shared module',equipment.RAM,blob[at:at+resources['bytes']])
+        check('saved profile unchanged',0x8046C000,saved)
+        check('no CPU fault',0x8003CE34,bytes(4));check('translation guard',0x8019C8D0,bytes.fromhex('AF32C0DE')*4)
+    finally:call(0x8009C040,[allocation])
+    return dict(native_reward_motion_dma=True,native_facial_frames=frames_checked,assertions=assertions,
+                skeletal_playback_tested=False,ordinary_reward_event_tested=False,hardware_tested=False,
+                flash_written=False,requires_checkpoint_restore=True)
 
 
 def player_motion(debug,rom_path,record):
