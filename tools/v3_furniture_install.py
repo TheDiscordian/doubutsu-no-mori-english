@@ -648,6 +648,7 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             report['shared_runtime_refresh']['artwork_changed']=True
         if held_selection:
             report['shared_runtime_refresh']['adapters'].append('held_selection')
+        if report['save_runtime']['profile_hex']!=prior['save_runtime']['profile_hex']:
             report['shared_runtime_refresh']['saved_profile_changed']=True
         report['sources'].update({p:sha256((ROOT/p).read_bytes()) for p in equipment.SOURCES})
         if equipment_report.get('parent_readers'):

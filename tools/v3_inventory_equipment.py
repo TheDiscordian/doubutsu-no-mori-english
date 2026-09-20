@@ -68,8 +68,9 @@ def records(source,equipment,*,animated=False):
         if not equipment.get('held_rig_actions',{}).get('loop_sound_installed'):
             raise ValueError('Animated inventory requires the complete installed rig actions')
         identities={r['item_id']:r for r in discover(source)['rows']}
+        installed={r['item_id'] for r in candidates}
         for kind in kind_rows.values():
-            if kind['item_main']==22:
+            if kind['item_main']==22 and kind['item_id'] not in installed:
                 original=identities[kind['item_id']]
                 candidates.append(dict(id=original['id'],item_id=kind['item_id'],native_kind=kind['native_kind']))
         raw,function=source.function(0x2723F4)

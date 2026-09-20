@@ -2,15 +2,23 @@
 
 ## Active: V3 optional GameCube imports
 
-Next implementation: connect the complete pinwheel category to shared parent
-readers, existing acquisition, catalogue, and individual selection records.
-Use the explicit ABI-120 lock at
-`build/v3-inventory-rigs-02/build-lock.json`. The shared action adapter supplies
-setup, movement/wind response, native skeleton animation, and joint drawing for
-all eight pinwheels. It reserves 44 transient state bytes in a 56-byte player
-allocation extension; the shared resident module is 56 KiB. Loop sound is
-installed, with its speed gain in four reserved bytes at `804B0FE0`. Parent
-selection remains disabled, so this is not yet playable pinwheel support.
+Next work uses the explicit ABI-121 lock at
+`build/v3-held-category-02/build-lock.json`. All eight pinwheels now have shared
+parent readers, pocket artwork, collection/catalogue, existing event acquisition,
+and individual experimental selections. The full proposal has 120 choices;
+existing fans and fixed identities are retained. No per-item installers or
+repeated first-install stages are needed. The native catalogue, corrected
+purchase fixture, and real browser worker pass; ordinary pinwheel gameplay and
+persistence remain open. See the
+[category checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-parent-category-expansion).
+
+Classify the independent seasonal-copy continuation/stack mismatch using its
+recorded instruction window and actual-PC/SP diagnostic before promoting a
+playable handoff. Work against the current proposal, not an old candidate.
+Do not replay exhausted navigation or setup attempts without a concrete
+correction. Continue remaining shared equipment categories and acquisition
+alongside that investigation; balloon texture/joint capacity and net/rod matrix
+dependencies remain implementation work, not disabled-content completion.
 
 Ten focused sound checks pass. The first silent native sound check passes
 165 records/50 assertions, including actual queued volume, retained pause/fade/
@@ -29,13 +37,12 @@ Reuse the native drawer and existing banks; do not reconvert assets or retest
 these unchanged paths. See the
 [inventory checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-animated-inventory-previews).
 
-Generalise shared parent discovery from the implemented category dependencies:
-fan category 23 and complete pinwheel category 22. Update the existing selector,
-name/price, pocket-icon, collection, and catalogue records together; do not
-create one installer per item or replay the old first-install-only stages.
-Preserve all selected fans and profiles while adding the new category's
-source-derived parent identities. Reuse prepared catalogue assets and existing
-event stock/menu code. Keep choices disabled until those dependencies agree.
+Shared parent discovery covers implemented categories 23 and 22. Its source
+inventory must agree with every installed kind; missing sound, preview, resource,
+or identity dependencies reject expansion. Six focused checks pass, including
+exact no-import/all-import composition, individual pinwheel/fan selection,
+retained profile bits, compatible profile expansion, and missing-bit rejection.
+The browser export stays unserved and does not authorise updating either patcher.
 
 Four focused checks pass. The silent native category probe passes both smallest
 and largest rigs, actual initialization, wind-driven frame advance, both joint
@@ -46,12 +53,13 @@ the native fixture's setup retry allowance is spent and its final check passes.
 See the
 [rig-action checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-animated-held-actions).
 
-The existing 112 choices, format-2 profile, 5,248-byte outdoor banks, 1,728-byte
-scene-arena increase, and complete artwork are unchanged. Inventory's existing
-15,584-byte model bank remains sufficient. Ordinary pinwheel gameplay, GPU
-appearance, acquisition, persistence, and hardware are not verified. Keep balloon
-texture/net-and-rod matrix dependencies and the independent seasonal-copy issue
-explicit. The main lock and both served patchers remain unchanged.
+The format-2 layout, 5,248-byte outdoor banks, 1,728-byte scene-arena increase,
+56-KiB equipment module, and 15,584-byte inventory bank remain sufficient.
+Existing profiles load only into matching or larger profiles; builds missing
+the new pinwheel bits reject saves requiring them. Imported saves must not be
+loaded in V2. Ordinary pinwheel gameplay, GPU appearance, acquisition,
+persistence, and hardware are not verified. The main lock and both served
+patchers remain unchanged.
 
 The ABI-116 festival fixture has no seeded fan or ownership. Town entry and the
 actual vendor/visitor scene load successfully. The ordinary purchase attempt

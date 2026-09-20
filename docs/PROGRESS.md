@@ -18,35 +18,36 @@ served patchers retain their existing builds.
 
 ## Active development
 
-The explicit ABI-120 proposal at `build/v3-inventory-rigs-02/` connects all
-eight pinwheels to shared inventory previews. It reuses the actual native
-skeleton drawer, item keyframe, seven-vector work areas, and 15,584-byte bank.
-Source-derived records supply complete models/animations and the original
-holding poses; a category-aware hook supplies the source-correct spin speed.
-Original tool timing remains intact, without additional allocation.
+The explicit ABI-121 proposal at `build/v3-held-category-02/` connects all
+eight pinwheels through shared parent discovery, names/prices, pocket artwork,
+collection, catalogue, and individual offline/browser selections. It retains
+all eight fans and their fixed identities. There are 120 experimental choices:
+20 villagers, 81 furniture items, three shirts, and 16 equipment parents.
+The refresh consumes complete prepared assets and source-category records;
+it adds no per-item installer, runtime action code, or resident allocation.
 
-Three current-cartridge/composition checks pass. The first silent native run
-passes 72 records/56 assertions, including actual inventory model/animation
-loading, initialization and speed, both joints of the smallest/largest models,
-original tool timing, graphics/matrix bounds, guards, saved-state retention,
-checkpoint restoration, and clean exit. This is component evidence, not a
-claim of ordinary inventory interaction or GPU appearance. See the
-[inventory-rig checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-animated-inventory-previews).
+Six focused current-cartridge/composition/save-codec checks pass. The native
+catalogue check passes 128 records/86 assertions, including source ordering,
+all 16 ownership entries, representative English names/prices/model transfers,
+disabled-item hiding, original umbrella retention, guards, and restored state.
+The corrected native purchase fixture passes actual 680-Bell transactions,
+ownership recording, shortage/full-pocket rejection, handover requests, and
+original-ware retention. Both runs restore their checkpoints and exit cleanly.
+The actual browser worker matches offline empty/all/mixed/equipment outputs
+using both supplied games. Its unserved export is
+`build/v3-held-category-browser-01/`; neither served patcher changes.
 
-The complete shared outdoor setup, movement/wind response, native animation,
-joint drawing, and speed-controlled loop sound are installed. Retain passing
-action and sound evidence for those unchanged implementations. Sound adds
-32 loaded bytes while reusing the exact native sample; conservative permanent
-audio accounting leaves 192 bytes spare. The resident module remains 56 KiB,
-with both 5,248-byte outdoor banks and the existing transient player extension.
+Continue from `build/v3-held-category-02/build-lock.json` explicitly. Retain
+passing animation, sound, and inventory evidence for unchanged implementations.
+The 56-KiB equipment module, both 5,248-byte outdoor banks, 15,584-byte inventory
+bank, and format-2 save layout stay intact. New pinwheel profile bits require a
+matching or larger profile; older builds lacking them reject these saves.
+Imported V3 saves remain unsuitable for V2. Empty selection returns exact V2-12.
 
-Continue from `build/v3-inventory-rigs-02/build-lock.json` explicitly. Connect
-parent readers, acquisition, catalogue, and individual selections through the
-existing category records. Pinwheel choices remain disabled; the existing
-112 choices, format-2 saved profile, and exact import-free V2-12 are preserved.
 Ordinary equipped-pinwheel gameplay, acquisition, persistence, listening, and
-hardware remain unverified. The main lock and both served patchers remain
-unchanged; the independent seasonal-copy issue remains unresolved.
+hardware remain unverified. The independent seasonal-copy issue remains
+unresolved and prevents main-lock promotion or a playable V3 handoff. See the
+[category checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-parent-category-expansion).
 
 The current ABI-116 two-fan profile has an isolated festival-night fixture with
 no seeded item or ownership. Normal town entry, original inventory, the festival

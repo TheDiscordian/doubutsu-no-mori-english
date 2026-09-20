@@ -163,4 +163,43 @@ class HeldSelectionTests(unittest.TestCase):
             with self.assertRaises(ValueError):create(source,self.base,self.report,**kwargs)
 
 
+CATEGORY_OUTPUT=ROOT/os.environ.get('V3_HELD_CATEGORY_BUILD','build/v3-held-category-02')
+
+@unittest.skipUnless((CATEGORY_OUTPUT/'build-lock.json').is_file(),'Current category refresh required')
+class CategorySelectionTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.previous_pin=(composer.BASE,composer.BASE_SHA,composer.REPORT_SHA,composer.ABI)
+        composer.use_build_lock(CATEGORY_OUTPUT/'build-lock.json')
+        shared.OptionalCompositionTests.setUpClass.__func__(cls)
+
+    @classmethod
+    def tearDownClass(cls):
+        shared.OptionalCompositionTests.tearDownClass.__func__(cls)
+        composer.BASE,composer.BASE_SHA,composer.REPORT_SHA,composer.ABI=cls.previous_pin
+
+    select=shared.OptionalCompositionTests.select
+    test_parent_profile_codec_upgrade_and_removal_rejection=HeldSelectionTests.test_parent_profile_codec_upgrade_and_removal_rejection
+
+    def test_individual_category_selections_and_exact_empty_all(self):
+        from v3_catalogue import VROM,RAM,UMBRELLA_COUNT
+        held={key:row for key,row in self.catalog.items() if row['kind']=='equipment'}
+        self.assertEqual(len(self.catalog),120);self.assertEqual(len(held),16)
+        self.assertEqual({r['item_id'] for r in held.values()},{f'{i:04X}' for i in range(0x224C,0x225C)})
+        chosen=['GAFE01-r0/item/224C','GAFE01-r0/item/2253','GAFE01-r0/item/2255']
+        selected=self.select(*chosen);self.assertEqual(selected['required'],[])
+        self.assertEqual(selected,self.select(*reversed(chosen),chosen[0]))
+        image,_,blob=composer.compose(self.base,self.report,self.catalog,selected)
+        data=by_vrom(image)[VROM].extract(image);cat=self.report['catalogue']['handheld'];at=cat['table_address']-RAM
+        self.assertEqual(struct.unpack_from('>I',data,UMBRELLA_COUNT-RAM)[0],35)
+        self.assertEqual(struct.unpack_from('>16H',data,at+64),(2132,2139,2146)+13*(0,))
+        profile=bytes.fromhex(selected['profile_hex'])
+        self.assertEqual(sum(x.bit_count() for x in profile),3)
+        for key,row in held.items():
+            self.assertEqual(struct.unpack_from('>I',blob,row['enable_offset'])[0],int(key in chosen))
+            with self.assertRaises(ValueError):self.select(composer.item_key(int(row['display_item_id'],16)))
+        self.assertEqual(composer.compose(self.base,self.report,self.catalog,self.select(*self.catalog))[0],self.base)
+        empty=composer.compose(self.base,self.report,self.catalog,self.select())[0]
+        self.assertEqual(sha256(empty),self.report['translation_baseline']['sha256'])
+
 if __name__=='__main__':unittest.main()

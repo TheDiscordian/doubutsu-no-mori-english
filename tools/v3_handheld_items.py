@@ -136,7 +136,7 @@ def parent_records(source, equipment):
         acquisition_installed=False,collection_installed=False,logical_imports_added=0,profile_bits_enabled=0)
 
 
-def selection_records(source, equipment):
+def selection_records(source, equipment, *, categories=None):
     """Build shared item/kind/profile records from implemented source categories.
 
     The parent's canonical collection identity owns its one profile bit. These
@@ -150,21 +150,41 @@ def selection_records(source, equipment):
             or sha256(raw)!='929013de1a36bb0912b94a5804290ce08a49a6fe3607f8f562b848355de0f58f'):
         raise ValueError('Changed complete donor held-item visibility rules')
     actions=equipment['player_actions']
+    if categories is None:
+        categories=actions.get('equipment_selection',{}).get('categories',[23])
+    categories=sorted(set(categories))
+    if not categories or set(categories)-{22,23}:
+        raise ValueError('Unimplemented held selection category')
     if (actions['enabled_imported_actions']!=[109] or not actions.get('fan_activation')
             or not actions['held_dispatch']['net_reset']['installed']):
         raise ValueError('Equipment selection requires the complete fan action category')
+    if 22 in categories:
+        rigs=equipment.get('held_rig_actions',{})
+        preview=equipment.get('inventory_preview',{})
+        if (22 not in rigs.get('category_indices',[]) or not rigs.get('loop_sound_installed')
+                or not preview.get('animated_rigs_installed')):
+            raise ValueError('Animated selection requires complete actions, sound, and inventory')
     kinds={r['item_id']:r for r in equipment['kind_readers']['rows']}
     source_rows={r['id']:r for r in inventory['rows']}
+    category_names={22:'pinwheel',23:'fan'}
+    expected={a['parent_item_id'] for a in aliases['rows']
+        if a['category'] in {category_names[c] for c in categories}}
+    if {r['item_id'] for r in kinds.values() if r['item_main'] in categories}!=expected:
+        raise ValueError('Installed kinds omit a complete source category')
     records=[];table=bytearray(struct.pack('>4I',0x41464853,1,92,8)+bytes(92*8))
     for alias in aliases['rows']:
-        if alias['category']!='fan':continue
+        if alias['parent_item_id'] not in expected:continue
         item=int(alias['parent_item_id'],16);row=source_rows[alias['parent_id']];kind=kinds[row['item_id']]
         display=int(alias['display_item_id'],16);index,_=furniture_identity(display)
+        animated=kind['item_main']==22
+        bank_limit=equipment['animated_rigs']['allocation']['bank_bytes'] if animated else 4376
         if (not 0x2224<=item<0x225C or kind['source_kind']!=row['equipment_kind']
                 or kind['native_kind']!=36+row['equipment_kind']
                 or not kind['resource_ready'] or not kind['shape_installed']
-                or kind['combined_bank_bytes']>4376 or kind['item_main']!=23
-                or not 107<=kind['native_kind']<115
+                or kind['combined_bank_bytes']>bank_limit
+                or alias['category']!=category_names[kind['item_main']]
+                or (animated and kind['native_kind'] not in equipment['held_rig_actions']['native_kinds'])
+                or not 99<=kind['native_kind']<115
                 or alias['context_outputs']['room_placement']!=[row['item_id']]
                 or alias['context_outputs']['collection_record']!=[alias['display_item_id']]):
             raise ValueError('Incomplete source-held category dependency or identity')
@@ -174,9 +194,11 @@ def selection_records(source, equipment):
             passive=True,profile_byte=byte,profile_mask=mask,display_item_id=alias['display_item_id'],
             collection_index=index,room_placement_uses_display=False,equipment_ready=True,
             inventory_installed=False,selectable=False,source=row,alias=alias))
-    if len(records)!=8 or len({r['native_kind'] for r in records})!=8:
-        raise ValueError('Incomplete shared fan selection category')
+    if (not records or {r['item_id'] for r in records}!=expected
+            or len({r['native_kind'] for r in records})!=len(records)):
+        raise ValueError('Incomplete shared held selection categories')
     return bytes(table),dict(format='AFV3-HELD-SELECTION-1',rows=records,
+        categories=categories,
         donor_visibility=visibility,source_functions=inventory['functions'],
         source_tables=inventory['tables'],alias_functions=aliases['functions'],
         source_rel_sha256=sha256(source.rel),table_bytes=len(table),table_sha256=sha256(table),

@@ -597,33 +597,48 @@ def event_menu(debug,rom_path,record):
         record(result);return result['return_value']
     def put(at,*words):debug.write_memory(at,struct.pack('>'+str(len(words))+'I',*words))
     check('complete menu startup module',event.RAM,module)
+    private=0x80126EC0
     saved={at:debug.read_memory(at,n) for at,n in ((event.SLOT,4),(0x80460020,192),
-                                                  (0x80135CF4,244),(0x80136FD8,4))}
+        (0x8046C000,864),(private,0xBD0),(0x80135CF4,244),(0x80136FD8,4))}
     size=0x5000;allocation=call(0x8009BFC0,[size])
     if allocation&15 or not MODULE_RAM+0x8000<=allocation<=0x80400000-size:
         raise ValueError('Event menu allocation outside native heap')
-    root,vendor,private,bridge=(allocation+n for n in (16,0x1800,0x3000,0x4800))
+    root,vendor,bridge=(allocation+n for n in (16,0x1800,0x4800))
     debug.write_memory(allocation,bytes(size));edge=b'V3EM'*4
-    guards=(allocation,vendor-16,vendor+0x958,private-16,private+0xBD0,
+    guards=(allocation,vendor-16,vendor+0x958,
             bridge-16,bridge+16,allocation+size-16,TEST_STACK-0x800,TEST_STACK+0x40)
     for at in guards:debug.write_memory(at,edge)
-    parents=equipment['parent_readers']['rows'];selected=(parents[0],parents[-1])
+    parents=equipment['parent_readers']['rows']
+    added=set(equipment.get('category_refresh',{}).get('added_parent_ids',[]))
+    stock_categories=equipment['event_acquisition']['source']['rows']
+    eligible=[category for category in stock_categories
+        if any(p['item_id']==row['item_id'] for p in parents for row in category['items'])]
+    category=next((c for c in eligible if any(row['item_id'] in added for row in c['items'])),eligible[0])
+    category_ids={r['item_id'] for r in category['items']}
+    candidates=[p for p in parents if p['item_id'] in category_ids]
+    selected=(candidates[0],candidates[-1]);price=category['price']
+    if len(candidates)<2:raise ValueError('Menu probe requires two implemented variants in one stock category')
+    record(dict(event_menu_category=category['kind'],representative_parents=[p['item_id'] for p in selected],price=price))
     def profile(rows):
         data=bytearray(saved[0x80460020])
         for row in parents:data[row['profile_byte']]&=~row['profile_mask']
         for row in rows:data[row['profile_byte']]|=row['profile_mask']
         debug.write_memory(0x80460020,data)
-    def routine(name,args=()):
-        target=receipt['code']['symbols']['af_v3_event_menu_'+name]
+        # Collection validates both an actual player slot and the live format-2
+        # profile. Initialise isolated working state instead of faking either.
+        resident(0x80469200)
+    def resident(target,args=()):
         stub=struct.pack('>2I',event.jump(target),0);debug.write_memory(bridge,stub)
         call(0x8002FE00,[bridge,8]);call(0x80034CE0,[bridge,8]);return call(bridge,args,(bridge,stub))
+    def routine(name,args=()):
+        return resident(receipt['code']['symbols']['af_v3_event_menu_'+name],args)
     def response(choice):
         put(window+0x1B0+0x80,choice);call(0x8007B44C,[4,9,1])
     def state(action):check('vendor action '+str(action),vendor+0x93C,struct.pack('>I',action))
     def message(value):check('continued message '+hex(value),window+0x2C4,struct.pack('>I',value))
     def enter_imports():
         routine('start',[vendor]);response(1);routine('route',[vendor,0]);state(1)
-        message(0x1758);response(0);routine('select',[vendor,0]);state(3);message(0x1761)
+        message(category['message']);response(0);routine('select',[vendor,0]);state(3);message(0x1761)
     try:
         data,rel=(files[v].extract(image) for v in (event.OWNER,event.RELOC))
         sections=struct.unpack_from('>5I',rel)
@@ -631,6 +646,7 @@ def event_menu(debug,rom_path,record):
         call(0x800262D0,[event.OWNER,event.OWNER+len(data),event.OWNER_RAM,
                         event.OWNER_RAM+len(data),root,root+len(data),len(rel)])
         check('complete relocated menu owner',root,loaded);put(event.SLOT,root);put(0x80136FD8,private)
+        debug.write_memory(private,bytes(0xBD0))
         native=struct.pack('>10H',*range(0x2600,0x2608),8,0)
         put(0x80135CF4,1);debug.write_memory(0x80135CF8,b'\x0B\0'+bytes(6)+native+bytes(20))
         area,stock=0x80135D00,0x80135D14;window=call(0x8009D1F0)
@@ -650,32 +666,37 @@ def event_menu(debug,rom_path,record):
             visible=module[at:at+16].rstrip(b' ')
             check('complete source item choice',0x8019A840+32*i,visible)
             check('visible choice length',window+0x1B0+0x5C+4*i,struct.pack('>I',len(visible)))
-        check('import price',vendor+0x94C,struct.pack('>I',780))
+        check('import price',vendor+0x94C,struct.pack('>I',price))
         stock_before=debug.read_memory(stock,20)
         debug.write_memory(private+0x14,struct.pack('>15H',*([0x2600]*15)));put(private+0x38,1000)
         response(0);routine('purchase',[vendor,0]);state(4);message(0x175D)
         check('full pockets preserve stock',stock,stock_before);check('full pockets preserve money',private+0x38,struct.pack('>I',1000))
-        debug.write_memory(private+0x14,bytes(30));put(private+0x38,779)
+        debug.write_memory(private+0x14,bytes(30));put(private+0x38,price-1)
         enter_imports();response(0);routine('purchase',[vendor,0]);state(4);message(0x175E)
-        check('insufficient funds preserve stock',stock,stock_before);check('short funds unchanged',private+0x38,struct.pack('>I',779))
-        # Native tool collection currently falls through without ownership credit;
-        # test the real pocket/payment route, not completed catalogue support.
+        check('insufficient funds preserve stock',stock,stock_before);check('short funds unchanged',private+0x38,struct.pack('>I',price-1))
+        # Use actual pocket/payment/collection with the isolated first player;
+        # the shared collection probe covers all four resident contexts.
         put(private+0x38,2000);enter_imports();response(1);routine('purchase',[vendor,0]);state(5);message(0x1764)
         last=int(selected[-1]['item_id'],16)
         check('native pocket insertion',private+0x14,struct.pack('>H',last)+bytes(28))
-        check('native single payment',private+0x38,struct.pack('>I',1220))
-        expected=bytearray(stock_before);struct.pack_into('>H',expected,14,0)
+        owned=bytearray(640);parent=selected[-1]
+        owned[parent['profile_byte']-32]|=parent['profile_mask']
+        check('purchase records only the active player collection',0x8046C0D0,owned)
+        check('native single payment',private+0x38,struct.pack('>I',2000-price))
+        expected=bytearray(stock_before);struct.pack_into('>H',expected,2*(last-category['first']),0)
         check('one consumed slot',stock,expected)
-        routine('purchase',[vendor,0]);check('same order cannot charge twice',private+0x38,struct.pack('>I',1220))
+        routine('purchase',[vendor,0]);check('same order cannot charge twice',private+0x38,struct.pack('>I',2000-price))
         call(0x8007B44C,[4,1,2]);routine('give',[vendor,0]);state(0);message(0x1766)
         values=[call(0x8007B49C,[5,i]) for i in range(3)]
         record(dict(event_menu_handover=values,assertion='passed' if values==[last,7,0] else 'failed'))
         if values!=[last,7,0]:raise ValueError('Changed native handover request')
         enter_imports();response(0);routine('purchase',[vendor,0]);state(5)
-        check('second native payment',private+0x38,struct.pack('>I',440))
+        check('second native payment',private+0x38,struct.pack('>I',2000-2*price))
+        parent=selected[0];owned[parent['profile_byte']-32]|=parent['profile_mask']
+        check('both purchased parents are collected',0x8046C0D0,owned)
         routine('give',[vendor,0]);state(4);message(0x1760)
         routine('start',[vendor]);response(1);routine('route',[vendor,0]);state(4);message(0x1757)
-        check('sold-out marker retained',stock,bytes(16)+struct.pack('>2H',8,0))
+        check('sold-out marker retained',stock,bytes(16)+struct.pack('>2H',8,category['kind']))
         check('all original merchandise retained',area,native)
         for at in guards:check('menu memory guard',at,edge)
     finally:
@@ -683,7 +704,7 @@ def event_menu(debug,rom_path,record):
         call(0x8009C0F0,[allocation])
     for at,raw in saved.items():check('restored menu globals',at,raw)
     return dict(event_menu_native=True,ordinary_conversation_tested=False,
-                catalogue_ownership_tested=False,save_reload_tested=False,requires_checkpoint_restore=True)
+                catalogue_ownership_tested=True,save_reload_tested=False,requires_checkpoint_restore=True)
 
 
 def held_collection(debug,rom_path,record):

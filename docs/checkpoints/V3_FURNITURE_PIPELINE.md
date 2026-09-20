@@ -1,5 +1,89 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared parent category expansion
+
+The shared catalogue refresh connects all eight pinwheels in one source-derived
+category batch. It extends existing selector, parent-name/price, icon, collection,
+catalogue, and optional-profile records, preserving all eight fans. Existing
+animation, sound, player, inventory, event, and seasonal code stays unchanged.
+Prepared models are reused; only eight new catalogue representations are appended.
+No per-item installer, extra resident allocation, or saved-format change is added.
+
+- Explicit lock: `build/v3-held-category-02/build-lock.json`, ABI 121.
+- ROM SHA-256:
+  `42fa74a2f66cfe28a4f81c1e4a718cbee86ed963e487982972f46ed9d63d7253`.
+- UPS SHA-256:
+  `474abb4daab5723ae20cbfa657dcdf34a5c0a4665fc021a5849560e781ec79c6`.
+- Build receipt SHA-256:
+  `53def547f634fcd37adbff01d78f47bd5f54190e1d1f0959f471a3002587392e`.
+- Equipment module SHA-256:
+  `e45074629539ba60b93e1be32c34b8a7d6cb8bf1156c124991620ca03af7ff7c`.
+- Choices: 120, including 16 equipment parents; representations are not choices.
+- Catalogue: 48 umbrella-category rows, including 32 originals; 62,928 loaded
+  bytes, 736 relocation bytes, 280,576/280,704 conservative pool use.
+- Pocket artwork: 1,568/2,048 reserved bytes; equipment module: unchanged 56 KiB.
+
+Six focused checks pass in 10.731 seconds:
+`tests.test_v3_held_catalogue.CategoryRefreshTests` and
+`tests.test_v3_held_selection.CategorySelectionTests`. They regenerate complete
+source categories, reject missing dependencies and changed modules, check exact
+data-only changes and untouched owners, preserve existing models/profiles,
+relocate the complete catalogue, verify official name credits, reconstruct the
+UPS, check all/empty/individual compositions, and execute the format-2 save
+codec for equal/superset/missing profiles. Python parsing and diff checks pass.
+
+The first native catalogue run at `build/smoke-v3-held-category-01/` passes
+128 records/86 assertions. It executes actual catalogue loading, relocation,
+collection, donor ordering, representative full English names/prices, complete
+model transfers, disabled-parent hiding, retained original umbrellas, guards,
+state restoration, checkpoint restoration, and clean exit. Results SHA-256:
+`616d836634ea95522a129758cec3a955752886e709dd2279fd98f99b934b7305`.
+This run uses build `v3-held-category-01`; `-02` tightens a source-inventory guard
+and emits the identical ROM/patch. Its passing native evidence is retained,
+not replayed. Neither run claims GPU appearance or ordinary ordering/delivery.
+
+The shared event-menu probe selects a source category and derives its price,
+message, identities, and stock slots from installed records. Its first run,
+`build/smoke-v3-category-purchase-01/`, passes 36 assertions through pinwheel
+choices, the 680-Bell price, and full-pocket/short-funds rejection, then times
+out during successful purchase. The old fixture supplies a heap-allocated
+private-player pointer and changes only the current profile, violating the
+installed collection reader's actual-player-slot and matching-live-profile
+requirements. Its results are retained, SHA-256
+`6250012029b74134948829c03c6e0a8f2600fb773ebd7a1a8d0bfc0e90327803`.
+
+The one justified retry uses a backed-up real first-player slot and the actual
+save-state reset function, restoring both afterwards. No game implementation
+changes. `build/smoke-v3-category-purchase-02/` passes 187 records/75 assertions:
+native pocket insertion, two 680-Bell payments, actual collection credit for
+both variants, one-time charging, stock consumption, handover requests,
+sold-out retention, original wares, guards, restored globals/checkpoint, and
+clean exit. Results SHA-256:
+`fd627acad495ff059c735e741fd0d1cfcc1aca6f9e0a8c8a87071d4d65a33d88`.
+The fixtures are silent and isolated, with FlashRAM writes disabled. These are
+native component transactions, not ordinary walking/conversation/purchase
+evidence or a save/restart test. The fixture retry allowance is spent.
+
+The unserved export `build/v3-held-category-browser-01/` provides all 120
+choices and both donor-backed reconstruction recipes. The actual browser
+worker at `build/check-v3-held-category-browser-01/` matches offline outputs
+for empty, all-installed, villager/item, and pinwheel/fan selections. It also
+passes cancellation, unknown-option rejection, corrupt-plan rejection, no
+browser errors, and local GET-only access; the temporary server stops.
+Results SHA-256:
+`8838af4cfc4f0bb59837ee0039586990a664d40ff4423af76d4cc0ef8e7381af`.
+This worker check does not close the previously partial full-interface test.
+
+All previous profile bits remain; eight pinwheel bits are added. Format 2 and
+save code stay unchanged. Equal/superset-profile loading has codec evidence;
+older builds missing these imports reject their saves. Removing imports is not
+migration, and imported V3 saves must not be loaded in V2. Empty composition
+returns exact corrected V2-12. No new ordinary cross-version reload or hardware
+test is claimed. The main ABI-109 lock and both served V2 patchers stay intact.
+The independent seasonal-copy assertion remains unresolved and blocks a playable
+handoff. Continue from the explicit ABI-121 lock, classify that recorded window,
+and finish remaining shared categories and ordinary gameplay/persistence.
+
 ## Shared animated inventory previews
 
 The existing runtime refresh consumes ABI 119 and connects all eight pinwheel

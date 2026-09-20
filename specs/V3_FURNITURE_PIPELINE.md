@@ -99,6 +99,13 @@ aliases provide its full name/price without changing ordinary room drops. The
 shared catalogue rebuilder retains this category in subsequent furniture batches.
 No standalone representation choices or new profile bits are introduced. See
 [held catalogue](V3_CATALOGUE.md#shared-handheld-representations).
+On a catalogue-equipped build, the same command expands complete implemented
+equipment categories in one refresh. It verifies and retains all existing parent
+identities, rebuilds the selection/name/price/icon/collection tables, appends only
+missing prepared catalogue models, and extends the experimental profile. No
+per-item installer, repeated first-install stages, or new action code is needed.
+The source-derived inventory bindings must already match. See
+[category expansion](V3_HANDHELD_ITEMS.md#shared-parent-category-expansion).
 `--refresh-runtime --held-selection` prepares the full experimental parent profile
 after these adapters are installed. Offline/browser composition derives each
 equipment choice and its representation from the checked records, including

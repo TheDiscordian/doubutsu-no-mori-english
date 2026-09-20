@@ -2,6 +2,7 @@
 import copy
 import json
 import struct
+import zlib
 
 from aflib import by_vrom,sha256,u32
 from v3_asset_loader import BLOB,ROOT,compile_part
@@ -18,14 +19,17 @@ SOURCES=('tools/v3_held_catalogue.py','tools/v3_held_collection.py',
     'overlays/v3/furniture.c','overlays/v3/furniture_expanded.ld',
     'overlays/v3/furniture_tables.c','overlays/v3/catalogue.c',
     'overlays/v3/catalogue.ld','overlays/v3/catalogue_bridge.S')
+SOURCES+=('tools/v3_handheld_items.py','tools/v3_inventory_equipment.py',
+    'tools/v3_room_aliases.py','tools/v3_player_actions.py')
 
 
-def select_installed(prior,blob):
+def select_installed(prior,blob,*,extend=False):
     """Prepare the full experimental reference; selectors remove parent choices."""
     equipment=copy.deepcopy(prior['equipment_resources'])
     required=('catalogue','collection','parent_readers','event_acquisition',
               'ground_categories','inventory_preview','player_actions','item_categories')
-    if (any(not equipment.get(k) for k in required) or equipment.get('optional_selection') or
+    previous=equipment.get('optional_selection')
+    if (any(not equipment.get(k) for k in required) or bool(previous)!=extend or
             equipment['catalogue']['imports']!=prior['catalogue']['handheld']['imports']):
         raise ValueError('Parent selection requires the complete installed shared adapters')
     start=equipment['blob_offset']
@@ -36,6 +40,10 @@ def select_installed(prior,blob):
         raise ValueError('Changed complete saved profile')
     parents={r['item_id']:r for r in equipment['parent_readers']['rows']}
     collections={r['item_id']:r for r in equipment['collection']['rows']}
+    retained=set(previous['identities']) if previous else set()
+    if previous and (len(retained)!=previous['profile_bits_enabled'] or
+            previous['format']!='AFV3-HELD-SELECTION-1'):
+        raise ValueError('Changed prior parent selection inventory')
     seen=set();identities=[]
     for row in equipment['catalogue']['imports']:
         parent=parents[row['parent_item_id']];collected=collections[row['parent_item_id']]
@@ -48,11 +56,11 @@ def select_installed(prior,blob):
                 u32(blob,at+76)!=1 or sha256(blob[at+8:at+76])!=row['profile_sha256'] or
                 sha256(blob[ITEMS+index*32:ITEMS+(index+1)*32])!=row['metadata_sha256'] or
                 sha256(blob[art:art+row['object_bytes']])!=row['object_sha256'] or
-                profile[parent['profile_byte']]&parent['profile_mask']):
+                bool(profile[parent['profile_byte']]&parent['profile_mask'])!=(parent['id'] in retained)):
             raise ValueError('Changed parent selection identity, installed model, or profile binding')
         seen.add(parent['item_id']);identities.append(parent['id'])
         profile[parent['profile_byte']]|=parent['profile_mask']
-    if not seen or seen!=set(parents) or seen!=set(collections):
+    if not seen or seen!=set(parents) or seen!=set(collections) or not retained<=set(identities):
         raise ValueError('Incomplete installed parent selection inventory')
     blob[0x20:0xE0]=profile
     saved.update(profile_hex=profile.hex(),profile_sha256=sha256(profile))
@@ -61,6 +69,65 @@ def select_installed(prior,blob):
         experimental=True,playable_handoff=False,web_patcher_enabled=False,
         save_compatibility='Older profiles lacking these imports reject saves using them; retain separate test saves.')
     return equipment,{},dict(save_runtime=saved)
+
+
+def refresh_parents(source,equipment,blob):
+    """Expand complete categories through existing bounded data readers only."""
+    from v3_handheld_items import selection_records,parent_records,pocket_icons
+    from v3_inventory_equipment import records as inventory_records,SELECTOR
+    from v3_player_actions import POCKET_ICON_OFFSET,TABLE_OFFSET
+    old=equipment;report=copy.deepcopy(old);start=old['blob_offset']
+    module=bytearray(blob[start:start+old['bytes']])
+    if sha256(module)!=old['sha256'] or not old.get('optional_selection'):
+        raise ValueError('Category refresh requires the complete installed parent module')
+    selector=old['player_actions']['equipment_selection']
+    categories=sorted(set(selector.get('categories',[23]))|
+        set(old.get('held_rig_actions',{}).get('category_indices',[])))
+    if categories==selector.get('categories',[23]):
+        raise ValueError('No additional implemented category to install')
+    # Bind every old table to its complete source before replacing any bytes.
+    old_selection,_=selection_records(source,old)
+    old_parents,_=parent_records(source,old)
+    old_icons,_=pocket_icons(source,old,old['pocket_icons']['ram'],TABLE_OFFSET-POCKET_ICON_OFFSET)
+    for data,receipt,digest in ((old_selection,selector,'table_sha256'),
+            (old_parents,old['parent_readers'],'table_sha256'),
+            (old_icons,old['pocket_icons'],'sha256')):
+        at=receipt['table_offset']
+        if sha256(data)!=receipt[digest] or module[at:at+len(data)]!=data:
+            raise ValueError('Changed installed source-derived parent table')
+    table,selection=selection_records(source,old,categories=categories)
+    selection=json.loads(json.dumps(selection))
+    old_rows={r['item_id']:r for r in selector['rows']}
+    new_rows={r['item_id']:r for r in selection['rows']}
+    if any(new_rows.get(k)!=v for k,v in old_rows.items()):
+        raise ValueError('Category refresh changes a retained parent identity')
+    report['player_actions']['equipment_selection'].update(selection)
+    module[selector['table_offset']:selector['table_offset']+len(table)]=table
+    table,parents=parent_records(source,report)
+    retained=report['parent_readers']
+    for key,value in parents.items():
+        if key not in ('collection_installed','acquisition_installed'):retained[key]=value
+    module[retained['table_offset']:retained['table_offset']+len(table)]=table
+    icons,icon_report=pocket_icons(source,report,old['pocket_icons']['ram'],TABLE_OFFSET-POCKET_ICON_OFFSET)
+    if any(module[POCKET_ICON_OFFSET+len(old_icons):TABLE_OFFSET]):
+        raise ValueError('Occupied shared pocket-icon expansion space')
+    module[POCKET_ICON_OFFSET:TABLE_OFFSET]=icons+bytes(TABLE_OFFSET-POCKET_ICON_OFFSET-len(icons))
+    report['pocket_icons'].update(icon_report)
+    _,collection=source_records(source,report)
+    report['collection'].update(collection)
+    # Preview bindings already exist; expanding selection must neither duplicate
+    # them nor change any installed motion, model, callback, or table.
+    preview,evidence=inventory_records(source,report,animated=True)
+    sort_rows=lambda rows: sorted(rows,key=lambda r:r['item_id'])
+    if (sort_rows(evidence['rows'])!=sort_rows(old['inventory_preview']['rows']) or
+            module[SELECTOR:SELECTOR+len(preview)]!=preview):
+        raise ValueError('Expanded parents disagree with installed inventory previews')
+    report.update(sha256=sha256(module),crc32=zlib.crc32(module))
+    report['category_refresh']=dict(categories=categories,
+        added_parent_ids=sorted(set(new_rows)-set(old_rows)),retained_parent_ids=sorted(old_rows),
+        code_changed=False,additional_resident_bytes=0,saved_format_changed=False)
+    blob[start:start+len(module)]=module
+    return report
 
 
 def assets(source,equipment,directory):
@@ -118,19 +185,25 @@ def assets(source,equipment,directory):
         source_initializer=init,framing_constants=constants)
 
 
-def install(base,prior,blob,core,original,output,directory):
-    from v3_furniture_install import profile,STABLE,STABLE_SHA
-    equipment=prior['equipment_resources'];files=by_vrom(base)
-    if not equipment.get('collection') or equipment.get('catalogue'):
-        raise ValueError('Held previews require installed collection and no previous preview adapter')
-    source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
-        (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
-    prepared,evidence=assets(source,equipment,directory)
-    stable=STABLE.read_bytes()
-    if sha256(stable)!=STABLE_SHA:raise ValueError('Changed import-free baseline')
+def install_profiles(blob,prepared,retained=()):
+    """Append new representations, checking and retaining existing identities."""
+    from v3_furniture_install import profile
+    previous={r['parent_item_id']:r for r in retained}
     installed=[]
     for parent,row,asset in prepared:
         item=int(row['item_id'],16);index=parent['runtime_index'];i=slot(item)
+        if parent['item_id'] in previous:
+            old=previous[parent['item_id']];at=int(old['object_vrom'],16)-BLOB
+            native=profile(row,BLOB+at)
+            metadata=struct.pack('>HH',index,item)+bytes(24)+struct.pack('>HH',int(parent['item_id'],16),0)
+            if (old['item_id']!=row['item_id'] or old['runtime_index']!=index or
+                    old['donor_position']!=parent['catalogue']['position'] or
+                    blob[at:at+old['object_bytes']]!=asset or sha256(asset)!=old['object_sha256'] or
+                    sha256(native)!=old['profile_sha256'] or
+                    blob[ROWS+i*80:ROWS+(i+1)*80]!=struct.pack('>HHI',index,item,1)+native+struct.pack('>I',1) or
+                    blob[ITEMS+i*32:ITEMS+(i+1)*32]!=metadata or sha256(metadata)!=old['metadata_sha256']):
+                raise ValueError('Changed retained parent catalogue representation')
+            installed.append(copy.deepcopy(old));continue
         if (index!=1024+i or any(blob[ROWS+i*80:ROWS+(i+1)*80]) or
                 any(blob[ITEMS+i*32:ITEMS+(i+1)*32]) or blob[32+i//8]&(1<<(i&7))):
             raise ValueError('Parent representation collides with an installed identity')
@@ -147,6 +220,50 @@ def install(base,prior,blob,core,original,output,directory):
             profile_ram=f'{ROWS_RAM+i*80+8:08X}',profile_sha256=sha256(native),
             profile_tag=1,metadata_sha256=sha256(metadata),model_offsets=row['model_offsets'],
             native_profile_scalar_hex=row['native_profile_scalar_hex'],independently_selectable=False))
+    if not set(previous)<={r['parent_item_id'] for r in installed}:
+        raise ValueError('Category refresh removes an installed representation')
+    return installed
+
+
+def catalogue_table(stable,installed,evidence):
+    native=catalogue.sources(stable)[0]
+    table=native[catalogue.UMBRELLA_TABLE-catalogue.RAM:catalogue.UMBRELLA_TABLE-catalogue.RAM+64]
+    if (sha256(table)!='c9cc20d285ce8a4f3e694d41a8905883955451c59ea27a4af3febb2087f43e89' or
+            struct.unpack_from('>2I',native,catalogue.UMBRELLA_POINTER-catalogue.RAM)!=(catalogue.UMBRELLA_TABLE,32)):
+        raise ValueError('Changed complete native umbrella catalogue')
+    installed.sort(key=lambda r:r['donor_position'])
+    table+=b''.join(struct.pack('>H',r['catalogue_index']) for r in installed)
+    return table,dict(native_rows=32,total_rows=32+len(installed),imports=installed,
+        category='umbrella',preview_scale=1.0,preview_height=36.0,preview_model_y=0.0,
+        profile_selection_required=True,source_evidence=evidence)
+
+
+def install(base,prior,blob,core,original,output,directory):
+    from v3_furniture_install import STABLE,STABLE_SHA
+    equipment=prior['equipment_resources'];files=by_vrom(base)
+    if not equipment.get('collection'):
+        raise ValueError('Held previews require installed collection')
+    source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+        (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    stable=STABLE.read_bytes()
+    if sha256(stable)!=STABLE_SHA:raise ValueError('Changed import-free baseline')
+    refresh=bool(equipment.get('catalogue'))
+    if refresh:equipment=refresh_parents(source,equipment,blob)
+    prepared,evidence=assets(source,equipment,directory)
+    installed=install_profiles(blob,prepared,equipment['catalogue']['imports'] if refresh else ())
+    table,cat=catalogue_table(stable,installed,evidence)
+    if refresh:
+        changes,cat_report=shared_catalogue.install_catalogue(base,stable,prior,
+            prior['furniture']['imports']+[prior['speed_bag']],output,source.rel,source.symbols.encode(),
+            reviewed_rows=prior['catalogue']['imports'],handheld=(table,cat))
+        if cat_report['code']['symbols']['af_v3_catalogue_item_price']!=prior['furniture_items']['code']['symbols']['af_v3_item_price']:
+            raise ValueError('Changed shared item-price ABI')
+        equipment['catalogue'].update(imports=installed,evidence=evidence,
+            artwork_bytes=sum(len(data) for _,_,data in prepared))
+        selection_prior={**prior,'equipment_resources':equipment,'catalogue':cat_report}
+        equipment,_,updates=select_installed(selection_prior,blob,extend=True)
+        updates['catalogue']=cat_report
+        return equipment,changes,updates
     expanded=copy.deepcopy(prior['furniture']['expanded_tables']);previous=expanded['expanded_code']
     defines=tuple(f[2:] for f in previous['flags'] if f.startswith('-D'))+('AF_V3_HELD_CATALOGUE=1',)
     code,compiled=compile_part('furniture_expanded',output/'furniture_expanded',
@@ -176,16 +293,6 @@ def install(base,prior,blob,core,original,output,directory):
     banks.update(source_owner_sha256=source_owner_sha,output_owner_sha256=sha256(owner))
     placement.update(owner_sha256=sha256(owner))
     expanded.update(expanded_code=compiled,output_sha256=sha256(owner))
-    native=catalogue.sources(stable)[0]
-    table=native[catalogue.UMBRELLA_TABLE-catalogue.RAM:catalogue.UMBRELLA_TABLE-catalogue.RAM+64]
-    if (sha256(table)!='c9cc20d285ce8a4f3e694d41a8905883955451c59ea27a4af3febb2087f43e89' or
-            struct.unpack_from('>2I',native,catalogue.UMBRELLA_POINTER-catalogue.RAM)!=(catalogue.UMBRELLA_TABLE,32)):
-        raise ValueError('Changed complete native umbrella catalogue')
-    installed.sort(key=lambda r:r['donor_position'])
-    table+=b''.join(struct.pack('>H',r['catalogue_index']) for r in installed)
-    cat=dict(native_rows=32,total_rows=32+len(installed),imports=installed,
-        category='umbrella',preview_scale=1.0,preview_height=36.0,preview_model_y=0.0,
-        profile_selection_required=True,source_evidence=evidence)
     furniture=copy.deepcopy(prior['furniture']);furniture.update(expanded_tables=expanded,bank_pool=banks)
     changes,cat_report=shared_catalogue.install_catalogue(base,stable,prior,
         furniture['imports']+[prior['speed_bag']],output,source.rel,source.symbols.encode(),
