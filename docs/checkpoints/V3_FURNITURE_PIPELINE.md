@@ -1,5 +1,74 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared golden-net capture
+
+The explicit proposal is ABI 132 at
+`build/v3-shared-net-capture-01/build-lock.json`. It retains all 128 experimental
+choices, fixed identities, complete assets, the 60-KiB module, format-2 saves,
+and exact V2-12 no-import output. No golden-tool choice is enabled. The main
+ABI-109 lock and both served patchers remain unchanged.
+
+- ROM SHA-256:
+  `f2e7de5d6898bc39f12f95f632d07d3833ae44a000aa0d0ce93cf0321cbacb2f`.
+- Report SHA-256:
+  `bd4bca2ff83a4cc96d86ca89ac648aa693885415f44265069c6016c5ba2ea199`.
+- UPS SHA-256:
+  `9c7b9faab6835e1b9e5eb2bd1e39510c99a8d34560f359f05852409299e57a6c`.
+
+The shared net helper uses actual selected equipment to supply the donor's
+radius/span 21/60 for golden kind 46, retaining 15/50 otherwise. The complete
+native force routine runs first; invalid candidate counts return without reading
+equipment or touching parameter words. The native loop/collision arithmetic
+remains, including first-match ordering, signed type output, and requested-radius
+endpoint tolerance. Two unused outgoing words carry the dimensions without
+shared mutable state. The sole local-capture caller and complete frame code are
+checked. Five exact instruction windows change; three obsolete relocations are
+removed. No unrelated owner code or resource changes.
+
+The first build passes. The helper adds 184 bytes at `804A5E28`; complete tool
+code is 1,168 bytes. All prior bytes, constants, public addresses, complete models,
+bank sizes, profile fields, and saved formats remain. No translation text changes.
+
+Four focused checks pass in 5.878 seconds:
+
+```sh
+python3 -m unittest \
+  tests.test_v3_player_actions.SelectionHostTests.test_source_net_parameters \
+  tests.test_v3_player_actions.NetCaptureTests
+```
+
+They cover sanitizer execution across native/extended/invalid kinds and counts,
+forced-catch priority, bounded parameter stores, immutable actor state, exact
+native instruction/relocation retention at two loaded bases, unchanged assets/
+profiles/save code, original-ROM UPS reconstruction/CRC, and empty/all composition.
+
+The first silent native run at `build/smoke-v3-tool-effects-01/` passes **244
+records and 179 assertions**, including 53 analytical collision cases. Results
+SHA-256: `51ac3c73fc5d0f567e8eadab8cec41bf16b548d660dfbdaeddd4b7b984c5ce53`.
+It enters the actual relocated cartridge candidate loop for normal net, imported
+normal net, and imported golden net. Radial boundaries, candidate radii, both
+endpoint limits, golden-only radius/span, diagonal spans, overlapping candidates,
+the eighth candidate, invalid counts, and forced catches all pass. The extra
+radial bonus does not incorrectly enlarge endpoint tolerance. An unselected
+golden selector cannot enlarge capture. Actor state, saved state, output guards,
+the complete equipment module, restored globals/profile, fault/memory guards,
+checkpoint restoration, and clean exit pass. No code is uploaded or user save
+used; audio is silent. No setup retry is needed.
+
+The fixture uses temporary selectors and synthetic collision candidates. It
+does not prove ordinary catching, golden-tool acquisition/persistence, GPU
+appearance, or original hardware. Existing complete input/motion/recovery
+evidence remains valid and is not replayed. Keep tool choices disabled pending
+their actual remaining consumers. Imported saves require matching-or-larger
+profiles and must not be loaded by V2; profile removal is not migration.
+
+Next implement both fish behaviours' golden-rod response through shared source
+tables, then shovel effects, axe wear, and inventory/parent/acquisition support.
+Source fishing search distances are identical for normal/golden rods; the real
+differences are wider detection angles and longer bite windows. Resolve native
+consumers/time-step units before installing them. Balloon release on get-up
+remains a separate actual behaviour dependency.
+
 ## Shared net transitions and tool recovery
 
 The explicit proposal is ABI 131 at

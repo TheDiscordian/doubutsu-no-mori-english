@@ -844,6 +844,44 @@ actors/selectors, not ordinary gameplay, golden effects, GPU appearance, or
 hardware. Exact results are in the
 [transition checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-net-transitions-and-tool-recovery).
 
+### Shared golden-net capture
+
+On the complete tool-transition build, `--refresh-runtime --player-actions`
+installs the source net dimensions while retaining the native candidate loop
+and collision arithmetic. Normal nets use radius/span 15/50; actual imported
+golden kind 46 uses 21/60. The existing selected-profile submenu reader decides
+the actual kind. Unselected imports cannot acquire golden dimensions.
+
+`overlays/v3/tool_net.c` first executes the original forced-capture routine.
+A forced label/type returns immediately, including when the candidate count is
+invalid. Otherwise, only counts one through eight read the actual kind and
+prepare dimensions. The original loop retains its count guards, first-match
+ordering, candidate labels/types, and all position/radius arrays.
+
+The 152-byte loop frame has two unused outgoing argument words at offsets 24
+and 28. The force-check call receives their address in `a3`; its old `a1` reload
+is redundant because the incoming label pointer is still live. The new helper
+writes radius and span there. The local-capture callee's 144-byte frame reads
+the additional radius argument at offset 168. The span feeds the original
+inverse-length calculation and its square feeds the original endpoint test.
+Requested candidate radius remains unchanged in both radial and endpoint math:
+the golden bonus must not extend the endpoint tolerance by six units.
+
+The installer verifies complete source/native functions, the local test's sole
+caller, absent address references, unused outgoing words, all five instruction
+windows, incoming branches, and exactly three replaced call/address relocations.
+The force routine itself remains unchanged. No global collision state, new
+allocation, actor field, or saved field is introduced. The helper adds 184 bytes
+at `804A5E28`, after the exact old code/constants; combined tool code is 1,168
+bytes. Existing public addresses and the 60-KiB module remain fixed.
+
+This installs golden-net collision geometry, not the complete golden-tool import
+category. Tools remain unavailable as optional choices until inventory, parent,
+acquisition, other required behaviours, and persistence are connected. The
+component fixture uses temporary selectors and isolated actors, not ordinary
+gameplay or hardware. See the
+[capture checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-golden-net-capture).
+
 ### Extended action tables
 
 `--refresh-runtime --player-actions` installs shared action-table capacity in the

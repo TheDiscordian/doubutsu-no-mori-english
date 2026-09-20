@@ -2,6 +2,14 @@
 
 ## Workflow
 
+For installed handheld categories, the shared `--refresh-runtime --player-actions`
+stages also connect source behaviour. The golden-net capture stage preserves the
+native candidate/forced-capture algorithms and supplies the donor's normal or
+golden dimensions through unused outgoing argument words. It retains source
+assets, fixed identities, selections, and save formats; geometry installation
+does not enable unfinished tool choices. See
+[golden-net capture](V3_HANDHELD_ITEMS.md#shared-golden-net-capture).
+
 New furniture uses `tools/v3_furniture_pipeline.py`, not a new Python item list,
 family installer, catalogue switch, or dedicated native scenario. Extend shared
 format/behaviour rules when the donor requires an unsupported feature. Item names

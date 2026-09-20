@@ -28,6 +28,75 @@ INVENTORY=ROOT/os.environ.get('V3_INVENTORY_EQUIPMENT_BUILD','build/v3-inventory
 TOOLS=ROOT/os.environ.get('V3_TOOL_CONTROLS_BUILD','build/v3-shared-tool-controls-02')
 TOOL_MOTION=ROOT/os.environ.get('V3_TOOL_MOTION_BUILD','build/v3-shared-tool-motion-02')
 TRANSITIONS=ROOT/os.environ.get('V3_TOOL_TRANSITIONS_BUILD','build/v3-shared-tool-transitions-01')
+NET_CAPTURE=ROOT/os.environ.get('V3_NET_CAPTURE_BUILD','build/v3-shared-net-capture-01')
+
+
+@unittest.skipUnless((NET_CAPTURE/'build-lock.json').is_file(),'Current net capture required')
+class NetCaptureTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.rom,cls.report=inputs(NET_CAPTURE/'build-lock.json')
+        cls.base,cls.prior=inputs(NET_CAPTURE/'base-lock.json')
+        cls.files,cls.before=by_vrom(cls.rom),by_vrom(cls.base)
+        cls.e=cls.report['equipment_resources'];cls.old=cls.prior['equipment_resources']
+        cls.capture=cls.e['player_actions']['net_capture']
+
+    def test_native_math_retained_and_three_relocations_removed(self):
+        owner=self.files[actions.PLAYER_VROM].extract(self.rom)
+        previous=self.before[actions.PLAYER_VROM].extract(self.base);restored=bytearray(owner)
+        self.assertEqual(len(self.capture['patches']),5)
+        for row in self.capture['patches']:
+            at=row['address']-actions.PLAYER_RAM;n=len(bytes.fromhex(row['before']))
+            self.assertEqual(owner[at:at+n].hex(),row['after']);self.assertEqual(previous[at:at+n].hex(),row['before'])
+            restored[at:at+n]=bytes.fromhex(row['before'])
+        self.assertEqual(restored,previous)
+        for row in self.capture['native_consumers']:
+            a,b=row['entry']-actions.PLAYER_RAM,row['end']-actions.PLAYER_RAM
+            self.assertEqual(sha256(restored[a:b]),row['sha256'])
+        rel=self.files[actions.PLAYER_RELOC].extract(self.rom);oldrel=self.before[actions.PLAYER_RELOC].extract(self.base)
+        sections=struct.unpack_from('>5I',rel);oldsections=struct.unpack_from('>5I',oldrel)
+        self.assertEqual(sections[:4],oldsections[:4]);self.assertEqual(sections[4],oldsections[4]-3)
+        removed=self.capture['removed_relocations'];self.assertEqual(len(removed),3)
+        oldrows=struct.unpack_from('>'+str(oldsections[4])+'I',oldrel,20)
+        self.assertEqual(list(struct.unpack_from('>'+str(sections[4])+'I',rel,20)),[r for r in oldrows if r not in removed])
+        for base in (0x80200010,0x80378010):
+            moved=relocate_verified_data(SimpleNamespace(ram=actions.PLAYER_RAM,resident_bytes=len(owner),sections=sections),owner,rel,base)
+            for row in self.capture['patches']:
+                at=row['address']-actions.PLAYER_RAM
+                self.assertEqual(moved[at:at+len(bytes.fromhex(row['after']))].hex(),row['after'])
+
+    def test_existing_code_resources_profiles_and_allocations_retained(self):
+        at=self.e['blob_offset'];start=at+actions.TOOL_MOTION_OFFSET;end=at+actions.PARENT_CODE_OFFSET
+        old=self.before[BLOB].extract(self.base);new=self.files[BLOB].extract(self.rom)
+        previous=self.old['player_actions']['tool_motion']['code'];current=self.capture['code']
+        self.assertEqual(new[at:start+previous['bytes']],old[at:start+previous['bytes']])
+        self.assertEqual(new[end:at+self.e['bytes']],old[end:at+self.old['bytes']])
+        self.assertEqual(sha256(new[start:start+current['bytes']]),current['sha256'])
+        for name,address in previous['symbols'].items():self.assertEqual(current['symbols'][name],address)
+        for key in ('records','kind_readers','held_rig_actions','inventory_preview','room_rigs',
+                    'optional_selection','parent_readers','pocket_icons','catalogue','event_acquisition'):
+            self.assertEqual(self.e[key],self.old[key],key)
+        self.assertEqual(self.e['bytes'],self.old['bytes']);self.assertEqual(self.report['save_runtime'],self.prior['save_runtime'])
+        self.assertEqual(self.capture['logical_imports_added'],0)
+        self.assertEqual((self.capture['normal_radius'],self.capture['normal_span'],
+                          self.capture['golden_radius'],self.capture['golden_span']),(15,50,21,60))
+        self.assertTrue(self.capture['golden_net_geometry_installed'])
+
+    def test_ups_composition_and_unrelated_cartridge_resources(self):
+        import v3_optional_composition as composer
+        native=(ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes()
+        self.assertEqual(apply_ups(native,(NET_CAPTURE/'asset-loader.ups').read_bytes()),self.rom)
+        self.assertEqual(struct.unpack_from('>2I',self.rom,16),n64_checksum(self.rom))
+        for v in self.files.keys()-{BLOB,MODULE,actions.PLAYER_VROM,actions.PLAYER_RELOC}:
+            self.assertEqual(self.files[v].extract(self.rom),self.before[v].extract(self.base),hex(v))
+        pin=composer.BASE,composer.BASE_SHA,composer.REPORT_SHA,composer.ABI
+        try:
+            composer.use_build_lock(NET_CAPTURE/'build-lock.json');catalogue=composer.catalogue(self.rom,self.report)
+            self.assertEqual(len(catalogue),128)
+            self.assertEqual(sha256(composer.compose(self.rom,self.report,catalogue,composer.resolve(catalogue,[]))[0]),
+                             self.report['translation_baseline']['sha256'])
+            self.assertEqual(composer.compose(self.rom,self.report,catalogue,composer.resolve(catalogue,list(catalogue)))[0],self.rom)
+        finally:composer.BASE,composer.BASE_SHA,composer.REPORT_SHA,composer.ABI=pin
 
 
 @unittest.skipUnless((TRANSITIONS/'build-lock.json').is_file(),'Current tool transitions required')
@@ -408,6 +477,9 @@ class PocketIconTests(unittest.TestCase):
 
 class SelectionHostTests(unittest.TestCase):
     sanitized=shared_tests.HostTests.sanitized
+
+    def test_source_net_parameters(self):
+        self.sanitized('v3_tool_net_test.c')
 
     def test_shared_tool_motion_mapping(self):
         self.sanitized('v3_tool_motion_test.c')

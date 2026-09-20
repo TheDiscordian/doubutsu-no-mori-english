@@ -957,7 +957,56 @@ def held_collection(debug,rom_path,record):
         ordinary_gameplay_tested=False,catalogue_screen_tested=False,requires_checkpoint_restore=True)
 
 
-def tool_controls(debug,rom_path,record,*,transitions=False):
+def net_capture_cases(debug,record,actor,result,field,table,profile,owner_call,check):
+    """Analytical collision cases through the actual native candidate loop."""
+    def capture(name,span,points,winner=None,*,count=None,forced=0,diagonal=False):
+        top=(10.0,20.0,30.0)
+        end=(10.0+span*0.6,20.0,30.0+span*0.8) if diagonal else (10.0,20.0,30.0+span)
+        debug.write_memory(actor+0xE3C,struct.pack('>6f',*top,*end))
+        labels=[0x90000001+i for i in range(8)];types=bytes((254,127,3,4,5,6,7,8))
+        padded=points+[(1000.0,1000.0,1000.0,0.0)]*(8-len(points))
+        debug.write_memory(actor+0xE70,struct.pack('>8I',*labels)+types+
+            b''.join(struct.pack('>3f',*(p[i]+top[i] for i in range(3))) for p in padded)+
+            struct.pack('>8f',*(p[3] for p in padded))+
+            struct.pack('>iIB',len(points) if count is None else count,forced,128))
+        before=debug.read_memory(actor,0x13A0)
+        output=b'NETG'+bytes.fromhex('1234567855ABCDEF')+b'NETG'
+        debug.write_memory(result,output)
+        want=int(bool(forced) or winner is not None)
+        owner_call(0x808CC7E0,0x808CC988,[actor,result+4,result+8],want)
+        expected=output if not want else b'NETG'+struct.pack('>IB',forced or labels[winner],
+            128 if forced else types[winner])+bytes.fromhex('ABCDEF')+b'NETG'
+        check(name+' output and bounded stores',result,expected)
+        check(name+' immutable actor',actor,before)
+        record(dict(net_capture_case=name,span=span,candidates=len(points) if count is None else count,
+                    expected_winner=winner,forced_label=forced))
+    for item,kind in ((0x2200,1),(0x2239,45),(0x2239,46)):
+        if item==0x2239:debug.write_memory(table,struct.pack('>HbBHBB',item,kind,0,159,0x80,1))
+        debug.write_memory(field,struct.pack('>H',item))
+        golden=kind==46;span=60.0 if golden else 50.0;radius=21.0 if golden else 15.0
+        for name,x,z,rad,winner in (
+            ('inside',0.0,25.0,0.0,0),('radial boundary',radius,25.0,0.0,0),
+            ('outside radius',radius+0.25,25.0,0.0,None),
+            ('requested radius',radius+2.0,25.0,2.0,0),
+            ('outside requested radius',radius+2.25,25.0,2.0,None),
+            ('front cap',0.0,-1.0,2.0,0),('outside front cap',0.0,-3.0,2.0,None),
+            ('end cap',0.0,span+1.0,2.0,0),('outside end cap',0.0,span+3.0,2.0,None),
+            ('golden-only radius',18.0,25.0,0.0,0 if golden else None),
+            ('golden-only span',0.0,55.0,0.0,0 if golden else None)):
+            capture(f'kind {kind}: {name}',span,[(x,0.0,z,rad)],winner)
+        capture(f'kind {kind}: first qualifying candidate',span,[(radius+1,0,25,0),(0,0,25,0),(1,0,25,0)],1)
+        capture(f'kind {kind}: overlapping candidates',span,[(0,0,25,0),(0,0,30,0)],0)
+        capture(f'kind {kind}: eighth candidate',span,[(radius+1,0,25,0)]*7+[(0,0,25,0)],7)
+        capture(f'kind {kind}: diagonal span',span,[(span*0.3,0,span*0.4,0)],0,diagonal=True)
+    for count in (-1,0,9):capture('rejected count '+str(count),60.0,[(0,0,25,0)],count=count)
+    for count in (-1,0,8,9):
+        capture('forced before count '+str(count),60.0,[(1000,0,25,0)],count=count,forced=0x87654321)
+    profile[159]&=0x7F;debug.write_memory(0x80460020,profile)
+    capture('unselected golden kind cannot enlarge net',50.0,[(18,0,25,0)])
+    profile[159]|=0x80;debug.write_memory(0x80460020,profile)
+
+
+def tool_controls(debug,rom_path,record,*,transitions=False,capture=False):
     """Execute current cartridge input consumers with isolated equipment data."""
     from aflib import CODE_RAM,CODE_VROM
     import v3_equipment_runtime as equipment
@@ -1024,6 +1073,10 @@ def tool_controls(debug,rom_path,record,*,transitions=False):
         cases=((0x2201,0,0),(0x2200,1,1),(0x2203,34,34),(0x2202,35,35),
                (0x2239,44,0),(0x2239,46,1),(0x2239,88,34),(0x2239,90,35),
                (0x2239,91,2),(0x2239,107,2))
+        if capture:
+            if not actions.get('net_capture'):raise ValueError('Cartridge lacks golden net geometry')
+            cases=()
+            net_capture_cases(debug,record,actor,game+0x500,field,table,profile,owner_call,check)
         if transitions:
             cases=();debug.write_memory(0x8013767D,b'\0');debug.write_memory(0x80137908,b'\0')
             requests=((0x808CB32C,0x808CB39C,40),(0x808CC108,0x808CC178,43),
@@ -1080,13 +1133,15 @@ def tool_controls(debug,rom_path,record,*,transitions=False):
     for a,data in saved.items():check('restored selector/profile/input state',a,data)
     check('complete equipment module restored',equipment.RAM,module)
     check('no fault',0x8003CE34,bytes(4));check('translation guard',0x8019C8D0,bytes.fromhex('AF32C0DE')*4)
-    return dict(native_shared_tool_controls=not transitions,native_tool_transitions=transitions,
+    return dict(native_shared_tool_controls=not transitions and not capture,native_tool_transitions=transitions,
+        native_net_capture=capture,
         assertions=assertions,title_demo_input=bool(title),
         code_uploaded=False,synthetic_equipment_data=True,ordinary_gameplay_tested=False,
-        golden_effects_tested=False,flash_written=False,requires_checkpoint_restore=True)
+        golden_net_geometry_tested=capture,golden_effects_tested=False,flash_written=False,requires_checkpoint_restore=True)
 
 
 def exercise(debug, rom_path, record, *, section='automatic_furniture'):
+    if section=='net_capture':return tool_controls(debug,rom_path,record,capture=True)
     if section=='tool_transitions':return tool_controls(debug,rom_path,record,transitions=True)
     if section=='tool_recovery':return held_rig_actions(debug,rom_path,record,tools=True,recovery=True)
     if section=='tool_motion':return held_rig_actions(debug,rom_path,record,tools=True)

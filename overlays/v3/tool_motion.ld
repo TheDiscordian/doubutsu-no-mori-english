@@ -4,7 +4,7 @@ SECTIONS
 {
     . = 0x804A5A50;
     .text : { *(.text.af_v3_tool_action_setup) *(.text .text.*) }
-    .rodata : { *(.rodata .rodata.*) *(.af_tool_recovery) }
+    .rodata : { *(.rodata .rodata.*) *(.af_tool_recovery) *(.af_tool_net) }
     .data : { *(.data .data.*) }
     .bss (NOLOAD) : { *(.bss .bss.* COMMON) }
     ASSERT(. <= 0x804A6000, "Tool setup overlaps held parent readers")

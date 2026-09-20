@@ -18,8 +18,8 @@ served patchers retain their existing builds.
 
 ## Active development
 
-The current explicit ABI-131 proposal is
-`build/v3-shared-tool-transitions-01/build-lock.json`. All eight balloons are
+The current explicit ABI-132 proposal is
+`build/v3-shared-net-capture-01/build-lock.json`. All eight balloons are
 connected through the shared parent-category installer: official names/prices,
 complete pocket icons, held/inventory animation, source acquisition records,
 collection/catalogue, animated room profiles, indoor conversion, and inverse
@@ -54,7 +54,17 @@ Four focused checks pass; the first silent native run passes 255 records and
 hidden/unselected rejection, recovery loading, guards, checkpoint restore, and
 clean exit. Complete ordinary gameplay and appearance remain unverified.
 
-Next connect golden effects and complete inventory/parent/acquisition support.
+Golden-net capture uses the donor's 21/60 radius/span, while original and
+ordinary imported nets retain 15/50. Native collision math, requested-radius
+endpoint tolerance, candidate ordering, and forced-capture priority remain.
+Four focused checks pass; the first silent native run passes 244 records and
+179 assertions across 53 collision cases, bounds, immutable actor/save state,
+restored selectors, checkpoint restore, and clean exit. The 184-byte helper fits
+existing space without allocation/save changes. These are isolated component
+checks, not ordinary golden-net gameplay or hardware. See the
+[capture checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-golden-net-capture).
+
+Next connect golden-rod/shovel/axe effects and complete inventory/parent/acquisition support.
 The donor's balloon-loss-on-get-up path also remains an explicit shared behaviour
 dependency; it is not implemented by the net recovery adapter. Keep tool choices
 disabled. Continue from the current lock and retain completed evidence. See the
@@ -121,7 +131,7 @@ actual initialization/hand tracking/animation/drawing commands, matrix and memor
 guards, saved-state retention, checkpoint restoration, and clean exit. This is
 component execution, not GPU appearance, ordinary gameplay, or hardware proof.
 
-Use the ABI-131 lock above for continued work. Reuse the
+Use the ABI-132 lock above for continued work. Reuse the
 passing eight-vector player/inventory allocation evidence. The main lock and
 both patchers stay unchanged. See the
 [balloon-action checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-balloon-actions).

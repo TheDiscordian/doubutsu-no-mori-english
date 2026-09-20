@@ -76,7 +76,8 @@ SOURCES = ('tools/v3_player_actions.py','tools/v3_furniture_pipeline.py',
            'overlays/v3/held_rigs.c','overlays/v3/held_rigs.S',
            'overlays/v3/held_rigs.ld','overlays/v3/tool_controls.c',
            'overlays/v3/tool_motion.c','overlays/v3/tool_motion.S',
-           'overlays/v3/tool_motion.ld','overlays/v3/tool_recovery.c') + sound_programs.SOURCES
+           'overlays/v3/tool_motion.ld','overlays/v3/tool_recovery.c',
+           'overlays/v3/tool_net.c') + sound_programs.SOURCES
 
 SELECTION_OFFSET=0x5500
 PARENT_CODE_OFFSET,PARENT_TABLE_OFFSET=0x3000,0x57F0
@@ -85,6 +86,97 @@ RIG_CODE_OFFSET,RIG_MODULE_SIZE=0xD000,0xE000
 RIG_STATE_OFFSET,RIG_STATE_BYTES,RIG_PLAYER_SIZE=0x12D8,44,0x1310
 BALLOON_MODULE_SIZE,BALLOON_STATE_OFFSET,BALLOON_STATE_BYTES=0xF000,0x1370,48
 TOOL_MOTION_OFFSET=0x2A50
+
+
+def refresh_net_capture(base,prior,blob,core,original,output):
+    """Supply donor net dimensions to the complete retained collision math."""
+    from v3_npc_clothing import guard_incoming
+    old=prior['equipment_resources'];actions=old['player_actions'];start=old['blob_offset']
+    module=bytearray(blob[start:start+old['bytes']]);files=by_vrom(base)
+    owner=bytearray(files[PLAYER_VROM].extract(base));rel=files[PLAYER_RELOC].extract(base)
+    native=by_vrom(original)[PLAYER_VROM].extract(original)
+    if (not actions.get('tool_transitions') or actions.get('net_capture')
+            or sha256(module)!=old['sha256'] or sha256(owner)!=actions['owner_sha256']
+            or sha256(rel)!=actions['relocation_sha256']):
+        raise ValueError('Net capture requires the complete current tool transitions')
+    source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+                  (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    sources=[];consumers=[]
+    for offset,n,digest,first,last in (
+        (0x182CA8,668,'144f0249e072ebe54c985861097ed32f5640f974a4493a3ebd391d391261f101',0x808CC54C,0x808CC7B4),
+        (0x182F44,40,'15eb0377c725aae4077ab4a75d5de0c65d6297cabe93d0cb681940640a714c3c',0x808CC7B4,0x808CC7E0),
+        (0x182F6C,356,'ec2773e55897dfd576babcb3596fa8d7b475dc93eb5d5b6c5cf7a9552d982c18',0x808CC7E0,0x808CC988)):
+        raw,receipt=source.function(offset)
+        if len(raw)!=n or sha256(raw)!=digest:raise ValueError('Changed complete donor net capture')
+        a,b=first-PLAYER_RAM,last-PLAYER_RAM
+        if owner[a:b]!=native[a:b]:raise ValueError('Changed complete native net capture')
+        sources.append(receipt);consumers.append(dict(entry=first,end=last,sha256=sha256(owner[a:b])))
+    groups,absolute,rows,locations,_=native_references(owner,rel)
+    local=0x808CC54C
+    calls=[PLAYER_RAM+i for i in range(0,TEXT_SIZE,4)
+           if u32(owner,i) in (jump(local),jump(local,link=True))]
+    if (calls!=[0x808CC908] or local in absolute.values()
+            or any(target==local for lows in groups.values() for _,target in lows)):
+        raise ValueError('Local net capture no longer has one checked caller')
+    # The complete native loop has a 152-byte frame. Outgoing words 24/28 are
+    # unused; the local callee adds 144 and only writes its first four homes.
+    for first,last,forbidden in ((0x808CC7E0,0x808CC988,(24,28)),
+                                (0x808CC54C,0x808CC7B4,(168,172))):
+        for at in range(first-PLAYER_RAM,last-PLAYER_RAM,4):
+            w=u32(owner,at)
+            if w>>26>=32 and w>>21&31==29 and w&65535 in forbidden:
+                raise ValueError('Net parameter stack words already used')
+    previous=actions['tool_motion']['code'];at=TOOL_MOTION_OFFSET;n=previous['bytes']
+    if sha256(module[at:at+n])!=previous['sha256'] or any(module[at+n:PARENT_CODE_OFFSET]):
+        raise ValueError('Changed tool code or occupied net parameter space')
+    code,compiled=compile_part('tool_motion',output/'tool_motion',extra_sources=(
+        'overlays/v3/tool_motion.S','overlays/v3/tool_recovery.c','overlays/v3/tool_net.c'))
+    if (code[:n]!=module[at:at+n] or len(code)>PARENT_CODE_OFFSET-at
+            or any(compiled['symbols'].get(k)!=v for k,v in previous['symbols'].items())):
+        raise ValueError('Net parameters move existing tool code/constants')
+    instructions=(
+        # a1 is still the incoming label pointer: its removed reload is redundant.
+        (0x808CC820,(0x8FA5009C,jump(0x808CC7B4,link=True)),
+                      (0x27A70018,jump(compiled['symbols']['af_v3_net_parameters'],link=True))),
+        (0x808CC88C,(0x3C014248,0x44818000),(0xC7B0001C,0)), # span into f16
+        (0x808CC8A8,(0x3C01808E,),(0xC7B4001C,)),            # span into f20
+        (0x808CC8E8,(0xC434045C,),(0x4614A502,)),             # f20 = span squared
+        (0x808CC60C,(0x3C014170,0x44814000),(0xC7A800A8,0))) # radius seventh argument
+    if groups.get(0x808CC8A8-PLAYER_RAM)!=[(0x808CC8E8-PLAYER_RAM,0x808E045C)]:
+        raise ValueError('Net squared-span high half has another consumer')
+    removed=[locations[p-PLAYER_RAM] for p in (0x808CC824,0x808CC8A8,0x808CC8E8)]
+    if [r>>24 for r in removed]!=[0x44,0x45,0x46]:raise ValueError('Changed net parameter relocations')
+    windows=[(p-PLAYER_RAM,4*len(before)) for p,before,_ in instructions]
+    guard_incoming(owner,TEXT_SIZE,PLAYER_RAM,windows)
+    patches=[]
+    for address,before,after in instructions:
+        pos=address-PLAYER_RAM;n=4*len(before)
+        if struct.unpack_from('>'+str(len(before))+'I',owner,pos)!=before:
+            raise ValueError('Changed net parameter instruction')
+        if any(locations.get(i) not in removed for i in range(pos,pos+n,4) if i in locations):
+            raise ValueError('Unexpected net parameter relocation')
+        replacement=struct.pack('>'+str(len(after))+'I',*after)
+        patches.append(dict(address=address,before=owner[pos:pos+n].hex(),after=replacement.hex()))
+        owner[pos:pos+n]=replacement
+    kept=[r for r in rows if r not in removed];relocated=bytearray(rel)
+    struct.pack_into('>I',relocated,16,len(kept))
+    relocated[20:20+len(rows)*4]=struct.pack('>'+str(len(kept))+'I',*kept)+bytes(4*len(removed))
+    module[at:PARENT_CODE_OFFSET]=code+bytes(PARENT_CODE_OFFSET-at-len(code))
+    blob[start:start+len(module)]=module
+    report=copy.deepcopy(old);current=report['player_actions']
+    current.update(owner_sha256=sha256(owner),relocation_sha256=sha256(relocated),
+        removed_relocations=current['removed_relocations']+len(removed))
+    current['tool_motion']['code']=compiled
+    current['net_capture']=dict(format='AFV3-NET-CAPTURE-1',code=compiled,
+        source_functions=sources,native_consumers=consumers,patches=patches,removed_relocations=removed,
+        parameter_entry=compiled['symbols']['af_v3_net_parameters'],caller_frame_bytes=152,
+        local_frame_bytes=144,outgoing_parameter_offset=24,normal_radius=15,normal_span=50,
+        golden_kind=46,golden_radius=21,golden_span=60,candidate_limit=8,
+        native_math_retained=True,forced_capture_retained=True,candidate_order_retained=True,
+        golden_net_geometry_installed=True,logical_imports_added=0,ordinary_gameplay_tested=False)
+    report['player_motion'].update(owner_sha256=sha256(owner),reloc_sha256=sha256(relocated))
+    report.update(sha256=sha256(module),crc32=zlib.crc32(module))
+    return report,{PLAYER_VROM:bytes(owner),PLAYER_RELOC:bytes(relocated)}
 
 
 def refresh_tool_transitions(base,prior,blob,core,original,output):
@@ -1247,6 +1339,9 @@ def expanded_tables(source,owner,reloc,*,categories=CATEGORIES,native_count=NATI
 
 def install(base,prior,blob,core,original,output):
     old=prior.get('equipment_resources',{})
+    if (old.get('player_actions',{}).get('tool_transitions') and
+            not old['player_actions'].get('net_capture')):
+        return refresh_net_capture(base,prior,blob,core,original,output)
     if (old.get('player_actions',{}).get('tool_motion') and
             not old['player_actions'].get('tool_transitions')):
         return refresh_tool_transitions(base,prior,blob,core,original,output)

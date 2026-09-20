@@ -2,8 +2,8 @@
 
 ## Active: V3 optional GameCube imports
 
-The current explicit proposal is ABI 131,
-`build/v3-shared-tool-transitions-01/build-lock.json`. All eight balloons are
+The current explicit proposal is ABI 132,
+`build/v3-shared-net-capture-01/build-lock.json`. All eight balloons are
 connected through shared source-derived parent records, room profiles, indoor
 conversion/pickup, collection/catalogue, complete icons, and optional selection.
 There are 128 experimental choices, with 24 equipment parents. Neither served
@@ -36,15 +36,23 @@ restored state, and clean exit. Reuse this evidence; do not replay input/motion
 or transition fixtures without a changed consumer. See the
 [transition checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-net-transitions-and-tool-recovery).
 
-Next connect golden effects and inventory/parent consumers. Reuse the complete
-installed model/motion resources. Source golden-net capture is
-21/60 rather than 15/50; golden-rod consumers are in both ordinary and special
-fish actors; the shovel forwards a golden flag into digging effects. Those are
-real implementation dependencies, not reasons to enable ordinary-tool substitutes.
-The native net capture consumers are `808CC54C..808CC7B4` (local test) and
-`808CC7E0..808CC988` (candidate loop); source counterparts are REL text
-`182CA8` and `182F6C`. Preserve the native forced-capture path, candidate order,
-output labels/types, and ordinary geometry while adding the actual golden values.
+Golden-net radius/span 21/60 is connected through retained native collision math;
+ordinary nets remain 15/50. Four focused checks pass; the first silent native
+run passes 244 records/179 assertions, including 53 analytical collision cases,
+candidate ordering, forced catches, unchanged endpoint tolerance, invalid-count
+rejection, guards, state restoration, and clean exit. The 184-byte helper uses
+existing code space and two checked unused outgoing argument words. Reuse this
+evidence; do not replay completed input, motion, transition, or collision checks.
+See the [capture checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-golden-net-capture).
+
+Next connect golden-rod effects in both ordinary and special fish behaviours,
+then shovel effects and inventory/parent consumers. The source fishing tables
+keep detection distances unchanged; golden rods widen detection angles and
+lengthen bite windows. Both `ac_gyo_test.c` and `ac_gyo_kaseki.c` contain the same
+normal/golden dimensions. Resolve their actual native consumers and retain
+native time-step units; do not assume a distance increase or replace ordinary
+behaviour. The shovel forwards a golden flag into digging effects. These are
+actual dependencies, not reasons to enable ordinary-tool substitutes.
 Check axe wear and acquisition/demos against both games. Keep all tool choices
 disabled until the required gameplay, inventory, acquisition, and persistence
 consumers are connected. Do not replay the completed input checks for unchanged code.
@@ -120,7 +128,7 @@ Net/rod behaviour and golden-tool differences remain explicit. Resources do
 not enable these imports. See the
 [capacity checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-rig-capacity-and-resource-extension).
 
-Next work uses the explicit ABI-131 lock above. All eight pinwheels have shared
+Next work uses the explicit ABI-132 lock above. All eight pinwheels have shared
 parent readers, pocket artwork, collection/catalogue, existing event acquisition,
 and individual experimental selections. The full proposal has 128 choices;
 existing fans and fixed identities are retained. No per-item installers or
