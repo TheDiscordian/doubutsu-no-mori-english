@@ -58,8 +58,8 @@ int main(void) {
     }
     _Alignas(16) u8 opaque[1024],translucent[64];
     RoomRigGraphics gfx={0};RoomRigGame game={.gfx=&gfx};
-    for (u32 n=0;n<8;++n) {
-        memset(&guarded,0xA7,sizeof(guarded));actor->index=(u16)(1024+n);
+    for (u32 n=0;n<16;++n) {
+        memset(&guarded,0xA7,sizeof(guarded));actor->index=(u16)(1024+n%8+(n>=8 ? 1024 : 0));
         af_v3_room_rig_ct(actor,model);
         assert(actor->speed.f==0 && actor->target.f==.5f && actor->keyframe.current.f==1);
         unsigned initial=plays;float speed=0,target=.5f,frame=1;
@@ -87,7 +87,7 @@ int main(void) {
         for (u32 parity=0;parity<2;++parity)
             for (int i=5*64;i<10*64;++i)assert(actor->matrices[parity][i/64][i%64]==0xA7);
     }
-    assert(constructs==8 && draws==16);
+    assert(constructs==16 && draws==32);
     RoomRig before=*actor;
     unsigned drawn=draws;
     gfx.head=(RoomCommand *)opaque;gfx.tail=opaque+144;

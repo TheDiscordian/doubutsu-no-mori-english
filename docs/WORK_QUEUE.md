@@ -2,14 +2,15 @@
 
 ## Active: V3 optional GameCube imports
 
-The current explicit proposal is ABI 126,
-`build/v3-room-rigs-runtime-03/build-lock.json`. All eight complete room rigs,
-shared lifecycle callbacks, immutable descriptors, and fixed additive destination
-IDs are installed. The 44,400-byte batch reuses verified retired ROM space;
-existing resident allocations, live resources, and save formats stay unchanged.
-Four focused checks pass. The corrected silent native check passes full DMA,
-independent animation/switch response, full drawing commands, guards, and restored
-checkpoint. Balloons remain unselectable until parent integration is complete.
+The current explicit proposal is ABI 127,
+`build/v3-room-parent-category-06/build-lock.json`. All eight balloons are
+connected through shared source-derived parent records, room profiles, indoor
+conversion/pickup, collection/catalogue, complete icons, and optional selection.
+There are 128 experimental choices, with 24 equipment parents. Ten focused checks
+pass. The first combined silent native check passes 216 records/151 assertions,
+including all parent conversions/order, four complete catalogue models, animated
+initialization, seven pocket-icon cases, register/memory guards, retained state,
+and checkpoint restoration. Neither served V2 patcher or main lock changes.
 
 All eight balloon inventory
 previews have their actual idle animation and reflection drawer. Three focused
@@ -24,15 +25,15 @@ all eight six-joint/five-list models and their 61-frame animations, totalling
 44,400 bytes. Four category checks, four shared pipeline checks, and seventeen
 affected held/keyframe checks pass. Reuse these assets without reconversion.
 
-Next complete shared parent-category integration. Balloons use room furniture
-on indoor placement, unlike fans and pinwheels. Source `1FF0..1FFC` has fixed
-additive destinations `3C00..3C0C`; source catalogue positions must remain
-distinct from these destination indices. Extend the existing complete-category
-installer to reuse installed room assets, build callback-bearing profiles,
-register forward room conversion, and retain inverse pickup/collection readers.
-Preserve existing parent records and selections. Do not expose balloons or
-substitute static catalogue models before these consumers are ready.
-See the [runtime checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-room-rig-runtime).
+Next run a bounded ordinary balloon acquisition/equip/room-placement/pickup/save
+pass using an isolated matching profile. Retain component evidence; do not
+reconvert artwork, add per-item scripts, or replay old builds. Continue remaining
+net/rod/golden-tool action categories if an ordinary navigation fixture reaches
+its setup limit. A concrete crash or memory/save defect remains a blocker.
+The unserved export is `build/v3-room-parent-browser-01/`; the actual worker
+matches offline empty/all/mixed/equipment outputs and passes cancellation and
+invalid-input checks. Full-interface and original-hardware acceptance remain separate.
+See the [parent checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-animated-room-parent-category).
 
 Shared balloon setup, hand delta,
 two-substep sway/spring animation, reflected drawing, and transient player state
@@ -41,12 +42,10 @@ are installed. Five focused checks pass; the first silent native run passes
 drawing commands, guards, saved-state retention, and checkpoint restoration.
 Reuse this component evidence; ordinary appearance/gameplay remain unverified.
 
-Continue through the existing shared parent-category expansion,
-catalogue/collection, and optional composers after room support. Preserve the
-pinwheel initializer's special speed and original tool timing. Balloons remain
-unselectable until their dependent readers are installed. No new per-item script
-or repeated held-resource conversion is needed. The explicit proposal has 120 choices, format-2
-saves, exact V2-12 no-import output, and a 60-KiB equipment module.
+Preserve the pinwheel initializer's special speed, original tool timing,
+format-2 saves, exact V2-12 no-import output, and the 60-KiB equipment module.
+New balloon profile bits require a matching or larger profile. Older profiles
+lacking these imports reject their saves; imported saves must not be used in V2.
 
 Inventory has eight-vector joint/morph arrays with matching BSS/owner/pool
 allocation. Its four focused checks and silent 99-record/83-assertion native

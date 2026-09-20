@@ -5,7 +5,8 @@ import zlib
 
 from aflib import CODE_RAM, CODE_VROM, by_vrom, sha256
 from v3_asset_loader import ROOT, compile_part
-from v3_furniture_pipeline import Source
+from v3_furniture_pipeline import Source,furniture_source_index
+from v3_registry import furniture_representation_identity
 from v3_handheld_items import parent_records
 from v3_room_aliases import discover
 from v3_equipment_runtime import RAM
@@ -50,20 +51,23 @@ def source_records(source,equipment):
     by_parent={a['parent_item_id']:a for a in aliases['rows']}
     rows=[]
     for parent in parents['rows']:
-        alias=by_parent[parent['item_id']];item=int(alias['display_item_id'],16)
-        index=1024+((item-0x3000)>>2)
+        alias=by_parent[parent['item_id']];source_item=int(alias['display_item_id'],16)
+        source_index=furniture_source_index(source_item)
+        index,item=furniture_representation_identity(source_item)
         membership=[dict(category=t['category'],category_index=t['category_index'],
-            source_symbol=t['symbol'],position=t['indices'].index(index)) for t in lists
-            if t['category'] not in ('wall','carpet','paper','music') and index in t['indices']]
-        if (alias['context_outputs']['collection_record']!=[parent['display_item_id']] or
-                alias['context_outputs']['collection_check']!=[parent['display_item_id']] or
-                alias['context_outputs']['room_placement']!=[parent['item_id']] or
+            source_symbol=t['symbol'],position=t['indices'].index(source_index)) for t in lists
+            if t['category'] not in ('wall','carpet','paper','music') and source_index in t['indices']]
+        room_display=alias['room_placement_uses_display']
+        if (alias['context_outputs']['collection_record']!=[alias['display_item_id']] or
+                alias['context_outputs']['collection_check']!=[alias['display_item_id']] or
+                alias['context_outputs']['room_placement']!=[alias['display_item_id'] if room_display else parent['item_id']] or
+                parent['display_item_id']!=f'{item:04X}' or
                 parent['profile_byte']!=32+((item&0xFFF)>>5) or
                 parent['profile_mask']!=1<<(((item&0xFFF)>>2)&7) or len(membership)!=1):
             raise ValueError('Unreviewed parent collection or catalogue context')
         rows.append(dict(item_id=parent['item_id'],display_item_id=parent['display_item_id'],
             runtime_index=index,profile_byte=parent['profile_byte'],profile_mask=parent['profile_mask'],
-            catalogue=membership[0],room_drop_item_id=parent['item_id']))
+            catalogue=membership[0],room_drop_item_id=f'{item:04X}' if room_display else parent['item_id']))
     return table,dict(format='AFV3-HELD-COLLECTION-1',rows=rows,
         source_contexts=aliases['contexts'],source_lists=lists,
         source_catalogue_constructor=source.function(0x25BB84)[1],

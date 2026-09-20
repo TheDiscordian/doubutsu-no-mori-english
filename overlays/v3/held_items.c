@@ -69,7 +69,11 @@ const u32 *af_v3_held_item_icon(u32 item) {
     if (!find(item) || icons[0]!=0x41464943u || icons[1]!=1u ||
             icons[2]!=56u || icons[3]!=8u) return 0;
     const u32 *row=icons+4+2*(item-0x2224u);
-    if (row[0]<0x804A69D0u || row[0]>0x804A6FE0u || (row[0]&7u) ||
+    int palette_ok=row[0]>=0x804A69D0u && row[0]<=0x804A6FE0u;
+#ifdef AF_V3_POCKET_ICON_PALETTES
+    palette_ok=palette_ok || row[0]-0x804A67A0u<=64u;
+#endif
+    if (!palette_ok || (row[0]&7u) ||
         row[1]<0x804A69D0u || row[1]>0x804A6E00u || (row[1]&7u)) return 0;
     return row;
 }

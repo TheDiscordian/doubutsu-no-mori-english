@@ -106,6 +106,12 @@ equipment categories in one refresh. It verifies and retains all existing parent
 identities, rebuilds the selection/name/price/icon/collection tables, appends only
 missing prepared catalogue models, and extends the experimental profile. No
 per-item installer, repeated first-install stages, or new action code is needed.
+Animated room categories reuse their already installed complete resources.
+Source catalogue indices remain separate from fixed N64 destination indices;
+the older donor range does not reuse native furniture. Shared sparse profiles
+bind the room vtable, and the forward alias index includes only categories whose
+donor room placement really converts the parent. Inverse pickup and collection
+continue to share one parent selection and one saved ownership bit.
 The source-derived inventory bindings must already match. See
 [category expansion](V3_HANDHELD_ITEMS.md#shared-parent-category-expansion).
 `--refresh-runtime --held-selection` prepares the full experimental parent profile
@@ -491,7 +497,8 @@ their held models. The retained source behaviour starts at zero speed, approache
 per native update, consuming the switch pulse once. Complete prepared assets are
 4,656 or 7,040 bytes each and fit the existing 9,216-byte room bank. They require
 44,400 bytes of ROM storage together. Context-correct placement/pickup and
-profile/collection readers remain required. The ordinary installer rejects
+profile/collection readers come from the shared parent-category adapter, not
+asset preparation. The ordinary installer rejects
 prepared data and unsupported animated lifecycle metadata. See the
 [conversion checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-indexed-room-rig-preparation).
 
@@ -514,10 +521,22 @@ checking opaque and translucent command capacity before submission.
 Registry version one reserves source `1FF0/1FF4/1FF8/1FFC` as destination
 `3C00/3C04/3C08/3C0C`, beyond the complete `3800..3BFC` garment range. Source
 `3000..300C` retains its canonical destinations. These fixed reservations do not
-install profiles, set save-profile bits, or create selectable imports. Category
-integration must connect the real parent, catalogue membership, room conversion,
-and inverse pickup before enabling these records. See the
+install profiles, set save-profile bits, or create selectable imports. The
+parent-category refresh connects those consumers before enabling records. The
+same lifecycle lookup handles a real catalogue actor's index, which is 1024
+above its imported room index; the native catalogue retains its own animation
+update and preview timing. See the
 [runtime checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-room-rig-runtime).
+
+Three complete pocket-icon families use the existing descriptor/texture area
+and a checked 96-byte palette bank at `804A67A0..804A67FF`. All original palette
+and texture bytes survive. Parent code ends before the palette bank; the reader
+accepts only complete palettes in that bank or its original range, and textures
+remain inside the original range. A shared reader refresh preserves fixed public
+entries and updates the actual menu hook if the private assembly entry moves.
+No resident allocation grows. Catalogue rebuilding retains the verified
+inventory-work pool increase and accounts for it in both required and reserved
+memory, instead of replacing a newer menu allocation with the stable baseline.
 
 The `switch-palette-fade` category discovers the complete shared building-model
 callbacks. It checks all four compiled functions, normalising only verified

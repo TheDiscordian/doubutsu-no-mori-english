@@ -275,10 +275,24 @@ def install_catalogue(base, stable, prior, imports, output, rel, symbols, *, wes
         clothing=(cloth, clothes), expanded=True,handheld=handheld)
     rebuilt_code = changes.pop(CODE_VROM)
     current_code = files[CODE_VROM].extract(base)
+    retained_inventory=prior.get('equipment_resources',{}).get('inventory_preview',{}).get('joint_work',{})
+    retained_pool=None
     for address in (0x800C4AFC, 0x800C4B10):
         at = address - CODE_RAM
         if rebuilt_code[at:at + 4] != current_code[at:at + 4]:
-            raise ValueError('Garden catalogue unexpectedly changes menu allocation')
+            patch=retained_inventory.get('pool_patch',{})
+            if (patch.get('address')!=address or retained_inventory.get('additional_pool_bytes')!=64 or
+                    struct.unpack_from('>I',rebuilt_code,at)[0]!=patch.get('before') or
+                    struct.unpack_from('>I',current_code,at)[0]!=patch.get('after') or
+                    patch['after']-patch['before']!=64):
+                raise ValueError(f'Catalogue allocation mismatch at {address:08X}: rebuilt '
+                    f'{rebuilt_code[at:at+4].hex()}, current {current_code[at:at+4].hex()}, '
+                    f'expected retained inventory {patch}')
+            retained_pool=copy.deepcopy(patch)
+    if retained_pool:
+        report['conservative_pool_required']+=64
+        report['pool_reserved']+=64
+        report['retained_inventory_pool_patch']=retained_pool
     report['linked_code'] = compiled
     report['code'] = {**compiled, 'symbols': {k: shifted(v) for k, v in compiled['symbols'].items()},
                      'sha256': sha256(changes[catalogue.VROM][catalogue.SIZE + GROWTH:])}

@@ -62,12 +62,18 @@ def profile(row, vrom):
     adapter=row.get('profile',{}).get('callback_adapter',{})
     fading = adapter.get('category') == 'switch-palette-fade'
     sequence = adapter.get('category') == 'constant-model-sequence'
-    layers = tuple(adapter['model_order']) if fading or sequence else LAYERS
+    rigged = adapter.get('category') == 'indexed-switch-rig'
+    layers = tuple(offsets) if rigged else tuple(adapter['model_order']) if fading or sequence else LAYERS
     if (not 0 < n <= 9216 or n%16 or vrom%16 or vrom+n > END or len(scalar) != 16
             or not offsets or set(offsets)-set(layers) or (fading or sequence) and set(offsets)!=set(layers)
             or any(type(at) is not int or at%8 or not 0 <= at <= n-8 for at in offsets.values())):
         raise ValueError('Invalid complete native object/profile bounds')
     pointers = [0x06000000+offsets[k] if k in offsets else 0 for k in LAYERS]
+    if rigged:
+        from v3_room_rig_runtime import VTABLE
+        if row.get('room_runtime')!={'vtable':VTABLE,'vrom':vrom} or len(offsets)!=row['profile']['skeleton']['shown_joints']:
+            raise ValueError('Animated profile requires its complete installed room lifecycle')
+        pointers=[0,0,0,0]
     if sequence:
         linked=row['draw_sequence'];at=linked['native_offset']
         if (linked['model_offsets']!=offsets or linked['arena']!='opaque' or
@@ -75,7 +81,7 @@ def profile(row, vrom):
             raise ValueError('Invalid static model sequence bounds')
         pointers=[0x06000000+at,0,0,0]
     return (struct.pack('>12I', vrom, vrom+n, 0x06000000, 0x06000000+n, *pointers, 0,0,0,0)+scalar+
-            struct.pack('>I',palette_fade.VTABLE if fading else 0))
+            struct.pack('>I',VTABLE if rigged else palette_fade.VTABLE if fading else 0))
 
 
 def catalogue_record(row):
@@ -471,6 +477,8 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         import v3_translation_updates as translation
         display_report,alias_report=prior['clothing']['display'],prior['display_aliases']
         owner_changes,report_updates=translation.install(base,prior,module,output)
+    elif held_catalogue_art is not None:
+        display_report,alias_report=prior['clothing']['display'],prior['display_aliases']
     else:
         display_report,alias_report=display_aliases.install(prior,blob,core,output,held_items=parent_readers,
             held_collection=held_collection)
@@ -511,6 +519,9 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         import v3_held_catalogue as equipment
         equipment_report,owner_changes,report_updates=equipment.select_installed(prior,blob)
     if equipment_report:
+        if held_catalogue_art is not None:
+            display_report,alias_report=display_aliases.install(
+                {**prior,**report_updates,'equipment_resources':equipment_report},blob,core,output)
         if equipment_report.get('parent_readers'):
             attribution=provenance_patch(equipment_report['parent_readers']['rows'])
             if attribution:write_new(output/'provenance.patch',attribution.encode())

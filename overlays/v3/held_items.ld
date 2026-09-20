@@ -19,7 +19,7 @@ SECTIONS
     .rodata : { *(.rodata .rodata.*) }
     .data : { *(.data .data.*) }
     .bss (NOLOAD) : { *(.bss .bss.* COMMON) }
-    ASSERT(. <= 0x804A6800, "Held parent readers overlap pocket icon resources")
+    ASSERT(. <= 0x804A67A0, "Held parent readers overlap pocket icon palettes")
     ASSERT(SIZEOF(.data) == 0 && SIZEOF(.bss) == 0, "Unexpected held parent state")
     /DISCARD/ : { *(.comment .note.* .reginfo .MIPS.abiflags .pdr .gnu.attributes) }
 }

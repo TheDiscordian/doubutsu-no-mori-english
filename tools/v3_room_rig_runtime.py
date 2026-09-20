@@ -144,3 +144,23 @@ def install(base,prior,blob,core,original,output,directory):
     report.update(sha256=sha256(module),crc32=zlib.crc32(module),additional_resident_bytes=0)
     blob[start:start+len(module)]=module
     return report,{}
+
+
+def refresh_code(equipment,blob,output):
+    """Retain full room resources while connecting an additional native consumer."""
+    runtime=equipment['room_rigs'];old=runtime['code'];start=equipment['blob_offset']
+    module=bytearray(blob[start:start+equipment['bytes']]);at=RAM-EQUIPMENT_RAM
+    if (sha256(module)!=equipment['sha256'] or sha256(module[at:at+old['bytes']])!=old['sha256'] or
+            any(module[at+old['bytes']:TABLE-EQUIPMENT_RAM]) or
+            module[VTABLE-EQUIPMENT_RAM:VTABLE-EQUIPMENT_RAM+20]!=bytes.fromhex(runtime['vtable_hex'])):
+        raise ValueError('Changed complete installed room lifecycle reservation')
+    code,compiled=compile_part('room_rigs',output/'room_rigs')
+    entries=[compiled['symbols']['af_v3_room_rig_'+role] for role in ('ct','mv','dw')]
+    if len(code)>TABLE-RAM or any(p&3 or not RAM<=p<RAM+len(code) for p in entries):
+        raise ValueError('Changed room lifecycle bounds')
+    table=struct.pack('>5I',*entries,0,0)
+    module[at:TABLE-EQUIPMENT_RAM]=code+bytes(TABLE-RAM-len(code))
+    module[VTABLE-EQUIPMENT_RAM:VTABLE-EQUIPMENT_RAM+20]=table
+    runtime.update(code=compiled,vtable_hex=table.hex(),catalogue_index_supported=True)
+    equipment.update(sha256=sha256(module),crc32=zlib.crc32(module))
+    blob[start:start+len(module)]=module

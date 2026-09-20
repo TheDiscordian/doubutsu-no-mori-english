@@ -2,6 +2,9 @@
 #include "room_rigs.h"
 
 static const RoomRigRecord *find(u32 index) {
+    /* Catalogue actors retain the catalogue's index, 1024 above the room
+       index for imported furniture. Both contexts use the same full model. */
+    if (index>=2048u && index<3072u) index-=1024u;
     if (room_rig_table->magic!=ROOM_RIG_MAGIC || room_rig_table->count>ROOM_RIG_CAPACITY ||
             room_rig_table->stride!=sizeof(RoomRigRecord) || room_rig_table->reserved) return 0;
     for (u32 i=0;i<room_rig_table->count;++i) {

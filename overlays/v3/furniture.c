@@ -243,6 +243,10 @@ int af_v3_furniture_import_dma(u32 argument, u32 item, u32 bank, int bank_index)
          * No item identity or theme determines its DMA behaviour. */
         if (row->profile[16] == 0x80483720u) complete_object_callback = 1;
 #endif
+#ifdef AF_V3_ROOM_RIGS
+        /* Shared complete model/skeleton/motion objects have no custom DMA. */
+        if (row->profile[16] == 0x804B1FA0u) complete_object_callback = 1;
+#endif
         if (!complete_object_callback) return 0;
     }
     if (dma((void *)(uptr)bank, row->profile[0], size)) return 0;

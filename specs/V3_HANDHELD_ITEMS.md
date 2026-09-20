@@ -948,46 +948,52 @@ not make the complete handheld item selectable or playable.
 
 `--refresh-runtime --held-catalogue-art` also extends an already installed parent
 catalogue. `selection_records` carries explicit implemented source categories:
-23 for fans and 22 for pinwheels. Old receipts without the field retain category
+23 for fans, 22 for pinwheels, and 21 for balloons. Old receipts without the field retain category
 23. Adding category 22 requires installed rig resources, actions, loop sound,
-and animated inventory previews. The complete source aliases must agree with
+and animated inventory previews. Category 21 additionally requires complete held,
+reflected inventory, and animated room rigs. The complete source aliases must agree with
 every installed kind; missing variants, changed identities, occupied slots,
 missing dependencies, and mismatching resource hashes reject the refresh.
 
 The shared refresh regenerates the bounded `AFHS`, `AFHI`, and `AFIC` tables,
-retaining existing records and all runtime code. Eight pinwheel parent IDs
+retaining existing identities and unchanged action/preview code. Eight pinwheel parent IDs
 `224C..2253` use native kinds `99..106` and display IDs `316C..3188`.
-Names and prices come from the complete official tool tables. Both icon
-categories share the existing 2,048-byte reservation; the complete converted
-bundle occupies 1,568 bytes. Source credits for all names live in the single
+Eight balloon parents `2244..224B` use native kinds `91..98`; four source room
+representations map to reserved destinations `3C00..3C0C`, and four retain
+`3000..300C`. Names and prices come from the complete official tool tables.
+Three icon categories use 2,016 bytes in the existing descriptor/texture area
+and 96 bytes in a checked palette reservation immediately before it. Source
+credits for all names live in the single
 provenance catalogue. Existing preview records are deduplicated and must match
 their installed model/animation/callback bindings exactly.
 
-Collection contexts retain parent IDs for ordinary drops and display IDs for
-ownership. Only new catalogue models are appended; existing fan model locations,
-profiles, metadata, and selection bits stay intact. The native umbrella page
-has 32 original rows plus 16 selected-parent candidates in donor order.
-Rebuilding its complete owner gives 62,928 loaded bytes and 736 relocation
-bytes. Conservative pool accounting is 280,576 of 280,704 reserved bytes.
-The 56-KiB equipment module and native banks do not grow.
+Fans and pinwheels retain parent IDs for ordinary drops; balloons use their
+actual animated room forms. Collection always uses the source-proven display
+identity, with mapped native destinations kept separate from donor list indices.
+Only missing catalogue models are appended; installed complete room models are
+reused. Existing profiles, metadata, and selection bits stay intact. The native
+umbrella page has 32 original rows plus 24 selected-parent candidates in donor
+order. Conservative pool accounting is 280,640 of 280,768 reserved bytes,
+retaining the existing inventory-work increase. The 60-KiB equipment module and
+native banks do not grow.
 
 Existing event code offers selected pinwheels at the donor's 680-Bell price.
 Parent metadata prices remain independent of that event price. Category stock
 contains only selected variants and preserves sold-out state and original wares.
 Offline/browser choices derive from the same installed parents, never their
-catalogue representations. The full explicit proposal has 120 experimental
+catalogue representations. The full explicit proposal has 128 experimental
 choices; imports remain optional, and empty selection gives exact V2-12.
 Neither served patcher changes.
 
-Save format 2 remains unchanged. Adding these eight profile bits allows old
+Save format 2 remains unchanged. Adding a category's fixed profile bits allows old
 compatible profiles to load into a matching or larger profile; builds lacking
 required bits reject the save. Removing imports is not migration, and imported
-V3 saves must not be loaded in V2. Ordinary pinwheel gameplay, cross-version
+V3 saves must not be loaded in V2. Ordinary equipment gameplay, cross-version
 game saves, and hardware are separate from code/codec/component checks.
 The seasonal copy/return routines have passing focused component evidence;
 full seasonal rendering and ordinary gameplay remain open. See the
 [diagnosis](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#seasonal-setter-copy-diagnosis)
-and [category checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-parent-category-expansion).
+and [category checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-animated-room-parent-category).
 
 ## Shared parent names and prices
 

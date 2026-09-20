@@ -8,7 +8,7 @@ import struct
 
 from aflib import CODE_RAM, sha256
 from v3_asset_loader import compile_part, ROOT
-from v3_import_storage import ITEMS, ITEMS_RAM, PACKAGE, PACKAGE_RAM, slot, replace_checked, jump
+from v3_import_storage import ROWS, ROWS_RAM, ITEMS, ITEMS_RAM, PACKAGE, PACKAGE_RAM, slot, replace_checked, jump
 
 RAM, LIMIT, CAPACITY, MAGIC = 0x804A0010, 0x804A0100, 58, 0x41464431
 OFFSET = PACKAGE+RAM-PACKAGE_RAM
@@ -43,6 +43,27 @@ def records(prior, blob):
             runtime_index=index,category='clothing',native_footprint_item='17AC',
             profile_ram=row['profile_ram'],metadata_ram=f'{ITEMS_RAM+slot(item)*32:08X}',
             parent_source=copy.deepcopy(parent),independently_selectable=False))
+    equipment=prior.get('equipment_resources',{})
+    parents={r['item_id']:r for r in equipment.get('parent_readers',{}).get('rows',[])}
+    collected={r['item_id']:r for r in equipment.get('collection',{}).get('rows',[])}
+    rigs={r['parent_item_id']:r for r in equipment.get('room_rigs',{}).get('rows',[])}
+    for row in equipment.get('catalogue',{}).get('imports',[]):
+        parent=parents[row['parent_item_id']];collection=collected[parent['item_id']]
+        if collection['room_drop_item_id']!=collection['display_item_id']:continue
+        rig=rigs[parent['item_id']];item=int(row['item_id'],16);index=row['runtime_index']
+        at=ROWS+slot(item)*80;vtable=equipment['room_rigs']['vtable']
+        if (row['item_id']!=parent['display_item_id'] or row['item_id']!=rig['item_id'] or
+                row['runtime_index']!=rig['runtime_index'] or index!=1024+slot(item) or
+                not row.get('room_placement_uses_display') or row['callback_vtable']!=vtable or
+                struct.unpack_from('>HHI',blob,at)!=(index,item,1) or
+                struct.unpack_from('>2I',blob,at+72)!=(vtable,1) or
+                row['profile_ram']!=f'{ROWS_RAM+slot(item)*80+8:08X}' or
+                sha256(blob[at+8:at+76])!=row['profile_sha256']):
+            raise ValueError('Changed complete room-rig alias dependency')
+        result.append(dict(parent_item_id=parent['item_id'],display_item_id=row['item_id'],
+            runtime_index=index,category='animated-room',native_footprint_item='0000',
+            profile_ram=row['profile_ram'],metadata_ram=f'{ITEMS_RAM+slot(item)*32:08X}',
+            parent_source=copy.deepcopy(parent),independently_selectable=False))
     return sorted(result,key=lambda r:r['parent_item_id'])
 
 
@@ -72,8 +93,10 @@ def install(prior, blob, core, output, *, held_items=False, held_collection=Fals
     previous=prior.get('display_aliases')
     display=copy.deepcopy(prior['clothing']['display'])
     if previous:
-        if (previous['rows']!=rows or previous['table_sha256']!=sha256(table)
-                or blob[OFFSET:OFFSET+len(table)]!=table):
+        old_table,_=encode(previous['rows']);new_rows={r['parent_item_id']:r for r in rows}
+        if (any(new_rows.get(r['parent_item_id'])!=r for r in previous['rows']) or
+                previous['table_sha256']!=sha256(old_table) or
+                blob[OFFSET:OFFSET+len(old_table)]!=old_table):
             raise ValueError('Changed installed alias records/table')
     elif any(blob[OFFSET:OFFSET+len(table)]):
         raise ValueError('Alias index overlaps occupied package bytes')
@@ -94,7 +117,10 @@ def install(prior, blob, core, output, *, held_items=False, held_collection=Fals
     if (previous and display['readers'].get('held_parent_readers',False)==held_items
             and display['readers'].get('held_collection',False)==held_collection
             and all(prior['sources'].get(p)==sha256((ROOT/p).read_bytes()) for p in SOURCES)):
-        return display,copy.deepcopy(previous)
+        report=copy.deepcopy(previous)
+        report.update(rows=rows,table_sha256=sha256(table))
+        if previous['rows']!=rows:report['native_test']='pending expanded room conversion/readers'
+        return display,report
 
     parts={}
     for part,at,end,old in (

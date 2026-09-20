@@ -20,7 +20,10 @@ SOURCES=('tools/v3_held_catalogue.py','tools/v3_held_collection.py',
     'overlays/v3/furniture_tables.c','overlays/v3/catalogue.c',
     'overlays/v3/catalogue.ld','overlays/v3/catalogue_bridge.S')
 SOURCES+=('tools/v3_handheld_items.py','tools/v3_inventory_equipment.py',
-    'tools/v3_room_aliases.py','tools/v3_player_actions.py')
+    'tools/v3_room_aliases.py','tools/v3_player_actions.py','tools/v3_registry.py',
+    'tools/v3_room_rig_runtime.py','overlays/v3/held_items.c','overlays/v3/held_items.ld',
+    'overlays/v3/held_icon.S','overlays/v3/room_rigs.c','overlays/v3/room_rigs.h',
+    'overlays/v3/room_rigs.ld')
 
 
 def select_installed(prior,blob,*,extend=False):
@@ -108,10 +111,19 @@ def refresh_parents(source,equipment,blob):
     for key,value in parents.items():
         if key not in ('collection_installed','acquisition_installed'):retained[key]=value
     module[retained['table_offset']:retained['table_offset']+len(table)]=table
-    icons,icon_report=pocket_icons(source,report,old['pocket_icons']['ram'],TABLE_OFFSET-POCKET_ICON_OFFSET)
+    icons,icon_report=pocket_icons(source,report,old['pocket_icons']['ram'],TABLE_OFFSET-POCKET_ICON_OFFSET,
+        palette_address=0x804A67A0 if 21 in categories else None)
     if any(module[POCKET_ICON_OFFSET+len(old_icons):TABLE_OFFSET]):
         raise ValueError('Occupied shared pocket-icon expansion space')
     module[POCKET_ICON_OFFSET:TABLE_OFFSET]=icons+bytes(TABLE_OFFSET-POCKET_ICON_OFFSET-len(icons))
+    if icon_report.get('palette_bank'):
+        bank=icon_report['palette_bank'];at=bank['ram']-0x804A3000
+        previous=old['pocket_icons'].get('palette_bank')
+        expected=bytes.fromhex(previous['data_hex']).ljust(bank['capacity'],b'\0') if previous else bytes(bank['capacity'])
+        if (0x3000+old['parent_readers']['code']['bytes']>at or
+                module[at:at+bank['capacity']]!=expected):
+            raise ValueError('Pocket palettes overlap parent code or occupied bytes')
+        module[at:at+bank['capacity']]=bytes.fromhex(bank['data_hex']).ljust(bank['capacity'],b'\0')
     report['pocket_icons'].update(icon_report)
     _,collection=source_records(source,report)
     report['collection'].update(collection)
@@ -130,7 +142,7 @@ def refresh_parents(source,equipment,blob):
     return report
 
 
-def assets(source,equipment,directory):
+def assets(source,equipment,directory,blob=None):
     """Check the prepared complete assets; never run another graphics compiler."""
     directory=directory.resolve();raw=(directory/'art.json').read_bytes();art=json.loads(raw)
     if (art['format']!='AFV3-AUTO-FURNITURE-PREPARED-ASSETS-1' or
@@ -142,10 +154,33 @@ def assets(source,equipment,directory):
         raise ValueError('Changed installed collection contexts')
     by_id={r['item_id']:r for r in art['objects']}
     if len(by_id)!=len(art['objects']):raise ValueError('Duplicate prepared representation')
-    prepared=[]
+    prepared=[];room_rows={};room_art={}
+    if any(r['room_drop_item_id']==r['display_item_id'] for r in discovered['rows']):
+        from v3_room_rig_runtime import prepared as prepared_rigs
+        runtime=equipment['room_rigs']
+        checked,room_art,receipt=prepared_rigs(source,ROOT/runtime['source']['directory'])
+        if receipt!=runtime['source'] or blob is None:
+            raise ValueError('Missing checked installed room-rig resources')
+        for row in runtime['rows']:
+            original=next(r for r in checked if r['source_item_id']==row['source_item_id'])
+            data=room_art[row['source_item_id']];at=row['blob_offset']
+            if ({k:row[k] for k in original}!=original or row['vrom']!=BLOB+at or
+                    blob[at:at+len(data)]!=data):
+                raise ValueError('Changed installed complete room-rig resource')
+            room_rows[row['parent_item_id']]=row
     for parent in discovered['rows']:
         if parent['catalogue']['category']!='umbrella':
             raise ValueError('Unimplemented parent catalogue category')
+        if parent['room_drop_item_id']==parent['display_item_id']:
+            installed=room_rows[parent['item_id']]
+            if (installed['item_id']!=parent['display_item_id'] or
+                    installed['runtime_index']!=parent['runtime_index']):
+                raise ValueError('Changed room parent/destination identity')
+            row=copy.deepcopy(installed['source'])
+            row.update(source_item_id=installed['source_item_id'],item_id=installed['item_id'],
+                room_runtime=dict(vtable=runtime['vtable'],vrom=installed['vrom']))
+            prepared.append((parent,row,room_art[installed['source_item_id']]))
+            continue
         row=by_id[parent['display_item_id']]
         descriptor,body,resources,_,models,commands,sections=prepare(source,int(row['item_id'],16))
         path=(directory/row['object_file']).resolve()
@@ -207,11 +242,15 @@ def install_profiles(blob,prepared,retained=()):
         if (index!=1024+i or any(blob[ROWS+i*80:ROWS+(i+1)*80]) or
                 any(blob[ITEMS+i*32:ITEMS+(i+1)*32]) or blob[32+i//8]&(1<<(i&7))):
             raise ValueError('Parent representation collides with an installed identity')
-        blob.extend(bytes(-len(blob)%16));vrom=BLOB+len(blob);blob.extend(asset)
+        if row.get('room_runtime'):
+            vrom=row['room_runtime']['vrom'];at=vrom-BLOB
+            if blob[at:at+len(asset)]!=asset:raise ValueError('Changed reusable complete room asset')
+        else:
+            blob.extend(bytes(-len(blob)%16));vrom=BLOB+len(blob);blob.extend(asset)
         native=profile(row,vrom)
         # Tag one checks the parent's selection; it is never standalone furniture.
         blob[ROWS+i*80:ROWS+(i+1)*80]=struct.pack('>HHI',index,item,1)+native+struct.pack('>I',1)
-        # Inverse alias only: no forward room-drop conversion is registered.
+        # Forward conversion is registered separately only for real room models.
         metadata=struct.pack('>HH',index,item)+bytes(24)+struct.pack('>HH',int(parent['item_id'],16),0)
         blob[ITEMS+i*32:ITEMS+(i+1)*32]=metadata
         installed.append(dict(parent_item_id=parent['item_id'],item_id=row['item_id'],runtime_index=index,
@@ -220,6 +259,9 @@ def install_profiles(blob,prepared,retained=()):
             profile_ram=f'{ROWS_RAM+i*80+8:08X}',profile_sha256=sha256(native),
             profile_tag=1,metadata_sha256=sha256(metadata),model_offsets=row['model_offsets'],
             native_profile_scalar_hex=row['native_profile_scalar_hex'],independently_selectable=False))
+        if row.get('room_runtime'):
+            installed[-1].update(source_item_id=row['source_item_id'],room_placement_uses_display=True,
+                callback_vtable=row['room_runtime']['vtable'])
     if not set(previous)<={r['parent_item_id'] for r in installed}:
         raise ValueError('Category refresh removes an installed representation')
     return installed
@@ -238,34 +280,46 @@ def catalogue_table(stable,installed,evidence):
         profile_selection_required=True,source_evidence=evidence)
 
 
-def install(base,prior,blob,core,original,output,directory):
-    from v3_furniture_install import STABLE,STABLE_SHA
-    equipment=prior['equipment_resources'];files=by_vrom(base)
-    if not equipment.get('collection'):
-        raise ValueError('Held previews require installed collection')
-    source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
-        (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
-    stable=STABLE.read_bytes()
-    if sha256(stable)!=STABLE_SHA:raise ValueError('Changed import-free baseline')
-    refresh=bool(equipment.get('catalogue'))
-    if refresh:equipment=refresh_parents(source,equipment,blob)
-    prepared,evidence=assets(source,equipment,directory)
-    installed=install_profiles(blob,prepared,equipment['catalogue']['imports'] if refresh else ())
-    table,cat=catalogue_table(stable,installed,evidence)
-    if refresh:
-        changes,cat_report=shared_catalogue.install_catalogue(base,stable,prior,
-            prior['furniture']['imports']+[prior['speed_bag']],output,source.rel,source.symbols.encode(),
-            reviewed_rows=prior['catalogue']['imports'],handheld=(table,cat))
-        if cat_report['code']['symbols']['af_v3_catalogue_item_price']!=prior['furniture_items']['code']['symbols']['af_v3_item_price']:
-            raise ValueError('Changed shared item-price ABI')
-        equipment['catalogue'].update(imports=installed,evidence=evidence,
-            artwork_bytes=sum(len(data) for _,_,data in prepared))
-        selection_prior={**prior,'equipment_resources':equipment,'catalogue':cat_report}
-        equipment,_,updates=select_installed(selection_prior,blob,extend=True)
-        updates['catalogue']=cat_report
-        return equipment,changes,updates
+def refresh_icon_reader(base,equipment,blob,output):
+    """Connect the bounded palette reservation while retaining actual menu metadata."""
+    import v3_furniture_icon as icon
+    from v3_equipment_runtime import RAM
+    bank=equipment['pocket_icons'].get('palette_bank')
+    previous=equipment['parent_readers']['code']
+    defines=tuple(f[2:] for f in previous['flags'] if f.startswith('-D'))
+    if not bank or 'AF_V3_POCKET_ICON_PALETTES=1' in defines:return {}
+    code,compiled=compile_part('held_items',output/'held_items',
+        defines=defines+('AF_V3_POCKET_ICON_PALETTES=1',),extra_sources=('overlays/v3/held_icon.S',))
+    start=equipment['blob_offset'];at=start+0x3000;end=start+bank['ram']-RAM
+    module=blob[start:start+equipment['bytes']]
+    if (sha256(module)!=equipment['sha256'] or len(code)>end-at or
+            sha256(blob[at:at+previous['bytes']])!=previous['sha256'] or
+            any(blob[at+previous['bytes']:end]) or any(compiled['symbols'][key]!=previous['symbols'][key]
+                for key in ('af_v3_held_item_name','af_v3_held_item_price','af_v3_held_item_icon','af_v3_held_item_collection'))):
+        raise ValueError('Icon palette reader moves a public entry or exceeds its reservation')
+    files=by_vrom(base);owner=bytearray(files[icon.VROM].extract(base));rel=files[icon.RELOC].extract(base)
+    receipt=equipment['pocket_icons'];hook=receipt['hook'];before=bytes.fromhex(hook['after'])
+    if sha256(rel)!=receipt['relocation_sha256'] or before!=struct.pack('>2I',jump(previous['symbols']['af_v3_held_icon_hook']),0):
+        raise ValueError('Changed icon hook or original relocation ownership')
+    target=compiled['symbols']['af_v3_held_icon_hook'];after=struct.pack('>2I',jump(target),0)
+    replace_checked(owner,hook['address']-icon.RAM,before,after)
+    hook.update(before=before.hex(),after=after.hex(),target=target)
+    receipt.update(code=compiled,previous_owner_sha256=sha256(files[icon.VROM].extract(base)),owner_sha256=sha256(owner))
+    equipment['parent_readers']['code']=compiled
+    equipment['collection']['identity_code']=compiled
+    blob[at:end]=code+bytes(end-at-len(code));module=blob[start:start+equipment['bytes']]
+    equipment.update(sha256=sha256(module),crc32=zlib.crc32(module))
+    return {icon.VROM:bytes(owner)}
+
+
+def refresh_profile_reader(base,prior,blob,equipment,output,*,room_rigs=False):
+    """Extend callback categories without changing bank ownership or public entries."""
+    files=by_vrom(base)
     expanded=copy.deepcopy(prior['furniture']['expanded_tables']);previous=expanded['expanded_code']
-    defines=tuple(f[2:] for f in previous['flags'] if f.startswith('-D'))+('AF_V3_HELD_CATALOGUE=1',)
+    defines=tuple(f[2:] for f in previous['flags'] if f.startswith('-D'))
+    required=('AF_V3_HELD_CATALOGUE=1',)+(('AF_V3_ROOM_RIGS=1',) if room_rigs else ())
+    if all(d in defines for d in required):return {},{}
+    defines+=tuple(d for d in required if d not in defines)
     code,compiled=compile_part('furniture_expanded',output/'furniture_expanded',
         defines=defines,primary_source='overlays/v3/furniture.c',extra_sources=('overlays/v3/furniture_entry.S',))
     if (sha256(blob[0x5800:0x5800+previous['bytes']])!=previous['sha256'] or
@@ -279,10 +333,7 @@ def install(base,prior,blob,core,original,output,directory):
         hook.update(before=hook['after'],after=after.hex(),target=target)
     banks=copy.deepcopy(prior['furniture']['bank_pool']);owner=bytearray(files[room.VROM].extract(base))
     hook=banks['hook'];before=bytes.fromhex(hook['after'])
-    # Placement is the latest shared installer to own this complete overlay;
-    # the bank receipt predates its checked address/relocation changes.
-    placement=copy.deepcopy(prior['furniture_placement'])
-    source_owner_sha=sha256(owner)
+    placement=copy.deepcopy(prior['furniture_placement']);source_owner_sha=sha256(owner)
     if (source_owner_sha!=placement['owner_sha256'] or
             sha256(files[room.RELOC].extract(base))!=placement['relocation_sha256'] or
             u32(before,4)!=jump(previous['symbols']['af_v3_furniture_secure_banks'],link=True)):
@@ -294,15 +345,52 @@ def install(base,prior,blob,core,original,output,directory):
     placement.update(owner_sha256=sha256(owner))
     expanded.update(expanded_code=compiled,output_sha256=sha256(owner))
     furniture=copy.deepcopy(prior['furniture']);furniture.update(expanded_tables=expanded,bank_pool=banks)
+    return {room.VROM:bytes(owner)},dict(furniture=furniture,furniture_placement=placement)
+
+
+def install(base,prior,blob,core,original,output,directory):
+    from v3_furniture_install import STABLE,STABLE_SHA
+    equipment=prior['equipment_resources'];files=by_vrom(base)
+    if not equipment.get('collection'):
+        raise ValueError('Held previews require installed collection')
+    source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+        (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    stable=STABLE.read_bytes()
+    if sha256(stable)!=STABLE_SHA:raise ValueError('Changed import-free baseline')
+    refresh=bool(equipment.get('catalogue'))
+    if refresh:equipment=refresh_parents(source,equipment,blob)
+    prepared,evidence=assets(source,equipment,directory,blob)
+    installed=install_profiles(blob,prepared,equipment['catalogue']['imports'] if refresh else ())
+    table,cat=catalogue_table(stable,installed,evidence)
+    reader_changes,reader_updates=refresh_profile_reader(base,prior,blob,equipment,output,
+        room_rigs=any(r.get('room_placement_uses_display') for r in installed))
+    reader_changes.update(refresh_icon_reader(base,equipment,blob,output))
+    if any(r.get('room_placement_uses_display') for r in installed):
+        from v3_room_rig_runtime import refresh_code
+        refresh_code(equipment,blob,output)
+    furniture=reader_updates.get('furniture',prior['furniture'])
+    if refresh:
+        changes,cat_report=shared_catalogue.install_catalogue(base,stable,prior,
+            prior['furniture']['imports']+[prior['speed_bag']],output,source.rel,source.symbols.encode(),
+            reviewed_rows=prior['catalogue']['imports'],handheld=(table,cat))
+        if cat_report['code']['symbols']['af_v3_catalogue_item_price']!=prior['furniture_items']['code']['symbols']['af_v3_item_price']:
+            raise ValueError('Changed shared item-price ABI')
+        equipment['catalogue'].update(imports=installed,evidence=evidence,
+            artwork_bytes=sum(len(data) for _,_,data in prepared))
+        selection_prior={**prior,'equipment_resources':equipment,'catalogue':cat_report}
+        equipment,_,updates=select_installed(selection_prior,blob,extend=True)
+        updates['catalogue']=cat_report
+        updates.update(reader_updates);changes.update(reader_changes)
+        return equipment,changes,updates
     changes,cat_report=shared_catalogue.install_catalogue(base,stable,prior,
         furniture['imports']+[prior['speed_bag']],output,source.rel,source.symbols.encode(),
         reviewed_rows=prior['catalogue']['imports'],handheld=(table,cat))
     if cat_report['code']['symbols']['af_v3_catalogue_item_price']!=prior['furniture_items']['code']['symbols']['af_v3_item_price']:
         raise ValueError('Changed shared item-price ABI')
-    changes[room.VROM]=bytes(owner)
+    changes.update(reader_changes)
     report=copy.deepcopy(equipment)
     report['catalogue']=dict(format='AFV3-HELD-CATALOGUE-1',imports=installed,evidence=evidence,
         profile_bits_enabled=0,additional_resident_bytes=0,artwork_bytes=sum(len(d) for _,_,d in prepared),
         ordinary_catalogue_tested=False,saved_format_changed=False)
     report['collection']['catalogue_rows_installed']=True
-    return report,changes,dict(furniture=furniture,catalogue=cat_report,furniture_placement=placement)
+    return report,changes,dict(**reader_updates,catalogue=cat_report)

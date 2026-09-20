@@ -28,7 +28,7 @@ PENDING = ('Prepared held artwork only; native equipment selection, player actio
            'inventory/ground readers, acquisition, catalogue/collection, and saved-profile integration remain.')
 
 
-def pocket_icons(source, equipment, address, capacity):
+def pocket_icons(source, equipment, address, capacity, *, palette_address=None):
     """Resolve complete donor tool icons for the installed parent category records."""
     from title_assets import pack4, untile
     from v3_villager_art import native_palette
@@ -50,6 +50,11 @@ def pocket_icons(source, equipment, address, capacity):
             or set(pointers) != set(range(at, at+size, 4)) or owner_size != 64
             or source.pointers(owner, owner_size).get(owner+8) != at):
         raise ValueError('Changed complete tool pocket icon table or category binding')
+    if palette_address is None:
+        palette_address=equipment.get('pocket_icons',{}).get('palette_bank',{}).get('ram')
+    if palette_address is not None and palette_address!=0x804A67A0:
+        raise ValueError('Unreviewed shared icon palette reservation')
+    palettes=bytearray()
     data = bytearray(struct.pack('>4I',0x41464943,1,56,8)+bytes(56*8))
     resources, offsets, rows = [], {}, []
     for parent in parents['rows']:
@@ -64,23 +69,30 @@ def pocket_icons(source, equipment, address, capacity):
             if key not in offsets:
                 raw = source.data[target:target+n]
                 converted = native_palette(raw) if kind == 'palette' else pack4(untile(raw,32,32,4))
-                data.extend(bytes(-len(data)%32)); offset = len(data)
-                offsets[key] = offset; data.extend(converted)
+                separate=kind=='palette' and palette_address is not None
+                storage=palettes if separate else data
+                storage.extend(bytes(-len(storage)%32)); offset = len(storage)
+                native_address=(palette_address if separate else address)+offset
+                offsets[key] = native_address; storage.extend(converted)
                 resources.append(dict(symbol=symbol,donor_offset=target,kind=kind,bytes=n,
-                    offset=offset,ram=address+offset,source_sha256=sha256(raw),sha256=sha256(converted)))
-            pair.append(address+offsets[key])
+                    offset=offset,ram=native_address,source_sha256=sha256(raw),sha256=sha256(converted)))
+            pair.append(offsets[key])
         slot = item-0x2224
         struct.pack_into('>2I',data,16+slot*8,*pair)
         rows.append(dict(id=parent['id'],item_id=parent['item_id'],source_index=index,
             descriptor_ram=address+16+slot*8,palette=pair[0],texture=pair[1],
             menu_category=(item>>8)&15,source_type=parent['source_type'],selectable=False))
-    if address & 31 or len(data)>capacity:
+    if address & 31 or len(data)>capacity or len(palettes)>96:
         raise ValueError('Pocket icon resources exceed the shared reservation')
-    return bytes(data),dict(format='AFV3-POCKET-ICONS-1',rows=rows,resources=resources,
+    receipt=dict(format='AFV3-POCKET-ICONS-1',rows=rows,resources=resources,
         source_functions=functions,source_table=dict(symbol='tool_tex_table$765',offset=at,bytes=size,
             pointers=pointers),ram=address,bytes=len(data),sha256=sha256(data),
         width=32,height=32,format_native='CI4/RGBA5551',profile_bits_enabled=0,
         original_tools_retained=36,ordinary_inventory_tested=False)
+    if palette_address is not None:
+        receipt['palette_bank']=dict(ram=palette_address,capacity=96,bytes=len(palettes),
+            sha256=sha256(palettes),data_hex=palettes.hex())
+    return bytes(data),receipt
 
 
 def parent_records(source, equipment):
@@ -143,7 +155,7 @@ def selection_records(source, equipment, *, categories=None):
     records do not set that bit, install inventory readers, or add web choices.
     """
     from v3_room_aliases import discover as room_aliases
-    from v3_registry import furniture_identity
+    from v3_registry import furniture_representation_identity
     inventory=discover(source);aliases=room_aliases(source)
     raw,visibility=source.function(0x1707E4)
     if (visibility['symbol']!='Player_actor_Get_ItemKind' or len(raw)!=232
@@ -153,7 +165,7 @@ def selection_records(source, equipment, *, categories=None):
     if categories is None:
         categories=actions.get('equipment_selection',{}).get('categories',[23])
     categories=sorted(set(categories))
-    if not categories or set(categories)-{22,23}:
+    if not categories or set(categories)-{21,22,23}:
         raise ValueError('Unimplemented held selection category')
     if (actions['enabled_imported_actions']!=[109] or not actions.get('fan_activation')
             or not actions['held_dispatch']['net_reset']['installed']):
@@ -164,9 +176,17 @@ def selection_records(source, equipment, *, categories=None):
         if (22 not in rigs.get('category_indices',[]) or not rigs.get('loop_sound_installed')
                 or not preview.get('animated_rigs_installed')):
             raise ValueError('Animated selection requires complete actions, sound, and inventory')
+    if 21 in categories:
+        rigs=equipment.get('held_rig_actions',{});room=equipment.get('room_rigs',{})
+        preview=equipment.get('inventory_preview',{})
+        wanted={a['parent_item_id'] for a in aliases['rows'] if a['room_placement_uses_display']}
+        if (21 not in rigs.get('category_indices',[]) or not rigs.get('balloon') or
+                not preview.get('balloon_drawer') or room.get('format')!='AFV3-ROOM-RIGS-1' or
+                {r['parent_item_id'] for r in room.get('rows',[])}!=wanted):
+            raise ValueError('Animated room selection requires complete held, inventory, and room rigs')
     kinds={r['item_id']:r for r in equipment['kind_readers']['rows']}
     source_rows={r['id']:r for r in inventory['rows']}
-    category_names={22:'pinwheel',23:'fan'}
+    category_names={21:'balloon',22:'pinwheel',23:'fan'}
     expected={a['parent_item_id'] for a in aliases['rows']
         if a['category'] in {category_names[c] for c in categories}}
     if {r['item_id'] for r in kinds.values() if r['item_main'] in categories}!=expected:
@@ -175,8 +195,8 @@ def selection_records(source, equipment, *, categories=None):
     for alias in aliases['rows']:
         if alias['parent_item_id'] not in expected:continue
         item=int(alias['parent_item_id'],16);row=source_rows[alias['parent_id']];kind=kinds[row['item_id']]
-        display=int(alias['display_item_id'],16);index,_=furniture_identity(display)
-        animated=kind['item_main']==22
+        source_display=int(alias['display_item_id'],16);index,display=furniture_representation_identity(source_display)
+        animated=kind['item_main'] in (21,22)
         bank_limit=equipment['animated_rigs']['allocation']['bank_bytes'] if animated else 4376
         if (not 0x2224<=item<0x225C or kind['source_kind']!=row['equipment_kind']
                 or kind['native_kind']!=36+row['equipment_kind']
@@ -184,15 +204,16 @@ def selection_records(source, equipment, *, categories=None):
                 or kind['combined_bank_bytes']>bank_limit
                 or alias['category']!=category_names[kind['item_main']]
                 or (animated and kind['native_kind'] not in equipment['held_rig_actions']['native_kinds'])
-                or not 99<=kind['native_kind']<115
-                or alias['context_outputs']['room_placement']!=[row['item_id']]
+                or not 91<=kind['native_kind']<115
+                or alias['context_outputs']['room_placement']!=[
+                    alias['display_item_id'] if alias['room_placement_uses_display'] else row['item_id']]
                 or alias['context_outputs']['collection_record']!=[alias['display_item_id']]):
             raise ValueError('Incomplete source-held category dependency or identity')
         slot=index-1024;byte=32+slot//8;mask=1<<(slot%8)
         struct.pack_into('>HbBHBB',table,16+(item-0x2200)*8,item,kind['native_kind'],1,byte,mask,1)
         records.append(dict(id=row['id'],item_id=row['item_id'],native_kind=kind['native_kind'],
-            passive=True,profile_byte=byte,profile_mask=mask,display_item_id=alias['display_item_id'],
-            collection_index=index,room_placement_uses_display=False,equipment_ready=True,
+            passive=True,profile_byte=byte,profile_mask=mask,display_item_id=f'{display:04X}',
+            collection_index=index,room_placement_uses_display=alias['room_placement_uses_display'],equipment_ready=True,
             inventory_installed=False,selectable=False,source=row,alias=alias))
     if (not records or {r['item_id'] for r in records}!=expected
             or len({r['native_kind'] for r in records})!=len(records)):

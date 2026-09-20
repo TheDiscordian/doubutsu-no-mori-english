@@ -1,5 +1,89 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared animated room-parent category
+
+The existing complete-category refresh connects all eight balloons alongside
+the sixteen fan/pinwheel parents. It consumes prepared/source records and the
+already installed room resources, without a per-item definition, graphics
+recompilation, duplicate model, new resident allocation, or changed saved format.
+
+- Explicit lock: `build/v3-room-parent-category-06/build-lock.json`, ABI 127.
+- ROM SHA-256:
+  `e081dea749ea8372a8b67a59fc0635b95fe8a3b3868a51819794e77e0fb5c94c`.
+- Report SHA-256:
+  `3a8199501bd6211d28e11fb9133b502b3e67d8693dabc029eb2e1219ff139f3f`.
+- UPS SHA-256:
+  `57758f9df8319ecb2ab1ea7f2b98abfc206369f8d730f88f18ac2aa7ab46c23e`.
+- Choices: 128 total, including 24 equipment parents. Room/catalogue forms are
+  dependencies, not separate options. Native umbrella rows remain 32; the
+  equipment catalogue contains 56 rows including those original umbrellas.
+- Code: expanded furniture 1,976 bytes, parent readers 1,716 bytes, room
+  lifecycle 1,072 bytes, each within its checked existing reservation.
+- Complete icon descriptor/texture data: 2,016 bytes; three complete palettes:
+  96 bytes at `804A67A0`, after parent code and before the descriptor table.
+- Conservative menu requirement: 280,640 of 280,768 bytes. The existing
+  inventory-work increase is retained, not applied a second time.
+
+Source catalogue membership uses the donor indices, not the assigned native
+destinations. Older source representations `1FF0..1FFC` map to `3C00..3C0C`;
+`3000..300C` retains its canonical mapping. All eight source positions 48–55
+survive. The eight new forward aliases convert balloons indoors; fans and
+pinwheels still drop as parents. Existing garment aliases and every old parent
+record remain. Sparse profiles delegate names/prices/ownership to selected
+parents and bind the complete room vtable. Pickup restores the parent identity.
+
+Actual catalogue actors retain a catalogue index 1024 above the imported room
+index. The shared lifecycle accepts both verified contexts; native catalogue
+construction and animation timing remain in control. The icon helper retains
+its fixed public entry points, complete source artwork, and pointer bounds. The
+menu's private hook is rebound to the newly compiled assembly entry while its
+existing inventory-allocation metadata survives.
+
+Initial builds reject an icon reservation short by 64 bytes and a catalogue
+rebuilder that expects the pre-inventory menu endpoint. The shared palette
+reservation and checked retained-pool handling resolve both. A reversed delta
+assertion in the new pool guard is corrected before any cartridge is generated.
+The first complete build (`-05`) and final provenance-complete build (`-06`)
+have the same ROM and UPS hashes. Eight official names receive their actual
+donor table/index/hash entries in the single `translations/provenance.json`.
+
+Ten focused checks pass in 12.173 seconds. They cover complete source categories,
+all destination/context mappings, retained old records/resources, full reused
+models and sparse profiles, forward/inverse aliases, real catalogue ordering,
+complete palette/texture bytes, bounded native readers, both room/catalogue
+actor indices, unchanged unrelated DMA resources, original-ROM reconstruction,
+128 choices, exact all/empty output, a mixed new-ID subset, and rejection of
+incomplete dependencies. The first host comparison needs JSON tuple/key
+normalisation; the corrected test passes without a cartridge change.
+
+The first combined silent native run at
+`build/smoke-v3-room-parent-category-01/` passes 216 records and 151 assertions.
+It executes all 24 ownership/conversion pairs, actual native catalogue list
+construction and ordering, four complete preview transfers, real animated
+constructors, full English names/prices/framing, disabled-item hiding, original
+umbrella retention, seven pocket-icon drawing cases, full-width hook registers,
+memory guards, restored source/save state, checkpoint restoration, and clean
+exit. Results SHA-256:
+`ff02df062d499dbad733fde9bd3379a92105b8a45a3125c98a3ca7712704ab2d`.
+No user save is used, and no test FlashRAM write is requested.
+
+The private export `build/v3-room-parent-browser-01/` contains 128 options and
+both donor-backed recipes. The actual worker at
+`build/check-v3-room-parent-browser-01/` matches offline empty, all-installed,
+villager/item, and equipment profiles, including an older-range balloon's mapped
+identity. Cancellation, unknown selection, corrupt-plan rejection, local GET-only
+access, absence of browser errors, and temporary server shutdown pass. Results
+SHA-256: `6534874ed0f3adb13b7a3870904b251bfe0255e8502fcbc37c589f02b0c83165`.
+This does not close the pending full-interface acceptance check.
+
+Eight saved-profile bits are added; format 2 and saved record layouts remain.
+Older profiles lacking the imports reject these saves. Keep separate tests;
+never load imported saves in V2 or treat removing choices as migration. Ordinary
+acquisition/equip/room placement/pickup/save, GPU appearance, and original
+hardware remain unverified. Next use a bounded ordinary combined pass, then
+continue remaining net/rod/golden-tool categories. Both served V2 patchers and
+the main ABI-109 lock remain unchanged.
+
 ## Shared room-rig runtime
 
 The shared runtime refresh installs all eight complete prepared room models and

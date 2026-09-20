@@ -74,6 +74,16 @@ int main(void) {
     last->item=0;assert(!af_v3_held_item_price(0x225B));*last=saved;
     last->kind=106;assert(!af_v3_held_item_price(0x225B));*last=saved;
     last->display|=1;assert(!af_v3_held_item_price(0x225B));*last=saved;
+#ifdef AF_V3_POCKET_ICON_PALETTES
+    for (u32 offset=0;offset<96;offset+=32) {
+        icons[4+110]=0x804A67A0u+offset;
+        assert(af_v3_held_item_icon(0x225B)==icons+4+110);
+    }
+    icons[4+110]=0x804A6780u;assert(!af_v3_held_item_icon(0x225B));
+    icons[4+110]=0x804A67E8u;assert(!af_v3_held_item_icon(0x225B));
+    icons[4+110]=0x804A67A0u;icons[5+110]=0x804A67A0u;
+    assert(!af_v3_held_item_icon(0x225B));
+#endif
     selectors[91].ready=0;assert(!af_v3_held_item_price(0x225B));
     puts("Shared held parent names, prices, selection, and bounded writes pass");
 }

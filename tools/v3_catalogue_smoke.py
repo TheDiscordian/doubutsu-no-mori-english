@@ -86,13 +86,18 @@ def held_previews(debug, rom_path, record):
         for row in rows:
             parent=int(row['parent_item_id'],16);display=int(row['item_id'],16)
             call(0x800B88EC,[parent])
-            call(0x800BEFCC,[parent],expected=parent)
+            call(0x800BEFCC,[parent],expected=display if row.get('room_placement_uses_display') else parent)
             call(0x800BF10C,[display+3],expected=parent)
         initialize()
         check('all collected parent entries',page,struct.pack('>H',len(rows)))
         check('actual donor category ordering',page+8,b''.join(bytes.fromhex(r['item_id']) for r in rows))
         check('partial category indicator',page+6,bytes(1))
-        for position in (0,len(rows)-1):
+        room_rows=[r for r in rows if r.get('room_placement_uses_display')]
+        positions={0,len(rows)-1}
+        if room_rows:
+            positions.update(rows.index(r) for r in (min(room_rows,key=lambda r:r['object_bytes']),
+                max(room_rows,key=lambda r:r['object_bytes'])))
+        for position in sorted(positions):
             # Native seven-name page cache: scroll the last record into slot zero.
             debug.write_memory(page+2,struct.pack('>HH',position,0))
             call(root+0x808A6A8C-RAM,[submenu,4],proof)
@@ -107,6 +112,10 @@ def held_previews(debug, rom_path, record):
             at=int(row['object_vrom'],16)-BLOB;asset=blob[at:at+row['object_bytes']]
             check('complete prepared model transfer',banks[buffer],asset)
             check('unchanged model buffer tail',banks[buffer]+len(asset),b'\xA5'*(0x2400-len(asset)))
+            if row.get('room_placement_uses_display'):
+                check('real catalogue constructor initializes room-rig work',preview+0x158,
+                      struct.pack('>2I',preview+0x1A4,preview+0x1DA))
+                check('room-rig initial state in the real catalogue',preview+0x204,struct.pack('>2f',0,.5))
             name=call(root+name_at,[page+capacity['name_offset']],(root+name_at,loaded[name_at:name_at+92]))
             check('full English parent name',name,parent['name'].encode().ljust(16,b' '))
         # Profile removal hides an owned item without clearing its collection.
@@ -127,7 +136,7 @@ def held_previews(debug, rom_path, record):
         for address,value in saved.items():debug.write_memory(address,value)
         call(0x8009C040,[allocation])
     for address,value in saved.items():check('restored fixture state',address,value)
-    return dict(native_parent_catalogue=True,category_rows=len(rows),complete_preview_models=2,
+    return dict(native_parent_catalogue=True,category_rows=len(rows),complete_preview_models=len(positions),
         gpu_rendered=False,ordinary_order_delivery_tested=False,saved_data_written=False,
         requires_checkpoint_restore=True)
 
