@@ -1,4 +1,4 @@
-"""Shared inventory-owner integration for installed static handheld categories."""
+"""Shared inventory-owner integration for complete static and animated equipment."""
 import copy
 import struct
 import zlib
@@ -32,7 +32,7 @@ FUNCTIONS=(
     (0x272524,156,'7d0497e25b735edec49669876912fa0ba67d4c0a9609bd41cfff3075ef6ff353'))
 
 
-def records(source,equipment):
+def records(source,equipment,*,animated=False):
     """Join actual inventory kinds/callbacks to installed equipment resources."""
     from v3_handheld_items import parent_records
     _,parents=parent_records(source,equipment)
@@ -62,27 +62,57 @@ def records(source,equipment):
     motions={r['index']:r for r in equipment['player_motion']['records']}
     kind_rows={r['item_id']:r for r in equipment['kind_readers']['rows']}
     selector=bytearray(struct.pack('>4I',0x41464956,1,56,4)+bytes(56*4));rows=[]
-    for parent in parents['rows']:
+    candidates=list(parents['rows'])
+    if animated:
+        from v3_handheld_items import discover
+        if not equipment.get('held_rig_actions',{}).get('loop_sound_installed'):
+            raise ValueError('Animated inventory requires the complete installed rig actions')
+        identities={r['item_id']:r for r in discover(source)['rows']}
+        for kind in kind_rows.values():
+            if kind['item_main']==22:
+                original=identities[kind['item_id']]
+                candidates.append(dict(id=original['id'],item_id=kind['item_id'],native_kind=kind['native_kind']))
+        raw,function=source.function(0x2723F4)
+        if len(raw)!=96 or sha256(raw)!='12815662833de2f10cfbcfe2c16bc04cbf10cc5d5b8c0a37725ea780e9353c6a':
+            raise ValueError('Changed complete source animated preview drawer')
+        functions.append(function)
+    for parent in candidates:
         kind=kind_rows[parent['item_id']];world=parent['native_kind']
         source_kind=world-36
         if kinds.count(source_kind)!=1:raise ValueError('Ambiguous inventory equipment kind')
         iv_kind=kinds.index(source_kind);preview=iv_kind+1
-        if preview<6 or preview>=COUNT or pointers[iv_kind*4][3]!=0x272454:
+        callback=pointers[iv_kind*4][3]
+        rig=animated and callback==0x2723F4
+        if preview<6 or preview>=COUNT or callback not in ((0x272454,0x2723F4) if animated else (0x272454,)):
             raise ValueError('Unimplemented inventory held-drawing category')
-        animation,_,shape,_,_,_=kind['fields']
+        animation,_,shape,item_animation,_,_=kind['fields']
         model=resources[shape];motion=motions[animation]
-        if (model['kind']!='static-model' or model['type']!=0 or model['bytes']>4376
-                or not kind['resource_ready'] or motion['bytes']>3848 or motion['type']>=5):
+        if not kind['resource_ready'] or motion['bytes']>3848 or motion['type']>=5:
             raise ValueError('Inventory equipment exceeds installed loader/rig support')
+        if rig:
+            item_motion=resources[item_animation];skeleton=model['source']['skeleton']
+            if (model['kind']!='animated-model' or model['type']!=1 or kind['item_main']!=22
+                    or not 0<skeleton['shown_joints']<=skeleton['joints']<=6
+                    or item_motion['kind']!='animation' or item_motion['type']!=5
+                    or item_motion['source']['joints']!=skeleton['joints']
+                    or model['bytes']+item_motion['bytes']>equipment['inventory_preview']['item_bank_bytes']):
+                raise ValueError('Animated preview exceeds native bank or joint work capacity')
+        elif model['kind']!='static-model' or model['type']!=0 or model['bytes']>4376:
+            raise ValueError('Static preview exceeds installed loader support')
         item=int(parent['item_id'],16)
         struct.pack_into('>HBB',selector,16+(item-0x2224)*4,item,preview,world)
         # Static models have no skeleton; the native loader skips item animation.
         rows.append(dict(id=parent['id'],item_id=parent['item_id'],source_kind=source_kind,
             source_preview_kind=iv_kind,preview_kind=preview,world_kind=world,
             fields=dict(player_animation=animation,player_pointer=motion['pointer'],
-                item_animation=17,item_pointer=0,shape=shape,skeleton=0,part=motion['type']),
+                item_animation=item_animation if rig else 17,item_pointer=item_motion['pointer'] if rig else 0,
+                shape=shape,skeleton=model['pointer'] if rig else 0,part=motion['type']),
             model_bytes=model['bytes'],model_sha256=model['sha256'],
             animation_bytes=motion['bytes'],animation_sha256=motion['sha256'],selectable=False))
+        if rig:
+            rows[-1].update(draw_callback=0x8087E098,item_animation_bytes=item_motion['bytes'],
+                item_animation_sha256=item_motion['sha256'],joint_vectors=skeleton['joints']+1,
+                source_frame_speed=7.5,native_frame_speed=15.0)
     if len({r['preview_kind'] for r in rows})!=len(rows):
         raise ValueError('Colliding native inventory preview kinds')
     return bytes(selector),dict(format='AFV3-INVENTORY-EQUIPMENT-1',rows=rows,
@@ -90,6 +120,73 @@ def records(source,equipment):
         source_draw_table=dict(symbol=name,offset=at,bytes=n,pointers=pointers),
         original_kinds=5,empty_kind=5,count=COUNT,profile_bits_enabled=0,
         ordinary_inventory_tested=False,save_reload_tested=False)
+
+
+def refresh_rigs(base,prior,blob,core,original,output):
+    """Connect every installed supported rig through the existing preview tables."""
+    old=prior['equipment_resources'];preview=old['inventory_preview'];offset=old['blob_offset']
+    module=bytearray(blob[offset:offset+old['bytes']]);files=by_vrom(base)
+    owner=files[VROM].extract(base);rel=files[RELOC].extract(base)
+    if (preview.get('animated_rigs_installed') or sha256(module)!=old['sha256']
+            or sha256(owner)!=preview['owner_sha256'] or sha256(rel)!=preview['relocation_sha256']):
+        raise ValueError('Animated previews require the checked current inventory module')
+    source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+                  (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    selector,generated=records(source,old,animated=True)
+    added=[r for r in generated['rows'] if r.get('draw_callback')]
+    indices=sorted(r['preview_kind'] for r in added)
+    if not indices or indices!=list(range(indices[0],indices[-1]+1)):
+        raise ValueError('Animated preview speed category is not a complete contiguous donor range')
+    _,init=source.function(0x2716FC);constant=init['relocations'].get(610)
+    if (constant!=(4,1,4,41608) or
+            source.rel[source.sections[4][0]+41608:source.sections[4][0]+41612]!=struct.pack('>f',7.5)):
+        raise ValueError('Changed donor animated inventory speed')
+    native=by_vrom(original)[VROM].extract(original)
+    first,last=0x8087E098-OWNER_RAM,0x8087E108-OWNER_RAM
+    if (owner[first:last]!=native[first:last] or
+            sha256(owner[first:last])!='aa2407b27fc7dd177028984f1a08d34b8fe47d5e7ca196641ca41d624cb2df0a'):
+        raise ValueError('Changed native null-callback skeleton drawer')
+    code,compiled=compile_part('inventory_equipment',output/'inventory_equipment',
+        extra_sources=('overlays/v3/inventory_equipment.S',),defines=(
+            f'AF_V3_HELD_SELECTED=0x{old["player_actions"]["code"]["symbols"]["af_v3_player_selected_equipment"]:08X}u',
+            f'AF_V3_INVENTORY_RIG_FIRST={indices[0]}',f'AF_V3_INVENTORY_RIG_COUNT={len(indices)}'))
+    previous=preview['code'];n=previous['bytes']
+    if (sha256(module[CODE:CODE+n])!=previous['sha256'] or any(module[CODE+n:TABLE])
+            or len(code)>TABLE-CODE):raise ValueError('Changed or overlapping inventory code reservation')
+    for symbol in ('af_v3_inventory_item_kind','af_v3_inventory_static_draw','af_v3_inventory_dispatch'):
+        if compiled['symbols'][symbol]!=previous['symbols'][symbol]:
+            raise ValueError('Animated preview changed an installed inventory entry')
+    receipt=copy.deepcopy(preview);receipt.update(generated)
+    for table in receipt['tables']:
+        at,n=table['offset'],table['bytes'];data=bytearray(module[at:at+n])
+        if sha256(data)!=table['sha256']:raise ValueError('Changed complete inventory table')
+        for row in added:
+            p=row['preview_kind']*4
+            if any(data[p:p+4]):raise ValueError('Animated preview slot is already occupied')
+            value=row['draw_callback'] if table['role']=='draw' else row['fields'][table['role']]
+            struct.pack_into('>I',data,p,value)
+        module[at:at+n]=data;table['sha256']=sha256(data)
+    if sha256(module[SELECTOR:SELECTOR+preview['selector_bytes']])!=preview['selector_sha256']:
+        raise ValueError('Changed inventory selector')
+    module[SELECTOR:SELECTOR+len(selector)]=selector
+    module[CODE:TABLE]=code+bytes(TABLE-CODE-len(code))
+    hook=0x8087DA64;at=hook-OWNER_RAM
+    if u32(owner,at)!=jump(0x80052584,link=True):raise ValueError('Changed native skeleton initializer call')
+    words=struct.unpack_from('>5I',rel)
+    if any((r&0xFFFFFF)==at for r in struct.unpack_from('>'+str(words[4])+'I',rel,20)):
+        raise ValueError('Unexpected initializer JAL relocation')
+    patched=bytearray(owner);after=jump(compiled['symbols']['af_v3_inventory_rig_init'],link=True)
+    struct.pack_into('>I',patched,at,after)
+    receipt.update(code=compiled,selector_sha256=sha256(selector),selector_bytes=len(selector),
+        animated_rigs_installed=True,owner_sha256=sha256(patched),previous_owner_sha256=sha256(owner),
+        animated_rig_indices=indices,additional_resident_bytes=0,
+        animated_drawer=dict(start=OWNER_RAM+first,end=OWNER_RAM+last,sha256=sha256(owner[first:last])),
+        animation_speed_hook=dict(address=hook,before=u32(owner,at),after=after,
+                                  source_speed=7.5,native_speed=15.0))
+    blob[offset:offset+len(module)]=module
+    report=copy.deepcopy(old);report.update(inventory_preview=receipt,sha256=sha256(module),
+        crc32=zlib.crc32(module),additional_resident_bytes=0)
+    return report,{VROM:bytes(patched)}
 
 
 def install(base,prior,blob,core,original,output):

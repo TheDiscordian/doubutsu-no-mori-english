@@ -268,6 +268,104 @@ def inventory_preview(debug, rom_path, record):
                 requires_checkpoint_restore=True)
 
 
+def inventory_rigs(debug,rom_path,record):
+    """Actual inventory load/init/draw path for complete animated preview records."""
+    from v3_inventory_equipment import VROM,RELOC,OWNER_RAM,SECTIONS
+    from v3_furniture_room_smoke import extend
+    from runtime_layout import TEST_STACK
+    path=Path(rom_path);image=path.read_bytes();report=json.loads((path.parent/'build.json').read_bytes())
+    if sha256(image)!=report['output_sha256']:raise ValueError('Changed animated inventory cartridge')
+    e=report['equipment_resources'];preview=e['inventory_preview'];files=by_vrom(image)
+    blob=files[runtime.BLOB].extract(image);boot=boot_proofs(image);assertions=0
+    def check(label,at,want):
+        nonlocal assertions
+        actual=debug.read_memory(at,len(want));passed=actual==want
+        record(dict(inventory_rig_check=label,address=f'{at:08X}',bytes=len(want),
+                    assertion='passed' if passed else 'failed',actual=actual.hex() if len(actual)<=32 else sha256(actual)))
+        if not passed:raise ValueError('Animated inventory mismatch: '+label)
+        assertions+=1
+    def call(at,args=(),proof=None):
+        result=debug.call(f'{at:08X}',list(args),return_address=MODULE_RAM+0x6480,verified_code=proof or boot.get(at))
+        record(result);return result['return_value']
+    def put(at,*values):debug.write_memory(at,struct.pack('>'+str(len(values))+'I',*values))
+    def word(at):return int.from_bytes(debug.read_memory(at,4),'big')
+    module=blob[e['blob_offset']:e['blob_offset']+e['bytes']]
+    check('complete cartridge-loaded inventory tables/code',0x804A3000,module)
+    saved={at:debug.read_memory(at,n) for at,n in ((0x801458B8,4),(0x8046C000,864))}
+    size=0x1D000;allocation=call(0x8009BFC0,[size])
+    if allocation&15 or not MODULE_RAM+0x8000<=allocation<=0x80400000-size:
+        raise ValueError('Animated inventory fixture outside native heap')
+    root,overlay,submenu,graph,game,gfx,xlu,bank,stack=(allocation+n for n in
+        (16,0x5000,0x15800,0x15A00,0x15E00,0x16000,0x17020,0x18000,0x1C800))
+    debug.write_memory(allocation,bytes(size));edge=b'V3IR'*4
+    guards=(allocation,overlay-16,submenu-16,graph-16,game-16,gfx-16,gfx+0x1000,
+            xlu-16,xlu+0x600,bank-16,bank+0x4000,stack+0x100,TEST_STACK-0x800,TEST_STACK+0x40)
+    for at in guards:debug.write_memory(at,edge)
+    data,rel=(files[v].extract(image) for v in (VROM,RELOC));resident=sum(SECTIONS)
+    loaded=relocate_verified_data(SimpleNamespace(ram=OWNER_RAM,resident_bytes=resident,
+        sections=struct.unpack_from('>5I',rel)),data,rel,root)
+    proof=(root,loaded[:SECTIONS[0]]);bss=root+preview['native_bss_address']-OWNER_RAM
+    resources={r['index']:r for r in e['records']};rows=[r for r in preview['rows'] if r.get('draw_callback')]
+    representatives=(min(rows,key=lambda r:r['model_bytes']),max(rows,key=lambda r:r['model_bytes']))
+    matrix=call(0x800E02AC);matrix_before=debug.read_memory(matrix,64)
+    identity=game+0x40;debug.write_memory(identity,struct.pack('>16f',*(1 if i%5==0 else 0 for i in range(16))))
+    def initialize(kind):
+        debug.write_memory(overlay+0x10016,struct.pack('>h',kind));put(stack+0x60,bss)
+        before=debug.command('g');regs=[int(before[i:i+16],16) for i in range(0,len(before),16)]
+        if len(regs)!=71 or regs[37]&0xFFFFFFFF!=0x800D334C:raise ValueError('Inventory init requires paused native frame')
+        for register,value in ((3,kind),(8,0),(16,overlay+0x10000),(17,bank),(29,stack),
+                               (37,root+0x8087D930-OWNER_RAM)):regs[register]=extend(value)
+        target=root+0x8087DA8C-OWNER_RAM;bp=f'0,{target:x},4'
+        if debug.command('Z'+bp)!='OK':raise ValueError('Inventory init breakpoint refused')
+        try:
+            if debug.command('G'+''.join(f'{r:016x}' for r in regs))!='OK':raise ValueError('Inventory init register write refused')
+            stopped=debug.command('c');raw=debug.command('g')
+            actual=[int(raw[i:i+16],16) for i in range(0,len(raw),16)]
+            passed=stopped[:3] in ('T05','S05') and actual[37]&0xFFFFFFFF==target and actual[29]==regs[29]
+            record(dict(inventory_rig_native_initialize=kind,assertion='passed' if passed else 'failed'))
+            if not passed:raise ValueError('Inventory init continuation/stack mismatch')
+        finally:debug.command('z'+bp);debug.command('G'+before)
+    try:
+        call(0x800262D0,[VROM,VROM+len(data),OWNER_RAM,OWNER_RAM+resident,root,root+resident,len(rel)])
+        check('complete cartridge-loaded relocated inventory owner',root,loaded)
+        put(submenu+0x2C,overlay);put(overlay+0x106DC,bss);put(game,graph)
+        initialize(1);check('original tool animation timing retained',bss+0x224+12,struct.pack('>2f',1,2))
+        for row in representatives:
+            model=resources[row['fields']['shape']];motion=resources[row['fields']['item_animation']]
+            fill=b'\xA5'*0x4000;debug.write_memory(bank,fill);initialize(row['preview_kind'])
+            wanted=(blob[model['blob_offset']:model['blob_offset']+model['bytes']]+
+                    blob[motion['blob_offset']:motion['blob_offset']+motion['bytes']])
+            check('complete native model/animation transfers and untouched tail',bank,wanted+fill[len(wanted):])
+            check('source-correct preview speed and first frame',bss+0x224+12,struct.pack('>2f',15,16))
+            check('native seven-vector work and morph pointers',bss+0x224+0x24,struct.pack('>2I',bss+0x294,bss+0x2BE))
+            put(0x801458B8,word(overlay+0x10030)&0x1FFFFFFF);call(0x800E0284,[identity])
+            put(graph+0x298,gfx,gfx+0x1000);put(graph+0x2A8,xlu,xlu+0x600)
+            call(root+row['draw_callback']-OWNER_RAM,[submenu,game],proof)
+            front,back=struct.unpack('>2I',debug.read_memory(graph+0x298,8))
+            if not gfx<front<=back<=gfx+0x1000:raise ValueError('Animated inventory escaped graphics arena')
+            commands=debug.read_memory(gfx,front-gfx)
+            drawn=[p for w,p in struct.iter_unpack('>2I',commands) if w>>24==0xDE]
+            expected=[0x06000000+p for p in model['source']['model_offsets'].values()]
+            passed=drawn==expected and back==gfx+0x1000-128
+            record(dict(inventory_rig_joint_draws=drawn,expected=expected,
+                        assertion='passed' if passed else 'failed',model=model['index']))
+            if not passed:raise ValueError('Animated inventory omitted a joint or allocated wrong matrices')
+            check('native translucent matrix binding retained',graph+0x2A8,struct.pack('>2I',xlu+8,xlu+0x600))
+            check('balanced native matrix stack',0x801462B4,struct.pack('>I',matrix))
+            check('unchanged parent transform',matrix,debug.read_memory(identity,64))
+            for at in guards:check('inventory rig guard',at,edge)
+        check('save/profile remains unchanged',0x8046C000,saved[0x8046C000])
+        check('complete equipment module remains unchanged',0x804A3000,module)
+        check('no CPU fault',0x8003CE34,bytes(4))
+    finally:
+        debug.write_memory(matrix,matrix_before)
+        for at,value in saved.items():debug.write_memory(at,value)
+        call(0x8009C040,[allocation])
+    return dict(native_inventory_rigs=True,representatives=len(representatives),assertions=assertions,
+        complete_model_animation_dma=True,original_tool_speed_retained=True,gpu_rendered=False,
+        ordinary_inventory_tested=False,parent_selection_tested=False,flash_written=False,requires_checkpoint_restore=True)
+
+
 def item_categories(debug,rom_path,record):
     """Loaded police capacity/drawing and handover category/table windows."""
     import v3_category_runtime as category
@@ -693,6 +791,7 @@ def exercise(debug, rom_path, record, *, section='automatic_furniture'):
     if section=='player_motion':return player_motion(debug,rom_path,record)
     if section=='pocket_icons':return pocket_icons(debug,rom_path,record)
     if section=='inventory_preview':return inventory_preview(debug,rom_path,record)
+    if section=='inventory_rigs':return inventory_rigs(debug,rom_path,record)
     if section=='item_categories':return item_categories(debug,rom_path,record)
     path = Path(rom_path)
     image = path.read_bytes()

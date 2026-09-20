@@ -27,3 +27,23 @@ af_v3_inventory_dispatch:
     jr $ra
     nop
 .end af_v3_inventory_dispatch
+
+#ifdef AF_V3_INVENTORY_RIG_FIRST
+/* This one native caller holds its segment in s0 and passes item animation
+   speed as the third stacked float. Tail-call the original initializer. */
+.section .text.af_v3_inventory_rig_init,"ax",@progbits
+.globl af_v3_inventory_rig_init
+.ent af_v3_inventory_rig_init
+af_v3_inventory_rig_init:
+    lh $t8, 0x16($s0)
+    addiu $t8, $t8, -AF_V3_INVENTORY_RIG_FIRST
+    sltiu $t8, $t8, AF_V3_INVENTORY_RIG_COUNT
+    beqz $t8, 1f
+    nop
+    lui $t8, 0x4170
+    sw $t8, 0x18($sp)
+1:
+    j 0x80052584
+    nop
+.end af_v3_inventory_rig_init
+#endif

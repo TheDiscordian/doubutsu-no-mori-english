@@ -288,8 +288,8 @@ The shared module grows from 52 to 56 KiB. Code starts at `804B0000`; the guard
 is at `804B0FF0`, below furniture banks at `80500000`. Startup transfers, checks,
 and flushes the complete module. Full source functions and native setup/API
 consumers are recorded and checked; retained resources and callback slots stay
-unchanged. Animated inventory previews and parent readiness remain explicit
-dependencies; loop sound uses the shared adapter below. The [action checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-animated-held-actions)
+unchanged. Parent readiness remains an explicit dependency; loop sound and
+animated inventory use the shared adapters below. The [action checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-animated-held-actions)
 records current component evidence, failed attempts, and gameplay limits.
 
 ### Shared held loop sound
@@ -925,6 +925,51 @@ See the [checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-pocket-
 for component evidence and the remaining native control/guard/render checks.
 
 ## Shared inventory equipment previews
+
+### Animated rigs
+
+After complete rig actions and sound are installed, the same shared refresh
+adds all supported animated preview records. Preview discovery reads installed
+kind/model/animation dependencies independently of parent enablement, avoiding
+a circular requirement that an item be selectable before its preview exists.
+All eight pinwheels occupy preview kinds `18..25`; the eight fans remain
+`26..33`, and the original five kinds plus empty sentinel retain their meanings.
+The same eight 41-entry tables and fixed selector reservation suffice.
+
+The complete donor windmill drawer at REL `.text+2723F4` is equivalent to native
+`8087E098..8087E108`: both allocate one matrix per shown joint and call the
+ordinary recursive skeleton drawer without custom callbacks. Reuse that actual
+native callback through the current-owner dispatcher. Do not add a new drawing
+implementation or reuse outdoor tilt/tip-state callbacks in inventory.
+
+The native initializer owns its item keyframe at inventory BSS `+224`, and
+seven-vector joint/morph arrays at `+294/+2BE`. Three joints plus the root
+translation fit. Complete models and their 160-byte motion share the existing
+15,584-byte item bank; the largest combined import is 5,248 bytes. Table records
+supply both real segmented pointers and actual resource IDs. No model,
+animation, ordinary bank, BSS, or module allocation grows.
+
+The exact call at `8087DA64` passes through a small assembly adapter that changes
+only the outgoing speed argument for preview kinds `18..25`. It reads the
+native caller's segment kind at `s0+16`, supplies 15 native frames per update
+(the donor's 7.5 over two source updates), and tail-calls original `80052584`.
+Other kinds retain their supplied speed. Existing initializer state, source
+frame count, looping mode, work pointers, and original relocations remain.
+Inventory entries and all outdoor code stay at their established addresses.
+
+Current-cartridge checks verify all sixteen records, exact table/selector/code
+changes, complete source functions, unchanged original draw code, the one JAL
+change, bank/work bounds, exact patch reconstruction, retained resources and
+save format, and empty/all composition. The focused native fixture runs the
+real model/animation loader and initializer for an original net and the smallest/
+largest imported rigs, then the actual inventory skeleton drawer. Full transfers,
+original timing, imported speed/first frame, joint lists, matrices/streams,
+guards, save retention, and checkpoint restoration pass. No ordinary inventory
+interaction, GPU appearance, parent selection, or hardware claim follows from
+this component check. Exact evidence is in the
+[inventory-rig checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-animated-inventory-previews).
+
+### Shared tables and static categories
 
 `tools/v3_inventory_equipment.py` extends the separate inventory owner through
 the same `--refresh-runtime --player-actions` importer. Its records join the

@@ -18,47 +18,35 @@ served patchers retain their existing builds.
 
 ## Active development
 
-The explicit ABI-119 proposal at `build/v3-held-rig-sound-04/` completes the
-shared pinwheel loop-sound dependency. It preserves the donor's sustained note,
-short attack/hold envelope, and speed-controlled volume while reusing the exact
-native instrument/sample. The loaded sequence grows by 32 bytes; conservative
-permanent-audio accounting leaves 192 bytes spare without heap growth.
+The explicit ABI-120 proposal at `build/v3-inventory-rigs-02/` connects all
+eight pinwheels to shared inventory previews. It reuses the actual native
+skeleton drawer, item keyframe, seven-vector work areas, and 15,584-byte bank.
+Source-derived records supply complete models/animations and the original
+holding poses; a category-aware hook supplies the source-correct spin speed.
+Original tool timing remains intact, without additional allocation.
 
-Ten focused parser, sanitizer, cartridge, and composition checks pass. The
-first silent native run passes 165 records/50 assertions: signed/saturated speed
-gain, actual volume commands with pause/fade/pan/reverb, actor registration,
-sample transfers, continued refresh, zero-speed expiry, guards, saved-state
-retention, checkpoint restoration, and clean exit. No listening or ordinary
-equipped-pinwheel gameplay is claimed. Reuse that passing evidence.
+Three current-cartridge/composition checks pass. The first silent native run
+passes 72 records/56 assertions, including actual inventory model/animation
+loading, initialization and speed, both joints of the smallest/largest models,
+original tool timing, graphics/matrix bounds, guards, saved-state retention,
+checkpoint restoration, and clean exit. This is component evidence, not a
+claim of ordinary inventory interaction or GPU appearance. See the
+[inventory-rig checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-animated-inventory-previews).
 
-Continue from `build/v3-held-rig-sound-04/build-lock.json` explicitly. Extend
-shared inventory previews to animated rigs, then connect parent readers,
-acquisition, catalogue, and individual selections using the existing category
-records. The 112 existing choices, format-2 saves, module/player allocations,
-and exact import-free V2-12 remain. The main lock and both served patchers stay
-unchanged; the independent seasonal-copy issue remains unresolved. See the
-[loop-sound checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-held-loop-sound).
+The complete shared outdoor setup, movement/wind response, native animation,
+joint drawing, and speed-controlled loop sound are installed. Retain passing
+action and sound evidence for those unchanged implementations. Sound adds
+32 loaded bytes while reusing the exact native sample; conservative permanent
+audio accounting leaves 192 bytes spare. The resident module remains 56 KiB,
+with both 5,248-byte outdoor banks and the existing transient player extension.
 
-The explicit ABI-118 proposal at `build/v3-held-rig-actions-03/` connects all
-eight pinwheel rigs to shared setup, movement/wind response, native animation,
-and joint drawing. The player gains a checked 56-byte allocation extension for
-44 bytes of transient state. The resident module is 56 KiB. Both 5,248-byte
-equipment banks and all prior resources are retained.
-
-Four focused host/cartridge checks pass. The corrected native category probe
-passes original-tool setup, complete initialization and wind-driven animation
-for the smallest/largest rigs, both joint display lists, matrix-stack/graphics
-bounds, guards, saved-state retention, checkpoint restoration, and clean exit.
-The full owner-relative setup continuation and both native graphics streams are
-verified. The fixture's setup retry allowance is spent; reuse its passing result.
-
-The same 112 existing choices, saved profile, and exact import-free V2-12 remain.
-Pinwheels are not selectable yet: complete their animated inventory
-previews, and acquisition/catalogue/selection connections next. Native component
-drawing is not proof of ordinary rendered gameplay or hardware appearance.
-The main lock and both served patchers remain unchanged; the independent
-seasonal-copy issue stays unresolved. See the
-[rig-action checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-animated-held-actions).
+Continue from `build/v3-inventory-rigs-02/build-lock.json` explicitly. Connect
+parent readers, acquisition, catalogue, and individual selections through the
+existing category records. Pinwheel choices remain disabled; the existing
+112 choices, format-2 saved profile, and exact import-free V2-12 are preserved.
+Ordinary equipped-pinwheel gameplay, acquisition, persistence, listening, and
+hardware remain unverified. The main lock and both served patchers remain
+unchanged; the independent seasonal-copy issue remains unresolved.
 
 The current ABI-116 two-fan profile has an isolated festival-night fixture with
 no seeded item or ownership. Normal town entry, original inventory, the festival

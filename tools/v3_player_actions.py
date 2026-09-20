@@ -887,6 +887,9 @@ def expanded_tables(source,owner,reloc,*,categories=CATEGORIES,native_count=NATI
 
 def install(base,prior,blob,core,original,output):
     old=prior.get('equipment_resources',{})
+    if old.get('held_rig_actions',{}).get('loop_sound_installed') and not old['inventory_preview'].get('animated_rigs_installed'):
+        from v3_inventory_equipment import refresh_rigs as inventory_rigs
+        return inventory_rigs(base,prior,blob,core,original,output)
     if old.get('held_rig_actions') and not old['held_rig_actions'].get('loop_sound_installed'):
         return refresh_rig_sound(base,prior,blob,core,original,output)
     if old.get('animated_rigs') and not old.get('held_rig_actions'):

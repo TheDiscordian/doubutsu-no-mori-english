@@ -165,8 +165,10 @@ route connects shared pinwheel setup, movement/wind, animation, and drawing.
 It grows the actual player allocation for transient state and retains every
 original callback/resource. On an action-enabled base, the same route adds the
 complete source sustained loop through the shared level-sound converter and
-native speed-dependent volume consumer. Animated inventory previews and parent
-readiness remain required dependencies; neither refresh enables choices.
+native speed-dependent volume consumer. The subsequent refresh connects complete
+animated inventory records, native skeleton drawing, and donor preview timing,
+retaining existing banks and original tool behaviour. Parent readiness remains
+required; these refreshes do not enable choices.
 See [animated-held actions](V3_HANDHELD_ITEMS.md#shared-animated-held-actions)
 and [loop sound](V3_HANDHELD_ITEMS.md#shared-held-loop-sound).
 

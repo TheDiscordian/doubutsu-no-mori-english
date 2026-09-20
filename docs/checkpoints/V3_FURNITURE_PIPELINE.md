@@ -1,5 +1,65 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared animated inventory previews
+
+The existing runtime refresh consumes ABI 119 and connects all eight pinwheel
+previews through the shared inventory tables. It reuses native skeleton drawing,
+keyframe work areas, and the model bank. A small category-aware initializer
+adapter supplies the source preview spin speed; original tools retain theirs.
+No model conversion, allocation growth, parent enablement, or saved-format
+change is added.
+
+- Explicit lock: `build/v3-inventory-rigs-02/build-lock.json`, ABI 120.
+- ROM SHA-256:
+  `41e6a2117b20af9224b8c6eba33ee1380878c23ba2e3183cd3b9aada241ed33a`.
+- UPS SHA-256:
+  `37426b4a25902408140ceae459d6915274a1e7e71edda777b8e90b46e125a3dc`.
+- Build receipt SHA-256:
+  `01422ed630a41eb8c0aa556f0d1b65500d8d5b8a26ba9af4b5aa77d75c9db8d1`.
+- Equipment module SHA-256:
+  `9fc85d822492efc1225a7a705aae7c0b097e113ca07cab51f34f212d179fe72e`.
+- Inventory code: 576 bytes at `804A9000`, SHA-256
+  `c0d791248429f7d9752b97a65543f35ff98e0bd4614fc72ef5e70eb908c51b14`.
+- Preview records: 16, retaining eight fans and adding eight pinwheels.
+- Resident module: 56 KiB; preview model bank: 15,584 bytes, both unchanged.
+
+Three focused current-cartridge/composition checks pass in 6.252 seconds.
+They regenerate all source records, validate every table binding, compare exact
+permitted changes and the complete speed adapter, retain all other owners/code/
+resources, reconstruct the UPS, and verify unchanged 112 choices plus exact
+all/empty composition. Source parsing and diff checks pass. Runtime C is
+unchanged; no redundant historical sanitizer replay is needed.
+
+The first silent native run, `build/smoke-v3-inventory-rigs-01/`, passes
+72 records/56 assertions. Results SHA-256:
+`d68ccd3550e03a4c405d38fdc017c73d4ae31ebfdbc83766747a6808c1446d4d`.
+It loads and relocates the complete cartridge inventory owner, executes the
+actual item-loading/initialization branch for original net kind 1 and imported
+kinds 18/24, and checks complete smallest/largest model-plus-animation transfers
+with untouched bank tails. The original speed/frame remain 1/2; imported
+speed/frame are 15/16. Native work/morph pointers, both actual joint display
+lists, two matrix allocations, both graphics streams, matrix-stack balance,
+parent transform, all private guards, unchanged saved state and resident module,
+checkpoint restoration, final guards, and clean exit pass. No native retry is
+needed. New focused test work takes approximately six minutes.
+
+The first build attempt `v3-inventory-rigs-01` stops before producing a ROM:
+its new guard expected animation type 2, while the verified pinwheel motion
+has source/native type 5. The corrected guard also binds the motion's actual
+joint count to the model. Build `-02` is the only resulting cartridge. A test
+patch initially listed hunks out of source order and applied nothing; the
+correctly ordered patch succeeds before the native run.
+
+This fixture executes cartridge code against isolated inventory state. It does
+not establish ordinary menu interaction, selected pinwheel gameplay, GPU
+appearance, acquisition, or hardware. Parent choices remain disabled. The
+existing fan profile and format-2 save code are unchanged; matching-profile
+compatibility with ABI 119 is expected both ways, without a newly claimed
+ordinary cross-version reload. Imported V3 saves must not be loaded in V2.
+The main lock and both patchers stay unchanged, and the independent seasonal-copy
+issue remains unresolved. Continue shared parent/readers/catalogue/selection
+integration using the installed category descriptors and prepared artwork.
+
 ## Shared held loop sound
 
 The existing `--refresh-runtime --player-actions` route consumes ABI 118 and
