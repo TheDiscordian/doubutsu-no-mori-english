@@ -39,6 +39,38 @@ extern float sqrtf(float);
 #define SHORT(p, at) (*(s16 *)((u8 *)(p) + (at)))
 #define STATE(p) ((RigState *)((u8 *)(p) + 0x12D8))
 
+#ifdef AF_V3_BALLOON
+typedef struct {
+    s16 lean;
+    Angle3 angle;
+    float z_velocity, saved_frame, saved_speed;
+    int stop;
+    s16 extra_x, counter;
+    float drawn_frame;
+    Vec3 hand_move;
+    int second_step;
+} BalloonState;
+typedef char BalloonStateSize[(sizeof(BalloonState) == 48) ? 1 : -1];
+#define BALLOON(p) ((BalloonState *)((u8 *)(p) + 0x1370))
+
+void af_v3_held_balloon_setup(void *actor, int previous_main) {
+    BalloonState *s = BALLOON(actor);
+    /* The native frame controller is start/end/duration, not duration/start/end. */
+    WORD(actor, 0xA2C) = 0; /* Source balloon initialization uses STOP. */
+    if (previous_main != 21) {
+        u8 *bytes = (u8 *)s;
+        unsigned i;
+        for (i = 0; i < sizeof(*s); ++i) bytes[i] = 0;
+        s->lean = (s16)-SHORT(actor, 0xDC);
+        s->saved_frame = REAL(actor, 0xA20);
+        s->stop = 1;
+        s->z_velocity = 30.0f;
+        REAL(actor, 0xA28) = s->saved_frame;
+        REAL(actor, 0xA24) = s->saved_speed;
+    }
+}
+#endif
+
 extern void af_v3_held_setup_original(void *, int, int, float, float, float, int *, int *);
 
 static int pinwheel(int kind) { return (u32)(kind - 99) < 8u; }
@@ -47,6 +79,9 @@ void af_v3_held_setup(void *actor, int animation, int item_animation, float spee
                       float morph, float frame, int *animation_out, int *part_out) {
     int kind = FN(0x808BD5C4u, int, void *, int)(actor, WORD(actor, 0xD00));
     int previous = *(signed char *)((u8 *)actor + 0x1117);
+#ifdef AF_V3_BALLOON
+    int previous_main = WORD(actor, 0xCFC);
+#endif
     RigState *state = STATE(actor);
     if (pinwheel(kind)) {
         if (!pinwheel(previous)) {
@@ -63,6 +98,9 @@ void af_v3_held_setup(void *actor, int animation, int item_animation, float spee
     }
     af_v3_held_setup_original(actor, animation, item_animation, speed, morph,
                               frame, animation_out, part_out);
+#ifdef AF_V3_BALLOON
+    if (WORD(actor, 0xCFC) == 21) af_v3_held_balloon_setup(actor, previous_main);
+#endif
 }
 
 static float absolute(float value) { return value < 0.0f ? -value : value; }
@@ -70,7 +108,11 @@ static float cosine(s16 angle) { return FN(0x80099A54u, float, int)(angle); }
 
 #ifdef AF_V3_PINWHEEL_SOUND
 #ifdef __mips__
+#ifdef AF_V3_BALLOON
+#define loop_level (*(volatile float *)0x804B1FE0u)
+#else
 #define loop_level (*(volatile float *)0x804B0FE0u)
+#endif
 #define level_rows ((const u8 *)0x80113D3Cu)
 #else
 extern float af_test_loop_level;
@@ -193,3 +235,142 @@ void af_v3_held_pinwheel_draw(void *actor, void *game) {
         state->valid = 1;
     }
 }
+
+#ifdef AF_V3_BALLOON
+static float sine(s16 angle) { return FN(0x80099A94u, float, int)(angle); }
+
+/* Replace the complete native hand-position callback. The matrix and original
+ * position retain their native locations; only the missing delta is appended. */
+void af_v3_held_hand_position(void *actor) {
+    Vec3 *hand = (Vec3 *)((u8 *)actor + 0x103C), previous = *hand;
+    FN(0x800E14D4u, void, Vec3 *)(hand);
+    if (WORD(actor, 0xCFC) == 21) {
+        BalloonState *s = BALLOON(actor);
+        s->hand_move.x = hand->x - previous.x;
+        s->hand_move.y = hand->y - previous.y;
+        s->hand_move.z = hand->z - previous.z;
+    }
+    FN(0x800E0260u, void, void *)((u8 *)actor + 0x1054);
+}
+
+static void balloon_advance(void *actor) {
+    BalloonState *s = BALLOON(actor);
+    float frame = REAL(actor, 0xA28), max = REAL(actor, 0xA20);
+    FN(0x8009A974u, void, s16 *, s16, float, s16, s16)
+        (&s->lean, (s16)-SHORT(actor, 0xDC), 1.0f - square_root(.91f), 250, 0);
+    s->saved_frame = frame;
+    s->saved_speed = REAL(actor, 0xA24);
+    frame += s->saved_speed;
+    if (frame > max) frame = max;
+    else if (frame < .5f * max) frame = .5f * max;
+    REAL(actor, 0xA28) = frame;
+}
+
+int af_v3_held_balloon_main(void *actor, void *game) {
+    (void)game;
+    balloon_advance(actor);
+    BALLOON(actor)->second_step = 1;
+    return 0;
+}
+
+static void balloon_movement(void *actor) {
+    BalloonState *s = BALLOON(actor);
+    float max = REAL(actor, 0xA20), frame = REAL(actor, 0xA28);
+    float speed = REAL(actor, 0xA24);
+    if (REAL(actor, 0xDF0) == 1.0f) {
+        float normalized = 26.0f * (frame - 1.0f) / (max - 1.0f);
+        if (!s->stop) {
+            s16 yaw = SHORT(actor, 0xDE), target;
+            float projected = .5f * (sine(yaw) * s->hand_move.x + cosine(yaw) * s->hand_move.z);
+            int z;
+            normalized -= .5f * s->hand_move.y * cosine(s->lean)
+                          + projected * cosine((s16)(0x4000 - s->lean));
+            s->z_velocity -= .0014f * s->angle.z;
+            z = (s16)(s->angle.z + (int)s->z_velocity);
+            if (z > 0x800) z = 0x800;
+            else if (z < -0x800) z = -0x800;
+            s->angle.z = (s16)z;
+            /* Convert through int before narrowing, matching the source's
+               integer conversion even when a teleported hand crosses 32767. */
+            target = (s16)(int)(-1200.0f * projected);
+            FN(0x8009A974u, void, s16 *, s16, float, s16, s16)
+                (&s->angle.x, target, 1.0f - square_root(
+                    absolute((float)target) < absolute((float)s->angle.x) ? .9f : .6f), 2500, 0);
+            target = 0;
+            if (WORD(actor, 0xCF0) == 8 || WORD(actor, 0xCF0) == 9) {
+                /* Actor speed is per native update; the source runs twice. */
+                s->counter = (s16)(s->counter + (s16)(int)(200.0f * REAL(actor, 0x74)));
+                target = (s16)(int)(1000.0f * sine(s->counter));
+            }
+            FN(0x8009A974u, void, s16 *, s16, float, s16, s16)
+                (&s->extra_x, target, 1.0f - square_root(.6f), 2500, 0);
+        }
+        if (normalized < 13.0f) normalized = 13.0f;
+        else if (normalized > 26.0f) normalized = 26.0f;
+        frame = 1.0f + normalized * (max - 1.0f) / 26.0f;
+        REAL(actor, 0xA28) = frame;
+    } else s->angle.z = 0;
+    if (frame >= max) speed = -.085f;
+    else if (speed <= 0.0f && frame <= .7f * max) speed = 0.0f;
+    else speed += .0039585f;
+    REAL(actor, 0xA24) = speed;
+}
+
+static void balloon_play(void *actor) {
+    BalloonState *s = BALLOON(actor);
+    float frame = REAL(actor, 0xA28), max = REAL(actor, 0xA20);
+    if (s->drawn_frame != frame) {
+        float delta = frame - s->drawn_frame, speed = REAL(actor, 0xA24);
+        REAL(actor, 0xA18) = delta >= 0.0f ? 1.0f : max;
+        REAL(actor, 0xA1C) = delta >= 0.0f ? max : 1.0f;
+        REAL(actor, 0xA24) = delta;
+        FN(0x808BD81Cu, void, void *)(actor);
+        REAL(actor, 0xA28) = frame;
+        s->drawn_frame = frame;
+        REAL(actor, 0xA24) = speed;
+    }
+}
+
+void af_v3_held_balloon_draw(void *actor, void *game) {
+    BalloonState *s = BALLOON(actor);
+    Vec3 *hand = (Vec3 *)((u8 *)actor + 0x103C);
+    void *graph = *(void **)game;
+    u32 **cursor = (u32 **)((u8 *)graph + 0x298), *command;
+    void *matrices = (u8 *)actor + 0xAE0 + (WORD(game, 0xA0) & 1) * 0x100;
+    float scale = REAL(actor, 0xDF0);
+    if (!FN(0x8009AD98u, int, void *)(game)) {
+        balloon_movement(actor);
+        if (s->second_step) {
+            balloon_advance(actor);
+            balloon_movement(actor);
+            s->second_step = 0;
+        }
+        balloon_play(actor);
+    }
+    FN(0x800E020Cu, void, void)();
+    FN(0x800E0314u, void, float, float, float, int)(hand->x, hand->y, hand->z, 0);
+    FN(0x800E0698u, void, int, int)(SHORT(actor, 0xDE), 1);
+    FN(0x800E0500u, void, int, int)((s16)(-0x4000 + s->lean + s->angle.x + s->extra_x), 1);
+    FN(0x800E0834u, void, int, int)(0x4000, 1);
+    FN(0x800E0500u, void, int, int)(s->angle.z, 1);
+    FN(0x800E041Cu, void, float, float, float, int)
+        (REAL(actor, 0x5C) * scale, REAL(actor, 0x60) * scale, REAL(actor, 0x64) * scale, 1);
+    command = *cursor;
+    command[0] = 0xDA380003u;
+    command[1] = FN(0x800E13C4u, u32, void *)(graph);
+    *cursor = command + 2;
+    FN(0x800588B8u, void, Vec3 *, void *)(hand, game);
+    /* The donor's TexEdgeAlpha callbacks tune GX's binary approximation of
+       RDP alpha coverage. N64 materials retain native AA/CVG_X_ALPHA instead;
+       emitting that GameCube-only opcode would be invalid on real hardware. */
+    FN(0x800530D8u, void, void *, void *, void *, JointCallback, JointCallback, void *)
+        (game, (u8 *)actor + 0xA18, matrices, (JointCallback)0, (JointCallback)0, actor);
+    FN(0x800E0244u, void, void)();
+    WORD(actor, 0xF44) = 0;
+    if (!STATE(actor)->valid) {
+        STATE(actor)->previous = STATE(actor)->current;
+        STATE(actor)->valid = 1;
+    }
+    s->stop = 0;
+}
+#endif

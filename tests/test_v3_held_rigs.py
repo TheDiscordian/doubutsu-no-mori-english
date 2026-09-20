@@ -34,6 +34,83 @@ class BehaviourTests(unittest.TestCase):
     def test_complete_shared_behaviour_and_level_sound_under_sanitizers(self):
         self.run_behaviour('-DAF_V3_PINWHEEL_SOUND=0x4D')
 
+    def test_balloon_category_and_retained_pinwheels_under_sanitizers(self):
+        self.run_behaviour('-DAF_V3_PINWHEEL_SOUND=0x4D', '-DAF_V3_BALLOON')
+
+
+BALLOON_OUTPUT=ROOT/'build/v3-balloon-actions-02'
+
+
+@unittest.skipUnless((BALLOON_OUTPUT/'build-lock.json').is_file(),'Current complete balloon-action build required')
+class BalloonCartridgeTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.image,cls.report=inputs(BALLOON_OUTPUT/'build-lock.json')
+        cls.before,cls.prior=inputs(BALLOON_OUTPUT/'base-lock.json')
+        cls.files,cls.old_files=by_vrom(cls.image),by_vrom(cls.before)
+        cls.e=cls.report['equipment_resources'];cls.old=cls.prior['equipment_resources']
+        cls.rigs=cls.e['held_rig_actions'];cls.balloon=cls.rigs['balloon']
+
+    def test_exact_allocation_callbacks_sequence_and_retained_resources(self):
+        from v3_sound_programs import installed_resource
+        core=bytearray(self.files[CODE_VROM].extract(self.image))
+        previous_core=self.old_files[CODE_VROM].extract(self.before)
+        sequence=self.e['sound_programs']['sequence'];old_sequence=self.old['sound_programs']['sequence']
+        data,header,physical=installed_resource(self.image,core,'seq',199)
+        self.assertEqual(data,installed_resource(self.before,previous_core,'seq',199)[0])
+        self.assertEqual((len(data),sha256(data),physical),(sequence['bytes'],sequence['sha256'],sequence['physical']))
+        at=sequence['header_address']-CODE_RAM;core[at:at+16]=bytes.fromhex(old_sequence['header_after'])
+        allocation=self.rigs['player_allocation'];at=allocation['address']-CODE_RAM
+        self.assertEqual(u32_(core,at),0x13A0);struct.pack_into('>I',core,at,0x1370)
+        hook=self.rigs['loop_sound']['hook'];at=hook['address']-CODE_RAM
+        self.assertEqual(core[at:at+4].hex(),hook['after'])
+        core[at:at+4]=bytes.fromhex(self.old['held_rig_actions']['loop_sound']['hook']['after'])
+        self.assertEqual(core,previous_core)
+        owner=bytearray(self.files[PLAYER_VROM].extract(self.image));hook=self.balloon['hand_hook']
+        at=hook['entry']-PLAYER_RAM;self.assertEqual(owner[at:at+8].hex(),hook['after'])
+        owner[at:at+8]=bytes.fromhex(hook['before'])
+        self.assertEqual(owner,self.old_files[PLAYER_VROM].extract(self.before))
+        allowed={CODE_VROM,MODULE,BLOB,PLAYER_VROM,0x19D40}
+        for v in set(self.files)-allowed:
+            self.assertEqual(self.files[v].extract(self.image),self.old_files[v].extract(self.before),hex(v))
+        blob=self.files[BLOB].extract(self.image)
+        old_blob=self.old_files[BLOB].extract(self.before)
+        for row in self.e['records']+self.e['player_motion']['records']:
+            at,n=row['blob_offset'],row['bytes']
+            self.assertEqual(blob[at:at+n],old_blob[at:at+n])
+            self.assertEqual(sha256(blob[at:at+n]),row['sha256'])
+        module=blob[self.e['blob_offset']:self.e['blob_offset']+self.e['bytes']]
+        self.assertEqual((len(module),sha256(module),zlib.crc32(module)),(0xF000,self.e['sha256'],self.e['crc32']))
+        self.assertEqual(module[-16:],struct.pack('>4I',*([GUARD]*4)))
+        compiled=(BALLOON_OUTPUT/'held_rigs/code.bin').read_bytes()
+        self.assertEqual(module[0xD000:0xD000+len(compiled)],compiled)
+        self.assertFalse(any(module[0xD000+len(compiled):-16]))
+        symbols=self.rigs['code']['symbols']
+        for table,action in zip(self.e['player_actions']['held_dispatch']['tables'],('main','draw')):
+            self.assertEqual(u32_(module,table['offset']+84),symbols['af_v3_held_balloon_'+action])
+            self.assertEqual(u32_(module,table['offset']+88),symbols['af_v3_held_pinwheel_'+action])
+        self.assertEqual(self.rigs['loop_sound']['level_ram'],0x804B1FE0)
+        for key in ('records','kind_readers','inventory_preview','animated_rigs','parent_readers'):
+            self.assertEqual(self.e[key],self.old[key])
+        self.assertEqual(apply_ups((ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes(),
+            (BALLOON_OUTPUT/'asset-loader.ups').read_bytes()),self.image)
+
+    def test_empty_and_all_profiles_and_no_premature_balloon_choices(self):
+        pin=(composer.BASE,composer.BASE_SHA,composer.REPORT_SHA,composer.ABI)
+        try:
+            composer.use_build_lock(BALLOON_OUTPUT/'build-lock.json')
+            catalog=composer.catalogue(self.image,self.report)
+            self.assertEqual(len(catalog),120)
+            self.assertFalse(any(f'GAFE01-r0/item/{i:04X}' in catalog for i in range(0x2244,0x224C)))
+            self.assertEqual(sha256(composer.compose(self.image,self.report,catalog,composer.resolve(catalog,[]))[0]),
+                self.report['translation_baseline']['sha256'])
+            self.assertEqual(composer.compose(self.image,self.report,catalog,composer.resolve(catalog,list(catalog)))[0],self.image)
+            self.assertEqual(self.report['save_runtime'],self.prior['save_runtime'])
+        finally:composer.BASE,composer.BASE_SHA,composer.REPORT_SHA,composer.ABI=pin
+
+
+def u32_(data,at):return struct.unpack_from('>I',data,at)[0]
+
 
 @unittest.skipUnless((OUTPUT/'build-lock.json').is_file(),'Current rig-action cartridge required')
 class CartridgeTests(unittest.TestCase):

@@ -81,6 +81,137 @@ PARENT_CODE_OFFSET,PARENT_TABLE_OFFSET=0x3000,0x57F0
 POCKET_ICON_OFFSET=0x3800
 RIG_CODE_OFFSET,RIG_MODULE_SIZE=0xD000,0xE000
 RIG_STATE_OFFSET,RIG_STATE_BYTES,RIG_PLAYER_SIZE=0x12D8,44,0x1310
+BALLOON_MODULE_SIZE,BALLOON_STATE_OFFSET,BALLOON_STATE_BYTES=0xF000,0x1370,48
+
+
+def refresh_balloon_actions(base,prior,blob,core,original,output):
+    """Extend the shared held categories; inventory/parents remain independent."""
+    old=prior['equipment_resources'];rigs=old['held_rig_actions'];position=old['blob_offset']
+    module=bytearray(blob[position:position+old['bytes']]);files=by_vrom(base)
+    owner=bytearray(files[PLAYER_VROM].extract(base));rel=files[PLAYER_RELOC].extract(base)
+    native_files=by_vrom(original);native_owner=native_files[PLAYER_VROM].extract(original)
+    native_core=native_files[CODE_VROM].extract(original)
+    if (rigs.get('balloon') or not rigs.get('loop_sound_installed') or old['bytes']!=RIG_MODULE_SIZE
+            or sha256(module)!=old['sha256'] or old['ram']!=RAM
+            or sha256(owner)!=old['player_motion']['owner_sha256']
+            or sha256(rel)!=old['player_motion']['reloc_sha256']
+            or old.get('player_joint_work',{}).get('vectors',0)<8
+            or old['inventory_preview'].get('joint_work',{}).get('vectors',0)<8
+            or struct.unpack_from('>4I',module,len(module)-16)!=(GUARD,)*4
+            or RAM+BALLOON_MODULE_SIZE>prior['furniture']['bank_pool']['start']):
+        raise ValueError('Balloon actions require the complete current eight-vector rig module')
+    source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+                  (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    names=('Player_actor_Item_Get_goal_balloon_lean_angle','Player_actor_Item_Setup_main_balloon_normal',
+        'Player_actor_Item_set_balloon_lean_angle','Player_actor_Item_CulcAnimation_balloon_normal',
+        'Player_actor_Item_Movement_balloon_normal','Player_actor_Item_PlayAnimation_balloon_normal',
+        'Player_actor_Item_main_balloon_normal','Player_actor_Item_draw_balloon_Before',
+        'Player_actor_Item_draw_balloon_After','Player_actor_Item_draw_balloon',
+        'Player_actor_draw_After_hand','Player_actor_Set_now_item_main_index','Player_actor_Item_Setup_main',
+        'Player_actor_SetupItem_Base0')
+    functions=[]
+    for name in names:
+        matches=[at for at,rows in source.functions.items() if any(n==name for n,_ in rows)]
+        if len(matches)!=1:raise ValueError('Missing complete source balloon callback: '+name)
+        functions.append(source.function(matches[0])[1])
+    rows=[r for r in old['kind_readers']['rows'] if r['item_main']==21]
+    resources={r['index']:r for r in old['records']}
+    if (sorted(r['native_kind'] for r in rows)!=list(range(91,99))
+            or any(not r['resource_ready'] or r['selectable'] or
+                   resources[r['fields'][2]]['kind']!='animated-model' or
+                   resources[r['fields'][2]]['source']['profile']['skeleton']['joints']!=7
+                   for r in rows)):
+        raise ValueError('Incomplete source balloon category or rig resources')
+    consumers=[]
+    for first,last in ((0x808BFA84,0x808BFAC4),(0x808BD81C,0x808BD880)):
+        a,b=first-PLAYER_RAM,last-PLAYER_RAM
+        if owner[a:b]!=native_owner[a:b]:raise ValueError('Changed complete native hand/animation consumer')
+        consumers.append(dict(start=first,end=last,sha256=sha256(owner[a:b])))
+    symbols=(ROOT/'upstream/af/linker_scripts/jp/symbol_addrs_code.txt').read_text()
+    bounds=sorted(int(a,16) for a in re.findall(r'= 0x([0-9A-Fa-f]+); // type:func',symbols))
+    for first in (0x80099A94,0x8009A974,0x8009AD98,0x800E0260,0x800E0314,
+                  0x800E041C,0x800E0500,0x800E0834,0x800588B8,0x80051AE4):
+        last=min(a for a in bounds if a>first);a,b=first-CODE_RAM,last-CODE_RAM
+        if core[a:b]!=native_core[a:b]:raise ValueError('Changed native balloon API')
+        consumers.append(dict(start=first,end=last,sha256=sha256(core[a:b])))
+    # The adjacent source is one checked audio sequence, not unowned padding.
+    # Relocate it intact through its actual native header before growing code.
+    sequence=old['sound_programs']['sequence']
+    data,entry,physical=sound_programs.installed_resource(base,core,'seq',sequence['index'])
+    first=position+len(module);last=first+sequence['bytes']
+    if (sequence['blob_offset']!=first or physical!=files[BLOB].pstart+first
+            or sha256(data)!=sequence['sha256'] or entry.hex()!=sequence['header_after']
+            or blob[first:last]!=data or len(data)<BALLOON_MODULE_SIZE-len(module)
+            or any(e.pstart<physical+len(data) and physical<(e.pend or e.pstart+e.size)
+                   for v,e in files.items() if v!=BLOB and e.pstart!=0xFFFFFFFF)):
+        raise ValueError('Rig expansion lacks exclusively owned adjacent sequence storage')
+    blob.extend(bytes(-len(blob)%16));destination=len(blob);blob.extend(data)
+    if BLOB+len(blob)>END:raise ValueError('Moved sequence exceeds import storage')
+    new_physical=files[BLOB].pstart+destination;header=bytearray(entry)
+    struct.pack_into('>I',header,0,new_physical-files[sound_programs.NATIVE_VROMS['seq']].pstart)
+    address=sequence['header_address'];a=address-CODE_RAM
+    if core[a:a+len(entry)]!=entry:raise ValueError('Changed native sequence header')
+    core[a:a+len(entry)]=header
+    blob[first:last]=bytes(len(data))
+    report=copy.deepcopy(old)
+    report['sound_programs']['sequence'].update(blob_offset=destination,physical=new_physical,
+        vrom=BLOB+destination,header_before=entry.hex(),header_after=header.hex())
+    relocation=dict(previous=copy.deepcopy(sequence),current=copy.deepcopy(report['sound_programs']['sequence']))
+    # Only the allocation size changes; original actor callbacks/identity remain.
+    allocation=rigs['player_allocation'];a=allocation['address']-CODE_RAM
+    profile=bytearray(core[a-12:a+20]);before=u32(profile,12)
+    struct.pack_into('>I',profile,12,allocation['original_bytes'])
+    if (before!=BALLOON_STATE_OFFSET or before!=allocation['bytes']
+            or profile!=native_core[a-12:a+20]):raise ValueError('Changed complete player allocation')
+    struct.pack_into('>I',core,a,BALLOON_STATE_OFFSET+BALLOON_STATE_BYTES)
+    sid=rigs['loop_sound']['native_sound_id']
+    code,compiled=compile_part('held_rigs',output/'held_rigs',extra_sources=('overlays/v3/held_rigs.S',),
+        defines=(f'AF_V3_PINWHEEL_SOUND=0x{sid:02X}','AF_V3_BALLOON'))
+    previous=rigs['code'];a=RIG_CODE_OFFSET
+    if (sha256(module[a:a+previous['bytes']])!=previous['sha256']
+            or any(module[a+previous['bytes']:-16])
+            or compiled['symbols']['af_v3_held_setup']!=previous['symbols']['af_v3_held_setup']
+            or len(code)>BALLOON_MODULE_SIZE-RIG_CODE_OFFSET-32):
+        raise ValueError('Changed rig code/entry or overlapping balloon code')
+    module[a:]=code+bytes(BALLOON_MODULE_SIZE-a-len(code)-16)+struct.pack('>4I',*([GUARD]*4))
+    dispatch=report['player_actions']['held_dispatch']
+    for table,action in zip(dispatch['tables'],('main','draw')):
+        at,n=table['offset'],table['bytes']
+        old_name=f'af_v3_held_pinwheel_{action}';new_name=f'af_v3_held_balloon_{action}'
+        if (sha256(module[at:at+n])!=table['sha256'] or u32(module,at+84)
+                or u32(module,at+88)!=previous['symbols'][old_name]
+                or table['source_callbacks']['21']['symbol']!=f'Player_actor_Item_{action}_balloon'+('_normal' if action=='main' else '')):
+            raise ValueError('Changed shared balloon/pinwheel dispatch')
+        struct.pack_into('>2I',module,at+84,compiled['symbols'][new_name],compiled['symbols'][old_name])
+        table.update(sha256=sha256(module[at:at+n]),enabled_imported_indices=[21,22,23])
+    dispatch.update(enabled_imported_indices=[21,22,23],disabled_indices=[])
+    hook=report['held_rig_actions']['loop_sound']['hook'];at=hook['address']-CODE_RAM
+    if core[at:at+4]!=bytes.fromhex(hook['after']):raise ValueError('Changed live level-volume hook')
+    target=compiled['symbols']['af_v3_held_loop_volume'];after=struct.pack('>I',jump(target,link=True))
+    core[at:at+4]=after;hook.update(after=after.hex(),target=target)
+    entry=0x808BFA84;a=entry-PLAYER_RAM
+    from v3_npc_clothing import guard_incoming
+    guard_incoming(owner,TEXT_SIZE,PLAYER_RAM,[(a,8)])
+    if any(at in relocation_offsets(rel,len(owner)) for at in (a,a+4)):
+        raise ValueError('Unexpected hand callback entry relocation')
+    before=bytes(owner[a:a+8]);after=struct.pack('>2I',jump(compiled['symbols']['af_v3_held_hand_position']),0)
+    owner[a:a+8]=after;blob[position:position+len(module)]=module
+    report.update(bytes=len(module),sha256=sha256(module),crc32=zlib.crc32(module),
+        additional_resident_bytes=len(module)-old['bytes'])
+    report['player_motion']['owner_sha256']=sha256(owner)
+    report['player_actions']['owner_sha256']=sha256(owner)
+    current=report['held_rig_actions'];current.update(code=compiled,category_indices=[21,22],
+        native_kinds=sorted(current['native_kinds']+[r['native_kind'] for r in rows]))
+    current['player_allocation']['bytes']=BALLOON_STATE_OFFSET+BALLOON_STATE_BYTES
+    current['loop_sound']['level_ram']=RAM+BALLOON_MODULE_SIZE-32
+    current['balloon']=dict(source_functions=functions,native_consumers=consumers,
+        state_offset=BALLOON_STATE_OFFSET,state_bytes=BALLOON_STATE_BYTES,
+        hand_hook=dict(entry=entry,before=before.hex(),after=after.hex()),
+        frame_fields=dict(start=0xA18,end=0xA1C,duration=0xA20,speed=0xA24,current=0xA28,mode=0xA2C),
+        source_steps_per_update=2,sequence_relocation=relocation,
+        edge_alpha='Native RDP alpha coverage; no GameCube-only GX threshold opcode',
+        inventory_preview_installed=False,parent_selection_enabled=False,ordinary_gameplay_tested=False)
+    return report,{PLAYER_VROM:bytes(owner)}
 
 
 def refresh_rig_sound(base,prior,blob,core,original,output):
@@ -892,6 +1023,9 @@ def install(base,prior,blob,core,original,output):
             old['inventory_preview'].get('joint_work',{}).get('vectors',7)):
         from v3_inventory_equipment import grow_joint_work
         return grow_joint_work(base,prior,blob,core,original,output)
+    if (old.get('inventory_preview',{}).get('joint_work',{}).get('vectors',0)>=8
+            and not old.get('held_rig_actions',{}).get('balloon')):
+        return refresh_balloon_actions(base,prior,blob,core,original,output)
     if old.get('held_rig_actions',{}).get('loop_sound_installed') and not old['inventory_preview'].get('animated_rigs_installed'):
         from v3_inventory_equipment import refresh_rigs as inventory_rigs
         return inventory_rigs(base,prior,blob,core,original,output)

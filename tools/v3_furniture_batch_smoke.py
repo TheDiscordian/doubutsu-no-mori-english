@@ -1506,7 +1506,8 @@ def held_rig_actions(debug,rom_path,record):
     debug.write_memory(identity,struct.pack('>16f',*(1.0 if i%5==0 else 0.0 for i in range(16))))
     put(game,graph);put(actor+0xDBC,bank0,bank0+capacity)
     put(actor+0xDDC,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF)
-    models=[r for r in resources['records'] if r['type']==1]
+    model_indices={r['fields'][2] for r in resources['kind_readers']['rows'] if r['item_main']==22}
+    models=[r for r in resources['records'] if r['index'] in model_indices]
     models=[min(models,key=lambda r:r['bytes']),max(models,key=lambda r:r['bytes'])]
     animations={r['source_index']:r for r in resources['records'] if r['kind']=='animation'}
     try:
@@ -1552,14 +1553,61 @@ def held_rig_actions(debug,rom_path,record):
             check('unchanged parent matrix',matrix_now,debug.read_memory(identity,64))
             check('native rod-tip validity cleared',actor+0xF44,bytes(4))
             for at in guards:check('native rig memory guard',at,edge)
+        if receipt.get('balloon'):
+            # The real view/light fields are required by reflection drawing.
+            # Redirect only its graphics context to the isolated command arenas.
+            saved[real_game]=debug.read_memory(real_game,4)
+            saved[real_game+0xA0]=debug.read_memory(real_game+0xA0,4)
+            model_indices={r['fields'][2] for r in resources['kind_readers']['rows'] if r['item_main']==21}
+            balloons=[r for r in resources['records'] if r['index'] in model_indices]
+            balloons=[min(balloons,key=lambda r:r['bytes']),max(balloons,key=lambda r:r['bytes'])]
+            for iteration,model in enumerate(balloons):
+                animation=animations[model['source']['motion_bindings'][0]['default_animation']]
+                owner_call(0x808BD934,0x808BDACC,[actor,model['index'],animation['index'],0,0,0x3F800000,0])
+                maximum=floating(actor+0xA20)
+                put(actor+0xCFC,21);put(actor+0xDF0,0x3F800000)
+                debug.write_memory(actor+0x5C,struct.pack('>3f',.01,.01,.01))
+                resident('af_v3_held_balloon_setup',[actor,0])
+                check('balloon setup uses actual duration and stop mode',actor+0xA24,struct.pack('>2fI',0,maximum,0))
+                call(0x800E0284,[identity])
+                owner_call(0x808BFA84,0x808BFAC4,[actor])
+                check('native hand callback retains the hand matrix',actor+0x1054,debug.read_memory(identity,64))
+                put(real_game,graph);put(real_game+0xA0,iteration)
+                put(graph+0x298,gfx,gfx+0x2000);put(graph+0x2A8,translucent,translucent+0x700)
+                bank=bank0+scalar(actor+0xDEC)*capacity;put(0x801458B8,bank&0x1FFFFFFF)
+                resident('af_v3_held_balloon_main',[actor,real_game])
+                resident('af_v3_held_balloon_draw',[actor,real_game])
+                front,back=struct.unpack('>2I',debug.read_memory(graph+0x298,8))
+                if not gfx<front<=back<gfx+0x2000:raise ValueError('Balloon draw escaped its command arena')
+                commands=debug.read_memory(gfx,front-gfx)
+                draws=[p for w,p in struct.iter_unpack('>2I',commands) if w>>24==0xDE]
+                expected_lists=[0x06000000+m['native_offset'] for m in model['source']['models']]
+                passed=(draws==expected_lists and abs(floating(actor+0xA28)-(maximum-.085))<.0001
+                        and abs(floating(actor+0xA24)+.0810415)<.0001)
+                record(dict(held_balloon_native_draw=model['index'],lists=draws,frame=floating(actor+0xA28),
+                    speed=floating(actor+0xA24),assertion='passed' if passed else 'failed'))
+                if not passed:raise ValueError('Balloon omitted source joints or timed spring advance')
+                assertions+=1
+                check('balloon duration survives playback',actor+0xA20,struct.pack('>f',maximum))
+                check('balloon consumes second substep',actor+receipt['balloon']['state_offset']+44,bytes(4))
+                check('balloon retains the parent matrix',matrix_now,debug.read_memory(identity,64))
+                check('balloon balances matrix stack',0x801462B4,struct.pack('>I',matrix_now))
+                for at in guards:check('balloon work/graphics/stack guard',at,edge)
         check('save/profile unchanged',0x8046C000,saved[0x8046C000])
         check('no CPU fault',0x8003CE34,bytes(4))
-        check('complete module remains intact',equipment.RAM,module)
+        if receipt.get('loop_sound_installed'):
+            # The new pinwheel callback legitimately updates only this float.
+            level=receipt['loop_sound']['level_ram']-equipment.RAM
+            check('module before runtime volume remains intact',equipment.RAM,module[:level])
+            check('module after runtime volume remains intact',equipment.RAM+level+4,module[level+4:])
+        else:check('complete module remains intact',equipment.RAM,module)
     finally:
         debug.write_memory(matrix_now,matrix_before)
         for at,value in saved.items():debug.write_memory(at,value)
         call(0x8009C040,[allocation])
-    return dict(native_held_rig_actions=True,assertions=assertions,representative_rigs=len(models),
+    return dict(native_held_rig_actions=True,assertions=assertions,
+        representative_rigs=len(models)+(len(balloons) if receipt.get('balloon') else 0),
+        representative_pinwheels=len(models),representative_balloons=len(balloons) if receipt.get('balloon') else 0,
         gpu_rendered=False,ordinary_gameplay_tested=False,pinwheel_selection_tested=False,
         sound_tested=False,flash_written=False,requires_checkpoint_restore=True)
 

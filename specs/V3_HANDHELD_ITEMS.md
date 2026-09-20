@@ -307,8 +307,9 @@ the [capacity checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-ri
 After installing the complete rigs, the existing `--refresh-runtime
 --player-actions` route adds the common animated-held implementation. It uses
 source-discovered category 22 and all eight corresponding kind rows `99..106`,
-not item-specific callbacks. Original held callbacks and the fan category remain;
-category 21 stays empty. Preparing these callbacks does not enable parent items.
+not item-specific callbacks. Original held callbacks and the fan category remain.
+The subsequent balloon-action stage below connects category 21 after both joint
+work areas have sufficient capacity. These callbacks do not enable parent items.
 
 `overlays/v3/held_rigs.c` preserves the donor's setup contract: newly equipped
 pinwheels start at frame one with zero speed; same-kind action transitions keep
@@ -355,6 +356,53 @@ consumers are recorded and checked; retained resources and callback slots stay
 unchanged. Parent readiness remains an explicit dependency; loop sound and
 animated inventory use the shared adapters below. The [action checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-animated-held-actions)
 records current component evidence, failed attempts, and gameplay limits.
+
+### Shared balloon actions
+
+On a complete eight-vector player/inventory build, `--refresh-runtime
+--player-actions` installs category 21 through the same `held_rigs.c` module and
+main/draw tables. All eight source kinds `91..98` must have their complete
+seven-joint models and animations. The installer records fourteen complete
+source functions and verifies the original native hand callback, skeleton
+player, matrix/reflection APIs, pause reader, and frame initializer.
+
+The player allocation is `13A0` bytes. A 48-byte balloon state at `+1370`
+follows the independent `+1310/+1340` joint/morph arrays. It contains lean/axis
+angles, spring velocity, source animation state, walking oscillation, hand delta,
+and substep state. No native or saved field is repurposed. The complete native
+hand callback at `808BFA84` keeps the hand position at `+103C` and matrix at
+`+1054`; its resident replacement additionally records balloon movement.
+Other equipment retains the original hand-position/matrix operations.
+
+The shared setup wrapper retains its fixed entry and original-body bridge.
+Balloon entry resets source state and uses STOP animation mode. Same-category
+transitions retain source state. Frame control uses the native order
+`start/end/duration/speed/current/mode` at `A18/A1C/A20/A24/A28/A2C`.
+The physics preserves lean smoothing, capped string oscillation, walking sway,
+frame bounds, and spring acceleration. Two source substeps span one native
+update; measured hand delta and actor speed are divided between the substeps.
+Paused drawing does not advance physics. The native animation player retains
+its temporary animation-bank binding, and drawing retains both four-matrix
+banks, world-space hand placement, actor/item scale, reflection setup, and all
+four displayed joints.
+
+The GameCube before/after callbacks change the emulator's GX binary alpha
+threshold. N64 uses the converted materials' actual RDP antialiased alpha
+coverage instead; no GameCube-only `G_SETTEXEDGEALPHA` command is emitted.
+This platform adaptation still needs visual/hardware confirmation.
+
+The module is 60 KiB, with the loop-volume float at `804B1FE0` and guard at
+`804B1FF0`. Its adjacent 20,240-byte audio sequence is moved intact and its native
+sequence header updated before code expansion. The installer verifies its entire
+contents, header, exclusive storage, and destination bounds. No audio program,
+instrument, sample, or audio-heap size changes. Startup covers the enlarged
+module; all pinwheel callbacks and the live loop-volume hook are rebound.
+
+Five focused checks and the first silent native component run pass. Ordinary
+gameplay, GPU appearance, acquisition/persistence, and hardware remain open.
+Inventory-specific reflection drawing and parent integration are required before
+balloons become selectable. See the
+[balloon checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-balloon-actions).
 
 ### Shared held loop sound
 

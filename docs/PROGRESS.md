@@ -18,20 +18,25 @@ served patchers retain their existing builds.
 
 ## Active development
 
-The explicit ABI-123 proposal at `build/v3-inventory-capacity-02/` gives the
-inventory its own eight-vector joint/morph arrays. Its BSS grows by 96 bytes;
-both menu-owner descriptors and the shared allocation grow consistently. Four
-focused checks pass. The silent native retry passes 99 records/83 assertions,
-including actual loading/BSS clearing, retained ordinary-tool timing, pinwheel
-initialization/drawing, full eight-vector playback through temporary test data,
-guards, saved-state retention, checkpoint restore, and clean exit.
+The explicit ABI-124 proposal at `build/v3-balloon-actions-02/` installs shared
+balloon setup, hand-motion tracking, sway/spring animation, and reflected drawing.
+The player owns 48 additional transient bytes; no saved field is changed.
+The shared equipment module is 60 KiB. An adjacent audio sequence moves intact
+through its actual native header, making room without changing any sound data.
 
-Use `build/v3-inventory-capacity-02/build-lock.json` for continued work. The
-120 choices, existing preview records, outdoor banks, resident module, saved
-formats, and exact V2-12 no-import output remain unchanged. Balloon gameplay
-and its source-specific preview drawing are not installed. Next implement those
-callbacks and complete parent integration. The main lock and both patchers stay
-unchanged. See the [inventory capacity checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-inventory-joint-capacity).
+Five focused checks pass. The first silent native run passes 148 records and
+96 assertions, covering two complete balloon rigs, two retained pinwheel rigs,
+actual initialization/hand tracking/animation/drawing commands, matrix and memory
+guards, saved-state retention, checkpoint restoration, and clean exit. This is
+component execution, not GPU appearance, ordinary gameplay, or hardware proof.
+
+Use `build/v3-balloon-actions-02/build-lock.json` for continued work. The 120
+experimental choices, existing inventory previews, complete resources, format-2
+saves, and exact V2-12 no-import output are retained. Balloon inventory drawing
+and parent integration are next; balloons are not selectable yet. Reuse the
+passing eight-vector player/inventory allocation evidence. The main lock and
+both patchers stay unchanged. See the
+[balloon-action checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-balloon-actions).
 
 The explicit ABI-122 proposal at `build/v3-rig-capacity-03/` installs all twenty
 complete animated equipment rigs through shared category discovery. Both outdoor
@@ -45,7 +50,7 @@ assertions: alternating complete models/animations, actual player initialization
 small and maximum-size joint/morph playback, old-array retention, guards, saved
 state retention, checkpoint restore, and clean exit. Ordinary gameplay and
 hardware are not established. The inventory proposal above retains these bank
-changes; next connect source-correct balloon actions/previews and remaining
+changes; next connect source-correct balloon previews and remaining
 parent consumers.
 The main lock and both served patchers stay unchanged. See the
 [capacity checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-rig-capacity-and-resource-extension).
@@ -60,7 +65,7 @@ Thirty-five focused checks pass, including complete donor/native comparisons,
 matrix ownership, material stride/format, and installed-resource retention.
 
 The complete assets are installed by the explicit capacity proposal above,
-not exposed as twelve newly playable imports. Balloon actions, inventory work,
+not exposed as twelve newly playable imports. Balloon inventory work
 and remaining consumers are still required; net/rod gameplay integration also
 remains open. Conversion and installation retain separate checked category
 contracts. See the
@@ -85,10 +90,10 @@ The actual browser worker matches offline empty/all/mixed/equipment outputs
 using both supplied games. Its unserved export is
 `build/v3-held-category-browser-01/`; neither served patcher changes.
 
-Continue from `build/v3-inventory-capacity-02/build-lock.json` explicitly. Retain
+Continue from `build/v3-balloon-actions-02/build-lock.json` explicitly. Retain
 passing animation, sound, and inventory evidence for unchanged implementations.
-The 56-KiB equipment module, 15,584-byte inventory bank, and format-2 save layout
-stay intact; outdoor banks hold 7,168 bytes each. Pinwheel profile bits require a
+The 60-KiB equipment module, 15,584-byte inventory bank, and format-2 save layout
+retain their current ownership; outdoor banks hold 7,168 bytes each. Pinwheel profile bits require a
 matching or larger profile; older builds lacking them reject these saves.
 Imported V3 saves remain unsuitable for V2. Empty selection returns exact V2-12.
 

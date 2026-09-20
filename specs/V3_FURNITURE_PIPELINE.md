@@ -178,8 +178,15 @@ native speed-dependent volume consumer. The subsequent refresh connects complete
 animated inventory records, native skeleton drawing, and donor preview timing,
 retaining existing banks and original tool behaviour. Parent readiness remains
 required; these refreshes do not enable choices.
+With both joint work areas expanded, the same route installs complete source
+balloon setup, hand tracking, physics, animation, and reflected drawing through
+shared category 21. It retains existing resources/choices and saved formats.
+The adjacent sound sequence moves intact to allow the 60-KiB module; its actual
+native header and startup transfer are updated. Balloon-specific inventory
+drawing and parent integration remain required before selection.
 See [animated-held actions](V3_HANDHELD_ITEMS.md#shared-animated-held-actions)
-and [loop sound](V3_HANDHELD_ITEMS.md#shared-held-loop-sound).
+[balloon actions](V3_HANDHELD_ITEMS.md#shared-balloon-actions), and
+[loop sound](V3_HANDHELD_ITEMS.md#shared-held-loop-sound).
 
 `--category` selects a discovered shared category without maintaining an item
 list. `convert --assets-only` prepares complete artwork while retaining missing

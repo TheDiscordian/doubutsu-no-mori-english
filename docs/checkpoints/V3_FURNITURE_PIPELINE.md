@@ -1,5 +1,74 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared balloon actions
+
+The shared `--player-actions` refresh installs the complete source balloon
+main/draw category in `held_rigs.c`. It retains all pinwheel/fan resources and
+choices while adding source setup, the missing hand delta, lean/walking/string
+motion, spring timing, pause handling, reflection setup, and four-joint drawing.
+It does not add per-item scripts or expose incomplete balloon selections.
+
+- Explicit lock: `build/v3-balloon-actions-02/build-lock.json`, ABI 124.
+- ROM SHA-256:
+  `265dd75fb6aed76305c8abd323f90bfd2cb3ef899f1f6d479f713cc8f5c089df`.
+- Report SHA-256:
+  `b8048dd1958e80c92289b8b5caadc49147b10872467cac7beca31604e105e6ad`.
+- UPS SHA-256:
+  `cf9c480aa95af9285cac186cae44b153c6f0f65af03740ce3b92c06b5ea07da5`.
+- Player allocation: `1370` to `13A0`, with 48 transient bytes at `+1370`.
+- Module: `E000` to `F000` bytes; compiled rig code is 4,336 bytes.
+- Loop-volume state: `804B1FE0`; module guard: `804B1FF0`.
+- Audio sequence: all 20,240 bytes retained at a new checked ROM location;
+  actual sequence header updated, with no audio data or heap-budget changes.
+
+The new allocation follows both expanded work arrays, rather than overlapping
+an existing native tool or saved field. The hand callback preserves its original
+position/matrix operations. The native frame controller's duration is `A20`,
+not `A18`; source and native layouts were verified before integration.
+Two source substeps use half the native measured hand delta/speed. The GameCube
+GX-only texture-edge threshold callbacks are adapted to native RDP alpha
+coverage in the converted materials, not emitted as unsupported N64 commands.
+
+Five focused checks pass in 6.335 seconds. Three sanitizer executions cover
+retained ordinary/pinwheel behaviour, balloon setup across all eight kinds,
+same-category transitions, 8,000 motion updates, paused drawing, scale changes,
+hand/matrix tracking, and state bounds. Two cartridge/composition checks verify
+exact player/core changes, callback rebinding, intact relocated audio, complete
+unrelated-resource retention, module bounds/guard, original-ROM UPS
+reconstruction, all 120 choices, and exact V2-12 no-import output.
+
+The first silent native run, `build/smoke-v3-balloon-actions-01/`, passes 148
+records and 96 assertions. It verifies actual cartridge-loaded code, player
+allocation, ordinary setup, two representative pinwheel rigs, and two complete
+balloon rigs (native model indices 40 and 45). Both balloons emit all four source
+joint lists, produce frame `26.9150009` and speed `-0.0810415`, preserve duration,
+consume the second substep, and retain their parent matrix. Actual hand callback,
+animation-bank playback, graphics/stack/player/bank guards, saved-state retention,
+checkpoint restoration, and final guards pass. The emulator exits cleanly.
+Results SHA-256:
+`ef7fba993fe3865cb897c861daafafce869b4cc8525650fb0f2d816ee810b9d3`.
+
+The existing shared probe is extended by category, not by individual item.
+Its retained `representative_rigs: 2` summary counts the pinwheel pair; the two
+additional `held_balloon_native_draw` records contain the balloon evidence.
+The summary generator now reports both category counts and their total for
+future runs; no replay is needed for that metadata correction.
+
+This is native component execution, not GPU-rendered appearance, ordinary
+balloon gameplay, hardware verification, or new acquisition/save evidence.
+The five focused tests and native fixture are bounded checks of this change;
+passing unchanged bank/inventory allocation evidence is retained without replay.
+The first compiled build is preserved locally; the second exposes the actual
+balloon setup callback for direct native verification and is the current lock.
+
+Next extend the shared inventory adapter with balloon-specific reflection
+drawing and complete preview records, then run the existing parent-category
+expansion and optional composers. No additional model conversion is required.
+The 120 choices, complete installed resources, format-2 save layout, and exact
+V2-12 empty selection remain. Imported saves require matching/equal-or-larger
+profiles and must not be loaded in V2. The main lock and both served patchers
+remain unchanged. No source text is added; provenance is unchanged.
+
 ## Shared inventory joint capacity
 
 The shared `--player-actions` refresh extends the inventory's independent joint
