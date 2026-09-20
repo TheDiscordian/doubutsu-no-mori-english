@@ -1,5 +1,61 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared material-frame renderer
+
+ABI 168 at `build/v3-material-frames-runtime-02/` installs one data-driven renderer
+and the complete six-object batch from `v3-material-frames-prepared-01`. All
+17,104 artwork bytes are reused; no graphics compiler is run. The complete
+draw callback, matrix helper, native actor bounds, switch field, room-owner
+argument, and catalogue null-room contract are checked against the actual inputs.
+
+The native packet contains 2,912 bytes of code within its existing 4-KiB code
+space. Six 40-byte material rows and their header fit the existing table tail;
+capacity is eleven rows. The bootstrap uses 793 bytes of its existing 1,536-byte
+reservation. No resident allocation, model-bank size, actor stride, or saved
+field grows. The import blob is 4,326,848 bytes, with 1,964,608 bytes remaining.
+
+The renderer retains repeated palette entries, every full texture frame, source
+model order, unsigned and signed division/wrapping, separate preview/room frame
+selection, room switch stopping, and private-state faces. Mouth of Truth uses
+reviewed additive destination `3C30`/1804, not donor index 1014 in the native
+table. Worksheet row 2392 has no native identity/name/model/texture fields, and
+neither approved translation mapping contains donor furniture `03F6`.
+
+Four focused `test_v3_room_materials.py` checks pass on their first invocation
+in 10.138 seconds. The sanitizer check executes the actual C renderer using all
+six generated records, including unsigned wrap/signed division, room/preview
+differences, both switch states, negative face-state inputs, full draw order,
+complete immutable resources, crowded/misaligned arenas, malformed tables,
+and actor guards. Cartridge checks compare the complete installed objects and
+packet, retain every previous profile/resource/save, reject forged lifecycle
+readiness, and reproduce the UPS, all-selected, and translation-only outputs.
+`checks.log` records the result. The first build has identical ROM/patch content;
+the second adds accurate adapter/artwork and pending-native report fields.
+
+No native emulator run is claimed, and the failed title-screen allocation
+fixture is not repeated. GPU appearance, actual effects/audio, and acquisition
+remain pending. These six resources have no ordinary profiles or enabled choices.
+The existing 136 choices, 26 room rigs, 23 staged profiles, saved format 3, main
+ABI-109 lock, and both served V2 patchers remain unchanged. Gold-tree effects and
+full golden-shovel acquisition remain required after primary import support.
+
+Reproduction:
+
+```sh
+python3 tools/v3_furniture_install.py --refresh-runtime \
+  --base-lock build/v3-shared-fixed-clock-profiles-01/build-lock.json \
+  --material-frames-art build/v3-material-frames-prepared-01 \
+  --output build/material-runtime-reproduction
+python3 -m unittest discover -s tests -p test_v3_room_materials.py -v
+```
+
+Hashes:
+
+- ROM: `8cb691cc707d506b0b1e4f16672f7863e3ec2871ff6122cd8c25271c2e8288fc`.
+- UPS: `b93cc9c4eb13f18e6241a6a58d496d7f34049a813313c880cd0674befb6547a7`.
+- Report: `700a38bf9d63e08fa1abdf91319c184fac25f2aa044f35606ad3ea93914505a6`.
+- Native packet: `db470c489164483a3ce13fc97db647f1295a18c04a56a49a0dfcfdc83b9eb493`.
+
 ## Shared material-frame resource preparation
 
 `build/v3-material-frames-prepared-01/` prepares six complete objects through the

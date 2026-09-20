@@ -5,6 +5,8 @@ frames and their duplicate table entries survive. Preparation never implies
 that the renderer, source timing, interaction, sound, or acquisition is ported.
 """
 import struct
+import copy
+import json
 
 from aflib import sha256, u32
 
@@ -100,3 +102,120 @@ def bindings(adapter):
         result[address]=row
     if not result:raise ValueError('Missing material-frame dependencies')
     return result
+
+
+def runtime_record(row):
+    """Translate a fully checked source descriptor into the shared draw ABI."""
+    from v3_registry import furniture_identity
+    from v3_room_rig_runtime import encode_materials
+    adapter=row['profile']['callback_adapter'];materials=bindings(adapter)
+    if len(materials)!=1 or adapter['draw_arena']!='opaque':
+        raise ValueError('Unsupported material draw layout')
+    address,material=next(iter(materials.items()));selector=material['selector']
+    if selector==dict(input='actor-s16',offset=0x82C,mask=1):mode,divisor,state=2,0,0x1A4
+    elif selector==dict(input='room-or-preview-frame',division=10,modulo=4,signed=True,
+                       stopped_in_room_when_switch_off=True):mode,divisor,state=1,10,0
+    elif (set(selector)=={'input','division','modulo'} and selector['input']=='room-or-preview-frame'
+          and (selector['division'],selector['modulo']) in ((8,7),(20,4),(2,2))):
+        mode,divisor,state=0,selector['division'],0
+    else:raise ValueError('Unsupported material selector semantics')
+    if mode!=2 and selector['modulo']!=len(material['frames']):raise ValueError('Incomplete material frame sequence')
+    resources={r['symbol']:r for r in row['resources']};frames=[]
+    for frame in material['frames']:
+        r=resources[frame['symbol']]
+        if any(r[k]!=frame[k] for k in ('donor_offset','bytes','source_sha256')) or r['kind']!=material['kind']:
+            raise ValueError('Changed complete material frame resource')
+        frames.append(r['native_offset'])
+    models=[row['model_offsets'][name] for name in adapter['model_order']]
+    if models!=[r['native_offset'] for r in row['models']]:raise ValueError('Changed material model order')
+    index,item=furniture_identity(int(row['item_id'],16))
+    record=dict(source_item_id=row['item_id'],item_id=f'{item:04X}',runtime_index=index,
+        bytes=row['object_bytes'],sha256=row['object_sha256'],mode=mode,divisor=divisor,
+        state_offset=state,segment=address>>24,kind=int(material['kind']=='texture'),
+        frame_bytes=material['frames'][0]['bytes'],frame_offsets=frames,model_offsets=models,
+        source=row,renderer_installed=True,lifecycle_installed=False,profile_installed=False,parent_selectable=False)
+    encode_materials([record])
+    return record
+
+
+def install(base,prior,blob,core,original,output,directories):
+    """Install complete frame banks together; never enable incomplete lifecycles."""
+    from aflib import by_vrom
+    from v3_asset_loader import ROOT,BLOB
+    from v3_equipment_runtime import RAM as EQUIPMENT_RAM
+    from v3_furniture_pipeline import Source,PreparedAssets,prepare,identity_rows
+    from v3_import_storage import ROWS,ITEMS,slot
+    from v3_resource_capacity import checked_limit
+    from v3_tent_model import native_contract
+    import v3_room_rig_runtime as runtime
+    result=copy.deepcopy(prior['equipment_resources']);installed=result['room_rigs']
+    module=blob[result['blob_offset']:result['blob_offset']+result['bytes']];packet=installed['packet']
+    packet_data=blob[packet['blob_offset']:packet['blob_offset']+packet['bytes']]
+    if (installed['format']!='AFV3-ROOM-RIGS-2' or packet['bytes']!=runtime.PACKET_BYTES or
+            packet['ram']!=runtime.PACKET_RAM or sha256(module)!=result['sha256'] or
+            sha256(packet_data)!=packet['sha256'] or packet_data[4096:]!=runtime.encode_packet(
+                installed['rows'],installed.get('sound_rows',[]),installed.get('material_rows',[])) or
+            EQUIPMENT_RAM+result['bytes']>runtime.PACKET_RAM or
+            runtime.PACKET_RAM+runtime.PACKET_BYTES>prior['furniture']['bank_pool']['start']):
+        raise ValueError('Changed or overlapping complete shared material runtime')
+    contract=native_contract(original,base,expected_sha=sha256(base))
+    # Catalogue passes a null room owner; rooms pass the actual room owner.
+    original_catalogue=by_vrom(original)[0x7A28F0].extract(original)
+    catalogue=by_vrom(base)[0x3970000].extract(base);a=0x808A7814-0x808A6100
+    if (sha256(original_catalogue[a:a+0xD0])!='aa1cd409237c29058fb12a0b15225172d7e25c3cbde53509bf87231fa3a790c1' or
+            catalogue[a:a+0xD0]!=original_catalogue[a:a+0xD0]):
+        raise ValueError('Changed preview null-room drawing contract')
+    contract.update(preview_draw_sha256=sha256(catalogue[a:a+0xD0]),preview_frame_offset=0xA0,
+        room_frame_offset=0x1EA0,source_frames_per_native_frame=2,state_offset=0x1A4)
+    source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+        (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    directories=[d.resolve() for d in directories];cache=PreparedAssets(source,directories)
+    identities=identity_rows(ROOT/'build/item-identity-megasheet.xlsx',include_unmapped_legacy=True)
+    occupied={r['item_id'] for r in installed['rows']+installed.get('sound_rows',[])+installed.get('material_rows',[])}
+    rows=[];evidence=[];assets={}
+    for directory in directories:
+        if not directory.is_relative_to(ROOT/'build'):raise ValueError('Materials require ignored prepared artwork')
+        raw=(directory/'art.json').read_bytes();art=json.loads(raw)
+        if art['format']!='AFV3-AUTO-FURNITURE-PREPARED-ASSETS-1':raise ValueError('Expected complete prepared frame assets')
+        evidence.append(dict(directory=str(directory.relative_to(ROOT)),sha256=sha256(raw)))
+        for row in art['objects']:
+            donor=row['item_id'];item=int(donor,16);prepared=prepare(source,item)
+            descriptor=prepared[0]
+            if (descriptor.get('callback_adapter',{}).get('category')!=CATEGORY or
+                    row['profile']!=json.loads(json.dumps(descriptor)) or
+                    row['native_profile_scalar_hex']!=descriptor['scalar_hex'] or
+                    any(identities[item][1].get(k)!='-' for k in ('C','H','CG','CJ')) or
+                    cache.reuse(source,donor,prepared) is None):
+                raise ValueError('Incomplete, changed, or unreviewed material resources')
+            path=(directory/row['object_file']).resolve()
+            if path.parent!=directory:raise ValueError('Material artwork escapes prepared directory')
+            data=path.read_bytes();record=runtime_record(row);i=slot(int(record['item_id'],16))
+            if (len(data)!=record['bytes'] or sha256(data)!=record['sha256'] or record['item_id'] in occupied or
+                    any(blob[ROWS+i*80:ROWS+(i+1)*80]) or any(blob[ITEMS+i*32:ITEMS+(i+1)*32]) or
+                    blob[0x40+i//8]&(1<<(i&7))):raise ValueError('Changed material artwork or occupied native identity')
+            occupied.add(record['item_id']);rows.append(record);assets[donor]=data
+    if not rows:raise ValueError('Empty material category')
+    all_rows=sorted(installed.get('material_rows',[])+rows,key=lambda r:r['runtime_index'])
+    runtime.encode_materials(all_rows)
+    for r in installed.get('material_rows',[]):
+        if sha256(blob[r['blob_offset']:r['blob_offset']+r['bytes']])!=r['sha256']:
+            raise ValueError('Changed installed material artwork')
+    needed=sum(len(d) for d in assets.values());start=(len(blob)+15)&~15
+    if BLOB+start+needed>checked_limit(base,prior):raise ValueError('Material category exceeds cartridge reservation')
+    blob.extend(bytes(start-len(blob)))
+    for row in rows:
+        at=len(blob);blob.extend(assets[row['source_item_id']]);row.update(blob_offset=at,vrom=BLOB+at)
+    installed.update(material_rows=all_rows,material_native_contract=contract,material_capacity=runtime.MATERIAL_CAPACITY)
+    installed.setdefault('material_sources',[]).extend(evidence)
+    installed['artwork_bytes']+=needed
+    runtime.publish_packet(result,blob,output)
+    result['additional_resident_bytes']=0
+    return result,{}
+
+
+# The common cartridge refresh records these dependencies with its build lock.
+SOURCES=('tools/v3_furniture_materials.py','tools/v3_room_rig_runtime.py','tools/v3_registry.py',
+    'tools/v3_furniture_pipeline.py','tools/v3_furniture_install.py','tools/v3_furniture_art.py',
+    'tools/v3_tent_model.py','overlays/v3/room_materials.c','overlays/v3/room_materials.h',
+    'overlays/v3/room_rigs.c','overlays/v3/room_rigs.h','overlays/v3/room_rigs_packet.ld',
+    'overlays/v3/room_rigs_bootstrap.c','overlays/v3/room_rigs_bootstrap.ld')

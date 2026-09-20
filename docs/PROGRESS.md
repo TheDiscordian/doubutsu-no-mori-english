@@ -18,6 +18,22 @@ served patchers retain their existing builds.
 
 ## Active development
 
+The current explicit proposal is ABI 168 at
+`build/v3-material-frames-runtime-02/build-lock.json`. One shared material renderer
+and all six complete frame-bank objects are installed, reusing the 17,104-byte
+prepared batch without recompiling artwork. Palette cycles, animated textures,
+room/preview timing, switch gating, and actor-state faces share bounded records.
+The code and tables fit the existing room packet; no resident allocation grows.
+Four current-build checks pass, including sanitizer execution of the renderer,
+complete frame order, malformed-input rejection, and unchanged existing choices,
+profiles, saves, and translation-only output. Native execution and GPU appearance
+remain unverified. Actual interaction/audio and acquisition remain pending, so
+none of these six objects is selectable. See the
+[renderer checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-material-frame-renderer).
+The 136 existing choices, 26 rigs, 23 staged profiles, saved format 3, main lock,
+and both served V2 patchers are preserved. Continue primary category/acquisition
+work before required gold-tree effects and full golden-shovel acquisition.
+
 The shared material-frame converter prepares complete artwork for six more
 objects: coin, ? block, starman, fire flower, festive candle, and Mouth of Truth.
 `build/v3-material-frames-prepared-01/` contains 17,104 bytes compiled in one
@@ -29,7 +45,7 @@ behaviour. Names use credited official source text. This preparation changes no
 ROM, choice, save, or served patcher. See the
 [material-frame checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-material-frame-resource-preparation).
 
-The current explicit proposal is ABI 167 at
+The shared clock integration is retained from ABI 167 at
 `build/v3-shared-fixed-clock-profiles-01/build-lock.json`. The shared clock
 runtime serves both fixed and indexed source bindings. Harvest clock's complete
 model, animation, live hands, inactive ordinary profile, official name, and price

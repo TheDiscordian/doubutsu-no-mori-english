@@ -12,18 +12,29 @@ After the primary importing work, finish gold-tree leaf/cut effects and the full
 golden-shovel acquisition route. This is deferred required V3 work, not a dropped
 feature or a separate release goal.
 
+The current ABI-168 proposal is
+`build/v3-material-frames-runtime-02/build-lock.json`. The shared material-frame
+renderer and all six complete objects are installed in the existing packet and
+model-storage reservation. Four current-build checks pass, including sanitizer
+execution and unchanged old records/saves/composition. Do not replay the failed
+title-screen arena fixture. Native rendering/GPU appearance remains unverified;
+actual lifecycle effects/audio and acquisition remain required before selection.
+The six records do not add ordinary profiles or choices. Next generalize shared
+callback/audio integration for the prepared categories, retaining their actual
+dependencies. The main lock and both served patchers remain unchanged.
+
 Complete texture/palette-frame artwork is prepared through one shared category
 at `build/v3-material-frames-prepared-01/`: six objects, 17,104 bytes, one compiler
 container. It covers coin, ? block, starman, fire flower, festive candle, and
 Mouth of Truth, retaining every frame, frame-table repetition, source selector,
 model order, and dynamic segment. Four focused checks pass after correcting one
-test's cache key; no emulator replay or cartridge change is needed. Connect the
-shared material-frame renderer, actual lifecycle effects/audio, and acquisition
-before enabling these resources. Do not substitute frozen first-frame models.
+test's cache key. The shared material-frame renderer is installed above; connect
+actual lifecycle effects/audio and acquisition before enabling these resources.
+Do not substitute frozen first-frame models.
 Official names have entries in the single provenance catalogue.
 
 The fixed and indexed clock bindings use one existing runtime. The current
-ABI-167 proposal is `build/v3-shared-fixed-clock-profiles-01/build-lock.json`.
+clock integration is retained from `build/v3-shared-fixed-clock-profiles-01/build-lock.json`.
 It installs the complete harvest clock rig, live hands, inactive ordinary profile,
 official name, and price. There are 26 room-rig records and 23 staged furniture
 profiles. The converter skips already-staged category members by default and

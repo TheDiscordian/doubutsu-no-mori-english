@@ -125,12 +125,41 @@ This shared category prepares the coin, ? block, starman, fire flower, festive
 candle, and Mouth of Truth together. Descriptors distinguish room/preview
 counters, division/modulo timing, switch-dependent stopping, and an actor-state
 selector. Source lifecycle receipts remain attached and pending. The artwork
-does not implement sounds, surprise/rumble, player colour changes, switch
-coordination, or the native material-frame renderer. Ordinary metadata and the
+does not implement sounds, surprise/rumble, player colour changes, or switch
+coordination. Ordinary metadata and the
 native profile writer both reject this category, including a forged runtime
 annotation. Use `convert --assets-only --category material-frame-assets` with the
-current explicit build lock; reuse the resulting complete objects when the
-shared renderer and real behaviours are connected.
+current explicit build lock; reuse the resulting complete objects through
+`--refresh-runtime --material-frames-art <prepared-directory>`.
+
+The shared native material renderer uses a checked 40-byte record containing
+stable destination index, complete object size, selector mode, segment, counts,
+division, complete frame size, four model offsets, eight frame offsets, native
+private-state offset, and material kind. All unused fields are zero. The table
+at `804B9E20` holds eleven records and fits the unused end of the existing 8-KiB
+room packet. Its header is `AFM1`, count, stride, and zero. Code uses the existing
+4-KiB code half; no new allocation or object header is needed. The stable vtable
+at `804B1E10` routes drawing through the same checked packet loader and caches.
+Other refresh operations retain this table and vtable.
+
+Modes are unsigned timed selection, signed timed selection stopped by an off
+room switch, and the low bit of a private signed halfword. A non-null native room
+argument selects gameplay frame `1EA0`; a preview uses generic frame `A0` and
+never reads beyond that smaller game context. Counters advance at native 30 Hz
+and are doubled before the original donor division/modulo. Unsigned wrapping and
+signed division toward zero are explicit. The switch is at native offset `12C`.
+The private selector uses `1A4` in non-rig actors, not the out-of-bounds donor
+offset `82C`; an eventual lifecycle must initialize and own that field.
+
+Complete frame bounds, eight-byte alignment, segment eight/nine, model order,
+and packet limits are validated before any graphics writes. Drawing reserves
+one matrix and all commands together, binds an immutable complete palette or
+texture, then submits every model in donor order. Crowded or malformed arenas
+produce no partial draw. The ordinary profile writer still refuses this resource
+category: installing its renderer does not imply implemented lifecycle or
+acquisition. Mouth of Truth's reviewed legacy source `1FD8` has the append-only
+destination `3C30`, runtime index 1804; the native worksheet correspondence and
+approved translation map contain no existing native identity for that source.
 
 The `static-models-pending-move` resource category separates ordinary profile
 drawing from an unfinished move-only callback. It requires complete direct model

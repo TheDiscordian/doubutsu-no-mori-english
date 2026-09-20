@@ -19,10 +19,12 @@ MAGIC=0x41465231
 PACKET_RAM,PACKET_TABLE,PACKET_BYTES,PACKET_CAPACITY=0x804B8000,0x804B9000,8192,128
 PACKET_MAGIC=0x41465232
 SOUND_TABLE,SOUND_VTABLE,SOUND_MAGIC,SOUND_CAPACITY=0x804B9C10,0x804B1FC0,0x41465331,64
+MATERIAL_TABLE,MATERIAL_VTABLE,MATERIAL_MAGIC,MATERIAL_CAPACITY=0x804B9E20,0x804B1E10,0x41464D31,11
 SOURCES=('tools/v3_room_rig_runtime.py','tools/v3_asset_loader.py','tools/v3_furniture_rigs.py','tools/v3_keyframes.py',
     'tools/v3_furniture_pipeline.py','tools/v3_furniture_install.py','tools/v3_registry.py','tools/v3_equipment_runtime.py',
     'tools/v3_display_aliases.py','tools/v3_held_catalogue.py',
-    'tools/v3_resource_capacity.py',
+    'tools/v3_resource_capacity.py','tools/v3_furniture_materials.py',
+    'overlays/v3/room_materials.c','overlays/v3/room_materials.h',
     'overlays/v3/room_rigs.c','overlays/v3/room_rigs.h','overlays/v3/room_rigs.ld',
     'overlays/v3/held_rigs.ld','overlays/v3/room_rigs_packet.ld',
     'overlays/v3/room_rigs_bootstrap.c','overlays/v3/room_rigs_bootstrap.ld')
@@ -143,11 +145,13 @@ def bind_profiles(source,base,report):
     packet=runtime['packet'];raw=blob[packet['blob_offset']:packet['blob_offset']+packet['bytes']]
     module=blob[e['blob_offset']:e['blob_offset']+e['bytes']]
     if (sha256(blob)!=report['blob_sha256'] or sha256(raw)!=packet['sha256'] or
-            sha256(module)!=e['sha256'] or raw[PACKET_TABLE-PACKET_RAM:]!=encode_packet(runtime['rows'],runtime['sound_rows']) or
+            sha256(module)!=e['sha256'] or raw[PACKET_TABLE-PACKET_RAM:]!=encode_packet(runtime['rows'],runtime['sound_rows'],runtime.get('material_rows',[])) or
             module[VTABLE-EQUIPMENT_RAM:VTABLE-EQUIPMENT_RAM+20].hex()!=runtime['vtable_hex'] or
             module[SOUND_VTABLE-EQUIPMENT_RAM:SOUND_VTABLE-EQUIPMENT_RAM+20].hex()!=runtime['sound_vtable_hex'] or
             blob[0x20:0xE0].hex()!=report['save_runtime']['profile_hex']):
         raise ValueError('Changed installed furniture lifecycle, packet, or selection')
+    if runtime.get('material_rows') and module[MATERIAL_VTABLE-EQUIPMENT_RAM:MATERIAL_VTABLE-EQUIPMENT_RAM+20].hex()!=runtime['material_vtable_hex']:
+        raise ValueError('Changed installed material draw dispatch')
     limit=checked_limit(base,report)
     bindings={r['source_item_id']:r for r in runtime['rows']+runtime['sound_rows']}
     for row,enabled in [(r,False) for r in staged.get('rows',[])]+[(r,True) for r in activated]:
@@ -229,7 +233,30 @@ def prepared_categories(source,directories):
     return sorted(rows,key=lambda r:r['runtime_index']),assets,evidence
 
 
-def encode_packet(rows,sound_rows=()):
+def encode_materials(rows):
+    if (not rows or len(rows)>MATERIAL_CAPACITY or
+            [r['runtime_index'] for r in rows]!=sorted({r['runtime_index'] for r in rows})):
+        raise ValueError('Unordered, duplicate, or excessive material records')
+    table=bytearray(struct.pack('>4I',MATERIAL_MAGIC,len(rows),40,0))
+    for r in rows:
+        index,n,mode,segment=r['runtime_index'],r['bytes'],r['mode'],r['segment']
+        frames,models=r['frame_offsets'],r['model_offsets'];size=r['frame_bytes']
+        divisor,state,kind=r['divisor'],r['state_offset'],r['kind']
+        if (not 1024<=index<2048 or not 32<=n<=9216 or n&15 or mode not in (0,1,2) or
+                segment not in (8,9) or not 1<=len(frames)<=8 or not 1<=len(models)<=4 or
+                kind not in (0,1) or not 0<size<=n or kind==0 and size!=32 or
+                mode==2 and (state!=0x1A4 or len(frames)!=2 or divisor) or
+                mode!=2 and (state or not 0<divisor<=65535) or
+                mode==1 and (len(frames)!=4 or divisor!=10) or
+                any(p&7 or not 0<=p<=n-size for p in frames) or
+                any(p&7 or not 0<=p<=n-8 for p in models)):
+            raise ValueError('Invalid complete material selector, resources, or native bounds')
+        table.extend(struct.pack('>HH4B2H4H8HH2B',index,n,mode,segment,len(frames),len(models),divisor,size,
+            *(models+[0]*(4-len(models))),*(frames+[0]*(8-len(frames))),state,kind,0))
+    return bytes(table)
+
+
+def encode_packet(rows,sound_rows=(),material_rows=()):
     if not rows or len(rows)>PACKET_CAPACITY:raise ValueError('Room-rig packet capacity exceeded')
     if [r['runtime_index'] for r in rows]!=sorted({r['runtime_index'] for r in rows}):
         raise ValueError('Unordered or duplicate room-rig records')
@@ -255,6 +282,10 @@ def encode_packet(rows,sound_rows=()):
                     word&0x80 or (word&0x7FFF)>>8 not in (1,4)):
                 raise ValueError('Invalid room sound identity or full native sound word')
             table.extend(struct.pack('>HHI',r['runtime_index'],word,0))
+    if material_rows:
+        table.extend(bytes(MATERIAL_TABLE-PACKET_TABLE-len(table)))
+        table.extend(encode_materials(material_rows))
+    if len(table)>PACKET_BYTES-(PACKET_TABLE-PACKET_RAM):raise ValueError('Shared room table exceeds packet')
     return bytes(table).ljust(PACKET_BYTES-(PACKET_TABLE-PACKET_RAM),b'\0')
 
 
@@ -283,11 +314,12 @@ def extended_contract(base,core,original):
 def publish_packet(equipment,blob,output):
     """Compile shared behaviour once and publish it through the stable room vtable."""
     runtime=equipment['room_rigs'];packet=runtime['packet'];at=packet['blob_offset']
-    sound_rows=runtime.get('sound_rows',[])
+    sound_rows=runtime.get('sound_rows',[]);material_rows=runtime.get('material_rows',[])
     defines=('AF_V3_ROOM_RIG_PACKET',)+(('AF_V3_ROOM_TRIGGER_SOUND',) if sound_rows else ())
     code,compiled=compile_part('room_rigs_packet',output/'room_rigs_packet',
-        primary_source='overlays/v3/room_rigs.c',defines=defines)
-    table=encode_packet(runtime['rows'],sound_rows)
+        primary_source='overlays/v3/room_rigs.c',defines=defines,
+        extra_sources=('overlays/v3/room_materials.c',) if material_rows else ())
+    table=encode_packet(runtime['rows'],sound_rows,material_rows)
     data=code.ljust(PACKET_TABLE-PACKET_RAM,b'\0')+table
     if len(code)>PACKET_TABLE-PACKET_RAM or len(data)!=PACKET_BYTES or not zlib.crc32(data):
         raise ValueError('Room code/table exceeds owned packet or has an invalid cache identity')
@@ -299,9 +331,14 @@ def publish_packet(equipment,blob,output):
         entry=symbols['af_v3_room_sound_mv']
         if entry&3 or not PACKET_RAM<=entry<PACKET_RAM+len(code):raise ValueError('Room sound entry escapes packet')
         sound_defines=(f'AF_ROOM_SOUND_MV=0x{entry:X}u',)
+    material_defines=()
+    if material_rows:
+        entry=symbols['af_v3_room_material_dw']
+        if entry&3 or not PACKET_RAM<=entry<PACKET_RAM+len(code):raise ValueError('Material entry escapes packet')
+        material_defines=(f'AF_ROOM_MATERIAL_DW=0x{entry:X}u',)
     boot,bootstrap=compile_part('room_rigs_bootstrap',output/'room_rigs_bootstrap',defines=(
         f'AF_ROOM_VROM=0x{BLOB+at:X}u',f'AF_ROOM_BYTES={PACKET_BYTES}u',f'AF_ROOM_CRC=0x{zlib.crc32(data):X}u',
-        *(f'AF_ROOM_{role.upper()}=0x{entry:X}u' for role,entry in zip(('ct','mv','dw'),entries)),*sound_defines))
+        *(f'AF_ROOM_{role.upper()}=0x{entry:X}u' for role,entry in zip(('ct','mv','dw'),entries)),*sound_defines,*material_defines))
     start=equipment['blob_offset'];module=bytearray(blob[start:start+equipment['bytes']])
     if sha256(module)!=equipment['sha256']:raise ValueError('Changed installed equipment before room publication')
     entries=[bootstrap['symbols']['af_v3_room_boot_'+role] for role in ('ct','mv','dw')]
@@ -309,7 +346,18 @@ def publish_packet(equipment,blob,output):
         raise ValueError('Room bootstrap escapes stable reservation')
     vtable=struct.pack('>5I',*entries,0,0)
     module[RAM-EQUIPMENT_RAM:TABLE-EQUIPMENT_RAM]=boot+bytes(TABLE-RAM-len(boot))
+    if runtime.get('format')=='AFV3-ROOM-RIGS-2' and runtime.get('bootstrap'):
+        expected=bytearray(VTABLE-TABLE)
+        expected[MATERIAL_VTABLE-TABLE:MATERIAL_VTABLE-TABLE+20]=bytes.fromhex(runtime.get('material_vtable_hex','00'*20))
+        if module[TABLE-EQUIPMENT_RAM:VTABLE-EQUIPMENT_RAM]!=expected:
+            raise ValueError('Occupied room cache/material vtable reservation')
     module[TABLE-EQUIPMENT_RAM:VTABLE-EQUIPMENT_RAM]=bytes(VTABLE-TABLE)
+    if material_rows:
+        entry=bootstrap['symbols']['af_v3_room_boot_material_dw']
+        if entry&3 or not RAM<=entry<RAM+len(boot):raise ValueError('Material bootstrap escapes reservation')
+        material_vtable=struct.pack('>5I',0,0,entry,0,0)
+        module[MATERIAL_VTABLE-EQUIPMENT_RAM:MATERIAL_VTABLE-EQUIPMENT_RAM+20]=material_vtable
+        runtime.update(material_vtable=MATERIAL_VTABLE,material_vtable_hex=material_vtable.hex(),material_table=MATERIAL_TABLE)
     module[VTABLE-EQUIPMENT_RAM:VTABLE-EQUIPMENT_RAM+20]=vtable
     if sound_rows:
         entry=bootstrap['symbols']['af_v3_room_boot_sound_mv']
