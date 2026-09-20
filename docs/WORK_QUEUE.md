@@ -2,18 +2,21 @@
 
 ## Active: V3 optional GameCube imports
 
-All twenty animated equipment rigs now have complete shared conversion support.
-Reuse `build/v3-held-matrix-prepared-02/` for the twelve balloon/net/rod models
-and retain the installed pinwheel bundle. Thirty-five focused checks pass; no
-emulator replay is needed for this converter-only change. Next extend the shared
-runtime for balloon banks (maximum 7,168 bytes including animation), eight-vector
-joint/morph work, source-correct actions, and inventory/parent consumers. Keep
-net/rod behaviour and golden-tool differences explicit. Preparation does not
-enable these imports. See the
-[checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-joint-matrix-and-ia8-conversion).
+All twenty animated equipment rigs have complete shared conversion and resource
+installation in the explicit ABI-122 proposal. Both outdoor banks hold 7,168
+bytes, and the player has eight-vector joint/morph work. Six focused checks and
+the silent native 116-record/93-assertion bank/playback check pass. Preserve that
+evidence; do not replay it without a changed consumer or concrete defect.
 
-Next work uses the explicit ABI-121 lock at
-`build/v3-held-category-02/build-lock.json`. All eight pinwheels now have shared
+Next connect source-correct balloon actions and the inventory's separate
+joint/morph capacity, then its complete previews and parent consumers. Reuse
+the installed models and shared category adapters, not per-item scripts.
+Net/rod behaviour and golden-tool differences remain explicit. Resources do
+not enable these imports. See the
+[capacity checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-rig-capacity-and-resource-extension).
+
+Next work uses the explicit ABI-122 lock at
+`build/v3-rig-capacity-03/build-lock.json`. All eight pinwheels have shared
 parent readers, pocket artwork, collection/catalogue, existing event acquisition,
 and individual experimental selections. The full proposal has 120 choices;
 existing fans and fixed identities are retained. No per-item installers or
@@ -30,8 +33,8 @@ Full seasonal rendering and ordinary gameplay remain open. See the
 [diagnosis](checkpoints/V3_FURNITURE_PIPELINE.md#seasonal-setter-copy-diagnosis).
 Work against the current proposal, not an old candidate. Do not replay exhausted
 navigation or setup attempts. Continue shared equipment categories and acquisition;
-balloon joint/bank capacity and equipment behaviour remain implementation work,
-not disabled-content completion.
+balloon inventory capacity and equipment behaviour remain implementation work,
+not completed imports.
 
 Ten focused sound checks pass. The first silent native sound check passes
 165 records/50 assertions, including actual queued volume, retained pause/fade/
@@ -66,8 +69,9 @@ the native fixture's setup retry allowance is spent and its final check passes.
 See the
 [rig-action checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-animated-held-actions).
 
-The format-2 layout, 5,248-byte outdoor banks, 1,728-byte scene-arena increase,
-56-KiB equipment module, and 15,584-byte inventory bank remain sufficient.
+The format-2 layout, 56-KiB equipment module, and 15,584-byte inventory bank
+remain intact. Outdoor banks hold 7,168 bytes; their scene arena has 5,568
+additional bytes, and the transient player allocation is 4,976 bytes.
 Existing profiles load only into matching or larger profiles; builds missing
 the new pinwheel bits reject saves requiring them. Imported saves must not be
 loaded in V2. Ordinary pinwheel gameplay, GPU appearance, acquisition,

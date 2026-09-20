@@ -8,7 +8,7 @@ import copy
 import struct
 import zlib
 
-from aflib import CODE_RAM, CODE_VROM, by_vrom, sha256
+from aflib import CODE_RAM, CODE_VROM, by_vrom, sha256, u32
 from v3_asset_loader import BLOB, ROOT, compile_part
 from v3_import_storage import PACKAGE_RAM, END, jump
 from v3_campsite_calendar import PACKAGE_SIZE
@@ -271,6 +271,8 @@ def grow_banks(original, core, owner, capacity):
 
 def install_rigs(base, prior, blob, core, original, output, art_path):
     """Add checked rigs to the same resource/kind namespace and native owners."""
+    if prior['equipment_resources'].get('animated_rigs'):
+        return extend_rigs(base,prior,blob,core,original,output,art_path)
     old=prior['equipment_resources'];position=old['blob_offset']
     module=bytearray(blob[position:position+old['bytes']]);files=by_vrom(base)
     owner=bytearray(files[PLAYER_VROM].extract(base))
@@ -368,6 +370,204 @@ def install_rigs(base, prior, blob, core, original, output, art_path):
         model_bytes=sum(len(a) for a in assets.values()),logical_imports_added=0,
         player_actions_installed=False,inventory_previews_installed=False,profile_changed=False)
     return report,{PLAYER_VROM:bytes(owner)}
+
+
+def grow_player_joint_work(original,core,owner,relocation,allocation,vectors,previous=None):
+    """Move complete transient work/morph arrays into an enlarged actor tail."""
+    from v3_npc_draw import relocation_offsets
+    native=by_vrom(original);before=native[PLAYER_VROM].extract(original)
+    native_core=native[CODE_VROM].extract(original)
+    entry=0x8010BCEC;at=entry-CODE_RAM
+    profile=bytearray(core[at-12:at+20])
+    if (allocation['address']!=entry or u32(profile,12)!=allocation['bytes']
+            or allocation['bytes']%16 or not 7<vectors<=16):
+        raise ValueError('Changed player allocation or unsupported joint capacity')
+    struct.pack_into('>I',profile,12,allocation['original_bytes'])
+    if profile!=native_core[at-12:at+20]:raise ValueError('Changed complete native player profile')
+    normalized=bytearray(owner)
+    if previous:
+        if allocation['bytes']!=previous['player_bytes'] or vectors<=previous['vectors']:
+            raise ValueError('Changed previous player joint reservation')
+        for patch in previous['patches']:
+            off=patch['address']-PLAYER_RAM
+            if u32(owner,off)!=patch['after']:raise ValueError('Changed installed player joint pointer')
+            struct.pack_into('>I',normalized,off,patch['before'])
+    first,last=0x808BD934-PLAYER_RAM,0x808BDACC-PLAYER_RAM
+    if normalized[first:last]!=before[first:last]:raise ValueError('Changed complete player skeleton initializer')
+    targets={0x808BD9DC:0xAB2,0x808BD9F0:0xA88,0x808BDA20:0xAB2,0x808BDA34:0xA88}
+    found={PLAYER_RAM+i:u32(normalized,i)&65535 for i in range(0,0x2AF00,4)
+           if u32(normalized,i)>>26==9 and u32(normalized,i)>>21&31 and u32(normalized,i)&65535 in (0xA88,0xAB2)}
+    if found!=targets:raise ValueError('Unreviewed player joint-work pointer consumer')
+    start=previous['joint_offset'] if previous else allocation['bytes']
+    length=vectors*6;end=(start+2*length+15)&~15
+    offsets={0xA88:start,0xAB2:start+length};patches=[]
+    relocations=relocation_offsets(relocation,len(owner))
+    for address,old in targets.items():
+        off=address-PLAYER_RAM;word=u32(normalized,off)
+        if off in relocations or offsets[old]>=32768:raise ValueError('Invalid player joint pointer patch')
+        changed=word&0xFFFF0000|offsets[old];struct.pack_into('>I',owner,off,changed)
+        patches.append(dict(address=address,before=word,after=changed))
+    struct.pack_into('>I',core,at,end)
+    return dict(vectors=vectors,previous_vectors=previous['vectors'] if previous else 7,joint_offset=start,morph_offset=start+length,
+        array_bytes=length,previous_player_bytes=allocation['bytes'],player_bytes=end,
+        additional_player_bytes=end-allocation['bytes'],patches=patches,
+        initializer=dict(start=PLAYER_RAM+first,end=PLAYER_RAM+last,
+                         original_sha256=sha256(before[first:last]),sha256=sha256(owner[first:last])),
+        save_format_changed=False,inventory_joint_work_changed=False)
+
+
+def extend_rigs(base,prior,blob,core,original,output,art_path):
+    """Extend complete resource categories while retaining every installed rig."""
+    old=prior['equipment_resources'];rigs=old['animated_rigs'];files=by_vrom(base)
+    module=bytearray(blob[old['blob_offset']:old['blob_offset']+old['bytes']])
+    owner=bytearray(files[PLAYER_VROM].extract(base));rel=files[PLAYER_RELOC].extract(base)
+    if (sha256(module)!=old['sha256'] or old['ram']!=RAM
+            or not old.get('held_rig_actions') or sha256(owner)!=old['player_motion']['owner_sha256']
+            or sha256(rel)!=old['player_motion']['reloc_sha256']
+            or struct.unpack_from('>4I',module,len(module)-16)!=(GUARD,)*4):
+        raise ValueError('Changed current rig module/owner')
+    source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+                  (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    art=json.loads((art_path/'art.json').read_bytes())
+    supplied={p for r in art['objects'] for p in r['parent_item_ids']}
+    categories=tuple(sorted({r['item_main'] for r in kind_bindings(source)['rows'] if r['item_id'] in supplied}))
+    description=motion(source)
+    previous_vectors=old.get('player_joint_work',{}).get('vectors',7)
+    vectors=max(previous_vectors,max(description['skeletons'][r['shape_index']]['joints']+1 for r in art['objects']))
+    assets,records,evidence=prepared_rigs(source,art_path,categories=categories,joint_work_vectors=vectors)
+    report=copy.deepcopy(old);installed={r['source_index']:r for r in report['records']}
+    capacity=rigs['allocation']['bank_bytes'];added=[]
+    reuse=retired_module_space(base,prior,blob,sum(len(a) for a in assets.values()))
+    cursor=reuse['blob_offset'] if reuse else len(blob)
+    for row in records:
+        if row['source_index'] in installed:raise ValueError('Resource extension would overwrite an installed rig')
+        for binding in row['source']['motion_bindings']:
+            for index in binding['animation_resources']:
+                animation_row=installed.get(index)
+                desc={k:v for k,v in description['equipment_animations'][index].items() if k!='resource_type'}
+                data,_=compile_animations(source,[desc])
+                if (not animation_row or animation_row['kind']!='animation'
+                        or animation_row['sha256']!=sha256(data)
+                        or blob[animation_row['blob_offset']:animation_row['blob_offset']+len(data)]!=data):
+                    raise ValueError('Extended rig lacks its complete installed animation')
+                capacity=max(capacity,row['bytes']+len(data))
+        slot=TABLE+16+row['source_index']*16
+        if any(module[slot:slot+16]):raise ValueError('Extended rig slot is occupied')
+        cursor=(cursor+15)&~15;at=cursor;data=assets[row['source_index']];cursor+=len(data)
+        if reuse:
+            if cursor>reuse['blob_offset']+reuse['bytes']:raise ValueError('Rig exceeds retired module reservation')
+            blob[at:cursor]=data
+        else:
+            blob.extend(bytes(at-len(blob)));blob.extend(data)
+        row.update(vrom=BLOB+at,blob_offset=at)
+        struct.pack_into('>4I',module,slot,row['vrom'],row['bytes'],row['pointer'],row['type'])
+        report['records'].append(row);installed[row['source_index']]=row;added.append(row['source_index'])
+    if not added:raise ValueError('No complete new equipment category')
+    capacity=(capacity+15)&~15
+    # Reconstruct the exact original bank consumers, checking every installed
+    # adjustment first, then apply the same shared bank-growth rule anew.
+    normalized=bytearray(core);normal_owner=bytearray(owner)
+    for patch in rigs['allocation']['patches']:
+        at=patch['address']-CODE_RAM;after=bytes.fromhex(patch['after'])
+        if normalized[at:at+len(after)]!=after:raise ValueError('Changed installed equipment bank patch')
+        normalized[at:at+len(after)]=bytes.fromhex(patch['before'])
+    for patch in rigs['owner_patches']:
+        at=patch['address']-PLAYER_RAM;after=bytes.fromhex(patch['after'])
+        if normal_owner[at:at+len(after)]!=after:raise ValueError('Changed installed model-cache hook')
+        normal_owner[at:at+len(after)]=bytes.fromhex(patch['before'])
+    allocation=grow_banks(original,normalized,normal_owner,capacity)
+    allocation.update(previous_extended_bank_bytes=rigs['allocation']['bank_bytes'],
+        incremental_scene_bytes=allocation['scene_arena_bytes']-rigs['allocation']['scene_arena_bytes'])
+    core[:]=normalized
+    if vectors>previous_vectors:
+        joint=grow_player_joint_work(original,core,owner,rel,old['held_rig_actions']['player_allocation'],vectors,
+                                     old.get('player_joint_work'))
+        report['player_joint_work']=joint
+        report['held_rig_actions']['player_allocation']['bytes']=joint['player_bytes']
+    report['records'].sort(key=lambda r:r['index'])
+    for row in report['kind_readers']['rows']:
+        if row['shape'] not in added:continue
+        shape,anim=installed[row['shape']],installed[row['animation']]
+        combined=shape['bytes']+anim['bytes']
+        if anim['kind']!='animation' or combined>capacity:raise ValueError('Extended kind exceeds complete bank')
+        row['fields'][2:4]=[shape['index'],anim['index']]
+        row.update(combined_bank_bytes=combined,shape_installed=True,resource_ready=True)
+        struct.pack_into('>6h',module,KIND_TABLE+16+row['source_kind']*KIND_STRIDE,*row['fields'])
+    code,compiled=compile_part('equipment_resources',output/'equipment_resources',defines=(
+        'AF_V3_PLAYER_MOTION=1','AF_V3_EQUIPMENT_KINDS=1','AF_V3_EQUIPMENT_RIGS=1',
+        f'AF_V3_EQUIPMENT_CAPACITY={capacity}u'),extra_sources=('overlays/v3/equipment_resources.S',))
+    if (len(code)>KIND_TABLE or compiled['symbols']!=old['code']['symbols']
+            or len(code)!=old['code']['bytes'] or sha256(module[:len(code)])!=old['code']['sha256']
+            or any(module[len(code):KIND_TABLE])):
+        raise ValueError('Resource refresh changes public entries or checked code bounds')
+    module[:KIND_TABLE]=code+bytes(KIND_TABLE-len(code))
+    # The resident reservation and module size are unchanged; keep this copy
+    # at its current VROM instead of accumulating another obsolete module.
+    at=old['blob_offset'];blob[at:at+len(module)]=module
+    if BLOB+len(blob)>END:raise ValueError('Extended equipment exceeds shared ROM storage')
+    report.update(code=compiled,vrom=BLOB+at,blob_offset=at,sha256=sha256(module),
+                  crc32=zlib.crc32(module),additional_resident_bytes=0)
+    report['animated_rigs'].update(allocation=allocation,
+        resource_indices=sorted(r['index'] for r in report['records'] if r['type']==1),
+        model_bytes=sum(r['bytes'] for r in report['records'] if r['type']==1))
+    report['animated_rigs'].setdefault('extensions',[]).append(dict(evidence=evidence,
+        source_categories=list(categories),source_indices=added,joint_vectors=vectors,
+        retired_module_reuse=reuse,model_bytes=sum(len(a) for a in assets.values()),
+        player_actions_installed=False,inventory_previews_installed=False,profile_changed=False))
+    report['player_motion']['owner_sha256']=sha256(owner)
+    report['player_actions']['owner_sha256']=sha256(owner)
+    return report,{PLAYER_VROM:bytes(owner)}
+
+
+def retired_module_space(base,prior,blob,needed):
+    """Find a hash-bound superseded resident copy, rejecting every live overlap.
+
+    Each predecessor receipt is verified through its descendant's exact hash.
+    Only former whole equipment modules qualify, never arbitrary zero padding
+    or reserved item slots. DMA mappings and current resource records are live.
+    """
+    files=by_vrom(base);physical=files[BLOB].pstart;current=prior['equipment_resources']
+    live=[(0,PACKAGE_SIZE+0x200000),(current['blob_offset'],current['blob_offset']+current['bytes'])]
+    for v,entry in files.items():
+        if v==BLOB or entry.pstart==0xFFFFFFFF:continue
+        live.append((entry.pstart-physical,(entry.pend or entry.pstart+entry.size)-physical))
+    def address(value):
+        if type(value) is int:return value
+        if isinstance(value,str):
+            try:return int(value,16)
+            except ValueError:pass
+        return None
+    def resources(value):
+        if isinstance(value,dict):
+            lengths=[value[k] for k in ('bytes','object_bytes','model_bytes','animation_bytes')
+                     if type(value.get(k)) is int and value[k]>0]
+            if type(value.get('blob_offset')) is int and lengths:
+                at=value['blob_offset'];live.append((at,at+max(lengths)))
+            for key,item in value.items():
+                if key.endswith('vrom') and (at:=address(item)) is not None and BLOB<=at<END:
+                    live.append((at-BLOB,at-BLOB+max(lengths,default=1)))
+                resources(item)
+        elif isinstance(value,list):
+            for item in value:resources(item)
+    resources(prior)
+    receipt=prior;seen=set()
+    while pin:=receipt.get('shared_runtime_refresh',{}).get('base'):
+        path=(ROOT/pin['directory']/'build.json').resolve()
+        if not path.is_relative_to(ROOT/'build') or path in seen:
+            raise ValueError('Invalid or cyclic equipment receipt lineage')
+        seen.add(path);raw=path.read_bytes()
+        if sha256(raw)!=pin['report_sha256']:raise ValueError('Changed predecessor equipment receipt')
+        receipt=json.loads(raw);candidate=receipt.get('equipment_resources')
+        if not candidate:break
+        start=candidate['blob_offset'];size=candidate['bytes'];end=start+size
+        if (size<needed or start%16 or end>len(blob)
+                or any(a<end and start<b for a,b in live)
+                or sha256(blob[start:end])!=candidate['sha256']):continue
+        return dict(blob_offset=start,bytes=size,used_bytes=needed,
+            predecessor_report=str(path.relative_to(ROOT)),predecessor_report_sha256=sha256(raw),
+            retired_module_sha256=candidate['sha256'],live_ranges_checked=len(live),
+            original_sha256=sha256(base))
+    return None
 
 
 def install(prior, blob, core, original, output, art_path):

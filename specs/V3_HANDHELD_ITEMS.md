@@ -263,6 +263,45 @@ acquisition, catalogue, ordinary reload, and hardware remain open.
 The [bank checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-animated-equipment-banks)
 owns exact build and test evidence. Neither served patcher changes.
 
+### Extended rig categories and joint work
+
+The same `--equipment-rigs` adapter extends an installed rig set using complete
+source-derived categories. The bundle at `build/v3-held-matrix-prepared-02/`
+contains category 2/11/21 models, with exact animation and kind bindings.
+All 50 reserved equipment resources are populated: 14 static models,
+20 animated models, and 16 animations. Installed identities and assets remain
+unchanged. Readiness does not install actions, inventory records, or profile bits.
+
+The complete maximum model/animation pair needs 7,168 bytes. Both native bank
+registrations use that capacity. The scene arena is
+`93400 + 2 * (7168 - ALIGN16(4376)) = 949C0`, preserving other arena capacity.
+The three original allocation patches are normalised and checked before growth;
+the model-cache hook and all public equipment entry addresses stay fixed.
+
+Seven-joint balloons require eight work vectors, including root translation.
+The native player profile at `8010BCEC` allocates `1370` bytes. Joint and morph
+arrays occupy `player+1310..1340` and `player+1340..1370`, respectively. The
+four pointer immediates at `808BD9DC`, `808BD9F0`, `808BDA20`, and `808BDA34`
+are the only modified initializer instructions. The complete original profile,
+initializer, relocation, and pointer-reference inventory are checked first.
+The pinwheel's 44-byte state at `12D8` is retained. These arrays are transient;
+no saved structure changes. Inventory owns separate arrays and is not implicitly
+expanded by this adapter.
+
+The current 56-KiB module is updated at its existing ROM position. New models
+may occupy a complete retired module only when its recorded hash still matches,
+the predecessor receipt chain is hash-verified, and no current DMA range,
+reserved package storage, module, or recorded resource overlaps. The importer
+does not treat arbitrary padding as free space or raise the English-choice
+boundary at `025F0000`. Used and protected ranges are included in the receipt.
+
+The explicit ABI-122 proposal retains 120 choices and the same format-2 profile;
+no-import composition remains exact V2-12. Native smallest/largest playback,
+both work arrays, six bank transitions, original-array retention, memory guards,
+and checkpoint restoration have focused evidence. This is not ordinary balloon
+gameplay, inventory rendering, fresh save/reload, or hardware verification. See
+the [capacity checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-rig-capacity-and-resource-extension).
+
 ### Shared animated-held actions
 
 After installing the complete rigs, the existing `--refresh-runtime

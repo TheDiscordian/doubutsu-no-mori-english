@@ -1329,12 +1329,14 @@ def equipment_bank_switch(debug,rom_path,record):
     check('complete current player owner',owner,expected[:sections[0]])
     at=resources['blob_offset'];check('complete current shared equipment code',equipment.RAM,blob[at:at+resources['bytes']])
     saved=debug.read_memory(0x8046C000,864)
-    capacity=rigs['allocation']['bank_bytes'];size=0x1400+capacity*2+32
-    allocation=call(0x8009BFC0,[size]);actor=allocation+16;bank0=allocation+0x1400
+    capacity=rigs['allocation']['bank_bytes']
+    player_bytes=resources.get('held_rig_actions',{}).get('player_allocation',{}).get('bytes',0x12D8)
+    bank_offset=(player_bytes+63)&~15;size=bank_offset+capacity*2+32
+    allocation=call(0x8009BFC0,[size]);actor=allocation+16;bank0=allocation+bank_offset
     if allocation&15 or not MODULE_RAM+0x8000<=allocation<=0x80400000-size:
         raise ValueError('Equipment switch scratch escapes native heap')
-    edge=b'V3RS'*4;guards=(allocation,actor+0x12D8,bank0-16,bank0+capacity*2)
-    debug.write_memory(actor,bytes(0x12D8))
+    edge=b'V3RS'*4;guards=(allocation,actor+player_bytes,bank0-16,bank0+capacity*2)
+    debug.write_memory(actor,bytes(player_bytes))
     for at in guards:debug.write_memory(at,edge)
     put(actor+0xDBC,bank0,bank0+capacity)
     put(actor+0xDDC,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF)
@@ -1344,6 +1346,7 @@ def equipment_bank_switch(debug,rom_path,record):
     entry=owner+0x808B5A10-equipment.PLAYER_RAM
     proof=(entry,expected[0x808B5A10-equipment.PLAYER_RAM:0x808B5B38-equipment.PLAYER_RAM])
     try:
+        if call(0x800B1590)!=capacity:raise ValueError('Native bank allocation size differs from installed capacity')
         for step,model in enumerate((small,small,large,large,small,small)):
             animation=animations[model['source']['motion_bindings'][0]['default_animation']]
             index=(step+1)%2;bank=bank0+index*capacity
@@ -1356,12 +1359,49 @@ def equipment_bank_switch(debug,rom_path,record):
             wanted=b''.join(blob[r['blob_offset']:r['blob_offset']+r['bytes']] for r in (model,animation))
             check('complete actual model and animation after switch',bank,wanted)
             for at in guards:check('native bank-switch memory guard',at,edge)
+        joint=resources.get('player_joint_work')
+        if joint:
+            check('actual player allocation includes complete animation work',0x8010BCEC,struct.pack('>I',player_bytes))
+            segment=debug.read_memory(0x801458B8,4)
+            original_work=b'\xA5\x5A'*42
+            debug.write_memory(actor+0xA88,original_work)
+            def owner_call(first,last,args):
+                start=owner+first-equipment.PLAYER_RAM
+                return call(start,args,(start,expected[first-equipment.PLAYER_RAM:last-equipment.PLAYER_RAM]))
+            for model in (small,large):
+                animation=animations[model['source']['motion_bindings'][0]['default_animation']]
+                used=(model['source']['skeleton']['joints']+1)*6
+                joint_at,morph_at=(actor+joint[k] for k in ('joint_offset','morph_offset'))
+                poison=b'\xA5\x5A'*(joint['array_bytes']//2)
+                debug.write_memory(joint_at,poison);debug.write_memory(morph_at,poison)
+                owner_call(0x808BD934,0x808BDACC,[actor,model['index'],animation['index'],0,0,0x3F800000,1])
+                check('native initializer binds both enlarged arrays',actor+0xA3C,struct.pack('>2I',joint_at,morph_at))
+                owner_call(0x808BD81C,0x808BD880,[actor])
+                pose=debug.read_memory(joint_at,used)
+                written=all(pose[i:i+2]!=b'\xA5\x5A' for i in range(0,used,2))
+                record(dict(equipment_joint_vectors=used//6,model=model['index'],
+                            assertion='passed' if written else 'failed'))
+                if not written:raise ValueError('Native animation did not write every joint component')
+                assertions+=1
+                check('no-morph playback retains other array',morph_at,poison)
+                if used<joint['array_bytes']:
+                    check('small rig retains unused joint vectors',joint_at+used,poison[used:])
+                # Frame one, stationary, with a one-frame morph: the real
+                # evaluator must write the complete morph table and joint pose.
+                put(actor+0xA38,0x3F800000)
+                owner_call(0x808BD81C,0x808BD880,[actor])
+                check('native morph writes every expected vector',morph_at,pose+poison[used:])
+                check('native morph retains stationary pose',joint_at,pose+poison[used:])
+                check('original short work arrays are not overwritten',actor+0xA88,original_work)
+                check('native animation restores segment six',0x801458B8,segment)
+                for at in guards:check('native expanded-joint memory guard',at,edge)
         check('saved state retained',0x8046C000,saved)
         check('no CPU fault',0x8003CE34,bytes(4))
         check('equipment module guard',equipment.RAM+resources['bytes']-16,struct.pack('>4I',*([equipment.GUARD]*4)))
     finally:call(0x8009C040,[allocation])
     return dict(native_equipment_bank_switch=True,assertions=assertions,transitions=6,
-        unchanged_animation_index=True,ordinary_gameplay_tested=False,hardware_tested=False,
+        unchanged_animation_index=True,joint_work_vectors=resources.get('player_joint_work',{}).get('vectors',7),
+        ordinary_gameplay_tested=False,hardware_tested=False,
         flash_written=False,requires_checkpoint_restore=True)
 
 

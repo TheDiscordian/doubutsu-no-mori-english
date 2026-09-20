@@ -1,5 +1,72 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared rig capacity and resource extension
+
+The shared equipment installer extends existing rigs with all twelve complete
+net/rod/balloon models. It derives categories and joint capacity from source
+bindings, retains all existing resources, and installs no new selectable parent.
+The proposal contains all 50 equipment resources, including twenty animated
+models. Models are reused from the prepared bundle; nothing is reconverted.
+
+- Explicit lock: `build/v3-rig-capacity-03/build-lock.json`, ABI 122.
+- ROM SHA-256:
+  `e539da80e8755d10c7da1cfc84343db0e5bcce353a0fc071155516b3480829fd`.
+- Report SHA-256:
+  `67a9f0faca2890a1efc9b86136a7fd847525f49f351f00eb9c3cc21d9aa5e5dc`.
+- UPS SHA-256:
+  `7d0c6f2d1b703681cac8cb31f3de270a9c071025d5f97a8e3d056403de4a3fa5`.
+- Outdoor banks: two times 7,168 bytes; scene arena `949C0`, an additional
+  3,840 bytes relative to the preceding proposal, 5,568 over the native arena.
+- Transient player: `1310` to `1370` bytes; two eight-vector arrays at
+  `+1310/+1340`, with four checked initializer pointer changes.
+- Module: unchanged 56-KiB reservation and public entries, updated in place at
+  blob offset `3BD350`.
+- New model bytes: 46,976, stored in the checked retired ABI-117 module at
+  blob offset `3B0350`, whose 53,248-byte extent does not overlap live resources.
+
+Six focused checks pass in 9.569 seconds: complete new and retained resources,
+source categories, all model/motion bounds, exact bank/profile/initializer
+changes, original-ROM UPS reconstruction, unrelated resource retention,
+source-mutation rejection, repeatable further joint growth, retired-range hash
+and live-overlap rejection, unchanged public entries/guards, and exact all/empty
+composition. Sanitizer readers cover original, 5,248-byte, and 7,168-byte limits;
+the added exact-capacity boundary check passes in a subsequent 0.879-second run.
+
+The current silent native retry at `build/smoke-v3-rig-capacity-02/` passes
+116 records and 93 assertions, including 89 component assertions. It loads
+the complete actual player owner/module, alternates six complete model/animation
+transfers, executes the native player initializer and animation update for a
+five-joint rod and seven-joint balloon, verifies both enlarged work arrays,
+retains the old short arrays, and checks memory guards and unchanged save state.
+The allocation is freed, checkpoint restored, fault/module guards checked, and
+the emulator exits cleanly. Results SHA-256:
+`05ab6545da858935ff4a529b3886fda4ce76b81ca856b585fe676ea01c272dec`.
+
+The first native attempt reaches full eight-vector playback but its fixture
+requests a zero-length unused-tail read for the largest rig. The debugger
+rejects that read; the correction skips the absent tail. Its 97 records/79
+passing assertions remain partial at `build/smoke-v3-rig-capacity-01/`, SHA-256
+`bcf94fc5cda5204869d4287fa8fb038275ccf5a4b06a199cd24ba7d348c44fdc`.
+The single justified retry succeeds. No uploaded code or user saves are used.
+
+Build attempts `v3-rig-capacity-01` and `-02` stop before producing a cartridge:
+the first lacks the `u32` import, and the second correctly detects exhausted
+import VROM space. The completed installer safely reuses a verified retired
+module instead of appending another current copy or overlapping choice data.
+Both failed output directories are preserved.
+
+The 120 experimental choices, format-2 profile, inventory tables/bank, existing
+actions, and translation-only V2-12 output remain unchanged. Equal-profile
+ABI-121/122 compatibility is expected without migration; a fresh cross-build
+game save/reload is not claimed. Imported V3 saves remain unsuitable for V2.
+The main lock, local/public patchers, and original ROMs/saves are unchanged.
+
+Continue with balloon actions, the inventory's separate joint storage and
+complete previews, then parent/acquisition support. Net/rod behaviour and
+golden-tool differences remain open. Native component checks do not establish
+ordinary interaction, GPU appearance, acquisition, persistence, or hardware.
+Do not rerun completed bank/playback checks without a relevant change.
+
 ## Shared joint-matrix and IA8 conversion
 
 The shared format converter prepares the remaining twelve animated equipment

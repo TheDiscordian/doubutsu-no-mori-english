@@ -143,6 +143,10 @@ int main(void) {
     rows[33]=(Resource){0x02500000,16,0x06000008,1};
     assert(af_v3_equipment_pointer(50)==0x06000008);
     rows[33].pointer+=4;invalid(50);
+    rows[33]=(Resource){0x02500000,AF_V3_EQUIPMENT_CAPACITY,
+                       0x06000000+AF_V3_EQUIPMENT_CAPACITY-8,1};
+    assert(af_v3_equipment_size(50)==AF_V3_EQUIPMENT_CAPACITY);
+    rows[33].pointer+=4;invalid(50);
 #endif
 #ifdef AF_V3_PLAYER_MOTION
     player_tests();
