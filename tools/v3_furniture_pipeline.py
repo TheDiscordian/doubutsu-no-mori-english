@@ -584,6 +584,88 @@ def prepare_models(source, descriptor):
     return descriptor, bytes(body), resources, offsets, models, commands, sections
 
 
+def prepare_native_variant(source, model, reference, reference_model, reference_segment):
+    """Pack legacy N64-format donor art against a complete native command list.
+
+    Some donor UI models retain native RGBA5551/linear CI4 resources, unlike
+    Dolphin models. Require the same complete command program as a known native
+    model, then change only its three resource pointers. This is not a fallback
+    for unsupported Dolphin commands or arbitrary native display lists.
+    """
+    name,start,size=model;raw=source.data[start:start+size]
+    original=reference[reference_model:reference_model+size]
+    pointers=source.pointers(start,size)
+    if (not size or size%8 or len(raw)!=size or len(original)!=size
+            or raw[-8:]!=struct.pack('>2I',0xDF000000,0)):
+        raise ReviewRequired('Incomplete legacy native model')
+    normalized=bytearray(original);resources=[];body=bytearray();fixes={};triangles=0
+    vertices=None;palette_count=None;texture_bytes=None;texture_extent=None
+    for offset in range(0,size,8):
+        a,b=struct.unpack_from('>2I',raw,offset);op=a>>24
+        if op not in (0xD7,0xE7,0xE2,0xFC,0xE3,0xFD,0xE8,0xF5,0xE6,
+                      0xF0,0xF3,0xF2,0xFA,0xD9,0x01,0x05,0x06,0xDF):
+            raise ReviewRequired('Unsupported legacy native command')
+        if op==0xDF and offset!=size-8:raise ReviewRequired('Early legacy model return')
+        if op in (0x01,0xFD):
+            target=pointers.get(start+offset+4)
+            if b or target is None:raise ReviewRequired('Missing legacy resource relocation')
+            symbol,at,n=source.containing(target,exact=True)
+            if source.pointers(at,n):raise ReviewRequired('Pointer-bearing legacy resource')
+            native_pointer=u32(original,offset+4)
+            if native_pointer>>24!=reference_segment or (native_pointer&0xFFFFFF)+n>len(reference):
+                raise ReviewRequired('Native reference resource escapes its bank')
+            if op==1:
+                count=a>>12&255;end=a>>1&127
+                if vertices is not None or count!=end or not 0<count<=32 or n!=count*16:
+                    raise ReviewRequired('Unsupported legacy vertex cache layout')
+                vertices=count;kind='vertices'
+            else:
+                fmt,bits=(a>>21)&7,(a>>19)&3
+                if bits!=2 or a&0xFFF:raise ReviewRequired('Unsupported legacy texture transfer')
+                kind={0:'palette',2:'texture'}.get(fmt)
+                if kind is None:raise ReviewRequired('Unsupported legacy material format')
+            if any(r['kind']==kind for r in resources):raise ReviewRequired('Multiple legacy resource bindings')
+            data=source.data[at:at+n];body.extend(bytes(-len(body)%32));destination=len(body);body.extend(data)
+            resources.append(dict(symbol=symbol,donor_offset=at,native_offset=destination,bytes=n,
+                source_sha256=sha256(data),output_sha256=sha256(data),kind=kind,
+                reference_offset=native_pointer&0xFFFFFF,
+                reference_sha256=sha256(reference[native_pointer&0xFFFFFF:(native_pointer&0xFFFFFF)+n])))
+            fixes[offset+4]=SEGMENT+destination
+            struct.pack_into('>I',normalized,offset+4,0)
+        elif op==0xF0:
+            if palette_count is not None:raise ReviewRequired('Multiple legacy palette loads')
+            palette_count=((b>>14)&1023)+1
+        elif op==0xF3:
+            if texture_bytes is not None:raise ReviewRequired('Multiple legacy texture loads')
+            texture_bytes=(((b>>12)&4095)+1)*2
+        elif op==0xF2:
+            if texture_extent is not None or a&0xFFFFFF:raise ReviewRequired('Unsupported legacy tile origin')
+            texture_extent=(((b>>12)&4095)//4+1,(b&4095)//4+1)
+        elif op in (5,6):
+            if vertices is None:raise ReviewRequired('Legacy triangles precede vertices')
+            for triangle in ((a,) if op==5 else (a,b)):
+                indices=[triangle>>shift&255 for shift in (16,8,0)]
+                if any(i%2 or i//2>=vertices for i in indices):raise ReviewRequired('Legacy vertex index escapes cache')
+                triangles+=1
+    if (set(pointers)!={start+p for p in fixes} or normalized!=raw
+            or {r['kind'] for r in resources}!={'palette','texture','vertices'}
+            or palette_count!=16 or texture_extent is None or not triangles):
+        raise ReviewRequired('Legacy program differs from the complete native reference')
+    by_kind={r['kind']:r for r in resources};w,h=texture_extent
+    if by_kind['palette']['bytes']!=palette_count*2 or by_kind['texture']['bytes']!=texture_bytes or w*h//2!=texture_bytes:
+        raise ReviewRequired('Legacy material transfer differs from complete resource sizes')
+    by_kind['palette']['format']='RGBA5551'
+    by_kind['texture'].update(format='CI4',layout='native-linear',width=w,height=h)
+    code=bytearray(raw)
+    for offset,pointer in fixes.items():struct.pack_into('>I',code,offset,pointer)
+    body.extend(bytes(-len(body)%8));model_offset=len(body);body.extend(code);body.extend(bytes(-len(body)%16))
+    compiled=dict(layer='opaque',symbol=name,donor_offset=start,source_sha256=sha256(raw),
+        native_offset=model_offset,bytes=len(code),output_sha256=sha256(code),triangles=triangles)
+    return bytes(body),dict(format='AFV3-NATIVE-MODEL-1',resources=resources,compiled_models=[compiled],
+        model_offsets={'opaque':model_offset},bytes=len(body),sha256=sha256(body),
+        reference_model_offset=reference_model,reference_model_sha256=sha256(original))
+
+
 def prepare_material_pair(source, parts):
     """Validate a full material/geometry pair, then retain its separate lists.
 

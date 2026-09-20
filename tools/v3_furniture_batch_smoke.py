@@ -277,6 +277,7 @@ def inventory_rigs(debug,rom_path,record):
     path=Path(rom_path);image=path.read_bytes();report=json.loads((path.parent/'build.json').read_bytes())
     if sha256(image)!=report['output_sha256']:raise ValueError('Changed animated inventory cartridge')
     e=report['equipment_resources'];preview=e['inventory_preview'];files=by_vrom(image)
+    tools=preview.get('tool_previews')
     blob=files[runtime.BLOB].extract(image);boot=boot_proofs(image);assertions=0
     def check(label,at,want):
         nonlocal assertions
@@ -292,7 +293,7 @@ def inventory_rigs(debug,rom_path,record):
     def word(at):return int.from_bytes(debug.read_memory(at,4),'big')
     module=blob[e['blob_offset']:e['blob_offset']+e['bytes']]
     check('complete cartridge-loaded inventory tables/code',0x804A3000,module)
-    saved={at:debug.read_memory(at,n) for at,n in ((0x801458B8,4),(0x8046C000,864))}
+    saved={at:debug.read_memory(at,n) for at,n in ((0x801458B8,4),(0x801458D0,4),(0x8046C000,864))}
     size=0x1D000;allocation=call(0x8009BFC0,[size])
     if allocation&15 or not MODULE_RAM+0x8000<=allocation<=0x80400000-size:
         raise ValueError('Animated inventory fixture outside native heap')
@@ -314,6 +315,10 @@ def inventory_rigs(debug,rom_path,record):
     groups={callback:[r for r in rows if r['draw_callback']==callback] for callback in {r['draw_callback'] for r in rows}}
     representatives=[row for _,group in sorted(groups.items()) for row in
                      (min(group,key=lambda r:r['model_bytes']),max(group,key=lambda r:r['model_bytes']))]
+    if tools:
+        representatives=[r for r in rows if r['preview_kind'] in tools['preview_indices']]
+        if sorted(r['preview_kind'] for r in representatives)!=[6,7,8,9]:
+            raise ValueError('Missing complete shared tool preview category')
     matrix=call(0x800E02AC);matrix_before=debug.read_memory(matrix,64)
     identity=game+0x40;debug.write_memory(identity,struct.pack('>16f',*(1 if i%5==0 else 0 for i in range(16))))
     def initialize(kind):
@@ -332,6 +337,27 @@ def inventory_rigs(debug,rom_path,record):
             record(dict(inventory_rig_native_initialize=kind,assertion='passed' if passed else 'failed'))
             if not passed:raise ValueError('Inventory init continuation/stack mismatch')
         finally:debug.command('z'+bp);debug.command('G'+before)
+    def draw():
+        # Execute the actual cartridge table lookup and relocated/resident
+        # dispatcher, without uploading a substitute callback bridge.
+        put(stack+0x30,submenu,game)
+        before=debug.command('g');regs=[int(before[i:i+16],16) for i in range(0,len(before),16)]
+        if len(regs)!=71 or regs[37]&0xFFFFFFFF!=0x800D334C:
+            raise ValueError('Inventory drawing requires the paused native frame')
+        for register,value in ((6,overlay+0x10000),(29,stack),(37,root+0x8087E5F4-OWNER_RAM)):
+            regs[register]=extend(value)
+        target=root+0x8087E618-OWNER_RAM;bp=f'0,{target:x},4'
+        if debug.command('Z'+bp)!='OK':raise ValueError('Inventory draw breakpoint refused')
+        try:
+            if debug.command('G'+''.join(f'{r:016x}' for r in regs))!='OK':raise ValueError('Inventory draw register write refused')
+            stopped=debug.command('c');raw=debug.command('g')
+            actual=[int(raw[i:i+16],16) for i in range(0,len(raw),16)]
+            passed=(stopped[:3] in ('T05','S05') and actual[37]&0xFFFFFFFF==target
+                    and actual[29]==regs[29] and actual[16:24]==regs[16:24] and actual[30]==regs[30])
+            record(dict(inventory_native_draw_kind=int.from_bytes(debug.read_memory(overlay+0x10016,2),'big'),
+                        assertion='passed' if passed else 'failed'))
+            if not passed:raise ValueError('Inventory native draw continuation or register mismatch')
+        finally:debug.command('z'+bp);debug.command('G'+before)
     try:
         call(0x800262D0,[VROM,VROM+len(data),OWNER_RAM,OWNER_RAM+resident,root,root+resident,len(rel)])
         check('complete cartridge-loaded relocated inventory owner',root,loaded)
@@ -340,20 +366,28 @@ def inventory_rigs(debug,rom_path,record):
         check('native overlay loader scratch guard',root+resident+len(rel),edge)
         debug.write_memory(root+resident,edge)
         put(submenu+0x2C,overlay);put(overlay+0x106DC,bss);put(game,graph)
-        initialize(1);check('original tool animation timing retained',bss+0x224+12,struct.pack('>2f',1,2))
+        if not tools:
+            initialize(1);check('original tool animation timing retained',bss+0x224+12,struct.pack('>2f',1,2))
         for row in representatives:
-            model=resources[row['fields']['shape']];motion=resources[row['fields']['item_animation']]
+            model=resources[row['fields']['shape']]
+            motion=resources[row['fields']['item_animation']] if row['fields']['skeleton'] else None
             fill=b'\xA5'*0x4000;debug.write_memory(bank,fill);initialize(row['preview_kind'])
-            wanted=(blob[model['blob_offset']:model['blob_offset']+model['bytes']]+
-                    blob[motion['blob_offset']:motion['blob_offset']+motion['bytes']])
+            wanted=blob[model['blob_offset']:model['blob_offset']+model['bytes']]
+            if motion:wanted+=blob[motion['blob_offset']:motion['blob_offset']+motion['bytes']]
             check('complete native model/animation transfers and untouched tail',bank,wanted+fill[len(wanted):])
-            speed=row['native_frame_speed']
-            check('source-correct preview speed and first frame',bss+0x224+12,struct.pack('>2f',speed,1+speed))
-            check('native inventory work and morph pointers',bss+0x224+0x24,
-                  struct.pack('>2I',bss+work['joint_offset'],bss+work['morph_offset']))
+            if motion:
+                speed=row['native_frame_speed']
+                check('source-correct preview speed and first frame',bss+0x224+12,struct.pack('>2f',speed,1+speed))
+                check('native inventory work and morph pointers',bss+0x224+0x24,
+                      struct.pack('>2I',bss+work['joint_offset'],bss+work['morph_offset']))
             put(0x801458B8,word(overlay+0x10030)&0x1FFFFFFF);call(0x800E0284,[identity])
             put(graph+0x298,gfx,gfx+0x1000);put(graph+0x2A8,xlu,xlu+0x600)
-            if OWNER_RAM<=row['draw_callback']<OWNER_RAM+SECTIONS[0]:
+            rod=row['draw_callback']==0x8087E2AC
+            if rod:
+                debug.write_memory(bss+0x2E8,debug.read_memory(identity,64))
+                put(overlay+0x100F8,bank&0x1FFFFFFF)
+            if tools:draw()
+            elif OWNER_RAM<=row['draw_callback']<OWNER_RAM+SECTIONS[0]:
                 call(root+row['draw_callback']-OWNER_RAM,[submenu,game],proof)
             else:
                 stub=struct.pack('>2I',jump(row['draw_callback']),0);debug.write_memory(bridge,stub)
@@ -363,17 +397,36 @@ def inventory_rigs(debug,rom_path,record):
             if not gfx<front<=back<=gfx+0x1000:raise ValueError('Animated inventory escaped graphics arena')
             commands=debug.read_memory(gfx,front-gfx)
             drawn=[p for w,p in struct.iter_unpack('>2I',commands) if w>>24==0xDE]
-            expected=[0x06000000+p for p in model['source']['model_offsets'].values()]
+            expected=([0x06000000+p for p in model['source']['model_offsets'].values()] if motion else [model['pointer']])
+            if rod:expected.append(tools['bobber']['display_pointer'])
             reflection=row['draw_callback']==preview.get('balloon_drawer',{}).get('address')
-            allocation_bytes=model['source']['skeleton']['shown_joints']*64+(48 if reflection else 0)
+            allocation_bytes=(model['source']['skeleton']['shown_joints']*64 if motion else 0)+(48 if reflection else 0)+(64 if rod else 0)
             passed=drawn==expected and back==gfx+0x1000-allocation_bytes
             record(dict(inventory_rig_joint_draws=drawn,expected=expected,
                         assertion='passed' if passed else 'failed',model=model['index']))
             if not passed:raise ValueError('Animated inventory omitted a joint or allocated wrong matrices')
-            check('native translucent matrix binding retained',graph+0x2A8,struct.pack('>2I',xlu+8,xlu+0x600))
+            check('native translucent matrix binding retained',graph+0x2A8,struct.pack('>2I',xlu+(8 if motion else 0),xlu+0x600))
             check('balanced native matrix stack',0x801462B4,struct.pack('>I',matrix))
-            check('unchanged parent transform',matrix,debug.read_memory(identity,64))
+            if not rod:check('unchanged parent transform',matrix,debug.read_memory(identity,64))
+            if rod:
+                check('native common-resource segment retained',0x801458D0,struct.pack('>I',bank))
             for at in guards:check('inventory rig guard',at,edge)
+        if tools:
+            # The changed pointer consumer must also retain the ordinary rod.
+            debug.write_memory(overlay+0x10016,struct.pack('>h',3));put(stack+88,submenu)
+            before=debug.command('g');regs=[int(before[i:i+16],16) for i in range(0,len(before),16)]
+            regs[29]=extend(stack);regs[37]=extend(root+tools['hook']['address']-OWNER_RAM)
+            target=root+tools['hook']['address']-OWNER_RAM+8;bp=f'0,{target:x},4'
+            if debug.command('Z'+bp)!='OK':raise ValueError('Ordinary bobber breakpoint refused')
+            try:
+                if debug.command('G'+''.join(f'{r:016x}' for r in regs))!='OK':raise ValueError('Ordinary bobber registers refused')
+                stopped=debug.command('c');raw=debug.command('g');actual=[int(raw[i:i+16],16) for i in range(0,len(raw),16)]
+                passed=(stopped[:3] in ('T05','S05') and actual[37]&0xFFFFFFFF==target
+                        and actual[13]==tools['native_bobber_pointer']
+                        and all(actual[i]==regs[i] for i in range(34) if i not in (1,13,31)))
+                record(dict(inventory_native_ordinary_bobber=True,assertion='passed' if passed else 'failed'))
+                if not passed:raise ValueError('Ordinary bobber pointer or live registers changed')
+            finally:debug.command('z'+bp);debug.command('G'+before)
         if work['vectors']>7 and not preview.get('balloon_drawer'):
             # Supply the largest installed skeleton through temporary table
             # data, not uploaded code or a claimed enabled inventory option.
@@ -418,7 +471,8 @@ def inventory_rigs(debug,rom_path,record):
         for at,value in saved.items():debug.write_memory(at,value)
         call(0x8009C040,[allocation])
     return dict(native_inventory_rigs=True,representatives=len(representatives),assertions=assertions,
-        complete_model_animation_dma=True,original_tool_speed_retained=True,gpu_rendered=False,
+        complete_model_animation_dma=True,original_tool_speed_retained=not bool(tools),
+        native_tool_draw_dispatch=bool(tools),golden_and_ordinary_bobber_checked=bool(tools),gpu_rendered=False,
         ordinary_inventory_tested=False,parent_selection_tested=False,flash_written=False,requires_checkpoint_restore=True)
 
 

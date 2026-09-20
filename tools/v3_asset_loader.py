@@ -111,6 +111,7 @@ def compile_part(part, out, extra_sources=(), defines=(), primary_source=None):
                        'room_rigs': ('af_v3_room_rig_ct', 0x804B1800),
                        'held_collection': ('af_v3_held_catalogue_record', 0x804AFA00),
                        'inventory_equipment': ('af_v3_inventory_item_kind', 0x804A9000),
+                       'inventory_aux': ('af_v3_inventory_bobber', 0x804B2180),
                        'item_categories': ('af_v3_equipment_category', 0x804AA000),
                        'ground_categories': ('af_v3_ground_prepare', 0x804AD000),
                        'event_acquisition': ('af_v3_event_stock_construct', 0x804AE000),

@@ -19,6 +19,12 @@ source position/RNG rules to generate the 100-Bell bonus. It reclaims a verified
 4-KiB portion of a retired audio sequence, retaining the live relocated sequence
 and every existing code/state address. See
 [golden-shovel digging](V3_HANDHELD_ITEMS.md#shared-golden-shovel-digging).
+The inventory stage discovers all four golden tools through shared parent aliases
+and source preview tables. It reuses complete installed equipment resources and
+native static/skeleton consumers, adding the complete native-format donor bobber
+through a strict native-reference graphics adapter. Existing allocations, choices,
+and saves remain unchanged; parent/acquisition integration is still required.
+See [golden-tool previews](V3_HANDHELD_ITEMS.md#golden-tool-previews).
 
 New furniture uses `tools/v3_furniture_pipeline.py`, not a new Python item list,
 family installer, catalogue switch, or dedicated native scenario. Extend shared

@@ -31,9 +31,15 @@ FUNCTIONS=(
     (0x2716FC,808,'896df698df4877431eda0f955ce962260ded4e0f62047c34528d0a42c9807029'),
     (0x272454,92,'0dc3803e01aa021475b87aecb8c592474abbb373d047f95972a9fb2df0cbfccb'),
     (0x272524,156,'7d0497e25b735edec49669876912fa0ba67d4c0a9609bd41cfff3075ef6ff353'))
+TOOL_FUNCTIONS=(
+    (0x271E70,96,'101238234480bdfdfc208f3a868875b1ee99cef3646994bc8eaf5bb51ccc250c'),
+    (0x271ED0,92,'050a2ea1a14f59789f1363577541a93b417d9fd854ebb002d30929d56cabb106'),
+    (0x2720B8,380,'ea46b8ddd8e09005dba73659152201416582397a36de3b7f3e432670d395a345'),
+    (0x272234,92,'c0da0b7b182b7c0a0c4a63375087fde5af1248c554bd8c9929c75c90aa0fc1bd'))
+AUX_CODE,AUX_LIMIT,AUX_ART,AUX_END=0xF180,0xF280,0xF800,0xFFD0
 
 
-def records(source,equipment,*,animated=False,balloon_callback=None):
+def records(source,equipment,*,animated=False,balloon_callback=None,include_tools=None):
     """Join actual inventory kinds/callbacks to installed equipment resources."""
     from v3_handheld_items import parent_records
     _,parents=parent_records(source,equipment)
@@ -64,6 +70,24 @@ def records(source,equipment,*,animated=False,balloon_callback=None):
     kind_rows={r['item_id']:r for r in equipment['kind_readers']['rows']}
     selector=bytearray(struct.pack('>4I',0x41464956,1,56,4)+bytes(56*4));rows=[]
     candidates=list(parents['rows'])
+    if include_tools is None:
+        include_tools=bool(equipment.get('inventory_preview',{}).get('tool_previews'))
+    if include_tools:
+        from v3_room_aliases import discover as aliases
+        if not animated or not equipment.get('player_actions',{}).get('shovel_effects'):
+            raise ValueError('Tool previews require complete shared tool support')
+        installed={r['item_id'] for r in candidates}
+        additions=[r for r in aliases(source)['rows'] if r['category']=='golden-tool']
+        if len(additions)!=4:raise ValueError('Changed complete source golden-tool category')
+        for row in additions:
+            item=row['parent_item_id']
+            if item not in kind_rows:raise ValueError('Missing complete golden-tool resources')
+            if item not in installed:
+                candidates.append(dict(id=row['parent_id'],item_id=item,native_kind=kind_rows[item]['native_kind']))
+        for at,n,digest in TOOL_FUNCTIONS:
+            raw,function=source.function(at)
+            if len(raw)!=n or sha256(raw)!=digest:raise ValueError('Changed complete source tool preview drawer')
+            functions.append(function)
     if balloon_callback is None:
         balloon_callback=equipment.get('inventory_preview',{}).get('balloon_drawer',{}).get('address')
     if balloon_callback is not None and (not animated or not RAM+CODE<=balloon_callback<RAM+TABLE
@@ -92,8 +116,11 @@ def records(source,equipment,*,animated=False,balloon_callback=None):
         iv_kind=kinds.index(source_kind);preview=iv_kind+1
         callback=pointers[iv_kind*4][3]
         balloon=bool(balloon_callback) and callback==0x272340
-        rig=animated and (callback==0x2723F4 or balloon)
+        tool=bool(include_tools) and callback in {r[0] for r in TOOL_FUNCTIONS}
+        tool_rig=tool and callback in (0x271E70,0x2720B8)
+        rig=animated and (callback==0x2723F4 or balloon or tool_rig)
         callbacks=(0x272454,0x2723F4,0x272340) if balloon_callback else ((0x272454,0x2723F4) if animated else (0x272454,))
+        if include_tools:callbacks+=tuple(r[0] for r in TOOL_FUNCTIONS)
         if preview<6 or preview>=COUNT or callback not in callbacks:
             raise ValueError('Unimplemented inventory held-drawing category')
         animation,_,shape,item_animation,_,_=kind['fields']
@@ -108,10 +135,11 @@ def records(source,equipment,*,animated=False,balloon_callback=None):
         if rig:
             item_motion=resources[item_animation];skeleton=model['source']['skeleton']
             vectors=equipment['inventory_preview'].get('joint_work',{}).get('vectors',7)
-            if (model['kind']!='animated-model' or model['type']!=1 or kind['item_main']!=(21 if balloon else 22)
+            category,animation_type={0x271E70:(2,2),0x2720B8:(11,3)}.get(callback,(21,4) if balloon else (22,5))
+            if (model['kind']!='animated-model' or model['type']!=1 or kind['item_main']!=category
                     or not 0<skeleton['shown_joints']<=min(skeleton['joints'],4)
                     or skeleton['joints']+1>vectors
-                    or item_motion['kind']!='animation' or item_motion['type']!=(4 if balloon else 5)
+                    or item_motion['kind']!='animation' or item_motion['type']!=animation_type
                     or item_motion['source']['joints']!=skeleton['joints']
                     or model['bytes']+item_motion['bytes']>equipment['inventory_preview']['item_bank_bytes']):
                 raise ValueError('Animated preview exceeds native bank or joint work capacity')
@@ -128,9 +156,11 @@ def records(source,equipment,*,animated=False,balloon_callback=None):
             model_bytes=model['bytes'],model_sha256=model['sha256'],
             animation_bytes=motion['bytes'],animation_sha256=motion['sha256'],selectable=False))
         if rig:
-            rows[-1].update(draw_callback=balloon_callback if balloon else 0x8087E098,item_animation_bytes=item_motion['bytes'],
+            rows[-1].update(draw_callback=balloon_callback if balloon else (0x8087E2AC if callback==0x2720B8 else 0x8087E098),item_animation_bytes=item_motion['bytes'],
                 item_animation_sha256=item_motion['sha256'],joint_vectors=skeleton['joints']+1,
-                source_frame_speed=.5 if balloon else 7.5,native_frame_speed=1.0 if balloon else 15.0)
+                source_frame_speed=.5 if balloon or tool else 7.5,native_frame_speed=1.0 if balloon or tool else 15.0)
+        elif tool:
+            rows[-1]['draw_callback']=equipment['inventory_preview']['code']['symbols']['af_v3_inventory_static_draw']
     if len({r['preview_kind'] for r in rows})!=len(rows):
         raise ValueError('Colliding native inventory preview kinds')
     return bytes(selector),dict(format='AFV3-INVENTORY-EQUIPMENT-1',rows=rows,
@@ -327,6 +357,100 @@ def refresh_rigs(base,prior,blob,core,original,output):
         crc32=zlib.crc32(module),additional_resident_bytes=0)
     if extend:report['held_rig_actions']['balloon']['inventory_preview_installed']=True
     return report,{} if extend else {VROM:bytes(patched)}
+
+
+def tool_bobber(source,original):
+    """Use the complete donor inventory accessory, including native-format art."""
+    from v3_furniture_pipeline import prepare_native_variant
+    from v3_category_runtime import rebase_art
+    raw,function=source.function(0x2720B8)
+    if (len(raw)!=TOOL_FUNCTIONS[2][1] or sha256(raw)!=TOOL_FUNCTIONS[2][2]
+            or function['relocations'].get(294)!=(6,1,5,0x444730)
+            or function['relocations'].get(306)!=(4,1,5,0x444730)
+            or function['relocations'].get(330)!=(6,1,5,0x444370)
+            or function['relocations'].get(342)!=(4,1,5,0x444370)):
+        raise ValueError('Changed complete donor rod accessory binding')
+    bank=by_vrom(original)[0xA30000].extract(original)
+    _,normal=prepare_native_variant(source,source.containing(0x444370,exact=True),bank,0xF9E0,12)
+    if any(r['source_sha256']!=r['reference_sha256'] for r in normal['resources']):
+        raise ValueError('Legacy accessory format is not established by the native original')
+    data,receipt=prepare_native_variant(source,source.containing(0x444730,exact=True),bank,0xF9E0,12)
+    rebased,fixes=rebase_art(data,receipt,RAM+AUX_ART)
+    receipt.update(ram=RAM+AUX_ART,module_offset=AUX_ART,rebased_sha256=sha256(rebased),
+        rebased_pointers=fixes,source_consumer=function,native_format_reference=normal,
+        display_pointer=((RAM+AUX_ART)&0x1FFFFFFF)+receipt['model_offsets']['opaque'])
+    return rebased,receipt
+
+
+def refresh_tools(base,prior,blob,core,original,output):
+    """Add complete tool categories to existing inventory tables and renderers."""
+    from v3_npc_draw import relocation_offsets
+    old=prior['equipment_resources'];preview=old['inventory_preview'];offset=old['blob_offset']
+    module=bytearray(blob[offset:offset+old['bytes']]);files=by_vrom(base)
+    owner=files[VROM].extract(base);rel=files[RELOC].extract(base)
+    effects=old.get('player_actions',{}).get('shovel_effects',{})
+    if (not effects or preview.get('tool_previews') or not preview.get('balloon_drawer')
+            or old['bytes']!=0x10000 or sha256(module)!=old['sha256']
+            or effects['code']['bytes']+0xF000>AUX_CODE or any(module[AUX_CODE:AUX_END])
+            or effects['previous_position_ram']!=RAM+AUX_END
+            or sha256(owner)!=preview['owner_sha256'] or sha256(rel)!=preview['relocation_sha256']):
+        raise ValueError('Changed inventory tool prerequisites or occupied auxiliary reservation')
+    native=by_vrom(original)[VROM].extract(original);consumers=[]
+    for first,last,digest in ((0x8087E098,0x8087E108,'aa2407b27fc7dd177028984f1a08d34b8fe47d5e7ca196641ca41d624cb2df0a'),
+                              (0x8087E2AC,0x8087E450,'c95d708859339f94f70630ea40a52240fe61e0e43e896e8f4103dc9e1bcee0f8')):
+        a,b=first-OWNER_RAM,last-OWNER_RAM
+        if owner[a:b]!=native[a:b] or sha256(owner[a:b])!=digest:
+            raise ValueError('Changed complete native tool preview drawer')
+        consumers.append(dict(start=first,end=last,sha256=digest))
+    source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+                  (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    selector,generated=records(source,old,animated=True,include_tools=True)
+    retained={r['item_id']:r for r in preview['rows']}
+    if any(retained.get(r['item_id'],r)!=r for r in generated['rows']):
+        raise ValueError('Tool preview changes an existing category')
+    added=[r for r in generated['rows'] if r['item_id'] not in retained]
+    if sorted(r['preview_kind'] for r in added)!=list(range(6,10)):
+        raise ValueError('Incomplete source tool preview category')
+    artwork,art_receipt=tool_bobber(source,original)
+    code,compiled=compile_part('inventory_aux',output/'inventory_aux',
+        primary_source='overlays/v3/inventory_aux.S',defines=(
+            f'AF_V3_BOBBER_POINTER=0x{art_receipt["display_pointer"]:08X}',))
+    if len(code)>AUX_LIMIT-AUX_CODE or len(artwork)>AUX_END-AUX_ART:
+        raise ValueError('Inventory accessory exceeds its existing reservation')
+    hook=0x8087E428;at=hook-OWNER_RAM
+    before=owner[at:at+8]
+    if before!=struct.pack('>2I',0x3C0D0C01,0x25ADF9E0):raise ValueError('Changed native bobber pointer load')
+    slots=relocation_offsets(rel,len(owner))
+    if any(p in slots for p in (at,at+4)):raise ValueError('Unexpected bobber pointer relocation')
+    guard_incoming(owner,SECTIONS[0],OWNER_RAM,[(at,8)])
+    patched=bytearray(owner);after=struct.pack('>2I',jump(RAM+AUX_CODE,link=True),0)
+    patched[at:at+8]=after
+    receipt=copy.deepcopy(preview);receipt.update(generated)
+    for table in receipt['tables']:
+        at,n=table['offset'],table['bytes'];data=bytearray(module[at:at+n])
+        if sha256(data)!=table['sha256']:raise ValueError('Changed complete inventory table')
+        for row in added:
+            p=row['preview_kind']*4
+            if any(data[p:p+4]):raise ValueError('Tool preview slot is already occupied')
+            value=row['draw_callback'] if table['role']=='draw' else row['fields'][table['role']]
+            struct.pack_into('>I',data,p,value)
+        module[at:at+n]=data;table['sha256']=sha256(data)
+    if sha256(module[SELECTOR:SELECTOR+preview['selector_bytes']])!=preview['selector_sha256']:
+        raise ValueError('Changed inventory selector')
+    module[SELECTOR:SELECTOR+len(selector)]=selector
+    module[AUX_CODE:AUX_CODE+len(code)]=code;module[AUX_ART:AUX_ART+len(artwork)]=artwork
+    receipt.update(selector_sha256=sha256(selector),selector_bytes=len(selector),
+        owner_sha256=sha256(patched),previous_owner_sha256=sha256(owner),additional_resident_bytes=0,
+        tool_previews=dict(format='AFV3-INVENTORY-TOOLS-1',code=compiled,code_offset=AUX_CODE,
+            bobber=art_receipt,preview_indices=sorted(r['preview_kind'] for r in added),
+            native_consumers=consumers,hook=dict(address=hook,before=before.hex(),after=after.hex()),
+            native_bobber_pointer=0x0C00F9E0,native_rod_transforms_retained=True,
+            source_functions=[source.function(at)[1] for at,_,_ in TOOL_FUNCTIONS],
+            parent_selection_enabled=False,ordinary_inventory_tested=False))
+    blob[offset:offset+len(module)]=module
+    report=copy.deepcopy(old);report.update(inventory_preview=receipt,sha256=sha256(module),
+        crc32=zlib.crc32(module),additional_resident_bytes=0)
+    return report,{VROM:bytes(patched)}
 
 
 def install(base,prior,blob,core,original,output):

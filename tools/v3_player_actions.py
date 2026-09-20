@@ -73,6 +73,7 @@ SOURCES = ('tools/v3_player_actions.py','tools/v3_furniture_pipeline.py',
            'tools/v3_handheld_items.py','tools/v3_inventory_equipment.py',
            'overlays/v3/inventory_equipment.c','overlays/v3/inventory_equipment.S',
            'overlays/v3/inventory_equipment.ld',
+           'overlays/v3/inventory_aux.S','overlays/v3/inventory_aux.ld',
            'overlays/v3/held_rigs.c','overlays/v3/held_rigs.S',
            'overlays/v3/held_rigs.ld','overlays/v3/tool_controls.c',
            'overlays/v3/tool_motion.c','overlays/v3/tool_motion.S',
@@ -1518,6 +1519,10 @@ def expanded_tables(source,owner,reloc,*,categories=CATEGORIES,native_count=NATI
 
 def install(base,prior,blob,core,original,output):
     old=prior.get('equipment_resources',{})
+    if (old.get('player_actions',{}).get('shovel_effects') and
+            not old.get('inventory_preview',{}).get('tool_previews')):
+        from v3_inventory_equipment import refresh_tools
+        return refresh_tools(base,prior,blob,core,original,output)
     if (old.get('player_actions',{}).get('rod_effects') and
             not old['player_actions'].get('shovel_effects')):
         return refresh_shovel_effects(base,prior,blob,core,original,output)

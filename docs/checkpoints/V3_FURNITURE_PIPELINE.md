@@ -1,5 +1,79 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared golden-tool inventory previews
+
+The explicit proposal is ABI 135 at
+`build/v3-shared-tool-previews-01/build-lock.json`. It retains all 128 experimental
+choices, fixed identities, complete existing assets, format-2 saves, and exact
+V2-12 empty-selection output. No golden-tool choice is enabled. The main ABI-109
+lock and both served V2 patchers remain unchanged.
+
+- ROM SHA-256:
+  `116346e16a9e3928dc07d87e509b48d38b89f1192070b19c9d0b64e55ec50537`.
+- Report SHA-256:
+  `d5cb050c356169821503422cfebb86a7c94601c30c4025a8c29c432c2a4fe2d5`.
+- UPS SHA-256:
+  `6b95da4235c2e7a860370812b10a9807a0294f95ff18ffbde350a1ee63e2c31d`.
+
+Shared source aliases and preview tables supply all four golden-tool records,
+without selecting items first or maintaining a per-item installer. The axe and
+shovel use the installed static models; net and rod use their complete rigs and
+native timing/drawers. Existing preview entries and code addresses remain.
+
+The rod's inventory accessory is a distinct native-format donor asset. Both
+ordinary and golden lists match the original N64 command program after resource
+pointer normalization. The ordinary donor palette, texture, and vertices exactly
+match the N64 resources, establishing native RGBA5551/linear-CI4 storage rather
+than the usual Dolphin data. The shared converter retains the golden resources
+and full 27-triangle geometry. The 960-byte accessory occupies `804B2800`; the
+56-byte pointer helper occupies `804B2180`. Only the two-instruction native
+pointer load changes. The complete native rod function retains its skeleton,
+transforms, segment setup, and matrix allocation. No module/bank/BSS/save/profile
+allocation grows, and every old imported resource stays intact.
+
+Four focused checks pass in 7.499 seconds:
+
+```sh
+PYTHONPATH=tools:tests python3 -m unittest test_v3_inventory_rigs.ToolPreviewTests -v
+```
+
+They cover complete source-derived rows, unchanged old categories, models/motions,
+animation/joint/bank limits, full native-format resource preservation and rebasing,
+rejected malformed commands/pointers/truncation, exact module/owner changes,
+occupied reservation rejection, unrelated DMA resources, original-ROM UPS
+reconstruction, unchanged saved profiles, all 128 selections, and exact empty
+output. Python syntax and `git diff --check` pass.
+
+The first silent native run, `build/smoke-v3-tool-previews-01/`, loads and draws
+all four tools, then fails a fixture assertion about the common-resource segment.
+The fixture put its pointer at overlay `10028`, missing the native segment base's
+additional `D0`. Native instructions `8087E2DC/8087E308/8087E3BC` establish the
+actual location `100F8`. This is a fixture setup error, not an accessory pointer
+or renderer failure. The corrected retry uses that actual offset; the ROM is
+unchanged.
+
+The retry, `build/smoke-v3-tool-previews-02/`, passes **132 records and 116
+assertions**. Results SHA-256:
+`0faf70b7493538d27e1d92565094eded8fd803dad73d9ca0717e427378a78063`.
+It loads/relocates the complete inventory owner from the cartridge, runs the
+actual model/animation loaders and initializer, and executes the native preview
+table lookup and draw dispatcher for each new tool. It checks complete transfers,
+joint/morph pointers, native timing, every expected joint/accessory display list,
+matrix allocation and stack balance, and the rod's common-resource segment.
+The changed ordinary-rod pointer window also returns its original model while
+retaining all live registers. Module/profile state and guards remain intact;
+checkpoint restoration, zero CPU fault, final guards, and clean exit pass.
+No code is uploaded for these cases, no user save is used, and audio stays silent.
+The test-harness work takes under the 30-minute budget; the justified retry is
+spent. Do not replay unchanged checks.
+
+This is component execution, not GPU rendering, ordinary inventory interaction,
+acquisition/reward demos, tool gameplay, persistence, or hardware confirmation.
+Continue shared parent/name/icon/catalogue and acquisition integration before
+enabling golden-tool choices. Imported saves still require matching-or-larger
+profiles and must not be loaded in V2. This goal turn makes implementation and
+verification progress; the overall V3 objective remains incomplete.
+
 ## Shared golden-shovel digging
 
 The explicit proposal is ABI 134 at

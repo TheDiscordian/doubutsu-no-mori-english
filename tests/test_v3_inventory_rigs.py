@@ -278,4 +278,131 @@ class JointCapacityTests(unittest.TestCase):
         finally:composer.BASE,composer.BASE_SHA,composer.REPORT_SHA,composer.ABI=pin
 
 
+TOOLS=ROOT/os.environ.get('V3_TOOL_PREVIEW_BUILD','build/v3-shared-tool-previews-01')
+
+
+@unittest.skipUnless((TOOLS/'build-lock.json').is_file(),'Current shared tool preview cartridge required')
+class ToolPreviewTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.image,cls.report=inputs(TOOLS/'build-lock.json');cls.base,cls.prior=inputs(TOOLS/'base-lock.json')
+        cls.files,cls.old_files=by_vrom(cls.image),by_vrom(cls.base)
+        cls.e=cls.report['equipment_resources'];cls.old=cls.prior['equipment_resources']
+        cls.p=cls.e['inventory_preview'];cls.previous=cls.old['inventory_preview'];cls.tools=cls.p['tool_previews']
+        cls.blob=cls.files[BLOB].extract(cls.image);cls.old_blob=cls.old_files[BLOB].extract(cls.base)
+        at=cls.e['blob_offset'];cls.module=cls.blob[at:at+cls.e['bytes']];cls.old_module=cls.old_blob[at:at+cls.old['bytes']]
+        cls.native=(ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes()
+        cls.source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+            (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+
+    def test_complete_tools_and_preserved_existing_records(self):
+        selector,generated=inventory.records(self.source,self.e,animated=True)
+        self.assertEqual(generated['rows'],self.p['rows'])
+        self.assertEqual(selector,self.module[inventory.SELECTOR:inventory.SELECTOR+len(selector)])
+        old={r['item_id']:r for r in self.previous['rows']}
+        new={r['preview_kind']:r for r in self.p['rows'] if r['item_id'] not in old}
+        self.assertEqual(set(new),{6,7,8,9})
+        for row in self.p['rows']:
+            if row['item_id'] in old:self.assertEqual(row,old[row['item_id']])
+        self.assertEqual([new[k]['world_kind'] for k in sorted(new)],[44,46,88,90])
+        self.assertEqual([new[k]['fields']['shape'] for k in sorted(new)],[20,22,31,39])
+        self.assertEqual([new[k]['draw_callback'] for k in sorted(new)],
+            [self.p['code']['symbols']['af_v3_inventory_static_draw'],0x8087E098,0x8087E2AC,
+             self.p['code']['symbols']['af_v3_inventory_static_draw']])
+        for kind in (7,8):
+            row=new[kind]
+            self.assertEqual((row['source_frame_speed'],row['native_frame_speed']),(.5,1))
+            self.assertLessEqual(row['joint_vectors'],self.p['joint_work']['vectors'])
+            self.assertLessEqual(row['model_bytes']+row['item_animation_bytes'],self.p['item_bank_bytes'])
+        for kind in (6,9):self.assertEqual(new[kind]['fields']['skeleton'],0)
+        for key in ('joint_work','code','animation_speed_hook','animated_rig_indices','balloon_drawer'):
+            self.assertEqual(self.p[key],self.previous[key])
+        self.assertFalse(self.tools['parent_selection_enabled'])
+        for mutation in ('capacity','model','motion','support'):
+            changed=copy.deepcopy(self.e)
+            if mutation=='capacity':changed['inventory_preview']['joint_work']['vectors']=6
+            if mutation=='model':next(r for r in changed['records'] if r['index']==22)['type']=0
+            if mutation=='motion':next(r for r in changed['records'] if r['index']==36)['type']=5
+            if mutation=='support':del changed['player_actions']['shovel_effects']
+            with self.assertRaises(ValueError,msg=mutation):inventory.records(self.source,changed,animated=True)
+
+    def test_complete_native_format_art_and_rejected_invalid_programs(self):
+        from v3_furniture_pipeline import prepare_native_variant
+        from v3_category_runtime import rebase_art
+        artwork,receipt=inventory.tool_bobber(self.source,self.native)
+        self.assertEqual(artwork,self.module[inventory.AUX_ART:inventory.AUX_ART+len(artwork)])
+        self.assertEqual(sha256(artwork),self.tools['bobber']['rebased_sha256'])
+        self.assertEqual((len(artwork),receipt['compiled_models'][0]['triangles']),(960,27))
+        for resource in receipt['resources']:
+            offset,size=resource['native_offset'],resource['bytes'];source=resource['donor_offset']
+            self.assertEqual(artwork[offset:offset+size],self.source.data[source:source+size])
+            self.assertEqual(resource['source_sha256'],resource['output_sha256'])
+        for r in receipt['native_format_reference']['resources']:
+            self.assertEqual(r['source_sha256'],r['reference_sha256'])
+        self.assertNotEqual(receipt['resources'][0]['source_sha256'],receipt['resources'][0]['reference_sha256'])
+        bank=by_vrom(self.native)[0xA30000].extract(self.native)
+        model=self.source.containing(0x444730,exact=True)
+        packed,description=prepare_native_variant(self.source,model,bank,0xF9E0,12)
+        self.assertEqual(rebase_art(packed,description,receipt['ram'])[0],artwork)
+        for offset in (0,0x2C,0x5C,0xA4,0xA8,0x118):
+            changed=copy.copy(self.source);changed.data=bytearray(self.source.data)
+            changed.data[model[1]+offset]^=1
+            with self.assertRaises(ValueError,msg=hex(offset)):
+                prepare_native_variant(changed,model,bank,0xF9E0,12)
+        with self.assertRaises(ValueError):prepare_native_variant(self.source,model,bank,0xF9E0,6)
+        with self.assertRaises(ValueError):prepare_native_variant(self.source,model,bank[:0xFB00],0xF9E0,12)
+
+    def test_only_new_slots_auxiliary_art_and_native_rod_pointer_change(self):
+        expected=bytearray(self.old_module)
+        old_ids={r['item_id'] for r in self.previous['rows']}
+        added=[r for r in self.p['rows'] if r['item_id'] not in old_ids]
+        for table in self.p['tables']:
+            at,n=table['offset'],table['bytes']
+            for row in added:
+                pos=at+row['preview_kind']*4
+                self.assertEqual(expected[pos:pos+4],bytes(4))
+                value=row['draw_callback'] if table['role']=='draw' else row['fields'][table['role']]
+                struct.pack_into('>I',expected,pos,value)
+            self.assertEqual(sha256(expected[at:at+n]),table['sha256'])
+        selector,_=inventory.records(self.source,self.e,animated=True)
+        expected[inventory.SELECTOR:inventory.SELECTOR+len(selector)]=selector
+        code=(TOOLS/'inventory_aux/code.bin').read_bytes();art=self.tools['bobber'];pos=inventory.AUX_ART
+        expected[inventory.AUX_CODE:inventory.AUX_CODE+len(code)]=code
+        expected[pos:pos+art['bytes']]=self.module[pos:pos+art['bytes']]
+        self.assertEqual(expected,self.module)
+        self.assertEqual(self.e['bytes'],self.old['bytes'])
+        self.assertEqual(self.module[-16:],struct.pack('>4I',*(GUARD,)*4))
+        hook=self.tools['hook'];at=hook['address']-inventory.OWNER_RAM
+        owner=bytearray(self.files[inventory.VROM].extract(self.image))
+        self.assertEqual(owner[at:at+8],bytes.fromhex(hook['after']))
+        owner[at:at+8]=bytes.fromhex(hook['before'])
+        self.assertEqual(owner,self.old_files[inventory.VROM].extract(self.base))
+        for v in set(self.files)-{inventory.VROM,BLOB,MODULE,0x19D40}:
+            self.assertEqual(self.files[v].extract(self.image),self.old_files[v].extract(self.base),hex(v))
+        for key in ('records','player_motion','player_joint_work','parent_readers','optional_selection','player_actions'):
+            self.assertEqual(self.e[key],self.old[key])
+        for r in self.e['records']:
+            at,n=r['blob_offset'],r['bytes'];self.assertEqual(self.blob[at:at+n],self.old_blob[at:at+n])
+        self.assertEqual(apply_ups(self.native,(TOOLS/'asset-loader.ups').read_bytes()),self.image)
+        reuse_resource_tail(self.image,self.report,self.blob)
+        damaged=bytearray(self.old_blob);damaged[self.old['blob_offset']+inventory.AUX_CODE]=1
+        prior=copy.deepcopy(self.prior);start=self.old['blob_offset']
+        prior['equipment_resources']['sha256']=sha256(damaged[start:start+self.old['bytes']])
+        with self.assertRaisesRegex(ValueError,'occupied auxiliary'):
+            inventory.refresh_tools(self.base,prior,damaged,bytearray(self.old_files[CODE_VROM].extract(self.base)),
+                self.native,TOOLS/'must-not-build')
+
+    def test_retained_profiles_saves_and_exact_no_import_output(self):
+        self.assertEqual(self.report['save_runtime'],self.prior['save_runtime'])
+        pin=(composer.BASE,composer.BASE_SHA,composer.REPORT_SHA,composer.ABI)
+        try:
+            composer.use_build_lock(TOOLS/'build-lock.json');catalog=composer.catalogue(self.image,self.report)
+            self.assertEqual(len(catalog),128)
+            self.assertFalse(any(f'GAFE01-r0/item/{i:04X}' in catalog for i in range(0x2239,0x223D)))
+            self.assertEqual(sha256(composer.compose(self.image,self.report,catalog,composer.resolve(catalog,[]))[0]),
+                self.report['translation_baseline']['sha256'])
+            self.assertEqual(composer.compose(self.image,self.report,catalog,composer.resolve(catalog,list(catalog)))[0],self.image)
+        finally:composer.BASE,composer.BASE_SHA,composer.REPORT_SHA,composer.ABI=pin
+
+
 if __name__=='__main__':unittest.main()

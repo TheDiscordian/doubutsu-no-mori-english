@@ -1415,6 +1415,50 @@ for component evidence and the remaining native control/guard/render checks.
 
 ## Shared inventory equipment previews
 
+### Golden-tool previews
+
+The shared `--player-actions` refresh discovers the complete golden-tool category
+from the donor's parent/display aliases, independently of enabled parent choices.
+It joins the actual preview-kind table, source drawers, and installed equipment
+resources. Native previews `6/7/8/9` represent golden axe/net/rod/shovel; original
+previews `0..4`, empty `5`, and every fan/pinwheel/balloon binding stay unchanged.
+
+The axe and shovel use the shared static resource-pointer drawer, not the native
+axe/shovel functions which hardcode ordinary models. Net and rod use the native
+skeleton drawers through the existing owner-relative dispatcher. The complete
+net and rod need seven and six joint vectors respectively, fit the current item
+bank, and retain native animation speed one. The pinwheel-only speed hook stays
+unchanged. Existing held models and player/item motions are reused in full.
+
+The donor rod drawer selects a distinct inventory bobber, separate from its
+outdoor equipment model. `prepare_native_variant` in the shared graphics pipeline
+handles this legacy N64-format category by requiring a complete native reference
+command program with matching material transfers, resource extents, vertex cache,
+triangles, and return. Only resource pointers may differ. An ordinary donor
+bobber comparison establishes that its palette, texture, and vertices exactly
+match the original N64 resource. These are RGBA5551 and native-linear CI4, not
+Dolphin RGB5A3/tiled data; converting them a second time would corrupt the art.
+Unknown commands, missing relocations, incomplete resources, and changed native
+programs fail. This is not a permissive fallback for unsupported Dolphin models.
+
+The complete golden accessory contains a 32-byte palette, 256-byte 16×32 texture,
+384-byte vertex array, and 288-byte/27-triangle list. Its 960 bytes occupy existing
+unused module space at `804B2800`. The shared resource rebasing pass produces
+physical pointers independent of the caller's segment six or twelve. A bounded
+leaf helper at `804B2180` replaces the ordinary pointer load at `8087E428` with
+a call: preview eight returns the golden list, and every other kind retains
+`0C00F9E0`. It reads the actual saved submenu at native caller `sp+88`, writes
+only `t5`, and uses only `at/ra` as scratch. The surrounding complete rod drawer
+retains skeleton drawing, bobber transforms, segment setup, and matrix allocation.
+
+The existing eight 41-entry tables and selector receive only their empty four
+tool slots. No inventory code entry, bank, joint allocation, shared module size,
+save field, profile bit, or enabled choice changes. The retained 64-KiB module
+already owns both code and accessory reservations. Parent names/icons/catalogue,
+acquisition/reward demos, and ordinary gameplay remain separate required work;
+preview installation does not enable unfinished tools. Evidence is recorded in
+the [checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-golden-tool-inventory-previews).
+
 ### Balloon previews
 
 After outdoor balloon actions and eight-vector work storage are installed,

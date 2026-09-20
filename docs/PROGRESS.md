@@ -18,13 +18,25 @@ served patchers retain their existing builds.
 
 ## Active development
 
-The current explicit ABI-134 proposal is
-`build/v3-shared-shovel-effects-02/build-lock.json`. All eight balloons are
+The current explicit ABI-135 proposal is
+`build/v3-shared-tool-previews-01/build-lock.json`. All eight balloons are
 connected through the shared parent-category installer: official names/prices,
 complete pocket icons, held/inventory animation, source acquisition records,
 collection/catalogue, animated room profiles, indoor conversion, and inverse
 pickup. The local composer has 128 experimental choices, including 24 equipment
 parents. These are not a public or hardware-ready handoff.
+
+All four golden-tool inventory previews use their complete installed models and
+motions through shared source-derived records. The rod includes its separate
+960-byte donor bobber, retaining its native-format palette/texture data. A
+56-byte pointer helper preserves the original rod, transforms, and graphics
+allocation. Existing previews, the 64-KiB module, saved formats, and 128 choices
+remain unchanged; no golden-tool option is enabled. Four focused checks pass.
+The silent native retry passes 132 records and 116 assertions, covering actual
+loading/animation/draw dispatch, complete joint/accessory lists, ordinary-bobber
+fallback, live registers, guards, checkpoint restoration, and clean exit.
+Ordinary inventory/gameplay and GPU/hardware appearance remain unverified.
+See the [preview checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-golden-tool-inventory-previews).
 
 The shared tool-input adapter connects all four active tool families to the
 native input predicates while retaining their real kinds and existing scene/
@@ -90,7 +102,7 @@ See the [shovel checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-golden-s
 The golden-axe durability audit finds no extra wear adapter is needed: the
 donor golden identity remains unchanged, and the retained native axe request/
 action path does not wear equipment. This is source/cartridge evidence, not
-ordinary gameplay. Next complete shared tool inventory/parent/acquisition support.
+ordinary gameplay. Next complete shared tool parent/acquisition support.
 The donor's balloon-loss-on-get-up path also remains an explicit shared behaviour
 dependency; it is not implemented by the net recovery adapter. Keep tool choices
 disabled. Continue from the current lock and retain completed evidence. See the
@@ -157,7 +169,7 @@ actual initialization/hand tracking/animation/drawing commands, matrix and memor
 guards, saved-state retention, checkpoint restoration, and clean exit. This is
 component execution, not GPU appearance, ordinary gameplay, or hardware proof.
 
-Use the ABI-133 lock above for continued work. Reuse the
+Use the ABI-135 lock above for continued work. Reuse the
 passing eight-vector player/inventory allocation evidence. The main lock and
 both patchers stay unchanged. See the
 [balloon-action checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-balloon-actions).

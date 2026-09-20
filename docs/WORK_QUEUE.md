@@ -2,12 +2,22 @@
 
 ## Active: V3 optional GameCube imports
 
-The current explicit proposal is ABI 134,
-`build/v3-shared-shovel-effects-02/build-lock.json`. All eight balloons are
+The current explicit proposal is ABI 135,
+`build/v3-shared-tool-previews-01/build-lock.json`. All eight balloons are
 connected through shared source-derived parent records, room profiles, indoor
 conversion/pickup, collection/catalogue, complete icons, and optional selection.
 There are 128 experimental choices, with 24 equipment parents. Neither served
 V2 patcher nor the main lock changes.
+
+The complete golden-tool inventory category is installed. All four preview rows
+come from shared source tables and reuse installed models/motions; the rod's
+separate 960-byte native-format accessory and 56-byte pointer helper fit existing
+space. Four focused checks pass. The silent native retry passes 132 records and
+116 assertions, including full loading, actual draw dispatch, source timing,
+joint/accessory commands, ordinary-rod fallback, registers, guards, restored
+checkpoint, and clean exit. Reuse this evidence; do not replay unchanged previews.
+Ordinary inventory interaction and GPU/hardware appearance remain open. See the
+[checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-golden-tool-inventory-previews).
 
 Shared tool-input classification is installed. All six actual native predicates
 retain their original controller semantics and now classify imported families
@@ -73,11 +83,16 @@ Do not add wear to existing N64 axes to implement an unbreakable golden axe.
 This is a source/cartridge audit, not ordinary golden-axe gameplay. See the
 [audit](checkpoints/V3_FURNITURE_PIPELINE.md#golden-axe-durability-audit).
 
-Next connect shared tool inventory/parent consumers and acquisition/demos.
+Next connect shared tool parent consumers and acquisition/demos.
 `selection_records` currently accepts only categories 21/22/23; extend complete
 tool categories through that shared machinery, retaining fixed parent/display
-identities. Check inventory models, room aliases, pocket icons, rewards and
-wrapped presents as dependencies; resources alone do not enable selections.
+identities. The source golden aliases identify the four additions; ordinary tools
+and worn-axe states in the same main categories are not new choices. Active tools
+need `passive=False`, unlike existing toys/fans. Reuse installed previews and
+prepared catalogue models; check room aliases, pocket icons, rewards, and wrapped
+presents as dependencies. Golden tool parents retain their IDs in rooms; their
+display forms belong to collection/catalogue, not ordinary room conversion.
+Resources alone do not enable selections.
 Keep all tool choices
 disabled until the required gameplay, inventory, acquisition, and persistence
 consumers are connected. Do not replay the completed input checks for unchanged code.
