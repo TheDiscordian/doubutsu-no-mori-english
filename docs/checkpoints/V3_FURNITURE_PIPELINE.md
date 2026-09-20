@@ -69,6 +69,19 @@ differences are wider detection angles and longer bite windows. Resolve native
 consumers/time-step units before installing them. Balloon release on get-up
 remains a separate actual behaviour dependency.
 
+The following source audit resolves both unnamed native fish owners for the
+next shared stage. Original VROM `00828C50`, linked at `809317D0`, has SHA-256
+`f07d956992ec2058942a0429c762294466db9d938333594d847dabb1a851c79c`;
+VROM `009591D0`, linked at `80A98F60`, has SHA-256
+`c5ba6a401a620eb537db976bee409bde3bc3c4568a51105379e575b9a607ae22`.
+The existing Docker disassembler creates ignored reference outputs at
+`build/disassembly/fish-ordinary/` and `build/disassembly/fish-special/`.
+All 32 native size/search/bite records independently match the checked donor
+tables after normal bite-class resolution. Native frames are not the donor's
+doubled initializer counts. Exact consumers and values are in the
+[rod specification](../../specs/V3_HANDHELD_ITEMS.md#golden-rod-consumers-awaiting-integration).
+This audit installs no rod behaviour and requires no replay of passing net tests.
+
 ## Shared net transitions and tool recovery
 
 The explicit proposal is ABI 131 at

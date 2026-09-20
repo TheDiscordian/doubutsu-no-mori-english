@@ -53,6 +53,13 @@ normal/golden dimensions. Resolve their actual native consumers and retain
 native time-step units; do not assume a distance increase or replace ordinary
 behaviour. The shovel forwards a golden flag into digging effects. These are
 actual dependencies, not reasons to enable ordinary-tool substitutes.
+The native fish owners are VROM/RAM `00828C50/809317D0` and
+`009591D0/80A98F60`; their angle loads are `80932404..80932410` and
+`80A99B1C..80A99B28`, and bite initializers are `809336E0..8093371C` and
+`80A9AB5C..80A9AB98`. All 32 fish records match donor normal classes. The
+[rod consumer specification](../specs/V3_HANDHELD_ITEMS.md#golden-rod-consumers-awaiting-integration)
+records exact tables and native timing units; reuse the extracted disassembly at
+`build/disassembly/fish-ordinary/` and `build/disassembly/fish-special/`.
 Check axe wear and acquisition/demos against both games. Keep all tool choices
 disabled until the required gameplay, inventory, acquisition, and persistence
 consumers are connected. Do not replay the completed input checks for unchanged code.

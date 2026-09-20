@@ -882,6 +882,44 @@ component fixture uses temporary selectors and isolated actors, not ordinary
 gameplay or hardware. See the
 [capture checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-golden-net-capture).
 
+### Golden-rod consumers awaiting integration
+
+The two N64 fish behaviour owners are unnamed overlays, not the common Gyoei
+actor. Their original-ROM layouts and complete data identify the corresponding
+donor behaviours:
+
+| Consumer | Normal fish | Special fish |
+| --- | --- | --- |
+| VROM / linked RAM | `00828C50` / `809317D0` | `009591D0` / `80A98F60` |
+| Relocation VROM | `0082B0C0` | `0095B1E0` |
+| Native fish table | `80933960` | `80A9AD50` |
+| Search-angle load | `80932404..80932410` | `80A99B1C..80A99B28` |
+| Bite initializer | `809336E0..8093371C` | `80A9AB5C..80A9AB98` |
+| Donor fish table, REL data | `00076858` | `00076BA8` |
+
+Both native tables contain the same 32 eight-byte records: size, search class,
+and a direct integer bite duration. All 32 match their corresponding checked
+donor records when the donor's bite-class index is resolved through the normal
+bite table. Their SHA-256 is
+`9e747aa7f24d51cfa6e2e2d81144cc767d8162524f69653ce9caddc45704fa46`;
+the corresponding first 256 donor bytes hash to
+`9c2f1661eb151aad912af34d82e9a5dfcb3cabb71d756224b0175bb2ffeea53e`.
+
+The verified donor REL data supplies ten floats per normal/golden table:
+distance at `00076A50`, angle at `00076A78`, and bite at `00076AA0`.
+Distance remains `40,40,40,50,60` for both kinds. Angles change from
+`3,7,30,50,180` to `7.5,15,40,60,180`. Bite classes change from
+`10,11,12,15,45` to `11,12,13,18,60`. The GameCube initializer doubles those
+values; N64 stores the original undoubled values directly at actor offset `214`.
+Preserve native timing units and normal behaviour; copying the GameCube's final
+doubled counts into N64 would change the baseline timing.
+
+Native detection/approach distance consumers can remain unchanged because both
+donor rows agree. Install shared selected-equipment angle/bite readers for both
+owners, preserving all live registers in their actual call windows. Golden rod
+is extended kind 88; its model/animation availability does not enable this
+behaviour. No rod-effect code is installed by the net-capture stage.
+
 ### Extended action tables
 
 `--refresh-runtime --player-actions` installs shared action-table capacity in the
