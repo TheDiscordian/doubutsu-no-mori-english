@@ -12,6 +12,7 @@ af_scenery_random = 0x8002C9AC;
 af_scenery_native_change = 0x80055EF8;
 af_v3_native_tree_grow = 0x804ADFC0;
 af_v3_native_tree_stump = 0x804ADFD0;
+af_tree_field_units = 0x8008A410;
 SECTIONS
 {
     . = 0x804B5000;
@@ -19,7 +20,7 @@ SECTIONS
     .rodata : { *(.rodata .rodata.*) }
     .data : { *(.data .data.*) }
     .bss (NOLOAD) : { *(.bss .bss.* COMMON) }
-    ASSERT(. <= 0x804B7000, "Scenery runtime exceeds its reservation")
+    ASSERT(. <= 0x804B8000, "Scenery runtime exceeds its reservation")
     ASSERT(SIZEOF(.data)==0 && SIZEOF(.bss)==0, "Unexpected scenery global state")
     /DISCARD/ : { *(.comment .note.* .reginfo .MIPS.abiflags .pdr .gnu.attributes) }
 }

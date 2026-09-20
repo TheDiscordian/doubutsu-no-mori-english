@@ -18,8 +18,23 @@ served patchers retain their existing builds.
 
 ## Active development
 
-Shared tree collision, shovel-removal, and NPC-walkability queries are installed
-in ABI 153 at `build/v3-shared-tree-world-02/build-lock.json`. The adapter uses
+Shared seasonal shake/drop and axe-hit initialization are installed in ABI 154
+at `build/v3-shared-tree-interactions-04/build-lock.json`. Complete donor records
+add the shovel, Bells, furniture, and bees while retaining native landing, luck,
+furniture selection, bee handling, and original tree records. All nine seasonal
+cut-initialization calls are connected, including winter's extra path. Four
+focused host/cartridge checks pass. Native verification is partial: 28 assertions
+pass before a test-recorder overlap, after an initial oversized fixture allocation.
+The overlap is corrected but not rerun within this batch's retry limit. The native
+result is not a complete pass; see the checkpoint for the precise tested scope.
+The packet occupies 8,232 bytes in a 12-KiB reservation, adding 4 KiB of fixed
+space without changing assets, owner sizes, saves, or choices. Next connect the
+player's tree/bee eligibility and timing consumers, planting sparkle, and remaining
+field/insect consumers before ordinary acquisition. Golden choices stay disabled.
+See the [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-seasonal-tree-interactions).
+
+Shared tree collision, shovel-removal, and NPC-walkability queries remain installed,
+verified in ABI 153 at `build/v3-shared-tree-world-02/build-lock.json`. The adapter uses
 native terrain and complete collision geometry while preserving real foreground
 identities and caller exclusions. Four focused checks pass. The first silent
 native run passes 132 records and 118 assertions, including all twelve solid gold
@@ -27,7 +42,8 @@ states, actual core dispatch/lazy loading, removal/walkability, native fallbacks
 guards, restored state/checkpoint, and clean exit. This is component verification,
 not an ordinary interaction or hardware test. The packet occupies 7,516 bytes
 within the existing 8-KiB reservation; no allocation, save field, or choice changes.
-Full cutting/shaking/drop and planting effects remain. Golden choices stay disabled.
+The seasonal drop/cut-count stage is installed; full player interactions and
+planting effects remain. Golden choices stay disabled.
 See the [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-tree-world-queries).
 
 Shared hidden tree contents remain installed, verified in ABI 152 at
@@ -38,8 +54,8 @@ first silent native run passes 75 records and 50 assertions: the real schedulers
 populate a temporary mixed grove, preserve families and shovel-bearing trees,
 avoid duplicate refills, and restore the complete world/RNG/profile/checkpoint.
 The packet is 6,812 bytes within the existing 8-KiB reservation; no allocation
-grows. World collision is connected; next connect full cutting/shaking/drop and planting
-effects. Golden choices remain disabled. See the
+grows in that stage. World queries and seasonal drop/cut-count consumers are
+connected; player interaction and planting effects remain. Golden choices remain disabled. See the
 [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-hidden-tree-contents).
 
 Shared daily tree growth remains installed. The actual daily owner connects
@@ -51,8 +67,8 @@ with restored state/checkpoint and clean exit. It executes daily-entry loading
 and isolated-acre consumers, not
 a full live-town renewal or hardware test. The shared code reservation adds 4 KiB;
 assets, owner sizes, saves, and all 128 choices remain unchanged. Next connect
-cutting/shaking/drop and planting effects. World collision and hidden-content
-replenishment is connected. Golden choices stay disabled. See the
+player interaction and planting effects. World collision, seasonal drop/cut counts,
+and hidden-content replenishment are connected. Golden choices stay disabled. See the
 [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-daily-tree-growth).
 
 Shared planting and tree-state rules remain installed. Shovel burial in a shining hole
@@ -65,7 +81,7 @@ native component run passes 150 records and 100 assertions, including lazy loadi
 all four burial helpers, native fallbacks, guards, restored state/checkpoint, and
 clean exit. It is not a full planting interaction, daily-growth, or hardware test.
 Daily growth, neighbour/death rules, thinning, and collision are connected;
-full cutting/shaking, planting effects, and selected shovel drops remain. Golden choices remain
+seasonal drops/cut counts are connected, while full player interaction and planting effects remain. Golden choices remain
 disabled. See the [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-planting-and-tree-state-runtime).
 
 The proposal retains shared seasonal scenery. All fourteen gold-tree foreground
@@ -80,13 +96,13 @@ passes 237 records and 122 assertions, including all four seasonal loads, all
 56 selected type records, safe unselected/native fallbacks, actual body drawing,
 memory guards, restored state/checkpoint, and clean exit. This is not GPU
 appearance, ordinary acquisition, or hardware proof. Reuse the prepared assets
-and this evidence. Full cutting/shaking, planting effects, and
-the selected shovel drop remain. Golden choices stay disabled.
+and this evidence. Full player interactions and planting effects remain;
+the selected seasonal shovel-drop consumer is installed. Golden choices stay disabled.
 The main lock and both served patchers remain unchanged. See the
 [scenery specification](../specs/V3_SCENERY.md) and
 [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-seasonal-scenery-runtime).
 
-The current explicit ABI-153 proposal retains the complete balloon integration.
+The current explicit ABI-154 proposal retains the complete balloon integration.
 All eight balloons are
 connected through the shared parent-category installer: official names/prices,
 complete pocket icons, held/inventory animation, source acquisition records,

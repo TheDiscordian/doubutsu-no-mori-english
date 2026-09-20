@@ -22,6 +22,7 @@ SOURCES = ('tools/v3_scenery_runtime.py', 'tools/v3_scenery.py',
            'overlays/v3/scenery_bootstrap.ld', 'overlays/v3/scenery_palette.c',
            'overlays/v3/scenery_trees.c', 'overlays/v3/scenery_trees.h',
            'overlays/v3/scenery_daily.c', 'overlays/v3/scenery_contents.c', 'overlays/v3/scenery_world.c',
+           'overlays/v3/scenery_interactions.c',
            'tools/v3_asset_loader.py', 'translations/provenance.json')
 
 
@@ -664,8 +665,101 @@ def world_contract(source,core):
     return dict(donor=donor,dimensions=dimensions,native=native)
 
 
+def interaction_contract(source,base,original,previous,ground):
+    """Bind complete source records to retained native drop/cutting machinery."""
+    from aflib import by_vrom
+    from v3_player_actions import native_references
+    from v3_import_storage import jump
+    from v3_npc_clothing import guard_incoming
+    from v3_scenery import resource
+    functions={}
+    specs={
+        'drop_fruit':(496,('b8abf3d9b34277fca04d054d0746b16c349017c58241d120e61b2ce3f0c1834d',
+            '3f7170eb94bd1460117429bb663ecd4c613664640ad11a9537ceb3d4091f8a41',
+            '3599eabce6ae745ba9493ae9e63284e5ba5e9ffc007022f4390f041956ad917d',
+            '71eb8c4e14f0b9298e7760627a0966a1c1c42fcbbd4242ae47c3c2ce05691711')),
+        'bg_item_tree_fruit_drop':(380,('a5b7c44e8dd145096ad27042cc60e161c557e73b4e970300999306006a84d67b',
+            '0cbc7bed7c4e6aff247a9e7cb43efb3b78c06f8e298fc60b299b942276b7f25e',
+            'b9e32f05846920ef4bcc72f798b3239f887ad22e532572d6c765253f7fb6bb79',
+            '8c1d450d793f61b60c44ad5a885ec3d88f76dddd02b60df8695e6c76a0548f83')),
+        'bIT_common_clear_treeatr':(176,('79e048bcd56c300d19d10e71d233cbc76ac4cbfd64d2865e35b635d5e2cdd372',
+            '38c428a0afa9e7c2de1578167c927c38c3fff5147f62fb98f8bb1fb019471e9a',
+            '1abe7dc07be15bb56afe2d71f151d84a33b55261cd47babc61fc2178c1f6e563',
+            'bbfbd1141cad3ee687e9e3fc55026a17c23570c07d55540c864a2d3ca2aa7c18'))}
+    for name,(size,hashes) in specs.items():
+        offsets=sorted(at for at,rows in source.functions.items() if any(n==name for n,_ in rows))
+        if len(offsets)!=4:raise ValueError('Missing complete seasonal interaction consumers')
+        functions[name]=[]
+        for at,digest in zip(offsets,hashes,strict=True):
+            raw,receipt=source.function(at)
+            if len(raw)!=size or sha256(raw)!=digest:raise ValueError('Changed complete donor tree interaction')
+            functions[name].append(receipt)
+    drops=[];cuts=[]
+    for at in (0x4549C,0x483FC,0x4B5CC,0x4E5CC):
+        drop=resource(source,at,size=168);cut=resource(source,at+180,size=332)
+        if (drop['sha256']!='5efec02170f3f9b95bbe34d1be9e4a7b5eee4355b4550994dd1df9ae52e48cce'
+                or cut['sha256']!='2003feb5ef735364198ded81bcf04fbd54f90c814531fc8fbe753942bfe28fcb'):
+            raise ValueError('Changed complete seasonal drop/cut records')
+        drops.append(drop);cuts.append(cut)
+    for name,tables in (('drop_fruit',drops),('bIT_common_clear_treeatr',cuts)):
+        for fn,table in zip(functions[name],tables,strict=True):
+            if table['donor_offset'] not in {r[3] for r in fn['relocations'].values() if r[2]==5}:
+                raise ValueError('Missing source interaction table binding')
+    drop_rows=list(struct.iter_unpack('>4H',bytes.fromhex(drops[0]['hex'])))
+    cut_rows=list(struct.iter_unpack('>2H',bytes.fromhex(cuts[0]['hex'])))
+    if (drop_rows[-4:]!=[(0x7F,0x2103,0x868,1),(0x80,0x1088,0x868,1),
+                         (0x81,0x62,0x868,1),(0x867,0x223B,0x868,1)]
+            or cut_rows[-8:]!=[(0x864,1),(0x865,2),(0x866,3),(0x867,3),
+                              (0x868,3),(0x7F,3),(0x80,3),(0x81,3)]):
+        raise ValueError('Changed source gold-tree interaction rules')
+    current,native=by_vrom(base),by_vrom(original);owners=[]
+    for row,expected_calls in zip(previous['owners'],((0x52C4,0x780C),(0x52C4,0x783C,0x78FC),
+            (0x52C4,0x7814),(0x52C4,0x7818)),strict=True):
+        data=current[row['vrom']].extract(base);old=native[row['vrom']].extract(original)
+        rel=current[row['reloc']].extract(base);sections=struct.unpack_from('>5I',rel)
+        groups,_,records,locations,_=native_references(data,rel,expected_sections=sections[:4])
+        if sha256(data)!=row['output_sha256'] or sha256(rel)!=row['output_reloc_sha256']:
+            raise ValueError('Changed complete interaction owner')
+        complete=[]
+        restored=bytearray(data)
+        held=next(g for g in ground['owners'] if g['vrom']==row['vrom'])
+        retained=[p for p in held['patches'] if 0x2100<=p['offset']<0x265C]
+        if {p['offset'] for p in retained}!={0x2358,0x235C,0x24EC,0x24F0}:
+            raise ValueError('Changed installed held-item drop windows')
+        original_words={0x2358:0x308CF000,0x235C:0x000C6B03,0x24EC:0x00095303,0x24F0:0x15410004}
+        for p in retained:
+            if u32(data,p['offset'])!=p['after'] or u32(old,p['offset'])!=original_words[p['offset']]:
+                raise ValueError('Changed retained held-item drop hook')
+            struct.pack_into('>I',restored,p['offset'],original_words[p['offset']])
+        for name,a,b in (('fruit_set',0x2100,0x265C),('drop_fruit',0x2698,0x2854),
+                ('cut_decrement',0x2854,0x2940),('shake',0x2940,0x2A8C),('cut_attributes',0x4F98,0x5044)):
+            if restored[a:b]!=old[a:b]:raise ValueError('Changed complete native tree interaction')
+            complete.append(dict(name=name,offset=a,bytes=b-a,sha256=sha256(data[a:b])))
+        start=groups[0x26B8];end=groups[0x26BC];cut=groups[0x4FBC]
+        if (len(start)!=1 or len(end)!=1 or len(cut)!=1 or start[0][0]!=0x26C4
+                or end!=[(0x26C0,start[0][1]+104)] or cut[0][0]!=0x4FC8):
+            raise ValueError('Changed native complete drop/cut table references')
+        da,ca=start[0][1]-row['ram'],cut[0][1]-row['ram']
+        if (data[da:da+104]!=bytes.fromhex(drops[0]['hex'])[:104]
+                or data[ca:ca+240]!=bytes.fromhex(cuts[0]['hex'])[:240]):
+            raise ValueError('Native interaction prefix differs from the source')
+        calls=tuple(at for at in range(0,sections[0],4) if u32(data,at)==jump(row['ram']+0x4F98,link=True))
+        if calls!=expected_calls or any(at not in locations for at in calls):
+            raise ValueError('Changed complete cut-attribute call inventory')
+        spans=[(0x26B8,20),(0x2780,48),(0x295C,16)]+[(at,4) for at in calls]
+        guard_incoming(data,sections[0],row['ram'],spans)
+        if (struct.unpack_from('>4I',data,0x295C)!=(0x97AE005A,0x2401005E,0x97A4005A,0x15C1003F)
+                or {a for a in locations if any(p<=a<p+n for p,n in spans)}
+                    !={0x26B8,0x26BC,0x26C0,0x26C4,*calls}):
+            raise ValueError('Changed interaction query instructions or relocations')
+        owners.append(dict(role=row['role'],complete=complete,retained_held_patches=retained,drop_table=da,cut_table=ca,
+                           calls=list(calls),spans=spans))
+    return dict(functions=functions,drop_sources=drops,cut_sources=cuts,
+                drops=drop_rows[:13]+drop_rows[-4:],cuts=cut_rows[-8:],owners=owners)
+
+
 def install_daily(base,prior,blob,core,original,output):
-    """Connect shared daily eligibility, death, neighbours, and acre thinning."""
+    """Refresh shared tree stages and all installed consumers together."""
     from aflib import CODE_RAM,by_vrom
     from apply_translation import write_new
     from v3_asset_loader import ROOT,BLOB,compile_part
@@ -675,10 +769,12 @@ def install_daily(base,prior,blob,core,original,output):
     module=bytearray(blob[position:position+old['bytes']]);files=by_vrom(base)
     contents=bool(previous.get('daily_growth'))
     world=bool(previous.get('hidden_contents'))
-    added=0 if contents else 4096
-    if (previous.get('world_queries') or not previous.get('tree_states') or old['bytes']!=0x12000
+    interactions=bool(previous.get('world_queries'))
+    capacity=12288 if interactions else 8192
+    added=capacity-previous['additional_fixed_resident_bytes']
+    if (previous.get('interactions') or not previous.get('tree_states') or old['bytes']!=0x12000
             or sha256(module)!=old['sha256'] or previous['additional_fixed_resident_bytes']!=(8192 if contents else 4096)
-            or RUNTIME_RAM+8192>prior['furniture']['bank_pool']['start']):
+            or RUNTIME_RAM+capacity>prior['furniture']['bank_pool']['start']):
         raise ValueError('Changed daily-growth runtime dependency')
     source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
                   (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
@@ -690,7 +786,7 @@ def install_daily(base,prior,blob,core,original,output):
             raise ValueError('Changed installed daily owner')
         if world:
             from v3_player_actions import native_references
-            evidence=world_contract(source,core)
+            evidence=(copy.deepcopy(previous['world_queries']) if interactions else world_contract(source,core))
             _,_,records,locations,_=native_references(owner,rel,expected_sections=(18960,368,0,1056))
             bindings=((0xC90,0,'af_v3_tree_record_content',True),(0xCCC,0,'af_v3_tree_record_content',True),
                 (0x4AA8,0,'af_v3_tree_count_money',False),(0x4AD4,0,'af_v3_tree_count_money',False),
@@ -710,6 +806,7 @@ def install_daily(base,prior,blob,core,original,output):
         bindings=(*bindings,*daily_bindings)
     else:
         evidence,bindings,records,locations=daily_contract(source,owner,rel,core)
+    interaction=interaction_contract(source,base,original,previous,old['ground_categories']) if interactions else None
     guard_incoming(owner,18960,0x80AB07C0,[(0x475C,8)])
     include='../'*len(output.relative_to(ROOT).parts)+'overlays/v3/scenery_trees.h'
     configuration=f'#include "{include}"\nconst Scenery af_v3_scenery_config[4]={{\n'
@@ -724,13 +821,19 @@ def install_daily(base,prior,blob,core,original,output):
     if contents:
         configuration+='const u16 af_v3_tree_content_tables[4][3]={'+','.join(
             '{'+','.join(f'0x{v:X}' for v in row)+'}' for row in evidence['tables'])+'};\n'
+    if interaction:
+        for typename,name,shape,rows in (('TreeDrop','drops','[17]',interaction['drops']),
+                ('u16','cuts','[8][2]',interaction['cuts'])):
+            configuration+=f'const {typename} af_v3_tree_{name}{shape}={{'+','.join(
+                '{'+','.join(f'0x{v:X}' for v in row)+'}' for row in rows)+'};\n'
     path=output/'scenery-config.c';write_new(path,configuration.encode())
     sources=['overlays/v3/scenery_trees.c','overlays/v3/scenery_daily.c']
     if contents:sources.append('overlays/v3/scenery_contents.c')
     if world:sources.append('overlays/v3/scenery_world.c')
+    if interactions:sources.append('overlays/v3/scenery_interactions.c')
     code,compiled=compile_part('scenery',output/'scenery',extra_sources=(*sources,str(path.relative_to(ROOT))))
     start=previous['blob_offset'];reservation=previous['reservations'][0]
-    if (sha256(blob[start:start+previous['bytes']])!=previous['sha256'] or len(code)>8192
+    if (sha256(blob[start:start+previous['bytes']])!=previous['sha256'] or len(code)>capacity
             or start+len(code)>reservation['blob_offset']+reservation['bytes']):
         raise ValueError('Daily tree packet exceeds owned cartridge or memory')
     defines=['AF_V3_SCENERY_WORLD'] if world else []
@@ -763,8 +866,29 @@ def install_daily(base,prior,blob,core,original,output):
         for at,after,before in edits:
             if u32(data,at)!=before:raise ValueError('Changed seasonal tree dispatch')
             patches.append(dict(offset=at,before=before,after=after));struct.pack_into('>I',data,at,after)
+        removed_owner=[]
+        if interaction:
+            from v3_player_actions import native_references
+            _,_,owner_records,owner_locations,_=native_references(data,orel,expected_sections=struct.unpack_from('>4I',orel))
+            symbol=compiled['symbols']
+            blocks={0x26B8:(jump(symbol['af_v3_tree_drop_table'],link=True),0,0x8C500000,0x8C430004,0x97A2005A),
+                0x2780:(0x00402025,jump(symbol['af_v3_tree_drop_item'],link=True),0x00602825,
+                    0x00402025,0x8FA5005C,0x8FA60060,0x8FAB0064,0x8FAC0068,0,0,0,0),
+                0x295C:(0x97A4005A,jump(symbol['af_v3_tree_bee_query'],link=True),0,0x1040003F)}
+            blocks.update({at:(jump(symbol[f'af_v3_tree_cut{variant}'],link=True),)
+                for at in interaction['owners'][variant]['calls']})
+            for block_offset,words in blocks.items():
+                for i,word in enumerate(words):
+                    at=block_offset+i*4;patches.append(dict(offset=at,before=u32(data,at),after=word))
+                    struct.pack_into('>I',data,at,word)
+                    if at in owner_locations:removed_owner.append(owner_locations[at])
+            keep=[v for v in owner_records if v not in removed_owner];orel=bytearray(orel)
+            struct.pack_into('>I',orel,16,len(keep))
+            orel[20:-4]=struct.pack('>'+str(len(keep))+'I',*keep)+bytes(len(orel)-24-4*len(keep))
+            changes[row['reloc']]=bytes(orel)
         new=copy.deepcopy(row);new.update(before_sha256=row['output_sha256'],before_reloc_sha256=row['output_reloc_sha256'],
-            output_sha256=sha256(data),patches=patches);owners.append(new);changes[row['vrom']]=bytes(data)
+            output_sha256=sha256(data),output_reloc_sha256=sha256(orel),patches=patches,
+            removed_relocations=removed_owner);owners.append(new);changes[row['vrom']]=bytes(data)
     core_hooks=[]
     for row in previous['tree_states']['core_consumers']:
         at=row['start']-CODE_RAM;before=bytes(core[at:at+8])
@@ -775,6 +899,10 @@ def install_daily(base,prior,blob,core,original,output):
     if world:
         for name,address,_,_,expected in WORLD_NATIVE:
             at=address-CODE_RAM;after=struct.pack('>2I',jump(bootstrap['symbols']['af_v3_tree_'+name+'_dispatch']),0)
+            if interactions:
+                matches=[h for h in previous['world_queries']['core_hooks'] if h['offset']==at]
+                if len(matches)!=1:raise ValueError('Missing installed world-query hook')
+                expected=matches[0]['after']
             if core[at:at+8].hex()!=expected:raise ValueError('Changed native world-query entry')
             core[at:at+8]=after;world_hooks.append(dict(offset=at,before=expected,after=after.hex(),name=name))
     data=bytearray(owner);relocation=bytearray(rel);patches=[];removed=set()
@@ -789,17 +917,23 @@ def install_daily(base,prior,blob,core,original,output):
     changes[0x970920]=bytes(data);changes[0x9754A0]=bytes(relocation)
     blob[position:position+len(module)]=module
     current=copy.deepcopy(previous);current.update(owners=owners,code=compiled,bytes=len(code),sha256=sha256(code),
-        crc32=zlib.crc32(code),bootstrap=bootstrap,config_sha256=sha256(configuration.encode()),additional_fixed_resident_bytes=8192)
+        crc32=zlib.crc32(code),bootstrap=bootstrap,config_sha256=sha256(configuration.encode()),additional_fixed_resident_bytes=capacity)
     current['reservations'][0]['used_bytes']=start+len(code)-reservation['blob_offset']
     current['tree_states'].update(daily_growth_owner_installed=True,shared_packet_bytes=len(code))
     for row,hook in zip(current['tree_states']['core_consumers'],core_hooks,strict=True):row['after']=hook['after']
-    receipt=dict(**evidence,config=config,vrom=0x970920,reloc=0x9754A0,ram=0x80AB07C0,
+    receipt=dict(evidence,config=config,vrom=0x970920,reloc=0x9754A0,ram=0x80AB07C0,
         resident_bytes=sum(struct.unpack_from('>4I',rel)),previous_sha256=sha256(owner),previous_reloc_sha256=sha256(rel),
         sha256=sha256(data),reloc_sha256=sha256(relocation),patches=patches,removed_relocations=sorted(removed),
         core_hooks=core_hooks+world_hooks,additional_resident_bytes=added,additional_scene_resident_bytes=0,
         hidden_content_refresh_installed=contents,ordinary_gameplay_tested=False,native_test='pending')
     if contents:
-        current['world_queries' if world else 'hidden_contents']=receipt
+        if interactions:
+            current['interactions']=dict(interaction,additional_resident_bytes=added,additional_scene_resident_bytes=0,
+                daily_owner=receipt,ordinary_gameplay_tested=False,native_test='pending')
+            current['world_queries'].update(sha256=sha256(data),reloc_sha256=sha256(relocation),
+                                            core_hooks=core_hooks+world_hooks)
+            current['tree_states']['shake_drop_installed']=True
+        else:current['world_queries' if world else 'hidden_contents']=receipt
         if world:current['hidden_contents'].update(sha256=sha256(data),reloc_sha256=sha256(relocation))
         current['daily_growth'].update(sha256=sha256(data),reloc_sha256=sha256(relocation),
             hidden_content_refresh_installed=True)

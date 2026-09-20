@@ -1,5 +1,115 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared seasonal tree interactions
+
+The ABI-154 proposal is `build/v3-shared-tree-interactions-04/build-lock.json`.
+The existing scenery gameplay refresh supplies complete gold-tree drop records
+to the native seasonal drop engine and connects all axe-hit-count initializers.
+It adds no individual-item installer, browser option, or replacement identity.
+
+- ROM SHA-256:
+  `276e63f303dbb119b6dc8aed352c9f57b3f588b26edef6e42a7ecadedeb12272`.
+- Report SHA-256:
+  `da51f53c390a828e572c147af5e16b592f3efc642d860b40e7b22a54dacdc68c`.
+- UPS SHA-256:
+  `aed6d4bbefc23de64ed8da350b3f9229de8c889aabea9db1392c6c59ada75e80`.
+
+Twelve complete donor functions and eight complete source tables bind drop,
+bee, and cutting behaviour across all four seasons. Each native thirteen-row
+drop prefix matches the donor exactly. Source gold Bell/furniture/bee/shovel
+rows append once in shared read-only code data; selected profiles expose them,
+while unselected profiles expose only the original thirteen rows. The original
+native drop loop, random furniture selection, landing machinery, held-item
+windows, coordinates, and foreground setter remain. Gold Bell trees share native
+money luck. The bee predicate preserves the native argument and complete
+actor-create/failure/delete flow. Every gold drop leaves a spent gold tree;
+the source shovel record drops actual item `223B`.
+
+The shared cut-count adapter first runs the complete original initializer, then
+overlays only eight gold records in the transient 256-cell counter array. All
+nine references are installed: two cherry, three winter, two Xmas, and two
+ordinary. Native counters and foreground cells are untouched; original hit
+decrement and stump conversion remain. Four table-reference relocation rows and
+the respective cut-call rows are removed per seasonal owner. Other relocation,
+original tables, owner dimensions, and actual native drop callbacks remain.
+
+The packet occupies 8,232 bytes in a 12,288-byte reservation at
+`804B5000..804B7FFF`, adding 4 KiB. Bootstrap stays 848 bytes; equipment stays
+72 KiB. Existing retired cartridge storage holds the packet without import-blob
+growth. Complete scenery assets, scene allocations, saved fields, provenance
+text, and all 128 experimental choices remain unchanged. All installed seasonal,
+daily, growth/stump, and world-query references bind the new code addresses.
+
+The first three build attempts stop before producing a ROM: one typed source
+hash contains an extra character; the initial native-retention comparison omits
+the already-installed held-item landing hooks; the corrected comparison then
+finds the ordinary owner's older recorded pre-hook words. The final guard checks
+current hook words against the installed receipt, checks original instructions
+against the verified retail ROM, and compares all remaining native bytes. No
+retention check is disabled. The fourth build succeeds.
+
+Four focused tests pass in 6.228 seconds on their first invocation. Host
+AddressSanitizer/UBSan covers every sixteen-bit identity, selected/unselected
+drop spans, bee predicates, money luck, all gold cut counts, native-counter
+retention, original foreground preservation, all four wrappers, and guarded
+writes. Cartridge checks bind complete donor/source/native records, all nine
+initialization callers, exact retained owner contents, relocation at two
+addresses, existing landing hooks, storage/memory limits, full original-ROM UPS
+reconstruction, retained format-3 fields, unchanged choices, and exact V2-12
+import-free output.
+
+Native verification is **partial**, not passed. The first silent attempt,
+`build/smoke-v3-tree-interactions-01/`, asks the native heap for 96 KiB and receives
+null before installing fixture data. The one justified retry reduces the private
+allocation to 92 KiB, still bounding the complete owner/relocation and fixture.
+`build/smoke-v3-tree-interactions-02/` passes 28 assertions in 57 recorded steps
+before its failed assertion and cleanup. It loads the complete packet and actual
+relocated cherry owner, checks selected/unselected axe counts and unchanged cells,
+and runs shovel, ordinary/lucky Bells, furniture, and bee drop control flow with
+correct six-argument forwarding, counts, resulting gold identity, and bee profile.
+
+The failing deletion assertion is a confirmed fixture overlap: the 24-byte actor
+creation recorder begins at `out+96`, while the old deletion recorder begins at
+`out+112`. Recording the actor's fifth argument (`BF800000`, or `-1.0`) writes
+that deletion slot. The observed hash exactly matches those four bytes. The
+recorders are separated and an explicit interval-overlap check is added, but
+the corrected fixture is not rerun: the batch's setup-retry allowance is spent.
+Harness work remains below thirty minutes. No game implementation change is
+made to accommodate the fixture failure.
+
+- First attempt results SHA-256:
+  `c8abd36f6977b66a42dd9ab4eb3c671a790097c5502429f2ef13ec3fb1a402a2`.
+- Partial retry results SHA-256:
+  `62d0ad3843e0f4b6bb43b1ff1e55d608f68aeb8aff557978d36ff948295b2a37`.
+
+Field access, item landing, furniture selection, terrain height, foreground
+commits, and actor creation/deletion are explicit fixture doubles. Cleanup
+restores modified state/code and frees the allocation, with returned calls;
+final restoration comparisons, fault/guard checks, checkpoint restoration,
+the other three seasonal native paths, failure branches, and the unchanged
+native-fruit sample are not reached. Do not claim complete native execution,
+real landing/actors, ordinary acquisition, save/restart, or hardware proof.
+No user save is used or modified; emulator audio stays disabled.
+
+Next connect the player's actual collideable-tree and bee-tree predicates and
+shake/axe/bee timing. The source's `m_player_main_shake_tree.c_inc` gates the
+drop callback with `IS_ITEM_COLLIDEABLE_TREE`, and delays bee release through
+`IS_ITEM_BEE_TREE`. Installed tool-button predicates alone do not cover those
+foreground checks. Also connect planting sparkle and the remaining shop-path,
+camera-limit, and insect-tree consumers. Reuse complete installed seasonal assets
+and passing unchanged evidence; do not restart the acquisition dependency chain.
+The source sparkle lives in `bIT_actor_drop_move_plant`; seasonal offsets are
+`(13,33,10)` in Xmas. Native plant completion is owner `+3928..3A84`, with foreground
+at drop `+0E`, position `+14`, and completion clearing callbacks `+0/+4/+8`.
+The native camera-limit routine is referenced by the move callback; confirm each
+season's actual reference before extending its descriptor range.
+
+All four golden-tool choices remain disabled until complete ordinary acquisition
+works. Format-3 matching/equal-or-larger profile restrictions remain; do not load
+imported saves in V2 or older format-1/2 V3 builds. Preserve backups. The main
+ABI-109 lock and both served patchers remain unchanged.
+See the [interaction design](../../specs/V3_SCENERY.md#seasonal-shakedrop-and-axe-hit-initialization).
+
 ## Shared tree world queries
 
 The ABI-153 proposal is `build/v3-shared-tree-world-02/build-lock.json`.

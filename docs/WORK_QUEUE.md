@@ -2,8 +2,8 @@
 
 ## Active: V3 optional GameCube imports
 
-The current explicit proposal is ABI 153,
-`build/v3-shared-tree-world-02/build-lock.json`. All eight balloons are
+The current explicit proposal is ABI 154,
+`build/v3-shared-tree-interactions-04/build-lock.json`. All eight balloons are
 connected through shared source-derived parent records, room profiles, indoor
 conversion/pickup, collection/catalogue, complete icons, and optional selection.
 There are 128 experimental choices, with 24 equipment parents. Neither served
@@ -37,7 +37,7 @@ gold-tree growth/drop, event/NPC completion rewards, and perfect-town acquisitio
 The complete gold-tree scenery dependency is installed through the shared
 seasonal renderer: fourteen states, complete models/shadows/positions, all
 palettes, owner-local lifetime, native fallbacks, and reserved descriptor slots.
-Each loaded seasonal owner adds 32,864 bytes; shared code owns 8,192 fixed bytes.
+Each loaded seasonal owner adds 32,864 bytes; shared code owns 12,288 fixed bytes.
 Four focused checks pass. The first native run passes 237 records and 122
 assertions for all four loaders, 56 type cases, actual body drawing, guards,
 restored state/checkpoint, and clean exit. It does not prove GPU appearance or
@@ -70,8 +70,17 @@ identities, and original-item exclusions. Four focused checks and the first sile
 native component run pass (132 records, 118 assertions), with all twelve solid
 gold states, real core dispatch/lazy loading, guards, restored state/checkpoint,
 and clean exit. Reuse this evidence; ordinary interactions remain untested.
-The 7,516-byte packet fits the existing 8-KiB reservation. Next connect full
-cutting/shaking, planting sparkle, and the selected shovel drop. Preserve
+Seasonal shaking/drop now consumes all four source gold-tree records through
+the native landing, luck, furniture, and bee routines. Nine original seasonal
+cut-count initialization calls include all eight gold stages, retaining all
+native counters. The 8,232-byte packet requires 12 KiB fixed space; resources,
+owner sizes, saves, and choices remain unchanged. Four focused checks pass.
+The native run remains partial: one oversized allocation fails, then the retry
+passes 28 assertions before overlapping fixture result buffers cause a false
+deletion check. The corrected recorder is not rerun; preserve the partial proof
+and do not replay its passed prefix. Next connect the player's collideable-tree
+and bee-tree checks/timing, planting sparkle, and remaining field/insect consumers,
+then exercise ordinary acquisition. Preserve
 native scenery and the actual donor route; no arbitrary acquisition substitute.
 See [shared scenery](../specs/V3_SCENERY.md).
 Keep all four golden choices disabled pending those complete ordinary routes.

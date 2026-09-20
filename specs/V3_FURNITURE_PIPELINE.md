@@ -43,8 +43,13 @@ This fits existing memory without reconverting assets or adding an item-specific
 installer. The subsequent refresh connects core collision, shovel-removal, and
 NPC-walkability queries through one ABI-preserving lazy-loading gate. Real item
 exclusions precede temporary geometry mapping; saved foreground data is never
-rewritten for collision. This also fits existing reservations. Planting effects
-and full cutting/shaking/drop remain required. See
+rewritten for collision. This also fits existing reservations. The seasonal
+interaction refresh extends native drop records and cut-count initialization,
+preserving actual native landing, furniture luck, bee spawning, and all native
+rows. It uses source category records once for all four seasons, including all
+nine initialization callers, and adds 4 KiB fixed code reservation. Player
+eligibility/timing, planting effects, and remaining field/insect integration
+still precede complete ordinary acquisition. See
 [seasonal scenery](V3_SCENERY.md).
 
 The shared flying-balloon category installs one complete donor state machine

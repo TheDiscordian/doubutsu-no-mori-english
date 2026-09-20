@@ -21,4 +21,7 @@ typedef struct {
 } TreeDaily;
 _Static_assert(sizeof(TreeDaily)==32,"Daily tree bindings");
 extern const TreeDaily af_v3_tree_daily_config;
+typedef struct { u16 tree,item,after,count; } TreeDrop;
+extern const TreeDrop af_v3_tree_drops[17];
+extern const u16 af_v3_tree_cuts[8][2];
 #endif

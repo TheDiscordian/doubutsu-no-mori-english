@@ -12,6 +12,132 @@ from v3_import_storage import jump
 from v3_npc_draw_smoke import boot_proofs
 
 
+def interactions(debug,rom_path,record):
+    """Native seasonal control flow with bounded field/landing/actor test doubles."""
+    path=Path(rom_path);image=path.read_bytes();report=json.loads((path.parent/'build.json').read_bytes())
+    if sha256(image)!=report['output_sha256']:raise ValueError('Changed tree-interaction cartridge')
+    e=report['equipment_resources'];r=e['scenery'];files=by_vrom(image);boot=boot_proofs(image)
+    capacity=r['additional_fixed_resident_bytes'];blob=files[BLOB].extract(image);assertions=0
+    def check(label,at,want):
+        nonlocal assertions
+        got=debug.read_memory(at,len(want));passed=got==want
+        record(dict(tree_interaction_check=label,address=f'{at:08X}',bytes=len(want),
+            expected_sha256=sha256(want),observed_sha256=sha256(got),assertion='passed' if passed else 'failed'))
+        if not passed:raise ValueError('Tree-interaction mismatch: '+label)
+        assertions+=1
+    def call(at,args=(),proof=None,want=None):
+        result=debug.call(f'{at:08X}',list(args),return_address=MODULE_RAM+0x6480,verified_code=proof or boot.get(at))
+        if want is not None:result['assertion']='passed' if result['return_value']==want else 'failed'
+        record(result)
+        if want is not None and result['return_value']!=want:raise ValueError('Tree-interaction return mismatch')
+        return result['return_value']
+    def put(at,*values):debug.write_memory(at,struct.pack('>'+'I'*len(values),*values))
+    def flush(at,n):call(0x8002FE00,[at,n]);call(0x80034CE0,[at,n])
+    def li(reg,value):return [0x3C000000|reg<<16|value>>16,0x34000000|reg<<21|reg<<16|value&65535]
+    def emit(at,words):put(at,*words);return struct.pack('>'+'I'*len(words),*words)
+    regions=[(o['config'][0],4) for o in r['owners']]+[(r['ram'],capacity),(r['tree_states']['cache_word'],4),
+        (0x80460020,192),(0x80136FD8,4),(0x8011EF90,4),(0x8008A410,8),
+        (0x8003C590,4),(0x800419F0,4),(TEST_STACK-0x800,16),(TEST_STACK+0x40,16)]
+    saved={at:debug.read_memory(at,n) for at,n in regions};module=debug.read_memory(e['ram'],e['bytes'])
+    size=0x17000;allocation=call(0x8009BFC0,[size])
+    if allocation&15 or not MODULE_RAM+0x8000<=allocation<=0x80400000-size:
+        raise ValueError('Tree-interaction fixture allocation failed')
+    root=allocation+16;bridge=allocation+0x14000;out=allocation+0x14800
+    cells=allocation+0x14A00;attributes=allocation+0x14D00;player=allocation+0x15000;game=allocation+0x16000
+    land,commit,actor,new_actor,deleted,selection=out,out+32,out+64,out+96,out+128,out+160
+    position=out+176;mode=out+192;actor_value=out+196;edge=b'AFTI'*4
+    result_spans=[(land,24),(commit,24),(new_actor,24),(deleted,24),(selection,4),(position,12),(mode,4),(actor_value,4)]
+    if any(a+n>b for (a,n),(b,_) in zip(result_spans,result_spans[1:])):
+        raise ValueError('Tree-interaction result buffers overlap')
+    guards=[allocation,bridge-16,out-16,out+224,cells-16,cells+512,attributes-16,attributes+256,
+            player-16,game-16,allocation+size-16,TEST_STACK-0x800,TEST_STACK+0x40]
+    debug.write_memory(allocation,bytes(size))
+    for at in guards:debug.write_memory(at,edge)
+    def capture(dest):
+        return li(8,dest)+[0xAD040000,0xAD050004,0xAD060008,0xAD07000C,0x8FA90010,0xAD090010,0x8FA90014,0xAD090014]
+    # Controlled landing captures all six native arguments and supplies a chosen
+    # success/failure position. No item is created and no live foreground changes.
+    land_code=capture(land)+li(8,mode)+[0x8D0A0000,0x8FA90010,0xAD2A0000,0xAD2A0004,0xAD2A0008,0x03E00008,0x00001025]
+    emit(bridge,land_code);emit(bridge+0x100,capture(commit)+[0x03E00008,0])
+    emit(bridge+0x180,capture(new_actor)+li(8,actor_value)+[0x8D020000,0x03E00008,0])
+    emit(bridge+0x200,capture(deleted)+[0x03E00008,0])
+    emit(bridge+0x280,li(8,selection)+[0x8FA90018,0xAD090000,0x24091088,0xA4A90000,0x03E00008,0])
+    emit(bridge+0x300,[0x44800000,0x03E00008,0])
+    field_stub=emit(bridge+0x340,li(2,cells)+[0x03E00008,0]);flush(bridge,0x380)
+    parent=next(x for x in e['player_actions']['equipment_selection']['rows'] if x['item_id']=='223B')
+    def select(enabled):
+        profile=bytearray(saved[0x80460020]);profile[parent['profile_byte']]&=~parent['profile_mask']
+        if enabled:profile[parent['profile_byte']]|=parent['profile_mask']
+        debug.write_memory(0x80460020,profile)
+    try:
+        call(0x800A5970,[0x800,0,4],want=0x801)
+        code=blob[r['blob_offset']:r['blob_offset']+r['bytes']];check('complete loaded interaction packet',r['ram'],code)
+        put(0x80136FD8,player);put(0x8011EF90,game)
+        put(0x8008A410,jump(bridge+0x340),0);flush(0x8008A410,8)
+        native_drops=r['interactions']['drops'][:13]
+        values=[0x800,0x801,0x804,0x863,0x864,0x865,0x866,0x867,0x868,0x869,0x7B,0x7F,0x80,0x81]+[0]*242
+        rawcells=struct.pack('>256H',*values);debug.write_memory(cells,rawcells)
+        for variant,o in enumerate(r['owners']):
+            data,rel=(files[o[k]].extract(image) for k in ('vrom','reloc'));sections=struct.unpack_from('>5I',rel);n=o['resident_bytes']
+            if root+n+len(rel)>=bridge-16:raise ValueError('Tree-interaction owner overlaps test work')
+            loaded=relocate_verified_data(SimpleNamespace(ram=o['ram'],resident_bytes=n,sections=sections),data,rel,root)
+            call(0x800262D0,[o['vrom'],o['vrom']+len(data),o['ram'],o['ram']+n,root,root+n,len(rel)])
+            check(o['role']+' complete actual relocated owner',root,loaded);put(o['config'][0],root)
+            fixture=bytearray(loaded)
+            # Only callbacks at the ends of the tested control flow are doubled.
+            for offset,target in ((0x2100,bridge),(0x2824,bridge+0x100),(0x29D4,bridge+0x180),
+                    (0x2A44,bridge+0x200),(0x274C,bridge+0x280),(0x27F0,bridge+0x300)):
+                struct.pack_into('>I',fixture,offset,jump(target,link=offset!=0x2100))
+                if offset==0x2100:struct.pack_into('>I',fixture,offset+4,0)
+            debug.write_memory(root,fixture);flush(root,sections[0]);proof=(root,bytes(fixture[:sections[0]]))
+            for enabled in (False,True):
+                select(enabled);debug.write_memory(attributes,b'?'*256)
+                target=u32(data,r['interactions']['owners'][variant]['calls'][0])&0x03FFFFFF
+                stub=emit(bridge+0x3C0,[jump(0x80000000|target<<2),0]);flush(bridge+0x3C0,8)
+                call(bridge+0x3C0,[1,1,attributes],(bridge+0x3C0,stub))
+                native_cut_at=r['interactions']['owners'][variant]['cut_table']
+                counts=dict(struct.iter_unpack('>2H',data[native_cut_at:native_cut_at+240]))
+                if enabled:counts.update(r['interactions']['cuts'])
+                check(o['role']+' selected/native axe hit counts',attributes,bytes(counts.get(v,255) for v in values))
+                check('cut initialization never changes foreground identities',cells,rawcells)
+            select(True)
+            for fg,want,luck in ((0x867,0x223B,0),(0x7F,0x2103,0),(0x7F,0x2100,4),(0x80,0x1088,0),(0x81,0x62,0),
+                    (0x80C,0x2800,0)):
+                debug.write_memory(out,bytes(208));put(mode,0x3F800000);put(actor_value,actor)
+                debug.write_memory(player+0xA8E,bytes([luck]));call(root+0x2940,[fg,16,16,position],proof)
+                native=next((row for row in native_drops if row[0]==fg),None)
+                after,count=(native[2],native[3]) if native else (0x868,1)
+                check(o['role']+' exact drop arguments including parent and stack',land,
+                    struct.pack('>6I',want,16,16,count,position,actor if fg==0x81 else 0))
+                check(o['role']+' retained family after drop',commit,struct.pack('>5I',after,0x44250000,0,0x44250000,1))
+                check('drop outcome position',position,struct.pack('>3I',*[0x3F800000]*3))
+                if fg==0x81:check('bee native actor profile',new_actor+8,struct.pack('>I',0xA4))
+                check('successful drops do not delete bee actor',deleted,bytes(4))
+            # One season suffices for shared failure/selection branches after the
+            # four distinct seasonal relocations above are exercised.
+            if variant==3:
+                for success_actor,success_drop,enabled in ((True,False,True),(False,False,True),(True,True,False)):
+                    debug.write_memory(out,bytes(208));put(mode,0x3F800000 if success_drop else 0xBF800000)
+                    put(actor_value,actor if success_actor else 0);select(enabled)
+                    call(root+0x2940,[0x81,16,16,position],proof)
+                    check('bee deletion only after failed landing',deleted,struct.pack('>I',actor if success_actor and enabled and not success_drop else 0))
+                    if not enabled or not success_actor:check('no drop or foreground change without actor/profile',land,bytes(56))
+                select(False);debug.write_memory(out,bytes(208));call(root+0x2940,[0x867,16,16,position],proof)
+                check('unselected shovel tree cannot emit an item',land,bytes(56))
+            check(o['role']+' control flow does not modify loaded code',root,bytes(fixture[:sections[0]]))
+        check('complete packet unchanged',r['ram'],code)
+        for at in guards:check('fixture guard',at,edge)
+        check('no faulted thread',0x8003CE34,bytes(4))
+    finally:
+        for at,value in saved.items():debug.write_memory(at,value)
+        flush(0x8008A410,8);flush(r['ram'],capacity);call(0x8009C040,[allocation])
+    for at,want in saved.items():check('restored state/code',at,want)
+    check('restored complete equipment module',e['ram'],module)
+    return dict(assertions=assertions,seasonal_owners=4,actual_drop_control_flow=True,
+        field_and_landing_stubs=True,actor_and_furniture_selection_stubs=True,terrain_height_stub=True,
+        ordinary_acquisition_tested=False,requires_checkpoint_restore=True)
+
+
 def world_queries(debug,rom_path,record):
     """Current core entries, terrain calculation, and guarded collision records."""
     path=Path(rom_path);image=path.read_bytes();report=json.loads((path.parent/'build.json').read_bytes())

@@ -91,8 +91,8 @@ The equipment module retains its size and guards. Its
 `804ADC90..804ADFEF` range contains an 848-byte bootstrap and native fallback
 stubs, bounded before the retained guard at `804ADFF0`. A four-byte cache word
 at `804ADFEC` starts clear in the startup-loaded module. The bootstrap transfers
-and verifies the 6,812-byte shared code packet into the reserved
-`804B5000..804B6FFF` range, flushes the instruction cache, and records the verified
+and verifies the 8,232-byte shared code packet into the reserved
+`804B5000..804B7FFF` range, flushes the instruction cache, and records the verified
 CRC. Constructors then prepare the native/held table and load the active scenery
 bank. Tree queries can load the same packet before any seasonal actor exists;
 later calls reuse it without repeating the transfer. A missing
@@ -126,8 +126,8 @@ held-category hooks. Disabled imported foreground IDs resolve the native empty
 row rather than indexing beyond a native table. Save/profile restrictions still
 apply; this fallback does not authorise removing imports from a saved world.
 
-The explicit ABI-153 proposal is `build/v3-shared-tree-world-02/build-lock.json`.
-It uses an 8,192-byte fixed reservation and 32,864 bytes per loaded seasonal owner.
+The explicit ABI-154 proposal is `build/v3-shared-tree-interactions-04/build-lock.json`.
+It uses a 12,288-byte fixed reservation and 32,864 bytes per loaded seasonal owner.
 All existing 128 experimental choices and format-3 saves remain unchanged.
 The main ABI-109 lock and both served V2 patchers stay unchanged. Component tests
 cover native loading, all seasonal type bindings, actual body-list generation,
@@ -204,7 +204,8 @@ eight-bit tree/candidate counters, including their full-acre wrap, remain intact
 Existing native routines handle unselected profiles.
 
 Daily growth requires an 8,192-byte reservation, 4 KiB beyond tree-state loading.
-The current packet includes hidden-content and world queries and occupies 7,516 bytes.
+The daily-growth stage uses 8,192 bytes; the interaction stage extends that
+reservation to 12,288 bytes for its complete 8,232-byte packet.
 The bootstrap still occupies 848 bytes. All complete scenery banks, daily owner
 and relocation sizes, equipment module, save/profile fields, and choices remain
 unchanged. Existing reserved retired cartridge storage holds the larger packet;
@@ -280,7 +281,7 @@ identities retain their original routine and exclusion semantics.
 Selected gold saplings, dead saplings, and four stump sizes are removable with
 the shovel; solid growth and mature states are not. Only the first sapling state
 adds NPC walkability. Position arguments and native fallbacks are retained.
-The packet occupies 7,516 of its reserved 8,192 bytes. The bootstrap remains
+The world-query stage occupies 7,516 of its reserved 8,192 bytes. The bootstrap remains
 848 bytes, with unchanged cache/guard/fallback addresses. Seasonal and daily
 references are rebound to current code without changing owner sizes, resources,
 scene allocations, saved formats, or choices.
@@ -296,12 +297,64 @@ guards, and full state/checkpoint restoration. No terrain or gameplay helper is
 stubbed in that fixture. It does not establish ordinary player interactions,
 rendered appearance, save/restart, or original-hardware behaviour.
 
+## Seasonal shake/drop and axe-hit initialization
+
+The subsequent shared gameplay refresh extends the native drop routine instead
+of replacing its landing engine. All four complete donor drop/bee/cut consumers
+and complete source tables are bound. The native thirteen-row drop prefix matches
+the donor exactly; four added records supply gold Bells (`007F`), furniture
+(`0080`), bees (`0081`), and the shovel-bearing state (`0867`). Every gold drop
+has count one and leaves the spent gold-tree identity (`0868`). The shovel drop
+is the actual installed golden shovel (`223B`), not a substitute acquisition.
+
+A selected-profile table span exposes seventeen rows; unselected profiles retain
+the original thirteen. The original loop, random furniture selection, placement
+routine, coordinates, and foreground setter remain. Existing held-item landing
+hooks remain intact. Gold Bell trees share native money-luck upgrading, while
+other Bell-tree counts retain their original treatment. The bee predicate includes
+selected gold bees and preserves the argument register needed by the native
+fallthrough. The original actor-creation, failed-creation position, and failed-
+landing deletion branches retain their ordering and actual actor profile.
+
+Nine original cut-count initialization calls use the shared adapter: two for
+cherry, two for ordinary, two for Xmas, and three for winter. Each runs the full
+native initializer, then overlays only the source's eight gold-tree records in
+the transient 256-cell hit-counter array. Native counters and real foreground
+identities remain unchanged. Source counts are one, two, and three for growing
+trees, and three for mature/reward/spent/hidden states. Stumps and saplings do
+not acquire axe-hit counters. Native hit decrement and core stump conversion
+remain installed. Only corresponding internal relocation records are removed.
+
+The packet is 8,232 bytes, requiring a 12-KiB reservation, 4 KiB beyond world
+queries. Existing retired cartridge storage holds it without growing the import
+blob. All shared seasonal/daily/core references bind the new packet addresses.
+Bootstrap, equipment module, seasonal banks, owner sizes, scene allocations,
+saved formats, source text, and browser choices do not grow or change.
+
+Four focused checks cover sanitized rules across all sixteen-bit IDs, profile
+selection, luck, immutable cells, native-count retention, complete source and
+native consumers, all nine calls, relocation at two addresses, allocations,
+complete patch reconstruction, saved formats, and exact V2-12 import-free output.
+Native evidence is partial: the first fixture requests more contiguous heap
+space than is available; a smaller bounded retry loads the packet and cherry
+owner, checks selected/unselected cut counts, and executes all four gold drop
+types plus money luck. Its actor recorder overlaps the deletion recorder, so a
+subsequent assertion fails on the actor's recorded `-1.0` coordinate. The corrected
+fixture is not rerun after the batch's setup-retry allowance is exhausted.
+Field access, landing, furniture selection, terrain height, foreground commits,
+and actor creation/deletion use explicit fixture doubles. This is not ordinary
+acquisition, real actor/landing execution, complete seasonal native coverage,
+final guard/checkpoint verification, or a hardware result.
+
 ## Remaining gameplay integration
 
 Reuse the installed renderer, planting conversion, tree-state helpers, and daily
 growth/death/neighbour/thinning, hidden-content, and world-query consumers.
-Full cutting/shaking, the planting sparkle, and the selected shovel drop remain
-required. The source plants an ordinary shovel in a shining hole; do not
+The seasonal drop and cut-count consumers are installed. Player eligibility,
+tree shaking/axe timing, bee timing, planting sparkle, and remaining field/insect
+consumers still need connection before full ordinary acquisition. The source
+player's `IS_ITEM_COLLIDEABLE_TREE` and `IS_ITEM_BEE_TREE` consumers must include
+selected gold states without changing real IDs. The source plants an ordinary shovel in a shining hole; do not
 substitute shop stock, arbitrary letters, recoloured ordinary trees, or seeded
 pockets for this route. Existing celebration and collection consumers remain
 installed, but all four golden choices stay disabled until their routes work.
