@@ -772,9 +772,10 @@ def install_daily(base,prior,blob,core,original,output):
     world=bool(previous.get('hidden_contents'))
     interactions=bool(previous.get('world_queries'))
     player=bool(previous.get('interactions'))
+    felling=bool(previous.get('player_queries'))
     capacity=12288 if interactions else 8192
     added=capacity-previous['additional_fixed_resident_bytes']
-    if (previous.get('player_queries') or not previous.get('tree_states') or old['bytes']!=0x12000
+    if (previous.get('felling_camera') or not previous.get('tree_states') or old['bytes']!=0x12000
             or sha256(module)!=old['sha256'] or previous['additional_fixed_resident_bytes']!=(12288 if player else 8192 if contents else 4096)
             or RUNTIME_RAM+capacity>prior['furniture']['bank_pool']['start']):
         raise ValueError('Changed daily-growth runtime dependency')
@@ -812,7 +813,9 @@ def install_daily(base,prior,blob,core,original,output):
                  interaction_contract(source,base,original,previous,old['ground_categories']) if interactions else None)
     if player:
         import v3_scenery_player as player_adapter
-        player_evidence,player_owner,player_rel,player_records=player_adapter.contract(source,base,original,old['player_actions'])
+        player_evidence,player_owner,player_rel,player_records=player_adapter.contract(
+            source,base,original,old['player_actions'],previous.get('player_queries'))
+    camera=player_adapter.camera_contract(source,base,original,previous) if felling else None
     guard_incoming(owner,18960,0x80AB07C0,[(0x475C,8)])
     include='../'*len(output.relative_to(ROOT).parts)+'overlays/v3/scenery_trees.h'
     configuration=f'#include "{include}"\nconst Scenery af_v3_scenery_config[4]={{\n'
@@ -835,13 +838,17 @@ def install_daily(base,prior,blob,core,original,output):
     if player:
         configuration+='const u32 af_v3_tree_player_masks[2][3]={'+','.join(
             '{'+','.join(f'0x{v:X}u' for v in row)+'}' for row in player_evidence['masks'])+'};\n'
+    if camera:
+        configuration+='const u32 af_v3_tree_talk_offsets[4]={'+','.join(
+            f'0x{row["entry"]:X}u' for row in camera['owners'])+'};\n'
     path=output/'scenery-config.c';write_new(path,configuration.encode())
     sources=['overlays/v3/scenery_trees.c','overlays/v3/scenery_daily.c']
     if contents:sources.append('overlays/v3/scenery_contents.c')
     if world:sources.append('overlays/v3/scenery_world.c')
     if interactions:sources.append('overlays/v3/scenery_interactions.c')
     if player:sources.append('overlays/v3/scenery_player.c')
-    code,compiled=compile_part('scenery',output/'scenery',extra_sources=(*sources,str(path.relative_to(ROOT))))
+    code,compiled=compile_part('scenery',output/'scenery',extra_sources=(*sources,str(path.relative_to(ROOT))),
+                               defines=('AF_V3_TREE_FELLING',) if felling else ())
     start=previous['blob_offset'];reservation=previous['reservations'][0]
     if (sha256(blob[start:start+previous['bytes']])!=previous['sha256'] or len(code)>capacity
             or start+len(code)>reservation['blob_offset']+reservation['bytes']):
@@ -893,6 +900,13 @@ def install_daily(base,prior,blob,core,original,output):
                     struct.pack_into('>I',data,at,word)
                     if at in owner_locations:removed_owner.append(owner_locations[at])
             keep=[v for v in owner_records if v not in removed_owner];orel=bytearray(orel)
+            if camera:
+                binding=camera['owners'][variant];target=compiled['symbols'][f'af_v3_tree_talk{variant}']
+                for at,value in ((binding['hi'],(target+0x8000)>>16),(binding['lo'],target&65535)):
+                    before=u32(data,at);after=(before&0xFFFF0000)|value
+                    patches.append(dict(offset=at,before=before,after=after));struct.pack_into('>I',data,at,after)
+                removed_owner.extend(binding['removed_relocations'])
+                keep=[v for v in owner_records if v not in removed_owner]
             struct.pack_into('>I',orel,16,len(keep))
             orel[20:-4]=struct.pack('>'+str(len(keep))+'I',*keep)+bytes(len(orel)-24-4*len(keep))
             changes[row['reloc']]=bytes(orel)
@@ -955,5 +969,8 @@ def install_daily(base,prior,blob,core,original,output):
         current['player_queries']=player_receipt
         result['player_actions'].update(owner_sha256=sha256(po),relocation_sha256=sha256(pr))
         result['player_motion'].update(owner_sha256=sha256(po),reloc_sha256=sha256(pr))
+    if camera:
+        current['felling_camera']=dict(camera,additional_resident_bytes=0,additional_scene_resident_bytes=0,
+            ordinary_gameplay_tested=False,native_test='pending')
     result.update(sha256=sha256(module),crc32=zlib.crc32(module),additional_resident_bytes=added)
     return result,changes

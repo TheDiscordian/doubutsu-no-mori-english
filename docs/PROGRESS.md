@@ -18,8 +18,23 @@ served patchers retain their existing builds.
 
 ## Active development
 
-The current explicit proposal is ABI 155 at
-`build/v3-shared-tree-player-02/build-lock.json`. Shared player tree queries
+The current explicit proposal is ABI 156 at
+`build/v3-shared-tree-felling-01/build-lock.json`. The final axe predicate accepts
+selected gold stumps, preserving their real identity through the existing
+height and foreground-update path. All four seasonal conversation-camera
+callbacks include the donor's medium/large/full gold-tree descriptors. Native
+fallbacks and descriptor identities remain intact. Five focused host/cartridge
+checks pass. The 8,824-byte packet fits its existing 12-KiB reservation; owner
+sizes, allocations, saves, choices, the main lock, and both patchers are unchanged.
+The first silent native run passes 172 records and 88 assertions, including
+the actual felling branch/commit arguments, loaded seasonal callbacks, guards,
+restored state/checkpoint, and clean exit. It injects the stump result and stops
+before terrain/foreground mutation; full ordinary felling/effects and acquisition
+remain unverified. Reuse these completed components.
+See the [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-final-felling-and-conversation-camera).
+
+Shared player tree queries remain installed, verified in ABI 155 at
+`build/v3-shared-tree-player-02/build-lock.json`. They
 connect axe targeting, nearby-tree selection, shovel reactions, shaking/touch
 sound eligibility, and bee checks. Eleven native call sites use one lazy-loading
 gate, preserving real foreground identities, native targeting, and bee timing.
@@ -32,11 +47,11 @@ results do not prove ordinary acquisition or hardware behaviour. Reuse them.
 
 The packet occupies 8,544 bytes within the existing 12-KiB reservation. The
 364-byte player gate reuses a replaced inline predicate; owner sizes, allocations,
-saves, choices, the main lock, and both patchers remain unchanged. Next connect
-the final axe-felling stump/height path, complete source gold-tree effects and
-planting sparkle, and remaining field/insect/camera consumers. In particular,
-native `808CA548..808CA558` still recognises only stump IDs `1..4`, so the tested
-gold-stump return alone is not a complete felling operation. Golden choices stay
+saves, choices, the main lock, and both patchers remain unchanged. Final stump
+acceptance and seasonal camera checks are connected. Next connect complete
+source gold-tree effects and planting sparkle, and remaining field/insect
+consumers. The native and donor stump-height lookups already agree and remain
+unchanged. Golden choices stay
 disabled. See the [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-player-tree-queries).
 
 Shared seasonal shake/drop and axe-hit initialization remain installed, verified
@@ -123,7 +138,7 @@ The main lock and both served patchers remain unchanged. See the
 [scenery specification](../specs/V3_SCENERY.md) and
 [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-seasonal-scenery-runtime).
 
-The current explicit ABI-155 proposal retains the complete balloon integration.
+The current explicit ABI-156 proposal retains the complete balloon integration.
 All eight balloons are
 connected through the shared parent-category installer: official names/prices,
 complete pocket icons, held/inventory animation, source acquisition records,

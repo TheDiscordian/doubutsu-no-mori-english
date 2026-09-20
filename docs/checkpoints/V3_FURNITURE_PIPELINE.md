@@ -1,5 +1,106 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared final felling and conversation camera
+
+The ABI-156 proposal is `build/v3-shared-tree-felling-01/build-lock.json`.
+The shared scenery gameplay installer connects final gold-stump acceptance
+and all four seasonal conversation-camera predicates. No per-item installer,
+additional choice, asset conversion, or allocation is introduced.
+
+- ROM SHA-256:
+  `b2db9a0fb6139178e2b45d188473b3ca9d75bb1d38ffc4df828f2c40ef4081e2`.
+- Report SHA-256:
+  `d469757d134997a2bbecdddcdb19d6cf15278f47a8ac50a2d3eeb2de5566a153`.
+- UPS SHA-256:
+  `551e0adc43939523a5f88e7ff05ef9433d67e60f692556428f3b8fd4ac431854`.
+
+The final axe consumer at `808CA548..808CA558` uses the existing register-saving
+gate with query three. It accepts original stump IDs `1..4` and selected gold
+stumps `007B..007E`, leaves the returned real ID in `v0`, and supplies the Boolean
+in `a0`. The original stack store, height lookup, terrain offset, foreground
+update, and later effect call remain. Complete donor/native function contracts
+and all retained player-query patches are validated before rebinding. Twelve
+jump relocations follow the original relocation order; no owner grows.
+
+Investigation resolves the earlier height-lookup question: both complete
+`obj_hight_table_item0_nogrow` implementations already return the same neutral
+record for gold stumps. Their three twelve-byte records match. Native code
+`800A5AC8..800A5B4C` and data `8010B478..8010B49C` remain unchanged. No identity
+substitution or speculative geometry patch is needed.
+
+Each seasonal move callback binds its actual HI16/LO16 function reference to a
+shared wrapper; two relocation records per owner are removed. The complete
+original predicate remains callable in its loaded owner. The wrapper adds the
+three actual donor medium/large/full gold descriptors, `first_index+2..4`, only
+when the golden-shovel profile bit is selected. Small trees, saplings, stumps,
+other objects, and unselected gold retain the native answer. Source cedar/palm
+families are not enabled. All complete native move functions and donor predicates
+are checked, including Xmas's longer move function and different reference pair.
+
+Code occupies 8,824 of the existing 12,288 bytes. Bootstrap remains 848 bytes,
+equipment remains 72 KiB, and seasonal banks remain 32,864 bytes each. Saved
+format, choices, source text, owner sizes, and scene/resident allocations do not
+change. The main ABI-109 lock and both served V2 patchers remain unchanged.
+
+Five focused checks pass in 6.778 seconds:
+
+```sh
+python3 -m unittest tests.test_v3_tree_player -v
+```
+
+Sanitizers cover all sixteen-bit player IDs and selected/unselected camera
+fallback forwarding. Cartridge checks cover complete source/native retention,
+all twelve player relocations, all four callback pairs at two relocation bases,
+unchanged geometry/resources/saves, full UPS reconstruction, all 128 experimental
+selections, and exact V2-12 for empty selections. Python compilation and
+`git diff --check` pass. Unchanged old native components are not replayed.
+
+The first silent native run passes 172 records and 88 assertions:
+
+```sh
+python3 tools/emulator_smoke.py \
+  --rom build/v3-shared-tree-felling-01/animal-forest-v3-asset-loader.z64 \
+  --output build/smoke-v3-tree-felling-01 \
+  --scenario tests/v3-tree-felling-scenario.json \
+  --xvfb /home/discordian/Games/OpenRSC/headless/vendor/usr/bin/Xvfb \
+  --seconds 180 --expansion-pak --no-initial-screenshot
+```
+
+- Results SHA-256:
+  `15c07a1ee54c2ed36cd7367861e6695978ee1318a11df9f21c0514938b62cdb2`.
+
+The actual player owner executes its final stump branch and lazy loading.
+Selected smallest/largest gold stumps and native stumps reach the original
+foreground call with the real identity, original position, and native update
+flag. Unselected gold and an uncut tree take the rejection branch. The original
+height lookup executes and returns the neutral record. The fixture injects the
+stump result, skips terrain mutation, and stops before foreground mutation and
+effects; it does not claim a full axe swing, tree commit, or acquisition.
+
+All four complete seasonal owners load and relocate from the cartridge. Their
+actual callback references resolve to the shared wrappers. The three accepted
+gold indices, small/sapling/stump exclusions, native objects, and unselected
+fallbacks execute with the original native predicate as the reference. Fixture
+guards, save data, player code, equipment, restored pointers/profile/code cache,
+checkpoint restoration, final fault/guards, and clean exit pass. No user save is
+used or modified, audio is disabled, and no code is changed in the cartridge.
+New harness work is below twenty minutes; no retry is needed.
+
+Next implement complete source gold-tree effects and planting sparkle, plus
+the remaining shop-path and insect consumers. The source effect owner reuses
+ordinary seasonal tree models/motions after normalizing gold variants, with
+a distinct gold status/palette and gold leaf flags. Bind the complete native
+dependencies before reusing them; do not substitute green effects. Small-tree
+and leaf-effect drawers also use the gold palette. The shop path touches only
+six cells in acre `(2,2)`; the insect source accepts mature/reward/Bell/furniture
+gold trees but excludes bee trees and the acre's two-cell border. Preserve those
+rules when extending the shared consumers. Golden choices stay disabled until
+ordinary acquisition works. Effects, ordinary gameplay, persistence, and hardware
+are not established by this component run.
+
+Format-3 matching/equal-or-larger profiles remain required. Do not load imported
+saves in V2 or older format-1/2 V3 builds. Preserve backups and all previous ROMs.
+
 ## Shared player tree queries
 
 The ABI-155 proposal is `build/v3-shared-tree-player-02/build-lock.json`.

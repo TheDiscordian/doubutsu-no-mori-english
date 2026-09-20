@@ -51,8 +51,11 @@ nine initialization callers, and adds 4 KiB fixed code reservation. The player
 query refresh binds complete source/native consumers and replaces eleven
 axe/shovel/shake/bee sites through one register-preserving lazy-loading gate.
 It reuses replaced inline code and existing packet space, retaining native
-target filters, timing, identities, and all allocations/saves. Final axe felling,
-complete gold-tree effects, planting sparkle, and remaining field/insect
+target filters, timing, identities, and all allocations/saves. Its next refresh
+extends the final stump predicate and four seasonal conversation-camera callbacks,
+retaining original height geometry and real foreground identities. It fits the
+same reservation and adds no item-specific installer. Complete gold-tree effects,
+planting sparkle, and remaining field/insect
 integration still precede ordinary acquisition. See
 [seasonal scenery](V3_SCENERY.md).
 

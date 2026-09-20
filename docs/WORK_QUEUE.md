@@ -2,8 +2,8 @@
 
 ## Active: V3 optional GameCube imports
 
-The current explicit proposal is ABI 155,
-`build/v3-shared-tree-player-02/build-lock.json`. All eight balloons are
+The current explicit proposal is ABI 156,
+`build/v3-shared-tree-felling-01/build-lock.json`. All eight balloons are
 connected through shared source-derived parent records, room profiles, indoor
 conversion/pickup, collection/catalogue, complete icons, and optional selection.
 There are 128 experimental choices, with 24 equipment parents. Neither served
@@ -87,12 +87,24 @@ consumers, guards, restored state/checkpoint, and clean exit. Drop/cut callbacks
 are stubs; reuse the completed components without claiming ordinary acquisition.
 The 8,544-byte packet fits the same 12-KiB reservation, and the 364-byte gate
 reuses replaced player code. No owner, allocation, save, or choice grows.
-Next connect final axe felling: `808CA548..808CA558` still only accepts native
-stumps `1..4`; its following height lookup at `800A5AC8` also needs gold geometry.
-Then connect complete source gold-tree leaf/cut effects, planting sparkle, and
-remaining field/insect/camera consumers before exercising ordinary acquisition.
+Final axe stump acceptance and all four seasonal conversation-camera callbacks
+are connected. Five focused host/cartridge checks pass. The packet is 8,824
+bytes in the same reservation; no allocation/save/choice changes. Both donor
+and native stump-height lookups already return the same neutral geometry for
+gold stumps, so no height patch is needed. The first silent native run passes
+172 records and 88 assertions, including actual branch/commit arguments and all
+four loaded camera callbacks, restored state/checkpoint, guards, and clean exit.
+The stump result is injected, and terrain/foreground mutation is not executed;
+this is not full ordinary felling/acquisition. Reuse this component evidence.
+Next connect complete source gold-tree
+leaf/cut effects, planting sparkle, and remaining field/insect consumers before
+exercising ordinary acquisition. See the
+[checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-final-felling-and-conversation-camera).
 Do not feed GameCube gold effect-variant indices into the unextended native
 effect owner, or substitute ordinary-green effects for the gold source artwork.
+The donor reuses ordinary seasonal tree motion/model families with a gold status
+flag and palette; verify complete native dependencies before reusing those
+resources. Small-tree and leaf effects also require the donor gold palette path.
 Preserve
 native scenery and the actual donor route; no arbitrary acquisition substitute.
 See [shared scenery](../specs/V3_SCENERY.md).

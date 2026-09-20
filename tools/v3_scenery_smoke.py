@@ -12,6 +12,125 @@ from v3_import_storage import jump
 from v3_npc_draw_smoke import boot_proofs
 
 
+def felling_camera(debug,rom_path,record):
+    """New felling branch/arguments and actual loaded seasonal callbacks.
+
+    The stump result is injected; stop before terrain/foreground mutation.
+    This does not simulate a full axe swing or claim its effects/acquisition.
+    """
+    import v3_scenery_player as player
+    path=Path(rom_path);image=path.read_bytes();report=json.loads((path.parent/'build.json').read_bytes())
+    if sha256(image)!=report['output_sha256']:raise ValueError('Changed felling/camera cartridge')
+    e=report['equipment_resources'];r=e['scenery'];files=by_vrom(image);boot=boot_proofs(image);assertions=0
+    def check(label,okay,**detail):
+        nonlocal assertions
+        record(dict(felling_camera_check=label,**detail,assertion='passed' if okay else 'failed'))
+        if not okay:raise ValueError('Felling/camera mismatch: '+label)
+        assertions+=1
+    def memory(label,at,want):
+        got=debug.read_memory(at,len(want));check(label,got==want,address=f'{at:08X}',
+            expected_sha256=sha256(want),observed_sha256=sha256(got))
+    def call(at,args=(),proof=None,want=None):
+        result=debug.call(f'{at:08X}',[v&0xffffffff for v in args],return_address=MODULE_RAM+0x6480,
+            verified_code=proof or boot.get(at));record(result)
+        if want is not None:check('native result',result['return_value']==want,entry=f'{at:08X}',expected=want,actual=result['return_value'])
+        return result['return_value']
+    def put(at,*values):debug.write_memory(at,struct.pack('>'+'I'*len(values),*values))
+    def flush(at,n):call(0x8002FE00,[at,n]);call(0x80034CE0,[at,n])
+    def regs(raw):return [int(raw[i:i+16],16) for i in range(0,len(raw),16)]
+    def extend(v):return v|(0xffffffff00000000 if v&0x80000000 else 0)
+    def setregs(values):
+        if debug.command('G'+''.join(f'{v:016x}' for v in values))!='OK':raise ValueError('Felling registers rejected')
+    regions=[(o['config'][0],4) for o in r['owners']]+[(r['ram'],r['additional_fixed_resident_bytes']),
+        (r['tree_states']['cache_word'],4),(0x80460020,192),(TEST_STACK-0x800,16),(TEST_STACK+0x40,16)]
+    saved={at:debug.read_memory(at,n) for at,n in regions};module=debug.read_memory(e['ram'],e['bytes'])
+    save_data=debug.read_memory(0x8046C000,864)
+    # Complete owner + relocation, with separate tiny bridge/position buffers.
+    extent=max(o['resident_bytes']+len(files[o['reloc']].extract(image)) for o in r['owners'])
+    extent=(extent+31)&~15;size=extent+0x300
+    allocation=call(0x8009BFC0,[size])
+    if allocation&15 or not MODULE_RAM+0x8000<=allocation<=0x80400000-size:raise ValueError('Camera fixture allocation failed')
+    root=allocation+16;bridge=allocation+extent+0x40;position=bridge+0x40
+    edge=b'AFFC'*4;guards=[allocation,bridge-16,bridge+16,position-16,position+16,allocation+size-16,
+        TEST_STACK-0x800,TEST_STACK+0x40]
+    debug.write_memory(allocation,bytes(size))
+    for at in guards:debug.write_memory(at,edge)
+    parent=next(row for row in e['player_actions']['equipment_selection']['rows'] if row['item_id']=='223B')
+    def select(enabled):
+        profile=bytearray(saved[0x80460020]);profile[parent['profile_byte']]&=~parent['profile_mask']
+        if enabled:profile[parent['profile_byte']]|=parent['profile_mask']
+        debug.write_memory(0x80460020,profile)
+    data=files[player.VROM].extract(image);rel=files[player.RELOC].extract(image)
+    owner=int.from_bytes(debug.read_memory(0x80143900,4),'big')-(0x808DD748-player.RAM)
+    if owner&15 or not MODULE_RAM+0x8000<=owner<=0x80400000-len(data):raise ValueError('Missing actual player owner')
+    p=r['player_queries'];loaded=relocate_verified_data(SimpleNamespace(ram=player.RAM,resident_bytes=p['resident_bytes'],
+        sections=struct.unpack_from('>5I',rel)),data,rel,owner)
+    memory('complete actual player text',owner,loaded[:p['sections'][0]])
+    def felling(item,enabled,want):
+        select(enabled);before=debug.command('g');values=regs(before);sp=TEST_STACK-0x100
+        if values[37]&0xffffffff!=0x800D334C:raise ValueError('Felling needs paused native frame')
+        put(position,0x41A00000,0,0x41A00000);put(sp+0x28,position)
+        values[2]=item;values[16]=extend(position-0x28);values[29]=extend(sp)
+        values[37]=extend(owner+0x808CA548-player.RAM)
+        stops=[owner+a-player.RAM for a in (0x808CA598,0x808CA600,0x808CA5C8)]
+        for at in stops:
+            if debug.command(f'Z0,{at:x},4')!='OK':raise ValueError('Felling breakpoint rejected')
+        try:
+            setregs(values);stopped=debug.command('c');actual=regs(debug.command('g'))
+            target=stops[0] if want else stops[1]
+            check('actual final stump branch',stopped[:3] in ('T05','S05') and actual[37]&0xffffffff==target,
+                item=f'{item:04X}',selected=enabled,expected_pc=f'{target:08X}',actual_pc=f'{actual[37]&0xffffffff:08X}')
+            if want:
+                check('native neutral stump height and original position',
+                    [actual[i]&0xffffffff for i in (4,5,6,7)]==[0x41A00000,0,0x41A00000,0]
+                    and actual[2]&0xffffffff==0x8010B478)
+                memory('real stump identity retained on stack',sp+0x36,struct.pack('>H',item))
+                # Terrain mutation is outside this bounded fixture. Resume after
+                # that existing call, then inspect the actual foreground call.
+                actual[37]=extend(owner+0x808CA5A0-player.RAM);setregs(actual)
+                stopped=debug.command('c');actual=regs(debug.command('g'))
+                check('foreground commit receives actual gold/native stump',
+                    stopped[:3] in ('T05','S05') and actual[37]&0xffffffff==stops[2]
+                    and [actual[i]&0xffffffff for i in (4,5,6,7)]==[item,0x41A00000,0,0x41A00000])
+                memory('native foreground update flag retained',sp+16,struct.pack('>I',1))
+        finally:
+            for at in stops:debug.command(f'z0,{at:x},4')
+            debug.command('G'+before)
+    try:
+        put(r['tree_states']['cache_word'],0)
+        for item,enabled,want in ((0x7B,True,True),(0x7E,True,True),(0x7E,False,False),(4,False,True),(0x867,True,False)):
+            felling(item,enabled,want)
+        blob=files[BLOB].extract(image);packet=blob[r['blob_offset']:r['blob_offset']+r['bytes']]
+        memory('final felling entry lazy-loads complete packet',r['ram'],packet)
+        for variant,(o,binding) in enumerate(zip(r['owners'],r['felling_camera']['owners'],strict=True)):
+            data,rel=(files[o[k]].extract(image) for k in ('vrom','reloc'));n=o['resident_bytes'];sections=struct.unpack_from('>5I',rel)
+            loaded_season=relocate_verified_data(SimpleNamespace(ram=o['ram'],resident_bytes=n,sections=sections),data,rel,root)
+            call(0x800262D0,[o['vrom'],o['vrom']+len(data),o['ram'],o['ram']+n,root,root+n,len(rel)])
+            memory(o['role']+' complete loaded camera owner',root,loaded_season);put(o['config'][0],root)
+            high=u32(debug.read_memory(root+binding['hi'],4),0)&65535
+            low=struct.unpack('>h',debug.read_memory(root+binding['lo']+2,2))[0];target=(high<<16)+low
+            check(o['role']+' actual callback points to shared code',target==r['code']['symbols'][f'af_v3_tree_talk{variant}'])
+            stub=struct.pack('>2I',jump(target),0);debug.write_memory(bridge,stub);flush(bridge,len(stub))
+            proof=(root,loaded_season[:sections[0]]);first=o['config'][8]
+            select(True)
+            for index in binding['indices']:call(bridge,[index],(bridge,stub),1)
+            for enabled,index in ((False,first+2),(True,first),(True,first+1),(True,first+5),(True,5),(True,24)):
+                select(enabled);want=call(root+binding['entry'],[index],proof)
+                call(bridge,[index],(bridge,stub),want)
+        memory('complete player text retained',owner,loaded[:p['sections'][0]])
+        memory('saved data unchanged',0x8046C000,save_data)
+        for at in guards:memory('fixture guard',at,edge)
+        memory('no faulted thread',0x8003CE34,bytes(4))
+    finally:
+        for at,value in saved.items():debug.write_memory(at,value)
+        flush(r['ram'],r['additional_fixed_resident_bytes']);call(0x8009C040,[allocation])
+    for at,value in saved.items():memory('restored state',at,value)
+    memory('equipment unchanged',e['ram'],module)
+    return dict(assertions=assertions,actual_felling_branch_and_commit_arguments=True,
+        stump_result_injected=True,terrain_and_foreground_mutation_not_executed=True,
+        actual_seasonal_callbacks=4,ordinary_acquisition_tested=False,requires_checkpoint_restore=True)
+
+
 def player_queries(debug,rom_path,record,*,consumers_only=False):
     """Actual player call sites and bee/cut consumers; callbacks are isolated."""
     import v3_scenery_player as player
@@ -103,7 +222,7 @@ def player_queries(debug,rom_path,record,*,consumers_only=False):
         if consumers_only:
             call(0x800A5970,[0x800,0,4],want=0x801)
         else:
-            for row in p['calls']:query(row,0x81 if row['query']==2 else 0x867,1)
+            for row in p['calls']:query(row,0x7e if row['query']==3 else 0x81 if row['query']==2 else 0x867,1)
         blob=files[BLOB].extract(image);packet=blob[r['blob_offset']:r['blob_offset']+r['bytes']]
         check('lazy-loaded complete query packet',r['ram'],packet)
         if not consumers_only:
@@ -137,7 +256,7 @@ def player_queries(debug,rom_path,record,*,consumers_only=False):
         flush(r['ram'],r['additional_fixed_resident_bytes']);call(0x8009C040,[allocation])
     for at,value in saved.items():check('restored state',at,value)
     check('complete equipment unchanged',e['ram'],module)
-    return dict(assertions=assertions,actual_player_queries=0 if consumers_only else 11,actual_common_bee_and_axe_consumers=True,
+    return dict(assertions=assertions,actual_player_queries=0 if consumers_only else len(p['calls']),actual_common_bee_and_axe_consumers=True,
         drop_and_cut_callbacks_stubbed=True,ordinary_acquisition_tested=False,requires_checkpoint_restore=True)
 
 

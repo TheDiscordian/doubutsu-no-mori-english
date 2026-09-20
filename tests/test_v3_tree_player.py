@@ -16,11 +16,11 @@ from v3_import_storage import jump
 import v3_scenery_runtime as scenery
 import v3_scenery_player as player
 import tests.test_v3_equipment_runtime as shared
-OUTPUT=ROOT/os.environ.get('V3_TREE_PLAYER_BUILD','build/v3-shared-tree-player-02')
+OUTPUT=ROOT/os.environ.get('V3_TREE_PLAYER_BUILD','build/v3-shared-tree-felling-01')
 
 class HostTests(unittest.TestCase):
     sanitized=shared.HostTests.sanitized
-    def test_all_native_and_imported_predicates(self):self.sanitized('v3_tree_player_test.c')
+    def test_all_native_and_imported_predicates(self):self.sanitized('v3_tree_player_test.c',defines=('-DAF_V3_TREE_FELLING',))
 
 @unittest.skipUnless((OUTPUT/'build.json').is_file(),'Current player-tree cartridge required')
 class CartridgeTests(unittest.TestCase):
@@ -36,7 +36,8 @@ class CartridgeTests(unittest.TestCase):
     def test_complete_source_native_retention_and_all_relocated_queries(self):
         source=scenery.Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
             (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
-        evidence,*_=player.contract(source,self.base,self.original,self.prior['equipment_resources']['player_actions'])
+        previous=self.prior['equipment_resources']['scenery'].get('player_queries')
+        evidence,*_=player.contract(source,self.base,self.original,self.prior['equipment_resources']['player_actions'],previous)
         for k,v in evidence.items():self.assertEqual(json.loads(json.dumps(v)),self.p[k])
         data=self.files[player.VROM].extract(self.rom);before=self.before[player.VROM].extract(self.base)
         rel=self.files[player.RELOC].extract(self.rom);oldrel=self.before[player.RELOC].extract(self.base)
@@ -46,8 +47,9 @@ class CartridgeTests(unittest.TestCase):
             struct.pack_into('>I',restored,at,p['before'])
         self.assertEqual(restored,before);self.assertEqual(rel[:16],oldrel[:16]);self.assertEqual(len(rel),len(oldrel))
         records=struct.unpack_from('>'+str(u32(oldrel,16))+'I',oldrel,20)
-        self.assertEqual(struct.unpack_from('>'+str(u32(rel,16))+'I',rel,20),tuple([*records,*self.p['added_relocations']]))
-        self.assertEqual(len(self.p['calls']),11)
+        retained=[v for v in records if not previous or v not in previous['added_relocations']]
+        self.assertEqual(struct.unpack_from('>'+str(u32(rel,16))+'I',rel,20),tuple([*retained,*self.p['added_relocations']]))
+        self.assertEqual(len(self.p['calls']),12)
         gate=player.gate(self.r['bootstrap']['symbols']['load'],self.r['code']['symbols']['af_v3_tree_player_query'])
         self.assertEqual(data[player.GATE-player.RAM:player.GATE-player.RAM+len(gate)],gate)
         for ram in (0x80200010,0x80300010):
@@ -62,6 +64,25 @@ class CartridgeTests(unittest.TestCase):
             self.assertEqual(self.e[name]['owner_sha256'],sha256(data))
         self.assertEqual(self.e['player_actions']['relocation_sha256'],sha256(rel))
         self.assertEqual(self.e['player_motion']['reloc_sha256'],sha256(rel))
+
+    def test_seasonal_camera_bindings_and_unchanged_height_geometry(self):
+        source=scenery.Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+            (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+        evidence=player.camera_contract(source,self.base,self.original,self.prior['equipment_resources']['scenery'])
+        for k,v in evidence.items():self.assertEqual(json.loads(json.dumps(v)),self.r['felling_camera'][k])
+        for variant,(row,binding) in enumerate(zip(self.r['owners'],evidence['owners'],strict=True)):
+            data=self.files[row['vrom']].extract(self.rom);rel=self.files[row['reloc']].extract(self.rom)
+            target=self.r['code']['symbols'][f'af_v3_tree_talk{variant}']
+            before=self.before[row['vrom']].extract(self.base)
+            self.assertEqual(data[binding['entry']:binding['move']],before[binding['entry']:binding['move']])
+            for ram in (0x80200010,0x80300010):
+                moved=relocate_verified_data(SimpleNamespace(ram=row['ram'],resident_bytes=sum(struct.unpack_from('>4I',rel)),
+                    sections=struct.unpack_from('>5I',rel)),data,rel,ram)
+                hi,lo=u32(moved,binding['hi']),u32(moved,binding['lo'])
+                self.assertEqual(((hi&65535)<<16)+struct.unpack('>h',struct.pack('>H',lo&65535))[0],target)
+        core=self.files[CODE_VROM].extract(self.rom);old=self.before[CODE_VROM].extract(self.base)
+        for a,b in ((0x800A5AC8,0x800A5B4C),(0x8010B478,0x8010B49C)):
+            self.assertEqual(core[a-CODE_RAM:b-CODE_RAM],old[a-CODE_RAM:b-CODE_RAM])
 
     def test_retained_allocations_resources_and_rebound_shared_consumers(self):
         old=self.prior['equipment_resources'];a=scenery.BOOT_RAM-old['ram'];b=scenery.BOOT_END-old['ram'];start=old['blob_offset']

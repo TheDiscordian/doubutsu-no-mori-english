@@ -351,10 +351,10 @@ final guard/checkpoint verification, or a hardware result.
 Reuse the installed renderer, planting conversion, tree-state helpers, and daily
 growth/death/neighbour/thinning, hidden-content, and world-query consumers.
 Seasonal drop/cut counts and player targeting/shaking/bee predicates are installed.
-Final axe felling, planting sparkle, complete gold-tree leaf/cut effects, and
-remaining field/insect/camera consumers still precede full ordinary acquisition.
-The native final axe routine only accepts stumps `1..4`; extend this predicate
-and its geometry lookup without changing the real saved gold-stump ID. The donor
+Final stump acceptance and conversation-camera consumers are connected. Planting
+sparkle, complete gold-tree leaf/cut effects, and remaining field/insect consumers
+still precede full ordinary acquisition. The final axe routine accepts selected
+gold stumps without changing their real saved identity. The donor
 effect owner has gold-specific variants, status, resources, and leaf types;
 do not pass unsupported variant indices to the native owner or substitute its
 ordinary-tree artwork. The source plants an ordinary shovel in a shining hole; do not
@@ -385,8 +385,8 @@ No actor/owner allocation grows, and the gate has a bounded 256-byte stack frame
 Existing target coordinates, height/distance/angle filters, original-item stores,
 animation checks, callback permission checks, and five-frame bee timers remain.
 Common bee and axe callbacks receive the real gold foreground identity. Axe
-decrement/drop and core stump conversion return correctly, but the final felling
-caller remains a separate pending consumer described above. The new packet fits
+decrement/drop and core stump conversion return correctly; the final felling
+predicate is extended by the following stage. The new packet fits
 the existing 12-KiB reservation without changing resources, saves, or choices.
 
 Four focused checks cover all sixteen-bit identities under both profiles,
@@ -399,6 +399,39 @@ memory/guards/checkpoint. Drop and cut-count callbacks are isolated test stubs;
 ordinary target selection, complete felling/acquisition, rendered effects,
 save/restart, and original-hardware behaviour remain unverified. The checkpoint
 records the partial initial fixture and focused corrected consumer retry.
+
+## Final stump acceptance and conversation-camera limits
+
+The shared gameplay refresh consumes the installed player-query receipt, verifies
+every retained instruction and relocation, and rebinds the existing gate to the
+new packet. Original relocation ordering remains intact. The additional query
+at `808CA548` accepts native stump IDs `1..4` or selected gold IDs `007B..007E`.
+It preserves `v0` as the real stump and returns the predicate in `a0`; the retained
+native code carries that identity into its foreground update. The twelfth jump
+relocation fits existing relocation padding. Owner and actor sizes do not change.
+
+The complete donor and native height consumers and three twelve-byte records
+are checked. Both already return the same neutral record for these stump IDs.
+Core `800A5AC8` and table `8010B478` stay untouched; mapping gold IDs to substitute
+native IDs is unnecessary. Terrain mutation and the native foreground setter
+retain their original callers and argument order.
+
+Four complete donor camera predicates bind the seasonal adaptation. Each native
+predicate and complete move function is preserved except for the callback's
+HI16/LO16 reference. The shared wrapper includes only the selected medium,
+large, and full gold descriptors at `first_index+2..4`; every other index uses
+the unchanged native predicate in its current loaded owner. The complete
+prepared descriptor ordering supplies those indices. Two internal relocation
+records per season are removed when binding the fixed shared callback.
+Source cedar/palm families are not implicitly enabled.
+
+Five focused checks cover sanitized predicates across every sixteen-bit ID,
+camera selection and fallback argument forwarding, complete source/native
+retention, player/seasonal relocation at two addresses, unchanged heights,
+resource/save retention, exact UPS reconstruction, all experimental selections,
+and the pinned V2-12 no-import output. Code occupies 8,824 of the existing 12,288
+bytes. The checkpoint records bounded native execution and its limits; full
+ordinary felling/effects/acquisition and hardware remain separate verification.
 
 The [checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-seasonal-scenery-preparation)
 records resources and focused checks. Component checks do not establish
