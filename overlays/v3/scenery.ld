@@ -8,6 +8,8 @@ af_scenery_writeback = 0x8002FE00;
 af_scenery_invalidate = 0x80034CE0;
 af_scenery_term = 0x800CA070;
 af_scenery_fault = 0x80029AB4;
+af_v3_native_tree_grow = 0x804ADFC0;
+af_v3_native_tree_stump = 0x804ADFD0;
 SECTIONS
 {
     . = 0x804B5000;

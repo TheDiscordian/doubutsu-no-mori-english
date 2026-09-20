@@ -60,7 +60,8 @@ def compile_part(part, out, extra_sources=(), defines=(), primary_source=None):
         raise ValueError('Unresolved V3 loader symbol')
     symbols = {name: int(address, 16) for address, kind, name in
                (line.split() for line in run('nm', '--defined-only', 'code.elf').splitlines())}
-    run('objcopy', '-O', 'binary', '-j', '.text', '-j', '.rodata', 'code.elf', 'code.bin')
+    run('objcopy', '-O', 'binary', '-j', '.text', '-j', '.rodata',
+        *(['-j', '.fallbacks'] if part=='scenery_bootstrap' else []), 'code.elf', 'code.bin')
     code = (out / 'code.bin').read_bytes()
     entry, expected = {'startup': ('af_v3_startup', MODULE_RAM + STARTUP),
                        'accessory': ('af_v3_accessory_draw', 0x80473100),

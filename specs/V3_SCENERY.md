@@ -87,11 +87,15 @@ the four owners; Xmas shares winter. Verified retired module copies supply
 cartridge storage, with explicit live reservations preventing subsequent reuse.
 The import blob and its DMA identity do not grow or overlap English choices.
 
-The equipment module retains its size and guards. Its unused
-`804ADC90..804ADFEF` range contains a 267-byte bootstrap, bounded before the
-retained guard at `804ADFF0`. Constructors transfer and verify a 2,892-byte code
-packet into the reserved `804B5000..804B5FFF` range, flush the instruction cache,
-then prepare the native/held table and load the active scenery bank. A missing
+The equipment module retains its size and guards. Its
+`804ADC90..804ADFEF` range contains an 848-byte bootstrap and native fallback
+stubs, bounded before the retained guard at `804ADFF0`. A four-byte cache word
+at `804ADFEC` starts clear in the startup-loaded module. The bootstrap transfers
+and verifies the 3,872-byte shared code packet into the reserved
+`804B5000..804B5FFF` range, flushes the instruction cache, and records the verified
+CRC. Constructors then prepare the native/held table and load the active scenery
+bank. Tree queries can load the same packet before any seasonal actor exists;
+later calls reuse it without repeating the transfer. A missing
 or corrupt resource enters the existing fault reporter instead of constructing
 an actor with invalid pointers. The five added diagnostic strings are credited
 to the assistant in the single text catalogue.
@@ -122,19 +126,58 @@ held-category hooks. Disabled imported foreground IDs resolve the native empty
 row rather than indexing beyond a native table. Save/profile restrictions still
 apply; this fallback does not authorise removing imports from a saved world.
 
-The explicit ABI-149 proposal is `build/v3-shared-scenery-04/build-lock.json`.
-It adds a 4,096-byte fixed reservation and 32,864 bytes per loaded seasonal owner.
+The explicit ABI-150 proposal is `build/v3-shared-tree-states-02/build-lock.json`.
+It retains the 4,096-byte fixed reservation and 32,864 bytes per loaded seasonal owner.
 All existing 128 experimental choices and format-3 saves remain unchanged.
 The main ABI-109 lock and both served V2 patchers stay unchanged. Component tests
 cover native loading, all seasonal type bindings, actual body-list generation,
 guards, and restoration; rendered appearance and ordinary gameplay are not
 claimed.
 
+## Shared planting and tree-state rules
+
+The shared installer's `--refresh-runtime --scenery-gameplay` stage consumes the
+installed seasonal category. Complete donor growth, stump, and four burial
+consumers are hash-bound. Growth and stump records come from the donor's actual
+tables, including growth caps and mature/spent stability. No item-specific
+installer or selectable scenery identity is added.
+
+All four native burial callers use the shared adapter. A normal shovel (`2202`)
+buried in a shining hole (`005D`) becomes a gold-tree sapling (`0863`) and returns
+the native planting action, only when the golden-shovel profile is selected.
+Other items/holes and unselected profiles use each loaded owner's complete
+original burial routine. The call's internal relocation is removed; the native
+routine remains intact. Fruit, seed, money, and pitfall processing are retained.
+The existing native caller still owns foreground placement and planting animation.
+
+Core growth at `800A5970` and stump conversion at `800A56F0` dispatch through the
+lazy loader. Gold stages use the actual six growth records and four stump sizes;
+hidden mature states use the full-sized stump. All other families execute their
+complete original routines through fixed prologue stubs at `804ADFC0` and
+`804ADFD0`. Negative elapsed days do not grow the tree; zero means one growth
+step, matching the donor helper's inclusive loop. Stable states stop immediately
+instead of iterating over unchanged days. The stump flag retains its signed
+sixteen-bit semantics.
+
+This stage consumes existing packet and bootstrap reservations. It adds no RAM,
+scene allocation, save/profile field, public diagnostic text, or browser choice.
+Host sanitizer tests cover boundaries, all native fallback IDs, and output
+guards. Cartridge checks cover original code retention, complete donor tables,
+relocation, storage, optional composition, and UPS reconstruction. A silent native
+component check verifies lazy loading without an actor, actual core dispatch,
+all four relocated burial helpers, native fallbacks, guards, and restoration.
+It does not execute the full ordinary planting interaction or establish daily
+growth, collision, rendering, save/restart, or hardware behaviour.
+
 ## Remaining gameplay integration
 
-Reuse the installed renderer and prepared resources. World collision,
-planting, growth/death, cutting, shaking, and selected-only acquisition remain
-required. The source plants an ordinary shovel in a shining hole; do not
+Reuse the installed renderer, planting conversion, and tree-state helpers.
+The daily-growth owner (`m_all_grow_ovl`, VROM `00970920`, relocation `009754A0`,
+linked RAM `80AB07C0`, loaded pointer `80100C5C`) still needs gold-tree eligibility,
+neighbour checks, and death handling. Preserve its existing imported-house
+protection changes. World collision, full cutting/shaking, the planting sparkle,
+and the selected shovel drop also remain required. The source plants an ordinary
+shovel in a shining hole; do not
 substitute shop stock, arbitrary letters, recoloured ordinary trees, or seeded
 pockets for this route. Existing celebration and collection consumers remain
 installed, but all four golden choices stay disabled until their routes work.

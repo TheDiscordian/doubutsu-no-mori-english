@@ -1,5 +1,73 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared planting and tree-state runtime
+
+The ABI-150 proposal is `build/v3-shared-tree-states-02/build-lock.json`.
+The shared scenery gameplay stage connects selected shovel burial to the donor's
+gold sapling in all four seasonal owners, and connects core growth/stump queries
+to complete donor state tables. Original native families retain their complete
+original consumers. The four internal burial calls lose only their corresponding
+relocation record; the original burial functions remain available for fallback.
+Existing foreground placement and planting animation stay with the native caller.
+This is not complete ordinary gold-tree acquisition; the four tool choices remain
+disabled pending daily growth/death, collision, cutting/shaking, sparkle, and drop.
+
+- ROM SHA-256:
+  `ac9d7e39045a1401b297d2492d02702f02aa7d729f0844d7b15e0554764f9c7a`.
+- Report SHA-256:
+  `0db3c8223a35068cc55dfdd1f217bfdf81e4f0432c64c3322bd61f65ddba0322`.
+- UPS SHA-256:
+  `f8a3e088a0ed458d3f67659210c6b33b967a966a3ed277257762882cd0f8bb1f`.
+
+The shared packet grows from 2,892 to 3,872 bytes, still within its existing
+4,096-byte reservation. Its cartridge storage remains inside the first declared
+retired module; all three complete seasonal banks remain unchanged. The existing
+equipment module's bootstrap reservation contains an 848-byte implementation,
+including native prologue stubs at `804ADFC0`/`804ADFD0`. The cached CRC at
+`804ADFEC` starts zero and is set only after verified DMA and cache maintenance.
+Tree queries can load the packet before a seasonal actor exists. The equipment
+module, startup size, scene allocations, profile bits, and saves do not grow.
+Build 01 provisionally reserved an unnecessary second page; build 02 retains the
+existing page after the compiled code proves it fits. Both ROMs are identical;
+only build 02's receipt records the correct unchanged reservation.
+
+Four focused tests pass in 6.174 seconds on the first invocation. The host fixture
+uses AddressSanitizer/UBSan for negative/zero/large elapsed days, growth caps,
+mature/spent stability, every stump size, flag narrowing, all other sixteen-bit
+native IDs, selection, all four burial adapters, and bounded output writes.
+Cartridge checks verify complete donor functions/tables, native core/owner
+retention, relocation at two addresses, lazy-load stubs/cache placement, retained
+guards/artwork, complete UPS reconstruction, 128 unchanged choices, and exact
+V2-12 empty-selection output. No diagnostic text or source-credit entry is added.
+
+The first silent native run, `build/smoke-v3-tree-states-01/`, passes 150 records
+and 100 assertions with restored state/checkpoint and clean exit. It clears the
+packet/cache and owner pointers in paused test memory, then enters the actual
+patched native growth function. Complete DMA/CRC loading succeeds with no owner.
+Native and selected gold growth/stump cases pass, including `INT_MAX` elapsed
+days. All four complete owners load and relocate, then their actual burial
+adapters pass sixteen selected/unselected/shovel/fruit/hole cases. Output bounds,
+positions, stack/fixture guards, zero fault, entire restored equipment module,
+and the final save/equipment guards all pass.
+
+- Results SHA-256:
+  `8ff7da4f69f33bcf9cdd7cac7351008ddbc80a357dd54ab307c97dd844a7787e`.
+
+The profile bit is enabled only in paused test RAM and restored; no user save or
+served patcher is changed. The fixture calls burial helpers, not the complete
+ordinary burial interaction. No GPU appearance, daily-growth cycle, save/restart,
+or original-hardware claim is added. Reuse unchanged seasonal resource/render
+evidence without replaying old builds. The next owner is `m_all_grow_ovl`, VROM
+`00970920`, relocation `009754A0`, linked RAM `80AB07C0`, loaded pointer `80100C5C`;
+its existing imported-house protection edits must survive the growth extension.
+
+Format 3 retains matching/equal-or-larger profile requirements. Imported saves
+must not be loaded in V2 or older format-1/2 V3 builds; preserve backups.
+The main ABI-109 lock remains
+`f69d44334f40335c687816ece1abf0f0d1d213ccfb52bbb433f889ff606428ef`.
+Both served patchers, existing builds/saves, and all 128 choices remain unchanged.
+See [shared scenery](../../specs/V3_SCENERY.md#shared-planting-and-tree-state-rules).
+
 ## Shared seasonal scenery runtime
 
 The ABI-149 proposal is `build/v3-shared-scenery-04/build-lock.json`. The shared

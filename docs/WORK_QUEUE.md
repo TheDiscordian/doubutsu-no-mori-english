@@ -2,8 +2,8 @@
 
 ## Active: V3 optional GameCube imports
 
-The current explicit proposal is ABI 149,
-`build/v3-shared-scenery-04/build-lock.json`. All eight balloons are
+The current explicit proposal is ABI 150,
+`build/v3-shared-tree-states-02/build-lock.json`. All eight balloons are
 connected through shared source-derived parent records, room profiles, indoor
 conversion/pickup, collection/catalogue, complete icons, and optional selection.
 There are 128 experimental choices, with 24 equipment parents. Neither served
@@ -43,8 +43,17 @@ assertions for all four loaders, 56 type cases, actual body drawing, guards,
 restored state/checkpoint, and clean exit. It does not prove GPU appearance or
 ordinary gameplay. Reuse this evidence and `build/v3-scenery-gold-tree-01/`;
 do not reconvert or replay unchanged seasonal components.
-Next connect native world collision, planting, growth/death, cutting/shaking,
-and the selected shovel drop. Preserve
+Shared core growth/stump helpers and all four shovel-planting conversions are
+installed from complete source rules. Lazy loading works before a seasonal actor
+exists. No RAM, scene allocation, save field, or choice is added. Four focused
+checks pass; the first silent native run passes 150 records and 100 assertions,
+including actual core dispatch, all four loaded burial helpers, native fallbacks,
+guards, restored state/checkpoint, and clean exit. Reuse this component evidence;
+it is not ordinary planting or daily-growth verification.
+Next connect the daily-growth owner at VROM `00970920` (linked `80AB07C0`, loaded
+pointer `80100C5C`), retaining imported-house protections. Add gold-tree eligibility,
+neighbour/death rules, native world collision, full cutting/shaking, the planting
+sparkle, and the selected shovel drop. Preserve
 native scenery and the actual donor route; no arbitrary acquisition substitute.
 See [shared scenery](../specs/V3_SCENERY.md).
 Keep all four golden choices disabled pending those complete ordinary routes.

@@ -20,6 +20,7 @@ SOURCES = ('tools/v3_scenery_runtime.py', 'tools/v3_scenery.py',
            'overlays/v3/scenery.h', 'overlays/v3/scenery.c',
            'overlays/v3/scenery.ld', 'overlays/v3/scenery_bootstrap.c',
            'overlays/v3/scenery_bootstrap.ld', 'overlays/v3/scenery_palette.c',
+           'overlays/v3/scenery_trees.c', 'overlays/v3/scenery_trees.h',
            'tools/v3_asset_loader.py', 'translations/provenance.json')
 
 
@@ -341,3 +342,155 @@ def install(base, prior, blob, core, original, output, art_path):
     report=copy.deepcopy(old);report['scenery']=receipt
     report.update(sha256=sha256(module),crc32=zlib.crc32(module),additional_resident_bytes=RUNTIME_END-RUNTIME_RAM)
     return report,changes
+
+
+TREE_CONTRACTS={
+    'bg_item_fg_sub_tree_grow':(280,('b2ebf5ae218081b040b81e79e2554cd3b7d388555d76087e916dabb98f26de70',)),
+    'bg_item_fg_sub':(720,('3ffbead261c106ac1e79f2b6254334e0cafbfbc41c01d98fea671205a5abbc9a',)),
+    'bIT_common_bury_after':(496,(
+        '30ce1d551b95d0ed31ac7e232f46a72e8209752b66a336a3c623726f00c0ef6f',
+        '9f1a7b58e97782284590597ff983337fe0bbf8ce964271a179f02e4fd02063cf',
+        '28bc9af9a5fe106a65e01d2805f63f6cfc1bf4a8abc2c26e9e42ac35636ac930',
+        '178eafc4e48e52786ad9e8d9b857eff51a5713b734f7872eea3e7c1f4857eb89')),
+}
+
+
+def tree_rules(source):
+    """Complete donor consumers and actual growth/stump tables, not name rules."""
+    functions={}
+    for name,(size,hashes) in TREE_CONTRACTS.items():
+        offsets=sorted(at for at,rows in source.functions.items() if any(n==name for n,_ in rows))
+        if len(offsets)!=len(hashes): raise ValueError('Missing complete tree-state consumers')
+        functions[name]=[]
+        for at,digest in zip(offsets,hashes,strict=True):
+            raw,receipt=source.function(at)
+            if len(raw)!=size or sha256(raw)!=digest: raise ValueError('Changed complete tree-state consumer')
+            functions[name].append(receipt)
+    targets={name:{r[3] for r in rows[0]['relocations'].values() if r[2]==5}
+             for name,rows in functions.items()}
+    if targets['bg_item_fg_sub_tree_grow']!={0xD510} or targets['bg_item_fg_sub']!={0xD4F0}:
+        raise ValueError('Changed complete tree-state table references')
+    from v3_scenery import resource
+    grow=resource(source,0xD510,size=84*4);stump=resource(source,0xD4F0,size=4*4*2)
+    states=list(struct.iter_unpack('>hh',bytes.fromhex(grow['hex'])))[78:84]
+    stumps=[struct.unpack_from('>H',bytes.fromhex(stump['hex']),i*8+6)[0] for i in range(4)]
+    if states!=[(-1,0),(-1,1),(-1,2),(-1,3),(0,4),(0,4)] or stumps!=[0x7E,0x7D,0x7C,0x7B]:
+        raise ValueError('Changed golden-tree source stages or stump sizes')
+    return dict(functions=functions,tables=dict(growth=grow,stumps=stump),first=0x863,count=6,
+        hidden_first=0x7F,hidden_count=3,selected_item=0x223B,plant_item=0x2202,hole=0x5D,
+        growth=states,stumps=stumps,source_rel_sha256=sha256(source.rel),
+        source_symbols_sha256=sha256(source.symbols.encode()))
+
+
+def install_gameplay(base,prior,blob,core,original,output):
+    """Connect shared planting and tree-state primitives without enabling tools."""
+    from aflib import CODE_RAM,CODE_VROM,by_vrom
+    from apply_translation import write_new
+    from v3_asset_loader import ROOT,BLOB,compile_part
+    from v3_equipment_runtime import RAM
+    from v3_import_storage import jump
+    from v3_player_actions import native_references
+    from v3_npc_clothing import guard_incoming
+    old=prior['equipment_resources'];previous=old['scenery'];position=old['blob_offset']
+    module=bytearray(blob[position:position+old['bytes']])
+    if (previous.get('tree_states') or old['bytes']!=0x12000 or sha256(module)!=old['sha256']
+            or previous['ram']!=RUNTIME_RAM or previous['additional_fixed_resident_bytes']!=4096
+            or RUNTIME_END>prior['furniture']['bank_pool']['start']):
+        raise ValueError('Changed tree-state runtime dependency')
+    start=previous['blob_offset'];old_code=blob[start:start+previous['bytes']]
+    if sha256(old_code)!=previous['sha256'] or module[BOOT_END-RAM-4:BOOT_END-RAM]!=bytes(4):
+        raise ValueError('Changed scenery packet or occupied cache word')
+    source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+                  (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    rules=tree_rules(source);files,native=by_vrom(base),by_vrom(original);original_core=native[CODE_VROM].extract(original)
+    core_ranges=((0x800A5970,0x800A5A0C,'grow'),(0x800A56F0,0x800A5970,'stump'))
+    core_consumers=[]
+    for a,b,name in core_ranges:
+        at=a-CODE_RAM;data=bytes(core[at:b-CODE_RAM])
+        if data!=original_core[at:b-CODE_RAM]: raise ValueError('Changed complete native tree-state consumer')
+        guard_incoming(bytes(core),len(core),CODE_RAM,[(at,8)])
+        core_consumers.append(dict(name=name,start=a,end=b,sha256=sha256(data),before=data[:8].hex()))
+    layouts=[]
+    for variant,row in enumerate(previous['owners']):
+        data,rel=(files[row[k]].extract(base) for k in ('vrom','reloc'))
+        if sha256(data)!=row['output_sha256'] or sha256(rel)!=row['output_reloc_sha256']:
+            raise ValueError('Changed complete tree planting owner')
+        sections=struct.unpack_from('>5I',rel);original_owner=native[row['vrom']].extract(original)
+        begin,end=0x19A4,0x1B68
+        if data[begin:end]!=original_owner[begin:end] or data[begin:begin+8]!=bytes.fromhex('27bdffd8afa40028'):
+            raise ValueError('Changed complete native bury conversion')
+        groups,absolute,records,locations,slots=native_references(data,rel,expected_sections=sections[:4])
+        target=row['ram']+begin
+        calls=[at for at in range(0,sections[0],4) if u32(data,at)==jump(target,link=True)]
+        if len(calls)!=1 or any(v==target for v in absolute.values()) or any(v==target for lows in groups.values() for _,v in lows):
+            raise ValueError('Changed complete native bury consumer references')
+        if any(at not in slots or locations[at]>>24!=0x44 for at in calls):
+            raise ValueError('Missing native bury call relocation')
+        layouts.append((row,data,rel,records,locations,calls))
+    include='../'*len(output.relative_to(ROOT).parts)+'overlays/v3/scenery_trees.h'
+    config_source=f'#include "{include}"\nconst Scenery af_v3_scenery_config[4]={{\n'
+    config_source+=''.join(' {'+','.join(f'0x{v:X}u' for v in row['config'])+'},\n' for row in previous['owners'])+'};\n'
+    fields=[rules[k] for k in ('first','count','hidden_first','hidden_count','selected_item','plant_item','hole')]+[0]
+    config_source+='const TreeRule af_v3_tree_rule={'+','.join(f'0x{v:X}' for v in fields)+',\n {'
+    config_source+=','.join('{'+','.join(str(v) for v in stage)+'}' for stage in rules['growth'])+'},\n {'
+    config_source+=','.join(str(v) for v in rules['stumps'])+'}};\n'
+    config_source+='const u32 af_v3_tree_bury_offsets[4]={0x19A4,0x19A4,0x19A4,0x19A4};\n'
+    config_path=output/'scenery-config.c';write_new(config_path,config_source.encode())
+    code,compiled=compile_part('scenery',output/'scenery',extra_sources=(
+        'overlays/v3/scenery_trees.c',str(config_path.relative_to(ROOT))))
+    reservation=previous['reservations'][0]
+    if len(code)>RUNTIME_END-RUNTIME_RAM or start+len(code)>reservation['blob_offset']+reservation['bytes']:
+        raise ValueError('Tree-state code exceeds reserved memory or cartridge storage')
+    if any(blob[start+len(old_code):start+len(code)]) and start+len(code)>start+len(old_code):
+        # Bytes after the old packet are the checked retired module, not empty
+        # padding. The entire reservation was already retained as live storage.
+        pin=reservation['predecessor_report'];raw=(ROOT/pin).read_bytes()
+        if sha256(raw)!=reservation['predecessor_report_sha256']:
+            raise ValueError('Changed full retired-module reservation evidence')
+    boot,bootstrap=compile_part('scenery_bootstrap',output/'scenery_bootstrap',defines=(
+        'AF_V3_SCENERY_TREES',f'AF_SCENERY_VROM=0x{BLOB+start:X}u',f'AF_SCENERY_BYTES={len(code)}u',
+        f'AF_SCENERY_CRC=0x{zlib.crc32(code):X}u',
+        f'AF_SCENERY_GROW=0x{compiled["symbols"]["af_v3_tree_grow"]:X}u',
+        f'AF_SCENERY_STUMP=0x{compiled["symbols"]["af_v3_tree_stump"]:X}u'))
+    if (len(boot)>BOOT_END-BOOT_RAM-4 or bootstrap['symbols']['af_v3_native_tree_grow']!=0x804ADFC0
+            or bootstrap['symbols']['af_v3_native_tree_stump']!=0x804ADFD0):
+        raise ValueError('Tree-state bootstrap exceeds its fixed contract')
+    # Before replacing the complete owned prefix, retain its original code and
+    # verify all remaining bytes are the previously unused zeros.
+    bstart=BOOT_RAM-RAM;n=previous['bootstrap']['bytes']
+    if sha256(module[bstart:bstart+n])!=previous['bootstrap']['sha256'] or any(module[bstart+n:BOOT_END-RAM]):
+        raise ValueError('Changed bootstrap code or occupied owned suffix')
+    module[bstart:BOOT_END-RAM]=boot+bytes(BOOT_END-BOOT_RAM-len(boot))
+    blob[start:start+len(code)]=code
+    owners=[];changes={};planting=[]
+    for variant,(row,old_data,old_rel,records,locations,calls) in enumerate(layouts):
+        data=bytearray(old_data);rel=bytearray(old_rel);patches=[];profile=u32(rel,0)
+        edits=[(profile+16,bootstrap['symbols']['af_v3_scenery_'+row['role']]),
+            (0x47A8,jump(compiled['symbols'][f'af_v3_scenery_type{variant}']))]
+        edits += [(at,jump(compiled['symbols'][f'af_v3_tree_bury{variant}'],link=True)) for at in calls]
+        for at,after in edits:
+            patches.append(dict(offset=at,before=u32(data,at),after=after));struct.pack_into('>I',data,at,after)
+        removed={locations[at] for at in calls};kept=[r for r in records if r not in removed]
+        struct.pack_into('>I',rel,16,len(kept))
+        rel[20:-4]=struct.pack('>'+str(len(kept))+'I',*kept)+bytes(len(rel)-24-4*len(kept))
+        updated=copy.deepcopy(row);updated.update(before_sha256=sha256(old_data),before_reloc_sha256=sha256(old_rel),
+            output_sha256=sha256(data),output_reloc_sha256=sha256(rel),patches=patches)
+        owners.append(updated);changes[row['vrom']]=bytes(data);changes[row['reloc']]=bytes(rel)
+        planting.append(dict(role=row['role'],entry=0x19A4,end=0x1B68,native_sha256=sha256(old_data[0x19A4:0x1B68]),
+            calls=calls,removed_relocations=sorted(removed)))
+    for row in core_consumers:
+        at=row['start']-CODE_RAM;after=jump(bootstrap['symbols']['af_v3_tree_'+row['name']+'_dispatch'])
+        struct.pack_into('>2I',core,at,after,0);row['after']=struct.pack('>2I',after,0).hex()
+    blob[position:position+len(module)]=module
+    current=copy.deepcopy(previous)
+    current.update(owners=owners,code=compiled,bytes=len(code),sha256=sha256(code),crc32=zlib.crc32(code),
+        bootstrap=bootstrap,config_sha256=sha256(config_source.encode()))
+    current['tree_states']=dict(source=rules,core_consumers=core_consumers,planting=planting,
+        cache_word=0x804ADFEC,shared_packet_bytes=len(code),growth_and_stumps_installed=True,
+        planting_conversion_installed=True,daily_growth_owner_installed=False,collision_installed=False,
+        shake_drop_installed=False,planting_effect_installed=False,additional_resident_bytes=0,
+        saved_format_changed=False,choices_enabled=0,native_test='pending')
+    current['reservations'][0]['used_bytes']=start+len(code)-reservation['blob_offset']
+    result=copy.deepcopy(old);result['scenery']=current
+    result.update(sha256=sha256(module),crc32=zlib.crc32(module),additional_resident_bytes=0)
+    return result,changes

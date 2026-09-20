@@ -4,12 +4,104 @@ from pathlib import Path
 import struct
 from types import SimpleNamespace
 
-from aflib import by_vrom,sha256,u32
+from aflib import CODE_RAM,CODE_VROM,by_vrom,sha256,u32
 from npc_mail_show import relocate_verified_data
 from runtime_layout import MODULE_RAM,TEST_STACK
 from v3_asset_loader import BLOB
 from v3_import_storage import jump
 from v3_npc_draw_smoke import boot_proofs
+
+
+def tree_states(debug,rom_path,record):
+    """Actual lazy loading and shared helpers, not an ordinary world playthrough."""
+    path=Path(rom_path);image=path.read_bytes();report=json.loads((path.parent/'build.json').read_bytes())
+    if sha256(image)!=report['output_sha256']:raise ValueError('Changed tree-state cartridge')
+    equipment=report['equipment_resources'];r=equipment['scenery'];t=r['tree_states'];files=by_vrom(image)
+    blob=files[BLOB].extract(image);core=files[CODE_VROM].extract(image);boot=boot_proofs(image);assertions=0
+    for row in t['core_consumers']:
+        a,b=row['start'],row['end'];boot[a]=(a,core[a-CODE_RAM:b-CODE_RAM])
+    def check(label,at,want):
+        nonlocal assertions
+        got=debug.read_memory(at,len(want));passed=got==want
+        record(dict(tree_state_check=label,address=f'{at:08X}',bytes=len(want),
+            expected_sha256=sha256(want),observed_sha256=sha256(got),assertion='passed' if passed else 'failed'))
+        if not passed:raise ValueError('Tree-state mismatch: '+label)
+        assertions+=1
+    def call(at,args=(),proof=None,want=None):
+        result=debug.call(f'{at:08X}',[v&0xFFFFFFFF for v in args],
+            return_address=MODULE_RAM+0x6480,verified_code=proof or boot.get(at))
+        if want is not None:result['assertion']='passed' if result['return_value']==want else 'failed'
+        record(result)
+        if want is not None and result['return_value']!=want:raise ValueError('Tree-state native return mismatch')
+        return result['return_value']
+    def put(at,*values):debug.write_memory(at,struct.pack('>'+'I'*len(values),*values))
+    saved={at:debug.read_memory(at,n) for at,n in [(o['config'][0],4) for o in r['owners']]+
+        [(r['ram'],4096),(t['cache_word'],4),(0x80460020,192),(TEST_STACK-0x800,16),(TEST_STACK+0x40,16)]}
+    module=debug.read_memory(equipment['ram'],equipment['bytes'])
+    size=0x15000;allocation=call(0x8009BFC0,[size])
+    if allocation&15 or not MODULE_RAM+0x8000<=allocation<=0x80400000-size:
+        raise ValueError('Tree-state fixture allocation failed')
+    root=allocation+16;bridge=allocation+0x14000;output=allocation+0x14100;position=output+64
+    edge=b'AFTS'*4;guards=[allocation,bridge-16,output-16,output+16,allocation+size-16,TEST_STACK-0x800,TEST_STACK+0x40]
+    debug.write_memory(allocation,bytes(size))
+    for at in guards:debug.write_memory(at,edge)
+    parent=next(x for x in equipment['player_actions']['equipment_selection']['rows'] if x['item_id']=='223B')
+    def select(enabled):
+        profile=bytearray(saved[0x80460020]);profile[parent['profile_byte']]&=~parent['profile_mask']
+        if enabled:profile[parent['profile_byte']]|=parent['profile_mask']
+        debug.write_memory(0x80460020,profile)
+    def resident(name,args=(),want=None):
+        stub=struct.pack('>2I',jump(r['code']['symbols'][name]),0)
+        debug.write_memory(bridge,stub);call(0x8002FE00,[bridge,8]);call(0x80034CE0,[bridge,8])
+        return call(bridge,args,(bridge,stub),want)
+    try:
+        # Town loading can query growth before the first seasonal actor exists.
+        for owner in r['owners']:put(owner['config'][0],0)
+        debug.write_memory(r['ram'],bytes(4096));put(t['cache_word'],0);select(False)
+        call(0x8002FE00,[r['ram'],4096]);call(0x80034CE0,[r['ram'],4096])
+        call(0x800A5970,[0x800,0,4],want=0x801)
+        code=blob[r['blob_offset']:r['blob_offset']+r['bytes']]
+        check('first native growth query loads entire packet without an owner',r['ram'],code)
+        check('successful CRC cached',t['cache_word'],struct.pack('>I',r['crc32']))
+        call(0x800A56F0,[0x804,0],want=4)
+        call(0x800A5970,[0x863,3,4],want=0x863)
+        call(0x800A56F0,[0x864,0],want=0x864)
+        select(True)
+        for item,days,cap,want in ((0x863,-1,4,0x863),(0x863,0,4,0x864),
+                (0x863,2,4,0x866),(0x863,3,4,0x867),(0x863,100,2,0x865),
+                (0x863,0x7FFFFFFF,4,0x867),(0x868,100,4,0x868),(0x869,3,4,0x869)):
+            call(0x800A5970,[item,days,cap],want=want)
+        for item,want in ((0x863,0x863),(0x864,0x7B),(0x865,0x7C),(0x866,0x7D),
+                          (0x867,0x7E),(0x868,0x7E),(0x7F,0x7E),(0x80,0x7E),(0x81,0x7E)):
+            call(0x800A56F0,[item,0],want=want)
+        call(0x800A56F0,[0x864,1],want=0x864)
+        call(0x800A5970,[0x800,0,4],want=0x801)
+        for variant,o in enumerate(r['owners']):
+            owner,rel=(files[o[k]].extract(image) for k in ('vrom','reloc'))
+            sections=struct.unpack_from('>5I',rel);n=o['resident_bytes']
+            if root+n+len(rel)>=bridge-16:raise ValueError('Tree-state owner overlaps fixture')
+            loaded=relocate_verified_data(SimpleNamespace(ram=o['ram'],resident_bytes=n,sections=sections),owner,rel,root)
+            call(0x800262D0,[o['vrom'],o['vrom']+len(owner),o['ram'],o['ram']+n,root,root+n,len(rel)])
+            check(o['role']+' complete loaded planting owner',root,loaded);put(o['config'][0],root)
+            cases=((True,0x2202,0x5D,0x863,1),(False,0x2202,0x5D,0x2202,0),
+                   (True,0x2202,0,0x2202,0),(True,0x2800,0,0x805,1))
+            for enabled,item,hole,want,action in cases:
+                select(enabled);debug.write_memory(output,b'?'*16)
+                xyz=struct.pack('>3f',1,2,3);debug.write_memory(position,xyz)
+                resident(f'af_v3_tree_bury{variant}',[item,hole,position,output+2],action)
+                check(o['role']+' bounded bury result',output,b'??'+struct.pack('>H',want)+b'?'*12)
+                check('bury position unchanged',position,xyz)
+        check('loaded shared code unchanged',r['ram'],code)
+        for at in guards:check('fixture guard',at,edge)
+        check('no faulted thread',0x8003CE34,bytes(4))
+    finally:
+        for at,data in saved.items():debug.write_memory(at,data)
+        call(0x8002FE00,[r['ram'],4096]);call(0x80034CE0,[r['ram'],4096]);call(0x8009C040,[allocation])
+    for at,want in saved.items():check('restored original state',at,want)
+    check('entire resident equipment module restored',equipment['ram'],module)
+    return dict(assertions=assertions,owner_loads=4,planting_cases=16,lazy_loading_before_owner=True,
+        code_uploaded=False,profile_enabled_only_in_paused_ram=True,ordinary_acquisition_tested=False,
+        requires_checkpoint_restore=True)
 
 
 def exercise(debug,rom_path,record):

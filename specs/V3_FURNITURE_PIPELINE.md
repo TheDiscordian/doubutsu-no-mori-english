@@ -30,7 +30,11 @@ dependency, not a selectable item or completed acquisition. Use
 `convert --representation scenery --category gold-tree --assets-only`;
 the shared `--refresh-runtime --scenery-art` installer connects owner-local
 banks, descriptors, palette updates, and classification to all four native
-renderers. Planting/growth/drop and world collision remain required. See
+renderers. The subsequent `--refresh-runtime --scenery-gameplay` stage connects
+shared source-table growth/stump helpers and selected shovel planting conversion
+to all four seasons, with lazy code loading before a seasonal actor exists.
+Daily-growth eligibility/death, planting effects, full cutting/shaking/drop, and
+world collision remain required. See
 [seasonal scenery](V3_SCENERY.md).
 
 The shared flying-balloon category installs one complete donor state machine

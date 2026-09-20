@@ -18,8 +18,21 @@ served patchers retain their existing builds.
 
 ## Active development
 
-Shared seasonal scenery is installed in ABI 149 at
-`build/v3-shared-scenery-04/build-lock.json`. All fourteen gold-tree foreground
+Shared planting and tree-state rules are installed in ABI 150 at
+`build/v3-shared-tree-states-02/build-lock.json`. Shovel burial in a shining hole
+uses the donor's gold-sapling conversion in all four seasonal owners. Core
+growth/stump queries use complete donor tables for selected gold trees and retain
+the original routines for native families. The code loads safely before any
+seasonal actor exists and fits the existing reservations: no added RAM, scene
+allocation, saved fields, or choices. Four focused checks pass. The first silent
+native component run passes 150 records and 100 assertions, including lazy loading,
+all four burial helpers, native fallbacks, guards, restored state/checkpoint, and
+clean exit. It is not a full planting interaction, daily-growth, or hardware test.
+Next connect the daily-growth owner, neighbour/death rules, collision,
+cutting/shaking, planting effect, and selected shovel drop. Golden choices remain
+disabled. See the [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-planting-and-tree-state-runtime).
+
+The proposal retains shared seasonal scenery. All fourteen gold-tree foreground
 states use complete owner-local models, positions, descriptors, palettes, and
 shadow dependencies. Each loaded season adds 32,864 bytes; a 4,096-byte fixed
 reservation holds shared code. Verified retired cartridge storage avoids growing
@@ -31,13 +44,13 @@ passes 237 records and 122 assertions, including all four seasonal loads, all
 56 selected type records, safe unselected/native fallbacks, actual body drawing,
 memory guards, restored state/checkpoint, and clean exit. This is not GPU
 appearance, ordinary acquisition, or hardware proof. Reuse the prepared assets
-and this evidence. Next connect world collision, planting/growth/death,
-cutting/shaking, and the selected shovel drop. Golden choices stay disabled.
+and this evidence. Daily growth/death, world collision, full cutting/shaking,
+planting effects, and the selected shovel drop remain. Golden choices stay disabled.
 The main lock and both served patchers remain unchanged. See the
 [scenery specification](../specs/V3_SCENERY.md) and
 [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-seasonal-scenery-runtime).
 
-The current explicit ABI-149 proposal retains the complete balloon integration.
+The current explicit ABI-150 proposal retains the complete balloon integration.
 All eight balloons are
 connected through the shared parent-category installer: official names/prices,
 complete pocket icons, held/inventory animation, source acquisition records,
