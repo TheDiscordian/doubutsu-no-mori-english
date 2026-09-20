@@ -91,7 +91,7 @@ The equipment module retains its size and guards. Its
 `804ADC90..804ADFEF` range contains an 848-byte bootstrap and native fallback
 stubs, bounded before the retained guard at `804ADFF0`. A four-byte cache word
 at `804ADFEC` starts clear in the startup-loaded module. The bootstrap transfers
-and verifies the 5,948-byte shared code packet into the reserved
+and verifies the 6,812-byte shared code packet into the reserved
 `804B5000..804B6FFF` range, flushes the instruction cache, and records the verified
 CRC. Constructors then prepare the native/held table and load the active scenery
 bank. Tree queries can load the same packet before any seasonal actor exists;
@@ -126,7 +126,7 @@ held-category hooks. Disabled imported foreground IDs resolve the native empty
 row rather than indexing beyond a native table. Save/profile restrictions still
 apply; this fallback does not authorise removing imports from a saved world.
 
-The explicit ABI-151 proposal is `build/v3-shared-tree-daily-01/build-lock.json`.
+The explicit ABI-152 proposal is `build/v3-shared-tree-contents-01/build-lock.json`.
 It uses an 8,192-byte fixed reservation and 32,864 bytes per loaded seasonal owner.
 All existing 128 experimental choices and format-3 saves remain unchanged.
 The main ABI-109 lock and both served V2 patchers stay unchanged. Component tests
@@ -203,7 +203,8 @@ each removal. Gold candidates become the gold dead-sapling identity. The source'
 eight-bit tree/candidate counters, including their full-acre wrap, remain intact.
 Existing native routines handle unselected profiles.
 
-The packet grows to 5,948 bytes within an 8,192-byte reservation, adding 4 KiB.
+Daily growth requires an 8,192-byte reservation, 4 KiB beyond tree-state loading.
+The current packet includes hidden-content handling and occupies 6,812 bytes.
 The bootstrap still occupies 848 bytes. All complete scenery banks, daily owner
 and relocation sizes, equipment module, save/profile fields, and choices remain
 unchanged. Existing reserved retired cartridge storage holds the larger packet;
@@ -220,14 +221,49 @@ growth/death, mixed native/imported neighbours, cross-acre rules, actual RNG
 thinning, guards, and restoration. Full live-town renewal, ordinary acquisition,
 save/restart, rendered appearance, and original hardware remain unverified.
 
+## Hidden contents and daily refilling
+
+The same daily-owner refresh connects recording, counting, and random replacement
+through eight existing calls/table references. Four internal relocation records
+are removed; calls to original core helpers have no internal relocation. Original
+record wrappers retain native `GrowInfo` offsets, and both daily callback arrays
+use the new Bell-tree counter. The complete bee, furniture, and Bell schedulers
+remain native, preserving the five-column town layout, five bee trees, two
+furniture trees, thirty Bell trees, occupied-column records, and random draws.
+
+Thirteen complete donor functions and all four three-family tables bind source
+identities and selection rules. Nine complete native owner functions plus the
+complete core count/change helpers bind native consumers. Only ordinary trees
+and selected spent gold trees (`0868`) are eligible. Replacements preserve their
+family, with gold Bell/furniture/bee identities `007F/0080/0081`. Shovel-bearing
+trees (`0867`), saplings, dead trees, and existing hidden contents are not refill
+candidates. The GameCube cedar column remains documented source data; this
+gold-tree dependency does not implicitly change native cedar behaviour.
+
+Existing hidden gold contents contribute to the native records and totals.
+Refilling uses the source's one random choice per changed tree, retaining native
+eight-bit acre counts. Unselected profiles and unrelated target kinds use native
+behaviour. Core helpers themselves remain untouched, preserving holiday users.
+No additional memory, owner allocation, save/profile field, or choice is added.
+
+Host sanitizer tests cover every sixteen-bit identity, selected/unselected
+records, guarded writes, mixed-family selection, protected trees, null acreage,
+counter widths, and fallback. Cartridge checks cover actual references and
+relocations, full native scheduler retention, memory reservations, unchanged
+artwork/saves, optional composition, and original-ROM patch reconstruction.
+The silent native component check executes actual recording and refill routines
+on a temporary mixed grove. It verifies native quotas/distribution, both tree
+families, duplicate prevention, native RNG, source identity retention, guards,
+and complete world/RNG/profile/checkpoint restoration. No user save is modified.
+Full renewal, ordinary shaking/drop, rendered appearance, and hardware remain
+unverified.
+
 ## Remaining gameplay integration
 
 Reuse the installed renderer, planting conversion, tree-state helpers, and daily
-growth/death/neighbour/thinning consumers. Daily hidden-content recording and
-replenishment still need to include spent gold trees with the donor's actual
-bee/furniture/Bell rules. World collision, full cutting/shaking, the planting
-sparkle, and the selected shovel drop also remain required. The source plants an ordinary
-shovel in a shining hole; do not
+growth/death/neighbour/thinning and hidden-content consumers. World collision,
+full cutting/shaking, the planting sparkle, and the selected shovel drop remain
+required. The source plants an ordinary shovel in a shining hole; do not
 substitute shop stock, arbitrary letters, recoloured ordinary trees, or seeded
 pockets for this route. Existing celebration and collection consumers remain
 installed, but all four golden choices stay disabled until their routes work.

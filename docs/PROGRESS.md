@@ -18,17 +18,29 @@ served patchers retain their existing builds.
 
 ## Active development
 
-Shared daily tree growth is installed in ABI 151 at
-`build/v3-shared-tree-daily-01/build-lock.json`. The actual daily owner connects
+Shared hidden tree contents are installed in ABI 152 at
+`build/v3-shared-tree-contents-01/build-lock.json`. Spent gold trees participate
+in native daily bee, furniture, and Bell recording/refilling without changing
+ordinary trees, spawn limits, or saved formats. Four focused checks pass. The
+first silent native run passes 75 records and 50 assertions: the real schedulers
+populate a temporary mixed grove, preserve families and shovel-bearing trees,
+avoid duplicate refills, and restore the complete world/RNG/profile/checkpoint.
+The packet is 6,812 bytes within the existing 8-KiB reservation; no allocation
+grows. Next connect world collision, full cutting/shaking/drop, and planting
+effects. Golden choices remain disabled. See the
+[checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-hidden-tree-contents).
+
+Shared daily tree growth remains installed. The actual daily owner connects
 gold-tree growth/death, mixed native/imported neighbours across acre boundaries,
 sapling recording/counting, and source-priority overcrowding removal. Native
 functions and imported-house protections remain intact. Four focused checks
 pass; the first silent native component run passes 97 records and 75 assertions,
-with restored state/checkpoint and clean exit. It executes daily-entry loading and isolated-acre consumers, not
+with restored state/checkpoint and clean exit. It executes daily-entry loading
+and isolated-acre consumers, not
 a full live-town renewal or hardware test. The shared code reservation adds 4 KiB;
 assets, owner sizes, saves, and all 128 choices remain unchanged. Next connect
-world collision, cutting/shaking/drop, planting effects, and hidden-content
-replenishment. Golden choices stay disabled. See the
+world collision, cutting/shaking/drop, and planting effects. Hidden-content
+replenishment is connected. Golden choices stay disabled. See the
 [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-daily-tree-growth).
 
 Shared planting and tree-state rules remain installed. Shovel burial in a shining hole
@@ -56,13 +68,13 @@ passes 237 records and 122 assertions, including all four seasonal loads, all
 56 selected type records, safe unselected/native fallbacks, actual body drawing,
 memory guards, restored state/checkpoint, and clean exit. This is not GPU
 appearance, ordinary acquisition, or hardware proof. Reuse the prepared assets
-and this evidence. World collision, full cutting/shaking, hidden-content
-replenishment, planting effects, and the selected shovel drop remain. Golden choices stay disabled.
+and this evidence. World collision, full cutting/shaking, planting effects, and
+the selected shovel drop remain. Golden choices stay disabled.
 The main lock and both served patchers remain unchanged. See the
 [scenery specification](../specs/V3_SCENERY.md) and
 [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-seasonal-scenery-runtime).
 
-The current explicit ABI-151 proposal retains the complete balloon integration.
+The current explicit ABI-152 proposal retains the complete balloon integration.
 All eight balloons are
 connected through the shared parent-category installer: official names/prices,
 complete pocket icons, held/inventory animation, source acquisition records,

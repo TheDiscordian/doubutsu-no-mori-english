@@ -35,8 +35,12 @@ shared source-table growth/stump helpers and selected shovel planting conversion
 to all four seasons, with lazy code loading before a seasonal actor exists.
 Its next shared stage connects the daily owner, growth/death, cross-acre neighbours,
 sapling records, and source-priority thinning. Native routines/house protections
-remain; only the shared code reservation grows by 4 KiB. Hidden-content
-replenishment, planting effects, full cutting/shaking/drop, and world collision
+remain; only the shared code reservation grows by 4 KiB. The next refresh reuses
+that installer to connect hidden bee/furniture/Bell recording and refilling.
+Complete donor tables supply the gold-family identities while original native
+acre scheduling, quotas, random selection, and unrelated holiday callers remain.
+This fits existing memory without reconverting assets or adding an item-specific
+installer. Planting effects, full cutting/shaking/drop, and world collision
 remain required. See
 [seasonal scenery](V3_SCENERY.md).
 

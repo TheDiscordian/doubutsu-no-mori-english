@@ -2,8 +2,8 @@
 
 ## Active: V3 optional GameCube imports
 
-The current explicit proposal is ABI 151,
-`build/v3-shared-tree-daily-01/build-lock.json`. All eight balloons are
+The current explicit proposal is ABI 152,
+`build/v3-shared-tree-contents-01/build-lock.json`. All eight balloons are
 connected through shared source-derived parent records, room profiles, indoor
 conversion/pickup, collection/catalogue, complete icons, and optional selection.
 There are 128 experimental choices, with 24 equipment parents. Neither served
@@ -57,9 +57,15 @@ families, adds 4 KiB shared code reservation, and changes no saves/choices or
 scene/owner allocations. Four focused checks and the first silent native
 component run pass (97 records, 75 assertions), with actual daily-entry loading, isolated acres, native RNG,
 guards, restored state/checkpoint, and clean exit. Reuse that evidence; a full
-live-town renewal is not tested. Next connect world collision, full cutting/
-shaking, planting sparkle, selected shovel drop, and daily hidden-content
-recording/replenishment for spent gold trees. Preserve
+live-town renewal is not tested. Hidden bee/furniture/Bell recording and refilling
+for spent gold trees are installed through the same daily-owner adapter. Four
+focused checks pass; the first silent native run passes 75 records and 50
+assertions, including the actual refill schedulers on a temporary mixed grove,
+native spawn limits/distribution, preserved tree families, duplicate prevention,
+unselected fallback, and full world/RNG/profile/checkpoint restoration. No extra
+allocation or saved field is needed. Reuse this evidence; shaking/drop and a
+complete live-town renewal remain untested. Next connect world collision,
+full cutting/shaking, planting sparkle, and the selected shovel drop. Preserve
 native scenery and the actual donor route; no arbitrary acquisition substitute.
 See [shared scenery](../specs/V3_SCENERY.md).
 Keep all four golden choices disabled pending those complete ordinary routes.

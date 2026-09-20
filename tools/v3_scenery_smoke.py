@@ -12,7 +12,7 @@ from v3_import_storage import jump
 from v3_npc_draw_smoke import boot_proofs
 
 
-def daily_growth(debug,rom_path,record):
+def daily_growth(debug,rom_path,record,*,contents=False):
     """Native daily consumers on isolated acres, preserving live town state."""
     path=Path(rom_path);image=path.read_bytes();report=json.loads((path.parent/'build.json').read_bytes())
     if sha256(image)!=report['output_sha256']:raise ValueError('Changed daily-growth cartridge')
@@ -36,6 +36,7 @@ def daily_growth(debug,rom_path,record):
     def short(at,value):debug.write_memory(at,struct.pack('>H',value))
     regions=[(0x80100C5C,4),(r['ram'],8192),(r['tree_states']['cache_word'],4),
         (0x80460020,192),(0x80126EB4,4),(0x8003C590,4),(0x800419F0,4),(TEST_STACK-0x800,16),(TEST_STACK+0x40,16)]
+    if contents:regions.append((0x8012D148,30*512))
     saved={at:debug.read_memory(at,n) for at,n in regions};module=debug.read_memory(e['ram'],e['bytes'])
     size=0x7000;allocation=call(0x8009BFC0,[size])
     if allocation&15 or not MODULE_RAM+0x8000<=allocation<=0x80400000-size:
@@ -47,6 +48,7 @@ def daily_growth(debug,rom_path,record):
     debug.write_memory(allocation,bytes(size))
     for at in guards:debug.write_memory(at,edge)
     helpers=['af_v3_tree_daily_plant','af_v3_tree_near','af_v3_tree_set_info','af_v3_tree_reset_info','af_v3_tree_thin']
+    if contents:helpers=['af_v3_tree_count_eligible','af_v3_tree_change_content','af_v3_tree_count_money']
     stubs=b''.join(struct.pack('>2I',jump(r['code']['symbols'][name]),0) for name in helpers)
     debug.write_memory(bridge,stubs);call(0x8002FE00,[bridge,len(stubs)]);call(0x80034CE0,[bridge,len(stubs)])
     def resident(name,args=(),want=None):return call(bridge+8*helpers.index(name),args,(bridge,stubs),want)
@@ -78,33 +80,37 @@ def daily_growth(debug,rom_path,record):
         debug.write_memory(0x80126EB4,saved[0x80126EB4])
         check('registered daily plant callback',root+0x4ABC,struct.pack('>I',r['code']['symbols']['af_v3_tree_daily_plant']))
         select(True)
-        for item,cap,days,want in ((0x863,4,0,0x863),(0x863,4,1,0x864),(0x864,4,3,0x867),
-                (0x863,2,5,0x865),(0x868,4,5,0x868),(0x863,0,1,0x869),(0x869,4,1,0),
-                (0x863,-1,1,0),(0x800,4,1,0x801)):
-            at=field(item,cap,days);resident('af_v3_tree_daily_plant',[at,info],1)
-            check('daily plant outcome',at,struct.pack('>H',want))
-        for current,near,want in ((0x863,0x804,0x869),(0x800,0x864,0x84E),(0x800,0x804,0x84E)):
-            at=field(current);short(at-2,near);resident('af_v3_tree_daily_plant',[at,info],1)
-            check('native/imported neighbours interact',at,struct.pack('>H',want))
-            check('neighbour identity never changed',at-2,struct.pack('>H',near))
-        for z,neighbour_value,present,want in ((1,0x863,True,0x869),(0,0x863,True,0x864),(1,0x867,False,0x864)):
-            at=field(0x863,x=0,z=z);debug.write_memory(adjacent,bytes(512))
-            short(adjacent+2*(z*16+15),neighbour_value);put(info+8,adjacent if present else 0)
-            resident('af_v3_tree_daily_plant',[at,info],1);check('cross-acre sapling rule',at,struct.pack('>H',want))
-        # Source thinning counts adult gold trees and removes native saplings
-        # first, then gold saplings, using the actual native RNG.
-        acre=[0x867]*32+[0x800,0x863]+[0]*222
-        debug.write_memory(cells,struct.pack('>256H',*acre));debug.write_memory(bits,bytes(32));put(counts,0)
-        resident('af_v3_tree_set_info',[bits,cells]);wanted=bytes(4)+b'\x00\x03'+bytes(26)
-        check('gold/native saplings recorded together',bits,wanted)
-        resident('af_v3_tree_reset_info',[bits,counts,counts+1,cells]);check('native and imported candidate counts',counts,b'\x01\x01\x00\x00')
-        resident('af_v3_tree_thin',[cells,bits,1,1]);acre[32:34]=[0x84E,0x869]
-        check('complete acre after two source-priority removals',cells,struct.pack('>256H',*acre));check('removed candidate flags',bits,bytes(32))
-        debug.write_memory(bits,wanted);put(counts,0);resident('af_v3_tree_reset_info',[bits,counts,counts+1,cells])
-        check('both dead sapling types leave the candidate set',bits,bytes(32));check('dead saplings are not counted',counts,bytes(4))
-        select(False);at=field(0x863);resident('af_v3_tree_daily_plant',[at,info],0)
-        check('unselected imported tree retains native fallback',at,struct.pack('>H',0x863))
-        check('complete loaded owner remains unchanged',root,loaded);check('shared packet remains unchanged',r['ram'],code)
+        if contents:
+            contents_cases(debug,record,call,resident,check,put,short,root,proof,info,cells,select)
+        else:
+            for item,cap,days,want in ((0x863,4,0,0x863),(0x863,4,1,0x864),(0x864,4,3,0x867),
+                    (0x863,2,5,0x865),(0x868,4,5,0x868),(0x863,0,1,0x869),(0x869,4,1,0),
+                    (0x863,-1,1,0),(0x800,4,1,0x801)):
+                at=field(item,cap,days);resident('af_v3_tree_daily_plant',[at,info],1)
+                check('daily plant outcome',at,struct.pack('>H',want))
+            for current,near,want in ((0x863,0x804,0x869),(0x800,0x864,0x84E),(0x800,0x804,0x84E)):
+                at=field(current);short(at-2,near);resident('af_v3_tree_daily_plant',[at,info],1)
+                check('native/imported neighbours interact',at,struct.pack('>H',want))
+                check('neighbour identity never changed',at-2,struct.pack('>H',near))
+            for z,neighbour_value,present,want in ((1,0x863,True,0x869),(0,0x863,True,0x864),(1,0x867,False,0x864)):
+                at=field(0x863,x=0,z=z);debug.write_memory(adjacent,bytes(512))
+                short(adjacent+2*(z*16+15),neighbour_value);put(info+8,adjacent if present else 0)
+                resident('af_v3_tree_daily_plant',[at,info],1);check('cross-acre sapling rule',at,struct.pack('>H',want))
+            # Source thinning counts adult gold trees and removes native saplings
+            # first, then gold saplings, using the actual native RNG.
+            acre=[0x867]*32+[0x800,0x863]+[0]*222
+            debug.write_memory(cells,struct.pack('>256H',*acre));debug.write_memory(bits,bytes(32));put(counts,0)
+            resident('af_v3_tree_set_info',[bits,cells]);wanted=bytes(4)+b'\x00\x03'+bytes(26)
+            check('gold/native saplings recorded together',bits,wanted)
+            resident('af_v3_tree_reset_info',[bits,counts,counts+1,cells]);check('native and imported candidate counts',counts,b'\x01\x01\x00\x00')
+            resident('af_v3_tree_thin',[cells,bits,1,1]);acre[32:34]=[0x84E,0x869]
+            check('complete acre after two source-priority removals',cells,struct.pack('>256H',*acre));check('removed candidate flags',bits,bytes(32))
+            debug.write_memory(bits,wanted);put(counts,0);resident('af_v3_tree_reset_info',[bits,counts,counts+1,cells])
+            check('both dead sapling types leave the candidate set',bits,bytes(32));check('dead saplings are not counted',counts,bytes(4))
+            select(False);at=field(0x863);resident('af_v3_tree_daily_plant',[at,info],0)
+            check('unselected imported tree retains native fallback',at,struct.pack('>H',0x863))
+        check('complete loaded owner code/data remains unchanged',root,loaded[:sum(sections[:3])] if contents else loaded)
+        check('shared packet remains unchanged',r['ram'],code)
         for at in guards:check('fixture guard',at,edge)
         check('no faulted thread',0x8003CE34,bytes(4))
     finally:
@@ -113,7 +119,61 @@ def daily_growth(debug,rom_path,record):
     for at,want in saved.items():check('restored original state',at,want)
     check('complete equipment module restored',e['ram'],module)
     return dict(assertions=assertions,daily_entry_lazy_load=True,actual_native_rng=True,
-        isolated_acres=True,full_town_renewal=False,ordinary_acquisition_tested=False,requires_checkpoint_restore=True)
+        isolated_acres=True,hidden_contents=contents,temporary_world_restored=contents,
+        full_town_renewal=False,ordinary_acquisition_tested=False,requires_checkpoint_restore=True)
+
+
+def contents_cases(debug,record,call,resident,check,put,short,root,proof,info,cells,select):
+    """Actual native scheduling on a temporary grove, restored by the caller."""
+    from collections import Counter
+    world=0x8012D148
+    initial=[]
+    for _ in range(30):initial.extend([0x804,0x868,0x804,0x868,0x867,0x863]+[0]*250)
+    debug.write_memory(world,struct.pack('>7680H',*initial));debug.write_memory(info,bytes(0x44))
+    put(0x8003C590,0x13579BDF)
+    # Both native callback arrays must reach the same new money counter.
+    for at in (0x4AA8,0x4AD4):
+        if debug.read_memory(root+at,4)!=debug.read_memory(root+0x4AA8,4):
+            raise ValueError('Daily content callback arrays disagree')
+    for native_offset,hidden,field in ((0xC6C,0x81,0x40),(0xCA8,0x80,0x41)):
+        short(cells,hidden);put(info+0x20,3)
+        call(root+native_offset,[cells,info],proof,1)
+        check('native callback records imported hidden content',info+field,b'\x08')
+    short(cells,0x7F);resident('af_v3_tree_count_money',[cells,info],1)
+    check('native money record offset',info+0x34,struct.pack('>I',1))
+    resident('af_v3_tree_count_eligible',[world],4)
+    # These are the cartridge's complete schedulers, not rewritten test loops.
+    call(root+0xEC0,[0],proof);call(root+0xF34,[0],proof);call(root+0x1110,[0],proof)
+    actual=struct.unpack('>7680H',debug.read_memory(world,30*512));totals=Counter(actual)
+    outcomes=(totals[0x5E]+totals[0x81],totals[0x5F]+totals[0x80],totals[0x69]+totals[0x7F])
+    record(dict(hidden_content_totals=dict(bees=outcomes[0],furniture=outcomes[1],bells=outcomes[2]),
+        assertion='passed' if outcomes==(5,2,30) else 'failed'))
+    if outcomes!=(5,2,30):raise ValueError('Native hidden-content quantities changed')
+    bee_columns=set();ftr_columns=set();native_changed=gold_changed=0
+    for i,(before,after) in enumerate(zip(initial,actual,strict=True)):
+        permitted={0x804,0x5E,0x5F,0x69} if before==0x804 else {0x868,0x81,0x80,0x7F} if before==0x868 else {before}
+        if after not in permitted:raise ValueError('Hidden content changed tree family or protected cell')
+        if before!=after:
+            native_changed+=before==0x804;gold_changed+=before==0x868
+        col=(i//256)%5
+        if after in (0x5E,0x81):bee_columns.add(col)
+        if after in (0x5F,0x80):ftr_columns.add(col)
+    if len(bee_columns)!=5 or len(ftr_columns)!=2 or not native_changed or not gold_changed:
+        raise ValueError('Mixed-tree native acre distribution missing')
+    record(dict(native_changed=native_changed,gold_changed=gold_changed,
+        bee_columns=sorted(bee_columns),furniture_columns=sorted(ftr_columns),assertion='passed'))
+    retained=debug.read_memory(world,30*512);seed=debug.read_memory(0x8003C590,4)
+    call(root+0xEC0,[0x3E],proof)
+    call(root+0xF34,[sum(1<<(x+1) for x in ftr_columns)],proof)
+    call(root+0x1110,[30],proof)
+    check('existing quantities prevent duplicate refill',world,retained)
+    check('no RNG consumed when quotas are met',0x8003C590,seed)
+    select(False);debug.write_memory(cells,bytes(512));short(cells,0x868);short(cells+2,0x804)
+    resident('af_v3_tree_count_eligible',[cells],1)
+    resident('af_v3_tree_change_content',[cells,0x5E,1])
+    check('unselected refill uses original native family',cells,struct.pack('>2H',0x868,0x5E))
+    debug.write_memory(info,bytes(0x44));short(cells,0x81);put(info+0x20,3)
+    call(root+0xC6C,[cells,info],proof,0);check('unselected hidden tree is not recorded',info+0x40,bytes(1))
 
 
 def tree_states(debug,rom_path,record):

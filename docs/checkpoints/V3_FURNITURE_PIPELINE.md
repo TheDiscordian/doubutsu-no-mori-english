@@ -1,5 +1,78 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared hidden tree contents
+
+The ABI-152 proposal is `build/v3-shared-tree-contents-01/build-lock.json`.
+The same shared scenery gameplay installer connects daily hidden-content
+recording, counting, and refilling for selected spent gold trees. It reuses the
+installed packet, bootstrap, owner lifetime, and seasonal banks; it adds no
+item-specific installer or selection. All native scheduling and quantities stay
+intact. Complete donor tables supply the gold identities, preserving ordinary
+trees and excluding saplings, dead trees, and trees still carrying a shovel.
+The donor's additional cedar behaviour is not imported implicitly.
+
+- ROM SHA-256:
+  `3da7cb11681c38f1288efb5f09d0ee55fe015ffe2ed3b082605ca4772b0391f7`.
+- Report SHA-256:
+  `48efde92a0d80fd97ded064667d13d6e3e63880579f2b4f2a51c0cbdff73151a`.
+- UPS SHA-256:
+  `5a85e2f25e195b22d5342986eacd89f334102a0b7c69a034d714c2c31f9c8b10`.
+
+Thirteen full donor functions, four complete source family tables, nine full
+native owner functions, and the complete core count/change helpers are checked.
+Eight actual owner call/table references connect four shared consumers. Only
+four internal relocation rows are removed; direct core calls have none. Both
+daily callback arrays use the new money counter. Native record wrappers retain
+their structure offsets; complete bee/furniture/Bell schedulers retain acre
+distribution, quotas, and random sampling. Original core/holiday users remain
+unchanged. All earlier growth, planting, native families, and imported-house
+protections remain installed.
+
+The packet is 6,812 bytes within its existing 8,192-byte reservation. The
+bootstrap remains 848 bytes; the equipment module remains 72 KiB. Complete
+seasonal banks, owner dimensions, scene allocations, save/profile fields, and
+128 experimental choices remain unchanged. Code fits the existing retired
+cartridge reservation without growing the import blob. No player-facing text
+is introduced; no new provenance entry is needed.
+
+Four focused tests pass in 6.351 seconds on the first invocation. Host
+AddressSanitizer/UBSan checks all sixteen-bit identities, record/count offsets,
+selected/unselected behaviour, complete acre counts, source-width wrap,
+mixed-family random choices, protected shovel trees/saplings, native fallbacks,
+and guarded writes. Cartridge checks bind complete source/native functions,
+actual callback inventory and relocation at two addresses, unchanged original
+schedulers and house protections, memory/storage bounds, complete patch
+reconstruction, retained save fields/choices, and exact V2-12 import-free output.
+
+The first silent native run, `build/smoke-v3-tree-contents-01/`, passes 75 records
+and 50 assertions, restores its checkpoint, and exits cleanly. Actual daily
+entry loading verifies the full packet. Native record wrappers and Bell-counter
+bindings execute with isolated structures. The real complete refill schedulers
+then process a temporary thirty-acre mixed grove, producing five bee trees, two
+furniture trees, and thirty Bell trees. Eighteen ordinary and nineteen gold trees
+change to their own family's hidden states. Bee contents occupy all five
+columns; furniture contents occupy two. Every sapling and shovel-bearing tree
+remains unchanged. Existing records/quotas prevent a second refill without
+consuming RNG. Unselected refill falls back to the actual native routine.
+
+All temporary world cells, original RNG, profile, owner pointer, packet/cache,
+scene selector, and test stack are restored and checked. Owner code/data and
+the whole equipment module remain intact; memory guards and zero fault pass.
+The owner's own scratch BSS is allowed to change during its normal scheduling.
+No user save is used or modified, and all emulator audio is disabled.
+New harness work took under ten minutes; no retry was needed.
+
+- Results SHA-256:
+  `ef60cd7aa2d81b3359915571562a2f8ad1a4370a595be5961bdcc5cefc929717`.
+
+This is not ordinary tree shaking, acquisition, a full live-town renewal,
+save/restart, GPU appearance, or hardware proof. Next connect world collision,
+cutting/shaking/drop, and planting effects. All four golden-tool choices remain
+disabled pending their complete source acquisition routes. No arbitrary reward
+substitute is introduced. Format-3 matching/equal-or-larger profile restrictions
+remain; imported saves must not be loaded in V2 or older format-1/2 V3 builds.
+Preserve backups. The main ABI-109 lock and both served patchers remain unchanged.
+
 ## Shared daily tree growth
 
 The ABI-151 proposal is `build/v3-shared-tree-daily-01/build-lock.json`. The shared
