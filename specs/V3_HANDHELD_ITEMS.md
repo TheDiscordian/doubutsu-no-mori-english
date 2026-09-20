@@ -1338,6 +1338,35 @@ the shovel comes from `GOLD_TREE_SHOVEL` in `bg_item_common.c_inc`. Their source
 reward animations and saved flags require native integration. Do not replace
 these routes with ordinary shop stock or enable a tool based on its assets alone.
 
+The native acquisition gap includes engine content, not only item substitutions:
+
+- All four native seasonal tree-drop tables contain thirteen eight-byte rows,
+  ending at `TREE_BELLS`. The corresponding donor tables contain 21 rows,
+  including `{0867,223B,0868,1}` for the shovel. Native tables are at linked
+  `808F58CC`, `809008A8`, `8090BCBC`, and `80916BF4`, in the existing shared
+  seasonal owner order. Their 104-byte hash is
+  `fd87cd02cbbb51ca8c00fa3effd9639010f7fe246ddc48eae6a3e1a149fb3847`.
+  The donor copies at `.data:04549C/0483FC/04B5CC/04E5CC` share the 168-byte hash
+  `5efec02170f3f9b95bbe34d1be9e4a7b5eee4355b4550994dd1df9ae52e48cce`.
+  Native header definitions for gold trees do not establish implemented tree
+  growth, rendering, or drops. Inspect and connect those consumers before
+  extending the table; changing its count alone would read unrelated constants.
+- The native actor table has no `Present_Demo`, `Present_Npc`, `Npc_Hem`, or
+  mayor actor entry. The donor present director registers the birthday villager
+  or mayor, waits for leaving-home and handover, then records the appropriate
+  trophy and requests the player celebration. `Birth_Control` is not evidence
+  of an equivalent gift-event actor. Shared scene/NPC event support is required.
+- Native collection completion uses its actual fish/insect bitfields; donor
+  counts cannot be copied into the N64 check. The donor's trophy receipt state
+  and `golden_items_collected` celebration state are separate from item catalogue
+  ownership. Preserve that distinction when extending persistent reward state.
+
+Next implement the shared reward celebration and its source animation/text/
+fanfare dependencies, then connect the event actors and acquisition conditions.
+Use the shared category installer and complete source records. Keep all four
+choices disabled until their full paths are connected; do not substitute a
+shop purchase, arbitrary letter, or unrelated NPC for a missing donor event.
+
 Wrapped representations `251F..2522` correspond in order to parents `2239..223C`.
 They are transport/field representations, not additional imports or pocket IDs.
 The donor's `sCCk_Check_ItemName_Possession` explicitly rejects wrapped aliases

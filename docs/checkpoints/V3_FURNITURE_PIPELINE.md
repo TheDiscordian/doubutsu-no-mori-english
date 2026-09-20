@@ -63,6 +63,24 @@ ordinary wrapped exchange/save gameplay, rendering, and hardware remain open.
 Imported saves still require matching or larger profiles and must not load in
 V2. Continue with shared reward implementation rather than replaying components.
 
+The following acquisition audit compares the four actual current seasonal
+owners with the complete donor tables. Each native table has thirteen rows,
+matching the first 104 donor bytes; the following twelve bytes are three `-1.0`
+floats, not additional rows. All four donor tables have 21 rows with identical
+168-byte contents, including the golden-shovel drop. The native actor table also
+lacks the donor gift director, masked gift NPC, Farley, and mayor entries.
+This changes the next action from looking for a direct existing reward hook to
+adding the required shared event support. The source director setup is
+`.text:113888`, 364 bytes, SHA-256
+`c1607d6b35ce0d49980c282e889b23e09cb162fa4c157e30eed087ce702395fb`;
+its retirement is `.text:113C34`, 208 bytes, SHA-256
+`14fa1ac18871adfdcefc1c880370700ab5ecbbd25efe271810611baec2834ab6`.
+Farley's reward callback is `.text:2225F0`, 84 bytes, SHA-256
+`552e62284912d7431dfa6cf3e44fe05d1f984c56fbd85d6f75e5b312b61c1511`.
+No runtime reward is installed by this audit. The next shared batch needs the
+celebration dependencies, followed by real event/tree routes and persistent
+reward state; existing collection ownership is not equivalent to trophy receipt.
+
 ## Shared wrapped-gift transport
 
 The explicit ABI-137 proposal is

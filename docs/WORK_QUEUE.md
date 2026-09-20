@@ -121,7 +121,12 @@ The complete parent records already preserve active/passive differences, room
 identities, ownership, previews, and icons; do not rebuild per-item installers.
 The donor's net/rod rewards use collection completion and the present-demo actor;
 the axe uses the perfect-town reward, and the shovel uses the gold-tree route.
-Inspect the native counterparts before choosing hooks. Keep source conditions,
+The native tree-drop tables stop at thirteen rows and have no golden-shovel row;
+the native actor list lacks the donor's gift-event actors. Header definitions
+alone do not prove those systems exist. Implement shared celebration resources/
+callbacks and then the required scene/NPC/tree support, using the
+[native-gap audit](../specs/V3_HANDHELD_ITEMS.md#golden-tool-acquisition-and-wrapped-identities).
+Keep source conditions,
 official dialogue, selected-profile rejection, and saved reward state explicit.
 `parent_readiness` keeps active parents pending until these consumers exist;
 resource installation alone must not enable them. Golden tool parents retain
