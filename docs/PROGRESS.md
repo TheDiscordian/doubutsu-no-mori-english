@@ -18,21 +18,23 @@ served patchers retain their existing builds.
 
 ## Active development
 
-The current explicit proposal is ABI 159 at
-`build/v3-room-categories-runtime-03/build-lock.json`. One shared room engine
-supports switch-driven rigs, live clock hands, and native storage callbacks.
-The eight installed balloon rows remain intact; both complete Harvest storage
-rigs are installed but await ordinary profiles/acquisition. Five focused checks
-pass. Native execution passes 92 component assertions plus restored-checkpoint
-CPU/module guards; its final save-guard check uses a stale test address and is
-not a complete scenario pass. The corrected final guard is not rerun. See the
-[runtime checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-room-category-runtime).
+The current explicit proposal is ABI 161 at
+`build/v3-clock-category-runtime-02/build-lock.json`. The shared import reservation
+has 2,060,768 free bytes after installing all fifteen complete clock models.
+The room engine serves 25 records: eight balloons, two storage rigs, and fifteen
+clocks. Clock/storage ordinary profiles and acquisition remain required; resources
+alone do not make them selectable. No additional resident memory or saved format
+is needed for this batch.
 
-Next expand general cartridge resource storage for bulk imports: the contiguous
-import region has 2,800 free bytes, and complete clock resources exceed available
-retired storage. Keep protected English resources intact and validate their
-consumers if relocation is necessary. The main ABI-109 lock and both served
-patchers remain unchanged. Gold-tree effects/acquisition follow primary imports.
+Four focused host/cartridge checks pass. The silent focused native run passes
+153 assertions, including the corrected final-string DMA boundary, three complete
+clock rig representatives, live hand angles, guards, state restoration, and clean
+exit. Earlier passing relocated-text checks are retained without replaying them.
+Ordinary acquisition, room gameplay, GPU appearance, and hardware remain unverified.
+Continue shared conversion/integration and acquisition categories. The main ABI-109
+lock and both served patchers remain unchanged. Required gold-tree leaf/cut effects
+and full golden-shovel acquisition follow the primary importing work. See the
+[storage/clock checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#bulk-storage-and-complete-clock-installation).
 
 The shared open/close category prepares both Harvest storage objects, retaining
 complete models, skeletons, animations, source interaction flags, and opening
@@ -54,8 +56,9 @@ See the [sound-category checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#switch-
 All fifteen station models have complete prepared artwork, skeletons, and motions
 through the shared indexed-clock category at `build/v3-indexed-clock-rigs-prepared-01/`.
 One compiler container handles the whole batch. Source clock-hand rules and live
-time dependencies are recorded explicitly; complete resource installation and
-acquisition support remain pending. Three converter checks pass, including complete graphics/motion
+time dependencies are recorded explicitly; complete resources and the shared clock
+runtime are installed in the current proposal. Ordinary profiles/acquisition remain
+pending. Three converter checks pass, including complete graphics/motion
 comparisons and refusal to install unfinished records. No ROM or choices change.
 See the [clock-rig checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#indexed-looping-clock-rigs).
 

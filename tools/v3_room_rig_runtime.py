@@ -12,6 +12,7 @@ from v3_furniture_rigs import CATEGORY,CLOCK_CATEGORY,STORAGE_CATEGORY,suffix
 from v3_registry import furniture_representation_identity,ROOM_ALIAS_REGISTRY_VERSION
 from v3_import_storage import ROWS,ITEMS,slot,END
 from v3_tent_model import native_contract
+from v3_resource_capacity import checked_limit
 
 RAM,TABLE,VTABLE,LIMIT,CAPACITY = 0x804B1800,0x804B1E00,0x804B1FA0,0x804B1FE0,24
 MAGIC=0x41465231
@@ -20,6 +21,7 @@ PACKET_MAGIC=0x41465232
 SOURCES=('tools/v3_room_rig_runtime.py','tools/v3_asset_loader.py','tools/v3_furniture_rigs.py','tools/v3_keyframes.py',
     'tools/v3_furniture_pipeline.py','tools/v3_registry.py','tools/v3_equipment_runtime.py',
     'tools/v3_display_aliases.py','tools/v3_held_catalogue.py',
+    'tools/v3_resource_capacity.py',
     'overlays/v3/room_rigs.c','overlays/v3/room_rigs.h','overlays/v3/room_rigs.ld',
     'overlays/v3/held_rigs.ld','overlays/v3/room_rigs_packet.ld',
     'overlays/v3/room_rigs_bootstrap.c','overlays/v3/room_rigs_bootstrap.ld')
@@ -169,8 +171,14 @@ def extend(base,prior,blob,core,original,output,directories):
     all_rows=sorted(copy.deepcopy(runtime['rows'])+rows,key=lambda r:r['runtime_index']);encode_packet(all_rows)
     needed=sum(len(d) for d in assets.values())+(0 if is_packet else PACKET_BYTES)
     reuse=retired_module_space(base,prior,blob,needed)
-    if reuse is None:raise ValueError('No verified retired storage for complete room category batch')
-    contract=extended_contract(base,core,original);cursor=reuse['blob_offset']
+    contract=extended_contract(base,core,original)
+    if reuse:
+        cursor=reuse['blob_offset']
+    else:
+        cursor=(len(blob)+15)&~15
+        if BLOB+cursor+needed>checked_limit(base,prior):
+            raise ValueError('Complete room category exceeds checked cartridge reservation')
+        blob.extend(bytes(cursor+needed-len(blob)))
     result=copy.deepcopy(old);installed=result['room_rigs']
     if not is_packet:
         installed['packet']=dict(ram=PACKET_RAM,bytes=PACKET_BYTES,blob_offset=cursor,vrom=BLOB+cursor)
@@ -183,7 +191,8 @@ def extend(base,prior,blob,core,original,output,directories):
         additional_resident_bytes=0 if is_packet else PACKET_BYTES,
         artwork_bytes=runtime['artwork_bytes']+sum(len(d) for d in assets.values()))
     installed.setdefault('additional_sources',[]).extend(evidence)
-    installed.setdefault('reservations',[]).append(reuse)
+    installed.setdefault('reservations',[]).append(reuse or dict(
+        blob_offset=cursor-needed,bytes=needed,appended=True))
     publish_packet(result,blob,output)
     result['additional_resident_bytes']=installed['additional_resident_bytes']
     return result,{}

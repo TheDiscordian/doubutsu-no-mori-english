@@ -22,26 +22,29 @@ artwork, including fifteen station variants in the separate
 at `build/v3-switch-sound-prepared-01/`, plus two complete storage rigs at
 `build/v3-storage-rigs-prepared-01/`. Their full clock/animation/sound/storage source
 rules and complete assets are prepared. Shared room lifecycle code supports
-clock/storage categories; storage resources are installed, while clock resources
-still need storage capacity. Connect ordinary profiles/acquisition before enabling
+clock/storage categories; all complete clock and storage resources are installed.
+Connect ordinary profiles/acquisition before enabling
 them. Extend shared categories for remaining
 models and source acquisition routes; do not substitute arbitrary shop stock.
 Event-present, Harvest, island, and direct-reward sources group other pending
 records. The sound category retains source trigger/singleton rules and requires
 actual native audio correspondence, not merely matching numerical sound IDs.
-The next primary task is general cartridge-resource storage expansion. Only
-2,800 bytes remain in the contiguous import reservation. Retired storage handles
-the new room packet and storage models, but not the complete clock batch. Preserve
-English-choice/general-string data and every consumer if relocation is needed;
-never relax overlap checks or replace complete assets with smaller placeholders.
+The shared import reservation extends to `02800000`, with 2,060,768 bytes free
+after the complete fifteen-clock batch. English choices/general strings retain
+their content and physical locations through checked virtual relocation. The
+final general string has three checked padding bytes for rounded native DMA.
+Continue general category conversion/integration and source acquisition routes;
+do not replay passed storage, text, or clock checks without a relevant change.
 
-The current explicit proposal is ABI 159,
-`build/v3-room-categories-runtime-03/build-lock.json`. The shared room packet
-adds 8 KiB of fixed memory after the scenery reservation, preserves all eight
-balloon rows, and installs both complete storage rigs. Five focused checks pass.
-Native component execution passes; the final obsolete save-guard check is corrected
-but not rerun. Preserve the passing component evidence instead of replaying it.
-Storage acquisition/profiles and ordinary gameplay remain open. All eight balloons are
+The current explicit proposal is ABI 161,
+`build/v3-clock-category-runtime-02/build-lock.json`. Its existing 8-KiB room
+packet contains 25 records: eight balloons, two complete storage rigs, and fifteen
+complete clocks. No additional RAM, selected choice, or saved format is introduced.
+Four host/cartridge checks and the focused native run pass; the latter has 153
+assertions covering the final-string boundary, three complete clock rigs/live hand
+angles, guards, restored state/checkpoint, and clean exit. Retain earlier passing
+relocated-text and storage components; ordinary room interaction, appearance,
+profiles/acquisition, and hardware remain open. All eight balloons are
 connected through shared source-derived parent records, room profiles, indoor
 conversion/pickup, collection/catalogue, complete icons, and optional selection.
 There are 128 experimental choices, with 24 equipment parents. Neither served

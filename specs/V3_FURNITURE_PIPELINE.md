@@ -13,8 +13,10 @@ checks the 64-MiB bound, sixteen-byte alignment, zero destination, and every liv
 physical DMA extent, including the proposed new end of the import blob. Old
 compressed bytes remain untouched but are no longer referenced by that owner.
 
-Do not consume the protected English-choice VROM range or relax import-blob
-growth checks to store an overlay copy. Resource-tail reuse still owns only its
+Do not consume a live English-resource range or relax import-blob growth checks
+to store an overlay copy. The checked resource-capacity adapter relocates both
+shared English readers/resources before permitting the expanded bound.
+Resource-tail reuse still owns only its
 three declared catalogue/shop resources. Every complete changed owner must match
 the final DMA extraction. This shared storage rule adds no item-specific paths,
 saved formats, or browser choices. The wrapped-gift stage uses it for the native
@@ -824,8 +826,9 @@ Acquisition remains independent: an eligible winter-camping model can install
 through the existing reward category; models needing other source routes remain
 prepared-only. Model conversion never substitutes shop stock for an unknown
 reward. Roof-colour selectors and additional effects remain separate unsupported
-categories, not static substitutions. Clocked rigs have complete prepared assets
-but still require their native clock/lifecycle adapter.
+categories, not static substitutions. Clocked rigs have complete installed assets
+and a shared native lifecycle; ordinary profiles/acquisition remain separate
+requirements.
 
 Other dynamic texture/palette pointers, animation rigs, custom callbacks, unsupported
 contact/interaction flags, other action sounds or acquisition routes, oversized
@@ -1005,10 +1008,15 @@ The complete native state machine, sounds, and interaction timing remain native;
 only its already installed expanded-profile table differs from original code.
 Catalogue drawing without a room owner cannot advance storage interactions.
 
-The current packet contains the eight existing balloon rows and both Harvest
-storage rows. All fifteen clocks are converter/descriptor-ready but not installed
-or selectable. Complete clock assets require the next general cartridge-storage
-expansion. Do not overwrite protected English resources or relax storage bounds.
+The current packet contains the eight existing balloon rows, both Harvest
+storage rows, and all fifteen clock rows. The installer reuses verified retired
+storage when available; otherwise it appends complete assets within the checked
+import reservation and rebuilds the shared terminal resources. No additional
+resident allocation is needed for the clock batch. Complete assets can cross the
+legacy storage bound only after `v3_resource_capacity.checked_limit` validates
+both relocated English resources, offset tables, and complete native consumers.
+Ordinary clock/storage profiles and acquisition remain required; these records
+are not selectable merely because their lifecycle and resources are installed.
 
 ## Verification policy
 

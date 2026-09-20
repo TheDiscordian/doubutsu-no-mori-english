@@ -483,7 +483,7 @@ def inventory_rigs(debug,rom_path,record):
         ordinary_inventory_tested=False,parent_selection_tested=False,flash_written=False,requires_checkpoint_restore=True)
 
 
-def room_rigs(debug,rom_path,record):
+def room_rigs(debug,rom_path,record,*,mode=2):
     """Manifest-selected complete room lifecycles, without enabling parent choices."""
     from runtime_layout import TEST_STACK
     from v3_import_storage import jump
@@ -517,6 +517,7 @@ def room_rigs(debug,rom_path,record):
     check('complete startup-loaded room lifecycle reservation',RAM+first,module[first:last])
     state=report['save_runtime']
     saved={at:debug.read_memory(at,n) for at,n in ((0x801458B8,4),(state['state_ram'],state['state_bytes']))}
+    if mode==1:saved[0x80136FC4]=debug.read_memory(0x80136FC4,4)
     size=0x6200;allocation=call(0x8009BFC0,[size])
     if allocation&15 or not MODULE_RAM+0x8000<=allocation<=0x80400000-size:
         raise ValueError('Room-rig fixture outside native heap')
@@ -531,6 +532,8 @@ def room_rigs(debug,rom_path,record):
     names=('ct','mv','dw');symbols=rigs['bootstrap' if packet else 'code']['symbols']
     prefix='af_v3_room_boot_' if packet else 'af_v3_room_rig_'
     jumps=b''.join(struct.pack('>2I',jump(symbols[prefix+name]),0) for name in names)
+    if mode==1:
+        jumps+=struct.pack('>2I',jump(rigs['code']['symbols']['clock_before']),0)
     debug.write_memory(bridge,jumps)
     call(0x8002FE00,[bridge,len(jumps)]);call(0x80034CE0,[bridge,len(jumps)])
     def callback(name,target):
@@ -538,11 +541,16 @@ def room_rigs(debug,rom_path,record):
         return call(bridge+names.index(name)*8,args,(bridge,jumps))
     matrix=call(0x800E02AC);matrix_before=debug.read_memory(matrix,64)
     debug.write_memory(identity,struct.pack('>16f',*(1 if i%5==0 else 0 for i in range(16))))
-    rows=[r for r in rigs['rows'] if r.get('mode')==2] if packet else rigs['rows']
+    rows=[r for r in rigs['rows'] if r.get('mode')==mode] if packet else rigs['rows']
     selected=[min(rows,key=lambda r:r['bytes']),max(rows,key=lambda r:r['bytes'])]
+    if mode==1:
+        unique={}
+        for row in rows:unique.setdefault(row['source']['profile']['skeleton']['header']['donor_offset'],row)
+        selected=list(unique.values())
     put(game,graph)
     try:
         for iteration,row in enumerate(selected):
+            parity=iteration&1
             fill=b'\xA5'*9216;debug.write_memory(bank,fill)
             call(0x80026B44,[bank,row['vrom'],row['bytes']])
             data=blob[row['blob_offset']:row['blob_offset']+row['bytes']]
@@ -555,14 +563,27 @@ def room_rigs(debug,rom_path,record):
                 check('initial per-instance speed and target',target+0x204,struct.pack('>2f',0,.5))
                 check('native work vectors belong to this instance',target+0x158,
                       struct.pack('>2I',target+0x1A4,target+0x1DA))
-                check('stationary initial frame one',target+0x140,struct.pack('>2f',0,1))
+                check('source initial speed and frame',target+0x140,struct.pack('>2f',.5,1.5) if mode==1 else struct.pack('>2f',0,1))
                 if packet:
-                    check('native storage uses stop mode',target+0x148,bytes(4))
+                    check('native category animation mode',target+0x148,struct.pack('>I',1 if mode==1 else 0))
                     check('complete lazily loaded room packet',packet['ram'],
                           blob[packet['blob_offset']:packet['blob_offset']+packet['bytes']])
                     check('startup cache remembers the verified packet',0x804B1E00,struct.pack('>I',packet['crc32']))
             independent=debug.read_memory(other,0x740)
-            if packet:
+            if mode==1:
+                callback('mv',actor)
+                check('clock preserves source two-step timing',actor+0x140,struct.pack('>2f',.5,2.5))
+                # Call the actual installed joint callback using its immutable
+                # descriptor; preserve wraparound and all other rotation axes.
+                debug.write_memory(0x80136FC4,struct.pack('>2H',32770,65500))
+                descriptor=rigs['table_ram']+16+rigs['rows'].index(row)*24
+                rotation=bridge+64
+                for joint,angle in ((3,65500),(4,32770),(2,0)):
+                    debug.write_memory(rotation,struct.pack('>3H',123,65215,32760)+b'G'*10)
+                    call(bridge+24,[0,actor+0x134,joint,0,0,descriptor,rotation,0],(bridge,jumps))
+                    check('live clock angles and rotation guards',rotation,
+                          struct.pack('>3H',123,65215,(32760-angle)&0xFFFF)+b'G'*10)
+            elif packet:
                 stopped=debug.read_memory(actor,0x740);callback('mv',actor)
                 check('storage without a room owner remains stopped',actor,stopped)
             else:
@@ -577,7 +598,7 @@ def room_rigs(debug,rom_path,record):
                 debug.write_memory(actor+0x204,struct.pack('>2f',1.24,1.25));callback('mv',actor)
                 check('source speed peak switches back to idle',actor+0x204,struct.pack('>2f',1.24,.5))
             check('second room instance remains independent',other,independent)
-            put(game+0xA0,iteration);call(0x800E0284,[identity])
+            put(game+0xA0,parity);call(0x800E0284,[identity])
             put(graph+0x298,gfx,gfx+0x1000);put(graph+0x2A8,xlu,xlu+0x800)
             callback('dw',actor)
             front,back=struct.unpack('>2I',debug.read_memory(graph+0x298,8))
@@ -591,8 +612,8 @@ def room_rigs(debug,rom_path,record):
             if not passed:raise ValueError('Room rig omitted complete models or misused graphics allocation')
             assertions+=1
             check('translucent stream only binds skeleton matrices',graph+0x2A8,struct.pack('>2I',xlu+8,xlu+0x800))
-            check('untouched opposite matrix bank',actor+0x210+(1-iteration)*0x280,b'\xA5'*0x280)
-            check('unused matrix slots retain their bytes',actor+0x210+iteration*0x280+row['shown']*64,b'\xA5'*((10-row['shown'])*64))
+            check('untouched opposite matrix bank',actor+0x210+(1-parity)*0x280,b'\xA5'*0x280)
+            check('unused matrix slots retain their bytes',actor+0x210+parity*0x280+row['shown']*64,b'\xA5'*((10-row['shown'])*64))
             check('native tail fields retain their bytes',actor+0x710,b'\xA5'*0x30)
             check('unused morph-vector bytes retain their bytes',actor+0x20C,b'\xA5'*4)
             check('balanced matrix stack',0x801462B4,struct.pack('>I',matrix))
@@ -1652,6 +1673,7 @@ def exercise(debug, rom_path, record, *, section='automatic_furniture'):
     if section=='inventory_preview':return inventory_preview(debug,rom_path,record)
     if section=='inventory_rigs':return inventory_rigs(debug,rom_path,record)
     if section=='room_rigs':return room_rigs(debug,rom_path,record)
+    if section=='clock_rigs':return room_rigs(debug,rom_path,record,mode=1)
     if section=='item_categories':return item_categories(debug,rom_path,record)
     path = Path(rom_path)
     image = path.read_bytes()

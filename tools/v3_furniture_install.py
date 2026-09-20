@@ -28,12 +28,13 @@ import v3_catalogue as catalogue
 import v3_hra as hra
 import v3_feng_shui as feng
 import v3_shops as shops
+import v3_resource_capacity as capacity
 
 VERSION = 9
 LOCK = ROOT/'config/v3-import-build.json'
 STABLE = ROOT/'build/v2-keyboard-fit-11/Animal Forest English V2.z64'
 STABLE_SHA = '8bbd1955536a2a3ac9f76d6f323842f5ce25c037e1ff5fd3da9f28d6dfe20507'
-SOURCES = ('tools/v3_furniture_pipeline.py', 'tools/v3_furniture_install.py', 'tools/map_artwork.py', 'tools/v3_room_aliases.py',
+SOURCES = capacity.SOURCES + ('tools/v3_furniture_pipeline.py', 'tools/v3_furniture_install.py', 'tools/map_artwork.py', 'tools/v3_room_aliases.py',
     'tools/v3_furniture_rigs.py', 'tools/v3_keyframes.py',
     'tools/v3_furniture_art.py', 'tools/v3_registry.py', 'tools/v3_catalogue.py',
     'tools/v3_garden_runtime.py', 'tools/v3_shops.py', 'overlays/v3/catalogue.c',
@@ -56,7 +57,7 @@ def inputs(lock=LOCK):
     return base, report
 
 
-def profile(row, vrom):
+def profile(row, vrom, *, limit=END):
     n, offsets = row['object_bytes'], row['model_offsets']
     scalar = bytes.fromhex(row['native_profile_scalar_hex'])
     adapter=row.get('profile',{}).get('callback_adapter',{})
@@ -65,7 +66,7 @@ def profile(row, vrom):
     from v3_furniture_rigs import RIG_CATEGORIES
     rigged = adapter.get('category') in RIG_CATEGORIES
     layers = tuple(offsets) if rigged else tuple(adapter['model_order']) if fading or sequence else LAYERS
-    if (not 0 < n <= 9216 or n%16 or vrom%16 or vrom+n > END or len(scalar) != 16
+    if (limit not in (END,capacity.LIMIT) or not 0 < n <= 9216 or n%16 or vrom%16 or vrom+n > limit or len(scalar) != 16
             or not offsets or set(offsets)-set(layers) or (fading or sequence) and set(offsets)!=set(layers)
             or any(type(at) is not int or at%8 or not 0 <= at <= n-8 for at in offsets.values())):
         raise ValueError('Invalid complete native object/profile bounds')
@@ -261,6 +262,7 @@ def build(output, art_path, lock=LOCK):
     output = output.resolve()
     if output.exists() or not output.is_relative_to(ROOT/'build'): raise ValueError('Use a fresh ignored build directory')
     base, prior = inputs(lock); files = by_vrom(base)
+    limit=capacity.checked_limit(base,prior)
     base_pin=json.loads(lock.read_bytes())
     if base_pin['rom_sha256']!=sha256(base): raise ValueError('Base lock changed during the build')
     stable = STABLE.read_bytes()
@@ -290,7 +292,7 @@ def build(output, art_path, lock=LOCK):
                 or any(blob[ITEMS+i*32:ITEMS+(i+1)*32]) or profile_bits[32+i//8]&(1<<(i&7))):
             raise ValueError('Canonical identity is already installed')
         blob.extend(bytes(-len(blob)%16)); vrom = BLOB+len(blob)
-        native = profile(row,vrom); blob.extend(asset)
+        native = profile(row,vrom,limit=limit); blob.extend(asset)
         blob[ROWS+i*80:ROWS+(i+1)*80] = struct.pack('>HHI',index,item,1)+native+bytes(4)
         record = struct.pack('>HHHBB',index,item,row['price'],row['size_code'],1)+row['name'].encode().ljust(16,b' ')+bytes(8)
         blob[ITEMS+i*32:ITEMS+(i+1)*32] = record
@@ -377,7 +379,7 @@ def build(output, art_path, lock=LOCK):
     module[STARTUP:CONFIG]=startup+bytes(CONFIG-STARTUP-len(startup))
     struct.pack_into('>4I',module,CONFIG,BLOB,0xC000,zlib.crc32(blob[:0xC000]),abi)
     start,end=files[BLOB].pstart+len(old_blob),files[BLOB].pstart+len(blob)
-    if (len(blob)<len(old_blob) or BLOB+len(blob)>END or end>len(base) or any(base[start:end])
+    if (len(blob)<len(old_blob) or BLOB+len(blob)>limit or end>len(base) or any(base[start:end])
             or any(e.pstart<end and start<(e.pend or e.pstart+e.size)
                    for v,e in files.items() if v!=BLOB and e.pstart!=0xFFFFFFFF)
             or any(e.vstart<BLOB+len(blob) and BLOB+len(old_blob)<e.vend for v,e in files.items() if v!=BLOB)):
@@ -416,7 +418,7 @@ def build(output, art_path, lock=LOCK):
     report['furniture_items']['active_metadata_rows']=len(imports)
     for section in report.values():
         if isinstance(section,dict) and 'package_sha256' in section: section['package_sha256']=sha256(package)
-    report['import_storage'].update(remaining_bytes=END-BLOB-len(blob),static_installed=len(imports)-1,
+    report['import_storage'].update(remaining_bytes=limit-BLOB-len(blob),static_installed=len(imports)-1,
         items_installed=len(imports),profile_rows_sha256=sha256(blob[ROWS:ITEMS]),
         item_rows_sha256=sha256(blob[ITEMS:TABLE_END]),saved_profile_changed=True)
     for section in (report['furniture']['imports'],report['furniture_items']['imports']):
@@ -466,12 +468,13 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
                     player_actions=False, item_category_art=None, ground_categories=False, event_acquisition=False,
                     held_collection=False, held_catalogue_art=None, held_selection=False, translation_updates=False,
                     room_rigs_art=None, scenery_art=None, scenery_gameplay=False,
-                    equipment_rigs=None):
+                    equipment_rigs=None, expand_storage=False):
     """Update shared readers; optionally install the shared held-resource adapter."""
     output=output.resolve()
     if output.exists() or not output.is_relative_to(ROOT/'build'):
         raise ValueError('Use a fresh ignored build directory')
     base,prior=inputs(lock); files=by_vrom(base)
+    limit=capacity.checked_limit(base,prior)
     base_pin=json.loads(lock.read_bytes())
     if base_pin['rom_sha256']!=sha256(base): raise ValueError('Base lock changed during the build')
     original=verified_rom((ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes())
@@ -483,12 +486,12 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             or struct.unpack_from('>4I',blob,0xF0)!=(BLOB+PACKAGE,PACKAGE_SIZE,zlib.crc32(package),PACKAGE_RAM)):
         raise ValueError('Changed shared runtime package')
     output.mkdir(parents=True)
-    moved=[];equipment_report=None;reused=None;owner_changes={};owner_moves=[];owner_updates=[];report_updates={}
+    moved=[];equipment_report=None;reused=None;owner_changes={};owner_moves=[];owner_updates=[];report_updates={};text_moves=[]
     equipment_mode=any((equipment_art is not None,equipment_rigs is not None,player_motion,equipment_kinds,player_actions,
                         item_category_art is not None,ground_categories,event_acquisition,held_collection,held_catalogue_art is not None,held_selection,room_rigs_art is not None,scenery_art is not None,scenery_gameplay))
-    resource_mode=equipment_mode or translation_updates
+    resource_mode=equipment_mode or translation_updates or expand_storage
     if sum((equipment_art is not None,equipment_rigs is not None,player_motion,equipment_kinds,player_actions,
-            item_category_art is not None,ground_categories,event_acquisition,held_collection,held_catalogue_art is not None,held_selection,translation_updates,room_rigs_art is not None,scenery_art is not None,scenery_gameplay))>1:
+            item_category_art is not None,ground_categories,event_acquisition,held_collection,held_catalogue_art is not None,held_selection,translation_updates,room_rigs_art is not None,scenery_art is not None,scenery_gameplay,expand_storage))>1:
         raise ValueError('Install shared runtime updates in dependency order')
     if resource_mode:
         blob,reused=reuse_resource_tail(base,prior,old_blob)
@@ -496,7 +499,11 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             raise ValueError('Equipment integration requires the checked shared resource tail')
     parent_readers=bool(player_actions and prior.get('equipment_resources',{}).get('player_actions',{}).get('equipment_selection'))
     wrapped_names=bool(player_actions and prior.get('equipment_resources',{}).get('wrapped_presents'))
-    if translation_updates:
+    if expand_storage:
+        display_report,alias_report=prior['clothing']['display'],prior['display_aliases']
+        report_updates,text_moves=capacity.expand(base,prior,core)
+        limit=report_updates['import_storage']['virtual_limit']
+    elif translation_updates:
         import v3_translation_updates as translation
         display_report,alias_report=prior['clothing']['display'],prior['display_aliases']
         owner_changes,report_updates=translation.install(base,prior,module,output)
@@ -626,7 +633,7 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
     result=bytearray(base)
     if resource_mode:
         start=files[BLOB].pstart+len(old_blob);end=files[BLOB].pstart+len(blob)
-        if (len(blob)<len(old_blob) or BLOB+len(blob)>END or end>len(base) or any(base[start:end])
+        if (len(blob)<len(old_blob) or BLOB+len(blob)>limit or end>len(base) or any(base[start:end])
                 or any(e.pstart<end and start<(e.pend or e.pstart+e.size)
                        for v,e in files.items() if v!=BLOB and e.pstart!=0xFFFFFFFF)
                 or any(e.vstart<BLOB+len(blob) and BLOB+len(old_blob)<e.vend
@@ -645,12 +652,15 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         for row in moved+owner_moves:
             struct.pack_into('>4I',result,DMA_START+files[row['vrom']].index*16,
                              row['vrom'],row['vrom']+row['bytes'],row['physical'],0)
+    if text_moves:capacity.relocate_directory(result,files,text_moves)
     expected=bytearray(base[DMA_START:DMA_END])
     if resource_mode:
         struct.pack_into('>I',expected,files[BLOB].index*16+4,BLOB+len(blob))
         for row in moved+owner_moves:
             struct.pack_into('>4I',expected,files[row['vrom']].index*16,
                              row['vrom'],row['vrom']+row['bytes'],row['physical'],0)
+    for row in text_moves:
+        struct.pack_into('>2I',expected,row['directory_index']*16,row['vrom'],row['vrom']+row['bytes'])
     if result[DMA_START:DMA_END]!=expected:raise ValueError('Undeclared DMA-directory change')
     if event_acquisition and equipment_report:
         result=equipment.finish(result,base,output,equipment_report)
@@ -678,10 +688,19 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
     report['shared_runtime_refresh']=dict(base=base_pin,adapters=['display_aliases'],
         artwork_changed=False,resource_allocations_changed=False,saved_format_changed=False,
         saved_profile_changed=False,web_patcher_enabled=False)
-    report['sources'].update({p:sha256((ROOT/p).read_bytes()) for p in ('tools/v3_furniture_install.py',)+display_aliases.SOURCES})
+    report['sources'].update({p:sha256((ROOT/p).read_bytes()) for p in capacity.SOURCES+display_aliases.SOURCES})
+    if expand_storage:
+        report['import_storage']['remaining_bytes']=limit-BLOB-len(blob)
+        report['shared_runtime_refresh'].update(adapters=['resource_capacity'],
+            resource_allocations_changed=True,resource_tail_reuse=reused,
+            unchanged_owner_moves=moved,changed_owner_moves=owner_moves,
+            in_place_owner_updates=owner_updates,additional_resident_bytes=0,
+            text_resource_relocations=text_moves)
+        capacity.checked_limit(result,report)
+        report['native_test']='pending shared text address/DMA and expanded-resource verification'
     if translation_updates:
         report['automatic_furniture']['resource_moves']=moved
-        report['import_storage']['remaining_bytes']=END-BLOB-len(blob)
+        report['import_storage']['remaining_bytes']=limit-BLOB-len(blob)
         report['shared_runtime_refresh'].update(adapters=['translation_headers'],
             resource_allocations_changed=True,resource_tail_reuse=reused,
             unchanged_owner_moves=moved,changed_owner_moves=owner_moves,
@@ -691,7 +710,7 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
     if equipment_report:
         report['equipment_resources']=equipment_report
         report['automatic_furniture']['resource_moves']=moved
-        report['import_storage']['remaining_bytes']=END-BLOB-len(blob)
+        report['import_storage']['remaining_bytes']=limit-BLOB-len(blob)
         report['shared_runtime_refresh'].update(adapters=['display_aliases','equipment_resources'],
             resource_allocations_changed=bool(owner_moves or len(blob)!=len(old_blob)
                 or any(row['physical']!=files[row['vrom']].pstart for row in moved)),resource_tail_reuse=reused,
@@ -798,6 +817,8 @@ if __name__=='__main__':
         help='With --refresh-runtime, install a complete prepared animated room category without enabling parents')
     parser.add_argument('--translation-updates',action='store_true',
         help='With --refresh-runtime, carry corrected translation headers and the pinned import-free baseline')
+    parser.add_argument('--expand-storage',action='store_true',
+        help='With --refresh-runtime, relocate complete English resources and expand the checked import reservation')
     args=parser.parse_args()
     if args.equipment_art and not args.refresh_runtime:parser.error('--equipment-art requires --refresh-runtime')
     if args.equipment_rigs and not args.refresh_runtime:parser.error('--equipment-rigs requires --refresh-runtime')
@@ -814,12 +835,14 @@ if __name__=='__main__':
     if args.held_selection and not args.refresh_runtime:parser.error('--held-selection requires --refresh-runtime')
     if args.room_rigs_art and not args.refresh_runtime:parser.error('--room-rigs-art requires --refresh-runtime')
     if args.translation_updates and not args.refresh_runtime:parser.error('--translation-updates requires --refresh-runtime')
+    if args.expand_storage and not args.refresh_runtime:parser.error('--expand-storage requires --refresh-runtime')
     result=(refresh_runtime(args.output,args.base_lock,equipment_art=args.equipment_art,player_motion=args.player_motion,
                             equipment_kinds=args.equipment_kinds,player_actions=args.player_actions,
                             item_category_art=args.item_category_art,ground_categories=args.ground_categories,
                             event_acquisition=args.event_acquisition,held_collection=args.held_collection,
                             held_catalogue_art=args.held_catalogue_art,held_selection=args.held_selection,
                             translation_updates=args.translation_updates,equipment_rigs=args.equipment_rigs,
-                            room_rigs_art=args.room_rigs_art,scenery_art=args.scenery_art,scenery_gameplay=args.scenery_gameplay)
+                            room_rigs_art=args.room_rigs_art,scenery_art=args.scenery_art,scenery_gameplay=args.scenery_gameplay,
+                            expand_storage=args.expand_storage)
             if args.refresh_runtime else build(args.output,args.art,args.base_lock))
     print(json.dumps({k:result[k] for k in ('runtime_abi','output_sha256','patch_sha256')},indent=2))

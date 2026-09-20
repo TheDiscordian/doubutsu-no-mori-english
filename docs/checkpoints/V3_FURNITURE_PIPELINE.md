@@ -1,8 +1,87 @@
 # Automatic furniture pipeline checkpoint
 
+## Bulk storage and complete clock installation
+
+The explicit proposal is ABI 161 at
+`build/v3-clock-category-runtime-02/build-lock.json`. The shared importer expands
+its checked contiguous reservation from `02200000..025EFFFF` to
+`02200000..027FFFFF`, then installs all fifteen complete prepared clocks through
+the same room-category installer. The blob occupies 4,230,688 bytes, leaving
+2,060,768 free. Complete clock models/motions occupy 104,720 bytes. The 25-row room
+packet retains the eight balloons and two storage rigs; its engine and 8-KiB
+resident reservation do not grow. No assets are recompiled, reduced, or dropped.
+Ordinary clock/storage profiles and acquisition remain pending, so these records
+do not add selectable choices.
+
+English choices and general strings retain their complete text, offset tables,
+directory indices, and physical locations. Only their virtual bases and verified
+native base-load pairs move, to `029E0000` and `029F0000`. The directory remains
+3,389 entries with its sole terminator; no new entry is consumed. Both complete
+native functions and every matching native-core upper-half load are checked.
+Future batches must validate the relocated resources/readers to use the expanded
+bound. The module at `02800000` and unrelated resources remain intact.
+
+The initial combined check exposed a real final-string DMA failure: the last
+five-byte string requires an eight-byte native transfer, crossing its unpadded
+resource end. The corrected capacity adapter extends the declared end by three
+verified zero bytes. It rejects occupied/nonzero/out-of-ROM padding and preserves
+all text and offsets. The failing proposals remain diagnostic artifacts, not
+current build locks or handoffs.
+
+Four focused tests pass in 7.775 seconds:
+
+```sh
+python3 -B -m unittest discover -s tests -p test_v3_resource_capacity.py -v
+```
+
+They verify complete text/core/directory and unrelated-resource retention;
+changed consumer, occupied destination, and forged-bound rejection; all fifteen
+complete clock objects and descriptors beyond the legacy limit; unchanged room
+engine, save runtime, existing artwork, and zero ordinary profile slots; full UPS
+reconstruction; and unchanged 128-choice composition with exact all/empty output.
+
+Native evidence is bounded and accumulated without replaying passed prefixes:
+
+- `build/v3-bulk-storage-native-01/` stops at a test-only call-permission error.
+  The corrected test uses the ordinary native text loaders.
+- `build/v3-bulk-storage-native-02/` passes thirteen assertions covering choices,
+  general strings, addresses, invalid choice rejection, and buffer guards before
+  reaching the real final-string DMA defect. Those passed components are retained;
+  this run is not a complete pass.
+- `build/v3-bulk-storage-native-03/` uses the corrected ABI-161 cartridge and
+  resumes at the final string, then runs the new clock category. It passes all
+  200 records / 153 assertions, with zero failed assertions and graceful exit.
+  The three source-rig representatives execute complete native model/motion DMA,
+  lazy packet loading, independent construction, source half-step timing, live
+  hour/minute Z-angle subtraction and wrapping, and complete skeleton drawing.
+  Matrix/work/graphics guards, the full 912-byte save/profile state, restored live
+  fields, restored emulator checkpoint, CPU/module/save guards, and exit pass.
+
+The focused scenario is generated from the existing storage generator, keeping
+setup plus the failed boundary and subsequent untested category. No new per-item
+scenario or historical-build replay is used. All emulation is silent, isolated,
+and time bounded. A restored checkpoint is not a game save/restart test. Ordinary
+acquisition, room interaction, GPU appearance, and hardware remain unverified.
+
+- ROM SHA-256:
+  `f08a670cb3b59d87d3ca9a3a40e5e41730353e7ce42cb36daa677a837294738b`.
+- UPS SHA-256:
+  `eac927a707c529827311b58280ba05127ee50ae0ee82f445643a9edc8008327f`.
+- Build receipt SHA-256:
+  `5972cb292b89f8eb3232b01211b35c0e243c0647519df90f4966535054962c2a`.
+- Focused native results SHA-256:
+  `ba00b15a67eed9f89511367d26bdc92cb5f167a11d6c4853d5f0ced6c89c83ff`.
+
+Saved format 3 and selected identities remain unchanged from ABI 159; cross-build
+ordinary reload is unverified. Imported saves still require a matching or larger
+profile and must not be loaded in V2/older formats. The main ABI-109 lock and both
+served patchers remain unchanged. Continue primary shared conversion/integration
+and acquisition, then complete the required gold-tree leaf/cut effects and full
+golden-shovel acquisition. Golden choices remain disabled until their route works.
+
 ## Shared room-category runtime
 
-The current proposal is ABI 159 at
+The recorded ABI-159 proposal is at
 `build/v3-room-categories-runtime-03/build-lock.json`. It extends the shared
 room engine for switch-driven rigs, clocks, and native storage callbacks.
 The same records/validator/compiler serve all three categories. Both complete
@@ -51,14 +130,9 @@ No save is supplied, written, or modified.
 - Native component results SHA-256:
   `ecc8fba65e722d217be91a348040595abc5d5028e1f312073b9cb9d98e79cef4`.
 
-Next complete general cartridge storage expansion for bulk categories. The
-current import reservation ends before choices at `025F0000`, general strings
-at `02600000`, and the existing module at `02800000`. There is no spare DMA
-directory entry. Relocating the first two resources could extend the existing
-import region without adding a directory entry, but every consumer and resource
-identity must be checked first. Do not simply raise the bound or overwrite text.
-Keep the main lock and both patchers unchanged. Gold-tree leaf/cut effects and
-ordinary golden-shovel acquisition follow the primary importing work.
+The bulk-storage checkpoint above closes this batch's storage dependency while
+preserving its completed component evidence. Ordinary storage interaction and
+acquisition remain separate work.
 
 ## Open/close storage category
 

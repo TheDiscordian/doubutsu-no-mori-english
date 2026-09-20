@@ -6,13 +6,38 @@ Expand the existing import resource without consuming another DMA-directory
 entry. The directory contains 3,389 entries and its sole remaining terminator;
 appending a new file would overrun the original boot allocation.
 
-The English choice data moves from VROM `02400000` to `025F0000`. Its complete
-contents, cumulative offset table, DMA identity/physical location, text buffers,
-and saved IDs remain unchanged. Retarget the shared address calculation at
-`80065614` and verify actual choice-address lookup and DMA. No other consumer
-is permitted to keep the old address. This frees the import resource's contiguous
-reservation `02200000..025EFFFF`, before the relocated choices and existing
-general strings at `02600000`. Physical free space is checked independently.
+The current import reservation is `02200000..027FFFFF` (6 MiB). The legacy
+reservation ends at `025F0000`; a larger bound requires the verified capacity
+receipt, not a changed constant. Physical free space is checked independently.
+
+`tools/v3_resource_capacity.py` relocates the complete shared English resources
+without changing their directory indices, physical starts, offset tables, text,
+buffers, or saved identities:
+
+| Resource | Current VROM | Offset table | Native base-load pair |
+| --- | --- | --- | --- |
+| English choices (511 entries) | `029E0000` | `00D06000` | `80065614` |
+| General strings (1,562 entries) | `029F0000` | `00D18000` | `800C3F1C` |
+
+Both complete 320-byte native address functions must match the checked source.
+The core must contain exactly one load of each previous base's upper half,
+including all register forms. Only the two verified base pairs change. The
+existing module at `02800000` and all other resource identities remain intact.
+
+The native text loaders round transfers up to eight bytes. Resource extents are
+padded to sixteen bytes after checking that the existing physical padding is
+zero, inside the ROM, and outside every other live resource. General strings need
+three padding bytes; their final five-byte entry requires an eight-byte transfer.
+No text or offset is changed. Enlarging the declared resource end prevents the
+native DMA bounds assertion for that final entry.
+
+The shared installer validates the expanded receipt against the actual complete
+resources, tables, readers, and logical overlaps before using its bound. It also
+checks every final physical/logical extent, directory terminator, retained owner,
+CRC, and complete patch reconstruction. The room-category installer appends
+complete batches when verified retired storage is insufficient; it does not
+allocate a separate resource per item. This capacity expansion adds 2,162,688
+bytes of cartridge reservation and no resident RAM.
 
 ## Resident package
 
@@ -45,16 +70,20 @@ physical overlaps, and reconstructs its UPS output. Verification targets changed
 startup, sparse lookups and boundaries, choice relocation, and an offline subset.
 Unchanged model-rendering and acquisition evidence is not replayed.
 
-This layout changes neither format 2 nor selected identity bits. Ordinary
-cross-build reload is unverified. It is not a complete-import handoff. Both
+The current capacity/clock batch changes neither saved format 3 nor selected
+identity bits. Ordinary cross-build reload is unverified. It is not a complete-import handoff. Both
 served web patchers stay on V2 pending user testing and explicit approval.
 
-Seventeen focused checks and the first actual native run pass. The native run
-has 23 calls and 48 memory assertions, including all installed static pointers,
-boundary rejection, one/two-cell and callback-item readers, a retained shirt,
-both extended English choice IDs, long odd/even choices, and final guards.
-The [checkpoint](../docs/checkpoints/V3_IMPORT_STORAGE.md) records exact artifacts,
-the corrected preflight, source report, and ordinary-gameplay limits.
+Four current host/cartridge checks pass, including complete resource retention,
+consumer/overlap rejection, all fifteen installed clocks, and exact full/empty
+optional composition. The focused native run passes 153 assertions covering the
+final-string boundary, three complete clock representatives, live hand angles,
+memory guards, restoration, and clean exit. Other relocated-text checks retain
+their passing evidence from the preceding partial run; they are not replayed.
+The [current checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#bulk-storage-and-complete-clock-installation)
+records exact artifacts and limits. The
+[initial storage checkpoint](../docs/checkpoints/V3_IMPORT_STORAGE.md) preserves
+earlier sparse-table and choice-reader evidence without retesting that build.
 
 ## Camping content
 

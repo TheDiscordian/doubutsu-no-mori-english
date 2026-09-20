@@ -12,6 +12,9 @@ from v3_import_storage import PACKAGE, PACKAGE_RAM, PACKAGE_SIZE, CHOICE_NEW, AB
 
 
 def scenario(image, report):
+    if report.get('resource_capacity'):
+        from v3_resource_capacity import native_scenario
+        return native_scenario(image,report)
     if report['runtime_abi'] != ABI or sha256(image) != report['output_sha256']:
         raise ValueError('Storage check requires the matching current cartridge report')
     files = by_vrom(image)
