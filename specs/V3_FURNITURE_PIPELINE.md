@@ -303,8 +303,13 @@ display identity, with its parent at bytes 28–29 and optional native footprint
 equivalent at bytes 30–31. Display-only records remain disabled as independent
 furniture. They introduce no second name, price, ownership bit, or browser option.
 Zero footprint means use the display's own generated footprint; only a checked
-category equivalent delegates to an original native item. Ordinary furniture
-records keep these four bytes zero.
+category equivalent delegates to an original native item. Real room forms also
+store their source size code at byte six and footprint eligibility at byte
+seven. The selected parent's sparse profile still gates access. Catalogue-only
+forms retain zero eligibility; using that zero for a room form makes the native
+footprint reader treat it as absent. Neither eligibility nor the source size
+creates an independent name, price, ownership bit, or selection. Ordinary
+furniture records keep the final four bytes zero.
 
 Forward conversion checks the bounded index and selected inverse relationship.
 Inverse conversion, names, prices, collection, and category readers share direct
@@ -516,7 +521,11 @@ five visible lists. The native actor's seven used morph vectors end at `204`;
 eight of the remaining twelve morph-work bytes hold per-instance speed/target.
 No native tail field, saved field, or joint matrix is borrowed for this state.
 Drawing uses the actor's current matrix bank and the actual parent transform,
-checking opaque and translucent command capacity before submission.
+checking opaque and translucent command capacity before submission. Native
+graphics allocations require eight-byte alignment. A valid matrix-allocation
+tail ending in eight must render; requiring sixteen-byte alignment incorrectly
+suppresses the entire model in ordinary rooms. Misaligned tails and insufficient
+space still reject before writing commands.
 
 Registry version one reserves source `1FF0/1FF4/1FF8/1FFC` as destination
 `3C00/3C04/3C08/3C0C`, beyond the complete `3800..3BFC` garment range. Source

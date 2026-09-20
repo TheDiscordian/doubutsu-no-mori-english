@@ -267,8 +267,20 @@ def install_catalogue(base, stable, prior, imports, output, rel, symbols, *, wes
     expected = bytearray(native_parent[catalogue.OWNER:catalogue.OWNER + 32])
     struct.pack_into('>I', expected, 4, catalogue.VROM + len(old))
     struct.pack_into('>I', expected, 12, catalogue.RAM + len(old))
+    owner_repair=None
     if parent[catalogue.OWNER:catalogue.OWNER + 32] != expected:
-        raise ValueError('Changed current catalogue owner')
+        # The ABI-127 icon refresh copied its predecessor's 16-byte-short
+        # catalogue descriptor over the new descriptor. Migrate only this
+        # exact diagnosed owner/image pair; unknown mismatches still reject.
+        before=bytes(parent[catalogue.OWNER:catalogue.OWNER+32])
+        if (prior['runtime_abi']!=127 or
+                sha256(parent)!='4d8b82a0ba116fb601a384c8ef235501b2a60fc95ac4cdd8b2243c8780293dbb' or
+                sha256(old)!='30a95d70fbfde3b744530ffe6dc93d17feacb6ace05d90d154ff5aeba2b7a7b8' or
+                len(old)!=0xF5E0 or
+                before!=bytes.fromhex('039700000397f5d0808a6100808b56d0808a96ac808a97c0808a92ec00000000')):
+            raise ValueError('Changed current catalogue owner')
+        owner_repair=dict(before=before.hex(),after=expected.hex(),restored_bytes=16,
+            source_owner_sha256=sha256(parent),reason='retained icon refresh overwrote catalogue descriptor')
     parent[catalogue.OWNER:catalogue.OWNER + 32] = native_parent[catalogue.OWNER:catalogue.OWNER + 32]
     changes, report = catalogue.install(stable, parent, suffix, compiled, ordering, rows,
         prior['collection']['code'], prior['save_runtime']['code'], prior['furniture_room']['code'],
@@ -294,6 +306,7 @@ def install_catalogue(base, stable, prior, imports, output, rel, symbols, *, wes
         report['pool_reserved']+=64
         report['retained_inventory_pool_patch']=retained_pool
     report['linked_code'] = compiled
+    if owner_repair:report['owner_descriptor_repair']=owner_repair
     report['code'] = {**compiled, 'symbols': {k: shifted(v) for k, v in compiled['symbols'].items()},
                      'sha256': sha256(changes[catalogue.VROM][catalogue.SIZE + GROWTH:])}
     report['code'].pop('elf_relocations')

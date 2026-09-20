@@ -19,6 +19,20 @@ SOURCES = ('tools/v3_display_aliases.py', 'overlays/v3/display_aliases.h',
     'overlays/v3/clothing_roster.S')
 
 
+def metadata_record(index, item, parent, footprint=0, *, size_code=None):
+    """Room forms need real footprint metadata; catalogue-only forms do not.
+
+    This eligibility byte is still gated by the parent's selected profile.
+    Names, prices, ownership, and optional choices remain on that parent.
+    """
+    if index!=1024+slot(item) or not 0<parent<0xFFFF or not 0<=footprint<0x10000:
+        raise ValueError('Invalid shared representation metadata identity')
+    if size_code is not None and (type(size_code) is not int or size_code not in (0,1,2) or footprint):
+        raise ValueError('Invalid source-derived room footprint')
+    return (struct.pack('>HHHBB',index,item,0,size_code or 0,int(size_code is not None))+
+            bytes(20)+struct.pack('>HH',parent,footprint))
+
+
 def records(prior, blob):
     """Consume the installed parent category, not another maintained item list."""
     display=prior['clothing']['display']
@@ -105,14 +119,19 @@ def install(prior, blob, core, output, *, held_items=False, held_collection=Fals
     if blob[OFFSET-16:OFFSET]!=bytes.fromhex('AFACC0DE')*4:
         raise ValueError('Changed alias-index predecessor guard')
     blob[OFFSET:OFFSET+len(table)]=table
+    room_forms={int(r['item_id'],16):r for r in prior.get('equipment_resources',{}).get('catalogue',{}).get('imports',[])
+                if r.get('room_footprint_installed')}
     for item,payload in metadata.items():
         at=ITEMS+slot(item)*32
-        expected=struct.pack('>HH',1024+slot(item),item)+bytes(24)+payload
+        parent,footprint=struct.unpack('>HH',payload)
+        room_form=room_forms.get(item)
+        expected=metadata_record(1024+slot(item),item,parent,footprint,
+                                 size_code=room_form['size_code'] if room_form else None)
         if previous:
             if blob[at:at+32]!=expected: raise ValueError('Changed display-only metadata')
         elif any(blob[at:at+32]): raise ValueError('Display metadata would overwrite an item')
-        # Disabled as independent furniture: readers delegate to the selected
-        # parent. This does not create another name, price, or ownership bit.
+        # Actual room forms retain their generated footprint. Representation
+        # names, prices, selection, and ownership still delegate to the parent.
         blob[at:at+32]=expected
     if (previous and display['readers'].get('held_parent_readers',False)==held_items
             and display['readers'].get('held_collection',False)==held_collection

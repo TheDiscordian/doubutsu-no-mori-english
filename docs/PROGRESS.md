@@ -18,28 +18,38 @@ served patchers retain their existing builds.
 
 ## Active development
 
-The current explicit ABI-127 proposal is
-`build/v3-room-parent-category-06/build-lock.json`. All eight balloons are
+The current explicit ABI-128 proposal is
+`build/v3-room-parent-gameplay-fix-04/build-lock.json`. All eight balloons are
 connected through the shared parent-category installer: official names/prices,
 complete pocket icons, held/inventory animation, source acquisition records,
 collection/catalogue, animated room profiles, indoor conversion, and inverse
 pickup. The local composer has 128 experimental choices, including 24 equipment
 parents. These are not a public or hardware-ready handoff.
 
-Ten focused checks pass. The first combined silent native check passes 216
-records and 151 assertions: all 24 equipment catalogue entries, source order,
-room/pocket conversion, four complete preview models, actual animated catalogue
-construction, seven pocket-icon cases, full-width hook registers, memory guards,
-retained saves, restored checkpoint, and clean exit. Complete assets and the
-60-KiB resident allocation are retained. A checked 96-byte palette reservation
-fits all three complete icon families without increasing memory.
+The shared installer repairs actual room-footprint metadata, permits the native
+eight-byte graphics alignment, and combines catalogue/icon owner edits without
+losing the catalogue's final 16 bytes. Twelve focused checks pass; the current
+combined native check passes 216 records and 151 assertions. The source models,
+128 choices, fixed identities, 60-KiB resident allocation, and saved formats are
+retained. The current checks cover complete catalogue loading, all 24 parent
+conversions/order, representative animated previews/icons, register/memory guards,
+retained saves, restored checkpoint, and clean exit.
 
-The unserved private export is `build/v3-room-parent-browser-01/`. Its actual
-browser worker matches offline empty/all/mixed/equipment outputs, and passes
-cancellation and invalid-input checks. Neither V2 patcher nor the main lock changes.
-Next use a bounded ordinary balloon acquisition/equip/room-placement/pickup/save
-pass, then continue the remaining shared net/rod/golden-tool action categories.
-Broad gameplay, GPU appearance, and original hardware remain unverified.
+The unserved private export `build/v3-room-parent-browser-01/` remains ABI 127,
+not the repaired cartridge. Its actual worker/composition checks remain evidence
+for unchanged browser code; it is not the current playtest output. Both served
+V2 patchers and the main lock remain unchanged.
+
+The isolated two-balloon profile visibly renders the placed red balloon and
+returns its parent item through normal pickup. Ordinary Save & Quit completes,
+and both actual FlashRAM banks match independent format-2 reconstruction. A
+fresh process restores the saved room form and visibly renders it. That run's
+additional pickup assertion fails, so post-reload pickup remains unresolved;
+the full scenario is not a pass. Exact results and limits are recorded in the
+[gameplay checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-room-gameplay-repairs).
+Reuse the unchanged equip/put-away evidence; a seeded pocket does not establish
+ordinary acquisition. Continue shared net/rod/golden-tool actions. Broad gameplay,
+other category interactions, and original hardware remain unverified.
 
 All eight balloon inventory
 previews use their source idle animation and reflected drawing. Existing fan and
@@ -75,7 +85,7 @@ actual initialization/hand tracking/animation/drawing commands, matrix and memor
 guards, saved-state retention, checkpoint restoration, and clean exit. This is
 component execution, not GPU appearance, ordinary gameplay, or hardware proof.
 
-Use the ABI-127 lock above for continued work. Reuse the
+Use the ABI-128 lock above for continued work. Reuse the
 passing eight-vector player/inventory allocation evidence. The main lock and
 both patchers stay unchanged. See the
 [balloon-action checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-balloon-actions).
@@ -132,7 +142,7 @@ The actual browser worker matches offline empty/all/mixed/equipment outputs
 using both supplied games. Its unserved export is
 `build/v3-held-category-browser-01/`; neither served patcher changes.
 
-Continue from `build/v3-room-parent-category-06/build-lock.json` explicitly. Retain
+Continue from `build/v3-room-parent-gameplay-fix-04/build-lock.json` explicitly. Retain
 passing animation, sound, and inventory evidence for unchanged implementations.
 The 60-KiB equipment module, 15,584-byte inventory bank, and format-2 save layout
 retain their current ownership; outdoor banks hold 7,168 bytes each. Pinwheel profile bits require a

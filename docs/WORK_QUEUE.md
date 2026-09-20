@@ -2,15 +2,12 @@
 
 ## Active: V3 optional GameCube imports
 
-The current explicit proposal is ABI 127,
-`build/v3-room-parent-category-06/build-lock.json`. All eight balloons are
+The current explicit proposal is ABI 128,
+`build/v3-room-parent-gameplay-fix-04/build-lock.json`. All eight balloons are
 connected through shared source-derived parent records, room profiles, indoor
 conversion/pickup, collection/catalogue, complete icons, and optional selection.
-There are 128 experimental choices, with 24 equipment parents. Ten focused checks
-pass. The first combined silent native check passes 216 records/151 assertions,
-including all parent conversions/order, four complete catalogue models, animated
-initialization, seven pocket-icon cases, register/memory guards, retained state,
-and checkpoint restoration. Neither served V2 patcher or main lock changes.
+There are 128 experimental choices, with 24 equipment parents. Neither served
+V2 patcher nor the main lock changes.
 
 All eight balloon inventory
 previews have their actual idle animation and reflection drawer. Three focused
@@ -25,14 +22,27 @@ all eight six-joint/five-list models and their 61-frame animations, totalling
 44,400 bytes. Four category checks, four shared pipeline checks, and seventeen
 affected held/keyframe checks pass. Reuse these assets without reconversion.
 
-Next run a bounded ordinary balloon acquisition/equip/room-placement/pickup/save
-pass using an isolated matching profile. Retain component evidence; do not
-reconvert artwork, add per-item scripts, or replay old builds. Continue remaining
-net/rod/golden-tool action categories if an ordinary navigation fixture reaches
-its setup limit. A concrete crash or memory/save defect remains a blocker.
-The unserved export is `build/v3-room-parent-browser-01/`; the actual worker
-matches offline empty/all/mixed/equipment outputs and passes cancellation and
-invalid-input checks. Full-interface and original-hardware acceptance remain separate.
+Room graphics accept native eight-byte allocation tails; actual room metadata
+has its source footprint; shared catalogue/icon owner edits preserve both
+consumers. Twelve focused checks and the current 216-record/151-assertion native
+check pass. Normal room placement visibly draws the red balloon, adjusted normal
+navigation and pickup restore its parent, and ordinary Save & Quit completes.
+Both saved banks independently re-encode exactly. A fresh process restores the
+room form and visibly renders it. Its added pickup attempt fails; that specific
+result stays unresolved, and the full reload scenario is not a pass. Do not
+repeat the successful boot/reload prefix merely to retry input timing. Follow the
+[gameplay checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-room-gameplay-repairs)
+for cold-reload evidence and remaining limits.
+
+Next continue remaining net/rod/golden-tool action categories through shared
+machinery. Ordinary acquisition remains open; seeded pockets are not acquisition.
+Do not reconvert artwork, add per-item scripts, replay old builds, or repeat
+completed gameplay paths. A concrete crash or memory/save defect remains a blocker.
+The unserved export `build/v3-room-parent-browser-01/` still contains ABI 127,
+not the repaired cartridge. Its passing worker/composition checks cover unchanged
+browser code; refresh the export from the current lock when preparing a private
+handoff, without switching either served patcher. Full-interface and
+original-hardware acceptance remain separate.
 See the [parent checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-animated-room-parent-category).
 
 Shared balloon setup, hand delta,
@@ -57,13 +67,13 @@ bytes, and the player has eight-vector joint/morph work. Six focused checks and
 the silent native 116-record/93-assertion bank/playback check pass. Preserve that
 evidence; do not replay it without a changed consumer or concrete defect.
 
-Next connect complete balloon room placement and parent consumers. Reuse
-the installed models and shared category adapters, not per-item scripts.
+Balloon room placement and parent consumers use the current proposal above.
+Reuse the installed models and shared category adapters, not per-item scripts.
 Net/rod behaviour and golden-tool differences remain explicit. Resources do
 not enable these imports. See the
 [capacity checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-rig-capacity-and-resource-extension).
 
-Next work uses the explicit ABI-125 lock above. All eight pinwheels have shared
+Next work uses the explicit ABI-128 lock above. All eight pinwheels have shared
 parent readers, pocket artwork, collection/catalogue, existing event acquisition,
 and individual experimental selections. The full proposal has 120 choices;
 existing fans and fixed identities are retained. No per-item installers or

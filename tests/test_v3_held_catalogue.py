@@ -25,6 +25,18 @@ OUTPUT=ROOT/os.environ.get('V3_HELD_CATALOGUE_BUILD','build/v3-held-catalogue-02
 
 class HostTests(unittest.TestCase):
     sanitized=shared.HostTests.sanitized
+    def test_shared_menu_edits_keep_both_consumers_and_reject_conflicts(self):
+        original=bytes(range(64));first=bytearray(original);second=bytearray(original)
+        first[4:8]=bytes.fromhex('0397f5e0');second[40:44]=bytes.fromhex('081298ea')
+        combined=adapter.merge_owner_changes(original,first,second)
+        self.assertEqual(combined[4:8],first[4:8]);self.assertEqual(combined[40:44],second[40:44])
+        self.assertEqual(combined[:4],original[:4]);self.assertEqual(combined[8:40],original[8:40])
+        self.assertEqual(combined[44:],original[44:])
+        second[4:8]=first[4:8];self.assertEqual(adapter.merge_owner_changes(original,first,second),combined)
+        second[4]^=1
+        with self.assertRaises(ValueError):adapter.merge_owner_changes(original,first,second)
+        with self.assertRaises(ValueError):adapter.merge_owner_changes(original,first[:-1],second)
+
     def test_selected_profiles_and_catalogue(self):
         self.sanitized('v3_held_catalogue_test.c')
 
@@ -181,7 +193,10 @@ class CategoryRefreshTests(unittest.TestCase):
             with self.assertRaises(ValueError):selection_records(self.source,e,categories=[22,23])
         damaged=bytearray(self.oldblob);damaged[self.old['blob_offset']]^=1
         with self.assertRaises(ValueError):adapter.refresh_parents(self.source,self.old,damaged)
-        with self.assertRaises(ValueError):adapter.refresh_parents(self.source,self.e,bytearray(self.blob))
+        retained=bytearray(self.blob)
+        refreshed=adapter.refresh_parents(self.source,self.e,retained)
+        self.assertEqual(retained,self.blob)
+        self.assertEqual(refreshed['category_refresh']['added_parent_ids'],[])
 
     def test_profile_retention_provenance_and_reconstructible_patch(self):
         before=bytes.fromhex(self.prior['save_runtime']['profile_hex']);after=bytes.fromhex(self.report['save_runtime']['profile_hex'])
@@ -302,6 +317,97 @@ class RoomCategoryTests(unittest.TestCase):
                 with self.assertRaises(ValueError):composer.resolve(catalog,[composer.item_key(int(catalog[key]['display_item_id'],16))])
             output,_,_=composer.compose(self.rom,self.report,catalog,selection)
             self.assertEqual(output,composer.compose(self.rom,self.report,catalog,composer.resolve(catalog,list(reversed(chosen))))[0])
+        finally:composer.BASE,composer.BASE_SHA,composer.REPORT_SHA,composer.ABI=pin
+
+
+REPAIR_OUTPUT=ROOT/os.environ.get('V3_ROOM_GAMEPLAY_BUILD','build/v3-room-parent-gameplay-fix-04')
+
+
+@unittest.skipUnless((REPAIR_OUTPUT/'build-lock.json').is_file(),'Current room gameplay repair required')
+class RoomGameplayRepairTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.rom,cls.report=inputs(REPAIR_OUTPUT/'build-lock.json')
+        cls.base,cls.prior=inputs(REPAIR_OUTPUT/'base-lock.json')
+        cls.files,cls.before=by_vrom(cls.rom),by_vrom(cls.base)
+        cls.blob=cls.files[BLOB].extract(cls.rom);cls.oldblob=cls.before[BLOB].extract(cls.base)
+
+    def test_source_footprints_and_unchanged_resources_profiles_and_selections(self):
+        from v3_display_aliases import metadata_record
+        from v3_furniture_pipeline import Source
+        equipment=self.report['equipment_resources'];old=self.prior['equipment_resources']
+        source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+            (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+        retained=bytearray(self.blob)
+        refreshed=adapter.refresh_parents(source,equipment,retained)
+        self.assertEqual(retained,self.blob)
+        self.assertEqual(refreshed['category_refresh']['added_parent_ids'],[])
+        sources={r['parent_item_id']:r for r in equipment['room_rigs']['rows']}
+        prior={r['parent_item_id']:r for r in old['catalogue']['imports']}
+        repaired=0
+        for row in equipment['catalogue']['imports']:
+            before=prior[row['parent_item_id']];at=ITEMS+slot(int(row['item_id'],16))*32
+            if row.get('room_placement_uses_display'):
+                size=sources[row['parent_item_id']]['source']['profile']['size_code']
+                self.assertEqual(size,0);self.assertTrue(row['room_footprint_installed'])
+                self.assertEqual(row['size_code'],size)
+                metadata=metadata_record(row['runtime_index'],int(row['item_id'],16),
+                    int(row['parent_item_id'],16),size_code=size)
+                self.assertEqual(self.blob[at:at+32],metadata)
+                self.assertEqual(row['metadata_sha256'],sha256(metadata))
+                self.assertEqual(self.oldblob[at:at+7],metadata[:7])
+                self.assertEqual(self.oldblob[at+8:at+32],metadata[8:])
+                repaired+=1
+            else:self.assertEqual(row,before)
+            i=slot(int(row['item_id'],16));at=ROWS+i*80
+            self.assertEqual(self.blob[at:at+80],self.oldblob[at:at+80])
+            at=int(row['object_vrom'],16)-BLOB;n=row['object_bytes']
+            self.assertEqual(self.blob[at:at+n],self.oldblob[at:at+n])
+        self.assertEqual(repaired,8)
+        for key in ('optional_selection','player_actions','inventory_preview','held_rig_actions','records','event_acquisition'):
+            self.assertEqual(equipment[key],old[key])
+        self.assertEqual(self.report['save_runtime'],self.prior['save_runtime'])
+        self.assertEqual(self.report['display_aliases']['rows'],self.prior['display_aliases']['rows'])
+        self.assertEqual(equipment['category_refresh']['added_parent_ids'],[])
+        self.assertEqual(equipment['bytes'],old['bytes'])
+
+    def test_complete_catalogue_descriptor_icon_hook_and_unrelated_dma(self):
+        from v3_furniture_icon import RAM as MENU_RAM
+        cat=self.report['catalogue'];menu=self.files[catalogue.PARENT].extract(self.rom)
+        body=self.files[catalogue.VROM].extract(self.rom);icons=self.report['equipment_resources']['pocket_icons']
+        self.assertEqual(struct.unpack_from('>4I',menu,catalogue.OWNER),
+            (catalogue.VROM,catalogue.VROM+len(body),catalogue.RAM,catalogue.RAM+len(body)))
+        self.assertEqual(sha256(menu),icons['owner_sha256'])
+        self.assertEqual(sha256(body),cat['output_sha256'])
+        self.assertEqual(sha256(self.files[catalogue.RELOC].extract(self.rom)),cat['relocation_sha256'])
+        self.assertEqual(cat['owner_descriptor_repair']['restored_bytes'],16)
+        h=cat['handheld'];at=h['table_address']-catalogue.RAM
+        self.assertLessEqual(at+h['total_rows']*2,len(body))
+        self.assertEqual(sha256(body[at:at+h['total_rows']*2]),h['table_sha256'])
+        hook=icons['hook'];self.assertEqual(menu[hook['address']-MENU_RAM:hook['address']-MENU_RAM+8],
+            bytes.fromhex(hook['after']))
+        for v in self.files.keys()-{BLOB,MODULE,0x19D40,catalogue.PARENT}:
+            self.assertEqual(self.files[v].extract(self.rom),self.before[v].extract(self.base),hex(v))
+        original=(ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes()
+        self.assertEqual(apply_ups(original,(REPAIR_OUTPUT/'asset-loader.ups').read_bytes()),self.rom)
+
+    def test_exact_empty_full_and_selected_parent_profiles(self):
+        import v3_optional_composition as composer
+        pin=composer.BASE,composer.BASE_SHA,composer.REPORT_SHA,composer.ABI
+        try:
+            composer.use_build_lock(REPAIR_OUTPUT/'build-lock.json');catalog=composer.catalogue(self.rom,self.report)
+            self.assertEqual(len(catalog),128)
+            self.assertEqual(sha256(composer.compose(self.rom,self.report,catalog,composer.resolve(catalog,[]))[0]),
+                self.report['translation_baseline']['sha256'])
+            self.assertEqual(composer.compose(self.rom,self.report,catalog,composer.resolve(catalog,list(catalog)))[0],self.rom)
+            chosen=[composer.item_key(0x2244),composer.item_key(0x224B)]
+            selection=composer.resolve(catalog,chosen)
+            self.assertEqual(selection['requested'],chosen);self.assertEqual(selection['required'],[])
+            image,_,_=composer.compose(self.rom,self.report,catalog,selection);blob=by_vrom(image)[BLOB].extract(image)
+            for row in self.report['equipment_resources']['catalogue']['imports']:
+                i=slot(int(row['item_id'],16))
+                self.assertEqual(int.from_bytes(blob[ROWS+i*80+4:ROWS+i*80+8],'big'),
+                    int(composer.item_key(int(row['parent_item_id'],16)) in chosen))
         finally:composer.BASE,composer.BASE_SHA,composer.REPORT_SHA,composer.ABI=pin
 
 

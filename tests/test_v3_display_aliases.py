@@ -22,6 +22,18 @@ OUTPUT=ROOT/os.environ.get('V3_DISPLAY_ALIAS_BUILD','build/v3-shared-display-run
 
 
 class HostTests(unittest.TestCase):
+    def test_room_metadata_has_a_footprint_without_an_independent_identity(self):
+        for size in (0,1,2):
+            row=aliases.metadata_record(1792,0x3C00,0x2244,size_code=size)
+            self.assertEqual(struct.unpack_from('>HHHBB',row),(1792,0x3C00,0,size,1))
+            self.assertEqual(row[8:28],bytes(20))
+            self.assertEqual(row[28:],bytes.fromhex('22440000'))
+        legacy=aliases.metadata_record(1792,0x3C00,0x2244)
+        self.assertEqual(legacy,bytes.fromhex('07003c00')+bytes(24)+bytes.fromhex('22440000'))
+        for size in (-1,3,True,'0'):
+            with self.assertRaises(ValueError):aliases.metadata_record(1792,0x3C00,0x2244,size_code=size)
+        with self.assertRaises(ValueError):aliases.metadata_record(1792,0x3C00,0x2244,0x17AC,size_code=0)
+
     def test_native_shared_readers_with_synthetic_categories(self):
         with tempfile.TemporaryDirectory(prefix='v3-aliases-') as directory:
             binary=Path(directory)/'check'

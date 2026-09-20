@@ -955,6 +955,20 @@ reflected inventory, and animated room rigs. The complete source aliases must ag
 every installed kind; missing variants, changed identities, occupied slots,
 missing dependencies, and mismatching resource hashes reject the refresh.
 
+The same checked route accepts an unchanged category set for shared consumer
+repairs. It preserves existing identities and resources without inventing new
+choices. Actual room representations retain source size and footprint eligibility
+in their sparse metadata; catalogue-only representations keep zero eligibility.
+Both still delegate names, prices, ownership, and selection to their parent.
+
+Catalogue and pocket-icon updates share the menu owner. Their independently
+generated edits merge against that same predecessor, retaining disjoint edits
+and rejecting conflicting bytes or changed owner dimensions. The final catalogue
+descriptor must cover the entire generated overlay, and the icon receipt hashes
+the combined owner. An incremental migration accepts only the exact diagnosed
+ABI-127 owner/image pair with its 16-byte-short descriptor; other mismatches
+remain errors.
+
 The shared refresh regenerates the bounded `AFHS`, `AFHI`, and `AFIC` tables,
 retaining existing identities and unchanged action/preview code. Eight pinwheel parent IDs
 `224C..2253` use native kinds `99..106` and display IDs `316C..3188`.

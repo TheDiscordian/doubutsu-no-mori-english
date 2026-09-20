@@ -86,8 +86,8 @@ def refresh_parents(source,equipment,blob):
     selector=old['player_actions']['equipment_selection']
     categories=sorted(set(selector.get('categories',[23]))|
         set(old.get('held_rig_actions',{}).get('category_indices',[])))
-    if categories==selector.get('categories',[23]):
-        raise ValueError('No additional implemented category to install')
+    # A category can also need a shared consumer repair without new choices.
+    # Keep the complete source/identity checks on that same-category path.
     # Bind every old table to its complete source before replacing any bytes.
     old_selection,_=selection_records(source,old)
     old_parents,_=parent_records(source,old)
@@ -223,22 +223,30 @@ def assets(source,equipment,directory,blob=None):
 def install_profiles(blob,prepared,retained=()):
     """Append new representations, checking and retaining existing identities."""
     from v3_furniture_install import profile
+    from v3_display_aliases import metadata_record
     previous={r['parent_item_id']:r for r in retained}
     installed=[]
     for parent,row,asset in prepared:
         item=int(row['item_id'],16);index=parent['runtime_index'];i=slot(item)
+        size_code=row['profile']['size_code'] if row.get('room_runtime') else None
+        metadata=metadata_record(index,item,int(parent['item_id'],16),size_code=size_code)
         if parent['item_id'] in previous:
             old=previous[parent['item_id']];at=int(old['object_vrom'],16)-BLOB
             native=profile(row,BLOB+at)
-            metadata=struct.pack('>HH',index,item)+bytes(24)+struct.pack('>HH',int(parent['item_id'],16),0)
+            old_metadata=metadata_record(index,item,int(parent['item_id'],16),
+                size_code=old['size_code'] if old.get('room_footprint_installed') else None)
             if (old['item_id']!=row['item_id'] or old['runtime_index']!=index or
                     old['donor_position']!=parent['catalogue']['position'] or
                     blob[at:at+old['object_bytes']]!=asset or sha256(asset)!=old['object_sha256'] or
                     sha256(native)!=old['profile_sha256'] or
                     blob[ROWS+i*80:ROWS+(i+1)*80]!=struct.pack('>HHI',index,item,1)+native+struct.pack('>I',1) or
-                    blob[ITEMS+i*32:ITEMS+(i+1)*32]!=metadata or sha256(metadata)!=old['metadata_sha256']):
+                    blob[ITEMS+i*32:ITEMS+(i+1)*32]!=old_metadata or sha256(old_metadata)!=old['metadata_sha256']):
                 raise ValueError('Changed retained parent catalogue representation')
-            installed.append(copy.deepcopy(old));continue
+            updated=copy.deepcopy(old)
+            if size_code is not None:
+                updated.update(room_footprint_installed=True,size_code=size_code,metadata_sha256=sha256(metadata))
+                blob[ITEMS+i*32:ITEMS+(i+1)*32]=metadata
+            installed.append(updated);continue
         if (index!=1024+i or any(blob[ROWS+i*80:ROWS+(i+1)*80]) or
                 any(blob[ITEMS+i*32:ITEMS+(i+1)*32]) or blob[32+i//8]&(1<<(i&7))):
             raise ValueError('Parent representation collides with an installed identity')
@@ -251,7 +259,6 @@ def install_profiles(blob,prepared,retained=()):
         # Tag one checks the parent's selection; it is never standalone furniture.
         blob[ROWS+i*80:ROWS+(i+1)*80]=struct.pack('>HHI',index,item,1)+native+struct.pack('>I',1)
         # Forward conversion is registered separately only for real room models.
-        metadata=struct.pack('>HH',index,item)+bytes(24)+struct.pack('>HH',int(parent['item_id'],16),0)
         blob[ITEMS+i*32:ITEMS+(i+1)*32]=metadata
         installed.append(dict(parent_item_id=parent['item_id'],item_id=row['item_id'],runtime_index=index,
             catalogue_index=(item-0x1000)//4,donor_position=parent['catalogue']['position'],
@@ -261,7 +268,7 @@ def install_profiles(blob,prepared,retained=()):
             native_profile_scalar_hex=row['native_profile_scalar_hex'],independently_selectable=False))
         if row.get('room_runtime'):
             installed[-1].update(source_item_id=row['source_item_id'],room_placement_uses_display=True,
-                callback_vtable=row['room_runtime']['vtable'])
+                callback_vtable=row['room_runtime']['vtable'],room_footprint_installed=True,size_code=size_code)
     if not set(previous)<={r['parent_item_id'] for r in installed}:
         raise ValueError('Category refresh removes an installed representation')
     return installed
@@ -348,6 +355,18 @@ def refresh_profile_reader(base,prior,blob,equipment,output,*,room_rigs=False):
     return {room.VROM:bytes(owner)},dict(furniture=furniture,furniture_placement=placement)
 
 
+def merge_owner_changes(original,first,second):
+    """Combine disjoint edits to one unchanged-size owner; reject conflicts."""
+    if len(original)!=len(first) or len(original)!=len(second):
+        raise ValueError('Shared owner edits change dimensions')
+    merged=bytearray(first)
+    for i,(before,a,b) in enumerate(zip(original,first,second)):
+        if b==before:continue
+        if a!=before and a!=b:raise ValueError('Conflicting shared owner edits')
+        merged[i]=b
+    return bytes(merged)
+
+
 def install(base,prior,blob,core,original,output,directory):
     from v3_furniture_install import STABLE,STABLE_SHA
     equipment=prior['equipment_resources'];files=by_vrom(base)
@@ -369,25 +388,28 @@ def install(base,prior,blob,core,original,output,directory):
         from v3_room_rig_runtime import refresh_code
         refresh_code(equipment,blob,output)
     furniture=reader_updates.get('furniture',prior['furniture'])
-    if refresh:
-        changes,cat_report=shared_catalogue.install_catalogue(base,stable,prior,
-            prior['furniture']['imports']+[prior['speed_bag']],output,source.rel,source.symbols.encode(),
-            reviewed_rows=prior['catalogue']['imports'],handheld=(table,cat))
-        if cat_report['code']['symbols']['af_v3_catalogue_item_price']!=prior['furniture_items']['code']['symbols']['af_v3_item_price']:
-            raise ValueError('Changed shared item-price ABI')
-        equipment['catalogue'].update(imports=installed,evidence=evidence,
-            artwork_bytes=sum(len(data) for _,_,data in prepared))
-        selection_prior={**prior,'equipment_resources':equipment,'catalogue':cat_report}
-        equipment,_,updates=select_installed(selection_prior,blob,extend=True)
-        updates['catalogue']=cat_report
-        updates.update(reader_updates);changes.update(reader_changes)
-        return equipment,changes,updates
     changes,cat_report=shared_catalogue.install_catalogue(base,stable,prior,
         furniture['imports']+[prior['speed_bag']],output,source.rel,source.symbols.encode(),
         reviewed_rows=prior['catalogue']['imports'],handheld=(table,cat))
     if cat_report['code']['symbols']['af_v3_catalogue_item_price']!=prior['furniture_items']['code']['symbols']['af_v3_item_price']:
         raise ValueError('Changed shared item-price ABI')
-    changes.update(reader_changes)
+    for vrom,data in reader_changes.items():
+        changes[vrom]=merge_owner_changes(files[vrom].extract(base),changes[vrom],data) if vrom in changes else data
+    # Bind both consumers to the actual combined menu, not either intermediate.
+    menu=changes[catalogue.PARENT]
+    descriptor=struct.unpack_from('>4I',menu,catalogue.OWNER)
+    if descriptor!=(catalogue.VROM,catalogue.VROM+len(changes[catalogue.VROM]),
+                    catalogue.RAM,catalogue.RAM+len(changes[catalogue.VROM])):
+        raise ValueError('Combined menu omits part of the complete catalogue')
+    equipment['pocket_icons']['owner_sha256']=sha256(menu)
+    if refresh:
+        equipment['catalogue'].update(imports=installed,evidence=evidence,
+            artwork_bytes=sum(len(data) for _,_,data in prepared))
+        selection_prior={**prior,'equipment_resources':equipment,'catalogue':cat_report}
+        equipment,_,updates=select_installed(selection_prior,blob,extend=True)
+        updates['catalogue']=cat_report
+        updates.update(reader_updates)
+        return equipment,changes,updates
     report=copy.deepcopy(equipment)
     report['catalogue']=dict(format='AFV3-HELD-CATALOGUE-1',imports=installed,evidence=evidence,
         profile_bits_enabled=0,additional_resident_bytes=0,artwork_bytes=sum(len(d) for _,_,d in prepared),

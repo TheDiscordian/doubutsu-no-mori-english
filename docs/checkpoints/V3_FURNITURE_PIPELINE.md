@@ -1,5 +1,118 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared room gameplay repairs
+
+The current explicit proposal is ABI 128 at
+`build/v3-room-parent-gameplay-fix-04/build-lock.json`. It keeps all 128 choices,
+source artwork, fixed identities, 60-KiB equipment allocation, format-2 saves,
+and the corrected V2-12 no-import baseline. Neither served patcher nor the main
+ABI-109 lock changes.
+
+- ROM SHA-256:
+  `71173f07d0e7a3a88f68217eb86d69ee6ffc924df28e437feb43c831274fe5ba`.
+- Report SHA-256:
+  `dcbbbf6b6eeb99eebddeb1be2a2e833d3a8290c799e1fec4b12cbf081204d932`.
+- UPS SHA-256:
+  `d76f2d640be2a3f68c059a730136792b8bae56f6fb7b8fe7cc2b9fcce4198626`.
+
+Ordinary room placement exposed an invisible model. The real actor, complete
+model bank, and animation were present, but its matrices stayed empty: the
+drawer rejected a valid graphics tail at `80168008`. Native graphics allocation
+uses eight-byte alignment. The shared drawer now accepts both valid parities,
+while rejecting four-byte alignment and insufficient command/matrix space.
+
+Source-derived room metadata also needs footprint eligibility. All eight real
+room forms now retain source size zero (one cell) and eligibility byte one.
+The selected parent's profile still gates access; names, prices, ownership, and
+choices remain on the parent. Catalogue-only forms retain their zero metadata.
+Actual native footprint-reader tests cover all four orientations and disabled
+metadata/profiles. This confirmed metadata defect is distinct from the first
+unsuccessful pickup attempt, which did not establish a game pickup defect.
+
+The rebuild uncovered a separate shared-owner integration error. The icon update
+copied its predecessor's menu over the rebuilt catalogue owner, restoring a
+descriptor 16 bytes shorter than the actual catalogue. The shared installer now
+merges disjoint edits against the same predecessor, rejects conflicting edits,
+checks complete catalogue bounds, and hashes the actual combined menu in the
+icon receipt. Migration accepts only the exact diagnosed ABI-127 owner and
+catalogue hashes. Unknown mismatches still reject. Same-category refresh is
+supported without adding choices or duplicating resources.
+
+Nine focused host checks and three current-cartridge checks pass. The latter
+also verify same-category refresh leaves the installed module unchanged, all
+eight source footprints, complete model/profile retention, actual owner bounds,
+icon hook/receipt, unrelated DMA resources, UPS reconstruction, and exact
+empty/all/two-balloon composition. An obsolete same-category rejection assertion
+is replaced with retention checks. The latest three-check invocation passes in
+10.601 seconds. `-03` and `-04` produce the same ROM and UPS; `-04` corrects the
+icon-owner receipt and common refresh branch. Gameplay uses that identical ROM.
+
+The existing combined native check at
+`build/smoke-v3-room-parent-gameplay-fix-01/` passes on its first attempt:
+216 records and 151 assertions, complete catalogue loading/relocation, all 24
+parent conversions and source order, representative animated constructors and
+icons, register/memory guards, saved-state retention, checkpoint restoration,
+and clean exit. Results SHA-256:
+`a0989ed0382e75d67da8823e462e59d38b3df2a78e7be4485fab340a1656fd7d`.
+
+### Ordinary balloon placement, pickup, and persistence
+
+The isolated two-balloon ROM in `build/v3-room-parent-gameplay-profile-02/` has
+SHA-256 `7a25088a41e6a4653cf0cb89884bd9c81cee0828e5c20fa70a9e64a4195b6746`.
+It selects only parents `2244` and `224B`, avoiding unrelated imported-villager
+scene checks. The copied fixture seeds red balloon `2244` and its ownership;
+this is not ordinary acquisition. The original town remains unchanged at
+SHA-256 `d489736e39abc7eff1c5b5085bf52e679186f2882a0247339e11603799b80b60`.
+
+The unchanged outdoor equip path in `build/v3-room-parent-equip-01/` completes
+normally on ABI 127: correct name/icon, parent `2244`, native kind 91, pocket
+removal, actual held red balloon, and guards. Its put-away path also succeeds.
+The repaired drawer does not alter those resources or actions; do not replay
+that result merely to attach a later build label.
+
+`build/v3-room-parent-place-02/` cold-boots the corrected profile, enters the
+house, and places native room form `3C00` at `8012A4A6`. The captured room now
+visibly contains the red balloon and its string. Its immediate pickup assertion
+fails with the player off-centre and about 53 units from the actor. The checkpoint
+before pickup is retained. The single navigation retry at
+`build/v3-room-parent-pickup-01/` resumes that same ROM/checkpoint, walks normally
+to the balloon, and successfully picks it up. Pocket zero returns to `2244`, the
+room field clears, other pockets remain intact, and fault/memory checks pass.
+It exits cleanly with 17 records; results SHA-256:
+`326b29c996be33daf72b9d48998e7aa91742cf3d842a8a555dc7c63dd3169f32`.
+This resolves the pickup navigation failure without another game-code change.
+
+`build/v3-room-parent-save-01/` branches from the retained placed checkpoint and
+uses the normal gyroid Save & Quit flow, returning to the title. Its 21 records
+pass, including the room identity and fault/module guards. Both actual FlashRAM
+banks match independent format-2 re-encoding with the selected profile, empty
+first pocket, and red-balloon ownership retained. The game save is
+`test.flash`, SHA-256
+`71a1fbbd99eae51e4d90ab0447121b4f0ebc0c8b726507b3a8dbc8dcae282021`.
+Results SHA-256:
+`2e437f35b5002074d8c20c2d8c715ccc64592ba530d5ce517da2511b1eddf555`.
+
+The fresh process at `build/v3-room-parent-reload-01/` uses only this actual game
+save, not an emulator checkpoint. It loads the expected pockets, room identity
+`3C00`, complete model bank, and room guards. The captured room visibly contains
+the saved balloon. Its additional post-reload pickup assertion fails after
+navigation ends with a rightward input followed by a one-frame north input;
+the item remains placed. Facing/navigation is a possible cause, not an
+established diagnosis. This run has 17 records and five passing explicit reads;
+results SHA-256:
+`ce06bf87e728f24e4620f3e19b04e8897d1cff96cd1dd26e3476b645f890ccc3`.
+No final checkpoint, post-pickup guards, or clean-exit result is recorded. Do not
+report the full scenario as passed, infer a save defect from it, or replay the
+successful cold-boot prefix solely for another input attempt. The bounded
+navigation allowance is spent. Retain post-reload pickup as unresolved alongside
+the passing separate pickup and demonstrated saved-object reload.
+
+Ordinary acquisition, other category gameplay, full imported-villager scenes,
+and original hardware remain open. Save formats do not change, but imported saves still
+require matching or larger profiles and must not be loaded in V2. Continue
+shared net/rod/golden-tool actions; preserve completed checks and the unchanged
+models rather than adding per-item installers or repeating historical builds.
+
 ## Shared animated room-parent category
 
 The existing complete-category refresh connects all eight balloons alongside

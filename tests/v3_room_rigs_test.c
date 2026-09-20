@@ -77,11 +77,12 @@ int main(void) {
         for (int i=0;i<0x30;++i)assert(actor->tail[i]==0xA7);
         for (int i=0;i<6;++i)assert(((u8 *)actor->joint)[42+i]==0xA7);
         for (u32 parity=0;parity<2;++parity) {
-            gfx.head=(RoomCommand *)opaque;gfx.tail=opaque+sizeof(opaque);
+            /* Ordinary rooms can have either eight-byte alignment parity. */
+            gfx.head=(RoomCommand *)opaque;gfx.tail=opaque+sizeof(opaque)-8*parity;
             gfx.xlu_head=(RoomCommand *)translucent;gfx.xlu_tail=translucent+sizeof(translucent);
             game.frame=parity;af_v3_room_rig_dw(actor,0,&game,model);
             assert(last_matrices==actor->matrices[parity]);
-            assert(gfx.head==(RoomCommand *)opaque+12 && gfx.tail==opaque+sizeof(opaque)-64);
+            assert(gfx.head==(RoomCommand *)opaque+12 && gfx.tail==opaque+sizeof(opaque)-8*parity-64);
             assert(gfx.xlu_head==(RoomCommand *)translucent+1);
         }
         for (u32 parity=0;parity<2;++parity)
@@ -90,6 +91,8 @@ int main(void) {
     assert(constructs==16 && draws==32);
     RoomRig before=*actor;
     unsigned drawn=draws;
+    gfx.head=(RoomCommand *)opaque;gfx.tail=opaque+sizeof(opaque)-4;
+    af_v3_room_rig_dw(actor,0,&game,model);assert(draws==drawn && gfx.head==(RoomCommand *)opaque);
     gfx.head=(RoomCommand *)opaque;gfx.tail=opaque+144;
     af_v3_room_rig_dw(actor,0,&game,model);assert(draws==drawn && gfx.head==(RoomCommand *)opaque);
     gfx.tail=opaque+sizeof(opaque);gfx.xlu_tail=(u8 *)gfx.xlu_head;

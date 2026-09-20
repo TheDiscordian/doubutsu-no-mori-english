@@ -64,6 +64,21 @@ int main(void) {
         assert(!af_v3_furniture_import_profile(n));
         assert(af_v3_furniture_bank(n) == -1);
     }
+    /* Display metadata keeps parent identity in the reserved tail, but needs
+       its own enabled footprint as well as the selected furniture profile. */
+    struct Import *room=af_v3_furniture_imports+768;
+    struct Item *form=af_v3_test_items+768;
+    *room=(struct Import){.index=1792,.item=0x3C00,.enabled=1};
+    profiles[1792]=AF_V3_STATIC_IMPORT_RAM+768*80+8;
+    *form=(struct Item){1792,0x3C00,0,0,1,{0},{0,0,0,0,0x22,0x44,0,0}};
+    for (u32 rotation=0;rotation<4;++rotation) {
+        struct Place cells[4];
+        assert(af_v3_item_place(0x3C00|rotation,-4,7,cells)==0);
+        for (u32 j=0;j<4;++j)assert(cells[j].exists==(j==0) && cells[j].x==-4 && cells[j].z==7);
+        form->enabled=0;assert(af_v3_item_place(0x3C00|rotation,-4,7,cells)==3);
+        form->enabled=1;room->enabled=0;assert(af_v3_item_place(0x3C00|rotation,-4,7,cells)==3);
+        room->enabled=1;
+    }
     assert(!af_v3_furniture_import_profile(1023) && !af_v3_furniture_import_profile(65535));
     assert(!af_v3_item_type(0x3004) && !af_v3_item_type(0x3FF8));
     assert(af_v3_item_type(0x1088) == 92 && af_v3_item_price(0x1088) == 95);

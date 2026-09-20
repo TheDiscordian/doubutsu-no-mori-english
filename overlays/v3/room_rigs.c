@@ -64,7 +64,9 @@ void af_v3_room_rig_dw(RoomRig *actor,void *room,RoomRigGame *game,u8 *data) {
     uptr xlu=(uptr)gfx->xlu_head,xlu_back=(uptr)gfx->xlu_tail;
     /* Parent matrix plus the skeleton's segment, matrix, and list commands.
        Both joint callbacks are verified no-ops in this source category. */
-    if ((front&7) || (back&15) || (xlu&7) || back<front || back-front<64u+(2u+2u*r->shown)*8u ||
+    /* Native graph allocations are eight-byte aligned. A valid tail ending
+       in eight must not suppress an entire room model. */
+    if ((front&7) || (back&7) || (xlu&7) || back<front || back-front<64u+(2u+2u*r->shown)*8u ||
             xlu_back<xlu || xlu_back-xlu<8) return;
     gfx->head=commands+1;
     commands[0]=(RoomCommand){0xDA380003,(u32)(uptr)_Matrix_to_Mtx_new(gfx)};
