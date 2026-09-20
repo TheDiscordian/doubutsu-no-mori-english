@@ -116,7 +116,7 @@ names do not select conversion code.
 
 Use `convert --assets-only --category scrolling-material-assets` with the current
 explicit build lock. The complete prepared batch covers Merlion, Manekin Pis,
-well model, fireplace, and sprinkler. The draw contract supplies segment eight
+well model, fireplace, sprinkler, backyard pool, and lawn mower. The draw contract supplies segment eight
 or nine only to its actual consuming model. Complete texture dimensions must
 match the ordered one/two tile loads; missing, reordered, relocated, or unused
 scroll bindings reject. CI4 and I4 use distinct non-overlapping TMEM regions
@@ -124,6 +124,30 @@ below palette storage. Eight-pixel rows use tile transfers with padded TMEM
 strides, retaining both CI4 layers even when they share a source texture.
 Source wrap, mirror, shifts, palette, both-cycle combiners, colour state, every
 texel, and geometry are preserved. Unknown dynamic display lists remain refused.
+
+The same resource category accepts verified EVW two-tile animation tables and
+the shared parameterised furniture scroll helper. EVW records retain signed
+source X rates and negated Y rates, dimensions, segment selection, the final
+negative-segment marker, full data relocations, the dispatcher table, and checked
+selected handlers. Unimplemented EVW colour/texture-animation types reject;
+they are not treated as static decoration. The parameterised helper retains its
+negated rates, frame-offset input, and room/preview counter selection.
+
+Drawing descriptors may assign several models to the translucent stream and
+bind scrolling to a middle model. The pool retains all three models, its actual
+EVW water rates, and both layers of the repeated water texture. Its earlier,
+unused scroll allocation is recorded separately and never mistaken for the
+active binding. Both primitive/environment colours preserve their actual debug
+register dependencies; constants are not substituted for unresolved state.
+The mower retains two independent texture layers and actor alpha multiplied by
+the verified source `255.0` constant, including actor-state alpha in previews.
+
+These additional draw features remain explicit pending runtime work. The
+36-byte renderer record refuses them rather than discarding secondary models,
+changing preview semantics, or losing state scaling. The current renderer serves
+the original five records only. Prepared artwork is reusable after the shared
+renderer and lifecycles support these contracts. Pipeline/installer version 17
+and graphics converter version 12 retain validated earlier artwork caches.
 
 Preparation does not imply native drawing, lifecycle colour/sound transitions,
 or acquisition. `--refresh-runtime --scrolling-materials-art` installs complete

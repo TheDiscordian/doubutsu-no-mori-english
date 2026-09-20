@@ -25,11 +25,16 @@ unchanged. Continue remaining shared conversion/runtime/acquisition categories;
 gold-tree completion remains after primary imports.
 
 Complete scrolling-material resources are prepared at
-`build/v3-scrolling-materials-prepared-02/`: five objects, 28,112 bytes, one
-compiler batch and complete subsequent cache reuse. Four focused checks pass.
-Continue shared lifecycle integration and the remaining EVW/rigged material
-categories, reusing these complete models rather than reconverting
-individual items. Source draw records retain OPA/XLU order, one/two texture
+`build/v3-scrolling-materials-prepared-03/`: seven objects, 38,336 bytes. The
+current batch compiles backyard pool and lawn mower together and reuses the five
+existing objects. Four focused resource checks pass. EVW two-tile tables and
+the shared parameterised scroll helper are decoded with complete dependencies.
+Extend the shared renderer for multiple translucent models, explicit colour
+commands, scaled actor alpha, and preview inputs before installing these two
+objects. Preserve the pool's actual debug-register colour dependencies and the
+mower's contact/floor-driven grass lifecycle; neither is an enabled import.
+Continue general rigged material and lifecycle/acquisition categories, reusing
+complete models rather than reconverting individual items. Source draw records retain OPA/XLU order, one/two texture
 layers, dimensions/rates, segment bindings, and runtime colour inputs. Their
 lifecycle effects and acquisition remain pending. Merlion and Manekin Pis have
 reviewed additive destinations `3C34` and `3C38`. Prepared assets cannot be
@@ -195,7 +200,8 @@ converter, cartridge, sanitizer, and native audio evidence.
 The ordinary bulk importer's chair-sound check accepts the expanded dispatch
 tables/fonts by verifying actual complete programs/instruments, not stale
 addresses. Its positive/negative check passes; reuse this machinery.
-The shared import reservation extends to `02800000`, with 1,981,712 bytes free.
+The shared import reservation extends to `02800000`; the current proposal has
+1,894,896 bytes free.
 English choices/general strings retain
 their content and physical locations through checked virtual relocation. The
 final general string has three checked padding bytes for rounded native DMA.

@@ -1,5 +1,59 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared EVW and parameter-scroll resources
+
+`build/v3-scrolling-materials-prepared-03/` extends the existing shared resource
+category to seven complete objects (38,336 bytes). Backyard pool `3258` is
+4,960 bytes and lawn mower `33A0` is 5,264 bytes. One compiler container produces
+both; the five existing objects are reused with identical models, resources,
+profiles, and object hashes. No per-item installer or emulator scenario is added.
+
+Source discovery verifies the full EVW table dispatcher, complete six-handler
+dispatch table, selected two-tile handler/generator, animation records, final
+negative-segment marker, and relocated dependencies. Other EVW animation types
+remain unsupported. The pool's active water rates are `(-1,0)` and `(0,2)`,
+not the `(1,0)` and `(0,2)` values passed to its unused direct scroll allocation.
+The complete source sequence has one opaque and two translucent models; only
+the middle model consumes segment nine. Both colour commands retain their
+CRV 47–55 debug-register dependencies and play-frame preview requirement.
+
+The common `fFTR_GetTwoTileGfx` helper retains parameter dimensions, rate negation,
+frame offset, and room/preview selection. The mower's two layers scroll at
+`(0,0)` and `(0,-10)`, with source mirror/clamp/repeat modes intact. Its alpha
+is actor float `834` times the verified `255.0` constant, including previews;
+it is not the existing renderer's unscaled byte-valued colour state.
+Three additional complete colour-combiner expressions compile to the exact
+source RDP words. The shared converter preserves every texel, vertex, triangle,
+material command, and dynamic scroll call.
+
+Four `ExtendedScrollingResourceTests` pass on their first invocation in
+1.898 seconds. Checks cover independent complete converted graphics, both new
+draw contracts, original-cache retention, reuse of the new prepared assets,
+changed code/dispatch/table/constant rejection, pending-runtime gates, and
+official name provenance. No emulator or historical-build replay is needed for
+this resource-only batch. Native rendering, ordinary gameplay, and hardware
+are not claimed tested.
+
+The ABI-171 cartridge, 136 choices, 26 staged profiles, saved format/profile,
+main ABI-109 lock, and stable website deployments remain unchanged. The two
+new resources cannot enter the current renderer or ordinary profiles. Extend
+shared drawing contracts and implement actual remaining lifecycles/acquisition
+before enabling them; do not flatten the water or grass effects. Gold-tree
+completion remains required after primary importing.
+
+```sh
+python3 tools/v3_furniture_pipeline.py convert --assets-only \
+  --category scrolling-material-assets \
+  --base-lock build/v3-scrolling-materials-runtime-02/build-lock.json \
+  --reuse-assets build/v3-scrolling-materials-prepared-02 \
+  --output build/scrolling-extended-reproduction
+PYTHONPATH=tests python3 -m unittest \
+  test_v3_furniture_pipeline.ExtendedScrollingResourceTests -v
+```
+
+Prepared manifest SHA-256:
+`e241d17928d18e7e2f7aa0a34f664ce1452dbbb5b193642b2c62c716bd50e2e4`.
+
 ## Shared scrolling-material renderer
 
 ABI 171 at `build/v3-scrolling-materials-runtime-02/` installs the shared renderer

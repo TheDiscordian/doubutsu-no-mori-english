@@ -47,11 +47,148 @@ WRAPPERS = {
 }
 
 
+def checked_generator(source, receipt):
+    source.checked_callback_code(receipt,204,
+        '595b86c4d52240deb412e1eb8e36370b1445e77e805782439314800eb132011e',
+        {0x10:(10,0,4,0x8009AED0),0xB8:(10,0,4,0x8009AF1C)}, {}, 'shared scroll generator',
+        internal_branches=True)
+
+
+def evw_scroll(source, target, setter):
+    """Decode complete EVW two-tile tables, including signed rates and terminator.
+
+    Colour/texture-animation variants need their own complete implementations;
+    none can be interpreted as a scrolling row or silently omitted.
+    """
+    from v3_furniture_pipeline import ReviewRequired
+    def reject(reason): raise ReviewRequired('EVW scrolling: '+reason)
+    module=u32(source.rel,0)
+    expected={0x10:(10,0,4,0x8009AED0),0x78:(10,0,4,0x8009AF1C),
+              0x2E:(6,module,5,0x80),0x32:(4,module,5,0x80)}
+    source.checked_callback_code(setter,140,
+        '96f668c610ec8c66b1c8e0e2048472b67b039a03634fbe16bd846c747956c22b',
+        expected,{},'EVW table dispatcher',internal_branches=True)
+    symbol,at,n=source.containing(0x80,exact=True)
+    dispatch={p-at:r for p,r in source.relocations.items() if at<=p<at+n}
+    targets=(10800,11068,11400,11548,12364,13084)
+    if n!=24 or source.data[at:at+n]!=bytes(n) or dispatch!={i*4:(1,True,1,t) for i,t in enumerate(targets)}:
+        reject('changed complete handler table')
+    helpers={setter['symbol']:setter}
+    _,handler=source.function(targets[1]);helpers[handler['symbol']]=handler
+    helpers.update(source.checked_callback_code(handler,132,
+        '2f929583442982283e82f98fc931e885db5f755a8b894472d9da958630ee22e6',{},
+        {0x20:(0x2AB4,'evw_two_tex_scroll_set')},'EVW two-tile binding'))
+    helper=helpers['evw_two_tex_scroll_set']
+    helpers.update(source.checked_callback_code(helper,136,
+        'a1211cc4c3f8d6217e831006d29369a99ac4049a02494dddf7345ac981830196',{},
+        {0x74:(0x75400,'two_tex_scroll_dolphin')},'EVW two-tile rates'))
+    checked_generator(source,helpers['two_tex_scroll_dolphin'])
+    table_name,start,n=source.containing(target,exact=True);raw=source.data[start:start+n]
+    if not n or n%8 or n>64:reject('incomplete animation table')
+    expected_data={};rows=[];segments=set()
+    for p in range(0,n,8):
+        segment,pad,kind,pointer=struct.unpack_from('>bBhI',raw,p)
+        if (not 1<=abs(segment)<=8 or pad or kind!=1 or pointer or
+                (segment<0)!=(p==n-8) or abs(segment) in segments):
+            reject('unsupported type, segment, or termination')
+        segments.add(abs(segment))
+        ref=source.relocations.get(start+p+4)
+        if ref is None or ref[:3]!=(1,True,5):reject('missing scroll data')
+        expected_data[start+p+4]=ref
+        name,at,size=source.containing(ref[3],exact=True);data=source.data[at:at+size]
+        if size!=8 or source.pointers(at,size):reject('incomplete two-tile data')
+        tiles=[]
+        for i,(x,y,w,h) in enumerate(struct.iter_unpack('>bbBB',data)):
+            if any(v<8 or v>64 or v&(v-1) for v in (w,h)):reject('unsupported complete tile dimensions')
+            tiles.append(dict(index=i,width=w,height=h,rate=[x,-y]))
+        rows.append(dict(segment_address=(7+abs(segment))<<24,input='play-frame',tiles=tiles,
+            data=dict(symbol=name,donor_offset=at,bytes=size,source_sha256=sha256(data))))
+    if {p:r for p,r in source.relocations.items() if start<=p<start+n}!=expected_data:
+        reject('unaccounted animation relocations')
+    return dict(symbol=table_name,donor_offset=start,bytes=n,source_sha256=sha256(raw),rows=rows,
+        dispatch=dict(symbol=symbol,donor_offset=0x80,bytes=24,targets=list(targets))),helpers
+
+
+EXTENDED_FORMS={
+    (468,'4bbcf5a499849b0d06544ff62a78e065da22b0b131213ca4229ab945d7337665'):'evw-colour-sequence',
+    (344,'6b546b76476693bdbaab15e19182f038e0f7b79a39894fffbfef582cdab21627'):'parameter-scroll-state-alpha',
+}
+
+
+def discover_extended(source,name,at,functions,digest):
+    from v3_furniture_pipeline import ReviewRequired
+    draw=functions['draw'];kind=EXTENDED_FORMS.get((draw['bytes'],digest))
+    if kind is None:return None
+    module=u32(source.rel,0);models={}
+    def pair(hi,lo,section=5):
+        ref=draw['relocations'].get(hi)
+        if ref is None or ref[:3]!=(6,module,section):
+            raise ReviewRequired('scrolling materials: missing paired source binding')
+        expected.update({hi:ref,lo:(4,module,section,ref[3])})
+        return ref[3]
+    if kind=='evw-colour-sequence':
+        expected={0x10:(10,0,4,0x8009AED4),0x1C0:(10,0,4,0x8009AF20)}
+        pairs=((0xA6,0xBE),(0x186,0x196),(0x18A,0x19E))
+        for i,(hi,lo) in enumerate(pairs):models[f'part{i}']=source.containing(pair(hi,lo),exact=True)
+        table=pair(0xAE,0xB6);debug=pair(0xAA,0xC6,6)
+        if debug!=0x39840:raise ReviewRequired('scrolling materials: changed debug-register owner')
+        helpers=source.checked_callback_code(draw,468,digest,expected,
+            {0x4C:(0x2CE81C,'fSKP_GetTwoTileGfx'),0x78:(0x9D214,'_Matrix_to_Mtx_new'),
+             0x9C:(0x9D214,'_Matrix_to_Mtx_new'),0x17C:(0x339C,'Evw_Anime_Set')},
+            'EVW colour sequence',internal_branches=True)
+        wrapper=helpers['fSKP_GetTwoTileGfx'];wn,wh,wcall=WRAPPERS[((16,16),(16,16))]
+        helpers.update(source.checked_callback_code(wrapper,wn,wh,{},
+            {wcall:(0x75400,'two_tex_scroll_dolphin')},'unused allocation guard'))
+        evw,dependencies=evw_scroll(source,table,helpers['Evw_Anime_Set']);helpers.update(dependencies)
+        if len(evw['rows'])!=1:raise ReviewRequired('scrolling materials: draw needs exactly one EVW binding')
+        scrolling=dict(evw['rows'][0],model='part1',colour=None,evw=evw,
+            source_coordinate_shift=1,allocation_failure='skip-draw',
+            unused_scroll_allocation=dict(dimensions=[[16,16],[16,16]],rates=[[1,0],[0,2]],
+                                          input='room-or-preview-frame'),
+            draw_features=['multiple-translucent-models','debug-register-colours','play-frame-preview'],
+            colours=[dict(command='primitive',before_model='part1',minimum_level=0,
+                          fields=['lod_fraction','r','g','b','a'],base=[160,55,255,255,200],
+                          debug_indices=[47,48,49,50,51]),
+                     dict(command='environment',before_model='part1',fields=['r','g','b','a'],
+                          base=[0,155,205,255],debug_indices=[52,53,54,55])],
+            debug_owner=dict(section=6,offset=debug,kind='pointer-to-debug-mode',register_bank='CRV'))
+        arenas=['opaque','translucent','translucent']
+    else:
+        expected={0x10:(10,0,4,0x8009AECC),0x144:(10,0,4,0x8009AF18)}
+        for i,(hi,lo) in enumerate(((0x9A,0xAA),(0xF2,0x10E))):
+            models[f'part{i}']=source.containing(pair(hi,lo),exact=True)
+        constant=pair(0x16,0x26,4);section,size=source.sections[4]
+        if (constant&3 or constant+4>size or source.rel[section+constant:section+constant+4]!=struct.pack('>f',255.0)
+                or any((4,p) in source.section_relocations for p in range(constant,constant+4))):
+            raise ReviewRequired('scrolling materials: changed alpha multiplier')
+        helpers=source.checked_callback_code(draw,344,digest,expected,
+            {0x64:(0x2BE944,'fFTR_GetTwoTileGfx'),0x90:(0x9D214,'_Matrix_to_Mtx_new'),
+             0xD4:(0x9D214,'_Matrix_to_Mtx_new')},'parameter scrolling and state alpha',internal_branches=True)
+        helper=helpers['fFTR_GetTwoTileGfx']
+        helpers.update(source.checked_callback_code(helper,160,
+            '1526a19c4fb00f3f24e833c6139daeb9a116eee0a93562185db011535577f526',{},
+            {0x84:(0x75400,'two_tex_scroll_dolphin')},'shared parameter scrolling',internal_branches=True))
+        checked_generator(source,helpers['two_tex_scroll_dolphin'])
+        scrolling=dict(segment_address=0x08000000,model='part1',input='room-or-preview-frame',
+            tiles=[dict(index=i,width=16,height=16,rate=rate) for i,rate in enumerate(([0,0],[0,-10]))],
+            source_coordinate_shift=1,allocation_failure='skip-draw',source_frame_offset=0,
+            draw_features=['scaled-state-alpha','state-alpha-preview'],
+            colour=dict(command='primitive',rgb=[120,255,180],lod_fraction=255,field='alpha',
+                        room_f32_offset=0x834,preview='actor-state',multiplier=255.0,
+                        multiplier_source=dict(section=4,offset=constant,bytes=4,source_hex='437f0000')))
+        arenas=['opaque','translucent']
+    labels=list(models)
+    return models,{},dict(category=CATEGORY,vtable_symbol=name,vtable_offset=at,
+        functions=functions,helpers=helpers,scrolling=scrolling,model_order=labels,
+        model_arenas=dict(zip(labels,arenas)),runtime_installed=False,pending_callbacks=list(functions),
+        resource_scope='complete opaque/translucent models and scrolling layers; runtime and lifecycle pending')
+
+
 def discover(source, name, at, functions):
     from v3_furniture_pipeline import ReviewRequired
     draw = functions['draw']; raw, _ = source.function(draw['offset'])
     forms = [form for form in FORMS if form[0] == len(raw)]
-    if not forms: return None
+    if not forms and len(raw) not in {r[0] for r in EXTENDED_FORMS}: return None
     normalized = bytearray(raw)
     for loc, (kind, _, _, _) in draw['relocations'].items():
         if kind in (4,6): normalized[loc:loc+2] = bytes(2)
@@ -62,7 +199,7 @@ def discover(source, name, at, functions):
         if word&0xFC000003 == 0x48000001:
             struct.pack_into('>I',normalized,loc,word&0xFC000003)
     form = next((r for r in forms if sha256(normalized) == r[1]),None)
-    if form is None: return None
+    if form is None: return discover_extended(source,name,at,functions,sha256(normalized))
     size,digest,pairs,call,matrices,save,segment,dimensions,rates,colour = form
     module = u32(source.rel,0); models = {}
     expected = {0x10:(10,0,4,save),size-20:(10,0,4,save+0x4C)}
@@ -81,10 +218,7 @@ def discover(source, name, at, functions):
     helpers = source.checked_callback_code(wrapper,wn,wh,{},
         {wcall:(0x75400,'two_tex_scroll_dolphin')},'scroll dimension wrapper')
     common = helpers['two_tex_scroll_dolphin']
-    source.checked_callback_code(common,204,
-        '595b86c4d52240deb412e1eb8e36370b1445e77e805782439314800eb132011e',
-        {0x10:(10,0,4,0x8009AED0),0xB8:(10,0,4,0x8009AF1C)}, {}, 'shared scroll generator',
-        internal_branches=True)
+    checked_generator(source,common)
     calls = {loc:(0x9D214,'_Matrix_to_Mtx_new') for loc in matrices}
     calls[call] = (target,wrapper['symbol'])
     helpers.update(source.checked_callback_code(draw,size,digest,expected,calls,'scrolling materials',internal_branches=True))
@@ -108,7 +242,7 @@ def bindings(adapter):
     if adapter.get('category') != CATEGORY: return {}
     row = adapter['scrolling']; tiles = row['tiles']
     if (row['segment_address'] not in (0x08000000,0x09000000) or len(tiles)!=2 or
-            [r['index'] for r in tiles]!=[0,1] or row['model']!=adapter['model_order'][-1] or
+            [r['index'] for r in tiles]!=[0,1] or row['model'] not in adapter['model_order'] or
             adapter['model_arenas'][row['model']]!='translucent'):
         raise ValueError('Invalid complete scroll material binding')
     dimensions = tuple((r['width'],r['height']) for r in tiles)
@@ -122,7 +256,11 @@ def runtime_record(row):
     a=row['profile']['callback_adapter'];binding=bindings(a)
     if not binding:raise ValueError('Missing complete scrolling resource category')
     source=a['scrolling'];colour=source['colour'];mode=word_a=word_b=preview=state=0
+    if source.get('draw_features'):
+        raise ValueError('Scrolling draw features need runtime adapters: '+', '.join(source['draw_features']))
     if colour:
+        if colour.get('multiplier',1)!=1 or type(colour['preview']) is not int:
+            raise ValueError('Scrolling state scaling or preview needs a runtime adapter')
         if colour['room_f32_offset']!=0x834:raise ValueError('Changed source colour state')
         mode=2 if colour['field']=='lod_fraction' else 1
         if colour['command']=='environment':word_a=0xFB000000

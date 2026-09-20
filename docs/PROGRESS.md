@@ -18,6 +18,19 @@ served patchers retain their existing builds.
 
 ## Active development
 
+The shared scrolling converter also prepares complete backyard pool and lawn
+mower artwork. `build/v3-scrolling-materials-prepared-03/` contains seven objects
+(38,336 bytes): two newly compiled together, five reused without compilation.
+EVW animation tables and the common parameterised scrolling helper feed the
+same graphics pipeline. All pool layers, water rates, debug colour dependencies,
+and the mower's scaled actor alpha remain explicit. Four focused resource checks
+pass, including complete graphics comparisons and rejection of unsupported
+runtime installation. Names are credited to the official donor in the single
+provenance catalogue. This is preparation, not two new playable imports; their
+additional drawing contracts and lifecycles remain pending. No ROM, saved
+profile, or website deployment changes. See the
+[EVW/parameter-scroll checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-evw-and-parameter-scroll-resources).
+
 The current explicit proposal is ABI 171 at
 `build/v3-scrolling-materials-runtime-02/build-lock.json`. The shared renderer
 installs all five complete prepared scrolling objects, with separate opaque and

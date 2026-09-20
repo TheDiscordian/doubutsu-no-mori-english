@@ -849,6 +849,103 @@ class DonorTests(unittest.TestCase):
                     self.assertEqual([w for w in words if w[0]==0xE3001001],luts)
 
 
+class ExtendedScrollingResourceTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.source=pipeline.Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+            (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+        cls.art=ROOT/'build/v3-scrolling-materials-prepared-03'
+        cls.report=json.loads((cls.art/'art.json').read_bytes())
+        cls.new={r['item_id']:r for r in cls.report['objects'] if not r.get('reused_artwork')}
+
+    def test_complete_bulk_artwork_and_existing_cache_reuse(self):
+        self.assertEqual(self.report['batch'],dict(objects=7,compiled=2,reused=5,compiler_containers=1))
+        self.assertEqual(set(self.new),{'3258','33A0'})
+        self.assertEqual(sum(r['object_bytes'] for r in self.new.values()),10224)
+        DonorTests.check_complete_artwork(self,self.art,dict(objects=list(self.new.values())))
+        old=json.loads((ROOT/'build/v3-scrolling-materials-prepared-02/art.json').read_bytes())
+        cached={r['item_id']:r for r in self.report['objects'] if r.get('reused_artwork')}
+        for row in old['objects']:
+            current=cached[row['item_id']]
+            for key in ('profile','resources','models','model_offsets','object_sha256'):
+                self.assertEqual(current[key],row[key])
+        cache=pipeline.PreparedAssets(self.source,[self.art])
+        for item,row in self.new.items():
+            prepared=pipeline.prepare(self.source,int(item,16))
+            self.assertEqual(json.loads(json.dumps(prepared[0])),row['profile'])
+            self.assertEqual(cache.reuse(self.source,item,prepared)[1]['object_sha256'],row['object_sha256'])
+
+    def test_evw_and_parameter_scrolling_retain_source_draw_contracts(self):
+        pool=self.new['3258']['profile']['callback_adapter'];scroll=pool['scrolling']
+        self.assertEqual(pool['model_order'],['part0','part1','part2'])
+        self.assertEqual(list(pool['model_arenas'].values()),['opaque','translucent','translucent'])
+        self.assertEqual(scroll['model'],'part1')
+        evw=scroll['evw'];at=evw['donor_offset'];data_at=data_pointers(self.source.rel,at,evw['bytes'])[at+4]
+        segment,pad,kind,pointer=struct.unpack_from('>bBhI',self.source.data,at)
+        self.assertEqual((segment,pad,kind,pointer),(-2,0,1,0))
+        values=list(struct.iter_unpack('>bbBB',self.source.data[data_at:data_at+8]))
+        self.assertEqual(scroll['tiles'],[dict(index=i,width=w,height=h,rate=[x,-y])
+                                         for i,(x,y,w,h) in enumerate(values)])
+        self.assertEqual([r['rate'] for r in scroll['tiles']],[[-1,0],[0,2]])
+        self.assertEqual(scroll['input'],'play-frame')
+        self.assertNotEqual(scroll['unused_scroll_allocation']['rates'],[r['rate'] for r in scroll['tiles']])
+        self.assertEqual([r['base'] for r in scroll['colours']],[[160,55,255,255,200],[0,155,205,255]])
+        self.assertEqual([r['debug_indices'] for r in scroll['colours']],[[47,48,49,50,51],[52,53,54,55]])
+        prepared=pipeline.prepare(self.source,0x3258)
+        tiles=[r for r in prepared[4]['part1']['rows'] if r['opcode']==0xFD]
+        self.assertEqual([r['tile_shifts'] for r in tiles],[(15,15),(15,15)])
+        self.assertEqual(tiles[0]['target'],tiles[1]['target'])
+        mower=self.new['33A0']['profile']['callback_adapter']['scrolling']
+        self.assertEqual([r['rate'] for r in mower['tiles']],[[0,0],[0,-10]])
+        self.assertEqual(mower['source_frame_offset'],0)
+        self.assertEqual(mower['colour']['multiplier'],255.0)
+        self.assertEqual(mower['colour']['preview'],'actor-state')
+        self.assertEqual(mower['colour']['rgb'],[120,255,180])
+        prepared=pipeline.prepare(self.source,0x33A0)
+        tiles=[r for r in prepared[4]['part1']['rows'] if r['opcode']==0xFD]
+        self.assertNotEqual(tiles[0]['target'],tiles[1]['target'])
+        self.assertEqual([r['wrap_modes'] for r in tiles],[(2,0),(1,1)])
+
+    def test_incomplete_evw_dependencies_and_changed_alpha_are_rejected(self):
+        for item,row in self.new.items():
+            adapter=row['profile']['callback_adapter']
+            functions=[adapter['functions']['draw']]+[r for k,r in adapter['helpers'].items()
+                                                      if k!='_Matrix_to_Mtx_new']
+            for function in functions:
+                changed=copy.copy(self.source);changed.rel=bytearray(self.source.rel)
+                changed.rel[self.source.sections[1][0]+function['offset']+3]^=4
+                with self.assertRaises(ValueError):changed.profile(int(item,16))
+        scroll=self.new['3258']['profile']['callback_adapter']['scrolling'];table=scroll['evw']['donor_offset']
+        for offset,value in ((0,2),(1,1),(3,5),(4,1)):
+            changed=copy.copy(self.source);changed.data=bytearray(self.source.data)
+            changed.data[table+offset]=value
+            with self.assertRaisesRegex(ValueError,'EVW scrolling'):changed.profile(0x3258)
+        changed=copy.copy(self.source);changed.relocations=dict(self.source.relocations)
+        changed.relocations.pop(table+4)
+        with self.assertRaisesRegex(ValueError,'missing scroll data'):changed.profile(0x3258)
+        changed=copy.copy(self.source);changed.relocations=dict(self.source.relocations)
+        changed.relocations[0x84]=(1,True,1,10800)
+        with self.assertRaisesRegex(ValueError,'handler table'):changed.profile(0x3258)
+        multiplier=self.new['33A0']['profile']['callback_adapter']['scrolling']['colour']['multiplier_source']
+        changed=copy.copy(self.source);changed.rel=bytearray(self.source.rel)
+        struct.pack_into('>f',changed.rel,changed.sections[4][0]+multiplier['offset'],128.0)
+        with self.assertRaisesRegex(ValueError,'alpha multiplier'):changed.profile(0x33A0)
+
+    def test_pending_drawing_and_gameplay_cannot_be_silently_installed(self):
+        from v3_furniture_scroll import runtime_record
+        for item,row in self.new.items():
+            self.assertFalse(row['import_ready'])
+            self.assertIn('need runtime adapters',row['pending_reason'])
+            with self.assertRaisesRegex(ValueError,'draw features need runtime adapters'):runtime_record(row)
+            forged=copy.deepcopy(row);forged['profile']['callback_adapter']['runtime_installed']=True
+            with self.assertRaisesRegex(ValueError,'no implemented native lifecycle'):install.profile(forged,0x02500000)
+            with self.assertRaisesRegex(ValueError,'Scrolling artwork'):
+                pipeline.metadata(self.source,int(item,16),forged['profile'],None)
+            self.assertEqual(forged['profile']['callback_adapter']['pending_callbacks'],
+                             list(forged['profile']['callback_adapter']['functions']))
+        self.assertEqual(install.provenance_patch(list(self.new.values())),'')
+
+
 class ScrollingMaterialResourceTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):

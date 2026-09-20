@@ -20,16 +20,18 @@ from v3_import_catalog import DONOR, REL_SHA, ROOT, SYMBOLS_SHA, read_donor
 from v3_villager_art import data_pointers, native_palette, normalise_vertex_flags, symbol_span
 
 SEGMENT = 0x06000000
-CONVERTER_VERSION = 11
+CONVERTER_VERSION = 12
 
 # Complete compatible RDP expressions, selected by material commands, not IDs.
-# Both use one texture and retain source alpha; neither introduces TEXEL1,
+# These use one texture and retain source alpha; none introduces TEXEL1,
 # noise, keying, or an unprovided external render dependency.
 TRANSLUCENT_COMBINERS = {
     (0xFC11FE04,0xFF0FF3FF): ('TEXEL0','0','PRIMITIVE','0','0','0','0','TEXEL0',
         'COMBINED','0','SHADE','0','COMBINED','0','PRIMITIVE','0'),
     (0xFC341604,0x5FFEFFF8): ('PRIMITIVE','ENVIRONMENT','TEXEL0_ALPHA','ENVIRONMENT',
         'TEXEL0','0','PRIMITIVE','0','COMBINED','0','SHADE','0','0','0','0','COMBINED'),
+    (0xFC119C04,0xFFFFF7F8): ('TEXEL0','0','PRIMITIVE','0','TEXEL0','0','PRIM_LOD_FRAC','PRIMITIVE',
+        'COMBINED','0','SHADE','0','0','0','0','COMBINED'),
 }
 
 # Scrolling models supply every referenced tile, with the second cycle's texture
@@ -44,6 +46,10 @@ SCROLL_COMBINERS = {
     (0xFC254C04,0x1FFCFFF8): ('TEXEL1','TEXEL0','PRIMITIVE_ALPHA','TEXEL0','SHADE','0','PRIM_LOD_FRAC','0',
         'COMBINED','0','SHADE','0','0','0','0','COMBINED'),
     (0xFC3097FF,0x5F06FE3F): ('PRIMITIVE','ENVIRONMENT','TEXEL0','ENVIRONMENT','TEXEL0','0','PRIMITIVE','0',
+        '0','0','0','COMBINED','COMBINED','0','TEXEL0','0'),
+    (0xFC30FE04,0x5F3AFDF0): ('PRIMITIVE','ENVIRONMENT','TEXEL0','ENVIRONMENT','0','0','0','1',
+        'COMBINED','0','SHADE','0','TEXEL0','1','PRIM_LOD_FRAC','COMBINED'),
+    (0xFC3217FF,0xFF07FE3F): ('PRIMITIVE','0','SHADE','0','TEXEL0','0','PRIMITIVE','0',
         '0','0','0','COMBINED','COMBINED','0','TEXEL0','0'),
 }
 
