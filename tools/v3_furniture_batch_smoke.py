@@ -1562,6 +1562,7 @@ def tool_controls(debug,rom_path,record,*,transitions=False,capture=False,rod=Fa
 
 def exercise(debug, rom_path, record, *, section='automatic_furniture'):
     if section=='reward_actions':return reward_actions(debug,rom_path,record)
+    if section=='reward_pickup':return reward_pickup(debug,rom_path,record)
     if section=='reward_controls':return reward_controls(debug,rom_path,record)
     if section=='reward_messages':return reward_messages(debug,rom_path,record)
     if section=='reward_motion':return reward_motion(debug,rom_path,record)
@@ -2626,6 +2627,116 @@ def original_equipment_kinds(original):
         result.append(kind)
     if sorted(result)!=list(range(36)):raise ValueError('Original equipment switch is incomplete')
     return result
+
+
+def reward_pickup(debug,rom_path,record):
+    """Actual collection transition entries, with source flags and native requests."""
+    import v3_equipment_runtime as equipment
+    from runtime_layout import TEST_STACK
+    path=Path(rom_path);image=path.read_bytes();report=json.loads((path.parent/'build.json').read_bytes())
+    if sha256(image)!=report['output_sha256']:raise ValueError('Changed reward-pickup cartridge')
+    resources=report['equipment_resources'];receipt=resources['player_actions']['reward_pickup']
+    files=by_vrom(image);blob=files[runtime.BLOB].extract(image);boot=boot_proofs(image);assertions=0
+    def check(label,at,want):
+        nonlocal assertions
+        actual=debug.read_memory(at,len(want));passed=actual==want
+        record(dict(reward_pickup_check=label,address=f'{at:08X}',bytes=len(want),
+            assertion='passed' if passed else 'failed',observed_sha256=sha256(actual),expected_sha256=sha256(want)))
+        if not passed:raise ValueError('Reward pickup mismatch: '+label)
+        assertions+=1
+    def call(at,args=(),proof=None,want=None):
+        nonlocal assertions
+        result=debug.call(f'{at:08X}',list(args),return_address=MODULE_RAM+0x6480,verified_code=proof or boot.get(at))
+        if want is not None:result['assertion']='passed' if result['return_value']==want else 'failed'
+        record(result)
+        if want is not None:
+            if result['return_value']!=want:raise ValueError('Unexpected reward pickup return')
+            assertions+=1
+        return result['return_value']
+    def put(at,*words):debug.write_memory(at,struct.pack('>'+str(len(words))+'I',*words))
+    def pointer(at,size):
+        value=int.from_bytes(debug.read_memory(at,4),'big')
+        if value&3 or not MODULE_RAM+0x8000<=value<=0x80400000-size:raise ValueError('Invalid pickup fixture pointer')
+        return value
+    start=resources['blob_offset'];module=blob[start:start+resources['bytes']]
+    check('complete installed reward module',equipment.RAM,module)
+    constructor=int.from_bytes(debug.read_memory(0x80143900,4),'big');owner=constructor-(0x808DD748-equipment.PLAYER_RAM)
+    data,rel=(files[v].extract(image) for v in (equipment.PLAYER_VROM,equipment.PLAYER_RELOC))
+    if owner&15 or not MODULE_RAM+0x8000<=owner<=0x80400000-len(data):raise ValueError('Missing live player owner')
+    sections=struct.unpack_from('>5I',rel)
+    expected=relocate_verified_data(SimpleNamespace(ram=equipment.PLAYER_RAM,resident_bytes=len(data),sections=sections),data,rel,owner)
+    check('complete actual relocated player code',owner,expected[:sections[0]])
+    game=pointer(0x8010EF90,0x1E00);actor_bytes=resources['held_rig_actions']['player_allocation']['bytes']
+    actor=pointer(game+0x1C90,actor_bytes);actor_before=debug.read_memory(actor,actor_bytes)
+    saved={at:debug.read_memory(at,size) for at,size in ((0x80460020,192),
+        (0x8046C000,report['save_runtime']['state_bytes']),(0x80126EA0,0xF980),(0x80136FD8,4),(0x8013767D,2))}
+    selection=next(r for r in resources['parent_readers']['rows'] if r['item_id']=='223B')
+    allocation=call(0x8009BFC0,[64])
+    if allocation&15 or not MODULE_RAM+0x8000<=allocation<=0x80400000-64:raise ValueError('Pickup query bridge allocation failed')
+    bridge=allocation+16;query=receipt['code']['symbols']['af_v3_reward_completed']
+    raw=struct.pack('>4I',0x08000000|(query>>2&0x3FFFFFF),0,0,0)
+    debug.write_memory(bridge,raw);call(0x8002FE00,[bridge,len(raw)]);call(0x80034CE0,[bridge,len(raw)])
+    proof=(bridge,raw);edge=b'V3RP'*4;guards=(allocation,allocation+48,TEST_STACK-0x800,TEST_STACK+0x40)
+    for at in guards:debug.write_memory(at,edge)
+    state=bytearray(saved[0x8046C000]);state[0x350:0x380]=bytes(48)
+    def select(enabled):
+        profile=bytearray(saved[0x80460020]);profile[selection['profile_byte']]&=~selection['profile_mask']
+        if enabled:profile[selection['profile_byte']]|=selection['profile_mask']
+        state[0x10:0xD0]=profile;debug.write_memory(0x80460020,profile);debug.write_memory(0x8046C000,state)
+    def prepare(row,item=0x223B,enabled=True,done=False,priority=0,pending=0):
+        state[0x350:0x380]=bytes(48);state[0x358]=8 if done else 0;select(enabled)
+        put(0x80136FD8,0x80126EC0);put(actor+0xCF0,row['action']);put(actor+0xD00,7,priority,pending,0)
+        debug.write_memory(actor+0xD10,bytes(0x48));debug.write_memory(actor+0xD58,b'\xA5'*16)
+        debug.write_memory(actor+0xD10,struct.pack('>3f',11,22,33))
+        debug.write_memory(actor+row['item_offset'],struct.pack('>H',item))
+    def transition(row,end=1):
+        first,last=row['entry']-equipment.PLAYER_RAM,row['end']-equipment.PLAYER_RAM
+        return call(owner+first,[actor,game,end],(owner+first,expected[first:last]))
+    try:
+        debug.write_memory(0x8013767D,bytes(2));debug.write_memory(0x80127908,b'\0');debug.write_memory(actor+0xE64,b'\1')
+        select(True)
+        for slot in range(4):
+            put(0x80136FD8,0x80126EC0+slot*0xBD0)
+            for type in range(4):
+                state[0x350:0x380]=bytes(48);state[0x358+12*slot]=1<<type
+                debug.write_memory(0x8046C000,state);call(bridge,[type],proof,1)
+                call(bridge,[(type+1)%4],proof,0)
+        call(bridge,[4],proof,0xFFFFFFFF);put(0x80136FD8,0x80126EC1);call(bridge,[3],proof,0xFFFFFFFF)
+        for row in receipt['bindings']['paths']:
+            label=str(row['action'])
+            prepare(row);before=debug.read_memory(actor,actor_bytes);transition(row,0)
+            check(label+' unfinished animation retains actor',actor,before)
+            transition(row);check(label+' first shovel requests celebration',actor+0xD00,struct.pack('>3I',118,34,1))
+            check(label+' shovel request type',actor+0xD58,struct.pack('>I',3))
+            check(label+' request does not mark completion',0x8046C000,state)
+            for item,enabled,done,description in ((0x223B,True,True,'completed shovel'),
+                    (0x223B,False,False,'unselected shovel'),(0x2202,True,False,'ordinary item')):
+                prepare(row,item,enabled,done);transition(row)
+                check(label+' '+description+' returns to idle',actor+0xD00,struct.pack('>3I',7,1,1))
+                check(label+' original wait arguments',actor+0xD58,struct.pack('>fI',-5,0))
+            prepare(row,priority=40,pending=1);before=debug.read_memory(actor,actor_bytes);transition(row)
+            check(label+' high-priority request rejects reward without fallback',actor,before)
+            if row['action']!=62:
+                prepare(row);exchange_offset=0xD3C if row['action']==32 else 0xD40
+                put(actor+exchange_offset,1);transition(row)
+                check(label+' full pockets retain original exchange request',actor+0xD00,struct.pack('>3I',33,21,1))
+                check(label+' exchange retains position and item',actor+0xD58,struct.pack('>3fH',11,22,33,0x223B))
+        check('callback module unchanged',equipment.RAM,module)
+        check('native save payload unchanged apart from fixture flag',0x80126EA0,
+            saved[0x80126EA0][:0xA68]+b'\0'+saved[0x80126EA0][0xA69:])
+        for at in guards:check('pickup guard',at,edge)
+        check('no CPU fault',0x8003CE34,bytes(4))
+    finally:
+        debug.write_memory(actor,actor_before)
+        for at,value in saved.items():debug.write_memory(at,value)
+        call(0x8009C040,[allocation])
+    check('live actor restored',actor,actor_before)
+    for at,value in saved.items():check('live state restored',at,value)
+    return dict(native_reward_pickup=True,assertions=assertions,actual_transition_entries=4,
+        reward_requests=True,repeat_suppression=True,selection_rejection=True,full_pocket_requests=3,
+        direct_component_calls=True,test_only_query_bridge=True,putaway_submenu_execution=False,
+        ordinary_acquisition_tested=False,ordinary_gameplay_tested=False,hardware_tested=False,
+        flash_written=False,requires_checkpoint_restore=True)
 
 
 def reward_actions(debug,rom_path,record):

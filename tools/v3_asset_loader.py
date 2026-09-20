@@ -114,6 +114,7 @@ def compile_part(part, out, extra_sources=(), defines=(), primary_source=None):
                        'player_rewards': ('af_v3_reward_bgm', 0x804B3880),
                        'reward_requests': ('af_v3_reward_request', 0x804B24E0),
                        'reward_wait': ('af_v3_reward_wait_setup', 0x804B3C90),
+                       'reward_pickup': ('af_v3_reward_pickup', 0x804B2620),
                        'held_rigs': ('af_v3_held_setup', 0x804B0000),
                        'room_rigs': ('af_v3_room_rig_ct', 0x804B1800),
                        'held_collection': ('af_v3_held_catalogue_record', 0x804AFA00),

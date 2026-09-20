@@ -71,6 +71,51 @@ out-of-range result, and the equipment-change callback still returns only
 
 ## Verification and remaining integration
 
+### Collection consumers
+
+The shared player-action installer connects four native collection tails to
+`af_v3_reward_pickup`, without replacing their animations, item transfers,
+unfinished-animation returns, or full-pocket branches:
+
+| Native action | Collection path | Item field | Settle priority before reward check |
+| --- | --- | --- | --- |
+| 30 | Pickup | `D3C` | Yes |
+| 31 | Jump pickup | `D38` | No |
+| 32 | Furniture pickup | `D38` | No |
+| 62 | Shovel put-away | `D1C` | Yes |
+
+The item must be selected golden shovel `223B`, and the active player's shovel
+celebration must be unfinished. The adapter requests action 118, type three,
+priority 34. A rejected request does not fall through to idle; the source
+transition can retry on the next update. Already completed, ordinary, and
+unselected items retain the native priority settlement and four-argument wait
+request with morph minus five and priority one. The full-pocket branches stay
+native, including their exchange/menu timing; this does not connect the later
+inventory exchange completion consumers.
+
+`af_v3_reward_completed(type)` resolves the active private pointer at `80136FD8`
+against all four slots at `80126EC0`, stride `BD0`, then queries the shared saved
+celebration flags. It never sets a completion flag. Unknown active pointers and
+invalid types return minus one, which is not treated as an unfinished reward.
+This shared query is available for subsequent event/submenu consumers.
+
+The complete 424-byte code group occupies `804B2620..804B27C7`; pickup is
+`804B2620`, and completion query is `804B2764`. It fits between existing requests
+and bobber artwork. Four 28-byte native tails call the adapter; their eight
+obsolete internal JAL relocations are removed. All other owner bytes and
+relocations remain. No allocation, profile, saved format, or selection grows.
+
+The installer binds complete donor transitions/query, native setup/main/
+transition bodies, existing request APIs, and actual native action table entries.
+Native Putaway is action 62 and Putin is action 63; their donor ordering differs.
+Do not identify an old native action by the same-numbered donor callback.
+
+See the [collection checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-reward-collection-consumers)
+for exact tests and their scope. Ordinary collection, inventory exchange,
+buried-item exchange, complete source acquisition, and hardware remain required.
+
+### Registered actions
+
 The [checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-reward-action-registration)
 records the exact cartridge and results. Host sanitizers exercise accepted and
 rejected requests, untouched actor bytes, source priorities, all wait-continuation
@@ -88,7 +133,8 @@ reach cartridge-loaded code. Live state and the emulator checkpoint are restored
 
 Ordinary acquisition still requires the source collection-completion event
 director/NPC support, perfect-town reward conversation, and gold-tree growth/drop
-route. Additional shovel pickup/submenu consumers must request the new action
+route. The four non-exchange collection tails are installed. Remaining shovel
+inventory exchange, burying, and release consumers must request the new action
 where the source does. These are required gameplay integration, not replaced
 with shop stock or arbitrary letters. The four golden-tool choices remain
 disabled. This stage adds no English text; existing source credits remain in

@@ -1369,8 +1369,10 @@ setup/main controller, fanfare requests, persistent settlement, and separate
 saved reward flags are installed as described below and in
 [reward persistence](V3_REWARD_SAVE.md).
 The [shared action stage](V3_REWARD_ACTIONS.md) registers the complete callbacks
-and request/wait routes. Next connect the event actors, acquisition conditions,
-and remaining shovel pickup/submenu consumers.
+and request/wait routes. The collection stage connects all four non-exchange
+pickup/put-away tails and the active-player completion query. Next connect the
+event actors, acquisition conditions, and remaining shovel inventory exchange,
+burying, and release consumers.
 Use the shared category installer and complete source records. Keep all four
 choices disabled until their full paths are connected; do not substitute a
 shop purchase, arbitrary letter, or unrelated NPC for a missing donor event.

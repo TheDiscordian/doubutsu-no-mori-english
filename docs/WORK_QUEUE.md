@@ -2,12 +2,30 @@
 
 ## Active: V3 optional GameCube imports
 
-The current explicit proposal is ABI 143,
-`build/v3-shared-reward-actions-01/build-lock.json`. All eight balloons are
+The current explicit proposal is ABI 144,
+`build/v3-shared-reward-pickup-01/build-lock.json`. All eight balloons are
 connected through shared source-derived parent records, room profiles, indoor
 conversion/pickup, collection/catalogue, complete icons, and optional selection.
 There are 128 experimental choices, with 24 equipment parents. Neither served
 V2 patcher nor the main lock changes.
+
+The four non-exchange collection tails and active-player reward query are
+installed through one shared adapter. Source priority ordering, native early
+returns, full-pocket paths, saved formats, and memory reservations are retained.
+One sanitizer and three cartridge/composition checks pass; the first silent
+native run passes 141 records and 102 assertions, including actual relocated
+entries, repeat/profile rejection, four-player flag queries, original exchange
+requests, guards, restored state/checkpoint, and clean exit. Retain these results;
+they are component calls, not ordinary acquisition or hardware proof.
+Next implement source inventory exchange completion: carry the golden-shovel
+condition through normal drop, empty-hand, buried-item, fish/insect release, and
+balloon release routes. Native Putin lacks the donor's deferred reward flag;
+preserve actual handover/release timing instead of celebrating early. Native
+Putaway is action 62 and Putin is 63, unlike donor ordering. Reuse the shared
+completion query at `804B2764` and registered submenu action 118. Keep gold-tree,
+collection-completion event/NPC, and perfect-town acquisition required; golden
+choices stay disabled. See the
+[collection checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-reward-collection-consumers).
 
 Complete shared reward actions 118–120 and all twelve source callbacks are
 registered. Source-priority requests, both celebration variants, the axe delay,
@@ -18,7 +36,8 @@ setup/main dispatchers, real priority rejection, the wait-to-celebration-to-idle
 sequence, saved celebration bits, guards, restored state/checkpoint, and clean
 exit. No callback-table substitutions are used; report completion is simulated,
 and delay boundaries are sampled. Reuse this evidence.
-Next implement source scene/NPC/tree acquisition and the shovel pickup/submenu
+Non-exchange collection consumers are installed. Next implement source
+scene/NPC/tree acquisition and remaining inventory exchange/bury/release
 consumers. Preserve official event conditions and dialogue; do not substitute
 shop stock, arbitrary letters, or unrelated NPCs. The four golden-tool choices
 remain disabled. Format-3 save/profile restrictions are unchanged. See the

@@ -1,5 +1,90 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared reward collection consumers
+
+The ABI-144 proposal is `build/v3-shared-reward-pickup-01/build-lock.json`.
+The shared player-action stage connects all four non-exchange collection tails
+to the source golden-shovel celebration, using an active-player completion query
+shared with subsequent event/menu consumers. It retains native item transfers,
+animations, early returns, full-pocket paths, and the source's different priority
+settlement ordering. The 128 choices, four disabled golden tools, format-3 saves,
+main ABI-109 lock, and both served V2 patchers remain unchanged.
+
+- ROM SHA-256:
+  `328f8ef72408fdc5e6fb5808754e95a7bc7342758d482337934f978a180fdcc6`.
+- Report SHA-256:
+  `0f94512ef6606b2bd073482e01cf14a194a0814462e8045ace21fb90807b18df`.
+- UPS SHA-256:
+  `92c9c83c697491c1a2f92bf4f0630a9dd52934bb616565f1283dfbf6c9f051a8`.
+- Code SHA-256:
+  `916153c8f9591cbe856f5a8d00dd2e09d3610fb6cf17812b0395ac5673bd9881`.
+
+The complete 424-byte helper fits `804B2620..804B27C8` (exclusive end), between
+retained requests and bobber artwork. The query at `804B2764` supports all four
+reward types and four player slots, returns minus one for unknown identities,
+and never marks completion. Four checked 28-byte native tails call pickup at
+`804B2620`; eight old JAL relocations are removed. All remaining owner bytes,
+relocations, resources, callbacks, profiles, and saved formats are retained.
+The complete source/native bodies, APIs, actual action bindings, and incoming
+control-flow guard are checked. Native Putaway is action 62, not donor action
+63; the installer uses the actual native setup/main pointers. No new English
+text is introduced, so the single provenance catalogue remains unchanged.
+
+One sanitizer and three cartridge/composition checks pass on the first run in
+6.404 seconds:
+
+```sh
+python3 -m unittest tests.test_v3_reward_pickup -v
+```
+
+They cover four-player/type queries, invalid arguments, selection/repeat
+rejection, source priority order, denied requests without idle fallback,
+unchanged actor/game data, complete source/native bindings and damage rejection,
+exact installed tails/relocations, unrelated resource retention, unchanged
+saves/selections, all/empty composition, UPS reconstruction, and future resource
+tail reuse. The mock selected-kind value was then corrected from a generic
+accepted kind to the actual shovel kind 90; that host test passes again.
+Python syntax compilation and `git diff --check` pass.
+
+The first silent native attempt passes 141 result records and 102 assertions:
+
+```sh
+python3 tools/emulator_smoke.py \
+  --rom build/v3-shared-reward-pickup-01/animal-forest-v3-asset-loader.z64 \
+  --output build/smoke-v3-reward-pickup-01 \
+  --scenario tests/v3-player-reward-pickup-scenario.json \
+  --xvfb /home/discordian/Games/OpenRSC/headless/vendor/usr/bin/Xvfb \
+  --seconds 180 --expansion-pak --no-initial-screenshot
+```
+
+Results SHA-256:
+`d75155d24a0f92dfa85e5496ac8c27354ed151d5da64789201c3dd7ee765cdac`.
+The shared probe calls each complete cartridge-loaded native transition, with
+actual relocation and native request APIs. It checks first pickup, repeated and
+unselected shovel pickup, ordinary items, animation-not-ended returns,
+higher-priority rejection, and the three original full-pocket exchange requests
+with complete position/item data. All four players and reward types resolve
+through real saved flags. A query-only test jump bridge reaches upper memory;
+there are no substituted callback tables or fabricated result functions.
+The four golden-tool options remain disabled in the cartridge: the fixture
+temporarily selects the shovel in both live and working profiles, then restores
+the original profile, reward state, actor, native payload, active pointer, and
+common flags. Module/state/stack guards, checkpoint restore, resumed game,
+and clean exit pass. No user save, physical audio, or FlashRAM write is used.
+The native check passes without a retry and within the 30-minute harness budget.
+
+This is direct transition evidence, not ordinary pickup, full-menu interaction,
+source acquisition, or original-hardware proof. The unchanged Putaway inventory-
+opening branch is checked as retained code but is not executed by this fixture.
+The next shared batch must carry the donor's exchange reward condition through
+normal drop, empty-hand, buried-item, fish/insect release, and balloon release
+endings. Native Putin lacks the source deferred flag and needs actual state/
+transition integration. Do not replace these timings with an immediate reward.
+Gold-tree growth/drop, event director/NPC collection rewards, and perfect-town
+acquisition remain required. Keep all golden choices disabled until their full
+paths work. Format-3 saves still require a compatible build and matching or larger
+profiles; older format-1/2 builds and V2 cannot load them. Preserve backups.
+
 ## Shared reward action registration
 
 The ABI-143 proposal is `build/v3-shared-reward-actions-01/build-lock.json`.

@@ -18,13 +18,26 @@ served patchers retain their existing builds.
 
 ## Active development
 
-The current explicit ABI-143 proposal is
-`build/v3-shared-reward-actions-01/build-lock.json`. All eight balloons are
+The current explicit ABI-144 proposal is
+`build/v3-shared-reward-pickup-01/build-lock.json`. All eight balloons are
 connected through the shared parent-category installer: official names/prices,
 complete pocket icons, held/inventory animation, source acquisition records,
 collection/catalogue, animated room profiles, indoor conversion, and inverse
 pickup. The local composer has 128 experimental choices, including 24 equipment
 parents. These are not a public or hardware-ready handoff.
+
+All four non-exchange collection tails share the installed reward-completion
+adapter: pickup, jump pickup, furniture pickup, and shovel put-away. The source
+priority ordering, early returns, and full-pocket branches remain intact. One
+424-byte code group fits existing space, with no save/profile/allocation change.
+One sanitizer and three cartridge/composition checks pass. The first silent
+native run passes 141 records and 102 assertions, including actual relocated
+collection entries, first/repeated/unselected items, rejected requests, all four
+players' completion queries, original exchange requests, guards, restored state/
+checkpoint, and clean exit. These are component calls, not ordinary acquisition
+or a hardware playthrough. Next connect inventory exchange/bury/release endings
+and source scene/NPC/tree acquisition. Golden-tool choices remain disabled. See
+the [collection checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-reward-collection-consumers).
 
 The shared reward-action category registers all twelve source callbacks for
 both golden-tool celebrations and the golden-axe waiting action. Requests retain
@@ -37,8 +50,9 @@ setup/main transitions, priority rejection, the axe-wait handoff, persistent
 settlement, unchanged code, guards, restored state/checkpoint, and clean exit.
 It simulates the message-completed phase and samples the delay boundaries;
 ordinary acquisition, full conversations, and hardware remain unverified.
-Next connect source scene/NPC/tree acquisition and the remaining shovel
-pickup/submenu consumers. The four golden-tool choices remain disabled. See the
+The collection stage connects non-exchange pickup/put-away. Source scene/NPC/tree
+acquisition and inventory exchange/bury/release consumers remain required.
+The four golden-tool choices remain disabled. See the
 [action checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-reward-action-registration).
 
 Shared reward persistence and the celebration settlement callback are installed.

@@ -92,7 +92,8 @@ SOURCES+=('tools/v3_event_text.py','tools/v3_camper_text.py',
           'overlays/v3/player_rewards.c','overlays/v3/player_rewards.ld')
 SOURCES+=v3_save_rewards.SOURCES
 SOURCES+=('overlays/v3/reward_requests.c','overlays/v3/reward_requests.ld',
-          'overlays/v3/reward_wait.c','overlays/v3/reward_wait.ld')
+          'overlays/v3/reward_wait.c','overlays/v3/reward_wait.ld',
+          'overlays/v3/reward_pickup.c','overlays/v3/reward_pickup.ld')
 
 SELECTION_OFFSET=0x5500
 PARENT_CODE_OFFSET,PARENT_TABLE_OFFSET=0x3000,0x57F0
@@ -105,6 +106,113 @@ EFFECTS_OFFSET,EFFECTS_STATE_OFFSET,EFFECTS_MODULE_SIZE=0xF000,0xFFD0,0x10000
 REWARD_MESSAGE_OFFSET,REWARD_MESSAGE_END=0xF280,0xF800
 REWARD_CONTROL_OFFSET,REWARD_CONTROL_END=0x10880,0x10FF0
 REWARD_REQUEST_OFFSET,REWARD_WAIT_OFFSET=0xF4E0,0x10C90
+REWARD_PICKUP_OFFSET=0xF620
+# Native action, setup, main, completed-action transition, idle-tail start,
+# exclusive end, item field, stack argument home, and source priority ordering.
+# Native Putaway/Putin ordering differs from the donor; do not index by GC IDs.
+REWARD_PICKUP_PATHS=(
+    (30,0x808C7D3C,0x808C8170,0x808C8100,0x808C8144,0x808C8170,0xD3C,0x18,1),
+    (31,0x808C82A8,0x808C8944,0x808C88D4,0x808C8918,0x808C8944,0xD38,0x18,0),
+    (32,0x808C8A64,0x808C9094,0x808C9024,0x808C9068,0x808C9094,0xD38,0x18,0),
+    (62,0x808D28CC,0x808D2AD4,0x808D2A58,0x808D2AA8,0x808D2AD4,0xD1C,0x20,1))
+
+
+def reward_pickup_bindings(source,owner,original,actions,module):
+    sources=[]
+    for at,size,digest in (
+        (0x17D668,184,'80170a0158e114d9c1efc84f4b8bc6f760a2996310b60351831302d475180d7a'),
+        (0x17DECC,188,'2bd9909e9ca9399922470c7d70af379a85b81308b095fb8b674568e5ed9c8ee4'),
+        (0x17E6CC,188,'c7feca8672a293355cecf8e377528fe3e663fe66ea0c5a1850dc295a51bfd97e'),
+        (0x189B78,192,'4b04b99cb936be68afe2b1cc3787f45d8709d354f1bc20306077623aa810967d'),
+        (0x6E59C,40,'7f631528179342250a982d056633c1d16e5ec4e6496494dbc9c7312ec19ef19c')):
+        raw,row=source.function(at)
+        if len(raw)!=size or sha256(raw)!=digest:raise ValueError('Changed complete donor pickup reward consumer')
+        sources.append(row)
+    bounds=sorted(int(a,16) for a in re.findall(r'= 0x([0-9A-Fa-f]+); // type:func',
+        (ROOT/'upstream/af/linker_scripts/jp/symbol_addrs_overlays.txt').read_text()))
+    native=by_vrom(original)[PLAYER_VROM].extract(original);consumers=[]
+    tables={r['native_entry']:r for r in actions['tables']}
+    for index,setup,main,first,tail,last,item,home,settle in REWARD_PICKUP_PATHS:
+        for table,entry in ((0x808DDA18,setup),(0x808DDB5C,main)):
+            row=tables[table];at=row['offset'];n=row['bytes']
+            if sha256(module[at:at+n])!=row['sha256'] or u32(module,at+4*index)!=entry:
+                raise ValueError('Changed native pickup action binding')
+        for entry in (setup,main,first):
+            end=min(b for b in bounds if b>entry);a,b=entry-PLAYER_RAM,end-PLAYER_RAM
+            if owner[a:b]!=native[a:b]:raise ValueError('Changed complete native pickup consumer')
+            consumers.append(dict(entry=entry,end=end,sha256=sha256(owner[a:b])))
+        if min(b for b in bounds if b>first)!=last:raise ValueError('Changed pickup transition boundary')
+    apis=[]
+    established={r['entry']:r for r in actions['reward_controls']['bindings']['native_functions']}
+    for entry in (0x808B3648,0x808C1064):
+        row=established[entry]
+        if sha256(owner[entry-PLAYER_RAM:row['end']-PLAYER_RAM])!=row['sha256']:
+            raise ValueError('Changed retained pickup request API')
+        apis.append(row)
+    return dict(source_functions=sources,native_functions=consumers,native_apis=apis,
+        paths=[dict(action=i,setup=s,main=m,entry=f,tail=t,end=e,item_offset=item,
+                    stack_home=home,settle_first=bool(order))
+               for i,s,m,f,t,e,item,home,order in REWARD_PICKUP_PATHS],
+        type=3,item=0x223B,priority=34,active_private=0x80136FD8,
+        private_base=0x80126EC0,private_stride=0xBD0,players=4)
+
+
+def refresh_reward_pickup(base,prior,blob,core,original,output):
+    """Connect all four source collection tails through one shared adapter."""
+    from v3_npc_clothing import guard_incoming
+    old=prior['equipment_resources'];actions=old['player_actions'];start=old['blob_offset']
+    module=bytearray(blob[start:start+old['bytes']]);files=by_vrom(base)
+    owner=bytearray(files[PLAYER_VROM].extract(base));reloc=files[PLAYER_RELOC].extract(base)
+    if (not actions.get('reward_actions') or actions.get('reward_pickup')
+            or len(module)!=0x12000 or sha256(module)!=old['sha256']
+            or sha256(owner)!=actions['owner_sha256'] or sha256(reloc)!=actions['relocation_sha256']):
+        raise ValueError('Pickup consumers require complete registered reward actions')
+    source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+        (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    bindings=reward_pickup_bindings(source,owner,original,actions,module)
+    requests=actions['reward_actions']['requests']
+    if (REWARD_REQUEST_OFFSET+requests['bytes']>REWARD_PICKUP_OFFSET
+            or sha256(module[REWARD_REQUEST_OFFSET:REWARD_REQUEST_OFFSET+requests['bytes']])!=requests['sha256']):
+        raise ValueError('Changed or overlapping retained reward requests')
+    code,compiled=compile_part('reward_pickup',output/'reward_pickup')
+    for name,expected in (
+        ('af_v3_reward_flag',actions['reward_state']['code']['symbols']['af_v3_reward_flag']),
+        ('af_v3_player_selected_equipment',actions['code']['symbols']['af_v3_player_selected_equipment']),
+        ('af_v3_reward_request',requests['symbols']['af_v3_reward_request'])):
+        if compiled['symbols'][name]!=expected:raise ValueError('Changed shared reward pickup dependency')
+    if any(module[REWARD_PICKUP_OFFSET:REWARD_MESSAGE_END]) or REWARD_PICKUP_OFFSET+len(code)>REWARD_MESSAGE_END:
+        raise ValueError('Occupied reward pickup reservation')
+    _,_,rows,locations,_=native_references(owner,reloc)
+    guard_incoming(owner,TEXT_SIZE,PLAYER_RAM,[(row[4]-PLAYER_RAM,28) for row in REWARD_PICKUP_PATHS])
+    removed=[];patches=[];target=compiled['symbols']['af_v3_reward_pickup']
+    for _,_,_,_,tail,_,item,home,settle in REWARD_PICKUP_PATHS:
+        pos=tail-PLAYER_RAM
+        before=(jump(0x808B3648,link=True),0x8FA40000|home,0x8FA40000|(home+4),
+                0x3C05C0A0,0x00003025,jump(0x808C1064,link=True),0x24070001)
+        if struct.unpack_from('>7I',owner,pos)!=before:raise ValueError('Changed native collection tail')
+        relocated={i:locations[i] for i in range(pos,pos+28,4) if i in locations}
+        if set(relocated)!={pos,pos+20} or any(r>>24!=0x44 for r in relocated.values()):
+            raise ValueError('Changed pickup-tail JAL relocations')
+        removed.extend(relocated.values())
+        replacement=struct.pack('>7I',0x8FA40000|home,0x8FA50000|(home+4),0x94860000|item,
+            jump(target,link=True),0x24070000|settle,0,0)
+        patches.append(dict(address=tail,before=owner[pos:pos+28].hex(),after=replacement.hex()))
+        owner[pos:pos+28]=replacement
+    kept=[r for r in rows if r not in removed];relocated=bytearray(reloc)
+    struct.pack_into('>I',relocated,16,len(kept))
+    relocated[20:20+4*len(rows)]=struct.pack('>'+str(len(kept))+'I',*kept)+bytes(4*len(removed))
+    module[REWARD_PICKUP_OFFSET:REWARD_PICKUP_OFFSET+len(code)]=code
+    blob[start:start+len(module)]=module
+    report=copy.deepcopy(old);current=report['player_actions']
+    current.update(owner_sha256=sha256(owner),relocation_sha256=sha256(relocated),
+        removed_relocations=current['removed_relocations']+len(removed))
+    current['reward_pickup']=dict(bindings=bindings,code=compiled,code_offset=REWARD_PICKUP_OFFSET,
+        patches=patches,removed_relocations=removed,native_early_return_and_exchange_retained=True,
+        collection_tails_installed=True,inventory_exchange_installed=False,tree_acquisition_installed=False,
+        ordinary_gameplay_tested=False,logical_imports_added=0)
+    report['player_motion'].update(owner_sha256=sha256(owner),reloc_sha256=sha256(relocated))
+    report.update(sha256=sha256(module),crc32=zlib.crc32(module),additional_resident_bytes=0)
+    return report,{PLAYER_VROM:bytes(owner),PLAYER_RELOC:bytes(relocated)}
 
 
 def reward_action_bindings(source,core,owner,original,actions):
@@ -1909,6 +2017,8 @@ def expanded_tables(source,owner,reloc,*,categories=CATEGORIES,native_count=NATI
 
 def install(base,prior,blob,core,original,output):
     old=prior.get('equipment_resources',{})
+    if old.get('player_actions',{}).get('reward_actions') and not old['player_actions'].get('reward_pickup'):
+        return refresh_reward_pickup(base,prior,blob,core,original,output)
     if old.get('player_actions',{}).get('reward_state') and not old['player_actions'].get('reward_actions'):
         return activate_reward_actions(base,prior,blob,core,original,output)
     if old.get('player_actions',{}).get('reward_controls') and not old['player_actions'].get('reward_state'):
