@@ -370,4 +370,142 @@ class InstalledBatchTests(unittest.TestCase):
             audio_contract(original,bytes(bad),wrong,source)
 
 
+class LoopingFurnitureBatchTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.path=ROOT/'build/v3-scrolling-level-audio-runtime-03'
+        cls.image,cls.report=inputs(cls.path/'build-lock.json')
+        cls.base,cls.prior=inputs(cls.path/'base-lock.json')
+        cls.code=by_vrom(cls.image)[CODE_VROM].extract(cls.image)
+        cls.old_code=by_vrom(cls.base)[CODE_VROM].extract(cls.base)
+        cls.audio=cls.report['equipment_resources']['furniture_level_audio']
+        cls.prepared_path=ROOT/'build/v3-scrolling-level-audio-prepared-01'
+        cls.prepared=json.loads((cls.prepared_path/'audio.json').read_bytes())
+
+    def test_shared_lifecycle_discovery_and_complete_source_programs(self):
+        from v3_furniture_pipeline import Source
+        source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+            (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+        self.assertEqual({r['item_id'] for r in self.audio['furniture']},{'1FE4','1FE8','31A0','3368'})
+        self.assertEqual(self.prepared['source_table_entries'],96)
+        self.assertEqual(self.prepared['native_table_entries'],128)
+        for row in self.audio['furniture']:
+            profile=source.profile(int(row['item_id'],16));before=copy.deepcopy(profile)
+            contract=sound.furniture_level(source,profile)
+            self.assertEqual(profile,before)
+            self.assertEqual(json.loads(json.dumps(contract)),row['lifecycle'])
+            self.assertFalse(contract['callback_installed'])
+            changed=copy.copy(source);changed.rel=bytearray(source.rel)
+            changed.rel[source.sections[1][0]+contract['functions']['move']['offset']]^=1
+            with self.assertRaises(ValueError):sound.furniture_level(changed,profile)
+            if contract['constants']:
+                changed.rel=bytearray(source.rel)
+                changed.rel[source.sections[4][0]+contract['constants']['zero']['offset']]^=1
+                with self.assertRaises(ValueError):sound.furniture_level(changed,profile)
+        resources={};sequence,receipt=sound.prepare_levels(self.base,self.prior,self.old_code,
+            [0x46,0x4A,0x4B,0x5B],font_resources=resources)
+        self.assertEqual(sequence,(self.prepared_path/'sequence.bin').read_bytes())
+        for key,value in receipt.items():self.assertEqual(json.loads(json.dumps(value)),self.prepared[key])
+        for key,data in resources.items():self.assertEqual(data,(self.prepared_path/(key+'.bin')).read_bytes())
+        for ids in ([96],[127],[74,74]):
+            with self.assertRaises(ValueError):sound.prepare_levels(self.base,self.prior,self.old_code,ids)
+
+    def test_all_audio_consumers_retain_prior_programs_and_complete_instruments(self):
+        sequence,header,physical=sound.installed_resource(self.image,self.code,'seq',199)
+        oldseq,_,_=sound.installed_resource(self.base,self.old_code,'seq',199)
+        self.assertEqual(sequence,(self.prepared_path/'sequence.bin').read_bytes())
+        self.assertEqual(len(sequence)-len(oldseq),128)
+        restored=bytearray(sequence[:len(oldseq)])
+        for row in self.audio['programs']:
+            at=row['native_table']+row['native_sound_id']*2
+            self.assertEqual(struct.unpack_from('>H',sequence,at)[0],row['offset'])
+            struct.pack_into('>H',restored,at,row['original_table_pointer'])
+            raw=sequence[row['offset']:row['offset']+row['bytes']]
+            actual=sound.looping_layer(raw,row['offset'],prefix=True)
+            for key in ('note','duration','velocity','decay','envelope_bytes'):
+                self.assertEqual(actual[key],row['source_program'][key])
+            self.assertEqual(actual['loop'],row['source_program']['loop']+4)
+            bank,h,_=sound.installed_resource(self.image,self.code,'bank',row['native_bank'])
+            wave,_,_=sound.installed_resource(self.image,self.code,'wave',h[10])
+            self.assertEqual(instrument(bank,wave,row['native_instrument'],h[12],extended=True),row['instrument_identity'])
+        self.assertEqual(restored,oldseq)
+        shared=self.report['equipment_resources']['sound_programs'];prior=self.prior['equipment_resources']['sound_programs']
+        self.assertEqual(shared['imports'][:-4],prior['imports'])
+        self.assertEqual(shared['trigger_batches'],prior['trigger_batches'])
+        for record in (shared['sequence'],self.audio['sequence'],
+                       self.report['equipment_resources']['furniture_audio']['sequence'],self.report['fire_sound']['resources']['seq']):
+            self.assertEqual((record['sha256'],record['header_after'],record['physical']),(sha256(sequence),header.hex(),physical))
+        bank,h,_=sound.installed_resource(self.image,self.code,'bank',140)
+        oldbank,oldh,_=sound.installed_resource(self.base,self.old_code,'bank',140)
+        wave,_,_=sound.installed_resource(self.image,self.code,'wave',5)
+        oldwave,_,_=sound.installed_resource(self.base,self.old_code,'wave',5)
+        self.assertEqual((oldh[12],h[12]),(82,83))
+        self.assertEqual(wave[:len(oldwave)],oldwave)
+        for i in range(82):
+            self.assertEqual(instrument(bank,wave,i,83,extended=True),instrument(oldbank,oldwave,i,82,extended=True))
+        self.assertEqual(self.audio['audio_heap_growth'],0)
+        self.assertEqual(sound.permanent_budget(self.code)['conservative_spare'],32)
+
+    def test_archive_relocation_preserves_text_external_waves_and_old_storage(self):
+        from v3_furniture_install import relocate_resource_plan
+        files,old=by_vrom(self.image),by_vrom(self.base)
+        archive=sound.audio_archive(self.image,self.code,'wave');before=sound.audio_archive(self.base,self.old_code,'wave')
+        self.assertEqual(archive.vstart,0x04000000);self.assertEqual(before.vstart,0x01A50000)
+        self.assertEqual(archive.index,before.index);self.assertNotIn(before.vstart,files)
+        self.assertEqual(archive.extract(self.image)[:before.size],before.extract(self.base))
+        self.assertEqual(self.image[before.pstart:before.pstart+before.size],before.extract(self.base))
+        self.assertEqual(files[0x1FA0000],old[0x1FA0000])
+        self.assertEqual(files[0x1FA0000].extract(self.image),old[0x1FA0000].extract(self.base))
+        for i in range(6):
+            data,_,p=sound.installed_resource(self.image,self.code,'wave',i)
+            olddata,_,oldp=sound.installed_resource(self.base,self.old_code,'wave',i)
+            self.assertEqual(data[:len(olddata)],olddata)
+            if i!=5:self.assertEqual(data,olddata)
+            if i==2:self.assertEqual(p,oldp)
+        wrong=bytearray(self.code);wrong[0x800D28DC-CODE_RAM]^=1
+        with self.assertRaises(ValueError):sound.audio_archive(self.image,wrong,'wave')
+        with self.assertRaises(ValueError):
+            relocate_resource_plan(self.base,old,before.vstart,archive.extract(self.image),
+                minimum_physical=0x3000000,target_vrom=0x1FA0000)
+        # The ordinary bulk importer still resolves its actual live audio resources.
+        from v3_furniture_pipeline import Source
+        from v3_furniture_behaviours import audio_contract
+        source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+            (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+        audio_contract((ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes(),self.image,self.report,source)
+
+    def test_profiles_and_composition_preserve_the_import_free_cartridge(self):
+        from aflib import apply_ups
+        from v3_asset_loader import BLOB
+        from v3_import_storage import ROWS,TABLE_END
+        import v3_optional_composition as composer
+        blob=by_vrom(self.image)[BLOB].extract(self.image);old=by_vrom(self.base)[BLOB].extract(self.base)
+        self.assertEqual(blob[ROWS:TABLE_END],old[ROWS:TABLE_END])
+        self.assertEqual(self.report['save_runtime'],self.prior['save_runtime'])
+        self.assertEqual(self.report['staged_furniture'],self.prior['staged_furniture'])
+        self.assertEqual(self.report['equipment_resources']['room_rigs'],self.prior['equipment_resources']['room_rigs'])
+        pin=composer.BASE,composer.BASE_SHA,composer.REPORT_SHA,composer.ABI
+        try:
+            composer.use_build_lock(self.path/'build-lock.json')
+            catalogue=composer.catalogue(self.image,self.report);self.assertEqual(len(catalogue),137)
+            for selected in ([],list(catalogue)):
+                result,_,_=composer.compose(self.image,self.report,catalogue,composer.resolve(catalogue,selected))
+                self.assertEqual(sha256(result),sha256(self.image) if selected else self.report['translation_baseline']['sha256'])
+        finally:composer.BASE,composer.BASE_SHA,composer.REPORT_SHA,composer.ABI=pin
+        self.assertEqual(apply_ups((ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes(),
+            (self.path/'asset-loader.ups').read_bytes()),self.image)
+
+    def test_subsequent_trigger_preparation_reuses_the_current_complete_font(self):
+        # Exercise the other sound category against the current relocated archive,
+        # without rebuilding an old cartridge or playing any audio.
+        words=[r['source_sound_word'] for r in self.report['equipment_resources']['furniture_audio']['programs']]
+        resources,prepared=sound.prepare_triggers(self.image,self.report,words)
+        bank,_,_=sound.installed_resource(self.image,self.code,'bank',140)
+        wave,_,_=sound.installed_resource(self.image,self.code,'wave',5)
+        self.assertEqual(resources['font'],bank);self.assertEqual(resources['wave'],wave)
+        self.assertEqual(prepared['layout']['instrument_count'],83)
+        self.assertEqual(prepared['layout']['font_growth_bytes'],0)
+        self.assertEqual(prepared['layout']['wave_growth_bytes'],0)
+
+
 if __name__=='__main__':unittest.main()

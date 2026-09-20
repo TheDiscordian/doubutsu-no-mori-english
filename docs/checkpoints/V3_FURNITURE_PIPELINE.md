@@ -1,5 +1,85 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared positioned-loop audio
+
+ABI 175 is `build/v3-scrolling-level-audio-runtime-03/build-lock.json`, based on
+ABI 174. The ordinary audio preparation/install commands process four scrolling
+lifecycles together: Merlion, Manekin Pis, fireplace, and sprinkler. Complete
+callback shapes, relocations, helper bodies, source constants, and scalar fields
+identify these categories without item-ID dispatch. The three fades retain
+their different maxima/steps, switch-event timing, actual destructor presence,
+and sprinkler's additional clicks/initial interaction flag. These are decoded
+contracts; the corresponding native callbacks are not yet installed.
+
+The sustained-program parser accepts mode setup on either side of the envelope
+command and preserves the actual loop target. The source dispatcher has 96
+entries ending at `2EC2`; reading 128 consumes program bytes as bogus pointers
+and incorrectly truncates the sprinkler sound. The native expanded table still
+contains 128 entries. Source IDs `46`, `4A`, `4B`, and `5B` are installed without
+altering previous entries. Three use the exact existing bank-139 instrument 40;
+the fireplace imports source bank-153 instrument 54 as bank-140 instrument 82.
+Its complete sample contains 75,178 bytes. Source envelopes, tuning, loop/book
+data, duration, velocity, and layer restart are retained.
+
+Trigger and looping batches use one complete sequence/font/wave installer.
+Interleaved categories update every shared resource receipt and retain previous
+program metadata, rather than discarding trigger batches. All 82 existing
+instruments remain identical after pointer relocation; the new count is 83.
+The sequence grows by 128 bytes and the font by 192. Permanent allocation remains
+111,616 bytes, with conservative usage 111,584 and 32 bytes spare. Streamed wave
+data grows by 75,184 bytes; it is not a permanent-RAM allocation.
+
+The first installation stopped because wave growth crossed the English text's
+virtual base `01FA0000`. A physical-copy attempt then found no sufficiently large
+zero gap while preserving retired copies. The final general solution separates
+virtual reassignment from physical placement: archive VROM becomes `04000000`,
+its DMA-directory index and physical base `032106B0` remain, and verified empty
+physical space receives the append. Full archive size is 5,642,144 bytes. No text
+or original archive prefix changes. The general native DMA request limit stays
+intact; audio reads use physical offsets, including external wave two. Current
+tools locate the archive through the actual native base-load instructions.
+Both rejected output directories remain available; neither contains a candidate.
+
+Commands:
+
+```sh
+python3 tools/v3_furniture_pipeline.py convert --assets-only --representation audio \
+  --category scrolling-material-assets \
+  --base-lock build/v3-draw-only-scrolling-imports-01/cartridge/build-lock.json \
+  --output build/v3-scrolling-level-audio-prepared-01
+python3 tools/v3_furniture_install.py --refresh-runtime \
+  --base-lock build/v3-draw-only-scrolling-imports-01/cartridge/build-lock.json \
+  --furniture-audio-art build/v3-scrolling-level-audio-prepared-01 \
+  --output build/v3-scrolling-level-audio-runtime-03
+```
+
+Seven focused format checks pass. The first cartridge-test invocation had no
+build lock because installation had not succeeded; it did not test a cartridge.
+Against the completed ABI-175 build, four tests pass in 7.316 seconds and a fifth
+forward-category preparation check passes in 0.325 seconds. They cover complete
+source/audio identity, malformed source/table rejection, prior dispatch/font
+preservation, directory/text/external-wave retention, current ordinary importer
+audio bindings, unchanged profiles/save metadata, all/empty composition, and UPS
+reconstruction. Subsequent trigger preparation reuses the current full font/wave
+without growth. No old cartridge or native scenario is replayed. Native sound
+execution, audible playback, GPU rendering, and ordinary interaction are not
+claimed for these additions.
+
+Hashes:
+
+- ROM: `3fcd95582548627ab6179cf57aa93e2723cea86041029232018216f188173f46`.
+- UPS: `201a02a26b149bca404080d5ff5d1756883af6a9303ead757ff003a250a62220`.
+- Report: `facbd37b55e3a68c6158ee78ae78e606ab98611dfb8b5d4d9cc49b025c24bfd8`.
+- Prepared manifest: `8c612726ffeee8593b04fc3e790291330fa1e8f1b3c5046d44adabb6fbbe54a9`.
+
+The import blob is 4,440,512 bytes with 1,850,944 bytes free. There are still 137
+experimental choices and 27 inactive profiles. Saved format 3 and selected IDs
+are unchanged from ABI 174; prior missing-ID/profile compatibility warnings
+remain. The main ABI-109 lock and both deployments of the stable website stay
+unchanged. Continue with shared switch/fade and positioned-loop native callbacks,
+then normal profile/acquisition integration. Gold-tree effects/acquisition remain
+after primary importing.
+
 ## Shared draw-only scroll profiles and imports
 
 ABI 173 at `build/v3-draw-only-scrolling-profiles-01/` stages complete ordinary

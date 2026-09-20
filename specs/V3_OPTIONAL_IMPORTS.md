@@ -331,6 +331,14 @@ Ordinary gameplay, appearance, and persistence remain required validation.
 
 ### Limits and saves
 
+The shared sustained-sound importer retains the donor's 96-entry level table
+and the native expanded 128-entry dispatcher. Loop and trigger categories share
+complete font/sample growth and resource placement. The extended wave archive
+has virtual base `04000000` while actual audio continues using checked physical
+ROM offsets; this does not increase cartridge capacity or the ordinary DMA
+request limit. Installing a furniture sound does not establish its lifecycle,
+acquisition, or playable eligibility.
+
 Target an Expansion Pak-equipped N64 with 128-KiB FlashRAM and RTC, retaining
 the existing hardware requirements. Measure actual loaded memory, display-list
 capacity, asset lifetime, and cartridge-size limits. The builder currently caps

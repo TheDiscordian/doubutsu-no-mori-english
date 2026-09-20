@@ -105,6 +105,36 @@ recompiling an entire installed category merely to add one newly supported membe
 
 ### Shared runtime categories
 
+Loop-audio preparation uses the ordinary `convert --assets-only --representation
+audio --category scrolling-material-assets` command with the explicit current
+lock. Complete move-function shapes select positioned loops or switch-driven
+fades; IDs and names do not select implementations. Checked read-only constants
+provide maximum/step values, and complete constructor/destructor bodies preserve
+their actual state and persistence semantics. Sprinkler clicks and its disabled
+initial interaction are explicit remaining callback dependencies. These source
+contracts do not claim installed behaviour.
+
+The same `--refresh-runtime --furniture-audio-art` installer accepts complete
+trigger or level-audio bundles. Sustained layers support mode setup before or
+after the envelope command, retaining the actual loop restart, note duration,
+velocity, decay, and all envelope data. The donor level dispatch contains 96
+entries; its following program bytes must not be read as another 32 pointers.
+The expanded native table retains 128 entries. Unknown layouts still reject.
+Exact native instruments are reused; missing complete instruments and samples
+use the same shared font/wave extension as trigger sounds. Interleaved category
+batches retain all prior dispatches and current complete-resource receipts.
+
+Growing wave archives can receive a checked virtual base at `04000000`, with an
+eight-MiB reservation, without changing their DMA-directory index or moving
+English text. Physical append/relocation remains independently bounded by all
+live owners and nonzero data. The native audio initializer and streaming reads
+use actual physical addresses; the general virtual-DMA request limit is not
+relaxed, and these high virtual identities must not be passed to that path.
+Tools resolve the live archive from the checked native physical-base instructions
+and its unique uncompressed owner. Every wave header, including external wave
+two, remains complete. The shared builder checks virtual destinations, emitted
+directory changes, and extraction of the full resulting owner.
+
 The `scrolling-material-assets` category prepares complete custom-drawn objects
 with model-local texture scrolling. Discovery verifies entire source draw
 functions, every model relocation pair, both matrix calls, dimension wrappers,

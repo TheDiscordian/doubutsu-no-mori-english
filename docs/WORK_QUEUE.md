@@ -12,7 +12,36 @@ After the primary importing work, finish gold-tree leaf/cut effects and the full
 golden-shovel acquisition route. This is deferred required V3 work, not a dropped
 feature or a separate release goal.
 
-The current explicit proposal is ABI 174 at
+The current explicit proposal is ABI 175 at
+`build/v3-scrolling-level-audio-runtime-03/build-lock.json`. Four source-derived
+looping sounds and the complete missing fireplace instrument/sample are installed
+through shared audio machinery. The donor dispatch table is correctly bounded to
+96 entries; the expanded native dispatcher retains 128 entries. All 82 existing
+instruments remain intact, with one complete addition. The wave archive's virtual
+base is `04000000`; its physical base is unchanged, and native audio still reads
+physical offsets. The bounded append preserves English text and external waves.
+Five current-build checks and seven format checks pass. Do not replay unchanged
+audio/graphics or historical native tests. New native audio execution remains
+unverified and can join the changed lifecycle batch.
+
+Next implement the shared positioned-loop and switch-fade callbacks using the
+decoded lifecycle contracts in `furniture_level_audio.furniture`. Preserve
+source maximum/step values, two source updates per native frame, switch events
+only at the fade target, the presence/absence of a destructor, state-based sound
+suppression, and sprinkler click sounds/start-disabled interaction. The callbacks
+are not installed; their four items remain disabled. Stage complete ordinary
+profiles and connect source acquisition through the existing bulk pipeline.
+Do not substitute arbitrary shop stock. The mower needs floor/contact updates;
+other material and rigged-material categories remain required. Gold-tree work
+follows primary importing. Keep both deployments of the stable website unchanged.
+
+There are 137 experimental choices and 27 inactive profiles. Saved format 3 and
+selected identities are unchanged from ABI 174; earlier missing-ID/profile
+restrictions still apply. The current permanent audio allocation has 32
+conservative bytes spare, so any subsequent audio growth must pass or extend the
+shared allocation check. The import blob has 1,850,944 bytes free.
+
+The retained draw-only proposal is ABI 174 at
 `build/v3-draw-only-scrolling-imports-01/cartridge/build-lock.json`. Shared
 draw-only lifecycle verification stages the well model and backyard pool; the
 ordinary bulk importer activates the pool through its actual event-item route.

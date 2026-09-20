@@ -482,13 +482,15 @@ def owner_tail_storage(base,files,changes,*,minimum_end=0):
     return rows
 
 
-def append_resource_plan(base,files,vrom,data,relocatable):
+def append_resource_plan(base,files,vrom,data,relocatable,*,target_vrom=None):
     """Append a complete resource in place; move only checked DMA-owned blockers."""
     entry=files[vrom];before=entry.extract(base)
     if entry.pend or len(data)<=len(before) or data[:len(before)]!=before:
         raise ValueError('In-place growth must retain the complete uncompressed resource')
     first=entry.pstart+entry.size;end=entry.pstart+len(data)
-    if (end>len(base) or any(e.vstart<vrom+len(data) and vrom<e.vend
+    target=vrom if target_vrom is None else target_vrom
+    if (type(target) is not int or target&15 or not 0<=target<target+len(data)<=0x100000000 or
+            end>len(base) or any(e.vstart<target+len(data) and target<e.vend
             for v,e in files.items() if v!=vrom)):
         raise ValueError('In-place resource growth exceeds cartridge or virtual bounds')
     occupied=sorted((e.pstart,e.pend or e.pstart+e.size,v,e) for v,e in files.items()
@@ -501,29 +503,36 @@ def append_resource_plan(base,files,vrom,data,relocatable):
             raise ValueError('Resource append overlaps undeclared or changed live data')
         blockers.append(v);changes[v]=old;cursor=min(end,b)
     if any(base[cursor:end]):raise ValueError('Resource append crosses unowned nonzero data')
-    return changes,dict(vrom=vrom,physical=entry.pstart,previous_bytes=entry.size,
+    record=dict(vrom=vrom,physical=entry.pstart,previous_bytes=entry.size,
         bytes=len(data),previous_sha256=sha256(before),sha256=sha256(data),relocated_blockers=blockers)
+    if target!=vrom:record['target_vrom']=target
+    return changes,record
 
 
-def relocate_resource_plan(base,files,vrom,data,*,minimum_physical):
+def relocate_resource_plan(base,files,vrom,data,*,minimum_physical,target_vrom=None):
     """Keep a whole growing resource in verified zero, unmapped cartridge space.
 
-    Logical identity is retained. Callers must update any physical readers;
+    Logical identity is retained unless the caller declares a new virtual base.
+    Callers must account for every reader of either changed address;
     old copies are left untouched, never treated as free data merely because
     they are absent from the current DMA directory.
     """
     entry=files[vrom];before=entry.extract(base)
+    destination=vrom if target_vrom is None else target_vrom
     if (entry.pend or len(data)<=len(before) or data[:len(before)]!=before or
-            any(e.vstart<vrom+len(data) and vrom<e.vend for v,e in files.items() if v!=vrom)):
+            type(destination) is not int or destination&15 or not 0<=destination<destination+len(data)<=0x100000000 or
+            any(e.vstart<destination+len(data) and destination<e.vend for v,e in files.items() if v!=vrom)):
         raise ValueError('Relocation needs a complete non-overlapping append')
     occupied=sorted((e.pstart,e.pend or e.pstart+e.size) for e in files.values() if e.pstart!=0xFFFFFFFF)
     cursor=minimum_physical
     for first,last in occupied+[(len(base),len(base))]:
         start=(cursor+15)&~15
         if start+len(data)<=first and not any(base[start:start+len(data)]):
-            return {vrom:data},dict(vrom=vrom,physical=start,previous_physical=entry.pstart,
+            record=dict(vrom=vrom,physical=start,previous_physical=entry.pstart,
                 previous_bytes=entry.size,bytes=len(data),previous_sha256=sha256(before),sha256=sha256(data),
                 relocated_blockers=[],relocated=True,retains_old_allocation=True)
+            if destination!=vrom:record['target_vrom']=destination
+            return {vrom:data},record
         cursor=max(cursor,last)
     raise ValueError('No verified zero cartridge gap for complete resource growth')
 
@@ -679,6 +688,12 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
                                 for e in files.values() if e.pstart!=0xFFFFFFFF) or
                             any(r is not row and r['physical']<end and start<r['physical']+r['bytes'] for r in growth)):
                         raise ValueError('Relocated resource overlaps occupied or nonzero cartridge data')
+                target=row.get('target_vrom',vrom)
+                if (target&15 or not 0<=target<target+len(data)<=0x100000000 or
+                        any(e.vstart<target+len(data) and target<e.vend for v,e in files.items() if v!=vrom) or
+                        any(r is not row and r.get('target_vrom',r['vrom'])<target+len(data) and
+                            target<r.get('target_vrom',r['vrom'])+r['bytes'] for r in growth)):
+                    raise ValueError('Changed resource virtual destination overlaps a live owner')
                 continue
             if vrom in forced_moves:
                 if data!=entry.extract(base):raise ValueError('Relocated blocker changes its complete contents')
@@ -716,7 +731,8 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             minimum_end=max([files[BLOB].pstart+len(blob)]+[r['physical']+r['bytes'] for r in growth]))
         owner_moves.extend(dict(vrom=r['vrom'],bytes=r['bytes'],physical=r['physical'],
             storage='checked-zero-gap' if r.get('relocated') else 'checked-in-place-append',
-            sha256=r['sha256'],original_sha256=r['previous_sha256']) for r in growth)
+            sha256=r['sha256'],original_sha256=r['previous_sha256'],
+            **({'target_vrom':r['target_vrom']} if 'target_vrom' in r else {})) for r in growth)
     abi=prior['runtime_abi']+1; struct.pack_into('>I',blob,4,abi)
     package=blob[PACKAGE:PACKAGE+PACKAGE_SIZE]; struct.pack_into('>I',blob,0xF8,zlib.crc32(package))
     old=prior['startup']
@@ -754,15 +770,17 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             result[row['physical']:row['physical']+row['bytes']]=owner_changes[row['vrom']]
         struct.pack_into('>I',result,DMA_START+files[BLOB].index*16+4,BLOB+len(blob))
         for row in moved+owner_moves:
+            target=row.get('target_vrom',row['vrom'])
             struct.pack_into('>4I',result,DMA_START+files[row['vrom']].index*16,
-                             row['vrom'],row['vrom']+row['bytes'],row['physical'],0)
+                             target,target+row['bytes'],row['physical'],0)
     if text_moves:capacity.relocate_directory(result,files,text_moves)
     expected=bytearray(base[DMA_START:DMA_END])
     if resource_mode:
         struct.pack_into('>I',expected,files[BLOB].index*16+4,BLOB+len(blob))
         for row in moved+owner_moves:
+            target=row.get('target_vrom',row['vrom'])
             struct.pack_into('>4I',expected,files[row['vrom']].index*16,
-                             row['vrom'],row['vrom']+row['bytes'],row['physical'],0)
+                             target,target+row['bytes'],row['physical'],0)
     for row in text_moves:
         struct.pack_into('>2I',expected,row['directory_index']*16,row['vrom'],row['vrom']+row['bytes'])
     if result[DMA_START:DMA_END]!=expected:raise ValueError('Undeclared DMA-directory change')
@@ -772,7 +790,8 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         result=equipment.finish(result,base,prior,output,equipment_report)
     installed=by_vrom(result)
     for vrom,data in owner_changes.items():
-        if installed[vrom].extract(result)!=data:
+        target=next((r.get('target_vrom',vrom) for r in owner_moves if r['vrom']==vrom),vrom)
+        if installed[target].extract(result)!=data:
             raise ValueError('Shared runtime loses a complete changed owner')
     fix_checksum(result);result=bytes(result)
     patch=make_ups(original,result)

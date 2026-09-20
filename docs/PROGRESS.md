@@ -18,7 +18,38 @@ served patchers retain their existing builds.
 
 ## Active development
 
-The current explicit proposal is ABI 174 at
+The current explicit proposal is ABI 175 at
+`build/v3-scrolling-level-audio-runtime-03/build-lock.json`. The shared audio
+pipeline installs complete looping programs for Merlion, Manekin Pis, fireplace,
+and sprinkler. All four use source-derived lifecycle records, not per-item
+implementations. Three reuse the exact native water instrument; the fireplace
+adds its complete donor instrument/sample. The shared font contains 83
+instruments, preserving all 82 previous instruments. Source loop timing,
+envelopes, and restart positions are retained.
+
+The wave archive moves to virtual `04000000`, keeping its physical start and
+existing contents. A checked append adds 75,184 bytes without overlapping the
+English text. The actual native audio reader uses physical offsets, not the
+general virtual-DMA path. Trigger and looping categories share the same complete
+resource installer. The permanent audio allocation is unchanged, with 32
+conservative bytes spare; future growth must pass the existing capacity checks.
+
+Five current-build checks pass for complete audio, source contracts, the changed
+archive mapping, subsequent trigger preparation, unchanged saves/profiles, and
+all/empty composition. Seven focused format checks also pass. Native execution,
+audible playback, and ordinary interaction remain unverified for the additions.
+The four native lifecycle callbacks remain required; installing audio does not
+enable those items. There are still 137 experimental choices and 27 inactive
+profiles. Save format and selected IDs are unchanged from ABI 174. The stable
+website and main lock remain unchanged. See the
+[loop-audio checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-positioned-loop-audio).
+
+Next connect the decoded switch/fade and positioned-loop categories to native
+callbacks, then their ordinary profiles/acquisition. Retain the mower's separate
+floor/contact dependency. Continue general rigged-material categories before
+gold-tree completion.
+
+The retained draw-only proposal is ABI 174 at
 `build/v3-draw-only-scrolling-imports-01/cartridge/build-lock.json`. Shared
 draw-only lifecycle checks connect the well model and backyard pool to ordinary
 profiles without new artwork, runtime code, or memory reservations. The pool

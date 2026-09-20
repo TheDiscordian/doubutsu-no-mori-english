@@ -1,4 +1,4 @@
-"""Shared single-layer sound imports using verified existing native instruments.
+"""Shared sound imports with complete source programs, fonts, and samples.
 
 Preserve the complete channel, note, pitch sweep, envelope, and padding. Only
 internal pointers and equivalent instrument bindings change. Unsupported forms
@@ -248,6 +248,9 @@ def furniture_trigger(source,profile):
 def prepare_furniture_audio(image,report,source,inventory,output,selected=(),category=None):
     """Select a shared furniture behaviour once and prepare all its audio dependencies."""
     from apply_translation import write_new
+    from v3_furniture_scroll import CATEGORY as SCROLL_CATEGORY
+    if category==SCROLL_CATEGORY:
+        return prepare_furniture_levels(image,report,source,inventory,output,selected)
     installed={r['item_id'] for r in report['equipment_resources'].get('furniture_audio',{}).get('furniture',[])}
     rows=[];triggers={}
     for r in inventory['rows']:
@@ -268,6 +271,114 @@ def prepare_furniture_audio(image,report,source,inventory,output,selected=(),cat
     files={'font.bin':resources['font'],'wave.bin':resources['wave'],**resources['fragments']}
     result['files']={name:dict(bytes=len(data),sha256=sha256(data)) for name,data in files.items()}
     for name,data in files.items():write_new(output/name,data)
+    write_new(output/'audio.json',(json.dumps(result,indent=2)+'\n').encode())
+    return result
+
+
+def furniture_level(source,profile):
+    """Decode shared loop-only and switch/fade lifecycles, independent of item IDs.
+
+    This is a source contract, not an installed native callback. All scalar
+    dependencies, full callbacks, and positioning helpers remain accounted for.
+    """
+    from v3_furniture_scroll import CATEGORY
+    adapter=profile.get('callback_adapter',{});functions=copy.deepcopy(adapter.get('functions',{}))
+    move=functions.get('move')
+    if adapter.get('category')!=CATEGORY or move is None or move['bytes'] not in (76,264,304):return None
+    raw,actual=source.function(move['offset'])
+    if actual!=move:raise ValueError('Changed complete furniture loop callback')
+    module=u32(source.rel,0);constants={};expected={};calls={};fields={}
+    size=move['bytes'];fade=size!=76
+    if (profile['contact_action'] or profile['interaction_flags'] not in (0,0x1000) or
+            set(adapter['pending_profile_fields'])-{'interaction'} or
+            ('interaction' in adapter['pending_profile_fields'])!=bool(profile['interaction_flags']) or
+            set(functions)-{'create','move','draw','destroy'} or 'draw' not in functions):
+        raise ValueError('Unsupported complete loop profile effects')
+    def float_pair(receipt,hi,lo,label):
+        pointer=receipt['relocations'].get(hi)
+        if (pointer is None or pointer[:3]!=(6,module,4) or
+                receipt['relocations'].get(lo)!=(4,module,4,pointer[3]) or pointer[3]&3):
+            raise ValueError('Changed complete loop constant binding')
+        start,n=source.sections[4];offset=pointer[3]
+        if not 0<=offset<=n-4:raise ValueError('Loop constant escapes read-only source data')
+        data=source.rel[start+offset:start+offset+4];value=struct.unpack('>f',data)[0]
+        record=dict(offset=offset,hex=data.hex(),value=value)
+        if label in fields and fields[label]!=record:raise ValueError('Loop lifecycle constants disagree')
+        fields[label]=record
+        return {hi:pointer,lo:(4,module,4,offset)}
+    if fade:
+        if 'create' not in functions or adapter['scrolling']['colour'] is None:
+            raise ValueError('Fade needs its complete initializer and colour consumer')
+        create=functions['create'];ct_expected={}
+        ct_expected.update(float_pair(create,0x2E,0x32,'maximum'))
+        ct_expected.update(float_pair(create,0x3A,0x3E,'zero'))
+        source.checked_callback_code(create,72,
+            'f721c7565653bf0168707a79397dbaeed4ce79f3123757131e1084435b7f1e0c',ct_expected,{},
+            'switch fade initializer',internal_branches=True)
+        for hi,lo,label in ((0x2A,0x2E,'maximum'),(0x36,0x3A,'zero'),(0x86,0x8A,'step'),(0xAE,0xB2,'step')):
+            expected.update(float_pair(move,hi,lo,label))
+        if fields['zero']['hex']!='00000000' or not 0<fields['step']['value']<=fields['maximum']['value']<=255:
+            raise ValueError('Invalid finite switch fade limits')
+        if 'destroy' in functions:
+            source.checked_callback_code(functions['destroy'],12,
+                'de1c5fee99abb0a9db68b6fb8bd0c39b083daaca438189ded589ed4584c9a59b',{}, {},
+                'switch state persistence')
+        loc,call=0x72,0x74
+        digest=('6edee21305ce2f3f54be0e55b7b4e6b5d42e3069ac71cbd6349e43cd7d4d1049' if size==264 else
+                'e43eabc8febfcabb68d7d4e90735d99a4c03586c5d1153712accc5d4f22b9a07')
+        if size==304:calls.update({0x100:(0x2BDDE8,'sAdo_OngenTrgStart'),0x110:(0x2BDDE8,'sAdo_OngenTrgStart')})
+    else:
+        if set(functions)!={'move','draw'} or adapter['scrolling']['colour'] is not None:
+            raise ValueError('Loop-only callback has additional lifecycle state')
+        loc,call=0x36,0x38;digest='a8ceb00c834d641445a8c363b8f47074017fb7444badcc69bd4147c1b35666ff'
+    sid=struct.unpack_from('>H',raw,loc)[0]
+    if not 68<=sid<96:raise ValueError('Furniture loop requires a real added donor sound')
+    constants[loc]=sid;calls[call]=(0x2BDD84,'sAdo_OngenPos')
+    helpers=source.checked_callback_code(move,size,digest,expected,calls,'positioned furniture loop',constants,
+        internal_branches=True)
+    helper=helpers['sAdo_OngenPos']
+    if (helper['bytes']!=100 or helper['sha256']!='b982dbca7ed68e0565b554e142e64d69a1d2c47ec061169d114502a25e61f885' or
+            helper['relocations']!={72:(10,0,4,0x80012E2C),10:(6,module,6,2306744),34:(4,module,6,2306744)}):
+        raise ValueError('Changed complete positioned furniture loop helper')
+    if size==304:
+        helper=helpers['sAdo_OngenTrgStart']
+        if (helper['bytes']!=72 or helper['sha256']!='4fdc889bb1697c19c8f386d72b80585ea07706d9f26b328389766bec96f0f989' or
+                helper['relocations']!={48:(10,0,4,0x8001383C)}):
+            raise ValueError('Changed complete switch-click helper')
+    return dict(category='switch-fade-loop' if fade else 'positioned-loop',source_sound_id=sid,
+        functions=functions,helpers=helpers,constants=fields,source_steps_per_native_update=2,
+        excluded_states=[12,13,14,15],state_offset=0x3C,position_offset=8,
+        source_switch_offset=0x12C,source_changed_offset=0x12D,
+        source_private_switch_offset=0x82A if fade else None,source_colour_offset=0x834 if fade else None,
+        switch_only_at_target=fade,persist_private_switch='destroy' in functions,
+        switch_clicks=[0x16,0x17] if size==304 else [],start_disabled=bool(profile['interaction_flags']),
+        callback_installed=False)
+
+
+def prepare_furniture_levels(image,report,source,inventory,output,selected=()):
+    from apply_translation import write_new
+    from aflib import CODE_VROM
+    previous=report['equipment_resources'].get('furniture_level_audio',{})
+    installed={r['item_id'] for r in previous.get('furniture',[])};rows=[]
+    for row in inventory['rows']:
+        if row['installed'] or row['item_id'] in installed or not row.get('asset_ready') or selected and row['item_id'] not in selected:
+            continue
+        contract=furniture_level(source,row.get('profile',{}))
+        if contract is not None:
+            rows.append(dict(item_id=row['item_id'],name=row['name'],profile_sha256=row['profile']['profile_sha256'],
+                callback=row['profile']['callback_adapter'],lifecycle=contract))
+    if not rows or selected and set(selected)!={r['item_id'] for r in rows}:
+        raise ValueError('Unsupported or empty furniture level-audio selection')
+    code=by_vrom(image)[CODE_VROM].extract(image)
+    resources={}
+    data,audio=prepare_levels(image,report,code,sorted({r['lifecycle']['source_sound_id'] for r in rows}),font_resources=resources)
+    result=dict(audio,format='AFV3-FURNITURE-LEVEL-AUDIO-PREPARED-1',base_sha256=sha256(image),
+        furniture=rows,source_rel_sha256=sha256(source.rel),source_symbols_sha256=sha256(source.symbols.encode()),
+        sequence=dict(bytes=len(data),sha256=sha256(data)),callback_installed=False,
+        files={name+'.bin':dict(bytes=len(value),sha256=sha256(value)) for name,value in resources.items()})
+    output.mkdir(parents=True,exist_ok=False)
+    write_new(output/'sequence.bin',data)
+    for name,value in resources.items():write_new(output/(name+'.bin'),value)
     write_new(output/'audio.json',(json.dumps(result,indent=2)+'\n').encode())
     return result
 
@@ -373,21 +484,28 @@ def looping_layer(data, origin, *, prefix=False):
             or struct.unpack_from('>H',data,start+1)[0]!=origin+start+4):
         raise ValueError('Incomplete single-layer loop channel')
     instrument_index=span(data,start+5,1)[0]
-    if instrument_index>125 or span(data,start+6,1)!=b'\xCB':
+    if instrument_index>125:
         raise ValueError('Unsupported loop instrument/envelope')
-    envelope=struct.unpack('>H',span(data,start+7,2))[0]-origin
-    decay=span(data,start+9,1)[0];at=start+10;mode=at
-    if span(data,at,1)!=b'\xC4':raise ValueError('Missing sustained-note mode')
-    note=span(data,at+1,1)[0];at+=2
+    at=start+6;early_mode=span(data,at,1)==b'\xC4';mode=at
+    if early_mode:at+=1
+    env_command=at
+    if span(data,at,1)!=b'\xCB':raise ValueError('Unsupported loop envelope command')
+    envelope=struct.unpack('>H',span(data,at+1,2))[0]-origin
+    env_pointer=at+1;decay=span(data,at+3,1)[0];at+=4
+    if not early_mode:
+        mode=at
+        if span(data,at,1)!=b'\xC4':raise ValueError('Missing sustained-note mode')
+        at+=1
+    note_at=at;note=span(data,at,1)[0];at+=1
     if not 0x40<=note<=0x7F:raise ValueError('Unsupported loop note')
     duration=span(data,at,1)[0];at+=1
     if duration&128:duration=(duration&127)*256+span(data,at,1)[0];at+=1
     velocity=span(data,at,1)[0];at+=1
     loop=struct.unpack('>H',span(data,at+1,2))[0]-origin
     if (not duration or velocity>127 or span(data,at,1)!=b'\xFB'
-            or loop not in (mode,mode+1)):
+            or loop not in ((mode,env_command,note_at) if early_mode else (mode,note_at))):
         raise ValueError('Loop target or timed event is incomplete')
-    pointers=[start+1,start+7,at+1];at+=3
+    pointers=[start+1,env_pointer,at+1];at+=3
     if (origin+envelope)&1 or not at<=envelope<len(data) or any(data[at:envelope]):
         raise ValueError('Loop envelope alignment or padding changed')
     env=extended_envelope(data,envelope,minimum_steps=1);end=envelope+len(env)
@@ -410,8 +528,12 @@ def bind_loop(data,description,offset,instrument_index,selector=0):
     return bytes(output)
 
 
-def install_level(image,prior,blob,code,source_ids):
-    """Extend the existing shared level dispatcher with equivalent native fonts."""
+def prepare_levels(image,prior,code,source_ids,*,font_resources=None):
+    """Resolve complete sustained programs and equivalent existing instruments.
+
+    The donor has 96 dispatch entries, not the expanded native table's 128.
+    Reading beyond that boundary treats note/envelope bytes as bogus pointers.
+    """
     if not source_ids or len(set(source_ids))!=len(source_ids):raise ValueError('Empty or duplicate level sound batch')
     read=lambda at,n:span(code,at-CODE_RAM,n)
     interpreter=extended_native_interpreter(read)
@@ -427,7 +549,12 @@ def install_level(image,prior,blob,code,source_ids):
     if (sha256(sequence)!=current['sha256'] or physical!=current['physical']
             or entry.hex()!=current['header_after'] or table!=0x4D20
             or sequence[0x178]!=0xC2):raise ValueError('Changed shared level sound dispatch')
-    starts=struct.unpack_from('>128H',source,0x2E02)
+    if (struct.unpack_from('>H',source,0x179)[0]!=0x2E02 or source[0x178]!=0xC2 or
+            struct.unpack_from('>H',source,0x2E02)[0]!=0x2EC2 or source[0x2EC2]!=255):
+        raise ValueError('Changed complete donor level table boundary')
+    starts=struct.unpack_from('>96H',source,0x2E02)
+    if any(not 0x2EC2<=p<len(source) for p in starts):
+        raise ValueError('Donor level entry escapes its program region')
     source_map=struct.unpack('>H',dol.read(0x800CE490+242*2,2))[0]
     native_map=struct.unpack('>H',read(0x80115D80+199*2,2))[0]
     source_banks=dol.read(0x800CE490+source_map,5);native_banks=read(0x80115D80+native_map,5)
@@ -439,33 +566,75 @@ def install_level(image,prior,blob,code,source_ids):
     if db[11]!=255 or nbe[11]!=255:raise ValueError('Unsupported multi-wave level font')
     donor_wave,_=resource(dol.read,GC_SECTIONS,donor,'wave',db[10])
     native_wave,_,_=installed_resource(image,code,'wave',nbe[10])
-    result=bytearray(sequence);rows=copy.deepcopy(installed['imports']);before=permanent_budget(code)
+    result=bytearray(sequence);rows=[];pending=[];missing={}
     for sid in sorted(source_ids):
-        if not 68<=sid<128:raise ValueError('Level sound must use an added slot')
+        if type(sid) is not int or not 68<=sid<len(starts):raise ValueError('Level sound must use a real added donor slot')
         old_pointer=struct.unpack_from('>H',sequence,table+sid*2)[0]
         if span(sequence,old_pointer,1)!=b'\xFF':raise ValueError('Level sound slot is occupied')
         origin=starts[sid];limit=min(p for p in starts if p>origin)
         data=span(source,origin,limit-origin);description=looping_layer(data,origin)
         identity=instrument(donor_bank,donor_wave,description['instrument'],db[12],extended=True)
         matches=[i for i in range(nbe[12]) if instrument(native_bank,native_wave,i,nbe[12],extended=True)==identity]
-        if not matches:raise ValueError('Level sound lacks its complete native instrument')
-        target=description['instrument'] if description['instrument'] in matches else matches[0]
-        result.extend(bytes(len(result)&1));at=len(result);bound=bind_loop(data,description,at,target)
+        if not matches and font_resources is None:raise ValueError('Level sound lacks its complete native instrument')
+        target=description['instrument'] if description['instrument'] in matches else matches[0] if matches else None
+        if target is None:
+            missing[description['instrument']]=dict(bank_id=sb,instrument=description['instrument'],
+                bank=donor_bank,wave=donor_wave,instrument_count=db[12])
+        pending.append((sid,old_pointer,data,description,identity,target))
+    extension={};layout=None
+    if font_resources is not None:
+        extra_bank,extra_header,_=installed_resource(image,code,'bank',native_banks[3])
+        extra_wave,_,_=installed_resource(image,code,'wave',extra_header[10])
+        if extra_header[11]!=255 or extra_header[13]:raise ValueError('Expected an instrument-only extension font')
+        if missing:
+            font,waves,layout=extend_instruments(extra_bank,extra_wave,extra_header[12],list(missing.values()))
+            extension={r['source_instrument']:r for r in layout['imports']}
+        else:
+            font,waves=extra_bank,extra_wave
+            layout=dict(native_instrument_count=extra_header[12],instrument_count=extra_header[12],
+                imports=[],font_growth_bytes=0,wave_growth_bytes=0)
+        font_resources.update(font=font,wave=waves)
+    for sid,old_pointer,data,description,identity,target in pending:
+        selector=0;selected_bank=nb;new_instrument=False;new_sample=False
+        if target is None:
+            mapping=extension[description['instrument']];target=mapping['native_instrument']
+            selector=1;selected_bank=native_banks[3];new_instrument=not mapping['reused']
+            inst=u32(font,8+target*4)
+            samples=[u32(font,inst+field) for field in (8,16,24)]
+            new_sample=any(p and u32(font,p+4)>=len(extra_wave) for p in samples)
+        result.extend(bytes(len(result)&1));at=len(result);bound=bind_loop(data,description,at,target,selector)
         result.extend(bound);struct.pack_into('>H',result,table+sid*2,at)
         rows.append(dict(kind='level',source_sound_id=sid,native_sound_id=sid,source_program=description,
-            source_bank=sb,native_bank=nb,native_instrument=target,instrument_identity=identity,
+            source_bank=sb,native_bank=selected_bank,native_instrument=target,instrument_identity=identity,
             offset=at,bytes=len(bound),sha256=sha256(bound),source_table=0x2E02,native_table=table,
-            original_table_pointer=old_pointer,new_instrument=False,new_sample=False))
-    result.extend(bytes(-len(result)%16));blob.extend(bytes(-len(blob)%16));position=len(blob);blob.extend(result)
+            original_table_pointer=old_pointer,new_instrument=new_instrument,new_sample=new_sample))
+    result.extend(bytes(-len(result)%16))
+    metadata=dict(programs=rows,interpreter=interpreter,previous_sequence=copy.deepcopy(current),
+        source_sequence_sha256=sha256(source),source_table=0x2E02,source_table_entries=len(starts),
+        source_table_sha256=sha256(source[0x2E02:0x2EC2]),native_table=table,native_table_entries=128)
+    if layout is not None:metadata.update(layout=layout,font_index=native_banks[3],wave_index=extra_header[10])
+    return bytes(result),metadata
+
+
+def install_level(image,prior,blob,code,source_ids):
+    """Extend the existing shared level dispatcher with equivalent native fonts."""
+    result,prepared=prepare_levels(image,prior,code,source_ids)
+    sequence,entry,_=installed_resource(image,code,'seq',199)
+    installed=prior['equipment_resources']['sound_programs'];current=installed['sequence']
+    before=permanent_budget(code)
+    blob.extend(bytes(-len(blob)%16));position=len(blob);blob.extend(result)
     new_physical=by_vrom(image)[BLOB].pstart+position;new_entry=bytearray(entry)
     struct.pack_into('>2I',new_entry,0,new_physical-by_vrom(image)[NATIVE_VROMS['seq']].pstart,len(result))
     address=NATIVE_HEADERS['seq']+16+199*16;code[address-CODE_RAM:address-CODE_RAM+16]=new_entry
-    return dict(format='AFV3-SHARED-SOUND-PROGRAMS-1',imports=rows,interpreter=interpreter,
+    updated=copy.deepcopy(installed)
+    updated.update(format='AFV3-SHARED-SOUND-PROGRAMS-1',imports=installed['imports']+prepared['programs'],
+        interpreter=prepared['interpreter'],
         sequence=dict(index=199,blob_offset=position,physical=new_physical,vrom=BLOB+position,
             bytes=len(result),sha256=sha256(result),header_address=address,header_before=entry.hex(),
             header_after=new_entry.hex(),retained_bytes=len(sequence)),previous_sequence=copy.deepcopy(current),
         before_budget=before,after_budget=permanent_budget(code),sound_resources_installed=True,
         native_synthesis_tested=False,physical_audio_played=False)
+    return updated
 
 
 def single_layer(sequence, origin, limit):
@@ -518,13 +687,26 @@ def bind_program(data,description,offset,instrument_index):
     return bytes(result)
 
 
+def audio_archive(image,code,kind):
+    """Locate the whole archive by the native reader's actual physical base."""
+    files=by_vrom(image)
+    if kind!='wave':return files[NATIVE_VROMS[kind]]
+    hi,lo=struct.unpack('>2I',span(code,0x800D28DC-CODE_RAM,8))
+    if hi&0xFFFF0000!=0x3C0E0000 or lo&0xFFFF0000!=0x25CE0000:
+        raise ValueError('Changed native wave archive base instructions')
+    base=((hi&65535)<<16)+(lo&65535)-(65536 if lo&32768 else 0)
+    matches=[entry for entry in files.values() if entry.pstart==base and not entry.pend]
+    if len(matches)!=1:raise ValueError('Native wave base lacks one complete archive owner')
+    return matches[0]
+
+
 def installed_resource(image,code,kind,index):
     files=by_vrom(image)
     read=lambda at,n:span(code,at-CODE_RAM,n)
     entry=header_entry(read,NATIVE_HEADERS[kind],index)
     if entry[8]!=2:raise ValueError('Sound requires ROM-backed audio')
     offset,n=struct.unpack_from('>2I',entry)
-    physical=(files[NATIVE_VROMS[kind]].pstart+offset)&0xFFFFFFFF
+    physical=(audio_archive(image,code,kind).pstart+offset)&0xFFFFFFFF
     if (not n or physical+n>len(image) or not any(e.pstart!=0xFFFFFFFF and not e.pend
             and e.pstart<=physical<=e.pstart+e.size-n for e in files.values())):
         raise ValueError('Installed sound resource escapes its complete ROM owner')
@@ -650,14 +832,167 @@ def register_triggers(sequence,programs,fragments,counts,native_priority,source_
     return bytes(result),rows,list(tables.values())
 
 
+def install_audio_resources(image,prior,blob,code,new_sequence,resources,audio):
+    """Store complete shared SFX resources for trigger and looping categories."""
+    from v3_furniture_install import append_resource_plan,relocate_resource_plan
+    files=by_vrom(image)
+    before_budget=permanent_budget(code)
+    def store(kind,index,data,*,count=None):
+        old,header,_=installed_resource(image,code,kind,index)
+        blob.extend(bytes(-len(blob)%16));at=len(blob);blob.extend(data)
+        physical=files[BLOB].pstart+at;new_header=bytearray(header)
+        struct.pack_into('>2I',new_header,0,(physical-files[NATIVE_VROMS[kind]].pstart)&0xFFFFFFFF,len(data))
+        if count is not None:new_header[12]=count
+        address=NATIVE_HEADERS[kind]+16+index*16
+        code[address-CODE_RAM:address-CODE_RAM+16]=new_header
+        return dict(index=index,blob_offset=at,physical=physical,vrom=BLOB+at,bytes=len(data),
+            sha256=sha256(data),header_address=address,header_before=header.hex(),header_after=new_header.hex(),
+            previous_sha256=sha256(old))
+    seq=store('seq',199,new_sequence)
+    bank=store('bank',audio['font_index'],resources['font'],count=audio['layout']['instrument_count'])
+    wave,header,physical=installed_resource(image,code,'wave',audio['wave_index'])
+    wave_owner=audio_archive(image,code,'wave');old_waves=wave_owner.extract(image)
+    if (physical+len(wave)!=wave_owner.pstart+len(old_waves) or
+            resources['wave'][:len(wave)]!=wave or sha256(old_waves)!=prior['fire_sound']['wave_file']['sha256']):
+        raise ValueError('Wave append changes a current complete resource')
+    new_waves=old_waves+resources['wave'][len(wave):]
+    relocatable={r['vrom']:r['output_sha256'] for r in prior['equipment_resources']['wrapped_presents']['consumers']}
+    relocatable.update({r['vrom']:r['sha256'] for r in prior['equipment_resources']['player_actions']['balloon_menu']['owner_resizes']})
+    # Later batches may reach complete scenery owners already moved behind
+    # the wave archive. Their loaders use logical VROM/relocation identities,
+    # not physical cartridge positions. Accept only installed owner receipts;
+    # the shared append planner verifies their complete bytes before moving.
+    scenery=prior['equipment_resources'].get('scenery',{})
+    for category in ('daily_growth','field_insects'):
+        owner=scenery.get(category)
+        if owner:
+            relocatable.update({owner['vrom']:owner['sha256'],owner['reloc']:owner['reloc_sha256']})
+    if new_waves==old_waves:changes,growth={},None
+    else:
+        target=wave_owner.vstart
+        if any(e.vstart<target+len(new_waves) and target<e.vend for v,e in files.items() if v!=target):
+            target=0x04000000
+        if target==0x04000000 and len(new_waves)>0x800000:
+            raise ValueError('Complete audio archive exceeds extended virtual reservation')
+        try:changes,growth=append_resource_plan(image,files,wave_owner.vstart,new_waves,relocatable,target_vrom=target)
+        except ValueError as error:
+            changes,growth=relocate_resource_plan(image,files,wave_owner.vstart,new_waves,
+                minimum_physical=0x3000000,target_vrom=target)
+            growth['in_place_rejection']=str(error)
+    wave_base=growth['physical'] if growth else wave_owner.pstart
+    # The native initializer uses unsigned ADDU to turn header offsets into
+    # physical addresses. Moving the complete wave archive must also retain
+    # external waveform resources and change the actual base-load instructions.
+    if span(code,0x800EA944-CODE_RAM,12)!=bytes.fromhex('8CD800100305C821ACD90010'):
+        raise ValueError('Changed unsigned native audio header initialization')
+    old_load=struct.pack('>2I',0x3C0E0000|((wave_owner.pstart+0x8000)>>16),0x25CE0000|(wave_owner.pstart&65535))
+    new_load=struct.pack('>2I',0x3C0E0000|((wave_base+0x8000)>>16),0x25CE0000|(wave_base&65535))
+    if span(code,0x800D28DC-CODE_RAM,8)!=old_load:raise ValueError('Changed native wave archive base')
+    header_count=struct.unpack_from('>H',code,NATIVE_HEADERS['wave']-CODE_RAM)[0]
+    if header_count!=6:raise ValueError('Changed native wave resource count')
+    wave_headers=[]
+    for index in range(header_count):
+        address=NATIVE_HEADERS['wave']+16+index*16
+        before=bytes(code[address-CODE_RAM:address-CODE_RAM+16]);offset,length=struct.unpack_from('>2I',before)
+        if not length or before[8:10]!=bytes((2,4)):raise ValueError('Changed native streamed-wave contract')
+        outside=not 0<=offset<=len(old_waves)-length
+        old_physical=(wave_owner.pstart+offset)&0xFFFFFFFF
+        if outside:
+            data,_,actual=installed_resource(image,code,'wave',index)
+            if actual!=old_physical or index==audio['wave_index']:raise ValueError('Invalid external wave binding')
+            new_physical=old_physical
+        else:new_physical=wave_base+offset
+        size=len(resources['wave']) if index==audio['wave_index'] else length
+        after=bytearray(before);struct.pack_into('>2I',after,0,(new_physical-wave_base)&0xFFFFFFFF,size)
+        code[address-CODE_RAM:address-CODE_RAM+16]=after
+        wave_headers.append(dict(index=index,address=address,before=before.hex(),after=after.hex(),
+            physical_before=old_physical,physical=new_physical,bytes=size,external_resource_retained=outside))
+    selected=wave_headers[audio['wave_index']]
+    code[0x800D28DC-CODE_RAM:0x800D28DC-CODE_RAM+8]=new_load
+    wave_vrom=growth.get('target_vrom',wave_owner.vstart) if growth else wave_owner.vstart
+    wave_record=dict(index=audio['wave_index'],physical=selected['physical'],
+        vrom=wave_vrom+physical-wave_owner.pstart,bytes=len(resources['wave']),
+        sha256=sha256(resources['wave']),header_address=selected['address'],header_before=header.hex(),header_after=selected['after'])
+    heap_growth,patches=grow_permanent_heap(code)
+    fire=copy.deepcopy(prior['fire_sound'])
+    fire['resources'].update(seq=seq,bank=bank,wave=wave_record)
+    fire['wave_file'].update(vrom=wave_vrom,physical=wave_base,bytes=len(new_waves),sha256=sha256(new_waves))
+    if wave_base!=wave_owner.pstart:
+        fire['wave_file'].update(old_physical=wave_owner.pstart,retains_old_allocation=True)
+    fire['wave_headers']=wave_headers
+    fire['heap_settings']=list(struct.unpack_from('>3I',code,0x80119A44-CODE_RAM))
+    fire['after_budget']=permanent_budget(code)
+    return seq,bank,wave_record,changes,growth,heap_growth,patches,before_budget,fire
+
+
+def install_furniture_levels(image,prior,blob,code,directory,prepared):
+    """Install a complete shared loop-audio batch without enabling its furniture.
+
+    The native lifecycle still needs its own checked switch/fade/move binding.
+    Existing trigger fonts, wave storage, dispatch, and consumers are retained.
+    """
+    from v3_furniture_pipeline import Source
+    if (not directory.is_relative_to(ROOT/'build') or prepared['base_sha256']!=sha256(image) or
+            prepared.get('callback_installed') is not False):
+        raise ValueError('Furniture level audio needs its checked current base')
+    source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+        (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    if (prepared['source_rel_sha256']!=sha256(source.rel) or
+            prepared['source_symbols_sha256']!=sha256(source.symbols.encode())):
+        raise ValueError('Changed complete furniture level source')
+    previous=prior['equipment_resources'].get('furniture_level_audio',{})
+    seen={r['item_id'] for r in previous.get('furniture',[])};ids=set()
+    for row in prepared['furniture']:
+        profile=source.profile(int(row['item_id'],16));lifecycle=furniture_level(source,profile)
+        if (row['item_id'] in seen or lifecycle is None or row['profile_sha256']!=profile['profile_sha256'] or
+                row['callback']!=json.loads(json.dumps(profile['callback_adapter'])) or
+                row['lifecycle']!=json.loads(json.dumps(lifecycle))):
+            raise ValueError('Changed complete furniture level lifecycle')
+        seen.add(row['item_id']);ids.add(lifecycle['source_sound_id'])
+    resources={}
+    data,audio=prepare_levels(image,prior,code,sorted(ids),font_resources=resources)
+    if (any(prepared[k]!=json.loads(json.dumps(v)) for k,v in audio.items()) or
+            prepared['sequence']!=dict(bytes=len(data),sha256=sha256(data)) or
+            (directory/'sequence.bin').read_bytes()!=data):
+        raise ValueError('Changed complete prepared furniture level audio')
+    if prepared['files']!={name+'.bin':dict(bytes=len(value),sha256=sha256(value)) for name,value in resources.items()}:
+        raise ValueError('Incomplete prepared level font/sample records')
+    for name,value in resources.items():
+        if (directory/(name+'.bin')).read_bytes()!=value:raise ValueError('Changed prepared level font/sample data')
+    result=copy.deepcopy(prior['equipment_resources'])
+    seq,bank,wave,changes,growth,heap_growth,patches,before,fire=install_audio_resources(
+        image,prior,blob,code,data,resources,audio)
+    shared=copy.deepcopy(result['sound_programs'])
+    shared.update(sequence=seq,previous_sequence=copy.deepcopy(shared['sequence']),
+        imports=shared['imports']+audio['programs'],interpreter=audio['interpreter'],
+        before_budget=before,after_budget=permanent_budget(code),native_synthesis_tested=False)
+    result['sound_programs']=shared
+    # These receipts also describe the shared physical sequence. Keep every
+    # consumer current so later trigger batches retain the level additions.
+    if 'furniture_audio' in result:
+        result['furniture_audio'].update(sequence=copy.deepcopy(seq),font=copy.deepcopy(bank),wave=copy.deepcopy(wave))
+        result['furniture_audio']['after_budget']=copy.deepcopy(shared['after_budget'])
+    result['furniture_level_audio']=dict(format='AFV3-FURNITURE-LEVEL-AUDIO-1',
+        furniture=previous.get('furniture',[])+prepared['furniture'],
+        programs=previous.get('programs',[])+audio['programs'],sequence=copy.deepcopy(seq),
+        source_table_entries=audio['source_table_entries'],native_table_entries=audio['native_table_entries'],
+        layout=audio['layout'],font=bank,wave=wave,audio_heap_growth=heap_growth,heap_patches=patches,
+        resource_growth=growth,callback_installed=False,
+        before_budget=shared['before_budget'],after_budget=shared['after_budget'],native_synthesis_tested=False,
+        batches=previous.get('batches',[])+[dict(prepared_sha256=sha256((directory/'audio.json').read_bytes()),
+            source_items=[r['item_id'] for r in prepared['furniture']],programs=audio['programs'])])
+    return result,changes,dict(fire_sound=fire,resource_growth=[growth] if growth else [])
+
+
 def install_furniture(image,prior,blob,code,original,output,directory):
     """Install the complete prepared sound category and its shared room callback."""
     from aflib import CODE_VROM
-    from v3_furniture_install import append_resource_plan,relocate_resource_plan
     from v3_furniture_pipeline import Source
     from v3_registry import furniture_representation_identity
     import v3_room_rig_runtime as room
     directory=directory.resolve();raw=(directory/'audio.json').read_bytes();prepared=json.loads(raw)
+    if prepared.get('format')=='AFV3-FURNITURE-LEVEL-AUDIO-PREPARED-1':
+        return install_furniture_levels(image,prior,blob,code,directory,prepared)
     if (not directory.is_relative_to(ROOT/'build') or prepared['format']!='AFV3-TRIGGER-AUDIO-PREPARED-1'
             or prepared['base_sha256']!=sha256(image)):
         raise ValueError('Furniture audio needs its checked current base')
@@ -715,78 +1050,8 @@ def install_furniture(image,prior,blob,code,original,output,directory):
     new_sequence,programs,tables=register_triggers(sequence,audio['programs'],resources['fragments'],
         {r['group']:r['previous_count'] for r in previous['tables']} if previous else {1:106,4:78},
         priority,dol.read(0x800A9A90,128),previous=previous)
-    before_budget=permanent_budget(code)
-    def store(kind,index,data,*,count=None):
-        old,header,_=installed_resource(image,code,kind,index)
-        blob.extend(bytes(-len(blob)%16));at=len(blob);blob.extend(data)
-        physical=files[BLOB].pstart+at;new_header=bytearray(header)
-        struct.pack_into('>2I',new_header,0,(physical-files[NATIVE_VROMS[kind]].pstart)&0xFFFFFFFF,len(data))
-        if count is not None:new_header[12]=count
-        address=NATIVE_HEADERS[kind]+16+index*16
-        code[address-CODE_RAM:address-CODE_RAM+16]=new_header
-        return dict(index=index,blob_offset=at,physical=physical,vrom=BLOB+at,bytes=len(data),
-            sha256=sha256(data),header_address=address,header_before=header.hex(),header_after=new_header.hex(),
-            previous_sha256=sha256(old))
-    seq=store('seq',199,new_sequence)
-    bank=store('bank',audio['font_index'],resources['font'],count=audio['layout']['instrument_count'])
-    wave,header,physical=installed_resource(image,code,'wave',audio['wave_index'])
-    wave_owner=files[NATIVE_VROMS['wave']];old_waves=wave_owner.extract(image)
-    if (physical+len(wave)!=wave_owner.pstart+len(old_waves) or
-            resources['wave'][:len(wave)]!=wave or sha256(old_waves)!=prior['fire_sound']['wave_file']['sha256']):
-        raise ValueError('Wave append changes a current complete resource')
-    new_waves=old_waves+resources['wave'][len(wave):]
-    relocatable={r['vrom']:r['output_sha256'] for r in prior['equipment_resources']['wrapped_presents']['consumers']}
-    relocatable.update({r['vrom']:r['sha256'] for r in prior['equipment_resources']['player_actions']['balloon_menu']['owner_resizes']})
-    # Later batches may reach complete scenery owners already moved behind
-    # the wave archive. Their loaders use logical VROM/relocation identities,
-    # not physical cartridge positions. Accept only installed owner receipts;
-    # the shared append planner verifies their complete bytes before moving.
-    scenery=prior['equipment_resources'].get('scenery',{})
-    for category in ('daily_growth','field_insects'):
-        owner=scenery.get(category)
-        if owner:
-            relocatable.update({owner['vrom']:owner['sha256'],owner['reloc']:owner['reloc_sha256']})
-    if new_waves==old_waves:changes,growth={},None
-    else:
-        try:changes,growth=append_resource_plan(image,files,NATIVE_VROMS['wave'],new_waves,relocatable)
-        except ValueError as error:
-            changes,growth=relocate_resource_plan(image,files,NATIVE_VROMS['wave'],new_waves,
-                minimum_physical=0x3000000)
-            growth['in_place_rejection']=str(error)
-    wave_base=growth['physical'] if growth else wave_owner.pstart
-    # The native initializer uses unsigned ADDU to turn header offsets into
-    # physical addresses. Moving the complete wave archive must also retain
-    # external waveform resources and change the actual base-load instructions.
-    if span(code,0x800EA944-CODE_RAM,12)!=bytes.fromhex('8CD800100305C821ACD90010'):
-        raise ValueError('Changed unsigned native audio header initialization')
-    old_load=struct.pack('>2I',0x3C0E0000|((wave_owner.pstart+0x8000)>>16),0x25CE0000|(wave_owner.pstart&65535))
-    new_load=struct.pack('>2I',0x3C0E0000|((wave_base+0x8000)>>16),0x25CE0000|(wave_base&65535))
-    if span(code,0x800D28DC-CODE_RAM,8)!=old_load:raise ValueError('Changed native wave archive base')
-    code[0x800D28DC-CODE_RAM:0x800D28DC-CODE_RAM+8]=new_load
-    header_count=struct.unpack_from('>H',code,NATIVE_HEADERS['wave']-CODE_RAM)[0]
-    if header_count!=6:raise ValueError('Changed native wave resource count')
-    wave_headers=[]
-    for index in range(header_count):
-        address=NATIVE_HEADERS['wave']+16+index*16
-        before=bytes(code[address-CODE_RAM:address-CODE_RAM+16]);offset,length=struct.unpack_from('>2I',before)
-        if not length or before[8:10]!=bytes((2,4)):raise ValueError('Changed native streamed-wave contract')
-        outside=not 0<=offset<=len(old_waves)-length
-        old_physical=(wave_owner.pstart+offset)&0xFFFFFFFF
-        if outside:
-            data,_,actual=installed_resource(image,code,'wave',index)
-            if actual!=old_physical or index==audio['wave_index']:raise ValueError('Invalid external wave binding')
-            new_physical=old_physical
-        else:new_physical=wave_base+offset
-        size=len(resources['wave']) if index==audio['wave_index'] else length
-        after=bytearray(before);struct.pack_into('>2I',after,0,(new_physical-wave_base)&0xFFFFFFFF,size)
-        code[address-CODE_RAM:address-CODE_RAM+16]=after
-        wave_headers.append(dict(index=index,address=address,before=before.hex(),after=after.hex(),
-            physical_before=old_physical,physical=new_physical,bytes=size,external_resource_retained=outside))
-    selected=wave_headers[audio['wave_index']]
-    wave_record=dict(index=audio['wave_index'],physical=selected['physical'],
-        vrom=wave_owner.vstart+physical-wave_owner.pstart,bytes=len(resources['wave']),
-        sha256=sha256(resources['wave']),header_address=selected['address'],header_before=header.hex(),header_after=selected['after'])
-    heap_growth,patches=grow_permanent_heap(code)
+    seq,bank,wave_record,changes,growth,heap_growth,patches,before_budget,fire=install_audio_resources(
+        image,prior,blob,code,new_sequence,resources,audio)
     result=copy.deepcopy(prior['equipment_resources']);runtime=result['room_rigs']
     packet=runtime['packet'];at=packet['blob_offset']
     packet_data=blob[at:at+packet['bytes']]
@@ -815,6 +1080,9 @@ def install_furniture(image,prior,blob,code,original,output,directory):
     shared=result['sound_programs'];shared['previous_sequence']=copy.deepcopy(old_sequence);shared['sequence']=seq
     shared.setdefault('trigger_batches',[]).append(dict(programs=programs,tables=tables))
     shared.update(after_budget=permanent_budget(code),native_synthesis_tested=False)
+    if 'furniture_level_audio' in result:
+        result['furniture_level_audio'].update(sequence=copy.deepcopy(seq),font=copy.deepcopy(bank),wave=copy.deepcopy(wave_record))
+        result['furniture_level_audio']['after_budget']=copy.deepcopy(shared['after_budget'])
     result['furniture_audio']=dict(format='AFV3-FURNITURE-TRIGGER-AUDIO-1',prepared_sha256=sha256(raw),
         furniture=sorted((previous['furniture'] if previous else [])+furniture,key=lambda r:r['item_id']),
         programs=sorted({r['source_sound_word']:r for r in (previous['programs'] if previous else [])+programs}.values(),
@@ -828,14 +1096,6 @@ def install_furniture(image,prior,blob,code,original,output,directory):
     result['furniture_audio']['batches']=(copy.deepcopy(previous.get('batches',[])) if previous else [])+[
         dict(prepared_sha256=sha256(raw),source_items=[r['item_id'] for r in furniture],
              programs=programs,heap_growth=heap_growth,resource_growth=growth)]
-    fire=copy.deepcopy(prior['fire_sound'])
-    fire['resources'].update(seq=seq,bank=bank,wave=wave_record)
-    fire['wave_file'].update(physical=wave_base,bytes=len(new_waves),sha256=sha256(new_waves))
-    if wave_base!=wave_owner.pstart:
-        fire['wave_file'].update(old_physical=wave_owner.pstart,retains_old_allocation=True)
-    fire['wave_headers']=wave_headers
-    fire['heap_settings']=list(struct.unpack_from('>3I',code,0x80119A44-CODE_RAM))
-    fire['after_budget']=permanent_budget(code)
     speed=copy.deepcopy(prior['speed_bag_sound']);speed['sequence_group_one_count']=128
     return result,changes,dict(fire_sound=fire,speed_bag_sound=speed,resource_growth=[growth] if growth else [])
 

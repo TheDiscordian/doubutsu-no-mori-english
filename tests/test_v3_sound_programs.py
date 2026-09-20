@@ -56,6 +56,25 @@ class ProgramTests(unittest.TestCase):
         for offset,index in ((1,7),(65530,7),(0,126)):
             with self.assertRaises(ValueError):sounds.bind_loop(raw,desc,offset,index)
 
+    def test_mode_before_envelope_retains_the_actual_loop_restart(self):
+        for target in (6,7,11):
+            # Alternate compiler layout: sustain before envelope setup.
+            raw=self.loop_program();raw[6:11]=bytes((0xC4,0xCB,0,18,224))
+            raw[17]=target
+            description=sounds.looping_layer(raw,0)
+            self.assertEqual(description['pointers'],[1,8,16])
+            bound=sounds.bind_loop(raw,description,0x4100,12,1)
+            actual=sounds.looping_layer(bound,0x4100,prefix=True)
+            self.assertEqual(actual['loop'],target+4)
+            self.assertEqual(bound[:4],bytes((0xEB,1,12,0xC4)))
+            for key in ('note','duration','velocity','decay','envelope_bytes'):
+                self.assertEqual(actual[key],description[key])
+            restored=bytearray(bound[4:]);restored[5]=raw[5]
+            for at in description['pointers']:restored[at:at+2]=raw[at:at+2]
+            self.assertEqual(restored,raw)
+            bad=raw.copy();bad[17]=8
+            with self.assertRaisesRegex(ValueError,'Loop target'):sounds.looping_layer(bad,0)
+
     def program(self,sweep=True,long=False):
         # Original synthetic sequence, not copied donor artwork/audio.
         result=bytearray.fromhex('eb0102880007ffcb0000e0')
