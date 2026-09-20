@@ -1,5 +1,49 @@
 # Automatic furniture pipeline checkpoint
 
+## Legacy donor discovery and bulk artwork
+
+The ordinary pipeline includes all 148 `1xxx` worksheet entries whose four
+native-correspondence fields are unresolved, as well as the existing 242 `3xxx`
+entries. Four of those legacy records are already classified balloon displays.
+Other records include dummy resources, fish/insect/umbrella/NES representations,
+and ordinary furnishings; this is not a claim of 148 new imports. All remain in
+review until actual representation and native identity are established. Legacy
+metadata fails before any source profile index can be treated as an additive
+N64 destination. Existing native items and registry reservations remain intact.
+
+The supported static subset is prepared in one compiler batch:
+
+```sh
+python3 -B tools/v3_furniture_pipeline.py convert --assets-only \
+  --category legacy-static \
+  --base-lock build/v3-shared-room-profiles-02/build-lock.json \
+  --output build/legacy-static-reproduction
+```
+
+`build/v3-legacy-static-prepared-01/` contains twelve complete objects totalling
+46,272 bytes: basic/scary/quaint/classic paintings, shogi piece, chocolates,
+tribal mask, pagoda, fishing bear, Chinese lioness, Tower of Pisa, and Tokyo Tower.
+No new item-specific converter or model description is introduced. Full artwork,
+source scalars, official name records, and pending mapping reasons remain in the
+normal prepared format, reusable by the ordinary importer once prerequisites
+are implemented. Their official name entries are in the single provenance
+catalogue. Complete art receipt SHA-256:
+`42ef9f99bd262c6840c0b2f50a661359157585d314b0c47eb3fc5cbf45252800`.
+
+Two focused tests pass in 18.778 seconds. They check default discovery against
+the full verified worksheet, retained `3xxx` rows, explicit alias/dummy handling,
+all twelve source names, source-bound cache reconstruction, and installation/
+destination rejection. The existing independent complete-artwork verifier checks
+every texel, palette, vertex, and triangle in the new batch. No old cartridge or
+native scenario is replayed: these changes prepare assets and broaden discovery,
+not executable ROM consumers. The current ABI-163 ROM, choices, saves, main lock,
+and both served patchers remain unchanged.
+
+Continue identity review and shared additive mapping/metadata before enabling
+these entries. Other legacy records retain their actual conversion/behaviour
+gaps, including the holiday bottled ship's unsupported colour combiner. Required
+gold-tree work remains after primary importing.
+
 ## Shared holiday reward preparation
 
 `build/v3-holiday-rewards-prepared-02/` contains the complete donor holiday

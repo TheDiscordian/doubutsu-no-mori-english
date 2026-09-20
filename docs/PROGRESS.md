@@ -18,6 +18,16 @@ served patchers retain their existing builds.
 
 ## Active development
 
+The bulk scan includes unresolved legacy `1xxx` donor records rather than
+silently omitting them. `build/v3-legacy-static-prepared-01/` contains twelve
+complete static objects (46,272 bytes), compiled in one container with the
+existing converter. Two focused checks pass, including complete graphics
+comparisons, source names, alias/dummy classification, and refusal of unfinished
+imports. Official name sources are in the single provenance catalogue.
+Identity review and stable additive mapping remain required before these
+records can be installed; same-numbered N64 items are not overwritten. See the
+[legacy checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#legacy-donor-discovery-and-bulk-artwork).
+
 The primary acquisition pipeline prepares all 28 source holiday selectors and
 65 gift candidates at `build/v3-holiday-rewards-prepared-02/`, plus a relocatable
 N64 selection/handover kernel. Three focused source and sanitizer checks pass.
@@ -26,8 +36,9 @@ receipts, duplicate rejection, and full-pocket failure without consuming a
 reward. This is prepared code/data, not an installed NPC or acquisition route;
 the current ROM and 128 choices remain unchanged. Next connect donor identity
 resolution, Tortimer's actor/calendar/dialogue, and actual delivery callbacks.
-Include legacy `1xxx` donor additions in primary discovery: the holiday program's
-bottled ship `1FC0` has no reviewed native identity or additive destination yet.
+Legacy `1xxx` donor records are included in primary discovery. The holiday
+program's bottled ship `1FC0` still has no reviewed native identity or additive
+destination, and its colour-combiner conversion remains unsupported.
 See the [holiday checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-holiday-reward-preparation).
 
 The current explicit proposal is ABI 163 at

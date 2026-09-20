@@ -24,6 +24,19 @@ hand owner; its tag owner remains an in-place update.
 
 ### Bulk compilation and prepared-artwork reuse
 
+Default discovery includes worksheet `1xxx` entries whose native ID/name/model/
+texture correspondence is unresolved, alongside the `3xxx` range and explicit
+room aliases. Missing correspondence is a review condition, not proof that the
+entry is new furniture. Dummy resources and parent/display representations keep
+their actual discovery reasons. No legacy donor number becomes a native ID.
+
+`--assets-only --category legacy-static` prepares complete supported static
+models from that range in one compiler batch. The native-correspondence and
+additive-destination gate remains ahead of ordinary installation. Prepared
+bundles retain full donor name/source records and use the same texture, geometry,
+material, and cache-validation machinery as the other categories. Source profile
+indices in these prepared records are not assigned N64 destination indices.
+
 Furniture `convert` and `import` preflight the entire selected batch, then compile
 all missing display lists in one existing toolchain container. Every object has
 separate sections and exact checked lengths. The compiler has no network and

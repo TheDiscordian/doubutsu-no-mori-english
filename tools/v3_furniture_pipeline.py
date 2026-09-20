@@ -907,7 +907,7 @@ def furniture_source_index(item):
     raise ReviewRequired('not a canonical donor furniture identity')
 
 
-def identity_rows(path, *, extra_items=()):
+def identity_rows(path, *, extra_items=(), include_unmapped_legacy=False):
     if sha256(path.read_bytes()) != SHEET_SHA: raise ValueError('Changed identity worksheet')
     rows = list(sheet_rows(path, 'Items'))
     if any(rows[0][1].get(k) != v for k,v in {'C':'ID (AF)', 'E':'ID (AC)', 'J':'Name (English)'}.items()):
@@ -917,7 +917,8 @@ def identity_rows(path, *, extra_items=()):
         value = cells.get('E', '')
         if not re.fullmatch(r'[13][0-9A-F]{3}', value): continue
         item = int(value, 16)
-        if item < 0x3000 and item not in extra_items: continue
+        if item < 0x3000 and item not in extra_items:
+            if not include_unmapped_legacy or any(cells.get(k)!='-' for k in ('C','H','CG','CJ')):continue
         if item in result: raise ValueError('Ambiguous worksheet donor identity')
         result[item] = number, cells
     return result
@@ -942,6 +943,8 @@ def metadata(source, item, profile, identity):
     alias = next((row for row in room_aliases(source)['rows'] if int(row['display_item_id'],16)==item), None)
     if alias:
         raise ReviewRequired(room_alias_reason(alias))
+    if item<0x3000:
+        raise ReviewRequired('legacy donor identity needs native correspondence review and an additive import mapping')
     binding=getattr(source,'runtime_profiles',{}).get(f'{item:04X}')
     if binding and (binding['source_profile_sha256']!=profile['profile_sha256'] or
             binding['category']!=profile.get('callback_adapter',{}).get('category')):
@@ -1018,7 +1021,7 @@ def scan(source, worksheet, installed=None):
     alias_catalogue = room_aliases(source)
     aliases = {int(row['display_item_id'],16):row for row in alias_catalogue['rows']}
     result = []
-    for item, identity in sorted(identity_rows(worksheet,extra_items=aliases).items()):
+    for item, identity in sorted(identity_rows(worksheet,extra_items=aliases,include_unmapped_legacy=True).items()):
         row = dict(item_id=f'{item:04X}', name=identity[1].get('J'), installed=item in installed,
                    asset_ready=False)
         try:
@@ -1032,6 +1035,9 @@ def scan(source, worksheet, installed=None):
             if estimated > 9216: raise ReviewRequired('complete object exceeds native model-bank capacity')
             formats={r['format'] for r in resources if r['kind']=='texture'}
             categories = [profile['behaviour'], ('1x1','2x1','2x2')[profile['size_code']]]
+            if item<0x3000:
+                categories.append('legacy-donor-range')
+                if profile['behaviour']=='static' and not profile.get('kind'):categories.append('legacy-static')
             categories.append('animated-materials' if profile.get('kind') else 'static-materials')
             if not profile.get('kind') and formats<={'CI4','I4'}: categories.append('static-4bit')
             if not profile.get('kind') and formats=={'CI4'}: categories.append('static-ci4')

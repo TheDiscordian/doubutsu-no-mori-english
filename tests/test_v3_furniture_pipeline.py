@@ -794,6 +794,57 @@ class DonorTests(unittest.TestCase):
                     self.assertEqual([w for w in words if w[0]==0xE3001001],luts)
 
 
+class LegacyDiscoveryTests(unittest.TestCase):
+    check_complete_artwork=DonorTests.check_complete_artwork
+
+    @classmethod
+    def setUpClass(cls):
+        cls.source=pipeline.Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+            (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+        cls.art=ROOT/'build/v3-legacy-static-prepared-01'
+        cls.report=json.loads((cls.art/'art.json').read_bytes())
+        cls.inventory=pipeline.scan(cls.source,ROOT/'build/item-identity-megasheet.xlsx',[])
+
+    def test_default_discovery_includes_unmapped_legacy_without_native_aliasing(self):
+        sheet=ROOT/'build/item-identity-megasheet.xlsx'
+        regular=pipeline.identity_rows(sheet)
+        expanded=pipeline.identity_rows(sheet,include_unmapped_legacy=True)
+        legacy={item:identity for item,identity in expanded.items() if item<0x3000}
+        self.assertEqual(len(legacy),148)
+        self.assertEqual({item:r for item,r in expanded.items() if item>=0x3000},regular)
+        self.assertTrue(all(all(cells[k]=='-' for k in ('C','H','CG','CJ')) for _,cells in legacy.values()))
+        rows={int(r['item_id'],16):r for r in self.inventory['rows']}
+        self.assertEqual(set(rows),set(expanded))
+        self.assertIn(0x1FC0,rows);self.assertEqual(rows[0x1FC0]['name'],'bottled ship')
+        self.assertEqual(rows[0x1FC0]['status'],'review')
+        self.assertTrue(all(rows[item]['status']=='review' for item in legacy))
+        for item in range(0x1FF0,0x2000,4):self.assertIn('room_alias',rows[item])
+        self.assertTrue(any('shared dummy profile' in rows[item].get('reason','') for item in legacy))
+        with self.assertRaisesRegex(ValueError,'additive import mapping'):
+            pipeline.metadata(self.source,0x1FD0,self.source.profile(0x1FD0),legacy[0x1FD0])
+
+    def test_complete_static_batch_uses_existing_compiler_and_retains_installation_gates(self):
+        self.assertEqual(self.report['batch'],dict(objects=12,compiled=12,reused=0,compiler_containers=1))
+        self.assertEqual(self.report['format'],'AFV3-AUTO-FURNITURE-PREPARED-ASSETS-1')
+        self.assertFalse(self.report['runtime_installed'])
+        cache=pipeline.PreparedAssets(self.source,[self.art])
+        identities=pipeline.identity_rows(ROOT/'build/item-identity-megasheet.xlsx',include_unmapped_legacy=True)
+        from v3_registry import furniture_representation_identity
+        for row in self.report['objects']:
+            item=int(row['item_id'],16)
+            self.assertLess(item,0x3000);self.assertFalse(row['import_ready'])
+            names=pipeline.name_metadata(self.source,item,identities[item])
+            self.assertEqual({k:row[k] for k in names},names)
+            self.assertIn('additive import mapping',row['pending_reason'])
+            with self.assertRaisesRegex(pipeline.ReviewRequired,'additive import mapping'):
+                pipeline.metadata(self.source,item,self.source.profile(item),identities[item])
+            with self.assertRaises(ValueError):furniture_representation_identity(item)
+            self.assertIsNotNone(cache.reuse(self.source,row['item_id'],pipeline.prepare(self.source,item)))
+        with self.assertRaisesRegex(ValueError,'Unknown converter/source revision'):
+            install.checked_assets(self.art,self.source,ROOT/'build/item-identity-megasheet.xlsx')
+        self.check_complete_artwork(self.art,self.report)
+
+
 class CurrentCartridgeTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):

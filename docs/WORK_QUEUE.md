@@ -21,15 +21,18 @@ the actual handover completion signal, selected identity resolver, ordinary
 inventory insertion/catalogue registration, and per-player format-3 trophy
 flag. No holiday item becomes selectable from preparation alone.
 
-Extend discovery to cover unresolved legacy `1xxx` donor furniture, not only
-the `3xxx` additions and four balloon display aliases. The holiday program
-requires bottled ship `1FC0`, for which the reviewed identity mapper finds no
-native correspondence. The worksheet contains further legacy unmapped entries,
-including ordinary furnishings, absent/dummy artwork, and fish/insect/NES/display
-dependencies; do not count all of them as new furniture or alias native IDs by
-number. Assign additive stable destinations only after identity/representation
-review. Preserve all existing furniture/clothing/display reservations. This is
-primary importing work, not a stretch goal or an optional audit.
+Default discovery includes all 148 unresolved legacy `1xxx` worksheet records
+alongside the 242 `3xxx` records. These include ordinary furnishings, absent/dummy
+artwork, and fish/insect/NES/display dependencies; do not count all of them as
+new furniture or alias native IDs by number. Twelve supported static objects
+are prepared at `build/v3-legacy-static-prepared-01/` (46,272 bytes, one compiler
+container); two complete focused checks pass and official names have provenance.
+Next assign additive stable destinations after identity/representation review
+and connect shared metadata/acquisition. Preserve all existing furniture,
+clothing, and display reservations. The holiday program also requires bottled
+ship `1FC0`, whose complete colour-combiner conversion and native correspondence
+remain unresolved. This is primary importing work, not a stretch goal or an
+optional audit.
 
 The bulk converter reuses validated prepared artwork and compiles all missing
 objects in one container. The current combined prepared bundle is
