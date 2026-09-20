@@ -942,9 +942,13 @@ def metadata(source, item, profile, identity):
     alias = next((row for row in room_aliases(source)['rows'] if int(row['display_item_id'],16)==item), None)
     if alias:
         raise ReviewRequired(room_alias_reason(alias))
-    if profile.get('kind') == 'animated-room-model':
+    binding=getattr(source,'runtime_profiles',{}).get(f'{item:04X}')
+    if binding and (binding['source_profile_sha256']!=profile['profile_sha256'] or
+            binding['category']!=profile.get('callback_adapter',{}).get('category')):
+        raise ReviewRequired('Installed lifecycle differs from the current source profile')
+    if profile.get('kind') == 'animated-room-model' and not binding:
         raise ReviewRequired('Animated room lifecycle needs the shared runtime adapter')
-    if profile.get('callback_adapter',{}).get('category')=='switch-trigger-sound':
+    if profile.get('callback_adapter',{}).get('category')=='switch-trigger-sound' and not binding:
         raise ReviewRequired('Switch-triggered sound needs the shared native sound/runtime adapter')
     number, sheet = identity
     if any(sheet.get(k) != '-' for k in ('C', 'H', 'CG', 'CJ')):
@@ -1004,7 +1008,8 @@ def metadata(source, item, profile, identity):
         catalogue_orderable=not reward, donor_hra_hex=f'{hra:08x}', native_hra_hex=f'{native_hra:08x}',
         feng_hex=feng.hex(), series=series, birth_category=birth, donor_birth_category=donor_birth, surface=surface,
         donor_series_hex=source.raw('mMkRm_series_info')[series*3:series*3+3].hex(),
-        identity_worksheet_row=number, behaviour=profile['behaviour'])
+        identity_worksheet_row=number, behaviour=profile['behaviour'],
+        **({'room_runtime':binding['room_runtime']} if binding else {}))
 
 
 def scan(source, worksheet, installed=None):
@@ -1162,6 +1167,8 @@ def main():
     worksheet = ROOT/'build/item-identity-megasheet.xlsx'
     from v3_furniture_install import inputs, build
     base, base_report = inputs(args.base_lock)
+    from v3_room_rig_runtime import bind_profiles
+    bind_profiles(source,base,base_report)
     installed = [int(r['item_id'],16) for r in base_report['furniture']['imports']+[base_report['speed_bag']]]
     if args.representation=='audio' and args.command=='convert':
         from v3_sound_programs import prepare_furniture_audio

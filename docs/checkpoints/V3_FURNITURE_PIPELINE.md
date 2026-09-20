@@ -1,5 +1,82 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared ordinary profile staging
+
+ABI 163 at `build/v3-shared-room-profiles-02/build-lock.json` connects all
+fifteen station clocks, both Harvest storage objects, and five sound-trigger
+objects to fixed ordinary furniture profiles, official English names, and donor
+prices through one shared adapter:
+
+```sh
+python3 -B tools/v3_furniture_install.py --refresh-runtime \
+  --base-lock build/v3-furniture-trigger-runtime-03/build-lock.json \
+  --furniture-profiles build/v3-indexed-clock-rigs-prepared-01 \
+  --furniture-profiles build/v3-storage-rigs-prepared-01 \
+  --furniture-profiles build/v3-switch-sound-prepared-01 \
+  --output build/profile-reproduction
+```
+
+All seventeen complete rigs retain their VROMs and resources. The five complete
+sound models add 12,352 bytes; the shared import reservation has 2,015,504 bytes
+free. The complete room packet, equipment code, and audio resources remain
+unchanged, and there is no extra resident allocation. The twenty-two official
+names have source entries in the single `translations/provenance.json` catalogue.
+
+Both profile/item enable flags and saved profile bits remain off. The native
+initializer leaves their profile-table entries null, and their item readers
+refuse access. This matters because the ordinary profile reader checks record
+flags/pointers, not the saved selection bit independently. These are staged
+integration records, not additional playable choices or acquisition substitutes.
+
+The normal importer binds checked current lifecycle records before metadata
+discovery. All 22 pass that prerequisite and stop at their real acquisition
+gaps: two belong to `ftr_listHarvest`, and twenty have direct event/distribution
+sources rather than a supported ordinary stock/reward list. The normal builder
+can promote checked staged rows without duplicating their complete models once
+the remaining acquisition/catalogue/scoring prerequisites exist. The importer
+uses the same complete prepared-artwork validator for static objects and full
+rig/motion suffixes. Shared room-category reservation guards read the furniture
+selection bits at the correct blob offset (`0x20 + 32 + slot/8`).
+
+Four focused host/cartridge tests pass in 14.807 seconds. They cover every new
+inactive record, retained previous records and complete resources, all staged
+reuse paths, refusal of changed bindings, actual acquisition gaps, the current
+installed static batch's shared validator, individual name provenance, unchanged
+128-choice composition, and exact no-import V2-12 output. The first host run's
+resource comparison incorrectly treated the DMA directory's own file as
+immutable; the corrected check permits only the four declared directory rows.
+No cartridge correction was needed for that test setup error.
+
+The silent native retry at `build/v3-shared-room-profiles-native-02/results.json`
+passes 127 records and 112 assertions (107 inside the shared category check).
+All 22 complete inactive records and null startup lookup pointers pass. One
+representative per category is enabled only inside the paused fixture to check
+the actual name, price, size, and profile readers and full profile-directed model
+DMA. Disabled names perform no write. The fixture restores every temporary
+record/pointer, retains the saved profile, passes guards, restores the checkpoint,
+and exits cleanly. Existing clock/storage/audio behaviour checks are retained,
+not rerun. Ordinary acquisition, room interaction, GPU appearance, save/restart,
+and original hardware are not established by this component test.
+
+The first native setup reached all 66 record/pointer comparisons, then attempted
+a debugger call directly into upper RAM, which the harness forbids. The single
+retry uses the existing checked low-memory jump-bridge pattern. The initial
+failure remains at `build/v3-shared-room-profiles-native-01/`; it was a rejected
+harness call, not a game exception. Test construction and correction stayed
+within the 30-minute batch limit.
+
+- ROM SHA-256: `c2f0eff4e5cf95b9bf91e72ecc83d3f14d1b04bebbb16a864585d8a78630ddb4`.
+- UPS SHA-256: `f160ca28c43df12e12bfb4e5953b5904de5b0bf9177fef94287ecdf8fa3b58a7`.
+- Build receipt SHA-256: `988cff3c5a5c2ec1d5c78b6df583f5493459c9289e7d72aa5caf382d552f5d94`.
+- Native results SHA-256: `5c538e5059c29bd66bff4c8878bd557587db1f757a775d9704020274afa4e684`.
+
+Format 3 and the selected profile are unchanged. Imported saves still require
+their matching or compatible larger import profile; V2 and older formats are
+not valid destinations. This is not a playtest-release handoff. The main
+ABI-109 lock and both served patchers remain unchanged. Continue shared import
+and acquisition categories before required gold-tree leaf/cut effects and full
+golden-shovel acquisition; the four golden choices stay disabled.
+
 ## Shared furniture trigger audio runtime
 
 ABI 162 at `build/v3-furniture-trigger-runtime-03/build-lock.json` installs all

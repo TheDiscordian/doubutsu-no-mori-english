@@ -1071,8 +1071,43 @@ import reservation and rebuilds the shared terminal resources. No additional
 resident allocation is needed for the clock batch. Complete assets can cross the
 legacy storage bound only after `v3_resource_capacity.checked_limit` validates
 both relocated English resources, offset tables, and complete native consumers.
-Ordinary clock/storage profiles and acquisition remain required; these records
-are not selectable merely because their lifecycle and resources are installed.
+Ordinary clock/storage profiles use the shared staging adapter below. Acquisition
+remains required; these records are not selectable merely because their lifecycle
+and resources are installed.
+
+### Shared ordinary profile staging
+
+`--refresh-runtime --furniture-profiles <prepared-directory>` accepts repeated
+complete prepared bundles for implemented clock, storage, and sound categories.
+Source identity, complete artwork, callback bindings, and installed audio are
+checked before writing ordinary 80-byte profile and 32-byte item records into
+their fixed canonical slots. Official English names retain individual entries
+in `translations/provenance.json`. Existing rig assets are reused at their
+original VROMs; complete sound models are appended within the checked reservation.
+No additional resident memory or saved fields are needed.
+
+Both enabled flags remain zero, along with the saved selection bit at
+`blob[0x20 + 32 + slot/8]`. The native profile-table initializer consequently
+leaves these entries null, and item readers refuse them. Saved selection bits
+alone are not a sufficient gate: both native record flags must stay inactive
+until full category integration. Inactive profiles cannot enter ordinary gifts.
+
+`staged_furniture` records complete installed profiles/assets and separately
+retains pending acquisition, catalogue, and scoring. These records are not
+browser choices. `bind_profiles` validates the current cartridge's complete
+runtime, table, artwork, record, and profile bindings before discovery accepts
+the installed lifecycle. Discovery still applies ordinary acquisition, scoring,
+and catalogue rules; missing routes remain explicit rather than being replaced
+with shop stock.
+
+When those prerequisites are implemented, the normal bulk installer promotes
+checked inactive records and reuses their complete assets in place. It rejects
+changed records, prices, names, model data, callback pointers, and active slots.
+One complete prepared-artwork validator handles both static objects and rig
+suffixes; the importer does not omit motions when calculating object size.
+Promotion enables records through the existing shared acquisition/catalogue/
+scoring flow and removes them from the staged list. No item-specific installer
+or checkbox-dependent identity assignment is needed.
 
 ## Verification policy
 

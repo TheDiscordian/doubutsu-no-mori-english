@@ -20,12 +20,175 @@ PACKET_RAM,PACKET_TABLE,PACKET_BYTES,PACKET_CAPACITY=0x804B8000,0x804B9000,8192,
 PACKET_MAGIC=0x41465232
 SOUND_TABLE,SOUND_VTABLE,SOUND_MAGIC,SOUND_CAPACITY=0x804B9C10,0x804B1FC0,0x41465331,64
 SOURCES=('tools/v3_room_rig_runtime.py','tools/v3_asset_loader.py','tools/v3_furniture_rigs.py','tools/v3_keyframes.py',
-    'tools/v3_furniture_pipeline.py','tools/v3_registry.py','tools/v3_equipment_runtime.py',
+    'tools/v3_furniture_pipeline.py','tools/v3_furniture_install.py','tools/v3_registry.py','tools/v3_equipment_runtime.py',
     'tools/v3_display_aliases.py','tools/v3_held_catalogue.py',
     'tools/v3_resource_capacity.py',
     'overlays/v3/room_rigs.c','overlays/v3/room_rigs.h','overlays/v3/room_rigs.ld',
     'overlays/v3/held_rigs.ld','overlays/v3/room_rigs_packet.ld',
     'overlays/v3/room_rigs_bootstrap.c','overlays/v3/room_rigs_bootstrap.ld')
+
+
+def install_profiles(base,prior,blob,core,original,output,directories):
+    """Bind complete implemented categories to ordinary, unselected item slots.
+
+    Acquisition, catalogue, and scoring activation remain explicit later stages.
+    Existing model storage is reused; no partial graphics or per-item list enters
+    this adapter. The selected-profile bits remain unchanged throughout.
+    """
+    from apply_translation import write_new
+    from v3_furniture_install import profile,provenance_patch
+    from v3_furniture_pipeline import identity_rows,name_metadata
+    from v3_import_storage import ROWS_RAM
+    result=copy.deepcopy(prior['equipment_resources']);runtime=result['room_rigs']
+    source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+        (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    directories=[d.resolve() for d in directories]
+    cache=PreparedAssets(source,directories)
+    identities=identity_rows(ROOT/'build/item-identity-megasheet.xlsx')
+    module=blob[result['blob_offset']:result['blob_offset']+result['bytes']]
+    packet=runtime['packet'];at=packet['blob_offset']
+    if (sha256(module)!=result['sha256'] or sha256(blob[at:at+packet['bytes']])!=packet['sha256'] or
+            module[VTABLE-EQUIPMENT_RAM:VTABLE-EQUIPMENT_RAM+20].hex()!=runtime['vtable_hex'] or
+            module[SOUND_VTABLE-EQUIPMENT_RAM:SOUND_VTABLE-EQUIPMENT_RAM+20].hex()!=runtime.get('sound_vtable_hex')):
+        raise ValueError('Changed complete shared room category runtime')
+    rigs={r['source_item_id']:r for r in runtime['rows']}
+    sounds={r['source_item_id']:r for r in runtime.get('sound_rows',[])}
+    old=copy.deepcopy(prior.get('staged_furniture',dict(format='AFV3-STAGED-FURNITURE-PROFILES-1',rows=[],sources=[])))
+    if old['format']!='AFV3-STAGED-FURNITURE-PROFILES-1':raise ValueError('Unknown staged furniture format')
+    occupied={r['item_id'] for r in old['rows']};staged=[];evidence=[]
+    limit=checked_limit(base,prior)
+    for directory in directories:
+        if not directory.is_relative_to(ROOT/'build'):raise ValueError('Profiles require ignored prepared artwork')
+        raw=(directory/'art.json').read_bytes();art=json.loads(raw)
+        if art['format']!='AFV3-AUTO-FURNITURE-PREPARED-ASSETS-1':raise ValueError('Expected complete prepared furniture category')
+        evidence.append(dict(directory=str(directory.relative_to(ROOT)),sha256=sha256(raw)))
+        for row in art['objects']:
+            donor=row['item_id'];item=int(donor,16);prepared_row=prepare(source,item)
+            descriptor=prepared_row[0];category=descriptor.get('callback_adapter',{}).get('category')
+            if (category not in (CLOCK_CATEGORY,STORAGE_CATEGORY,'switch-trigger-sound') or
+                    donor in occupied or item not in identities or
+                    row['profile']!=json.loads(json.dumps(descriptor)) or
+                    row['native_profile_scalar_hex']!=descriptor['scalar_hex']):
+                raise ValueError('Unsupported, duplicate, or changed complete room category')
+            reused=cache.reuse(source,donor,prepared_row)
+            if reused is None:raise ValueError('Missing complete prepared profile artwork')
+            data=(directory/row['object_file']).read_bytes()
+            if len(data)!=row['object_bytes'] or sha256(data)!=row['object_sha256']:
+                raise ValueError('Changed complete prepared profile object')
+            index,destination=furniture_representation_identity(item);i=slot(destination)
+            if destination!=item or index!=1024+i:
+                raise ValueError('Parent/display aliases require their shared parent adapter')
+            if any(identities[item][1].get(k)!='-' for k in ('C','H','CG','CJ')):
+                raise ValueError('Staged identity needs native correspondence review')
+            if (any(blob[ROWS+i*80:ROWS+(i+1)*80]) or any(blob[ITEMS+i*32:ITEMS+(i+1)*32]) or
+                    blob[0x40+i//8]&(1<<(i&7))):raise ValueError('Profile staging overwrites an existing or selected identity')
+            if category in (CLOCK_CATEGORY,STORAGE_CATEGORY):
+                installed=rigs.get(donor)
+                if (not installed or installed['profile_installed'] or installed['source']!=row or
+                        installed['bytes']!=len(data) or installed['sha256']!=sha256(data) or
+                        blob[installed['blob_offset']:installed['blob_offset']+len(data)]!=data):
+                    raise ValueError('Prepared rig is not completely installed in the current runtime')
+                vrom=installed['vrom'];vtable=VTABLE;reused_asset=True
+            else:
+                installed=sounds.get(donor);audio=result.get('furniture_audio',{})
+                audio_row=next((r for r in audio.get('furniture',[]) if r['item_id']==donor),None)
+                if (not installed or installed['profile_installed'] or not audio_row or
+                        audio_row['callback']!=json.loads(json.dumps(descriptor['callback_adapter'])) or
+                        not all(audio.get(k) for k in ('runtime_installed','dispatch_and_priority_installed',
+                            'allocation_installed','callback_installed'))):
+                    raise ValueError('Sound furniture lacks its complete installed audio/callback')
+                blob.extend(bytes(-len(blob)%16));vrom=BLOB+len(blob);blob.extend(data)
+                if vrom+len(data)>limit:raise ValueError('Complete sound models exceed checked import reservation')
+                vtable=SOUND_VTABLE;reused_asset=False
+                installed.update(blob_offset=vrom-BLOB,vrom=vrom,bytes=len(data),sha256=sha256(data),source=row)
+            generated=copy.deepcopy(row);generated['room_runtime']=dict(vtable=vtable,vrom=vrom)
+            native=profile(generated,vrom,limit=limit)
+            if len(native)!=68:raise ValueError('Incomplete ordinary furniture profile')
+            names=name_metadata(source,item,identities[item])
+            price=struct.unpack_from('>H',source.raw('ftr_price_table'),index*2)[0]
+            record=struct.pack('>HHHBB',index,item,price,descriptor['size_code'],0)+names['name'].encode().ljust(16,b' ')+bytes(8)
+            profile_record=struct.pack('>HHI',index,item,0)+native+bytes(4)
+            blob[ROWS+i*80:ROWS+(i+1)*80]=profile_record
+            blob[ITEMS+i*32:ITEMS+(i+1)*32]=record
+            installed.update(profile_installed=True,parent_selectable=False)
+            staged.append(dict(**names,category=category,price=price,size_code=descriptor['size_code'],
+                object_vrom=vrom,object_bytes=len(data),object_sha256=sha256(data),reused_asset=reused_asset,
+                profile_ram=ROWS_RAM+i*80+8,profile_hex=native.hex(),profile_record_sha256=sha256(profile_record),
+                item_record_sha256=sha256(record),source_profile_sha256=descriptor['profile_sha256'],
+                room_runtime=generated['room_runtime'],profile_installed=True,item_record_installed=True,
+                selected=False,acquisition_installed=False,catalogue_installed=False,scoring_installed=False))
+            occupied.add(donor)
+    if not staged:raise ValueError('Empty complete furniture profile batch')
+    old['rows']=sorted(old['rows']+staged,key=lambda r:r['runtime_index']);old['sources'].extend(evidence)
+    old.update(profile_bits_changed=False,additional_resident_bytes=0)
+    patch=provenance_patch(staged)
+    if patch:write_new(output/'provenance.patch',patch.encode())
+    return result,{},dict(staged_furniture=old)
+
+
+def bind_profiles(source,base,report):
+    """Expose checked installed lifecycles to the ordinary category importer.
+
+    Staged records remain inactive. This removes only the lifecycle prerequisite;
+    normal acquisition, catalogue, scoring, and selection checks still apply.
+    """
+    from v3_furniture_install import profile
+    source.runtime_profiles={}
+    staged=report.get('staged_furniture',{})
+    activated=[r for r in report['furniture']['imports'] if r.get('room_runtime')]
+    if not staged and not activated:return source.runtime_profiles
+    if staged and staged['format']!='AFV3-STAGED-FURNITURE-PROFILES-1':
+        raise ValueError('Unknown staged furniture profile format')
+    blob=by_vrom(base)[BLOB].extract(base);e=report['equipment_resources'];runtime=e['room_rigs']
+    packet=runtime['packet'];raw=blob[packet['blob_offset']:packet['blob_offset']+packet['bytes']]
+    module=blob[e['blob_offset']:e['blob_offset']+e['bytes']]
+    if (sha256(blob)!=report['blob_sha256'] or sha256(raw)!=packet['sha256'] or
+            sha256(module)!=e['sha256'] or raw[PACKET_TABLE-PACKET_RAM:]!=encode_packet(runtime['rows'],runtime['sound_rows']) or
+            module[VTABLE-EQUIPMENT_RAM:VTABLE-EQUIPMENT_RAM+20].hex()!=runtime['vtable_hex'] or
+            module[SOUND_VTABLE-EQUIPMENT_RAM:SOUND_VTABLE-EQUIPMENT_RAM+20].hex()!=runtime['sound_vtable_hex'] or
+            blob[0x20:0xE0].hex()!=report['save_runtime']['profile_hex']):
+        raise ValueError('Changed installed furniture lifecycle, packet, or selection')
+    limit=checked_limit(base,report)
+    bindings={r['source_item_id']:r for r in runtime['rows']+runtime['sound_rows']}
+    for row,enabled in [(r,False) for r in staged.get('rows',[])]+[(r,True) for r in activated]:
+        item=int(row['item_id'],16);i=slot(item);binding=bindings.get(row['item_id'])
+        if (row['item_id'] in source.runtime_profiles or not binding or not binding['profile_installed'] or
+                row['runtime_index']!=1024+i or binding['runtime_index']!=1024+i or
+                bool(blob[0x40+i//8]&(1<<(i&7)))!=enabled):
+            raise ValueError('Changed furniture profile identity or activation')
+        descriptor=prepare(source,item)[0];art=copy.deepcopy(binding['source']);vrom=binding['vrom']
+        expected_vtable=SOUND_VTABLE if descriptor['callback_adapter']['category']=='switch-trigger-sound' else VTABLE
+        art['room_runtime']=dict(vtable=expected_vtable,vrom=vrom)
+        at=vrom-BLOB;n=art['object_bytes'];native=profile(art,vrom,limit=limit)
+        current=blob[ROWS+i*80:ROWS+(i+1)*80];record=blob[ITEMS+i*32:ITEMS+(i+1)*32]
+        expected=struct.pack('>HHI',1024+i,item,int(enabled))+native+bytes(4)
+        if (art['profile']!=json.loads(json.dumps(descriptor)) or row['room_runtime']!=art['room_runtime'] or
+                not 0<=at<at+n<=len(blob) or sha256(blob[at:at+n])!=art['object_sha256'] or
+                current!=expected or record[:8]!=struct.pack('>HHHBB',1024+i,item,row['price'],descriptor['size_code'],int(enabled)) or
+                record[8:24]!=row['name'].encode().ljust(16,b' ') or
+                sha256(record)!=row['record_sha256' if enabled else 'item_record_sha256'] or
+                not enabled and (sha256(current)!=row['profile_record_sha256'] or row['selected'])):
+            raise ValueError('Changed complete installed furniture profile, artwork, or item record')
+        source.runtime_profiles[row['item_id']]=dict(room_runtime=art['room_runtime'],
+            source_profile_sha256=descriptor['profile_sha256'],category=descriptor['callback_adapter']['category'],
+            object_sha256=art['object_sha256'],object_bytes=n,profile_hex=native.hex(),staged=not enabled)
+    return source.runtime_profiles
+
+
+def reuse_profile(source,row,asset,blob,*,limit):
+    """Promote a checked inactive record without duplicating its complete model."""
+    from v3_furniture_install import profile
+    binding=getattr(source,'runtime_profiles',{}).get(row['item_id'])
+    if binding is None:return None
+    i=slot(int(row['item_id'],16));vrom=binding['room_runtime']['vrom'];at=vrom-BLOB
+    native=profile(row,vrom,limit=limit)
+    if (not binding['staged'] or row.get('room_runtime')!=binding['room_runtime'] or
+            len(asset)!=binding['object_bytes'] or sha256(asset)!=binding['object_sha256'] or
+            blob[at:at+len(asset)]!=asset or native.hex()!=binding['profile_hex'] or
+            blob[ROWS+i*80:ROWS+(i+1)*80]!=struct.pack('>HHI',row['runtime_index'],int(row['item_id'],16),0)+native+bytes(4) or
+            blob[ITEMS+i*32:ITEMS+(i+1)*32]!=struct.pack('>HHHBB',row['runtime_index'],int(row['item_id'],16),row['price'],row['size_code'],0)+row['name'].encode().ljust(16,b' ')+bytes(8)):
+        raise ValueError('Changed staged record or model during ordinary furniture promotion')
+    return vrom,native
 
 
 def prepared_categories(source,directories):
@@ -195,7 +358,7 @@ def extend(base,prior,blob,core,original,output,directories):
     for r in rows:
         i=slot(int(r['item_id'],16))
         if (r['item_id'] in occupied or any(blob[ROWS+i*80:ROWS+(i+1)*80]) or
-                any(blob[ITEMS+i*32:ITEMS+(i+1)*32]) or blob[32+i//8]&(1<<(i&7))):
+                any(blob[ITEMS+i*32:ITEMS+(i+1)*32]) or blob[0x40+i//8]&(1<<(i&7))):
             raise ValueError('Additional room category collides with an installed identity')
     all_rows=sorted(copy.deepcopy(runtime['rows'])+rows,key=lambda r:r['runtime_index']);encode_packet(all_rows)
     needed=sum(len(d) for d in assets.values())+(0 if is_packet else PACKET_BYTES)
@@ -315,7 +478,7 @@ def install(base,prior,blob,core,original,output,directory):
     rows,assets,evidence=prepared(source,directory)
     for r in rows:
         i=slot(int(r['item_id'],16))
-        if any(blob[ROWS+i*80:ROWS+(i+1)*80]) or any(blob[ITEMS+i*32:ITEMS+(i+1)*32]) or blob[32+i//8]&(1<<(i&7)):
+        if any(blob[ROWS+i*80:ROWS+(i+1)*80]) or any(blob[ITEMS+i*32:ITEMS+(i+1)*32]) or blob[0x40+i//8]&(1<<(i&7)):
             raise ValueError('Room-rig reservation collides with installed data or a selected identity')
     contract=native_contract(original,base,expected_sha=sha256(base))
     native=by_vrom(original)[CODE_VROM].extract(original)

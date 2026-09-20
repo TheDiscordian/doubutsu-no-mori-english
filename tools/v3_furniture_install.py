@@ -63,6 +63,7 @@ def profile(row, vrom, *, limit=END):
     adapter=row.get('profile',{}).get('callback_adapter',{})
     fading = adapter.get('category') == 'switch-palette-fade'
     sequence = adapter.get('category') == 'constant-model-sequence'
+    sound = adapter.get('category') == 'switch-trigger-sound'
     from v3_furniture_rigs import RIG_CATEGORIES
     rigged = adapter.get('category') in RIG_CATEGORIES
     layers = tuple(offsets) if rigged else tuple(adapter['model_order']) if fading or sequence else LAYERS
@@ -82,8 +83,12 @@ def profile(row, vrom, *, limit=END):
                 at%8 or not 0<=at<=n-linked['bytes'] or linked['bytes']!=(len(offsets)+1)*8):
             raise ValueError('Invalid static model sequence bounds')
         pointers=[0x06000000+at,0,0,0]
+    if sound:
+        from v3_room_rig_runtime import SOUND_VTABLE
+        if row.get('room_runtime')!={'vtable':SOUND_VTABLE,'vrom':vrom}:
+            raise ValueError('Sound profile requires its complete installed room lifecycle')
     return (struct.pack('>12I', vrom, vrom+n, 0x06000000, 0x06000000+n, *pointers, 0,0,0,0)+scalar+
-            struct.pack('>I',VTABLE if rigged else palette_fade.VTABLE if fading else 0))
+            struct.pack('>I',VTABLE if rigged else SOUND_VTABLE if sound else palette_fade.VTABLE if fading else 0))
 
 
 def catalogue_record(row):
@@ -173,6 +178,7 @@ def scoring(base, prior, rows, source):
 
 
 def checked_assets(art_path, source, worksheet):
+    from v3_furniture_pipeline import PreparedAssets
     raw = (art_path/'art.json').read_bytes(); art = json.loads(raw)
     # Prior objects still undergo complete current metadata and model checks;
     # a display alias cannot pass as standalone furniture through an old report.
@@ -181,38 +187,19 @@ def checked_assets(art_path, source, worksheet):
             or art['source_symbols_sha256'] != sha256(source.symbols.encode())):
         raise ValueError('Unknown converter/source revision')
     identities = identity_rows(worksheet); seen = set(); rows = []
+    cache=PreparedAssets(source,[art_path])
     for row in art['objects']:
         item = int(row['item_id'],16)
         if item in seen: raise ValueError('Duplicate batch identity')
         seen.add(item)
-        descriptor, body, resources, _, models, commands, sections = prepare(source,item)
-        sequence_record,sequence=draw_sequence(descriptor,len(body),sections)
+        prepared=prepare(source,item);descriptor=prepared[0]
         meta = metadata(source,item,descriptor,identities[item])
         if any(row.get(k) != v for k,v in meta.items()) or row['profile'] != json.loads(json.dumps(descriptor)):
             raise ValueError('Import metadata differs from source discovery')
-        path = (art_path/row['object_file']).resolve()
-        if path.parent != art_path.resolve(): raise ValueError('Object path escapes batch')
-        asset = path.read_bytes()
-        if (sha256(asset) != row['object_sha256'] or len(asset) != row['object_bytes']
-                or asset[:len(body)] != body or row['resources'] != resources
-                or row['native_profile_scalar_hex'] != descriptor['scalar_hex']
-                or set(row['model_offsets']) != set(models)
-                or len(asset) != (len(body)+sum(n for _,n in sections)+len(sequence)+15)&~15
-                or (art_path/row['item_id']/'commands.c').read_text() != commands):
-            raise ValueError('Changed complete converted asset or emitter input')
-        if row.get('draw_sequence')!=sequence_record:
-            raise ValueError('Changed generated static draw sequence record')
-        if sequence_record:
-            at=sequence_record['native_offset']
-            if asset[at:at+len(sequence)]!=sequence:
-                raise ValueError('Changed complete static draw order or targets')
-        # Verify compiled display lists against the emitter's checked receipt.
-        for model in row['models']:
-            if model.get('source_parts')!=models[model['layer']].get('source_parts'):
-                raise ValueError('Changed complete source model sequence')
-            at,n = row['model_offsets'][model['layer']],model['bytes']
-            if sha256(asset[at:at+n]) != model['output_sha256']:
-                raise ValueError('Changed converted display list')
+        if (row['native_profile_scalar_hex']!=descriptor['scalar_hex'] or
+                cache.reuse(source,row['item_id'],prepared) is None):
+            raise ValueError('Changed complete converted asset or native profile scalar')
+        asset=(art_path/row['object_file']).read_bytes()
         rows.append((row,asset))
     if not rows: raise ValueError('Empty automatic import batch')
     return rows, sha256(raw)
@@ -270,6 +257,8 @@ def build(output, art_path, lock=LOCK):
     original = verified_rom((ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes())
     source = Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
                     (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    from v3_room_rig_runtime import bind_profiles,reuse_profile
+    bind_profiles(source,base,prior)
     prepared, art_sha = checked_assets(art_path.resolve(), source, ROOT/'build/item-identity-megasheet.xlsx')
     old_blob = files[BLOB].extract(base); blob = bytearray(old_blob)
     package = blob[PACKAGE:PACKAGE+PACKAGE_SIZE]
@@ -288,11 +277,14 @@ def build(output, art_path, lock=LOCK):
     installed = []
     for row,asset in prepared:
         item,index = int(row['item_id'],16),row['runtime_index']; i=slot(item)
-        if (index != 1024+i or any(blob[ROWS+i*80:ROWS+(i+1)*80])
-                or any(blob[ITEMS+i*32:ITEMS+(i+1)*32]) or profile_bits[32+i//8]&(1<<(i&7))):
+        existing=reuse_profile(source,row,asset,blob,limit=limit)
+        if (index != 1024+i or profile_bits[32+i//8]&(1<<(i&7)) or
+                existing is None and (any(blob[ROWS+i*80:ROWS+(i+1)*80]) or any(blob[ITEMS+i*32:ITEMS+(i+1)*32]))):
             raise ValueError('Canonical identity is already installed')
-        blob.extend(bytes(-len(blob)%16)); vrom = BLOB+len(blob)
-        native = profile(row,vrom,limit=limit); blob.extend(asset)
+        if existing is None:
+            blob.extend(bytes(-len(blob)%16)); vrom = BLOB+len(blob)
+            native = profile(row,vrom,limit=limit); blob.extend(asset)
+        else:vrom,native=existing
         blob[ROWS+i*80:ROWS+(i+1)*80] = struct.pack('>HHI',index,item,1)+native+bytes(4)
         record = struct.pack('>HHHBB',index,item,row['price'],row['size_code'],1)+row['name'].encode().ljust(16,b' ')+bytes(8)
         blob[ITEMS+i*32:ITEMS+(i+1)*32] = record
@@ -395,6 +387,11 @@ def build(output, art_path, lock=LOCK):
     patch=make_ups(original,result)
     if apply_ups(original,patch)!=result: raise ValueError('Patch reconstruction failed')
     report=copy.deepcopy(prior)
+    if report.get('staged_furniture'):
+        promoted={r['item_id'] for r in installed}
+        report['staged_furniture']['rows']=[r for r in report['staged_furniture']['rows'] if r['item_id'] not in promoted]
+        for row in report['equipment_resources']['room_rigs']['rows']+report['equipment_resources']['room_rigs']['sound_rows']:
+            if row['source_item_id'] in promoted:row['parent_selectable']=True
     report.update(build='v3-automatic-furniture',runtime_abi=abi,input_build_sha256=sha256(base),
         output_sha256=sha256(result),patch_sha256=sha256(patch),blob_sha256=sha256(blob),
         blob_bytes=len(blob),blob_file_bytes=len(blob),startup=startup_report,furniture=all_furniture,
@@ -491,7 +488,7 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
                     player_actions=False, item_category_art=None, ground_categories=False, event_acquisition=False,
                     held_collection=False, held_catalogue_art=None, held_selection=False, translation_updates=False,
                     room_rigs_art=None, scenery_art=None, scenery_gameplay=False,
-                    equipment_rigs=None, expand_storage=False, furniture_audio_art=None):
+                    equipment_rigs=None, expand_storage=False, furniture_audio_art=None, furniture_profiles=None):
     """Update shared readers; optionally install the shared held-resource adapter."""
     output=output.resolve()
     if output.exists() or not output.is_relative_to(ROOT/'build'):
@@ -512,9 +509,9 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
     moved=[];equipment_report=None;reused=None;owner_changes={};owner_moves=[];owner_updates=[];report_updates={};text_moves=[]
     equipment_mode=any((equipment_art is not None,equipment_rigs is not None,player_motion,equipment_kinds,player_actions,
                         item_category_art is not None,ground_categories,event_acquisition,held_collection,held_catalogue_art is not None,held_selection,room_rigs_art is not None,scenery_art is not None,scenery_gameplay))
-    resource_mode=equipment_mode or translation_updates or expand_storage or furniture_audio_art is not None
+    resource_mode=equipment_mode or translation_updates or expand_storage or furniture_audio_art is not None or furniture_profiles is not None
     if sum((equipment_art is not None,equipment_rigs is not None,player_motion,equipment_kinds,player_actions,
-            item_category_art is not None,ground_categories,event_acquisition,held_collection,held_catalogue_art is not None,held_selection,translation_updates,room_rigs_art is not None,scenery_art is not None,scenery_gameplay,expand_storage,furniture_audio_art is not None))>1:
+            item_category_art is not None,ground_categories,event_acquisition,held_collection,held_catalogue_art is not None,held_selection,translation_updates,room_rigs_art is not None,scenery_art is not None,scenery_gameplay,expand_storage,furniture_audio_art is not None,furniture_profiles is not None))>1:
         raise ValueError('Install shared runtime updates in dependency order')
     if resource_mode:
         blob,reused=reuse_resource_tail(base,prior,old_blob)
@@ -530,7 +527,7 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         import v3_translation_updates as translation
         display_report,alias_report=prior['clothing']['display'],prior['display_aliases']
         owner_changes,report_updates=translation.install(base,prior,module,output)
-    elif held_catalogue_art is not None or wrapped_names or furniture_audio_art is not None:
+    elif held_catalogue_art is not None or wrapped_names or furniture_audio_art is not None or furniture_profiles is not None:
         display_report,alias_report=prior['clothing']['display'],prior['display_aliases']
     else:
         display_report,alias_report=display_aliases.install(prior,blob,core,output,held_items=parent_readers,
@@ -581,6 +578,10 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         import v3_sound_programs as equipment
         equipment_report,owner_changes,report_updates=equipment.install_furniture(
             base,prior,blob,core,original,output,furniture_audio_art)
+    elif furniture_profiles is not None:
+        import v3_room_rig_runtime as equipment
+        equipment_report,owner_changes,report_updates=equipment.install_profiles(
+            base,prior,blob,core,original,output,furniture_profiles)
     elif held_selection:
         import v3_held_catalogue as equipment
         equipment_report,owner_changes,report_updates=equipment.select_installed(prior,blob)
@@ -809,6 +810,9 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         if furniture_audio_art is not None:
             report['shared_runtime_refresh']['adapters'].append('furniture_trigger_audio')
             report['shared_runtime_refresh']['additional_resident_bytes']=equipment_report['furniture_audio']['audio_heap_growth']
+        if furniture_profiles is not None:
+            report['shared_runtime_refresh']['adapters'].append('inactive_furniture_profiles')
+            report['shared_runtime_refresh']['artwork_changed']=True
         if held_selection:
             report['shared_runtime_refresh']['adapters'].append('held_selection')
         if report['save_runtime']['profile_hex']!=prior['save_runtime']['profile_hex']:
@@ -868,6 +872,8 @@ if __name__=='__main__':
         help='With --refresh-runtime, relocate complete English resources and expand the checked import reservation')
     parser.add_argument('--furniture-audio-art',type=Path,
         help='With --refresh-runtime, install prepared shared furniture audio and its callback')
+    parser.add_argument('--furniture-profiles',type=Path,action='append',
+        help='With --refresh-runtime, bind complete room categories to inactive ordinary profiles and names')
     args=parser.parse_args()
     if args.equipment_art and not args.refresh_runtime:parser.error('--equipment-art requires --refresh-runtime')
     if args.equipment_rigs and not args.refresh_runtime:parser.error('--equipment-rigs requires --refresh-runtime')
@@ -886,6 +892,7 @@ if __name__=='__main__':
     if args.translation_updates and not args.refresh_runtime:parser.error('--translation-updates requires --refresh-runtime')
     if args.expand_storage and not args.refresh_runtime:parser.error('--expand-storage requires --refresh-runtime')
     if args.furniture_audio_art and not args.refresh_runtime:parser.error('--furniture-audio-art requires --refresh-runtime')
+    if args.furniture_profiles and not args.refresh_runtime:parser.error('--furniture-profiles requires --refresh-runtime')
     result=(refresh_runtime(args.output,args.base_lock,equipment_art=args.equipment_art,player_motion=args.player_motion,
                             equipment_kinds=args.equipment_kinds,player_actions=args.player_actions,
                             item_category_art=args.item_category_art,ground_categories=args.ground_categories,
@@ -893,6 +900,7 @@ if __name__=='__main__':
                             held_catalogue_art=args.held_catalogue_art,held_selection=args.held_selection,
                             translation_updates=args.translation_updates,equipment_rigs=args.equipment_rigs,
                             room_rigs_art=args.room_rigs_art,scenery_art=args.scenery_art,scenery_gameplay=args.scenery_gameplay,
-                            expand_storage=args.expand_storage,furniture_audio_art=args.furniture_audio_art)
+                            expand_storage=args.expand_storage,furniture_audio_art=args.furniture_audio_art,
+                            furniture_profiles=args.furniture_profiles)
             if args.refresh_runtime else build(args.output,args.art,args.base_lock))
     print(json.dumps({k:result[k] for k in ('runtime_abi','output_sha256','patch_sha256')},indent=2))

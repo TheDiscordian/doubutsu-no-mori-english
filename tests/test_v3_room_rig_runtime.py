@@ -23,6 +23,90 @@ from v3_registry import furniture_representation_identity,LEGACY_ROOM_ALIASES,CL
 
 OUT=ROOT/'build/v3-room-rigs-runtime-03'
 PACKET_OUT=ROOT/os.environ.get('V3_ROOM_CATEGORY_BUILD','build/v3-room-categories-runtime-03')
+PROFILE_OUT=ROOT/os.environ.get('V3_ROOM_PROFILE_BUILD','build/v3-shared-room-profiles-02')
+
+
+class ProfileTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.image,cls.report=inputs(PROFILE_OUT/'build-lock.json')
+        cls.base,cls.prior=inputs(PROFILE_OUT/'base-lock.json')
+        cls.blob=by_vrom(cls.image)[BLOB].extract(cls.image)
+        cls.old=by_vrom(cls.base)[BLOB].extract(cls.base)
+        cls.source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+            (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+        cls.rows=cls.report['staged_furniture']['rows']
+        cls.bindings=runtime.bind_profiles(cls.source,cls.image,cls.report)
+
+    def test_complete_inactive_batch_retains_every_previous_record_and_resource(self):
+        from v3_import_storage import TABLE_END
+        self.assertEqual(len(self.rows),22)
+        self.assertEqual(sum(r['reused_asset'] for r in self.rows),17)
+        expected=bytearray(self.old[ROWS:TABLE_END]);e=self.report['equipment_resources'];old=self.prior['equipment_resources']
+        for r in self.rows:
+            item=int(r['item_id'],16);i=slot(item);vrom=r['object_vrom'];at=vrom-BLOB;n=r['object_bytes']
+            self.assertEqual(sha256(self.blob[at:at+n]),r['object_sha256'])
+            if r['reused_asset']:self.assertEqual(self.blob[at:at+n],self.old[at:at+n])
+            profile=self.blob[ROWS+i*80:ROWS+(i+1)*80];record=self.blob[ITEMS+i*32:ITEMS+(i+1)*32]
+            self.assertEqual(profile,struct.pack('>HHI',r['runtime_index'],item,0)+bytes.fromhex(r['profile_hex'])+bytes(4))
+            self.assertEqual(record,struct.pack('>HHHBB',r['runtime_index'],item,r['price'],r['size_code'],0)+r['name'].encode().ljust(16,b' ')+bytes(8))
+            self.assertFalse(self.blob[0x40+i//8]&(1<<(i&7)))
+            self.assertFalse(any(r[k] for k in ('selected','acquisition_installed','catalogue_installed','scoring_installed')))
+            expected[i*80:(i+1)*80]=profile
+            expected[ITEMS-ROWS+i*32:ITEMS-ROWS+(i+1)*32]=record
+        self.assertEqual(self.blob[ROWS:TABLE_END],expected)
+        self.assertEqual(self.blob[e['blob_offset']:e['blob_offset']+e['bytes']],self.old[old['blob_offset']:old['blob_offset']+old['bytes']])
+        self.assertEqual(e['room_rigs']['packet'],old['room_rigs']['packet'])
+        self.assertEqual(e['furniture_audio'],old['furniture_audio'])
+        self.assertEqual(self.report['save_runtime'],self.prior['save_runtime'])
+        self.assertEqual(self.report['shared_runtime_refresh']['additional_resident_bytes'],0)
+        from aflib import DMA_START
+        files,previous=by_vrom(self.image),by_vrom(self.base)
+        for v,entry in files.items():
+            if v in (BLOB,MODULE):continue
+            expected=bytearray(previous[v].extract(self.base))
+            if entry.vstart<=DMA_START<entry.vend:
+                for changed in [BLOB]+[r['vrom'] for r in self.report['shared_runtime_refresh']['unchanged_owner_moves']]:
+                    e=files[changed];at=DMA_START+e.index*16-entry.vstart
+                    struct.pack_into('>4I',expected,at,e.vstart,e.vend,e.pstart,e.pend)
+            self.assertEqual(entry.extract(self.image),expected,hex(v))
+        original=(ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes()
+        self.assertEqual(apply_ups(original,(PROFILE_OUT/'asset-loader.ups').read_bytes()),self.image)
+
+    def test_current_metadata_advances_to_real_acquisition_gaps_and_promotes_without_copying(self):
+        from v3_furniture_pipeline import prepare,metadata,identity_rows
+        from v3_resource_capacity import checked_limit
+        ids=identity_rows(ROOT/'build/item-identity-megasheet.xlsx');limit=checked_limit(self.image,self.report)
+        rigs=self.report['equipment_resources']['room_rigs'];bindings={r['source_item_id']:r for r in rigs['rows']+rigs['sound_rows']}
+        for r in self.rows:
+            item=int(r['item_id'],16)
+            with self.assertRaisesRegex(ValueError,'^acquisition needs an adapter:'):
+                metadata(self.source,item,prepare(self.source,item)[0],ids[item])
+            row={**bindings[r['item_id']]['source'],**r};at=r['object_vrom']-BLOB;asset=self.blob[at:at+r['object_bytes']]
+            self.assertEqual(runtime.reuse_profile(self.source,row,asset,self.blob,limit=limit),
+                (r['object_vrom'],bytes.fromhex(r['profile_hex'])))
+        row=copy.deepcopy(row);row['room_runtime']['vtable']+=4
+        with self.assertRaises(ValueError):runtime.reuse_profile(self.source,row,asset,self.blob,limit=limit)
+        bad=copy.deepcopy(self.report);bad['staged_furniture']['rows'][0]['room_runtime']['vrom']+=16
+        with self.assertRaises(ValueError):runtime.bind_profiles(self.source,self.image,bad)
+        runtime.bind_profiles(self.source,self.image,self.report)
+
+    def test_single_artwork_validator_still_accepts_current_installed_static_batch(self):
+        from v3_furniture_install import checked_assets,provenance_patch
+        rows,_=checked_assets(ROOT/self.report['automatic_furniture']['art_directory'],self.source,ROOT/'build/item-identity-megasheet.xlsx')
+        self.assertTrue(rows)
+        self.assertEqual(provenance_patch(self.rows),'')
+
+    def test_composition_retains_choices_and_complete_translation_only_output(self):
+        pin=composer.BASE,composer.BASE_SHA,composer.REPORT_SHA,composer.ABI
+        try:
+            composer.use_build_lock(PROFILE_OUT/'build-lock.json');catalog=composer.catalogue(self.image,self.report)
+            self.assertEqual(len(catalog),128)
+            self.assertFalse({r['id'] for r in self.rows}&set(catalog))
+            self.assertEqual(sha256(composer.compose(self.image,self.report,catalog,composer.resolve(catalog,[]))[0]),
+                self.report['translation_baseline']['sha256'])
+            self.assertEqual(composer.compose(self.image,self.report,catalog,composer.resolve(catalog,list(catalog)))[0],self.image)
+        finally:composer.BASE,composer.BASE_SHA,composer.REPORT_SHA,composer.ABI=pin
 
 
 class PacketTests(unittest.TestCase):

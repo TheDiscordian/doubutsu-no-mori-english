@@ -18,13 +18,31 @@ served patchers retain their existing builds.
 
 ## Active development
 
-The current explicit proposal is ABI 162 at
-`build/v3-furniture-trigger-runtime-03/build-lock.json`. All five complete
-furniture sound programs, instruments, and samples are installed with one shared
+The current explicit proposal is ABI 163 at
+`build/v3-shared-room-profiles-02/build-lock.json`. One shared batch connects
+all fifteen clocks, both storage rigs, and five sound objects to ordinary
+profiles, official names, and prices. It reuses all seventeen rig assets and
+adds 12,352 bytes of complete sound models, with no additional resident memory.
+The import reservation has 2,015,504 free bytes. Both record flags and saved
+selection bits remain off, preventing unfinished items from entering gameplay.
+
+The ordinary bulk importer validates these installed lifecycle bindings and can
+reuse staged records/assets when their acquisition categories are implemented.
+All 22 now reach the actual acquisition checks instead of stopping on missing
+lifecycle code. Four focused host/cartridge tests pass, including full/empty
+composition and unchanged existing records/resources. The silent native check
+passes 112 assertions, covering disabled registration and three category
+representatives' names, prices, sizes, complete model transfers, and guards.
+See the [profile checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-ordinary-profile-staging).
+There remain 128 experimental choices; acquisition, catalogue/scoring activation,
+ordinary gameplay, and hardware checks are not claimed complete. The main lock,
+both served patchers, and saved format/profile remain unchanged.
+
+The retained ABI 162 audio evidence covers all five complete
+furniture sound programs, instruments, and samples installed with one shared
 move callback. Sound priorities are preserved; the callback supplies the donor's
 single-instance rule missing from the N64 engine. Audio memory grows by 2 KiB,
-with 864 bytes of conservative spare capacity. The shared import reservation
-has 2,027,856 free bytes.
+with 864 bytes of conservative spare capacity.
 
 Seven focused audio checks and the shared sanitizer check pass; the three
 current-cartridge checks and affected sanitizer check also pass on the corrected
@@ -43,9 +61,9 @@ change; it neither changes the current ROM nor calls for another emulator run.
 
 The installed complete clock batch retains its passing component evidence.
 The room engine serves 25 records: eight balloons, two storage rigs, and fifteen
-clocks. Clock/storage ordinary profiles and acquisition remain required; resources
-alone do not make them selectable. No additional resident memory or saved format
-is needed for this batch.
+clocks. Clock/storage ordinary profiles are staged, and acquisition remains
+required. Resources alone do not make them selectable. No additional resident
+memory or saved format is needed for this batch.
 
 Four focused host/cartridge checks pass. The silent focused native run passes
 153 assertions, including the corrected final-string DMA boundary, three complete
@@ -60,7 +78,7 @@ and full golden-shovel acquisition follow the primary importing work. See the
 The shared open/close category prepares both Harvest storage objects, retaining
 complete models, skeletons, animations, source interaction flags, and opening
 limits. Two converter checks pass; the shared runtime above supplies their
-lifecycle. Ordinary profiles/acquisition remain required. Across the
+lifecycle. Ordinary profiles are staged; acquisition remains required. Across the
 remaining furniture candidates, 69 of 101 non-alias, non-dummy records have
 prepared artwork. Continue shared integration before required gold-tree work.
 See the [storage checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#openclose-storage-category).
@@ -69,16 +87,16 @@ The shared sound category reuses complete prepared artwork and audio from
 `build/v3-switch-sound-prepared-01/` and `build/v3-furniture-trigger-audio-02/`.
 The installed audio retains all 74 previous instruments and adds five complete
 donor instruments, preserving repeated notes, envelopes, tuning, and samples.
-Ordinary profiles and acquisition still need connecting before these five
-objects become selectable.
+Ordinary profiles are staged; acquisition still needs connecting before these
+five objects become selectable.
 
 All fifteen station models have complete prepared artwork, skeletons, and motions
 through the shared indexed-clock category at `build/v3-indexed-clock-rigs-prepared-01/`.
 One compiler container handles the whole batch. Source clock-hand rules and live
 time dependencies are recorded explicitly; complete resources and the shared clock
-runtime are installed in the current proposal. Ordinary profiles/acquisition remain
-pending. Three converter checks pass, including complete graphics/motion
-comparisons and refusal to install unfinished records. No ROM or choices change.
+runtime and inactive ordinary profiles are installed in the current proposal.
+Acquisition remains pending. Three retained converter checks pass, including
+complete graphics/motion comparisons and refusal to enable unfinished records.
 See the [clock-rig checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#indexed-looping-clock-rigs).
 
 The primary importing pipeline compiles missing furniture artwork in one batch

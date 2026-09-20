@@ -23,8 +23,9 @@ at `build/v3-switch-sound-prepared-01/`, plus two complete storage rigs at
 `build/v3-storage-rigs-prepared-01/`. Their full clock/animation/sound/storage source
 rules and complete assets are prepared. Shared room lifecycle code supports
 clock/storage categories; all complete clock and storage resources are installed.
-Connect ordinary profiles/acquisition before enabling
-them. Extend shared categories for remaining
+Ordinary profiles, official names, and prices are staged for all 22 clock,
+storage, and sound objects. Connect source acquisition and catalogue/scoring
+activation before enabling them. Extend shared categories for remaining
 models and source acquisition routes; do not substitute arbitrary shop stock.
 Event-present, Harvest, island, and direct-reward sources group other pending
 records. Complete sound-category audio is prepared at
@@ -33,22 +34,33 @@ all 74 existing instruments retained, and actual sample/envelope/timing identity
 Native dispatch/priorities, complete audio allocation, and the shared move-only
 callback are installed. Both trigger tables have 128 entries; the mapped words
 retain source priorities without changing the shared native priority table. The
-callback supplies the missing N64 single-instance guard. Next connect ordinary
-profiles and source acquisition. The 2-KiB audio allocation increase includes
+callback supplies the missing N64 single-instance guard. Next connect source
+acquisition through shared event/reward categories. The 2-KiB audio allocation increase includes
 both sequence and font growth, with 864 conservative bytes spare. Reuse passing
 converter, cartridge, sanitizer, and native audio evidence.
 The ordinary bulk importer's chair-sound check accepts the expanded dispatch
 tables/fonts by verifying actual complete programs/instruments, not stale
 addresses. Its positive/negative check passes; reuse this machinery.
-The shared import reservation extends to `02800000`, with 2,027,856 bytes free.
+The shared import reservation extends to `02800000`, with 2,015,504 bytes free.
 English choices/general strings retain
 their content and physical locations through checked virtual relocation. The
 final general string has three checked padding bytes for rounded native DMA.
 Continue general category conversion/integration and source acquisition routes;
 do not replay passed storage, text, or clock checks without a relevant change.
 
-The current explicit proposal is ABI 162,
-`build/v3-furniture-trigger-runtime-03/build-lock.json`. Its existing 8-KiB room
+The current explicit proposal is ABI 163,
+`build/v3-shared-room-profiles-02/build-lock.json`. The shared staging adapter
+reuses all seventeen rig objects and adds five complete sound models. Both
+record enable flags and saved selection bits stay off. Four focused host checks
+pass, including promotion-ready asset reuse and unchanged full/empty composition.
+All 22 records now reach acquisition checks in the ordinary bulk importer.
+Keep their missing calendar/NPC/distribution routes explicit; no arbitrary
+shop-stock substitute. The focused native check passes 112 assertions for
+inactive registration, three category reader/model representatives, restored
+state, and guards. Native evidence is in the
+[profile checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-ordinary-profile-staging).
+
+Retain ABI 162's unchanged audio evidence. Its existing 8-KiB room
 packet also contains five sound records and the shared callback. The focused
 silent native audio check passes 61 assertions, with two real positioned-trigger
 and sample-transfer representatives, single-instance suppression, memory guards,
@@ -62,7 +74,7 @@ Four host/cartridge checks and the focused native run pass; the latter has 153
 assertions covering the final-string boundary, three complete clock rigs/live hand
 angles, guards, restored state/checkpoint, and clean exit. Retain earlier passing
 relocated-text and storage components; ordinary room interaction, appearance,
-profiles/acquisition, and hardware remain open. All eight balloons are
+acquisition, and hardware remain open. All eight balloons are
 connected through shared source-derived parent records, room profiles, indoor
 conversion/pickup, collection/catalogue, complete icons, and optional selection.
 There are 128 experimental choices, with 24 equipment parents. Neither served

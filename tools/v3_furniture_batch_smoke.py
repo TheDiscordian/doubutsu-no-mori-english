@@ -1606,6 +1606,7 @@ def tool_controls(debug,rom_path,record,*,transitions=False,capture=False,rod=Fa
 
 
 def exercise(debug, rom_path, record, *, section='automatic_furniture'):
+    if section=='staged_profiles':return staged_profiles(debug,rom_path,record)
     if section=='furniture_audio':return furniture_audio(debug,rom_path,record)
     if section in ('scenery_planting_sparkle','scenery_planting_sparkle_remaining'):
         from v3_scenery_smoke import planting_sparkle
@@ -2628,6 +2629,77 @@ def held_level_sound(debug,rom_path,record):
         native_volume_pause_fade_pan_reverb=True,native_actor_registration_and_expiry=True,
         physical_audio_played=False,pcm_or_listening_verified=False,ordinary_gameplay_tested=False,
         flash_written=False,requires_checkpoint_restore=True)
+
+
+def staged_profiles(debug,rom_path,record):
+    """Check inactive batch registration and one reader/model per shared category.
+
+    Temporary activation is confined to this paused fixture; it is not an
+    acquisition or gameplay claim. Previously verified callbacks are not replayed.
+    """
+    from v3_import_storage import ROWS,ROWS_RAM,ITEMS,ITEMS_RAM,slot
+    path=Path(rom_path);image=path.read_bytes();report=json.loads((path.parent/'build.json').read_bytes())
+    if sha256(image)!=report['output_sha256']:raise ValueError('Changed staged-profile cartridge')
+    blob=by_vrom(image)[runtime.BLOB].extract(image);boot=boot_proofs(image);assertions=0
+    rows=report['staged_furniture']['rows'];table=int(report['furniture']['expanded_tables']['profile_table_ram'],16)
+    def check(label,at,want):
+        nonlocal assertions
+        actual=debug.read_memory(at,len(want));passed=actual==want
+        record(dict(staged_profile_check=label,address=f'{at:08X}',bytes=len(want),assertion='passed' if passed else 'failed'))
+        if not passed:raise ValueError('Staged-profile mismatch: '+label)
+        assertions+=1
+    def call(at,args=(),want=None,proof=None):
+        nonlocal assertions
+        result=debug.call(f'{at:08X}',list(args),return_address=MODULE_RAM+0x6480,verified_code=proof or boot.get(at))
+        if want is not None:result['assertion']='passed' if result['return_value']==want else 'failed'
+        record(result)
+        if want is not None:
+            if result['return_value']!=want:raise ValueError('Staged-profile native return differs')
+            assertions+=1
+        return result['return_value']
+    selected={}
+    for row in rows:
+        i=slot(int(row['item_id'],16))
+        check('inactive complete profile '+row['item_id'],ROWS_RAM+i*80,blob[ROWS+i*80:ROWS+(i+1)*80])
+        check('inactive complete item '+row['item_id'],ITEMS_RAM+i*32,blob[ITEMS+i*32:ITEMS+(i+1)*32])
+        check('excluded from startup profile lookup '+row['item_id'],table+row['runtime_index']*4,bytes(4))
+        selected.setdefault(row['category'],row)
+    size=0x2500;allocation=call(0x8009BFC0,[size])
+    if allocation&15 or not MODULE_RAM+0x8000<=allocation<=0x80400000-size:
+        raise ValueError('Staged-profile fixture outside native heap')
+    bank,text,bridge=allocation+16,allocation+0x2420,allocation+0x2440;edge=b'V3SP'*4
+    saved={};guards=(allocation,bank+9216,text-16,text+16,bridge+16,allocation+size-16)
+    for at in guards:debug.write_memory(at,edge)
+    entry=next(r for r in report['furniture']['expanded_tables']['public_entries'] if r['name']=='af_v3_furniture_import_profile')
+    check('installed native profile lookup entry',entry['entry'],bytes.fromhex(entry['after']))
+    jump=struct.pack('>2I',0x08000000|((entry['entry']>>2)&0x3FFFFFF),0)
+    debug.write_memory(bridge,jump);call(0x8002FE00,[bridge,8]);call(0x80034CE0,[bridge,8])
+    try:
+        for row in selected.values():
+            item=int(row['item_id'],16);index=row['runtime_index'];i=slot(item)
+            locations=((ROWS_RAM+i*80+4,4),(ITEMS_RAM+i*32+7,1),(table+index*4,4))
+            for at,n in locations:saved[at]=debug.read_memory(at,n)
+            debug.write_memory(text,b'\xA5'*16)
+            call(bridge,[index],0,(bridge,jump));call(0x801969C8,[text,16,item],0)
+            check('disabled item writes no name',text,b'\xA5'*16)
+            for (at,n),value in zip(locations,(struct.pack('>I',1),b'\x01',struct.pack('>I',row['profile_ram'])),strict=True):
+                debug.write_memory(at,value)
+            call(bridge,[index],1,(bridge,jump));call(0x801969C8,[text,16,item],1)
+            check('complete official name',text,row['name'].encode().ljust(16,b' '))
+            call(0x800A5630,[item],10);call(0x800C0194,[item],row['price'])
+            call(0x800BE69C,[item],row['size_code'])
+            call(0x80026B44,[bank,row['object_vrom'],row['object_bytes']])
+            at=row['object_vrom']-runtime.BLOB
+            check('complete profile-directed model DMA',bank,blob[at:at+row['object_bytes']])
+            for at,_ in locations:debug.write_memory(at,saved[at])
+            call(bridge,[index],0,(bridge,jump))
+        for at in guards:check('temporary reader/model guard',at,edge)
+        check('saved profile unchanged',0x80460020,blob[0x20:0xE0])
+    finally:
+        for at,value in saved.items():debug.write_memory(at,value)
+        call(0x8009C040,[allocation])
+    return dict(native_staged_profiles=True,assertions=assertions,records=len(rows),
+        category_representatives=len(selected),acquisition_tested=False,ordinary_gameplay_tested=False)
 
 
 def furniture_audio(debug,rom_path,record):
