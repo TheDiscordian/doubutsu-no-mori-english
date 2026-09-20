@@ -1,5 +1,82 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared fixed and indexed clock integration
+
+ABI 167 at `build/v3-shared-fixed-clock-profiles-01/` installs harvest clock's
+complete rig through the existing shared clock runtime, then stages its ordinary
+profile, official name, and price. There is no item-specific installer or runtime
+branch. The native clock code is unchanged, SHA-256
+`41f20bc9ba96b3b97770c1ae89317404fed83bc3fda385a58c40f02aef214bc2`.
+The existing clock record parameters select hour/minute joints three/four.
+
+Fixed resource discovery now promotes a clock only after proving the complete
+move callback is one keyframe step, destroy is a no-op, and repeat initialization
+has its actual source speed. The full donor initializer at `00000A24`, length
+124, has SHA-256 `5c600ed1925e67be3f776252b5cb4617389ee5612133e188505d05ba28e3bd7c`.
+All relocations and its `1.0`, `0.0`, integer-conversion, and `0.5` constants are
+checked. Source initialization supplies `0.5` before the constructor's first
+play, then the constructor reassigns `0.5`. Native initialization supplies `1.0`;
+the existing adapter sets `0.5` before playback, producing the same first-frame
+evaluation. Two source move steps per native update preserve running speed.
+The complete source clock joint callbacks are already checked by discovery.
+
+Preparation automatically skips current, verified staged profiles unless an
+explicit selection requests them. Thus this shared-category invocation avoids
+rebuilding all fifteen station clocks:
+
+```sh
+python3 tools/v3_furniture_pipeline.py convert --assets-only \
+  --category indexed-loop-clock-rig \
+  --base-lock build/v3-shared-translucent-imports-01/cartridge/build-lock.json \
+  --reuse-assets build/v3-fixed-keyframe-rigs-prepared-01 \
+  --output build/fixed-clock-reproduction
+```
+
+The recorded `build/v3-shared-fixed-clock-prepared-01/` contains one reused
+3,744-byte object, with zero artwork compiler containers. Its fresh profile
+records the verified clock category; the earlier prepared-only metadata does
+not confer eligibility. Manifest SHA-256:
+`090d9024e09291e49e7d29088433c7de9599e96c24f7c43b0452712b7bbabef1`.
+
+The normal `tools/v3_furniture_install.py --refresh-runtime --room-rigs-art`
+path installs the resource/table row at
+`build/v3-shared-fixed-clock-runtime-01/` (ABI 166), then the same builder's
+`--furniture-profiles` path produces the ABI-167 proposal. Both use the prepared
+directory above and their preceding explicit build lock. Both succeed on the
+first attempt. Complete asset storage uses checked retired space; the blob stays
+4,309,744 bytes with 1,981,712 bytes free. There is no resident allocation growth.
+The packet now has 26 rig rows; inactive furniture staging has 23 records.
+
+Three focused current-build tests pass in 7.988 seconds:
+
+```sh
+python3 -m unittest tests.test_v3_room_rig_runtime.FixedClockIntegrationTests -v
+```
+
+The final build's `checks.log` records the result. Checks cover complete source
+lifecycle/initializer dependencies and negative changes, reuse of the entire
+original model/animation object, unchanged clock runtime code and previous
+records/resources/audio, exact packet encoding, inactive readers/selection bits,
+source acquisition rejection, complete UPS reconstruction, and full/empty
+composition. Empty selection retains V2-12; all reproduces the current proposal.
+The 136 selectable choices remain unchanged. No native replay is needed for
+unchanged clock code; earlier native live-hand/timing evidence is retained, not
+reported as a new test. This new model's ordinary gameplay, acquisition, GPU
+appearance, persistence, and hardware remain unverified.
+
+Final hashes:
+
+- ROM SHA-256: `3a05ae197111405302e53b7e0f14800374897fc6dde15ac13d50bd9bb78171b6`.
+- UPS SHA-256: `0ddba54385a9c3d5c5f79551eb9a49fe7b62ecfdffcee1566c7c6024d21f83b9`.
+- Build report SHA-256: `9f8c877a2fee72a11bed6fdda1c2da0abf9ace624fa54147baa5f7833bbb3f51`.
+
+Save format 3 and selected profile requirements are unchanged; this disabled
+record adds no new saved identity requirement. Ordinary cross-build reload is
+not newly tested. The main ABI-109 lock and both served V2 patchers remain
+unchanged. Harvest acquisition remains a required dependency before activation.
+Other fixed rigs retain their actual pending behaviours, and gold-tree effects
+and full golden-shovel acquisition remain after primary importing.
+
 ## Shared static-callback resource preparation
 
 The bulk importer prepares direct profile models independently of pending

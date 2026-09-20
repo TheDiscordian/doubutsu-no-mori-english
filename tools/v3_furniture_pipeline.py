@@ -24,7 +24,7 @@ from v3_registry import FURNITURE, LEGACY_FURNITURE, furniture_identity, furnitu
 from v3_room_aliases import discover as room_aliases, pending_reason as room_alias_reason
 from v3_villager_art import native_palette, normalise_vertex_flags
 
-VERSION = 13
+VERSION = 14
 PENDING_MOVE_CATEGORY = 'static-models-pending-move'
 LAYERS = ('opaque', 'opaque1', 'translucent', 'translucent1')
 BEHAVIOURS = {0: 'static', 1: 'front-seat', 2: 'any-direction-seat', 4: 'front-sofa',
@@ -1109,6 +1109,7 @@ def convert(source, worksheet, output, selected=(), installed=None, *, assets_on
     inventory = scan(source, worksheet, installed)
     rows = [r for r in inventory['rows'] if (r['asset_ready'] if assets_only else r['status']=='supported') and
             (r['item_id'] in selected if selected else not r['installed']) and
+            (bool(selected) or not assets_only or r['item_id'] not in getattr(source,'runtime_profiles',{})) and
             (category is None or category in r['categories'])]
     if selected and set(selected) != {r['item_id'] for r in rows}:
         missing = sorted(set(selected)-{r['item_id'] for r in rows})

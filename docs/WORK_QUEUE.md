@@ -12,6 +12,16 @@ After the primary importing work, finish gold-tree leaf/cut effects and the full
 golden-shovel acquisition route. This is deferred required V3 work, not a dropped
 feature or a separate release goal.
 
+The fixed and indexed clock bindings use one existing runtime. The current
+ABI-167 proposal is `build/v3-shared-fixed-clock-profiles-01/build-lock.json`.
+It installs the complete harvest clock rig, live hands, inactive ordinary profile,
+official name, and price. There are 26 room-rig records and 23 staged furniture
+profiles. The converter skips already-staged category members by default and
+reuses the fixed-clock object without an artwork compiler. Three current-build
+checks pass; runtime code, allocations, prior rows, saved format, and the 136
+selectable choices are unchanged. Harvest acquisition remains required; do not
+enable the staged clock yet or repeat unchanged native clock checks.
+
 The shared static-profile path prepares piggy bank, ukulele, barbecue, and
 cannon at `build/v3-static-callback-resources-prepared-01/` (17,168 bytes, one
 compiler container). Three focused checks pass. Reuse the complete models while
@@ -25,15 +35,15 @@ The shared fixed-keyframe path prepares four complete rigs in one compiler
 container at `build/v3-fixed-keyframe-rigs-prepared-01/` (15,776 bytes): tiger
 bobblehead, stone coin, harvest clock, and judge's bell. Three focused checks
 pass. Reuse these resources; do not reconvert them per item. The descriptors
-retain stop/repeat mode, initial-play ordering, live clock joints, and pending
-move/destroy callbacks. Behaviour, spawned effects/sounds, acquisition, and the
-bell's seven-joint native work capacity remain required before installation.
+retain stop/repeat mode, initial-play ordering, and live clock joints. Harvest
+clock's lifecycle/profile is installed above; the other three retain pending
+behaviour, spawned effects/sounds, acquisition, and, for the bell, seven-joint
+native work capacity.
 General category and acquisition work takes priority over those unique details.
-The ROM, 136 choices, saved formats, and both served patchers are unchanged.
+The three pending rigs add no choices or save changes. Both served patchers
+remain unchanged.
 
-Use the current explicit ABI-165 proposal:
-`build/v3-shared-translucent-imports-01/cartridge/build-lock.json`. Shared IA16
-and translucent-material conversion prepares complete tissue/bottled-ship artwork
+Shared IA16 and translucent-material conversion prepares complete tissue/bottled-ship artwork
 and enables the Moai statue's complete ordinary import. No effects are dropped,
 textures reduced, or native allocation added. Reuse these shared formats and
 the prepared bundle at `build/v3-legacy-materials-prepared-01/`.
@@ -89,8 +99,8 @@ at `build/v3-switch-sound-prepared-01/`, plus two complete storage rigs at
 above. The implemented clock/animation/sound/storage categories' source
 rules and complete assets are prepared. Shared room lifecycle code supports
 clock/storage categories; their implemented-category resources are installed.
-The four additional fixed rigs above are prepared only, not installed.
-Ordinary profiles, official names, and prices are staged for all 22 clock,
+Harvest clock uses the same installed category; the other three fixed rigs
+remain prepared only. Ordinary profiles, official names, and prices are staged for all 23 clock,
 storage, and sound objects. Connect source acquisition and catalogue/scoring
 activation before enabling them. Extend shared categories for remaining
 models and source acquisition routes; do not substitute arbitrary shop stock.
@@ -144,8 +154,8 @@ relocated-text and storage components; ordinary room interaction, appearance,
 acquisition, and hardware remain open. All eight balloons are
 connected through shared source-derived parent records, room profiles, indoor
 conversion/pickup, collection/catalogue, complete icons, and optional selection.
-There are 128 experimental choices, with 24 equipment parents. Neither served
-V2 patcher nor the main lock changes.
+The current 136 experimental choices include 24 equipment parents. Neither
+served V2 patcher nor the main lock changes.
 
 The separate flying-balloon actor and selected-profile player creation are
 installed. All eight complete models and both motions use private actor-owned

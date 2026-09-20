@@ -18,6 +18,16 @@ served patchers retain their existing builds.
 
 ## Active development
 
+The current explicit proposal is ABI 167 at
+`build/v3-shared-fixed-clock-profiles-01/build-lock.json`. The shared clock
+runtime serves both fixed and indexed source bindings. Harvest clock's complete
+model, animation, live hands, inactive ordinary profile, official name, and price
+are installed. Its 3,744-byte object is reused without an artwork compiler; the
+runtime code and resident allocations are unchanged. There are 26 room rigs and
+23 staged furniture profiles. Three current-build checks pass. Acquisition remains
+pending, and the selectable count stays 136. See the
+[clock integration checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-fixed-and-indexed-clock-integration).
+
 The static-profile resource path prepares complete models even when a move-only
 callback still needs porting. `build/v3-static-callback-resources-prepared-01/`
 contains piggy bank, ukulele, barbecue, and cannon: 17,168 bytes, compiled together
@@ -34,13 +44,11 @@ bytes of complete models, skeletons, and motions compiled in one container.
 Three focused checks pass, covering complete graphics/keyframe data, changed
 resource bindings, cache reuse, and refusal to enable unfinished behaviour.
 Stop/repeat initialization, clock joints, and pending move/destroy code remain
-explicit. These are prepared resources, not four new playable imports; neither
-the cartridge nor its 136 choices changes. See the
+explicit. Harvest clock's lifecycle and profile are integrated above; the other
+three remain prepared only. These are not four new playable imports. See the
 [fixed-rig checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-fixed-keyframe-resource-preparation).
 
-The current explicit proposal is ABI 165 at
-`build/v3-shared-translucent-imports-01/cartridge/build-lock.json`. Shared IA16
-texture conversion and two translucent material formulas preserve all source
+Shared IA16 texture conversion and two translucent material formulas preserve all source
 pixels, alpha, geometry, and draw states. The complete tissue and bottled ship
 artwork is prepared, while the Moai statue is integrated through the ordinary
 importer and existing Gulliver reward category. The prepared batch compiles
@@ -136,9 +144,9 @@ verifies complete original chair instruments instead of requiring their old
 addresses. Its focused positive/negative check passes. This is an importer-only
 change; it neither changes the current ROM nor calls for another emulator run.
 
-The installed complete clock batch retains its passing component evidence.
-The room engine serves 25 records: eight balloons, two storage rigs, and fifteen
-clocks. Clock/storage ordinary profiles are staged, and acquisition remains
+The installed clock category retains its passing component evidence from the
+25-record ABI-161 packet. The current room engine serves 26 records: eight
+balloons, two storage rigs, and sixteen clocks. Clock/storage ordinary profiles are staged, and acquisition remains
 required. Resources alone do not make them selectable. No additional resident
 memory or saved format is needed for this batch.
 
@@ -156,8 +164,8 @@ The shared open/close category prepares both Harvest storage objects, retaining
 complete models, skeletons, animations, source interaction flags, and opening
 limits. Two converter checks pass; the shared runtime above supplies their
 lifecycle. Ordinary profiles are staged; acquisition remains required. The additional
-fixed rigs described above are prepared separately and need their actual runtime
-behaviours. Continue shared integration before required gold-tree work.
+fixed rigs described above are prepared separately; three still need their
+actual runtime behaviours. Continue shared integration before required gold-tree work.
 See the [storage checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#openclose-storage-category).
 
 The shared sound category reuses complete prepared artwork and audio from

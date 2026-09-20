@@ -193,14 +193,41 @@ def discover_fixed(source, vtable_name, vtable_at, functions):
     rig=skeleton(source,bones);animation_record=animation(source,motion,joints=rig['joints'])
     if clock and rig['joints']<=4:reject('missing clock-hand joints')
     descriptor=model_descriptor(rig,kind='animated-room-model')
-    return descriptor['models'],{},dict(category=FIXED_CATEGORY,vtable_symbol=vtable_name,
+    category=FIXED_CATEGORY;pending=[role for role in ('move','destroy') if role in functions]
+    runtime_contract={}
+    if clock and mode=='repeat' and raw_speed==struct.pack('>f',.5) and set(functions)==set(CLOCK_CODE):
+        # A fixed resource binding can use the existing clock runtime once all
+        # remaining behaviour is proved identical. Resource preparation alone
+        # never grants that permission.
+        helpers.update(source.checked_callback_code(functions['move'],*CLOCK_CODE['move'],{},
+            {0x10:(0xE54,'cKF_SkeletonInfo_R_play')},'fixed looping clock'))
+        source.checked_callback_code(functions['destroy'],*CLOCK_CODE['destroy'],{},{},'fixed looping clock')
+        init_raw,init_receipt=source.function(0xA24)
+        expected={0x0A:(6,module,4,0),0x0E:(6,module,4,0x20),0x1E:(4,module,4,0),
+                  0x2E:(6,module,4,0x30),0x36:(4,module,4,0x20),0x3E:(4,module,4,0x30),
+                  0x42:(6,module,4,4),0x4E:(4,module,4,4)}
+        constants=((0,bytes.fromhex('3f800000')),(4,bytes(4)),
+                   (0x20,bytes.fromhex('4330000080000000')),(0x30,bytes.fromhex('3f000000')))
+        if (len(init_raw)!=124 or sha256(init_raw)!='5c600ed1925e67be3f776252b5cb4617389ee5612133e188505d05ba28e3bd7c' or
+                init_receipt['relocations']!=expected or
+                any(source.rel[base+at:base+at+len(value)]!=value for at,value in constants)):
+            reject('changed source repeat initialization speed')
+        # Source init already supplies .5 before its initial play. The N64
+        # initializer supplies 1, so the existing runtime explicitly assigns
+        # .5 before playback. Both evaluate the same first frame and then loop.
+        category=CLOCK_CATEGORY;pending=[]
+        runtime_contract=dict(binding='fixed',category=CLOCK_CATEGORY,
+            source_initial_speed=.5,source_move_steps_per_native_update=2,
+            source_initializer=init_receipt)
+    return descriptor['models'],{},dict(category=category,vtable_symbol=vtable_name,
         vtable_offset=vtable_at,functions=functions,helpers=helpers,joint_callbacks=callbacks,
         constructor=dict(mode=mode,initial_speed=dict(section=4,offset=speed,hex=raw_speed.hex(),value=value),
                          initial_play_before_speed=True),
         **({'clock':clock} if clock else {}),skeleton=rig,animation=animation_record,
         joint_models=descriptor['joint_models'],runtime_installed=False,
-        pending_callbacks=[role for role in ('move','destroy') if role in functions],
-        resource_scope='complete constructor rig; callback gameplay and spawned effects remain pending')
+        pending_callbacks=pending,**({'runtime_contract':runtime_contract} if runtime_contract else {}),
+        resource_scope='complete fixed looping clock' if runtime_contract else
+            'complete constructor rig; callback gameplay and spawned effects remain pending')
 
 
 def discover_clock(source, vtable_name, vtable_at, functions, index):

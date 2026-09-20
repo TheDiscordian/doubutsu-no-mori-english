@@ -26,6 +26,91 @@ PACKET_OUT=ROOT/os.environ.get('V3_ROOM_CATEGORY_BUILD','build/v3-room-categorie
 PROFILE_OUT=ROOT/os.environ.get('V3_ROOM_PROFILE_BUILD','build/v3-shared-room-profiles-02')
 
 
+class FixedClockIntegrationTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.out=ROOT/'build/v3-shared-fixed-clock-profiles-01'
+        cls.image,cls.report=inputs(cls.out/'build-lock.json')
+        cls.base,cls.prior=inputs(ROOT/'build/v3-shared-translucent-imports-01/cartridge/build-lock.json')
+        cls.blob=by_vrom(cls.image)[BLOB].extract(cls.image)
+        cls.old=by_vrom(cls.base)[BLOB].extract(cls.base)
+        cls.source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+            (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+
+    def test_fixed_and_indexed_clocks_share_complete_semantics_and_reject_changes(self):
+        from v3_furniture_rigs import CLOCK_CATEGORY
+        source=self.source;profile=source.profile(0x32F0);a=profile['callback_adapter']
+        self.assertEqual(a['category'],CLOCK_CATEGORY);self.assertEqual(a['pending_callbacks'],[])
+        self.assertEqual(a['runtime_contract']['source_initial_speed'],.5)
+        self.assertEqual(a['runtime_contract']['source_move_steps_per_native_update'],2)
+        self.assertEqual(a['clock'],source.profile(0x30A8)['callback_adapter']['clock'])
+        for row in [a['functions'][k] for k in ('move','destroy')]+[a['runtime_contract']['source_initializer']]:
+            changed=copy.copy(source);changed.rel=bytearray(source.rel)
+            changed.rel[source.sections[1][0]+row['offset']]^=1
+            with self.assertRaises(ValueError):changed.profile(0x32F0)
+        for at in (0,4,0x20,0x30):
+            changed=copy.copy(source);changed.rel=bytearray(source.rel)
+            changed.rel[source.sections[4][0]+at]^=1
+            with self.assertRaisesRegex(ValueError,'repeat initialization'):changed.profile(0x32F0)
+        changed=copy.copy(source);changed.code_relocations=dict(source.code_relocations)
+        del changed.code_relocations[0xA24+0x0A]
+        with self.assertRaisesRegex(ValueError,'repeat initialization'):changed.profile(0x32F0)
+
+    def test_new_clock_reuses_complete_art_and_runtime_without_changing_other_records(self):
+        from v3_furniture_pipeline import PreparedAssets,prepare
+        art=ROOT/'build/v3-shared-fixed-clock-prepared-01';manifest=json.loads((art/'art.json').read_bytes())
+        self.assertEqual(manifest['batch'],dict(objects=1,reused=1,compiled=0,compiler_containers=0))
+        self.assertEqual([r['item_id'] for r in manifest['objects']],['32F0'])
+        self.assertEqual(PreparedAssets(self.source,[ROOT/'build/v3-fixed-keyframe-rigs-prepared-01']).reuse(
+            self.source,'32F0',prepare(self.source,0x32F0))[1]['object_sha256'],manifest['objects'][0]['object_sha256'])
+        e=self.report['equipment_resources'];r=e['room_rigs'];old=self.prior['equipment_resources']['room_rigs']
+        self.assertEqual(r['code']['sha256'],old['code']['sha256'])
+        self.assertEqual(r['code']['bytes'],old['code']['bytes'])
+        self.assertEqual(len(r['rows']),26);self.assertEqual(len(self.report['staged_furniture']['rows']),23)
+        self.assertEqual([v for v in r['rows'] if v['source_item_id']!='32F0'],old['rows'])
+        self.assertEqual([v for v in self.report['staged_furniture']['rows'] if v['item_id']!='32F0'],
+                         self.prior['staged_furniture']['rows'])
+        row=next(v for v in r['rows'] if v['source_item_id']=='32F0')
+        self.assertEqual((row['mode'],row['first'],row['last'],row['joints'],row['shown']),(1,3,4,5,3))
+        data=(art/manifest['objects'][0]['object_file']).read_bytes();at=row['blob_offset']
+        self.assertEqual(self.blob[at:at+row['bytes']],data);self.assertEqual(len(data),3744)
+        table=runtime.encode_packet(r['rows'],r['sound_rows']);packet=r['packet']
+        self.assertEqual(self.blob[packet['blob_offset']+runtime.PACKET_TABLE-runtime.PACKET_RAM:
+                                  packet['blob_offset']+packet['bytes']],table)
+        from v3_import_storage import TABLE_END
+        expected=bytearray(self.old[ROWS:TABLE_END]);i=slot(0x32F0)
+        for first,size in ((ROWS+i*80,80),(ITEMS+i*32,32)):
+            expected[first-ROWS:first-ROWS+size]=self.blob[first:first+size]
+        self.assertEqual(self.blob[ROWS:TABLE_END],expected)
+        self.assertEqual(self.report['shared_runtime_refresh']['additional_resident_bytes'],0)
+        self.assertEqual(e['furniture_audio'],self.prior['equipment_resources']['furniture_audio'])
+        self.assertEqual(self.report['save_runtime'],self.prior['save_runtime'])
+        self.assertEqual(apply_ups((ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes(),
+            (self.out/'asset-loader.ups').read_bytes()),self.image)
+
+    def test_staged_readers_reach_acquisition_without_enabling_or_changing_composition(self):
+        from v3_furniture_pipeline import prepare,metadata,identity_rows
+        bindings=runtime.bind_profiles(self.source,self.image,self.report)
+        self.assertIn('32F0',bindings)
+        row=next(r for r in self.report['staged_furniture']['rows'] if r['item_id']=='32F0')
+        self.assertTrue(row['profile_installed']);self.assertTrue(row['item_record_installed'])
+        self.assertFalse(any(row[k] for k in ('selected','acquisition_installed','catalogue_installed','scoring_installed')))
+        i=slot(0x32F0);self.assertFalse(self.blob[0x40+i//8]&(1<<(i&7)))
+        self.assertEqual(self.blob[ROWS+i*80+4:ROWS+i*80+8],bytes(4))
+        self.assertEqual(self.blob[ITEMS+i*32+8:ITEMS+i*32+24],b'harvest clock   ')
+        ids=identity_rows(ROOT/'build/item-identity-megasheet.xlsx')
+        with self.assertRaisesRegex(ValueError,'acquisition needs an adapter: ftr_listHarvest'):
+            metadata(self.source,0x32F0,prepare(self.source,0x32F0)[0],ids[0x32F0])
+        pin=composer.BASE,composer.BASE_SHA,composer.REPORT_SHA,composer.ABI
+        try:
+            composer.use_build_lock(self.out/'build-lock.json');catalog=composer.catalogue(self.image,self.report)
+            self.assertEqual(len(catalog),136);self.assertNotIn('GAFE01-r0/item/32F0',catalog)
+            self.assertEqual(sha256(composer.compose(self.image,self.report,catalog,composer.resolve(catalog,[]))[0]),
+                self.report['translation_baseline']['sha256'])
+            self.assertEqual(composer.compose(self.image,self.report,catalog,composer.resolve(catalog,list(catalog)))[0],self.image)
+        finally:composer.BASE,composer.BASE_SHA,composer.REPORT_SHA,composer.ABI=pin
+
+
 class ProfileTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):

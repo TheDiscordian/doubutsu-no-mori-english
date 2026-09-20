@@ -112,20 +112,20 @@ class FixedResourceTests(unittest.TestCase):
         for item,mode,speed,joints,shown,frames in ((0x1FC4,'stop',0,2,2,101),
                 (0x3018,'repeat',0,3,2,100),(0x32F0,'repeat',.5,5,3,13),(0x33B8,'stop',.5,7,4,10)):
             profile=self.source.profile(item);adapter=profile['callback_adapter']
-            self.assertEqual(adapter['category'],rigs.FIXED_CATEGORY)
+            self.assertEqual(adapter['category'],rigs.CLOCK_CATEGORY if item==0x32F0 else rigs.FIXED_CATEGORY)
             self.assertEqual((profile['skeleton']['joints'],profile['skeleton']['shown_joints']),(joints,shown))
             self.assertEqual(adapter['animation']['duration'],frames)
             self.assertEqual(adapter['constructor']['mode'],mode)
             self.assertEqual(adapter['constructor']['initial_speed']['value'],speed)
             self.assertTrue(adapter['constructor']['initial_play_before_speed'])
-            self.assertFalse(adapter['runtime_installed']);self.assertIn('move',adapter['pending_callbacks'])
+            self.assertFalse(adapter['runtime_installed'])
+            self.assertEqual(adapter['pending_callbacks'],[] if item==0x32F0 else ['move'])
             self.assertEqual(len(profile['models']),shown)
             if item==0x32F0:
                 self.assertEqual((adapter['clock']['hour_joint'],adapter['clock']['minute_joint']),(3,4))
                 self.assertEqual(len(adapter['joint_callbacks']),2)
-            self.source.runtime_profiles={f'{item:04X}':dict(category=rigs.FIXED_CATEGORY,
-                source_profile_sha256=profile['profile_sha256'])}
-            with self.assertRaisesRegex(ValueError,'move/destroy behaviour'):
+            self.source.runtime_profiles={}
+            with self.assertRaisesRegex(ValueError,'Animated room lifecycle' if item==0x32F0 else 'move/destroy behaviour'):
                 pipeline.metadata(self.source,item,profile,None)
         self.assertNotIn(rigs.FIXED_CATEGORY,rigs.RIG_CATEGORIES)
         # Same-sized existing constructors keep their real implemented category.

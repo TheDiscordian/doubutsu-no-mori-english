@@ -98,6 +98,10 @@ metadata to bypass missing gameplay. An item whose category is now complete can
 reuse its verified graphics while receiving fresh installation records. The
 output `batch` receipt records object, reuse, compilation, and container counts.
 Use a fresh ignored output path and the explicit current proposal lock.
+Default artwork preparation skips profiles already installed and verified by the
+current build's runtime bindings, including inactive staged profiles. Explicit
+`--select` requests can regenerate those records when needed. This avoids
+recompiling an entire installed category merely to add one newly supported member.
 
 ### Shared runtime categories
 
@@ -839,6 +843,16 @@ relocated pointer. The animation packer accepts an aligned object offset; its
 default zero-offset format and all existing held resources remain unchanged.
 No animation is flattened into a decorative model.
 
+The clock runtime accepts fixed as well as indexed bindings. A fixed constructor
+with the complete clock drawer is promoted only after its move loop, no-op
+destroy callback, and repeat initializer code/relocations/constants are checked.
+The donor initializer already supplies speed `0.5`; the native initializer uses
+`1.0`, so the existing runtime explicitly sets `0.5` before initial playback.
+This preserves the donor's evaluated first frame even when its constructor
+assigns the same `0.5` again after playback. Both bindings share two source motion
+steps per native update and the same live hour/minute joint callbacks. No new
+per-item runtime branch or additional resident allocation is required.
+
 The `indexed-loop-clock-rig` category uses the same complete model, skeleton,
 motion, and batch compiler. Its three checked sixteen-entry tables select a rig,
 animation, and constant palette together. Both create/draw selectors must agree;
@@ -877,7 +891,9 @@ effects; the clock drawer additionally retains verified hour/minute callbacks.
 Unknown drawing, billboard, or extra material dependencies still reject.
 
 The same source records discover tiger bobblehead, stone coin, harvest clock,
-and judge's bell without an item-specific definition. Every visible model,
+and judge's bell without an item-specific definition. Harvest clock's complete
+verified lifecycle promotes to the existing clock category; the other three
+retain their pending callbacks. Every visible model,
 texture, palette, skeleton joint, and animation array is compiled by the ordinary
 bulk pipeline. Remaining move/destroy callback hashes and dependencies stay in
 the descriptor, with explicit pending status. This describes complete constructor
