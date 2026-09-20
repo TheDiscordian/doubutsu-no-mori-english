@@ -12,6 +12,16 @@ After the primary importing work, finish gold-tree leaf/cut effects and the full
 golden-shovel acquisition route. This is deferred required V3 work, not a dropped
 feature or a separate release goal.
 
+The bulk converter reuses validated prepared artwork and compiles all missing
+objects in one container. The current combined prepared bundle is
+`build/v3-bulk-prepared-02/`: 95 objects, including two constant-palette trophies.
+These are prepared resources, not 95 new selectable items. Forty-seven of the
+101 remaining non-alias, non-dummy furniture candidates have complete converted
+artwork. Extend shared categories for the remaining models and source acquisition
+routes; do not substitute arbitrary shop stock. Indexed animated models share
+fifteen station variants; event-present, Harvest, island, and direct-reward
+sources group other pending records. The cartridge remains ABI 158.
+
 The current explicit proposal is ABI 158,
 `build/v3-shared-tree-sparkle-02/build-lock.json`. All eight balloons are
 connected through shared source-derived parent records, room profiles, indoor

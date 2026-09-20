@@ -20,6 +20,29 @@ the final DMA extraction. This shared storage rule adds no item-specific paths,
 saved formats, or browser choices. The wrapped-gift stage uses it for the native
 hand owner; its tag owner remains an in-place update.
 
+### Bulk compilation and prepared-artwork reuse
+
+Furniture `convert` and `import` preflight the entire selected batch, then compile
+all missing display lists in one existing toolchain container. Every object has
+separate sections and exact checked lengths. The compiler has no network and
+can write only the fresh output directory. Empty compilation batches start no
+container. The single-object API remains available to other representations.
+
+Repeat `--reuse-assets <directory>` to consume existing ready or prepared artwork
+bundles. Reuse checks the exact donor REL/symbol identities, complete regenerated
+resource bytes, emitter source, every model span/hash, draw sequence, skeleton,
+and animation suffix. The reconstructed complete object must match the cached
+object. Conflicting or changed caches fail; unknown formats and escaping paths
+are rejected. Earlier manifest revisions are usable only when all current
+artwork checks pass. Cache receipts retain the source manifest/object hashes.
+
+Eligibility, identity, names, behaviour, and acquisition are regenerated using
+the current rules. A prepared bundle cannot be installed directly or use its old
+metadata to bypass missing gameplay. An item whose category is now complete can
+reuse its verified graphics while receiving fresh installation records. The
+output `batch` receipt records object, reuse, compilation, and container counts.
+Use a fresh ignored output path and the explicit current proposal lock.
+
 ### Shared runtime categories
 
 The `scenery` representation follows complete seasonal foreground descriptors
@@ -598,8 +621,16 @@ The `constant-model-sequence` category recognises reviewed draw-only callbacks.
 Null lifecycle slots are allowed; any present create/move/destroy callback must
 be a complete no-op. DMA callbacks remain unsupported. The shared code verifier
 checks every instruction, model-address relocation pair, and matrix-helper call.
-It supports fixed one- and three-model opaque sequences without item definitions.
+It supports fixed one-, two-, and three-model opaque sequences without item definitions.
 Other draw operations, transformations, state changes, and lifecycle effects fail.
+
+The two-model form additionally binds a complete constant sixteen-colour palette
+through the checked segment-eight assignment. Its palette and both model
+addresses come from paired code relocations, not item IDs. The normal converter
+resolves palette loads into each object's private resources and retains the
+complete cup/base submission order. `constant-palette-model-sequence` selects
+this subset. Fishing-trophy acquisition remains a separate required adapter;
+converting both donor colour variants does not enable their imports.
 
 The converter retains every complete source list and appends one small native
 display list that calls those lists in their original order. The sequence record

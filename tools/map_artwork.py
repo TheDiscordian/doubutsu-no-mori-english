@@ -5,6 +5,8 @@ from dataclasses import dataclass
 import json
 import os
 from pathlib import Path
+import re
+import shlex
 import struct
 import subprocess
 
@@ -48,6 +50,46 @@ def compile_commands(out, source=None, sections=(('acre', 56), ('dash', 48))):
         result[name] = (out/(name+'.bin')).read_bytes()
         if len(result[name]) != expected:
             raise ValueError('Native map command section exceeds its fixed space')
+    return result
+
+
+def compile_commands_batch(out, jobs):
+    """Compile checked display-list jobs in one existing toolchain container.
+
+    Each job retains its own object/sections and exact expected lengths. No
+    shell data is interpolated without quoting; only the output tree is writable.
+    """
+    out=out.resolve();seen=set();commands=['set -eu'];targets=[]
+    for key,source,sections in jobs:
+        if not re.fullmatch(r'[A-Za-z0-9_-]+',key) or key in seen:
+            raise ValueError('Invalid or duplicated native command job')
+        seen.add(key);source=source.resolve();sections=tuple(sections)
+        if not source.is_relative_to(ROOT) or not source.is_file() or not sections:
+            raise ValueError('Native command source must be an existing project file')
+        names=[name for name,_ in sections]
+        if (len(set(names))!=len(names) or any(not re.fullmatch(r'[A-Za-z0-9_]+',name)
+                or type(size) is not int or size<=0 or size%8 for name,size in sections)):
+            raise ValueError('Invalid native command section contract')
+        target=out/key;targets.append((key,target,sections))
+        commands.append(shlex.join(['/n64_toolchain/bin/mips64-elf-gcc','-c','-EB','-mabi=32',
+            '-march=vr4300','-G0','-mno-abicalls','-fno-pic','-D_LANGUAGE_C','-DF3DEX_GBI_2',
+            '-I/source/upstream/af/lib/ultralib/include','/source/'+str(source.relative_to(ROOT)),
+            '-o',f'/out/{key}/commands.o']))
+        for name,_ in sections:
+            commands.append(shlex.join(['/n64_toolchain/bin/mips64-elf-objcopy','-O','binary',
+                '-j','.'+name,f'/out/{key}/commands.o',f'/out/{key}/{name}.bin']))
+    if not targets:return {}
+    for _,target,_ in targets:target.mkdir(parents=True,exist_ok=False)
+    subprocess.run(['docker','run','--rm','--network','none','--user',f'{os.getuid()}:{os.getgid()}',
+        '-v',f'{ROOT}:/source:ro','-v',f'{out}:/out','-w','/out','--entrypoint','/bin/sh',IMAGE,
+        '-c','\n'.join(commands)],check=True,capture_output=True,timeout=max(60,15*len(targets)))
+    result={}
+    for key,target,sections in targets:
+        result[key]={}
+        for name,expected in sections:
+            raw=(target/(name+'.bin')).read_bytes()
+            if len(raw)!=expected:raise ValueError('Native batch command section differs from its contract')
+            result[key][name]=raw
     return result
 
 

@@ -16,7 +16,7 @@ from aflib import sha256, u32
 from apply_translation import write_new
 from gc_names import rel_sections
 from item_identity_sheet import SHEET_SHA, sheet_rows
-from map_artwork import compile_commands
+from map_artwork import compile_commands, compile_commands_batch
 from title_assets import model_texture_shape, pack4, rgb5a3, untile
 from v3_asset_loader import ROOT
 from v3_furniture_art import SEGMENT, command_source, parse_model, verify_sources
@@ -56,6 +56,8 @@ STATIC_SEQUENCE_CODE = {
     116: ('76825aad3256c4118369c78a4240d0264e2e3dc18516ad1d386edf10dfaad8d1', ((0x3E,0x4A),)),
     172: ('d6dde5a8fad4d727364de9b717ef27562e128d4149e3e6da49846727ac9e7d2d',
           ((0x3E,0x52),(0x42,0x56),(0x46,0x5E))),
+    180: ('56b8b2fc6b1cd975dc5b119c9d16350198a7c758ebcfef304d8bbed74bf5903e',
+          ((0x46,0x66),(0x4E,0x6A))),
 }
 # Complete indexed draw shapes. Checked table bases/conditional selectors are
 # parameters; no item names or per-item model descriptions select this category.
@@ -272,17 +274,29 @@ class Source:
 
     def static_sequence_models(self, name, at, functions):
         draw=functions['draw'];digest,pairs=STATIC_SEQUENCE_CODE[draw['bytes']]
-        module=u32(self.rel,0);expected={};models={}
+        module=u32(self.rel,0);expected={};models={};bindings={};palette_record={}
         for i,(hi,lo) in enumerate(pairs):
             pointer=draw['relocations'].get(hi)
             if pointer is None or pointer[:3]!=(6,module,5):
                 raise ReviewRequired('custom callbacks: fixed draw missing model dependency')
             target=pointer[3];models[f'part{i}']=self.containing(target,exact=True)
             expected.update({hi:(6,module,5,target),lo:(4,module,5,target)})
+        if draw['bytes']==180:
+            pointer=draw['relocations'].get(0x42)
+            if pointer is None or pointer[:3]!=(6,module,5):
+                raise ReviewRequired('custom callbacks: fixed draw missing constant palette')
+            target=pointer[3];symbol,base,size=self.containing(target,exact=True)
+            if size!=32 or self.pointers(base,size):
+                raise ReviewRequired('custom callbacks: fixed draw needs a complete constant palette')
+            expected.update({0x42:(6,module,5,target),0x56:(4,module,5,target)})
+            bindings[0x08000000]=target
+            palette_record=dict(constant_palette=dict(symbol=symbol,donor_offset=base,bytes=size,
+                source_sha256=sha256(self.data[base:base+size]),segment_address=0x08000000))
         helpers=self.checked_callback_code(draw,draw['bytes'],digest,expected,
             {0x34:(643604,'_Matrix_to_Mtx_new')},'fixed draw')
-        return models,{},dict(category='constant-model-sequence',vtable_symbol=name,vtable_offset=at,
+        return models,bindings,dict(category='constant-model-sequence',vtable_symbol=name,vtable_offset=at,
             functions=functions,helpers=helpers,model_order=list(models),draw_arena='opaque',
+            **palette_record,
             null_callbacks=[r for r in ('create','move','destroy') if r not in functions])
 
     def indexed_sequence_models(self, name, at, functions, index):
@@ -736,6 +750,14 @@ def compile_models(directory, prepared):
     profile, body, resources, offsets, models, commands, sections = prepared
     source_file = directory/'commands.c'; write_new(source_file, commands.encode())
     compiled = compile_commands(directory/'gbi', source_file, sections)
+    return assemble_models(prepared,compiled)
+
+
+def assemble_models(prepared, compiled):
+    """Shared complete-object packing for single, bulk, and reused commands."""
+    profile, body, resources, offsets, models, commands, sections = prepared
+    if set(compiled)!=set(models) or any(len(compiled[name])!=n for name,n in sections):
+        raise ValueError('Compiled models differ from the complete section contract')
     asset, destinations, records = bytearray(body), {}, []
     for label, model in models.items():
         asset.extend(bytes(-len(asset)%8)); destinations[label] = len(asset); asset.extend(compiled[label])
@@ -752,6 +774,67 @@ def compile_models(directory, prepared):
     expected = (len(body)+sum(n for _,n in sections)+len(sequence)+15)&~15
     if len(asset) != expected: raise ValueError('Compiled object size differs from preflight')
     return bytes(asset), destinations, records, sequence_record
+
+
+class PreparedAssets:
+    """Explicit source-bound cache; readiness always comes from current rules."""
+    def __init__(self, source, directories=()):
+        self.rows={}
+        for path in directories:
+            path=Path(path).resolve();raw=(path/'art.json').read_bytes();art=json.loads(raw)
+            if (art.get('format') not in ('AFV3-AUTO-FURNITURE-ASSETS-1','AFV3-AUTO-FURNITURE-PREPARED-ASSETS-1')
+                    or type(art.get('version')) is not int or not 1<=art['version']<=VERSION
+                    or art.get('source_rel_sha256')!=sha256(source.rel)
+                    or art.get('source_symbols_sha256')!=sha256(source.symbols.encode())):
+                raise ValueError('Prepared cache has an unsupported source/format')
+            seen=set()
+            for row in art['objects']:
+                item=row.get('item_id')
+                if not isinstance(item,str) or not re.fullmatch(r'[13][0-9A-F]{3}',item) or item in seen:
+                    raise ValueError('Prepared cache has an invalid or duplicate item')
+                seen.add(item)
+                self.rows.setdefault(item,[]).append((path,row,sha256(raw)))
+
+    def reuse(self,source,item,prepared):
+        from v3_furniture_rigs import suffix
+        candidates=self.rows.get(item,[])
+        if not candidates:return None
+        profile,body,resources,_,models,commands,sections=prepared
+        accepted=None
+        for path,row,report_sha in candidates:
+            file=(path/row['object_file']).resolve();command_file=(path/item/'commands.c').resolve()
+            if file.parent!=path or not command_file.is_relative_to(path):
+                raise ValueError('Prepared cache file escapes its bundle')
+            asset=file.read_bytes()
+            if (len(asset)!=row['object_bytes'] or sha256(asset)!=row['object_sha256']
+                    or row['resources']!=resources or asset[:len(body)]!=body
+                    or command_file.read_text()!=commands):
+                raise ValueError('Prepared cache artwork/emitter differs from current source')
+            if len(row['models'])!=len(sections):raise ValueError('Prepared cache has incomplete model sections')
+            compiled={}
+            for old,(label,n) in zip(row['models'],sections,strict=True):
+                at=old['native_offset']
+                if type(at) is not int or at%8 or at<len(body) or at+n>len(asset):
+                    raise ValueError('Prepared cache model escapes its complete object')
+                raw=asset[at:at+n]
+                model=models[label]
+                if (old['layer']!=label or old['bytes']!=n
+                        or row['model_offsets'].get(label)!=at
+                        or old['source_sha256']!=model['source_sha256']
+                        or old.get('source_parts')!=model.get('source_parts')
+                        or sha256(raw)!=old['output_sha256']):
+                    raise ValueError('Prepared cache model differs from complete source/layout')
+                compiled[label]=raw
+            packed,destinations,records,sequence=assemble_models(prepared,compiled)
+            extra,rig=suffix(source,profile,destinations,start=len(packed));packed+=extra
+            if (packed!=asset or row['model_offsets']!=destinations or row['models']!=records
+                    or row.get('draw_sequence')!=sequence or row.get('rig',{})!=rig):
+                raise ValueError(f'Prepared cache {item} differs from complete reconstructed object')
+            if accepted is not None and accepted[0]!=compiled:
+                raise ValueError('Conflicting prepared cache objects')
+            accepted=(compiled,dict(directory=str(path.relative_to(ROOT)) if path.is_relative_to(ROOT) else str(path),
+                report_sha256=report_sha,object_sha256=sha256(asset)))
+        return accepted
 
 
 def draw_sequence(profile, body_bytes, sections):
@@ -905,6 +988,8 @@ def scan(source, worksheet, installed=None):
             if 'RGBA16' in formats: categories.append('rgba16-materials')
             if 'IA8' in formats: categories.append('ia8-materials')
             if 'callback_adapter' in profile: categories.append(profile['callback_adapter']['category'])
+            if profile.get('callback_adapter',{}).get('constant_palette'):
+                categories.append('constant-palette-model-sequence')
             row.update(asset_ready=True, profile=profile,
                 object_bytes=estimated, textures=sum(r['kind']=='texture' for r in resources),
                 vertices=sum(r['bytes']//16 for r in resources if r['kind']=='vertices'),
@@ -927,7 +1012,7 @@ def scan(source, worksheet, installed=None):
                 counts=dict(Counter(r['status'] for r in result)), rows=result)
 
 
-def convert(source, worksheet, output, selected=(), installed=None, *, assets_only=False, category=None):
+def convert(source, worksheet, output, selected=(), installed=None, *, assets_only=False, category=None, reuse_assets=()):
     from v3_furniture_rigs import suffix
     inventory = scan(source, worksheet, installed)
     rows = [r for r in inventory['rows'] if (r['asset_ready'] if assets_only else r['status']=='supported') and
@@ -939,14 +1024,24 @@ def convert(source, worksheet, output, selected=(), installed=None, *, assets_on
     if not rows: raise ValueError('No supported uninstalled furniture in the requested category')
     identities = identity_rows(worksheet,extra_items={int(r['item_id'],16) for r in rows})
     names = {r['item_id']:name_metadata(source,int(r['item_id'],16),identities[int(r['item_id'],16)]) for r in rows}
-    output.mkdir(parents=True, exist_ok=False)
-    objects = []
+    cache=PreparedAssets(source,reuse_assets);plans=[];jobs=[]
+    # Resolve and validate the entire batch before starting a compiler. A
+    # prepared cache supplies artwork only, never old eligibility or metadata.
     for row in rows:
         item = int(row['item_id'], 16)
         prepared = prepare(source, item)
+        reused=cache.reuse(source,row['item_id'],prepared)
+        plans.append((row,prepared,reused))
+    output.mkdir(parents=True, exist_ok=False)
+    for row,prepared,reused in plans:
+        directory=output/row['item_id'];directory.mkdir()
+        command_file=directory/'commands.c';write_new(command_file,prepared[5].encode())
+        if reused is None:jobs.append((row['item_id'],command_file,prepared[6]))
+    compiled=compile_commands_batch(output/'compiled',jobs)
+    objects = []
+    for row,prepared,reused in plans:
         profile, body, resources, offsets, models, commands, sections = prepared
-        directory = output/row['item_id']; directory.mkdir()
-        asset, destinations, records, sequence_record = compile_models(directory, prepared)
+        asset, destinations, records, sequence_record = assemble_models(prepared,reused[0] if reused else compiled[row['item_id']])
         rig_bytes, rig_record = suffix(source,profile,destinations,start=len(asset))
         asset += rig_bytes
         if len(asset) != row['object_bytes']: raise ValueError('Compiled object size differs from preflight')
@@ -957,12 +1052,16 @@ def convert(source, worksheet, output, selected=(), installed=None, *, assets_on
             native_profile_scalar_hex=profile['scalar_hex'], model_offsets=destinations,
             **({'draw_sequence':sequence_record} if sequence_record else {}),
             **({'rig':rig_record} if rig_record else {}),
+            **({'reused_artwork':reused[1]} if reused else {}),
             object_file=name, object_bytes=len(asset), object_sha256=sha256(asset)))
-        print(json.dumps(dict(converted=row['item_id'], name=row['name'], bytes=len(asset))), flush=True)
+        print(json.dumps(dict(converted=row['item_id'], name=row['name'], bytes=len(asset),
+                             reused=reused is not None)), flush=True)
     report = dict(format=('AFV3-AUTO-FURNITURE-PREPARED-ASSETS-1' if assets_only else
                           'AFV3-AUTO-FURNITURE-ASSETS-1'), version=VERSION,
         source_rel_sha256=inventory['source_rel_sha256'], source_symbols_sha256=inventory['source_symbols_sha256'],
-        objects=objects, runtime_installed=False)
+        objects=objects, runtime_installed=False,
+        batch=dict(objects=len(objects),compiled=len(jobs),reused=len(objects)-len(jobs),
+                   compiler_containers=int(bool(jobs))))
     write_new(output/'inventory.json', (json.dumps(inventory, indent=2)+'\n').encode())
     write_new(output/'art.json', (json.dumps(report, indent=2)+'\n').encode())
     return report
@@ -979,9 +1078,13 @@ def main():
     parser.add_argument('--assets-only', action='store_true',
                         help='convert only: prepare artwork even when metadata/acquisition is unsupported; never install')
     parser.add_argument('--base-lock', type=Path, default=ROOT/'config/v3-import-build.json')
+    parser.add_argument('--reuse-assets', type=Path, action='append', default=[],
+        help='Reuse a verified artwork bundle without recompilation; repeat for multiple bundles')
     args = parser.parse_args(); output = args.output.resolve()
     if args.assets_only and args.command != 'convert': parser.error('--assets-only requires convert')
     if args.category and args.command == 'scan': parser.error('--category requires convert or import')
+    if args.reuse_assets and (args.command=='scan' or args.representation!='furniture'):
+        parser.error('--reuse-assets requires furniture convert or import')
     if args.representation in ('handheld','scenery') and (args.command == 'import' or
             args.command == 'convert' and not args.assets_only):
         parser.error('This representation requires convert --assets-only; runtime integration is unfinished')
@@ -1018,10 +1121,10 @@ def main():
         print(json.dumps(dict(counts=report['counts'], supported_new=[r['item_id'] for r in report['rows']
                          if r['status']=='supported' and not r['installed']])))
     elif args.command == 'convert': convert(source, worksheet, output, args.select, installed,
-                                            assets_only=args.assets_only, category=args.category)
+                                            assets_only=args.assets_only, category=args.category,reuse_assets=args.reuse_assets)
     else:
         output.mkdir(parents=True)
-        convert(source,worksheet,output/'assets',args.select,installed,category=args.category)
+        convert(source,worksheet,output/'assets',args.select,installed,category=args.category,reuse_assets=args.reuse_assets)
         report = build(output/'cartridge',output/'assets',args.base_lock)
         print(json.dumps(dict(runtime_abi=report['runtime_abi'],output_sha256=report['output_sha256'])))
 

@@ -1,5 +1,47 @@
 # Automatic furniture pipeline checkpoint
 
+## Bulk compilation and prepared reuse
+
+`build/v3-bulk-prepared-02/` rebuilds current descriptors for 95 complete prepared
+objects: 93 reused from verified bundles and two newly compiled in one existing
+Docker container. Reuse reconstructs the full object from regenerated source
+resources, checked emitter/model sections, and complete rig/animation suffixes.
+Cached metadata never supplies current eligibility. Prepared-only bundles still
+cannot enter the installer directly. Source hashes, model bounds, paths,
+section lengths, and conflicting cache entries reject before installation.
+
+The constant-palette sequence category covers both fishing-trophy variants
+without per-item production definitions. Complete compiled donor callbacks at
+`002CEEB4` and `002CFADC` have the same checked 180-byte instruction pattern after
+normalising paired addresses and the matrix-helper call. Both complete cup/base
+lists and their distinct 16-colour palettes survive. Each native object is 3,744
+bytes. Their source acquisition route remains unfinished; neither is enabled.
+
+- Combined manifest SHA-256:
+  `a3835d2b9aa80120995510f29d8b690c1a614e912b1052fe8870541f2493609c`.
+- Fishing trophy object SHA-256:
+  `1a5a04e40c38f66e7442588fb6a9dea960613df14e8862592149571c3ca38898`.
+- Angler trophy object SHA-256:
+  `8fd28f98d97744aa7b621309f40031afd4e7647ed151dd91666a5baedf1b3b44`.
+
+The initial 93-object pass uses zero compiler containers. The combined pass uses
+one for both new objects and all four model sections. Five batch/reuse checks
+pass in 2.442 seconds, including invalid requests, incomplete output, source/hash/
+layout rejection, and complete reconstruction without compilation. The initial
+cache implementation rejected absent rig metadata against an empty rig record;
+the comparison now uses the writer's actual empty-record convention. No asset
+bytes or safety requirements are relaxed.
+
+Three focused category and prepared-batch checks pass in 22.404 seconds. They
+cover complete trophy palette/model dependencies, reject changed callbacks,
+compare all 95 complete converted texture/vertex/triangle resources to the donor,
+and verify that acquisition gaps and installer rejection remain intact. No
+native replay is needed because no cartridge code or resources change.
+
+No runtime code, ROM, save, selected choice, main lock, or served patcher changes.
+The explicit cartridge remains ABI 158. General import category work has priority;
+gold-tree effects and ordinary acquisition remain required afterwards.
+
 ## Shared planting sparkle
 
 ABI 158 at `build/v3-shared-tree-sparkle-02/build-lock.json` connects gold-sapling

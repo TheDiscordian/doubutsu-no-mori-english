@@ -18,6 +18,15 @@ served patchers retain their existing builds.
 
 ## Active development
 
+The primary importing pipeline compiles missing furniture artwork in one batch
+and reuses verified prepared objects while regenerating current eligibility and
+metadata. `build/v3-bulk-prepared-02/` contains 95 complete prepared objects:
+93 reused and two newly compiled constant-palette trophy variants. Acquisition
+gaps remain explicit; preparation adds no selectable items or ROM changes.
+The current cartridge proposal remains ABI 158. Continue shared conversion and
+acquisition categories before returning to required gold-tree completion. See
+the [bulk checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#bulk-compilation-and-prepared-reuse).
+
 The current explicit proposal is ABI 158 at
 `build/v3-shared-tree-sparkle-02/build-lock.json`. All four seasonal planting
 callbacks add the donor's gold-sapling sparkle at its actual source position.

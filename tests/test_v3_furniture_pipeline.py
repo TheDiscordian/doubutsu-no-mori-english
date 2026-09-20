@@ -376,8 +376,9 @@ class DonorTests(unittest.TestCase):
     def test_constant_draw_sequences_keep_all_models_and_reject_additional_effects(self):
         inventory=pipeline.scan(self.source,ROOT/'build/item-identity-megasheet.xlsx')
         rows=[r for r in inventory['rows'] if 'constant-model-sequence' in r.get('categories',[])]
-        self.assertEqual(sorted(len(r['profile']['models']) for r in rows),[1,3])
-        self.assertTrue(all(r['status']=='supported' for r in rows))
+        self.assertEqual(sorted(len(r['profile']['models']) for r in rows),[1,2,2,3])
+        self.assertTrue(all(r['status']=='supported' for r in rows
+                           if 'constant-palette-model-sequence' not in r['categories']))
         for row in rows:
             item=int(row['item_id'],16);profile,body,_,_,models,_,sections=pipeline.prepare(self.source,item)
             adapter=profile['callback_adapter'];draw=adapter['functions']['draw']

@@ -33,7 +33,7 @@ VERSION = 9
 LOCK = ROOT/'config/v3-import-build.json'
 STABLE = ROOT/'build/v2-keyboard-fit-11/Animal Forest English V2.z64'
 STABLE_SHA = '8bbd1955536a2a3ac9f76d6f323842f5ce25c037e1ff5fd3da9f28d6dfe20507'
-SOURCES = ('tools/v3_furniture_pipeline.py', 'tools/v3_furniture_install.py', 'tools/v3_room_aliases.py',
+SOURCES = ('tools/v3_furniture_pipeline.py', 'tools/v3_furniture_install.py', 'tools/map_artwork.py', 'tools/v3_room_aliases.py',
     'tools/v3_furniture_rigs.py', 'tools/v3_keyframes.py',
     'tools/v3_furniture_art.py', 'tools/v3_registry.py', 'tools/v3_catalogue.py',
     'tools/v3_garden_runtime.py', 'tools/v3_shops.py', 'overlays/v3/catalogue.c',
