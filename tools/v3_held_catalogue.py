@@ -7,6 +7,7 @@ import zlib
 from aflib import by_vrom,sha256,u32
 from v3_asset_loader import BLOB,ROOT,compile_part
 from v3_furniture_pipeline import Source,prepare
+from v3_equipment_runtime import RAM,GUARD
 from v3_import_storage import ROWS,ROWS_RAM,ITEMS,slot,jump,replace_checked
 from v3_held_collection import source_records
 import v3_catalogue as catalogue
@@ -26,14 +27,26 @@ SOURCES+=('tools/v3_handheld_items.py','tools/v3_inventory_equipment.py',
     'overlays/v3/room_rigs.ld')
 
 
+def parent_readiness(equipment):
+    """Keep completed passive categories separate from pending active rewards."""
+    ready=set();pending={}
+    for row in equipment['player_actions']['equipment_selection']['rows']:
+        if row['passive']:ready.add(row['id'])
+        else:pending[row['id']]=['tool-acquisition','reward-demo']
+    return ready,pending
+
+
 def select_installed(prior,blob,*,extend=False):
     """Prepare the full experimental reference; selectors remove parent choices."""
     equipment=copy.deepcopy(prior['equipment_resources'])
     required=('catalogue','collection','parent_readers','event_acquisition',
               'ground_categories','inventory_preview','player_actions','item_categories')
     previous=equipment.get('optional_selection')
+    ready,pending=parent_readiness(equipment)
+    visible=[r for r in equipment['catalogue']['imports']
+             if f'GAFE01-r0/item/{r["parent_item_id"]}' in ready]
     if (any(not equipment.get(k) for k in required) or bool(previous)!=extend or
-            equipment['catalogue']['imports']!=prior['catalogue']['handheld']['imports']):
+            visible!=prior['catalogue']['handheld']['imports']):
         raise ValueError('Parent selection requires the complete installed shared adapters')
     start=equipment['blob_offset']
     if sha256(blob[start:start+equipment['bytes']])!=equipment['sha256']:
@@ -61,8 +74,9 @@ def select_installed(prior,blob,*,extend=False):
                 sha256(blob[art:art+row['object_bytes']])!=row['object_sha256'] or
                 bool(profile[parent['profile_byte']]&parent['profile_mask'])!=(parent['id'] in retained)):
             raise ValueError('Changed parent selection identity, installed model, or profile binding')
-        seen.add(parent['item_id']);identities.append(parent['id'])
-        profile[parent['profile_byte']]|=parent['profile_mask']
+        seen.add(parent['item_id'])
+        if parent['id'] in ready:
+            identities.append(parent['id']);profile[parent['profile_byte']]|=parent['profile_mask']
     if not seen or seen!=set(parents) or seen!=set(collections) or not retained<=set(identities):
         raise ValueError('Incomplete installed parent selection inventory')
     blob[0x20:0xE0]=profile
@@ -71,6 +85,7 @@ def select_installed(prior,blob,*,extend=False):
         identities=sorted(identities),profile_bits_enabled=len(identities),
         experimental=True,playable_handoff=False,web_patcher_enabled=False,
         save_compatibility='Older profiles lacking these imports reject saves using them; retain separate test saves.')
+    if pending:equipment['optional_selection']['pending']=pending
     return equipment,{},dict(save_runtime=saved)
 
 
@@ -85,7 +100,8 @@ def refresh_parents(source,equipment,blob):
         raise ValueError('Category refresh requires the complete installed parent module')
     selector=old['player_actions']['equipment_selection']
     categories=sorted(set(selector.get('categories',[23]))|
-        set(old.get('held_rig_actions',{}).get('category_indices',[])))
+        set(old.get('held_rig_actions',{}).get('category_indices',[]))|
+        ({1,2,11,20} if old.get('inventory_preview',{}).get('tool_previews') else set()))
     # A category can also need a shared consumer repair without new choices.
     # Keep the complete source/identity checks on that same-category path.
     # Bind every old table to its complete source before replacing any bytes.
@@ -123,6 +139,12 @@ def refresh_parents(source,equipment,blob):
         if (0x3000+old['parent_readers']['code']['bytes']>at or
                 module[at:at+bank['capacity']]!=expected):
             raise ValueError('Pocket palettes overlap parent code or occupied bytes')
+        module[at:at+bank['capacity']]=bytes.fromhex(bank['data_hex']).ljust(bank['capacity'],b'\0')
+    if icon_report.get('extension_bank'):
+        bank=icon_report['extension_bank'];at=bank['ram']-RAM;previous=old['pocket_icons']['extension_bank']
+        expected=bytes.fromhex(previous.get('data_hex','')).ljust(bank['capacity'],b'\0')
+        if at<old['bytes']-4096 or at+bank['capacity']!=old['bytes']-16 or module[at:at+bank['capacity']]!=expected:
+            raise ValueError('Changed bounded icon extension storage')
         module[at:at+bank['capacity']]=bytes.fromhex(bank['data_hex']).ljust(bank['capacity'],b'\0')
     report['pocket_icons'].update(icon_report)
     _,collection=source_records(source,report)
@@ -294,9 +316,11 @@ def refresh_icon_reader(base,equipment,blob,output):
     bank=equipment['pocket_icons'].get('palette_bank')
     previous=equipment['parent_readers']['code']
     defines=tuple(f[2:] for f in previous['flags'] if f.startswith('-D'))
-    if not bank or 'AF_V3_POCKET_ICON_PALETTES=1' in defines:return {}
+    required=(('AF_V3_POCKET_ICON_PALETTES=1',) if bank else ())+(
+        ('AF_V3_POCKET_ICON_EXTENSION=1',) if equipment['pocket_icons'].get('extension_bank') else ())
+    if all(d in defines for d in required):return {}
     code,compiled=compile_part('held_items',output/'held_items',
-        defines=defines+('AF_V3_POCKET_ICON_PALETTES=1',),extra_sources=('overlays/v3/held_icon.S',))
+        defines=defines+tuple(d for d in required if d not in defines),extra_sources=('overlays/v3/held_icon.S',))
     start=equipment['blob_offset'];at=start+0x3000;end=start+bank['ram']-RAM
     module=blob[start:start+equipment['bytes']]
     if (sha256(module)!=equipment['sha256'] or len(code)>end-at or
@@ -367,9 +391,25 @@ def merge_owner_changes(original,first,second):
     return bytes(merged)
 
 
+def extend_icons(base,prior,blob,core):
+    """Grow shared icon resources once for an entire installed tool category."""
+    from v3_player_actions import equipment_extension
+    equipment=copy.deepcopy(prior['equipment_resources'])
+    if not equipment.get('inventory_preview',{}).get('tool_previews') or equipment['pocket_icons'].get('extension_bank'):
+        return equipment
+    reservation=equipment_extension(base,prior,blob,core,0x10000,0x11000)
+    start=equipment['blob_offset'];module=bytearray(blob[start:start+equipment['bytes']])+bytearray(4096)
+    struct.pack_into('>4I',module,len(module)-16,*([GUARD]*4))
+    blob[start:start+len(module)]=module
+    equipment.update(bytes=len(module),sha256=sha256(module),crc32=zlib.crc32(module),additional_resident_bytes=4096)
+    equipment['pocket_icons']['extension_bank']=dict(ram=RAM+0x10000,capacity=4080)
+    equipment['pocket_icons']['extension_reservation']=reservation
+    return equipment
+
+
 def install(base,prior,blob,core,original,output,directory):
     from v3_furniture_install import STABLE,STABLE_SHA
-    equipment=prior['equipment_resources'];files=by_vrom(base)
+    equipment=extend_icons(base,prior,blob,core);files=by_vrom(base)
     if not equipment.get('collection'):
         raise ValueError('Held previews require installed collection')
     source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
@@ -380,7 +420,12 @@ def install(base,prior,blob,core,original,output,directory):
     if refresh:equipment=refresh_parents(source,equipment,blob)
     prepared,evidence=assets(source,equipment,directory,blob)
     installed=install_profiles(blob,prepared,equipment['catalogue']['imports'] if refresh else ())
-    table,cat=catalogue_table(stable,installed,evidence)
+    ready,_=parent_readiness(equipment)
+    visible=[r for r in installed if f'GAFE01-r0/item/{r["parent_item_id"]}' in ready]
+    # Store complete pending representations, but do not insert unreachable
+    # tools into completion counts or enable them as browser choices.
+    table,cat=catalogue_table(stable,visible,evidence)
+    installed.sort(key=lambda r:r['donor_position'])
     reader_changes,reader_updates=refresh_profile_reader(base,prior,blob,equipment,output,
         room_rigs=any(r.get('room_placement_uses_display') for r in installed))
     reader_changes.update(refresh_icon_reader(base,equipment,blob,output))

@@ -2,12 +2,23 @@
 
 ## Active: V3 optional GameCube imports
 
-The current explicit proposal is ABI 135,
-`build/v3-shared-tool-previews-01/build-lock.json`. All eight balloons are
+The current explicit proposal is ABI 136,
+`build/v3-shared-tool-parents-01/build-lock.json`. All eight balloons are
 connected through shared source-derived parent records, room profiles, indoor
 conversion/pickup, collection/catalogue, complete icons, and optional selection.
 There are 128 experimental choices, with 24 equipment parents. Neither served
 V2 patcher nor the main lock changes.
+
+Shared golden-tool parent integration is installed: official names/prices,
+complete pocket icons, collection bindings, catalogue models, and active-tool
+selectors. The checked icon extension brings the module to 68 KiB without moving
+old resources. One sanitizer check and four cartridge/composition checks pass;
+the first silent native run passes 182 records and 117 assertions. It covers the
+changed readers and all four models/icons, not ordinary acquisition or rendered
+appearance. The current private browser worker matches all four offline profiles.
+Reuse this evidence. The four pending tools remain excluded from choices and
+catalogue completion counts. See the
+[checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-golden-tool-parent-category).
 
 The complete golden-tool inventory category is installed. All four preview rows
 come from shared source tables and reuse installed models/motions; the rod's
@@ -83,19 +94,17 @@ Do not add wear to existing N64 axes to implement an unbreakable golden axe.
 This is a source/cartridge audit, not ordinary golden-axe gameplay. See the
 [audit](checkpoints/V3_FURNITURE_PIPELINE.md#golden-axe-durability-audit).
 
-Next connect shared tool parent consumers and acquisition/demos.
-`selection_records` currently accepts only categories 21/22/23; extend complete
-tool categories through that shared machinery, retaining fixed parent/display
-identities. The source golden aliases identify the four additions; ordinary tools
-and worn-axe states in the same main categories are not new choices. Active tools
-need `passive=False`, unlike existing toys/fans. Reuse installed previews and
-prepared catalogue models; check room aliases, pocket icons, rewards, and wrapped
-presents as dependencies. Golden tool parents retain their IDs in rooms; their
-display forms belong to collection/catalogue, not ordinary room conversion.
-Resources alone do not enable selections.
-Keep all tool choices
-disabled until the required gameplay, inventory, acquisition, and persistence
-consumers are connected. Do not replay the completed input checks for unchanged code.
+Next connect shared tool acquisition, reward demos, and wrapped-present handling.
+The complete parent records already preserve active/passive differences, room
+identities, ownership, previews, and icons; do not rebuild per-item installers.
+The donor's net/rod rewards use collection completion and the present-demo actor;
+the axe uses the perfect-town reward, and the shovel uses the gold-tree route.
+Inspect the native counterparts before choosing hooks. Keep source conditions,
+official dialogue, selected-profile rejection, and saved reward state explicit.
+`parent_readiness` keeps active parents pending until these consumers exist;
+resource installation alone must not enable them. Golden tool parents retain
+their IDs in rooms; display forms belong to collection/catalogue. Continue from
+the current lock without replaying completed input, preview, or parent checks.
 
 The source `Player_actor_setup_Item_Tumble_getup` also releases a carried balloon
 when its balloon actor exists: it clears the equipped item and requests the

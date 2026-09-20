@@ -92,18 +92,19 @@ TOOL_MOTION_OFFSET=0x2A50
 EFFECTS_OFFSET,EFFECTS_STATE_OFFSET,EFFECTS_MODULE_SIZE=0xF000,0xFFD0,0x10000
 
 
-def effects_reservation(base,prior,blob,core):
-    """Reclaim only the checked retired audio sequence's unused next 4 KiB."""
+def equipment_extension(base,prior,blob,core,previous_size,new_size):
+    """Reclaim checked unused storage from the relocated equipment sequence."""
     old=prior['equipment_resources'];start=old['blob_offset'];files=by_vrom(base)
     module=bytes(blob[start:start+old['bytes']])
-    if (old['ram']!=RAM or old['bytes']!=EFFECTS_OFFSET or sha256(module)!=old['sha256']
+    if (old['ram']!=RAM or old['bytes']!=previous_size or sha256(module)!=old['sha256']
+            or previous_size%4096 or new_size%4096 or not previous_size<new_size
             or struct.unpack_from('>4I',module,len(module)-16)!=(GUARD,)*4
-            or RAM+EFFECTS_MODULE_SIZE>prior['furniture']['bank_pool']['start']):
-        raise ValueError('Tool effects require the complete guarded 60-KiB equipment module')
+            or RAM+new_size>prior['furniture']['bank_pool']['start']):
+        raise ValueError('Equipment extension requires the complete guarded module')
     moved=old['held_rig_actions']['balloon']['sequence_relocation']
     retired,current=moved['previous'],old['sound_programs']['sequence']
     data,header,physical=sound_programs.installed_resource(base,core,'seq',current['index'])
-    first,last=start+EFFECTS_OFFSET,start+EFFECTS_MODULE_SIZE
+    first,last=start+previous_size,start+new_size
     if (current!=moved['current'] or retired['blob_offset']!=start+RIG_MODULE_SIZE
             or retired['bytes']!=20240 or retired['sha256']!=current['sha256']
             or first<retired['blob_offset'] or last>retired['blob_offset']+retired['bytes']
@@ -112,16 +113,20 @@ def effects_reservation(base,prior,blob,core):
             or header.hex()!=current['header_after']
             or blob[current['blob_offset']:current['blob_offset']+len(data)]!=data
             or last>len(blob) or any(blob[first:last])):
-        raise ValueError('Tool effects space is not the verified retired sequence range')
+        raise ValueError('Equipment extension is not the verified retired sequence range')
     physical_first,physical_last=files[BLOB].pstart+first,files[BLOB].pstart+last
     if any(e.pstart<physical_last and physical_first<(e.pend or e.pstart+e.size)
            for v,e in files.items() if v!=BLOB and e.pstart!=0xFFFFFFFF):
-        raise ValueError('Tool effects extension overlaps another live resource')
+        raise ValueError('Equipment extension overlaps another live resource')
     for record in old['records']:
         if record['blob_offset']<last and first<record['blob_offset']+record['bytes']:
-            raise ValueError('Tool effects extension overlaps equipment artwork')
+            raise ValueError('Equipment extension overlaps equipment artwork')
     return dict(first=first,end=last,bytes=last-first,retired_sequence=copy.deepcopy(retired),
-                current_sequence=copy.deepcopy(current),ram=RAM+EFFECTS_OFFSET)
+                current_sequence=copy.deepcopy(current),ram=RAM+previous_size)
+
+
+def effects_reservation(base,prior,blob,core):
+    return equipment_extension(base,prior,blob,core,EFFECTS_OFFSET,EFFECTS_MODULE_SIZE)
 
 
 def refresh_shovel_effects(base,prior,blob,core,original,output):

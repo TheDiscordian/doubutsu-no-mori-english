@@ -84,6 +84,25 @@ int main(void) {
     icons[4+110]=0x804A67A0u;icons[5+110]=0x804A67A0u;
     assert(!af_v3_held_item_icon(0x225B));
 #endif
+#ifdef AF_V3_POCKET_ICON_EXTENSION
+    icons[4+110]=0x804B3000u;icons[5+110]=0x804B3020u;
+    assert(af_v3_held_item_icon(0x225B)==icons+4+110);
+    icons[4+110]=0x804B3FC0u;icons[5+110]=0x804B3DE0u;
+    assert(af_v3_held_item_icon(0x225B)==icons+4+110);
+    for (unsigned lane=0;lane<2;++lane) {
+        u32 old=icons[4+110+lane];
+        const u32 invalid[]={0x804B2FF8u,0x804B3FF0u,0x804B4000u,0x804B3001u,0xFFFFFFFFu};
+        for (unsigned i=0;i<sizeof invalid/sizeof *invalid;++i) {
+            icons[4+110+lane]=invalid[i];assert(!af_v3_held_item_icon(0x225B));
+        }
+        icons[4+110+lane]=old;
+    }
+    icons[5+110]=0x804B3DF8u;assert(!af_v3_held_item_icon(0x225B));
+    icons[5+110]=0x804B3020u;
+    selectors[91].passive=0;
+    assert(af_v3_player_selected_equipment(0x225B)==selectors[91].kind);
+    assert(!af_v3_player_passive_equipment(selectors[91].kind));
+#endif
     selectors[91].ready=0;assert(!af_v3_held_item_price(0x225B));
     puts("Shared held parent names, prices, selection, and bounded writes pass");
 }

@@ -1,5 +1,86 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared golden-tool parent category
+
+The explicit ABI-136 proposal is
+`build/v3-shared-tool-parents-01/build-lock.json`. The shared category refresh
+installs all four golden-tool parents, names/prices, icons, ownership bindings,
+and complete catalogue models together. The 128 experimental choices and saved
+profile are unchanged; the four tools remain pending acquisition and reward
+demos. Neither served V2 patcher nor the main ABI-109 lock changes.
+
+- ROM SHA-256:
+  `cd4b7467a650cd3933eb357af837d71f72062591ee00893d1999d15fafd5ab2f`.
+- Report SHA-256:
+  `26881ef568a6a9bf98051f6b44e4d98a0b40886cd7e455516a5f8bd28c96ef21`.
+- UPS SHA-256:
+  `4c765b554ba9fb00cddb54073d747f0e8bf97fec9073e51ba5c6767e8dfd1618`.
+
+Source aliases identify parents `2239..223C` and their four complete prepared
+catalogue models, adding 4,928 ROM bytes. Active selector records use native
+kinds and `passive=False`; ordinary tools and worn axe states are not additional
+imports. All official names share the existing provenance catalogue. Ordinary
+room drops retain the parent IDs. The complete model count is 28, but the actual
+umbrella catalogue still has 32 original plus 24 ready rows, with no unreachable
+golden entries added to completion counts. The installer and composer share the
+same readiness/dependency calculation and verify pending models and profile bits.
+
+The equipment module grows from 64 to 68 KiB through the generalized checked
+retired-sequence reservation. It verifies the actual live relocated sequence,
+its native header, all affected resource bounds, and the zero destination.
+Old addresses and both earlier guards remain. Four complete icons use 2,176 of
+4,080 available bytes at `804B3000`; the new final guard is `804B3FF0`. Old icon
+resources retain their exact addresses/data through recorded allocation order.
+The compiled reader preserves public entry addresses and validates complete
+aligned palette/texture bounds. The menu hook follows its relocated private
+implementation. Pool accounting remains 280,640 of 280,768 bytes.
+
+One sanitizer check and four focused cartridge/composition checks pass:
+
+```sh
+python3 -m unittest \
+  tests.test_v3_held_catalogue.HostTests.test_shared_icon_extension_bounds_and_active_selection \
+  tests.test_v3_held_catalogue.ToolParentTests -v
+```
+
+The initial invocation passes three checks and exposes two incorrect fixture
+expectations: inverse-parent metadata is not all zero, and private helper calls
+move within the fixed-address compiled reader. Those expectations are corrected;
+the two affected checks pass in 2.270 seconds. The ROM does not change. Coverage
+includes complete regeneration/source credits, icon data/bounds, old resource
+retention, guarded allocation, complete models, inactive pending choices,
+unchanged save profile, unrelated DMA resources, UPS reconstruction, all choices,
+exact V2-12 empty selection, and invalid pending-dependency rejection.
+
+The first silent native run at `build/smoke-v3-tool-parents-01/` passes **182
+records and 117 assertions**, SHA-256
+`6c507f5fe7234e55c6acd72fc8f5a5f0e07208401b7900b1da6f0a0d6fbcddc1`.
+It loads the actual catalogue/menu owners and complete equipment readers from
+the cartridge. All four tool names/prices, ownership/inverse aliases, active
+selectors, complete catalogue transfers/framing, and ten icon cases pass.
+Disabled/profile/wrapped handling, original categories, live register retention,
+stack/resource guards, state restoration, checkpoint reload, and clean exit pass.
+The fixture temporarily supplies pending profile/list data after checking that
+the real list excludes those tools; it also uses the established entry-animation
+stub and upper-memory call bridge. No ordinary acquisition, GPU appearance,
+save/reload, or hardware claim follows. No user save or audible output is used.
+Native harness work finishes within its 30-minute budget without a retry.
+
+The unserved export `build/v3-tool-parents-browser-01/` has 128 choices. The real
+browser worker reads both supplied games and matches offline empty/all/mixed/
+equipment profiles. Empty output is exact V2-12; all output is the ABI-136 ROM
+above. Cancellation, unknown choices, damaged plan rejection, no browser errors,
+local GET-only traffic, and server shutdown pass. Results at
+`build/check-v3-tool-parents-browser-01/results.json` have SHA-256
+`a224cf47bb362e1a1f75e826281bb5391011d9b64a321c4c8398efde5b5c2777`.
+The separate full-interface fixture is not rerun or relabelled as passing.
+
+Continue shared source-backed acquisition, reward demos, and wrapped presents.
+Do not enable golden choices merely because their resources/readers are ready.
+Format-2 saves retain their matching-or-larger profile requirement and must not
+be loaded in V2. Broad gameplay and hardware remain open. This batch makes
+implementation and verification progress; the full V3 objective is incomplete.
+
 ## Shared golden-tool inventory previews
 
 The explicit proposal is ABI 135 at

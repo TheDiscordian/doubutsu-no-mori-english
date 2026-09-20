@@ -85,7 +85,10 @@ def held_options(blob,report):
     if sha256(blob[start:start+equipment['bytes']])!=equipment['sha256']:
         raise ValueError('Changed complete parent readers')
     parents={r['item_id']:r for r in equipment['parent_readers']['rows']}
-    result={}
+    from v3_held_catalogue import parent_readiness
+    ready,pending=parent_readiness(equipment)
+    if enabled.get('pending',{})!=pending:raise ValueError('Changed pending parent dependencies')
+    result={};seen=set()
     from v3_import_storage import ITEMS
     for row in equipment['catalogue']['imports']:
         parent=parents[row['parent_item_id']];item=int(row['item_id'],16);index=row['runtime_index']
@@ -97,14 +100,17 @@ def held_options(blob,report):
                 sha256(blob[ITEMS+slot*32:ITEMS+(slot+1)*32])!=row['metadata_sha256'] or
                 sha256(blob[art:art+row['object_bytes']])!=row['object_sha256'] or
                 (parent['profile_byte'],parent['profile_mask'])!=(32+slot//8,1<<(slot&7)) or
-                not blob[0x20+parent['profile_byte']]&parent['profile_mask']):
+                bool(blob[0x20+parent['profile_byte']]&parent['profile_mask'])!=(parent['id'] in ready)):
             raise ValueError('Changed installed parent/catalogue selection binding')
         key=item_key(int(parent['item_id'],16))
-        if key in result or key!=parent['id']:raise ValueError('Duplicate or changed parent identity')
+        if key in seen or key!=parent['id']:raise ValueError('Duplicate or changed parent identity')
+        seen.add(key)
+        if key in pending:continue
         result[key]=dict(id=key,name=parent['name'],kind='equipment',item_id=parent['item_id'],
             dependencies=[],enable_offset=at+4,enable_bytes=4,enable_ram=int(row['profile_ram'],16)-4,
             display_item_id=row['item_id'],display_runtime_index=index)
-    if sorted(result)!=enabled['identities'] or len(result)!=enabled['profile_bits_enabled']:
+    if (sorted(result)!=enabled['identities'] or len(result)!=enabled['profile_bits_enabled']
+            or set(result)!=ready or seen!=ready|set(pending)):
         raise ValueError('Incomplete installed parent choices')
     return result
 

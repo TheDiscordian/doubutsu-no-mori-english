@@ -20,6 +20,10 @@ def held_previews(debug, rom_path, record):
         raise ValueError('Shared parent catalogue requires its checked cartridge/category')
     files,boot=by_vrom(rom),boot_proofs(rom);blob=files[BLOB].extract(rom)
     rows=category['imports'];parents={r['item_id']:r for r in equipment['parent_readers']['rows']}
+    pending=equipment.get('optional_selection',{}).get('pending',{})
+    if pending:
+        rows=[r for r in equipment['catalogue']['imports'] if parents[r['parent_item_id']]['id'] in pending]
+        if len(rows)!=len(pending):raise ValueError('Incomplete pending category fixture')
     bridge=None
     def check(label,address,want):
         actual=debug.read_memory(address,len(want));passed=actual==want
@@ -88,12 +92,28 @@ def held_previews(debug, rom_path, record):
             call(0x800B88EC,[parent])
             call(0x800BEFCC,[parent],expected=display if row.get('room_placement_uses_display') else parent)
             call(0x800BF10C,[display+3],expected=parent)
+            if pending:
+                selected_kind=next(r for r in equipment['player_actions']['equipment_selection']['rows'] if int(r['item_id'],16)==parent)
+                call(equipment['player_actions']['code']['symbols']['af_v3_player_selected_equipment'],
+                     [parent],expected=selected_kind['native_kind'])
+                call(equipment['player_actions']['code']['symbols']['af_v3_player_passive_equipment'],
+                     [selected_kind['native_kind']],expected=0)
+        if pending:
+            # The shipped catalogue deliberately excludes unfinished choices.
+            # Verify that first, then supply only temporary list/count data to
+            # exercise installed new models without enabling a release profile.
+            from v3_catalogue import UMBRELLA_COUNT
+            initialize();check('pending tools absent from real catalogue counts',page,bytes(2))
+            table=root+category['table_address']-RAM
+            debug.write_memory(table+64,b''.join(struct.pack('>H',r['catalogue_index']) for r in rows))
+            put(root+UMBRELLA_COUNT-RAM,32+len(rows))
         initialize()
         check('all collected parent entries',page,struct.pack('>H',len(rows)))
         check('actual donor category ordering',page+8,b''.join(bytes.fromhex(r['item_id']) for r in rows))
         check('partial category indicator',page+6,bytes(1))
         room_rows=[r for r in rows if r.get('room_placement_uses_display')]
         positions={0,len(rows)-1}
+        if pending:positions=set(range(len(rows)))
         if room_rows:
             positions.update(rows.index(r) for r in (min(room_rows,key=lambda r:r['object_bytes']),
                 max(room_rows,key=lambda r:r['object_bytes'])))
@@ -137,6 +157,7 @@ def held_previews(debug, rom_path, record):
         call(0x8009C040,[allocation])
     for address,value in saved.items():check('restored fixture state',address,value)
     return dict(native_parent_catalogue=True,category_rows=len(rows),complete_preview_models=len(positions),
+        temporary_pending_list=bool(pending),pending_choices_remain_disabled=bool(pending),
         gpu_rendered=False,ordinary_order_delivery_tested=False,saved_data_written=False,
         requires_checkpoint_restore=True)
 

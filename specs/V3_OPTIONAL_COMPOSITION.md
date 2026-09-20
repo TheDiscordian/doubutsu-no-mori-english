@@ -57,6 +57,15 @@ bit correspondence before offering a choice. A display ID cannot be requested
 as furniture. Disabled choices clear both the profile bit and representation
 enable word. Collection/name/price/action readers already use the parent bit.
 
+Installed but unfinished active tools share these complete source/model checks,
+but are excluded from choices by `parent_readiness`. Their report carries the
+explicit acquisition/reward-demo dependencies; their profile bits stay clear.
+The composer rejects missing or mismatched pending entries, duplicate identities,
+or a pending tool with an enabled bit. The browser plan derives only ready
+choices and the same filtered catalogue list. Installing artwork must not add
+unreachable items to completion counts. The explicit tool-parent proposal keeps
+128 experimental choices while storing four pending golden-tool parents.
+
 The umbrella list retains its 32 native entries, packs selected appended models
 in donor order, zeros unused slots, and updates the shared iteration/completion
 count. The browser generator consumes those same checked writes. Its Equipment

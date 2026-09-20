@@ -1259,8 +1259,13 @@ not make the complete handheld item selectable or playable.
 
 `--refresh-runtime --held-catalogue-art` also extends an already installed parent
 catalogue. `selection_records` carries explicit implemented source categories:
-23 for fans, 22 for pinwheels, and 21 for balloons. Old receipts without the field retain category
-23. Adding category 22 requires installed rig resources, actions, loop sound,
+23 for fans, 22 for pinwheels, and 21 for balloons. Active tool categories
+1/2/11/20 require all four golden aliases, installed previews, and shared input,
+motion, transition, capture, rod, and shovel consumers. Source aliases select
+the four new parents without treating ordinary tools or worn axe states as
+additional choices. Their selector records use `passive=False`.
+Old receipts without the field retain category 23. Adding category 22 requires
+installed rig resources, actions, loop sound,
 and animated inventory previews. Category 21 additionally requires complete held,
 reflected inventory, and animated room rigs. The complete source aliases must agree with
 every installed kind; missing variants, changed identities, occupied slots,
@@ -1297,10 +1302,14 @@ actual animated room forms. Collection always uses the source-proven display
 identity, with mapped native destinations kept separate from donor list indices.
 Only missing catalogue models are appended; installed complete room models are
 reused. Existing profiles, metadata, and selection bits stay intact. The native
-umbrella page has 32 original rows plus 24 selected-parent candidates in donor
-order. Conservative pool accounting is 280,640 of 280,768 reserved bytes,
-retaining the existing inventory-work increase. The 60-KiB equipment module and
-native banks do not grow.
+umbrella page has 32 original rows plus 24 implemented passive-parent candidates
+in donor order. Four complete golden-tool models occupy their canonical sparse
+slots but stay out of the page and completion count until acquisition/reward
+consumers are ready. `parent_readiness` supplies the same ready/pending sets to
+the installer and optional composer. Pending profile bits stay clear; every
+parent, including pending ones, still requires complete source/model bindings.
+Conservative pool accounting is 280,640 of 280,768 reserved bytes, retaining the
+existing inventory-work increase. Native model banks do not grow.
 
 Existing event code offers selected pinwheels at the donor's 680-Bell price.
 Parent metadata prices remain independent of that event price. Category stock
@@ -1379,6 +1388,23 @@ Original tools must not be duplicated as imports. Preserve existing ROMs/saves
 and both V2 patchers.
 
 ## Shared pocket icons
+
+The complete parent catalogue retains its 2,016-byte descriptor/texture region
+and 96-byte palette bank. Four distinct golden-tool icons use an additional
+2,176 bytes at `804B3000`, inside a 4-KiB module extension. The allocation order
+is recorded separately from source parent ordering so existing resource pointers
+stay fixed across regeneration. The shared converter preserves all palette and
+texture data; the runtime accepts only complete aligned resources within the
+original regions or the bounded 4,080-byte extension before its guard.
+
+`equipment_extension` verifies the old module/hash/footer, retired audio storage,
+actual live relocated sequence/header, zero destination bytes, other DMA/artwork
+ranges, and the furniture-pool boundary. The module is 68 KiB with its final
+guard at `804B3FF0`; the older guard at `804B2FF0` remains intact. Startup DMA and
+CRC cover the full new size. Public name/price/icon/collection entry addresses
+remain fixed; private helper calls may move when the shared reader grows.
+No saved field or selected-profile bit changes. See the
+[tool-parent checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-golden-tool-parent-category).
 
 `pocket_icons` consumes the installed parent records and complete donor
 `tool_tex_table$765`, including every palette/texture relocation and its

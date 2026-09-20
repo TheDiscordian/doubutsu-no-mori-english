@@ -73,6 +73,9 @@ def pocket_icons(debug, rom_path, record):
     proof=(root,loaded[:sections[0]])
     selection={r['item_id']:r for r in equipment['parent_readers']['rows']}
     rows=icons['rows'];first,second=rows[0],rows[-1]
+    pending=equipment.get('optional_selection',{}).get('pending',{})
+    pending_rows=[r for r in rows if r['id'] in pending]
+    if pending_rows:first,second=pending_rows[0],pending_rows[-1]
     def selected(row):
         profile=bytearray(saved[0x80460020])
         for p in selection.values():profile[p['profile_byte']]&=~p['profile_mask']
@@ -110,6 +113,10 @@ def pocket_icons(debug, rom_path, record):
             debug.command('z'+bp);debug.command('G'+before)
         cases=((first,first,0),(second,first,0),(second,second,0),(first,None,0),
                (first,None,1),(0x2200,None,0),(0x2223,None,0))
+        if pending_rows:
+            cases+=tuple((r,r,0) for r in pending_rows[1:-1])
+            retained=next(r for r in rows if r['id'] not in pending)
+            cases+=((retained,retained,0),)
         segments=debug.read_memory(0x801458A0,64)
         segment_bases=struct.unpack('>16I',segments)
         for row,enabled,wrapped in cases:

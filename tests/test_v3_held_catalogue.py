@@ -43,6 +43,10 @@ class HostTests(unittest.TestCase):
     def test_shared_palette_bank_bounds(self):
         self.sanitized('v3_held_items_test.c',defines=('-DAF_V3_POCKET_ICON_PALETTES=1',))
 
+    def test_shared_icon_extension_bounds_and_active_selection(self):
+        self.sanitized('v3_held_items_test.c',defines=(
+            '-DAF_V3_POCKET_ICON_PALETTES=1','-DAF_V3_POCKET_ICON_EXTENSION=1'))
+
 @unittest.skipUnless((OUTPUT/'build.json').is_file(),'Current held catalogue cartridge required')
 class CartridgeTests(unittest.TestCase):
     @classmethod
@@ -408,6 +412,143 @@ class RoomGameplayRepairTests(unittest.TestCase):
                 i=slot(int(row['item_id'],16))
                 self.assertEqual(int.from_bytes(blob[ROWS+i*80+4:ROWS+i*80+8],'big'),
                     int(composer.item_key(int(row['parent_item_id'],16)) in chosen))
+        finally:composer.BASE,composer.BASE_SHA,composer.REPORT_SHA,composer.ABI=pin
+
+
+TOOLS_OUTPUT=ROOT/os.environ.get('V3_TOOL_PARENT_BUILD','build/v3-shared-tool-parents-01')
+
+
+@unittest.skipUnless((TOOLS_OUTPUT/'build-lock.json').is_file(),'Current tool-parent proposal required')
+class ToolParentTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        from v3_furniture_pipeline import Source
+        cls.image,cls.report=inputs(TOOLS_OUTPUT/'build-lock.json');cls.base,cls.prior=inputs(TOOLS_OUTPUT/'base-lock.json')
+        cls.files,cls.before=by_vrom(cls.image),by_vrom(cls.base)
+        cls.blob=cls.files[BLOB].extract(cls.image);cls.old_blob=cls.before[BLOB].extract(cls.base)
+        cls.e=cls.report['equipment_resources'];cls.old=cls.prior['equipment_resources']
+        start=cls.e['blob_offset'];cls.module=cls.blob[start:start+cls.e['bytes']];cls.old_module=cls.old_blob[start:start+cls.old['bytes']]
+        cls.source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+            (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+        cls.native=(ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes()
+
+    def test_complete_parent_records_active_permissions_and_official_names(self):
+        from v3_handheld_items import selection_records,parent_records
+        from v3_held_collection import source_records
+        from v3_furniture_install import provenance_patch
+        from text_provenance import validate
+        _,selection=selection_records(self.source,self.e)
+        self.assertEqual(selection['categories'],[1,2,11,20,21,22,23])
+        self.assertEqual(json.loads(json.dumps(selection['rows'])),self.e['player_actions']['equipment_selection']['rows'])
+        _,parents=parent_records(self.source,self.e);_,collection=source_records(self.source,self.e)
+        self.assertEqual(parents['rows'],self.e['parent_readers']['rows']);self.assertEqual(len(parents['rows']),28)
+        self.assertEqual(collection['rows'],self.e['collection']['rows'])
+        old={r['item_id']:r for r in self.old['player_actions']['equipment_selection']['rows']}
+        added=[r for r in selection['rows'] if r['item_id'] not in old]
+        self.assertEqual({r['item_id'] for r in added},{'2239','223A','223B','223C'})
+        for row in selection['rows']:
+            if row['item_id'] in old:self.assertEqual(json.loads(json.dumps(row)),old[row['item_id']])
+            else:
+                self.assertFalse(row['passive']);self.assertFalse(row['room_placement_uses_display'])
+                self.assertFalse(self.blob[0x20+row['profile_byte']]&row['profile_mask'])
+        for row in collection['rows']:
+            if row['item_id'] not in old:
+                self.assertEqual(row['room_drop_item_id'],row['item_id'])
+                self.assertEqual(row['catalogue']['category'],'umbrella')
+                self.assertIn(row['catalogue']['position'],range(56,60))
+        self.assertEqual(provenance_patch(parents['rows']),'')
+        catalogue=json.loads((ROOT/'translations/provenance.json').read_bytes());validate(catalogue)
+        for row in added:
+            name=next(r for r in parents['rows'] if r['item_id']==row['item_id'])
+            credit=next(r for r in catalogue['entries'] if r['id']==row['id']+'/name')['locales']['en']
+            self.assertEqual(credit['credit'],'official');self.assertEqual(credit['source']['symbol'],'itemName_tool')
+            self.assertEqual(credit['source']['index'],int(row['item_id'],16)-0x2200)
+            self.assertEqual(credit['text'],name['name'])
+        for dependency in ('tool_previews','rod_effects'):
+            broken=copy.deepcopy(self.e)
+            del broken['inventory_preview' if dependency=='tool_previews' else 'player_actions'][dependency]
+            with self.assertRaises(ValueError):selection_records(self.source,broken)
+
+    def test_complete_icon_extension_and_unchanged_old_resources(self):
+        from v3_handheld_items import pocket_icons
+        data,receipt=pocket_icons(self.source,self.e,0x804A6800,2048)
+        for key,value in json.loads(json.dumps(receipt)).items():self.assertEqual(value,self.e['pocket_icons'][key])
+        self.assertEqual(self.module[0x3800:0x3800+len(data)],data)
+        ext=receipt['extension_bank'];self.assertEqual((ext['ram'],ext['bytes'],ext['capacity']),(0x804B3000,2176,4080))
+        self.assertEqual(self.module[0x10000:0x10FF0],bytes.fromhex(ext['data_hex']).ljust(4080,b'\0'))
+        for old in self.old['pocket_icons']['resources']:
+            self.assertIn(old,receipt['resources'])
+        for r in receipt['resources']:
+            offset=r['ram']-0x804A3000
+            self.assertEqual(sha256(self.module[offset:offset+r['bytes']]),r['sha256'])
+        self.assertEqual(self.e['pocket_icons']['palette_bank'],self.old['pocket_icons']['palette_bank'])
+        for symbol in ('af_v3_held_item_name','af_v3_held_item_price','af_v3_held_item_icon','af_v3_held_item_collection'):
+            self.assertEqual(self.e['parent_readers']['code']['symbols'][symbol],self.old['parent_readers']['code']['symbols'][symbol])
+        old_code=self.old['parent_readers']['code'];new_code=self.e['parent_readers']['code']
+        # Public addresses stay fixed; calls to the shared private find helper
+        # legitimately change when the icon function grows before that helper.
+        self.assertEqual(new_code['bytes'],old_code['bytes'])
+        self.assertEqual(self.module[0x3000:0x3000+new_code['bytes']],(TOOLS_OUTPUT/'held_items/code.bin').read_bytes())
+        with self.assertRaises(ValueError):pocket_icons(self.source,self.e,0x804A6800,2048,extension_bank={'ram':0x804B2800,'capacity':4080})
+
+    def test_all_catalogue_models_installed_without_enabling_pending_tools(self):
+        from v3_furniture_install import profile
+        prepared,_=adapter.assets(self.source,self.e,ROOT/self.e['catalogue']['evidence']['prepared_directory'],self.blob)
+        self.assertEqual(len(prepared),28)
+        installed={r['parent_item_id']:r for r in self.e['catalogue']['imports']}
+        old={r['parent_item_id']:r for r in self.old['catalogue']['imports']}
+        for parent,row,asset in prepared:
+            record=installed[parent['item_id']];at=int(record['object_vrom'],16)-BLOB
+            self.assertEqual(self.blob[at:at+len(asset)],asset)
+            i=slot(int(row['item_id'],16));native=profile(row,BLOB+at)
+            self.assertEqual(self.blob[ROWS+i*80:ROWS+(i+1)*80],
+                struct.pack('>HHI',parent['runtime_index'],int(row['item_id'],16),1)+native+struct.pack('>I',1))
+            if parent['item_id'] in old:self.assertEqual(record,old[parent['item_id']])
+            else:
+                self.assertFalse(record.get('room_placement_uses_display',False))
+                self.assertEqual(self.blob[ITEMS+i*32+28:ITEMS+i*32+32],bytes.fromhex(parent['item_id'])+bytes(2))
+        self.assertEqual(self.report['catalogue']['handheld']['imports'],self.prior['catalogue']['handheld']['imports'])
+        self.assertEqual(self.report['catalogue']['handheld']['total_rows'],56)
+        self.assertEqual(self.report['display_aliases']['rows'],self.prior['display_aliases']['rows'])
+        self.assertEqual(self.e['optional_selection']['identities'],self.old['optional_selection']['identities'])
+        self.assertEqual(len(self.e['optional_selection']['pending']),4)
+        self.assertEqual(self.report['save_runtime'],self.prior['save_runtime'])
+
+    def test_guarded_storage_other_resources_and_optional_composition(self):
+        from aflib import CODE_VROM
+        from v3_equipment_runtime import GUARD
+        from v3_player_actions import equipment_extension
+        import v3_optional_composition as composer
+        self.assertEqual(self.e['bytes'],69632)
+        self.assertEqual(self.module[0xFFF0:0x10000],struct.pack('>4I',*(GUARD,)*4))
+        self.assertEqual(self.module[-16:],struct.pack('>4I',*(GUARD,)*4))
+        expected=bytearray(self.module[:len(self.old_module)])
+        for first,last in ((0x3000,0x37A0),(0x3800,0x4000),(0x5500,0x5D40)):
+            expected[first:last]=self.old_module[first:last]
+        self.assertEqual(expected,self.old_module)
+        core=self.before[CODE_VROM].extract(self.base)
+        receipt=equipment_extension(self.base,self.prior,self.old_blob,core,65536,69632)
+        self.assertEqual(receipt,self.e['pocket_icons']['extension_reservation'])
+        broken=bytearray(self.old_blob);broken[receipt['first']]=1
+        with self.assertRaises(ValueError):equipment_extension(self.base,self.prior,broken,core,65536,69632)
+        for key in ('inventory_preview','records','player_motion','held_rig_actions','ground_categories','item_categories','event_acquisition'):
+            self.assertEqual(self.e[key],self.old[key])
+        for v,row in self.before.items():
+            if v not in (BLOB,MODULE,0x19D40,0x7749C0,catalogue.VROM,catalogue.RELOC):
+                self.assertEqual(row.extract(self.base),self.files[v].extract(self.image),hex(v))
+        self.assertEqual(apply_ups(self.native,(TOOLS_OUTPUT/'asset-loader.ups').read_bytes()),self.image)
+        self.assertIn('-DAF_V3_EQUIPMENT_BYTES=0x11000u',self.report['startup']['flags'])
+        pin=composer.BASE,composer.BASE_SHA,composer.REPORT_SHA,composer.ABI
+        try:
+            composer.use_build_lock(TOOLS_OUTPUT/'build-lock.json');options=composer.catalogue(self.image,self.report)
+            self.assertEqual(len(options),128)
+            for key in self.e['optional_selection']['pending']:
+                self.assertNotIn(key,options)
+                with self.assertRaises(ValueError):composer.resolve(options,[key])
+            self.assertEqual(composer.compose(self.image,self.report,options,composer.resolve(options,list(options)))[0],self.image)
+            self.assertEqual(sha256(composer.compose(self.image,self.report,options,composer.resolve(options,[]))[0]),self.report['translation_baseline']['sha256'])
+            broken=copy.deepcopy(self.report);broken['equipment_resources']['optional_selection']['pending'].popitem()
+            with self.assertRaises(ValueError):composer.catalogue(self.image,broken)
         finally:composer.BASE,composer.BASE_SHA,composer.REPORT_SHA,composer.ABI=pin
 
 

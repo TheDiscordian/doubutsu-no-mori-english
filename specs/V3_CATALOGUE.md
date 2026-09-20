@@ -2,6 +2,13 @@
 
 ## Shared handheld representations
 
+The complete equipment catalogue contains 28 prepared parent representations.
+The native page includes its 32 original entries and 24 implemented passive
+imports; four golden-tool models are installed but excluded until their
+acquisition and reward consumers exist. Their names/prices, ownership aliases,
+and source ordering are ready without enabling their profile bits. Both
+installation and composition use the same ready/pending classification.
+
 The shared runtime installer's `--held-catalogue-art <prepared-directory>` option
 consumes installed parent/collection records and complete prepared display models.
 It uses `v3_held_catalogue` as a category adapter, not an item-specific installer.
