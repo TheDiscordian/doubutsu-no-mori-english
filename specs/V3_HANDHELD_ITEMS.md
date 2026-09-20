@@ -1361,12 +1361,51 @@ The native acquisition gap includes engine content, not only item substitutions:
   and `golden_items_collected` celebration state are separate from item catalogue
   ownership. Preserve that distinction when extending persistent reward state.
 
-The complete reward motions and shared facial sequences are installed as
-described below. Next implement the shared celebration callbacks and their text/
-fanfare dependencies, then connect the event actors and acquisition conditions.
+The complete reward motions, shared facial sequences, and official message
+phase are installed as described below. Next implement the shared celebration
+callbacks and fanfare dependencies, then connect the event actors and acquisition conditions.
 Use the shared category installer and complete source records. Keep all four
 choices disabled until their full paths are connected; do not substitute a
 shop purchase, arbitrary letter, or unrelated NPC for a missing donor event.
+
+#### Shared reward messages
+
+The common player-action installer imports complete donor messages `306D..3070`
+into additive native records `2EEB..2EEE`. Axe, net, rod, and shovel map in order
+to `2EED`, `2EEB`, `2EEC`, and `2EEE`. The type relation comes from the complete
+200-byte source constructor at `.text:19861C`, SHA-256
+`cd0326d46ea06262ae35f80a6752ae8a1c38de14879fd37f840b51efba211492`.
+Every official encoded record is retained intact, including page boundaries,
+colours, delays, and terminator. Each has its source hash and installed locator
+in `translations/provenance.json`; no second translation catalogue is created.
+The shared text-region repacker retains all 12,011 earlier messages and all
+choices. Both native reader bounds become 12,015. The installer rejects unknown
+commands, buffer overflow, source changes, and conflicting or missing credits.
+
+`player_reward_messages.c` implements the source message controller from the
+complete 272-byte function at `.text:1986E4`, SHA-256
+`93d7466af8f92d5c137966d6d672656bb0e7e678da916a9c65061b053a5b23c8`.
+The twelve-byte transient reward state uses the native player's main union at
+`D10`; this is not saved data. The source's 42-update delay becomes 21 native
+updates at twice the timer increment, matching the checked native/donor animation
+speeds of 1.0/0.5. It requests report type nine until accepted, retains the
+continuation lock until animation completion, waits for the report to close,
+then reports completion. The begin callback uses item camera five, the source
+window colour, hidden speaker name, enabled listening, and cleared selection.
+Null actors and invalid types are rejected without writes or engine calls.
+
+The 604-byte callback group at `804B2280` fits between the existing inventory
+helper reservation ending at `804B2280` and bobber artwork at `804B2800`.
+Neither neighbouring resource, the previous-dig state at `804B2FD0`, the full
+72-KiB module allocation, nor the import blob grows. Source/native API bindings,
+complete module checks, and zero-space checks guard installation. Later stages
+retain already installed text without reapplying an older resource image.
+
+These callbacks are not yet registered as complete reward actions. Source
+setup/main/settlement, fanfares, persistent flags, and acquisition remain required.
+The focused native fixture temporarily uses an unused existing dispatcher slot
+and restores it; that is component verification, not ordinary acquisition.
+See the [checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-reward-messages).
 
 #### Shared reward motions and player faces
 

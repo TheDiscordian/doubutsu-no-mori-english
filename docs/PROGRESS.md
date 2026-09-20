@@ -18,13 +18,28 @@ served patchers retain their existing builds.
 
 ## Active development
 
-The current explicit ABI-139 proposal is
-`build/v3-shared-reward-motion-03/build-lock.json`. All eight balloons are
+The current explicit ABI-140 proposal is
+`build/v3-shared-reward-messages-02/build-lock.json`. All eight balloons are
 connected through the shared parent-category installer: official names/prices,
 complete pocket icons, held/inventory animation, source acquisition records,
 collection/catalogue, animated room profiles, indoor conversion, and inverse
 pickup. The local composer has 128 experimental choices, including 24 equipment
 parents. These are not a public or hardware-ready handoff.
+
+The shared golden-tool message phase imports all four complete official messages
+and preserves their wording, pages, colours, and commands. A 604-byte callback
+group fits unused space between the inventory-bobber helper and artwork. Native
+timing retains the donor delay; the continuation lock remains until animation
+completion, and the controller waits for the report to close. All four source
+credits are in the single provenance catalogue. No save, profile, import-blob,
+or resident allocation grows. One sanitizer and four cartridge/composition
+checks pass. The first silent native run passes 115 records and 98 assertions,
+including full message loads, phase transitions, guards, unchanged saved data,
+restored checkpoint, and clean exit. The fixture temporarily routes an unused
+callback slot; ordinary reward events are not yet connected. Next implement
+celebration setup/main/settlement, fanfares, persistent reward flags, and the
+source acquisition events. The four golden tools remain disabled. See the
+[message checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-reward-messages).
 
 The shared player-animation category includes both complete golden-tool reward
 motions and source eye/mouth timelines for all installed player motions. The

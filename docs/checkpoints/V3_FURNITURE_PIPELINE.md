@@ -1,5 +1,78 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared reward messages
+
+The ABI-140 proposal is `build/v3-shared-reward-messages-02/build-lock.json`.
+It installs the shared golden-tool message phase and all four complete official
+donor messages through the existing category installer and text-region repacker.
+All 128 experimental choices, format-2 saves, resident allocations, previous
+messages/choices, and artwork remain. Golden tools are still pending/disabled.
+The main ABI-109 lock and both served patchers remain unchanged.
+
+- ROM SHA-256:
+  `d392a1b6b8c39efa2ce33d5ac62c901ae6f36d4507c4378794f54c78699d7a49`.
+- Report SHA-256:
+  `ab6ca360e739f9231e48fd8ee2ea1cc126f7d0aa18759292a0f8695979137b0d`.
+- UPS SHA-256:
+  `78ca97cc68312668312c9741648f637cebc7980dff25d53e73e17ac4c5556c12`.
+
+Complete messages `306D..3070` become `2EEB..2EEE`, retaining all encoded wording,
+pages, colours, delays, and terminators. The single provenance catalogue credits
+each official source. The 604-byte MIPS group at `804B2280` uses existing zero
+space before the bobber artwork at `804B2800`, without enlarging the module or
+import blob. The first build correctly rejected a proposed `804B2180` placement:
+the inventory-bobber helper already occupies that address. The corrected layout
+respects both code and artwork reservations; no existing build was overwritten.
+
+One sanitizer and four cartridge/composition checks pass:
+
+```sh
+python3 -m unittest tests.test_v3_player_actions.RewardMessageHostTests \
+  tests.test_v3_player_actions.RewardMessageTests -v
+```
+
+They cover all four types, bounded reset, invalid/null inputs, the source delay,
+retry-until-accepted requests, unfinished/finished animation lock behaviour,
+report-close completion, actor guards, complete official text retention, one
+source catalogue, changed native/source rejection, module/core/resource bounds,
+unchanged saves, future text retention, original-ROM UPS reconstruction, all
+128 choices, and exact empty-selection V2-12. All five pass on their first run.
+
+The first silent native run `build/smoke-v3-reward-messages-01/` passes **115
+records and 98 assertions**, results SHA-256
+`3a30e9ab8fe82884abf21a562bd38fea63e3bf392bb77f6f92bfde4abdf3ff2f`.
+It validates the complete cartridge-loaded module and actual loaded player code,
+then temporarily selects the new callbacks in an unused native table slot.
+No executable code is uploaded. Four actual cartridge message loads, all begin
+callbacks, native reset, all 21 delay updates, real report requests, accepted/
+unlock/wait/complete phases, count rejection, and guards pass. The dispatcher
+leaves its second argument equal to one: native reset uses the net type, and
+native update uses finished animation; the host sanitizer covers other types
+and unfinished animation. Report acceptance/closure is fixture state, not a
+normal complete reward event.
+
+The run restores the callback slot, full demo/window state, and emulator
+checkpoint, retains all four private-player records and saved V3 state, resumes
+with zero faults, and exits cleanly. It uses isolated blank saves and disabled
+audio. No setup retry is needed; fixture work is within the 30-minute limit.
+
+```sh
+python3 tools/emulator_smoke.py \
+  --rom build/v3-shared-reward-messages-02/animal-forest-v3-asset-loader.z64 \
+  --output build/smoke-v3-reward-messages-01 \
+  --scenario tests/v3-player-reward-scenario.json \
+  --xvfb /home/discordian/Games/OpenRSC/headless/vendor/usr/bin/Xvfb \
+  --seconds 180 --expansion-pak --no-initial-screenshot
+```
+
+Full reward setup/main/settlement, fanfares, persistent reward flags, and actual
+scene/NPC/tree acquisition remain unfinished. GPU appearance, ordinary gameplay,
+and original hardware are not established by these checks. Browser code is
+unchanged; the unserved ABI-137 worker evidence is retained, not called a fresh
+ABI-140 browser test. Imported saves require matching/equal-or-larger profiles
+and must not load in V2. Continue from this explicit proposal without replaying
+the completed message, motion, or facial checks.
+
 ## Shared reward motions and player faces
 
 The ABI-139 proposal is `build/v3-shared-reward-motion-03/build-lock.json`.

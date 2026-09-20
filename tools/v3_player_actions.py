@@ -86,6 +86,8 @@ SOURCES+=('overlays/v3/held_presents.c','overlays/v3/held_presents.S',
           'overlays/v3/item_categories.ld','overlays/v3/held_present_names.c',
           'overlays/v3/held_present_names.S','overlays/v3/held_present_names.ld')
 SOURCES+=('tools/v3_equipment_runtime.py','overlays/v3/player_faces.c','overlays/v3/player_faces.ld')
+SOURCES+=('tools/v3_event_text.py','tools/v3_camper_text.py',
+          'overlays/v3/player_reward_messages.c','overlays/v3/player_reward_messages.ld')
 
 SELECTION_OFFSET=0x5500
 PARENT_CODE_OFFSET,PARENT_TABLE_OFFSET=0x3000,0x57F0
@@ -95,6 +97,75 @@ RIG_STATE_OFFSET,RIG_STATE_BYTES,RIG_PLAYER_SIZE=0x12D8,44,0x1310
 BALLOON_MODULE_SIZE,BALLOON_STATE_OFFSET,BALLOON_STATE_BYTES=0xF000,0x1370,48
 TOOL_MOTION_OFFSET=0x2A50
 EFFECTS_OFFSET,EFFECTS_STATE_OFFSET,EFFECTS_MODULE_SIZE=0xF000,0xFFD0,0x10000
+REWARD_MESSAGE_OFFSET,REWARD_MESSAGE_END=0xF280,0xF800
+
+
+def reward_message_bindings(source,core,original,owner):
+    """Bind the complete message phase and unchanged native engine functions."""
+    raw,controller=source.function(0x1986E4)
+    if (len(raw)!=272 or sha256(raw)!='93d7466af8f92d5c137966d6d672656bb0e7e678da916a9c65061b053a5b23c8'
+            or controller['symbol']!='Player_actor_MessageControl_Demo_get_golden_item'):
+        raise ValueError('Changed complete reward message controller')
+    boundaries=sorted(int(a,16) for a in re.findall(r'= 0x([0-9A-Fa-f]+); // type:func',
+        (ROOT/'upstream/af/linker_scripts/jp/symbol_addrs_code.txt').read_text()))
+    native=by_vrom(original)[CODE_VROM].extract(original)
+    code=(ROOT/'overlays/v3/player_reward_messages.c').read_text();bindings=[]
+    for entry in sorted({int(a,16) for a in re.findall(r'FN\(0x([0-9A-F]+)u,',code)}):
+        end=next(a for a in boundaries if a>entry);first,last=entry-CODE_RAM,end-CODE_RAM
+        if not core[first:last] or core[first:last]!=native[first:last]:
+            raise ValueError(f'Changed native reward-message API {entry:08X}')
+        bindings.append(dict(entry=entry,end=end,bytes=last-first,sha256=sha256(core[first:last])))
+    rodata=source.sections[4][0]
+    if (source.rel[rodata+23256:rodata+23260]!=struct.pack('>f',0.5)
+            or u32(owner,0x808C1174-PLAYER_RAM)!=0x3C013F80
+            or u32(owner,0x808C1180-PLAYER_RAM)!=0x44814000
+            or u32(owner,0x808C11AC-PLAYER_RAM)!=0xE7A80018):
+        raise ValueError('Changed donor/native message timing binding')
+    return dict(source_controller=controller,native_functions=bindings,state_offset=0xD10,state_bytes=12,
+        timing=dict(donor_animation_speed=0.5,native_animation_speed=1.0,
+            donor_delay_updates=42,native_delay_updates=21,native_timer_step=2.0,
+            donor_wait_speed_constant=23256,native_wait_initializer=0x808C1118),
+        report_demo=9,item_camera=5,continue_lock_offset=0x2D0)
+
+
+def refresh_reward_messages(base,prior,blob,core,original,output):
+    from v3_event_text import prepare_rewards,patch_bounds,REWARD_FIRST
+    old=prior['equipment_resources'];start=old['blob_offset']
+    module=bytearray(blob[start:start+old['bytes']]);at=REWARD_MESSAGE_OFFSET;end=REWARD_MESSAGE_END
+    shovel=old['player_actions']['shovel_effects']
+    previews=old['inventory_preview']['tool_previews']
+    if (old['player_actions'].get('reward_messages') or not old['player_motion'].get('reward_motion')
+            or len(module)!=0x12000 or sha256(module)!=old['sha256']
+            or shovel['code']['bytes']+EFFECTS_OFFSET>previews['code_offset']
+            or previews['code_offset']+previews['code']['bytes']>at
+            or previews['bobber']['module_offset']!=end or any(module[at:end])):
+        raise ValueError('Reward messages require unused checked action storage')
+    source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+                  (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    bindings=reward_message_bindings(source,core,original,by_vrom(base)[PLAYER_VROM].extract(base))
+    text=prepare_rewards(base,output,source)
+    if text['provenance_missing']:raise ValueError('Reward messages need single-catalogue source credits')
+    code,compiled=compile_part('player_reward_messages',output/'player_reward_messages',
+        defines=(f'AF_V3_REWARD_MESSAGE_FIRST={REWARD_FIRST}',))
+    if len(code)>end-at:raise ValueError('Reward messages overlap the inventory bobber')
+    module[at:at+len(code)]=code
+    bounds=patch_bounds(core,REWARD_FIRST,len(text['rows']))
+    report=copy.deepcopy(old)
+    report['player_actions']['reward_messages']=dict(code=compiled,code_offset=at,text=text,
+        bounds=bounds,bindings=bindings,action_callbacks_installed=False,ordinary_gameplay_tested=False)
+    report.update(sha256=sha256(module),crc32=zlib.crc32(module),additional_resident_bytes=0)
+    blob[start:start+len(module)]=module
+    return report,{}
+
+
+def finish(image,base,prior,output,report):
+    """Install newly prepared text once; later action stages retain its resources."""
+    previous=prior['equipment_resources']['player_actions'].get('reward_messages')
+    current=report['player_actions'].get('reward_messages')
+    if current and not previous:
+        from v3_event_text import install as install_text
+        return install_text(image,base,output,current['text'])
+    return image
 
 
 def equipment_extension(base,prior,blob,core,previous_size,new_size):
@@ -1649,6 +1720,8 @@ def expanded_tables(source,owner,reloc,*,categories=CATEGORIES,native_count=NATI
 
 def install(base,prior,blob,core,original,output):
     old=prior.get('equipment_resources',{})
+    if old.get('player_motion',{}).get('reward_motion') and not old['player_actions'].get('reward_messages'):
+        return refresh_reward_messages(base,prior,blob,core,original,output)
     if old.get('wrapped_presents',{}).get('name_readers') and not old['player_motion'].get('reward_motion'):
         from v3_equipment_runtime import install_reward_motion
         return install_reward_motion(base,prior,blob,core,original,output)

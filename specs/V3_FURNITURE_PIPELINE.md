@@ -261,6 +261,14 @@ all earlier code. Golden effects and the donor's separate balloon-release
 behaviour remain explicit dependencies; see
 [tool recovery](V3_HANDHELD_ITEMS.md#shared-net-transitions-and-tool-recovery).
 
+The same route installs complete reward motions and shared facial timelines,
+then the source-backed reward-message phase and all four official messages.
+The text adapter extends the checked native bank and source catalogue through
+the existing text-region repacker, without consuming the bounded import blob.
+Later refreshes preserve those resources. Installing these components does not
+register incomplete reward actions or enable golden-tool choices. See
+[reward messages](V3_HANDHELD_ITEMS.md#shared-reward-messages).
+
 `--category` selects a discovered shared category without maintaining an item
 list. `convert --assets-only` prepares complete artwork while retaining missing
 metadata/gameplay/acquisition reasons. It produces a distinct **prepared-assets**

@@ -2,12 +2,25 @@
 
 ## Active: V3 optional GameCube imports
 
-The current explicit proposal is ABI 139,
-`build/v3-shared-reward-motion-03/build-lock.json`. All eight balloons are
+The current explicit proposal is ABI 140,
+`build/v3-shared-reward-messages-02/build-lock.json`. All eight balloons are
 connected through shared source-derived parent records, room profiles, indoor
 conversion/pickup, collection/catalogue, complete icons, and optional selection.
 There are 128 experimental choices, with 24 equipment parents. Neither served
 V2 patcher nor the main lock changes.
+
+The shared reward-message phase and four complete official messages are
+installed and source-credited. One sanitizer and four cartridge/composition
+checks pass; the first silent native check passes 115 records and 98 assertions.
+It uses a temporary callback-table slot, actual native message loads and report
+requests, delay/lock/completion checks, retained saved data, restored state, and
+clean exit. Reuse this evidence; ordinary reward events are not connected.
+Next integrate the shared celebration setup/main/settlement, source fanfares,
+and separate persistent reward flags, then the source scene/NPC/tree acquisition
+events. The 604-byte message group occupies `804B2280..804B24DC`; the bobber
+helper at `804B2180` and artwork beginning `804B2800` must remain intact.
+Do not enable the four golden-tool choices until their full paths work. See the
+[checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-reward-messages).
 
 Both complete reward motions and the shared eye/mouth timeline reader are
 installed. Existing motion resources, 3,848-byte player banks, the 72-KiB module,
@@ -16,7 +29,7 @@ pass; the first silent native run passes 165 records and 123 assertions, includi
 full transfers, 30 native facial frames, bounded writes, segment restoration,
 guards, restored checkpoint, and clean exit. Reuse this evidence; skeletal
 playback and ordinary reward events remain unverified. Next implement shared
-celebration setup/main/settlement, official dialogue and fanfares, and persistent
+celebration setup/main/settlement, fanfares, and persistent
 reward flags before the event actors and acquisition conditions. Do not enable
 the four golden tools based on installed motions. See the
 [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-reward-motions-and-player-faces).
@@ -136,7 +149,7 @@ the axe uses the perfect-town reward, and the shovel uses the gold-tree route.
 The native tree-drop tables stop at thirteen rows and have no golden-shovel row;
 the native actor list lacks the donor's gift-event actors. Header definitions
 alone do not prove those systems exist. The complete animation/facial resources
-are installed; implement shared celebration callbacks, dialogue, fanfares, and
+are installed, as is their message phase; implement shared celebration callbacks, fanfares, and
 then the required scene/NPC/tree support, using the
 [native-gap audit](../specs/V3_HANDHELD_ITEMS.md#golden-tool-acquisition-and-wrapped-identities).
 Keep source conditions,

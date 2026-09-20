@@ -1561,6 +1561,7 @@ def tool_controls(debug,rom_path,record,*,transitions=False,capture=False,rod=Fa
 
 
 def exercise(debug, rom_path, record, *, section='automatic_furniture'):
+    if section=='reward_messages':return reward_messages(debug,rom_path,record)
     if section=='reward_motion':return reward_motion(debug,rom_path,record)
     if section=='held_names':return held_names(debug,rom_path,record)
     if section=='shovel_effects':return tool_controls(debug,rom_path,record,shovel=True)
@@ -2623,6 +2624,120 @@ def original_equipment_kinds(original):
         result.append(kind)
     if sorted(result)!=list(range(36)):raise ValueError('Original equipment switch is incomplete')
     return result
+
+
+def reward_messages(debug,rom_path,record):
+    """Run cartridge message callbacks through the existing native table dispatcher."""
+    from aflib import CODE_RAM,CODE_VROM
+    from textbanks import Bank
+    from v3_event_text import MESSAGE,TABLE
+    import v3_equipment_runtime as equipment
+    path=Path(rom_path);image=path.read_bytes();report=json.loads((path.parent/'build.json').read_bytes())
+    if sha256(image)!=report['output_sha256']:raise ValueError('Changed reward-message cartridge')
+    resources=report['equipment_resources'];actions=resources['player_actions'];receipt=actions['reward_messages']
+    files=by_vrom(image);blob=files[runtime.BLOB].extract(image);core=files[CODE_VROM].extract(image)
+    messages=Bank('message',0,0,files[MESSAGE].extract(image),files[TABLE].extract(image)).entries()
+    boot=boot_proofs(image);assertions=0
+    def check(label,at,want):
+        nonlocal assertions
+        actual=debug.read_memory(at,len(want));passed=actual==want
+        record(dict(reward_message_check=label,address=f'{at:08X}',bytes=len(want),
+            assertion='passed' if passed else 'failed',observed_sha256=sha256(actual),expected_sha256=sha256(want)))
+        if not passed:raise ValueError('Reward message mismatch: '+label)
+        assertions+=1
+    def call(at,args=(),want=None,proof=None):
+        nonlocal assertions
+        result=debug.call(f'{at:08X}',list(args),return_address=MODULE_RAM+0x6480,verified_code=proof or boot.get(at))
+        if want is not None:
+            result['assertion']='passed' if result['return_value']==want else 'failed';assertions+=1
+        record(result)
+        if want is not None and result['return_value']!=want:raise ValueError(f'Reward message call {at:08X} mismatch')
+        return result['return_value']
+    def put(at,*words):debug.write_memory(at,struct.pack('>'+str(len(words))+'I',*words))
+    at=resources['blob_offset'];module=blob[at:at+resources['bytes']]
+    check('complete installed module',equipment.RAM,module)
+    check('native demo pointer',0x80104A70,struct.pack('>I',0x80139C40))
+    window=call(0x8009D1F0);demo=0x80139C40
+    if window!=0x80142410:raise ValueError('Changed reward message window')
+    saved={address:debug.read_memory(address,size) for address,size in
+        ((demo,0x330),(window,0x330),(0x8046C000,864),(0x80126EC0,4*0xBD0))}
+    constructor=int.from_bytes(debug.read_memory(0x80143900,4),'big')
+    owner=constructor-(0x808DD748-equipment.PLAYER_RAM)
+    data=files[equipment.PLAYER_VROM].extract(image);rel=files[equipment.PLAYER_RELOC].extract(image)
+    if owner&15 or not MODULE_RAM+0x8000<=owner<=0x80400000-len(data):
+        raise ValueError('Reward messages need the actual loaded player owner')
+    sections=struct.unpack_from('>5I',rel)
+    expected=relocate_verified_data(SimpleNamespace(ram=equipment.PLAYER_RAM,resident_bytes=len(data),sections=sections),data,rel,owner)
+    check('complete actual loaded player code',owner,expected[:sections[0]])
+    dispatch=next(r for r in actions['tables'] if r['native_entry']==0x808BE620)
+    slot=dispatch['ram']+118*4;original_slot=debug.read_memory(slot,4)
+    if original_slot!=bytes(4):raise ValueError('Reward fixture requires a disabled action slot')
+    first,last=dispatch['native_entry']-equipment.PLAYER_RAM,dispatch['native_end']-equipment.PLAYER_RAM
+    proof=(owner+first,expected[first:last])
+    size=0x1C00;allocation=call(0x8009BFC0,[size]);actor=allocation+16;message=allocation+0x1500
+    if allocation&15 or not MODULE_RAM+0x8000<=allocation<=0x80400000-size:
+        raise ValueError('Reward-message allocation outside native heap')
+    edge=b'V3RM'*4;guards=(allocation,actor+0x1400,message-16,message+0x410,allocation+size-16)
+    for address in guards:debug.write_memory(address,edge)
+    def routine(name,want=None):
+        # This existing one-argument dispatcher leaves a1=1 for a valid index.
+        # It exercises reset(type=net) and update(animation_ended=true); host
+        # checks cover arbitrary second arguments and the unfinished animation.
+        put(slot,receipt['code']['symbols']['af_v3_reward_message_'+name])
+        return call(owner+first,[actor],want,proof)
+    initial=bytearray(b'\xA5'*0x1400);struct.pack_into('>I',initial,0xCF0,118)
+    try:
+        for kind,number in enumerate(receipt['text']['type_messages']):
+            value=bytearray(initial);struct.pack_into('>f2I',value,0xD10,42.0,0,kind)
+            debug.write_memory(actor,value);demo_value=bytearray(0x330)
+            struct.pack_into('>2I',demo_value,0xE0,actor,9);debug.write_memory(demo,demo_value)
+            debug.write_memory(window,saved[window]);routine('begin')
+            for offset,v in ((0xC,1),(0x2F8,5),(0x300,number),(0x30C,0)):
+                struct.pack_into('>I',demo_value,offset,v)
+            demo_value[0x318:0x31C]=bytes((185,245,80,255))
+            check('official message and demo settings',demo,demo_value)
+            window_value=bytearray(saved[window]);struct.pack_into('>I',window_value,0x2D0,1)
+            struct.pack_into('>I',window_value,0x230,0xFFFFFFFF)
+            check('native continue lock and cleared selection',window,window_value)
+            check('begin retains complete actor',actor,value)
+            debug.write_memory(message,b'\xA5'*0x410)
+            call(0x8009E558,[message,number,0],1)
+            check('complete actual cartridge message load',message,
+                struct.pack('>4I',1,number,len(messages[number]),0)+messages[number])
+        debug.write_memory(actor,initial);debug.write_memory(demo,bytes(0x330));routine('reset',1)
+        value=bytearray(initial);struct.pack_into('>f2I',value,0xD10,0.0,0,1)
+        check('native bounded reset',actor,value)
+        for frame in range(21):
+            routine('update',0);struct.pack_into('>f',value,0xD10,(frame+1)*2.0)
+            check('native source-equivalent delay',actor,value)
+        check('delay does not request a demo',demo,bytes(0x330))
+        routine('update',0)
+        check('actual report request',demo+0xF0,struct.pack('>3If',actor,9,
+            receipt['code']['symbols']['af_v3_reward_message_begin'],1.0))
+        check('request count and priority',demo+0x2F0,struct.pack('>2I',1,9))
+        put(demo+0xE0,actor,9);routine('begin');routine('update',0)
+        check('accepted report phase',actor+0xD14,struct.pack('>I',1))
+        check('acceptance retains animation lock',window+0x2D0,struct.pack('>I',1))
+        routine('update',0);check('finished animation releases lock',window+0x2D0,bytes(4))
+        check('waiting for message close',actor+0xD14,struct.pack('>I',2))
+        routine('update',0);check('open report retains waiting phase',actor+0xD14,struct.pack('>I',2))
+        put(demo+0xE0,0,0);routine('update',0);routine('update',1)
+        struct.pack_into('>f2I',value,0xD10,42.0,3,1)
+        check('completed phase changes only reward state',actor,value)
+        index=message+0x420;debug.write_memory(index,b'\xA5'*16)
+        call(0x8009E388,[len(messages),index,index+4]);check('new count guard',index,bytes(8)+b'\xA5'*8)
+        for address in guards:check('allocation guard',address,edge)
+        for address in (0x8046C000,0x80126EC0):check('saved data untouched',address,saved[address])
+    finally:
+        debug.write_memory(slot,original_slot)
+        for address in (demo,window):debug.write_memory(address,saved[address])
+        call(0x8009C040,[allocation])
+    check('complete shared module restored',equipment.RAM,module)
+    for address in (demo,window):check('native message state restored',address,saved[address])
+    check('no CPU fault',0x8003CE34,bytes(4));check('translation guard',0x8019C8D0,bytes.fromhex('AF32C0DE')*4)
+    return dict(native_reward_messages=True,complete_messages_loaded=4,assertions=assertions,
+        temporary_callback_slot=True,animation_unfinished_tested=False,ordinary_reward_event_tested=False,
+        hardware_tested=False,flash_written=False,requires_checkpoint_restore=True)
 
 
 def reward_motion(debug,rom_path,record):

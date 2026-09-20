@@ -13,6 +13,7 @@ from v3_camper_text import donor,extend_bank
 from text_provenance import validate
 
 FIRST=12007
+REWARD_FIRST=FIRST+4
 MESSAGE,TABLE,CHOICES,CHOICE_TABLE=0x1FA0000,0xCF9000,0x25F0000,0xD06000
 # Only the platform-specific merchandise pages are newly written. Greetings,
 # final questions, page boundaries, and branch/timing commands retain the donor.
@@ -24,6 +25,51 @@ PAGES=(
     ("Look what I've got for you!{cmd:7F0308}\nFruit from far and wide!{cmd:7F04}\n",
      "Only 1,280 Bells each!{cmd:7F0314}\nA bargain's bargain!{cmd:7F04}\n"))
 LABELS=(b'Original wares  ',b'Festival items  ')
+
+
+def prepare_rewards(base,output,source):
+    """Import complete official message records selected by the donor's reward callback."""
+    raw,constructor=source.function(0x19861C)
+    if (len(raw)!=200 or sha256(raw)!='cd0326d46ea06262ae35f80a6752ae8a1c38de14879fd37f840b51efba211492'
+            or constructor['symbol']!='Player_actor_Demo_get_golden_item_demo_ct'):
+        raise ValueError('Changed complete reward message constructor')
+    ordered=[word&65535 for word in struct.unpack('>50I',raw)
+             if word>>16==0x3860 and word&65535>=0x3000]
+    if ordered!=[0x306F,0x306D,0x306E,0x3070]:raise ValueError('Changed reward type/message relation')
+    files=by_vrom(base);info=module_command_info(base);messages,_,decoder=donor()
+    extra=[];rows=[];credits=[]
+    for index,source_id in enumerate(sorted(ordered)):
+        target=REWARD_FIRST+index;original=messages[source_id]
+        data=encode(decode_gc(original,decoder),info);tokens=list(tokenize(data,info))
+        if (tokens[-1].data!=b'\x7f\0' or expanded_bound(data,info)>1024
+                or any(t.kind=='cmd' and t.data[1] not in (0,2,3,5) for t in tokens)
+                or sum(t.kind=='cmd' and t.data[1]==0 for t in tokens)!=1):
+            raise ValueError('Reward text has an unreviewed operation or native overflow')
+        extra.append(data)
+        rows.append(dict(id=target,source_id=source_id,bytes=len(data),sha256=sha256(data),
+                         source_sha256=sha256(original),expanded_bound=expanded_bound(data,info)))
+        credits.append(dict(id=f'message:{target:04X}',native_sha256=None,locales=dict(en=dict(
+            credit='official',locator=['tools/v3_event_text.py:prepare_rewards',f'N64/message/{target:04X}'],
+            source=dict(source='user-supplied GAFE01 revision 0 disc',reference_id=f'message:{source_id:04X}',
+                        reference_sha256=sha256(original)),
+            adaptations=['Lossless native encoding; retain all official wording, pages, colours, and message commands'],
+            human_review='not_recorded',encoded_sha256=sha256(data)))))
+    catalogue=json.loads((ROOT/'translations/provenance.json').read_bytes());validate(catalogue)
+    indexed={r['id']:r for r in catalogue['entries']};missing=[]
+    for row in credits:
+        if row['id'] not in indexed:missing.append(row)
+        elif indexed[row['id']]!=row:raise ValueError('Conflicting reward text provenance: '+row['id'])
+    payload,directory=extend_bank(files[MESSAGE].extract(base),files[TABLE].extract(base),extra,REWARD_FIRST)
+    resources=[]
+    for v,data in ((MESSAGE,payload),(TABLE,directory),(CHOICES,files[CHOICES].extract(base)),
+                   (CHOICE_TABLE,files[CHOICE_TABLE].extract(base))):
+        filename=f'reward-text-{v:08X}.bin';write_new(output/filename,data)
+        resources.append(dict(vrom=v,file=filename,bytes=len(data),sha256=sha256(data),
+                              original_sha256=sha256(files[v].extract(base))))
+    return dict(first_id=REWARD_FIRST,count=len(extra),rows=rows,source_constructor=constructor,
+        type_messages=[REWARD_FIRST+sorted(ordered).index(i) for i in ordered],resources=resources,
+        provenance_entries=credits,provenance_missing=missing,
+        max_expanded_bytes=max(row['expanded_bound'] for row in rows))
 
 
 def prepare(base,output):
@@ -83,10 +129,10 @@ def prepare(base,output):
         max_expanded_bytes=max(expanded_bound(d,info) for d in originals))
 
 
-def patch_bounds(core):
+def patch_bounds(core,first=FIRST,count=4):
     patches=[]
     for address,opcode in ((0x8009E3A4,0x2A010000),(0x8009E668,0x28A10000)):
-        at=address-CODE_RAM;before=opcode|FIRST;after=opcode|(FIRST+4)
+        at=address-CODE_RAM;before=opcode|first;after=opcode|(first+count)
         if u32(core,at)!=before:raise ValueError('Changed complete message reader bound')
         struct.pack_into('>I',core,at,after);patches.append(dict(address=address,before=before,after=after))
     return patches

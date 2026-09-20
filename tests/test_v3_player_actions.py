@@ -33,6 +33,98 @@ ROD_EFFECTS=ROOT/os.environ.get('V3_ROD_EFFECTS_BUILD','build/v3-shared-rod-effe
 SHOVEL_EFFECTS=ROOT/os.environ.get('V3_SHOVEL_EFFECTS_BUILD','build/v3-shared-shovel-effects-02')
 WRAPPED=ROOT/os.environ.get('V3_WRAPPED_PARENT_BUILD','build/v3-shared-wrapped-parents-03')
 PRESENT_NAMES=ROOT/os.environ.get('V3_PRESENT_NAMES_BUILD','build/v3-shared-present-names-03')
+REWARD_MESSAGES=ROOT/os.environ.get('V3_REWARD_MESSAGES_BUILD','build/v3-shared-reward-messages-02')
+
+
+class RewardMessageHostTests(unittest.TestCase):
+    sanitized=shared_tests.HostTests.sanitized
+    def test_source_message_phase_and_bounds(self):self.sanitized('v3_player_reward_messages_test.c')
+
+
+@unittest.skipUnless((REWARD_MESSAGES/'build-lock.json').is_file(),'Current reward-message proposal required')
+class RewardMessageTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.rom,cls.report=inputs(REWARD_MESSAGES/'build-lock.json')
+        cls.base,cls.prior=inputs(REWARD_MESSAGES/'base-lock.json')
+        cls.files,cls.before=by_vrom(cls.rom),by_vrom(cls.base)
+        cls.e=cls.report['equipment_resources'];cls.old=cls.prior['equipment_resources']
+        cls.r=cls.e['player_actions']['reward_messages'];cls.blob=cls.files[BLOB].extract(cls.rom)
+        cls.oldblob=cls.before[BLOB].extract(cls.base)
+        cls.source=actions.Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+            (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+
+    def test_complete_official_text_and_single_catalogue(self):
+        from textbanks import Bank
+        from v3_event_text import MESSAGE,TABLE,CHOICES,CHOICE_TABLE
+        from v3_camper_text import donor
+        from text_provenance import validate
+        messages,_,_=donor()
+        old=Bank('message',0,0,self.before[MESSAGE].extract(self.base),self.before[TABLE].extract(self.base)).entries()
+        new=Bank('message',0,0,self.files[MESSAGE].extract(self.rom),self.files[TABLE].extract(self.rom)).entries()
+        self.assertEqual(len(new),12015);self.assertEqual(new[:len(old)],old)
+        for row in self.r['text']['rows']:
+            self.assertEqual(new[row['id']],messages[row['source_id']])
+            self.assertEqual(sha256(new[row['id']]),row['sha256'])
+        for v in (CHOICES,CHOICE_TABLE):self.assertEqual(self.files[v].extract(self.rom),self.before[v].extract(self.base))
+        catalogue=json.loads((ROOT/'translations/provenance.json').read_bytes());validate(catalogue)
+        entries={r['id']:r for r in catalogue['entries']}
+        for row in self.r['text']['provenance_entries']:self.assertEqual(entries[row['id']],row)
+        self.assertFalse(self.r['text']['provenance_missing'])
+        self.assertEqual(self.r['text']['type_messages'],[12013,12011,12012,12014])
+
+    def test_source_and_native_bindings_reject_changes(self):
+        from unittest.mock import patch
+        from aflib import CODE_RAM
+        original=(ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes()
+        core=self.before[CODE_VROM].extract(self.base);owner=self.before[actions.PLAYER_VROM].extract(self.base)
+        actual=actions.reward_message_bindings(self.source,core,original,owner)
+        self.assertEqual(json.loads(json.dumps(actual)),self.r['bindings'])
+        damaged=bytearray(core);damaged[0x8009E9E8-CODE_RAM]^=1
+        with self.assertRaises(ValueError):actions.reward_message_bindings(self.source,damaged,original,owner)
+        get=self.source.function
+        def changed(at):
+            data,receipt=get(at);return bytes([data[0]^1])+data[1:],receipt
+        with patch.object(self.source,'function',side_effect=changed),self.assertRaises(ValueError):
+            actions.reward_message_bindings(self.source,core,original,owner)
+
+    def test_bounded_module_core_and_retained_resources(self):
+        from aflib import CODE_RAM
+        from v3_event_text import MESSAGE,TABLE
+        e=self.e;start=e['blob_offset'];old=self.oldblob[start:start+e['bytes']]
+        module=self.blob[start:start+e['bytes']];retained=bytearray(module)
+        at=self.r['code_offset'];end=at+self.r['code']['bytes']
+        self.assertEqual(module[at:end],(REWARD_MESSAGES/'player_reward_messages/code.bin').read_bytes())
+        self.assertFalse(any(old[at:actions.REWARD_MESSAGE_END]));retained[at:end]=old[at:end]
+        self.assertEqual(retained,old);self.assertEqual(len(module),0x12000)
+        self.assertEqual(sha256(module),e['sha256']);self.assertEqual(zlib.crc32(module),e['crc32'])
+        core=bytearray(self.files[CODE_VROM].extract(self.rom));before=self.before[CODE_VROM].extract(self.base)
+        for row in self.r['bounds']:
+            offset=row['address']-CODE_RAM;self.assertEqual(u32(core,offset),row['after'])
+            self.assertEqual(u32(before,offset),row['before']);struct.pack_into('>I',core,offset,row['before'])
+        self.assertEqual(core,before)
+        for v in self.files.keys()-{BLOB,MODULE,CODE_VROM,0x19D40,MESSAGE,TABLE}:
+            self.assertEqual(self.files[v].extract(self.rom),self.before[v].extract(self.base),hex(v))
+        self.assertEqual(len(self.blob),len(self.oldblob));self.assertEqual(self.report['save_runtime'],self.prior['save_runtime'])
+        original=(ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes()
+        self.assertEqual(apply_ups(original,(REWARD_MESSAGES/'asset-loader.ups').read_bytes()),self.rom)
+        self.assertFalse(self.r['action_callbacks_installed'])
+        self.assertEqual(self.e['player_actions']['enabled_imported_actions'],self.old['player_actions']['enabled_imported_actions'])
+
+    def test_optional_profiles_and_future_text_retention(self):
+        import v3_optional_composition as composer
+        pin=composer.BASE,composer.BASE_SHA,composer.REPORT_SHA,composer.ABI
+        try:
+            composer.use_build_lock(REWARD_MESSAGES/'build-lock.json');choices=composer.catalogue(self.rom,self.report)
+            self.assertEqual(len(choices),128)
+            self.assertEqual(composer.compose(self.rom,self.report,choices,composer.resolve(choices,list(choices)))[0],self.rom)
+            empty=composer.compose(self.rom,self.report,choices,composer.resolve(choices,[]))[0]
+            self.assertEqual(sha256(empty),self.report['translation_baseline']['sha256'])
+        finally:composer.BASE,composer.BASE_SHA,composer.REPORT_SHA,composer.ABI=pin
+        image=bytearray(self.rom)
+        self.assertIs(actions.finish(image,self.rom,self.report,ROOT/'build/absent-reward-resources',self.e),image)
+        self.assertEqual(image,self.rom)
+        reuse_resource_tail(self.rom,self.report,self.blob)
 
 
 class WrappedHostTests(unittest.TestCase):

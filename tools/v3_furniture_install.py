@@ -632,6 +632,8 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
     if result[DMA_START:DMA_END]!=expected:raise ValueError('Undeclared DMA-directory change')
     if event_acquisition and equipment_report:
         result=equipment.finish(result,base,output,equipment_report)
+    if player_actions and equipment_report:
+        result=equipment.finish(result,base,prior,output,equipment_report)
     installed=by_vrom(result)
     for vrom,data in owner_changes.items():
         if installed[vrom].extract(result)!=data:
