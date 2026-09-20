@@ -402,6 +402,30 @@ class DonorTests(unittest.TestCase):
             changed.code_relocations[draw['offset']+location]=(kind,module,section,target+8)
             with self.assertRaises(ValueError):changed.profile(item)
 
+    def test_switch_sound_category_preserves_geometry_sound_flags_and_guards(self):
+        expected={0x32F8:(0x178,2),0x3304:(0x44E,1),0x330C:(0x8179,1),
+                  0x3320:(0x464,1),0x33BC:(0x46A,2)}
+        for item,(sound,count) in expected.items():
+            profile,body,resources,_,models,_,sections=pipeline.prepare(self.source,item)
+            adapter=profile['callback_adapter'];move=adapter['functions']['move']
+            self.assertEqual(adapter['category'],'switch-trigger-sound')
+            self.assertEqual(profile['behaviour'],'switch-trigger-sound')
+            self.assertEqual(adapter['sound_word'],sound)
+            self.assertEqual(adapter['excluded_states'],[13,14,15,12])
+            self.assertEqual((adapter['state_offset'],adapter['switch_offset'],adapter['switch_value'],
+                              adapter['position_offset']),(0x3C,0x12D,1,8))
+            self.assertEqual(adapter['null_callbacks'],['create','draw','destroy','dma'])
+            self.assertFalse(adapter['runtime_installed']);self.assertEqual(len(models),count)
+            self.assertEqual(len(sections),count);self.assertTrue(body and resources)
+            changed=copy.copy(self.source);changed.rel=bytearray(self.source.rel)
+            changed.rel[self.source.sections[1][0]+move['offset']+0x34+3]^=1
+            with self.assertRaisesRegex(ValueError,'switch sound'):changed.profile(item)
+            changed=copy.copy(self.source);changed.relocations=dict(self.source.relocations)
+            changed.relocations[adapter['vtable_offset']+8]=(1,True,1,move['offset'])
+            with self.assertRaisesRegex(ValueError,'additional lifecycle'):changed.profile(item)
+        for item in (0x31CC,0x3244,0x3324):
+            with self.assertRaisesRegex(ValueError,'unrecognised complete move'):self.source.profile(item)
+
     def test_palette_category_rejects_changed_code_calls_palettes_and_effects(self):
         p=self.source.profile(0x31A4);adapter=p['callback_adapter']
         f=adapter['functions']['move'];text=self.source.sections[1][0]

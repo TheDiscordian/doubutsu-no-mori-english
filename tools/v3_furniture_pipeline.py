@@ -68,6 +68,10 @@ INDEXED_SEQUENCE_CODE = {
     284: ('288e2fc954229a6c8ac6dc48702c5dcedabc03857f352c02508926d0e02e7459',
           ((0x52,0x66),(0x56,0x6A))),
 }
+SWITCH_SOUND_CODE = {
+    88: ('678f62c4248166f0aae5393058ac1032e32e9967ae77b8674d6852c33a292215', (0x42,), 0x44),
+    92: ('c40056198201de07a4cdf163f0dba3260d31c009fb8aaab7464e849350030256', (0x3E,0x46), 0x48),
+}
 
 
 class ReviewRequired(ValueError):
@@ -301,6 +305,36 @@ class Source:
             **palette_record,
             null_callbacks=[r for r in ('create','move','destroy') if r not in functions])
 
+    def switch_sound_models(self, profile_at):
+        """Keep ordinary profile geometry and the complete one-shot sound rule."""
+        def reject(reason):raise ReviewRequired('custom callbacks: switch sound '+reason)
+        pointer=self.relocations.get(profile_at+48)
+        if pointer is None or pointer[:3]!=(1,True,5):reject('invalid vtable pointer')
+        name,at,n=self.containing(pointer[3],exact=True)
+        if n!=20 or any(self.data[at:at+n]):reject('unsupported vtable')
+        pointers={p-at:r for p,r in self.relocations.items() if at<=p<at+n}
+        if set(pointers)!={4} or pointers[4][:3]!=(1,True,1):
+            reject('additional lifecycle, drawing, or DMA effects')
+        raw,receipt=self.function(pointers[4][3]);size=len(raw)
+        if size not in SWITCH_SOUND_CODE:reject('unrecognised complete move implementation')
+        digest,locations,call=SWITCH_SOUND_CODE[size]
+        constants={loc:struct.unpack_from('>H',raw,loc)[0] for loc in locations}
+        signed=struct.unpack_from('>h',raw,locations[-1])[0]
+        sound=signed if len(locations)==1 else (constants[locations[0]]<<16)+signed
+        if not 0<=sound<=65535:reject('sound word exceeds its source encoding')
+        helpers=self.checked_callback_code(receipt,size,digest,{},
+            {call:(0x2BDDE8,'sAdo_OngenTrgStart')},'switch sound',constants)
+        pointers=self.pointers(profile_at,52)
+        models={LAYERS[(p-profile_at)//4]:self.containing(target,exact=True)
+                for p,target in pointers.items() if p-profile_at in (0,4,8,12)}
+        if not models or set(pointers)-{profile_at+i for i in (0,4,8,12,48)}:
+            reject('changed profile model dependencies')
+        return models,{},dict(category='switch-trigger-sound',vtable_symbol=name,vtable_offset=at,
+            functions=dict(move=receipt),helpers=helpers,sound_word=sound,
+            excluded_states=[13,14,15,12],state_offset=0x3C,switch_offset=0x12D,
+            switch_value=1,position_offset=8,runtime_installed=False,
+            null_callbacks=['create','draw','destroy','dma'])
+
     def indexed_sequence_models(self, name, at, functions, index):
         """Select complete ordered lists, retaining conditional translucent parts."""
         def reject(reason): raise ReviewRequired('custom callbacks: indexed sequence ' + reason)
@@ -467,8 +501,8 @@ class Source:
             raise ReviewRequired(f'contact/interaction behaviour {contact:02X}/{interaction:04X}')
         extra = {}
         if 48 in locations:
-            if locations != [48]: raise ReviewRequired('custom callbacks with additional model dependencies')
-            models, bindings, adapter = self.callback_models(at,index)
+            if locations != [48]:models,bindings,adapter=self.switch_sound_models(at)
+            else:models, bindings, adapter = self.callback_models(at,index)
             extra = dict(palette_bindings=bindings, callback_adapter=adapter)
         else:
             pointers = self.pointers(at, n)
@@ -484,7 +518,8 @@ class Source:
             if contact or interaction: raise ReviewRequired('unsupported rig contact/interaction flags')
             extra.update(kind='animated-room-model',skeleton=adapter['skeleton'],joint_models=adapter['joint_models'])
         return dict(profile_symbol=name, profile_offset=at, profile_sha256=sha256(raw),
-            scalar_hex=raw[32:48].hex(), behaviour=adapter.get('category') if extra.get('kind') else BEHAVIOURS[contact], contact_action=contact,
+            scalar_hex=raw[32:48].hex(), behaviour=adapter.get('category') if extra.get('kind') or
+                adapter.get('category')=='switch-trigger-sound' else BEHAVIOURS[contact], contact_action=contact,
             interaction_flags=interaction,
             size_code={3:1, 4:0, 5:2}[shape], shape=shape, models=models, **extra)
 
@@ -903,6 +938,8 @@ def metadata(source, item, profile, identity):
         raise ReviewRequired(room_alias_reason(alias))
     if profile.get('kind') == 'animated-room-model':
         raise ReviewRequired('Animated room lifecycle needs the shared runtime adapter')
+    if profile.get('callback_adapter',{}).get('category')=='switch-trigger-sound':
+        raise ReviewRequired('Switch-triggered sound needs the shared native sound/runtime adapter')
     number, sheet = identity
     if any(sheet.get(k) != '-' for k in ('C', 'H', 'CG', 'CJ')):
         raise ReviewRequired('native identity/artwork correspondence needs review')

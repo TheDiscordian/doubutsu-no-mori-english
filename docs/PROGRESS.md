@@ -18,6 +18,15 @@ served patchers retain their existing builds.
 
 ## Active development
 
+The shared switch-triggered sound category prepares five more complete objects
+at `build/v3-switch-sound-prepared-01/`, retaining source sound words, singleton
+flags, trigger conditions, and all profile model layers. Two focused checks pass.
+Native sound/callback and acquisition adapters remain required; no selectable
+imports or ROM change is claimed. Across the current remaining furniture
+candidates, 67 of 101 non-alias, non-dummy records have prepared artwork. Continue
+shared conversion/integration categories, then the required gold-tree completion.
+See the [sound-category checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#switch-triggered-sound-category).
+
 All fifteen station models have complete prepared artwork, skeletons, and motions
 through the shared indexed-clock category at `build/v3-indexed-clock-rigs-prepared-01/`.
 One compiler container handles the whole batch. Source clock-hand rules and live

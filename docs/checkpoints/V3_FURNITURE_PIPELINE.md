@@ -1,5 +1,31 @@
 # Automatic furniture pipeline checkpoint
 
+## Switch-triggered sound category
+
+`build/v3-switch-sound-prepared-01/` prepares green pipe, flagpole, super mushroom,
+koopa shell, and noisemaker in one compiler container. The shared category derives
+all profile models and the move-only sound rule from source, without per-item
+production definitions. Objects occupy 2,288, 2,144, 2,144, 3,312, and 2,464 bytes.
+
+Two complete 88/92-byte callback forms retain the source actor-state exclusions,
+switch equality, positioned sound call, and full sound word. The mushroom's
+`8179` singleton encoding is not truncated to `0179`. Profile geometry keeps all
+opaque layers; the callback is not silently removed. Other lifecycle/draw/DMA
+effects and unknown callback implementations reject.
+
+- Manifest SHA-256:
+  `e7f6daba1b7d2cf34e4b08930daa3972f74f400b397be2a071496ebac175825c`.
+- Two focused checks pass in 2.583 seconds, covering source conditions, singleton
+  encoding, additional-effect rejection, complete graphics comparisons, current
+  pending reasons, and refusal to install the prepared bundle.
+- Native sound equivalence/conversion, actual callback integration, and source
+  acquisition remain required. No audio is played and no native replay is run.
+
+Sixty-seven of the 101 remaining non-alias, non-dummy furniture candidates now
+have prepared artwork. This is not a selectable-import count. No ROM, save,
+choice, main lock, or served patcher changes; ABI 158 remains the explicit build.
+Continue primary category work before required gold-tree completion.
+
 ## Indexed looping clock rigs
 
 `build/v3-indexed-clock-rigs-prepared-01/` prepares all fifteen station models

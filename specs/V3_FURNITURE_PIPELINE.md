@@ -643,6 +643,17 @@ This linking method is independent of an item's identity or theme. A constant
 draw callback is removed only after its complete lack of additional effects is
 verified; this is not a mechanism for stripping animations.
 
+The `switch-trigger-sound` category retains ordinary profile model slots alongside
+a checked move-only callback. The two complete source instruction forms differ
+only in loading a normal or singleton-tagged sound word. Every instruction,
+constant field, helper target, and absence of other lifecycle/draw/DMA callbacks
+is checked. Source excluded actor states, switch flag/value, position field, and
+the full sound word remain in the descriptor. The converter does not mistake a
+callback-bearing object for silent decoration. Artwork can be prepared as a
+batch; native audio correspondence, callback integration, and acquisition remain
+required before metadata can permit installation. Additional particles, movement,
+or instrument behaviour reject rather than passing through this category.
+
 The `indexed-model-sequence` category supports constant identity-indexed draws
 with one or two ordered opaque lists and an optional conditional translucent
 pair. Complete reviewed instructions, all relocations, matrix-helper targets,
