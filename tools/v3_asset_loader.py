@@ -129,6 +129,8 @@ def compile_part(part, out, extra_sources=(), defines=(), primary_source=None):
                        'inventory_aux': ('af_v3_inventory_bobber', 0x804B2180),
                        'item_categories': ('af_v3_equipment_category', 0x804AA000),
                        'ground_categories': ('af_v3_ground_prepare', 0x804AD000),
+                       'scenery': ('af_v3_scenery_construct', 0x804B5000),
+                       'scenery_bootstrap': ('af_v3_scenery_boot', 0x804ADC90),
                        'event_acquisition': ('af_v3_event_stock_construct', 0x804AE000),
                        'event_menu': ('af_v3_event_menu_start', 0x804AF000),
                        'room': ('af_v3_room_value', BLOB_RAM + 0x8000),

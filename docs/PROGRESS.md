@@ -18,23 +18,27 @@ served patchers retain their existing builds.
 
 ## Active development
 
-The shared scenery converter prepares the golden-shovel tree's complete
-seasonal dependency at `build/v3-scenery-gold-tree-01/`: fourteen foreground
-states across four owners, forty descriptors, 37 distinct material/geometry
-pairs, and all fourteen colour palettes. It retains growth sizes, dead saplings,
-stumps, source positions, and adjusted shadows. The objects total 65,632 bytes
-plus 448 palette bytes; each season uses 29,408 object bytes. Six focused
-source/artwork checks, seventeen shared-format checks, and one unchanged
-ordinary-emission check pass. They verify source relationships, every converted
-pixel/vertex/triangle, native palette slots, and rejection of missing dependencies.
-No cartridge, save, choice, or served patcher changes. Next install shared
-seasonal rendering and gold-tree planting/growth/drop; acquisition and gameplay
-remain unfinished, and golden choices stay disabled. See the
-[scenery specification](../specs/V3_SCENERY.md) and
-[checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-seasonal-scenery-preparation).
+Shared seasonal scenery is installed in ABI 149 at
+`build/v3-shared-scenery-04/build-lock.json`. All fourteen gold-tree foreground
+states use complete owner-local models, positions, descriptors, palettes, and
+shadow dependencies. Each loaded season adds 32,864 bytes; a 4,096-byte fixed
+reservation holds shared code. Verified retired cartridge storage avoids growing
+the import blob or equipment module. Original scenery, held categories, actor
+sizes, and saved/profile formats remain unchanged.
 
-The current explicit ABI-148 proposal is
-`build/v3-shared-balloon-menu-04/build-lock.json`. All eight balloons are
+Four focused host/cartridge checks pass. The first silent native component run
+passes 237 records and 122 assertions, including all four seasonal loads, all
+56 selected type records, safe unselected/native fallbacks, actual body drawing,
+memory guards, restored state/checkpoint, and clean exit. This is not GPU
+appearance, ordinary acquisition, or hardware proof. Reuse the prepared assets
+and this evidence. Next connect world collision, planting/growth/death,
+cutting/shaking, and the selected shovel drop. Golden choices stay disabled.
+The main lock and both served patchers remain unchanged. See the
+[scenery specification](../specs/V3_SCENERY.md) and
+[checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-seasonal-scenery-runtime).
+
+The current explicit ABI-149 proposal retains the complete balloon integration.
+All eight balloons are
 connected through the shared parent-category installer: official names/prices,
 complete pocket icons, held/inventory animation, source acquisition records,
 collection/catalogue, animated room profiles, indoor conversion, and inverse

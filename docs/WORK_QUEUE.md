@@ -2,8 +2,8 @@
 
 ## Active: V3 optional GameCube imports
 
-The current explicit proposal is ABI 148,
-`build/v3-shared-balloon-menu-04/build-lock.json`. All eight balloons are
+The current explicit proposal is ABI 149,
+`build/v3-shared-scenery-04/build-lock.json`. All eight balloons are
 connected through shared source-derived parent records, room profiles, indoor
 conversion/pickup, collection/catalogue, complete icons, and optional selection.
 There are 128 experimental choices, with 24 equipment parents. Neither served
@@ -34,16 +34,19 @@ state/checkpoint, guards, and clean exit. The close callback is a test stub;
 ordinary full gameplay and appearance remain unverified. Reuse this evidence.
 Next connect source acquisition events:
 gold-tree growth/drop, event/NPC completion rewards, and perfect-town acquisition.
-The complete gold-tree scenery dependency is prepared at
-`build/v3-scenery-gold-tree-01/`: all four owners, fourteen foreground states,
-forty descriptors, 37 deduplicated model pairs, and all fourteen palettes.
-Six focused source/artwork checks, seventeen shared-format checks, and one
-unchanged ordinary-emission check pass. Reuse those converted resources.
-Next extend shared seasonal descriptor/palette/foreground consumers with an
-explicit resource lifetime and measured allocation, then connect native
-planting, growth/death, cutting/shaking, and the selected shovel drop. Preserve
+The complete gold-tree scenery dependency is installed through the shared
+seasonal renderer: fourteen states, complete models/shadows/positions, all
+palettes, owner-local lifetime, native fallbacks, and reserved descriptor slots.
+Each loaded seasonal owner adds 32,864 bytes; shared code owns 4,096 fixed bytes.
+Four focused checks pass. The first native run passes 237 records and 122
+assertions for all four loaders, 56 type cases, actual body drawing, guards,
+restored state/checkpoint, and clean exit. It does not prove GPU appearance or
+ordinary gameplay. Reuse this evidence and `build/v3-scenery-gold-tree-01/`;
+do not reconvert or replay unchanged seasonal components.
+Next connect native world collision, planting, growth/death, cutting/shaking,
+and the selected shovel drop. Preserve
 native scenery and the actual donor route; no arbitrary acquisition substitute.
-See [shared scenery](../specs/V3_SCENERY.md). No new ROM is claimed for preparation.
+See [shared scenery](../specs/V3_SCENERY.md).
 Keep all four golden choices disabled pending those complete ordinary routes.
 The menu adds 384 transient bytes but no new saved state or selection options.
 See the [flight specification](../specs/V3_BALLOON_RELEASE.md) and

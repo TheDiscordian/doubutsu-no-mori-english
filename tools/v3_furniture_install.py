@@ -464,7 +464,7 @@ def owner_tail_storage(base,files,changes,*,minimum_end=0):
 def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=False, equipment_kinds=False,
                     player_actions=False, item_category_art=None, ground_categories=False, event_acquisition=False,
                     held_collection=False, held_catalogue_art=None, held_selection=False, translation_updates=False,
-                    room_rigs_art=None,
+                    room_rigs_art=None, scenery_art=None,
                     equipment_rigs=None):
     """Update shared readers; optionally install the shared held-resource adapter."""
     output=output.resolve()
@@ -484,10 +484,10 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
     output.mkdir(parents=True)
     moved=[];equipment_report=None;reused=None;owner_changes={};owner_moves=[];owner_updates=[];report_updates={}
     equipment_mode=any((equipment_art is not None,equipment_rigs is not None,player_motion,equipment_kinds,player_actions,
-                        item_category_art is not None,ground_categories,event_acquisition,held_collection,held_catalogue_art is not None,held_selection,room_rigs_art is not None))
+                        item_category_art is not None,ground_categories,event_acquisition,held_collection,held_catalogue_art is not None,held_selection,room_rigs_art is not None,scenery_art is not None))
     resource_mode=equipment_mode or translation_updates
     if sum((equipment_art is not None,equipment_rigs is not None,player_motion,equipment_kinds,player_actions,
-            item_category_art is not None,ground_categories,event_acquisition,held_collection,held_catalogue_art is not None,held_selection,translation_updates,room_rigs_art is not None))>1:
+            item_category_art is not None,ground_categories,event_acquisition,held_collection,held_catalogue_art is not None,held_selection,translation_updates,room_rigs_art is not None,scenery_art is not None))>1:
         raise ValueError('Install shared runtime updates in dependency order')
     if resource_mode:
         blob,reused=reuse_resource_tail(base,prior,old_blob)
@@ -528,6 +528,9 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
     elif ground_categories:
         import v3_ground_categories as equipment
         equipment_report,owner_changes=equipment.install(base,prior,blob,core,original,output)
+    elif scenery_art is not None:
+        import v3_scenery_runtime as equipment
+        equipment_report,owner_changes=equipment.install(base,prior,blob,core,original,output,scenery_art)
     elif event_acquisition:
         import v3_event_acquisition as equipment
         equipment_report,owner_changes=equipment.install(base,prior,blob,core,original,output)
@@ -708,6 +711,11 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             report['shared_runtime_refresh']['artwork_changed']=True
         if ground_categories:
             report['shared_runtime_refresh']['adapters'].append('ground_categories')
+        if scenery_art is not None:
+            report['shared_runtime_refresh']['adapters'].append('seasonal_scenery')
+            report['shared_runtime_refresh'].update(artwork_changed=True,resource_allocations_changed=True,
+                additional_resident_bytes=equipment_report['scenery']['additional_fixed_resident_bytes'],
+                additional_scene_resident_bytes=equipment_report['scenery']['additional_scene_resident_bytes'])
         if event_acquisition:
             report['shared_runtime_refresh']['adapters'].append('event_acquisition')
         if held_collection:
@@ -757,6 +765,8 @@ if __name__=='__main__':
         help='With --refresh-runtime, install prepared shared category artwork and police/handover consumers')
     parser.add_argument('--ground-categories',action='store_true',
         help='With --refresh-runtime, integrate installed categories in all four seasonal ground owners')
+    parser.add_argument('--scenery-art',type=Path,
+        help='With --refresh-runtime, install prepared seasonal scenery with owner-local resource banks')
     parser.add_argument('--event-acquisition',action='store_true',
         help='With --refresh-runtime, install separate source-derived event stock for selected handhelds')
     parser.add_argument('--held-collection',action='store_true',
@@ -777,6 +787,7 @@ if __name__=='__main__':
     if args.player_actions and not args.refresh_runtime:parser.error('--player-actions requires --refresh-runtime')
     if args.item_category_art and not args.refresh_runtime:parser.error('--item-category-art requires --refresh-runtime')
     if args.ground_categories and not args.refresh_runtime:parser.error('--ground-categories requires --refresh-runtime')
+    if args.scenery_art and not args.refresh_runtime:parser.error('--scenery-art requires --refresh-runtime')
     if args.event_acquisition and not args.refresh_runtime:parser.error('--event-acquisition requires --refresh-runtime')
     if args.held_collection and not args.refresh_runtime:parser.error('--held-collection requires --refresh-runtime')
     if args.held_catalogue_art and not args.refresh_runtime:parser.error('--held-catalogue-art requires --refresh-runtime')
@@ -789,6 +800,6 @@ if __name__=='__main__':
                             event_acquisition=args.event_acquisition,held_collection=args.held_collection,
                             held_catalogue_art=args.held_catalogue_art,held_selection=args.held_selection,
                             translation_updates=args.translation_updates,equipment_rigs=args.equipment_rigs,
-                            room_rigs_art=args.room_rigs_art)
+                            room_rigs_art=args.room_rigs_art,scenery_art=args.scenery_art)
             if args.refresh_runtime else build(args.output,args.art,args.base_lock))
     print(json.dumps({k:result[k] for k in ('runtime_abi','output_sha256','patch_sha256')},indent=2))

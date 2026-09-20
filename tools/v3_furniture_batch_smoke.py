@@ -1561,6 +1561,9 @@ def tool_controls(debug,rom_path,record,*,transitions=False,capture=False,rod=Fa
 
 
 def exercise(debug, rom_path, record, *, section='automatic_furniture'):
+    if section=='seasonal_scenery':
+        from v3_scenery_smoke import exercise as scenery
+        return scenery(debug,rom_path,record)
     if section=='balloon_menu':return balloon_menu(debug,rom_path,record)
     if section=='balloon_release':return balloon_release(debug,rom_path,record)
     if section=='balloon_exchange':return reward_exchange(debug,rom_path,record,balloons=True)

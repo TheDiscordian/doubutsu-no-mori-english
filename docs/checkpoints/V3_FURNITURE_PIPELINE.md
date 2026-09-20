@@ -1,5 +1,92 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared seasonal scenery runtime
+
+The ABI-149 proposal is `build/v3-shared-scenery-04/build-lock.json`. The shared
+runtime installer consumes the prepared scenery category, retains complete
+native owners, and supplies all fourteen gold-tree type records in each season.
+Each scene bank includes complete body and shadow objects, all source positions,
+ordered descriptors/lists, fourteen palettes, the eighteen-term selector, and
+explicit CPU/graphics/callback relocation tables. No individual-item installer,
+replacement native identity, or enabled golden-tool choice is added.
+
+- ROM SHA-256:
+  `be67ec87c84a651111b6ae88592f2461973d45e48430bfd88f4a198cc2f737a8`.
+- Report SHA-256:
+  `ace6955ebb5dfd25364ebb7d397e05adfb389469b45f442fe1018f3cf1f17b06`.
+- UPS SHA-256:
+  `e51f81804b299c0867fe7234840127595b429880e67fefdb87e0066686312ed0`.
+
+Three 32,864-byte cartridge banks serve the four seasonal owners, with Xmas
+sharing winter. Each uses verified retired module storage; the first reservation
+also holds a 2,892-byte shared code packet. Existing live resources remain
+protected through explicit reservations in the report. The import blob does not
+grow. A 267-byte bootstrap fits unused equipment space before the retained ground
+guard; the equipment module and startup allocation remain unchanged. Shared code
+reserves `804B5000..804B5FFF`; each loaded seasonal owner adds 32,864 bytes of BSS.
+Owner resident totals are cherry 74,688, winter 74,832, Xmas 75,872, and ordinary
+74,624 bytes. Original actors and start-index array capacities do not grow.
+
+The constructor loads and CRC-checks the code and data, binds callbacks to the
+current owner, relocates CPU/graphics pointers, and calls the original native
+constructor. The body callback updates its active palette using the native term
+query and retains the original material/matrix/geometry order. Ten checked unused
+descriptor slots follow the native NONE sentinel, without overlapping any
+installed held category. Future category work must preserve those reservations.
+The full original native foreground tables have 112 low and 84 environmental
+entries; the fourteen imported IDs overlap neither. Native types retain their
+original classification routine through an owner-local trampoline, while
+unselected imported types use the safe empty row. This does not permit loading
+a saved import under an incompatible profile.
+
+Four focused checks pass. The host fixture uses AddressSanitizer/UBSan and covers
+all owner lifetimes, pointer/graphics/callback fixups, selection/fallback, every
+calendar term, reinitialization, malformed resource bounds, CRC/DMA failure,
+and unchanged guards. Cartridge checks verify complete prepared resources,
+every declared relocation, native data/code retention, relocated allocations,
+retired-storage ownership, future reclamation protection, official composition,
+128 retained choices, UPS reconstruction, and exact empty-selection V2-12.
+All five new failure messages carry assistant authorship in the single source
+catalogue; no donor translation is claimed for those diagnostics.
+
+The first preflight found the previous module's retained guard inside the
+proposed bootstrap range and correctly rejected it. The range now stops before
+that guard. Initial resource rebasing rejected a valid interior vertex-array
+load; the shared bank packer now requires its full aligned, bounded source slice.
+The first test invocation also used a nonexistent composition module name; it
+was corrected to the existing composer. No game defect or native fixture retry
+was encountered. Builds 02–04 have identical cartridge and UPS hashes; the final
+receipt includes diagnostic credits and general output-path support. Native
+evidence from build 02 therefore covers the unchanged final cartridge, without
+replaying historical candidates.
+
+The first silent native run, `build/smoke-v3-scenery-01/`, passes 237 records and
+122 assertions, then exits cleanly. It uses actual cartridge DMA and overlay
+relocation for all four complete owners/banks, checks every relocated byte and
+palette, resolves all 56 selected foreground cases with guarded output, executes
+unselected and ordinary-item fallbacks, and calls all four actual body drawers.
+Material/geometry lists, graphics bounds, memory guards, saved-state restoration,
+checkpoint restoration, and the final zero-fault check pass. The fixture enables
+the existing golden-shovel profile bit only in paused test RAM and restores it;
+neither the browser options nor on-disk saves are changed.
+
+- Native results SHA-256:
+  `a5adc47f9854b92dbd81d458b5465472f21c66e2671ad084ffc7c9ad5f6c5038`.
+
+The component run does not execute a full seasonal constructor, adjusted-shadow
+drawing, GPU appearance comparison, ordinary tree acquisition, save/restart, or
+hardware playthrough. Do not infer those from successful body-list generation.
+Next implement native world collision, shining-hole shovel planting,
+growth/death, cutting/shaking, and the selected golden-shovel reward. Keep all
+four golden-tool choices disabled until their actual source routes work.
+
+Format 3 and existing saved identities/profile bits are unchanged. Imported saves
+still require matching/equal-or-larger profiles; do not load them in V2 or older
+format-1/2 V3 builds. No new cross-version reload claim is made. The main ABI-109
+lock remains `f69d44334f40335c687816ece1abf0f0d1d213ccfb52bbb433f889ff606428ef`;
+both served patchers and existing ROMs/saves remain unchanged. See
+[the specification](../../specs/V3_SCENERY.md).
+
 ## Shared seasonal scenery preparation
 
 `build/v3-scenery-gold-tree-01/` contains the complete converted artwork

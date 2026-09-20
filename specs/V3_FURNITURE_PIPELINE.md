@@ -26,9 +26,11 @@ The `scenery` representation follows complete seasonal foreground descriptors
 and feeds body/shadow lists into the shared converter. Its gold-tree category
 prepares growth sizes, dead saplings, stumps, seasonal palettes, and adjusted
 shadows through explicit inherited render contracts. This is an acquisition
-dependency, not a selectable item or installed gameplay. Use
+dependency, not a selectable item or completed acquisition. Use
 `convert --representation scenery --category gold-tree --assets-only`;
-native rendering and planting/growth/drop remain required. See
+the shared `--refresh-runtime --scenery-art` installer connects owner-local
+banks, descriptors, palette updates, and classification to all four native
+renderers. Planting/growth/drop and world collision remain required. See
 [seasonal scenery](V3_SCENERY.md).
 
 The shared flying-balloon category installs one complete donor state machine
