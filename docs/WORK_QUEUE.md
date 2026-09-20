@@ -15,11 +15,12 @@ feature or a separate release goal.
 The bulk converter reuses validated prepared artwork and compiles all missing
 objects in one container. The current combined prepared bundle is
 `build/v3-bulk-prepared-02/`: 95 objects, including two constant-palette trophies.
-These are prepared resources, not 95 new selectable items. Sixty-seven of the
+These are prepared resources, not 95 new selectable items. Sixty-nine of the
 101 remaining non-alias, non-dummy furniture candidates have complete converted
 artwork, including fifteen station variants in the separate
 `build/v3-indexed-clock-rigs-prepared-01/` bundle and five sound-triggered objects
-at `build/v3-switch-sound-prepared-01/`. Their full clock/animation/sound source
+at `build/v3-switch-sound-prepared-01/`, plus two complete storage rigs at
+`build/v3-storage-rigs-prepared-01/`. Their full clock/animation/sound/storage source
 rules and complete assets are prepared; connect the shared native lifecycle and
 acquisition adapters before enabling them. Extend shared categories for remaining
 models and source acquisition routes; do not substitute arbitrary shop stock.

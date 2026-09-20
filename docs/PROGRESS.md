@@ -18,12 +18,20 @@ served patchers retain their existing builds.
 
 ## Active development
 
+The shared open/close category prepares both Harvest storage objects, retaining
+complete models, skeletons, animations, source interaction flags, and opening
+limits. Two focused checks pass. Native lifecycle and acquisition integration
+remain required; preparation adds no selectable item or ROM change. Across the
+remaining furniture candidates, 69 of 101 non-alias, non-dummy records have
+prepared artwork. Continue shared integration before required gold-tree work.
+See the [storage checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#openclose-storage-category).
+
 The shared switch-triggered sound category prepares five more complete objects
 at `build/v3-switch-sound-prepared-01/`, retaining source sound words, singleton
 flags, trigger conditions, and all profile model layers. Two focused checks pass.
 Native sound/callback and acquisition adapters remain required; no selectable
 imports or ROM change is claimed. Across the current remaining furniture
-candidates, 67 of 101 non-alias, non-dummy records have prepared artwork. Continue
+candidates, the sound batch contributes five prepared objects. Continue
 shared conversion/integration categories, then the required gold-tree completion.
 See the [sound-category checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#switch-triggered-sound-category).
 

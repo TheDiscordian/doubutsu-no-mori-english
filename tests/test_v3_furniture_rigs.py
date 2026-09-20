@@ -17,6 +17,7 @@ from tests import test_v3_furniture_pipeline as furniture_tests
 
 OUTPUT = ROOT/'build/v3-indexed-room-rigs-prepared-01'
 CLOCK_OUTPUT = ROOT/'build/v3-indexed-clock-rigs-prepared-01'
+STORAGE_OUTPUT = ROOT/'build/v3-storage-rigs-prepared-01'
 
 
 class SourceTests(unittest.TestCase):
@@ -98,6 +99,64 @@ class SourceTests(unittest.TestCase):
             self.assertEqual(b['source_sha256'],a['source_sha256'])
         for bad in (-16,1,0x1000000,True):
             with self.assertRaises(ValueError):keyframes.compile_animations(self.source,[motion],start=bad)
+
+
+class StorageTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        SourceTests.setUpClass.__func__(cls)
+
+    def test_storage_category_preserves_source_limits_and_interactions(self):
+        for item,joints,shown,end,flags in ((0x3300,5,3,12,2),(0x3308,3,2,10,1)):
+            profile=self.source.profile(item);adapter=profile['callback_adapter']
+            self.assertEqual(profile['kind'],'animated-room-model')
+            self.assertEqual(adapter['category'],rigs.STORAGE_CATEGORY)
+            self.assertEqual((profile['skeleton']['joints'],profile['skeleton']['shown_joints']),(joints,shown))
+            self.assertEqual(adapter['animation']['duration'],end)
+            self.assertEqual({k:v['value'] for k,v in adapter['constants'].items()},
+                             dict(initial_speed=0,start_frame=1,end_frame=end))
+            self.assertEqual(int(profile['scalar_hex'][-4:],16),flags)
+            self.assertEqual(adapter['room_callback']['clip_offset'],0x2608C)
+            self.assertEqual(adapter['room_callback']['callback_offset'],0x34)
+            self.assertTrue(adapter['room_callback']['nullable'])
+            self.assertFalse(adapter['runtime_installed'])
+            for row in adapter['functions'].values():
+                source=copy.copy(self.source);source.rel=bytearray(source.rel)
+                source.rel[source.sections[1][0]+row['offset']]^=1
+                with self.subTest(item=item,function=row['symbol']),self.assertRaises(ValueError):source.profile(item)
+            for constant in adapter['constants'].values():
+                source=copy.copy(self.source);source.rel=bytearray(source.rel)
+                at=source.sections[constant['section']][0]+constant['offset']
+                struct.pack_into('>I',source.rel,at,0x7FC00000)
+                with self.assertRaisesRegex(ValueError,'non-finite'):source.profile(item)
+            source=copy.copy(self.source);source.code_relocations=dict(source.code_relocations)
+            del source.code_relocations[adapter['functions']['move']['offset']+0x36]
+            with self.assertRaises(ValueError):source.profile(item)
+
+    def test_complete_storage_artwork_and_motion_reuse_without_enabling(self):
+        report=json.loads((STORAGE_OUTPUT/'art.json').read_bytes())
+        self.assertEqual(report['batch'],dict(objects=2,compiled=2,reused=0,compiler_containers=1))
+        self.assertEqual({r['item_id'] for r in report['objects']},{'3300','3308'})
+        cache=pipeline.PreparedAssets(self.source,[STORAGE_OUTPUT])
+        for row in report['objects']:
+            prepared=pipeline.prepare(self.source,int(row['item_id'],16))
+            profile,body,_,_,_,_,sections=prepared
+            asset=(STORAGE_OUTPUT/row['object_file']).read_bytes()
+            start=(len(body)+sum(n for _,n in sections)+15)&~15
+            suffix,receipt=rigs.suffix(self.source,profile,row['model_offsets'],start=start)
+            self.assertEqual(asset[start:],suffix)
+            self.assertEqual(row['rig'],json.loads(json.dumps(receipt)))
+            self.assertFalse(row['import_ready'])
+            self.assertIn('lifecycle',row['pending_reason'])
+            self.assertEqual(cache.reuse(self.source,row['item_id'],prepared)[1]['object_sha256'],row['object_sha256'])
+            for r in receipt['skeleton']['relocations']+receipt['animations']['relocations']:
+                self.assertEqual(struct.unpack_from('>I',asset,r['offset'])[0],0x06000000+r['target_offset'])
+            for r in receipt['animations']['arrays']:
+                at,n,source=r['native_offset'],r['bytes'],r['donor_offset']
+                self.assertEqual(asset[at:at+n],self.source.data[source:source+n])
+        furniture_tests.DonorTests.check_complete_artwork(self,STORAGE_OUTPUT,report)
+        with self.assertRaisesRegex(ValueError,'Unknown converter/source revision'):
+            install.checked_assets(STORAGE_OUTPUT,self.source,ROOT/'build/item-identity-megasheet.xlsx')
 
 
 class ClockTests(unittest.TestCase):

@@ -230,11 +230,14 @@ class Source:
         for slot, role in enumerate(('create','move','draw','destroy')):
             if slot*4 not in pointers: continue
             raw, receipt = self.function(pointers[slot*4][3]); functions[role] = receipt
-        from v3_furniture_rigs import CODE as RIG_CODE, CLOCK_CODE, discover as discover_rig, discover_clock
+        from v3_furniture_rigs import (CODE as RIG_CODE, CLOCK_CODE, STORAGE_CODE,
+            discover as discover_rig, discover_clock, discover_storage)
         if functions.get('create',{}).get('bytes') == RIG_CODE['create'][0]:
             return discover_rig(self,name,at,functions,index)
         if functions.get('create',{}).get('bytes') == CLOCK_CODE['create'][0]:
             return discover_clock(self,name,at,functions,index)
+        if functions.get('create',{}).get('bytes') == STORAGE_CODE['create'][0]:
+            return discover_storage(self,name,at,functions)
         if functions.get('create',{}).get('bytes') == PALETTE_FADE_CODE['create'][0]:
             if set(pointers) != {0,4,8,12}: reject('unsupported palette-fade callback slots')
             return self.palette_fade_models(name, at, functions)
@@ -497,7 +500,7 @@ class Source:
                 or shape not in (3, 4, 5) or collision not in (0, 1, 2, 5)
                 or rotation not in (0, 1) or lighting not in (0, 1, 2) or pad):
             raise ReviewRequired('unsupported scalar profile category')
-        if contact not in BEHAVIOURS or interaction not in (0, 0x10, 0x8000):
+        if contact not in BEHAVIOURS or interaction not in (0, 1, 2, 4, 0x10, 0x8000):
             raise ReviewRequired(f'contact/interaction behaviour {contact:02X}/{interaction:04X}')
         extra = {}
         if 48 in locations:
@@ -513,9 +516,12 @@ class Source:
         if fading and (interaction != 0x8000 or contact) or interaction == 0x8000 and not fading:
             raise ReviewRequired('contact/interaction requires a checked palette-fade callback')
         adapter = extra.get('callback_adapter', {})
-        from v3_furniture_rigs import RIG_CATEGORIES
+        from v3_furniture_rigs import RIG_CATEGORIES, STORAGE_CATEGORY
+        storage=adapter.get('category')==STORAGE_CATEGORY
+        if storage and (contact or interaction not in (1,2,4)) or interaction in (1,2,4) and not storage:
+            raise ReviewRequired('storage interaction requires the complete open/close category')
         if adapter.get('category') in RIG_CATEGORIES:
-            if contact or interaction: raise ReviewRequired('unsupported rig contact/interaction flags')
+            if contact or interaction and not storage: raise ReviewRequired('unsupported rig contact/interaction flags')
             extra.update(kind='animated-room-model',skeleton=adapter['skeleton'],joint_models=adapter['joint_models'])
         return dict(profile_symbol=name, profile_offset=at, profile_sha256=sha256(raw),
             scalar_hex=raw[32:48].hex(), behaviour=adapter.get('category') if extra.get('kind') or

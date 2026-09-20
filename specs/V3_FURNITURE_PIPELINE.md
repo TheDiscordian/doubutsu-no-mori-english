@@ -708,6 +708,16 @@ prepared object includes all graphics and keyframe data, not a frozen decorative
 substitute. The native lifecycle/clock adapter and source acquisition route
 remain required; prepared resources do not enable these records.
 
+The `open-close-storage-rig` category shares the same complete graphics and
+keyframe conversion. Verified create/move/draw/destroy instructions supply the
+actual skeleton, stop-mode motion, initial zero speed, opening limits, and nullable
+shared room callback. Drawers, wardrobes, and closets retain their source
+interaction flags; those flags cannot enter unrelated callback categories.
+The Harvest bureau and dresser retain five/three joints and complete twelve/ten
+frame motions respectively. Non-finite or out-of-motion limits, changed helpers,
+extra lifecycle effects, or missing dependencies reject. Prepared objects remain
+disabled until the native lifecycle and actual acquisition route are connected.
+
 The switch-driven category prepares all eight room balloons in one command:
 
 ```sh

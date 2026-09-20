@@ -1,5 +1,27 @@
 # Automatic furniture pipeline checkpoint
 
+## Open/close storage category
+
+`build/v3-storage-rigs-prepared-01/` contains the complete Harvest bureau and
+dresser, 4,864 and 4,704 bytes respectively, compiled together in one container.
+Shared source discovery retains the actual storage flags, stop-mode skeletons,
+opening limits, and nullable room callback. The bureau has five joints/three
+visible lists and a twelve-frame motion; the dresser has three joints/two visible
+lists and a ten-frame motion. Neither animation is flattened or truncated.
+
+- Manifest SHA-256:
+  `6973affeda63d9d2753b628fdca0b6733e81bdbfbdf71f77e1c5b9d696b8082b`.
+- Two focused tests pass in 1.780 seconds: source behaviour/dependency guards,
+  non-finite limit rejection, complete graphics/keyframe comparisons, prepared
+  cache reuse, and refusal to install unfinished resources as ready items.
+- No emulator replay, ROM change, save change, choice, or patcher update.
+
+The native room engine has the corresponding shared opening/closing callback;
+connecting that category and its actual acquisition route remains work. There
+are 69 prepared records among the 101 remaining non-alias, non-dummy furniture
+candidates. ABI 158 remains the current explicit cartridge. Gold-tree completion
+follows the primary importing work and remains required.
+
 ## Switch-triggered sound category
 
 `build/v3-switch-sound-prepared-01/` prepares green pipe, flagpole, super mushroom,

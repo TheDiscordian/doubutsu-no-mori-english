@@ -4,6 +4,7 @@ This is a callback/asset category, not an item list. Preparing a rig does not
 install its lifecycle callbacks or make its parent selectable.
 """
 import re
+import math
 import struct
 
 from aflib import sha256, u32
@@ -11,13 +12,20 @@ from v3_keyframes import animation, skeleton, model_descriptor, compile_skeleton
 
 CATEGORY = 'indexed-switch-rig'
 CLOCK_CATEGORY = 'indexed-loop-clock-rig'
+STORAGE_CATEGORY = 'open-close-storage-rig'
+STORAGE_CODE = {
+    'create': (116, '17985ba5a79cb082f421871e07eca8189d15291d08d408f4d68c257b072d166d'),
+    'move': (80, '74d56a7240cc6101e429e75a9163eacb63753bfb06e944d1e80d291853fa6690'),
+    'draw': (140, '61e6b19d38da02cca2132d93466c24a5e2907042ce42521c49675b0c3dba0470'),
+    'destroy': (4, 'f332ea5b5437103cbb6f1508679da89eec9288ad775c96c439a17fccabe3de8e'),
+}
 CLOCK_CODE = {
     'create': (140, '6979dab4959772e11795a2b2cd0711ffa5875e1243321c7c856974deea9a4064'),
     'move': (36, 'bb0989f0a657b30e25ea7de2e21589425883dfaed308bd116dabef8de4ef1dd2'),
     'draw': (200, 'f6e60a96386c7721dcd0c894196eae1ee3e5c6339aadf921e2f95952ff7584de'),
     'destroy': (4, 'f332ea5b5437103cbb6f1508679da89eec9288ad775c96c439a17fccabe3de8e'),
 }
-RIG_CATEGORIES = (CATEGORY, CLOCK_CATEGORY)
+RIG_CATEGORIES = (CATEGORY, CLOCK_CATEGORY, STORAGE_CATEGORY)
 CODE = {
     'create': (164, '2a86d61bc9aaf4a0a6479fe97a7f0d5dfe3dc42f9eea663eeb3fd1b8cbc35733'),
     'move': (208, '4b36894add16ecf872c1bfdcbeed2331519049fffd5b3d1d1d5db533f7c68d89'),
@@ -186,6 +194,53 @@ def discover_clock(source, vtable_name, vtable_at, functions, index):
         clock=dict(common_symbol='common_data',hour_joint=3,minute_joint=4,
                    hour_offset=0x2612A,minute_offset=0x26128,axis='z',operation='subtract'),
         palette=dict(symbol=name,donor_offset=at,bytes=n,source_sha256=sha256(source.data[at:at+n])),
+        skeleton=rig,animation=motion,joint_models=descriptor['joint_models'],runtime_installed=False)
+
+
+def discover_storage(source, vtable_name, vtable_at, functions):
+    """Resolve complete stop-mode rigs controlled by the shared storage helper."""
+    from v3_furniture_pipeline import ReviewRequired
+    def reject(reason):raise ReviewRequired('custom callbacks: storage rig '+reason)
+    if set(functions)!=set(STORAGE_CODE):reject('incomplete lifecycle')
+    module=u32(source.rel,0)
+    def target(role,high,section):
+        pointer=functions[role]['relocations'].get(high)
+        if pointer is None or pointer[:3]!=(6,module,section):reject('missing paired dependency')
+        return pointer[3]
+    def pair(high,low,address,section):return {high:(6,module,section,address),low:(4,module,section,address)}
+    bones=target('create',0x0E,5);motion=target('create',0x16,5)
+    constants={}
+    for label,role,high in (('initial_speed','create',0x4E),('start_frame','move',0x2A),('end_frame','move',0x2E)):
+        at=target(role,high,4);base,n=source.sections[4]
+        if not 0<=at<=n-4:reject('float dependency escapes section')
+        raw=source.rel[base+at:base+at+4];value=struct.unpack('>f',raw)[0]
+        if not math.isfinite(value):reject('non-finite animation limit')
+        constants[label]=dict(section=4,offset=at,hex=raw.hex(),value=value)
+    if constants['initial_speed']['hex']!='00000000':reject('changed stopped initialization')
+    common=target('move',0x0A,6)
+    spans=re.findall(r'^common_data = \.bss:0x([0-9A-Fa-f]+);[^\n]* size:0x([0-9A-Fa-f]+) ',source.symbols,re.M)
+    if [(int(at,16),int(n,16)) for at,n in spans]!=[(common,0x2DC00)]:reject('changed shared room owner')
+    expected={
+        'create':pair(0x0E,0x1A,bones,5)|pair(0x16,0x2A,motion,5)|pair(0x3A,0x42,motion,5)|
+            pair(0x4E,0x56,constants['initial_speed']['offset'],4),
+        'move':pair(0x0A,0x0E,common,6)|pair(0x2A,0x32,constants['start_frame']['offset'],4)|
+            pair(0x2E,0x36,constants['end_frame']['offset'],4),
+        'draw':{0x10:(10,0,4,0x8009AED0),0x78:(10,0,4,0x8009AF1C)},'destroy':{},
+    }
+    calls={'create':{0x34:(0x8D4,'cKF_SkeletonInfo_R_ct'),
+                     0x48:(0x934,'cKF_SkeletonInfo_R_init_standard_stop'),0x5C:(0xE54,'cKF_SkeletonInfo_R_play')},
+           'move':{},'draw':{0x50:(0x9D214,'_Matrix_to_Mtx_new'),0x70:(0x1578,'cKF_Si3_draw_R_SV')},'destroy':{}}
+    helpers={}
+    for role,(length,digest) in STORAGE_CODE.items():
+        helpers.update(source.checked_callback_code(functions[role],length,digest,expected[role],calls[role],'storage rig'))
+    rig=skeleton(source,bones);motion=animation(source,motion,joints=rig['joints'])
+    if not 1<=constants['start_frame']['value']<constants['end_frame']['value']<=motion['duration']:
+        reject('open/close limits escape complete motion')
+    descriptor=model_descriptor(rig,kind='animated-room-model')
+    return descriptor['models'],{},dict(category=STORAGE_CATEGORY,vtable_symbol=vtable_name,
+        vtable_offset=vtable_at,functions=functions,helpers=helpers,constants=constants,
+        room_callback=dict(common_symbol='common_data',common_offset=common,clip_offset=0x2608C,
+                           callback_offset=0x34,nullable=True,animation_mode='stop'),
         skeleton=rig,animation=motion,joint_models=descriptor['joint_models'],runtime_installed=False)
 
 
