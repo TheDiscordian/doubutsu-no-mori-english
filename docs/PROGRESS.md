@@ -44,14 +44,18 @@ remaining furniture candidates, 69 of 101 non-alias, non-dummy records have
 prepared artwork. Continue shared integration before required gold-tree work.
 See the [storage checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#openclose-storage-category).
 
-The shared switch-triggered sound category prepares five more complete objects
-at `build/v3-switch-sound-prepared-01/`, retaining source sound words, singleton
-flags, trigger conditions, and all profile model layers. Two focused checks pass.
-Native sound/callback and acquisition adapters remain required; no selectable
-imports or ROM change is claimed. Across the current remaining furniture
-candidates, the sound batch contributes five prepared objects. Continue
-shared conversion/integration categories, then the required gold-tree completion.
-See the [sound-category checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#switch-triggered-sound-category).
+The shared sound category has complete prepared artwork and audio for five
+objects. `build/v3-furniture-trigger-audio-02/` contains all five programs and a
+single expanded font/wave pair, retaining all 74 current instruments and adding
+five complete donor instruments. Shared code preserves repeated notes, envelopes,
+timing, tuning, samples, and single-instance flags. Four focused checks pass;
+the final allocation-accounting change has its affected check rerun successfully.
+Native sound dispatch/priorities, allocation, callbacks, and acquisition remain
+required. The font alone needs 576 bytes beyond the current permanent audio
+headroom; sequence growth must also be included before installation. No ROM,
+save, choice, or served patcher changes. Continue this shared integration before
+the required gold-tree completion. See the
+[audio checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-furniture-trigger-audio-preparation).
 
 All fifteen station models have complete prepared artwork, skeletons, and motions
 through the shared indexed-clock category at `build/v3-indexed-clock-rigs-prepared-01/`.

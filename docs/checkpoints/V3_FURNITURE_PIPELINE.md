@@ -1,5 +1,61 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared furniture trigger audio preparation
+
+`build/v3-furniture-trigger-audio-02/` prepares complete audio for the five
+source-discovered sound-triggered objects: green pipe, flagpole, super mushroom,
+koopa shell, and noisemaker. The shared pipeline selects records by callback
+category, not an item list:
+
+```sh
+python3 -B tools/v3_furniture_pipeline.py convert \
+  --representation audio --assets-only --category switch-trigger-sound \
+  --base-lock build/v3-clock-category-runtime-02/build-lock.json \
+  --output build/v3-furniture-trigger-audio-02
+```
+
+All five instruments are absent from the current native sound fonts; matching
+sound numbers do not supply the missing samples. The generic converter retains
+complete note programs and instruments, adding five source instruments to font
+140 while preserving all 74 existing entries. The pointer table grows by 32
+bytes, and every original bank-relative pointer follows; wave offsets and tuning
+remain unchanged. Shared complete resources are deduplicated. The pipe retains
+all three notes; the mushroom retains its `8000` single-instance flag.
+
+The complete font is 12,064 bytes (784 bytes larger); the complete wave resource
+is 3,019,472 bytes (36,992 bytes larger). Five relocatable programs are 17, 11,
+11, 33, and 11 bytes, including all original source padding. The aligned font
+allocation grows by 768 bytes. Current permanent audio headroom is 192 bytes,
+so at least 576 additional bytes are needed before adding sequence/table growth.
+No native sound ID, header, priority, heap setting, or callback changes yet.
+
+Four focused checks pass in 0.582 seconds. They cover complete repeated-note
+retention and malformed-program rejection; synthetic three-range instruments,
+pointer-table growth, resource deduplication, deterministic source ordering, and
+malformed-font rejection; all five actual programs/instruments, complete source
+reconstruction, every existing instrument/sample retained, and singleton flags;
+and changed cartridge/interpreter or unsupported sound-group rejection. The
+final aligned-capacity accounting change reruns only its affected check, passing
+in 0.225 seconds. The final source-receipt output has identical generated audio
+to the first output. No emulator, historical build, or audible test is run: the
+current cartridge is unchanged.
+
+- Manifest SHA-256:
+  `0a0825a9ee3a4078e6dc134658aa4372ca29fbbbad5b5170f5fef8beb9e6935a`.
+- Complete prepared font SHA-256:
+  `7cd1ba7d21ff562822c736b2a6428b26dddbc5b7da84a8c95d4bd4f503a7d2a0`.
+- Complete prepared wave SHA-256:
+  `f21c37a316bcd4592961f2712e226cbc9510c6316c99cf1b93476f16058b3efa`.
+
+Next integrate shared native trigger slots and source priorities, expanded
+permanent allocation, complete physical audio resources, and one move callback
+for the category. Donor IDs cannot be copied directly: they exceed the reviewed
+native group-one/group-four tables, where unchecked reads reach unrelated data. Preserve original
+programs and the source single-instance flag through the mapping. Ordinary
+profiles/acquisition remain separate work. ABI 161, 128 experimental choices,
+saved format 3, the main lock, and both served patchers remain unchanged. Required
+gold-tree completion stays after the primary importing work.
+
 ## Bulk storage and complete clock installation
 
 The explicit proposal is ABI 161 at

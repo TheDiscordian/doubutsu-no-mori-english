@@ -1119,8 +1119,8 @@ def main():
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--select', action='append', default=[], help='Canonical donor ID; defaults to all supported new furniture')
     parser.add_argument('--category', help='Restrict to a discovered shared category, without an item list')
-    parser.add_argument('--representation', choices=('furniture','handheld','scenery'), default='furniture',
-                        help='Discover furniture, held equipment, or shared scenery dependencies')
+    parser.add_argument('--representation', choices=('furniture','handheld','scenery','audio'), default='furniture',
+                        help='Discover furniture, held equipment, scenery, or furniture audio dependencies')
     parser.add_argument('--assets-only', action='store_true',
                         help='convert only: prepare artwork even when metadata/acquisition is unsupported; never install')
     parser.add_argument('--base-lock', type=Path, default=ROOT/'config/v3-import-build.json')
@@ -1128,10 +1128,12 @@ def main():
         help='Reuse a verified artwork bundle without recompilation; repeat for multiple bundles')
     args = parser.parse_args(); output = args.output.resolve()
     if args.assets_only and args.command != 'convert': parser.error('--assets-only requires convert')
+    if args.representation=='audio' and args.command!='convert':
+        parser.error('Audio preparation requires convert --assets-only; dispatch/allocation integration is unfinished')
     if args.category and args.command == 'scan': parser.error('--category requires convert or import')
     if args.reuse_assets and (args.command=='scan' or args.representation!='furniture'):
         parser.error('--reuse-assets requires furniture convert or import')
-    if args.representation in ('handheld','scenery') and (args.command == 'import' or
+    if args.representation in ('handheld','scenery','audio') and (args.command == 'import' or
             args.command == 'convert' and not args.assets_only):
         parser.error('This representation requires convert --assets-only; runtime integration is unfinished')
     if output.exists() or not output.is_relative_to(ROOT/'build'): raise ValueError('Use a fresh ignored build path')
@@ -1159,8 +1161,16 @@ def main():
         return
     worksheet = ROOT/'build/item-identity-megasheet.xlsx'
     from v3_furniture_install import inputs, build
-    _, base_report = inputs(args.base_lock)
+    base, base_report = inputs(args.base_lock)
     installed = [int(r['item_id'],16) for r in base_report['furniture']['imports']+[base_report['speed_bag']]]
+    if args.representation=='audio' and args.command=='convert':
+        from v3_sound_programs import prepare_furniture_audio
+        report=prepare_furniture_audio(base,base_report,source,scan(source,worksheet,installed),
+            output,args.select,args.category)
+        print(json.dumps(dict(furniture=len(report['furniture']),programs=len(report['programs']),
+            new_instruments=report['layout']['instrument_count']-report['layout']['native_instrument_count'],
+            runtime_installed=False)))
+        return
     if args.command == 'scan':
         report = scan(source, worksheet, installed); output.parent.mkdir(parents=True, exist_ok=True)
         write_new(output, (json.dumps(report, indent=2)+'\n').encode())

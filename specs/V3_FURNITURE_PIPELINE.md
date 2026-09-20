@@ -656,6 +656,32 @@ batch; native audio correspondence, callback integration, and acquisition remain
 required before metadata can permit installation. Additional particles, movement,
 or instrument behaviour reject rather than passing through this category.
 
+`convert --representation audio --assets-only --category switch-trigger-sound`
+uses these source-derived records to prepare the whole category's audio in one
+batch. The shared `v3_sound_programs` converter retains complete explicit-font,
+single-layer note sequences, including repeated notes and optional custom
+envelopes. Durations, velocities, pitches, tuning, and envelope data remain exact;
+only verified instrument/selector/internal-address bindings change. Unsupported
+commands, ambiguous boundaries, and unaccounted bytes reject. Full trigger words
+retain their single-instance flag separately from the source dispatch identity.
+
+The font builder grows its pointer table once, relocates all original live bank
+pointers, and preserves every existing instrument. Wave offsets and tuning words
+are not mistaken for bank pointers. Complete envelopes, samples, loops, predictor
+books, and all three instrument ranges are retained; identical dependencies are
+reused. Source records are sorted independently of request order. This is a
+general instrument batch, not an item-specific sound implementation.
+
+Prepared output contains a full expanded font/wave pair, relocatable programs,
+source/callback receipts, current-cartridge identity, and aligned font-capacity
+requirements. It does not assign native sound IDs, change audio headers, allocate
+memory, or install callbacks. Native dispatch/priority and allocation integration
+are mandatory: the same donor sound number can be out of bounds or select a
+different native program. The current five-object batch retains 74 instruments,
+adds five, and needs 768 more aligned font bytes. Only 192 bytes remain in the
+current permanent audio budget; new sequence/table storage is not yet included.
+Neither shrinking samples nor dropping sounds is an acceptable substitute.
+
 The `indexed-model-sequence` category supports constant identity-indexed draws
 with one or two ordered opaque lists and an optional conditional translucent
 pair. Complete reviewed instructions, all relocations, matrix-helper targets,

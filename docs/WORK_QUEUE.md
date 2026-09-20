@@ -27,8 +27,16 @@ Connect ordinary profiles/acquisition before enabling
 them. Extend shared categories for remaining
 models and source acquisition routes; do not substitute arbitrary shop stock.
 Event-present, Harvest, island, and direct-reward sources group other pending
-records. The sound category retains source trigger/singleton rules and requires
-actual native audio correspondence, not merely matching numerical sound IDs.
+records. Complete sound-category audio is prepared at
+`build/v3-furniture-trigger-audio-02/`: five complete programs/instruments,
+all 74 existing instruments retained, and actual sample/envelope/timing identity.
+Next extend shared native dispatch/priorities, permanent audio allocation, and
+the move-only callback together, then connect source acquisition. The prepared
+font requires 768 additional aligned resident bytes, versus 192 available;
+sequence/table growth is additional. Do not use the donor sound numbers directly:
+they exceed the reviewed native tables, where unchecked reads reach unrelated data.
+Preserve single-instance flags through the new mapping. Keep preparation distinct
+from installed/selectable content, and reuse the passing converter checks.
 The shared import reservation extends to `02800000`, with 2,060,768 bytes free
 after the complete fifteen-clock batch. English choices/general strings retain
 their content and physical locations through checked virtual relocation. The
