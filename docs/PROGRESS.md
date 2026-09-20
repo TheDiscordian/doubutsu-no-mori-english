@@ -18,13 +18,28 @@ served patchers retain their existing builds.
 
 ## Active development
 
-The current explicit ABI-145 proposal is
-`build/v3-shared-reward-exchange-02/build-lock.json`. All eight balloons are
+The current explicit ABI-146 proposal is
+`build/v3-shared-balloon-actor-04/build-lock.json`. All eight balloons are
 connected through the shared parent-category installer: official names/prices,
 complete pocket icons, held/inventory animation, source acquisition records,
 collection/catalogue, animated room profiles, indoor conversion, and inverse
 pickup. The local composer has 128 experimental choices, including 24 equipment
 parents. These are not a public or hardware-ready handoff.
+
+The complete separate flying-balloon actor is installed for all eight shapes,
+with private model/motion banks, donor flight/hide behaviour, reflection drawing,
+and actual selected-profile player creation. Existing native actors and resources
+remain intact. Its code fits existing reserved space; selected profiles add
+8,336 bytes of transient scene allocation including the player's pointer slot.
+Four host/cartridge checks pass. Native components cover all eight resource
+banks, two representative drawers, movement/hiding, and memory guards. The
+focused current-build selection check passes 41 records and 26 assertions,
+including restored state/checkpoint and clean exit. Interrupted full fixtures
+are not claimed as passes; the checkpoint records corrections and reused evidence.
+Release/look/exchange and fall/get-up consumers remain unfinished; the four
+golden-tool choices stay disabled. No saved format, choice, main lock, or served
+patcher changes. See the
+[flight checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-flying-balloon-actor).
 
 Shared inventory exchange carries the golden-shovel reward condition through
 normal drop, empty hand, burying, and fish/insect release. Three existing
@@ -37,8 +52,8 @@ the actual loaded tag's empty/fish/insect branches, all four installed callbacks
 request clearing/rejection, setup, sampled release timing, guards, restored state/
 checkpoint, and clean exit. Its menu-close callback is a test stub; bury setup
 uses item zero, and release setup uses an existing actor. Ordinary world
-placement/release, hardware, and balloon flight remain unverified. Next implement
-the separate balloon release actor/look/continuation route and source acquisition
+placement/release and hardware remain unverified. Next implement
+the balloon release/look/continuation consumers and source acquisition
 events. Golden choices remain disabled. See the
 [exchange checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-reward-inventory-exchange).
 

@@ -1561,6 +1561,8 @@ def tool_controls(debug,rom_path,record,*,transitions=False,capture=False,rod=Fa
 
 
 def exercise(debug, rom_path, record, *, section='automatic_furniture'):
+    if section=='balloon_actor':return balloon_actor(debug,rom_path,record)
+    if section=='balloon_selection':return balloon_actor(debug,rom_path,record,selection_only=True)
     if section=='reward_actions':return reward_actions(debug,rom_path,record)
     if section=='reward_pickup':return reward_pickup(debug,rom_path,record)
     if section=='reward_exchange':return reward_exchange(debug,rom_path,record)
@@ -2628,6 +2630,133 @@ def original_equipment_kinds(original):
         result.append(kind)
     if sorted(result)!=list(range(36)):raise ValueError('Original equipment switch is incomplete')
     return result
+
+
+def balloon_actor(debug,rom_path,record,*,selection_only=False):
+    """Real ctor-created actor, all complete banks, native flight, and two drawers."""
+    from runtime_layout import TEST_STACK
+    import v3_balloon_actor as runtime_actor
+    from v3_import_storage import jump
+    path=Path(rom_path);image=path.read_bytes();report=json.loads((path.parent/'build.json').read_bytes())
+    if sha256(image)!=report['output_sha256']:raise ValueError('Balloon probe requires current cartridge')
+    resources=report['equipment_resources'];r=resources['player_actions']['balloon_actor'];symbols=r['code']['symbols']
+    files=by_vrom(image);blob=files[runtime.BLOB].extract(image);boot=boot_proofs(image);assertions=0
+    def check(label,at,want):
+        nonlocal assertions
+        got=debug.read_memory(at,len(want));passed=got==want
+        record(dict(balloon_actor_check=label,address=f'{at:08X}',bytes=len(want),
+                    assertion='passed' if passed else 'failed',observed_sha256=sha256(got),expected_sha256=sha256(want)))
+        if not passed:raise ValueError('Balloon actor mismatch: '+label)
+        assertions+=1
+    def call(at,args=(),proof=None):
+        value=debug.call(f'{at:08X}',list(args),return_address=MODULE_RAM+0x6480,verified_code=proof or boot.get(at))
+        record(value);return value['return_value']
+    def put(at,*words):debug.write_memory(at,struct.pack('>'+str(len(words))+'I',*words))
+    def scalar(at):return int.from_bytes(debug.read_memory(at,4),'big')
+    def floating(at):return struct.unpack('>f',debug.read_memory(at,4))[0]
+    def pointer(at,n):
+        p=scalar(at)
+        if p&3 or not MODULE_RAM+0x8000<=p<=0x80400000-n:raise ValueError('Missing balloon lifecycle pointer')
+        return p
+    start=resources['blob_offset'];module=blob[start:start+resources['bytes']]
+    check('complete installed flight code',runtime_actor.RAM+r['offset'],module[r['offset']:r['offset']+r['code']['bytes']])
+    game=pointer(0x8010EF90,0x1E00);player=pointer(game+0x1C90,r['player_bytes'])
+    actor=pointer(player+r['player_pointer_offset'],r['actor_bytes'])
+    packet=runtime_actor.RAM+r['packet_offset'];before=debug.read_memory(actor,r['actor_bytes'])
+    check('ordinary player ctor created distinct CB actor',actor,b'\x00\xCB\x04')
+    check('actor owns resident descriptor',actor+0x170,struct.pack('>I',packet))
+    check('native descriptor instance count',packet+0x1E,b'\x01')
+    check('complete descriptor/profile except mutable count',packet,module[r['packet_offset']:r['packet_offset']+0x1E])
+    check('complete descriptor/profile suffix',packet+0x1F,module[r['packet_offset']+0x1F:r['packet_offset']+0x60])
+    check('hidden source mode',actor+0x448,bytes(4))
+    check('player extension padding',player+0x13A4,bytes(12))
+    saved={at:debug.read_memory(at,n) for at,n in ((game,4),(game+0xA0,4),(0x801458A0,64),
+        (0x80460020,192),(0x8046C000,report['save_runtime']['state_bytes']),(0x80126EA0,0xF980),
+        (TEST_STACK-0x800,16),(TEST_STACK+0x40,16))}
+    matrix=call(0x800E02AC);matrix_before=debug.read_memory(matrix,128)
+    size=0x3A00;allocation=call(0x8009BFC0,[size])
+    if allocation&15 or not MODULE_RAM+0x8000<=allocation<=0x80400000-size:raise ValueError('Balloon fixture allocation failed')
+    graph,bridge,args,gfx,xlu=(allocation+x for x in (0x10,0x400,0x500,0x800,0x2A00))
+    debug.write_memory(allocation,bytes(size));edge=b'V3BA'*4
+    guards=(allocation,graph+0x300,bridge-16,bridge+0x80,args-16,args+0x80,gfx-16,gfx+0x2000,
+            xlu-16,xlu+0x800,allocation+size-16,TEST_STACK-0x800,TEST_STACK+0x40)
+    for at in guards:debug.write_memory(at,edge)
+    names=('fly','main','draw','hide','descriptor')
+    stubs=b''.join(struct.pack('>2I',jump(symbols['af_v3_balloon_'+name]),0) for name in names)
+    debug.write_memory(bridge,stubs);call(0x8002FE00,[bridge,len(stubs)]);call(0x80034CE0,[bridge,len(stubs)])
+    def resident(name,args=()):return call(bridge+names.index(name)*8,args,(bridge,stubs))
+    position=debug.read_memory(player+0x28,12);models={x['index']:x for x in r['resources']}
+    try:
+        for iteration,shape in enumerate(() if selection_only else (0,7)):
+            debug.write_memory(actor,before)
+            debug.write_memory(args,struct.pack('>3h',400,1234,-200));debug.write_memory(args+16,position)
+            value=resident('fly',[actor,game,shape,args,100,args+16,0xBF800000 if not iteration else 0x41400000,0x40E00000])
+            check('request accepted with source shape',actor+0x450,struct.pack('>2I',1,shape))
+            if value!=1:raise ValueError('Selected balloon release rejected')
+            resident('main',[actor,game])
+            check('source fly mode and pending sentinel',actor+0x448,struct.pack('>3I',1,shape,0xFFFFFFFF))
+            check('complete independent model',actor+0x480,blob[models[40+shape]['blob_offset']:
+                  models[40+shape]['blob_offset']+models[40+shape]['bytes']])
+            idle=models[48];check('complete independent idle motion',actor+0x1AE0,blob[idle['blob_offset']:idle['blob_offset']+idle['bytes']])
+            check('native setup readiness',actor+0x474,struct.pack('>I',1))
+            delta=floating(actor+0x2C)-struct.unpack_from('>f',position,4)[0]
+            passed=abs(delta-.15)<.001
+            record(dict(balloon_rise_delta=delta,assertion='passed' if passed else 'failed'))
+            if not passed:raise ValueError('Incorrect donor half-step movement')
+            assertions+=1
+            check('native keyframe speed/frame/repeat',actor+0x180,struct.pack('>2fI',.5,2,1))
+            check('main restores CPU segment six',0x801458B8,saved[0x801458A0][24:28])
+            put(game,graph);put(game+0xA0,iteration)
+            put(graph+0x298,gfx,gfx+0x2000);put(graph+0x2A8,xlu,xlu+0x800)
+            resident('draw',[actor,game])
+            front,back=struct.unpack('>2I',debug.read_memory(graph+0x298,8))
+            if not gfx<front<back<=gfx+0x2000:raise ValueError('Balloon drawing escaped private graphics arena')
+            commands=list(struct.iter_unpack('>2I',debug.read_memory(gfx,front-gfx)))
+            lists=[p for w,p in commands if w==0xDE000000 and p>>24==6]
+            passed=len(lists)==4 and all(p==0x6000000 or p-0x6000000<models[40+shape]['bytes'] for p in lists)
+            record(dict(balloon_shape=shape,source_joint_lists=lists,assertion='passed' if passed else 'failed'))
+            if not passed:raise ValueError('Balloon drawer omits complete model joints')
+            assertions+=1
+            check('drawer restores opaque segment',front-8,struct.pack('>II',0xDB060018,int.from_bytes(saved[0x801458A0][24:28],'big')))
+            check('drawer restores CPU segment',0x801458B8,saved[0x801458A0][24:28])
+            check('balanced matrix stack',0x801462B4,struct.pack('>I',matrix))
+            check('parent matrix unchanged',matrix,matrix_before[:64])
+            # Sample disappearance at the real source threshold, not a replacement timer.
+            debug.write_memory(actor+0x2C,struct.pack('>f',struct.unpack_from('>f',position,4)[0]+199.99))
+            put(actor+0x6C,0);resident('main',[actor,game])
+            check('height threshold requests then enters hide',actor+0x448,struct.pack('>3I',0,shape,0xFFFFFFFF))
+            check('hidden actor follows actual player position',actor+0x28,position)
+            for at in guards:check('bounded work graphics and stack',at,edge)
+        # Every other shape uses the same implementation; verify actual transfer,
+        # animation construction, and bank isolation without repeating its draw.
+        for shape in (() if selection_only else range(1,7)):
+            resident('fly',[actor,game,shape,args,0,args+16,0xBF800000,0x40E00000]);resident('main',[actor,game])
+            row=models[40+shape];check('complete shared shape bank',actor+0x480,blob[row['blob_offset']:row['blob_offset']+row['bytes']])
+        profile=bytearray(saved[0x80460020])
+        for row in resources['parent_readers']['rows']:
+            if 0x2244<=int(row['item_id'],16)<0x224C:profile[row['profile_byte']]&=~row['profile_mask']
+        debug.write_memory(0x80460020,profile)
+        state=debug.read_memory(actor+0x448,0x30)
+        if resident('fly',[actor,game,0,args,0,args+16,0xBF800000,0x40E00000])!=0:raise ValueError('Unselected balloon accepted')
+        check('rejected release leaves actor untouched',actor+0x448,state)
+        row=next(x for x in resources['parent_readers']['rows'] if int(x['item_id'],16)==0x224B)
+        profile[row['profile_byte']]|=row['profile_mask'];debug.write_memory(0x80460020,profile)
+        if resident('fly',[actor,game,7,args,0,args+16,0xBF800000,0x40E00000])!=1:raise ValueError('Selected shape rejected')
+        check('selected shape accepted after rejection',actor+0x450,struct.pack('>2I',1,7))
+        check('saved payload retained',0x80126EA0,saved[0x80126EA0])
+        check('save/profile state retained',0x8046C000,saved[0x8046C000])
+    finally:
+        debug.write_memory(actor,before);debug.write_memory(matrix,matrix_before)
+        for at,value in saved.items():debug.write_memory(at,value)
+        call(0x8009C040,[allocation])
+    check('complete actor restored',actor,before)
+    for at,value in saved.items():check('restored live state',at,value)
+    check('no fault',0x8003CE34,bytes(4))
+    return dict(native_balloon_actor=not selection_only,native_balloon_selection=selection_only,
+        assertions=assertions,actual_player_ctor=True,models=0 if selection_only else 8,
+        representative_drawers=0 if selection_only else 2,source_timing_sampled=not selection_only,
+        game_code_uploaded=False,test_jump_bridges=True,
+        ordinary_release_tested=False,hardware_tested=False,flash_written=False,requires_checkpoint_restore=True)
 
 
 def reward_exchange(debug,rom_path,record):

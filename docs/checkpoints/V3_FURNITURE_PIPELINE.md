@@ -1,5 +1,112 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared flying-balloon actor
+
+The ABI-146 proposal is `build/v3-shared-balloon-actor-04/build-lock.json`.
+The shared installer adds complete donor flight/hide behaviour for all eight
+shapes, private model/motion banks, reflection drawing, and player creation.
+All 128 experimental choices, four disabled golden tools, saved format/profile,
+main ABI-109 lock, and both served V2 patchers remain unchanged. Ordinary release,
+exchange/look continuation, and fall/get-up consumers are still required; this
+is not a playable V3 handoff.
+
+- ROM SHA-256:
+  `492c4e42e3bad66807bd138a0be12759bea0c42b76a6d1620f98d536824a3e81`.
+- Report SHA-256:
+  `338e3fa6642aace40118ccacdcd22541e1a7b42cd8983c12c2647f12cae15e3b`.
+- UPS SHA-256:
+  `b4ff499e6dfffdd75b23c765803918f2411d14167b2cb9cd84f28d56ff757a24`.
+- Code SHA-256:
+  `fe20a698c5bb50f63f66fe08150b11286ce965eb703b542e3e9a2e68ae0e1767`.
+
+The 2,268-byte code group uses `804AC300..804ACBDC`; the 96-byte native
+descriptor/profile uses `804AEA40..804AEAA0`. Both occupy checked unused space
+in the existing 72-KiB module. Descriptor lookup adds `CB` while retaining `CA`,
+the `C9` sentinel, and all original descriptors. The core player allocation at
+`8010BCEC` grows sixteen bytes to `13B0`. Ctor call `808DD79C` dispatches the
+wrapper and removes only relocation `4402AA4C`; other player code and relocation
+remain. The new actor owns `2080` bytes including complete 5,728-/1,440-byte
+banks. Additional selected-profile scene allocation is 8,336 bytes; no permanent
+reservation or heap limit grows. Failed allocation leaves a null player slot.
+
+`python3 -m unittest tests.test_v3_balloon_actor -v` passes four checks in
+8.068 seconds. The sanitizer check includes the actual shared equipment-selector
+implementation, all shapes, both pose-entry modes, motion/hiding, segment
+retention, each transfer-failure boundary, allocation failure, no-selection,
+and invalid-shape fallback. Cartridge checks bind complete donor actor/profile,
+source/native APIs, complete retained resources, exact code/descriptor/hooks,
+one removed relocation, unrelated owners, unchanged saves, all/empty composition,
+128 options, UPS reconstruction, and reusable resource-tail ownership.
+Syntax compilation and `git diff --check` pass.
+
+### Native evidence and corrections
+
+The first run on build `01` reaches real actor creation and flight setup, then
+catches a wrong loader API: the implementation called the origin-offset reader
+instead of the VROM reader, so model contents differ. This is an actual code
+defect, not a harness exception. The fix uses `800B1650`, checks transfer bounds,
+and pins all three actual resource API bindings. No affected build is handed off.
+
+`build/smoke-v3-balloon-actor-02/` on corrected build `02` passes actual ctor/
+descriptor identity, independent loading for all eight shapes, both entry poses,
+two representative reflection drawers with four source lists each, donor
+half-step movement, animation speed/frame, source height-based hiding, segment
+and matrix restoration, and work/graphics/stack guards. It contains 100 records
+and 71 passing assertions, then hits a fixture type error parsing a hexadecimal
+item ID. Results SHA-256:
+`e4d89f871d943bb229f12abcfbf47c1f9965baa1e2b1e28f89c31fe1fb16ae43`.
+Build `03` has the same ROM as `02`, with strengthened build receipts.
+
+The corrected fixture on build `03` reaches the disabled-profile case and finds
+another actual code defect: treating the kind-or-minus-one selector result as
+a boolean accepts `-1`. Its 101 records contain 71 passing assertions; the full
+run is not a pass. Results SHA-256:
+`a97f89cf4dd69624557688366d825dc3a8b60055d1374e36b475863fbbb83073`.
+Build `04` requires the exact selected kind `91+shape` for both construction and
+release. Host tests use the real selector, not a boolean stand-in.
+
+The final native scenario targets changed selection and cleanup rather than
+replaying the completed model/physics/drawing prefix. Object-code sections for
+`load`, `source_step`, and `af_v3_balloon_main` are unchanged between `03` and
+`04`; the entire drawing object retains SHA-256
+`5b8b93a02a67886362136fa5bf25339dd35dc941efe800f1b42381e9f0674424`.
+Reuse the prior component evidence for those unchanged implementations; do not
+describe either interrupted full fixture as successful.
+
+The focused command is:
+
+```sh
+python3 tools/emulator_smoke.py \
+  --rom build/v3-shared-balloon-actor-04/animal-forest-v3-asset-loader.z64 \
+  --output build/smoke-v3-balloon-selection-01 \
+  --scenario tests/v3-player-balloon-selection-scenario.json \
+  --xvfb /home/discordian/Games/OpenRSC/headless/vendor/usr/bin/Xvfb \
+  --seconds 180 --expansion-pak --no-initial-screenshot
+```
+
+The focused current-cartridge run completes successfully with 41 records and
+26 passing assertions. Results SHA-256:
+`64e13bacd0e4ff0bc7cf00c4ef783a5ff0f97d04ab46a33bbbc32662218c3cdd`.
+It verifies actual
+player-created actor ownership, rejects an unselected shape without changing
+its actor, accepts the independently enabled eighth shape, retains saved data,
+restores the complete actor and live state, restores its checkpoint, resumes,
+checks the fault/save/equipment guards, and exits cleanly. The fixture uses small
+test-only jumps to actual loaded upper-memory code, not replacement game code.
+All emulator runs are silent and isolated; no user save or FlashRAM write is used.
+GPU appearance, normal scene teardown, ordinary release/fall interaction, and
+original-hardware behaviour remain unverified. Format-3 incompatibility and
+matching/equal-or-larger profile requirements remain unchanged.
+
+### Next action
+
+Connect the owned actor to the shared release setup, source head tracking and
+continuation result, exchange branch, and tumble/get-up handoff. Preserve native
+fish/insect behaviour and deferred golden-shovel settlement. Do not clear an item
+when the player lacks its flying actor, and do not label room-form placement as
+source balloon release. Keep source acquisition events and all four disabled
+golden choices in scope. See [the specification](../../specs/V3_BALLOON_RELEASE.md).
+
 ## Shared reward inventory exchange
 
 The ABI-145 proposal is `build/v3-shared-reward-exchange-02/build-lock.json`.

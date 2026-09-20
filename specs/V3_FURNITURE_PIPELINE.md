@@ -22,6 +22,14 @@ hand owner; its tag owner remains an in-place update.
 
 ### Shared runtime categories
 
+The shared flying-balloon category installs one complete donor state machine
+for all eight shapes, reusing complete converted resources. Its additive actor,
+private model/motion banks, player creation, physics, and native drawer preserve
+the existing gift balloon and all original actor descriptors. Code and the
+descriptor fit checked unused module suffixes; only transient scene allocations
+grow. Release/look/exchange/fall consumers remain required. See
+[flying balloons](V3_BALLOON_RELEASE.md).
+
 The shared inventory exchange stage carries the source reward condition through
 native normal-drop, empty-hand, burying, and fish/insect release routes. Existing
 transient unions hold the deferred flag; ordinary setters clear it, rejected

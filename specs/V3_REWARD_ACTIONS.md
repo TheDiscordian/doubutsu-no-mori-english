@@ -173,8 +173,9 @@ grows; four callback values, seven instruction windows, and their checked code
 reservations change. The installer binds ten complete donor functions, complete
 native consumers/APIs, prior wrapped conversion, and actual callback identities.
 
-Balloon release remains unfinished: its source branch needs the separate flying
-actor and balloon-dependent look/continuation rules. The installed exchange
+Balloon release remains unfinished: the [separate flying actor](V3_BALLOON_RELEASE.md)
+is installed, but its source branch still needs balloon-dependent release,
+look, and continuation rules. The installed exchange
 retains its existing placement path for balloons; that is not a completed donor
 release implementation. Source island-only restrictions have no N64 island
 counterpart. The four golden-tool choices remain disabled until full ordinary

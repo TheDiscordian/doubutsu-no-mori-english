@@ -117,6 +117,7 @@ def compile_part(part, out, extra_sources=(), defines=(), primary_source=None):
                        'reward_pickup': ('af_v3_reward_pickup', 0x804B2620),
                        'reward_deferred': ('af_v3_reward_bury_submenu', 0x804AE690),
                        'reward_exchange': ('af_v3_reward_exchange', 0x804AD650),
+                       'balloon_actor': ('af_v3_balloon_descriptor', 0x804AC300),
                        'held_rigs': ('af_v3_held_setup', 0x804B0000),
                        'room_rigs': ('af_v3_room_rig_ct', 0x804B1800),
                        'held_collection': ('af_v3_held_catalogue_record', 0x804AFA00),

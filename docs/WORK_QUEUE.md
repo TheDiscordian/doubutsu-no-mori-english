@@ -2,12 +2,29 @@
 
 ## Active: V3 optional GameCube imports
 
-The current explicit proposal is ABI 145,
-`build/v3-shared-reward-exchange-02/build-lock.json`. All eight balloons are
+The current explicit proposal is ABI 146,
+`build/v3-shared-balloon-actor-04/build-lock.json`. All eight balloons are
 connected through shared source-derived parent records, room profiles, indoor
 conversion/pickup, collection/catalogue, complete icons, and optional selection.
 There are 128 experimental choices, with 24 equipment parents. Neither served
 V2 patcher nor the main lock changes.
+
+The separate flying-balloon actor and selected-profile player creation are
+installed. All eight complete models and both motions use private actor-owned
+banks, with source flight/hide timing and native reflection drawing. Existing
+gift balloons, descriptors, resource identities, saves, and choices remain.
+Four current host/cartridge checks pass. Retained native components cover all
+eight resource banks, two actual drawers, movement/hiding, and memory guards.
+The current focused selection run passes 41 records and 26 assertions, including
+rejection/acceptance, restored state/checkpoint, final guards, and clean exit.
+Do not replay those completed components; the checkpoint records the two actual
+bugs corrected during implementation and the interrupted full fixtures.
+Next connect ordinary/exchange release and look/continuation, then fall/get-up
+handoff. Do not clear held items until the matching flying actor is available,
+and retain native fish/insect behaviour plus the deferred reward flag. Keep all
+four golden choices disabled pending these consumers and source acquisition.
+See the [flight specification](../specs/V3_BALLOON_RELEASE.md) and
+[checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-flying-balloon-actor).
 
 The shared exchange/deferred stage connects normal-drop, empty-hand, burying,
 and fish/insect release reward endings. Two sanitizer and three cartridge/
@@ -17,7 +34,7 @@ ordinary flag clearing, priority rejection, native setup, timing boundaries,
 guards, restored state/checkpoint, and clean exit. Retain those results. The
 fixture's close callback, empty bury item, and existing release actor deliberately
 limit its scope; ordinary world placement/release and hardware remain unproven.
-Next implement the complete source flying-balloon actor and its release/look/
+Next connect the complete source flying-balloon actor to release/look/
 continuation rules, including exchange and tumble loss. The exchange currently
 retains the existing placement path for balloons; do not label that as source
 release behaviour or merely clear the held item. Keep gold-tree growth/drop,
