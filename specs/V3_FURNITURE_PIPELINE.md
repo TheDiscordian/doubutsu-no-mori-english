@@ -22,21 +22,29 @@ hand owner; its tag owner remains an in-place update.
 
 ### Shared runtime categories
 
+The shared reward-action stage registers all complete callbacks for source
+actions 118–120, retaining other actions and all metadata. Shared requests keep
+native permissions and donor priorities; the axe delay preserves idle animation
+continuity and uses the native interval. Both code groups fit unused existing
+module space. The actual registered native transitions and persistent settlement
+have passing component evidence. Ordinary acquisition remains required before
+enabling golden-tool choices. See [reward actions](V3_REWARD_ACTIONS.md).
+
 The shared player-action reward-state stage follows the control stage. It
 installs independent per-player trophy/celebration flags, persistent settlement,
 and explicit format-3 migration through `tools/v3_save_rewards.py`. Existing
 catalogue/profile offsets, public entry addresses, item-reader suffix, source
 identities, and permanent reservations remain intact. Offline and private browser
 exports use the actual build's save warning; neither served patcher is updated.
-Action registration, request routes, and ordinary acquisition remain required.
+The action stage connects registration/requests; ordinary acquisition remains required.
 See [reward persistence](V3_REWARD_SAVE.md).
 
 The shared player-action reward-control stage follows the installed message
 phase. It connects source setup/main behaviour and native fanfare requests in
 checked unused icon-reservation space, preserving resources, action registration,
 saved formats, and selections. Its complete source/native audio audit reuses
-existing native sequences, fonts, and samples. Action registration and ordinary
-acquisition remain required before enabling rewards or tools. See
+existing native sequences, fonts, and samples. The action stage supplies complete
+registration; ordinary acquisition remains required before enabling tool choices. See
 [reward controls](V3_HANDHELD_ITEMS.md#shared-reward-controls-and-fanfares).
 
 The player-action refresh installs complete reward motions and generic eye/mouth

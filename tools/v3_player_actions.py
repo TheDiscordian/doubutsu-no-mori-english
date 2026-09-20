@@ -91,6 +91,8 @@ SOURCES+=('tools/v3_event_text.py','tools/v3_camper_text.py',
           'overlays/v3/player_reward_messages.c','overlays/v3/player_reward_messages.ld',
           'overlays/v3/player_rewards.c','overlays/v3/player_rewards.ld')
 SOURCES+=v3_save_rewards.SOURCES
+SOURCES+=('overlays/v3/reward_requests.c','overlays/v3/reward_requests.ld',
+          'overlays/v3/reward_wait.c','overlays/v3/reward_wait.ld')
 
 SELECTION_OFFSET=0x5500
 PARENT_CODE_OFFSET,PARENT_TABLE_OFFSET=0x3000,0x57F0
@@ -102,6 +104,122 @@ TOOL_MOTION_OFFSET=0x2A50
 EFFECTS_OFFSET,EFFECTS_STATE_OFFSET,EFFECTS_MODULE_SIZE=0xF000,0xFFD0,0x10000
 REWARD_MESSAGE_OFFSET,REWARD_MESSAGE_END=0xF280,0xF800
 REWARD_CONTROL_OFFSET,REWARD_CONTROL_END=0x10880,0x10FF0
+REWARD_REQUEST_OFFSET,REWARD_WAIT_OFFSET=0xF4E0,0x10C90
+
+
+def reward_action_bindings(source,core,owner,original,actions):
+    sources=[]
+    for at,size,digest in (
+        (0x198264,120,'66c6c4335f1b1d82406b2dfbe293efffc37ee1ce33d2ac1407453a0b7963b0e4'),
+        (0x1982DC,44,'083e82a171c2cbd4e424ef2e78bf41fce22c025f4377eb332d104641de4490d5'),
+        (0x198308,44,'4c1499cf72268936d4f06c119c7164242f7f2ce6575c9f29fdd11b25d66cfb31'),
+        (0x1988F4,44,'370d4b47e185118f2eb5a80246635f8b2180afddbd2f3c36a1bf94ecc25496d9'),
+        (0x198980,100,'17d3785d8d1fbbdad11c880148459bd8bcaa68cb583bb86801640cf470961574'),
+        (0x1989E4,160,'32eb8d257bfc38d097a3dffb79c6a8d821bf5807d8c7f84300b6353726ae16ea'),
+        (0x198A84,32,'696b9c0ec59ac8375100b22c20336831af94f2e3c92e2a9624725ca0f904391f'),
+        (0x198AA4,32,'a446ee39c4c4fe4ab4abd7532c88b8d6128d7b7e0efc81f0fcda68ea1fd8f662'),
+        (0x198AC4,32,'e6224e92725602eb8510c1594b3b4003658c4a49122fac24e2b238b753c260b4'),
+        (0x198AE4,80,'8014c5f579e4a960c32b94df4483852c3c7445805ddcd32a0e4f471572edb199'),
+        (0x198B34,124,'2e9b9711cd5ee52a0b0e5a86e282bfe73275b74e84a17e0377ff6727823aca67'),
+        (0x6A060,80,'b2e5e09372beba99e8e4fb757beb9dfdf3a55b89f7d990037792b5f134a528d5'),
+        (0x166460,216,'257c34ecc1fb88de2328837ec365f9eaf860ec97816678320d6bd3b8e92501bf'),
+        (0x166538,280,'ef09e8053d7db204d909fd31358e0c4788b47f1a9d0e8e5296e80e8d143859d3')):
+        raw,row=source.function(at)
+        if len(raw)!=size or sha256(raw)!=digest:raise ValueError('Changed complete reward request/wait source')
+        sources.append(row)
+    extended={row['entry']:row['sha256'] for row in actions['reward_controls']['bindings']['native_functions']}
+    boundaries=[]
+    for name in ('symbol_addrs_code.txt','symbol_addrs_overlays.txt'):
+        boundaries.extend(int(a,16) for a in re.findall(r'= 0x([0-9A-Fa-f]+); // type:func',
+            (ROOT/'upstream/af/linker_scripts/jp'/name).read_text()))
+    code=''.join((ROOT/'overlays/v3'/name).read_text() for name in ('reward_requests.c','reward_wait.c'))
+    files=by_vrom(original);native=[]
+    for entry in sorted({int(a,16) for a in re.findall(r'FN\(0x([0-9A-F]+)u,',code)}):
+        end=min(a for a in boundaries if a>entry)
+        data,old,ram=(owner,files[PLAYER_VROM].extract(original),PLAYER_RAM) if entry>=PLAYER_RAM else (
+            core,files[CODE_VROM].extract(original),CODE_RAM)
+        raw=data[entry-ram:end-ram]
+        if not raw or sha256(raw)!=extended.get(entry,sha256(old[entry-ram:end-ram])):
+            raise ValueError(f'Changed native reward request/wait API {entry:08X}')
+        native.append(dict(entry=entry,end=end,sha256=sha256(raw)))
+    # The two real action-limit consumers outside the player already return
+    # the source's zero for these actions, or receive only the native wait/walk
+    # callback's -1/7/8/9/10 set. Do not widen an unrelated resource-size bound.
+    audit=fan_action_audit(source,owner,core,original)
+    values=source.rel[source.sections[4][0]+7912+118:source.sections[4][0]+7912+121]
+    if values!=bytes(3):raise ValueError('Reward actions need a different core event-position rule')
+    return dict(source_functions=sources,native_functions=native,core_audit=audit,
+        event_position_values=list(values),actions=[118,119,120],submenu_priority=31,
+        event_priority=34,axe_wait_priority=33,donor_wait_updates=320,native_timer_step=2.0,
+        native_wait_updates=160,continuation_preserved=True,core_changes_required=False)
+
+
+def activate_reward_actions(base,prior,blob,core,original,output):
+    old=prior['equipment_resources'];actions=old['player_actions'];start=old['blob_offset']
+    module=bytearray(blob[start:start+old['bytes']]);files=by_vrom(base)
+    owner=files[PLAYER_VROM].extract(base);reloc=files[PLAYER_RELOC].extract(base)
+    if (actions.get('reward_actions') or not actions.get('reward_state')
+            or not actions['reward_controls']['persistent_settlement_installed']
+            or actions['enabled_imported_actions']!=[109] or len(module)!=0x12000
+            or sha256(module)!=old['sha256'] or sha256(owner)!=actions['owner_sha256']
+            or sha256(reloc)!=actions['relocation_sha256']):
+        raise ValueError('Reward activation requires complete checked control/state dependencies')
+    source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+        (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    bindings=reward_action_bindings(source,core,owner,original,actions)
+    for name,end in (('reward_messages',REWARD_REQUEST_OFFSET),('reward_controls',REWARD_WAIT_OFFSET)):
+        row=actions[name];at=row['code_offset'];size=row['code']['bytes']
+        if at+size>end or sha256(module[at:at+size])!=row['code']['sha256']:
+            raise ValueError('Changed retained reward code or overlapping reservation')
+    request_code,requests=compile_part('reward_requests',output/'reward_requests')
+    wait_code,wait=compile_part('reward_wait',output/'reward_wait',defines=(
+        f'AF_V3_REWARD_EVENT=0x{requests["symbols"]["af_v3_reward_event"]:08X}u',))
+    for at,end,code in ((REWARD_REQUEST_OFFSET,REWARD_MESSAGE_END,request_code),
+                        (REWARD_WAIT_OFFSET,REWARD_CONTROL_END,wait_code)):
+        if any(module[at:end]) or at+len(code)>end:raise ValueError('Occupied reward action reservation')
+        module[at:at+len(code)]=code
+    report=copy.deepcopy(old);tables=report['player_actions']['tables']
+    fresh={r['native_entry']:r for r in source_tables(source)}
+    symbols=actions['reward_controls']['code']['symbols']
+    callbacks={'Player_actor_Item_net_CulcJointAngle_dummy_net_reset':0x808BE140,
+        'Player_actor_request_main_demo_get_golden_item_from_submenu':requests['symbols']['af_v3_reward_submenu'],
+        'Player_actor_setup_main_Demo_get_golden_item':symbols['af_v3_reward_setup'],
+        'Player_actor_setup_main_Demo_get_golden_item2':symbols['af_v3_reward_setup'],
+        'Player_actor_main_Demo_get_golden_item':symbols['af_v3_reward_main'],
+        'Player_actor_main_Demo_get_golden_item2':symbols['af_v3_reward_main'],
+        'Player_actor_settle_main_Demo_get_golden_item':actions['reward_state']['code']['symbols']['af_v3_reward_settle'],
+        'Player_actor_settle_main_Demo_get_golden_item2':actions['reward_state']['code']['symbols']['af_v3_reward_settle'],
+        'Player_actor_setup_main_Demo_get_golden_axe_wait':wait['symbols']['af_v3_reward_wait_setup'],
+        'Player_actor_main_Demo_get_golden_axe_wait':wait['symbols']['af_v3_reward_wait_main']}
+    installed=[]
+    for row in tables:
+        if row['width']!=4:continue
+        at,n=row['offset'],row['bytes']
+        if sha256(module[at:at+n])!=row['sha256']:raise ValueError('Changed complete action table')
+        for index in (118,119,120):
+            slot=at+index*4;callback=fresh[row['native_entry']]['source_callbacks'].get(index)
+            if u32(module,slot):raise ValueError('Reward slot is not disabled')
+            if callback is None:
+                if str(index) in row['source_callbacks']:raise ValueError('Changed null source reward callback')
+                continue
+            previous=row['source_callbacks'].get(str(index))
+            if (not previous or callback['symbol']!=previous['symbol'] or callback['sha256']!=previous['sha256']
+                    or callback['symbol'] not in callbacks):raise ValueError('Unknown or changed source reward callback')
+            target=callbacks[callback['symbol']];struct.pack_into('>I',module,slot,target)
+            installed.append(dict(index=index,consumer=row['native_entry'],offset=slot,target=target,source=callback))
+        row['sha256']=sha256(module[at:at+n])
+    if len(installed)!=12:raise ValueError('Incomplete source reward callback group')
+    blob[start:start+len(module)]=module
+    report.update(sha256=sha256(module),crc32=zlib.crc32(module),additional_resident_bytes=0)
+    current=report['player_actions']
+    current.update(enabled_imported_actions=[109,118,119,120],
+        disabled_indices=[i for i in range(NATIVE_COUNT,COUNT) if i not in (109,118,119,120)],
+        reward_actions=dict(bindings=bindings,callbacks=installed,requests=requests,wait=wait,
+            request_code_offset=REWARD_REQUEST_OFFSET,wait_code_offset=REWARD_WAIT_OFFSET,
+            action_callbacks_installed=True,ordinary_acquisition_installed=False,
+            ordinary_gameplay_tested=False,logical_imports_added=0))
+    for key in ('reward_controls','reward_messages','reward_state'):current[key]['action_callbacks_installed']=True
+    return report,{}
 
 
 def reward_control_bindings(source,core,owner,original):
@@ -1791,6 +1909,8 @@ def expanded_tables(source,owner,reloc,*,categories=CATEGORIES,native_count=NATI
 
 def install(base,prior,blob,core,original,output):
     old=prior.get('equipment_resources',{})
+    if old.get('player_actions',{}).get('reward_state') and not old['player_actions'].get('reward_actions'):
+        return activate_reward_actions(base,prior,blob,core,original,output)
     if old.get('player_actions',{}).get('reward_controls') and not old['player_actions'].get('reward_state'):
         report=copy.deepcopy(old)
         receipt=v3_save_rewards.install(base,prior,blob,core,output)

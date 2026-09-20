@@ -1561,6 +1561,7 @@ def tool_controls(debug,rom_path,record,*,transitions=False,capture=False,rod=Fa
 
 
 def exercise(debug, rom_path, record, *, section='automatic_furniture'):
+    if section=='reward_actions':return reward_actions(debug,rom_path,record)
     if section=='reward_controls':return reward_controls(debug,rom_path,record)
     if section=='reward_messages':return reward_messages(debug,rom_path,record)
     if section=='reward_motion':return reward_motion(debug,rom_path,record)
@@ -2625,6 +2626,121 @@ def original_equipment_kinds(original):
         result.append(kind)
     if sorted(result)!=list(range(36)):raise ValueError('Original equipment switch is incomplete')
     return result
+
+
+def reward_actions(debug,rom_path,record):
+    """Registered native transitions, including axe wait and persistent settlement."""
+    import v3_equipment_runtime as equipment
+    from runtime_layout import TEST_STACK
+    path=Path(rom_path);image=path.read_bytes();report=json.loads((path.parent/'build.json').read_bytes())
+    if sha256(image)!=report['output_sha256']:raise ValueError('Changed reward-action cartridge')
+    resources=report['equipment_resources'];actions=resources['player_actions'];receipt=actions['reward_actions']
+    files=by_vrom(image);blob=files[runtime.BLOB].extract(image);boot=boot_proofs(image);assertions=0
+    def check(label,at,want):
+        nonlocal assertions
+        actual=debug.read_memory(at,len(want));passed=actual==want
+        record(dict(reward_action_check=label,address=f'{at:08X}',bytes=len(want),
+            assertion='passed' if passed else 'failed',observed_sha256=sha256(actual),expected_sha256=sha256(want)))
+        if not passed:raise ValueError('Reward action mismatch: '+label)
+        assertions+=1
+    def call(at,args=(),proof=None,want=None):
+        nonlocal assertions
+        result=debug.call(f'{at:08X}',list(args),return_address=MODULE_RAM+0x6480,verified_code=proof or boot.get(at))
+        if want is not None:result['assertion']='passed' if result['return_value']==want else 'failed'
+        record(result)
+        if want is not None:
+            if result['return_value']!=want:raise ValueError('Unexpected reward action return')
+            assertions+=1
+        return result['return_value']
+    def put(at,*words):debug.write_memory(at,struct.pack('>'+str(len(words))+'I',*words))
+    def pointer(at,size):
+        value=int.from_bytes(debug.read_memory(at,4),'big')
+        if value&3 or not MODULE_RAM+0x8000<=value<=0x80400000-size:raise ValueError('Invalid reward action fixture pointer')
+        return value
+    start=resources['blob_offset'];module=blob[start:start+resources['bytes']]
+    check('complete installed callback module',equipment.RAM,module)
+    constructor=int.from_bytes(debug.read_memory(0x80143900,4),'big');owner=constructor-(0x808DD748-equipment.PLAYER_RAM)
+    data,rel=(files[v].extract(image) for v in (equipment.PLAYER_VROM,equipment.PLAYER_RELOC))
+    if owner&15 or not MODULE_RAM+0x8000<=owner<=0x80400000-len(data):raise ValueError('Missing live player owner')
+    sections=struct.unpack_from('>5I',rel)
+    expected=relocate_verified_data(SimpleNamespace(ram=equipment.PLAYER_RAM,resident_bytes=len(data),sections=sections),data,rel,owner)
+    check('complete actual player code',owner,expected[:sections[0]])
+    proofs={}
+    for row in actions['tables']:
+        if row['native_entry'] in (0x808DDA18,0x808DDB5C):
+            first,last=row['native_entry']-equipment.PLAYER_RAM,row['native_end']-equipment.PLAYER_RAM
+            proofs[row['native_entry']]=(owner+first,expected[first:last])
+    def dispatch(entry):
+        proof=proofs[entry];return call(proof[0],[actor,game],proof,want=1 if entry==0x808DDA18 else None)
+    game=pointer(0x8010EF90,0x1E00);actor_bytes=resources['held_rig_actions']['player_allocation']['bytes']
+    actor=pointer(game+0x1C90,actor_bytes);actor_before=debug.read_memory(actor,actor_bytes)
+    saved={at:debug.read_memory(at,size) for at,size in ((0x80123E10,0x154),(0x801458A0,64),
+        (0x8046C000,report['save_runtime']['state_bytes']),(0x80126EA0,0xF980),(0x80136FD8,4),(0x8013767D,2))}
+    banks={}
+    for index in struct.unpack_from('>2h',actor_before,0xDA0):
+        if not 0<=index<8:raise ValueError('Invalid live reward bank')
+        address=pointer(game+0x114+84*index,equipment.PLAYER_CAPACITY)
+        banks[address]=debug.read_memory(address,equipment.PLAYER_CAPACITY)
+    allocation=call(0x8009BFC0,[128])
+    if allocation&15 or not MODULE_RAM+0x8000<=allocation<=0x80400000-128:raise ValueError('Reward bridge allocation failed')
+    bridge=allocation+16;raw=bytearray();entries={}
+    for name in ('af_v3_reward_request','af_v3_reward_event','af_v3_reward_axe_wait_request'):
+        entries[name]=bridge+len(raw);raw.extend(struct.pack('>4I',0x08000000|(receipt['requests']['symbols'][name]>>2&0x3FFFFFF),0,0,0))
+    debug.write_memory(bridge,raw);call(0x8002FE00,[bridge,len(raw)]);call(0x80034CE0,[bridge,len(raw)])
+    proof=(bridge,bytes(raw));edge=b'V3RA'*4
+    guards=(allocation,allocation+112,TEST_STACK-0x800,TEST_STACK+0x40)
+    for at in guards:debug.write_memory(at,edge)
+    def request(name,args,want=1):return call(entries['af_v3_reward_'+name],args,proof,want)
+    expected_state=bytearray(saved[0x8046C000]);expected_state[0x350:0x380]=bytes(48)
+    def finish(type):
+        # Message rendering/timing has separate passing evidence. Simulate its
+        # completed phase here to exercise the real request/settle transition.
+        debug.write_memory(actor+0xD10,struct.pack('>f2I',42.0,3,type))
+        dispatch(0x808DDB5C)
+        check('completed report requests ordinary wait',actor+0xD00,struct.pack('>3I',7,1,1))
+        dispatch(0x808DDA18);expected_state[0x358]|=1<<type
+        check('registered settlement records the active celebration',0x8046C000,expected_state)
+        check('returned to native wait',actor+0xCF0,struct.pack('>I',7))
+    try:
+        debug.write_memory(0x8046C000,expected_state);put(0x80136FD8,0x80126EC0)
+        debug.write_memory(0x8013767D,bytes(2));debug.write_memory(0x80127908,b'\0')
+        debug.write_memory(actor+0xE64,b'\1');put(actor+0xCF0,7);put(actor+0xD00,7,0,0)
+        call(0x8005EB74,[0x80123E10])
+        request('request',[game,118,3,31])
+        check('first reward request data',actor+0xD00,struct.pack('>3I',118,31,1))
+        check('first reward requested type',actor+0xD58,struct.pack('>I',3))
+        request('request',[game,119,2,30],0)
+        check('lower-priority request is rejected without changing type',actor+0xD58,struct.pack('>I',3))
+        dispatch(0x808DDA18);check('actual first reward setup selected',actor+0xCF0,struct.pack('>I',118))
+        dispatch(0x808DDB5C);check('real reward frame advances message timer',actor+0xD10,struct.pack('>f',2.0))
+        finish(3)
+        request('event',[game,1]);dispatch(0x808DDA18)
+        check('actual second reward setup selected',actor+0xCF0,struct.pack('>I',119));finish(1)
+        request('axe_wait_request',[game]);dispatch(0x808DDA18)
+        check('actual axe wait selected',actor+0xCF0,struct.pack('>I',120))
+        check('axe timer starts clear',actor+0xD10,bytes(4))
+        dispatch(0x808DDB5C);check('native axe timer interval',actor+0xD10,struct.pack('>f',2.0))
+        debug.write_memory(actor+0xD10,struct.pack('>f',318.0));dispatch(0x808DDB5C)
+        check('axe reaches full source delay',actor+0xD10,struct.pack('>f',320.0))
+        check('axe still waits at delay boundary',actor+0xCF0,struct.pack('>I',120))
+        dispatch(0x808DDB5C)
+        check('axe wait requests event celebration',actor+0xD00,struct.pack('>3I',119,34,1))
+        dispatch(0x808DDA18);check('axe celebration selected',actor+0xCF0,struct.pack('>I',119));finish(0)
+        check('callback tables and all installed code stay unchanged',equipment.RAM,module)
+        for at in guards:check('reward action guard',at,edge)
+        check('no CPU fault',0x8003CE34,bytes(4))
+    finally:
+        debug.write_memory(actor,actor_before)
+        for at,value in banks.items():debug.write_memory(at,value)
+        for at,value in saved.items():debug.write_memory(at,value)
+        call(0x8009C040,[allocation])
+    check('live actor restored',actor,actor_before)
+    for at,value in banks.items():check('live motion bank restored',at,value)
+    for at,value in saved.items():check('live state restored',at,value)
+    return dict(native_reward_actions=True,registered_indices=[118,119,120],assertions=assertions,
+        temporary_callback_slots=False,test_only_jump_wrappers=True,simulated_report_completion=True,
+        sampled_axe_delay=True,persistent_settlement_tested=True,ordinary_acquisition_tested=False,
+        ordinary_gameplay_tested=False,hardware_tested=False,flash_written=False,requires_checkpoint_restore=True)
 
 
 def reward_controls(debug,rom_path,record):

@@ -1337,8 +1337,8 @@ Golden-tool acquisition is not installed. The donor's `ac_present_demo_move.c_in
 selects the rod or net after the corresponding complete creature collection and
 checks its trophy flag. The axe uses the perfect-town reward in `ac_npc_hem.c_inc`;
 the shovel comes from `GOLD_TREE_SHOVEL` in `bg_item_common.c_inc`. Their source
-reward action registration and acquisition events require native integration.
-The installed motions and saved flags do not connect those routes. Do not replace
+acquisition events require native integration. The installed actions, motions,
+and saved flags do not connect those source events. Do not replace
 these routes with ordinary shop stock or enable a tool based on its assets alone.
 
 The native acquisition gap includes engine content, not only item substitutions:
@@ -1368,8 +1368,9 @@ The complete reward motions, shared facial sequences, official message phase,
 setup/main controller, fanfare requests, persistent settlement, and separate
 saved reward flags are installed as described below and in
 [reward persistence](V3_REWARD_SAVE.md).
-Next connect action registration and request routes, then
-the event actors and acquisition conditions.
+The [shared action stage](V3_REWARD_ACTIONS.md) registers the complete callbacks
+and request/wait routes. Next connect the event actors, acquisition conditions,
+and remaining shovel pickup/submenu consumers.
 Use the shared category installer and complete source records. Keep all four
 choices disabled until their full paths are connected; do not substitute a
 shop purchase, arbitrary letter, or unrelated NPC for a missing donor event.
@@ -1423,8 +1424,8 @@ sequence, instrument, sample, or permanent audio allocation is needed.
 The fanfare stop callback only stops audio. The
 [persistent settlement wrapper](V3_REWARD_SAVE.md) also records the active
 player's celebration bit, distinct from trophy receipt and catalogue ownership.
-Action registration/request routes and ordinary acquisition remain required;
-do not enable golden tools based on these installed callbacks. See the
+The shared action stage registers this callback; ordinary acquisition remains
+required. Do not enable golden tools based on installed callbacks alone. See the
 [checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-reward-controls-and-fanfares).
 
 #### Shared reward messages
@@ -1460,11 +1461,11 @@ Neither neighbouring resource, the previous-dig state at `804B2FD0`, the full
 complete module checks, and zero-space checks guard installation. Later stages
 retain already installed text without reapplying an older resource image.
 
-These callbacks are not yet registered as complete reward actions. The
-persistence stage supplies settlement and saved flags; registration/request
-routes and source acquisition remain required.
-The focused native fixture temporarily uses an unused existing dispatcher slot
-and restores it; that is component verification, not ordinary acquisition.
+The persistence stage supplies settlement and saved flags, and the
+[action stage](V3_REWARD_ACTIONS.md) registers complete reward callbacks.
+Source acquisition remains required. The message-stage native fixture uses a
+temporary dispatcher slot; the action-stage fixture uses the actual registered
+dispatchers. Both are component verification, not ordinary acquisition.
 See the [checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-reward-messages).
 
 #### Shared reward motions and player faces

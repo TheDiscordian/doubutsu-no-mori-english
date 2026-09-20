@@ -1,5 +1,93 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared reward action registration
+
+The ABI-143 proposal is `build/v3-shared-reward-actions-01/build-lock.json`.
+The shared category installer registers all twelve source callbacks for actions
+118–120: both golden-tool celebration variants and the golden-axe waiting action.
+It connects source-priority requests, the submenu callback, the axe delay,
+existing messages/animations/fanfares, and persistent settlement. Ordinary
+source acquisition events remain unfinished; the four golden-tool choices stay
+disabled. The 128 experimental choices, format-3 saves, profiles, allocations,
+main ABI-109 lock, and both served V2 patchers remain unchanged.
+
+- ROM SHA-256:
+  `be64382472c2cba2d132ade0a9aff709ddcb770cadf343d26cc5576bcbf5dedd`.
+- Report SHA-256:
+  `4f2198c301447045790eb32e16ba938de93c90290914dfefcc6d104414540054`.
+- UPS SHA-256:
+  `5d209b6cb4254626e13ab8a5ab5516d08257173f31862345910f9a56ee4a0b29`.
+- Request code SHA-256:
+  `c385d18bcd1035324820eacb043a901e486f86768cef34bbb349b7beb5931c4c`.
+- Waiting code SHA-256:
+  `5c34771fa003edda98dff67ecca6222a4214169688ba62841b776cdc0cdf7bde`.
+
+The 308-byte request group fits `804B24E0..804B2614`, before existing bobber
+artwork. The 668-byte waiting group fits `804B3C90..804B3F2C`, before the icon
+guard. The complete module, prior code, and zero reservations are verified;
+all unrelated table entries and resources remain. No native owner or relocation
+changes. Complete donor table consumers and callbacks are re-resolved and bound
+before installing pointers. The existing shared native dispatcher handles both
+resident callbacks and the unchanged native net-reset callback.
+
+Requests preserve source priorities 31/34/33 for submenu/event/axe wait and the
+actual native permission/priority predicates. A rejected request does not alter
+its requested type. The wait uses the native equivalent of the source interval,
+retains complete per-frame behaviour, and supplies the donor's WAIT1 continuation
+predicate, absent from the native initializer. Both animation frames continue
+when valid; otherwise the source restart/morph applies. The complete 320-source-
+update delay becomes 160 native updates, then requests celebration on the next
+update. Rejection retries without restarting the timer. See
+[the specification](../../specs/V3_REWARD_ACTIONS.md).
+
+One sanitizer and three cartridge/composition checks pass on their first run,
+in 7.081 seconds:
+
+```sh
+python3 -m unittest tests.test_v3_reward_actions -v
+```
+
+They cover every reward type/request route, denied and missing-actor paths,
+unchanged actor bytes, priorities, complete wait duration and retry, all source
+continuation branches, null inputs, complete source/native bindings, changed
+source/API rejection, all twelve actual callback slots, remaining null actions,
+retained tables/resources/save code, exact empty/all composition, all 128 choices,
+original-ROM UPS reconstruction, and future resource-tail reuse. Python syntax
+compilation and `git diff --check` pass.
+
+The first silent native attempt passes 73 records and 53 assertions:
+
+```sh
+python3 tools/emulator_smoke.py \
+  --rom build/v3-shared-reward-actions-01/animal-forest-v3-asset-loader.z64 \
+  --output build/smoke-v3-reward-actions-01 \
+  --scenario tests/v3-player-reward-actions-scenario.json \
+  --xvfb /home/discordian/Games/OpenRSC/headless/vendor/usr/bin/Xvfb \
+  --seconds 180 --expansion-pak --no-initial-screenshot
+```
+
+Results SHA-256:
+`199df8822e4375eb1a7a2c66b8716d3ca396a0500fd3017b45378e7dfaf07a84`.
+The shared representative probe uses the actual loaded player owner and actual
+registered setup/main tables without substituting callback slots. It executes
+both celebration variants, native priority rejection, sampled axe-delay
+boundaries, the wait-to-celebration-to-idle transition, and actual persistent
+settlement for shovel, net, and axe. The complete shared module remains unchanged.
+Stack/bridge/state guards, restored actor/motion banks/native payload/flags/BGM,
+checkpoint restoration, resumed game, and clean exit pass. The fixture uses
+test-only jump wrappers for resident requests and simulates completed message
+state; it does not claim a complete player conversation, normal acquisition,
+full native delay playback, FlashRAM I/O, or original-hardware verification.
+No user save is used, and no physical audio is played. Native fixture work took
+less than five minutes; the retry allowance is unused.
+
+Next connect the source collection-completion event director/NPCs, perfect-town
+reward conversation, gold-tree route, and remaining shovel pickup/submenu
+consumers. Keep original source conditions and official dialogue; do not replace
+missing events with shops or arbitrary gifts. Format-3 saves still require a
+compatible build and matching/equal-or-larger profile; older format-1/2 V3 builds
+and V2 must not load them. No save-format change occurs in this batch.
+
 ## Shared reward persistence
 
 The ABI-142 proposal is `build/v3-shared-reward-state-02/build-lock.json`.

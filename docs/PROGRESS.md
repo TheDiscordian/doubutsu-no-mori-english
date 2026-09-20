@@ -18,13 +18,28 @@ served patchers retain their existing builds.
 
 ## Active development
 
-The current explicit ABI-142 proposal is
-`build/v3-shared-reward-state-02/build-lock.json`. All eight balloons are
+The current explicit ABI-143 proposal is
+`build/v3-shared-reward-actions-01/build-lock.json`. All eight balloons are
 connected through the shared parent-category installer: official names/prices,
 complete pocket icons, held/inventory animation, source acquisition records,
 collection/catalogue, animated room profiles, indoor conversion, and inverse
 pickup. The local composer has 128 experimental choices, including 24 equipment
 parents. These are not a public or hardware-ready handoff.
+
+The shared reward-action category registers all twelve source callbacks for
+both golden-tool celebrations and the golden-axe waiting action. Requests retain
+native permissions and donor priorities; the axe wait preserves idle animation
+continuity and source timing. The 308-byte request group and 668-byte wait group
+fit existing unused space. No save, profile, resource, or allocation grows.
+One sanitizer and three cartridge/composition checks pass. The first silent
+native run passes 73 records and 53 assertions, including actual registered
+setup/main transitions, priority rejection, the axe-wait handoff, persistent
+settlement, unchanged code, guards, restored state/checkpoint, and clean exit.
+It simulates the message-completed phase and samples the delay boundaries;
+ordinary acquisition, full conversations, and hardware remain unverified.
+Next connect source scene/NPC/tree acquisition and the remaining shovel
+pickup/submenu consumers. The four golden-tool choices remain disabled. See the
+[action checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-reward-action-registration).
 
 Shared reward persistence and the celebration settlement callback are installed.
 Format 3 appends 48 bytes for four players' distinct trophy and celebration
@@ -38,8 +53,8 @@ export-warning check pass. The
 first silent native run passes 67 records and 50 assertions, including migration,
 complete encoding, actual commit/settlement/player deletion, retained guards,
 restored state/checkpoint, and clean exit. This is component verification, not
-an ordinary save/restart or hardware test. Next connect reward action registration
-and request routes, then the source scene/NPC/tree acquisition events. The four
+an ordinary save/restart or hardware test. The action stage connects registration
+and request routes; source scene/NPC/tree acquisition remains required. The four
 golden-tool choices remain disabled. See the
 [persistence checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-reward-persistence).
 
@@ -54,9 +69,9 @@ one frame, fanfare requests, native segment behaviour, unchanged saved data,
 restored state/checkpoint, and clean exit. The first run also verifies all four
 fanfare request/delete pairs before its incorrect segment-retention assertion.
 No actual game-code defect is found: the unchanged native animation combiner
-leaves the lower bank selected in segment six. Reward action registration and
-ordinary acquisition events remain unimplemented, so the four golden tools and
-their reward actions remain disabled. See the
+leaves the lower bank selected in segment six. Reward actions are registered;
+ordinary acquisition events remain unimplemented, so the four golden-tool
+choices remain disabled. See the
 [control checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-reward-controls-and-fanfares).
 
 The shared golden-tool message phase imports all four complete official messages
@@ -69,8 +84,8 @@ or resident allocation grows. One sanitizer and four cartridge/composition
 checks pass. The first silent native run passes 115 records and 98 assertions,
 including full message loads, phase transitions, guards, unchanged saved data,
 restored checkpoint, and clean exit. The fixture temporarily routes an unused
-callback slot; ordinary reward events are not yet connected. Next connect action
-registration, request routes, and source acquisition events. The four golden
+callback slot; ordinary reward events are not yet connected. The action stage
+connects registration and request routes; source acquisition is next. The four golden
 tools remain disabled. See the
 [message checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-reward-messages).
 
@@ -84,8 +99,8 @@ One sanitizer check and four cartridge/composition checks pass. The first silent
 native run passes 165 records and 123 assertions, including both full transfers,
 30 actual native facial frames, segment restoration, guards, restored checkpoint,
 and clean exit. Skeletal playback and ordinary reward events are not established
-by that component check. Golden-tool choices remain disabled pending reward
-action registration and ordinary acquisition. See the
+by that component check. Golden-tool choices remain disabled pending ordinary
+acquisition. See the
 [reward-motion checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-reward-motions-and-player-faces).
 
 Both wrapped-item name readers use the official GameCube `present` label with
@@ -545,7 +560,8 @@ current composition checks pass, including exact no-import V2, all-import ABI
 The shared converter handles all 27 player action tables and both held-item
 main/draw tables. All 105 native actions and 21 native held categories remain
 intact. Fan category 23 draws complete static held models; balloon/pinwheel
-categories and fifteen unfinished actions remain disabled. The native dispatch
+categories use their installed rig callbacks. Fan action 109 and reward actions
+118–120 are registered; twelve unfinished actions remain disabled. The native dispatch
 resolves the currently loaded player owner. The
 [held-draw evidence](checkpoints/V3_FURNITURE_PIPELINE.md#shared-held-item-dispatch)
 and [sound evidence](checkpoints/V3_FURNITURE_PIPELINE.md#shared-sound-programs-and-per-frame-actions)

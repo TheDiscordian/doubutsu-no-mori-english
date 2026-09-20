@@ -96,9 +96,9 @@ An unknown active private pointer stops before audio/state effects. Native
 private clearing at `800B7ADC` uses the shared wrapper; foreign private pointers
 retain the existing fallback behaviour without clearing another player's flags.
 
-The callback is installed but not registered as a complete player action.
-Action registration/request routes and source scene/NPC/tree acquisition remain
-required. The four golden-tool options stay disabled; this stage adds no choices
+The [shared reward actions](V3_REWARD_ACTIONS.md) register the callback with both
+celebration variants and connect their request/wait paths. Source scene/NPC/tree
+acquisition remains required. The four golden-tool options stay disabled; this stage adds no choices
 or translation text. The single provenance catalogue remains unchanged.
 
 ## Verification
