@@ -957,6 +957,79 @@ def held_collection(debug,rom_path,record):
         ordinary_gameplay_tested=False,catalogue_screen_tested=False,requires_checkpoint_restore=True)
 
 
+def rod_effects_cases(debug,record,image,effects,actor,field,table,profile,call,check):
+    """Load both cartridge fish owners; execute real angle windows and bite setup."""
+    from v3_furniture_room_smoke import extend
+    files=by_vrom(image);boot=boot_proofs(image);size=0x4000
+    allocation=call(0x8009BFC0,[size]);root=allocation+16;stack=root+0x3C00
+    if allocation&15 or not MODULE_RAM+0x8000<=allocation<=0x80400000-size:
+        raise ValueError('Fish fixture allocation outside native heap')
+    edge=b'V3RF'*4
+    debug.write_memory(allocation,edge+bytes(size-32)+edge)
+    debug.write_memory(stack-0x400,edge);debug.write_memory(stack+0x40,edge)
+    f32=lambda value:struct.unpack('>f',struct.pack('>f',value))[0]
+    try:
+        for row in effects['owners']:
+            data=files[row['vrom']].extract(image);rel=files[row['relocation_vrom']].extract(image)
+            sections=struct.unpack_from('>5I',rel);ram=row['ram']
+            expected=relocate_verified_data(SimpleNamespace(ram=ram,resident_bytes=len(data),sections=sections),data,rel,root)
+            call(0x800262D0,[row['vrom'],row['vrom']+len(data),ram,ram+len(data),root,root+len(data),len(rel)],
+                 proof=boot[0x800262D0])
+            check('complete cartridge fish owner and relocation',root,expected)
+            factor=struct.unpack_from('>f',expected,row['angle_scale']-ram)[0]
+            start=root+row['angle_window']-ram-4;end=root+row['angle_end']-ram
+            imm=struct.unpack_from('>h',expected,row['angle_window']-ram-2)[0]
+            scale_base=root+row['angle_scale']-ram-imm
+            def angle(kind,index,value,want):
+                before=debug.command('g');regs=[int(before[i:i+16],16) for i in range(0,len(before),16)]
+                if len(regs)!=71 or regs[37]&0xFFFFFFFF!=0x800D334C:
+                    raise ValueError('Rod window requires the paused native game frame')
+                regs[1]=extend(scale_base);regs[2]=index*4;regs[4]=extend(value&0xFFFFFFFF)
+                regs[29]=extend(stack);regs[37]=extend(start)
+                bp=f'0,{end:x},4'
+                if debug.command('Z'+bp)!='OK':raise ValueError('Rod angle breakpoint rejected')
+                try:
+                    if debug.command('G'+''.join(f'{r:016x}' for r in regs))!='OK':
+                        raise ValueError('Rod angle registers rejected')
+                    stopped=debug.command('c');raw=debug.command('g')
+                    actual=[int(raw[i:i+16],16) for i in range(0,len(raw),16)]
+                    passed=(stopped[:3] in ('T05','S05') and actual[37]&0xFFFFFFFF==end
+                            and actual[2]&0xFFFFFFFF==want and actual[29]&0xFFFFFFFF==stack
+                            and actual[4]&0xFFFFFFFF==value&0xFFFFFFFF
+                            and all(actual[i]&0xFFFFFFFF==regs[i]&0xFFFFFFFF for i in (*range(16,24),30)))
+                    record(dict(rod_angle_window=f'{row["angle_window"]:08X}',kind=kind,search_class=index,
+                        target_angle=value,expected=want,actual=actual[2]&0xFFFFFFFF,
+                        stack_restored=actual[29]&0xFFFFFFFF==stack,assertion='passed' if passed else 'failed'))
+                    if not passed:raise ValueError('Rod angle window changed result or live state')
+                finally:debug.command('z'+bp);debug.command('G'+before)
+            def bite(kind,index,want):
+                debug.write_memory(actor+0x1D4,struct.pack('>I',index))
+                debug.write_memory(actor+0x74,struct.pack('>3f',3.5,7.5,-2.25))
+                before=bytearray(debug.read_memory(actor,0x13A0))
+                call(root+row['bite_first']-ram,[actor],proof=(root,expected[:sections[0]]))
+                before[0x214:0x218]=struct.pack('>I',want);before[0x228:0x22A]=struct.pack('>H',3)
+                before[0x74:0x78]=before[0x7C:0x80]=bytes(4)
+                check(f'rod kind {kind} fish {index}: exact bite setup and unrelated state',actor,bytes(before))
+            for item,kind in ((0x2203,34),(0x2239,87),(0x2239,88)):
+                if item==0x2239:debug.write_memory(table,struct.pack('>HbBHBB',item,kind,0,159,0x80,1))
+                debug.write_memory(field,struct.pack('>H',item))
+                values=(7.5,15.0,40.0,60.0,180.0) if kind==88 else (3.0,7.0,30.0,50.0,180.0)
+                for i in (range(5) if kind!=87 else (0,)):
+                    limit=int(f32(values[i]*factor))
+                    # Include the gap where only the golden rod sees the bobber.
+                    middle=int(f32(((3,7,30,50,180)[i]+(7.5,15,40,60,180)[i])*0.5*factor))
+                    for value in dict.fromkeys((limit-1,limit,-limit,middle)):
+                        if -32768<=value<=32767:angle(kind,i,value,int(-limit<value<limit))
+                for index,cls in ((31,0),(7,1),(1,2),(2,3),(0,4)):
+                    bite(kind,index,effects['golden_bite_frames' if kind==88 else 'normal_bite_frames'][cls])
+            profile[159]&=0x7F;debug.write_memory(0x80460020,profile)
+            angle('unselected golden',0,int(4*factor),0);bite('unselected golden',31,10)
+            profile[159]|=0x80;debug.write_memory(0x80460020,profile)
+            check('loaded fish code retained',root,expected)
+        for at in (allocation,allocation+size-16,stack-0x400,stack+0x40):check('fish fixture guard',at,edge)
+    finally:call(0x8009C040,[allocation])
+
+
 def net_capture_cases(debug,record,actor,result,field,table,profile,owner_call,check):
     """Analytical collision cases through the actual native candidate loop."""
     def capture(name,span,points,winner=None,*,count=None,forced=0,diagonal=False):
@@ -1006,7 +1079,7 @@ def net_capture_cases(debug,record,actor,result,field,table,profile,owner_call,c
     profile[159]|=0x80;debug.write_memory(0x80460020,profile)
 
 
-def tool_controls(debug,rom_path,record,*,transitions=False,capture=False):
+def tool_controls(debug,rom_path,record,*,transitions=False,capture=False,rod=False):
     """Execute current cartridge input consumers with isolated equipment data."""
     from aflib import CODE_RAM,CODE_VROM
     import v3_equipment_runtime as equipment
@@ -1077,6 +1150,9 @@ def tool_controls(debug,rom_path,record,*,transitions=False,capture=False):
             if not actions.get('net_capture'):raise ValueError('Cartridge lacks golden net geometry')
             cases=()
             net_capture_cases(debug,record,actor,game+0x500,field,table,profile,owner_call,check)
+        if rod:
+            cases=()
+            rod_effects_cases(debug,record,image,actions['rod_effects'],actor,field,table,profile,call,check)
         if transitions:
             cases=();debug.write_memory(0x8013767D,b'\0');debug.write_memory(0x80137908,b'\0')
             requests=((0x808CB32C,0x808CB39C,40),(0x808CC108,0x808CC178,43),
@@ -1133,14 +1209,16 @@ def tool_controls(debug,rom_path,record,*,transitions=False,capture=False):
     for a,data in saved.items():check('restored selector/profile/input state',a,data)
     check('complete equipment module restored',equipment.RAM,module)
     check('no fault',0x8003CE34,bytes(4));check('translation guard',0x8019C8D0,bytes.fromhex('AF32C0DE')*4)
-    return dict(native_shared_tool_controls=not transitions and not capture,native_tool_transitions=transitions,
-        native_net_capture=capture,
+    return dict(native_shared_tool_controls=not transitions and not capture and not rod,native_tool_transitions=transitions,
+        native_net_capture=capture,native_rod_effects=rod,
         assertions=assertions,title_demo_input=bool(title),
         code_uploaded=False,synthetic_equipment_data=True,ordinary_gameplay_tested=False,
-        golden_net_geometry_tested=capture,golden_effects_tested=False,flash_written=False,requires_checkpoint_restore=True)
+        golden_net_geometry_tested=capture,golden_rod_effects_tested=rod,
+        golden_effects_tested=False,flash_written=False,requires_checkpoint_restore=True)
 
 
 def exercise(debug, rom_path, record, *, section='automatic_furniture'):
+    if section=='rod_effects':return tool_controls(debug,rom_path,record,rod=True)
     if section=='net_capture':return tool_controls(debug,rom_path,record,capture=True)
     if section=='tool_transitions':return tool_controls(debug,rom_path,record,transitions=True)
     if section=='tool_recovery':return held_rig_actions(debug,rom_path,record,tools=True,recovery=True)

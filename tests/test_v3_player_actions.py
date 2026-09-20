@@ -29,6 +29,105 @@ TOOLS=ROOT/os.environ.get('V3_TOOL_CONTROLS_BUILD','build/v3-shared-tool-control
 TOOL_MOTION=ROOT/os.environ.get('V3_TOOL_MOTION_BUILD','build/v3-shared-tool-motion-02')
 TRANSITIONS=ROOT/os.environ.get('V3_TOOL_TRANSITIONS_BUILD','build/v3-shared-tool-transitions-01')
 NET_CAPTURE=ROOT/os.environ.get('V3_NET_CAPTURE_BUILD','build/v3-shared-net-capture-01')
+ROD_EFFECTS=ROOT/os.environ.get('V3_ROD_EFFECTS_BUILD','build/v3-shared-rod-effects-01')
+
+
+@unittest.skipUnless((ROD_EFFECTS/'build-lock.json').is_file(),'Current golden rod effects required')
+class RodEffectsTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.rom,cls.report=inputs(ROD_EFFECTS/'build-lock.json')
+        cls.base,cls.prior=inputs(ROD_EFFECTS/'base-lock.json')
+        cls.files,cls.before=by_vrom(cls.rom),by_vrom(cls.base)
+        cls.e=cls.report['equipment_resources'];cls.old=cls.prior['equipment_resources']
+        cls.effects=cls.e['player_actions']['rod_effects']
+
+    def test_both_native_owners_exact_windows_and_relocations(self):
+        self.assertEqual(len(self.effects['owners']),2)
+        for row in self.effects['owners']:
+            v,rv,ram=row['vrom'],row['relocation_vrom'],row['ram']
+            owner=self.files[v].extract(self.rom);previous=self.before[v].extract(self.base)
+            restored=bytearray(owner)
+            self.assertEqual(sha256(owner),row['sha256'])
+            for p in row['patches']:
+                at=p['address']-ram;n=len(bytes.fromhex(p['before']))
+                self.assertEqual(owner[at:at+n].hex(),p['after']);self.assertEqual(previous[at:at+n].hex(),p['before'])
+                restored[at:at+n]=bytes.fromhex(p['before'])
+            self.assertEqual(restored,previous)
+            rel=self.files[rv].extract(self.rom);oldrel=self.before[rv].extract(self.base)
+            sections=struct.unpack_from('>5I',rel);oldsections=struct.unpack_from('>5I',oldrel)
+            self.assertEqual(sections[:4],oldsections[:4]);self.assertEqual(sections[4],oldsections[4]-3)
+            removed=row['removed_relocations'];self.assertEqual(len(removed),3)
+            oldrows=struct.unpack_from('>'+str(oldsections[4])+'I',oldrel,20)
+            self.assertEqual(list(struct.unpack_from('>'+str(sections[4])+'I',rel,20)),[r for r in oldrows if r not in removed])
+            for base in (0x80200010,0x80378010):
+                moved=relocate_verified_data(SimpleNamespace(ram=ram,resident_bytes=len(owner),sections=sections),owner,rel,base)
+                for p in row['patches']:
+                    at=p['address']-ram
+                    self.assertEqual(moved[at:at+len(bytes.fromhex(p['after']))].hex(),p['after'])
+
+    def test_source_angles_and_all_native_fish_classes(self):
+        source=actions.Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+                              (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+        blob=self.files[BLOB].extract(self.rom);at=self.e['blob_offset']+self.effects['angle_table']-actions.RAM
+        self.assertEqual(blob[at:at+40],source.data[0x76A78:0x76AA0])
+        normal,gold=self.effects['normal_bite_frames'],self.effects['golden_bite_frames']
+        self.assertEqual(normal,[10,11,12,15,45]);self.assertEqual(gold,[11,12,13,18,60])
+        for row in self.effects['owners']:
+            owner=self.files[row['vrom']].extract(self.rom);at=row['fish_table']-row['ram']
+            classes=set()
+            for i,(size,search,frames) in enumerate(struct.iter_unpack('>hhI',owner[at:at+256])):
+                ds,dc,bi=struct.unpack_from('>hhI',source.data,row['source_fish_table']+i*8)
+                self.assertEqual((size,search,frames),(ds,dc,normal[bi]));classes.add(bi)
+                # This is the complete scalar mapping installed in the shared assembly helper.
+                self.assertEqual(60 if frames==45 else 18 if frames==15 else frames+1,gold[bi])
+            self.assertEqual(classes,set(range(5)))
+
+    def test_old_code_resources_profile_and_save_formats_retained(self):
+        at=self.e['blob_offset'];start=at+actions.TOOL_MOTION_OFFSET;end=at+actions.PARENT_CODE_OFFSET
+        old=self.before[BLOB].extract(self.base);new=self.files[BLOB].extract(self.rom)
+        previous=self.old['player_actions']['tool_motion']['code'];current=self.effects['code']
+        self.assertEqual(new[at:start+previous['bytes']],old[at:start+previous['bytes']])
+        self.assertEqual(new[end:at+self.e['bytes']],old[end:at+self.old['bytes']])
+        self.assertEqual(sha256(new[start:start+current['bytes']]),current['sha256'])
+        for name,address in previous['symbols'].items():self.assertEqual(current['symbols'][name],address)
+        for key in ('records','kind_readers','held_rig_actions','inventory_preview','room_rigs',
+                    'optional_selection','parent_readers','pocket_icons','catalogue','event_acquisition'):
+            self.assertEqual(self.e[key],self.old[key],key)
+        self.assertEqual(self.e['bytes'],self.old['bytes']);self.assertEqual(self.report['save_runtime'],self.prior['save_runtime'])
+        self.assertEqual(self.effects['logical_imports_added'],0)
+
+    def test_ups_composition_and_unrelated_cartridge_resources(self):
+        import v3_optional_composition as composer
+        native=(ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes()
+        self.assertEqual(apply_ups(native,(ROD_EFFECTS/'asset-loader.ups').read_bytes()),self.rom)
+        self.assertEqual(struct.unpack_from('>2I',self.rom,16),n64_checksum(self.rom))
+        changed={BLOB,MODULE,0x19D40}|{row[k] for row in self.effects['owners'] for k in ('vrom','relocation_vrom')}
+        # Repacked fish files move physical ROM storage. Only those directory
+        # coordinates may change; virtual identities, dimensions, and all other
+        # bytes of the directory resource remain exact.
+        from aflib import DMA_START
+        directory=bytearray(self.files[0x19D40].extract(self.rom))
+        self.assertEqual(set(self.files),set(self.before))
+        moves=self.report['shared_runtime_refresh']['changed_owner_moves']
+        self.assertEqual({r['vrom'] for r in moves},{0x9591D0,0x95B1E0})
+        self.assertEqual(self.files[BLOB].size,self.before[BLOB].size+sum(r['bytes'] for r in moves))
+        for v,entry in self.files.items():
+            old=self.before[v]
+            self.assertEqual((entry.index,entry.vstart),(old.index,old.vstart))
+            if v!=BLOB:self.assertEqual(entry.vend,old.vend)
+            struct.pack_into('>3I',directory,DMA_START-0x19D40+entry.index*16+4,old.vend,old.pstart,old.pend)
+        self.assertEqual(directory,self.before[0x19D40].extract(self.base))
+        for v in self.files.keys()-changed:
+            self.assertEqual(self.files[v].extract(self.rom),self.before[v].extract(self.base),hex(v))
+        pin=composer.BASE,composer.BASE_SHA,composer.REPORT_SHA,composer.ABI
+        try:
+            composer.use_build_lock(ROD_EFFECTS/'build-lock.json');catalogue=composer.catalogue(self.rom,self.report)
+            self.assertEqual(len(catalogue),128)
+            self.assertEqual(sha256(composer.compose(self.rom,self.report,catalogue,composer.resolve(catalogue,[]))[0]),
+                             self.report['translation_baseline']['sha256'])
+            self.assertEqual(composer.compose(self.rom,self.report,catalogue,composer.resolve(catalogue,list(catalogue)))[0],self.rom)
+        finally:composer.BASE,composer.BASE_SHA,composer.REPORT_SHA,composer.ABI=pin
 
 
 @unittest.skipUnless((NET_CAPTURE/'build-lock.json').is_file(),'Current net capture required')

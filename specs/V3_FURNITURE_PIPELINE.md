@@ -9,6 +9,11 @@ golden dimensions through unused outgoing argument words. It retains source
 assets, fixed identities, selections, and save formats; geometry installation
 does not enable unfinished tool choices. See
 [golden-net capture](V3_HANDHELD_ITEMS.md#shared-golden-net-capture).
+The next stage uses shared source-derived angle/timing readers for both native
+fish behaviours. Normal fishing stays unchanged; selected golden rods use the
+donor differences in native timing units. The existing resource-tail allocator
+handles the compressed fish owner without extra resident memory. See
+[golden-rod response](V3_HANDHELD_ITEMS.md#shared-golden-rod-response).
 
 New furniture uses `tools/v3_furniture_pipeline.py`, not a new Python item list,
 family installer, catalogue switch, or dedicated native scenario. Extend shared

@@ -1,5 +1,85 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared golden-rod response
+
+The explicit proposal is ABI 133 at
+`build/v3-shared-rod-effects-01/build-lock.json`. It retains 128 experimental
+choices, complete assets, fixed identities, the 60-KiB module, format-2 saves,
+and exact V2-12 no-import output. No golden-tool choice is enabled. The main
+ABI-109 lock and both served V2 patchers remain unchanged.
+
+- ROM SHA-256:
+  `769f282b11d571cada3a0c33d9c5d9218b96c7bc1a1b8452cee3d5ffcff43edd`.
+- Report SHA-256:
+  `11dafdcb317dd1b858d485a9af9cc7274c605a341267cd04645673bb7c4ff71d`.
+- UPS SHA-256:
+  `775fc03bbbee6eada8f20185ebe1668e9a01afa4fa8782c64bcdda996ca88a9c`.
+
+Both native fish owners use the same source-verified normal/golden response
+classes. A shared angle wrapper preserves their live signed target angle and
+conversion factor, and lets the native comparisons decide the result. A shared
+bite wrapper preserves normal durations and supplies golden durations in N64
+timing units; it retains the original speed reset, work fields, and fish records.
+The actual selected-equipment reader decides kind 88. Unselected imports do not
+receive golden values. Detection and approach distances remain unchanged, as
+both donor rows agree. Six complete source consumers and both complete original
+owners/relocations are checked before installation.
+
+The first build passes. The assembly/data suffix adds 248 bytes at `804A5EE0`,
+for a 1,416-byte complete tool image ending at `804A5FD8`. All previous code,
+constants, public entries, resources, and native player bytes remain. Four
+instruction windows change across the two fish owners, removing six obsolete
+relocations. Resident, actor, save, and profile allocations do not grow.
+The compressed special-fish owner and relocation use the existing shared-tail
+allocator, adding 8,816 ROM bytes and moving the catalogue/shop tail intact.
+
+Four focused cartridge checks pass. The three structural/source checks pass in
+the initial invocation. The fourth initially assumes that the DMA-directory
+resource is unchanged; a subsequent assertion also assumes the blob's virtual
+end cannot grow. Inspection identifies the existing builder's reported move of
+the 8,208-byte owner and 608-byte relocation. The corrected test verifies that
+exact growth, unchanged virtual identities and all other resource sizes, physical
+directory coordinates, complete unrelated resources, original-ROM UPS/CRC, and
+empty/all composition. Its final focused run passes in 5.641 seconds:
+
+```sh
+python3 -m unittest \
+  tests.test_v3_player_actions.RodEffectsTests.test_ups_composition_and_unrelated_cartridge_resources
+```
+
+The complete class is `tests.test_v3_player_actions.RodEffectsTests`. It also
+checks both relocated owner bases, all 32 fish records against the donor,
+complete normal/golden angle data, all five bite mappings, unchanged earlier
+code/addresses, and retained resources/save/profile fields. The test corrections
+do not change cartridge code or invalidate the native evidence.
+
+The first silent native run at `build/smoke-v3-rod-effects-01/` passes **190
+records and 142 assertions**, including 82 angle windows and 32 complete bite
+initializers across both loaded owners. Results SHA-256:
+`365c7e2b1b4fcf4bb1c7176c43d97318abc8319687a92d3f0097698b0ee20208`.
+It checks normal, imported-normal, and imported-golden kinds; strict positive/
+negative boundaries; the angle interval visible only to golden rods; all five
+bite classes; and unselected rejection. Complete actor-state comparisons retain
+unrelated fields. All calls restore their stacks, the angle windows retain live
+state, and current cartridge code is loaded through native DMA/relocation without
+code uploads. Guards, saved state, restored globals/profile, checkpoint reload,
+zero fault, and clean exit pass. No real user save is used; audio is silent.
+
+This is component execution with temporary equipment data, not ordinary fishing,
+tool acquisition/persistence, GPU appearance, or original hardware. Reuse the
+unchanged input/motion/net/recovery evidence. Keep tool choices disabled until
+their remaining parent/inventory/acquisition consumers are complete. Imported
+saves require matching-or-larger profiles and must not be loaded by V2.
+
+Next implement golden-shovel effects through the actual dig-status consumer,
+then axe wear and complete parent/acquisition support. Balloon release on get-up
+remains an explicit shared dependency. Do not replay completed rod checks.
+The source dig-status implementation at REL text `39240` uses a previous-position
+vector, updated on ordinary digs too, to gate a 10% chance of 100 Bells for the
+golden shovel. Its full caller/status/item path remains required. Only 40 bytes
+remain in the current tool-code slot; further effects need checked additional
+space, not a reduced mechanic squeezed into that remainder.
+
 ## Shared golden-net capture
 
 The explicit proposal is ABI 132 at
@@ -79,7 +159,7 @@ The existing Docker disassembler creates ignored reference outputs at
 All 32 native size/search/bite records independently match the checked donor
 tables after normal bite-class resolution. Native frames are not the donor's
 doubled initializer counts. Exact consumers and values are in the
-[rod specification](../../specs/V3_HANDHELD_ITEMS.md#golden-rod-consumers-awaiting-integration).
+[rod specification](../../specs/V3_HANDHELD_ITEMS.md#shared-golden-rod-response).
 This audit installs no rod behaviour and requires no replay of passing net tests.
 
 ## Shared net transitions and tool recovery

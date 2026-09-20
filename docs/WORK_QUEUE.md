@@ -2,8 +2,8 @@
 
 ## Active: V3 optional GameCube imports
 
-The current explicit proposal is ABI 132,
-`build/v3-shared-net-capture-01/build-lock.json`. All eight balloons are
+The current explicit proposal is ABI 133,
+`build/v3-shared-rod-effects-01/build-lock.json`. All eight balloons are
 connected through shared source-derived parent records, room profiles, indoor
 conversion/pickup, collection/catalogue, complete icons, and optional selection.
 There are 128 experimental choices, with 24 equipment parents. Neither served
@@ -45,21 +45,26 @@ existing code space and two checked unused outgoing argument words. Reuse this
 evidence; do not replay completed input, motion, transition, or collision checks.
 See the [capture checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-golden-net-capture).
 
-Next connect golden-rod effects in both ordinary and special fish behaviours,
-then shovel effects and inventory/parent consumers. The source fishing tables
-keep detection distances unchanged; golden rods widen detection angles and
-lengthen bite windows. Both `ac_gyo_test.c` and `ac_gyo_kaseki.c` contain the same
-normal/golden dimensions. Resolve their actual native consumers and retain
-native time-step units; do not assume a distance increase or replace ordinary
-behaviour. The shovel forwards a golden flag into digging effects. These are
-actual dependencies, not reasons to enable ordinary-tool substitutes.
-The native fish owners are VROM/RAM `00828C50/809317D0` and
-`009591D0/80A98F60`; their angle loads are `80932404..80932410` and
-`80A99B1C..80A99B28`, and bite initializers are `809336E0..8093371C` and
-`80A9AB5C..80A9AB98`. All 32 fish records match donor normal classes. The
-[rod consumer specification](../specs/V3_HANDHELD_ITEMS.md#golden-rod-consumers-awaiting-integration)
-records exact tables and native timing units; reuse the extracted disassembly at
-`build/disassembly/fish-ordinary/` and `build/disassembly/fish-special/`.
+Both fish behaviours use shared selected-equipment golden angles/bite windows,
+retaining normal fishing and native timing units. Four focused cartridge checks
+pass; the first silent native run passes 190 records/142 assertions, including
+82 angle windows, 32 complete bite setups, profile rejection, guards, state
+retention, checkpoint restore, and clean exit. Retain the passing evidence;
+do not replay it for unchanged code. The 248-byte suffix fits existing resident
+space; moving the compressed owner through the shared tail adds 8,816 ROM bytes.
+See the [rod checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-golden-rod-response)
+and [specification](../specs/V3_HANDHELD_ITEMS.md#shared-golden-rod-response).
+
+Next connect golden-shovel effects and inventory/parent consumers. The actual
+source request passes a golden flag through `mPlib_Check_scoop_after` to
+`mFI_GetDigStatus`; trace that full path and its generated-item behaviour before
+counting the tool complete. Do not add a flag with no downstream effect.
+The donor `mFI_GetDigStatus` (`.text+39240`) grants 100 Bells on a 10% roll only
+for a new eligible dig position. Its twelve-byte previous-position state updates
+on ordinary digs too; retain that rule and existing buried-item/hole handling.
+The current tool-code slot ends at `804A5FD8`, leaving only 40 bytes before
+parent readers. Add a checked shared reservation for further effects rather
+than overwriting old callbacks/constants or omitting required state.
 Check axe wear and acquisition/demos against both games. Keep all tool choices
 disabled until the required gameplay, inventory, acquisition, and persistence
 consumers are connected. Do not replay the completed input checks for unchanged code.
@@ -135,7 +140,7 @@ Net/rod behaviour and golden-tool differences remain explicit. Resources do
 not enable these imports. See the
 [capacity checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-rig-capacity-and-resource-extension).
 
-Next work uses the explicit ABI-132 lock above. All eight pinwheels have shared
+Next work uses the explicit ABI-133 lock above. All eight pinwheels have shared
 parent readers, pocket artwork, collection/catalogue, existing event acquisition,
 and individual experimental selections. The full proposal has 128 choices;
 existing fans and fixed identities are retained. No per-item installers or

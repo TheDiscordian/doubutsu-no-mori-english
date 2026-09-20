@@ -77,7 +77,7 @@ SOURCES = ('tools/v3_player_actions.py','tools/v3_furniture_pipeline.py',
            'overlays/v3/held_rigs.ld','overlays/v3/tool_controls.c',
            'overlays/v3/tool_motion.c','overlays/v3/tool_motion.S',
            'overlays/v3/tool_motion.ld','overlays/v3/tool_recovery.c',
-           'overlays/v3/tool_net.c') + sound_programs.SOURCES
+           'overlays/v3/tool_net.c','overlays/v3/tool_rod.S') + sound_programs.SOURCES
 
 SELECTION_OFFSET=0x5500
 PARENT_CODE_OFFSET,PARENT_TABLE_OFFSET=0x3000,0x57F0
@@ -86,6 +86,101 @@ RIG_CODE_OFFSET,RIG_MODULE_SIZE=0xD000,0xE000
 RIG_STATE_OFFSET,RIG_STATE_BYTES,RIG_PLAYER_SIZE=0x12D8,44,0x1310
 BALLOON_MODULE_SIZE,BALLOON_STATE_OFFSET,BALLOON_STATE_BYTES=0xF000,0x1370,48
 TOOL_MOTION_OFFSET=0x2A50
+
+
+def refresh_rod_effects(base,prior,blob,core,original,output):
+    """Shared source rod angles/timing for both complete native fish owners."""
+    from v3_npc_clothing import guard_incoming
+    old=prior['equipment_resources'];actions=old['player_actions'];start=old['blob_offset']
+    module=bytearray(blob[start:start+old['bytes']]);files=by_vrom(base);native_files=by_vrom(original)
+    if (not actions.get('net_capture') or actions.get('rod_effects') or sha256(module)!=old['sha256']):
+        raise ValueError('Rod effects require the complete current net-capture proposal')
+    source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+                  (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    sources=[]
+    for offset,n,digest in (
+        (0x2336BC,448,'e3991342a29f1e5f842fa94844bd8ebe1af97dd0359051633e7b40c34ca66b06'),
+        (0x233E18,308,'3efa0dada3e1513d12c46cf06168bff3bd13e2e3e93c5929734d24e02f786448'),
+        (0x2348C4,136,'558c4d105ac309866e06d406dcfd1658cb41294baf9f05685f07b6fde3c1afe1'),
+        (0x235488,448,'fce68c63ee2facd7917c56ee7cb0e57a2d8cb8ab1fe6251d4dc0e649ceb19377'),
+        (0x235E40,308,'dc2d40eeeaef07224e78aefa058608c6075cb3d546fe60bf4b40c9305406fce8'),
+        (0x2367C4,136,'9f37c7a4b85f66bcef084a9224932f2dd6074a2cffd631e6952ea3a82545cdf0')):
+        raw,receipt=source.function(offset)
+        if len(raw)!=n or sha256(raw)!=digest:raise ValueError('Changed complete donor rod consumer')
+        sources.append(receipt)
+    distance=struct.unpack_from('>10f',source.data,0x76A50)
+    angles=source.data[0x76A78:0x76AA0];bite=struct.unpack_from('>10f',source.data,0x76AA0)
+    if (distance!=(40,40,40,50,60)*2 or struct.unpack('>10f',angles)!=(3,7,30,50,180,7.5,15,40,60,180)
+            or bite!=(10,11,12,15,45,11,12,13,18,60)):
+        raise ValueError('Changed source golden-rod parameter classes')
+    previous=actions['tool_motion']['code'];at=TOOL_MOTION_OFFSET;n=previous['bytes']
+    if sha256(module[at:at+n])!=previous['sha256'] or any(module[at+n:PARENT_CODE_OFFSET]):
+        raise ValueError('Changed tool code or occupied rod space')
+    code,compiled=compile_part('tool_motion',output/'tool_motion',extra_sources=(
+        'overlays/v3/tool_motion.S','overlays/v3/tool_recovery.c','overlays/v3/tool_net.c','overlays/v3/tool_rod.S'))
+    angle_at=compiled['symbols']['af_v3_fish_angles']-(RAM+at)
+    if (code[:n]!=module[at:at+n] or len(code)>PARENT_CODE_OFFSET-at or code[angle_at:angle_at+40]!=angles
+            or any(compiled['symbols'].get(k)!=v for k,v in previous['symbols'].items())):
+        raise ValueError('Rod code moves earlier code/constants or changes donor angles')
+    changes={};owners=[]
+    # Engine behaviour owners and their actual instruction/data consumers.
+    specs=((0x828C50,0x82B0C0,0x809317D0,0x80933960,0x80933B00,0x80932404,
+            0x80932458,0x80933BF8,0x809336E0,0x8093371C,0x80933704,0x809318E4,0x76858),
+           (0x9591D0,0x95B1E0,0x80A98F60,0x80A9AD50,0x80A9AE84,0x80A99B1C,
+            0x80A99B70,0x80A9AF40,0x80A9AB5C,0x80A9AB98,0x80A9AB80,0x80A9906C,0x76BA8))
+    for vrom,reloc,ram,table,angle,window,end,scale,bfirst,blast,bcall,reset,donor in specs:
+        owner=bytearray(files[vrom].extract(base));rel=files[reloc].extract(base)
+        if owner!=native_files[vrom].extract(original) or rel!=native_files[reloc].extract(original):
+            raise ValueError('Changed native fish owner or relocation')
+        before_sha=sha256(owner);sections=struct.unpack_from('>5I',rel)
+        groups,_,rows,locations,_=native_references(owner,rel,expected_sections=sections[:4])
+        data=owner[table-ram:table-ram+256];donor_data=source.data[donor:donor+256]
+        for i,(size,search,frames) in enumerate(struct.iter_unpack('>hhI',data)):
+            ds,dc,bi=struct.unpack_from('>hhI',donor_data,i*8)
+            if bi>=5 or (size,search,frames)!=(ds,dc,int(bite[bi])):
+                raise ValueError('Native fish class differs from source normal timing')
+        if (owner[angle-ram:angle-ram+20]!=angles[:20]
+                or owner[angle-ram-20:angle-ram]!=struct.pack('>5f',*distance[:5])
+                or groups.get(window-ram)!=[(window+8-ram,angle)]
+                or struct.unpack_from('>6I',owner,reset-ram)!=(0x44800000,0,0xE4800074,0xE480007C,0x03E00008,0)):
+            raise ValueError('Changed complete native rod angle/distance/reset consumer')
+        high=((angle+0x8000)>>16)&65535;low=angle&65535
+        instructions=((window,(0x3C010000|high,0x00220821,0xC4200000|low),
+                        (jump(compiled['symbols']['af_v3_fish_angle'],link=True),0,0)),
+                      (bcall,(jump(reset,link=True),0xAC980214),
+                        (jump(compiled['symbols']['af_v3_fish_bite'],link=True),0)))
+        removed=[locations[p-ram] for p in (window,window+8,bcall)]
+        if [r>>24 for r in removed]!=[0x45,0x46,0x44]:raise ValueError('Changed fish hook relocations')
+        guard_incoming(owner,sections[0],ram,[(p-ram,4*len(before)) for p,before,_ in instructions])
+        patches=[]
+        for address,before,after in instructions:
+            pos=address-ram;n=4*len(before)
+            if struct.unpack_from('>'+str(len(before))+'I',owner,pos)!=before:
+                raise ValueError('Changed fish instruction window')
+            if any(locations.get(i) not in removed for i in range(pos,pos+n,4) if i in locations):
+                raise ValueError('Unexpected fish window relocation')
+            replacement=struct.pack('>'+str(len(after))+'I',*after)
+            patches.append(dict(address=address,before=owner[pos:pos+n].hex(),after=replacement.hex()))
+            owner[pos:pos+n]=replacement
+        kept=[r for r in rows if r not in removed];relocated=bytearray(rel)
+        struct.pack_into('>I',relocated,16,len(kept))
+        relocated[20:20+len(rows)*4]=struct.pack('>'+str(len(kept))+'I',*kept)+bytes(4*len(removed))
+        changes.update({vrom:bytes(owner),reloc:bytes(relocated)})
+        owners.append(dict(vrom=vrom,relocation_vrom=reloc,ram=ram,bytes=len(owner),sections=sections[:4],
+            original_sha256=before_sha,sha256=sha256(owner),relocation_sha256=sha256(relocated),
+            fish_table=table,source_fish_table=donor,native_fish_sha256=sha256(data),source_fish_sha256=sha256(donor_data),
+            angle_window=window,angle_end=end,angle_scale=scale,bite_first=bfirst,bite_end=blast,
+            patches=patches,removed_relocations=removed))
+    module[at:PARENT_CODE_OFFSET]=code+bytes(PARENT_CODE_OFFSET-at-len(code))
+    blob[start:start+len(module)]=module
+    report=copy.deepcopy(old);current=report['player_actions'];current['tool_motion']['code']=compiled
+    current['rod_effects']=dict(format='AFV3-ROD-EFFECTS-1',code=compiled,owners=owners,source_functions=sources,
+        angle_table=compiled['symbols']['af_v3_fish_angles'],angle_sha256=sha256(angles),
+        normal_bite_frames=list(map(int,bite[:5])),golden_bite_frames=list(map(int,bite[5:])),
+        golden_kind=88,distance_unchanged=True,native_timing_units_retained=True,
+        golden_rod_effects_installed=True,logical_imports_added=0,ordinary_gameplay_tested=False)
+    report.update(sha256=sha256(module),crc32=zlib.crc32(module))
+    return report,changes
 
 
 def refresh_net_capture(base,prior,blob,core,original,output):
@@ -1339,6 +1434,9 @@ def expanded_tables(source,owner,reloc,*,categories=CATEGORIES,native_count=NATI
 
 def install(base,prior,blob,core,original,output):
     old=prior.get('equipment_resources',{})
+    if (old.get('player_actions',{}).get('net_capture') and
+            not old['player_actions'].get('rod_effects')):
+        return refresh_rod_effects(base,prior,blob,core,original,output)
     if (old.get('player_actions',{}).get('tool_transitions') and
             not old['player_actions'].get('net_capture')):
         return refresh_net_capture(base,prior,blob,core,original,output)

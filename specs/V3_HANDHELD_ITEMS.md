@@ -882,7 +882,7 @@ component fixture uses temporary selectors and isolated actors, not ordinary
 gameplay or hardware. See the
 [capture checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-golden-net-capture).
 
-### Golden-rod consumers awaiting integration
+### Shared golden-rod response
 
 The two N64 fish behaviour owners are unnamed overlays, not the common Gyoei
 actor. Their original-ROM layouts and complete data identify the corresponding
@@ -914,11 +914,37 @@ values; N64 stores the original undoubled values directly at actor offset `214`.
 Preserve native timing units and normal behaviour; copying the GameCube's final
 doubled counts into N64 would change the baseline timing.
 
-Native detection/approach distance consumers can remain unchanged because both
-donor rows agree. Install shared selected-equipment angle/bite readers for both
-owners, preserving all live registers in their actual call windows. Golden rod
-is extended kind 88; its model/animation availability does not enable this
-behaviour. No rod-effect code is installed by the net-capture stage.
+Native detection/approach distance consumers remain unchanged because both
+donor rows agree. On the complete net-capture build, the shared player-action
+refresh installs `overlays/v3/tool_rod.S` for both owners. Actual selected kind
+88 chooses the golden row; all other kinds retain normal values. Each detection
+window replaces only its three-instruction angle load. The adapter preserves
+the live signed target angle, conversion factor, stack, and callee-saved state;
+the original strict positive/negative angle comparisons still decide detection.
+
+Each bite initializer retains its original fish-table lookup and local state.
+The final speed-reset call and its delay-slot duration store delegate to the
+shared helper. Golden durations map `10→11`, `11→12`, `12→13`, `15→18`, and
+`45→60`. Complete source/native table verification rejects other classes before
+installation. Normal durations remain exact. The adapter reproduces both speed
+zeroes and the original zero float result; mode three stays set by native code.
+Exactly three obsolete relocations are removed from each fish owner. No owner
+or actor allocation grows, and all fish identities/search classes remain native.
+
+The 248-byte assembly/data suffix follows all prior tool code/constants at
+`804A5EE0`; total tool image size is 1,416 bytes, ending at `804A5FD8`. Neither
+the 60-KiB module nor any resident/save/profile allocation grows. The compressed
+special-fish owner and relocation move into the shared ROM resource tail,
+adding 8,816 cartridge bytes; existing catalogue/shop resources move intact.
+Virtual identities, owner sizes, and all unrelated extracted resources remain.
+
+The focused native fixture loads both complete owners from the actual cartridge,
+executes their angle-comparison windows and complete bite initializers, and checks
+normal/imported/golden classes plus profile rejection. This does not establish
+an ordinary fishing session, acquisition/persistence, visual appearance, or
+original hardware. Keep golden-tool choices disabled until their remaining
+consumers are complete. See the
+[rod checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-golden-rod-response).
 
 ### Extended action tables
 

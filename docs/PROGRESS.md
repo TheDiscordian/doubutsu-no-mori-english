@@ -18,8 +18,8 @@ served patchers retain their existing builds.
 
 ## Active development
 
-The current explicit ABI-132 proposal is
-`build/v3-shared-net-capture-01/build-lock.json`. All eight balloons are
+The current explicit ABI-133 proposal is
+`build/v3-shared-rod-effects-01/build-lock.json`. All eight balloons are
 connected through the shared parent-category installer: official names/prices,
 complete pocket icons, held/inventory animation, source acquisition records,
 collection/catalogue, animated room profiles, indoor conversion, and inverse
@@ -64,7 +64,18 @@ existing space without allocation/save changes. These are isolated component
 checks, not ordinary golden-net gameplay or hardware. See the
 [capture checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-golden-net-capture).
 
-Next connect golden-rod/shovel/axe effects and complete inventory/parent/acquisition support.
+Golden-rod response is connected in both fish behaviours. Detection angles and
+bite windows use the source golden values with native timing; normal fishing,
+detection distance, fish identities, and existing state updates remain. Four
+focused cartridge checks pass. The first silent native run passes 190 records
+and 142 assertions, including 82 actual angle windows, 32 complete bite setups,
+unselected rejection, guards, retained state, checkpoint restore, and clean exit.
+The 248-byte suffix uses existing resident space; the shared builder relocates
+the compressed fish owner and adds 8,816 ROM bytes. No saved/profile/actor format
+changes. These component checks do not prove ordinary fishing or hardware.
+See the [rod checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-golden-rod-response).
+
+Next connect golden-shovel/axe effects and complete inventory/parent/acquisition support.
 The donor's balloon-loss-on-get-up path also remains an explicit shared behaviour
 dependency; it is not implemented by the net recovery adapter. Keep tool choices
 disabled. Continue from the current lock and retain completed evidence. See the
@@ -131,7 +142,7 @@ actual initialization/hand tracking/animation/drawing commands, matrix and memor
 guards, saved-state retention, checkpoint restoration, and clean exit. This is
 component execution, not GPU appearance, ordinary gameplay, or hardware proof.
 
-Use the ABI-132 lock above for continued work. Reuse the
+Use the ABI-133 lock above for continued work. Reuse the
 passing eight-vector player/inventory allocation evidence. The main lock and
 both patchers stay unchanged. See the
 [balloon-action checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-balloon-actions).
