@@ -1430,9 +1430,39 @@ space stay intact; the existing import blob does not grow for this copy. See
 
 Save formats, selected profiles, 128 existing choices, official names, and
 translation-only output remain unchanged. Golden tools stay pending acquisition
-and reward demos. Field/name/save acceptance outside these consumers still needs
-integration. Passing native pocket/menu-hook checks do not establish complete
+and reward demos. The shared name integration and field/save audit below cover
+the remaining identity consumers. Passing native pocket/menu-hook checks do not establish complete
 ordinary exchange, reward playthroughs, save/reload, appearance, or hardware.
+
+### Shared wrapped-gift names
+
+Both name widths normalise selected wrapped aliases to existing present `251C`.
+The complete donor `itemName_etc` table has 784 bytes, SHA-256
+`41e671ca45dd43ac8a54f8e71ff4b55b947d52b80cd97bae9fb40e5fc7edc07f`.
+Indices 28 and 31–34 contain `present` padded to sixteen bytes. The four alias
+credits are `GAFE01-r0/item/251F/name` through `2522/name` in the single
+provenance catalogue. Names do not become additional selection choices.
+
+`held_present_names` occupies 184 unused bytes at `804B4480`. The legacy entry
+`80096740` jumps to that adapter; the original prologue resumes at `80096748`
+through a checked trampoline at `804B452C`. Selected aliases use the existing
+ten-byte label, and unavailable aliases leave the destination unchanged. Original
+items retain the complete native function and its sixteen-bit item argument.
+The normaliser at `804B44E0` also feeds the shared full-name reader at `801969C8`;
+that reader retains null, capacity, and wide-argument rejection. Its 712 bytes
+fit the existing 768-byte reservation. No call writes a sixteen-byte name into
+a ten-byte destination. Wrapped gifts retain price zero, matching both games'
+null miscellaneous price-table entry rather than their underlying tool price.
+
+The complete native field setters `8008A81C..8008A960` and
+`8008AA24..8008AA98` match the original cartridge. They validate coordinates,
+resolve the foreground cell, and store the full item halfword without an item
+table bound. Native save identity checking at `8008EF0C..8008EF94` also matches
+the original cartridge; it is not an item scanner. The format-2 codec preserves
+the original payload apart from its signature/checksum and checks the extended
+profile/ownership state separately. Do not import a GameCube diagnostic-only
+pocket validator as new N64 gameplay logic. These code checks do not establish
+ordinary wrapped-field rendering, exchange, or save/reload gameplay.
 
 ## Shared parent names and prices
 

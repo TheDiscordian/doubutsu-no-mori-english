@@ -18,13 +18,25 @@ served patchers retain their existing builds.
 
 ## Active development
 
-The current explicit ABI-137 proposal is
-`build/v3-shared-wrapped-parents-03/build-lock.json`. All eight balloons are
+The current explicit ABI-138 proposal is
+`build/v3-shared-present-names-03/build-lock.json`. All eight balloons are
 connected through the shared parent-category installer: official names/prices,
 complete pocket icons, held/inventory animation, source acquisition records,
 collection/catalogue, animated room profiles, indoor conversion, and inverse
 pickup. The local composer has 128 experimental choices, including 24 equipment
 parents. These are not a public or hardware-ready handoff.
+
+Both wrapped-item name readers use the official GameCube `present` label with
+their original ten- and sixteen-byte output limits. Selected aliases share the
+existing present name; disabled aliases leave the output untouched. Four source
+credits live in the single provenance catalogue. The 184-byte adapter and
+712-byte shared reader fit existing reservations without changing saved data,
+choices, or resource allocations. One sanitizer check and four cartridge checks
+pass; the first silent native check passes 101 records and 60 assertions,
+including both actual readers, bounded unaligned writes, original-item fallback,
+zero gift prices, memory guards, restored checkpoint, and clean exit.
+Ordinary reward acquisition and hardware remain open. See the
+[name-reader checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-wrapped-gift-names).
 
 Shared wrapped-gift transport connects all four golden-tool identities through
 native pocket insertion, exchange-hand initialization, and field exchange. Pockets
@@ -40,8 +52,10 @@ handling, full/unselected rejection, 14 relocated menu-hook windows, live regist
 and memory guards, restored state, and clean exit. The private browser worker
 matches offline empty/all/mixed/equipment outputs; its export stays unserved.
 These are component checks, not ordinary reward acquisition or hardware tests.
-Golden-tool choices remain disabled pending acquisition, reward demos, and the
-remaining wrapped field/name/save consumers. See the
+Golden-tool choices remain disabled pending acquisition and reward demos.
+The field setters preserve full item halfwords, and the save codec preserves
+the original payload; neither needs an extra item-ID filter. Ordinary wrapped
+exchange/save gameplay remains unverified. See the
 [wrapped-gift checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-wrapped-gift-transport).
 
 All four golden-tool parents have official names/prices, complete pocket icons,

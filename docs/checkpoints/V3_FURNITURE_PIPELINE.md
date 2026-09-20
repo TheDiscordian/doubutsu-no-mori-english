@@ -1,5 +1,68 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared wrapped-gift names
+
+The ABI-138 proposal is `build/v3-shared-present-names-03/build-lock.json`.
+All four wrapped aliases use the official `present` name at both native output
+widths. Source attribution is in the single catalogue. Existing choices, saves,
+allocations, assets, transport, and reward readiness remain unchanged; the four
+golden tools stay disabled. The main ABI-109 lock and both served patchers stay
+unchanged.
+
+- ROM SHA-256:
+  `84e45e710056eaf7877781ef2ffafd20be39abd2591dac86b6666ac74cb313ba`.
+- Report SHA-256:
+  `d2e77adf6dd7ea3ea46d289e0cb2211c1eee0283dde262a400c376093624ad86`.
+- UPS SHA-256:
+  `d58222e79a5f9bd3c747f075371e533e1a07fd26be4fbfff117804ceb9ec9166`.
+
+The initial build stopped correctly when the shared reader needed 772 bytes in
+its 768-byte reservation. Moving the tiny identity normaliser into existing
+unused equipment code space leaves a 712-byte shared reader and 184-byte legacy/
+normaliser adapter. No allocation expands. The `-02` build generated the four
+missing official credits; `-03` verifies them and produces the same ROM.
+
+One sanitizer check and four cartridge/composition checks pass:
+
+```sh
+python3 -m unittest \
+  tests.test_v3_display_aliases.HostTests.test_native_shared_readers_with_synthetic_categories \
+  tests.test_v3_player_actions.PresentNameTests -v
+```
+
+These cover all selection masks, ten/sixteen-byte bounds, unaligned destinations,
+null/short/wide rejection, ordinary fallback, source names/credits, complete
+cartridge hooks and unchanged resources, save/profile retention, exact UPS,
+idempotent shared readers, 128 choices, and exact all/translation-only output.
+One cartridge fixture initially assumed an absent `clothing_profile` report key;
+removing that fixture-only assumption makes the affected check pass.
+
+The first silent native run `build/smoke-v3-present-names-01/` passes **101
+records and 60 assertions**, SHA-256
+`33f5652e6404d5c6d58a9e75e7e39fa0b290676d706e9e55e1ccbdce7be4d8a6`.
+It calls both actual cartridge entries for all four selected/disabled aliases,
+checks exact bounded output and zero gift prices, retains ordinary present/net
+names, and checks code, complete live-save memory, extension state, stack guards,
+restored selections, checkpoint restore, zero faults, and clean exit. No code is
+uploaded, user save used, or audible output produced. No retry is needed.
+
+The complete native field setters match the original cartridge: 324 bytes at
+`8008A81C`, SHA-256
+`33ba2059735f9dd36b8a937fe3b2e8633a0ecfcd92ffef19c03c75794e2c78d2`,
+and 116 bytes at `8008AA24`, SHA-256
+`9fe9499a066d010cbf4bb39fd29f15f7ab9217e20784bfd624a1d2e7f55cec85`.
+They store complete item halfwords after coordinate checks, without indexing an
+item table. The unchanged 136-byte save-identity region at `8008EF0C` has SHA-256
+`8754bfd6d4f7e944996d8649b9f33255123d0b6b3f7aaaabbc5b853bafe00835`.
+Inspection of `save_codec.c` confirms payload retention apart from signature/
+checksum; no new saved field or item filter is needed for these aliases.
+
+Retain the ABI-137 transport and real-browser-worker results for unchanged code;
+do not describe that export as an ABI-138 browser run. Acquisition/reward demos,
+ordinary wrapped exchange/save gameplay, rendering, and hardware remain open.
+Imported saves still require matching or larger profiles and must not load in
+V2. Continue with shared reward implementation rather than replaying components.
+
 ## Shared wrapped-gift transport
 
 The explicit ABI-137 proposal is

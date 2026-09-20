@@ -1018,6 +1018,80 @@ def wrapped_menu_cases(debug,image,receipt,call,check,record):
     return cases
 
 
+def held_names(debug,rom_path,record):
+    """Both real name entry points, with isolated selections and bounded outputs."""
+    from runtime_layout import TEST_STACK
+    from aflib import CODE_VROM,CODE_RAM
+    path=Path(rom_path);image=path.read_bytes();report=json.loads((path.parent/'build.json').read_bytes())
+    if sha256(image)!=report['output_sha256']:raise ValueError('Changed held-name cartridge')
+    equipment=report['equipment_resources'];wrapped=equipment['wrapped_presents'];names=wrapped['name_readers']
+    files=by_vrom(image);blob=files[runtime.BLOB].extract(image);boot=boot_proofs(image)
+    module=blob[equipment['blob_offset']:equipment['blob_offset']+equipment['bytes']]
+    def check(label,address,want):
+        actual=debug.read_memory(address,len(want));passed=actual==want
+        record(dict(held_name_check=label,address=f'{address:08X}',bytes=len(want),
+            assertion='passed' if passed else 'failed'))
+        if not passed:raise ValueError('Held-name mismatch: '+label)
+    def call(address,args=(),expected=None):
+        result=debug.call(f'{address:08X}',list(args),return_address=MODULE_RAM+0x6480,
+                          verified_code=boot.get(address))
+        record(result)
+        if expected is not None:
+            passed=result['return_value']==expected
+            record(dict(held_name_return=f'{address:08X}',actual=result['return_value'],
+                expected=expected,assertion='passed' if passed else 'failed'))
+            if not passed:raise ValueError('Held-name return mismatch')
+    check('complete startup equipment module',0x804A3000,module)
+    check('complete current display readers',0x80466C00,blob[0x6C00:0x6F00])
+    core=files[CODE_VROM].extract(image)
+    check('complete hooked legacy getter',0x80096740,core[0x80096740-CODE_RAM:0x80096860-CODE_RAM])
+    saved={a:debug.read_memory(a,n) for a,n in ((0x80460020,192),(TEST_STACK-0x800,16),(TEST_STACK+0x40,16))}
+    live=debug.read_memory(0x80126EA0,0xF980);state=debug.read_memory(0x8046C000,864)
+    # Reuse the resident test scratch, below the independent call stack.
+    output=MODULE_RAM+0x7000;before_output=debug.read_memory(output,64);edge=b'V3HN'*4;cases=0
+    try:
+        for address in (TEST_STACK-0x800,TEST_STACK+0x40):debug.write_memory(address,edge)
+        for enabled in (True,False):
+            selected=bytearray(saved[0x80460020])
+            for row in wrapped['rows']:
+                if enabled:selected[row['profile_byte']]|=row['profile_mask']
+                else:selected[row['profile_byte']]&=~row['profile_mask']
+            debug.write_memory(0x80460020,selected)
+            for row in wrapped['rows']:
+                item=int(row['wrapped_item_id'],16)
+                for entry,width in ((0x801969C8,16),(0x80096740,10)):
+                    debug.write_memory(output,b'\xA5'*64)
+                    args=[output+17,width,item] if width==16 else [output+17,item]
+                    call(entry,args,int(enabled) if width==16 else None)
+                    want=bytearray(b'\xA5'*64)
+                    if enabled:want[17:17+width]=b'present'.ljust(width,b' ')
+                    check('exact name and both destination guards',output,want);cases+=1
+                call(0x800C0194,[item],0) # Miscellaneous gifts have no sale price in either game.
+        selected=bytearray(saved[0x80460020])
+        for row in wrapped['rows']:selected[row['profile_byte']]|=row['profile_mask']
+        debug.write_memory(0x80460020,selected)
+        for item,capacity in ((0x251F,15),(0xFFFF251F,16),(0xFFFF,16)):
+            debug.write_memory(output,b'\xA5'*64);call(0x801969C8,[output+17,capacity,item],0)
+            check('invalid full-name arguments retain destination',output,b'\xA5'*64)
+        call(0x801969C8,[0,16,0x251F],0);call(0x80096740,[0,0x251F])
+        for item,label in ((0x251C,b'present'),(0x2200,b'net')):
+            for entry,width in ((0x801969C8,16),(0x80096740,10)):
+                debug.write_memory(output,b'\xA5'*64)
+                call(entry,[output+17,width,item] if width==16 else [output+17,item],1 if width==16 else None)
+                want=bytearray(b'\xA5'*64);want[17:17+width]=label.ljust(width,b' ')
+                check('ordinary item reader retained',output,want);cases+=1
+        check('equipment resources retained',0x804A3000,module)
+        check('complete live save retained',0x80126EA0,live);check('extended save state retained',0x8046C000,state)
+        for address in (TEST_STACK-0x800,TEST_STACK+0x40):check('name test stack guard',address,edge)
+        check('no native fault',0x8003CE34,bytes(4))
+    finally:
+        for address,value in saved.items():debug.write_memory(address,value)
+        debug.write_memory(output,before_output)
+    for address,value in saved.items():check('restored name fixture',address,value)
+    return dict(native_held_name_cases=cases,ten_and_sixteen_byte_entries=True,
+        ordinary_gameplay_tested=False,flash_written=False,requires_checkpoint_restore=True)
+
+
 def held_collection(debug,rom_path,record):
     """Actual acquisition/collection with four isolated resident records; no Flash writes."""
     from runtime_layout import TEST_STACK
@@ -1487,6 +1561,7 @@ def tool_controls(debug,rom_path,record,*,transitions=False,capture=False,rod=Fa
 
 
 def exercise(debug, rom_path, record, *, section='automatic_furniture'):
+    if section=='held_names':return held_names(debug,rom_path,record)
     if section=='shovel_effects':return tool_controls(debug,rom_path,record,shovel=True)
     if section=='rod_effects':return tool_controls(debug,rom_path,record,rod=True)
     if section=='net_capture':return tool_controls(debug,rom_path,record,capture=True)

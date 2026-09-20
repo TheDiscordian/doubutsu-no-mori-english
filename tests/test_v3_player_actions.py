@@ -32,11 +32,86 @@ NET_CAPTURE=ROOT/os.environ.get('V3_NET_CAPTURE_BUILD','build/v3-shared-net-capt
 ROD_EFFECTS=ROOT/os.environ.get('V3_ROD_EFFECTS_BUILD','build/v3-shared-rod-effects-01')
 SHOVEL_EFFECTS=ROOT/os.environ.get('V3_SHOVEL_EFFECTS_BUILD','build/v3-shared-shovel-effects-02')
 WRAPPED=ROOT/os.environ.get('V3_WRAPPED_PARENT_BUILD','build/v3-shared-wrapped-parents-03')
+PRESENT_NAMES=ROOT/os.environ.get('V3_PRESENT_NAMES_BUILD','build/v3-shared-present-names-03')
 
 
 class WrappedHostTests(unittest.TestCase):
     sanitized=shared_tests.HostTests.sanitized
     def test_parent_condition_and_category_bounds(self):self.sanitized('v3_held_presents_test.c')
+
+
+@unittest.skipUnless((PRESENT_NAMES/'build-lock.json').is_file(),'Current wrapped-name proposal required')
+class PresentNameTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.rom,cls.report=inputs(PRESENT_NAMES/'build-lock.json');cls.base,cls.prior=inputs(PRESENT_NAMES/'base-lock.json')
+        cls.files,cls.before=by_vrom(cls.rom),by_vrom(cls.base)
+        cls.e=cls.report['equipment_resources'];cls.old=cls.prior['equipment_resources']
+        cls.n=cls.e['wrapped_presents']['name_readers'];cls.blob=cls.files[BLOB].extract(cls.rom)
+        cls.oldblob=cls.before[BLOB].extract(cls.base)
+
+    def test_official_alias_names_and_single_catalogue(self):
+        from text_provenance import validate
+        source=actions.Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+            (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+        donor=source.raw('itemName_etc');self.assertEqual(sha256(donor),self.n['source_names_sha256'])
+        provenance=json.loads((ROOT/'translations/provenance.json').read_bytes());validate(provenance)
+        entries={r['id']:r for r in provenance['entries']}
+        self.assertTrue(self.n['provenance_complete'])
+        for row in self.n['rows']:
+            name=donor[row['source_index']*16:(row['source_index']+1)*16]
+            self.assertEqual(name,b'present         ');self.assertEqual(name.hex(),self.n['name_hex'])
+            credit=entries[row['id']]['locales']['en']
+            self.assertEqual(credit['credit'],'official');self.assertEqual(credit['encoded_sha256'],sha256(name))
+            self.assertEqual((credit['source']['symbol'],credit['source']['index']),('itemName_etc',row['source_index']))
+        self.assertEqual(self.files[0x10F4000].extract(self.rom)[self.n['legacy_name_offset']:self.n['legacy_name_offset']+10],b'present   ')
+
+    def test_bounded_both_width_readers_and_unchanged_transport(self):
+        at=self.e['blob_offset'];new=self.blob[at:at+self.e['bytes']];old=self.oldblob[at:at+self.old['bytes']]
+        self.assertEqual(len(new),0x12000);start=self.n['code_offset'];size=self.n['code']['bytes']
+        self.assertEqual(size,184);self.assertEqual(new[start:start+size],(PRESENT_NAMES/'held_present_names/code.bin').read_bytes())
+        copy=bytearray(new);copy[start:start+size]=old[start:start+size];self.assertEqual(copy,old)
+        hook=self.n['hook'];core=bytearray(self.files[CODE_VROM].extract(self.rom));before=self.before[CODE_VROM].extract(self.base)
+        off=hook['address']-actions.CODE_RAM
+        self.assertEqual(core[off:off+8].hex(),hook['after']);self.assertEqual(before[off:off+8].hex(),hook['before'])
+        core[off:off+8]=bytes.fromhex(hook['before']);self.assertEqual(core,before)
+        self.assertEqual(sha256(core[off:off+0x120]),self.n['native_consumer_sha256'])
+        bridge=self.n['code']['symbols']['af_v3_present_original_name']-actions.RAM
+        self.assertEqual(struct.unpack_from('>3I',new,bridge),(0x27BDFFC0,actions.jump(0x80096748),0xAFBF0014))
+        display=self.report['clothing']['display']['readers'];compiled=display['code']
+        self.assertEqual(compiled['bytes'],712);self.assertLessEqual(compiled['bytes'],768)
+        self.assertEqual(display['present_name'],self.n['code']['symbols']['af_v3_present_name_item'])
+        self.assertEqual(sha256(self.blob[0x6C00:0x6C00+compiled['bytes']]),compiled['sha256'])
+        for row in display['item_hooks']+display['collection_hooks']:
+            self.assertEqual(self.blob[row['entry']-0x80460000:row['entry']-0x80460000+8].hex(),row['after'])
+
+    def test_retained_resources_save_profile_and_exact_patch(self):
+        for v in self.files.keys()-{BLOB,MODULE,CODE_VROM,0x19D40}:
+            self.assertEqual(self.files[v].extract(self.rom),self.before[v].extract(self.base),hex(v))
+        for key in ('save_runtime','furniture','catalogue'):
+            self.assertEqual(self.report[key],self.prior[key])
+        self.assertEqual(self.e['optional_selection'],self.old['optional_selection'])
+        self.assertEqual(self.report['shared_runtime_refresh']['changed_owner_moves'],[])
+        self.assertEqual(len(self.blob),len(self.oldblob))
+        original=(ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes()
+        self.assertEqual(apply_ups(original,(PRESENT_NAMES/'asset-loader.ups').read_bytes()),self.rom)
+
+    def test_shared_reader_repeat_and_optional_profiles(self):
+        import tempfile
+        import v3_display_aliases as aliases
+        import v3_optional_composition as composer
+        blob=bytearray(self.blob);core=bytearray(self.files[CODE_VROM].extract(self.rom))
+        with tempfile.TemporaryDirectory(prefix='v3-present-repeat-') as directory:
+            display,receipt=aliases.install(self.report,blob,core,Path(directory))
+            self.assertFalse(list(Path(directory).iterdir()))
+        self.assertEqual(blob,self.blob);self.assertEqual(display,self.report['clothing']['display'])
+        pin=composer.BASE,composer.BASE_SHA,composer.REPORT_SHA,composer.ABI
+        try:
+            composer.use_build_lock(PRESENT_NAMES/'build-lock.json');choices=composer.catalogue(self.rom,self.report)
+            self.assertEqual(len(choices),128)
+            self.assertEqual(composer.compose(self.rom,self.report,choices,composer.resolve(choices,list(choices)))[0],self.rom)
+            self.assertEqual(sha256(composer.compose(self.rom,self.report,choices,composer.resolve(choices,[]))[0]),self.report['translation_baseline']['sha256'])
+        finally:composer.BASE,composer.BASE_SHA,composer.REPORT_SHA,composer.ABI=pin
 
 
 @unittest.skipUnless((WRAPPED/'build-lock.json').is_file(),'Current wrapped-parent proposal required')

@@ -108,6 +108,7 @@ def compile_part(part, out, extra_sources=(), defines=(), primary_source=None):
                        'tool_effects': ('af_v3_shovel_call', 0x804B2000),
                        'held_items': ('af_v3_held_item_name', 0x804A6000),
                        'held_presents': ('af_v3_present_pocket', 0x804B4000),
+                       'held_present_names': ('af_v3_present_legacy_name', 0x804B4480),
                        'held_rigs': ('af_v3_held_setup', 0x804B0000),
                        'room_rigs': ('af_v3_room_rig_ct', 0x804B1800),
                        'held_collection': ('af_v3_held_catalogue_record', 0x804AFA00),

@@ -83,7 +83,8 @@ SOURCES = ('tools/v3_player_actions.py','tools/v3_furniture_pipeline.py',
            'overlays/v3/tool_effects.ld') + sound_programs.SOURCES
 SOURCES+=('overlays/v3/held_presents.c','overlays/v3/held_presents.S',
           'overlays/v3/held_presents.ld','overlays/v3/item_categories.c',
-          'overlays/v3/item_categories.ld')
+          'overlays/v3/item_categories.ld','overlays/v3/held_present_names.c',
+          'overlays/v3/held_present_names.S','overlays/v3/held_present_names.ld')
 
 SELECTION_OFFSET=0x5500
 PARENT_CODE_OFFSET,PARENT_TABLE_OFFSET=0x3000,0x57F0
@@ -130,6 +131,52 @@ def equipment_extension(base,prior,blob,core,previous_size,new_size):
 
 def effects_reservation(base,prior,blob,core):
     return equipment_extension(base,prior,blob,core,EFFECTS_OFFSET,EFFECTS_MODULE_SIZE)
+
+
+def refresh_present_names(base,prior,blob,core,original,output):
+    """Both item-name widths share the source present label without larger writes."""
+    old=prior['equipment_resources'];wrapped=old['wrapped_presents'];start=old['blob_offset']
+    module=bytearray(blob[start:start+old['bytes']]);at=0x11480;end=0x11F00
+    if (wrapped.get('name_readers') or len(module)!=0x12000 or sha256(module)!=old['sha256']
+            or wrapped['code_offset']+wrapped['code']['bytes']>at or any(module[at:end])):
+        raise ValueError('Present-name extension is not unused checked equipment storage')
+    source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+                  (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    names=source.raw('itemName_etc');label=b'present'.ljust(16,b' ')
+    if len(names)!=784 or sha256(names)!='41e671ca45dd43ac8a54f8e71ff4b55b947d52b80cd97bae9fb40e5fc7edc07f':
+        raise ValueError('Changed complete donor miscellaneous names')
+    rows=[]
+    for row in wrapped['rows']:
+        index=int(row['wrapped_item_id'],16)&255
+        if names[index*16:(index+1)*16]!=label or names[28*16:29*16]!=label:
+            raise ValueError('Wrapped alias does not use the complete original present name')
+        rows.append(dict(id=f'GAFE01-r0/item/{row["wrapped_item_id"]}/name',item_id=row['wrapped_item_id'],
+            source_symbol='itemName_etc',source_index=index,encoded_sha256=sha256(label),text='present'))
+    files=by_vrom(base);native_names=files[0x10F4000].extract(base);english=files[0x2A00000].extract(base)
+    pointer=u32(core,0x801076BC+5*4-CODE_RAM);name_at=pointer-0x6000000+280
+    if (pointer!=0x6000F50 or native_names[name_at:name_at+10]!=label[:10]
+            or english[32+(64+4+36+32+255+28)*16:32+(64+4+36+32+255+29)*16]!=label):
+        raise ValueError('Installed complete present names differ at either width')
+    first,last=0x80096740-CODE_RAM,0x80096860-CODE_RAM
+    native=by_vrom(original)[CODE_VROM].extract(original)
+    if (core[first:last]!=native[first:last] or
+            sha256(core[first:last])!='0e8c91e6c465c297cb9532d31d1a8495ff4779690b9f1f20934d2ad9de49d3c3'):
+        raise ValueError('Changed complete native ten-byte item-name getter')
+    code,compiled=compile_part('held_present_names',output/'held_present_names',
+        extra_sources=('overlays/v3/held_present_names.S',),defines=(
+            f'AF_V3_PRESENT_DECODE=0x{wrapped["code"]["symbols"]["af_v3_present_decode"]:08X}u',))
+    if len(code)>end-at:raise ValueError('Present names overlap wrapped identity records')
+    module[at:at+len(code)]=code
+    before=core[first:first+8].hex();core[first:first+8]=struct.pack('>2I',jump(RAM+at),0)
+    report=copy.deepcopy(old)
+    report['wrapped_presents']['name_readers']=dict(rows=rows,code=compiled,code_offset=at,
+        source_names_sha256=sha256(names),original_present='251C',name_hex=label.hex(),
+        legacy_name_offset=name_at,native_consumer_sha256=sha256(native[first:last]),
+        hook=dict(address=0x80096740,before=before,after=core[first:first+8].hex()),
+        destination_widths=[10,16],saved_format_changed=False)
+    report.update(sha256=sha256(module),crc32=zlib.crc32(module),additional_resident_bytes=0)
+    blob[start:start+len(module)]=module
+    return report,{}
 
 
 def refresh_presents(base,prior,blob,core,original,output):
@@ -1601,6 +1648,8 @@ def expanded_tables(source,owner,reloc,*,categories=CATEGORIES,native_count=NATI
 
 def install(base,prior,blob,core,original,output):
     old=prior.get('equipment_resources',{})
+    if old.get('wrapped_presents') and not old['wrapped_presents'].get('name_readers'):
+        return refresh_present_names(base,prior,blob,core,original,output)
     if old.get('optional_selection',{}).get('pending') and not old.get('wrapped_presents'):
         return refresh_presents(base,prior,blob,core,original,output)
     if (old.get('player_actions',{}).get('shovel_effects') and

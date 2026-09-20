@@ -2,12 +2,21 @@
 
 ## Active: V3 optional GameCube imports
 
-The current explicit proposal is ABI 137,
-`build/v3-shared-wrapped-parents-03/build-lock.json`. All eight balloons are
+The current explicit proposal is ABI 138,
+`build/v3-shared-present-names-03/build-lock.json`. All eight balloons are
 connected through shared source-derived parent records, room profiles, indoor
 conversion/pickup, collection/catalogue, complete icons, and optional selection.
 There are 128 experimental choices, with 24 equipment parents. Neither served
 V2 patcher nor the main lock changes.
+
+Both wrapped-item name widths are connected and source-credited. One sanitizer
+and four cartridge/composition checks pass; the first silent native check passes
+101 records and 60 assertions, including actual ten/sixteen-byte calls, output
+guards, ordinary fallback, zero gift prices, unchanged save memory, restored
+checkpoint, and clean exit. Reuse the unchanged transport and browser-worker
+evidence; the current export remains unserved and contains ABI 137, not ABI 138.
+Refresh it only when a private handoff needs the new cartridge. See the
+[name checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-wrapped-gift-names).
 
 Shared wrapped-gift decoding/encoding and bounded category lookup are installed.
 The module occupies 72 KiB; complete changed compressed owners use checked unused
@@ -104,8 +113,10 @@ Do not add wear to existing N64 axes to implement an unbreakable golden axe.
 This is a source/cartridge audit, not ordinary golden-axe gameplay. See the
 [audit](checkpoints/V3_FURNITURE_PIPELINE.md#golden-axe-durability-audit).
 
-Next connect shared tool acquisition and reward demos, finishing the remaining
-wrapped field/name/save consumers before enabling rewards.
+Next connect shared tool acquisition and reward demos. The wrapped name readers
+are complete; native field setters retain full item halfwords, and the save
+codec preserves the original payload. Do not add donor debug-only item filters
+or a new saved format without an actual missing native consumer.
 The complete parent records already preserve active/passive differences, room
 identities, ownership, previews, and icons; do not rebuild per-item installers.
 The donor's net/rod rewards use collection completion and the present-demo actor;
@@ -120,7 +131,8 @@ The [wrapped-identity audit](../specs/V3_HANDHELD_ITEMS.md#golden-tool-acquisiti
 pins the three donor/native consumers and actual current tag owner. Their shared
 decode/encode and category handling is installed: wrapped aliases bypass the
 original 30-entry miscellaneous table, and pockets store parent plus condition,
-never an alias. Check field/save/name handling before enabling any reward route.
+never an alias. Ordinary wrapped exchange and save/reload remain gameplay checks,
+not a reason to replay the completed component fixtures.
 
 The source `Player_actor_setup_Item_Tumble_getup` also releases a carried balloon
 when its balloon actor exists: it clears the equipped item and requests the

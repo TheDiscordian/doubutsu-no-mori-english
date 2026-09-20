@@ -494,11 +494,12 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         if not reused['reused_bytes']:
             raise ValueError('Equipment integration requires the checked shared resource tail')
     parent_readers=bool(player_actions and prior.get('equipment_resources',{}).get('player_actions',{}).get('equipment_selection'))
+    wrapped_names=bool(player_actions and prior.get('equipment_resources',{}).get('wrapped_presents'))
     if translation_updates:
         import v3_translation_updates as translation
         display_report,alias_report=prior['clothing']['display'],prior['display_aliases']
         owner_changes,report_updates=translation.install(base,prior,module,output)
-    elif held_catalogue_art is not None:
+    elif held_catalogue_art is not None or wrapped_names:
         display_report,alias_report=prior['clothing']['display'],prior['display_aliases']
     else:
         display_report,alias_report=display_aliases.install(prior,blob,core,output,held_items=parent_readers,
@@ -540,13 +541,18 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         import v3_held_catalogue as equipment
         equipment_report,owner_changes,report_updates=equipment.select_installed(prior,blob)
     if equipment_report:
-        if held_catalogue_art is not None:
+        if held_catalogue_art is not None or wrapped_names:
             display_report,alias_report=display_aliases.install(
                 {**prior,**report_updates,'equipment_resources':equipment_report},blob,core,output)
         if equipment_report.get('parent_readers'):
-            attribution=provenance_patch(equipment_report['parent_readers']['rows'])
+            present_names=equipment_report.get('wrapped_presents',{}).get('name_readers',{})
+            name_rows=[dict(id=r['id'].removesuffix('/name'),name=r['text'],
+                name_sha256=r['encoded_sha256'],name_source_symbol=r['source_symbol'],
+                name_source_index=r['source_index']) for r in present_names.get('rows',[])]
+            attribution=provenance_patch(equipment_report['parent_readers']['rows']+name_rows)
             if attribution:write_new(output/'provenance.patch',attribution.encode())
             equipment_report['parent_readers']['provenance_complete']=not bool(attribution)
+            if present_names:present_names['provenance_complete']=not bool(attribution)
     if resource_mode:
         # Changed compressed owners retain their logical DMA identities. Store
         # their complete images outside the bounded import-object VROM region.

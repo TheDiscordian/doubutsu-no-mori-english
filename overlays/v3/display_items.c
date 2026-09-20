@@ -40,6 +40,14 @@ u32 af_v3_display_pocket_item(u32 item) {
 }
 
 int af_v3_display_item_name(u8 *destination, u32 capacity, u32 item) {
+#ifdef AF_V3_PRESENT_NAME_ITEM
+#ifdef __mips__
+    item=((u32 (*)(u32))AF_V3_PRESENT_NAME_ITEM)(item);
+#else
+    extern u32 af_v3_present_name_item(u32);
+    item=af_v3_present_name_item(item);
+#endif
+#endif
     item=af_v3_display_pocket_item(item);
 #ifdef AF_V3_HELD_ITEMS
     if (item-0x2224u<56u) return af_v3_held_item_name(destination,capacity,item);

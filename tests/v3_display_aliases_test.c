@@ -3,6 +3,8 @@
 #include <string.h>
 #define AF_V3_DISPLAY_ALIASES 1
 #define AF_V3_HELD_ITEMS 1
+#define AF_V3_PRESENT_NAME_ITEM 1
+#include "../overlays/v3/held_present_names.c"
 #include "../overlays/v3/display_items.c"
 #include "../overlays/v3/display_conversion.c"
 #include "../overlays/v3/display_roster.c"
@@ -12,6 +14,15 @@ unsigned short af_v3_test_alias_items[1024*16];
 u8 af_v3_display_profile[192];
 static int selected=1;
 static u32 last;
+static unsigned present_selected=15,legacy_calls;
+u32 af_test_present_decode(u32 item) {
+    return item-0x251Fu<4u && (present_selected&(1u<<(item-0x251Fu))) ? item-0x251Fu+0x2239u : 0;
+}
+void af_v3_present_original_name(u8 *out,u32 item) {
+    ++legacy_calls;last=item;
+    if (item==0x251C) memcpy(out,"present   ",10);
+    else memset(out,'N',10);
+}
 
 int af_v3_item_type(u32 item) { return af_v3_display_item_type(item); }
 int af_v3_furniture_import_profile(u32 index) {
@@ -24,8 +35,10 @@ int af_v3_furniture_import_profile(u32 index) {
 }
 int af_v3_base_item_name(u8 *out,u32 capacity,u32 item) {
     last=item;
-    if (!out || capacity<16 || item>65535) return 0;
-    memset(out,'X',16);return 1;
+    if (!out || capacity<16 || item>=65535) return 0;
+    if (item==0x251C) memcpy(out,"present         ",16);
+    else memset(out,'X',16);
+    return 1;
 }
 int af_v3_base_item_type(u32 item) { last=item;return (item>>8)==0x34 ? 12 : 0; }
 int af_v3_base_item_place(u32 item,int x,int z,void *out) {
@@ -58,6 +71,27 @@ int main(void) {
      * One uses its own generated footprint, one the garment category. */
     add(0x2200,0x318C,0);add(0x3407,0x381C,0x17AC);
     u8 text[18],private[4]={0};
+    for (present_selected=0;present_selected<16;++present_selected)for (u32 i=0;i<4;++i) {
+        u32 item=0x251F+i,yes=(present_selected>>i)&1u;
+        memset(text,0xA5,sizeof text);
+        assert(af_v3_display_item_name(text+1,16,item)==(int)yes);
+        if (yes) assert(!memcmp(text+1,"present         ",16));
+        else for (u32 n=1;n<17;++n)assert(text[n]==0xA5);
+        assert(text[0]==0xA5 && text[17]==0xA5);
+        memset(text,0xA5,sizeof text);legacy_calls=0;
+        af_v3_present_legacy_name(text+1,item);
+        assert(legacy_calls==yes);
+        if (yes)assert(!memcmp(text+1,"present   ",10));
+        for (u32 n=yes?11:1;n<18;++n)assert(text[n]==0xA5);
+        assert(text[0]==0xA5);
+        assert(!af_v3_display_item_name(text,15,item));
+        assert(!af_v3_display_item_name(0,16,item));
+        assert(!af_v3_display_item_name(text,16,item|0xFFFF0000u));
+        af_v3_present_legacy_name(0,item);
+    }
+    present_selected=15;
+    af_v3_present_legacy_name(text,0xFFFF251Fu);assert(last==0x251C);
+    af_v3_present_legacy_name(text,0x2200);assert(last==0x2200);
     for (u32 item=0x2224;item<0x225C;++item) {
         memset(text,0xA5,sizeof text);
         assert(af_v3_display_item_name(text+1,16,item));
