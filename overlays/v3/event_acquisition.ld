@@ -7,7 +7,7 @@ SECTIONS
     .rodata : { *(.rodata .rodata.*) }
     .data : { *(.data .data.*) }
     .bss (NOLOAD) : { *(.bss .bss.* COMMON) }
-    ASSERT(. <= 0x804AEF00, "Event stock code overlaps category records")
+    ASSERT(. <= 0x804AE690, "Event stock code overlaps shared deferred rewards")
     ASSERT(SIZEOF(.data) == 0 && SIZEOF(.bss) == 0, "Unexpected event stock globals")
     /DISCARD/ : { *(.comment .note.* .reginfo .MIPS.abiflags .pdr .gnu.attributes) }
 }

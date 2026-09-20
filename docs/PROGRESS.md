@@ -18,13 +18,29 @@ served patchers retain their existing builds.
 
 ## Active development
 
-The current explicit ABI-144 proposal is
-`build/v3-shared-reward-pickup-01/build-lock.json`. All eight balloons are
+The current explicit ABI-145 proposal is
+`build/v3-shared-reward-exchange-02/build-lock.json`. All eight balloons are
 connected through the shared parent-category installer: official names/prices,
 complete pocket icons, held/inventory animation, source acquisition records,
 collection/catalogue, animated room profiles, indoor conversion, and inverse
 pickup. The local composer has 128 experimental choices, including 24 equipment
 parents. These are not a public or hardware-ready handoff.
+
+Shared inventory exchange carries the golden-shovel reward condition through
+normal drop, empty hand, burying, and fish/insect release. Three existing
+transient unions hold the deferred flag; ordinary requests clear it, rejected
+requests do not overwrite it, and actual native setup/animation precedes the
+reward. Two code groups fit unused ground/event reservations without module,
+save, or allocation growth. Two sanitizer and three cartridge/composition checks
+pass. The first silent native run passes 142 records and 92 assertions, covering
+the actual loaded tag's empty/fish/insect branches, all four installed callbacks,
+request clearing/rejection, setup, sampled release timing, guards, restored state/
+checkpoint, and clean exit. Its menu-close callback is a test stub; bury setup
+uses item zero, and release setup uses an existing actor. Ordinary world
+placement/release, hardware, and balloon flight remain unverified. Next implement
+the separate balloon release actor/look/continuation route and source acquisition
+events. Golden choices remain disabled. See the
+[exchange checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-reward-inventory-exchange).
 
 All four non-exchange collection tails share the installed reward-completion
 adapter: pickup, jump pickup, furniture pickup, and shovel put-away. The source
@@ -35,8 +51,9 @@ native run passes 141 records and 102 assertions, including actual relocated
 collection entries, first/repeated/unselected items, rejected requests, all four
 players' completion queries, original exchange requests, guards, restored state/
 checkpoint, and clean exit. These are component calls, not ordinary acquisition
-or a hardware playthrough. Next connect inventory exchange/bury/release endings
-and source scene/NPC/tree acquisition. Golden-tool choices remain disabled. See
+or a hardware playthrough. The exchange stage connects normal/bury/fish/insect
+endings; balloon release and source scene/NPC/tree acquisition remain required.
+Golden-tool choices remain disabled. See
 the [collection checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-reward-collection-consumers).
 
 The shared reward-action category registers all twelve source callbacks for
@@ -51,7 +68,7 @@ settlement, unchanged code, guards, restored state/checkpoint, and clean exit.
 It simulates the message-completed phase and samples the delay boundaries;
 ordinary acquisition, full conversations, and hardware remain unverified.
 The collection stage connects non-exchange pickup/put-away. Source scene/NPC/tree
-acquisition and inventory exchange/bury/release consumers remain required.
+acquisition and balloon-release consumers remain required.
 The four golden-tool choices remain disabled. See the
 [action checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-reward-action-registration).
 

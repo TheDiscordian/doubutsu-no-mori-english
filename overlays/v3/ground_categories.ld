@@ -8,7 +8,7 @@ SECTIONS
     .rodata : { *(.rodata .rodata.*) }
     .data : { *(.data .data.*) }
     .bss (NOLOAD) : { *(.bss .bss.* COMMON) }
-    ASSERT(. <= 0x804ADC00, "Ground adapter overlaps configuration")
+    ASSERT(. <= 0x804AD650, "Ground adapter overlaps the shared reward exchange")
     ASSERT(SIZEOF(.data) == 0 && SIZEOF(.bss) == 0, "Unexpected resident ground state")
     /DISCARD/ : { *(.comment .note.* .reginfo .MIPS.abiflags .pdr .gnu.attributes) }
 }

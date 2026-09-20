@@ -2,12 +2,29 @@
 
 ## Active: V3 optional GameCube imports
 
-The current explicit proposal is ABI 144,
-`build/v3-shared-reward-pickup-01/build-lock.json`. All eight balloons are
+The current explicit proposal is ABI 145,
+`build/v3-shared-reward-exchange-02/build-lock.json`. All eight balloons are
 connected through shared source-derived parent records, room profiles, indoor
 conversion/pickup, collection/catalogue, complete icons, and optional selection.
 There are 128 experimental choices, with 24 equipment parents. Neither served
 V2 patcher nor the main lock changes.
+
+The shared exchange/deferred stage connects normal-drop, empty-hand, burying,
+and fish/insect release reward endings. Two sanitizer and three cartridge/
+composition checks pass. The first silent native run passes 142 records and 92
+assertions, including actual loaded tag branches, four installed callbacks,
+ordinary flag clearing, priority rejection, native setup, timing boundaries,
+guards, restored state/checkpoint, and clean exit. Retain those results. The
+fixture's close callback, empty bury item, and existing release actor deliberately
+limit its scope; ordinary world placement/release and hardware remain unproven.
+Next implement the complete source flying-balloon actor and its release/look/
+continuation rules, including exchange and tumble loss. The exchange currently
+retains the existing placement path for balloons; do not label that as source
+release behaviour or merely clear the held item. Keep gold-tree growth/drop,
+event director/NPC collection rewards, and perfect-town acquisition as required
+work, with all four golden choices disabled. Save/profile restrictions remain
+format 3; no new migration is added. See the
+[exchange checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-reward-inventory-exchange).
 
 The four non-exchange collection tails and active-player reward query are
 installed through one shared adapter. Source priority ordering, native early
@@ -17,12 +34,11 @@ native run passes 141 records and 102 assertions, including actual relocated
 entries, repeat/profile rejection, four-player flag queries, original exchange
 requests, guards, restored state/checkpoint, and clean exit. Retain these results;
 they are component calls, not ordinary acquisition or hardware proof.
-Next implement source inventory exchange completion: carry the golden-shovel
-condition through normal drop, empty-hand, buried-item, fish/insect release, and
-balloon release routes. Native Putin lacks the donor's deferred reward flag;
-preserve actual handover/release timing instead of celebrating early. Native
-Putaway is action 62 and Putin is 63, unlike donor ordering. Reuse the shared
-completion query at `804B2764` and registered submenu action 118. Keep gold-tree,
+The exchange stage carries the golden-shovel condition through normal drop,
+empty hand, buried items, and fish/insect release, with native timing and the
+deferred flag. Balloon release remains required. Native Putaway is action 62 and
+Putin is 63, unlike donor ordering. Reuse the shared completion query at
+`804B2764` and registered submenu action 118. Keep gold-tree,
 collection-completion event/NPC, and perfect-town acquisition required; golden
 choices stay disabled. See the
 [collection checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-reward-collection-consumers).
@@ -36,9 +52,9 @@ setup/main dispatchers, real priority rejection, the wait-to-celebration-to-idle
 sequence, saved celebration bits, guards, restored state/checkpoint, and clean
 exit. No callback-table substitutions are used; report completion is simulated,
 and delay boundaries are sampled. Reuse this evidence.
-Non-exchange collection consumers are installed. Next implement source
-scene/NPC/tree acquisition and remaining inventory exchange/bury/release
-consumers. Preserve official event conditions and dialogue; do not substitute
+Non-exchange collection and normal/bury/fish/insect exchange consumers are
+installed. Next implement source scene/NPC/tree acquisition and balloon release.
+Preserve official event conditions and dialogue; do not substitute
 shop stock, arbitrary letters, or unrelated NPCs. The four golden-tool choices
 remain disabled. Format-3 save/profile restrictions are unchanged. See the
 [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-reward-action-registration).

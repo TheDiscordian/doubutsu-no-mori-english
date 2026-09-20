@@ -97,7 +97,8 @@ inventory exchange completion consumers.
 against all four slots at `80126EC0`, stride `BD0`, then queries the shared saved
 celebration flags. It never sets a completion flag. Unknown active pointers and
 invalid types return minus one, which is not treated as an unfinished reward.
-This shared query is available for subsequent event/submenu consumers.
+The inventory exchange uses the same query; subsequent event consumers can
+reuse it without another saved field.
 
 The complete 424-byte code group occupies `804B2620..804B27C7`; pickup is
 `804B2620`, and completion query is `804B2764`. It fits between existing requests
@@ -111,8 +112,75 @@ Native Putaway is action 62 and Putin is action 63; their donor ordering differs
 Do not identify an old native action by the same-numbered donor callback.
 
 See the [collection checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-reward-collection-consumers)
-for exact tests and their scope. Ordinary collection, inventory exchange,
-buried-item exchange, complete source acquisition, and hardware remain required.
+for exact tests and their scope. Ordinary gameplay, complete source acquisition,
+balloon release, and hardware remain required.
+
+### Inventory exchange and deferred completion
+
+The shared exchange stage connects normal-drop and empty-hand reward requests,
+plus deferred completion after burying or fish/insect release. It preserves
+the original N64 placement search, field insertion, insect-index conversion,
+warning, menu-close, and sound APIs. The pending incoming item must be selected
+golden shovel `223B`, the outgoing item must not itself be `223B`, and the active
+player's celebration must be unfinished. Wrapped outgoing tools are converted
+through the existing source-derived parent mapper before that comparison.
+Ordinary swaps retain their original wait/animation. A failed placement without
+a valid shovel/dig position keeps its warning and does not close the menu or
+schedule a reward. Both ordinary and selected golden shovels can bury the swapped
+item. Successful golden-shovel ground exchanges retain the source menu sound;
+ordinary successful ground drops remain silent.
+
+The tag's entry retains its original stack frame and calls a resident bridge.
+The bridge passes its actual return PC to the C exchange implementation, which
+resolves the loaded tag's native helper addresses from that PC. It does not
+assume a fixed tag heap address or use a guessed overlay pointer. Complete old
+tag code remains outside its 28-byte entry replacement, including the wrapped
+adapter; the new path calls the same shared mapper directly.
+
+Three existing transient unions carry the deferred flag without enlarging any
+state or save:
+
+| Stage | Flag location | Ownership |
+| --- | --- | --- |
+| Submenu request | `80143910 + 20` | Outside the bury/fish/insect request data |
+| Player request | Player `D70` | After native bury data and the release actor pointer |
+| Active action | Player `D20` | After the native bury/release main fields |
+
+The ordinary core bury, fish, and insect submenu setters clear the first flag
+on return. The native common player request tail clears `D70` only for actions
+63 and 81. Other action unions retain every byte. This prevents stale flags in
+ordinary actions and preserves the native return value, priority, and delay
+slots. Four actual callback-table entries bind the deferred submenu/setup
+wrappers to native Putin 63 and Release 81. A rejected submenu request never
+writes the player's flag. Accepted requests copy the flag; setup retains the
+complete original native animation and actor creation, then transfers the flag
+into the active action.
+
+Unflagged burying calls the original Fill transition, including early movement
+and controller handling. Flagged burying waits for animation completion, settles
+priority, and requests celebration 118/type 3/priority 34. Fish/insect release
+retains its existing native look/animation/actor processing and waits 42 native
+updates, equivalent to 84 donor updates. Completion settles priority, requests
+idle or the celebration, and clamps the timer to that boundary. Rejection retries
+on subsequent updates without bypassing request permissions.
+
+The exchange group is 760 bytes at `804AD650..804AD947`, after the 1,612-byte
+ground adapter. The deferred group is 944 bytes at `804AE690..804AEA3F`, after
+the 1,680-byte event-stock adapter. Both fit checked unused code reservations.
+Their neighbouring linker limits prevent future growth from overwriting the
+new groups. No native owner, relocation, module, allocation, save, or profile
+grows; four callback values, seven instruction windows, and their checked code
+reservations change. The installer binds ten complete donor functions, complete
+native consumers/APIs, prior wrapped conversion, and actual callback identities.
+
+Balloon release remains unfinished: its source branch needs the separate flying
+actor and balloon-dependent look/continuation rules. The installed exchange
+retains its existing placement path for balloons; that is not a completed donor
+release implementation. Source island-only restrictions have no N64 island
+counterpart. The four golden-tool choices remain disabled until full ordinary
+acquisition and required release paths are connected. See the
+[exchange checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-reward-inventory-exchange)
+for actual test coverage and fixture limitations.
 
 ### Registered actions
 
@@ -133,9 +201,9 @@ reach cartridge-loaded code. Live state and the emulator checkpoint are restored
 
 Ordinary acquisition still requires the source collection-completion event
 director/NPC support, perfect-town reward conversation, and gold-tree growth/drop
-route. The four non-exchange collection tails are installed. Remaining shovel
-inventory exchange, burying, and release consumers must request the new action
-where the source does. These are required gameplay integration, not replaced
+route. Collection and normal-drop/empty-hand/bury/fish/insect exchange consumers
+are installed. Balloon release still requires its actor and continuation rules.
+These are required gameplay integration, not replaced
 with shop stock or arbitrary letters. The four golden-tool choices remain
 disabled. This stage adds no English text; existing source credits remain in
 the single provenance catalogue. Format-3 save/profile restrictions continue

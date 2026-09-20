@@ -1563,6 +1563,7 @@ def tool_controls(debug,rom_path,record,*,transitions=False,capture=False,rod=Fa
 def exercise(debug, rom_path, record, *, section='automatic_furniture'):
     if section=='reward_actions':return reward_actions(debug,rom_path,record)
     if section=='reward_pickup':return reward_pickup(debug,rom_path,record)
+    if section=='reward_exchange':return reward_exchange(debug,rom_path,record)
     if section=='reward_controls':return reward_controls(debug,rom_path,record)
     if section=='reward_messages':return reward_messages(debug,rom_path,record)
     if section=='reward_motion':return reward_motion(debug,rom_path,record)
@@ -2627,6 +2628,145 @@ def original_equipment_kinds(original):
         result.append(kind)
     if sorted(result)!=list(range(36)):raise ValueError('Original equipment switch is incomplete')
     return result
+
+
+def reward_exchange(debug,rom_path,record):
+    """Loaded tag routing and actual native deferred request/setup/completion paths."""
+    import v3_equipment_runtime as equipment
+    from runtime_layout import TEST_STACK
+    path=Path(rom_path);image=path.read_bytes();report=json.loads((path.parent/'build.json').read_bytes())
+    if sha256(image)!=report['output_sha256']:raise ValueError('Changed deferred reward cartridge')
+    resources=report['equipment_resources'];receipt=resources['player_actions']['reward_exchange']
+    files=by_vrom(image);blob=files[runtime.BLOB].extract(image);boot=boot_proofs(image);assertions=0
+    def check(label,at,want):
+        nonlocal assertions
+        actual=debug.read_memory(at,len(want));passed=actual==want
+        record(dict(reward_exchange_check=label,address=f'{at:08X}',bytes=len(want),
+            assertion='passed' if passed else 'failed',observed_sha256=sha256(actual),expected_sha256=sha256(want)))
+        if not passed:raise ValueError('Deferred reward mismatch: '+label)
+        assertions+=1
+    def call(at,args=(),proof=None):
+        result=debug.call(f'{at:08X}',list(args),return_address=MODULE_RAM+0x6480,verified_code=proof or boot.get(at))
+        record(result);return result['return_value']
+    def put(at,*words):debug.write_memory(at,struct.pack('>'+str(len(words))+'I',*words))
+    def pointer(at,size):
+        value=int.from_bytes(debug.read_memory(at,4),'big')
+        if value&3 or not MODULE_RAM+0x8000<=value<=0x80400000-size:raise ValueError('Invalid deferred fixture pointer')
+        return value
+    start=resources['blob_offset'];module=blob[start:start+resources['bytes']]
+    check('complete installed module',equipment.RAM,module)
+    constructor=int.from_bytes(debug.read_memory(0x80143900,4),'big');owner=constructor-(0x808DD748-equipment.PLAYER_RAM)
+    data,rel=(files[v].extract(image) for v in (equipment.PLAYER_VROM,equipment.PLAYER_RELOC))
+    if owner&15 or not MODULE_RAM+0x8000<=owner<=0x80400000-len(data):raise ValueError('Missing live player owner')
+    sections=struct.unpack_from('>5I',rel)
+    expected=relocate_verified_data(SimpleNamespace(ram=equipment.PLAYER_RAM,resident_bytes=len(data),sections=sections),data,rel,owner)
+    check('complete relocated player code',owner,expected[:sections[0]])
+    native_rows={r['entry']:r for r in receipt['bindings']['native_functions']}
+    def player(entry,args):
+        row=native_rows[entry];a,b=entry-equipment.PLAYER_RAM,row['end']-equipment.PLAYER_RAM
+        return call(owner+a,args,(owner+a,expected[a:b]))
+    game=pointer(0x8010EF90,0x1E00);actor_bytes=resources['held_rig_actions']['player_allocation']['bytes']
+    actor=pointer(game+0x1C90,actor_bytes);actor_before=debug.read_memory(actor,actor_bytes)
+    saved={at:debug.read_memory(at,size) for at,size in ((0x80460020,192),(0x8046C000,report['save_runtime']['state_bytes']),
+        (0x80126EA0,0xF980),(0x80136FD8,4),(0x8013767D,2),(0x80143910,0x50),(0x80123E10,0x154),(0x801458A0,64))}
+    banks={}
+    for index in struct.unpack_from('>2h',actor_before,0xDA0):
+        if not 0<=index<8:raise ValueError('Invalid native animation bank')
+        address=pointer(game+0x114+84*index,equipment.PLAYER_CAPACITY)
+        banks[address]=debug.read_memory(address,equipment.PLAYER_CAPACITY)
+    size=0x1D000;allocation=call(0x8009BFC0,[size])
+    if allocation&15 or not MODULE_RAM+0x8000<=allocation<=0x80400000-size:raise ValueError('Deferred fixture allocation failed')
+    tag,overlay,hand,submenu,menu,bridge,counts,pos=(allocation+n for n in (0x10,0xC000,0x1C720,0x1CA40,0x1CAA0,0x1CB00,0x1CC00,0x1CC20))
+    debug.write_memory(overlay,bytes(size-(overlay-allocation)))
+    tag_data,tag_rel=(files[v].extract(image) for v in (0x3950000,0x3960000))
+    tag_sections=struct.unpack_from('>5I',tag_rel)
+    if len(tag_data)+len(tag_rel)+0x20>=0xC000:raise ValueError('Tag staging exceeds fixture reservation')
+    tag_loaded=relocate_verified_data(SimpleNamespace(ram=0x8086F310,resident_bytes=len(tag_data),sections=tag_sections),tag_data,tag_rel,tag)
+    call(0x800262D0,[0x3950000,0x3950000+len(tag_data),0x8086F310,0x8086F310+len(tag_data),tag,tag+len(tag_data),len(tag_rel)])
+    check('complete cartridge-loaded tag owner',tag,tag_loaded)
+    raw=bytearray();entries={}
+    for row in receipt['callbacks']:
+        key=(row['consumer'],row['action']);target=int.from_bytes(debug.read_memory(equipment.RAM+row['offset'],4),'big')
+        if target!=row['after']:raise ValueError('Changed actual deferred callback')
+        entries[key]=bridge+len(raw);raw.extend(struct.pack('>4I',0x08000000|(target>>2&0x3FFFFFF),0,0,0))
+    close=bridge+len(raw)
+    raw.extend(struct.pack('>9I',0x3C080000|((counts+0x8000)>>16),0x25080000|(counts&65535),
+        0x8D090000,0x25290001,0xAD090000,0xAD040004,0xAD050008,0x03E00008,0))
+    debug.write_memory(bridge,raw);call(0x8002FE00,[bridge,len(raw)]);call(0x80034CE0,[bridge,len(raw)])
+    bridge_proof=(bridge,bytes(raw));edge=b'V3RX'*4
+    guards=(allocation,overlay-16,hand-16,submenu-16,menu-16,bridge-16,allocation+size-16,TEST_STACK-0x800,TEST_STACK+0x40)
+    for at in guards:debug.write_memory(at,edge)
+    put(submenu+0x2C,overlay);put(overlay+0x106D4,hand);put(overlay+0x106B0,close)
+    debug.write_memory(hand+0x264,b'\xFF');debug.write_memory(pos,struct.pack('>3f',0,0,0))
+    state=bytearray(saved[0x8046C000]);selection=next(r for r in resources['parent_readers']['rows'] if r['item_id']=='223B')
+    def profile(enabled,done=False):
+        p=bytearray(saved[0x80460020]);p[selection['profile_byte']]&=~selection['profile_mask']
+        if enabled:p[selection['profile_byte']]|=selection['profile_mask']
+        state[0x10:0xD0]=p;state[0x350:0x380]=bytes(48);state[0x358]=8 if done else 0
+        debug.write_memory(0x80460020,p);debug.write_memory(0x8046C000,state)
+    def prepare():
+        put(actor+0xCF0,7);put(actor+0xD00,7,0,0,0);debug.write_memory(actor+0xD58,b'\xA5'*32)
+    def callback(table,index):return call(entries[(table,index)],[actor,game],bridge_proof)
+    try:
+        put(0x80136FD8,0x80126EC0);debug.write_memory(0x8013767D,bytes(2));debug.write_memory(0x80127908,b'\0')
+        debug.write_memory(actor+0xE64,b'\1');profile(True)
+        for action in (7,63,81,118):
+            prepare();player(0x808B3334,[game,action,31])
+            check('ordinary request clears flag only for deferred actions',actor+0xD70,bytes(4) if action in (63,81) else b'\xA5'*4)
+        for entry,args in ((0x800B2008,[pos,0]),(0x800B2060,[123,0x2301]),(0x800B20A8,[1])):
+            debug.write_memory(0x80143910,b'\xA5'*0x50);call(entry,args)
+            check('ordinary submenu request clears deferred flag',0x80143930,bytes(4))
+        for enabled,done in ((True,False),(True,True),(False,False)):
+            profile(enabled,done);flag=enabled and not done
+            for item in (0,0x2301,0x2D01):
+                debug.write_memory(hand+0x23C,struct.pack('>H',item));put(menu+0x3C,0x223B);put(counts,0,0,0)
+                debug.write_memory(0x80143910,b'\xA5'*0x50)
+                a,b=0x80873ADC-0x8086F310,0x80873C88-0x8086F310
+                call(tag+a,[submenu,menu],(tag+a,tag_loaded[a:b]))
+                check('actual tag route selects correct action',0x80143910,struct.pack('>2I',(118 if flag else 7) if not item else 81,1))
+                check('tag route carries reward only to deferred action',0x80143930,struct.pack('>I',int(flag and bool(item))))
+                check('test close callback receives native menu and direction',counts,struct.pack('>3I',1,menu,0))
+        profile(True)
+        for index,entry,transition in ((63,0x800B2008,0x808D2774),(81,0x800B2060,0x808D7814)):
+            for flag in (0,1):
+                prepare();call(entry,[pos,0] if index==63 else [123,0x2301]);put(0x80143930,flag)
+                callback(0x808DD874,index)
+                check('registered submenu preserves native request priority',actor+0xD00,struct.pack('>3I',index,31,1))
+                check('accepted submenu carries requested flag',actor+0xD70,struct.pack('>I',flag))
+                if index==81:put(actor+0xD6C,actor) # Existing release actor; do not spawn into this component fixture.
+                callback(0x808DDA18,index)
+                check('actual native setup selects deferred action',actor+0xCF0,struct.pack('>I',index))
+                check('registered setup retains deferred flag',actor+0xD20,struct.pack('>I',flag))
+                put(actor+0xD00,7,0,0,0)
+                if index==81:
+                    debug.write_memory(actor+0xD18,struct.pack('>f',40));player(transition,[actor,game])
+                    check('release waits before boundary',actor+0xD08,bytes(4))
+                    player(transition,[actor,game]);check('release timer clamps at source-equivalent boundary',actor+0xD18,struct.pack('>f',42))
+                else:
+                    if flag:
+                        player(transition,[actor,game,0]);check('bury reward waits for animation end',actor+0xD08,bytes(4))
+                    player(transition,[actor,game,1])
+                check('finished deferred action requests correct continuation',actor+0xD00,struct.pack('>3I',118 if flag else 7,34 if flag else 1,1))
+                if flag:check('deferred reward type',actor+0xD58,struct.pack('>I',3))
+            prepare();put(actor+0xD00,7,40,1);put(actor+0xD70,77);callback(0x808DD874,index)
+            check('rejected submenu does not overwrite requested flag',actor+0xD70,struct.pack('>I',77))
+        check('reward completion remains unset until settlement',0x8046C000,state)
+        check('module remains unchanged',equipment.RAM,module)
+        for at in guards:check('deferred reward guard',at,edge)
+        check('no CPU fault',0x8003CE34,bytes(4))
+    finally:
+        debug.write_memory(actor,actor_before)
+        for at,value in banks.items():debug.write_memory(at,value)
+        for at,value in saved.items():debug.write_memory(at,value)
+        call(0x8009C040,[allocation])
+    check('live actor restored',actor,actor_before)
+    for at,value in banks.items():check('live bank restored',at,value)
+    for at,value in saved.items():check('live state restored',at,value)
+    return dict(native_reward_exchange=True,assertions=assertions,actual_tag_empty_fish_insect=True,
+        actual_registered_callbacks=4,test_only_jump_bridges=True,test_only_close_callback=True,
+        bury_item_zero=True,release_existing_actor=True,ordinary_placement_tested=False,
+        ordinary_gameplay_tested=False,balloon_release_tested=False,hardware_tested=False,
+        flash_written=False,requires_checkpoint_restore=True)
 
 
 def reward_pickup(debug,rom_path,record):

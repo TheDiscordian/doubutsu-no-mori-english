@@ -22,14 +22,24 @@ hand owner; its tag owner remains an in-place update.
 
 ### Shared runtime categories
 
+The shared inventory exchange stage carries the source reward condition through
+native normal-drop, empty-hand, burying, and fish/insect release routes. Existing
+transient unions hold the deferred flag; ordinary setters clear it, rejected
+requests preserve it, and actual native setup/animation precedes celebration.
+Two checked unused code suffixes hold the implementation without module/save/
+allocation growth. Balloon release and source acquisition remain unfinished;
+the golden-tool choices stay disabled. See
+[deferred exchange](V3_REWARD_ACTIONS.md#inventory-exchange-and-deferred-completion).
+
 The shared collection stage connects all four source non-exchange collection
 tails through one reward adapter and one active-player completion query. It
 preserves source priority ordering, original item transfers, animation timing,
 early returns, and full-pocket branches. Complete native action bindings handle
 the donor/native Putaway ordering difference explicitly. The new code fits the
 existing reward reservation; no item-specific installer, save change, or option
-is added. Inventory exchange/bury/release consumers and ordinary acquisition
-remain required. See [reward collection](V3_REWARD_ACTIONS.md#collection-consumers).
+is added. The exchange stage connects normal/bury/fish/insect consumers; balloon
+release and ordinary acquisition remain required. See
+[reward collection](V3_REWARD_ACTIONS.md#collection-consumers).
 
 The shared reward-action stage registers all complete callbacks for source
 actions 118–120, retaining other actions and all metadata. Shared requests keep

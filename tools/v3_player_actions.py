@@ -93,7 +93,10 @@ SOURCES+=('tools/v3_event_text.py','tools/v3_camper_text.py',
 SOURCES+=v3_save_rewards.SOURCES
 SOURCES+=('overlays/v3/reward_requests.c','overlays/v3/reward_requests.ld',
           'overlays/v3/reward_wait.c','overlays/v3/reward_wait.ld',
-          'overlays/v3/reward_pickup.c','overlays/v3/reward_pickup.ld')
+          'overlays/v3/reward_pickup.c','overlays/v3/reward_pickup.ld',
+          'overlays/v3/reward_exchange.c','overlays/v3/reward_exchange.ld',
+          'overlays/v3/reward_deferred.c','overlays/v3/reward_deferred.S','overlays/v3/reward_deferred.ld',
+          'overlays/v3/ground_categories.ld','overlays/v3/event_acquisition.ld')
 
 SELECTION_OFFSET=0x5500
 PARENT_CODE_OFFSET,PARENT_TABLE_OFFSET=0x3000,0x57F0
@@ -115,6 +118,133 @@ REWARD_PICKUP_PATHS=(
     (31,0x808C82A8,0x808C8944,0x808C88D4,0x808C8918,0x808C8944,0xD38,0x18,0),
     (32,0x808C8A64,0x808C9094,0x808C9024,0x808C9068,0x808C9094,0xD38,0x18,0),
     (62,0x808D28CC,0x808D2AD4,0x808D2A58,0x808D2AA8,0x808D2AD4,0xD1C,0x20,1))
+
+
+def reward_exchange_bindings(source,core,owner,tag,original,actions,presents):
+    sources=[]
+    for at,size,digest in (
+        (0x28781C,876,'739d4562cf390230978e0a660396b30ae2ba76d7320fc2d4d36527dc04441e4c'),
+        (0x69784,108,'04731ce21a2ff11749e367d26238cf6c1640a47db0ce2a8fc1981ee05e9441f2'),
+        (0x697F0,92,'852d36cbae873e62b6c7bef1a1d6bdf6bdb439cdf579ad9ec845637499b46b58'),
+        (0x6984C,200,'80fd0e9a92fbe8c90da4fbe2830f89cf9b1a62f866a10d410f848db546af9ae7'),
+        (0x18956C,68,'54168ac26f44ce3604be7ce5e6fd63e67339128a51a2831eb316c5ce552dd59a'),
+        (0x1895B0,300,'d4e9f88bcf73afbf3fed65ff02a5dd162bbd042f09bc0bf719dc43da5d9795ef'),
+        (0x18982C,88,'759660a0dd19705837d7ea6fb2dbd6cfd4731b5444ec65322ebc7152d02b5c69'),
+        (0x18EA18,76,'6f6108a633d7e00e44937953e5aa51fd68f710de32524e497dfc0e916f227ce7'),
+        (0x18EA64,588,'6c2cbf844299f821d800b12849098db983a6cefca7e1a51d696506ec10533f35'),
+        (0x18F430,192,'557e1fd362a7128a7a0bbc27dab023fd1bf3d79b240ebae4e66b75271192e37b')):
+        raw,row=source.function(at)
+        if len(raw)!=size or sha256(raw)!=digest:raise ValueError('Changed complete deferred reward source')
+        sources.append(row)
+    bounds=[]
+    for name in ('symbol_addrs_code.txt','symbol_addrs_overlays.txt'):
+        bounds.extend(int(a,16) for a in re.findall(r'= 0x([0-9A-Fa-f]+); // type:func',
+            (ROOT/'upstream/af/linker_scripts/jp'/name).read_text()))
+    text=''.join((ROOT/'overlays/v3'/name).read_text() for name in ('reward_exchange.c','reward_deferred.c'))
+    entries={int(a,16) for a in re.findall(r'FN\(0x([0-9A-F]+)u,',text)}|{
+        0x808B3334,0x808D24E0,0x808D729C,0x808D2774,0x808D7814}
+    files=by_vrom(original);native=[]
+    extended={r['entry']:r['sha256'] for r in actions['reward_controls']['bindings']['native_functions']}
+    for entry in sorted(entries):
+        if entry>=PLAYER_RAM:data,old,ram=owner,files[PLAYER_VROM].extract(original),PLAYER_RAM
+        elif entry>=0x8086F310:data,old,ram=tag,files[0x777AE0].extract(original),0x8086F310
+        else:data,old,ram=core,files[CODE_VROM].extract(original),CODE_RAM
+        end=min(b for b in bounds if b>entry);raw=data[entry-ram:end-ram]
+        if not raw or sha256(raw)!=extended.get(entry,sha256(old[entry-ram:end-ram])):
+            raise ValueError(f'Changed complete deferred reward API {entry:08X}')
+        native.append(dict(entry=entry,end=end,sha256=sha256(raw)))
+    restored=bytearray(tag);hook=next(r for r in presents['hooks'] if r['address']==0x80873B30)
+    p=hook['address']-0x8086F310
+    if restored[p:p+8].hex()!=hook['after']:raise ValueError('Changed retained wrapped exchange adapter')
+    restored[p:p+8]=bytes.fromhex(hook['before'])
+    a,b=0x80873ADC-0x8086F310,0x80873C88-0x8086F310
+    old=files[0x777AE0].extract(original)
+    if restored[a:b]!=old[a:b]:raise ValueError('Changed complete native exchange body')
+    return dict(source_functions=sources,native_functions=native,
+        native_exchange=dict(entry=0x80873ADC,end=0x80873C88,sha256=sha256(tag[a:b]),wrapped_hook=hook),
+        submenu_flag_offset=0x20,request_flag_offset=0xD70,main_flag_offset=0xD20,
+        native_release_types=[0,1],native_release_updates=42,source_release_updates=84,
+        balloon_release_installed=False,island_rules_applicable=False)
+
+
+def refresh_reward_exchange(base,prior,blob,core,original,output):
+    """Shared menu exchange and deferred bury/fish/insect reward endings."""
+    from v3_npc_clothing import guard_incoming
+    old=prior['equipment_resources'];actions=old['player_actions'];start=old['blob_offset'];files=by_vrom(base)
+    module=bytearray(blob[start:start+old['bytes']]);owner=bytearray(files[PLAYER_VROM].extract(base))
+    tag=bytearray(files[0x3950000].extract(base));rel=files[PLAYER_RELOC].extract(base)
+    if (not actions.get('reward_pickup') or actions.get('reward_exchange') or len(module)!=0x12000
+            or sha256(module)!=old['sha256'] or sha256(owner)!=actions['owner_sha256']
+            or sha256(rel)!=actions['relocation_sha256']):
+        raise ValueError('Deferred rewards require complete checked collection consumers')
+    source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+        (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    bindings=reward_exchange_bindings(source,core,owner,tag,original,actions,old['wrapped_presents'])
+    codes={}
+    for name,at,end,retained in (('reward_exchange',0xA650,0xAC00,'ground_categories'),
+                                ('reward_deferred',0xB690,0xBF00,'event_acquisition')):
+        row=old[retained];a=row['code_offset'];n=row['code']['bytes']
+        if a+n>at or sha256(module[a:a+n])!=row['code']['sha256'] or any(module[at:end]):
+            raise ValueError('Deferred reward reservation overlaps retained category data')
+        extra=('overlays/v3/reward_deferred.S',) if name=='reward_deferred' else ()
+        code,compiled=compile_part(name,output/name,extra_sources=extra)
+        if at+len(code)>end:raise ValueError('Deferred reward exceeds checked reservation')
+        codes[name]=dict(code=compiled,offset=at,end=end);module[at:at+len(code)]=code
+    symbols=codes['reward_deferred']['code']['symbols'];exchange=codes['reward_exchange']['code']['symbols']
+    dependencies={'af_v3_reward_completed':actions['reward_pickup']['code']['symbols']['af_v3_reward_completed'],
+        'af_v3_player_selected_equipment':actions['code']['symbols']['af_v3_player_selected_equipment'],
+        'af_v3_present_encode':old['wrapped_presents']['code']['symbols']['af_v3_present_encode']}
+    if any(exchange[k]!=v for k,v in dependencies.items()) or symbols['af_v3_reward_exchange']!=exchange['af_v3_reward_exchange']:
+        raise ValueError('Changed deferred reward shared dependencies')
+    if symbols['af_v3_reward_request']!=actions['reward_actions']['requests']['symbols']['af_v3_reward_request']:
+        raise ValueError('Changed shared reward request target')
+    patches=[]
+    owners={CODE_VROM:(core,CODE_RAM,None),PLAYER_VROM:(owner,PLAYER_RAM,rel),
+            0x3950000:(tag,0x8086F310,files[0x3960000].extract(base))}
+    plans=[(CODE_VROM,at,(0x03E00008,),(jump(symbols['af_v3_reward_clear_submenu']),))
+           for at in (0x800B2058,0x800B20A0,0x800B2168)]
+    plans.append((PLAYER_VROM,0x808B3368,(0x03E00008,),(jump(symbols['af_v3_reward_clear_request']),)))
+    for at,key in ((0x808D2774,'af_v3_reward_bury_transition'),(0x808D7814,'af_v3_reward_release_transition')):
+        plans.append((PLAYER_VROM,at,(0x27BDFFE8,0xAFBF0014),(jump(symbols[key]),0)))
+    plans.append((0x3950000,0x80873ADC,
+        (0x27BDFFB8,0xAFBF0014,0xAFA40048,0xAFA5004C,0x3C048011,0x8C84EF90,0x0C02C721),
+        (0x27BDFFB8,0xAFBF0014,jump(symbols['af_v3_reward_exchange_entry'],link=True),0,
+         0x8FBF0014,0x03E00008,0x27BD0048)))
+    for v,(data,ram,relocation) in owners.items():
+        windows=[(at-ram,len(before)*4) for vrom,at,before,_ in plans if vrom==v]
+        slots=relocation_offsets(relocation,len(data)) if relocation else set()
+        guard_incoming(data,struct.unpack_from('>I',relocation)[0] if relocation else len(data),ram,windows)
+        for vrom,at,before,after in plans:
+            if vrom!=v:continue
+            p=at-ram;n=4*len(before)
+            if struct.unpack_from('>'+str(len(before))+'I',data,p)!=before or slots&set(range(p,p+n,4)):
+                raise ValueError('Changed or relocated deferred reward hook')
+            replacement=struct.pack('>'+str(len(after))+'I',*after)
+            patches.append(dict(vrom=v,ram=ram,address=at,before=data[p:p+n].hex(),after=replacement.hex()))
+            data[p:p+n]=replacement
+    report=copy.deepcopy(old);current=report['player_actions'];callbacks=[]
+    mappings={0x808DD874:{63:(0x808D24E0,'af_v3_reward_bury_submenu'),81:(0x808D729C,'af_v3_reward_release_submenu')},
+              0x808DDA18:{63:(0x808D251C,'af_v3_reward_bury_setup'),81:(0x808D72E0,'af_v3_reward_release_setup')}}
+    for row in current['tables']:
+        if row['native_entry'] not in mappings:continue
+        at,n=row['offset'],row['bytes']
+        if sha256(module[at:at+n])!=row['sha256']:raise ValueError('Changed deferred action callback table')
+        for index,(before,name) in mappings[row['native_entry']].items():
+            slot=at+4*index
+            if u32(module,slot)!=before:raise ValueError('Wrong native deferred action binding')
+            struct.pack_into('>I',module,slot,symbols[name])
+            callbacks.append(dict(action=index,consumer=row['native_entry'],offset=slot,before=before,after=symbols[name]))
+        row['sha256']=sha256(module[at:at+n])
+    current.update(owner_sha256=sha256(owner))
+    current['reward_exchange']=dict(bindings=bindings,codes=codes,patches=patches,callbacks=callbacks,
+        owner_sha256=sha256(tag),relocation_sha256=sha256(owners[0x3950000][2]),
+        native_bury_and_creature_animations_retained=True,ordinary_requests_clear_deferred_flag=True,
+        normal_drop_empty_hand_bury_fish_insect_installed=True,balloon_release_installed=False,
+        tree_acquisition_installed=False,ordinary_gameplay_tested=False,logical_imports_added=0)
+    report['player_motion']['owner_sha256']=sha256(owner)
+    report.update(sha256=sha256(module),crc32=zlib.crc32(module),additional_resident_bytes=0)
+    blob[start:start+len(module)]=module
+    return report,{PLAYER_VROM:bytes(owner),0x3950000:bytes(tag)}
 
 
 def reward_pickup_bindings(source,owner,original,actions,module):
@@ -2017,6 +2147,8 @@ def expanded_tables(source,owner,reloc,*,categories=CATEGORIES,native_count=NATI
 
 def install(base,prior,blob,core,original,output):
     old=prior.get('equipment_resources',{})
+    if old.get('player_actions',{}).get('reward_pickup') and not old['player_actions'].get('reward_exchange'):
+        return refresh_reward_exchange(base,prior,blob,core,original,output)
     if old.get('player_actions',{}).get('reward_actions') and not old['player_actions'].get('reward_pickup'):
         return refresh_reward_pickup(base,prior,blob,core,original,output)
     if old.get('player_actions',{}).get('reward_state') and not old['player_actions'].get('reward_actions'):

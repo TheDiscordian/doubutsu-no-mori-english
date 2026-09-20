@@ -1,5 +1,113 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared reward inventory exchange
+
+The ABI-145 proposal is `build/v3-shared-reward-exchange-02/build-lock.json`.
+The shared installer connects normal-drop/empty-hand rewards and deferred bury/
+fish/insect completion, preserving the native placement, warnings, animations,
+and actual request permissions. It carries one source flag through existing
+submenu/request/main unions, with clearing on ordinary requests and no write
+after rejected requests. All 128 experimental choices, four disabled golden
+tools, saved format/profile, memory reservations, main ABI-109 lock, and both
+served V2 patchers remain unchanged.
+
+- ROM SHA-256:
+  `ad0a50c1f19f9826cf4f528440a8f6e1606a1ed2479b3eb17ae10cd2d0060037`.
+- Report SHA-256:
+  `bd684073a418be6085841aaad47c61d89fd3b23d970d858c1e3cc3eb5e88be7d`.
+- UPS SHA-256:
+  `36356f6d77ef25c20c4d7d7d2427aa5ebfb5190da8456c71ac32b8e5bd15fcd7`.
+- Exchange code SHA-256:
+  `c138971221125ec793f85e18d9179abb2472b0e23881ed5f8269a1fbef690a95`.
+- Deferred code SHA-256:
+  `5cba56ae9d86356ccfb29ee003888259588ce99914739d8289e40b6fe7caf4f7`.
+
+The 760-byte exchange group occupies `804AD650..804AD948` (exclusive end), after
+the complete ground adapter. The 944-byte deferred group occupies
+`804AE690..804AEA40`, after complete event-stock code. The older linker limits
+are tightened to protect these shared suffixes from future growth. The final
+build regenerates source receipts for those limits; its complete ROM and UPS
+equal the first build, preserving the native evidence below without a rerun.
+There is no resource truncation or allocation growth.
+
+Seven instruction windows and four actual callback entries change. All native
+relocations and all other owner/resource bytes are retained. The tag entry keeps
+its original frame, and its resident bridge uses the actual return PC to resolve
+native tag helpers. The new C exchange uses the existing wrapped-parent mapper,
+source completion query, and selected-parent predicate. It preserves full hand
+and menu identities, existing creature-index conversion, placement failure,
+warnings, menu-close arguments, and source sound behaviour. Ordinary and
+selected golden shovels both satisfy the burying-equipment check.
+
+The flag lives at submenu `+20`, request `D70`, and active action `D20`. Ordinary
+core bury/fish/insect setters clear it. The native common player request clears
+only actions 63/81, preserving other action unions. Actual submenu/setup table
+callbacks copy the flag after accepted requests and retained native setup.
+Flagged burying cannot use the native early-movement escape before animation
+completion. Fish/insect release uses 42 native updates, corresponding to 84 source
+updates, then idle or celebration with the source priority and timer clamp.
+Full balloon flight and its Look result remain unimplemented, not substituted
+with this fish/insect continuation. No text is added; provenance is unchanged.
+
+Two sanitizer and three cartridge/composition checks pass initially in 8.473
+seconds and on the final source-receipt build in 9.853 seconds:
+
+```sh
+python3 -m unittest tests.test_v3_reward_exchange -v
+```
+
+Host tests cover incoming/outgoing/selected/completed/wrapped cases, empty hand,
+normal drop and source sound, fish/insect requests, successful/failed placement,
+ordinary/golden shovel burying, unchanged failed-warning requests, accepted and
+rejected flag transfer, original setup, flagged/unflagged interruption rules,
+all release-delay updates, boundary retry/clamp, and null arguments. Cartridge
+checks bind ten complete donor functions and all native APIs, reject changed
+source/core/player/tag data, check exact instruction/table changes and every
+unrelated resource, retain all relocations/saves/selections, reconstruct the
+original-ROM UPS, verify all/empty profiles, and retain future resource-tail reuse.
+Python syntax checks and `git diff --check` pass.
+
+The first silent native attempt passes 142 result records and 92 assertions:
+
+```sh
+python3 tools/emulator_smoke.py \
+  --rom build/v3-shared-reward-exchange-01/animal-forest-v3-asset-loader.z64 \
+  --output build/smoke-v3-reward-exchange-01 \
+  --scenario tests/v3-player-reward-exchange-scenario.json \
+  --xvfb /home/discordian/Games/OpenRSC/headless/vendor/usr/bin/Xvfb \
+  --seconds 180 --expansion-pak --no-initial-screenshot
+```
+
+Results SHA-256:
+`9aee900077a7e5db3d66ecac8ba78cff15871107e71f28e3aeac787f2d973b3b`.
+The cartridge-loaded tag is completely relocated and its actual entry runs the
+empty-hand, fish, and insect branches for selected, completed, and disabled
+profiles. The native core setters, common player request, four installed
+submenu/setup callbacks, and both actual transition entries execute. Clearing
+is limited to the relevant actions; rejected requests preserve the old flag.
+Native setup selects the intended actions, burying waits for animation end,
+release waits until its sampled boundary, and completion selects the proper
+idle/reward request. The saved celebration remains unmarked until settlement.
+
+The fixture uses test-only jump bridges to the installed callback pointers and
+a test-only menu-close callback that records its arguments. Bury setup uses
+item zero; release setup receives an existing actor to avoid spawning a creature
+into this component fixture. Those limits are explicit: no ordinary ground
+placement, burying an actual item, spawned-creature lifecycle, full menu
+interaction, balloon flight, FlashRAM write, or hardware is claimed. Complete
+module/state/stack guards, actor/motion-bank/native-payload/profile/reward/
+submenu/audio-state restoration, checkpoint restoration, resumed game, and clean
+exit pass. Audio is disabled and no user save is used. The native fixture passes
+within the harness budget without using a retry.
+
+Next implement the complete source balloon release actor, its Look/continuation
+rules, and exchange/tumble consumers. The current exchange still uses its prior
+placement path for balloons, which is not source release behaviour. Gold-tree
+growth/drop, collection-completion NPC/event support, and perfect-town reward
+acquisition remain required. Keep all golden choices disabled until their full
+paths work. Format-3 saves require a compatible build and matching/equal-or-larger
+profile; older format-1/2 builds and V2 cannot load them. Preserve backups.
+
 ## Shared reward collection consumers
 
 The ABI-144 proposal is `build/v3-shared-reward-pickup-01/build-lock.json`.
