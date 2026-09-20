@@ -77,6 +77,16 @@ The separate full-interface fixture is not rerun or relabelled as passing.
 
 Continue shared source-backed acquisition, reward demos, and wrapped presents.
 Do not enable golden choices merely because their resources/readers are ready.
+The follow-on source/cartridge audit identifies the three unchanged pocket/hand/
+exchange consumers and the donor's four wrapped aliases. Those aliases exceed
+the original 30-entry miscellaneous table; the native category reader has no
+bound. The donor uses existing present category 14 and stores actual parents
+plus condition in pockets. Exact hashes, offsets, current relocated tag owner,
+and source reward routes are recorded in the
+[acquisition contract](../../specs/V3_HANDHELD_ITEMS.md#golden-tool-acquisition-and-wrapped-identities).
+This narrows the next implementation to shared decode/encode/category handling,
+with reward demos and saved flags still required. No runtime code changes follow
+from this audit, and no additional native run is needed for these notes.
 Format-2 saves retain their matching-or-larger profile requirement and must not
 be loaded in V2. Broad gameplay and hardware remain open. This batch makes
 implementation and verification progress; the full V3 objective is incomplete.

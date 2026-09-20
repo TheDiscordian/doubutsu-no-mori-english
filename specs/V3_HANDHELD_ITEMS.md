@@ -1329,6 +1329,63 @@ full seasonal rendering and ordinary gameplay remain open. See the
 [diagnosis](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#seasonal-setter-copy-diagnosis)
 and [category checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-animated-room-parent-category).
 
+### Golden-tool acquisition and wrapped identities
+
+Golden-tool acquisition is not installed. The donor's `ac_present_demo_move.c_inc`
+selects the rod or net after the corresponding complete creature collection and
+checks its trophy flag. The axe uses the perfect-town reward in `ac_npc_hem.c_inc`;
+the shovel comes from `GOLD_TREE_SHOVEL` in `bg_item_common.c_inc`. Their source
+reward animations and saved flags require native integration. Do not replace
+these routes with ordinary shop stock or enable a tool based on its assets alone.
+
+Wrapped representations `251F..2522` correspond in order to parents `2239..223C`.
+They are transport/field representations, not additional imports or pocket IDs.
+The donor's `sCCk_Check_ItemName_Possession` explicitly rejects wrapped aliases
+in saved pockets: pockets contain the actual parent plus condition one. The
+shared `mPr_SetPossessionItem` and exchange-hand constructor decode the aliases;
+`mTG_exchange_proc` encodes a wrapped parent when returning it to the field.
+Normal/quest conditions, ownership collection, and unrelated presents retain
+their existing semantics.
+
+The complete donor consumers are:
+
+| Consumer | REL text offset | Bytes | SHA-256 |
+| --- | --- | --- | --- |
+| `mPr_SetPossessionItem` | `070C68` | 224 | `10f76ef4231b793e950ab1ab53b74981fc9bfab8892183b581e9020a1b6b8388` |
+| `mHD_hand_ovl_construct` | `26F53C` | 464 | `cf5fadb664fc01766f108c5ac02a3329528e7f6c4f2c3776d954276444b845ab` |
+| `mTG_exchange_proc` | `28781C` | 876 | `739d4562cf390230978e0a660396b30ae2ba76d7320fc2d4d36527dc04441e4c` |
+
+The donor miscellaneous-category table `item1_5_tableNo` has 49 bytes, SHA-256
+`682d400251d20485243dcd4f8b77235f5b4d1ce43fe1e6c19ae814ead87fbb39`.
+All four aliases and ordinary present `251C` use category 14. The original native
+table at `8010B1BC` has only 30 entries. Its reader `800A5630` indexes the low byte
+without a bound, so forwarding these aliases to it reads beyond the table.
+The shared category adapter must recognise selected wrapped parents before its
+ordinary fallback, returning the existing present category/art rather than the
+golden tool's unwrapped category. Disabled or invalid aliases must not reach that
+short table. Check the remaining field/save/name consumers before enabling them.
+
+The relevant native regions remain unchanged in the ABI-136 cartridge:
+
+- Core pocket insertion pair `800B8B08..800B8BE4`, 220 bytes, SHA-256
+  `381dedb15e54d276176dc4691c7ed020b484ca87aa3b2df5604ba47193afb32a`.
+  The ordinary random-present branch is `800B8B18..800B8B40`.
+- Hand constructor `8087C360..8087C574`, 532 bytes, SHA-256
+  `a09dc65364813de64a24cfe3be1b4a3011e8a7632ea04f310544d4a7b8fb199c`.
+  Its exchange input is menu-info `3C`; hand item/condition are owner offsets
+  `263C`/`26E4`, inside the native BSS. Its random-present branch is
+  `8087C4B8..8087C4F0`. Preserve relocation and the surrounding constructor.
+- Tag exchange `80873ADC..80873C88`, 428 bytes, SHA-256
+  `b8687849d775924757ba47023c91b0b3ef1dc889cda8ca77a5a71a1e613f611f`.
+  The current translated owner is VROM `03950000`, not original `00777AE0`.
+  At `80873B30` it reads the actual hand item at `23C`; condition is at `2E4`.
+  Preserve all live registers, original type branches, native placement/burying,
+  and the full-pocket/failed-placement paths when adding wrapped conversion.
+
+Use one source-derived wrapped-parent mapping and the existing selected-parent
+predicate for all consumers. Keep reward state and acquisition readiness separate
+from ownership; none of this source audit constitutes installed wrapped support.
+
 ## Shared parent names and prices
 
 `parent_records` consumes the installed selected-equipment records, not a second

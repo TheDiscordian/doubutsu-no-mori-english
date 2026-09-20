@@ -105,6 +105,12 @@ official dialogue, selected-profile rejection, and saved reward state explicit.
 resource installation alone must not enable them. Golden tool parents retain
 their IDs in rooms; display forms belong to collection/catalogue. Continue from
 the current lock without replaying completed input, preview, or parent checks.
+The [wrapped-identity audit](../specs/V3_HANDHELD_ITEMS.md#golden-tool-acquisition-and-wrapped-identities)
+pins the three donor/native consumers and actual current tag owner. Implement
+their shared decode/encode and category handling together: wrapped aliases exceed
+the original 30-entry miscellaneous table and must not reach its unchecked
+fallback. Pockets store parent plus condition, never a wrapped alias. Check
+field/save/name handling before enabling any reward route.
 
 The source `Player_actor_setup_Item_Tumble_getup` also releases a carried balloon
 when its balloon actor exists: it clears the equipped item and requests the
