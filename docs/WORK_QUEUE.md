@@ -12,6 +12,17 @@ After the primary importing work, finish gold-tree leaf/cut effects and the full
 golden-shovel acquisition route. This is deferred required V3 work, not a dropped
 feature or a separate release goal.
 
+Complete scrolling-material resources are prepared at
+`build/v3-scrolling-materials-prepared-02/`: five objects, 28,112 bytes, one
+compiler batch and complete subsequent cache reuse. Four focused checks pass.
+Continue shared scrolling runtime/integration and the remaining EVW/rigged
+material categories, reusing these complete models rather than reconverting
+individual items. Source draw records retain OPA/XLU order, one/two texture
+layers, dimensions/rates, segment bindings, and runtime colour inputs. Their
+lifecycle effects and acquisition remain pending, and legacy Merlion/Manekin Pis
+need reviewed additive destinations. Prepared assets cannot be enabled as static
+objects. The current cartridge stays ABI 170; the website stays on stable V2.
+
 The current ABI-170 proposal is
 `build/v3-material-trigger-profiles-02/build-lock.json`. Coin, ? block, and fire
 flower have complete inactive ordinary profiles, official names/prices, and

@@ -20,7 +20,7 @@ from v3_import_catalog import DONOR, REL_SHA, ROOT, SYMBOLS_SHA, read_donor
 from v3_villager_art import data_pointers, native_palette, normalise_vertex_flags, symbol_span
 
 SEGMENT = 0x06000000
-CONVERTER_VERSION = 10
+CONVERTER_VERSION = 11
 
 # Complete compatible RDP expressions, selected by material commands, not IDs.
 # Both use one texture and retain source alpha; neither introduces TEXEL1,
@@ -30,6 +30,21 @@ TRANSLUCENT_COMBINERS = {
         'COMBINED','0','SHADE','0','COMBINED','0','PRIMITIVE','0'),
     (0xFC341604,0x5FFEFFF8): ('PRIMITIVE','ENVIRONMENT','TEXEL0_ALPHA','ENVIRONMENT',
         'TEXEL0','0','PRIMITIVE','0','COMBINED','0','SHADE','0','0','0','0','COMBINED'),
+}
+
+# Scrolling models supply every referenced tile, with the second cycle's texture
+# input retaining the second tile. Expressions match the donor model sources.
+SCROLL_COMBINERS = {
+    (0xFC609C04,0xFFFDF7F8): ('1','0','TEXEL0','PRIMITIVE','TEXEL0','0','PRIM_LOD_FRAC','PRIMITIVE',
+        'COMBINED','0','SHADE','0','0','0','0','COMBINED'),
+    (0xFC30FE03,0x5F3AF3F0): ('PRIMITIVE','ENVIRONMENT','TEXEL0','ENVIRONMENT','0','0','0','TEXEL0',
+        'COMBINED','0','PRIMITIVE','0','TEXEL0','1','PRIM_LOD_FRAC','COMBINED'),
+    (0xFC309A04,0x5F06FFFF): ('PRIMITIVE','ENVIRONMENT','TEXEL0','ENVIRONMENT','TEXEL0','0','ENVIRONMENT','0',
+        'COMBINED','0','SHADE','0','COMBINED','0','TEXEL0','0'),
+    (0xFC254C04,0x1FFCFFF8): ('TEXEL1','TEXEL0','PRIMITIVE_ALPHA','TEXEL0','SHADE','0','PRIM_LOD_FRAC','0',
+        'COMBINED','0','SHADE','0','0','0','0','COMBINED'),
+    (0xFC3097FF,0x5F06FE3F): ('PRIMITIVE','ENVIRONMENT','TEXEL0','ENVIRONMENT','TEXEL0','0','PRIMITIVE','0',
+        '0','0','0','COMBINED','COMBINED','0','TEXEL0','0'),
 }
 
 
@@ -224,7 +239,7 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
                 large_western=False, water=False, camping=False, tent=False,
                 campfire_body=False, fire_effect=0, school=False, static_materials=False,
                 palette_bindings=None, palette_fade=False, joint_matrices=0,
-                inherited_palette_slot=None, inherited_vertices=0, material_bindings=None):
+                inherited_palette_slot=None, inherited_vertices=0, material_bindings=None, scrolling=None):
     """Decode supported static materials and explicit dynamic dependencies, never GX loads."""
     if not raw or len(raw) % 8 or sum(map(bool, (speed_bag, accessory, mirrored_s,
                                               garden, western, large_western, water, camping,
@@ -243,6 +258,13 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
             or joint_matrices and not static_materials):
         raise ValueError('Joint matrices require a bounded shared skeleton material')
     material_bindings={} if material_bindings is None else material_bindings
+    if scrolling is not None and (not static_materials or material_bindings or palette_fade or palette_bindings or
+            inherited_palette_slot is not None or set(scrolling)!={'segment','dimensions'} or
+            scrolling['segment'] not in (0x08000000,0x09000000) or
+            not 1<=len(scrolling['dimensions'])<=2 or
+            any(len(shape)!=2 or any(type(n) is not int or n<8 or n>64 or n&(n-1) for n in shape)
+                for shape in scrolling['dimensions'])):
+        raise ValueError('Invalid complete scrolling-material binding')
     if material_bindings and (not static_materials or palette_fade or palette_bindings or
             inherited_palette_slot is not None or
             any(address not in (0x08000000,0x09000000) or kind not in ('texture','palette') or
@@ -260,6 +282,7 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
     material_wrap, material_direct = None, False
     vertex_cache = [None]*32
     fire_tiles, fire_scroll = 0, False
+    scroll_tiles, scroll_call, scroll_tmem, scroll_format = 0, False, 0, None
     while at < len(raw):
         a, b = struct.unpack_from('>II', raw, at)
         op = a >> 24
@@ -339,12 +362,22 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
                 word, reserved = struct.unpack('>II', tile)
                 wraps = (word >> 10 & 3, word >> 8 & 3)
                 pal=word>>12&15
-                if (word & 0xFFFF0000 != 0xD2F00000 or reserved or 3 in wraps
+                tile_index=word>>16&7
+                if (word & (0xFFF80000 if scrolling else 0xFFFF0000) != 0xD2F00000 or reserved or 3 in wraps
                         or pal not in ((0,15) if intensity or rgba16 or ia8 or ia16 else
                                        (15 if inherited_palette_slot is None else inherited_palette_slot,))):
                     raise ValueError('Static material needs tile 0, a supported palette, and clamp/repeat/mirror')
                 row['wrap_modes'] = wraps
                 row['tile_shifts'] = (word>>4&15,word&15)
+                if scrolling:
+                    if (scroll_call or tile_index!=scroll_tiles or scroll_tiles>=len(scrolling['dimensions']) or
+                            tuple(shape[:2])!=tuple(scrolling['dimensions'][scroll_tiles]) or
+                            shape[2:] not in ((2,0),(4,0)) or scroll_format not in (None,shape[2:])):
+                        raise ValueError('Incomplete, reordered, or mismatched scrolling texture layers')
+                    row.update(scroll_tile=tile_index,scroll_tmem=scroll_tmem)
+                    scroll_tmem+=((shape[0]+15)//16)*shape[1]
+                    if scroll_tmem>256:raise ValueError('Scrolling textures overlap palette TMEM')
+                    scroll_tiles+=1;scroll_format=shape[2:]
                 if inherited_palette_slot is not None and not (intensity or rgba16 or ia8 or ia16):
                     row['palette_slot'] = inherited_palette_slot
             elif fire_effect:
@@ -435,7 +468,7 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
             if slot: row['vertex_slot'] = slot
             vertex_cache[slot:slot+count] = range(first_vertex,first_vertex+count)
         elif op == 0x0A:
-            if not loaded or material is None or fire_effect and not fire_scroll:
+            if not loaded or material is None or fire_effect and not fire_scroll or scrolling and not scroll_call:
                 raise ValueError('Furniture triangles lack vertices or a material')
             count = (a >> 17 & 127) + 1
             size = (1 + (max(0, count - 3) + 3) // 4) * 8
@@ -457,6 +490,7 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
             # the furniture's name or theme. No extra texture/state is needed.
             unlit = static_materials and (a, b) == (0xFCFFFE60, 0xFFFCF3F8)
             translucent = TRANSLUCENT_COMBINERS.get((a,b)) if static_materials else None
+            scroll_combiner=SCROLL_COMBINERS.get((a,b)) if scrolling else None
             modes = (((0xFC30FE03, 0x5F1AF3E9 if fire_effect == 1 else 0x5F06F3FF),)
                 if fire_effect else ((0xFC309C04, 0x5FFEF7F8),) if water else (
                 (0xFC127E60, 0xFFFFF3F8), (0xFC11FE04, 0xFFFFF3F8)))
@@ -466,10 +500,14 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
             # FC327FFF/FFFFFC38 multiplies primitive RGB by shade, sets
             # alpha to one, then passes the combined result through cycle two.
             # It has no texture dependency; explicit texture-off commands stay.
-            if not unlit and not translucent and (a, b) not in modes:
+            if not unlit and not translucent and not scroll_combiner and (a, b) not in modes:
                 raise ValueError('Unsupported furniture colour combiner')
             if unlit: row['unlit_texture_primitive'] = True
             if translucent: row['combine_lerp'] = list(translucent)
+            if scroll_combiner:
+                if (a,b)!=(0xFC609C04,0xFFFDF7F8) and len(scrolling['dimensions'])!=2:
+                    raise ValueError('Scrolling combiner needs both complete texture layers')
+                row['scroll_combine_lerp']=list(scroll_combiner)
         elif op == 0xE2:
             modes = ((0xC81049D8 if fire_effect == 1 else 0xC8104A50,) if fire_effect else
                 (0xC8104A50,) if water else ((0xC8112078, 0xC8113078)
@@ -545,10 +583,16 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
             if a != 0xD9000000 or b not in modes:
                 raise ValueError('Unsupported furniture geometry mode')
         elif op == 0xDE:
-            if not fire_effect or fire_tiles != 2 or fire_scroll or (a, b) != (0xDE000000, 0x09000000):
+            if scrolling:
+                if (scroll_tiles!=len(scrolling['dimensions']) or scroll_call or
+                        (a,b)!=(0xDE000000,scrolling['segment']) or start+at+4 in pointers):
+                    raise ValueError('Invalid or incomplete dynamic scroll call')
+                scroll_call=True;row['dynamic_scroll']=b
+            elif not fire_effect or fire_tiles != 2 or fire_scroll or (a, b) != (0xDE000000, 0x09000000):
                 raise ValueError('Unsupported dynamic furniture display-list dependency')
-            fire_scroll = True
-            row['dynamic_scroll'] = 0x09000000
+            else:
+                fire_scroll = True
+                row['dynamic_scroll'] = 0x09000000
         elif op == 0xDA:
             if (not joint_matrices or a != 0xDA380003 or b >> 24 != 13
                     or b & 63 or (b & 0xFFFFFF)//64 >= joint_matrices):
@@ -567,6 +611,7 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
         raise ValueError('Unaccounted furniture data relocation')
     if fire_effect and (fire_tiles != 2 or not fire_scroll):
         raise ValueError('Incomplete two-texture fire effect')
+    if scrolling and not scroll_call:raise ValueError('Unused dynamic scroll binding')
     return result
 
 
@@ -754,6 +799,18 @@ def command_source(models, offsets):
                 shifts=row.get('tile_shifts',(shift,shift))
                 if len(shifts)!=2 or any(type(n) is not int or not 0<=n<=15 for n in shifts):
                     raise ValueError('Invalid native texture tile shifts')
+                if 'scroll_tile' in row:
+                    tile,tmem=row['scroll_tile'],row['scroll_tmem']
+                    if (rgba16 or ia8 or ia16 or type(tile) is not int or tile not in (0,1) or
+                            type(tmem) is not int or not 0<=tmem<=256-((w+15)//16)*h or
+                            (tile==0)!=(tmem==0)):
+                        raise ValueError('Invalid complete scrolling texture allocation')
+                    args=(f'{tmem}, {tile}, {fmt}, {w}, {h}, '+
+                          (f'0, 0, {w-1}, {h-1}, ' if w%16 else '')+
+                          f'{pal}, {wrap_s}, {wrap_t}, {mask_s}, {mask_t}, {shifts[0]}, {shifts[1]}')
+                    macro='gsDPLoadMultiTile_4b' if w%16 else 'gsDPLoadMultiBlock_4b'
+                    emit(f'{macro}(0x{texture:08X}, {args})',7)
+                    continue
                 if rgba16 or ia8 or ia16:
                     if w%(4 if rgba16 or ia16 else 8) or h%4:
                         raise ValueError('Direct texture needs complete GX blocks')
@@ -799,15 +856,21 @@ def command_source(models, offsets):
                     else:
                         emit('gsSP1Triangle(' + ', '.join(map(str, (*triangles[i], 0))) + ')')
             elif op == 0xDE:
-                if row.get('dynamic_scroll') != 0x09000000 or row['words'] != (0xDE000000, 0x09000000):
-                    raise ValueError('Unreviewed dynamic fire scroll list')
-                emit('gsSPDisplayList(0x09000000)')
+                segment=row.get('dynamic_scroll')
+                if segment not in (0x08000000,0x09000000) or row['words'] != (0xDE000000,segment):
+                    raise ValueError('Unreviewed dynamic scroll list')
+                emit(f'gsSPDisplayList(0x{segment:08X})')
             elif op == 0xDA:
                 index=row.get('joint_matrix')
                 if (type(index) is not int or not 0 <= index < 255
                         or row['words'] != (0xDA380003,0x0D000000+index*64)):
                     raise ValueError('Changed skeleton matrix in native compiler input')
                 emit(f'gsSPMatrix(0x{0x0D000000+index*64:08X}, G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW)')
+            elif op == 0xFC and row.get('scroll_combine_lerp'):
+                expression=SCROLL_COMBINERS.get(tuple(row['words']))
+                if expression is None or list(expression)!=row['scroll_combine_lerp']:
+                    raise ValueError('Changed scrolling colour combiner')
+                emit('gsDPSetCombineLERP('+', '.join(expression)+')')
             elif op == 0xFC and row.get('combine_lerp'):
                 expression=TRANSLUCENT_COMBINERS.get(tuple(row['words']))
                 if expression is None or list(expression)!=row['combine_lerp']:

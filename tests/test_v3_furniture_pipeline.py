@@ -733,9 +733,10 @@ class DonorTests(unittest.TestCase):
                         self.assertEqual(native[start+8:start+16],donor[start+8:start+16])
             for model in row['models']:
                 self.assertEqual(model.get('source_parts'),models[model['layer']].get('source_parts'))
+                donor=models[model['layer']]['rows']
                 start,n=model['native_offset'],model['bytes']; faces=[]; state=[]; loads=[]
                 self.assertEqual(n,dict(sections)[model['layer']])
-                cache=[None]*32;matrices=[];matrix=-1;posed_cache=[None]*32;posed_faces=[]
+                cache=[None]*32;matrices=[];matrix=-1;posed_cache=[None]*32;posed_faces=[];calls=[]
                 inherited_vertices = descriptor.get('render_context', {}).get('external_vertices')
                 if inherited_vertices:
                     count = inherited_vertices[2]//16
@@ -743,7 +744,9 @@ class DonorTests(unittest.TestCase):
                     posed_cache[:count] = [(i, -1) for i in range(count)]
                 for a,b in struct.iter_unpack('>II',asset[start:start+n]):
                     op=a>>24
-                    self.assertNotIn(op,(0x0A,0xD2,0xDE))
+                    self.assertNotIn(op,(0x0A,0xD2))
+                    if op==0xDE:
+                        self.assertEqual(a,0xDE000000);self.assertIn(b,(0x08000000,0x09000000));calls.append((a,b))
                     if op in (0xFC,0xE2,0xFA,0xFB,0xD9):state.append((a,b))
                     if op==0xDA:
                         self.assertEqual(a,0xDA380003);matrices.append((a,b));matrix=(b&0xFFFFFF)//64
@@ -764,7 +767,7 @@ class DonorTests(unittest.TestCase):
                             self.assertTrue(all(i%2==0 and i//2<32 and cache[i//2] is not None for i in indices))
                             faces.append(tuple(cache[i//2] for i in indices))
                             posed_faces.append(tuple(posed_cache[i//2] for i in indices))
-                donor=models[model['layer']]['rows']
+                self.assertEqual(calls,[r['words'] for r in donor if r['opcode']==0xDE])
                 expected_faces=[];expected_cache=[None]*32;matrix=-1
                 if inherited_vertices:
                     expected_cache[:inherited_vertices[2]//16] = [(i, -1) for i in range(inherited_vertices[2]//16)]
@@ -793,15 +796,15 @@ class DonorTests(unittest.TestCase):
                     direct=ia8 or rgba16 or ia16 or intensity
                     wraps=tuple({0:2,1:0,2:1}[v] for v in command.get('wrap_modes',(0,0)))
                     shifts=command.get('tile_shifts',(0,0))
-                    expected.append((0 if rgba16 else 3 if ia8 or ia16 else 4 if intensity else 2,
+                    expected.append((command.get('scroll_tile',0),0 if rgba16 else 3 if ia8 or ia16 else 4 if intensity else 2,
                                      2 if rgba16 or ia16 else 1 if ia8 else 0,
-                                     w//4 if rgba16 or ia16 else w//8 if ia8 else (w+15)//16,0,
+                                     w//4 if rgba16 or ia16 else w//8 if ia8 else (w+15)//16,command.get('scroll_tmem',0),
                                      0 if direct else command.get('palette_slot',15),*wraps,*shifts))
                     if command['opcode']==0xFD and direct!=last:
                         luts.append((0xE3001001,0 if direct else 0x8000));last=direct
-                actual=[(a>>21&7,a>>19&3,a>>9&511,a&511,b>>20&15,
+                actual=[(b>>24&7,a>>21&7,a>>19&3,a>>9&511,a&511,b>>20&15,
                          b>>8&3,b>>18&3,b&15,b>>10&15)
-                        for a,b in words if a>>24==0xF5 and b>>24&7==0]
+                        for a,b in words if a>>24==0xF5 and b>>24&7 in (0,1)]
                 self.assertEqual(actual,expected)
                 self.assertEqual([w for w in words if w[0]==0xE3001001],luts)
 
@@ -844,6 +847,96 @@ class DonorTests(unittest.TestCase):
                             for a,b in words if a>>24==0xF5 and b>>24&7==0]
                     self.assertEqual(actual,expected)
                     self.assertEqual([w for w in words if w[0]==0xE3001001],luts)
+
+
+class ScrollingMaterialResourceTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.source=pipeline.Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+            (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+        cls.art=ROOT/'build/v3-scrolling-materials-prepared-02'
+        cls.report=json.loads((cls.art/'art.json').read_bytes())
+
+    def test_complete_bulk_resources_and_both_texture_tiles(self):
+        first=json.loads((ROOT/'build/v3-scrolling-materials-prepared-01/art.json').read_bytes())
+        self.assertEqual(first['batch'],dict(objects=5,compiled=5,reused=0,compiler_containers=1))
+        self.assertEqual(self.report['batch'],dict(objects=5,compiled=0,reused=5,compiler_containers=0))
+        self.assertEqual({r['item_id'] for r in self.report['objects']},{'1FE4','1FE8','30E4','31A0','3368'})
+        self.assertEqual(sum(r['object_bytes'] for r in self.report['objects']),28112)
+        DonorTests.check_complete_artwork(self,self.art,self.report)
+        cache=pipeline.PreparedAssets(self.source,[self.art])
+        for row in self.report['objects']:
+            prepared=pipeline.prepare(self.source,int(row['item_id'],16));p=prepared[0];a=p['callback_adapter']
+            self.assertEqual(json.loads(json.dumps(p)),row['profile'])
+            self.assertEqual(cache.reuse(self.source,row['item_id'],prepared)[1]['object_sha256'],row['object_sha256'])
+            self.assertEqual(a['model_order'],list(row['model_offsets']))
+            self.assertEqual(list(a['model_arenas'].values()),['opaque']*(len(a['model_order'])-1)+['translucent'])
+            scroll=a['scrolling'];last=prepared[4][scroll['model']]['rows']
+            tiles=[r for r in last if r['opcode']==0xFD]
+            self.assertEqual([r['shape'] for r in tiles],[(r['width'],r['height']) for r in scroll['tiles'] if r['width']])
+            self.assertEqual([r['scroll_tile'] for r in tiles],list(range(len(tiles))))
+            tmem=0
+            for tile in tiles:
+                self.assertEqual(tile['scroll_tmem'],tmem)
+                w,h=tile['shape'];tmem+=((w+15)//16)*h
+            self.assertLessEqual(tmem,256)
+            if row['item_id']=='1FE4':
+                # Eight-pixel CI rows occupy a padded TMEM word, not four bytes.
+                self.assertEqual([r['scroll_tmem'] for r in tiles],[0,8])
+                self.assertEqual([r['tile_shifts'] for r in tiles],[(0,1),(0,1)])
+            self.assertEqual([r['dynamic_scroll'] for r in last if r['opcode']==0xDE],[scroll['segment_address']])
+            if scroll['colour']:self.assertEqual(scroll['colour']['room_f32_offset'],0x834)
+
+    def test_complete_draw_helpers_and_unfinished_gameplay_are_guarded(self):
+        from v3_furniture_scroll import CATEGORY
+        for row in self.report['objects']:
+            item=int(row['item_id'],16);p=self.source.profile(item);a=p['callback_adapter']
+            self.assertEqual(a['category'],CATEGORY)
+            self.assertEqual(a['pending_callbacks'],list(a['functions']))
+            self.assertFalse(row['import_ready']);self.assertIn('need runtime adapters',row['pending_reason'])
+            # Code changes in draw, its dimension wrapper, and the shared scroll
+            # generator must all be rejected, not reduced to a static model.
+            functions=[a['functions']['draw']]+[r for k,r in a['helpers'].items() if k!='_Matrix_to_Mtx_new']
+            for function in functions:
+                changed=copy.copy(self.source);changed.rel=bytearray(self.source.rel)
+                changed.rel[self.source.sections[1][0]+function['offset']+3]^=4
+                with self.assertRaises(ValueError):changed.profile(item)
+            draw=a['functions']['draw'];changed=copy.copy(self.source)
+            changed.code_relocations=dict(self.source.code_relocations)
+            changed.code_relocations[draw['offset']+0x10]=(10,2,4,0x8009AED0)
+            with self.assertRaisesRegex(ValueError,'changed dependencies'):changed.profile(item)
+            forged=copy.deepcopy(row);forged['profile']['callback_adapter']['runtime_installed']=True
+            with self.assertRaisesRegex(ValueError,'no implemented native lifecycle'):install.profile(forged,0x02500000)
+            with self.assertRaisesRegex(ValueError,'Scrolling artwork'):pipeline.metadata(self.source,item,forged['profile'],None)
+        self.assertEqual(install.provenance_patch(self.report['objects']),'')
+
+    def test_missing_or_changed_scroll_layers_are_not_flattened(self):
+        row=next(r for r in self.report['objects'] if r['item_id']=='1FE4')
+        original=self.source.profile(0x1FE4);label=original['callback_adapter']['scrolling']['model']
+        _,at,n=original['models'][label];raw=self.source.data[at:at+n]
+        # Change the second layer to tile zero, remove its nested scroll call,
+        # or point the call at an undeclared dynamic segment.
+        cases=((0x38,0xD2F0F901),(0x40,0xD7000002),(0x44,0x09000000))
+        for offset,word in cases:
+            changed=copy.copy(self.source);changed.data=bytearray(self.source.data)
+            struct.pack_into('>I',changed.data,at+offset,word)
+            if offset==0x40:struct.pack_into('>I',changed.data,at+offset+4,0)
+            with self.assertRaises(ValueError):pipeline.prepare_models(changed,original)
+        changed=copy.deepcopy(original);changed['callback_adapter']['scrolling']['tiles'][1]['width']=16
+        with self.assertRaises(ValueError):pipeline.prepare_models(self.source,changed)
+        changed=copy.deepcopy(original);changed.pop('callback_adapter')
+        with self.assertRaises(ValueError):pipeline.prepare_models(self.source,changed)
+        changed=copy.copy(self.source);changed.relocations=dict(self.source.relocations)
+        changed.relocations[at+0x44]=(1,True,5,at)
+        changed.relocation_addresses=sorted(changed.relocations)
+        with self.assertRaises(ValueError):pipeline.prepare_models(changed,original)
+
+    def test_unchanged_graphics_reuse_without_another_compiler(self):
+        for path,item in (('v3-legacy-materials-prepared-01','1FC8'),
+                          ('v3-fixed-keyframe-rigs-prepared-01','32F0'),
+                          ('v3-material-frames-prepared-01','3314')):
+            cache=pipeline.PreparedAssets(self.source,[ROOT/'build'/path])
+            self.assertIsNotNone(cache.reuse(self.source,item,pipeline.prepare(self.source,int(item,16))))
 
 
 class MaterialFrameResourceTests(unittest.TestCase):

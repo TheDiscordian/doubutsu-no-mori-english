@@ -24,7 +24,7 @@ from v3_registry import FURNITURE, LEGACY_FURNITURE, furniture_identity, furnitu
 from v3_room_aliases import discover as room_aliases, pending_reason as room_alias_reason
 from v3_villager_art import native_palette, normalise_vertex_flags
 
-VERSION = 15
+VERSION = 16
 PENDING_MOVE_CATEGORY = 'static-models-pending-move'
 LAYERS = ('opaque', 'opaque1', 'translucent', 'translucent1')
 BEHAVIOURS = {0: 'static', 1: 'front-seat', 2: 'any-direction-seat', 4: 'front-sofa',
@@ -258,6 +258,9 @@ class Source:
         from v3_furniture_materials import discover as discover_materials
         materials=discover_materials(self,name,at,functions)
         if materials is not None:return materials
+        from v3_furniture_scroll import discover as discover_scroll
+        scrolling=discover_scroll(self,name,at,functions)
+        if scrolling is not None:return scrolling
         from v3_furniture_rigs import (CODE as RIG_CODE, CLOCK_CODE, STORAGE_CODE,
             discover as discover_rig, discover_clock, discover_storage, discover_fixed)
         if functions.get('create',{}).get('bytes') == RIG_CODE['create'][0]:
@@ -559,7 +562,8 @@ class Source:
             models = {LAYERS[(p-at)//4]: self.containing(target, exact=True) for p, target in pointers.items()}
         adapter = extra.get('callback_adapter', {})
         from v3_furniture_materials import CATEGORY as MATERIAL_CATEGORY
-        pending_move=adapter.get('category') in (PENDING_MOVE_CATEGORY,MATERIAL_CATEGORY)
+        from v3_furniture_scroll import CATEGORY as SCROLL_CATEGORY
+        pending_move=adapter.get('category') in (PENDING_MOVE_CATEGORY,MATERIAL_CATEGORY,SCROLL_CATEGORY)
         pending_fields=[]
         if raw[36:40]!=struct.pack('>f',.01):pending_fields.append('scale')
         if contact not in BEHAVIOURS:pending_fields.append('contact')
@@ -580,7 +584,7 @@ class Source:
             extra.update(kind='animated-room-model',skeleton=adapter['skeleton'],joint_models=adapter['joint_models'])
         return dict(profile_symbol=name, profile_offset=at, profile_sha256=sha256(raw),
             scalar_hex=raw[32:48].hex(), behaviour=adapter.get('category') if extra.get('kind') or
-                adapter.get('category') in ('switch-trigger-sound',PENDING_MOVE_CATEGORY,MATERIAL_CATEGORY) else BEHAVIOURS[contact], contact_action=contact,
+                adapter.get('category') in ('switch-trigger-sound',PENDING_MOVE_CATEGORY,MATERIAL_CATEGORY,SCROLL_CATEGORY) else BEHAVIOURS[contact], contact_action=contact,
             interaction_flags=interaction,
             size_code={3:1, 4:0, 5:2}[shape], shape=shape, models=models, **extra)
 
@@ -614,7 +618,9 @@ def prepare_models(source, descriptor):
         inherited_vertices = n // 16
     adapter = descriptor.get('callback_adapter', {})
     from v3_furniture_materials import bindings as frame_bindings
+    from v3_furniture_scroll import bindings as scroll_bindings
     material_frames=frame_bindings(adapter);used_frames=set()
+    scrolling=scroll_bindings(adapter)
     fading = adapter.get('category') == 'switch-palette-fade'
     dynamic_used = False
     if fading:
@@ -725,6 +731,7 @@ def prepare_models(source, descriptor):
                 palette_bindings=bindings, palette_fade=fading,
                 joint_matrices=matrices, inherited_palette_slot=inherited_palette,
                 inherited_vertices=inherited_vertices,
+                scrolling=scrolling.get(label),
                 material_bindings={address:(row['kind'],row['frames'][0]['donor_offset'])
                                    for address,row in material_frames.items()}))
     # Validate all native emitter rules before creating output files.
@@ -1012,7 +1019,10 @@ def name_metadata(source, item, identity):
 def metadata(source, item, profile, identity):
     from v3_furniture_rigs import FIXED_CATEGORY
     from v3_furniture_materials import CATEGORY as MATERIAL_CATEGORY
+    from v3_furniture_scroll import CATEGORY as SCROLL_CATEGORY
     binding=getattr(source,'runtime_profiles',{}).get(f'{item:04X}')
+    if profile.get('callback_adapter',{}).get('category')==SCROLL_CATEGORY:
+        raise ReviewRequired('Scrolling artwork is prepared; drawing, lifecycle behaviour, and acquisition need runtime adapters')
     if profile.get('callback_adapter',{}).get('category')==MATERIAL_CATEGORY and not binding:
         raise ReviewRequired('Material-frame artwork is prepared; drawing, lifecycle behaviour, and acquisition need runtime adapters')
     if profile.get('callback_adapter',{}).get('category')==PENDING_MOVE_CATEGORY:

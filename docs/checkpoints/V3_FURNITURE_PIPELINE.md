@@ -1,5 +1,55 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared scrolling-material resource preparation
+
+`build/v3-scrolling-materials-prepared-02/` prepares five complete objects through
+one shared category: Merlion `1FE4` (4,592 bytes), Manekin Pis `1FE8` (6,224),
+well model `30E4` (5,056), fireplace `31A0` (7,568), and sprinkler `3368` (4,672).
+Total: 28,112 bytes. The first preparation compiles all five in one container;
+the second retains additional checked helper receipts and reuses every object
+without compilation. Neither preparation changes a cartridge.
+
+Source discovery checks full draw functions, paired model relocations, matrix
+helper calls, five complete dimension wrappers, and the shared scroll generator.
+Descriptors retain model order and OPA/XLU allocation, segment eight/nine, frame
+selection, both tile dimensions/rates, and external colour inputs. The actual
+source float read is at actor offset `834`; native lifecycle state must be mapped
+explicitly, not copied to that out-of-bounds native offset. Well model's unused
+second zero-sized source tile is recorded but is not a texture dependency.
+
+The common graphics parser/compiler retains both CI4/I4 layers and the exact
+two-cycle combiners, mirror/wrap/shift values, colours, palettes, geometry, and
+texels. Complete layers use separate TMEM ranges. Merlion's two eight-pixel CI4
+rows use padded native tile transfers; sharing a source texture does not collapse
+the two independently scrolled tiles. Unknown or incomplete scroll dependencies
+remain rejected. Names use official-source entries in `translations/provenance.json`.
+
+Four `ScrollingMaterialResourceTests` pass on the first invocation in 1.880
+seconds. They independently compare complete converted textures, vertices,
+triangles, commands, and compiled tile descriptors; check source draw/helper
+changes and missing/reordered/relocated scroll rejection; verify cache reuse;
+and confirm both metadata and native-profile gates refuse unfinished lifecycles.
+The focused check reuses unchanged static, rig, and frame-bank artwork without
+building or replaying old cartridges. No native GPU, ordinary gameplay, or
+original-hardware claim is made for this prepared-only change.
+
+```sh
+python3 tools/v3_furniture_pipeline.py convert --assets-only \
+  --category scrolling-material-assets \
+  --base-lock build/v3-material-trigger-profiles-02/build-lock.json \
+  --output build/scrolling-material-reproduction
+PYTHONPATH=tests python3 -m unittest test_v3_furniture_pipeline.ScrollingMaterialResourceTests -v
+```
+
+Prepared manifest SHA-256:
+`d7128c7b6c5692063943036ff99abae422a24bef2f3f179be4f848ac57a1c1ab`.
+Runtime rendering, lifecycle effects/audio, acquisition, and legacy additive
+identity review remain required. No new choices, save/profile requirements, RAM
+allocations, or browser assets are introduced. ABI 170 remains the current
+cartridge, and the main ABI-109 lock remains unchanged. Continue shared category
+support before required gold-tree completion. The local preview and public
+website remain deployments of the same stable V2 patcher.
+
 ## Shared material-trigger profile integration
 
 ABI 170 at `build/v3-material-trigger-profiles-02/` stages three complete

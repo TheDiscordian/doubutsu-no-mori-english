@@ -105,6 +105,34 @@ recompiling an entire installed category merely to add one newly supported membe
 
 ### Shared runtime categories
 
+The `scrolling-material-assets` category prepares complete custom-drawn objects
+with model-local texture scrolling. Discovery verifies entire source draw
+functions, every model relocation pair, both matrix calls, dimension wrappers,
+and the complete shared `two_tex_scroll_dolphin` generator. Descriptors retain
+actual opaque/translucent submission order, source frame selection, signed scroll
+rates, the Dolphin coordinate shift, runtime colour fields, and all lifecycle
+receipts. Implementation fingerprints select formats; item IDs and artwork
+names do not select conversion code.
+
+Use `convert --assets-only --category scrolling-material-assets` with the current
+explicit build lock. The complete prepared batch covers Merlion, Manekin Pis,
+well model, fireplace, and sprinkler. The draw contract supplies segment eight
+or nine only to its actual consuming model. Complete texture dimensions must
+match the ordered one/two tile loads; missing, reordered, relocated, or unused
+scroll bindings reject. CI4 and I4 use distinct non-overlapping TMEM regions
+below palette storage. Eight-pixel rows use tile transfers with padded TMEM
+strides, retaining both CI4 layers even when they share a source texture.
+Source wrap, mirror, shifts, palette, both-cycle combiners, colour state, every
+texel, and geometry are preserved. Unknown dynamic display lists remain refused.
+
+Preparation does not implement native scroll-list allocation, timing, split
+draw arenas, lifecycle colour/sound transitions, or acquisition. Both metadata
+and native profile construction refuse this prepared-only category, including
+forged readiness annotations. Legacy identities still require reviewed additive
+destinations. Reuse complete objects through the common prepared-artwork cache
+when the runtime category is implemented; do not freeze the textures or discard
+translucent models to enable an import.
+
 The `material-frame-assets` category prepares complete custom-drawn models and
 their texture/palette frame tables independently of unfinished lifecycle code.
 Discovery verifies the entire draw implementation, paired data relocations,

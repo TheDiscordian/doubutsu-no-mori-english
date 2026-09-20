@@ -18,6 +18,18 @@ served patchers retain their existing builds.
 
 ## Active development
 
+The shared scrolling-material category prepares five complete objects at
+`build/v3-scrolling-materials-prepared-02/`: Merlion, Manekin Pis, well model,
+fireplace, and sprinkler, totalling 28,112 bytes. One compiler batch produces
+their graphics; the final receipt reuses all five objects without compilation.
+The common converter preserves both texture layers, padded eight-pixel texture
+rows, opaque/translucent model order, scroll rates, and external colour state.
+Four focused checks pass. Runtime drawing, lifecycle, acquisition, and legacy
+destination review remain required; these prepared resources are not selectable.
+Names are credited to the official donor in the single provenance catalogue.
+No cartridge or served website changes. See the
+[scrolling-material checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-scrolling-material-resource-preparation).
+
 The current explicit proposal is ABI 170 at
 `build/v3-material-trigger-profiles-02/build-lock.json`. The shared profile
 importer stages coin, ? block, and fire flower with their complete material/sound
