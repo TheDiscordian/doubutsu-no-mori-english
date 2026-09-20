@@ -1561,6 +1561,7 @@ def tool_controls(debug,rom_path,record,*,transitions=False,capture=False,rod=Fa
 
 
 def exercise(debug, rom_path, record, *, section='automatic_furniture'):
+    if section=='reward_controls':return reward_controls(debug,rom_path,record)
     if section=='reward_messages':return reward_messages(debug,rom_path,record)
     if section=='reward_motion':return reward_motion(debug,rom_path,record)
     if section=='held_names':return held_names(debug,rom_path,record)
@@ -2624,6 +2625,117 @@ def original_equipment_kinds(original):
         result.append(kind)
     if sorted(result)!=list(range(36)):raise ValueError('Original equipment switch is incomplete')
     return result
+
+
+def reward_controls(debug,rom_path,record):
+    """Actual player setup/frame and fanfare requests through a retained native dispatcher."""
+    import v3_equipment_runtime as equipment
+    path=Path(rom_path);image=path.read_bytes();report=json.loads((path.parent/'build.json').read_bytes())
+    if sha256(image)!=report['output_sha256']:raise ValueError('Changed reward-control cartridge')
+    resources=report['equipment_resources'];actions=resources['player_actions'];receipt=actions['reward_controls']
+    files=by_vrom(image);blob=files[runtime.BLOB].extract(image);boot=boot_proofs(image);assertions=0
+    def check(label,at,want):
+        nonlocal assertions
+        actual=debug.read_memory(at,len(want));passed=actual==want
+        record(dict(reward_control_check=label,address=f'{at:08X}',bytes=len(want),
+            assertion='passed' if passed else 'failed',observed_sha256=sha256(actual),expected_sha256=sha256(want)))
+        if not passed:raise ValueError('Reward control mismatch: '+label)
+        assertions+=1
+    def call(at,args=(),proof=None):
+        result=debug.call(f'{at:08X}',list(args),return_address=MODULE_RAM+0x6480,verified_code=proof or boot.get(at))
+        record(result);return result['return_value']
+    def put(at,*words):debug.write_memory(at,struct.pack('>'+str(len(words))+'I',*words))
+    def pointer(at,size):
+        value=int.from_bytes(debug.read_memory(at,4),'big')
+        if value&3 or not MODULE_RAM+0x8000<=value<=0x80400000-size:
+            raise ValueError('Reward control fixture pointer outside native heap')
+        return value
+    start=resources['blob_offset'];module=blob[start:start+resources['bytes']]
+    check('complete installed module',equipment.RAM,module)
+    constructor=int.from_bytes(debug.read_memory(0x80143900,4),'big')
+    owner=constructor-(0x808DD748-equipment.PLAYER_RAM)
+    data=files[equipment.PLAYER_VROM].extract(image);rel=files[equipment.PLAYER_RELOC].extract(image)
+    if owner&15 or not MODULE_RAM+0x8000<=owner<=0x80400000-len(data):
+        raise ValueError('Reward controls need the actual loaded player owner')
+    sections=struct.unpack_from('>5I',rel)
+    expected=relocate_verified_data(SimpleNamespace(ram=equipment.PLAYER_RAM,resident_bytes=len(data),sections=sections),data,rel,owner)
+    check('complete actual loaded player code',owner,expected[:sections[0]])
+    dispatch=next(r for r in actions['tables'] if r['native_entry']==0x808DD9B4)
+    footprint=next(r for r in actions['tables'] if r['native_entry']==0x808B828C)
+    check('reward action has no settlement footprint callback',footprint['ram']+118,b'\0')
+    slot=dispatch['ram']+118*4;original_slot=debug.read_memory(slot,4)
+    if original_slot!=bytes(4):raise ValueError('Reward fixture requires a disabled callback slot')
+    first,last=dispatch['native_entry']-equipment.PLAYER_RAM,dispatch['native_end']-equipment.PLAYER_RAM
+    proof=(owner+first,expected[first:last])
+    game=pointer(0x8010EF90,0x1E00);actor_bytes=resources['held_rig_actions']['player_allocation']['bytes']
+    actor=pointer(game+0x1C90,actor_bytes);actor_before=debug.read_memory(actor,actor_bytes)
+    bgm=0x80123E10
+    saved={at:debug.read_memory(at,size) for at,size in
+        ((bgm,0x154),(0x801458A0,64),(0x8046C000,864),(0x80126EC0,4*0xBD0))}
+    banks={}
+    for index in struct.unpack_from('>2h',actor_before,0xDA0):
+        if not 0<=index<8:raise ValueError('Invalid live animation-bank selector')
+        address=pointer(game+0x114+84*index,equipment.PLAYER_CAPACITY)
+        banks[address]=debug.read_memory(address,equipment.PLAYER_CAPACITY)
+    def routine(name):
+        put(slot,receipt['code']['symbols']['af_v3_reward_'+name])
+        return call(owner+first,[actor,game],proof)
+    motion=next(r for r in resources['player_motion']['records'] if r['index']==258)
+    segments=bytearray(saved[0x801458A0])
+    try:
+        # One representative exercises the shared native calls and restoration;
+        # retain the recorded four-type evidence and host mapping checks.
+        for kind,bgm_id in enumerate(receipt['fanfares']['type_bgms'][:1]):
+            call(0x8005EB74,[bgm])
+            debug.write_memory(actor+0xE64,b'\x01')
+            put(actor+0xCF0,118);put(actor+0xD00,118,1,1);put(actor+0xD58,kind)
+            routine('setup')
+            check('setup preserves segment bases',0x801458A0,segments)
+            check('reward action selected by real Base setup',actor+0xCF0,struct.pack('>I',118))
+            check('reward state reset',actor+0xD10,struct.pack('>f2I',0.0,0,kind))
+            check('complete native reward frame control',actor+0x174,struct.pack('>5fI',1,53,53,1,1,0))
+            for bank in banks:
+                check('complete source reward motion in native bank',bank,
+                    blob[motion['blob_offset']:motion['blob_offset']+motion['bytes']])
+            check('native fanfare request count',bgm+0xF0,struct.pack('>I',1))
+            check('native source-selected fanfare number',bgm,bytes([bgm_id]))
+            check('native source stop type',bgm+6,struct.pack('>H',0x168))
+            check('native fanfare category and lifetime',bgm+8,struct.pack('>IhHB',0,-1,0,255))
+            if kind==0:
+                routine('main')
+                check('actual animation advances once',actor+0x184,struct.pack('>f',2.0))
+                check('message uses one native interval',actor+0xD10,struct.pack('>f2I',2.0,0,kind))
+                check('reward remains active before its message',actor+0xCF0,struct.pack('>I',118))
+                # Unchanged native cKF_SkeletonInfo_R_combine_play supplies
+                # segment six for both layers. Its restoration helper writes
+                # the second layer's prior base last: the lower animation bank.
+                # This is normal native animation behaviour, not corruption.
+                # Assert the exact bank and every other unchanged segment.
+                lower=int.from_bytes(debug.read_memory(actor+0xDA4,4),'big')
+                if lower not in banks:raise ValueError('Reward lower animation escaped its native bank')
+                struct.pack_into('>I',segments,6*4,lower&0x1FFFFFFF)
+                check('frame retains native lower-bank segment semantics',0x801458A0,segments)
+            routine('stop_fanfare')
+            check('native deletion retains selected fanfare identity',bgm,bytes([bgm_id]))
+            check('native deletion stop type',bgm+4,struct.pack('>H',0x168))
+            check('native deletion flag',bgm+14,struct.pack('>H',1))
+        for at in (0x8046C000,0x80126EC0):check('saved data untouched',at,saved[at])
+        check('only native animation segment selection changes',0x801458A0,segments)
+    finally:
+        debug.write_memory(slot,original_slot);debug.write_memory(actor,actor_before)
+        for bank,value in banks.items():debug.write_memory(bank,value)
+        debug.write_memory(bgm,saved[bgm])
+        debug.write_memory(0x801458A0,saved[0x801458A0])
+    check('complete shared module restored',equipment.RAM,module)
+    check('live player restored',actor,actor_before)
+    for bank,value in banks.items():check('live animation bank restored',bank,value)
+    check('native BGM state restored',bgm,saved[bgm])
+    check('fixture segment bases restored',0x801458A0,saved[0x801458A0])
+    check('no CPU fault',0x8003CE34,bytes(4));check('translation guard',0x8019C8D0,bytes.fromhex('AF32C0DE')*4)
+    return dict(native_reward_setup=True,native_reward_main_frames=1,native_fanfare_requests=1,
+        assertions=assertions,temporary_callback_slot=True,code_uploaded=False,
+        balloon_reward_setup_tested=False,audio_output_auditioned=False,persistent_settlement_tested=False,
+        ordinary_reward_event_tested=False,hardware_tested=False,flash_written=False,requires_checkpoint_restore=True)
 
 
 def reward_messages(debug,rom_path,record):

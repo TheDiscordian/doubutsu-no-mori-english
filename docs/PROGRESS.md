@@ -18,13 +18,29 @@ served patchers retain their existing builds.
 
 ## Active development
 
-The current explicit ABI-140 proposal is
-`build/v3-shared-reward-messages-02/build-lock.json`. All eight balloons are
+The current explicit ABI-141 proposal is
+`build/v3-shared-reward-controls-01/build-lock.json`. All eight balloons are
 connected through the shared parent-category installer: official names/prices,
 complete pocket icons, held/inventory animation, source acquisition records,
 collection/catalogue, animated room profiles, indoor conversion, and inverse
 pickup. The local composer has 128 experimental choices, including 24 equipment
 parents. These are not a public or hardware-ready handoff.
+
+The shared golden-tool celebration setup and per-frame controller connect the
+installed motions, held-item handling, facial animation, and message phase.
+All four source fanfare selections use complete existing native sequences and
+fonts; all 60 referenced samples match the donor. The 1,036-byte callback group
+fits unused icon-reservation space without moving resources or changing saves.
+One sanitizer and three cartridge/composition checks pass. The silent native
+retry passes 46 records and 34 assertions, including real animation setup and
+one frame, fanfare requests, native segment behaviour, unchanged saved data,
+restored state/checkpoint, and clean exit. The first run also verifies all four
+fanfare request/delete pairs before its incorrect segment-retention assertion.
+No actual game-code defect is found: the unchanged native animation combiner
+leaves the lower bank selected in segment six. Saved reward flags, complete
+settlement, and ordinary acquisition events remain unimplemented, so the four
+golden tools and their reward actions remain disabled. See the
+[control checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-reward-controls-and-fanfares).
 
 The shared golden-tool message phase imports all four complete official messages
 and preserves their wording, pages, colours, and commands. A 604-byte callback
@@ -37,7 +53,7 @@ checks pass. The first silent native run passes 115 records and 98 assertions,
 including full message loads, phase transitions, guards, unchanged saved data,
 restored checkpoint, and clean exit. The fixture temporarily routes an unused
 callback slot; ordinary reward events are not yet connected. Next implement
-celebration setup/main/settlement, fanfares, persistent reward flags, and the
+complete settlement, persistent reward flags, and the
 source acquisition events. The four golden tools remain disabled. See the
 [message checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-reward-messages).
 
@@ -51,8 +67,8 @@ One sanitizer check and four cartridge/composition checks pass. The first silent
 native run passes 165 records and 123 assertions, including both full transfers,
 30 actual native facial frames, segment restoration, guards, restored checkpoint,
 and clean exit. Skeletal playback and ordinary reward events are not established
-by this check. Golden-tool choices remain disabled pending celebration callbacks
-and ordinary acquisition. See the
+by that component check. Golden-tool choices remain disabled pending saved
+reward settlement and ordinary acquisition. See the
 [reward-motion checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-reward-motions-and-player-faces).
 
 Both wrapped-item name readers use the official GameCube `present` label with

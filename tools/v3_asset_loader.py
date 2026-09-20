@@ -111,6 +111,7 @@ def compile_part(part, out, extra_sources=(), defines=(), primary_source=None):
                        'held_present_names': ('af_v3_present_legacy_name', 0x804B4480),
                        'player_faces': ('af_v3_player_eye_sequence', 0x804B4540),
                        'player_reward_messages': ('af_v3_reward_message_id', 0x804B2280),
+                       'player_rewards': ('af_v3_reward_bgm', 0x804B3880),
                        'held_rigs': ('af_v3_held_setup', 0x804B0000),
                        'room_rigs': ('af_v3_room_rig_ct', 0x804B1800),
                        'held_collection': ('af_v3_held_catalogue_record', 0x804AFA00),

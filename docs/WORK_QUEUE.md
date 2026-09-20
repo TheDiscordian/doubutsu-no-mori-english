@@ -2,12 +2,25 @@
 
 ## Active: V3 optional GameCube imports
 
-The current explicit proposal is ABI 140,
-`build/v3-shared-reward-messages-02/build-lock.json`. All eight balloons are
+The current explicit proposal is ABI 141,
+`build/v3-shared-reward-controls-01/build-lock.json`. All eight balloons are
 connected through shared source-derived parent records, room profiles, indoor
 conversion/pickup, collection/catalogue, complete icons, and optional selection.
 There are 128 experimental choices, with 24 equipment parents. Neither served
 V2 patcher nor the main lock changes.
+
+Shared celebration setup/main and fanfare requests are installed. One sanitizer
+and three cartridge/composition checks pass; the silent native retry passes 46
+records and 34 assertions, with one actual animation frame, native BGM requests,
+exact segment behaviour, saved-data retention, restored state/checkpoint, and
+clean exit. The first run's four fanfare pairs retain passing evidence. Reuse
+these checks; do not repeat the native fixture without a changed consumer.
+Next implement complete settlement and separate persistent reward flags, then
+source scene/NPC/tree acquisition. Do not repurpose unidentified saved bytes or
+catalogue ownership bits. The 1,036-byte control group occupies
+`804B3880..804B3C8C`; retain the icon prefix and guard at `804B3FF0`.
+Reward actions and golden-tool choices remain disabled. See the
+[checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-reward-controls-and-fanfares).
 
 The shared reward-message phase and four complete official messages are
 installed and source-credited. One sanitizer and four cartridge/composition
@@ -15,8 +28,8 @@ checks pass; the first silent native check passes 115 records and 98 assertions.
 It uses a temporary callback-table slot, actual native message loads and report
 requests, delay/lock/completion checks, retained saved data, restored state, and
 clean exit. Reuse this evidence; ordinary reward events are not connected.
-Next integrate the shared celebration setup/main/settlement, source fanfares,
-and separate persistent reward flags, then the source scene/NPC/tree acquisition
+Next integrate complete settlement and separate persistent reward flags,
+then the source scene/NPC/tree acquisition
 events. The 604-byte message group occupies `804B2280..804B24DC`; the bobber
 helper at `804B2180` and artwork beginning `804B2800` must remain intact.
 Do not enable the four golden-tool choices until their full paths work. See the
@@ -28,9 +41,8 @@ and saves remain intact. One sanitizer and four cartridge/composition checks
 pass; the first silent native run passes 165 records and 123 assertions, including
 full transfers, 30 native facial frames, bounded writes, segment restoration,
 guards, restored checkpoint, and clean exit. Reuse this evidence; skeletal
-playback and ordinary reward events remain unverified. Next implement shared
-celebration setup/main/settlement, fanfares, and persistent
-reward flags before the event actors and acquisition conditions. Do not enable
+appearance and ordinary reward events remain unverified. Next implement shared
+settlement and persistent reward flags before the event actors and acquisition conditions. Do not enable
 the four golden tools based on installed motions. See the
 [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-reward-motions-and-player-faces).
 
@@ -149,8 +161,8 @@ the axe uses the perfect-town reward, and the shovel uses the gold-tree route.
 The native tree-drop tables stop at thirteen rows and have no golden-shovel row;
 the native actor list lacks the donor's gift-event actors. Header definitions
 alone do not prove those systems exist. The complete animation/facial resources
-are installed, as is their message phase; implement shared celebration callbacks, fanfares, and
-then the required scene/NPC/tree support, using the
+are installed, as are their message, setup/main, and fanfare phases. Implement
+shared saved reward settlement and the required scene/NPC/tree support, using the
 [native-gap audit](../specs/V3_HANDHELD_ITEMS.md#golden-tool-acquisition-and-wrapped-identities).
 Keep source conditions,
 official dialogue, selected-profile rejection, and saved reward state explicit.

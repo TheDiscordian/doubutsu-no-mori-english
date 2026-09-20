@@ -1361,12 +1361,65 @@ The native acquisition gap includes engine content, not only item substitutions:
   and `golden_items_collected` celebration state are separate from item catalogue
   ownership. Preserve that distinction when extending persistent reward state.
 
-The complete reward motions, shared facial sequences, and official message
-phase are installed as described below. Next implement the shared celebration
-callbacks and fanfare dependencies, then connect the event actors and acquisition conditions.
+The complete reward motions, shared facial sequences, official message phase,
+setup/main controller, and fanfare requests are installed as described below.
+Next implement complete settlement and separate saved reward flags, then connect
+the event actors and acquisition conditions.
 Use the shared category installer and complete source records. Keep all four
 choices disabled until their full paths are connected; do not substitute a
 shop purchase, arbitrary letter, or unrelated NPC for a missing donor event.
+
+#### Shared reward controls and fanfares
+
+The common `--refresh-runtime --player-actions` stage installs `player_rewards.c`
+after the message stage. The 1,036-byte code group at `804B3880` ends at
+`804B3C8C`, within the unused suffix of the golden-tool icon reservation. The
+complete icon prefix, guard at `804B3FF0`, module size, import blob, native action
+tables, and saved format remain unchanged. The installer checks nine complete
+donor functions and eighteen complete native API functions, retaining the three
+existing extended metadata/kind/held-dispatch implementations.
+
+Setup reads the requested type at player offset `D58`, resets transient state
+at `D10`, and uses native `SetupItem_Base1` at linked `808B846C`. Its existing
+Base0 adapter retains pinwheel/balloon handling. Ordinary lower motion is 258;
+the upper motion follows the source held-item rule. Balloon kinds 91–98 select
+motion 260 on both layers with part mask zero; ordinary rewards use mask three.
+Native `InitAnimation_Base2` at `808B4A44` sets frame one, speed one, morph minus
+five, and stop mode. Native base setup selects the requested action. Null
+arguments and invalid reward types make no engine calls or writes.
+
+Main uses native combined animation, two source turning substeps per native
+update, native braking, position reinput, lean recovery, source facial timelines,
+standing/background checks, held-item updates, and the installed message phase.
+It requests ordinary wait only after message completion. The unchanged native
+animation combiner at `80053B54` receives segment six for both layers; its helper
+at `80053384` restores the first layer followed by the second, leaving the lower
+animation bank selected. Component fixtures must assert that exact native
+effect and restore the prior segment table on cleanup, not require an unchanged
+segment six during animation.
+
+The complete donor fanfare selector at `.text:16F878` maps axe/net/rod/shovel to
+logical BGM IDs 73/75/76/74. These are logical IDs, not sequence indices. The
+checked donor/native BGM tables at `800A9838`/`80113964` select donor sequences
+232–235 and native sequences 195–198; their source/native fonts are 143–146 and
+135–138. Native request/delete calls retain stop type `0168`.
+
+`reward_fanfares` reuses complete existing native audio without replacing or
+shortening any file. Each native sequence equals the corresponding complete
+donor prefix; three donor sequence files and all four donor font files contain
+sixteen additional trailing bytes, recorded in the receipt. Those bytes are not
+assumed zero or called converted. Font comparison covers the entire native
+font after normalising only waveform offsets, including instruments, drums,
+envelopes, tuning, loops, and predictors. All sixty sample headers resolve to
+complete matching waveform data. Unknown layouts, changed source/native tables,
+out-of-bounds pointers, and sample/font differences are rejected. No new audio
+sequence, instrument, sample, or permanent audio allocation is needed.
+
+The fanfare stop callback is not complete settlement: the donor also sets a
+per-player celebration bit, distinct from trophy receipt and catalogue ownership.
+Do not register reward actions or enable golden tools until that saved state and
+the ordinary acquisition events exist. See the
+[checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-reward-controls-and-fanfares).
 
 #### Shared reward messages
 
@@ -1401,8 +1454,8 @@ Neither neighbouring resource, the previous-dig state at `804B2FD0`, the full
 complete module checks, and zero-space checks guard installation. Later stages
 retain already installed text without reapplying an older resource image.
 
-These callbacks are not yet registered as complete reward actions. Source
-setup/main/settlement, fanfares, persistent flags, and acquisition remain required.
+These callbacks are not yet registered as complete reward actions. Complete
+settlement, persistent flags, and source acquisition remain required.
 The focused native fixture temporarily uses an unused existing dispatcher slot
 and restores it; that is component verification, not ordinary acquisition.
 See the [checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-reward-messages).

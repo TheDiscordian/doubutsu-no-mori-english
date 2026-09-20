@@ -16,6 +16,96 @@ from v3_villager_audio import (GC_SECTIONS, NATIVE_HEADERS, extended_envelope,
 SOURCES=('tools/v3_sound_programs.py','tools/v3_villager_audio.py')
 
 
+def shared_font_samples(donor_bank,native_bank,donor_wave,native_wave,metadata):
+    """Compare complete native font data after resolving every sample address."""
+    if metadata[3]!=255 or metadata[6:]!=bytes(2) or len(donor_bank) not in (len(native_bank),len(native_bank)+16):
+        raise ValueError('Unsupported shared fanfare font layout')
+    instruments,drums=metadata[4:6];samples=set();envelopes=set()
+    def pointer(at,size):
+        value=u32(native_bank,at)
+        if value:
+            span(native_bank,value,size)
+            if value&3:raise ValueError('Unaligned shared font pointer')
+        return value
+    for i in range(instruments):
+        at=pointer(8+i*4,32)
+        if at:
+            envelopes.add(pointer(at+4,4))
+            samples.update(p for j in (8,16,24) if (p:=pointer(at+j,16)))
+    drum_table=pointer(0,drums*4) if drums else 0
+    if bool(drums)!=bool(drum_table):raise ValueError('Missing shared drum table')
+    for i in range(drums):
+        at=pointer(drum_table+i*4,16)
+        if at:
+            samples.add(pointer(at+4,16));envelopes.add(pointer(at+12,4))
+    if not samples or 0 in samples or 0 in envelopes:raise ValueError('Missing shared font dependencies')
+    # The complete native font must match the donor prefix, including its
+    # envelopes, tuning, loops, predictors, instrument ranges, and drum rows.
+    # Only wave offsets may differ; compare the entire addressed samples.
+    normalized=bytearray(donor_bank[:len(native_bank)]);rows=[]
+    for at in sorted(samples):
+        flags,native_offset,loop,book=struct.unpack('>4I',span(native_bank,at,16))
+        if not 0<flags<0x1000000 or not loop or not book:
+            raise ValueError('Unsupported shared waveform')
+        loops=u32(span(native_bank,loop,16),8);span(native_bank,loop,48 if loops else 16)
+        order,count=struct.unpack('>2I',span(native_bank,book,8))
+        if not 1<=order<=2 or not 1<=count<=16:raise ValueError('Unbounded shared ADPCM predictor')
+        span(native_bank,book,8+16*order*count)
+        donor_offset=u32(donor_bank,at+4)
+        a,b=span(donor_wave,donor_offset,flags),span(native_wave,native_offset,flags)
+        if a!=b:raise ValueError('Shared fanfare sample differs')
+        struct.pack_into('>I',normalized,at+4,native_offset)
+        rows.append(dict(header_offset=at,source_offset=donor_offset,native_offset=native_offset,
+                         bytes=flags,sha256=sha256(a)))
+    if normalized!=native_bank:raise ValueError('Shared fanfare font differs beyond sample addresses')
+    return dict(source_bytes=len(donor_bank),native_bytes=len(native_bank),
+        source_sha256=sha256(donor_bank),native_sha256=sha256(native_bank),
+        source_trailing_hex=donor_bank[len(native_bank):].hex(),samples=rows,
+        instrument_count=instruments,drum_count=drums,envelope_offsets=sorted(envelopes))
+
+
+def reward_fanfares(image,code,source):
+    """Retain existing native reward fanfares with source/native asset bindings."""
+    raw,selector=source.function(0x16F878)
+    if (len(raw)!=68 or sha256(raw)!='07a6b4d855a833c30e50d586a162884365c2256d9626caa7966aaec9eaad2fab'
+            or selector['symbol']!='Player_actor_sound_Get_bgm_num_forDemoGetGoldenItem'):
+        raise ValueError('Changed complete reward fanfare selector')
+    ordered=[w&65535 for w in struct.unpack('>17I',raw) if w>>16==0x3860]
+    if ordered!=[73,75,76,74]:raise ValueError('Changed reward fanfare order')
+    dol,audio=read_audio_donor(ROOT/'local/gamecube/Animal Crossing (USA, Canada).ciso')
+    donor={k:span(audio,*struct.unpack_from('>II',header_entry(dol.read,0x800CE450,i)))
+           for i,k in enumerate(('seq','bank','wave'))}
+    read=lambda at,n:span(code,at-CODE_RAM,n)
+    source_table=dol.read(0x800A9838,256);native_table=read(0x80113964,256)
+    if (sha256(source_table)!='3627168080c7151cc4a4bd5d021735e17a591168a85dab4abfd9af16b833f0df'
+            or sha256(native_table)!='d0ded694c8643bc28abf25d7cc743ce84ea73d022d8af60d08f8aae0033e5e53'):
+        raise ValueError('Changed complete BGM selector table')
+    rows=[]
+    for bgm in ordered:
+        gi,ni=source_table[bgm],native_table[bgm]
+        g,gh=resource(dol.read,GC_SECTIONS,donor,'seq',gi)
+        n,nh,physical=installed_resource(image,code,'seq',ni)
+        if len(g) not in (len(n),len(n)+16) or g[:len(n)]!=n:
+            raise ValueError('Native fanfare is not the complete common sequence')
+        def bank_id(reader,base,index):
+            offset=struct.unpack('>H',reader(base+index*2,2))[0];data=reader(base+offset,2)
+            if data[0]!=1:raise ValueError('Unreviewed multi-font fanfare')
+            return data[1]
+        gb,nb=bank_id(dol.read,0x800CE490,gi),bank_id(read,0x80115D80,ni)
+        gbank,gbh=resource(dol.read,GC_SECTIONS,donor,'bank',gb)
+        nbank,nbh,_=installed_resource(image,code,'bank',nb)
+        if gbh[8:]!=nbh[8:]:raise ValueError('Shared fanfare font metadata differs')
+        gwave,_=resource(dol.read,GC_SECTIONS,donor,'wave',gbh[10])
+        nwave,_,_=installed_resource(image,code,'wave',nbh[10])
+        font=shared_font_samples(gbank,nbank,gwave,nwave,nbh[8:])
+        rows.append(dict(bgm=bgm,source_sequence=gi,native_sequence=ni,source_bytes=len(g),native_bytes=len(n),
+            source_sha256=sha256(g),native_sha256=sha256(n),source_trailing_hex=g[len(n):].hex(),
+            native_physical=physical,source_bank=gb,native_bank=nb,font=font))
+    return dict(selector=selector,type_bgms=ordered,rows=rows,source_table=0x800A9838,native_table=0x80113964,
+        source_table_sha256=sha256(source_table),native_table_sha256=sha256(native_table),
+        new_sequences=0,new_instruments=0,new_samples=0,native_resources_retained=True)
+
+
 def looping_layer(data, origin, *, prefix=False):
     """Complete single-layer sustained note, custom envelope, and timed loop."""
     start=4 if prefix else 0

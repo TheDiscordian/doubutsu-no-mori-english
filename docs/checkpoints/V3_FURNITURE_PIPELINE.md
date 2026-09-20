@@ -1,5 +1,100 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared reward controls and fanfares
+
+The ABI-141 proposal is `build/v3-shared-reward-controls-01/build-lock.json`.
+It installs the shared golden-tool celebration setup/main and fanfare callbacks
+through the existing category installer. All 128 experimental choices, format-2
+saves, resource addresses, resident allocations, and official messages remain.
+Full persistent settlement and ordinary reward acquisition remain unfinished;
+the four golden tools and their reward actions stay disabled. The main ABI-109
+lock and both served patchers remain unchanged.
+
+- ROM SHA-256:
+  `3371dcfdfe1b3d7f88323604578faacb631622a4420302fcc839aa5ea98b3d87`.
+- Report SHA-256:
+  `f6312a2cfcb50b71f372c336731324941b616e95dab9288fef28ba8f04812eb2`.
+- UPS SHA-256:
+  `ad138022ed2a5a70be30628a41998d79a2c4ba710c59983edca84fee38be7c1d`.
+- Reward code SHA-256:
+  `0ad4ccb353c4781aff3671cc58fe71f2864b708c4806c60caa8d7d379c85a58b`.
+
+The 1,036-byte code group occupies `804B3880..804B3C8C`, preserving the complete
+icon prefix and old guard at `804B3FF0`. It connects the installed celebration
+motions, source held-item rules, two source turn steps per native update, native
+braking, animated/normal facial selection, standing/background checks, held-item
+updates, and the installed message phase. The source fanfare selector supplies
+axe/net/rod/shovel logical IDs 73/75/76/74. These resolve through native tables
+to existing complete fanfares, with no new audio allocation.
+
+The audio audit compares complete native sequences with donor prefixes and
+complete native fonts after normalising waveform offsets. All 60 sample headers
+resolve to identical full waveform data. Three donor sequences and four donor
+fonts have sixteen additional trailing bytes; their receipts preserve those
+bytes and do not call them zero padding or a completed conversion. The existing
+native files are used unchanged. No physical audio is played.
+
+One sanitizer and three cartridge/composition checks pass on their first run:
+
+```sh
+python3 -m unittest tests.test_v3_player_actions.RewardControlHostTests \
+  tests.test_v3_player_actions.RewardControlTests -v
+```
+
+They cover all reward types and held kinds, source setup/frame call order,
+animation/part masks, message-gated exit, null/invalid input rejection, immutable
+actor guards, complete source/native/audio bindings, changed-source/API/table
+rejection, only the reserved code changing, no resource/save/allocation growth,
+unchanged action registration, original-ROM UPS reconstruction, all 128 choices,
+exact empty-selection V2-12, and future resource-tail reuse. Syntax compilation
+and `git diff --check` also pass.
+
+Native attempt one, `build/smoke-v3-reward-controls-01/`, has 75 records with 57
+passing assertions and one failed assertion. All four real setup/motion/fanfare
+request/delete pairs, one actual main frame, and saved-data retention pass. The
+fixture then incorrectly requires the whole segment table to remain unchanged.
+Results SHA-256:
+`126cb489285859038d390c70c830cb1fd5867f33b418c08ae4da51be86231eff`.
+
+The unchanged native animation combiner at `80053B54` receives segment six for
+both animation layers. Its restoration helper at `80053384` writes the saved
+lower-layer base last; this leaves the lower animation bank selected. Both the
+retail disassembly and `upstream/af/src/code/c_keyframe.c` establish that normal
+effect. It is not new memory corruption. The fixture is corrected to check the
+exact lower-bank value and every other segment, then restore the prior table.
+No production code or cartridge changes for this correction.
+
+The justified retry, `build/smoke-v3-reward-controls-02/`, narrows execution to
+one representative instead of replaying all four completed fanfare pairs. It
+passes **46 records and 34 assertions**, results SHA-256
+`54d30488f219d7dc82b74f03d474f7a57d540ff25456c87ad24caa2a61720569`.
+The complete cartridge-loaded module and actual relocated player code are
+verified. A temporary unused native settlement-table slot preserves both real
+actor/game arguments; no executable code is uploaded. Real animation setup,
+complete motion banks, one frame, timer state, BGM request/delete, exact segment
+behaviour, unchanged four-player/V3 saved data, restored actor/banks/BGM/module,
+guards, restored checkpoint, resume, and clean exit pass. Audio remains disabled
+and only isolated blank saves are used. The one setup retry is spent; fixture
+work stays inside its 30-minute budget.
+
+```sh
+python3 tools/emulator_smoke.py \
+  --rom build/v3-shared-reward-controls-01/animal-forest-v3-asset-loader.z64 \
+  --output build/smoke-v3-reward-controls-02 \
+  --scenario tests/v3-player-reward-controls-scenario.json \
+  --xvfb /home/discordian/Games/OpenRSC/headless/vendor/usr/bin/Xvfb \
+  --seconds 180 --expansion-pak --no-initial-screenshot
+```
+
+This establishes one actual native animation frame, not full rendered reward
+playback, audible fanfare quality, balloon reward playback, ordinary acquisition,
+persistent settlement, or hardware. Reuse the preceding complete message/motion/
+face evidence. Browser code is unchanged; no fresh browser test is claimed.
+Imported saves still require matching/equal-or-larger profiles and must not load
+in V2. Next implement separate saved celebration/trophy flags and full settlement,
+then source scene/NPC/tree events. Do not enable golden tools from this component
+result or change either served patcher.
+
 ## Shared reward messages
 
 The ABI-140 proposal is `build/v3-shared-reward-messages-02/build-lock.json`.

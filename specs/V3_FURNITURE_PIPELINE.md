@@ -22,6 +22,14 @@ hand owner; its tag owner remains an in-place update.
 
 ### Shared runtime categories
 
+The shared player-action reward-control stage follows the installed message
+phase. It connects source setup/main behaviour and native fanfare requests in
+checked unused icon-reservation space, preserving resources, action registration,
+saved formats, and selections. Its complete source/native audio audit reuses
+existing native sequences, fonts, and samples. Complete persistent settlement
+and ordinary acquisition remain required before enabling rewards or tools. See
+[reward controls](V3_HANDHELD_ITEMS.md#shared-reward-controls-and-fanfares).
+
 The player-action refresh installs complete reward motions and generic eye/mouth
 timelines through the existing player-resource category. It discovers source
 indices from the donor setup, preserves complete animation/frame arrays, retains

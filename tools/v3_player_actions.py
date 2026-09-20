@@ -87,7 +87,8 @@ SOURCES+=('overlays/v3/held_presents.c','overlays/v3/held_presents.S',
           'overlays/v3/held_present_names.S','overlays/v3/held_present_names.ld')
 SOURCES+=('tools/v3_equipment_runtime.py','overlays/v3/player_faces.c','overlays/v3/player_faces.ld')
 SOURCES+=('tools/v3_event_text.py','tools/v3_camper_text.py',
-          'overlays/v3/player_reward_messages.c','overlays/v3/player_reward_messages.ld')
+          'overlays/v3/player_reward_messages.c','overlays/v3/player_reward_messages.ld',
+          'overlays/v3/player_rewards.c','overlays/v3/player_rewards.ld')
 
 SELECTION_OFFSET=0x5500
 PARENT_CODE_OFFSET,PARENT_TABLE_OFFSET=0x3000,0x57F0
@@ -98,6 +99,74 @@ BALLOON_MODULE_SIZE,BALLOON_STATE_OFFSET,BALLOON_STATE_BYTES=0xF000,0x1370,48
 TOOL_MOTION_OFFSET=0x2A50
 EFFECTS_OFFSET,EFFECTS_STATE_OFFSET,EFFECTS_MODULE_SIZE=0xF000,0xFFD0,0x10000
 REWARD_MESSAGE_OFFSET,REWARD_MESSAGE_END=0xF280,0xF800
+REWARD_CONTROL_OFFSET,REWARD_CONTROL_END=0x10880,0x10FF0
+
+
+def reward_control_bindings(source,core,owner,original):
+    sources=[]
+    for at,size,digest in (
+        (0x198334,280,'5954e79412efe934cb5f528e87fa3d3434677dc4aafc08c47e4ce53763c19041'),
+        (0x19844C,112,'39355e06c2344881c3fe31300064b80ebca3c611c3f11597ce4f1dc046c43427'),
+        (0x1984BC,36,'5d6ab1974e077a1ee497a050e9163dd607b94a343baf8b09878f53a001933c75'),
+        (0x1984E0,204,'6162e5084652b834079c3d0b9defb008eefa6e7fd238e8050ebb38821e60d13d'),
+        (0x1985AC,48,'18e2b99cb1b3dfe2621f500d30c1090adfdba57703444427f21e5070b4e419bd'),
+        (0x1985DC,32,'99c4561e2c627a49c2d2e95dca1a814bc5c13272b4d1e64ba01fdeb91ed52e35'),
+        (0x1985FC,32,'815d327c76e3c6b002526895748717518db0674989e5b5d47a213c05cf8d4539'),
+        (0x1987F4,88,'c773b08a4e8b28c4d818b609908ad7acd1b1dc1233bf6fffe51ec6248041c02a'),
+        (0x19884C,168,'967596117a95ebc7c1977fed5eb45ce0650d21c6210146e1ad1c81f106144c06')):
+        raw,receipt=source.function(at)
+        if len(raw)!=size or sha256(raw)!=digest:raise ValueError('Changed complete source reward control')
+        sources.append(receipt)
+    # Existing source-backed extensions to request metadata, equipment kinds,
+    # and held-item dispatch are retained, not reverted to short native tables.
+    extended={0x808B3648:'3b7d669b96713b70f8aba44f0b98d854b08ea996198cd1a149c594e2d2435e00',
+        0x808BD5C4:'c0c6e144fad3778bf2bcf5f89f7cdf71d018c810c62d5fd4609c86717b48f792',
+        0x808BF410:'3e5bfc3ce6ac9e6b0eacc746204209bec24b325881fcf5d49d135e60e796a55d'}
+    boundaries=[]
+    for name in ('symbol_addrs_code.txt','symbol_addrs_overlays.txt'):
+        boundaries.extend(int(a,16) for a in re.findall(r'= 0x([0-9A-Fa-f]+); // type:func',
+            (ROOT/'upstream/af/linker_scripts/jp'/name).read_text()))
+    files=by_vrom(original);native=[]
+    code=(ROOT/'overlays/v3/player_rewards.c').read_text()
+    for entry in sorted({int(a,16) for a in re.findall(r'FN\(0x([0-9A-F]+)u,',code)}):
+        end=min(a for a in boundaries if a>entry)
+        data,old,ram=(owner,files[PLAYER_VROM].extract(original),PLAYER_RAM) if entry>=PLAYER_RAM else (
+            core,files[CODE_VROM].extract(original),CODE_RAM)
+        raw=data[entry-ram:end-ram];digest=extended.get(entry,sha256(old[entry-ram:end-ram]))
+        if not raw or sha256(raw)!=digest:raise ValueError(f'Changed native reward control API {entry:08X}')
+        native.append(dict(entry=entry,end=end,bytes=len(raw),sha256=digest,extended=entry in extended))
+    return dict(source_functions=sources,native_functions=native,native_turn_substeps=2,
+        native_animation_speed=1.0,native_braking=0.75,part_masks=dict(ordinary=3,balloon=0),
+        animations=dict(ordinary=258,balloon=260),requested_type_offset=0xD58,
+        reward_type_offset=0xD18,fanfare_stop_type=0x168)
+
+
+def refresh_reward_controls(base,prior,blob,core,original,output):
+    old=prior['equipment_resources'];start=old['blob_offset'];actions=old['player_actions']
+    module=bytearray(blob[start:start+old['bytes']]);at,end=REWARD_CONTROL_OFFSET,REWARD_CONTROL_END
+    bank=old['pocket_icons']['extension_bank'];icon_data=bytes.fromhex(bank['data_hex'])
+    if (not actions.get('reward_messages') or actions.get('reward_controls') or len(module)!=0x12000
+            or sha256(module)!=old['sha256'] or bank['ram']!=RAM+0x10000 or len(icon_data)>at-0x10000
+            or module[0x10000:0x10000+len(icon_data)]!=icon_data or any(module[at:end])
+            or module[end:end+16]!=struct.pack('>4I',*([GUARD]*4))):
+        raise ValueError('Reward controls require unused checked icon reservation')
+    source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+                  (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    bindings=reward_control_bindings(source,core,by_vrom(base)[PLAYER_VROM].extract(base),original)
+    fanfares=sound_programs.reward_fanfares(base,core,source)
+    messages=actions['reward_messages']['code']['symbols']
+    code,compiled=compile_part('player_rewards',output/'player_rewards',defines=(
+        'AF_V3_REWARD_BGMS='+','.join(map(str,fanfares['type_bgms'])),
+        f'AF_V3_REWARD_RESET=0x{messages["af_v3_reward_message_reset"]:08X}u',
+        f'AF_V3_REWARD_UPDATE=0x{messages["af_v3_reward_message_update"]:08X}u'))
+    if len(code)>end-at:raise ValueError('Reward controls overlap retained icon guard')
+    module[at:at+len(code)]=code;blob[start:start+len(module)]=module
+    report=copy.deepcopy(old)
+    report['player_actions']['reward_controls']=dict(code=compiled,code_offset=at,bindings=bindings,
+        fanfares=fanfares,action_callbacks_installed=False,persistent_settlement_installed=False,
+        ordinary_gameplay_tested=False)
+    report.update(sha256=sha256(module),crc32=zlib.crc32(module),additional_resident_bytes=0)
+    return report,{}
 
 
 def reward_message_bindings(source,core,original,owner):
@@ -1720,6 +1789,8 @@ def expanded_tables(source,owner,reloc,*,categories=CATEGORIES,native_count=NATI
 
 def install(base,prior,blob,core,original,output):
     old=prior.get('equipment_resources',{})
+    if old.get('player_actions',{}).get('reward_messages') and not old['player_actions'].get('reward_controls'):
+        return refresh_reward_controls(base,prior,blob,core,original,output)
     if old.get('player_motion',{}).get('reward_motion') and not old['player_actions'].get('reward_messages'):
         return refresh_reward_messages(base,prior,blob,core,original,output)
     if old.get('wrapped_presents',{}).get('name_readers') and not old['player_motion'].get('reward_motion'):

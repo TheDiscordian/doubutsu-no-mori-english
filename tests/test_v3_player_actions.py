@@ -34,6 +34,74 @@ SHOVEL_EFFECTS=ROOT/os.environ.get('V3_SHOVEL_EFFECTS_BUILD','build/v3-shared-sh
 WRAPPED=ROOT/os.environ.get('V3_WRAPPED_PARENT_BUILD','build/v3-shared-wrapped-parents-03')
 PRESENT_NAMES=ROOT/os.environ.get('V3_PRESENT_NAMES_BUILD','build/v3-shared-present-names-03')
 REWARD_MESSAGES=ROOT/os.environ.get('V3_REWARD_MESSAGES_BUILD','build/v3-shared-reward-messages-02')
+REWARD_CONTROLS=ROOT/os.environ.get('V3_REWARD_CONTROLS_BUILD','build/v3-shared-reward-controls-01')
+
+
+class RewardControlHostTests(unittest.TestCase):
+    sanitized=shared_tests.HostTests.sanitized
+    def test_source_setup_frame_order_and_fanfares(self):self.sanitized('v3_player_rewards_test.c')
+
+
+@unittest.skipUnless((REWARD_CONTROLS/'build-lock.json').is_file(),'Current reward-control proposal required')
+class RewardControlTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.rom,cls.report=inputs(REWARD_CONTROLS/'build-lock.json');cls.base,cls.prior=inputs(REWARD_CONTROLS/'base-lock.json')
+        cls.files,cls.before=by_vrom(cls.rom),by_vrom(cls.base)
+        cls.e=cls.report['equipment_resources'];cls.old=cls.prior['equipment_resources']
+        cls.r=cls.e['player_actions']['reward_controls'];cls.blob=cls.files[BLOB].extract(cls.rom)
+        cls.oldblob=cls.before[BLOB].extract(cls.base)
+        cls.source=actions.Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+            (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+
+    def test_complete_source_native_and_audio_bindings(self):
+        from unittest.mock import patch
+        from aflib import CODE_RAM
+        core=self.files[CODE_VROM].extract(self.rom);owner=self.files[actions.PLAYER_VROM].extract(self.rom)
+        original=(ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes()
+        binding=actions.reward_control_bindings(self.source,core,owner,original)
+        self.assertEqual(json.loads(json.dumps(binding)),self.r['bindings'])
+        fanfares=actions.sound_programs.reward_fanfares(self.rom,core,self.source)
+        self.assertEqual(json.loads(json.dumps(fanfares)),self.r['fanfares'])
+        self.assertEqual(fanfares['type_bgms'],[73,75,76,74])
+        self.assertEqual(sum(len(r['font']['samples']) for r in fanfares['rows']),60)
+        bad=bytearray(core);bad[0x80113964-CODE_RAM+73]^=1
+        with self.assertRaises(ValueError):actions.sound_programs.reward_fanfares(self.rom,bad,self.source)
+        bad=bytearray(core);bad[0x8005DC9C-CODE_RAM]^=1
+        with self.assertRaises(ValueError):actions.reward_control_bindings(self.source,bad,owner,original)
+        get=self.source.function
+        def changed(at):
+            data,row=get(at);return bytes([data[0]^1])+data[1:],row
+        with patch.object(self.source,'function',side_effect=changed),self.assertRaises(ValueError):
+            actions.reward_control_bindings(self.source,core,owner,original)
+
+    def test_only_reserved_code_changes_no_resource_growth(self):
+        start=self.e['blob_offset'];module=self.blob[start:start+self.e['bytes']]
+        old=self.oldblob[start:start+self.old['bytes']];retained=bytearray(module)
+        at=self.r['code_offset'];end=at+self.r['code']['bytes']
+        self.assertEqual(module[at:end],(REWARD_CONTROLS/'player_rewards/code.bin').read_bytes())
+        self.assertFalse(any(old[at:actions.REWARD_CONTROL_END]));retained[at:end]=old[at:end]
+        self.assertEqual(retained,old);self.assertEqual(len(self.blob),len(self.oldblob))
+        self.assertEqual(sha256(module),self.e['sha256']);self.assertEqual(zlib.crc32(module),self.e['crc32'])
+        for v in self.files.keys()-{BLOB,MODULE,0x19D40}:
+            self.assertEqual(self.files[v].extract(self.rom),self.before[v].extract(self.base),hex(v))
+        for key in ('save_runtime','translation_baseline'):self.assertEqual(self.report[key],self.prior[key])
+        self.assertEqual(self.e['player_actions']['enabled_imported_actions'],self.old['player_actions']['enabled_imported_actions'])
+        self.assertFalse(self.r['action_callbacks_installed']);self.assertFalse(self.r['persistent_settlement_installed'])
+
+    def test_optional_outputs_and_patch(self):
+        import v3_optional_composition as composer
+        pin=composer.BASE,composer.BASE_SHA,composer.REPORT_SHA,composer.ABI
+        try:
+            composer.use_build_lock(REWARD_CONTROLS/'build-lock.json');choices=composer.catalogue(self.rom,self.report)
+            self.assertEqual(len(choices),128)
+            self.assertEqual(composer.compose(self.rom,self.report,choices,composer.resolve(choices,list(choices)))[0],self.rom)
+            self.assertEqual(sha256(composer.compose(self.rom,self.report,choices,composer.resolve(choices,[]))[0]),
+                self.report['translation_baseline']['sha256'])
+        finally:composer.BASE,composer.BASE_SHA,composer.REPORT_SHA,composer.ABI=pin
+        original=(ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes()
+        self.assertEqual(apply_ups(original,(REWARD_CONTROLS/'asset-loader.ups').read_bytes()),self.rom)
+        reuse_resource_tail(self.rom,self.report,self.blob)
 
 
 class RewardMessageHostTests(unittest.TestCase):
