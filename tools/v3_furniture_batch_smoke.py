@@ -505,8 +505,18 @@ def room_rigs(debug,rom_path,record):
     def put(at,*values):debug.write_memory(at,struct.pack('>'+str(len(values))+'I',*values))
     def floating(at):return struct.unpack('>f',debug.read_memory(at,4))[0]
     module=blob[equipment['blob_offset']:equipment['blob_offset']+equipment['bytes']]
-    check('complete startup-loaded room module',RAM,module)
-    saved={at:debug.read_memory(at,n) for at,n in ((0x801458B8,4),(0x8046C000,864))}
+    # The equipment package also contains live cache/cursor state owned by
+    # unrelated categories. Check this runtime's whole immutable reservation.
+    packet=rigs.get('packet')
+    first,last=(0x804B1800-RAM,0x804B1FB4-RAM) if packet else (0,len(module))
+    if packet:
+        actual=debug.read_memory(RAM,len(module))
+        differences=[dict(address=f'{RAM+at:08X}',rom=module[at:at+4].hex(),live=actual[at:at+4].hex())
+                     for at in range(0,len(module),4) if module[at:at+4]!=actual[at:at+4]]
+        record(dict(room_rig_module_live_differences=differences))
+    check('complete startup-loaded room lifecycle reservation',RAM+first,module[first:last])
+    state=report['save_runtime']
+    saved={at:debug.read_memory(at,n) for at,n in ((0x801458B8,4),(state['state_ram'],state['state_bytes']))}
     size=0x6200;allocation=call(0x8009BFC0,[size])
     if allocation&15 or not MODULE_RAM+0x8000<=allocation<=0x80400000-size:
         raise ValueError('Room-rig fixture outside native heap')
@@ -518,8 +528,9 @@ def room_rigs(debug,rom_path,record):
             bank-16,bank+9216,gfx-16,gfx+0x1000,xlu-16,xlu+0x800,
             allocation+size-16,TEST_STACK-0x800,TEST_STACK+0x40)
     for at in guards:debug.write_memory(at,edge)
-    names=('ct','mv','dw');symbols=rigs['code']['symbols']
-    jumps=b''.join(struct.pack('>2I',jump(symbols['af_v3_room_rig_'+name]),0) for name in names)
+    names=('ct','mv','dw');symbols=rigs['bootstrap' if packet else 'code']['symbols']
+    prefix='af_v3_room_boot_' if packet else 'af_v3_room_rig_'
+    jumps=b''.join(struct.pack('>2I',jump(symbols[prefix+name]),0) for name in names)
     debug.write_memory(bridge,jumps)
     call(0x8002FE00,[bridge,len(jumps)]);call(0x80034CE0,[bridge,len(jumps)])
     def callback(name,target):
@@ -527,7 +538,8 @@ def room_rigs(debug,rom_path,record):
         return call(bridge+names.index(name)*8,args,(bridge,jumps))
     matrix=call(0x800E02AC);matrix_before=debug.read_memory(matrix,64)
     debug.write_memory(identity,struct.pack('>16f',*(1 if i%5==0 else 0 for i in range(16))))
-    rows=rigs['rows'];selected=[min(rows,key=lambda r:r['bytes']),max(rows,key=lambda r:r['bytes'])]
+    rows=[r for r in rigs['rows'] if r.get('mode')==2] if packet else rigs['rows']
+    selected=[min(rows,key=lambda r:r['bytes']),max(rows,key=lambda r:r['bytes'])]
     put(game,graph)
     try:
         for iteration,row in enumerate(selected):
@@ -544,18 +556,27 @@ def room_rigs(debug,rom_path,record):
                 check('native work vectors belong to this instance',target+0x158,
                       struct.pack('>2I',target+0x1A4,target+0x1DA))
                 check('stationary initial frame one',target+0x140,struct.pack('>2f',0,1))
+                if packet:
+                    check('native storage uses stop mode',target+0x148,bytes(4))
+                    check('complete lazily loaded room packet',packet['ram'],
+                          blob[packet['blob_offset']:packet['blob_offset']+packet['bytes']])
+                    check('startup cache remembers the verified packet',0x804B1E00,struct.pack('>I',packet['crc32']))
             independent=debug.read_memory(other,0x740)
-            debug.write_memory(actor+0x12D,b'\x01');callback('mv',actor)
-            actual=[floating(actor+p) for p in (0x204,0x208,0x144)]
-            passed=all(abs(a-b)<.00001 for a,b in zip(actual,(.02,1.25,1.03)))
-            record(dict(room_rig_switch_response=actual,assertion='passed' if passed else 'failed'))
-            if not passed:raise ValueError('Room rig lost source two-step switch response')
-            assertions+=1
-            check('native owner retains switch pulse',actor+0x12D,b'\x01')
+            if packet:
+                stopped=debug.read_memory(actor,0x740);callback('mv',actor)
+                check('storage without a room owner remains stopped',actor,stopped)
+            else:
+                debug.write_memory(actor+0x12D,b'\x01');callback('mv',actor)
+                actual=[floating(actor+p) for p in (0x204,0x208,0x144)]
+                passed=all(abs(a-b)<.00001 for a,b in zip(actual,(.02,1.25,1.03)))
+                record(dict(room_rig_switch_response=actual,assertion='passed' if passed else 'failed'))
+                if not passed:raise ValueError('Room rig lost source two-step switch response')
+                assertions+=1
+                check('native owner retains switch pulse',actor+0x12D,b'\x01')
+                debug.write_memory(actor+0x12D,bytes(1))
+                debug.write_memory(actor+0x204,struct.pack('>2f',1.24,1.25));callback('mv',actor)
+                check('source speed peak switches back to idle',actor+0x204,struct.pack('>2f',1.24,.5))
             check('second room instance remains independent',other,independent)
-            debug.write_memory(actor+0x12D,bytes(1))
-            debug.write_memory(actor+0x204,struct.pack('>2f',1.24,1.25));callback('mv',actor)
-            check('source speed peak switches back to idle',actor+0x204,struct.pack('>2f',1.24,.5))
             put(game+0xA0,iteration);call(0x800E0284,[identity])
             put(graph+0x298,gfx,gfx+0x1000);put(graph+0x2A8,xlu,xlu+0x800)
             callback('dw',actor)
@@ -564,21 +585,23 @@ def room_rigs(debug,rom_path,record):
             commands=debug.read_memory(gfx,front-gfx)
             drawn=[b for a,b in struct.iter_unpack('>2I',commands) if a>>24==0xDE]
             expected=[0x06000000+p for p in row['source']['model_offsets'].values()]
-            passed=drawn==expected and back==gfx+0x1000-64 and len(commands)==96
+            passed=drawn==expected and back==gfx+0x1000-64 and len(commands)==(2+2*row['shown'])*8
             record(dict(room_rig_draw=row['source_item_id'],lists=drawn,expected=expected,
                         assertion='passed' if passed else 'failed'))
             if not passed:raise ValueError('Room rig omitted complete models or misused graphics allocation')
             assertions+=1
             check('translucent stream only binds skeleton matrices',graph+0x2A8,struct.pack('>2I',xlu+8,xlu+0x800))
             check('untouched opposite matrix bank',actor+0x210+(1-iteration)*0x280,b'\xA5'*0x280)
-            check('unused matrix slots retain their bytes',actor+0x210+iteration*0x280+5*64,b'\xA5'*(5*64))
+            check('unused matrix slots retain their bytes',actor+0x210+iteration*0x280+row['shown']*64,b'\xA5'*((10-row['shown'])*64))
             check('native tail fields retain their bytes',actor+0x710,b'\xA5'*0x30)
             check('unused morph-vector bytes retain their bytes',actor+0x20C,b'\xA5'*4)
             check('balanced matrix stack',0x801462B4,struct.pack('>I',matrix))
             check('unchanged parent transform',matrix,debug.read_memory(identity,64))
             for at in guards:check('room-rig work/graphics/stack guard',at,edge)
-        check('save/profile unchanged',0x8046C000,saved[0x8046C000])
-        check('complete room module unchanged',RAM,module)
+        check('complete save/profile state unchanged',state['state_ram'],saved[state['state_ram']])
+        expected_module=bytearray(module)
+        if packet:struct.pack_into('>I',expected_module,0x804B1E00-RAM,packet['crc32'])
+        check('room lifecycle retains code and only updates its cache',RAM+first,expected_module[first:last])
         check('no CPU fault',0x8003CE34,bytes(4))
     finally:
         debug.write_memory(matrix,matrix_before)
@@ -586,6 +609,7 @@ def room_rigs(debug,rom_path,record):
         call(0x8009C040,[allocation])
     return dict(native_room_rigs=True,representatives=len(selected),assertions=assertions,
         complete_model_animation_dma=True,independent_instances=True,gpu_rendered=False,
+        storage_open_close_gameplay_tested=False,lazy_packet_tested=bool(packet),
         ordinary_room_tested=False,parent_selection_tested=False,flash_written=False,requires_checkpoint_restore=True)
 
 

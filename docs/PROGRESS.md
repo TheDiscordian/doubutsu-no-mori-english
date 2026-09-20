@@ -18,10 +18,26 @@ served patchers retain their existing builds.
 
 ## Active development
 
+The current explicit proposal is ABI 159 at
+`build/v3-room-categories-runtime-03/build-lock.json`. One shared room engine
+supports switch-driven rigs, live clock hands, and native storage callbacks.
+The eight installed balloon rows remain intact; both complete Harvest storage
+rigs are installed but await ordinary profiles/acquisition. Five focused checks
+pass. Native execution passes 92 component assertions plus restored-checkpoint
+CPU/module guards; its final save-guard check uses a stale test address and is
+not a complete scenario pass. The corrected final guard is not rerun. See the
+[runtime checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-room-category-runtime).
+
+Next expand general cartridge resource storage for bulk imports: the contiguous
+import region has 2,800 free bytes, and complete clock resources exceed available
+retired storage. Keep protected English resources intact and validate their
+consumers if relocation is necessary. The main ABI-109 lock and both served
+patchers remain unchanged. Gold-tree effects/acquisition follow primary imports.
+
 The shared open/close category prepares both Harvest storage objects, retaining
 complete models, skeletons, animations, source interaction flags, and opening
-limits. Two focused checks pass. Native lifecycle and acquisition integration
-remain required; preparation adds no selectable item or ROM change. Across the
+limits. Two converter checks pass; the shared runtime above supplies their
+lifecycle. Ordinary profiles/acquisition remain required. Across the
 remaining furniture candidates, 69 of 101 non-alias, non-dummy records have
 prepared artwork. Continue shared integration before required gold-tree work.
 See the [storage checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#openclose-storage-category).
@@ -38,8 +54,8 @@ See the [sound-category checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#switch-
 All fifteen station models have complete prepared artwork, skeletons, and motions
 through the shared indexed-clock category at `build/v3-indexed-clock-rigs-prepared-01/`.
 One compiler container handles the whole batch. Source clock-hand rules and live
-time dependencies are recorded explicitly; native lifecycle/acquisition support
-is still pending. Three focused checks pass, including complete graphics/motion
+time dependencies are recorded explicitly; complete resource installation and
+acquisition support remain pending. Three converter checks pass, including complete graphics/motion
 comparisons and refusal to install unfinished records. No ROM or choices change.
 See the [clock-rig checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#indexed-looping-clock-rigs).
 
@@ -48,11 +64,11 @@ and reuses verified prepared objects while regenerating current eligibility and
 metadata. `build/v3-bulk-prepared-02/` contains 95 complete prepared objects:
 93 reused and two newly compiled constant-palette trophy variants. Acquisition
 gaps remain explicit; preparation adds no selectable items or ROM changes.
-The current cartridge proposal remains ABI 158. Continue shared conversion and
+The current cartridge proposal is identified above. Continue shared conversion and
 acquisition categories before returning to required gold-tree completion. See
 the [bulk checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#bulk-compilation-and-prepared-reuse).
 
-The current explicit proposal is ABI 158 at
+The retained planting-sparkle evidence is from ABI 158 at
 `build/v3-shared-tree-sparkle-02/build-lock.json`. All four seasonal planting
 callbacks add the donor's gold-sapling sparkle at its actual source position.
 The existing N64 effect, planting timing, foreground arguments, and callback

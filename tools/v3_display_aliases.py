@@ -60,7 +60,7 @@ def records(prior, blob):
     equipment=prior.get('equipment_resources',{})
     parents={r['item_id']:r for r in equipment.get('parent_readers',{}).get('rows',[])}
     collected={r['item_id']:r for r in equipment.get('collection',{}).get('rows',[])}
-    rigs={r['parent_item_id']:r for r in equipment.get('room_rigs',{}).get('rows',[])}
+    rigs={r['parent_item_id']:r for r in equipment.get('room_rigs',{}).get('rows',[]) if 'parent_item_id' in r}
     for row in equipment.get('catalogue',{}).get('imports',[]):
         parent=parents[row['parent_item_id']];collection=collected[parent['item_id']]
         if collection['room_drop_item_id']!=collection['display_item_id']:continue

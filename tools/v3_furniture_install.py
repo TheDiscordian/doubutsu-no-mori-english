@@ -62,7 +62,8 @@ def profile(row, vrom):
     adapter=row.get('profile',{}).get('callback_adapter',{})
     fading = adapter.get('category') == 'switch-palette-fade'
     sequence = adapter.get('category') == 'constant-model-sequence'
-    rigged = adapter.get('category') == 'indexed-switch-rig'
+    from v3_furniture_rigs import RIG_CATEGORIES
+    rigged = adapter.get('category') in RIG_CATEGORIES
     layers = tuple(offsets) if rigged else tuple(adapter['model_order']) if fading or sequence else LAYERS
     if (not 0 < n <= 9216 or n%16 or vrom%16 or vrom+n > END or len(scalar) != 16
             or not offsets or set(offsets)-set(layers) or (fading or sequence) and set(offsets)!=set(layers)
@@ -741,6 +742,7 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         if room_rigs_art is not None:
             report['shared_runtime_refresh']['adapters'].append('room_rigs')
             report['shared_runtime_refresh']['artwork_changed']=True
+            report['shared_runtime_refresh']['additional_resident_bytes']=equipment_report['room_rigs']['additional_resident_bytes']
         if held_selection:
             report['shared_runtime_refresh']['adapters'].append('held_selection')
         if report['save_runtime']['profile_hex']!=prior['save_runtime']['profile_hex']:
@@ -792,7 +794,7 @@ if __name__=='__main__':
         help='With --refresh-runtime, connect prepared parent display models to their actual catalogue category')
     parser.add_argument('--held-selection',action='store_true',
         help='With --refresh-runtime, enable installed parents in the full experimental composition reference')
-    parser.add_argument('--room-rigs-art',type=Path,
+    parser.add_argument('--room-rigs-art',type=Path,action='append',
         help='With --refresh-runtime, install a complete prepared animated room category without enabling parents')
     parser.add_argument('--translation-updates',action='store_true',
         help='With --refresh-runtime, carry corrected translation headers and the pinned import-free baseline')

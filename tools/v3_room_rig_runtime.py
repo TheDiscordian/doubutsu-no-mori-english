@@ -7,18 +7,186 @@ import zlib
 from aflib import CODE_RAM,CODE_VROM,by_vrom,sha256
 from v3_asset_loader import ROOT,BLOB,compile_part
 from v3_equipment_runtime import RAM as EQUIPMENT_RAM,retired_module_space
-from v3_furniture_pipeline import Source,prepare,room_aliases
-from v3_furniture_rigs import CATEGORY,suffix
+from v3_furniture_pipeline import Source,prepare,room_aliases,PreparedAssets
+from v3_furniture_rigs import CATEGORY,CLOCK_CATEGORY,STORAGE_CATEGORY,suffix
 from v3_registry import furniture_representation_identity,ROOM_ALIAS_REGISTRY_VERSION
 from v3_import_storage import ROWS,ITEMS,slot,END
 from v3_tent_model import native_contract
 
 RAM,TABLE,VTABLE,LIMIT,CAPACITY = 0x804B1800,0x804B1E00,0x804B1FA0,0x804B1FE0,24
 MAGIC=0x41465231
+PACKET_RAM,PACKET_TABLE,PACKET_BYTES,PACKET_CAPACITY=0x804B8000,0x804B9000,8192,128
+PACKET_MAGIC=0x41465232
 SOURCES=('tools/v3_room_rig_runtime.py','tools/v3_asset_loader.py','tools/v3_furniture_rigs.py','tools/v3_keyframes.py',
     'tools/v3_furniture_pipeline.py','tools/v3_registry.py','tools/v3_equipment_runtime.py',
+    'tools/v3_display_aliases.py','tools/v3_held_catalogue.py',
     'overlays/v3/room_rigs.c','overlays/v3/room_rigs.h','overlays/v3/room_rigs.ld',
-    'overlays/v3/held_rigs.ld')
+    'overlays/v3/held_rigs.ld','overlays/v3/room_rigs_packet.ld',
+    'overlays/v3/room_rigs_bootstrap.c','overlays/v3/room_rigs_bootstrap.ld')
+
+
+def prepared_categories(source,directories):
+    """Use the normal complete-art cache for all implemented room rig categories."""
+    rows=[];assets={};evidence=[]
+    for directory in directories:
+        directory=directory.resolve()
+        if not directory.is_relative_to(ROOT/'build'):raise ValueError('Room rigs require ignored prepared assets')
+        cache=PreparedAssets(source,[directory]);raw=(directory/'art.json').read_bytes();art=json.loads(raw)
+        if art['format']!='AFV3-AUTO-FURNITURE-PREPARED-ASSETS-1':raise ValueError('Expected complete prepared room rigs')
+        for row in art['objects']:
+            donor=row['item_id'];item=int(donor,16);prepared_row=prepare(source,item)
+            profile=prepared_row[0];adapter=profile.get('callback_adapter',{});category=adapter.get('category')
+            if category not in (CLOCK_CATEGORY,STORAGE_CATEGORY):
+                raise ValueError('Unimplemented additional room-rig category')
+            if (row['profile']!=json.loads(json.dumps(profile)) or donor in assets or
+                    row['native_profile_scalar_hex']!=profile['scalar_hex'] or
+                    profile['skeleton']['joints']>6 or any(r.get('draw_stream') for r in profile['skeleton']['rows'])):
+                raise ValueError('Changed room-rig profile or native work capacity')
+            cache.reuse(source,donor,prepared_row)
+            data=(directory/row['object_file']).read_bytes()
+            if len(data)>9216:raise ValueError('Complete rig exceeds room bank')
+            rig=row['rig'];index,destination=furniture_representation_identity(item)
+            if category==CLOCK_CATEGORY:
+                mode=1;first=adapter['clock']['hour_joint'];last=adapter['clock']['minute_joint']
+            else:
+                mode=2;first=int(adapter['constants']['start_frame']['hex'],16)
+                last=int(adapter['constants']['end_frame']['hex'],16)
+            rows.append(dict(source_item_id=donor,item_id=f'{destination:04X}',runtime_index=index,
+                bytes=len(data),sha256=sha256(data),category=category,mode=mode,first=first,last=last,
+                skeleton=0x06000000+rig['skeleton_offset'],animation=0x06000000+rig['animation_offset'],
+                joints=rig['skeleton']['joints'],shown=rig['skeleton']['shown_joints'],source=row,
+                profile_installed=False,parent_selectable=False))
+            assets[donor]=data
+        evidence.append(dict(directory=str(directory.relative_to(ROOT)),sha256=sha256(raw),
+                             source_rel_sha256=sha256(source.rel)))
+    if not rows:raise ValueError('Empty additional room-rig batch')
+    return sorted(rows,key=lambda r:r['runtime_index']),assets,evidence
+
+
+def encode_packet(rows):
+    if not rows or len(rows)>PACKET_CAPACITY:raise ValueError('Room-rig packet capacity exceeded')
+    if [r['runtime_index'] for r in rows]!=sorted({r['runtime_index'] for r in rows}):
+        raise ValueError('Unordered or duplicate room-rig records')
+    table=bytearray(struct.pack('>4I',PACKET_MAGIC,len(rows),24,0))
+    for r in rows:
+        encode([r])  # Retain the complete existing object/pointer/work-area checks.
+        mode,first,last=r.get('mode',0),r.get('first',0),r.get('last',0)
+        if (mode not in (0,1,2) or mode==0 and (first or last) or
+                mode==1 and not (0<first<r['joints'] and 0<last<r['joints'] and first!=last) or
+                mode==2 and not 0x3F800000<=first<last<=0x43800000):
+            raise ValueError('Invalid complete room-rig behaviour parameters')
+        table.extend(struct.pack('>HHIIBBBBII',r['runtime_index'],r['bytes'],r['skeleton'],r['animation'],
+                                 r['joints'],r['shown'],mode,0,first,last))
+    return bytes(table).ljust(PACKET_BYTES-(PACKET_TABLE-PACKET_RAM),b'\0')
+
+
+def extended_contract(base,core,original):
+    """Native storage owns its existing state machine, audio, and room interaction."""
+    current=by_vrom(base)[0x82D7F0].extract(base);native=by_vrom(original)[0x82D7F0].extract(original)
+    a,b=0x8094630C-0x80936710,0x809465CC-0x80936710
+    if sha256(native[a:b])!='3453821b77da92ff7456b8c495c9c9cbb2e6372ce303400bec0e2d08473fb37e':
+        raise ValueError('Changed complete native storage state machine')
+    expected=bytearray(native[a:b])
+    # The installed shared profile table is the only change to the native helper.
+    struct.pack_into('>I',expected,0x24,0x3C188047)
+    struct.pack_into('>I',expected,0x30,0x8F180010)
+    c,d=0x80939050-0x80936710,0x8093919C-0x80936710
+    if (current[a:b]!=expected or current[c:d]!=native[c:d] or
+            sha256(native[c:d])!='829a1b5c83b3284fe2e0174932f22be1ad56e184b4540017259fe6b229ed381a'):
+        raise ValueError('Changed native room clip registration or storage profile binding')
+    n=by_vrom(original)[CODE_VROM].extract(original);a,b=0x80052228-CODE_RAM,0x80053170-CODE_RAM
+    if core[a:b]!=n[a:b]:raise ValueError('Changed native complete keyframe APIs')
+    return dict(storage_owner_vrom=0x82D7F0,storage_helper=0x8094630C,
+        storage_helper_sha256=sha256(expected),clip_registration_sha256=sha256(native[c:d]),
+        room_clip=0x80136F2C,open_close_offset=0x34,hour=0x80136FC6,minute=0x80136FC4,
+        keyframe_api_sha256=sha256(n[a:b]),native_storage_speed=1.0,source_storage_speed=0.5)
+
+
+def publish_packet(equipment,blob,output):
+    """Compile shared behaviour once and publish it through the stable room vtable."""
+    runtime=equipment['room_rigs'];packet=runtime['packet'];at=packet['blob_offset']
+    code,compiled=compile_part('room_rigs_packet',output/'room_rigs_packet',
+        primary_source='overlays/v3/room_rigs.c',defines=('AF_V3_ROOM_RIG_PACKET',))
+    table=encode_packet(runtime['rows'])
+    data=code.ljust(PACKET_TABLE-PACKET_RAM,b'\0')+table
+    if len(code)>PACKET_TABLE-PACKET_RAM or len(data)!=PACKET_BYTES or not zlib.crc32(data):
+        raise ValueError('Room code/table exceeds owned packet or has an invalid cache identity')
+    symbols=compiled['symbols'];entries=[symbols['af_v3_room_rig_'+role] for role in ('ct','mv','dw')]
+    if any(p&3 or not PACKET_RAM<=p<PACKET_RAM+len(code) for p in entries):
+        raise ValueError('Room lifecycle entry escapes packet')
+    boot,bootstrap=compile_part('room_rigs_bootstrap',output/'room_rigs_bootstrap',defines=(
+        f'AF_ROOM_VROM=0x{BLOB+at:X}u',f'AF_ROOM_BYTES={PACKET_BYTES}u',f'AF_ROOM_CRC=0x{zlib.crc32(data):X}u',
+        *(f'AF_ROOM_{role.upper()}=0x{entry:X}u' for role,entry in zip(('ct','mv','dw'),entries))))
+    start=equipment['blob_offset'];module=bytearray(blob[start:start+equipment['bytes']])
+    if sha256(module)!=equipment['sha256']:raise ValueError('Changed installed equipment before room publication')
+    entries=[bootstrap['symbols']['af_v3_room_boot_'+role] for role in ('ct','mv','dw')]
+    if len(boot)>TABLE-RAM or any(p&3 or not RAM<=p<RAM+len(boot) for p in entries):
+        raise ValueError('Room bootstrap escapes stable reservation')
+    vtable=struct.pack('>5I',*entries,0,0)
+    module[RAM-EQUIPMENT_RAM:TABLE-EQUIPMENT_RAM]=boot+bytes(TABLE-RAM-len(boot))
+    module[TABLE-EQUIPMENT_RAM:VTABLE-EQUIPMENT_RAM]=bytes(VTABLE-TABLE)
+    module[VTABLE-EQUIPMENT_RAM:VTABLE-EQUIPMENT_RAM+20]=vtable
+    blob[at:at+len(data)]=data;blob[start:start+len(module)]=module
+    packet.update(sha256=sha256(data),crc32=zlib.crc32(data))
+    runtime.update(code=compiled,bootstrap=bootstrap,table_sha256=sha256(table),
+                   vtable_hex=vtable.hex(),catalogue_index_supported=True)
+    equipment.update(sha256=sha256(module),crc32=zlib.crc32(module))
+
+
+def extend(base,prior,blob,core,original,output,directories):
+    old=prior['equipment_resources'];runtime=old['room_rigs'];start=old['blob_offset']
+    module=blob[start:start+old['bytes']];scenery=old['scenery']
+    if (sha256(module)!=old['sha256'] or EQUIPMENT_RAM+old['bytes']>PACKET_RAM or
+            scenery['ram']+scenery['additional_fixed_resident_bytes']>PACKET_RAM or
+            PACKET_RAM+PACKET_BYTES>prior['furniture']['bank_pool']['start'] or
+            module[VTABLE-EQUIPMENT_RAM:VTABLE-EQUIPMENT_RAM+20]!=bytes.fromhex(runtime['vtable_hex'])):
+        raise ValueError('Changed room module/vtable or occupied packet reservation')
+    is_packet=runtime['format']=='AFV3-ROOM-RIGS-2'
+    if is_packet:
+        packet=runtime['packet'];boot=runtime['bootstrap']
+        if sha256(blob[packet['blob_offset']:packet['blob_offset']+PACKET_BYTES])!=packet['sha256']:
+            raise ValueError('Changed complete installed room packet')
+    elif runtime['format']=='AFV3-ROOM-RIGS-1':
+        boot=runtime['code']
+        if module[TABLE-EQUIPMENT_RAM:VTABLE-EQUIPMENT_RAM]!=encode(runtime['rows']):
+            raise ValueError('Changed complete installed room records')
+    else:raise ValueError('Unknown room runtime format')
+    if (sha256(module[RAM-EQUIPMENT_RAM:RAM-EQUIPMENT_RAM+boot['bytes']])!=boot['sha256'] or
+            any(module[RAM-EQUIPMENT_RAM+boot['bytes']:TABLE-EQUIPMENT_RAM])):
+        raise ValueError('Changed complete room lifecycle reservation')
+    source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+        (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    rows,assets,evidence=prepared_categories(source,directories)
+    occupied={r['item_id'] for r in runtime['rows']}
+    for r in runtime['rows']:
+        if sha256(blob[r['blob_offset']:r['blob_offset']+r['bytes']])!=r['sha256']:
+            raise ValueError('Changed installed complete room artwork')
+    for r in rows:
+        i=slot(int(r['item_id'],16))
+        if (r['item_id'] in occupied or any(blob[ROWS+i*80:ROWS+(i+1)*80]) or
+                any(blob[ITEMS+i*32:ITEMS+(i+1)*32]) or blob[32+i//8]&(1<<(i&7))):
+            raise ValueError('Additional room category collides with an installed identity')
+    all_rows=sorted(copy.deepcopy(runtime['rows'])+rows,key=lambda r:r['runtime_index']);encode_packet(all_rows)
+    needed=sum(len(d) for d in assets.values())+(0 if is_packet else PACKET_BYTES)
+    reuse=retired_module_space(base,prior,blob,needed)
+    if reuse is None:raise ValueError('No verified retired storage for complete room category batch')
+    contract=extended_contract(base,core,original);cursor=reuse['blob_offset']
+    result=copy.deepcopy(old);installed=result['room_rigs']
+    if not is_packet:
+        installed['packet']=dict(ram=PACKET_RAM,bytes=PACKET_BYTES,blob_offset=cursor,vrom=BLOB+cursor)
+        cursor+=PACKET_BYTES
+    for r in rows:
+        data=assets[r['source_item_id']];at=cursor;cursor+=len(data)
+        blob[at:cursor]=data;r.update(blob_offset=at,vrom=BLOB+at)
+    installed.update(format='AFV3-ROOM-RIGS-2',categories=[CATEGORY,CLOCK_CATEGORY,STORAGE_CATEGORY],rows=all_rows,
+        table_ram=PACKET_TABLE,capacity=PACKET_CAPACITY,ram=PACKET_RAM,extended_native_contract=contract,
+        additional_resident_bytes=0 if is_packet else PACKET_BYTES,
+        artwork_bytes=runtime['artwork_bytes']+sum(len(d) for d in assets.values()))
+    installed.setdefault('additional_sources',[]).extend(evidence)
+    installed.setdefault('reservations',[]).append(reuse)
+    publish_packet(result,blob,output)
+    result['additional_resident_bytes']=installed['additional_resident_bytes']
+    return result,{}
 
 
 def prepared(source,directory):
@@ -92,6 +260,11 @@ def encode(rows):
 
 
 def install(base,prior,blob,core,original,output,directory):
+    directories=list(directory) if isinstance(directory,(list,tuple)) else [directory]
+    if prior['equipment_resources'].get('room_rigs'):
+        return extend(base,prior,blob,core,original,output,directories)
+    if len(directories)!=1:raise ValueError('Initial room runtime requires one complete category')
+    directory=directories[0]
     old=prior['equipment_resources'];start=old['blob_offset'];offset=RAM-EQUIPMENT_RAM
     module=bytearray(blob[start:start+old['bytes']])
     if (old.get('room_rigs') or not old.get('inventory_preview',{}).get('balloon_drawer') or
@@ -148,7 +321,12 @@ def install(base,prior,blob,core,original,output,directory):
 
 def refresh_code(equipment,blob,output):
     """Retain full room resources while connecting an additional native consumer."""
-    runtime=equipment['room_rigs'];old=runtime['code'];start=equipment['blob_offset']
+    runtime=equipment['room_rigs']
+    if runtime['format']=='AFV3-ROOM-RIGS-2':
+        packet=runtime['packet'];at=packet['blob_offset']
+        if sha256(blob[at:at+PACKET_BYTES])!=packet['sha256']:raise ValueError('Changed complete room packet')
+        return publish_packet(equipment,blob,output)
+    old=runtime['code'];start=equipment['blob_offset']
     module=bytearray(blob[start:start+equipment['bytes']]);at=RAM-EQUIPMENT_RAM
     if (sha256(module)!=equipment['sha256'] or sha256(module[at:at+old['bytes']])!=old['sha256'] or
             any(module[at+old['bytes']:TABLE-EQUIPMENT_RAM]) or

@@ -125,6 +125,8 @@ def compile_part(part, out, extra_sources=(), defines=(), primary_source=None):
                        'balloon_menu': ('af_v3_balloon_menu_type', 0x804AFBF0),
                        'held_rigs': ('af_v3_held_setup', 0x804B0000),
                        'room_rigs': ('af_v3_room_rig_ct', 0x804B1800),
+                       'room_rigs_packet': ('af_v3_room_rig_ct', 0x804B8000),
+                       'room_rigs_bootstrap': ('af_v3_room_boot_ct', 0x804B1800),
                        'held_collection': ('af_v3_held_catalogue_record', 0x804AFA00),
                        'inventory_equipment': ('af_v3_inventory_item_kind', 0x804A9000),
                        'inventory_aux': ('af_v3_inventory_bobber', 0x804B2180),

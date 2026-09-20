@@ -1,5 +1,65 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared room-category runtime
+
+The current proposal is ABI 159 at
+`build/v3-room-categories-runtime-03/build-lock.json`. It extends the shared
+room engine for switch-driven rigs, clocks, and native storage callbacks.
+The same records/validator/compiler serve all three categories. Both complete
+Harvest storage objects join the eight retained balloon rows; their ordinary
+profiles/acquisition remain disabled. Clock descriptors and behaviour are
+supported, but complete clock resources are not installed yet.
+
+The 1,576-byte engine and up to 128 twenty-four-byte records occupy a checked
+8-KiB packet at `804B8000`. A 545-byte bootstrap replaces the old room code and
+retains the stable vtable. Startup clears its checksum cache; the first callback
+loads and validates the complete packet before execution. Existing scene actors,
+model banks, profiles, selections, and saved formats do not grow or change.
+The packet and 9,568 bytes of storage artwork reuse a verified retired module;
+the contiguous import resource still has 2,800 bytes free.
+
+Five focused checks pass: category behaviour under address/undefined-behaviour
+sanitizers; complete packet/code/assets/patch reconstruction and retained data;
+128-entry encoding with a 25-row mixed-category fixture; unchanged 128-choice
+composition with exact import-free/full outputs; and parent-alias retention plus
+complete native storage profile generation. The final source-receipt build
+produces the same cartridge as the tested build, so unchanged native evidence
+applies without replaying it.
+
+The first silent emulator attempt stops on an overbroad whole-module comparison.
+The corrected retry records differences only at the scenery cache `804ADFEC`
+and the live balloon-actor descriptor word `804AEA5C`. The new room reservation
+matches in full. `build/v3-room-categories-native-02/results.json` records 120
+steps and 96 passing assertions, including 92 component assertions: both complete
+asset transfers, actual lazy DMA/checksum loading, native stop-mode construction,
+independent actor state, complete skeleton drawing, matrix/graphics/work guards,
+null-room storage suppression, unchanged save/profile prefix, and restoration.
+After checkpoint restoration, CPU and module guards pass. The final scenario
+check incorrectly uses format-2 guard address `8046C350`; format 3 uses
+`8046C380`, and the former address is now reward-state storage. The test and
+full-state comparison are corrected, but no third run is made. This is passing
+component evidence, **not** a complete scenario/exit verification. Ordinary
+opening/closing, acquisition, GPU appearance, and hardware remain unverified.
+No save is supplied, written, or modified.
+
+- ROM SHA-256:
+  `ed2122947445b3f1f76c452535303780f6f2eb5808a66de34b9494e7ed759e46`.
+- UPS SHA-256:
+  `0b3d27574f4ba2572b3fa7abf3a0c41475b6dfa7933f49350c122629e70a3f2f`.
+- Final receipt SHA-256:
+  `593c8cc033d93251e23f30c6113893048b635e45fe55be65e325d44997530de4`.
+- Native component results SHA-256:
+  `ecc8fba65e722d217be91a348040595abc5d5028e1f312073b9cb9d98e79cef4`.
+
+Next complete general cartridge storage expansion for bulk categories. The
+current import reservation ends before choices at `025F0000`, general strings
+at `02600000`, and the existing module at `02800000`. There is no spare DMA
+directory entry. Relocating the first two resources could extend the existing
+import region without adding a directory entry, but every consumer and resource
+identity must be checked first. Do not simply raise the bound or overwrite text.
+Keep the main lock and both patchers unchanged. Gold-tree leaf/cut effects and
+ordinary golden-shovel acquisition follow the primary importing work.
+
 ## Open/close storage category
 
 `build/v3-storage-rigs-prepared-01/` contains the complete Harvest bureau and

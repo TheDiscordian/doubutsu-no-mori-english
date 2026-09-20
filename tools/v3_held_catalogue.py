@@ -24,7 +24,8 @@ SOURCES+=('tools/v3_handheld_items.py','tools/v3_inventory_equipment.py',
     'tools/v3_room_aliases.py','tools/v3_player_actions.py','tools/v3_registry.py',
     'tools/v3_room_rig_runtime.py','overlays/v3/held_items.c','overlays/v3/held_items.ld',
     'overlays/v3/held_icon.S','overlays/v3/room_rigs.c','overlays/v3/room_rigs.h',
-    'overlays/v3/room_rigs.ld')
+    'overlays/v3/room_rigs.ld','overlays/v3/room_rigs_packet.ld',
+    'overlays/v3/room_rigs_bootstrap.c','overlays/v3/room_rigs_bootstrap.ld')
 
 
 def parent_readiness(equipment):
@@ -186,6 +187,7 @@ def assets(source,equipment,directory,blob=None):
         if receipt!=runtime['source'] or blob is None:
             raise ValueError('Missing checked installed room-rig resources')
         for row in runtime['rows']:
+            if 'parent_item_id' not in row:continue
             original=next(r for r in checked if r['source_item_id']==row['source_item_id'])
             data=room_art[row['source_item_id']];at=row['blob_offset']
             if ({k:row[k] for k in original}!=original or row['vrom']!=BLOB+at or

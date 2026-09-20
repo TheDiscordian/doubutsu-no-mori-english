@@ -1,4 +1,4 @@
-/* Complete indexed looping room rigs with source switch-driven speed changes. */
+/* Complete shared room rigs; each record retains its actual behaviour. */
 #include "room_rigs.h"
 
 static const RoomRigRecord *find(u32 index) {
@@ -14,6 +14,15 @@ static const RoomRigRecord *find(u32 index) {
                 !r->joints || r->joints>6 || !r->shown || r->shown>r->joints ||
                 (r->skeleton&3) || r->skeleton<0x06000000u || r->skeleton>0x06000000u+r->bytes-8 ||
                 (r->animation&3) || r->animation<0x06000000u || r->animation>0x06000000u+r->bytes-20) return 0;
+#ifdef AF_V3_ROOM_RIG_PACKET
+        if (r->reserved || r->mode>ROOM_RIG_STORAGE) return 0;
+        if (r->mode==ROOM_RIG_SWITCH && (r->first.bits || r->last.bits)) return 0;
+        if (r->mode==ROOM_RIG_CLOCK && (!r->first.bits || r->first.bits>=r->joints ||
+                !r->last.bits || r->last.bits>=r->joints || r->first.bits==r->last.bits)) return 0;
+        /* Positive finite floats compare in the same order as their bit words. */
+        if (r->mode==ROOM_RIG_STORAGE && (r->first.bits<0x3F800000u ||
+                r->last.bits<=r->first.bits || r->last.bits>0x43800000u)) return 0;
+#endif
         return r;
     }
     return 0;
@@ -26,9 +35,17 @@ void af_v3_room_rig_ct(RoomRig *actor,u8 *data) {
     void *animation=Lib_SegmentedToVirtual((void *)(uptr)r->animation);
     if (skeleton[0]!=r->joints || skeleton[1]!=r->shown) return;
     cKF_SkeletonInfo_R_ct(&actor->keyframe,skeleton,animation,actor->joint,actor->morph);
-    cKF_SkeletonInfo_R_init_standard_repeat(&actor->keyframe,animation,(void *)0);
+#ifdef AF_V3_ROOM_RIG_PACKET
+    if (r->mode==ROOM_RIG_STORAGE)
+        cKF_SkeletonInfo_R_init_standard_stop(&actor->keyframe,animation,(void *)0);
+    else
+#endif
+        cKF_SkeletonInfo_R_init_standard_repeat(&actor->keyframe,animation,(void *)0);
     actor->speed.bits=0;actor->target.bits=0x3F000000u;
     actor->keyframe.speed.bits=0;
+#ifdef AF_V3_ROOM_RIG_PACKET
+    if (r->mode==ROOM_RIG_CLOCK) actor->keyframe.speed.bits=0x3F000000u;
+#endif
     cKF_SkeletonInfo_R_play(&actor->keyframe);
 }
 
@@ -36,6 +53,20 @@ void af_v3_room_rig_mv(RoomRig *actor,void *room,RoomRigGame *game,u8 *data) {
     FloatWord high,idle,step;
     (void)room;(void)game;
     if (!data || !find(actor->index)) return;
+#ifdef AF_V3_ROOM_RIG_PACKET
+    const RoomRigRecord *r=find(actor->index);
+    if (r->mode==ROOM_RIG_STORAGE) {
+        RoomRigClip *clip=room_rig_clip;
+        if (room && game && clip && clip->open_close)
+            clip->open_close(actor,room,game,r->first.f,r->last.f);
+        return;
+    }
+    if (r->mode==ROOM_RIG_CLOCK) {
+        cKF_SkeletonInfo_R_play(&actor->keyframe);
+        cKF_SkeletonInfo_R_play(&actor->keyframe);
+        return;
+    }
+#endif
     high.bits=0x3FA00000u;idle.bits=0x3F000000u;step.bits=0x3C23D70Au;
     /* Two exact source updates at the N64 update rate. Retain the native
        owner's changed-switch flag until the owner clears it after callbacks. */
@@ -54,6 +85,17 @@ void af_v3_room_rig_mv(RoomRig *actor,void *room,RoomRigGame *game,u8 *data) {
     }
 }
 
+#ifdef AF_V3_ROOM_RIG_PACKET
+static int clock_before(void *game,RoomKeyframe *key,int joint,void *list,
+                        void *flags,void *arg,s16 *rotation,void *position) {
+    (void)game;(void)key;(void)list;(void)flags;(void)position;
+    const RoomRigRecord *r=arg;
+    if ((u32)joint==r->first.bits) rotation[2]=(s16)((u16)rotation[2]-room_rig_hour);
+    else if ((u32)joint==r->last.bits) rotation[2]=(s16)((u16)rotation[2]-room_rig_minute);
+    return 1;
+}
+#endif
+
 void af_v3_room_rig_dw(RoomRig *actor,void *room,RoomRigGame *game,u8 *data) {
     (void)room;
     const RoomRigRecord *r=find(actor->index);
@@ -71,5 +113,9 @@ void af_v3_room_rig_dw(RoomRig *actor,void *room,RoomRigGame *game,u8 *data) {
     gfx->head=commands+1;
     commands[0]=(RoomCommand){0xDA380003,(u32)(uptr)_Matrix_to_Mtx_new(gfx)};
     cKF_Si3_draw_R_SV(game,&actor->keyframe,actor->matrices[game->frame&1],
+#ifdef AF_V3_ROOM_RIG_PACKET
+                    r->mode==ROOM_RIG_CLOCK ? (void *)clock_before : (void *)0,(void *)0,(void *)r);
+#else
                     (void *)0,(void *)0,(void *)0);
+#endif
 }

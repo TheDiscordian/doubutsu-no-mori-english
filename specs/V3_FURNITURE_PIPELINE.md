@@ -705,8 +705,9 @@ palette. Source repeat speed is `0.5`; the before-draw callback subtracts the li
 hour/minute angles from joints three/four about Z. The descriptor retains those
 rules and the exact source clock owner/fields for runtime integration. The
 prepared object includes all graphics and keyframe data, not a frozen decorative
-substitute. The native lifecycle/clock adapter and source acquisition route
-remain required; prepared resources do not enable these records.
+substitute. The shared room engine supports the live clock callback. Installing
+the complete clock resources and source acquisition route remains required;
+prepared resources do not enable these records.
 
 The `open-close-storage-rig` category shares the same complete graphics and
 keyframe conversion. Verified create/move/draw/destroy instructions supply the
@@ -716,7 +717,8 @@ interaction flags; those flags cannot enter unrelated callback categories.
 The Harvest bureau and dresser retain five/three joints and complete twelve/ten
 frame motions respectively. Non-finite or out-of-motion limits, changed helpers,
 extra lifecycle effects, or missing dependencies reject. Prepared objects remain
-disabled until the native lifecycle and actual acquisition route are connected.
+disabled until actual acquisition and ordinary item profiles are connected.
+The shared runtime installs their complete resources and storage callback.
 
 The switch-driven category prepares all eight room balloons in one command:
 
@@ -752,7 +754,7 @@ every prepared source binding, model, skeleton, animation, and command source;
 it does not recompile artwork. The checked retired-module allocator supplies
 the full 44,400 bytes without extending into English choices or moving live data.
 
-The lifecycle code occupies `804B1800..804B1DFF`, with immutable descriptors at
+The initial lifecycle code occupies `804B1800..804B1DFF`, with immutable descriptors at
 `804B1E00..804B1F9F` and a five-entry vtable at `804B1FA0`. Existing held code,
 loop-volume state, the module guard, and the 60-KiB resident allocation retain
 their bounds. Twenty-four descriptors fit; actual room rigs use six joints and
@@ -966,6 +968,47 @@ remain unchanged; future batches update this verified owner in place. Separate
 The train category appends source-identified items to the already existing
 native list 4; it needs no new runtime adapter. Catalogue orderability follows
 that actual list, while Gulliver souvenirs remain non-orderable.
+
+### Shared room-category runtime
+
+The extended installer accepts repeated `--room-rigs-art` prepared bundles through
+the same complete-art validator. Source category records determine behaviour:
+switch-driven repeat, clock-driven repeat, or native storage opening/closing.
+No item-specific callback or installer is needed. Actual profile/acquisition
+eligibility remains separate; installing resources does not enable items.
+
+The current runtime owns `804B8000..804B9FFF`: 4 KiB for code and 4 KiB for a
+header, up to 128 twenty-four-byte descriptors, and zero padding. This sits after
+the gold-tree code's `804B5000..804B7FFF` reservation and before the fixed model
+pool. Future reservation growth must preserve both owners. It adds 8 KiB of
+fixed Expansion Pak space without growing scene actors or model banks.
+
+Each descriptor contains the canonical index, complete object length, skeleton
+and animation pointers, joint/visible counts, category, zero reserved byte, and
+two category parameters. Switch rigs require zero parameters. Clocks supply
+distinct hour/minute joint indices; storage supplies finite start/end frames
+within the complete source motion. Current native work supports at most six
+joints. The existing complete-object and pointer bounds remain mandatory.
+
+The stable vtable at `804B1FA0` dispatches through a bootstrap in the old code
+reservation. The bootstrap loads and verifies the complete packet, updates both
+caches, and records its checksum at `804B1E00`. Startup reloads that word as zero,
+so a soft reset cannot trust stale upper-memory code. Packet/compiler bounds,
+checksum failures, changed old code/resources, occupied identities, and lack of
+verified cartridge storage reject. Existing balloon assets/profiles stay intact.
+
+Clocks play two source half-speed updates per native frame. Their joint callback
+uses native hour/minute fields `80136FC6`/`80136FC4`, retaining sixteen-bit angle
+wrapping and subtracting about Z. Storage starts stopped and calls the existing
+nullable room clip at `80136F2C`, callback offset `34`, with source opening limits.
+The complete native state machine, sounds, and interaction timing remain native;
+only its already installed expanded-profile table differs from original code.
+Catalogue drawing without a room owner cannot advance storage interactions.
+
+The current packet contains the eight existing balloon rows and both Harvest
+storage rows. All fifteen clocks are converter/descriptor-ready but not installed
+or selectable. Complete clock assets require the next general cartridge-storage
+expansion. Do not overwrite protected English resources or relax storage bounds.
 
 ## Verification policy
 
