@@ -203,6 +203,11 @@ tools and matching native renderers. These stages use existing code space and
 do not enable tool choices before golden effects, remaining action checks,
 inventory, and acquisition are connected. See
 [tool animation setup](V3_HANDHELD_ITEMS.md#shared-tool-animation-setup).
+The following stage connects net request/transition predicates and shared fall/
+get-up setup while retaining actual tool identities, native priorities, and
+all earlier code. Golden effects and the donor's separate balloon-release
+behaviour remain explicit dependencies; see
+[tool recovery](V3_HANDHELD_ITEMS.md#shared-net-transitions-and-tool-recovery).
 
 `--category` selects a discovered shared category without maintaining an item
 list. `convert --assets-only` prepares complete artwork while retaining missing

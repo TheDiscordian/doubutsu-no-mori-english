@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "../overlays/v3/tool_motion.c"
+#include "../overlays/v3/tool_recovery.c"
 
 static union { int align; unsigned char bytes[0x13A0]; } player;
 static int kind, loads, setups, seen_kind, seen_animation, seen_main, seen_mode;
@@ -34,6 +35,7 @@ void *af_test_tool_motion_function(u32 at) {
         case 0x808BDF6Cu: return check_animation;
         case 0x808BDDB4u: return load;
         case 0x808BD6E0u: return basic_animation;
+        case 0x808BD690u: return basic_animation;
         case 0x808B83B4u: return setup;
     }
     assert(0); return 0;
@@ -75,6 +77,20 @@ int main(void) {
         assert(seen_frame == -1.0f && seen_morph == -3.5f);
         assert(seen_animation == (k==34 ? 11 : k==87 || k==88 ? 33 : 1000));
         assert(seen_speed == (k==34 || k==87 || k==88 ? 1.75f : 1.0f));
+        for (int getup=0;getup<2;++getup) {
+            unsigned char before[sizeof(player.bytes)];memcpy(before,player.bytes,sizeof(before));
+            int imported_net=k==45 || k==46, net=k==1 || imported_net;
+            loads=0;
+            if (getup) af_v3_tool_getup(player.bytes,0,k,-5.0f);
+            else af_v3_tool_tumble(player.bytes,0,k,-5.0f);
+            assert(loads==1 && seen_kind==k && seen_speed==1.0f && seen_morph==-5.0f && seen_frame==-1.0f);
+            assert(seen_mode==!net);
+            assert(seen_animation==(net ? (getup ? 5 : 6)+(imported_net ? 21 : 0) : 1000));
+            assert(WORD(player.bytes,0xCFC)==(net ? (getup ? 6 : 5) : 1000));
+            assert((signed char)player.bytes[0x1117]==k);
+            memcpy(player.bytes+0xCFC,before+0xCFC,4);player.bytes[0x1117]=before[0x1117];
+            assert(memcmp(player.bytes,before,sizeof(before))==0);
+        }
     }
     puts("Shared tool motions preserve actual kinds, timing, original tools, and bounded state: pass");
 }

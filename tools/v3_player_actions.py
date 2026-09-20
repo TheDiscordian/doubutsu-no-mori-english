@@ -76,7 +76,7 @@ SOURCES = ('tools/v3_player_actions.py','tools/v3_furniture_pipeline.py',
            'overlays/v3/held_rigs.c','overlays/v3/held_rigs.S',
            'overlays/v3/held_rigs.ld','overlays/v3/tool_controls.c',
            'overlays/v3/tool_motion.c','overlays/v3/tool_motion.S',
-           'overlays/v3/tool_motion.ld') + sound_programs.SOURCES
+           'overlays/v3/tool_motion.ld','overlays/v3/tool_recovery.c') + sound_programs.SOURCES
 
 SELECTION_OFFSET=0x5500
 PARENT_CODE_OFFSET,PARENT_TABLE_OFFSET=0x3000,0x57F0
@@ -85,6 +85,77 @@ RIG_CODE_OFFSET,RIG_MODULE_SIZE=0xD000,0xE000
 RIG_STATE_OFFSET,RIG_STATE_BYTES,RIG_PLAYER_SIZE=0x12D8,44,0x1310
 BALLOON_MODULE_SIZE,BALLOON_STATE_OFFSET,BALLOON_STATE_BYTES=0xF000,0x1370,48
 TOOL_MOTION_OFFSET=0x2A50
+
+
+def refresh_tool_transitions(base,prior,blob,core,original,output):
+    """Reuse family predicates and connect complete native fall/get-up setup."""
+    from v3_npc_clothing import guard_incoming
+    old=prior['equipment_resources'];actions=old['player_actions'];start=old['blob_offset']
+    module=bytearray(blob[start:start+old['bytes']]);files=by_vrom(base)
+    owner=bytearray(files[PLAYER_VROM].extract(base));rel=files[PLAYER_RELOC].extract(base)
+    native=by_vrom(original)[PLAYER_VROM].extract(original)
+    if (not actions.get('tool_motion') or actions.get('tool_transitions')
+            or sha256(module)!=old['sha256'] or sha256(owner)!=actions['owner_sha256']
+            or sha256(rel)!=actions['relocation_sha256']):
+        raise ValueError('Tool transitions require the complete current motion adapter')
+    source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+                  (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    specs=(
+        (0x181878,152,'55fc16e02b1da0d11d183d8c757c6b8a3887d6640ea3c8c13b716f40959d18cb',0x808CB32C,0x808CB39C),
+        (0x181C08,188,'57cd9bf4604734f438d82ed17cad3b897a396fcbc98cbe1a33277d165356bae5',0x808CB6BC,0x808CB74C),
+        (0x182828,152,'fa202c92f3b781575a5ade65edf058eb6b0c6f23a2c24ca6e5e48355fd18484b',0x808CC108,0x808CC178),
+        (0x1834DC,152,'f3c02733fed4281ad2e5b67017234e99230ab72f0faebcdda8760a7951e7301a',0x808CCCF4,0x808CCD64),
+        (0x177924,240,'76fde36fbf55619f244b6d24cea2f2919baed7ca2f86e05ad19a2cec78c4a3c1',0x808C2C8C,0x808C2D4C),
+        (0x177F98,428,'44ca596f5c0684acaa9d51a3148110bd2ed9cb5e78702db6bea0ed3ae17df7c4',0x808C320C,0x808C32CC))
+    _,_,rows,locations,_=native_references(owner,rel)
+    sources=[];consumers=[];patches=[];removed=[]
+    for offset,n,digest,first,last in specs:
+        raw,receipt=source.function(offset)
+        if len(raw)!=n or sha256(raw)!=digest:raise ValueError('Changed complete source net transition')
+        a,b=first-PLAYER_RAM,last-PLAYER_RAM
+        if owner[a:b]!=native[a:b]:raise ValueError('Changed complete native net transition')
+        sources.append(receipt);consumers.append(dict(entry=first,end=last,sha256=sha256(owner[a:b])))
+        if len(sources)<=4:
+            calls=[i for i in range(a,b,4) if u32(owner,i)==jump(0x808BD5C4,link=True)]
+            if len(calls)!=1 or locations.get(calls[0],0)>>24!=0x44:
+                raise ValueError('Net transition lacks one relocated visible-kind call')
+            at=calls[0];after=jump(actions['tool_controls']['entry'],link=True)
+            patches.append(dict(address=PLAYER_RAM+at,before=owner[at:at+4].hex(),after=struct.pack('>I',after).hex()))
+            removed.append(locations[at]);consumers[-1]['call']=PLAYER_RAM+at
+    previous=actions['tool_motion']['code'];at=TOOL_MOTION_OFFSET;n=previous['bytes']
+    if sha256(module[at:at+n])!=previous['sha256'] or any(module[at+n:PARENT_CODE_OFFSET]):
+        raise ValueError('Changed tool-motion code or occupied transition space')
+    code,compiled=compile_part('tool_motion',output/'tool_motion',
+        extra_sources=('overlays/v3/tool_motion.S','overlays/v3/tool_recovery.c'))
+    if (code[:n]!=module[at:at+n] or len(code)>PARENT_CODE_OFFSET-at
+            or any(compiled['symbols'].get(k)!=v for k,v in previous['symbols'].items())):
+        raise ValueError('Tool recovery moves existing motion code/constants')
+    windows=[]
+    for entry,name in ((0x808C2C8C,'af_v3_tool_tumble'),(0x808C320C,'af_v3_tool_getup')):
+        pos=entry-PLAYER_RAM;windows.append((pos,8))
+        if any(x in locations for x in (pos,pos+4)):raise ValueError('Relocated recovery entry')
+        patches.append(dict(address=entry,before=owner[pos:pos+8].hex(),
+            after=struct.pack('>2I',jump(compiled['symbols'][name]),0).hex(),symbol=name))
+    guard_incoming(owner,TEXT_SIZE,PLAYER_RAM,windows)
+    for row in patches:
+        pos=row['address']-PLAYER_RAM;replacement=bytes.fromhex(row['after'])
+        owner[pos:pos+len(replacement)]=replacement
+    kept=[r for r in rows if r not in removed];relocated=bytearray(rel)
+    struct.pack_into('>I',relocated,16,len(kept))
+    relocated[20:20+len(rows)*4]=struct.pack('>'+str(len(kept))+'I',*kept)+bytes(4*len(removed))
+    module[at:PARENT_CODE_OFFSET]=code+bytes(PARENT_CODE_OFFSET-at-len(code))
+    blob[start:start+len(module)]=module
+    report=copy.deepcopy(old);current=report['player_actions']
+    current.update(owner_sha256=sha256(owner),relocation_sha256=sha256(relocated),
+        removed_relocations=current['removed_relocations']+len(removed))
+    current['tool_motion']['code']=compiled
+    current['tool_transitions']=dict(format='AFV3-TOOL-TRANSITIONS-1',code=compiled,
+        source_functions=sources,native_consumers=consumers,patches=patches,removed_relocations=removed,
+        actual_kinds_retained=True,priorities_retained=True,golden_effects_installed=False,
+        balloon_release_installed=False,logical_imports_added=0,ordinary_gameplay_tested=False)
+    report['player_motion'].update(owner_sha256=sha256(owner),reloc_sha256=sha256(relocated))
+    report.update(sha256=sha256(module),crc32=zlib.crc32(module))
+    return report,{PLAYER_VROM:bytes(owner),PLAYER_RELOC:bytes(relocated)}
 
 
 def refresh_tool_motion(base,prior,blob,core,original,output):
@@ -1176,6 +1247,9 @@ def expanded_tables(source,owner,reloc,*,categories=CATEGORIES,native_count=NATI
 
 def install(base,prior,blob,core,original,output):
     old=prior.get('equipment_resources',{})
+    if (old.get('player_actions',{}).get('tool_motion') and
+            not old['player_actions'].get('tool_transitions')):
+        return refresh_tool_transitions(base,prior,blob,core,original,output)
     if (old.get('player_actions',{}).get('tool_controls') and
             not old['player_actions'].get('tool_motion')):
         return refresh_tool_motion(base,prior,blob,core,original,output)

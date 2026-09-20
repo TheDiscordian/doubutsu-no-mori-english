@@ -2,8 +2,8 @@
 
 ## Active: V3 optional GameCube imports
 
-The current explicit proposal is ABI 130,
-`build/v3-shared-tool-motion-02/build-lock.json`. All eight balloons are
+The current explicit proposal is ABI 131,
+`build/v3-shared-tool-transitions-01/build-lock.json`. All eight balloons are
 connected through shared source-derived parent records, room profiles, indoor
 conversion/pickup, collection/catalogue, complete icons, and optional selection.
 There are 128 experimental choices, with 24 equipment parents. Neither served
@@ -28,16 +28,33 @@ checkpoint restoration, and clean exit. Reuse this evidence and the complete
 installed models; no render replacement or asset reconversion is required.
 See the [motion checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-tool-animation-setup).
 
-Next extend remaining native action-request family checks: the donor's net
-swing/pull/slip, tumble, and get-up paths accept both nets, whereas the N64 paths
-still assume kind one. Then connect golden effects and inventory/parent consumers.
-Reuse the complete installed model/motion resources. Source golden-net capture is
+The four net action/transition checks and shared fall/get-up setup are connected.
+Four focused checks pass; the first silent native run passes 255 records/218
+assertions, including actual action IDs, priorities, slip release/hold/recovery
+branches, hidden/unselected rejection, real recovery transfers, memory guards,
+restored state, and clean exit. Reuse this evidence; do not replay input/motion
+or transition fixtures without a changed consumer. See the
+[transition checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-net-transitions-and-tool-recovery).
+
+Next connect golden effects and inventory/parent consumers. Reuse the complete
+installed model/motion resources. Source golden-net capture is
 21/60 rather than 15/50; golden-rod consumers are in both ordinary and special
 fish actors; the shovel forwards a golden flag into digging effects. Those are
 real implementation dependencies, not reasons to enable ordinary-tool substitutes.
+The native net capture consumers are `808CC54C..808CC7B4` (local test) and
+`808CC7E0..808CC988` (candidate loop); source counterparts are REL text
+`182CA8` and `182F6C`. Preserve the native forced-capture path, candidate order,
+output labels/types, and ordinary geometry while adding the actual golden values.
 Check axe wear and acquisition/demos against both games. Keep all tool choices
 disabled until the required gameplay, inventory, acquisition, and persistence
 consumers are connected. Do not replay the completed input checks for unchanged code.
+
+The source `Player_actor_setup_Item_Tumble_getup` also releases a carried balloon
+when its balloon actor exists: it clears the equipped item and requests the
+matching flying shape with the current hand position/angles/frame. This shared
+balloon behaviour is not installed. Record and implement it with the necessary
+actor/shape/ownership support; the net recovery helper must not silently count
+it as complete or clear a balloon before a real release path exists.
 
 All eight balloon inventory
 previews have their actual idle animation and reflection drawer. Three focused
@@ -103,7 +120,7 @@ Net/rod behaviour and golden-tool differences remain explicit. Resources do
 not enable these imports. See the
 [capacity checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-rig-capacity-and-resource-extension).
 
-Next work uses the explicit ABI-130 lock above. All eight pinwheels have shared
+Next work uses the explicit ABI-131 lock above. All eight pinwheels have shared
 parent readers, pocket artwork, collection/catalogue, existing event acquisition,
 and individual experimental selections. The full proposal has 128 choices;
 existing fans and fixed identities are retained. No per-item installers or

@@ -18,8 +18,8 @@ served patchers retain their existing builds.
 
 ## Active development
 
-The current explicit ABI-130 proposal is
-`build/v3-shared-tool-motion-02/build-lock.json`. All eight balloons are
+The current explicit ABI-131 proposal is
+`build/v3-shared-tool-transitions-01/build-lock.json`. All eight balloons are
 connected through the shared parent-category installer: official names/prices,
 complete pocket icons, held/inventory animation, source acquisition records,
 collection/catalogue, animated room profiles, indoor conversion, and inverse
@@ -46,11 +46,19 @@ Four focused checks pass. The first silent native check passes 128 records and
 original-tool setup, rod movement speed, bobber lifetime, guards, restored
 checkpoint, and clean exit. GPU appearance and ordinary gameplay are not proven.
 
-Next connect remaining native action-request kind checks and golden effects,
-then complete inventory/parent/acquisition support. Net swing/pull/slip and
-tumble paths still need their source family checks; direct action setup does not
-prove these ordinary transitions. Keep tool choices disabled. Continue these
-shared categories from the current lock and retain completed evidence. See the
+The four remaining net request/transition checks use the shared family reader,
+and fall/get-up setup preserves imported net identity with the proper stopped
+animations. Non-net tools retain their default recovery motions and repeat mode.
+Four focused checks pass; the first silent native run passes 255 records and
+218 assertions, covering actual requested actions/priorities, slip input exits,
+hidden/unselected rejection, recovery loading, guards, checkpoint restore, and
+clean exit. Complete ordinary gameplay and appearance remain unverified.
+
+Next connect golden effects and complete inventory/parent/acquisition support.
+The donor's balloon-loss-on-get-up path also remains an explicit shared behaviour
+dependency; it is not implemented by the net recovery adapter. Keep tool choices
+disabled. Continue from the current lock and retain completed evidence. See the
+[transition checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-net-transitions-and-tool-recovery),
 [motion checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-tool-animation-setup) and
 [tool-control checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-tool-input-predicates).
 
@@ -113,7 +121,7 @@ actual initialization/hand tracking/animation/drawing commands, matrix and memor
 guards, saved-state retention, checkpoint restoration, and clean exit. This is
 component execution, not GPU appearance, ordinary gameplay, or hardware proof.
 
-Use the ABI-129 lock above for continued work. Reuse the
+Use the ABI-131 lock above for continued work. Reuse the
 passing eight-vector player/inventory allocation evidence. The main lock and
 both patchers stay unchanged. See the
 [balloon-action checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-balloon-actions).

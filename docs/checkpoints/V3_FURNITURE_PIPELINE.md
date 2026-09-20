@@ -1,5 +1,80 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared net transitions and tool recovery
+
+The explicit proposal is ABI 131 at
+`build/v3-shared-tool-transitions-01/build-lock.json`. It retains all 128
+experimental choices, complete assets, fixed identities, the 60-KiB module,
+format-2 saves/profile, and exact V2-12 no-import output. The main ABI-109 lock
+and both served V2 patchers remain unchanged.
+
+- ROM SHA-256:
+  `5333def11ffaefda03cf7d691b3ece236e14c49cf90a5f8d1b2ae4f3de12374d`.
+- Report SHA-256:
+  `4df8c1bd42dec18c8ad489cfe59e5f094a859be6ab222a87de471ef3e0f325d4`.
+- UPS SHA-256:
+  `11a39fd71688a9b701e95d0b817fab1394d330187aed03a440067e53757b0066`.
+
+Four remaining net consumers compared the real kind directly with native kind
+one. Their single visible-kind call now uses the existing family reader, so
+original and imported nets can reach slip/swing/pull requests and slip exits.
+Priority, controller semantics, requested actions, and non-net fallbacks remain
+native. Four obsolete local-call relocations are removed.
+
+The shared recovery implementation preserves actual kinds and complete models.
+Original net recovery uses native animations six/five; imported nets use actual
+source resources 27/26. Both retain stopped playback and native callbacks five/
+six. Non-nets retain default motions and repeat mode; rods retain the earlier
+bobber-lifetime correction. Two eight-byte prologue hooks install this category
+without changing owner dimensions or any other relocation.
+
+The first build passes. Recovery adds 296 bytes after the exact existing tool
+code and constants; the combined image is 984 bytes. All old public addresses,
+assets, selectors, profile bits, native draw callbacks, and saved formats remain.
+No translation text or golden-tool choice is added.
+
+Four focused checks pass in 6.132 seconds:
+
+```sh
+python3 -m unittest \
+  tests.test_v3_player_actions.SelectionHostTests.test_shared_tool_motion_mapping \
+  tests.test_v3_player_actions.ToolTransitionsTests
+```
+
+They cover sanitizer execution of recovery across original/extended kinds,
+complete previous animation mapping, immutable unrelated state, all six exact
+consumers, four relocation removals, two loaded-owner bases, old code/constant
+retention, complete resource/save/profile retention, original-ROM UPS/CRC checks,
+and exact empty/all composition.
+
+The first silent native run at `build/smoke-v3-tool-transitions-01/` passes **255
+records and 218 assertions**. Results SHA-256:
+`88546e31c8b915715f82df16998bcd796994d9c8a807bf2b1e425d36b50ef9b6`.
+The existing shared fixtures execute only the changed transition/recovery paths:
+original net, original non-net, both extended net kinds, and imported rod
+recovery. Actual native requests, priorities, rejected equal-priority requests,
+held-A/released-A/completed-slip branches, hidden/unselected rejection, actual
+recovery model/motion loading, stopped/repeating modes, real-kind retention, and
+bobber lifetime pass. All calls restore the stack; memory guards, retained live
+save state, restored temporary globals/profile, checkpoint reload, and clean exit
+pass. No code is uploaded and no real user save is used; audio remains silent.
+The fixture uses synthetic equipment selectors, not enabled golden-tool options.
+
+The source audit also identifies balloon release in its get-up routine. It needs
+the separate flying actor/shape and equipped-item removal, which are not native
+net behaviours and are not installed here. The receipt makes that omission
+explicit. Complete ordinary gameplay, GPU appearance, golden effects, acquisition,
+and hardware remain unverified; do not convert these component results into
+playable-tool certification. Retain the passing evidence without replaying it.
+
+Next implement golden-net capture, then both fish actors' golden-rod response,
+shovel effects, axe wear, and complete inventory/parent/acquisition routes through
+shared adapters. Native capture functions are `808CC54C..808CC7B4` and
+`808CC7E0..808CC988`; donor functions are at REL text `182CA8`/`182F6C`.
+The source uses radius/span 21/60 versus ordinary 15/50. Preserve native forced
+capture, candidate ordering, output identities, and normal-tool geometry.
+Imported saves require matching-or-larger profiles and must not be used in V2.
+
 ## Shared tool animation setup
 
 The explicit proposal is ABI 130 at

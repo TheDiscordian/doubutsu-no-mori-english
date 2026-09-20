@@ -957,7 +957,7 @@ def held_collection(debug,rom_path,record):
         ordinary_gameplay_tested=False,catalogue_screen_tested=False,requires_checkpoint_restore=True)
 
 
-def tool_controls(debug,rom_path,record):
+def tool_controls(debug,rom_path,record,*,transitions=False):
     """Execute current cartridge input consumers with isolated equipment data."""
     from aflib import CODE_RAM,CODE_VROM
     import v3_equipment_runtime as equipment
@@ -1004,6 +1004,7 @@ def tool_controls(debug,rom_path,record):
         button_spans=((actual_game+0x14,2),(actual_game+0x20,2))
     table=actions['equipment_selection']['table_ram']+16+(0x2239-0x2200)*8
     spans=((field,2),(0x80460020,192),(0x80126EB4,4),(table,8),*button_spans)
+    if transitions:spans+=((0x8013767D,1),(0x80137908,1))
     if any(not 0x80000400<=a<=0x80800000-n for a,n in spans):raise ValueError('Invalid tool fixture data')
     saved={a:debug.read_memory(a,n) for a,n in spans};save_state=debug.read_memory(0x8046C000,864)
     allocation=call(0x8009BFC0,[0x3200]);actor=allocation+16;game=allocation+0x1400
@@ -1023,6 +1024,31 @@ def tool_controls(debug,rom_path,record):
         cases=((0x2201,0,0),(0x2200,1,1),(0x2203,34,34),(0x2202,35,35),
                (0x2239,44,0),(0x2239,46,1),(0x2239,88,34),(0x2239,90,35),
                (0x2239,91,2),(0x2239,107,2))
+        if transitions:
+            cases=();debug.write_memory(0x8013767D,b'\0');debug.write_memory(0x80137908,b'\0')
+            requests=((0x808CB32C,0x808CB39C,40),(0x808CC108,0x808CC178,43),
+                      (0x808CCCF4,0x808CCD64,44))
+            def clear_request():debug.write_memory(actor+0xD00,struct.pack('>3I',7,0,0))
+            for item,kind in ((0x2200,1),(0x2201,0),(0x2239,45),(0x2239,46)):
+                if item==0x2239:debug.write_memory(table,struct.pack('>HbBHBB',item,kind,0,159,0x80,1))
+                debug.write_memory(field,struct.pack('>H',item));net=kind in (1,45,46)
+                for first,last,action in requests:
+                    clear_request();owner_call(first,last,[game,5],int(net))
+                    check('actual net request and priority',actor+0xD00,
+                        struct.pack('>3I',action,5,1) if net else struct.pack('>3I',7,0,0))
+                    clear_request();owner_call(first,last,[game,0],0)
+                    check('equal priority cannot replace action',actor+0xD00,struct.pack('>3I',7,0,0))
+                for held,done in ((1,0),(1,1),(0,0)):
+                    clear_request();buttons(held,held)
+                    owner_call(0x808CB6BC,0x808CB74C,[actor,game,done])
+                    wanted=(7,34,1) if not net else ((43,22,1) if not held else ((41,13,1) if done else (7,0,0)))
+                    check('slip exit chooses actual next action',actor+0xD00,struct.pack('>3I',*wanted))
+            for first,last,_ in requests:
+                clear_request();debug.write_memory(actor+0xE64,b'\1')
+                owner_call(first,last,[game,5],0)
+                debug.write_memory(actor+0xE64,b'\0');profile[159]&=0x7F;debug.write_memory(0x80460020,profile)
+                owner_call(first,last,[game,5],0)
+                profile[159]|=0x80;debug.write_memory(0x80460020,profile)
         for item,kind,family in cases:
             if item==0x2239:debug.write_memory(table,struct.pack('>HbBHBB',item,kind,int(family==2),159,0x80,1))
             debug.write_memory(field,struct.pack('>H',item));buttons(1,1)
@@ -1054,12 +1080,15 @@ def tool_controls(debug,rom_path,record):
     for a,data in saved.items():check('restored selector/profile/input state',a,data)
     check('complete equipment module restored',equipment.RAM,module)
     check('no fault',0x8003CE34,bytes(4));check('translation guard',0x8019C8D0,bytes.fromhex('AF32C0DE')*4)
-    return dict(native_shared_tool_controls=True,assertions=assertions,title_demo_input=bool(title),
+    return dict(native_shared_tool_controls=not transitions,native_tool_transitions=transitions,
+        assertions=assertions,title_demo_input=bool(title),
         code_uploaded=False,synthetic_equipment_data=True,ordinary_gameplay_tested=False,
         golden_effects_tested=False,flash_written=False,requires_checkpoint_restore=True)
 
 
 def exercise(debug, rom_path, record, *, section='automatic_furniture'):
+    if section=='tool_transitions':return tool_controls(debug,rom_path,record,transitions=True)
+    if section=='tool_recovery':return held_rig_actions(debug,rom_path,record,tools=True,recovery=True)
     if section=='tool_motion':return held_rig_actions(debug,rom_path,record,tools=True)
     if section=='tool_controls':return tool_controls(debug,rom_path,record)
     if section=='held_catalogue':
@@ -1672,7 +1701,7 @@ def equipment_bank_switch(debug,rom_path,record):
         flash_written=False,requires_checkpoint_restore=True)
 
 
-def held_rig_actions(debug,rom_path,record,*,tools=False):
+def held_rig_actions(debug,rom_path,record,*,tools=False,recovery=False):
     """Complete native rig initialization and draw callbacks on isolated actors."""
     import v3_equipment_runtime as equipment
     from v3_import_storage import jump
@@ -1758,6 +1787,22 @@ def held_rig_actions(debug,rom_path,record,*,tools=False):
             by_index={r['index']:r for r in resources['records']}
             cases=((0x2200,1,1,3,3,4),(0x2239,46,22,3,24,4),
                    (0x2203,34,9,13,13,13),(0x2239,88,31,13,35,13))
+            if recovery:
+                cases=()
+                for kind,shape,fall,rise,main in ((1,1,6,5,2),(46,22,27,26,2),(88,31,36,36,11)):
+                    for getup,entry,end in ((False,0x808C2C8C,0x808C2D4C),(True,0x808C320C,0x808C32CC)):
+                        put(bobber+0x234,7)
+                        owner_call(entry,end,[actor,game,kind,0xC0A00000])
+                        index=scalar(actor+0xDEC)
+                        check('recovery preserves actual tool kind',actor+0x1117,bytes((kind,)))
+                        check('recovery loads actual complete model',actor+0xDDC+index*4,struct.pack('>I',shape))
+                        check('recovery uses proper fall/get-up motion',actor+0xDE4+index*4,struct.pack('>I',rise if getup else fall))
+                        net=main==2
+                        check('recovery selects native callback category',actor+0xCFC,struct.pack('>I',(6 if getup else 5) if net else main))
+                        check('net recovery stops, other tools repeat',actor+0xA2C,struct.pack('>I',int(not net)))
+                        check('recovery preserves native animation speed',actor+0xA24,struct.pack('>f',1))
+                        check('non-net recovery retains bobber',bobber+0x234,struct.pack('>I',0 if net else 7))
+                        for at in guards:check('recovery memory guard',at,edge)
             for iteration,(item,kind,shape,native_motion,motion,item_main) in enumerate(cases):
                 family=1 if kind in (1,46) else 34
                 if item==0x2239:debug.write_memory(table,struct.pack('>HbBHBB',item,kind,0,159,0x80,1))
@@ -1887,7 +1932,8 @@ def held_rig_actions(debug,rom_path,record,*,tools=False):
         for at,value in saved.items():debug.write_memory(at,value)
         call(0x8009C040,[allocation])
     if tools:
-        return dict(native_tool_motion=True,assertions=assertions,original_tools=2,imported_rigs=2,
+        return dict(native_tool_motion=not recovery,native_tool_recovery=recovery,assertions=assertions,
+            original_tools=1 if recovery else 2,imported_rigs=2,
             synthetic_equipment_data=True,code_uploaded=False,gpu_rendered=False,
             golden_effects_tested=False,ordinary_gameplay_tested=False,flash_written=False,
             requires_checkpoint_restore=True)

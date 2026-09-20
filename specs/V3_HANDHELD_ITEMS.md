@@ -802,9 +802,47 @@ The native fixture exercises original net/rod setup plus complete imported net/
 rod loading, animation, and drawing commands using isolated selectors. It does
 not enable golden-tool choices or establish ordinary action transitions, golden
 effects, acquisition, persistence, GPU appearance, or hardware. Remaining net
-request/tumble family checks are separate actual consumers, not implied by
-successful direct setup. See the
+request/tumble family checks are separate actual consumers, connected through
+the next shared stage below rather than implied by direct setup. See the
 [motion checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-tool-animation-setup).
+
+### Shared net transitions and tool recovery
+
+The next `--refresh-runtime --player-actions` stage routes four actual net
+consumers through the existing visible-family reader: slip request at `808CB32C`,
+slip exit at `808CB6BC`, swing request at `808CC108`, and pull request at
+`808CCCF4`. Only their single visible-kind JAL changes. Their original priority
+checks, requested-action writes, input decisions, and fallbacks stay intact.
+Exactly four obsolete local JAL relocations are removed. The real visible-kind
+reader still rejects hidden, disallowed, and unselected equipment first.
+
+`overlays/v3/tool_recovery.c` shares fall/get-up setup for all equipment. Entries
+`808C2C8C` and `808C320C` retain their native signature. Original net kind one uses
+native motions six/five; imported net kinds 45/46 use resources 27/26. The native
+item callbacks remain five/six with stopped playback. Other equipment keeps its
+actual default animation, native item-main category, and repeat mode. All paths
+preserve native speed one, supplied morph, start-frame selection, actual model,
+and saved kind. The existing rod-lifetime correction remains in effect.
+
+This appends 296 bytes after the exact old tool-motion code/constants, for a
+984-byte combined image. All old public addresses remain. Neither the 60-KiB
+module, player/overlay allocations, model banks, profiles, nor saved formats grow.
+Complete source/native functions, entry windows, incoming branches, original
+relocations, and available code space are checked. The actual optional catalogue
+retains 128 choices and no golden-tool entries. Both patchers remain on V2.
+
+The donor get-up routine has an additional balloon-release branch, requiring its
+separate balloon actor, flying-shape request, equipped-item removal, and hand/
+angle/frame transfer. The N64 net recovery function does not contain that branch.
+The import receipt explicitly reports `balloon_release_installed: false`; balloon
+loss/release remains shared behaviour work, not something this net adapter proves.
+
+Focused native checks cover actual action requests/priorities, all three slip
+exits, hidden/unselected rejection, native and imported recovery transfers/modes,
+bobber retention, guards, restored checkpoint, and clean exit. These use isolated
+actors/selectors, not ordinary gameplay, golden effects, GPU appearance, or
+hardware. Exact results are in the
+[transition checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-net-transitions-and-tool-recovery).
 
 ### Extended action tables
 

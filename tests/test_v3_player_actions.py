@@ -27,6 +27,74 @@ ICONS=ROOT/os.environ.get('V3_POCKET_ICONS_BUILD','build/v3-held-pocket-icons-01
 INVENTORY=ROOT/os.environ.get('V3_INVENTORY_EQUIPMENT_BUILD','build/v3-inventory-equipment-03')
 TOOLS=ROOT/os.environ.get('V3_TOOL_CONTROLS_BUILD','build/v3-shared-tool-controls-02')
 TOOL_MOTION=ROOT/os.environ.get('V3_TOOL_MOTION_BUILD','build/v3-shared-tool-motion-02')
+TRANSITIONS=ROOT/os.environ.get('V3_TOOL_TRANSITIONS_BUILD','build/v3-shared-tool-transitions-01')
+
+
+@unittest.skipUnless((TRANSITIONS/'build-lock.json').is_file(),'Current tool transitions required')
+class ToolTransitionsTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.rom,cls.report=inputs(TRANSITIONS/'build-lock.json')
+        cls.base,cls.prior=inputs(TRANSITIONS/'base-lock.json')
+        cls.files,cls.before=by_vrom(cls.rom),by_vrom(cls.base)
+        cls.e=cls.report['equipment_resources'];cls.old=cls.prior['equipment_resources']
+        cls.transitions=cls.e['player_actions']['tool_transitions']
+
+    def test_six_complete_consumers_and_four_removed_call_relocations(self):
+        owner=self.files[actions.PLAYER_VROM].extract(self.rom)
+        previous=self.before[actions.PLAYER_VROM].extract(self.base);restored=bytearray(owner)
+        self.assertEqual(len(self.transitions['patches']),6)
+        for row in self.transitions['patches']:
+            at=row['address']-actions.PLAYER_RAM;n=len(bytes.fromhex(row['before']))
+            self.assertEqual(owner[at:at+n].hex(),row['after']);self.assertEqual(previous[at:at+n].hex(),row['before'])
+            restored[at:at+n]=bytes.fromhex(row['before'])
+        self.assertEqual(restored,previous)
+        for row in self.transitions['native_consumers']:
+            a,b=row['entry']-actions.PLAYER_RAM,row['end']-actions.PLAYER_RAM
+            self.assertEqual(sha256(restored[a:b]),row['sha256'])
+        rel=self.files[actions.PLAYER_RELOC].extract(self.rom);oldrel=self.before[actions.PLAYER_RELOC].extract(self.base)
+        sections=struct.unpack_from('>5I',rel);oldsections=struct.unpack_from('>5I',oldrel)
+        self.assertEqual(sections[:4],oldsections[:4]);self.assertEqual(sections[4],oldsections[4]-4)
+        removed=self.transitions['removed_relocations'];self.assertEqual(len(removed),4)
+        oldrows=struct.unpack_from('>'+str(oldsections[4])+'I',oldrel,20)
+        self.assertEqual(list(struct.unpack_from('>'+str(sections[4])+'I',rel,20)),[r for r in oldrows if r not in removed])
+        for base in (0x80200010,0x80378010):
+            spec=SimpleNamespace(ram=actions.PLAYER_RAM,resident_bytes=len(owner),sections=sections)
+            moved=relocate_verified_data(spec,owner,rel,base)
+            for row in self.transitions['patches']:
+                at=row['address']-actions.PLAYER_RAM
+                self.assertEqual(moved[at:at+len(bytes.fromhex(row['after']))].hex(),row['after'])
+
+    def test_exact_old_motion_code_and_all_resources_retained(self):
+        at=self.e['blob_offset'];start=at+actions.TOOL_MOTION_OFFSET;end=at+actions.PARENT_CODE_OFFSET
+        old=self.before[BLOB].extract(self.base);new=self.files[BLOB].extract(self.rom)
+        previous=self.old['player_actions']['tool_motion']['code'];current=self.transitions['code']
+        self.assertEqual(new[at:start+previous['bytes']],old[at:start+previous['bytes']])
+        self.assertEqual(new[end:at+self.e['bytes']],old[end:at+self.old['bytes']])
+        self.assertEqual(sha256(new[start:start+current['bytes']]),current['sha256'])
+        for name,address in previous['symbols'].items():self.assertEqual(current['symbols'][name],address)
+        for key in ('records','kind_readers','held_rig_actions','inventory_preview','room_rigs',
+                    'optional_selection','parent_readers','pocket_icons','catalogue','event_acquisition'):
+            self.assertEqual(self.e[key],self.old[key],key)
+        self.assertEqual(self.e['bytes'],self.old['bytes']);self.assertEqual(self.report['save_runtime'],self.prior['save_runtime'])
+        self.assertEqual(self.transitions['logical_imports_added'],0)
+        self.assertFalse(self.transitions['golden_effects_installed']);self.assertFalse(self.transitions['balloon_release_installed'])
+
+    def test_ups_composition_and_unrelated_cartridge_resources(self):
+        import v3_optional_composition as composer
+        native=(ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes()
+        self.assertEqual(apply_ups(native,(TRANSITIONS/'asset-loader.ups').read_bytes()),self.rom)
+        self.assertEqual(struct.unpack_from('>2I',self.rom,16),n64_checksum(self.rom))
+        for v in self.files.keys()-{BLOB,MODULE,actions.PLAYER_VROM,actions.PLAYER_RELOC}:
+            self.assertEqual(self.files[v].extract(self.rom),self.before[v].extract(self.base),hex(v))
+        pin=composer.BASE,composer.BASE_SHA,composer.REPORT_SHA,composer.ABI
+        try:
+            composer.use_build_lock(TRANSITIONS/'build-lock.json');catalogue=composer.catalogue(self.rom,self.report)
+            self.assertEqual(len(catalogue),128)
+            empty=composer.compose(self.rom,self.report,catalogue,composer.resolve(catalogue,[]))[0]
+            self.assertEqual(sha256(empty),self.report['translation_baseline']['sha256'])
+            self.assertEqual(composer.compose(self.rom,self.report,catalogue,composer.resolve(catalogue,list(catalogue)))[0],self.rom)
+        finally:composer.BASE,composer.BASE_SHA,composer.REPORT_SHA,composer.ABI=pin
 
 
 @unittest.skipUnless((TOOL_MOTION/'build-lock.json').is_file(),'Current shared tool motions required')
