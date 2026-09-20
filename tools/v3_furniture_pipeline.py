@@ -364,18 +364,26 @@ class Source:
                 functions=dict(move=receipt),runtime_installed=False,pending_callbacks=['move'],
                 null_callbacks=['create','draw','destroy','dma'],
                 resource_scope='complete static profile models; move behaviour and spawned effects remain pending')
+        sound=self.switch_sound_callback(receipt)
+        return models,{},dict(category='switch-trigger-sound',vtable_symbol=name,vtable_offset=at,
+            functions=dict(move=receipt),**sound,
+            null_callbacks=['create','draw','destroy','dma'])
+
+    def switch_sound_callback(self, receipt):
+        """Verify the shared move behaviour independently of its draw category."""
+        raw,actual=self.function(receipt['offset']);size=len(raw)
+        if receipt!=actual or size not in SWITCH_SOUND_CODE:
+            raise ReviewRequired('Unsupported complete switch-trigger move callback')
         digest,locations,call=SWITCH_SOUND_CODE[size]
         constants={loc:struct.unpack_from('>H',raw,loc)[0] for loc in locations}
         signed=struct.unpack_from('>h',raw,locations[-1])[0]
         sound=signed if len(locations)==1 else (constants[locations[0]]<<16)+signed
-        if not 0<=sound<=65535:reject('sound word exceeds its source encoding')
+        if not 0<=sound<=65535:raise ReviewRequired('Switch sound word exceeds its source encoding')
         helpers=self.checked_callback_code(receipt,size,digest,{},
             {call:(0x2BDDE8,'sAdo_OngenTrgStart')},'switch sound',constants)
-        return models,{},dict(category='switch-trigger-sound',vtable_symbol=name,vtable_offset=at,
-            functions=dict(move=receipt),helpers=helpers,sound_word=sound,
+        return dict(helpers=helpers,sound_word=sound,
             excluded_states=[13,14,15,12],state_offset=0x3C,switch_offset=0x12D,
-            switch_value=1,position_offset=8,runtime_installed=False,
-            null_callbacks=['create','draw','destroy','dma'])
+            switch_value=1,position_offset=8,runtime_installed=False)
 
     def indexed_sequence_models(self, name, at, functions, index):
         """Select complete ordered lists, retaining conditional translucent parts."""

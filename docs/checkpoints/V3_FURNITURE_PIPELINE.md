@@ -1,5 +1,93 @@
 # Automatic furniture pipeline checkpoint
 
+## Incremental shared furniture audio
+
+ABI 169 at `build/v3-material-trigger-runtime-04/` connects the existing
+switch-trigger behaviour to the complete material drawing of coin, ? block,
+and fire flower. The same complete move-function verifier serves ordinary and
+custom-drawn furniture; no object-specific behaviour implementation is added.
+`build/v3-material-trigger-audio-prepared-02/` contains their complete source
+programs, instruments, and samples. All existing artwork is reused in place.
+
+The importer accepts further audio batches. It verifies every existing table
+entry and program, preserves mapped IDs/priorities, rejects occupied slots, and
+reuses an already installed source program only if its complete binding agrees.
+Eight sound objects now share the runtime, and the complete font has 82
+instruments. The three new native words are bound from source `017A`, `017B`,
+and `017F`; existing five mappings do not change. The shared room packet code
+is unchanged from ABI 168. The material vtable gains the existing sound-move
+entry, with complete lifecycle readiness recorded only for those three objects.
+Ordinary profiles and acquisition remain pending; no new choices are enabled.
+
+Complete wave storage grows by 25,920 bytes. Its in-place path encounters
+unclaimed nonzero bytes after the current archive, followed by live overlays.
+Those bytes are not discarded. The shared allocator moves the full 5,566,960-byte
+archive to checked zero space at physical `032106B0`, preserving logical VROM
+`01A50000`. All six wave headers and the real native base load are updated;
+external wave two retains its absolute physical location. The old archive at
+`03800000`, all scenery/menu overlays, and their relocation resources stay intact.
+
+No audio heap growth is needed. Conservative permanent headroom is 352 bytes.
+The import blob is 4,360,256 bytes, leaving 1,931,200 bytes in its reservation.
+Saved format 3, selection bits, 136 choices, 26 rigs, 23 staged profiles, the
+main ABI-109 lock, and both served V2 patchers remain unchanged.
+
+Development build failures are retained:
+
+- `v3-material-trigger-runtime-01`: discovery annotated the move receipt inside
+  the artwork descriptor; installer correctly rejected the mismatch. Discovery
+  now validates a copy, and preparation `-02` keeps graphics descriptors intact.
+- `-02`: the first append reached additional installed scenery owners not in
+  the old blocker inventory. Their complete receipts join the permitted owners.
+- `-03`: the now-identified owners were not the only obstruction; nonzero
+  unclaimed gap data also prevents an append. Complete zero-gap relocation
+  supplies the general solution. No guard is removed or old data overwritten.
+- `-04`: complete build and UPS reconstruction succeed.
+
+Four `IncrementalBatchTests` pass on the first test invocation in 5.458 seconds.
+They check shared non-mutating discovery, changed-source rejection, complete
+retention of all 79 previous instruments, all three new instruments/programs,
+all eight priorities and mappings, repeat dependency reuse without duplication,
+changed-slot rejection, whole-wave relocation and every waveform group,
+the actual base-load address, unchanged scenery owners, allocation, callback
+bindings, saved profiles, all/empty composition, and full UPS reconstruction.
+
+The first silent native check at `build/v3-material-trigger-native-01/` passes
+75 records and 50 assertions, including 45 inside the shared audio probe.
+It verifies actual relocated headers, native pools, full tables/programs,
+all 82 loaded instruments and sample pointers, the newly mapped callback,
+lazy-loaded packet, real priorities, singleton suppression, and sample DMA for
+source `017A` and retained `8179`. The incremental probe selects its new batch
+and omits the already-passing unchanged state-condition matrix. Work/stack
+guards and saved profile remain intact; checkpoint restoration and clean exit
+pass. Audio is disabled; no supplied save or write permission is used.
+
+This does not prove ordinary furniture interaction, acquisition, material GPU
+appearance, PCM/listening quality, or hardware behaviour. Retain those limits
+while continuing primary profile/acquisition integration. Gold-tree effects and
+full golden-shovel acquisition remain required afterwards.
+
+Reproduction uses fresh output paths:
+
+```sh
+python3 tools/v3_furniture_pipeline.py convert --representation audio --assets-only \
+  --category material-frame-assets \
+  --base-lock build/v3-material-frames-runtime-02/build-lock.json \
+  --output build/material-audio-preparation-reproduction
+python3 tools/v3_furniture_install.py --refresh-runtime \
+  --base-lock build/v3-material-frames-runtime-02/build-lock.json \
+  --furniture-audio-art build/v3-material-trigger-audio-prepared-02 \
+  --output build/material-audio-runtime-reproduction
+PYTHONPATH=tests python3 -m unittest test_v3_furniture_audio.IncrementalBatchTests -v
+```
+
+Hashes:
+
+- ROM: `e10f6628db63198a0a40efe3aec7711fc6eb0a250b189852be4dc1c701ba4a74`.
+- UPS: `f95cd6cc70df42aacc90ce53c13d8e716729a703137f0389127c46edc05e8ed7`.
+- Report: `b3c6cb9e20d90dde62e94e6b4b256998f299357cf8a9b946c1a5ed1323df0b47`.
+- Native results: `170a9249b5eca7ebceb63060649166e7d970a8f6e37d2af34db92c0d32695ee9`.
+
 ## Shared material-frame renderer
 
 ABI 168 at `build/v3-material-frames-runtime-02/` installs one data-driven renderer

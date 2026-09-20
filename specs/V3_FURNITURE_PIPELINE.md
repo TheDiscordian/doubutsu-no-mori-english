@@ -804,6 +804,10 @@ callback-bearing object for silent decoration. Artwork can be prepared as a
 batch; native audio correspondence, callback integration, and acquisition remain
 required before metadata can permit installation. Additional particles, movement,
 or instrument behaviour reject rather than passing through this category.
+The same complete move verifier serves material-frame objects with exactly
+move/draw callbacks. Audio discovery inspects a copy of that move receipt so it
+does not mutate the independent prepared-artwork descriptor. Other lifecycle
+functions retain their own pending dependencies and cannot enter this adapter.
 
 `convert --representation audio --assets-only --category switch-trigger-sound`
 uses these source-derived records to prepare the whole category's audio in one
@@ -813,6 +817,9 @@ envelopes. Durations, velocities, pitches, tuning, and envelope data remain exac
 only verified instrument/selector/internal-address bindings change. Unsupported
 commands, ambiguous boundaries, and unaccounted bytes reject. Full trigger words
 retain their single-instance flag separately from the source dispatch identity.
+Using `--category material-frame-assets` prepares matching material triggers
+through the same path. Already installed furniture audio is excluded by the
+current source-bound manifest, without an item-specific exclusion list.
 
 The font builder grows its pointer table once, relocates all original live bank
 pointers, and preserves every existing instrument. Wave offsets and tuning words
@@ -839,13 +846,30 @@ single-instance flags stay in the mapped word. The original N64 dispatcher does
 not implement that flag, so the category callback checks all six actual live
 trigger slots before dispatch. It preserves native actor state and the owner's
 switch-change flag. No per-object behaviour script is required.
+Later batches validate the full existing dispatch tables and original table
+prefixes, every installed program, priorities, and native identities. They fill
+only verified vacant slots and retain the current tables instead of appending
+another pair. Identical existing source programs are reused only when complete
+current instrument/program bindings agree. One sound callback serves ordinary
+and material drawing; the material vtable gains that move entry only after its
+complete prepared artwork and checked move category are installed. Ordinary
+profiles and acquisition remain independent requirements.
 
 The complete new sequence and font use the import resource. The wave group keeps
-its physical start and complete existing prefix. Its checked append can relocate
+its complete existing prefix. Its checked in-place append can relocate
 only declared, hash-verified DMA owners blocking the extension; those owners keep
 their complete contents and virtual identities. Unknown owners and nonzero
 unowned gaps reject. The normal cartridge-tail allocator places the blockers
 outside the expanded wave group and all other live owners.
+If an in-place append is unavailable, the complete archive can move to a
+sixteen-byte-aligned, fully zero, unmapped cartridge gap beyond the import
+reservation. Logical VROM identity is retained; all six wave headers and the
+actual native base-load instruction pair are rebound together. External wave
+resources retain their absolute physical locations using the verified unsigned
+header addition. Existing copies remain untouched, and unclaimed nonzero data
+is never silently reclaimed. Final cartridge extraction verifies the complete
+changed archive. Neither this relocation nor a sample append inherently grows
+resident RAM.
 
 Permanent audio capacity accounts for every actual permanent header with native
 alignment. Required growth rounds upward to 1 KiB and updates both malloc

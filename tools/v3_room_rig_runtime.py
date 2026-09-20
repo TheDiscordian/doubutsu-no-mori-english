@@ -355,7 +355,8 @@ def publish_packet(equipment,blob,output):
     if material_rows:
         entry=bootstrap['symbols']['af_v3_room_boot_material_dw']
         if entry&3 or not RAM<=entry<RAM+len(boot):raise ValueError('Material bootstrap escapes reservation')
-        material_vtable=struct.pack('>5I',0,0,entry,0,0)
+        move=bootstrap['symbols']['af_v3_room_boot_sound_mv'] if any(r.get('move_category')=='switch-trigger-sound' for r in material_rows) else 0
+        material_vtable=struct.pack('>5I',0,move,entry,0,0)
         module[MATERIAL_VTABLE-EQUIPMENT_RAM:MATERIAL_VTABLE-EQUIPMENT_RAM+20]=material_vtable
         runtime.update(material_vtable=MATERIAL_VTABLE,material_vtable_hex=material_vtable.hex(),material_table=MATERIAL_TABLE)
     module[VTABLE-EQUIPMENT_RAM:VTABLE-EQUIPMENT_RAM+20]=vtable

@@ -2722,6 +2722,8 @@ def furniture_audio(debug,rom_path,record):
     path=Path(rom_path);image=path.read_bytes();report=json.loads((path.parent/'build.json').read_bytes())
     if sha256(image)!=report['output_sha256']:raise ValueError('Changed furniture-audio cartridge')
     e=report['equipment_resources'];audio=e['furniture_audio'];rig=e['room_rigs'];files=by_vrom(image)
+    newest=audio.get('batches',[dict(programs=audio['programs'])])[-1]['programs']
+    incremental=len(newest)<len(audio['programs'])
     core=files[CODE_VROM].extract(image);blob=files[runtime.BLOB].extract(image);boot=boot_proofs(image);assertions=0
     def check(label,at,want):
         nonlocal assertions
@@ -2786,9 +2788,11 @@ def furniture_audio(debug,rom_path,record):
     try:
         check('original position dispatcher before isolated recorder',native_entry,native_bytes)
         debug.write_memory(native_entry,recorder);call(0x8002FE00,[native_entry,24]);call(0x80034CE0,[native_entry,24])
-        row=next(r for r in rig['sound_rows'] if r['native_sound_word']&0x8000)
-        for action,changed,alias in ((0,1,False),(12,1,False),(13,1,False),(14,1,False),(15,1,False),
-                                     (0,0,False),(0,2,False),(-1,1,True)):
+        row=(next(r for r in rig['sound_rows'] if r['native_sound_word']==newest[0]['native_sound_word']) if incremental else
+             next(r for r in rig['sound_rows'] if r['native_sound_word']&0x8000))
+        cases=((0,1,False),) if incremental else ((0,1,False),(12,1,False),(13,1,False),(14,1,False),(15,1,False),
+                                                (0,0,False),(0,2,False),(-1,1,True))
+        for action,changed,alias in cases:
             debug.write_memory(actor,struct.pack('>H',row['runtime_index']+(1024 if alias else 0)))
             debug.write_memory(actor+0x3C,struct.pack('>h',action));debug.write_memory(actor+0x12D,bytes((changed,)))
             debug.write_memory(capture,bytes(8));before=debug.read_memory(actor,0x740)
@@ -2799,7 +2803,7 @@ def furniture_audio(debug,rom_path,record):
         debug.write_memory(native_entry,native_bytes);call(0x8002FE00,[native_entry,24]);call(0x80034CE0,[native_entry,24])
         check('complete lazy-loaded room packet',rig['packet']['ram'],
               blob[rig['packet']['blob_offset']:rig['packet']['blob_offset']+rig['packet']['bytes']])
-        selected=[max(audio['programs'],key=lambda r:len(r['source_program']['events'])),
+        selected=[max(newest,key=lambda r:len(r['source_program']['events'])),
                   next(r for r in audio['programs'] if r['singleton'])]
         debug.write_memory(0x80113844,b'\x01')
         mic=bounded(call(0x80060D6C,[word(0x8010EF90)]),12)
@@ -2842,6 +2846,7 @@ def furniture_audio(debug,rom_path,record):
         debug.write_memory(0x80113844,saved_scene)
         call(0x8009C040,[allocation])
     return dict(native_furniture_audio=True,assertions=assertions,sample_representatives=len(observed),
+        incremental_batch=incremental,source_sound_words=[r['source_sound_word'] for r in selected],
         callback_dispatch_recorder=True,ordinary_room_interaction=False,physical_audio_played=False,
         pcm_or_listening_verified=False,requires_checkpoint_restore=True)
 

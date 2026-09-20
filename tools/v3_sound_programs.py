@@ -228,18 +228,39 @@ def prepare_triggers(image,report,sound_words):
         native_synthesis_tested=False,physical_audio_played=False)
 
 
+def furniture_trigger(source,profile):
+    """Recognize move-only triggers with ordinary or complete custom drawing."""
+    adapter=profile.get('callback_adapter',{})
+    functions=adapter.get('functions',{})
+    if adapter.get('category')=='switch-trigger-sound':
+        if set(functions)!={'move'}:raise ValueError('Changed ordinary trigger lifecycle')
+        # Source.profile already verifies and annotates this direct callback.
+        return {k:copy.deepcopy(adapter[k]) for k in ('helpers','sound_word','excluded_states',
+            'state_offset','switch_offset','switch_value','position_offset','runtime_installed')}
+    elif adapter.get('category')=='material-frame-assets':
+        if set(functions)!={'move','draw'}:return None
+    else:return None
+    # Callback validation annotates its receipt. Keep prepared graphics
+    # descriptors unchanged when another subsystem inspects their behaviour.
+    return source.switch_sound_callback(copy.deepcopy(functions['move']))
+
+
 def prepare_furniture_audio(image,report,source,inventory,output,selected=(),category=None):
     """Select a shared furniture behaviour once and prepare all its audio dependencies."""
     from apply_translation import write_new
-    rows=[r for r in inventory['rows'] if not r['installed'] and r.get('asset_ready') and
-          r.get('profile',{}).get('callback_adapter',{}).get('category')=='switch-trigger-sound' and
-          (not selected or r['item_id'] in selected) and
-          (category is None or category in r['categories'])]
+    installed={r['item_id'] for r in report['equipment_resources'].get('furniture_audio',{}).get('furniture',[])}
+    rows=[];triggers={}
+    for r in inventory['rows']:
+        if (r['installed'] or r['item_id'] in installed or not r.get('asset_ready') or
+                selected and r['item_id'] not in selected or category is not None and category not in r['categories']):continue
+        trigger=furniture_trigger(source,r.get('profile',{}))
+        if trigger is not None:rows.append(r);triggers[r['item_id']]=trigger
     if not rows or selected and set(selected)!={r['item_id'] for r in rows}:
         raise ValueError('Unsupported or empty furniture audio selection')
-    resources,result=prepare_triggers(image,report,[r['profile']['callback_adapter']['sound_word'] for r in rows])
+    resources,result=prepare_triggers(image,report,[triggers[r['item_id']]['sound_word'] for r in rows])
     result['furniture']=[dict(item_id=r['item_id'],name=r['name'],
-        profile_sha256=r['profile']['profile_sha256'],callback=r['profile']['callback_adapter']) for r in rows]
+        profile_sha256=r['profile']['profile_sha256'],callback=r['profile']['callback_adapter'],
+        trigger=triggers[r['item_id']]) for r in rows]
     result['source_rel_sha256']=sha256(source.rel)
     result['source_symbols_sha256']=sha256(source.symbols.encode())
     result['sources']={p:sha256((ROOT/p).read_bytes()) for p in SOURCES+('tools/v3_furniture_pipeline.py',)}
@@ -553,13 +574,41 @@ def grow_permanent_heap(code):
     return growth,patches
 
 
-def register_triggers(sequence,programs,fragments,counts,native_priority,source_priority):
+def register_triggers(sequence,programs,fragments,counts,native_priority,source_priority,*,previous=None):
     """Extend whole dispatch tables while preserving shared cross-group priorities."""
-    if len(native_priority)!=128 or len(source_priority)!=128 or set(counts)!={1,4}:
+    if (len(native_priority)!=128 or len(source_priority)!=128 or set(counts)!={1,4} or
+            any(type(n) is not int or not 0<n<=128 for n in counts.values())):
         raise ValueError('Unsupported complete trigger dispatch contract')
-    result=bytearray(sequence);tables={};rows=[];used=set()
+    result=bytearray(sequence);tables={};rows=[];used=set();retained={}
+    if previous is not None:
+        retained={r['source_sound_word']:r for r in previous['programs']}
+        if len(retained)!=len(previous['programs']):raise ValueError('Duplicate retained source trigger')
+        tables={r['group']:copy.deepcopy(r) for r in previous['tables']}
+        if set(tables)!=set(counts) or len(tables)!=len(previous['tables']):raise ValueError('Incomplete retained trigger tables')
+        for group,count in sorted(counts.items()):
+            table=tables[group]
+            if (table['count']!=128 or table['previous_count']!=count or
+                    struct.unpack_from('>H',sequence,0x188+group*2)[0]!=table['offset']):
+                raise ValueError('Changed retained trigger table binding')
+            original=list(struct.unpack('>'+str(count)+'H',span(sequence,table['previous_offset'],count*2)))
+            if any(p>=len(sequence) for p in original) or sequence[original[0]]!=255:
+                raise ValueError('Changed original trigger pointers or terminator')
+            expected=original+[original[0]]*(128-count)
+            for row in retained.values():
+                word=row['native_sound_word'];g,index=(word&0x7FFF)>>8,word&255
+                if g!=group:continue
+                if (not count<=index<128 or (g,index) in used or
+                        native_priority[index]!=row['trigger_priority'] or
+                        (word&0x8000)!=(row['source_sound_word']&0x8000) or
+                        sha256(span(sequence,row['offset'],row['bytes']))!=row['sha256']):
+                    raise ValueError('Changed retained complete trigger or native identity')
+                used.add((g,index));expected[index]=row['offset']
+            if span(sequence,table['offset'],256)!=struct.pack('>128H',*expected):
+                raise ValueError('Occupied or changed retained trigger dispatch slot')
+        if len(used)!=len(retained):raise ValueError('Retained trigger has unsupported native group')
     for group,count in sorted(counts.items()):
         if not 0<count<=128:raise ValueError('Invalid native trigger table count')
+        if previous is not None:continue
         old=struct.unpack_from('>H',sequence,0x188+group*2)[0]
         pointers=list(struct.unpack('>'+str(count)+'H',span(sequence,old,count*2)))
         if any(p>=len(sequence) for p in pointers) or sequence[pointers[0]]!=255:
@@ -574,13 +623,21 @@ def register_triggers(sequence,programs,fragments,counts,native_priority,source_
         if group not in counts or index>=128 or source_word in used:
             raise ValueError('Unsupported or duplicate trigger identity')
         used.add(source_word);priority=source_priority[index];count=counts[group]
+        raw=fragments[row['fragment_file']];origin=row['fragment_origin']
+        if len(raw)!=row['bytes'] or sha256(raw)!=row['sha256']:raise ValueError('Changed complete prepared trigger')
+        desc=trigger_program(bytes(origin)+raw,origin,origin+len(raw))
+        if source_word in retained:
+            old=retained[source_word]
+            bound=bind_trigger(raw,desc,old['offset'],row['native_selector'],row['native_instrument'])
+            if (old['source_program']!=row['source_program'] or old['trigger_priority']!=priority or
+                    old['native_instrument']!=row['native_instrument'] or
+                    span(sequence,old['offset'],old['bytes'])!=bound):
+                raise ValueError('Reused trigger differs from complete current source')
+            rows.append(copy.deepcopy(old));continue
         available=[i for i in range(count,128) if native_priority[i]==priority and (group,i) not in used]
         if not available:raise ValueError('No vacant native trigger with matching source priority')
         target=index if index in available else available[0];used.add((group,target))
         native_word=(source_word&0x8000)|(group<<8)|target
-        raw=fragments[row['fragment_file']];origin=row['fragment_origin']
-        if len(raw)!=row['bytes'] or sha256(raw)!=row['sha256']:raise ValueError('Changed complete prepared trigger')
-        desc=trigger_program(bytes(origin)+raw,origin,origin+len(raw))
         result.extend(bytes((len(result)^origin)&1));at=len(result)
         bound=bind_trigger(raw,desc,at,row['native_selector'],row['native_instrument']);result.extend(bound)
         struct.pack_into('>H',result,tables[group]['offset']+target*2,at)
@@ -596,28 +653,32 @@ def register_triggers(sequence,programs,fragments,counts,native_priority,source_
 def install_furniture(image,prior,blob,code,original,output,directory):
     """Install the complete prepared sound category and its shared room callback."""
     from aflib import CODE_VROM
-    from v3_furniture_install import append_resource_plan
+    from v3_furniture_install import append_resource_plan,relocate_resource_plan
     from v3_furniture_pipeline import Source
     from v3_registry import furniture_representation_identity
     import v3_room_rig_runtime as room
     directory=directory.resolve();raw=(directory/'audio.json').read_bytes();prepared=json.loads(raw)
     if (not directory.is_relative_to(ROOT/'build') or prepared['format']!='AFV3-TRIGGER-AUDIO-PREPARED-1'
-            or prepared['base_sha256']!=sha256(image) or prior['equipment_resources'].get('furniture_audio')):
-        raise ValueError('Furniture audio needs its checked current base and a fresh batch')
+            or prepared['base_sha256']!=sha256(image)):
+        raise ValueError('Furniture audio needs its checked current base')
+    previous=prior['equipment_resources'].get('furniture_audio')
     source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
         (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
     if (prepared['source_rel_sha256']!=sha256(source.rel) or
             prepared['source_symbols_sha256']!=sha256(source.symbols.encode())):
         raise ValueError('Changed furniture source resources')
-    furniture=prepared['furniture'];seen=set()
+    furniture=prepared['furniture'];seen={int(r['item_id'],16) for r in previous['furniture']} if previous else set()
+    triggers={}
     for row in furniture:
         item=int(row['item_id'],16);profile=source.profile(item)
         if (item in seen or row['profile_sha256']!=profile['profile_sha256'] or
-                row['callback']!=json.loads(json.dumps(profile.get('callback_adapter',{}))) or
-                row['callback']['category']!='switch-trigger-sound'):
+                row['callback']!=json.loads(json.dumps(profile.get('callback_adapter',{})))):
             raise ValueError('Changed complete furniture sound callback')
-        seen.add(item)
-    resources,audio=prepare_triggers(image,prior,[r['callback']['sound_word'] for r in furniture])
+        trigger=furniture_trigger(source,profile)
+        if trigger is None or row.get('trigger',json.loads(json.dumps(trigger)))!=json.loads(json.dumps(trigger)):
+            raise ValueError('Changed shared furniture trigger behaviour')
+        seen.add(item);triggers[row['item_id']]=trigger
+    resources,audio=prepare_triggers(image,prior,[r['sound_word'] for r in triggers.values()])
     for key in ('programs','layout','previous','font_index','wave_index','source_sequence_sha256'):
         if json.loads(json.dumps(audio[key]))!=prepared[key]:raise ValueError('Changed complete prepared audio identity')
     all_data={'font.bin':resources['font'],'wave.bin':resources['wave'],**resources['fragments']}
@@ -636,14 +697,24 @@ def install_furniture(image,prior,blob,code,original,output,directory):
     old_sequence=prior['equipment_resources']['sound_programs']['sequence']
     if (sha256(sequence)!=old_sequence['sha256'] or physical!=old_sequence['physical'] or
             entry.hex()!=old_sequence['header_after'] or
-            struct.unpack_from('>H',sequence,0x18A)[0]!=0x4C30 or
-            struct.unpack_from('>2H',sequence,0x190)!=(0x33E,0x3DA) or
-            prior['speed_bag_sound']['sequence_group_one_count']!=106):
+            struct.unpack_from('>H',sequence,0x192)[0]!=0x3DA or
+            previous is None and (struct.unpack_from('>H',sequence,0x18A)[0]!=0x4C30 or
+                struct.unpack_from('>H',sequence,0x190)[0]!=0x33E or
+                prior['speed_bag_sound']['sequence_group_one_count']!=106)):
         raise ValueError('Changed complete current trigger tables')
     dol,_=read_audio_donor(ROOT/'local/gamecube/Animal Crossing (USA, Canada).ciso')
     priority=span(code,0x80113B84-CODE_RAM,128)
+    if previous:
+        for key,kind,index in (('font','bank',audio['font_index']),('wave','wave',audio['wave_index']),('sequence','seq',199)):
+            data,header,physical=installed_resource(image,code,kind,index);record=previous[key]
+            if (record['sha256']!=sha256(data) or record['header_after']!=header.hex() or
+                    record['physical']!=physical):raise ValueError('Changed retained complete furniture audio resource')
+        if (sha256(priority)!=previous['priority_table_sha256'] or prior['speed_bag_sound']['sequence_group_one_count']!=128 or
+                previous['format']!='AFV3-FURNITURE-TRIGGER-AUDIO-1'):
+            raise ValueError('Changed retained furniture audio dispatch contract')
     new_sequence,programs,tables=register_triggers(sequence,audio['programs'],resources['fragments'],
-        {1:106,4:78},priority,dol.read(0x800A9A90,128))
+        {r['group']:r['previous_count'] for r in previous['tables']} if previous else {1:106,4:78},
+        priority,dol.read(0x800A9A90,128),previous=previous)
     before_budget=permanent_budget(code)
     def store(kind,index,data,*,count=None):
         old,header,_=installed_resource(image,code,kind,index)
@@ -666,48 +737,107 @@ def install_furniture(image,prior,blob,code,original,output,directory):
     new_waves=old_waves+resources['wave'][len(wave):]
     relocatable={r['vrom']:r['output_sha256'] for r in prior['equipment_resources']['wrapped_presents']['consumers']}
     relocatable.update({r['vrom']:r['sha256'] for r in prior['equipment_resources']['player_actions']['balloon_menu']['owner_resizes']})
-    changes,growth=append_resource_plan(image,files,NATIVE_VROMS['wave'],new_waves,relocatable)
-    new_header=bytearray(header);struct.pack_into('>I',new_header,4,len(resources['wave']))
-    address=NATIVE_HEADERS['wave']+16+audio['wave_index']*16
-    code[address-CODE_RAM:address-CODE_RAM+16]=new_header
-    wave_record=dict(index=audio['wave_index'],physical=physical,
+    # Later batches may reach complete scenery owners already moved behind
+    # the wave archive. Their loaders use logical VROM/relocation identities,
+    # not physical cartridge positions. Accept only installed owner receipts;
+    # the shared append planner verifies their complete bytes before moving.
+    scenery=prior['equipment_resources'].get('scenery',{})
+    for category in ('daily_growth','field_insects'):
+        owner=scenery.get(category)
+        if owner:
+            relocatable.update({owner['vrom']:owner['sha256'],owner['reloc']:owner['reloc_sha256']})
+    if new_waves==old_waves:changes,growth={},None
+    else:
+        try:changes,growth=append_resource_plan(image,files,NATIVE_VROMS['wave'],new_waves,relocatable)
+        except ValueError as error:
+            changes,growth=relocate_resource_plan(image,files,NATIVE_VROMS['wave'],new_waves,
+                minimum_physical=0x3000000)
+            growth['in_place_rejection']=str(error)
+    wave_base=growth['physical'] if growth else wave_owner.pstart
+    # The native initializer uses unsigned ADDU to turn header offsets into
+    # physical addresses. Moving the complete wave archive must also retain
+    # external waveform resources and change the actual base-load instructions.
+    if span(code,0x800EA944-CODE_RAM,12)!=bytes.fromhex('8CD800100305C821ACD90010'):
+        raise ValueError('Changed unsigned native audio header initialization')
+    old_load=struct.pack('>2I',0x3C0E0000|((wave_owner.pstart+0x8000)>>16),0x25CE0000|(wave_owner.pstart&65535))
+    new_load=struct.pack('>2I',0x3C0E0000|((wave_base+0x8000)>>16),0x25CE0000|(wave_base&65535))
+    if span(code,0x800D28DC-CODE_RAM,8)!=old_load:raise ValueError('Changed native wave archive base')
+    code[0x800D28DC-CODE_RAM:0x800D28DC-CODE_RAM+8]=new_load
+    header_count=struct.unpack_from('>H',code,NATIVE_HEADERS['wave']-CODE_RAM)[0]
+    if header_count!=6:raise ValueError('Changed native wave resource count')
+    wave_headers=[]
+    for index in range(header_count):
+        address=NATIVE_HEADERS['wave']+16+index*16
+        before=bytes(code[address-CODE_RAM:address-CODE_RAM+16]);offset,length=struct.unpack_from('>2I',before)
+        if not length or before[8:10]!=bytes((2,4)):raise ValueError('Changed native streamed-wave contract')
+        outside=not 0<=offset<=len(old_waves)-length
+        old_physical=(wave_owner.pstart+offset)&0xFFFFFFFF
+        if outside:
+            data,_,actual=installed_resource(image,code,'wave',index)
+            if actual!=old_physical or index==audio['wave_index']:raise ValueError('Invalid external wave binding')
+            new_physical=old_physical
+        else:new_physical=wave_base+offset
+        size=len(resources['wave']) if index==audio['wave_index'] else length
+        after=bytearray(before);struct.pack_into('>2I',after,0,(new_physical-wave_base)&0xFFFFFFFF,size)
+        code[address-CODE_RAM:address-CODE_RAM+16]=after
+        wave_headers.append(dict(index=index,address=address,before=before.hex(),after=after.hex(),
+            physical_before=old_physical,physical=new_physical,bytes=size,external_resource_retained=outside))
+    selected=wave_headers[audio['wave_index']]
+    wave_record=dict(index=audio['wave_index'],physical=selected['physical'],
         vrom=wave_owner.vstart+physical-wave_owner.pstart,bytes=len(resources['wave']),
-        sha256=sha256(resources['wave']),header_address=address,header_before=header.hex(),header_after=new_header.hex())
+        sha256=sha256(resources['wave']),header_address=selected['address'],header_before=header.hex(),header_after=selected['after'])
     heap_growth,patches=grow_permanent_heap(code)
     result=copy.deepcopy(prior['equipment_resources']);runtime=result['room_rigs']
     packet=runtime['packet'];at=packet['blob_offset']
-    if runtime.get('sound_rows') or sha256(blob[at:at+packet['bytes']])!=packet['sha256']:
-        raise ValueError('Changed complete room packet or existing furniture sound batch')
+    packet_data=blob[at:at+packet['bytes']]
+    if (sha256(packet_data)!=packet['sha256'] or packet_data[4096:]!=room.encode_packet(
+            runtime['rows'],runtime.get('sound_rows',[]),runtime.get('material_rows',[]))):
+        raise ValueError('Changed complete shared room packet')
+    old_sound_rows=runtime.get('sound_rows',[])
+    expected_members={r['item_id'] for r in previous['furniture']} if previous else set()
+    if {r['source_item_id'] for r in old_sound_rows}!=expected_members:
+        raise ValueError('Changed retained furniture sound membership')
     mapping={r['source_sound_word']:r for r in programs};sound_rows=[]
     for row in furniture:
         index,destination=furniture_representation_identity(int(row['item_id'],16))
         sound_rows.append(dict(source_item_id=row['item_id'],item_id=f'{destination:04X}',runtime_index=index,
-            source_sound_word=row['callback']['sound_word'],
-            native_sound_word=mapping[row['callback']['sound_word']]['native_sound_word'],
+            source_sound_word=triggers[row['item_id']]['sound_word'],
+            native_sound_word=mapping[triggers[row['item_id']]['sound_word']]['native_sound_word'],
             profile_installed=False,parent_selectable=False))
-    runtime['sound_rows']=sorted(sound_rows,key=lambda r:r['runtime_index'])
+        if row['callback']['category']=='material-frame-assets':
+            material=next((r for r in runtime.get('material_rows',[]) if r['source_item_id']==row['item_id']),None)
+            if (material is None or material['source']['profile']!=json.loads(json.dumps(source.profile(int(row['item_id'],16)))) or
+                    sha256(blob[material['blob_offset']:material['blob_offset']+material['bytes']])!=material['sha256']):
+                raise ValueError('Trigger lifecycle requires its complete installed material renderer/assets')
+            material.update(lifecycle_installed=True,move_category='switch-trigger-sound')
+    runtime['sound_rows']=sorted(old_sound_rows+sound_rows,key=lambda r:r['runtime_index'])
     room.publish_packet(result,blob,output)
     shared=result['sound_programs'];shared['previous_sequence']=copy.deepcopy(old_sequence);shared['sequence']=seq
     shared.setdefault('trigger_batches',[]).append(dict(programs=programs,tables=tables))
     shared.update(after_budget=permanent_budget(code),native_synthesis_tested=False)
     result['furniture_audio']=dict(format='AFV3-FURNITURE-TRIGGER-AUDIO-1',prepared_sha256=sha256(raw),
-        furniture=furniture,programs=programs,tables=tables,layout=audio['layout'],
+        furniture=sorted((previous['furniture'] if previous else [])+furniture,key=lambda r:r['item_id']),
+        programs=sorted({r['source_sound_word']:r for r in (previous['programs'] if previous else [])+programs}.values(),
+            key=lambda r:r['source_sound_word']),tables=tables,layout=audio['layout'],
         sequence=seq,font=bank,wave=wave_record,native_dispatch=contracts,
         singleton_guard=dict(callback=True,native_dispatcher_supports_flag=False,slots=6,ram=0x80113C34,stride=32),
         priority_table_sha256=sha256(priority),before_budget=before_budget,after_budget=permanent_budget(code),
         audio_heap_growth=heap_growth,heap_patches=patches,resource_growth=growth,
         runtime_installed=True,dispatch_and_priority_installed=True,allocation_installed=True,callback_installed=True,
         profiles_installed=False,ordinary_acquisition_tested=False,native_synthesis_tested=False,physical_audio_played=False)
+    result['furniture_audio']['batches']=(copy.deepcopy(previous.get('batches',[])) if previous else [])+[
+        dict(prepared_sha256=sha256(raw),source_items=[r['item_id'] for r in furniture],
+             programs=programs,heap_growth=heap_growth,resource_growth=growth)]
     fire=copy.deepcopy(prior['fire_sound'])
     fire['resources'].update(seq=seq,bank=bank,wave=wave_record)
-    fire['wave_file'].update(bytes=len(new_waves),sha256=sha256(new_waves))
+    fire['wave_file'].update(physical=wave_base,bytes=len(new_waves),sha256=sha256(new_waves))
+    if wave_base!=wave_owner.pstart:
+        fire['wave_file'].update(old_physical=wave_owner.pstart,retains_old_allocation=True)
+    fire['wave_headers']=wave_headers
     fire['heap_settings']=list(struct.unpack_from('>3I',code,0x80119A44-CODE_RAM))
     fire['after_budget']=permanent_budget(code)
-    for row in fire['wave_headers']:
-        if row['index']==audio['wave_index']:
-            row.update(before=header.hex(),after=new_header.hex(),bytes=len(resources['wave']))
     speed=copy.deepcopy(prior['speed_bag_sound']);speed['sequence_group_one_count']=128
-    return result,changes,dict(fire_sound=fire,speed_bag_sound=speed,resource_growth=[growth])
+    return result,changes,dict(fire_sound=fire,speed_bag_sound=speed,resource_growth=[growth] if growth else [])
 
 
 def install(image,prior,blob,code,source_ids):

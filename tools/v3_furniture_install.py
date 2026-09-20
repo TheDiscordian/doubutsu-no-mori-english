@@ -490,6 +490,29 @@ def append_resource_plan(base,files,vrom,data,relocatable):
         bytes=len(data),previous_sha256=sha256(before),sha256=sha256(data),relocated_blockers=blockers)
 
 
+def relocate_resource_plan(base,files,vrom,data,*,minimum_physical):
+    """Keep a whole growing resource in verified zero, unmapped cartridge space.
+
+    Logical identity is retained. Callers must update any physical readers;
+    old copies are left untouched, never treated as free data merely because
+    they are absent from the current DMA directory.
+    """
+    entry=files[vrom];before=entry.extract(base)
+    if (entry.pend or len(data)<=len(before) or data[:len(before)]!=before or
+            any(e.vstart<vrom+len(data) and vrom<e.vend for v,e in files.items() if v!=vrom)):
+        raise ValueError('Relocation needs a complete non-overlapping append')
+    occupied=sorted((e.pstart,e.pend or e.pstart+e.size) for e in files.values() if e.pstart!=0xFFFFFFFF)
+    cursor=minimum_physical
+    for first,last in occupied+[(len(base),len(base))]:
+        start=(cursor+15)&~15
+        if start+len(data)<=first and not any(base[start:start+len(data)]):
+            return {vrom:data},dict(vrom=vrom,physical=start,previous_physical=entry.pstart,
+                previous_bytes=entry.size,bytes=len(data),previous_sha256=sha256(before),sha256=sha256(data),
+                relocated_blockers=[],relocated=True,retains_old_allocation=True)
+        cursor=max(cursor,last)
+    raise ValueError('No verified zero cartridge gap for complete resource growth')
+
+
 def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=False, equipment_kinds=False,
                     player_actions=False, item_category_art=None, ground_categories=False, event_acquisition=False,
                     held_collection=False, held_catalogue_art=None, held_selection=False, translation_updates=False,
@@ -627,10 +650,17 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             entry=files[vrom]
             if vrom in growth_vroms:
                 row=next(r for r in growth if r['vrom']==vrom)
-                if (entry.pend or entry.size!=row['previous_bytes'] or entry.pstart!=row['physical']
+                if (entry.pend or entry.size!=row['previous_bytes'] or entry.pstart!=row.get('previous_physical',row['physical'])
                         or len(data)!=row['bytes'] or sha256(data)!=row['sha256']
                         or sha256(entry.extract(base))!=row['previous_sha256']):
-                    raise ValueError('Changed complete in-place growth plan')
+                    raise ValueError('Changed complete resource growth plan')
+                if row.get('relocated'):
+                    start,end=row['physical'],row['physical']+row['bytes']
+                    if (start&15 or not 0<=start<end<=len(base) or any(base[start:end]) or
+                            any(e.pstart<end and start<(e.pend or e.pstart+e.size)
+                                for e in files.values() if e.pstart!=0xFFFFFFFF) or
+                            any(r is not row and r['physical']<end and start<r['physical']+r['bytes'] for r in growth)):
+                        raise ValueError('Relocated resource overlaps occupied or nonzero cartridge data')
                 continue
             if vrom in forced_moves:
                 if data!=entry.extract(base):raise ValueError('Relocated blocker changes its complete contents')
@@ -667,7 +697,8 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         owner_moves=owner_tail_storage(base,files,external,
             minimum_end=max([files[BLOB].pstart+len(blob)]+[r['physical']+r['bytes'] for r in growth]))
         owner_moves.extend(dict(vrom=r['vrom'],bytes=r['bytes'],physical=r['physical'],
-            storage='checked-in-place-append',sha256=r['sha256'],original_sha256=r['previous_sha256']) for r in growth)
+            storage='checked-zero-gap' if r.get('relocated') else 'checked-in-place-append',
+            sha256=r['sha256'],original_sha256=r['previous_sha256']) for r in growth)
     abi=prior['runtime_abi']+1; struct.pack_into('>I',blob,4,abi)
     package=blob[PACKAGE:PACKAGE+PACKAGE_SIZE]; struct.pack_into('>I',blob,0xF8,zlib.crc32(package))
     old=prior['startup']

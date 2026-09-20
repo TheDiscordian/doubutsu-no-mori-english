@@ -18,7 +18,29 @@ served patchers retain their existing builds.
 
 ## Active development
 
-The current explicit proposal is ABI 168 at
+The current explicit proposal is ABI 169 at
+`build/v3-material-trigger-runtime-04/build-lock.json`. Shared audio installation
+accepts incremental batches, preserves previous sound identities and complete
+instruments/samples, and connects the existing switch-trigger callback to coin,
+? block, and fire flower's installed material renderer. Their three full sound
+programs/instruments are installed alongside the five previous sound objects.
+All 82 instruments fit the existing audio allocation, with 352 bytes of
+conservative permanent headroom. Ordinary profiles and acquisition remain pending;
+this batch does not add selectable choices.
+
+The shared allocator relocates the complete wave archive into verified empty
+cartridge space when an in-place append encounters occupied or unclaimed data.
+All six headers and the native base load follow the new location; external wave
+resources and the old allocation remain intact. Four current-build checks pass.
+The first silent native run passes 75 records and 50 assertions, including
+complete instrument/sample relocation, one new and one retained real sample
+transfer, guards, checkpoint restoration, and clean exit. Ordinary interaction,
+GPU appearance, listening, and hardware are not claimed verified. See the
+[incremental-audio checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#incremental-shared-furniture-audio).
+The 136 choices, saved format 3, main lock, and both served V2 patchers are unchanged.
+Continue primary profiles/acquisition before required gold-tree completion.
+
+The shared material-renderer integration is retained from ABI 168 at
 `build/v3-material-frames-runtime-02/build-lock.json`. One shared material renderer
 and all six complete frame-bank objects are installed, reusing the 17,104-byte
 prepared batch without recompiling artwork. Palette cycles, animated textures,
@@ -27,8 +49,9 @@ The code and tables fit the existing room packet; no resident allocation grows.
 Four current-build checks pass, including sanitizer execution of the renderer,
 complete frame order, malformed-input rejection, and unchanged existing choices,
 profiles, saves, and translation-only output. Native execution and GPU appearance
-remain unverified. Actual interaction/audio and acquisition remain pending, so
-none of these six objects is selectable. See the
+remain unverified. Coin, ? block, and fire flower's trigger lifecycles are
+connected above; the other three lifecycles and all six acquisition routes remain
+pending, so none of these objects is selectable. See the
 [renderer checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-material-frame-renderer).
 The 136 existing choices, 26 rigs, 23 staged profiles, saved format 3, main lock,
 and both served V2 patchers are preserved. Continue primary category/acquisition

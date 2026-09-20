@@ -12,16 +12,34 @@ After the primary importing work, finish gold-tree leaf/cut effects and the full
 golden-shovel acquisition route. This is deferred required V3 work, not a dropped
 feature or a separate release goal.
 
-The current ABI-168 proposal is
+The current ABI-169 proposal is
+`build/v3-material-trigger-runtime-04/build-lock.json`. Incremental audio batches
+preserve complete existing programs/instruments and sound IDs. Coin, ? block,
+and fire flower now use the shared switch-trigger callback with their complete
+material renderer. All eight sound objects and 82 instruments are installed;
+no additional RAM or selected profile is needed. Four current-build checks and
+the first focused silent native run pass (75 records, 50 assertions). Reuse this
+evidence; ordinary interactions, listening, and hardware are not established.
+
+Next stage the three implemented material/trigger lifecycles through the shared
+ordinary-profile importer, reusing their existing artwork and sound rows. Keep
+Mouth of Truth, festive candle, and starman's actual remaining lifecycle work
+explicit; do not promote all material rows based on drawing alone. Acquisition
+remains required, including the missing original Mario-item delivery route.
+The shared wave allocator handles blocked in-place growth by relocating the
+complete archive into verified zero cartridge space and adjusting every header
+and the native base. Old copies and external waves remain intact. The main lock,
+136 choices, saved format 3, and both served patchers remain unchanged.
+
+The shared material-renderer proposal is retained at
 `build/v3-material-frames-runtime-02/build-lock.json`. The shared material-frame
 renderer and all six complete objects are installed in the existing packet and
 model-storage reservation. Four current-build checks pass, including sanitizer
 execution and unchanged old records/saves/composition. Do not replay the failed
 title-screen arena fixture. Native rendering/GPU appearance remains unverified;
-actual lifecycle effects/audio and acquisition remain required before selection.
-The six records do not add ordinary profiles or choices. Next generalize shared
-callback/audio integration for the prepared categories, retaining their actual
-dependencies. The main lock and both served patchers remain unchanged.
+actual remaining lifecycle effects and acquisition are required before selection.
+The six records do not add ordinary profiles or choices. Shared trigger/audio
+integration is connected above; retain the other actual dependencies.
 
 Complete texture/palette-frame artwork is prepared through one shared category
 at `build/v3-material-frames-prepared-01/`: six objects, 17,104 bytes, one compiler
