@@ -8,7 +8,7 @@ SECTIONS
     .rodata : { *(.rodata .rodata.*) }
     .data : { *(.data .data.*) }
     .bss (NOLOAD) : { *(.bss .bss.* COMMON) }
-    ASSERT(. <= 0x804B0FF0, "Animated equipment exceeds reserved code space")
+    ASSERT(. <= 0x804B0FE0, "Animated equipment overlaps loop-volume state")
     ASSERT(SIZEOF(.data) == 0 && SIZEOF(.bss) == 0, "Unexpected shared rig state")
     /DISCARD/ : { *(.comment .note.* .reginfo .MIPS.abiflags .pdr .gnu.attributes) }
 }

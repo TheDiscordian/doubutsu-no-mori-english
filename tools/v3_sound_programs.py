@@ -16,6 +16,112 @@ from v3_villager_audio import (GC_SECTIONS, NATIVE_HEADERS, extended_envelope,
 SOURCES=('tools/v3_sound_programs.py','tools/v3_villager_audio.py')
 
 
+def looping_layer(data, origin, *, prefix=False):
+    """Complete single-layer sustained note, custom envelope, and timed loop."""
+    start=4 if prefix else 0
+    span(data,0,start+11)
+    if not 0<=origin<=65536-len(data):raise ValueError('Loop exceeds sequence address space')
+    if prefix and (span(data,0,1)!=b'\xEB' or data[1]>3 or data[2]>125 or data[3]!=0xC4):
+        raise ValueError('Unsupported explicit loop bank')
+    if (span(data,start,1)!=b'\x88' or span(data,start+3,2)!=b'\xFF\xC6'
+            or struct.unpack_from('>H',data,start+1)[0]!=origin+start+4):
+        raise ValueError('Incomplete single-layer loop channel')
+    instrument_index=span(data,start+5,1)[0]
+    if instrument_index>125 or span(data,start+6,1)!=b'\xCB':
+        raise ValueError('Unsupported loop instrument/envelope')
+    envelope=struct.unpack('>H',span(data,start+7,2))[0]-origin
+    decay=span(data,start+9,1)[0];at=start+10;mode=at
+    if span(data,at,1)!=b'\xC4':raise ValueError('Missing sustained-note mode')
+    note=span(data,at+1,1)[0];at+=2
+    if not 0x40<=note<=0x7F:raise ValueError('Unsupported loop note')
+    duration=span(data,at,1)[0];at+=1
+    if duration&128:duration=(duration&127)*256+span(data,at,1)[0];at+=1
+    velocity=span(data,at,1)[0];at+=1
+    loop=struct.unpack('>H',span(data,at+1,2))[0]-origin
+    if (not duration or velocity>127 or span(data,at,1)!=b'\xFB'
+            or loop not in (mode,mode+1)):
+        raise ValueError('Loop target or timed event is incomplete')
+    pointers=[start+1,start+7,at+1];at+=3
+    if (origin+envelope)&1 or not at<=envelope<len(data) or any(data[at:envelope]):
+        raise ValueError('Loop envelope alignment or padding changed')
+    env=extended_envelope(data,envelope,minimum_steps=1);end=envelope+len(env)
+    if len(data)-end>15 or any(data[end:]):raise ValueError('Unaccounted loop tail')
+    return dict(origin=origin,bytes=len(data),sha256=sha256(data),instrument=instrument_index,
+        pointers=pointers,instrument_offset=start+5,envelope=envelope,envelope_bytes=len(env),
+        decay=decay,note=note&63,duration=duration,velocity=velocity,loop=loop)
+
+
+def bind_loop(data,description,offset,instrument_index,selector=0):
+    if (looping_layer(data,description['origin'])!=description or offset&1
+            or not 0<=offset<=65536-len(data)-4 or not 0<=instrument_index<=125
+            or not 0<=selector<=3):raise ValueError('Loop binding exceeds checked structure')
+    output=bytearray(bytes((0xEB,selector,instrument_index,0xC4))+data)
+    for at in description['pointers']:
+        pointer=struct.unpack_from('>H',data,at)[0]
+        struct.pack_into('>H',output,at+4,offset+4+pointer-description['origin'])
+    output[description['instrument_offset']+4]=instrument_index
+    looping_layer(output,offset,prefix=True)
+    return bytes(output)
+
+
+def install_level(image,prior,blob,code,source_ids):
+    """Extend the existing shared level dispatcher with equivalent native fonts."""
+    if not source_ids or len(set(source_ids))!=len(source_ids):raise ValueError('Empty or duplicate level sound batch')
+    read=lambda at,n:span(code,at-CODE_RAM,n)
+    interpreter=extended_native_interpreter(read)
+    dol,audio=read_audio_donor(ROOT/'local/gamecube/Animal Crossing (USA, Canada).ciso')
+    donor={k:span(audio,*struct.unpack_from('>II',header_entry(dol.read,0x800CE450,i)))
+           for i,k in enumerate(('seq','bank','wave'))}
+    source,_=resource(dol.read,GC_SECTIONS,donor,'seq',242)
+    if sha256(source)!='790526e46582305f94eb05851337ccab5b8aa248c451e98f99f2d65965ab2a22':
+        raise ValueError('Changed complete donor level sequence')
+    installed=prior['equipment_resources']['sound_programs'];current=installed['sequence']
+    sequence,entry,physical=installed_resource(image,code,'seq',199)
+    table=struct.unpack_from('>H',sequence,0x179)[0]
+    if (sha256(sequence)!=current['sha256'] or physical!=current['physical']
+            or entry.hex()!=current['header_after'] or table!=0x4D20
+            or sequence[0x178]!=0xC2):raise ValueError('Changed shared level sound dispatch')
+    starts=struct.unpack_from('>128H',source,0x2E02)
+    source_map=struct.unpack('>H',dol.read(0x800CE490+242*2,2))[0]
+    native_map=struct.unpack('>H',read(0x80115D80+199*2,2))[0]
+    source_banks=dol.read(0x800CE490+source_map,5);native_banks=read(0x80115D80+native_map,5)
+    if source_banks!=bytes((4,2,155,154,153)) or native_banks!=bytes((4,2,141,140,139)):
+        raise ValueError('Changed default level sound banks')
+    sb,nb=source_banks[-1],native_banks[-1]
+    donor_bank,db=resource(dol.read,GC_SECTIONS,donor,'bank',sb)
+    native_bank,nbe,_=installed_resource(image,code,'bank',nb)
+    if db[11]!=255 or nbe[11]!=255:raise ValueError('Unsupported multi-wave level font')
+    donor_wave,_=resource(dol.read,GC_SECTIONS,donor,'wave',db[10])
+    native_wave,_,_=installed_resource(image,code,'wave',nbe[10])
+    result=bytearray(sequence);rows=copy.deepcopy(installed['imports']);before=permanent_budget(code)
+    for sid in sorted(source_ids):
+        if not 68<=sid<128:raise ValueError('Level sound must use an added slot')
+        old_pointer=struct.unpack_from('>H',sequence,table+sid*2)[0]
+        if span(sequence,old_pointer,1)!=b'\xFF':raise ValueError('Level sound slot is occupied')
+        origin=starts[sid];limit=min(p for p in starts if p>origin)
+        data=span(source,origin,limit-origin);description=looping_layer(data,origin)
+        identity=instrument(donor_bank,donor_wave,description['instrument'],db[12],extended=True)
+        matches=[i for i in range(nbe[12]) if instrument(native_bank,native_wave,i,nbe[12],extended=True)==identity]
+        if not matches:raise ValueError('Level sound lacks its complete native instrument')
+        target=description['instrument'] if description['instrument'] in matches else matches[0]
+        result.extend(bytes(len(result)&1));at=len(result);bound=bind_loop(data,description,at,target)
+        result.extend(bound);struct.pack_into('>H',result,table+sid*2,at)
+        rows.append(dict(kind='level',source_sound_id=sid,native_sound_id=sid,source_program=description,
+            source_bank=sb,native_bank=nb,native_instrument=target,instrument_identity=identity,
+            offset=at,bytes=len(bound),sha256=sha256(bound),source_table=0x2E02,native_table=table,
+            original_table_pointer=old_pointer,new_instrument=False,new_sample=False))
+    result.extend(bytes(-len(result)%16));blob.extend(bytes(-len(blob)%16));position=len(blob);blob.extend(result)
+    new_physical=by_vrom(image)[BLOB].pstart+position;new_entry=bytearray(entry)
+    struct.pack_into('>2I',new_entry,0,new_physical-by_vrom(image)[NATIVE_VROMS['seq']].pstart,len(result))
+    address=NATIVE_HEADERS['seq']+16+199*16;code[address-CODE_RAM:address-CODE_RAM+16]=new_entry
+    return dict(format='AFV3-SHARED-SOUND-PROGRAMS-1',imports=rows,interpreter=interpreter,
+        sequence=dict(index=199,blob_offset=position,physical=new_physical,vrom=BLOB+position,
+            bytes=len(result),sha256=sha256(result),header_address=address,header_before=entry.hex(),
+            header_after=new_entry.hex(),retained_bytes=len(sequence)),previous_sequence=copy.deepcopy(current),
+        before_budget=before,after_budget=permanent_budget(code),sound_resources_installed=True,
+        native_synthesis_tested=False,physical_audio_played=False)
+
+
 def single_layer(sequence, origin, limit):
     """Parse a complete explicit-bank, one-note channel with custom ADSR."""
     if not 0 <= origin < limit <= len(sequence):raise ValueError('Invalid sound program span')

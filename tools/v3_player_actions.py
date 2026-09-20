@@ -83,6 +83,63 @@ RIG_CODE_OFFSET,RIG_MODULE_SIZE=0xD000,0xE000
 RIG_STATE_OFFSET,RIG_STATE_BYTES,RIG_PLAYER_SIZE=0x12D8,44,0x1310
 
 
+def refresh_rig_sound(base,prior,blob,core,original,output):
+    """Complete sustained equipment audio through the shared level dispatcher."""
+    old=prior['equipment_resources'];position=old['blob_offset'];rigs=old['held_rig_actions']
+    module=bytearray(blob[position:position+old['bytes']]);files=by_vrom(base)
+    source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+                  (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    if (rigs.get('loop_sound_installed') or old['bytes']!=RIG_MODULE_SIZE or sha256(module)!=old['sha256']
+            or sha256(files[PLAYER_VROM].extract(base))!=old['player_motion']['owner_sha256']):
+        raise ValueError('Loop sound requires the checked complete held-rig module')
+    raw,function=source.function(0x16FA24);_,level=source.function(0x2BE6A4)
+    ro=source.sections[4][0]
+    if (function['sha256']!='970100344688651b241662123d4dabeeb9eef4a907f3c6df991a4391c3c64883'
+            or u32(raw,0x88)&0xFFFF0000!=0x38800000 or source.rel[ro+27636:ro+27640]!=struct.pack('>f',44)
+            or level['relocations'].get(12)!=(10,0,4,0x80015614)):
+        raise ValueError('Changed source speed-controlled equipment sound')
+    sid=u32(raw,0x88)&65535
+    from v3_villager_audio import read_audio_donor
+    dol,_=read_audio_donor(ROOT/'local/gamecube/Animal Crossing (USA, Canada).ciso')
+    if sha256(dol.read(0x8000E004,0x224))!='a4392efc099e7c12edcfa95951351a62de3528916665acc31e83b7ade6253032':
+        raise ValueError('Changed source level-volume implementation')
+    original_core=by_vrom(original)[CODE_VROM].extract(original);start,end=0x800F76CC,0x800F7810
+    if core[start-CODE_RAM:end-CODE_RAM]!=original_core[start-CODE_RAM:end-CODE_RAM]:
+        raise ValueError('Changed complete native level-volume consumer')
+    hook=0x800F77A0;at=hook-CODE_RAM;before=bytes(core[at:at+4])
+    if before!=struct.pack('>I',jump(0x800EEDFC,link=True)):
+        raise ValueError('Changed ordinary native level-volume call')
+    sounds=sound_programs.install_level(base,prior,blob,core,[sid])
+    compiled_code,compiled=compile_part('held_rigs',output/'held_rigs',extra_sources=('overlays/v3/held_rigs.S',),
+                                      defines=(f'AF_V3_PINWHEEL_SOUND=0x{sid:02X}',))
+    previous=rigs['code'];a=RIG_CODE_OFFSET
+    if (sha256(module[a:a+previous['bytes']])!=previous['sha256'] or any(module[a+previous['bytes']:-16])
+            or compiled['symbols']['af_v3_held_setup']!=previous['symbols']['af_v3_held_setup']
+            or len(compiled_code)>RIG_MODULE_SIZE-RIG_CODE_OFFSET-32):
+        raise ValueError('Changed rig code, entry point, or loop-state reservation')
+    module[a:-16]=compiled_code+bytes(len(module)-16-a-len(compiled_code))
+    report=copy.deepcopy(old)
+    for table,name in zip(report['player_actions']['held_dispatch']['tables'],
+                           ('af_v3_held_pinwheel_main','af_v3_held_pinwheel_draw')):
+        at,n=table['offset'],table['bytes']
+        if sha256(module[at:at+n])!=table['sha256'] or u32(module,at+88)!=previous['symbols'][name]:
+            raise ValueError('Changed held-rig callback binding')
+        struct.pack_into('>I',module,at+88,compiled['symbols'][name])
+        table['sha256']=sha256(module[at:at+n])
+    target=compiled['symbols']['af_v3_held_loop_volume'];after=struct.pack('>I',jump(target,link=True))
+    core[hook-CODE_RAM:hook-CODE_RAM+4]=after
+    blob[position:position+len(module)]=module
+    report.update(sha256=sha256(module),crc32=zlib.crc32(module),sound_programs=sounds,additional_resident_bytes=0)
+    report['held_rig_actions'].update(code=compiled,loop_sound_installed=True,
+        loop_sound=dict(source_functions=[function,level],source_volume=dict(address=0x8000E004,bytes=0x224,
+            sha256=sha256(dol.read(0x8000E004,0x224))),native_sound_id=sid,level_ram=RAM+RIG_MODULE_SIZE-32,
+            native_volume_consumer=dict(start=start,end=end,sha256=sha256(original_core[start-CODE_RAM:end-CODE_RAM])),
+            hook=dict(address=hook,before=before.hex(),after=after.hex(),target=target),
+            native_frame_speed_divisor=88,source_frame_speed_divisor=44,native_expiry_retained=True,
+            native_pause_fade_pan_reverb_retained=True,physical_audio_played=False))
+    return report,{}
+
+
 def refresh_rigs(base,prior,blob,core,original,output):
     """Install one shared animated-held category, without enabling its parents."""
     from v3_npc_clothing import guard_incoming
@@ -830,6 +887,8 @@ def expanded_tables(source,owner,reloc,*,categories=CATEGORIES,native_count=NATI
 
 def install(base,prior,blob,core,original,output):
     old=prior.get('equipment_resources',{})
+    if old.get('held_rig_actions') and not old['held_rig_actions'].get('loop_sound_installed'):
+        return refresh_rig_sound(base,prior,blob,core,original,output)
     if old.get('animated_rigs') and not old.get('held_rig_actions'):
         return refresh_rigs(base,prior,blob,core,original,output)
     if old.get('player_actions'):

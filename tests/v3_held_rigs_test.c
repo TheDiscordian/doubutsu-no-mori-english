@@ -13,6 +13,20 @@ static float wind_power, target_seen, setup_speed, setup_morph, setup_frame;
 static int setup_animation, setup_item;
 static Vec3 point;
 static u32 commands[32];
+#ifdef AF_V3_PINWHEEL_SOUND
+float af_test_loop_level;
+u8 af_test_level_rows[120];
+static int sound_calls, volume_calls;
+static u32 volume_command;
+static float volume_seen;
+static void sound_position(void *identity, int id, void *position_) {
+    assert(identity == actor && id == AF_V3_PINWHEEL_SOUND && position_ == (u8 *)actor + 0x28);
+    ++sound_calls;
+}
+static void queue_volume(u32 command, float volume) {
+    volume_command = command; volume_seen = volume; ++volume_calls;
+}
+#endif
 
 static int item_kind(void *a, int action) {
     assert(a == actor && action == WORD(actor, 0xD00)); return kind;
@@ -84,6 +98,10 @@ void *af_test_rig_function(u32 at) {
     case 0x800E02AC: return current_matrix;
     case 0x800E1AA0: return angle;
     case 0x800530D8: return draw;
+#ifdef AF_V3_PINWHEEL_SOUND
+    case 0x800D1D08: return sound_position;
+    case 0x800EEDFC: return queue_volume;
+#endif
     default: assert(!"Unknown native held-rig API"); return NULL;
     }
 }
@@ -96,6 +114,10 @@ static void reset(void) {
     kind = 99; wade = wind_angle = animation_calls = setup_calls = smoothing_calls = 0;
     pushed = drawn = 0; wind_power = 0.0f;
     *(signed char *)((u8 *)actor + 0x1117) = -1;
+#ifdef AF_V3_PINWHEEL_SOUND
+    af_test_loop_level = 0; sound_calls = volume_calls = 0;
+    memset(af_test_level_rows, 0, sizeof(af_test_level_rows));
+#endif
 }
 int main(void) {
     int out, part;
@@ -143,6 +165,30 @@ int main(void) {
     af_v3_held_pinwheel_draw(actor, game);
     near(STATE(actor)->previous.z, 30); near(STATE(actor)->current.z, 35);
     assert(drawn == 2 && !pushed);
+#ifdef AF_V3_PINWHEEL_SOUND
+    reset();
+    const float speeds[] = {0, 22, -44, 88, -176, 0};
+    const float gains[] = {0, .25f, .5f, 1, 1, 1};
+    for (unsigned i = 0; i < sizeof(speeds) / sizeof(speeds[0]); ++i) {
+        REAL(actor, 0xA24) = speeds[i];
+        af_v3_held_pinwheel_sound(actor); near(af_test_loop_level, gains[i]);
+    }
+    assert(sound_calls == 4); /* No registration/refresh at zero speed. */
+    af_test_loop_level = .25f;
+    for (unsigned channel = 0; channel < 256; ++channel) {
+        memset(af_test_level_rows, 0, sizeof(af_test_level_rows));
+        if (channel >= 8 && channel < 14) af_test_level_rows[(channel - 8) * 20] = AF_V3_PINWHEEL_SOUND;
+        u32 command = 0x01000000u | (channel << 8);
+        af_v3_held_loop_volume(command, .8f);
+        assert(volume_command == command);
+        near(volume_seen, channel >= 8 && channel < 14 ? .2f : .8f);
+        memset(af_test_level_rows, 0x4C, sizeof(af_test_level_rows));
+        af_v3_held_loop_volume(command, .8f); near(volume_seen, .8f);
+    }
+    assert(volume_calls == 512);
+    reset(); wind_power = 1; af_v3_held_pinwheel_main(actor, game);
+    assert(sound_calls == 1); near(af_test_loop_level, 1.2f / 88);
+#endif
     puts("held rig setup, timing, movement/wind, drawing callbacks, and bounds pass");
     return 0;
 }

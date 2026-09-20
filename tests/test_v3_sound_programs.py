@@ -19,6 +19,43 @@ OUTPUT=ROOT/os.environ.get('V3_PLAYER_FRAME_BUILD','build/v3-player-frame-sound-
 
 
 class ProgramTests(unittest.TestCase):
+    def loop_program(self, long=True, loop_mode=False):
+        # Synthetic attack/hold envelope and timed sustained note.
+        data=bytearray.fromhex('880004ffc607cb0000e0c466')
+        data.extend(bytes((0x81,0x20)) if long else bytes((12,)))
+        data.extend(bytes((50,0xFB,0,10 if loop_mode else 11)))
+        data.extend(bytes(len(data)&1));struct.pack_into('>H',data,7,len(data))
+        data.extend(struct.pack('>4h',12,24000,-1,0))
+        return data
+
+    def test_sustained_loop_and_short_envelope_relocate_without_changing_timing(self):
+        for long in (False,True):
+            for mode in (False,True):
+                raw=self.loop_program(long,mode);desc=sounds.looping_layer(raw,0)
+                self.assertEqual(desc['duration'],288 if long else 12)
+                self.assertEqual(desc['loop'],10 if mode else 11)
+                bound=sounds.bind_loop(raw,desc,0x5000,12)
+                actual=sounds.looping_layer(bound,0x5000,prefix=True)
+                for key in ('note','duration','velocity','decay','envelope_bytes'):
+                    self.assertEqual(actual[key],desc[key])
+                self.assertEqual(actual['loop'],desc['loop']+4)
+                restored=bytearray(bound[4:]);restored[5]=raw[5]
+                for at in desc['pointers']:restored[at:at+2]=raw[at:at+2]
+                self.assertEqual(restored,raw)
+
+    def test_incomplete_loop_envelope_pointer_and_zero_time_reject(self):
+        raw=self.loop_program();desc=sounds.looping_layer(raw,0)
+        for size in range(len(raw)):
+            with self.subTest(size=size),self.assertRaises(ValueError):sounds.looping_layer(raw[:size],0)
+        for at,value in ((0,0x89),(2,6),(4,0xC5),(5,126),(6,0xCA),(8,255),(10,0xC3),
+                         (11,0x80),(14,128),(15,0xFA),(17,12),(22,0),(25,1)):
+            bad=raw.copy();bad[at]=value
+            with self.subTest(at=at),self.assertRaises(ValueError):sounds.looping_layer(bad,0)
+        zero=raw.copy();zero[12:14]=bytes((0x80,0))
+        with self.assertRaises(ValueError):sounds.looping_layer(zero,0)
+        for offset,index in ((1,7),(65530,7),(0,126)):
+            with self.assertRaises(ValueError):sounds.bind_loop(raw,desc,offset,index)
+
     def program(self,sweep=True,long=False):
         # Original synthetic sequence, not copied donor artwork/audio.
         result=bytearray.fromhex('eb0102880007ffcb0000e0')

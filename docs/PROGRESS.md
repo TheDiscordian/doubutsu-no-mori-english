@@ -18,6 +18,27 @@ served patchers retain their existing builds.
 
 ## Active development
 
+The explicit ABI-119 proposal at `build/v3-held-rig-sound-04/` completes the
+shared pinwheel loop-sound dependency. It preserves the donor's sustained note,
+short attack/hold envelope, and speed-controlled volume while reusing the exact
+native instrument/sample. The loaded sequence grows by 32 bytes; conservative
+permanent-audio accounting leaves 192 bytes spare without heap growth.
+
+Ten focused parser, sanitizer, cartridge, and composition checks pass. The
+first silent native run passes 165 records/50 assertions: signed/saturated speed
+gain, actual volume commands with pause/fade/pan/reverb, actor registration,
+sample transfers, continued refresh, zero-speed expiry, guards, saved-state
+retention, checkpoint restoration, and clean exit. No listening or ordinary
+equipped-pinwheel gameplay is claimed. Reuse that passing evidence.
+
+Continue from `build/v3-held-rig-sound-04/build-lock.json` explicitly. Extend
+shared inventory previews to animated rigs, then connect parent readers,
+acquisition, catalogue, and individual selections using the existing category
+records. The 112 existing choices, format-2 saves, module/player allocations,
+and exact import-free V2-12 remain. The main lock and both served patchers stay
+unchanged; the independent seasonal-copy issue remains unresolved. See the
+[loop-sound checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-held-loop-sound).
+
 The explicit ABI-118 proposal at `build/v3-held-rig-actions-03/` connects all
 eight pinwheel rigs to shared setup, movement/wind response, native animation,
 and joint drawing. The player gains a checked 56-byte allocation extension for
@@ -32,7 +53,7 @@ The full owner-relative setup continuation and both native graphics streams are
 verified. The fixture's setup retry allowance is spent; reuse its passing result.
 
 The same 112 existing choices, saved profile, and exact import-free V2-12 remain.
-Pinwheels are not selectable yet: complete their loop sound, animated inventory
+Pinwheels are not selectable yet: complete their animated inventory
 previews, and acquisition/catalogue/selection connections next. Native component
 drawing is not proof of ordinary rendered gameplay or hardware appearance.
 The main lock and both served patchers remain unchanged; the independent

@@ -80,11 +80,13 @@ def resource(read, headers, sources, kind, index):
     return span(sources[kind], offset, size), entry
 
 
-def extended_envelope(bank, address):
+def extended_envelope(bank, address, *, minimum_steps=2):
+    if not 1 <= minimum_steps <= 63:
+        raise ValueError('Invalid minimum envelope length')
     for index in range(64):
         delay, target = struct.unpack('>hh', span(bank, address+4*index, 4))
         if delay in (0, -1):
-            if target != 0 or index < 2:
+            if target != 0 or index < minimum_steps:
                 raise ValueError('Invalid extended envelope terminator')
             return span(bank, address, 4*(index+1))
         if delay == -4 and index == 0 and target == 0:

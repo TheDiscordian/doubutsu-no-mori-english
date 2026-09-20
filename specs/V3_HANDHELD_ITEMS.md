@@ -288,9 +288,55 @@ The shared module grows from 52 to 56 KiB. Code starts at `804B0000`; the guard
 is at `804B0FF0`, below furniture banks at `80500000`. Startup transfers, checks,
 and flushes the complete module. Full source functions and native setup/API
 consumers are recorded and checked; retained resources and callback slots stay
-unchanged. Source sound, animated inventory previews, and parent readiness
-remain explicit dependencies. The [action checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-animated-held-actions)
+unchanged. Animated inventory previews and parent readiness remain explicit
+dependencies; loop sound uses the shared adapter below. The [action checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-animated-held-actions)
 records current component evidence, failed attempts, and gameplay limits.
+
+### Shared held loop sound
+
+On an action-enabled build, the same `--refresh-runtime --player-actions`
+adapter installs the donor's continuous level sound `4D`. The shared parser in
+`tools/v3_sound_programs.py` preserves the complete one-layer sustained note,
+duration, velocity, envelope, and loop target; it rejects unaccounted bytes or
+unsupported commands. The complete 26-byte source program at sequence-242
+offset `323C` uses a 32,000-tick note and loops to the note at `3247`, after its
+continuous-mode command. Its envelope contains one attack followed by hold.
+The shared envelope reader permits this explicitly; existing callers retain
+their stricter two-step minimum.
+
+Only the three internal pointers and equivalent instrument binding change.
+An explicit native-bank prefix adds four bytes; sequence padding makes the
+loaded increase 32 bytes. Donor bank 153 instrument 120 matches native bank 139
+instrument 120 in ranges, decay, envelope, tuning, sample, loop, and predictor.
+Its 21,880-byte sample remains in the original native wave bank. No sample or
+instrument is copied or replaced. Existing fan and fire programs remain intact.
+The complete permanent-resource budget leaves 192 bytes spare in the existing
+`1AC00` capacity; transiently unused space is not counted as extra capacity.
+
+The donor's sound-move function supplies absolute animation speed divided by
+44, clamped to one. Native animation advances two source updates, so the
+adapter uses 88. Nonzero speed registers/refreshes the actor's original
+positional sound identity through `800D1D08`. Zero speed makes no registration
+call; the native sound owner expires it. This also retains ordinary put-away
+expiry without inventing a separate stop timer.
+
+The exact native ordinary-volume call at `800F77A0` is redirected to the
+resident gain wrapper. It scales only channels 8–13 whose active level ID is
+`4D`, then forwards to native `Nap_SetF32`. The existing pause branch at
+`800F772C` remains untouched, as do native fades, pan, reverb, and other sounds.
+Four transient bytes at `804B0FE0` hold the gain. Code ends below that address;
+the guard remains at `804B0FF0`. Module and player allocations do not grow.
+Recompilation retains the public setup entry and rebinds both held callbacks.
+
+Focused checks verify complete source identity, native instruction changes,
+equivalent instruments, pointer relocation, bounds, rejected inputs, exact
+patch reconstruction, retained saves, and empty/all composition. Silent native
+checks exercise actual actor registration, signed/saturated gain, queued volume,
+pause/fade/pan/reverb, sample transfers, continued refresh, zero-speed expiry,
+guards, and checkpoint restoration. Listening, ordinary equipped gameplay,
+and hardware remain unverified. The
+[loop checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-held-loop-sound)
+records the exact build and evidence. No parent becomes selectable here.
 
 ### Shared event stock
 

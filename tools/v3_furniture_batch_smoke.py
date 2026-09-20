@@ -689,6 +689,7 @@ def exercise(debug, rom_path, record, *, section='automatic_furniture'):
     if section=='equipment_resources':return equipment_resources(debug,rom_path,record)
     if section=='equipment_bank_switch':return equipment_bank_switch(debug,rom_path,record)
     if section=='held_rig_actions':return held_rig_actions(debug,rom_path,record)
+    if section=='held_level_sound':return held_level_sound(debug,rom_path,record)
     if section=='player_motion':return player_motion(debug,rom_path,record)
     if section=='pocket_icons':return pocket_icons(debug,rom_path,record)
     if section=='inventory_preview':return inventory_preview(debug,rom_path,record)
@@ -1357,6 +1358,126 @@ def held_rig_actions(debug,rom_path,record):
     return dict(native_held_rig_actions=True,assertions=assertions,representative_rigs=len(models),
         gpu_rendered=False,ordinary_gameplay_tested=False,pinwheel_selection_tested=False,
         sound_tested=False,flash_written=False,requires_checkpoint_restore=True)
+
+
+def held_level_sound(debug,rom_path,record):
+    """Shared sustained-equipment sound: native gain, registration, DMA, and expiry."""
+    from aflib import CODE_VROM,u32
+    from v3_import_storage import jump
+    from v3_sound_programs import installed_resource
+    from runtime_layout import TEST_STACK
+    import v3_equipment_runtime as equipment
+    path=Path(rom_path);image=path.read_bytes();report=json.loads((path.parent/'build.json').read_bytes())
+    if sha256(image)!=report['output_sha256']:raise ValueError('Changed level-sound cartridge')
+    resources=report['equipment_resources'];rig=resources['held_rig_actions'];loop=rig['loop_sound']
+    sound=resources['sound_programs'];rows=[r for r in sound['imports'] if r.get('kind')=='level']
+    if len(rows)!=1 or not rig['loop_sound_installed']:raise ValueError('Expected one representative shared level program')
+    row=rows[0];sid=row['native_sound_id'];symbols=rig['code']['symbols'];boot=boot_proofs(image);assertions=0
+    files=by_vrom(image);core=files[CODE_VROM].extract(image);blob=files[runtime.BLOB].extract(image)
+    def check(label,at,want):
+        nonlocal assertions
+        actual=debug.read_memory(at,len(want));passed=actual==want
+        record(dict(level_sound_check=label,address=f'{at:08X}',bytes=len(want),
+                    assertion='passed' if passed else 'failed',actual=actual.hex() if len(actual)<=32 else sha256(actual)))
+        if not passed:raise ValueError('Shared level sound mismatch: '+label)
+        assertions+=1
+    def call(at,args=(),proof=None):
+        result=debug.call(f'{at:08X}',list(args),return_address=MODULE_RAM+0x6480,verified_code=proof or boot.get(at))
+        record(result);return result['return_value']
+    def word(at):return u32(debug.read_memory(at,4),0)
+    def bounded(at,n):
+        if at&3 or not 0x80000400<=at<=0x80400000-n:raise ValueError('Level-sound pointer escapes native RAM')
+        return at
+    at=resources['blob_offset'];module=blob[at:at+resources['bytes']]
+    check('complete startup-loaded sound module',equipment.RAM,module)
+    hook=loop['hook'];check('installed native volume call',hook['address'],bytes.fromhex(hook['after']))
+    seq=sound['sequence'];data=image[seq['physical']:seq['physical']+seq['bytes']]
+    header=bytearray.fromhex(seq['header_after']);struct.pack_into('>I',header,0,seq['physical'])
+    check('loaded sequence header',seq['header_address'],header)
+    sequence=bounded(word(0x8014CBA8),len(data))
+    check('complete sustained program',sequence+row['offset'],data[row['offset']:row['offset']+row['bytes']])
+    check('level dispatch registration',sequence+row['native_table']+sid*2,struct.pack('>H',row['offset']))
+    start,current,capacity,count=struct.unpack('>4I',debug.read_memory(0x8014C260,16))
+    bounded(start,capacity)
+    if capacity!=sound['after_budget']['capacity'] or not start<=current<=start+capacity or not count:
+        raise ValueError('Shared level sound exceeds actual permanent heap')
+    record(dict(level_sound_heap_used=current-start,capacity=capacity,remaining=start+capacity-current,assertion='passed'))
+    allocation=bounded(call(0x8009BFC0,[0x1500]),0x1500);actor=allocation+16;bridge=allocation+0x1400
+    debug.write_memory(allocation,bytes(0x1500));edge=b'V3LS'*4
+    guards=(allocation,actor+0x1310,bridge-16,bridge+16,TEST_STACK-0x800,TEST_STACK+0x40)
+    for at in guards:debug.write_memory(at,edge)
+    def resident(name,args):
+        stub=struct.pack('>II',jump(symbols[name]),0);debug.write_memory(bridge,stub)
+        call(0x8002FE00,[bridge,8]);call(0x80034CE0,[bridge,8]);return call(bridge,args,(bridge,stub))
+    saved={at:debug.read_memory(at,n) for at,n in ((0x80113D3C,120),(0x801138A8,1),(0x80113954,1),
+          (0x80114324,72),(0x8010EF80,4),(0x80113844,1),(0x80113934,2),(0x8046C000,864))}
+    observations=0
+    try:
+        debug.write_memory(0x8010EF80,bytes(4));debug.write_memory(0x80113844,b'\x01')
+        debug.write_memory(0x80113934,bytes(2));debug.write_memory(0x801138A8,b'\0')
+        mic=bounded(call(0x80060D6C,[word(0x8010EF90)]),12)
+        debug.write_memory(actor+0x28,debug.read_memory(mic,12))
+        for speed,gain in ((22,.25),(-44,.5),(176,1),(0,1)):
+            debug.write_memory(actor+0xA24,struct.pack('>f',speed))
+            resident('af_v3_held_pinwheel_sound',[actor])
+            check('speed-dependent gain with zero retaining expiry',loop['level_ram'],struct.pack('>f',gain))
+        entries=debug.read_memory(0x80113E04,50*16)
+        matches=[i for i in range(50) if u32(entries,i*16)==actor]
+        if len(matches)!=1:raise ValueError('Native actor sound identity was not registered uniquely')
+        entry=0x80113E04+matches[0]*16
+        check('native actor registration retains sound ID',entry+6,struct.pack('>H',sid))
+        # Exercise the actual native volume consumer, including its unchanged
+        # pause branch, fade factor, pan, and reverb command paths.
+        for channel,kind,paused,fade,gain in ((0,sid,0,1,.25),(5,sid,0,.5,.25),
+                                            (0,sid,1,1,.25),(2,sid-1,0,1,.25)):
+            row_at=0x80113D3C+channel*20;temporary=bytearray(20);temporary[0]=kind
+            struct.pack_into('>f',temporary,8,.8);temporary[16]=31;temporary[18]=temporary[19]=1
+            debug.write_memory(row_at,temporary);debug.write_memory(loop['level_ram'],struct.pack('>f',gain))
+            debug.write_memory(0x801138A8,bytes((paused,)));debug.write_memory(0x80113954,b'\x01')
+            debug.write_memory(0x80114324+channel*12,struct.pack('>f',fade))
+            cursor=debug.read_memory(0x80151BD8,1)[0];call(0x800F76CC,[channel])
+            expected=.8*(.5 if paused else fade*(gain if kind==sid else 1))
+            check('native queued volume',0x80151C54+cursor*8,struct.pack('>If',0x01000000|((channel+8)<<8),expected))
+            if not paused:
+                check('native queued pan',0x80151C54+((cursor+1)&255)*8,struct.pack('>2I',0x03000000|((channel+8)<<8),31<<24))
+                check('native queued reverb',0x80151C54+((cursor+2)&255)*8,struct.pack('>2I',0x05000000|((channel+8)<<8),40<<24))
+        for at in (0x80113D3C,0x801138A8,0x80113954,0x80114324):debug.write_memory(at,saved[at])
+        debug.write_memory(0x801138A8,b'\0');debug.write_memory(actor+0xA24,struct.pack('>f',44))
+        bank,header,_=installed_resource(image,core,'bank',row['native_bank'])
+        _,_,wave=installed_resource(image,core,'wave',header[10])
+        instrument=u32(bank,8+row['native_instrument']*4);sample=u32(bank,instrument+16)
+        sample_bytes=u32(bank,sample)&0xFFFFFF;sample_start=wave+u32(bank,sample+4)
+        for frame in range(10):
+            resident('af_v3_held_pinwheel_sound',[actor]);record(debug.advance_game_frame())
+            n=word(0x8014BB20)
+            if not 0<n<=256:raise ValueError('Unbounded level-sound sample-DMA list')
+            entries=debug.read_memory(bounded(word(0x8014BB1C),n*16),n*16)
+            for i in range(n):
+                raw=entries[i*16:(i+1)*16];ram,device=struct.unpack_from('>2I',raw)
+                size=struct.unpack_from('>H',raw,10)[0];first,last=max(device,sample_start),min(device+size,sample_start+sample_bytes)
+                if first>=last or not raw[14]:continue
+                got=debug.read_memory(bounded(ram,size)+first-device,last-first)
+                if got!=image[first:last]:raise ValueError('Level sound sample transfer differs from cartridge')
+                observations+=1;record(dict(level_sound_sample_dma=True,frame=frame+1,bytes=len(got),assertion='passed'))
+        if not observations:raise ValueError('No native sample transfers observed for sustained sound')
+        check('sound remains registered while refreshed',entry,struct.pack('>I',actor))
+        debug.write_memory(actor+0xA24,bytes(4))
+        for _ in range(12):
+            resident('af_v3_held_pinwheel_sound',[actor]);record(debug.advance_game_frame())
+        check('native sound expires when speed reaches zero',entry,bytes(4))
+        for at in guards:check('sound fixture guard',at,edge)
+        check('save/profile remains unchanged',0x8046C000,saved[0x8046C000])
+        check('no CPU fault',0x8003CE34,bytes(4))
+        before=bytearray(module);at=loop['level_ram']-equipment.RAM
+        before[at:at+4]=debug.read_memory(loop['level_ram'],4)
+        check('only reserved loop gain changes in module',equipment.RAM,before)
+    finally:
+        for at,value in saved.items():debug.write_memory(at,value)
+        call(0x8009C040,[allocation])
+    return dict(native_held_level_sound=True,assertions=assertions,sample_dma_observations=observations,
+        native_volume_pause_fade_pan_reverb=True,native_actor_registration_and_expiry=True,
+        physical_audio_played=False,pcm_or_listening_verified=False,ordinary_gameplay_tested=False,
+        flash_written=False,requires_checkpoint_restore=True)
 
 
 def sound_programs_probe(debug,image,resources,check,call,record):

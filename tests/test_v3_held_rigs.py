@@ -20,13 +20,19 @@ OUTPUT=ROOT/'build/v3-held-rig-actions-03'
 
 
 class BehaviourTests(unittest.TestCase):
-    def test_complete_shared_behaviour_under_sanitizers(self):
+    def run_behaviour(self, *flags):
         with tempfile.TemporaryDirectory(prefix='v3-held-rigs-') as directory:
             binary=str(Path(directory)/'test')
             subprocess.run(['cc','-std=c11','-O1','-g','-Wall','-Wextra','-Werror',
-                '-fsanitize=address,undefined','-fno-omit-frame-pointer',
+                '-fsanitize=address,undefined','-fno-omit-frame-pointer',*flags,
                 str(ROOT/'tests/v3_held_rigs_test.c'),'-lm','-o',binary],check=True,capture_output=True,timeout=30)
             subprocess.run([binary],check=True,capture_output=True,timeout=10)
+
+    def test_complete_shared_behaviour_under_sanitizers(self):
+        self.run_behaviour()
+
+    def test_complete_shared_behaviour_and_level_sound_under_sanitizers(self):
+        self.run_behaviour('-DAF_V3_PINWHEEL_SOUND=0x4D')
 
 
 @unittest.skipUnless((OUTPUT/'build-lock.json').is_file(),'Current rig-action cartridge required')

@@ -2,14 +2,33 @@
 
 ## Active: V3 optional GameCube imports
 
-Next implementation: complete the pinwheel loop-sound dependency, extend shared
-inventory previews to animated rigs, then connect their existing acquisition,
-catalogue, and individual selection records. Use the explicit ABI-118 lock at
-`build/v3-held-rig-actions-03/build-lock.json`. The shared action adapter supplies
+Next implementation: extend shared inventory previews to animated rigs, then
+connect parent readers, existing acquisition, catalogue, and individual selection
+records. Use the explicit ABI-119 lock at
+`build/v3-held-rig-sound-04/build-lock.json`. The shared action adapter supplies
 setup, movement/wind response, native skeleton animation, and joint drawing for
 all eight pinwheels. It reserves 44 transient state bytes in a 56-byte player
-allocation extension; the shared resident module is 56 KiB. Sound and parent
-selection remain disabled, so this is not yet playable pinwheel support.
+allocation extension; the shared resident module is 56 KiB. Loop sound is
+installed, with its speed gain in four reserved bytes at `804B0FE0`. Parent
+selection remains disabled, so this is not yet playable pinwheel support.
+
+Ten focused sound checks pass. The first silent native sound check passes
+165 records/50 assertions, including actual queued volume, retained pause/fade/
+pan/reverb, complete program loading, sample transfers, refreshed actor identity,
+zero-speed expiry, guards, save retention, and checkpoint restoration. Reuse the
+passing result; no further sound harness or historical replay is needed without
+a concrete defect. The sequence grows by 32 bytes within the existing heap.
+See the [sound checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-held-loop-sound).
+
+Inventory integration uses the existing preview tables and native item keyframe:
+the donor's windmill drawer calls the ordinary skeleton renderer without custom
+joint callbacks. The native item keyframe lives at inventory BSS `+224`, with
+seven-vector work/morph arrays at `+294/+2BE`. Its item bank holds the combined
+model/animation. Preserve the donor preview speed of 7.5 source frames per
+update as 15 native frames, using a category-aware initialization hook. Derive
+preview records from installed kind/rig dependencies rather than requiring
+already-enabled parent selections; keep actual parent enablement separate.
+Verify the complete native consumers and source bindings before installation.
 
 Four focused checks pass. The silent native category probe passes both smallest
 and largest rigs, actual initialization, wind-driven frame advance, both joint

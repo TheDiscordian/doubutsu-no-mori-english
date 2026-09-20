@@ -163,9 +163,12 @@ inside the blob before computing the complete blob receipt.
 After complete animated resources are installed, the same `--player-actions`
 route connects shared pinwheel setup, movement/wind, animation, and drawing.
 It grows the actual player allocation for transient state and retains every
-original callback/resource. Sound, animated inventory previews, and parent
-readiness remain separate required dependencies; the refresh does not enable
-choices. See [animated-held actions](V3_HANDHELD_ITEMS.md#shared-animated-held-actions).
+original callback/resource. On an action-enabled base, the same route adds the
+complete source sustained loop through the shared level-sound converter and
+native speed-dependent volume consumer. Animated inventory previews and parent
+readiness remain required dependencies; neither refresh enables choices.
+See [animated-held actions](V3_HANDHELD_ITEMS.md#shared-animated-held-actions)
+and [loop sound](V3_HANDHELD_ITEMS.md#shared-held-loop-sound).
 
 `--category` selects a discovered shared category without maintaining an item
 list. `convert --assets-only` prepares complete artwork while retaining missing

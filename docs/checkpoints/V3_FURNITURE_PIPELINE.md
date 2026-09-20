@@ -1,5 +1,74 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared held loop sound
+
+The existing `--refresh-runtime --player-actions` route consumes ABI 118 and
+installs the complete pinwheel level sound for the shared rig category. No
+per-item installer, copied sample, new allocation, or enabled choice is added.
+
+- Explicit lock: `build/v3-held-rig-sound-04/build-lock.json`, ABI 119.
+- ROM SHA-256:
+  `9bd860fd2cf04da77b54f66ef61ef2babe844c0a9f4b82699761c0d268ebd8da`.
+- UPS SHA-256:
+  `06fb251a3c01bb8714f42a4648e482ef493f1acd5cdcf5fb17a3dd39784dea83`.
+- Build receipt SHA-256:
+  `db57fa0fe25944148555e35004fe5ec890949c6ecce8c7cbaf1c29d6e610dd0f`.
+- Rig code: 2,192 bytes at `804B0000`, SHA-256
+  `988b216a8e84e00b7b81399ab08be34289b17083123fe71cad62ec4231aff2e4`.
+- Module: 56 KiB; four gain bytes at `804B0FE0`; guard at `804B0FF0`.
+- Sound sequence: 20,240 bytes; 32 added loaded bytes, 192 bytes spare under
+  conservative accounting for every permanent resource, no heap growth.
+
+Ten focused checks pass in 6.255 seconds. Shared synthetic parser checks cover
+short/long durations, loops to mode or note, complete short envelopes, exact
+rebinding, every truncated prefix, invalid control/pointer/velocity/envelope,
+and zero elapsed time. Sanitizer checks run the full rig behaviour with and
+without sound, including negative/saturated/zero speed and all 256 channel
+values. Current-cartridge checks recreate the source conversion, retain every
+old sound, bind the complete equivalent sample/loop/predictor, verify exact
+code changes and callback rebinding, preserve unrelated resources and save
+code, reconstruct the UPS, and retain 112 choices plus exact import-free V2-12.
+Python parsing and `git diff --check` pass.
+
+The first silent native attempt, `build/smoke-v3-held-level-sound-01/`, passes
+165 records and 50 assertions. Results SHA-256:
+`8363ae1f2e3541c3949f4ceaa60746fc86e7b0ab414a30f4043b567421ebc5f7`.
+The cartridge-loaded module, patched core call, complete loop program, dispatch,
+and actual heap bounds pass. It executes gain for positive/negative/saturated/
+zero speeds and actual native volume calls, including the original pause
+branch, fade factor, pan, and reverb commands. The actor registers uniquely,
+retains its level sound through ten refresh frames, and expires through native
+processing after zero-speed updates. Thirteen actual sample-DMA observations
+match cartridge data. Private stack/actor/module guards, unchanged saved state,
+checkpoint restoration, final guards, and clean exit pass. No FlashRAM writes
+or physical audio playback are requested. No ordinary pinwheel gameplay,
+listening/PCM quality, GPU appearance, or hardware verification is claimed.
+The native probe needs no retry. New focused test work takes approximately
+nine minutes, within the batch allowance; retain the passing result.
+
+Build attempts `v3-held-rig-sound-01` through `-03` produce no cartridge: the
+new parser initially assumed the loop target included the continuous-mode
+command, rejected zero-length alignment padding, and inherited a two-step
+envelope minimum inappropriate for the source's attack/hold pair. Those parser
+defects are corrected, without changing source timing or inserting envelope
+steps. Synthetic tests retain each case. The final `-04` cartridge is the only
+sound-enabled proposal. An initial wrapper called nonexistent `main`; the
+correct builder entry is `refresh_runtime`.
+
+Continue animated inventory integration, then shared parent/acquisition/
+catalogue/selection connections. The native preview initializer already loads
+model plus animation into its item bank and owns seven-vector work/morph
+arrays. The source windmill callback is an ordinary recursive skeleton draw;
+its preview speed needs the native two-source-update conversion. No inventory
+changes are installed by this batch.
+
+Save format 2 and existing profile requirements remain unchanged. Matching
+profiles are expected to remain compatible with ABI 118 both ways; no new
+ordinary cross-version reload is claimed. Imported V3 saves must not be loaded
+in V2, and removing imports is not migration. The independent seasonal-copy
+issue remains unresolved; the main lock stays ABI 109. Both served patchers,
+original saves, and earlier cartridges remain unchanged.
+
 ## Shared animated-held actions
 
 The shared `--refresh-runtime --player-actions` adapter consumes ABI 117 and

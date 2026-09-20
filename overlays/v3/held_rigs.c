@@ -68,6 +68,36 @@ void af_v3_held_setup(void *actor, int animation, int item_animation, float spee
 static float absolute(float value) { return value < 0.0f ? -value : value; }
 static float cosine(s16 angle) { return FN(0x80099A54u, float, int)(angle); }
 
+#ifdef AF_V3_PINWHEEL_SOUND
+#ifdef __mips__
+#define loop_level (*(volatile float *)0x804B0FE0u)
+#define level_rows ((const u8 *)0x80113D3Cu)
+#else
+extern float af_test_loop_level;
+extern u8 af_test_level_rows[120];
+#define loop_level af_test_loop_level
+#define level_rows af_test_level_rows
+#endif
+/* Only the ordinary level-volume call is adapted. The original pause branch,
+ * fade factor, pan, reverb, voice ownership, and expiry remain native. */
+void af_v3_held_loop_volume(u32 command, float volume) {
+    u32 channel = ((command >> 8) & 255u) - 8u;
+    if (channel < 6u && level_rows[channel * 20u] == AF_V3_PINWHEEL_SOUND)
+        volume *= loop_level;
+    FN(0x800EEDFCu, void, u32, float)(command, volume);
+}
+
+void af_v3_held_pinwheel_sound(void *actor) {
+    /* Native frame speed spans two source updates, hence 2 * 44. */
+    float level = absolute(REAL(actor, 0xA24) / 88.0f);
+    if (level > 1.0f) level = 1.0f;
+    if (level != 0.0f) {
+        loop_level = level;
+        FN(0x800D1D08u, void, void *, int, void *)(actor, AF_V3_PINWHEEL_SOUND, (u8 *)actor + 0x28);
+    }
+}
+#endif
+
 int af_v3_held_pinwheel_main(void *actor, void *game) {
     RigState *state = STATE(actor);
     Vec3 delta = {0.0f, 0.0f, 0.0f};
@@ -118,6 +148,9 @@ int af_v3_held_pinwheel_main(void *actor, void *game) {
     /* This owner helper temporarily binds segment six to the animation bank;
        calling the skeleton player directly would interpret model bytes. */
     FN(0x808BD81Cu, void, void *)(actor);
+#ifdef AF_V3_PINWHEEL_SOUND
+    af_v3_held_pinwheel_sound(actor);
+#endif
     return 0;
 }
 
