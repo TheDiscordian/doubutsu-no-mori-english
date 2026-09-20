@@ -10,7 +10,7 @@ from aflib import apply_ups, by_vrom, fix_checksum, make_ups, sha256, verified_r
 from apply_translation import write_new
 from v3_asset_loader import BLOB, CONFIG, MODULE, ROOT
 from v3_registry import (CLOTHING, CLOTHING_DISPLAYS, FURNITURE, VILLAGERS,
-                         villager_actor, villager_house_layers, furniture_identity)
+                         villager_actor, villager_house_layers, furniture_identity, furniture_source)
 from v3_save_runtime import profile_bytes
 from v3_villager_houses import layers
 
@@ -52,6 +52,10 @@ def canonical(value):
 
 def item_key(item):
     return f'GAFE01-r0/item/{item:04X}'
+
+
+def furniture_key(row):
+    return item_key(furniture_source(row)[0])
 
 
 def save_compatibility(report):
@@ -134,8 +138,10 @@ def catalogue(image, report):
     furniture_rows = report['furniture']['imports']+[report['speed_bag']]
     for row in furniture_rows:
         donor = int(row['id'].rsplit('/', 1)[1], 16)
-        if row.get('registry_version') == 2:
+        if row.get('registry_version') in (2,3):
             index,item = furniture_identity(donor)
+            if furniture_key(row)!=row['id'] or (row['registry_version']==3)!=(donor<0x3000):
+                raise ValueError('Changed furniture registry/source binding')
             at=int(row['object_vrom'],16)-BLOB
             if sha256(blob[at:at+row['object_bytes']]) != row['object_sha256']:
                 raise ValueError('Changed manifest-bound furniture artwork')
@@ -189,7 +195,8 @@ def catalogue(image, report):
         for layer in house_layers:
             for item in struct.unpack_from('>256H', rooms[layer], 2):
                 if 0x3000 <= item < 0x4000:
-                    key = item_key(item & 0xFFFC)
+                    matches=[key for key,r in result.items() if r['kind']=='furniture' and r['item_id']==f'{item & 0xFFFC:04X}']
+                    key = matches[0] if len(matches)==1 else None
                     if key not in result or result[key]['kind'] != 'furniture':
                         raise ValueError('House requires an unreviewed imported furnishing')
                     dependencies.add(key)
@@ -266,7 +273,7 @@ def catalogue_selection(image, report, enabled):
     cat = report['catalogue']
     if entry.pend or sha256(data) != cat['output_sha256']:
         raise ValueError('Changed full source catalogue resource')
-    rows = [row for row in cat['imports'] if item_key(int(row['item_id'], 16)) in enabled]
+    rows = [row for row in cat['imports'] if furniture_key(row) in enabled]
     clothes = [row for row in cat['clothing']['imports'] if item_key(int(row['donor_item_id'], 16)) in enabled]
     writes = []
 
@@ -444,7 +451,7 @@ def build(output, selected=(), *, select_all=False):
         for row in current['furniture']['imports']+[current['speed_bag']]:
             row['enabled'] = row['id'] in selection['enabled']
         for row in current['furniture_items']['imports']:
-            row['enabled'] = item_key(int(row['item_id'], 16)) in selection['enabled']
+            row['enabled'] = furniture_key(row) in selection['enabled']
         current['speed_bag']['saved_profile_included'] = current['speed_bag']['enabled']
         current['clothing']['punchy_defaults_enabled'] = 'E0ED' in actors
         for slot,row in enumerate(current['clothing']['imports']):

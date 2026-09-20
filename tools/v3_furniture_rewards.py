@@ -5,6 +5,7 @@ from aflib import CODE_RAM, CODE_VROM, by_vrom, sha256, u32
 from v3_asset_loader import BLOB, compile_part
 from v3_import_storage import PACKAGE, PACKAGE_RAM, ITEMS, slot
 from v3_furniture_pipeline import REWARDS
+from v3_registry import furniture_source
 
 RAM, FIRST, END = 0x80474BC0, 0x80474BB0, 0x80474FF0
 GUARD = bytes.fromhex('AFF9C0DE')*4
@@ -66,7 +67,7 @@ def install(original, base, prior, blob, imports, source, output):
             raw=source.raw(row['donor_list']);digest=sha256(raw)
             members=struct.unpack('>'+str(len(raw)//2)+'H',raw)
             if (row.get('catalogue_orderable') or row.get('reward_route',route)!=route or
-                    row.get('donor_list_sha256',digest)!=digest or members.count(item)!=1 or
+                    row.get('donor_list_sha256',digest)!=digest or members.count(furniture_source(row)[0])!=1 or
                     members[-1] or 0 in members[:-1]):
                 raise ValueError('Reward descriptor differs from source category')
             row.update(reward_route=route,donor_list_sha256=digest)

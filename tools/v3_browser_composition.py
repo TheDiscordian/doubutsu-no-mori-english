@@ -103,8 +103,8 @@ def rules(image, report):
             raise ValueError('Changed selected catalogue suffix contract')
         members = []
         for i, row in enumerate(rows):
-            donor = row['donor_item_id'] if kind == 'clothing' else row['parent_item_id'] if kind=='equipment' else row['item_id']
-            key = composition.item_key(int(donor, 16))
+            key = (composition.furniture_key(row) if kind=='furniture' else
+                   composition.item_key(int(row['donor_item_id'] if kind=='clothing' else row['parent_item_id'],16)))
             if catalog[key]['kind'] != kind:
                 raise ValueError('Catalogue option has the wrong item class')
             members.append({'id': key, 'hex': before[start + i * width:start + (i + 1) * width].hex()})
@@ -140,14 +140,14 @@ def rules(image, report):
 def review_catalogue(plan, report):
     """Generate unavailable furniture reasons from a fresh shared scan.
 
-    This is the 3xxx furniture queue, not a claim to classify every donor item.
+    This is the discovered furniture queue, not every donor item category.
     Installed records take precedence over the static converter's narrower
     coverage of legacy animated/custom imports.
     """
     import v3_furniture_pipeline as pipeline
     source = pipeline.Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
                              (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
-    installed = {int(row['item_id'], 16) for row in report['furniture']['imports'] + [report['speed_bag']]}
+    installed = {int(row['id'].rsplit('/',1)[1], 16) for row in report['furniture']['imports'] + [report['speed_bag']]}
     scan = pipeline.scan(source, ROOT/'build/item-identity-megasheet.xlsx', installed)
     options = {row['id'] for row in plan['options']}
     unavailable = []
@@ -162,7 +162,7 @@ def review_catalogue(plan, report):
             **({'room_alias':row['room_alias']} if 'room_alias' in row else {}),
             'reason': row.get('reason') or 'Conversion supported; runtime installation is pending.'})
     return {'format': 'AFV3-BROWSER-REVIEW-1', 'base_sha256': plan['base_sha256'],
-            'scope': 'GAFE01-r0 3xxx furniture import queue, not all donor items',
+            'scope': 'GAFE01-r0 3xxx and unresolved legacy furniture queue, not all donor items',
             'pipeline_version': pipeline.VERSION,
             'source_rel_sha256': scan['source_rel_sha256'],
             'source_symbols_sha256': scan['source_symbols_sha256'],

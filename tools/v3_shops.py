@@ -5,6 +5,7 @@ from aflib import CODE_RAM, CODE_VROM, by_vrom, sha256
 from gc_names import symbol_data
 from v3_furniture_art import verify_sources
 from v3_construction_items import STOCK as CONSTRUCTION_STOCK
+from v3_registry import furniture_source
 
 ABI, CODE, LIMIT, BRIDGE = 16, 0x9C00, 0x9D00, 0xBAA0
 CLOTHING_ABI = 36
@@ -101,10 +102,15 @@ def goods(base, rel, symbols, imports, *, garden=False, western=False, western_l
         _, name, group, at = rules[item]
         donor = symbol_data(rel, symbols.decode(), name)
         ids = struct.unpack('>' + str(len(donor) // 2) + 'H', donor)
-        if ids[-1] != 0 or 0 in ids[:-1] or ids.count(item) != 1 or old[at:at + 2] != bytes(2):
+        source_item,source_index=furniture_source(row)
+        if reviewed_rows is not None:
+            checked=next(r for r in reviewed_rows if r['item_id']==row['item_id'])
+            if furniture_source(checked)!=(source_item,source_index):raise ValueError('Changed stock source identity')
+        if ids[-1] != 0 or 0 in ids[:-1] or ids.count(source_item) != 1 or old[at:at + 2] != bytes(2):
             raise ValueError('Changed donor goods membership or native list terminator')
         insertions.append((at, item))
         selected.append({'item_id': f'{item:04X}', 'group': group,
+                         **{k:row[k] for k in ('donor_item_id','donor_runtime_index') if k in row},
                          'donor_list': name, 'donor_list_sha256': sha256(donor)})
     if len({item for _, item in insertions}) != len(insertions):
         raise ValueError('Duplicate selected shop identity')

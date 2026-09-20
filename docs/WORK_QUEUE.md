@@ -12,6 +12,17 @@ After the primary importing work, finish gold-tree leaf/cut effects and the full
 golden-shovel acquisition route. This is deferred required V3 work, not a dropped
 feature or a separate release goal.
 
+Use the current explicit ABI-164 proposal:
+`build/v3-legacy-mapped-imports-03/build-lock.json`. Shared source/destination
+mapping installs seven complete legacy souvenirs through existing Gulliver
+rewards, readers, catalogue, scoring, and optional composition. There are 135
+experimental choices; native IDs, clothing/display reservations, saved format 3,
+and both served patchers are preserved. Five focused checks pass. The native
+batch cannot allocate its temporary title-screen owner arena after one corrected
+retry; retain the startup/table evidence and leave changed-item execution open.
+Do not repeat that setup while category work remains. Reuse prepared resources,
+stable mappings, and shared tests. The checkpoint records exact hashes/limits.
+
 The complete holiday selector and no-loss transaction kernel are prepared at
 `build/v3-holiday-rewards-prepared-02/`: 28 events and 65 gift variants, driven by
 verified source code/tables. Three source/sanitizer checks pass; the N64 object
@@ -27,9 +38,10 @@ artwork, and fish/insect/NES/display dependencies; do not count all of them as
 new furniture or alias native IDs by number. Twelve supported static objects
 are prepared at `build/v3-legacy-static-prepared-01/` (46,272 bytes, one compiler
 container); two complete focused checks pass and official names have provenance.
-Next assign additive stable destinations after identity/representation review
-and connect shared metadata/acquisition. Preserve all existing furniture,
-clothing, and display reservations. The holiday program also requires bottled
+Seven prepared souvenirs have stable additive destinations and shared integration.
+Review the remaining paintings/chocolates and other legacy representations before
+assigning additional destinations; extend shared categories, not item installers.
+Preserve all furniture, clothing, and display reservations. The holiday program also requires bottled
 ship `1FC0`, whose complete colour-combiner conversion and native correspondence
 remain unresolved. This is primary importing work, not a stretch goal or an
 optional audit.
@@ -63,16 +75,16 @@ converter, cartridge, sanitizer, and native audio evidence.
 The ordinary bulk importer's chair-sound check accepts the expanded dispatch
 tables/fonts by verifying actual complete programs/instruments, not stale
 addresses. Its positive/negative check passes; reuse this machinery.
-The shared import reservation extends to `02800000`, with 2,015,504 bytes free.
+The shared import reservation extends to `02800000`, with 1,985,760 bytes free.
 English choices/general strings retain
 their content and physical locations through checked virtual relocation. The
 final general string has three checked padding bytes for rounded native DMA.
 Continue general category conversion/integration and source acquisition routes;
 do not replay passed storage, text, or clock checks without a relevant change.
 
-The current explicit proposal is ABI 163,
-`build/v3-shared-room-profiles-02/build-lock.json`. The shared staging adapter
-reuses all seventeen rig objects and adds five complete sound models. Both
+The retained ABI-163 staging at
+`build/v3-shared-room-profiles-02/build-lock.json` reuses all seventeen rig objects
+and adds five complete sound models. Both
 record enable flags and saved selection bits stay off. Four focused host checks
 pass, including promotion-ready asset reuse and unchanged full/empty composition.
 All 22 records now reach acquisition checks in the ordinary bulk importer.
@@ -87,7 +99,7 @@ packet also contains five sound records and the shared callback. The focused
 silent native audio check passes 61 assertions, with two real positioned-trigger
 and sample-transfer representatives, single-instance suppression, memory guards,
 restored checkpoint, and clean exit. Ordinary acquisition, room interaction,
-listening, and hardware remain open. Save formats and 128 choices are unchanged.
+listening, and hardware remain open. This retained audio work adds no choices.
 
 Retain the complete clock/storage evidence from ABI 161. The same room
 packet contains 25 records: eight balloons, two complete storage rigs, and fifteen

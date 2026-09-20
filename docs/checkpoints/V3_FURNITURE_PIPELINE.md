@@ -1,5 +1,101 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared source-to-destination mapping
+
+ABI 164 at `build/v3-legacy-mapped-imports-03/` installs the supported ordinary
+legacy souvenir category through the existing bulk importer. Source and native
+indices are separate throughout conversion, cache reuse, names/prices, placement,
+sound categories, scoring, catalogue framing, acquisition, and composition.
+The seven literal registry reservations preserve native items, all garment
+reservations, and existing balloon displays:
+
+| Donor | N64 destination | Official name |
+| --- | --- | --- |
+| `1FA0` | `3C10` | shogi piece |
+| `1FB4` | `3C14` | tribal mask |
+| `1FD0` | `3C18` | pagoda |
+| `1FD4` | `3C1C` | fishing bear |
+| `1FDC` | `3C20` | Chinese lioness |
+| `1FE0` | `3C24` | Tower of Pisa |
+| `1FEC` | `3C28` | Tokyo Tower |
+
+Identity review uses the pinned worksheet's complete missing native ID/name/
+model/texture correspondence, actual non-dummy donor profiles and English names,
+and absence from the approved native translation/dependency mapping. These are
+ordinary souvenir objects, not parent/display aliases. The actual donor list
+places all seven in `ftr_listJonason`; existing native Gulliver reward code uses
+that shared route. Names retain their official credits in the single catalogue.
+Other legacy identities, including paintings and chocolates, remain in review.
+
+The batch reuses all seven complete cached models, 29,712 bytes total, without
+an artwork compiler container. The normal runtime builder compiles its shared
+code and installs profiles, names, prices, source placement/sound categories,
+catalogue framing/non-orderability, HRA/feng-shui metadata, and selected reward
+records. There is no per-item installer, behaviour script, or native scenario.
+There are 135 experimental choices: 20 villagers, 88 furniture, 24 equipment,
+and three shirts. The import blob is 4,305,696 bytes with 1,985,760 bytes free.
+Resident allocations do not grow. Four golden-tool parents remain disabled.
+
+The integration exposed two stale shared-builder guards. The catalogue now
+validates and retains both existing pool increments: 64 bytes for inventory
+joints and 384 for the balloon menu. The complete bed functions remain unchanged;
+their guard now checks those five functions and all four expanded table bindings
+instead of rejecting unrelated changes elsewhere in the room owner. Altered
+bed functions still fail. Build attempts `01` and `02` stopped at those guards
+before producing a cartridge; `03` is the completed proposal.
+
+Reproduce with a fresh output directory:
+
+```sh
+python3 tools/v3_furniture_pipeline.py import \
+  --base-lock build/v3-shared-room-profiles-02/build-lock.json \
+  --category legacy-static --reuse-assets build/v3-legacy-static-prepared-01 \
+  --output build/legacy-mapped-reproduction
+```
+
+Five focused checks pass in 27.742 seconds:
+
+```sh
+python3 -m unittest tests.test_v3_furniture_pipeline.LegacyDiscoveryTests \
+  tests.test_v3_furniture_pipeline.MappedIdentityTests -v
+```
+
+They cover complete cached-art validation, reviewed identities, source tables,
+new destination records, negative identity/function corruption, retained previous
+assets/records/staging/equipment/saved format, unchanged native allocations, and
+cartridge checksums. Three browser/offline cases (empty, all, mixed mapped items
+with a dependent villager) agree, including selection-order independence. Empty
+output remains the pinned V2-12 image; all reproduces the current V3 image.
+No served website is updated or started by these checks.
+The installed placement/scoring/saved-bit assertions are extended and their
+affected source/destination check also passes in 3.729 seconds; unchanged
+graphics and browser cases are not replayed.
+
+Native verification is **incomplete**. The shared existing scenario at
+`tests/scenarios/v3_furniture_batch.json` runs silently with isolated state and
+an Expansion Pak. Both `build/v3-legacy-mapped-native-01/` and `-02/` pass startup,
+placement-table/guard, and catalogue-framing-table/guard checks. The first native
+test allocation requests 135,168 bytes and returns zero. The one justified retry
+sizes the arena from actual owner/relocation extents, requests 112,496 bytes, and
+also returns zero. Both stop before changed-item reader, model, acquisition, or
+ownership execution. No save is written. This is an unsatisfied test allocation,
+not evidence of a cartridge crash or successful gameplay. Do not replay the same
+title-screen setup; retain missing execution evidence for a later combined
+playable-context test. The shared probe also limits reward tests to changed
+categories instead of replaying every earlier NPC route.
+
+Output hashes:
+
+- ROM SHA-256: `6b438d1481a84599de89a475119f2c0cc586b716cf018fc061f3f1045dade5ca`.
+- UPS SHA-256: `37e9f9ba700e10e3d9b4f1f8854d731383789024643acf98382403ef790ba093`.
+- Build report SHA-256: `121b800bb49b83b9531ef8473d5cb8877e9dceba5bd84e277dadde42dec826b5`.
+
+Save format 3 is unchanged; saves using these additions require their selected
+destinations and are not compatible with older builds or V2. Ordinary gameplay,
+save/reload for the added items, GPU appearance, and original hardware remain
+unverified. The ABI-109 main lock and both served patchers are unchanged. Required
+gold-tree effects and golden-shovel acquisition follow primary import completion.
+
 ## Legacy donor discovery and bulk artwork
 
 The ordinary pipeline includes all 148 `1xxx` worksheet entries whose four

@@ -18,6 +18,7 @@ from v3_campsite_calendar import PACKAGE_SIZE
 from v3_furniture_pipeline import Source, LAYERS, prepare, metadata, identity_rows, draw_sequence
 from v3_garden_runtime import install_catalogue
 from v3_import_storage import PACKAGE, PACKAGE_RAM, ROWS, ROWS_RAM, ITEMS, TABLE_END, END, slot
+from v3_registry import furniture_source
 import v3_furniture_behaviours as behaviours
 import v3_furniture_placement as placement
 import v3_furniture_rewards as rewards
@@ -30,7 +31,7 @@ import v3_feng_shui as feng
 import v3_shops as shops
 import v3_resource_capacity as capacity
 
-VERSION = 9
+VERSION = 10
 LOCK = ROOT/'config/v3-import-build.json'
 STABLE = ROOT/'build/v2-keyboard-fit-11/Animal Forest English V2.z64'
 STABLE_SHA = '8bbd1955536a2a3ac9f76d6f323842f5ce25c037e1ff5fd3da9f28d6dfe20507'
@@ -93,6 +94,7 @@ def profile(row, vrom, *, limit=END):
 
 def catalogue_record(row):
     return dict(item_id=row['item_id'], runtime_index=row['runtime_index'],
+        **{k:row[k] for k in ('id','donor_item_id','donor_runtime_index') if k in row},
         catalogue_index=(int(row['item_id'],16)-0x1000)//4, mode=0,
         donor_position=row['donor_catalogue_position'], donor_acquisition_list=row['donor_list'],
         donor_preview_mode=row['preview_mode'],donor_preview_scalar_hex=row['donor_preview_scalar_hex'],
@@ -182,14 +184,14 @@ def checked_assets(art_path, source, worksheet):
     raw = (art_path/'art.json').read_bytes(); art = json.loads(raw)
     # Prior objects still undergo complete current metadata and model checks;
     # a display alias cannot pass as standalone furniture through an old report.
-    if (art['format'] != 'AFV3-AUTO-FURNITURE-ASSETS-1' or art['version'] not in (7, 8, VERSION)
+    if (art['format'] != 'AFV3-AUTO-FURNITURE-ASSETS-1' or art['version'] not in (7, 8, 9, VERSION)
             or art['source_rel_sha256'] != sha256(source.rel)
             or art['source_symbols_sha256'] != sha256(source.symbols.encode())):
         raise ValueError('Unknown converter/source revision')
-    identities = identity_rows(worksheet); seen = set(); rows = []
+    identities = identity_rows(worksheet,include_unmapped_legacy=True); seen = set(); rows = []
     cache=PreparedAssets(source,[art_path])
     for row in art['objects']:
-        item = int(row['item_id'],16)
+        item,_ = furniture_source(row)
         if item in seen: raise ValueError('Duplicate batch identity')
         seen.add(item)
         prepared=prepare(source,item);descriptor=prepared[0]
@@ -197,7 +199,7 @@ def checked_assets(art_path, source, worksheet):
         if any(row.get(k) != v for k,v in meta.items()) or row['profile'] != json.loads(json.dumps(descriptor)):
             raise ValueError('Import metadata differs from source discovery')
         if (row['native_profile_scalar_hex']!=descriptor['scalar_hex'] or
-                cache.reuse(source,row['item_id'],prepared) is None):
+                cache.reuse(source,f'{item:04X}',prepared) is None):
             raise ValueError('Changed complete converted asset or native profile scalar')
         asset=(art_path/row['object_file']).read_bytes()
         rows.append((row,asset))
@@ -289,7 +291,7 @@ def build(output, art_path, lock=LOCK):
         record = struct.pack('>HHHBB',index,item,row['price'],row['size_code'],1)+row['name'].encode().ljust(16,b' ')+bytes(8)
         blob[ITEMS+i*32:ITEMS+(i+1)*32] = record
         profile_bits[32+i//8] |= 1<<(i&7)
-        installed.append({**row, 'registry_version':2, 'object_vrom':f'{vrom:08X}',
+        installed.append({**row, 'registry_version':3 if row.get('donor_item_id') else 2, 'object_vrom':f'{vrom:08X}',
             'profile_ram':f'{ROWS_RAM+i*80+8:08X}', 'profile_sha256':sha256(native),
             'record_sha256':sha256(record), 'runtime_installed':True, 'enabled':True,
             'selectable':False, 'ordinary_gameplay_tested':False,
@@ -313,6 +315,7 @@ def build(output, art_path, lock=LOCK):
         source.symbols.encode(),reviewed_rows=cat_rows)
     changes.update(cat_changes)
     stock_rows = prior['shops']['imports']+[dict(item_id=r['item_id'],group=r['stock_group'],
+        **{k:r[k] for k in ('donor_item_id','donor_runtime_index') if k in r},
         donor_list=r['donor_list'],donor_list_sha256=r['donor_list_sha256']) for r in installed if not r['reward_route']]
     stock_ids = {r['item_id'] for r in stock_rows}
     goods,table_at,stock_rows = shops.goods(stable,source.rel,source.symbols.encode(),
@@ -423,7 +426,7 @@ def build(output, art_path, lock=LOCK):
             at=ITEMS+slot(int(row['item_id'],16))*32; row['record_sha256']=sha256(blob[at:at+32])
             row['action_sound']=blob[at+25]
             row['reward_route']=blob[at+27]
-            row['layer_type']=source.raw('aMR_layer_set_info')[row['runtime_index']]
+            row['layer_type']=source.raw('aMR_layer_set_info')[furniture_source(row)[1]]
     report['automatic_furniture']=dict(version=VERSION,imports=installed,art_report_sha256=art_sha,
         base=base_pin,art_directory=str(art_path.resolve().relative_to(ROOT)),
         resource_moves=moves,owner_moves=owner_moves,resource_tail_reuse=reused,additional_resident_bytes=0,saved_format_changed=False,

@@ -1725,11 +1725,21 @@ def exercise(debug, rom_path, record, *, section='automatic_furniture'):
     index_ram = int(report['furniture']['expanded_tables']['bank_index_ram'], 16)
     for row in rows:
         at = index_ram + row['runtime_index']; saved[at] = debug.read_memory(at, 1)
-    size = 0x21000
+    # The category owners share this temporary buffer, never coexist in it.
+    # Use their actual resident/relocation lengths rather than reserving an
+    # unrelated fixed 128-KiB owner arena in the crowded title-screen heap.
+    owners=[(furniture.RESIDENT,len(files[furniture.RELOC].extract(image))),
+            (files[catalogue.VROM].size,len(files[catalogue.RELOC].extract(image)))]
+    changed_routes={r.get('reward_route') for r in rows}
+    owners.extend((r['resident'],len(files[r['reloc']].extract(image)))
+        for r in report.get('furniture_rewards',{}).get('routes',[]) if r['route'] in changed_routes)
+    scratch_offset=(max(n+rel for n,rel in owners)+63)&~15
+    size = scratch_offset+0x1000
     allocation = call(0x8009BFC0, [size])
+    record(dict(furniture_fixture_bytes=size,owner_bytes=scratch_offset-32,allocation=allocation))
     if allocation & 15 or not MODULE_RAM + 0x8000 <= allocation <= 0x80400000 - size:
         raise ValueError('Furniture fixture allocation outside native heap')
-    owner, scratch, bridge = allocation + 16, allocation + 0x20000, allocation + 0x20F00
+    owner, scratch, bridge = allocation + 16, allocation + scratch_offset, allocation + scratch_offset+0xF00
     edge = b'V3SD' * 4
     guards = (allocation, scratch - 16, scratch + 0x100, bridge - 16, bridge + 8, allocation + size - 16)
     for at in guards: debug.write_memory(at, edge)
@@ -1963,7 +1973,8 @@ def exercise(debug, rom_path, record, *, section='automatic_furniture'):
             debug.write_memory(bridge,reward_stub)
             call(0x8002FE00,[bridge,8]);call(0x80034CE0,[bridge,8])
             reward_proof=(bridge,reward_stub)
-            for route in reward['routes']+reward.get('trade_routes',[]):
+            changed_routes={r.get('reward_route') for r in rows}
+            for route in [r for r in reward['routes']+reward.get('trade_routes',[]) if r['route'] in changed_routes]:
                 if 'vrom' in route:
                     loaded,_=load(route['vrom'],route['reloc'],route['ram'],route['resident'])
                     for patch in route['patches']:

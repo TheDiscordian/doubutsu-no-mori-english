@@ -817,11 +817,12 @@ class LegacyDiscoveryTests(unittest.TestCase):
         self.assertEqual(set(rows),set(expanded))
         self.assertIn(0x1FC0,rows);self.assertEqual(rows[0x1FC0]['name'],'bottled ship')
         self.assertEqual(rows[0x1FC0]['status'],'review')
-        self.assertTrue(all(rows[item]['status']=='review' for item in legacy))
+        from v3_registry import LEGACY_FURNITURE
+        self.assertEqual({item for item in legacy if rows[item]['status']=='supported'},set(LEGACY_FURNITURE))
         for item in range(0x1FF0,0x2000,4):self.assertIn('room_alias',rows[item])
         self.assertTrue(any('shared dummy profile' in rows[item].get('reason','') for item in legacy))
         with self.assertRaisesRegex(ValueError,'additive import mapping'):
-            pipeline.metadata(self.source,0x1FD0,self.source.profile(0x1FD0),legacy[0x1FD0])
+            pipeline.metadata(self.source,0x1FA4,self.source.profile(0x1FA4),legacy[0x1FA4])
 
     def test_complete_static_batch_uses_existing_compiler_and_retains_installation_gates(self):
         self.assertEqual(self.report['batch'],dict(objects=12,compiled=12,reused=0,compiler_containers=1))
@@ -829,20 +830,143 @@ class LegacyDiscoveryTests(unittest.TestCase):
         self.assertFalse(self.report['runtime_installed'])
         cache=pipeline.PreparedAssets(self.source,[self.art])
         identities=pipeline.identity_rows(ROOT/'build/item-identity-megasheet.xlsx',include_unmapped_legacy=True)
-        from v3_registry import furniture_representation_identity
+        from v3_registry import furniture_representation_identity, LEGACY_FURNITURE, furniture_source
         for row in self.report['objects']:
             item=int(row['item_id'],16)
             self.assertLess(item,0x3000);self.assertFalse(row['import_ready'])
             names=pipeline.name_metadata(self.source,item,identities[item])
             self.assertEqual({k:row[k] for k in names},names)
             self.assertIn('additive import mapping',row['pending_reason'])
-            with self.assertRaisesRegex(pipeline.ReviewRequired,'additive import mapping'):
-                pipeline.metadata(self.source,item,self.source.profile(item),identities[item])
-            with self.assertRaises(ValueError):furniture_representation_identity(item)
+            if item in LEGACY_FURNITURE:
+                meta=pipeline.metadata(self.source,item,self.source.profile(item),identities[item])
+                self.assertEqual(furniture_source(meta),(item,pipeline.furniture_source_index(item)))
+                self.assertEqual((meta['runtime_index'],int(meta['item_id'],16)),LEGACY_FURNITURE[item])
+            else:
+                with self.assertRaisesRegex(pipeline.ReviewRequired,'additive import mapping'):
+                    pipeline.metadata(self.source,item,self.source.profile(item),identities[item])
+                with self.assertRaises(ValueError):furniture_representation_identity(item)
             self.assertIsNotNone(cache.reuse(self.source,row['item_id'],pipeline.prepare(self.source,item)))
         with self.assertRaisesRegex(ValueError,'Unknown converter/source revision'):
             install.checked_assets(self.art,self.source,ROOT/'build/item-identity-megasheet.xlsx')
         self.check_complete_artwork(self.art,self.report)
+
+
+class MappedIdentityTests(unittest.TestCase):
+    """One shared batch verifies distinct donor and destination identities."""
+    @classmethod
+    def setUpClass(cls):
+        cls.out=ROOT/os.environ.get('V3_MAPPED_FURNITURE_BUILD','build/v3-legacy-mapped-imports-03')
+        cls.image,cls.report=install.inputs(cls.out/'build-lock.json')
+        cls.base,cls.prior=install.inputs(cls.out/'base-lock.json')
+        cls.files=by_vrom(cls.image);cls.blob=cls.files[install.BLOB].extract(cls.image)
+        cls.old=by_vrom(cls.base)[install.BLOB].extract(cls.base)
+        cls.rows=cls.report['automatic_furniture']['imports']
+        cls.source=pipeline.Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+            (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+
+    def test_shared_mapping_reuses_complete_art_and_reads_source_tables(self):
+        from v3_registry import LEGACY_FURNITURE,LEGACY_ROOM_ALIASES,CLOTHING_DISPLAYS,furniture_source
+        from v3_villager_houses import item_dependencies
+        self.assertEqual({int(r['donor_item_id'],16) for r in self.rows},set(LEGACY_FURNITURE))
+        self.assertFalse(set(LEGACY_FURNITURE.values())&(set(LEGACY_ROOM_ALIASES.values())|set(CLOTHING_DISPLAYS.values())))
+        self.assertEqual(len(set(LEGACY_FURNITURE.values())),len(LEGACY_FURNITURE))
+        original=(ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes()
+        reviewed=item_dependencies(original,{'rel':self.source.rel},self.source.symbols,set(LEGACY_FURNITURE))
+        self.assertTrue(all(not r['reviewed_native_items'] and not r['shared_identity_evidence'] for r in reviewed))
+        art=ROOT/self.report['automatic_furniture']['art_directory']
+        rows,_=install.checked_assets(art,self.source,ROOT/'build/item-identity-megasheet.xlsx')
+        self.assertEqual(len(rows),len(self.rows));self.assertEqual(install.provenance_patch(self.rows),'')
+        self.assertEqual(json.loads((art/'art.json').read_bytes())['batch'],
+                         dict(objects=7,reused=7,compiled=0,compiler_containers=0))
+        cat={r['item_id']:r for r in self.report['catalogue']['imports']}
+        for row in self.rows:
+            donor,idx=furniture_source(row);native=int(row['item_id'],16);slot=install.slot(native)
+            self.assertNotEqual(donor,native);self.assertNotEqual(idx,row['runtime_index'])
+            self.assertEqual((row['runtime_index'],native),LEGACY_FURNITURE[donor])
+            self.assertEqual(row['registry_version'],3)
+            raw=self.source.raw('ftrName_table')[idx*16:(idx+1)*16]
+            self.assertEqual(row['name'].encode().ljust(16,b' '),raw)
+            self.assertEqual(row['price'],struct.unpack_from('>H',self.source.raw('ftr_price_table'),idx*2)[0])
+            record=self.blob[install.ITEMS+slot*32:install.ITEMS+(slot+1)*32]
+            self.assertEqual(record[8:24],raw);self.assertEqual(record[24],0);self.assertEqual(record[27],12)
+            self.assertEqual(record[25],self.source.raw('mRmTp_ftr_se_type')[idx])
+            placement=self.report['furniture_placement']['table_ram']
+            offset=install.PACKAGE+placement-install.PACKAGE_RAM+row['runtime_index']
+            self.assertEqual(self.blob[offset],self.source.raw('aMR_layer_set_info')[idx])
+            self.assertTrue(self.blob[0x40+slot//8]&(1<<(slot&7)))
+            for section,tool,width,field in (('hra',hra,4,'native_hra_hex'),('feng_shui',feng,2,'feng_hex')):
+                data=self.files[tool.NEW_VROM].extract(self.image)
+                offset=self.report[section]['metadata_address']-tool.RAM+row['runtime_index']*width
+                self.assertEqual(data[offset:offset+width],bytes.fromhex(row[field]))
+            at=int(row['object_vrom'],16)-install.BLOB
+            self.assertEqual(self.blob[at:at+row['object_bytes']],(art/row['object_file']).read_bytes())
+            self.assertEqual(furniture_source(cat[row['item_id']]),(donor,idx))
+            self.assertEqual(cat[row['item_id']]['catalogue_index'],(native-0x1000)//4)
+            for field,value in (('donor_item_id','1FA4'),('donor_runtime_index',idx+1),
+                                ('runtime_index',row['runtime_index']+1),('id','GAFE01-r0/item/3000')):
+                damaged={**row,field:value}
+                with self.assertRaises(ValueError):furniture_source(damaged)
+
+    def test_retained_objects_guards_acquisition_and_memory(self):
+        from v3_furniture_runtime import VROM as ROOM,RAM as ROOM_RAM
+        from v3_furniture_behaviours import contact_contract,BED_HEAD
+        for row in self.prior['furniture']['imports']+[self.prior['speed_bag']]:
+            i=install.slot(int(row['item_id'],16));a=int(row['object_vrom'],16)-install.BLOB;n=row['object_bytes']
+            self.assertEqual(self.blob[install.ROWS+i*80:install.ROWS+(i+1)*80],self.old[install.ROWS+i*80:install.ROWS+(i+1)*80])
+            self.assertEqual(self.blob[install.ITEMS+i*32:install.ITEMS+(i+1)*32],self.old[install.ITEMS+i*32:install.ITEMS+(i+1)*32])
+            self.assertEqual(self.blob[a:a+n],self.old[a:a+n])
+        self.assertEqual(self.report['shops'],self.prior['shops'])
+        self.assertEqual(self.report['equipment_resources'],self.prior['equipment_resources'])
+        self.assertEqual(self.report['staged_furniture'],self.prior['staged_furniture'])
+        self.assertEqual(self.report['save_codec'],self.prior['save_codec'])
+        self.assertEqual(self.report['automatic_furniture']['additional_resident_bytes'],0)
+        self.assertFalse(self.report['automatic_furniture']['saved_format_changed'])
+        core=self.files[CODE_VROM].extract(self.image);old=by_vrom(self.base)[CODE_VROM].extract(self.base)
+        for a in (0x800C4AFC,0x800C4B10):self.assertEqual(core[a-CODE_RAM:a-CODE_RAM+4],old[a-CODE_RAM:a-CODE_RAM+4])
+        patches=self.report['catalogue']['retained_submenu_pool_patches']
+        self.assertEqual(sum(r['after']-r['before'] for r in patches),448)
+        all_rows=self.report['furniture']['imports']+[self.report['speed_bag']]
+        contract=contact_contract(self.image,self.report,self.blob,all_rows)
+        self.assertEqual(contract,self.report['furniture_behaviours']['contacts'])
+        damaged=bytearray(self.image);damaged[self.files[ROOM].pstart+BED_HEAD-ROOM_RAM]^=1
+        with self.assertRaisesRegex(ValueError,'bed/contact engine'):
+            contact_contract(damaged,self.report,self.blob,all_rows)
+        self.assertEqual(struct.unpack_from('>2I',self.image,0x10),n64_checksum(self.image))
+
+    def test_offline_and_browser_share_source_choices_and_destination_writes(self):
+        import v3_browser_composition as browser
+        pin=composer.BASE,composer.BASE_SHA,composer.REPORT_SHA,composer.ABI
+        try:
+            composer.use_build_lock(self.out/'build-lock.json')
+            catalog=composer.catalogue(self.image,self.report);plan=browser.rules(self.image,self.report)
+            keys=[r['id'] for r in self.rows]
+            self.assertEqual(len(catalog),135)
+            self.assertFalse({composer.item_key(int(r['item_id'],16)) for r in self.rows}&catalog.keys())
+            self.assertTrue(set(keys)<=catalog.keys());self.assertFalse(plan['web_patcher_enabled'])
+            cases=[]
+            for label,requested in (('empty',[]),('all',list(catalog)),
+                ('mapped-and-villager',keys[::3]+['GAFE01-r0/villager/00EB'])):
+                choice=composer.resolve(catalog,requested)
+                self.assertEqual(choice,composer.resolve(catalog,list(reversed(requested))))
+                image,_,blob=composer.compose(self.image,self.report,catalog,choice)
+                if label=='empty':self.assertEqual(sha256(image),self.report['translation_baseline']['sha256'])
+                elif label=='all':self.assertEqual(image,self.image)
+                else:
+                    _,receipt=composer.catalogue_selection(self.image,self.report,set(choice['enabled']))
+                    self.assertEqual({composer.furniture_key(r) for r in receipt['imports']} & set(keys),set(keys[::3]))
+                    for row in self.rows:
+                        i=install.slot(int(row['item_id'],16));active=row['id'] in choice['enabled']
+                        self.assertEqual(struct.unpack_from('>I',blob,install.ROWS+i*80+4)[0],active)
+                        self.assertEqual(bool(blob[0x40+i//8]&(1<<(i&7))),active)
+                cases.append(dict(name=label,requested=requested,selection=choice,sha256=sha256(image)))
+            with tempfile.TemporaryDirectory(prefix='v3-mapped-composition-') as directory:
+                path=Path(directory)/'fixture.json'
+                path.write_bytes(composer.canonical(dict(plan=plan,cases=cases,
+                    base=str(self.out/'animal-forest-v3-asset-loader.z64'),stable=str(composer.stable_reference(self.report)[0]))))
+                result=subprocess.run(['node','--experimental-global-webcrypto',str(ROOT/'tests/v3_browser_equivalence.mjs'),str(path)],
+                    check=True,capture_output=True,text=True,timeout=90)
+                self.assertEqual(len(json.loads(result.stdout)['passed']),3)
+        finally:composer.BASE,composer.BASE_SHA,composer.REPORT_SHA,composer.ABI=pin
 
 
 class CurrentCartridgeTests(unittest.TestCase):

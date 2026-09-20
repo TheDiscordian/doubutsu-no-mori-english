@@ -19,11 +19,51 @@ FURNITURE_REGISTRY_VERSION = 1
 # belong to the checked build manifest, not saved identity or checkbox order.
 CANONICAL_FURNITURE_VERSION = 2
 
+# Additive ordinary legacy furniture. These reviewed source identities have no
+# native correspondence in the pinned worksheet or approved translation map.
+# Keep reservations literal and append-only; membership is not an acquisition
+# or behaviour rule. 3C00..3C0C belong to balloon representations below this range.
+LEGACY_FURNITURE_VERSION = 3
+LEGACY_FURNITURE = {
+    0x1FA0: (1796, 0x3C10),
+    0x1FB4: (1797, 0x3C14),
+    0x1FD0: (1798, 0x3C18),
+    0x1FD4: (1799, 0x3C1C),
+    0x1FDC: (1800, 0x3C20),
+    0x1FE0: (1801, 0x3C24),
+    0x1FEC: (1802, 0x3C28),
+}
+
 
 def furniture_identity(donor_item):
+    if type(donor_item) is int and donor_item in LEGACY_FURNITURE:
+        return LEGACY_FURNITURE[donor_item]
     if type(donor_item) is not int or not 0x3000 <= donor_item < 0x33C8 or donor_item & 3:
         raise ValueError('Not a canonical English-donor furniture identity')
     return 1024+(donor_item-0x3000)//4, donor_item
+
+
+def furniture_source_index(item):
+    """Decode the donor table, never an N64 destination table."""
+    if type(item) is not int or item & 3:
+        raise ValueError('Not a canonical donor furniture identity')
+    if 0x1000 <= item < 0x2000: return (item-0x1000)//4
+    if 0x3000 <= item < 0x33C8: return 1024+(item-0x3000)//4
+    raise ValueError('Not a canonical donor furniture identity')
+
+
+def furniture_source(row):
+    """Validate a record's stable source/destination pair before source reads."""
+    item = int(row['item_id'],16)
+    donor = int(row.get('donor_item_id',row['item_id']),16)
+    index = furniture_source_index(donor)
+    native_index,native_item = furniture_identity(donor)
+    if (item != native_item or row.get('runtime_index',native_index) != native_index
+            or row.get('donor_runtime_index',index) != index
+            or row.get('id',f'GAFE01-r0/item/{donor:04X}') != f'GAFE01-r0/item/{donor:04X}'
+            or donor != item and ('donor_runtime_index' not in row or 'donor_item_id' not in row)):
+        raise ValueError('Changed furniture source/destination identity')
+    return donor,index
 
 
 # Older donor room aliases cannot use their source indices in the shorter N64

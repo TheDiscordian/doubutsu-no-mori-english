@@ -20,11 +20,11 @@ from map_artwork import compile_commands, compile_commands_batch
 from title_assets import model_texture_shape, pack4, rgb5a3, untile
 from v3_asset_loader import ROOT
 from v3_furniture_art import SEGMENT, command_source, parse_model, verify_sources
-from v3_registry import FURNITURE
+from v3_registry import FURNITURE, LEGACY_FURNITURE, furniture_identity, furniture_source_index
 from v3_room_aliases import discover as room_aliases, pending_reason as room_alias_reason
 from v3_villager_art import native_palette, normalise_vertex_flags
 
-VERSION = 9
+VERSION = 10
 LAYERS = ('opaque', 'opaque1', 'translucent', 'translucent1')
 BEHAVIOURS = {0: 'static', 1: 'front-seat', 2: 'any-direction-seat', 4: 'front-sofa',
               8: 'single-bed', 16: 'double-bed'}
@@ -833,7 +833,7 @@ class PreparedAssets:
                 raise ValueError('Prepared cache has an unsupported source/format')
             seen=set()
             for row in art['objects']:
-                item=row.get('item_id')
+                item=row.get('donor_item_id',row.get('item_id'))
                 if not isinstance(item,str) or not re.fullmatch(r'[13][0-9A-F]{3}',item) or item in seen:
                     raise ValueError('Prepared cache has an invalid or duplicate item')
                 seen.add(item)
@@ -898,15 +898,6 @@ def draw_sequence(profile, body_bytes, sections):
                 arena='opaque',output_sha256=sha256(raw)),raw
 
 
-def furniture_source_index(item):
-    """Decode donor furniture types, without assigning a destination identity."""
-    if type(item) is not int or item & 3:
-        raise ReviewRequired('not a canonical donor furniture identity')
-    if 0x1000 <= item < 0x2000: return (item-0x1000)//4
-    if 0x3000 <= item < 0x33C8: return 1024+(item-0x3000)//4
-    raise ReviewRequired('not a canonical donor furniture identity')
-
-
 def identity_rows(path, *, extra_items=(), include_unmapped_legacy=False):
     if sha256(path.read_bytes()) != SHEET_SHA: raise ValueError('Changed identity worksheet')
     rows = list(sheet_rows(path, 'Items'))
@@ -943,7 +934,7 @@ def metadata(source, item, profile, identity):
     alias = next((row for row in room_aliases(source)['rows'] if int(row['display_item_id'],16)==item), None)
     if alias:
         raise ReviewRequired(room_alias_reason(alias))
-    if item<0x3000:
+    if item<0x3000 and item not in LEGACY_FURNITURE:
         raise ReviewRequired('legacy donor identity needs native correspondence review and an additive import mapping')
     binding=getattr(source,'runtime_profiles',{}).get(f'{item:04X}')
     if binding and (binding['source_profile_sha256']!=profile['profile_sha256'] or
@@ -1001,6 +992,10 @@ def metadata(source, item, profile, identity):
     if birth >= 23 or hra&63 or series >= 59:
         raise ReviewRequired('scoring needs an acquisition/category adapter')
     native_hra = (hra&0xFFFFC000)|(birth<<9)|(surface<<7)
+    runtime_index,destination = furniture_identity(item)
+    if destination != item:
+        names.update(item_id=f'{destination:04X}',runtime_index=runtime_index,
+                     donor_item_id=f'{item:04X}',donor_runtime_index=index)
     return dict(**names, action_sound=action_sound,
         layer_type=layer_type, interaction_flags=profile['interaction_flags'],
         price=price, size_code=profile['size_code'], footprint=('1x1','2x1','2x2')[profile['size_code']],
@@ -1186,7 +1181,7 @@ def main():
     base, base_report = inputs(args.base_lock)
     from v3_room_rig_runtime import bind_profiles
     bind_profiles(source,base,base_report)
-    installed = [int(r['item_id'],16) for r in base_report['furniture']['imports']+[base_report['speed_bag']]]
+    installed = [int(r['id'].rsplit('/',1)[1],16) for r in base_report['furniture']['imports']+[base_report['speed_bag']]]
     if args.representation=='audio' and args.command=='convert':
         from v3_sound_programs import prepare_furniture_audio
         report=prepare_furniture_audio(base,base_report,source,scan(source,worksheet,installed),

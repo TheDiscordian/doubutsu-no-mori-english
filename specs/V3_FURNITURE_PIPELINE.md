@@ -32,10 +32,51 @@ their actual discovery reasons. No legacy donor number becomes a native ID.
 
 `--assets-only --category legacy-static` prepares complete supported static
 models from that range in one compiler batch. The native-correspondence and
-additive-destination gate remains ahead of ordinary installation. Prepared
+additive-destination gate remains ahead of ordinary installation for unreviewed
+identities. Prepared
 bundles retain full donor name/source records and use the same texture, geometry,
 material, and cache-validation machinery as the other categories. Source profile
 indices in these prepared records are not assigned N64 destination indices.
+
+### Stable donor and destination records
+
+The registry reserves reviewed ordinary legacy identities in `3C10..3C28`,
+after the balloon displays at `3C00..3C0C`. Existing native IDs, the entire
+garment display range, and every previous import reservation remain intact.
+Reservations are literal and append-only, not assigned by selection order.
+The seven current mappings identify ordinary Gulliver souvenirs; acquisition,
+graphics, and behaviour still come from source records, not that registry.
+Other legacy entries remain in review until identity and representation are
+established. Unresolved worksheet cells alone do not justify a new identity.
+
+Installed records keep `id` as the canonical GameCube identity. `item_id` and
+`runtime_index` identify the N64 destination; differing mappings also require
+`donor_item_id` and `donor_runtime_index`. Registry version 3 records express
+this distinction. `v3_registry.furniture_source` checks the full pair before any
+donor-table access. Same-identity records retain their previous representation.
+
+Source indices drive names, prices, action sounds, placement categories, HRA,
+feng shui, catalogue framing, and acquisition-list membership. Destination
+indices drive native profiles/readers, placement/scoring tables, catalogue
+encoding, inventory IDs, and saved selection/ownership bits. Graphics cache keys
+and filenames remain source identities. Neither prepared manifests nor same-ID
+arithmetic can bypass the mapping check.
+
+The shared ordinary installer consumes these records without another category
+installer. Gulliver's existing reward category returns selected destination IDs
+and keeps souvenirs non-orderable. Browser/offline options remain source IDs;
+catalogue packing and villager-house dependencies resolve those IDs to installed
+destinations. Empty profiles retain the pinned translation-only build. New
+destinations use existing saved format 3, but older builds lack those items and
+cannot accept saves which require them.
+
+Rebuilding the catalogue retains the checked chain of existing submenu pool
+increases for inventory joints and the balloon menu. Every before/after word,
+positive aligned increment, and final live instruction must agree. The builder
+does not reduce those allocations or accept an unexplained larger pool.
+Bed validation checks all five complete affected native functions and their
+four expanded profile-table bindings; unrelated room-owner updates do not
+invalidate unchanged bed code. Changed function contents still reject.
 
 Furniture `convert` and `import` preflight the entire selected batch, then compile
 all missing display lists in one existing toolchain container. Every object has

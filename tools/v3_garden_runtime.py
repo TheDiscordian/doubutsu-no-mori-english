@@ -287,24 +287,29 @@ def install_catalogue(base, stable, prior, imports, output, rel, symbols, *, wes
         clothing=(cloth, clothes), expanded=True,handheld=handheld)
     rebuilt_code = changes.pop(CODE_VROM)
     current_code = files[CODE_VROM].extract(base)
-    retained_inventory=prior.get('equipment_resources',{}).get('inventory_preview',{}).get('joint_work',{})
-    retained_pool=None
+    equipment=prior.get('equipment_resources',{})
+    retained_allocations=[r for r in (
+        equipment.get('inventory_preview',{}).get('joint_work'),
+        equipment.get('player_actions',{}).get('balloon_menu')) if r]
+    retained_pool=[]
     for address in (0x800C4AFC, 0x800C4B10):
         at = address - CODE_RAM
         if rebuilt_code[at:at + 4] != current_code[at:at + 4]:
-            patch=retained_inventory.get('pool_patch',{})
-            if (patch.get('address')!=address or retained_inventory.get('additional_pool_bytes')!=64 or
-                    struct.unpack_from('>I',rebuilt_code,at)[0]!=patch.get('before') or
-                    struct.unpack_from('>I',current_code,at)[0]!=patch.get('after') or
-                    patch['after']-patch['before']!=64):
-                raise ValueError(f'Catalogue allocation mismatch at {address:08X}: rebuilt '
-                    f'{rebuilt_code[at:at+4].hex()}, current {current_code[at:at+4].hex()}, '
-                    f'expected retained inventory {patch}')
-            retained_pool=copy.deepcopy(patch)
+            word=struct.unpack_from('>I',rebuilt_code,at)[0]
+            for retained in retained_allocations:
+                patch=retained.get('pool_patch',{});extra=retained.get('additional_pool_bytes',0)
+                if (address!=0x800C4B10 or patch.get('address')!=address or patch.get('before')!=word
+                        or type(extra) is not int or extra<=0 or extra%64
+                        or patch.get('after')!=word+extra or (word^(word+extra))&0xFFFF8000):
+                    raise ValueError('Changed retained submenu allocation chain')
+                word=patch['after'];retained_pool.append(copy.deepcopy(patch))
+            if word!=struct.unpack_from('>I',current_code,at)[0]:
+                raise ValueError(f'Catalogue allocation mismatch at {address:08X}')
     if retained_pool:
-        report['conservative_pool_required']+=64
-        report['pool_reserved']+=64
-        report['retained_inventory_pool_patch']=retained_pool
+        growth=sum(p['after']-p['before'] for p in retained_pool)
+        report['conservative_pool_required']+=growth
+        report['pool_reserved']+=growth
+        report['retained_submenu_pool_patches']=retained_pool
     report['linked_code'] = compiled
     if owner_repair:report['owner_descriptor_repair']=owner_repair
     report['code'] = {**compiled, 'symbols': {k: shifted(v) for k, v in compiled['symbols'].items()},

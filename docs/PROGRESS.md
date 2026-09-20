@@ -18,14 +18,36 @@ served patchers retain their existing builds.
 
 ## Active development
 
+The current explicit proposal is ABI 164 at
+`build/v3-legacy-mapped-imports-03/build-lock.json`. The shared importer separates
+donor IDs/indices from stable N64 destinations throughout artwork reuse, names,
+prices, placement, sound categories, scoring, catalogue, acquisition, and optional
+selection. Seven complete legacy Gulliver souvenirs are installed through that
+pipeline, using 29,712 bytes of prepared artwork and no new resident allocation.
+There are 135 experimental choices: 20 villagers, 88 furnishings, 24 equipment
+parents, and three shirts. Four golden tools remain disabled.
+
+Five focused checks pass, including three browser/offline composition profiles,
+retained assets/allocations, stable identity rejection, and exact empty/all output.
+The bounded native check reaches startup/table assertions but cannot allocate its
+temporary owner arena at the title screen, even after one size correction.
+Changed-item native readers/acquisition and ordinary gameplay remain unverified;
+do not replay the same setup. See the
+[mapped-identity checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-source-to-destination-mapping).
+Save format 3 is unchanged, but saves using the new items require their selected
+destinations and cannot be loaded by older builds. Neither served patcher nor
+the main ABI-109 lock changes. Continue primary category/acquisition work before
+required gold-tree effects and golden-shovel acquisition.
+
 The bulk scan includes unresolved legacy `1xxx` donor records rather than
 silently omitting them. `build/v3-legacy-static-prepared-01/` contains twelve
 complete static objects (46,272 bytes), compiled in one container with the
 existing converter. Two focused checks pass, including complete graphics
 comparisons, source names, alias/dummy classification, and refusal of unfinished
 imports. Official name sources are in the single provenance catalogue.
-Identity review and stable additive mapping remain required before these
-records can be installed; same-numbered N64 items are not overwritten. See the
+Seven ordinary souvenirs have reviewed additive destinations; the four paintings
+and chocolates remain pending identity/acquisition review. Same-numbered N64
+items are not overwritten. See the
 [legacy checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#legacy-donor-discovery-and-bulk-artwork).
 
 The primary acquisition pipeline prepares all 28 source holiday selectors and
@@ -34,19 +56,19 @@ N64 selection/handover kernel. Three focused source and sanitizer checks pass.
 The shared kernel handles optional variant selection, independent player
 receipts, duplicate rejection, and full-pocket failure without consuming a
 reward. This is prepared code/data, not an installed NPC or acquisition route;
-the current ROM and 128 choices remain unchanged. Next connect donor identity
+holiday preparation adds no selectable choices. Next connect donor identity
 resolution, Tortimer's actor/calendar/dialogue, and actual delivery callbacks.
 Legacy `1xxx` donor records are included in primary discovery. The holiday
 program's bottled ship `1FC0` still has no reviewed native identity or additive
 destination, and its colour-combiner conversion remains unsupported.
 See the [holiday checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-holiday-reward-preparation).
 
-The current explicit proposal is ABI 163 at
-`build/v3-shared-room-profiles-02/build-lock.json`. One shared batch connects
+The retained ABI-163 staging at
+`build/v3-shared-room-profiles-02/build-lock.json` connects
 all fifteen clocks, both storage rigs, and five sound objects to ordinary
 profiles, official names, and prices. It reuses all seventeen rig assets and
 adds 12,352 bytes of complete sound models, with no additional resident memory.
-The import reservation has 2,015,504 free bytes. Both record flags and saved
+The current import reservation has 1,985,760 free bytes. Both record flags and saved
 selection bits remain off, preventing unfinished items from entering gameplay.
 
 The ordinary bulk importer validates these installed lifecycle bindings and can
@@ -57,9 +79,9 @@ composition and unchanged existing records/resources. The silent native check
 passes 112 assertions, covering disabled registration and three category
 representatives' names, prices, sizes, complete model transfers, and guards.
 See the [profile checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-ordinary-profile-staging).
-There remain 128 experimental choices; acquisition, catalogue/scoring activation,
-ordinary gameplay, and hardware checks are not claimed complete. The main lock,
-both served patchers, and saved format/profile remain unchanged.
+Those 22 staged records add no experimental choices; their acquisition and
+catalogue/scoring activation remain incomplete. Ordinary gameplay and hardware
+checks are not claimed complete.
 
 The retained ABI 162 audio evidence covers all five complete
 furniture sound programs, instruments, and samples installed with one shared

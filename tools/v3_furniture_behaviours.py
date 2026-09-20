@@ -14,8 +14,17 @@ NATIVE_CATEGORIES, NATIVE_SOUNDS = 0x8010D314, 0x8010D6C8
 CATEGORY_SHA = '6e88fc4da791a5e31e72b21c59876c4f2f5adf0d721dcb8d4b8d268c56dc0a73'
 # Existing native bed geometry, entry, and exit use the expanded profile table.
 # This is a shared engine contract, not a list of approved bed identities.
-BED_OWNER_SHA = 'ca540a6f48fa15fb8bfad4d36abf77bb3d318799732d965f278063207f64b74a'
 BED_HEAD, BED_FOOT_SIDES, BED_PILLOW_SIDES = 0x80940304, 0x80940498, 0x80940784
+# Complete bed consumers with the installed profile-table/range bindings.
+# Unrelated placement and rig functions in the same owner may evolve without
+# changing these consumers. Keep complete function checks, not just entry bytes.
+BED_FUNCTIONS = (
+    (0x80940304,0x80940378,'ea92f54a016cb2ddb55c567f45fc18341fe0ad8287277435bb820126cc061bd1'),
+    (0x80940498,0x80940784,'525a96d61a69e0519d73e5446d5b4c06870bac61f6e66d1a35b409d4268a410b'),
+    (0x80940784,0x80940A64,'b3ff8c8decbbede285143189da5a74545e18e6d34aadfc1120530f04e79641ee'),
+    (0x80940D4C,0x809410FC,'f74591acddf4a73931b8af4e9678429bdf592fdda08de92769e295d15299e020'),
+    (0x80941868,0x80941C08,'ff545f4472ce3a7fe776d67b13f82dce6733eb777bc9066c01ddf1774f794a64'),
+)
 SOURCES = ('tools/v3_furniture_behaviours.py','tools/v3_four_cell_items.py','overlays/v3/items.c',
            'tools/v3_asset_loader.py','overlays/v3/furniture_behaviours.c',
            'overlays/v3/furniture_behaviours.S','overlays/v3/furniture_behaviours.ld',
@@ -28,7 +37,7 @@ def contact_contract(base, prior, blob, imports):
     if not beds: return None
     from v3_furniture_runtime import VROM, RAM as OWNER_RAM
     owner = by_vrom(base)[VROM].extract(base)
-    if sha256(owner) != BED_OWNER_SHA:
+    if any(sha256(owner[a-OWNER_RAM:z-OWNER_RAM])!=digest for a,z,digest in BED_FUNCTIONS):
         raise ValueError('Changed native bed/contact engine requires category review')
     tables = prior['furniture']['expanded_tables']
     if tables['profile_table_ram'] != '80470010' or tables['capacity'] != 2051:
@@ -41,7 +50,8 @@ def contact_contract(base, prior, blob, imports):
         if address != int(tables['profile_table_ram'],16):
             raise ValueError('Bed contact profile binding is not expanded')
     actions=sorted({blob[ROWS+slot(int(row['item_id'],16))*80+8+60] for row in beds})
-    return dict(contact_actions=actions,category='native-bed',native_owner_sha256=BED_OWNER_SHA,
+    return dict(contact_actions=actions,category='native-bed',native_owner_sha256=sha256(owner),
+        functions=[dict(start=a,end=z,sha256=digest) for a,z,digest in BED_FUNCTIONS],
         profile_table_ram=tables['profile_table_ram'],imports=[r['item_id'] for r in beds],
         head_direction_entry=BED_HEAD,foot_sides_entry=BED_FOOT_SIDES,pillow_sides_entry=BED_PILLOW_SIDES,
         added_runtime_bytes=0,ordinary_bed_gameplay_tested=False)
@@ -165,9 +175,10 @@ def install(original, base, prior, blob, code, imports, source, output):
     after=struct.pack('>II',0x08000000|(RAM>>2&0x3FFFFFF),0)
     code[ENTRY-CODE_RAM:ENTRY-CODE_RAM+8]=after
     categories=source.raw('mRmTp_ftr_se_type'); records=[]
+    from v3_registry import furniture_source
     for row in imports:
         index,item=row['runtime_index'],int(row['item_id'],16); at=ITEMS+slot(item)*32
-        category=categories[index]
+        category=categories[furniture_source(row)[1]]
         if (category not in (0,1,2) or blob[at+26]>PREVIEW_COUNT or any(blob[at+28:at+32])
                 or blob[at+25] not in (0,category)
                 or struct.unpack_from('>HH',blob,at)!=(index,item)):

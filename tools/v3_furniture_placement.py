@@ -111,15 +111,17 @@ def install(original, base, prior, blob, imports, source):
             struct.pack_into('>I',registration,p['address']-REGISTER,p['before'])
     if sha256(registration)!=REGISTER_SHA: raise ValueError('Changed native collision-registration behaviour')
     table=bytearray(CAPACITY); table[:947]=native_table
+    from v3_registry import furniture_source
     records=[]; seen=set()
     for row in imports:
         index=row['runtime_index']; item=int(row['item_id'],16)
-        if not 1024<=index<len(donor) or index!=1024+(item-0x3000)//4 or index in seen:
+        _,donor_index=furniture_source(row)
+        if not 1024<=index<CAPACITY or not 0<=donor_index<len(donor) or index!=1024+(item-0x3000)//4 or index in seen:
             raise ValueError('Invalid canonical placement identity')
-        value=donor[index]
+        value=donor[donor_index]
         if value not in (0,1,2): raise ValueError('Unsupported furniture placement category')
         table[index]=value;seen.add(index);row['layer_type']=value
-        records.append(dict(item_id=row['item_id'],runtime_index=index,source_index=index,layer_type=value))
+        records.append(dict(item_id=row['item_id'],runtime_index=index,source_index=donor_index,layer_type=value))
     # Display aliases retain their native mannequin category, not an unrelated
     # donor furniture row at the alias index.
     if set(native_table[491:746])!={0}: raise ValueError('Changed native clothing placement category')
