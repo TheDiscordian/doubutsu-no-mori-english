@@ -1,5 +1,69 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared tree world queries
+
+The ABI-153 proposal is `build/v3-shared-tree-world-02/build-lock.json`.
+The shared scenery gameplay installer connects collision geometry, shovel-removal
+eligibility, and NPC walkability for imported gold trees. It retains actual native
+terrain calculation, complete original routines, original-ID exclusions, and
+saved foreground identities. No individual-item installer or new choice is added.
+
+- ROM SHA-256:
+  `c301c71d9931a5ab15c84e870c50024b6f483a7ce90229a0fe69da7fbf709806`.
+- Report SHA-256:
+  `b5f377c157bc8faee2527ed47d08ea46bc21d5813387dd4ca581485f299ce8f6`.
+- UPS SHA-256:
+  `fec9f21af1270c505bb8234f22e6459845b34953056f3708da586cb0317831da`.
+
+Three complete donor and three complete native functions are hash-bound, together
+with source collision dimensions. Core entries `8006C980`, `8008C964`, and
+`8008D7B0` use one ABI-preserving resident gate. Lazy loading retains the original
+fifth stack argument; fallback stubs replay exact displaced prologues. Twelve
+solid imported states use complete native geometry through a temporary unit copy.
+Inclusive exclusions use the real ID, never the temporary geometry ID. Neither
+the source unit nor saved world data is changed. Native callers, the removal
+callback table, terrain helpers, and original routine bodies remain intact.
+Selected saplings/dead saplings/stumps allow removal; only initial saplings add
+NPC walkability. Unselected/native IDs retain their complete original behaviour.
+
+The packet occupies 7,516 bytes of its existing 8,192-byte reservation. Bootstrap
+size stays 848 bytes; equipment stays 72 KiB. Seasonal and daily consumers bind
+the new code addresses. No relocation rows, resource/scene allocations, saved
+fields, provenance text, or any of the 128 experimental choices change.
+
+The first build exposed a compiler-generated `memcpy` dependency in the temporary
+unit copy; the explicit eleven-word prefix copy and flags copy avoid that missing
+runtime dependency. The corrected build links successfully. Four focused tests
+pass in 6.873 seconds on their first invocation: host AddressSanitizer/UBSan covers
+all sixteen-bit IDs, selection, exclusions, immutable units, argument forwarding,
+and bounds; cartridge checks bind complete functions/prologues, retained owner
+code and relocation, storage limits, original-ROM patch reconstruction, optional
+composition, unchanged saves/choices, and exact V2-12 import-free output.
+
+The first silent native run, `build/smoke-v3-tree-world-01/`, passes 132 records
+and 118 assertions, restores its checkpoint, and exits cleanly. Actual core entry
+dispatch loads the complete packet, preserves stack arguments, and uses native
+terrain queries. All twelve solid gold states match the complete corresponding
+native columns. Real-ID exclusions, non-solid saplings, dig eligibility, NPC
+walkability, existing growth/stump dispatch, and unselected/native fallbacks pass.
+No game helper is replaced with a fixture stub. Complete packet/module contents,
+input units, allocation/stack guards, restored profile/cache/packet, and zero
+fault are checked. The private allocation is freed before checkpoint restoration.
+No user save is used or modified, and emulator audio is disabled. Harness work
+stays within the batch's thirty-minute limit; no native retry is needed.
+
+- Results SHA-256:
+  `35126cd76afa789785a95fa244443df5a1bd3ef61ffffa8e405d86cfdf2d95c1`.
+
+This is component verification, not ordinary walking/digging, shaking/cutting,
+acquisition, rendering, save/restart, or hardware proof. Full cutting/shaking/drop
+and planting effects remain; audit tree-specific field/insect consumers while
+connecting those routes. All four golden-tool choices stay disabled pending
+complete source acquisition. Format-3 matching/equal-or-larger profile restrictions
+remain; do not load imported saves in V2 or older format-1/2 V3 builds. Preserve
+backups. The main ABI-109 lock and both served patchers remain unchanged.
+See the [world-query design](../../specs/V3_SCENERY.md#collision-removal-and-npc-walkability).
+
 ## Shared hidden tree contents
 
 The ABI-152 proposal is `build/v3-shared-tree-contents-01/build-lock.json`.

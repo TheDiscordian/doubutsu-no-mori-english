@@ -2,8 +2,8 @@
 
 ## Active: V3 optional GameCube imports
 
-The current explicit proposal is ABI 152,
-`build/v3-shared-tree-contents-01/build-lock.json`. All eight balloons are
+The current explicit proposal is ABI 153,
+`build/v3-shared-tree-world-02/build-lock.json`. All eight balloons are
 connected through shared source-derived parent records, room profiles, indoor
 conversion/pickup, collection/catalogue, complete icons, and optional selection.
 There are 128 experimental choices, with 24 equipment parents. Neither served
@@ -64,8 +64,14 @@ assertions, including the actual refill schedulers on a temporary mixed grove,
 native spawn limits/distribution, preserved tree families, duplicate prevention,
 unselected fallback, and full world/RNG/profile/checkpoint restoration. No extra
 allocation or saved field is needed. Reuse this evidence; shaking/drop and a
-complete live-town renewal remain untested. Next connect world collision,
-full cutting/shaking, planting sparkle, and the selected shovel drop. Preserve
+complete live-town renewal remain untested. Shared collision, shovel-removal,
+and NPC-walkability queries are installed, with native terrain, unchanged saved
+identities, and original-item exclusions. Four focused checks and the first silent
+native component run pass (132 records, 118 assertions), with all twelve solid
+gold states, real core dispatch/lazy loading, guards, restored state/checkpoint,
+and clean exit. Reuse this evidence; ordinary interactions remain untested.
+The 7,516-byte packet fits the existing 8-KiB reservation. Next connect full
+cutting/shaking, planting sparkle, and the selected shovel drop. Preserve
 native scenery and the actual donor route; no arbitrary acquisition substitute.
 See [shared scenery](../specs/V3_SCENERY.md).
 Keep all four golden choices disabled pending those complete ordinary routes.

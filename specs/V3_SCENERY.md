@@ -126,7 +126,7 @@ held-category hooks. Disabled imported foreground IDs resolve the native empty
 row rather than indexing beyond a native table. Save/profile restrictions still
 apply; this fallback does not authorise removing imports from a saved world.
 
-The explicit ABI-152 proposal is `build/v3-shared-tree-contents-01/build-lock.json`.
+The explicit ABI-153 proposal is `build/v3-shared-tree-world-02/build-lock.json`.
 It uses an 8,192-byte fixed reservation and 32,864 bytes per loaded seasonal owner.
 All existing 128 experimental choices and format-3 saves remain unchanged.
 The main ABI-109 lock and both served V2 patchers stay unchanged. Component tests
@@ -204,7 +204,7 @@ eight-bit tree/candidate counters, including their full-acre wrap, remain intact
 Existing native routines handle unselected profiles.
 
 Daily growth requires an 8,192-byte reservation, 4 KiB beyond tree-state loading.
-The current packet includes hidden-content handling and occupies 6,812 bytes.
+The current packet includes hidden-content and world queries and occupies 7,516 bytes.
 The bootstrap still occupies 848 bytes. All complete scenery banks, daily owner
 and relocation sizes, equipment module, save/profile fields, and choices remain
 unchanged. Existing reserved retired cartridge storage holds the larger packet;
@@ -258,11 +258,49 @@ and complete world/RNG/profile/checkpoint restoration. No user save is modified.
 Full renewal, ordinary shaking/drop, rendered appearance, and hardware remain
 unverified.
 
+## Collision, removal, and NPC walkability
+
+The shared scenery gameplay refresh connects three complete native core entries:
+collision at `8006C980`, shovel-removal eligibility at `8008C964`, and NPC
+walkability at `8008D7B0`. Three complete donor consumers and actual source
+dimension constants bind the adaptation. Original core functions remain intact
+beyond their displaced prologues, with checked incoming branches and packet-local
+fallback stubs. Existing core callers and the removal callback table stay native.
+
+One resident assembly gate retains all four argument registers and the original
+stack arguments across lazy loading, then tail-dispatches into the packet. The
+native collision API has five arguments; it does not use the donor's callback
+and coordinate API. Its inclusive exclusion range is checked against the real
+foreground identity before mapping geometry. A temporary complete 48-byte unit
+copy selects matching native dimensions and terrain processing for twelve solid
+gold-tree/stump states. The real unit and saved foreground are never rewritten.
+Sapling and dead-sapling states have no trunk column. Native and unselected
+identities retain their original routine and exclusion semantics.
+
+Selected gold saplings, dead saplings, and four stump sizes are removable with
+the shovel; solid growth and mature states are not. Only the first sapling state
+adds NPC walkability. Position arguments and native fallbacks are retained.
+The packet occupies 7,516 of its reserved 8,192 bytes. The bootstrap remains
+848 bytes, with unchanged cache/guard/fallback addresses. Seasonal and daily
+references are rebound to current code without changing owner sizes, resources,
+scene allocations, saved formats, or choices.
+
+Host sanitizer checks cover every sixteen-bit identity, selection, exclusions,
+original-unit preservation, argument forwarding, and bounds. Cartridge checks
+bind complete source/core functions, displaced prologues, owner rebindings,
+relocations, memory limits, full patch reconstruction, retained save data, and
+exact V2-12 import-free output. The first silent native run uses actual terrain
+calculation and core entries, verifies all twelve solid states against complete
+native geometry, and checks removal, walkability, exclusions, lazy loading,
+guards, and full state/checkpoint restoration. No terrain or gameplay helper is
+stubbed in that fixture. It does not establish ordinary player interactions,
+rendered appearance, save/restart, or original-hardware behaviour.
+
 ## Remaining gameplay integration
 
 Reuse the installed renderer, planting conversion, tree-state helpers, and daily
-growth/death/neighbour/thinning and hidden-content consumers. World collision,
-full cutting/shaking, the planting sparkle, and the selected shovel drop remain
+growth/death/neighbour/thinning, hidden-content, and world-query consumers.
+Full cutting/shaking, the planting sparkle, and the selected shovel drop remain
 required. The source plants an ordinary shovel in a shining hole; do not
 substitute shop stock, arbitrary letters, recoloured ordinary trees, or seeded
 pockets for this route. Existing celebration and collection consumers remain

@@ -40,8 +40,11 @@ that installer to connect hidden bee/furniture/Bell recording and refilling.
 Complete donor tables supply the gold-family identities while original native
 acre scheduling, quotas, random selection, and unrelated holiday callers remain.
 This fits existing memory without reconverting assets or adding an item-specific
-installer. Planting effects, full cutting/shaking/drop, and world collision
-remain required. See
+installer. The subsequent refresh connects core collision, shovel-removal, and
+NPC-walkability queries through one ABI-preserving lazy-loading gate. Real item
+exclusions precede temporary geometry mapping; saved foreground data is never
+rewritten for collision. This also fits existing reservations. Planting effects
+and full cutting/shaking/drop remain required. See
 [seasonal scenery](V3_SCENERY.md).
 
 The shared flying-balloon category installs one complete donor state machine

@@ -21,7 +21,7 @@ SOURCES = ('tools/v3_scenery_runtime.py', 'tools/v3_scenery.py',
            'overlays/v3/scenery.ld', 'overlays/v3/scenery_bootstrap.c',
            'overlays/v3/scenery_bootstrap.ld', 'overlays/v3/scenery_palette.c',
            'overlays/v3/scenery_trees.c', 'overlays/v3/scenery_trees.h',
-           'overlays/v3/scenery_daily.c', 'overlays/v3/scenery_contents.c',
+           'overlays/v3/scenery_daily.c', 'overlays/v3/scenery_contents.c', 'overlays/v3/scenery_world.c',
            'tools/v3_asset_loader.py', 'translations/provenance.json')
 
 
@@ -631,6 +631,39 @@ def contents_contract(source,owner,rel,core):
         core_helpers_sha256=sha256(core_data)),tuple(bindings),records,locations
 
 
+WORLD_NATIVE=(
+    ('column',0x8006C980,2608,'69ed68aa1a87b3b8b9edb773746ba60a2d9116b148ba051ff69076ea6c0445c0','27bdffe0afb10018'),
+    ('dig',0x8008C964,176,'a0899af5a2cc5d190d31cd7297f0440131bec7707f564ed7d9526d1b5afbeb3d','afa50004afa60008'),
+    ('npc',0x8008D7B0,212,'859d536b93bd64b97a3c4a2287a851fcb38f9c1f181e86f678b6079777dcc43b','afa400003084ffff'),
+)
+
+
+def world_contract(source,core):
+    from aflib import CODE_RAM
+    from v3_npc_clothing import guard_incoming
+    donor={}
+    for at,size,digest in ((0x1DB50,3332,'bce9070a5a5bff8b86dc7d1829c576feab3ecd5446cb96f6f0e879253f14db54'),
+            (0x39040,248,'cc9e0122c561705f90e0e61308b3f98cb2c89fd8449a52f583b24bdc34384e4d'),
+            (0x39D88,220,'61ca154407ea62ee18164e6ebd400fb4ec55f545a119cd6b215f5906e25d3a99')):
+        raw,receipt=source.function(at)
+        if len(raw)!=size or sha256(raw)!=digest:raise ValueError('Changed complete donor world query')
+        donor[receipt['symbol']]=receipt
+    dimensions=[]
+    for at,expected in ((2140,40.0),(2144,20.0),(2160,10.0),(2264,30.0),(2272,19.0),
+            (2276,60.0),(2280,80.0),(2284,18.0)):
+        raw=source.rel[source.sections[4][0]+at:source.sections[4][0]+at+4]
+        if struct.unpack('>f',raw)[0]!=expected:raise ValueError('Changed source tree collision dimensions')
+        dimensions.append(dict(section=4,offset=at,hex=raw.hex(),value=expected))
+    native=[]
+    for name,start,n,digest,prologue in WORLD_NATIVE:
+        at=start-CODE_RAM
+        if sha256(core[at:at+n])!=digest or core[at:at+8].hex()!=prologue:
+            raise ValueError('Changed complete native world query: '+name)
+        native.append(dict(name=name,start=start,bytes=n,sha256=digest,prologue=prologue))
+    guard_incoming(core,len(core),CODE_RAM,[(at-CODE_RAM,8) for _,at,*_ in WORLD_NATIVE])
+    return dict(donor=donor,dimensions=dimensions,native=native)
+
+
 def install_daily(base,prior,blob,core,original,output):
     """Connect shared daily eligibility, death, neighbours, and acre thinning."""
     from aflib import CODE_RAM,by_vrom
@@ -641,8 +674,9 @@ def install_daily(base,prior,blob,core,original,output):
     old=prior['equipment_resources'];previous=old['scenery'];position=old['blob_offset']
     module=bytearray(blob[position:position+old['bytes']]);files=by_vrom(base)
     contents=bool(previous.get('daily_growth'))
+    world=bool(previous.get('hidden_contents'))
     added=0 if contents else 4096
-    if (previous.get('hidden_contents') or not previous.get('tree_states') or old['bytes']!=0x12000
+    if (previous.get('world_queries') or not previous.get('tree_states') or old['bytes']!=0x12000
             or sha256(module)!=old['sha256'] or previous['additional_fixed_resident_bytes']!=(8192 if contents else 4096)
             or RUNTIME_RAM+8192>prior['furniture']['bank_pool']['start']):
         raise ValueError('Changed daily-growth runtime dependency')
@@ -654,11 +688,22 @@ def install_daily(base,prior,blob,core,original,output):
         before=previous['daily_growth']
         if sha256(owner)!=before['sha256'] or sha256(rel)!=before['reloc_sha256']:
             raise ValueError('Changed installed daily owner')
-        evidence,bindings,records,locations=contents_contract(source,owner,rel,core)
+        if world:
+            from v3_player_actions import native_references
+            evidence=world_contract(source,core)
+            _,_,records,locations,_=native_references(owner,rel,expected_sections=(18960,368,0,1056))
+            bindings=((0xC90,0,'af_v3_tree_record_content',True),(0xCCC,0,'af_v3_tree_record_content',True),
+                (0x4AA8,0,'af_v3_tree_count_money',False),(0x4AD4,0,'af_v3_tree_count_money',False),
+                (0xDF4,0,'af_v3_tree_count_eligible',True),(0x117C,0,'af_v3_tree_count_eligible',True),
+                (0xE84,0,'af_v3_tree_change_content',True),(0x10BC,0,'af_v3_tree_change_content',True))
+            evidence['tables']=previous['hidden_contents']['tables']
+            actual=[list(struct.unpack_from('>3H',source.data,at)) for at in (0x52664,0x5266C,0x52674,0x5267C)]
+            if evidence['tables']!=actual:raise ValueError('Changed installed hidden-content tables')
+        else:evidence,bindings,records,locations=contents_contract(source,owner,rel,core)
         daily_bindings=((0x830,0x398,'af_v3_tree_near',True),(0x4ABC,0x910,'af_v3_tree_daily_plant',False),
             (0x28E0,0x14A0,'af_v3_tree_set_info',True),(0x296C,0x160C,'af_v3_tree_reset_info',True),
             (0x2980,0x1854,'af_v3_tree_thin',True))
-        for at,_,name,link in daily_bindings:
+        for at,_,name,link in (*daily_bindings,*(bindings if world else ())):
             target=previous['code']['symbols'][name]
             if u32(owner,at)!=(jump(target,link=True) if link else target) or at in locations:
                 raise ValueError('Changed installed daily callback')
@@ -682,12 +727,15 @@ def install_daily(base,prior,blob,core,original,output):
     path=output/'scenery-config.c';write_new(path,configuration.encode())
     sources=['overlays/v3/scenery_trees.c','overlays/v3/scenery_daily.c']
     if contents:sources.append('overlays/v3/scenery_contents.c')
+    if world:sources.append('overlays/v3/scenery_world.c')
     code,compiled=compile_part('scenery',output/'scenery',extra_sources=(*sources,str(path.relative_to(ROOT))))
     start=previous['blob_offset'];reservation=previous['reservations'][0]
     if (sha256(blob[start:start+previous['bytes']])!=previous['sha256'] or len(code)>8192
             or start+len(code)>reservation['blob_offset']+reservation['bytes']):
         raise ValueError('Daily tree packet exceeds owned cartridge or memory')
-    boot,bootstrap=compile_part('scenery_bootstrap',output/'scenery_bootstrap',defines=(
+    defines=['AF_V3_SCENERY_WORLD'] if world else []
+    if world:defines.extend(f'AF_SCENERY_{name.upper()}=0x{compiled["symbols"]["af_v3_tree_"+name]:X}' for name, *_ in WORLD_NATIVE)
+    boot,bootstrap=compile_part('scenery_bootstrap',output/'scenery_bootstrap',defines=(*defines,
         'AF_V3_SCENERY_TREES','AF_V3_SCENERY_DAILY',f'AF_SCENERY_VROM=0x{BLOB+start:X}u',
         f'AF_SCENERY_BYTES={len(code)}u',f'AF_SCENERY_CRC=0x{zlib.crc32(code):X}u',
         f'AF_SCENERY_GROW=0x{compiled["symbols"]["af_v3_tree_grow"]:X}u',
@@ -723,6 +771,12 @@ def install_daily(base,prior,blob,core,original,output):
         if before.hex()!=row['after']:raise ValueError('Changed core tree-state dispatch')
         after=struct.pack('>2I',jump(bootstrap['symbols']['af_v3_tree_'+row['name']+'_dispatch']),0)
         core[at:at+8]=after;core_hooks.append(dict(offset=at,before=before.hex(),after=after.hex()))
+    world_hooks=[]
+    if world:
+        for name,address,_,_,expected in WORLD_NATIVE:
+            at=address-CODE_RAM;after=struct.pack('>2I',jump(bootstrap['symbols']['af_v3_tree_'+name+'_dispatch']),0)
+            if core[at:at+8].hex()!=expected:raise ValueError('Changed native world-query entry')
+            core[at:at+8]=after;world_hooks.append(dict(offset=at,before=expected,after=after.hex(),name=name))
     data=bytearray(owner);relocation=bytearray(rel);patches=[];removed=set()
     for at,_,name,link in bindings:
         target=compiled['symbols'][name];after=jump(target,link=True) if link else target
@@ -742,10 +796,11 @@ def install_daily(base,prior,blob,core,original,output):
     receipt=dict(**evidence,config=config,vrom=0x970920,reloc=0x9754A0,ram=0x80AB07C0,
         resident_bytes=sum(struct.unpack_from('>4I',rel)),previous_sha256=sha256(owner),previous_reloc_sha256=sha256(rel),
         sha256=sha256(data),reloc_sha256=sha256(relocation),patches=patches,removed_relocations=sorted(removed),
-        core_hooks=core_hooks,additional_resident_bytes=added,additional_scene_resident_bytes=0,
+        core_hooks=core_hooks+world_hooks,additional_resident_bytes=added,additional_scene_resident_bytes=0,
         hidden_content_refresh_installed=contents,ordinary_gameplay_tested=False,native_test='pending')
     if contents:
-        current['hidden_contents']=receipt
+        current['world_queries' if world else 'hidden_contents']=receipt
+        if world:current['hidden_contents'].update(sha256=sha256(data),reloc_sha256=sha256(relocation))
         current['daily_growth'].update(sha256=sha256(data),reloc_sha256=sha256(relocation),
             hidden_content_refresh_installed=True)
     else:current['daily_growth']=receipt

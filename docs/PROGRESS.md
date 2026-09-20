@@ -18,7 +18,19 @@ served patchers retain their existing builds.
 
 ## Active development
 
-Shared hidden tree contents are installed in ABI 152 at
+Shared tree collision, shovel-removal, and NPC-walkability queries are installed
+in ABI 153 at `build/v3-shared-tree-world-02/build-lock.json`. The adapter uses
+native terrain and complete collision geometry while preserving real foreground
+identities and caller exclusions. Four focused checks pass. The first silent
+native run passes 132 records and 118 assertions, including all twelve solid gold
+states, actual core dispatch/lazy loading, removal/walkability, native fallbacks,
+guards, restored state/checkpoint, and clean exit. This is component verification,
+not an ordinary interaction or hardware test. The packet occupies 7,516 bytes
+within the existing 8-KiB reservation; no allocation, save field, or choice changes.
+Full cutting/shaking/drop and planting effects remain. Golden choices stay disabled.
+See the [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-tree-world-queries).
+
+Shared hidden tree contents remain installed, verified in ABI 152 at
 `build/v3-shared-tree-contents-01/build-lock.json`. Spent gold trees participate
 in native daily bee, furniture, and Bell recording/refilling without changing
 ordinary trees, spawn limits, or saved formats. Four focused checks pass. The
@@ -26,7 +38,7 @@ first silent native run passes 75 records and 50 assertions: the real schedulers
 populate a temporary mixed grove, preserve families and shovel-bearing trees,
 avoid duplicate refills, and restore the complete world/RNG/profile/checkpoint.
 The packet is 6,812 bytes within the existing 8-KiB reservation; no allocation
-grows. Next connect world collision, full cutting/shaking/drop, and planting
+grows. World collision is connected; next connect full cutting/shaking/drop and planting
 effects. Golden choices remain disabled. See the
 [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-hidden-tree-contents).
 
@@ -39,7 +51,7 @@ with restored state/checkpoint and clean exit. It executes daily-entry loading
 and isolated-acre consumers, not
 a full live-town renewal or hardware test. The shared code reservation adds 4 KiB;
 assets, owner sizes, saves, and all 128 choices remain unchanged. Next connect
-world collision, cutting/shaking/drop, and planting effects. Hidden-content
+cutting/shaking/drop and planting effects. World collision and hidden-content
 replenishment is connected. Golden choices stay disabled. See the
 [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-daily-tree-growth).
 
@@ -52,7 +64,7 @@ allocation, saved fields, or choices. Four focused checks pass. The first silent
 native component run passes 150 records and 100 assertions, including lazy loading,
 all four burial helpers, native fallbacks, guards, restored state/checkpoint, and
 clean exit. It is not a full planting interaction, daily-growth, or hardware test.
-Daily growth, neighbour/death rules, and thinning are connected; collision,
+Daily growth, neighbour/death rules, thinning, and collision are connected;
 full cutting/shaking, planting effects, and selected shovel drops remain. Golden choices remain
 disabled. See the [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-planting-and-tree-state-runtime).
 
@@ -68,13 +80,13 @@ passes 237 records and 122 assertions, including all four seasonal loads, all
 56 selected type records, safe unselected/native fallbacks, actual body drawing,
 memory guards, restored state/checkpoint, and clean exit. This is not GPU
 appearance, ordinary acquisition, or hardware proof. Reuse the prepared assets
-and this evidence. World collision, full cutting/shaking, planting effects, and
+and this evidence. Full cutting/shaking, planting effects, and
 the selected shovel drop remain. Golden choices stay disabled.
 The main lock and both served patchers remain unchanged. See the
 [scenery specification](../specs/V3_SCENERY.md) and
 [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-seasonal-scenery-runtime).
 
-The current explicit ABI-152 proposal retains the complete balloon integration.
+The current explicit ABI-153 proposal retains the complete balloon integration.
 All eight balloons are
 connected through the shared parent-category installer: official names/prices,
 complete pocket icons, held/inventory animation, source acquisition records,

@@ -1561,6 +1561,9 @@ def tool_controls(debug,rom_path,record,*,transitions=False,capture=False,rod=Fa
 
 
 def exercise(debug, rom_path, record, *, section='automatic_furniture'):
+    if section=='scenery_world_queries':
+        from v3_scenery_smoke import world_queries
+        return world_queries(debug,rom_path,record)
     if section=='scenery_hidden_contents':
         from v3_scenery_smoke import daily_growth
         return daily_growth(debug,rom_path,record,contents=True)

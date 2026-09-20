@@ -1,7 +1,7 @@
 #include "scenery.h"
 /* This code is in the already loaded equipment package, not in the packet it
    transfers. The cache word starts clear in the startup-loaded module. */
-static int load(void) {
+static __attribute__((noinline,used)) int load(void) {
     void *code=(void *)0x804B5000u;
 #ifdef AF_V3_SCENERY_TREES
     volatile u32 *ready=(volatile u32 *)0x804ADFECu;
@@ -18,6 +18,28 @@ static int load(void) {
 #endif
     return 1;
 }
+#ifdef AF_V3_SCENERY_WORLD
+#define AF_TREE_STRING_INNER(x) #x
+#define AF_TREE_STRING(x) AF_TREE_STRING_INNER(x)
+/* Shared ABI-preserving gate. Tail dispatch leaves fifth/later stack arguments
+   at their original addresses; the called helper returns directly to core. */
+__asm__(".set noreorder\n.section .text.af_v3_tree_world_dispatch,\"ax\"\n"
+        ".globl af_v3_tree_column_dispatch\naf_v3_tree_column_dispatch:\n"
+        "lui $t9,%hi(" AF_TREE_STRING(AF_SCENERY_COLUMN) ")\n"
+        "b af_v3_tree_query_dispatch\naddiu $t9,$t9,%lo(" AF_TREE_STRING(AF_SCENERY_COLUMN) ")\n"
+        ".globl af_v3_tree_dig_dispatch\naf_v3_tree_dig_dispatch:\n"
+        "lui $t9,%hi(" AF_TREE_STRING(AF_SCENERY_DIG) ")\n"
+        "b af_v3_tree_query_dispatch\naddiu $t9,$t9,%lo(" AF_TREE_STRING(AF_SCENERY_DIG) ")\n"
+        ".globl af_v3_tree_npc_dispatch\naf_v3_tree_npc_dispatch:\n"
+        "lui $t9,%hi(" AF_TREE_STRING(AF_SCENERY_NPC) ")\n"
+        "addiu $t9,$t9,%lo(" AF_TREE_STRING(AF_SCENERY_NPC) ")\n"
+        "af_v3_tree_query_dispatch:\naddiu $sp,$sp,-32\n"
+        "sw $a0,32($sp)\nsw $a1,36($sp)\nsw $a2,40($sp)\nsw $a3,44($sp)\n"
+        "sw $ra,20($sp)\njal load\nsw $t9,16($sp)\n"
+        "lw $ra,20($sp)\nlw $t9,16($sp)\nbeqz $v0,1f\nlw $a0,32($sp)\n"
+        "lw $a1,36($sp)\nlw $a2,40($sp)\nlw $a3,44($sp)\n"
+        "jr $t9\naddiu $sp,$sp,32\n1:\njr $ra\naddiu $sp,$sp,32\n.set reorder\n");
+#endif
 void af_v3_scenery_boot(void *actor,void *game,u32 variant) {
     if (load()) ((void (*)(void *,void *,u32))0x804B5000u)(actor,game,variant);
 }

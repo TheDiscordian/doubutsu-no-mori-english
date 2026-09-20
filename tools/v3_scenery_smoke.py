@@ -12,6 +12,84 @@ from v3_import_storage import jump
 from v3_npc_draw_smoke import boot_proofs
 
 
+def world_queries(debug,rom_path,record):
+    """Current core entries, terrain calculation, and guarded collision records."""
+    path=Path(rom_path);image=path.read_bytes();report=json.loads((path.parent/'build.json').read_bytes())
+    if sha256(image)!=report['output_sha256']:raise ValueError('Changed tree-world cartridge')
+    e=report['equipment_resources'];r=e['scenery'];files=by_vrom(image)
+    blob=files[BLOB].extract(image);boot=boot_proofs(image);assertions=0
+    def check(label,at,want):
+        nonlocal assertions
+        got=debug.read_memory(at,len(want));passed=got==want
+        record(dict(tree_world_check=label,address=f'{at:08X}',bytes=len(want),
+            expected_sha256=sha256(want),observed_sha256=sha256(got),assertion='passed' if passed else 'failed'))
+        if not passed:raise ValueError('Tree-world mismatch: '+label)
+        assertions+=1
+    def call(at,args=(),want=None):
+        result=debug.call(f'{at:08X}',[v&0xffffffff for v in args],return_address=MODULE_RAM+0x6480,verified_code=boot.get(at))
+        if want is not None:result['assertion']='passed' if result['return_value']==want else 'failed'
+        record(result)
+        if want is not None and result['return_value']!=want:raise ValueError('Tree-world native return mismatch')
+        return result['return_value']
+    regions=[(r['ram'],8192),(r['tree_states']['cache_word'],4),(0x80460020,192),
+        (TEST_STACK-0x800,16),(TEST_STACK+0x40,16)]
+    saved={at:debug.read_memory(at,n) for at,n in regions};module=debug.read_memory(e['ram'],e['bytes'])
+    allocation=call(0x8009BFC0,[0x400])
+    if allocation&15 or not MODULE_RAM+0x8000<=allocation<=0x803FFC00:raise ValueError('Tree-world fixture allocation failed')
+    unit=allocation+0x40;column=allocation+0xC0;item=allocation+0x120
+    guards=[allocation,unit-16,unit+48,column-16,column+32,item-16,item+16,allocation+0x3F0,TEST_STACK-0x800,TEST_STACK+0x40]
+    edge=b'AFWQ'*4;debug.write_memory(allocation,bytes(0x400))
+    for at in guards:debug.write_memory(at,edge)
+    parent=next(row for row in e['player_actions']['equipment_selection']['rows'] if row['item_id']=='223B')
+    def select(enabled):
+        profile=bytearray(saved[0x80460020]);profile[parent['profile_byte']]&=~parent['profile_mask']
+        if enabled:profile[parent['profile_byte']]|=parent['profile_mask']
+        debug.write_memory(0x80460020,profile)
+    def collision(value,low=0xffff,high=0,want=1):
+        data=bytearray(b'\xa5'*48);struct.pack_into('>2i',data,32,16,16);struct.pack_into('>H',data,46,value)
+        debug.write_memory(unit,data);debug.write_memory(column,b'\xa5'*32)
+        call(0x8006C980,[column,unit,0,low,high],want)
+        check('collision unit retains its original identity and fields',unit,bytes(data))
+        return debug.read_memory(column,32)
+    try:
+        select(True);debug.write_memory(r['ram'],bytes(8192));debug.write_memory(r['tree_states']['cache_word'],bytes(4))
+        call(0x8002FE00,[r['ram'],8192]);call(0x80034CE0,[r['ram'],8192])
+        # First entry must load the packet and preserve the fifth stack argument.
+        collision(0x864)
+        code=blob[r['blob_offset']:r['blob_offset']+r['bytes']]
+        check('core column entry loads the complete packet',r['ram'],code)
+        check('world-query packet cache',r['tree_states']['cache_word'],struct.pack('>I',r['crc32']))
+        reference={i:collision(i) for i in (1,2,3,4,0x801,0x802,0x803,0x804)}
+        for imported,native in ((0x864,0x801),(0x865,0x802),(0x866,0x803),(0x867,0x804),(0x868,0x804),
+                (0x7F,0x804),(0x80,0x804),(0x81,0x804),(0x7B,1),(0x7C,2),(0x7D,3),(0x7E,4)):
+            collision(imported);check('gold collision equals the complete matching native geometry',column,reference[native])
+        # Exclusion is applied to the real item, not its temporary geometry ID.
+        collision(0x864,0x800,0x804);check('native-ID exclusion does not exclude imported identity',column,reference[0x801])
+        collision(0x864,0x863,0x869,0);check('real imported-ID exclusion retains output',column,b'\xa5'*32)
+        for value in (0x863,0x869):
+            collision(value,want=0);check('sapling/dead sapling has no trunk column',column,b'\xa5'*32)
+        for value,want in ((0x863,1),(0x869,1),(0x7B,1),(0x7E,1),(0x864,0),(0x867,0),(0x800,1)):
+            raw=struct.pack('>H',value)+bytes(14);debug.write_memory(item,raw)
+            call(0x8008C964,[item,0x3f800000,0x40000000,0x40400000],want)
+            check('dig classification does not mutate foreground',item,raw)
+        for value,want in ((0x863,1),(0x869,0),(0x867,0),(0x800,1)):call(0x8008D7B0,[value],want)
+        # Existing entry dispatches were rebound when the bootstrap grew.
+        call(0x800A5970,[0x863,0,4],0x864);call(0x800A56F0,[0x867,0],0x7E)
+        select(False);collision(0x864,want=0);check('unselected tree keeps original collision behaviour',column,b'\xa5'*32)
+        debug.write_memory(item,struct.pack('>H',0x863));call(0x8008C964,[item,0,0,0],0);call(0x8008D7B0,[0x863],0)
+        collision(0x801);check('native geometry remains unchanged without selection',column,reference[0x801])
+        check('complete packet remains unchanged',r['ram'],code)
+        for at in guards:check('fixture guard',at,edge)
+        check('no faulted thread',0x8003CE34,bytes(4))
+    finally:
+        for at,data in saved.items():debug.write_memory(at,data)
+        call(0x8002FE00,[r['ram'],8192]);call(0x80034CE0,[r['ram'],8192]);call(0x8009C040,[allocation])
+    for at,want in saved.items():check('restored original state',at,want)
+    check('complete equipment module restored',e['ram'],module)
+    return dict(assertions=assertions,actual_native_terrain=True,all_gold_collision_states=True,
+        real_core_entries=True,world_identity_unchanged=True,ordinary_world_interaction=False,requires_checkpoint_restore=True)
+
+
 def daily_growth(debug,rom_path,record,*,contents=False):
     """Native daily consumers on isolated acres, preserving live town state."""
     path=Path(rom_path);image=path.read_bytes();report=json.loads((path.parent/'build.json').read_bytes())
