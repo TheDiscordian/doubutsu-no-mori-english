@@ -66,11 +66,18 @@ exit. Most cases inject native status results; one native cancellation path runs
 fully. Reuse this evidence, but do not claim ordinary terrain digging. See the
 [shovel checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-golden-shovel-digging).
 
-Next check axe wear and acquisition/demos against both games, then connect shared
-inventory/parent consumers. The source damage function preserves title-demo
-equipment, advances ordinary axe wear by one or three after reflection, and
-excludes the golden axe. Audit the actual native counterpart and downstream
-frame-15 item/counter updates before deciding which adapter is needed.
+The golden-axe durability audit is complete: the donor retains the golden item
+unchanged, and the existing native request/action handlers have no ordinary-axe
+wear path to disable. Both complete native regions are unchanged in ABI 134.
+Do not add wear to existing N64 axes to implement an unbreakable golden axe.
+This is a source/cartridge audit, not ordinary golden-axe gameplay. See the
+[audit](checkpoints/V3_FURNITURE_PIPELINE.md#golden-axe-durability-audit).
+
+Next connect shared tool inventory/parent consumers and acquisition/demos.
+`selection_records` currently accepts only categories 21/22/23; extend complete
+tool categories through that shared machinery, retaining fixed parent/display
+identities. Check inventory models, room aliases, pocket icons, rewards and
+wrapped presents as dependencies; resources alone do not enable selections.
 Keep all tool choices
 disabled until the required gameplay, inventory, acquisition, and persistence
 consumers are connected. Do not replay the completed input checks for unchanged code.

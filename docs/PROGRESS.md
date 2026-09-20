@@ -87,7 +87,10 @@ result to isolate the new suffix; one negative-position case executes the comple
 native cancellation path. This does not establish ordinary terrain digging.
 See the [shovel checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-golden-shovel-digging).
 
-Next verify axe wear and complete inventory/parent/acquisition support.
+The golden-axe durability audit finds no extra wear adapter is needed: the
+donor golden identity remains unchanged, and the retained native axe request/
+action path does not wear equipment. This is source/cartridge evidence, not
+ordinary gameplay. Next complete shared tool inventory/parent/acquisition support.
 The donor's balloon-loss-on-get-up path also remains an explicit shared behaviour
 dependency; it is not implemented by the net recovery adapter. Keep tool choices
 disabled. Continue from the current lock and retain completed evidence. See the

@@ -60,9 +60,39 @@ buried-item gameplay, reward animation, acquisition, persistence, GPU appearance
 or original hardware. Reuse unchanged prior tool evidence; do not replay it.
 Imported saves need matching-or-larger profiles and must not be used in V2.
 
-Next verify actual axe wear/exemption consumers and connect shared parent,
-inventory, acquisition/demo, and persistence support before enabling tools.
+Next connect shared parent, inventory, acquisition/demo, and persistence support
+before enabling tools; the durability audit below needs no new runtime code.
 Balloon release on get-up remains a separate shared dependency.
+
+## Golden-axe durability audit
+
+The complete source damage function at REL text `169188`, 416 bytes, has
+SHA-256 `18edb9be71e27e97a0002553a9f637579fb372dca68710cbbcf63203642aa53c`.
+Its request caller at `169328`, 348 bytes, hashes to
+`33adc9f21083b37a6a5fe38ede518ecd50c26f38c42d86b15a177cf494444973`.
+The source frame-15 item change function at `18005C`, 228 bytes, hashes to
+`745865c51347f47cb43e837a6b3ffa69b4365758dd94f357be6f4c942a003875`.
+The golden item `223A` is not in the accepted ordinary/worn axe set and returns
+unchanged. The frame-15 update sees the same item and does not alter equipment,
+reset wear, or play break sounds. Ordinary wear forms are not a dependency of
+that golden behaviour.
+
+The actual N64 request `808B7CDC..808B7DD8`, 252 bytes, hashes to
+`04da44d62527230350e1f29ec8db2ee7799cb3c667a16e2b5dbf622b51c5d4fc`.
+Its complete direct-call sequence is input `808B2DE4`, player `800B1C84`,
+collision `808B6458`, position conversion `80088344`, tree-swing request
+`808CA060`, reflection request `808CAD58`, and air-swing request `808CA9E4`.
+There is no intervening equipment lookup, damage update, or worn-item argument.
+The complete 4,812-byte swing/air/reflection region `808CA060..808CB32C` hashes
+to `53f7ace416bce0118f16197003f29af7f44768d6ba0731799a6fe9a66ae8951c`.
+Both regions compare exactly with the original cartridge in ABI 134. Existing
+tool-input evidence covers actual kind 44 being accepted as the axe family.
+
+No new axe-wear patch is needed for the golden import, and no ordinary N64 axe
+durability change is justified by this feature. This audit does not establish
+the golden parent's complete inventory/acquisition path or ordinary chopping/
+reflection gameplay. Continue those consumers rather than adding a redundant
+wear implementation or repeating unchanged tool-input tests.
 
 ## Shared golden-rod response
 

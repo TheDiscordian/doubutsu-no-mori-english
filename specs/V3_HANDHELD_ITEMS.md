@@ -995,6 +995,29 @@ animation test. Tool choices stay disabled until remaining shared inventory,
 parent, acquisition/demo, and persistence requirements are complete. See the
 [checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-golden-shovel-digging).
 
+### Golden axe and native durability
+
+Golden-axe durability does not require adding the GameCube ordinary-axe wear
+system. Source `Player_actor_GetitemNo_forDamageAxe` at REL text `169188`
+returns golden item `223A` unchanged: `IS_ITEM_AXE` accepts only ordinary `2201`
+and worn `223D..2243`, and the inner golden-tool exclusion also prevents wear.
+Only ordinary accepted IDs increase `axe_damage` by one or three and advance
+through worn forms at nine. At frame 15, `Player_actor_ChangeItemNo_axe_common`
+(`18005C`) changes equipment, resets damage, and plays break sounds only if the
+requested item differs from the equipped item. It does nothing for the unchanged
+golden identity. Preserve original N64 tool behaviour; do not add ordinary-axe
+wear merely to implement an unbreakable golden axe.
+
+The native request `808B7CDC..808B7DD8` directly selects tree swing, reflection,
+or air swing. It does not call an item-damage function or pass a wear identity.
+The native swing/air/reflection handlers at `808CA060..808CB32C` retain that
+non-wearing action path. The current proposal preserves both complete regions
+from the original cartridge. Shared input classification already accepts actual
+golden kind 44 as the axe family without changing its real kind. This closes the
+need for a golden-axe durability adapter, not the remaining item binding,
+acquisition, ordinary gameplay, or hardware verification. Evidence is recorded
+in the [checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#golden-axe-durability-audit).
+
 ### Extended action tables
 
 `--refresh-runtime --player-actions` installs shared action-table capacity in the
