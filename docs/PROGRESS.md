@@ -18,7 +18,24 @@ served patchers retain their existing builds.
 
 ## Active development
 
-The explicit ABI-124 proposal at `build/v3-balloon-actions-02/` installs shared
+The current explicit ABI-125 proposal is
+`build/v3-balloon-inventory-02/build-lock.json`. All eight balloon inventory
+previews use their source idle animation and reflected drawing. Existing fan and
+pinwheel records, timing, resources, selections, and saved formats are retained.
+Three focused checks pass. The first silent native run passes 141 records,
+including 103 component assertions and four final fault/memory checks, covering
+four representative balloon/pinwheel previews and checkpoint restoration.
+GPU appearance, ordinary inventory interaction, and hardware remain unverified.
+
+Next connect balloon room representations and context-correct parent conversion.
+Unlike fans/pinwheels, balloons become animated room furniture indoors; four
+source representations also need additive destination IDs for the older donor
+furniture range. Balloons remain unavailable as selections until these readers,
+real room models, and behaviours are integrated. The 120 existing choices,
+format-2 saves, exact V2-12 empty output, and both served patchers stay unchanged.
+See the [inventory checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-balloon-inventory-previews).
+
+The retained ABI-124 proposal at `build/v3-balloon-actions-02/` installs shared
 balloon setup, hand-motion tracking, sway/spring animation, and reflected drawing.
 The player owns 48 additional transient bytes; no saved field is changed.
 The shared equipment module is 60 KiB. An adjacent audio sequence moves intact
@@ -30,10 +47,10 @@ actual initialization/hand tracking/animation/drawing commands, matrix and memor
 guards, saved-state retention, checkpoint restoration, and clean exit. This is
 component execution, not GPU appearance, ordinary gameplay, or hardware proof.
 
-Use `build/v3-balloon-actions-02/build-lock.json` for continued work. The 120
-experimental choices, existing inventory previews, complete resources, format-2
-saves, and exact V2-12 no-import output are retained. Balloon inventory drawing
-and parent integration are next; balloons are not selectable yet. Reuse the
+Use the ABI-125 lock above for continued work. The 120
+experimental choices, complete resources, format-2 saves, and exact V2-12
+no-import output are retained. Balloon parent/room integration is next;
+balloons are not selectable yet. Reuse the
 passing eight-vector player/inventory allocation evidence. The main lock and
 both patchers stay unchanged. See the
 [balloon-action checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-balloon-actions).
@@ -90,7 +107,7 @@ The actual browser worker matches offline empty/all/mixed/equipment outputs
 using both supplied games. Its unserved export is
 `build/v3-held-category-browser-01/`; neither served patcher changes.
 
-Continue from `build/v3-balloon-actions-02/build-lock.json` explicitly. Retain
+Continue from `build/v3-balloon-inventory-02/build-lock.json` explicitly. Retain
 passing animation, sound, and inventory evidence for unchanged implementations.
 The 60-KiB equipment module, 15,584-byte inventory bank, and format-2 save layout
 retain their current ownership; outdoor banks hold 7,168 bytes each. Pinwheel profile bits require a

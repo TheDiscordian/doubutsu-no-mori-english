@@ -400,8 +400,9 @@ module; all pinwheel callbacks and the live loop-volume hook are rebound.
 
 Five focused checks and the first silent native component run pass. Ordinary
 gameplay, GPU appearance, acquisition/persistence, and hardware remain open.
-Inventory-specific reflection drawing and parent integration are required before
-balloons become selectable. See the
+Inventory-specific reflection drawing is installed through the shared adapter
+below. Parent integration and actual animated room placement remain required
+before balloons become selectable. See the
 [balloon checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-balloon-actions).
 
 ### Shared held loop sound
@@ -1082,6 +1083,33 @@ See the [checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-pocket-
 for component evidence and the remaining native control/guard/render checks.
 
 ## Shared inventory equipment previews
+
+### Balloon previews
+
+After outdoor balloon actions and eight-vector work storage are installed,
+`--refresh-runtime --player-actions` adds the complete source category to the
+existing inventory records. Native kinds `91..98` map to previews `10..17`.
+The pinned source animation consumer remaps outdoor GYAZA animation 32 to
+inventory WAIT animation 31; native resource IDs are 49 and 48 respectively.
+The type-four idle animation retains all seven joints and eight work vectors.
+Source speed 0.5 uses the ordinary native initializer's speed 1.0; the separate
+pinwheel speed hook remains confined to previews `18..25`.
+
+The resident drawer uses source reflection vectors at the origin with eye
+`(0,0,1)` and light `(-1,1,1)/sqrt(3)`. It calls the unchanged native
+`HiliteReflect_new` at `80058620` and skeleton drawer at `800530D8`, allocating
+four shown-joint matrices plus the native 48-byte LookAt/Hilite structures.
+GameCube-only edge-threshold callbacks use the same native RDP coverage
+adaptation as outdoor balloons. Complete source callbacks are recorded.
+
+Explicit linker ordering retains all existing inventory entry addresses.
+Code occupies 824 of the reserved 1,024 bytes at `804A9000`; the same eight
+tables and selector gain only their previously empty balloon slots. No owner,
+native initializer, model/animation resource, bank, BSS, module size, or save
+format changes. Inventory readiness does not enable parent selection.
+Focused source/cartridge/composition checks and a four-representative native
+component run pass; ordinary interaction and GPU/hardware appearance remain open.
+See the [checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-balloon-inventory-previews).
 
 ### Animated rigs
 

@@ -1026,6 +1026,10 @@ def install(base,prior,blob,core,original,output):
     if (old.get('inventory_preview',{}).get('joint_work',{}).get('vectors',0)>=8
             and not old.get('held_rig_actions',{}).get('balloon')):
         return refresh_balloon_actions(base,prior,blob,core,original,output)
+    if (old.get('held_rig_actions',{}).get('balloon') and
+            not old.get('inventory_preview',{}).get('balloon_drawer')):
+        from v3_inventory_equipment import refresh_rigs as inventory_rigs
+        return inventory_rigs(base,prior,blob,core,original,output)
     if old.get('held_rig_actions',{}).get('loop_sound_installed') and not old['inventory_preview'].get('animated_rigs_installed'):
         from v3_inventory_equipment import refresh_rigs as inventory_rigs
         return inventory_rigs(base,prior,blob,core,original,output)

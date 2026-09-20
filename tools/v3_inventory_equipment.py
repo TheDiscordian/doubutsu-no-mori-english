@@ -33,7 +33,7 @@ FUNCTIONS=(
     (0x272524,156,'7d0497e25b735edec49669876912fa0ba67d4c0a9609bd41cfff3075ef6ff353'))
 
 
-def records(source,equipment,*,animated=False):
+def records(source,equipment,*,animated=False,balloon_callback=None):
     """Join actual inventory kinds/callbacks to installed equipment resources."""
     from v3_handheld_items import parent_records
     _,parents=parent_records(source,equipment)
@@ -64,6 +64,11 @@ def records(source,equipment,*,animated=False):
     kind_rows={r['item_id']:r for r in equipment['kind_readers']['rows']}
     selector=bytearray(struct.pack('>4I',0x41464956,1,56,4)+bytes(56*4));rows=[]
     candidates=list(parents['rows'])
+    if balloon_callback is None:
+        balloon_callback=equipment.get('inventory_preview',{}).get('balloon_drawer',{}).get('address')
+    if balloon_callback is not None and (not animated or not RAM+CODE<=balloon_callback<RAM+TABLE
+            or not equipment.get('held_rig_actions',{}).get('balloon')):
+        raise ValueError('Balloon preview requires the checked category and resident drawer')
     if animated:
         from v3_handheld_items import discover
         if not equipment.get('held_rig_actions',{}).get('loop_sound_installed'):
@@ -71,31 +76,42 @@ def records(source,equipment,*,animated=False):
         identities={r['item_id']:r for r in discover(source)['rows']}
         installed={r['item_id'] for r in candidates}
         for kind in kind_rows.values():
-            if kind['item_main']==22 and kind['item_id'] not in installed:
+            if kind['item_main'] in ((21,22) if balloon_callback else (22,)) and kind['item_id'] not in installed:
                 original=identities[kind['item_id']]
                 candidates.append(dict(id=original['id'],item_id=kind['item_id'],native_kind=kind['native_kind']))
         raw,function=source.function(0x2723F4)
         if len(raw)!=96 or sha256(raw)!='12815662833de2f10cfbcfe2c16bc04cbf10cc5d5b8c0a37725ea780e9353c6a':
             raise ValueError('Changed complete source animated preview drawer')
         functions.append(function)
+        if balloon_callback:
+            for at in (0x272290,0x2722E8,0x272340):functions.append(source.function(at)[1])
     for parent in candidates:
         kind=kind_rows[parent['item_id']];world=parent['native_kind']
         source_kind=world-36
         if kinds.count(source_kind)!=1:raise ValueError('Ambiguous inventory equipment kind')
         iv_kind=kinds.index(source_kind);preview=iv_kind+1
         callback=pointers[iv_kind*4][3]
-        rig=animated and callback==0x2723F4
-        if preview<6 or preview>=COUNT or callback not in ((0x272454,0x2723F4) if animated else (0x272454,)):
+        balloon=bool(balloon_callback) and callback==0x272340
+        rig=animated and (callback==0x2723F4 or balloon)
+        callbacks=(0x272454,0x2723F4,0x272340) if balloon_callback else ((0x272454,0x2723F4) if animated else (0x272454,))
+        if preview<6 or preview>=COUNT or callback not in callbacks:
             raise ValueError('Unimplemented inventory held-drawing category')
         animation,_,shape,item_animation,_,_=kind['fields']
+        if balloon:
+            # The complete pinned mIV_Get_player_item_anime_index consumer
+            # maps source BALLOON_GYAZA (32) to BALLOON_WAIT (31) in menus.
+            if item_animation!=17+32:raise ValueError('Changed source balloon animation remap')
+            item_animation=17+31
         model=resources[shape];motion=motions[animation]
         if not kind['resource_ready'] or motion['bytes']>3848 or motion['type']>=5:
             raise ValueError('Inventory equipment exceeds installed loader/rig support')
         if rig:
             item_motion=resources[item_animation];skeleton=model['source']['skeleton']
-            if (model['kind']!='animated-model' or model['type']!=1 or kind['item_main']!=22
-                    or not 0<skeleton['shown_joints']<=skeleton['joints']<=6
-                    or item_motion['kind']!='animation' or item_motion['type']!=5
+            vectors=equipment['inventory_preview'].get('joint_work',{}).get('vectors',7)
+            if (model['kind']!='animated-model' or model['type']!=1 or kind['item_main']!=(21 if balloon else 22)
+                    or not 0<skeleton['shown_joints']<=min(skeleton['joints'],4)
+                    or skeleton['joints']+1>vectors
+                    or item_motion['kind']!='animation' or item_motion['type']!=(4 if balloon else 5)
                     or item_motion['source']['joints']!=skeleton['joints']
                     or model['bytes']+item_motion['bytes']>equipment['inventory_preview']['item_bank_bytes']):
                 raise ValueError('Animated preview exceeds native bank or joint work capacity')
@@ -112,9 +128,9 @@ def records(source,equipment,*,animated=False):
             model_bytes=model['bytes'],model_sha256=model['sha256'],
             animation_bytes=motion['bytes'],animation_sha256=motion['sha256'],selectable=False))
         if rig:
-            rows[-1].update(draw_callback=0x8087E098,item_animation_bytes=item_motion['bytes'],
+            rows[-1].update(draw_callback=balloon_callback if balloon else 0x8087E098,item_animation_bytes=item_motion['bytes'],
                 item_animation_sha256=item_motion['sha256'],joint_vectors=skeleton['joints']+1,
-                source_frame_speed=7.5,native_frame_speed=15.0)
+                source_frame_speed=.5 if balloon else 7.5,native_frame_speed=1.0 if balloon else 15.0)
     if len({r['preview_kind'] for r in rows})!=len(rows):
         raise ValueError('Colliding native inventory preview kinds')
     return bytes(selector),dict(format='AFV3-INVENTORY-EQUIPMENT-1',rows=rows,
@@ -222,14 +238,15 @@ def refresh_rigs(base,prior,blob,core,original,output):
     old=prior['equipment_resources'];preview=old['inventory_preview'];offset=old['blob_offset']
     module=bytearray(blob[offset:offset+old['bytes']]);files=by_vrom(base)
     owner=files[VROM].extract(base);rel=files[RELOC].extract(base)
-    if (preview.get('animated_rigs_installed') or sha256(module)!=old['sha256']
+    extend=bool(preview.get('animated_rigs_installed'))
+    if ((extend and (preview.get('balloon_drawer') or not old.get('held_rig_actions',{}).get('balloon')))
+            or sha256(module)!=old['sha256']
             or sha256(owner)!=preview['owner_sha256'] or sha256(rel)!=preview['relocation_sha256']):
         raise ValueError('Animated previews require the checked current inventory module')
     source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
                   (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
     selector,generated=records(source,old,animated=True)
-    added=[r for r in generated['rows'] if r.get('draw_callback')]
-    indices=sorted(r['preview_kind'] for r in added)
+    indices=sorted(r['preview_kind'] for r in generated['rows'] if r.get('draw_callback'))
     if not indices or indices!=list(range(indices[0],indices[-1]+1)):
         raise ValueError('Animated preview speed category is not a complete contiguous donor range')
     _,init=source.function(0x2716FC);constant=init['relocations'].get(610)
@@ -241,14 +258,26 @@ def refresh_rigs(base,prior,blob,core,original,output):
     if (owner[first:last]!=native[first:last] or
             sha256(owner[first:last])!='aa2407b27fc7dd177028984f1a08d34b8fe47d5e7ca196641ca41d624cb2df0a'):
         raise ValueError('Changed native null-callback skeleton drawer')
+    defines=(
+        f'AF_V3_HELD_SELECTED=0x{old["player_actions"]["code"]["symbols"]["af_v3_player_selected_equipment"]:08X}u',
+        f'AF_V3_INVENTORY_RIG_FIRST={indices[0]}',f'AF_V3_INVENTORY_RIG_COUNT={len(indices)}')
+    if extend:defines+=('AF_V3_INVENTORY_BALLOON',)
     code,compiled=compile_part('inventory_equipment',output/'inventory_equipment',
-        extra_sources=('overlays/v3/inventory_equipment.S',),defines=(
-            f'AF_V3_HELD_SELECTED=0x{old["player_actions"]["code"]["symbols"]["af_v3_player_selected_equipment"]:08X}u',
-            f'AF_V3_INVENTORY_RIG_FIRST={indices[0]}',f'AF_V3_INVENTORY_RIG_COUNT={len(indices)}'))
+        extra_sources=('overlays/v3/inventory_equipment.S',),defines=defines)
+    if extend:
+        selector,generated=records(source,old,animated=True,
+            balloon_callback=compiled['symbols']['af_v3_inventory_balloon_draw'])
+        retained={r['item_id']:r for r in preview['rows']}
+        if any(retained.get(r['item_id'],r)!=r for r in generated['rows']):
+            raise ValueError('Preview expansion changes an existing category binding')
+    added=[r for r in generated['rows'] if r['item_id'] not in {p['item_id'] for p in preview['rows']}]
+    if not added:raise ValueError('No new complete preview category')
     previous=preview['code'];n=previous['bytes']
     if (sha256(module[CODE:CODE+n])!=previous['sha256'] or any(module[CODE+n:TABLE])
             or len(code)>TABLE-CODE):raise ValueError('Changed or overlapping inventory code reservation')
-    for symbol in ('af_v3_inventory_item_kind','af_v3_inventory_static_draw','af_v3_inventory_dispatch'):
+    stable_symbols=['af_v3_inventory_item_kind','af_v3_inventory_static_draw','af_v3_inventory_dispatch']
+    if extend:stable_symbols.append('af_v3_inventory_rig_init')
+    for symbol in stable_symbols:
         if compiled['symbols'][symbol]!=previous['symbols'][symbol]:
             raise ValueError('Animated preview changed an installed inventory entry')
     receipt=copy.deepcopy(preview);receipt.update(generated)
@@ -266,7 +295,8 @@ def refresh_rigs(base,prior,blob,core,original,output):
     module[SELECTOR:SELECTOR+len(selector)]=selector
     module[CODE:TABLE]=code+bytes(TABLE-CODE-len(code))
     hook=0x8087DA64;at=hook-OWNER_RAM
-    if u32(owner,at)!=jump(0x80052584,link=True):raise ValueError('Changed native skeleton initializer call')
+    expected=preview['animation_speed_hook']['after'] if extend else jump(0x80052584,link=True)
+    if u32(owner,at)!=expected:raise ValueError('Changed native skeleton initializer call')
     words=struct.unpack_from('>5I',rel)
     if any((r&0xFFFFFF)==at for r in struct.unpack_from('>'+str(words[4])+'I',rel,20)):
         raise ValueError('Unexpected initializer JAL relocation')
@@ -276,12 +306,27 @@ def refresh_rigs(base,prior,blob,core,original,output):
         animated_rigs_installed=True,owner_sha256=sha256(patched),previous_owner_sha256=sha256(owner),
         animated_rig_indices=indices,additional_resident_bytes=0,
         animated_drawer=dict(start=OWNER_RAM+first,end=OWNER_RAM+last,sha256=sha256(owner[first:last])),
-        animation_speed_hook=dict(address=hook,before=u32(owner,at),after=after,
-                                  source_speed=7.5,native_speed=15.0))
+        animation_speed_hook=preview['animation_speed_hook'] if extend else dict(
+            address=hook,before=u32(owner,at),after=after,source_speed=7.5,native_speed=15.0))
+    if extend:
+        native_core=by_vrom(original)[CODE_VROM].extract(original)
+        first_api,last_api=0x80058620,0x80058810
+        if core[first_api-CODE_RAM:last_api-CODE_RAM]!=native_core[first_api-CODE_RAM:last_api-CODE_RAM]:
+            raise ValueError('Changed complete native inventory reflection API')
+        receipt['balloon_drawer']=dict(address=compiled['symbols']['af_v3_inventory_balloon_draw'],
+            preview_indices=sorted(r['preview_kind'] for r in added),source_frame_speed=.5,native_frame_speed=1,
+            reflection_origin=[0,0,0],reflection_eye=[0,0,1],
+            reflection_light=[-.5773502691896257,.5773502691896257,.5773502691896257],
+            native_reflection_api=0x80058620,native_skeleton_api=0x800530D8,
+            reflection_api_sha256=sha256(core[first_api-CODE_RAM:last_api-CODE_RAM]),
+            source_animation_remap=dict(outdoor=32,inventory=31,native_outdoor=49,native_inventory=48),
+            edge_alpha='Native RDP coverage, without GameCube-only GX threshold commands')
+        receipt['balloon_drawer']['source_functions']=generated['source_functions'][-3:]
     blob[offset:offset+len(module)]=module
     report=copy.deepcopy(old);report.update(inventory_preview=receipt,sha256=sha256(module),
         crc32=zlib.crc32(module),additional_resident_bytes=0)
-    return report,{VROM:bytes(patched)}
+    if extend:report['held_rig_actions']['balloon']['inventory_preview_installed']=True
+    return report,{} if extend else {VROM:bytes(patched)}
 
 
 def install(base,prior,blob,core,original,output):

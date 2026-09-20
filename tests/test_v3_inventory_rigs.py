@@ -21,6 +21,96 @@ import v3_optional_composition as composer
 OUTPUT=ROOT/os.environ.get('V3_INVENTORY_RIG_BUILD','build/v3-inventory-rigs-02')
 
 
+BALLOON_OUTPUT=ROOT/'build/v3-balloon-inventory-02'
+
+
+@unittest.skipUnless((BALLOON_OUTPUT/'build-lock.json').is_file(),'Current balloon inventory build required')
+class BalloonPreviewTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.image,cls.report=inputs(BALLOON_OUTPUT/'build-lock.json')
+        cls.before,cls.prior=inputs(BALLOON_OUTPUT/'base-lock.json')
+        cls.files,cls.old_files=by_vrom(cls.image),by_vrom(cls.before)
+        cls.e=cls.report['equipment_resources'];cls.old=cls.prior['equipment_resources']
+        cls.p=cls.e['inventory_preview'];cls.previous=cls.old['inventory_preview']
+        cls.blob=cls.files[BLOB].extract(cls.image);cls.old_blob=cls.old_files[BLOB].extract(cls.before)
+        at=cls.e['blob_offset'];cls.module=cls.blob[at:at+cls.e['bytes']]
+        cls.old_module=cls.old_blob[at:at+cls.old['bytes']]
+        cls.source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+            (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+
+    def test_complete_source_category_and_correct_inventory_motion(self):
+        selector,generated=inventory.records(self.source,self.e,animated=True)
+        self.assertEqual(generated['rows'],self.p['rows'])
+        self.assertEqual(selector,self.module[inventory.SELECTOR:inventory.SELECTOR+len(selector)])
+        previous={r['item_id']:r for r in self.previous['rows']}
+        added=[r for r in self.p['rows'] if r['item_id'] not in previous]
+        self.assertEqual(len(added),8)
+        self.assertEqual(sorted(r['preview_kind'] for r in added),list(range(10,18)))
+        self.assertEqual(sorted(r['world_kind'] for r in added),list(range(91,99)))
+        for r in self.p['rows']:
+            if r['item_id'] in previous:self.assertEqual(r,previous[r['item_id']])
+        for r in added:
+            self.assertEqual((r['fields']['item_animation'],r['joint_vectors'],r['source_frame_speed'],r['native_frame_speed']),
+                (48,8,.5,1))
+            self.assertEqual(r['draw_callback'],self.p['balloon_drawer']['address'])
+            self.assertNotEqual(r['draw_callback'],0x8087E098)
+            self.assertFalse(r['selectable'])
+        for category in ('joint_work','animation_speed_hook','animated_rig_indices'):
+            self.assertEqual(self.p[category],self.previous[category])
+        for mutate in ('vectors','missing_category','bad_motion','bad_callback'):
+            changed=copy.deepcopy(self.e)
+            if mutate=='vectors':changed['inventory_preview']['joint_work']['vectors']=7
+            if mutate=='missing_category':del changed['held_rig_actions']['balloon']
+            if mutate=='bad_callback':changed['inventory_preview']['balloon_drawer']['address']=0x8087E098
+            if mutate=='bad_motion':
+                next(r for r in changed['records'] if r['index']==48)['source']['joints']=6
+            with self.assertRaises(ValueError,msg=mutate):inventory.records(self.source,changed,animated=True)
+
+    def test_only_inventory_code_and_new_table_slots_change(self):
+        expected=bytearray(self.old_module);code=(BALLOON_OUTPUT/'inventory_equipment/code.bin').read_bytes()
+        expected[inventory.CODE:inventory.TABLE]=code+bytes(inventory.TABLE-inventory.CODE-len(code))
+        self.assertLessEqual(len(code),inventory.TABLE-inventory.CODE)
+        for name in self.previous['code']['symbols']:
+            self.assertEqual(self.p['code']['symbols'][name],self.previous['code']['symbols'][name])
+        added=[r for r in self.p['rows'] if r['preview_kind'] in range(10,18)]
+        for table in self.p['tables']:
+            at,n=table['offset'],table['bytes']
+            for row in added:
+                offset=at+row['preview_kind']*4
+                self.assertEqual(expected[offset:offset+4],bytes(4))
+                value=row['draw_callback'] if table['role']=='draw' else row['fields'][table['role']]
+                struct.pack_into('>I',expected,offset,value)
+            self.assertEqual(sha256(expected[at:at+n]),table['sha256'])
+        selector,_=inventory.records(self.source,self.e,animated=True)
+        expected[inventory.SELECTOR:inventory.SELECTOR+len(selector)]=selector
+        self.assertEqual(self.module,expected)
+        for v in set(self.files)-{BLOB,MODULE,0x19D40}:
+            self.assertEqual(self.files[v].extract(self.image),self.old_files[v].extract(self.before),hex(v))
+        for key in ('records','player_motion','player_joint_work','parent_readers','optional_selection'):
+            self.assertEqual(self.e[key],self.old[key])
+        for row in self.e['records']:
+            at,n=row['blob_offset'],row['bytes']
+            self.assertEqual(self.blob[at:at+n],self.old_blob[at:at+n])
+        self.assertTrue(self.e['held_rig_actions']['balloon']['inventory_preview_installed'])
+        self.assertEqual(self.e['bytes'],self.old['bytes'])
+        self.assertEqual(apply_ups((ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes(),
+            (BALLOON_OUTPUT/'asset-loader.ups').read_bytes()),self.image)
+
+    def test_existing_choices_saves_and_exact_no_import_output(self):
+        self.assertEqual(self.report['save_runtime'],self.prior['save_runtime'])
+        pin=(composer.BASE,composer.BASE_SHA,composer.REPORT_SHA,composer.ABI)
+        try:
+            composer.use_build_lock(BALLOON_OUTPUT/'build-lock.json')
+            catalog=composer.catalogue(self.image,self.report)
+            self.assertEqual(len(catalog),120)
+            self.assertFalse(any(f'GAFE01-r0/item/{i:04X}' in catalog for i in range(0x2244,0x224C)))
+            self.assertEqual(sha256(composer.compose(self.image,self.report,catalog,composer.resolve(catalog,[]))[0]),
+                self.report['translation_baseline']['sha256'])
+            self.assertEqual(composer.compose(self.image,self.report,catalog,composer.resolve(catalog,list(catalog)))[0],self.image)
+        finally:composer.BASE,composer.BASE_SHA,composer.REPORT_SHA,composer.ABI=pin
+
+
 @unittest.skipUnless((OUTPUT/'build-lock.json').is_file(),'Current animated inventory cartridge required')
 class CartridgeTests(unittest.TestCase):
     @classmethod

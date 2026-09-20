@@ -1,5 +1,56 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared balloon inventory previews
+
+The shared inventory adapter installs all eight balloon previews, including
+source WAIT animation selection, seven-joint/eight-vector work, native reflection,
+and all four drawn joint lists. It retains all prior preview entry addresses,
+tables, timing, and resource identities. Parent choices remain disabled.
+
+- Explicit lock: `build/v3-balloon-inventory-02/build-lock.json`, ABI 125.
+- ROM SHA-256:
+  `84b4f55a3b501a05387bb33d3132b30c51bfef0a0260cdd1ed416fdb08460495`.
+- Report SHA-256:
+  `24b0f96b36ed9fd38594fb708ed4e3a84f2013011c9622053849c82459647917`.
+- UPS SHA-256:
+  `eb8a496e502c434ba81748dd42f533771f892d7c6a80b050a418e0171d773868`.
+- Inventory code: 824 bytes in the existing 1,024-byte reservation.
+- Preview records: 24, including eight balloons, eight pinwheels, and eight fans.
+
+The first build stops before cartridge generation because an old pinwheel-only
+animation-type check rejects the type-four balloon idle motion. The corrected
+category check validates both real types and their joint counts. No art is
+truncated or replaced, and no new allocation or saved field is introduced.
+
+Three focused tests pass in 7.917 seconds. They verify regenerated source
+records, the actual source animation remap, old timing/entry retention, rejected
+short work buffers/missing actions/bad motion/foreign callbacks, exact table and
+code changes, unchanged unrelated DMA resources, original-ROM UPS reconstruction,
+all 120 existing choices, retained saves, and exact no-import V2-12 output.
+
+The first silent native run, `build/smoke-v3-balloon-inventory-01/`, passes
+141 records, including 103 component assertions and four final fault/memory
+checks. The shared fixture selects smallest/largest models per draw category:
+two balloons and two retained pinwheels. It executes actual cartridge-loaded
+inventory initialization, complete model/motion DMA, source-correct first-frame
+timing, four/two joint lists, reflection/matrix allocation, graphics/stack/work
+guards, and unchanged source state. Scratch is freed, the checkpoint restored,
+and the isolated emulator exits cleanly. Results SHA-256:
+`ad482d7658f57ab0f9f152c619cdbd23b8e6aef47f82daaa4b5d98df63dbb20b`.
+No ordinary inventory interaction, GPU appearance, hardware, or new save/reload
+claim follows from this component test. No user save is touched.
+
+Next implement shared animated room representations and their context-correct
+parent conversions. All eight source balloons become room furniture indoors;
+four use older donor IDs `1FF0..1FFC`, requiring additive destination mappings.
+Their actual room rigs and switch-driven speed response are separate from held
+models. The ordinary static fan/pinwheel catalogue adapter cannot substitute for
+them. Keep parent choices off until these dependencies are installed.
+
+The main ABI-109 lock, both served V2 patchers, 120 experimental choices, and
+format-2 saves are unchanged. Imported saves require matching/equal-or-larger
+profiles and remain unsuitable for V2. No source text or provenance changes.
+
 ## Shared balloon actions
 
 The shared `--player-actions` refresh installs the complete source balloon

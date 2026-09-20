@@ -2,21 +2,35 @@
 
 ## Active: V3 optional GameCube imports
 
-The current explicit proposal is ABI 124,
-`build/v3-balloon-actions-02/build-lock.json`. Shared balloon setup, hand delta,
+The current explicit proposal is ABI 125,
+`build/v3-balloon-inventory-02/build-lock.json`. All eight balloon inventory
+previews have their actual idle animation and reflection drawer. Three focused
+checks pass; the first silent native check passes 141 records, 103 component
+assertions, and four final fault/memory checks. It covers two balloon and two
+pinwheel previews, full native loading/initialization/drawing commands, source
+timing, guards, saved-state retention, and restored checkpoint. Reuse this
+evidence; ordinary inventory interaction, GPU appearance, and hardware are open.
+
+Next extend shared animated-room conversion and behaviour, then parent-category
+integration. Balloons use room furniture on indoor placement, unlike fans and
+pinwheels. Four representations use donor `1FF0..1FFC`; assign explicit additive
+destination identities without replacing native items or existing reservations.
+Preserve the real room skeletons, animations, switch-driven speed response,
+collection positions, parent pickup, and optional-profile dependencies. Do not
+expose balloons or substitute static catalogue models before these are ready.
+
+Shared balloon setup, hand delta,
 two-substep sway/spring animation, reflected drawing, and transient player state
 are installed. Five focused checks pass; the first silent native run passes
 148 records/96 assertions, including complete balloon and retained pinwheel
 drawing commands, guards, saved-state retention, and checkpoint restoration.
 Reuse this component evidence; ordinary appearance/gameplay remain unverified.
 
-Next extend the existing inventory adapter with source-correct balloon reflection
-drawing and the complete category's preview records. Then run the existing shared
-parent-category expansion, catalogue/collection, and optional composers. Preserve
-the pinwheel initializer's special speed and original tool timing. Do not use the
-plain pinwheel drawer as a balloon substitute. Balloons remain unselectable until
-their dependent readers are installed. No new per-item script or repeated
-resource conversion is needed. The explicit proposal has 120 choices, format-2
+Continue through the existing shared parent-category expansion,
+catalogue/collection, and optional composers after room support. Preserve the
+pinwheel initializer's special speed and original tool timing. Balloons remain
+unselectable until their dependent readers are installed. No new per-item script
+or repeated held-resource conversion is needed. The explicit proposal has 120 choices, format-2
 saves, exact V2-12 no-import output, and a 60-KiB equipment module.
 
 Inventory has eight-vector joint/morph arrays with matching BSS/owner/pool
@@ -29,13 +43,13 @@ bytes, and the player has eight-vector joint/morph work. Six focused checks and
 the silent native 116-record/93-assertion bank/playback check pass. Preserve that
 evidence; do not replay it without a changed consumer or concrete defect.
 
-Next connect complete balloon inventory drawing and parent consumers. Reuse
+Next connect complete balloon room placement and parent consumers. Reuse
 the installed models and shared category adapters, not per-item scripts.
 Net/rod behaviour and golden-tool differences remain explicit. Resources do
 not enable these imports. See the
 [capacity checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-rig-capacity-and-resource-extension).
 
-Next work uses the explicit ABI-124 lock above. All eight pinwheels have shared
+Next work uses the explicit ABI-125 lock above. All eight pinwheels have shared
 parent readers, pocket artwork, collection/catalogue, existing event acquisition,
 and individual experimental selections. The full proposal has 120 choices;
 existing fans and fixed identities are retained. No per-item installers or
@@ -52,7 +66,7 @@ Full seasonal rendering and ordinary gameplay remain open. See the
 [diagnosis](checkpoints/V3_FURNITURE_PIPELINE.md#seasonal-setter-copy-diagnosis).
 Work against the current proposal, not an old candidate. Do not replay exhausted
 navigation or setup attempts. Continue shared equipment categories and acquisition;
-balloon inventory drawing, remaining tool behaviour, and parent integration
+balloon room behaviour, remaining tool behaviour, and parent integration
 remain implementation work, not completed imports.
 
 Ten focused sound checks pass. The first silent native sound check passes

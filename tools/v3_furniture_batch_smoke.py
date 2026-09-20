@@ -273,6 +273,7 @@ def inventory_rigs(debug,rom_path,record):
     from v3_inventory_equipment import VROM,RELOC,OWNER_RAM,SECTIONS
     from v3_furniture_room_smoke import extend
     from runtime_layout import TEST_STACK
+    from v3_import_storage import jump
     path=Path(rom_path);image=path.read_bytes();report=json.loads((path.parent/'build.json').read_bytes())
     if sha256(image)!=report['output_sha256']:raise ValueError('Changed animated inventory cartridge')
     e=report['equipment_resources'];preview=e['inventory_preview'];files=by_vrom(image)
@@ -297,8 +298,9 @@ def inventory_rigs(debug,rom_path,record):
         raise ValueError('Animated inventory fixture outside native heap')
     root,overlay,submenu,graph,game,gfx,xlu,bank,stack=(allocation+n for n in
         (16,0x5000,0x15800,0x15A00,0x15E00,0x16000,0x17020,0x18000,0x1C800))
+    bridge=allocation+0x4C00
     debug.write_memory(allocation,bytes(size));edge=b'V3IR'*4
-    guards=(allocation,overlay-16,submenu-16,graph-16,game-16,gfx-16,gfx+0x1000,
+    guards=(allocation,bridge-16,bridge+16,overlay-16,submenu-16,graph-16,game-16,gfx-16,gfx+0x1000,
             xlu-16,xlu+0x600,bank-16,bank+0x4000,stack+0x100,TEST_STACK-0x800,TEST_STACK+0x40)
     for at in guards:debug.write_memory(at,edge)
     data,rel=(files[v].extract(image) for v in (VROM,RELOC));resident=sum(struct.unpack_from('>4I',rel))
@@ -309,7 +311,9 @@ def inventory_rigs(debug,rom_path,record):
     guards=(*guards,root+resident,root+resident+len(rel))
     debug.write_memory(root+resident+len(rel),edge)
     resources={r['index']:r for r in e['records']};rows=[r for r in preview['rows'] if r.get('draw_callback')]
-    representatives=(min(rows,key=lambda r:r['model_bytes']),max(rows,key=lambda r:r['model_bytes']))
+    groups={callback:[r for r in rows if r['draw_callback']==callback] for callback in {r['draw_callback'] for r in rows}}
+    representatives=[row for _,group in sorted(groups.items()) for row in
+                     (min(group,key=lambda r:r['model_bytes']),max(group,key=lambda r:r['model_bytes']))]
     matrix=call(0x800E02AC);matrix_before=debug.read_memory(matrix,64)
     identity=game+0x40;debug.write_memory(identity,struct.pack('>16f',*(1 if i%5==0 else 0 for i in range(16))))
     def initialize(kind):
@@ -343,18 +347,26 @@ def inventory_rigs(debug,rom_path,record):
             wanted=(blob[model['blob_offset']:model['blob_offset']+model['bytes']]+
                     blob[motion['blob_offset']:motion['blob_offset']+motion['bytes']])
             check('complete native model/animation transfers and untouched tail',bank,wanted+fill[len(wanted):])
-            check('source-correct preview speed and first frame',bss+0x224+12,struct.pack('>2f',15,16))
+            speed=row['native_frame_speed']
+            check('source-correct preview speed and first frame',bss+0x224+12,struct.pack('>2f',speed,1+speed))
             check('native inventory work and morph pointers',bss+0x224+0x24,
                   struct.pack('>2I',bss+work['joint_offset'],bss+work['morph_offset']))
             put(0x801458B8,word(overlay+0x10030)&0x1FFFFFFF);call(0x800E0284,[identity])
             put(graph+0x298,gfx,gfx+0x1000);put(graph+0x2A8,xlu,xlu+0x600)
-            call(root+row['draw_callback']-OWNER_RAM,[submenu,game],proof)
+            if OWNER_RAM<=row['draw_callback']<OWNER_RAM+SECTIONS[0]:
+                call(root+row['draw_callback']-OWNER_RAM,[submenu,game],proof)
+            else:
+                stub=struct.pack('>2I',jump(row['draw_callback']),0);debug.write_memory(bridge,stub)
+                call(0x8002FE00,[bridge,8]);call(0x80034CE0,[bridge,8])
+                call(bridge,[submenu,game],(bridge,stub))
             front,back=struct.unpack('>2I',debug.read_memory(graph+0x298,8))
             if not gfx<front<=back<=gfx+0x1000:raise ValueError('Animated inventory escaped graphics arena')
             commands=debug.read_memory(gfx,front-gfx)
             drawn=[p for w,p in struct.iter_unpack('>2I',commands) if w>>24==0xDE]
             expected=[0x06000000+p for p in model['source']['model_offsets'].values()]
-            passed=drawn==expected and back==gfx+0x1000-128
+            reflection=row['draw_callback']==preview.get('balloon_drawer',{}).get('address')
+            allocation_bytes=model['source']['skeleton']['shown_joints']*64+(48 if reflection else 0)
+            passed=drawn==expected and back==gfx+0x1000-allocation_bytes
             record(dict(inventory_rig_joint_draws=drawn,expected=expected,
                         assertion='passed' if passed else 'failed',model=model['index']))
             if not passed:raise ValueError('Animated inventory omitted a joint or allocated wrong matrices')
@@ -362,7 +374,7 @@ def inventory_rigs(debug,rom_path,record):
             check('balanced native matrix stack',0x801462B4,struct.pack('>I',matrix))
             check('unchanged parent transform',matrix,debug.read_memory(identity,64))
             for at in guards:check('inventory rig guard',at,edge)
-        if work['vectors']>7:
+        if work['vectors']>7 and not preview.get('balloon_drawer'):
             # Supply the largest installed skeleton through temporary table
             # data, not uploaded code or a claimed enabled inventory option.
             model=max((r for r in resources.values() if r['type']==1),

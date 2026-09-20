@@ -53,3 +53,27 @@ void af_v3_inventory_static_draw(u8 *submenu,u8 *game) {
     commands[0]=0xDE000000u;commands[1]=pointer;
     *(u32 **)(graph+0x298)=commands+2;
 }
+
+#if defined(__mips__) && defined(AF_V3_INVENTORY_BALLOON)
+void af_v3_inventory_balloon_draw(u8 *submenu,u8 *game) {
+    u8 *overlay=*(u8 **)(submenu+0x2C);
+    u8 *keyframe=*(u8 **)(overlay+0x106DC)+0x224;
+    u8 *skeleton=*(u8 **)(keyframe+0x18);
+    u8 *graph=*(u8 **)game;
+    u32 **front=(u32 **)(graph+0x298),**back=(u32 **)(graph+0x29C);
+    u32 shown=skeleton[1];
+    void *matrices,*hilite;
+    static const float origin[3]={0,0,0},eye[3]={0,0,1};
+    static const float light[3]={-.5773502691896257f,.5773502691896257f,.5773502691896257f};
+    if (!shown || shown>4)return;
+    matrices=(u8 *)*back-shown*64;
+    *back=(u32 *)matrices;
+    if (!matrices)return;
+    *front=((u32 *(*)(const float *,const float *,const float *,void *,u32 *,void **))0x80058620u)
+        (origin,eye,light,graph,*front,&hilite);
+    /* Native RDP coverage replaces the donor's GX-only edge-alpha callbacks,
+       just as in the shared outdoor balloon drawer. */
+    ((void (*)(void *,void *,void *,void *,void *,void *))0x800530D8u)
+        (game,keyframe,matrices,(void *)0,(void *)0,(void *)0);
+}
+#endif
