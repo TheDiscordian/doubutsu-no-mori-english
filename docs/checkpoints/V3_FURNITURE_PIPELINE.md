@@ -1,5 +1,108 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared animated-held actions
+
+The shared `--refresh-runtime --player-actions` adapter consumes ABI 117 and
+adds source-based setup, movement/wind response, animation, and joint drawing
+for all eight pinwheel kinds. Both held callback tables gain category 22;
+original tools, fan callbacks, and all 38 complete equipment resources remain.
+It adds no selectable item and does not claim complete pinwheel gameplay.
+
+### Current proposal
+
+- Explicit lock: `build/v3-held-rig-actions-03/build-lock.json`, ABI 118.
+- ROM SHA-256:
+  `e8bcc7cb059abe4481736a4b7e567a7b615f6ad6be5574bc570298533b72fb81`.
+- UPS SHA-256:
+  `70445565b3c86c32c2ee07b93506c9f2dea6e53adfce19fa89c48458313ac39b`.
+- Build receipt SHA-256:
+  `8eeeae97afc77da28b4797f1875418d691e36dde1bc8a1854c7bf804f7aed9a5`.
+- Equipment module SHA-256:
+  `8e50876aad3b8f2493ea06e4bfdcd69d595da11ce63f64ada43235f281065189`.
+- Shared rig code: 1,932 bytes at `804B0000`.
+- Module: 57,344 bytes, guard `804B0FF0`, 4,096 additional resident bytes.
+- Player allocation: `12D8` → `1310`, 56 additional requested bytes;
+  44 bytes of transient state and twelve padding bytes.
+
+The complete native setup base remains intact behind an eight-byte entry hook.
+The callback resolves the currently loaded owner, preserves ordinary setup,
+and retains same-kind pinwheel speed/frame across player-action changes.
+Movement and wind follow the source projections, opposing-wind rule, and speed
+limits, adapted to two source intervals per N64 update. Native animation keeps
+its actual segment-six switching. The original double matrix banks and recursive
+skeleton renderer draw the complete joints; the source tip/axis callback updates
+only the new transient state. See the
+[contract](../../specs/V3_HANDHELD_ITEMS.md#shared-animated-held-actions).
+
+### Verification and corrected failures
+
+Four focused checks pass against the current proposal in 6.829 seconds:
+sanitized setup across original/all imported kinds, same-kind and changed-kind
+frame/speed handling, wind direction, motion/rotation, wade suppression, braking,
+large-displacement safety, both matrix banks, joint callback updates, and bounds;
+complete cartridge change accounting; original resource/relocation retention;
+real player/module reservations, callback/bridge instructions, startup extent,
+original-ROM UPS reconstruction, future tail reuse, unchanged save/profile,
+all 112 existing choices, and exact full/import-free V2-12 composition.
+
+`build/v3-held-rig-actions-01/` is a partial compile output: the first assembly
+used register spelling the installed assembler rejects. Correcting the spelling
+produced `build/v3-held-rig-actions-02/`, but its setup continuation subtracted
+only `538C`, missing the high `20000` of the actual `2538C` displacement.
+The silent native attempt at `build/smoke-v3-held-rig-actions-01/` confirmed
+startup completion and then froze before reaching the paused game frame. The
+emulator log records invalid RDRAM access. This was an actual implementation
+defect, not a fixture limitation. The failed ROM hash is
+`dd6798958e608c3fa36baf7617758df5c19f3744fd6a4066e5c8e32873130563`;
+do not use that artifact. The corrected linker derives the full displacement
+from the two native addresses, and a focused check independently binds the
+assembled instructions to that value.
+
+The corrected current cartridge boots and reaches native tests. The first run
+against it, `build/smoke-v3-held-rig-actions-02/`, verifies the loaded module and
+player code, enlarged allocation, original setup/return bridge, actual first-rig
+initialization, and wind-driven speed/frame. It stops when the native skeleton
+renderer writes its matrix-segment command through the fixture's uninitialized
+translucent cursor. Disassembly at `80053124..80053138` proves that every call
+writes that stream, including opaque rigs; the test configured only the opaque
+cursor. The normal game supplies both streams. This specific fixture defect is
+corrected by reserving and guarding the second stream; no game code changes.
+
+The one justified setup retry, `build/smoke-v3-held-rig-actions-03/`, passes:
+83 result records, 55 passing assertions, including 50 component assertions.
+Results SHA-256:
+`2256a200f5e0fca2ff5b2ac20a0f62a7a83c725b4e009ffbb935971053c0c613`.
+It checks actual cartridge-loaded player code and the full resident module,
+normal setup and return, then complete native skeleton initialization for
+resource 50 (smallest) and resource 56 (largest). Both advance from speed zero/
+frame one to speed `1.2000000477`/frame `2.2000000477` under controlled wind.
+Each emits six opaque commands with its two actual joint display lists, plus
+the native translucent segment binding. Both alternating matrix banks, first-draw
+position initialization, rod-tip clearing, restored matrix stack/parent matrix,
+graphics bounds, memory guards, unchanged saved state, restored checkpoint,
+final fault/translation/equipment/save guards, and clean emulator exit pass.
+Only an eight-byte test call bridge is uploaded; game code comes from the ROM.
+The emulator is silent, uses disposable state, and writes no FlashRAM.
+
+The setup retry is spent. No further replay is needed for this unchanged code.
+Retain ABI-117's complete bank/DMA/cache evidence rather than rerunning it.
+
+### Remaining work and compatibility
+
+Complete the source loop-sound dependency and animated inventory previews, then
+connect parent acquisition, catalogue, and individual selection through the
+existing shared records. Those readiness flags stay false. This probe does not
+enable a selected pinwheel, execute GPU rendering, test ordinary item/menu
+gameplay, establish hardware appearance, or validate save/restart for pinwheels.
+
+The 112 existing choices, format-2 save/profile, Museum-header correction,
+complete artwork, and exact V2-12 import-free output remain unchanged. ABI-117
+and ABI-118 same-profile saves are expected compatible both ways; no new ordinary
+cross-version reload is claimed. Keep equal-or-superset imported profiles and
+never load imported V3 saves in V2. Removing imports is not migration.
+The independent seasonal-copy issue remains unresolved; the main ABI-109 lock
+is not promoted. Both served V2 patchers and all existing ROMs/saves remain.
+
 ## Shared animated equipment banks
 
 The shared runtime importer consumes the complete prepared rig category with

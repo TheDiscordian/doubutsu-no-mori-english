@@ -72,11 +72,116 @@ SOURCES = ('tools/v3_player_actions.py','tools/v3_furniture_pipeline.py',
            'overlays/v3/held_icon.S',
            'tools/v3_handheld_items.py','tools/v3_inventory_equipment.py',
            'overlays/v3/inventory_equipment.c','overlays/v3/inventory_equipment.S',
-           'overlays/v3/inventory_equipment.ld') + sound_programs.SOURCES
+           'overlays/v3/inventory_equipment.ld',
+           'overlays/v3/held_rigs.c','overlays/v3/held_rigs.S',
+           'overlays/v3/held_rigs.ld') + sound_programs.SOURCES
 
 SELECTION_OFFSET=0x5500
 PARENT_CODE_OFFSET,PARENT_TABLE_OFFSET=0x3000,0x57F0
 POCKET_ICON_OFFSET=0x3800
+RIG_CODE_OFFSET,RIG_MODULE_SIZE=0xD000,0xE000
+RIG_STATE_OFFSET,RIG_STATE_BYTES,RIG_PLAYER_SIZE=0x12D8,44,0x1310
+
+
+def refresh_rigs(base,prior,blob,core,original,output):
+    """Install one shared animated-held category, without enabling its parents."""
+    from v3_npc_clothing import guard_incoming
+    old=prior['equipment_resources'];offset=old['blob_offset']
+    module=bytearray(blob[offset:offset+old['bytes']]);files=by_vrom(base)
+    owner=bytearray(files[PLAYER_VROM].extract(base));reloc=files[PLAYER_RELOC].extract(base)
+    native_files=by_vrom(original);native_owner=native_files[PLAYER_VROM].extract(original)
+    native_core=native_files[CODE_VROM].extract(original)
+    if (not old.get('animated_rigs') or old.get('held_rig_actions') or old['bytes']!=RIG_CODE_OFFSET
+            or sha256(module)!=old['sha256'] or old['ram']!=RAM
+            or sha256(owner)!=old['player_motion']['owner_sha256']
+            or sha256(reloc)!=old['player_motion']['reloc_sha256']
+            or struct.unpack_from('>4I',module,len(module)-16)!=(GUARD,)*4
+            or RAM+RIG_MODULE_SIZE>prior['furniture']['bank_pool']['start']):
+        raise ValueError('Animated-held actions require the complete checked rig module')
+    source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+                  (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    functions=[]
+    for name in ('Player_actor_SetupItem_Base0','Player_actor_SetupItem_Base_windmill',
+                 'Player_actor_SetupItem_Base1','Player_actor_SetupItem_Base3',
+                 'Player_actor_Item_windmill_CulcParam','Player_actor_Item_windmill_CulcRotationSpeed',
+                 'Player_actor_Item_main_windmill_normal','Player_actor_Item_draw_windmill_After_kaza1_fan',
+                 'Player_actor_Item_draw_windmill_After','Player_actor_Item_draw_windmill',
+                 'mPlib_check_player_actor_main_index_AllWade','mEnv_GetWindPowerF_Windmill'):
+        matches=[at for at,rows in source.functions.items() if any(n==name for n,_ in rows)]
+        if len(matches)!=1:raise ValueError('Missing complete animated-held source function: '+name)
+        functions.append(source.function(matches[0])[1])
+    report=copy.deepcopy(old);dispatch=report['player_actions']['held_dispatch']
+    rows=[row for row in report['kind_readers']['rows'] if row['item_main']==22]
+    resources={r['index']:r for r in old['records']}
+    if (sorted(r['native_kind'] for r in rows)!=list(range(99,107))
+            or any(not r['resource_ready'] or r['selectable'] or r['fields'][1]!=22
+                   or resources[r['fields'][2]]['type']!=1 for r in rows)
+            or [t['source_callbacks']['22']['symbol'] for t in dispatch['tables']]!=[
+                'Player_actor_Item_main_windmill_normal','Player_actor_Item_draw_windmill']):
+        raise ValueError('Changed rig category bindings or incomplete resources')
+    # Keep the complete native setup/load/draw consumers and core APIs pinned to
+    # the verified original, not only the instructions replaced by this adapter.
+    consumers=[]
+    owner_ranges=((0x808B83B4,0x808B846C),(0x808B846C,0x808B8628),
+                  (0x808BD81C,0x808BD880),(0x808BD934,0x808BDACC),
+                  (0x808BDDB4,0x808BDF48),(0x808BE788,0x808BE85C))
+    for first,last in owner_ranges:
+        a,b=first-PLAYER_RAM,last-PLAYER_RAM
+        if owner[a:b]!=native_owner[a:b]:raise ValueError('Changed native rig initialization or drawing')
+        consumers.append(dict(start=first,end=last,sha256=sha256(owner[a:b])))
+    symbols=(ROOT/'upstream/af/linker_scripts/jp/symbol_addrs_code.txt').read_text()
+    bounds=sorted(int(a,16) for a in re.findall(r'= 0x([0-9A-Fa-f]+); // type:func',symbols))
+    apis=(0x80099A54,0x800E0008,0x8009A570,0x8009895C,0x80098980,0x800B6074,
+          0x800E020C,0x800E0244,0x800E02AC,0x800E0698,0x800E13C4,0x800E14D4,
+          0x800E1AA0,0x800530D8)
+    for first in apis:
+        last=min(x for x in bounds if x>first);a,b=first-CODE_RAM,last-CODE_RAM
+        if core[a:b]!=native_core[a:b]:raise ValueError('Changed native animated-held API')
+        consumers.append(dict(start=first,end=last,sha256=sha256(core[a:b])))
+    # All three normal/rod-aware setup callers enter the same complete base.
+    entry=0x808B83B4;at=entry-PLAYER_RAM
+    callers=[PLAYER_RAM+i for i in range(0,TEXT_SIZE,4) if u32(owner,i)==jump(entry,link=True)]
+    if callers!=[0x808B84C4,0x808B85D0,0x808B8610]:
+        raise ValueError('Changed shared rig setup callers')
+    guard_incoming(owner,TEXT_SIZE,PLAYER_RAM,[(at,8)])
+    relocations=relocation_offsets(reloc,len(owner))
+    if (owner[at:at+8]!=bytes.fromhex('27bdffd0afb00024')
+            or any(i in relocations for i in (at,at+4))):
+        raise ValueError('Changed shared rig setup prologue')
+    profile=0x8010BCE0-CODE_RAM
+    if (core[profile:profile+32]!=native_core[profile:profile+32]
+            or u32(core,profile+12)!=RIG_STATE_OFFSET):
+        raise ValueError('Changed complete player allocation profile')
+    code,compiled=compile_part('held_rigs',output/'held_rigs',extra_sources=('overlays/v3/held_rigs.S',))
+    if len(code)>RIG_MODULE_SIZE-RIG_CODE_OFFSET-16:raise ValueError('Animated-held code exceeds reservation')
+    module.extend(bytes(RIG_MODULE_SIZE-len(module)))
+    module[RIG_CODE_OFFSET:RIG_CODE_OFFSET+len(code)]=code
+    struct.pack_into('>4I',module,RIG_MODULE_SIZE-16,*([GUARD]*4))
+    for table,name in zip(dispatch['tables'],('af_v3_held_pinwheel_main','af_v3_held_pinwheel_draw')):
+        at,n=table['offset'],table['bytes']
+        if sha256(module[at:at+n])!=table['sha256'] or u32(module,at+22*4):
+            raise ValueError('Changed or occupied shared held callback slot')
+        struct.pack_into('>I',module,at+22*4,compiled['symbols'][name])
+        table.update(sha256=sha256(module[at:at+n]),enabled_imported_indices=[22,23])
+    at=entry-PLAYER_RAM;before=bytes(owner[at:at+8]);after=struct.pack('>II',jump(compiled['symbols']['af_v3_held_setup']),0)
+    owner[at:at+8]=after
+    struct.pack_into('>I',core,profile+12,RIG_PLAYER_SIZE)
+    blob.extend(bytes(-len(blob)%16));position=len(blob);blob.extend(module)
+    if BLOB+len(blob)>END:raise ValueError('Animated-held module exceeds shared ROM storage')
+    report.update(bytes=len(module),vrom=BLOB+position,blob_offset=position,
+        sha256=sha256(module),crc32=zlib.crc32(module),additional_resident_bytes=len(module)-old['bytes'])
+    report['player_motion']['owner_sha256']=sha256(owner)
+    report['player_actions'].update(owner_sha256=sha256(owner),relocation_sha256=sha256(reloc))
+    dispatch.update(enabled_imported_indices=[22,23],disabled_indices=[21])
+    report['held_rig_actions']=dict(format='AFV3-HELD-RIG-ACTIONS-1',code=compiled,code_offset=RIG_CODE_OFFSET,
+        source_functions=functions,native_consumers=consumers,setup_callers=callers,
+        setup_hook=dict(entry=entry,before=before.hex(),after=after.hex(),continuation=entry+8),
+        player_allocation=dict(address=0x8010BCEC,original_bytes=RIG_STATE_OFFSET,bytes=RIG_PLAYER_SIZE,
+                               state_offset=RIG_STATE_OFFSET,state_bytes=RIG_STATE_BYTES),
+        category_indices=[22],native_kinds=[r['native_kind'] for r in rows],source_steps_per_update=2,
+        loop_sound_installed=False,inventory_preview_installed=False,logical_imports_added=0,
+        ordinary_gameplay_tested=False,save_format_changed=False)
+    return report,{PLAYER_VROM:bytes(owner)}
 
 
 def refresh_pocket_icons(base,prior,blob,core,original,output):
@@ -725,6 +830,8 @@ def expanded_tables(source,owner,reloc,*,categories=CATEGORIES,native_count=NATI
 
 def install(base,prior,blob,core,original,output):
     old=prior.get('equipment_resources',{})
+    if old.get('animated_rigs') and not old.get('held_rig_actions'):
+        return refresh_rigs(base,prior,blob,core,original,output)
     if old.get('player_actions'):
         if old.get('pocket_icons'):
             from v3_inventory_equipment import install as inventory_equipment

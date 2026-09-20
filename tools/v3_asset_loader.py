@@ -105,6 +105,7 @@ def compile_part(part, out, extra_sources=(), defines=(), primary_source=None):
                        'equipment_resources': ('af_v3_equipment_pointer', 0x804A3000),
                        'player_actions': ('af_v3_player_action_v0', 0x804A5000),
                        'held_items': ('af_v3_held_item_name', 0x804A6000),
+                       'held_rigs': ('af_v3_held_setup', 0x804B0000),
                        'held_collection': ('af_v3_held_catalogue_record', 0x804AFA00),
                        'inventory_equipment': ('af_v3_inventory_item_kind', 0x804A9000),
                        'item_categories': ('af_v3_equipment_category', 0x804AA000),

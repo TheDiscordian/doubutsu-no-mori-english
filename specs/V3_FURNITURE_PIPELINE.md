@@ -160,6 +160,12 @@ all original tools. Source static-held drawing uses the existing equipment
 resources and native outer draw setup. Unimplemented rig categories retain null
 callbacks. Refreshes account for changed uncompressed owners already stored
 inside the blob before computing the complete blob receipt.
+After complete animated resources are installed, the same `--player-actions`
+route connects shared pinwheel setup, movement/wind, animation, and drawing.
+It grows the actual player allocation for transient state and retains every
+original callback/resource. Sound, animated inventory previews, and parent
+readiness remain separate required dependencies; the refresh does not enable
+choices. See [animated-held actions](V3_HANDHELD_ITEMS.md#shared-animated-held-actions).
 
 `--category` selects a discovered shared category without maintaining an item
 list. `convert --assets-only` prepares complete artwork while retaining missing

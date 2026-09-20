@@ -18,23 +18,26 @@ served patchers retain their existing builds.
 
 ## Active development
 
-The explicit ABI-117 proposal at `build/v3-equipment-rigs-02/` installs all
-eight complete pinwheel rigs through the shared importer. Both outdoor banks
-hold 5,248 bytes, including the largest complete rig/animation; their containing
-scene allocation grows by 1,728 bytes. Inventory retains its sufficient existing
-bank. Changed models invalidate cached animation addresses, including when two
-models share the same animation. The resident module remains 52 KiB.
+The explicit ABI-118 proposal at `build/v3-held-rig-actions-03/` connects all
+eight pinwheel rigs to shared setup, movement/wind response, native animation,
+and joint drawing. The player gains a checked 56-byte allocation extension for
+44 bytes of transient state. The resident module is 56 KiB. Both 5,248-byte
+equipment banks and all prior resources are retained.
 
-Five focused checks pass on the current cartridge. Native bank registration and
-complete resource transfers pass on the first proposal; the current proposal's
-six small/large transitions pass through the actual loaded player owner, with
-intact guards, saved state, and checkpoint restoration. These are resource and
-bank-loading checks, not rendered/gameplay pinwheels. All 112 existing choices,
-the saved profile, original equipment, and exact import-free V2-12 remain.
-Next connect native rig initialization/drawing and pinwheel behaviour, then
-inventory/acquisition/catalogue and selection. The main lock and both served
-patchers remain unchanged. See the
-[bank checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-animated-equipment-banks).
+Four focused host/cartridge checks pass. The corrected native category probe
+passes original-tool setup, complete initialization and wind-driven animation
+for the smallest/largest rigs, both joint display lists, matrix-stack/graphics
+bounds, guards, saved-state retention, checkpoint restoration, and clean exit.
+The full owner-relative setup continuation and both native graphics streams are
+verified. The fixture's setup retry allowance is spent; reuse its passing result.
+
+The same 112 existing choices, saved profile, and exact import-free V2-12 remain.
+Pinwheels are not selectable yet: complete their loop sound, animated inventory
+previews, and acquisition/catalogue/selection connections next. Native component
+drawing is not proof of ordinary rendered gameplay or hardware appearance.
+The main lock and both served patchers remain unchanged; the independent
+seasonal-copy issue stays unresolved. See the
+[rig-action checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-animated-held-actions).
 
 The current ABI-116 two-fan profile has an isolated festival-night fixture with
 no seeded item or ownership. Normal town entry, original inventory, the festival

@@ -688,6 +688,7 @@ def exercise(debug, rom_path, record, *, section='automatic_furniture'):
         return ground_categories(debug,rom_path,record)
     if section=='equipment_resources':return equipment_resources(debug,rom_path,record)
     if section=='equipment_bank_switch':return equipment_bank_switch(debug,rom_path,record)
+    if section=='held_rig_actions':return held_rig_actions(debug,rom_path,record)
     if section=='player_motion':return player_motion(debug,rom_path,record)
     if section=='pocket_icons':return pocket_icons(debug,rom_path,record)
     if section=='inventory_preview':return inventory_preview(debug,rom_path,record)
@@ -1241,6 +1242,121 @@ def equipment_bank_switch(debug,rom_path,record):
     return dict(native_equipment_bank_switch=True,assertions=assertions,transitions=6,
         unchanged_animation_index=True,ordinary_gameplay_tested=False,hardware_tested=False,
         flash_written=False,requires_checkpoint_restore=True)
+
+
+def held_rig_actions(debug,rom_path,record):
+    """Complete native rig initialization and draw callbacks on isolated actors."""
+    import v3_equipment_runtime as equipment
+    from v3_import_storage import jump
+    from runtime_layout import TEST_STACK
+    path=Path(rom_path);image=path.read_bytes();report=json.loads((path.parent/'build.json').read_bytes())
+    if sha256(image)!=report['output_sha256']:raise ValueError('Changed held-rig cartridge')
+    resources=report['equipment_resources'];receipt=resources['held_rig_actions'];symbols=receipt['code']['symbols']
+    files=by_vrom(image);blob=files[runtime.BLOB].extract(image);boot=boot_proofs(image);assertions=0
+    def check(label,at,want):
+        nonlocal assertions
+        actual=debug.read_memory(at,len(want));passed=actual==want
+        record(dict(held_rig_check=label,address=f'{at:08X}',bytes=len(want),
+                    assertion='passed' if passed else 'failed',actual=actual.hex() if len(actual)<=32 else sha256(actual)))
+        if not passed:raise ValueError('Held rig mismatch: '+label)
+        assertions+=1
+    def call(at,args=(),proof=None):
+        result=debug.call(f'{at:08X}',list(args),return_address=MODULE_RAM+0x6480,verified_code=proof or boot.get(at))
+        record(result);return result['return_value']
+    def put(at,*values):debug.write_memory(at,struct.pack('>'+str(len(values))+'I',*values))
+    def scalar(at):return struct.unpack('>I',debug.read_memory(at,4))[0]
+    def floating(at):return struct.unpack('>f',debug.read_memory(at,4))[0]
+    constructor=scalar(0x80143900);owner=constructor-(0x808DD748-equipment.PLAYER_RAM)
+    data=files[equipment.PLAYER_VROM].extract(image);rel=files[equipment.PLAYER_RELOC].extract(image)
+    sections=struct.unpack_from('>5I',rel)
+    if owner&15 or not MODULE_RAM+0x8000<=owner<=0x80400000-len(data):
+        raise ValueError('Held rigs require the actual loaded player owner')
+    expected=relocate_verified_data(SimpleNamespace(ram=equipment.PLAYER_RAM,resident_bytes=len(data),sections=sections),data,rel,owner)
+    check('complete game-loaded player code',owner,expected[:sections[0]])
+    at=resources['blob_offset'];module=blob[at:at+resources['bytes']]
+    check('complete startup-loaded rig module',equipment.RAM,module)
+    check('native player allocation includes transient rig state',0x8010BCEC,struct.pack('>I',receipt['player_allocation']['bytes']))
+    saved={at:debug.read_memory(at,n) for at,n in ((0x8046C000,864),(0x801458B8,4),(0x80107ADC,4),(0x80107AE8,4))}
+    real_game=scalar(0x8010EF90)
+    if not MODULE_RAM+0x8000<=real_game<=0x80400000-0x1000:raise ValueError('Missing current game')
+    capacity=resources['animated_rigs']['allocation']['bank_bytes'];size=0x5000+capacity*2+32
+    allocation=call(0x8009BFC0,[size])
+    if allocation&15 or not MODULE_RAM+0x8000<=allocation<=0x80400000-size:
+        raise ValueError('Held-rig fixture allocation outside native heap')
+    actor,bridge,identity,game,graph,gfx,bank0=(allocation+x for x in (16,0x1400,0x1480,0x1500,0x1800,0x2000,0x5000))
+    translucent=allocation+0x4100
+    debug.write_memory(allocation,bytes(size));edge=b'V3RA'*4
+    guards=(allocation,actor+receipt['player_allocation']['bytes'],bridge-16,bridge+16,graph-16,
+            gfx-16,gfx+0x2000,translucent-16,translucent+0x700,
+            bank0-16,bank0+capacity*2,TEST_STACK-0x800,TEST_STACK+0x40)
+    for at in guards:debug.write_memory(at,edge)
+    def resident(name,args):
+        stub=struct.pack('>II',jump(symbols[name]),0);debug.write_memory(bridge,stub)
+        call(0x8002FE00,[bridge,8]);call(0x80034CE0,[bridge,8])
+        return call(bridge,args,(bridge,stub))
+    def owner_call(first,last,args):
+        entry=owner+first-equipment.PLAYER_RAM
+        return call(entry,args,(entry,expected[first-equipment.PLAYER_RAM:last-equipment.PLAYER_RAM]))
+    matrix_now=call(0x800E02AC);matrix_before=debug.read_memory(matrix_now,64)
+    debug.write_memory(identity,struct.pack('>16f',*(1.0 if i%5==0 else 0.0 for i in range(16))))
+    put(game,graph);put(actor+0xDBC,bank0,bank0+capacity)
+    put(actor+0xDDC,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF)
+    models=[r for r in resources['records'] if r['type']==1]
+    models=[min(models,key=lambda r:r['bytes']),max(models,key=lambda r:r['bytes'])]
+    animations={r['source_index']:r for r in resources['records'] if r['kind']=='animation'}
+    try:
+        # An ordinary original setup exercises the resident wrapper and its
+        # owner-relative prologue bridge before native pinwheel initialization.
+        put(actor+0xD00,0);debug.write_memory(actor+0x1117,b'\xFF')
+        owner_call(0x808B83B4,0x808B846C,[actor,7,0xFFFFFFFF,0x3F800000,0,0xBF800000,identity+64,identity+68])
+        check('ordinary setup retains no equipped item',actor+0x1117,b'\xFF')
+        check('ordinary setup retains requested player animation',identity+64,struct.pack('>I',7))
+        for iteration,model in enumerate(models):
+            animation=animations[model['source']['motion_bindings'][0]['default_animation']]
+            owner_call(0x808BD934,0x808BDACC,[actor,model['index'],animation['index'],0,0,0x3F800000,1])
+            check('native rig starts with stationary frame one',actor+0xA24,struct.pack('>2f',0,1))
+            put(0x80107ADC,0);put(0x80107AE8,0x3F800000)
+            debug.write_memory(actor+0x12D8,bytes(44))
+            resident('af_v3_held_pinwheel_main',[actor,real_game])
+            speed=floating(actor+0xA24);frame=floating(actor+0xA28)
+            passed=abs(speed-1.2)<0.0001 and abs(frame-2.2)<0.0001
+            record(dict(held_rig_native_animation=model['index'],speed=speed,frame=frame,
+                        assertion='passed' if passed else 'failed'))
+            if not passed:raise ValueError('Native rig wind speed/frame mismatch')
+            assertions+=1
+            bank=bank0+scalar(actor+0xDEC)*capacity
+            put(0x801458B8,bank&0x1FFFFFFF);call(0x800E0284,[identity])
+            put(game+0xA0,iteration);put(graph+0x298,gfx,gfx+0x2000)
+            # The native skeleton renderer binds its matrix segment in both
+            # streams, even when every joint is opaque.
+            put(graph+0x2A8,translucent,translucent+0x700)
+            resident('af_v3_held_pinwheel_draw',[actor,game])
+            front,back=struct.unpack('>2I',debug.read_memory(graph+0x298,8))
+            if not gfx<front<=back<gfx+0x2000:raise ValueError('Held rig drawing escaped its graphics arena')
+            check('translucent stream contains only its matrix-segment binding',graph+0x2A8,
+                  struct.pack('>2I',translucent+8,translucent+0x700))
+            command=scalar(gfx);commands=debug.read_memory(gfx,front-gfx)
+            draws=[p for w,p in struct.iter_unpack('>2I',commands) if w>>24==0xDE]
+            passed=command==0xDA380003 and len(draws)==2 and scalar(actor+0x1300)==1
+            record(dict(held_rig_native_draw=model['index'],commands=(front-gfx)//8,lists=draws,
+                        assertion='passed' if passed else 'failed'))
+            if not passed:raise ValueError('Native rig drawing omitted complete joints or state')
+            assertions+=1
+            check('first draw has no spurious movement delta',actor+0x12D8,debug.read_memory(actor+0x12E4,12))
+            check('balanced matrix-stack pointer',0x801462B4,struct.pack('>I',matrix_now))
+            check('unchanged parent matrix',matrix_now,debug.read_memory(identity,64))
+            check('native rod-tip validity cleared',actor+0xF44,bytes(4))
+            for at in guards:check('native rig memory guard',at,edge)
+        check('save/profile unchanged',0x8046C000,saved[0x8046C000])
+        check('no CPU fault',0x8003CE34,bytes(4))
+        check('complete module remains intact',equipment.RAM,module)
+    finally:
+        debug.write_memory(matrix_now,matrix_before)
+        for at,value in saved.items():debug.write_memory(at,value)
+        call(0x8009C040,[allocation])
+    return dict(native_held_rig_actions=True,assertions=assertions,representative_rigs=len(models),
+        gpu_rendered=False,ordinary_gameplay_tested=False,pinwheel_selection_tested=False,
+        sound_tested=False,flash_written=False,requires_checkpoint_restore=True)
 
 
 def sound_programs_probe(debug,image,resources,check,call,record):

@@ -232,10 +232,65 @@ All nine core reader hooks and both player-motion/six kind-reader owner hooks
 are rebound together after compilation. Static drawing keeps its fixed entry.
 The complete startup CRC covers the updated module. Native shared allocation,
 complete resource transfers, and alternating small/large model changes have
-focused evidence. GPU drawing, rig initialization, pinwheel actions, inventory
-previews, acquisition, catalogue, ordinary reload, and hardware remain open.
+focused evidence. The next stage connects initialization and shared animation/
+drawing. GPU appearance, complete pinwheel actions, inventory previews,
+acquisition, catalogue, ordinary reload, and hardware remain open.
 The [bank checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-animated-equipment-banks)
 owns exact build and test evidence. Neither served patcher changes.
+
+### Shared animated-held actions
+
+After installing the complete rigs, the existing `--refresh-runtime
+--player-actions` route adds the common animated-held implementation. It uses
+source-discovered category 22 and all eight corresponding kind rows `99..106`,
+not item-specific callbacks. Original held callbacks and the fan category remain;
+category 21 stays empty. Preparing these callbacks does not enable parent items.
+
+`overlays/v3/held_rigs.c` preserves the donor's setup contract: newly equipped
+pinwheels start at frame one with zero speed; same-kind action transitions keep
+the current frame/speed. Every original setup still enters the complete native
+body. The checked eight-byte hook at `808B83B4` uses the current loaded player
+constructor at `80143900`, never a cached overlay address. Its assembly bridge
+replays the original prologue and resumes at `808B83BC`. The linker derives the
+full `2538C` displacement from constructor `808DD748`; it is not a signed
+sixteen-bit displacement. All native overlay relocations remain intact.
+
+The actual core player profile's size at `8010BCEC` becomes `1310`, from `12D8`.
+Forty-four transient bytes at `player+12D8` contain previous/current tip positions,
+travel distance, parameter/axis angles, and a validity flag. The remaining twelve
+bytes are padding. The state is cleared on entry from a non-pinwheel kind and
+invalidated on exit. No original field, saved identity, profile bit, or save
+format is enlarged or borrowed.
+
+Movement projects the measured tip delta onto the pinwheel axis; native all-wade
+states suppress movement input. The original unclamped wind-power getter at
+`80098980` matches the donor's dedicated pinwheel getter. Opposing wind is omitted
+as in the donor. One native update spans two source updates: measured distance
+is halved, source-speed smoothing runs twice with the original minimum/maximum
+steps, and stored native frame speed is twice the resulting source speed.
+The source fraction's square-root argument is clamped at zero for discontinuous
+large positions, preventing invalid animation speeds without altering ordinary
+movement. Native `808BD81C` advances the skeleton with the animation bank's
+temporary segment-six binding; it is not replaced with a raw skeleton call.
+
+Drawing retains the outer native hand transform, size, model-bank binding, and
+visibility policy. The callback uses the original two four-matrix work banks at
+`player+AE0`, selected by `game+A0 & 1`; three-joint/two-draw pinwheels fit those
+banks and the existing seven-vector animation work areas. It emits the source
+tilt transform and calls the native recursive skeleton renderer. Joint two
+records the tip transform and axis. First drawing initializes both tip positions
+equally, avoiding an artificial initial movement delta. Push/pull and rod-tip
+validity follow the source behaviour. Both opaque and translucent command
+streams must exist: the native skeleton renderer binds its matrix segment in
+both streams even when every joint is opaque.
+
+The shared module grows from 52 to 56 KiB. Code starts at `804B0000`; the guard
+is at `804B0FF0`, below furniture banks at `80500000`. Startup transfers, checks,
+and flushes the complete module. Full source functions and native setup/API
+consumers are recorded and checked; retained resources and callback slots stay
+unchanged. Source sound, animated inventory previews, and parent readiness
+remain explicit dependencies. The [action checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-animated-held-actions)
+records current component evidence, failed attempts, and gameplay limits.
 
 ### Shared event stock
 

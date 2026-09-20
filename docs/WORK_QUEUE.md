@@ -2,24 +2,30 @@
 
 ## Active: V3 optional GameCube imports
 
-Next implementation: native rig initialization/drawing and pinwheel behaviour
-through the shared action adapter. Use the explicit ABI-117 lock at
-`build/v3-equipment-rigs-02/build-lock.json`. All eight complete rigs are installed
-with type-one readers, their actual motion dependencies, 5,248-byte outdoor
-banks, and a matching 1,728-byte scene-arena increase. Model changes invalidate
-the old animation cache, preserving correct pointers for different model sizes.
-Inventory's existing 15,584-byte bank is sufficient and unchanged.
+Next implementation: complete the pinwheel loop-sound dependency, extend shared
+inventory previews to animated rigs, then connect their existing acquisition,
+catalogue, and individual selection records. Use the explicit ABI-118 lock at
+`build/v3-held-rig-actions-03/build-lock.json`. The shared action adapter supplies
+setup, movement/wind response, native skeleton animation, and joint drawing for
+all eight pinwheels. It reserves 44 transient state bytes in a 56-byte player
+allocation extension; the shared resident module is 56 KiB. Sound and parent
+selection remain disabled, so this is not yet playable pinwheel support.
 
-Five current-cartridge/host checks pass. Native bank registration and complete
-resource transfers pass on the first proposal. Six small/large transitions pass
-on the current proposal through its actual loaded player owner, including guards,
-unchanged saved state, and checkpoint restoration. Retain those checks; do not
-reconvert models or replay passing transfer tests. The existing 112 choices and
-profile are unchanged; no pinwheel is selectable yet. Native actions,
-inventory/acquisition/catalogue, and selected ownership remain required.
-Keep balloon texture/net-and-rod matrix dependencies explicit and retain the
-separate seasonal-copy issue. See the
-[bank checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-animated-equipment-banks).
+Four focused checks pass. The silent native category probe passes both smallest
+and largest rigs, actual initialization, wind-driven frame advance, both joint
+display lists, original-tool setup, matrix-stack/graphics bounds, guards, and
+checkpoint restoration. Retain the unchanged ABI-117 bank/load evidence; do not
+reconvert models or repeat those checks. Use only the explicit current lock;
+the native fixture's setup retry allowance is spent and its final check passes.
+See the
+[rig-action checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-animated-held-actions).
+
+The existing 112 choices, format-2 profile, 5,248-byte outdoor banks, 1,728-byte
+scene-arena increase, and complete artwork are unchanged. Inventory's existing
+15,584-byte model bank remains sufficient. Ordinary pinwheel gameplay, GPU
+appearance, acquisition, persistence, and hardware are not verified. Keep balloon
+texture/net-and-rod matrix dependencies and the independent seasonal-copy issue
+explicit. The main lock and both served patchers remain unchanged.
 
 The ABI-116 festival fixture has no seeded fan or ownership. Town entry and the
 actual vendor/visitor scene load successfully. The ordinary purchase attempt
