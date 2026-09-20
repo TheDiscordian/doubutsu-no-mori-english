@@ -2,10 +2,14 @@
 
 ## Implemented boundary
 
-The clothing-enabled variant uses the independently versioned
+The reward-enabled variant uses the [format-3 reward extension](V3_REWARD_SAVE.md),
+with 48 independent trophy/celebration bytes after the existing catalogue data.
+It migrates valid NAFJ and format-1/2 banks; those older builds reject format 3.
+The clothing-only variant uses the independently versioned
 [format-2 clothing extension](V3_CLOTHING_SAVE.md). It retains the format-1
 villager/furniture records, adds separate garment records, and migrates valid
 format-1 saves. The following format-1 layout remains the non-clothing variant.
+Use the selected build's actual working-state size, not a historical buffer size.
 
 `overlays/v3/save_codec.c` implements a bounded bank encoder, validator/decoder,
 and four-player imported-furniture catalogue. `--save-codec` installs this code

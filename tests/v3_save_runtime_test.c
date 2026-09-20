@@ -154,4 +154,5 @@ int main(void) {
     assert(af_v3_save_sync() == -1 && erases == 4 && writes == 1041 && releases == 4);
     for (u32 i = 0; i < 16; ++i) assert(buffer.before[i] == 0xA5 && buffer.after[i] == 0xA5);
     puts("Prepare/read/commit, catalogue state, legacy migration, failure-before-I/O, retries, and guards pass");
+    return 0;
 }

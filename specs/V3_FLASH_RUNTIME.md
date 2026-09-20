@@ -2,7 +2,13 @@
 
 ## Implemented scope
 
-The [clothing variant](V3_CLOTHING_SAVE.md) uses format 2, a 192-byte immutable
+The [reward variant](V3_REWARD_SAVE.md) uses format 3, the same 192-byte immutable
+profile, and 912-byte runtime state with guards at `8046C380`. It retains all
+public runtime entries and native I/O. Valid older banks migrate on decode;
+format-1/2 builds cannot read format-3 saves. The added reward state is separate
+from catalogue ownership, and player deletion clears only that player's records.
+
+The [clothing-only variant](V3_CLOTHING_SAVE.md) uses format 2, a 192-byte immutable
 profile, and 864-byte runtime state. Its separate checked codec keeps the public
 save-entry addresses stable. The format-1 sizes below describe the non-clothing
 variant; do not use those working-buffer sizes with the clothing variant.

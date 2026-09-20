@@ -1,5 +1,101 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared reward persistence
+
+The ABI-142 proposal is `build/v3-shared-reward-state-02/build-lock.json`.
+The shared player-action installer adds separate saved trophy/celebration flags,
+the complete persistent settlement callback, and player-delete clearing. All
+128 experimental choices and selected identities remain. The four golden-tool
+choices stay disabled pending action registration/request routes and source
+scene/NPC/tree acquisition. The main ABI-109 lock and both served patchers remain
+unchanged; empty selection is exact V2-12.
+
+- ROM SHA-256:
+  `eb0bd296424761992553b88ac654609db7e38a1f6ce57b68c4f11d7bc6769f29`.
+- Report SHA-256:
+  `2b10f9e7f2782f2c10eb6f5cb7c67d7a029c17c9918e06179233b48844649f47`.
+- UPS SHA-256:
+  `3bfde87c0b0dab6e188d2fca6c80fd5da244f39c4b671cb324a07a63796f6418`.
+- Reward helper SHA-256:
+  `41b93de3d76df183cc59d9b57fd0a50c4bbe51afabcc1edc9b0d32ebdb000e09`.
+- Extended codec SHA-256:
+  `329a52be7f396502d2a7fd2b294741e501026b13782eecd668647c6c623afd07`.
+- Rebuilt save runtime SHA-256:
+  `167a0d8c91d9f1f78a5a1a76c02c259d70894b0c525d296001ebef412f292f4c`.
+
+Format 3, registry 2, adds 48 bytes without moving existing profile/catalogue
+fields. Each player has 33 trophy bits and four independent celebration bits.
+The working state is 880 bytes; the complete runtime state is 912 bytes with
+guards at `8046C380`. Valid NAFJ and format-1/2 banks migrate with new flags clear
+and prior ownership retained. Older format-1/2 builds reject format-3 saves.
+Matching/equal-or-larger profiles remain required; never load imported saves in
+V2. Preserve backups. Offline receipts and private browser exports use the
+actual format-3 report warning; no served export is rebuilt.
+
+The 772-byte helper reuses the checked retired codec body at `8046B408`, keeping
+all live public entries and original native bridges. The 2,248-byte codec at
+`8046D000` retains the item-reader boundary at `8046D8DC`. Startup actually loads
+the complete 12-KiB codec/item-reader/lamp resource at VROM `024A1080`; its suffix
+is retained exactly. The 1,867-byte runtime retains every entry address. No ROM
+blob, module, heap, or permanent reservation grows. Details and source semantics
+are in [the specification](../../specs/V3_REWARD_SAVE.md).
+
+Five focused codec/host/cartridge checks pass:
+
+```sh
+python3 -m unittest tests.test_v3_save_rewards -v
+```
+
+The first combined invocation passed both codec and both cartridge checks, but
+the sanitizer fixture failed compilation because renaming the included earlier
+test's `main` removed its implicit successful return. Adding an explicit return
+fixed the fixture; rerunning only `RewardStateHostTests` passed. No completed
+cartridge checks were replayed. The separate `RewardCompatibilityNoteTests`
+check passes in 0.050 seconds and covers the new export warning and retained
+older-format wording. Python syntax compilation and `git diff --check` pass.
+
+Checks cover complete independent format-3 encoding, all three migration inputs,
+older codec rejection, profile additions/removals, illegal/reserved flag bits,
+CRC/payload binding, unchanged failure outputs, overlapping buffers, all four
+players/all 33 trophies/all four celebrations, independent catalogue data,
+new-town reset, prepare/read/commit, player deletion, active-player settlement,
+foreign-pointer rejection, and no erase/write on invalid flags. Cartridge checks
+bind actual resource/code hashes, complete source functions, stable entry maps,
+only declared changes, retained resource suffixes, guards, 128 selections,
+empty/all reconstruction, original-ROM UPS reconstruction, and future tail reuse.
+
+The first silent native attempt passes 67 records and 50 assertions:
+
+```sh
+python3 tools/emulator_smoke.py \
+  --rom build/v3-shared-reward-state-02/animal-forest-v3-asset-loader.z64 \
+  --output build/smoke-v3-reward-state-01 \
+  --scenario tests/scenarios/v3_save_rewards.json \
+  --xvfb /home/discordian/Games/OpenRSC/headless/vendor/usr/bin/Xvfb \
+  --seconds 180 --expansion-pak --no-initial-screenshot
+```
+
+Results SHA-256:
+`febee30b8c0b46a1b3b970ffdfb8b9f1c9342bc71607fd013535e9df2614b244`.
+The existing format-aware save fixture verifies the complete loaded prefix and
+active extra resource, then executes actual codec/runtime/settlement/private-clear
+entries through test-only jump wrappers. Migration, complete format-3 packing,
+rejection atomicity, real payload commit, four-player flags, fanfare deletion,
+selected-player catalogue/flag clearing, stack/output/state/code guards, and
+absence of CPU faults pass. It restores the native payload, expanded state,
+active player pointer, BGM state, allocation, and checkpoint, then exits cleanly.
+No physical FlashRAM I/O is performed. This does not establish ordinary
+save/restart, complete reward acquisition, GPU appearance, or original hardware.
+The native retry allowance is unused.
+
+Build guards rejected two overlarge codec compilations before a shared external
+validator and single version/registry read fitted the existing boundary. The
+first installer proposal rejected the obsolete clothing-resource descriptor
+assumption; the corrected installer follows and verifies the active 12-KiB
+startup resource. No linker limit, reserved-byte check, or source guard was
+relaxed. Native harness construction and execution stayed within the batch's
+30-minute limit. Unchanged prior device-worker evidence is retained, not rerun.
+
 ## Shared reward controls and fanfares
 
 The ABI-141 proposal is `build/v3-shared-reward-controls-01/build-lock.json`.

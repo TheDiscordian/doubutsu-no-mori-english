@@ -215,7 +215,8 @@ def build(output, *, recipes=False, disc=None):
                 'recipe': {'file': 'patch.afwp.gz', 'size': len(compressed), 'sha256': sha256(compressed),
                            'decoded_size': len(recipe), 'decoded_sha256': sha256(recipe)},
                 'requirements': {'expansion_pak': True, 'save_type': 'FlashRAM', 'save_bytes': 131072, 'rtc': True},
-                'save_compatibility': SAVE_NOTE, 'stats': stats}
+                'save_compatibility': SAVE_NOTE if label == 'v2' else composition.save_compatibility(report),
+                'stats': stats}
     (data/'manifest.json').write_bytes(composition.canonical(manifest))
     receipt = {'format': 'AFV3-BROWSER-EXPORT-1', 'base_sha256': plan['base_sha256'],
                'base_report_sha256': composition.REPORT_SHA, 'runtime_abi': plan['runtime_abi'],

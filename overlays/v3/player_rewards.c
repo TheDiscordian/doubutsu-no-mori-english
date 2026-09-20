@@ -41,7 +41,7 @@ void af_v3_reward_stop_fanfare(void *actor) {
     if (!actor) return;
     int bgm=af_v3_reward_bgm(WORD(actor,0xD18));
     if (bgm>=0) FN(0x8005E494u,void,int,int)(bgm,0x168);
-    /* Do not claim settlement: the separate saved receipt bit is still needed. */
+    /* Audio only; the shared settlement wrapper records the saved reward bit. */
 }
 
 void af_v3_reward_main(void *actor,void *game) {

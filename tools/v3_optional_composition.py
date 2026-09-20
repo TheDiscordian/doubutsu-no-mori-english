@@ -54,6 +54,15 @@ def item_key(item):
     return f'GAFE01-r0/item/{item:04X}'
 
 
+def save_compatibility(report):
+    """Keep exported warnings tied to the cartridge's actual saved format."""
+    version = report['save_codec']['format_version']
+    if version == 3:
+        return report['save_warning']
+    return (f'Format {version}: equal or larger profiles accepted by codec; missing dependencies rejected. '
+            'Do not load imported saves in V2. Ordinary cross-profile reload is unverified.')
+
+
 def inputs():
     image = (BASE/'animal-forest-v3-asset-loader.z64').read_bytes()
     raw = (BASE/'build.json').read_bytes()
@@ -408,9 +417,7 @@ def build(output, selected=(), *, select_all=False):
         'composer_sha256':sha256(Path(__file__).read_bytes()), 'output_sha256':sha256(result),
         'patch_sha256':sha256(patch), 'rom_bytes':len(result), 'writes':writes,
         'retains_unselected_resource_storage':blob is not None,
-        'save_compatibility':'V2 baseline' if blob is None else
-            'Format 2: equal or larger profiles accepted by codec; missing dependencies rejected. '
-            'Do not load imported saves in V2. Ordinary cross-profile reload is unverified.'}
+        'save_compatibility':'V2 baseline' if blob is None else save_compatibility(report)}
     if blob is None:
         current = {'build':'v2-import-free', 'output_sha256':sha256(result), 'composition':receipt}
     else:

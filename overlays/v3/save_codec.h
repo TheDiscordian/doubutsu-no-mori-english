@@ -16,13 +16,23 @@ typedef unsigned int af_save_u32;
 #define AF_SAVE_PROFILE AF_SAVE_BASE_PROFILE
 #define AF_SAVE_CATALOGUE AF_SAVE_FURNITURE_CATALOGUE
 #endif
-#define AF_SAVE_STATE (AF_SAVE_PROFILE + AF_SAVE_CATALOGUE)
+#define AF_SAVE_REWARD_OFFSET (AF_SAVE_PROFILE + AF_SAVE_CATALOGUE)
+#ifdef AF_V3_REWARD_PROFILE
+#ifndef AF_V3_CLOTHING_PROFILE
+#error Reward state requires the complete clothing profile
+#endif
+#define AF_SAVE_REWARD_BYTES 48u
+#else
+#define AF_SAVE_REWARD_BYTES 0u
+#endif
+#define AF_SAVE_STATE (AF_SAVE_REWARD_OFFSET + AF_SAVE_REWARD_BYTES)
 
 enum {
     AF_SAVE_LEGACY = 0, AF_SAVE_OK = 1,
     AF_SAVE_ARGUMENT = -1, AF_SAVE_HEADER = -2, AF_SAVE_CHECKSUM = -3,
     AF_SAVE_FORMAT = -4, AF_SAVE_BINDING = -5, AF_SAVE_CRC = -6,
-    AF_SAVE_PROFILE_MISSING = -7, AF_SAVE_CATALOGUE_INVALID = -8
+    AF_SAVE_PROFILE_MISSING = -7, AF_SAVE_CATALOGUE_INVALID = -8,
+    AF_SAVE_REWARD_INVALID = -9
 };
 
 /* Exact bank-sized input. Output state may be null, but must not overlap input

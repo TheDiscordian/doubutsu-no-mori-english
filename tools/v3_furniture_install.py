@@ -519,6 +519,9 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
     elif player_actions:
         import v3_player_actions as equipment
         equipment_report,owner_changes=equipment.install(base,prior,blob,core,original,output)
+        reward_state=equipment_report['player_actions'].get('reward_state')
+        if reward_state and not prior['equipment_resources']['player_actions'].get('reward_state'):
+            report_updates.update(equipment.v3_save_rewards.report_updates(prior,reward_state))
     elif item_category_art is not None:
         import v3_category_runtime as equipment
         equipment_report,owner_changes=equipment.install(base,prior,blob,core,original,output,item_category_art)
@@ -685,6 +688,9 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             report['shared_runtime_refresh']['artwork_changed']=True
         if player_actions:
             report['shared_runtime_refresh']['adapters'].append('player_actions')
+            if 'save_codec' in report_updates:
+                report['shared_runtime_refresh'].update(saved_format_changed=True,
+                    additional_save_state_bytes=report['save_runtime']['state_bytes']-prior['save_runtime']['state_bytes'])
         if item_category_art is not None:
             report['shared_runtime_refresh']['adapters'].append('item_categories')
             report['shared_runtime_refresh']['artwork_changed']=True

@@ -45,6 +45,14 @@ static int clothing_valid(const u8 *profile, const u8 *catalogue) {
     return 1;
 }
 #endif
+#ifdef AF_V3_REWARD_PROFILE
+#include "save_rewards.h"
+#ifdef AF_V3_EXTERNAL_REWARD_VALIDATOR
+#define rewards_valid af_v3_reward_data_valid
+#else
+#define rewards_valid af_save_rewards_valid
+#endif
+#endif
 
 int af_v3_save_check(const u8 *bank, u32 size, const u8 *current, u8 *state) {
     if (!bank || size != AF_SAVE_BANK || !current || (state &&
@@ -58,18 +66,31 @@ int af_v3_save_check(const u8 *bank, u32 size, const u8 *current, u8 *state) {
 #ifdef AF_V3_CLOTHING_PROFILE
     int clothing_format = 0;
 #endif
+#ifdef AF_V3_REWARD_PROFILE
+    int reward_format = 0;
+#endif
     if (magic == 0x4E414633u) {
 #ifdef AF_V3_CLOTHING_PROFILE
+#ifdef AF_V3_REWARD_PROFILE
+        u32 version=read32(ext+4), registry=read32(ext+8);
+        reward_format = version == 0x00030680u && registry == 2;
+        clothing_format = (version == 0x00020680u || reward_format) && registry == 2;
+        if (read32(ext) != 0x41465333u || (!clothing_format &&
+                (version != 0x00010680u || registry != 1))) return AF_SAVE_FORMAT;
+#else
         clothing_format = read32(ext+4) == 0x00020680u && read32(ext+8) == 2;
         if (read32(ext) != 0x41465333u || (!clothing_format &&
                 (read32(ext+4) != 0x00010680u || read32(ext+8) != 1))) return AF_SAVE_FORMAT;
+#endif
 #else
         if (read32(ext) != 0x41465333u || read32(ext + 4) != 0x00010680u ||
                 read32(ext + 8) != 1) return AF_SAVE_FORMAT;
 #endif
         for (u32 i = 0x14; i < AF_SAVE_CAPSULE; ++i)
             if ((i < 0x18 || (i >= 0xB8 && i < 0xC0) ||
-#ifdef AF_V3_CLOTHING_PROFILE
+#ifdef AF_V3_REWARD_PROFILE
+                    i >= (reward_format ? 0x390u : clothing_format ? 0x360u : 0x2C0u)
+#elif defined(AF_V3_CLOTHING_PROFILE)
                     i >= (clothing_format ? 0x360u : 0x2C0u)
 #else
                     i >= 0x2C0
@@ -88,6 +109,9 @@ int af_v3_save_check(const u8 *bank, u32 size, const u8 *current, u8 *state) {
             if (!clothing_valid(ext+0x2C0, ext+0x2E0)) return AF_SAVE_CATALOGUE_INVALID;
         }
 #endif
+#ifdef AF_V3_REWARD_PROFILE
+        if (reward_format && !rewards_valid(ext+0x360)) return AF_SAVE_REWARD_INVALID;
+#endif
         result = AF_SAVE_OK;
     }
     if (state) {
@@ -97,6 +121,10 @@ int af_v3_save_check(const u8 *bank, u32 size, const u8 *current, u8 *state) {
 #ifdef AF_V3_CLOTHING_PROFILE
         for (u32 i = 0; i < 128; ++i)
             state[AF_SAVE_PROFILE+512+i] = clothing_format ? ext[0x2E0+i] : 0;
+#endif
+#ifdef AF_V3_REWARD_PROFILE
+        for (u32 i=0;i<AF_SAVE_REWARD_BYTES;++i)
+            state[AF_SAVE_REWARD_OFFSET+i] = reward_format ? ext[0x360+i] : 0;
 #endif
     }
     return result;
@@ -110,12 +138,20 @@ int af_v3_save_pack(u8 *bank, u32 size, const u8 *state) {
 #ifdef AF_V3_CLOTHING_PROFILE
     if (!clothing_valid(state+160, state+AF_SAVE_PROFILE+512)) return AF_SAVE_CATALOGUE_INVALID;
 #endif
+#ifdef AF_V3_REWARD_PROFILE
+    if (!rewards_valid(state+AF_SAVE_REWARD_OFFSET)) return AF_SAVE_REWARD_INVALID;
+#endif
     u8 *ext = bank + AF_SAVE_PAYLOAD;
     write32(bank + 4, 0x4E414633u);
     for (u32 i = 0; i < AF_SAVE_CAPSULE; ++i) ext[i] = 0;
     write32(ext, 0x41465333u);
 #ifdef AF_V3_CLOTHING_PROFILE
+#ifdef AF_V3_REWARD_PROFILE
+    write32(ext + 4, 0x00030680u);
+    copy(ext+0x360, state+AF_SAVE_REWARD_OFFSET, AF_SAVE_REWARD_BYTES);
+#else
     write32(ext + 4, 0x00020680u);
+#endif
     write32(ext + 8, 2);
     copy(ext+0x2C0, state+160, 32);
     copy(ext+0x2E0, state+AF_SAVE_PROFILE+512, 128);

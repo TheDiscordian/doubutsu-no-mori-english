@@ -1319,7 +1319,9 @@ catalogue representations. The full explicit proposal has 128 experimental
 choices; imports remain optional, and empty selection gives exact V2-12.
 Neither served patcher changes.
 
-Save format 2 remains unchanged. Adding a category's fixed profile bits allows old
+The parent category retains existing save-profile offsets. The reward-enabled
+proposal uses [format 3](V3_REWARD_SAVE.md), with explicit older-bank migration
+and no backward compatibility with format-1/2 builds. Adding fixed profile bits allows old
 compatible profiles to load into a matching or larger profile; builds lacking
 required bits reject the save. Removing imports is not migration, and imported
 V3 saves must not be loaded in V2. Ordinary equipment gameplay, cross-version
@@ -1335,7 +1337,8 @@ Golden-tool acquisition is not installed. The donor's `ac_present_demo_move.c_in
 selects the rod or net after the corresponding complete creature collection and
 checks its trophy flag. The axe uses the perfect-town reward in `ac_npc_hem.c_inc`;
 the shovel comes from `GOLD_TREE_SHOVEL` in `bg_item_common.c_inc`. Their source
-reward animations and saved flags require native integration. Do not replace
+reward action registration and acquisition events require native integration.
+The installed motions and saved flags do not connect those routes. Do not replace
 these routes with ordinary shop stock or enable a tool based on its assets alone.
 
 The native acquisition gap includes engine content, not only item substitutions:
@@ -1362,8 +1365,10 @@ The native acquisition gap includes engine content, not only item substitutions:
   ownership. Preserve that distinction when extending persistent reward state.
 
 The complete reward motions, shared facial sequences, official message phase,
-setup/main controller, and fanfare requests are installed as described below.
-Next implement complete settlement and separate saved reward flags, then connect
+setup/main controller, fanfare requests, persistent settlement, and separate
+saved reward flags are installed as described below and in
+[reward persistence](V3_REWARD_SAVE.md).
+Next connect action registration and request routes, then
 the event actors and acquisition conditions.
 Use the shared category installer and complete source records. Keep all four
 choices disabled until their full paths are connected; do not substitute a
@@ -1415,10 +1420,11 @@ complete matching waveform data. Unknown layouts, changed source/native tables,
 out-of-bounds pointers, and sample/font differences are rejected. No new audio
 sequence, instrument, sample, or permanent audio allocation is needed.
 
-The fanfare stop callback is not complete settlement: the donor also sets a
-per-player celebration bit, distinct from trophy receipt and catalogue ownership.
-Do not register reward actions or enable golden tools until that saved state and
-the ordinary acquisition events exist. See the
+The fanfare stop callback only stops audio. The
+[persistent settlement wrapper](V3_REWARD_SAVE.md) also records the active
+player's celebration bit, distinct from trophy receipt and catalogue ownership.
+Action registration/request routes and ordinary acquisition remain required;
+do not enable golden tools based on these installed callbacks. See the
 [checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-reward-controls-and-fanfares).
 
 #### Shared reward messages
@@ -1454,8 +1460,9 @@ Neither neighbouring resource, the previous-dig state at `804B2FD0`, the full
 complete module checks, and zero-space checks guard installation. Later stages
 retain already installed text without reapplying an older resource image.
 
-These callbacks are not yet registered as complete reward actions. Complete
-settlement, persistent flags, and source acquisition remain required.
+These callbacks are not yet registered as complete reward actions. The
+persistence stage supplies settlement and saved flags; registration/request
+routes and source acquisition remain required.
 The focused native fixture temporarily uses an unused existing dispatcher slot
 and restores it; that is component verification, not ordinary acquisition.
 See the [checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-reward-messages).

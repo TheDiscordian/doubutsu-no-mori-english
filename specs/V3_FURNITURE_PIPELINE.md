@@ -22,12 +22,21 @@ hand owner; its tag owner remains an in-place update.
 
 ### Shared runtime categories
 
+The shared player-action reward-state stage follows the control stage. It
+installs independent per-player trophy/celebration flags, persistent settlement,
+and explicit format-3 migration through `tools/v3_save_rewards.py`. Existing
+catalogue/profile offsets, public entry addresses, item-reader suffix, source
+identities, and permanent reservations remain intact. Offline and private browser
+exports use the actual build's save warning; neither served patcher is updated.
+Action registration, request routes, and ordinary acquisition remain required.
+See [reward persistence](V3_REWARD_SAVE.md).
+
 The shared player-action reward-control stage follows the installed message
 phase. It connects source setup/main behaviour and native fanfare requests in
 checked unused icon-reservation space, preserving resources, action registration,
 saved formats, and selections. Its complete source/native audio audit reuses
-existing native sequences, fonts, and samples. Complete persistent settlement
-and ordinary acquisition remain required before enabling rewards or tools. See
+existing native sequences, fonts, and samples. Action registration and ordinary
+acquisition remain required before enabling rewards or tools. See
 [reward controls](V3_HANDHELD_ITEMS.md#shared-reward-controls-and-fanfares).
 
 The player-action refresh installs complete reward motions and generic eye/mouth

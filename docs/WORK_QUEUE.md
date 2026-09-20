@@ -2,12 +2,27 @@
 
 ## Active: V3 optional GameCube imports
 
-The current explicit proposal is ABI 141,
-`build/v3-shared-reward-controls-01/build-lock.json`. All eight balloons are
+The current explicit proposal is ABI 142,
+`build/v3-shared-reward-state-02/build-lock.json`. All eight balloons are
 connected through shared source-derived parent records, room profiles, indoor
 conversion/pickup, collection/catalogue, complete icons, and optional selection.
 There are 128 experimental choices, with 24 equipment parents. Neither served
 V2 patcher nor the main lock changes.
+
+Shared persistent trophy/celebration flags and the settlement callback are
+installed. Format 3 retains prior profile/catalogue offsets and migrates valid
+NAFJ/format-1/2 banks with new flags clear. Older format-1/2 builds reject the
+new saves; preserve backups, matching/equal-or-larger profiles, and V2 isolation.
+Five focused host/cartridge checks and one export-warning check pass.
+The first silent native run passes
+67 records and 50 assertions, including actual commit, settlement, selected
+player deletion, guards, and full state/checkpoint restoration. Reuse this
+evidence; ordinary gameplay save/restart and hardware are not claimed.
+Next register the complete reward actions and request routes, then implement
+source scene/NPC/tree acquisition. Keep all four golden-tool choices disabled
+until their full paths work. Retain the new guard at `8046C380`, stable public
+codec entries, and extra-code item-reader suffix at `8046D8DC`. See the
+[checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-reward-persistence).
 
 Shared celebration setup/main and fanfare requests are installed. One sanitizer
 and three cartridge/composition checks pass; the silent native retry passes 46
@@ -15,8 +30,8 @@ records and 34 assertions, with one actual animation frame, native BGM requests,
 exact segment behaviour, saved-data retention, restored state/checkpoint, and
 clean exit. The first run's four fanfare pairs retain passing evidence. Reuse
 these checks; do not repeat the native fixture without a changed consumer.
-Next implement complete settlement and separate persistent reward flags, then
-source scene/NPC/tree acquisition. Do not repurpose unidentified saved bytes or
+Next connect reward action registration/request routes, then source scene/NPC/tree
+acquisition. Do not repurpose unidentified saved bytes or
 catalogue ownership bits. The 1,036-byte control group occupies
 `804B3880..804B3C8C`; retain the icon prefix and guard at `804B3FF0`.
 Reward actions and golden-tool choices remain disabled. See the
@@ -28,9 +43,8 @@ checks pass; the first silent native check passes 115 records and 98 assertions.
 It uses a temporary callback-table slot, actual native message loads and report
 requests, delay/lock/completion checks, retained saved data, restored state, and
 clean exit. Reuse this evidence; ordinary reward events are not connected.
-Next integrate complete settlement and separate persistent reward flags,
-then the source scene/NPC/tree acquisition
-events. The 604-byte message group occupies `804B2280..804B24DC`; the bobber
+Next integrate action registration and request routes, then source scene/NPC/tree
+acquisition events. The 604-byte message group occupies `804B2280..804B24DC`; the bobber
 helper at `804B2180` and artwork beginning `804B2800` must remain intact.
 Do not enable the four golden-tool choices until their full paths work. See the
 [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-reward-messages).
@@ -41,9 +55,9 @@ and saves remain intact. One sanitizer and four cartridge/composition checks
 pass; the first silent native run passes 165 records and 123 assertions, including
 full transfers, 30 native facial frames, bounded writes, segment restoration,
 guards, restored checkpoint, and clean exit. Reuse this evidence; skeletal
-appearance and ordinary reward events remain unverified. Next implement shared
-settlement and persistent reward flags before the event actors and acquisition conditions. Do not enable
-the four golden tools based on installed motions. See the
+appearance and ordinary reward events remain unverified. Next connect shared
+action registration before the event actors and acquisition conditions. Do not
+enable the four golden tools based on installed motions. See the
 [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-reward-motions-and-player-faces).
 
 Both wrapped-item name widths are connected and source-credited. One sanitizer

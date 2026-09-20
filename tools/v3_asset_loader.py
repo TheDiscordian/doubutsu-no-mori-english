@@ -130,6 +130,8 @@ def compile_part(part, out, extra_sources=(), defines=(), primary_source=None):
                        'pockets': ('af_v3_pocket_index', BLOB_RAM + 0xB200),
                        'save_codec': ('af_v3_save_check', BLOB_RAM + 0xB400),
                        'save_clothing': ('af_v3_save_check_extended', BLOB_RAM + 0xD000),
+                       'save_rewards': ('af_v3_save_check_extended', BLOB_RAM + 0xD000),
+                       'reward_state': ('af_v3_reward_data_valid', BLOB_RAM + 0xB408),
                        'clothing_menu': ('af_v3_room_value_clothing', BLOB_RAM + 0x3C30),
                        'shop_mannequin': ('af_v3_mannequin_80959320', BLOB_RAM + 0x4C00),
                        'save_runtime': ('af_v3_save_reset', BLOB_RAM + 0x9200),

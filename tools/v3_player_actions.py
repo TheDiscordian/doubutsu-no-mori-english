@@ -9,6 +9,7 @@ import copy
 import re
 import struct
 import zlib
+import v3_save_rewards
 
 from aflib import CODE_RAM, CODE_VROM, by_vrom, sha256, u32
 from v3_asset_loader import BLOB, ROOT, compile_part
@@ -89,6 +90,7 @@ SOURCES+=('tools/v3_equipment_runtime.py','overlays/v3/player_faces.c','overlays
 SOURCES+=('tools/v3_event_text.py','tools/v3_camper_text.py',
           'overlays/v3/player_reward_messages.c','overlays/v3/player_reward_messages.ld',
           'overlays/v3/player_rewards.c','overlays/v3/player_rewards.ld')
+SOURCES+=v3_save_rewards.SOURCES
 
 SELECTION_OFFSET=0x5500
 PARENT_CODE_OFFSET,PARENT_TABLE_OFFSET=0x3000,0x57F0
@@ -1789,6 +1791,13 @@ def expanded_tables(source,owner,reloc,*,categories=CATEGORIES,native_count=NATI
 
 def install(base,prior,blob,core,original,output):
     old=prior.get('equipment_resources',{})
+    if old.get('player_actions',{}).get('reward_controls') and not old['player_actions'].get('reward_state'):
+        report=copy.deepcopy(old)
+        receipt=v3_save_rewards.install(base,prior,blob,core,output)
+        report['player_actions']['reward_state']=receipt
+        report['player_actions']['reward_controls'].update(persistent_settlement_installed=True,
+            settlement_callback=receipt['code']['symbols']['af_v3_reward_settle'])
+        return report,{}
     if old.get('player_actions',{}).get('reward_messages') and not old['player_actions'].get('reward_controls'):
         return refresh_reward_controls(base,prior,blob,core,original,output)
     if old.get('player_motion',{}).get('reward_motion') and not old['player_actions'].get('reward_messages'):

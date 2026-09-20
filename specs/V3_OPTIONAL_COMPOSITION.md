@@ -74,12 +74,13 @@ default selection remains empty. Implemented representations are omitted from
 the unavailable-furniture queue because their parent is the user-facing choice.
 
 All choices reproduce the full proposal; no choices reproduce the exact pinned
-translation-only cartridge. The existing format-2 codec accepts equal or larger
+translation-only cartridge. The reward-enabled format-3 codec accepts equal or larger
 profiles and rejects a missing equipment bit without modifying destination state.
 Saves using these choices must not be loaded in V2 or an older profile without
 them. A codec check does not establish ordinary cross-build save/reload. The
-inherited seasonal-copy issue still prevents promotion or a playable handoff;
-both served V2 patchers stay unchanged.
+seasonal copy/return routines have passing component evidence, but ordinary
+gameplay and complete reward acquisition remain open. Both served V2 patchers
+stay unchanged.
 
 ## Dependency resolution
 
@@ -207,9 +208,13 @@ conversion remain separate work.
 
 ## Saves and verification
 
-Selected imports are saved dependencies even before acquisition. The format-2
+Selected imports are saved dependencies even before acquisition. The format-3
 codec accepts a saved profile in an equal or larger selection and rejects missing
-dependencies before modifying output state. Removing imports is not migration.
+dependencies before modifying output state. Valid NAFJ and format-1/2 banks
+migrate with the new reward flags clear; format-1/2 builds reject format-3 saves.
+Offline receipts and private browser manifests use the checked report's actual
+format-3 warning. The import-free path retains the V2 note. See
+[reward persistence](V3_REWARD_SAVE.md). Removing imports is not migration.
 Do not load imported saves in V2 or an older build lacking those identities.
 Ordinary cross-profile reload remains unverified; stable field sizes do not
 establish gameplay compatibility.

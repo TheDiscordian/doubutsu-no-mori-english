@@ -2,6 +2,11 @@
 
 ## Implemented format
 
+The [reward-enabled format-3 variant](V3_REWARD_SAVE.md) retains every clothing
+record and profile offset described here. It adds 48 separate reward bytes,
+expands runtime state to 912 bytes, and migrates valid format-2 banks. Format 2
+below remains the clothing-only variant, not the current reward-enabled output.
+
 Clothing needs independent selected/owned bits, not furniture rotation bits.
 The clothing variant uses extension format/registry 2 while retaining the
 original `F980`-byte town payload and `680`-byte extension in each 64-KiB bank.
