@@ -101,6 +101,25 @@ Use a fresh ignored output path and the explicit current proposal lock.
 
 ### Shared runtime categories
 
+The `static-models-pending-move` resource category separates ordinary profile
+drawing from an unfinished move-only callback. It requires complete direct model
+slots and exactly one move callback; create, custom draw, destroy, DMA, dynamic
+texture, and other profile resource dependencies cannot enter this category.
+Known switch-sound implementations retain their checked implemented category.
+Other callback code retains its complete source identity and relocations without
+being represented as understood or ported behaviour.
+
+`convert --assets-only --category static-models-pending-move` prepares all matching
+complete graphics in one normal compiler batch. The source profile's scalar,
+contact, and interaction fields are preserved. Unimplemented fields are recorded
+in `pending_profile_fields`; this exception applies only to the prepared-only
+category. Invalid finite/bounds/structural values still reject, and implemented
+categories retain their stricter semantics checks. Both metadata generation and
+native profile construction reject the prepared-only category regardless of
+alleged runtime bindings. Future behaviour adapters can reuse validated artwork
+while regenerating current eligibility. No smoke, sound, money, or other effect
+is silently discarded to make an item selectable.
+
 The `scenery` representation follows complete seasonal foreground descriptors
 and feeds body/shadow lists into the shared converter. Its gold-tree category
 prepares growth sizes, dead saplings, stumps, seasonal palettes, and adjusted

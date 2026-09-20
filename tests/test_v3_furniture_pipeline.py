@@ -469,7 +469,10 @@ class DonorTests(unittest.TestCase):
             changed.relocations[adapter['vtable_offset']+8]=(1,True,1,move['offset'])
             with self.assertRaisesRegex(ValueError,'additional lifecycle'):changed.profile(item)
         for item in (0x31CC,0x3244,0x3324):
-            with self.assertRaisesRegex(ValueError,'unrecognised complete move'):self.source.profile(item)
+            profile=self.source.profile(item)
+            self.assertEqual(profile['callback_adapter']['category'],pipeline.PENDING_MOVE_CATEGORY)
+            with self.assertRaisesRegex(ValueError,'move behaviour'):
+                pipeline.metadata(self.source,item,profile,None)
 
     def test_palette_category_rejects_changed_code_calls_palettes_and_effects(self):
         p=self.source.profile(0x31A4);adapter=p['callback_adapter']
@@ -840,6 +843,65 @@ class DonorTests(unittest.TestCase):
                             for a,b in words if a>>24==0xF5 and b>>24&7==0]
                     self.assertEqual(actual,expected)
                     self.assertEqual([w for w in words if w[0]==0xE3001001],luts)
+
+
+class PendingMoveResourceTests(unittest.TestCase):
+    test_existing_sound_category_remains_checked=DonorTests.test_switch_sound_category_preserves_geometry_sound_flags_and_guards
+
+    @classmethod
+    def setUpClass(cls):
+        cls.source=pipeline.Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+            (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+        cls.art=ROOT/'build/v3-static-callback-resources-prepared-01'
+        cls.report=json.loads((cls.art/'art.json').read_bytes())
+
+    def test_complete_batch_and_cache_preserve_pending_behaviour_and_native_gate(self):
+        self.assertEqual(self.report['batch'],dict(objects=4,compiled=4,reused=0,compiler_containers=1))
+        self.assertEqual({r['item_id'] for r in self.report['objects']},{'1FAC','31CC','3244','3324'})
+        self.assertEqual(sum(r['object_bytes'] for r in self.report['objects']),17168)
+        DonorTests.check_complete_artwork(self,self.art,self.report)
+        cache=pipeline.PreparedAssets(self.source,[self.art])
+        for row in self.report['objects']:
+            item=int(row['item_id'],16);prepared=pipeline.prepare(self.source,item)
+            profile=prepared[0];adapter=profile['callback_adapter']
+            self.assertEqual(adapter['category'],pipeline.PENDING_MOVE_CATEGORY)
+            self.assertEqual(adapter['pending_callbacks'],['move'])
+            self.assertEqual(adapter['pending_profile_fields'],[])
+            self.assertEqual(adapter['null_callbacks'],['create','draw','destroy','dma'])
+            self.assertEqual(adapter['functions']['move'],self.source.function(adapter['functions']['move']['offset'])[1])
+            self.assertFalse(row['import_ready']);self.assertIn('move behaviour',row['pending_reason'])
+            self.assertEqual(cache.reuse(self.source,row['item_id'],prepared)[1]['object_sha256'],row['object_sha256'])
+            with self.assertRaisesRegex(ValueError,'no implemented native lifecycle'):install.profile(row,0x02500000)
+            with self.assertRaisesRegex(ValueError,'move behaviour'):pipeline.metadata(self.source,item,profile,None)
+        self.assertEqual(install.provenance_patch(self.report['objects']),'')
+        with self.assertRaisesRegex(ValueError,'Unknown converter/source revision'):
+            install.checked_assets(self.art,self.source,ROOT/'build/item-identity-megasheet.xlsx')
+
+    def test_extra_graphics_dependencies_reject_and_pending_fields_cannot_be_installed(self):
+        profile=self.source.profile(0x31CC);adapter=profile['callback_adapter'];at=profile['profile_offset']
+        for slot in (0,8,12,16):
+            changed=copy.copy(self.source);changed.relocations=dict(self.source.relocations)
+            changed.relocations[adapter['vtable_offset']+slot]=(1,True,1,adapter['functions']['move']['offset'])
+            with self.assertRaisesRegex(ValueError,'additional lifecycle'):changed.profile(0x31CC)
+        changed=copy.copy(self.source);changed.relocations=dict(self.source.relocations)
+        changed.relocations[at+16]=(1,True,5,0)
+        with self.assertRaisesRegex(ValueError,'dynamic texture'):changed.profile(0x31CC)
+        changed=copy.copy(self.source);changed.data=bytearray(self.source.data)
+        struct.pack_into('>f',changed.data,at+36,.009)
+        changed.data[at+44]=0x20;struct.pack_into('>H',changed.data,at+46,0x4000)
+        pending=changed.profile(0x31CC)
+        self.assertEqual(pending['scalar_hex'],changed.data[at+32:at+48].hex())
+        self.assertEqual(pending['callback_adapter']['pending_profile_fields'],['scale','contact','interaction'])
+        changed.runtime_profiles={'31CC':dict(category=pipeline.PENDING_MOVE_CATEGORY,
+            source_profile_sha256=pending['profile_sha256'])}
+        with self.assertRaisesRegex(ValueError,'move behaviour'):pipeline.metadata(changed,0x31CC,pending,None)
+        for invalid in (float('nan'),float('inf'),-1,0,2):
+            struct.pack_into('>f',changed.data,at+36,invalid)
+            with self.assertRaisesRegex(ValueError,'scalar profile'):changed.profile(0x31CC)
+        # The same unsupported fields still reject for implemented static models.
+        changed=copy.copy(self.source);changed.data=bytearray(self.source.data)
+        static=changed.profile(0x3220);struct.pack_into('>f',changed.data,static['profile_offset']+36,.009)
+        with self.assertRaisesRegex(ValueError,'unsupported scalar/contact'):changed.profile(0x3220)
 
 
 class SharedMaterialTests(unittest.TestCase):

@@ -12,6 +12,15 @@ After the primary importing work, finish gold-tree leaf/cut effects and the full
 golden-shovel acquisition route. This is deferred required V3 work, not a dropped
 feature or a separate release goal.
 
+The shared static-profile path prepares piggy bank, ukulele, barbecue, and
+cannon at `build/v3-static-callback-resources-prepared-01/` (17,168 bytes, one
+compiler container). Three focused checks pass. Reuse the complete models while
+implementing their actual money, melody, sound, and spawned-effect dependencies.
+Unknown move-only callbacks remain recorded, not treated as decorative behaviour.
+Neither metadata nor the profile writer permits these prepared-only entries.
+Continue remaining shared resource categories; no emulator replay is needed for
+this asset-only change.
+
 The shared fixed-keyframe path prepares four complete rigs in one compiler
 container at `build/v3-fixed-keyframe-rigs-prepared-01/` (15,776 bytes): tiger
 bobblehead, stone coin, harvest clock, and judge's bell. Three focused checks
@@ -48,6 +57,12 @@ Connect the shared actor/calendar/dialogue and native operations, including
 the actual handover completion signal, selected identity resolver, ordinary
 inventory insertion/catalogue registration, and per-player format-3 trophy
 flag. No holiday item becomes selectable from preparation alone.
+
+Acquisition policy needs the user's choice for donor systems absent on N64:
+recreate those systems, or adapt rewards to suitable existing native routes.
+That question covers added holidays and GBA-island sources; it does not authorise
+a substitution yet. Continue unrelated conversion and behaviour work while the
+choice is pending. Keep prepared gift selectors reusable under the current plan.
 
 Default discovery includes all 148 unresolved legacy `1xxx` worksheet records
 alongside the 242 `3xxx` records. These include ordinary furnishings, absent/dummy

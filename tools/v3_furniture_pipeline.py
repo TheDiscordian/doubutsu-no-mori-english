@@ -24,7 +24,8 @@ from v3_registry import FURNITURE, LEGACY_FURNITURE, furniture_identity, furnitu
 from v3_room_aliases import discover as room_aliases, pending_reason as room_alias_reason
 from v3_villager_art import native_palette, normalise_vertex_flags
 
-VERSION = 12
+VERSION = 13
+PENDING_MOVE_CATEGORY = 'static-models-pending-move'
 LAYERS = ('opaque', 'opaque1', 'translucent', 'translucent1')
 BEHAVIOURS = {0: 'static', 1: 'front-seat', 2: 'any-direction-seat', 4: 'front-sofa',
               8: 'single-bed', 16: 'double-bed'}
@@ -326,8 +327,8 @@ class Source:
             **palette_record,
             null_callbacks=[r for r in ('create','move','destroy') if r not in functions])
 
-    def switch_sound_models(self, profile_at):
-        """Keep ordinary profile geometry and the complete one-shot sound rule."""
+    def direct_callback_models(self, profile_at):
+        """Keep direct model slots with implemented sound or pending move code."""
         def reject(reason):raise ReviewRequired('custom callbacks: switch sound '+reason)
         pointer=self.relocations.get(profile_at+48)
         if pointer is None or pointer[:3]!=(1,True,5):reject('invalid vtable pointer')
@@ -337,7 +338,19 @@ class Source:
         if set(pointers)!={4} or pointers[4][:3]!=(1,True,1):
             reject('additional lifecycle, drawing, or DMA effects')
         raw,receipt=self.function(pointers[4][3]);size=len(raw)
-        if size not in SWITCH_SOUND_CODE:reject('unrecognised complete move implementation')
+        pointers=self.pointers(profile_at,52)
+        models={LAYERS[(p-profile_at)//4]:self.containing(target,exact=True)
+                for p,target in pointers.items() if p-profile_at in (0,4,8,12)}
+        if not models or set(pointers)-{profile_at+i for i in (0,4,8,12,48)}:
+            reject('changed profile model dependencies')
+        if size not in SWITCH_SOUND_CODE:
+            # Direct profile drawing is independent of this move callback.
+            # Preserve its source record and refuse gameplay installation,
+            # while allowing complete ordinary model preparation in bulk.
+            return models,{},dict(category=PENDING_MOVE_CATEGORY,vtable_symbol=name,vtable_offset=at,
+                functions=dict(move=receipt),runtime_installed=False,pending_callbacks=['move'],
+                null_callbacks=['create','draw','destroy','dma'],
+                resource_scope='complete static profile models; move behaviour and spawned effects remain pending')
         digest,locations,call=SWITCH_SOUND_CODE[size]
         constants={loc:struct.unpack_from('>H',raw,loc)[0] for loc in locations}
         signed=struct.unpack_from('>h',raw,locations[-1])[0]
@@ -345,11 +358,6 @@ class Source:
         if not 0<=sound<=65535:reject('sound word exceeds its source encoding')
         helpers=self.checked_callback_code(receipt,size,digest,{},
             {call:(0x2BDDE8,'sAdo_OngenTrgStart')},'switch sound',constants)
-        pointers=self.pointers(profile_at,52)
-        models={LAYERS[(p-profile_at)//4]:self.containing(target,exact=True)
-                for p,target in pointers.items() if p-profile_at in (0,4,8,12)}
-        if not models or set(pointers)-{profile_at+i for i in (0,4,8,12,48)}:
-            reject('changed profile model dependencies')
         return models,{},dict(category='switch-trigger-sound',vtable_symbol=name,vtable_offset=at,
             functions=dict(move=receipt),helpers=helpers,sound_word=sound,
             excluded_states=[13,14,15,12],state_offset=0x3C,switch_offset=0x12D,
@@ -514,15 +522,13 @@ class Source:
         if raw[:32] != bytes(32) or raw[48:] != bytes(4):
             raise ReviewRequired('unrelocated profile pointers')
         h, scale, shape, collision, rotation, lighting, contact, pad, interaction = struct.unpack_from('>ff6BH', raw, 32)
-        if (not math.isfinite(h) or not 0 < h <= 200 or raw[36:40] != struct.pack('>f', .01)
+        if (not math.isfinite(h) or not 0 < h <= 200 or not math.isfinite(scale) or not 0 < scale <= 1
                 or shape not in (3, 4, 5) or collision not in (0, 1, 2, 5)
                 or rotation not in (0, 1) or lighting not in (0, 1, 2) or pad):
             raise ReviewRequired('unsupported scalar profile category')
-        if contact not in BEHAVIOURS or interaction not in (0, 1, 2, 4, 0x10, 0x8000):
-            raise ReviewRequired(f'contact/interaction behaviour {contact:02X}/{interaction:04X}')
         extra = {}
         if 48 in locations:
-            if locations != [48]:models,bindings,adapter=self.switch_sound_models(at)
+            if locations != [48]:models,bindings,adapter=self.direct_callback_models(at)
             else:models, bindings, adapter = self.callback_models(at,index)
             extra = dict(palette_bindings=bindings, callback_adapter=adapter)
         else:
@@ -530,20 +536,29 @@ class Source:
             if not pointers or any(p-at not in (0, 4, 8, 12) for p in pointers):
                 raise ReviewRequired('unsupported static model slots')
             models = {LAYERS[(p-at)//4]: self.containing(target, exact=True) for p, target in pointers.items()}
-        fading = extra.get('callback_adapter', {}).get('category') == 'switch-palette-fade'
-        if fading and (interaction != 0x8000 or contact) or interaction == 0x8000 and not fading:
-            raise ReviewRequired('contact/interaction requires a checked palette-fade callback')
         adapter = extra.get('callback_adapter', {})
+        pending_move=adapter.get('category')==PENDING_MOVE_CATEGORY
+        pending_fields=[]
+        if raw[36:40]!=struct.pack('>f',.01):pending_fields.append('scale')
+        if contact not in BEHAVIOURS:pending_fields.append('contact')
+        if interaction not in (0,1,2,4,0x10,0x8000):pending_fields.append('interaction')
+        if pending_fields and not pending_move:
+            raise ReviewRequired('unsupported scalar/contact/interaction profile category')
+        if pending_move:
+            adapter['pending_profile_fields']=pending_fields
+        fading = adapter.get('category') == 'switch-palette-fade'
+        if not pending_move and (fading and (interaction != 0x8000 or contact) or interaction == 0x8000 and not fading):
+            raise ReviewRequired('contact/interaction requires a checked palette-fade callback')
         from v3_furniture_rigs import RESOURCE_CATEGORIES, STORAGE_CATEGORY
         storage=adapter.get('category')==STORAGE_CATEGORY
-        if storage and (contact or interaction not in (1,2,4)) or interaction in (1,2,4) and not storage:
+        if not pending_move and (storage and (contact or interaction not in (1,2,4)) or interaction in (1,2,4) and not storage):
             raise ReviewRequired('storage interaction requires the complete open/close category')
         if adapter.get('category') in RESOURCE_CATEGORIES:
             if contact or interaction and not storage: raise ReviewRequired('unsupported rig contact/interaction flags')
             extra.update(kind='animated-room-model',skeleton=adapter['skeleton'],joint_models=adapter['joint_models'])
         return dict(profile_symbol=name, profile_offset=at, profile_sha256=sha256(raw),
             scalar_hex=raw[32:48].hex(), behaviour=adapter.get('category') if extra.get('kind') or
-                adapter.get('category')=='switch-trigger-sound' else BEHAVIOURS[contact], contact_action=contact,
+                adapter.get('category') in ('switch-trigger-sound',PENDING_MOVE_CATEGORY) else BEHAVIOURS[contact], contact_action=contact,
             interaction_flags=interaction,
             size_code={3:1, 4:0, 5:2}[shape], shape=shape, models=models, **extra)
 
@@ -950,6 +965,8 @@ def name_metadata(source, item, identity):
 
 def metadata(source, item, profile, identity):
     from v3_furniture_rigs import FIXED_CATEGORY
+    if profile.get('callback_adapter',{}).get('category')==PENDING_MOVE_CATEGORY:
+        raise ReviewRequired('Static artwork is prepared; move behaviour, profile interactions, and spawned effects need runtime adapters')
     if profile.get('callback_adapter',{}).get('category')==FIXED_CATEGORY:
         raise ReviewRequired('Fixed rig artwork is prepared; move/destroy behaviour and spawned effects need runtime adapters')
     alias = next((row for row in room_aliases(source)['rows'] if int(row['display_item_id'],16)==item), None)

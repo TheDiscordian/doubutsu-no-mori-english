@@ -1,5 +1,70 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared static-callback resource preparation
+
+The bulk importer prepares direct profile models independently of pending
+move-only code. This is a shared structural category, not an item-name allowlist
+or a decorative replacement for an interactive item. Complete model slots and
+exactly one move callback are required. Custom drawing, creation, destruction,
+DMA, and dynamic profile resources remain outside this category. Known complete
+switch-sound callbacks keep their existing checked adapter.
+
+```sh
+python3 tools/v3_furniture_pipeline.py convert --assets-only \
+  --category static-models-pending-move \
+  --base-lock build/v3-shared-translucent-imports-01/cartridge/build-lock.json \
+  --output build/static-callback-reproduction
+```
+
+`build/v3-static-callback-resources-prepared-01/` compiles four complete objects
+in one existing Docker toolchain container, totalling 17,168 bytes:
+
+| Donor | Official name | Bytes |
+| --- | --- | ---: |
+| `1FAC` | piggy bank | 3,472 |
+| `31CC` | ukulele | 3,456 |
+| `3244` | barbecue | 5,760 |
+| `3324` | cannon | 4,480 |
+
+Prepared manifest SHA-256:
+`09cb8b27a921059ffc8bb357f7f73c75de018c98d8c1e9498623010bf380b93b`.
+
+The single provenance catalogue records each official name's donor table/index
+and encoded hash. Complete geometry, palettes, textures, material states, and
+source profile scalars are preserved. The callback descriptor retains its source
+symbol, offset, full function hash, relocations, and explicit pending status.
+Prepared static artwork does not include or certify dynamically spawned effects,
+the ukulele melody, piggy-bank money logic, or cannon/barbecue sound/effects.
+Those remain required gameplay implementation, not optional omissions.
+
+Unimplemented scale/contact/interaction fields can be preserved for this
+prepared-only category, with explicit `pending_profile_fields`. Structural and
+finite/bounds checks remain. Implemented categories still reject fields outside
+their supported semantics. Metadata and native profile construction reject the
+entire pending category, including forged installed-runtime annotations.
+The complete-art cache can reuse these objects after a real behaviour category
+is implemented; preparation never supplies a shortcut to installation.
+
+Three focused tests pass in 0.806 seconds:
+
+```sh
+python3 -m unittest tests.test_v3_furniture_pipeline.PendingMoveResourceTests -v
+```
+
+The prepared directory's `checks.log` retains the output. Checks independently
+compare every compiled model's vertices, triangles, textures, material state,
+and native commands with the donor; validate complete cache reuse and name
+credits; reject extra lifecycle/dynamic-texture dependencies; retain unsupported
+fields without allowing installation; and reject malformed scale values.
+The existing switch-sound category is checked for dispatch and guard retention
+because its shared discovery path changes. No old cartridge, emulator, or
+gameplay test is replayed.
+
+No ROM is rebuilt and no import is enabled. ABI 165 remains the explicit
+cartridge with 136 experimental choices and saved format 3. The main ABI-109
+lock, saves, and both served patchers remain unchanged. Primary conversion,
+behaviour, and acquisition work continues before required gold-tree completion.
+
 ## Shared fixed-keyframe resource preparation
 
 `build/v3-fixed-keyframe-rigs-prepared-01/` contains four complete constructor

@@ -18,6 +18,15 @@ served patchers retain their existing builds.
 
 ## Active development
 
+The static-profile resource path prepares complete models even when a move-only
+callback still needs porting. `build/v3-static-callback-resources-prepared-01/`
+contains piggy bank, ukulele, barbecue, and cannon: 17,168 bytes, compiled together
+in one container. Three focused checks pass. Move code, interaction fields, and
+spawned effects remain explicit pending dependencies; metadata and native-profile
+construction refuse to enable these resources. No cartridge, choice, save, or
+served-patcher changes result from this preparation. See the
+[static-callback checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-static-callback-resource-preparation).
+
 The shared importer also prepares complete fixed keyframe rigs independently of
 unfinished gameplay callbacks. `build/v3-fixed-keyframe-rigs-prepared-01/`
 contains tiger bobblehead, stone coin, harvest clock, and judge's bell: 15,776
