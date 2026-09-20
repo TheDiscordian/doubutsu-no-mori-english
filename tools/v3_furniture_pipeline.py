@@ -226,9 +226,11 @@ class Source:
         for slot, role in enumerate(('create','move','draw','destroy')):
             if slot*4 not in pointers: continue
             raw, receipt = self.function(pointers[slot*4][3]); functions[role] = receipt
-        from v3_furniture_rigs import CODE as RIG_CODE, discover as discover_rig
+        from v3_furniture_rigs import CODE as RIG_CODE, CLOCK_CODE, discover as discover_rig, discover_clock
         if functions.get('create',{}).get('bytes') == RIG_CODE['create'][0]:
             return discover_rig(self,name,at,functions,index)
+        if functions.get('create',{}).get('bytes') == CLOCK_CODE['create'][0]:
+            return discover_clock(self,name,at,functions,index)
         if functions.get('create',{}).get('bytes') == PALETTE_FADE_CODE['create'][0]:
             if set(pointers) != {0,4,8,12}: reject('unsupported palette-fade callback slots')
             return self.palette_fade_models(name, at, functions)
@@ -477,7 +479,8 @@ class Source:
         if fading and (interaction != 0x8000 or contact) or interaction == 0x8000 and not fading:
             raise ReviewRequired('contact/interaction requires a checked palette-fade callback')
         adapter = extra.get('callback_adapter', {})
-        if adapter.get('category') == 'indexed-switch-rig':
+        from v3_furniture_rigs import RIG_CATEGORIES
+        if adapter.get('category') in RIG_CATEGORIES:
             if contact or interaction: raise ReviewRequired('unsupported rig contact/interaction flags')
             extra.update(kind='animated-room-model',skeleton=adapter['skeleton'],joint_models=adapter['joint_models'])
         return dict(profile_symbol=name, profile_offset=at, profile_sha256=sha256(raw),

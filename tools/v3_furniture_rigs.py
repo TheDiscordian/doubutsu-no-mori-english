@@ -3,12 +3,21 @@
 This is a callback/asset category, not an item list. Preparing a rig does not
 install its lifecycle callbacks or make its parent selectable.
 """
+import re
 import struct
 
 from aflib import sha256, u32
 from v3_keyframes import animation, skeleton, model_descriptor, compile_skeleton, compile_animations
 
 CATEGORY = 'indexed-switch-rig'
+CLOCK_CATEGORY = 'indexed-loop-clock-rig'
+CLOCK_CODE = {
+    'create': (140, '6979dab4959772e11795a2b2cd0711ffa5875e1243321c7c856974deea9a4064'),
+    'move': (36, 'bb0989f0a657b30e25ea7de2e21589425883dfaed308bd116dabef8de4ef1dd2'),
+    'draw': (200, 'f6e60a96386c7721dcd0c894196eae1ee3e5c6339aadf921e2f95952ff7584de'),
+    'destroy': (4, 'f332ea5b5437103cbb6f1508679da89eec9288ad775c96c439a17fccabe3de8e'),
+}
+RIG_CATEGORIES = (CATEGORY, CLOCK_CATEGORY)
 CODE = {
     'create': (164, '2a86d61bc9aaf4a0a6479fe97a7f0d5dfe3dc42f9eea663eeb3fd1b8cbc35733'),
     'move': (208, '4b36894add16ecf872c1bfdcbeed2331519049fffd5b3d1d1d5db533f7c68d89'),
@@ -95,10 +104,95 @@ def discover(source, vtable_name, vtable_at, functions, index):
         runtime_installed=False)
 
 
+def selector_table(source, functions, role, high, low, count, section=5):
+    """Resolve a complete identity-indexed pointer table, never a model list."""
+    from v3_furniture_pipeline import ReviewRequired
+    relocations=functions[role]['relocations'];module=u32(source.rel,0)
+    pointer=relocations.get(high)
+    if (pointer is None or pointer[:3]!=(6,module,section)
+            or relocations.get(low)!=(4,module,section,pointer[3])):
+        raise ReviewRequired('custom callbacks: indexed rig changed paired table binding')
+    name,at,n=source.containing(pointer[3],exact=True)
+    pointers=source.pointers(at,n)
+    if n!=count*4 or any(source.data[at:at+n]) or set(pointers)!=set(range(at,at+n,4)):
+        raise ReviewRequired('custom callbacks: indexed rig incomplete selector table')
+    return dict(symbol=name,offset=at,bytes=n,targets=[pointers[p] for p in range(at,at+n,4)])
+
+
+def discover_clock(source, vtable_name, vtable_at, functions, index):
+    """Retain an indexed looping skeleton, constant palette, and live clock hands."""
+    from v3_furniture_pipeline import ReviewRequired
+    def reject(reason):raise ReviewRequired('custom callbacks: indexed clock rig '+reason)
+    if set(functions)!=set(CLOCK_CODE):reject('incomplete lifecycle')
+    create=functions['create'];draw=functions['draw']
+    raw,_=source.function(create['offset']);draw_raw,_=source.function(draw['offset'])
+    if len(raw)!=CLOCK_CODE['create'][0] or len(draw_raw)!=CLOCK_CODE['draw'][0]:
+        reject('changed selector implementation')
+    origin=-struct.unpack_from('>h',raw,0x26)[0];count=16
+    if (u32(raw,0x34)!=0x541E16BA or u32(draw_raw,0x30)!=0x540016BA
+            or raw[0x26:0x28]!=draw_raw[0x26:0x28] or not origin<=index<origin+count):
+        reject('selector escapes the complete tables')
+    tables={role:selector_table(source,functions,owner,hi,lo,count) for role,owner,hi,lo in (
+        ('skeleton','create',0x1E,0x32),('animation','create',0x22,0x2E),('palette','draw',0x22,0x36))}
+    module=u32(source.rel,0)
+    speed_pointer=create['relocations'].get(0x62)
+    if speed_pointer is None or speed_pointer[:3]!=(6,module,4):reject('missing repeat speed')
+    speed_at=speed_pointer[3];base,size=source.sections[4]
+    if not 0<=speed_at<=size-4 or source.rel[base+speed_at:base+speed_at+4]!=struct.pack('>f',.5):
+        reject('changed repeat speed')
+    def pair(high,low,target,section=5):return {high:(6,module,section,target),low:(4,module,section,target)}
+    expected={
+        'create':{0x10:(10,0,4,0x8009AED4),0x78:(10,0,4,0x8009AF20)} |
+            pair(0x1E,0x32,tables['skeleton']['offset']) | pair(0x22,0x2E,tables['animation']['offset']) |
+            pair(0x62,0x6A,speed_at,4),
+        'move':{},'destroy':{},
+        'draw':{0x10:(10,0,4,0x8009AEC8),0xB4:(10,0,4,0x8009AF14)} |
+            pair(0x22,0x36,tables['palette']['offset']),
+    }
+    callbacks=[]
+    for role,high,low,digest,length in (
+            ('before',0x72,0x82,'99f04fbcf9b117cc9cb4f790d376b2d806c2902868fce4a96d49c645f3d33dfd',84),
+            ('after',0x7A,0x8A,'2bf7a94759a252fd0d2af700ff876c19ab13998fb28ac5b0db3c70cdbc9ef8d6',8)):
+        pointer=draw['relocations'].get(high)
+        if pointer is None or pointer[:3]!=(6,module,1):reject('missing joint callback')
+        code,receipt=source.function(pointer[3])
+        relocations=({0x0A:(6,module,6,0xBC40),0x12:(4,module,6,0xBC40),
+                      0x32:(6,module,6,0xBC40),0x3A:(4,module,6,0xBC40)} if role=='before' else {})
+        if len(code)!=length or sha256(code)!=digest or receipt['relocations']!=relocations:
+            reject('changed clock-joint behaviour')
+        callbacks.append(dict(role=role,**receipt));expected['draw'].update(pair(high,low,pointer[3],1))
+    common=re.findall(r'^common_data = \.bss:0x([0-9A-Fa-f]+);[^\n]* size:0x([0-9A-Fa-f]+) ',source.symbols,re.M)
+    if [(int(at,16),int(n,16)) for at,n in common]!=[(0xBC40,0x2DC00)]:
+        reject('changed source clock owner')
+    calls={'create':{0x4C:(0x8D4,'cKF_SkeletonInfo_R_ct'),
+                     0x5C:(0xA24,'cKF_SkeletonInfo_R_init_standard_repeat'),0x70:(0xE54,'cKF_SkeletonInfo_R_play')},
+           'move':{0x10:(0xE54,'cKF_SkeletonInfo_R_play')},
+           'draw':{0x68:(0x9D214,'_Matrix_to_Mtx_new'),0xAC:(0x1578,'cKF_Si3_draw_R_SV')},'destroy':{}}
+    helpers={}
+    for role,(length,digest) in CLOCK_CODE.items():
+        helpers.update(source.checked_callback_code(functions[role],length,digest,expected[role],calls[role],
+            'indexed clock rig',{0x26:(-origin)&65535} if role in ('create','draw') else {}))
+    selected=index-origin
+    rig=skeleton(source,tables['skeleton']['targets'][selected])
+    if rig['joints']<=4:reject('missing clock-hand joints')
+    motion=animation(source,tables['animation']['targets'][selected],joints=rig['joints'])
+    palette=tables['palette']['targets'][selected];name,at,n=source.containing(palette,exact=True)
+    if n!=32 or source.pointers(at,n):reject('incomplete constant palette')
+    descriptor=model_descriptor(rig,kind='animated-room-model')
+    return descriptor['models'],{0x08000000:palette},dict(category=CLOCK_CATEGORY,
+        vtable_symbol=vtable_name,vtable_offset=vtable_at,functions=functions,helpers=helpers,
+        joint_callbacks=callbacks,tables=tables,index_origin=origin,entries=count,selected_index=selected,
+        constants=dict(repeat_speed=dict(section=4,offset=speed_at,hex='3f000000')),
+        clock=dict(common_symbol='common_data',hour_joint=3,minute_joint=4,
+                   hour_offset=0x2612A,minute_offset=0x26128,axis='z',operation='subtract'),
+        palette=dict(symbol=name,donor_offset=at,bytes=n,source_sha256=sha256(source.data[at:at+n])),
+        skeleton=rig,animation=motion,joint_models=descriptor['joint_models'],runtime_installed=False)
+
+
 def suffix(source, profile, model_offsets, *, start):
     """Pack the real skeleton and motion after the shared complete artwork."""
     adapter = profile.get('callback_adapter',{})
-    if adapter.get('category') != CATEGORY: return b'', {}
+    if adapter.get('category') not in RIG_CATEGORIES: return b'', {}
     roots = {root[1]:model_offsets[label] for label,root in profile['models'].items()}
     bones, rig = compile_skeleton(source,profile['skeleton'],roots,start=start)
     motion, animations = compile_animations(source,[adapter['animation']],start=start+len(bones))
@@ -109,7 +203,7 @@ def suffix(source, profile, model_offsets, *, start):
 
 def estimated_suffix(source, profile, start):
     adapter = profile.get('callback_adapter',{})
-    if adapter.get('category') != CATEGORY: return 0
+    if adapter.get('category') not in RIG_CATEGORIES: return 0
     bones = (profile['skeleton']['joint_table']['bytes']+8+15)&~15
     motion, _ = compile_animations(source,[adapter['animation']],start=start+bones)
     return bones+len(motion)

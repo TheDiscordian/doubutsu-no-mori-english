@@ -1,5 +1,36 @@
 # Automatic furniture pipeline checkpoint
 
+## Indexed looping clock rigs
+
+`build/v3-indexed-clock-rigs-prepared-01/` prepares all fifteen station models
+through `indexed-loop-clock-rig`, using the existing shared geometry/keyframe
+converters and one compiler container for all 45 visible model sections.
+The three complete source tables contain sixteen entries each; the last entry
+duplicates the fifteenth model rather than supplying another item identity.
+Each variant retains five joints, three visible models, its constant palette,
+and the complete 100-frame motion. Object sizes are 6,720, 8,368, and 5,856 bytes
+for the three groups of five variants; no art is resized or discarded.
+
+Complete source functions `fNSN_ct`, `fNSN_mv`, `fNSN_dw`, `fNSN_dt`, and both
+joint callbacks establish the category. Paired table dependencies, bounded
+selectors, actual keyframe/matrix helper calls, the `0.5` repeat speed, and
+the clock owner are checked. Before drawing, source joint three subtracts the
+hour angle and joint four subtracts the minute angle about Z. These rules remain
+explicit metadata for the required native runtime adapter, not a claim that
+converted assets already execute clock behaviour.
+
+- Manifest SHA-256:
+  `9831b2e618d322f59e9f13c47e4a98bf6cd40190038929fb3c81439cf274bc42`.
+- Three focused source/prepared checks pass in 4.735 seconds: complete category
+  discovery, changed code/table/speed rejection, every converted texture/vertex/
+  triangle, complete keyframe arrays/pointers, cache reuse, and installer refusal.
+- No emulator replay, ROM change, save change, new choice, or patcher update.
+
+The remaining non-alias, non-dummy furniture inventory has 101 candidate records;
+62 now have complete prepared artwork. Native clock lifecycle and source
+acquisition remain unfinished. Continue primary category work before required
+gold-tree completion. The current explicit cartridge remains ABI 158.
+
 ## Bulk compilation and prepared reuse
 
 `build/v3-bulk-prepared-02/` rebuilds current descriptors for 95 complete prepared

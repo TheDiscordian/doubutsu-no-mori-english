@@ -681,7 +681,23 @@ relocated pointer. The animation packer accepts an aligned object offset; its
 default zero-offset format and all existing held resources remain unchanged.
 No animation is flattened into a decorative model.
 
-The category prepares all eight room balloons in one command:
+The `indexed-loop-clock-rig` category uses the same complete model, skeleton,
+motion, and batch compiler. Its three checked sixteen-entry tables select a rig,
+animation, and constant palette together. Both create/draw selectors must agree;
+every lifecycle instruction, relocated dependency, helper call, speed constant,
+and joint callback is verified. The last source table entry duplicates the
+fifteenth variant; table padding does not create another selectable item.
+
+This category prepares all fifteen station models in one invocation. Each keeps
+five joints, three visible lists, the complete 100-frame animation, and its own
+palette. Source repeat speed is `0.5`; the before-draw callback subtracts the live
+hour/minute angles from joints three/four about Z. The descriptor retains those
+rules and the exact source clock owner/fields for runtime integration. The
+prepared object includes all graphics and keyframe data, not a frozen decorative
+substitute. The native lifecycle/clock adapter and source acquisition route
+remain required; prepared resources do not enable these records.
+
+The switch-driven category prepares all eight room balloons in one command:
 
 ```sh
 python3 tools/v3_furniture_pipeline.py convert --assets-only \
@@ -784,8 +800,9 @@ recording a loaded bank. There is no per-item DMA case for this category.
 Acquisition remains independent: an eligible winter-camping model can install
 through the existing reward category; models needing other source routes remain
 prepared-only. Model conversion never substitutes shop stock for an unknown
-reward. Roof-colour selectors, clocked station rigs, and additional effects
-remain separate unsupported categories, not static substitutions.
+reward. Roof-colour selectors and additional effects remain separate unsupported
+categories, not static substitutions. Clocked rigs have complete prepared assets
+but still require their native clock/lifecycle adapter.
 
 Other dynamic texture/palette pointers, animation rigs, custom callbacks, unsupported
 contact/interaction flags, other action sounds or acquisition routes, oversized

@@ -16,6 +16,7 @@ import v3_furniture_install as install
 from tests import test_v3_furniture_pipeline as furniture_tests
 
 OUTPUT = ROOT/'build/v3-indexed-room-rigs-prepared-01'
+CLOCK_OUTPUT = ROOT/'build/v3-indexed-clock-rigs-prepared-01'
 
 
 class SourceTests(unittest.TestCase):
@@ -97,6 +98,77 @@ class SourceTests(unittest.TestCase):
             self.assertEqual(b['source_sha256'],a['source_sha256'])
         for bad in (-16,1,0x1000000,True):
             with self.assertRaises(ValueError):keyframes.compile_animations(self.source,[motion],start=bad)
+
+
+class ClockTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        SourceTests.setUpClass.__func__(cls)
+
+    def test_shared_clock_category_retains_three_rigs_and_fifteen_palettes(self):
+        profiles=[self.source.profile(item) for item in range(0x30A8,0x30E4,4)]
+        adapters=[p['callback_adapter'] for p in profiles]
+        self.assertEqual({a['selected_index'] for a in adapters},set(range(15)))
+        self.assertEqual({a['index_origin'] for a in adapters},{1066})
+        self.assertEqual(len({a['skeleton']['header']['donor_offset'] for a in adapters}),3)
+        self.assertEqual(len({a['animation']['header']['donor_offset'] for a in adapters}),3)
+        self.assertEqual(len({a['palette']['donor_offset'] for a in adapters}),15)
+        for profile,adapter in zip(profiles,adapters,strict=True):
+            self.assertEqual(profile['kind'],'animated-room-model')
+            self.assertEqual(adapter['category'],rigs.CLOCK_CATEGORY)
+            self.assertEqual(adapter['entries'],16)
+            self.assertEqual(adapter['clock'],dict(common_symbol='common_data',hour_joint=3,minute_joint=4,
+                hour_offset=0x2612A,minute_offset=0x26128,axis='z',operation='subtract'))
+            self.assertEqual(adapter['constants']['repeat_speed']['hex'],'3f000000')
+            self.assertFalse(adapter['runtime_installed'])
+            for table in adapter['tables'].values():
+                self.assertEqual(len(table['targets']),16)
+                self.assertEqual(table['targets'][14],table['targets'][15])
+
+    def test_changed_clock_behaviour_speed_and_table_bindings_reject(self):
+        profile=self.source.profile(0x30A8);adapter=profile['callback_adapter']
+        for row in list(adapter['functions'].values())+adapter['joint_callbacks']:
+            source=copy.copy(self.source);source.rel=bytearray(source.rel)
+            source.rel[source.sections[1][0]+row['offset']]^=1
+            with self.subTest(function=row['symbol']),self.assertRaises(ValueError):source.profile(0x30A8)
+        for table in adapter['tables'].values():
+            source=copy.copy(self.source);source.relocations=dict(source.relocations)
+            del source.relocations[table['offset']+4]
+            source.relocation_addresses=sorted(source.relocations)
+            with self.assertRaisesRegex(ValueError,'incomplete selector table'):source.profile(0x30A8)
+        source=copy.copy(self.source);source.rel=bytearray(source.rel)
+        constant=adapter['constants']['repeat_speed']
+        source.rel[source.sections[constant['section']][0]+constant['offset']]^=1
+        with self.assertRaisesRegex(ValueError,'repeat speed'):source.profile(0x30A8)
+        for index in (1065,1082):
+            with self.assertRaisesRegex(ValueError,'selector escapes'):
+                self.source.callback_models(profile['profile_offset'],index)
+
+    def test_prepared_clock_objects_retain_complete_motion_and_reuse_without_enabling(self):
+        report=json.loads((CLOCK_OUTPUT/'art.json').read_bytes())
+        self.assertEqual(report['batch'],dict(objects=15,compiled=15,reused=0,compiler_containers=1))
+        cache=pipeline.PreparedAssets(self.source,[CLOCK_OUTPUT])
+        self.assertEqual(len(report['objects']),15)
+        for row in report['objects']:
+            item=int(row['item_id'],16);prepared=pipeline.prepare(self.source,item)
+            profile,body,_,_,_,_,sections=prepared
+            asset=(CLOCK_OUTPUT/row['object_file']).read_bytes()
+            start=(len(body)+sum(n for _,n in sections)+15)&~15
+            suffix,receipt=rigs.suffix(self.source,profile,row['model_offsets'],start=start)
+            self.assertEqual(asset[start:],suffix)
+            self.assertEqual(len(asset),start+rigs.estimated_suffix(self.source,profile,start))
+            self.assertEqual(row['rig'],json.loads(json.dumps(receipt)))
+            self.assertFalse(row['import_ready'])
+            self.assertIn('lifecycle',row['pending_reason'])
+            self.assertEqual(cache.reuse(self.source,row['item_id'],prepared)[1]['object_sha256'],row['object_sha256'])
+            for r in receipt['skeleton']['relocations']+receipt['animations']['relocations']:
+                self.assertEqual(struct.unpack_from('>I',asset,r['offset'])[0],0x06000000+r['target_offset'])
+            for r in receipt['animations']['arrays']:
+                at,n,source=r['native_offset'],r['bytes'],r['donor_offset']
+                self.assertEqual(asset[at:at+n],self.source.data[source:source+n])
+        furniture_tests.DonorTests.check_complete_artwork(self,CLOCK_OUTPUT,report)
+        with self.assertRaisesRegex(ValueError,'Unknown converter/source revision'):
+            install.checked_assets(CLOCK_OUTPUT,self.source,ROOT/'build/item-identity-megasheet.xlsx')
 
 
 @unittest.skipUnless((OUTPUT/'art.json').is_file(),'Current room-rig conversion required')

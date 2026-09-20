@@ -18,6 +18,14 @@ served patchers retain their existing builds.
 
 ## Active development
 
+All fifteen station models have complete prepared artwork, skeletons, and motions
+through the shared indexed-clock category at `build/v3-indexed-clock-rigs-prepared-01/`.
+One compiler container handles the whole batch. Source clock-hand rules and live
+time dependencies are recorded explicitly; native lifecycle/acquisition support
+is still pending. Three focused checks pass, including complete graphics/motion
+comparisons and refusal to install unfinished records. No ROM or choices change.
+See the [clock-rig checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#indexed-looping-clock-rigs).
+
 The primary importing pipeline compiles missing furniture artwork in one batch
 and reuses verified prepared objects while regenerating current eligibility and
 metadata. `build/v3-bulk-prepared-02/` contains 95 complete prepared objects:
