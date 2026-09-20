@@ -1,5 +1,67 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared holiday reward preparation
+
+`build/v3-holiday-rewards-prepared-02/` contains the complete donor holiday
+program and a relocatable N64 o32 selection/handover kernel:
+
+```sh
+python3 -B tools/v3_furniture_pipeline.py convert \
+  --representation rewards --assets-only --category holiday \
+  --output build/holiday-reproduction
+```
+
+The compiler derives all 28 event rows and 65 candidate entries from the actual
+donor's fixed gifts, complete selector jump table, random bounds, and code.
+It checks complete function hashes and dependencies for gift selection, station
+selection, furniture index conversion, pre-give, and give. The source branch
+table's relocation targets are bound independently of its zero-filled raw data.
+The output retains fifteen diary choices (the original off-by-one), fifteen
+stations, nine flowers, Toy Day's gender-dependent pair, and every fixed gift.
+The 370-byte `AFHG` table contains donor IDs, not invented native mappings.
+
+The shared C kernel validates the complete table, exposes available variant
+counts through a checked resolver, creates bounded transient offers, and
+rechecks the source variant/native mapping/receipt before committing. Missing
+or disabled items are unavailable; complete selections retain source variant
+order/distribution. A failed pocket insertion never marks a trophy. Repeated
+handover calls cannot award another gift after that player's receipt is marked.
+The caller supplies the validated player, real normal-condition insertion,
+catalogue registration, and existing format-3 trophy operations. No new saved
+field is introduced by the kernel.
+
+Three focused tests pass in 0.735 seconds. Complete source mutation checks
+cover code, external/data dependencies, tables, random ranges, and changed
+valid-looking selector targets. Address/undefined-behaviour sanitizers cover
+all selector forms, complete and sparse choices, unrepresentable/out-of-range
+requests, unchanged failed output, changed selection, tampered offers, duplicate
+receipts, independent four-player state, full pockets, and malformed tables.
+The actual Docker toolchain compiles a big-endian ELF32 MIPS relocatable object
+with no unresolved external symbols. Stack reports show at most 80 bytes for
+an individual kernel function, before caller/callback stack requirements.
+
+No RAM address is assigned and no ROM is rebuilt: actor/calendar/dialogue,
+selected native identity mappings, actual delivery-trigger bindings, catalogue/
+scoring activation, and ordinary gameplay remain required. Native component
+tests for an uninstalled kernel would not demonstrate those missing routes;
+the current ABI-163 ROM and its accepted component evidence are retained.
+
+Following the complete holiday program also exposed a discovery gap: bottled
+ship `1FC0` is a gift with no reviewed native mapping, but the default furniture
+scan covers `3xxx` and four explicitly known legacy balloon aliases. A source-
+worksheet check finds other legacy entries requiring classification, including
+ordinary furniture, dummy resources, and parent/display dependencies. They are
+not automatically new furniture and must not overwrite same-numbered N64 items.
+The primary queue now explicitly requires broad legacy discovery and stable
+additive mapping after identity/representation review.
+
+- Prepared receipt SHA-256: `375ec29617200dea9a4297ef4ab7925c2f23cd5bd169652fe4ebae9bfc9acbd2`.
+- Complete program SHA-256: `474eb2e54e967b8f05de6f561ec4dac2eafa75711568e0013607f2e6998fb778`.
+- Relocatable kernel SHA-256: `b1c0bc38c473705960d3638ff06af087e75b2749cdda9cedc0614ca5318d8147`.
+
+No choices, ROMs, saves, main build lock, or served patchers change. Gold-tree
+completion remains required after primary imports, not replaced by this work.
+
 ## Shared ordinary profile staging
 
 ABI 163 at `build/v3-shared-room-profiles-02/build-lock.json` connects all

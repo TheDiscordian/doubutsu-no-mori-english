@@ -18,6 +18,18 @@ served patchers retain their existing builds.
 
 ## Active development
 
+The primary acquisition pipeline prepares all 28 source holiday selectors and
+65 gift candidates at `build/v3-holiday-rewards-prepared-02/`, plus a relocatable
+N64 selection/handover kernel. Three focused source and sanitizer checks pass.
+The shared kernel handles optional variant selection, independent player
+receipts, duplicate rejection, and full-pocket failure without consuming a
+reward. This is prepared code/data, not an installed NPC or acquisition route;
+the current ROM and 128 choices remain unchanged. Next connect donor identity
+resolution, Tortimer's actor/calendar/dialogue, and actual delivery callbacks.
+Include legacy `1xxx` donor additions in primary discovery: the holiday program's
+bottled ship `1FC0` has no reviewed native identity or additive destination yet.
+See the [holiday checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-holiday-reward-preparation).
+
 The current explicit proposal is ABI 163 at
 `build/v3-shared-room-profiles-02/build-lock.json`. One shared batch connects
 all fifteen clocks, both storage rigs, and five sound objects to ordinary
@@ -79,7 +91,7 @@ The shared open/close category prepares both Harvest storage objects, retaining
 complete models, skeletons, animations, source interaction flags, and opening
 limits. Two converter checks pass; the shared runtime above supplies their
 lifecycle. Ordinary profiles are staged; acquisition remains required. Across the
-remaining furniture candidates, 69 of 101 non-alias, non-dummy records have
+currently scanned `3xxx` furniture candidates, 69 of 101 non-alias, non-dummy records have
 prepared artwork. Continue shared integration before required gold-tree work.
 See the [storage checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#openclose-storage-category).
 

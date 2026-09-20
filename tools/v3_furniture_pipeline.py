@@ -1124,8 +1124,8 @@ def main():
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--select', action='append', default=[], help='Canonical donor ID; defaults to all supported new furniture')
     parser.add_argument('--category', help='Restrict to a discovered shared category, without an item list')
-    parser.add_argument('--representation', choices=('furniture','handheld','scenery','audio'), default='furniture',
-                        help='Discover furniture, held equipment, scenery, or furniture audio dependencies')
+    parser.add_argument('--representation', choices=('furniture','handheld','scenery','audio','rewards'), default='furniture',
+                        help='Discover furniture, held equipment, scenery, audio, or shared reward dependencies')
     parser.add_argument('--assets-only', action='store_true',
                         help='convert only: prepare artwork even when metadata/acquisition is unsupported; never install')
     parser.add_argument('--base-lock', type=Path, default=ROOT/'config/v3-import-build.json')
@@ -1138,12 +1138,23 @@ def main():
     if args.category and args.command == 'scan': parser.error('--category requires convert or import')
     if args.reuse_assets and (args.command=='scan' or args.representation!='furniture'):
         parser.error('--reuse-assets requires furniture convert or import')
-    if args.representation in ('handheld','scenery','audio') and (args.command == 'import' or
+    if args.representation in ('handheld','scenery','audio','rewards') and (args.command == 'import' or
             args.command == 'convert' and not args.assets_only):
         parser.error('This representation requires convert --assets-only; runtime integration is unfinished')
     if output.exists() or not output.is_relative_to(ROOT/'build'): raise ValueError('Use a fresh ignored build path')
     source = Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
                     (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    if args.representation=='rewards':
+        from v3_holiday_rewards import discover as discover_rewards,prepare as prepare_rewards
+        if args.select or args.category not in (None,'holiday'):
+            parser.error('Reward preparation retains the complete shared holiday category; item selection belongs to the runtime profile')
+        if args.command=='scan':
+            report=discover_rewards(source);output.parent.mkdir(parents=True,exist_ok=True)
+            write_new(output,(json.dumps(report,indent=2,sort_keys=True)+'\n').encode())
+        else:report=prepare_rewards(source,output)
+        print(json.dumps(dict(events=len(report['rows']),candidates=sum(len(r['source_items']) for r in report['rows']),
+            runtime_installed=False,acquisition_installed=False)))
+        return
     if args.representation == 'scenery':
         from v3_scenery import discover as scan_scenery, convert as convert_scenery
         if args.command == 'scan':

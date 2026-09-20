@@ -894,6 +894,43 @@ converted object is not automatically evidence of complete gameplay.
 
 ## Shared installation
 
+### Shared holiday reward preparation
+
+`convert --representation rewards --assets-only --category holiday` prepares
+the donor's complete 28-event gift program and a relocatable N64 o32 selector/
+handover kernel. The actual `mSC_trophy_item` code, station selector, index-to-item
+conversion, give/pre-give functions, relocations, complete branch table, fixed
+gifts, calendar identities, and floating-point random bounds are checked.
+Selectors retain all 65 candidate entries, including the source's fifteen-diary
+New Year's range, fifteen stations, nine flowers, and gender-dependent Toy Day.
+No manually maintained item-name list determines event membership.
+
+The `AFHG` table contains a 16-byte header, 28 eight-byte event records, and
+complete big-endian donor item IDs. Source IDs are not presumed native IDs.
+The shared runtime accepts a pure checked resolver that returns an installed,
+selected native item or zero. Complete selection preserves donor variant order
+and distribution; sparse selection chooses uniformly among available variants
+using a bounded index supplied by the caller. Missing identity/artwork/behaviour
+must resolve to zero, never to a native item with the same numerical ID.
+
+Transient offers preserve event, original variant, donor ID, native ID, and
+gender. Handover rechecks the complete source record, current mapping/selection,
+and active player's trophy before delivery. Only successful native inventory
+insertion may mark the receipt; full pockets, changed selection, duplicate
+delivery, and malformed offers cannot consume the reward. Caller operations
+bind to the validated active player, normal possession conditions, existing
+catalogue-registration insertion, and format-3 trophy state. The source NPC
+demo completion signal remains the required delivery trigger.
+
+The kernel is prepared as a relocatable object, not linked to an invented RAM
+address. The existing ordinary importer must continue refusing these acquisition
+routes until the complete NPC, calendar, dialogue, identity resolution, and
+delivery bindings are installed. In particular, the gift program includes
+legacy `1xxx` furniture and diary parents: a `3xxx`-only inventory does not cover
+all donor additions. Legacy room/display aliases must remain distinct from
+new ordinary furniture. Prepared selectors are not playable imports or web
+choices, and do not replace missing holidays with unrelated shop stock.
+
 `tools/v3_furniture_install.py` binds the complete base ROM/report and source
 data, regenerates the metadata/dependency description, and checks the converted
 assets. It installs full profiles and item records, names/prices/footprints,

@@ -12,11 +12,30 @@ After the primary importing work, finish gold-tree leaf/cut effects and the full
 golden-shovel acquisition route. This is deferred required V3 work, not a dropped
 feature or a separate release goal.
 
+The complete holiday selector and no-loss transaction kernel are prepared at
+`build/v3-holiday-rewards-prepared-02/`: 28 events and 65 gift variants, driven by
+verified source code/tables. Three source/sanitizer checks pass; the N64 object
+has no unresolved external symbols, but remains unlinked and uninstalled.
+Connect the shared actor/calendar/dialogue and native operations, including
+the actual handover completion signal, selected identity resolver, ordinary
+inventory insertion/catalogue registration, and per-player format-3 trophy
+flag. No holiday item becomes selectable from preparation alone.
+
+Extend discovery to cover unresolved legacy `1xxx` donor furniture, not only
+the `3xxx` additions and four balloon display aliases. The holiday program
+requires bottled ship `1FC0`, for which the reviewed identity mapper finds no
+native correspondence. The worksheet contains further legacy unmapped entries,
+including ordinary furnishings, absent/dummy artwork, and fish/insect/NES/display
+dependencies; do not count all of them as new furniture or alias native IDs by
+number. Assign additive stable destinations only after identity/representation
+review. Preserve all existing furniture/clothing/display reservations. This is
+primary importing work, not a stretch goal or an optional audit.
+
 The bulk converter reuses validated prepared artwork and compiles all missing
 objects in one container. The current combined prepared bundle is
 `build/v3-bulk-prepared-02/`: 95 objects, including two constant-palette trophies.
 These are prepared resources, not 95 new selectable items. Sixty-nine of the
-101 remaining non-alias, non-dummy furniture candidates have complete converted
+101 currently scanned `3xxx` non-alias, non-dummy furniture candidates have complete converted
 artwork, including fifteen station variants in the separate
 `build/v3-indexed-clock-rigs-prepared-01/` bundle and five sound-triggered objects
 at `build/v3-switch-sound-prepared-01/`, plus two complete storage rigs at
