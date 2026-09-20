@@ -24,6 +24,127 @@ OUT=ROOT/'build/v3-scrolling-materials-runtime-04'
 ART=ROOT/'build/v3-scrolling-materials-prepared-03'
 
 
+class ScrollingProfileIntegrationTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.out=ROOT/'build/v3-draw-only-scrolling-imports-01/cartridge'
+        cls.image,cls.report=inputs(cls.out/'build-lock.json')
+        cls.stage,cls.staged=inputs(ROOT/'build/v3-draw-only-scrolling-profiles-01/build-lock.json')
+        cls.base,cls.prior=inputs(ROOT/'build/v3-draw-only-scrolling-profiles-01/base-lock.json')
+        cls.blob=by_vrom(cls.image)[BLOB].extract(cls.image)
+        cls.intermediate=by_vrom(cls.stage)[BLOB].extract(cls.stage)
+        cls.old=by_vrom(cls.base)[BLOB].extract(cls.base)
+        cls.source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+            (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+
+    def test_complete_profiles_and_promotion_reuse_assets_and_runtime(self):
+        rows=[r for r in self.staged['staged_furniture']['rows'] if r['category']==scroll.CATEGORY]
+        self.assertEqual({r['item_id'] for r in rows},{'30E4','3258'})
+        self.assertEqual(len(self.staged['staged_furniture']['rows']),28)
+        self.assertEqual(len(self.report['staged_furniture']['rows']),27)
+        self.assertEqual([r['item_id'] for r in self.report['automatic_furniture']['imports']],['3258'])
+        art=json.loads((self.out.parent/'assets/art.json').read_bytes())
+        self.assertEqual(art['batch'],dict(objects=1,reused=1,compiled=0,compiler_containers=0))
+        e=self.report['equipment_resources'];old=self.prior['equipment_resources']
+        for key in ('bytes','sha256','furniture_audio','scenery'):self.assertEqual(e[key],old[key])
+        self.assertEqual(self.report['furniture']['bank_pool'],self.prior['furniture']['bank_pool'])
+        for packet in (e['room_rigs']['packet'],e['room_rigs']['scrolling']['packet']):
+            at,n=packet['blob_offset'],packet['bytes']
+            self.assertEqual(self.blob[at:at+n],self.old[at:at+n])
+        expected=bytearray(self.old[ROWS:TABLE_END])
+        for row in rows:
+            i=slot(int(row['item_id'],16));at=row['object_vrom']-BLOB;n=row['object_bytes']
+            self.assertTrue(row['reused_asset']);self.assertEqual(self.blob[at:at+n],self.old[at:at+n])
+            staged=self.intermediate[ROWS+i*80:ROWS+(i+1)*80]
+            current=self.blob[ROWS+i*80:ROWS+(i+1)*80]
+            enabled=row['item_id']=='3258'
+            self.assertEqual(staged[:8],struct.pack('>HHI',row['runtime_index'],int(row['item_id'],16),0))
+            self.assertEqual(current[:8],struct.pack('>HHI',row['runtime_index'],int(row['item_id'],16),enabled))
+            self.assertEqual(current[8:],staged[8:]);self.assertEqual(current[24:56],bytes(32))
+            self.assertEqual(struct.unpack_from('>I',current,72)[0],scroll.VTABLE)
+            item=self.blob[ITEMS+i*32:ITEMS+(i+1)*32]
+            self.assertEqual(item[8:24],row['name'].encode().ljust(16,b' '));self.assertEqual(item[7],enabled)
+            expected[i*80:(i+1)*80]=current;expected[ITEMS-ROWS+i*32:ITEMS-ROWS+(i+1)*32]=item
+        self.assertEqual(self.blob[ROWS:TABLE_END],expected)
+        selected=bytearray.fromhex(self.prior['save_runtime']['profile_hex']);i=slot(0x3258)
+        selected[32+i//8]|=1<<(i&7)
+        self.assertEqual(self.report['save_runtime']['profile_hex'],selected.hex())
+        self.assertEqual(self.report['save_codec']['format_version'],3)
+
+    def test_source_lifecycle_and_acquisition_gates_remain_independent(self):
+        bindings=room.bind_profiles(self.source,self.image,self.report)
+        self.assertEqual(len(bindings),28)
+        identities=identity_rows(ROOT/'build/item-identity-megasheet.xlsx')
+        ready=[]
+        for row in json.loads((ART/'art.json').read_bytes())['objects']:
+            item=int(row['item_id'],16);descriptor=prepare(self.source,item)[0]
+            if scroll.draw_only_lifecycle(descriptor,self.source) is not None:ready.append(row['item_id'])
+            else:
+                with self.assertRaisesRegex(ValueError,'Scrolling artwork'):metadata(self.source,item,descriptor,None)
+        self.assertEqual(ready,['30E4','3258'])
+        with self.assertRaisesRegex(ValueError,'^acquisition needs an adapter:'):
+            metadata(self.source,0x30E4,prepare(self.source,0x30E4)[0],identities[0x30E4])
+        pool=metadata(self.source,0x3258,prepare(self.source,0x3258)[0],identities[0x3258])
+        self.assertEqual(pool['donor_list'],'ftr_listEvent');self.assertTrue(pool['catalogue_orderable'])
+        bad=copy.deepcopy(self.report)
+        next(r for r in bad['equipment_resources']['room_rigs']['scrolling']['rows'] if r['source_item_id']=='3258')['lifecycle_installed']=False
+        with self.assertRaisesRegex(ValueError,'Incomplete installed scrolling lifecycle'):
+            room.bind_profiles(self.source,self.image,bad)
+        descriptor=prepare(self.source,0x3258)[0];move=descriptor['callback_adapter']['functions']['move']
+        changed=copy.copy(self.source);changed.rel=bytearray(self.source.rel)
+        changed.rel[self.source.sections[1][0]+move['offset']+3]^=4
+        with self.assertRaisesRegex(ValueError,'Changed source empty furniture lifecycle'):
+            scroll.draw_only_lifecycle(descriptor,changed)
+        damaged=bytearray(self.blob);packet=self.report['equipment_resources']['room_rigs']['scrolling']['packet']
+        damaged[packet['blob_offset']+4096+20]^=1
+        with self.assertRaisesRegex(ValueError,'Changed complete scrolling renderer'):
+            scroll.checked_runtime(self.report['equipment_resources'],damaged)
+        room.bind_profiles(self.source,self.image,self.report)
+
+    def test_optional_browser_composition_and_translation_only_remain_exact(self):
+        import v3_browser_composition as browser
+        pin=composer.BASE,composer.BASE_SHA,composer.REPORT_SHA,composer.ABI
+        try:
+            composer.use_build_lock(self.out/'build-lock.json')
+            catalogue=composer.catalogue(self.image,self.report);plan=browser.rules(self.image,self.report)
+            self.assertEqual(len(catalogue),137);self.assertFalse(plan['web_patcher_enabled'])
+            self.assertNotIn('GAFE01-r0/item/30E4',catalogue)
+            cases=[]
+            for label,requested in (('empty',[]),('all',list(catalogue)),
+                                    ('new-scroll',['GAFE01-r0/item/3258']),('existing-villager',['GAFE01-r0/villager/00EB'])):
+                selected=composer.resolve(catalogue,requested)
+                image,_,blob=composer.compose(self.image,self.report,catalogue,selected)
+                if label=='empty':self.assertEqual(sha256(image),self.report['translation_baseline']['sha256'])
+                elif label=='all':self.assertEqual(image,self.image)
+                else:
+                    i=slot(0x3258);enabled=label=='new-scroll'
+                    self.assertEqual(struct.unpack_from('>I',blob,ROWS+i*80+4)[0],enabled)
+                    self.assertEqual(bool(blob[0x40+i//8]&(1<<(i&7))),enabled)
+                    self.assertFalse(blob[0x40+slot(0x30E4)//8]&(1<<(slot(0x30E4)&7)))
+                cases.append(dict(name=label,requested=requested,selection=selected,sha256=sha256(image)))
+            with tempfile.TemporaryDirectory(prefix='v3-scroll-composition-') as directory:
+                path=Path(directory)/'fixture.json'
+                path.write_bytes(composer.canonical(dict(plan=plan,cases=cases,
+                    base=str(self.out/'animal-forest-v3-asset-loader.z64'),stable=str(composer.stable_reference(self.report)[0]))))
+                result=subprocess.run(['node','--experimental-global-webcrypto',str(ROOT/'tests/v3_browser_equivalence.mjs'),str(path)],
+                                      check=True,capture_output=True,text=True,timeout=60)
+                self.assertEqual(len(json.loads(result.stdout)['passed']),4)
+        finally:composer.BASE,composer.BASE_SHA,composer.REPORT_SHA,composer.ABI=pin
+        self.assertEqual(apply_ups((ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes(),
+                                  (self.out/'asset-loader.ups').read_bytes()),self.image)
+
+    def test_subsequent_resource_batches_retain_completed_profiles(self):
+        from aflib import CODE_VROM
+        original=(ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes()
+        blob=bytearray(self.blob);core=by_vrom(self.image)[CODE_VROM].extract(self.image)
+        # Every object is already installed. Reach the empty-new-batch guard
+        # after checking both staged and active profiles, without recompiling
+        # artwork/runtime or downgrading either lifecycle back to "pending".
+        with self.assertRaisesRegex(ValueError,'^Empty scrolling material batch$'):
+            scroll.install(self.image,self.report,blob,core,original,self.out,[ART])
+        self.assertEqual(blob,self.blob)
+
+
 class ScrollingRuntimeTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):

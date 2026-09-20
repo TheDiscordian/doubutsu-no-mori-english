@@ -355,7 +355,7 @@ and cold-boot rejection checks. Ordinary gameplay/catalogue and Controller Pak
 integration remain required. The web patcher does not upload or edit saves.
 
 The [optional composer](V3_OPTIONAL_COMPOSITION.md) resolves per-entry
-selections for twenty installed villagers and 116 installed logical items,
+selections for twenty installed villagers and 117 installed logical items,
 including required outfits, house furnishings, and twenty-four equipment parents.
 Mannequin and equipment catalogue representations are dependencies, not separate
 choices.
@@ -370,6 +370,11 @@ the pinned complete integration cartridge. The private browser interface uses
 generated records for the same choices, not a separate maintained item list.
 These are experimental development profiles,
 not complete donor coverage, playable-import certification, or served web options.
+The shared draw-only scrolling category supplies backyard pool through its
+verified donor event-item route, with complete layered graphics and the same
+optional catalogue/save consumers. Well model remains inactive pending its
+actual acquisition route; neither renderer preparation nor no-op callbacks
+substitute ordinary shop stock for an unresolved source.
 
 ## Browser implementation
 

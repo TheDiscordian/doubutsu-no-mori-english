@@ -12,7 +12,25 @@ After the primary importing work, finish gold-tree leaf/cut effects and the full
 golden-shovel acquisition route. This is deferred required V3 work, not a dropped
 feature or a separate release goal.
 
-The current explicit proposal is ABI 172 at
+The current explicit proposal is ABI 174 at
+`build/v3-draw-only-scrolling-imports-01/cartridge/build-lock.json`. Shared
+draw-only lifecycle verification stages the well model and backyard pool; the
+ordinary bulk importer activates the pool through its actual event-item route.
+Artwork and runtime storage are reused unchanged. Four focused checks pass,
+including four browser/offline selection cases and future-batch preservation
+of active/staged profiles. There are 137 experimental choices and 27 inactive
+profiles. Saved format 3 is unchanged; the pool adds its own required selection
+bit, so saves using it cannot load in builds/profiles without it.
+
+Continue general lifecycle/acquisition and rigged-material categories. Preserve
+the well model's missing acquisition route, five unfinished scrolling
+lifecycles, and the material-category gaps. Do not reconvert existing graphics
+or replay unchanged renderer/native evidence. The mower needs floor/contact
+updates; the remaining fountains/fireplace need their real switch/fade/audio
+categories. Gold-tree work stays after primary importing. Keep both deployments
+of the stable website unchanged.
+
+The retained renderer proposal is ABI 172 at
 `build/v3-scrolling-materials-runtime-04/build-lock.json`. Seven complete scrolling
 objects share an installed renderer and the existing 8-KiB extension at `804BA000`.
 Layered translucent models, native debug colour registers, and scaled actor alpha
@@ -34,10 +52,11 @@ existing objects. Four focused resource checks pass. EVW two-tile tables and
 the shared parameterised scroll helper are decoded with complete dependencies.
 The shared renderer supports multiple translucent models, native debug colour
 commands, scaled actor alpha, and safe preview inputs; both objects are installed.
-Connect the no-op lifecycle category through shared ordinary-profile integration:
-the pool's only move callback is a complete `blr`, with no create/destroy callback.
-Retain the mower's required contact/floor-driven grass lifecycle; neither is an
-enabled import. The current renderer record does not by itself enable gameplay.
+The no-op lifecycle category is integrated above: pool has one empty move
+callback, and well model has three empty lifecycle callbacks. Pool is enabled
+experimentally; well model still needs acquisition support. Retain the mower's
+required contact/floor-driven grass lifecycle. A renderer record alone does not
+enable gameplay.
 Continue general rigged material and lifecycle/acquisition categories, reusing
 complete models rather than reconverting individual items. Source draw records retain OPA/XLU order, one/two texture
 layers, dimensions/rates, segment bindings, and runtime colour inputs. Their

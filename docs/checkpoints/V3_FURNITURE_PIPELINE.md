@@ -1,5 +1,69 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared draw-only scroll profiles and imports
+
+ABI 173 at `build/v3-draw-only-scrolling-profiles-01/` stages complete ordinary
+profiles for well model `30E4` and backyard pool `3258`, reusing their installed
+models and shared scroll renderer. Every non-draw callback is absent or a
+complete, relocation-free source return instruction. Unsupported profile fields,
+contact/interaction flags, and actor-state colour inputs cannot use this category.
+The source-bound binder re-reads the callbacks; the native profile writer also
+requires their exact receipts and the installed vtable.
+
+ABI 174 at `build/v3-draw-only-scrolling-imports-01/cartridge/` promotes the pool
+through the ordinary bulk importer. Category discovery selects it automatically;
+no item-specific installer or maintained eligibility list is added. Its source
+`ftr_listEvent` membership supplies event stock, ordering, scoring, and catalogue
+integration. Official English name and source price are preserved. The complete
+4,960-byte object remains at VROM `026218F0`, index 1174, item `3258`, with vtable
+`804B1E30`. Generic model/rig fields stay null so the callback alone draws all
+three layers. There is no artwork compiler, duplicated object, runtime-code
+change, or additional RAM allocation in this batch.
+
+Well model remains staged because no supported donor acquisition-list binding
+exists. The five nonempty scrolling lifecycles stay deferred. Staging merges
+their pending records with the existing three material-lifecycle gaps instead
+of replacing the previous category's unfinished work. Renderer-resource
+extension validates and retains completed lifecycle/profiles, including an
+activated item, while continuing to reject overwritten identities and changed
+source/drawing records. An all-retained batch reaches the explicit empty-new-
+batch guard without compilation or mutation.
+
+The three `ScrollingProfileIntegrationTests` pass first time in 18.304 seconds;
+the additional subsequent-resource-batch preservation check passes first time
+in 5.109 seconds. They check both staged profiles, normal promotion, unchanged
+models/runtime/audio/scenery/reservations, exact saved selection changes, source
+callback and renderer-table mutation rejection, unresolved acquisition, and
+UPS reconstruction. Browser and offline composition agree for empty, all,
+pool-only, and an existing villager without the pool. The empty selection
+retains the exact translation-only cartridge. Reuse ABI 172's unchanged renderer
+sanitizer evidence; no historical emulator scenario is replayed.
+
+There are 137 experimental choices: 20 villagers, 90 furnishings, 24 equipment
+parents, and three shirts. Twenty-seven ordinary profiles remain inactive. The
+blob remains 4,406,784 bytes, with 1,884,672 bytes free before VROM `02800000`.
+Saved format 3 is unchanged; only the pool's selection bit is added. Saves using
+that import require an equal/superset profile on a compatible build containing
+the pool and cannot be loaded by older/V2 builds lacking it. Ordinary save/load,
+native acquisition/rendering, GPU appearance, and hardware are not newly verified.
+The main ABI-109 lock and both stable website deployments stay unchanged.
+
+```sh
+python3 tools/v3_furniture_install.py --refresh-runtime \
+  --base-lock build/v3-scrolling-materials-runtime-04/build-lock.json \
+  --furniture-profiles build/v3-scrolling-materials-prepared-03 \
+  --output build/scrolling-profiles-reproduction
+python3 tools/v3_furniture_pipeline.py import --category scrolling-material-assets \
+  --base-lock build/scrolling-profiles-reproduction/build-lock.json \
+  --reuse-assets build/v3-scrolling-materials-prepared-03 \
+  --output build/scrolling-imports-reproduction
+PYTHONPATH=tests python3 -m unittest test_v3_room_scroll.ScrollingProfileIntegrationTests -v
+```
+
+- ROM SHA-256: `4153b065c06aee6194d69472368b096587e7e76d6e7b04d10b06d0ba11c07b9e`.
+- UPS SHA-256: `76b7eae577be6ee2fc8fc9add3eafd7083085ca07ddd048e3ec293ef1d498be1`.
+- Report SHA-256: `981e74542ffefd6c4fa97a5889e382e6582700b739658a1fa32b730d1b4a0f2f`.
+
 ## Shared layered-scroll renderer
 
 ABI 172 at `build/v3-scrolling-materials-runtime-04/` installs the complete pool

@@ -336,6 +336,66 @@ def encode(rows):
     return bytes(out)
 
 
+def draw_only_lifecycle(profile,source=None):
+    """Accept complete empty callbacks only; drawing does not waive gameplay.
+
+    Source-bound callers re-read each function. The native profile writer also
+    checks the receipt, so merely supplying a vtable/readiness flag is insufficient.
+    """
+    adapter=profile.get('callback_adapter',{})
+    if (adapter.get('category')!=CATEGORY or adapter.get('pending_profile_fields') or
+            profile['contact_action'] or profile['interaction_flags'] or adapter['scrolling']['colour']):
+        return None
+    functions=adapter['functions'];callbacks={}
+    if 'draw' not in functions or set(functions)-{'create','move','draw','destroy'}:return None
+    empty=bytes.fromhex('4e800020')
+    for role,receipt in functions.items():
+        if role=='draw':continue
+        if receipt['bytes']!=4 or receipt['sha256']!=sha256(empty) or receipt['relocations']:return None
+        if source is not None:
+            raw,actual=source.function(receipt['offset'])
+            if raw!=empty or any(receipt[k]!=v for k,v in actual.items()):
+                raise ValueError('Changed source empty furniture lifecycle')
+        callbacks[role]=receipt
+    return dict(category='draw-only-scrolling',callbacks=callbacks,actor_state_used=False)
+
+
+def checked_runtime(equipment,blob):
+    """Verify complete scrolling drawing/storage before binding ordinary profiles."""
+    from v3_asset_loader import BLOB
+    from v3_equipment_runtime import RAM as EQUIPMENT_RAM
+    runtime=equipment['room_rigs'].get('scrolling')
+    if runtime is None:return {}
+    if runtime['format']=='AFV3-ROOM-SCROLL-1':
+        # The earlier renderer has no ordinary lifecycle/profile support.
+        # Leave unrelated staged categories usable while requiring an upgrade
+        # before any scrolling record can acquire an ordinary profile.
+        if any(r.get(k) for r in runtime['rows'] for k in
+               ('lifecycle_installed','profile_installed','parent_selectable')):
+            raise ValueError('Legacy scrolling renderer cannot expose ordinary profiles')
+        return {}
+    packet=runtime['packet'];at=packet['blob_offset'];data=blob[at:at+BYTES]
+    module=blob[equipment['blob_offset']:equipment['blob_offset']+equipment['bytes']]
+    code=runtime['code'];n=code['bytes'];table=encode(runtime['rows'])
+    boot=equipment['room_rigs']['bootstrap']['symbols']['af_v3_room_boot_scroll_dw']
+    vtable=struct.pack('>5I',0,0,boot,0,0)
+    if (runtime['format']!='AFV3-ROOM-SCROLL-2' or packet['ram']!=RAM or packet['bytes']!=BYTES or
+            packet['vrom']!=BLOB+at or at&15 or len(data)!=BYTES or sha256(data)!=packet['sha256'] or
+            not 0<n<=TABLE-RAM or sha256(data[:n])!=code['sha256'] or any(data[n:TABLE-RAM]) or
+            data[TABLE-RAM:]!=table.ljust(BYTES-(TABLE-RAM),b'\0') or
+            module[VTABLE-EQUIPMENT_RAM:VTABLE-EQUIPMENT_RAM+20]!=vtable or
+            runtime['vtable_hex']!=vtable.hex()):
+        raise ValueError('Changed complete scrolling renderer, table, or dispatch')
+    rows={}
+    for r in runtime['rows']:
+        start=r['blob_offset'];n=r['bytes'];key=r['source_item_id']
+        if (key in rows or r['vrom']!=BLOB+start or start&15 or not 0<=start<start+n<=len(blob) or
+                sha256(blob[start:start+n])!=r['sha256'] or not r['renderer_installed']):
+            raise ValueError('Changed complete installed scrolling artwork')
+        rows[key]=r
+    return rows
+
+
 def publish(equipment,blob,output):
     """Publish a bounded extension; existing rig/material tables stay put."""
     from v3_asset_loader import BLOB,compile_part
@@ -391,16 +451,28 @@ def install(base,prior,blob,core,original,output,directories):
         maximum_frame_alignment_padding=8,opaque_and_translucent_atomic_reservation=True)
     source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
         (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    profile_bindings=room.bind_profiles(source,base,prior)
     directories=[d.resolve() for d in directories];cache=PreparedAssets(source,directories)
     identities=identity_rows(ROOT/'build/item-identity-megasheet.xlsx',include_unmapped_legacy=True)
     installed=runtime.get('scrolling',dict(format='AFV3-ROOM-SCROLL-1',rows=[],sources=[]))
     if installed['format'] not in ('AFV3-ROOM-SCROLL-1','AFV3-ROOM-SCROLL-2'):
         raise ValueError('Unknown scrolling runtime format')
+    progress_fields={'lifecycle_installed','lifecycle','profile_installed','parent_selectable'}
     for old in installed['rows']:
         regenerated=json.loads(json.dumps(runtime_record(old['source'])))
-        if any(value!=regenerated[key] for key,value in old.items() if key not in ('blob_offset','vrom')):
+        if any(value!=regenerated[key] for key,value in old.items()
+               if key not in {'blob_offset','vrom'}|progress_fields):
             raise ValueError('Changed installed scroll source contract')
-        old.update(regenerated)
+        if old.get('lifecycle_installed'):
+            actual=draw_only_lifecycle(prepare(source,int(old['source_item_id'],16))[0],source)
+            if actual is None or old.get('lifecycle')!=json.loads(json.dumps(actual)):
+                raise ValueError('Changed completed scrolling lifecycle')
+        if old.get('profile_installed'):
+            binding=profile_bindings.get(old['source_item_id'])
+            if binding is None or old['parent_selectable']==binding['staged']:
+                raise ValueError('Changed retained scrolling profile')
+        elif old.get('parent_selectable'):raise ValueError('Selected scrolling resource has no profile')
+        old.update({k:v for k,v in regenerated.items() if k not in progress_fields})
     retained={r['source_item_id']:r for r in installed['rows']};reused=[]
     occupied={r['item_id'] for r in runtime['rows']+runtime.get('sound_rows',[])+
               runtime.get('material_rows',[])+installed['rows']}
@@ -421,18 +493,19 @@ def install(base,prior,blob,core,original,output,directories):
             path=(directory/row['object_file']).resolve()
             if path.parent!=directory:raise ValueError('Scroll artwork escapes its prepared directory')
             data=path.read_bytes();record=json.loads(json.dumps(runtime_record(row)));i=slot(int(record['item_id'],16))
-            if (len(data)!=record['bytes'] or sha256(data)!=record['sha256'] or
-                    any(blob[ROWS+i*80:ROWS+(i+1)*80]) or any(blob[ITEMS+i*32:ITEMS+(i+1)*32]) or
-                    blob[0x40+i//8]&(1<<(i&7))):raise ValueError('Changed scroll art or occupied destination')
+            if len(data)!=record['bytes'] or sha256(data)!=record['sha256']:
+                raise ValueError('Changed complete scrolling artwork')
             if donor in retained:
                 old=retained[donor]
-                if ({k:v for k,v in record.items() if k!='source'}!=
-                        {k:v for k,v in old.items() if k not in ('blob_offset','vrom','source')} or
+                if ({k:v for k,v in record.items() if k not in {'source'}|progress_fields}!=
+                        {k:v for k,v in old.items() if k not in {'blob_offset','vrom','source'}|progress_fields} or
                         {k:v for k,v in record['source'].items() if k!='reused_artwork'}!=
                         {k:v for k,v in old['source'].items() if k!='reused_artwork'} or donor in reused):
                     raise ValueError('Changed or duplicate retained scrolling resources')
                 reused.append(donor);continue
-            if record['item_id'] in occupied:raise ValueError('Occupied scrolling destination')
+            if (record['item_id'] in occupied or any(blob[ROWS+i*80:ROWS+(i+1)*80]) or
+                    any(blob[ITEMS+i*32:ITEMS+(i+1)*32]) or blob[0x40+i//8]&(1<<(i&7))):
+                raise ValueError('Occupied scrolling destination')
             occupied.add(record['item_id']);rows.append(record);assets[donor]=data
     if not rows:raise ValueError('Empty scrolling material batch')
     all_rows=sorted(installed['rows']+rows,key=lambda r:r['runtime_index']);encode(all_rows)

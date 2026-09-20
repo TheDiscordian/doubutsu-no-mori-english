@@ -1021,7 +1021,7 @@ def metadata(source, item, profile, identity):
     from v3_furniture_materials import CATEGORY as MATERIAL_CATEGORY
     from v3_furniture_scroll import CATEGORY as SCROLL_CATEGORY
     binding=getattr(source,'runtime_profiles',{}).get(f'{item:04X}')
-    if profile.get('callback_adapter',{}).get('category')==SCROLL_CATEGORY:
+    if profile.get('callback_adapter',{}).get('category')==SCROLL_CATEGORY and not binding:
         raise ReviewRequired('Scrolling artwork is prepared; drawing, lifecycle behaviour, and acquisition need runtime adapters')
     if profile.get('callback_adapter',{}).get('category')==MATERIAL_CATEGORY and not binding:
         raise ReviewRequired('Material-frame artwork is prepared; drawing, lifecycle behaviour, and acquisition need runtime adapters')

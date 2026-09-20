@@ -43,6 +43,7 @@ def install_profiles(base,prior,blob,core,original,output,directories):
     from v3_furniture_pipeline import identity_rows,name_metadata
     from v3_import_storage import ROWS_RAM
     from v3_furniture_materials import CATEGORY as MATERIAL_CATEGORY
+    from v3_furniture_scroll import CATEGORY as SCROLL_CATEGORY,VTABLE as SCROLL_VTABLE,draw_only_lifecycle,checked_runtime
     from v3_sound_programs import furniture_trigger
     result=copy.deepcopy(prior['equipment_resources']);runtime=result['room_rigs']
     source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
@@ -59,6 +60,7 @@ def install_profiles(base,prior,blob,core,original,output,directories):
     rigs={r['source_item_id']:r for r in runtime['rows']}
     sounds={r['source_item_id']:r for r in runtime.get('sound_rows',[])}
     materials={r['source_item_id']:r for r in runtime.get('material_rows',[])}
+    scrolling=checked_runtime(result,blob)
     old=copy.deepcopy(prior.get('staged_furniture',dict(format='AFV3-STAGED-FURNITURE-PROFILES-1',rows=[],sources=[])))
     if old['format']!='AFV3-STAGED-FURNITURE-PROFILES-1':raise ValueError('Unknown staged furniture format')
     occupied={r['item_id'] for r in old['rows']};staged=[];evidence=[];deferred=[]
@@ -71,7 +73,7 @@ def install_profiles(base,prior,blob,core,original,output,directories):
         for row in art['objects']:
             donor=row['item_id'];item=int(donor,16);prepared_row=prepare(source,item)
             descriptor=prepared_row[0];category=descriptor.get('callback_adapter',{}).get('category')
-            if (category not in (CLOCK_CATEGORY,STORAGE_CATEGORY,'switch-trigger-sound',MATERIAL_CATEGORY) or
+            if (category not in (CLOCK_CATEGORY,STORAGE_CATEGORY,'switch-trigger-sound',MATERIAL_CATEGORY,SCROLL_CATEGORY) or
                     donor in occupied or item not in identities or
                     row['profile']!=json.loads(json.dumps(descriptor)) or
                     row['native_profile_scalar_hex']!=descriptor['scalar_hex']):
@@ -86,6 +88,11 @@ def install_profiles(base,prior,blob,core,original,output,directories):
                 if not installed or not installed.get('lifecycle_installed'):
                     deferred.append(dict(source_item_id=donor,reason='Material lifecycle remains incomplete'))
                     continue
+            if category==SCROLL_CATEGORY:
+                lifecycle=draw_only_lifecycle(descriptor,source)
+                if lifecycle is None:
+                    deferred.append(dict(source_item_id=donor,reason='Scrolling lifecycle remains incomplete'))
+                    continue
             index,destination=furniture_representation_identity(item);i=slot(destination)
             if destination!=item or index!=1024+i:
                 raise ValueError('Parent/display aliases require their shared parent adapter')
@@ -93,7 +100,16 @@ def install_profiles(base,prior,blob,core,original,output,directories):
                 raise ValueError('Staged identity needs native correspondence review')
             if (any(blob[ROWS+i*80:ROWS+(i+1)*80]) or any(blob[ITEMS+i*32:ITEMS+(i+1)*32]) or
                     blob[0x40+i//8]&(1<<(i&7))):raise ValueError('Profile staging overwrites an existing or selected identity')
-            if category in (CLOCK_CATEGORY,STORAGE_CATEGORY):
+            if category==SCROLL_CATEGORY:
+                installed=scrolling.get(donor)
+                if (not installed or installed['profile_installed'] or
+                        {k:v for k,v in installed['source'].items() if k!='reused_artwork'}!=
+                        {k:v for k,v in row.items() if k!='reused_artwork'} or
+                        installed['bytes']!=len(data) or installed['sha256']!=sha256(data)):
+                    raise ValueError('Prepared scrolling resource is not completely installed')
+                vrom=installed['vrom'];vtable=SCROLL_VTABLE;reused_asset=True
+                installed.update(lifecycle_installed=True,lifecycle=json.loads(json.dumps(lifecycle)))
+            elif category in (CLOCK_CATEGORY,STORAGE_CATEGORY):
                 installed=rigs.get(donor)
                 if (not installed or installed['profile_installed'] or installed['source']!=row or
                         installed['bytes']!=len(data) or installed['sha256']!=sha256(data) or
@@ -144,7 +160,10 @@ def install_profiles(base,prior,blob,core,original,output,directories):
     if not staged:raise ValueError('Empty complete furniture profile batch')
     old['rows']=sorted(old['rows']+staged,key=lambda r:r['runtime_index']);old['sources'].extend(evidence)
     old.update(profile_bits_changed=False,additional_resident_bytes=0)
-    if deferred:old['deferred_resources']=deferred
+    if deferred:
+        combined={r['source_item_id']:r for r in old.get('deferred_resources',[])+deferred}
+        for row in staged:combined.pop(row['item_id'],None)
+        old['deferred_resources']=sorted(combined.values(),key=lambda r:r['source_item_id'])
     patch=provenance_patch(staged)
     if patch:write_new(output/'provenance.patch',patch.encode())
     return result,{},dict(staged_furniture=old)
@@ -158,6 +177,7 @@ def bind_profiles(source,base,report):
     """
     from v3_furniture_install import profile
     from v3_furniture_materials import CATEGORY as MATERIAL_CATEGORY
+    from v3_furniture_scroll import CATEGORY as SCROLL_CATEGORY,VTABLE as SCROLL_VTABLE,draw_only_lifecycle,checked_runtime
     from v3_sound_programs import furniture_trigger
     source.runtime_profiles={}
     staged=report.get('staged_furniture',{})
@@ -178,6 +198,7 @@ def bind_profiles(source,base,report):
         raise ValueError('Changed installed material draw dispatch')
     limit=checked_limit(base,report)
     bindings={r['source_item_id']:r for r in runtime['rows']+runtime['sound_rows']+runtime.get('material_rows',[])}
+    bindings.update(checked_runtime(e,blob))
     for row,enabled in [(r,False) for r in staged.get('rows',[])]+[(r,True) for r in activated]:
         item=int(row['item_id'],16);i=slot(item);binding=bindings.get(row['item_id'])
         if (row['item_id'] in source.runtime_profiles or not binding or not binding['profile_installed'] or
@@ -186,7 +207,13 @@ def bind_profiles(source,base,report):
             raise ValueError('Changed furniture profile identity or activation')
         descriptor=prepare(source,item)[0];art=copy.deepcopy(binding['source']);vrom=binding['vrom']
         category=descriptor['callback_adapter']['category']
-        expected_vtable=MATERIAL_VTABLE if category==MATERIAL_CATEGORY else SOUND_VTABLE if category=='switch-trigger-sound' else VTABLE
+        expected_vtable=(MATERIAL_VTABLE if category==MATERIAL_CATEGORY else SOUND_VTABLE if category=='switch-trigger-sound'
+                         else SCROLL_VTABLE if category==SCROLL_CATEGORY else VTABLE)
+        if category==SCROLL_CATEGORY:
+            lifecycle=draw_only_lifecycle(descriptor,source)
+            if (not binding.get('lifecycle_installed') or lifecycle is None or
+                    binding.get('lifecycle')!=json.loads(json.dumps(lifecycle))):
+                raise ValueError('Incomplete installed scrolling lifecycle')
         if category==MATERIAL_CATEGORY:
             trigger=furniture_trigger(source,descriptor)
             sound=next((r for r in runtime['sound_rows'] if r['source_item_id']==row['item_id']),None)

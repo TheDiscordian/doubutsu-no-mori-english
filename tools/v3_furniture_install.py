@@ -67,12 +67,14 @@ def profile(row, vrom, *, limit=END):
     sound = adapter.get('category') == 'switch-trigger-sound'
     from v3_furniture_rigs import RIG_CATEGORIES,FIXED_CATEGORY
     from v3_furniture_materials import CATEGORY as MATERIAL_CATEGORY
-    from v3_furniture_scroll import CATEGORY as SCROLL_CATEGORY
+    from v3_furniture_scroll import CATEGORY as SCROLL_CATEGORY,VTABLE as SCROLL_VTABLE,draw_only_lifecycle
     material=adapter.get('category')==MATERIAL_CATEGORY
-    if adapter.get('category') in (FIXED_CATEGORY,PENDING_MOVE_CATEGORY,SCROLL_CATEGORY):
+    scrolling=adapter.get('category')==SCROLL_CATEGORY
+    if (adapter.get('category') in (FIXED_CATEGORY,PENDING_MOVE_CATEGORY) or scrolling and
+            (draw_only_lifecycle(row['profile']) is None or row.get('room_runtime')!={'vtable':SCROLL_VTABLE,'vrom':vrom})):
         raise ValueError('Prepared resources have no implemented native lifecycle')
     rigged = adapter.get('category') in RIG_CATEGORIES
-    layers = tuple(offsets) if rigged else tuple(adapter['model_order']) if fading or sequence or material else LAYERS
+    layers = tuple(offsets) if rigged else tuple(adapter['model_order']) if fading or sequence or material or scrolling else LAYERS
     if (limit not in (END,capacity.LIMIT) or not 0 < n <= 9216 or n%16 or vrom%16 or vrom+n > limit or len(scalar) != 16
             or not offsets or set(offsets)-set(layers) or (fading or sequence) and set(offsets)!=set(layers)
             or any(type(at) is not int or at%8 or not 0 <= at <= n-8 for at in offsets.values())):
@@ -99,8 +101,12 @@ def profile(row, vrom, *, limit=END):
                 set(adapter['functions'])!={'move','draw'} or set(offsets)!=set(layers)):
             raise ValueError('Prepared resources have no implemented native material lifecycle')
         pointers=[0,0,0,0]
+    if scrolling:
+        if set(offsets)!=set(layers):raise ValueError('Scrolling profile needs every source model')
+        pointers=[0,0,0,0]
     return (struct.pack('>12I', vrom, vrom+n, 0x06000000, 0x06000000+n, *pointers, 0,0,0,0)+scalar+
-            struct.pack('>I',VTABLE if rigged else SOUND_VTABLE if sound else MATERIAL_VTABLE if material else palette_fade.VTABLE if fading else 0))
+            struct.pack('>I',VTABLE if rigged else SOUND_VTABLE if sound else MATERIAL_VTABLE if material else
+                        SCROLL_VTABLE if scrolling else palette_fade.VTABLE if fading else 0))
 
 
 def catalogue_record(row):
@@ -404,7 +410,8 @@ def build(output, art_path, lock=LOCK):
     if report.get('staged_furniture'):
         promoted={r['item_id'] for r in installed}
         report['staged_furniture']['rows']=[r for r in report['staged_furniture']['rows'] if r['item_id'] not in promoted]
-        for row in report['equipment_resources']['room_rigs']['rows']+report['equipment_resources']['room_rigs']['sound_rows']:
+        runtime=report['equipment_resources']['room_rigs']
+        for row in runtime['rows']+runtime['sound_rows']+runtime.get('material_rows',[])+runtime.get('scrolling',{}).get('rows',[]):
             if row['source_item_id'] in promoted:row['parent_selectable']=True
     report.update(build='v3-automatic-furniture',runtime_abi=abi,input_build_sha256=sha256(base),
         output_sha256=sha256(result),patch_sha256=sha256(patch),blob_sha256=sha256(blob),

@@ -1427,7 +1427,7 @@ and resources are installed.
 
 `--refresh-runtime --furniture-profiles <prepared-directory>` accepts repeated
 complete prepared bundles for implemented clock, storage, sound, and
-material/trigger categories.
+material/trigger categories, plus draw-only scrolling objects.
 Source identity, complete artwork, callback bindings, and installed audio are
 checked before writing ordinary 80-byte profile and 32-byte item records into
 their fixed canonical slots. Official English names retain individual entries
@@ -1440,6 +1440,26 @@ Both the material and sound rows retain the profile binding. The complete move
 category and sound word are checked again when the ordinary importer resolves
 runtime readiness. Prepared material objects without an installed lifecycle
 remain explicitly deferred in the staging receipt, not silently promoted.
+
+Draw-only scrolling eligibility checks every non-draw callback: each must be
+absent or exactly the complete source return instruction, with no relocations.
+Actor-state colour inputs, unsupported scalars, contact actions, and interaction
+flags still prevent this classification. The native profile writer repeats the
+receipt checks and requires the installed scroll vtable. `bind_profiles` checks
+the full scroll packet, code, table, dispatch, artwork, and source callbacks.
+Neither a readiness flag nor an empty-looking function name bypasses these rules.
+
+Well model and backyard pool satisfy this category and reuse existing graphics
+with null generic model/animation slots, so the engine does not draw duplicate
+geometry. The normal metadata path admits the pool's actual `ftr_listEvent`
+route and existing event stock/catalogue/scoring adapters. The well model has no
+supported acquisition-list binding and remains staged, not shop-stocked.
+Five other scrolling objects keep their actual unfinished lifecycle dependencies.
+Staging merges pending resources across categories, preserving material gaps.
+Subsequent resource batches validate and retain both staged and activated
+profiles without resetting completed lifecycle status or duplicating objects.
+The older scrolling format exposes no ordinary profiles; upgrading its renderer
+remains a prerequisite for this category.
 
 Both enabled flags remain zero, along with the saved selection bit at
 `blob[0x20 + 32 + slot/8]`. The native profile-table initializer consequently

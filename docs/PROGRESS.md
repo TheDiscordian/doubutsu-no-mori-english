@@ -18,7 +18,32 @@ served patchers retain their existing builds.
 
 ## Active development
 
-The current explicit proposal is ABI 172 at
+The current explicit proposal is ABI 174 at
+`build/v3-draw-only-scrolling-imports-01/cartridge/build-lock.json`. Shared
+draw-only lifecycle checks connect the well model and backyard pool to ordinary
+profiles without new artwork, runtime code, or memory reservations. The pool
+also passes the normal donor event-item acquisition, catalogue, price, name, and
+scoring checks, so it is an optional experimental import. The well model remains
+inactive pending acquisition support. Five other scrolling lifecycles and the
+previous material dependencies remain explicitly pending.
+
+Four focused checks pass, including unchanged resource/runtime storage,
+source-lifecycle rejection, retained staged/active profiles, saved selection
+changes, UPS reconstruction, and matching browser/offline outputs for four
+profiles. The 137 experimental choices comprise 20 villagers, 90 furnishings,
+24 equipment parents, and three shirts; 27 ordinary profiles remain inactive.
+No native/GPU/ordinary-gameplay verification is added by this batch. Saved format
+3 is unchanged, but a profile containing the pool requires a build/profile that
+includes it; older builds lacking the pool cannot load such a save. The stable
+website and main lock remain unchanged. See the
+[draw-only profile checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-draw-only-scroll-profiles-and-imports).
+
+Continue the remaining shared lifecycle/acquisition and rigged-material
+categories. The mower's contact/floor-driven grass update, switch-driven fades,
+and looping sounds remain real dependencies. Gold-tree completion follows
+primary importing.
+
+The retained shared renderer is ABI 172 at
 `build/v3-scrolling-materials-runtime-04/build-lock.json`. All seven scrolling
 objects use one renderer, including the pool's three layers/native colour
 registers and the mower's scaled grass alpha in room and preview contexts.
@@ -31,10 +56,8 @@ retry passed. Native execution, GPU appearance, and ordinary gameplay remain
 unverified. The 136 choices and 26 staged profiles are unchanged. See the
 [extended-renderer checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-layered-scroll-renderer).
 
-Next connect complete no-op lifecycles through shared profile integration, then
-remaining lifecycle/acquisition categories. The mower's floor/contact-driven
-grass update still needs implementation. Gold-tree completion remains after
-primary imports; neither website deployment changes.
+The complete no-op lifecycle category is connected above. Remaining
+lifecycle/acquisition categories still require implementation.
 
 The shared scrolling converter also prepares complete backyard pool and lawn
 mower artwork. `build/v3-scrolling-materials-prepared-03/` contains seven objects
