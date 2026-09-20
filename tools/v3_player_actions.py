@@ -2151,6 +2151,8 @@ def expanded_tables(source,owner,reloc,*,categories=CATEGORIES,native_count=NATI
 
 def install(base,prior,blob,core,original,output):
     old=prior.get('equipment_resources',{})
+    if old.get('player_actions',{}).get('balloon_release') and not old['player_actions'].get('balloon_menu'):
+        return v3_balloon_release.install_menu(base,prior,blob,core,original,output)
     if old.get('player_actions',{}).get('balloon_actor') and not old['player_actions'].get('balloon_release'):
         return v3_balloon_release.install(base,prior,blob,core,original,output)
     if old.get('player_actions',{}).get('reward_exchange') and not old['player_actions'].get('balloon_actor'):

@@ -28,8 +28,9 @@ private model/motion banks, player creation, physics, and native drawer preserve
 the existing gift balloon and all original actor descriptors. Code and the
 descriptor fit checked unused module suffixes; only transient scene allocations
 grow. The shared consumer stage connects release/look, exchange, and fall/get-up
-with native creature fallbacks and no further allocation. Ordinary inventory
-`Let Go` selection remains required. See
+with native creature fallbacks and no further allocation. The ordinary inventory
+stage appends the donor `Let Go` menu for all eight shapes, retains all original
+menu rows, and grows the shared menu reservation by 384 bytes. See
 [flying balloons](V3_BALLOON_RELEASE.md).
 
 The shared inventory exchange stage carries the source reward condition through
@@ -37,8 +38,8 @@ native normal-drop, empty-hand, burying, and fish/insect release routes. Existin
 transient unions hold the deferred flag; ordinary setters clear it, rejected
 requests preserve it, and actual native setup/animation precedes celebration.
 Two checked unused code suffixes hold the implementation without module/save/
-allocation growth. Balloon exchange uses the shared flight action; its ordinary
-inventory option and source acquisition remain unfinished;
+allocation growth. Balloon exchange and the ordinary inventory option use the
+shared flight action; source acquisition remains unfinished;
 the golden-tool choices stay disabled. See
 [deferred exchange](V3_REWARD_ACTIONS.md#inventory-exchange-and-deferred-completion).
 

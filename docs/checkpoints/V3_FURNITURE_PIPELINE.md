@@ -1,5 +1,101 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared ordinary balloon menu
+
+The ABI-148 proposal is `build/v3-shared-balloon-menu-04/build-lock.json`.
+All eight selected balloon parents gain the donor outdoor `Grab` / `Let Go` /
+`Quit` menu through the shared category installer. Indoor placement, restricted
+fields, present/quest priority, and unselected/native items retain their proper
+menus. The four golden-tool choices, 128 experimental options, main ABI-109
+lock, and both served V2 patchers are unchanged. This is not a hardware handoff.
+
+- ROM SHA-256:
+  `9b310665f095ac42483a4830b3ffd37491f5a3cc570230113c891337e87487d1`.
+- Report SHA-256:
+  `93b18b506db4ee018173f71aeeb07ec471ed9f8abc56035a366f418a310f0a01`.
+- UPS SHA-256:
+  `c04a4d7bc6b0e549095c6d5a756cd339807d2a9bc70594331f403c7d0885da48`.
+
+The 680-byte menu group occupies `804AFBF0..804AFE98`, inside unused existing
+module space. Type selection starts at `804AFBF0`; the callback is `804AFCD8`.
+It calls the existing release queue before consuming a pocket item, preserving
+items when the selected shape or owned actor is unavailable. Accepted releases
+use the actual pocket setter, return-tag initializer, and close/sound path.
+Native exchange mode inserts the current hand item into the vacated slot.
+The existing wrapped-import pocket hook and furniture-menu hook remain intact.
+
+The tag owner grows by 400 bytes to 44,784 bytes, with a 3,760-byte relocation
+resource. A complete copied 44-row table plus the new row at `8087A070` retain
+all original callbacks and translated text. All sixteen table references move,
+including dynamic money-menu writes. Only the wrapper call loses its internal
+relocation; the new resident callback is deliberately not relocated.
+The shared-menu reservation grows by 384 rounded bytes. Complete owner hashes,
+declared sizes, DMA identities, cartridge-tail bounds, and unused destination
+space constrain the shared resize/storage path. No save/profile/module growth
+or new asset conversion occurs. The official label has one provenance entry.
+
+### Verification and corrections
+
+`python3 -m unittest tests.test_v3_balloon_menu -v` passes four checks in 6.955
+seconds. The sanitizer fixture covers all shapes, four field contexts, all
+present/quest flags, profile rejection, ordinary/exchange consumption, rejected
+queue item retention, invalid slots, absent pointers, and call ordering. The
+cartridge checks verify complete source/native helpers, official attribution,
+all original rows at two relocation bases, exact code/owner changes, allocation,
+unchanged resources/saves/options, all/empty composition, UPS reconstruction,
+and reusable resource tails. Syntax compilation and `git diff --check` pass.
+
+Builds `01` and `02` stop before output on incorrect donor-relocation tuple
+ordering and an overstrict stock-helper comparison. The verifier now checks the
+complete original helpers plus their exact previously installed V3 hooks; no
+unknown differences are accepted. The first source test compared in-memory
+tuples with serialized lists; normalizing that representation fixes the test.
+
+Inspection of the actual native selector identifies a real address error in
+build `03`: the current field byte is `80136EA1`, not the saved town-data area
+at `80126EA1`. Build `04` derives the field address from the original MIPS loads
+and supplies that checked value to the compiler. No affected build is handed off.
+
+### Native evidence
+
+The initial fixture, `build/smoke-v3-balloon-menu-01/`, verifies startup and the
+complete installed module but cannot allocate its unnecessarily large 135,168-
+byte test block. Native malloc returns zero. No menu callback is executed.
+The corrected fixture shares disjoint temporary parent/overlay fields and uses
+118,784 bytes, retaining bounds and guards. This is a fixture allocation issue,
+not evidence that the real menu's 384-byte increase fails.
+
+The justified retry, `build/smoke-v3-balloon-menu-02/`, runs build `04` and passes:
+92 records, 55 component assertions, and four startup/final assertions.
+Results SHA-256:
+`20d343582e7019076326c3a546b9ba8edf9357a062f4eb95d161517f0127a2ac`.
+
+It loads and relocates the actual complete expanded tag owner, checks first/last
+shape classification in all four fields, present/quest priority, and unselected
+fallback. Actual native cursor movement reaches all three rows and stops at
+both ends. Actual native A dispatch selects `Let Go`, reaches the resident
+handler through the installed label callback, transfers only the selected
+pocket item through the native setter, initializes return-tag state, closes the
+menu, and queues the complete balloon release union. Both ordinary emptying and
+exchange replacement pass. Saved import state, player, and complete code remain
+intact; touched state and the checkpoint are restored, fault/memory guards pass,
+and the isolated silent emulator exits cleanly. No user save or physical audio
+is used, and the fixture performs no FlashRAM writes.
+
+The fixture uses a classification jump bridge and a test-only final close
+callback. It does not render the menu, replay full flight, or establish ordinary
+gameplay or hardware appearance. Reuse the unchanged release/look/fall/actor
+evidence instead of rerunning those components.
+
+### Next work and compatibility
+
+Continue source acquisition events, including gold-tree growth/drop, collection
+completion NPC/events, and perfect-town acquisition. Keep golden tools disabled
+until their full ordinary routes are implemented. Retain the explicit gameplay/
+hardware gaps. Format-3 saves still require matching/equal-or-larger import
+profiles and must not be loaded in V2 or older format-1/2 V3 builds. No migration
+is added here; preserve backups. Empty selection remains exact corrected V2-12.
+
 ## Shared balloon release, exchange, and fall
 
 The ABI-147 proposal is `build/v3-shared-balloon-release-04/build-lock.json`.

@@ -121,6 +121,7 @@ def compile_part(part, out, extra_sources=(), defines=(), primary_source=None):
                        'balloon_release': ('af_v3_balloon_request', 0x804B1100),
                        'balloon_look': ('af_v3_balloon_look', 0x804AEAA0),
                        'balloon_fall': ('af_v3_balloon_getup', 0x804ACBE0),
+                       'balloon_menu': ('af_v3_balloon_menu_type', 0x804AFBF0),
                        'held_rigs': ('af_v3_held_setup', 0x804B0000),
                        'room_rigs': ('af_v3_room_rig_ct', 0x804B1800),
                        'held_collection': ('af_v3_held_catalogue_record', 0x804AFA00),

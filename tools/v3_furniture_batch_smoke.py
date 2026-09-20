@@ -1561,6 +1561,7 @@ def tool_controls(debug,rom_path,record,*,transitions=False,capture=False,rod=Fa
 
 
 def exercise(debug, rom_path, record, *, section='automatic_furniture'):
+    if section=='balloon_menu':return balloon_menu(debug,rom_path,record)
     if section=='balloon_release':return balloon_release(debug,rom_path,record)
     if section=='balloon_exchange':return reward_exchange(debug,rom_path,record,balloons=True)
     if section=='balloon_actor':return balloon_actor(debug,rom_path,record)
@@ -2759,6 +2760,117 @@ def balloon_actor(debug,rom_path,record,*,selection_only=False):
         representative_drawers=0 if selection_only else 2,source_timing_sampled=not selection_only,
         game_code_uploaded=False,test_jump_bridges=True,
         ordinary_release_tested=False,hardware_tested=False,flash_written=False,requires_checkpoint_restore=True)
+
+
+def balloon_menu(debug,rom_path,record):
+    """Actual relocated menu cursor/dispatch, pocket transfer and flight queue."""
+    from runtime_layout import TEST_STACK
+    from v3_import_storage import jump
+    import v3_equipment_runtime as equipment
+    path=Path(rom_path);image=path.read_bytes();report=json.loads((path.parent/'build.json').read_bytes())
+    if sha256(image)!=report['output_sha256']:raise ValueError('Changed balloon menu cartridge')
+    resources=report['equipment_resources'];r=resources['player_actions']['balloon_menu']
+    files=by_vrom(image);blob=files[runtime.BLOB].extract(image);boot=boot_proofs(image);assertions=0
+    def check(label,at,want):
+        nonlocal assertions
+        got=debug.read_memory(at,len(want));passed=got==want
+        record(dict(balloon_menu_check=label,address=f'{at:08X}',bytes=len(want),
+            assertion='passed' if passed else 'failed',observed_sha256=sha256(got),expected_sha256=sha256(want)))
+        if not passed:raise ValueError('Balloon menu mismatch: '+label)
+        assertions+=1
+    def call(at,args=(),proof=None):
+        result=debug.call(f'{at:08X}',list(args),return_address=MODULE_RAM+0x6480,verified_code=proof or boot.get(at))
+        record(result);return result['return_value']
+    def put(at,*words):debug.write_memory(at,struct.pack('>'+str(len(words))+'I',*words))
+    def scalar(at):return int.from_bytes(debug.read_memory(at,4),'big')
+    def pointer(at,size):
+        value=scalar(at)
+        if value&3 or not MODULE_RAM+0x8000<=value<=0x80400000-size:raise ValueError('Invalid menu fixture pointer')
+        return value
+    start=resources['blob_offset'];module=bytearray(blob[start:start+resources['bytes']])
+    packet=resources['player_actions']['balloon_actor']['packet_offset']
+    check('one actual flying actor instance',equipment.RAM+packet+0x1E,b'\1');module[packet+0x1E]=1
+    check('complete installed equipment module',equipment.RAM,module)
+    game=pointer(0x8010EF90,0x1E00);actor=pointer(game+0x1C90,0x13B0)
+    balloon=pointer(actor+0x13A0,0x2080);actor_before=debug.read_memory(actor,0x13B0)
+    saved={at:debug.read_memory(at,n) for at,n in ((0x8010DCEC,4),(0x80136EA1,1),(0x80460020,192),
+        (0x8046C000,report['save_runtime']['state_bytes']),(0x80126EA0,0xF980),(0x80136FD8,4),
+        (0x80143910,0x50),(balloon,0x2080),(TEST_STACK-0x800,16),(TEST_STACK+0x40,16))}
+    size=0x1D000;allocation=call(0x8009BFC0,[size])
+    if allocation&15 or not MODULE_RAM+0x8000<=allocation<=0x80400000-size:raise ValueError('Menu fixture allocation failed')
+    tag,overlay,state,submenu,menu,bridge,counts=(allocation+n for n in
+        (0x10,0xC000,0x1C720,0x1CA00,0x1CB20,0x1CC00,0x1CD00))
+    # These two isolated owners use disjoint offsets in one fixture buffer.
+    parent=overlay
+    debug.write_memory(overlay,bytes(size-(overlay-allocation)))
+    data,rel=(files[v].extract(image) for v in (0x3950000,0x3960000));ram=0x8086F310
+    if len(data)+len(rel)+0x20>=0xC000:raise ValueError('Expanded menu exceeds fixture staging')
+    loaded=relocate_verified_data(SimpleNamespace(ram=ram,resident_bytes=len(data),sections=struct.unpack_from('>5I',rel)),data,rel,tag)
+    call(0x800262D0,[0x3950000,0x3950000+len(data),ram,ram+len(data),tag,tag+len(data),len(rel)])
+    check('complete cartridge-loaded expanded menu',tag,loaded)
+    raw=struct.pack('>2I',jump(r['code']['symbols']['af_v3_balloon_menu_type']),0)
+    close=bridge+len(raw)
+    raw+=struct.pack('>9I',0x3C080000|((counts+0x8000)>>16),0x25080000|(counts&65535),
+        0x8D090000,0x25290001,0xAD090000,0xAD040004,0xAD050008,0x03E00008,0)
+    debug.write_memory(bridge,raw);call(0x8002FE00,[bridge,len(raw)]);call(0x80034CE0,[bridge,len(raw)])
+    edge=b'V3BM'*4;guards=(allocation,overlay-16,state-16,submenu-16,menu-16,bridge-16,
+        allocation+size-16,TEST_STACK-0x800,TEST_STACK+0x40)
+    for at in guards:debug.write_memory(at,edge)
+    put(submenu+0x2C,overlay);put(overlay+0x106D0,state);put(overlay+0x106B0,close)
+    put(parent+0x2CC0,tag+0x808787A0-ram)
+    selected_tag=state+8+0x54;private=0x80126EC0
+    def dispatch(button):
+        put(overlay+0x1068C,button);a,b=0x80876C50-ram,0x80876D90-ram
+        return call(tag+a,[submenu,menu,selected_tag],(tag+a,loaded[a:b]))
+    def type_check(item,slot,want):
+        nonlocal assertions
+        actual=call(bridge,[submenu,item,slot],(bridge,raw));passed=actual==want
+        record(dict(balloon_menu_type=item,slot=slot,expected=want,observed=actual,assertion='passed' if passed else 'failed'))
+        if not passed:raise ValueError('Native balloon menu classification mismatch')
+        assertions+=1
+    try:
+        put(0x8010DCEC,parent);put(0x80136FD8,private);put(private+0x34,0)
+        for shape in (0,7):
+            for field,want in ((0,44),(1,12),(2,8),(3,8)):
+                debug.write_memory(0x80136EA1,bytes([field]));type_check(0x2244+shape,14,want)
+        debug.write_memory(0x80136EA1,b'\0')
+        for condition,want in ((1,11),(2,8),(3,11)):
+            put(private+0x34,condition<<28);type_check(0x224B,14,want)
+        put(private+0x34,0)
+        row=next(x for x in resources['parent_readers']['rows'] if x['item_id']=='224B')
+        profile=bytearray(saved[0x80460020]);profile[row['profile_byte']]&=~row['profile_mask']
+        debug.write_memory(0x80460020,profile);type_check(0x224B,14,1)
+        debug.write_memory(0x80460020,saved[0x80460020])
+        put(state,1,0);debug.write_memory(selected_tag,b'\x2C');put(selected_tag+0x3C,0)
+        for button,want in ((4,1),(4,2),(4,2),(8,1),(8,0),(8,0)):
+            dispatch(button);check('actual native three-option cursor bounds',selected_tag+0x3C,struct.pack('>I',want))
+        for shape,slot,replacement in ((0,0,0),(7,14,0x1234)):
+            debug.write_memory(state,bytes(0x200));put(state,1,0);debug.write_memory(selected_tag,b'\x2C')
+            put(selected_tag+0x3C,1);put(state+8+0x34,0,slot%5,slot//5)
+            put(menu+0x38,13 if replacement else 0,replacement);put(counts,0,0,0)
+            debug.write_memory(submenu+0xDF,b'\xA5'*3);put(private+0x34,0)
+            pockets=bytearray(b'\x12\x00'*15);struct.pack_into('>H',pockets,slot*2,0x2244+shape)
+            debug.write_memory(private+0x14,pockets);debug.write_memory(0x80143910,b'\xA5'*0x50)
+            dispatch(0x8000)
+            check('A dispatch queues selected balloon before close',0x80143910,struct.pack('>9I',81,1,2,shape,0,0,0,0,0))
+            check('native handler records selected pocket and full item',submenu+0xDF,struct.pack('>BH',slot,0x2244+shape))
+            struct.pack_into('>H',pockets,slot*2,replacement);check('actual pocket setter replaces only the selected item',private+0x14,pockets)
+            check('native return-tag initializer completes',state+4,b'\xFF'*4)
+            check('native close invokes isolated close callback',counts,struct.pack('>3I',1,menu,0))
+        check('native menu retains complete expanded owner',tag,loaded)
+        check('equipment module unchanged',equipment.RAM,module)
+        check('release queue does not prematurely mutate player',actor,actor_before)
+        check('saved import state unchanged',0x8046C000,saved[0x8046C000])
+        for at in guards:check('menu memory guard',at,edge)
+        check('no CPU fault',0x8003CE34,bytes(4))
+    finally:
+        for at,value in saved.items():debug.write_memory(at,value)
+        call(0x8009C040,[allocation])
+    for at,value in saved.items():check('live state restored',at,value)
+    return dict(native_balloon_menu=True,assertions=assertions,actual_cursor_and_A_dispatch=True,
+        actual_pocket_setter=True,actual_return_tag_initializer=True,test_only_close_callback=True,
+        test_only_classification_bridge=True,ordinary_gameplay_tested=False,hardware_tested=False,
+        flash_written=False,requires_checkpoint_restore=True)
 
 
 def balloon_release(debug,rom_path,record):

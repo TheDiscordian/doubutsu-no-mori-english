@@ -18,8 +18,8 @@ served patchers retain their existing builds.
 
 ## Active development
 
-The current explicit ABI-147 proposal is
-`build/v3-shared-balloon-release-04/build-lock.json`. All eight balloons are
+The current explicit ABI-148 proposal is
+`build/v3-shared-balloon-menu-04/build-lock.json`. All eight balloons are
 connected through the shared parent-category installer: official names/prices,
 complete pocket icons, held/inventory animation, source acquisition records,
 collection/catalogue, animated room profiles, indoor conversion, and inverse
@@ -41,9 +41,19 @@ The release action retains source positions, poses, head tracking, disappearance
 and timing rules, native fish/insect behaviour, and deferred rewards. Missing
 actors cannot consume a held balloon. Five focused host/cartridge checks pass.
 Native release/fall and exchange checks pass, with preserved/restored live data,
-memory guards, checkpoint restoration, and clean exits. Ordinary `Let Go` menu
-selection and gameplay/hardware verification remain; the four golden-tool choices
-stay disabled. No saved format, choice, main lock, or served patcher changes.
+memory guards, checkpoint restoration, and clean exits. The ordinary outdoor
+`Let Go` menu is installed for all eight shapes, retaining indoor placement,
+present/quest priority, the native pocket setter, and all 44 existing menu rows.
+Four focused host/cartridge checks pass, including relocation, allocation,
+optional composition, and no-loss rejection. The silent native menu check passes
+92 records and 59 assertions, including actual cursor/A dispatch, pocket
+replacement, return-tag initialization, the flight queue, state/checkpoint
+restoration, fault/memory guards, and clean exit. Its final close callback is a
+test stub; full ordinary gameplay and appearance remain unverified.
+The menu needs 384 additional transient bytes; saved formats, choices, the main
+lock, and both served patchers remain unchanged. Gameplay/hardware verification
+and source acquisition remain; the four golden-tool choices stay disabled.
+See the [menu checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-ordinary-balloon-menu).
 See the [consumer checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-balloon-release-exchange-and-fall)
 and the
 [flight checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-flying-balloon-actor).
@@ -59,9 +69,8 @@ the actual loaded tag's empty/fish/insect branches, all four installed callbacks
 request clearing/rejection, setup, sampled release timing, guards, restored state/
 checkpoint, and clean exit. Its menu-close callback is a test stub; bury setup
 uses item zero, and release setup uses an existing actor. Ordinary world
-placement/release and hardware remain unverified. Next implement
-the ordinary balloon `Let Go` menu and source acquisition
-events. Golden choices remain disabled. See the
+placement/release and hardware remain unverified. The ordinary balloon menu is
+installed; next implement source acquisition events. Golden choices remain disabled. See the
 [exchange checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-reward-inventory-exchange).
 
 All four non-exchange collection tails share the installed reward-completion
@@ -74,7 +83,7 @@ collection entries, first/repeated/unselected items, rejected requests, all four
 players' completion queries, original exchange requests, guards, restored state/
 checkpoint, and clean exit. These are component calls, not ordinary acquisition
 or a hardware playthrough. The exchange stage connects normal/bury/fish/insect
-endings; ordinary balloon menu selection and source scene/NPC/tree acquisition remain required.
+endings; the ordinary balloon menu is installed, while source scene/NPC/tree acquisition remains required.
 Golden-tool choices remain disabled. See
 the [collection checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-reward-collection-consumers).
 

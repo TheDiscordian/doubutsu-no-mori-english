@@ -560,6 +560,12 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         # Changed compressed owners retain their logical DMA identities. Store
         # their complete images outside the bounded import-object VROM region.
         external=[]
+        menu_resizes={}
+        if (player_actions and equipment_report['player_actions'].get('balloon_menu') and
+                not prior['equipment_resources']['player_actions'].get('balloon_menu')):
+            menu_resizes={r['vrom']:r for r in equipment_report['player_actions']['balloon_menu']['owner_resizes']}
+            if set(menu_resizes)!={0x3950000,0x3960000} or not set(menu_resizes)<=set(owner_changes):
+                raise ValueError('Incomplete declared balloon-menu owner resize')
         for vrom,data in owner_changes.items():
             entry=files[vrom]
             if held_catalogue_art is not None and vrom in (catalogue.VROM,catalogue.RELOC):
@@ -567,6 +573,12 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
                     raise ValueError('Resized catalogue is not owned by the reusable tail')
                 continue
             resized=translation_updates and vrom in (0x3B60000,0x3B70000)
+            if vrom in menu_resizes:
+                row=menu_resizes[vrom]
+                if (row['previous_bytes']!=entry.size or row['previous_sha256']!=sha256(entry.extract(base))
+                        or row['bytes']!=len(data) or row['sha256']!=sha256(data)):
+                    raise ValueError('Changed declared menu owner dimensions or complete data')
+                resized=True
             if len(data)!=entry.size and not resized:raise ValueError('Runtime update changes owner dimensions')
             if entry.pend or resized:
                 external.append((vrom,data))

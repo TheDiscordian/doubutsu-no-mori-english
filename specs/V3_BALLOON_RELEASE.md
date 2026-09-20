@@ -119,18 +119,44 @@ neither scene allocations nor saved formats grow. The native Look call loses
 its one internal relocation. Other original callbacks, instructions, and
 relocations remain apart from the explicit get-up and completion entry jumps.
 
-## Remaining ordinary menu route
+## Ordinary inventory menu
 
-The inventory's ordinary balloon menu still needs its donor `Let Go` option and
-handler. Source `mTG_tag_word_fly` at REL data `00082A50` contains the official
-sixteen-byte label; `mTG_field_balloon` selects grab, let go, and cancel outdoors.
-`mTG_get_item_tag_type` retains room placement indoors and the source restricted
-menu in other fields. Its present/quest conditions precede balloon classification.
-The source handler `mTG_fly_proc` sets the selected slot/item, performs the
-ordinary or exchange pocket transfer, returns/closes the menu, and queues flight.
-Validate actor availability before consuming the item. Reuse public queue entry
-`804B1680`; do not duplicate flight, fall, or deferred reward code. Credit the
-new displayed label in `translations/provenance.json` when installing it.
+The shared installer appends menu type 44 with `Grab`, `Let Go`, and `Quit`.
+Source `mTG_tag_word_fly` at REL data `00082A50` supplies the official sixteen-byte
+label, credited once as `v3/ui/balloon/let-go` in `translations/provenance.json`.
+`mTG_field_balloon` binds the source choices and `mTG_fly_proc` binds the handler.
+Grab and Quit reuse the complete existing translated objects and callbacks.
+
+All eight selected parents use this menu outdoors. The wrapper preserves native
+room-placement type 12 indoors and restricted type eight elsewhere. Present and
+quest conditions retain the complete original selector, including the existing
+furniture-import hook. Unselected and unrelated items also retain that selector.
+The live field byte is `80136EA1`, derived from the native selector's actual
+address-loading instructions; it is not the saved town-data base at `80126EA0`.
+
+The handler uses the native table-position reader and guards the fifteen-slot
+pocket range and item condition. Public queue entry `804B1680` validates the
+selected shape and owned actor before consumption. A rejected queue uses the
+native warning without changing pockets or closing the menu. Success records
+the selected slot/item and calls the existing pocket setter, retaining its
+wrapped-import hook. Ordinary release empties that slot; native exchange mode
+replaces it with the current hand item. The original return-tag initializer,
+close callback, and sound request remain. Flight/fall/reward code is not copied.
+
+The 680-byte resident menu group occupies `804AFBF0..804AFE98`, inside the unused
+held-collection suffix. The module, scene actor, save state, and selection profile
+do not grow. The complete 44-row native table is copied and extended to 45 rows
+at `8087A070`; all sixteen native table references, including mutable money-menu
+rows, point to the extended table. Every original row and pointer relocation
+is retained. The new resident callback must not receive an overlay relocation.
+The wrapper replaces the selector's single call at `80875834` and removes only
+that call's internal relocation.
+
+The tag owner grows from 44,384 to 44,784 bytes and its relocation resource from
+3,568 to 3,760 bytes. The parent allocation descriptor and rounded shared-menu
+reservation grow by 384 bytes. The shared owner-tail storage accepts only these
+two explicitly sized/hash-bound resized owners. It retains their logical DMA
+identities and rejects unknown resize requests or occupied cartridge space.
 
 Ordinary menu interaction, full gameplay flight, GPU appearance, and original
 hardware remain unverified. Focused native component results do not close these.
@@ -138,4 +164,5 @@ hardware remain unverified. Focused native component results do not close these.
 The four golden-tool choices remain disabled. Saved format three, selected
 profile requirements, and existing incompatibility warnings remain unchanged.
 Neither served V2 patcher nor the main V3 lock is switched. Native component
-results and limits belong in the [checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-balloon-release-exchange-and-fall).
+results and limits belong in the [menu checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-ordinary-balloon-menu)
+and [release checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-balloon-release-exchange-and-fall).

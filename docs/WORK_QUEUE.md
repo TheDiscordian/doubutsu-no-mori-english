@@ -2,8 +2,8 @@
 
 ## Active: V3 optional GameCube imports
 
-The current explicit proposal is ABI 147,
-`build/v3-shared-balloon-release-04/build-lock.json`. All eight balloons are
+The current explicit proposal is ABI 148,
+`build/v3-shared-balloon-menu-04/build-lock.json`. All eight balloons are
 connected through shared source-derived parent records, room profiles, indoor
 conversion/pickup, collection/catalogue, complete icons, and optional selection.
 There are 128 experimental choices, with 24 equipment parents. Neither served
@@ -25,11 +25,17 @@ are installed. Five host/cartridge checks pass. Native release/fall checks pass
 assertions. Reuse unchanged flight, Look, and fall evidence. Both runs restore
 live state/checkpoint, pass memory guards, and exit cleanly; they do not prove
 ordinary gameplay, menu interaction, or hardware appearance.
-Next connect the ordinary outdoor `Let Go` menu from the donor tag category,
-preserving indoor placement and present/quest priority. Use the existing queue
-at `804B1680`, guard actor availability before pocket removal, and credit the
-official label once in the provenance catalogue. Keep all four golden choices
-disabled pending the complete ordinary routes and source acquisition.
+The ordinary outdoor `Let Go` menu is installed, preserving indoor placement,
+present/quest priority, all existing menu rows, and no-loss queue rejection.
+Its official source credit is in the single catalogue. Four focused checks pass;
+the native menu check passes 92 records and 59 assertions, including actual
+cursor/A dispatch, pocket replacement, menu return, flight queue, restored
+state/checkpoint, guards, and clean exit. The close callback is a test stub;
+ordinary full gameplay and appearance remain unverified. Reuse this evidence.
+Next connect source acquisition events:
+gold-tree growth/drop, event/NPC completion rewards, and perfect-town acquisition.
+Keep all four golden choices disabled pending those complete ordinary routes.
+The menu adds 384 transient bytes but no new saved state or selection options.
 See the [flight specification](../specs/V3_BALLOON_RELEASE.md) and
 [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-balloon-release-exchange-and-fall).
 
@@ -42,8 +48,8 @@ guards, restored state/checkpoint, and clean exit. Retain those results. The
 fixture's close callback, empty bury item, and existing release actor deliberately
 limit its scope; ordinary world placement/release and hardware remain unproven.
 The shared flight consumer replaces balloon exchange placement with release,
-source continuation, and tumble loss. Ordinary inventory `Let Go` selection
-remains required. Keep gold-tree growth/drop,
+source continuation, and tumble loss. Ordinary inventory `Let Go` is installed.
+Keep gold-tree growth/drop,
 event director/NPC collection rewards, and perfect-town acquisition as required
 work, with all four golden choices disabled. Save/profile restrictions remain
 format 3; no new migration is added. See the
@@ -59,7 +65,7 @@ requests, guards, restored state/checkpoint, and clean exit. Retain these result
 they are component calls, not ordinary acquisition or hardware proof.
 The exchange stage carries the golden-shovel condition through normal drop,
 empty hand, buried items, and fish/insect release, with native timing and the
-deferred flag. Ordinary balloon menu selection remains required. Native Putaway is action 62 and
+deferred flag. Ordinary balloon menu selection is installed. Native Putaway is action 62 and
 Putin is 63, unlike donor ordering. Reuse the shared completion query at
 `804B2764` and registered submenu action 118. Keep gold-tree,
 collection-completion event/NPC, and perfect-town acquisition required; golden
