@@ -15,12 +15,14 @@ from npc_mail_show import relocate_verified_data
 from v3_import_storage import jump
 import v3_scenery_runtime as scenery
 import v3_scenery_player as player
+import v3_scenery_field as field
 import tests.test_v3_equipment_runtime as shared
-OUTPUT=ROOT/os.environ.get('V3_TREE_PLAYER_BUILD','build/v3-shared-tree-felling-01')
+OUTPUT=ROOT/os.environ.get('V3_TREE_PLAYER_BUILD','build/v3-shared-tree-field-01')
 
 class HostTests(unittest.TestCase):
     sanitized=shared.HostTests.sanitized
     def test_all_native_and_imported_predicates(self):self.sanitized('v3_tree_player_test.c',defines=('-DAF_V3_TREE_FELLING',))
+    def test_field_clearing_and_insect_habitats(self):self.sanitized('v3_tree_field_test.c')
 
 @unittest.skipUnless((OUTPUT/'build.json').is_file(),'Current player-tree cartridge required')
 class CartridgeTests(unittest.TestCase):
@@ -84,6 +86,30 @@ class CartridgeTests(unittest.TestCase):
         for a,b in ((0x800A5AC8,0x800A5B4C),(0x8010B478,0x8010B49C)):
             self.assertEqual(core[a-CODE_RAM:b-CODE_RAM],old[a-CODE_RAM:b-CODE_RAM])
 
+    def test_complete_field_consumers_and_relocated_insect_predicate(self):
+        source=scenery.Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+            (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+        evidence,data,rel,records=field.contract(source,self.base,self.original)
+        core=bytearray(self.before[CODE_VROM].extract(self.base))
+        changes,receipt=field.install(evidence,data,rel,records,core,self.r['bootstrap'],self.r['code']['symbols'])
+        self.assertEqual(json.loads(json.dumps(receipt)),self.r['field_insects'])
+        for v,expected in changes.items():self.assertEqual(self.files[v].extract(self.rom),expected)
+        actual=bytearray(self.files[CODE_VROM].extract(self.rom));before=self.before[CODE_VROM].extract(self.base)
+        for row in self.r['interactions']['daily_owner']['core_hooks']:
+            at=row['offset'];self.assertEqual(actual[at:at+len(bytes.fromhex(row['after']))].hex(),row['after'])
+            actual[at:at+len(bytes.fromhex(row['before']))]=bytes.fromhex(row['before'])
+        for row in receipt['core_hooks']:
+            at=row['offset'];self.assertEqual(actual[at:at+12].hex(),row['after']);actual[at:at+12]=bytes.fromhex(row['before'])
+        self.assertEqual(actual,before)
+        for ram in (0x80200010,0x80300010):
+            moved=relocate_verified_data(SimpleNamespace(ram=field.RAM,resident_bytes=evidence['resident_bytes'],
+                sections=struct.unpack_from('>5I',changes[field.RELOC])),changes[field.VROM],changes[field.RELOC],ram)
+            self.assertEqual(u32(moved,field.MATCH-field.RAM),jump(ram+field.GATE-field.RAM,link=True))
+            self.assertEqual(moved[field.GATE-field.RAM:field.GATE-field.RAM+receipt['gate_bytes']],
+                             changes[field.VROM][field.GATE-field.RAM:field.GATE-field.RAM+receipt['gate_bytes']])
+        for key in ('sections','resident_bytes'):
+            self.assertEqual(evidence[key],receipt[key])
+
     def test_retained_allocations_resources_and_rebound_shared_consumers(self):
         old=self.prior['equipment_resources'];a=scenery.BOOT_RAM-old['ram'];b=scenery.BOOT_END-old['ram'];start=old['blob_offset']
         before=self.oldblob[start:start+old['bytes']];after=self.blob[start:start+self.e['bytes']]
@@ -107,7 +133,7 @@ class CartridgeTests(unittest.TestCase):
     def test_complete_patch_optional_profiles_and_save_retention(self):
         self.assertEqual(sha256(self.rom),self.report['output_sha256'])
         self.assertEqual(apply_ups(self.original,(OUTPUT/'asset-loader.ups').read_bytes()),self.rom)
-        changed={BLOB,MODULE,CODE_VROM,0x19D40,0x970920,0x9754A0,player.VROM,player.RELOC}|{r[k] for r in self.r['owners'] for k in ('vrom','reloc')}
+        changed={BLOB,MODULE,CODE_VROM,0x19D40,0x970920,0x9754A0,player.VROM,player.RELOC,field.VROM,field.RELOC}|{r[k] for r in self.r['owners'] for k in ('vrom','reloc')}
         for v,e in self.before.items():
             if v not in changed:self.assertEqual(e.extract(self.base),self.files[v].extract(self.rom),hex(v))
         for key in ('save_runtime','save_codec','catalogue','furniture'):self.assertEqual(self.prior[key],self.report[key])

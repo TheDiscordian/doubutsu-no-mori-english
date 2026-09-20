@@ -100,6 +100,18 @@ def camera_contract(source,base,original,scenery):
         native=retail[row['vrom']].extract(original)
         if sha256(data)!=row['output_sha256'] or sha256(rel)!=row['output_reloc_sha256']:
             raise ValueError('Changed complete seasonal camera owner')
+        if scenery.get('felling_camera'):
+            variant=len(owners);target=scenery['code']['symbols'][f'af_v3_tree_talk{variant}']
+            before=scenery['felling_camera']['owners'][variant]
+            if (u32(data,hi)&65535!=(target+0x8000)>>16 or u32(data,lo)&65535!=target&65535
+                    or (before['hi'],before['lo'],before['entry'])!=(hi,lo,entry)):
+                raise ValueError('Changed installed seasonal camera callback')
+            data=bytearray(data);data[hi:hi+4]=native[hi:hi+4];data[lo:lo+4]=native[lo:lo+4]
+            rows=list(struct.unpack_from('>'+str(u32(rel,16))+'I',rel,20))
+            if set(rows)&set(before['removed_relocations']):raise ValueError('Camera callback is still internally relocated')
+            rows+=before['removed_relocations'];rel=bytearray(rel)
+            struct.pack_into('>I',rel,16,len(rows))
+            rel[20:-4]=struct.pack('>'+str(len(rows))+'I',*rows)+bytes(len(rel)-24-4*len(rows))
         raw,receipt=source.function(donor)
         digest=('fac1a475a783b762bc9728ae8cf0ecb21b93d29394340228e527a1a8564f8311' if role=='xmas'
                 else '8dbda9bf5038d1235c120f575bfe4abfbdc328a2a1a2ed4ab86f25d55b4e5bcb')

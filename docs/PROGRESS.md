@@ -18,8 +18,21 @@ served patchers retain their existing builds.
 
 ## Active development
 
-The current explicit proposal is ABI 156 at
-`build/v3-shared-tree-felling-01/build-lock.json`. The final axe predicate accepts
+The current explicit proposal is ABI 157 at
+`build/v3-shared-tree-field-01/build-lock.json`. Shared field clearing and both
+insect-habitat consumers include selected gold trees while preserving the N64's
+four-cell entrance layout, original habitats, and bee-tree exclusion. Seven
+focused checks pass. The first silent native check passes 106 records and 69
+assertions, including the actual entrance routine, complete loaded insect owner,
+three real candidate selections, guards, restored state/checkpoint, and clean
+exit. No insect actor is created; ordinary spawning/acquisition and hardware
+remain unverified. The 9,296-byte packet fits the existing 12-KiB reservation.
+No owner allocation, artwork, saved format, choice, main lock, or patcher changes.
+Reuse these components. Next connect gold-tree leaf/cut effects and planting
+sparkle; golden choices stay disabled until their ordinary routes work. See the
+[field checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-field-clearing-and-insect-habitats).
+
+The final axe predicate accepts
 selected gold stumps, preserving their real identity through the existing
 height and foreground-update path. All four seasonal conversation-camera
 callbacks include the donor's medium/large/full gold-tree descriptors. Native
@@ -49,8 +62,8 @@ The packet occupies 8,544 bytes within the existing 12-KiB reservation. The
 364-byte player gate reuses a replaced inline predicate; owner sizes, allocations,
 saves, choices, the main lock, and both patchers remain unchanged. Final stump
 acceptance and seasonal camera checks are connected. Next connect complete
-source gold-tree effects and planting sparkle, and remaining field/insect
-consumers. The native and donor stump-height lookups already agree and remain
+source gold-tree effects and planting sparkle. Field/insect consumers are
+connected. The native and donor stump-height lookups already agree and remain
 unchanged. Golden choices stay
 disabled. See the [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-player-tree-queries).
 
@@ -138,7 +151,7 @@ The main lock and both served patchers remain unchanged. See the
 [scenery specification](../specs/V3_SCENERY.md) and
 [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-seasonal-scenery-runtime).
 
-The current explicit ABI-156 proposal retains the complete balloon integration.
+The current explicit ABI-157 proposal retains the complete balloon integration.
 All eight balloons are
 connected through the shared parent-category installer: official names/prices,
 complete pocket icons, held/inventory animation, source acquisition records,

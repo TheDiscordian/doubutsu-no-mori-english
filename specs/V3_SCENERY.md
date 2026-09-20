@@ -91,7 +91,7 @@ The equipment module retains its size and guards. Its
 `804ADC90..804ADFEF` range contains an 848-byte bootstrap and native fallback
 stubs, bounded before the retained guard at `804ADFF0`. A four-byte cache word
 at `804ADFEC` starts clear in the startup-loaded module. The bootstrap transfers
-and verifies the 8,544-byte shared code packet into the reserved
+and verifies the 9,296-byte shared code packet into the reserved
 `804B5000..804B7FFF` range, flushes the instruction cache, and records the verified
 CRC. Constructors then prepare the native/held table and load the active scenery
 bank. Tree queries can load the same packet before any seasonal actor exists;
@@ -126,7 +126,7 @@ held-category hooks. Disabled imported foreground IDs resolve the native empty
 row rather than indexing beyond a native table. Save/profile restrictions still
 apply; this fallback does not authorise removing imports from a saved world.
 
-The explicit ABI-154 proposal is `build/v3-shared-tree-interactions-04/build-lock.json`.
+The explicit ABI-157 proposal is `build/v3-shared-tree-field-01/build-lock.json`.
 It uses a 12,288-byte fixed reservation and 32,864 bytes per loaded seasonal owner.
 All existing 128 experimental choices and format-3 saves remain unchanged.
 The main ABI-109 lock and both served V2 patchers stay unchanged. Component tests
@@ -351,8 +351,8 @@ final guard/checkpoint verification, or a hardware result.
 Reuse the installed renderer, planting conversion, tree-state helpers, and daily
 growth/death/neighbour/thinning, hidden-content, and world-query consumers.
 Seasonal drop/cut counts and player targeting/shaking/bee predicates are installed.
-Final stump acceptance and conversation-camera consumers are connected. Planting
-sparkle, complete gold-tree leaf/cut effects, and remaining field/insect consumers
+Final stump acceptance, conversation-camera, field clearing, and insect-habitat
+consumers are connected. Planting sparkle and complete gold-tree leaf/cut effects
 still precede full ordinary acquisition. The final axe routine accepts selected
 gold stumps without changing their real saved identity. The donor
 effect owner has gold-specific variants, status, resources, and leaf types;
@@ -432,6 +432,43 @@ resource/save retention, exact UPS reconstruction, all experimental selections,
 and the pinned V2-12 no-import output. Code occupies 8,824 of the existing 12,288
 bytes. The checkpoint records bounded native execution and its limits; full
 ordinary felling/effects/acquisition and hardware remain separate verification.
+
+## Field clearing and insect habitats
+
+The shared gameplay refresh extends core `mSDI_PullTreeUT` at `800C3398` through
+the existing lazy-loading gate. It retains native `0800..083B` and `084F..0853`
+clearing and adds selected gold stages `0863..0868`. Hidden-content gold trees,
+stumps, dead saplings, and unrelated items remain excluded, matching the donor
+helper. All five original clearing callers remain intact. The N64 entrance
+routine clears cells `7,8,23,24`; do not import the GameCube's different six-cell
+entrance layout. The same helper serves the original town-cliff clearing loops.
+
+The complete native insect owner at VROM `00821B40`, relocation `008240D0`, and
+linked RAM `8092A030` retains its 10,400-byte resident size. Acre eligibility at
+`8092A258` and candidate-cell selection at `8092A88C` share one predicate. Existing
+range requests retain their answers. Only the native `0804..0804` tree request
+adds selected gold reward/spent/Bell/furniture trees (`0867,0868,007F,0080`).
+Gold bee trees are excluded, as in the donor. Flowers, empty terrain, other native
+habitats, the two-cell border exclusion, scheduling, random selection, species,
+and original on-tree cockroach metadata remain unchanged. Queries never replace
+the real foreground identity.
+
+The acre scan dispatches to the packet. A 60-byte candidate gate inside reclaimed
+scan code preserves the native loop's live registers and five stack arguments;
+one additional jump relocation fits the existing relocation padding. Original
+coordinate insertion and selection remain native. Complete donor/native functions,
+range tables, all callers, incoming branches, relocation, and memory dimensions
+are checked before installing. Refreshes rebind the player, seasonal, daily, and
+core consumers without repeating removed camera relocation records.
+
+The shared packet occupies 9,296 of its existing 12,288 bytes. Equipment,
+bootstrap, artwork, owner allocations, saved format, and experimental choices
+do not grow. Seven focused checks include all sixteen-bit identities under
+selected/unselected profiles, guarded clearing, scan borders and immutable
+foreground, complete installed consumers, relocation at two bases, existing
+resources/saves, full UPS reconstruction, and exact translation-only output.
+The [field checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-field-clearing-and-insect-habitats)
+records native evidence and remaining ordinary-gameplay limits.
 
 The [checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-seasonal-scenery-preparation)
 records resources and focused checks. Component checks do not establish

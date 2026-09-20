@@ -54,9 +54,12 @@ It reuses replaced inline code and existing packet space, retaining native
 target filters, timing, identities, and all allocations/saves. Its next refresh
 extends the final stump predicate and four seasonal conversation-camera callbacks,
 retaining original height geometry and real foreground identities. It fits the
-same reservation and adds no item-specific installer. Complete gold-tree effects,
-planting sparkle, and remaining field/insect
-integration still precede ordinary acquisition. See
+same reservation and adds no item-specific installer. The field/insect refresh
+extends the existing clearing helper and both native tree-habitat consumers,
+preserving the N64 entrance layout, original ranges, candidate selection, and
+bee-tree exclusion. It also fits existing memory and uses complete category
+rules. Complete gold-tree effects and planting sparkle still precede ordinary
+acquisition. See
 [seasonal scenery](V3_SCENERY.md).
 
 The shared flying-balloon category installs one complete donor state machine

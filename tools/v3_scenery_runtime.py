@@ -24,6 +24,7 @@ SOURCES = ('tools/v3_scenery_runtime.py', 'tools/v3_scenery.py',
            'overlays/v3/scenery_daily.c', 'overlays/v3/scenery_contents.c', 'overlays/v3/scenery_world.c',
            'overlays/v3/scenery_interactions.c', 'overlays/v3/scenery_player.c',
            'tools/v3_scenery_player.py',
+           'tools/v3_scenery_field.py', 'overlays/v3/scenery_field.c',
            'tools/v3_asset_loader.py', 'translations/provenance.json')
 
 
@@ -773,9 +774,10 @@ def install_daily(base,prior,blob,core,original,output):
     interactions=bool(previous.get('world_queries'))
     player=bool(previous.get('interactions'))
     felling=bool(previous.get('player_queries'))
+    field=bool(previous.get('felling_camera'))
     capacity=12288 if interactions else 8192
     added=capacity-previous['additional_fixed_resident_bytes']
-    if (previous.get('felling_camera') or not previous.get('tree_states') or old['bytes']!=0x12000
+    if (previous.get('field_insects') or not previous.get('tree_states') or old['bytes']!=0x12000
             or sha256(module)!=old['sha256'] or previous['additional_fixed_resident_bytes']!=(12288 if player else 8192 if contents else 4096)
             or RUNTIME_RAM+capacity>prior['furniture']['bank_pool']['start']):
         raise ValueError('Changed daily-growth runtime dependency')
@@ -816,6 +818,9 @@ def install_daily(base,prior,blob,core,original,output):
         player_evidence,player_owner,player_rel,player_records=player_adapter.contract(
             source,base,original,old['player_actions'],previous.get('player_queries'))
     camera=player_adapter.camera_contract(source,base,original,previous) if felling else None
+    if field:
+        import v3_scenery_field as field_adapter
+        field_evidence,field_owner,field_rel,field_records=field_adapter.contract(source,base,original)
     guard_incoming(owner,18960,0x80AB07C0,[(0x475C,8)])
     include='../'*len(output.relative_to(ROOT).parts)+'overlays/v3/scenery_trees.h'
     configuration=f'#include "{include}"\nconst Scenery af_v3_scenery_config[4]={{\n'
@@ -847,6 +852,7 @@ def install_daily(base,prior,blob,core,original,output):
     if world:sources.append('overlays/v3/scenery_world.c')
     if interactions:sources.append('overlays/v3/scenery_interactions.c')
     if player:sources.append('overlays/v3/scenery_player.c')
+    if field:sources.append('overlays/v3/scenery_field.c')
     code,compiled=compile_part('scenery',output/'scenery',extra_sources=(*sources,str(path.relative_to(ROOT))),
                                defines=('AF_V3_TREE_FELLING',) if felling else ())
     start=previous['blob_offset'];reservation=previous['reservations'][0]
@@ -905,7 +911,7 @@ def install_daily(base,prior,blob,core,original,output):
                 for at,value in ((binding['hi'],(target+0x8000)>>16),(binding['lo'],target&65535)):
                     before=u32(data,at);after=(before&0xFFFF0000)|value
                     patches.append(dict(offset=at,before=before,after=after));struct.pack_into('>I',data,at,after)
-                removed_owner.extend(binding['removed_relocations'])
+                if not field:removed_owner.extend(binding['removed_relocations'])
                 keep=[v for v in owner_records if v not in removed_owner]
             struct.pack_into('>I',orel,16,len(keep))
             orel[20:-4]=struct.pack('>'+str(len(keep))+'I',*keep)+bytes(len(orel)-24-4*len(keep))
@@ -972,5 +978,9 @@ def install_daily(base,prior,blob,core,original,output):
     if camera:
         current['felling_camera']=dict(camera,additional_resident_bytes=0,additional_scene_resident_bytes=0,
             ordinary_gameplay_tested=False,native_test='pending')
+    if field:
+        updates,receipt=field_adapter.install(field_evidence,field_owner,field_rel,field_records,
+                                              core,bootstrap,compiled['symbols'])
+        changes.update(updates);current['field_insects']=receipt
     result.update(sha256=sha256(module),crc32=zlib.crc32(module),additional_resident_bytes=added)
     return result,changes

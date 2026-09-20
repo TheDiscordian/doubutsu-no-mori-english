@@ -1,5 +1,96 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared field clearing and insect habitats
+
+The ABI-157 proposal is `build/v3-shared-tree-field-01/build-lock.json`.
+The shared gameplay installer adds selected gold trees to the existing clearing
+helper and both native insect-habitat consumers. It introduces no item-specific
+installer, asset conversion, browser choice, or memory allocation.
+
+- ROM SHA-256:
+  `29819bd234f0440e2e191de351585cb7bbb985a333b6deccd4b8fb04d6375aea`.
+- Report SHA-256:
+  `716dc833f9553a4da99af5bf521e83053597a5e6b73e323a14424c6900ef87e3`.
+- UPS SHA-256:
+  `baff9ffca8731d4963d89ab12243e3d6a0cbc1e193483517b06ec5ff1e2de609`.
+
+Build command:
+
+```sh
+python3 tools/v3_furniture_install.py --refresh-runtime --scenery-gameplay \
+  --base-lock build/v3-shared-tree-felling-01/build-lock.json \
+  --output build/v3-shared-tree-field-01
+```
+
+Complete source and native functions establish the original N64 layout:
+`mSDI_PullTreeUnderPlayerBlock` clears cells `7,8,23,24` through
+`mSDI_PullTreeUT`. The GameCube's six-cell path is not the native layout and is
+not copied. All five native helper callers, including the cliff-column caller,
+remain unchanged. Core `800C3398` uses the shared lazy loader and retains native
+families while adding selected `0863..0868`, exactly the gold range in the donor
+helper. Hidden contents, stumps, and dead saplings remain excluded.
+
+The complete native insect owner at `00821B40` retains its 10,400-byte resident
+size and original 1,072-byte relocation. The original tree request `0804..0804`
+recognises selected `0867,0868,007F,0080`, excluding gold bee trees. Acre scans
+and actual candidate-cell insertion share this predicate; native ranges,
+scheduling, border exclusions, species, coordinates, random selection, and
+on-tree cockroach metadata remain. A 60-byte gate occupies reclaimed scan code;
+one new jump relocation fits existing padding. All existing packet consumers,
+including installed seasonal camera references, rebind to the new code safely.
+
+Code occupies 9,296 of the existing 12,288 bytes. Bootstrap remains 848 bytes,
+equipment remains 72 KiB, and complete seasonal banks remain 32,864 bytes each.
+No save/profile field, owner allocation, resource, source text, or choice changes.
+The main ABI-109 lock and both served V2 patchers remain unchanged.
+
+Seven focused checks pass in 7.500 seconds:
+
+```sh
+python3 -m unittest tests.test_v3_tree_player -v
+```
+
+Sanitizers cover all sixteen-bit identities, selected/unselected clearing and
+habitat requests, every scan position, border exclusions, invalid dimensions,
+immutable queries, and guarded writes. Cartridge checks bind complete source/
+native functions, exact owner changes and relocations at two bases, current
+camera/player rebinding, allocations, unchanged resources/saves, complete UPS
+reconstruction, all 128 experimental selections, and exact V2-12 empty output.
+Python compilation and `git diff --check` pass.
+
+The first silent native run passes 106 records and 69 assertions:
+
+```sh
+python3 tools/emulator_smoke.py \
+  --rom build/v3-shared-tree-field-01/animal-forest-v3-asset-loader.z64 \
+  --output build/smoke-v3-tree-field-01 \
+  --scenario tests/v3-tree-field-scenario.json \
+  --xvfb /home/discordian/Games/OpenRSC/headless/vendor/usr/bin/Xvfb \
+  --seconds 180 --expansion-pak --no-initial-screenshot
+```
+
+- Results SHA-256:
+  `e7d6d6818f5ed96ef71f447cd127c66fa490042428d99a478767013ae3d61db4`.
+
+The actual core helper loads the complete packet and clears only supported
+identities. The actual four-cell entrance caller clears a temporary mixed acre
+while retaining the two additional cells cleared only by the GameCube layout.
+The complete insect owner loads and relocates from the cartridge. Actual acre
+scans check selected gold, native trees, flowers, borders, exclusions, and null
+input. Three executions of the original candidate-selection function choose
+the expected real gold/native cells, set the spawn flag and tree metadata,
+and leave foreground data intact. No insect actor is created or simulated.
+Complete code, saved import data, fixture guards, and fault state pass. World
+acre, profile, code/cache, stack guards, equipment, and checkpoint restore;
+the emulator resumes and exits cleanly. No user save is opened or modified.
+This is component evidence, not ordinary spawning, acquisition, GPU appearance,
+live-town clearing, cross-version reload, or hardware verification.
+
+Next implement complete gold-tree leaf/cut effects and planting sparkle, then
+exercise the ordinary acquisition route. Keep all four golden-tool choices
+disabled until their full routes work. Format-3 saves require matching or
+equal-or-larger profiles; never load imported saves in V2 or format-1/2 V3.
+
 ## Shared final felling and conversation camera
 
 The ABI-156 proposal is `build/v3-shared-tree-felling-01/build-lock.json`.

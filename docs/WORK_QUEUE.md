@@ -2,8 +2,8 @@
 
 ## Active: V3 optional GameCube imports
 
-The current explicit proposal is ABI 156,
-`build/v3-shared-tree-felling-01/build-lock.json`. All eight balloons are
+The current explicit proposal is ABI 157,
+`build/v3-shared-tree-field-01/build-lock.json`. All eight balloons are
 connected through shared source-derived parent records, room profiles, indoor
 conversion/pickup, collection/catalogue, complete icons, and optional selection.
 There are 128 experimental choices, with 24 equipment parents. Neither served
@@ -96,10 +96,18 @@ gold stumps, so no height patch is needed. The first silent native run passes
 four loaded camera callbacks, restored state/checkpoint, guards, and clean exit.
 The stump result is injected, and terrain/foreground mutation is not executed;
 this is not full ordinary felling/acquisition. Reuse this component evidence.
-Next connect complete source gold-tree
-leaf/cut effects, planting sparkle, and remaining field/insect consumers before
+Field clearing and both insect-habitat consumers are connected through shared
+rules. Preserve the actual N64 four-cell entrance layout, not the GameCube's
+six-cell path. Native habitat ranges and gold bee-tree exclusion remain intact.
+Seven focused checks pass. The first silent native run passes 106 records and
+69 assertions, including the actual entrance routine, complete loaded owner,
+three native candidate selections, guards, restored state/checkpoint, and clean
+exit. It does not create an insect actor or prove ordinary spawning/acquisition.
+The 9,296-byte packet fits the existing reservation; no owner, asset, allocation,
+save, or choice changes. Reuse these components and do not replay them. Next
+connect complete source gold-tree leaf/cut effects and planting sparkle before
 exercising ordinary acquisition. See the
-[checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-final-felling-and-conversation-camera).
+[checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-field-clearing-and-insect-habitats).
 Do not feed GameCube gold effect-variant indices into the unextended native
 effect owner, or substitute ordinary-green effects for the gold source artwork.
 The donor reuses ordinary seasonal tree motion/model families with a gold status

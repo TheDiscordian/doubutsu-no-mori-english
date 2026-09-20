@@ -1561,6 +1561,9 @@ def tool_controls(debug,rom_path,record,*,transitions=False,capture=False,rod=Fa
 
 
 def exercise(debug, rom_path, record, *, section='automatic_furniture'):
+    if section=='scenery_field_insects':
+        from v3_scenery_smoke import field_insects
+        return field_insects(debug,rom_path,record)
     if section=='scenery_felling_camera':
         from v3_scenery_smoke import felling_camera
         return felling_camera(debug,rom_path,record)

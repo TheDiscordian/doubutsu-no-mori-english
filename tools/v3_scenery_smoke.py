@@ -12,6 +12,110 @@ from v3_import_storage import jump
 from v3_npc_draw_smoke import boot_proofs
 
 
+def field_insects(debug,rom_path,record):
+    """Actual clearing callers and complete insect scan/candidate selection.
+
+    Isolated foreground and candidate records; no insect actor is created.
+    The temporary world acre, profile, and code cache are restored afterwards.
+    """
+    import v3_scenery_field as field
+    path=Path(rom_path);image=path.read_bytes();report=json.loads((path.parent/'build.json').read_bytes())
+    if sha256(image)!=report['output_sha256']:raise ValueError('Changed field/insect cartridge')
+    e=report['equipment_resources'];r=e['scenery'];f=r['field_insects'];files=by_vrom(image)
+    boot=boot_proofs(image);assertions=0
+    def check(label,okay,**detail):
+        nonlocal assertions
+        record(dict(field_insect_check=label,**detail,assertion='passed' if okay else 'failed'))
+        if not okay:raise ValueError('Field/insect mismatch: '+label)
+        assertions+=1
+    def memory(label,at,want):
+        got=debug.read_memory(at,len(want));check(label,got==want,address=f'{at:08X}',
+            expected_sha256=sha256(want),observed_sha256=sha256(got))
+    def call(at,args=(),proof=None,want=None):
+        result=debug.call(f'{at:08X}',[v&0xffffffff for v in args],return_address=MODULE_RAM+0x6480,
+            verified_code=proof or boot.get(at));record(result)
+        if want is not None:check('native result',result['return_value']==want,
+            entry=f'{at:08X}',expected=want,actual=result['return_value'])
+        return result['return_value']
+    def put(at,*values):debug.write_memory(at,struct.pack('>'+'I'*len(values),*values))
+    def flush(at,n):call(0x8002FE00,[at,n]);call(0x80034CE0,[at,n])
+    acre=0x8012E948
+    regions=[(r['ram'],r['additional_fixed_resident_bytes']),(r['tree_states']['cache_word'],4),
+        (0x80460020,192),(acre,512),(TEST_STACK-0x800,16),(TEST_STACK+0x40,16)]
+    saved={at:debug.read_memory(at,n) for at,n in regions};module=debug.read_memory(e['ram'],e['bytes'])
+    save_data=debug.read_memory(0x8046C000,864)
+    size=0x6000;allocation=call(0x8009BFC0,[size])
+    if allocation&15 or not MODULE_RAM+0x8000<=allocation<=0x80400000-size:
+        raise ValueError('Field/insect fixture allocation failed')
+    root=allocation+16;game=allocation+0x3000;state=allocation+0x5100
+    fg=allocation+0x5200;collision=allocation+0x5500
+    data,rel=(files[v].extract(image) for v in (field.VROM,field.RELOC));n=f['resident_bytes']
+    guards=[allocation,root+n+len(rel),game-16,game+0x2000,state-16,state+16,fg-16,fg+512,
+        collision-16,collision+1024,allocation+size-16,TEST_STACK-0x800,TEST_STACK+0x40]
+    occupied=sorted([(root,n+len(rel)),(game,0x2000),(state,8),(fg,512),(collision,1024)]+
+        [(at,16) for at in guards if allocation<=at<allocation+size])
+    if any(a+m>b for (a,m),(b,_) in zip(occupied,occupied[1:])):
+        raise ValueError('Field/insect fixture buffers/guards overlap')
+    debug.write_memory(allocation,bytes(size));edge=b'AFFI'*4
+    for at in guards:debug.write_memory(at,edge)
+    parent=next(row for row in e['player_actions']['equipment_selection']['rows'] if row['item_id']=='223B')
+    def select(enabled):
+        profile=bytearray(saved[0x80460020]);profile[parent['profile_byte']]&=~parent['profile_mask']
+        if enabled:profile[parent['profile_byte']]|=parent['profile_mask']
+        debug.write_memory(0x80460020,profile)
+    def cells(entries):
+        raw=bytearray(512)
+        for index,item in entries.items():struct.pack_into('>H',raw,index*2,item)
+        return bytes(raw)
+    loaded=relocate_verified_data(SimpleNamespace(ram=field.RAM,resident_bytes=n,
+        sections=struct.unpack_from('>5I',rel)),data,rel,root)
+    proof=(root,loaded[:f['sections'][0]]);core=files[CODE_VROM].extract(image)
+    try:
+        memory('complete installed clearing function',0x800C3398,core[0x800C3398-CODE_RAM:0x800C33CC-CODE_RAM])
+        memory('complete native four-cell entrance caller',0x800C3488,core[0x800C3488-CODE_RAM:0x800C34D0-CODE_RAM])
+        put(r['tree_states']['cache_word'],0)
+        for item,enabled,want in ((0x863,True,0),(0x868,True,0),(0x863,False,0x863),
+                (0x800,False,0),(0x853,False,0),(0x7F,True,0x7F),(0x7E,True,0x7E),(0x869,True,0x869)):
+            select(enabled);debug.write_memory(state,struct.pack('>H',item)+b'?'*6)
+            call(0x800C3398,[state]);memory('clearing retains exclusions and neighbouring bytes',state,struct.pack('>H',want)+b'?'*6)
+        blob=files[BLOB].extract(image);packet=blob[r['blob_offset']:r['blob_offset']+r['bytes']]
+        memory('clearing lazy-loads complete shared packet',r['ram'],packet)
+        select(True);debug.write_memory(acre,cells({7:0x863,8:0x804,23:0x868,24:0x853,39:0x863,40:0x868}))
+        call(0x800C3488);memory('only original four entrance cells cleared',acre,cells({39:0x863,40:0x868}))
+        call(0x800262D0,[field.VROM,field.VROM+len(data),field.RAM,field.RAM+n,root,root+n,len(rel)])
+        memory('complete loaded insect owner and BSS',root,loaded)
+        scan=root+field.SCAN-field.RAM
+        for item,index,enabled,minimum,maximum,want in (
+                (0x868,34,True,0x804,0x804,1),(0x867,221,True,0x804,0x804,1),
+                (0x80,136,True,0x804,0x804,1),(0x7F,136,False,0x804,0x804,0),
+                (0x868,33,True,0x804,0x804,0),(0x868,46,True,0x804,0x804,0),
+                (0x81,136,True,0x804,0x804,0),(0x863,136,True,0x804,0x804,0),
+                (0x804,136,False,0x804,0x804,1),(0x845,136,True,0x845,0x84D,1),
+                (0x868,136,True,0x845,0x84D,0)):
+            select(enabled);raw=cells({index:item});debug.write_memory(fg,raw)
+            call(scan,[minimum,maximum,fg,16,16],proof,want)
+            memory('scan leaves real foreground intact',fg,raw)
+        call(scan,[0x804,0x804,0,16,16],proof,0)
+        for enabled,entries,xy in ((True,{136:0x868,137:0x81},(8,8)),
+                (True,{136:0x7F},(8,8)),(False,{136:0x868,153:0x804},(9,9))):
+            select(enabled);raw=cells(entries);debug.write_memory(fg,raw);debug.write_memory(state,b'?'*8)
+            call(root+0x8092A76C-field.RAM,[game,state,fg,collision,0,16,16,28,0x804,0x804],proof)
+            memory('native candidate coordinates, spawn flag, and on-tree metadata',state,
+                bytes((28,*xy,1))+struct.pack('>I',4))
+            memory('candidate selection leaves real foreground intact',fg,raw)
+        memory('complete insect text retained',root,loaded[:f['sections'][0]])
+        memory('saved import data unchanged',0x8046C000,save_data)
+        for at in guards:memory('fixture guard',at,edge)
+        memory('no faulted thread',0x8003CE34,bytes(4))
+    finally:
+        for at,value in saved.items():debug.write_memory(at,value)
+        flush(r['ram'],r['additional_fixed_resident_bytes']);call(0x8009C040,[allocation])
+    for at,value in saved.items():memory('restored state',at,value)
+    memory('equipment unchanged',e['ram'],module)
+    return dict(assertions=assertions,actual_entrance_cells=4,actual_native_candidate_selections=3,
+        insect_actor_created=False,ordinary_acquisition_tested=False,requires_checkpoint_restore=True)
+
+
 def felling_camera(debug,rom_path,record):
     """New felling branch/arguments and actual loaded seasonal callbacks.
 
