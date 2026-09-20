@@ -18,8 +18,8 @@ served patchers retain their existing builds.
 
 ## Active development
 
-The current explicit ABI-133 proposal is
-`build/v3-shared-rod-effects-01/build-lock.json`. All eight balloons are
+The current explicit ABI-134 proposal is
+`build/v3-shared-shovel-effects-02/build-lock.json`. All eight balloons are
 connected through the shared parent-category installer: official names/prices,
 complete pocket icons, held/inventory animation, source acquisition records,
 collection/catalogue, animated room profiles, indoor conversion, and inverse
@@ -75,7 +75,19 @@ the compressed fish owner and adds 8,816 ROM bytes. No saved/profile/actor forma
 changes. These component checks do not prove ordinary fishing or hardware.
 See the [rod checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-golden-rod-response).
 
-Next connect golden-shovel/axe effects and complete inventory/parent/acquisition support.
+Golden-shovel digging uses the actual player's cached kind and retains native
+foreground/hole/buried-item processing. A new eligible position gives the donor's
+10% chance of 100 Bells; ordinary digs also update the previous-position state.
+The shared module grows to 64 KiB using checked retired sequence storage, with
+all prior code and state addresses retained. One sanitizer check and four
+cartridge/composition checks pass. The first silent native run passes 186 records
+and 174 assertions across 29 cases, real hook/argument passing, native RNG, state,
+guards, checkpoint restore, and clean exit. Most cases inject the native digging
+result to isolate the new suffix; one negative-position case executes the complete
+native cancellation path. This does not establish ordinary terrain digging.
+See the [shovel checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-golden-shovel-digging).
+
+Next verify axe wear and complete inventory/parent/acquisition support.
 The donor's balloon-loss-on-get-up path also remains an explicit shared behaviour
 dependency; it is not implemented by the net recovery adapter. Keep tool choices
 disabled. Continue from the current lock and retain completed evidence. See the
@@ -87,7 +99,7 @@ The shared installer repairs actual room-footprint metadata, permits the native
 eight-byte graphics alignment, and combines catalogue/icon owner edits without
 losing the catalogue's final 16 bytes. Twelve focused checks pass; the current
 combined native check passes 216 records and 151 assertions. The source models,
-128 choices, fixed identities, 60-KiB resident allocation, and saved formats are
+128 choices, fixed identities, and saved formats are
 retained. The current checks cover complete catalogue loading, all 24 parent
 conversions/order, representative animated previews/icons, register/memory guards,
 retained saves, restored checkpoint, and clean exit.

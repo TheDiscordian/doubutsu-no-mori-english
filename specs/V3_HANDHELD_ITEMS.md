@@ -946,6 +946,55 @@ original hardware. Keep golden-tool choices disabled until their remaining
 consumers are complete. See the
 [rod checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-golden-rod-response).
 
+### Shared golden-shovel digging
+
+The source request at REL text `16A458` passes whether the actual player's
+cached item kind is golden through `Player_actor_Check_scoop_after` (`16A370`)
+and `mPlib_Check_scoop_after` (`6C438`) to `mFI_GetDigStatus` (`39240`). The
+complete source functions and strict position helper at `391E8` are pinned by
+the shared installer. Native `8008CAD8..8008CC1C` retains foreground lookup,
+hole checks, all six status predicates, buried-item conversion, and sky swings.
+
+Only the core call at `800B5390` changes. Its containing native function
+`800B4038..800B553C` has a 680-byte frame and stores the actual player at offset
+676. The adapter's 32-byte frame reads that slot at offset 708, reads signed
+kind at player offset `1117`, and passes equality with golden kind 90 as the
+fifth o32 argument. The original item pointer and by-value position in `a0..a3`
+and delay-slot store remain unchanged. No global equipment guess or family
+replacement supplies the bonus. Subsequent native NPC/snowball/ball collision
+checks and action requests remain intact.
+
+`overlays/v3/tool_effects.c` calls native status first. Only status three, DIG,
+can roll: the actual golden flag must equal one, and either X or Z must differ
+from the previous position by strictly more than 20 world units. Y alone and
+exact endpoints do not qualify. Native `fqrand` at `8002C9AC`, multiplied by ten
+and truncated to an integer, must yield one. A successful roll returns GET_ITEM,
+five, and writes `ITM_MONEY_100`, `2103`, to the original bounded item output.
+Every DIG updates the previous position, including ordinary shovels and failed
+or suppressed rolls. Other statuses leave the state and RNG untouched. This
+matches the donor; using `fqrand2` would use the wrong random range.
+
+The 384-byte code image starts at `804B2000`, with the twelve-byte position
+state at `804B2FD0` and new guard at `804B2FF0`. The complete equipment module is
+64 KiB. All previous bytes remain, including the old interior guard and the
+pinwheel sound-level state. Startup transfers, checksums, and cache maintenance
+cover the larger module; it still ends before the furniture pool at `80500000`.
+The extension consumes exactly 4 KiB within the checked retired audio-sequence
+range. The actual native sequence header, complete live relocated sequence,
+retirement receipt, zero range, resource exclusions, and prior module checksum
+must match. Arbitrary zero padding is insufficient. No ROM resource grows, and
+no actor, profile, save format, public entry, or asset address changes.
+
+Host tests cover all six statuses, normal/golden flags, ten random buckets,
+strict positive/negative endpoints, Y-only changes, ordinary-to-golden repeated
+digs, RNG calls, full position updates, and bounded item writes. The native
+component fixture uses the real core hook, compiled bridge/C code, and native
+RNG, with injected status results for most cases. One negative-position case
+executes native digging fully. It is not an ordinary in-town digging or reward
+animation test. Tool choices stay disabled until remaining shared inventory,
+parent, acquisition/demo, and persistence requirements are complete. See the
+[checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-golden-shovel-digging).
+
 ### Extended action tables
 
 `--refresh-runtime --player-actions` installs shared action-table capacity in the

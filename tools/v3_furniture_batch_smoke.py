@@ -1079,7 +1079,94 @@ def net_capture_cases(debug,record,actor,result,field,table,profile,owner_call,c
     profile[159]|=0x80;debug.write_memory(0x80460020,profile)
 
 
-def tool_controls(debug,rom_path,record,*,transitions=False,capture=False,rod=False):
+def shovel_effects_cases(debug,record,image,effects,actor,game,check):
+    """Actual hook/ABI/RNG; injected digging outcomes isolate the new suffix.
+
+    One negative-world-position case also executes the complete unchanged native
+    status routine. Other cases do not claim terrain or ordinary digging tests.
+    """
+    from aflib import CODE_RAM,CODE_VROM
+    from v3_furniture_room_smoke import extend
+    core=by_vrom(image)[CODE_VROM].extract(image)
+    start=effects['hook']['address'];end=start+8;native=0x8008CAD8
+    check('cartridge shovel hook and delay',start,core[start-CODE_RAM:end-CODE_RAM])
+    check('complete native digging function',native,core[native-CODE_RAM:0x8008CC1C-CODE_RAM])
+    rng=effects['random_function'];offset=rng-0x80025C60+0x1060
+    check('complete native random function',rng,image[offset:offset+0x54])
+    state=effects['previous_position_ram'];stack=game+0xC00;item=game+0x500
+    spans=((state,12),(0x8003C590,4),(0x800419F0,4))
+    saved={at:debug.read_memory(at,n) for at,n in spans}
+    edge=b'V3DG'*4
+    debug.write_memory(stack-0x200,edge);debug.write_memory(stack+0x2C0,edge)
+    debug.write_memory(stack+676,struct.pack('>I',actor))
+    origin=(100.0,9.0,-100.0);cases=[]
+    for kind in (35,89,90):
+        for status in range(6):cases.append((f'kind {kind}, status {status}',kind,status,(140.0,9.0,-100.0),True))
+    for p in ((100,9999,-100),(120,9,-100),(80,9,-100),(100,9,-80),(100,9,-120),
+              (120.001,9,-100),(79.999,9,-100),(100,9,-79.999),(100,9,-120.001)):
+        cases.append(('strict position bounds',90,3,p,True))
+    cases+= [('golden losing roll',90,3,(140,9,-100),False),
+             ('native outside-world cancel',90,None,(-100,0,0),True)]
+    try:
+        for name,kind,status,position,win in cases:
+            rawpos=struct.pack('>3f',*position);position=struct.unpack('>3f',rawpos)
+            different=abs(position[0]-origin[0])>20 or abs(position[2]-origin[2])>20
+            eligible=kind==90 and status==3 and different
+            random_value=0x26666666 if win else 0x80000000
+            seed=((random_value-0x3C6EF35F)*pow(0x19660D,-1,1<<32))&0xFFFFFFFF
+            debug.write_memory(state,struct.pack('>3f',*origin))
+            debug.write_memory(0x8003C590,struct.pack('>I',seed))
+            debug.write_memory(0x800419F0,bytes(4))
+            debug.write_memory(actor+0x1117,bytes((kind,)))
+            actor_before=debug.read_memory(actor,0x13A0)
+            debug.write_memory(item,b'\xA5\x5A\xFF\xFF\x5A\xA5')
+            before=debug.command('g');regs=[int(before[i:i+16],16) for i in range(0,len(before),16)]
+            if len(regs)!=71 or regs[37]&0xFFFFFFFF!=0x800D334C:
+                raise ValueError('Shovel fixture requires the paused native frame')
+            regs[4]=extend(item+2)
+            for i,value in enumerate(struct.unpack('>3I',rawpos),5):regs[i]=extend(value)
+            regs[29]=extend(stack);regs[37]=extend(start)
+            bps=[f'0,{address:x},4' for address in (native,end)]
+            for bp in bps:
+                if debug.command('Z'+bp)!='OK':raise ValueError('Shovel breakpoint rejected')
+            try:
+                if debug.command('G'+''.join(f'{v:016x}' for v in regs))!='OK':raise ValueError('Shovel registers rejected')
+                stopped=debug.command('c');raw=debug.command('g')
+                current=[int(raw[i:i+16],16) for i in range(0,len(raw),16)]
+                if (stopped[:3] not in ('T05','S05') or current[37]&0xFFFFFFFF!=native
+                        or any(current[i]&0xFFFFFFFF!=regs[i]&0xFFFFFFFF for i in range(4,8))):
+                    raise ValueError('Actual shovel bridge changed native item/position arguments')
+                if status is not None:
+                    # Data/register fixture only: no mock code enters cartridge RAM.
+                    debug.write_memory(item+2,struct.pack('>H',0x4321))
+                    current[2]=status;current[37]=current[31]
+                    if debug.command('G'+''.join(f'{v:016x}' for v in current))!='OK':raise ValueError('Dig outcome injection rejected')
+                debug.command('z'+bps[0]);stopped=debug.command('c');raw=debug.command('g')
+                current=[int(raw[i:i+16],16) for i in range(0,len(raw),16)]
+                expected_status=5 if eligible and win else 1 if status is None else status
+                okay=(stopped[:3] in ('T05','S05') and current[37]&0xFFFFFFFF==end
+                      and current[2]&0xFFFFFFFF==expected_status and current[29]&0xFFFFFFFF==stack
+                      and all(current[i]&0xFFFFFFFF==regs[i]&0xFFFFFFFF for i in (*range(16,24),30)))
+                record(dict(shovel_effects_case=name,kind=kind,injected_native_result=status,
+                    actual_status=current[2]&0xFFFFFFFF,expected_status=expected_status,
+                    actual_random_roll=eligible,stack_restored=current[29]&0xFFFFFFFF==stack,
+                    assertion='passed' if okay else 'failed'))
+                if not okay:raise ValueError('Native shovel effect result or ABI mismatch')
+                expected_item=0x2103 if eligible and win else 0 if status is None else 0x4321
+                check('shovel item and neighbouring guards',item,struct.pack('>3H',0xA55A,expected_item,0x5AA5))
+                check('source previous-position update',state,rawpos if status==3 else struct.pack('>3f',*origin))
+                check('exact RNG advancement',0x8003C590,struct.pack('>I',random_value if eligible else seed))
+                check('actual player unchanged',actor,actor_before)
+            finally:
+                for bp in bps:debug.command('z'+bp)
+                debug.command('G'+before)
+        for at in (stack-0x200,stack+0x2C0):check('shovel stack guard',at,edge)
+    finally:
+        for at,data in saved.items():debug.write_memory(at,data)
+    for at,data in saved.items():check('restored digging and random state',at,data)
+
+
+def tool_controls(debug,rom_path,record,*,transitions=False,capture=False,rod=False,shovel=False):
     """Execute current cartridge input consumers with isolated equipment data."""
     from aflib import CODE_RAM,CODE_VROM
     import v3_equipment_runtime as equipment
@@ -1153,6 +1240,11 @@ def tool_controls(debug,rom_path,record,*,transitions=False,capture=False,rod=Fa
         if rod:
             cases=()
             rod_effects_cases(debug,record,image,actions['rod_effects'],actor,field,table,profile,call,check)
+        if shovel:
+            cases=()
+            shovel_effects_cases(debug,record,image,actions['shovel_effects'],actor,game,check)
+            debug.write_memory(table,struct.pack('>HbBHBB',0x2239,90,0,159,0x80,1))
+            debug.write_memory(field,struct.pack('>H',0x2239))
         if transitions:
             cases=();debug.write_memory(0x8013767D,b'\0');debug.write_memory(0x80137908,b'\0')
             requests=((0x808CB32C,0x808CB39C,40),(0x808CC108,0x808CC178,43),
@@ -1209,8 +1301,9 @@ def tool_controls(debug,rom_path,record,*,transitions=False,capture=False,rod=Fa
     for a,data in saved.items():check('restored selector/profile/input state',a,data)
     check('complete equipment module restored',equipment.RAM,module)
     check('no fault',0x8003CE34,bytes(4));check('translation guard',0x8019C8D0,bytes.fromhex('AF32C0DE')*4)
-    return dict(native_shared_tool_controls=not transitions and not capture and not rod,native_tool_transitions=transitions,
-        native_net_capture=capture,native_rod_effects=rod,
+    return dict(native_shared_tool_controls=not transitions and not capture and not rod and not shovel,native_tool_transitions=transitions,
+        native_net_capture=capture,native_rod_effects=rod,native_shovel_effects=shovel,
+        digging_outcomes_injected=shovel,
         assertions=assertions,title_demo_input=bool(title),
         code_uploaded=False,synthetic_equipment_data=True,ordinary_gameplay_tested=False,
         golden_net_geometry_tested=capture,golden_rod_effects_tested=rod,
@@ -1218,6 +1311,7 @@ def tool_controls(debug,rom_path,record,*,transitions=False,capture=False,rod=Fa
 
 
 def exercise(debug, rom_path, record, *, section='automatic_furniture'):
+    if section=='shovel_effects':return tool_controls(debug,rom_path,record,shovel=True)
     if section=='rod_effects':return tool_controls(debug,rom_path,record,rod=True)
     if section=='net_capture':return tool_controls(debug,rom_path,record,capture=True)
     if section=='tool_transitions':return tool_controls(debug,rom_path,record,transitions=True)

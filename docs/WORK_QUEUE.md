@@ -2,8 +2,8 @@
 
 ## Active: V3 optional GameCube imports
 
-The current explicit proposal is ABI 133,
-`build/v3-shared-rod-effects-01/build-lock.json`. All eight balloons are
+The current explicit proposal is ABI 134,
+`build/v3-shared-shovel-effects-02/build-lock.json`. All eight balloons are
 connected through shared source-derived parent records, room profiles, indoor
 conversion/pickup, collection/catalogue, complete icons, and optional selection.
 There are 128 experimental choices, with 24 equipment parents. Neither served
@@ -55,17 +55,23 @@ space; moving the compressed owner through the shared tail adds 8,816 ROM bytes.
 See the [rod checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-golden-rod-response)
 and [specification](../specs/V3_HANDHELD_ITEMS.md#shared-golden-rod-response).
 
-Next connect golden-shovel effects and inventory/parent consumers. The actual
-source request passes a golden flag through `mPlib_Check_scoop_after` to
-`mFI_GetDigStatus`; trace that full path and its generated-item behaviour before
-counting the tool complete. Do not add a flag with no downstream effect.
-The donor `mFI_GetDigStatus` (`.text+39240`) grants 100 Bells on a 10% roll only
-for a new eligible dig position. Its twelve-byte previous-position state updates
-on ordinary digs too; retain that rule and existing buried-item/hole handling.
-The current tool-code slot ends at `804A5FD8`, leaving only 40 bytes before
-parent readers. Add a checked shared reservation for further effects rather
-than overwriting old callbacks/constants or omitting required state.
-Check axe wear and acquisition/demos against both games. Keep all tool choices
+Golden-shovel effects are connected through the real core call, actual player
+kind, retained native status, and generated item. Ordinary digs update the same
+twelve-byte previous-position state. The 384-byte helper and state occupy a
+checked 4-KiB extension; all old code/state and the relocated sequence remain.
+One sanitizer check and four cartridge/composition checks pass. The first silent
+native run passes 186 records/174 assertions, including 29 cases, actual call
+arguments, native RNG, guards, state restoration, checkpoint restore, and clean
+exit. Most cases inject native status results; one native cancellation path runs
+fully. Reuse this evidence, but do not claim ordinary terrain digging. See the
+[shovel checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-golden-shovel-digging).
+
+Next check axe wear and acquisition/demos against both games, then connect shared
+inventory/parent consumers. The source damage function preserves title-demo
+equipment, advances ordinary axe wear by one or three after reflection, and
+excludes the golden axe. Audit the actual native counterpart and downstream
+frame-15 item/counter updates before deciding which adapter is needed.
+Keep all tool choices
 disabled until the required gameplay, inventory, acquisition, and persistence
 consumers are connected. Do not replay the completed input checks for unchanged code.
 
@@ -120,7 +126,7 @@ drawing commands, guards, saved-state retention, and checkpoint restoration.
 Reuse this component evidence; ordinary appearance/gameplay remain unverified.
 
 Preserve the pinwheel initializer's special speed, original tool timing,
-format-2 saves, exact V2-12 no-import output, and the 60-KiB equipment module.
+format-2 saves, exact V2-12 no-import output, and the 64-KiB equipment module.
 New balloon profile bits require a matching or larger profile. Older profiles
 lacking these imports reject their saves; imported saves must not be used in V2.
 
@@ -140,7 +146,7 @@ Net/rod behaviour and golden-tool differences remain explicit. Resources do
 not enable these imports. See the
 [capacity checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-rig-capacity-and-resource-extension).
 
-Next work uses the explicit ABI-133 lock above. All eight pinwheels have shared
+Next work uses the explicit ABI-134 lock above. All eight pinwheels have shared
 parent readers, pocket artwork, collection/catalogue, existing event acquisition,
 and individual experimental selections. The full proposal has 128 choices;
 existing fans and fixed identities are retained. No per-item installers or

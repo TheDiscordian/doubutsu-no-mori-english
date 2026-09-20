@@ -105,6 +105,7 @@ def compile_part(part, out, extra_sources=(), defines=(), primary_source=None):
                        'equipment_resources': ('af_v3_equipment_pointer', 0x804A3000),
                        'player_actions': ('af_v3_player_action_v0', 0x804A5000),
                        'tool_motion': ('af_v3_tool_action_setup', 0x804A5A50),
+                       'tool_effects': ('af_v3_shovel_call', 0x804B2000),
                        'held_items': ('af_v3_held_item_name', 0x804A6000),
                        'held_rigs': ('af_v3_held_setup', 0x804B0000),
                        'room_rigs': ('af_v3_room_rig_ct', 0x804B1800),

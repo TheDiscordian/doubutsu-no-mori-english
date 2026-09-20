@@ -1,5 +1,69 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared golden-shovel digging
+
+The explicit proposal is ABI 134 at
+`build/v3-shared-shovel-effects-02/build-lock.json`. It retains 128 experimental
+choices, complete assets, fixed identities, format-2 saves, and exact V2-12
+no-import output. No golden-tool choice is enabled. The main ABI-109 lock and
+both served V2 patchers remain unchanged.
+
+- ROM SHA-256:
+  `07a3ad9e636b64eb1ef94fb097223c273a73e517af53dc2a6cfef252384e5459`.
+- Report SHA-256:
+  `786fcaf06c441bd06bf61ff612b75051fac31c55668af37bb747be0222f52354`.
+- UPS SHA-256:
+  `ca2b058be20a732e77f8581e0865a7c031e9da083153a7d140008343fcca774f`.
+
+The real core call reads golden kind 90 from the actual caller's player, passes
+the original item/position arguments, and executes native digging before the
+new effect. DIG at a new eligible spot can generate 100 Bells on the source's
+10% roll. Ordinary digs also update the previous position. Other status/item
+handling, downstream collision/action logic, and RNG use remain native.
+
+The 384-byte helper and twelve-byte state use a checked 4-KiB module extension,
+bringing the equipment allocation to 64 KiB. Retired sequence ownership and the
+actual live moved sequence are verified before reclaiming storage. All earlier
+module bytes, constants, state, code addresses, assets, and guards are retained.
+Startup covers the new allocation. There is no ROM growth or saved/profile/actor
+format change. The first build attempt stops before compilation because the
+new frame assertion names `800B4064` instead of the actual store at `800B4060`.
+The corrected exact-instruction assertion builds successfully in fresh output.
+
+The sanitizer-backed host test passes. Four current-cartridge checks pass in
+6.148 seconds, covering complete source/native consumers, the sole four-byte
+core hook, retained old code/assets/sequence, CRC/guards/startup length, rejection
+of occupied/unowned/changed sequence storage, every unrelated resource,
+original-ROM UPS reconstruction/checksum, the all-selected 128-choice build,
+and exact empty selection. Commands:
+
+```sh
+python3 -m unittest tests.test_v3_player_actions.SelectionHostTests.test_shovel_effects -v
+python3 -m unittest tests.test_v3_player_actions.ShovelEffectsTests -v
+```
+
+The first silent native run at `build/smoke-v3-shovel-effects-01/` passes
+**186 records and 174 assertions**, with 29 shovel cases. Results SHA-256:
+`868b47a2dd5fde5d2ae93d3855874f066841016ad831d89d49c8859492e3b0bb`.
+It verifies the complete cartridge-loaded module, actual hook and item/position
+arguments, normal/imported-normal/golden kinds, every dig status, strict
+positive/negative position boundaries, Y-only movement, winning/losing native
+RNG advances, item output guards, previous-position updates, unchanged player
+and saved state, stack/callee-saved registers, restored globals/profile, both
+equipment guards, checkpoint restoration, zero fault, and clean exit. No code
+is uploaded, no user save is used, and audio stays silent.
+
+Most cases inject a status/item result at the unchanged native function's entry
+to isolate the new compiled suffix. The out-of-world negative-X case instead
+runs the entire native cancellation path. This is not ordinary terrain digging,
+buried-item gameplay, reward animation, acquisition, persistence, GPU appearance,
+or original hardware. Reuse unchanged prior tool evidence; do not replay it.
+Imported saves need matching-or-larger profiles and must not be used in V2.
+
+Next verify actual axe wear/exemption consumers and connect shared parent,
+inventory, acquisition/demo, and persistence support before enabling tools.
+Balloon release on get-up remains a separate shared dependency.
+
 ## Shared golden-rod response
 
 The explicit proposal is ABI 133 at

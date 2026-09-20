@@ -77,7 +77,9 @@ SOURCES = ('tools/v3_player_actions.py','tools/v3_furniture_pipeline.py',
            'overlays/v3/held_rigs.ld','overlays/v3/tool_controls.c',
            'overlays/v3/tool_motion.c','overlays/v3/tool_motion.S',
            'overlays/v3/tool_motion.ld','overlays/v3/tool_recovery.c',
-           'overlays/v3/tool_net.c','overlays/v3/tool_rod.S') + sound_programs.SOURCES
+           'overlays/v3/tool_net.c','overlays/v3/tool_rod.S',
+           'overlays/v3/tool_effects.c','overlays/v3/tool_effects.S',
+           'overlays/v3/tool_effects.ld') + sound_programs.SOURCES
 
 SELECTION_OFFSET=0x5500
 PARENT_CODE_OFFSET,PARENT_TABLE_OFFSET=0x3000,0x57F0
@@ -86,6 +88,88 @@ RIG_CODE_OFFSET,RIG_MODULE_SIZE=0xD000,0xE000
 RIG_STATE_OFFSET,RIG_STATE_BYTES,RIG_PLAYER_SIZE=0x12D8,44,0x1310
 BALLOON_MODULE_SIZE,BALLOON_STATE_OFFSET,BALLOON_STATE_BYTES=0xF000,0x1370,48
 TOOL_MOTION_OFFSET=0x2A50
+EFFECTS_OFFSET,EFFECTS_STATE_OFFSET,EFFECTS_MODULE_SIZE=0xF000,0xFFD0,0x10000
+
+
+def effects_reservation(base,prior,blob,core):
+    """Reclaim only the checked retired audio sequence's unused next 4 KiB."""
+    old=prior['equipment_resources'];start=old['blob_offset'];files=by_vrom(base)
+    module=bytes(blob[start:start+old['bytes']])
+    if (old['ram']!=RAM or old['bytes']!=EFFECTS_OFFSET or sha256(module)!=old['sha256']
+            or struct.unpack_from('>4I',module,len(module)-16)!=(GUARD,)*4
+            or RAM+EFFECTS_MODULE_SIZE>prior['furniture']['bank_pool']['start']):
+        raise ValueError('Tool effects require the complete guarded 60-KiB equipment module')
+    moved=old['held_rig_actions']['balloon']['sequence_relocation']
+    retired,current=moved['previous'],old['sound_programs']['sequence']
+    data,header,physical=sound_programs.installed_resource(base,core,'seq',current['index'])
+    first,last=start+EFFECTS_OFFSET,start+EFFECTS_MODULE_SIZE
+    if (current!=moved['current'] or retired['blob_offset']!=start+RIG_MODULE_SIZE
+            or retired['bytes']!=20240 or retired['sha256']!=current['sha256']
+            or first<retired['blob_offset'] or last>retired['blob_offset']+retired['bytes']
+            or current['blob_offset']<last or physical!=files[BLOB].pstart+current['blob_offset']
+            or len(data)!=current['bytes'] or sha256(data)!=current['sha256']
+            or header.hex()!=current['header_after']
+            or blob[current['blob_offset']:current['blob_offset']+len(data)]!=data
+            or last>len(blob) or any(blob[first:last])):
+        raise ValueError('Tool effects space is not the verified retired sequence range')
+    physical_first,physical_last=files[BLOB].pstart+first,files[BLOB].pstart+last
+    if any(e.pstart<physical_last and physical_first<(e.pend or e.pstart+e.size)
+           for v,e in files.items() if v!=BLOB and e.pstart!=0xFFFFFFFF):
+        raise ValueError('Tool effects extension overlaps another live resource')
+    for record in old['records']:
+        if record['blob_offset']<last and first<record['blob_offset']+record['bytes']:
+            raise ValueError('Tool effects extension overlaps equipment artwork')
+    return dict(first=first,end=last,bytes=last-first,retired_sequence=copy.deepcopy(retired),
+                current_sequence=copy.deepcopy(current),ram=RAM+EFFECTS_OFFSET)
+
+
+def refresh_shovel_effects(base,prior,blob,core,original,output):
+    """Actual-player golden shovel flag, native digging, and complete source bonus."""
+    old=prior['equipment_resources'];actions=old['player_actions'];start=old['blob_offset']
+    if not actions.get('rod_effects') or actions.get('shovel_effects'):
+        raise ValueError('Shovel effects require the complete current rod-effects proposal')
+    reservation=effects_reservation(base,prior,blob,core)
+    source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+                  (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    sources=[]
+    for offset,n,digest in (
+        (0x391E8,88,'a91eeaf7de41e2ef2d7ee7c0aa91f66831f22ec9b341c7e62392d2020932c320'),
+        (0x39240,472,'dde3fb10e1fd7d08f45745e6504b8224dca5893e6dcb59f9ca193660cad4f4e8'),
+        (0x6C438,4672,'e88166cd971c1fa648976a8a91afd0e7ad9806ff282b82ec94425b8586bacd41'),
+        (0x16A370,32,'efd5cbde1d80a021bb339dfee600bbeec429c281a49008bd4b07093ebcd7669b'),
+        (0x16A458,332,'1b69b77e9995c8d3b9821162b59ff91cbb2e3bc956468006c5f9c6199d1af77d')):
+        raw,receipt=source.function(offset)
+        if len(raw)!=n or sha256(raw)!=digest:raise ValueError('Changed complete source shovel consumer')
+        sources.append(receipt)
+    native=by_vrom(original)[CODE_VROM].extract(original);consumers=[]
+    for first,last in ((0x8008CAD8,0x8008CC1C),(0x800B4038,0x800B553C)):
+        a,b=first-CODE_RAM,last-CODE_RAM
+        if core[a:b]!=native[a:b]:raise ValueError('Changed native digging consumer')
+        consumers.append(dict(start=first,end=last,sha256=sha256(core[a:b])))
+    hook=0x800B5390;a=hook-CODE_RAM;before=bytes(core[a:a+4])
+    if (before!=struct.pack('>I',jump(0x8008CAD8,link=True)) or u32(core,a+4)!=0xAFA7000C
+            or u32(core,0x800B4038-CODE_RAM)!=0x27BDFD58
+            or u32(core,0x800B4060-CODE_RAM)!=0xAFA202A4):
+        raise ValueError('Changed shovel caller frame or actual-player slot')
+    code,compiled=compile_part('tool_effects',output/'tool_effects',extra_sources=('overlays/v3/tool_effects.S',))
+    if len(code)>EFFECTS_STATE_OFFSET-EFFECTS_OFFSET:raise ValueError('Tool effects overlap dig state')
+    module=bytearray(blob[start:start+old['bytes']])+bytearray(EFFECTS_MODULE_SIZE-old['bytes'])
+    module[EFFECTS_OFFSET:EFFECTS_OFFSET+len(code)]=code
+    struct.pack_into('>4I',module,len(module)-16,*([GUARD]*4))
+    after=struct.pack('>I',jump(compiled['symbols']['af_v3_shovel_call'],link=True))
+    core[a:a+4]=after;blob[start:start+len(module)]=module
+    report=copy.deepcopy(old)
+    report.update(bytes=len(module),sha256=sha256(module),crc32=zlib.crc32(module),
+                  additional_resident_bytes=len(module)-old['bytes'])
+    report['player_actions']['shovel_effects']=dict(format='AFV3-SHOVEL-EFFECTS-1',code=compiled,
+        reservation=reservation,source_functions=sources,native_consumers=consumers,
+        hook=dict(address=hook,before=before.hex(),after=after.hex()),
+        previous_position_ram=RAM+EFFECTS_STATE_OFFSET,previous_position_bytes=12,
+        caller_player_slot=676,player_kind_offset=0x1117,golden_kind=90,
+        random_function=0x8002C9AC,bonus_item=0x2103,bonus_status=5,
+        native_digging_retained=True,ordinary_digs_update_position=True,
+        logical_imports_added=0,ordinary_gameplay_tested=False)
+    return report,{}
 
 
 def refresh_rod_effects(base,prior,blob,core,original,output):
@@ -1434,6 +1518,9 @@ def expanded_tables(source,owner,reloc,*,categories=CATEGORIES,native_count=NATI
 
 def install(base,prior,blob,core,original,output):
     old=prior.get('equipment_resources',{})
+    if (old.get('player_actions',{}).get('rod_effects') and
+            not old['player_actions'].get('shovel_effects')):
+        return refresh_shovel_effects(base,prior,blob,core,original,output)
     if (old.get('player_actions',{}).get('net_capture') and
             not old['player_actions'].get('rod_effects')):
         return refresh_rod_effects(base,prior,blob,core,original,output)

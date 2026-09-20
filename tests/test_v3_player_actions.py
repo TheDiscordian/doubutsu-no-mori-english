@@ -30,6 +30,86 @@ TOOL_MOTION=ROOT/os.environ.get('V3_TOOL_MOTION_BUILD','build/v3-shared-tool-mot
 TRANSITIONS=ROOT/os.environ.get('V3_TOOL_TRANSITIONS_BUILD','build/v3-shared-tool-transitions-01')
 NET_CAPTURE=ROOT/os.environ.get('V3_NET_CAPTURE_BUILD','build/v3-shared-net-capture-01')
 ROD_EFFECTS=ROOT/os.environ.get('V3_ROD_EFFECTS_BUILD','build/v3-shared-rod-effects-01')
+SHOVEL_EFFECTS=ROOT/os.environ.get('V3_SHOVEL_EFFECTS_BUILD','build/v3-shared-shovel-effects-02')
+
+
+@unittest.skipUnless((SHOVEL_EFFECTS/'build-lock.json').is_file(),'Current shovel effects required')
+class ShovelEffectsTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.rom,cls.report=inputs(SHOVEL_EFFECTS/'build-lock.json')
+        cls.base,cls.prior=inputs(SHOVEL_EFFECTS/'base-lock.json')
+        cls.files,cls.before=by_vrom(cls.rom),by_vrom(cls.base)
+        cls.e=cls.report['equipment_resources'];cls.old=cls.prior['equipment_resources']
+        cls.effects=cls.e['player_actions']['shovel_effects']
+
+    def test_exact_core_hook_and_complete_native_consumers(self):
+        from aflib import CODE_RAM
+        core=bytearray(self.files[CODE_VROM].extract(self.rom));old=self.before[CODE_VROM].extract(self.base)
+        hook=self.effects['hook'];at=hook['address']-CODE_RAM
+        self.assertEqual(core[at:at+4].hex(),hook['after']);self.assertEqual(old[at:at+4].hex(),hook['before'])
+        core[at:at+4]=bytes.fromhex(hook['before']);self.assertEqual(core,old)
+        original=(ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes()
+        native=by_vrom(original)[CODE_VROM].extract(original)
+        for row in self.effects['native_consumers']:
+            data=core[row['start']-CODE_RAM:row['end']-CODE_RAM]
+            self.assertEqual(data,native[row['start']-CODE_RAM:row['end']-CODE_RAM])
+            self.assertEqual(sha256(data),row['sha256'])
+        source=actions.Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+                              (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+        for row in self.effects['source_functions']:
+            raw,receipt=source.function(row['offset'])
+            self.assertEqual(sha256(raw),row['sha256']);self.assertEqual(receipt['symbol'],row['symbol'])
+
+    def test_guarded_growth_retains_all_prior_code_state_and_assets(self):
+        new=self.files[BLOB].extract(self.rom);old=self.before[BLOB].extract(self.base);at=self.e['blob_offset']
+        self.assertEqual(new[at:at+self.old['bytes']],old[at:at+self.old['bytes']])
+        self.assertEqual(self.e['bytes'],0x10000);self.assertEqual(self.e['ram'],self.old['ram'])
+        compiled=self.effects['code'];a=at+actions.EFFECTS_OFFSET
+        self.assertEqual(sha256(new[a:a+compiled['bytes']]),compiled['sha256'])
+        state=self.effects['previous_position_ram']-actions.RAM+at
+        self.assertEqual(new[state:state+12],bytes(12))
+        self.assertEqual(struct.unpack_from('>4I',new,at+self.e['bytes']-16),(actions.GUARD,)*4)
+        self.assertEqual(zlib.crc32(new[at:at+self.e['bytes']]),self.e['crc32'])
+        self.assertIn('-DAF_V3_EQUIPMENT_BYTES=0x10000u',self.report['startup']['flags'])
+        for key in self.old.keys()-{'bytes','sha256','crc32','additional_resident_bytes','player_actions'}:
+            self.assertEqual(self.e[key],self.old[key],key)
+        self.assertEqual({k:v for k,v in self.e['player_actions'].items() if k!='shovel_effects'},self.old['player_actions'])
+        self.assertEqual(self.report['save_runtime'],self.prior['save_runtime'])
+
+    def test_growth_rejects_occupied_moved_or_unowned_space(self):
+        import copy
+        blob=bytearray(self.before[BLOB].extract(self.base));core=bytearray(self.before[CODE_VROM].extract(self.base))
+        receipt=actions.effects_reservation(self.base,self.prior,blob,core)
+        self.assertEqual(receipt,self.effects['reservation'])
+        damaged=bytearray(blob);damaged[receipt['first']]=1
+        with self.assertRaises(ValueError):actions.effects_reservation(self.base,self.prior,damaged,core)
+        prior=copy.deepcopy(self.prior);prior['equipment_resources']['held_rig_actions']['balloon']['sequence_relocation']['previous']['bytes']=4096
+        with self.assertRaises(ValueError):actions.effects_reservation(self.base,prior,blob,core)
+        damaged=bytearray(core);damaged[self.old['sound_programs']['sequence']['header_address']-actions.CODE_RAM]^=1
+        with self.assertRaises(ValueError):actions.effects_reservation(self.base,self.prior,blob,damaged)
+
+    def test_patch_resources_and_optional_composition(self):
+        import v3_optional_composition as composer
+        native=(ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes()
+        self.assertEqual(apply_ups(native,(SHOVEL_EFFECTS/'asset-loader.ups').read_bytes()),self.rom)
+        self.assertEqual(struct.unpack_from('>2I',self.rom,16),n64_checksum(self.rom))
+        self.assertEqual(self.files,self.before)
+        for v,entry in self.files.items():
+            if v not in (BLOB,CODE_VROM,MODULE):
+                self.assertEqual(entry.extract(self.rom),self.before[v].extract(self.base),hex(v))
+        blob=bytearray(self.files[BLOB].extract(self.rom));old=self.before[BLOB].extract(self.base)
+        blob[4:8]=old[4:8];a=self.e['blob_offset']+actions.EFFECTS_OFFSET;b=self.e['blob_offset']+self.e['bytes']
+        blob[a:b]=old[a:b];self.assertEqual(blob,old)
+        pin=composer.BASE,composer.BASE_SHA,composer.REPORT_SHA,composer.ABI
+        try:
+            composer.use_build_lock(SHOVEL_EFFECTS/'build-lock.json')
+            catalogue=composer.catalogue(self.rom,self.report)
+            empty=composer.compose(self.rom,self.report,catalogue,composer.resolve(catalogue,[]))[0]
+            self.assertEqual(sha256(empty),'a09373b051cbcd93991e5dd6cb17a238a2afb1e2e2d7694d75408d24a55d4eee')
+            complete=composer.compose(self.rom,self.report,catalogue,composer.resolve(catalogue,list(catalogue)))[0]
+            self.assertEqual(complete,self.rom);self.assertEqual(len(catalogue),128)
+        finally:composer.BASE,composer.BASE_SHA,composer.REPORT_SHA,composer.ABI=pin
 
 
 @unittest.skipUnless((ROD_EFFECTS/'build-lock.json').is_file(),'Current golden rod effects required')
@@ -576,6 +656,9 @@ class PocketIconTests(unittest.TestCase):
 
 class SelectionHostTests(unittest.TestCase):
     sanitized=shared_tests.HostTests.sanitized
+
+    def test_shovel_effects(self):
+        self.sanitized('v3_tool_effects_test.c')
 
     def test_source_net_parameters(self):
         self.sanitized('v3_tool_net_test.c')

@@ -14,6 +14,11 @@ fish behaviours. Normal fishing stays unchanged; selected golden rods use the
 donor differences in native timing units. The existing resource-tail allocator
 handles the compressed fish owner without extra resident memory. See
 [golden-rod response](V3_HANDHELD_ITEMS.md#shared-golden-rod-response).
+The shovel stage uses the actual player's kind, retained native digging, and
+source position/RNG rules to generate the 100-Bell bonus. It reclaims a verified
+4-KiB portion of a retired audio sequence, retaining the live relocated sequence
+and every existing code/state address. See
+[golden-shovel digging](V3_HANDHELD_ITEMS.md#shared-golden-shovel-digging).
 
 New furniture uses `tools/v3_furniture_pipeline.py`, not a new Python item list,
 family installer, catalogue switch, or dedicated native scenario. Extend shared
