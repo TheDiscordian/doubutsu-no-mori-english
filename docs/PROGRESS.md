@@ -45,8 +45,13 @@ matching or larger profile; older builds lacking them reject these saves.
 Imported V3 saves remain unsuitable for V2. Empty selection returns exact V2-12.
 
 Ordinary equipped-pinwheel gameplay, acquisition, persistence, listening, and
-hardware remain unverified. The independent seasonal-copy issue remains
-unresolved and prevents main-lock promotion or a playable V3 handoff. See the
+hardware remain unverified. All four seasonal setter-copy routines have passing
+complete-return component evidence on this cartridge. The prior stack mismatch
+depends on stopping at an internal return instruction; it is not reproduced
+across the complete epilogue. The overall focused run remains partial because
+of a final guard-expectation typo, and full seasonal rendering/gameplay remains
+open. No cartridge change is needed for the tested copy operation. See the
+[diagnosis](checkpoints/V3_FURNITURE_PIPELINE.md#seasonal-setter-copy-diagnosis) and
 [category checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-parent-category-expansion).
 
 The current ABI-116 two-fan profile has an isolated festival-night fixture with
@@ -73,9 +78,8 @@ matching empty, all-installed, mixed, and equipment outputs from both supplied
 games. Ordinary letter appearance and hardware remain
 unverified; the older rendering fixture is not relabelled as passed.
 
-Continue from `build/v3-translation-headers-02/build-lock.json` explicitly.
-The inherited seasonal-copy failure still prevents main-lock promotion or a
-playable handoff. Ordinary acquisition and order/delivery remain open; continue
+The current ABI-121 proposal retains these translation changes. Ordinary
+acquisition and order/delivery remain open; continue
 shared category implementation without replaying exhausted navigation batches.
 Both served patchers remain unchanged. See the
 [translation checkpoint](checkpoints/MUSEUM_LETTER_HEADERS.md#v3-integration).
@@ -94,8 +98,8 @@ Pickup remains unverified: the house forces the dropped item away from the
 player, and the bounded navigation retry stops about 21 units from it before
 issuing pickup. The corrected limit/radius is unexecuted; do not replay that
 failed setup. Ten focused observation/navigation checks pass. Next pursue
-ordinary reward acquisition/catalogue delivery, retaining the independent
-seasonal-copy issue as unresolved. The main
+ordinary reward acquisition/catalogue delivery, retaining the seasonal rendering
+and gameplay checks as open. The main
 lock stays ABI 109; this evidence is for one copied town/profile, not every
 parent, cross-profile migration, or hardware. See the
 [persistence checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#ordinary-equipment-put-away-drop-and-persistence).
@@ -117,9 +121,9 @@ the corrected genuine-input-change fixture is unexecuted. Preserve these
 successful downloads instead of replaying the full setup. The prior catalogue's
 104-record/70-assertion native result applies to unchanged runtime code.
 
-Next classify the inherited seasonal-copy failure and complete ordinary
+Next complete ordinary
 acquisition, pickup, and order/delivery gameplay on the current selected build.
-Use the ABI-116 proposal lock; the main lock remains ABI 109. Do not hand over
+Use the ABI-121 proposal lock; the main lock remains ABI 109. Do not hand over
 this proposal as validated. Saves containing fan selections require those bits;
 older profiles reject them. Codec acceptance of equal/superset profiles is tested,
 but ordinary cross-build reload and hardware are not. Both served V2 patchers
@@ -148,8 +152,8 @@ single provenance catalogue credits every adaptation and new label. All
 handheld choices remain absent from the served patchers. The current explicit
 proposal connects collection/catalogue and optional selection; ordinary gameplay
 is still required. Reuse the installed shared consumers and prepared models.
-The main lock stays ABI 109 because the inherited seasonal-copy check remains
-unresolved. See the [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-event-menu-and-transactions).
+The main lock stays ABI 109 pending combined gameplay verification. See the
+[checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-event-menu-and-transactions).
 
 The proposed ABI 110 at `build/v3-ground-categories-02/` implements the shared
 seasonal ground adapter: all four renderers, their complete category tables,
@@ -161,7 +165,8 @@ reconverted, and no handheld choice or saved format changes.
 Six focused tests and twelve composition tests pass. Native startup, selected/
 disabled/original categories, the complete cherry owner/table, four constructor
 index pointers/counts, and local-array clearing pass. The setter-copy window
-has an unresolved continuation/stack assertion. Remaining seasonal execution,
+has a breakpoint-dependent continuation/stack assertion, classified by the
+current complete-return checks above. Remaining seasonal execution,
 drawing, final guards, and checkpoint restoration are not established. The
 main lock remains ABI 109; do not hand over the proposed build as validated.
 See the [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-seasonal-ground-runtime).
@@ -181,12 +186,10 @@ guards, and restored profile/checkpoint. This is component execution, not GPU
 appearance, ordinary acquisition, or save/reload verification. See the
 [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-police-and-handover-runtime).
 
-The proposed adapter above connects all four seasonal consumers and the global
-item-type wrapper, but its outstanding native copy check prevents promotion.
-Continue shared acquisition, collection/catalogue, and optional selection while
-retaining that unresolved check. All added handheld choices stay disabled.
-Saved formats, the 104 experimental choices, the import-free V2 baseline, and
-both served patchers remain unchanged.
+The proposed adapter connects all four seasonal consumers and the global
+item-type wrapper. Current ABI 121 supplies shared acquisition, collection,
+catalogue, and optional selections for fans and pinwheels. Full seasonal
+rendering and ordinary gameplay remain open; both served patchers stay unchanged.
 
 The retained ABI 108 integration connects the inventory
 screen's separate equipment selector, all eight shape/animation/draw tables,

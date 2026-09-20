@@ -871,8 +871,10 @@ compatible profiles to load into a matching or larger profile; builds lacking
 required bits reject the save. Removing imports is not migration, and imported
 V3 saves must not be loaded in V2. Ordinary pinwheel gameplay, cross-version
 game saves, and hardware are separate from code/codec/component checks.
-The independent seasonal-copy issue remains unresolved and blocks a playable
-handoff. See the [category checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-parent-category-expansion).
+The seasonal copy/return routines have passing focused component evidence;
+full seasonal rendering and ordinary gameplay remain open. See the
+[diagnosis](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#seasonal-setter-copy-diagnosis)
+and [category checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-parent-category-expansion).
 
 ## Shared parent names and prices
 
@@ -1270,9 +1272,16 @@ furniture, scenery, and equipment retain their values. Native category numbering
 remains `27 + donor category`; saved identities never depend on season or order.
 
 The adapter is implemented in a proposed build, not yet the promoted lock.
-Focused host/cartridge and optional-composition checks pass; native validation
-is incomplete at the setter-copy window. See the exact evidence and unresolved
-check in the [checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-seasonal-ground-runtime).
-Full outdoor gameplay, acquisition, collection/catalogue, optional parent
-selection, persistence, and original hardware remain required before completed
-handheld imports can be claimed. Both V2 patchers stay unchanged.
+Focused host/cartridge and optional-composition checks pass. All four native
+setter-copy routines have complete-return component evidence. The probe observes
+SP before the epilogue adjustment and at an external return address; an internal
+return-instruction breakpoint gives an inconsistent SP in the installed emulator.
+Scratch memory starts after the actual current equipment module, not at a fixed
+address inside later larger modules. This focused mode does not execute the full
+classification/constructor/drawing path. Its overall run remains partial because
+of a final guard-expectation typo; see the
+[diagnosis](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#seasonal-setter-copy-diagnosis).
+Current parent selections, acquisition components, and collection/catalogue are
+connected for fans and pinwheels. Full outdoor gameplay, ordinary acquisition,
+persistence, and original hardware remain required before completed handheld
+imports can be claimed. Both V2 patchers stay unchanged.

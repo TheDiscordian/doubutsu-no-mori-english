@@ -802,9 +802,9 @@ def exercise(debug, rom_path, record, *, section='automatic_furniture'):
     if section=='held_collection':return held_collection(debug,rom_path,record)
     if section=='event_menu':return event_menu(debug,rom_path,record)
     if section=='event_acquisition':return event_stock(debug,rom_path,record)
-    if section=='ground_categories':
+    if section in ('ground_categories','ground_copy'):
         from v3_ground_categories_smoke import exercise as ground_categories
-        return ground_categories(debug,rom_path,record)
+        return ground_categories(debug,rom_path,record,copy_only=section=='ground_copy')
     if section=='equipment_resources':return equipment_resources(debug,rom_path,record)
     if section=='equipment_bank_switch':return equipment_bank_switch(debug,rom_path,record)
     if section=='held_rig_actions':return held_rig_actions(debug,rom_path,record)

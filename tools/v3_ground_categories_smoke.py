@@ -12,7 +12,7 @@ from v3_furniture_room_smoke import extend
 import v3_ground_categories as ground
 
 
-def exercise(debug,rom_path,record):
+def exercise(debug,rom_path,record,*,copy_only=False):
     path=Path(rom_path);image=path.read_bytes();report=json.loads((path.parent/'build.json').read_bytes())
     if sha256(image)!=report['output_sha256']:raise ValueError('Ground probe requires its exact cartridge')
     equipment=report['equipment_resources'];receipt=equipment['ground_categories']
@@ -33,7 +33,7 @@ def exercise(debug,rom_path,record):
     saved={at:debug.read_memory(at,n) for at,n in [(s['slot'],4) for s in receipt['owners']]+[(0x80460020,192)]}
     # Keep executable owners in the debugger's low-RAM proof range. Actor/data
     # fixtures use the checked gap after this module and before model banks.
-    scratch,scratch_size=0x804B0000,0x22000
+    scratch,scratch_size=(ground.RAM+equipment['bytes']+0xFFF)&~0xFFF,0x22000
     if not ground.RAM+equipment['bytes']<=scratch<scratch+scratch_size<=report['furniture']['bank_pool']['start']:
         raise ValueError('No verified unowned Expansion Pak fixture space')
     scratch_saved=debug.read_memory(scratch,scratch_size)
@@ -56,17 +56,30 @@ def exercise(debug,rom_path,record):
         for p in parents:profile[p['profile_byte']]&=~p['profile_mask']
         if enabled:profile[parent['profile_byte']]|=parent['profile_mask']
         debug.write_memory(0x80460020,profile)
-    def window(start,end,updates,expected_sp=None):
+    def window(start,end,updates,expected_sp=None,waypoint=None):
         before=debug.command('g');regs=[int(before[i:i+16],16) for i in range(0,len(before),16)]
         if len(regs)!=71 or regs[37]&0xFFFFFFFF!=0x800D334C:raise ValueError('Ground window needs paused game frame')
         regs[29]=extend(stack);regs[37]=extend(start)
         for r,v in updates.items():regs[r]=extend(v)
         bp=f'0,{end:x},4'
         if debug.command('Z'+bp)!='OK':raise ValueError('Ground breakpoint refused')
+        middle=f'0,{waypoint:x},4' if waypoint is not None else None
+        if middle and debug.command('Z'+middle)!='OK':raise ValueError('Ground waypoint refused')
         try:
             if debug.command('G'+''.join(f'{r:016x}' for r in regs))!='OK':raise ValueError('Ground registers refused')
+            applied=debug.command('g')
+            if any(int(applied[i*16:(i+1)*16],16)!=regs[i] for i in {*updates,29,37}):
+                raise ValueError('Ground fixture registers were not applied')
             stopped=debug.command('c');raw=debug.command('g')
             actual=[int(raw[i:i+16],16) for i in range(0,len(raw),16)]
+            if middle:
+                record(dict(ground_epilogue_waypoint=f'{waypoint:08X}',stop=stopped,
+                    actual_pc=f'{actual[37]:016X}',actual_sp=f'{actual[29]:016X}',
+                    input_sp=f'{regs[29]:016X}'))
+                if actual[37]&0xFFFFFFFF!=waypoint:raise ValueError('Ground epilogue waypoint not reached')
+                debug.command('z'+middle);middle=None
+                stopped=debug.command('c');raw=debug.command('g')
+                actual=[int(raw[i:i+16],16) for i in range(0,len(raw),16)]
             passed=stopped[:3] in ('T05','S05') and actual[37]&0xFFFFFFFF==end
             passed &= actual[29]==extend(regs[29] if expected_sp is None else expected_sp)
             record(dict(ground_window=f'{start:08X}',stop=stopped,
@@ -75,16 +88,35 @@ def exercise(debug,rom_path,record):
                 actual_sp=f'{actual[29]:016X}',assertion='passed' if passed else 'failed'))
             if not passed:raise ValueError('Ground continuation/stack mismatch')
             return actual
-        finally:debug.command('z'+bp);debug.command('G'+before)
+        finally:
+            if middle:debug.command('z'+middle)
+            debug.command('z'+bp);debug.command('G'+before)
+    def copy_array(spec,loaded,common):
+        cap=spec['capacity'];frame=cap['stack_bytes'];destination=actor+cap['index_offset']
+        check(spec['role']+' retained incoming common pointer',stack+4,struct.pack('>I',common))
+        values=struct.pack('>'+str(cap['count'])+'H',*range(1,cap['count']+1))
+        debug.write_memory(stack-frame+44,values)
+        # Execute the whole return sequence, observing SP immediately before
+        # its increment and at an external return address. A breakpoint on JR
+        # itself gives an inconsistent SP in the installed emulator.
+        put(stack-frame+28,bridge)
+        epilogue=0x5EE8 if spec['role']=='winter' else 0x5EC8
+        if u32(loaded,epilogue)!=(0x27BD0000|frame):
+            raise ValueError('Changed complete ground epilogue increment')
+        window(root+0x5E78,bridge,{29:stack-frame},stack,root+epilogue)
+        check(spec['role']+' complete extended start copy',destination,values)
+        check(spec['role']+' next index array remains untouched',destination+len(values),bytes(cap['index_stride']))
+        check(spec['role']+' copy completion flag',common+0x4850,struct.pack('>H',1))
     try:
-        select(False);call(0x800A5630,[item],0)
-        select(True);call(0x800A5630,[item],art['native_category'])
-        # Category fallback now bypasses the core entry; original items must not recurse.
-        original_stub=struct.pack('>II',ground.jump(0x8046744C),0)
-        debug.write_memory(bridge,original_stub);call(0x8002FE00,[bridge,8]);call(0x80034CE0,[bridge,8])
-        native_type=call(bridge,[0x2200],proof=(bridge,original_stub))
-        call(0x800A5630,[0x2200],native_type)
-        debug.write_memory(bridge,stub);call(0x8002FE00,[bridge,8]);call(0x80034CE0,[bridge,8])
+        if not copy_only:
+            select(False);call(0x800A5630,[item],0)
+            select(True);call(0x800A5630,[item],art['native_category'])
+            # Category fallback bypasses the core entry; original items must not recurse.
+            original_stub=struct.pack('>II',ground.jump(0x8046744C),0)
+            debug.write_memory(bridge,original_stub);call(0x8002FE00,[bridge,8]);call(0x80034CE0,[bridge,8])
+            native_type=call(bridge,[0x2200],proof=(bridge,original_stub))
+            call(0x800A5630,[0x2200],native_type)
+            debug.write_memory(bridge,stub);call(0x8002FE00,[bridge,8]);call(0x80034CE0,[bridge,8])
         for variant,spec in enumerate(receipt['owners']):
             owner,rel=(files[spec[k]].extract(image) for k in ('vrom','reloc'))
             sections=struct.unpack_from('>5I',rel);cap=spec['capacity'];resident=cap['resident_bytes']
@@ -92,6 +124,18 @@ def exercise(debug,rom_path,record):
             call(0x800262D0,[spec['vrom'],spec['vrom']+len(owner),spec['ram'],spec['ram']+resident,root,root+resident,len(rel)])
             check(spec['role']+' complete loaded owner and BSS',root,loaded);put(spec['slot'],root)
             proof=(root,loaded[:sections[0]])
+            if copy_only:
+                # Resume the unresolved operation without replaying category
+                # discovery, constructors, or graphics setup. Real cartridge
+                # code owns the local array, matrix clear, copy, and epilogue.
+                debug.write_memory(actor,bytes(cap['actor_bytes']))
+                common=actor+spec['common'];destination=actor+cap['index_offset']
+                put(common+0x4848,destination)
+                frame=cap['stack_bytes'];put(stack+16,0)
+                window(root+0x5E14,root+0x5E70,{5:common,7:data},stack-frame)
+                check(spec['role']+' zeroed complete local array',stack-frame+44,bytes(cap['count']*2))
+                copy_array(spec,loaded,common)
+                continue
             call(bridge,[variant],root,(bridge,stub))
             table=root+cap['table_offset'];parts=root+cap['parts_offset']
             expected=bytearray(cap['resident_bytes']-cap['table_offset'])
@@ -134,10 +178,7 @@ def exercise(debug,rom_path,record):
             nodes=debug.read_memory(common,257*72)
             if any(struct.unpack_from('>h',nodes,i*72+68)[0]!=256 for i in range(257)):
                 raise ValueError('Ground matrix-list sentinel initialization failed')
-            values=struct.pack('>'+str(cap['count'])+'H',*range(1,cap['count']+1))
-            debug.write_memory(stack-frame+44,values)
-            window(root+0x5E78,root+(0x5EEC if spec['role']=='winter' else 0x5ECC),{29:stack-frame},stack)
-            check(spec['role']+' complete extended start copy',actor+cap['index_offset'],values)
+            copy_array(spec,loaded,common)
             # Both native ID paths share the global category reader and new type hooks.
             put(data,*([data+32]*4));debug.write_memory(data+32,bytes(12))
             furniture=int(report['furniture']['imports'][0]['item_id'],16)
@@ -172,5 +213,6 @@ def exercise(debug,rom_path,record):
         call(0x8009C040,[allocation])
     for at,want in saved.items():check('restored owner/profile',at,want)
     check('restored Expansion Pak scratch',scratch,scratch_saved)
-    return dict(seasonal_owners=4,constructed_index_arrays=16,imported_descriptors=36,
+    return dict(seasonal_owners=4,constructed_index_arrays=0 if copy_only else 16,
+        imported_descriptors=0 if copy_only else 36,setter_copy_only=copy_only,
         gpu_rendered=False,ordinary_gameplay_tested=False,save_reload_tested=False,requires_checkpoint_restore=True)

@@ -12,12 +12,15 @@ purchase fixture, and real browser worker pass; ordinary pinwheel gameplay and
 persistence remain open. See the
 [category checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-parent-category-expansion).
 
-Classify the independent seasonal-copy continuation/stack mismatch using its
-recorded instruction window and actual-PC/SP diagnostic before promoting a
-playable handoff. Work against the current proposal, not an old candidate.
-Do not replay exhausted navigation or setup attempts without a concrete
-correction. Continue remaining shared equipment categories and acquisition
-alongside that investigation; balloon texture/joint capacity and net/rod matrix
+The seasonal setter-copy mismatch is classified as breakpoint-boundary-dependent:
+all four actual routines copy their complete arrays and restore the stack when
+checked across the full epilogue. The overall focused run remains partial due
+to a final guard-expectation typo; no further replay is warranted for that typo.
+Full seasonal rendering and ordinary gameplay remain open. See the
+[diagnosis](checkpoints/V3_FURNITURE_PIPELINE.md#seasonal-setter-copy-diagnosis).
+Work against the current proposal, not an old candidate. Do not replay exhausted
+navigation or setup attempts. Continue shared equipment categories and acquisition;
+balloon texture/joint capacity and net/rod matrix
 dependencies remain implementation work, not disabled-content completion.
 
 Ten focused sound checks pass. The first silent native sound check passes
@@ -67,7 +70,7 @@ stops at the stall counter before dialogue; no payment, handover, or new catalog
 ownership is proven. Preserve `build/v3-festival-near-stall-01/` for a later
 meaningful gameplay batch or human check. The setup retry is spent; do not replay
 the route or boot prefix. Keep ordinary acquisition and catalogue delivery open,
-and keep the independent seasonal-copy assertion unresolved. See the
+and retain full seasonal rendering/gameplay as open. See the
 [festival checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#ordinary-festival-acquisition-setup).
 
 The ABI-117 proposal retains the ABI-116 Museum-header correction
@@ -79,8 +82,7 @@ checks. Seventeen focused checks and fourteen browser/offline profiles pass;
 actual worker reconstruction also matches empty, all, mixed, and equipment
 outputs. The full interface's separate prior invalidation check remains partial;
 the worker result does not close it. Ordinary mail appearance and hardware
-remain unverified. The separate
-seasonal-copy failure remains unresolved, so the main lock stays ABI 109.
+remain unverified. The main lock stays ABI 109 pending combined gameplay checks.
 
 The two-fan profile in `build/v3-held-subset-01/` passes normal equipping,
 putting away, dropping with correct ground artwork, and an ordinary gyroid
@@ -95,8 +97,7 @@ partial: `build/v3-equipment-drop-pickup-01/` retains the dropped checkpoint,
 and the single navigation retry stops 20.575 units from the item before pickup.
 The corrected limit/radius is unexecuted. Its setup retry is spent; do not
 replay it under a renamed batch. These scenarios do not establish all equipment,
-cross-profile save migration, or hardware. Keep the separate seasonal-copy
-continuation assertion unresolved; the main lock remains ABI 109. See the
+cross-profile save migration, or hardware. The main lock remains ABI 109. See the
 [persistence evidence](checkpoints/V3_FURNITURE_PIPELINE.md#ordinary-equipment-put-away-drop-and-persistence).
 
 The proposed ABI 115 in `build/v3-held-selection-02/` adds eight equipment-parent
@@ -108,8 +109,7 @@ leaves the complete UI check partial; the genuine-change correction is unexecute
 This batch's setup retry is spent. Do not replay the successful downloads.
 See the [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-held-parent-selections).
 
-Use the corrected-header proposal above for new builds. Classify the
-inherited seasonal-copy continuation/stack mismatch before promotion, and finish
+Use the current ABI-121 proposal for new builds. Finish
 ordinary acquisition, pickup, and order/delivery gameplay. The existing two-fan
 profile at `build/v3-held-subset-01/` is suitable for isolated developer checks,
 not a validated player handoff. Reuse installed artwork/readers and passing
@@ -124,12 +124,12 @@ passes 178 records/73 assertions, including actual pocket insertion/debit,
 rejected full pockets/short funds, single-order sales, sold-out retention,
 original merchandise, guards, and restored globals/checkpoint. The module is
 52 KiB, and the vendor gains four unsaved bytes. Handheld choices are confined
-to the explicit experimental proposal. The main lock stays ABI 109 because the inherited seasonal-copy
-check is unresolved. See the [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-event-menu-and-transactions).
+to the explicit experimental proposal. The main lock stays ABI 109 pending
+combined gameplay checks. See the [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-event-menu-and-transactions).
 
 The shared collection proposal above extends these transactions without changing
 the menu/payment code. Do not reconvert artwork, write per-item installers, or
-promote the unresolved ground dependency.
+claim full seasonal gameplay from component evidence.
 Keep disabled categories explicit and finish ordinary take-out/put-away,
 conversation/handover appearance, and persistence before a playable handoff.
 Do not replay passing stock/menu component checks without a relevant change.
@@ -152,17 +152,14 @@ adds owner-local tables and actor-tail index arrays, and preserves Christmas
 lights and the original no-draw sentinel. Do not repeat conversion or create
 per-item installers. The main lock remains ABI 109 pending native verification.
 
-The bounded native run stops at the cherry setter-copy window with an unresolved
-continuation/stack mismatch. Do not assume a fixture cause or mark it passed.
-Startup, category lookup, complete loaded cherry tables, four constructor index
-pointers/counts, and array clearing pass. PC/SP failure diagnostics are now
-present but unexecuted. Classify the copy-window failure before promotion;
-retain the other three seasons, drawing, guards, and restoration as unverified.
-See the [exact stopping point](checkpoints/V3_FURNITURE_PIPELINE.md#shared-seasonal-ground-runtime).
-The setup retry and new-harness budget for this batch are spent. Continue the
-shared acquisition menu and collection/catalogue/selection implementation, reusing
-the installed category resources. No test setup failure permits shipping a
-possible memory defect. All imported handheld choices remain disabled.
+The earlier full native run stops at the cherry setter-copy window. Its startup,
+category lookup, complete cherry tables, constructor pointers/counts, and array
+clearing pass. Current focused checks classify that copy-window mismatch and
+exercise all four complete copy/return routines; they do not complete the skipped
+classification, constructor, or drawing checks. Preserve those limits and the
+partial-run status described in the diagnosis above. Setup retry and harness
+budgets are spent. Continue shared category implementation, using the current
+16 experimental equipment choices; do not replay the old full probe.
 
 The retained inventory integration connects selected equipment kinds,
 all eight shape/animation/draw tables, and owner-relative callbacks for the
@@ -201,7 +198,7 @@ put-away, full scene drawing, persistence, and equipped-fan use explicit;
 native direct-reader checks do not establish ordinary inventory gameplay.
 No further selector/name/price native replay is needed without a relevant change.
 The corrected-header proposal carries the Museum fix and its V2-12 import-free
-pin; the main lock retains V2-11 until the unresolved native issue is classified.
+pin; the main lock retains V2-11 pending combined gameplay verification.
 
 ABI 102 at `build/v3-player-frame-sound-01/` contains the complete fan per-frame
 callback and shared sound-program converter. Its actual `0167` program retains

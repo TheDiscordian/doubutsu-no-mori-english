@@ -1,5 +1,47 @@
 # Automatic furniture pipeline checkpoint
 
+## Seasonal setter-copy diagnosis
+
+The focused check uses the unchanged ABI-121 cartridge at
+`build/v3-held-category-02/`, SHA-256
+`42fa74a2f66cfe28a4f81c1e4a718cbee86ed963e487982972f46ed9d63d7253`.
+It classifies the recorded setter-copy stack mismatch as dependent on the
+installed emulator's breakpoint boundary. No cartridge change is needed for
+the tested copy/return operations; the emulator's internal cause is not proven.
+
+`build/smoke-v3-ground-copy-01/results.json` reproduces the mismatch with exact
+PC/SP observations. Stopping at the cherry setter's internal return instruction
+reports SP `804D1108`, one 264-byte frame above expected `804D1000`, despite the
+complete code containing only one matching stack adjustment. Results SHA-256:
+`ae798e210bd286af012e73d5cbf74ea7cf9a7733ca57f79d92dc438c723a244e`.
+
+The one justified retry, `build/smoke-v3-ground-copy-02/results.json`, checks
+SP before the adjustment and after the complete epilogue at an external return
+address. All four actual cartridge-loaded seasonal owners return with the
+correct stack. Each clears its full local array, retains the incoming common
+pointer, copies all 108 indices (107 in winter), preserves the next array, and
+sets its completion flag. Private guards, the complete equipment module, zero
+CPU fault, restored owner/profile/scratch state, heap release, and checkpoint
+reload have passing evidence. The fixture scratch area follows the module's
+actual extent, avoiding the old fixed address inside the larger 56-KiB module.
+
+The retry records 75 results and 57 passing assertions. The overall process
+still exits unsuccessfully: the final translation-guard expectation contains
+only three words for a 16-byte read. The actual read contains the correct four
+guard words. The literal is corrected, but no further complete run is made;
+the retry/harness budget is spent. The final equipment-guard read after checkpoint
+reload and the ordinary successful-exit path are unexecuted. Do not relabel this
+partial run as a complete pass. Results SHA-256:
+`fdfa9f93739a4e6fccdd981f66cebef1e3076f05fc6080b35cab29c9e38ed712`.
+
+The focused mode deliberately skips category classification, constructors,
+drawing, and ordinary gameplay; its result reports zero constructed index arrays
+and imported descriptors. The existing full probe shares the corrected copy
+window but has not been replayed. Remaining seasonal rendering and ordinary
+gameplay checks stay open. Both runs are silent and use isolated checkpoints;
+no user saves, cartridge code, main lock, or served patchers change. Continue
+shared equipment conversion/integration from the explicit ABI-121 lock.
+
 ## Shared parent category expansion
 
 The shared catalogue refresh connects all eight pinwheels in one source-derived
