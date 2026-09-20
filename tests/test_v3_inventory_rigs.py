@@ -1,5 +1,6 @@
 """Animated inventory category records, unchanged native allocations, and complete installation."""
 import json
+import copy
 import os
 from pathlib import Path
 import struct
@@ -9,7 +10,7 @@ import zlib
 
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'tools'))
-from aflib import CODE_VROM,apply_ups,by_vrom,sha256
+from aflib import CODE_RAM,CODE_VROM,apply_ups,by_vrom,sha256,u32
 from v3_asset_loader import BLOB,MODULE
 from v3_furniture_install import inputs,reuse_resource_tail
 from v3_equipment_runtime import RAM,GUARD
@@ -91,6 +92,99 @@ class CartridgeTests(unittest.TestCase):
             empty=composer.compose(self.image,self.report,catalog,composer.resolve(catalog,[]))[0]
             self.assertEqual(sha256(empty),self.report['translation_baseline']['sha256'])
             self.assertEqual(composer.compose(self.image,self.report,catalog,composer.resolve(catalog,list(catalog)))[0],self.image)
+        finally:composer.BASE,composer.BASE_SHA,composer.REPORT_SHA,composer.ABI=pin
+
+
+CAPACITY=ROOT/'build/v3-inventory-capacity-02'
+
+
+@unittest.skipUnless((CAPACITY/'build-lock.json').is_file(),'Expanded inventory cartridge required')
+class JointCapacityTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.image,cls.report=inputs(CAPACITY/'build-lock.json')
+        cls.base,cls.prior=inputs(CAPACITY/'base-lock.json')
+        cls.files,cls.old_files=by_vrom(cls.image),by_vrom(cls.base)
+        cls.native=(ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes()
+        cls.e=cls.report['equipment_resources'];cls.p=cls.e['inventory_preview']
+        cls.work=cls.p['joint_work'];cls.blob=cls.files[BLOB].extract(cls.image)
+
+    def test_exact_initializer_arrays_owner_bounds_and_relocations(self):
+        w=self.work
+        self.assertEqual((w['vectors'],w['joint_offset'],w['morph_offset'],w['array_bytes']),
+                         (8,0x5E0,0x610,48))
+        self.assertEqual((w['bss_bytes'],w['resident_bytes'],w['additional_bss_bytes'],w['additional_pool_bytes']),
+                         (0x640,0x4800,96,64))
+        owner=bytearray(self.files[inventory.VROM].extract(self.image))
+        self.assertEqual(sha256(owner),self.p['owner_sha256'])
+        for p in w['patches']:
+            at=p['address']-inventory.OWNER_RAM
+            self.assertEqual(u32(owner,at),p['after']);struct.pack_into('>I',owner,at,p['before'])
+        self.assertEqual(owner,self.old_files[inventory.VROM].extract(self.base))
+        rel=bytearray(self.files[inventory.RELOC].extract(self.image))
+        self.assertEqual(u32(rel,12),0x640);struct.pack_into('>I',rel,12,w['previous_bss_bytes'])
+        self.assertEqual(rel,self.old_files[inventory.RELOC].extract(self.base))
+        parent=bytearray(self.files[inventory.MENU_VROM].extract(self.image))
+        self.assertEqual(len(w['metadata']),2)
+        for p in w['metadata']:
+            at=p['offset'];self.assertEqual(parent[at:at+32].hex(),p['after'])
+            self.assertEqual(u32(parent,at+12),inventory.OWNER_RAM+0x4800)
+            parent[at:at+32]=bytes.fromhex(p['before'])
+        self.assertEqual(parent,self.old_files[inventory.MENU_VROM].extract(self.base))
+        core=bytearray(self.files[CODE_VROM].extract(self.image));p=w['pool_patch'];at=p['address']-CODE_RAM
+        self.assertEqual(u32(core,at),p['after']);self.assertEqual(p['after']-p['before'],64)
+        struct.pack_into('>I',core,at,p['before'])
+        self.assertEqual(core,self.old_files[CODE_VROM].extract(self.base))
+        from npc_mail_show import relocate_verified_data
+        from types import SimpleNamespace
+        current=self.files[inventory.VROM].extract(self.image);rel=self.files[inventory.RELOC].extract(self.image)
+        for address in (0x80200010,0x80370010):
+            moved=relocate_verified_data(SimpleNamespace(ram=inventory.OWNER_RAM,
+                resident_bytes=w['resident_bytes'],sections=struct.unpack_from('>5I',rel)),current,rel,address)
+            self.assertEqual(moved[len(current):],bytes(w['bss_bytes']))
+            for p in w['patches']:self.assertEqual(u32(moved,p['address']-inventory.OWNER_RAM),p['after'])
+
+    def test_shared_growth_reproduces_cartridge_and_rejects_changed_ownership(self):
+        def run(prior=None,core=None):
+            return inventory.grow_joint_work(self.base,prior or self.prior,
+                bytearray(self.old_files[BLOB].extract(self.base)),
+                bytearray(self.old_files[CODE_VROM].extract(self.base)) if core is None else core,
+                self.native,CAPACITY)
+        e,changed=run();self.assertEqual(e,self.e)
+        for v,data in changed.items():self.assertEqual(data,self.files[v].extract(self.image))
+        damaged=copy.deepcopy(self.prior)
+        damaged['equipment_resources']['inventory_preview']['owner_sha256']='0'*64
+        with self.assertRaises(ValueError):run(damaged)
+        core=bytearray(self.old_files[CODE_VROM].extract(self.base))
+        struct.pack_into('>I',core,0x800C4B10-CODE_RAM,0x25CE7FF0)
+        with self.assertRaisesRegex(ValueError,'signed immediate'):run(core=core)
+        core=bytearray(self.old_files[CODE_VROM].extract(self.base))
+        struct.pack_into('>I',core,0x800C4B10-CODE_RAM,0x24CE8E20)
+        with self.assertRaisesRegex(ValueError,'submenu immediate'):run(core=core)
+
+    def test_every_other_resource_and_resident_module_are_retained(self):
+        changed={inventory.VROM,inventory.RELOC,inventory.MENU_VROM,CODE_VROM,BLOB,MODULE,0x19D40}
+        self.assertEqual(set(self.files),set(self.old_files))
+        for v in set(self.files)-changed:
+            self.assertEqual(self.files[v].extract(self.image),self.old_files[v].extract(self.base),hex(v))
+        a=self.e['blob_offset'];n=self.e['bytes']
+        self.assertEqual(self.blob[a:a+n],self.old_files[BLOB].extract(self.base)[a:a+n])
+        self.assertEqual(self.p['rows'],self.prior['equipment_resources']['inventory_preview']['rows'])
+        self.assertFalse(self.work['saved_format_changed'] or self.work['preview_records_changed'])
+        for key in ('save_runtime','furniture','translation_baseline','translation_updates'):
+            self.assertEqual(self.report[key],self.prior[key])
+        self.assertEqual(apply_ups(self.native,(CAPACITY/'asset-loader.ups').read_bytes()),self.image)
+
+    def test_optional_selection_and_exact_translation_only_stay_unchanged(self):
+        pin=(composer.BASE,composer.BASE_SHA,composer.REPORT_SHA,composer.ABI)
+        try:
+            composer.use_build_lock(CAPACITY/'build-lock.json');catalogue=composer.catalogue(self.image,self.report)
+            self.assertEqual(len(catalogue),120)
+            empty=composer.compose(self.image,self.report,catalogue,composer.resolve(catalogue,[]))[0]
+            self.assertEqual(sha256(empty),self.report['translation_baseline']['sha256'])
+            selection=composer.resolve(catalogue,list(catalogue))
+            self.assertEqual(selection['profile_hex'],self.prior['save_runtime']['profile_hex'])
+            self.assertEqual(composer.compose(self.image,self.report,catalogue,selection)[0],self.image)
         finally:composer.BASE,composer.BASE_SHA,composer.REPORT_SHA,composer.ABI=pin
 
 

@@ -1078,6 +1078,33 @@ interaction, GPU appearance, parent selection, or hardware claim follows from
 this component check. Exact evidence is in the
 [inventory-rig checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-animated-inventory-previews).
 
+### Inventory joint storage
+
+The `--player-actions` shared refresh also grows inventory joint work when
+installed outdoor rigs require more vectors. It compares complete existing
+owner/relocation hashes, restores the known table/speed hooks for a full native
+initializer comparison, and checks every reference to the old work arrays.
+Only two initializer immediates change: `8087D9AC` points to morph work and
+`8087D9BC` to joint work. Native seven-vector arrays at BSS `294/2BE` remain
+untouched; eight-vector arrays use appended BSS `5E0/610`.
+
+BSS is `640` bytes, giving a complete `4800`-byte resident inventory overlay.
+The relocation header and both submenu metadata rows at `2A10/2A30` carry the
+larger extent. Native `mSM_ovl_prog_seg` uses `ALIGN64` to advance the submenu
+allocation, so its complete 96-byte BSS increase needs 64 additional bytes
+relative to the previously rounded allocation. The shared maximum at `800C4B10`
+is increased accordingly, rejecting changed registers or signed-immediate
+boundary crossings. Native clearing covers the added BSS during overlay load.
+
+This changes storage only: the same preview rows, native timings, callbacks,
+resource tables, resident equipment code, and saved formats remain. The full
+balloon drawer still requires source reflection and joint-specific texture-edge
+handling; the pinwheel drawer is not a replacement. The native capacity check
+supplies a complete seven-joint balloon through temporary table data to exercise
+all eight work vectors without claiming that balloon inventory selection or
+drawing is implemented. See the
+[capacity checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-inventory-joint-capacity).
+
 ### Shared tables and static categories
 
 `tools/v3_inventory_equipment.py` extends the separate inventory owner through

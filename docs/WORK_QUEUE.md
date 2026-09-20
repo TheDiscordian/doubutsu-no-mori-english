@@ -2,21 +2,27 @@
 
 ## Active: V3 optional GameCube imports
 
+The current explicit proposal is ABI 123,
+`build/v3-inventory-capacity-02/build-lock.json`. Inventory now has its own
+eight-vector joint/morph arrays, with matching BSS/owner/pool allocation.
+Four focused checks and the silent 99-record/83-assertion native check pass.
+This includes complete eight-vector playback supplied through temporary test
+table data, not an enabled balloon preview. Reuse the allocation evidence.
+
 All twenty animated equipment rigs have complete shared conversion and resource
 installation in the explicit ABI-122 proposal. Both outdoor banks hold 7,168
 bytes, and the player has eight-vector joint/morph work. Six focused checks and
 the silent native 116-record/93-assertion bank/playback check pass. Preserve that
 evidence; do not replay it without a changed consumer or concrete defect.
 
-Next connect source-correct balloon actions and the inventory's separate
-joint/morph capacity, then its complete previews and parent consumers. Reuse
+Next connect source-correct balloon actions, complete inventory drawing, and
+parent consumers. Reuse
 the installed models and shared category adapters, not per-item scripts.
 Net/rod behaviour and golden-tool differences remain explicit. Resources do
 not enable these imports. See the
 [capacity checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-rig-capacity-and-resource-extension).
 
-Next work uses the explicit ABI-122 lock at
-`build/v3-rig-capacity-03/build-lock.json`. All eight pinwheels have shared
+Next work uses the explicit ABI-123 lock above. All eight pinwheels have shared
 parent readers, pocket artwork, collection/catalogue, existing event acquisition,
 and individual experimental selections. The full proposal has 120 choices;
 existing fans and fixed identities are retained. No per-item installers or
@@ -33,7 +39,7 @@ Full seasonal rendering and ordinary gameplay remain open. See the
 [diagnosis](checkpoints/V3_FURNITURE_PIPELINE.md#seasonal-setter-copy-diagnosis).
 Work against the current proposal, not an old candidate. Do not replay exhausted
 navigation or setup attempts. Continue shared equipment categories and acquisition;
-balloon inventory capacity and equipment behaviour remain implementation work,
+balloon drawing and equipment behaviour remain implementation work,
 not completed imports.
 
 Ten focused sound checks pass. The first silent native sound check passes

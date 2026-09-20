@@ -1,5 +1,64 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared inventory joint capacity
+
+The shared `--player-actions` refresh extends the inventory's independent joint
+work when installed equipment requires more vectors. It changes two initializer
+pointers, the BSS relocation size, both actual submenu-owner extents, and the
+common aligned allocation. It does not install a per-item adapter or new preview
+record. Existing code, table entries, assets, callback meanings, and saves remain.
+
+- Explicit lock: `build/v3-inventory-capacity-02/build-lock.json`, ABI 123.
+- ROM SHA-256:
+  `49a353fda4c39c293c11f3575832e195848039c10c749afc583db16bab888a31`.
+- Report SHA-256:
+  `26d368cab7a7261885679af5025d2ee3872e7a6c8e0ed79ef2ba20f259075c99`.
+- UPS SHA-256:
+  `fe37e6697dd46760cadefcb292b7a104911059e531796a0f13622b0be95b569c`.
+- BSS: `5E0` to `640` bytes, with 48-byte arrays at `+5E0/+610`.
+- Resident overlay: `47A0` to `4800` bytes; shared pool adds 64 bytes after
+  native 64-byte allocation rounding. Both metadata rows end at `80881C80`.
+- Build `v3-inventory-capacity-01/` has the same ROM and patch; `-02` binds
+  the final source with an additional signed-immediate boundary rejection.
+
+Four focused checks pass in 6.446 seconds. They reproduce the installed update,
+verify exact initializer/metadata/BSS/pool changes, exercise relocation at two
+addresses, reject damaged ownership and unsafe allocation words, preserve every
+unrelated resource and the complete equipment module, reconstruct the original-
+ROM UPS, and retain all 120 choices, profile bits, and exact no-import V2-12.
+
+The first silent native check stops at a fixture guard placed in the loader's
+relocation workspace. Its observed bytes are the correct relocation header,
+`00003D30 000003F0 000000A0 00000640`, not a runtime array overflow. The
+corrected fixture protects the relocation workspace end before loading and
+the BSS end after relocation has finished using that space.
+
+The single justified retry at `build/smoke-v3-inventory-capacity-02/` passes
+99 records and 83 assertions. It verifies complete cartridge loading/relocation
+and zeroed expanded BSS, ordinary-net timing, smallest/largest installed
+pinwheel initialization and joint drawing, matrices/graphics bounds, both new
+work pointers, and untouched state. A temporary otherwise-disabled table slot
+then supplies a real seven-joint balloon and its complete animation to the
+native initializer. All eight vectors are written; the morph buffer, old short
+arrays, and guards remain intact. All changed table data is restored, the
+complete module compared, scratch freed, checkpoint restored, final fault and
+memory guards checked, and the isolated silent emulator exits cleanly.
+Results SHA-256:
+`76936d59f549002db71535203a354a6180d8a9b8ae50a81b5e911443fd99c114`.
+
+The temporary table data is a capacity probe, not a supported balloon preview
+or ordinary gameplay. No uploaded code, user save, public/local patcher, or
+main lock changes. Equal-profile ABI-122/123 save compatibility is expected;
+fresh cross-build game reload and hardware are not claimed. Imported V3 saves
+remain unsuitable for V2.
+
+Next implement the complete balloon main/setup/draw behaviour from
+`local/ac-decomp/src/game/m_player_item_balloon.c_inc` and its separate inventory
+drawer in `m_inventory_ovl.c`. Both source drawers set joint-specific texture-edge
+alpha and reflection; a null-callback pinwheel drawer would omit those details.
+Keep behaviour, preview records, selection, and ordinary interaction explicitly
+pending. Do not replay the completed capacity checks without a relevant change.
+
 ## Shared rig capacity and resource extension
 
 The shared equipment installer extends existing rigs with all twelve complete

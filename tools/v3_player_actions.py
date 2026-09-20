@@ -887,6 +887,11 @@ def expanded_tables(source,owner,reloc,*,categories=CATEGORIES,native_count=NATI
 
 def install(base,prior,blob,core,original,output):
     old=prior.get('equipment_resources',{})
+    if (old.get('inventory_preview',{}).get('animated_rigs_installed') and
+            old.get('player_joint_work',{}).get('vectors',7)>
+            old['inventory_preview'].get('joint_work',{}).get('vectors',7)):
+        from v3_inventory_equipment import grow_joint_work
+        return grow_joint_work(base,prior,blob,core,original,output)
     if old.get('held_rig_actions',{}).get('loop_sound_installed') and not old['inventory_preview'].get('animated_rigs_installed'):
         from v3_inventory_equipment import refresh_rigs as inventory_rigs
         return inventory_rigs(base,prior,blob,core,original,output)

@@ -14,6 +14,7 @@ VROM,RELOC,OWNER_RAM=0x785700,0x7898C0,0x8087D480
 SECTIONS=(15664,1008,160,1504)
 CODE,TABLE,SELECTOR,SIZE=0x6000,0x6400,0x6C00,0x7000
 COUNT=41  # Forty donor preview kinds plus retained native empty sentinel five.
+MENU_VROM,MENU_RELOC,MENU_RAM=0x7749C0,0x7778B0,0x8085BAC0
 TABLES=(('player_animation',0x80881310),('player_pointer',0x80881324),
         ('item_animation',0x80881338),('item_pointer',0x8088134C),
         ('shape',0x80881360),('skeleton',0x80881374),('part',0x80881388),('draw',0x8088149C))
@@ -121,6 +122,99 @@ def records(source,equipment,*,animated=False):
         source_draw_table=dict(symbol=name,offset=at,bytes=n,pointers=pointers),
         original_kinds=5,empty_kind=5,count=COUNT,profile_bits_enabled=0,
         ordinary_inventory_tested=False,save_reload_tested=False)
+
+
+def grow_joint_work(base,prior,blob,core,original,output):
+    """Grow the inventory's own complete work arrays and submenu reservation."""
+    from v3_npc_draw import relocation_offsets
+    old=prior['equipment_resources'];preview=old['inventory_preview']
+    files,native=by_vrom(base),by_vrom(original)
+    owner=bytearray(files[VROM].extract(base));rel=bytearray(files[RELOC].extract(base))
+    module=blob[old['blob_offset']:old['blob_offset']+old['bytes']]
+    previous=preview.get('joint_work');vectors=old['player_joint_work']['vectors']
+    sections=struct.unpack_from('>5I',rel)
+    if (sha256(owner)!=preview['owner_sha256'] or sha256(rel)!=preview['relocation_sha256']
+            or sha256(module)!=old['sha256'] or not preview.get('animated_rigs_installed')
+            or sections[:3]!=SECTIONS[:3] or not 7<vectors<=16
+            or previous and vectors<=previous['vectors']):
+        raise ValueError('Changed inventory work owner or unsupported capacity')
+    normalized=bytearray(owner)
+    for patch in preview['patches']+[preview['animation_speed_hook']]:
+        at=patch['address']-OWNER_RAM
+        if u32(normalized,at)!=patch['after']:raise ValueError('Changed installed inventory consumer')
+        struct.pack_into('>I',normalized,at,patch['before'])
+    if previous:
+        if sections[3]!=previous['bss_bytes']:raise ValueError('Changed previous inventory BSS size')
+        for patch in previous['patches']:
+            at=patch['address']-OWNER_RAM
+            if u32(normalized,at)!=patch['after']:raise ValueError('Changed installed inventory work pointer')
+            struct.pack_into('>I',normalized,at,patch['before'])
+    elif sections[3]!=SECTIONS[3]:raise ValueError('Changed native inventory BSS size')
+    original_owner=native[VROM].extract(original)
+    first,last=0x8087D5A4-OWNER_RAM,0x8087DAA0-OWNER_RAM
+    if normalized[first:last]!=original_owner[first:last]:
+        raise ValueError('Changed complete native inventory initializer')
+    targets={0x8087D9AC:0x2BE,0x8087D9BC:0x294}
+    found={OWNER_RAM+i:u32(normalized,i)&65535 for i in range(0,sections[0],4)
+           if u32(normalized,i)>>26==9 and u32(normalized,i)>>21&31 and u32(normalized,i)&65535 in (0x294,0x2BE)}
+    if found!=targets:raise ValueError('Unreviewed inventory work-pointer consumer')
+    start=previous['joint_offset'] if previous else sections[3]
+    length=vectors*6;bss=(start+2*length+15)&~15
+    offsets={0x294:start,0x2BE:start+length};patches=[]
+    relocations=relocation_offsets(rel,len(owner))
+    for address,old_offset in targets.items():
+        at=address-OWNER_RAM;word=u32(normalized,at)
+        if at in relocations or offsets[old_offset]>=32768:raise ValueError('Invalid inventory work pointer')
+        changed=word&0xFFFF0000|offsets[old_offset];struct.pack_into('>I',owner,at,changed)
+        patches.append(dict(address=address,before=word,after=changed))
+    struct.pack_into('>I',rel,12,bss)
+    old_resident=sum(sections[:4]);resident=sum(sections[:3])+bss
+    menu=bytearray(files[MENU_VROM].extract(base));native_menu=native[MENU_VROM].extract(original)
+    entries=[i for i in range(0,len(menu)-31,4) if u32(menu,i)==VROM]
+    if entries!=[0x2A10,0x2A30]:raise ValueError('Changed complete inventory allocation-owner table')
+    metadata=[]
+    for at in entries:
+        before=bytes(menu[at:at+32]);normal=bytearray(before)
+        if struct.unpack_from('>4I',normal)!=(VROM,VROM+len(owner),OWNER_RAM,OWNER_RAM+old_resident):
+            raise ValueError('Changed inventory owner allocation')
+        struct.pack_into('>I',normal,12,OWNER_RAM+sum(SECTIONS))
+        if normal!=native_menu[at:at+32]:raise ValueError('Changed inventory lifecycle or metadata')
+        struct.pack_into('>I',menu,at+12,OWNER_RAM+resident)
+        metadata.append(dict(offset=at,before=before.hex(),after=menu[at:at+32].hex()))
+    # The shared loader advances each inventory allocation by ALIGN64(size).
+    # Both menu identities use the same owner, one in each mutually exclusive
+    # menu path. Grow the common maximum by its complete aligned difference.
+    extra=((resident+63)&~63)-((old_resident+63)&~63)
+    pool_at=0x800C4B10-CODE_RAM;pool_before=u32(core,pool_at)
+    if pool_before>>16!=0x25CE or extra<=0 or (pool_before&65535)+extra>=65536:
+        raise ValueError('Inventory growth exceeds checked submenu immediate')
+    pool_after=pool_before+extra
+    if (pool_before^pool_after)&0x8000:raise ValueError('Submenu growth crosses a signed immediate boundary')
+    struct.pack_into('>I',core,pool_at,pool_after)
+    # Bind the allocation/rounding consumer itself, not just the metadata.
+    # Locate the complete loader through the native symbol map.
+    import re
+    text=(ROOT/'upstream/af/linker_scripts/jp/symbol_addrs_overlays.txt').read_text()
+    match=re.search(r'^mSM_ovl_prog_seg = 0x([0-9A-Fa-f]+);',text,re.M)
+    if not match:raise ValueError('Missing native submenu allocation function')
+    address=int(match[1],16)
+    bounds=sorted(int(x,16) for x in re.findall(r'= 0x([0-9A-Fa-f]+); // type:func',text))
+    loader_first=address-MENU_RAM;loader_last=min(x for x in bounds if x>address)-MENU_RAM
+    if menu[loader_first:loader_last]!=native_menu[loader_first:loader_last]:
+        raise ValueError('Changed complete submenu allocation consumer')
+    receipt=dict(vectors=vectors,previous_vectors=previous['vectors'] if previous else 7,
+        joint_offset=start,morph_offset=start+length,array_bytes=length,previous_bss_bytes=sections[3],
+        bss_bytes=bss,previous_resident_bytes=old_resident,resident_bytes=resident,
+        additional_bss_bytes=bss-sections[3],additional_pool_bytes=extra,patches=patches,
+        metadata=metadata,pool_patch=dict(address=CODE_RAM+pool_at,before=pool_before,after=pool_after),
+        initializer=dict(start=OWNER_RAM+first,end=OWNER_RAM+last,sha256=sha256(owner[first:last])),
+        allocation_consumer=dict(start=MENU_RAM+loader_first,end=MENU_RAM+loader_last,
+                                 sha256=sha256(menu[loader_first:loader_last])),
+        saved_format_changed=False,preview_records_changed=False)
+    report=copy.deepcopy(old);report['inventory_preview'].update(joint_work=receipt,
+        owner_sha256=sha256(owner),relocation_sha256=sha256(rel))
+    report['additional_resident_bytes']=0
+    return report,{VROM:bytes(owner),RELOC:bytes(rel),MENU_VROM:bytes(menu)}
 
 
 def refresh_rigs(base,prior,blob,core,original,output):

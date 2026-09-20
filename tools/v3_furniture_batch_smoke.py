@@ -189,7 +189,7 @@ def inventory_preview(debug, rom_path, record):
             gfx+0x100,buffer-16,buffer+0x1200,stack-0x800,stack+0x200,
             allocation+size-16,TEST_STACK-0x800,TEST_STACK+0x40)
     for at in guards:debug.write_memory(at,edge)
-    data,rel=(files[v].extract(image) for v in (VROM,RELOC));resident=sum(SECTIONS)
+    data,rel=(files[v].extract(image) for v in (VROM,RELOC));resident=sum(struct.unpack_from('>4I',rel))
     spec=SimpleNamespace(ram=OWNER_RAM,resident_bytes=resident,sections=struct.unpack_from('>5I',rel))
     loaded=relocate_verified_data(spec,data,rel,root);proof=(root,loaded[:SECTIONS[0]])
     parents={r['item_id']:r for r in equipment['parent_readers']['rows']}
@@ -301,10 +301,13 @@ def inventory_rigs(debug,rom_path,record):
     guards=(allocation,overlay-16,submenu-16,graph-16,game-16,gfx-16,gfx+0x1000,
             xlu-16,xlu+0x600,bank-16,bank+0x4000,stack+0x100,TEST_STACK-0x800,TEST_STACK+0x40)
     for at in guards:debug.write_memory(at,edge)
-    data,rel=(files[v].extract(image) for v in (VROM,RELOC));resident=sum(SECTIONS)
+    data,rel=(files[v].extract(image) for v in (VROM,RELOC));resident=sum(struct.unpack_from('>4I',rel))
     loaded=relocate_verified_data(SimpleNamespace(ram=OWNER_RAM,resident_bytes=resident,
         sections=struct.unpack_from('>5I',rel)),data,rel,root)
     proof=(root,loaded[:SECTIONS[0]]);bss=root+preview['native_bss_address']-OWNER_RAM
+    work=preview.get('joint_work',dict(joint_offset=0x294,morph_offset=0x2BE,array_bytes=42,vectors=7))
+    guards=(*guards,root+resident,root+resident+len(rel))
+    debug.write_memory(root+resident+len(rel),edge)
     resources={r['index']:r for r in e['records']};rows=[r for r in preview['rows'] if r.get('draw_callback')]
     representatives=(min(rows,key=lambda r:r['model_bytes']),max(rows,key=lambda r:r['model_bytes']))
     matrix=call(0x800E02AC);matrix_before=debug.read_memory(matrix,64)
@@ -328,6 +331,10 @@ def inventory_rigs(debug,rom_path,record):
     try:
         call(0x800262D0,[VROM,VROM+len(data),OWNER_RAM,OWNER_RAM+resident,root,root+resident,len(rel)])
         check('complete cartridge-loaded relocated inventory owner',root,loaded)
+        # The loader uses the following bytes for relocation scratch. Protect
+        # the BSS boundary only once relocation has finished using that space.
+        check('native overlay loader scratch guard',root+resident+len(rel),edge)
+        debug.write_memory(root+resident,edge)
         put(submenu+0x2C,overlay);put(overlay+0x106DC,bss);put(game,graph)
         initialize(1);check('original tool animation timing retained',bss+0x224+12,struct.pack('>2f',1,2))
         for row in representatives:
@@ -337,7 +344,8 @@ def inventory_rigs(debug,rom_path,record):
                     blob[motion['blob_offset']:motion['blob_offset']+motion['bytes']])
             check('complete native model/animation transfers and untouched tail',bank,wanted+fill[len(wanted):])
             check('source-correct preview speed and first frame',bss+0x224+12,struct.pack('>2f',15,16))
-            check('native seven-vector work and morph pointers',bss+0x224+0x24,struct.pack('>2I',bss+0x294,bss+0x2BE))
+            check('native inventory work and morph pointers',bss+0x224+0x24,
+                  struct.pack('>2I',bss+work['joint_offset'],bss+work['morph_offset']))
             put(0x801458B8,word(overlay+0x10030)&0x1FFFFFFF);call(0x800E0284,[identity])
             put(graph+0x298,gfx,gfx+0x1000);put(graph+0x2A8,xlu,xlu+0x600)
             call(root+row['draw_callback']-OWNER_RAM,[submenu,game],proof)
@@ -354,6 +362,42 @@ def inventory_rigs(debug,rom_path,record):
             check('balanced native matrix stack',0x801462B4,struct.pack('>I',matrix))
             check('unchanged parent transform',matrix,debug.read_memory(identity,64))
             for at in guards:check('inventory rig guard',at,edge)
+        if work['vectors']>7:
+            # Supply the largest installed skeleton through temporary table
+            # data, not uploaded code or a claimed enabled inventory option.
+            model=max((r for r in resources.values() if r['type']==1),
+                      key=lambda r:r['source']['skeleton']['joints'])
+            source_motion=model['source']['motion_bindings'][0]['default_animation']
+            motion=next(r for r in resources.values() if r['source_index']==source_motion)
+            fields=dict(shape=model['index'],skeleton=model['pointer'],
+                        item_animation=motion['index'],item_pointer=motion['pointer'])
+            changed={};slot=40
+            try:
+                for table in preview['tables']:
+                    if table['role'] in fields:
+                        at=table['ram']+slot*4;changed[at]=debug.read_memory(at,4)
+                        put(at,fields[table['role']])
+                poison=b'\xA5\x5A'*(work['array_bytes']//2)
+                debug.write_memory(bss+work['joint_offset'],poison)
+                debug.write_memory(bss+work['morph_offset'],poison)
+                old_work=debug.read_memory(bss+0x294,84)
+                initialize(slot)
+                check('maximum rig retains actual enlarged work pointers',bss+0x248,
+                      struct.pack('>2I',bss+work['joint_offset'],bss+work['morph_offset']))
+                used=(model['source']['skeleton']['joints']+1)*6
+                pose=debug.read_memory(bss+work['joint_offset'],used)
+                written=all(pose[i:i+2]!=b'\xA5\x5A' for i in range(0,used,2))
+                record(dict(inventory_capacity_vectors=used//6,temporary_table_slot=slot,
+                            assertion='passed' if written else 'failed'))
+                if not written:raise ValueError('Native inventory did not write every maximum-rig component')
+                assertions+=1
+                check('maximum-rig initialization retains morph buffer',bss+work['morph_offset'],poison)
+                check('maximum rig retains original short arrays',bss+0x294,old_work)
+                wanted=b''.join(blob[r['blob_offset']:r['blob_offset']+r['bytes']] for r in (model,motion))
+                check('maximum-rig complete native DMA',bank,wanted)
+                for at in guards:check('maximum inventory rig guard',at,edge)
+            finally:
+                for at,value in changed.items():debug.write_memory(at,value)
         check('save/profile remains unchanged',0x8046C000,saved[0x8046C000])
         check('complete equipment module remains unchanged',0x804A3000,module)
         check('no CPU fault',0x8003CE34,bytes(4))
