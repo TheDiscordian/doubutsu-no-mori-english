@@ -12,6 +12,16 @@ After the primary importing work, finish gold-tree leaf/cut effects and the full
 golden-shovel acquisition route. This is deferred required V3 work, not a dropped
 feature or a separate release goal.
 
+Complete texture/palette-frame artwork is prepared through one shared category
+at `build/v3-material-frames-prepared-01/`: six objects, 17,104 bytes, one compiler
+container. It covers coin, ? block, starman, fire flower, festive candle, and
+Mouth of Truth, retaining every frame, frame-table repetition, source selector,
+model order, and dynamic segment. Four focused checks pass after correcting one
+test's cache key; no emulator replay or cartridge change is needed. Connect the
+shared material-frame renderer, actual lifecycle effects/audio, and acquisition
+before enabling these resources. Do not substitute frozen first-frame models.
+Official names have entries in the single provenance catalogue.
+
 The fixed and indexed clock bindings use one existing runtime. The current
 ABI-167 proposal is `build/v3-shared-fixed-clock-profiles-01/build-lock.json`.
 It installs the complete harvest clock rig, live hands, inactive ordinary profile,

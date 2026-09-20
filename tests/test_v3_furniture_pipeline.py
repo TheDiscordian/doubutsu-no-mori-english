@@ -748,7 +748,7 @@ class DonorTests(unittest.TestCase):
                     if op==0xDA:
                         self.assertEqual(a,0xDA380003);matrices.append((a,b));matrix=(b&0xFFFFFF)//64
                     if op==0xFD:
-                        self.assertIn(b>>24,(6,8));loads.append(b)
+                        self.assertIn(b>>24,(6,8,9));loads.append(b)
                     if op==1:
                         self.assertEqual(b>>24,6);count=a>>12&255
                         first=(b-0x06000000-vertex['native_offset'])//16
@@ -778,7 +778,8 @@ class DonorTests(unittest.TestCase):
                 self.assertEqual(faces,[t for r in donor for t in r.get('global_triangles',[])])
                 self.assertEqual(matrices,[r['words'] for r in donor if r['opcode']==0xDA])
                 self.assertEqual(state,[r['words'] for r in donor if r['opcode'] in (0xFC,0xE2,0xFA,0xFB,0xD9)])
-                self.assertEqual(loads,[r['dynamic_palette'] if 'dynamic_palette' in r else 0x06000000+offsets[r['target']]
+                self.assertEqual(loads,[r['dynamic_palette'] if 'dynamic_palette' in r else
+                                       r['dynamic_texture'] if 'dynamic_texture' in r else 0x06000000+offsets[r['target']]
                                        for r in donor if r['opcode'] in (0xF0,0xFD)])
                 self.assertEqual(asset[start+n-8:start+n],struct.pack('>II',0xDF000000,0))
                 # Independently decode the native tile descriptors, not just
@@ -843,6 +844,111 @@ class DonorTests(unittest.TestCase):
                             for a,b in words if a>>24==0xF5 and b>>24&7==0]
                     self.assertEqual(actual,expected)
                     self.assertEqual([w for w in words if w[0]==0xE3001001],luts)
+
+
+class MaterialFrameResourceTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.source=pipeline.Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+            (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+        cls.art=ROOT/'build/v3-material-frames-prepared-01'
+        cls.report=json.loads((cls.art/'art.json').read_bytes())
+
+    def test_complete_bulk_resources_frames_draw_order_and_reuse(self):
+        self.assertEqual(self.report['batch'],dict(objects=6,compiled=6,reused=0,compiler_containers=1))
+        self.assertEqual({r['item_id'] for r in self.report['objects']},{'1FD8','3298','3314','3318','331C','332C'})
+        self.assertEqual(sum(r['object_bytes'] for r in self.report['objects']),17104)
+        DonorTests.check_complete_artwork(self,self.art,self.report)
+        cache=pipeline.PreparedAssets(self.source,[self.art]);kinds=set();off_commands=0
+        for row in self.report['objects']:
+            prepared=pipeline.prepare(self.source,int(row['item_id'],16))
+            profile,_,resources,offsets,models,_,_=prepared;a=profile['callback_adapter']
+            self.assertEqual(json.loads(json.dumps(profile)),row['profile'])
+            self.assertEqual(a['model_order'],list(row['model_offsets']))
+            self.assertEqual(cache.reuse(self.source,row['item_id'],prepared)[1]['object_sha256'],row['object_sha256'])
+            asset=(self.art/row['object_file']).read_bytes();by_source={r['donor_offset']:r for r in resources}
+            for binding in a['material_frames']:
+                kinds.add(binding['kind']);table=binding['table'];at=table['donor_offset']
+                actual=data_pointers(self.source.rel,at,table['bytes'])
+                self.assertEqual([r['donor_offset'] for r in binding['frames']],
+                                 [actual[i] for i in range(at,at+table['bytes'],4)])
+                # Duplicated frame entries carry timing; resource deduplication
+                # must not compact that sequence or drop less frequent frames.
+                for frame in binding['frames']:
+                    resource=by_source[frame['donor_offset']]
+                    self.assertEqual(resource['source_sha256'],frame['source_sha256'])
+                    self.assertEqual(resource['bytes'],frame['bytes'])
+                    if binding['kind']=='palette':
+                        source=self.source.data[frame['donor_offset']:frame['donor_offset']+32]
+                        expected=[]
+                        for (word,) in struct.iter_unpack('>H',source):
+                            if word&0x8000:value=(word&0x7FFF)*2+1
+                            else:
+                                self.assertIn(word>>12,(0,7))
+                                red,green,blue=((word>>shift&15)*17>>3 for shift in (8,4,0))
+                                value=red<<11|green<<6|blue<<1|bool(word>>12)
+                            expected.append(value)
+                        start=resource['native_offset']
+                        self.assertEqual(asset[start:start+32],struct.pack('>16H',*expected))
+            for model in row['models']:
+                at,n=model['native_offset'],model['bytes']
+                actual=[(a,b) for a,b in struct.iter_unpack('>II',asset[at:at+n]) if a>>24==0xD7]
+                expected=[(r['words'][0],r['words'][1] if r.get('texture_disabled') else r['words'][1] or 0xFFFFFFFF)
+                          for r in models[model['layer']]['rows'] if r['opcode']==0xD7]
+                self.assertEqual(actual,expected);off_commands+=actual.count((0xD7000000,0))
+        self.assertEqual(kinds,{'texture','palette'});self.assertEqual(off_commands,1)
+        # The shared change retains complete cached graphics for existing static,
+        # fading, rigged, direct-colour, and translucent categories without a build.
+        for path,item in (('v3-legacy-materials-prepared-01','1FC8'),
+                          ('v3-fixed-keyframe-rigs-prepared-01','32F0'),
+                          ('v3-bulk-prepared-02','3020')):
+            cache=pipeline.PreparedAssets(self.source,[ROOT/'build'/path])
+            self.assertIsNotNone(cache.reuse(self.source,item,pipeline.prepare(self.source,int(item,16))))
+
+    def test_source_changes_missing_frames_and_forged_runtime_still_reject(self):
+        from v3_furniture_materials import CATEGORY
+        for row in self.report['objects']:
+            item=int(row['item_id'],16);p=self.source.profile(item);a=p['callback_adapter'];draw=a['functions']['draw']
+            self.assertEqual(a['category'],CATEGORY);self.assertEqual(a['pending_callbacks'],list(a['functions']))
+            self.assertFalse(row['import_ready']);self.assertIn('need runtime adapters',row['pending_reason'])
+            for loc in (0,next(iter(draw['local_calls']))):
+                changed=copy.copy(self.source);changed.rel=bytearray(self.source.rel)
+                changed.rel[self.source.sections[1][0]+draw['offset']+loc+3]^=4
+                with self.assertRaises(ValueError):changed.profile(item)
+            changed=copy.copy(self.source);changed.code_relocations=dict(self.source.code_relocations)
+            changed.code_relocations[draw['offset']+0x10]=(10,2,4,0x8009AED4)
+            with self.assertRaisesRegex(ValueError,'changed dependencies'):changed.profile(item)
+            table=a['material_frames'][0]['table'];changed=copy.copy(self.source)
+            changed.relocations=dict(self.source.relocations);changed.relocations.pop(table['donor_offset'])
+            changed.relocation_addresses=sorted(changed.relocations)
+            with self.assertRaisesRegex(ValueError,'incomplete source frame table'):changed.profile(item)
+            forged=copy.deepcopy(row);forged['profile']['callback_adapter']['runtime_installed']=True
+            with self.assertRaisesRegex(ValueError,'no implemented native lifecycle'):install.profile(forged,0x02500000)
+            with self.assertRaisesRegex(ValueError,'Material-frame artwork'):pipeline.metadata(self.source,item,forged['profile'],None)
+        self.assertEqual(install.provenance_patch(self.report['objects']),'')
+        with self.assertRaisesRegex(ValueError,'Unknown converter/source revision'):
+            install.checked_assets(self.art,self.source,ROOT/'build/item-identity-megasheet.xlsx')
+
+    def test_dynamic_segments_reject_relocations_wrong_types_and_missing_bindings(self):
+        for kind,at,fixup,target,segment in (('palette',0x1C,0x11C,0x500,0x09000000),
+                                           ('texture',0x24,0x124,0x600,0x08000000)):
+            raw,pointers=fixture();raw=bytearray(raw);struct.pack_into('>I',raw,at,segment);pointers.pop(fixup)
+            def parse(bindings):
+                return parse_model(raw,0x100,pointers,(0x500,),{0x600:(32,32)},0x1000,48,
+                                   static_materials=True,material_bindings=bindings)
+            rows=parse({segment:(kind,target)})
+            self.assertEqual(next(r for r in rows if 'dynamic_'+kind in r)['dynamic_'+kind],segment)
+            for bindings in ({},{segment:('palette' if kind=='texture' else 'texture',target)},
+                             {0x0A000000:(kind,target)},{segment:(kind,0x999)}):
+                with self.assertRaises(ValueError):parse(bindings)
+            pointers[fixup]=target
+            with self.assertRaisesRegex(ValueError,'also has a relocation'):parse({segment:(kind,target)})
+        raw,pointers=fixture();raw=bytearray(raw);struct.pack_into('>I',raw,0,0xD7000000)
+        rows=parse_model(raw,0x100,pointers,(0x500,),{0x600:(32,32)},0x1000,48,static_materials=True)
+        self.assertTrue(rows[0]['texture_disabled'])
+        struct.pack_into('>I',raw,4,0xFFFFFFFF)
+        with self.assertRaisesRegex(ValueError,'texture scale'):
+            parse_model(raw,0x100,pointers,(0x500,),{0x600:(32,32)},0x1000,48,static_materials=True)
 
 
 class PendingMoveResourceTests(unittest.TestCase):

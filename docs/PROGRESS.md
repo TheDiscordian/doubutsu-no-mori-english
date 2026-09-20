@@ -18,6 +18,17 @@ served patchers retain their existing builds.
 
 ## Active development
 
+The shared material-frame converter prepares complete artwork for six more
+objects: coin, ? block, starman, fire flower, festive candle, and Mouth of Truth.
+`build/v3-material-frames-prepared-01/` contains 17,104 bytes compiled in one
+container. Every texture/palette frame, repeated frame-table entry, and source
+draw order is retained, along with explicit pending timing/interaction callbacks.
+Four focused checks pass, including independent complete graphics comparisons,
+cache reuse, changed-dependency rejection, and refusal to install unfinished
+behaviour. Names use credited official source text. This preparation changes no
+ROM, choice, save, or served patcher. See the
+[material-frame checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-material-frame-resource-preparation).
+
 The current explicit proposal is ABI 167 at
 `build/v3-shared-fixed-clock-profiles-01/build-lock.json`. The shared clock
 runtime serves both fixed and indexed source bindings. Harvest clock's complete

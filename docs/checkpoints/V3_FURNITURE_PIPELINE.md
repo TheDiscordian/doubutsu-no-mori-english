@@ -1,5 +1,69 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared material-frame resource preparation
+
+`build/v3-material-frames-prepared-01/` prepares six complete objects through the
+ordinary bulk converter, with one compiler container and no native runtime
+change. The build uses the ABI-167 proposal as its explicit base:
+
+```sh
+python3 tools/v3_furniture_pipeline.py convert --assets-only \
+  --category material-frame-assets \
+  --base-lock build/v3-shared-fixed-clock-profiles-01/build-lock.json \
+  --output build/material-frame-reproduction
+```
+
+The batch succeeds on the first compiler invocation. The shared converter gains
+typed dynamic texture/palette bindings, full frame-bank extraction, and exact
+texture-off/on transitions; it does not flatten animation into a still model.
+Full draw instructions, address pairs, bounded branches, helper targets, source
+selectors, and complete frame tables establish each resource contract. The
+graphics converter retains all original lists, texels, geometry, alpha, draw
+order, and material commands. Lifecycle behaviour remains pending, not removed.
+
+| Donor identity | Official name | Object bytes | Material selection retained |
+| --- | --- | ---: | --- |
+| `1FD8` | Mouth of Truth | 3,968 | Two face textures; actor-state low bit |
+| `3298` | festive candle | 4,448 | Two flame textures; frame divided by two |
+| `3314` | coin | 1,984 | Seven-entry palette sequence; frame divided by eight |
+| `3318` | ? block | 3,168 | Seven-entry palette sequence; frame divided by eight |
+| `331C` | starman | 1,120 | Four palettes; frame divided by ten; room switch gate |
+| `332C` | fire flower | 2,416 | Four palettes; frame divided by twenty |
+
+Total: 17,104 bytes. Coin/block duplicate palette entries remain in their
+seven-entry sequences. Palette and texture resources are stored once, without
+shortening those sequences. All time-driven selectors preserve the donor's
+separate room and preview counter choice in their descriptors; N64 timing and
+renderer integration are not installed by this resource preparation.
+
+Manifest SHA-256:
+`9deb0ce737d8e2c9824cfb6bbb3fb68b87a11f3302116eb532fcf10dfd0df8e2`.
+
+Three `MaterialFrameResourceTests` and the existing dynamic-palette format check
+pass. The first combined invocation reports three passes and one failed cache
+lookup: the test requests `3010` from a bundle which actually contains `3020`.
+That fixture key is corrected, then the affected complete-art test and the
+extended invalid-binding test pass in 0.914 seconds. This is not a cartridge or
+graphics failure. Passing unchanged checks are not replayed. `checks.log` keeps
+the invocation/results record.
+
+Checks compare every texture sample, complete palette conversion, vertex,
+triangle, material/tile state, dynamic pointer, and texture enable transition.
+They preserve frame-table repetition and draw order, reconstruct cached complete
+objects, and reject changed code/calls/relocations, missing frame entries, wrong
+material types, absent resources, invalid segments, and forged runtime readiness.
+The unchanged static/translucent, fading, and keyframe categories still reuse
+their existing complete cached objects. Official names are credited in
+`translations/provenance.json`.
+
+Native metadata/profile creation refuses these prepared-only objects. The shared
+renderer, actual lifecycle behaviour (including sound, surprise/rumble, player
+colour requests, and coordinated switches where present), and acquisition remain
+required. No emulator is run for this resource-only change. The current ABI-167
+cartridge, 136 experimental choices, saved format 3, main lock, and both served
+V2 patchers remain unchanged. Primary importing still precedes required
+gold-tree effects and full golden-shovel acquisition.
+
 ## Shared fixed and indexed clock integration
 
 ABI 167 at `build/v3-shared-fixed-clock-profiles-01/` installs harvest clock's

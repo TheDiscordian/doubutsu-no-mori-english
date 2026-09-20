@@ -20,7 +20,7 @@ from v3_import_catalog import DONOR, REL_SHA, ROOT, SYMBOLS_SHA, read_donor
 from v3_villager_art import data_pointers, native_palette, normalise_vertex_flags, symbol_span
 
 SEGMENT = 0x06000000
-CONVERTER_VERSION = 9
+CONVERTER_VERSION = 10
 
 # Complete compatible RDP expressions, selected by material commands, not IDs.
 # Both use one texture and retain source alpha; neither introduces TEXEL1,
@@ -224,7 +224,7 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
                 large_western=False, water=False, camping=False, tent=False,
                 campfire_body=False, fire_effect=0, school=False, static_materials=False,
                 palette_bindings=None, palette_fade=False, joint_matrices=0,
-                inherited_palette_slot=None, inherited_vertices=0):
+                inherited_palette_slot=None, inherited_vertices=0, material_bindings=None):
     """Decode supported static materials and explicit dynamic dependencies, never GX loads."""
     if not raw or len(raw) % 8 or sum(map(bool, (speed_bag, accessory, mirrored_s,
                                               garden, western, large_western, water, camping,
@@ -242,6 +242,13 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
     if (type(joint_matrices) is not int or not 0 <= joint_matrices <= 255
             or joint_matrices and not static_materials):
         raise ValueError('Joint matrices require a bounded shared skeleton material')
+    material_bindings={} if material_bindings is None else material_bindings
+    if material_bindings and (not static_materials or palette_fade or palette_bindings or
+            inherited_palette_slot is not None or
+            any(address not in (0x08000000,0x09000000) or kind not in ('texture','palette') or
+                type(target) is not int or target<0
+                for address,(kind,target) in material_bindings.items())):
+        raise ValueError('Invalid dynamic material-frame bindings')
     if palette_fade and (not static_materials or palette_bindings):
         raise ValueError('Palette fade requires the shared materials and no constant binding')
     if palette_bindings and (not static_materials or set(palette_bindings) != {0x08000000}
@@ -257,11 +264,22 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
         a, b = struct.unpack_from('>II', raw, at)
         op = a >> 24
         row = {'words': (a, b), 'opcode': op}
-        dynamic_palette = (tent or palette_fade) and op == 0xF0 and b == 0x08000000
+        binding=material_bindings.get(b)
+        framed_palette=op==0xF0 and binding is not None and binding[0]=='palette'
+        framed_texture=op==0xFD and binding is not None and binding[0]=='texture'
+        if binding and not (framed_palette or framed_texture):
+            raise ValueError('Dynamic material binding used with the wrong command')
+        dynamic_palette = framed_palette or (tent or palette_fade) and op == 0xF0 and b == 0x08000000
         if dynamic_palette:
             if start+at+4 in pointers:
                 raise ValueError('Dynamic furniture palette also has a relocation')
+            if framed_palette and binding[1] not in palette:
+                raise ValueError('Dynamic palette has no complete frame resource')
             row['dynamic_palette'] = b
+        elif framed_texture:
+            if start+at+4 in pointers:
+                raise ValueError('Dynamic material texture also has a relocation')
+            row.update(target=binding[1],dynamic_texture=b)
         elif op == 0xF0 and b in palette_bindings:
             if start+at+4 in pointers:
                 raise ValueError('Constant furniture palette binding also has a relocation')
@@ -274,8 +292,10 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
             used.add(fixup)
         if op == 0xD7:
             if static_materials:
-                if a!=0xD7000002 or b and (not b>>16 or not b&65535):
+                if (a not in (0xD7000000,0xD7000002) or a==0xD7000000 and b or
+                        b and (not b>>16 or not b&65535)):
                     raise ValueError('Unsupported static texture scale')
+                if a==0xD7000000:row['texture_disabled']=True
                 if b: row['texture_scale']=(b>>16,b&65535)
             elif water and (a, b) != (0xD7000002, 0x0FA00FA0):
                 raise ValueError('Unsupported water texture scale')
@@ -442,7 +462,10 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
                 (0xFC127E60, 0xFFFFF3F8), (0xFC11FE04, 0xFFFFF3F8)))
             if static_materials: modes += ((0xFC309C04,0x5FFEF7F8),(0xFC309604,0x5FFEFFF8),
                                      (0xFC30FE04,0x5FFEFDF8),(0xFC3217FF,0xFFFFFE38),
-                                     (0xFC30FE04,0x5FFEF3F8))
+                                     (0xFC30FE04,0x5FFEF3F8),(0xFC327FFF,0xFFFFFC38))
+            # FC327FFF/FFFFFC38 multiplies primitive RGB by shade, sets
+            # alpha to one, then passes the combined result through cycle two.
+            # It has no texture dependency; explicit texture-off commands stay.
             if not unlit and not translucent and (a, b) not in modes:
                 raise ValueError('Unsupported furniture colour combiner')
             if unlit: row['unlit_texture_primitive'] = True
@@ -665,7 +688,11 @@ def command_source(models, offsets):
             op = row['opcode']
             if op == 0xD7:
                 # GX zero means its normal scale; native zero collapses UVs.
-                if 'texture_scale' in row:
+                if row.get('texture_disabled'):
+                    if row['words']!=(0xD7000000,0) or 'texture_scale' in row:
+                        raise ValueError('Changed disabled texture state')
+                    emit('gsSPTexture(0, 0, 0, G_TX_RENDERTILE, G_OFF)')
+                elif 'texture_scale' in row:
                     if (len(row['texture_scale'])!=2 or
                             any(type(n) is not int or not 0<n<=65535 for n in row['texture_scale'])):
                         raise ValueError('Unsupported furniture environment-map scale')
@@ -676,10 +703,13 @@ def command_source(models, offsets):
             elif op == 0xF0:
                 emit('gsDPPipeSync()')
                 palette = row['dynamic_palette'] if 'dynamic_palette' in row else SEGMENT + offsets[row['target']]
-                if 'dynamic_palette' in row and palette != 0x08000000:
+                if 'dynamic_palette' in row and palette not in (0x08000000,0x09000000):
                     raise ValueError('Unreviewed dynamic palette segment')
                 emit(f"gsDPLoadTLUT_pal16(15, 0x{palette:08X})", 6)
             elif op == 0xFD:
+                texture=row.get('dynamic_texture',SEGMENT+offsets[row['target']])
+                if 'dynamic_texture' in row and texture not in (0x08000000,0x09000000):
+                    raise ValueError('Unreviewed dynamic texture segment')
                 w, h = row['shape']
                 rgba16=bool(row.get('rgba16'))
                 ia8=bool(row.get('ia8'))
@@ -719,7 +749,7 @@ def command_source(models, offsets):
                         raise ValueError('Unreviewed fire multi-texture allocation')
                     args = (f'{tile * 128}, {tile}, G_IM_FMT_I, {w}, {h}, 0, G_TX_WRAP, G_TX_WRAP, '
                             f'{mask_s}, {mask_t}, {shifts[0]}, {shifts[1]}')
-                    emit(f"gsDPLoadMultiBlock_4b(0x{SEGMENT + offsets[row['target']]:08X}, {args})", 7)
+                    emit(f"gsDPLoadMultiBlock_4b(0x{texture:08X}, {args})", 7)
                     continue
                 shifts=row.get('tile_shifts',(shift,shift))
                 if len(shifts)!=2 or any(type(n) is not int or not 0<=n<=15 for n in shifts):
@@ -730,7 +760,7 @@ def command_source(models, offsets):
                     size='G_IM_SIZ_16b' if rgba16 or ia16 else 'G_IM_SIZ_8b'
                     args=(f'{fmt}, {size}, {w}, {h}, 0, {wrap_s}, {wrap_t}, '
                           f'{mask_s}, {mask_t}, {shifts[0]}, {shifts[1]}')
-                    emit(f"gsDPLoadTextureBlock(0x{SEGMENT + offsets[row['target']]:08X}, {args})",7)
+                    emit(f"gsDPLoadTextureBlock(0x{texture:08X}, {args})",7)
                     continue
                 args = (f'{fmt}, {w}, {h}, ' + (f'0, 0, {w - 1}, {h - 1}, ' if w % 16 else '') +
                         f'{pal}, {wrap_s}, {wrap_t}, {mask_s}, {mask_t}, {shifts[0]}, {shifts[1]}')
@@ -738,7 +768,7 @@ def command_source(models, offsets):
                 # 8-byte TMEM words. Tile DMA preserves that distinction; block
                 # DMA would pack rows together and corrupt the padded stride.
                 macro = 'gsDPLoadTextureTile_4b' if w % 16 else 'gsDPLoadTextureBlock_4b'
-                emit(f"{macro}(0x{SEGMENT + offsets[row['target']]:08X}, {args})", 7)
+                emit(f"{macro}(0x{texture:08X}, {args})", 7)
             elif op == 0xD2:
                 if not row.get('static_materials') and (row['shape'], row['wrap_modes']) not in (((32, 40), (2, 0)), ((32, 32), (2, 1)),
                                                            ((16, 32), (0, 0))):

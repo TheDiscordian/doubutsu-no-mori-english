@@ -105,6 +105,33 @@ recompiling an entire installed category merely to add one newly supported membe
 
 ### Shared runtime categories
 
+The `material-frame-assets` category prepares complete custom-drawn models and
+their texture/palette frame tables independently of unfinished lifecycle code.
+Discovery verifies the entire draw implementation, paired data relocations,
+matrix helper, source frame selector, full pointer table, and actual model order.
+Bounded internal branches retain their exact instructions in the checked digest;
+they are not mistaken for helper calls or removed from verification. No item ID
+or artwork name selects a conversion rule.
+
+Every material frame is converted, including frames which appear briefly.
+Repeated table entries retain their positions and timing even when the stored
+resource is shared. Dynamic texture/palette loads retain segment eight or nine;
+they are not replaced with the first frame. Resource type, complete extent,
+texture dimensions, alpha, and absence of conflicting relocations are checked.
+The same native command emitter preserves explicit texture-off/on transitions
+and the primitive-times-shade, opaque untextured combiner.
+
+This shared category prepares the coin, ? block, starman, fire flower, festive
+candle, and Mouth of Truth together. Descriptors distinguish room/preview
+counters, division/modulo timing, switch-dependent stopping, and an actor-state
+selector. Source lifecycle receipts remain attached and pending. The artwork
+does not implement sounds, surprise/rumble, player colour changes, switch
+coordination, or the native material-frame renderer. Ordinary metadata and the
+native profile writer both reject this category, including a forged runtime
+annotation. Use `convert --assets-only --category material-frame-assets` with the
+current explicit build lock; reuse the resulting complete objects when the
+shared renderer and real behaviours are connected.
+
 The `static-models-pending-move` resource category separates ordinary profile
 drawing from an unfinished move-only callback. It requires complete direct model
 slots and exactly one move callback; create, custom draw, destroy, DMA, dynamic

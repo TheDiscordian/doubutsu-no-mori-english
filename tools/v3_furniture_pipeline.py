@@ -24,7 +24,7 @@ from v3_registry import FURNITURE, LEGACY_FURNITURE, furniture_identity, furnitu
 from v3_room_aliases import discover as room_aliases, pending_reason as room_alias_reason
 from v3_villager_art import native_palette, normalise_vertex_flags
 
-VERSION = 14
+VERSION = 15
 PENDING_MOVE_CATEGORY = 'static-models-pending-move'
 LAYERS = ('opaque', 'opaque1', 'translucent', 'translucent1')
 BEHAVIOURS = {0: 'static', 1: 'front-seat', 2: 'any-direction-seat', 4: 'front-sofa',
@@ -195,7 +195,8 @@ class Source:
         return raw, dict(symbol=name, offset=target, bytes=n, sha256=sha256(raw),
                         relocations=relocations)
 
-    def checked_callback_code(self, receipt, size, digest, expected, calls, category, constants=None):
+    def checked_callback_code(self, receipt, size, digest, expected, calls, category, constants=None,
+                              internal_branches=False):
         """Normalise checked addresses, helper calls, and bounded selector fields."""
         def reject(reason): raise ReviewRequired('custom callbacks: '+category+' '+reason)
         if receipt['bytes'] != size or receipt['relocations'] != expected:
@@ -210,10 +211,18 @@ class Source:
             if kind in (4,6): normalized[loc:loc+2] = bytes(2)
             elif kind == 10: struct.pack_into('>I',normalized,loc,u32(raw,loc)&0xFC000003)
             else: reject('unsupported code relocation')
-        found, helpers = {}, {}
+        found, helpers, branches = {}, {}, {}
         for loc in range(0, size, 4):
             word = u32(raw,loc)
             if word>>26 != 18 or loc in expected: continue
+            if internal_branches and word&3==0:
+                displacement=word&0x3FFFFFC
+                if displacement&0x2000000:displacement-=0x4000000
+                if not 0<=loc+displacement<size:reject('branch escapes complete function')
+                branches[loc]=loc+displacement
+                # The whole instruction, including its local displacement,
+                # stays in the checked digest. Only actual calls normalize.
+                continue
             if word & 0xFC000003 != 0x48000001 or loc not in calls:
                 reject('unexpected local branch')
             displacement = word & 0x3FFFFFC
@@ -227,6 +236,7 @@ class Source:
         if set(found) != set(calls) or sha256(normalized) != digest:
             reject('unrecognised complete implementation')
         receipt.update(normalized_sha256=digest, local_calls=found)
+        if branches:receipt['internal_branches']=branches
         if constants: receipt['selector_constants'] = constants
         return helpers
 
@@ -245,6 +255,9 @@ class Source:
         for slot, role in enumerate(('create','move','draw','destroy')):
             if slot*4 not in pointers: continue
             raw, receipt = self.function(pointers[slot*4][3]); functions[role] = receipt
+        from v3_furniture_materials import discover as discover_materials
+        materials=discover_materials(self,name,at,functions)
+        if materials is not None:return materials
         from v3_furniture_rigs import (CODE as RIG_CODE, CLOCK_CODE, STORAGE_CODE,
             discover as discover_rig, discover_clock, discover_storage, discover_fixed)
         if functions.get('create',{}).get('bytes') == RIG_CODE['create'][0]:
@@ -537,7 +550,8 @@ class Source:
                 raise ReviewRequired('unsupported static model slots')
             models = {LAYERS[(p-at)//4]: self.containing(target, exact=True) for p, target in pointers.items()}
         adapter = extra.get('callback_adapter', {})
-        pending_move=adapter.get('category')==PENDING_MOVE_CATEGORY
+        from v3_furniture_materials import CATEGORY as MATERIAL_CATEGORY
+        pending_move=adapter.get('category') in (PENDING_MOVE_CATEGORY,MATERIAL_CATEGORY)
         pending_fields=[]
         if raw[36:40]!=struct.pack('>f',.01):pending_fields.append('scale')
         if contact not in BEHAVIOURS:pending_fields.append('contact')
@@ -558,7 +572,7 @@ class Source:
             extra.update(kind='animated-room-model',skeleton=adapter['skeleton'],joint_models=adapter['joint_models'])
         return dict(profile_symbol=name, profile_offset=at, profile_sha256=sha256(raw),
             scalar_hex=raw[32:48].hex(), behaviour=adapter.get('category') if extra.get('kind') or
-                adapter.get('category') in ('switch-trigger-sound',PENDING_MOVE_CATEGORY) else BEHAVIOURS[contact], contact_action=contact,
+                adapter.get('category') in ('switch-trigger-sound',PENDING_MOVE_CATEGORY,MATERIAL_CATEGORY) else BEHAVIOURS[contact], contact_action=contact,
             interaction_flags=interaction,
             size_code={3:1, 4:0, 5:2}[shape], shape=shape, models=models, **extra)
 
@@ -591,11 +605,17 @@ def prepare_models(source, descriptor):
         vertex_arrays[at] = name, n
         inherited_vertices = n // 16
     adapter = descriptor.get('callback_adapter', {})
+    from v3_furniture_materials import bindings as frame_bindings
+    material_frames=frame_bindings(adapter);used_frames=set()
     fading = adapter.get('category') == 'switch-palette-fade'
     dynamic_used = False
     if fading:
         for endpoint in adapter['endpoints'].values():
             palettes[endpoint['donor_offset']] = endpoint['symbol'], endpoint['bytes']
+    for frames in material_frames.values():
+        if frames['kind']=='palette':
+            for frame in frames['frames']:
+                palettes[frame['donor_offset']]=frame['symbol'],frame['bytes']
     bindings, used_bindings = descriptor.get('palette_bindings', {}), set()
     for label, (name, at, n) in descriptor['models'].items():
         if n%8: raise ReviewRequired('unaligned display list')
@@ -610,7 +630,16 @@ def prepare_models(source, descriptor):
             op = a >> 24
             if op in (0xF0, 0xFD, 0x01):
                 target = pointers.get(at+position+4)
-                if fading and op == 0xF0 and b == 0x08000000:
+                framed=material_frames.get(b)
+                targets=[]
+                if framed:
+                    if (target is not None or (op,framed['kind']) not in ((0xF0,'palette'),(0xFD,'texture'))):
+                        raise ReviewRequired('changed material-frame resource binding')
+                    used_frames.add(b)
+                    targets=[row['donor_offset'] for row in framed['frames']]
+                    if op==0xF0:position+=8;continue
+                    target=targets[0]
+                elif fading and op == 0xF0 and b == 0x08000000:
                     if target is not None: raise ReviewRequired('relocated dynamic palette binding')
                     dynamic_used = True; position += 8; continue
                 elif op == 0xF0 and b in bindings:
@@ -632,6 +661,12 @@ def prepare_models(source, descriptor):
                     if start in textures and textures[start][2:] != (w, h, fmt, bits):
                         raise ReviewRequired('texture has inconsistent dimensions')
                     textures[start] = (symbol, size, w, h, fmt, bits)
+                    for frame_target in targets:
+                        frame_name,frame_at,frame_size=source.containing(frame_target,exact=True)
+                        if (frame_size!=size or source.pointers(frame_at,frame_size) or
+                                frame_at in textures and textures[frame_at][2:]!=(w,h,fmt,bits)):
+                            raise ReviewRequired('material frames have inconsistent texture layouts')
+                        textures[frame_at]=(frame_name,frame_size,w,h,fmt,bits)
                 else:
                     if inherited_vertices:
                         raise ReviewRequired('Model overwrites its inherited vertex contract')
@@ -644,6 +679,7 @@ def prepare_models(source, descriptor):
             if position > n: raise ReviewRequired('truncated packed model')
         raw_models[label] = name, at, raw, pointers, receipts
     if used_bindings != set(bindings): raise ReviewRequired('unused constant palette binding')
+    if used_frames != set(material_frames):raise ReviewRequired('unused material-frame binding')
     if fading and not dynamic_used: raise ReviewRequired('unused palette-fade dependency')
     if inherited_palette is not None and (palettes or bindings or fading or not any(r[4]==2 for r in textures.values())):
         raise ReviewRequired('Unused or conflicting inherited palette contract')
@@ -680,7 +716,9 @@ def prepare_models(source, descriptor):
                 {p:(r[2], r[3]) for p,r in textures.items()}, vertex, n, static_materials=True,
                 palette_bindings=bindings, palette_fade=fading,
                 joint_matrices=matrices, inherited_palette_slot=inherited_palette,
-                inherited_vertices=inherited_vertices))
+                inherited_vertices=inherited_vertices,
+                material_bindings={address:(row['kind'],row['frames'][0]['donor_offset'])
+                                   for address,row in material_frames.items()}))
     # Validate all native emitter rules before creating output files.
     commands, sections = command_source(models, offsets)
     if fading:
@@ -965,6 +1003,9 @@ def name_metadata(source, item, identity):
 
 def metadata(source, item, profile, identity):
     from v3_furniture_rigs import FIXED_CATEGORY
+    from v3_furniture_materials import CATEGORY as MATERIAL_CATEGORY
+    if profile.get('callback_adapter',{}).get('category')==MATERIAL_CATEGORY:
+        raise ReviewRequired('Material-frame artwork is prepared; drawing, lifecycle behaviour, and acquisition need runtime adapters')
     if profile.get('callback_adapter',{}).get('category')==PENDING_MOVE_CATEGORY:
         raise ReviewRequired('Static artwork is prepared; move behaviour, profile interactions, and spawned effects need runtime adapters')
     if profile.get('callback_adapter',{}).get('category')==FIXED_CATEGORY:
