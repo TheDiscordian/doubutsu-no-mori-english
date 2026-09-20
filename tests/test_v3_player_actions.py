@@ -31,6 +31,106 @@ TRANSITIONS=ROOT/os.environ.get('V3_TOOL_TRANSITIONS_BUILD','build/v3-shared-too
 NET_CAPTURE=ROOT/os.environ.get('V3_NET_CAPTURE_BUILD','build/v3-shared-net-capture-01')
 ROD_EFFECTS=ROOT/os.environ.get('V3_ROD_EFFECTS_BUILD','build/v3-shared-rod-effects-01')
 SHOVEL_EFFECTS=ROOT/os.environ.get('V3_SHOVEL_EFFECTS_BUILD','build/v3-shared-shovel-effects-02')
+WRAPPED=ROOT/os.environ.get('V3_WRAPPED_PARENT_BUILD','build/v3-shared-wrapped-parents-03')
+
+
+class WrappedHostTests(unittest.TestCase):
+    sanitized=shared_tests.HostTests.sanitized
+    def test_parent_condition_and_category_bounds(self):self.sanitized('v3_held_presents_test.c')
+
+
+@unittest.skipUnless((WRAPPED/'build-lock.json').is_file(),'Current wrapped-parent proposal required')
+class WrappedParentTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.rom,cls.report=inputs(WRAPPED/'build-lock.json');cls.base,cls.prior=inputs(WRAPPED/'base-lock.json')
+        cls.files,cls.before=by_vrom(cls.rom),by_vrom(cls.base)
+        cls.e=cls.report['equipment_resources'];cls.old=cls.prior['equipment_resources'];cls.w=cls.e['wrapped_presents']
+        cls.blob=cls.files[BLOB].extract(cls.rom);cls.oldblob=cls.before[BLOB].extract(cls.base)
+        at=cls.e['blob_offset'];cls.module=cls.blob[at:at+cls.e['bytes']];cls.oldmodule=cls.oldblob[at:at+cls.old['bytes']]
+
+    def test_complete_source_mappings_and_guarded_reservation(self):
+        from v3_handheld_items import present_records
+        source=actions.Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+            (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+        table,receipt=present_records(source,self.e)
+        for key,value in json.loads(json.dumps(receipt)).items():self.assertEqual(value,self.w[key])
+        self.assertEqual(self.module[0x11F00:0x11F00+len(table)],table)
+        self.assertEqual(self.e['bytes'],0x12000)
+        self.assertEqual(self.module[-16:],struct.pack('>4I',*([actions.GUARD]*4)))
+        retained=bytearray(self.module[:len(self.oldmodule)]);retained[0x7000:0x7200]=self.oldmodule[0x7000:0x7200]
+        self.assertEqual(retained,self.oldmodule)
+        core=self.before[CODE_VROM].extract(self.base)
+        self.assertEqual(actions.equipment_extension(self.base,self.prior,self.oldblob,core,0x11000,0x12000),self.w['extension'])
+        broken=bytearray(self.oldblob);broken[self.w['extension']['first']]=1
+        with self.assertRaises(ValueError):actions.equipment_extension(self.base,self.prior,broken,core,0x11000,0x12000)
+        for key in ('inventory_preview','pocket_icons','parent_readers','player_actions','records','catalogue','optional_selection'):
+            self.assertEqual(self.e[key],self.old[key])
+        code=self.w['code'];self.assertEqual(code['bytes'],1132)
+        self.assertEqual(self.module[0x11000:0x11000+code['bytes']],(WRAPPED/'held_presents/code.bin').read_bytes())
+        for (word,) in struct.iter_unpack('>I',self.module[0x11000:0x11000+code['bytes']]):
+            self.assertNotIn(word>>26,(17,49,53,57,61))
+
+    def test_only_declared_hooks_and_complete_owner_relocation(self):
+        for row in self.w['consumers']:
+            before=self.before[row['vrom']].extract(self.base);after=self.files[row['vrom']].extract(self.rom)
+            restored=bytearray(after)
+            for h in self.w['hooks']:
+                if h['vrom']!=row['vrom']:continue
+                at=h['address']-row['ram'];self.assertEqual(after[at:at+8],bytes.fromhex(h['after']))
+                self.assertEqual(before[at:at+8],bytes.fromhex(h['before']));restored[at:at+8]=before[at:at+8]
+            self.assertEqual(restored,before)
+            self.assertEqual(sha256(before[row['start']-row['ram']:row['end']-row['ram']]),row['native_sha256'])
+            if row['relocation_vrom']:
+                rel=self.files[row['relocation_vrom']].extract(self.rom)
+                self.assertEqual(sha256(rel),row['relocation_sha256'])
+                sections=struct.unpack_from('>5I',rel)
+                # The hand's native Bell table subtracts 2100*4 from its base
+                # at 8087C6A8 before adding the complete item ID.
+                constants=(0x808742A8,) if row['vrom']==0x7829E0 else ()
+                for root in (0x80200010,0x80380010):
+                    moved=relocate_verified_data(SimpleNamespace(ram=row['ram'],resident_bytes=len(after)+sections[3],
+                        sections=sections),after,rel,root,address_constants=constants)
+                    for h in self.w['hooks']:
+                        if h['vrom']==row['vrom']:
+                            at=h['address']-row['ram'];self.assertEqual(moved[at:at+8],bytes.fromhex(h['after']))
+
+    def test_complete_external_owner_storage_and_retained_resources(self):
+        from v3_furniture_install import owner_tail_storage
+        moves=self.report['shared_runtime_refresh']['changed_owner_moves'];self.assertEqual(len(moves),1)
+        row=moves[0];self.assertEqual((row['vrom'],row['storage'],row['bytes']),(0x7829E0,'cartridge-tail',9216))
+        data=self.files[row['vrom']].extract(self.rom);start=row['physical'];end=start+len(data)
+        self.assertFalse(any(self.base[start:end]));self.assertEqual(self.rom[start:end],data)
+        self.assertEqual(owner_tail_storage(self.base,self.before,[(row['vrom'],data)]),moves)
+        relocated=owner_tail_storage(self.base,self.before,[(row['vrom'],data)],minimum_end=end+64)
+        self.assertGreaterEqual(relocated[0]['physical'],end+64)
+        bad=bytearray(self.base);bad[start]=1
+        with self.assertRaises(ValueError):owner_tail_storage(bad,self.before,[(row['vrom'],data)])
+        with self.assertRaises(ValueError):owner_tail_storage(self.base,self.before,[(row['vrom'],data)],minimum_end=len(self.base)-16)
+        self.assertEqual(len(self.blob),len(self.oldblob));reuse_resource_tail(self.rom,self.report,self.blob)
+        changed={BLOB,MODULE,CODE_VROM,0x19D40,0x7829E0,0x3950000}
+        for v in self.files.keys()-changed:
+            self.assertEqual(self.files[v].extract(self.rom),self.before[v].extract(self.base),hex(v))
+        self.assertEqual(self.report['save_runtime'],self.prior['save_runtime'])
+        self.assertIn('-DAF_V3_EQUIPMENT_BYTES=0x12000u',self.report['startup']['flags'])
+        original=(ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes()
+        self.assertEqual(apply_ups(original,(WRAPPED/'asset-loader.ups').read_bytes()),self.rom)
+
+    def test_future_category_refresh_and_optional_output(self):
+        import v3_held_catalogue as parents
+        import v3_optional_composition as composer
+        source=actions.Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+            (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+        clone=bytearray(self.blob);parents.refresh_parents(source,self.e,clone);self.assertEqual(clone,self.blob)
+        pin=composer.BASE,composer.BASE_SHA,composer.REPORT_SHA,composer.ABI
+        try:
+            composer.use_build_lock(WRAPPED/'build-lock.json');catalogue=composer.catalogue(self.rom,self.report)
+            self.assertEqual(len(catalogue),128)
+            self.assertEqual(composer.compose(self.rom,self.report,catalogue,composer.resolve(catalogue,list(catalogue)))[0],self.rom)
+            self.assertEqual(sha256(composer.compose(self.rom,self.report,catalogue,composer.resolve(catalogue,[]))[0]),self.report['translation_baseline']['sha256'])
+            for r in self.w['rows']:
+                with self.assertRaises(ValueError):composer.resolve(catalogue,[r['id']])
+        finally:composer.BASE,composer.BASE_SHA,composer.REPORT_SHA,composer.ABI=pin
 
 
 @unittest.skipUnless((SHOVEL_EFFECTS/'build-lock.json').is_file(),'Current shovel effects required')

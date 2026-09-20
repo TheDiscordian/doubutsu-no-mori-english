@@ -143,7 +143,9 @@ def refresh_parents(source,equipment,blob):
     if icon_report.get('extension_bank'):
         bank=icon_report['extension_bank'];at=bank['ram']-RAM;previous=old['pocket_icons']['extension_bank']
         expected=bytes.fromhex(previous.get('data_hex','')).ljust(bank['capacity'],b'\0')
-        if at<old['bytes']-4096 or at+bank['capacity']!=old['bytes']-16 or module[at:at+bank['capacity']]!=expected:
+        if (at!=0x10000 or at+bank['capacity']>old['bytes']-16
+                or module[at+bank['capacity']:at+bank['capacity']+16]!=struct.pack('>4I',*([GUARD]*4))
+                or module[at:at+bank['capacity']]!=expected):
             raise ValueError('Changed bounded icon extension storage')
         module[at:at+bank['capacity']]=bytes.fromhex(bank['data_hex']).ljust(bank['capacity'],b'\0')
     report['pocket_icons'].update(icon_report)

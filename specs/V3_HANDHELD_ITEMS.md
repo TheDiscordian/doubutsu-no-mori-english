@@ -1365,7 +1365,7 @@ ordinary fallback, returning the existing present category/art rather than the
 golden tool's unwrapped category. Disabled or invalid aliases must not reach that
 short table. Check the remaining field/save/name consumers before enabling them.
 
-The relevant native regions remain unchanged in the ABI-136 cartridge:
+The shared installer verifies these complete native input regions:
 
 - Core pocket insertion pair `800B8B08..800B8BE4`, 220 bytes, SHA-256
   `381dedb15e54d276176dc4691c7ed020b484ca87aa3b2df5604ba47193afb32a`.
@@ -1384,7 +1384,55 @@ The relevant native regions remain unchanged in the ABI-136 cartridge:
 
 Use one source-derived wrapped-parent mapping and the existing selected-parent
 predicate for all consumers. Keep reward state and acquisition readiness separate
-from ownership; none of this source audit constitutes installed wrapped support.
+from ownership. The transport implementation below does not enable reward routes.
+
+### Shared wrapped-gift transport
+
+`--refresh-runtime --player-actions` connects the complete active-tool parent
+category through `present_records`, `held_presents.c`, and `held_presents.S`.
+The `AFPW` table at `804B4F00` contains four header words (magic `41465057`,
+version one, count four, stride four), followed by four wrapped/parent halfword
+pairs. Each lookup validates the source identity pairing and selected parent.
+This is one mapping for the category, not extra imports or independent bits.
+
+The shared module occupies 72 KiB at `804A3000..804B5000`. A checked retired-
+sequence extension holds 1,132 bytes of integer-only code at `804B4000`, the
+32-byte mapping table, and the final guard at `804B4FF0`. All prior addresses
+and earlier guards remain. The category reader at `804AA000` occupies 412 of
+its reserved 512 bytes and handles aliases before native fallback: selected
+aliases use present category 14; unavailable aliases return zero.
+
+Four native hooks retain the surrounding functions and original relocations:
+
+- `800B8B18`: direct pocket insertion decodes selected aliases to parent and
+  condition one. Disabled aliases leave pockets unchanged. Ordinary presents
+  retain their native random-present branch.
+- `800B8B8C`: free-slot insertion rejects unavailable aliases before searching
+  or writing a pocket. Selected aliases use the native free/full-slot handling.
+- `8087C4B8`: the relocated hand constructor decodes exchange input and sets
+  the actual hand condition in BSS, addressed relative to its live continuation.
+  Unavailable aliases produce an empty hand rather than an invalid item.
+- `80873B30`: field exchange converts a selected wrapped parent to its alias;
+  normal and quest conditions retain the original parent. Native placement and
+  burying code remains in place.
+
+The two middle-of-function adapters preserve full 64-bit live GPRs, HI/LO,
+and untouched floating-point state. The hand owner retains its native BSS and
+biased Bell-table relocation (`808742A8 + item*4`, actual table `8087C6A8`).
+The installer checks complete original consumers, rejects relocation at displaced
+instructions, and verifies every emitted owner through the new DMA directory.
+
+The complete 9,216-byte hand owner uses the shared installer's checked physical
+cartridge-tail storage. Its logical VROM/relocation and resident dimensions do
+not change. The protected English-choice region and bounded import-object VROM
+space stay intact; the existing import blob does not grow for this copy. See
+[shared owner storage](V3_FURNITURE_PIPELINE.md#changed-owner-storage).
+
+Save formats, selected profiles, 128 existing choices, official names, and
+translation-only output remain unchanged. Golden tools stay pending acquisition
+and reward demos. Field/name/save acceptance outside these consumers still needs
+integration. Passing native pocket/menu-hook checks do not establish complete
+ordinary exchange, reward playthroughs, save/reload, appearance, or hardware.
 
 ## Shared parent names and prices
 

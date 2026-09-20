@@ -440,6 +440,27 @@ def build(output, art_path, lock=LOCK):
     return report
 
 
+def owner_tail_storage(base,files,changes,*,minimum_end=0):
+    """Allocate complete changed overlays after live physical cartridge data.
+
+    Overlay VROM identities already exist; consuming import-object VROM space
+    for their uncompressed copies needlessly constrains later shared adapters.
+    Keep the 64-MiB image, require zero padding, and retain every old resource.
+    """
+    cursor=max(minimum_end,max(e.pend or e.pstart+e.size for e in files.values() if e.pstart!=0xFFFFFFFF))
+    rows=[]
+    for vrom,data in changes:
+        first=(cursor+15)&~15;end=first+len(data);entry=files[vrom]
+        if (not data or len(base)!=0x4000000 or end>len(base) or any(base[cursor:end])
+                or any(e.pstart<end and first<(e.pend or e.pstart+e.size)
+                       for e in files.values() if e.pstart!=0xFFFFFFFF)):
+            raise ValueError('Changed owner requires verified unused cartridge-tail storage')
+        rows.append(dict(vrom=vrom,bytes=len(data),physical=first,storage='cartridge-tail',
+                         sha256=sha256(data),original_sha256=sha256(entry.extract(base))))
+        cursor=end
+    return rows
+
+
 def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=False, equipment_kinds=False,
                     player_actions=False, item_category_art=None, ground_categories=False, event_acquisition=False,
                     held_collection=False, held_catalogue_art=None, held_selection=False, translation_updates=False,
@@ -527,8 +548,9 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             if attribution:write_new(output/'provenance.patch',attribution.encode())
             equipment_report['parent_readers']['provenance_complete']=not bool(attribution)
     if resource_mode:
-        # Changed compressed owners keep their logical DMA identity/size but
-        # receive checked uncompressed storage before the ordinary resource tail.
+        # Changed compressed owners retain their logical DMA identities. Store
+        # their complete images outside the bounded import-object VROM region.
+        external=[]
         for vrom,data in owner_changes.items():
             entry=files[vrom]
             if held_catalogue_art is not None and vrom in (catalogue.VROM,catalogue.RELOC):
@@ -538,10 +560,7 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             resized=translation_updates and vrom in (0x3B60000,0x3B70000)
             if len(data)!=entry.size and not resized:raise ValueError('Runtime update changes owner dimensions')
             if entry.pend or resized:
-                blob.extend(bytes(-len(blob)%16));at=len(blob);blob.extend(data)
-                owner_moves.append(dict(vrom=vrom,blob_offset=at,bytes=len(data),
-                    physical=files[BLOB].pstart+at,sha256=sha256(data),
-                    original_sha256=sha256(entry.extract(base))))
+                external.append((vrom,data))
             elif files[BLOB].pstart<=entry.pstart<files[BLOB].pstart+len(blob):
                 # An earlier refresh can already own uncompressed overlay
                 # relocations inside the import blob. Update that same copy so
@@ -557,6 +576,8 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             blob.extend(bytes(-len(blob)%16));at=len(blob);blob.extend(data)
             moved.append(dict(vrom=row['vrom'],blob_offset=at,bytes=len(data),
                               physical=files[BLOB].pstart+at,sha256=sha256(data)))
+        owner_moves=owner_tail_storage(base,files,external,
+            minimum_end=files[BLOB].pstart+len(blob))
     abi=prior['runtime_abi']+1; struct.pack_into('>I',blob,4,abi)
     package=blob[PACKAGE:PACKAGE+PACKAGE_SIZE]; struct.pack_into('>I',blob,0xF8,zlib.crc32(package))
     old=prior['startup']
@@ -590,6 +611,8 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             raise ValueError('Runtime update changes an undeclared resource allocation')
         result[entry.pstart:entry.pstart+len(data)]=data
     if resource_mode:
+        for row in owner_moves:
+            result[row['physical']:row['physical']+row['bytes']]=owner_changes[row['vrom']]
         struct.pack_into('>I',result,DMA_START+files[BLOB].index*16+4,BLOB+len(blob))
         for row in moved+owner_moves:
             struct.pack_into('>4I',result,DMA_START+files[row['vrom']].index*16,
@@ -603,6 +626,10 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
     if result[DMA_START:DMA_END]!=expected:raise ValueError('Undeclared DMA-directory change')
     if event_acquisition and equipment_report:
         result=equipment.finish(result,base,output,equipment_report)
+    installed=by_vrom(result)
+    for vrom,data in owner_changes.items():
+        if installed[vrom].extract(result)!=data:
+            raise ValueError('Shared runtime loses a complete changed owner')
     fix_checksum(result);result=bytes(result)
     patch=make_ups(original,result)
     if apply_ups(original,patch)!=result: raise ValueError('Runtime patch reconstruction failed')

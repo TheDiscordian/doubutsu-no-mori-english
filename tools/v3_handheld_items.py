@@ -28,6 +28,33 @@ PENDING = ('Prepared held artwork only; native equipment selection, player actio
            'inventory/ground readers, acquisition, catalogue/collection, and saved-profile integration remain.')
 
 
+def present_records(source,equipment):
+    """Source golden aliases share one field/pocket transport contract."""
+    functions=[]
+    for at,n,digest in (
+        (0x70C68,224,'10f76ef4231b793e950ab1ab53b74981fc9bfab8892183b581e9020a1b6b8388'),
+        (0x26F53C,464,'cf5fadb664fc01766f108c5ac02a3329528e7f6c4f2c3776d954276444b845ab'),
+        (0x28781C,876,'739d4562cf390230978e0a660396b30ae2ba76d7320fc2d4d36527dc04441e4c')):
+        raw,receipt=source.function(at)
+        if len(raw)!=n or sha256(raw)!=digest:raise ValueError('Changed source wrapped-parent consumer')
+        functions.append(receipt)
+    types=source.raw('item1_5_tableNo')
+    if (len(types)!=49 or sha256(types)!='682d400251d20485243dcd4f8b77235f5b4d1ce43fe1e6c19ae814ead87fbb39'
+            or types[28]!=14 or types[31:35]!=bytes([14]*4)):
+        raise ValueError('Changed complete source present-category binding')
+    selected=equipment['player_actions']['equipment_selection']['rows']
+    parents=sorted((r for r in selected if not r['passive']),key=lambda r:r['item_id'])
+    if [int(r['item_id'],16) for r in parents]!=list(range(0x2239,0x223D)):
+        raise ValueError('Wrapped records require the complete installed active-tool category')
+    rows=[dict(id=r['id'],item_id=r['item_id'],wrapped_item_id=f'{0x251F+i:04X}',
+               native_kind=r['native_kind'],profile_byte=r['profile_byte'],profile_mask=r['profile_mask'],
+               pocket_condition=1,native_category=14) for i,r in enumerate(parents)]
+    table=struct.pack('>4I',0x41465057,1,len(rows),4)+b''.join(
+        struct.pack('>HH',int(r['wrapped_item_id'],16),int(r['item_id'],16)) for r in rows)
+    return table,dict(rows=rows,source_functions=functions,source_category_sha256=sha256(types),
+                      table_sha256=sha256(table),table_bytes=len(table))
+
+
 def pocket_icons(source, equipment, address, capacity, *, palette_address=None, extension_bank=None):
     """Resolve complete donor tool icons for the installed parent category records."""
     from title_assets import pack4, untile

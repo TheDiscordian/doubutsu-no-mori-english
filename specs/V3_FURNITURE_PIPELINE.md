@@ -2,6 +2,26 @@
 
 ## Workflow
 
+### Changed-owner storage
+
+The shared runtime refresh retains each changed overlay's logical DMA identity.
+Uncompressed, same-sized owners can be updated in place; owners inside the
+import blob also update that blob's authoritative contents and checksums.
+Compressed or explicitly permitted resized owners use complete uncompressed
+copies in verified unused physical cartridge-tail space. `owner_tail_storage`
+checks the 64-MiB bound, sixteen-byte alignment, zero destination, and every live
+physical DMA extent, including the proposed new end of the import blob. Old
+compressed bytes remain untouched but are no longer referenced by that owner.
+
+Do not consume the protected English-choice VROM range or relax import-blob
+growth checks to store an overlay copy. Resource-tail reuse still owns only its
+three declared catalogue/shop resources. Every complete changed owner must match
+the final DMA extraction. This shared storage rule adds no item-specific paths,
+saved formats, or browser choices. The wrapped-gift stage uses it for the native
+hand owner; its tag owner remains an in-place update.
+
+### Shared runtime categories
+
 For installed handheld categories, the shared `--refresh-runtime --player-actions`
 stages also connect source behaviour. The golden-net capture stage preserves the
 native candidate/forced-capture algorithms and supplies the donor's normal or

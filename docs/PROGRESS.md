@@ -18,19 +18,37 @@ served patchers retain their existing builds.
 
 ## Active development
 
-The current explicit ABI-136 proposal is
-`build/v3-shared-tool-parents-01/build-lock.json`. All eight balloons are
+The current explicit ABI-137 proposal is
+`build/v3-shared-wrapped-parents-03/build-lock.json`. All eight balloons are
 connected through the shared parent-category installer: official names/prices,
 complete pocket icons, held/inventory animation, source acquisition records,
 collection/catalogue, animated room profiles, indoor conversion, and inverse
 pickup. The local composer has 128 experimental choices, including 24 equipment
 parents. These are not a public or hardware-ready handoff.
 
+Shared wrapped-gift transport connects all four golden-tool identities through
+native pocket insertion, exchange-hand initialization, and field exchange. Pockets
+contain the actual tool plus its wrapped condition; disabled aliases are rejected.
+The category reader uses existing present artwork without indexing beyond the
+native miscellaneous table. The module occupies 72 KiB, preserving prior resource
+addresses. The shared installer stores changed compressed overlays in checked
+unused cartridge space without consuming the bounded import-object region.
+
+One sanitizer check and four cartridge/composition checks pass. The first silent
+native run passes 308 records and 202 assertions, including four-player pocket
+handling, full/unselected rejection, 14 relocated menu-hook windows, live register
+and memory guards, restored state, and clean exit. The private browser worker
+matches offline empty/all/mixed/equipment outputs; its export stays unserved.
+These are component checks, not ordinary reward acquisition or hardware tests.
+Golden-tool choices remain disabled pending acquisition, reward demos, and the
+remaining wrapped field/name/save consumers. See the
+[wrapped-gift checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-wrapped-gift-transport).
+
 All four golden-tool parents have official names/prices, complete pocket icons,
 collection bindings, and catalogue models through the shared category installer.
 Their active-tool selectors retain native actions rather than passive-item rules.
-The module occupies 68 KiB; a checked 4-KiB extension preserves all old resource
-addresses and holds the four new icons. Acquisition and reward demos remain
+The four new icons occupy their checked 4-KiB extension, with all old resource
+addresses retained. Acquisition and reward demos remain
 unfinished, so these four choices and their catalogue completion counts stay
 disabled. The existing 128 choices and saved profile are unchanged.
 

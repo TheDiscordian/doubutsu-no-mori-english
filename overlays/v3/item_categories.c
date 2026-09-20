@@ -24,6 +24,17 @@ extern int af_test_category_selected(u32), af_test_category_original(u32);
 
 int af_v3_equipment_category(u32 argument) {
     u32 item=(u16)argument, index=item-0x2224u;
+#ifdef AF_V3_PRESENT_DECODE
+    if (item-0x251Fu<4u) {
+#ifdef __mips__
+        u32 parent=((u32 (*)(u32))AF_V3_PRESENT_DECODE)(item);
+#else
+        extern u32 af_test_present_decode(u32);
+        u32 parent=af_test_present_decode(item);
+#endif
+        return parent ? 14 : 0; /* Existing wrapped-present artwork. */
+    }
+#endif
     if (index>=56u) return original(argument);
     /* Never let a missing/disabled extended identity index the native short
        equipment table. The shared selector includes actual profile readiness. */

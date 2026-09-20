@@ -81,6 +81,9 @@ SOURCES = ('tools/v3_player_actions.py','tools/v3_furniture_pipeline.py',
            'overlays/v3/tool_net.c','overlays/v3/tool_rod.S',
            'overlays/v3/tool_effects.c','overlays/v3/tool_effects.S',
            'overlays/v3/tool_effects.ld') + sound_programs.SOURCES
+SOURCES+=('overlays/v3/held_presents.c','overlays/v3/held_presents.S',
+          'overlays/v3/held_presents.ld','overlays/v3/item_categories.c',
+          'overlays/v3/item_categories.ld')
 
 SELECTION_OFFSET=0x5500
 PARENT_CODE_OFFSET,PARENT_TABLE_OFFSET=0x3000,0x57F0
@@ -127,6 +130,80 @@ def equipment_extension(base,prior,blob,core,previous_size,new_size):
 
 def effects_reservation(base,prior,blob,core):
     return equipment_extension(base,prior,blob,core,EFFECTS_OFFSET,EFFECTS_MODULE_SIZE)
+
+
+def refresh_presents(base,prior,blob,core,original,output):
+    """Shared selected wrapped identities across pockets, exchange, and ground art."""
+    from v3_handheld_items import present_records
+    from v3_category_runtime import CODE as CATEGORY_CODE,MAP as CATEGORY_END
+    old=prior['equipment_resources'];start=old['blob_offset'];files=by_vrom(base)
+    if not old.get('optional_selection',{}).get('pending') or old.get('wrapped_presents'):
+        raise ValueError('Wrapped transport requires the installed pending active-tool parents')
+    reservation=equipment_extension(base,prior,blob,core,0x11000,0x12000)
+    source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+                  (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    table,receipt=present_records(source,old)
+    code,compiled=compile_part('held_presents',output/'held_presents',
+        extra_sources=('overlays/v3/held_presents.S',),defines=(
+            f'AF_V3_HELD_SELECTED=0x{old["player_actions"]["code"]["symbols"]["af_v3_player_selected_equipment"]:08X}u',))
+    if len(code)>0xF00 or len(table)>0xF0:raise ValueError('Wrapped transport exceeds its bounded extension')
+    # Mid-function wrappers preserve every integer register; their callees must
+    # remain integer-only, without FP instructions or extra state.
+    for (word,) in struct.iter_unpack('>I',code):
+        if word>>26 in (17,49,53,57,61):raise ValueError('Unexpected floating-point wrapped-item instruction')
+    module=bytearray(blob[start:start+old['bytes']])+bytearray(4096)
+    module[0x11000:0x11000+len(code)]=code;module[0x11F00:0x11F00+len(table)]=table
+    struct.pack_into('>4I',module,0x11FF0,*([GUARD]*4))
+    category=old['item_categories'];previous=category['code'];at=CATEGORY_CODE
+    if sha256(module[at:at+previous['bytes']])!=previous['sha256'] or any(module[at+previous['bytes']:CATEGORY_END]):
+        raise ValueError('Changed complete category reader/reservation')
+    defines=tuple(f[2:] for f in previous['flags'] if f.startswith('-D'))+(
+        f'AF_V3_PRESENT_DECODE=0x{compiled["symbols"]["af_v3_present_decode"]:08X}u',)
+    reader,reader_report=compile_part('item_categories',output/'item_categories',defines=defines)
+    if len(reader)>CATEGORY_END-at or reader_report['symbols']['af_v3_equipment_category']!=RAM+at:
+        raise ValueError('Wrapped category reader exceeds its fixed reservation')
+    module[at:CATEGORY_END]=reader.ljust(CATEGORY_END-at,b'\0')
+    native=by_vrom(original);consumers=[];changes={};hooks=[]
+    for vrom,original_vrom,ram,first,last,digest,sites in (
+        (CODE_VROM,CODE_VROM,CODE_RAM,0x800B8B08,0x800B8BE4,
+         '381dedb15e54d276176dc4691c7ed020b484ca87aa3b2df5604ba47193afb32a',
+         ((0x800B8B18,'af_v3_present_pocket',False,None),(0x800B8B8C,'af_v3_present_free',False,None))),
+        (0x7829E0,0x7829E0,0x8087A330,0x8087C360,0x8087C574,
+         'a09dc65364813de64a24cfe3be1b4a3011e8a7632ea04f310544d4a7b8fb199c',
+         ((0x8087C4B8,'af_v3_present_hand',True,0x8C62003C),)),
+        (0x3950000,0x777AE0,0x8086F310,0x80873ADC,0x80873C88,
+         'b8687849d775924757ba47023c91b0b3ef1dc889cda8ca77a5a71a1e613f611f',
+         ((0x80873B30,'af_v3_present_exchange',True,0x9727023C),))):
+        before=bytes(core) if vrom==CODE_VROM else files[vrom].extract(base)
+        reference=native[original_vrom].extract(original)[first-ram:last-ram]
+        if before[first-ram:last-ram]!=reference or sha256(reference)!=digest:
+            raise ValueError('Changed complete native wrapped-item consumer')
+        patched=bytearray(before)
+        reloc_vrom={0x7829E0:0x784DE0,0x3950000:0x3960000}.get(vrom)
+        rel=files[reloc_vrom].extract(base) if reloc_vrom else None
+        slots=relocation_offsets(rel,len(before)) if rel else set()
+        for address,name,link,delay in sites:
+            p=address-ram
+            if slots&{p,p+4}:raise ValueError('Wrapped hook displaces native relocation')
+            after=struct.pack('>2I',(0x0C000000 if link else 0x08000000)|
+                               ((compiled['symbols'][name]>>2)&0x3FFFFFF),delay or 0)
+            hooks.append(dict(vrom=vrom,ram=ram,address=address,symbol=name,
+                              before=before[p:p+8].hex(),after=after.hex()))
+            patched[p:p+8]=after
+        if vrom==CODE_VROM:core[:]=patched
+        else:changes[vrom]=bytes(patched)
+        consumers.append(dict(vrom=vrom,ram=ram,start=first,end=last,native_sha256=digest,
+            output_sha256=sha256(patched),relocation_vrom=reloc_vrom,
+            relocation_sha256=sha256(rel) if rel else None))
+    blob[start:start+len(module)]=module
+    report=copy.deepcopy(old);report['item_categories']['code']=reader_report
+    receipt.update(format='AFV3-WRAPPED-PARENTS-1',code=compiled,code_offset=0x11000,
+        table_offset=0x11F00,table_ram=RAM+0x11F00,extension=reservation,hooks=hooks,
+        consumers=consumers,category_reader=reader_report,saved_format_changed=False,
+        profile_bits_enabled=0,ordinary_acquisition_tested=False,reward_demos_installed=False)
+    report.update(wrapped_presents=receipt,bytes=len(module),sha256=sha256(module),
+                  crc32=zlib.crc32(module),additional_resident_bytes=4096)
+    return report,changes
 
 
 def refresh_shovel_effects(base,prior,blob,core,original,output):
@@ -1524,6 +1601,8 @@ def expanded_tables(source,owner,reloc,*,categories=CATEGORIES,native_count=NATI
 
 def install(base,prior,blob,core,original,output):
     old=prior.get('equipment_resources',{})
+    if old.get('optional_selection',{}).get('pending') and not old.get('wrapped_presents'):
+        return refresh_presents(base,prior,blob,core,original,output)
     if (old.get('player_actions',{}).get('shovel_effects') and
             not old.get('inventory_preview',{}).get('tool_previews')):
         from v3_inventory_equipment import refresh_tools

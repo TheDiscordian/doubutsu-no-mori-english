@@ -1,5 +1,90 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared wrapped-gift transport
+
+The explicit ABI-137 proposal is
+`build/v3-shared-wrapped-parents-03/build-lock.json`. Shared source-derived
+records connect the four golden-tool wrapped identities across native direct/
+free pocket insertion, hand construction, field exchange, and category lookup.
+The 128 experimental choices, saved profile, official text, and exact V2-12
+no-import output remain unchanged. Golden-tool rewards and options stay disabled.
+The main ABI-109 lock and both served patchers remain unchanged.
+
+- ROM SHA-256:
+  `b5e35a39bbee583fad2e98ecac6b6b89bca2b8bbd4e72c777a1b5fd2c793f3c4`.
+- Report SHA-256:
+  `7bac03e7438cbbaa7b42a5c80fe3aa1b999fd2ef7c3a3fcecc187df5ee89b66d`.
+- UPS SHA-256:
+  `da29665024e32cb7bcde24e54f98d1784491053f58fb37f323dafc0b56bf0111`.
+
+The 1,132-byte adapter and 32-byte table occupy a checked retired-sequence
+extension, bringing the module to 72 KiB without moving old resources. The final
+guard is `804B4FF0`; all earlier guards remain. The category reader uses 412 of
+its reserved 512 bytes. Selected aliases map to existing present category 14,
+never the native out-of-bounds miscellaneous index. Pockets contain actual
+parents plus condition one; disabled aliases cannot insert invalid pocket items.
+Full pockets retain native rejection, and wrapped insertion does not prematurely
+credit collection. Normal and quest exchange conditions keep the parent identity.
+
+The initial build correctly stopped at the import-blob growth guard: placing
+the complete uncompressed hand owner there would cross protected English-choice
+VROM `025F0000`. The shared installer now stores compressed/resized owner copies
+in checked unused physical cartridge space, retaining their logical DMA IDs and
+all old bytes. The complete 9,216-byte hand owner moves; the tag owner updates in
+place. The import blob does not grow, and no overlap guard is relaxed. The final
+allocator also accounts for any proposed new physical blob end before placing
+external copies. The preceding `-02` ROM has the same output hash; `-03` records
+the stricter shared allocator source and is the authoritative proposal.
+
+One host sanitizer check and four current cartridge/composition checks pass:
+
+```sh
+python3 -m unittest \
+  tests.test_v3_player_actions.WrappedHostTests \
+  tests.test_v3_player_actions.WrappedParentTests -v
+```
+
+The host check covers mappings, selection masks, conditions, damaged headers,
+strict identities, native fallback, and bounded category handling. Three initial
+cartridge checks pass; the relocation check exposes a fixture omission, not a
+ROM failure. Its corrected model includes the hand's 768-byte BSS and original
+biased Bell-table base (`808742A8 + item*4`); the affected check then passes.
+Together these bind complete donor functions/table, native regions, all four
+hooks, two relocation bases, module retention, allocation/zero-space rejection,
+actual DMA extraction, unchanged unrelated resources/save profile, exact UPS
+reconstruction, future parent-table regeneration, all/empty composition, and
+unavailable-option rejection. No native or cartridge guard is weakened.
+
+The first silent native run at `build/smoke-v3-wrapped-parents-01/` passes
+**308 records and 202 assertions**, SHA-256
+`e122c865df8974ebb9275685d774dd01fa2489a188a7fb51a737b371c710d3b7`.
+The existing shared collection scenario exercises actual current-cartridge
+pocket APIs for four isolated resident records, all four aliases, ownership,
+conditions, full pockets, disabled selections, and category lookup. It loads
+both complete hand/tag owners through the native DMA/relocation loader, then
+executes 14 actual hook windows with full-width live GPRs, HI/LO, FP state, and
+private memory guards. Actual relocated hand-condition writes, untouched owner
+code, restored profiles/player state, checkpoint restoration, zero faults, and
+clean shutdown pass. The established lower-memory call bridge is the only
+uploaded executable fixture. No user save or audible output is used. Harness
+work stays within its 30-minute budget; no native retry is needed.
+
+The current private export is `build/v3-wrapped-parents-browser-01/`. The real
+browser worker reads the two supplied games and matches offline empty/all/
+mixed/equipment outputs. Empty output is exact V2-12; all output is the ABI-137
+ROM above. Cancellation, unknown-option and corrupt-plan rejection, no browser
+errors, local GET-only requests, and temporary-server shutdown pass. Results at
+`build/check-v3-wrapped-parents-browser-01/results.json` have SHA-256
+`32427ac8070cebd203ee5add2b9cfa76be913b0c8a11670df279641162214f07`.
+The export stays unserved. This does not close the separate full-interface test.
+
+Remaining work: finish wrapped field/name/save consumers and source-backed tool
+acquisition/reward demos before enabling any golden-tool choice. Full ordinary
+exchange, reward gameplay, visual appearance, save/reload, and hardware are not
+proven by these component checks. Format-2 imported saves require matching or
+larger profiles and must not be loaded in V2. This batch makes implementation
+and verification progress; the full V3 objective remains incomplete.
+
 ## Shared golden-tool parent category
 
 The explicit ABI-136 proposal is

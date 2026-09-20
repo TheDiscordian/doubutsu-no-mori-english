@@ -930,12 +930,101 @@ def event_menu(debug,rom_path,record):
                 catalogue_ownership_tested=True,save_reload_tested=False,requires_checkpoint_restore=True)
 
 
+def wrapped_menu_cases(debug,image,receipt,call,check,record):
+    """Actual relocated hand/exchange hook windows; no menu or reward simulation."""
+    from v3_furniture_room_smoke import extend
+    files=by_vrom(image);size=0x18000
+    allocation=call(0x8009BFC0,[size])
+    if allocation&15 or not MODULE_RAM+0x8000<=allocation<=0x80400000-size:
+        raise ValueError('Wrapped menu allocation outside native heap')
+    root,fixture,stack=(allocation+n for n in (16,0x12000,0x16000))
+    edge=b'V3WP'*4
+    debug.write_memory(allocation,bytes(size))
+    guards=(allocation,fixture-16,fixture+0x400,stack-0x800,stack+0x200,allocation+size-16)
+    for address in guards:debug.write_memory(address,edge)
+    profiles={a:debug.read_memory(a,192) for a in (0x80460020,0x8046C010)}
+    cases=0
+    try:
+        for row in receipt['consumers']:
+            if not row['relocation_vrom']:continue
+            data,rel=(files[v].extract(image) for v in (row['vrom'],row['relocation_vrom']))
+            if sha256(data)!=row['output_sha256'] or sha256(rel)!=row['relocation_sha256']:
+                raise ValueError('Wrapped menu owner differs from its full receipt')
+            sections=struct.unpack_from('>5I',rel);ram=row['ram'];resident=len(data)+sections[3]
+            if resident+len(rel)>=fixture-root-16:raise ValueError('Wrapped menu fixture overlaps owner')
+            hand=row['vrom']==0x7829E0
+            constants=(0x808742A8,) if hand else () # Native biased Bell table.
+            loaded=relocate_verified_data(SimpleNamespace(ram=ram,resident_bytes=resident,sections=sections),
+                                         data,rel,root,address_constants=constants)
+            call(0x800262D0,[row['vrom'],row['vrom']+len(data),ram,ram+resident,root,root+resident,len(rel)])
+            check('complete cartridge hand/exchange owner and BSS',root,loaded)
+            hook=next(h for h in receipt['hooks'] if h['vrom']==row['vrom'])
+            start=root+hook['address']-ram;target=start+8
+            # One case for each mapping, plus unavailable and ordinary states.
+            tests=[(r,True,1) for r in receipt['rows']]
+            tests += [(receipt['rows'][0],False,1),(None,True,0)]
+            if not hand:tests += [(receipt['rows'][0],True,0),(receipt['rows'][0],True,2)]
+            for parent,enabled,condition in tests:
+                for address,original in profiles.items():
+                    profile=bytearray(original)
+                    for r in receipt['rows']:profile[r['profile_byte']]|=r['profile_mask']
+                    if parent and not enabled:profile[parent['profile_byte']]&=~parent['profile_mask']
+                    debug.write_memory(address,profile)
+                item=int(parent['wrapped_item_id' if hand else 'item_id'],16) if parent else 0x2200
+                result=(int(parent['item_id'],16) if enabled else 0) if hand and parent else item
+                if not hand and parent and enabled and condition==1:result=int(parent['wrapped_item_id'],16)
+                debug.write_memory(fixture,bytes(0x400))
+                if hand:
+                    debug.write_memory(fixture+0x3C,struct.pack('>I',item))
+                    debug.write_memory(root+0x26E4,bytes(4))
+                else:
+                    debug.write_memory(fixture+0x23C,struct.pack('>H',item))
+                    debug.write_memory(fixture+0x2E4,struct.pack('>I',condition))
+                before=debug.command('g');regs=[int(before[i:i+16],16) for i in range(0,len(before),16)]
+                if len(regs)!=71 or regs[37]&0xFFFFFFFF!=0x800D334C:
+                    raise ValueError('Wrapped hook requires a paused native game frame')
+                for i in range(1,32):
+                    if i not in (26,27):regs[i]=(0x13579000+i)<<32|(0x2468A000+i)
+                regs[3 if hand else 25]=extend(fixture)
+                regs[29],regs[37]=extend(stack),extend(start)
+                regs[33],regs[34]=0x123456789ABCDEF0,0xFEDCBA9876543210
+                wanted=regs.copy();wanted[31]=extend(target)
+                if hand:wanted[1],wanted[2]=0x251C,result
+                else:wanted[3],wanted[7]=result&0xF000,result
+                bp=f'0,{target:x},4'
+                if debug.command('Z'+bp)!='OK':raise ValueError('Wrapped hook breakpoint refused')
+                try:
+                    if debug.command('G'+''.join(f'{r:016x}' for r in regs))!='OK':
+                        raise ValueError('Wrapped hook register write refused')
+                    stopped=debug.command('c');raw=debug.command('g')
+                    actual=[int(raw[i:i+16],16) for i in range(0,len(raw),16)]
+                    changes={str(i):[f'{wanted[i]:016X}',f'{actual[i]:016X}']
+                        for i in (*range(26),28,29,30,31,33,34,*range(38,70)) if wanted[i]!=actual[i]}
+                    passed=not changes and stopped[:3] in ('T05','S05') and actual[37]&0xFFFFFFFF==target
+                    record(dict(wrapped_menu_hook=hook['symbol'],item=f'{item:04X}',selected=enabled,
+                        condition=condition,differences=changes,assertion='passed' if passed else 'failed'))
+                    if not passed:raise ValueError('Wrapped hook changed live registers or continuation')
+                finally:debug.command('z'+bp);debug.command('G'+before)
+                if hand:
+                    check('actual relocated hand condition',root+0x26E4,struct.pack('>I',int(parent is not None and enabled)))
+                    debug.write_memory(root+0x26E4,bytes(4))
+                check('complete hand/exchange owner retained',root,loaded)
+                for address in guards:check('wrapped menu memory guard',address,edge)
+                cases+=1
+    finally:
+        for address,original in profiles.items():debug.write_memory(address,original)
+        call(0x8009C040,[allocation])
+    for address,original in profiles.items():check('restored wrapped menu profile',address,original)
+    return cases
+
+
 def held_collection(debug,rom_path,record):
     """Actual acquisition/collection with four isolated resident records; no Flash writes."""
     from runtime_layout import TEST_STACK
     path=Path(rom_path);image=path.read_bytes();report=json.loads((path.parent/'build.json').read_bytes())
     if sha256(image)!=report['output_sha256']:raise ValueError('Changed collection cartridge')
     equipment=report['equipment_resources'];receipt=equipment['collection']
+    wrapped=equipment.get('wrapped_presents');menu_cases=0
     files=by_vrom(image);blob=files[runtime.BLOB].extract(image)
     at=equipment['blob_offset'];module=blob[at:at+equipment['bytes']]
     boot=boot_proofs(image)
@@ -980,6 +1069,9 @@ def held_collection(debug,rom_path,record):
         for address in (TEST_STACK-0x800,TEST_STACK+0x40):debug.write_memory(address,edge)
         wanted=bytearray(640)
         first,last=receipt['rows'][0],receipt['rows'][-1]
+        if wrapped:
+            parents={r['item_id']:r for r in receipt['rows']}
+            first,last=(parents[r['item_id']] for r in (wrapped['rows'][0],wrapped['rows'][-1]))
         for p in range(4):
             private=0x80126EC0+p*0xBD0
             debug.write_memory(0x80136FD8,struct.pack('>I',private))
@@ -992,7 +1084,17 @@ def held_collection(debug,rom_path,record):
             call(0x80469AD4,[private,item],1);call(0x80469AD4,[private,display+3],1)
             call(0x800B88EC,[display+1]);check('rotation shares one bit',0x8046C0D0,wanted)
             other=(last,first)[p%2];other_item=int(other['item_id'],16)
-            call(0x800B8B8C,[private,other_item,1])
+            if wrapped:
+                # Rotate through all four aliases without crediting ownership.
+                alias=wrapped['rows'][(p+1)%4];other_item=int(alias['item_id'],16)
+                if other_item==item:alias=wrapped['rows'][(p+2)%4];other_item=int(alias['item_id'],16)
+                wrapped_id=int(alias['wrapped_item_id'],16)
+                call(0x800B8B8C,[private,wrapped_id,0],1)
+                call(0x800B8B08,[private,2,wrapped_id,0])
+                check('wrapped aliases become actual pocket parents',private+0x14,struct.pack('>3H',item,other_item,other_item)+bytes(24))
+                check('wrapped aliases set both pocket conditions',private+0x34,struct.pack('>I',0x14))
+                call(0x804AA000,[wrapped_id],14)
+            else:call(0x800B8B8C,[private,other_item,1])
             check('wrapped condition does not collect',0x8046C0D0,wanted)
             call(0x80469AD4,[private,other_item],0)
             check('original native furniture collection untouched',private+0xAF0,bytes(120))
@@ -1004,6 +1106,19 @@ def held_collection(debug,rom_path,record):
         call(0x80469AD4,[0x80126EC0,int(first['item_id'],16)],0)
         call(0x800B88EC,[int(first['item_id'],16)])
         check('disabled parent leaves ownership intact',0x8046C0D0,wanted)
+        if wrapped:
+            private=0x80126EC0;alias=int(wrapped['rows'][0]['wrapped_item_id'],16)
+            pockets=debug.read_memory(private+0x14,36)
+            call(0x800B8B8C,[private,alias,0],0);call(0x800B8B08,[private,0,alias,0])
+            check('unselected aliases never mutate pockets',private+0x14,pockets)
+            call(0x804AA000,[alias],0)
+            selected[first['profile_byte']]|=first['profile_mask']
+            debug.write_memory(0x80460020,selected);debug.write_memory(0x8046C010,selected)
+            full=struct.pack('>15H',*([0x2200]*15))+pockets[30:]
+            debug.write_memory(private+0x14,full);call(0x800B8B8C,[private,alias,0],0)
+            check('full pockets reject without mutation',private+0x14,full)
+            menu_cases=wrapped_menu_cases(debug,image,wrapped,call,check,record)
+            check('wrapped handling does not grant ownership',0x8046C0D0,wanted)
         for address in (TEST_STACK-0x800,TEST_STACK+0x40):check('test stack guard',address,edge)
         check('save-state guard',0x8046C350,bytes.fromhex('AF53C0DE')*4)
         check('equipment guard',0x804A3000+equipment['bytes']-16,bytes.fromhex('AF48C0DE')*4)
@@ -1014,7 +1129,7 @@ def held_collection(debug,rom_path,record):
         for address,value in saved.items():debug.write_memory(address,value)
         call(0x8009C040,[allocation])
     for address,value in saved.items():check('restored isolated state',address,value)
-    return dict(native_held_collection=True,players=4,flash_written=False,
+    return dict(native_held_collection=True,players=4,flash_written=False,wrapped_menu_windows=menu_cases,
         ordinary_gameplay_tested=False,catalogue_screen_tested=False,requires_checkpoint_restore=True)
 
 

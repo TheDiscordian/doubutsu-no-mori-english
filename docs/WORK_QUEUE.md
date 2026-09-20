@@ -2,17 +2,27 @@
 
 ## Active: V3 optional GameCube imports
 
-The current explicit proposal is ABI 136,
-`build/v3-shared-tool-parents-01/build-lock.json`. All eight balloons are
+The current explicit proposal is ABI 137,
+`build/v3-shared-wrapped-parents-03/build-lock.json`. All eight balloons are
 connected through shared source-derived parent records, room profiles, indoor
 conversion/pickup, collection/catalogue, complete icons, and optional selection.
 There are 128 experimental choices, with 24 equipment parents. Neither served
 V2 patcher nor the main lock changes.
 
+Shared wrapped-gift decoding/encoding and bounded category lookup are installed.
+The module occupies 72 KiB; complete changed compressed owners use checked unused
+physical cartridge storage, retaining their logical DMA identities. One sanitizer
+check and four cartridge/composition checks pass. The first silent native check
+passes 308 records and 202 assertions, including all four pocket aliases and
+14 actual relocated hand/exchange windows. Current private browser reconstruction
+passes empty/all/mixed/equipment profiles. Reuse these component results; they do
+not prove full reward, ordinary exchange, or hardware behaviour. See the
+[wrapped-gift checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-wrapped-gift-transport).
+
 Shared golden-tool parent integration is installed: official names/prices,
 complete pocket icons, collection bindings, catalogue models, and active-tool
-selectors. The checked icon extension brings the module to 68 KiB without moving
-old resources. One sanitizer check and four cartridge/composition checks pass;
+selectors. The checked icon extension retains all older resource addresses.
+One sanitizer check and four cartridge/composition checks pass;
 the first silent native run passes 182 records and 117 assertions. It covers the
 changed readers and all four models/icons, not ordinary acquisition or rendered
 appearance. The current private browser worker matches all four offline profiles.
@@ -94,7 +104,8 @@ Do not add wear to existing N64 axes to implement an unbreakable golden axe.
 This is a source/cartridge audit, not ordinary golden-axe gameplay. See the
 [audit](checkpoints/V3_FURNITURE_PIPELINE.md#golden-axe-durability-audit).
 
-Next connect shared tool acquisition, reward demos, and wrapped-present handling.
+Next connect shared tool acquisition and reward demos, finishing the remaining
+wrapped field/name/save consumers before enabling rewards.
 The complete parent records already preserve active/passive differences, room
 identities, ownership, previews, and icons; do not rebuild per-item installers.
 The donor's net/rod rewards use collection completion and the present-demo actor;
@@ -106,11 +117,10 @@ resource installation alone must not enable them. Golden tool parents retain
 their IDs in rooms; display forms belong to collection/catalogue. Continue from
 the current lock without replaying completed input, preview, or parent checks.
 The [wrapped-identity audit](../specs/V3_HANDHELD_ITEMS.md#golden-tool-acquisition-and-wrapped-identities)
-pins the three donor/native consumers and actual current tag owner. Implement
-their shared decode/encode and category handling together: wrapped aliases exceed
-the original 30-entry miscellaneous table and must not reach its unchecked
-fallback. Pockets store parent plus condition, never a wrapped alias. Check
-field/save/name handling before enabling any reward route.
+pins the three donor/native consumers and actual current tag owner. Their shared
+decode/encode and category handling is installed: wrapped aliases bypass the
+original 30-entry miscellaneous table, and pockets store parent plus condition,
+never an alias. Check field/save/name handling before enabling any reward route.
 
 The source `Player_actor_setup_Item_Tumble_getup` also releases a carried balloon
 when its balloon actor exists: it clears the equipped item and requests the
