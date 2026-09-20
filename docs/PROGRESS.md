@@ -18,6 +18,17 @@ served patchers retain their existing builds.
 
 ## Active development
 
+The shared importer also prepares complete fixed keyframe rigs independently of
+unfinished gameplay callbacks. `build/v3-fixed-keyframe-rigs-prepared-01/`
+contains tiger bobblehead, stone coin, harvest clock, and judge's bell: 15,776
+bytes of complete models, skeletons, and motions compiled in one container.
+Three focused checks pass, covering complete graphics/keyframe data, changed
+resource bindings, cache reuse, and refusal to enable unfinished behaviour.
+Stop/repeat initialization, clock joints, and pending move/destroy code remain
+explicit. These are prepared resources, not four new playable imports; neither
+the cartridge nor its 136 choices changes. See the
+[fixed-rig checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-fixed-keyframe-resource-preparation).
+
 The current explicit proposal is ABI 165 at
 `build/v3-shared-translucent-imports-01/cartridge/build-lock.json`. Shared IA16
 texture conversion and two translucent material formulas preserve all source
@@ -135,9 +146,9 @@ and full golden-shovel acquisition follow the primary importing work. See the
 The shared open/close category prepares both Harvest storage objects, retaining
 complete models, skeletons, animations, source interaction flags, and opening
 limits. Two converter checks pass; the shared runtime above supplies their
-lifecycle. Ordinary profiles are staged; acquisition remains required. Across the
-currently scanned `3xxx` furniture candidates, 69 of 101 non-alias, non-dummy records have
-prepared artwork. Continue shared integration before required gold-tree work.
+lifecycle. Ordinary profiles are staged; acquisition remains required. The additional
+fixed rigs described above are prepared separately and need their actual runtime
+behaviours. Continue shared integration before required gold-tree work.
 See the [storage checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#openclose-storage-category).
 
 The shared sound category reuses complete prepared artwork and audio from

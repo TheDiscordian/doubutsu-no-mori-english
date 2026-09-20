@@ -31,7 +31,7 @@ import v3_feng_shui as feng
 import v3_shops as shops
 import v3_resource_capacity as capacity
 
-VERSION = 11
+VERSION = 12
 LOCK = ROOT/'config/v3-import-build.json'
 STABLE = ROOT/'build/v2-keyboard-fit-11/Animal Forest English V2.z64'
 STABLE_SHA = '8bbd1955536a2a3ac9f76d6f323842f5ce25c037e1ff5fd3da9f28d6dfe20507'
@@ -65,7 +65,9 @@ def profile(row, vrom, *, limit=END):
     fading = adapter.get('category') == 'switch-palette-fade'
     sequence = adapter.get('category') == 'constant-model-sequence'
     sound = adapter.get('category') == 'switch-trigger-sound'
-    from v3_furniture_rigs import RIG_CATEGORIES
+    from v3_furniture_rigs import RIG_CATEGORIES,FIXED_CATEGORY
+    if adapter.get('category')==FIXED_CATEGORY:
+        raise ValueError('Prepared fixed rigs have no implemented native lifecycle')
     rigged = adapter.get('category') in RIG_CATEGORIES
     layers = tuple(offsets) if rigged else tuple(adapter['model_order']) if fading or sequence else LAYERS
     if (limit not in (END,capacity.LIMIT) or not 0 < n <= 9216 or n%16 or vrom%16 or vrom+n > limit or len(scalar) != 16
@@ -184,7 +186,7 @@ def checked_assets(art_path, source, worksheet):
     raw = (art_path/'art.json').read_bytes(); art = json.loads(raw)
     # Prior objects still undergo complete current metadata and model checks;
     # a display alias cannot pass as standalone furniture through an old report.
-    if (art['format'] != 'AFV3-AUTO-FURNITURE-ASSETS-1' or art['version'] not in (7, 8, 9, 10, VERSION)
+    if (art['format'] != 'AFV3-AUTO-FURNITURE-ASSETS-1' or art['version'] not in (7, 8, 9, 10, 11, VERSION)
             or art['source_rel_sha256'] != sha256(source.rel)
             or art['source_symbols_sha256'] != sha256(source.symbols.encode())):
         raise ValueError('Unknown converter/source revision')

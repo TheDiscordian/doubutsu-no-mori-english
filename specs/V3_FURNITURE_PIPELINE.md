@@ -848,6 +848,34 @@ extra lifecycle effects, or missing dependencies reject. Prepared objects remain
 disabled until actual acquisition and ordinary item profiles are connected.
 The shared runtime installs their complete resources and storage callback.
 
+The `fixed-keyframe-rig-assets` category separates resource preparation from
+unfinished interaction code. It recognises a shared fixed skeleton/motion
+constructor by complete normalised instructions, paired resource relocations,
+actual keyframe helper calls, and finite initial speed. Stop/repeat mode and
+the source's initial-play-before-speed ordering are recorded, not substituted
+with an existing runtime's ordering. Its complete standard drawer has no joint
+effects; the clock drawer additionally retains verified hour/minute callbacks.
+Unknown drawing, billboard, or extra material dependencies still reject.
+
+The same source records discover tiger bobblehead, stone coin, harvest clock,
+and judge's bell without an item-specific definition. Every visible model,
+texture, palette, skeleton joint, and animation array is compiled by the ordinary
+bulk pipeline. Remaining move/destroy callback hashes and dependencies stay in
+the descriptor, with explicit pending status. This describes complete constructor
+rig resources, not ported gameplay or any dynamically spawned effects. In
+particular, seven-joint resources can be prepared even though the current room
+runtime's six-joint work area cannot yet serve them.
+
+`RESOURCE_CATEGORIES` includes this prepared-only category; `RIG_CATEGORIES`
+contains implemented room categories only. Both ordinary metadata generation
+and native profile construction reject the prepared-only category, even with a
+forged installed-runtime annotation. The room-resource installer also rejects
+it. Once a complete behaviour adapter exists, unchanged graphics/keyframes can
+be reused from the validated cache without another model compiler or installer.
+Use `convert --assets-only --category fixed-keyframe-rig-assets` with the current
+explicit build lock. Neither prepared resources nor source callback receipts
+make a playable import or a browser choice.
+
 The switch-driven category prepares all eight room balloons in one command:
 
 ```sh
@@ -858,9 +886,9 @@ python3 tools/v3_furniture_pipeline.py convert --assets-only \
 ```
 
 The source-only furniture index decoder handles both `1xxx` and `3xxx` ranges.
-The ordinary worksheet scan remains restricted to its existing `3xxx` entries
-plus older-range IDs proven by shared room aliases; it does not offer the entire
-native furniture range as new imports. Names use the matching official source
+The ordinary worksheet scan includes unresolved legacy correspondence alongside
+the `3xxx` entries and reviewed room aliases. It does not classify the entire
+legacy range as new imports. Names use the matching official source
 table and retain the parent identity. Source IDs/indices do not assign N64
 destination IDs, enable items, or create independent furniture choices.
 

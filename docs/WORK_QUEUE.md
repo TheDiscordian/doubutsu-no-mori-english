@@ -12,6 +12,16 @@ After the primary importing work, finish gold-tree leaf/cut effects and the full
 golden-shovel acquisition route. This is deferred required V3 work, not a dropped
 feature or a separate release goal.
 
+The shared fixed-keyframe path prepares four complete rigs in one compiler
+container at `build/v3-fixed-keyframe-rigs-prepared-01/` (15,776 bytes): tiger
+bobblehead, stone coin, harvest clock, and judge's bell. Three focused checks
+pass. Reuse these resources; do not reconvert them per item. The descriptors
+retain stop/repeat mode, initial-play ordering, live clock joints, and pending
+move/destroy callbacks. Behaviour, spawned effects/sounds, acquisition, and the
+bell's seven-joint native work capacity remain required before installation.
+General category and acquisition work takes priority over those unique details.
+The ROM, 136 choices, saved formats, and both served patchers are unchanged.
+
 Use the current explicit ABI-165 proposal:
 `build/v3-shared-translucent-imports-01/cartridge/build-lock.json`. Shared IA16
 and translucent-material conversion prepares complete tissue/bottled-ship artwork
@@ -56,14 +66,15 @@ optional audit.
 The bulk converter reuses validated prepared artwork and compiles all missing
 objects in one container. The current combined prepared bundle is
 `build/v3-bulk-prepared-02/`: 95 objects, including two constant-palette trophies.
-These are prepared resources, not 95 new selectable items. Sixty-nine of the
-101 currently scanned `3xxx` non-alias, non-dummy furniture candidates have complete converted
-artwork, including fifteen station variants in the separate
+These are prepared resources, not 95 new selectable items. Prepared `3xxx`
+resources include fifteen station variants in the separate
 `build/v3-indexed-clock-rigs-prepared-01/` bundle and five sound-triggered objects
 at `build/v3-switch-sound-prepared-01/`, plus two complete storage rigs at
-`build/v3-storage-rigs-prepared-01/`. Their full clock/animation/sound/storage source
+`build/v3-storage-rigs-prepared-01/`, and the three `3xxx` fixed rigs described
+above. The implemented clock/animation/sound/storage categories' source
 rules and complete assets are prepared. Shared room lifecycle code supports
-clock/storage categories; all complete clock and storage resources are installed.
+clock/storage categories; their implemented-category resources are installed.
+The four additional fixed rigs above are prepared only, not installed.
 Ordinary profiles, official names, and prices are staged for all 22 clock,
 storage, and sound objects. Connect source acquisition and catalogue/scoring
 activation before enabling them. Extend shared categories for remaining

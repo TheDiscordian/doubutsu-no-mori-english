@@ -18,6 +18,7 @@ from tests import test_v3_furniture_pipeline as furniture_tests
 OUTPUT = ROOT/'build/v3-indexed-room-rigs-prepared-01'
 CLOCK_OUTPUT = ROOT/'build/v3-indexed-clock-rigs-prepared-01'
 STORAGE_OUTPUT = ROOT/'build/v3-storage-rigs-prepared-01'
+FIXED_OUTPUT = ROOT/'build/v3-fixed-keyframe-rigs-prepared-01'
 
 
 class SourceTests(unittest.TestCase):
@@ -99,6 +100,88 @@ class SourceTests(unittest.TestCase):
             self.assertEqual(b['source_sha256'],a['source_sha256'])
         for bad in (-16,1,0x1000000,True):
             with self.assertRaises(ValueError):keyframes.compile_animations(self.source,[motion],start=bad)
+
+
+class FixedResourceTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.source=pipeline.Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+            (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+
+    def test_shared_constructor_and_draw_discover_complete_rigs_without_gameplay_claims(self):
+        for item,mode,speed,joints,shown,frames in ((0x1FC4,'stop',0,2,2,101),
+                (0x3018,'repeat',0,3,2,100),(0x32F0,'repeat',.5,5,3,13),(0x33B8,'stop',.5,7,4,10)):
+            profile=self.source.profile(item);adapter=profile['callback_adapter']
+            self.assertEqual(adapter['category'],rigs.FIXED_CATEGORY)
+            self.assertEqual((profile['skeleton']['joints'],profile['skeleton']['shown_joints']),(joints,shown))
+            self.assertEqual(adapter['animation']['duration'],frames)
+            self.assertEqual(adapter['constructor']['mode'],mode)
+            self.assertEqual(adapter['constructor']['initial_speed']['value'],speed)
+            self.assertTrue(adapter['constructor']['initial_play_before_speed'])
+            self.assertFalse(adapter['runtime_installed']);self.assertIn('move',adapter['pending_callbacks'])
+            self.assertEqual(len(profile['models']),shown)
+            if item==0x32F0:
+                self.assertEqual((adapter['clock']['hour_joint'],adapter['clock']['minute_joint']),(3,4))
+                self.assertEqual(len(adapter['joint_callbacks']),2)
+            self.source.runtime_profiles={f'{item:04X}':dict(category=rigs.FIXED_CATEGORY,
+                source_profile_sha256=profile['profile_sha256'])}
+            with self.assertRaisesRegex(ValueError,'move/destroy behaviour'):
+                pipeline.metadata(self.source,item,profile,None)
+        self.assertNotIn(rigs.FIXED_CATEGORY,rigs.RIG_CATEGORIES)
+        # Same-sized existing constructors keep their real implemented category.
+        for item in (0x3300,0x3308):
+            self.assertEqual(self.source.profile(item)['callback_adapter']['category'],rigs.STORAGE_CATEGORY)
+
+    def test_unknown_constructor_drawing_bindings_and_clock_effects_reject(self):
+        for item in (0x1FC4,0x32F0):
+            adapter=self.source.profile(item)['callback_adapter']
+            for row in [adapter['functions'][r] for r in ('create','draw')]+adapter['joint_callbacks']:
+                source=copy.copy(self.source);source.rel=bytearray(source.rel)
+                source.rel[source.sections[1][0]+row['offset']]^=1
+                with self.subTest(item=item,code=row['symbol']),self.assertRaises(ValueError):source.profile(item)
+            for role,offset in (('create',0x1A),('draw',next(iter(adapter['functions']['draw']['relocations'])))):
+                source=copy.copy(self.source);source.code_relocations=dict(source.code_relocations)
+                del source.code_relocations[adapter['functions'][role]['offset']+offset]
+                with self.assertRaises(ValueError):source.profile(item)
+            speed=adapter['constructor']['initial_speed'];source=copy.copy(self.source);source.rel=bytearray(source.rel)
+            struct.pack_into('>I',source.rel,source.sections[4][0]+speed['offset'],0x7FC00000)
+            with self.assertRaisesRegex(ValueError,'invalid initial speed'):source.profile(item)
+        # Pending move code is recorded, never silently certified as understood.
+        source=copy.copy(self.source);source.rel=bytearray(source.rel)
+        before=source.profile(0x1FC4)['callback_adapter']['functions']['move']
+        source.rel[source.sections[1][0]+before['offset']]^=1
+        changed=source.profile(0x1FC4)
+        self.assertNotEqual(changed['callback_adapter']['functions']['move']['sha256'],before['sha256'])
+        with self.assertRaisesRegex(ValueError,'move/destroy behaviour'):
+            pipeline.metadata(source,0x1FC4,changed,None)
+        with self.assertRaises(ValueError):self.source.profile(0x3264)  # Additional billboard/fire drawing.
+
+    def test_bulk_compiled_models_motion_and_cache_keep_unfinished_records_disabled(self):
+        from v3_room_rig_runtime import prepared_categories,VTABLE
+        report=json.loads((FIXED_OUTPUT/'art.json').read_bytes())
+        self.assertEqual(report['batch'],dict(objects=4,compiled=4,reused=0,compiler_containers=1))
+        self.assertEqual({r['item_id'] for r in report['objects']},{'1FC4','3018','32F0','33B8'})
+        self.assertEqual(sum(r['object_bytes'] for r in report['objects']),15776)
+        cache=pipeline.PreparedAssets(self.source,[FIXED_OUTPUT])
+        furniture_tests.DonorTests.check_complete_artwork(self,FIXED_OUTPUT,report)
+        for row in report['objects']:
+            prepared=pipeline.prepare(self.source,int(row['item_id'],16));profile=prepared[0]
+            asset=(FIXED_OUTPUT/row['object_file']).read_bytes();receipt=row['rig']
+            self.assertFalse(row['import_ready']);self.assertIn('move/destroy behaviour',row['pending_reason'])
+            self.assertEqual(cache.reuse(self.source,row['item_id'],prepared)[1]['object_sha256'],row['object_sha256'])
+            self.assertEqual(receipt['skeleton']['joints'],profile['skeleton']['joints'])
+            for r in receipt['skeleton']['relocations']+receipt['animations']['relocations']:
+                self.assertEqual(struct.unpack_from('>I',asset,r['offset'])[0],0x06000000+r['target_offset'])
+            for r in receipt['animations']['arrays']:
+                at,n,src=r['native_offset'],r['bytes'],r['donor_offset']
+                self.assertEqual(asset[at:at+n],self.source.data[src:src+n])
+            forged=copy.deepcopy(row);forged['room_runtime']=dict(vtable=VTABLE,vrom=0x02500000)
+            with self.assertRaisesRegex(ValueError,'no implemented native lifecycle'):install.profile(forged,0x02500000)
+        self.assertEqual(install.provenance_patch(report['objects']),'')
+        with self.assertRaisesRegex(ValueError,'Unimplemented additional room-rig category'):
+            prepared_categories(self.source,[FIXED_OUTPUT])
+        with self.assertRaisesRegex(ValueError,'Unknown converter/source revision'):
+            install.checked_assets(FIXED_OUTPUT,self.source,ROOT/'build/item-identity-megasheet.xlsx')
 
 
 class StorageTests(unittest.TestCase):

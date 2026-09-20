@@ -1,5 +1,76 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared fixed-keyframe resource preparation
+
+`build/v3-fixed-keyframe-rigs-prepared-01/` contains four complete constructor
+rigs prepared together by the ordinary importer. The discovery category checks
+the full fixed constructor, actual stop/repeat helper, paired skeleton/motion
+addresses, finite initial speed, and complete standard or live-clock drawing.
+Resource records preserve initial playback before assigning speed; this differs
+from some existing room callbacks and must not be silently reordered later.
+Models, skeletons, motions, and names come from actual source bindings, not an
+item-definition list. Complete constructor resources do not certify pending
+move/destroy behaviour, sound, or dynamically spawned effects.
+
+```sh
+python3 tools/v3_furniture_pipeline.py convert --assets-only \
+  --category fixed-keyframe-rig-assets \
+  --base-lock build/v3-shared-translucent-imports-01/cartridge/build-lock.json \
+  --output build/fixed-rig-reproduction
+```
+
+The recorded batch compiles all four objects in one existing Docker compiler
+container, totalling 15,776 bytes. No graphics or animation arrays are reduced.
+
+| Donor | Official name | Bytes | Joints/visible | Frames | Initial mode/speed |
+| --- | --- | ---: | ---: | ---: | --- |
+| `1FC4` | tiger bobblehead | 5,312 | 2/2 | 101 | stop / 0 |
+| `3018` | stone coin | 3,168 | 3/2 | 100 | repeat / 0 |
+| `32F0` | harvest clock | 3,744 | 5/3 | 13 | repeat / 0.5 |
+| `33B8` | judge's bell | 3,552 | 7/4 | 10 | stop / 0.5 |
+
+Official name sources are in the single provenance catalogue. The prepared
+manifest SHA-256 is
+`449eaaec63aa5a2acf2160714ac5ba5125744611e4c16c8ab9ecc61e506c60b9`.
+The seven-joint bell is retained whole; the existing room runtime's six-joint
+limit is not weakened. Its native work capacity remains an integration task.
+The clock's actual before/after joint callbacks and common clock fields are
+checked and recorded. Unknown extra drawing, including the torch's fire and
+billboard dependencies, stays rejected rather than losing those effects.
+
+`RESOURCE_CATEGORIES` permits preparation and complete suffix/cache handling.
+The separate implemented `RIG_CATEGORIES` list does not include this category.
+Ordinary metadata, profile construction, and room-resource installation all
+refuse the prepared-only category. An alleged installed-runtime binding cannot
+turn pending code into completed behaviour. Remaining callbacks retain their
+actual source symbols, offsets, full-code hashes, and relocations, without a
+claim that their semantics have been ported. Cache reuse regenerates current
+profile/readiness records, so future category implementation can reuse complete
+graphics and keyframes without inheriting a stale eligibility claim.
+
+Three focused tests pass in 1.919 seconds:
+
+```sh
+python3 -m unittest tests.test_v3_furniture_rigs.FixedResourceTests -v
+```
+
+`checks.log` in the prepared directory retains the output. Checks cover every
+new graphics resource, vertex/triangle/material, skeleton/motion pointer, and
+complete animation array; stop/repeat and clock bindings; negative constructor,
+drawer, relocation, speed, and joint-callback changes; complete cache reuse;
+official-name credits; and all three installation gates. Changed pending move
+code changes its recorded hash but remains explicitly unimplemented. The two
+existing storage constructor categories are checked only for dispatch retention;
+old cartridge, native, or gameplay suites are not replayed.
+
+There is no ROM rebuild, new choice, saved-format change, or emulator run. ABI
+165 remains the explicit proposal, the main ABI-109 lock is unchanged, and both
+served patchers remain V2. Actual interactions, sounds/effects, acquisition, GPU
+appearance, persistence, and hardware for these four objects are not established.
+Continue primary categories/acquisition and reuse these complete resources when
+their behaviour groups are integrated. Required gold-tree effects and full
+golden-shovel acquisition follow the primary importing work.
+
 ## Shared IA16 and translucent materials
 
 ABI 165 at `build/v3-shared-translucent-imports-01/cartridge/` adds complete

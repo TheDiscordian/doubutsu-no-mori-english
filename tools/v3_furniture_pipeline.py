@@ -24,7 +24,7 @@ from v3_registry import FURNITURE, LEGACY_FURNITURE, furniture_identity, furnitu
 from v3_room_aliases import discover as room_aliases, pending_reason as room_alias_reason
 from v3_villager_art import native_palette, normalise_vertex_flags
 
-VERSION = 11
+VERSION = 12
 LAYERS = ('opaque', 'opaque1', 'translucent', 'translucent1')
 BEHAVIOURS = {0: 'static', 1: 'front-seat', 2: 'any-direction-seat', 4: 'front-sofa',
               8: 'single-bed', 16: 'double-bed'}
@@ -245,12 +245,16 @@ class Source:
             if slot*4 not in pointers: continue
             raw, receipt = self.function(pointers[slot*4][3]); functions[role] = receipt
         from v3_furniture_rigs import (CODE as RIG_CODE, CLOCK_CODE, STORAGE_CODE,
-            discover as discover_rig, discover_clock, discover_storage)
+            discover as discover_rig, discover_clock, discover_storage, discover_fixed)
         if functions.get('create',{}).get('bytes') == RIG_CODE['create'][0]:
             return discover_rig(self,name,at,functions,index)
         if functions.get('create',{}).get('bytes') == CLOCK_CODE['create'][0]:
             return discover_clock(self,name,at,functions,index)
         if functions.get('create',{}).get('bytes') == STORAGE_CODE['create'][0]:
+            # Same-sized constructors do not imply the same behaviour. Fixed
+            # rigs can be prepared independently of their pending move code.
+            if functions.get('move',{}).get('bytes')!=STORAGE_CODE['move'][0]:
+                return discover_fixed(self,name,at,functions)
             return discover_storage(self,name,at,functions)
         if functions.get('create',{}).get('bytes') == PALETTE_FADE_CODE['create'][0]:
             if set(pointers) != {0,4,8,12}: reject('unsupported palette-fade callback slots')
@@ -530,11 +534,11 @@ class Source:
         if fading and (interaction != 0x8000 or contact) or interaction == 0x8000 and not fading:
             raise ReviewRequired('contact/interaction requires a checked palette-fade callback')
         adapter = extra.get('callback_adapter', {})
-        from v3_furniture_rigs import RIG_CATEGORIES, STORAGE_CATEGORY
+        from v3_furniture_rigs import RESOURCE_CATEGORIES, STORAGE_CATEGORY
         storage=adapter.get('category')==STORAGE_CATEGORY
         if storage and (contact or interaction not in (1,2,4)) or interaction in (1,2,4) and not storage:
             raise ReviewRequired('storage interaction requires the complete open/close category')
-        if adapter.get('category') in RIG_CATEGORIES:
+        if adapter.get('category') in RESOURCE_CATEGORIES:
             if contact or interaction and not storage: raise ReviewRequired('unsupported rig contact/interaction flags')
             extra.update(kind='animated-room-model',skeleton=adapter['skeleton'],joint_models=adapter['joint_models'])
         return dict(profile_symbol=name, profile_offset=at, profile_sha256=sha256(raw),
@@ -945,6 +949,9 @@ def name_metadata(source, item, identity):
 
 
 def metadata(source, item, profile, identity):
+    from v3_furniture_rigs import FIXED_CATEGORY
+    if profile.get('callback_adapter',{}).get('category')==FIXED_CATEGORY:
+        raise ReviewRequired('Fixed rig artwork is prepared; move/destroy behaviour and spawned effects need runtime adapters')
     alias = next((row for row in room_aliases(source)['rows'] if int(row['display_item_id'],16)==item), None)
     if alias:
         raise ReviewRequired(room_alias_reason(alias))

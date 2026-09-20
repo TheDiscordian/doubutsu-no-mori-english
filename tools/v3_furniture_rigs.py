@@ -13,6 +13,9 @@ from v3_keyframes import animation, skeleton, model_descriptor, compile_skeleton
 CATEGORY = 'indexed-switch-rig'
 CLOCK_CATEGORY = 'indexed-loop-clock-rig'
 STORAGE_CATEGORY = 'open-close-storage-rig'
+# Complete fixed rig resources with explicit, still-unimplemented callbacks.
+# This category is deliberately not a native behaviour adapter.
+FIXED_CATEGORY = 'fixed-keyframe-rig-assets'
 STORAGE_CODE = {
     'create': (116, '17985ba5a79cb082f421871e07eca8189d15291d08d408f4d68c257b072d166d'),
     'move': (80, '74d56a7240cc6101e429e75a9163eacb63753bfb06e944d1e80d291853fa6690'),
@@ -26,6 +29,7 @@ CLOCK_CODE = {
     'destroy': (4, 'f332ea5b5437103cbb6f1508679da89eec9288ad775c96c439a17fccabe3de8e'),
 }
 RIG_CATEGORIES = (CATEGORY, CLOCK_CATEGORY, STORAGE_CATEGORY)
+RESOURCE_CATEGORIES = RIG_CATEGORIES + (FIXED_CATEGORY,)
 CODE = {
     'create': (164, '2a86d61bc9aaf4a0a6479fe97a7f0d5dfe3dc42f9eea663eeb3fd1b8cbc35733'),
     'move': (208, '4b36894add16ecf872c1bfdcbeed2331519049fffd5b3d1d1d5db533f7c68d89'),
@@ -125,6 +129,78 @@ def selector_table(source, functions, role, high, low, count, section=5):
     if n!=count*4 or any(source.data[at:at+n]) or set(pointers)!=set(range(at,at+n,4)):
         raise ReviewRequired('custom callbacks: indexed rig incomplete selector table')
     return dict(symbol=name,offset=at,bytes=n,targets=[pointers[p] for p in range(at,at+n,4)])
+
+
+def discover_fixed(source, vtable_name, vtable_at, functions):
+    """Prepare full fixed rigs without treating arbitrary move code as ported.
+
+    Constructor and drawing implementations establish the complete resources.
+    Every remaining callback stays attached to the descriptor as pending code.
+    No item IDs or artwork names participate in discovery.
+    """
+    from v3_furniture_pipeline import ReviewRequired
+    def reject(reason):raise ReviewRequired('custom callbacks: fixed rig '+reason)
+    if not {'create','move','draw'} <= functions.keys() or set(functions)-{'create','move','draw','destroy'}:
+        reject('incomplete lifecycle')
+    module=u32(source.rel,0);create=functions['create'];draw=functions['draw']
+    def target(role,high,section):
+        pointer=functions[role]['relocations'].get(high)
+        if pointer is None or pointer[:3]!=(6,module,section):reject('missing paired resource')
+        return pointer[3]
+    def pair(high,low,address,section):return {high:(6,module,section,address),low:(4,module,section,address)}
+    bones=target('create',0x0E,5);motion=target('create',0x16,5)
+    speed=target('create',0x56,4);base,n=source.sections[4]
+    if not 0<=speed<=n-4:reject('speed escapes source section')
+    raw_speed=source.rel[base+speed:base+speed+4];value=struct.unpack('>f',raw_speed)[0]
+    if not math.isfinite(value) or value<0:reject('invalid initial speed')
+    raw,_=source.function(create['offset'])
+    if len(raw)!=116:reject('unknown constructor')
+    word=u32(raw,0x48);delta=word&0x3FFFFFC
+    if delta&0x2000000:delta-=0x4000000
+    init=create['offset']+0x48+delta
+    modes={0x934:('stop','cKF_SkeletonInfo_R_init_standard_stop'),
+           0xA24:('repeat','cKF_SkeletonInfo_R_init_standard_repeat')}
+    if word&0xFC000003!=0x48000001 or init not in modes:reject('unsupported animation initializer')
+    mode,helper=modes[init]
+    expected=pair(0x0E,0x1A,bones,5)|pair(0x16,0x2A,motion,5)|pair(0x3A,0x42,motion,5)|pair(0x56,0x5A,speed,4)
+    helpers=source.checked_callback_code(create,116,
+        '455f9460b16f657d595ebc17273179ebb0d656711392835051bc2dd92be0eb23',expected,
+        {0x34:(0x8D4,'cKF_SkeletonInfo_R_ct'),0x48:(init,helper),0x50:(0xE54,'cKF_SkeletonInfo_R_play')},'fixed rig')
+    clock={};callbacks=[]
+    if draw['bytes']==140:
+        helpers.update(source.checked_callback_code(draw,*STORAGE_CODE['draw'],
+            {0x10:(10,0,4,0x8009AED0),0x78:(10,0,4,0x8009AF1C)},
+            {0x50:(0x9D214,'_Matrix_to_Mtx_new'),0x70:(0x1578,'cKF_Si3_draw_R_SV')},'fixed rig drawing'))
+    elif draw['bytes']==80:
+        expected={}
+        for role,high,low,digest,length in (
+                ('before',0x0E,0x26,'99f04fbcf9b117cc9cb4f790d376b2d806c2902868fce4a96d49c645f3d33dfd',84),
+                ('after',0x16,0x1A,'2bf7a94759a252fd0d2af700ff876c19ab13998fb28ac5b0db3c70cdbc9ef8d6',8)):
+            at=target('draw',high,1);code,receipt=source.function(at)
+            relocations=({0x0A:(6,module,6,0xBC40),0x12:(4,module,6,0xBC40),
+                          0x32:(6,module,6,0xBC40),0x3A:(4,module,6,0xBC40)} if role=='before' else {})
+            if len(code)!=length or sha256(code)!=digest or receipt['relocations']!=relocations:
+                reject('changed clock-joint behaviour')
+            expected.update(pair(high,low,at,1));callbacks.append(dict(role=role,**receipt))
+        helpers.update(source.checked_callback_code(draw,80,
+            'e6b24d256d78fad6e7fa15a1114b82cb4ad3f570208a8748ee65489c8980319b',expected,
+            {0x3C:(0x1578,'cKF_Si3_draw_R_SV')},'fixed clock drawing'))
+        common=re.findall(r'^common_data = \.bss:0x([0-9A-Fa-f]+);[^\n]* size:0x([0-9A-Fa-f]+) ',source.symbols,re.M)
+        if [(int(at,16),int(n,16)) for at,n in common]!=[(0xBC40,0x2DC00)]:reject('changed source clock owner')
+        clock=dict(common_symbol='common_data',hour_joint=3,minute_joint=4,
+                   hour_offset=0x2612A,minute_offset=0x26128,axis='z',operation='subtract')
+    else:reject('drawing needs additional resource/effect discovery')
+    rig=skeleton(source,bones);animation_record=animation(source,motion,joints=rig['joints'])
+    if clock and rig['joints']<=4:reject('missing clock-hand joints')
+    descriptor=model_descriptor(rig,kind='animated-room-model')
+    return descriptor['models'],{},dict(category=FIXED_CATEGORY,vtable_symbol=vtable_name,
+        vtable_offset=vtable_at,functions=functions,helpers=helpers,joint_callbacks=callbacks,
+        constructor=dict(mode=mode,initial_speed=dict(section=4,offset=speed,hex=raw_speed.hex(),value=value),
+                         initial_play_before_speed=True),
+        **({'clock':clock} if clock else {}),skeleton=rig,animation=animation_record,
+        joint_models=descriptor['joint_models'],runtime_installed=False,
+        pending_callbacks=[role for role in ('move','destroy') if role in functions],
+        resource_scope='complete constructor rig; callback gameplay and spawned effects remain pending')
 
 
 def discover_clock(source, vtable_name, vtable_at, functions, index):
@@ -247,7 +323,7 @@ def discover_storage(source, vtable_name, vtable_at, functions):
 def suffix(source, profile, model_offsets, *, start):
     """Pack the real skeleton and motion after the shared complete artwork."""
     adapter = profile.get('callback_adapter',{})
-    if adapter.get('category') not in RIG_CATEGORIES: return b'', {}
+    if adapter.get('category') not in RESOURCE_CATEGORIES: return b'', {}
     roots = {root[1]:model_offsets[label] for label,root in profile['models'].items()}
     bones, rig = compile_skeleton(source,profile['skeleton'],roots,start=start)
     motion, animations = compile_animations(source,[adapter['animation']],start=start+len(bones))
@@ -258,7 +334,7 @@ def suffix(source, profile, model_offsets, *, start):
 
 def estimated_suffix(source, profile, start):
     adapter = profile.get('callback_adapter',{})
-    if adapter.get('category') not in RIG_CATEGORIES: return 0
+    if adapter.get('category') not in RESOURCE_CATEGORIES: return 0
     bones = (profile['skeleton']['joint_table']['bytes']+8+15)&~15
     motion, _ = compile_animations(source,[adapter['animation']],start=start+bones)
     return bones+len(motion)
