@@ -202,5 +202,23 @@ class InstalledBatchTests(unittest.TestCase):
             self.assertEqual(composer.compose(self.image,self.report,catalog,composer.resolve(catalog,list(catalog)))[0],self.image)
         finally:composer.BASE,composer.BASE_SHA,composer.REPORT_SHA,composer.ABI=pin
 
+    def test_next_bulk_import_checks_actual_retained_chair_sounds_after_resource_growth(self):
+        from v3_furniture_behaviours import audio_contract
+        from v3_furniture_pipeline import Source
+        source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+            (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+        original=(ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes()
+        current=audio_contract(original,self.image,self.report,source)
+        self.assertEqual(len(current['sounds']),4)
+        self.assertEqual(current['new_audio_bytes'],0)
+        # Reject an actual moved-table binding change, not the relocation itself.
+        bad=bytearray(self.image);seq=self.audio['sequence'];at=seq['physical']
+        table=struct.unpack_from('>H',bad,at+0x190)[0]
+        struct.pack_into('>H',bad,at+table+0x1F*2,0)
+        wrong=copy.deepcopy(self.report)
+        wrong['fire_sound']['resources']['seq']['sha256']=sha256(bad[at:at+seq['bytes']])
+        with self.assertRaisesRegex(ValueError,'sound route'):
+            audio_contract(original,bytes(bad),wrong,source)
+
 
 if __name__=='__main__':unittest.main()

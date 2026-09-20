@@ -706,6 +706,12 @@ conservative spare bytes. Shared sound rows and the move-only vtable use checked
 free space in the existing room packet/bootstrap reservations. Audio installation
 does not enable incomplete profiles or acquisition routes.
 
+Subsequent ordinary furniture imports resolve retained chair sounds through the
+actual installed sequence table, font header, and wave binding. They compare
+complete original/donor instrument semantics, timing, selection mapping, and
+program pointers. A relocated dispatch table or expanded pointer table is not a
+sound change; a mismatched program or instrument remains a rejected import.
+
 The `indexed-model-sequence` category supports constant identity-indexed draws
 with one or two ordered opaque lists and an optional conditional translucent
 pair. Complete reviewed instructions, all relocations, matrix-helper targets,

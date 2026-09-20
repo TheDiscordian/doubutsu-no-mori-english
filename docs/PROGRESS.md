@@ -36,6 +36,11 @@ saved formats, main lock, or served patchers change. Continue shared category
 integration and acquisition, then required gold-tree completion. See the
 [audio runtime checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-furniture-trigger-audio-runtime).
 
+The next bulk-import check follows the installed sound tables/font locations and
+verifies complete original chair instruments instead of requiring their old
+addresses. Its focused positive/negative check passes. This is an importer-only
+change; it neither changes the current ROM nor calls for another emulator run.
+
 The installed complete clock batch retains its passing component evidence.
 The room engine serves 25 records: eight balloons, two storage rigs, and fifteen
 clocks. Clock/storage ordinary profiles and acquisition remain required; resources

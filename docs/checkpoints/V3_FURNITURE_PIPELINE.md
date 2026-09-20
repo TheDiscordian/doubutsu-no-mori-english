@@ -78,6 +78,15 @@ Continue shared profiles/acquisition and remaining bulk import categories.
 Required gold-tree leaf/cut effects and full golden-shovel acquisition follow
 primary importing. This is not a V3 playtest handoff or public release.
 
+The following importer-only update repairs a stale ordinary furniture preflight:
+`audio_contract` assumed chair sounds still used their original table/font
+addresses. The actual complete resources are retained after the audio batch.
+The check now resolves current headers and tables and verifies complete original
+instrument/sample/envelope/tuning identity, programme bytes, and binding. One
+focused current-cartridge test passes in 1.019 seconds, accepting all four
+unchanged chair sounds and rejecting a deliberately corrupted dispatch entry.
+No cartridge bytes change; no additional emulator run is needed.
+
 ## Shared furniture trigger audio preparation
 
 `build/v3-furniture-trigger-audio-02/` prepares complete audio for the five

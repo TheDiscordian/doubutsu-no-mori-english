@@ -37,6 +37,9 @@ callback supplies the missing N64 single-instance guard. Next connect ordinary
 profiles and source acquisition. The 2-KiB audio allocation increase includes
 both sequence and font growth, with 864 conservative bytes spare. Reuse passing
 converter, cartridge, sanitizer, and native audio evidence.
+The ordinary bulk importer's chair-sound check accepts the expanded dispatch
+tables/fonts by verifying actual complete programs/instruments, not stale
+addresses. Its positive/negative check passes; reuse this machinery.
 The shared import reservation extends to `02800000`, with 2,027,856 bytes free.
 English choices/general strings retain
 their content and physical locations through checked virtual relocation. The

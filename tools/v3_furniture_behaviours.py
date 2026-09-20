@@ -63,6 +63,7 @@ def four_cell_contract(original, prior, blob, imports, source):
 
 def audio_contract(original, base, prior, source):
     """Bind complete sounds: matching numbers alone do not prove matching audio."""
+    from v3_sound_programs import installed_resource
     native = by_vrom(original); current = by_vrom(base)
     code = native[CODE_VROM].extract(original); now = current[CODE_VROM].extract(base)
     nr = lambda at,n: span(code,at-CODE_RAM,n)
@@ -90,7 +91,6 @@ def audio_contract(original, base, prior, source):
     live_wave=span(waves,wave_record['vrom']-wave_file['vrom'],wave_record['bytes'])
     if sha256(waves)!=wave_file['sha256'] or sha256(live_wave)!=wave_record['sha256']:
         raise ValueError('Changed installed complete sound waves')
-    live_banks=current[0x019F0000].extract(base)
     records=[]
     for sound_id in struct.unpack('>4I',sounds):
         pair=[]
@@ -114,13 +114,15 @@ def audio_contract(original, base, prior, source):
             complete=instrument(bank,wave,program[2],header[12],extended=True)
             if label=='N64-Japan':
                 current_offset=struct.unpack_from('>H',now,mapping-CODE_RAM+sequence*2)[0]
-                bank_at,bank_size=struct.unpack_from('>II',header)
+                live_table=struct.unpack_from('>H',live_sequence,0x188+(sound_id>>8)*2)[0]
+                live_font,live_header,_=installed_resource(base,now,'bank',bank_id)
+                live_samples,_,_=installed_resource(base,now,'wave',live_header[10])
                 if (live_sequence[at:at+11]!=program
-                        or struct.unpack_from('>H',live_sequence,0x190)[0]!=table
-                        or struct.unpack_from('>H',live_sequence,table+(sound_id&255)*2)[0]!=at
+                        or struct.unpack('>H',span(live_sequence,live_table+(sound_id&255)*2,2))[0]!=at
                         or now[mapping-CODE_RAM+current_offset:mapping-CODE_RAM+current_offset+5]!=fonts
-                        or header_entry(lambda a,n:span(now,a-CODE_RAM,n),NATIVE_HEADERS['bank'],bank_id)!=header
-                        or span(live_banks,bank_at,bank_size)!=bank or live_wave[:len(wave)]!=wave):
+                        or live_header[8:12]!=header[8:12] or live_header[13:]!=header[13:]
+                        or instrument(live_font,live_samples,program[2],live_header[12],extended=True)!=complete
+                        or live_wave[:len(wave)]!=wave):
                     raise ValueError('Installed sound route differs from verified native chair sound')
             pair.append(dict(source=label,program_sha256=sha256(program),program_offset=at,
                 timing_velocity=program[8:10].hex(),bank=bank_id,instrument=program[2],
