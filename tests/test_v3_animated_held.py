@@ -18,6 +18,7 @@ from tests import test_v3_furniture_pipeline as furniture_checks
 
 OUTPUT=ROOT/os.environ.get('V3_ANIMATED_HELD_ART','build/v3-handheld-animated-prepared-01')
 BASE=ROOT/os.environ.get('V3_ANIMATED_HELD_BASE','build/v3-translation-headers-02')
+EXTENDED=ROOT/'build/v3-held-matrix-prepared-02'
 
 
 class AnimatedHeldTests(unittest.TestCase):
@@ -32,17 +33,14 @@ class AnimatedHeldTests(unittest.TestCase):
     def test_shared_scan_exposes_complete_rigs_without_claiming_gameplay(self):
         rows=[r for r in self.rows.values() if r['category']=='animated-held-model']
         self.assertEqual(len(rows),20)
-        self.assertEqual({r['item_id'] for r in rows if r['asset_ready']},
-                         {f'{i:04X}' for i in range(0x224C,0x2254)})
-        self.assertEqual(self.inventory['counts']['prepared_model_roots'],22)
+        self.assertTrue(all(r['asset_ready'] for r in rows))
+        self.assertEqual(self.inventory['counts']['prepared_model_roots'],34)
         self.assertEqual(self.inventory['counts']['usable_imports'],0)
         for row in rows:
             self.assertFalse(row['selectable']);self.assertFalse(row['runtime_installed'])
             self.assertEqual(row['motion_binding']['shape_index'],row['shape_index'])
-            if row['asset_ready']:
-                self.assertEqual((row['joints'],row['shown_joints']),(3,2))
-            else:
-                self.assertTrue('opcode DA' in row['reason'] or 'TMEM-sized' in row['reason'])
+            rig=self.motion['skeletons'][row['shape_index']]
+            self.assertEqual((row['joints'],row['shown_joints']),(rig['joints'],rig['shown_joints']))
 
     def test_rig_packing_keeps_every_joint_field_and_checked_model_reference(self):
         for rig in self.motion['skeletons'].values():
@@ -90,13 +88,52 @@ class AnimatedHeldTests(unittest.TestCase):
     def test_category_and_selection_rejections_create_no_partial_output(self):
         with tempfile.TemporaryDirectory(prefix='v3-animated-held-') as directory:
             output=Path(directory)/'not-created'
-            for selected in (['2200'],['2244'],['FFFF'],['2254'],['224C','2244']):
+            for selected in (['2224'],['FFFF'],['2254'],['224C','FFFF']):
                 with self.assertRaisesRegex(ValueError,'Unsupported or unknown selected animated'):
                     held.convert(self.source,output,selected,category='animated-held-model')
                 self.assertFalse(output.exists())
             with self.assertRaisesRegex(ValueError,'Unsupported or unknown selected handheld'):
                 held.convert(self.source,output,['224C'])
             self.assertFalse(output.exists())
+
+    @unittest.skipUnless((EXTENDED/'art.json').is_file(),'Prepared matrix/IA8 category required')
+    def test_remaining_rigs_preserve_complete_artwork_and_skeleton_dependencies(self):
+        report=json.loads((EXTENDED/'art.json').read_bytes())
+        self.assertFalse(report['runtime_installed']);self.assertFalse(report['selectable'])
+        installed=json.loads((OUTPUT/'art.json').read_bytes())
+        old={r['shape_index'] for r in installed['objects']}
+        self.assertEqual({r['shape_index'] for r in report['objects']},set(self.motion['skeletons'])-old)
+        self.assertEqual(len(report['objects']),12)
+        furniture_checks.DonorTests.check_complete_artwork(self,EXTENDED,report,
+            prepare=lambda row:pipeline.prepare_models(self.source,row['profile']))
+        for row in report['objects']:
+            rig=self.motion['skeletons'][row['shape_index']]
+            parent=self.rows[row['parent_item_ids'][0]]
+            self.assertEqual(row['profile'],json.loads(json.dumps(held.rig_descriptor(parent,rig))))
+            asset=(EXTENDED/row['object_file']).read_bytes()
+            roots={root[1]:row['model_offsets'][label] for label,root in row['profile']['models'].items()}
+            suffix,description=keyframes.compile_skeleton(self.source,rig,roots,start=row['artwork_bytes'])
+            self.assertEqual(asset[row['artwork_bytes']:],suffix)
+            self.assertEqual(row['skeleton'],json.loads(json.dumps(description)))
+            self.assertEqual(row['maximum_model_animation_bytes'],len(asset)+row['maximum_animation_bytes'])
+        self.assertEqual(max(r['maximum_model_animation_bytes'] for r in report['objects']),7168)
+
+    @unittest.skipUnless((EXTENDED/'art.json').is_file(),'Prepared matrix/IA8 category required')
+    def test_preparation_does_not_expand_installed_categories_or_joint_capacity(self):
+        import v3_equipment_runtime as equipment
+        old=json.loads((OUTPUT/'art.json').read_bytes())
+        assets,_,_=equipment.prepared_rigs(self.source,OUTPUT)
+        self.assertEqual(set(assets),{r['shape_index'] for r in old['objects']})
+        with self.assertRaisesRegex(ValueError,'unsupported equipment rig'):
+            equipment.prepared_rigs(self.source,EXTENDED)
+        report=json.loads((EXTENDED/'art.json').read_bytes())
+        parents={p for row in report['objects'] for p in row['parent_item_ids']}
+        categories=tuple(sorted({r['item_main'] for r in held.kind_bindings(self.source)['rows']
+                                 if r['item_id'] in parents}))
+        with self.assertRaisesRegex(ValueError,'work-vector capacity'):
+            equipment.prepared_rigs(self.source,EXTENDED,categories=categories)
+        assets,_,_=equipment.prepared_rigs(self.source,EXTENDED,categories=categories,joint_work_vectors=8)
+        self.assertEqual(set(assets),{r['shape_index'] for r in report['objects']})
 
     @unittest.skipUnless((OUTPUT/'art.json').is_file(),'Prepared animated category required')
     def test_complete_native_artwork_and_rigs_match_actual_donor(self):

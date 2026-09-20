@@ -213,13 +213,16 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
                 accessory=False, mirrored_s=False, garden=False, western=False,
                 large_western=False, water=False, camping=False, tent=False,
                 campfire_body=False, fire_effect=0, school=False, static_materials=False,
-                palette_bindings=None, palette_fade=False):
+                palette_bindings=None, palette_fade=False, joint_matrices=0):
     """Decode supported static materials and explicit dynamic dependencies, never GX loads."""
     if not raw or len(raw) % 8 or sum(map(bool, (speed_bag, accessory, mirrored_s,
                                               garden, western, large_western, water, camping,
                                               tent, campfire_body, fire_effect, school, static_materials))) > 1 or fire_effect not in (0, 1, 2):
         raise ValueError('Incomplete furniture display list')
     palette_bindings = {} if palette_bindings is None else palette_bindings
+    if (type(joint_matrices) is not int or not 0 <= joint_matrices <= 255
+            or joint_matrices and not static_materials):
+        raise ValueError('Joint matrices require a bounded shared skeleton material')
     if palette_fade and (not static_materials or palette_bindings):
         raise ValueError('Palette fade requires the shared materials and no constant binding')
     if palette_bindings and (not static_materials or set(palette_bindings) != {0x08000000}
@@ -228,6 +231,7 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
     result, used = [], set()
     at, loaded, first_vertex, material, have_palette = 0, 0, 0, None, False
     material_wrap, material_direct = None, False
+    vertex_cache = [None]*32
     fire_tiles, fire_scroll = 0, False
     while at < len(raw):
         a, b = struct.unpack_from('>II', raw, at)
@@ -269,8 +273,9 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
             target = row['target']
             intensity=bool(water or fire_effect or static_materials and shape[2:]==(4,0))
             rgba16=bool(static_materials and shape[2:]==(0,2))
-            expected=(0,2) if rgba16 else (4 if intensity else 2,0)
-            if (target not in textures or (not (intensity or rgba16) and not have_palette) or
+            ia8=bool(static_materials and shape[2:]==(3,1))
+            expected=(0,2) if rgba16 else (3,1) if ia8 else (4 if intensity else 2,0)
+            if (target not in textures or (not (intensity or rgba16 or ia8) and not have_palette) or
                     shape != (*textures[target], *expected) or
                     water and shape[:2] != (32, 16)):
                 raise ValueError('Unsupported furniture texture or palette')
@@ -278,6 +283,8 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
                 row['intensity'] = True
             if rgba16:
                 row['rgba16'] = True
+            if ia8:
+                row['ia8'] = True
             # Consume the paired Dolphin tile command. Additional wrap modes
             # require an explicit reviewed model mode; the default clamps both axes.
             tile = raw[at + 8:at + 16]
@@ -288,7 +295,7 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
                 wraps = (word >> 10 & 3, word >> 8 & 3)
                 pal=word>>12&15
                 if (word & 0xFFFF0000 != 0xD2F00000 or reserved or 3 in wraps
-                        or pal not in ((0,15) if intensity or rgba16 else (15,))):
+                        or pal not in ((0,15) if intensity or rgba16 or ia8 else (15,))):
                     raise ValueError('Static material needs tile 0, a supported palette, and clamp/repeat/mirror')
                 row['wrap_modes'] = wraps
                 row['tile_shifts'] = (word>>4&15,word&15)
@@ -338,7 +345,7 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
                 raise ValueError('Unsupported furniture wrap mode')
             row['shape'] = shape[:2]
             material = target
-            material_direct=intensity or rgba16
+            material_direct=intensity or rgba16 or ia8
             material_wrap = row.get('wrap_modes')
             at += 8
         elif op == 0xD2:
@@ -364,11 +371,16 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
         elif op == 0x01:
             count = a >> 12 & 255
             offset = row['target'] - vertex
-            if (not 1 <= count <= 32 or a != 0x01000000 | count << 12 | count << 1 or
+            end = (a & 255)//2
+            slot = end-count
+            if (not 1 <= count <= 32 or not 0 <= slot <= 32-count
+                    or slot and not joint_matrices or a != 0x01000000 | count << 12 | end << 1 or
                     offset < 0 or offset % 16 or offset + count * 16 > vertex_size):
                 raise ValueError('Furniture vertex load escapes its array')
             loaded, first_vertex = count, offset // 16
             row.update(count=count, first_vertex=first_vertex)
+            if slot: row['vertex_slot'] = slot
+            vertex_cache[slot:slot+count] = range(first_vertex,first_vertex+count)
         elif op == 0x0A:
             if not loaded or material is None or fire_effect and not fire_scroll:
                 raise ValueError('Furniture triangles lack vertices or a material')
@@ -376,8 +388,13 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
             size = (1 + (max(0, count - 3) + 3) // 4) * 8
             if at + size > len(raw):
                 raise ValueError('Furniture triangles escape the display list')
-            row['triangles'] = packed(raw[at:at + size], loaded)
-            row['global_triangles'] = [tuple(v + first_vertex for v in t) for t in row['triangles']]
+            row['triangles'] = packed(raw[at:at + size], 32 if joint_matrices else loaded)
+            if joint_matrices:
+                if any(vertex_cache[v] is None for t in row['triangles'] for v in t):
+                    raise ValueError('Skeleton triangle reads an unloaded vertex-cache slot')
+                row['global_triangles'] = [tuple(vertex_cache[v] for v in t) for t in row['triangles']]
+            else:
+                row['global_triangles'] = [tuple(v + first_vertex for v in t) for t in row['triangles']]
             row['material'] = material
             at += size - 8
         elif op == 0xFC:
@@ -390,7 +407,8 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
                 if fire_effect else ((0xFC309C04, 0x5FFEF7F8),) if water else (
                 (0xFC127E60, 0xFFFFF3F8), (0xFC11FE04, 0xFFFFF3F8)))
             if static_materials: modes += ((0xFC309C04,0x5FFEF7F8),(0xFC309604,0x5FFEFFF8),
-                                     (0xFC30FE04,0x5FFEFDF8))
+                                     (0xFC30FE04,0x5FFEFDF8),(0xFC3217FF,0xFFFFFE38),
+                                     (0xFC30FE04,0x5FFEF3F8))
             if not unlit and (a, b) not in modes:
                 raise ValueError('Unsupported furniture colour combiner')
             if unlit: row['unlit_texture_primitive'] = True
@@ -473,6 +491,11 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
                 raise ValueError('Unsupported dynamic furniture display-list dependency')
             fire_scroll = True
             row['dynamic_scroll'] = 0x09000000
+        elif op == 0xDA:
+            if (not joint_matrices or a != 0xDA380003 or b >> 24 != 13
+                    or b & 63 or (b & 0xFFFFFF)//64 >= joint_matrices):
+                raise ValueError('Skeleton matrix references an unavailable visible joint')
+            row['joint_matrix'] = (b & 0xFFFFFF)//64
         elif op == 0xDF:
             if (a, b) != (0xDF000000, 0) or at + 8 != len(raw):
                 raise ValueError('Invalid furniture display-list terminator')
@@ -599,7 +622,7 @@ def command_source(models, offsets):
         if inherited and any(row['opcode'] not in (0x01,0x0A,0xDF) for row in model['rows']):
             raise ValueError('Inherited material is limited to validated geometry lists')
         if not inherited:emit('gsDPPipeSync()')
-        direct = next((bool(row.get('intensity') or row.get('rgba16'))
+        direct = next((bool(row.get('intensity') or row.get('rgba16') or row.get('ia8'))
                        for row in model['rows'] if row['opcode']==0xFD),False)
         if not inherited:
             emit('gsDPSetTextureLUT(G_TT_NONE)' if direct else 'gsDPSetTextureLUT(G_TT_RGBA16)')
@@ -624,11 +647,13 @@ def command_source(models, offsets):
             elif op == 0xFD:
                 w, h = row['shape']
                 rgba16=bool(row.get('rgba16'))
+                ia8=bool(row.get('ia8'))
                 # Keep upper TMEM intact for CI palettes across mixed-format lists.
-                if w*h*(4 if rgba16 else 1)//2 > 2048 or rgba16 and row.get('intensity'):
+                if (w*h*(4 if rgba16 else 2 if ia8 else 1)//2 > 2048
+                        or sum(map(bool,(rgba16,ia8,row.get('intensity'))))>1):
                     raise ValueError('Furniture texture exceeds shared TMEM capacity or has conflicting formats')
                 emit('gsDPPipeSync()')
-                wanted=bool(row.get('intensity') or rgba16)
+                wanted=bool(row.get('intensity') or rgba16 or ia8)
                 if wanted!=direct:
                     emit('gsDPSetTextureLUT(G_TT_NONE)' if wanted else 'gsDPSetTextureLUT(G_TT_RGBA16)')
                     direct=wanted
@@ -643,6 +668,7 @@ def command_source(models, offsets):
                         raise ValueError('Unsupported furniture water tile')
                     shift = 1
                 fmt, pal = (('G_IM_FMT_RGBA',0) if rgba16 else
+                            ('G_IM_FMT_IA',0) if ia8 else
                             ('G_IM_FMT_I',0) if row.get('intensity') else ('G_IM_FMT_CI',15))
                 if 'fire_tile' in row:
                     tile = row['fire_tile']
@@ -659,10 +685,11 @@ def command_source(models, offsets):
                 shifts=row.get('tile_shifts',(shift,shift))
                 if len(shifts)!=2 or any(type(n) is not int or not 0<=n<=15 for n in shifts):
                     raise ValueError('Invalid native texture tile shifts')
-                if rgba16:
-                    if w%4 or h%4:
-                        raise ValueError('RGBA16 texture needs complete GX blocks')
-                    args=(f'{fmt}, G_IM_SIZ_16b, {w}, {h}, 0, {wrap_s}, {wrap_t}, '
+                if rgba16 or ia8:
+                    if w%(4 if rgba16 else 8) or h%4:
+                        raise ValueError('Direct texture needs complete GX blocks')
+                    size='G_IM_SIZ_16b' if rgba16 else 'G_IM_SIZ_8b'
+                    args=(f'{fmt}, {size}, {w}, {h}, 0, {wrap_s}, {wrap_t}, '
                           f'{mask_s}, {mask_t}, {shifts[0]}, {shifts[1]}')
                     emit(f"gsDPLoadTextureBlock(0x{SEGMENT + offsets[row['target']]:08X}, {args})",7)
                     continue
@@ -687,7 +714,10 @@ def command_source(models, offsets):
                 # The donor pointer can address the middle of the vertex array.
                 first = row['first_vertex']
                 target = offsets[row['target'] - first * 16] + first * 16
-                emit(f"gsSPVertex(0x{SEGMENT + target:08X}, {row['count']}, 0)")
+                slot=row.get('vertex_slot',0)
+                if not 0 <= slot <= 32-row['count']:
+                    raise ValueError('Native vertex load escapes the cache')
+                emit(f"gsSPVertex(0x{SEGMENT + target:08X}, {row['count']}, {slot})")
             elif op == 0x0A:
                 triangles = row['triangles']
                 for i in range(0, len(triangles), 2):
@@ -700,6 +730,12 @@ def command_source(models, offsets):
                 if row.get('dynamic_scroll') != 0x09000000 or row['words'] != (0xDE000000, 0x09000000):
                     raise ValueError('Unreviewed dynamic fire scroll list')
                 emit('gsSPDisplayList(0x09000000)')
+            elif op == 0xDA:
+                index=row.get('joint_matrix')
+                if (type(index) is not int or not 0 <= index < 255
+                        or row['words'] != (0xDA380003,0x0D000000+index*64)):
+                    raise ValueError('Changed skeleton matrix in native compiler input')
+                emit(f'gsSPMatrix(0x{0x0D000000+index*64:08X}, G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW)')
             elif op == 0xFC and row.get('unlit_texture_primitive'):
                 if row['words'] != (0xFCFFFE60, 0xFFFCF3F8):
                     raise ValueError('Changed unlit texture/primitive combiner')

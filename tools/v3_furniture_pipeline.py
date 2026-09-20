@@ -93,6 +93,11 @@ def native_rgba16(data, width, height):
     return bytes(result)
 
 
+def native_ia8(data, width, height):
+    """GX IA4 stores alpha first; N64 IA8 stores intensity first, losslessly."""
+    return bytes((v & 15) << 4 | v >> 4 for v in untile(data,width,height,8))
+
+
 class Source:
     """Index the checked donor once; resolve thousands of dependencies cheaply."""
     def __init__(self, rel, symbols):
@@ -509,9 +514,9 @@ def prepare_models(source, descriptor):
                     palettes[start] = (symbol, size)
                 elif op == 0xFD:
                     w, h, fmt, bits = model_texture_shape(raw[position:position+8])
-                    if ((fmt,bits) not in ((2,0),(4,0),(0,2))
+                    if ((fmt,bits) not in ((2,0),(4,0),(0,2),(3,1))
                             or w*h*(4<<bits)//8 != size or size>2048):
-                        raise ReviewRequired('texture is not complete TMEM-sized CI4/I4/RGBA16')
+                        raise ReviewRequired('texture is not complete TMEM-sized CI4/I4/IA8/RGBA16')
                     if start in textures and textures[start][2:] != (w, h, fmt, bits):
                         raise ReviewRequired('texture has inconsistent dimensions')
                     textures[start] = (symbol, size, w, h, fmt, bits)
@@ -539,17 +544,26 @@ def prepare_models(source, descriptor):
     for at, (name, n) in sorted(palettes.items()): add(at, name, n, native_palette, kind='palette')
     for at, (name, n, w, h, fmt, bits) in sorted(textures.items()):
         add(at, name, n, lambda data, w=w, h=h, bits=bits:
-            native_rgba16(data,w,h) if bits==2 else pack4(untile(data,w,h,4)),
-            kind='texture',width=w,height=h,format={2:'CI4',4:'I4',0:'RGBA16'}[fmt])
+            native_rgba16(data,w,h) if bits==2 else native_ia8(data,w,h) if bits==1
+            else pack4(untile(data,w,h,4)),
+            kind='texture',width=w,height=h,format={(2,0):'CI4',(4,0):'I4',(0,2):'RGBA16',(3,1):'IA8'}[fmt,bits])
     vertex, (name, n) = next(iter(vertex_arrays.items()))
     add(vertex, name, n, lambda data: normalise_vertex_flags(data)[0], kind='vertices')
     models = {}
     for label, (name, at, raw, pointers, receipts) in raw_models.items():
+        matrices = 0
+        if descriptor.get('kind') == 'animated-held-model':
+            # The native skeleton drawer publishes each visible joint matrix
+            # before its list runs. No list may read a later, uninitialised joint.
+            visible = [r['index'] for r in descriptor['skeleton']['rows'] if 'model' in r]
+            joints = [r['joint_index'] for r in descriptor['joint_models'] if r['model_label']==label]
+            matrices = min(visible.index(index)+1 for index in joints)
         models[label] = dict(symbol=name, donor_offset=at, source_sha256=sha256(raw),
             **({'source_parts':receipts} if receipts else {}),
             rows=parse_model(raw, at, pointers, tuple(palettes),
                 {p:(r[2], r[3]) for p,r in textures.items()}, vertex, n, static_materials=True,
-                palette_bindings=bindings, palette_fade=fading))
+                palette_bindings=bindings, palette_fade=fading,
+                joint_matrices=matrices))
     # Validate all native emitter rules before creating output files.
     commands, sections = command_source(models, offsets)
     if fading:
@@ -761,6 +775,7 @@ def scan(source, worksheet, installed=None):
             if formats=={'CI4'}: categories.append('static-ci4')
             if 'I4' in formats: categories.append('intensity-materials')
             if 'RGBA16' in formats: categories.append('rgba16-materials')
+            if 'IA8' in formats: categories.append('ia8-materials')
             if 'callback_adapter' in profile: categories.append(profile['callback_adapter']['category'])
             row.update(asset_ready=True, profile=profile,
                 object_bytes=estimated, textures=sum(r['kind']=='texture' for r in resources),

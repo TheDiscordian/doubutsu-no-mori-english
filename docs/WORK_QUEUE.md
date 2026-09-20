@@ -2,6 +2,16 @@
 
 ## Active: V3 optional GameCube imports
 
+All twenty animated equipment rigs now have complete shared conversion support.
+Reuse `build/v3-held-matrix-prepared-02/` for the twelve balloon/net/rod models
+and retain the installed pinwheel bundle. Thirty-five focused checks pass; no
+emulator replay is needed for this converter-only change. Next extend the shared
+runtime for balloon banks (maximum 7,168 bytes including animation), eight-vector
+joint/morph work, source-correct actions, and inventory/parent consumers. Keep
+net/rod behaviour and golden-tool differences explicit. Preparation does not
+enable these imports. See the
+[checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-joint-matrix-and-ia8-conversion).
+
 Next work uses the explicit ABI-121 lock at
 `build/v3-held-category-02/build-lock.json`. All eight pinwheels now have shared
 parent readers, pocket artwork, collection/catalogue, existing event acquisition,
@@ -20,8 +30,8 @@ Full seasonal rendering and ordinary gameplay remain open. See the
 [diagnosis](checkpoints/V3_FURNITURE_PIPELINE.md#seasonal-setter-copy-diagnosis).
 Work against the current proposal, not an old candidate. Do not replay exhausted
 navigation or setup attempts. Continue shared equipment categories and acquisition;
-balloon texture/joint capacity and net/rod matrix
-dependencies remain implementation work, not disabled-content completion.
+balloon joint/bank capacity and equipment behaviour remain implementation work,
+not disabled-content completion.
 
 Ten focused sound checks pass. The first silent native sound check passes
 165 records/50 assertions, including actual queued volume, retained pause/fade/
@@ -252,13 +262,13 @@ motion integration. Its complete twenty-four animations occupy 7,760 bytes;
 all sixteen equipment motions and eight player holding/action animations retain
 full source data. `tools/v3_keyframes.py` handles shared skeleton/keyframe
 formats, and the existing pipeline's `held-motion` category prepares the bundle.
-Twenty actual held skeletons are described, not flattened or installed. Connect
-selected model ownership/loading, native rig buffers, player action dispatch,
-and source timing/part masks. Fans need their actual waving action; net/rod
-joint-matrix commands and balloon textures need shared graphics support.
-Pinwheel graphics preflight succeeds, but complete rig/model packing and action
-ownership remain work. Keep real inventory/readers/acquisition/profile and
-context-correct catalogue dependencies; motion data alone enables no item.
+All twenty held skeletons have complete converted models; none are flattened.
+Fan and pinwheel actions are installed in the current explicit proposal. Connect
+remaining categories through shared model ownership/loading, native rig buffers,
+player action dispatch, and source timing/part masks. Net/rod joint matrices and
+balloon textures use the common converter. Keep actual inventory/readers,
+acquisition/profile, and context-correct catalogue dependencies; prepared
+artwork alone enables no item.
 Fourteen focused source/packing checks pass. Equipment resource loading uses
 the native adapters above; actual player actions and complete rigs remain work.
 

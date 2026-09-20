@@ -146,9 +146,10 @@ constant player poses, fan idle, and fan swing. Fan idle has seventeen frames;
 fan swing has nine. Neither timing is inferred from a catalogue model.
 
 Skeleton descriptions preserve actual model dependencies. The complete-rig
-category below converts supported graphics without installing draw callbacks.
-Net/rod joint-matrix commands and balloon texture formats still require shared
-graphics support. No animated model is flattened to pass the static converter.
+category below converts all twenty held rigs without installing draw callbacks.
+Shared graphics support retains net/rod/balloon joint matrices, partial vertex
+loads, and balloon IA8 textures. No animated model is flattened to pass the
+converter.
 
 ### Complete animated-held preparation
 
@@ -178,14 +179,38 @@ extends the native equipment banks to retain these complete variants.
 Required native skeleton initialization/drawing, player actions,
 inventory/acquisition/catalogue, and selected save ownership remain explicit.
 
+The remaining twelve roots cover ordinary/golden nets and rods plus eight
+balloons. They use the same category, complete skeleton packer, and compiler.
+Joint-matrix loads retain segment `0D` and the exact model-view load semantics.
+Each model may reference only matrices published by its current or earlier
+visible joints. Partial vertex loads retain cache destinations and previously
+transformed vertices; triangles referencing uninitialised slots reject.
+Neither the skeleton nor its meshes are flattened.
+
+IA8 conversion untile-orders GX IA4 blocks and swaps each sample's alpha and
+intensity nibbles into N64 IA8 order. All sixteen alpha levels survive. Native
+loads retain eight-bit format/stride, texture-LUT disabling, wrapping, shifts,
+colour combiners, and environment/primitive colours. Complete source data,
+not texture names, selects these rules. The common furniture converter supports
+the same format independently of the held-item representation.
+
+The twelve-root bundle occupies 46,976 bytes, with 1,219 vertices and 850
+triangles. Balloon model/animation combinations need 4,784 or 7,168 bytes;
+seven joints require eight work vectors including translation. Net combinations
+need 4,320/4,336 bytes; rods need 2,960. These capacities and their real gameplay
+must be installed before enabling the remaining categories.
+
 The output format is `AFV3-ANIMATED-HELD-PREPARED-1`. Both the static equipment
 consumer and furniture installer reject it. `asset_ready` means conversion is
 complete, not that the item is usable or selectable. The common scan exposes
-22 prepared roots (14 static and eight rigs), while retaining explicit graphics
-dependencies for the other twelve animated roots. The static consumer filters
+34 prepared roots (14 static and twenty rigs). The rig resource validator takes
+an explicit source-category and joint-work capacity contract; the installed
+adapter still requests only category 22 and seven vectors. New converter
+support does not expand that runtime contract implicitly. The static consumer filters
 by representation and retains its existing thirty model/animation resources.
 No cartridge, allocation, saved profile, or served patcher changes during
-preparation. See the [conversion evidence](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#complete-animated-held-preparation).
+preparation. See the [new graphics evidence](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-joint-matrix-and-ia8-conversion)
+and [retained pinwheel evidence](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#complete-animated-held-preparation).
 
 ## Native integration work
 

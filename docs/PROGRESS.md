@@ -18,6 +18,23 @@ served patchers retain their existing builds.
 
 ## Active development
 
+The shared graphics converter prepares all twenty animated equipment rigs,
+including the twelve remaining balloon/net/rod roots in
+`build/v3-held-matrix-prepared-02/`. Complete joint-matrix commands, partial
+vertex-cache loads, and IA8 intensity/alpha conversion preserve articulated
+geometry and transparency. The new bundle contains 46,976 bytes, 1,219 vertices,
+and 850 triangles; existing pinwheel assets are retained without recompilation.
+Thirty-five focused checks pass, including complete donor/native comparisons,
+matrix ownership, material stride/format, and installed-resource retention.
+
+This is preparation, not twelve newly playable imports. Balloons still need
+eight joint-work vectors and up to 7,168 bytes per model/animation bank, plus
+their actual actions and remaining consumers. Net/rod gameplay integration
+also remains open. The current runtime's category-22 contract stays explicit:
+adding converter support cannot silently install or enable another category.
+No ROM, save, main lock, or served patcher changes. See the
+[graphics checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-joint-matrix-and-ia8-conversion).
+
 The explicit ABI-121 proposal at `build/v3-held-category-02/` connects all
 eight pinwheels through shared parent discovery, names/prices, pocket artwork,
 collection, catalogue, and individual offline/browser selections. It retains

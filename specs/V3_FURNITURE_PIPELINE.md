@@ -46,7 +46,9 @@ The same shared runtime installer accepts it explicitly through
 `--refresh-runtime --equipment-rigs <prepared-directory>`, retains complete
 artwork, expands both native banks and their containing scene allocation, and
 invalidates cached animations when a model change moves their addresses.
-This installs resources, not selectable pinwheel gameplay. See
+Other prepared animated categories require explicit runtime category and joint
+capacity contracts; broader converter support does not expand an installed
+runtime category. This installs resources, not selectable pinwheel gameplay. See
 [animated-held preparation](V3_HANDHELD_ITEMS.md#complete-animated-held-preparation).
 
 Within the handheld representation, `--category item-category-art` prepares
@@ -331,6 +333,17 @@ The shared static-material category supports:
   RGBA/16-to-RGB5A3 mapping, not a guess from the texture's symbol name.
 - Native vertex conversion preserving position, UVs, and colours, clearing only
   donor flag fields; complete triangle conversion and bounded vertex loads.
+- Complete IA8 textures up to 2,048 bytes, untiled from GX IA4 eight-by-four
+  blocks with intensity/alpha nibbles swapped into native order. Every alpha
+  level survives; texture-LUT disabling, eight-bit line stride, wrapping, and
+  independent shifts are retained. `ia8-materials` selects these objects.
+  The same verified donor format table maps IA/8 to GX IA4; `texconv_tile`
+  in the donor source documents the inverse nibble conversion.
+- Animated-held descriptors additionally supply each visible joint's matrix
+  availability. Model-view loads may address only current/earlier matrices in
+  segment `0D`. Partial vertex loads preserve cache destinations and previous
+  transformed vertices; unloaded triangle indices and future matrices reject.
+  Static descriptors do not gain permission to read an unspecified matrix bank.
 - Source primitive colours and the supported material/geometry commands.
   The unlit texture/primitive category preserves texture RGBA in cycle one,
   multiplies RGB by primitive colour in cycle two, and preserves texture alpha.

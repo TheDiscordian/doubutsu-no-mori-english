@@ -26,6 +26,59 @@ import v3_feng_shui as feng
 
 
 class FormatTests(unittest.TestCase):
+    def test_ia8_retains_every_intensity_alpha_pair_and_tiled_sample(self):
+        for w,h in ((8,4),(16,16),(32,32)):
+            raw=bytearray(w*h);expected=bytearray(w*h)
+            for y in range(h):
+                for x in range(w):
+                    i=y*w+x;value=(i*73)&255
+                    gx=((y//4)*(w//8)+x//8)*32+y%4*8+x%8
+                    raw[gx]=value;expected[i]=(value&15)<<4|value>>4
+            self.assertEqual(pipeline.native_ia8(raw,w,h),expected)
+        for raw,w,h in ((bytes(32),4,8),(bytes(31),8,4),(bytes(32),8,0)):
+            with self.assertRaises(ValueError):pipeline.native_ia8(raw,w,h)
+
+    def test_ia8_material_keeps_alpha_format_stride_and_direct_lut(self):
+        original,_=fixture();raw=bytearray(original[:0x18]+original[0x20:])
+        pointers={0x11C:0x600,0x13C:0x1000}
+        struct.pack_into('>I',raw,0x18,0xFD6C1C1F)
+        struct.pack_into('>I',raw,0x20,0xD2F00511)
+        rows=parse_model(raw,0x100,pointers,(),{0x600:(32,32)},0x1000,48,static_materials=True)
+        texture=next(r for r in rows if r['opcode']==0xFD)
+        self.assertTrue(texture['ia8']);self.assertNotIn('rgba16',texture)
+        code,_=command_source({'opaque':{'rows':rows}},{0x600:0,0x1000:1024})
+        self.assertIn('G_IM_FMT_IA, G_IM_SIZ_8b, 32, 32, 0, G_TX_WRAP, G_TX_WRAP, 5, 5, 1, 1',code)
+        self.assertIn('gsDPSetTextureLUT(G_TT_NONE)',code)
+        self.assertNotIn('gsDPLoadTLUT',code)
+        for field,value in (('shape',(64,64)),('shape',(12,8)),('rgba16',True),('intensity',True)):
+            bad=copy.deepcopy(rows);next(r for r in bad if r['opcode']==0xFD)[field]=value
+            with self.assertRaises(ValueError):command_source({'opaque':{'rows':bad}},{0x600:0,0x1000:1024})
+
+    def test_joint_matrices_preserve_partial_vertex_cache_and_reject_future_reads(self):
+        raw,pointers=fixture();pointers.pop(0x144)
+        words=[(0xDA380003,0x0D000000),(0x01002004,0),
+               (0xDA380003,0x0D000040),(0x01001006,0),
+               (0x0A000000,(1<<5|2<<10)<<4),(0xDF000000,0)]
+        raw=bytearray(raw[:0x40]+b''.join(struct.pack('>II',*w) for w in words))
+        pointers.update({0x14C:0x1010,0x15C:0x1000})
+        def parse(data=raw,fixups=pointers,limit=2):
+            return parse_model(data,0x100,fixups,(0x500,),{0x600:(32,32)},0x1000,48,
+                               static_materials=True,joint_matrices=limit)
+        rows=parse()
+        self.assertEqual(next(r['global_triangles'] for r in rows if 'triangles' in r),[(1,2,0)])
+        self.assertEqual([r['joint_matrix'] for r in rows if r['opcode']==0xDA],[0,1])
+        self.assertEqual([r.get('vertex_slot',0) for r in rows if r['opcode']==1],[0,2])
+        code,_=command_source({'joint1':{'rows':rows}},{0x500:0,0x600:32,0x1000:544})
+        self.assertIn('gsSPVertex(0x06000220, 1, 2)',code)
+        self.assertIn('gsSPMatrix(0x0D000040, G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW)',code)
+        for off,value in ((0x44,0x0D000080),(0x44,0x0D000001),(0x44,0x0C000000),
+                          (0x40,0xDA380001),(0x58,0x01001008),(0x58,0x01001042)):
+            bad=bytearray(raw);struct.pack_into('>I',bad,off,value)
+            with self.subTest(offset=off,value=value),self.assertRaises(ValueError):parse(bad)
+        for limit in (0,1,-1,256,True):
+            with self.assertRaises(ValueError):parse(limit=limit)
+        with self.assertRaisesRegex(ValueError,'Unaccounted'):parse(fixups={**pointers,0x144:0x1000})
+
     def test_static_model_linker_keeps_order_and_rejects_bad_layouts(self):
         profile={'callback_adapter':{'category':'constant-model-sequence','draw_arena':'opaque',
                                      'model_order':['part0','part1','part2']}}
@@ -293,6 +346,7 @@ class DonorTests(unittest.TestCase):
         self.assertEqual(struct.unpack_from('>H',table,2*2)[0],5)  # RGBA/16 -> GX_RGB5A3
         self.assertEqual(struct.unpack_from('>H',table,2*4*2)[0],8)  # CI/4 -> GX_C4
         self.assertEqual(struct.unpack_from('>H',table,4*4*2)[0],0)  # I/4 -> GX_I4
+        self.assertEqual(struct.unpack_from('>H',table,(3*4+1)*2)[0],2)  # IA/8 -> GX_IA4
 
     def test_palette_fade_category_discovers_all_shared_code_and_complete_layouts(self):
         inventory=pipeline.scan(self.source,ROOT/'build/item-identity-megasheet.xlsx')
@@ -589,6 +643,9 @@ class DonorTests(unittest.TestCase):
                                     red,green,blue=((value>>s&15)*17>>3 for s in (8,4,0))
                                     expected=red<<11|green<<6|blue<<1|bool(alpha)
                                 self.assertEqual(struct.unpack_from('>H',native,flat*2)[0],expected)
+                            elif r['format']=='IA8':
+                                gx=((y//4)*(r['width']//8)+x//8)*32+y%4*8+x%8
+                                self.assertEqual(native[flat],(donor[gx]&15)<<4|donor[gx]>>4)
                             else:
                                 gx=((y//8)*(r['width']//8)+x//8)*64+y%8*8+x%8
                                 self.assertEqual(donor[gx//2]>>(4 if gx%2==0 else 0)&15,
@@ -602,28 +659,67 @@ class DonorTests(unittest.TestCase):
                 self.assertEqual(model.get('source_parts'),models[model['layer']].get('source_parts'))
                 start,n=model['native_offset'],model['bytes']; faces=[]; state=[]; loads=[]
                 self.assertEqual(n,dict(sections)[model['layer']])
-                first,count=0,0
+                cache=[None]*32;matrices=[];matrix=-1;posed_cache=[None]*32;posed_faces=[]
                 for a,b in struct.iter_unpack('>II',asset[start:start+n]):
                     op=a>>24
                     self.assertNotIn(op,(0x0A,0xD2,0xDE))
                     if op in (0xFC,0xE2,0xFA,0xFB,0xD9):state.append((a,b))
+                    if op==0xDA:
+                        self.assertEqual(a,0xDA380003);matrices.append((a,b));matrix=(b&0xFFFFFF)//64
                     if op==0xFD:
                         self.assertIn(b>>24,(6,8));loads.append(b)
                     if op==1:
                         self.assertEqual(b>>24,6);count=a>>12&255
                         first=(b-0x06000000-vertex['native_offset'])//16
+                        slot=(a&255)//2-count
+                        self.assertTrue(0<=slot<=32-count)
+                        self.assertGreaterEqual(first,0)
                         self.assertLessEqual(first+count,vertex['bytes']//16)
+                        cache[slot:slot+count]=range(first,first+count)
+                        posed_cache[slot:slot+count]=[(i,matrix) for i in range(first,first+count)]
                     if op in (5,6):
                         for word in ((a,b) if op==6 else (a,)):
                             indices=tuple(word>>shift&255 for shift in (16,8,0))
-                            self.assertTrue(all(i%2==0 and i//2<count for i in indices))
-                            faces.append(tuple(first+i//2 for i in indices))
+                            self.assertTrue(all(i%2==0 and i//2<32 and cache[i//2] is not None for i in indices))
+                            faces.append(tuple(cache[i//2] for i in indices))
+                            posed_faces.append(tuple(posed_cache[i//2] for i in indices))
                 donor=models[model['layer']]['rows']
+                expected_faces=[];expected_cache=[None]*32;matrix=-1
+                for command in donor:
+                    if command['opcode']==0xDA:matrix=command['joint_matrix']
+                    if command['opcode']==1:
+                        slot=command.get('vertex_slot',0);count=command['count'];first=command['first_vertex']
+                        expected_cache[slot:slot+count]=[(i,matrix) for i in range(first,first+count)]
+                    expected_faces.extend(tuple(expected_cache[v] for v in face) for face in command.get('triangles',[]))
+                self.assertEqual(posed_faces,expected_faces)
                 self.assertEqual(faces,[t for r in donor for t in r.get('global_triangles',[])])
+                self.assertEqual(matrices,[r['words'] for r in donor if r['opcode']==0xDA])
                 self.assertEqual(state,[r['words'] for r in donor if r['opcode'] in (0xFC,0xE2,0xFA,0xFB,0xD9)])
                 self.assertEqual(loads,[r['dynamic_palette'] if 'dynamic_palette' in r else 0x06000000+offsets[r['target']]
                                        for r in donor if r['opcode'] in (0xF0,0xFD)])
                 self.assertEqual(asset[start+n-8:start+n],struct.pack('>II',0xDF000000,0))
+                # Independently decode the native tile descriptors, not just
+                # the generated C, including the new 8-bit line stride/LUT.
+                words=list(struct.iter_unpack('>II',asset[start:start+n]))
+                expected=[];luts=[];last=None
+                for command in donor:
+                    if command['opcode'] not in (0xFD,0xD2):continue
+                    ia8=bool(command.get('ia8'));rgba16=bool(command.get('rgba16'))
+                    intensity=bool(command.get('intensity'));w,h=command['shape']
+                    direct=ia8 or rgba16 or intensity
+                    wraps=tuple({0:2,1:0,2:1}[v] for v in command.get('wrap_modes',(0,0)))
+                    shifts=command.get('tile_shifts',(0,0))
+                    expected.append((0 if rgba16 else 3 if ia8 else 4 if intensity else 2,
+                                     2 if rgba16 else 1 if ia8 else 0,
+                                     w//4 if rgba16 else w//8 if ia8 else (w+15)//16,0,
+                                     0 if direct else 15,*wraps,*shifts))
+                    if command['opcode']==0xFD and direct!=last:
+                        luts.append((0xE3001001,0 if direct else 0x8000));last=direct
+                actual=[(a>>21&7,a>>19&3,a>>9&511,a&511,b>>20&15,
+                         b>>8&3,b>>18&3,b&15,b>>10&15)
+                        for a,b in words if a>>24==0xF5 and b>>24&7==0]
+                self.assertEqual(actual,expected)
+                self.assertEqual([w for w in words if w[0]==0xE3001001],luts)
 
     def test_automatic_text_credits_are_in_the_single_catalogue(self):
         self.assertEqual(install.provenance_patch(self.report['objects']),'')

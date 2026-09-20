@@ -158,7 +158,7 @@ def native_contract(original, core):
         menu_reload='mSM_load_player_anime', buffer_sizes_changed=False)
 
 
-def prepared_rigs(source, art_path):
+def prepared_rigs(source, art_path, *, categories=(22,), joint_work_vectors=7):
     """Validate the complete prepared category without recompiling its artwork."""
     from v3_handheld_items import rig_descriptor
     from v3_keyframes import compile_skeleton
@@ -167,8 +167,23 @@ def prepared_rigs(source, art_path):
             or art['version']!=1 or art['source_rel_sha256']!=sha256(source.rel)
             or art['source_symbols_sha256']!=sha256(source.symbols.encode())):
         raise ValueError('Changed prepared equipment rig source/format')
+    if (not categories or len(set(categories))!=len(categories)
+            or any(type(c) is not int or c<0 for c in categories)
+            or type(joint_work_vectors) is not int or not 1<=joint_work_vectors<=256):
+        raise ValueError('Invalid equipment rig category/capacity contract')
     description=motion(source);inventory=scan(source)
-    parents=[r for r in inventory['rows'] if r['category']=='animated-held-model' and r['asset_ready']]
+    # Conversion support is not runtime support. The current installer supplies
+    # category 22; new converters must not silently enlarge its required bundle.
+    kinds=kind_bindings(source)['rows']
+    if not set(categories)<={r['item_main'] for r in kinds}:
+        raise ValueError('Unknown equipment rig source category')
+    identities={r['item_id'] for r in kinds if r['item_main'] in categories}
+    parents=[r for r in inventory['rows'] if r['category']=='animated-held-model'
+             and r['item_id'] in identities]
+    parent_ids={r['item_id'] for r in parents}
+    if (not parents or any(not r['asset_ready'] for r in parents)
+            or {r['item_main'] for r in kinds if r['item_id'] in parent_ids}!=set(categories)):
+        raise ValueError('Incomplete convertible equipment rig categories')
     roots={r['shape_index'] for r in parents};assets={};records=[]
     for row in art['objects']:
         index=row['shape_index'];matches=[r for r in parents if r['shape_index']==index]
@@ -199,7 +214,7 @@ def prepared_rigs(source, art_path):
         if (any(asset[at:aligned]) or row['artwork_bytes']!=aligned or asset[aligned:]!=suffix
                 or row['skeleton']!=json.loads(json.dumps(compiled))
                 or row['root_offset']!=compiled['header']['native_offset']
-                or not 0<rig['joints']<7 or rig['shown_joints']>7
+                or not 0<rig['joints']<joint_work_vectors or rig['shown_joints']>joint_work_vectors
                 or row['maximum_animation_bytes']!=matches[0]['maximum_animation_bytes']
                 or row['maximum_model_animation_bytes']!=matches[0]['maximum_model_animation_bytes']):
             raise ValueError('Changed complete joint hierarchy or native work-vector capacity')

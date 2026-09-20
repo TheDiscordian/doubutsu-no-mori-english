@@ -1,5 +1,65 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared joint-matrix and IA8 conversion
+
+The shared format converter prepares the remaining twelve animated equipment
+roots: ordinary/golden nets and fishing rods plus eight balloons. It retains
+all skeleton joints, material state, articulated vertex-cache operations,
+matrix loads, complete texels/alpha, and triangles. No per-item converter or
+static substitute is added. Existing pinwheel assets are reused, not rebuilt.
+
+- Prepared bundle: `build/v3-held-matrix-prepared-02/`.
+- Receipt SHA-256:
+  `76d32952d729f2c495e8bb31e465bdcd075823f6fb71db85a24b67e541aa43bf`.
+- Twelve complete objects: 46,976 bytes, 1,219 vertices, 850 triangles, 46 lists.
+- Combined model/animation bounds: nets 4,320/4,336 bytes; rods 2,960 bytes;
+  five balloons 4,784 bytes and three balloons 7,168 bytes.
+- Nets: six joints/three shown; rods: five/four; balloons: seven/four.
+- Shared scan: 34 convertible model roots, comprising 14 static and 20 animated.
+
+`prepare_models` derives the visible-matrix limit for each model from its
+skeleton and joint bindings. `parse_model` retains partial cache destinations
+and checks every triangle against initialised slots. Matrix references must
+use the exact model-view load and segment `0D`, aligned to 64 bytes, within
+already published visible joints. The native skeleton drawer's segment setup
+and matrix publication order are confirmed in `upstream/af/src/code/c_keyframe.c`.
+The common compiler preserves those loads and their positions among vertex loads.
+
+The texture adapter untile-orders GX IA4 and swaps intensity/alpha nibbles to
+N64 IA8, preserving all levels. The supplied donor executable's complete format
+table confirms IA/8 maps to GX IA4; the donor `emu64::texconv_tile` implementation
+confirms the nibble ordering. Native commands retain IA8 width/stride, disabled
+palette lookup, wrapping, shifts, primitive/environment colours, and combiners.
+
+The runtime validator now takes explicit source categories and joint-vector
+capacity. Its existing caller retains category 22/seven vectors and accepts the
+unchanged complete pinwheel bundle. It rejects the new categories by default;
+an explicit eight-vector validation can verify the complete new bundle without
+installing it. This prevents a new converter from silently changing an older
+runtime installation's required or permitted category.
+
+Thirty-five focused checks pass in 10.395 seconds, using
+`V3_ANIMATED_HELD_BASE=build/v3-held-category-02` and the animated-held, shared
+format, donor format-table, static-held artwork, and furniture-format tests.
+They compare every native texture sample, vertex, triangle and its matrix
+association, material format/stride/LUT, model binding, and skeleton field.
+They reject uninitialised cache slots, future/unaligned/wrong-segment matrices,
+bad alpha/texture sizes, missing resources, and insufficient joint capacity.
+The current installed resources and previously prepared pinwheel/static models
+remain unchanged. Python parsing and diff checks pass.
+
+The first conversion invocation passes a relative output path to a helper that
+requires an absolute repository path. It stops before compiling a model; its
+partial output is preserved at `build/v3-held-matrix-prepared-01/`. The corrected
+absolute-path invocation produces the complete `-02` bundle with the pinned
+Docker compiler. No emulator run is needed for this converter-only change.
+
+No ROM, saved data, main lock, or served patcher changes. These are prepared
+models, not twelve new playable imports. Continue from the explicit ABI-121
+cartridge: extend the shared resource installer, bank and joint/morph capacity,
+real balloon/tool behaviours, inventory, parent records, and acquisition before
+enabling the remaining categories. Existing format-2 profile restrictions remain.
+
 ## Seasonal setter-copy diagnosis
 
 The focused check uses the unchanged ABI-121 cartridge at
