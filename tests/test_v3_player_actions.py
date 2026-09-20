@@ -26,6 +26,73 @@ PARENTS=ROOT/os.environ.get('V3_HELD_PARENTS_BUILD','build/v3-held-parent-reader
 ICONS=ROOT/os.environ.get('V3_POCKET_ICONS_BUILD','build/v3-held-pocket-icons-01')
 INVENTORY=ROOT/os.environ.get('V3_INVENTORY_EQUIPMENT_BUILD','build/v3-inventory-equipment-03')
 TOOLS=ROOT/os.environ.get('V3_TOOL_CONTROLS_BUILD','build/v3-shared-tool-controls-02')
+TOOL_MOTION=ROOT/os.environ.get('V3_TOOL_MOTION_BUILD','build/v3-shared-tool-motion-02')
+
+
+@unittest.skipUnless((TOOL_MOTION/'build-lock.json').is_file(),'Current shared tool motions required')
+class ToolMotionTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.rom,cls.report=inputs(TOOL_MOTION/'build-lock.json')
+        cls.base,cls.prior=inputs(TOOL_MOTION/'base-lock.json')
+        cls.files,cls.before=by_vrom(cls.rom),by_vrom(cls.base)
+        cls.e=cls.report['equipment_resources'];cls.old=cls.prior['equipment_resources']
+        cls.motion=cls.e['player_actions']['tool_motion']
+
+    def test_exact_hooks_relocation_and_retained_drawers(self):
+        owner=self.files[actions.PLAYER_VROM].extract(self.rom)
+        before=self.before[actions.PLAYER_VROM].extract(self.base);restored=bytearray(owner)
+        self.assertEqual(len(self.motion['patches']),3)
+        for row in self.motion['patches']:
+            at=row['address']-actions.PLAYER_RAM;n=len(bytes.fromhex(row['before']))
+            self.assertEqual(owner[at:at+n].hex(),row['after'])
+            self.assertEqual(before[at:at+n].hex(),row['before'])
+            restored[at:at+n]=bytes.fromhex(row['before'])
+        self.assertEqual(restored,before)
+        rel=self.files[actions.PLAYER_RELOC].extract(self.rom)
+        self.assertEqual(rel,self.before[actions.PLAYER_RELOC].extract(self.base))
+        for base in (0x80200010,0x80378010):
+            spec=SimpleNamespace(ram=actions.PLAYER_RAM,resident_bytes=len(owner),sections=struct.unpack_from('>5I',rel))
+            moved=relocate_verified_data(spec,owner,rel,base)
+            for row in self.motion['patches']:
+                at=row['address']-actions.PLAYER_RAM
+                self.assertEqual(moved[at:at+len(bytes.fromhex(row['after']))].hex(),row['after'])
+        for row in self.motion['native_consumers']:
+            a,b=row['entry']-actions.PLAYER_RAM,row['end']-actions.PLAYER_RAM
+            self.assertEqual(sha256(restored[a:b]),row['sha256'])
+
+    def test_complete_rig_motions_without_changed_assets_or_profiles(self):
+        a=self.e['blob_offset'];first=a+self.motion['code_offset'];end=a+actions.PARENT_CODE_OFFSET
+        old=self.before[BLOB].extract(self.base);new=self.files[BLOB].extract(self.rom)
+        self.assertEqual(new[a:first],old[a:first]);self.assertEqual(new[end:a+self.e['bytes']],old[end:a+self.old['bytes']])
+        self.assertEqual(sha256(new[first:first+self.motion['code']['bytes']]),self.motion['code']['sha256'])
+        self.assertLessEqual(self.motion['code']['bytes'],end-first)
+        self.assertEqual([(r['native'],r['imported']) for r in self.motion['motion_map']],
+            [(i,i+21) for i in range(2,9)]+[(i,i+22) for i in range(10,16)])
+        self.assertEqual([(r['joints'],r['shown_joints']) for r in self.motion['rigs']],[(6,3)]*2+[(5,4)]*2)
+        for key in ('records','kind_readers','held_rig_actions','inventory_preview','room_rigs','optional_selection',
+                    'parent_readers','pocket_icons','catalogue','event_acquisition'):
+            self.assertEqual(self.e[key],self.old[key],key)
+        self.assertEqual(self.e['player_actions']['tool_controls'],self.old['player_actions']['tool_controls'])
+        self.assertEqual(self.e['bytes'],self.old['bytes']);self.assertEqual(self.report['save_runtime'],self.prior['save_runtime'])
+        self.assertFalse(self.motion['golden_effects_installed']);self.assertEqual(self.motion['logical_imports_added'],0)
+
+    def test_patch_original_resources_and_composition(self):
+        import v3_optional_composition as composer
+        native=(ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes()
+        self.assertEqual(apply_ups(native,(TOOL_MOTION/'asset-loader.ups').read_bytes()),self.rom)
+        self.assertEqual(struct.unpack_from('>2I',self.rom,16),n64_checksum(self.rom))
+        for v in self.files.keys()-{BLOB,MODULE,actions.PLAYER_VROM}:
+            self.assertEqual(self.files[v].extract(self.rom),self.before[v].extract(self.base),hex(v))
+        pin=composer.BASE,composer.BASE_SHA,composer.REPORT_SHA,composer.ABI
+        try:
+            composer.use_build_lock(TOOL_MOTION/'build-lock.json')
+            catalogue=composer.catalogue(self.rom,self.report);self.assertEqual(len(catalogue),128)
+            empty=composer.compose(self.rom,self.report,catalogue,composer.resolve(catalogue,[]))[0]
+            self.assertEqual(sha256(empty),self.report['translation_baseline']['sha256'])
+            full=composer.compose(self.rom,self.report,catalogue,composer.resolve(catalogue,list(catalogue)))[0]
+            self.assertEqual(full,self.rom)
+        finally:composer.BASE,composer.BASE_SHA,composer.REPORT_SHA,composer.ABI=pin
 
 
 @unittest.skipUnless((TOOLS/'build-lock.json').is_file(),'Current shared tool controls required')
@@ -273,6 +340,9 @@ class PocketIconTests(unittest.TestCase):
 
 class SelectionHostTests(unittest.TestCase):
     sanitized=shared_tests.HostTests.sanitized
+
+    def test_shared_tool_motion_mapping(self):
+        self.sanitized('v3_tool_motion_test.c')
 
     def test_shared_tool_kind_predicates(self):
         self.sanitized('v3_tool_controls_test.c')

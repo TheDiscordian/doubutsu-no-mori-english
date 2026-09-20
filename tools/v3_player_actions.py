@@ -74,7 +74,9 @@ SOURCES = ('tools/v3_player_actions.py','tools/v3_furniture_pipeline.py',
            'overlays/v3/inventory_equipment.c','overlays/v3/inventory_equipment.S',
            'overlays/v3/inventory_equipment.ld',
            'overlays/v3/held_rigs.c','overlays/v3/held_rigs.S',
-           'overlays/v3/held_rigs.ld','overlays/v3/tool_controls.c') + sound_programs.SOURCES
+           'overlays/v3/held_rigs.ld','overlays/v3/tool_controls.c',
+           'overlays/v3/tool_motion.c','overlays/v3/tool_motion.S',
+           'overlays/v3/tool_motion.ld') + sound_programs.SOURCES
 
 SELECTION_OFFSET=0x5500
 PARENT_CODE_OFFSET,PARENT_TABLE_OFFSET=0x3000,0x57F0
@@ -82,6 +84,93 @@ POCKET_ICON_OFFSET=0x3800
 RIG_CODE_OFFSET,RIG_MODULE_SIZE=0xD000,0xE000
 RIG_STATE_OFFSET,RIG_STATE_BYTES,RIG_PLAYER_SIZE=0x12D8,44,0x1310
 BALLOON_MODULE_SIZE,BALLOON_STATE_OFFSET,BALLOON_STATE_BYTES=0xF000,0x1370,48
+TOOL_MOTION_OFFSET=0x2A50
+
+
+def refresh_tool_motion(base,prior,blob,core,original,output):
+    """Connect action motions to complete net/rod rigs through shared setup."""
+    from v3_npc_clothing import guard_incoming
+    old=prior['equipment_resources'];actions=old['player_actions'];start=old['blob_offset']
+    module=bytearray(blob[start:start+old['bytes']]);files=by_vrom(base)
+    owner=bytearray(files[PLAYER_VROM].extract(base));rel=files[PLAYER_RELOC].extract(base)
+    native_files=by_vrom(original);native=native_files[PLAYER_VROM].extract(original)
+    if (not actions.get('tool_controls') or actions.get('tool_motion')
+            or sha256(module)!=old['sha256'] or sha256(owner)!=actions['owner_sha256']
+            or sha256(rel)!=actions['relocation_sha256']
+            or CODE_OFFSET+actions['code']['bytes']>TOOL_MOTION_OFFSET
+            or any(module[TOOL_MOTION_OFFSET:PARENT_CODE_OFFSET])):
+        raise ValueError('Tool motions require the checked complete tool-control proposal')
+    source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+                  (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    sources=[]
+    for at,n,digest in (
+        (0x169E5C,196,'b1c13a93ee0e9632ad9e8d6b706f12f9b169901d524514b54da89b35eba50cde'),
+        (0x169F20,268,'45a25c5c34ced37de5ca38ec520cbe5bc9ee8787d1966b2538268548ea1498d1'),
+        (0x1710D4,352,'7aa8f6cde60b847553056c7ec80c3eab6ef33f22490419bcffe2c62d153bbc5c'),
+        (0x171B20,216,'6731aa36ac2e84707d6709a7f3f33162c1db9192ec2c06866371dd092727782e'),
+        (0x172728,212,'01e1ea69910aecdaabe60499c6a02570d9d5deaa01ab4c8140ed3593f349ceac'),
+        (0x171AAC,116,'09c5cfb93402bbd45fb3781050b3826ad883aa2080c0691ba07cdeca558e3389'),
+        (0x1726B4,116,'39eef516e44d182bed159f1d580f028a5657ff2703bc99b151d585d89f9e3516')):
+        raw,receipt=source.function(at)
+        if len(raw)!=n or sha256(raw)!=digest:raise ValueError('Changed complete donor tool setup/drawing')
+        sources.append(receipt)
+    consumers=[]
+    for first,last in ((0x808B84DC,0x808B8628),(0x808BDDB4,0x808BDEF0),
+                       (0x808BDF6C,0x808BE000),(0x808BE670,0x808BE85C),
+                       (0x808BE8C4,0x808BF360)):
+        a,b=first-PLAYER_RAM,last-PLAYER_RAM
+        if owner[a:b]!=native[a:b]:raise ValueError('Changed complete native tool setup/drawing')
+        consumers.append(dict(entry=first,end=last,sha256=sha256(native[a:b])))
+    native_core=native_files[CODE_VROM].extract(original)
+    types=native_core[0x8010BF74-CODE_RAM:0x8010BF74-CODE_RAM+17]
+    if types!=bytes((0,1,2,2,2,2,2,2,2,1,3,3,3,3,3,3,0)):
+        raise ValueError('Changed native tool resource categories')
+    resources={r['index']:r for r in old['records']};rigs=[];motion_map=[]
+    for first,count,delta,typ,joints,models,shown in ((2,7,21,2,6,(21,22),3),(10,6,22,3,5,(30,31),4)):
+        for index in range(first,first+count):
+            r=resources[index+delta]
+            if r['kind']!='animation' or r['type']!=typ or r['source']['joints']!=joints:
+                raise ValueError('Incomplete source tool animation family')
+            motion_map.append(dict(native=index,imported=index+delta,type=typ,sha256=r['sha256']))
+        for index in models:
+            r=resources[index];s=r['source']['skeleton']
+            if (r['kind']!='animated-model' or r['type']!=1 or s['joints']!=joints
+                    or s['shown_joints']!=shown or joints+1>old['player_joint_work']['vectors']
+                    or r['bytes']+max(resources[i+delta]['bytes'] for i in range(first,first+count))>
+                        old['animated_rigs']['allocation']['bank_bytes']):
+                raise ValueError('Complete tool rig exceeds native skeleton or bank capacity')
+            rigs.append(dict(index=index,joints=joints,shown_joints=shown,sha256=r['sha256']))
+    # Both retained after-joint tables use the same source joint meanings.
+    for at,expected in ((0x808DF7CC,(0,0,0,0x808BE6DC,0,0)),
+                        (0x808DF7E4,(0,0,0,0,0x808BF1E8))):
+        if struct.unpack_from('>'+str(len(expected))+'I',owner,at-PLAYER_RAM)!=expected:
+            raise ValueError('Changed native tool joint callback layout')
+    code,compiled=compile_part('tool_motion',output/'tool_motion',extra_sources=('overlays/v3/tool_motion.S',))
+    if len(code)>PARENT_CODE_OFFSET-TOOL_MOTION_OFFSET:raise ValueError('Tool setup exceeds reservation')
+    _,_,_,locations,_=native_references(owner,rel)
+    hooks=((0x808B84DC,'af_v3_tool_action_setup',False,8),
+           (0x808B856C,'af_v3_tool_moving_setup',False,8),
+           (0x808BDEC4,'af_v3_tool_rod_lifetime',True,4))
+    guard_incoming(owner,TEXT_SIZE,PLAYER_RAM,[(at-PLAYER_RAM,n) for at,_,_,n in hooks])
+    patches=[]
+    for address,name,link,n in hooks:
+        at=address-PLAYER_RAM
+        if any(i in locations for i in range(at,at+n,4)):raise ValueError('Relocated tool setup hook')
+        before=bytes(owner[at:at+n]);after=struct.pack('>I',jump(compiled['symbols'][name],link=link))+bytes(n-4)
+        if link and before!=bytes.fromhex('24010022'):raise ValueError('Changed rod lifetime predicate')
+        owner[at:at+n]=after
+        patches.append(dict(address=address,before=before.hex(),after=after.hex(),symbol=name))
+    module[TOOL_MOTION_OFFSET:TOOL_MOTION_OFFSET+len(code)]=code
+    blob[start:start+len(module)]=module
+    report=copy.deepcopy(old);current=report['player_actions']
+    current.update(owner_sha256=sha256(owner))
+    current['tool_motion']=dict(format='AFV3-TOOL-MOTION-1',code=compiled,code_offset=TOOL_MOTION_OFFSET,
+        source_functions=sources,native_consumers=consumers,patches=patches,motion_map=motion_map,rigs=rigs,
+        native_drawers_retained=True,actual_kinds_retained=True,rod_lifetime_connected=True,
+        golden_effects_installed=False,logical_imports_added=0,ordinary_gameplay_tested=False)
+    report['player_motion'].update(owner_sha256=sha256(owner))
+    report.update(sha256=sha256(module),crc32=zlib.crc32(module))
+    return report,{PLAYER_VROM:bytes(owner)}
 
 
 def refresh_tool_controls(base,prior,blob,core,original,output):
@@ -1087,6 +1176,9 @@ def expanded_tables(source,owner,reloc,*,categories=CATEGORIES,native_count=NATI
 
 def install(base,prior,blob,core,original,output):
     old=prior.get('equipment_resources',{})
+    if (old.get('player_actions',{}).get('tool_controls') and
+            not old['player_actions'].get('tool_motion')):
+        return refresh_tool_motion(base,prior,blob,core,original,output)
     if (old.get('inventory_preview',{}).get('balloon_drawer') and
             not old.get('player_actions',{}).get('tool_controls')):
         return refresh_tool_controls(base,prior,blob,core,original,output)

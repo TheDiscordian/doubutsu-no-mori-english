@@ -2,8 +2,8 @@
 
 ## Active: V3 optional GameCube imports
 
-The current explicit proposal is ABI 129,
-`build/v3-shared-tool-controls-02/build-lock.json`. All eight balloons are
+The current explicit proposal is ABI 130,
+`build/v3-shared-tool-motion-02/build-lock.json`. All eight balloons are
 connected through shared source-derived parent records, room profiles, indoor
 conversion/pickup, collection/catalogue, complete icons, and optional selection.
 There are 128 experimental choices, with 24 equipment parents. Neither served
@@ -19,9 +19,19 @@ unselected extended kinds, not ordinary golden-tool gameplay. The setup retry
 allowance is spent; retain the passing evidence. See the
 [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-tool-input-predicates).
 
-Next extend the existing shared equipment/inventory adapters for source-correct
-net/rod drawing and animation, then golden effects and parent consumers. Reuse
-the complete installed model/motion resources. Source golden-net capture is
+The shared tool-animation adapter connects all thirteen net/rod motion indices,
+actual kind retention, rod-aware moving setup, and bobber lifetime. Native net/
+rod drawers retain the matching source joint callbacks. Four focused checks pass;
+the first silent native run passes 128 records/102 assertions, including both
+original tools, complete imported drawing commands, movement timing, guards,
+checkpoint restoration, and clean exit. Reuse this evidence and the complete
+installed models; no render replacement or asset reconversion is required.
+See the [motion checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-tool-animation-setup).
+
+Next extend remaining native action-request family checks: the donor's net
+swing/pull/slip, tumble, and get-up paths accept both nets, whereas the N64 paths
+still assume kind one. Then connect golden effects and inventory/parent consumers.
+Reuse the complete installed model/motion resources. Source golden-net capture is
 21/60 rather than 15/50; golden-rod consumers are in both ordinary and special
 fish actors; the shovel forwards a golden flag into digging effects. Those are
 real implementation dependencies, not reasons to enable ordinary-tool substitutes.
@@ -93,7 +103,7 @@ Net/rod behaviour and golden-tool differences remain explicit. Resources do
 not enable these imports. See the
 [capacity checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-rig-capacity-and-resource-extension).
 
-Next work uses the explicit ABI-129 lock above. All eight pinwheels have shared
+Next work uses the explicit ABI-130 lock above. All eight pinwheels have shared
 parent readers, pocket artwork, collection/catalogue, existing event acquisition,
 and individual experimental selections. The full proposal has 128 choices;
 existing fans and fixed identities are retained. No per-item installers or

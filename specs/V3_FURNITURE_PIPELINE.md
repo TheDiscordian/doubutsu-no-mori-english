@@ -196,6 +196,14 @@ See [animated-held actions](V3_HANDHELD_ITEMS.md#shared-animated-held-actions)
 [balloon actions](V3_HANDHELD_ITEMS.md#shared-balloon-actions), and
 [loop sound](V3_HANDHELD_ITEMS.md#shared-held-loop-sound).
 
+On a complete animated-parent build, the same route connects shared native tool
+input predicates, then action animation/moving setup and rod lifetime. It maps
+actual source families and complete motion resources while preserving original
+tools and matching native renderers. These stages use existing code space and
+do not enable tool choices before golden effects, remaining action checks,
+inventory, and acquisition are connected. See
+[tool animation setup](V3_HANDHELD_ITEMS.md#shared-tool-animation-setup).
+
 `--category` selects a discovered shared category without maintaining an item
 list. `convert --assets-only` prepares complete artwork while retaining missing
 metadata/gameplay/acquisition reasons. It produces a distinct **prepared-assets**

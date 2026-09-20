@@ -759,6 +759,53 @@ fixed identities; do not make an independent installer or test per tool.
 Evidence and limits are in the
 [tool-control checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-tool-input-predicates).
 
+### Shared tool animation setup
+
+On a tool-control-enabled build, `--refresh-runtime --player-actions` installs
+the shared action/moving setup adapter. `overlays/v3/tool_motion.c` resolves the
+current player owner through `80143900`; it never caches a relocated address.
+The original entry points at `808B84DC` and `808B856C` keep their callers and
+calling conventions. Imported axe/net/rod/shovel families may match the native
+action request, but their actual kinds are passed to loading and stored in the
+player. Hidden, scene-disallowed, or unselected equipment still fails the actual
+visible-kind reader before setup.
+
+Native net animation indices `2..8` map to installed source resources `23..29`;
+rod indices `10..15` map to `32..37`. Each complete resource retains its native
+type and six-/five-joint count. Unrelated animations are not remapped; the native
+animation/type predicate rejects mismatched families. Original tools retain
+their original indices, speed, start frame, morph, loop mode, and callbacks.
+Rod-aware movement uses imported resource `33`, retaining its supplied speed.
+The existing common setup still owns pinwheel/balloon handling and holding poses.
+
+The native loader's final lifetime test at `808BDEC4` recognises imported rods
+`87..88` without issuing bobber destruction. Its 28-byte assembly helper maps
+only temporary register `t4` for that comparison and recreates `at=34`; actual
+kind/model data is unchanged. All other kinds keep the native destruction path.
+
+The native net drawer `808BE788` retains its collision-point transforms and
+joint-three angle callback. The rod drawer `808BF288` retains its joint-four
+tip callback, bend rotation, virtual tip, and valid flag. Their complete code,
+joint tables, source callbacks, model joint counts, displayed-list counts, and
+work/bank capacities are checked. The converted complete rigs fit these exact
+callbacks: no new drawer or reduced model is installed.
+
+The adapter occupies 688 bytes at `804A5A50`, after the existing control adapter
+and before held-parent code at `804A6000`. Only two eight-byte entry hooks and
+one four-byte lifetime call change in the player owner. None overlaps an original
+relocation or an incoming interior branch. All prior code/resources/relocations,
+module allocation, profiles, and saved formats remain. Startup covers the new
+module CRC; empty/all composition and original-ROM patch reconstruction are
+checked. The explicit proposal does not promote the main lock or either patcher.
+
+The native fixture exercises original net/rod setup plus complete imported net/
+rod loading, animation, and drawing commands using isolated selectors. It does
+not enable golden-tool choices or establish ordinary action transitions, golden
+effects, acquisition, persistence, GPU appearance, or hardware. Remaining net
+request/tumble family checks are separate actual consumers, not implied by
+successful direct setup. See the
+[motion checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-tool-animation-setup).
+
 ### Extended action tables
 
 `--refresh-runtime --player-actions` installs shared action-table capacity in the

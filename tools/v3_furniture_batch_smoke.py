@@ -1060,6 +1060,7 @@ def tool_controls(debug,rom_path,record):
 
 
 def exercise(debug, rom_path, record, *, section='automatic_furniture'):
+    if section=='tool_motion':return held_rig_actions(debug,rom_path,record,tools=True)
     if section=='tool_controls':return tool_controls(debug,rom_path,record)
     if section=='held_catalogue':
         from v3_catalogue_smoke import held_previews
@@ -1671,7 +1672,7 @@ def equipment_bank_switch(debug,rom_path,record):
         flash_written=False,requires_checkpoint_restore=True)
 
 
-def held_rig_actions(debug,rom_path,record):
+def held_rig_actions(debug,rom_path,record,*,tools=False):
     """Complete native rig initialization and draw callbacks on isolated actors."""
     import v3_equipment_runtime as equipment
     from v3_import_storage import jump
@@ -1731,6 +1732,7 @@ def held_rig_actions(debug,rom_path,record):
     model_indices={r['fields'][2] for r in resources['kind_readers']['rows'] if r['item_main']==22}
     models=[r for r in resources['records'] if r['index'] in model_indices]
     models=[min(models,key=lambda r:r['bytes']),max(models,key=lambda r:r['bytes'])]
+    if tools:models=[]
     animations={r['source_index']:r for r in resources['records'] if r['kind']=='animation'}
     try:
         # An ordinary original setup exercises the resident wrapper and its
@@ -1739,6 +1741,63 @@ def held_rig_actions(debug,rom_path,record):
         owner_call(0x808B83B4,0x808B846C,[actor,7,0xFFFFFFFF,0x3F800000,0,0xBF800000,identity+64,identity+68])
         check('ordinary setup retains no equipped item',actor+0x1117,b'\xFF')
         check('ordinary setup retains requested player animation',identity+64,struct.pack('>I',7))
+        if tools:
+            from aflib import CODE_RAM,CODE_VROM
+            core=files[CODE_VROM].extract(image)
+            def core_call(first,last):
+                return call(first,proof=(first,core[first-CODE_RAM:last-CODE_RAM]))
+            title=core_call(0x8007D90C,0x8007D91C)
+            field=(core_call(0x800B593C,0x800B594C)+0x3C if title else scalar(0x80136FD8)+0x3EC)
+            table=resources['player_actions']['equipment_selection']['table_ram']+16+(0x2239-0x2200)*8
+            for at,n in ((field,2),(table,8),(0x80460020,192),(0x80126EB4,4)):
+                saved[at]=debug.read_memory(at,n)
+            profile=bytearray(saved[0x80460020]);profile[159]|=0x80
+            debug.write_memory(0x80460020,profile);put(0x80126EB4,0)
+            put(actor+0xD00,44);put(actor+0xCF0,7);debug.write_memory(actor+0xE65,b'\1')
+            bobber=allocation+0x4800;put(actor+0xF28,bobber)
+            by_index={r['index']:r for r in resources['records']}
+            cases=((0x2200,1,1,3,3,4),(0x2239,46,22,3,24,4),
+                   (0x2203,34,9,13,13,13),(0x2239,88,31,13,35,13))
+            for iteration,(item,kind,shape,native_motion,motion,item_main) in enumerate(cases):
+                family=1 if kind in (1,46) else 34
+                if item==0x2239:debug.write_memory(table,struct.pack('>HbBHBB',item,kind,0,159,0x80,1))
+                debug.write_memory(field,struct.pack('>H',item));put(bobber+0x234,7)
+                owner_call(0x808B84DC,0x808B856C,[actor,family,native_motion,item_main,0,0x3F800000,1])
+                index=scalar(actor+0xDEC);bank=bank0+index*capacity
+                check('tool action keeps actual kind',actor+0x1117,bytes((kind,)))
+                check('tool action keeps requested callback',actor+0xCFC,struct.pack('>I',item_main))
+                check('tool action selects complete model',actor+0xDDC+index*4,struct.pack('>I',shape))
+                check('tool action selects correct animation',actor+0xDE4+index*4,struct.pack('>I',motion))
+                check('rod survives model/animation setup',bobber+0x234,struct.pack('>I',7 if family==34 else 0))
+                check('tool action uses native timing',actor+0xA24,struct.pack('>2f',1,1))
+                if kind>35:
+                    model,animation=by_index[shape],by_index[motion]
+                    wanted=b''.join(blob[r['blob_offset']:r['blob_offset']+r['bytes']] for r in (model,animation))
+                    check('complete tool model and animation loaded',bank,wanted)
+                    owner_call(0x808BD81C,0x808BD880,[actor])
+                    put(0x801458B8,bank&0x1FFFFFFF);call(0x800E0284,[identity])
+                    put(game+0xA0,iteration);put(graph+0x298,gfx,gfx+0x2000)
+                    put(graph+0x2A8,translucent,translucent+0x700)
+                    first,last=(0x808BE788,0x808BE85C) if family==1 else (0x808BF288,0x808BF360)
+                    owner_call(first,last,[actor,game])
+                    front,back=struct.unpack('>2I',debug.read_memory(graph+0x298,8))
+                    if not gfx<front<=back<=gfx+0x2000:raise ValueError('Tool drawer escaped its graphics arena')
+                    draws=[p for w,p in struct.iter_unpack('>2I',debug.read_memory(gfx,front-gfx)) if w>>24==0xDE]
+                    expected_lists=[0x06000000+m['native_offset'] for m in model['source']['models']]
+                    passed=draws==expected_lists
+                    record(dict(tool_draw_kind=kind,lists=draws,expected=expected_lists,assertion='passed' if passed else 'failed'))
+                    if not passed:raise ValueError('Tool drawer omitted complete source model joints')
+                    assertions+=1
+                    check('tool drawer retains matrix stack',0x801462B4,struct.pack('>I',matrix_now))
+                    check('rod-tip callback validity',actor+0xF44,struct.pack('>I',int(family==34)))
+                if family==34:
+                    owner_call(0x808B856C,0x808B8628,[actor,7,0x3FE00000,0,identity+64,identity+68])
+                    index=scalar(actor+0xDEC)
+                    check('rod walking selects moving animation',actor+0xDE4+index*4,struct.pack('>I',11 if kind==34 else 33))
+                    check('rod walking preserves requested native speed',actor+0xA24,struct.pack('>f',1.75))
+                for at in guards:check('tool setup/draw memory guard',at,edge)
+            for at in (field,table,0x80460020,0x80126EB4):debug.write_memory(at,saved[at])
+            check('complete tool module restored',equipment.RAM,module)
         for iteration,model in enumerate(models):
             animation=animations[model['source']['motion_bindings'][0]['default_animation']]
             owner_call(0x808BD934,0x808BDACC,[actor,model['index'],animation['index'],0,0,0x3F800000,1])
@@ -1775,7 +1834,7 @@ def held_rig_actions(debug,rom_path,record):
             check('unchanged parent matrix',matrix_now,debug.read_memory(identity,64))
             check('native rod-tip validity cleared',actor+0xF44,bytes(4))
             for at in guards:check('native rig memory guard',at,edge)
-        if receipt.get('balloon'):
+        if receipt.get('balloon') and not tools:
             # The real view/light fields are required by reflection drawing.
             # Redirect only its graphics context to the isolated command arenas.
             saved[real_game]=debug.read_memory(real_game,4)
@@ -1827,6 +1886,11 @@ def held_rig_actions(debug,rom_path,record):
         debug.write_memory(matrix_now,matrix_before)
         for at,value in saved.items():debug.write_memory(at,value)
         call(0x8009C040,[allocation])
+    if tools:
+        return dict(native_tool_motion=True,assertions=assertions,original_tools=2,imported_rigs=2,
+            synthetic_equipment_data=True,code_uploaded=False,gpu_rendered=False,
+            golden_effects_tested=False,ordinary_gameplay_tested=False,flash_written=False,
+            requires_checkpoint_restore=True)
     return dict(native_held_rig_actions=True,assertions=assertions,
         representative_rigs=len(models)+(len(balloons) if receipt.get('balloon') else 0),
         representative_pinwheels=len(models),representative_balloons=len(balloons) if receipt.get('balloon') else 0,

@@ -18,8 +18,8 @@ served patchers retain their existing builds.
 
 ## Active development
 
-The current explicit ABI-129 proposal is
-`build/v3-shared-tool-controls-02/build-lock.json`. All eight balloons are
+The current explicit ABI-130 proposal is
+`build/v3-shared-tool-motion-02/build-lock.json`. All eight balloons are
 connected through the shared parent-category installer: official names/prices,
 complete pocket icons, held/inventory animation, source acquisition records,
 collection/catalogue, animated room profiles, indoor conversion, and inverse
@@ -36,9 +36,22 @@ assertions across the six real controller functions, original/golden-family
 kinds, pressed/held inputs, rejection paths, guards, state restoration, and clean
 exit. Extended kinds use temporary fixture data, not enabled golden-tool choices.
 
-Tool animation/drawing, golden effects, and complete parent/acquisition support
-remain required. Continue these shared categories from the current lock; retain
-the completed controller evidence. See the
+Shared action setup connects the thirteen imported net/rod animations to their
+native action requests, preserves the actual equipment kind, and retains the
+rod's bobber during animation changes. The original net/rod drawers match the
+complete source skeletons and stay unchanged. The 688-byte adapter uses existing
+unused code space; no asset, selection, saved format, or allocation grows.
+Four focused checks pass. The first silent native check passes 128 records and
+102 assertions, including actual model/motion loading, complete drawing commands,
+original-tool setup, rod movement speed, bobber lifetime, guards, restored
+checkpoint, and clean exit. GPU appearance and ordinary gameplay are not proven.
+
+Next connect remaining native action-request kind checks and golden effects,
+then complete inventory/parent/acquisition support. Net swing/pull/slip and
+tumble paths still need their source family checks; direct action setup does not
+prove these ordinary transitions. Keep tool choices disabled. Continue these
+shared categories from the current lock and retain completed evidence. See the
+[motion checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-tool-animation-setup) and
 [tool-control checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-tool-input-predicates).
 
 The shared installer repairs actual room-footprint metadata, permits the native

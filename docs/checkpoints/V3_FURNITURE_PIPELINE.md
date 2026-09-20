@@ -1,5 +1,77 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared tool animation setup
+
+The explicit proposal is ABI 130 at
+`build/v3-shared-tool-motion-02/build-lock.json`. It retains all 128 experimental
+choices, complete assets, fixed identities, the 60-KiB equipment allocation,
+format-2 saves/profile, and exact V2-12 no-import output. The main ABI-109 lock
+and both served V2 patchers remain unchanged.
+
+- ROM SHA-256:
+  `de1bba6c5880871348b3685e300e5a0cdd813cbf035ed0073807d736c6899263`.
+- Report SHA-256:
+  `20c36d8d1d5bbb5164566ff2a6c1383f4ff849a4ce7ca69d91159f76a7fd5d78`.
+- UPS SHA-256:
+  `1898031f7a9e0bbd932993481ab48ddd107c9136e43ec26534dddeccf45d7ad4`.
+
+The native action setup formerly required exact ordinary-tool kinds and native
+animation indices. The shared adapter accepts the actual imported family, maps
+all seven net and six rod motions to the installed complete donor resources,
+and stores the actual imported kind. Rod-aware movement retains its supplied
+speed. The native model loader's final rod comparison no longer destroys the
+bobber merely because an imported rod changes animation. Other kinds retain
+the original destruction path. Original-tool indices and timing remain intact.
+
+The native net/rod drawers already match the donor skeleton contracts: six
+net joints/three display lists, five rod joints/four display lists, net joint-three
+angle callback, and rod joint-four tip callback. Their complete code and callback
+tables remain untouched. No new renderer or reduced asset substitutes for them.
+The adapter occupies 688 bytes at `804A5A50`; two entry hooks and one lifetime
+call change. Relocation data, owner dimensions, earlier action code/constants,
+profiles, save code, and all installed resources remain unchanged.
+
+Four focused checks pass in 5.915 seconds:
+
+```sh
+python3 -m unittest \
+  tests.test_v3_player_actions.SelectionHostTests.test_shared_tool_motion_mapping \
+  tests.test_v3_player_actions.ToolMotionTests
+```
+
+They cover sanitizer execution, all thirteen mapped motions, ordinary/extended
+tools, timing and retained actual IDs, rejected mismatched/hidden kinds and
+extreme inputs, exact installed hooks at two relocation bases, retained complete
+assets/code, original-ROM UPS reconstruction, CRCs, and exact empty/all optional
+composition. The first build stops on a wrong report-key lookup before code
+installation; the corrected build uses the existing bank-allocation receipt.
+Two new composition-test API mistakes are corrected without changing the ROM.
+
+The first silent native run at `build/smoke-v3-tool-motion-01/` passes **128
+records and 102 assertions**, including 98 fixture assertions plus startup/final
+guards. Its results SHA-256 is
+`eec55763f0247777bf65c59175e30dc3bcc036244b2e4d9bf8134ff35a5cdd73`.
+The existing representative rig fixture runs only the changed tool paths, not
+old pinwheel/balloon scenarios. Actual cartridge code loads native and imported
+net/rod models and motions, keeps actual kinds, selects the proper callbacks,
+retains bobber lifetime, and preserves rod walking speed. Both imported rigs
+emit every expected source joint display list. Memory/stack/matrix guards, saved
+state retention, restored temporary selectors/profile, checkpoint reload, and
+clean emulator exit pass. No code or real user save is supplied to the fixture;
+only isolated selector/actor data is synthetic. Audio remains silent.
+
+This is component evidence, not GPU appearance, ordinary net/fishing gameplay,
+golden effects, acquisition, persistence, or hardware verification. Tool choices
+remain disabled. No English wording changes, so provenance is unchanged.
+
+Next audit/adapt the remaining action-request and tumble/get-up kind checks
+through shared family machinery. Source locations are
+`m_player_main_{swing_net,pull_net,slip_net,tumble,tumble_getup}.c_inc`.
+Then connect golden-net capture radius/span, both fish-actor golden-rod response
+paths, shovel effects, axe wear, and complete inventory/parent/acquisition routes.
+Do not replay completed input or motion fixtures for unchanged code. Preserve
+matching-or-larger V3 save profiles; imported saves must not be loaded in V2.
+
 ## Shared tool input predicates
 
 The explicit proposal is ABI 129 at
