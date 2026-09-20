@@ -18,19 +18,31 @@ served patchers retain their existing builds.
 
 ## Active development
 
-The current explicit proposal is ABI 164 at
-`build/v3-legacy-mapped-imports-03/build-lock.json`. The shared importer separates
+The current explicit proposal is ABI 165 at
+`build/v3-shared-translucent-imports-01/cartridge/build-lock.json`. Shared IA16
+texture conversion and two translucent material formulas preserve all source
+pixels, alpha, geometry, and draw states. The complete tissue and bottled ship
+artwork is prepared, while the Moai statue is integrated through the ordinary
+importer and existing Gulliver reward category. The prepared batch compiles
+three models and reuses five; native storage adds the 4,048-byte Moai object
+without another resident allocation. See the
+[material checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-ia16-and-translucent-materials).
+
+The shared importer separates
 donor IDs/indices from stable N64 destinations throughout artwork reuse, names,
 prices, placement, sound categories, scoring, catalogue, acquisition, and optional
-selection. Seven complete legacy Gulliver souvenirs are installed through that
-pipeline, using 29,712 bytes of prepared artwork and no new resident allocation.
-There are 135 experimental choices: 20 villagers, 88 furnishings, 24 equipment
+selection. Eight complete legacy Gulliver souvenirs are installed through that
+pipeline, using 33,760 bytes of prepared artwork and no new resident allocation.
+There are 136 experimental choices: 20 villagers, 89 furnishings, 24 equipment
 parents, and three shirts. Four golden tools remain disabled.
 
-Five focused checks pass, including three browser/offline composition profiles,
-retained assets/allocations, stable identity rejection, and exact empty/all output.
+Eight focused checks pass for the material batch: three format checks, two
+complete-art/source checks, and three current-cartridge mapping checks. Four
+browser/offline composition profiles agree, including retained assets/allocations,
+stable identity rejection, and exact empty/all output.
 The bounded native check reaches startup/table assertions but cannot allocate its
 temporary owner arena at the title screen, even after one size correction.
+That allocation limit is retained, not retried for the material batch.
 Changed-item native readers/acquisition and ordinary gameplay remain unverified;
 do not replay the same setup. See the
 [mapped-identity checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-source-to-destination-mapping).
@@ -45,8 +57,8 @@ complete static objects (46,272 bytes), compiled in one container with the
 existing converter. Two focused checks pass, including complete graphics
 comparisons, source names, alias/dummy classification, and refusal of unfinished
 imports. Official name sources are in the single provenance catalogue.
-Seven ordinary souvenirs have reviewed additive destinations; the four paintings
-and chocolates remain pending identity/acquisition review. Same-numbered N64
+Eight ordinary souvenirs have reviewed additive destinations; the four paintings,
+chocolates, tissue, and bottled ship remain pending identity/acquisition work. Same-numbered N64
 items are not overwritten. See the
 [legacy checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#legacy-donor-discovery-and-bulk-artwork).
 
@@ -60,7 +72,7 @@ holiday preparation adds no selectable choices. Next connect donor identity
 resolution, Tortimer's actor/calendar/dialogue, and actual delivery callbacks.
 Legacy `1xxx` donor records are included in primary discovery. The holiday
 program's bottled ship `1FC0` still has no reviewed native identity or additive
-destination, and its colour-combiner conversion remains unsupported.
+destination. Its complete artwork is prepared; holiday acquisition remains open.
 See the [holiday checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-holiday-reward-preparation).
 
 The retained ABI-163 staging at
@@ -68,7 +80,7 @@ The retained ABI-163 staging at
 all fifteen clocks, both storage rigs, and five sound objects to ordinary
 profiles, official names, and prices. It reuses all seventeen rig assets and
 adds 12,352 bytes of complete sound models, with no additional resident memory.
-The current import reservation has 1,985,760 free bytes. Both record flags and saved
+The current import reservation has 1,981,712 free bytes. Both record flags and saved
 selection bits remain off, preventing unfinished items from entering gameplay.
 
 The ordinary bulk importer validates these installed lifecycle bindings and can

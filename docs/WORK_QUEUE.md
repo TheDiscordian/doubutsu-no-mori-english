@@ -12,16 +12,23 @@ After the primary importing work, finish gold-tree leaf/cut effects and the full
 golden-shovel acquisition route. This is deferred required V3 work, not a dropped
 feature or a separate release goal.
 
-Use the current explicit ABI-164 proposal:
-`build/v3-legacy-mapped-imports-03/build-lock.json`. Shared source/destination
-mapping installs seven complete legacy souvenirs through existing Gulliver
-rewards, readers, catalogue, scoring, and optional composition. There are 135
+Use the current explicit ABI-165 proposal:
+`build/v3-shared-translucent-imports-01/cartridge/build-lock.json`. Shared IA16
+and translucent-material conversion prepares complete tissue/bottled-ship artwork
+and enables the Moai statue's complete ordinary import. No effects are dropped,
+textures reduced, or native allocation added. Reuse these shared formats and
+the prepared bundle at `build/v3-legacy-materials-prepared-01/`.
+Shared source/destination mapping installs eight complete legacy souvenirs through existing Gulliver
+rewards, readers, catalogue, scoring, and optional composition. There are 136
 experimental choices; native IDs, clothing/display reservations, saved format 3,
-and both served patchers are preserved. Five focused checks pass. The native
+and both served patchers are preserved. Eight focused material/source/cartridge
+checks pass, including four browser/offline composition profiles. The native
 batch cannot allocate its temporary title-screen owner arena after one corrected
 retry; retain the startup/table evidence and leave changed-item execution open.
 Do not repeat that setup while category work remains. Reuse prepared resources,
-stable mappings, and shared tests. The checkpoint records exact hashes/limits.
+stable mappings, and shared tests. The material and mapping checkpoints record
+exact hashes/limits. Continue broader callback/rig and acquisition categories;
+do not treat prepared reward artwork as a completed reward route.
 
 The complete holiday selector and no-loss transaction kernel are prepared at
 `build/v3-holiday-rewards-prepared-02/`: 28 events and 65 gift variants, driven by
@@ -38,12 +45,12 @@ artwork, and fish/insect/NES/display dependencies; do not count all of them as
 new furniture or alias native IDs by number. Twelve supported static objects
 are prepared at `build/v3-legacy-static-prepared-01/` (46,272 bytes, one compiler
 container); two complete focused checks pass and official names have provenance.
-Seven prepared souvenirs have stable additive destinations and shared integration.
+Eight prepared souvenirs have stable additive destinations and shared integration.
 Review the remaining paintings/chocolates and other legacy representations before
 assigning additional destinations; extend shared categories, not item installers.
 Preserve all furniture, clothing, and display reservations. The holiday program also requires bottled
-ship `1FC0`, whose complete colour-combiner conversion and native correspondence
-remain unresolved. This is primary importing work, not a stretch goal or an
+ship `1FC0`, whose complete artwork is prepared but native correspondence and
+acquisition remain unresolved. This is primary importing work, not a stretch goal or an
 optional audit.
 
 The bulk converter reuses validated prepared artwork and compiles all missing
@@ -75,7 +82,7 @@ converter, cartridge, sanitizer, and native audio evidence.
 The ordinary bulk importer's chair-sound check accepts the expanded dispatch
 tables/fonts by verifying actual complete programs/instruments, not stale
 addresses. Its positive/negative check passes; reuse this machinery.
-The shared import reservation extends to `02800000`, with 1,985,760 bytes free.
+The shared import reservation extends to `02800000`, with 1,981,712 bytes free.
 English choices/general strings retain
 their content and physical locations through checked virtual relocation. The
 final general string has three checked padding bytes for rounded native DMA.

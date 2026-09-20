@@ -99,6 +99,9 @@ Developer verification and a private playtest handoff do not satisfy that approv
   readiness and keep incomplete gameplay out of selectable imports. Extend a
   shared category once for all matching records. Reuse passing tests for
   unchanged components and defer unique-item verification to its implementation.
+- After primary importing is complete, finish gold-tree leaf/cut effects and
+  the full golden-shovel acquisition route. These remain required V3 work;
+  deferring them does not remove them from completion criteria.
 - Use existing focused checks once per meaningful change. Reuse passing native
   evidence for unchanged code/resources; do not add exhaustive per-record or
   all-combinations harnesses without a concrete uncovered risk. For a testing-

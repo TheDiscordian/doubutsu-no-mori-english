@@ -1,5 +1,101 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared IA16 and translucent materials
+
+ABI 165 at `build/v3-shared-translucent-imports-01/cartridge/` adds complete
+Moai statue artwork through the ordinary importer. The same shared converter
+also prepares complete tissue and bottled-ship artwork; those two identities
+remain unavailable until destination and acquisition work is complete. There
+is no model-specific converter or installer, and no texture/effect reduction.
+
+The material extension handles native IA16 textures using the donor's GX IA8
+four-by-four blocks. Each source pixel stores alpha before intensity; native
+output reverses the pair and untile order without reducing either channel.
+The actual donor executable's format table at `800AAFC0` maps IA/16 to GX IA8.
+Its complete texture-conversion function at `8004BBA8`, length `318`, confirms
+the pair order and block layout. Corresponding decompiled code is
+`local/ac-decomp/src/static/libforest/emu64/emu64.c`.
+
+Two complete two-cycle transparency expressions are accepted by their command
+words, `FC11FE04 FF0FF3FF` and `FC341604 5FFEFFF8`. Source primitive/environment
+colours and alpha remain intact. Native compiler macros emit the expressions;
+unknown expressions, extra texture dependencies, and conflicting formats still
+reject. The shared material category also accepts the source fog/translucent
+render mode `E200001C C81049D8`. Mixed CI4/IA8/IA16 models switch palette lookup
+correctly and retain the upper TMEM palette region. The existing 2-KiB texture
+limit remains in force.
+
+Reproduce preparation with a fresh output directory:
+
+```sh
+python3 tools/v3_furniture_pipeline.py convert --assets-only \
+  --category legacy-static \
+  --base-lock build/v3-legacy-mapped-imports-03/build-lock.json \
+  --reuse-assets build/v3-legacy-static-prepared-01 \
+  --output build/legacy-materials-reproduction
+```
+
+The recorded `build/v3-legacy-materials-prepared-01/` batch contains eight
+objects, 29,168 bytes: five unchanged cached objects and three newly compiled
+objects in one compiler container. Tissue is 2,368 bytes, bottled ship 6,192,
+and Moai statue 4,048. Every model, texture, vertex, triangle, and material is
+retained. Official names have source entries in `translations/provenance.json`.
+Prepared artwork cannot bypass the ordinary eligibility/installation checks.
+
+Moai's actual non-dummy donor profile, missing native correspondence, absence
+from approved existing mappings, and membership in `ftr_listJonason` establish
+the reviewed ordinary souvenir identity. Its append-only reservation maps donor
+`1FC8`/index 1010 to native `3C2C`/index 1803. The existing Gulliver reward route,
+non-orderability, readers, placement, scoring, and optional composition consume
+the shared source/destination records. Existing destinations are unchanged.
+
+```sh
+python3 tools/v3_furniture_pipeline.py import \
+  --base-lock build/v3-legacy-mapped-imports-03/build-lock.json \
+  --category legacy-static --reuse-assets build/v3-legacy-materials-prepared-01 \
+  --output build/shared-translucent-reproduction
+```
+
+The ordinary import reuses Moai's complete compiled object, with no artwork
+compiler container. The runtime builder succeeds on its first attempt. There
+are 136 experimental choices: 20 villagers, 89 furniture, 24 equipment parents,
+and three shirts. Four golden tools remain disabled. The blob is 4,309,744
+bytes with 1,981,712 bytes free; no resident allocation or saved format changes.
+
+Eight focused checks pass. Three format tests cover all 65,536 intensity/alpha
+pairs, complete blocks, native stride/LUT handling, both expressions, and
+negative format/dependency mutations. Two prepared-art/source tests independently
+compare every converted pixel, palette, vertex, triangle, material command,
+native pointer, and compiled texture state in the eight-object batch. They also
+verify the actual donor format table and full texture-conversion function.
+Three current-cartridge mapping tests pass in 6.631 seconds, covering source
+metadata, installed destination records, acquisition, retained resources and
+allocations, and four browser/offline profiles: empty, all, selected mapped
+content with a villager, and that villager without the new batch. The final
+mapping output is retained in
+`build/v3-shared-translucent-imports-01/mapped-checks.log`.
+
+The earlier mapping-test completion output was unavailable after session
+continuation, so those three current-cartridge checks were run once with a
+durable log. No native scenario, old cartridge, audio test, or prior gameplay
+suite was replayed. The title-screen arena allocation failure recorded below
+remains unresolved; this batch does not retry that setup or claim native
+changed-item execution. Ordinary gameplay, GPU appearance, save/reload of these
+new objects, and original hardware remain unverified.
+
+Output hashes:
+
+- ROM SHA-256: `65ee309b1e2b237e20f9d8b05fde28f53b7ab28782671a806f470963e4b4c71e`.
+- UPS SHA-256: `de3c339e7c4b4aab814c47e6aa36185249e3cf45328da4a2745457a43b0079d8`.
+- Build report SHA-256: `9d16acf6228de4a1489f9dc842712255d8fea2b0da54ba38b370744f3afdab88`.
+- Prepared artwork manifest SHA-256: `4f043d4dcab4a3d503e6136aa050e9d5081a2b4c35841fd8540ba446e149ba45`.
+
+Format 3 remains unchanged, but saves using the new destination require a
+profile containing that item and cannot be loaded in older builds or V2. The
+main ABI-109 lock and both served patchers remain unchanged. Continue primary
+import categories and acquisition first; gold-tree leaf/cut effects and full
+golden-shovel acquisition remain required afterwards.
+
 ## Shared source-to-destination mapping
 
 ABI 164 at `build/v3-legacy-mapped-imports-03/` installs the supported ordinary

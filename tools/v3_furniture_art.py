@@ -20,7 +20,17 @@ from v3_import_catalog import DONOR, REL_SHA, ROOT, SYMBOLS_SHA, read_donor
 from v3_villager_art import data_pointers, native_palette, normalise_vertex_flags, symbol_span
 
 SEGMENT = 0x06000000
-CONVERTER_VERSION = 8
+CONVERTER_VERSION = 9
+
+# Complete compatible RDP expressions, selected by material commands, not IDs.
+# Both use one texture and retain source alpha; neither introduces TEXEL1,
+# noise, keying, or an unprovided external render dependency.
+TRANSLUCENT_COMBINERS = {
+    (0xFC11FE04,0xFF0FF3FF): ('TEXEL0','0','PRIMITIVE','0','0','0','0','TEXEL0',
+        'COMBINED','0','SHADE','0','COMBINED','0','PRIMITIVE','0'),
+    (0xFC341604,0x5FFEFFF8): ('PRIMITIVE','ENVIRONMENT','TEXEL0_ALPHA','ENVIRONMENT',
+        'TEXEL0','0','PRIMITIVE','0','COMBINED','0','SHADE','0','0','0','0','COMBINED'),
+}
 
 
 @dataclass(frozen=True)
@@ -286,8 +296,9 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
             intensity=bool(water or fire_effect or static_materials and shape[2:]==(4,0))
             rgba16=bool(static_materials and shape[2:]==(0,2))
             ia8=bool(static_materials and shape[2:]==(3,1))
-            expected=(0,2) if rgba16 else (3,1) if ia8 else (4 if intensity else 2,0)
-            if (target not in textures or (not (intensity or rgba16 or ia8) and not have_palette) or
+            ia16=bool(static_materials and shape[2:]==(3,2))
+            expected=(0,2) if rgba16 else (3,2) if ia16 else (3,1) if ia8 else (4 if intensity else 2,0)
+            if (target not in textures or (not (intensity or rgba16 or ia8 or ia16) and not have_palette) or
                     shape != (*textures[target], *expected) or
                     water and shape[:2] != (32, 16)):
                 raise ValueError('Unsupported furniture texture or palette')
@@ -297,6 +308,8 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
                 row['rgba16'] = True
             if ia8:
                 row['ia8'] = True
+            if ia16:
+                row['ia16'] = True
             # Consume the paired Dolphin tile command. Additional wrap modes
             # require an explicit reviewed model mode; the default clamps both axes.
             tile = raw[at + 8:at + 16]
@@ -307,12 +320,12 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
                 wraps = (word >> 10 & 3, word >> 8 & 3)
                 pal=word>>12&15
                 if (word & 0xFFFF0000 != 0xD2F00000 or reserved or 3 in wraps
-                        or pal not in ((0,15) if intensity or rgba16 or ia8 else
+                        or pal not in ((0,15) if intensity or rgba16 or ia8 or ia16 else
                                        (15 if inherited_palette_slot is None else inherited_palette_slot,))):
                     raise ValueError('Static material needs tile 0, a supported palette, and clamp/repeat/mirror')
                 row['wrap_modes'] = wraps
                 row['tile_shifts'] = (word>>4&15,word&15)
-                if inherited_palette_slot is not None and not (intensity or rgba16 or ia8):
+                if inherited_palette_slot is not None and not (intensity or rgba16 or ia8 or ia16):
                     row['palette_slot'] = inherited_palette_slot
             elif fire_effect:
                 shapes = ((32, 64), (32, 32) if fire_effect == 1 else (64, 32))
@@ -360,7 +373,7 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
                 raise ValueError('Unsupported furniture wrap mode')
             row['shape'] = shape[:2]
             material = target
-            material_direct=intensity or rgba16 or ia8
+            material_direct=intensity or rgba16 or ia8 or ia16
             material_wrap = row.get('wrap_modes')
             at += 8
         elif op == 0xD2:
@@ -423,20 +436,22 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
             # The donor uses this for several material parts, independently of
             # the furniture's name or theme. No extra texture/state is needed.
             unlit = static_materials and (a, b) == (0xFCFFFE60, 0xFFFCF3F8)
+            translucent = TRANSLUCENT_COMBINERS.get((a,b)) if static_materials else None
             modes = (((0xFC30FE03, 0x5F1AF3E9 if fire_effect == 1 else 0x5F06F3FF),)
                 if fire_effect else ((0xFC309C04, 0x5FFEF7F8),) if water else (
                 (0xFC127E60, 0xFFFFF3F8), (0xFC11FE04, 0xFFFFF3F8)))
             if static_materials: modes += ((0xFC309C04,0x5FFEF7F8),(0xFC309604,0x5FFEFFF8),
                                      (0xFC30FE04,0x5FFEFDF8),(0xFC3217FF,0xFFFFFE38),
                                      (0xFC30FE04,0x5FFEF3F8))
-            if not unlit and (a, b) not in modes:
+            if not unlit and not translucent and (a, b) not in modes:
                 raise ValueError('Unsupported furniture colour combiner')
             if unlit: row['unlit_texture_primitive'] = True
+            if translucent: row['combine_lerp'] = list(translucent)
         elif op == 0xE2:
             modes = ((0xC81049D8 if fire_effect == 1 else 0xC8104A50,) if fire_effect else
                 (0xC8104A50,) if water else ((0xC8112078, 0xC8113078)
                 if accessory else (0xC8113078, 0xC8104DD8)))
-            if static_materials: modes += (0xC8104A50,)
+            if static_materials: modes += (0xC8104A50,0xC81049D8)
             if a != 0xE200001C or b not in modes:
                 raise ValueError('Unsupported furniture render mode')
         elif op == 0xFA:
@@ -642,7 +657,7 @@ def command_source(models, offsets):
         if inherited and any(row['opcode'] not in (0x01,0x0A,0xDF) for row in model['rows']):
             raise ValueError('Inherited material is limited to validated geometry lists')
         if not inherited:emit('gsDPPipeSync()')
-        direct = next((bool(row.get('intensity') or row.get('rgba16') or row.get('ia8'))
+        direct = next((bool(row.get('intensity') or row.get('rgba16') or row.get('ia8') or row.get('ia16'))
                        for row in model['rows'] if row['opcode']==0xFD),False)
         if not inherited:
             emit('gsDPSetTextureLUT(G_TT_NONE)' if direct else 'gsDPSetTextureLUT(G_TT_RGBA16)')
@@ -668,12 +683,13 @@ def command_source(models, offsets):
                 w, h = row['shape']
                 rgba16=bool(row.get('rgba16'))
                 ia8=bool(row.get('ia8'))
+                ia16=bool(row.get('ia16'))
                 # Keep upper TMEM intact for CI palettes across mixed-format lists.
-                if (w*h*(4 if rgba16 else 2 if ia8 else 1)//2 > 2048
-                        or sum(map(bool,(rgba16,ia8,row.get('intensity'))))>1):
+                if (w*h*(4 if rgba16 or ia16 else 2 if ia8 else 1)//2 > 2048
+                        or sum(map(bool,(rgba16,ia8,ia16,row.get('intensity'))))>1):
                     raise ValueError('Furniture texture exceeds shared TMEM capacity or has conflicting formats')
                 emit('gsDPPipeSync()')
-                wanted=bool(row.get('intensity') or rgba16 or ia8)
+                wanted=bool(row.get('intensity') or rgba16 or ia8 or ia16)
                 if wanted!=direct:
                     emit('gsDPSetTextureLUT(G_TT_NONE)' if wanted else 'gsDPSetTextureLUT(G_TT_RGBA16)')
                     direct=wanted
@@ -691,7 +707,7 @@ def command_source(models, offsets):
                 if type(inherited_pal) is not int or not 0 <= inherited_pal <= 15:
                     raise ValueError('Invalid native palette slot')
                 fmt, pal = (('G_IM_FMT_RGBA',0) if rgba16 else
-                            ('G_IM_FMT_IA',0) if ia8 else
+                            ('G_IM_FMT_IA',0) if ia8 or ia16 else
                             ('G_IM_FMT_I',0) if row.get('intensity') else ('G_IM_FMT_CI',inherited_pal))
                 if 'fire_tile' in row:
                     tile = row['fire_tile']
@@ -708,10 +724,10 @@ def command_source(models, offsets):
                 shifts=row.get('tile_shifts',(shift,shift))
                 if len(shifts)!=2 or any(type(n) is not int or not 0<=n<=15 for n in shifts):
                     raise ValueError('Invalid native texture tile shifts')
-                if rgba16 or ia8:
-                    if w%(4 if rgba16 else 8) or h%4:
+                if rgba16 or ia8 or ia16:
+                    if w%(4 if rgba16 or ia16 else 8) or h%4:
                         raise ValueError('Direct texture needs complete GX blocks')
-                    size='G_IM_SIZ_16b' if rgba16 else 'G_IM_SIZ_8b'
+                    size='G_IM_SIZ_16b' if rgba16 or ia16 else 'G_IM_SIZ_8b'
                     args=(f'{fmt}, {size}, {w}, {h}, 0, {wrap_s}, {wrap_t}, '
                           f'{mask_s}, {mask_t}, {shifts[0]}, {shifts[1]}')
                     emit(f"gsDPLoadTextureBlock(0x{SEGMENT + offsets[row['target']]:08X}, {args})",7)
@@ -762,6 +778,11 @@ def command_source(models, offsets):
                         or row['words'] != (0xDA380003,0x0D000000+index*64)):
                     raise ValueError('Changed skeleton matrix in native compiler input')
                 emit(f'gsSPMatrix(0x{0x0D000000+index*64:08X}, G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW)')
+            elif op == 0xFC and row.get('combine_lerp'):
+                expression=TRANSLUCENT_COMBINERS.get(tuple(row['words']))
+                if expression is None or list(expression)!=row['combine_lerp']:
+                    raise ValueError('Changed translucent colour combiner')
+                emit('gsDPSetCombineLERP('+', '.join(expression)+')')
             elif op == 0xFC and row.get('unlit_texture_primitive'):
                 if row['words'] != (0xFCFFFE60, 0xFFFCF3F8):
                     raise ValueError('Changed unlit texture/primitive combiner')

@@ -26,6 +26,50 @@ import v3_feng_shui as feng
 
 
 class FormatTests(unittest.TestCase):
+    def test_ia16_preserves_every_intensity_alpha_pair_and_rejects_partial_blocks(self):
+        width=height=256;donor=bytearray(width*height*2);expected=bytearray(len(donor))
+        for y in range(height):
+            for x in range(width):
+                tiled=((y//4)*(width//4)+x//4)*32+(y%4*4+x%4)*2
+                donor[tiled:tiled+2]=bytes((y,x))
+                expected[(y*width+x)*2:(y*width+x)*2+2]=bytes((x,y))
+        self.assertEqual(pipeline.native_ia16(donor,width,height),expected)
+        for raw,w,h in ((bytes(32),4,0),(bytes(31),4,4),(bytes(16),2,4),(bytes(32),4,3),(bytes(32),True,16)):
+            with self.assertRaises(ValueError):pipeline.native_ia16(raw,w,h)
+
+    def test_ia16_material_retains_native_stride_lut_and_mixed_format_guards(self):
+        raw,pointers=fixture();raw=bytearray(raw);pointers.pop(0x11C)
+        # Replace the unused palette command with a compatible primitive colour.
+        struct.pack_into('>II',raw,0x18,0xFA000080,0xFFFFFFFF)
+        struct.pack_into('>I',raw,0x20,0xFD740C1F)
+        struct.pack_into('>I',raw,0x28,0xD2F00511)
+        rows=parse_model(raw,0x100,pointers,(),{0x600:(32,16)},0x1000,48,static_materials=True)
+        texture=next(r for r in rows if r['opcode']==0xFD)
+        self.assertTrue(texture['ia16']);self.assertNotIn('ia8',texture)
+        code,_=command_source({'opaque':{'rows':rows}},{0x600:0,0x1000:1024})
+        self.assertIn('G_IM_FMT_IA, G_IM_SIZ_16b, 32, 16, 0, G_TX_WRAP, G_TX_WRAP, 5, 4, 1, 1',code)
+        self.assertIn('gsDPSetTextureLUT(G_TT_NONE)',code)
+        for field,value in (('shape',(64,32)),('shape',(10,8)),('rgba16',True),('ia8',True),('intensity',True)):
+            bad=copy.deepcopy(rows);next(r for r in bad if r['opcode']==0xFD)[field]=value
+            with self.assertRaises(ValueError):command_source({'opaque':{'rows':bad}},{0x600:0,0x1000:1024})
+
+    def test_translucent_combiners_keep_both_source_cycles_and_reject_unknown_dependencies(self):
+        from v3_furniture_art import TRANSLUCENT_COMBINERS
+        for words,expression in TRANSLUCENT_COMBINERS.items():
+            raw,pointers=fixture();raw=bytearray(raw);struct.pack_into('>II',raw,8,*words)
+            rows=parse_model(raw,0x100,pointers,(0x500,),{0x600:(32,32)},0x1000,48,static_materials=True)
+            self.assertEqual(rows[1]['combine_lerp'],list(expression))
+            code,_=command_source({'opaque':{'rows':rows}},{0x500:0,0x600:32,0x1000:544})
+            self.assertIn('gsDPSetCombineLERP('+', '.join(expression)+')',code)
+            with self.assertRaisesRegex(ValueError,'colour combiner'):
+                parse_model(raw,0x100,pointers,0x500,{0x600:(32,32)},0x1000,48)
+            bad=copy.deepcopy(rows);bad[1]['combine_lerp'][0]='TEXEL1'
+            with self.assertRaisesRegex(ValueError,'translucent colour combiner'):
+                command_source({'opaque':{'rows':bad}},{0x500:0,0x600:32,0x1000:544})
+            struct.pack_into('>I',raw,8,words[0]^0x100000)
+            with self.assertRaisesRegex(ValueError,'colour combiner'):
+                parse_model(raw,0x100,pointers,(0x500,),{0x600:(32,32)},0x1000,48,static_materials=True)
+
     def test_ia8_retains_every_intensity_alpha_pair_and_tiled_sample(self):
         for w,h in ((8,4),(16,16),(32,32)):
             raw=bytearray(w*h);expected=bytearray(w*h)
@@ -347,6 +391,7 @@ class DonorTests(unittest.TestCase):
         self.assertEqual(struct.unpack_from('>H',table,2*4*2)[0],8)  # CI/4 -> GX_C4
         self.assertEqual(struct.unpack_from('>H',table,4*4*2)[0],0)  # I/4 -> GX_I4
         self.assertEqual(struct.unpack_from('>H',table,(3*4+1)*2)[0],2)  # IA/8 -> GX_IA4
+        self.assertEqual(struct.unpack_from('>H',table,(3*4+2)*2)[0],3)  # IA/16 -> GX_IA8
 
     def test_palette_fade_category_discovers_all_shared_code_and_complete_layouts(self):
         inventory=pipeline.scan(self.source,ROOT/'build/item-identity-megasheet.xlsx')
@@ -668,6 +713,9 @@ class DonorTests(unittest.TestCase):
                                     red,green,blue=((value>>s&15)*17>>3 for s in (8,4,0))
                                     expected=red<<11|green<<6|blue<<1|bool(alpha)
                                 self.assertEqual(struct.unpack_from('>H',native,flat*2)[0],expected)
+                            elif r['format']=='IA16':
+                                gx=(((y//4)*(r['width']//4)+x//4)*16+y%4*4+x%4)*2
+                                self.assertEqual(native[flat*2:flat*2+2],bytes((donor[gx+1],donor[gx])))
                             elif r['format']=='IA8':
                                 gx=((y//4)*(r['width']//8)+x//8)*32+y%4*8+x%8
                                 self.assertEqual(native[flat],(donor[gx]&15)<<4|donor[gx]>>4)
@@ -736,14 +784,14 @@ class DonorTests(unittest.TestCase):
                 expected=[];luts=[];last=None
                 for command in donor:
                     if command['opcode'] not in (0xFD,0xD2):continue
-                    ia8=bool(command.get('ia8'));rgba16=bool(command.get('rgba16'))
+                    ia8=bool(command.get('ia8'));rgba16=bool(command.get('rgba16'));ia16=bool(command.get('ia16'))
                     intensity=bool(command.get('intensity'));w,h=command['shape']
-                    direct=ia8 or rgba16 or intensity
+                    direct=ia8 or rgba16 or ia16 or intensity
                     wraps=tuple({0:2,1:0,2:1}[v] for v in command.get('wrap_modes',(0,0)))
                     shifts=command.get('tile_shifts',(0,0))
-                    expected.append((0 if rgba16 else 3 if ia8 else 4 if intensity else 2,
-                                     2 if rgba16 else 1 if ia8 else 0,
-                                     w//4 if rgba16 else w//8 if ia8 else (w+15)//16,0,
+                    expected.append((0 if rgba16 else 3 if ia8 or ia16 else 4 if intensity else 2,
+                                     2 if rgba16 or ia16 else 1 if ia8 else 0,
+                                     w//4 if rgba16 or ia16 else w//8 if ia8 else (w+15)//16,0,
                                      0 if direct else command.get('palette_slot',15),*wraps,*shifts))
                     if command['opcode']==0xFD and direct!=last:
                         luts.append((0xE3001001,0 if direct else 0x8000));last=direct
@@ -792,6 +840,44 @@ class DonorTests(unittest.TestCase):
                             for a,b in words if a>>24==0xF5 and b>>24&7==0]
                     self.assertEqual(actual,expected)
                     self.assertEqual([w for w in words if w[0]==0xE3001001],luts)
+
+
+class SharedMaterialTests(unittest.TestCase):
+    check_complete_artwork=DonorTests.check_complete_artwork
+
+    @classmethod
+    def setUpClass(cls):
+        cls.source=pipeline.Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+            (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+        cls.art=ROOT/'build/v3-legacy-materials-prepared-01'
+        cls.report=json.loads((cls.art/'art.json').read_bytes())
+
+    def test_complete_mixed_materials_and_compiled_expressions_without_art_reduction(self):
+        self.assertEqual(self.report['batch'],dict(objects=8,reused=5,compiled=3,compiler_containers=1))
+        self.assertEqual(sum(r['object_bytes'] for r in self.report['objects']),29168)
+        self.check_complete_artwork(self.art,self.report)
+        new=[r for r in self.report['objects'] if not r.get('reused_artwork')]
+        from v3_furniture_art import TRANSLUCENT_COMBINERS
+        actual=set();formats=set()
+        for row in new:
+            _,_,resources,_,models,_,_=pipeline.prepare(self.source,int(row['item_id'],16))
+            formats.update(r['format'] for r in resources if r['kind']=='texture')
+            actual.update(r['words'] for m in models.values() for r in m['rows'] if r.get('combine_lerp'))
+        self.assertEqual(actual,set(TRANSLUCENT_COMBINERS));self.assertEqual(formats,{'CI4','IA8','IA16'})
+        self.assertEqual(install.provenance_patch(self.report['objects']),'')
+        # Old prepared eligibility cannot bypass current metadata or the normal
+        # importer, even after its graphics category becomes complete.
+        with self.assertRaisesRegex(ValueError,'Unknown converter/source revision'):
+            install.checked_assets(self.art,self.source,ROOT/'build/item-identity-megasheet.xlsx')
+
+    def test_actual_donor_format_binding_and_complete_texture_conversion_function(self):
+        from v3_villager_audio import read_audio_donor
+        dol,_=read_audio_donor(ROOT/'local/gamecube/Animal Crossing (USA, Canada).ciso')
+        table=dol.read(0x800AAFC0,64)
+        self.assertEqual(sha256(table),'7ae4019ff69d72ee09dd42b8b1c5a4c7a3a236d07aa238e2acdb93c97302fe30')
+        self.assertEqual(struct.unpack_from('>H',table,(3*4+2)*2)[0],3)
+        self.assertEqual(sha256(dol.read(0x8004BBA8,0x318)),
+            'b4979d91b94ed2b0a6ea51dcc27f7a6bf9dcb9e8859b4ee16b293d96ca49ddbe')
 
 
 class LegacyDiscoveryTests(unittest.TestCase):
@@ -867,7 +953,7 @@ class MappedIdentityTests(unittest.TestCase):
     def test_shared_mapping_reuses_complete_art_and_reads_source_tables(self):
         from v3_registry import LEGACY_FURNITURE,LEGACY_ROOM_ALIASES,CLOTHING_DISPLAYS,furniture_source
         from v3_villager_houses import item_dependencies
-        self.assertEqual({int(r['donor_item_id'],16) for r in self.rows},set(LEGACY_FURNITURE))
+        self.assertTrue({int(r['donor_item_id'],16) for r in self.rows}<=set(LEGACY_FURNITURE))
         self.assertFalse(set(LEGACY_FURNITURE.values())&(set(LEGACY_ROOM_ALIASES.values())|set(CLOTHING_DISPLAYS.values())))
         self.assertEqual(len(set(LEGACY_FURNITURE.values())),len(LEGACY_FURNITURE))
         original=(ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes()
@@ -877,7 +963,7 @@ class MappedIdentityTests(unittest.TestCase):
         rows,_=install.checked_assets(art,self.source,ROOT/'build/item-identity-megasheet.xlsx')
         self.assertEqual(len(rows),len(self.rows));self.assertEqual(install.provenance_patch(self.rows),'')
         self.assertEqual(json.loads((art/'art.json').read_bytes())['batch'],
-                         dict(objects=7,reused=7,compiled=0,compiler_containers=0))
+                         dict(objects=len(self.rows),reused=len(self.rows),compiled=0,compiler_containers=0))
         cat={r['item_id']:r for r in self.report['catalogue']['imports']}
         for row in self.rows:
             donor,idx=furniture_source(row);native=int(row['item_id'],16);slot=install.slot(native)
@@ -940,12 +1026,13 @@ class MappedIdentityTests(unittest.TestCase):
             composer.use_build_lock(self.out/'build-lock.json')
             catalog=composer.catalogue(self.image,self.report);plan=browser.rules(self.image,self.report)
             keys=[r['id'] for r in self.rows]
-            self.assertEqual(len(catalog),135)
+            self.assertEqual(len(catalog),len(self.report['furniture']['imports'])+1+20+24+3)
             self.assertFalse({composer.item_key(int(r['item_id'],16)) for r in self.rows}&catalog.keys())
             self.assertTrue(set(keys)<=catalog.keys());self.assertFalse(plan['web_patcher_enabled'])
             cases=[]
             for label,requested in (('empty',[]),('all',list(catalog)),
-                ('mapped-and-villager',keys[::3]+['GAFE01-r0/villager/00EB'])):
+                ('mapped-and-villager',keys[::3]+['GAFE01-r0/villager/00EB']),
+                ('villager-without-batch',['GAFE01-r0/villager/00EB'])):
                 choice=composer.resolve(catalog,requested)
                 self.assertEqual(choice,composer.resolve(catalog,list(reversed(requested))))
                 image,_,blob=composer.compose(self.image,self.report,catalog,choice)
@@ -953,7 +1040,8 @@ class MappedIdentityTests(unittest.TestCase):
                 elif label=='all':self.assertEqual(image,self.image)
                 else:
                     _,receipt=composer.catalogue_selection(self.image,self.report,set(choice['enabled']))
-                    self.assertEqual({composer.furniture_key(r) for r in receipt['imports']} & set(keys),set(keys[::3]))
+                    self.assertEqual({composer.furniture_key(r) for r in receipt['imports']} & set(keys),
+                                     set(keys)&set(choice['enabled']))
                     for row in self.rows:
                         i=install.slot(int(row['item_id'],16));active=row['id'] in choice['enabled']
                         self.assertEqual(struct.unpack_from('>I',blob,install.ROWS+i*80+4)[0],active)
@@ -965,7 +1053,7 @@ class MappedIdentityTests(unittest.TestCase):
                     base=str(self.out/'animal-forest-v3-asset-loader.z64'),stable=str(composer.stable_reference(self.report)[0]))))
                 result=subprocess.run(['node','--experimental-global-webcrypto',str(ROOT/'tests/v3_browser_equivalence.mjs'),str(path)],
                     check=True,capture_output=True,text=True,timeout=90)
-                self.assertEqual(len(json.loads(result.stdout)['passed']),3)
+                self.assertEqual(len(json.loads(result.stdout)['passed']),4)
         finally:composer.BASE,composer.BASE_SHA,composer.REPORT_SHA,composer.ABI=pin
 
 

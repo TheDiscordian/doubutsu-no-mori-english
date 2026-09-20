@@ -32,6 +32,7 @@ LEGACY_FURNITURE = {
     0x1FDC: (1800, 0x3C20),
     0x1FE0: (1801, 0x3C24),
     0x1FEC: (1802, 0x3C28),
+    0x1FC8: (1803, 0x3C2C),
 }
 
 

@@ -40,11 +40,11 @@ indices in these prepared records are not assigned N64 destination indices.
 
 ### Stable donor and destination records
 
-The registry reserves reviewed ordinary legacy identities in `3C10..3C28`,
+The registry reserves reviewed ordinary legacy identities in `3C10..3C2C`,
 after the balloon displays at `3C00..3C0C`. Existing native IDs, the entire
 garment display range, and every previous import reservation remain intact.
 Reservations are literal and append-only, not assigned by selection order.
-The seven current mappings identify ordinary Gulliver souvenirs; acquisition,
+The eight current mappings identify ordinary Gulliver souvenirs; acquisition,
 graphics, and behaviour still come from source records, not that registry.
 Other legacy entries remain in review until identity and representation are
 established. Unresolved worksheet cells alone do not justify a new identity.
@@ -609,6 +609,14 @@ The shared static-material category supports:
   independent shifts are retained. `ia8-materials` selects these objects.
   The same verified donor format table maps IA/8 to GX IA4; `texconv_tile`
   in the donor source documents the inverse nibble conversion.
+- Complete IA16 textures up to 2,048 bytes, untiled from GX IA8 four-by-four
+  blocks. Each pixel swaps the donor's alpha/intensity bytes into native
+  intensity/alpha order; all 256 levels of both channels survive. No threshold,
+  palette reduction, or resizing is used. The pinned donor format table maps
+  IA/16 to GX format 3, and its complete `texconv_tile` implementation confirms
+  the byte swap. Native tile stride is two bytes per pixel, texture LUT is
+  disabled for IA16 and restored for subsequent CI4, and upper TMEM palettes
+  remain untouched. `ia16-materials` selects this shared format category.
 - Animated-held descriptors additionally supply each visible joint's matrix
   availability. Model-view loads may address only current/earlier matrices in
   segment `0D`. Partial vertex loads preserve cache destinations and previous
@@ -619,6 +627,14 @@ The shared static-material category supports:
   multiplies RGB by primitive colour in cycle two, and preserves texture alpha.
   Its symbolic native combiner compiles to the exact checked donor command;
   no theme/item switch or extra texture dependency is required.
+  The `translucent-combiners` category adds two complete two-cycle forms:
+  texture/primitive/shade RGB with primitive-modulated texture alpha, and
+  texture-alpha interpolation between environment/primitive RGB followed by
+  shade multiplication. Both retain source alpha and use one texture only.
+  Native symbolic compilation must reproduce the actual complete donor words;
+  changed operands, TEXEL1 dependencies, and unknown formulas still reject.
+  The compatible fog/antialiased-depth-tested translucent render mode retains
+  its complete native command. Existing blend modes remain unchanged.
   Primitive/environment interpolation, alpha, and texture-generated or linear
   reflection coordinates retain their checked native commands. Positive S/T
   scales and four-bit S/T tile shifts remain independent; zero/zero source scale

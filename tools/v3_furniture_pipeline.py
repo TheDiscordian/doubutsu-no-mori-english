@@ -24,7 +24,7 @@ from v3_registry import FURNITURE, LEGACY_FURNITURE, furniture_identity, furnitu
 from v3_room_aliases import discover as room_aliases, pending_reason as room_alias_reason
 from v3_villager_art import native_palette, normalise_vertex_flags
 
-VERSION = 10
+VERSION = 11
 LAYERS = ('opaque', 'opaque1', 'translucent', 'translucent1')
 BEHAVIOURS = {0: 'static', 1: 'front-seat', 2: 'any-direction-seat', 4: 'front-sofa',
               8: 'single-bed', 16: 'double-bed'}
@@ -102,6 +102,20 @@ def native_rgba16(data, width, height):
 def native_ia8(data, width, height):
     """GX IA4 stores alpha first; N64 IA8 stores intensity first, losslessly."""
     return bytes((v & 15) << 4 | v >> 4 for v in untile(data,width,height,8))
+
+
+def native_ia16(data, width, height):
+    """GX IA8 has four-by-four blocks and alpha before intensity per pixel."""
+    if (type(width) is not int or type(height) is not int or width<=0 or height<=0
+            or width%4 or height%4 or len(data)!=width*height*2):
+        raise ReviewRequired('IA16 texture needs complete four-by-four GX blocks')
+    result=bytearray(len(data))
+    for y in range(height):
+        for x in range(width):
+            source=(((y//4)*(width//4)+x//4)*16+(y%4)*4+x%4)*2
+            target=(y*width+x)*2
+            result[target:target+2]=data[source:source+2][::-1]
+    return bytes(result)
 
 
 class Source:
@@ -593,9 +607,9 @@ def prepare_models(source, descriptor):
                     palettes[start] = (symbol, size)
                 elif op == 0xFD:
                     w, h, fmt, bits = model_texture_shape(raw[position:position+8])
-                    if ((fmt,bits) not in ((2,0),(4,0),(0,2),(3,1))
+                    if ((fmt,bits) not in ((2,0),(4,0),(0,2),(3,1),(3,2))
                             or w*h*(4<<bits)//8 != size or size>2048):
-                        raise ReviewRequired('texture is not complete TMEM-sized CI4/I4/IA8/RGBA16')
+                        raise ReviewRequired('texture is not complete TMEM-sized CI4/I4/IA8/IA16/RGBA16')
                     if start in textures and textures[start][2:] != (w, h, fmt, bits):
                         raise ReviewRequired('texture has inconsistent dimensions')
                     textures[start] = (symbol, size, w, h, fmt, bits)
@@ -626,10 +640,10 @@ def prepare_models(source, descriptor):
             source_sha256=sha256(raw), output_sha256=sha256(converted), **details))
     for at, (name, n) in sorted(palettes.items()): add(at, name, n, native_palette, kind='palette')
     for at, (name, n, w, h, fmt, bits) in sorted(textures.items()):
-        add(at, name, n, lambda data, w=w, h=h, bits=bits:
-            native_rgba16(data,w,h) if bits==2 else native_ia8(data,w,h) if bits==1
+        add(at, name, n, lambda data, w=w, h=h, bits=bits, fmt=fmt:
+            native_rgba16(data,w,h) if (fmt,bits)==(0,2) else native_ia16(data,w,h) if bits==2 else native_ia8(data,w,h) if bits==1
             else pack4(untile(data,w,h,4)),
-            kind='texture',width=w,height=h,format={(2,0):'CI4',(4,0):'I4',(0,2):'RGBA16',(3,1):'IA8'}[fmt,bits])
+            kind='texture',width=w,height=h,format={(2,0):'CI4',(4,0):'I4',(0,2):'RGBA16',(3,1):'IA8',(3,2):'IA16'}[fmt,bits])
     vertex, (name, n) = next(iter(vertex_arrays.items()))
     add(vertex, name, n, lambda data: normalise_vertex_flags(data)[0], kind='vertices')
     models = {}
@@ -1039,6 +1053,8 @@ def scan(source, worksheet, installed=None):
             if 'I4' in formats: categories.append('intensity-materials')
             if 'RGBA16' in formats: categories.append('rgba16-materials')
             if 'IA8' in formats: categories.append('ia8-materials')
+            if 'IA16' in formats: categories.append('ia16-materials')
+            if any(r.get('combine_lerp') for m in models.values() for r in m['rows']):categories.append('translucent-combiners')
             if 'callback_adapter' in profile: categories.append(profile['callback_adapter']['category'])
             if profile.get('callback_adapter',{}).get('constant_palette'):
                 categories.append('constant-palette-model-sequence')
