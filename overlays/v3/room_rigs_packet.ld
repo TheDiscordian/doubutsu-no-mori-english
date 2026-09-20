@@ -7,6 +7,7 @@ cKF_SkeletonInfo_R_play = 0x800528D4;
 cKF_Si3_draw_R_SV = 0x800530D8;
 Lib_SegmentedToVirtual = 0x8009ADA8;
 _Matrix_to_Mtx_new = 0x800E13C4;
+sAdo_OngenTrgStart = 0x800D1D58;
 SECTIONS {
     . = 0x804B8000;
     .text : { *(.text.af_v3_room_rig_ct) *(.text .text.*) }

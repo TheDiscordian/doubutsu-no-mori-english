@@ -464,11 +464,34 @@ def owner_tail_storage(base,files,changes,*,minimum_end=0):
     return rows
 
 
+def append_resource_plan(base,files,vrom,data,relocatable):
+    """Append a complete resource in place; move only checked DMA-owned blockers."""
+    entry=files[vrom];before=entry.extract(base)
+    if entry.pend or len(data)<=len(before) or data[:len(before)]!=before:
+        raise ValueError('In-place growth must retain the complete uncompressed resource')
+    first=entry.pstart+entry.size;end=entry.pstart+len(data)
+    if (end>len(base) or any(e.vstart<vrom+len(data) and vrom<e.vend
+            for v,e in files.items() if v!=vrom)):
+        raise ValueError('In-place resource growth exceeds cartridge or virtual bounds')
+    occupied=sorted((e.pstart,e.pend or e.pstart+e.size,v,e) for v,e in files.items()
+                    if v!=vrom and e.pstart!=0xFFFFFFFF and e.pstart<end and first<(e.pend or e.pstart+e.size))
+    changes={vrom:data};cursor=first;blockers=[]
+    for a,b,v,e in occupied:
+        old=e.extract(base)
+        if (v not in relocatable or sha256(old)!=relocatable[v] or a<first
+                or a<cursor or any(base[cursor:a])):
+            raise ValueError('Resource append overlaps undeclared or changed live data')
+        blockers.append(v);changes[v]=old;cursor=min(end,b)
+    if any(base[cursor:end]):raise ValueError('Resource append crosses unowned nonzero data')
+    return changes,dict(vrom=vrom,physical=entry.pstart,previous_bytes=entry.size,
+        bytes=len(data),previous_sha256=sha256(before),sha256=sha256(data),relocated_blockers=blockers)
+
+
 def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=False, equipment_kinds=False,
                     player_actions=False, item_category_art=None, ground_categories=False, event_acquisition=False,
                     held_collection=False, held_catalogue_art=None, held_selection=False, translation_updates=False,
                     room_rigs_art=None, scenery_art=None, scenery_gameplay=False,
-                    equipment_rigs=None, expand_storage=False):
+                    equipment_rigs=None, expand_storage=False, furniture_audio_art=None):
     """Update shared readers; optionally install the shared held-resource adapter."""
     output=output.resolve()
     if output.exists() or not output.is_relative_to(ROOT/'build'):
@@ -489,9 +512,9 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
     moved=[];equipment_report=None;reused=None;owner_changes={};owner_moves=[];owner_updates=[];report_updates={};text_moves=[]
     equipment_mode=any((equipment_art is not None,equipment_rigs is not None,player_motion,equipment_kinds,player_actions,
                         item_category_art is not None,ground_categories,event_acquisition,held_collection,held_catalogue_art is not None,held_selection,room_rigs_art is not None,scenery_art is not None,scenery_gameplay))
-    resource_mode=equipment_mode or translation_updates or expand_storage
+    resource_mode=equipment_mode or translation_updates or expand_storage or furniture_audio_art is not None
     if sum((equipment_art is not None,equipment_rigs is not None,player_motion,equipment_kinds,player_actions,
-            item_category_art is not None,ground_categories,event_acquisition,held_collection,held_catalogue_art is not None,held_selection,translation_updates,room_rigs_art is not None,scenery_art is not None,scenery_gameplay,expand_storage))>1:
+            item_category_art is not None,ground_categories,event_acquisition,held_collection,held_catalogue_art is not None,held_selection,translation_updates,room_rigs_art is not None,scenery_art is not None,scenery_gameplay,expand_storage,furniture_audio_art is not None))>1:
         raise ValueError('Install shared runtime updates in dependency order')
     if resource_mode:
         blob,reused=reuse_resource_tail(base,prior,old_blob)
@@ -507,7 +530,7 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         import v3_translation_updates as translation
         display_report,alias_report=prior['clothing']['display'],prior['display_aliases']
         owner_changes,report_updates=translation.install(base,prior,module,output)
-    elif held_catalogue_art is not None or wrapped_names:
+    elif held_catalogue_art is not None or wrapped_names or furniture_audio_art is not None:
         display_report,alias_report=prior['clothing']['display'],prior['display_aliases']
     else:
         display_report,alias_report=display_aliases.install(prior,blob,core,output,held_items=parent_readers,
@@ -554,6 +577,10 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
     elif room_rigs_art is not None:
         import v3_room_rig_runtime as equipment
         equipment_report,owner_changes=equipment.install(base,prior,blob,core,original,output,room_rigs_art)
+    elif furniture_audio_art is not None:
+        import v3_sound_programs as equipment
+        equipment_report,owner_changes,report_updates=equipment.install_furniture(
+            base,prior,blob,core,original,output,furniture_audio_art)
     elif held_selection:
         import v3_held_catalogue as equipment
         equipment_report,owner_changes,report_updates=equipment.select_installed(prior,blob)
@@ -574,6 +601,11 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         # Changed compressed owners retain their logical DMA identities. Store
         # their complete images outside the bounded import-object VROM region.
         external=[]
+        growth=report_updates.get('resource_growth',[])
+        growth_vroms={r['vrom'] for r in growth}
+        forced_moves={v for r in growth for v in r['relocated_blockers']}
+        if len(growth_vroms)!=len(growth) or growth_vroms&forced_moves:
+            raise ValueError('Conflicting in-place resource growth plans')
         menu_resizes={}
         if (player_actions and equipment_report['player_actions'].get('balloon_menu') and
                 not prior['equipment_resources']['player_actions'].get('balloon_menu')):
@@ -582,6 +614,16 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
                 raise ValueError('Incomplete declared balloon-menu owner resize')
         for vrom,data in owner_changes.items():
             entry=files[vrom]
+            if vrom in growth_vroms:
+                row=next(r for r in growth if r['vrom']==vrom)
+                if (entry.pend or entry.size!=row['previous_bytes'] or entry.pstart!=row['physical']
+                        or len(data)!=row['bytes'] or sha256(data)!=row['sha256']
+                        or sha256(entry.extract(base))!=row['previous_sha256']):
+                    raise ValueError('Changed complete in-place growth plan')
+                continue
+            if vrom in forced_moves:
+                if data!=entry.extract(base):raise ValueError('Relocated blocker changes its complete contents')
+                external.append((vrom,data));continue
             if held_catalogue_art is not None and vrom in (catalogue.VROM,catalogue.RELOC):
                 if vrom not in {r['vrom'] for r in reused['retired_resources']}:
                     raise ValueError('Resized catalogue is not owned by the reusable tail')
@@ -612,7 +654,9 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             moved.append(dict(vrom=row['vrom'],blob_offset=at,bytes=len(data),
                               physical=files[BLOB].pstart+at,sha256=sha256(data)))
         owner_moves=owner_tail_storage(base,files,external,
-            minimum_end=files[BLOB].pstart+len(blob))
+            minimum_end=max([files[BLOB].pstart+len(blob)]+[r['physical']+r['bytes'] for r in growth]))
+        owner_moves.extend(dict(vrom=r['vrom'],bytes=r['bytes'],physical=r['physical'],
+            storage='checked-in-place-append',sha256=r['sha256'],original_sha256=r['previous_sha256']) for r in growth)
     abi=prior['runtime_abi']+1; struct.pack_into('>I',blob,4,abi)
     package=blob[PACKAGE:PACKAGE+PACKAGE_SIZE]; struct.pack_into('>I',blob,0xF8,zlib.crc32(package))
     old=prior['startup']
@@ -762,6 +806,9 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             report['shared_runtime_refresh']['adapters'].append('room_rigs')
             report['shared_runtime_refresh']['artwork_changed']=True
             report['shared_runtime_refresh']['additional_resident_bytes']=equipment_report['room_rigs']['additional_resident_bytes']
+        if furniture_audio_art is not None:
+            report['shared_runtime_refresh']['adapters'].append('furniture_trigger_audio')
+            report['shared_runtime_refresh']['additional_resident_bytes']=equipment_report['furniture_audio']['audio_heap_growth']
         if held_selection:
             report['shared_runtime_refresh']['adapters'].append('held_selection')
         if report['save_runtime']['profile_hex']!=prior['save_runtime']['profile_hex']:
@@ -819,6 +866,8 @@ if __name__=='__main__':
         help='With --refresh-runtime, carry corrected translation headers and the pinned import-free baseline')
     parser.add_argument('--expand-storage',action='store_true',
         help='With --refresh-runtime, relocate complete English resources and expand the checked import reservation')
+    parser.add_argument('--furniture-audio-art',type=Path,
+        help='With --refresh-runtime, install prepared shared furniture audio and its callback')
     args=parser.parse_args()
     if args.equipment_art and not args.refresh_runtime:parser.error('--equipment-art requires --refresh-runtime')
     if args.equipment_rigs and not args.refresh_runtime:parser.error('--equipment-rigs requires --refresh-runtime')
@@ -836,6 +885,7 @@ if __name__=='__main__':
     if args.room_rigs_art and not args.refresh_runtime:parser.error('--room-rigs-art requires --refresh-runtime')
     if args.translation_updates and not args.refresh_runtime:parser.error('--translation-updates requires --refresh-runtime')
     if args.expand_storage and not args.refresh_runtime:parser.error('--expand-storage requires --refresh-runtime')
+    if args.furniture_audio_art and not args.refresh_runtime:parser.error('--furniture-audio-art requires --refresh-runtime')
     result=(refresh_runtime(args.output,args.base_lock,equipment_art=args.equipment_art,player_motion=args.player_motion,
                             equipment_kinds=args.equipment_kinds,player_actions=args.player_actions,
                             item_category_art=args.item_category_art,ground_categories=args.ground_categories,
@@ -843,6 +893,6 @@ if __name__=='__main__':
                             held_catalogue_art=args.held_catalogue_art,held_selection=args.held_selection,
                             translation_updates=args.translation_updates,equipment_rigs=args.equipment_rigs,
                             room_rigs_art=args.room_rigs_art,scenery_art=args.scenery_art,scenery_gameplay=args.scenery_gameplay,
-                            expand_storage=args.expand_storage)
+                            expand_storage=args.expand_storage,furniture_audio_art=args.furniture_audio_art)
             if args.refresh_runtime else build(args.output,args.art,args.base_lock))
     print(json.dumps({k:result[k] for k in ('runtime_abi','output_sha256','patch_sha256')},indent=2))

@@ -30,22 +30,29 @@ Event-present, Harvest, island, and direct-reward sources group other pending
 records. Complete sound-category audio is prepared at
 `build/v3-furniture-trigger-audio-02/`: five complete programs/instruments,
 all 74 existing instruments retained, and actual sample/envelope/timing identity.
-Next extend shared native dispatch/priorities, permanent audio allocation, and
-the move-only callback together, then connect source acquisition. The prepared
-font requires 768 additional aligned resident bytes, versus 192 available;
-sequence/table growth is additional. Do not use the donor sound numbers directly:
-they exceed the reviewed native tables, where unchecked reads reach unrelated data.
-Preserve single-instance flags through the new mapping. Keep preparation distinct
-from installed/selectable content, and reuse the passing converter checks.
-The shared import reservation extends to `02800000`, with 2,060,768 bytes free
-after the complete fifteen-clock batch. English choices/general strings retain
+Native dispatch/priorities, complete audio allocation, and the shared move-only
+callback are installed. Both trigger tables have 128 entries; the mapped words
+retain source priorities without changing the shared native priority table. The
+callback supplies the missing N64 single-instance guard. Next connect ordinary
+profiles and source acquisition. The 2-KiB audio allocation increase includes
+both sequence and font growth, with 864 conservative bytes spare. Reuse passing
+converter, cartridge, sanitizer, and native audio evidence.
+The shared import reservation extends to `02800000`, with 2,027,856 bytes free.
+English choices/general strings retain
 their content and physical locations through checked virtual relocation. The
 final general string has three checked padding bytes for rounded native DMA.
 Continue general category conversion/integration and source acquisition routes;
 do not replay passed storage, text, or clock checks without a relevant change.
 
-The current explicit proposal is ABI 161,
-`build/v3-clock-category-runtime-02/build-lock.json`. Its existing 8-KiB room
+The current explicit proposal is ABI 162,
+`build/v3-furniture-trigger-runtime-03/build-lock.json`. Its existing 8-KiB room
+packet also contains five sound records and the shared callback. The focused
+silent native audio check passes 61 assertions, with two real positioned-trigger
+and sample-transfer representatives, single-instance suppression, memory guards,
+restored checkpoint, and clean exit. Ordinary acquisition, room interaction,
+listening, and hardware remain open. Save formats and 128 choices are unchanged.
+
+Retain the complete clock/storage evidence from ABI 161. The same room
 packet contains 25 records: eight balloons, two complete storage rigs, and fifteen
 complete clocks. No additional RAM, selected choice, or saved format is introduced.
 Four host/cartridge checks and the focused native run pass; the latter has 153

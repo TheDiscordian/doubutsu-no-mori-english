@@ -1606,6 +1606,7 @@ def tool_controls(debug,rom_path,record,*,transitions=False,capture=False,rod=Fa
 
 
 def exercise(debug, rom_path, record, *, section='automatic_furniture'):
+    if section=='furniture_audio':return furniture_audio(debug,rom_path,record)
     if section in ('scenery_planting_sparkle','scenery_planting_sparkle_remaining'):
         from v3_scenery_smoke import planting_sparkle
         return planting_sparkle(debug,rom_path,record,remaining_only=section.endswith('_remaining'))
@@ -2627,6 +2628,139 @@ def held_level_sound(debug,rom_path,record):
         native_volume_pause_fade_pan_reverb=True,native_actor_registration_and_expiry=True,
         physical_audio_played=False,pcm_or_listening_verified=False,ordinary_gameplay_tested=False,
         flash_written=False,requires_checkpoint_restore=True)
+
+
+def furniture_audio(debug,rom_path,record):
+    """One current-build check for the complete shared trigger category."""
+    from aflib import CODE_RAM,CODE_VROM,u32
+    from runtime_layout import TEST_STACK
+    from v3_import_storage import jump
+    from v3_equipment_runtime import RAM
+    path=Path(rom_path);image=path.read_bytes();report=json.loads((path.parent/'build.json').read_bytes())
+    if sha256(image)!=report['output_sha256']:raise ValueError('Changed furniture-audio cartridge')
+    e=report['equipment_resources'];audio=e['furniture_audio'];rig=e['room_rigs'];files=by_vrom(image)
+    core=files[CODE_VROM].extract(image);blob=files[runtime.BLOB].extract(image);boot=boot_proofs(image);assertions=0
+    def check(label,at,want):
+        nonlocal assertions
+        actual=debug.read_memory(at,len(want));passed=actual==want
+        record(dict(furniture_audio_check=label,address=f'{at:08X}',bytes=len(want),
+            assertion='passed' if passed else 'failed',actual=actual.hex() if len(actual)<=32 else sha256(actual)))
+        if not passed:raise ValueError('Furniture audio mismatch: '+label)
+        assertions+=1
+    def call(at,args=(),proof=None):
+        result=debug.call(f'{at:08X}',list(args),return_address=MODULE_RAM+0x6480,verified_code=proof or boot.get(at))
+        record(result);return result['return_value']
+    def word(at):return u32(debug.read_memory(at,4),0)
+    def bounded(at,n):
+        if at&3 or not 0x80000400<=at<=0x80400000-n:raise ValueError('Furniture-audio pointer escapes native RAM')
+        return at
+    for row in (audio['sequence'],audio['font'],audio['wave']):
+        header=bytearray.fromhex(row['header_after']);struct.pack_into('>I',header,0,row['physical'])
+        check('actual relocated resource header',row['header_address'],header)
+    total,fixed,permanent=struct.unpack_from('>3I',core,0x80119A44-CODE_RAM)
+    heap=bounded(word(0x8014CB84),total);check('actual audio malloc size',0x8014CB88,struct.pack('>I',total))
+    for label,at,size,expected_start in (('fixed',0x8014BEC0,fixed,heap),
+            ('session',0x8014BEA0,total-fixed,heap+fixed),('permanent',0x8014C260,permanent,None)):
+        start,current,capacity,count=struct.unpack('>4I',debug.read_memory(at,16))
+        if (size!=capacity or not heap<=start<=current<=start+size<=heap+total or
+                expected_start is not None and start!=expected_start):raise ValueError('Incorrect native '+label+' pool')
+        record(dict(furniture_audio_pool=label,capacity=capacity,used=current-start,allocations=count,assertion='passed'))
+        assertions+=1
+    seq=audio['sequence'];sequence=bounded(word(0x8014CBA8),seq['bytes'])
+    data=image[seq['physical']:seq['physical']+seq['bytes']]
+    for table in audio['tables']:
+        check('registered complete trigger table',sequence+table['offset'],data[table['offset']:table['offset']+256])
+        at=0x188+table['group']*2;check('native group pointer',sequence+at,data[at:at+2])
+    for row in audio['programs']:
+        check('complete trigger program',sequence+row['offset'],data[row['offset']:row['offset']+row['bytes']])
+    font_row=audio['font'];font=image[font_row['physical']:font_row['physical']+font_row['bytes']]
+    count=audio['layout']['instrument_count'];info=bounded(word(0x8014BD48),145*20)+font_row['index']*20
+    check('expanded font count and wave binding',info,bytes((count,0,audio['wave']['index'],255,0,0)))
+    bank=bounded(word(info+8)-8,len(font));expected=bytearray(font);samples=set()
+    for index in range(count):
+        inst=u32(font,8+4*index)
+        if not inst:continue
+        struct.pack_into('>I',expected,8+4*index,bank+inst);expected[inst]=1
+        struct.pack_into('>I',expected,inst+4,bank+u32(font,inst+4))
+        for field in (8,16,24):
+            sample=u32(font,inst+field)
+            if sample:struct.pack_into('>I',expected,inst+field,bank+sample);samples.add(sample)
+    for at in samples:
+        flags,start,loop,book=struct.unpack_from('>4I',font,at)
+        struct.pack_into('>4I',expected,at,flags|0x09000000,audio['wave']['physical']+start,bank+loop,bank+book)
+    check('complete native font and every instrument/sample relocation',bank,expected)
+    allocation=bounded(call(0x8009BFC0,[0x800]),0x800);actor=allocation+16;capture=allocation+0x760;bridge=allocation+0x780
+    debug.write_memory(allocation,bytes(0x800));edge=b'V3FA'*4
+    guards=(allocation,actor+0x740,capture-16,bridge+16,allocation+0x7F0,TEST_STACK-0x800,TEST_STACK+0x40)
+    for at in guards:debug.write_memory(at,edge)
+    stub=struct.pack('>2I',jump(rig['bootstrap']['symbols']['af_v3_room_boot_sound_mv']),0)
+    debug.write_memory(bridge,stub);call(0x8002FE00,[bridge,8]);call(0x80034CE0,[bridge,8])
+    native_entry=0x800D1D58;native_bytes=core[native_entry-CODE_RAM:native_entry-CODE_RAM+24]
+    recorder=struct.pack('>6I',0x3C080000|(capture>>16),0x35080000|(capture&65535),0xAD040000,0xAD050004,0x03E00008,0)
+    state=report['save_runtime'];saved=debug.read_memory(state['state_ram'],state['state_bytes'])
+    saved_scene=debug.read_memory(0x80113844,1)
+    observed=set()
+    try:
+        check('original position dispatcher before isolated recorder',native_entry,native_bytes)
+        debug.write_memory(native_entry,recorder);call(0x8002FE00,[native_entry,24]);call(0x80034CE0,[native_entry,24])
+        row=next(r for r in rig['sound_rows'] if r['native_sound_word']&0x8000)
+        for action,changed,alias in ((0,1,False),(12,1,False),(13,1,False),(14,1,False),(15,1,False),
+                                     (0,0,False),(0,2,False),(-1,1,True)):
+            debug.write_memory(actor,struct.pack('>H',row['runtime_index']+(1024 if alias else 0)))
+            debug.write_memory(actor+0x3C,struct.pack('>h',action));debug.write_memory(actor+0x12D,bytes((changed,)))
+            debug.write_memory(capture,bytes(8));before=debug.read_memory(actor,0x740)
+            call(bridge,[actor,0,0,0],(bridge,stub))
+            expected=struct.pack('>2I',row['native_sound_word'],actor+8) if changed==1 and not 12<=action<=15 else bytes(8)
+            check('source state/switch rule and full sound word',capture,expected)
+            check('callback retains complete native actor',actor,before)
+        debug.write_memory(native_entry,native_bytes);call(0x8002FE00,[native_entry,24]);call(0x80034CE0,[native_entry,24])
+        check('complete lazy-loaded room packet',rig['packet']['ram'],
+              blob[rig['packet']['blob_offset']:rig['packet']['blob_offset']+rig['packet']['bytes']])
+        selected=[max(audio['programs'],key=lambda r:len(r['source_program']['events'])),
+                  next(r for r in audio['programs'] if r['singleton'])]
+        debug.write_memory(0x80113844,b'\x01')
+        mic=bounded(call(0x80060D6C,[word(0x8010EF90)]),12)
+        debug.write_memory(actor+8,debug.read_memory(mic,12))
+        debug.write_memory(actor+0x3C,bytes(2));debug.write_memory(actor+0x12D,b'\x01')
+        sample_ranges={}
+        for row in selected:
+            sid=row['native_sound_word']
+            selected_row=next(r for r in rig['sound_rows'] if r['native_sound_word']==sid)
+            debug.write_memory(actor,struct.pack('>H',selected_row['runtime_index']))
+            call(bridge,[actor,0,0,0],(bridge,stub))
+            slots=debug.read_memory(0x80113C34,192)
+            matches=[i for i in range(6) if struct.unpack_from('>H',slots,i*32)[0]==sid]
+            if len(matches)!=1:raise ValueError('Native furniture trigger was not registered uniquely')
+            check('actual native trigger priority',0x80113C34+matches[0]*32+28,bytes((row['trigger_priority'],)))
+            if row['singleton']:
+                call(bridge,[actor,0,0,0],(bridge,stub))
+                for i in range(6):check('single-instance retrigger retains native identity',0x80113C34+i*32,slots[i*32:i*32+2])
+            inst=u32(font,8+row['native_instrument']*4);sample=u32(font,inst+16)
+            sample_ranges[sid]=(audio['wave']['physical']+u32(font,sample+4),u32(font,sample)&0xFFFFFF)
+        for frame in range(12):
+            record(debug.advance_game_frame());n=word(0x8014BB20)
+            if not 0<n<=256:raise ValueError('Unbounded audio sample-DMA list')
+            entries=debug.read_memory(bounded(word(0x8014BB1C),n*16),n*16)
+            for i in range(n):
+                r=entries[i*16:(i+1)*16];ram,device=struct.unpack_from('>2I',r);size=struct.unpack_from('>H',r,10)[0]
+                if not r[14]:continue
+                for sid,(first,length) in sample_ranges.items():
+                    a,b=max(device,first),min(device+size,first+length)
+                    if a>=b or sid in observed:continue
+                    check('actual imported sample transfer',bounded(ram,size)+a-device,image[a:b]);observed.add(sid)
+            if len(observed)==len(selected):break
+        if len(observed)!=len(selected):raise ValueError('Missing representative complete sample transfer')
+        for at in guards:check('callback work/stack guard',at,edge)
+        check('complete saved profile retained',state['state_ram'],saved)
+        check('native dispatcher restored',native_entry,native_bytes)
+        check('no CPU fault',0x8003CE34,bytes(4))
+    finally:
+        debug.write_memory(native_entry,native_bytes);call(0x8002FE00,[native_entry,24]);call(0x80034CE0,[native_entry,24])
+        debug.write_memory(0x80113844,saved_scene)
+        call(0x8009C040,[allocation])
+    return dict(native_furniture_audio=True,assertions=assertions,sample_representatives=len(observed),
+        callback_dispatch_recorder=True,ordinary_room_interaction=False,physical_audio_played=False,
+        pcm_or_listening_verified=False,requires_checkpoint_restore=True)
 
 
 def sound_programs_probe(debug,image,resources,check,call,record):

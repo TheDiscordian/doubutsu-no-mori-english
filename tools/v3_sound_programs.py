@@ -13,8 +13,9 @@ from v3_asset_loader import BLOB, ROOT
 from v3_fire_audio import NATIVE_VROMS
 from v3_villager_audio import (GC_SECTIONS, NATIVE_HEADERS, extended_envelope,
     extended_native_interpreter, header_entry, instrument, read_audio_donor, resource, span)
+from v3_room_rig_runtime import SOURCES as ROOM_SOURCES
 
-SOURCES=('tools/v3_sound_programs.py','tools/v3_villager_audio.py')
+SOURCES=('tools/v3_sound_programs.py','tools/v3_villager_audio.py','tools/v3_furniture_install.py')+ROOM_SOURCES
 
 
 def trigger_program(sequence, origin, limit):
@@ -509,12 +510,15 @@ def installed_resource(image,code,kind,index):
     return image[physical:physical+n],entry,physical
 
 
-def permanent_budget(code):
+def permanent_budget(code,*,require_fit=True):
     read=lambda at,n:span(code,at-CODE_RAM,n)
     total,fixed,capacity=struct.unpack('>3I',read(0x80119A44,12))
-    if (total,fixed,capacity)!=(0x47E00,0x1DC00,0x1AC00):
+    growth=total-0x47E00
+    if (not 0<=growth<0x8200 or growth%0x400 or
+            (fixed,capacity)!=(0x1DC00+growth,0x1AC00+growth)):
         raise ValueError('Changed current audio allocation contract')
-    for at,want in ((0x800D28D8,0x34847E00),(0x800D28F8,0x34A57E00)):
+    for at,want in ((0x800D28CC,0x3C040004),(0x800D28E4,0x3C050004),
+                    (0x800D28D8,0x34840000|(total&65535)),(0x800D28F8,0x34A50000|(total&65535))):
         if u32(code,at-CODE_RAM)!=want:raise ValueError('Audio heap arguments disagree with capacity')
     rows=[]
     for kind,base in NATIVE_HEADERS.items():
@@ -525,9 +529,185 @@ def permanent_budget(code):
                 if entry[8]!=2:raise ValueError('Unsupported permanent sound medium')
                 rows.append(dict(kind=kind,index=index,bytes=n,conservative_allocation=(n+31)&-32))
     required=sum(r['conservative_allocation'] for r in rows)
-    if required>capacity:raise ValueError('Sound sequence exceeds current permanent audio capacity')
+    if require_fit and required>capacity:raise ValueError('Sound sequence exceeds current permanent audio capacity')
     return dict(capacity=capacity,conservative_required=required,conservative_spare=capacity-required,
-        all_permanent_resources=rows,heap_changed=False)
+        all_permanent_resources=rows,heap_changed=bool(growth))
+
+
+def grow_permanent_heap(code):
+    """Grow only the fixed/permanent allocation, preserving all session pools."""
+    before=permanent_budget(code,require_fit=False)
+    growth=(max(0,-before['conservative_spare'])+0x3FF)&~0x3FF
+    if not growth:return 0,[]
+    settings=struct.unpack_from('>3I',code,0x80119A44-CODE_RAM)
+    after=tuple(n+growth for n in settings)
+    if after[0]>=0x50000:raise ValueError('Audio allocation exceeds reviewed malloc instruction range')
+    patches=[]
+    for at,data in ((0x80119A44,struct.pack('>3I',*after)),
+                    (0x800D28D8,struct.pack('>I',0x34840000|(after[0]&65535))),
+                    (0x800D28F8,struct.pack('>I',0x34A50000|(after[0]&65535)))):
+        old=bytes(code[at-CODE_RAM:at-CODE_RAM+len(data)])
+        code[at-CODE_RAM:at-CODE_RAM+len(data)]=data
+        patches.append(dict(address=at,before=old.hex(),after=data.hex()))
+    permanent_budget(code)
+    return growth,patches
+
+
+def register_triggers(sequence,programs,fragments,counts,native_priority,source_priority):
+    """Extend whole dispatch tables while preserving shared cross-group priorities."""
+    if len(native_priority)!=128 or len(source_priority)!=128 or set(counts)!={1,4}:
+        raise ValueError('Unsupported complete trigger dispatch contract')
+    result=bytearray(sequence);tables={};rows=[];used=set()
+    for group,count in sorted(counts.items()):
+        if not 0<count<=128:raise ValueError('Invalid native trigger table count')
+        old=struct.unpack_from('>H',sequence,0x188+group*2)[0]
+        pointers=list(struct.unpack('>'+str(count)+'H',span(sequence,old,count*2)))
+        if any(p>=len(sequence) for p in pointers) or sequence[pointers[0]]!=255:
+            raise ValueError('Changed native trigger terminator or program bounds')
+        pointers.extend([pointers[0]]*(128-count))
+        result.extend(bytes(len(result)&1));at=len(result)
+        result.extend(struct.pack('>128H',*pointers))
+        struct.pack_into('>H',result,0x188+group*2,at)
+        tables[group]=dict(group=group,previous_offset=old,previous_count=count,offset=at,count=128)
+    for row in sorted(programs,key=lambda r:r['sound_word']):
+        source_word=row['sound_word'];sid=source_word&0x7FFF;group,index=sid>>8,sid&255
+        if group not in counts or index>=128 or source_word in used:
+            raise ValueError('Unsupported or duplicate trigger identity')
+        used.add(source_word);priority=source_priority[index];count=counts[group]
+        available=[i for i in range(count,128) if native_priority[i]==priority and (group,i) not in used]
+        if not available:raise ValueError('No vacant native trigger with matching source priority')
+        target=index if index in available else available[0];used.add((group,target))
+        native_word=(source_word&0x8000)|(group<<8)|target
+        raw=fragments[row['fragment_file']];origin=row['fragment_origin']
+        if len(raw)!=row['bytes'] or sha256(raw)!=row['sha256']:raise ValueError('Changed complete prepared trigger')
+        desc=trigger_program(bytes(origin)+raw,origin,origin+len(raw))
+        result.extend(bytes((len(result)^origin)&1));at=len(result)
+        bound=bind_trigger(raw,desc,at,row['native_selector'],row['native_instrument']);result.extend(bound)
+        struct.pack_into('>H',result,tables[group]['offset']+target*2,at)
+        rows.append(dict(source_sound_word=source_word,native_sound_word=native_word,
+            source_sound_id=sid,native_sound_id=native_word&0x7FFF,trigger_priority=priority,
+            singleton=bool(source_word&0x8000),offset=at,bytes=len(bound),sha256=sha256(bound),
+            source_program=row['source_program'],native_bank=140,native_instrument=row['native_instrument']))
+    result.extend(bytes(-len(result)%16))
+    if len(result)>65536:raise ValueError('Complete trigger sequence exceeds native pointer capacity')
+    return bytes(result),rows,list(tables.values())
+
+
+def install_furniture(image,prior,blob,code,original,output,directory):
+    """Install the complete prepared sound category and its shared room callback."""
+    from aflib import CODE_VROM
+    from v3_furniture_install import append_resource_plan
+    from v3_furniture_pipeline import Source
+    from v3_registry import furniture_representation_identity
+    import v3_room_rig_runtime as room
+    directory=directory.resolve();raw=(directory/'audio.json').read_bytes();prepared=json.loads(raw)
+    if (not directory.is_relative_to(ROOT/'build') or prepared['format']!='AFV3-TRIGGER-AUDIO-PREPARED-1'
+            or prepared['base_sha256']!=sha256(image) or prior['equipment_resources'].get('furniture_audio')):
+        raise ValueError('Furniture audio needs its checked current base and a fresh batch')
+    source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+        (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    if (prepared['source_rel_sha256']!=sha256(source.rel) or
+            prepared['source_symbols_sha256']!=sha256(source.symbols.encode())):
+        raise ValueError('Changed furniture source resources')
+    furniture=prepared['furniture'];seen=set()
+    for row in furniture:
+        item=int(row['item_id'],16);profile=source.profile(item)
+        if (item in seen or row['profile_sha256']!=profile['profile_sha256'] or
+                row['callback']!=json.loads(json.dumps(profile.get('callback_adapter',{}))) or
+                row['callback']['category']!='switch-trigger-sound'):
+            raise ValueError('Changed complete furniture sound callback')
+        seen.add(item)
+    resources,audio=prepare_triggers(image,prior,[r['callback']['sound_word'] for r in furniture])
+    for key in ('programs','layout','previous','font_index','wave_index','source_sequence_sha256'):
+        if json.loads(json.dumps(audio[key]))!=prepared[key]:raise ValueError('Changed complete prepared audio identity')
+    all_data={'font.bin':resources['font'],'wave.bin':resources['wave'],**resources['fragments']}
+    if set(prepared['files'])!=set(all_data):raise ValueError('Incomplete prepared audio files')
+    for name,data in all_data.items():
+        if ((directory/name).read_bytes()!=data or
+                prepared['files'][name]!=dict(bytes=len(data),sha256=sha256(data))):
+            raise ValueError('Changed complete prepared sound dependency')
+    files=by_vrom(image);native=by_vrom(original)[CODE_VROM].extract(original)
+    contracts=[]
+    for first,last in ((0x800D1D58,0x800D1D94),(0x800FA354,0x800FA498),(0x800F6BF8,0x800F6FCC)):
+        old=span(native,first-CODE_RAM,last-first)
+        if span(code,first-CODE_RAM,last-first)!=old:raise ValueError('Changed native positioned-trigger dispatcher')
+        contracts.append(dict(address=first,bytes=last-first,sha256=sha256(old)))
+    sequence,entry,physical=installed_resource(image,code,'seq',199)
+    old_sequence=prior['equipment_resources']['sound_programs']['sequence']
+    if (sha256(sequence)!=old_sequence['sha256'] or physical!=old_sequence['physical'] or
+            entry.hex()!=old_sequence['header_after'] or
+            struct.unpack_from('>H',sequence,0x18A)[0]!=0x4C30 or
+            struct.unpack_from('>2H',sequence,0x190)!=(0x33E,0x3DA) or
+            prior['speed_bag_sound']['sequence_group_one_count']!=106):
+        raise ValueError('Changed complete current trigger tables')
+    dol,_=read_audio_donor(ROOT/'local/gamecube/Animal Crossing (USA, Canada).ciso')
+    priority=span(code,0x80113B84-CODE_RAM,128)
+    new_sequence,programs,tables=register_triggers(sequence,audio['programs'],resources['fragments'],
+        {1:106,4:78},priority,dol.read(0x800A9A90,128))
+    before_budget=permanent_budget(code)
+    def store(kind,index,data,*,count=None):
+        old,header,_=installed_resource(image,code,kind,index)
+        blob.extend(bytes(-len(blob)%16));at=len(blob);blob.extend(data)
+        physical=files[BLOB].pstart+at;new_header=bytearray(header)
+        struct.pack_into('>2I',new_header,0,(physical-files[NATIVE_VROMS[kind]].pstart)&0xFFFFFFFF,len(data))
+        if count is not None:new_header[12]=count
+        address=NATIVE_HEADERS[kind]+16+index*16
+        code[address-CODE_RAM:address-CODE_RAM+16]=new_header
+        return dict(index=index,blob_offset=at,physical=physical,vrom=BLOB+at,bytes=len(data),
+            sha256=sha256(data),header_address=address,header_before=header.hex(),header_after=new_header.hex(),
+            previous_sha256=sha256(old))
+    seq=store('seq',199,new_sequence)
+    bank=store('bank',audio['font_index'],resources['font'],count=audio['layout']['instrument_count'])
+    wave,header,physical=installed_resource(image,code,'wave',audio['wave_index'])
+    wave_owner=files[NATIVE_VROMS['wave']];old_waves=wave_owner.extract(image)
+    if (physical+len(wave)!=wave_owner.pstart+len(old_waves) or
+            resources['wave'][:len(wave)]!=wave or sha256(old_waves)!=prior['fire_sound']['wave_file']['sha256']):
+        raise ValueError('Wave append changes a current complete resource')
+    new_waves=old_waves+resources['wave'][len(wave):]
+    relocatable={r['vrom']:r['output_sha256'] for r in prior['equipment_resources']['wrapped_presents']['consumers']}
+    relocatable.update({r['vrom']:r['sha256'] for r in prior['equipment_resources']['player_actions']['balloon_menu']['owner_resizes']})
+    changes,growth=append_resource_plan(image,files,NATIVE_VROMS['wave'],new_waves,relocatable)
+    new_header=bytearray(header);struct.pack_into('>I',new_header,4,len(resources['wave']))
+    address=NATIVE_HEADERS['wave']+16+audio['wave_index']*16
+    code[address-CODE_RAM:address-CODE_RAM+16]=new_header
+    wave_record=dict(index=audio['wave_index'],physical=physical,
+        vrom=wave_owner.vstart+physical-wave_owner.pstart,bytes=len(resources['wave']),
+        sha256=sha256(resources['wave']),header_address=address,header_before=header.hex(),header_after=new_header.hex())
+    heap_growth,patches=grow_permanent_heap(code)
+    result=copy.deepcopy(prior['equipment_resources']);runtime=result['room_rigs']
+    packet=runtime['packet'];at=packet['blob_offset']
+    if runtime.get('sound_rows') or sha256(blob[at:at+packet['bytes']])!=packet['sha256']:
+        raise ValueError('Changed complete room packet or existing furniture sound batch')
+    mapping={r['source_sound_word']:r for r in programs};sound_rows=[]
+    for row in furniture:
+        index,destination=furniture_representation_identity(int(row['item_id'],16))
+        sound_rows.append(dict(source_item_id=row['item_id'],item_id=f'{destination:04X}',runtime_index=index,
+            source_sound_word=row['callback']['sound_word'],
+            native_sound_word=mapping[row['callback']['sound_word']]['native_sound_word'],
+            profile_installed=False,parent_selectable=False))
+    runtime['sound_rows']=sorted(sound_rows,key=lambda r:r['runtime_index'])
+    room.publish_packet(result,blob,output)
+    shared=result['sound_programs'];shared['previous_sequence']=copy.deepcopy(old_sequence);shared['sequence']=seq
+    shared.setdefault('trigger_batches',[]).append(dict(programs=programs,tables=tables))
+    shared.update(after_budget=permanent_budget(code),native_synthesis_tested=False)
+    result['furniture_audio']=dict(format='AFV3-FURNITURE-TRIGGER-AUDIO-1',prepared_sha256=sha256(raw),
+        furniture=furniture,programs=programs,tables=tables,layout=audio['layout'],
+        sequence=seq,font=bank,wave=wave_record,native_dispatch=contracts,
+        singleton_guard=dict(callback=True,native_dispatcher_supports_flag=False,slots=6,ram=0x80113C34,stride=32),
+        priority_table_sha256=sha256(priority),before_budget=before_budget,after_budget=permanent_budget(code),
+        audio_heap_growth=heap_growth,heap_patches=patches,resource_growth=growth,
+        runtime_installed=True,dispatch_and_priority_installed=True,allocation_installed=True,callback_installed=True,
+        profiles_installed=False,ordinary_acquisition_tested=False,native_synthesis_tested=False,physical_audio_played=False)
+    fire=copy.deepcopy(prior['fire_sound'])
+    fire['resources'].update(seq=seq,bank=bank,wave=wave_record)
+    fire['wave_file'].update(bytes=len(new_waves),sha256=sha256(new_waves))
+    fire['heap_settings']=list(struct.unpack_from('>3I',code,0x80119A44-CODE_RAM))
+    fire['after_budget']=permanent_budget(code)
+    for row in fire['wave_headers']:
+        if row['index']==audio['wave_index']:
+            row.update(before=header.hex(),after=new_header.hex(),bytes=len(resources['wave']))
+    speed=copy.deepcopy(prior['speed_bag_sound']);speed['sequence_group_one_count']=128
+    return result,changes,dict(fire_sound=fire,speed_bag_sound=speed,resource_growth=[growth])
 
 
 def install(image,prior,blob,code,source_ids):

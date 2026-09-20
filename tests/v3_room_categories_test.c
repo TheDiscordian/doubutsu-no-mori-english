@@ -2,9 +2,17 @@
 #include <stdio.h>
 #include <string.h>
 #define AF_V3_ROOM_RIG_PACKET
+#define AF_V3_ROOM_TRIGGER_SOUND
 #include "../overlays/v3/room_rigs.c"
 
 RoomRigTable af_v3_test_room_rigs;
+RoomSoundTable af_v3_test_room_sounds;
+RoomNativeTrigger af_v3_test_room_triggers[6];
+static u32 last_sound,sound_calls;
+static float *last_position;
+void sAdo_OngenTrgStart(u32 word,float *position) {
+    last_sound=word;last_position=position;++sound_calls;
+}
 RoomRigClip *af_v3_test_room_clip;
 u16 af_v3_test_room_hour,af_v3_test_room_minute;
 static u8 model[9216];
@@ -63,6 +71,33 @@ void cKF_Si3_draw_R_SV(void *value,RoomKeyframe *key,void *matrices,void *before
     }
 }
 int main(void) {
+    struct { u8 front[16];RoomSoundActor actor;u8 back[16]; } sound_guard;
+    memset(&sound_guard,0xA7,sizeof(sound_guard));
+    af_v3_test_room_sounds=(RoomSoundTable){ROOM_SOUND_MAGIC,2,8,0,{{1070,0x816B,0},{1071,0x44E,0}}};
+    for (int variant=0;variant<2;++variant) for (int state=-1;state<17;++state) for (int changed=0;changed<3;++changed) {
+        RoomSoundActor *actor=&sound_guard.actor;
+        actor->index=(u16)(1070+variant*1024);actor->state=(s16)state;actor->changed=(u8)changed;
+        unsigned before=sound_calls;RoomSoundActor saved=*actor;
+        af_v3_room_sound_mv(actor,0,0,0);
+        unsigned added=changed==1 && !(state>=12 && state<=15);
+        assert(sound_calls==before+added && !memcmp(actor,&saved,sizeof(saved)));
+        if (added)assert(last_sound==0x816B && last_position==actor->position);
+    }
+    for (int i=0;i<16;++i)assert(sound_guard.front[i]==0xA7 && sound_guard.back[i]==0xA7);
+    sound_guard.actor.index=1070;sound_guard.actor.state=0;sound_guard.actor.changed=1;
+    for (int i=0;i<6;++i) {
+        unsigned before=sound_calls;af_v3_test_room_triggers[i].word=0x816B;
+        af_v3_room_sound_mv(&sound_guard.actor,0,0,0);assert(sound_calls==before);
+        af_v3_test_room_triggers[i].word=0x016B;
+        af_v3_room_sound_mv(&sound_guard.actor,0,0,0);assert(sound_calls==before+1);
+        af_v3_test_room_triggers[i].word=0;
+    }
+    sound_guard.actor.index=1071;sound_guard.actor.state=0;sound_guard.actor.changed=1;
+    af_v3_room_sound_mv(&sound_guard.actor,0,0,0);assert(last_sound==0x44E);
+    unsigned before=sound_calls;
+    af_v3_test_room_sounds.rows[1].reserved=1;af_v3_room_sound_mv(&sound_guard.actor,0,0,0);
+    af_v3_test_room_sounds.count=65;af_v3_room_sound_mv(&sound_guard.actor,0,0,0);
+    af_v3_room_sound_mv(0,0,0,0);assert(sound_calls==before);
     struct { u8 front[16];RoomRig actor;u8 back[16]; } guarded;
     RoomRig *actor=&guarded.actor;expected_actor=actor;
     _Alignas(16) u8 opa[1024],xlu[64];

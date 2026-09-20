@@ -1,5 +1,83 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared furniture trigger audio runtime
+
+ABI 162 at `build/v3-furniture-trigger-runtime-03/build-lock.json` installs all
+five prepared furniture sound programs through the shared runtime refresh:
+
+```sh
+python3 -B tools/v3_furniture_install.py --refresh-runtime \
+  --base-lock build/v3-clock-category-runtime-02/build-lock.json \
+  --furniture-audio-art build/v3-furniture-trigger-audio-02 \
+  --output build/v3-furniture-trigger-runtime-03
+```
+
+The complete 20,848-byte sequence contains extended 128-entry group-one and
+group-four tables, retaining every previous entry/program. Priority-equivalent
+slots map pipe `0178→016A` and mushroom `8179→816B`; the other three logical
+IDs remain. The shared native priority table is unchanged. Complete source
+callbacks determine all five records and retain excluded states 12–15, the
+exact `changed==1` condition, actor position, and the owner's unchanged flag.
+The shared room packet uses 1,880 code bytes and five sound rows in previously
+unused table space; the bootstrap is 669 bytes. Its existing 8-KiB reservation
+and the equipment allocation do not grow.
+
+The first native check found a real donor/native difference: the N64 trigger
+dispatcher ignores the `8000` single-instance flag. Its complete disassembly
+confirms there is no duplicate check before free-slot allocation. The corrected
+shared callback checks all six live native slots for the complete flagged word
+before dispatch. This is a category rule, not a mushroom-specific installer.
+The first check's 39 passing assertions and one failure remain recorded at
+`build/v3-furniture-trigger-native-01/results.json`; that proposal is not current.
+
+The complete 12,064-byte font retains 74 instruments and adds five; the complete
+wave-five resource is 3,019,472 bytes. The wave group retains its complete prefix
+and physical start at `03800000`, growing by 36,992 bytes. The shared allocator
+moves complete owners `007829E0` and `03950000` into checked free tail space,
+retaining their contents and virtual identities. It rejects unknown blockers,
+nonzero unowned gaps, prefix changes, and virtual/physical overlap. Every changed
+owner is extracted again from the final cartridge and compared in full.
+
+The actual permanent-resource headers require 2 KiB more audio allocation.
+Both malloc arguments and total/fixed/permanent pool settings grow together;
+session capacity and the fixed remainder stay intact. Conservative permanent
+headroom is 864 bytes. The import blob occupies 4,263,600 bytes, with 2,027,856
+bytes free. No saved format, profile bit, selected option, main lock, or served
+patcher changes. There remain 128 experimental choices; ordinary sound-object
+profiles and source acquisition are not enabled by audio installation.
+
+Seven focused audio checks and the shared room-category sanitizer check pass.
+The initial complete-DMA-owner test incorrectly compared the DMA directory's own
+owner against its pre-relocation contents; correcting that expectation passes
+the affected check. After the actual singleton correction, the three current
+cartridge tests pass in 6.094 seconds and the affected sanitizer check in 0.480
+seconds. Checks include complete original resource retention, source priorities,
+all five timings/envelopes/flags, guarded state dispatch, all six duplicate
+positions, unchanged saves/choices, empty/full composition, and UPS reconstruction.
+
+The corrected silent native run at `build/v3-furniture-trigger-native-02/`
+passes 93 records and 61 assertions, with a restored checkpoint and clean exit.
+It verifies actual resource headers and all three allocation pools, every new
+program and both complete tables, full native relocation of all 79 instruments,
+lazy-loaded callback code, rejected states, untouched actor memory, and guards.
+Two representatives then use the real positioned sound callback and native
+dispatcher, preserve their priorities, transfer actual donor sample data, and
+verify singleton suppression. The callback condition checks use an isolated
+argument recorder; actual playback checks restore the original dispatcher.
+No existing save is used, no FlashRAM write is requested, and no physical audio
+is played. Ordinary room interaction, acquisition, full PCM/listening, and
+original hardware remain unverified. Retain these components without replaying
+unchanged audio during the acquisition batch.
+
+- ROM SHA-256: `6e3780d606d0d548736071331524374c894f0b1e8992ec7b664232eabaedf927`.
+- UPS SHA-256: `d9c99a9d536399661886ccb407f341a03e4341246f44d1b8a45adec98ca3e83a`.
+- Build receipt SHA-256: `92739671a1d2f3aafff9d91bb195740383175fba7681dccfa630beafce93dc78`.
+- Native results SHA-256: `df144c0bdb7fd3cf0ee069220552f8c202e0cd90e89ebeb329c3f2b13b13624e`.
+
+Continue shared profiles/acquisition and remaining bulk import categories.
+Required gold-tree leaf/cut effects and full golden-shovel acquisition follow
+primary importing. This is not a V3 playtest handoff or public release.
+
 ## Shared furniture trigger audio preparation
 
 `build/v3-furniture-trigger-audio-02/` prepares complete audio for the five

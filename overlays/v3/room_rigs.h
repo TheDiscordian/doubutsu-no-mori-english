@@ -82,6 +82,35 @@ extern RoomRigTable af_v3_test_room_rigs;
 #define room_rig_table (&af_v3_test_room_rigs)
 #endif
 #define ROOM_CHECK(type,field,at) _Static_assert(__builtin_offsetof(type,field)==(at),#type "." #field)
+#ifdef AF_V3_ROOM_TRIGGER_SOUND
+typedef struct {
+    u16 index;
+    u8 before_position[6];
+    float position[3];
+    u8 before_state[0x3C-20];
+    s16 state;
+    u8 before_changed[0x12D-0x3E];
+    u8 changed;
+} RoomSoundActor;
+typedef struct { u16 index,word; u32 reserved; } RoomSoundRecord;
+typedef struct { u16 word;u8 rest[30]; } RoomNativeTrigger;
+#define ROOM_SOUND_MAGIC 0x41465331u
+#define ROOM_SOUND_CAPACITY 64u
+typedef struct { u32 magic,count,stride,reserved; RoomSoundRecord rows[ROOM_SOUND_CAPACITY]; } RoomSoundTable;
+#ifdef __mips__
+#define room_sound_table ((const RoomSoundTable *)0x804B9C10u)
+#define room_native_triggers ((const volatile RoomNativeTrigger *)0x80113C34u)
+#else
+extern RoomSoundTable af_v3_test_room_sounds;
+extern RoomNativeTrigger af_v3_test_room_triggers[6];
+#define room_sound_table (&af_v3_test_room_sounds)
+#define room_native_triggers af_v3_test_room_triggers
+#endif
+ROOM_CHECK(RoomSoundActor,position,8); ROOM_CHECK(RoomSoundActor,state,0x3C);
+ROOM_CHECK(RoomSoundActor,changed,0x12D);
+_Static_assert(sizeof(RoomSoundRecord)==8,"Room sound record stride");
+extern void sAdo_OngenTrgStart(u32,float *);
+#endif
 ROOM_CHECK(RoomRig,changed,0x12D); ROOM_CHECK(RoomRig,keyframe,0x134);
 ROOM_CHECK(RoomRig,joint,0x1A4); ROOM_CHECK(RoomRig,morph,0x1DA);
 ROOM_CHECK(RoomRig,speed,0x204); ROOM_CHECK(RoomRig,target,0x208);

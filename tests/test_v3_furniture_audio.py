@@ -1,5 +1,6 @@
 """Shared furniture audio conversion; no historic cartridge or audible replay."""
 import copy
+import json
 from pathlib import Path
 import struct
 import sys
@@ -117,6 +118,89 @@ class PreparedBatchTests(unittest.TestCase):
         at=0x800F43D4-CODE_RAM;bad=bytearray(self.image);entry=by_vrom(self.image)[CODE_VROM]
         bad[entry.pstart+at]^=1;wrong['output_sha256']=sha256(bad)
         with self.assertRaisesRegex(ValueError,'interpreter'):sound.prepare_triggers(bad,wrong,self.words)
+
+
+class InstalledBatchTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.path=ROOT/'build/v3-furniture-trigger-runtime-03'
+        cls.image,cls.report=inputs(cls.path/'build-lock.json')
+        cls.base,cls.prior=inputs(cls.path/'base-lock.json')
+        cls.files=by_vrom(cls.image);cls.old_files=by_vrom(cls.base)
+        cls.code=cls.files[CODE_VROM].extract(cls.image)
+        cls.old_code=cls.old_files[CODE_VROM].extract(cls.base)
+        cls.audio=cls.report['equipment_resources']['furniture_audio']
+
+    def test_complete_old_resources_and_source_priority_survive_registration(self):
+        new,_,_=sound.installed_resource(self.image,self.code,'seq',199)
+        old,_,_=sound.installed_resource(self.base,self.old_code,'seq',199)
+        restored=bytearray(new[:len(old)])
+        for table in self.audio['tables']:
+            group=table['group'];pointer=0x188+group*2
+            restored[pointer:pointer+2]=old[pointer:pointer+2]
+            n=table['previous_count']*2
+            self.assertEqual(new[table['offset']:table['offset']+n],old[table['previous_offset']:table['previous_offset']+n])
+        self.assertEqual(restored,old)
+        self.assertEqual(self.code[0x80113B84-CODE_RAM:0x80113C04-CODE_RAM],
+                         self.old_code[0x80113B84-CODE_RAM:0x80113C04-CODE_RAM])
+        for row in self.audio['programs']:
+            word=row['native_sound_word'];group=word>>8&127;index=word&127
+            table=next(r for r in self.audio['tables'] if r['group']==group)
+            self.assertEqual(struct.unpack_from('>H',new,table['offset']+index*2)[0],row['offset'])
+            self.assertEqual(self.code[0x80113B84-CODE_RAM+index],row['trigger_priority'])
+            self.assertEqual(word&0x8000,row['source_sound_word']&0x8000)
+            raw=new[row['offset']:row['offset']+row['bytes']]
+            desc=sound.trigger_program(bytes(row['offset'])+raw,row['offset'],row['offset']+len(raw))
+            for key in ('events','duration','envelope_bytes','decay'):
+                self.assertEqual(desc[key],row['source_program'][key])
+        self.assertEqual(len(self.audio['programs']),5)
+
+    def test_growth_preserves_complete_dma_owners_and_audio_allocation(self):
+        from v3_furniture_install import append_resource_plan
+        from aflib import apply_ups,DMA_START,DMA_END
+        growth=self.audio['resource_growth'];v=growth['vrom'];data=self.files[v].extract(self.image)
+        self.assertEqual(data[:growth['previous_bytes']],self.old_files[v].extract(self.base))
+        for owner in growth['relocated_blockers']:
+            self.assertEqual(self.files[owner].extract(self.image),self.old_files[owner].extract(self.base))
+            self.assertGreaterEqual(self.files[owner].pstart,growth['physical']+growth['bytes'])
+        with self.assertRaises(ValueError):append_resource_plan(self.base,self.old_files,v,data,{})
+        with self.assertRaises(ValueError):append_resource_plan(self.base,self.old_files,v,b'X'+data[1:],{})
+        # Only the import resource, resident module, core, waveform group, and
+        # declared complete moved owners may differ in the logical directory.
+        from v3_asset_loader import BLOB,MODULE
+        allowed={BLOB,MODULE,CODE_VROM,v}
+        for owner,entry in self.files.items():
+            if owner in allowed:continue
+            expected=bytearray(self.old_files[owner].extract(self.base))
+            if entry.pstart<=DMA_START and DMA_END<=entry.pstart+entry.size and not entry.pend:
+                expected[DMA_START-entry.pstart:DMA_END-entry.pstart]=self.image[DMA_START:DMA_END]
+            self.assertEqual(entry.extract(self.image),expected,hex(owner))
+        before=struct.unpack_from('>3I',self.old_code,0x80119A44-CODE_RAM)
+        after=struct.unpack_from('>3I',self.code,0x80119A44-CODE_RAM)
+        self.assertEqual(tuple(b+2048 for b in before),after)
+        self.assertEqual(sound.permanent_budget(self.code)['conservative_spare'],864)
+        original=(ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes()
+        self.assertEqual(apply_ups(original,(self.path/'asset-loader.ups').read_bytes()),self.image)
+
+    def test_runtime_table_and_composition_preserve_saved_profile_and_choices(self):
+        import v3_room_rig_runtime as room
+        import v3_optional_composition as composer
+        from v3_asset_loader import BLOB
+        e=self.report['equipment_resources'];r=e['room_rigs'];blob=self.files[BLOB].extract(self.image)
+        packet=blob[r['packet']['blob_offset']:r['packet']['blob_offset']+room.PACKET_BYTES]
+        self.assertEqual(packet[room.PACKET_TABLE-room.PACKET_RAM:],room.encode_packet(r['rows'],r['sound_rows']))
+        self.assertEqual(r['rows'],self.prior['equipment_resources']['room_rigs']['rows'])
+        self.assertEqual(len(r['sound_rows']),5)
+        self.assertTrue(all(not row['profile_installed'] and not row['parent_selectable'] for row in r['sound_rows']))
+        self.assertEqual(self.report['save_runtime'],self.prior['save_runtime'])
+        pin=composer.BASE,composer.BASE_SHA,composer.REPORT_SHA,composer.ABI
+        try:
+            composer.use_build_lock(self.path/'build-lock.json');catalog=composer.catalogue(self.image,self.report)
+            self.assertEqual(len(catalog),128)
+            self.assertEqual(sha256(composer.compose(self.image,self.report,catalog,composer.resolve(catalog,[]))[0]),
+                             self.report['translation_baseline']['sha256'])
+            self.assertEqual(composer.compose(self.image,self.report,catalog,composer.resolve(catalog,list(catalog)))[0],self.image)
+        finally:composer.BASE,composer.BASE_SHA,composer.REPORT_SHA,composer.ABI=pin
 
 
 if __name__=='__main__':unittest.main()

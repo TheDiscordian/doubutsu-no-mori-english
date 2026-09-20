@@ -18,9 +18,25 @@ served patchers retain their existing builds.
 
 ## Active development
 
-The current explicit proposal is ABI 161 at
-`build/v3-clock-category-runtime-02/build-lock.json`. The shared import reservation
-has 2,060,768 free bytes after installing all fifteen complete clock models.
+The current explicit proposal is ABI 162 at
+`build/v3-furniture-trigger-runtime-03/build-lock.json`. All five complete
+furniture sound programs, instruments, and samples are installed with one shared
+move callback. Sound priorities are preserved; the callback supplies the donor's
+single-instance rule missing from the N64 engine. Audio memory grows by 2 KiB,
+with 864 bytes of conservative spare capacity. The shared import reservation
+has 2,027,856 free bytes.
+
+Seven focused audio checks and the shared sanitizer check pass; the three
+current-cartridge checks and affected sanitizer check also pass on the corrected
+build. The silent native run passes 61 assertions, including all program/font
+loading, two actual positioned-trigger/sample-transfer representatives, duplicate
+suppression, guards, restored checkpoint, and clean exit. Ordinary furniture
+interaction, acquisition, listening, and hardware remain unverified. No choices,
+saved formats, main lock, or served patchers change. Continue shared category
+integration and acquisition, then required gold-tree completion. See the
+[audio runtime checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-furniture-trigger-audio-runtime).
+
+The installed complete clock batch retains its passing component evidence.
 The room engine serves 25 records: eight balloons, two storage rigs, and fifteen
 clocks. Clock/storage ordinary profiles and acquisition remain required; resources
 alone do not make them selectable. No additional resident memory or saved format
@@ -44,18 +60,12 @@ remaining furniture candidates, 69 of 101 non-alias, non-dummy records have
 prepared artwork. Continue shared integration before required gold-tree work.
 See the [storage checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#openclose-storage-category).
 
-The shared sound category has complete prepared artwork and audio for five
-objects. `build/v3-furniture-trigger-audio-02/` contains all five programs and a
-single expanded font/wave pair, retaining all 74 current instruments and adding
-five complete donor instruments. Shared code preserves repeated notes, envelopes,
-timing, tuning, samples, and single-instance flags. Four focused checks pass;
-the final allocation-accounting change has its affected check rerun successfully.
-Native sound dispatch/priorities, allocation, callbacks, and acquisition remain
-required. The font alone needs 576 bytes beyond the current permanent audio
-headroom; sequence growth must also be included before installation. No ROM,
-save, choice, or served patcher changes. Continue this shared integration before
-the required gold-tree completion. See the
-[audio checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-furniture-trigger-audio-preparation).
+The shared sound category reuses complete prepared artwork and audio from
+`build/v3-switch-sound-prepared-01/` and `build/v3-furniture-trigger-audio-02/`.
+The installed audio retains all 74 previous instruments and adds five complete
+donor instruments, preserving repeated notes, envelopes, tuning, and samples.
+Ordinary profiles and acquisition still need connecting before these five
+objects become selectable.
 
 All fifteen station models have complete prepared artwork, skeletons, and motions
 through the shared indexed-clock category at `build/v3-indexed-clock-rigs-prepared-01/`.

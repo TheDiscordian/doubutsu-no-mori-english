@@ -677,10 +677,34 @@ source/callback receipts, current-cartridge identity, and aligned font-capacity
 requirements. It does not assign native sound IDs, change audio headers, allocate
 memory, or install callbacks. Native dispatch/priority and allocation integration
 are mandatory: the same donor sound number can be out of bounds or select a
-different native program. The current five-object batch retains 74 instruments,
-adds five, and needs 768 more aligned font bytes. Only 192 bytes remain in the
-current permanent audio budget; new sequence/table storage is not yet included.
-Neither shrinking samples nor dropping sounds is an acceptable substitute.
+different native program. Neither shrinking samples nor dropping sounds is an
+acceptable substitute.
+
+`--refresh-runtime --furniture-audio-art <prepared-directory>` installs the
+complete prepared category through the shared resource allocator. It reconstructs
+and compares every program, instrument, sample, and source callback before use.
+Complete group-one/group-four tables grow to 128 entries, retaining every existing
+pointer. New identities use vacant appended slots with the source's priority;
+the priority table itself is shared across groups and must not change. Source
+single-instance flags stay in the mapped word. The original N64 dispatcher does
+not implement that flag, so the category callback checks all six actual live
+trigger slots before dispatch. It preserves native actor state and the owner's
+switch-change flag. No per-object behaviour script is required.
+
+The complete new sequence and font use the import resource. The wave group keeps
+its physical start and complete existing prefix. Its checked append can relocate
+only declared, hash-verified DMA owners blocking the extension; those owners keep
+their complete contents and virtual identities. Unknown owners and nonzero
+unowned gaps reject. The normal cartridge-tail allocator places the blockers
+outside the expanded wave group and all other live owners.
+
+Permanent audio capacity accounts for every actual permanent header with native
+alignment. Required growth rounds upward to 1 KiB and updates both malloc
+arguments and all three total/fixed/permanent settings together, retaining the
+session pool and fixed remainder. The five-object batch adds 2 KiB, with 864
+conservative spare bytes. Shared sound rows and the move-only vtable use checked
+free space in the existing room packet/bootstrap reservations. Audio installation
+does not enable incomplete profiles or acquisition routes.
 
 The `indexed-model-sequence` category supports constant identity-indexed draws
 with one or two ordered opaque lists and an optional conditional translucent

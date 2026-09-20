@@ -28,3 +28,8 @@ void af_v3_room_boot_mv(RoomRig *actor,void *room,RoomRigGame *game,u8 *data) {
 void af_v3_room_boot_dw(RoomRig *actor,void *room,RoomRigGame *game,u8 *data) {
     if (load()) ((void (*)(RoomRig *,void *,RoomRigGame *,u8 *))AF_ROOM_DW)(actor,room,game,data);
 }
+#ifdef AF_ROOM_SOUND_MV
+void af_v3_room_boot_sound_mv(void *actor,void *room,RoomRigGame *game,u8 *data) {
+    if (load()) ((void (*)(void *,void *,RoomRigGame *,u8 *))AF_ROOM_SOUND_MV)(actor,room,game,data);
+}
+#endif

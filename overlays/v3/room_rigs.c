@@ -1,6 +1,29 @@
 /* Complete shared room rigs; each record retains its actual behaviour. */
 #include "room_rigs.h"
 
+#ifdef AF_V3_ROOM_TRIGGER_SOUND
+void af_v3_room_sound_mv(RoomSoundActor *actor,void *room,RoomRigGame *game,u8 *data) {
+    (void)room;(void)game;(void)data;
+    if (!actor || actor->changed!=1 || (actor->state>=12 && actor->state<=15)) return;
+    if (room_sound_table->magic!=ROOM_SOUND_MAGIC || room_sound_table->count>ROOM_SOUND_CAPACITY ||
+            room_sound_table->stride!=sizeof(RoomSoundRecord) || room_sound_table->reserved) return;
+    u32 index=actor->index;
+    if (index>=2048u && index<3072u) index-=1024u;
+    for (u32 i=0;i<room_sound_table->count;++i) {
+        const RoomSoundRecord *r=room_sound_table->rows+i;
+        if (r->index!=index) continue;
+        if (r->index<1024 || r->index>=2048 || r->reserved || (r->word&0x80u) ||
+                (((r->word>>8)&127u)!=1u && ((r->word>>8)&127u)!=4u)) return;
+        /* The original N64 dispatcher lacks the donor's singleton flag.
+           Its six live slots retain the full word, including that flag. */
+        if (r->word&0x8000u) for (u32 j=0;j<6;++j)
+            if (room_native_triggers[j].word==r->word) return;
+        sAdo_OngenTrgStart(r->word,actor->position);
+        return;
+    }
+}
+#endif
+
 static const RoomRigRecord *find(u32 index) {
     /* Catalogue actors retain the catalogue's index, 1024 above the room
        index for imported furniture. Both contexts use the same full model. */
