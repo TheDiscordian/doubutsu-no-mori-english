@@ -224,6 +224,9 @@ class Source:
         for slot, role in enumerate(('create','move','draw','destroy')):
             if slot*4 not in pointers: continue
             raw, receipt = self.function(pointers[slot*4][3]); functions[role] = receipt
+        from v3_furniture_rigs import CODE as RIG_CODE, discover as discover_rig
+        if functions.get('create',{}).get('bytes') == RIG_CODE['create'][0]:
+            return discover_rig(self,name,at,functions,index)
         if functions.get('create',{}).get('bytes') == PALETTE_FADE_CODE['create'][0]:
             if set(pointers) != {0,4,8,12}: reject('unsupported palette-fade callback slots')
             return self.palette_fade_models(name, at, functions)
@@ -421,9 +424,7 @@ class Source:
         return name, start, n
 
     def profile(self, item):
-        if type(item) is not int or not 0x3000 <= item < 0x33C8 or item&3:
-            raise ReviewRequired('not a canonical donor furniture identity')
-        index = 1024 + (item-0x3000)//4
+        index = furniture_source_index(item)
         targets = [table.get(at+index*4) for (at, _), table in zip(self.names['furniture_quality'], self.quality)]
         if targets[0] is None or targets[0] != targets[1]:
             raise ReviewRequired('profile tables disagree or lack the item')
@@ -461,8 +462,12 @@ class Source:
         fading = extra.get('callback_adapter', {}).get('category') == 'switch-palette-fade'
         if fading and (interaction != 0x8000 or contact) or interaction == 0x8000 and not fading:
             raise ReviewRequired('contact/interaction requires a checked palette-fade callback')
+        adapter = extra.get('callback_adapter', {})
+        if adapter.get('category') == 'indexed-switch-rig':
+            if contact or interaction: raise ReviewRequired('unsupported rig contact/interaction flags')
+            extra.update(kind='animated-room-model',skeleton=adapter['skeleton'],joint_models=adapter['joint_models'])
         return dict(profile_symbol=name, profile_offset=at, profile_sha256=sha256(raw),
-            scalar_hex=raw[32:48].hex(), behaviour=BEHAVIOURS[contact], contact_action=contact,
+            scalar_hex=raw[32:48].hex(), behaviour=adapter.get('category') if extra.get('kind') else BEHAVIOURS[contact], contact_action=contact,
             interaction_flags=interaction,
             size_code={3:1, 4:0, 5:2}[shape], shape=shape, models=models, **extra)
 
@@ -552,7 +557,7 @@ def prepare_models(source, descriptor):
     models = {}
     for label, (name, at, raw, pointers, receipts) in raw_models.items():
         matrices = 0
-        if descriptor.get('kind') == 'animated-held-model':
+        if descriptor.get('kind') in ('animated-held-model','animated-room-model'):
             # The native skeleton drawer publishes each visible joint matrix
             # before its list runs. No list may read a later, uninitialised joint.
             visible = [r['index'] for r in descriptor['skeleton']['rows'] if 'model' in r]
@@ -661,7 +666,16 @@ def draw_sequence(profile, body_bytes, sections):
                 arena='opaque',output_sha256=sha256(raw)),raw
 
 
-def identity_rows(path):
+def furniture_source_index(item):
+    """Decode donor furniture types, without assigning a destination identity."""
+    if type(item) is not int or item & 3:
+        raise ReviewRequired('not a canonical donor furniture identity')
+    if 0x1000 <= item < 0x2000: return (item-0x1000)//4
+    if 0x3000 <= item < 0x33C8: return 1024+(item-0x3000)//4
+    raise ReviewRequired('not a canonical donor furniture identity')
+
+
+def identity_rows(path, *, extra_items=()):
     if sha256(path.read_bytes()) != SHEET_SHA: raise ValueError('Changed identity worksheet')
     rows = list(sheet_rows(path, 'Items'))
     if any(rows[0][1].get(k) != v for k,v in {'C':'ID (AF)', 'E':'ID (AC)', 'J':'Name (English)'}.items()):
@@ -669,8 +683,9 @@ def identity_rows(path):
     result = {}
     for number, cells in rows[1:]:
         value = cells.get('E', '')
-        if not re.fullmatch(r'3[0-9A-F]{3}', value): continue
+        if not re.fullmatch(r'[13][0-9A-F]{3}', value): continue
         item = int(value, 16)
+        if item < 0x3000 and item not in extra_items: continue
         if item in result: raise ValueError('Ambiguous worksheet donor identity')
         result[item] = number, cells
     return result
@@ -678,20 +693,25 @@ def identity_rows(path):
 
 def name_metadata(source, item, identity):
     """Keep prepared-asset names tied to the actual English donor too."""
-    index = 1024+(item-0x3000)//4
-    name_raw = source.raw('ftrName2_table')[(index-1024)*16:(index-1023)*16]
+    index = furniture_source_index(item)
+    symbol = 'ftrName_table' if index < 1024 else 'ftrName2_table'
+    name_index = index if index < 1024 else index-1024
+    name_raw = source.raw(symbol)[name_index*16:(name_index+1)*16]
     try: name = name_raw.decode('ascii').rstrip(' ')
     except UnicodeDecodeError: raise ReviewRequired('name needs supported encoding') from None
     if not name or name != identity[1].get('J') or name in ('DUMMY', 'dummy'):
         raise ReviewRequired('name/identity is ambiguous or unused')
     return dict(id=f'GAFE01-r0/item/{item:04X}', item_id=f'{item:04X}', runtime_index=index,
-                name=name, name_sha256=sha256(name_raw), name_source_index=index-1024)
+                name=name, name_sha256=sha256(name_raw), name_source_index=name_index,
+                **({'name_source_symbol':symbol} if index < 1024 else {}))
 
 
 def metadata(source, item, profile, identity):
     alias = next((row for row in room_aliases(source)['rows'] if int(row['display_item_id'],16)==item), None)
     if alias:
         raise ReviewRequired(room_alias_reason(alias))
+    if profile.get('kind') == 'animated-room-model':
+        raise ReviewRequired('Animated room lifecycle needs the shared runtime adapter')
     number, sheet = identity
     if any(sheet.get(k) != '-' for k in ('C', 'H', 'CG', 'CJ')):
         raise ReviewRequired('native identity/artwork correspondence needs review')
@@ -754,11 +774,12 @@ def metadata(source, item, profile, identity):
 
 
 def scan(source, worksheet, installed=None):
+    from v3_furniture_rigs import estimated_suffix
     installed = set(FURNITURE) if installed is None else set(installed)
     alias_catalogue = room_aliases(source)
     aliases = {int(row['display_item_id'],16):row for row in alias_catalogue['rows']}
     result = []
-    for item, identity in sorted(identity_rows(worksheet).items()):
+    for item, identity in sorted(identity_rows(worksheet,extra_items=aliases).items()):
         row = dict(item_id=f'{item:04X}', name=identity[1].get('J'), installed=item in installed,
                    asset_ready=False)
         try:
@@ -768,11 +789,13 @@ def scan(source, worksheet, installed=None):
             name_metadata(source,item,identity)
             _,sequence=draw_sequence(profile,len(body),sections)
             estimated = (len(body)+sum(n for _,n in sections)+len(sequence)+15)&~15
+            estimated += estimated_suffix(source,profile,estimated)
             if estimated > 9216: raise ReviewRequired('complete object exceeds native model-bank capacity')
             formats={r['format'] for r in resources if r['kind']=='texture'}
-            categories = [profile['behaviour'], 'static-materials', ('1x1','2x1','2x2')[profile['size_code']]]
-            if formats<={'CI4','I4'}: categories.append('static-4bit')
-            if formats=={'CI4'}: categories.append('static-ci4')
+            categories = [profile['behaviour'], ('1x1','2x1','2x2')[profile['size_code']]]
+            categories.append('animated-materials' if profile.get('kind') else 'static-materials')
+            if not profile.get('kind') and formats<={'CI4','I4'}: categories.append('static-4bit')
+            if not profile.get('kind') and formats=={'CI4'}: categories.append('static-ci4')
             if 'I4' in formats: categories.append('intensity-materials')
             if 'RGBA16' in formats: categories.append('rgba16-materials')
             if 'IA8' in formats: categories.append('ia8-materials')
@@ -800,6 +823,7 @@ def scan(source, worksheet, installed=None):
 
 
 def convert(source, worksheet, output, selected=(), installed=None, *, assets_only=False, category=None):
+    from v3_furniture_rigs import suffix
     inventory = scan(source, worksheet, installed)
     rows = [r for r in inventory['rows'] if (r['asset_ready'] if assets_only else r['status']=='supported') and
             (r['item_id'] in selected if selected else not r['installed']) and
@@ -808,7 +832,7 @@ def convert(source, worksheet, output, selected=(), installed=None, *, assets_on
         missing = sorted(set(selected)-{r['item_id'] for r in rows})
         raise ValueError('Unsupported or filtered requested entries: '+json.dumps(missing))
     if not rows: raise ValueError('No supported uninstalled furniture in the requested category')
-    identities = identity_rows(worksheet)
+    identities = identity_rows(worksheet,extra_items={int(r['item_id'],16) for r in rows})
     names = {r['item_id']:name_metadata(source,int(r['item_id'],16),identities[int(r['item_id'],16)]) for r in rows}
     output.mkdir(parents=True, exist_ok=False)
     objects = []
@@ -818,6 +842,8 @@ def convert(source, worksheet, output, selected=(), installed=None, *, assets_on
         profile, body, resources, offsets, models, commands, sections = prepared
         directory = output/row['item_id']; directory.mkdir()
         asset, destinations, records, sequence_record = compile_models(directory, prepared)
+        rig_bytes, rig_record = suffix(source,profile,destinations,start=len(asset))
+        asset += rig_bytes
         if len(asset) != row['object_bytes']: raise ValueError('Compiled object size differs from preflight')
         name = row['item_id']+'.n64obj.bin'; write_new(output/name, asset)
         objects.append(dict(**row.get('metadata',names[row['item_id']]), profile=profile, resources=resources, models=records,
@@ -825,6 +851,7 @@ def convert(source, worksheet, output, selected=(), installed=None, *, assets_on
             **({'room_alias':row['room_alias']} if 'room_alias' in row else {}),
             native_profile_scalar_hex=profile['scalar_hex'], model_offsets=destinations,
             **({'draw_sequence':sequence_record} if sequence_record else {}),
+            **({'rig':rig_record} if rig_record else {}),
             object_file=name, object_bytes=len(asset), object_sha256=sha256(asset)))
         print(json.dumps(dict(converted=row['item_id'], name=row['name'], bytes=len(asset))), flush=True)
     report = dict(format=('AFV3-AUTO-FURNITURE-PREPARED-ASSETS-1' if assets_only else

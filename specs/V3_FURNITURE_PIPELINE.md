@@ -453,6 +453,49 @@ displays, and four ordinary-tool displays with one conversion command. These
 remain parent-item aliases requiring actual parent gameplay and room conversion;
 prepared graphics do not make them standalone furniture imports.
 
+The `indexed-switch-rig` category retains complete animated room objects selected
+by a checked callback index. `tools/v3_furniture_rigs.py` verifies complete create,
+move, draw, and destroy instructions, every relocated dependency, the actual
+local keyframe/matrix calls, both full skeleton/animation tables, source float
+constants, and both effect-free joint callbacks. Unknown lifecycle effects or
+incomplete dependencies reject. The source selector supplies the origin and
+bounded table position; no maintained per-item list chooses models or motions.
+
+The shared keyframe model descriptor feeds all visible joint roots into the same
+material/vertex/triangle converter used by handheld rigs. Each compiled object
+appends its complete skeleton and animation, including every keyframe array and
+relocated pointer. The animation packer accepts an aligned object offset; its
+default zero-offset format and all existing held resources remain unchanged.
+No animation is flattened into a decorative model.
+
+The category prepares all eight room balloons in one command:
+
+```sh
+python3 tools/v3_furniture_pipeline.py convert --assets-only \
+  --category indexed-switch-rig \
+  --base-lock build/v3-balloon-inventory-02/build-lock.json \
+  --output build/room-rig-assets
+```
+
+The source-only furniture index decoder handles both `1xxx` and `3xxx` ranges.
+The ordinary worksheet scan remains restricted to its existing `3xxx` entries
+plus older-range IDs proven by shared room aliases; it does not offer the entire
+native furniture range as new imports. Names use the matching official source
+table and retain the parent identity. Source IDs/indices do not assign N64
+destination IDs, enable items, or create independent furniture choices.
+
+Room balloons have six joints, five visible lists, and a 61-frame motion, unlike
+their held models. The retained source behaviour starts at zero speed, approaches
+0.5 by 0.01 per source update, targets 1.25 after interaction, and returns toward
+0.5 after reaching that target. The runtime must implement this behaviour and
+native timing, not merely install the model. Complete prepared assets are
+4,656 or 7,040 bytes each and fit the existing 9,216-byte room bank. They require
+44,400 bytes of ROM storage together. Runtime callbacks, context-correct
+placement/pickup, additive older-range destinations, profile/collection readers,
+and safe aggregate storage remain required. The ordinary installer rejects
+prepared data and unsupported animated lifecycle metadata. See the
+[conversion checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-indexed-room-rig-preparation).
+
 The `switch-palette-fade` category discovers the complete shared building-model
 callbacks. It checks all four compiled functions, normalising only verified
 address relocations and local call displacements. Every call target, paired

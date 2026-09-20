@@ -1,5 +1,66 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared indexed room-rig preparation
+
+The automatic furniture pipeline discovers the source `indexed-switch-rig`
+callback category and prepares all eight complete room balloons in one command.
+`tools/v3_furniture_rigs.py` binds all four lifecycle functions, both effect-free
+joint callbacks, actual helper calls, source speed constants, and the complete
+relocated skeleton/motion tables. Models are selected by the verified source
+index rule, not a per-item Python definition or copied held model.
+
+- Prepared output: `build/v3-indexed-room-rigs-prepared-01/`.
+- Asset-report SHA-256:
+  `06215bb037c4b7cbd8fa06715d9a5ee83490ee1af8c6991eef91e2cf340efb69`.
+- Eight objects, 44,400 bytes total: five at 4,656 and three at 7,040 bytes.
+- Every object retains six joints, five visible model lists, and a complete
+  61-frame animation. Each fits the 9,216-byte native room model bank.
+- Source representations: `1FF0..1FFC` and `3000..300C`, with their existing
+  parent IDs and room/collection conversion contexts retained.
+- Current cartridge remains ABI 125 at
+  `build/v3-balloon-inventory-02/build-lock.json`; no room runtime is installed.
+
+The shared keyframe module now supplies joint-model descriptors to both held
+and room converters. Its animation packer supports an explicit aligned suffix
+offset while retaining the default zero-offset format. All graphics continue
+through the established complete texture/material/vertex/triangle converter.
+No source joint, animation channel, reflection coordinate, IA8 alpha, or list
+is discarded. Room and held rigs remain distinct source resources.
+
+Source profile/name discovery accepts the older donor furniture range, but the
+ordinary scan only adds older IDs proven by room aliases. It does not duplicate
+existing native furniture or assign destination IDs. Prepared objects retain
+official name/table/hash references and remain rejected by ordinary installation;
+there is no new applied translation or change to the sole provenance catalogue.
+
+Four category checks pass in 6.371 seconds: complete table/range/name discovery,
+rejected changed code/dependencies/constants/effectful callbacks, aligned motion
+packing, and complete compiled models/skeletons/keyframes. Independent texture,
+vertex, material, triangle, matrix-binding, and all relocated-pointer comparisons
+pass across the eight actual assets. The first malformed-table fixture removed
+a relocation without rebuilding its lookup index; correcting that fixture gives
+the intended rejected incomplete table. This is not a cartridge defect.
+
+Seventeen affected shared keyframe/held-converter checks pass in 5.812 seconds,
+including unchanged previously prepared resources. Four shared furniture checks
+pass in 17.427 seconds, covering prepared-only rejection, retained indexed
+sequences, original profile scalars/footprints, and unsupported lifecycle/sounds.
+No native emulator run is needed for this converter-only change; the unchanged
+ABI-125 component evidence is retained, not replayed.
+
+Next install the actual room lifecycle: per-instance source speed/target,
+interaction response, complete looping keyframe playback, and native drawing.
+Connect context-correct room placement and parent pickup, all eight collection
+representations, and optional profile readers. Reserve additive destination
+identities for the four older source IDs without reusing native items. The
+44,400-byte batch exceeds the current 19,632-byte append space; use checked
+retired-resource reuse or verified storage expansion, retaining the English
+choice boundary at `025F0000`. Do not reduce assets to avoid that work.
+
+Both served V2 patchers, main ABI-109 lock, current cartridge, saved formats,
+and 120 experimental choices remain unchanged. Prepared art is not gameplay,
+GPU appearance, ordinary acquisition/persistence, or hardware verification.
+
 ## Shared balloon inventory previews
 
 The shared inventory adapter installs all eight balloon previews, including

@@ -90,10 +90,24 @@ def skeleton(source, address):
     return dict(header=header, joint_table=table, joints=count, shown_joints=shown, rows=rows)
 
 
-def compile_animations(source, descriptions):
+def model_descriptor(rig, **fields):
+    """Keep every shown joint while deduplicating shared display-list roots."""
+    models, labels, bindings = {}, {}, []
+    for joint in rig['rows']:
+        if 'model' not in joint:
+            continue
+        model = joint['model']; at = model['donor_offset']
+        if at not in labels:
+            label = 'joint'+str(joint['index']); labels[at] = label
+            models[label] = model['symbol'], at, model['bytes']
+        bindings.append(dict(joint_index=joint['index'], model_label=labels[at]))
+    return dict(**fields, skeleton=rig, joint_models=bindings, models=models)
+
+
+def compile_animations(source, descriptions, *, start=0):
     """Pack complete arrays once and relocate headers into one native object."""
-    if not descriptions:
-        raise ValueError('No checked animations to compile')
+    if not descriptions or type(start) is not int or not 0 <= start < 0x1000000 or start % 16:
+        raise ValueError('No checked animations or invalid object offset')
     checked = {}
     for row in descriptions:
         at = row['header']['donor_offset']
@@ -103,25 +117,25 @@ def compile_animations(source, descriptions):
     output, offsets, arrays = bytearray(), {}, []
     for at in sorted({r['donor_offset'] for row in checked.values() for r in row['arrays'].values() if r}):
         raw, receipt = resource(source, at)
-        output.extend(bytes(-len(output)%4)); offsets[at] = len(output)
+        output.extend(bytes(-len(output)%4)); offsets[at] = start+len(output)
         output.extend(raw)
         arrays.append(dict(**receipt, native_offset=offsets[at], output_sha256=sha256(raw)))
     headers, relocations = [], []
     for at, row in sorted(checked.items()):
         raw, _ = resource(source, at, size=20, pointers=True)
         fixed = bytearray(raw)
-        output.extend(bytes(-len(output)%4)); start = len(output)
+        output.extend(bytes(-len(output)%4)); header_at = start+len(output)
         for i, label in enumerate(CHANNELS):
             if row['arrays'][label] is None:
                 continue
             target = offsets[row['arrays'][label]['donor_offset']]
             struct.pack_into('>I', fixed, i*4, SEGMENT+target)
-            relocations.append(dict(offset=start+i*4, target_offset=target))
+            relocations.append(dict(offset=header_at+i*4, target_offset=target))
         output.extend(fixed)
-        headers.append(dict(**row['header'], native_offset=start, output_sha256=sha256(fixed),
+        headers.append(dict(**row['header'], native_offset=header_at, output_sha256=sha256(fixed),
                             joints=row['joints'], duration=row['duration']))
     output.extend(bytes(-len(output)%16))
-    if len(output) >= 0x1000000:
+    if start+len(output) >= 0x1000000:
         raise ValueError('Animation object exceeds a segmented address range')
     return bytes(output), dict(arrays=arrays, headers=headers, relocations=relocations,
                               segment=SEGMENT, runtime_installed=False)

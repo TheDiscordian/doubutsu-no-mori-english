@@ -27,13 +27,21 @@ including 103 component assertions and four final fault/memory checks, covering
 four representative balloon/pinwheel previews and checkpoint restoration.
 GPU appearance, ordinary inventory interaction, and hardware remain unverified.
 
-Next connect balloon room representations and context-correct parent conversion.
-Unlike fans/pinwheels, balloons become animated room furniture indoors; four
-source representations also need additive destination IDs for the older donor
-furniture range. Balloons remain unavailable as selections until these readers,
-real room models, and behaviours are integrated. The 120 existing choices,
+The shared converter prepares all eight complete room-balloon models, skeletons,
+and animations at `build/v3-indexed-room-rigs-prepared-01/`. The category needs
+44,400 ROM bytes; each object fits the existing room bank. Four new category
+checks, four shared pipeline checks, and seventeen affected held/keyframe checks
+pass. No cartridge or selectable choice is added by asset preparation.
+
+Next connect animated-room callbacks and context-correct parent conversion.
+Four source representations need additive destination IDs for the older donor
+range, and aggregate ROM storage needs checked reuse or expansion beyond the
+19,632 remaining append bytes. Balloons remain unavailable as selections until
+these readers and behaviours are integrated. The 120 existing choices,
 format-2 saves, exact V2-12 empty output, and both served patchers stay unchanged.
 See the [inventory checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-balloon-inventory-previews).
+The [room-rig checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-indexed-room-rig-preparation)
+records complete asset conversion and its remaining runtime dependencies.
 
 The retained ABI-124 proposal at `build/v3-balloon-actions-02/` installs shared
 balloon setup, hand-motion tracking, sway/spring animation, and reflected drawing.

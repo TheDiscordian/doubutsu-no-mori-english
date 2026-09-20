@@ -562,7 +562,7 @@ class DonorTests(unittest.TestCase):
         worksheet=ROOT/'build/item-identity-megasheet.xlsx'
         with self.assertRaisesRegex(ValueError,'Unknown converter/source revision'):
             install.checked_assets(art,self.source,worksheet)
-        identities=pipeline.identity_rows(worksheet)
+        identities=pipeline.identity_rows(worksheet,extra_items={int(r['item_id'],16) for r in report['objects']})
         for row in report['objects']:
             item=int(row['item_id'],16)
             self.assertEqual(row['profile'],json.loads(json.dumps(self.source.profile(item))))

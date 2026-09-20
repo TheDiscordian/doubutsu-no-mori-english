@@ -440,22 +440,13 @@ def descriptor(row):
 
 def rig_descriptor(row, rig):
     """Follow every shown joint, deduplicating shared roots without flattening."""
+    from v3_keyframes import model_descriptor
     root = row['model_root']
     if (row['category'] != 'animated-held-model' or row.get('data_type') != 1 or
             (root['symbol'], root['offset'], root['bytes']) !=
             (rig['header']['symbol'], rig['header']['donor_offset'], rig['header']['bytes'])):
         raise ValueError('Animated handheld root does not match its complete skeleton')
-    models, labels, bindings = {}, {}, []
-    for joint in rig['rows']:
-        if 'model' not in joint:
-            continue
-        model = joint['model']; at = model['donor_offset']
-        if at not in labels:
-            label = 'joint'+str(joint['index']); labels[at] = label
-            models[label] = model['symbol'], at, model['bytes']
-        bindings.append(dict(joint_index=joint['index'], model_label=labels[at]))
-    return dict(kind='animated-held-model', shape_index=row['shape_index'],
-                skeleton=rig, joint_models=bindings, models=models)
+    return model_descriptor(rig, kind='animated-held-model', shape_index=row['shape_index'])
 
 
 def scan(source):
