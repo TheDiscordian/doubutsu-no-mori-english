@@ -1,5 +1,62 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared room-rig runtime
+
+The shared runtime refresh installs all eight complete prepared room models and
+one source-derived lifecycle implementation. No per-item script, reduced asset,
+new resident allocation, or changed saved field is introduced.
+
+- Explicit lock: `build/v3-room-rigs-runtime-03/build-lock.json`, ABI 126.
+- ROM SHA-256:
+  `febced937539f3f03777ddb98da7de952708ce21cba3d0d175b577a43c52c3d0`.
+- Report SHA-256:
+  `f217bb2b737ffbf75cc1c49858093a636c97bb4715f5634f4ab9ed09d186314e`.
+- UPS SHA-256:
+  `eddacfa7fafe3e1d174618df8c99c2e25b6c62e82bfaabcdf3c1f94be083975d`.
+- Code: 1,056 bytes at `804B1800`; immutable descriptor table at `804B1E00`
+  and vtable at `804B1FA0`, within the existing 60-KiB equipment module.
+- Artwork: 44,400 bytes in a verified retired 53,248-byte equipment block.
+  The allocator checks the immutable predecessor chain and 3,903 live ranges;
+  no current resource, English-choice boundary, or existing import is overwritten.
+- Source `1FF0..1FFC` uses reserved additive destination `3C00..3C0C`;
+  source `3000..300C` retains its canonical mapping. Profiles remain empty and
+  their selection bits remain off.
+
+The runtime uses the native keyframe constructor, looping initializer, evaluator,
+and skeleton renderer. Each N64 update performs two source movement steps and
+consumes an interaction pulse once. The source zero/0.5/1.25 speeds and 0.01 step
+are retained. Per-instance state occupies eight otherwise unused morph-work
+bytes after the seven required vectors; the native tail and matrix banks are
+untouched. Drawing submits all five visible model lists with the real parent
+transform and current matrix-bank parity, checking both command streams first.
+
+Four focused checks pass in 7.289 seconds: sanitizer timing/interaction/bounds,
+stable noncolliding destination reservations, complete installed assets and
+code/table/retired-space bindings, existing-resource retention, original-ROM UPS
+reconstruction, all 120 choices, unchanged saves, and exact V2-12 empty output.
+Two initial builds fail before cartridge generation on a signedness warning and
+the missing shared compiler entry registration. Both implementation errors are
+corrected in this build.
+
+The first native fixture stops before DMA because the test runner lacks a proof
+for the boot-resident transfer function. The one corrected retry adds the full
+verified original-function proof. `build/smoke-v3-room-rigs-02/` passes 116
+records and 89 assertions, including 84 component assertions. It covers the
+smallest/largest complete resources, actual cartridge DMA, two independent
+instances, native keyframe pointers/frame timing, switch/peak response, every
+model list, both matrix parities, unused work/tail retention, balanced matrix
+stack, all private/work/graphics guards, retained saves, checkpoint restoration,
+and clean exit. Results SHA-256:
+`ffa1ecadaf21d756657426a5633e128b68f726311c11c97746bb571e4e8f535a`.
+No user save is used. GPU appearance, ordinary room placement/pickup, gameplay,
+FlashRAM persistence, and hardware are not established by this component test.
+
+Next extend the existing parent-category installer to consume these installed
+assets, callback-bearing sparse profiles, source catalogue membership, forward
+room conversion, inverse pickup, and optional selection. No additional graphics
+conversion is required. Keep all eight parent choices off until that integration
+is complete. Both served V2 patchers and the main ABI-109 lock remain unchanged.
+
 ## Shared indexed room-rig preparation
 
 The automatic furniture pipeline discovers the source `indexed-switch-rig`

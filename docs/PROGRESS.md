@@ -18,8 +18,19 @@ served patchers retain their existing builds.
 
 ## Active development
 
-The current explicit ABI-125 proposal is
-`build/v3-balloon-inventory-02/build-lock.json`. All eight balloon inventory
+The current explicit ABI-126 proposal is
+`build/v3-room-rigs-runtime-03/build-lock.json`. All eight complete room-balloon
+assets and shared animation callbacks are installed without additional resident
+memory. The complete 44,400-byte asset batch uses checked retired ROM space;
+fixed older-donor destinations occupy `3C00..3C0C`, beyond garment displays.
+Four focused checks pass, including sanitizer timing/bounds, exact installation,
+retained selections/saves, patch reconstruction, and exact V2-12 empty output.
+The corrected silent native check passes complete DMA, independent animation,
+switch response, full drawing commands, memory guards, and checkpoint restoration.
+Ordinary room gameplay and hardware remain unverified. Balloons are not
+selectable yet.
+
+All eight balloon inventory
 previews use their source idle animation and reflected drawing. Existing fan and
 pinwheel records, timing, resources, selections, and saved formats are retained.
 Three focused checks pass. The first silent native run passes 141 records,
@@ -33,15 +44,13 @@ and animations at `build/v3-indexed-room-rigs-prepared-01/`. The category needs
 checks, four shared pipeline checks, and seventeen affected held/keyframe checks
 pass. No cartridge or selectable choice is added by asset preparation.
 
-Next connect animated-room callbacks and context-correct parent conversion.
-Four source representations need additive destination IDs for the older donor
-range, and aggregate ROM storage needs checked reuse or expansion beyond the
-19,632 remaining append bytes. Balloons remain unavailable as selections until
-these readers and behaviours are integrated. The 120 existing choices,
+Next connect context-correct parent conversion, callback-bearing profiles,
+collection/catalogue membership, pickup, and optional selection through the
+shared category installer. The 120 existing choices,
 format-2 saves, exact V2-12 empty output, and both served patchers stay unchanged.
 See the [inventory checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-balloon-inventory-previews).
-The [room-rig checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-indexed-room-rig-preparation)
-records complete asset conversion and its remaining runtime dependencies.
+The [room-rig checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-room-rig-runtime)
+records complete asset/runtime installation and its remaining parent dependencies.
 
 The retained ABI-124 proposal at `build/v3-balloon-actions-02/` installs shared
 balloon setup, hand-motion tracking, sway/spring animation, and reflected drawing.
@@ -55,7 +64,7 @@ actual initialization/hand tracking/animation/drawing commands, matrix and memor
 guards, saved-state retention, checkpoint restoration, and clean exit. This is
 component execution, not GPU appearance, ordinary gameplay, or hardware proof.
 
-Use the ABI-125 lock above for continued work. The 120
+Use the ABI-126 lock above for continued work. The 120
 experimental choices, complete resources, format-2 saves, and exact V2-12
 no-import output are retained. Balloon parent/room integration is next;
 balloons are not selectable yet. Reuse the
@@ -115,7 +124,7 @@ The actual browser worker matches offline empty/all/mixed/equipment outputs
 using both supplied games. Its unserved export is
 `build/v3-held-category-browser-01/`; neither served patcher changes.
 
-Continue from `build/v3-balloon-inventory-02/build-lock.json` explicitly. Retain
+Continue from `build/v3-room-rigs-runtime-03/build-lock.json` explicitly. Retain
 passing animation, sound, and inventory evidence for unchanged implementations.
 The 60-KiB equipment module, 15,584-byte inventory bank, and format-2 save layout
 retain their current ownership; outdoor banks hold 7,168 bytes each. Pinwheel profile bits require a

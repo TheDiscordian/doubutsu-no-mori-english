@@ -26,6 +26,24 @@ def furniture_identity(donor_item):
     return 1024+(donor_item-0x3000)//4, donor_item
 
 
+# Older donor room aliases cannot use their source indices in the shorter N64
+# furniture table. Reserve additive slots beyond the full 3800..3BFC garment
+# display range. These reservations are stable, not allocated by checkbox order.
+ROOM_ALIAS_REGISTRY_VERSION = 1
+LEGACY_ROOM_ALIASES = {
+    0x1FF0: (1792, 0x3C00),
+    0x1FF4: (1793, 0x3C04),
+    0x1FF8: (1794, 0x3C08),
+    0x1FFC: (1795, 0x3C0C),
+}
+
+
+def furniture_representation_identity(donor_item):
+    if type(donor_item) is int and donor_item in LEGACY_ROOM_ALIASES:
+        return LEGACY_ROOM_ALIASES[donor_item]
+    return furniture_identity(donor_item)
+
+
 FURNITURE = {
     0x3224: (1161, 0x3224, STORAGE+0x8000),
     0x32B8: (1198, 0x32B8, STORAGE+0xA000),

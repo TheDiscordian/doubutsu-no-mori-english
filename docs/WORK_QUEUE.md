@@ -2,8 +2,16 @@
 
 ## Active: V3 optional GameCube imports
 
-The current explicit proposal is ABI 125,
-`build/v3-balloon-inventory-02/build-lock.json`. All eight balloon inventory
+The current explicit proposal is ABI 126,
+`build/v3-room-rigs-runtime-03/build-lock.json`. All eight complete room rigs,
+shared lifecycle callbacks, immutable descriptors, and fixed additive destination
+IDs are installed. The 44,400-byte batch reuses verified retired ROM space;
+existing resident allocations, live resources, and save formats stay unchanged.
+Four focused checks pass. The corrected silent native check passes full DMA,
+independent animation/switch response, full drawing commands, guards, and restored
+checkpoint. Balloons remain unselectable until parent integration is complete.
+
+All eight balloon inventory
 previews have their actual idle animation and reflection drawer. Three focused
 checks pass; the first silent native check passes 141 records, 103 component
 assertions, and four final fault/memory checks. It covers two balloon and two
@@ -16,17 +24,15 @@ all eight six-joint/five-list models and their 61-frame animations, totalling
 44,400 bytes. Four category checks, four shared pipeline checks, and seventeen
 affected held/keyframe checks pass. Reuse these assets without reconversion.
 
-Next implement shared animated-room behaviour and parent-category integration.
-Balloons use room furniture on indoor placement, unlike fans and
-pinwheels. Four representations use donor `1FF0..1FFC`; assign explicit additive
-destination identities without replacing native items or existing reservations.
-Preserve the real room skeletons, animations, switch-driven speed response,
-collection positions, parent pickup, and optional-profile dependencies. Do not
-expose balloons or substitute static catalogue models before these are ready.
-The current blob has 19,632 append bytes left, less than this complete asset
-batch. Use checked retired-resource reuse or a verified storage extension;
-do not overwrite live data or extend into English choices at `025F0000`.
-See the [room-rig checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-indexed-room-rig-preparation).
+Next complete shared parent-category integration. Balloons use room furniture
+on indoor placement, unlike fans and pinwheels. Source `1FF0..1FFC` has fixed
+additive destinations `3C00..3C0C`; source catalogue positions must remain
+distinct from these destination indices. Extend the existing complete-category
+installer to reuse installed room assets, build callback-bearing profiles,
+register forward room conversion, and retain inverse pickup/collection readers.
+Preserve existing parent records and selections. Do not expose balloons or
+substitute static catalogue models before these consumers are ready.
+See the [runtime checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-room-rig-runtime).
 
 Shared balloon setup, hand delta,
 two-substep sway/spring animation, reflected drawing, and transient player state

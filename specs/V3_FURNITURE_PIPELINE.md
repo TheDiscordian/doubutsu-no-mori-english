@@ -487,14 +487,37 @@ destination IDs, enable items, or create independent furniture choices.
 Room balloons have six joints, five visible lists, and a 61-frame motion, unlike
 their held models. The retained source behaviour starts at zero speed, approaches
 0.5 by 0.01 per source update, targets 1.25 after interaction, and returns toward
-0.5 after reaching that target. The runtime must implement this behaviour and
-native timing, not merely install the model. Complete prepared assets are
+0.5 after reaching that target. The shared runtime implements two source steps
+per native update, consuming the switch pulse once. Complete prepared assets are
 4,656 or 7,040 bytes each and fit the existing 9,216-byte room bank. They require
-44,400 bytes of ROM storage together. Runtime callbacks, context-correct
-placement/pickup, additive older-range destinations, profile/collection readers,
-and safe aggregate storage remain required. The ordinary installer rejects
+44,400 bytes of ROM storage together. Context-correct placement/pickup and
+profile/collection readers remain required. The ordinary installer rejects
 prepared data and unsupported animated lifecycle metadata. See the
 [conversion checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-indexed-room-rig-preparation).
+
+`--refresh-runtime --room-rigs-art <prepared-directory>` installs this complete
+category through the existing resource-tail and build-lock machinery. It verifies
+every prepared source binding, model, skeleton, animation, and command source;
+it does not recompile artwork. The checked retired-module allocator supplies
+the full 44,400 bytes without extending into English choices or moving live data.
+
+The lifecycle code occupies `804B1800..804B1DFF`, with immutable descriptors at
+`804B1E00..804B1F9F` and a five-entry vtable at `804B1FA0`. Existing held code,
+loop-volume state, the module guard, and the 60-KiB resident allocation retain
+their bounds. Twenty-four descriptors fit; actual room rigs use six joints and
+five visible lists. The native actor's seven used morph vectors end at `204`;
+eight of the remaining twelve morph-work bytes hold per-instance speed/target.
+No native tail field, saved field, or joint matrix is borrowed for this state.
+Drawing uses the actor's current matrix bank and the actual parent transform,
+checking opaque and translucent command capacity before submission.
+
+Registry version one reserves source `1FF0/1FF4/1FF8/1FFC` as destination
+`3C00/3C04/3C08/3C0C`, beyond the complete `3800..3BFC` garment range. Source
+`3000..300C` retains its canonical destinations. These fixed reservations do not
+install profiles, set save-profile bits, or create selectable imports. Category
+integration must connect the real parent, catalogue membership, room conversion,
+and inverse pickup before enabling these records. See the
+[runtime checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-room-rig-runtime).
 
 The `switch-palette-fade` category discovers the complete shared building-model
 callbacks. It checks all four compiled functions, normalising only verified
