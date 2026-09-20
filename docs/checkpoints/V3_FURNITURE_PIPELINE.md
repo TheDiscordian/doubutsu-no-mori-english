@@ -1,5 +1,85 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared tool input predicates
+
+The explicit proposal is ABI 129 at
+`build/v3-shared-tool-controls-02/build-lock.json`. It retains 128 choices, all
+installed artwork, fixed identities, the 60-KiB equipment allocation, format-2
+saves/profile, and the corrected V2-12 no-import baseline. The main ABI-109 lock
+and both served V2 patchers remain unchanged.
+
+- ROM SHA-256:
+  `ab3197986d49b6f5f7cdcb58ab0746b05467e6eb602d814a0ba9d8a140650a16`.
+- Report SHA-256:
+  `a8b753115a50f18e71c73220cff69591543fe34bc887c8041954b9b816f0acc3`.
+- UPS SHA-256:
+  `2bb79e4978753672f7f174ae96411fe124bb453dd59f80009cb6a31a5676563c`.
+
+The ordinary N64 axe/net/rod/shovel input functions compare only original kind
+values. The source GameCube functions use tool families including worn axes and
+golden variants. One shared 132-byte adapter at `804A59C8` calls the actual
+native visible-equipment reader, then classifies its result only for these input
+predicates. Pickup and tree shaking receive valid non-tool classification for
+imported passive equipment. The separate umbrella-spin input is unchanged.
+Actual equipment IDs, kinds, renderer/effect decisions, saved identities, and
+selected-only lookup remain intact.
+
+The existing `--refresh-runtime --player-actions` path installs the change. Six
+complete source/native consumers and the complete current owner are checked.
+Exactly six JAL instructions change, and their six obsolete local relocations
+are removed. The owner/relocation allocations stay fixed. All old action code,
+constants, public entries, callbacks, tables, and resource bindings retain their
+values. The complete action image occupies 2,636 bytes in its 4-KiB reservation.
+
+The first build rejects movement of the existing constant pool caused by adding
+another ordinary text section. The adapter's dedicated appended section keeps
+that pool and all prior instructions intact; the corrected build passes the
+exact-retention guard. The unsigned range calculation also avoids signed overflow
+for rejected extreme inputs. Neither issue produced a distributed cartridge.
+
+Four focused checks pass in 6.174 seconds: sanitizer execution across all signed
+kind values and action arguments, extreme-value rejection, complete donor/native
+consumers, all 79 source category bindings, actual hooks and relocations at two
+owner bases, retained old code/resources/identities, unchanged profiles/saves,
+unrelated DMA resources, original-ROM UPS reconstruction, and exact empty/all
+composition. Golden-tool IDs are explicitly absent from the choice catalogue.
+No translation wording is added, so the single text provenance catalogue stays
+unchanged.
+
+The first silent native attempt verifies the complete module and loaded player
+owner, then stops because the generic debugger's direct-call proof is limited
+to four-MiB code addresses. The fixture is corrected to enter through the actual
+relocated N64 controller functions, whose installed calls reach the Expansion
+Pak adapter. It neither relaxes the debugger's restriction nor uploads code.
+
+The single justified retry at `build/smoke-v3-tool-controls-02/` passes 128
+records and 106 assertions (102 fixture assertions plus startup/final guards).
+It executes all six actual input functions with original axe/net/rod/shovel
+kinds and representative golden-tool, balloon, and fan kinds. Net held-A versus
+other tools' triggered-A, released input, pickup/tree shaking, hidden-item and
+scene rejection, disabled-profile rejection, and unmodified real kinds pass.
+All native calls restore the stack. Selected profile, equipment source, input
+data, selector row, and scene are restored; save state and module/heap guards
+are intact. The checkpoint is restored and emulation exits cleanly. Results
+SHA-256:
+`3b8348896fdfce276db1010005fede6265e52b4a0dd8c073c03f8d2f92f9d641`.
+
+This run uses title-demo controller input and temporary isolated selector data
+for the extended kinds. It is not ordinary tool gameplay, golden effects,
+acquisition, a save-cycle test, or hardware verification. No user save is used
+and no FlashRAM test write is requested. The setup retry allowance is spent;
+retain this passing result instead of replaying it.
+
+Next connect source-correct net/rod held and inventory consumers through the
+existing shared adapters, then special effects and parent/acquisition consumers.
+The donor's net capture code distinguishes radius 21/span 60 from ordinary
+15/50. Ordinary and special fish actors have golden-rod detection/approach/bite
+consumers; the shovel forwards a golden flag into digging. Axe wear and golden
+acquisition/demo state also need source/native comparison. All these are required
+before enabling tool choices; the control adapter does not declare the imports
+complete. Keep matching-or-larger V3 save profiles, never use imported saves in
+V2, and preserve the current patchers until user testing and approval.
+
 ## Shared room gameplay repairs
 
 The current explicit proposal is ABI 128 at

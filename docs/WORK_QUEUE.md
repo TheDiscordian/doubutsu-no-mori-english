@@ -2,12 +2,32 @@
 
 ## Active: V3 optional GameCube imports
 
-The current explicit proposal is ABI 128,
-`build/v3-room-parent-gameplay-fix-04/build-lock.json`. All eight balloons are
+The current explicit proposal is ABI 129,
+`build/v3-shared-tool-controls-02/build-lock.json`. All eight balloons are
 connected through shared source-derived parent records, room profiles, indoor
 conversion/pickup, collection/catalogue, complete icons, and optional selection.
 There are 128 experimental choices, with 24 equipment parents. Neither served
 V2 patcher nor the main lock changes.
+
+Shared tool-input classification is installed. All six actual native predicates
+retain their original controller semantics and now classify imported families
+without overwriting real equipment identities. Four focused checks pass; the
+silent native retry passes 128 records/106 assertions, including pressed versus
+held input, actual original/golden-family kinds, hidden/scene/profile rejection,
+restored state, guards, and clean exit. It uses synthetic selector data for
+unselected extended kinds, not ordinary golden-tool gameplay. The setup retry
+allowance is spent; retain the passing evidence. See the
+[checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-tool-input-predicates).
+
+Next extend the existing shared equipment/inventory adapters for source-correct
+net/rod drawing and animation, then golden effects and parent consumers. Reuse
+the complete installed model/motion resources. Source golden-net capture is
+21/60 rather than 15/50; golden-rod consumers are in both ordinary and special
+fish actors; the shovel forwards a golden flag into digging effects. Those are
+real implementation dependencies, not reasons to enable ordinary-tool substitutes.
+Check axe wear and acquisition/demos against both games. Keep all tool choices
+disabled until the required gameplay, inventory, acquisition, and persistence
+consumers are connected. Do not replay the completed input checks for unchanged code.
 
 All eight balloon inventory
 previews have their actual idle animation and reflection drawer. Three focused
@@ -73,9 +93,9 @@ Net/rod behaviour and golden-tool differences remain explicit. Resources do
 not enable these imports. See the
 [capacity checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-rig-capacity-and-resource-extension).
 
-Next work uses the explicit ABI-128 lock above. All eight pinwheels have shared
+Next work uses the explicit ABI-129 lock above. All eight pinwheels have shared
 parent readers, pocket artwork, collection/catalogue, existing event acquisition,
-and individual experimental selections. The full proposal has 120 choices;
+and individual experimental selections. The full proposal has 128 choices;
 existing fans and fixed identities are retained. No per-item installers or
 repeated first-install stages are needed. The native catalogue, corrected
 purchase fixture, and real browser worker pass; ordinary pinwheel gameplay and

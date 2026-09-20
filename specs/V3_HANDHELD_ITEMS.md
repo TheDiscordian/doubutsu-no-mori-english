@@ -707,6 +707,58 @@ resident-memory, actor, saved-format, or optional-profile growth. The current
 [checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-equipment-kind-readers)
 records native relocation/readers and representative motion-transfer evidence.
 
+### Shared tool input predicates
+
+On the complete animated-parent build, `--refresh-runtime --player-actions`
+installs the shared tool-control adapter. Six original input functions retain
+their entire controller logic: pickup, axe, net, rod, shovel, and tree shaking.
+Only their calls to the visible-equipment reader change. The adapter calls that
+same native reader first, preserving selected-profile, scene, hidden-item, and
+forced-visibility rules; it then supplies a family value to the input predicate.
+
+| Actual kind | Source kind | Input family |
+| --- | --- | --- |
+| Original `0..35` | Native N64 | Unchanged |
+| `36..44` | Axes `0..8` | Native axe `0` |
+| `45..46` | Nets `9..10` | Native net `1` |
+| `47..86` | Umbrellas `11..50` | Valid non-tool `2` |
+| `87..88` | Rods `51..52` | Native rod `34` |
+| `89..90` | Shovels `53..54` | Native shovel `35` |
+| `91..114` | Balloons, pinwheels, fans `55..78` | Valid non-tool `2` |
+
+Invalid kinds and the native empty sentinel retain their values. This is a local
+input classification, not replacement of the actual equipment kind: renderers,
+animations, collision/effects, inventory, and saves still see the original kind.
+The umbrella-spin input is deliberately not hooked; passive toys must not start
+an umbrella action. Pickup's title-demo test treats imported passive items as
+valid equipment, while tree shaking retains the donor's non-tool behaviour.
+The net retains held-A input; axe, shovel, and rod retain triggered-A input.
+
+The 132-byte adapter is appended after the existing action constants at
+`804A59C8`. Every prior code byte, constant address, public entry, and callback
+is retained. The complete action image is 2,636 bytes within its existing 4-KiB
+reservation. Six old local-call relocations are removed; the owner and relocation
+allocations do not grow. The shared module stays 60 KiB, and startup checksums
+cover the complete updated module. All six complete donor/native consumers,
+installed owner hashes, old code, and unused reservation are checked before use.
+
+This adapter does not enable tool imports or substitute ordinary-tool behaviour
+for golden effects. Golden-net local capture radius is 21 rather than 15, and
+its capture span is 60 rather than 50, in donor
+`m_player_main_swing_net.c_inc`. Both `ac_gyo_test.c` and `ac_gyo_kaseki.c` select
+golden-rod response data from the real equipped item; detection, approach, and
+bite timing consumers need integration. The shovel action forwards a golden
+flag to `mPlib_Check_scoop_after`; its effects and golden-shovel acquisition/demo
+paths remain required. Verify axe wear/identity handling against both games
+before treating native axe actions as complete golden-axe support.
+
+Next connect source-correct tool animation/drawing consumers and these effects,
+then their shared parent/inventory/catalogue/acquisition/save-profile records.
+Ordinary N64 tools are not new import choices. Keep complete source models and
+fixed identities; do not make an independent installer or test per tool.
+Evidence and limits are in the
+[tool-control checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-tool-input-predicates).
+
 ### Extended action tables
 
 `--refresh-runtime --player-actions` installs shared action-table capacity in the

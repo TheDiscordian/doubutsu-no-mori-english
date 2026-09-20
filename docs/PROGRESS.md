@@ -18,13 +18,28 @@ served patchers retain their existing builds.
 
 ## Active development
 
-The current explicit ABI-128 proposal is
-`build/v3-room-parent-gameplay-fix-04/build-lock.json`. All eight balloons are
+The current explicit ABI-129 proposal is
+`build/v3-shared-tool-controls-02/build-lock.json`. All eight balloons are
 connected through the shared parent-category installer: official names/prices,
 complete pocket icons, held/inventory animation, source acquisition records,
 collection/catalogue, animated room profiles, indoor conversion, and inverse
 pickup. The local composer has 128 experimental choices, including 24 equipment
 parents. These are not a public or hardware-ready handoff.
+
+The shared tool-input adapter connects all four active tool families to the
+native input predicates while retaining their real kinds and existing scene/
+profile rules. Pickup and tree shaking also recognise imported passive items
+correctly; umbrella-spin behaviour stays separate. The 132-byte adapter fits
+the existing code reservation without moving any prior callback or constant.
+Four focused checks pass. The silent native check passes 128 records and 106
+assertions across the six real controller functions, original/golden-family
+kinds, pressed/held inputs, rejection paths, guards, state restoration, and clean
+exit. Extended kinds use temporary fixture data, not enabled golden-tool choices.
+
+Tool animation/drawing, golden effects, and complete parent/acquisition support
+remain required. Continue these shared categories from the current lock; retain
+the completed controller evidence. See the
+[tool-control checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-tool-input-predicates).
 
 The shared installer repairs actual room-footprint metadata, permits the native
 eight-byte graphics alignment, and combines catalogue/icon owner edits without
@@ -85,7 +100,7 @@ actual initialization/hand tracking/animation/drawing commands, matrix and memor
 guards, saved-state retention, checkpoint restoration, and clean exit. This is
 component execution, not GPU appearance, ordinary gameplay, or hardware proof.
 
-Use the ABI-128 lock above for continued work. Reuse the
+Use the ABI-129 lock above for continued work. Reuse the
 passing eight-vector player/inventory allocation evidence. The main lock and
 both patchers stay unchanged. See the
 [balloon-action checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-balloon-actions).
@@ -142,7 +157,7 @@ The actual browser worker matches offline empty/all/mixed/equipment outputs
 using both supplied games. Its unserved export is
 `build/v3-held-category-browser-01/`; neither served patcher changes.
 
-Continue from `build/v3-room-parent-gameplay-fix-04/build-lock.json` explicitly. Retain
+Continue from `build/v3-shared-tool-controls-02/build-lock.json` explicitly. Retain
 passing animation, sound, and inventory evidence for unchanged implementations.
 The 60-KiB equipment module, 15,584-byte inventory bank, and format-2 save layout
 retain their current ownership; outdoor banks hold 7,168 bytes each. Pinwheel profile bits require a

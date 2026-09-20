@@ -957,7 +957,110 @@ def held_collection(debug,rom_path,record):
         ordinary_gameplay_tested=False,catalogue_screen_tested=False,requires_checkpoint_restore=True)
 
 
+def tool_controls(debug,rom_path,record):
+    """Execute current cartridge input consumers with isolated equipment data."""
+    from aflib import CODE_RAM,CODE_VROM
+    import v3_equipment_runtime as equipment
+    path=Path(rom_path);image=path.read_bytes();report=json.loads((path.parent/'build.json').read_bytes())
+    if sha256(image)!=report['output_sha256']:raise ValueError('Changed tool-control cartridge')
+    e=report['equipment_resources'];actions=e['player_actions'];controls=actions['tool_controls']
+    files=by_vrom(image);blob=files[runtime.BLOB].extract(image);core=files[CODE_VROM].extract(image)
+    module=blob[e['blob_offset']:e['blob_offset']+e['bytes']];assertions=0
+    def check(label,at,want):
+        nonlocal assertions
+        actual=debug.read_memory(at,len(want));ok=actual==want
+        record(dict(tool_controls_check=label,address=f'{at:08X}',bytes=len(want),
+            assertion='passed' if ok else 'failed'))
+        if not ok:raise ValueError('Tool-control mismatch: '+label)
+        assertions+=1
+    def call(address,args=(),want=None,proof=None):
+        nonlocal assertions
+        result=debug.call(f'{address:08X}',list(args),return_address=MODULE_RAM+0x6480,verified_code=proof)
+        if want is not None:
+            result['assertion']='passed' if result['return_value']==want else 'failed';assertions+=1
+        record(result)
+        if want is not None and result['return_value']!=want:raise ValueError('Native tool control returned wrong class/input')
+        return result['return_value']
+    def core_call(entry,end,args=()):
+        return call(entry,args,proof=(entry,core[entry-CODE_RAM:end-CODE_RAM]))
+    check('complete cartridge-loaded equipment code',equipment.RAM,module)
+    constructor=struct.unpack('>I',debug.read_memory(0x80143900,4))[0]
+    owner=constructor-(0x808DD748-equipment.PLAYER_RAM)
+    data=files[equipment.PLAYER_VROM].extract(image);rel=files[equipment.PLAYER_RELOC].extract(image)
+    sections=struct.unpack_from('>5I',rel)
+    if owner&15 or not MODULE_RAM+0x8000<=owner<=0x80400000-len(data):raise ValueError('Missing loaded player')
+    loaded=relocate_verified_data(SimpleNamespace(ram=equipment.PLAYER_RAM,resident_bytes=len(data),sections=sections),data,rel,owner)
+    check('complete game-loaded player text',owner,loaded[:sections[0]])
+    def owner_call(entry,end,args=(),want=None):
+        at=owner+entry-equipment.PLAYER_RAM
+        return call(at,args,want,(at,loaded[entry-equipment.PLAYER_RAM:end-equipment.PLAYER_RAM]))
+    title=core_call(0x8007D90C,0x8007D91C)
+    actual_game=struct.unpack('>I',debug.read_memory(0x8010EF90,4))[0]
+    if title:
+        controller=core_call(0x800B593C,0x800B594C);field=controller+0x3C
+        button_spans=((controller+0x38,4),)
+    else:
+        private=struct.unpack('>I',debug.read_memory(0x80136FD8,4))[0];field=private+0x3EC
+        button_spans=((actual_game+0x14,2),(actual_game+0x20,2))
+    table=actions['equipment_selection']['table_ram']+16+(0x2239-0x2200)*8
+    spans=((field,2),(0x80460020,192),(0x80126EB4,4),(table,8),*button_spans)
+    if any(not 0x80000400<=a<=0x80800000-n for a,n in spans):raise ValueError('Invalid tool fixture data')
+    saved={a:debug.read_memory(a,n) for a,n in spans};save_state=debug.read_memory(0x8046C000,864)
+    allocation=call(0x8009BFC0,[0x3200]);actor=allocation+16;game=allocation+0x1400
+    if allocation&15 or not MODULE_RAM+0x8000<=allocation<=0x803FCE00:raise ValueError('Tool fixture allocation failed')
+    edge=b'V3TC'*4;debug.write_memory(allocation,edge+bytes(0x31E0)+edge)
+    debug.write_memory(game+0x1C90,struct.pack('>I',actor));debug.write_memory(actor+0xCF0,struct.pack('>I',7))
+    debug.write_memory(actor+0xE65,b'\1')
+    def buttons(trigger,held,b=0):
+        if title:debug.write_memory(controller+0x38,bytes((trigger,held,b,b)))
+        else:
+            debug.write_memory(actual_game+0x14,struct.pack('>H',(0x8000 if held else 0)|(0x4000 if b else 0)))
+            debug.write_memory(actual_game+0x20,struct.pack('>H',(0x8000 if trigger else 0)|(0x4000 if b else 0)))
+    predicates=[r for r in controls['consumers'] if r['symbol'].rsplit('for',1)[-1] in ('Axe','Net','Rod','Scoop')]
+    try:
+        profile=bytearray(saved[0x80460020]);profile[159]|=0x80
+        debug.write_memory(0x80460020,profile);debug.write_memory(0x80126EB4,bytes(4))
+        cases=((0x2201,0,0),(0x2200,1,1),(0x2203,34,34),(0x2202,35,35),
+               (0x2239,44,0),(0x2239,46,1),(0x2239,88,34),(0x2239,90,35),
+               (0x2239,91,2),(0x2239,107,2))
+        for item,kind,family in cases:
+            if item==0x2239:debug.write_memory(table,struct.pack('>HbBHBB',item,kind,int(family==2),159,0x80,1))
+            debug.write_memory(field,struct.pack('>H',item));buttons(1,1)
+            owner_call(0x808BD5C4,0x808BD668,[actor,7],kind)
+            # Enter through the real relocated N64 callers. Their installed
+            # calls exercise the Expansion Pak adapter without uploaded code.
+            for row,wanted in zip(predicates,(0,1,34,35)):
+                owner_call(row['entry'],row['end'],[game],int(family==wanted))
+            if family in (0,1,34,35):
+                index=(0,1,34,35).index(family);row=predicates[index];buttons(0,1)
+                owner_call(row['entry'],row['end'],[game],int(family==1))
+                buttons(0,0);owner_call(row['entry'],row['end'],[game],0)
+            buttons(1,1)
+            for name,want in (('Pickup',0),('Shake_tree',int(family==2))):
+                row=next(r for r in controls['consumers'] if r['symbol']=='Player_actor_CheckController_for'+name)
+                owner_call(row['entry'],row['end'],[game],want)
+            record(dict(tool_family=family,actual_kind=kind,synthetic_extended_selector=item==0x2239))
+        # Original selector guards still precede classification.
+        debug.write_memory(actor+0xE64,b'\1');owner_call(0x808BD5C4,0x808BD668,[actor,7],0xFFFFFFFF)
+        debug.write_memory(actor+0xE64,b'\0');debug.write_memory(0x80126EB4,struct.pack('>I',35))
+        owner_call(0x808BD5C4,0x808BD668,[actor,7],0xFFFFFFFF)
+        debug.write_memory(0x80126EB4,bytes(4));profile[159]&=0x7F;debug.write_memory(0x80460020,profile)
+        owner_call(0x808BD5C4,0x808BD668,[actor,7],0xFFFFFFFF)
+        check('saved state unchanged',0x8046C000,save_state)
+        for a in (allocation,allocation+0x31F0):check('scratch guard',a,edge)
+    finally:
+        for a,data in saved.items():debug.write_memory(a,data)
+        call(0x8009C040,[allocation])
+    for a,data in saved.items():check('restored selector/profile/input state',a,data)
+    check('complete equipment module restored',equipment.RAM,module)
+    check('no fault',0x8003CE34,bytes(4));check('translation guard',0x8019C8D0,bytes.fromhex('AF32C0DE')*4)
+    return dict(native_shared_tool_controls=True,assertions=assertions,title_demo_input=bool(title),
+        code_uploaded=False,synthetic_equipment_data=True,ordinary_gameplay_tested=False,
+        golden_effects_tested=False,flash_written=False,requires_checkpoint_restore=True)
+
+
 def exercise(debug, rom_path, record, *, section='automatic_furniture'):
+    if section=='tool_controls':return tool_controls(debug,rom_path,record)
     if section=='held_catalogue':
         from v3_catalogue_smoke import held_previews
         return held_previews(debug,rom_path,record)

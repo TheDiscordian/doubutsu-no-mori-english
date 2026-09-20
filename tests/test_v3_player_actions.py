@@ -10,7 +10,7 @@ import zlib
 
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'tools'))
-from aflib import CODE_VROM,by_vrom,sha256,apply_ups,n64_checksum
+from aflib import CODE_VROM,by_vrom,sha256,apply_ups,n64_checksum,u32
 from v3_asset_loader import BLOB,MODULE,STARTUP,CONFIG
 from v3_furniture_install import inputs,reuse_resource_tail
 from npc_mail_show import relocate_verified_data
@@ -25,6 +25,96 @@ SELECTION=ROOT/os.environ.get('V3_HELD_SELECTION_BUILD','build/v3-held-selection
 PARENTS=ROOT/os.environ.get('V3_HELD_PARENTS_BUILD','build/v3-held-parent-readers-01')
 ICONS=ROOT/os.environ.get('V3_POCKET_ICONS_BUILD','build/v3-held-pocket-icons-01')
 INVENTORY=ROOT/os.environ.get('V3_INVENTORY_EQUIPMENT_BUILD','build/v3-inventory-equipment-03')
+TOOLS=ROOT/os.environ.get('V3_TOOL_CONTROLS_BUILD','build/v3-shared-tool-controls-02')
+
+
+@unittest.skipUnless((TOOLS/'build-lock.json').is_file(),'Current shared tool controls required')
+class ToolControlsTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.rom,cls.report=inputs(TOOLS/'build-lock.json')
+        cls.base,cls.prior=inputs(TOOLS/'base-lock.json')
+        cls.files,cls.before=by_vrom(cls.rom),by_vrom(cls.base)
+        cls.e=cls.report['equipment_resources'];cls.old=cls.prior['equipment_resources']
+        cls.controls=cls.e['player_actions']['tool_controls']
+        cls.blob=cls.files[BLOB].extract(cls.rom);cls.oldblob=cls.before[BLOB].extract(cls.base)
+
+    def test_complete_controller_functions_and_exact_relocation_changes(self):
+        owner=self.files[actions.PLAYER_VROM].extract(self.rom)
+        previous=self.before[actions.PLAYER_VROM].extract(self.base)
+        restored=bytearray(owner);controls=self.controls
+        source=actions.Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+            (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+        self.assertEqual(len(controls['patches']),6)
+        for row,consumer,donor in zip(controls['patches'],controls['consumers'],controls['source_functions']):
+            self.assertEqual(source.function(donor['offset'])[1],donor)
+            at=row['offset'];self.assertEqual(u32(owner,at),actions.jump(controls['entry'],link=True))
+            self.assertEqual(u32(previous,at),row['before'])
+            self.assertEqual(consumer['call'],actions.PLAYER_RAM+at)
+            a,b=consumer['entry']-actions.PLAYER_RAM,consumer['end']-actions.PLAYER_RAM
+            self.assertEqual(sha256(previous[a:b]),consumer['sha256'])
+            struct.pack_into('>I',restored,at,row['before'])
+        self.assertEqual(restored,previous)
+        rel=self.files[actions.PLAYER_RELOC].extract(self.rom)
+        old_rel=self.before[actions.PLAYER_RELOC].extract(self.base)
+        sections=struct.unpack_from('>5I',rel);old_sections=struct.unpack_from('>5I',old_rel)
+        self.assertEqual(sections[:4],old_sections[:4]);self.assertEqual(len(rel),len(old_rel))
+        self.assertEqual(sections[4],old_sections[4]-6)
+        old_rows=struct.unpack_from('>'+str(old_sections[4])+'I',old_rel,20)
+        rows=struct.unpack_from('>'+str(sections[4])+'I',rel,20)
+        self.assertEqual(list(rows),[r for r in old_rows if r not in controls['removed_relocations']])
+        spec=SimpleNamespace(ram=actions.PLAYER_RAM,resident_bytes=len(owner),sections=sections)
+        for base in (0x80200010,0x80378010):
+            loaded=relocate_verified_data(spec,owner,rel,base)
+            for row in controls['patches']:self.assertEqual(u32(loaded,row['offset']),row['after'])
+        self.assertEqual(sha256(owner),self.e['player_actions']['owner_sha256'])
+        self.assertEqual(sha256(rel),self.e['player_motion']['reloc_sha256'])
+
+    def test_old_code_resources_and_actual_kind_identities_are_retained(self):
+        old=self.old['player_actions']['code'];new=self.e['player_actions']['code']
+        at=self.e['blob_offset'];first=at+actions.CODE_OFFSET;last=at+actions.PARENT_CODE_OFFSET
+        self.assertEqual(self.blob[first:first+old['bytes']],self.oldblob[first:first+old['bytes']])
+        self.assertEqual(self.blob[at:first],self.oldblob[at:first])
+        self.assertEqual(self.blob[last:at+self.e['bytes']],self.oldblob[last:at+self.old['bytes']])
+        self.assertEqual(sha256(self.blob[first:first+new['bytes']]),new['sha256'])
+        for name,value in old['symbols'].items():self.assertEqual(new['symbols'][name],value)
+        self.assertEqual(new['symbols']['af_v3_player_control_kind'],self.controls['entry'])
+        self.assertLessEqual(first+new['bytes'],last)
+        for key in ('kind_readers','records','held_rig_actions','inventory_preview','room_rigs',
+                    'optional_selection','parent_readers','pocket_icons','catalogue','event_acquisition'):
+            self.assertEqual(self.e[key],self.old[key],key)
+        for key in ('equipment_selection','tables','held_dispatch','fan_activation'):
+            self.assertEqual(self.e['player_actions'][key],self.old['player_actions'][key])
+        # Independent source-derived item-main categories agree with every
+        # extended kind family; the hook never overwrites the real kind table.
+        family={1:0,2:1,10:2,11:34,20:35,21:2,22:2,23:2}
+        self.assertEqual(len(self.e['kind_readers']['rows']),79)
+        for row in self.e['kind_readers']['rows']:
+            kind=row['native_kind'];self.assertEqual(kind,36+row['source_kind'])
+            expected=0 if kind<45 else 1 if kind<47 else 2 if kind<87 else 34 if kind<89 else 35 if kind<91 else 2
+            self.assertEqual(family[row['item_main']],expected)
+
+    def test_patch_profile_original_consumers_and_optional_composition(self):
+        import v3_optional_composition as composer
+        original=(ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes()
+        self.assertEqual(apply_ups(original,(TOOLS/'asset-loader.ups').read_bytes()),self.rom)
+        for v in self.files.keys()-{BLOB,MODULE,CODE_VROM,actions.PLAYER_VROM,actions.PLAYER_RELOC}:
+            self.assertEqual(self.files[v].extract(self.rom),self.before[v].extract(self.base),hex(v))
+        self.assertEqual(self.files[CODE_VROM].extract(self.rom),self.before[CODE_VROM].extract(self.base))
+        self.assertEqual(self.e['bytes'],self.old['bytes'])
+        self.assertEqual(self.report['save_runtime'],self.prior['save_runtime'])
+        self.assertFalse(self.report['shared_runtime_refresh']['saved_profile_changed'])
+        self.assertFalse(self.report['shared_runtime_refresh']['saved_format_changed'])
+        self.assertFalse(self.controls['golden_effects_installed'])
+        pin=composer.BASE,composer.BASE_SHA,composer.REPORT_SHA,composer.ABI
+        try:
+            composer.use_build_lock(TOOLS/'build-lock.json');catalog=composer.catalogue(self.rom,self.report)
+            self.assertEqual(len(catalog),128)
+            for item in ('2239','223A','223B','223C'):self.assertNotIn('GAFE01-r0/item/'+item,catalog)
+            self.assertEqual(sha256(composer.compose(self.rom,self.report,catalog,composer.resolve(catalog,[]))[0]),
+                self.report['translation_baseline']['sha256'])
+            self.assertEqual(composer.compose(self.rom,self.report,catalog,composer.resolve(catalog,list(catalog)))[0],self.rom)
+        finally:composer.BASE,composer.BASE_SHA,composer.REPORT_SHA,composer.ABI=pin
 
 
 @unittest.skipUnless((INVENTORY/'build.json').is_file(),'Current inventory-preview cartridge required')
@@ -183,6 +273,9 @@ class PocketIconTests(unittest.TestCase):
 
 class SelectionHostTests(unittest.TestCase):
     sanitized=shared_tests.HostTests.sanitized
+
+    def test_shared_tool_kind_predicates(self):
+        self.sanitized('v3_tool_controls_test.c')
 
     def test_selected_equipment_bounds_and_passive_permissions(self):
         self.sanitized('v3_held_selection_test.c')

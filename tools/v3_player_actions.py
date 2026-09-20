@@ -74,7 +74,7 @@ SOURCES = ('tools/v3_player_actions.py','tools/v3_furniture_pipeline.py',
            'overlays/v3/inventory_equipment.c','overlays/v3/inventory_equipment.S',
            'overlays/v3/inventory_equipment.ld',
            'overlays/v3/held_rigs.c','overlays/v3/held_rigs.S',
-           'overlays/v3/held_rigs.ld') + sound_programs.SOURCES
+           'overlays/v3/held_rigs.ld','overlays/v3/tool_controls.c') + sound_programs.SOURCES
 
 SELECTION_OFFSET=0x5500
 PARENT_CODE_OFFSET,PARENT_TABLE_OFFSET=0x3000,0x57F0
@@ -82,6 +82,75 @@ POCKET_ICON_OFFSET=0x3800
 RIG_CODE_OFFSET,RIG_MODULE_SIZE=0xD000,0xE000
 RIG_STATE_OFFSET,RIG_STATE_BYTES,RIG_PLAYER_SIZE=0x12D8,44,0x1310
 BALLOON_MODULE_SIZE,BALLOON_STATE_OFFSET,BALLOON_STATE_BYTES=0xF000,0x1370,48
+
+
+def refresh_tool_controls(base,prior,blob,core,original,output):
+    """Extend shared input predicates without changing actual equipment IDs."""
+    old=prior['equipment_resources'];actions=old['player_actions'];start=old['blob_offset']
+    module=bytearray(blob[start:start+old['bytes']]);files=by_vrom(base)
+    owner=bytearray(files[PLAYER_VROM].extract(base));rel=files[PLAYER_RELOC].extract(base)
+    native=by_vrom(original)[PLAYER_VROM].extract(original)
+    if (actions.get('tool_controls') or not old.get('inventory_preview',{}).get('balloon_drawer')
+            or sha256(module)!=old['sha256'] or sha256(owner)!=actions['owner_sha256']
+            or sha256(rel)!=actions['relocation_sha256']):
+        raise ValueError('Tool controls require the complete current equipment module')
+    previous=actions['code'];at=CODE_OFFSET;n=previous['bytes'];limit=PARENT_CODE_OFFSET
+    if sha256(module[at:at+n])!=previous['sha256'] or any(module[at+n:limit]):
+        raise ValueError('Changed action-code reservation before shared tool controls')
+    source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+                  (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    specs=(
+        ('Pickup',0x164324,152,'21df739a8363df4f676e21edb6256fedeb70b9a186e1fb7f5adda2b66ec65b68',0x808B2D50,0x808B2DE4),
+        ('Axe',0x1643BC,124,'4fdabbae802568a90fec294d0bf9707a13b2bfb3288d9bee446ab6e06521e137',0x808B2DE4,0x808B2E4C),
+        ('Net',0x164438,124,'667daedb17150ced36643148578bb42b10e7d884f8c2d7bbb88900c2ce540e2a',0x808B2E4C,0x808B2EB8),
+        ('Rod',0x1644B4,124,'4462d5c6d71c2531e62915097da7c6a2e5b8e76b2431a6f255a8b4ca5ffac650',0x808B2EB8,0x808B2F24),
+        ('Scoop',0x164530,124,'de3fb93262a497cfa23d2005eb3b23b17b1ad6ff3442a0bc07fc2303c78551ff',0x808B2F24,0x808B2F90),
+        ('Shake_tree',0x1646DC,228,'986de9cd1b5a36444a1a2ada4f0c76fbc584ac90ad8596974b5964d1c37de5e0',0x808B3010,0x808B30B4))
+    _,_,records,locations,_=native_references(owner,rel)
+    sources=[];consumers=[];removed=[];patches=[]
+    expected_call=jump(0x808BD5C4,link=True)
+    for name,offset,size,digest,first,last in specs:
+        raw,receipt=source.function(offset)
+        if (receipt['symbol']!='Player_actor_CheckController_for'+name or len(raw)!=size or sha256(raw)!=digest):
+            raise ValueError('Changed complete donor tool input predicate')
+        a,b=first-PLAYER_RAM,last-PLAYER_RAM
+        if owner[a:b]!=native[a:b]:raise ValueError('Changed complete native tool input predicate')
+        calls=[i for i in range(a,b,4) if u32(owner,i)==expected_call]
+        if len(calls)!=1 or locations.get(calls[0],0)>>24!=0x44:
+            raise ValueError('Tool predicate lacks one native relocated kind call')
+        call=calls[0];removed.append(locations[call]);sources.append(receipt)
+        consumers.append(dict(symbol=receipt['symbol'],entry=first,end=last,
+            sha256=sha256(owner[a:b]),call=PLAYER_RAM+call))
+        patches.append(dict(offset=call,before=expected_call))
+    # Append the common adapter while requiring every existing callback and
+    # public reader address to stay fixed; no incidental rebinding is needed.
+    code,compiled=compile_part('player_actions',output/'player_actions',
+        primary_source='overlays/v3/player_actions.S',
+        extra_sources=('overlays/v3/player_actions.c','overlays/v3/held_selection.c','overlays/v3/tool_controls.c'),
+        defines=tuple(flag[2:] for flag in previous['flags'] if flag.startswith('-D')))
+    if (len(code)>limit-at or code[:n]!=module[at:at+n] or
+            any(compiled['symbols'].get(k)!=v for k,v in previous['symbols'].items())):
+        raise ValueError('Shared tool controls move or change installed action code')
+    target=compiled['symbols']['af_v3_player_control_kind']
+    for row in patches:
+        row['after']=jump(target,link=True)
+        struct.pack_into('>I',owner,row['offset'],row['after'])
+    remaining=[r for r in records if r not in removed]
+    relocated=bytearray(rel);struct.pack_into('>I',relocated,16,len(remaining))
+    relocated[20:20+len(records)*4]=struct.pack('>'+str(len(remaining))+'I',*remaining)+bytes(4*len(removed))
+    module[at:limit]=code+bytes(limit-at-len(code))
+    blob[start:start+len(module)]=module
+    report=copy.deepcopy(old);current=report['player_actions']
+    current.update(code=compiled,owner_sha256=sha256(owner),relocation_sha256=sha256(relocated),
+        patches=current['patches']+patches,removed_relocations=current['removed_relocations']+len(removed))
+    current['tool_controls']=dict(format='AFV3-TOOL-CONTROLS-1',source_functions=sources,
+        consumers=consumers,patches=patches,removed_relocations=removed,entry=target,
+        original_kinds=36,extended_kinds=79,actual_kind_retained=True,
+        umbrella_spin_retained=True,profile_bits_enabled=0,logical_imports_added=0,
+        golden_effects_installed=False,ordinary_gameplay_tested=False)
+    report['player_motion'].update(owner_sha256=sha256(owner),reloc_sha256=sha256(relocated))
+    report.update(sha256=sha256(module),crc32=zlib.crc32(module))
+    return report,{PLAYER_VROM:bytes(owner),PLAYER_RELOC:bytes(relocated)}
 
 
 def refresh_balloon_actions(base,prior,blob,core,original,output):
@@ -1018,6 +1087,9 @@ def expanded_tables(source,owner,reloc,*,categories=CATEGORIES,native_count=NATI
 
 def install(base,prior,blob,core,original,output):
     old=prior.get('equipment_resources',{})
+    if (old.get('inventory_preview',{}).get('balloon_drawer') and
+            not old.get('player_actions',{}).get('tool_controls')):
+        return refresh_tool_controls(base,prior,blob,core,original,output)
     if (old.get('inventory_preview',{}).get('animated_rigs_installed') and
             old.get('player_joint_work',{}).get('vectors',7)>
             old['inventory_preview'].get('joint_work',{}).get('vectors',7)):
