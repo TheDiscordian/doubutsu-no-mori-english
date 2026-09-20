@@ -660,6 +660,11 @@ class DonorTests(unittest.TestCase):
                 start,n=model['native_offset'],model['bytes']; faces=[]; state=[]; loads=[]
                 self.assertEqual(n,dict(sections)[model['layer']])
                 cache=[None]*32;matrices=[];matrix=-1;posed_cache=[None]*32;posed_faces=[]
+                inherited_vertices = descriptor.get('render_context', {}).get('external_vertices')
+                if inherited_vertices:
+                    count = inherited_vertices[2]//16
+                    cache[:count] = range(count)
+                    posed_cache[:count] = [(i, -1) for i in range(count)]
                 for a,b in struct.iter_unpack('>II',asset[start:start+n]):
                     op=a>>24
                     self.assertNotIn(op,(0x0A,0xD2,0xDE))
@@ -685,6 +690,8 @@ class DonorTests(unittest.TestCase):
                             posed_faces.append(tuple(posed_cache[i//2] for i in indices))
                 donor=models[model['layer']]['rows']
                 expected_faces=[];expected_cache=[None]*32;matrix=-1
+                if inherited_vertices:
+                    expected_cache[:inherited_vertices[2]//16] = [(i, -1) for i in range(inherited_vertices[2]//16)]
                 for command in donor:
                     if command['opcode']==0xDA:matrix=command['joint_matrix']
                     if command['opcode']==1:
@@ -712,7 +719,7 @@ class DonorTests(unittest.TestCase):
                     expected.append((0 if rgba16 else 3 if ia8 else 4 if intensity else 2,
                                      2 if rgba16 else 1 if ia8 else 0,
                                      w//4 if rgba16 else w//8 if ia8 else (w+15)//16,0,
-                                     0 if direct else 15,*wraps,*shifts))
+                                     0 if direct else command.get('palette_slot',15),*wraps,*shifts))
                     if command['opcode']==0xFD and direct!=last:
                         luts.append((0xE3001001,0 if direct else 0x8000));last=direct
                 actual=[(a>>21&7,a>>19&3,a>>9&511,a&511,b>>20&15,

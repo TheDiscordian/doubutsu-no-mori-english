@@ -213,13 +213,22 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
                 accessory=False, mirrored_s=False, garden=False, western=False,
                 large_western=False, water=False, camping=False, tent=False,
                 campfire_body=False, fire_effect=0, school=False, static_materials=False,
-                palette_bindings=None, palette_fade=False, joint_matrices=0):
+                palette_bindings=None, palette_fade=False, joint_matrices=0,
+                inherited_palette_slot=None, inherited_vertices=0):
     """Decode supported static materials and explicit dynamic dependencies, never GX loads."""
     if not raw or len(raw) % 8 or sum(map(bool, (speed_bag, accessory, mirrored_s,
                                               garden, western, large_western, water, camping,
                                               tent, campfire_body, fire_effect, school, static_materials))) > 1 or fire_effect not in (0, 1, 2):
         raise ValueError('Incomplete furniture display list')
     palette_bindings = {} if palette_bindings is None else palette_bindings
+    if inherited_palette_slot is not None and (
+            type(inherited_palette_slot) is not int or not 0 <= inherited_palette_slot <= 15
+            or not static_materials or palette or palette_bindings or palette_fade):
+        raise ValueError('Inherited palette requires an exclusive bounded static caller binding')
+    if (type(inherited_vertices) is not int or not 0 <= inherited_vertices <= 32
+            or inherited_vertices and (not static_materials or joint_matrices
+                                      or vertex_size != inherited_vertices * 16)):
+        raise ValueError('Inherited vertices require a complete bounded caller array')
     if (type(joint_matrices) is not int or not 0 <= joint_matrices <= 255
             or joint_matrices and not static_materials):
         raise ValueError('Joint matrices require a bounded shared skeleton material')
@@ -229,7 +238,8 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
                              or any(p not in palette for p in palette_bindings.values())):
         raise ValueError('Unsupported constant furniture palette binding')
     result, used = [], set()
-    at, loaded, first_vertex, material, have_palette = 0, 0, 0, None, False
+    at, loaded, first_vertex, material, have_palette = (
+        0, inherited_vertices, 0, None, inherited_palette_slot is not None)
     material_wrap, material_direct = None, False
     vertex_cache = [None]*32
     fire_tiles, fire_scroll = 0, False
@@ -264,6 +274,8 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
             elif (a, b) != (0xD7000002, 0):
                 raise ValueError('Unsupported furniture texture scale')
         elif op == 0xF0:
+            if inherited_palette_slot is not None:
+                raise ValueError('Model overwrites its inherited palette contract')
             allowed_palettes = palette if (campfire_body or static_materials) and isinstance(palette, tuple) else (palette,)
             if water or fire_effect or a != 0xF08F4010 or (not dynamic_palette and row['target'] not in allowed_palettes):
                 raise ValueError('Unsupported furniture palette load')
@@ -295,10 +307,13 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
                 wraps = (word >> 10 & 3, word >> 8 & 3)
                 pal=word>>12&15
                 if (word & 0xFFFF0000 != 0xD2F00000 or reserved or 3 in wraps
-                        or pal not in ((0,15) if intensity or rgba16 or ia8 else (15,))):
+                        or pal not in ((0,15) if intensity or rgba16 or ia8 else
+                                       (15 if inherited_palette_slot is None else inherited_palette_slot,))):
                     raise ValueError('Static material needs tile 0, a supported palette, and clamp/repeat/mirror')
                 row['wrap_modes'] = wraps
                 row['tile_shifts'] = (word>>4&15,word&15)
+                if inherited_palette_slot is not None and not (intensity or rgba16 or ia8):
+                    row['palette_slot'] = inherited_palette_slot
             elif fire_effect:
                 shapes = ((32, 64), (32, 32) if fire_effect == 1 else (64, 32))
                 tiles = ((0xD2F0F500, 0xD2F1F500) if fire_effect == 1 else (0xD2F0F511, 0xD2F1F520))
@@ -352,10 +367,13 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
             # Birdhouse reuses its current CI4 image with explicit GX C4 format
             # and mirrored S. This is a material update, not a native command.
             if static_materials and material is not None:
-                if material_direct or a & 0xFFFFF0FF != 0xD280F000 or b or 3 in (a >> 10 & 3, a >> 8 & 3):
+                pal = 15 if inherited_palette_slot is None else inherited_palette_slot
+                if (material_direct or (a & 0xFFFFF0FF) != (0xD2800000 | pal << 12)
+                        or b or 3 in (a >> 10 & 3, a >> 8 & 3)):
                     raise ValueError('Unsupported static CI4 material update')
                 material_wrap = (a >> 10 & 3, a >> 8 & 3)
                 row['static_materials'] = True
+                if inherited_palette_slot is not None: row['palette_slot'] = inherited_palette_slot
             elif (garden and (a, b) == (0xD280F800, 0)
                     and textures.get(material) == (32, 40) and material_wrap == (0, 0)):
                 material_wrap = (2, 0)
@@ -369,6 +387,8 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
                 raise ValueError('Unsupported standalone furniture tile update')
             row.update(shape=textures[material], wrap_modes=material_wrap)
         elif op == 0x01:
+            if inherited_vertices:
+                raise ValueError('Model overwrites its inherited vertex contract')
             count = a >> 12 & 255
             offset = row['target'] - vertex
             end = (a & 255)//2
@@ -667,9 +687,12 @@ def command_source(models, offsets):
                     if not row.get('intensity') or (w, h) != (32, 16) or row['water_shift'] != 1:
                         raise ValueError('Unsupported furniture water tile')
                     shift = 1
+                inherited_pal = row.get('palette_slot', 15)
+                if type(inherited_pal) is not int or not 0 <= inherited_pal <= 15:
+                    raise ValueError('Invalid native palette slot')
                 fmt, pal = (('G_IM_FMT_RGBA',0) if rgba16 else
                             ('G_IM_FMT_IA',0) if ia8 else
-                            ('G_IM_FMT_I',0) if row.get('intensity') else ('G_IM_FMT_CI',15))
+                            ('G_IM_FMT_I',0) if row.get('intensity') else ('G_IM_FMT_CI',inherited_pal))
                 if 'fire_tile' in row:
                     tile = row['fire_tile']
                     shifts = row['fire_shifts']
@@ -706,9 +729,12 @@ def command_source(models, offsets):
                     raise ValueError('Unreviewed furniture tile update in compiler input')
                 w, h = row['shape']
                 wrap_s, wrap_t, mask_s, mask_t = tile_fields((w, h), row['wrap_modes'])
+                pal = row.get('palette_slot', 15)
+                if type(pal) is not int or not 0 <= pal <= 15:
+                    raise ValueError('Invalid native palette slot')
                 emit('gsDPTileSync()')
                 emit(f'gsDPSetTile(G_IM_FMT_CI, G_IM_SIZ_4b, {(w+15) // 16}, 0, '
-                     f'G_TX_RENDERTILE, 15, {wrap_t}, {mask_t}, 0, {wrap_s}, {mask_s}, 0)')
+                     f'G_TX_RENDERTILE, {pal}, {wrap_t}, {mask_t}, 0, {wrap_s}, {mask_s}, 0)')
                 emit(f'gsDPSetTileSize(G_TX_RENDERTILE, 0, 0, {(w - 1) * 4}, {(h - 1) * 4})')
             elif op == 0x01:
                 # The donor pointer can address the middle of the vertex array.

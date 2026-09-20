@@ -1,5 +1,60 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared seasonal scenery preparation
+
+`build/v3-scenery-gold-tree-01/` contains the complete converted artwork
+dependency for the donor's golden-shovel tree route. One table-following scenery
+adapter feeds the shared graphics compiler. It retains all fourteen foreground
+identities across cherry, ordinary, winter, and Xmas owners, forty descriptors,
+52 body-list uses, and 24 shadow-list uses, deduplicated to 37 native objects.
+Growth sizes, the dead sapling, all four stumps, position arrays, shadow lengths,
+adjustment flags, and every source palette/term remain represented.
+
+The objects total 65,632 bytes and 199 triangles; all fourteen converted palettes
+add 448 bytes. Each season references nineteen objects totalling 29,408 bytes.
+These are prepared resource sizes, not an installed memory measurement. Runtime
+rendering/allocation, growth/death, collision, cutting/shaking, selected-only
+reward acquisition, ordinary appearance, and hardware remain unimplemented or
+unverified. No tool choice is enabled by preparation.
+
+- Asset report SHA-256:
+  `3e4247f0285b741cfff3e758d853d39fc1e962a0d7ca3eb2fcabcfec5fc4ec79`.
+- Inventory SHA-256:
+  `a11d26ae1ae74ebc3559f2ca4f64b6dfdd24e0b34209dbcc53c5223ccb832c33`.
+- Native palette bank SHA-256:
+  `c819376b0eb34110a36c2d1ef976754236ade95408316be85683611dfbf53887`.
+
+The shared converter supports explicit caller-owned palette slots and complete
+caller-loaded vertex arrays. Default furniture/equipment requirements remain
+unchanged. Gold bodies retain slot eight; shadows retain the caller's adjusted
+vertices rather than loading a static replacement. Complete consumer hashes,
+draw callbacks, ordered parts, unused-list rejection, source/output hashes, and
+strict prepared formats constrain the category. No per-item converter is added.
+
+`python3 -m unittest tests.test_v3_scenery -v` passes six checks in 2.101 seconds.
+The reused complete-artwork assertion independently compares every texture
+pixel, vertex field, native triangle, command state, texture stride/wrap/shift,
+and palette slot with the source. Additional checks cover all 224 palette
+colours, the full term selector, cross-season identities, shared roots,
+unknown/conflicting inherited state, changed consumers/callbacks/shadows,
+missing resources, invalid selections, and rejection by unrelated installers.
+Seventeen shared-format checks pass in 0.964 seconds. The existing ordinary
+installed-model emission check also passes, retaining its exact generated code.
+Syntax compilation and `git diff --check` pass.
+
+The first scan rejected legitimate null rows in the full drawing table. The
+adapter now requires aligned relocated roots and zero stored pointers while
+retaining unused rows; selected descriptors still require every actual
+dependency. Conversion then completed in one build. No emulator fixture was
+needed or run: this batch installs no runtime code and does not replay old builds.
+
+The current cartridge remains ABI 148 at
+`build/v3-shared-balloon-menu-04/build-lock.json`. The main ABI-109 lock, existing
+ROMs/saves, format-3 compatibility restrictions, and both served V2 patchers are
+unchanged. Continue shared seasonal rendering and the real planting/growth/shake
+route using these assets; do not reconvert them or treat seeded pockets as
+acquisition. See [the specification](../../specs/V3_SCENERY.md).
+
 ## Shared ordinary balloon menu
 
 The ABI-148 proposal is `build/v3-shared-balloon-menu-04/build-lock.json`.

@@ -34,6 +34,16 @@ state/checkpoint, guards, and clean exit. The close callback is a test stub;
 ordinary full gameplay and appearance remain unverified. Reuse this evidence.
 Next connect source acquisition events:
 gold-tree growth/drop, event/NPC completion rewards, and perfect-town acquisition.
+The complete gold-tree scenery dependency is prepared at
+`build/v3-scenery-gold-tree-01/`: all four owners, fourteen foreground states,
+forty descriptors, 37 deduplicated model pairs, and all fourteen palettes.
+Six focused source/artwork checks, seventeen shared-format checks, and one
+unchanged ordinary-emission check pass. Reuse those converted resources.
+Next extend shared seasonal descriptor/palette/foreground consumers with an
+explicit resource lifetime and measured allocation, then connect native
+planting, growth/death, cutting/shaking, and the selected shovel drop. Preserve
+native scenery and the actual donor route; no arbitrary acquisition substitute.
+See [shared scenery](../specs/V3_SCENERY.md). No new ROM is claimed for preparation.
 Keep all four golden choices disabled pending those complete ordinary routes.
 The menu adds 384 transient bytes but no new saved state or selection options.
 See the [flight specification](../specs/V3_BALLOON_RELEASE.md) and
@@ -82,7 +92,7 @@ sequence, saved celebration bits, guards, restored state/checkpoint, and clean
 exit. No callback-table substitutions are used; report completion is simulated,
 and delay boundaries are sampled. Reuse this evidence.
 Non-exchange collection and normal/bury/fish/insect exchange consumers are
-installed. Next implement source scene/NPC/tree acquisition and balloon release.
+installed, including balloon release. Next implement source scene/NPC/tree acquisition.
 Preserve official event conditions and dialogue; do not substitute
 shop stock, arbitrary letters, or unrelated NPCs. The four golden-tool choices
 remain disabled. Format-3 save/profile restrictions are unchanged. See the
@@ -271,10 +281,10 @@ not a reason to replay the completed component fixtures.
 
 The source `Player_actor_setup_Item_Tumble_getup` also releases a carried balloon
 when its balloon actor exists: it clears the equipped item and requests the
-matching flying shape with the current hand position/angles/frame. This shared
-balloon behaviour is not installed. Record and implement it with the necessary
-actor/shape/ownership support; the net recovery helper must not silently count
-it as complete or clear a balloon before a real release path exists.
+matching flying shape with the current hand position/angles/frame. The shared
+flight/fall adapter supplies that behaviour and retains a balloon when its actor
+is unavailable. Reuse its passing component evidence; ordinary gameplay and
+original-hardware appearance remain unverified.
 
 All eight balloon inventory
 previews have their actual idle animation and reflection drawer. Three focused

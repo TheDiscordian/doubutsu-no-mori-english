@@ -480,11 +480,25 @@ def prepare(source, item):
 def prepare_models(source, descriptor):
     """Convert checked model roots independently of furniture/item identity.
 
-    Furniture profiles and handheld equipment tables have separate source
-    discovery. Both feed the same complete resource/material/geometry converter.
+    Furniture, equipment, and scenery have separate source discovery. All feed
+    the same complete resource/material/geometry converter.
     This function supplies artwork, never gameplay or installation eligibility.
     """
     palettes, textures, vertex_arrays, raw_models = {}, {}, {}, {}
+    context = descriptor.get('render_context', {})
+    if set(context) - {'palette_slot', 'external_vertices'}:
+        raise ReviewRequired('Unknown inherited render context')
+    inherited_palette = context.get('palette_slot')
+    if inherited_palette is not None and (type(inherited_palette) is not int or not 0 <= inherited_palette <= 15):
+        raise ReviewRequired('Invalid inherited palette slot')
+    inherited_vertices = 0
+    if 'external_vertices' in context:
+        name, at, n = context['external_vertices']
+        if (tuple(source.containing(at, exact=True)) != (name, at, n)
+                or not 16 <= n <= 512 or n % 16 or source.pointers(at, n)):
+            raise ReviewRequired('Invalid complete inherited vertex array')
+        vertex_arrays[at] = name, n
+        inherited_vertices = n // 16
     adapter = descriptor.get('callback_adapter', {})
     fading = adapter.get('category') == 'switch-palette-fade'
     dynamic_used = False
@@ -515,6 +529,8 @@ def prepare_models(source, descriptor):
                 symbol, start, size = source.containing(target, exact=op != 0x01)
                 if source.pointers(start, size): raise ReviewRequired('pointer-bearing texture or vertex array')
                 if op == 0xF0:
+                    if inherited_palette is not None:
+                        raise ReviewRequired('Model overwrites its inherited palette contract')
                     if size != 32: raise ReviewRequired('palette is not sixteen colours')
                     palettes[start] = (symbol, size)
                 elif op == 0xFD:
@@ -526,6 +542,8 @@ def prepare_models(source, descriptor):
                         raise ReviewRequired('texture has inconsistent dimensions')
                     textures[start] = (symbol, size, w, h, fmt, bits)
                 else:
+                    if inherited_vertices:
+                        raise ReviewRequired('Model overwrites its inherited vertex contract')
                     if size%16: raise ReviewRequired('invalid complete vertex array')
                     vertex_arrays[start] = (symbol, size)
             if op == 0x0A:
@@ -536,7 +554,9 @@ def prepare_models(source, descriptor):
         raw_models[label] = name, at, raw, pointers, receipts
     if used_bindings != set(bindings): raise ReviewRequired('unused constant palette binding')
     if fading and not dynamic_used: raise ReviewRequired('unused palette-fade dependency')
-    if (any(r[4]==2 for r in textures.values()) and not palettes) or len(vertex_arrays) != 1:
+    if inherited_palette is not None and (palettes or bindings or fading or not any(r[4]==2 for r in textures.values())):
+        raise ReviewRequired('Unused or conflicting inherited palette contract')
+    if (any(r[4]==2 for r in textures.values()) and not palettes and inherited_palette is None) or len(vertex_arrays) != 1:
         raise ReviewRequired('static materials need CI4 palettes and one complete vertex array')
     body, resources, offsets = bytearray(32 if fading else 0), [], {}
     def add(at, name, n, convert, **details):
@@ -568,7 +588,8 @@ def prepare_models(source, descriptor):
             rows=parse_model(raw, at, pointers, tuple(palettes),
                 {p:(r[2], r[3]) for p,r in textures.items()}, vertex, n, static_materials=True,
                 palette_bindings=bindings, palette_fade=fading,
-                joint_matrices=matrices))
+                joint_matrices=matrices, inherited_palette_slot=inherited_palette,
+                inherited_vertices=inherited_vertices))
     # Validate all native emitter rules before creating output files.
     commands, sections = command_source(models, offsets)
     if fading:
@@ -666,15 +687,17 @@ def prepare_native_variant(source, model, reference, reference_model, reference_
         reference_model_offset=reference_model,reference_model_sha256=sha256(original))
 
 
-def prepare_material_pair(source, parts):
+def prepare_material_pair(source, parts, *, render_context=None):
     """Validate a full material/geometry pair, then retain its separate lists.
 
     Ground and handover renderers insert per-instance matrices between these
-    lists. Never weaken complete-model parsing to accept an arbitrary fragment.
+    lists. Scenery may also supply a checked palette or adjusted shadow vertices.
+    Never accept an arbitrary fragment without its complete render contract.
     """
     if len(parts)!=2:raise ReviewRequired('Material pair requires exactly two complete lists')
     descriptor=dict(models={'opaque':parts[0]},callback_adapter=dict(
         category='split-material-geometry',model_sequences={'opaque':parts}))
+    if render_context is not None: descriptor['render_context'] = render_context
     _,body,resources,offsets,joined,_,_=prepare_models(source,descriptor)
     material=source.data[parts[0][1]:parts[0][1]+parts[0][2]]
     geometry=source.data[parts[1][1]:parts[1][1]+parts[1][2]]
@@ -951,20 +974,31 @@ def main():
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--select', action='append', default=[], help='Canonical donor ID; defaults to all supported new furniture')
     parser.add_argument('--category', help='Restrict to a discovered shared category, without an item list')
-    parser.add_argument('--representation', choices=('furniture','handheld'), default='furniture',
-                        help='Discover furniture profiles or actual held-equipment roots')
+    parser.add_argument('--representation', choices=('furniture','handheld','scenery'), default='furniture',
+                        help='Discover furniture, held equipment, or shared scenery dependencies')
     parser.add_argument('--assets-only', action='store_true',
                         help='convert only: prepare artwork even when metadata/acquisition is unsupported; never install')
     parser.add_argument('--base-lock', type=Path, default=ROOT/'config/v3-import-build.json')
     args = parser.parse_args(); output = args.output.resolve()
     if args.assets_only and args.command != 'convert': parser.error('--assets-only requires convert')
     if args.category and args.command == 'scan': parser.error('--category requires convert or import')
-    if args.representation == 'handheld' and (args.command == 'import' or
+    if args.representation in ('handheld','scenery') and (args.command == 'import' or
             args.command == 'convert' and not args.assets_only):
-        parser.error('Handheld assets require convert --assets-only; runtime integration is unfinished')
+        parser.error('This representation requires convert --assets-only; runtime integration is unfinished')
     if output.exists() or not output.is_relative_to(ROOT/'build'): raise ValueError('Use a fresh ignored build path')
     source = Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
                     (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    if args.representation == 'scenery':
+        from v3_scenery import discover as scan_scenery, convert as convert_scenery
+        if args.command == 'scan':
+            if args.select: parser.error('Scenery dependencies are not selectable items')
+            report = scan_scenery(source); output.parent.mkdir(parents=True, exist_ok=True)
+            write_new(output, (json.dumps(report, indent=2)+'\n').encode())
+            print(json.dumps(report['counts']))
+        else:
+            report = convert_scenery(source, output, args.select, category=args.category or 'gold-tree')
+            print(json.dumps(report['counts']))
+        return
     if args.representation == 'handheld':
         from v3_handheld_items import scan as scan_handheld, convert as convert_handheld
         if args.command == 'scan':

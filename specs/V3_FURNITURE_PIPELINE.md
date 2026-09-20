@@ -22,6 +22,15 @@ hand owner; its tag owner remains an in-place update.
 
 ### Shared runtime categories
 
+The `scenery` representation follows complete seasonal foreground descriptors
+and feeds body/shadow lists into the shared converter. Its gold-tree category
+prepares growth sizes, dead saplings, stumps, seasonal palettes, and adjusted
+shadows through explicit inherited render contracts. This is an acquisition
+dependency, not a selectable item or installed gameplay. Use
+`convert --representation scenery --category gold-tree --assets-only`;
+native rendering and planting/growth/drop remain required. See
+[seasonal scenery](V3_SCENERY.md).
+
 The shared flying-balloon category installs one complete donor state machine
 for all eight shapes, reusing complete converted resources. Its additive actor,
 private model/motion banks, player creation, physics, and native drawer preserve
@@ -49,8 +58,8 @@ preserves source priority ordering, original item transfers, animation timing,
 early returns, and full-pocket branches. Complete native action bindings handle
 the donor/native Putaway ordering difference explicitly. The new code fits the
 existing reward reservation; no item-specific installer, save change, or option
-is added. The exchange stage connects normal/bury/fish/insect consumers; balloon
-release and ordinary acquisition remain required. See
+is added. The exchange stage connects normal/bury/fish/insect consumers; the
+shared flight stage connects balloon release. Ordinary acquisition remains required. See
 [reward collection](V3_REWARD_ACTIONS.md#collection-consumers).
 
 The shared reward-action stage registers all complete callbacks for source

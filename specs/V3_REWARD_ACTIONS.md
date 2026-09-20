@@ -112,8 +112,10 @@ Native Putaway is action 62 and Putin is action 63; their donor ordering differs
 Do not identify an old native action by the same-numbered donor callback.
 
 See the [collection checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-reward-collection-consumers)
-for exact tests and their scope. Ordinary gameplay, complete source acquisition,
-ordinary balloon menu selection, and hardware remain required.
+for exact tests and their scope. The ordinary balloon menu is installed.
+Ordinary gameplay, complete source acquisition, and hardware remain required.
+The [shared scenery adapter](V3_SCENERY.md) prepares the gold-tree dependency;
+preparation alone does not supply its acquisition route.
 
 ### Inventory exchange and deferred completion
 
