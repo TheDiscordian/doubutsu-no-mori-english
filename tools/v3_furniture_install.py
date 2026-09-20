@@ -526,7 +526,7 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
                     held_collection=False, held_catalogue_art=None, held_selection=False, translation_updates=False,
                     room_rigs_art=None, scenery_art=None, scenery_gameplay=False,
                     equipment_rigs=None, expand_storage=False, furniture_audio_art=None, furniture_profiles=None,
-                    material_frames_art=None):
+                    material_frames_art=None,scrolling_materials_art=None):
     """Update shared readers; optionally install the shared held-resource adapter."""
     output=output.resolve()
     if output.exists() or not output.is_relative_to(ROOT/'build'):
@@ -547,9 +547,9 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
     moved=[];equipment_report=None;reused=None;owner_changes={};owner_moves=[];owner_updates=[];report_updates={};text_moves=[]
     equipment_mode=any((equipment_art is not None,equipment_rigs is not None,player_motion,equipment_kinds,player_actions,
                         item_category_art is not None,ground_categories,event_acquisition,held_collection,held_catalogue_art is not None,held_selection,room_rigs_art is not None,scenery_art is not None,scenery_gameplay))
-    resource_mode=equipment_mode or translation_updates or expand_storage or furniture_audio_art is not None or furniture_profiles is not None or material_frames_art is not None
+    resource_mode=equipment_mode or translation_updates or expand_storage or furniture_audio_art is not None or furniture_profiles is not None or material_frames_art is not None or scrolling_materials_art is not None
     if sum((equipment_art is not None,equipment_rigs is not None,player_motion,equipment_kinds,player_actions,
-            item_category_art is not None,ground_categories,event_acquisition,held_collection,held_catalogue_art is not None,held_selection,translation_updates,room_rigs_art is not None,scenery_art is not None,scenery_gameplay,expand_storage,furniture_audio_art is not None,furniture_profiles is not None,material_frames_art is not None))>1:
+            item_category_art is not None,ground_categories,event_acquisition,held_collection,held_catalogue_art is not None,held_selection,translation_updates,room_rigs_art is not None,scenery_art is not None,scenery_gameplay,expand_storage,furniture_audio_art is not None,furniture_profiles is not None,material_frames_art is not None,scrolling_materials_art is not None))>1:
         raise ValueError('Install shared runtime updates in dependency order')
     if resource_mode:
         blob,reused=reuse_resource_tail(base,prior,old_blob)
@@ -565,7 +565,7 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         import v3_translation_updates as translation
         display_report,alias_report=prior['clothing']['display'],prior['display_aliases']
         owner_changes,report_updates=translation.install(base,prior,module,output)
-    elif held_catalogue_art is not None or wrapped_names or furniture_audio_art is not None or furniture_profiles is not None or material_frames_art is not None:
+    elif held_catalogue_art is not None or wrapped_names or furniture_audio_art is not None or furniture_profiles is not None or material_frames_art is not None or scrolling_materials_art is not None:
         display_report,alias_report=prior['clothing']['display'],prior['display_aliases']
     else:
         display_report,alias_report=display_aliases.install(prior,blob,core,output,held_items=parent_readers,
@@ -623,6 +623,9 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
     elif material_frames_art is not None:
         import v3_furniture_materials as equipment
         equipment_report,owner_changes=equipment.install(base,prior,blob,core,original,output,material_frames_art)
+    elif scrolling_materials_art is not None:
+        import v3_furniture_scroll as equipment
+        equipment_report,owner_changes=equipment.install(base,prior,blob,core,original,output,scrolling_materials_art)
     elif held_selection:
         import v3_held_catalogue as equipment
         equipment_report,owner_changes,report_updates=equipment.select_installed(prior,blob)
@@ -865,6 +868,10 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         if material_frames_art is not None:
             report['shared_runtime_refresh']['adapters'].append('material_frames')
             report['shared_runtime_refresh']['artwork_changed']=True
+        if scrolling_materials_art is not None:
+            report['shared_runtime_refresh']['adapters'].append('scrolling_materials')
+            report['shared_runtime_refresh']['artwork_changed']=True
+            report['shared_runtime_refresh']['additional_resident_bytes']=equipment_report['additional_resident_bytes']
         if held_selection:
             report['shared_runtime_refresh']['adapters'].append('held_selection')
         if report['save_runtime']['profile_hex']!=prior['save_runtime']['profile_hex']:
@@ -875,6 +882,8 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         report['native_test']='pending shared equipment resource DMA/readers'
         if material_frames_art is not None:
             report['native_test']='pending material-frame renderer native execution and GPU appearance; lifecycle/acquisition remain incomplete'
+        if scrolling_materials_art is not None:
+            report['native_test']='pending scrolling renderer native execution and GPU appearance; lifecycle/acquisition remain incomplete'
     write_new(output/'animal-forest-v3-asset-loader.z64',result)
     write_new(output/'asset-loader.ups',patch)
     write_new(output/'build.json',(json.dumps(report,indent=2,sort_keys=True)+'\n').encode())
@@ -930,6 +939,8 @@ if __name__=='__main__':
         help='With --refresh-runtime, bind complete room categories to inactive ordinary profiles and names')
     parser.add_argument('--material-frames-art',type=Path,action='append',
         help='With --refresh-runtime, install shared complete material-frame rendering without enabling unfinished items')
+    parser.add_argument('--scrolling-materials-art',type=Path,action='append',
+        help='With --refresh-runtime, install shared scrolling-material rendering without enabling unfinished items')
     args=parser.parse_args()
     if args.equipment_art and not args.refresh_runtime:parser.error('--equipment-art requires --refresh-runtime')
     if args.equipment_rigs and not args.refresh_runtime:parser.error('--equipment-rigs requires --refresh-runtime')
@@ -950,6 +961,7 @@ if __name__=='__main__':
     if args.furniture_audio_art and not args.refresh_runtime:parser.error('--furniture-audio-art requires --refresh-runtime')
     if args.furniture_profiles and not args.refresh_runtime:parser.error('--furniture-profiles requires --refresh-runtime')
     if args.material_frames_art and not args.refresh_runtime:parser.error('--material-frames-art requires --refresh-runtime')
+    if args.scrolling_materials_art and not args.refresh_runtime:parser.error('--scrolling-materials-art requires --refresh-runtime')
     result=(refresh_runtime(args.output,args.base_lock,equipment_art=args.equipment_art,player_motion=args.player_motion,
                             equipment_kinds=args.equipment_kinds,player_actions=args.player_actions,
                             item_category_art=args.item_category_art,ground_categories=args.ground_categories,
@@ -958,6 +970,7 @@ if __name__=='__main__':
                             translation_updates=args.translation_updates,equipment_rigs=args.equipment_rigs,
                             room_rigs_art=args.room_rigs_art,scenery_art=args.scenery_art,scenery_gameplay=args.scenery_gameplay,
                             expand_storage=args.expand_storage,furniture_audio_art=args.furniture_audio_art,
-                            furniture_profiles=args.furniture_profiles,material_frames_art=args.material_frames_art)
+                            furniture_profiles=args.furniture_profiles,material_frames_art=args.material_frames_art,
+                            scrolling_materials_art=args.scrolling_materials_art)
             if args.refresh_runtime else build(args.output,args.art,args.base_lock))
     print(json.dumps({k:result[k] for k in ('runtime_abi','output_sha256','patch_sha256')},indent=2))

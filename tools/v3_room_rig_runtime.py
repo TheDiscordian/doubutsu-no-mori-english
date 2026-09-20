@@ -23,7 +23,8 @@ MATERIAL_TABLE,MATERIAL_VTABLE,MATERIAL_MAGIC,MATERIAL_CAPACITY=0x804B9E20,0x804
 SOURCES=('tools/v3_room_rig_runtime.py','tools/v3_asset_loader.py','tools/v3_furniture_rigs.py','tools/v3_keyframes.py',
     'tools/v3_furniture_pipeline.py','tools/v3_furniture_install.py','tools/v3_registry.py','tools/v3_equipment_runtime.py',
     'tools/v3_display_aliases.py','tools/v3_held_catalogue.py',
-    'tools/v3_resource_capacity.py','tools/v3_furniture_materials.py',
+    'tools/v3_resource_capacity.py','tools/v3_furniture_materials.py','tools/v3_furniture_scroll.py',
+    'overlays/v3/room_scroll.c','overlays/v3/room_scroll.h','overlays/v3/room_scroll.ld',
     'overlays/v3/room_materials.c','overlays/v3/room_materials.h',
     'overlays/v3/room_rigs.c','overlays/v3/room_rigs.h','overlays/v3/room_rigs.ld',
     'overlays/v3/held_rigs.ld','overlays/v3/room_rigs_packet.ld',
@@ -367,9 +368,13 @@ def publish_packet(equipment,blob,output):
         entry=symbols['af_v3_room_material_dw']
         if entry&3 or not PACKET_RAM<=entry<PACKET_RAM+len(code):raise ValueError('Material entry escapes packet')
         material_defines=(f'AF_ROOM_MATERIAL_DW=0x{entry:X}u',)
+    scroll_defines=()
+    if runtime.get('scrolling'):
+        from v3_furniture_scroll import publish as publish_scroll
+        scroll_defines=publish_scroll(equipment,blob,output)
     boot,bootstrap=compile_part('room_rigs_bootstrap',output/'room_rigs_bootstrap',defines=(
         f'AF_ROOM_VROM=0x{BLOB+at:X}u',f'AF_ROOM_BYTES={PACKET_BYTES}u',f'AF_ROOM_CRC=0x{zlib.crc32(data):X}u',
-        *(f'AF_ROOM_{role.upper()}=0x{entry:X}u' for role,entry in zip(('ct','mv','dw'),entries)),*sound_defines,*material_defines))
+        *(f'AF_ROOM_{role.upper()}=0x{entry:X}u' for role,entry in zip(('ct','mv','dw'),entries)),*sound_defines,*material_defines,*scroll_defines))
     start=equipment['blob_offset'];module=bytearray(blob[start:start+equipment['bytes']])
     if sha256(module)!=equipment['sha256']:raise ValueError('Changed installed equipment before room publication')
     entries=[bootstrap['symbols']['af_v3_room_boot_'+role] for role in ('ct','mv','dw')]
@@ -380,9 +385,19 @@ def publish_packet(equipment,blob,output):
     if runtime.get('format')=='AFV3-ROOM-RIGS-2' and runtime.get('bootstrap'):
         expected=bytearray(VTABLE-TABLE)
         expected[MATERIAL_VTABLE-TABLE:MATERIAL_VTABLE-TABLE+20]=bytes.fromhex(runtime.get('material_vtable_hex','00'*20))
+        if runtime.get('scrolling'):
+            from v3_furniture_scroll import VTABLE as SCROLL_VTABLE
+            expected[SCROLL_VTABLE-TABLE:SCROLL_VTABLE-TABLE+20]=bytes.fromhex(runtime['scrolling'].get('vtable_hex','00'*20))
         if module[TABLE-EQUIPMENT_RAM:VTABLE-EQUIPMENT_RAM]!=expected:
             raise ValueError('Occupied room cache/material vtable reservation')
     module[TABLE-EQUIPMENT_RAM:VTABLE-EQUIPMENT_RAM]=bytes(VTABLE-TABLE)
+    if scroll_defines:
+        from v3_furniture_scroll import VTABLE as SCROLL_VTABLE
+        entry=bootstrap['symbols']['af_v3_room_boot_scroll_dw']
+        if entry&3 or not RAM<=entry<RAM+len(boot):raise ValueError('Scroll bootstrap escapes reservation')
+        scroll_vtable=struct.pack('>5I',0,0,entry,0,0)
+        module[SCROLL_VTABLE-EQUIPMENT_RAM:SCROLL_VTABLE-EQUIPMENT_RAM+20]=scroll_vtable
+        runtime['scrolling'].update(vtable=SCROLL_VTABLE,vtable_hex=scroll_vtable.hex(),cache_ram=TABLE+4)
     if material_rows:
         entry=bootstrap['symbols']['af_v3_room_boot_material_dw']
         if entry&3 or not RAM<=entry<RAM+len(boot):raise ValueError('Material bootstrap escapes reservation')

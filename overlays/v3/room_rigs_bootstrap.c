@@ -33,6 +33,22 @@ void af_v3_room_boot_sound_mv(void *actor,void *room,RoomRigGame *game,u8 *data)
     if (load()) ((void (*)(void *,void *,RoomRigGame *,u8 *))AF_ROOM_SOUND_MV)(actor,room,game,data);
 }
 #endif
+#ifdef AF_ROOM_SCROLL_DW
+void af_v3_room_boot_scroll_dw(RoomRig *actor,void *room,RoomRigGame *game,u8 *data) {
+    volatile u32 *ready=(volatile u32 *)0x804B1E04u;
+    void *packet=(void *)0x804BA000u;
+    if (*ready!=AF_ROOM_SCROLL_CRC) {
+        if (af_room_dma(packet,AF_ROOM_SCROLL_VROM,AF_ROOM_SCROLL_BYTES) ||
+                af_room_crc(packet,AF_ROOM_SCROLL_BYTES)!=AF_ROOM_SCROLL_CRC) {
+            af_room_fault("V3 room materials","Invalid scroll code");return;
+        }
+        af_room_writeback(packet,AF_ROOM_SCROLL_BYTES);
+        af_room_invalidate(packet,AF_ROOM_SCROLL_BYTES);
+        *ready=AF_ROOM_SCROLL_CRC;
+    }
+    ((void (*)(RoomRig *,void *,RoomRigGame *,u8 *))AF_ROOM_SCROLL_DW)(actor,room,game,data);
+}
+#endif
 #ifdef AF_ROOM_MATERIAL_DW
 void af_v3_room_boot_material_dw(RoomRig *actor,void *room,RoomRigGame *game,u8 *data) {
     if (load()) ((void (*)(RoomRig *,void *,RoomRigGame *,u8 *))AF_ROOM_MATERIAL_DW)(actor,room,game,data);

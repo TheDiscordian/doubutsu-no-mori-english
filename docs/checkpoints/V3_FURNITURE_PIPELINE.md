@@ -1,5 +1,68 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared scrolling-material renderer
+
+ABI 171 at `build/v3-scrolling-materials-runtime-02/` installs the shared renderer
+and all five complete prepared objects (28,112 bytes), without recompiling any
+artwork. The source-bound 36-byte records retain opaque/translucent model order,
+one/two independently scrolled tiles, signed rates, segment bindings, external
+colour state, and preview values. Merlion and Manekin Pis gain append-only
+destinations `3C34`/1805 and `3C38`/1806; worksheet rows 2395/2396 have no native
+ID/name/art mappings, and the approved translation maps have no corresponding
+`furniture:03f9`/`03fa` identities. Existing reservations remain unchanged.
+
+The scroll packet reserves `804BA000..804BBFFF`, following the old room packet
+and below furniture banks. Its 1,624-byte code and five-record table fit separate
+4-KiB halves. Bootstrap size is 1,098 bytes within its existing reservation.
+Stable vtable `804B1E30` and startup-zeroed cache `804B1E04` provide independent
+DMA/CRC/cache validation. The old room packet's code and records are unchanged.
+The new extension adds 8 KiB of fixed Expansion Pak storage, not ordinary heap
+growth or larger model banks.
+
+The renderer reserves both command streams and all scratch before writing,
+shares one parent matrix, retains complete OPA/XLU model ordering, and flushes
+immutable frame-owned scroll commands. It follows source room/preview counters,
+rate signs, and origin wrapping, converting sixteenth-texel source offsets to
+native quarter-texel offsets. Source colour state at `834` maps to native private
+`1A4`; lifecycle initialization/transitions remain required. Malformed state,
+NaNs, out-of-range colours, incomplete records, and crowded arenas do not submit
+partial commands. The source's unchecked well-model allocation is made bounded.
+
+The first build stops at link time because the compiler emits `memcpy` for the
+four-byte colour read. Explicit character-byte copies remove that libc dependency;
+the second build succeeds. This is a toolchain integration failure, not an
+emulator or game crash. No previous build is overwritten.
+
+Four `ScrollingRuntimeTests` pass on the first invocation in 10.308 seconds.
+They cover actual renderer C under address/undefined-behaviour sanitizers,
+positive/negative rates and wrap points, preview/room colour state, both arenas,
+guarded immutable objects/actors, partial-write rejection, complete installed
+packets/assets/dispatch, additive identities, inactive slots, retained old room
+code/tables/profiles/audio/scenery, saved formats, all/empty composition, and UPS
+reconstruction. No native execution, GPU appearance, ordinary gameplay, or
+original-hardware verification is claimed. The failed large title-screen arena
+fixture is not replayed.
+
+The 136 existing choices, 26 staged ordinary profiles, and saved profile/format 3
+remain unchanged. These five renderer records are not ordinary item profiles;
+their lifecycle/audio and acquisition remain unfinished. New imports still need
+equal/superset save profiles and must not be loaded in older/V2 builds; this
+batch introduces no additional saved selection requirements. The blob grows to
+4,396,560 bytes, leaving 1,894,896 bytes before VROM `02800000`. The main ABI-109
+lock and stable website deployments remain unchanged.
+
+```sh
+python3 tools/v3_furniture_install.py --refresh-runtime \
+  --base-lock build/v3-material-trigger-profiles-02/build-lock.json \
+  --scrolling-materials-art build/v3-scrolling-materials-prepared-02 \
+  --output build/scrolling-runtime-reproduction
+PYTHONPATH=tests python3 -m unittest test_v3_room_scroll.ScrollingRuntimeTests -v
+```
+
+- ROM SHA-256: `f8845e6e12c2d5f3e79976b5c48a69d6c69461dd3e3ecf2e00d41c0531dec4e5`.
+- UPS SHA-256: `e3f1bb2286b460c030830a3eb28ea0fb3f7c639f71cfebb1834da522cd3e0bc5`.
+- Report SHA-256: `148f231e5c629235c0c8afe7cf316b65a845d049e40cc81a62a2471dc7d7b74b`.
+
 ## Shared scrolling-material resource preparation
 
 `build/v3-scrolling-materials-prepared-02/` prepares five complete objects through

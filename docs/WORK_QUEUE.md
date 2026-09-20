@@ -12,18 +12,30 @@ After the primary importing work, finish gold-tree leaf/cut effects and the full
 golden-shovel acquisition route. This is deferred required V3 work, not a dropped
 feature or a separate release goal.
 
+The current explicit proposal is ABI 171 at
+`build/v3-scrolling-materials-runtime-02/build-lock.json`. Five complete scrolling
+objects share an installed renderer and an 8-KiB extension at `804BA000`.
+Four focused current-build checks pass, including sanitizer execution, complete
+resources, split-arena bounds, retained records/saves, and all/empty composition.
+Native execution/GPU appearance remain unverified; do not replay the failed
+title-screen large-arena fixture. The source bodies and new legacy destinations
+are complete, but lifecycle/audio and acquisition still need integration before
+ordinary profiles or selection. The 136 choices and 26 staged profiles stay
+unchanged. Continue remaining shared conversion/runtime/acquisition categories;
+gold-tree completion remains after primary imports.
+
 Complete scrolling-material resources are prepared at
 `build/v3-scrolling-materials-prepared-02/`: five objects, 28,112 bytes, one
 compiler batch and complete subsequent cache reuse. Four focused checks pass.
-Continue shared scrolling runtime/integration and the remaining EVW/rigged
-material categories, reusing these complete models rather than reconverting
+Continue shared lifecycle integration and the remaining EVW/rigged material
+categories, reusing these complete models rather than reconverting
 individual items. Source draw records retain OPA/XLU order, one/two texture
 layers, dimensions/rates, segment bindings, and runtime colour inputs. Their
-lifecycle effects and acquisition remain pending, and legacy Merlion/Manekin Pis
-need reviewed additive destinations. Prepared assets cannot be enabled as static
-objects. The current cartridge stays ABI 170; the website stays on stable V2.
+lifecycle effects and acquisition remain pending. Merlion and Manekin Pis have
+reviewed additive destinations `3C34` and `3C38`. Prepared assets cannot be
+enabled as static objects. The website stays on stable V2.
 
-The current ABI-170 proposal is
+The retained ABI-170 material/trigger profile integration is
 `build/v3-material-trigger-profiles-02/build-lock.json`. Coin, ? block, and fire
 flower have complete inactive ordinary profiles, official names/prices, and
 shared material/sound bindings. The importer reuses all existing artwork and

@@ -125,13 +125,41 @@ strides, retaining both CI4 layers even when they share a source texture.
 Source wrap, mirror, shifts, palette, both-cycle combiners, colour state, every
 texel, and geometry are preserved. Unknown dynamic display lists remain refused.
 
-Preparation does not implement native scroll-list allocation, timing, split
-draw arenas, lifecycle colour/sound transitions, or acquisition. Both metadata
-and native profile construction refuse this prepared-only category, including
-forged readiness annotations. Legacy identities still require reviewed additive
-destinations. Reuse complete objects through the common prepared-artwork cache
-when the runtime category is implemented; do not freeze the textures or discard
-translucent models to enable an import.
+Preparation does not imply native drawing, lifecycle colour/sound transitions,
+or acquisition. `--refresh-runtime --scrolling-materials-art` installs complete
+prepared objects and their shared renderer, without ordinary profiles. Metadata
+and native profile construction refuse the incomplete lifecycle category,
+including forged readiness annotations. Merlion `1FE4` and Manekin Pis `1FE8`
+have append-only destinations `3C34`/1805 and `3C38`/1806 after the existing legacy
+reservations. The pinned worksheet and approved translation maps contain no
+native correspondence for either source. Membership does not enable gameplay.
+
+The scroll extension owns `804BA000..804BBFFF`, after the unchanged 8-KiB room
+packet and below furniture banks at `80500000`. Code has 4 KiB; the remaining
+4 KiB contains `AFC1`, count, stride 36, zero, and up to 64 complete records.
+Records carry identity/size, model order, segment, one/two dimensions and signed
+rates, source colour commands, preview colour, and private native state offset.
+The bootstrap uses cache word `804B1E04` and vtable `804B1E30`. DMA, CRC,
+writeback/invalidation, and startup-reset cache semantics match the existing
+room packet, but the extension has its own checked code/data identity. Further
+room packet publication retains both vtables and reload contracts.
+
+Drawing reserves both OPA/XLU command streams and aligned frame scratch before
+writing either. One matrix is shared by the two draw streams; one/two native
+tile-scroll pairs and termination follow it. All submitted scratch is immutable
+and written back for the RSP. Native counters are doubled to source counters;
+the source's doubled 14-bit tile origin is reduced from sixteenth-texel to
+quarter-texel units with explicit unsigned wrapping. Preview context never reads
+the larger play-context frame field. Colour state maps donor float offset `834`
+to private native `1A4`; a future lifecycle must initialise and maintain it.
+NaNs, invalid colour values, malformed records, and insufficient arenas produce
+no partial draw. Maximum scratch is 104 bytes plus eight alignment bytes.
+
+The complete artwork is reused without compilation. The native model banks,
+ordinary heap, old room packet, selections, and saved formats remain unchanged;
+the additional fixed resident reservation is 8 KiB. Lifecycle/audio, ordinary
+profiles, acquisition, and native GPU/gameplay verification remain required.
+Do not freeze textures or discard translucent models to enable an import.
 
 The `material-frame-assets` category prepares complete custom-drawn models and
 their texture/palette frame tables independently of unfinished lifecycle code.

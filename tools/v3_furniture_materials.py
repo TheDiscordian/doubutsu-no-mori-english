@@ -215,6 +215,8 @@ def install(base,prior,blob,core,original,output,directories):
 
 # The common cartridge refresh records these dependencies with its build lock.
 SOURCES=('tools/v3_furniture_materials.py','tools/v3_room_rig_runtime.py','tools/v3_registry.py',
+    'tools/v3_furniture_scroll.py','tools/v3_asset_loader.py',
+    'overlays/v3/room_scroll.c','overlays/v3/room_scroll.h','overlays/v3/room_scroll.ld',
     'tools/v3_furniture_pipeline.py','tools/v3_furniture_install.py','tools/v3_furniture_art.py',
     'tools/v3_tent_model.py','overlays/v3/room_materials.c','overlays/v3/room_materials.h',
     'overlays/v3/room_rigs.c','overlays/v3/room_rigs.h','overlays/v3/room_rigs_packet.ld',

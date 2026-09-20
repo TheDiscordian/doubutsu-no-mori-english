@@ -4,10 +4,15 @@ This resource category preserves both texture layers and callback parameters.
 It does not enable an item before its renderer, lifecycle, and acquisition exist.
 """
 import struct
+import copy
+import json
+import zlib
 
 from aflib import sha256, u32
 
 CATEGORY = 'scrolling-material-assets'
+RAM,TABLE,BYTES,CAPACITY,VTABLE = 0x804BA000,0x804BB000,8192,64,0x804B1E30
+MAGIC = 0x41464331
 # Complete normalized draw code, paired model relocations in submission order,
 # scroll helper call, matrix calls, external save/restore addresses, and runtime
 # parameters. These are implementation shapes, never item or artwork selectors.
@@ -110,3 +115,160 @@ def bindings(adapter):
     if dimensions not in WRAPPERS: raise ValueError('Unsupported complete scrolling dimensions')
     return {row['model']:dict(segment=row['segment_address'],
                              dimensions=[list(shape) for shape in dimensions if shape!=(0,0)])}
+
+
+def runtime_record(row):
+    from v3_registry import furniture_identity
+    a=row['profile']['callback_adapter'];binding=bindings(a)
+    if not binding:raise ValueError('Missing complete scrolling resource category')
+    source=a['scrolling'];colour=source['colour'];mode=word_a=word_b=preview=state=0
+    if colour:
+        if colour['room_f32_offset']!=0x834:raise ValueError('Changed source colour state')
+        mode=2 if colour['field']=='lod_fraction' else 1
+        if colour['command']=='environment':word_a=0xFB000000
+        elif colour['command']=='primitive':word_a=0xFA000000|colour.get('lod_fraction',0)
+        else:raise ValueError('Unknown complete source colour command')
+        components=colour['rgba'] if mode==2 else (*colour['rgb'],0)
+        word_b=int.from_bytes(bytes(components),'big');preview=colour['preview'];state=0x1A4
+    index,item=furniture_identity(int(row['item_id'],16))
+    dimensions=[(r['width'],r['height']) for r in source['tiles'] if r['width']]
+    rates=[r['rate'] for r in source['tiles'] if r['width']]
+    models=[row['model_offsets'][label] for label in a['model_order']]
+    if (a['model_order']!=list(row['model_offsets']) or
+            list(a['model_arenas'].values())!=['opaque']*(len(models)-1)+['translucent'] or
+            source['input']!='room-or-preview-frame' or source['source_coordinate_shift']!=1):
+        raise ValueError('Changed complete source scroll draw contract')
+    result=dict(source_item_id=row['item_id'],item_id=f'{item:04X}',runtime_index=index,
+        bytes=row['object_bytes'],sha256=row['object_sha256'],segment=source['segment_address']>>24,
+        model_offsets=models,dimensions=dimensions,rates=rates,colour_mode=mode,colour_a=word_a,colour_b=word_b,
+        state_offset=state,preview=preview,source=row,renderer_installed=True,lifecycle_installed=False,
+        profile_installed=False,parent_selectable=False)
+    encode([result]);return result
+
+
+def encode(rows):
+    if not rows or len(rows)>CAPACITY or [r['runtime_index'] for r in rows]!=sorted({r['runtime_index'] for r in rows}):
+        raise ValueError('Unordered, duplicate, or excessive scroll records')
+    out=bytearray(struct.pack('>4I',MAGIC,len(rows),36,0))
+    for r in rows:
+        index,n,models,dimensions,rates=r['runtime_index'],r['bytes'],r['model_offsets'],r['dimensions'],r['rates']
+        mode,a,b,state,preview=r['colour_mode'],r['colour_a'],r['colour_b'],r['state_offset'],r['preview']
+        if (not 1024<=index<2048 or not 32<=n<=9216 or n&15 or not 2<=len(models)<=4 or
+                any(type(p) is not int or p&7 or not 0<=p<=n-8 for p in models) or
+                r['segment'] not in (8,9) or not 1<=len(dimensions)<=2 or len(dimensions)!=len(rates) or
+                any(len(d)!=2 or any(type(v) is not int or v<8 or v>64 or v&(v-1) for v in d) for d in dimensions) or
+                any(len(d)!=2 or any(type(v) is not int or not -16<=v<=16 for v in d) for d in rates) or
+                mode not in (0,1,2) or not 0<=a<=0xFFFFFFFF or not 0<=b<=0xFFFFFFFF or not 0<=preview<=255 or
+                mode==0 and (a or b or state or preview) or mode!=0 and state!=0x1A4 or
+                mode==1 and (a!=0xFB000000 and a&0xFFFFFF00!=0xFA000000 or b&255) or
+                mode==2 and a!=0xFA000000):
+            raise ValueError('Invalid complete scrolling record or native bounds')
+        d=[v for pair in dimensions for v in pair]+[0]*(4-len(dimensions)*2)
+        rates=[v for pair in rates for v in pair]+[0]*(4-len(rates)*2)
+        out.extend(struct.pack('>HH4B4H4B4bIIHBB',index,n,len(models),r['segment'],len(dimensions),mode,
+            *(models+[0]*(4-len(models))),*d,*rates,a,b,state,preview,0))
+    return bytes(out)
+
+
+def publish(equipment,blob,output):
+    """Publish a bounded extension; existing rig/material tables stay put."""
+    from v3_asset_loader import BLOB,compile_part
+    runtime=equipment['room_rigs']['scrolling'];packet=runtime['packet'];at=packet['blob_offset']
+    if (packet['ram']!=RAM or packet['bytes']!=BYTES or packet['vrom']!=BLOB+at or
+            at&15 or at+BYTES>len(blob) or
+            ('sha256' in packet and sha256(blob[at:at+BYTES])!=packet['sha256'])):
+        raise ValueError('Changed complete scroll packet storage')
+    code,compiled=compile_part('room_scroll',output/'room_scroll')
+    table=encode(runtime['rows']);data=code.ljust(TABLE-RAM,b'\0')+table.ljust(BYTES-(TABLE-RAM),b'\0')
+    entry=compiled['symbols']['af_v3_room_scroll_dw']
+    if len(code)>TABLE-RAM or len(data)!=BYTES or entry!=RAM or not zlib.crc32(data):
+        raise ValueError('Scroll code/records exceed reservation')
+    blob[at:at+BYTES]=data;packet.update(sha256=sha256(data),crc32=zlib.crc32(data))
+    runtime.update(code=compiled,table_sha256=sha256(table),capacity=CAPACITY,table_ram=TABLE)
+    return (f'AF_ROOM_SCROLL_DW=0x{entry:X}u',f'AF_ROOM_SCROLL_VROM=0x{BLOB+at:X}u',
+            f'AF_ROOM_SCROLL_BYTES={BYTES}u',f'AF_ROOM_SCROLL_CRC=0x{zlib.crc32(data):X}u')
+
+
+def install(base,prior,blob,core,original,output,directories):
+    from aflib import by_vrom
+    from v3_asset_loader import ROOT,BLOB
+    from v3_equipment_runtime import RAM as EQUIPMENT_RAM
+    from v3_furniture_pipeline import Source,PreparedAssets,prepare,identity_rows
+    from v3_import_storage import ROWS,ITEMS,slot
+    from v3_resource_capacity import checked_limit
+    from v3_tent_model import native_contract
+    import v3_room_rig_runtime as room
+    result=copy.deepcopy(prior['equipment_resources']);runtime=result['room_rigs'];packet=runtime['packet']
+    module=blob[result['blob_offset']:result['blob_offset']+result['bytes']]
+    if (runtime['format']!='AFV3-ROOM-RIGS-2' or sha256(module)!=result['sha256'] or
+            sha256(blob[packet['blob_offset']:packet['blob_offset']+packet['bytes']])!=packet['sha256'] or
+            EQUIPMENT_RAM+result['bytes']>room.PACKET_RAM or
+            result['scenery']['ram']+result['scenery']['additional_fixed_resident_bytes']>room.PACKET_RAM or
+            packet['ram']+packet['bytes']>RAM or RAM+BYTES>prior['furniture']['bank_pool']['start']):
+        raise ValueError('Changed shared material runtime or overlapping scroll reservation')
+    contract=native_contract(original,base,expected_sha=sha256(base))
+    old_catalogue=by_vrom(original)[0x7A28F0].extract(original)
+    catalogue=by_vrom(base)[0x3970000].extract(base);at=0x808A7814-0x808A6100
+    if (sha256(old_catalogue[at:at+0xD0])!='aa1cd409237c29058fb12a0b15225172d7e25c3cbde53509bf87231fa3a790c1' or
+            catalogue[at:at+0xD0]!=old_catalogue[at:at+0xD0]):
+        raise ValueError('Changed preview null-room drawing contract')
+    contract.update(preview_draw_sha256=sha256(catalogue[at:at+0xD0]),private_colour_offset=0x1A4,
+        preview_frame_offset=0xA0,room_frame_offset=0x1EA0,source_frames_per_native_frame=2,
+        native_coordinate_fraction_bits=2,source_coordinate_fraction_bits=4,maximum_frame_scratch_bytes=104,
+        maximum_frame_alignment_padding=8,opaque_and_translucent_atomic_reservation=True)
+    source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+        (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    directories=[d.resolve() for d in directories];cache=PreparedAssets(source,directories)
+    identities=identity_rows(ROOT/'build/item-identity-megasheet.xlsx',include_unmapped_legacy=True)
+    installed=runtime.get('scrolling',dict(format='AFV3-ROOM-SCROLL-1',rows=[],sources=[]))
+    if installed['format']!='AFV3-ROOM-SCROLL-1':raise ValueError('Unknown scrolling runtime format')
+    occupied={r['item_id'] for r in runtime['rows']+runtime.get('sound_rows',[])+
+              runtime.get('material_rows',[])+installed['rows']}
+    assets={};rows=[];evidence=[]
+    for directory in directories:
+        if not directory.is_relative_to(ROOT/'build'):raise ValueError('Scroll materials require ignored prepared artwork')
+        raw=(directory/'art.json').read_bytes();art=json.loads(raw)
+        if art['format']!='AFV3-AUTO-FURNITURE-PREPARED-ASSETS-1':raise ValueError('Expected complete prepared scroll assets')
+        evidence.append(dict(directory=str(directory.relative_to(ROOT)),sha256=sha256(raw)))
+        for row in art['objects']:
+            donor=row['item_id'];item=int(donor,16);prepared=prepare(source,item)
+            if (prepared[0]['callback_adapter']['category']!=CATEGORY or
+                    row['profile']!=json.loads(json.dumps(prepared[0])) or
+                    row['native_profile_scalar_hex']!=prepared[0]['scalar_hex'] or
+                    any(identities[item][1].get(k)!='-' for k in ('C','H','CG','CJ')) or
+                    cache.reuse(source,donor,prepared) is None):
+                raise ValueError('Incomplete, changed, or unreviewed scrolling resources')
+            path=(directory/row['object_file']).resolve()
+            if path.parent!=directory:raise ValueError('Scroll artwork escapes its prepared directory')
+            data=path.read_bytes();record=runtime_record(row);i=slot(int(record['item_id'],16))
+            if (len(data)!=record['bytes'] or sha256(data)!=record['sha256'] or record['item_id'] in occupied or
+                    any(blob[ROWS+i*80:ROWS+(i+1)*80]) or any(blob[ITEMS+i*32:ITEMS+(i+1)*32]) or
+                    blob[0x40+i//8]&(1<<(i&7))):raise ValueError('Changed scroll art or occupied destination')
+            occupied.add(record['item_id']);rows.append(record);assets[donor]=data
+    if not rows:raise ValueError('Empty scrolling material batch')
+    all_rows=sorted(installed['rows']+rows,key=lambda r:r['runtime_index']);encode(all_rows)
+    for r in installed['rows']:
+        if sha256(blob[r['blob_offset']:r['blob_offset']+r['bytes']])!=r['sha256']:
+            raise ValueError('Changed installed scrolling artwork')
+    fresh='packet' not in installed;needed=sum(len(d) for d in assets.values())+(BYTES if fresh else 0)
+    start=(len(blob)+15)&~15
+    if BLOB+start+needed>checked_limit(base,prior):raise ValueError('Scroll resources exceed cartridge reservation')
+    blob.extend(bytes(start-len(blob)))
+    if fresh:
+        installed['packet']=dict(ram=RAM,bytes=BYTES,blob_offset=len(blob),vrom=BLOB+len(blob));blob.extend(bytes(BYTES))
+    for r in rows:
+        at=len(blob);blob.extend(assets[r['source_item_id']]);r.update(blob_offset=at,vrom=BLOB+at)
+    installed.update(rows=all_rows,native_contract=contract,additional_fixed_resident_bytes=BYTES)
+    installed['sources'].extend(evidence);runtime['scrolling']=installed
+    runtime['artwork_bytes']+=sum(len(d) for d in assets.values())
+    room.publish_packet(result,blob,output)
+    result['additional_resident_bytes']=BYTES if fresh else 0
+    return result,{}
+
+
+SOURCES=('tools/v3_furniture_scroll.py','tools/v3_furniture_pipeline.py','tools/v3_furniture_art.py',
+    'tools/v3_furniture_install.py','tools/v3_registry.py','tools/v3_asset_loader.py','tools/v3_tent_model.py',
+    'tools/v3_room_rig_runtime.py','overlays/v3/room_scroll.c','overlays/v3/room_scroll.h','overlays/v3/room_scroll.ld',
+    'overlays/v3/room_materials.c','overlays/v3/room_materials.h','overlays/v3/room_rigs.c',
+    'overlays/v3/room_rigs_packet.ld','overlays/v3/room_rigs.h','overlays/v3/room_rigs_bootstrap.c',
+    'overlays/v3/room_rigs_bootstrap.ld')

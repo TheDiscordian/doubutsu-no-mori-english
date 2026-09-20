@@ -18,19 +18,34 @@ served patchers retain their existing builds.
 
 ## Active development
 
+The current explicit proposal is ABI 171 at
+`build/v3-scrolling-materials-runtime-02/build-lock.json`. The shared renderer
+installs all five complete prepared scrolling objects, with separate opaque and
+translucent draws, both texture layers, frame-owned commands, and mapped colour
+inputs. An 8-KiB extension fits between existing room code and furniture banks;
+the original room packet, model pool, and ordinary heap stay unchanged. Four
+current-build checks pass, including address/undefined-behaviour sanitizer
+execution, installed resource/dispatch checks, and retained saves/composition.
+Native execution and GPU appearance remain unverified. Lifecycle and acquisition
+remain unfinished, so these five objects have no ordinary profiles or choices.
+The 136 choices, 26 staged profiles, saved format 3, main lock, and stable website
+are unchanged. See the
+[scrolling-renderer checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-scrolling-material-renderer).
+
 The shared scrolling-material category prepares five complete objects at
 `build/v3-scrolling-materials-prepared-02/`: Merlion, Manekin Pis, well model,
 fireplace, and sprinkler, totalling 28,112 bytes. One compiler batch produces
 their graphics; the final receipt reuses all five objects without compilation.
 The common converter preserves both texture layers, padded eight-pixel texture
 rows, opaque/translucent model order, scroll rates, and external colour state.
-Four focused checks pass. Runtime drawing, lifecycle, acquisition, and legacy
-destination review remain required; these prepared resources are not selectable.
+Four focused checks pass. Runtime drawing and additive destination reservations
+are installed above; lifecycle and acquisition remain required and these
+resources are not selectable.
 Names are credited to the official donor in the single provenance catalogue.
 No cartridge or served website changes. See the
 [scrolling-material checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-scrolling-material-resource-preparation).
 
-The current explicit proposal is ABI 170 at
+The material/trigger profile integration is retained from ABI 170 at
 `build/v3-material-trigger-profiles-02/build-lock.json`. The shared profile
 importer stages coin, ? block, and fire flower with their complete material/sound
 callbacks, official names, prices, and ordinary records. All graphics and runtime
