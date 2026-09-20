@@ -1561,6 +1561,9 @@ def tool_controls(debug,rom_path,record,*,transitions=False,capture=False,rod=Fa
 
 
 def exercise(debug, rom_path, record, *, section='automatic_furniture'):
+    if section in ('scenery_player_queries','scenery_player_guarded_consumers'):
+        from v3_scenery_smoke import player_queries
+        return player_queries(debug,rom_path,record,consumers_only=section=='scenery_player_guarded_consumers')
     if section=='scenery_interactions':
         from v3_scenery_smoke import interactions
         return interactions(debug,rom_path,record)

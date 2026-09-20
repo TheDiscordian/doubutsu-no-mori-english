@@ -1,5 +1,119 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared player tree queries
+
+The ABI-155 proposal is `build/v3-shared-tree-player-02/build-lock.json`.
+The existing shared scenery gameplay refresh connects player tree eligibility
+and bee handling without adding a per-item installer or enabling unfinished tools.
+
+- ROM SHA-256:
+  `5aab16914859630dbaa6ffcc92af99baf4e6a5ff1031c225f6404e3baab5bbf7`.
+- Report SHA-256:
+  `b9a43b2b8f1ba7b2a4e85ca64beaee29cdfbf01ca26a6ae278e116c4608af6bf`.
+- UPS SHA-256:
+  `b9907efde2fa718152b758d0ac084ec72f3b1ca22b78aaf0a0184d73abb64728`.
+
+Eight complete donor functions and matching unchanged native functions bind
+three axe-target checks, nearby-tree selection, touch/shake sound eligibility,
+two shovel reactions, the shake action, common bee release, and the axe drop/
+stump helper. The native solid category contains sixty identities; its small-tree
+subset contains ten. Shared masks are extracted from the original predicates.
+Selected gold trees extend those categories without accepting unsupported donor
+palm/cedar families, saplings, dead trees, or stumps. Small gold trees are solid
+but do not gain the larger trees' touch sound. Selected gold bees retain their
+actual `0081` identity through native callbacks.
+
+Eleven installed calls share a 364-byte gate at linked player `808B6934`, inside
+one replaced inline predicate. Inert delay-slot metadata supplies the source
+register, result register, and predicate kind without consuming another live
+register. The gate preserves the other live integer registers, HI/LO, floating-
+point registers/control, and the caller's stack; its own frame is 256 bytes.
+It uses the existing verified packet loader before dispatch. Original target
+coordinates, nearest-tree selection, height/distance/angle filters, callback
+permissions, animation checks, and five-frame bee timers remain.
+
+The packet is 8,544 bytes within the existing 12,288-byte reservation. Seasonal
+banks stay 32,864 bytes, bootstrap stays 848 bytes, and equipment stays 72 KiB.
+No owner/relocation file, import blob, scene allocation, save field, source text,
+or selection catalogue grows. All seasonal/daily/core references bind the new
+packet, and both player-action and player-motion owner receipts are updated.
+The main ABI-109 lock and both served patchers remain unchanged.
+
+The first host/cartridge invocation catches an actual implementation defect:
+sorting the expanded relocation list groups HI16 and LO16 records separately,
+breaking the native loader's register-cached high/low pairing. The installer
+now retains the entire original ordering and appends only the eleven new jump
+relocations. Build `01` is not a deliverable. Build `02` passes all four focused
+checks in 6.211 seconds:
+
+```sh
+python3 -m unittest tests.test_v3_tree_player -v
+```
+
+AddressSanitizer/UBSan covers every sixteen-bit ID with selected and unselected
+profiles, solid/shakeable/bee queries, ignored upper argument bits, and unsupported
+queries. Cartridge checks bind complete source/native functions and masks, retain
+all instructions outside declared windows, relocate every query at two addresses,
+retain original relocation ordering, validate live owner receipts and unchanged
+resources/allocations/saves, reconstruct the full ROM from UPS, retain all 128
+experimental choices, and reproduce exact V2-12 when imports are disabled.
+
+The initial silent native run, `build/smoke-v3-tree-player-01/`, is partial:
+58 records, 46 passing assertions, and one failed fixture-guard assertion. It
+verifies the complete actual relocated player text, all eleven installed call
+sites, expected results, live integer/HI/LO/floating-point register preservation,
+lazy packet loading, native/unselected and small-tree fallbacks, common bee
+callbacks, axe drops/stump returns, real identities, and the permission-controlled
+five-frame bee timer. The final guard overlaps the test's cut-result recorder:
+`actor+13A0` equals old `out+32`. The observed hash is exactly the callback's
+recorded four words `0,2,3,0`, not unexplained game memory damage.
+
+- Initial partial results SHA-256:
+  `2c5c106e6ea8078cd8a7af36e8ac594ac86a2e6e0cf1cbd8ad32d7c287d18f32`.
+
+The corrected layout separates actor, output, clip, code, and guard intervals,
+with an explicit overlap assertion. The one justified retry uses the focused
+consumer scenario instead of repeating the passed eleven-query/register prefix:
+
+```sh
+python3 tools/emulator_smoke.py \
+  --rom build/v3-shared-tree-player-02/animal-forest-v3-asset-loader.z64 \
+  --output build/smoke-v3-tree-player-consumers-01 \
+  --scenario tests/v3-tree-player-guarded-scenario.json \
+  --xvfb /home/discordian/Games/OpenRSC/headless/vendor/usr/bin/Xvfb \
+  --seconds 180 --expansion-pak --no-initial-screenshot
+```
+
+The retry passes 67 records and 52 assertions, restores all modified state and
+the complete emulator checkpoint, checks final fault/save/equipment guards, and
+exits successfully. New harness work stays below ten minutes. Common bee release
+retains null/type/coordinate rejection and facing fallback. Axe calls preserve
+counter/drop arguments, return the original tree before exhaustion and gold
+stump `007E` at exhaustion, and delay bee release through the native permission
+check. No user save is loaded or modified; both runs are silent and isolated.
+
+- Focused consumer results SHA-256:
+  `6a197178437db8ea4255f3d2e848430e00a1fb7c58701f3a909b42daec9bbc2a`.
+
+Drop and cut-count callbacks are explicit isolated stubs. These results do not
+prove ordinary target selection, actual landing/bee actors, complete felling,
+ordinary acquisition, save/restart, rendered appearance, or original hardware.
+Retain the passed query prefix and corrected consumer result; do not replay them
+without changed code. The ABI-154 seasonal fixture remains partial, not closed by
+these player checks.
+
+Next connect the final axe-felling caller: native `808CA548..808CA558` accepts
+only stump IDs `1..4`, followed by the geometry lookup at `800A5AC8`. Returning
+gold stump `007E` alone does not commit the new foreground. Preserve real saved
+identities while adapting the geometry query. The donor's `ac_effectbg.c` has
+gold-specific size variants, status flag, tree/leaf resources, and cut handling;
+port those dependencies before routing gold variants into the native effect
+owner. Also retain planting sparkle and the remaining shop-path, camera-limit,
+and insect consumers as required work. Reuse the installed complete tree art.
+All four golden choices stay disabled until complete ordinary acquisition works.
+Format-3 matching/equal-or-larger profile restrictions remain; imported saves
+must not be loaded in V2 or older format-1/2 V3 builds. Preserve backups.
+
 ## Shared seasonal tree interactions
 
 The ABI-154 proposal is `build/v3-shared-tree-interactions-04/build-lock.json`.

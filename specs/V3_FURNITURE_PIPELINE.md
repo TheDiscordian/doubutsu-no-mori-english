@@ -47,9 +47,13 @@ rewritten for collision. This also fits existing reservations. The seasonal
 interaction refresh extends native drop records and cut-count initialization,
 preserving actual native landing, furniture luck, bee spawning, and all native
 rows. It uses source category records once for all four seasons, including all
-nine initialization callers, and adds 4 KiB fixed code reservation. Player
-eligibility/timing, planting effects, and remaining field/insect integration
-still precede complete ordinary acquisition. See
+nine initialization callers, and adds 4 KiB fixed code reservation. The player
+query refresh binds complete source/native consumers and replaces eleven
+axe/shovel/shake/bee sites through one register-preserving lazy-loading gate.
+It reuses replaced inline code and existing packet space, retaining native
+target filters, timing, identities, and all allocations/saves. Final axe felling,
+complete gold-tree effects, planting sparkle, and remaining field/insect
+integration still precede ordinary acquisition. See
 [seasonal scenery](V3_SCENERY.md).
 
 The shared flying-balloon category installs one complete donor state machine

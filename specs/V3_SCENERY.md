@@ -91,7 +91,7 @@ The equipment module retains its size and guards. Its
 `804ADC90..804ADFEF` range contains an 848-byte bootstrap and native fallback
 stubs, bounded before the retained guard at `804ADFF0`. A four-byte cache word
 at `804ADFEC` starts clear in the startup-loaded module. The bootstrap transfers
-and verifies the 8,232-byte shared code packet into the reserved
+and verifies the 8,544-byte shared code packet into the reserved
 `804B5000..804B7FFF` range, flushes the instruction cache, and records the verified
 CRC. Constructors then prepare the native/held table and load the active scenery
 bank. Tree queries can load the same packet before any seasonal actor exists;
@@ -350,14 +350,55 @@ final guard/checkpoint verification, or a hardware result.
 
 Reuse the installed renderer, planting conversion, tree-state helpers, and daily
 growth/death/neighbour/thinning, hidden-content, and world-query consumers.
-The seasonal drop and cut-count consumers are installed. Player eligibility,
-tree shaking/axe timing, bee timing, planting sparkle, and remaining field/insect
-consumers still need connection before full ordinary acquisition. The source
-player's `IS_ITEM_COLLIDEABLE_TREE` and `IS_ITEM_BEE_TREE` consumers must include
-selected gold states without changing real IDs. The source plants an ordinary shovel in a shining hole; do not
+Seasonal drop/cut counts and player targeting/shaking/bee predicates are installed.
+Final axe felling, planting sparkle, complete gold-tree leaf/cut effects, and
+remaining field/insect/camera consumers still precede full ordinary acquisition.
+The native final axe routine only accepts stumps `1..4`; extend this predicate
+and its geometry lookup without changing the real saved gold-stump ID. The donor
+effect owner has gold-specific variants, status, resources, and leaf types;
+do not pass unsupported variant indices to the native owner or substitute its
+ordinary-tree artwork. The source plants an ordinary shovel in a shining hole; do not
 substitute shop stock, arbitrary letters, recoloured ordinary trees, or seeded
 pockets for this route. Existing celebration and collection consumers remain
 installed, but all four golden choices stay disabled until their routes work.
+
+## Shared player tree queries
+
+Eight complete donor/native functions bind axe target selection, nearby-tree
+search, touch sound, shovel reactions, shaking, axe drops, and common bee release.
+The native category is extracted from the original complete predicates into
+three-word bitmaps; all sixty original solid-tree identities and ten small-tree
+identities remain. Selected gold stages extend the solid/shakeable predicates,
+excluding saplings, dead trees, and stumps. Small gold trees remain solid without
+acquiring the larger trees' touch sound. Bee predicates recognise native bees and
+selected gold bees only. Unsupported donor palm/cedar families are not enabled.
+
+Eleven call sites share one 364-byte gate inside a replaced player predicate.
+Each delay slot is an inert `ori zero,zero,metadata`, identifying input register,
+output register, and query kind. The gate preserves the other live integer
+registers, HI/LO, and floating-point registers/control, and uses the existing
+verified lazy loader before dispatching into the packet. Relative branches skip
+the reclaimed code. Eleven new jump relocations append after the unchanged
+original sequence: HI16/LO16 ordering must never be sorted by relocation type.
+No actor/owner allocation grows, and the gate has a bounded 256-byte stack frame.
+
+Existing target coordinates, height/distance/angle filters, original-item stores,
+animation checks, callback permission checks, and five-frame bee timers remain.
+Common bee and axe callbacks receive the real gold foreground identity. Axe
+decrement/drop and core stump conversion return correctly, but the final felling
+caller remains a separate pending consumer described above. The new packet fits
+the existing 12-KiB reservation without changing resources, saves, or choices.
+
+Four focused checks cover all sixteen-bit identities under both profiles,
+complete source/native retention, exact relocation at two addresses, all eleven
+call descriptors, storage, unchanged resources/saves, complete patch rebuilding,
+and exact V2-12 import-free output. Native component evidence covers all actual
+query sites and register preservation, lazy loading, common bee/axe consumers,
+original identities, permission-controlled timer initialization, and restored
+memory/guards/checkpoint. Drop and cut-count callbacks are isolated test stubs;
+ordinary target selection, complete felling/acquisition, rendered effects,
+save/restart, and original-hardware behaviour remain unverified. The checkpoint
+records the partial initial fixture and focused corrected consumer retry.
 
 The [checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-seasonal-scenery-preparation)
 records resources and focused checks. Component checks do not establish

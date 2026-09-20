@@ -18,8 +18,29 @@ served patchers retain their existing builds.
 
 ## Active development
 
-Shared seasonal shake/drop and axe-hit initialization are installed in ABI 154
-at `build/v3-shared-tree-interactions-04/build-lock.json`. Complete donor records
+The current explicit proposal is ABI 155 at
+`build/v3-shared-tree-player-02/build-lock.json`. Shared player tree queries
+connect axe targeting, nearby-tree selection, shovel reactions, shaking/touch
+sound eligibility, and bee checks. Eleven native call sites use one lazy-loading
+gate, preserving real foreground identities, native targeting, and bee timing.
+Four focused host/cartridge checks pass. All eleven native query sites and
+register preservation pass in the initial partial run; its final fixture guard
+overlaps a result recorder. The corrected, focused consumer retry passes 67
+records and 52 assertions, including actual bee and axe routines, guards, restored
+state/checkpoint, and clean exit. Drop/cut callbacks are fixture stubs; these
+results do not prove ordinary acquisition or hardware behaviour. Reuse them.
+
+The packet occupies 8,544 bytes within the existing 12-KiB reservation. The
+364-byte player gate reuses a replaced inline predicate; owner sizes, allocations,
+saves, choices, the main lock, and both patchers remain unchanged. Next connect
+the final axe-felling stump/height path, complete source gold-tree effects and
+planting sparkle, and remaining field/insect/camera consumers. In particular,
+native `808CA548..808CA558` still recognises only stump IDs `1..4`, so the tested
+gold-stump return alone is not a complete felling operation. Golden choices stay
+disabled. See the [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-player-tree-queries).
+
+Shared seasonal shake/drop and axe-hit initialization remain installed, verified
+in ABI 154 at `build/v3-shared-tree-interactions-04/build-lock.json`. Complete donor records
 add the shovel, Bells, furniture, and bees while retaining native landing, luck,
 furniture selection, bee handling, and original tree records. All nine seasonal
 cut-initialization calls are connected, including winter's extra path. Four
@@ -28,9 +49,9 @@ pass before a test-recorder overlap, after an initial oversized fixture allocati
 The overlap is corrected but not rerun within this batch's retry limit. The native
 result is not a complete pass; see the checkpoint for the precise tested scope.
 The packet occupies 8,232 bytes in a 12-KiB reservation, adding 4 KiB of fixed
-space without changing assets, owner sizes, saves, or choices. Next connect the
-player's tree/bee eligibility and timing consumers, planting sparkle, and remaining
-field/insect consumers before ordinary acquisition. Golden choices stay disabled.
+space without changing assets, owner sizes, saves, or choices. Player eligibility
+and bee timing are connected; final felling, effects, and remaining field/insect
+consumers still precede ordinary acquisition. Golden choices stay disabled.
 See the [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-seasonal-tree-interactions).
 
 Shared tree collision, shovel-removal, and NPC-walkability queries remain installed,
@@ -102,7 +123,7 @@ The main lock and both served patchers remain unchanged. See the
 [scenery specification](../specs/V3_SCENERY.md) and
 [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-seasonal-scenery-runtime).
 
-The current explicit ABI-154 proposal retains the complete balloon integration.
+The current explicit ABI-155 proposal retains the complete balloon integration.
 All eight balloons are
 connected through the shared parent-category installer: official names/prices,
 complete pocket icons, held/inventory animation, source acquisition records,

@@ -2,8 +2,8 @@
 
 ## Active: V3 optional GameCube imports
 
-The current explicit proposal is ABI 154,
-`build/v3-shared-tree-interactions-04/build-lock.json`. All eight balloons are
+The current explicit proposal is ABI 155,
+`build/v3-shared-tree-player-02/build-lock.json`. All eight balloons are
 connected through shared source-derived parent records, room profiles, indoor
 conversion/pickup, collection/catalogue, complete icons, and optional selection.
 There are 128 experimental choices, with 24 equipment parents. Neither served
@@ -78,9 +78,22 @@ owner sizes, saves, and choices remain unchanged. Four focused checks pass.
 The native run remains partial: one oversized allocation fails, then the retry
 passes 28 assertions before overlapping fixture result buffers cause a false
 deletion check. The corrected recorder is not rerun; preserve the partial proof
-and do not replay its passed prefix. Next connect the player's collideable-tree
-and bee-tree checks/timing, planting sparkle, and remaining field/insect consumers,
-then exercise ordinary acquisition. Preserve
+and do not replay its passed prefix. The shared player-query stage connects
+eleven axe/shovel/shake/bee call sites through one lazy-loading gate. Four focused
+checks pass. The initial native run verifies all eleven sites and register
+preservation, then encounters an overlapping fixture guard. The focused corrected
+consumer retry passes 67 records and 52 assertions, including native bee/axe
+consumers, guards, restored state/checkpoint, and clean exit. Drop/cut callbacks
+are stubs; reuse the completed components without claiming ordinary acquisition.
+The 8,544-byte packet fits the same 12-KiB reservation, and the 364-byte gate
+reuses replaced player code. No owner, allocation, save, or choice grows.
+Next connect final axe felling: `808CA548..808CA558` still only accepts native
+stumps `1..4`; its following height lookup at `800A5AC8` also needs gold geometry.
+Then connect complete source gold-tree leaf/cut effects, planting sparkle, and
+remaining field/insect/camera consumers before exercising ordinary acquisition.
+Do not feed GameCube gold effect-variant indices into the unextended native
+effect owner, or substitute ordinary-green effects for the gold source artwork.
+Preserve
 native scenery and the actual donor route; no arbitrary acquisition substitute.
 See [shared scenery](../specs/V3_SCENERY.md).
 Keep all four golden choices disabled pending those complete ordinary routes.

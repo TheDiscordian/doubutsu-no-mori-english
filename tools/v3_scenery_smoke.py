@@ -12,6 +12,135 @@ from v3_import_storage import jump
 from v3_npc_draw_smoke import boot_proofs
 
 
+def player_queries(debug,rom_path,record,*,consumers_only=False):
+    """Actual player call sites and bee/cut consumers; callbacks are isolated."""
+    import v3_scenery_player as player
+    path=Path(rom_path);image=path.read_bytes();report=json.loads((path.parent/'build.json').read_bytes())
+    if sha256(image)!=report['output_sha256']:raise ValueError('Changed player-tree cartridge')
+    e=report['equipment_resources'];r=e['scenery'];p=r['player_queries'];files=by_vrom(image);boot=boot_proofs(image)
+    assertions=0
+    def check(label,at,want):
+        nonlocal assertions
+        got=debug.read_memory(at,len(want));okay=got==want
+        record(dict(player_tree_check=label,address=f'{at:08X}',expected_sha256=sha256(want),
+            observed_sha256=sha256(got),assertion='passed' if okay else 'failed'))
+        if not okay:raise ValueError('Player-tree mismatch: '+label)
+        assertions+=1
+    def call(at,args=(),proof=None,want=None):
+        nonlocal assertions
+        result=debug.call(f'{at:08X}',[v&0xffffffff for v in args],return_address=MODULE_RAM+0x6480,
+            verified_code=proof or boot.get(at))
+        if want is not None:
+            result['assertion']='passed' if result['return_value']==want else 'failed';assertions+=1
+        record(result)
+        if want is not None and result['return_value']!=want:raise ValueError('Player-tree return mismatch')
+        return result['return_value']
+    def put(at,*values):debug.write_memory(at,struct.pack('>'+'I'*len(values),*values))
+    def flush(at,n):call(0x8002FE00,[at,n]);call(0x80034CE0,[at,n])
+    data=files[player.VROM].extract(image);rel=files[player.RELOC].extract(image)
+    owner=int.from_bytes(debug.read_memory(0x80143900,4),'big')-(0x808DD748-player.RAM)
+    if owner&15 or not MODULE_RAM+0x8000<=owner<=0x80400000-len(data):raise ValueError('Missing actual player owner')
+    loaded=relocate_verified_data(SimpleNamespace(ram=player.RAM,resident_bytes=p['resident_bytes'],
+        sections=struct.unpack_from('>5I',rel)),data,rel,owner)
+    check('complete actual relocated player text',owner,loaded[:p['sections'][0]])
+    regions=[(0x80460020,192),(0x80136F20,4),(r['ram'],r['additional_fixed_resident_bytes']),
+        (r['tree_states']['cache_word'],4),(TEST_STACK-0x800,16),(TEST_STACK+0x40,16)]
+    saved={at:debug.read_memory(at,n) for at,n in regions};module=debug.read_memory(e['ram'],e['bytes'])
+    save_data=debug.read_memory(0x8046C000,864)
+    allocation=call(0x8009BFC0,[0x1800])
+    if allocation&15 or not MODULE_RAM+0x8000<=allocation<=0x803FE800:raise ValueError('Player-tree fixture allocation failed')
+    actor,out,clip,bridge=allocation+0x100,allocation+0x14C0,allocation+0x1540,allocation+0x1600
+    edge=b'AFPT'*4;guards=[allocation,actor-16,actor+0x13A0,out-16,out+96,clip-16,clip+64,
+        bridge-16,allocation+0x17F0,TEST_STACK-0x800,TEST_STACK+0x40]
+    occupied=sorted([(actor,0x13A0),(out,96),(clip,64),(bridge,0xB0)]+[(at,16) for at in guards
+                    if allocation<=at<allocation+0x1800])
+    if any(a+n>b for (a,n),(b,_) in zip(occupied,occupied[1:])):
+        raise ValueError('Player-tree fixture buffers/guards overlap')
+    debug.write_memory(allocation,bytes(0x1800))
+    for at in guards:debug.write_memory(at,edge)
+    def li(reg,value):return [0x3C000000|reg<<16|value>>16,0x34000000|reg<<21|reg<<16|value&65535]
+    def emit(at,words):put(at,*words)
+    emit(bridge,li(8,out)+[0xAD040000,0xAD050004,0xAD060008,0xAD07000C,
+        0x3C093F80,0xACE90000,0xACE90004,0xACE90008,0x03E00008,0x00001025])
+    emit(bridge+0x80,li(8,out+32)+[0xAD040000,0xAD050004,0xAD060008,0x8D020010,0x03E00008,0])
+    flush(bridge,0xB0)
+    parent=next(row for row in e['player_actions']['equipment_selection']['rows'] if row['item_id']=='223B')
+    def select(enabled):
+        profile=bytearray(saved[0x80460020]);profile[parent['profile_byte']]&=~parent['profile_mask']
+        if enabled:profile[parent['profile_byte']]|=parent['profile_mask']
+        debug.write_memory(0x80460020,profile)
+    def regs(raw):return [int(raw[i:i+16],16) for i in range(0,len(raw),16)]
+    def extend(v):return v|(0xffffffff00000000 if v&0x80000000 else 0)
+    def query(row,item,want):
+        nonlocal assertions
+        before=debug.command('g');initial=regs(before)
+        if len(initial)!=71 or initial[37]&0xffffffff!=0x800D334C:raise ValueError('Player query needs paused native frame')
+        pc=owner+row['address']-player.RAM;values=initial[:]
+        for i in (*range(1,16),24,25):values[i]=0x10203000+i
+        values[row['source']]=item;values[29]=extend(TEST_STACK);values[37]=extend(pc)
+        values[33]=0x13572468;values[34]=0x24681357
+        stop=f'0,{pc+8:x},4'
+        if debug.command('Z'+stop)!='OK':raise ValueError('Player query breakpoint rejected')
+        try:
+            if debug.command('G'+''.join(f'{v:016x}' for v in values))!='OK':raise ValueError('Player query registers rejected')
+            stopped=debug.command('c');actual=regs(debug.command('g'))
+            expected=values[:];expected[row['result']]=want;expected[31]=extend(pc+8);expected[37]=extend(pc+8)
+            compared=(*range(1,32),33,34,*range(38,71))
+            bad=[i for i in compared if actual[i]&0xffffffff!=expected[i]&0xffffffff]
+            okay=stopped[:3] in ('T05','S05') and actual[37]&0xffffffff==pc+8 and not bad
+            record(dict(player_tree_query=row,item=f'{item:04X}',result=actual[row['result']]&0xffffffff,
+                expected=want,mismatched_registers=bad,actual_pc=f'{actual[37]&0xffffffff:08X}',
+                assertion='passed' if okay else 'failed'))
+            if not okay:raise ValueError('Actual player query result/register preservation failed')
+            assertions+=1
+        finally:
+            debug.command('z'+stop);debug.command('G'+before)
+    def native(start,end,args,want=None):
+        at=owner+start-player.RAM
+        return call(at,args,(at,loaded[start-player.RAM:end-player.RAM]),want)
+    try:
+        select(True);put(r['tree_states']['cache_word'],0)
+        if consumers_only:
+            call(0x800A5970,[0x800,0,4],want=0x801)
+        else:
+            for row in p['calls']:query(row,0x81 if row['query']==2 else 0x867,1)
+        blob=files[BLOB].extract(image);packet=blob[r['blob_offset']:r['blob_offset']+r['bytes']]
+        check('lazy-loaded complete query packet',r['ram'],packet)
+        if not consumers_only:
+            select(False);query(p['calls'][0],0x867,0);query(p['calls'][0],0x804,1)
+            select(True);query(p['calls'][4],0x864,0);query(p['calls'][4],0x865,1)
+        put(0x80136F20,clip);put(clip+12,bridge+0x80);put(clip+56,bridge)
+        put(actor+0x28,0x3F800000,0,0x3F800000);debug.write_memory(actor+0xDE,b'\x12\x34')
+        for enabled,item,x,want in ((True,0x81,2,1),(False,0x81,2,0),(False,0x5e,2,1),(True,0x80,2,0),(True,0x81,-1,0)):
+            select(enabled);debug.write_memory(out,bytes(96));put(out+64,0xA5A5A5A5)
+            native(0x808BAE38,0x808BAF40,[actor,item,x,3,out+64],want)
+            check('actual common bee callback keeps item and coordinates',out,
+                struct.pack('>3I',item,x,3) if want else bytes(12))
+            check('bee orientation/fallback output bounds',out+64,b'\x12\x34\xA5\xA5' if want else b'\xA5'*4)
+        select(True)
+        for count in (1,0):
+            debug.write_memory(out,bytes(96));put(out+48,count)
+            native(0x808CA400,0x808CA4C8,[actor,0,0x867,2,3],0x867 if count else 0x7e)
+            check('actual axe drop forwards full gold identity',out,struct.pack('>3I',0x867,2,3))
+            check('actual axe decrement forwards game and coordinates',out+32,struct.pack('>3I',0,2,3))
+        debug.write_memory(out,bytes(96));put(out+48,1);put(actor+0xD30,0)
+        allowed=call(0x800B5CD4)
+        native(0x808CA400,0x808CA4C8,[actor,0,0x81,2,3],0x81)
+        check('bee axe hit does not drop before its native timer',out,bytes(16))
+        check('native permission controls the unchanged five-frame bee timer',actor+0xD30,struct.pack('>I',5 if allowed else 0))
+        check('saved data unchanged',0x8046C000,save_data)
+        check('complete actual player text unchanged',owner,loaded[:p['sections'][0]])
+        for at in guards:check('fixture guard',at,edge)
+        check('no faulted thread',0x8003CE34,bytes(4))
+    finally:
+        for at,value in saved.items():debug.write_memory(at,value)
+        flush(r['ram'],r['additional_fixed_resident_bytes']);call(0x8009C040,[allocation])
+    for at,value in saved.items():check('restored state',at,value)
+    check('complete equipment unchanged',e['ram'],module)
+    return dict(assertions=assertions,actual_player_queries=0 if consumers_only else 11,actual_common_bee_and_axe_consumers=True,
+        drop_and_cut_callbacks_stubbed=True,ordinary_acquisition_tested=False,requires_checkpoint_restore=True)
+
+
 def interactions(debug,rom_path,record):
     """Native seasonal control flow with bounded field/landing/actor test doubles."""
     path=Path(rom_path);image=path.read_bytes();report=json.loads((path.parent/'build.json').read_bytes())
