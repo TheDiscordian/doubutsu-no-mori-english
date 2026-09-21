@@ -213,10 +213,13 @@ def checked_contracts(source,image,report,*,rows=None):
     """
     from v3_furniture_pipeline import prepare
     result={}
+    from v3_room_movement import checked_binding
+    movement=checked_binding(source,image,report)
     if rows is None:rows=report['equipment_resources']['room_rigs'].get('scrolling',{}).get('rows',[])
     for row in rows:
         contract=prepare_lifecycle(source,prepare(source,int(row['source_item_id'],16))[0],image,report)
         if contract and contract['dependencies_complete']:
+            if row['source_item_id'] in movement:contract['movement']=movement[row['source_item_id']]
             lifecycle_record(row,contract)
             result[row['source_item_id']]=contract
     return result

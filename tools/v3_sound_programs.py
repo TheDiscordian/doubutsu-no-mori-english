@@ -34,8 +34,19 @@ def trigger_program(sequence, origin, limit):
         envelope=struct.unpack('>H',span(data,at+1,2))[0]-origin
         decay=span(data,at+3,1)[0];pointers.append(at+1);at+=4
         if (origin+envelope)&1:raise ValueError('Unaligned trigger envelope')
+    commands=[]
     while at<len(data) and data[at]!=255:
         start=at;op=data[at];at+=1
+        if op==0xC2:
+            transpose=span(data,at,1)[0];at+=1
+            commands.append(dict(offset=start,opcode=op,transpose=transpose));continue
+        if op==0xC4:
+            commands.append(dict(offset=start,opcode=op));continue
+        if op==0xC7:
+            mode,target,time=span(data,at,3);at+=3
+            if not mode&128 or not 1<=mode&127<=5 or target>127 or not time:
+                raise ValueError('Unsupported trigger pitch sweep')
+            commands.append(dict(offset=start,opcode=op,mode=mode,target=target,time=time));continue
         if not 0x40<=op<=0x7F:raise ValueError('Unsupported trigger note command')
         duration=span(data,at,1)[0];at+=1
         if duration&128:duration=(duration&127)*256+span(data,at,1)[0];at+=1
@@ -51,7 +62,7 @@ def trigger_program(sequence, origin, limit):
     if len(data)-at>15 or any(data[at:]):raise ValueError('Unaccounted complete trigger tail')
     return dict(origin=origin,bytes=len(data),sha256=sha256(data),selector=data[1],instrument=data[2],
         pointers=pointers,envelope=envelope,envelope_bytes=envelope_bytes,decay=decay,events=events,
-        duration=sum(e['duration'] for e in events))
+        duration=sum(e['duration'] for e in events),**({'commands':commands} if commands else {}))
 
 
 def bind_trigger(data,description,offset,selector,instrument_index):
@@ -180,7 +191,7 @@ def prepare_triggers(image,report,sound_words):
     native_banks=span(code,0x80115D80-CODE_RAM+native_map,5)
     if source_banks!=bytes((4,2,155,154,153)) or native_banks!=bytes((4,2,141,140,139)):
         raise ValueError('Changed trigger font selection')
-    tables={1:(0x294,128),4:(0x394,107)};starts=set()
+    tables={0:(0x194,128),1:(0x294,128),4:(0x394,107)};starts=set()
     for group,(at,count) in tables.items():
         if struct.unpack_from('>H',source,0x188+group*2)[0]!=at:
             raise ValueError('Changed complete source trigger table')
@@ -251,6 +262,9 @@ def prepare_furniture_audio(image,report,source,inventory,output,selected=(),cat
     from v3_furniture_scroll import CATEGORY as SCROLL_CATEGORY
     if category==SCROLL_CATEGORY:
         return prepare_furniture_levels(image,report,source,inventory,output,selected)
+    if category=='room-movement':
+        from v3_room_movement import prepare_audio
+        return prepare_audio(image,report,source,output,selected)
     installed={r['item_id'] for r in report['equipment_resources'].get('furniture_audio',{}).get('furniture',[])}
     rows=[];triggers={}
     for r in inventory['rows']:
@@ -854,7 +868,7 @@ def grow_permanent_heap(code):
 
 def register_triggers(sequence,programs,fragments,counts,native_priority,source_priority,*,previous=None):
     """Extend whole dispatch tables while preserving shared cross-group priorities."""
-    if (len(native_priority)!=128 or len(source_priority)!=128 or set(counts)!={1,4} or
+    if (len(native_priority)!=128 or len(source_priority)!=128 or not {1,4}<=set(counts)<= {0,1,4} or
             any(type(n) is not int or not 0<n<=128 for n in counts.values())):
         raise ValueError('Unsupported complete trigger dispatch contract')
     result=bytearray(sequence);tables={};rows=[];used=set();retained={}
@@ -862,8 +876,9 @@ def register_triggers(sequence,programs,fragments,counts,native_priority,source_
         retained={r['source_sound_word']:r for r in previous['programs']}
         if len(retained)!=len(previous['programs']):raise ValueError('Duplicate retained source trigger')
         tables={r['group']:copy.deepcopy(r) for r in previous['tables']}
-        if set(tables)!=set(counts) or len(tables)!=len(previous['tables']):raise ValueError('Incomplete retained trigger tables')
+        if not set(tables)<=set(counts) or len(tables)!=len(previous['tables']):raise ValueError('Incomplete retained trigger tables')
         for group,count in sorted(counts.items()):
+            if group not in tables:continue
             table=tables[group]
             if (table['count']!=128 or table['previous_count']!=count or
                     struct.unpack_from('>H',sequence,0x188+group*2)[0]!=table['offset']):
@@ -886,7 +901,7 @@ def register_triggers(sequence,programs,fragments,counts,native_priority,source_
         if len(used)!=len(retained):raise ValueError('Retained trigger has unsupported native group')
     for group,count in sorted(counts.items()):
         if not 0<count<=128:raise ValueError('Invalid native trigger table count')
-        if previous is not None:continue
+        if group in tables:continue
         old=struct.unpack_from('>H',sequence,0x188+group*2)[0]
         pointers=list(struct.unpack('>'+str(count)+'H',span(sequence,old,count*2)))
         if any(p>=len(sequence) for p in pointers) or sequence[pointers[0]]!=255:
@@ -1087,6 +1102,9 @@ def install_furniture(image,prior,blob,code,original,output,directory):
     from v3_registry import furniture_representation_identity
     import v3_room_rig_runtime as room
     directory=directory.resolve();raw=(directory/'audio.json').read_bytes();prepared=json.loads(raw)
+    if prepared.get('format')=='AFV3-ROOM-MOVEMENT-PREPARED-1':
+        from v3_room_movement import install
+        return install(image,prior,blob,code,original,output,directory,prepared)
     if prepared.get('format')=='AFV3-FURNITURE-LEVEL-AUDIO-PREPARED-1':
         return install_furniture_levels(image,prior,blob,code,directory,prepared)
     if (not directory.is_relative_to(ROOT/'build') or prepared['format']!='AFV3-TRIGGER-AUDIO-PREPARED-1'

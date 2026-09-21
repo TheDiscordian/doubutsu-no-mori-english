@@ -18,15 +18,38 @@ deployments retain their existing builds.
 
 ## Active development
 
-The current explicit V3 proposal is ABI 191 at
+The current explicit V3 proposal is ABI 194 at
+`build/v3-room-movement-imports-01/cartridge/build-lock.json`. The shared room
+movement-sound dispatcher implements both source categories, with complete
+directional rolling/dragging and grass-dependent pushing sounds. The normal
+bulk importer enables lawn mower through its actual event-item stock and
+catalogue reordering, reusing its complete graphics and contact callbacks.
+There are 148 experimental choices and 27 inactive profiles. Stone-coin sound
+support does not enable its unfinished model/behaviour category.
+
+Four focused host checks pass, including sanitized runtime execution, complete
+audio/program/instrument rebinding, and four browser/offline ROM comparisons.
+A silent native first attempt passes 62 internal assertions through the complete
+movement-owner function, real lazy loader, and installed dispatch. Audio call
+arguments are recorded; actual synthesis/listening, ordinary room use, and
+hardware are not newly verified. Unchanged alpha/rendering evidence is retained.
+No additional fixed memory is reserved. Audio has 288 conservative bytes spare.
+
+Saved format 4 is unchanged, but selecting the mower adds its required profile
+bit: builds or selections without that import cannot load such saves. Preserve
+backups; ordinary cross-version reload is not established by these checks.
+The main lock and both stable website deployments are unchanged. See the
+[movement checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-room-movement-sounds-and-ordinary-import).
+
+The retained contact proposal is ABI 191 at
 `build/v3-contact-floor-runtime-04/build-lock.json`. Shared contact/floor alpha
 callbacks are installed without additional memory or saved fields. Complete
 source/artwork bindings map backyard lawn to new floor 74 and retain native
 meadow 48; native plank floor 26 is untouched. A focused silent emulator run
 passes the installed callbacks, native easing, complete actor-write boundaries,
 saved-state preservation, and guards. Ordinary room use and hardware remain
-unverified. The mower stays unavailable until its room-owner movement sounds
-are connected; installed alpha callbacks alone do not complete that behaviour.
+unverified. This retained proposal has alpha callbacks but no room-owner
+movement sounds; the current proposal above supplies the complete sound binding.
 
 Existing import choices and resources are unchanged. Furniture validation now
 follows the expanded floor-sound table while checking all original entries and

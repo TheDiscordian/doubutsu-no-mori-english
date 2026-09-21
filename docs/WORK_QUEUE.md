@@ -12,7 +12,24 @@ After the primary importing work, finish gold-tree leaf/cut effects and the full
 golden-shovel acquisition route. This is deferred required V3 work, not a dropped
 feature or a separate release goal.
 
-The current explicit proposal is ABI 191 at
+The current explicit proposal is ABI 194 at
+`build/v3-room-movement-imports-01/cartridge/build-lock.json`. Shared room
+movement sounds are installed for both source categories. The ordinary bulk
+pipeline enables the mower through its real event-item route and catalogue
+reordering, reusing its graphics. Four focused host checks and the first native
+attempt pass; the latter has 62 internal assertions. Retain these results and
+the unchanged alpha/rendering checks instead of replaying them. There are 148
+experimental choices and 27 inactive profiles. Sound support alone does not
+enable the stone coin's unfinished material/behaviour category.
+
+Next finish HomePage/Mario and Harvest delivery and full theme categories,
+and continue shared material/rigged-material support. New audio keeps all old
+dispatch entries and fits the current allocation, with 288 conservative bytes
+spare. Saved format 4 stays unchanged, but a selected mower needs its additional
+profile bit; preserve backups and equal-or-larger selections. Ordinary gameplay
+and hardware remain unverified. Neither stable deployment is changed.
+
+The retained contact proposal is ABI 191 at
 `build/v3-contact-floor-runtime-04/build-lock.json`. Shared contact/floor alpha
 callbacks are installed in the existing scrolling module. Complete bindings use
 additive lawn 74 and native meadow 48; original plank floor 26 stays unchanged.
@@ -22,16 +39,15 @@ The existing 147 choices, artwork, sound resources, saved layout, and profile
 selection are unchanged. Retain the unchanged surface-composition evidence below.
 
 The retained ABI-190 proposal at
-`build/v3-surface-selection-runtime-02/build-lock.json` supplies private composition
-offers 147 choices, including six surfaces with genuine A/C/event stock. Separate
+`build/v3-surface-selection-runtime-02/build-lock.json` offers 147 choices in
+private composition, including six surfaces with genuine A/C/event stock. Separate
 surface save profiles, selected catalogue rows/counts, and data-only CRC updates
 are connected in Python and JavaScript. Five focused host checks, ten browser
 unit checks, a corrected cold-startup fixture, and one focused Chromium worker/
 category-control check pass. The private export `build/v3-surface-browser-01/`
 is not deployed; the temporary test server is stopped. Retain this evidence.
 
-Next connect the shared room movement-sound category, then finish HomePage/Mario
-and Harvest delivery and complete theme categories. These are
+Finish HomePage/Mario and Harvest delivery and complete theme categories. These are
 shared category dependencies, not per-item import scripts. Ordinary gameplay
 and persistence still require focused integration/human testing. Keep the stable
 deployments unchanged and retain format-4 incompatibility warnings/backups.
@@ -120,13 +136,11 @@ movement dispatcher remains a distinct required integration step.
 
 Contact/floor callbacks are installed through complete source/native bindings.
 GameCube backyard lawn (26) maps to additive N64 floor 74; the distinct native
-plank floor 26 is preserved. Daisy meadow (48) matches completely. Implement
-the source room owner's shared
-movement sound category (`aMR_SetMoveSE`, lawn mower/stone coin); alpha callbacks
-alone do not include that behaviour. Reuse the source/native consumer checks and
-completed mower graphics. Native alpha-callback execution passes; ordinary room
-interaction and the movement-sound dispatcher remain unverified/unimplemented.
-The private proposal includes 147 choices; four surfaces remain unavailable.
+plank floor 26 is preserved. Daisy meadow (48) matches completely. The source
+room owner's shared movement sounds (`aMR_SetMoveSE`, lawn mower/stone coin) are
+installed and pass native dispatch checks. Reuse those checks and the completed
+mower graphics/alpha callbacks. Ordinary room interaction remains unverified.
+The private proposal includes 148 choices; four surfaces remain unavailable.
 Continue material and rigged-material categories alongside unresolved unique
 behaviours; the floor dependency must not stall unrelated importing.
 Other material callbacks/acquisition routes and ordinary gameplay/save checks
@@ -134,10 +148,10 @@ remain required. Gold-tree leaf/cut effects and full golden-shovel acquisition
 follow primary importing. Keep both stable website deployments unchanged until
 the user's testing and explicit approval.
 
-There are 147 experimental choices and 27 inactive profiles. Saved format 4
+There are 148 experimental choices and 27 inactive profiles. Saved format 4
 requires a compatible build and equal-or-larger selected profile. Surface options
 include six enabled surfaces and four pending delivery routes. Permanent audio
-has 896 conservative bytes spare and the import blob has 1,738,336 bytes free.
+has 288 conservative bytes spare and the import blob has 1,703,824 bytes free.
 The complete surface packet occupies 16 KiB,
 with no scene allocation. Ordinary room interaction, full sample synthesis, GPU
 appearance, and hardware verification remain unclaimed. No physical audio is

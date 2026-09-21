@@ -24,7 +24,7 @@ MATERIAL_TABLE,MATERIAL_VTABLE,MATERIAL_MAGIC,MATERIAL_CAPACITY=0x804B9E20,0x804
 SOURCES=('tools/v3_room_rig_runtime.py','tools/v3_asset_loader.py','tools/v3_furniture_rigs.py','tools/v3_keyframes.py',
     'tools/v3_furniture_pipeline.py','tools/v3_furniture_install.py','tools/v3_registry.py','tools/v3_equipment_runtime.py',
     'tools/v3_display_aliases.py','tools/v3_held_catalogue.py',
-    'tools/v3_resource_capacity.py','tools/v3_furniture_materials.py','tools/v3_furniture_scroll.py','tools/v3_furniture_contact.py','tools/v3_sound_programs.py',
+    'tools/v3_resource_capacity.py','tools/v3_furniture_materials.py','tools/v3_furniture_scroll.py','tools/v3_furniture_contact.py','tools/v3_sound_programs.py','tools/v3_room_movement.py',
     'tools/v3_furniture_behaviours.py','overlays/v3/furniture_behaviours.c','overlays/v3/furniture_behaviours.S','overlays/v3/furniture_behaviours.ld',
     'overlays/v3/room_scroll.c','overlays/v3/room_scroll.h','overlays/v3/room_scroll.ld',
     'overlays/v3/room_materials.c','overlays/v3/room_materials.h',
@@ -459,6 +459,9 @@ def publish_packet(equipment,blob,output):
         if runtime.get('scrolling'):
             from v3_furniture_scroll import VTABLE as SCROLL_VTABLE
             expected[SCROLL_VTABLE-TABLE:SCROLL_VTABLE-TABLE+20]=bytes.fromhex(runtime['scrolling'].get('vtable_hex','00'*20))
+            if runtime['scrolling'].get('movement',{}).get('bridge_hex'):
+                from v3_room_movement import BRIDGE
+                expected[BRIDGE-TABLE:BRIDGE-TABLE+8]=bytes.fromhex(runtime['scrolling']['movement']['bridge_hex'])
         if module[TABLE-EQUIPMENT_RAM:VTABLE-EQUIPMENT_RAM]!=expected:
             raise ValueError('Occupied room cache/material vtable reservation')
     module[TABLE-EQUIPMENT_RAM:VTABLE-EQUIPMENT_RAM]=bytes(VTABLE-TABLE)
@@ -471,6 +474,12 @@ def publish_packet(equipment,blob,output):
         scroll_vtable=struct.pack('>5I',*entries,0)
         module[SCROLL_VTABLE-EQUIPMENT_RAM:SCROLL_VTABLE-EQUIPMENT_RAM+20]=scroll_vtable
         runtime['scrolling'].update(vtable=SCROLL_VTABLE,vtable_hex=scroll_vtable.hex(),cache_ram=TABLE+4)
+        if runtime['scrolling'].get('movement'):
+            from v3_room_movement import BRIDGE
+            target=bootstrap['symbols']['af_v3_room_boot_scroll_move_sound']
+            bridge=struct.pack('>2I',0x08000000|(target>>2&0x3FFFFFF),0)
+            module[BRIDGE-EQUIPMENT_RAM:BRIDGE-EQUIPMENT_RAM+8]=bridge
+            runtime['scrolling']['movement'].update(entry=BRIDGE,helper_entry=target,bridge_hex=bridge.hex())
     if material_rows:
         entry=bootstrap['symbols']['af_v3_room_boot_material_dw']
         if entry&3 or not RAM<=entry<RAM+len(boot):raise ValueError('Material bootstrap escapes reservation')

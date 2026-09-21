@@ -1,5 +1,118 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared room movement sounds and ordinary import
+
+ABI 194 is `build/v3-room-movement-imports-01/cartridge/build-lock.json`.
+The shared source room-owner dispatcher, complete sound programs, and ordinary
+profile pipeline make lawn mower `33A0` available without an item-specific
+installer. It uses its donor `ftr_listEvent` acquisition and catalogue reordering,
+official name, native price/scoring readers, and independent selection. All
+5,264 graphics bytes are reused; the renderer and contact-alpha algorithm are
+unchanged. There are 148 experimental choices and 27 inactive profiles.
+
+The source `aMR_SetMoveSE` binds both movement categories. Stone coin preserves
+seven push/pull states and left/right rolling versus other-direction dragging;
+missing contact is silent. Mower preserves four push states and back contact on
+the two verified grass floors. Other floors retain the original native floor
+sound. This complete category also prepares the stone coin's sound support, but
+does not enable its unfinished model/material behaviour.
+
+Native movement function `8093EA60..8093EACF` retains its complete room predicate
+and floor lookup, changing only the call target at `8093EAB8`. Fixed bridge
+`804B1E50` follows the shared lazy-loader entry across later rebuilds. There are
+no new overlay relocations, saved fields, actor writes, or fixed allocations.
+Movement records occupy the existing scroll packet at `804BBF20`; the source
+case IDs, states, floors, directions, and sounds are bound before installation.
+
+The complete source rolling program retains all three pitch sweeps, transposition,
+continuous-note mode, notes, velocities, and durations. The shared trigger parser
+supports these commands and rejects unknown/incomplete programs. The registrar
+adds group zero while retaining existing groups one/four, original priorities,
+and all 81 previous movement entries. Source sounds `007D/007E/0177` map to native
+`0069/006A/016F`. Two complete instruments grow the font by 288 bytes; wave data
+grows 8,864 bytes, and sequence data grows 320 bytes. No audio-heap increase is
+needed. Conservative audio spare space is 288 bytes. Shared code occupies
+3,984/4,096 bytes and bootstrap code 1,510/1,536. Further code additions must
+respect those remaining 112/26-byte limits. The blob is 4,587,632 bytes, leaving
+1,703,824 bytes before its checked limit.
+
+Reproduction uses the existing preparation, runtime, profile, and bulk-import
+steps, not a separate item script:
+
+```sh
+python3 tools/v3_furniture_pipeline.py convert --assets-only \
+  --representation audio --category room-movement \
+  --base-lock build/v3-contact-floor-runtime-04/build-lock.json \
+  --output build/v3-room-movement-prepared-01
+python3 tools/v3_furniture_install.py --refresh-runtime \
+  --base-lock build/v3-contact-floor-runtime-04/build-lock.json \
+  --furniture-audio-art build/v3-room-movement-prepared-01 \
+  --output build/v3-room-movement-runtime-01
+python3 tools/v3_furniture_install.py --refresh-runtime \
+  --base-lock build/v3-room-movement-runtime-01/build-lock.json \
+  --furniture-profiles build/v3-scrolling-materials-prepared-03 \
+  --output build/v3-room-movement-profiles-02
+python3 tools/v3_furniture_pipeline.py import \
+  --base-lock build/v3-room-movement-profiles-02/build-lock.json \
+  --category scrolling-material-assets \
+  --reuse-assets build/v3-scrolling-materials-prepared-03 \
+  --output build/v3-room-movement-imports-01
+```
+
+The first profile build correctly refused activation because its comparison
+treated source-verification annotations as differences in the original callback
+descriptor. Matching all original descriptor fields while retaining/rechecking
+the extra proof resolves this; the profile step then succeeds. No source guard
+is bypassed. Runtime installation and bulk import succeed on their first attempts.
+
+Four focused checks in `tests/test_v3_room_movement.py` pass in 15.394 seconds:
+
+- Actual dispatcher C with the installed records runs under address and
+  undefined-behaviour sanitizers, covering both source modes, aliases, null
+  owners, states/directions/floors, fallbacks, and complete unchanged actors.
+- Complete program/instrument/source rebinding, pitch commands, incremental
+  table reuse, old-program preservation, original movement entries, and the
+  still-complete furniture-loop/click category pass.
+- Ordinary profile binding, the checked native owner/bridge, memory bounds,
+  unchanged graphics, exact new saved-profile bit, and malformed source/floor
+  rejection pass. The stone coin remains absent from selectable imports.
+- Browser/Python complete ROMs match for none, all, mower alone, and mower with
+  backyard lawn. The mower-only profile has no required surface bits. Empty
+  selection reproduces V2-12 exactly; all reproduces the current cartridge.
+  UPS reconstruction passes.
+
+Two existing synthetic sound-format tests pass in 0.001 seconds. They exercise
+the changed parser/font machinery, not historical cartridge builds.
+
+`build/v3-room-movement-native-01/` passes on its first attempt: 102 records,
+62 internal assertions. The fixture executes a complete installed native
+movement-function copy with an isolated player-room query, real lazy loader,
+actual packet/table/bridge, complete loaded sound programs, and real sound-table
+entries. Recorders observe trigger/floor sound identities, positions, and counts
+without physical audio. Grass/plank/native fallbacks, rolling/dragging, wrong
+states/directions, null contact, unchanged actors/saved state, work guards,
+checkpoint restoration, and shutdown pass. It does not establish synthesis,
+listening, ordinary acquisition/room interaction, full save/restart, GPU
+appearance, or original-hardware compatibility. Retain unchanged contact-alpha
+and renderer evidence instead of replaying it.
+
+Hashes:
+
+- ROM: `46cc452ffc97bdd1af71252b2ccdaf94b69e3e25a26a18f475674eb4d105f52e`.
+- UPS: `e3cde64e0aa0a26423f3261c953fb3c96ef86ddbe3efc4c0ef4b582689da0349`.
+- Build report: `7b872790ad005f994d47cbc77dff4226b952ed9cad3ba151b04c79b1680a4837`.
+- Prepared audio: `ff958f1c44bbb8094252b4e7a3aed9074a5e201f3277892b0e16cb795d26c6d1`.
+- Native results: `cf90c6467d7fff073ff9d199c045d2a52cad70f564850eca3b4f8358ae41d585`.
+
+Saved format 4 is unchanged, but mower selection adds profile byte 61 mask `01`.
+Builds or selections lacking that bit cannot load saves requiring the mower.
+Older V2/format-1/2/3 V3 builds still cannot load format-4 saves. Preserve backups;
+ordinary cross-version reload is not newly verified. The main ABI-109 lock and
+both stable website deployments stay unchanged; no private or public website
+switch is authorised. Next work is the shared HomePage/Mario and Harvest
+delivery/theme categories and remaining material/rigged-material behaviour.
+Gold-tree completion remains required after primary importing.
+
 ## Installed contact and floor lifecycles
 
 ABI 191 is `build/v3-contact-floor-runtime-04/build-lock.json`:

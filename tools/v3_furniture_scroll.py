@@ -403,6 +403,10 @@ def tables(runtime):
     drawing=encode(runtime['rows']);life=runtime.get('lifecycle_rows',[])
     if not life:return drawing.ljust(BYTES-(TABLE-RAM),b'\0')
     data=drawing.ljust(LIFE_TABLE-TABLE,b'\0')+encode_lifecycles(life)
+    if runtime.get('movement'):
+        from v3_room_movement import TABLE as MOVE_TABLE,encode as encode_movement
+        if len(data)>MOVE_TABLE-TABLE:raise ValueError('Lifecycles overlap movement records')
+        data=data.ljust(MOVE_TABLE-TABLE,b'\0')+encode_movement(runtime['movement']['rows'])
     if len(data)>BYTES-(TABLE-RAM):raise ValueError('Scrolling tables exceed their complete reservation')
     return data.ljust(BYTES-(TABLE-RAM),b'\0')
 
@@ -416,6 +420,17 @@ def profile_lifecycle(profile,contract,placement=None):
     """
     if draw_only_lifecycle(profile) is not None:return True
     adapter=profile.get('callback_adapter',{})
+    if contract and contract.get('category')=='contact-floor-alpha':
+        binding=contract.get('movement');functions=json.loads(json.dumps(adapter.get('functions',{})))
+        bound=json.loads(json.dumps(contract['source']['functions']))
+        if (not binding or binding.get('mode')!=2 or binding.get('entry')!=0x804B1E50 or
+                adapter.get('category')!=CATEGORY or adapter.get('pending_profile_fields') or
+                profile['contact_action'] or profile['interaction_flags'] or
+                set(bound)!=set(functions) or any(bound[role].get(k)!=v
+                    for role,receipt in functions.items() for k,v in receipt.items())):return False
+        record=lifecycle_record(dict(source_item_id=binding['source_item_id'],runtime_index=binding['runtime_index']),contract)
+        encode_lifecycles([record])
+        return binding['floors']==[record['on'],record['off']]
     start=profile['interaction_flags']==0x1000
     if start:
         from v3_furniture_behaviours import initial_switch_patch
@@ -504,6 +519,7 @@ def publish(equipment,blob,output):
     lifecycle=bool(runtime.get('lifecycle_rows'))
     defines=('AF_V3_ROOM_SCROLL_LIFECYCLE=1',) if lifecycle else ()
     if any(r['mode']==3 for r in runtime.get('lifecycle_rows',[])):defines+=('AF_V3_ROOM_CONTACT=1',)
+    if runtime.get('movement'):defines+=('AF_V3_ROOM_MOVEMENT=1',)
     code,compiled=compile_part('room_scroll',output/'room_scroll',defines=defines)
     table=tables(runtime);data=code.ljust(TABLE-RAM,b'\0')+table
     entry=compiled['symbols']['af_v3_room_scroll_dw']
@@ -516,6 +532,8 @@ def publish(equipment,blob,output):
     if lifecycle:
         runtime.update(lifecycle_table=LIFE_TABLE,lifecycle_table_sha256=sha256(encode_lifecycles(runtime['lifecycle_rows'])))
         extra=tuple(f'AF_ROOM_SCROLL_{role.upper()}=0x{compiled["symbols"]["af_v3_room_scroll_"+role]:X}u' for role in ('ct','mv','dt'))
+    if runtime.get('movement'):
+        extra+=(f'AF_ROOM_SCROLL_MOVE_SOUND=0x{compiled["symbols"]["af_v3_room_scroll_move_sound"]:X}u',)
     return (f'AF_ROOM_SCROLL_DW=0x{entry:X}u',f'AF_ROOM_SCROLL_VROM=0x{BLOB+at:X}u',
             f'AF_ROOM_SCROLL_BYTES={BYTES}u',f'AF_ROOM_SCROLL_CRC=0x{zlib.crc32(data):X}u',*extra)
 

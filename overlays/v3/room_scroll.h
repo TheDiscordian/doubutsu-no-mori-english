@@ -83,6 +83,20 @@ extern signed char af_v3_test_contact_floor;
 #define room_contact_floor af_v3_test_contact_floor
 #endif
 extern float add_calc(float *,float,float,float,float);
+#ifdef AF_V3_ROOM_MOVEMENT
+#define ROOM_MOVE_MAGIC 0x41464D56u
+#define ROOM_MOVE_CAPACITY 8u
+typedef struct { u16 index,mode,sound_a,sound_b,floor_a,floor_b; } RoomMoveRecord;
+typedef struct { u32 magic,count,stride,reserved; RoomMoveRecord rows[ROOM_MOVE_CAPACITY]; } RoomMoveTable;
+_Static_assert(sizeof(RoomMoveRecord)==12,"Movement record size");
+#ifdef __mips__
+#define room_move_table ((const RoomMoveTable *)0x804BBF20u)
+#else
+extern RoomMoveTable af_v3_test_room_moves;
+#define room_move_table (&af_v3_test_room_moves)
+#endif
+extern void sAdo_FloorTrgStart(u8,float *);
+#endif
 #endif
 #endif
 #endif

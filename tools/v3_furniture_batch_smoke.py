@@ -1609,6 +1609,7 @@ def exercise(debug, rom_path, record, *, section='automatic_furniture'):
     if section=='staged_profiles':return staged_profiles(debug,rom_path,record)
     if section=='scroll_lifecycles':return scroll_lifecycles(debug,rom_path,record)
     if section=='contact_lifecycles':return scroll_lifecycles(debug,rom_path,record,contact_only=True)
+    if section=='movement_sounds':return movement_sounds(debug,rom_path,record)
     if section=='initial_switch':return initial_switch(debug,rom_path,record)
     if section=='room_surfaces':return room_surfaces(debug,rom_path,record)
     if section=='surface_consumers':return surface_consumers(debug,rom_path,record)
@@ -3557,6 +3558,94 @@ def initial_switch(debug,rom_path,record):
     return dict(native_initial_switch=True,assertions=assertions,complete_installed_function_copy=True,
         fresh_placement_path=True,reload_or_gyroid_execution=False,ordinary_room_interaction=False,
         physical_audio_played=False,requires_checkpoint_restore=True)
+
+
+def movement_sounds(debug,rom_path,record):
+    """Complete room movement owner plus actual new shared sound dispatch."""
+    from aflib import CODE_RAM,CODE_VROM,u32
+    import v3_room_movement as movement
+    path=Path(rom_path);image=path.read_bytes();report=json.loads((path.parent/'build.json').read_bytes())
+    if sha256(image)!=report['output_sha256']:raise ValueError('Changed movement cartridge')
+    e=report['equipment_resources'];scroll=e['room_rigs']['scrolling'];rules=scroll['movement']
+    files=by_vrom(image);core=files[CODE_VROM].extract(image);blob=files[runtime.BLOB].extract(image)
+    body=movement.checked_owner(image,movement.BRIDGE)[movement.FIRST-movement.RAM:movement.LAST-movement.RAM]
+    boot=boot_proofs(image);assertions=0
+    def check(label,at,want):
+        nonlocal assertions
+        actual=debug.read_memory(at,len(want));passed=actual==want
+        record(dict(movement_sound_check=label,address=f'{at:08X}',bytes=len(want),
+            assertion='passed' if passed else 'failed',actual=actual.hex() if len(actual)<=16 else sha256(actual)))
+        if not passed:raise ValueError('Native movement sound mismatch: '+label)
+        assertions+=1
+    def call(at,args=(),proof=None):
+        result=debug.call(f'{at:08X}',list(args),return_address=MODULE_RAM+0x6480,verified_code=proof or boot.get(at))
+        record(result);return result['return_value']
+    def publish(at,data):
+        debug.write_memory(at,data);call(0x8002FE00,[at,len(data)]);call(0x80034CE0,[at,len(data)])
+    sequence=u32(debug.read_memory(0x8014CBA8,4),0);seq=e['sound_programs']['sequence']
+    if not 0x80000400<=sequence<=0x80400000-seq['bytes']:raise ValueError('Unbounded loaded movement sequence')
+    raw=image[seq['physical']:seq['physical']+seq['bytes']]
+    for row in rules['programs']:
+        check('complete loaded movement program',sequence+row['offset'],raw[row['offset']:row['offset']+row['bytes']])
+        word=row['native_sound_word'];table=struct.unpack_from('>H',raw,0x188+2*(word>>8))[0]
+        check('real trigger-table entry',sequence+table+2*(word&255),struct.pack('>H',row['offset']))
+    allocation=call(0x8009BFC0,[0xC00])
+    if allocation&15 or not MODULE_RAM+0x8000<=allocation<=0x80400000-0xC00:
+        raise ValueError('Movement fixture allocation failed')
+    actor,capture,function,owner,clip=(allocation+n for n in (16,0x780,0x800,0x900,0xB00))
+    debug.write_memory(allocation,bytes(0xC00));edge=b'V3MS'*4
+    guards=(allocation,actor+0x740,capture-16,capture+32,function-16,function+0x80,
+        owner-16,owner+0x1B0,clip-16,clip+16,allocation+0xBF0)
+    for at in guards:debug.write_memory(at,edge)
+    publish(function,body)
+    saved_code={}
+    for entry,target in ((0x800D1D58,capture),(0x800D1DE4,capture+16)):
+        original=core[entry-CODE_RAM:entry-CODE_RAM+40];check('native sound wrapper before recorder',entry,original)
+        saved_code[entry]=original
+        publish(entry,struct.pack('>10I',0x3C080000|(target>>16),0x35080000|(target&65535),
+            0xAD040000,0xAD050004,0xAD060008,0x8D09000C,0x25290001,0xAD09000C,0x03E00008,0))
+    entry=0x80087C88;original=core[entry-CODE_RAM:entry-CODE_RAM+12]
+    check('native room query before isolated fixture',entry,original);saved_code[entry]=original
+    publish(entry,struct.pack('>3I',0x24026000,0x03E00008,0))
+    field=0x6000
+    native_floor=(0x7BD80000+(((((field*4-field)*4-field)*4+field)*8+field)*8)-23492)&0xFFFFFFFF
+    if not 0x80100000<=native_floor<0x80150000:raise ValueError('Unbounded original floor reader')
+    saved={at:debug.read_memory(at,n) for at,n in ((0x80136F2C,4),(0x80137655,1),(native_floor,1))}
+    state=report['save_runtime'];saved_state=debug.read_memory(state['state_ram'],state['state_bytes'])
+    directional,grass=rules['rows'];a,b=grass['floors']
+    cases=[(directional['runtime_index'],a,4,1,True,1,directional['sounds'][0]),
+        (directional['runtime_index'],a,7,0,True,1,directional['sounds'][1]),
+        (directional['runtime_index'],a,8,1,True,0,0),
+        (directional['runtime_index'],a,1,1,False,0,0),
+        (grass['runtime_index'],a,1,0,True,1,grass['sounds'][0]),
+        (grass['runtime_index'],b,4,0,True,1,grass['sounds'][0]),
+        (grass['runtime_index'],26,1,0,True,2,26),
+        (grass['runtime_index'],a,5,0,True,0,0),
+        (grass['runtime_index'],a,1,1,True,0,0),
+        (grass['runtime_index'],a,1,0,False,0,0),(37,27,1,0,True,2,27)]
+    try:
+        for index,floor,step,direction,connected,kind,sound in cases:
+            data=bytearray(b'\xA7'*0x740);struct.pack_into('>H',data,0,index);struct.pack_into('>h',data,0x3C,step)
+            debug.write_memory(actor,data);debug.write_memory(capture,bytes(32))
+            debug.write_memory(clip,struct.pack('>I',owner));debug.write_memory(owner+0x1A0,struct.pack('>i',direction))
+            debug.write_memory(0x80136F2C,struct.pack('>I',clip if connected else 0))
+            for at in (native_floor,0x80137655):debug.write_memory(at,bytes((floor,)))
+            call(function,[actor],(function,body))
+            for output in (1,2):
+                at=capture+(output-1)*16
+                check('source movement condition and call count',at+12,struct.pack('>I',int(output==kind)))
+                if kind==output:check('native sound identity and actor position',at,struct.pack('>2I',sound,actor+8))
+            check('complete actor untouched by movement sound',actor,data)
+        p=scroll['packet'];check('complete lazy-loaded movement packet',p['ram'],blob[p['blob_offset']:p['blob_offset']+p['bytes']])
+        for at in guards:check('movement work guard',at,edge)
+        check('saved state preserved',state['state_ram'],saved_state);check('no CPU fault',0x8003CE34,bytes(4))
+    finally:
+        for at,data in saved.items():debug.write_memory(at,data)
+        for at,data in saved_code.items():publish(at,data)
+        call(0x8009C040,[allocation])
+    return dict(native_movement_sounds=True,assertions=assertions,complete_native_owner_copy=True,
+        real_lazy_loader=True,loaded_programs=True,sound_arguments_recorded=True,
+        synthesis_tested=False,physical_audio_played=False,ordinary_room_interaction=False,requires_checkpoint_restore=True)
 
 
 def scroll_lifecycles(debug,rom_path,record,*,contact_only=False):

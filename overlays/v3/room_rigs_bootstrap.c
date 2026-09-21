@@ -61,6 +61,11 @@ void af_v3_room_boot_scroll_mv(RoomRig *actor,void *room,RoomRigGame *game,u8 *d
 void af_v3_room_boot_scroll_dt(RoomRig *actor,u8 *data) {
     if (load_scroll()) ((void (*)(RoomRig *,u8 *))AF_ROOM_SCROLL_DT)(actor,data);
 }
+#ifdef AF_ROOM_SCROLL_MOVE_SOUND
+void af_v3_room_boot_scroll_move_sound(u32 floor,float *position) {
+    if (load_scroll()) ((void (*)(u32,float *))AF_ROOM_SCROLL_MOVE_SOUND)(floor,position);
+}
+#endif
 #endif
 #endif
 #ifdef AF_ROOM_MATERIAL_DW

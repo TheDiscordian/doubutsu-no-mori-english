@@ -264,8 +264,8 @@ Merlion, Manekin Pis, and fireplace use the shared ordinary profile/acquisition
 pipeline. Sprinkler's `1000` start-disabled profile flag requires the shared
 native placement binding as well as its complete move/draw/audio callbacks.
 It uses its source C-stock acquisition and supports catalogue reordering.
-The mower's contact/floor-driven alpha state is installed; its separate
-room-owner movement-sound behaviour remains required before activation.
+The mower's contact/floor-driven alpha state and separate room-owner movement
+sounds are installed; ordinary profile/acquisition selection uses both bindings.
 
 #### Shared contact and floor lifecycle preparation
 
@@ -302,7 +302,7 @@ fixed RAM. Without its compile-time definition, existing callbacks are unchanged
 The shared scrolling installer binds this category for all matching source
 records, including newly added drawing records in the same batch. It installs
 the contact code and records within the existing reservation. Ordinary profile
-binding still refuses activation until room-owner movement sounds are connected.
+binding requires the independently verified room-owner movement sounds.
 
 Floor binding compares every decoded pixel of the complete converted donor
 surface against the native room-floor bank. Zero matches require an additive
@@ -319,7 +319,7 @@ No existing native floor is replaced. Preparation accepts the checked build
 report so its dependency result reflects installed additive floors.
 
 The complete alpha callback remains independent from room movement sounds.
-Installed callbacks do not by themselves enable a parent profile or web option.
+Installed alpha callbacks do not by themselves enable a parent profile or web option.
 Future batches rebind source functions and complete installed floor resources;
 a readiness flag or matching numeric index cannot stand in for those checks.
 
@@ -328,6 +328,47 @@ table. A surface-audio expansion preserves all original 80 entries while adding
 new sounds; the verifier checks the complete original entries and each click's
 program, instruments, and priority instead of assuming the table remains at its
 original address.
+
+#### Shared room movement sounds
+
+`convert --assets-only --representation audio --category room-movement`
+prepares the complete source room-owner category, using the current explicit
+build lock. Both dispatch cases, source states/directions, complete helper
+functions, floor identities, and sound words come from `aMR_SetMoveSE`.
+The regular `--furniture-audio-art` installer installs the prepared category;
+ordinary profile and bulk-import steps remain responsible for activating items.
+
+The native complete movement function at `8093EA60..8093EACF` keeps its room
+predicate and floor calculation. Its one call at `8093EAB8` targets a fixed
+bridge at `804B1E50`, preserving the native position argument and fallback floor.
+The bridge follows the current lazy-loader function when later shared batches
+rebuild the bootstrap. No native overlay relocation changes. Added code and
+records fit the existing room reservations: 3,984/4,096 code bytes and a
+1,510/1,536-byte bootstrap. The movement table at `804BBF20` has a 16-byte
+magic/count/stride/reserved header and up to eight 12-byte records containing
+native index, mode, two sounds, and two floors. Records are immutable and do not
+change actor or saved state.
+
+Mode one preserves seven push/pull states and chooses rolling for left/right
+contact, dragging otherwise; absent contact is silent. Mode two preserves four
+push states and back contact on either bound grass floor, remaining silent for
+other contact/state combinations on grass. Other floors retain the ordinary
+native floor sound. Original furniture always retains that native fallback.
+
+Complete trigger programs preserve transposition, continuous-note mode, and
+all timed pitch sweeps. The shared registrar can add a dispatch group while
+preserving previous groups and every old slot/priority. Group zero retains all
+81 existing movement entries and grows to 128 slots. Sound mapping is source
+`007D/007E/0177` to native `0069/006A/016F`; these are generated mappings, not
+item-specific code constants. Two real instruments and their samples are added,
+growing the font by 288 bytes and sequence by 320 bytes. Existing audio capacity
+is sufficient, with 288 conservative bytes spare; no heap increase is needed.
+
+The mower uses ordinary event-item stock and catalogue reordering. Its optional
+selection does not require backyard lawn: native meadow also satisfies the
+source condition. Save format 4 is unchanged; selected imports still require
+their profile bits in future builds. Stone-coin movement audio does not waive
+that item's separate unfinished model/material behaviour.
 
 #### Shared initial-switch placement
 

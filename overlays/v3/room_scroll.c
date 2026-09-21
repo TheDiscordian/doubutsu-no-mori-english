@@ -200,4 +200,34 @@ void af_v3_room_scroll_dt(RoomScrollActor *actor,u8 *data) {
     if (r && (r->flags&1) && (unsigned)actor->private_switch<=1)
         actor->saved_switch=(u8)actor->private_switch;
 }
+#ifdef AF_V3_ROOM_MOVEMENT
+void af_v3_room_scroll_move_sound(u32 floor,float *position) {
+    if (!position) return;
+    RoomScrollActor *actor=(RoomScrollActor *)((u8 *)position-8);
+    u32 index=actor->index;
+    if (index>=2048u && index<3072u) index-=1024u;
+    if (room_move_table->magic==ROOM_MOVE_MAGIC && !room_move_table->reserved &&
+            room_move_table->stride==sizeof(RoomMoveRecord) && room_move_table->count<=ROOM_MOVE_CAPACITY) {
+        for (u32 i=0;i<room_move_table->count;++i) {
+            const RoomMoveRecord *r=room_move_table->rows+i;
+            if (r->index!=index || index<1024 || index>=2048) continue;
+            RoomContactClip *clip=room_contact_clip;
+            if (r->mode==1) {
+                if (actor->state>=1 && actor->state<=7 && clip && clip->owner) {
+                    int direction=clip->owner->direction;
+                    sAdo_OngenTrgStart(direction==1 || direction==3 ? r->sound_a : r->sound_b,position);
+                }
+                return;
+            }
+            if (r->mode==2 && (room_contact_floor==r->floor_a || room_contact_floor==r->floor_b)) {
+                if (actor->state>=1 && actor->state<=4 && clip && clip->owner && clip->owner->direction==0)
+                    sAdo_OngenTrgStart(r->sound_a,position);
+                return;
+            }
+            break;
+        }
+    }
+    sAdo_FloorTrgStart((u8)floor,position);
+}
+#endif
 #endif
