@@ -12,14 +12,15 @@ After the primary importing work, finish gold-tree leaf/cut effects and the full
 golden-shovel acquisition route. This is deferred required V3 work, not a dropped
 feature or a separate release goal.
 
-The current explicit proposal is ABI 181 at
-`build/v3-room-surfaces-runtime-02/build-lock.json`. All ten prepared floor/wall
-objects and shared room/shop readers are installed. Four focused checks and
-the first silent native run with 26 assertions pass. Original/imported texture
-DMA, buffer/actor guards, and saved state are checked; ordinary room entry,
-GPU appearance, surface application, and reload are not. No surface is selectable.
-Retain this reader evidence; finish the other consumers before further native
-surface testing unless changed code or a concrete defect requires it.
+The current explicit proposal is ABI 182 at
+`build/v3-surface-consumers-runtime-01/build-lock.json`. All ten prepared
+floor/wall objects have shared room/shop, catalogue-preview, and arranged-room
+readers. Five focused checks and the first silent consumer run with 24 internal
+assertions pass. Catalogue rebuilds retain the preview code; arranged-room bounds
+accept additions and preserve invalid-index fallback. The accepted room/shop
+checks remain valid without replay. Ordinary room entry, GPU appearance, surface
+application, and reload remain unverified. No surface is selectable. Continue
+item/action/persistence integration without replaying unchanged texture tests.
 
 The shared start-disabled placement adapter and ordinary sprinkler import are complete.
 Source C-stock acquisition and catalogue reordering are installed. Existing
@@ -38,9 +39,11 @@ preserve that route. Player floor reads still mask identity to six bits, so
 application/persistence need a real extension, not just larger texture bounds.
 Use `specs/V3_ROOM_SURFACES.md` for the shared reader/action/save integration order.
 Catalogue preview (`03970000`, linked `808A6100`) and arranged NPC rooms
-(`00845C40`, linked `80950E50`) still use original texture addresses and bounds.
-Their shared readers are next, then item/action/persistence integration; do not
-recompile artwork or replay the accepted room/shop transfer test.
+(`00845C40`, linked `80950E50`) use the separate added resource banks, preserving
+original resources and native preview geometry. Next connect complete surface
+item identities to names/prices, inventory actions, catalogue ownership, and
+saved room application. Preserve the six-bit native home fields until all
+readers/writers and their unrelated flags are accounted for.
 
 Contact/floor callbacks
 are source-bound and compiled, with four focused host/source checks passing.

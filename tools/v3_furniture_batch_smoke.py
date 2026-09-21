@@ -1610,6 +1610,7 @@ def exercise(debug, rom_path, record, *, section='automatic_furniture'):
     if section=='scroll_lifecycles':return scroll_lifecycles(debug,rom_path,record)
     if section=='initial_switch':return initial_switch(debug,rom_path,record)
     if section=='room_surfaces':return room_surfaces(debug,rom_path,record)
+    if section=='surface_consumers':return surface_consumers(debug,rom_path,record)
     if section=='furniture_audio':return furniture_audio(debug,rom_path,record)
     if section in ('scenery_planting_sparkle','scenery_planting_sparkle_remaining'):
         from v3_scenery_smoke import planting_sparkle
@@ -2643,6 +2644,86 @@ def held_level_sound(debug,rom_path,record):
         native_volume_pause_fade_pan_reverb=True,native_actor_registration_and_expiry=True,
         physical_audio_played=False,pcm_or_listening_verified=False,ordinary_gameplay_tested=False,
         flash_written=False,requires_checkpoint_restore=True)
+
+
+def surface_consumers(debug,rom_path,record):
+    """Changed single-buffer/preview paths and the actual constructor bounds."""
+    path=Path(rom_path);image=path.read_bytes();report=json.loads((path.parent/'build.json').read_bytes())
+    if sha256(image)!=report['output_sha256']:raise ValueError('Changed surface-consumer cartridge')
+    surface=report['room_surfaces'];files=by_vrom(image);blob=files[runtime.BLOB].extract(image)
+    boot=boot_proofs(image);assertions=0
+    def check(label,at,want):
+        nonlocal assertions
+        got=debug.read_memory(at,len(want));passed=got==want
+        record(dict(surface_consumer_check=label,address=f'{at:08X}',bytes=len(want),
+            assertion='passed' if passed else 'failed',actual=got.hex() if len(got)<=16 else sha256(got)))
+        if not passed:raise ValueError('Surface-consumer native mismatch: '+label)
+        assertions+=1
+    def call(at,args=(),proof=None):
+        result=debug.call(f'{at:08X}',list(args),return_address=MODULE_RAM+0x6480,verified_code=proof or boot.get(at))
+        record(result);return result['return_value']
+    allocation=call(0x8009BFC0,[0x4000])
+    if allocation&15 or not MODULE_RAM+0x8000<=allocation<=0x80400000-0x4000:
+        raise ValueError('Surface-consumer fixture allocation failed')
+    actor,single,preview,bounds,target=(allocation+n for n in (16,0x800,0x900,0xB20,0x1000))
+    debug.write_memory(allocation,bytes(0x4000));edge=b'V3SC'*4
+    guards=(allocation,actor+0x760,single-16,single+0xB0,preview-16,preview+0x200,bounds-16,bounds+0x80,
+        target-16,target+0x2020,allocation+0x3FF0)
+    for at in guards:debug.write_memory(at,edge)
+    bodies=[]
+    for owner,destination in zip(surface['secondary_owners'],(single,preview)):
+        data=files[owner['vrom']].extract(image);start=owner['windows'][0]['offset']
+        body=data[start:start+owner['compiled']['bytes']]
+        if sha256(data)!=owner['sha256'] or sha256(body)!=owner['compiled']['sha256']:
+            raise ValueError('Changed installed complete surface consumer')
+        bodies.append(body);debug.write_memory(destination,body)
+        call(0x8002FE00,[destination,len(body)]);call(0x80034CE0,[destination,len(body)])
+    bound=surface['secondary_owners'][0]['bounds'];data=files[0x845C40].extract(image)
+    body=data[bound['offset']:bound['offset']+bound['bytes']]
+    if body.hex()!=bound['after']:raise ValueError('Changed installed constructor bounds')
+    bridge=struct.pack('>4I',0x0200C825,0x00808025,0x00A02025,0x00C03825)+body+struct.pack('>5I',0xAE07017C,0xAE080184,0x03208025,0x03E00008,0)
+    debug.write_memory(bounds,bridge);call(0x8002FE00,[bounds,len(bridge)]);call(0x80034CE0,[bounds,len(bridge)])
+    state=report['save_runtime'];saved_state=debug.read_memory(state['state_ram'],state['state_bytes'])
+    fill=b'\xA5'*0x2020
+    try:
+        for kind,index in (('wall',73),('floor',77),('floor',68)):
+            debug.write_memory(target,fill)
+            row=next((r for r in surface['rows'] if r['kind']==kind and r['destination_index']==index),None)
+            want=blob[row['blob_offset']:row['blob_offset']+row['bytes']]+fill[row['bytes']:] if row else fill
+            entry=single+(0 if kind=='wall' else 0x54)
+            call(entry,[target,index],(single,bodies[0]));check('single-buffer complete resource and untouched tail',target,want)
+        for kind,index in (('wall',0),('floor',74)):
+            stride=0x1020 if kind=='wall' else 0x2020;item=(0x2700 if kind=='wall' else 0x2600)+index
+            stock_kind=4 if kind=='wall' else 3
+            eligible=any(call(0x800C0490,[item,stock_kind,stock,0]) for stock in range(3))
+            price=call(0x800C0194,[item]) if eligible else 0
+            expected=bytearray(b'\xA7'*0x760);struct.pack_into('>I',expected,0x744,target)
+            debug.write_memory(actor,expected);debug.write_memory(target,fill)
+            call(preview+(0 if kind=='wall' else 0xF8),[actor,0x12340000|item],(preview,bodies[1]))
+            struct.pack_into('>H',expected,0,index);struct.pack_into('>2I',expected,0x748,0,index*stride)
+            struct.pack_into('>H',expected,0x750,2 if kind=='wall' else 3)
+            struct.pack_into('>3I',expected,0x754,price,0x3F000000,0xC2B40000)
+            check('complete preview fields and native catalogue pricing',actor,expected)
+            if index<68:
+                raw=files[0x182A000 if kind=='wall' else 0x17A1000].extract(image);texture=raw[index*stride:(index+1)*stride]
+            else:
+                row=next(r for r in surface['rows'] if r['kind']==kind and r['destination_index']==index)
+                texture=blob[row['blob_offset']:row['blob_offset']+row['bytes']]
+            check('preview complete resource and untouched tail',target,texture+fill[stride:])
+        for floor,wall in ((26,48),(73,77),(68,72),(78,255)):
+            expected=bytearray(b'\xA7'*0x200);debug.write_memory(actor,expected)
+            call(bounds,[actor,floor,wall],(bounds,bridge))
+            selected=lambda i:i if i<64 or 73<=i<78 else 63
+            struct.pack_into('>I',expected,0x174,0);struct.pack_into('>I',expected,0x17C,selected(wall))
+            struct.pack_into('>I',expected,0x184,selected(floor))
+            check('actual arranged-room bound block retains identities and fallback',actor,expected)
+        for at in guards:check('consumer code/actor/resource guard',at,edge)
+        check('saved extension retained',state['state_ram'],saved_state);check('no CPU fault',0x8003CE34,bytes(4))
+    finally:call(0x8009C040,[allocation])
+    return dict(native_surface_consumers=True,assertions=assertions,complete_installed_reader_copy=True,
+        actual_constructor_bound_block=True,actual_native_stock_and_price=True,
+        ordinary_room_entry_tested=False,gpu_appearance_tested=False,surface_application_tested=False,
+        physical_audio_played=False,flash_written=False,requires_checkpoint_restore=True)
 
 
 def room_surfaces(debug,rom_path,record):

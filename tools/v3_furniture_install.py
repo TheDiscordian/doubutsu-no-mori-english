@@ -839,7 +839,7 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         report['automatic_furniture']['resource_moves']=moved
         report['import_storage']['remaining_bytes']=limit-BLOB-len(blob)
         report['shared_runtime_refresh'].update(adapters=['room_surfaces'],
-            artwork_changed=True,resource_allocations_changed=True,resource_tail_reuse=reused,
+            artwork_changed=not bool(prior.get('room_surfaces')),resource_allocations_changed=True,resource_tail_reuse=reused,
             unchanged_owner_moves=moved,changed_owner_moves=owner_moves,
             in_place_owner_updates=owner_updates,additional_resident_bytes=0)
         report['sources'].update(report['room_surfaces']['sources'])

@@ -316,6 +316,13 @@ def install_catalogue(base, stable, prior, imports, output, rel, symbols, *, wes
                      'sha256': sha256(changes[catalogue.VROM][catalogue.SIZE + GROWTH:])}
     report['code'].pop('elf_relocations')
     report['capacity_expansion']['pool_patches'] = prior['catalogue']['capacity_expansion']['pool_patches']
+    if prior.get('room_surfaces',{}).get('catalogue_texture_reader_installed'):
+        from v3_surface_runtime import retain_catalogue
+        changes[catalogue.VROM],changes[catalogue.RELOC],retained=retain_catalogue(
+            prior,base,changes[catalogue.VROM],changes[catalogue.RELOC])
+        report.update(output_sha256=sha256(changes[catalogue.VROM]),
+            relocation_sha256=sha256(changes[catalogue.RELOC]),retained_surface_preview=retained,
+            surface_preview_code_sha256=retained['code_sha256'])
     return changes, report
 
 

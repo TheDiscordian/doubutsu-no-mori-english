@@ -6,9 +6,10 @@ The general furniture pipeline's `surfaces` representation discovers complete
 GameCube floor/wall banks, preserves existing N64 identities, converts missing
 surfaces in a batch, and retains their names, prices, catalogue order, acquisition
 lists, and floor-sound selectors. The shared runtime installer connects complete
-artwork to the player-room and shop double-buffer readers. Catalogue/arranged-room
-readers, item actions, persistence, acquisition, and browser composition remain
-required. No surface is selectable merely because its artwork is installed.
+artwork to player-room/shop double-buffer readers, single-buffer arranged rooms,
+and catalogue previews. Item actions, persistence, acquisition, and browser
+composition remain required. No surface is selectable merely because its
+artwork is installed.
 
 Use the current explicit experimental lock; keep the main lock and both stable
 website deployments unchanged:
@@ -135,22 +136,55 @@ The native representative probe copies the installed pair into an isolated
 Room/shop instruction identity avoids repeating an identical execution. This
 does not establish ordinary room entry, GPU drawing, item use, or persistence.
 
+## Shared catalogue and arranged-room consumers
+
+The same refresh command extends an already installed surface category without
+appending or recompiling its artwork. `surface_single.c` occupies the complete
+arranged-room wall/floor functions at `80950EC8`/`80950F1C` in owner `00845C40`,
+linked at `80950E50`. The pair uses 164 bytes and no stack/local data. Original
+indices 0–67 and additive 73–77 have bounded complete transfers; invalid indices
+and null destinations do not transfer. The constructor's checked 72-byte bounds
+window accepts original player indices 0–63 and additive 73–77, retains fallback
+63 otherwise, and preserves all remaining constructor code and actor sizes.
+
+`surface_preview.c` replaces the two complete catalogue setup functions at
+`808A6854`/`808A694C` in owner `03970000`, linked at `808A6100`. The pair uses
+480 bytes and 40/32-byte stack frames. It preserves the native preview's half
+scale, -90 Y position, wall/floor draw types 2/3, timer, profile/offset fields,
+16-bit item interpretation, and actual A/B/C-stock price eligibility. Complete
+palettes/textures come from the existing or separate added bank. Missing indices
+and null texture buffers cannot cause out-of-range DMA. This is texture setup,
+not new item orderability or complete catalogue ownership integration.
+
+Each owner retains its complete original function checks and control-flow
+guards. Four obsolete debug relocations are removed per owner; all other
+relocations remain. `v3_garden_runtime.install_catalogue` reapplies the checked
+installed preview code to fresh catalogue builds, checks the complete original
+preview functions, and records updated owner/relocation hashes. Ordinary bulk
+imports must not silently discard surface readers.
+
+Focused tests cover the actual C under address/undefined-behaviour sanitizers,
+all preview fields, price-query ordering, full owner/relocation reconstruction,
+constructor mutation rejection, future catalogue retention, and unchanged
+save/profile composition. A bounded native probe uses complete installed reader
+copies, real DMA and native stock/pricing, and the actual constructor bounds
+block in an isolated 16-KiB arena. It does not run the entire arranged-room
+constructor, ordinary room entry, GPU draw, item use, or save/restart.
+
 ## Runtime integration queue
 
-1. Complete catalogue and arranged-NPC-room texture readers, retaining the
-   installed shared room/shop readers and original special-room sounds.
-2. Connect full item IDs to names, pricing, inventory actions, catalogue lists,
+1. Connect full item IDs to names, pricing, inventory actions, catalogue lists,
    ownership, and the existing optional-profile/save validation.
-3. Connect floor/wall application, removal, saved home identity, and reload;
+2. Connect floor/wall application, removal, saved home identity, and reload;
    retain existing home flags and native surface behaviour. Keep imports optional.
-4. Apply genuine acquisition categories, floor sound mapping, and matching-pair
+3. Apply genuine acquisition categories, floor sound mapping, and matching-pair
    HRA scoring. Existing Western, Backyard, and Boxing adapters explicitly lack
    their matching surfaces and must be updated from the same registry.
-5. Bind the prepared contact/floor lifecycle to installed surfaces. The mower
+4. Bind the prepared contact/floor lifecycle to installed surfaces. The mower
    also requires the donor room owner's movement sound dispatch in
    `aMR_SetMoveSE`; that owner handles both lawn mower and stone coin sounds.
    Colour callbacks alone do not complete the parent behaviour.
-6. Add individual/all surface browser composition privately, and run focused
+5. Add individual/all surface browser composition privately, and run focused
    native reader/application/save checks before a playtest handoff.
 
 Do not replay unchanged rendering or earlier cartridge tests for preparation.

@@ -1,8 +1,61 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared catalogue and arranged-room surface readers
+
+ABI 182 is `build/v3-surface-consumers-runtime-01/build-lock.json`, built with:
+
+```sh
+python3 tools/v3_furniture_install.py --refresh-runtime \
+  --base-lock build/v3-room-surfaces-runtime-02/build-lock.json \
+  --room-surfaces-art build/v3-room-surfaces-prepared-02 \
+  --output build/v3-surface-consumers-runtime-01
+```
+
+The ten complete installed assets, room/shop reader code, native banks, campsite
+wrapper, and original save/profile/choice data are retained. The 4,502,288-byte
+blob has 1,789,168 bytes free. No permanent/scene allocation, actor, or saved field
+grows. There are 141 choices and 27 inactive furniture profiles; surface items
+are not selectable until item/application/persistence/acquisition is complete.
+
+Arranged NPC rooms use 164 bytes of shared single-buffer code within their two
+existing functions. The checked constructor bounds preserve original player
+indices and invalid-index fallback while admitting stable additions 73–77.
+Catalogue preview uses 480 bytes within its two existing functions, preserving
+native metadata, scale/position, timer, and real stock/price queries. Four obsolete
+debug relocations are removed per owner. Future catalogue rebuilds restore the
+checked preview code and update their full owner/relocation hashes.
+
+Five focused tests in `tests/test_v3_surface_consumers.py` pass in 4.784 seconds:
+complete owner/relocation reconstruction and constructor checks; retained assets
+and room/shop code; actual consumer C under address/undefined-behaviour sanitizers;
+fresh catalogue rebuild retention and mutation rejection; unchanged saved
+profiles, exact empty/all composition, and UPS reconstruction. No full historical
+suite or unchanged native texture check is replayed.
+
+The first silent native run at `build/v3-surface-consumers-native-01/` passes
+59 records and 24 internal assertions, with no retry. Complete installed reader
+copies perform original/imported DMA; preview fields and actual native A/B/C
+stock/prices match. The actual constructor bounds block retains both native and
+added indices with the original fallback. All actor/code/resource guards and
+saved extension bytes remain intact. The checkpoint restores, no CPU fault is
+present, and the emulator exits cleanly. The isolated arena is 16 KiB. No user
+save or physical audio is used. This does not test the complete constructor,
+ordinary room entry, GPU appearance, surface application, or save/restart.
+
+- ROM SHA-256: `15c37d539aeed6f523297cb89fe236d165ae79cec8ee820028eaaabd633c6af5`.
+- UPS SHA-256: `5fbf38b33e727248496d37184fe2fc3155a58c781af30fefdd795a135d174730`.
+- Build receipt SHA-256: `58430acf38fb579787213a33252a19f324ba63a82765f5f044a30d50afae56ae`.
+- Native results SHA-256: `9afc902a3c126be1d3c9874694e1ef91b2653389ddee940d406553ac3352e3ba`.
+
+Saved format 3 and equal/superset selection restrictions are unchanged. No new
+ordinary reload or hardware compatibility claim is made. The main lock and both
+deployments of the one stable web patcher remain unchanged. Continue shared
+item/action/save readers, acquisition, sound/scoring, and private composition.
+Required gold-tree work follows primary imports.
+
 ## Shared room and shop surface readers
 
-The current resource proposal is ABI 181 at
+The retained room/shop resource proposal is ABI 181 at
 `build/v3-room-surfaces-runtime-02/build-lock.json`, built through:
 
 ```sh

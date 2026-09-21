@@ -18,23 +18,27 @@ served patchers retain their existing builds.
 
 ## Active development
 
-The current explicit V3 proposal is ABI 181 at
-`build/v3-room-surfaces-runtime-02/build-lock.json`. All ten additive floor/wall
-assets are installed through shared room/shop texture readers. The two owners
-use identical 520-byte reader code inside existing function storage; no resident
-allocation, scene buffer, or actor grows. Existing surface banks, the campsite
-floor wrapper, saved format/profile, and 141 choices are unchanged.
+The current explicit V3 proposal is ABI 182 at
+`build/v3-surface-consumers-runtime-01/build-lock.json`. All ten additive
+floor/wall assets have shared room, shop, catalogue-preview, and arranged
+villager-room texture readers. Arranged rooms accept the added indices while
+retaining the original invalid-index fallback. Future bulk catalogue rebuilds
+retain the installed preview code. No artwork, resident allocation, scene
+buffer, actor, saved format/profile, or experimental choice grows in this batch.
 
-Four focused checks pass, including memory-safety sanitizers, full resources,
-changed owners/relocations, and exact empty/all composition. The first silent
-native check passes 26 assertions with real original/imported texture DMA,
-complete copied installed functions, double-buffer/tail guards, retained saved
-state, checkpoint restoration, and clean exit. Ordinary room entry, GPU
-appearance, new-surface application, and persistence remain unverified.
-No surface is selectable yet. Next connect catalogue/arranged-room readers,
-item actions and saved room identity, acquisition, sound/scoring, and private
-composition. The main lock and both stable website deployments stay unchanged.
-See the [reader checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-room-and-shop-surface-readers).
+Five focused checks pass, including memory-safety sanitizers, complete changed
+owners/relocations, catalogue-rebuild retention, and exact empty/all composition.
+The first silent native check passes 24 internal assertions for complete
+single-buffer/preview transfers, actual native stock/price queries, the installed
+arranged-room bounds block, memory guards, retained saved state, checkpoint
+restoration, and clean exit. The passing room/shop transfer evidence is retained
+without replay. Ordinary room entry, GPU appearance, new-surface application,
+and persistence remain unverified. No surface is selectable yet.
+
+Next connect item actions and saved room identity, acquisition, sound/scoring,
+and private composition. The main lock and both deployments of the stable web
+patcher stay unchanged. See the
+[consumer checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-catalogue-and-arranged-room-surface-readers).
 
 The shared room-surface pipeline prepares all ten donor-only floors/wallpapers
 in `build/v3-room-surfaces-prepared-02/`: 61,760 bytes with complete palettes,
