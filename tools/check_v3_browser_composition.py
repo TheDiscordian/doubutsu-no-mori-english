@@ -184,7 +184,8 @@ def check_interface(page, origin, out, expected, catalog, review):
     return results
 
 
-def check(export, output, *, interface=False):
+def check(export, output, *, interface=False, selected=None):
+    focused=selected is not None
     export, out = export.resolve(), output.resolve()
     if (not export.is_relative_to(ROOT/'build') or not out.is_relative_to(ROOT/'build') or out.exists()):
         raise ValueError('Use an ignored export and a fresh ignored check directory')
@@ -240,6 +241,10 @@ def check(export, output, *, interface=False):
                 ('villager-and-seasonal-subset', ['GAFE01-r0/villager/00EB', 'GAFE01-r0/item/31D4'])]
     equipment=[key for key,row in catalog.items() if row['kind']=='equipment']
     if equipment:profiles.append(('equipment-subset',[equipment[1],equipment[-1]]))
+    if focused:
+        if interface:raise ValueError('Choose a focused worker profile or the complete interface check')
+        composer.resolve(catalog,selected)
+        profiles=[('focused-selection',selected)]
     expected = {}
     for name, selected in profiles:
         if interface and name == 'all-installed': continue
@@ -288,24 +293,44 @@ def check(export, output, *, interface=False):
                     results['interface'] = check_interface(page, origin, out, expected, catalog,
                         json.loads(resources['data/review.json']))
                 else:
-                    cancelled = worker(profiles[-1][1], cancel=True)
-                    assert cancelled['type'] == 'cancelled', cancelled
-                    results['worker_termination'] = cancelled
+                    if not focused:
+                        cancelled = worker(profiles[-1][1], cancel=True)
+                        assert cancelled['type'] == 'cancelled', cancelled
+                        results['worker_termination'] = cancelled
                     for name, selected in profiles:
                         result = worker(selected)
                         assert result['type'] == 'done', result
                         assert result['sha256'] == expected[name] == result['receipt']['output_sha256'], name
                         for key in ('enabled', 'required', 'profile_hex'):
                             assert result['receipt'][key] == composer.resolve(catalog, selected)[key], (name, key)
+                        selection=composer.resolve(catalog,selected)
+                        if 'surface_profile_hex' in selection:
+                            for key in ('surface_profile_hex','surface_profile_sha256'):
+                                assert result['receipt'][key]==selection[key],(name,key)
+                            if selected:assert result['receipt']['save_compatibility']==composer.save_compatibility(report)
                         results[name] = result
                         print(json.dumps({'case': name, 'sha256': result['sha256'], 'matched_offline': True}), flush=True)
-                    unknown = worker(['GAFE01-r0/item/0000'])
-                    assert unknown['type'] == 'error' and 'Unknown or unimplemented' in unknown['message'], unknown
-                    results['unknown_option_rejected'] = unknown
-                    state['corrupt_plan'] = True
-                    corrupt = worker(profiles[-1][1])
-                    assert corrupt['type'] == 'error' and 'plan checksum mismatch' in corrupt['message'], corrupt
-                    results['corrupt_plan_rejected'] = corrupt
+                    if focused:
+                        ui=context.new_page();ui.on('pageerror',lambda error:errors.append(str(error)))
+                        ui.goto(origin+'/preview/')
+                        ui.wait_for_function("() => !document.querySelector('#selection-controls').disabled")
+                        counts={}
+                        for kind in sorted({catalog[k]['kind'] for k in profiles[0][1]}):
+                            count=sum(r['kind']==kind for r in catalog.values())
+                            ui.locator('#kind').select_option(kind)
+                            assert ui.locator('.option:visible').count()==count
+                            ui.locator('#select-visible').click()
+                            assert ui.locator('.option:visible input:checked').count()==count
+                            ui.locator('#clear-all').click();counts[kind]=count
+                        results['focused_category_controls']=counts;ui.close()
+                    else:
+                        unknown = worker(['GAFE01-r0/item/0000'])
+                        assert unknown['type'] == 'error' and 'Unknown or unimplemented' in unknown['message'], unknown
+                        results['unknown_option_rejected'] = unknown
+                        state['corrupt_plan'] = True
+                        corrupt = worker(profiles[-1][1])
+                        assert corrupt['type'] == 'error' and 'plan checksum mismatch' in corrupt['message'], corrupt
+                        results['corrupt_plan_rejected'] = corrupt
                 assert not errors, errors
                 assert all(r['method'] == 'GET' and not r['body_bytes'] and
                            urlsplit(r['url']).netloc == urlsplit(origin).netloc for r in requests)
@@ -326,6 +351,7 @@ if __name__ == '__main__':
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--interface', action='store_true', help='Check the real selection page and downloads instead of the worker probe')
     parser.add_argument('--base-lock',type=Path,help='Explicit checked proposal lock for this isolated test')
+    parser.add_argument('--select',action='append',help='Check only this current profile and its category controls; repeat for more identities')
     args = parser.parse_args()
     if args.base_lock:composer.use_build_lock(args.base_lock)
-    print(json.dumps(check(args.export, args.output, interface=args.interface), indent=2))
+    print(json.dumps(check(args.export, args.output, interface=args.interface,selected=args.select), indent=2))

@@ -174,6 +174,10 @@ def catalogue(image, report):
     held=held_options(blob,report)
     if result.keys()&held.keys():raise ValueError('Parent identity collides with another import')
     result.update(held)
+    from v3_surface_selection import options as surface_options
+    surfaces=surface_options(blob,report)
+    if result.keys()&surfaces.keys():raise ValueError('Surface identity collides with another import')
+    result.update(surfaces)
     for row in report['villager_text']['imports']:
         donor = int(row['id'].rsplit('/', 1)[1], 16)
         actor = villager_actor(donor)
@@ -208,8 +212,8 @@ def catalogue(image, report):
     # installs them. Its catalogue must cover its actual installed records only.
     expected = ({row['id'] for row in report['villager_text']['imports']} |
                 {row['id'] for row in furniture_rows} |
-                {item_key(int(row['donor_item_id'], 16)) for row in report['clothing']['imports']} | held.keys())
-    if (set(result) != expected or len(result) != len(VILLAGERS)+len(furniture_rows)+len(CLOTHING)+len(held)):
+                {item_key(int(row['donor_item_id'], 16)) for row in report['clothing']['imports']} | held.keys() | surfaces.keys())
+    if (set(result) != expected or len(result) != len(VILLAGERS)+len(furniture_rows)+len(CLOTHING)+len(held)+len(surfaces)):
         raise ValueError('Incomplete or duplicated installed development catalogue')
     return dict(sorted(result.items()))
 
@@ -237,7 +241,7 @@ def resolve(catalog, selected):
     displays = [{'item_id':row['display_item_id'], 'runtime_index':row['display_runtime_index']}
                 for row in catalog.values() if row['id'] in enabled and row['kind'] in ('clothing','equipment')]
     profile = profile_bytes(villagers, furniture+displays, [row['source_record'] for row in shirts])
-    return {'format':'AFV3-LOCAL-SELECTION-1', 'donor':'GAFE01-r0',
+    result={'format':'AFV3-LOCAL-SELECTION-1', 'donor':'GAFE01-r0',
         'registry_versions':{'villagers':1, 'furniture':1, 'clothing':1, 'displays':1},
         'requested':requested, 'enabled':sorted(enabled),
         'required':sorted(enabled-set(requested)),
@@ -247,6 +251,12 @@ def resolve(catalog, selected):
             (catalog[key] for key in sorted(enabled))],
         'profile_hex':profile.hex(), 'profile_sha256':sha256(profile),
         'experimental':True, 'web_patcher_enabled':False, 'playable_handoff':False}
+    if any(r['kind'] in ('floor','wall') for r in catalog.values()):
+        from v3_surface_selection import profile as surface_profile
+        bits=surface_profile([catalog[k] for k in enabled if catalog[k]['kind'] in ('floor','wall')])
+        result.update(surface_profile_hex=bits.hex(),surface_profile_sha256=sha256(bits))
+        result['registry_versions']['surfaces']=1
+    return result
 
 
 def apply_writes(source, writes):
@@ -312,6 +322,10 @@ def catalogue_selection(image, report, enabled):
         change(UMBRELLA_COUNT,struct.pack('>I',held['total_rows']),struct.pack('>I',32+len(selected)),
             'selected equipment iteration/completion count')
         receipt.update(equipment_imports=selected,equipment_total_rows=32+len(selected))
+    from v3_surface_selection import table_writes
+    surface_writes,surface_receipt=table_writes(image,report,enabled)
+    writes.extend(surface_writes)
+    if surface_receipt:receipt['surfaces']=surface_receipt
     return writes,receipt
 
 
@@ -341,7 +355,8 @@ def compose(image, report, catalog, selection):
             writes.append({'offset':offset, 'before':before.hex(), 'after':value.hex(), 'purpose':label})
     def prefix(offset, value, label):
         if not (0x20 <= offset < offset+len(value) <= PREFIX_SIZE or
-                len(value) == 4 and offset in (STATIC_ROWS + slot * 80 + 4 for slot in range(STATIC_COUNT))):
+                len(value) == 4 and (offset in (STATIC_ROWS + slot * 80 + 4 for slot in range(STATIC_COUNT)) or
+                    offset in {r['enable_offset'] for r in catalog.values() if r['kind'] in ('floor','wall')})):
             raise ValueError('Selection field escapes reviewed resident enable words')
         change(files[BLOB].pstart+offset, value, label)
     prefix(0x20, bytes.fromhex(selection['profile_hex']), 'complete saved import profile')
@@ -357,6 +372,11 @@ def compose(image, report, catalog, selection):
     writes.extend(catalogue_writes)
     scoring_writes, _ = scoring_selection(image, report, catalog, enabled)
     writes.extend(scoring_writes)
+    from v3_surface_selection import checksum_fields
+    for field in checksum_fields(image,report):
+        intermediate=apply_writes(image,writes);at=field['start']
+        change(field['offset'],struct.pack('>I',zlib.crc32(intermediate[at:at+field['length']])),
+            'selected surface resource CRC')
     intermediate = apply_writes(image, writes)
     start = files[BLOB].pstart
     new_blob = intermediate[start:start+len(blob)]
@@ -515,6 +535,9 @@ def build(output, selected=(), *, select_all=False):
         at = hr['metadata_address'] - hra.RAM
         hr.update(imports=selected_hra, output_sha256=sha256(data),
                   metadata_sha256=sha256(data[at:at + hr['metadata_rows'] * 4]))
+        if 'surfaces' in selected_cat:
+            from v3_surface_selection import update_report
+            update_report(result,blob,current,selection,selected_cat['surfaces'])
     output.mkdir(parents=True, exist_ok=False)
     write_new(output/'animal-forest-v3-asset-loader.z64', result)
     write_new(output/'asset-loader.ups', patch)

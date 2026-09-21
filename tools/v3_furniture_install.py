@@ -754,6 +754,9 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
                   f'AF_V3_EQUIPMENT_CRC=0x{equipment_report["crc32"]:08X}u',
                   f'AF_V3_EQUIPMENT_BYTES=0x{equipment_report["bytes"]:X}u')
     surface_items=report_updates.get('room_surfaces',{}).get('items')
+    if report_updates.get('room_surfaces',{}).get('optional_selection'):
+        defines=tuple(f for f in defines if not f.startswith('AF_V3_EDITABLE_CHECKSUMS='))
+        defines+=('AF_V3_EDITABLE_CHECKSUMS=1',)
     if surface_items:
         defines=tuple(f for f in defines if not f.startswith('AF_V3_FURNITURE_INIT='))
         defines+=(f'AF_V3_FURNITURE_INIT=0x{surface_items["bootstrap"]["ram"]:X}u',)
@@ -959,6 +962,9 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             if report['room_surfaces'].get('stock'):
                 report['shared_runtime_refresh']['adapters'].append('surface_stock')
                 report['native_test']='pending selected-only surface stock execution; HomePage/Harvest acquisition, full remaining themes, and private selection remain incomplete'
+            if report['room_surfaces'].get('optional_selection'):
+                report['shared_runtime_refresh']['adapters'].append('surface_selection')
+                report['native_test']='pending private surface composition/startup; ordinary gameplay/persistence and HomePage/Harvest categories remain incomplete'
     write_new(output/'animal-forest-v3-asset-loader.z64',result)
     write_new(output/'asset-loader.ups',patch)
     write_new(output/'build.json',(json.dumps(report,indent=2,sort_keys=True)+'\n').encode())

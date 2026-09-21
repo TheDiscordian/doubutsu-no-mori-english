@@ -5,7 +5,7 @@ import { resolveSelection } from './composer.mjs';
 const $ = id => document.getElementById(id);
 const inputs = [$('n64'), $('gamecube')];
 const requested = new Set(), cards = new Map(), reviews = [];
-const kinds = { villager: 'Villager', furniture: 'Furniture', clothing: 'Clothing', equipment: 'Equipment' };
+const kinds = { villager: 'Villager', furniture: 'Furniture', clothing: 'Clothing', equipment: 'Equipment', floor: 'Floor', wall: 'Wallpaper' };
 let loaded, selection, worker, generation = 0, romURL, receiptURL;
 const status = message => { $('status').textContent = message; };
 function fileError() {

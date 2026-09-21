@@ -1618,6 +1618,7 @@ def exercise(debug, rom_path, record, *, section='automatic_furniture'):
     if section=='surface_scoring':return surface_scoring(debug,rom_path,record)
     if section=='surface_audio':return surface_audio(debug,rom_path,record)
     if section=='surface_stock':return surface_stock(debug,rom_path,record)
+    if section=='surface_selection':return surface_selection(debug,rom_path,record)
     if section=='furniture_audio':return furniture_audio(debug,rom_path,record)
     if section in ('scenery_planting_sparkle','scenery_planting_sparkle_remaining'):
         from v3_scenery_smoke import planting_sparkle
@@ -2651,6 +2652,41 @@ def held_level_sound(debug,rom_path,record):
         native_volume_pause_fade_pan_reverb=True,native_actor_registration_and_expiry=True,
         physical_audio_played=False,pcm_or_listening_verified=False,ordinary_gameplay_tested=False,
         flash_written=False,requires_checkpoint_restore=True)
+
+
+def surface_selection(debug,rom_path,record):
+    """Cold startup of a composed profile, including both checked packets."""
+    path=Path(rom_path);image=path.read_bytes();report=json.loads((path.parent/'build.json').read_bytes())
+    if sha256(image)!=report['output_sha256']:raise ValueError('Changed composed surface cartridge')
+    blob=by_vrom(image)[runtime.BLOB].extract(image);surface=report['room_surfaces']
+    selected=surface['optional_selection'];assertions=0
+    def check(label,at,want):
+        nonlocal assertions
+        actual=debug.read_memory(at,len(want));passed=actual==want
+        record(dict(surface_selection_check=label,address=f'{at:08X}',bytes=len(want),
+            expected_sha256=sha256(want),actual_sha256=sha256(actual),assertion='passed' if passed else 'failed'))
+        if not passed:raise ValueError('Composed surface startup mismatch: '+label)
+        assertions+=1
+    for name,resource in (('equipment',report['equipment_resources']),('surfaces',surface['items'])):
+        start=resource['blob_offset'];data=blob[start:start+resource['bytes']]
+        if sha256(data)!=resource['sha256']:raise ValueError('Changed complete '+name+' receipt')
+        if name=='equipment':
+            scenery=resource['scenery'];cache=scenery['tree_states']['cache_word']
+            at=cache-resource['ram'];value=debug.read_memory(cache,4)
+            if data[at:at+4]!=bytes(4) or value not in (bytes(4),struct.pack('>I',scenery['crc32'])):
+                raise ValueError('Unexpected native scenery bootstrap cache')
+            data=bytearray(data);data[at:at+4]=value
+            record(dict(retained_scenery_cache=f'{cache:08X}',value=value.hex(),bound_crc32=scenery['crc32']))
+        check('complete startup-loaded '+name+' packet',resource['ram'],data)
+    bits=bytes.fromhex(selected['profile_hex']);base=bytes.fromhex(report['save_runtime']['profile_hex'])
+    if len(bits)!=64 or len(base)!=192:raise ValueError('Invalid composed saved profile width')
+    expected=struct.pack('>4I',0xAF535633,0,0,0)+base+bytes(880-192)+bits+bytes(256)+bytes.fromhex('AF53C0DE')*4
+    check('complete format-4 state initialized from selected metadata',0x8046C000,expected)
+    check('ordinary startup installed flag',0x8019ACD0,struct.pack('>I',1))
+    check('no CPU fault',0x8003CE34,bytes(4))
+    return dict(native_surface_selection=True,assertions=assertions,real_cold_startup=True,
+        selected_surfaces=surface['items']['enabled_items'],ordinary_gameplay_tested=False,
+        explicit_flash_write=False,requires_checkpoint_restore=True)
 
 
 def surface_stock(debug,rom_path,record):

@@ -26,6 +26,10 @@ export function validatePlan(plan) {
   integer(plan.runtime_abi, 1, 65535);
   integer(plan.base_size, 0x101000, MAX); integer(plan.stable_size, 0x101000, MAX);
   for (const key of ['base_sha256', 'stable_sha256', 'base_report_sha256']) hash(plan[key]);
+  const surfaces = plan.surface_profile_hex !== undefined;
+  if (surfaces) hexSize(plan.surface_profile_hex, 64, 64);
+  if (plan.save_compatibility !== undefined) require(typeof plan.save_compatibility === 'string' &&
+    plan.save_compatibility.length > 0 && plan.save_compatibility.length <= 2048, 'Invalid save compatibility warning.');
   array(plan.options, 1, 2048); array(plan.tables, 1, 16); array(plan.crc32, 1, 16);
   const options = new Map(), regions = [];
   const field = (row, min, max) => {
@@ -36,13 +40,17 @@ export function validatePlan(plan) {
   for (const option of plan.options) {
     require(typeof option.id === 'string' && /^GAFE01-r0\/(item|villager)\/[0-9A-F]{4}$/.test(option.id) &&
       !options.has(option.id), 'Invalid or repeated import identity.');
-    require(['furniture', 'clothing', 'equipment', 'villager'].includes(option.kind) &&
+    require(['furniture', 'clothing', 'equipment', 'villager', 'floor', 'wall'].includes(option.kind) &&
       option.id.includes(option.kind === 'villager' ? '/villager/' : '/item/'), 'Invalid import kind.');
     require(typeof option.name === 'string' && option.name.length > 0 && option.name.length <= 128,
       'Invalid import name.');
     array(option.dependencies, 0, 2048); array(option.disable, 1, 16);
     hexSize(option.profile_hex, 192, 192);
-    require(bytes(option.profile_hex).some(n => n), 'Import has an empty save profile.');
+    if (surfaces) hexSize(option.surface_profile_hex, 64, 64);
+    const isSurface = ['floor', 'wall'].includes(option.kind);
+    require(isSurface ? surfaces && bytes(option.surface_profile_hex).some(n => n) && !bytes(option.profile_hex).some(n => n) :
+      bytes(option.profile_hex).some(n => n) && (!surfaces || !bytes(option.surface_profile_hex).some(n => n)),
+      'Import has an empty or wrong-category save profile.');
     for (const row of option.disable) {
       const size = field(row, 1, 4); hexSize(row.after, size, size);
     }
@@ -70,15 +78,24 @@ export function validatePlan(plan) {
     });
   }
   require(hex(fullProfile) === plan.profile.before, 'Incomplete installed save profile.');
+  if (surfaces) {
+    const fullSurface = new Uint8Array(64);
+    for (const option of options.values()) bytes(option.surface_profile_hex).forEach((n, i) => {
+      require(!(fullSurface[i] & n), 'Two surface options own the same saved identity.'); fullSurface[i] |= n;
+    });
+    require(hex(fullSurface) === plan.surface_profile_hex, 'Incomplete installed surface profile.');
+  }
   for (const table of plan.tables) {
     integer(table.width, 1, 16); array(table.rows, 1, 2048); array(table.counts, 1, 16);
-    field(table, table.rows.length * table.width, table.rows.length * table.width);
+    const capacity = table.capacity ?? table.rows.length; integer(capacity, table.rows.length, 2048);
+    field(table, capacity * table.width, capacity * table.width);
     const seen = new Set();
     for (const row of table.rows) {
       require(options.has(row.id) && !seen.has(row.id), 'Unknown or repeated catalogue member.');
       seen.add(row.id); hexSize(row.hex, table.width, table.width);
     }
-    require(table.rows.map(row => row.hex).join('') === table.before, 'Changed catalogue ordering.');
+    require(table.rows.map(row => row.hex).join('') + '00'.repeat((capacity - table.rows.length) * table.width) ===
+      table.before, 'Changed catalogue ordering.');
     for (const count of table.counts) {
       field(count, 4, 4); integer(count.base, 0, 0xffffffff - table.rows.length);
       require(parseInt(count.before, 16) === count.base + table.rows.length, 'Changed catalogue count.');
@@ -115,10 +132,14 @@ export function resolveSelection(plan, requested) {
     }
   }
   const profile = new Uint8Array(192);
+  const surfaceProfile = new Uint8Array(64);
   for (const id of enabled) bytes(options.get(id).profile_hex).forEach((n, i) => { profile[i] |= n; });
+  if (plan.surface_profile_hex !== undefined) for (const id of enabled)
+    bytes(options.get(id).surface_profile_hex).forEach((n, i) => { surfaceProfile[i] |= n; });
   return { requested: chosen, enabled: [...enabled].sort(), required: [...enabled].filter(id => !chosen.includes(id)).sort(),
     dependency_reasons: Object.fromEntries([...reasons].sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0)
-      .map(([key, parents]) => [key, [...parents].sort()])), profile_hex: hex(profile) };
+      .map(([key, parents]) => [key, [...parents].sort()])), profile_hex: hex(profile),
+    ...(plan.surface_profile_hex === undefined ? {} : { surface_profile_hex: hex(surfaceProfile) }) };
 }
 
 const crcTable = Uint32Array.from({ length: 256 }, (_, index) => {
@@ -200,9 +221,11 @@ export async function composeSelection(source, plan, requested) {
   if (selection.enabled.length === plan.options.length) require(outputHash === plan.base_sha256, 'All-selected output differs from the pinned cartridge.');
   return { output, receipt: { format: 'AFV3-BROWSER-SELECTION-1', ...selection,
     profile_sha256: await sha256(bytes(selection.profile_hex)), output_sha256: outputHash,
+    ...(selection.surface_profile_hex === undefined ? {} : {
+      surface_profile_sha256: await sha256(bytes(selection.surface_profile_hex)) }),
     base_sha256: empty ? plan.stable_sha256 : plan.base_sha256, base_report_sha256: plan.base_report_sha256,
     runtime_abi: empty ? null : plan.runtime_abi, writes: writes.sort((a, b) => a.offset - b.offset),
     experimental: true, web_patcher_enabled: false, playable_handoff: false,
     save_compatibility: empty ? 'V2 baseline. Do not load V3 import saves.' :
-      'Format 2: retain every import selected for your save. Removing imports is not a save migration. Do not load this save in V2 or an older build missing these imports. Ordinary cross-profile reload is unverified.' } };
+      (plan.save_compatibility || 'Retain every import selected for your save. Removing imports is not a save migration. Do not load imported saves in V2 or an older incompatible build. Ordinary cross-profile reload is unverified.') } };
 }

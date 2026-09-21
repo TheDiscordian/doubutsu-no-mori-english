@@ -162,6 +162,11 @@ def install(base, prior, blob, core, original, output, art_path, *, module=None)
     inventory,assets=discover(source,base)
     prepared=checked_prepared(art_path,inventory,assets)
     if set(prepared)!=set(assets):raise ValueError('Install the complete prepared surface category')
+    if prior.get('room_surfaces',{}).get('stock'):
+        from v3_surface_selection import install as install_selection
+        changes,updates=install_selection(base,prior,blob,output)
+        updates['room_surfaces']['sources'].update({p:sha256((ROOT/p).read_bytes()) for p in SOURCES})
+        return changes,updates
     if prior.get('room_surfaces',{}).get('sound'):
         from v3_surface_stock import install as install_stock
         changes,updates=install_stock(base,prior,blob,core,output,source)

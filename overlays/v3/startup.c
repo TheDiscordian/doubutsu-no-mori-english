@@ -15,6 +15,12 @@ extern u32 af_crc32(const void *, u32);
 #define AF_V3_ABI 1u
 #endif
 #define AF_V3_GUARD ((AF_V3_BLOB_SIZE - 16u) / 4u)
+#if defined(AF_V3_EDITABLE_CHECKSUMS) && defined(AF_V3_EQUIPMENT_CRC)
+const u32 af_v3_equipment_crc_expected = AF_V3_EQUIPMENT_CRC;
+#define equipment_crc (*(volatile const u32 *)&af_v3_equipment_crc_expected)
+#else
+#define equipment_crc AF_V3_EQUIPMENT_CRC
+#endif
 #ifdef __mips__
 #define memory ((unsigned char *)0x80460000u)
 #define config ((volatile const u32 *)0x8019ACC0u)
@@ -107,9 +113,9 @@ int af_v3_startup(void) {
     extern unsigned char af_v3_equipment_memory[AF_V3_EQUIPMENT_BYTES];
     unsigned char *equipment = af_v3_equipment_memory;
 #endif
-    if (!load_checked(equipment, AF_V3_EQUIPMENT_VROM, AF_V3_EQUIPMENT_BYTES, AF_V3_EQUIPMENT_CRC)) return 0;
-    /* The compiled checksum binds the complete module, including its table
-       header and footer. Unlike the other packages, it is not a RAM descriptor. */
+    if (!load_checked(equipment, AF_V3_EQUIPMENT_VROM, AF_V3_EQUIPMENT_BYTES, equipment_crc)) return 0;
+    /* The checksum binds the complete module, including its table and footer.
+       Editable builds expose a checked read-only data word for composition. */
     writeback(equipment, AF_V3_EQUIPMENT_BYTES);
     invalidate(equipment, AF_V3_EQUIPMENT_BYTES);
 #endif

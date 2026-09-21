@@ -18,17 +18,34 @@ deployments retain their existing builds.
 
 ## Active development
 
-The current explicit V3 proposal is ABI 189 at
-`build/v3-surface-stock-runtime-01/build-lock.json`. Shared native stock lists
-include six additive floors/walls through their actual A/C and event categories.
+The current explicit V3 proposal is ABI 190 at
+`build/v3-surface-selection-runtime-02/build-lock.json`. The private selector
+offers 147 installed development choices, including three floors and three
+wallpapers. Individual/all composition updates real enabled metadata, packs
+catalogue rows/counts, and exports independent 64-byte surface profiles. Two
+checked read-only CRC words allow selection without changing instructions.
+No allocation or saved format grows. Format-4 saves still cannot load in V2 or
+format-1/2/3 V3; preserve backups and retain every selected import.
+
+Five focused checks pass, including four complete browser/offline ROM comparisons
+and sanitized startup failure paths. Ten browser-engine unit checks pass across
+the base run and added surface case. A composed two-surface build passes native
+cold startup after one fixture correction for the existing scenery cache word.
+A focused silent Chromium worker reconstructs the same ROM from the two supplied
+games, verifies the profile/warning, and checks floor/wall category controls.
+The temporary verification server is stopped. The private export is
+`build/v3-surface-browser-01/`; neither stable website deployment changes.
+See the [selection checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-surface-optional-selection).
+
+Shared native stock lists
+include the six additive surfaces through their actual A/C and event categories.
 The complete native picker and membership query filter disabled imports before
 selection, retaining original goods, RNG, and rarity. HomePage/Mario and Harvest
 surfaces remain outside these lists, awaiting their real delivery categories.
 The helper occupies existing reserved memory; temporary goods allocations grow
 80 bytes each. Three focused host checks pass. A native run passes after one
 fixture correction to initialize rarity settings in its disposable blank town.
-Ordinary purchases/event delivery and hardware are not established. Private
-surface selection is next; all ten surface records remain disabled in this build.
+Ordinary purchases/event delivery and hardware are not established.
 See the [stock checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-surface-stock).
 
 The retained audio proposal is ABI 188 at
@@ -85,9 +102,9 @@ retained, not replayed.
 
 Format-4 saves require a compatible newer build; V2 and format-1/2/3 V3 builds
 cannot load them. Preserve backups. Private exports carry this warning. There
-are still 141 choices and 27 inactive furniture profiles; all ten surfaces stay
-disabled. Next connect genuine acquisition, remaining theme categories, and private surface
-composition, including selected catalogue counts. The stable
+are 147 choices and 27 inactive furniture profiles; four Mario/Harvest surfaces
+remain disabled pending genuine delivery routes. Next connect those shared
+acquisition/theme categories and the prepared contact/floor lifecycles. The stable
 patcher and main lock remain unchanged. See the
 [surface-menu checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-surface-catalogue-and-inventory-exchange).
 
@@ -111,7 +128,7 @@ Four focused conversion/metadata/cache checks pass. Every added palette and
 texel is checked through independent tile addressing; malformed resources and
 changed caches reject. Preparation itself changes no choices, saved layouts,
 main lock, or served website content. The room/shop installation is described
-above; private category selection, acquisition, remaining theme categories, and
+above; remaining acquisition/theme categories and
 ordinary persistence remain required. See the
 [surface specification](../specs/V3_ROOM_SURFACES.md).
 

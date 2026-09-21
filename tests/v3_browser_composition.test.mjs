@@ -137,3 +137,37 @@ test('caller changes during asynchronous verification do not alter the captured 
   assert.deepEqual(built.receipt.requested, [C]);
   assert.notEqual(built.receipt.output_sha256, await sha256(source));
 });
+
+test('surface profiles stay independent and padded catalogue capacity is checked', async () => {
+  const { plan, source } = await fixture(), v = new DataView(source.buffer);
+  const bits = new Uint8Array(64); bits[9] = 4;
+  plan.surface_profile_hex = hex(bits);
+  for (const option of plan.options) option.surface_profile_hex = '00'.repeat(64);
+  plan.options[0].kind = 'floor'; plan.options[0].surface_profile_hex = hex(bits);
+  plan.options[0].profile_hex = '00'.repeat(192);
+  source[plan.profile.offset + 32] = 0;
+  plan.profile.before = hex(source.subarray(plan.profile.offset, plan.profile.offset + 192));
+  const table = plan.tables[0]; table.capacity = 3; table.before += '00000000';
+  source.fill(0, table.offset + 8, table.offset + 12);
+  for (const row of plan.crc32) {
+    v.setUint32(row.offset, crc32(source.subarray(row.start, row.start + row.length)));
+    row.before = hex(source.subarray(row.offset, row.offset + 4));
+  }
+  source.set(n64Checksum(source), 0x10); plan.header.before = hex(source.subarray(0x10, 0x18));
+  plan.base_sha256 = await sha256(source);
+  plan.save_compatibility = 'Format-4 saves require compatible builds. Keep backups.';
+  const { output, receipt } = await composeSelection(source, plan, [A]);
+  assert.equal(receipt.surface_profile_hex, hex(bits));
+  assert.equal(receipt.profile_hex, '00'.repeat(192));
+  assert.equal(receipt.surface_profile_sha256, await sha256(bits));
+  assert.equal(receipt.save_compatibility, plan.save_compatibility);
+  assert.equal(hex(output.subarray(table.offset, table.offset + 12)), '010200000000000000000000');
+  for (const mutate of [
+    p => { p.tables[0].capacity = 2; },
+    p => { p.tables[0].before = p.tables[0].before.slice(0, -2) + '01'; },
+    p => { p.options[0].surface_profile_hex = '00'.repeat(64); },
+    p => { p.options[1].surface_profile_hex = p.surface_profile_hex; },
+    p => { p.surface_profile_hex = '00'.repeat(64); },
+    p => { delete p.surface_profile_hex; },
+  ]) { const changed = clone(plan); mutate(changed); assert.throws(() => validatePlan(changed)); }
+});

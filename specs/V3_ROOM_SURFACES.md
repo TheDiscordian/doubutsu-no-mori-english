@@ -14,9 +14,12 @@ validation and independent ownership. Native inventory actions preserve full
 surface IDs; catalogue page lists and bit dispatch use the new ownership category.
 Base scoring, three existing matching themes, and full-index footstep/drag audio
 are installed. Shared A/C/event stock supports six additions with selected-only
-membership and selection. HomePage/Harvest acquisition, complete Harvest/Mario furniture themes, and browser
-composition remain required. All new item records remain disabled; installed
-artwork and metadata do not make a surface selectable.
+membership and selection. The private composer exposes those six surfaces as
+individual or all-selected options, with real catalogue counts and independent
+saved profiles. HomePage/Harvest acquisition and complete Harvest/Mario furniture
+themes remain required. The four associated records stay disabled; installed
+artwork alone does not make them selectable. Ordinary gameplay and persistence
+are not established by category installation.
 
 Use the current explicit experimental lock; keep the main lock and both stable
 website deployments unchanged:

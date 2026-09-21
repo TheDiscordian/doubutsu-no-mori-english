@@ -377,10 +377,14 @@ and cold-boot rejection checks. Ordinary gameplay/catalogue and Controller Pak
 integration remain required. The web patcher does not upload or edit saves.
 
 The [optional composer](V3_OPTIONAL_COMPOSITION.md) resolves per-entry
-selections for twenty installed villagers and 121 installed logical items,
+selections for twenty installed villagers and 127 installed logical items,
 including required outfits, house furnishings, and twenty-four equipment parents.
 Mannequin and equipment catalogue representations are dependencies, not separate
 choices.
+The six selectable surfaces have genuine A/C/event acquisition and independent
+format-4 saved-profile bits. Floor/wall catalogue counts and selected-only stock
+follow the same private selection records. The Mario/Harvest pairs remain
+unavailable until their real delivery and complete theme categories are installed.
 Ten ordinary legacy furniture imports use explicit source-to-destination
 registry records; their browser identities retain the GameCube IDs while native
 records and saved bits use additive N64 destinations. The shared pipeline
@@ -423,7 +427,7 @@ are disclosed, not silently enabled as unrelated additions.
 Changing a selection or input invalidates old results. Cancellation releases the
 worker and download URLs. Equivalent selection sets produce the same profile
 and cartridge regardless of click order. The source files remain untouched.
-Keep both served patchers on stable V2 until the user has tested V3 and
+Keep both deployments of the one patcher on stable V2 until the user has tested V3 and
 explicitly approved the switch. A verified playtest handoff alone is not approval.
 
 ## Delivery order and acceptance

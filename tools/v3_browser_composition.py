@@ -33,6 +33,7 @@ def rules(image, report):
     if blob.pend or module.pend:
         raise ValueError('Selection resources must be uncompressed')
     entries, slots = [], {}
+    surfaces=report.get('room_surfaces',{}).get('optional_selection')
 
     def field(at, size):
         if type(at) is not int or not 0 <= at <= len(image) - size or size <= 0:
@@ -65,6 +66,9 @@ def rules(image, report):
         entries.append({'id': key, 'name': row['name'], 'kind': row['kind'],
                         'dependencies': row['dependencies'], 'profile_hex': profile.hex(),
                         'disable': off})
+        if surfaces:
+            from v3_surface_selection import profile as surface_profile
+            entries[-1]['surface_profile_hex']=surface_profile([row] if row['kind'] in ('floor','wall') else []).hex()
 
     # Reuse the authoritative HRA write generator, assigning each disabled row
     # to the option that owns its fixed furniture/mannequin runtime identity.
@@ -89,21 +93,28 @@ def rules(image, report):
     cat = report['catalogue']
     categories=[
             ('furniture', 4, cat['imports'], 'selected furniture ordering',
-             'selected furniture iteration/search/completion count'),
+             'selected furniture iteration/search/completion count',None),
             ('clothing', 2, cat['clothing']['imports'], 'selected clothing ordering',
-             'selected clothing iteration/completion count')]
+             'selected clothing iteration/completion count',None)]
     if report.get('equipment_resources',{}).get('optional_selection'):
         categories.append(('equipment',2,cat['handheld']['imports'],'selected equipment ordering',
-            'selected equipment iteration/completion count'))
-    for kind, width, rows, ordering, count_label in categories:
+            'selected equipment iteration/completion count',None))
+    if surfaces:
+        for row in report['room_surfaces']['menu']['tables']:
+            kind=row['kind']
+            categories.append((kind,2,row['imports'],'selected '+kind+' ordering',
+                'selected '+kind+' iteration/completion count',row['capacity']-row['native_rows']))
+    for kind, width, rows, ordering, count_label, capacity in categories:
+        capacity=len(rows) if capacity is None else capacity
         table = next(row for row in table_writes if row['purpose'] == ordering)
         before, empty = bytes.fromhex(table['before']), bytes.fromhex(table['after'])
-        start = len(before) - len(rows) * width
+        start = len(before) - capacity * width
         if before[:start] != empty[:start] or any(empty[start:]):
             raise ValueError('Changed selected catalogue suffix contract')
         members = []
         for i, row in enumerate(rows):
-            key = (composition.furniture_key(row) if kind=='furniture' else
+            key = (composition.item_key(int(row['source_item_id'],16)) if kind in ('floor','wall') else
+                   composition.furniture_key(row) if kind=='furniture' else
                    composition.item_key(int(row['donor_item_id'] if kind=='clothing' else row['parent_item_id'],16)))
             if catalog[key]['kind'] != kind:
                 raise ValueError('Catalogue option has the wrong item class')
@@ -114,12 +125,14 @@ def rules(image, report):
                 counts.append({**field(row['offset'], 4), 'base': int(row['after'], 16)})
                 if int(row['before'], 16) != counts[-1]['base'] + len(members):
                     raise ValueError('Catalogue count is not a bounded additive count')
-        packed.append({**field(table['offset'] + start, len(rows) * width),
-                       'width': width, 'rows': members, 'counts': counts})
+        packed.append({**field(table['offset'] + start, capacity * width),
+                       'width': width, 'rows': members, 'counts': counts,
+                       **({'capacity':capacity} if capacity!=len(rows) else {})})
     if len(table_writes) != len(packed) + sum(len(row['counts']) for row in packed):
         raise ValueError('Unassigned catalogue changes')
 
-    crcs = []
+    from v3_surface_selection import checksum_fields
+    crcs = checksum_fields(image,report)
     for at, start, length in ((blob.pstart + 0xF8, blob.pstart + composition.PACKAGE, composition.PACKAGE_SIZE),
                               (module.pstart + composition.CONFIG + 8, blob.pstart, composition.PREFIX_SIZE)):
         value = field(at, 4)
@@ -134,7 +147,9 @@ def rules(image, report):
             'stable_sha256': stable_sha, 'stable_size': stable_path.stat().st_size,
             'experimental': True, 'web_patcher_enabled': False,
             'options': entries, 'profile': field(blob.pstart + 0x20, 192), 'tables': packed,
-            'crc32': crcs, 'header': field(0x10, 8)}
+            'crc32': crcs, 'header': field(0x10, 8),
+            'save_compatibility':composition.save_compatibility(report),
+            **({'surface_profile_hex':surfaces['profile_hex']} if surfaces else {})}
 
 
 def review_catalogue(plan, report):
@@ -161,6 +176,12 @@ def review_catalogue(plan, report):
             'kind': 'furniture', 'selectable': False,
             **({'room_alias':row['room_alias']} if 'room_alias' in row else {}),
             'reason': row.get('reason') or 'Conversion supported; runtime installation is pending.'})
+    surface=report.get('room_surfaces',{})
+    if surface.get('optional_selection'):
+        names={r['id']:r for r in surface['rows']}
+        for key,reason in surface['optional_selection']['pending'].items():
+            row=names[key]
+            unavailable.append(dict(id=key,name=row['name'],kind=row['kind'],selectable=False,reason=reason+' is not implemented.'))
     return {'format': 'AFV3-BROWSER-REVIEW-1', 'base_sha256': plan['base_sha256'],
             'scope': 'GAFE01-r0 3xxx and unresolved legacy furniture queue, not all donor items',
             'pipeline_version': pipeline.VERSION,

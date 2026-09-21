@@ -12,17 +12,29 @@ After the primary importing work, finish gold-tree leaf/cut effects and the full
 golden-shovel acquisition route. This is deferred required V3 work, not a dropped
 feature or a separate release goal.
 
-The current explicit proposal is ABI 189 at
-`build/v3-surface-stock-runtime-01/build-lock.json`. The shared stock adapter
+The current explicit proposal is ABI 190 at
+`build/v3-surface-selection-runtime-02/build-lock.json`. Private composition
+offers 147 choices, including six surfaces with genuine A/C/event stock. Separate
+surface save profiles, selected catalogue rows/counts, and data-only CRC updates
+are connected in Python and JavaScript. Five focused host checks, ten browser
+unit checks, a corrected cold-startup fixture, and one focused Chromium worker/
+category-control check pass. The private export `build/v3-surface-browser-01/`
+is not deployed; the temporary test server is stopped. Retain this evidence.
+
+Next finish HomePage/Mario and Harvest delivery and complete theme categories,
+then bind prepared contact/floor lifecycles and room movement sounds. These are
+shared category dependencies, not per-item import scripts. Ordinary gameplay
+and persistence still require focused integration/human testing. Keep the stable
+deployments unchanged and retain format-4 incompatibility warnings/backups.
+
+The shared stock adapter
 connects six floor/wall additions to genuine A/C/event lists, filtering disabled
 imports before the complete native membership and random-selection functions.
 Three focused host checks and the corrected native fixture pass. Its one setup
 retry supplies valid rarity bytes to a disposable blank town; no player save is
 used. Temporary goods lists grow 80 bytes, with no permanent allocation growth.
-Next connect individual/all private surface selection, catalogue counts, and
-format-4 profile receipts. HomePage/Harvest acquisition and full theme categories
-remain required. Keep the stable deployments unchanged and reuse passing stock
-evidence while the code is unchanged.
+HomePage/Harvest acquisition and full theme categories remain required. Reuse
+passing stock evidence while its code is unchanged.
 
 The retained ABI-188 audio proposal is at
 `build/v3-surface-audio-runtime-01/build-lock.json`. Complete floor audio maps
@@ -50,9 +62,8 @@ checks pass; a native first attempt passes 42 assertions for real catalogue
 loading/initialization, names, completion, and full-ID inventory exchange bodies.
 The inventory fixture substitutes only UI index/close calls. Ordinary UI
 playthrough and save/restart are not established. No packet, menu, or saved-state
-allocation grows. Both category lists retain 64 counted original rows while
-surface selections remain disabled; private composition must compact selected
-imports into the reserved five-row tails and update the corresponding counts.
+allocation grows. Both category lists retain 64 original rows; private composition
+packs selected imports into the reserved five-row tails and updates counts.
 The complete surface packet is 16 KiB; runtime save state is 1,232 bytes with
 guards at `8046C4C0`, within existing reserved memory. Startup remains 960/992.
 Retain passing unchanged room/item/texture evidence instead of replaying it.
@@ -67,7 +78,7 @@ installed initializer into a small isolated arena, not an ordinary room.
 Retain the passing ABI-178 fade/audio-dispatch evidence and ABI-180 placement
 results; do not replay old builds or unchanged renderer/audio tests.
 
-Next complete the general additive room-surface runtime. All ten missing
+Continue the general additive room-surface runtime. All ten missing
 surfaces are prepared together at `build/v3-room-surfaces-prepared-02/`, with
 complete source metadata, sound-selector inputs, and official name attribution.
 Stable paired indices 73–77 preserve all original texture and special-room sound
@@ -81,9 +92,9 @@ Use `specs/V3_ROOM_SURFACES.md` for the shared reader/action/save integration or
 Catalogue preview (`03970000`, linked `808A6100`) and arranged NPC rooms
 (`00845C40`, linked `80950E50`) use the separate added resource banks, preserving
 original resources and native preview geometry. Inventory full-ID exchange and
-catalogue lists/ownership dispatch are connected. Next implement genuine donor
-acquisition categories, remaining full theme categories, and private
-surface selection. Do not replay unchanged catalogue/application/save checks. Preserve the
+catalogue lists/ownership dispatch and private selection are connected. Next
+implement remaining genuine acquisition and full theme categories. Do not replay
+unchanged catalogue/application/save checks. Preserve the
 full native home bytes and every unrelated field. Do not repurpose furniture
 selection/ownership bits to represent floors or wallpapers.
 The installed name/type/price hooks wrap the existing native public entries and
@@ -111,7 +122,7 @@ through complete floor bindings. Also implement the source room owner's shared
 movement sound category (`aMR_SetMoveSE`, lawn mower/stone coin); alpha callbacks
 alone do not include that behaviour. Reuse the source/native consumer checks and
 completed mower graphics. Native callback execution is still pending, not passed.
-The 141 existing choices remain unchanged by surface resource installation.
+The private proposal includes 147 choices; four surfaces remain unavailable.
 Continue material and rigged-material categories alongside unresolved unique
 behaviours; the floor dependency must not stall unrelated importing.
 Other material callbacks/acquisition routes and ordinary gameplay/save checks

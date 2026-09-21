@@ -55,7 +55,7 @@ export async function loadReview(bundle, plan) {
   const seen = new Set(plan.options.map(row => row.id));
   for (const row of review.unavailable) {
     if (typeof row.id !== 'string' || !/^GAFE01-r0\/item\/[0-9A-F]{4}$/.test(row.id) || seen.has(row.id) ||
-        row.kind !== 'furniture' || row.selectable !== false || typeof row.name !== 'string' ||
+        !['furniture', 'floor', 'wall'].includes(row.kind) || row.selectable !== false || typeof row.name !== 'string' ||
         !row.name.length || row.name.length > 128 || typeof row.reason !== 'string' ||
         !row.reason.length || row.reason.length > 2048) throw new Error('Invalid unavailable import record.');
     seen.add(row.id);

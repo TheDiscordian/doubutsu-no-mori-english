@@ -1,5 +1,89 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared surface optional selection
+
+ABI 190 is `build/v3-surface-selection-runtime-02/build-lock.json`:
+
+```sh
+python3 tools/v3_furniture_install.py --refresh-runtime \
+  --base-lock build/v3-surface-stock-runtime-01/build-lock.json \
+  --room-surfaces-art build/v3-room-surfaces-prepared-02 \
+  --output build/v3-surface-selection-runtime-02
+```
+
+The six source-bound A/C/event surfaces are selectable in the private composer:
+western desert/vista, backyard lawn/fence, and boxing ring mat/ringside seating.
+The complete private catalogue has 147 choices: 94 furniture items, three
+shirts, 24 equipment parents, twenty villagers, three floors, and three walls.
+The four Mario/Harvest surfaces remain disabled with genuine pending delivery
+reasons. Installed choices are experimental, not gameplay/hardware certification.
+
+Python and JavaScript consume the same checked records. Surface metadata enables
+only the requested items, independent saved-profile bits follow native stable
+IDs, and catalogue lists retain the original 64 entries while packing selected
+imports into existing five-row tails. All-selected has 67 rows per category.
+Unused tail capacity stays zero, without treating pending items as selectable.
+The native stock category retains its ABI-189 filtering evidence unchanged.
+
+Two CRC constants become checked read-only data words: one in the equipment
+packet's surface bootstrap and one in the original startup reservation. The
+native code actually loads those words. Composition updates surface/equipment
+CRCs before the existing package/prefix/cartridge checksums. Startup uses
+964/992 bytes, bootstrap 132 bytes, with no allocation growth or saved-format
+change. The blob remains 4,553,120 bytes with 1,738,336 bytes free. Four complete
+selection profiles match independently between Python and JavaScript, including
+all, none, surfaces-only, and a mixed villager/surface dependency selection.
+
+Five focused tests pass in 12.058 seconds: complete source/runtime bindings,
+preserved gameplay resources, changed-input rejection, actual checksum-word
+loads and bounds, C startup failure paths under memory sanitizers, selected
+tables/profiles/report checks, UPS reconstruction, and full-ROM browser/offline
+equivalence. Nine existing browser-engine tests pass, followed by the added
+surface/padded-capacity case alone; that case checks independent profiles,
+actual save warnings, reserved tail zeroing, and malformed-profile/table rejection.
+No historical native build is replayed.
+
+The composed subset `build/v3-surface-selection-sparse-01/` selects backyard
+lawn and western vista. Its 192-byte existing profile is empty; surface bytes
+9/41 are `04`/`02`. The first native attempt reaches successful startup but
+rejects an overly strict complete-equipment comparison. The checkpoint differs
+only in the existing scenery bootstrap's cache word `804ADFEC`: zero becomes
+the exact checked scenery CRC `8422D785`. The corrected fixture verifies that
+known cache state, all remaining equipment bytes, the complete surface packet,
+and the entire initialized format-4 working state.
+
+The single corrected retry `build/v3-surface-selection-native-02/` passes 19
+records, including five internal assertions, restored checkpoint, guards, and
+clean shutdown. This establishes actual cold startup of the composed profile,
+not ordinary room play, physical audio, hardware, or explicit FlashRAM writes.
+
+Private browser export with both reconstruction recipes is
+`build/v3-surface-browser-01/`. A focused Chromium check at
+`build/v3-surface-browser-check-01/` runs the real worker with the two local game
+files and reconstructs the exact same subset ROM and both profile hashes. The
+actual page loads all 147 choices and the pending review list; floor/wall
+filters and select/clear controls each operate on three entries. No browser
+errors occur; all network requests are body-free GETs to the isolated temporary
+server, which is stopped. Neither stable website deployment changes.
+
+- All-selected ROM SHA-256: `3e21559c339581c6dc0048d535a353909362a4d9a055cfb74188a870467d208c`.
+- UPS SHA-256: `4fae2bdcd2aedd5050f1878b69c2c85815543cc67ad4e0d67a3ea98579e7c1d4`.
+- Build receipt SHA-256: `8b8ff26b03667a7b998bca11e58133889909258bcc7771fad8683dc2499aea43`.
+- Subset ROM SHA-256: `bddc52476370d218062fa8598090bb67812e4a17dd97c9edddba00b70a87b22e`.
+- Subset receipt SHA-256: `575d37102f798dae3aa3765c51febeb18067e3de0ebf1d02e3abc12a0965811a`.
+- Initial native results SHA-256: `48b058c12e675d9b105cd334c952ab06ac3a7c4598bc65e5333b9c929b7a0cbc`.
+- Passing native results SHA-256: `7cb168bdf199e2db3ad5ec0dbe55a96d0414324d08efccbbaf4e6ddfe584353d`.
+- Browser export receipt SHA-256: `858ae32ea451333ede8148a4a59af15b8d8997c808ada3f82d01401143d379ea`.
+- Chromium results SHA-256: `d0772b416d5becef2d746684a4180385eb5f5b4a7d7dfbc3a5890dc4a37e497b`.
+
+Format-4 saves require compatible newer builds and all selected imports. V2
+and older format-1/2/3 V3 cannot load them; preserve backups. Empty selections
+still produce exact V2-12. The ABI-109 main lock, stable deployments, and old
+ROMs/saves are untouched. Continue genuine HomePage/Mario and Harvest delivery,
+full theme categories, shared contact/floor lifecycles and movement sounds,
+remaining material/rigged categories, and ordinary gameplay/persistence. Complete
+gold-tree effects and the golden-shovel route after primary imports.
+
 ## Shared surface stock
 
 ABI 189 is `build/v3-surface-stock-runtime-01/build-lock.json`, built by the

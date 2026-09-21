@@ -10,8 +10,9 @@ selector maintains another item list. A newly installed supported item therefore
 needs no browser item definition, checkbox-order identity, or bespoke patch path.
 
 The main locked catalogue contains 104 choices: 81 furniture items, three shirts,
-and twenty villagers. The explicit held-selection proposal contains 112, adding
-eight equipment parents. A shirt's mannequin and a handheld's catalogue model
+and twenty villagers. The explicit surface-selection proposal contains 147:
+94 furniture items, three shirts, 24 equipment parents, twenty villagers,
+three floors, and three wallpapers. A shirt's mannequin and a handheld's catalogue model
 are required representations, not extra selectable choices. This catalogue describes installed
 development content, not completed gameplay acceptance. Select-all means the
 installed catalogue, not every entry on the donor disc. Unimplemented identities
@@ -79,7 +80,7 @@ profiles and rejects a missing equipment bit without modifying destination state
 Saves using these choices must not be loaded in V2 or an older profile without
 them. A codec check does not establish ordinary cross-build save/reload. The
 seasonal copy/return routines have passing component evidence, but ordinary
-gameplay and complete reward acquisition remain open. Both served V2 patchers
+gameplay and complete reward acquisition remain open. Both deployments of the V2 patcher
 stay unchanged.
 
 ## Dependency resolution
@@ -99,6 +100,38 @@ removal; do not mutate a previously expanded dependency result. Browser plans
 also reject cyclic dependencies and two options owning the same saved bit.
 
 ## Checked cartridge writes
+
+### Surface category
+
+Source-verified A/C/event acquisition enables six experimental surfaces. The
+HomePage/Mario and Harvest pairs remain unselectable with their real missing
+routes shown in the private review list. Choices retain donor identities while
+native records use stable additive floor/wall IDs. The shared source catalogue
+generates both selectors; neither maintains another list of eligible surfaces.
+
+Surface choices own a separate 64-byte `surface_profile_hex`, never furniture
+or clothing bits. Native startup derives that profile from enabled surface
+metadata. Both receipts include its hash. Browser validation rejects empty,
+duplicate, overlapping, or wrong-category profiles and requires complete union
+coverage. The actual build's save warning accompanies browser receipts; no
+obsolete hard-coded saved-format number overrides the build.
+
+Catalogue tables preserve 64 originals, pack selected additions in donor order,
+zero unused slots in the existing five-row tail, and update native counts.
+The data-only browser plan describes capacity separately from eligible members;
+pending imports do not become selectable to fill an unused slot.
+
+Editable builds place the surface packet CRC in the bootstrap's read-only data
+and the equipment packet CRC in startup's read-only data. Full source hashes and
+compiled symbol bindings identify each word. Composition recalculates surface,
+equipment, package, and prefix checksums in dependency order, then the cartridge
+checksum. No instruction constants or allocation bounds change with selection.
+The complete startup uses 964 of 992 reserved bytes; the surface bootstrap uses
+132 bytes of its existing reservation. Ordinary stock reads enabled metadata
+through the shared selected-only filter, so changing selection needs no new
+stock resource or RNG implementation.
+
+### Shared records
 
 Validate the complete source ROM/report and every installed binding. Resident
 changes cover the profile at blob offset `20`, villager town-eligibility bytes,
