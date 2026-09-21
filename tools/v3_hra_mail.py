@@ -17,6 +17,68 @@ COUNTERS = {0x25F4: 0x240205A0, 0x2834: 0x24140037,
             0x2848: 0x240D0037, 0x2A10: 0x2E820037, 0x2B68: 0x2E820037}
 
 
+def extend_current(source, module, report, donor_names):
+    """Append missing official theme names to the current complete creator."""
+    count, size = report['name_rows'], report['image_bytes']
+    at = report['name_table_address']-RAM
+    end = at+count*WIDTH
+    if (sha256(source) != report['output_sha256'] or len(source) != size+RELOC_BYTES
+            or list(struct.unpack_from('>8I', module, 0x48)) != report['configuration']
+            or at != IMAGE or sha256(source[at:end]) != report['name_table_sha256']
+            or any(source[end:size]) or size-end != (-count*WIDTH) % 16
+            or sha256(donor_names) != '9d5b0d3d4faa60cc780462ef1ed8320bd14b3f01e22f09303ce513e4e41c6e42'):
+        raise ValueError('Changed complete score-letter names, donor, or loader')
+    table = bytearray(source[at:end]); additions = []
+    keys = {bytes(table[i:i+10]): bytes(table[i+10:i+26]) for i in range(0, len(table), WIDTH)}
+    if len(keys) != count:
+        raise ValueError('Duplicate installed score-letter key')
+    for index in range(55, len(donor_names)//16):
+        name = donor_names[index*16:index*16+16]
+        if name[10:] != b' '*6:
+            raise ValueError('Donor theme exceeds native key width')
+        if name[:10] in keys:
+            if keys[name[:10]] != name:
+                raise ValueError('Installed theme has different official wording')
+        else:
+            table.extend(name[:10]+name)
+            additions.append(dict(series=index, name=name.decode('ascii').rstrip(), sha256=sha256(name)))
+    new_count = len(table)//WIDTH
+    padding = -len(table) % 16
+    data = bytearray(source[:at]+table+bytes(padding))
+    relocation = bytearray(source[size:])
+    sections = struct.unpack_from('>5I', relocation)
+    if sections != (size, 0, 0, 0, 233) or len(data) > 65536:
+        raise ValueError('Theme names exceed the complete letter loader')
+    patches = []
+    for offset, original in COUNTERS.items():
+        before = original & 0xFFFF0000 | (((count*WIDTH+15) & ~15) if offset == 0x25F4 else count)
+        after = original & 0xFFFF0000 | ((len(table)+padding) if offset == 0x25F4 else new_count)
+        if u32(data, offset) != before:
+            raise ValueError('Changed current score-letter counter')
+        struct.pack_into('>I', data, offset, after)
+        patches.append(dict(offset=offset, before=before, after=after))
+    if u32(data, 0x2A04) != 0x24020037:
+        raise ValueError('Theme extension changes a letter template selector')
+    struct.pack_into('>I', relocation, 0, len(data))
+    allowed = {i for p in patches for i in range(p['offset'], p['offset']+4)} | set(range(end, size))
+    for loaded in (0x801A0010, 0x802F8010, 0x803D0010):
+        before = relocate_verified_data(SimpleNamespace(ram=RAM, resident_bytes=size, sections=sections),
+                                        source[:size], source[size:], loaded)
+        after = relocate_verified_data(SimpleNamespace(ram=RAM, resident_bytes=len(data),
+            sections=(len(data), 0, 0, 0, 233)), data, relocation, loaded)
+        if any(a != b and i not in allowed for i, (a, b) in enumerate(zip(before, after))):
+            raise ValueError('Theme names change unrelated relocated letter contents')
+    output = bytes(data+relocation)
+    config = list(report['configuration'])
+    config[1], config[2], config[5], config[6] = len(output), len(data), len(data), zlib.crc32(output)
+    struct.pack_into('>8I', module, 0x48, *config)
+    return output, {**report, 'output_sha256': sha256(output), 'image_bytes': len(data),
+        'bytes': len(output), 'name_rows': new_count, 'name_table_sha256': sha256(table),
+        'name_table_bytes': len(table), 'name_table_padding': padding,
+        'added_names': additions, 'patches': report['patches']+patches, 'configuration': config,
+        'native_letter_generation_tested': False}
+
+
 def install(source, module, rel, symbols):
     verify_sources(rel, symbols)
     config = struct.unpack_from('>8I', module, 0x48)

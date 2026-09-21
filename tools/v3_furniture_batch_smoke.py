@@ -1618,6 +1618,7 @@ def exercise(debug, rom_path, record, *, section='automatic_furniture'):
     if section=='surface_save':return surface_save(debug,rom_path,record)
     if section=='surface_menu':return surface_menu(debug,rom_path,record)
     if section=='surface_scoring':return surface_scoring(debug,rom_path,record)
+    if section=='furniture_scoring':return furniture_scoring(debug,rom_path,record)
     if section=='surface_audio':return surface_audio(debug,rom_path,record)
     if section=='surface_stock':return surface_stock(debug,rom_path,record)
     if section=='surface_selection':return surface_selection(debug,rom_path,record)
@@ -2868,6 +2869,101 @@ def surface_audio(debug,rom_path,record):
         for at,data in saved.items():debug.write_memory(at,data)
     return dict(native_surface_audio=True,assertions=assertions,complete_native_floor_consumers=True,
         native_synthesis_tested=False,physical_audio_played=False,ordinary_room_interaction=False,
+        saved_data_written=False,requires_checkpoint_restore=True)
+
+
+def furniture_scoring(debug,rom_path,record):
+    """Changed theme bounds, all group rows, and native category score loops."""
+    import v3_hra as hra
+    from catalogue_names import Image
+    from aflib import u32
+    path=Path(rom_path);image=path.read_bytes();report=json.loads((path.parent/'build.json').read_bytes())
+    if sha256(image)!=report['output_sha256']:raise ValueError('Changed theme-scoring cartridge')
+    files=by_vrom(image);hr=report['hra'];series=hr['series'];boot=boot_proofs(image);assertions=0
+    def check(label,at,want):
+        nonlocal assertions
+        got=debug.read_memory(at,len(want));passed=got==want
+        record(dict(theme_check=label,address=f'{at:08X}',bytes=len(want),
+            assertion='passed' if passed else 'failed',observed_sha256=sha256(got),expected_sha256=sha256(want)))
+        if not passed:raise ValueError('Native theme mismatch: '+label)
+        assertions+=1
+    def call(at,args=(),proof=None):
+        result=debug.call(f'{at:08X}',list(args),return_address=MODULE_RAM+0x6480,
+            verified_code=proof or boot.get(at));record(result);return result['return_value']
+    def put(at,*values):debug.write_memory(at,struct.pack('>'+str(len(values))+'I',*values))
+    size=0xA000;allocation=call(0x8009BFC0,[size])
+    if allocation&15 or not MODULE_RAM+0x8000<=allocation<=0x80400000-size:
+        raise ValueError('Theme-scoring arena allocation failed')
+    owner,layers,points,theme,recommendation,name=(allocation+n for n in (16,0x8800,0x8840,0x8870,0x8880,0x88A0))
+    data,reloc=(files[v].extract(image) for v in (hra.NEW_VROM,hra.NEW_RELOC))
+    if (sha256(data),sha256(reloc))!=(hr['output_sha256'],hr['relocation_sha256']):
+        raise ValueError('Changed complete scoring owner')
+    if owner+len(data)+len(reloc)>layers-16:raise ValueError('Scoring owner exceeds isolated arena')
+    loaded=relocate_verified_data(Image(hra.RAM,len(data),struct.unpack_from('>5I',reloc)),data,reloc,owner)
+    debug.write_memory(allocation,bytes(size))
+    call(0x800262D0,[hra.NEW_VROM,hra.NEW_VROM+len(data),hra.RAM,hra.RAM+len(data),owner,owner+len(data),len(reloc)])
+    check('complete actual scoring load and relocation',owner,loaded)
+    linked=lambda at:owner+at-hra.RAM
+    proof=(owner,loaded[:hra.SECTIONS[0]])
+    old_pointer=debug.read_memory(0x80107B50,4);old_state=debug.read_memory(0x8046C000,1232)
+    edge=b'V3TH'*4;guards=(allocation,layers-16,points-16,name+16,allocation+size-16)
+    for at in guards:debug.write_memory(at,edge)
+    try:
+        put(0x80107B50,owner)
+        info_at=series['info_address']-hra.RAM;table_at=hr['metadata_address']-hra.RAM
+        info=bytearray(data[info_at:info_at+63*3]);table=bytearray(data[table_at:table_at+hr['metadata_rows']*4])
+        for idx in range(63):
+            kind=info[idx*3];group=5 if kind==1 else 0;count=0
+            for i in range(hr['metadata_rows']):
+                value=u32(table,i*4)
+                if value>>26==idx:
+                    if kind==255:raise ValueError('A real item uses an inert padding theme')
+                    if kind!=1 or (value>>16&1023)>=5:
+                        struct.pack_into('>I',table,i*4,value&0xFC00FFFF|group<<16);group+=1
+                    count+=1
+            info[idx*3+1]=count&255
+        call(linked(0x8092817C),[layers,5],proof)
+        check('all installed furniture group assignments',linked(hr['metadata_address']),table)
+        check('all 63 category counts and inert padding',linked(series['info_address']),info)
+        check('all 63 empty search masks',linked(series['search_address']),bytes(63*4))
+        for index in (57,59):
+            call(linked(hra.RAM),[name,index],proof)
+            key=data[series['names_address']-hra.RAM+index*10:series['names_address']-hra.RAM+(index+1)*10]
+            check('actual full English theme key '+str(index),name,key)
+        # Isolate each actual type without claiming the missing item delivery
+        # is installed. These are disposable scoring tables, not saved rooms.
+        for index,kind,pair in ((57,1,77),(59,2,75)):
+            local=bytearray(info)
+            for i in range(63):local[i*3+1]=0
+            count=10 if kind==1 else 4
+            local[index*3+1]=count
+            debug.write_memory(linked(series['info_address']),local)
+            debug.write_memory(linked(series['search_address']),bytes(63*4))
+            put(linked(series['search_address'])+index*4,(1<<count)-1)
+            for wall,floor,bonus in ((0,0,48000 if kind==1 else 0),(pair,pair,58000 if kind==1 else 43000)):
+                put(points,17);put(theme,0xFFFFFFFF);put(recommendation,0)
+                if kind==1:call(linked(0x80926FA0),[points,recommendation,wall,floor],proof)
+                else:call(linked(0x80926B34),[points,theme,recommendation,name,wall,floor],proof)
+                check('native category/matching-pair score '+str((index,wall,floor)),points,struct.pack('>I',17+bonus))
+            debug.write_memory(linked(series['search_address']),bytes(63*4))
+            for address,args in ((0x8092726C,[points]),(0x80926A08,[points]),
+                    (0x80926FA0,[points,recommendation,0,0]),(0x80926B34,[points,theme,recommendation,name,0,0])):
+                put(points,17);call(linked(address),args,proof)
+                check('expanded scoring loop terminates without false bonus '+hex(address),points,struct.pack('>I',17))
+        for index in (59,60,61,62,63,0xFFFFFFFF):
+            result=call(linked(0x80925A5C),[0,index],proof)
+            record(dict(theme_remaining_index=index,return_value=result,assertion='passed' if result==0 else 'failed'))
+            if result:raise ValueError('Uninstalled or sentinel theme recommends a fabricated item')
+            assertions+=1
+        for at in guards:check('bounded theme arena guard',at,edge)
+        check('complete scoring instructions remain unchanged',owner,loaded[:hra.SECTIONS[0]])
+        check('no CPU fault',0x8003CE34,bytes(4))
+        check('saved state unchanged',0x8046C000,old_state)
+    finally:
+        debug.write_memory(0x80107B50,old_pointer);call(0x8009C040,[allocation])
+    check('prior scoring pointer restored',0x80107B50,old_pointer)
+    return dict(native_furniture_theme_categories=True,assertions=assertions,complete_native_loops=True,
+        synthetic_theme_membership=True,ordinary_score_letters_tested=False,acquisition_tested=False,
         saved_data_written=False,requires_checkpoint_restore=True)
 
 

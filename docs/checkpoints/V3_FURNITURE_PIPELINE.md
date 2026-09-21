@@ -1,5 +1,92 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared complete donor themes
+
+ABI 195 is `build/v3-theme-scoring-runtime-02/build-lock.json`. The ordinary
+shared runtime refresh installs every donor theme definition and missing official
+English score-letter name. It adds no per-item installer or enabled import.
+There are 148 experimental choices and 27 inactive profiles. Harvest/Mario
+delivery, new furniture birth-point categories, and other unfinished behaviours
+remain required; this is not a playtest handoff or a release.
+
+The native owner has 63 theme rows: all 60 donor categories and three inert rows.
+Its original 55 definitions are retained. Harvest uses source type 1 with native
+floor/wall 77; Mario uses source type 2 with pair 75. Western, Backyard, and Boxing
+retain pairs 73, 74, and 76. Sentinel 63 stays outside counted storage. The seven
+native count sites, 27 theme references, and imported missing-item helper have
+matching bounds. All 48 furniture metadata references remain unchanged, including
+the metadata end pointer that shares the old theme table's address.
+
+The owner grows 1,088 bytes to 32,480, leaving 288 bytes below its 32-KiB limit.
+Relocations remain 1,184 bytes. Scheduler sizes and complete load/relocation
+are updated without extra fixed RAM. The score-letter creator grows 48 bytes
+to 63,728 including its unchanged 960-byte relocation. All 58 previous name rows
+remain; the two added names produce 60 rows. Complete donor names and hashes for
+all five additions are in `translations/provenance.json`, the sole source catalogue.
+The 4,587,632-byte import blob, audio allocation, artwork, and gameplay state are
+unchanged. Resized owners use the checked zero cartridge tail through the shared
+installer, retaining logical DMA identities.
+
+Reproduction:
+
+```sh
+python3 tools/v3_furniture_install.py --refresh-runtime --furniture-scoring \
+  --base-lock build/v3-room-movement-imports-01/cartridge/build-lock.json \
+  --output build/v3-theme-scoring-runtime-02
+python3 -m unittest tests.test_v3_furniture_scoring -v
+python3 tools/emulator_smoke.py \
+  --rom build/v3-theme-scoring-runtime-02/animal-forest-v3-asset-loader.z64 \
+  --output build/v3-theme-scoring-native-02 \
+  --xvfb /home/discordian/Games/OpenRSC/headless/vendor/usr/bin/Xvfb \
+  --expansion-pak --no-initial-screenshot --seconds 90 \
+  --scenario tests/scenarios/v3_furniture_scoring.json
+```
+
+Use fresh output directories. Runtime build `01` failed before emitting a ROM
+because the shared-address metadata end was initially classified as a theme
+reference. The complete original reference inventories disambiguate it.
+
+Three focused host checks pass in 8.761 seconds. They reproduce all complete
+changed owners, exercise altered-source and mismatched-pair rejection, verify
+official-name provenance and preserved letter keys/templates, and compare three
+complete Python/Node outputs: none, all, and mower only. No imports reproduces
+the pinned V2-12 translation exactly. UPS reconstruction passes. Saved format 4,
+all existing save/profile records, artwork, catalogue, surface packet, and
+equipment data are unchanged.
+
+The silent native run has 69 records and 33 internal assertions. It loads and
+relocates the actual expanded owner, verifies all furniture group assignments,
+all category counts/search rows, both English name keys, Harvest/Mario score
+rules and matching pairs, four complete native scoring loops, missing-item bounds,
+arena guards, saved-state preservation, and checkpoint restoration. Theme members
+are supplied in disposable scoring tables; this does not test their acquisition
+or room rendering. Ordinary score-letter creation and hardware remain unverified.
+The first attempt stopped in the Python fixture after successful loading because
+the existing `other` category count exceeds 255. The single retry mirrors the
+native byte-sized count, passes, and shuts down. No ROM correction was needed.
+
+Hashes:
+
+- ROM: `90406c0a8c5b33cb7a94dc1073e547dd2d3e04f47e81420a7dbd1015a03a4a16`.
+- UPS: `523e0b031bba87da18f655ab79f1c4b12aab439003f83e896c52ad0f66df31e5`.
+- Build report: `ba81457e09596463dcd6ffa7447aa05902daa61cd2bd63829c2f72ec907a8d3d`.
+- Native results: `9853590ae77d08d842ea79cb01769d40d20f17058c27cdae6eb6576713e6eed7`.
+
+Saved format/profile compatibility is unchanged from ABI 194. Format-4 saves
+still cannot load in V2 or earlier V3 formats, and every selected import remains
+required. Preserve backups; these checks do not establish ordinary cross-build
+reload. The main lock and both deployments of the one web patcher stay unchanged.
+
+The next shared scoring step can represent every remaining donor birth category
+with 27 native counters. Preserve all current 23 values, then append 1,983, 1,300,
+1,177, and 1,400. Map donor categories 23–37 by exact point equivalence, retaining
+acquisition separately. Native category 7 has 2,951 points versus the donor's
+1,029 and must not be overwritten. Three native birth-field consumers already
+use the five-bit field; the new 27-counter size fits that field and the native
+three-plus-four unrolled evaluator. Implement the larger stack/counter bounds,
+source-bound shared mapping, current pipeline checks, and focused verification
+before accepting these additional metadata categories.
+
 ## Shared room movement sounds and ordinary import
 
 ABI 194 is `build/v3-room-movement-imports-01/cartridge/build-lock.json`.

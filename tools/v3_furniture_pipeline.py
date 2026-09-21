@@ -1086,7 +1086,7 @@ def metadata(source, item, profile, identity):
         points=source.raw('mMkRm_birth_point_table')
         if len(points)!=152 or u32(points,birth*4)!=412 or u32(points,donor_birth*4)!=412:
             raise ReviewRequired('source scoring equivalence changed')
-    if birth >= 23 or hra&63 or series >= 59:
+    if birth >= 23 or hra&63 or series >= 60:
         raise ReviewRequired('scoring needs an acquisition/category adapter')
     native_hra = (hra&0xFFFFC000)|(birth<<9)|(surface<<7)
     runtime_index,destination = furniture_identity(item)

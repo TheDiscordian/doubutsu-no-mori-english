@@ -18,7 +18,27 @@ deployments retain their existing builds.
 
 ## Active development
 
-The current explicit V3 proposal is ABI 194 at
+The current explicit V3 proposal is ABI 195 at
+`build/v3-theme-scoring-runtime-02/build-lock.json`. Shared HRA theme storage
+supports all 60 donor categories with three inert padding rows for the native
+unrolled loops. Harvest retains its base-series rules; Mario retains its theme
+rules. Both use their actual additive floor/wall pairs and official English
+names in the complete score-letter lookup. The first 55 native definitions,
+all installed furniture metadata, and native base-point weights are preserved.
+
+Three focused host checks pass, including complete owner reconstruction,
+relocation bounds, text provenance, and browser/offline none/all/single output.
+The focused native run passes complete scoring loading/relocation, group assignment,
+both new category rules, loop termination, English key lookup, and saved-state
+preservation after one fixture correction for byte-sized category counts.
+Ordinary score-letter generation and hardware are not newly verified.
+There are still 148 experimental
+choices and 27 inactive profiles: theme support does not substitute for delivery
+or the remaining new birth-point categories. Saved format 4 and selection
+profiles are unchanged. Neither stable deployment nor the main lock changes.
+See the [theme checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-complete-donor-themes).
+
+The shared movement proposal is ABI 194 at
 `build/v3-room-movement-imports-01/cartridge/build-lock.json`. The shared room
 movement-sound dispatcher implements both source categories, with complete
 directional rolling/dragging and grass-dependent pushing sounds. The normal

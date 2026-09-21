@@ -12,7 +12,25 @@ After the primary importing work, finish gold-tree leaf/cut effects and the full
 golden-shovel acquisition route. This is deferred required V3 work, not a dropped
 feature or a separate release goal.
 
-The current explicit proposal is ABI 194 at
+The current explicit proposal is ABI 195 at
+`build/v3-theme-scoring-runtime-02/build-lock.json`. Complete source-derived
+theme storage and English score-letter names cover Harvest and Mario as well
+as the existing categories. Three focused host checks and the bounded native
+category run pass; one fixture correction accounts for byte-sized native counts.
+Retain these results rather than repeating unchanged category tests.
+Choices remain 148, with no added saved fields or profile bits.
+
+Next extend the shared base-point categories, preserving every native weight.
+The 38 donor categories need only four additional distinct weights beyond the
+23 installed counters: 1,983, 1,300, 1,177, and 1,400. A 27-counter layout retains
+the native five-bit field and unrolled-loop shape; equivalent scoring buckets
+must not change actual acquisition. Native lottery points differ from the donor
+and must remain unchanged. Connect the checked map through the ordinary importer,
+not per-item rules. Then finish HomePage/Mario and Harvest delivery, continue
+shared material/rigged-material support, and complete required gold-tree work
+after the primary import pipelines. Keep both stable deployments unchanged.
+
+The shared movement proposal is ABI 194 at
 `build/v3-room-movement-imports-01/cartridge/build-lock.json`. Shared room
 movement sounds are installed for both source categories. The ordinary bulk
 pipeline enables the mower through its real event-item route and catalogue
@@ -22,8 +40,8 @@ the unchanged alpha/rendering checks instead of replaying them. There are 148
 experimental choices and 27 inactive profiles. Sound support alone does not
 enable the stone coin's unfinished material/behaviour category.
 
-Next finish HomePage/Mario and Harvest delivery and full theme categories,
-and continue shared material/rigged-material support. New audio keeps all old
+HomePage/Mario and Harvest delivery and remaining base-point categories are
+required, alongside shared material/rigged-material support. New audio keeps all old
 dispatch entries and fits the current allocation, with 288 conservative bytes
 spare. Saved format 4 stays unchanged, but a selected mower needs its additional
 profile bit; preserve backups and equal-or-larger selections. Ordinary gameplay
@@ -47,7 +65,7 @@ unit checks, a corrected cold-startup fixture, and one focused Chromium worker/
 category-control check pass. The private export `build/v3-surface-browser-01/`
 is not deployed; the temporary test server is stopped. Retain this evidence.
 
-Finish HomePage/Mario and Harvest delivery and complete theme categories. These are
+Finish HomePage/Mario and Harvest delivery and complete base-point categories. These are
 shared category dependencies, not per-item import scripts. Ordinary gameplay
 and persistence still require focused integration/human testing. Keep the stable
 deployments unchanged and retain format-4 incompatibility warnings/backups.

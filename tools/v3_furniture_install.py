@@ -176,6 +176,8 @@ def scoring(base, prior, rows, source):
             if not 1024 <= index < 2048 or data[at:at+width] != (bytes.fromhex('fc000000') if width==4 else bytes(2)):
                 raise ValueError('Scoring record would replace an installed identity')
             if width == 4:
+                if not 0 <= row['series'] < report['series']['count']:
+                    raise ValueError('Scoring series exceeds installed category storage')
                 series = report['series']; start = series['info_address']-hra.RAM+row['series']*3
                 actual = data[start:start+3]; expected = bytes.fromhex(row['donor_series_hex'])
                 # Existing theme adapters explicitly omit unavailable matching
@@ -545,7 +547,7 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
                     held_collection=False, held_catalogue_art=None, held_selection=False, translation_updates=False,
                     room_rigs_art=None, scenery_art=None, scenery_gameplay=False,
                     equipment_rigs=None, expand_storage=False, furniture_audio_art=None, furniture_profiles=None,
-                    material_frames_art=None,scrolling_materials_art=None,room_surfaces_art=None):
+                    material_frames_art=None,scrolling_materials_art=None,room_surfaces_art=None,furniture_scoring=False):
     """Update shared readers; optionally install the shared held-resource adapter."""
     output=output.resolve()
     if output.exists() or not output.is_relative_to(ROOT/'build'):
@@ -566,9 +568,9 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
     moved=[];equipment_report=None;reused=None;owner_changes={};owner_moves=[];owner_updates=[];report_updates={};text_moves=[]
     equipment_mode=any((equipment_art is not None,equipment_rigs is not None,player_motion,equipment_kinds,player_actions,
                         item_category_art is not None,ground_categories,event_acquisition,held_collection,held_catalogue_art is not None,held_selection,room_rigs_art is not None,scenery_art is not None,scenery_gameplay))
-    resource_mode=equipment_mode or translation_updates or expand_storage or furniture_audio_art is not None or furniture_profiles is not None or material_frames_art is not None or scrolling_materials_art is not None or room_surfaces_art is not None
+    resource_mode=equipment_mode or translation_updates or expand_storage or furniture_audio_art is not None or furniture_profiles is not None or material_frames_art is not None or scrolling_materials_art is not None or room_surfaces_art is not None or furniture_scoring
     if sum((equipment_art is not None,equipment_rigs is not None,player_motion,equipment_kinds,player_actions,
-            item_category_art is not None,ground_categories,event_acquisition,held_collection,held_catalogue_art is not None,held_selection,translation_updates,room_rigs_art is not None,scenery_art is not None,scenery_gameplay,expand_storage,furniture_audio_art is not None,furniture_profiles is not None,material_frames_art is not None,scrolling_materials_art is not None,room_surfaces_art is not None))>1:
+            item_category_art is not None,ground_categories,event_acquisition,held_collection,held_catalogue_art is not None,held_selection,translation_updates,room_rigs_art is not None,scenery_art is not None,scenery_gameplay,expand_storage,furniture_audio_art is not None,furniture_profiles is not None,material_frames_art is not None,scrolling_materials_art is not None,room_surfaces_art is not None,furniture_scoring))>1:
         raise ValueError('Install shared runtime updates in dependency order')
     if resource_mode:
         blob,reused=reuse_resource_tail(base,prior,old_blob)
@@ -576,7 +578,11 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             raise ValueError('Equipment integration requires the checked shared resource tail')
     parent_readers=bool(player_actions and prior.get('equipment_resources',{}).get('player_actions',{}).get('equipment_selection'))
     wrapped_names=bool(player_actions and prior.get('equipment_resources',{}).get('wrapped_presents'))
-    if expand_storage:
+    if furniture_scoring:
+        import v3_furniture_scoring as scoring_categories
+        display_report,alias_report=prior['clothing']['display'],prior['display_aliases']
+        owner_changes,report_updates=scoring_categories.install(base,prior,core,module)
+    elif expand_storage:
         display_report,alias_report=prior['clothing']['display'],prior['display_aliases']
         report_updates,text_moves=capacity.expand(base,prior,core)
         limit=report_updates['import_storage']['virtual_limit']
@@ -676,7 +682,7 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         forced_moves={v for r in growth for v in r['relocated_blockers']}
         if len(growth_vroms)!=len(growth) or growth_vroms&forced_moves:
             raise ValueError('Conflicting in-place resource growth plans')
-        menu_resizes={}
+        menu_resizes={r['vrom']:r for r in report_updates.get('furniture_scoring',{}).get('owner_resizes',[])}
         if (player_actions and equipment_report['player_actions'].get('balloon_menu') and
                 not prior['equipment_resources']['player_actions'].get('balloon_menu')):
             menu_resizes={r['vrom']:r for r in equipment_report['player_actions']['balloon_menu']['owner_resizes']}
@@ -846,6 +852,15 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             in_place_owner_updates=owner_updates,additional_resident_bytes=0)
         report['sources'].update(report['translation_updates']['sources'])
         report['native_test']='pending changed translation headers; inherited gameplay limits retained'
+    if furniture_scoring:
+        report['automatic_furniture']['resource_moves']=moved
+        report['import_storage']['remaining_bytes']=limit-BLOB-len(blob)
+        report['shared_runtime_refresh'].update(adapters=['furniture_scoring'],
+            resource_allocations_changed=True,resource_tail_reuse=reused,
+            unchanged_owner_moves=moved,changed_owner_moves=owner_moves,
+            in_place_owner_updates=owner_updates,additional_resident_bytes=0)
+        report['sources'].update(report['furniture_scoring']['sources'])
+        report['native_test']='pending expanded theme scoring and English letter names; acquisition and new birth categories remain incomplete'
     if room_surfaces_art is not None:
         report['automatic_furniture']['resource_moves']=moved
         report['import_storage']['remaining_bytes']=limit-BLOB-len(blob)
@@ -1024,6 +1039,8 @@ if __name__=='__main__':
         help='With --refresh-runtime, install shared scrolling-material rendering without enabling unfinished items')
     parser.add_argument('--room-surfaces-art',type=Path,
         help='With --refresh-runtime, install prepared floor/wall artwork and shared room readers without enabling items')
+    parser.add_argument('--furniture-scoring',action='store_true',
+        help='With --refresh-runtime, install complete donor theme categories and official score-letter names')
     args=parser.parse_args()
     if args.equipment_art and not args.refresh_runtime:parser.error('--equipment-art requires --refresh-runtime')
     if args.equipment_rigs and not args.refresh_runtime:parser.error('--equipment-rigs requires --refresh-runtime')
@@ -1046,6 +1063,7 @@ if __name__=='__main__':
     if args.material_frames_art and not args.refresh_runtime:parser.error('--material-frames-art requires --refresh-runtime')
     if args.scrolling_materials_art and not args.refresh_runtime:parser.error('--scrolling-materials-art requires --refresh-runtime')
     if args.room_surfaces_art and not args.refresh_runtime:parser.error('--room-surfaces-art requires --refresh-runtime')
+    if args.furniture_scoring and not args.refresh_runtime:parser.error('--furniture-scoring requires --refresh-runtime')
     result=(refresh_runtime(args.output,args.base_lock,equipment_art=args.equipment_art,player_motion=args.player_motion,
                             equipment_kinds=args.equipment_kinds,player_actions=args.player_actions,
                             item_category_art=args.item_category_art,ground_categories=args.ground_categories,
@@ -1055,6 +1073,7 @@ if __name__=='__main__':
                             room_rigs_art=args.room_rigs_art,scenery_art=args.scenery_art,scenery_gameplay=args.scenery_gameplay,
                             expand_storage=args.expand_storage,furniture_audio_art=args.furniture_audio_art,
                             furniture_profiles=args.furniture_profiles,material_frames_art=args.material_frames_art,
-                            scrolling_materials_art=args.scrolling_materials_art,room_surfaces_art=args.room_surfaces_art)
+                            scrolling_materials_art=args.scrolling_materials_art,room_surfaces_art=args.room_surfaces_art,
+                            furniture_scoring=args.furniture_scoring)
             if args.refresh_runtime else build(args.output,args.art,args.base_lock))
     print(json.dumps({k:result[k] for k in ('runtime_abi','output_sha256','patch_sha256')},indent=2))

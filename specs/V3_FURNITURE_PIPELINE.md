@@ -2,6 +2,30 @@
 
 ## Workflow
 
+### Complete donor scoring themes
+
+`--refresh-runtime --furniture-scoring` extends the current checked HRA owner
+through the shared installer. All 60 donor series fit 63 allocated rows: the
+three inert padding entries preserve the native three-plus-four and one-plus-two
+unrolled loops. Sentinel 63 stays excluded. Every counted loop, original table
+reference, and the imported missing-item helper receives the matching bound.
+The metadata end pointer can equal the old series-table start; reference identity,
+not address alone, determines which pointer moves.
+
+Original 55 definitions and all existing furniture metadata remain intact.
+The five additional definitions retain complete source types, official names,
+and stable paired surface mappings. Harvest is a base series, not a theme;
+Mario is a theme. The native scheduler and complete overlay relocation receive
+the increased image size, bounded by 32 KiB plus the existing relocation limit.
+The separate English score-letter creator appends missing source names while
+preserving every previous lookup key and template selector. The single text
+provenance catalogue records the exact donor name fields.
+
+This category changes no saved fields, selection bits, or active imports.
+Acquisition and additional base-point categories remain independent eligibility
+requirements. The ordinary installer checks a row's series against installed
+storage before accessing it. Neither web-patcher deployment is updated.
+
 ### Changed-owner storage
 
 The shared runtime refresh retains each changed overlay's logical DMA identity.

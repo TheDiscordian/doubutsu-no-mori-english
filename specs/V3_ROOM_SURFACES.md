@@ -12,12 +12,12 @@ the same ten identities. Shared room reservation/application and full saved-byte
 reading are installed. The format-4 save category supplies optional-profile
 validation and independent ownership. Native inventory actions preserve full
 surface IDs; catalogue page lists and bit dispatch use the new ownership category.
-Base scoring, three existing matching themes, and full-index footstep/drag audio
+Base surface scoring, all five additive matching themes, and full-index footstep/drag audio
 are installed. Shared A/C/event stock supports six additions with selected-only
 membership and selection. The private composer exposes those six surfaces as
 individual or all-selected options, with real catalogue counts and independent
-saved profiles. HomePage/Harvest acquisition and complete Harvest/Mario furniture
-themes remain required. The four associated records stay disabled; installed
+saved profiles. HomePage/Harvest acquisition and additional furniture birth-point
+categories remain required. The four associated records stay disabled; installed
 artwork alone does not make them selectable. Ordinary gameplay and persistence
 are not established by category installation.
 
@@ -373,10 +373,11 @@ removed without increasing owner or relocation storage. The actual home reader
 already passes full bytes; no additional home-format change is needed.
 
 Source-bound Western, Backyard, and Boxing series adapters map donor pair
-indices 18, 26, and 65 to stable native indices 73, 74, and 76. Native partial
-and complete furniture-theme scoring uses these pairs. Full Harvest and Mario
-furniture theme categories remain incomplete; installing their surface base
-values does not supply their whole furniture themes. The ordinary furniture
+indices 18, 26, and 65 to stable native indices 73, 74, and 76. The complete donor
+theme extension also maps Harvest 66 to 77 and Mario 64 to 75, retaining their
+distinct base-series/theme rules. Native partial and complete scoring uses these
+pairs. New furniture birth-point categories and actual delivery remain required;
+installing these definitions does not enable an unfinished import. The ordinary furniture
 installer accepts checked mapped indices as well as explicitly missing pairs,
 so future bulk imports retain this shared mapping.
 
