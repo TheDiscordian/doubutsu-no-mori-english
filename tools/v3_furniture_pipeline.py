@@ -1242,10 +1242,11 @@ def main():
     source = Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
                     (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
     if args.representation=='rewards':
-        if args.category=='password':
-            from v3_password import prepare as prepare_password
+        if args.category in ('password','password-policy'):
+            if args.category=='password':from v3_password import prepare as prepare_password
+            else:from v3_password_policy import prepare as prepare_password
             if args.select or args.command!='convert':parser.error('Password preparation compiles one complete shared category')
-            report=prepare_password(source,output)
+            report=prepare_password(source,output,**({'lock':args.base_lock} if args.category=='password-policy' else {}))
             print(json.dumps({k:report[k] for k in ('bytes','sha256','runtime_installed','acquisition_installed')}))
             return
         from v3_holiday_rewards import discover as discover_rewards,prepare as prepare_rewards

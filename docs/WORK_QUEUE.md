@@ -13,15 +13,25 @@ golden-shovel acquisition route. This is deferred required V3 work, not a droppe
 feature or a separate release goal.
 
 The common password transform is prepared and donor-verified at
-`build/v3-password-prepared-02/`; reuse its passing comparison and sanitizer
-checks while the codec is unchanged. Continue the shared acquisition route:
-derive source eligibility by category, resolve only implemented selected native
-destinations, connect Nook's 28-character input and donor-font name conversion,
-reuse official dialogue, and enter the actual animated handover state machine.
+`build/v3-password-prepared-03/`; its refreshed object/tables match the retained
+verified codec. Shared eligibility, Nook result handling, and a map of all 128
+implemented item imports are prepared at `build/v3-password-policy-prepared-03/`.
+Reuse passing checks while those modules are unchanged. Continue the shared
+acquisition route: complete reviewed existing-native correspondence and
+display-parent mappings, connect the actual live-selection reader and game RNG,
+link code/data with checked memory bounds, and connect Nook's 28-character input
+and donor-font name conversion. Reuse official dialogue and enter the actual
+animated handover state machine. Keep the current scoring owner's limit intact.
 The eight-byte donor names are not raw native saved names. Keep magazine RNG,
 name/NPC checks, cancellation, and no-award results intact. Neither a decoded
-item number nor HomePage list membership authorises delivery. The codec is not
-linked into the current ROM and enables no choices. See
+item number nor HomePage list membership authorises delivery. The HomePage
+furniture list contains five Famicom-only rewards; its floor/wall use other
+codes. Ten Mario furniture entries use Nintendo-code birth category 34 despite
+the empty `ftr_listMario` and absent ordinary stock membership. Extend the shared
+metadata/acquisition adapter by this actual category once native delivery is
+installed; do not add those items to normal stock or assume the empty list means
+no rewards. The prepared modules are not linked into the current ROM and enable
+no choices. See
 `specs/V3_PASSWORDS.md` for the source contracts and integration order.
 
 The current explicit proposal is ABI 196 at

@@ -18,16 +18,35 @@ deployments retain their existing builds.
 
 ## Active development
 
+The shared password eligibility and Nook decision module is prepared at
+`build/v3-password-policy-prepared-03/`. Actual donor rules compile with their
+complete disc tables into a 6,194-byte permission packet. A separate 4,972-byte
+map binds 128 implemented imports, including furniture rotations, to their
+current native IDs and live selection fields. Missing or unselected items do
+not resolve. Existing native-item correspondence and display aliases still
+need mapping; these prepared modules are not installed into the cartridge.
+
+Three focused checks pass after one fixture correction. Sanitized execution
+matches the donor's result functions, preserves no-gift outcomes and magazine
+RNG boundaries, checks the full permission matrix and current destination map,
+and exercises a decoded code through selection-aware resolution. The source
+distinguishes HomePage NES rewards from its surfaces; Mario furniture uses
+birth category 34 and has no ordinary stock-list entries. Continue native
+mapping, keyboard/dialogue, linked storage, and animated handover. No ROM,
+save, choice, or deployment changes. See the
+[policy checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-password-eligibility-and-selected-destinations).
+
 The shared GameCube password codec is prepared at
-`build/v3-password-prepared-02/`. The ordinary category pipeline extracts the
+`build/v3-password-prepared-03/`. The ordinary category pipeline extracts the
 complete donor tables and builds an independent, bounded N64 encode/decode
 kernel. Three focused checks pass, including 384 payload comparisons against
 the pinned donor implementation across all six types, every transform-key
 choice, aliases, and malformed inputs under memory/undefined-behaviour sanitizers.
 The 1,551-byte packet and 3,948 bytes of MIPS instructions have no heap or
-external dependencies. This is prepared code, not installed password delivery.
-Nook's input UI, source item eligibility, selected destination mapping, official
-dialogue, and handover remain required. No cartridge, choice, save, or website
+external dependencies. The refreshed receipt reproduces the verified codec
+object and tables unchanged. This is prepared code, not installed delivery.
+Nook's input UI, complete destination mapping, official dialogue, linked
+eligibility, and handover remain required. No cartridge, choice, save, or website
 changes. See the [password checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-password-codec).
 
 The current explicit V3 proposal is ABI 196 at

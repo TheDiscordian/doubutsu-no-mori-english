@@ -15,7 +15,7 @@ from aflib import sha256
 from v3_furniture_pipeline import Source
 import v3_password as password
 
-OUTPUT=ROOT/'build/v3-password-prepared-02'
+OUTPUT=ROOT/'build/v3-password-prepared-03'
 
 
 def oracle_source():

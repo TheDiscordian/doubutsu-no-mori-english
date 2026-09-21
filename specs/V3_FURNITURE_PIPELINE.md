@@ -12,6 +12,16 @@ selected destination resolution, keyboard/dialogue, and actual delivery remain
 separate required integration steps, described in [V3 passwords](V3_PASSWORDS.md).
 Prepared codec success does not activate any import or update a deployment.
 
+`--category password-policy` uses the same rewards representation and explicit
+current build lock. It prepares complete donor eligibility, Nook result rules,
+and current import destinations with their live selection-field bindings. The
+source's HomePage furniture is Famicom-only; Mario furniture instead uses birth
+category 34 without ordinary stock membership. An empty `ftr_listMario` must
+not cause this source category to be lost. These packets and callbacks are not
+yet linked; original-item correspondence, display aliases, frontend, and actual
+handover remain required. An unavailable destination never becomes a substitute
+item or bypasses the active profile.
+
 ### Complete donor scoring themes
 
 `--refresh-runtime --furniture-scoring` extends the current checked HRA owner

@@ -95,7 +95,7 @@ def encode(description):
 
 def compile_kernel(output, *, name='holiday_rewards'):
     """Prepare a relocatable o32 kernel; do not invent a resident address."""
-    if name not in ('holiday_rewards','password'):raise ValueError('Unreviewed shared acquisition kernel')
+    if name not in ('holiday_rewards','password','password_policy'):raise ValueError('Unreviewed shared acquisition kernel')
     compiler='/n64_toolchain/bin/mips64-elf-'
     docker=['docker','run','--rm','--network','none','--user',f'{os.getuid()}:{os.getgid()}',
         '-v',f'{ROOT}:/source:ro','-v',f'{output.resolve()}:/out','-w','/out','--entrypoint']

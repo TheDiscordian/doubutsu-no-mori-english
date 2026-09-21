@@ -1,5 +1,109 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared password eligibility and selected destinations
+
+`build/v3-password-policy-prepared-03/` contains the shared source permission
+packet, current import destination map, and freestanding Nook decision/resolver
+module. None is linked into the ROM. The compiler uses the existing rewards
+category command and explicit ABI-196 lock; it does not add per-item adapters.
+
+The host evaluator compiles fourteen complete pinned donor functions against
+actual disc tables: eligibility, furniture/parent conversion, price lookup,
+list selection, and membership. Complete goods roots/lists, price roots/tables,
+birth categories, Famicom permissions, and magazine probabilities are extracted
+with their dependency receipts. The evaluator runs under address and
+undefined-behaviour sanitizers. ABC-priority union, positive fruit prices, and
+the unreachable year-dependent grab-bag branch make these permission answers
+independent of the supplied fixture's town/year. The randomized ABC branch is
+not part of eligibility and is explicitly refused in the host binding.
+
+The full 65,536-byte source matrix compacts into 1,027 sorted ranges, a
+6,194-byte `AFPE` packet. Its three masks represent Famicom, user, and other
+code types. The raw permission counts include the source's reserved `FFFF`
+sentinel and unknown/unimplemented native identities; they are not import or
+playability counts. In particular, source permission cannot authorise an
+unmapped native item. Source HomePage furniture is five Famicom-only NES
+rewards, while its floor/wall use other-code permission. Nintendo-code birth
+category 34 covers Nintendo bench and ten Mario pieces; the ten Mario pieces
+have no stock-list membership, and `ftr_listMario` is empty. Their eventual
+metadata acquisition adapter must use the real code category, not ordinary stock.
+
+The `AFPM` map has 413 records in 4,972 bytes. It derives from the current
+checked composition catalogue: 95 furniture, three clothing, 24 equipment,
+and six surface identities. Furniture retains all four rotations. Examples
+include donor `1FA0..1FA3 -> 3C10..3C13`, floor `2612 -> 2649`, and shirt
+`24BF -> 34BF`. Each record binds its actual one/four-byte live enable field.
+The C resolver validates sorted records, bounds, width/alignment, reserved
+fields, and reader results; only exactly one means selected. Missing, disabled,
+malformed, and reserved identities resolve to zero. The map supplies no guessed
+existing-native correspondence or display-parent aliases; both remain required.
+
+The decision module retains checksum/type/rate/name/NPC rules and each source
+result. It distinguishes wrong names, card-e no-gift responses, magazine wins
+and losses, and gift results. Valid magazine attempts consume one continuous
+game RNG sample even at zero/hundred percent. Unavailable destinations and
+invalid rates do not consume a roll. NaN and out-of-range rolls reject. The
+separate gift-result helper excludes every no-award status. Nothing in this
+module writes inventory or saved state; actual delivery still belongs to the
+native animated handover and its conversation state machine.
+
+The MIPS object has 2,428 instruction bytes and 28 read-only data bytes, no heap
+or unresolved external symbols, and no assigned resident address. Compiler
+frames are 56 bytes for deciding, 32 for resolution, 24 for map validation and
+permission lookup, and zero for other helpers. The eventual accessor/RNG and
+caller frames are additional; no installed-memory capacity claim is made.
+
+Reproduction with fresh output paths:
+
+```sh
+python3 tools/v3_furniture_pipeline.py convert --assets-only \
+  --representation rewards --category password-policy \
+  --base-lock build/v3-birth-scoring-runtime-02/build-lock.json \
+  --output build/v3-password-policy-prepared-03
+python3 -m unittest tests.test_v3_password_policy -v
+```
+
+Three focused checks pass. The sanitized C run compares every ID/type lookup
+with the complete source permission matrix, exercises all 413 current mapped
+IDs with enabled/disabled/invalid flags, and compares 768 result combinations
+against the actual donor's Nook result functions. Name matching itself receives
+explicit full-field/blank-name checks; the reference result functions receive
+the supplied name-comparison result, not an emulated private-player structure.
+Rate thresholds, NPC bounds, null/truncated/malformed packets, source identity
+changes, output preservation, invalid RNG, and no-gift routing are covered.
+An added integration case encodes and decodes a code, resolves an actual current
+import, verifies the native destination, and rejects it after disabling its flag
+without consuming RNG. The memory reader is a host callback, not live RDRAM.
+
+The initial host fixture needed its named-enum regex, shirt destination, and
+HomePage-family expectations corrected; the corrected suite passed in 4.357
+seconds. The added integrated decision case passed in 3.611 seconds. A subsequent
+category assertion distinguished eleven Nintendo-code records from ten Mario
+pieces; its focused metadata check passed in 0.641 seconds. No native scenario,
+historical ROM replay, or new game defect is asserted by these fixture corrections.
+Strict host C syntax checks pass. Tests of unchanged codec transforms are
+retained, not replayed: `build/v3-password-prepared-03/` refreshes source receipts
+and reproduces the complete verified `prepared-02` object/tables unchanged.
+Its focused packet/receipt check passes in 0.365 seconds.
+
+Hashes:
+
+- Permission packet: `5f2d7cd882b9dc38e3136be5f909e06710f51ccc5c80ab687fde72eae6f6d5c5`.
+- Complete source matrix: `22a5c233464f1779aa1d80944166b4ba4657b25392ff563cba7e9b02a04a2cc9`.
+- Destination map: `fe9cc4b90f443aa89ea8e357df7f6a0beef6d62987db4ec6997ee2475c415d17`.
+- MIPS object: `67e4d6090f7caaa826c95f389adf69308fdc317cf4bff1f47e5204f5a5e717fb`.
+- Preparation report: `76de80b5222158e4a883b368b0983f2596e4db51e35abc2ef30c89bb4d54ccd3`.
+
+No cartridge or saved field changes. ABI 196, the 148 existing experimental
+choices, main ABI-109 lock, and both stable deployments remain unchanged.
+Format-4 incompatibility warnings and backups still apply to that ROM. No new
+in-game text is authored. Continue reviewed native/display mappings, real
+selection/RNG bindings, checked linked storage, full donor-font name input,
+official dialogue provenance, and animated handover. Latch the accepted result
+for that conversation; do not reroll or award each frame. Original hardware,
+ordinary Nook use, and save/restart are not verified by these prepared modules.
+Gold-tree work remains after primary importing.
+
 ## Shared password codec
 
 The ordinary rewards-category command prepares one shared GameCube password

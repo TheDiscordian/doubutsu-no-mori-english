@@ -2,7 +2,7 @@
 
 ## Scope
 
-Use the donor's password route for HomePage/Mario rewards instead of placing
+Use the donor's code routes for password rewards instead of placing
 those items in unrelated shop stock. One codec and shared eligibility rules
 serve the category; item records supply identities and selected destinations.
 This does not imply that every decoded item is present in the native game.
@@ -60,13 +60,68 @@ twenty decoded descriptor bytes. The implementation initializes it to zero;
 the independent host reference uses zero-initialized automatic variables.
 Neither detail justifies changing the donor's accepted-code behaviour.
 
+## Prepared eligibility and selected destinations
+
+`tools/v3_password_policy.py` compiles the pinned donor's complete eligibility,
+price, item-conversion, and stock-list functions against actual disc tables in
+an ignored host evaluator. Table roots, complete pointer targets, list/price
+terminators, and source identities are checked. The evaluator runs under memory
+and undefined-behaviour sanitizers and produces one permission mask per 16-bit
+donor item. Bits 0/1/2 mean Famicom/user/other code eligibility; the latter covers
+types 1, 2, 3, and 5. Permission is not a claim that an item exists in N64.
+
+The evaluator needs no game state: the source user-rule queries all three ABC
+priorities, so their ordering does not affect the union. The local and foreign
+fruit prices are positive, and the year-dependent grab-bag price is unreachable
+from the user eligibility path. These conditions are checked. No source RNG
+branch is used by permission extraction. The full 65,536-byte matrix remains
+local and is compacted into sorted inclusive ranges.
+
+The `AFPE` version-1 packet contains a 32-byte header: magic, version, range
+count, total bytes, normal/special NPC bounds, reserved-item value, five source
+magazine percentages, and eleven zero reserved bytes. Each six-byte row contains
+unsigned 16-bit first/last IDs, mask, and a zero reserved byte. Canonical rows
+are ordered, non-overlapping, and merge adjacent identical masks. The packet
+preserves the source's reserved `FFFF` permission; the destination map never
+treats that sentinel as a real gift.
+
+HomePage furniture contains five Famicom-only rewards. HomePage floor/wall use
+the other-code rule. Nintendo-code birth category 34 contains Nintendo bench
+and ten Mario pieces. The ten Mario furniture records have other-code
+permission despite no stock-list membership and an
+empty `ftr_listMario`. Source acquisition must use those actual rules, not the
+name or emptiness of one list. The ordinary metadata importer still needs the
+linked password-acquisition adapter before enabling these records.
+
+The separate `AFPM` version-1 packet binds implemented imports from the checked
+current composition catalogue. Its 16-byte header is magic plus six unsigned
+16-bit fields: version, count, stride 12, total bytes, zero, zero. Twelve-byte
+rows contain source/native unsigned 16-bit IDs, live enable-field RAM address,
+field width (one or four), and three zero bytes. Furniture keeps all four
+rotations. The live reader must return exactly one; disabled, malformed, or
+missing records resolve to zero. The map is build-specific, not a stable saved
+format. No native correspondence is inferred from equal IDs. Existing native
+items and display-parent aliases still need their separately reviewed mappings.
+
+`overlays/v3/password_policy.c` validates both packets, resolves selected
+destinations through a supplied read-only accessor, and implements Nook's
+result classification. Checksum/type/rate, full-name equality, NPC bounds, and
+no-gift outcomes are retained. An unavailable destination does not consume RNG.
+Valid magazine attempts consume one continuous `[0,100)` game roll, including
+zero/hundred-percent rates; invalid/NaN/out-of-range rolls reject. The explicit
+`result_gives_item` helper excludes invalid, wrong-name, card-e, losing-magazine,
+and cancellation results. None of these functions awards an item or writes
+saved state. The engine accessor, RNG, input, dialogue, and handover are not
+installed merely because their prepared callbacks pass host checks.
+
 ## Required integration
 
-1. Derive shared source eligibility from `mMpswd_check_present`: Famicom uses
+1. Install the prepared source eligibility from `mMpswd_check_present`: Famicom uses
    its whitelist, user-trade codes use actual tradable stock/price rules, and
    other codes use the source birth/category exclusions and item ranges.
    HomePage lists are evidence of acquisition, not the complete allowed set.
-2. Resolve donor identity to a checked native identity. Reject missing,
+2. Complete existing-native and display-parent correspondence alongside the
+   prepared import map. Resolve donor identity to a checked native identity. Reject missing,
    unfinished, disabled, or unsupported items before showing a gift. Do not
    cast donor IDs, alias missing items, or use checkbox order as identity.
 3. Connect Nook's 28-character keyboard route and cancellation. Preserve the
