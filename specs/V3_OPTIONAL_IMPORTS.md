@@ -118,6 +118,12 @@ mappings and bind complete donor programs/instruments with bounded audio storage
 HomePage/Harvest acquisition and ordinary persistence
 remain required before these become optional playable imports.
 
+The [shared password codec](V3_PASSWORDS.md) prepares the complete donor code
+transform for HomePage/Mario acquisition, with bounded MIPS code and independent
+donor comparisons. It is not linked into the current cartridge. Source
+eligibility, native destination mapping, Nook's input/dialogue, and animated
+handover remain required before password rewards become usable imports.
+
 The [expanded import storage](V3_IMPORT_STORAGE.md) supports further batches
 without adding to the full DMA directory. English choice data retains its
 identity and contents at a new virtual address; the import resource gains a

@@ -1,5 +1,76 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared password codec
+
+The ordinary rewards-category command prepares one shared GameCube password
+codec at `build/v3-password-prepared-02/`, not item-specific scripts. Extraction
+retains the actual 64-character alphabet, substitution permutation, all 256
+primes, sixteen selectors, and both sets of sixteen complete cipher keys. Root
+and entry relocations, key lengths/positions, full source codec instructions,
+and input identities are checked. The resulting packet is 1,551 bytes.
+
+The freestanding MIPS implementation handles all six source types and the full
+28-character transform, including ASCII/donor `#`, `0/O`, and `1/l` aliases.
+It writes outputs only on success, checks lengths/tables, bounds the modular
+inverse search, and has no heap, RNG, saved-state access, or external symbols.
+Its instruction sections total 3,948 bytes. Compiler-reported decode/encode
+frames are 112/88 bytes; the largest called helper uses 48 bytes, for codec-only
+stack totals of at most 160/136 bytes. These exclude the future caller's frame.
+The object remains relocatable and has no assigned resident address.
+
+Reproduction, using fresh output directories:
+
+```sh
+python3 tools/v3_furniture_pipeline.py convert --assets-only \
+  --representation rewards --category password \
+  --base-lock build/v3-birth-scoring-runtime-02/build-lock.json \
+  --output build/v3-password-prepared-02
+python3 -m unittest tests.test_v3_password -v
+```
+
+Three focused checks pass in 1.966 seconds. The independent reference compiles
+the pinned local CC0 donor implementation and headers into an ignored temporary
+translation unit; no generated donor data is committed. The sanitized C check
+compares 384 synthetic payloads across all six types, complete encoded strings,
+decoded descriptors, and accepted/rejected results. Observed inputs cover all
+sixteen keys in each transposition stage, all sixteen RSA selector rows and
+bit-mix values, and all four shuffle selectors in each stage. It also checks
+aliases, unchanged inputs, output canaries, invalid type/checksum/characters,
+short/long/null inputs, malformed table lengths/directories/permutations, and
+transactional failure writes. Address and undefined-behaviour sanitizers pass.
+The source's popular-code checksum overlap remains observable and agrees; the
+unused stage-zero scratch byte is initialized without altering the descriptor.
+
+The other checks verify the exact prepared packet, current source receipts,
+big-endian MIPS ELF identity, and rejection of changed source code, core tables,
+key positions, and directory bindings. The MIPS build rejects unresolved symbols.
+Strict host C syntax checks pass. Compiling the shared helper's default holiday
+target reproduces its retained object hash
+`b1c0bc38c473705960d3638ff06af087e75b2749cdda9cedc0614ca5318d8147`;
+the added password target does not change the existing category's code.
+During implementation, the directory reader was corrected to use absolute
+relocation keys, and an implicit structure-copy `memcpy` dependency was replaced
+with the bounded local copy. `prepared-01` contains the rejected object; it is
+not an accepted kernel. No emulator attempt or historical ROM replay is needed
+for this still-unlinked code.
+
+Hashes:
+
+- Tables: `6b5f9f41c2fb5c4b3a9da49d485c414910a3551560fe5813bf189d6ffb4b0d8e`.
+- MIPS object: `715feba6982267f22b91eb7934fb227992edd59ed61209ce43df8594142c950c`.
+- Preparation report: `9b4301b2c5a35a8527a5ce55db18c3775471bdc961ffa47bdf53732a847784cb`.
+- Complete donor codec instructions: `2e50485a272ebe4a91092da7d36d7e01e72b8caf5664c5216c6df8dc91917449`.
+- Reference C source: `aad4e6de15db2d48b579456e981c139ff1501e199227443fb4f5c4d308218405`.
+
+No cartridge is rebuilt. ABI 196, 148 choices, format-4 saves/profiles, main
+ABI-109 lock, and both stable deployments remain unchanged. No new in-game text
+is introduced. The codec is not installed acquisition: continue source item
+eligibility, checked selected destinations, full donor-font name conversion,
+Nook's input/results and official dialogue, and the animated gift handover.
+Magazine losing codes and card-e no-gift results must remain no-gift outcomes.
+See `specs/V3_PASSWORDS.md`; no native execution, ordinary gameplay, save/restart,
+or hardware result is claimed. Gold-tree completion remains after primary imports.
+
 ## Shared complete donor base points
 
 ABI 196 is `build/v3-birth-scoring-runtime-02/build-lock.json`. The shared

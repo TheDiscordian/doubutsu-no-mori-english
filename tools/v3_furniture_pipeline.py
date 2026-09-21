@@ -1242,6 +1242,12 @@ def main():
     source = Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
                     (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
     if args.representation=='rewards':
+        if args.category=='password':
+            from v3_password import prepare as prepare_password
+            if args.select or args.command!='convert':parser.error('Password preparation compiles one complete shared category')
+            report=prepare_password(source,output)
+            print(json.dumps({k:report[k] for k in ('bytes','sha256','runtime_installed','acquisition_installed')}))
+            return
         from v3_holiday_rewards import discover as discover_rewards,prepare as prepare_rewards
         if args.select or args.category not in (None,'holiday'):
             parser.error('Reward preparation retains the complete shared holiday category; item selection belongs to the runtime profile')

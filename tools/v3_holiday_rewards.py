@@ -93,20 +93,21 @@ def encode(description):
     return struct.pack('>4s6H',b'AFHG',1,28,len(candidates),8,2,0)+records+struct.pack('>'+str(len(candidates))+'H',*candidates)
 
 
-def compile_kernel(output):
+def compile_kernel(output, *, name='holiday_rewards'):
     """Prepare a relocatable o32 kernel; do not invent a resident address."""
+    if name not in ('holiday_rewards','password'):raise ValueError('Unreviewed shared acquisition kernel')
     compiler='/n64_toolchain/bin/mips64-elf-'
     docker=['docker','run','--rm','--network','none','--user',f'{os.getuid()}:{os.getgid()}',
         '-v',f'{ROOT}:/source:ro','-v',f'{output.resolve()}:/out','-w','/out','--entrypoint']
     flags=['-c','-Os','-EB','-mabi=32','-march=vr4300','-mfix4300','-G0','-mno-abicalls','-fno-pic',
         '-ffreestanding','-fno-builtin','-fno-common','-fno-stack-protector','-ffunction-sections',
         '-fdata-sections','-fstack-usage','-Wall','-Wextra','-Werror']
-    subprocess.run(docker+[compiler+'gcc',IMAGE,*flags,'/source/overlays/v3/holiday_rewards.c','-o','holiday_rewards.o'],
+    subprocess.run(docker+[compiler+'gcc',IMAGE,*flags,f'/source/overlays/v3/{name}.c','-o',name+'.o'],
         check=True,capture_output=True,text=True,timeout=60)
-    undefined=subprocess.run(docker+[compiler+'nm',IMAGE,'--undefined-only','holiday_rewards.o'],
+    undefined=subprocess.run(docker+[compiler+'nm',IMAGE,'--undefined-only',name+'.o'],
         check=True,capture_output=True,text=True,timeout=30).stdout
-    if undefined.strip():raise ValueError('Holiday kernel has unresolved external dependencies')
-    return dict(format='ELF-o32-MIPS-big-endian',sha256=sha256((output/'holiday_rewards.o').read_bytes()),
+    if undefined.strip():raise ValueError('Acquisition kernel has unresolved external dependencies')
+    return dict(format='ELF-o32-MIPS-big-endian',sha256=sha256((output/(name+'.o')).read_bytes()),
         compiler_image=IMAGE,flags=flags,linked=False,resident_address=None)
 
 

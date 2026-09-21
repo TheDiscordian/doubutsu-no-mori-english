@@ -18,6 +18,18 @@ deployments retain their existing builds.
 
 ## Active development
 
+The shared GameCube password codec is prepared at
+`build/v3-password-prepared-02/`. The ordinary category pipeline extracts the
+complete donor tables and builds an independent, bounded N64 encode/decode
+kernel. Three focused checks pass, including 384 payload comparisons against
+the pinned donor implementation across all six types, every transform-key
+choice, aliases, and malformed inputs under memory/undefined-behaviour sanitizers.
+The 1,551-byte packet and 3,948 bytes of MIPS instructions have no heap or
+external dependencies. This is prepared code, not installed password delivery.
+Nook's input UI, source item eligibility, selected destination mapping, official
+dialogue, and handover remain required. No cartridge, choice, save, or website
+changes. See the [password checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-password-codec).
+
 The current explicit V3 proposal is ABI 196 at
 `build/v3-birth-scoring-runtime-02/build-lock.json`. The shared importer maps all
 38 donor birth categories into 27 native scoring counters, preserving every

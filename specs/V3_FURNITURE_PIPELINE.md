@@ -2,6 +2,16 @@
 
 ## Workflow
 
+### Shared password acquisition
+
+`convert --assets-only --representation rewards --category password` prepares
+the complete donor code tables and freestanding MIPS codec in one batch. There
+are no per-item decoder definitions or rewritten shop-stock categories. All six
+code types use the same 28-character transform. Source eligibility, identity,
+selected destination resolution, keyboard/dialogue, and actual delivery remain
+separate required integration steps, described in [V3 passwords](V3_PASSWORDS.md).
+Prepared codec success does not activate any import or update a deployment.
+
 ### Complete donor scoring themes
 
 `--refresh-runtime --furniture-scoring` extends the current checked HRA owner

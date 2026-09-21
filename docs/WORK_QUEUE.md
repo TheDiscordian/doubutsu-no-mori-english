@@ -12,6 +12,18 @@ After the primary importing work, finish gold-tree leaf/cut effects and the full
 golden-shovel acquisition route. This is deferred required V3 work, not a dropped
 feature or a separate release goal.
 
+The common password transform is prepared and donor-verified at
+`build/v3-password-prepared-02/`; reuse its passing comparison and sanitizer
+checks while the codec is unchanged. Continue the shared acquisition route:
+derive source eligibility by category, resolve only implemented selected native
+destinations, connect Nook's 28-character input and donor-font name conversion,
+reuse official dialogue, and enter the actual animated handover state machine.
+The eight-byte donor names are not raw native saved names. Keep magazine RNG,
+name/NPC checks, cancellation, and no-award results intact. Neither a decoded
+item number nor HomePage list membership authorises delivery. The codec is not
+linked into the current ROM and enables no choices. See
+`specs/V3_PASSWORDS.md` for the source contracts and integration order.
+
 The current explicit proposal is ABI 196 at
 `build/v3-birth-scoring-runtime-02/build-lock.json`. Shared source-derived
 base-point conversion covers all 38 donor categories with 27 native counters,

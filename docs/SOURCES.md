@@ -12,7 +12,7 @@ project's input resources; it is not a second per-text attribution list.
 | User-supplied AFProjectDistro.zip | Legacy patch for text-identity corroboration, and reverse-engineering notes | Archive, patch, extracted resources, and bundled utilities stay local; no general licence established |
 | https://github.com/zeldaret/af | N64 decompilation and symbol reference | Pinned submodule; preserve upstream terms |
 | User-supplied GAFE01 revision 0 GameCube CISO | English script and matching reference | Local extraction; no full disc distribution |
-| https://github.com/ACreTeam/ac-decomp | GameCube structures, symbols, and character/command tables | CC0; pinned local reference |
+| https://github.com/ACreTeam/ac-decomp | GameCube structures, symbols, character/command tables, and password algorithm/reference checks | CC0; pinned local reference |
 | https://github.com/dolphin-emu/dolphin | CISO sparse-block format reference | Format research only; no copied implementation |
 | https://github.com/ares-emulator/ares | Silent emulator validation and debugger protocol | Source research; executable remains separately installed |
 
