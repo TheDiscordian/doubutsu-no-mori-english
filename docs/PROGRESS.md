@@ -18,6 +18,24 @@ served patchers retain their existing builds.
 
 ## Active development
 
+The current explicit V3 proposal is ABI 181 at
+`build/v3-room-surfaces-runtime-02/build-lock.json`. All ten additive floor/wall
+assets are installed through shared room/shop texture readers. The two owners
+use identical 520-byte reader code inside existing function storage; no resident
+allocation, scene buffer, or actor grows. Existing surface banks, the campsite
+floor wrapper, saved format/profile, and 141 choices are unchanged.
+
+Four focused checks pass, including memory-safety sanitizers, full resources,
+changed owners/relocations, and exact empty/all composition. The first silent
+native check passes 26 assertions with real original/imported texture DMA,
+complete copied installed functions, double-buffer/tail guards, retained saved
+state, checkpoint restoration, and clean exit. Ordinary room entry, GPU
+appearance, new-surface application, and persistence remain unverified.
+No surface is selectable yet. Next connect catalogue/arranged-room readers,
+item actions and saved room identity, acquisition, sound/scoring, and private
+composition. The main lock and both stable website deployments stay unchanged.
+See the [reader checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-room-and-shop-surface-readers).
+
 The shared room-surface pipeline prepares all ten donor-only floors/wallpapers
 in `build/v3-room-surfaces-prepared-02/`: 61,760 bytes with complete palettes,
 tiles, official names, price/catalogue records, acquisition lists, and floor-sound
@@ -28,10 +46,10 @@ indices for scoring. Names are credited in the single provenance catalogue.
 
 Four focused conversion/metadata/cache checks pass. Every added palette and
 texel is checked through independent tile addressing; malformed resources and
-changed caches reject. This is preparation, not a cartridge installation.
-No choices, saved layouts, main lock, or served website content change. Next
-connect shared resource/item readers, complete room application/persistence,
-actual acquisition routes, sound, and scoring. See the
+changed caches reject. Preparation itself changes no choices, saved layouts,
+main lock, or served website content. The room/shop installation is described
+above; item readers, room application/persistence, acquisition, sound, and scoring
+remain required. See the
 [surface specification](../specs/V3_ROOM_SURFACES.md).
 
 Shared contact/floor lifecycle preparation is available through the ordinary
@@ -51,9 +69,7 @@ adding donor-only identities, then bind the prepared contact category. Do not
 reconvert the mower's completed graphics. See the
 [contact/floor checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-contact-and-floor-lifecycle-preparation).
 
-The current explicit proposal is ABI 180 at
-`build/v3-start-disabled-imports-01/cartridge/build-lock.json`. Shared native
-fresh-placement handling applies the source start-disabled flag to imported
+Shared native fresh-placement handling applies the source start-disabled flag to imported
 items while preserving original-item defaults. Loaded switches and gyroid paths
 remain native. A twenty-byte owner patch calls the existing shared behaviour
 reservation; the complete helper is 280 bytes with no additional RAM or heap.

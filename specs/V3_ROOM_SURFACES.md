@@ -5,9 +5,10 @@
 The general furniture pipeline's `surfaces` representation discovers complete
 GameCube floor/wall banks, preserves existing N64 identities, converts missing
 surfaces in a batch, and retains their names, prices, catalogue order, acquisition
-lists, and floor-sound selectors. Preparation does not install items or make
-them selectable. Resource readers, room application, persistence, acquisition,
-and browser composition remain required.
+lists, and floor-sound selectors. The shared runtime installer connects complete
+artwork to the player-room and shop double-buffer readers. Catalogue/arranged-room
+readers, item actions, persistence, acquisition, and browser composition remain
+required. No surface is selectable merely because its artwork is installed.
 
 Use the current explicit experimental lock; keep the main lock and both stable
 website deployments unchanged:
@@ -97,10 +98,47 @@ converted objects. Partial, changed, ambiguous, or unknown resources reject.
 Ten objects total 61,760 bytes; conversion requires no compiler container or
 cartridge write.
 
+## Shared room/shop texture runtime
+
+`tools/v3_furniture_install.py --refresh-runtime --room-surfaces-art <prepared>`
+installs the complete prepared category using the explicit predecessor lock.
+Five floor records and five wallpaper records are appended contiguously in
+stable destination order. Original texture banks are neither moved nor copied.
+Additional cartridge artwork is 61,760 bytes; RAM and saved state do not grow.
+
+`overlays/v3/room_surfaces.c` supplies both native owners. The player-room actor
+at VROM `00846860`, linked `80951A70`, calls floor/wall readers at `80951BC4`
+and `80951CDC`. The shop actor at `0084F180`, linked `8095A3B0`, calls the same
+implementation at `8095A514` and `8095A62C`. Each complete native function has
+280 bytes. Both compiled pairs contain identical 520-byte instructions/padding,
+with 40-byte stack frames, no local data, and only a fixed engine-DMA call.
+
+All original indices 0–67 retain their original complete palette/texture reads.
+New indices 73–77 resolve into the separate appended banks. Missing indices,
+invalid buffer selectors, null actors, and null individual buffers issue no
+out-of-range transfer. The argument registers are explicitly narrowed as the
+retail functions do. Buffer selector 2 refreshes both buffers; 0/1 changes only
+that buffer. Floor/wall pointers remain at actor offsets `180`/`188`, with two
+pointers each. Texture sizes remain `2020`/`1020`.
+
+Installation checks complete native function hashes, incoming control flow,
+compiled entry positions, and complete relocation tables. Each owner removes
+eight obsolete debug-string relocations within the rewritten functions. The
+remaining owner bytes, relocation entries, and all caller targets are retained.
+The common owner-tail allocator stores full uncompressed owners without changing
+their logical DMA identities or overwriting earlier ROMs.
+
+Focused checks cover the actual shared C under memory-safety sanitizers, complete
+installed objects, owner/relocation mutations, and unchanged selection/saves.
+The native representative probe copies the installed pair into an isolated
+20-KiB arena and uses real DMA for original/imported floor and wall resources.
+Room/shop instruction identity avoids repeating an identical execution. This
+does not establish ordinary room entry, GPU drawing, item use, or persistence.
+
 ## Runtime integration queue
 
-1. Install additive surface resource records and shared room/catalogue texture
-   readers without moving or changing original surfaces or special-room sounds.
+1. Complete catalogue and arranged-NPC-room texture readers, retaining the
+   installed shared room/shop readers and original special-room sounds.
 2. Connect full item IDs to names, pricing, inventory actions, catalogue lists,
    ownership, and the existing optional-profile/save validation.
 3. Connect floor/wall application, removal, saved home identity, and reload;

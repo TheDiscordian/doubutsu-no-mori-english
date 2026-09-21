@@ -1609,6 +1609,7 @@ def exercise(debug, rom_path, record, *, section='automatic_furniture'):
     if section=='staged_profiles':return staged_profiles(debug,rom_path,record)
     if section=='scroll_lifecycles':return scroll_lifecycles(debug,rom_path,record)
     if section=='initial_switch':return initial_switch(debug,rom_path,record)
+    if section=='room_surfaces':return room_surfaces(debug,rom_path,record)
     if section=='furniture_audio':return furniture_audio(debug,rom_path,record)
     if section in ('scenery_planting_sparkle','scenery_planting_sparkle_remaining'):
         from v3_scenery_smoke import planting_sparkle
@@ -2642,6 +2643,69 @@ def held_level_sound(debug,rom_path,record):
         native_volume_pause_fade_pan_reverb=True,native_actor_registration_and_expiry=True,
         physical_audio_played=False,pcm_or_listening_verified=False,ordinary_gameplay_tested=False,
         flash_written=False,requires_checkpoint_restore=True)
+
+
+def room_surfaces(debug,rom_path,record):
+    """Execute installed shared room copies with actual original/additive DMA."""
+    path=Path(rom_path);image=path.read_bytes();report=json.loads((path.parent/'build.json').read_bytes())
+    if sha256(image)!=report['output_sha256']:raise ValueError('Changed surface cartridge')
+    surface=report['room_surfaces'];files=by_vrom(image);blob=files[runtime.BLOB].extract(image)
+    bodies=[]
+    for owner in surface['owners']:
+        data=files[owner['vrom']].extract(image);start=owner['windows'][0]['offset']
+        code=data[start:start+owner['compiled']['bytes']]
+        if sha256(data)!=owner['sha256'] or sha256(code)!=owner['compiled']['sha256']:
+            raise ValueError('Changed installed complete surface reader')
+        bodies.append(code)
+    if len(bodies)!=2 or bodies[0]!=bodies[1]:raise ValueError('Room/shop readers no longer share identical instructions')
+    body=bodies[0];boot=boot_proofs(image);assertions=0
+    def check(label,at,want):
+        nonlocal assertions
+        got=debug.read_memory(at,len(want));passed=got==want
+        record(dict(surface_check=label,address=f'{at:08X}',bytes=len(want),
+            assertion='passed' if passed else 'failed',actual=got.hex() if len(got)<=16 else sha256(got)))
+        if not passed:raise ValueError('Surface native mismatch: '+label)
+        assertions+=1
+    def call(at,args=(),proof=None):
+        result=debug.call(f'{at:08X}',list(args),return_address=MODULE_RAM+0x6480,verified_code=proof or boot.get(at))
+        record(result);return result['return_value']
+    size=0x5000;allocation=call(0x8009BFC0,[size])
+    if allocation&15 or not MODULE_RAM+0x8000<=allocation<=0x80400000-size:
+        raise ValueError('Surface fixture allocation failed')
+    actor,function,first,second=(allocation+n for n in (16,0x300,0x800,0x2840))
+    debug.write_memory(allocation,bytes(size));edge=b'V3SF'*4
+    guards=(allocation,actor+0x200,function-16,function+0x240,first-16,first+0x2020,second-16,second+0x2020,allocation+size-16)
+    for at in guards:debug.write_memory(at,edge)
+    debug.write_memory(function,body);call(0x8002FE00,[function,len(body)]);call(0x80034CE0,[function,len(body)])
+    state=report['save_runtime'];saved_state=debug.read_memory(state['state_ram'],state['state_bytes'])
+    actor_data=bytearray(b'\xA7'*0x200);struct.pack_into('>4I',actor_data,0x180,first,second,first,second)
+    debug.write_memory(actor,actor_data);fill=b'\xA5'*0x2020
+    try:
+        # One per routing/size/buffer class, not every individual surface.
+        for kind,index,bank in (('floor',26,2),('floor',74,0),('wall',77,2),('wall',64,1),('floor',68,2)):
+            debug.write_memory(first,fill);debug.write_memory(second,fill)
+            stride=0x2020 if kind=='floor' else 0x1020
+            expected=None
+            if index<68:
+                raw=files[0x17A1000 if kind=='floor' else 0x182A000].extract(image)
+                expected=raw[index*stride:(index+1)*stride]
+            elif index>=73:
+                row=next(r for r in surface['rows'] if r['kind']==kind and r['destination_index']==index)
+                expected=blob[row['blob_offset']:row['blob_offset']+row['bytes']]
+            entry=function+(0 if kind=='floor' else 0x118)
+            call(entry,[actor,0x12340000|index,0x56780000|bank],(function,body))
+            for i,at in enumerate((first,second)):
+                want=expected+fill[stride:] if expected is not None and (bank==2 or i==bank) else fill
+                check('complete '+kind+' DMA and untouched other buffer/tail',at,want)
+            check('surface transfer preserves complete actor',actor,actor_data)
+        for at in guards:check('surface code/actor/buffer guard',at,edge)
+        check('saved extension retained',state['state_ram'],saved_state)
+        check('no CPU fault',0x8003CE34,bytes(4))
+    finally:call(0x8009C040,[allocation])
+    return dict(native_surface_readers=True,assertions=assertions,complete_installed_function_copy=True,
+        actual_original_and_added_resource_dma=True,room_and_shop_instructions_identical=True,
+        ordinary_room_entry_tested=False,gpu_appearance_tested=False,surface_application_tested=False,
+        physical_audio_played=False,flash_written=False,requires_checkpoint_restore=True)
 
 
 def initial_switch(debug,rom_path,record):

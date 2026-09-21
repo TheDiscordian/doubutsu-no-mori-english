@@ -12,9 +12,16 @@ After the primary importing work, finish gold-tree leaf/cut effects and the full
 golden-shovel acquisition route. This is deferred required V3 work, not a dropped
 feature or a separate release goal.
 
-The current explicit proposal is ABI 180 at
-`build/v3-start-disabled-imports-01/cartridge/build-lock.json`. The shared
-start-disabled placement adapter and ordinary sprinkler import are complete.
+The current explicit proposal is ABI 181 at
+`build/v3-room-surfaces-runtime-02/build-lock.json`. All ten prepared floor/wall
+objects and shared room/shop readers are installed. Four focused checks and
+the first silent native run with 26 assertions pass. Original/imported texture
+DMA, buffer/actor guards, and saved state are checked; ordinary room entry,
+GPU appearance, surface application, and reload are not. No surface is selectable.
+Retain this reader evidence; finish the other consumers before further native
+surface testing unless changed code or a concrete defect requires it.
+
+The shared start-disabled placement adapter and ordinary sprinkler import are complete.
 Source C-stock acquisition and catalogue reordering are installed. Existing
 models, fade/loop callbacks, and audio are reused. Three focused checks and a
 bounded native run with 21 assertions pass; the native test copies the complete
@@ -22,7 +29,7 @@ installed initializer into a small isolated arena, not an ordinary room.
 Retain the passing ABI-178 fade/audio-dispatch evidence and ABI-180 placement
 results; do not replay old builds or unchanged renderer/audio tests.
 
-Next integrate the general additive room-surface runtime. All ten missing
+Next complete the general additive room-surface runtime. All ten missing
 surfaces are prepared together at `build/v3-room-surfaces-prepared-02/`, with
 complete source metadata, sound-selector inputs, and official name attribution.
 Stable paired indices 73–77 preserve all original texture and special-room sound
@@ -30,6 +37,10 @@ IDs. The current floor getter is wrapped by the campsite environment adapter;
 preserve that route. Player floor reads still mask identity to six bits, so
 application/persistence need a real extension, not just larger texture bounds.
 Use `specs/V3_ROOM_SURFACES.md` for the shared reader/action/save integration order.
+Catalogue preview (`03970000`, linked `808A6100`) and arranged NPC rooms
+(`00845C40`, linked `80950E50`) still use original texture addresses and bounds.
+Their shared readers are next, then item/action/persistence integration; do not
+recompile artwork or replay the accepted room/shop transfer test.
 
 Contact/floor callbacks
 are source-bound and compiled, with four focused host/source checks passing.
@@ -44,7 +55,7 @@ through complete floor bindings. Also implement the source room owner's shared
 movement sound category (`aMR_SetMoveSE`, lawn mower/stone coin); alpha callbacks
 alone do not include that behaviour. Reuse the source/native consumer checks and
 completed mower graphics. Native callback execution is still pending, not passed.
-The existing ABI-180 proposal and 141 choices remain unchanged by preparation.
+The 141 existing choices remain unchanged by surface resource installation.
 Continue material and rigged-material categories alongside unresolved unique
 behaviours; the floor dependency must not stall unrelated importing.
 Other material callbacks/acquisition routes and ordinary gameplay/save checks
@@ -55,8 +66,8 @@ the user's testing and explicit approval.
 There are 141 experimental choices and 27 inactive profiles. Saved format 3 is
 unchanged; profiles selecting sprinkler require a build containing its ID.
 Missing-ID/removed-selection restrictions remain. Permanent audio has 32
-conservative bytes spare and the import blob has 1,850,928 bytes free; neither
-grows in this batch. Ordinary room interaction, full sample synthesis, GPU
+conservative bytes spare and the import blob has 1,789,168 bytes free.
+No additional resident/scene RAM is allocated. Ordinary room interaction, full sample synthesis, GPU
 appearance, and hardware verification remain unclaimed. No physical audio is
 played.
 

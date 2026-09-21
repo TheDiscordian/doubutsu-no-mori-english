@@ -1,5 +1,62 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared room and shop surface readers
+
+The current resource proposal is ABI 181 at
+`build/v3-room-surfaces-runtime-02/build-lock.json`, built through:
+
+```sh
+python3 tools/v3_furniture_install.py --refresh-runtime \
+  --base-lock build/v3-start-disabled-imports-01/cartridge/build-lock.json \
+  --room-surfaces-art build/v3-room-surfaces-prepared-02 \
+  --output build/v3-room-surfaces-runtime-02
+```
+
+All ten complete converted assets are reused, totalling 61,760 new cartridge
+bytes. The import blob is 4,502,288 bytes with 1,789,168 bytes remaining before
+its checked virtual limit. No existing artwork bank, actor, scene buffer,
+permanent RAM, saved format, saved profile, or browser choice changes.
+
+The two room/shop owners use identical 520-byte code inside their existing
+two-function storage. Sixteen obsolete debug-string relocations are removed
+across both owners; remaining code and relocation entries are retained. Native
+original indices 0–67 and additive indices 73–77 keep distinct resource ranges.
+Both original buffers and the native argument-narrowing convention are preserved.
+Missing IDs and invalid buffer selectors cannot read neighbouring resources.
+
+- ROM SHA-256: `d31222959b078c37708e54ced4b87dd3e7a8811d182d11eb731aeb781b2762a8`.
+- UPS SHA-256: `375ac53c7e20f9094a6722daa24576cb20dacc8635ee5e1e9766cc45e7100c50`.
+- Build receipt SHA-256: `db6e03610637ac3101af86c744c4f017604623aff153b8db15eef7ecdd453901`.
+- Shared code SHA-256: `9ab0f2cc695f20f04e22745abdcdd64e382d844e57cdbe491078b9a205b90b35`.
+
+The four tests in `tests/test_v3_surface_runtime.py` pass in 4.705 seconds:
+actual shared C under address/undefined-behaviour sanitizers, complete assets
+and unchanged original banks, complete owner/relocation checks with mutation
+rejection, retained profiles/saves, exact all/empty composition, and UPS
+reconstruction. The preserved `runtime-01` build is not the current target;
+`runtime-02` explicitly narrows both argument registers like the retail entries.
+Only the final current build receives native verification.
+
+The first silent native run at `build/v3-room-surfaces-native-01/` passes
+48 records and 26 internal assertions. Results SHA-256:
+`4a32ce7f4c655e41c5d90b9c27161e36b9ef2d82b0e3b3bdb7a0f84c39fc06a7`.
+It runs the complete installed reader pair in an isolated 20-KiB arena, with
+real original/imported texture DMA, both buffer selectors, unchanged tails,
+invalid-ID rejection, dirty upper argument bits, complete actor/code/buffer
+guards, retained saved state, checkpoint restoration, and clean emulator exit.
+The second owner's complete instructions match, so it does not repeat the same
+execution. No existing save or physical audio is used. No retry is needed.
+
+The 141 existing choices and saved format 3 remain unchanged. Profile
+equal/superset restrictions still apply. This batch makes no new ordinary
+save/restart or hardware claim. The build receipt's pre-test native status is
+retained; the separate results above supply the narrower execution evidence.
+No new surface is selectable: catalogue/arranged-room readers, item/action/save
+integration, acquisition, floor sound/scoring, and private composition remain.
+The main lock and both deployments of the stable browser patcher are untouched.
+Continue those shared consumers without reconverting artwork or replaying this
+accepted reader check. Required gold-tree completion follows primary imports.
+
 ## Bulk room-surface preparation
 
 `build/v3-room-surfaces-prepared-02/surfaces.json` prepares all ten donor-only
