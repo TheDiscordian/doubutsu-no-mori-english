@@ -1,5 +1,78 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared surface audio
+
+The explicit ABI-188 proposal is
+`build/v3-surface-audio-runtime-01/build-lock.json`:
+
+```sh
+python3 tools/v3_furniture_install.py --refresh-runtime \
+  --base-lock build/v3-surface-scoring-runtime-01/build-lock.json \
+  --room-surfaces-art build/v3-room-surfaces-prepared-02 \
+  --output build/v3-surface-audio-runtime-01
+```
+
+The five-floor sound category is bound in one pass. Complete donor programs,
+envelopes, notes, instruments, samples, and priorities establish equivalence.
+All eight walking/running variants are mapped across donor stride ten and native
+stride nine. Eight complete grass programs already present but unreferenced in
+the native sequence occupy its reserved silent column. No variant reachable
+from the original 73 selectors changes. The lawn's separate raw drag program
+uses new group-zero slot 80; original movement entries 0–79 stay intact.
+No new instrument or waveform is required.
+
+Two 512-byte tables at `804BFA00`/`804BFC00` occupy existing packet space. The
+complete native player, NPC, and drag functions retain their original logic;
+six checked load instructions redirect their table reads. The common variant
+selector and positioned dispatch remain unchanged. Gaps have a bounded original
+wood fallback. The sequence grows from 21,040 to 21,216 bytes. Shared resource
+installation adds 1 KiB to fixed/permanent audio storage, retaining session
+pools and all previous audio batches. Conservative permanent spare is 896 bytes.
+
+Three focused host checks pass, covering all complete source/native bindings,
+every original floor variant, bounded resource/core changes, complete original
+fonts/waves, packet CRCs, unchanged profiles/scoring/menu/save code, 141 choices,
+exact no-import/all-import outputs, and UPS reconstruction. The initial run
+catches a test-only expected spare value of 864 rather than the actual 896:
+32-byte allocation rounding makes sequence allocation growth 160 bytes. The
+corrected focused check passes in 0.229 seconds. The additional original-variant
+invariant check passes in 0.377 seconds; unchanged composition is not replayed.
+
+The first native run stops on a fixture assumption that the entire loaded
+sequence must equal ROM. Its saved checkpoint has exactly two changed bytes,
+offsets `5C` and `64`, both explicit native C7 dispatch stores. The corrected
+fixture checks all twelve original self-modifying index/group operand bindings
+and their bounds, while still comparing every other sequence byte.
+
+The one corrected retry at `build/v3-surface-audio-native-02/` passes 96 result
+records and 58 internal assertions. Actual loaded sequence/header, complete
+resident packet, audio allocation, all five added and one original floor's
+player-walk/player-run/NPC/drag calls, priorities, saved state, guards, restored
+checkpoint, and clean shutdown pass. Actual fixed/session/permanent pools are
+124,928/172,544/112,640 bytes; observed use is 124,000/172,288/77,600 bytes.
+No physical audio, synthesis/listening proof, ordinary room interaction, explicit
+FlashRAM write, or hardware execution is claimed. This fixture does not replay
+unchanged surface application, catalogue, scoring, or save tests.
+
+- ROM SHA-256: `21afe8dba4695ea2478834cd19729af16e22d04d562fefab44c8c8d048fd5564`.
+- UPS SHA-256: `3eb06fe08813f4e697ecc305e47abca6d850f008433a26f24949671589bb7ac9`.
+- Build receipt SHA-256: `05b173553646410c27d43ff0bd236ca0d39239651a2e14e387114133cb25045f`.
+- Initial native results SHA-256: `bd2a7461f2fec1ae0816997cf4ad12cd386413ccca5dab6c9a022cb721661260`.
+- Passing native results SHA-256: `e73bef83af86b9d5b4eeada768b37ed035de0e701a0796bf727c1fc6757d6726`.
+
+The blob is 4,552,576 bytes with 1,738,880 bytes free. All ten surfaces remain
+disabled; choices and 27 inactive furniture profiles remain unchanged. Format 4
+and profile do not change. Format-4 saves still require a compatible newer build;
+V2 and format-1/2/3 V3 builds cannot load them. Preserve backups. The ABI-109
+main lock, both deployments of the one stable web patcher, and existing ROMs/saves
+remain untouched.
+
+Next connect genuine acquisition categories, complete Harvest/Mario furniture
+themes, and private surface selection. Then bind contact/floor lifecycles and
+the room owner's separate mower/stone-coin movement-sound dispatcher. Other
+shared material/rigged categories remain required; gold-tree effects and full
+golden-shovel acquisition follow primary imports.
+
 ## Shared surface scoring
 
 The explicit ABI-187 proposal is

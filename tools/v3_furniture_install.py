@@ -951,6 +951,10 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             if report['room_surfaces'].get('scoring'):
                 report['shared_runtime_refresh']['adapters'].append('surface_scoring')
                 report['native_test']='pending full-index surface scoring and matching themes; acquisition, sound, and private selection remain incomplete'
+            if report['room_surfaces'].get('sound'):
+                report['shared_runtime_refresh']['adapters'].append('surface_sound')
+                report['shared_runtime_refresh']['additional_resident_bytes']=report['room_surfaces']['sound']['audio_heap_growth']
+                report['native_test']='pending full-index surface sound dispatch; acquisition, full remaining themes, and private selection remain incomplete'
     write_new(output/'animal-forest-v3-asset-loader.z64',result)
     write_new(output/'asset-loader.ups',patch)
     write_new(output/'build.json',(json.dumps(report,indent=2,sort_keys=True)+'\n').encode())

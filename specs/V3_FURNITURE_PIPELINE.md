@@ -1383,7 +1383,8 @@ data, regenerates the metadata/dependency description, and checks the converted
 assets. It installs full profiles and item records, names/prices/footprints,
 stock, catalogue entries, HRA/feng-shui rows, and selected-profile bits together.
 Missing native scoring-series definitions require a category adapter. Existing
-documented theme adapters retain their unavailable matching-surface policy.
+documented theme adapters retain their source-bound surface mappings, including
+stable additive pairs where installed and explicit missing pairs otherwise.
 Donor HRA birth categories 33 and 37 map to native scoring category 3 only after
 checking their equal 412-point weights and all three actual native bitfield
 consumers. This is scoring metadata only: winter/summer acquisition remains

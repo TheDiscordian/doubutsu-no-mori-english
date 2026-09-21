@@ -1616,6 +1616,7 @@ def exercise(debug, rom_path, record, *, section='automatic_furniture'):
     if section=='surface_save':return surface_save(debug,rom_path,record)
     if section=='surface_menu':return surface_menu(debug,rom_path,record)
     if section=='surface_scoring':return surface_scoring(debug,rom_path,record)
+    if section=='surface_audio':return surface_audio(debug,rom_path,record)
     if section=='furniture_audio':return furniture_audio(debug,rom_path,record)
     if section in ('scenery_planting_sparkle','scenery_planting_sparkle_remaining'):
         from v3_scenery_smoke import planting_sparkle
@@ -2649,6 +2650,85 @@ def held_level_sound(debug,rom_path,record):
         native_volume_pause_fade_pan_reverb=True,native_actor_registration_and_expiry=True,
         physical_audio_played=False,pcm_or_listening_verified=False,ordinary_gameplay_tested=False,
         flash_written=False,requires_checkpoint_restore=True)
+
+
+def surface_audio(debug,rom_path,record):
+    """Current complete native floor callers, sound dispatch, and audio heap."""
+    from aflib import CODE_RAM,CODE_VROM,u32
+    from v3_surface_items import RAM
+    path=Path(rom_path);image=path.read_bytes();report=json.loads((path.parent/'build.json').read_bytes())
+    if sha256(image)!=report['output_sha256']:raise ValueError('Changed surface-audio cartridge')
+    files=by_vrom(image);core=files[CODE_VROM].extract(image);audio=report['room_surfaces']['sound']
+    items=report['room_surfaces']['items'];blob=files[runtime.BLOB].extract(image)
+    packet=blob[items['blob_offset']:items['blob_offset']+items['bytes']];assertions=0
+    def check(label,at,want):
+        nonlocal assertions
+        got=debug.read_memory(at,len(want));passed=got==want
+        record(dict(surface_audio_check=label,address=f'{at:08X}',bytes=len(want),
+            assertion='passed' if passed else 'failed',actual=got.hex() if len(got)<32 else sha256(got)))
+        if not passed:raise ValueError('Surface-audio mismatch: '+label)
+        assertions+=1
+    def word(at):return u32(debug.read_memory(at,4),0)
+    def bounded(at,n):
+        if at&3 or not 0x80000400<=at<=0x80400000-n:raise ValueError('Surface audio allocation escapes native RAM')
+        return at
+    def call(at,args):
+        owner=next(r for r in audio['native_consumers'] if r['address']==at)
+        proof=(at,core[at-CODE_RAM:at-CODE_RAM+owner['bytes']])
+        result=debug.call(f'{at:08X}',list(args),return_address=MODULE_RAM+0x6480,verified_code=proof)
+        record(result)
+    check('complete resident selector packet',RAM,packet)
+    seq=audio['sequence'];header=bytearray.fromhex(seq['header_after']);struct.pack_into('>I',header,0,seq['physical'])
+    check('actual loaded SFX header',seq['header_address'],header)
+    sequence=bounded(word(0x8014CBA8),seq['bytes'])
+    expected=bytearray(image[seq['physical']:seq['physical']+seq['bytes']])
+    # Six original channels use C7 stores to patch their own index/group
+    # operands from live ports. These are dispatch state, not ROM corruption.
+    scratch=[]
+    for channel in range(6):
+        for at,limit in ((0x5C+41*channel,128),(0x64+41*channel,6)):
+            command=bytes((0xC7,0))+struct.pack('>H',at)
+            if expected[at-5:at-1]!=command or expected[at]!=0:
+                raise ValueError('Changed self-modifying native SFX channel')
+            value=debug.read_memory(sequence+at,1)[0]
+            if value>=limit:raise ValueError('Native SFX dispatch scratch exceeds its table bounds')
+            expected[at]=value;scratch.append(dict(offset=at,value=value))
+    record(dict(native_sequence_dispatch_scratch=scratch))
+    check('complete loaded sequence retaining checked live dispatch operands',sequence,expected)
+    total,fixed,permanent=struct.unpack_from('>3I',core,0x80119A44-CODE_RAM)
+    heap=bounded(word(0x8014CB84),total);check('actual audio malloc size',0x8014CB88,struct.pack('>I',total))
+    for label,at,size,expected_start in (('fixed',0x8014BEC0,fixed,heap),
+            ('session',0x8014BEA0,total-fixed,heap+fixed),('permanent',0x8014C260,permanent,None)):
+        start,current,capacity,count=struct.unpack('>4I',debug.read_memory(at,16))
+        if (size!=capacity or not heap<=start<=current<=start+size<=heap+total or
+                expected_start is not None and start!=expected_start):raise ValueError('Incorrect native '+label+' audio pool')
+        record(dict(surface_audio_pool=label,capacity=capacity,used=current-start,allocations=count,assertion='passed'));assertions+=1
+    saved={at:debug.read_memory(at,n) for at,n in ((0x80113844,0x28),(0x80113C34,192),(0x8046C000,1232))}
+    try:
+        debug.write_memory(0x80113844,b'\x01')
+        # The real common walk dispatcher chooses one of four variants for each
+        # walking/running mode. Verify its actual result against the bound set.
+        rows=[dict(index=0,native_walk_selector=27,native_movement_sound=27)]+audio['imports']
+        for row in rows:
+            for entry,dash in ((0x800F9064,1),(0x800F9064,3),(0x800F9170,1),(0x800FA520,1)):
+                debug.write_memory(0x80113C34,bytes(192));debug.write_memory(0x80113868,bytes((dash,)))
+                debug.write_memory(0x8011385C,bytes(12));call(entry,[row['index'],0,0])
+                slots=debug.read_memory(0x80113C34,192)
+                live=[(i,struct.unpack_from('>H',slots,i*32)[0]) for i in range(6) if slots[i*32:i*32+2]!=bytes(2)]
+                expected=({row['native_movement_sound']} if entry==0x800FA520 else
+                    {0x2E6+row['native_walk_selector']+9*v+(36 if dash==3 else 0) for v in range(4)})
+                if len(live)!=1 or live[0][1] not in expected:
+                    raise ValueError('Native floor caller selected an unbound sound: '+str((row['index'],entry,dash,live,expected)))
+                record(dict(native_floor_index=row['index'],caller=f'{entry:08X}',dash=dash,
+                    actual_sound=f'{live[0][1]:04X}',assertion='passed'));assertions+=1
+                check('actual sound priority',0x80113C34+live[0][0]*32+28,b'\x32')
+        check('surface saved state unchanged',0x8046C000,saved[0x8046C000])
+        check('surface packet unchanged',RAM,packet);check('no CPU fault',0x8003CE34,bytes(4))
+    finally:
+        for at,data in saved.items():debug.write_memory(at,data)
+    return dict(native_surface_audio=True,assertions=assertions,complete_native_floor_consumers=True,
+        native_synthesis_tested=False,physical_audio_played=False,ordinary_room_interaction=False,
+        saved_data_written=False,requires_checkpoint_restore=True)
 
 
 def surface_scoring(debug,rom_path,record):

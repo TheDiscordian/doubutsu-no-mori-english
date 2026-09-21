@@ -12,7 +12,9 @@ the same ten identities. Shared room reservation/application and full saved-byte
 reading are installed. The format-4 save category supplies optional-profile
 validation and independent ownership. Native inventory actions preserve full
 surface IDs; catalogue page lists and bit dispatch use the new ownership category.
-Acquisition, sound/scoring, and browser composition remain required. All new item records remain disabled; installed
+Base scoring, three existing matching themes, and full-index footstep/drag audio
+are installed. Acquisition, complete Harvest/Mario furniture themes, and browser
+composition remain required. All new item records remain disabled; installed
 artwork and metadata do not make a surface selectable.
 
 Use the current explicit experimental lock; keep the main lock and both stable
@@ -96,8 +98,8 @@ generated metadata stay in ignored `build/` directories.
 
 The complete donor 95-entry and native 73-entry floor-sound selector tables are
 source-hash checked and retained. This establishes numbering and dependencies,
-not complete sound equivalence: corresponding programs, instruments, and samples
-still need checking when the runtime sound reader is connected. The existing
+not complete sound equivalence: the runtime installer checks corresponding
+complete programs, instruments, samples, and walking/running variants. The existing
 campsite floor getter deliberately uses native sound slot 68; preserve its
 wrapper when extending ordinary room-floor identity.
 
@@ -180,9 +182,9 @@ constructor, ordinary room entry, GPU draw, item use, or save/restart.
 
 ## Runtime integration queue
 
-1. Apply genuine acquisition categories, floor sound mapping, and matching-pair
-   HRA scoring. Existing Western, Backyard, and Boxing adapters explicitly lack
-   their matching surfaces and must be updated from the same registry.
+1. Apply genuine acquisition categories and complete Harvest/Mario furniture
+   themes. Floor sounds, base surface scoring, and the existing Western,
+   Backyard, and Boxing matching pairs are installed from the shared registry.
 2. Connect private individual/all composition to enabled metadata, independent
    required-profile bits, and counted catalogue lists. Preserve the original 64
    rows; compact selected imports in source order without changing their IDs.
@@ -239,7 +241,7 @@ disabled and invalid IDs, original-floor name/category, complete restored packet
 guards, and unchanged saved extension. It restores an emulator checkpoint; it
 does not establish room application, acquisition, ordinary save/restart, or
 hardware operation. Optional profile/save validation uses the same enabled
-metadata in the format-4 category; acquisition, sound/scoring, and private
+metadata in the format-4 category; acquisition, remaining themes, and private
 selection must finish before any surface is offered for selection.
 
 ## Room reservation, application, and complete home identities
@@ -285,6 +287,52 @@ home-byte writes, and the untouched native initializer reload pass. It restores
 all saved/transient fixture data and the emulator checkpoint. Live-player
 notification, ordinary inventory exchange, real FlashRAM restart, GPU appearance,
 and hardware operation are not established by this fixture.
+
+## Full-index floor sound dispatch
+
+`tools/v3_surface_audio.py` handles the complete five-floor category together.
+It binds the verified donor selector table and full SFX sequence to actual
+native programs, complete instruments, envelopes, predictors, loops, samples,
+and shared priorities. Corresponding numerical IDs alone do not establish
+equivalence. Native walking variants have stride nine; donor variants have
+stride ten. All eight variants for each distinct selector are checked.
+
+Native grass programs remain complete but unreferenced in the sequence.
+Reserved group-three slots 9, 18, 27, 36, 45, 54, 63, and 72 bind those exact
+programs for the additive lawn. None overlaps any variant reachable from the
+73 original floor selectors. Existing live program pointers and complete
+program data stay intact. The raw lawn drag sound differs from the original
+sound with the same number. It uses a new group-zero slot 80 and a complete
+source program, reusing the exact existing instrument. All 80 original movement
+slots remain in the extended 81-entry table, with no priority changes.
+
+Independent 256-entry halfword tables at `804BFA00` (walk selectors) and
+`804BFC00` (full raw movement sounds) fit the existing surface packet. All 73
+original selectors and special rooms remain unchanged. Added indices use their
+checked donor bindings; other byte indices fall back to the original wood
+selector instead of reading outside a table. The actual native player, NPC,
+and drag functions at `800F9064`, `800F9170`, and `800FA520` receive only checked
+pointer-load changes. Their scene conditions, angle/distance/volume/reverb,
+walking/running selection, and complete common dispatcher remain native.
+
+The complete sequence grows by 176 bytes without new instruments or waveforms.
+Shared audio resource installation retains existing batches and headers and
+grows only fixed/permanent audio capacity by 1 KiB. Session pools stay unchanged;
+conservative spare capacity is 896 bytes. This is measured heap growth, not an
+assumption that an Expansion Pak automatically changes native allocations.
+
+Host checks cover source/program equivalence, original mappings, complete
+resource retention, bounded patches, CRCs, selections, and UPS reconstruction.
+The bounded native fixture verifies actual loaded data, heap pools, complete
+player/NPC/drag callers, selected priorities, saved state, and guards. Original
+SFX channels self-modify twelve explicit index/group operands via C7 stores;
+the fixture checks those stores and live operand bounds instead of comparing
+live dispatch state to zero-filled ROM operands. No synthesis, listening,
+ordinary room interaction, or original-hardware verification is implied.
+
+The room owner's `aMR_SetMoveSE` equivalent, which chooses mower/stone-coin
+movement effects, remains part of contact/floor lifecycle integration. Completing
+the public floor-sound readers does not implement that separate caller.
 
 ## Full-index HRA scoring
 
