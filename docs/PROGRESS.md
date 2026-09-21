@@ -18,7 +18,25 @@ deployments retain their existing builds.
 
 ## Active development
 
-The current explicit V3 proposal is ABI 195 at
+The current explicit V3 proposal is ABI 196 at
+`build/v3-birth-scoring-runtime-02/build-lock.json`. The shared importer maps all
+38 donor birth categories into 27 native scoring counters, preserving every
+existing native weight and actual acquisition rule. Four new values cover the
+remaining categories, including Harvest's exact 1,177 points. No per-item
+scoring exceptions or wider metadata fields are required.
+
+Three focused host checks pass, including real donor-row integration through
+the ordinary installer and rejection on an older evaluator. The first silent
+native attempt passes 83 assertions across 17 cases: complete counters/products,
+new values, native lottery points, mixed/null layers, full surface indices, stack
+boundaries, relocation, and saved-state preservation. The report-only final
+refresh produces the identical tested ROM; unchanged theme checks are retained.
+The scoring owner grows 112 bytes, with no extra fixed allocation. Saved format
+4, profiles, artwork, and 148 choices are unchanged. Delivery and remaining
+behaviours still gate imports. Neither deployment nor the main lock changes.
+See the [base-point checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-complete-donor-base-points).
+
+The shared theme proposal is ABI 195 at
 `build/v3-theme-scoring-runtime-02/build-lock.json`. Shared HRA theme storage
 supports all 60 donor categories with three inert padding rows for the native
 unrolled loops. Harvest retains its base-series rules; Mario retains its theme

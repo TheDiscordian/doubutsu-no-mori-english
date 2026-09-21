@@ -1,4 +1,4 @@
-"""Complete donor themes, official names, bounded owners, and optional output."""
+"""Complete donor base points, bounded evaluator, and ordinary bulk integration."""
 import copy
 import json
 from pathlib import Path
@@ -12,16 +12,17 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT/'tools'))
 from aflib import CODE_VROM, by_vrom, sha256, apply_ups
 from v3_asset_loader import MODULE
-from v3_furniture_install import inputs
+from v3_furniture_install import inputs, scoring
 from v3_furniture_scoring import install
 from v3_furniture_pipeline import Source
+from v3_hra_birth import donor_categories, checked_categories, extend_current, ENTRY, END
 import v3_hra as hra
 import v3_hra_mail as mail
 import v3_hra_series as series
 import v3_optional_composition as composer
 import v3_browser_composition as browser
 
-OUT = ROOT/'build/v3-theme-scoring-runtime-02'
+OUT = ROOT/'build/v3-birth-scoring-runtime-02'
 
 
 class FurnitureScoringTests(unittest.TestCase):
@@ -40,55 +41,79 @@ class FurnitureScoringTests(unittest.TestCase):
         for vrom, payload in owners.items():
             self.assertEqual(payload, self.files[vrom].extract(self.image))
         self.assertEqual(report['hra'], self.report['hra'])
+        self.assertEqual(self.report['hra_birth'],self.report['hra']['birth_extension'])
         self.assertEqual(core, self.files[CODE_VROM].extract(self.image))
         self.assertEqual(module[0x48:0x68], self.files[MODULE].extract(self.image)[0x48:0x68])
         data, old = owners[hra.NEW_VROM], self.before[hra.NEW_VROM].extract(self.base)
         hr, previous = self.report['hra'], self.prior['hra']
-        sr = hr['series']; self.assertEqual(sr['count'], 63)
-        self.assertEqual((sr['count']-3) % 4, 0); self.assertEqual((sr['count']-1) % 2, 0)
-        info = data[sr['info_address']-hra.RAM:sr['info_address']-hra.RAM+63*3]
-        self.assertEqual(info[:55*3], old[previous['series']['info_address']-hra.RAM:previous['series']['info_address']-hra.RAM+55*3])
-        self.assertEqual(info[55*3:], bytes.fromhex('02004902004a01004d02004c02004b')+b'\xff\0\xff'*3)
-        self.assertEqual(data[hra.START:hra.START+4], bytes.fromhex('2ca2003f'))
-        # The metadata end and old info start shared an address. Expanding
-        # themes must not move the metadata end or its 48 complete references.
-        self.assertEqual(hr['pointer_changes'], previous['pointer_changes'])
-        for key in ('metadata_address', 'metadata_sha256', 'imports', 'birth_extension', 'surface_scoring'):
+        for key in ('metadata_address', 'metadata_sha256', 'imports', 'series', 'theme_extension', 'score_letters', 'pointer_changes'):
             self.assertEqual(hr[key], previous[key])
-        for p in hr['theme_extension']['patches']:
-            a = p['offset']; self.assertEqual(struct.unpack_from('>I', old, a)[0], p['before'])
+        ext=hr['birth_extension'];points,mapping=donor_categories(self.source)
+        self.assertEqual((ext['count'],ext['stack_bytes']),(27,296))
+        self.assertEqual(ext['added_points'],[1983,1300,1177,1400])
+        self.assertEqual((ext['count']-3)%4,0);self.assertLessEqual(ext['count'],32)
+        at=ext['points_address']-hra.RAM
+        self.assertEqual(data[at:at+108],struct.pack('>27I',*points))
+        original=previous['birth_extension']['points_address']-hra.RAM
+        self.assertEqual(data[at:at+92],old[original:original+92])
+        self.assertEqual(data[original:original+92],old[original:original+92])
+        for p in ext['patches']:
+            a = p['address']-hra.RAM; self.assertEqual(struct.unpack_from('>I', old, a)[0], p['before'])
             self.assertEqual(struct.unpack_from('>I', data, a)[0], p['after'])
+        self.assertEqual(len(data)-len(old),112)
         self.assertLessEqual(len(data), 32768)
         self.assertLessEqual(len(data)+len(owners[hra.NEW_RELOC]), 0x8800)
-        damaged = bytearray(old); damaged[0] ^= 1
-        with self.assertRaisesRegex(ValueError, 'complete theme'):
-            series.extend_current(damaged, self.before[hra.NEW_RELOC].extract(self.base), previous, self.source, self.prior['room_surfaces'])
-        changed = copy.deepcopy(self.prior['room_surfaces']); changed['rows'][0]['destination_index'] ^= 1
-        with self.assertRaisesRegex(ValueError, 'floor/wall pair'):
-            series.extend_current(old, self.before[hra.NEW_RELOC].extract(self.base), previous, self.source, changed)
+        damaged = bytearray(old); damaged[ENTRY-hra.RAM] ^= 1
+        with self.assertRaisesRegex(ValueError, 'complete native birth'):
+            extend_current(damaged, self.before[hra.NEW_RELOC].extract(self.base), previous, self.source)
+        changed=copy.deepcopy(hr);changed['birth_extension']['donor_to_native'][35]=3
+        with self.assertRaisesRegex(ValueError,'complete birth category map'):checked_categories(data,changed,self.source)
+        changed=bytearray(data);changed[ENTRY-hra.RAM+8]^=1
+        changed_report=copy.deepcopy(hr);changed_report['output_sha256']=sha256(changed)
+        with self.assertRaisesRegex(ValueError,'birth evaluator instruction'):checked_categories(changed,changed_report,self.source)
+        self.assertEqual(checked_categories(data,hr,self.source)[0],mapping)
+        window=hr['surface_scoring']['window'];a=window['address']-hra.RAM
+        self.assertEqual(data[a:a+window['bytes']].hex(),window['after'])
+        self.assertEqual(hr['surface_scoring']['evaluator_sha256'],sha256(data[ENTRY-hra.RAM:END-hra.RAM]))
 
-    def test_official_names_reach_full_letter_table_with_single_catalogue_credit(self):
-        lr = self.report['hra']['score_letters']; previous = self.prior['hra']['score_letters']
-        data = self.files[mail.VROM].extract(self.image); old = self.before[mail.VROM].extract(self.base)
-        at = lr['name_table_address']-mail.RAM
-        table = data[at:at+lr['name_rows']*26]
-        self.assertEqual(lr['name_rows'], 60)
-        self.assertEqual(table[:previous['name_rows']*26], old[at:at+previous['name_rows']*26])
-        self.assertEqual(sha256(table), lr['name_table_sha256'])
-        provenance = {r['id']: r for r in json.loads((ROOT/'translations/provenance.json').read_bytes())['entries']}
-        for index in range(55, 60):
-            name = self.source.raw('mMkRm_series_name')[index*16:(index+1)*16]
-            self.assertEqual([table[i:i+26] for i in range(0, len(table), 26)].count(name[:10]+name), 1)
-            credit = provenance[f'GAFE01-r0/hra/theme/{index}/name']['locales']['en']
-            self.assertEqual(credit['credit'], 'official')
-            self.assertEqual(credit['source']['reference_sha256'], sha256(name))
-        self.assertEqual(data[lr['image_bytes']+20:], old[previous['image_bytes']+20:])
-        self.assertEqual(data[0x2A04:0x2A08], bytes.fromhex('24020037'))
-        self.assertLessEqual(lr['image_bytes'], 65536)
+    def test_source_mapping_and_real_donor_rows_use_the_ordinary_installer(self):
+        points,mapping=donor_categories(self.source)
+        donor=struct.unpack('>38I',self.source.raw('mMkRm_birth_point_table'))
+        self.assertEqual(mapping[:23],list(range(23)))
+        self.assertEqual((points[7],donor[7]),(2951,1029))
+        for i in range(38):
+            if i!=7:self.assertEqual(points[mapping[i]],donor[i])
+        self.assertEqual(mapping[33],3);self.assertEqual(mapping[37],3)
+        rows=[]
+        for index in (1053,1204,1214,1127,1054):
+            value=struct.unpack_from('>I',self.source.data,0x4FAFC+index*4)[0]
+            birth=value>>8&63;category=mapping[birth];series=value>>26;surface=value>>6&3
+            rows.append(dict(item_id=f'{0x3000+(index-1024)*4:04X}',runtime_index=index,
+                donor_birth_category=birth,birth_category=category,series=series,surface=surface,
+                donor_hra_hex=f'{value:08x}',native_hra_hex=f'{(value&0xFFFFC000)|(category<<9)|(surface<<7):08x}',
+                donor_series_hex=self.source.raw('mMkRm_series_info')[series*3:series*3+3].hex(),
+                feng_hex=self.source.data[0x4EBF0+index*2:0x4EBF0+index*2+2].hex()))
+        changes,reports=scoring(self.image,self.report,rows,self.source)
+        old=self.files[hra.NEW_VROM].extract(self.image);expected=bytearray(old)
+        for row in rows:
+            a=self.report['hra']['metadata_address']-hra.RAM+row['runtime_index']*4
+            expected[a:a+4]=bytes.fromhex(row['native_hra_hex'])
+        self.assertEqual(changes[hra.NEW_VROM],expected)
+        self.assertTrue(all(not r['acquisition_category_changed'] for r in reports['hra']['automatic_scoring_aliases'][-len(rows):]))
+        # Metadata preparation must never authorise a larger category on an
+        # older evaluator, or accept an arbitrary low-bucket substitution.
+        with self.assertRaisesRegex(ValueError,'installed native counter'):scoring(self.base,self.prior,rows,self.source)
+        bad=copy.deepcopy(rows);bad[1]['birth_category']=3
+        with self.assertRaisesRegex(ValueError,'installed native counter'):scoring(self.image,self.report,bad,self.source)
+        bad=copy.deepcopy(rows);bad[1]['native_hra_hex']='d4050600'
+        with self.assertRaisesRegex(ValueError,'complete donor birth conversion'):scoring(self.image,self.report,bad,self.source)
 
     def test_unchanged_selection_save_profiles_and_browser_composition(self):
-        for key in ('save_runtime', 'save_codec', 'room_surfaces', 'catalogue', 'equipment_resources'):
+        for key in ('save_runtime', 'save_codec', 'catalogue', 'equipment_resources'):
             self.assertEqual(self.report[key], self.prior[key])
+        self.assertEqual({k:v for k,v in self.report['room_surfaces'].items() if k!='scoring'},
+                         {k:v for k,v in self.prior['room_surfaces'].items() if k!='scoring'})
+        self.assertEqual(self.files[mail.VROM].extract(self.image),self.before[mail.VROM].extract(self.base))
         pin = composer.BASE, composer.BASE_SHA, composer.REPORT_SHA, composer.ABI
         try:
             composer.use_build_lock(OUT/'build-lock.json')

@@ -49,6 +49,177 @@ POINTERS = {
 SOURCES = ('tools/v3_hra_birth.py', 'tools/v3_asset_loader.py',
            'overlays/v3/startup.c', 'overlays/v3/startup.ld')
 
+DONOR_WEIGHTS_SHA = '103194595d5d358b4087c51a693824d1b902d0103fe5f1d11f3accb0923713d3'
+NATIVE_WEIGHTS_SHA = 'b59b1cd06b11a7de766d35034410fb17dda573410fb7eec950b501b6eed0cf4e'
+SURFACE_FUNCTION_SHA = '5a50afca2f181ea86b472113f7c569d6b2424bcd75d51cce57983428f2b4bb5a'
+SURFACE_STACK = {
+    0x809274F8: 0x27BDFEF8, 0x809274FC: 0xAFB00004,
+    0x80927500: 0xAFA40108, 0x80927504: 0xAFA70114,
+    0x80927508: 0xAFA000AC, 0x8092750C: 0xAFA00050,
+    0x80927510: 0xAFA000B0, 0x80927514: 0xAFA00054,
+    0x80927518: 0xAFA000B4, 0x8092751C: 0xAFA00058,
+    0x80927520: 0x27A300B8, 0x80927524: 0x27A4005C,
+    0x80927528: 0x27A200AC, 0x80927568: 0x27A300AC,
+    0x809276C4: 0x8FAF00AC, 0x809276D4: 0x8FB900B0,
+    0x809276E0: 0x8FAF00B4, 0x809276EC: 0x27A4005C,
+    0x809276F0: 0x27A300B8, 0x809276F4: 0x27AA0108,
+    0x809276FC: 0xAFA70050, 0x80927710: 0xAFA80054,
+    0x8092771C: 0xAFA90058, 0x80927794: 0x8FB80118,
+    0x80927798: 0x8FB90114, 0x809277D4: 0x8FAE0108,
+    0x809277EC: 0x8FB00004, 0x809277F4: 0x27BD0108,
+}
+
+
+def donor_categories(source):
+    """Derive stable scoring buckets from complete source points, not items."""
+    raw = source.raw('mMkRm_birth_point_table')
+    if sha256(raw) != DONOR_WEIGHTS_SHA or len(raw) != 38*4:
+        raise ValueError('Changed complete donor birth-point table')
+    donor = struct.unpack('>38I', raw)
+    points = list(donor[:23])
+    # Native lottery objects retain their original 2,951-point value. This
+    # adaptation does not change any donor category's actual acquisition.
+    points[7] = 2951
+    if sha256(struct.pack('>23I', *points)) != NATIVE_WEIGHTS_SHA:
+        raise ValueError('Changed native birth-point identity')
+    mapping = list(range(23))
+    for value in donor[23:]:
+        if value not in points:
+            points.append(value)
+        mapping.append(points.index(value))
+    if len(points) != 27 or (len(points)-3) % 4 or len(points) > 32:
+        raise ValueError('Donor buckets exceed native birth field or unrolled loops')
+    return points, mapping
+
+
+def extend_current(data, relocation, report, source):
+    """Grow both native counter arrays and retain full-index surface scoring."""
+    points, mapping = donor_categories(source)
+    extension = report['birth_extension']
+    old_at = extension['points_address']-hra.RAM
+    if (sha256(data) != report['output_sha256'] or sha256(relocation) != report['relocation_sha256']
+            or sha256(data[ENTRY-hra.RAM:END-hra.RAM]) != SURFACE_FUNCTION_SHA
+            or extension['count'] != 23 or extension['stack_bytes'] != 264
+            or sha256(data[old_at:old_at+92]) != NATIVE_WEIGHTS_SHA
+            or extension['points_sha256'] != NATIVE_WEIGHTS_SHA):
+        raise ValueError('Changed complete native birth evaluator or weights')
+    found = {hra.RAM+at: u32(data, at) for at in range(ENTRY-hra.RAM, END-hra.RAM, 4)
+             if u32(data, at) >> 21 & 31 == 29}
+    if found != SURFACE_STACK:
+        raise ValueError('Changed complete base evaluator stack inventory')
+    sections = struct.unpack_from('>5I', relocation)
+    if sections[:4] != (len(data), 0, 0, 0):
+        raise ValueError('Changed birth evaluator relocation sections')
+    payload = struct.pack('>'+str(len(points))+'I', *points)
+    at = len(data)
+    image = bytearray(data+payload)
+    image.extend(bytes(-len(image) % 16))
+    if at & 15 or len(image) > 0x8000 or len(image)+len(relocation) > 0x8800:
+        raise ValueError('Expanded birth weights exceed scoring owner limits')
+    patches = []
+    def word(address, before, after):
+        pos = address-hra.RAM
+        if u32(image, pos) not in (before, after) or u32(data, pos) != before:
+            raise ValueError('Changed or conflicting birth evaluator instruction')
+        struct.pack_into('>I', image, pos, after)
+        if before != after and not any(p['address'] == address for p in patches):
+            patches.append(dict(address=address, before=before, after=after))
+    # Products start at 50; counts move AC -> BC; the caller frame and its
+    # arguments move 108 -> 128. Both arrays grow four words. The three initial
+    # rows and four-row loops retain their exact initialisation/termination.
+    for address, before in SURFACE_STACK.items():
+        imm = before & 65535
+        if address == ENTRY:
+            imm = (-296) & 65535
+        elif imm >= 0x108:
+            imm += 32
+        elif imm >= 0xAC:
+            imm += 16
+        word(address, before, before & 0xFFFF0000 | imm)
+    high, pointers = {}, {}
+    for (value,) in struct.iter_unpack('>I', relocation[20:20+sections[4]*4]):
+        kind, pos = value >> 24 & 63, value & 0xFFFFFF
+        instruction = u32(data, pos)
+        if value >> 30 != 1:
+            raise ValueError('Unexpected birth evaluator relocation section')
+        if kind == 5:
+            high[instruction >> 16 & 31] = pos, instruction
+        elif kind == 6:
+            h_at, hi = high[instruction >> 21 & 31]
+            target = (hi & 65535)*65536+(instruction & 65535)-(65536 if instruction & 32768 else 0)
+            if extension['points_address'] <= target < extension['points_address']+92:
+                offset = target-extension['points_address']
+                pointers[hra.RAM+pos] = (hra.RAM+h_at, offset)
+                new = hra.RAM+at+offset
+                word(hra.RAM+h_at, hi, hi & 0xFFFF0000 | (new+0x8000) >> 16 & 65535)
+                word(hra.RAM+pos, instruction, instruction & 0xFFFF0000 | new & 65535)
+    if pointers != {a: (h, p-TABLE) for a, (h, p) in POINTERS.items() if a != 0x809277A8}:
+        raise ValueError('Changed complete current birth-weight reference inventory')
+    fixed = bytearray(relocation)
+    struct.pack_into('>I', fixed, 0, len(image))
+    allowed = {i for p in patches for i in range(p['address']-hra.RAM, p['address']-hra.RAM+4)}
+    for destination in (0x801A0010, 0x802F8010, 0x803D0010):
+        before = relocate_verified_data(SimpleNamespace(ram=hra.RAM, resident_bytes=len(data), sections=sections),
+                                        data, relocation, destination)
+        after = relocate_verified_data(SimpleNamespace(ram=hra.RAM, resident_bytes=len(image),
+            sections=(len(image), 0, 0, 0, sections[4])), image, fixed, destination)
+        if any(a != b and i not in allowed for i, (a, b) in enumerate(zip(before, after))):
+            raise ValueError('Birth expansion changes unrelated relocated scoring contents')
+    result = copy.deepcopy(report)
+    detail = dict(format='AFV3-BIRTH-CATEGORIES-1', old_count=23, count=len(points),
+        old_stack_bytes=264, stack_bytes=296, points_address=hra.RAM+at, points_sha256=sha256(payload),
+        donor_weights_sha256=DONOR_WEIGHTS_SHA, native_weights_preserved=True,
+        added_categories=list(range(23, len(points))), added_points=points[23:], donor_to_native=mapping,
+        patches=patches, source_evaluator_sha256=SURFACE_FUNCTION_SHA,
+        evaluator_sha256=sha256(image[ENTRY-hra.RAM:END-hra.RAM]),
+        relocation_destinations_checked=3, saved_format_changed=False, saved_profile_changed=False,
+        additional_on_demand_bytes=len(image)-len(data), additional_permanent_ram=0,
+        native_test='pending', reward_acquisition_installed=False, new_item_ids_enabled=False)
+    result.update(bytes=len(image), output_sha256=sha256(image), relocation_sha256=sha256(fixed),
+        on_demand_growth=len(image)-result['source_resident_bytes'], birth_extension=detail)
+    surface = result['surface_scoring']
+    window = surface['window']; start = window['address']-hra.RAM
+    if data[start:start+window['bytes']].hex() != window['after']:
+        raise ValueError('Changed complete installed surface-score window')
+    window['after'] = image[start:start+window['bytes']].hex()
+    surface['evaluator_sha256'] = detail['evaluator_sha256']
+    surface['birth_counter_frame_bytes'] = detail['stack_bytes']
+    return bytes(image), bytes(fixed), result
+
+
+def checked_categories(data, report, source):
+    """Bind generated metadata to the real current owner, points, and consumers."""
+    points, mapping = donor_categories(source)
+    extension = report['birth_extension']; count = extension['count']
+    at = extension['points_address']-hra.RAM
+    expected = struct.pack('>'+str(count)+'I', *points[:count]) if count in (23, 27) else None
+    if (sha256(data) != report['output_sha256'] or expected is None or data[at:at+count*4] != expected
+            or sha256(expected) != extension['points_sha256']
+            or extension['donor_weights_sha256'] != DONOR_WEIGHTS_SHA):
+        raise ValueError('Changed current birth-point mapping or scoring owner')
+    if count == 27:
+        digest = extension['evaluator_sha256']
+        if extension['donor_to_native'] != mapping or extension['stack_bytes'] != 296:
+            raise ValueError('Changed installed complete birth category map')
+        if any(u32(data, p['address']-hra.RAM) != p['after'] for p in extension['patches']):
+            raise ValueError('Changed installed birth evaluator instruction')
+    else:
+        digest = SURFACE_FUNCTION_SHA
+        if extension['stack_bytes'] != 264:
+            raise ValueError('Changed original birth category counter frame')
+    if sha256(data[ENTRY-hra.RAM:END-hra.RAM]) != digest:
+        raise ValueError('Changed complete current birth evaluator')
+    consumers = [(hra.RAM+i, u32(data, i)) for i in range(0, hra.SECTIONS[0], 4)
+                 if u32(data, i) in (0x000B5C80, 0x000B5EC2)]
+    expected_consumers = [(address+d, word) for address in (0x809275E0, 0x8092763C, 0x80927680)
+                          for d, word in ((0, 0x000B5C80), (4, 0x000B5EC2))]
+    if consumers != expected_consumers:
+        raise ValueError('Changed complete native birth-field consumer inventory')
+    return mapping, dict(native_counter_count=count, native_points_sha256=sha256(expected),
+        donor_points_sha256=DONOR_WEIGHTS_SHA, native_hra_sha256=sha256(data),
+        native_consumers=[a for a, _ in consumers[::2]], acquisition_category_changed=False,
+        domain='HRA base-point metadata only')
+
 
 def extend(data, relocation, report, rel, symbols):
     verify_sources(rel, symbols)

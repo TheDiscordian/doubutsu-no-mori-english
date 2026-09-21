@@ -1619,6 +1619,9 @@ def exercise(debug, rom_path, record, *, section='automatic_furniture'):
     if section=='surface_menu':return surface_menu(debug,rom_path,record)
     if section=='surface_scoring':return surface_scoring(debug,rom_path,record)
     if section=='furniture_scoring':return furniture_scoring(debug,rom_path,record)
+    if section=='birth_scoring':
+        from v3_hra_birth_smoke import exercise as birth_scoring
+        return birth_scoring(debug,rom_path,record)
     if section=='surface_audio':return surface_audio(debug,rom_path,record)
     if section=='surface_stock':return surface_stock(debug,rom_path,record)
     if section=='surface_selection':return surface_selection(debug,rom_path,record)

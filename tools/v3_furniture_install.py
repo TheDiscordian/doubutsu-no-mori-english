@@ -155,16 +155,21 @@ def scoring(base, prior, rows, source):
     changes, reports = {}, {}
     files = by_vrom(base)
     aliases=[]
+    from v3_hra_birth import checked_categories
+    mapping, binding = checked_categories(files[hra.NEW_VROM].extract(base), prior['hra'], source)
     for row in rows:
-        if row['donor_birth_category']!=row['birth_category']:
-            from v3_camping_items import score_mapping
-            mapping=score_mapping(source.rel,source.symbols.encode(),base,prior,source_sha256=sha256(base))
-            points=source.raw('mMkRm_birth_point_table')
-            donor=row['donor_birth_category'];native=row['birth_category']
-            if (native!=mapping['native_scoring_category'] or
-                    struct.unpack_from('>I',points,donor*4)[0]!=mapping['points']):
-                raise ValueError('Changed source/native reward scoring equivalence')
-            aliases.append(dict(**{**mapping,'donor_category':donor},item_id=row['item_id']))
+        donor,native=row['donor_birth_category'],row['birth_category']
+        if (not 0 <= donor < len(mapping) or native != mapping[donor]
+                or native >= binding['native_counter_count']):
+            raise ValueError('Scoring category lacks its installed native counter')
+        value=int(row['donor_hra_hex'],16)
+        expected=(value&0xFFFFC000)|(native<<9)|((value>>6&3)<<7)
+        if value>>8&63 != donor or value&63 or row['native_hra_hex'] != f'{expected:08x}':
+            raise ValueError('Scoring metadata differs from the complete donor birth conversion')
+        if donor!=native:
+            points=struct.unpack_from('>I',source.raw('mMkRm_birth_point_table'),donor*4)[0]
+            aliases.append(dict(**binding,donor_category=donor,native_scoring_category=native,
+                points=points,item_id=row['item_id']))
     for key, tool, width in (('hra',hra,4), ('feng_shui',feng,2)):
         report = copy.deepcopy(prior[key]); data = bytearray(files[tool.NEW_VROM].extract(base))
         if (sha256(data) != report['output_sha256'] or
@@ -860,7 +865,7 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             unchanged_owner_moves=moved,changed_owner_moves=owner_moves,
             in_place_owner_updates=owner_updates,additional_resident_bytes=0)
         report['sources'].update(report['furniture_scoring']['sources'])
-        report['native_test']='pending expanded theme scoring and English letter names; acquisition and new birth categories remain incomplete'
+        report['native_test']='pending expanded birth-point evaluator; acquisition remains incomplete'
     if room_surfaces_art is not None:
         report['automatic_furniture']['resource_moves']=moved
         report['import_storage']['remaining_bytes']=limit-BLOB-len(blob)
@@ -1040,7 +1045,7 @@ if __name__=='__main__':
     parser.add_argument('--room-surfaces-art',type=Path,
         help='With --refresh-runtime, install prepared floor/wall artwork and shared room readers without enabling items')
     parser.add_argument('--furniture-scoring',action='store_true',
-        help='With --refresh-runtime, install complete donor theme categories and official score-letter names')
+        help='With --refresh-runtime, install complete donor themes, names, and source-mapped base-point categories')
     args=parser.parse_args()
     if args.equipment_art and not args.refresh_runtime:parser.error('--equipment-art requires --refresh-runtime')
     if args.equipment_rigs and not args.refresh_runtime:parser.error('--equipment-rigs requires --refresh-runtime')

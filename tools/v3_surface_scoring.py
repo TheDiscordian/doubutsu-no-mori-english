@@ -23,10 +23,12 @@ def tables(data,report,surface,source):
         raise ValueError('Changed complete donor surface score weights')
     donor=struct.unpack('>38I',weights)
     at=report['birth_extension']['points_address']-hra.RAM
-    native=data[at:at+23*4]
+    count=report['birth_extension']['count']
+    if count not in (23,27):raise ValueError('Unsupported complete birth counter layout')
+    native=data[at:at+count*4]
     if sha256(native)!=report['birth_extension']['points_sha256']:
         raise ValueError('Changed complete native acquisition weights')
-    native=struct.unpack('>23I',native);out=[]
+    native=struct.unpack('>'+str(count)+'I',native);out=[]
     for kind,address,offset,digest in TABLES:
         original=data[address-hra.RAM:address-hra.RAM+64]
         name='mMkRm_'+kind+'_from';birth=source.raw(name)

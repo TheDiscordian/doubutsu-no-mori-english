@@ -1,5 +1,88 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared complete donor base points
+
+ABI 196 is `build/v3-birth-scoring-runtime-02/build-lock.json`. The shared
+scoring refresh and ordinary importer represent all 38 donor birth categories
+without widening item metadata or adding per-item rules. Existing native buckets
+0–22 keep their identities and values. Donor categories 23–37 map by exact point
+equivalence, appending missing values in source order. Native buckets 23–26
+contain 1,983, 1,300, 1,177, and 1,400. Harvest therefore retains its actual 1,177
+points rather than an unrelated 412-point category. Acquisition remains separate.
+Native lottery retains 2,951 points rather than the donor's 1,029.
+
+The complete 27-word table has SHA-256
+`8b4646ee2c39ef6fbc91dfada57d9398dc214c3a4b6298ff562ca5d6d9feb6da`.
+All three five-bit birth readers remain unchanged. Both counter/product arrays
+grow four words; the stack frame grows from 264 to 296 bytes. Complete stack,
+point-reference, source-function, and relocation inventories are checked. The
+full-index surface-scoring tail retains its actual caller arguments and values.
+The complete installed evaluator at `809274F8..809277F7` has SHA-256
+`6353c670f844f56b03eaab0a612a67653700f38faec1bd5b2373c16c12368909`.
+
+The owner grows 112 bytes to 32,592, with its existing 1,184-byte relocation.
+There are 176 bytes spare below the 32-KiB image limit. No extra fixed allocation,
+audio growth, artwork change, or saved field is introduced. Every theme, official
+score-letter name, existing metadata row, and source acquisition record remains.
+The ordinary installer checks the actual current mapping and complete evaluator
+before accepting a row; a prepared record cannot fabricate a missing counter or
+substitute a convenient score. The surface scoring receipt follows the changed
+stack-relative instructions, while surface packet bytes stay unchanged.
+
+Reproduction:
+
+```sh
+python3 tools/v3_furniture_install.py --refresh-runtime --furniture-scoring \
+  --base-lock build/v3-theme-scoring-runtime-02/build-lock.json \
+  --output build/v3-birth-scoring-runtime-02
+python3 -m unittest tests.test_v3_furniture_scoring -v
+python3 tools/emulator_smoke.py \
+  --rom build/v3-birth-scoring-runtime-02/animal-forest-v3-asset-loader.z64 \
+  --output build/v3-birth-scoring-native-01 \
+  --xvfb /home/discordian/Games/OpenRSC/headless/vendor/usr/bin/Xvfb \
+  --expansion-pak --no-initial-screenshot --seconds 90 \
+  --scenario tests/scenarios/v3_furniture_birth_scoring.json
+```
+
+Use fresh output directories. Three focused host checks pass in 8.623 seconds.
+They reproduce complete changed owners and scheduler instructions; verify every
+donor category and preserved native values; exercise five real donor records
+through ordinary `scoring()`; reject an older evaluator, fabricated mappings,
+changed instructions, and malformed conversion; and compare complete none/all/
+single browser and Python outputs. The real donor-row test modifies host copies
+only, not the cartridge or active import list. UPS reconstruction passes.
+
+The first silent native attempt passes 83 internal assertions across 17 cases
+and 115 result records. The existing base-point fixture uses the current owner,
+expanded counters, and a bounded larger arena. It verifies complete relocated
+loading, all counters and products, the four new values, native lottery points,
+mixed layers including the far-corner final bucket, null layers, full-index and
+invalid surface arguments, complete instructions, stack/allocation guards,
+and the complete saved runtime state. Temporary native metadata supplies scoring
+categories in scratch memory; acquisition, ordinary score-letter generation,
+room rendering, actual FlashRAM writes, and hardware are not claimed.
+
+The native run used runtime build `01`. Build `02` refreshes the report's duplicate
+birth summary and source fingerprints, producing the identical complete ROM and
+UPS. Complete file equality was checked; the unchanged emulator test was not
+replayed. The native process exited successfully. Existing theme/name execution
+evidence is retained rather than repeated.
+
+Hashes:
+
+- ROM: `4af6d2a3c2c3ce570d2a7ca9c4cf5b43593ce371ebb1ce96df97d22eb8844f3a`.
+- UPS: `8c5b9683649cfe968090cc3c65485f59b69b645d3630effcef34ee29c310e1e2`.
+- Build report: `05dfaa89051e119782ce025d694cc41e1af9ca50a74348c8b5470f5fd47e19ee`.
+- Native results: `c6de595f1d649b49360ec30edf8df97ea76d00f3c50550d965286aa2998a8f6f`.
+
+Saved format 4, every profile bit, and the 148 experimental choices remain
+unchanged from ABI 195. Keep the existing V2/earlier-format incompatibility
+warnings and preserve backups; ordinary cross-build reload is not established
+by this fixture. The 27 inactive furniture profiles and four inactive surfaces
+are not made selectable. HomePage/Mario and Harvest delivery, remaining shared
+material/rigged-material categories, unique behaviours, and required gold-tree
+work remain. Neither deployment of the web patcher nor the main lock changes.
+
 ## Shared complete donor themes
 
 ABI 195 is `build/v3-theme-scoring-runtime-02/build-lock.json`. The ordinary

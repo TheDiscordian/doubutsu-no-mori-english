@@ -112,11 +112,10 @@ and acquisition dependencies are retained. Shared resource, item, room-change,
 and full home-byte readers are installed. Format-4 surface profile/ownership
 validation is installed. Catalogue page lists/ownership dispatch and native full-ID
 inventory exchange are connected. Full-index base weights retain native values
-and add exact donor points; Western, Backyard, and Boxing matching pairs are
-connected. Full-index player/NPC footstep and drag readers preserve original
+and add exact donor points; all five additive matching pairs and complete donor
+theme/base-point categories are connected. Full-index player/NPC footstep and drag readers preserve original
 mappings and bind complete donor programs/instruments with bounded audio storage.
-Acquisition, private surface selection, complete Harvest/Mario furniture themes,
-and ordinary persistence
+HomePage/Harvest acquisition and ordinary persistence
 remain required before these become optional playable imports.
 
 The [expanded import storage](V3_IMPORT_STORAGE.md) supports further batches

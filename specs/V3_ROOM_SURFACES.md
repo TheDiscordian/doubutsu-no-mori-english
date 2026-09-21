@@ -16,8 +16,8 @@ Base surface scoring, all five additive matching themes, and full-index footstep
 are installed. Shared A/C/event stock supports six additions with selected-only
 membership and selection. The private composer exposes those six surfaces as
 individual or all-selected options, with real catalogue counts and independent
-saved profiles. HomePage/Harvest acquisition and additional furniture birth-point
-categories remain required. The four associated records stay disabled; installed
+saved profiles. HomePage/Harvest acquisition remains required; complete shared
+theme and furniture birth-point categories are installed. The four associated records stay disabled; installed
 artwork alone does not make them selectable. Ordinary gameplay and persistence
 are not established by category installation.
 
@@ -376,8 +376,9 @@ Source-bound Western, Backyard, and Boxing series adapters map donor pair
 indices 18, 26, and 65 to stable native indices 73, 74, and 76. The complete donor
 theme extension also maps Harvest 66 to 77 and Mario 64 to 75, retaining their
 distinct base-series/theme rules. Native partial and complete scoring uses these
-pairs. New furniture birth-point categories and actual delivery remain required;
-installing these definitions does not enable an unfinished import. The ordinary furniture
+pairs. Complete furniture birth-point categories use the shared 27-counter
+evaluator. Actual delivery remains required; installing these definitions does
+not enable an unfinished import. The ordinary furniture
 installer accepts checked mapped indices as well as explicitly missing pairs,
 so future bulk imports retain this shared mapping.
 

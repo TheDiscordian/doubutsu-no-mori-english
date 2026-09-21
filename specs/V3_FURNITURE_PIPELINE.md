@@ -22,9 +22,35 @@ preserving every previous lookup key and template selector. The single text
 provenance catalogue records the exact donor name fields.
 
 This category changes no saved fields, selection bits, or active imports.
-Acquisition and additional base-point categories remain independent eligibility
-requirements. The ordinary installer checks a row's series against installed
+Acquisition and base-point support remain independent eligibility requirements.
+The ordinary installer checks a row's series against installed
 storage before accessing it. Neither web-patcher deployment is updated.
+
+### Complete donor base-point categories
+
+The same `--furniture-scoring` refresh installs shared base-point support after
+the theme storage. `donor_categories` derives stable scoring buckets from the
+complete checked 38-entry donor table. Existing native categories 0–22 retain
+their identities and points, including native lottery 2,951 rather than donor
+1,029. Donor categories 23–37 reuse an equal native point value or append one
+missing value in source order. Four new buckets contain 1,983, 1,300, 1,177, and
+1,400. This mapping changes scoring metadata only, never the acquisition list.
+
+Twenty-seven counters fit the native five-bit birth field and three-plus-four
+unrolled loops. Both complete counter/product arrays grow four words, moving the
+count array `AC -> BC` and frame end `108 -> 128`. The complete native stack and
+point-reference inventories are checked, including the surface-scoring tail's
+caller arguments. Stack use grows 32 bytes to 296. The complete point table
+adds 112 aligned owner bytes, and both relocation and scheduler sizes follow it.
+Original metadata, themes, letter names, and all full-index surface values remain.
+
+The ordinary metadata generator uses the shared source map. The installer checks
+the full current owner, complete weight table, installed frame and instructions,
+all three birth-field readers, selected bucket, and complete converted metadata.
+A prepared row cannot supply a missing counter, arbitrary point substitute, or
+unavailable theme. Shared surface-table rebuilding reads the complete active
+counter layout while retaining all original values. No item is enabled merely
+because its score can be represented.
 
 ### Changed-owner storage
 
@@ -1468,10 +1494,11 @@ stock, catalogue entries, HRA/feng-shui rows, and selected-profile bits together
 Missing native scoring-series definitions require a category adapter. Existing
 documented theme adapters retain their source-bound surface mappings, including
 stable additive pairs where installed and explicit missing pairs otherwise.
-Donor HRA birth categories 33 and 37 map to native scoring category 3 only after
-checking their equal 412-point weights and all three actual native bitfield
-consumers. This is scoring metadata only: winter/summer acquisition remains
-independent in byte 27. Native weights, counters, and stack sizes do not change.
+Donor HRA birth categories use the shared checked point-equivalence map above;
+categories 33 and 37 retain their existing 412-point mapping to category 3.
+This is scoring metadata only: winter/summer acquisition remains independent
+in byte 27. Original weights remain unchanged; complete counter/stack expansion
+is an explicit shared runtime dependency, never a per-item adjustment.
 
 Canonical furniture identity version 2 is independent of conversion order,
 checkbox selection, and resource placement:

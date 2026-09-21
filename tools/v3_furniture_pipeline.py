@@ -33,10 +33,6 @@ STOCK = {'ftr_listA': 0, 'ftr_listB': 1, 'ftr_listC': 2,
          'ftr_listEvent': 3, 'ftr_listTrain': 4, 'ftr_listLottery': 5}
 # Source list types for shared optional NPC reward selection, not shop stock.
 REWARDS = {'ftr_listJonason': 12, 'ftr_listKamakura': 19, 'ftr_listTent': 23}
-# HRA-only equivalents for source categories exceeding the native bitfield.
-# Acquisition remains the separate actual donor list. The installer verifies
-# the equal source/native weights and the complete native scoring consumers.
-SCORING_ALIASES = {33: 3, 37: 3}
 # Reviewed complete GAFE01-r0 draw implementation, not an item allowlist.
 # It selects two opaque models and a palette using (actor index - base) * 12.
 INDEXED_STATIC_DRAW_SHA = '612998bdab7cb941114e08d66db7100ded74894f8c1ccfdbdffe4bb9fbb44917'
@@ -1081,13 +1077,11 @@ def metadata(source, item, profile, identity):
     hra = u32(source.data, 0x4FAFC+index*4)
     feng = source.data[0x4EBF0+index*2:0x4EBF0+index*2+2]
     donor_birth, surface, series = hra>>8&63, hra>>6&3, hra>>26
-    birth = SCORING_ALIASES.get(donor_birth, donor_birth)
-    if birth != donor_birth:
-        points=source.raw('mMkRm_birth_point_table')
-        if len(points)!=152 or u32(points,birth*4)!=412 or u32(points,donor_birth*4)!=412:
-            raise ReviewRequired('source scoring equivalence changed')
-    if birth >= 23 or hra&63 or series >= 60:
+    from v3_hra_birth import donor_categories
+    _, categories = donor_categories(source)
+    if donor_birth >= len(categories) or hra&63 or series >= 60:
         raise ReviewRequired('scoring needs an acquisition/category adapter')
+    birth = categories[donor_birth]
     native_hra = (hra&0xFFFFC000)|(birth<<9)|(surface<<7)
     runtime_index,destination = furniture_identity(item)
     if destination != item:
