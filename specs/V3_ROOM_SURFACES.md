@@ -8,8 +8,9 @@ surfaces in a batch, and retains their names, prices, catalogue order, acquisiti
 lists, and floor-sound selectors. The shared runtime installer connects complete
 artwork to player-room/shop double-buffer readers, single-buffer arranged rooms,
 and catalogue previews. Shared full-name, price, and item-category readers use
-the same ten identities. Item actions, persistence, acquisition, and browser
-composition remain required. All new item records remain disabled; installed
+the same ten identities. Shared room reservation/application and full saved-byte
+reading are installed. Inventory dispatch, catalogue ownership, optional-profile
+validation, acquisition, and browser composition remain required. All new item records remain disabled; installed
 artwork and metadata do not make a surface selectable.
 
 Use the current explicit experimental lock; keep the main lock and both stable
@@ -65,12 +66,14 @@ room-series scoring representation can identify a matching pair.
 | `2641` / `2741` | boxing ring mat / ringside seating | 76 | `264C` / `274C` |
 | `2642` / `2742` | harvest rug / harvest wall | 77 | `264D` / `274D` |
 
-Reservations do not imply working native readers. The current native player
-floor getter masks the saved floor to six bits. Do not merely increase artwork
-bounds while that reader and the corresponding writers still truncate identity.
-Preserve unrelated bits in saved home records; establish complete application
-and persistence before enabling any surface. An eventual save-format extension
-requires an explicit compatibility warning before a test build is handed over.
+Reservations do not imply complete item integration. Each native home record has
+independent full-byte floor/wall fields at offsets `14`/`15`; neither field packs
+unrelated flags. Native initialization and application preserve all eight bits.
+The original floor getter alone masks player/NPC floor identity to six bits;
+the selected-surface wrapper preserves additive IDs and retains original masking
+for other values. Preserve the complete native home payload and establish
+optional-profile validation before enabling a surface. An eventual save-format
+extension requires an explicit compatibility warning before a test build handoff.
 
 ## Complete metadata and preparation
 
@@ -176,8 +179,9 @@ constructor, ordinary room entry, GPU draw, item use, or save/restart.
 
 1. Connect full item IDs to inventory actions, catalogue lists,
    ownership, and the existing optional-profile/save validation.
-2. Connect floor/wall application, removal, saved home identity, and reload;
-   retain existing home flags and native surface behaviour. Keep imports optional.
+2. Retain the installed floor/wall reservation/application and full saved-byte
+   readers. Complete inventory exchange and ordinary save/reload with explicit
+   selected-profile validation; keep imports optional.
 3. Apply genuine acquisition categories, floor sound mapping, and matching-pair
    HRA scoring. Existing Western, Backyard, and Boxing adapters explicitly lack
    their matching surfaces and must be updated from the same registry.
@@ -204,7 +208,7 @@ prior native/imported item dispatch chains. Name arguments retain their full
 width; type/price arguments narrow to sixteen bits like their native entries.
 
 The 4-KiB permanent packet at `804BC000..804BCFFF` follows the existing scrolling
-packet and ends below the model pool at `80500000`. Its 488-byte reader code has
+packet and ends below the model pool at `80500000`. Its 912-byte reader/action code has
 24-byte stack frames. The `AFSI` metadata header at `804BC800` carries version 1,
 count 10, and stride 24. Each row stores item/price halfwords, one enable word,
 and sixteen name bytes. Only enable word 1 is accepted; all proposal records
@@ -233,3 +237,46 @@ guards, and unchanged saved extension. It restores an emulator checkpoint; it
 does not establish room application, acquisition, ordinary save/restart, or
 hardware operation. Optional profile/save validation must replace the disabled
 state before any surface is offered for selection.
+
+## Room reservation, application, and complete home identities
+
+`tools/v3_surface_application.py` extends the installed category through the same
+refresh command. It reuses the 4-KiB packet, complete metadata, artwork, startup
+reservation, and equipment bootstrap. The complete item/action code occupies
+912 bytes before metadata at `804BC800`; no RAM reservation or saved format grows.
+
+Both native reservation entries, `8095267C`/`809526D4`, delegate to a shared
+helper. Arguments narrow to sixteen bits. Null clips/owners, busy queues, wrong
+item groups, missing identities, and disabled imports return zero without
+changing the actor or exchanging an item. Original application indices 0–67
+remain accepted; additive 73–77 require their exact enabled metadata record.
+
+Two checked 32-byte windows in native wall/floor commit functions
+`80952444`/`8095253C` call the same predicate. The remaining complete functions
+retain menu-close deferral, pending-flag clearing, room eligibility, buffer flip,
+actual texture DMA, saved-byte writes, sound calls, and native notification.
+Complete function hashes, incoming branches, and relocation intersections are
+checked. All existing relocations and owner sizes remain unchanged.
+
+The full floor wrapper at `800BEEC4` reads original home bytes for scenes 20–22
+and the actual NPC floor query for scene 6. Selected additive IDs remain intact;
+other values retain the native low-six-bit fallback. Invalid player-home indices
+reject without an out-of-bounds read. Other scenes delegate to the complete
+existing campsite/native wrapper, retaining special-room sound identities.
+
+Homes begin at payload offset `3588`, stride `B48`, with four records. The
+native default initializer stores complete bytes, and the room initializer at
+`80951F14` reads complete bytes into actor halfwords `174`/`176`. The complete
+current save runtime and its installed hooks are checked; native payload-copy
+lengths remain `F980`. No extra room-ID storage is needed. Surface selection and
+catalogue ownership still need an explicit saved category; full-byte room storage
+does not supply missing profile guards.
+
+Actual C sanitizer fixtures cover the shared reserve/predicate/getter, original
+scene routing, all four homes, and a host-side full-payload save/read/commit. The
+bounded native fixture executes a complete relocated installed room owner with
+a private actor. Real reserve/commit paths, menu deferral, complete DMA, saved
+home-byte writes, and the untouched native initializer reload pass. It restores
+all saved/transient fixture data and the emulator checkpoint. Live-player
+notification, ordinary inventory exchange, real FlashRAM restart, GPU appearance,
+and hardware operation are not established by this fixture.

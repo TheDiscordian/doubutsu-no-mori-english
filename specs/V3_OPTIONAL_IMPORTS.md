@@ -108,8 +108,10 @@ Keep source hashes and conversion revisions attached to each compiled import.
 The [room-surface pipeline](V3_ROOM_SURFACES.md) prepares ten additive floors and
 wallpapers while preserving all existing surfaces and special-room identifiers.
 Complete resources, stable paired destinations, official names, source metadata,
-and acquisition dependencies are retained. Shared resource/item/application/save
-readers remain required before these become optional playable imports.
+and acquisition dependencies are retained. Shared resource, item, room-change,
+and full home-byte readers are installed. Inventory/catalogue integration,
+surface profile validation, acquisition, sound/scoring, and ordinary persistence
+remain required before these become optional playable imports.
 
 The [expanded import storage](V3_IMPORT_STORAGE.md) supports further batches
 without adding to the full DMA directory. English choice data retains its

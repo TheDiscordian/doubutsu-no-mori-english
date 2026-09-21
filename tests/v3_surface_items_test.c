@@ -63,4 +63,5 @@ int main(void) {
     stage=0;crc_error=1;assert(!af_v3_surface_init() && stage==2);crc_error=0;
     stage=0;init_value=0;assert(!af_v3_surface_init() && stage==5);
     puts("surface metadata, disabled IDs, original routing, guards, and checked startup pass");
+    return 0;
 }

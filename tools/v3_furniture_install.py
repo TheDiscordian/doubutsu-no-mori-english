@@ -935,6 +935,9 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             report['native_test']='pending scrolling renderer native execution and GPU appearance; lifecycle/acquisition remain incomplete'
         if surface_items:
             report['native_test']='pending shared surface item startup/name/type/price execution; application, saves, and selection remain incomplete'
+            if report['room_surfaces'].get('application'):
+                report['shared_runtime_refresh']['adapters'].append('surface_application')
+                report['native_test']='pending shared surface reservation/application and full floor identity; profile, catalogue, acquisition, and ordinary persistence remain incomplete'
     write_new(output/'animal-forest-v3-asset-loader.z64',result)
     write_new(output/'asset-loader.ups',patch)
     write_new(output/'build.json',(json.dumps(report,indent=2,sort_keys=True)+'\n').encode())

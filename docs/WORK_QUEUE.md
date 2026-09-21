@@ -12,17 +12,17 @@ After the primary importing work, finish gold-tree leaf/cut effects and the full
 golden-shovel acquisition route. This is deferred required V3 work, not a dropped
 feature or a separate release goal.
 
-The current explicit proposal is ABI 183 at
-`build/v3-surface-items-runtime-03/build-lock.json`. All ten floor/wall objects
-have shared texture consumers and complete official names, price words, and
-native item-category readers. Four focused checks and the first silent native
-item run with 64 internal assertions pass. Actual startup/public entries, all ten
-names/prices, disabled/invalid IDs, original-item fallback, memory guards, and
-saved state are covered. No surface is selectable; all ten enable flags remain
-zero in the proposal. The 4-KiB packet at `804BC000` follows the scroll packet
-and ends before the model pool. Its 128-byte bootstrap uses an existing checked
-equipment gap; startup occupies 960 of 992 bytes. Retain passing unchanged
-texture evidence rather than replaying it.
+The current explicit proposal is ABI 184 at
+`build/v3-surface-application-runtime-01/build-lock.json`. Shared room reservation,
+application, and full floor identity join the complete surface texture/item
+readers. Three cartridge checks and both actual C sanitizer fixtures pass;
+the first silent native room run passes 34 assertions. Native menu deferral,
+texture DMA, full saved-byte writes, initializer reload, special-scene routing,
+and guards are covered. Ordinary inventory/save-restart are not established.
+All ten surfaces remain disabled pending inventory/catalogue, profile,
+acquisition, and scoring/sound integration. The 912-byte code uses the existing
+4-KiB packet; bootstrap/startup reservations and all artwork remain unchanged.
+Retain passing unchanged texture/item evidence rather than replaying it.
 
 The shared start-disabled placement adapter and ordinary sprinkler import are complete.
 Source C-stock acquisition and catalogue reordering are installed. Existing
@@ -36,19 +36,22 @@ Next complete the general additive room-surface runtime. All ten missing
 surfaces are prepared together at `build/v3-room-surfaces-prepared-02/`, with
 complete source metadata, sound-selector inputs, and official name attribution.
 Stable paired indices 73–77 preserve all original texture and special-room sound
-IDs. The current floor getter is wrapped by the campsite environment adapter;
-preserve that route. Player floor reads still mask identity to six bits, so
-application/persistence need a real extension, not just larger texture bounds.
+IDs. The shared floor getter preserves selected identities and the campsite
+route. The native home fields are complete independent bytes, not packed six-bit
+fields: only the original getter masks them. Native application and full-payload
+save copies preserve the bytes; optional-profile validation still needs its own
+explicit surface category before any surface is selectable.
 Use `specs/V3_ROOM_SURFACES.md` for the shared reader/action/save integration order.
 Catalogue preview (`03970000`, linked `808A6100`) and arranged NPC rooms
 (`00845C40`, linked `80950E50`) use the separate added resource banks, preserving
-original resources and native preview geometry. Next connect inventory actions,
-catalogue ownership, and saved room application. Preserve the six-bit native home fields until all
-readers/writers and their unrelated flags are accounted for.
+original resources and native preview geometry. Next connect inventory dispatch,
+catalogue lists/ownership, and explicit surface profile validation. Preserve the
+full native home bytes and every unrelated field. Do not repurpose furniture
+selection/ownership bits to represent floors or wallpapers.
 The installed name/type/price hooks wrap the existing native public entries and
 retain their prior complete chains. Keep those outer hooks and the bootstrap
 when extending category readers. Replace the disabled item metadata with actual
-optional-profile validation only when application/persistence is complete.
+optional-profile validation only when the full item/persistence path is complete.
 
 Contact/floor callbacks
 are source-bound and compiled, with four focused host/source checks passing.

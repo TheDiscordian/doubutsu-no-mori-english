@@ -46,3 +46,53 @@ u32 af_v3_surface_item_price(u32 argument) {
     const SurfaceItem *row=find(item);
     return row ? row->price : 0;
 }
+
+#ifdef AF_SURFACE_ROOM
+extern int af_surface_prior_floor(void);
+extern u32 af_surface_field(void);
+extern int af_surface_npc_floor(void);
+#ifdef __mips__
+#define room_clip (*(u8 ***)0x80136F48u)
+#define room_scene (*(const u32 *)0x80126EB4u)
+#define home_bytes ((const u8 *)0x8012A428u)
+#else
+extern u8 **af_test_room_clip;
+extern u32 af_test_room_scene;
+extern u8 af_test_homes[4*0xB48];
+#define room_clip af_test_room_clip
+#define room_scene af_test_room_scene
+#define home_bytes af_test_homes
+#endif
+
+/* Keep the native 0..67 application range. Added identities must be selected. */
+int af_v3_surface_allowed(u32 item,u32 base) {
+    return (base==0x2600u || base==0x2700u) &&
+        (item-base<68u || (item>>8==base>>8 && find(item)));
+}
+
+static u32 reserve(u32 argument,u32 base,u32 identity,u32 pending) {
+    u32 item=(u16)argument;
+    u8 **clip=room_clip;
+    if (!clip || !*clip || !af_v3_surface_allowed(item,base)) return 0;
+    u8 *actor=*clip;
+    if (*(u32 *)(actor+pending)) return 0;
+    u32 old=(u16)(*(short *)(actor+identity)+base);
+    *(u32 *)(actor+pending)=1;
+    *(u16 *)(actor+pending+4)=(u16)item;
+    return old;
+}
+
+u32 af_v3_surface_reserve_floor(u32 item) {return reserve(item,0x2600,0x174,0x1B0);}
+u32 af_v3_surface_reserve_wall(u32 item) {return reserve(item,0x2700,0x176,0x1A8);}
+
+int af_v3_surface_floor_index(void) {
+    u32 index;
+    if (room_scene-20u<3u) {
+        u32 home=af_surface_field()-0x6000u;
+        if (home>=4u) return -1;
+        index=home_bytes[home*0xB48+0x14];
+    } else if (room_scene==6u) index=(u32)af_surface_npc_floor();
+    else return af_surface_prior_floor(); /* Includes the existing campsite. */
+    return index>=73u && index<78u && find(0x2600u+index) ? (int)index : (int)(index&63u);
+}
+#endif

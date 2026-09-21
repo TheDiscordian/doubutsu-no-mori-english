@@ -3,6 +3,9 @@ ENTRY(af_v3_surface_item_name)
 af_surface_prior_name = 0x80467300;
 af_surface_prior_type = 0x804AA000;
 af_surface_prior_price = 0x80467574;
+af_surface_prior_floor = 0x804A2F54;
+af_surface_field = 0x80087C88;
+af_surface_npc_floor = 0x800AE558;
 SECTIONS {
     . = 0x804BC000;
     .text : { *(.text.af_v3_surface_item_name) *(.text .text.*) }

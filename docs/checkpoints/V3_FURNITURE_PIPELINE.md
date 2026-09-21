@@ -1,8 +1,75 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared surface room application and identity
+
+The current explicit proposal is ABI 184 at
+`build/v3-surface-application-runtime-01/build-lock.json`:
+
+```sh
+python3 tools/v3_furniture_install.py --refresh-runtime \
+  --base-lock build/v3-surface-items-runtime-03/build-lock.json \
+  --room-surfaces-art build/v3-room-surfaces-prepared-02 \
+  --output build/v3-surface-application-runtime-01
+```
+
+One shared predicate and reservation path support all ten surfaces. Disabled,
+missing, wrong-group, null-owner, and busy requests cannot exchange items.
+Checked native commit windows preserve complete menu timing, room checks, texture
+DMA, double-buffer flips, full saved-byte writes, notification, and sound calls.
+The full floor getter preserves selected IDs in homes/NPC rooms and retains
+the complete existing campsite/native route for special scenes.
+
+The native saved fields are independent full bytes at home offsets `14`/`15`,
+not packed six-bit fields. Their default initializer, complete room initializer,
+complete current save runtime/hooks, and `F980` payload-copy sizes are checked.
+Only the original floor getter truncates player/NPC values. No extra room-ID
+storage, RAM reservation, artwork, scene buffer, actor, or save format is added.
+Combined code occupies 912 bytes in the existing 4-KiB packet; startup remains
+960/992 bytes. The blob remains 4,506,384 bytes with 1,785,072 bytes free.
+
+Three current-cartridge tests pass: complete owner/relocation reconstruction
+and mutation rejection; packet/entry/bootstrap/source binding; retained artwork,
+save/profile data, exact empty/all composition, and UPS reconstruction. Both
+actual C fixtures compile and exit successfully with address/undefined-behaviour
+sanitizers, covering complete reserve/getter behaviour and a host-side full
+payload save/read/commit for all four surface pairs. The first host invocation
+needs an explicit return when reusing a renamed `main`. The corrected invocation
+executes both fixtures successfully but reports a wrapper failure because its
+success-banner substring differs. That unnecessary banner assertion is removed;
+the complete suite is not repeatedly replayed for that presentation-only change.
+The recorded 5.743-second run therefore is not labelled a clean four-test run.
+
+The first silent native run at `build/v3-surface-application-native-01/` passes
+67 records and 34 internal assertions. It executes a complete relocated installed
+room owner in a private 28-KiB arena, including both reservation and commit paths,
+busy/disabled rejection, open-menu deferral, actual complete texture DMA, full
+saved-byte writes, and the untouched native initializer reading the pair back.
+The actual floor entry retains backyard lawn 74, falls back when disabled,
+and preserves campsite 68 and original shop 64. Startup packet, memory guards,
+and saved extension are intact; fixture state/checkpoint restore and shutdown
+complete. No retry or old-build/native-category replay is needed.
+
+The fixture uses no live player notification, ordinary pocket exchange, explicit
+FlashRAM write, or physical audio. Host save/read/commit and native initializer
+reload do not establish an ordinary game save/restart, GPU appearance, or
+original-hardware operation. Those limits remain explicit.
+
+- ROM SHA-256: `409e132240a97988d8db6dee4331b91161fecb4837dcbb1696bf384e0bf2a574`.
+- UPS SHA-256: `1ef45f8f9deb9c6082885e32002f692e90c3b3661220dcfd67eeb4c8304902e7`.
+- Receipt SHA-256: `2777299590abbbfa6386ac254aec8288b49232ca9254e0f4aaa129db7f34e129`.
+- Native results SHA-256: `952c7285c9c5a5edd157c4265210924a9aa98ab64714f29a3f7d5242cb7755e2`.
+
+Saved format 3, 141 choices, and 27 inactive furniture profiles are unchanged.
+All ten surfaces remain disabled. Next connect inventory dispatch, catalogue
+lists/ownership, explicit surface selection/profile validation, genuine
+acquisition, sound/scoring, and private composition. Do not repurpose existing
+furniture bits or claim native saved bytes alone provide profile compatibility.
+The main ABI-109 lock and both deployments of the one stable web patcher remain
+unchanged. Gold-tree completion follows primary importing.
+
 ## Shared surface item metadata and startup
 
-The current explicit proposal is ABI 183 at
+The retained item-reader proposal is ABI 183 at
 `build/v3-surface-items-runtime-03/build-lock.json`:
 
 ```sh

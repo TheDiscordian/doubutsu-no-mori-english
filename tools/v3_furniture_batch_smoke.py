@@ -1612,6 +1612,7 @@ def exercise(debug, rom_path, record, *, section='automatic_furniture'):
     if section=='room_surfaces':return room_surfaces(debug,rom_path,record)
     if section=='surface_consumers':return surface_consumers(debug,rom_path,record)
     if section=='surface_items':return surface_items(debug,rom_path,record)
+    if section=='surface_application':return surface_application(debug,rom_path,record)
     if section=='furniture_audio':return furniture_audio(debug,rom_path,record)
     if section in ('scenery_planting_sparkle','scenery_planting_sparkle_remaining'):
         from v3_scenery_smoke import planting_sparkle
@@ -2645,6 +2646,104 @@ def held_level_sound(debug,rom_path,record):
         native_volume_pause_fade_pan_reverb=True,native_actor_registration_and_expiry=True,
         physical_audio_played=False,pcm_or_listening_verified=False,ordinary_gameplay_tested=False,
         flash_written=False,requires_checkpoint_restore=True)
+
+
+def surface_application(debug,rom_path,record):
+    """Actual room reservation/commit and saved-byte reload in a private actor."""
+    from v3_surface_application import OWNER,RELOC,OWNER_RAM
+    from v3_surface_items import RAM,SIZE
+    path=Path(rom_path);image=path.read_bytes();report=json.loads((path.parent/'build.json').read_bytes())
+    if sha256(image)!=report['output_sha256']:raise ValueError('Changed surface application cartridge')
+    surface=report['room_surfaces'];items=surface['items'];files=by_vrom(image)
+    blob=files[runtime.BLOB].extract(image);packet=blob[items['blob_offset']:items['blob_offset']+SIZE]
+    boot=boot_proofs(image);assertions=0
+    def check(label,at,want):
+        nonlocal assertions
+        got=debug.read_memory(at,len(want));passed=got==want
+        record(dict(surface_application_check=label,address=f'{at:08X}',bytes=len(want),
+            assertion='passed' if passed else 'failed',actual=got.hex() if len(got)<=16 else sha256(got)))
+        if not passed:raise ValueError('Surface application mismatch: '+label)
+        assertions+=1
+    def call(at,args=(),want=None,proof=None):
+        nonlocal assertions
+        result=debug.call(f'{at:08X}',list(args),return_address=MODULE_RAM+0x6480,
+            verified_code=proof or boot.get(at));record(result)
+        if want is not None:
+            passed=result['return_value']==want
+            record(dict(surface_application_return=f'{at:08X}',expected=want,actual=result['return_value'],
+                assertion='passed' if passed else 'failed'))
+            if not passed:raise ValueError('Surface application return mismatch')
+            assertions+=1
+        return result['return_value']
+    def put(at,*values):debug.write_memory(at,struct.pack('>'+str(len(values))+'I',*values))
+    check('complete packet loaded by startup',RAM,packet)
+    size=0x7000;allocation=call(0x8009BFC0,[size])
+    if allocation&15 or not MODULE_RAM+0x8000<=allocation<=0x80400000-size:
+        raise ValueError('Surface application fixture allocation failed')
+    root,actor,field,game,floor,wall=(allocation+n for n in (16,0x1000,0x1240,0x1300,0x3000,0x5100))
+    data,rel=(files[v].extract(image) for v in (OWNER,RELOC));sections=struct.unpack_from('>5I',rel)
+    if (sha256(data)!=surface['owners'][0]['sha256'] or sha256(rel)!=surface['owners'][0]['relocation_sha256']):
+        raise ValueError('Changed complete room application owner')
+    loaded=relocate_verified_data(SimpleNamespace(ram=OWNER_RAM,resident_bytes=len(data)+sections[3],
+        sections=sections),data,rel,root)
+    if len(loaded)>0xFE0:raise ValueError('Surface fixture owner exceeds small arena')
+    debug.write_memory(allocation,bytes(size));debug.write_memory(root,loaded)
+    call(0x8002FE00,[root,len(loaded)]);call(0x80034CE0,[root,len(loaded)])
+    proof=(root,loaded[:sections[0]]);edge=b'V3SA'*4
+    guards=(allocation,allocation+0xFF0,allocation+0x1220,floor-16,floor+0x2020,wall-16,wall+0x1020,allocation+size-16)
+    for at in guards:debug.write_memory(at,edge)
+    state=report['save_runtime'];saved={at:debug.read_memory(at,n) for at,n in
+        ((0x80126EA0,0xF980),(0x80136EA0,4),(0x80136F48,4),(0x8013A248,4),
+         (0x80137655,1),(state['state_ram'],state['state_bytes']))}
+    def room(at,args=(),want=None):return call(root+at-OWNER_RAM,args,want,proof)
+    home=0x80126EA0+0x3588+3*0xB48
+    try:
+        put(0x8013A248,field);debug.write_memory(field,bytes.fromhex('60030000'))
+        put(0x80126EB4,20);debug.write_memory(0x80136EA1,b'\x01')
+        debug.write_memory(0x80136EA3,b'\xFF') # No live player notification in this private actor.
+        put(0x80136F48,actor+0x190);put(actor+0x190,actor)
+        debug.write_memory(home+0x14,bytes([26,48]))
+        room(0x80951F14,[actor,game])
+        check('native initializer reads full saved home bytes',actor+0x174,bytes.fromhex('001A003000000000'))
+        put(actor+0x180,floor,floor,wall,wall)
+        original=debug.read_memory(actor,0x1B8)
+        room(0x8095267C,[0x264A],0);check('disabled floor cannot exchange inventory',actor,original)
+        selected=[items['rows'][1],items['rows'][-1]]
+        for row in selected:put(RAM+row['offset']+4,1)
+        # Different identities cover both shared paths without replaying every texture.
+        for kind,item,old,reserve,commit,pending,identity,target,stride in (
+                ('floor',0x264A,0x261A,0x8095267C,0x8095253C,0x1B0,0x174,floor,0x2020),
+                ('wall',0x274D,0x2730,0x809526D4,0x80952444,0x1A8,0x176,wall,0x1020)):
+            debug.write_memory(target,b'\xA5'*stride)
+            room(reserve,[0x12340000|item],old);room(reserve,[item],0)
+            queued=debug.read_memory(actor,0x1B8);put(game+0x1CC8,1)
+            room(commit,[actor,game]);check('open menu defers complete room change',actor,queued)
+            put(game+0x1CC8,0);room(commit,[actor,game])
+            check('queued change consumed once',actor+pending,bytes(4))
+            check('actor keeps full surface identity',actor+identity,struct.pack('>H',item&255))
+            check('native writer keeps full saved byte',home+0x14+(kind=='wall'),bytes([item&255]))
+            row=next(r for r in surface['rows'] if int(r['destination_item_id'],16)==item)
+            check('native commit loads full surface resource',target,blob[row['blob_offset']:row['blob_offset']+stride])
+        call(0x800BEEC4,[],74)
+        # Reload uses the untouched complete native home initializer.
+        room(0x80951F14,[actor,game]);check('native initializer reloads added pair',actor+0x174,bytes.fromhex('004A004D00000000'))
+        for row in selected:put(RAM+row['offset']+4,0)
+        call(0x800BEEC4,[],74&63)
+        put(0x80126EB4,35);call(0x800BEEC4,[],68)
+        put(0x80126EB4,9);call(0x800BEEC4,[],64)
+        check('packet restored after fixture selections',RAM,packet)
+        check('save profile and ownership remain unchanged',state['state_ram'],saved[state['state_ram']])
+        for at in guards:check('room fixture guard',at,edge)
+        check('no CPU fault',0x8003CE34,bytes(4))
+    finally:
+        for row in items['rows']:put(RAM+row['offset']+4,0)
+        for at,value in saved.items():debug.write_memory(at,value)
+        call(0x8009C040,[allocation])
+    return dict(native_surface_application=True,assertions=assertions,complete_relocated_owner_copy=True,
+        actual_reservation_commit_texture_dma_and_saved_byte_reload=True,
+        live_player_notification_tested=False,ordinary_inventory_exchange_tested=False,
+        ordinary_save_restart_tested=False,physical_audio_played=False,flash_written=False,
+        requires_checkpoint_restore=True)
 
 
 def surface_items(debug,rom_path,record):
