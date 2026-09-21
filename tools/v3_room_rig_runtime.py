@@ -24,7 +24,7 @@ MATERIAL_TABLE,MATERIAL_VTABLE,MATERIAL_MAGIC,MATERIAL_CAPACITY=0x804B9E20,0x804
 SOURCES=('tools/v3_room_rig_runtime.py','tools/v3_asset_loader.py','tools/v3_furniture_rigs.py','tools/v3_keyframes.py',
     'tools/v3_furniture_pipeline.py','tools/v3_furniture_install.py','tools/v3_registry.py','tools/v3_equipment_runtime.py',
     'tools/v3_display_aliases.py','tools/v3_held_catalogue.py',
-    'tools/v3_resource_capacity.py','tools/v3_furniture_materials.py','tools/v3_furniture_scroll.py','tools/v3_sound_programs.py',
+    'tools/v3_resource_capacity.py','tools/v3_furniture_materials.py','tools/v3_furniture_scroll.py','tools/v3_furniture_contact.py','tools/v3_sound_programs.py',
     'tools/v3_furniture_behaviours.py','overlays/v3/furniture_behaviours.c','overlays/v3/furniture_behaviours.S','overlays/v3/furniture_behaviours.ld',
     'overlays/v3/room_scroll.c','overlays/v3/room_scroll.h','overlays/v3/room_scroll.ld',
     'overlays/v3/room_materials.c','overlays/v3/room_materials.h',
@@ -106,7 +106,12 @@ def install_profiles(base,prior,blob,core,original,output,directories):
                 if lifecycle is None and donor in scrolling:
                     lifecycle=checked_lifecycle(source,descriptor,scrolling[donor],runtime['scrolling'],contracts)
                 if lifecycle is None:
-                    deferred.append(dict(source_item_id=donor,reason='Scrolling lifecycle remains incomplete'))
+                    from v3_furniture_contact import prepare_lifecycle
+                    pending=prepare_lifecycle(source,descriptor,base)
+                    deferred.append(dict(source_item_id=donor,
+                        reason='Contact/floor lifecycle requires additive room-surface imports' if pending and not
+                            pending['dependencies_complete'] else 'Scrolling lifecycle remains incomplete',
+                        **({'lifecycle_dependencies':pending} if pending else {})))
                     continue
                 if lifecycle.get('start_disabled') and placement is None:
                     placement,owner_changes,updates=install_initial_switch(base,prior,blob,source,output)

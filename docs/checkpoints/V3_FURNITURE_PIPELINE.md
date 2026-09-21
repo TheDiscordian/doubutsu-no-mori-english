@@ -1,5 +1,66 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared contact and floor lifecycle preparation
+
+The shared pipeline prepares `contact-floor-alpha` with:
+
+```sh
+python3 tools/v3_furniture_pipeline.py convert --assets-only \
+  --representation lifecycle --category contact-floor-alpha \
+  --base-lock build/v3-start-disabled-imports-01/cartridge/build-lock.json \
+  --output build/v3-contact-floor-prepared-02
+```
+
+This discovers the source implementation rather than naming the mower in the
+converter. The complete 16-byte constructor, 184-byte move, 52-byte contact
+getter, 228-byte easing helper, all relocations/constants, both source floor
+conditions, and the already prepared draw dependency are retained. Six complete
+native functions bind room registration, direction calculation, contact writes,
+layer selection, floor initialisation, and easing. No graphics are reconverted.
+
+The prepared shared MIPS module is 3,612 bytes, leaving 484 bytes in its existing
+4-KiB reservation. Constructor/move/destroy stack use is 24/72/24 bytes; draw
+remains 64 bytes. It calls the checked native `add_calc` twice per native update,
+preserving exponential approach and the minimum-step tail. The constructor only
+clears private alpha; no new saved field, heap, or resident reservation is used.
+This compiled module is not installed in the current ROM.
+
+Prepared receipt SHA-256:
+`ef1e0f7797e4ef2060c2739b55b48b067669451adf7610a11c52046429b8886c`.
+Complete compiled module SHA-256:
+`be915f522ff8fb5c29ae071de3fa749dfee9cf2cc7e2687110df98eae70b0662`.
+
+The floor inventory exposes a genuine missing dependency. Source backyard lawn,
+index 26, has no complete native artwork match. N64 index 26 is the different
+old plank floor, as recorded in `translations/n64-design-item-names.json` and
+the single translation provenance catalogue. Source daisy meadow, index 48,
+matches all 16,384 native pixels. The record builder refuses an incomplete
+binding, including a forged readiness flag or a same-number fallback. The
+ordinary profile staging path records this concrete surface dependency instead
+of an unspecified lifecycle failure. No mower choice is enabled.
+
+Four focused tests in `tests/test_v3_furniture_contact.py` pass. They cover the
+actual callback C under address/undefined-behaviour sanitizers, source helper
+mutation rejection, complete native dependencies, both floor results, malformed
+records, preparation bounds, null owners, source-step timing, actor guards, and
+unchanged saved fields. The first preparation and sanitizer run pass without
+a fixture retry. A second preparation adds the source-file receipt; it is not
+another cartridge test. Native MIPS execution, ordinary room interaction, GPU
+appearance, and hardware remain untested for this category. There is no new
+emulator fixture, audio playback, or replay of old builds.
+
+ABI 180, its ROM hash, 141 choices, 27 inactive profiles, saved format 3, and
+main lock remain unchanged. Both stable website deployments are untouched.
+The existing equal/superset save-profile restriction still applies; no new
+save compatibility claim is made by preparation.
+
+Next implement the general additive room-surface category, retaining original
+floors and adding missing donor identities/artwork with their item, catalogue,
+house, sound, and persistence readers. Connect complete floor bindings to this
+prepared lifecycle, then enable eligible furniture through the ordinary importer.
+Continue other shared categories independently; gold-tree completion follows
+the primary importing work.
+
 ## Shared start-disabled placement and import
 
 ABI 180 is `build/v3-start-disabled-imports-01/cartridge/build-lock.json`.

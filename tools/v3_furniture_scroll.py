@@ -383,6 +383,12 @@ def encode_lifecycles(rows):
     for r in rows:
         index,mode,flags=r['runtime_index'],r['mode'],r['flags']
         sound,on,off,maximum,step=(r[k] for k in ('sound','on','off','maximum','step'))
+        if mode==3:
+            if (not 1024<=index<2048 or any((flags,sound,maximum,step)) or
+                    not 0<=on<128 or not 0<=off<128 or on==off):
+                raise ValueError('Invalid complete contact/floor lifecycle record')
+            data.extend(struct.pack('>HBBHHHBB',index,mode,flags,sound,on,off,maximum,step))
+            continue
         if (not 1024<=index<2048 or mode not in (1,2) or flags not in (0,1) or not 68<=sound<96 or
                 bool(on)!=bool(off) or not 0<=on<128 or not 0<=off<128 or
                 mode==1 and any((flags,on,off,maximum,step)) or mode==2 and not 0<step<=maximum<=255):
@@ -494,7 +500,9 @@ def publish(equipment,blob,output):
             ('sha256' in packet and sha256(blob[at:at+BYTES])!=packet['sha256'])):
         raise ValueError('Changed complete scroll packet storage')
     lifecycle=bool(runtime.get('lifecycle_rows'))
-    code,compiled=compile_part('room_scroll',output/'room_scroll',defines=('AF_V3_ROOM_SCROLL_LIFECYCLE=1',) if lifecycle else ())
+    defines=('AF_V3_ROOM_SCROLL_LIFECYCLE=1',) if lifecycle else ()
+    if any(r['mode']==3 for r in runtime.get('lifecycle_rows',[])):defines+=('AF_V3_ROOM_CONTACT=1',)
+    code,compiled=compile_part('room_scroll',output/'room_scroll',defines=defines)
     table=tables(runtime);data=code.ljust(TABLE-RAM,b'\0')+table
     entry=compiled['symbols']['af_v3_room_scroll_dw']
     if len(code)>TABLE-RAM or len(data)!=BYTES or entry!=RAM or not zlib.crc32(data):
@@ -642,7 +650,7 @@ def install(base,prior,blob,core,original,output,directories):
     return result,{}
 
 
-SOURCES=('tools/v3_furniture_scroll.py','tools/v3_furniture_pipeline.py','tools/v3_furniture_art.py',
+SOURCES=('tools/v3_furniture_scroll.py','tools/v3_furniture_contact.py','tools/v3_furniture_pipeline.py','tools/v3_furniture_art.py',
     'tools/v3_furniture_install.py','tools/v3_registry.py','tools/v3_asset_loader.py','tools/v3_tent_model.py',
     'tools/v3_room_rig_runtime.py','tools/v3_sound_programs.py','overlays/v3/room_scroll.c','overlays/v3/room_scroll.h','overlays/v3/room_scroll.ld',
     'overlays/v3/room_materials.c','overlays/v3/room_materials.h','overlays/v3/room_rigs.c',

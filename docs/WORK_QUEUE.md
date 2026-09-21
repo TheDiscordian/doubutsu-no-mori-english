@@ -22,12 +22,20 @@ installed initializer into a small isolated arena, not an ordinary room.
 Retain the passing ABI-178 fade/audio-dispatch evidence and ABI-180 placement
 results; do not replay old builds or unchanged renderer/audio tests.
 
-Next continue general contact/floor, material, and rigged-material categories.
-The mower's complete prepared graphics still need grass-state updates from
-`aMR_GetContactInfoLayer1`, floor identity, and push state. Source
-`ac_nog_lawnmower.c` accepts backyard lawn/daisy meadow, back contact, and four
-push states; it eases alpha with source `add_calc` parameters `.04/.1/.001`.
-Bind the actual native contact/floor consumers and preserve full source timing.
+Next complete general additive room-surface imports. Contact/floor callbacks
+are source-bound and compiled, with four focused host/source checks passing.
+Their preparation identifies a missing floor, not an unfinished grass-alpha
+formula: GameCube backyard lawn (26) replaces a different N64 old plank floor.
+Preserve that native floor and add the donor surface under a stable new identity.
+Daisy meadow (48) already matches completely. Inspect the shared floor item,
+catalogue, house, saved-room, artwork, and sound readers before extending their
+bounds; do not replace native slot 26 or silently omit this source condition.
+Then connect the prepared contact lifecycle to ordinary profile installation
+through complete floor bindings. Reuse the source/native consumer checks and
+completed mower graphics. Native callback execution is still pending, not passed.
+The existing ABI-180 proposal and 141 choices remain unchanged by preparation.
+Continue material and rigged-material categories alongside unresolved unique
+behaviours; the floor dependency must not stall unrelated importing.
 Other material callbacks/acquisition routes and ordinary gameplay/save checks
 remain required. Gold-tree leaf/cut effects and full golden-shovel acquisition
 follow primary importing. Keep both stable website deployments unchanged until

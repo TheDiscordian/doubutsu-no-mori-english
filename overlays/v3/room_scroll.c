@@ -121,6 +121,13 @@ static const RoomScrollLife *life_find(u32 index) {
     for (u32 i=0;i<room_scroll_lives->count;++i) {
         const RoomScrollLife *r=room_scroll_lives->rows+i;
         if (r->index!=index) continue;
+#ifdef AF_V3_ROOM_CONTACT
+        if (r->mode==3) {
+            if (index<1024 || index>=2048 || r->flags || r->sound || r->maximum || r->step ||
+                    r->on>=128 || r->off>=128 || r->on==r->off) return 0;
+            return r;
+        }
+#endif
         if (index<1024 || index>=2048 || r->mode<1 || r->mode>2 || r->flags>1 ||
                 r->sound<68 || r->sound>=96 ||
                 (r->on ? (!r->off || r->on>=128 || r->off>=128) : r->off!=0)) return 0;
@@ -134,6 +141,9 @@ static const RoomScrollLife *life_find(u32 index) {
 void af_v3_room_scroll_ct(RoomScrollActor *actor,u8 *data) {
     (void)data;
     const RoomScrollLife *r=actor ? life_find(actor->index) : 0;
+#ifdef AF_V3_ROOM_CONTACT
+    if (r && r->mode==3) { actor->colour.f=0.0f;return; }
+#endif
     if (!r || r->mode!=2) return;
     actor->private_switch=actor->saved_switch==1;
     actor->colour.f=actor->private_switch ? (float)r->maximum : 0.0f;
@@ -143,6 +153,21 @@ void af_v3_room_scroll_mv(RoomScrollActor *actor,void *room,RoomRigGame *game,u8
     (void)room;(void)game;(void)data;
     const RoomScrollLife *r=actor ? life_find(actor->index) : 0;
     if (!r) return;
+#ifdef AF_V3_ROOM_CONTACT
+    if (r->mode==3) {
+        if (!(actor->colour.f>=0.0f && actor->colour.f<=1.0f)) return;
+        float target=0.0f;
+        RoomContactClip *clip=room_contact_clip;
+        int floor=room_contact_floor;
+        if (clip && clip->owner && (floor==r->on || floor==r->off) &&
+                actor->state>=1 && actor->state<=4 && clip->owner->direction==0) target=1.0f;
+        /* Two real source steps preserve both exponential easing and the
+           minimum-step tail. Doubling a single fraction changes that timing. */
+        for (u32 half=0;half<2;++half)
+            if (actor->colour.f!=target) add_calc(&actor->colour.f,target,0.04f,0.1f,0.001f);
+        return;
+    }
+#endif
     int audible=actor->state<12 || actor->state>15;
     if (r->mode==1) {
         if (audible) sAdo_OngenPos((u32)(uptr)actor,(u8)r->sound,actor->position);

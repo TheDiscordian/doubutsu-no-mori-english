@@ -1225,8 +1225,8 @@ def main():
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--select', action='append', default=[], help='Canonical donor ID; defaults to all supported new furniture')
     parser.add_argument('--category', help='Restrict to a discovered shared category, without an item list')
-    parser.add_argument('--representation', choices=('furniture','handheld','scenery','audio','rewards'), default='furniture',
-                        help='Discover furniture, held equipment, scenery, audio, or shared reward dependencies')
+    parser.add_argument('--representation', choices=('furniture','handheld','scenery','audio','rewards','lifecycle'), default='furniture',
+                        help='Discover furniture, held equipment, scenery, audio, reward, or lifecycle dependencies')
     parser.add_argument('--assets-only', action='store_true',
                         help='convert only: prepare artwork even when metadata/acquisition is unsupported; never install')
     parser.add_argument('--base-lock', type=Path, default=ROOT/'config/v3-import-build.json')
@@ -1236,6 +1236,8 @@ def main():
     if args.assets_only and args.command != 'convert': parser.error('--assets-only requires convert')
     if args.representation=='audio' and args.command!='convert':
         parser.error('Audio preparation requires convert --assets-only; dispatch/allocation integration is unfinished')
+    if args.representation=='lifecycle' and (args.command!='convert' or not args.assets_only):
+        parser.error('Lifecycle preparation requires convert --assets-only; missing dependencies remain explicit')
     if args.category and args.command == 'scan': parser.error('--category requires convert or import')
     if args.reuse_assets and (args.command=='scan' or args.representation!='furniture'):
         parser.error('--reuse-assets requires furniture convert or import')
@@ -1282,6 +1284,12 @@ def main():
     from v3_room_rig_runtime import bind_profiles
     bind_profiles(source,base,base_report)
     installed = [int(r['id'].rsplit('/',1)[1],16) for r in base_report['furniture']['imports']+[base_report['speed_bag']]]
+    if args.representation=='lifecycle':
+        from v3_furniture_contact import prepare_batch
+        report=prepare_batch(source,base,scan(source,worksheet,installed),output,args.select,args.category)
+        print(json.dumps(dict(lifecycles=len(report['rows']),complete_dependencies=report['complete_dependencies'],
+            code_bytes=report['code']['bytes'],runtime_installed=False)))
+        return
     if args.representation=='audio' and args.command=='convert':
         from v3_sound_programs import prepare_furniture_audio
         report=prepare_furniture_audio(base,base_report,source,scan(source,worksheet,installed),

@@ -67,5 +67,22 @@ extern RoomScrollLives af_v3_test_room_scroll_lives;
 #endif
 extern void sAdo_OngenPos(u32,u8,float *);
 extern void sAdo_OngenTrgStart(u32,float *);
+#ifdef AF_V3_ROOM_CONTACT
+/* The contact getter resolves the current room through the native clip. A
+   null preview room argument is not evidence that this global owner exists. */
+typedef struct { u8 before_direction[0x1A0]; int direction; } RoomContactOwner;
+typedef struct { RoomContactOwner *owner; } RoomContactClip;
+ROOM_CHECK(RoomContactOwner,direction,0x1A0);
+#ifdef __mips__
+#define room_contact_clip (*(RoomContactClip *volatile *)0x80136F2Cu)
+#define room_contact_floor (*(volatile signed char *)0x80137655u)
+#else
+extern RoomContactClip *af_v3_test_contact_clip;
+extern signed char af_v3_test_contact_floor;
+#define room_contact_clip af_v3_test_contact_clip
+#define room_contact_floor af_v3_test_contact_floor
+#endif
+extern float add_calc(float *,float,float,float,float);
+#endif
 #endif
 #endif

@@ -18,6 +18,23 @@ served patchers retain their existing builds.
 
 ## Active development
 
+Shared contact/floor lifecycle preparation is available through the ordinary
+pipeline's `lifecycle` representation. Complete source callbacks, easing
+constants, contact helpers, six native consumer/owner functions, and complete
+floor artwork are checked. The shared native callback compiles to 3,612 bytes
+within the existing 4-KiB scroll-code reservation; four focused host/source
+checks pass, including memory-safety sanitizers. It is prepared, not installed
+in a cartridge, and native execution remains unverified.
+
+The mower exposes an actual additive floor dependency: GameCube backyard lawn
+at index 26 is not N64 old plank floor at index 26. Daisy meadow at index 48
+matches completely. The importer refuses the numerical alias and keeps the
+mower unavailable until the missing floor has its own additive runtime support.
+Next extend the general room-surface pipeline to preserve existing floors while
+adding donor-only identities, then bind the prepared contact category. Do not
+reconvert the mower's completed graphics. See the
+[contact/floor checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-contact-and-floor-lifecycle-preparation).
+
 The current explicit proposal is ABI 180 at
 `build/v3-start-disabled-imports-01/cartridge/build-lock.json`. Shared native
 fresh-placement handling applies the source start-disabled flag to imported

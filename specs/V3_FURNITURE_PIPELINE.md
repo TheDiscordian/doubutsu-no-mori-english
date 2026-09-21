@@ -266,6 +266,44 @@ native placement binding as well as its complete move/draw/audio callbacks.
 It uses its source C-stock acquisition and supports catalogue reordering.
 The mower's separate contact/floor-driven state remains unfinished.
 
+#### Shared contact and floor lifecycle preparation
+
+`convert --assets-only --representation lifecycle --category contact-floor-alpha`
+uses the current explicit build lock and discovers complete source callback
+shapes, not item IDs. The preparation report retains source constructor, move,
+draw, contact getter, easing helper, all constants, both floor predicates, and
+the actual four push states. It compiles the shared renderer/lifecycle module
+with contact support without changing a cartridge or enabling a parent.
+
+The native callback maps source alpha at `834` to private float `1A4`. Its
+constructor clears only that float; it adds no destructor or saved state. Move
+resolves the nullable native room clip at `80136F2C`, its owner at offset zero,
+and first-layer contact direction at owner `178+28`. Signed floor identity comes
+from `80137655`. Back contact and states one through four set target one only
+for the two completely bound floor records; otherwise target is zero. Two
+source `add_calc` updates per native frame preserve `.04/.1/.001` easing and its
+minimum-step tail. NaN/out-of-range actor values reject without writes. The
+native helper at `8009A570` retains its complete verified implementation.
+
+The category fits the existing 12-byte lifecycle record as mode three: the two
+16-bit fields used for click IDs by mode two hold native floor indices. Flags,
+sound, maximum, and step must be zero; floor indices must be distinct in `0..127`.
+There is no missing-floor sentinel and no numerical fallback. Complete contact
+support compiles within the existing 4-KiB code allowance and adds no heap or
+fixed RAM. Without its compile-time definition, existing callbacks are unchanged.
+Ordinary profile binding still refuses this category until complete surface
+dependencies and installation are connected.
+
+Floor binding compares every decoded pixel of the complete converted donor
+surface against the native room-floor bank. Zero matches require an additive
+surface import; multiple matches require identity resolution. An equal numeric
+index is not evidence. GameCube backyard lawn at 26 has no native artwork match:
+native 26 is old plank floor, independently recorded in the translation catalogue.
+Daisy meadow at 48 matches all 16,384 pixels. The prepared mower remains inactive
+until both source floor identities have complete native bindings. Missing room
+surfaces need the general item/artwork/house/catalogue/save pipeline, not a
+special-case mower substitution or replacement of original content.
+
 #### Shared initial-switch placement
 
 The complete donor `aMR_SetSwitchStepData` supplies the start-disabled rule.

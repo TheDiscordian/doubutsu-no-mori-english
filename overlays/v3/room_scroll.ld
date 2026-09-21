@@ -5,6 +5,7 @@ osWritebackDCache = 0x8002FE00;
 af_v3_room_debug = 0x80138E50;
 sAdo_OngenPos = 0x800D1D08;
 sAdo_OngenTrgStart = 0x800D1D58;
+add_calc = 0x8009A570;
 SECTIONS {
     . = 0x804BA000;
     .text : { *(.text.af_v3_room_scroll_dw) *(.text .text.*) }
