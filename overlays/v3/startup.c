@@ -118,7 +118,10 @@ int af_v3_startup(void) {
     if (execute() != 1) return 0;
 #ifdef AF_V3_FURNITURE_TABLES
 #ifdef __mips__
-    if (((int (*)(void))0x8046A000u)() != 1) return 0;
+#ifndef AF_V3_FURNITURE_INIT
+#define AF_V3_FURNITURE_INIT 0x8046A000u
+#endif
+    if (((int (*)(void))AF_V3_FURNITURE_INIT)() != 1) return 0;
 #else
     extern int af_v3_furniture_tables_init(void);
     if (af_v3_furniture_tables_init() != 1) return 0;

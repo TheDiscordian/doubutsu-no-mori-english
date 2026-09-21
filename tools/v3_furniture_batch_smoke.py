@@ -1611,6 +1611,7 @@ def exercise(debug, rom_path, record, *, section='automatic_furniture'):
     if section=='initial_switch':return initial_switch(debug,rom_path,record)
     if section=='room_surfaces':return room_surfaces(debug,rom_path,record)
     if section=='surface_consumers':return surface_consumers(debug,rom_path,record)
+    if section=='surface_items':return surface_items(debug,rom_path,record)
     if section=='furniture_audio':return furniture_audio(debug,rom_path,record)
     if section in ('scenery_planting_sparkle','scenery_planting_sparkle_remaining'):
         from v3_scenery_smoke import planting_sparkle
@@ -2644,6 +2645,70 @@ def held_level_sound(debug,rom_path,record):
         native_volume_pause_fade_pan_reverb=True,native_actor_registration_and_expiry=True,
         physical_audio_played=False,pcm_or_listening_verified=False,ordinary_gameplay_tested=False,
         flash_written=False,requires_checkpoint_restore=True)
+
+
+def surface_items(debug,rom_path,record):
+    """Live installed startup/name/type/price paths, without enabling gameplay."""
+    from v3_surface_items import RAM,SIZE,BOOT_END
+    path=Path(rom_path);image=path.read_bytes();report=json.loads((path.parent/'build.json').read_bytes())
+    if sha256(image)!=report['output_sha256']:raise ValueError('Changed surface-item cartridge')
+    items=report['room_surfaces']['items'];files=by_vrom(image);blob=files[runtime.BLOB].extract(image)
+    packet=blob[items['blob_offset']:items['blob_offset']+SIZE];boot=boot_proofs(image);assertions=0
+    def check(label,at,want):
+        nonlocal assertions
+        got=debug.read_memory(at,len(want));passed=got==want
+        record(dict(surface_item_check=label,address=f'{at:08X}',bytes=len(want),
+            assertion='passed' if passed else 'failed',actual=got.hex() if len(got)<=16 else sha256(got)))
+        if not passed:raise ValueError('Surface-item native mismatch: '+label)
+        assertions+=1
+    def call(at,args=(),want=None):
+        nonlocal assertions
+        result=debug.call(f'{at:08X}',list(args),return_address=MODULE_RAM+0x6480,verified_code=boot.get(at))
+        record(result)
+        if want is not None:
+            passed=result['return_value']==want
+            record(dict(surface_item_return=f'{at:08X}',expected=want,actual=result['return_value'],
+                assertion='passed' if passed else 'failed'))
+            if not passed:raise ValueError('Surface-item native return mismatch')
+            assertions+=1
+        return result['return_value']
+    check('complete new packet loaded by real startup',RAM,packet)
+    check('existing equipment guard retained',BOOT_END,bytes.fromhex('AF48C0DE')*4)
+    allocation=call(0x8009BFC0,[128])
+    if allocation&15 or not MODULE_RAM+0x8000<=allocation<=0x80400000-128:
+        raise ValueError('Surface-item fixture allocation failed')
+    fill=b'\xA5'*128;state=report['save_runtime'];saved=debug.read_memory(state['state_ram'],state['state_bytes'])
+    try:
+        for row in (items['rows'][0],items['rows'][-1]):
+            item=int(row['item_id'],16);debug.write_memory(allocation,fill)
+            call(0x801969C8,[allocation+16,16,item],0)
+            call(0x800A5630,[item],0);call(0x800C0194,[item],0)
+            check('disabled identity writes no name',allocation,fill)
+        for row in items['rows']:
+            item=int(row['item_id'],16);flag=RAM+row['offset']+4
+            debug.write_memory(flag,struct.pack('>I',1));debug.write_memory(allocation,fill)
+            call(0x801969C8,[allocation+16,16,item],1)
+            call(0x800A5630,[0x12340000|item],12)
+            call(0x800C0194,[0x12340000|item],row['price_word'])
+            check('complete official name and untouched guards',allocation,
+                fill[:16]+row['name'].encode().ljust(16,b' ')+fill[32:])
+            debug.write_memory(flag,bytes(4))
+        debug.write_memory(allocation,fill)
+        native_names=files[0x2A00000].extract(image);index=sum((64,4,36,32,255,30))
+        name=native_names[32+index*16:48+index*16]
+        call(0x801969C8,[allocation+16,16,0x2600],1);call(0x800A5630,[0x2600],12)
+        check('original floor keeps its complete English name',allocation,fill[:16]+name+fill[32:])
+        for item in (0x2640,0x2648,0x264E,0x27FF):
+            call(0x800A5630,[item],0);call(0x800C0194,[item],0)
+        check('complete surface packet restored',RAM,packet)
+        check('saved profile and ownership retained',state['state_ram'],saved)
+        check('no CPU fault',0x8003CE34,bytes(4))
+    finally:
+        for row in items['rows']:debug.write_memory(RAM+row['offset']+4,bytes(4))
+        call(0x8009C040,[allocation])
+    return dict(native_surface_items=True,assertions=assertions,actual_startup_and_public_entries=True,
+        fixture_only_enabled_records=True,ordinary_acquisition_tested=False,surface_application_tested=False,
+        saved_format_changed=False,flash_written=False,physical_audio_played=False,requires_checkpoint_restore=True)
 
 
 def surface_consumers(debug,rom_path,record):

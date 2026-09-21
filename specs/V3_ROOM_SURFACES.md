@@ -7,9 +7,10 @@ GameCube floor/wall banks, preserves existing N64 identities, converts missing
 surfaces in a batch, and retains their names, prices, catalogue order, acquisition
 lists, and floor-sound selectors. The shared runtime installer connects complete
 artwork to player-room/shop double-buffer readers, single-buffer arranged rooms,
-and catalogue previews. Item actions, persistence, acquisition, and browser
-composition remain required. No surface is selectable merely because its
-artwork is installed.
+and catalogue previews. Shared full-name, price, and item-category readers use
+the same ten identities. Item actions, persistence, acquisition, and browser
+composition remain required. All new item records remain disabled; installed
+artwork and metadata do not make a surface selectable.
 
 Use the current explicit experimental lock; keep the main lock and both stable
 website deployments unchanged:
@@ -173,7 +174,7 @@ constructor, ordinary room entry, GPU draw, item use, or save/restart.
 
 ## Runtime integration queue
 
-1. Connect full item IDs to names, pricing, inventory actions, catalogue lists,
+1. Connect full item IDs to inventory actions, catalogue lists,
    ownership, and the existing optional-profile/save validation.
 2. Connect floor/wall application, removal, saved home identity, and reload;
    retain existing home flags and native surface behaviour. Keep imports optional.
@@ -190,3 +191,45 @@ constructor, ordinary room entry, GPU draw, item use, or save/restart.
 Do not replay unchanged rendering or earlier cartridge tests for preparation.
 Native execution, in-game appearance, ordinary transactions, save/restart, and
 hardware acceptance remain separate from source and converted-resource checks.
+
+## Shared item names, prices, categories, and startup
+
+`tools/v3_surface_items.py` consumes the complete installed surface records. It
+retains each full sixteen-byte official name and complete unsigned price word
+under its stable destination. Both native category tables independently contain
+64 entries of category 12; their complete contents and pointer bounds are checked.
+Missing indices 64–72 and 78–255 in either surface group cannot fall through to
+the native unchecked category-table access. Original 0–63 indices retain the
+prior native/imported item dispatch chains. Name arguments retain their full
+width; type/price arguments narrow to sixteen bits like their native entries.
+
+The 4-KiB permanent packet at `804BC000..804BCFFF` follows the existing scrolling
+packet and ends below the model pool at `80500000`. Its 488-byte reader code has
+24-byte stack frames. The `AFSI` metadata header at `804BC800` carries version 1,
+count 10, and stride 24. Each row stores item/price halfwords, one enable word,
+and sixteen name bytes. Only enable word 1 is accepted; all proposal records
+contain zero. The complete packet ends with four `AF5351DE` guard words.
+There is no new heap, actor, scene, profile, or saved-state allocation.
+
+A 128-byte bootstrap occupies `804A8D40..804A8DBF`, in the checked unused gap
+after parent metadata and before the retained equipment guard at `804A8FF0`.
+It performs real DMA, checks the entire new packet's CRC, flushes caches, and
+then calls the original furniture-table initialiser at `8046A000`. A compile-time
+startup target selects this chain; the complete startup remains 960/992 bytes.
+DMA/checksum failure does not mark startup installed or run the remaining init.
+The equipment packet's full hash and startup CRC are updated; its size is unchanged.
+
+The public name/type/price entries at `801969C8`, `800A5630`, and `800C0194`
+call the new wrappers. Non-extended items delegate to the exact previous entries
+`80467300`, `804AA000`, and `80467574`. Existing display aliases, clothing,
+equipment categories, and full furniture readers are not replaced. Future
+category updates must preserve these outer hooks and the startup chain.
+
+Actual C and bootstrap failure cases pass memory-safety sanitizer checks. The
+bounded native probe verifies the complete packet loaded by ordinary startup,
+actual public entries, all ten names/prices under temporary fixture enable flags,
+disabled and invalid IDs, original-floor name/category, complete restored packet,
+guards, and unchanged saved extension. It restores an emulator checkpoint; it
+does not establish room application, acquisition, ordinary save/restart, or
+hardware operation. Optional profile/save validation must replace the disabled
+state before any surface is offered for selection.

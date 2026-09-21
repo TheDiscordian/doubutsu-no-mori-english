@@ -12,15 +12,17 @@ After the primary importing work, finish gold-tree leaf/cut effects and the full
 golden-shovel acquisition route. This is deferred required V3 work, not a dropped
 feature or a separate release goal.
 
-The current explicit proposal is ABI 182 at
-`build/v3-surface-consumers-runtime-01/build-lock.json`. All ten prepared
-floor/wall objects have shared room/shop, catalogue-preview, and arranged-room
-readers. Five focused checks and the first silent consumer run with 24 internal
-assertions pass. Catalogue rebuilds retain the preview code; arranged-room bounds
-accept additions and preserve invalid-index fallback. The accepted room/shop
-checks remain valid without replay. Ordinary room entry, GPU appearance, surface
-application, and reload remain unverified. No surface is selectable. Continue
-item/action/persistence integration without replaying unchanged texture tests.
+The current explicit proposal is ABI 183 at
+`build/v3-surface-items-runtime-03/build-lock.json`. All ten floor/wall objects
+have shared texture consumers and complete official names, price words, and
+native item-category readers. Four focused checks and the first silent native
+item run with 64 internal assertions pass. Actual startup/public entries, all ten
+names/prices, disabled/invalid IDs, original-item fallback, memory guards, and
+saved state are covered. No surface is selectable; all ten enable flags remain
+zero in the proposal. The 4-KiB packet at `804BC000` follows the scroll packet
+and ends before the model pool. Its 128-byte bootstrap uses an existing checked
+equipment gap; startup occupies 960 of 992 bytes. Retain passing unchanged
+texture evidence rather than replaying it.
 
 The shared start-disabled placement adapter and ordinary sprinkler import are complete.
 Source C-stock acquisition and catalogue reordering are installed. Existing
@@ -40,10 +42,13 @@ application/persistence need a real extension, not just larger texture bounds.
 Use `specs/V3_ROOM_SURFACES.md` for the shared reader/action/save integration order.
 Catalogue preview (`03970000`, linked `808A6100`) and arranged NPC rooms
 (`00845C40`, linked `80950E50`) use the separate added resource banks, preserving
-original resources and native preview geometry. Next connect complete surface
-item identities to names/prices, inventory actions, catalogue ownership, and
-saved room application. Preserve the six-bit native home fields until all
+original resources and native preview geometry. Next connect inventory actions,
+catalogue ownership, and saved room application. Preserve the six-bit native home fields until all
 readers/writers and their unrelated flags are accounted for.
+The installed name/type/price hooks wrap the existing native public entries and
+retain their prior complete chains. Keep those outer hooks and the bootstrap
+when extending category readers. Replace the disabled item metadata with actual
+optional-profile validation only when application/persistence is complete.
 
 Contact/floor callbacks
 are source-bound and compiled, with four focused host/source checks passing.
@@ -69,8 +74,8 @@ the user's testing and explicit approval.
 There are 141 experimental choices and 27 inactive profiles. Saved format 3 is
 unchanged; profiles selecting sprinkler require a build containing its ID.
 Missing-ID/removed-selection restrictions remain. Permanent audio has 32
-conservative bytes spare and the import blob has 1,789,168 bytes free.
-No additional resident/scene RAM is allocated. Ordinary room interaction, full sample synthesis, GPU
+conservative bytes spare and the import blob has 1,785,072 bytes free.
+Surface item readers add 4 KiB of resident RAM and no scene allocation. Ordinary room interaction, full sample synthesis, GPU
 appearance, and hardware verification remain unclaimed. No physical audio is
 played.
 

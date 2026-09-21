@@ -1,5 +1,69 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared surface item metadata and startup
+
+The current explicit proposal is ABI 183 at
+`build/v3-surface-items-runtime-03/build-lock.json`:
+
+```sh
+python3 tools/v3_furniture_install.py --refresh-runtime \
+  --base-lock build/v3-surface-consumers-runtime-01/build-lock.json \
+  --room-surfaces-art build/v3-room-surfaces-prepared-02 \
+  --output build/v3-surface-items-runtime-03
+```
+
+All ten official full names, unsigned price words, and stable item identities use
+one new shared category adapter. The original 64-entry floor/wall type tables
+establish category 12. Public name/type/price hooks preserve existing original,
+clothing, equipment, and furniture chains. Disabled or missing surface IDs do
+not reach the native unchecked type table. All ten proposal enable flags are
+zero; actions, catalogue ownership, room application/persistence, acquisition,
+sound/scoring, and optional-profile selection remain incomplete.
+
+The 488-byte reader and complete metadata occupy a new 4-KiB resident packet at
+`804BC000`, below the existing model pool. A 128-byte checked loader uses the
+unused existing equipment gap at `804A8D40`; the preceding parent metadata and
+following guard remain intact. It loads and verifies the packet before calling
+the original table initialiser. Startup occupies 960 of its 992-byte allowance.
+No actor/scene allocation, artwork, saved state, profile, or choice grows. The
+blob is 4,506,384 bytes with 1,785,072 bytes free. Saved format 3, 141 choices,
+27 inactive furniture profiles, and equal/superset restrictions remain unchanged.
+
+Four focused tests in `tests/test_v3_surface_items.py` pass in 5.021 seconds:
+complete metadata/code/guard installation and mutation rejection; checked
+bootstrap storage and public hooks; actual reader/loader C under address and
+undefined-behaviour sanitizers, including DMA/CRC/init failure paths; retained
+artwork/owners/save profiles, exact empty/all composition, and UPS reconstruction.
+
+The first silent native run, `build/v3-surface-items-native-01/`, passes 126
+records and 64 internal assertions. Real startup loads the complete packet;
+actual public item functions return every complete official name and price when
+the fixture temporarily enables that record. Disabled/missing IDs reject,
+original floor naming/category remains intact, all writes stay within guards,
+and saved profile/ownership bytes are retained. The complete packet is restored,
+then the emulator checkpoint restores and shutdown is clean. No existing save
+or physical audio is used. No retry or unchanged rendering replay is needed.
+This is not ordinary acquisition, room application, save/restart, or hardware proof.
+
+The first build stops at report generation because the new path lacks its source
+module binding; it emits no final cartridge. `runtime-02` fixes that binding and
+receives the focused/native checks. `runtime-03` refreshes complete installer
+source hashes in the receipt. Its entire ROM, UPS, startup, runtime records,
+equipment packet, and saved state match the tested output; this is checked
+directly, and native execution is not repeated for receipt-only changes.
+
+- ROM SHA-256: `4028c8d5548d7d86265f374c4e76f0a709b751671cf7505644782924c6fed9a9`.
+- UPS SHA-256: `dbb3d5f3909994f94c7f27fe340361d14a44151d0d3492a4689599155081e1cf`.
+- Current receipt SHA-256: `9e8332d046a85c223335d0263c055e24cebfe14d0b3caec73ad89a75d104a42c`.
+- Native results SHA-256: `0f7dd0e2cbeb4f76b9853bacc5e34098ccb625ddcd28059b775a2aa04ab83817`.
+
+The main ABI-109 lock and both deployments of the one stable web patcher remain
+unchanged. No new cross-version save or ordinary reload claim is made. Next
+connect inventory actions, catalogue ownership, and full saved room identities;
+then genuine acquisition, floor sounds/scoring, and private optional composition.
+Do not replay the accepted texture/readers while those consumers are unchanged.
+Gold-tree completion remains required after primary imports.
+
 ## Shared catalogue and arranged-room surface readers
 
 ABI 182 is `build/v3-surface-consumers-runtime-01/build-lock.json`, built with:

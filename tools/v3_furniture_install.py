@@ -646,7 +646,9 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         equipment_report,owner_changes=equipment.install(base,prior,blob,core,original,output,scrolling_materials_art)
     elif room_surfaces_art is not None:
         import v3_surface_runtime as surfaces
-        owner_changes,report_updates=surfaces.install(base,prior,blob,core,original,output,room_surfaces_art)
+        import v3_surface_items as equipment
+        owner_changes,report_updates=surfaces.install(base,prior,blob,core,original,output,room_surfaces_art,module=module)
+        equipment_report=report_updates.get('equipment_resources')
     elif held_selection:
         import v3_held_catalogue as equipment
         equipment_report,owner_changes,report_updates=equipment.select_installed(prior,blob)
@@ -749,6 +751,10 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         defines+=(f'AF_V3_EQUIPMENT_VROM=0x{equipment_report["vrom"]:08X}u',
                   f'AF_V3_EQUIPMENT_CRC=0x{equipment_report["crc32"]:08X}u',
                   f'AF_V3_EQUIPMENT_BYTES=0x{equipment_report["bytes"]:X}u')
+    surface_items=report_updates.get('room_surfaces',{}).get('items')
+    if surface_items:
+        defines=tuple(f for f in defines if not f.startswith('AF_V3_FURNITURE_INIT='))
+        defines+=(f'AF_V3_FURNITURE_INIT=0x{surface_items["bootstrap"]["ram"]:X}u',)
     startup,startup_report=compile_part('startup',output/'startup',defines=defines)
     if (sha256(module[STARTUP:STARTUP+old['bytes']])!=old['sha256']
             or any(module[STARTUP+old['bytes']:CONFIG]) or len(startup)>CONFIG-STARTUP):
@@ -841,7 +847,7 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         report['shared_runtime_refresh'].update(adapters=['room_surfaces'],
             artwork_changed=not bool(prior.get('room_surfaces')),resource_allocations_changed=True,resource_tail_reuse=reused,
             unchanged_owner_moves=moved,changed_owner_moves=owner_moves,
-            in_place_owner_updates=owner_updates,additional_resident_bytes=0)
+            in_place_owner_updates=owner_updates,additional_resident_bytes=(surface_items or {}).get('additional_resident_bytes',0))
         report['sources'].update(report['room_surfaces']['sources'])
         report['native_test']='pending additive room/shop surface reader execution; actions, saves, and selection remain incomplete'
     if equipment_report:
@@ -854,6 +860,9 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             unchanged_owner_moves=moved,changed_owner_moves=owner_moves,
             in_place_owner_updates=owner_updates,
             additional_resident_bytes=equipment_report['bytes']-prior.get('equipment_resources',{}).get('bytes',0))
+        if surface_items:
+            report['shared_runtime_refresh'].update(adapters=['room_surfaces','surface_items'],
+                additional_resident_bytes=surface_items['additional_resident_bytes'])
         if player_motion:
             report['shared_runtime_refresh']['adapters'].append('player_motion')
         if equipment_kinds:
@@ -924,6 +933,8 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             report['native_test']='pending material-frame renderer native execution and GPU appearance; lifecycle/acquisition remain incomplete'
         if scrolling_materials_art is not None:
             report['native_test']='pending scrolling renderer native execution and GPU appearance; lifecycle/acquisition remain incomplete'
+        if surface_items:
+            report['native_test']='pending shared surface item startup/name/type/price execution; application, saves, and selection remain incomplete'
     write_new(output/'animal-forest-v3-asset-loader.z64',result)
     write_new(output/'asset-loader.ups',patch)
     write_new(output/'build.json',(json.dumps(report,indent=2,sort_keys=True)+'\n').encode())
