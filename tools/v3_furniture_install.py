@@ -552,7 +552,8 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
                     held_collection=False, held_catalogue_art=None, held_selection=False, translation_updates=False,
                     room_rigs_art=None, scenery_art=None, scenery_gameplay=False,
                     equipment_rigs=None, expand_storage=False, furniture_audio_art=None, furniture_profiles=None,
-                    material_frames_art=None,scrolling_materials_art=None,room_surfaces_art=None,furniture_scoring=False):
+                    material_frames_art=None,scrolling_materials_art=None,room_surfaces_art=None,furniture_scoring=False,
+                    password_runtime=None):
     """Update shared readers; optionally install the shared held-resource adapter."""
     output=output.resolve()
     if output.exists() or not output.is_relative_to(ROOT/'build'):
@@ -573,9 +574,9 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
     moved=[];equipment_report=None;reused=None;owner_changes={};owner_moves=[];owner_updates=[];report_updates={};text_moves=[]
     equipment_mode=any((equipment_art is not None,equipment_rigs is not None,player_motion,equipment_kinds,player_actions,
                         item_category_art is not None,ground_categories,event_acquisition,held_collection,held_catalogue_art is not None,held_selection,room_rigs_art is not None,scenery_art is not None,scenery_gameplay))
-    resource_mode=equipment_mode or translation_updates or expand_storage or furniture_audio_art is not None or furniture_profiles is not None or material_frames_art is not None or scrolling_materials_art is not None or room_surfaces_art is not None or furniture_scoring
+    resource_mode=equipment_mode or translation_updates or expand_storage or furniture_audio_art is not None or furniture_profiles is not None or material_frames_art is not None or scrolling_materials_art is not None or room_surfaces_art is not None or furniture_scoring or password_runtime is not None
     if sum((equipment_art is not None,equipment_rigs is not None,player_motion,equipment_kinds,player_actions,
-            item_category_art is not None,ground_categories,event_acquisition,held_collection,held_catalogue_art is not None,held_selection,translation_updates,room_rigs_art is not None,scenery_art is not None,scenery_gameplay,expand_storage,furniture_audio_art is not None,furniture_profiles is not None,material_frames_art is not None,scrolling_materials_art is not None,room_surfaces_art is not None,furniture_scoring))>1:
+            item_category_art is not None,ground_categories,event_acquisition,held_collection,held_catalogue_art is not None,held_selection,translation_updates,room_rigs_art is not None,scenery_art is not None,scenery_gameplay,expand_storage,furniture_audio_art is not None,furniture_profiles is not None,material_frames_art is not None,scrolling_materials_art is not None,room_surfaces_art is not None,furniture_scoring,password_runtime is not None))>1:
         raise ValueError('Install shared runtime updates in dependency order')
     if resource_mode:
         blob,reused=reuse_resource_tail(base,prior,old_blob)
@@ -583,7 +584,11 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             raise ValueError('Equipment integration requires the checked shared resource tail')
     parent_readers=bool(player_actions and prior.get('equipment_resources',{}).get('player_actions',{}).get('equipment_selection'))
     wrapped_names=bool(player_actions and prior.get('equipment_resources',{}).get('wrapped_presents'))
-    if furniture_scoring:
+    if password_runtime is not None:
+        import v3_password_runtime as equipment
+        display_report,alias_report=prior['clothing']['display'],prior['display_aliases']
+        equipment_report=equipment.install(base,prior,blob,original,output,password_runtime,lock)
+    elif furniture_scoring:
         import v3_furniture_scoring as scoring_categories
         display_report,alias_report=prior['clothing']['display'],prior['display_aliases']
         owner_changes,report_updates=scoring_categories.install(base,prior,core,module)
@@ -885,6 +890,11 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             unchanged_owner_moves=moved,changed_owner_moves=owner_moves,
             in_place_owner_updates=owner_updates,
             additional_resident_bytes=equipment_report['bytes']-prior.get('equipment_resources',{}).get('bytes',0))
+        if password_runtime is not None:
+            report['shared_runtime_refresh'].update(adapters=['password_runtime'],
+                additional_resident_bytes=equipment_report['passwords']['additional_resident_bytes'])
+            report['sources'].update(equipment_report['passwords']['sources'])
+            report['native_test']='pending linked password engine and lazy loader; Nook input/delivery remain incomplete'
         if surface_items:
             report['shared_runtime_refresh'].update(adapters=['room_surfaces','surface_items'],
                 additional_resident_bytes=surface_items['additional_resident_bytes'])
@@ -985,6 +995,8 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             if report['room_surfaces'].get('optional_selection'):
                 report['shared_runtime_refresh']['adapters'].append('surface_selection')
                 report['native_test']='pending private surface composition/startup; ordinary gameplay/persistence and HomePage/Harvest categories remain incomplete'
+    if password_runtime is not None:
+        report['native_test']='pending linked password engine and lazy loader; Nook input/delivery remain incomplete'
     write_new(output/'animal-forest-v3-asset-loader.z64',result)
     write_new(output/'asset-loader.ups',patch)
     write_new(output/'build.json',(json.dumps(report,indent=2,sort_keys=True)+'\n').encode())
@@ -1046,6 +1058,8 @@ if __name__=='__main__':
         help='With --refresh-runtime, install prepared floor/wall artwork and shared room readers without enabling items')
     parser.add_argument('--furniture-scoring',action='store_true',
         help='With --refresh-runtime, install complete donor themes, names, and source-mapped base-point categories')
+    parser.add_argument('--password-runtime',type=Path,
+        help='With --refresh-runtime, link prepared password rules and live engine bindings without enabling delivery')
     args=parser.parse_args()
     if args.equipment_art and not args.refresh_runtime:parser.error('--equipment-art requires --refresh-runtime')
     if args.equipment_rigs and not args.refresh_runtime:parser.error('--equipment-rigs requires --refresh-runtime')
@@ -1069,6 +1083,7 @@ if __name__=='__main__':
     if args.scrolling_materials_art and not args.refresh_runtime:parser.error('--scrolling-materials-art requires --refresh-runtime')
     if args.room_surfaces_art and not args.refresh_runtime:parser.error('--room-surfaces-art requires --refresh-runtime')
     if args.furniture_scoring and not args.refresh_runtime:parser.error('--furniture-scoring requires --refresh-runtime')
+    if args.password_runtime and not args.refresh_runtime:parser.error('--password-runtime requires --refresh-runtime')
     result=(refresh_runtime(args.output,args.base_lock,equipment_art=args.equipment_art,player_motion=args.player_motion,
                             equipment_kinds=args.equipment_kinds,player_actions=args.player_actions,
                             item_category_art=args.item_category_art,ground_categories=args.ground_categories,
@@ -1079,6 +1094,6 @@ if __name__=='__main__':
                             expand_storage=args.expand_storage,furniture_audio_art=args.furniture_audio_art,
                             furniture_profiles=args.furniture_profiles,material_frames_art=args.material_frames_art,
                             scrolling_materials_art=args.scrolling_materials_art,room_surfaces_art=args.room_surfaces_art,
-                            furniture_scoring=args.furniture_scoring)
+                            furniture_scoring=args.furniture_scoring,password_runtime=args.password_runtime)
             if args.refresh_runtime else build(args.output,args.art,args.base_lock))
     print(json.dumps({k:result[k] for k in ('runtime_abi','output_sha256','patch_sha256')},indent=2))

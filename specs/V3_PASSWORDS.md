@@ -6,7 +6,8 @@ Use the donor's code routes for password rewards instead of placing
 those items in unrelated shop stock. One codec and shared eligibility rules
 serve the category; item records supply identities and selected destinations.
 This does not imply that every decoded item is present in the native game.
-The codec is prepared, not linked. No input UI or gift delivery is installed.
+The codec, eligibility, and selected-import reader are linked in the experimental
+cartridge. No input UI or gift delivery is installed.
 
 The algorithm reference is the pinned CC0 ACreTeam/ac-decomp
 `src/game/m_mail_password_check.c`; Nook's result and handover rules are in
@@ -111,12 +112,76 @@ Valid magazine attempts consume one continuous `[0,100)` game roll, including
 zero/hundred-percent rates; invalid/NaN/out-of-range rolls reject. The explicit
 `result_gives_item` helper excludes invalid, wrong-name, card-e, losing-magazine,
 and cancellation results. None of these functions awards an item or writes
-saved state. The engine accessor, RNG, input, dialogue, and handover are not
-installed merely because their prepared callbacks pass host checks.
+saved state. Prepared callback tests do not establish engine execution. The
+installed native accessor and RNG binding below still need complete native
+execution; input, dialogue, and handover remain absent.
+
+## Linked engine and memory ownership
+
+The ordinary runtime refresh accepts `--password-runtime <prepared-policy-dir>`
+with the checked base lock. It rebinds all source functions/tables and the actual
+import map, verifies the retained donor matrix against its known digest, and
+links the shared modules without changing their donor rules. No native item is
+inferred from equal source/destination numbers. The map must be refreshed when
+the ordinary importer adds supported identities; installation alone does not
+permit enabling password-only acquisition metadata.
+
+The 32-KiB packet occupies `804C0000..804C7FFF`, beyond scenery, room rigs,
+scrolling materials, and the full surface packet, before furniture banks at
+`80500000`. Code begins at `804C0000`; complete codec/policy/map tables begin at
+offsets `2800`, `3000`, and `5000`. The last sixteen bytes are a guard. The
+linker rejects code/table overlaps and mutable compiler-generated data.
+
+The public loader entry is `804B4D00`. Its code and strings must end before the
+cache word at `804B4EF0`. The existing wrapped-present map at `804B4F00` and
+equipment footer at `804B4FF0` stay untouched. The equipment packet retains its
+size: extending it would overwrite the separately loaded scenery owner at
+`804B5000`. Startup reloads the zero cache word. The lazy loader transfers the
+complete packet, verifies CRC, performs data and instruction cache operations,
+and only then publishes its ready value and calls the engine. DMA/CRC failures
+never call the engine. No new ordinary heap allocation is introduced.
+
+`password_runtime.h` defines the frontend contract: one call per submitted
+attempt, exactly 28 ASCII input characters, two eight-byte donor-font names,
+and an output offer. Cancellation uses the source trailing-space sentinel.
+Invalid/cancelled attempts leave the offer untouched. The frontend must latch
+the returned classification rather than invoking it again on every frame.
+The native resolver reads checked one-/four-byte live selection fields. Magazine
+rolls call native `fqrand` at `8002C9AC` and multiply by 100 as the donor does.
+No function in this module writes inventory, a save, or dialogue state.
+
+The single provenance catalogue credits both resource-failure diagnostics to
+the assistant. They are project diagnostics, not translated donor dialogue.
+The installer binds those entries to the actual compiled strings.
+
+## Nook integration bindings
+
+The current cranny owner retains its full native action dispatcher. Verified
+disassembly is generated from the current build lock, not an assumed retail
+ROM, using `tools/disassemble.py --build-lock`. Its action/next-action/function
+fields are `938`, `93C`, and `940`; its actor allocation is `96C` bytes. Do not
+copy the GameCube password fields at `9D8`/`9F8` into that smaller native actor.
+The request-answer action is `809CC654`; setup is `809CDFF4`; per-frame indirect
+action dispatch is at `809CE0AC..809CE0BC`. Native init/update tables are at
+`809CE7E0`/`809CE88C`. Other shop variants require their own checked bindings.
+
+The native submenu opens through `800C4D8C`, with `play + 1CBC` as its submenu.
+Menu completion is read at `play + 1D98`. The cranny's buy-menu wait functions
+at `809CC7E8`, `809CC854`, `809CC8A0`, and `809CC8D0` show the existing message
+hide, open, close, and message-return sequence. These are integration evidence,
+not permission to replace purchasing or to reuse its saved item fields.
+
+The donor request-answer flow also rejects visiting players, full pockets, and
+a common gift count of three. Preserve its actual reset scope; do not assume
+that count is a new daily saved field. The takeout initializer inserts exactly
+one wrapped gift through `mPr_SetFreePossessionItem`, increments that count,
+locks message continuation, and sets the head lock. The following frames create
+the handover actor and transfer ownership. Inventory insertion by itself is not
+the complete delivery, and it must not be repeated in the frame-update action.
 
 ## Required integration
 
-1. Install the prepared source eligibility from `mMpswd_check_present`: Famicom uses
+1. Retain the installed source eligibility from `mMpswd_check_present`: Famicom uses
    its whitelist, user-trade codes use actual tradable stock/price rules, and
    other codes use the source birth/category exclusions and item ranges.
    HomePage lists are evidence of acquisition, not the complete allowed set.
@@ -142,12 +207,12 @@ installed merely because their prepared callbacks pass host checks.
    and unlocks dialogue only after completion. A direct pocket write is not a
    substitute. Handle full pockets, aborted input, disabled selections, and
    repeat conversations without accidental duplicate awards or a dialogue loop.
-7. Link the shared code/data with checked owner/storage/relocation bounds, then
-   run one focused native acquisition batch on the current build. Use isolated
+7. Connect the frontend to the installed shared code/data, respecting its checked
+   bounds, then run one focused native acquisition batch on the current build. Use isolated
    saves. Enable item choices only after graphics, behaviour, real delivery,
    and persistence requirements are met. Preserve translation-only output.
 
-The prepared decoder and encoder are not evidence for installed UI, native
+The linked decoder and encoder are not evidence for installed UI, native
 execution, ordinary gameplay, save/restart, or hardware. Keep the current
 experimental build and both deployments of the one stable patcher unchanged
 until their respective integration and user-approval requirements are met.

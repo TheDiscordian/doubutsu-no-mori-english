@@ -17,8 +17,10 @@ current build lock. It prepares complete donor eligibility, Nook result rules,
 and current import destinations with their live selection-field bindings. The
 source's HomePage furniture is Famicom-only; Mario furniture instead uses birth
 category 34 without ordinary stock membership. An empty `ftr_listMario` must
-not cause this source category to be lost. These packets and callbacks are not
-yet linked; original-item correspondence, display aliases, frontend, and actual
+not cause this source category to be lost. The runtime refresh's
+`--password-runtime <prepared-policy-dir>` links these packets and callbacks,
+including native RNG and live selection access, in a checked lazy-loaded module.
+Original-item correspondence, display aliases, frontend, and actual
 handover remain required. An unavailable destination never becomes a substitute
 item or bypasses the active profile.
 

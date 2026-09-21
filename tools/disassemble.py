@@ -12,7 +12,10 @@ from toolchain import IMAGE, KNOWN_IMAGES
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--rom", type=Path, required=True)
+    source = parser.add_mutually_exclusive_group(required=True)
+    source.add_argument("--rom", type=Path)
+    source.add_argument("--build-lock", type=Path,
+                        help="Inspect a hash-checked, uncomposed V3 development cartridge")
     parser.add_argument("--output", type=Path, default=Path("build/disassembly"))
     parser.add_argument("--vrom", type=lambda x: int(x, 0), default=CODE_VROM)
     parser.add_argument("--ram", type=lambda x: int(x, 0))
@@ -22,7 +25,11 @@ def main():
         if args.vrom != CODE_VROM:
             parser.error("overlay disassembly requires its linked --ram address")
         args.ram = CODE_RAM
-    rom = verified_rom(args.rom.read_bytes())
+    if args.build_lock:
+        from v3_furniture_install import inputs
+        rom, _ = inputs(args.build_lock)
+    else:
+        rom = verified_rom(args.rom.read_bytes())
     out = args.output.resolve()
     out.mkdir(parents=True, exist_ok=True)
     (out/"code.bin").write_bytes(by_vrom(rom)[args.vrom].extract(rom))

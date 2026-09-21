@@ -12,29 +12,40 @@ After the primary importing work, finish gold-tree leaf/cut effects and the full
 golden-shovel acquisition route. This is deferred required V3 work, not a dropped
 feature or a separate release goal.
 
-The common password transform is prepared and donor-verified at
-`build/v3-password-prepared-03/`; its refreshed object/tables match the retained
-verified codec. Shared eligibility, Nook result handling, and a map of all 128
-implemented item imports are prepared at `build/v3-password-policy-prepared-03/`.
-Reuse passing checks while those modules are unchanged. Continue the shared
-acquisition route: complete reviewed existing-native correspondence and
-display-parent mappings, connect the actual live-selection reader and game RNG,
-link code/data with checked memory bounds, and connect Nook's 28-character input
-and donor-font name conversion. Reuse official dialogue and enter the actual
-animated handover state machine. Keep the current scoring owner's limit intact.
-The eight-byte donor names are not raw native saved names. Keep magazine RNG,
-name/NPC checks, cancellation, and no-award results intact. Neither a decoded
-item number nor HomePage list membership authorises delivery. The HomePage
-furniture list contains five Famicom-only rewards; its floor/wall use other
-codes. Ten Mario furniture entries use Nintendo-code birth category 34 despite
-the empty `ftr_listMario` and absent ordinary stock membership. Extend the shared
-metadata/acquisition adapter by this actual category once native delivery is
-installed; do not add those items to normal stock or assume the empty list means
-no rewards. The prepared modules are not linked into the current ROM and enable
-no choices. See
-`specs/V3_PASSWORDS.md` for the source contracts and integration order.
+The linked password engine is ABI 197 at
+`build/v3-password-runtime-05/build-lock.json`. Its 32-KiB packet, native RNG,
+live selected-import reader, and checked lazy loader are installed. Continue
+the actual Nook input/dialogue and gift flow; do not stop at this callable engine.
+The loader entry is `804B4D00`; code input is 28 ASCII bytes and both names are
+eight-byte donor-font fields. Convert native saved/keyboard bytes explicitly.
+Complete existing-native/display correspondence and keep destination packets
+updated when the ordinary bulk importer adds more supported identities.
 
-The current explicit proposal is ABI 196 at
+Four focused host checks cover installed bindings, preserved resources,
+sanitized loader failure/cache ordering, and browser/offline none/all/individual
+composition. Native attempts stop before decoder execution: first on an invalid
+whole-equipment immutable comparison, then on a debugger proof that includes a
+non-word-aligned string suffix. The proof now includes checked zero alignment;
+do not spend further fixture retries in this batch. Include the pending native
+engine check in the next meaningful frontend/integration run. Retain all passed
+unchanged codec/policy evidence and keep this partial native result explicit.
+
+The common password transform and policy retain their verified preparations at
+`build/v3-password-prepared-03/` and `build/v3-password-policy-prepared-03/`.
+Preserve magazine RNG, names, NPC checks, cancellation, and no-award results.
+Reuse official dialogue and the full animated handover state machine, including
+the one-time wrapped pocket insertion in its takeout initializer. Preserve the
+source foreign-player, full-pocket, and three-gift-count guards. Native actor
+allocations are smaller than the donor's; never copy its field offsets blindly.
+See `specs/V3_PASSWORDS.md` for verified native integration bindings.
+
+The HomePage furniture list contains five Famicom-only rewards; its floor/wall
+use other codes. Ten Mario furniture entries use Nintendo-code birth category
+34 despite the empty `ftr_listMario` and absent ordinary stock membership.
+Extend the shared metadata/acquisition adapter by this actual category once
+native delivery is installed. The linked engine alone enables no new choice.
+
+The retained scoring proposal is ABI 196 at
 `build/v3-birth-scoring-runtime-02/build-lock.json`. Shared source-derived
 base-point conversion covers all 38 donor categories with 27 native counters,
 without changing acquisition or existing native scores. Three focused host checks

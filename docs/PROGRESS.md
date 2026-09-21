@@ -18,38 +18,30 @@ deployments retain their existing builds.
 
 ## Active development
 
-The shared password eligibility and Nook decision module is prepared at
-`build/v3-password-policy-prepared-03/`. Actual donor rules compile with their
-complete disc tables into a 6,194-byte permission packet. A separate 4,972-byte
-map binds 128 implemented imports, including furniture rotations, to their
-current native IDs and live selection fields. Missing or unselected items do
-not resolve. Existing native-item correspondence and display aliases still
-need mapping; these prepared modules are not installed into the cartridge.
+The current explicit V3 proposal is ABI 197 at
+`build/v3-password-runtime-05/build-lock.json`. The shared password codec,
+eligibility rules, and 128-import destination map are linked into a checked
+32-KiB demand-loaded packet. The 6,764-byte engine reads actual selection flags
+and calls the native continuous RNG. A 306-byte loader fits existing equipment
+padding; startup resets its cache, with no increase to startup code or ordinary
+heap allocations. Missing and disabled imports do not resolve.
 
-Three focused checks pass after one fixture correction. Sanitized execution
-matches the donor's result functions, preserves no-gift outcomes and magazine
-RNG boundaries, checks the full permission matrix and current destination map,
-and exercises a decoded code through selection-aware resolution. The source
-distinguishes HomePage NES rewards from its surfaces; Mario furniture uses
-birth category 34 and has no ordinary stock-list entries. Continue native
-mapping, keyboard/dialogue, linked storage, and animated handover. No ROM,
-save, choice, or deployment changes. See the
-[policy checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-password-eligibility-and-selected-destinations).
+Four focused host checks cover source/data bindings, complete retained resources,
+loader failure/cache ordering under sanitizers, and browser/offline none/all/
+individual composition. Native execution remains incomplete after two fixture
+setup failures; the corrected proof alignment is queued with frontend testing,
+not replayed in this batch. The new loader's startup bytes, zero cache, footer,
+and original RNG instructions pass the reached native checks. No decoder,
+keyboard, or gift-handover execution is claimed.
 
-The shared GameCube password codec is prepared at
-`build/v3-password-prepared-03/`. The ordinary category pipeline extracts the
-complete donor tables and builds an independent, bounded N64 encode/decode
-kernel. Three focused checks pass, including 384 payload comparisons against
-the pinned donor implementation across all six types, every transform-key
-choice, aliases, and malformed inputs under memory/undefined-behaviour sanitizers.
-The 1,551-byte packet and 3,948 bytes of MIPS instructions have no heap or
-external dependencies. The refreshed receipt reproduces the verified codec
-object and tables unchanged. This is prepared code, not installed delivery.
-Nook's input UI, complete destination mapping, official dialogue, linked
-eligibility, and handover remain required. No cartridge, choice, save, or website
-changes. See the [password checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-password-codec).
+Continue Nook's input/dialogue and animated handover, native saved-name conversion,
+and reviewed existing-item/display correspondence. Reuse the verified codec and
+policy results. The same 148 choices and saved format 4 remain: keep backups and
+every selected import when moving between V3 builds. Neither deployment nor the
+main lock changes. See the
+[runtime checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#linked-password-engine-and-native-bindings).
 
-The current explicit V3 proposal is ABI 196 at
+The retained scoring proposal is ABI 196 at
 `build/v3-birth-scoring-runtime-02/build-lock.json`. The shared importer maps all
 38 donor birth categories into 27 native scoring counters, preserving every
 existing native weight and actual acquisition rule. Four new values cover the

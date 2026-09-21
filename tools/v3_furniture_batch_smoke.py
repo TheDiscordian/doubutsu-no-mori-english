@@ -1606,6 +1606,9 @@ def tool_controls(debug,rom_path,record,*,transitions=False,capture=False,rod=Fa
 
 
 def exercise(debug, rom_path, record, *, section='automatic_furniture'):
+    if section=='password_runtime':
+        from v3_password_smoke import exercise as passwords
+        return passwords(debug,rom_path,record)
     if section=='staged_profiles':return staged_profiles(debug,rom_path,record)
     if section=='scroll_lifecycles':return scroll_lifecycles(debug,rom_path,record)
     if section=='contact_lifecycles':return scroll_lifecycles(debug,rom_path,record,contact_only=True)

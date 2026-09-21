@@ -1,5 +1,26 @@
 # Work record
 
+## 2026-09-21: linked shared item-code engine
+
+- Installed the donor-verified password codec and eligibility rules, complete
+  tables, selected-import map, native RNG binding, and CRC-checked lazy loader
+  through the ordinary runtime refresh. ABI 197 is recorded at
+  `build/v3-password-runtime-05/build-lock.json`; no new choice or shop UI is enabled.
+- Reserved 32 KiB beyond the surface packet without increasing the ordinary
+  heap, saved formats, actor sizes, or startup code. Preserved the separate
+  scenery owner and existing wrapped-present map. Credited both new diagnostics
+  to the assistant in the single text provenance catalogue.
+- Four focused host checks pass, including three complete browser/offline
+  compositions. Native verification remains incomplete after two fixture
+  failures before decoder execution; the corrected alignment is queued with
+  frontend integration. No third retry or unchanged-code replay is performed.
+- Recorded native Nook action/submenu bindings and the source's one-time wrapped
+  pocket insertion, gift-count limit, and subsequent animated handover. Continue
+  these shared delivery steps, then remaining bulk categories and required
+  gold-tree work. V3 remains experimental; neither website deployment changes.
+- Exact hashes, reached checks, remaining gaps, and compatibility notes are in
+  `docs/checkpoints/V3_FURNITURE_PIPELINE.md#linked-password-engine-and-native-bindings`.
+
 ## 2026-09-06: reference framework and English-first keyboard
 
 - Extended reference import across eleven message/string/mail-component banks.

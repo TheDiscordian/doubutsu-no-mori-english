@@ -1,5 +1,107 @@
 # Automatic furniture pipeline checkpoint
 
+## Linked password engine and native bindings
+
+The current explicit proposal is ABI 197 at
+`build/v3-password-runtime-05/build-lock.json`. The ordinary runtime refresh links
+the retained donor-verified codec/policy, complete tables, native RNG, and actual
+live selection-field accessor. No shop action is hooked yet. These components
+are installed callable code, not a usable Nook menu or completed acquisition.
+
+Reproduction:
+
+```sh
+python3 tools/v3_furniture_install.py --refresh-runtime \
+  --base-lock build/v3-birth-scoring-runtime-02/build-lock.json \
+  --password-runtime build/v3-password-policy-prepared-03 \
+  --output build/v3-password-runtime-05
+python3 -m unittest discover -s tests -p test_v3_password_runtime.py -v
+```
+
+Use a fresh output directory to reproduce; preserve these artifacts. Runtime-01
+rejects occupied wrapped-present storage before producing a ROM. Runtime-02
+stops on the new installer's generic receipt branch. Runtime-03/04/05 contain
+identical ROM data; the final receipt includes the shared API header and bound
+assistant-authored diagnostics. These construction fixes are distinct from the
+two emulator-fixture attempts below.
+
+The password packet is 32,768 bytes at VROM `02650340`, linked RAM `804C0000`.
+It occupies verified space beyond the complete surface reservation and before
+the furniture-bank pool. Its code is 6,764 bytes; codec/policy/destination data
+are 1,551/6,194/4,972 bytes, retaining 413 mapping rows for 128 imports. It uses
+no heap, new saved fields, or widened actor allocations. The 306-byte bootstrap
+fits existing equipment padding at `804B4D00`, before cache `804B4EF0`, existing
+wrapped-present mappings `804B4F00`, and footer `804B4FF0`. The equipment packet
+does not grow across the separate scenery owner at `804B5000`. Startup remains
+964 of 992 bytes. The HRA owner's 176-byte spare bound is unchanged.
+
+The loader validates full DMA/CRC results, then performs both cache operations
+before publishing readiness. Startup resets its cache word. The engine accepts
+28 ASCII code characters and full eight-byte donor-font names; the frontend
+must convert native names and submit once, not reroll on every frame. Native
+`fqrand` is bound at `8002C9AC`; selected fields use checked byte/word reads.
+Cancel and invalid results preserve the caller's offer. The engine never awards
+an item or writes saved state. Both failure strings are credited to the assistant
+in the single provenance catalogue and checked against compiled strings.
+
+Four focused checks pass on the final artifact in 6.553 seconds:
+
+- Actual source packets, retained known permission-matrix digest, complete source
+  receipts, all compiled resources, and startup-cache bytes agree.
+- Every existing DMA resource except the changed startup module, import blob,
+  and regenerated DMA directory has identical contents; native owner sizes and
+  saved-state/profile contracts remain unchanged. The equipment change is only
+  its declared loader padding.
+- Sanitized host execution checks DMA failure, CRC failure, no entry on failure,
+  data-before-instruction cache order, repeated-call caching, session reset,
+  and untouched output.
+- Three complete browser/offline ROM comparisons pass: none, all, and one
+  surface. The password packet stays unchanged under selection. Empty selection
+  returns the pinned corrected V2-12 output, SHA-256
+  `a09373b051cbcd93991e5dd6cb17a238a2afb1e2e2d7694d75408d24a55d4eee`.
+
+Native evidence is **incomplete**. Silent, isolated runs use the current ROM,
+eight MiB, a 180-second bound, and no FlashRAM or Controller Pak write permission:
+
+- `build/v3-password-native-01/` stops on a whole-equipment comparison that
+  incorrectly treats the existing live cache words as immutable. It does not
+  reach the password entry.
+- `build/v3-password-native-02/` passes the installed-startup flag, complete new
+  bootstrap/cache span, equipment footer, cold cache, and full original RNG
+  instructions. It reaches scratch allocation, then the debugger refuses the
+  306-byte code proof because its trailing diagnostic strings are not aligned to
+  four bytes. No decoder call executes. The fixture now includes the verified
+  zero alignment, but a third attempt is deliberately not run in this batch.
+
+Do not infer native decoding, lazy DMA, magazine RNG execution, selection reads,
+gift delivery, ordinary gameplay, save/restart, GPU appearance, or hardware
+acceptance from those reached checks. Include the corrected fixture in the next
+meaningful frontend/integration batch; retain unchanged codec/policy/scoring
+evidence instead of replaying it. No game crash or saved-state overwrite is
+established by either setup failure.
+
+Hashes:
+
+- ROM: `5ed3239b02e7bf307edc5029363bd1eb376692d2dd59f6f1f4a24bb7a1094425`.
+- UPS: `25450f3b8e74f9726ae077a6845b2947900986b009d5c86a5a7ef3941d0e4dc4`.
+- Build receipt: `d5320692d314c1fd3aa12451d214eb7479319376cf2590182a56970039095b26`.
+- Password packet: `930e8b7c95a59084947bce45ff426e8798e12c12c4e93dcdcdf62c196cc06820`.
+- Linked engine: `3b9cc2c57a866de2286cca19b881e4d9f9f08f0140c1a9319a9e85f6d120ce1e`.
+- Bootstrap: `ffe1a20e0d6ccb41810ec3edb877bf4f069d28b430cf3b81740ececa622500e2`.
+
+Import blob: 4,620,400 bytes, 1,671,056 bytes free in its current reservation.
+Choices remain 148. Saved format 4 and selection requirements are unchanged:
+preserve backups and equal-or-larger profiles; V2 and format-1/2/3 V3 cannot
+load format-4 saves. Ordinary cross-version reload is not newly verified.
+The main ABI-109 lock and both stable deployments remain unchanged.
+
+Continue Nook's input, official dialogue, name conversion, complete native/display
+mapping, and animated handover. The source's one-time wrapped inventory insertion
+and gift-count update belong in takeout initialization, not its per-frame action.
+Retain foreign-player, full-pocket, and source gift-count guards. See the native
+cranny addresses and allocation constraints in `specs/V3_PASSWORDS.md`. Connect
+map regeneration to ordinary bulk imports before enabling new password rewards.
+
 ## Shared password eligibility and selected destinations
 
 `build/v3-password-policy-prepared-03/` contains the shared source permission

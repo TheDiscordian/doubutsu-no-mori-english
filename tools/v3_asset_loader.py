@@ -63,7 +63,9 @@ def compile_part(part, out, extra_sources=(), defines=(), primary_source=None):
     run('objcopy', '-O', 'binary', '-j', '.text', '-j', '.rodata',
         *(['-j', '.fallbacks'] if part=='scenery_bootstrap' else []), 'code.elf', 'code.bin')
     code = (out / 'code.bin').read_bytes()
-    entry, expected = {'startup': ('af_v3_startup', MODULE_RAM + STARTUP),
+    entry, expected = {'password_runtime': ('af_v3_password_check', 0x804C0000),
+                       'password_bootstrap': ('af_v3_password_boot_check', 0x804B4D00),
+                       'startup': ('af_v3_startup', MODULE_RAM + STARTUP),
                        'accessory': ('af_v3_accessory_draw', 0x80473100),
                        'melody_expanded': ('af_v3_melody_start', 0x80473500),
                        'clothing_roster': ('af_v3_roster_clothing_record', 0x80473A00),
