@@ -1615,6 +1615,7 @@ def exercise(debug, rom_path, record, *, section='automatic_furniture'):
     if section=='surface_application':return surface_application(debug,rom_path,record)
     if section=='surface_save':return surface_save(debug,rom_path,record)
     if section=='surface_menu':return surface_menu(debug,rom_path,record)
+    if section=='surface_scoring':return surface_scoring(debug,rom_path,record)
     if section=='furniture_audio':return furniture_audio(debug,rom_path,record)
     if section in ('scenery_planting_sparkle','scenery_planting_sparkle_remaining'):
         from v3_scenery_smoke import planting_sparkle
@@ -2648,6 +2649,88 @@ def held_level_sound(debug,rom_path,record):
         native_volume_pause_fade_pan_reverb=True,native_actor_registration_and_expiry=True,
         physical_audio_played=False,pcm_or_listening_verified=False,ordinary_gameplay_tested=False,
         flash_written=False,requires_checkpoint_restore=True)
+
+
+def surface_scoring(debug,rom_path,record):
+    """Current complete HRA evaluator with additive weights and matching themes."""
+    import v3_hra as hra
+    from catalogue_names import Image
+    from v3_surface_items import RAM
+    path=Path(rom_path);image=path.read_bytes();report=json.loads((path.parent/'build.json').read_bytes())
+    if sha256(image)!=report['output_sha256']:raise ValueError('Changed surface-scoring cartridge')
+    files=by_vrom(image);hr=report['hra'];score=hr['surface_scoring'];items=report['room_surfaces']['items']
+    blob=files[runtime.BLOB].extract(image);packet=blob[items['blob_offset']:items['blob_offset']+items['bytes']]
+    boot=boot_proofs(image);assertions=0
+    def check(label,at,want):
+        nonlocal assertions
+        got=debug.read_memory(at,len(want));passed=got==want
+        record(dict(surface_score_check=label,address=f'{at:08X}',bytes=len(want),
+            assertion='passed' if passed else 'failed',observed_sha256=sha256(got),expected_sha256=sha256(want)))
+        if not passed:raise ValueError('Surface-score mismatch: '+label)
+        assertions+=1
+    def call(at,args=(),proof=None):
+        result=debug.call(f'{at:08X}',list(args),return_address=MODULE_RAM+0x6480,
+            verified_code=proof or boot.get(at));record(result);return result['return_value']
+    def put(at,*values):debug.write_memory(at,struct.pack('>'+str(len(values))+'I',*values))
+    check('complete current surface packet',RAM,packet)
+    size=0x9000;allocation=call(0x8009BFC0,[size])
+    if allocation&15 or not MODULE_RAM+0x8000<=allocation<=0x80400000-size:
+        raise ValueError('Surface-scoring arena allocation failed')
+    owner,layers,points,grid,theme,recommendation,name=(allocation+n for n in (16,0x8000,0x8020,0x8100,0x8050,0x8060,0x8070))
+    data,reloc=(files[v].extract(image) for v in (hra.NEW_VROM,hra.NEW_RELOC))
+    if (sha256(data),sha256(reloc))!=(hr['output_sha256'],hr['relocation_sha256']):
+        raise ValueError('Changed complete HRA owner')
+    if owner+len(data)+len(reloc)>=layers-16:raise ValueError('HRA image exceeds bounded scoring arena')
+    loaded=relocate_verified_data(Image(hra.RAM,len(data),struct.unpack_from('>5I',reloc)),data,reloc,owner)
+    debug.write_memory(allocation,bytes(size))
+    call(0x800262D0,[hra.NEW_VROM,hra.NEW_VROM+len(data),hra.RAM,hra.RAM+len(data),owner,owner+len(data),len(reloc)])
+    check('complete actual HRA loading and relocation',owner,loaded)
+    linked=lambda at:owner+at-hra.RAM
+    proof=(owner,loaded[:hra.SECTIONS[0]])
+    old_pointer=debug.read_memory(0x80107B50,4);old_state=debug.read_memory(0x8046C000,1232)
+    edge=b'V3SC'*4;guards=(allocation,layers-16,points-16,points+16,grid-16,grid+512,allocation+size-16)
+    for at in guards:debug.write_memory(at,edge)
+    try:
+        put(0x80107B50,owner)
+        for index,weight in [(0,51),(73,412),(74,51),(75,1000),(76,412),(77,1177),(72,0),(255,0)]:
+            put(points,17)
+            call(linked(0x809274F8),[points,layers,5,index,index],proof)
+            check('full-index native surface contribution '+str(index),points,struct.pack('>I',17+2*weight))
+        put(points,17);call(linked(0x809274F8),[points,layers,5,256,0xFFFFFFFF],proof)
+        check('out-of-range arguments cannot read outside weight tables',points,struct.pack('>I',17))
+        # A real original furnishing proves the new tail keeps prior accumulation.
+        put(layers,grid);debug.write_memory(grid+34,bytes.fromhex('1000'))
+        birth=struct.unpack_from('>I',data,hr['metadata_address']-hra.RAM)[0]>>9&31
+        weight=struct.unpack_from('>I',data,hr['birth_extension']['points_address']-hra.RAM+birth*4)[0]
+        put(points,17);call(linked(0x809274F8),[points,layers,5,75,77],proof)
+        check('native furnishing score and caller total retained',points,struct.pack('>I',17+1000+1177+weight))
+        put(layers,0)
+        call(linked(0x8092817C),[layers,5],proof)
+        series=linked(hr['series']['info_address']);search=linked(hr['series']['search_address'])
+        for row in score['themes']:
+            count=debug.read_memory(series+row['series']*3+1,1)[0]
+            if not 1<=count<=32:raise ValueError('Theme member count exceeds native mask')
+            debug.write_memory(search,bytes(hr['series']['count']*4))
+            put(points,17);put(theme,0xFFFFFFFF);put(recommendation,0)
+            call(linked(0x80926B34),[points,theme,recommendation,name,row['index'],row['index']],proof)
+            check('matching surfaces retain native partial-theme bonus '+row['name'],points,struct.pack('>I',10017))
+            put(search+row['series']*4,(1<<count)-1)
+            put(points,17);put(theme,0xFFFFFFFF);put(recommendation,0)
+            call(linked(0x80926B34),[points,theme,recommendation,name,row['index'],row['index']],proof)
+            check('complete matching theme uses native bonus '+row['name'],points,struct.pack('>I',17+7000*count+15000))
+            check('native complete theme identity '+row['name'],theme,struct.pack('>I',row['series']))
+            check('existing English theme name '+row['name'],name,row['name'].encode().ljust(10,b' '))
+        for at in guards:check('scoring arena guard',at,edge)
+        check('complete installed evaluator stays intact',linked(0x809274F8),loaded[0x809274F8-hra.RAM:0x809277F8-hra.RAM])
+        check('no CPU fault',0x8003CE34,bytes(4))
+        check('saved profile and ownership remain unchanged',0x8046C000,old_state)
+        check('surface packet remains unchanged',RAM,packet)
+    finally:
+        debug.write_memory(0x80107B50,old_pointer);call(0x8009C040,[allocation])
+    check('prior HRA owner pointer restored',0x80107B50,old_pointer)
+    return dict(native_surface_scoring=True,assertions=assertions,full_native_evaluator=True,
+        existing_matching_theme_categories=3,complete_original_furniture_accumulator=True,
+        ordinary_score_letters_tested=False,saved_data_written=False,requires_checkpoint_restore=True)
 
 
 def surface_menu(debug,rom_path,record):

@@ -111,8 +111,10 @@ Complete resources, stable paired destinations, official names, source metadata,
 and acquisition dependencies are retained. Shared resource, item, room-change,
 and full home-byte readers are installed. Format-4 surface profile/ownership
 validation is installed. Catalogue page lists/ownership dispatch and native full-ID
-inventory exchange are connected. Acquisition, private surface selection,
-sound/scoring, and ordinary persistence
+inventory exchange are connected. Full-index base weights retain native values
+and add exact donor points; Western, Backyard, and Boxing matching pairs are
+connected. Acquisition, private surface selection, floor sounds, complete
+Harvest/Mario furniture themes, and ordinary persistence
 remain required before these become optional playable imports.
 
 The [expanded import storage](V3_IMPORT_STORAGE.md) supports further batches

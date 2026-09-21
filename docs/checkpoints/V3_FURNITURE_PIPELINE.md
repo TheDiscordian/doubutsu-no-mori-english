@@ -1,5 +1,60 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared surface scoring
+
+The explicit ABI-187 proposal is
+`build/v3-surface-scoring-runtime-01/build-lock.json`:
+
+```sh
+python3 tools/v3_furniture_install.py --refresh-runtime \
+  --base-lock build/v3-surface-menu-runtime-03/build-lock.json \
+  --room-surfaces-art build/v3-room-surfaces-prepared-02 \
+  --output build/v3-surface-scoring-runtime-01
+```
+
+The shared installer binds complete original and donor acquisition tables to
+two 512-byte point tables inside the existing 16-KiB surface packet. All native
+values remain unchanged; all ten additions receive exact donor base points.
+The original HRA base evaluator retains its furniture accumulation, caller
+points, stack, and epilogue. Its checked 88-byte replacement bounds full surface
+indices. Six obsolete pointer relocations are removed, with owner and relocation
+sizes unchanged. Western, Backyard, and Boxing theme pairs use their stable
+added indices. Full Harvest and Mario furniture themes remain pending.
+
+Three host tests pass in 5.395 seconds: complete original/donor weights, all
+changed resources, checked relocation at three bases, mutation rejection,
+unchanged saved state/profile/artwork/menu, 141 choices, exact no-import/all-import
+composition, and UPS reconstruction.
+
+The silent native first attempt at `build/v3-surface-scoring-native-01/` passes
+69 result records and 36 internal scoring assertions. It loads and relocates
+the complete installed HRA owner into a 36-KiB isolated arena and runs the real
+base evaluator and theme routines. Original and all added values, gaps and
+invalid indices, original furniture accumulation, caller points, three partial
+theme bonuses, complete-theme bonuses/names, guards, state restoration,
+checkpoint restoration, and clean shutdown pass. No explicit FlashRAM writes,
+ordinary score letters, physical audio, GPU comparison, or hardware execution
+are claimed. Unchanged menu/application/save evidence is retained, not replayed.
+
+- ROM SHA-256: `59107e36a75492818c76e82a6a1a7fc780367634ec997bd9f928853581aceb44`.
+- UPS SHA-256: `f2be39a1e916f44fa2c4a7f46c0e7dcd00409d17e55a2967fa216089c89acd97`.
+- Build receipt SHA-256: `c695e30bcdf2b4bad8c6eb6384f40a1bcde5d763f183588e62379aa999cce1b3`.
+- Native results SHA-256: `74368e043e79498fc3f193225c3cb97464005475c0db0ef556c06ddb707dd089`.
+
+All ten surfaces remain disabled; choices and 27 inactive furniture profiles do
+not change. Format 4 and profile remain unchanged. Format-4 saves require a
+compatible newer build and cannot load in V2 or format-1/2/3 V3 builds. Preserve
+backups. The ABI-109 main lock, both deployments of the one stable web patcher,
+and existing ROMs/saves remain untouched.
+
+Next complete general floor sounds, genuine acquisition categories, remaining
+theme categories, and private selection, then bind contact/floor lifecycles.
+Floor sound discovery identifies an actual missing lawn footstep program and
+a different raw movement program; all eight walking/running variants need
+complete program/instrument matching before reuse. No same-number sound alias
+is assumed. Other shared material/rigged categories remain required; gold-tree
+effects and golden-shovel acquisition follow primary imports.
+
 ## Shared surface catalogue and inventory exchange
 
 The current explicit proposal is ABI 186 at

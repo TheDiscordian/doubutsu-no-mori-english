@@ -181,8 +181,9 @@ def scoring(base, prior, rows, source):
                 # Existing theme adapters explicitly omit unavailable matching
                 # surfaces. Do not invent a surface ID or another per-item rule.
                 adapters = [r for r in series.values() if isinstance(r,dict) and r.get('series')==row['series']]
-                if actual != expected and not (len(adapters)==1 and not adapters[0]['matching_surfaces_installed']
-                        and actual == expected[:2]+b'\xff' and expected[2]==adapters[0]['donor_wall_floor_index']):
+                if actual != expected and not (len(adapters)==1
+                        and actual == expected[:2]+bytes([adapters[0]['native_wall_floor_index']])
+                        and expected[2]==adapters[0]['donor_wall_floor_index']):
                     raise ValueError('Scoring series needs a shared category adapter')
                 if row['birth_category'] >= report['birth_extension']['count']:
                     raise ValueError('Unimplemented scoring birth category')
@@ -947,6 +948,9 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             if report['room_surfaces'].get('menu'):
                 report['shared_runtime_refresh']['adapters'].append('surface_menu')
                 report['native_test']='pending shared surface catalogue execution; inventory verification, acquisition, sound/scoring, and private selection remain incomplete'
+            if report['room_surfaces'].get('scoring'):
+                report['shared_runtime_refresh']['adapters'].append('surface_scoring')
+                report['native_test']='pending full-index surface scoring and matching themes; acquisition, sound, and private selection remain incomplete'
     write_new(output/'animal-forest-v3-asset-loader.z64',result)
     write_new(output/'asset-loader.ups',patch)
     write_new(output/'build.json',(json.dumps(report,indent=2,sort_keys=True)+'\n').encode())

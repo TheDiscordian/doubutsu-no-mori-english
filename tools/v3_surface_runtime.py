@@ -162,6 +162,11 @@ def install(base, prior, blob, core, original, output, art_path, *, module=None)
     inventory,assets=discover(source,base)
     prepared=checked_prepared(art_path,inventory,assets)
     if set(prepared)!=set(assets):raise ValueError('Install the complete prepared surface category')
+    if prior.get('room_surfaces',{}).get('menu'):
+        from v3_surface_scoring import install as install_scoring
+        changes,updates=install_scoring(base,prior,blob,output,source)
+        updates['room_surfaces']['sources'].update({p:sha256((ROOT/p).read_bytes()) for p in SOURCES})
+        return changes,updates
     if prior.get('room_surfaces',{}).get('save'):
         from v3_surface_menu import install as install_menu
         changes,updates=install_menu(base,prior,blob,output)

@@ -18,8 +18,24 @@ deployments retain their existing builds.
 
 ## Active development
 
-The current explicit V3 proposal is ABI 186 at
-`build/v3-surface-menu-runtime-03/build-lock.json`. The catalogue's floor/wall
+The current explicit V3 proposal is ABI 187 at
+`build/v3-surface-scoring-runtime-01/build-lock.json`. All ten additive surfaces
+use their exact donor HRA base values, while all original surface values remain
+native. Western, Backyard, and Boxing themes reference the new matching pairs.
+The complete native base evaluator retains furniture accumulation and bounds
+full surface indices before reading independent resident tables. No owner,
+packet, or saved-state allocation grows. Full Harvest and Mario furniture theme
+categories remain incomplete; surface base values do not establish those bonuses.
+
+Three focused host checks pass. A silent native first attempt passes 36 internal
+assertions through the complete evaluator and existing theme scorer, including
+original values, all added values, invalid indices, retained furniture points,
+partial/complete theme bonuses, restored state, and guards. Ordinary score
+letters, save/restart, and hardware execution are not tested by this fixture.
+Unchanged menu/application/save checks are retained, not replayed. See the
+[scoring checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-surface-scoring).
+
+The catalogue's floor/wall
 lists connect to independent surface ownership through one 144-byte helper.
 Original entries, debug behaviour, complete English names, and completion flags
 remain intact. Lists and helper fit the existing surface packet; menu memory,
@@ -41,7 +57,7 @@ retained, not replayed.
 Format-4 saves require a compatible newer build; V2 and format-1/2/3 V3 builds
 cannot load them. Preserve backups. Private exports carry this warning. There
 are still 141 choices and 27 inactive furniture profiles; all ten surfaces stay
-disabled. Next connect genuine acquisition, sound/scoring, and private surface
+disabled. Next connect genuine acquisition, sound, remaining theme categories, and private surface
 composition, including selected catalogue counts. The stable
 patcher and main lock remain unchanged. See the
 [surface-menu checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-surface-catalogue-and-inventory-exchange).
@@ -66,7 +82,7 @@ Four focused conversion/metadata/cache checks pass. Every added palette and
 texel is checked through independent tile addressing; malformed resources and
 changed caches reject. Preparation itself changes no choices, saved layouts,
 main lock, or served website content. The room/shop installation is described
-above; private category selection, acquisition, sound, scoring, and
+above; private category selection, acquisition, sound, remaining theme categories, and
 ordinary persistence remain required. See the
 [surface specification](../specs/V3_ROOM_SURFACES.md).
 

@@ -286,6 +286,37 @@ all saved/transient fixture data and the emulator checkpoint. Live-player
 notification, ordinary inventory exchange, real FlashRAM restart, GPU appearance,
 and hardware operation are not established by this fixture.
 
+## Full-index HRA scoring
+
+`tools/v3_surface_scoring.py` supplies independent 256-entry halfword point
+tables at `804BF600` (floors) and `804BF800` (walls), inside the existing packet.
+Original indices 0–63 use the complete checked native birth/weight tables,
+including the native lottery value. Added indices 73–77 use donor base values
+412, 51, 1000, 412, and 1177 respectively. Gaps are zero. Donor acquisition
+categories need not index the smaller native furniture counters.
+
+The complete native base evaluator at `809274F8` is checked before changing
+its 88-byte surface accumulation window at `80927794`. Each full index is
+bounded before a direct halfword load. Existing furniture points, the caller's
+points, stack, and epilogue remain intact. Six old pointer relocations are
+removed without increasing owner or relocation storage. The actual home reader
+already passes full bytes; no additional home-format change is needed.
+
+Source-bound Western, Backyard, and Boxing series adapters map donor pair
+indices 18, 26, and 65 to stable native indices 73, 74, and 76. Native partial
+and complete furniture-theme scoring uses these pairs. Full Harvest and Mario
+furniture theme categories remain incomplete; installing their surface base
+values does not supply their whole furniture themes. The ordinary furniture
+installer accepts checked mapped indices as well as explicitly missing pairs,
+so future bulk imports retain this shared mapping.
+
+Focused verification covers complete resource/relocation reconstruction,
+unchanged original values and resources, exact no-import/all-import composition,
+and UPS reconstruction. A bounded native fixture runs the complete evaluator
+and existing theme routines in a small isolated arena, preserving furniture
+accumulation and checking matching bonuses, invalid indices, saved-state
+restoration, and guards. It does not test ordinary score letters or hardware.
+
 ## Catalogue category lists and inventory exchange
 
 `tools/v3_surface_menu.py` installs one 144-byte, leaf catalogue helper at

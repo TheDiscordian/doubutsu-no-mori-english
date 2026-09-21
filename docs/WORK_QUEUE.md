@@ -12,8 +12,16 @@ After the primary importing work, finish gold-tree leaf/cut effects and the full
 golden-shovel acquisition route. This is deferred required V3 work, not a dropped
 feature or a separate release goal.
 
-The current explicit proposal is ABI 186 at
-`build/v3-surface-menu-runtime-03/build-lock.json`. Surface catalogue lists and
+The current explicit proposal is ABI 187 at
+`build/v3-surface-scoring-runtime-01/build-lock.json`. Full-index HRA surface
+weights preserve all native values and install exact donor values for all ten
+additions. Western, Backyard, and Boxing matching pairs are connected. Three
+focused host checks and 36 internal native assertions pass on the first attempt;
+the complete base evaluator and theme scorer run, without ordinary score letters
+or FlashRAM writes. Full Harvest/Mario furniture themes remain required.
+No allocations or saved formats grow. Retain this evidence for unchanged code.
+
+Surface catalogue lists and
 ownership dispatch connect to the independent format-4 category. Three focused
 checks pass; a native first attempt passes 42 assertions for real catalogue
 loading/initialization, names, completion, and full-ID inventory exchange bodies.
@@ -51,7 +59,7 @@ Catalogue preview (`03970000`, linked `808A6100`) and arranged NPC rooms
 (`00845C40`, linked `80950E50`) use the separate added resource banks, preserving
 original resources and native preview geometry. Inventory full-ID exchange and
 catalogue lists/ownership dispatch are connected. Next implement genuine donor
-acquisition categories, floor sound mapping, matching-pair scoring, and private
+acquisition categories, floor sound mapping, remaining full theme categories, and private
 surface selection. Do not replay unchanged catalogue/application/save checks. Preserve the
 full native home bytes and every unrelated field. Do not repurpose furniture
 selection/ownership bits to represent floors or wallpapers.
@@ -59,6 +67,14 @@ The installed name/type/price hooks wrap the existing native public entries and
 retain their prior complete chains. Keep those outer hooks and the bootstrap
 when extending category readers. Surface profiles derive from those exact enabled
 metadata rows. Enable optional selections only when the full item path is complete.
+
+Floor audio requires complete program/instrument matching, not numerical aliases.
+The native 73-entry selector table has no added-index entries. Donor backyard
+lawn selector 35 reaches a missing native footstep program; its raw movement
+program also differs. Check all eight walking/running variants and the separate
+raw drag dispatch through the shared sound importer before extending consumers.
+Native selector 30 has a footstep program despite no player floor using it.
+Preserve all existing selectors and room reverb/volume/distance behaviour.
 
 Contact/floor callbacks
 are source-bound and compiled, with four focused host/source checks passing.
