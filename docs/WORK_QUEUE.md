@@ -22,7 +22,16 @@ installed initializer into a small isolated arena, not an ordinary room.
 Retain the passing ABI-178 fade/audio-dispatch evidence and ABI-180 placement
 results; do not replay old builds or unchanged renderer/audio tests.
 
-Next complete general additive room-surface imports. Contact/floor callbacks
+Next integrate the general additive room-surface runtime. All ten missing
+surfaces are prepared together at `build/v3-room-surfaces-prepared-02/`, with
+complete source metadata, sound-selector inputs, and official name attribution.
+Stable paired indices 73–77 preserve all original texture and special-room sound
+IDs. The current floor getter is wrapped by the campsite environment adapter;
+preserve that route. Player floor reads still mask identity to six bits, so
+application/persistence need a real extension, not just larger texture bounds.
+Use `specs/V3_ROOM_SURFACES.md` for the shared reader/action/save integration order.
+
+Contact/floor callbacks
 are source-bound and compiled, with four focused host/source checks passing.
 Their preparation identifies a missing floor, not an unfinished grass-alpha
 formula: GameCube backyard lawn (26) replaces a different N64 old plank floor.
@@ -31,7 +40,9 @@ Daisy meadow (48) already matches completely. Inspect the shared floor item,
 catalogue, house, saved-room, artwork, and sound readers before extending their
 bounds; do not replace native slot 26 or silently omit this source condition.
 Then connect the prepared contact lifecycle to ordinary profile installation
-through complete floor bindings. Reuse the source/native consumer checks and
+through complete floor bindings. Also implement the source room owner's shared
+movement sound category (`aMR_SetMoveSE`, lawn mower/stone coin); alpha callbacks
+alone do not include that behaviour. Reuse the source/native consumer checks and
 completed mower graphics. Native callback execution is still pending, not passed.
 The existing ABI-180 proposal and 141 choices remain unchanged by preparation.
 Continue material and rigged-material categories alongside unresolved unique

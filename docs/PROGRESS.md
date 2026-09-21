@@ -18,6 +18,22 @@ served patchers retain their existing builds.
 
 ## Active development
 
+The shared room-surface pipeline prepares all ten donor-only floors/wallpapers
+in `build/v3-room-surfaces-prepared-02/`: 61,760 bytes with complete palettes,
+tiles, official names, price/catalogue records, acquisition lists, and floor-sound
+selectors. Complete artwork matching retains 124 existing player surfaces and
+all eight shop-surface mappings. Stable new indices 73–77 preserve original
+player/shop content and special-room sound IDs; the paired floors/walls share
+indices for scoring. Names are credited in the single provenance catalogue.
+
+Four focused conversion/metadata/cache checks pass. Every added palette and
+texel is checked through independent tile addressing; malformed resources and
+changed caches reject. This is preparation, not a cartridge installation.
+No choices, saved layouts, main lock, or served website content change. Next
+connect shared resource/item readers, complete room application/persistence,
+actual acquisition routes, sound, and scoring. See the
+[surface specification](../specs/V3_ROOM_SURFACES.md).
+
 Shared contact/floor lifecycle preparation is available through the ordinary
 pipeline's `lifecycle` representation. Complete source callbacks, easing
 constants, contact helpers, six native consumer/owner functions, and complete

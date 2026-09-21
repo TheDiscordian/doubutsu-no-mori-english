@@ -268,6 +268,13 @@ The mower's separate contact/floor-driven state remains unfinished.
 
 #### Shared contact and floor lifecycle preparation
 
+The [bulk room-surface pipeline](V3_ROOM_SURFACES.md) prepares both missing and
+additional donor floors/wallpapers with stable identities. Runtime application,
+persistence, sound, and acquisition are required before contact bindings can
+consume those identities. Preserve the separate room-owner movement sounds;
+source `aMR_SetMoveSE` supplies mower and stone-coin behaviour outside their
+individual callbacks.
+
 `convert --assets-only --representation lifecycle --category contact-floor-alpha`
 uses the current explicit build lock and discovers complete source callback
 shapes, not item IDs. The preparation report retains source constructor, move,

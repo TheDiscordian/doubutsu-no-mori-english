@@ -154,6 +154,24 @@ def clothing_slot(donor_item):
         raise ValueError('Unassigned imported clothing identity')
     return CLOTHING[donor_item]
 
+
+# Additive room surfaces retain native player/shop textures and floor-sound
+# identities 0..72, including special rooms. Paired surfaces share an index for
+# room-series scoring. These are reservations, not installed items/save support.
+SURFACE_REGISTRY_VERSION = 1
+SURFACES = {
+    0x2612: (73, 0x2649), 0x261A: (74, 0x264A),
+    0x2640: (75, 0x264B), 0x2641: (76, 0x264C), 0x2642: (77, 0x264D),
+    0x2712: (73, 0x2749), 0x271A: (74, 0x274A),
+    0x2740: (75, 0x274B), 0x2741: (76, 0x274C), 0x2742: (77, 0x274D),
+}
+
+
+def surface_identity(donor_item):
+    if type(donor_item) is not int or donor_item not in SURFACES:
+        raise ValueError('Unassigned additive room-surface identity')
+    return SURFACES[donor_item]
+
 # Preserve the native sorted house-layer range 398..855. Each imported villager
 # owns two fixed layer slots, including unavailable villagers and subsets.
 HOUSE_LAYER_BASE, HOUSE_LAYER_CAPACITY = 856, 40

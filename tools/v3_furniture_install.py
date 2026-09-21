@@ -129,7 +129,7 @@ def order_mask(row):
     return masks[group]
 
 
-def provenance_patch(rows):
+def provenance_patch(rows,locators=('tools/v3_furniture_pipeline.py','tools/v3_furniture_install.py')):
     """Generate additions to the sole text catalogue, preserving human edits."""
     existing = {r['id']:r for r in json.loads((ROOT/'translations/provenance.json').read_bytes())['entries']}
     additions = []
@@ -141,7 +141,7 @@ def provenance_patch(rows):
                 raise ValueError('Existing text attribution differs; preserve it for review')
             continue
         entry = dict(id=key,native_sha256=None,locales={'en':dict(credit='official',
-            locator=['tools/v3_furniture_pipeline.py','tools/v3_furniture_install.py'],
+            locator=list(locators),
             source=dict(source='user-supplied GAFE01 revision 0 disc',symbol=row.get('name_source_symbol','ftrName2_table'),
                 index=row['name_source_index'],reference_sha256=row['name_sha256']),
             text=row['name'],evidence_id=key,human_review='not_recorded',encoded_sha256=row['name_sha256'])})

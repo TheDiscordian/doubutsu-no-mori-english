@@ -1,5 +1,35 @@
 # Automatic furniture pipeline checkpoint
 
+## Bulk room-surface preparation
+
+`build/v3-room-surfaces-prepared-02/surfaces.json` prepares all ten donor-only
+floors/wallpapers, totalling 61,760 bytes without a compiler container. Receipt
+SHA-256: `8a7a5713859ba29205cc79c6f6b673319b5389be1a0ff03516ee16ef8921add4`.
+The shared `surfaces` representation retains complete source artwork, official
+names, prices, catalogue order, acquisition lists, and floor-sound selector
+inputs. The single provenance catalogue credits all ten names. Complete decoded
+pixel matching retains 124 existing player surfaces and eight shop mappings.
+New paired indices 73–77 preserve every native special-room sound identifier.
+
+Four tests in `tests/test_v3_room_surfaces.py` passed in 6.926 seconds. Every
+converted palette entry and texel is checked using independent GC tile-address
+arithmetic; the other checks cover native identities, official attribution,
+actual source stock lists, subset-independent destinations, complete cache
+reuse, and malformed input rejection. After adding sound-selector metadata and
+correcting the unpublished reservations from 68–72 to 73–77, the three affected
+identity/metadata/cache tests passed in 5.838 seconds. Artwork bytes are unchanged,
+so the independent pixel test is retained rather than replayed. The earlier
+`prepared-01` directory remains preserved but has stale reservations; use `02`.
+
+No cartridge, saved layout, selection, main lock, or served patcher changes.
+ABI 180 remains the current proposal. This batch does not establish runtime
+drawing, floor-sound equivalence, room application, persistence, or acquisition.
+The native player-floor getter masks saved identities to six bits, and its
+campsite wrapper must remain intact. The next shared runtime work follows
+[V3_ROOM_SURFACES.md](../../specs/V3_ROOM_SURFACES.md), not per-item installers.
+The mower also needs the source room owner's movement-sound dispatch, shared
+with stone coin; its prepared grass-alpha callback is not the full behaviour.
+
 ## Shared contact and floor lifecycle preparation
 
 The shared pipeline prepares `contact-floor-alpha` with:

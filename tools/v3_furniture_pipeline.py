@@ -1225,8 +1225,8 @@ def main():
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--select', action='append', default=[], help='Canonical donor ID; defaults to all supported new furniture')
     parser.add_argument('--category', help='Restrict to a discovered shared category, without an item list')
-    parser.add_argument('--representation', choices=('furniture','handheld','scenery','audio','rewards','lifecycle'), default='furniture',
-                        help='Discover furniture, held equipment, scenery, audio, reward, or lifecycle dependencies')
+    parser.add_argument('--representation', choices=('furniture','handheld','scenery','audio','rewards','lifecycle','surfaces'), default='furniture',
+                        help='Discover furniture, held equipment, scenery, audio, rewards, lifecycles, or room surfaces')
     parser.add_argument('--assets-only', action='store_true',
                         help='convert only: prepare artwork even when metadata/acquisition is unsupported; never install')
     parser.add_argument('--base-lock', type=Path, default=ROOT/'config/v3-import-build.json')
@@ -1239,9 +1239,9 @@ def main():
     if args.representation=='lifecycle' and (args.command!='convert' or not args.assets_only):
         parser.error('Lifecycle preparation requires convert --assets-only; missing dependencies remain explicit')
     if args.category and args.command == 'scan': parser.error('--category requires convert or import')
-    if args.reuse_assets and (args.command=='scan' or args.representation!='furniture'):
-        parser.error('--reuse-assets requires furniture convert or import')
-    if args.representation in ('handheld','scenery','audio','rewards') and (args.command == 'import' or
+    if args.reuse_assets and (args.command=='scan' or args.representation not in ('furniture','surfaces')):
+        parser.error('--reuse-assets requires furniture convert/import or surface preparation')
+    if args.representation in ('handheld','scenery','audio','rewards','surfaces') and (args.command == 'import' or
             args.command == 'convert' and not args.assets_only):
         parser.error('This representation requires convert --assets-only; runtime integration is unfinished')
     if output.exists() or not output.is_relative_to(ROOT/'build'): raise ValueError('Use a fresh ignored build path')
@@ -1281,6 +1281,15 @@ def main():
     worksheet = ROOT/'build/item-identity-megasheet.xlsx'
     from v3_furniture_install import inputs, build
     base, base_report = inputs(args.base_lock)
+    if args.representation=='surfaces':
+        from v3_room_surfaces import discover as discover_surfaces,convert as convert_surfaces
+        if args.command=='scan':
+            if args.select:parser.error('Surface discovery retains the complete source banks')
+            report,_=discover_surfaces(source,base);output.parent.mkdir(parents=True,exist_ok=True)
+            write_new(output,(json.dumps(report,indent=2)+'\n').encode())
+        else:report=convert_surfaces(source,base,output,args.select,args.category,args.reuse_assets)
+        print(json.dumps(report.get('batch',report['counts'])))
+        return
     from v3_room_rig_runtime import bind_profiles
     bind_profiles(source,base,base_report)
     installed = [int(r['id'].rsplit('/',1)[1],16) for r in base_report['furniture']['imports']+[base_report['speed_bag']]]
