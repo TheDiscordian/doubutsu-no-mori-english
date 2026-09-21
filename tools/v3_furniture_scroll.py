@@ -13,6 +13,7 @@ from aflib import sha256, u32
 CATEGORY = 'scrolling-material-assets'
 RAM,TABLE,BYTES,CAPACITY,VTABLE = 0x804BA000,0x804BB000,8192,64,0x804B1E30
 MAGIC = 0x41464332
+LIFE_TABLE,LIFE_MAGIC,LIFE_CAPACITY=0x804BBC10,0x41464C31,64
 # Complete normalized draw code, paired model relocations in submission order,
 # scroll helper call, matrix calls, external save/restore addresses, and runtime
 # parameters. These are implementation shapes, never item or artwork selectors.
@@ -360,6 +361,78 @@ def draw_only_lifecycle(profile,source=None):
     return dict(category='draw-only-scrolling',callbacks=callbacks,actor_state_used=False)
 
 
+def lifecycle_record(row,contract):
+    """Pack only completely implemented source lifecycle shapes."""
+    fade=contract['category']=='switch-fade-loop'
+    if contract['category'] not in ('positioned-loop','switch-fade-loop'):
+        raise ValueError('Unsupported scrolling lifecycle category')
+    parameters=contract['constants'];maximum=parameters['maximum']['value'] if fade else 0
+    step=parameters['step']['value'] if fade else 0
+    if int(maximum)!=maximum or int(step)!=step:raise ValueError('Unrepresentable exact fade constants')
+    on,off=contract['switch_clicks'] or (0,0)
+    return dict(source_item_id=row['source_item_id'],runtime_index=row['runtime_index'],mode=2 if fade else 1,
+        flags=int(contract['persist_private_switch']),sound=contract['source_sound_id'],on=on,off=off,
+        maximum=int(maximum),step=int(step),source=contract)
+
+
+def encode_lifecycles(rows):
+    if (len(rows)>LIFE_CAPACITY or
+            [r['runtime_index'] for r in rows]!=sorted({r['runtime_index'] for r in rows})):
+        raise ValueError('Duplicate or excessive scrolling lifecycles')
+    data=bytearray(struct.pack('>4I',LIFE_MAGIC,len(rows),12,0))
+    for r in rows:
+        index,mode,flags=r['runtime_index'],r['mode'],r['flags']
+        sound,on,off,maximum,step=(r[k] for k in ('sound','on','off','maximum','step'))
+        if (not 1024<=index<2048 or mode not in (1,2) or flags not in (0,1) or not 68<=sound<96 or
+                bool(on)!=bool(off) or not 0<=on<128 or not 0<=off<128 or
+                mode==1 and any((flags,on,off,maximum,step)) or mode==2 and not 0<step<=maximum<=255):
+            raise ValueError('Invalid complete scrolling lifecycle record')
+        data.extend(struct.pack('>HBBHHHBB',index,mode,flags,sound,on,off,maximum,step))
+    return bytes(data)
+
+
+def tables(runtime):
+    drawing=encode(runtime['rows']);life=runtime.get('lifecycle_rows',[])
+    if not life:return drawing.ljust(BYTES-(TABLE-RAM),b'\0')
+    data=drawing.ljust(LIFE_TABLE-TABLE,b'\0')+encode_lifecycles(life)
+    if len(data)>BYTES-(TABLE-RAM):raise ValueError('Scrolling tables exceed their complete reservation')
+    return data.ljust(BYTES-(TABLE-RAM),b'\0')
+
+
+def profile_lifecycle(profile,contract):
+    """Check the source-bound lifecycle carried into an ordinary profile.
+
+    The binding caller additionally verifies actual source code, installed
+    table/dispatch, and complete audio. A readiness annotation alone is not used.
+    Start-disabled placement still needs its native owner adapter.
+    """
+    if draw_only_lifecycle(profile) is not None:return True
+    adapter=profile.get('callback_adapter',{})
+    if (not contract or adapter.get('category')!=CATEGORY or
+            adapter.get('pending_profile_fields') or profile['contact_action'] or
+            profile['interaction_flags'] or contract.get('start_disabled') or
+            contract.get('category') not in ('positioned-loop','switch-fade-loop')):return False
+    functions=json.loads(json.dumps(adapter['functions']));bound=contract.get('functions',{})
+    if (set(bound)!=set(functions) or any(bound[role].get(k)!=v
+            for role,receipt in functions.items() for k,v in receipt.items())):return False
+    record=lifecycle_record(dict(source_item_id='',runtime_index=1024),contract)
+    encode_lifecycles([record])
+    return True
+
+
+def checked_lifecycle(source,profile,binding,runtime,contracts):
+    empty=draw_only_lifecycle(profile,source)
+    contract=empty or contracts.get(binding['source_item_id'])
+    if (contract is None or not binding.get('lifecycle_installed') or
+            binding.get('lifecycle')!=json.loads(json.dumps(contract))):
+        return None
+    if empty is None:
+        expected=json.loads(json.dumps(lifecycle_record(binding,contract)))
+        matches=[r for r in runtime.get('lifecycle_rows',[]) if r['source_item_id']==binding['source_item_id']]
+        if matches!=[expected]:raise ValueError('Changed installed scrolling lifecycle source binding')
+    return json.loads(json.dumps(contract))
+
+
 def checked_runtime(equipment,blob):
     """Verify complete scrolling drawing/storage before binding ordinary profiles."""
     from v3_asset_loader import BLOB
@@ -376,13 +449,15 @@ def checked_runtime(equipment,blob):
         return {}
     packet=runtime['packet'];at=packet['blob_offset'];data=blob[at:at+BYTES]
     module=blob[equipment['blob_offset']:equipment['blob_offset']+equipment['bytes']]
-    code=runtime['code'];n=code['bytes'];table=encode(runtime['rows'])
-    boot=equipment['room_rigs']['bootstrap']['symbols']['af_v3_room_boot_scroll_dw']
-    vtable=struct.pack('>5I',0,0,boot,0,0)
-    if (runtime['format']!='AFV3-ROOM-SCROLL-2' or packet['ram']!=RAM or packet['bytes']!=BYTES or
+    code=runtime['code'];n=code['bytes'];table=tables(runtime)
+    symbols=equipment['room_rigs']['bootstrap']['symbols']
+    lifecycle=bool(runtime.get('lifecycle_rows'))
+    entries=[symbols['af_v3_room_boot_scroll_'+role] if role=='dw' or lifecycle else 0 for role in ('ct','mv','dw','dt')]
+    vtable=struct.pack('>5I',*entries,0)
+    if (runtime['format']!=('AFV3-ROOM-SCROLL-3' if lifecycle else 'AFV3-ROOM-SCROLL-2') or packet['ram']!=RAM or packet['bytes']!=BYTES or
             packet['vrom']!=BLOB+at or at&15 or len(data)!=BYTES or sha256(data)!=packet['sha256'] or
             not 0<n<=TABLE-RAM or sha256(data[:n])!=code['sha256'] or any(data[n:TABLE-RAM]) or
-            data[TABLE-RAM:]!=table.ljust(BYTES-(TABLE-RAM),b'\0') or
+            data[TABLE-RAM:]!=table or
             module[VTABLE-EQUIPMENT_RAM:VTABLE-EQUIPMENT_RAM+20]!=vtable or
             runtime['vtable_hex']!=vtable.hex()):
         raise ValueError('Changed complete scrolling renderer, table, or dispatch')
@@ -393,6 +468,15 @@ def checked_runtime(equipment,blob):
                 sha256(blob[start:start+n])!=r['sha256'] or not r['renderer_installed']):
             raise ValueError('Changed complete installed scrolling artwork')
         rows[key]=r
+    if lifecycle:
+        if (runtime.get('lifecycle_table')!=LIFE_TABLE or
+                runtime.get('lifecycle_table_sha256')!=sha256(encode_lifecycles(runtime['lifecycle_rows']))):
+            raise ValueError('Changed scrolling lifecycle table receipt')
+        for r in runtime['lifecycle_rows']:
+            parent=rows.get(r['source_item_id'])
+            if (not parent or not parent.get('lifecycle_installed') or
+                    r!=json.loads(json.dumps(lifecycle_record(parent,parent['lifecycle'])))):
+                raise ValueError('Changed installed scrolling lifecycle source binding')
     return rows
 
 
@@ -404,15 +488,21 @@ def publish(equipment,blob,output):
             at&15 or at+BYTES>len(blob) or
             ('sha256' in packet and sha256(blob[at:at+BYTES])!=packet['sha256'])):
         raise ValueError('Changed complete scroll packet storage')
-    code,compiled=compile_part('room_scroll',output/'room_scroll')
-    table=encode(runtime['rows']);data=code.ljust(TABLE-RAM,b'\0')+table.ljust(BYTES-(TABLE-RAM),b'\0')
+    lifecycle=bool(runtime.get('lifecycle_rows'))
+    code,compiled=compile_part('room_scroll',output/'room_scroll',defines=('AF_V3_ROOM_SCROLL_LIFECYCLE=1',) if lifecycle else ())
+    table=tables(runtime);data=code.ljust(TABLE-RAM,b'\0')+table
     entry=compiled['symbols']['af_v3_room_scroll_dw']
     if len(code)>TABLE-RAM or len(data)!=BYTES or entry!=RAM or not zlib.crc32(data):
         raise ValueError('Scroll code/records exceed reservation')
     blob[at:at+BYTES]=data;packet.update(sha256=sha256(data),crc32=zlib.crc32(data))
-    runtime.update(format='AFV3-ROOM-SCROLL-2',code=compiled,table_sha256=sha256(table),capacity=CAPACITY,table_ram=TABLE)
+    runtime.update(format='AFV3-ROOM-SCROLL-3' if lifecycle else 'AFV3-ROOM-SCROLL-2',code=compiled,
+        table_sha256=sha256(encode(runtime['rows'])),capacity=CAPACITY,table_ram=TABLE)
+    extra=()
+    if lifecycle:
+        runtime.update(lifecycle_table=LIFE_TABLE,lifecycle_table_sha256=sha256(encode_lifecycles(runtime['lifecycle_rows'])))
+        extra=tuple(f'AF_ROOM_SCROLL_{role.upper()}=0x{compiled["symbols"]["af_v3_room_scroll_"+role]:X}u' for role in ('ct','mv','dt'))
     return (f'AF_ROOM_SCROLL_DW=0x{entry:X}u',f'AF_ROOM_SCROLL_VROM=0x{BLOB+at:X}u',
-            f'AF_ROOM_SCROLL_BYTES={BYTES}u',f'AF_ROOM_SCROLL_CRC=0x{zlib.crc32(data):X}u')
+            f'AF_ROOM_SCROLL_BYTES={BYTES}u',f'AF_ROOM_SCROLL_CRC=0x{zlib.crc32(data):X}u',*extra)
 
 
 def install(base,prior,blob,core,original,output,directories):
@@ -455,7 +545,7 @@ def install(base,prior,blob,core,original,output,directories):
     directories=[d.resolve() for d in directories];cache=PreparedAssets(source,directories)
     identities=identity_rows(ROOT/'build/item-identity-megasheet.xlsx',include_unmapped_legacy=True)
     installed=runtime.get('scrolling',dict(format='AFV3-ROOM-SCROLL-1',rows=[],sources=[]))
-    if installed['format'] not in ('AFV3-ROOM-SCROLL-1','AFV3-ROOM-SCROLL-2'):
+    if installed['format'] not in ('AFV3-ROOM-SCROLL-1','AFV3-ROOM-SCROLL-2','AFV3-ROOM-SCROLL-3'):
         raise ValueError('Unknown scrolling runtime format')
     progress_fields={'lifecycle_installed','lifecycle','profile_installed','parent_selectable'}
     for old in installed['rows']:
@@ -465,6 +555,9 @@ def install(base,prior,blob,core,original,output,directories):
             raise ValueError('Changed installed scroll source contract')
         if old.get('lifecycle_installed'):
             actual=draw_only_lifecycle(prepare(source,int(old['source_item_id'],16))[0],source)
+            if actual is None:
+                from v3_sound_programs import furniture_level
+                actual=furniture_level(source,prepare(source,int(old['source_item_id'],16))[0])
             if actual is None or old.get('lifecycle')!=json.loads(json.dumps(actual)):
                 raise ValueError('Changed completed scrolling lifecycle')
         if old.get('profile_installed'):
@@ -507,8 +600,23 @@ def install(base,prior,blob,core,original,output,directories):
                     any(blob[ITEMS+i*32:ITEMS+(i+1)*32]) or blob[0x40+i//8]&(1<<(i&7))):
                 raise ValueError('Occupied scrolling destination')
             occupied.add(record['item_id']);rows.append(record);assets[donor]=data
-    if not rows:raise ValueError('Empty scrolling material batch')
     all_rows=sorted(installed['rows']+rows,key=lambda r:r['runtime_index']);encode(all_rows)
+    from v3_sound_programs import checked_furniture_loops
+    lifecycles,proof=checked_furniture_loops(base,core,result,source)
+    new_lives=[]
+    for row in all_rows:
+        lifecycle=lifecycles.get(row['source_item_id'])
+        if lifecycle is not None and not row['lifecycle_installed']:
+            new_lives.append(lifecycle_record(row,lifecycle))
+            row.update(lifecycle_installed=True,lifecycle=json.loads(json.dumps(lifecycle)))
+    if not rows and not new_lives:raise ValueError('Empty scrolling material batch')
+    if new_lives:
+        native_core=by_vrom(original)[CODE_VROM].extract(original)
+        first,last=0x800D1D08-CODE_RAM,0x800D1D94-CODE_RAM
+        if core[first:last]!=native_core[first:last]:raise ValueError('Changed complete native positioned sound wrappers')
+        installed['lifecycle_rows']=sorted(installed.get('lifecycle_rows',[])+new_lives,key=lambda r:r['runtime_index'])
+        installed['lifecycle_audio']=proof
+        installed['lifecycle_native_contract']=dict(address=first+CODE_RAM,bytes=last-first,sha256=sha256(native_core[first:last]))
     for r in installed['rows']:
         if sha256(blob[r['blob_offset']:r['blob_offset']+r['bytes']])!=r['sha256']:
             raise ValueError('Changed installed scrolling artwork')
@@ -531,7 +639,7 @@ def install(base,prior,blob,core,original,output,directories):
 
 SOURCES=('tools/v3_furniture_scroll.py','tools/v3_furniture_pipeline.py','tools/v3_furniture_art.py',
     'tools/v3_furniture_install.py','tools/v3_registry.py','tools/v3_asset_loader.py','tools/v3_tent_model.py',
-    'tools/v3_room_rig_runtime.py','overlays/v3/room_scroll.c','overlays/v3/room_scroll.h','overlays/v3/room_scroll.ld',
+    'tools/v3_room_rig_runtime.py','tools/v3_sound_programs.py','overlays/v3/room_scroll.c','overlays/v3/room_scroll.h','overlays/v3/room_scroll.ld',
     'overlays/v3/room_materials.c','overlays/v3/room_materials.h','overlays/v3/room_rigs.c',
     'overlays/v3/room_rigs_packet.ld','overlays/v3/room_rigs.h','overlays/v3/room_rigs_bootstrap.c',
     'overlays/v3/room_rigs_bootstrap.ld')

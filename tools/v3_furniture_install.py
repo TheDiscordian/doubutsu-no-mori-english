@@ -67,11 +67,11 @@ def profile(row, vrom, *, limit=END):
     sound = adapter.get('category') == 'switch-trigger-sound'
     from v3_furniture_rigs import RIG_CATEGORIES,FIXED_CATEGORY
     from v3_furniture_materials import CATEGORY as MATERIAL_CATEGORY
-    from v3_furniture_scroll import CATEGORY as SCROLL_CATEGORY,VTABLE as SCROLL_VTABLE,draw_only_lifecycle
+    from v3_furniture_scroll import CATEGORY as SCROLL_CATEGORY,VTABLE as SCROLL_VTABLE,profile_lifecycle
     material=adapter.get('category')==MATERIAL_CATEGORY
     scrolling=adapter.get('category')==SCROLL_CATEGORY
     if (adapter.get('category') in (FIXED_CATEGORY,PENDING_MOVE_CATEGORY) or scrolling and
-            (draw_only_lifecycle(row['profile']) is None or row.get('room_runtime')!={'vtable':SCROLL_VTABLE,'vrom':vrom})):
+            (not profile_lifecycle(row['profile'],row.get('room_lifecycle')) or row.get('room_runtime')!={'vtable':SCROLL_VTABLE,'vrom':vrom})):
         raise ValueError('Prepared resources have no implemented native lifecycle')
     rigged = adapter.get('category') in RIG_CATEGORIES
     layers = tuple(offsets) if rigged else tuple(adapter['model_order']) if fading or sequence or material or scrolling else LAYERS
@@ -409,10 +409,11 @@ def build(output, art_path, lock=LOCK):
     report=copy.deepcopy(prior)
     if report.get('staged_furniture'):
         promoted={r['item_id'] for r in installed}
+        promoted_sources={f'{furniture_source(r)[0]:04X}' for r in installed}
         report['staged_furniture']['rows']=[r for r in report['staged_furniture']['rows'] if r['item_id'] not in promoted]
         runtime=report['equipment_resources']['room_rigs']
         for row in runtime['rows']+runtime['sound_rows']+runtime.get('material_rows',[])+runtime.get('scrolling',{}).get('rows',[]):
-            if row['source_item_id'] in promoted:row['parent_selectable']=True
+            if row['source_item_id'] in promoted_sources:row['parent_selectable']=True
     report.update(build='v3-automatic-furniture',runtime_abi=abi,input_build_sha256=sha256(base),
         output_sha256=sha256(result),patch_sha256=sha256(patch),blob_sha256=sha256(blob),
         blob_bytes=len(blob),blob_file_bytes=len(blob),startup=startup_report,furniture=all_furniture,

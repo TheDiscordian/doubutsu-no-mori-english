@@ -1,5 +1,4 @@
-/* Complete scrolling layers share immutable, frame-owned commands and matrix.
-   The caller supplies non-rig private colour state; lifecycle remains separate. */
+/* Complete scrolling layers share immutable, frame-owned commands and matrix. */
 #include "room_scroll.h"
 
 static const RoomScrollRecord *scroll_find(u32 index) {
@@ -112,3 +111,68 @@ void af_v3_room_scroll_dw(RoomRig *actor,void *room,RoomRigGame *game,u8 *data) 
         *x++=(RoomCommand){0xDE000000,0x06000000u+r->model_offsets[i]};
     osWritebackDCache((void *)allocation,(int)scratch);
 }
+
+#ifdef AF_V3_ROOM_SCROLL_LIFECYCLE
+static const RoomScrollLife *life_find(u32 index) {
+    if (index>=2048u && index<3072u) index-=1024u;
+    if (room_scroll_lives->magic!=ROOM_SCROLL_LIFE_MAGIC || room_scroll_lives->reserved ||
+            room_scroll_lives->stride!=sizeof(RoomScrollLife) ||
+            room_scroll_lives->count>ROOM_SCROLL_LIFE_CAPACITY) return 0;
+    for (u32 i=0;i<room_scroll_lives->count;++i) {
+        const RoomScrollLife *r=room_scroll_lives->rows+i;
+        if (r->index!=index) continue;
+        if (index<1024 || index>=2048 || r->mode<1 || r->mode>2 || r->flags>1 ||
+                r->sound<68 || r->sound>=96 ||
+                (r->on ? (!r->off || r->on>=128 || r->off>=128) : r->off!=0)) return 0;
+        if (r->mode==1 ? (r->flags || r->maximum || r->step || r->on || r->off)
+                       : (!r->maximum || !r->step || r->step>r->maximum)) return 0;
+        return r;
+    }
+    return 0;
+}
+
+void af_v3_room_scroll_ct(RoomScrollActor *actor,u8 *data) {
+    (void)data;
+    const RoomScrollLife *r=actor ? life_find(actor->index) : 0;
+    if (!r || r->mode!=2) return;
+    actor->private_switch=actor->saved_switch==1;
+    actor->colour.f=actor->private_switch ? (float)r->maximum : 0.0f;
+}
+
+void af_v3_room_scroll_mv(RoomScrollActor *actor,void *room,RoomRigGame *game,u8 *data) {
+    (void)room;(void)game;(void)data;
+    const RoomScrollLife *r=actor ? life_find(actor->index) : 0;
+    if (!r) return;
+    int audible=actor->state<12 || actor->state>15;
+    if (r->mode==1) {
+        if (audible) sAdo_OngenPos((u32)(uptr)actor,(u8)r->sound,actor->position);
+        return;
+    }
+    if ((unsigned)actor->private_switch>1 ||
+            !(actor->colour.f>=0.0f && actor->colour.f<=(float)r->maximum)) return;
+    /* The native update replaces two source updates. A switch edge occurs
+       only in the first half; do not repeat it or clear the owner's flag. */
+    for (u32 half=0;half<2;++half) {
+        float target=actor->private_switch ? (float)r->maximum : 0.0f;
+        if (audible && actor->private_switch)
+            sAdo_OngenPos((u32)(uptr)actor,(u8)r->sound,actor->position);
+        if (actor->colour.f>target) {
+            actor->colour.f-=(float)r->step;
+            if (actor->colour.f<target) actor->colour.f=target;
+        } else if (actor->colour.f<target) {
+            actor->colour.f+=(float)r->step;
+            if (actor->colour.f>target) actor->colour.f=target;
+        } else if (!half && actor->changed) {
+            actor->private_switch^=1;
+            if (r->on) sAdo_OngenTrgStart(actor->private_switch ? r->on : r->off,actor->position);
+        }
+    }
+}
+
+void af_v3_room_scroll_dt(RoomScrollActor *actor,u8 *data) {
+    (void)data;
+    const RoomScrollLife *r=actor ? life_find(actor->index) : 0;
+    if (r && (r->flags&1) && (unsigned)actor->private_switch<=1)
+        actor->saved_switch=(u8)actor->private_switch;
+}
+#endif

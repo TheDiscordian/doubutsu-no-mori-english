@@ -1607,6 +1607,7 @@ def tool_controls(debug,rom_path,record,*,transitions=False,capture=False,rod=Fa
 
 def exercise(debug, rom_path, record, *, section='automatic_furniture'):
     if section=='staged_profiles':return staged_profiles(debug,rom_path,record)
+    if section=='scroll_lifecycles':return scroll_lifecycles(debug,rom_path,record)
     if section=='furniture_audio':return furniture_audio(debug,rom_path,record)
     if section in ('scenery_planting_sparkle','scenery_planting_sparkle_remaining'):
         from v3_scenery_smoke import planting_sparkle
@@ -2640,6 +2641,83 @@ def held_level_sound(debug,rom_path,record):
         native_volume_pause_fade_pan_reverb=True,native_actor_registration_and_expiry=True,
         physical_audio_played=False,pcm_or_listening_verified=False,ordinary_gameplay_tested=False,
         flash_written=False,requires_checkpoint_restore=True)
+
+
+def scroll_lifecycles(debug,rom_path,record):
+    """One bounded shared-category callback/loader check; no ordinary play claim."""
+    from aflib import CODE_RAM,CODE_VROM,u32
+    from v3_import_storage import jump
+    path=Path(rom_path);image=path.read_bytes();report=json.loads((path.parent/'build.json').read_bytes())
+    if sha256(image)!=report['output_sha256']:raise ValueError('Changed scrolling lifecycle cartridge')
+    e=report['equipment_resources'];rig=e['room_rigs'];scroll=rig['scrolling'];audio=e['furniture_level_audio']
+    files=by_vrom(image);core=files[CODE_VROM].extract(image);blob=files[runtime.BLOB].extract(image)
+    boot=boot_proofs(image);assertions=0
+    def check(label,at,want):
+        nonlocal assertions
+        got=debug.read_memory(at,len(want));passed=got==want
+        record(dict(scroll_lifecycle_check=label,address=f'{at:08X}',bytes=len(want),
+                    assertion='passed' if passed else 'failed',actual=got.hex() if len(got)<=16 else sha256(got)))
+        if not passed:raise ValueError('Scrolling lifecycle mismatch: '+label)
+        assertions+=1
+    def call(at,args=(),proof=None):
+        result=debug.call(f'{at:08X}',list(args),return_address=MODULE_RAM+0x6480,verified_code=proof or boot.get(at))
+        record(result);return result['return_value']
+    sequence=u32(debug.read_memory(0x8014CBA8,4),0);seq=audio['sequence']
+    if not 0x80000400<=sequence<=0x80400000-seq['bytes']:raise ValueError('Unbounded native sound sequence')
+    raw=image[seq['physical']:seq['physical']+seq['bytes']]
+    for row in audio['programs']:
+        check('loaded complete positioned-loop program',sequence+row['offset'],raw[row['offset']:row['offset']+row['bytes']])
+        check('actual level dispatch binding',sequence+row['native_table']+row['native_sound_id']*2,
+              struct.pack('>H',row['offset']))
+    allocation=call(0x8009BFC0,[0x900])
+    if allocation&15 or not MODULE_RAM+0x8000<=allocation<=0x80400000-0x900:
+        raise ValueError('Scrolling callback fixture allocation failed')
+    actor,capture,bridge=allocation+16,allocation+0x780,allocation+0x800
+    debug.write_memory(allocation,bytes(0x900));edge=b'V3SL'*4
+    guards=(allocation,actor+0x740,capture-16,capture+32,bridge-16,bridge+32,allocation+0x8F0)
+    for at in guards:debug.write_memory(at,edge)
+    names=('ct','mv','dt');stubs=b''.join(struct.pack('>2I',jump(rig['bootstrap']['symbols']['af_v3_room_boot_scroll_'+n]),0) for n in names)
+    debug.write_memory(bridge,stubs);call(0x8002FE00,[bridge,len(stubs)]);call(0x80034CE0,[bridge,len(stubs)])
+    def invoke(name):return call(bridge+names.index(name)*8,[actor,0,0,0],(bridge,stubs))
+    # Observe the real MIPS callback's sound arguments without audible output.
+    # Native synthesis and ordinary interactions are deliberately separate.
+    saved={}
+    for entry,target in ((0x800D1D08,capture),(0x800D1D58,capture+16)):
+        original=core[entry-CODE_RAM:entry-CODE_RAM+40];check('native sound entry before recorder',entry,original)
+        saved[entry]=original
+        recorder=struct.pack('>10I',0x3C080000|(target>>16),0x35080000|(target&65535),
+            0xAD040000,0xAD050004,0xAD060008,0x8D09000C,0x25290001,0xAD09000C,0x03E00008,0)
+        debug.write_memory(entry,recorder);call(0x8002FE00,[entry,40]);call(0x80034CE0,[entry,40])
+    saved_state=debug.read_memory(report['save_runtime']['state_ram'],report['save_runtime']['state_bytes'])
+    try:
+        for row in scroll['lifecycle_rows']:
+            debug.write_memory(actor,bytes(0x740));debug.write_memory(actor,struct.pack('>H',row['runtime_index']))
+            invoke('ct');check('constructor starts from saved off state',actor+0x1A4,bytes(6))
+            debug.write_memory(actor+0x12D,b'\x01');debug.write_memory(capture,bytes(32));invoke('mv')
+            check('actual positioned sound identity, position, and count',capture,
+                  struct.pack('>4I',actor,row['sound'],actor+8,1))
+            if row['mode']==2:
+                check('one edge and one source-half fade',actor+0x1A4,struct.pack('>fh',row['step'],1))
+                check('switch edge is owned by native parent',actor+0x12D,b'\x01')
+                if row['on']:check('actual switch-on click and count',capture+16,struct.pack('>2I',row['on'],actor+8))
+                else:check('no invented switch click',capture+16,bytes(16))
+                debug.write_memory(actor+0x12D,b'\0');debug.write_memory(capture,bytes(32));invoke('mv')
+                check('two source updates per native frame',actor+0x1A4,struct.pack('>fh',row['step']*3,1))
+                check('sustained refresh uses the same actor',capture,struct.pack('>4I',actor,row['sound'],actor+8,2))
+                invoke('dt');check('source-specific teardown persistence',actor+0x12C,bytes((row['flags'],)))
+            debug.write_memory(actor+0x3C,struct.pack('>h',12));debug.write_memory(actor+0x12D,b'\0')
+            debug.write_memory(capture,bytes(32));invoke('mv');check('excluded native state suppresses sound',capture,bytes(32))
+        p=scroll['packet'];check('complete lazy-loaded scroll code and both tables',p['ram'],blob[p['blob_offset']:p['blob_offset']+p['bytes']])
+        for at in guards:check('native callback work guard',at,edge)
+        check('saved data retained',report['save_runtime']['state_ram'],saved_state)
+        check('no CPU fault',0x8003CE34,bytes(4))
+    finally:
+        for entry,original in saved.items():
+            debug.write_memory(entry,original);call(0x8002FE00,[entry,len(original)]);call(0x80034CE0,[entry,len(original)])
+        call(0x8009C040,[allocation])
+    return dict(native_scroll_lifecycles=True,assertions=assertions,source_shapes=len(scroll['lifecycle_rows']),
+        callback_dispatch_recorder=True,ordinary_room_interaction=False,physical_audio_played=False,
+        synthesis_tested=False,requires_checkpoint_restore=True)
 
 
 def staged_profiles(debug,rom_path,record):

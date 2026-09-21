@@ -1,5 +1,127 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared scroll lifecycles and ordinary imports
+
+ABI 178 is `build/v3-scrolling-loop-imports-01/cartridge/build-lock.json`.
+The shared loop/fade lifecycle build is ABI 176 at
+`build/v3-scrolling-lifecycles-runtime-01/`; ABI 177 at
+`build/v3-scrolling-loop-profiles-02/` stages the three eligible ordinary profiles.
+The final ordinary importer activates Merlion (`1FE4` → `3C34`/1805),
+Manekin Pis (`1FE8` → `3C38`/1806), and fireplace (`31A0`/1128). The source
+`ftr_listJonason` and `ftr_listKamakura` routes use the existing Gulliver and
+winter-camper adapters. All three remain non-orderable. Their official names
+already have entries in the single provenance catalogue; no text is invented.
+
+Four twelve-byte records implement source-shaped positioned loops/switch fades,
+with maxima/steps 126/4, 255/6, and 100/4. Native constructor, move, and destroy
+entries join the existing renderer's vtable. Two source half-updates retain
+the fade speed at native frame rate; one edge may toggle only at the target.
+The native parent keeps ownership of its changed flag. States 12–15 suppress
+loop refreshes. Teardown persists the private switch only where the source
+has a destructor. Sprinkler clicks `16`/`17` match complete existing native
+two-note programs, including both instruments and priority 50.
+
+Full source contracts, packed records, installed programs, every required
+instrument/sample, and complete packet/artwork/dispatch are checked again when
+ordinary profiles bind. Staging reuses existing checked active/inactive profiles
+from a full prepared bundle. Source indices remain separate from destination
+indices for names/prices, profile creation, binding, asset reuse, and promotion.
+The three models total 18,384 bytes and are all reused with zero compiler
+containers for artwork. Only terminal metadata alignment grows the blob, by
+16 bytes. Native profiles leave generic model/animation pointers null so the
+custom renderer does not double-draw geometry.
+
+The scroll code is 3,184 bytes; bootstrap is 1,426 bytes inside its 1,536-byte
+reservation. The lifecycle table starts at `804BBC10` inside the existing
+8-KiB packet. Complete code/table storage, ordinary heap, model banks, and saved
+formats do not grow. The source callbacks use native private colour `1A4` and
+switch `1A8`; save switch/changed remain `12C`/`12D`. Stack use is 64 bytes for
+drawing, 48 for movement, and 24 for constructor/destructor.
+
+Commands used:
+
+```sh
+python3 tools/v3_furniture_install.py --refresh-runtime \
+  --base-lock build/v3-scrolling-level-audio-runtime-03/build-lock.json \
+  --scrolling-materials-art build/v3-scrolling-materials-prepared-03 \
+  --output build/v3-scrolling-lifecycles-runtime-01
+python3 tools/v3_furniture_install.py --refresh-runtime \
+  --base-lock build/v3-scrolling-lifecycles-runtime-01/build-lock.json \
+  --furniture-profiles build/v3-scrolling-materials-prepared-03 \
+  --output build/v3-scrolling-loop-profiles-02
+python3 tools/v3_furniture_pipeline.py import \
+  --base-lock build/v3-scrolling-loop-profiles-02/build-lock.json \
+  --category scrolling-material-assets \
+  --reuse-assets build/v3-scrolling-materials-prepared-03 \
+  --output build/v3-scrolling-loop-imports-01
+```
+
+The initial profile build correctly stopped with no eligible profiles because
+the new binding comparison incorrectly required decoded function annotations
+to exist in the earlier raw descriptor. Comparing all actual descriptor fields
+while retaining source revalidation fixes that importer error; the successful
+second directory is retained independently. No partial profile build is used.
+
+Four focused checks cover the changed implementation:
+
+- Actual shared C callbacks pass address/undefined-behaviour sanitizers for all
+  four records, canonical/preview aliases, saved switch values, complete fades,
+  ignored mid-fade edges, sound suppression, clicks, persistence, guards, and
+  malformed records/NaN rejection. This executed against the ABI-176 table;
+  code/table contents are unchanged in ABI 178.
+- ABI 178 passes complete source/audio/runtime checks and forged binding
+  rejection. All 31 active/staged room bindings validate.
+- Empty/all, single legacy fountain, and fireplace selections match between
+  browser JavaScript and offline composition. Empty/all reproduce the exact
+  translation-only baseline/current cartridge; new selections set destination
+  bits, not donor-index bits. Nothing is served or deployed.
+- All three ordinary records retain complete source models, prices, names,
+  acquisition routes, non-orderability, stable identities, profiles, and exact
+  UPS reconstruction. The sprinkler/mower remain rejected.
+
+The first composition fixture passed a list instead of the normal resolved
+selection object; the corrected fixture passes. One ordinary-record assertion
+also needed the receipt's hexadecimal VROM converted to an integer; its focused
+retry passes. The successful ABI-178 source/composition group took 14.778 seconds
+including that failed assertion, and the corrected ordinary test passed in
+10.957 seconds. No old candidate or unchanged test matrix was replayed.
+
+The first silent native run at `build/v3-scrolling-lifecycles-native-01/` passes
+93 records and 55 assertions. It verifies actual sequence/program loading,
+level dispatch, lazy loading of the entire new packet, MIPS constructor/move/
+destroy execution, fade timing, sound-call arguments/counts, excluded states,
+source-specific persistence, guards, saved-data retention, checkpoint restore,
+and graceful exit. Isolated recorders replace only the positioned/trigger entry
+prefixes during this paused test and are restored. This is not sample synthesis,
+audible playback, GPU appearance, an ordinary room interaction, or hardware
+verification. No repeated large-arena/title fixture is used.
+
+Final hashes:
+
+- ROM: `5c7daa8d53b9b3207af5baf119602e01e3f8512e609c28d97d211efeb17305ec`.
+- UPS: `b97b43c1f7e4987bbc82f56eb90dd11cd83ad9162af95fb7afc928f6504e8295`.
+- Report: `4df75df5069f5feeb90300a7db06b7dffe32fa01a52c2ffc7e6e3b8d9eca1cd2`.
+- Scroll packet: `c6430b43b7ee6c20c9c961d03d9093204644bf02ecfdbe69dbabba1701cc4f9e`.
+- Scroll code: `e340d668b5795ed47475f3bb1a3f4ec2d24f281401ad2f11e20f5f3b1b074755`.
+- Lifecycle table: `a267ec1d8298718e66d0219afb4f0739d4d8053cc061900ddaca77682cdb0cd4`.
+
+There are 140 experimental choices: 20 villagers, 93 furniture items, 24
+equipment parents, and three shirts. Twenty-seven profiles remain inactive.
+The blob is 4,440,528 bytes, leaving 1,850,928 bytes in the checked reservation.
+Saved format 3 is unchanged; saves selecting these additions require the IDs in
+the target build/profile. Older builds missing them are incompatible. No new
+ordinary save/restart or original-hardware acceptance is claimed. The main lock
+retains SHA `f69d44334f40335c687816ece1abf0f0d1d213ccfb52bbb433f889ff606428ef`;
+both deployments of the one stable patcher remain unchanged.
+
+Next complete the native start-disabled placement category. Original native
+`80937FB0..809380EB` sets fresh non-gyroid switches to one without the GC
+`1000` test. Preserve loaded switches, existing native interaction semantics,
+and relocation when adding this rule. Sprinkler has complete callbacks/audio
+but is still disabled for that reason. Mower needs its source contact/floor
+update; other material and rigged-material categories remain. Finish primary
+imports before the required gold-tree effects and golden-shovel acquisition.
+
 ## Shared positioned-loop audio
 
 ABI 175 is `build/v3-scrolling-level-audio-runtime-03/build-lock.json`, based on

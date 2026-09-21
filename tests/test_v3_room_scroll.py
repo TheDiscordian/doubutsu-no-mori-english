@@ -24,6 +24,129 @@ OUT=ROOT/'build/v3-scrolling-materials-runtime-04'
 ART=ROOT/'build/v3-scrolling-materials-prepared-03'
 
 
+class ScrollingLifecycleTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        import os
+        cls.out=ROOT/os.environ.get('V3_SCROLL_LIFECYCLE_BUILD','build/v3-scrolling-loop-imports-01/cartridge')
+        cls.image,cls.report=inputs(cls.out/'build-lock.json')
+        cls.blob=by_vrom(cls.image)[BLOB].extract(cls.image)
+        cls.equipment=cls.report['equipment_resources']
+        cls.runtime=cls.equipment['room_rigs']['scrolling']
+        cls.source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+            (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+
+    def test_actual_callbacks_under_memory_sanitizers(self):
+        with tempfile.TemporaryDirectory(prefix='v3-scroll-lifecycle-') as temporary:
+            binary=Path(temporary)/'test';table=Path(temporary)/'table'
+            table.write_bytes(scroll.encode_lifecycles(self.runtime['lifecycle_rows']))
+            result=subprocess.run(['cc','-std=c11','-O1','-g','-Wall','-Wextra','-Werror',
+                '-fsanitize=address,undefined','-fno-omit-frame-pointer',
+                str(ROOT/'tests/v3_room_scroll_lifecycle_test.c'),'-o',str(binary)],
+                capture_output=True,text=True,timeout=30)
+            self.assertEqual(result.returncode,0,result.stderr)
+            result=subprocess.run([str(binary),str(table)],capture_output=True,text=True,timeout=20)
+            self.assertEqual(result.returncode,0,result.stderr)
+            self.assertIn('bounded rejection pass',result.stdout)
+
+    def test_complete_source_and_installed_callback_bindings(self):
+        from aflib import CODE_VROM
+        from v3_sound_programs import checked_furniture_loops
+        contracts,proof=checked_furniture_loops(self.image,by_vrom(self.image)[CODE_VROM].extract(self.image),
+                                               self.equipment,self.source)
+        self.assertEqual(set(contracts),{'1FE4','1FE8','31A0','3368'})
+        self.assertTrue(proof['complete_programs_and_instruments'])
+        rows=scroll.checked_runtime(self.equipment,self.blob)
+        life=self.runtime['lifecycle_rows'];self.assertEqual(len(life),4)
+        for key,contract in contracts.items():
+            descriptor=prepare(self.source,int(key,16))[0]
+            verified=scroll.checked_lifecycle(self.source,descriptor,rows[key],self.runtime,contracts)
+            self.assertEqual(verified,json.loads(json.dumps(contract)))
+            self.assertEqual(scroll.profile_lifecycle(descriptor,verified),not contract['start_disabled'])
+        self.assertLessEqual(self.runtime['code']['bytes'],4096)
+        self.assertLessEqual(self.equipment['room_rigs']['bootstrap']['bytes'],room.TABLE-room.RAM)
+        self.assertEqual(scroll.tables(self.runtime),self.blob[self.runtime['packet']['blob_offset']+4096:
+                                                             self.runtime['packet']['blob_offset']+8192])
+        for field,value in (('mode',3),('sound',96),('flags',2),('on',128),('step',256)):
+            bad=copy.deepcopy(life);bad[0][field]=value
+            with self.assertRaises(ValueError):scroll.encode_lifecycles(bad)
+        bad=copy.deepcopy(self.equipment)
+        bad['room_rigs']['scrolling']['rows'][-1]['lifecycle']['constants']['step']['value']+=1
+        with self.assertRaisesRegex(ValueError,'lifecycle source binding'):
+            scroll.checked_runtime(bad,self.blob)
+        for key in contracts:
+            descriptor=prepare(self.source,int(key,16))[0]
+            forged=copy.deepcopy(contracts[key]);forged['functions']['move']['sha256']='0'*64
+            self.assertFalse(scroll.profile_lifecycle(descriptor,forged))
+        # Also verifies retained ordinary profiles against the new full vtable.
+        room.bind_profiles(self.source,self.image,self.report)
+
+    def test_current_selection_and_translation_only_composition(self):
+        import v3_browser_composition as browser
+        pin=composer.BASE,composer.BASE_SHA,composer.REPORT_SHA,composer.ABI
+        try:
+            composer.use_build_lock(self.out/'build-lock.json')
+            catalogue=composer.catalogue(self.image,self.report)
+            self.assertEqual(sha256(composer.compose(self.image,self.report,catalogue,composer.resolve(catalogue,[]))[0]),
+                             self.report['translation_baseline']['sha256'])
+            self.assertEqual(composer.compose(self.image,self.report,catalogue,composer.resolve(catalogue,list(catalogue)))[0],self.image)
+            self.assertEqual(self.report['save_codec']['format_version'],3)
+            plan=browser.rules(self.image,self.report);self.assertFalse(plan['web_patcher_enabled'])
+            self.assertEqual(len(catalogue),140)
+            cases=[]
+            for label,requested in (('empty',[]),('all',list(catalogue)),
+                    ('legacy-fade',['GAFE01-r0/item/1FE4']),('positioned-loop',['GAFE01-r0/item/31A0'])):
+                selection=composer.resolve(catalogue,requested)
+                image,_,blob=composer.compose(self.image,self.report,catalogue,selection)
+                if requested and label!='all':
+                    for item in (0x3C34,0x3C38,0x31A0):
+                        enabled=item==(0x3C34 if label=='legacy-fade' else 0x31A0);i=slot(item)
+                        self.assertEqual(struct.unpack_from('>I',blob,ROWS+i*80+4)[0],enabled)
+                        self.assertEqual(bool(blob[0x40+i//8]&(1<<(i&7))),enabled)
+                cases.append(dict(name=label,requested=requested,selection=selection,sha256=sha256(image)))
+            with tempfile.TemporaryDirectory(prefix='v3-scroll-loop-composition-') as directory:
+                path=Path(directory)/'fixture.json'
+                path.write_bytes(composer.canonical(dict(plan=plan,cases=cases,
+                    base=str(self.out/'animal-forest-v3-asset-loader.z64'),stable=str(composer.stable_reference(self.report)[0]))))
+                result=subprocess.run(['node','--experimental-global-webcrypto',str(ROOT/'tests/v3_browser_equivalence.mjs'),str(path)],
+                                      check=True,capture_output=True,text=True,timeout=60)
+                self.assertEqual(len(json.loads(result.stdout)['passed']),4)
+        finally:composer.BASE,composer.BASE_SHA,composer.REPORT_SHA,composer.ABI=pin
+
+    def test_complete_ordinary_profiles_preserve_donor_destination_and_assets(self):
+        rows=self.report['automatic_furniture']['imports']
+        self.assertEqual({r['item_id'] for r in rows},{'3C34','3C38','31A0'})
+        bindings=room.bind_profiles(self.source,self.image,self.report)
+        self.assertEqual(len(bindings),31)
+        self.assertEqual(len(self.report['staged_furniture']['rows']),27)
+        installed=scroll.checked_runtime(self.equipment,self.blob)
+        identities=identity_rows(ROOT/'build/item-identity-megasheet.xlsx',include_unmapped_legacy=True)
+        assets=json.loads((ART/'art.json').read_bytes())
+        from v3_registry import furniture_source
+        from v3_furniture_install import profile
+        for r in rows:
+            donor,index=furniture_source(r);key=f'{donor:04X}'
+            original=next(a for a in assets['objects'] if a['item_id']==key)
+            binding=installed[key]
+            self.assertTrue(binding['parent_selectable']);self.assertTrue(binding['profile_installed'])
+            vrom=int(r['object_vrom'],16)
+            self.assertEqual(vrom,binding['vrom'])
+            self.assertEqual(self.blob[binding['blob_offset']:binding['blob_offset']+binding['bytes']],
+                             (ART/original['object_file']).read_bytes())
+            self.assertEqual(r['price'],struct.unpack_from('>H',self.source.raw('ftr_price_table'),index*2)[0])
+            row=metadata(self.source,donor,prepare(self.source,donor)[0],identities[donor])
+            self.assertEqual(row['room_lifecycle'],r['room_lifecycle'])
+            self.assertEqual(row['donor_list'],'ftr_listKamakura' if donor==0x31A0 else 'ftr_listJonason')
+            self.assertFalse(row['catalogue_orderable'])
+            self.assertEqual(profile(r,vrom,limit=0x2800000),bytes.fromhex(bindings[key]['profile_hex']))
+        for key in ('3368','33A0'):
+            self.assertFalse(installed[key]['profile_installed'])
+            with self.assertRaisesRegex(ValueError,'Scrolling artwork'):
+                metadata(self.source,int(key,16),prepare(self.source,int(key,16))[0],identities[int(key,16)])
+        self.assertEqual(apply_ups((ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes(),
+                                  (self.out/'asset-loader.ups').read_bytes()),self.image)
+
+
 class ScrollingProfileIntegrationTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):

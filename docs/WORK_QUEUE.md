@@ -12,34 +12,36 @@ After the primary importing work, finish gold-tree leaf/cut effects and the full
 golden-shovel acquisition route. This is deferred required V3 work, not a dropped
 feature or a separate release goal.
 
-The current explicit proposal is ABI 175 at
-`build/v3-scrolling-level-audio-runtime-03/build-lock.json`. Four source-derived
-looping sounds and the complete missing fireplace instrument/sample are installed
-through shared audio machinery. The donor dispatch table is correctly bounded to
-96 entries; the expanded native dispatcher retains 128 entries. All 82 existing
-instruments remain intact, with one complete addition. The wave archive's virtual
-base is `04000000`; its physical base is unchanged, and native audio still reads
-physical offsets. The bounded append preserves English text and external waves.
-Five current-build checks and seven format checks pass. Do not replay unchanged
-audio/graphics or historical native tests. New native audio execution remains
-unverified and can join the changed lifecycle batch.
+The current explicit proposal is ABI 178 at
+`build/v3-scrolling-loop-imports-01/cartridge/build-lock.json`. The shared native
+positioned-loop and switch-fade callbacks are installed for all four source
+records, including verified sprinkler clicks. Merlion, Manekin Pis, and fireplace
+are optional ordinary imports through actual Gulliver/winter-camper routes.
+Three complete models are reused without compilation or additional RAM. Staging
+and promotion preserve distinct donor/destination IDs and existing profiles.
+Four focused checks and the first native callback run pass; the latter records
+55 assertions with restored state and clean exit. Reuse those results and the
+unchanged graphics/audio evidence; do not replay older builds.
 
-Next implement the shared positioned-loop and switch-fade callbacks using the
-decoded lifecycle contracts in `furniture_level_audio.furniture`. Preserve
-source maximum/step values, two source updates per native frame, switch events
-only at the fade target, the presence/absence of a destructor, state-based sound
-suppression, and sprinkler click sounds/start-disabled interaction. The callbacks
-are not installed; their four items remain disabled. Stage complete ordinary
-profiles and connect source acquisition through the existing bulk pipeline.
-Do not substitute arbitrary shop stock. The mower needs floor/contact updates;
-other material and rigged-material categories remain required. Gold-tree work
-follows primary importing. Keep both deployments of the stable website unchanged.
+Next finish the shared start-disabled placement flag, then stage/promote the
+sprinkler through the ordinary importer. Its installed callbacks/audio alone
+do not waive this missing placement rule. The original native switch initializer
+is `80937FB0..809380EB`; fresh placement sets the switch to one at `809380A8`,
+whereas donor `aMR_SetSwitchStepData` also checks `START_DISABLED` (`1000`).
+Preserve loaded save switches, native flags/gyroid behaviour, and relocation.
+The mower needs floor/contact-driven grass state. Other material and
+rigged-material categories, true acquisition routes, and ordinary gameplay/save
+verification remain required. Continue general category coverage before required
+gold-tree effects and golden-shovel acquisition. Keep both website deployments
+unchanged until the user's testing and explicit approval.
 
-There are 137 experimental choices and 27 inactive profiles. Saved format 3 and
-selected identities are unchanged from ABI 174; earlier missing-ID/profile
-restrictions still apply. The current permanent audio allocation has 32
-conservative bytes spare, so any subsequent audio growth must pass or extend the
-shared allocation check. The import blob has 1,850,944 bytes free.
+There are 140 experimental choices and 27 inactive profiles. Saved format 3 is
+unchanged; saves selecting these additions require an equal/superset supported
+profile and cannot load in older builds missing their IDs. Permanent audio has
+32 conservative bytes spare; future growth must pass or extend its allocation
+check. The import blob has 1,850,928 bytes free. Full sample synthesis, GPU
+appearance, and ordinary room interaction are not established by silent callback
+recording. No physical audio is played.
 
 The retained draw-only proposal is ABI 174 at
 `build/v3-draw-only-scrolling-imports-01/cartridge/build-lock.json`. Shared

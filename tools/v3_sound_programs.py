@@ -700,6 +700,95 @@ def audio_archive(image,code,kind):
     return matches[0]
 
 
+def checked_furniture_loops(image,code,equipment,source):
+    """Rebind installed level programs and native click pairs to complete sources."""
+    audio=equipment.get('furniture_level_audio')
+    if audio is None:return {},{}
+    if audio['format']!='AFV3-FURNITURE-LEVEL-AUDIO-1':raise ValueError('Unknown furniture loop audio format')
+    sequence,header,physical=installed_resource(image,code,'seq',199);record=audio['sequence']
+    if (record!=equipment['sound_programs']['sequence'] or record['sha256']!=sha256(sequence) or
+            record['header_after']!=header.hex() or record['physical']!=physical):
+        raise ValueError('Changed complete furniture loop sequence')
+    dol,packed=read_audio_donor(ROOT/'local/gamecube/Animal Crossing (USA, Canada).ciso')
+    donor={k:span(packed,*struct.unpack_from('>II',header_entry(dol.read,0x800CE450,i)))
+           for i,k in enumerate(('seq','bank','wave'))}
+    original,_=resource(dol.read,GC_SECTIONS,donor,'seq',242)
+    if sha256(original)!='790526e46582305f94eb05851337ccab5b8aa248c451e98f99f2d65965ab2a22':
+        raise ValueError('Changed complete source level sequence')
+    source_map=struct.unpack('>H',dol.read(0x800CE490+242*2,2))[0]
+    native_map=struct.unpack_from('>H',code,0x80115D80-CODE_RAM+199*2)[0]
+    source_banks=dol.read(0x800CE490+source_map,5)
+    native_banks=span(code,0x80115D80-CODE_RAM+native_map,5)
+    if (source_banks!=bytes((4,2,155,154,153)) or native_banks!=bytes((4,2,141,140,139)) or
+            struct.unpack_from('>H',sequence,0x179)[0]!=0x4D20):
+        raise ValueError('Changed complete level bank/dispatch mapping')
+    banks={};native={}
+    def identity(bank,index,donor_side):
+        cache=banks if donor_side else native
+        if bank not in cache:
+            if donor_side:
+                data,h=resource(dol.read,GC_SECTIONS,donor,'bank',bank)
+                wave,_=resource(dol.read,GC_SECTIONS,donor,'wave',h[10])
+            else:
+                data,h,_=installed_resource(image,code,'bank',bank)
+                wave,_,_=installed_resource(image,code,'wave',h[10])
+            cache[bank]=(data,wave,h[12])
+        data,wave,count=cache[bank]
+        return instrument(data,wave,index,count,extended=True)
+    starts=struct.unpack_from('>96H',original,0x2E02)
+    programs={r['source_sound_id']:r for r in audio['programs']};rows={};clicks=set()
+    for item in audio['furniture']:
+        donor_id=item['item_id'];profile=source.profile(int(donor_id,16));lifecycle=furniture_level(source,profile)
+        if (donor_id in rows or lifecycle is None or item['profile_sha256']!=profile['profile_sha256'] or
+                json.loads(json.dumps(lifecycle))!=item['lifecycle']):
+            raise ValueError('Changed complete furniture loop lifecycle')
+        sid=lifecycle['source_sound_id'];p=programs[sid]
+        origin=starts[sid];limit=min(at for at in starts if at>origin);data=original[origin:limit]
+        desc=looping_layer(data,origin)
+        if (p['source_program']!=desc or p['native_sound_id']!=sid or p['native_bank'] not in native_banks[1:] or
+                p['source_bank']!=source_banks[-1] or
+                struct.unpack_from('>H',sequence,0x4D20+sid*2)[0]!=p['offset']):
+            raise ValueError('Changed installed level program/source mapping')
+        selector=4-native_banks.index(p['native_bank'],1)
+        bound=bind_loop(data,desc,p['offset'],p['native_instrument'],selector)
+        sound_identity=identity(p['source_bank'],desc['instrument'],True)
+        if (len(bound)!=p['bytes'] or sha256(bound)!=p['sha256'] or
+                span(sequence,p['offset'],len(bound))!=bound or p['instrument_identity']!=sound_identity or
+                identity(p['native_bank'],p['native_instrument'],False)!=sound_identity):
+            raise ValueError('Changed complete installed level program or instrument')
+        rows[donor_id]=lifecycle;clicks.update(lifecycle['switch_clicks'])
+    click_proofs=[]
+    if clicks:
+        if any(struct.unpack_from('>H',seq,0x188)[0]!=0x194 for seq in (original,sequence)):
+            raise ValueError('Changed native/source group-zero click dispatch')
+        for sid in sorted(clicks):
+            parts=[]
+            for seq in (original,sequence):
+                offsets=struct.unpack_from('>128H',seq,0x194);at=offsets[sid]
+                # Both channel and layer terminate inside this exact form.
+                # Unrelated programs may follow before the next table-zero entry.
+                data=span(seq,at,16)
+                if (len(data)!=16 or data[0]!=0xEB or data[1]>3 or data[2]>125 or data[3]!=0x88 or
+                        struct.unpack_from('>H',data,4)[0]!=at+7 or data[6]!=255 or data[7]!=0x67 or
+                        not data[8] or data[9]>127 or data[10]!=0xC6 or data[11]>125 or
+                        data[12]!=0x67 or not data[13] or data[14]>127 or data[15]!=255):
+                    raise ValueError('Unsupported complete native click pair')
+                normalized=data[:4]+b'\0\x07'+data[6:];parts.append((at,data,normalized))
+            g,n=parts
+            source_priority=dol.read(0x800A9A90+sid,1)[0];native_priority=code[0x80113B84-CODE_RAM+sid]
+            if g[2]!=n[2] or source_priority!=native_priority:raise ValueError('Native click changes source timing or priority')
+            instruments=[]
+            for index in (g[1][2],g[1][11]):
+                source_identity=identity(source_banks[4-g[1][1]],index,True)
+                if identity(native_banks[4-n[1][1]],index,False)!=source_identity:
+                    raise ValueError('Native click lacks its complete source instrument')
+                instruments.append(source_identity)
+            click_proofs.append(dict(sound_word=sid,source_offset=g[0],native_offset=n[0],bytes=16,
+                source_sha256=sha256(g[1]),native_sha256=sha256(n[1]),instruments=instruments,priority=source_priority))
+    return rows,dict(sequence_sha256=sha256(sequence),clicks=click_proofs,
+        complete_programs_and_instruments=True,new_audio_resources=False)
+
+
 def installed_resource(image,code,kind,index):
     files=by_vrom(image)
     read=lambda at,n:span(code,at-CODE_RAM,n)

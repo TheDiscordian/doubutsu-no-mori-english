@@ -110,9 +110,9 @@ audio --category scrolling-material-assets` command with the explicit current
 lock. Complete move-function shapes select positioned loops or switch-driven
 fades; IDs and names do not select implementations. Checked read-only constants
 provide maximum/step values, and complete constructor/destructor bodies preserve
-their actual state and persistence semantics. Sprinkler clicks and its disabled
-initial interaction are explicit remaining callback dependencies. These source
-contracts do not claim installed behaviour.
+their actual state and persistence semantics. Shared native callbacks implement
+both categories, including the sprinkler's on/off clicks. Its disabled initial
+interaction remains a separate placement dependency.
 
 The same `--refresh-runtime --furniture-audio-art` installer accepts complete
 trigger or level-audio bundles. Sustained layers support mode setup before or
@@ -221,7 +221,7 @@ and written back for the RSP. Native counters are doubled to source counters;
 the source's doubled 14-bit tile origin is reduced from sixteenth-texel to
 quarter-texel units with explicit unsigned wrapping. Preview context never reads
 the larger play-context frame field. Colour state maps donor float offset `834`
-to private native `1A4`; a future lifecycle must initialise and maintain it.
+to private native `1A4`; the shared lifecycle initialises and maintains it.
 NaNs, invalid colour values, malformed records, and insufficient arenas produce
 no partial draw. Maximum scratch is 104 bytes plus eight alignment bytes.
 
@@ -230,6 +230,41 @@ ordinary heap, old room packet, selections, and saved formats remain unchanged;
 the additional fixed resident reservation is 8 KiB. Lifecycle/audio, ordinary
 profiles, acquisition, and native GPU/gameplay verification remain required.
 Do not freeze textures or discard translucent models to enable an import.
+
+#### Shared switch/fade and positioned-loop lifecycle
+
+The scroll packet's remaining table space at `804BBC10` contains `AFL1`, count,
+stride 12, zero, and up to 64 records. Each record carries native index, mode,
+persist-on-destroy flag, loop sound, optional on/off clicks, maximum, and step.
+The code reservation remains 4 KiB and the complete packet remains 8 KiB.
+The existing bootstrap supplies constructor, move, draw, and destroy dispatch
+through the same checked lazy loader. Draw-only records have no lifecycle entry
+and consequently no new actor writes or sounds.
+
+Mode one refreshes the source positioned sound on native updates. Mode two maps
+the source private switch to native `1A8` and colour float to `1A4`, retaining
+the native saved switch/changed fields at `12C`/`12D`. Construction interprets
+only saved value one as on. Each native move performs two source fade updates;
+only the first half sees the switch edge, and only at the current target. Edges
+during a fade remain ignored. Neither callback clears the parent's changed flag.
+Loop sounds are suppressed in native states 12–15. Source click events retain
+their independent rule. Destruction writes the private switch back only when
+the source actually has that destructor; no persistence callback is invented
+for Manekin Pis. Invalid records, switches, and non-finite/out-of-range colour
+state produce no callback writes or sounds.
+
+Ordinary binding rechecks full source callbacks/helpers/constants, actual native
+sound programs, bank selectors, complete instruments/samples, drawing resources,
+packed lifecycle records, packet identity, and vtable. Sprinkler clicks use the
+complete two-note native programs, including their instrument change, note timing,
+and priorities. Each channel/layer has its own checked termination; a later
+dispatch pointer is not assumed to delimit the program.
+
+Merlion, Manekin Pis, and fireplace use the shared ordinary profile/acquisition
+pipeline. Sprinkler's `1000` start-disabled profile flag is not implemented by
+the original native fresh-placement path, so that profile remains rejected.
+Installed move/draw/audio callbacks do not bypass the missing placement rule.
+The mower's separate contact/floor-driven state remains unfinished.
 
 The `material-frame-assets` category prepares complete custom-drawn models and
 their texture/palette frame tables independently of unfinished lifecycle code.
@@ -1457,7 +1492,7 @@ and resources are installed.
 
 `--refresh-runtime --furniture-profiles <prepared-directory>` accepts repeated
 complete prepared bundles for implemented clock, storage, sound, and
-material/trigger categories, plus draw-only scrolling objects.
+material/trigger categories, plus draw-only and complete loop/fade scrolling objects.
 Source identity, complete artwork, callback bindings, and installed audio are
 checked before writing ordinary 80-byte profile and 32-byte item records into
 their fixed canonical slots. Official English names retain individual entries
@@ -1484,10 +1519,17 @@ with null generic model/animation slots, so the engine does not draw duplicate
 geometry. The normal metadata path admits the pool's actual `ftr_listEvent`
 route and existing event stock/catalogue/scoring adapters. The well model has no
 supported acquisition-list binding and remains staged, not shop-stocked.
-Five other scrolling objects keep their actual unfinished lifecycle dependencies.
+The loop/fade category additionally supplies the two fountains and fireplace.
+Sprinkler keeps its pending start-disabled placement; mower keeps its missing
+contact/floor-driven lifecycle.
 Staging merges pending resources across categories, preserving material gaps.
 Subsequent resource batches validate and retain both staged and activated
 profiles without resetting completed lifecycle status or duplicating objects.
+Prepared staging bundles may contain those verified existing profiles; they are
+reused rather than rejected as duplicates. Donor and destination identities are
+resolved through the shared registry. Prices and source profiles use donor
+indices, while native slots, saved selections, and item records use destinations.
+Bindings and promotion match on canonical donor identity, including legacy IDs.
 The older scrolling format exposes no ordinary profiles; upgrading its renderer
 remains a prerequisite for this category.
 

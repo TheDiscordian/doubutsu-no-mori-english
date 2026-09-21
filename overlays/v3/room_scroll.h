@@ -30,4 +30,42 @@ extern void *_Matrix_to_Mtx(void *);
 extern void osWritebackDCache(void *,int);
 /* Existing native Debug_mode owner, not new shared writable renderer state. */
 extern u8 *af_v3_room_debug;
+#ifdef AF_V3_ROOM_SCROLL_LIFECYCLE
+#define ROOM_SCROLL_LIFE_MAGIC 0x41464C31u
+#define ROOM_SCROLL_LIFE_CAPACITY 64u
+typedef struct {
+    u16 index;
+    u8 mode,flags;
+    u16 sound,on,off;
+    u8 maximum,step;
+} RoomScrollLife;
+typedef struct {
+    u32 magic,count,stride,reserved;
+    RoomScrollLife rows[ROOM_SCROLL_LIFE_CAPACITY];
+} RoomScrollLives;
+typedef struct {
+    u16 index;
+    u8 before_position[6];
+    float position[3];
+    u8 before_state[0x3C-20];
+    s16 state;
+    u8 before_switch[0x12C-0x3E];
+    u8 saved_switch,changed;
+    u8 before_private[0x1A4-0x12E];
+    FloatWord colour;
+    s16 private_switch;
+} RoomScrollActor;
+_Static_assert(sizeof(RoomScrollLife)==12,"Scroll lifecycle record size");
+ROOM_CHECK(RoomScrollActor,position,8); ROOM_CHECK(RoomScrollActor,state,0x3C);
+ROOM_CHECK(RoomScrollActor,saved_switch,0x12C); ROOM_CHECK(RoomScrollActor,changed,0x12D);
+ROOM_CHECK(RoomScrollActor,colour,0x1A4); ROOM_CHECK(RoomScrollActor,private_switch,0x1A8);
+#ifdef __mips__
+#define room_scroll_lives ((const RoomScrollLives *)0x804BBC10u)
+#else
+extern RoomScrollLives af_v3_test_room_scroll_lives;
+#define room_scroll_lives (&af_v3_test_room_scroll_lives)
+#endif
+extern void sAdo_OngenPos(u32,u8,float *);
+extern void sAdo_OngenTrgStart(u32,float *);
+#endif
 #endif
