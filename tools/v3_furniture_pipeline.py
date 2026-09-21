@@ -1104,7 +1104,7 @@ def metadata(source, item, profile, identity):
         feng_hex=feng.hex(), series=series, birth_category=birth, donor_birth_category=donor_birth, surface=surface,
         donor_series_hex=source.raw('mMkRm_series_info')[series*3:series*3+3].hex(),
         identity_worksheet_row=number, behaviour=profile['behaviour'],
-        **({k:binding[k] for k in ('room_runtime','room_lifecycle') if k in binding} if binding else {}))
+        **({k:binding[k] for k in ('room_runtime','room_lifecycle','room_placement') if k in binding} if binding else {}))
 
 
 def scan(source, worksheet, installed=None):

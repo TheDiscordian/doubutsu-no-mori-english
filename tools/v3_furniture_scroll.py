@@ -399,18 +399,23 @@ def tables(runtime):
     return data.ljust(BYTES-(TABLE-RAM),b'\0')
 
 
-def profile_lifecycle(profile,contract):
+def profile_lifecycle(profile,contract,placement=None):
     """Check the source-bound lifecycle carried into an ordinary profile.
 
     The binding caller additionally verifies actual source code, installed
     table/dispatch, and complete audio. A readiness annotation alone is not used.
-    Start-disabled placement still needs its native owner adapter.
+    Start-disabled placement requires the checked native owner adapter.
     """
     if draw_only_lifecycle(profile) is not None:return True
     adapter=profile.get('callback_adapter',{})
+    start=profile['interaction_flags']==0x1000
+    if start:
+        from v3_furniture_behaviours import initial_switch_patch
+        if (not placement or placement.get('mask')!=0x1000 or
+                placement.get('owner_patch_sha256')!=sha256(initial_switch_patch(placement.get('entry')))):return False
     if (not contract or adapter.get('category')!=CATEGORY or
-            adapter.get('pending_profile_fields') or profile['contact_action'] or
-            profile['interaction_flags'] or contract.get('start_disabled') or
+            adapter.get('pending_profile_fields')!=(['interaction'] if start else []) or profile['contact_action'] or
+            profile['interaction_flags'] not in (0,0x1000) or bool(contract.get('start_disabled'))!=start or
             contract.get('category') not in ('positioned-loop','switch-fade-loop')):return False
     functions=json.loads(json.dumps(adapter['functions']));bound=contract.get('functions',{})
     if (set(bound)!=set(functions) or any(bound[role].get(k)!=v

@@ -1608,6 +1608,7 @@ def tool_controls(debug,rom_path,record,*,transitions=False,capture=False,rod=Fa
 def exercise(debug, rom_path, record, *, section='automatic_furniture'):
     if section=='staged_profiles':return staged_profiles(debug,rom_path,record)
     if section=='scroll_lifecycles':return scroll_lifecycles(debug,rom_path,record)
+    if section=='initial_switch':return initial_switch(debug,rom_path,record)
     if section=='furniture_audio':return furniture_audio(debug,rom_path,record)
     if section in ('scenery_planting_sparkle','scenery_planting_sparkle_remaining'):
         from v3_scenery_smoke import planting_sparkle
@@ -2641,6 +2642,78 @@ def held_level_sound(debug,rom_path,record):
         native_volume_pause_fade_pan_reverb=True,native_actor_registration_and_expiry=True,
         physical_audio_played=False,pcm_or_listening_verified=False,ordinary_gameplay_tested=False,
         flash_written=False,requires_checkpoint_restore=True)
+
+
+def initial_switch(debug,rom_path,record):
+    """Execute the complete installed initializer's changed fresh-placement path.
+
+    Copy its checked function into a small isolated arena; do not allocate or
+    replay an entire room owner. Unchanged reload/gyroid callees are not invoked.
+    """
+    import v3_furniture_behaviours as behaviours
+    from v3_furniture_runtime import VROM,RAM as OWNER_RAM
+    from v3_import_storage import jump,ROWS,slot,PACKAGE,PACKAGE_RAM
+    path=Path(rom_path);image=path.read_bytes();report=json.loads((path.parent/'build.json').read_bytes())
+    if sha256(image)!=report['output_sha256']:raise ValueError('Changed placement cartridge')
+    files=by_vrom(image);blob=files[runtime.BLOB].extract(image)
+    binding=behaviours.checked_initial_switch(image,report,blob)
+    if binding is None:raise ValueError('Missing complete initial-switch adapter')
+    owner=files[VROM].extract(image);body=owner[behaviours.SWITCH_FIRST-OWNER_RAM:behaviours.SWITCH_END-OWNER_RAM]
+    boot=boot_proofs(image);assertions=0
+    def check(label,at,want):
+        nonlocal assertions
+        got=debug.read_memory(at,len(want));passed=got==want
+        record(dict(initial_switch_check=label,address=f'{at:08X}',bytes=len(want),
+            assertion='passed' if passed else 'failed',actual=got.hex() if len(got)<=16 else sha256(got)))
+        if not passed:raise ValueError('Initial-switch native mismatch: '+label)
+        assertions+=1
+    def call(at,args=(),proof=None):
+        result=debug.call(f'{at:08X}',list(args),return_address=MODULE_RAM+0x6480,verified_code=proof or boot.get(at))
+        record(result);return result['return_value']
+    allocation=call(0x8009BFC0,[0xC00])
+    if allocation&15 or not MODULE_RAM+0x8000<=allocation<=0x80400000-0xC00:
+        raise ValueError('Fresh-placement fixture allocation failed')
+    actor,function,bridge,profile=allocation+16,allocation+0x780,allocation+0x900,allocation+0x940
+    debug.write_memory(allocation,bytes(0xC00));edge=b'V3IS'*4
+    guards=(allocation,actor+0x740,function-16,function+0x140,bridge-16,bridge+16,profile-16,profile+80,allocation+0xBF0)
+    for at in guards:debug.write_memory(at,edge)
+    debug.write_memory(function,body);call(0x8002FE00,[function,len(body)]);call(0x80034CE0,[function,len(body)])
+    table=int(report['furniture']['expanded_tables']['profile_table_ram'],16)
+    row=report['automatic_furniture']['imports'][0];index=row['runtime_index']
+    at=ROWS+slot(int(row['item_id'],16))*80+8;native_profile=blob[at:at+68]
+    if len(native_profile)!=68 or struct.unpack_from('>H',native_profile,62)[0]!=0x1000:
+        raise ValueError('Fixture needs a real installed start-disabled profile')
+    code=report['furniture_behaviours']['code'];at=PACKAGE+behaviours.RAM-PACKAGE_RAM
+    check('complete installed shared behaviour helper',0x80483D00,blob[at:at+code['bytes']])
+    state=report['save_runtime'];saved_state=debug.read_memory(state['state_ram'],state['state_bytes'])
+    saved={}
+    try:
+        for selected,flags,expected in ((index,0x1000,0),(index,0,1),(1,0x1000,1)):
+            pointer=table+selected*4
+            if pointer not in saved:saved[pointer]=debug.read_memory(pointer,4)
+            data=bytearray(native_profile);struct.pack_into('>H',data,62,flags)
+            debug.write_memory(profile,data);debug.write_memory(pointer,struct.pack('>I',profile))
+            actor_data=bytearray(b'\xA7'*0x740);struct.pack_into('>H',actor_data,0,selected)
+            debug.write_memory(actor,actor_data)
+            call(function,[actor,1,0],(function,body))
+            actor_data[0x12C]=expected;actor_data[0x12E]=255
+            check('complete fresh actor; native defaults preserved',actor,actor_data)
+            debug.write_memory(pointer,saved[pointer])
+        # The real installed scrolling constructor must consume the initial
+        # off bit. Its unchanged movement/rendering checks are not replayed.
+        data=bytearray(0x740);struct.pack_into('>H',data,0,index);debug.write_memory(actor,data)
+        entry=report['equipment_resources']['room_rigs']['bootstrap']['symbols']['af_v3_room_boot_scroll_ct']
+        stub=struct.pack('>2I',jump(entry),0);debug.write_memory(bridge,stub)
+        call(0x8002FE00,[bridge,8]);call(0x80034CE0,[bridge,8]);call(bridge,[actor,0],(bridge,stub))
+        check('installed fade constructor keeps fresh off state',actor+0x1A4,bytes(6))
+        for at in guards:check('fresh-placement actor/code guard',at,edge)
+        check('saved state retained',state['state_ram'],saved_state);check('no CPU fault',0x8003CE34,bytes(4))
+    finally:
+        for pointer,data in saved.items():debug.write_memory(pointer,data)
+        call(0x8009C040,[allocation])
+    return dict(native_initial_switch=True,assertions=assertions,complete_installed_function_copy=True,
+        fresh_placement_path=True,reload_or_gyroid_execution=False,ordinary_room_interaction=False,
+        physical_audio_played=False,requires_checkpoint_restore=True)
 
 
 def scroll_lifecycles(debug,rom_path,record):

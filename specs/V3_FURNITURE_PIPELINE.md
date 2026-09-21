@@ -111,8 +111,8 @@ lock. Complete move-function shapes select positioned loops or switch-driven
 fades; IDs and names do not select implementations. Checked read-only constants
 provide maximum/step values, and complete constructor/destructor bodies preserve
 their actual state and persistence semantics. Shared native callbacks implement
-both categories, including the sprinkler's on/off clicks. Its disabled initial
-interaction remains a separate placement dependency.
+both categories, including the sprinkler's on/off clicks. A shared native
+placement adapter also preserves its start-disabled interaction.
 
 The same `--refresh-runtime --furniture-audio-art` installer accepts complete
 trigger or level-audio bundles. Sustained layers support mode setup before or
@@ -261,10 +261,36 @@ and priorities. Each channel/layer has its own checked termination; a later
 dispatch pointer is not assumed to delimit the program.
 
 Merlion, Manekin Pis, and fireplace use the shared ordinary profile/acquisition
-pipeline. Sprinkler's `1000` start-disabled profile flag is not implemented by
-the original native fresh-placement path, so that profile remains rejected.
-Installed move/draw/audio callbacks do not bypass the missing placement rule.
+pipeline. Sprinkler's `1000` start-disabled profile flag requires the shared
+native placement binding as well as its complete move/draw/audio callbacks.
+It uses its source C-stock acquisition and supports catalogue reordering.
 The mower's separate contact/floor-driven state remains unfinished.
+
+#### Shared initial-switch placement
+
+The complete donor `aMR_SetSwitchStepData` supplies the start-disabled rule.
+The native owner function at `80937FB0..809380EB` retains original gyroid,
+loaded-switch, and null-profile paths. Only the fresh non-gyroid branch changes:
+twenty bytes at `809380A0` pass actor/profile to a shared resident helper and
+resume the existing epilogue. The fixed helper call has no overlay relocation;
+all existing relocation data and owner bytes outside that span are retained.
+The branch-delay profile argument is harmless on reload because the next native
+instructions replace it before use.
+
+The helper starts imported indices `1024..2047` off when profile interaction
+bit `1000` is set. All other indices keep the original on default, including
+original furniture with a coincident flag. The native step field still receives
+`FF`; the changed flag, actor position, and private state remain untouched.
+It reads the actual profile flags, not an item-ID list or a new mutable table.
+The helper shares `80483D00..80483FBF` with the seating-sound reader. No heap,
+fixed RAM, or saved layout grows. Subsequent bulk imports retain the helper's
+checked entry and recompile the same complete reservation.
+
+`--furniture-profiles` installs this category when a complete source lifecycle
+requires it. Ordinary binding verifies source code, the full current helper,
+complete native initializer, patch instructions, and relocation exclusion.
+The native profile writer requires the resulting placement binding; merely
+marking a prepared source flag as supported cannot enable the item.
 
 The `material-frame-assets` category prepares complete custom-drawn models and
 their texture/palette frame tables independently of unfinished lifecycle code.
@@ -1520,8 +1546,8 @@ geometry. The normal metadata path admits the pool's actual `ftr_listEvent`
 route and existing event stock/catalogue/scoring adapters. The well model has no
 supported acquisition-list binding and remains staged, not shop-stocked.
 The loop/fade category additionally supplies the two fountains and fireplace.
-Sprinkler keeps its pending start-disabled placement; mower keeps its missing
-contact/floor-driven lifecycle.
+Sprinkler additionally requires the installed start-disabled placement binding;
+mower keeps its missing contact/floor-driven lifecycle.
 Staging merges pending resources across categories, preserving material gaps.
 Subsequent resource batches validate and retain both staged and activated
 profiles without resetting completed lifecycle status or duplicating objects.

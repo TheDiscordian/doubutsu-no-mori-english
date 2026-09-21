@@ -31,3 +31,23 @@ int af_v3_furniture_action_sound(int index, int mode) {
         !af_v3_furniture_import_profile((u32)index)) return -1;
     return sounds[(sound-1u)*2u + (u32)mode];
 }
+
+#ifdef AF_V3_INITIAL_SWITCH
+struct InitialActor {
+    u16 index;
+    u8 before_switch[0x12C-2];
+    u8 saved_switch,changed,step;
+};
+struct InitialProfile { u8 prefix[0x3E];u16 interaction; };
+_Static_assert(__builtin_offsetof(struct InitialActor,saved_switch)==0x12C,"Saved switch field");
+_Static_assert(__builtin_offsetof(struct InitialActor,step)==0x12E,"Gyroid step field");
+_Static_assert(__builtin_offsetof(struct InitialProfile,interaction)==0x3E,"Native interaction field");
+
+/* Called only in the checked fresh-placement, non-gyroid branch. Original
+   indices retain their native defaults even if an unrelated flag overlaps. */
+void af_v3_furniture_initial_switch(struct InitialActor *actor,const struct InitialProfile *profile) {
+    if (!actor || !profile) return;
+    actor->saved_switch=!((u32)actor->index-1024u<1024u && (profile->interaction&0x1000u));
+    actor->step=255;
+}
+#endif

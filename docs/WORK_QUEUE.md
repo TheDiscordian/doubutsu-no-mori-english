@@ -12,36 +12,34 @@ After the primary importing work, finish gold-tree leaf/cut effects and the full
 golden-shovel acquisition route. This is deferred required V3 work, not a dropped
 feature or a separate release goal.
 
-The current explicit proposal is ABI 178 at
-`build/v3-scrolling-loop-imports-01/cartridge/build-lock.json`. The shared native
-positioned-loop and switch-fade callbacks are installed for all four source
-records, including verified sprinkler clicks. Merlion, Manekin Pis, and fireplace
-are optional ordinary imports through actual Gulliver/winter-camper routes.
-Three complete models are reused without compilation or additional RAM. Staging
-and promotion preserve distinct donor/destination IDs and existing profiles.
-Four focused checks and the first native callback run pass; the latter records
-55 assertions with restored state and clean exit. Reuse those results and the
-unchanged graphics/audio evidence; do not replay older builds.
+The current explicit proposal is ABI 180 at
+`build/v3-start-disabled-imports-01/cartridge/build-lock.json`. The shared
+start-disabled placement adapter and ordinary sprinkler import are complete.
+Source C-stock acquisition and catalogue reordering are installed. Existing
+models, fade/loop callbacks, and audio are reused. Three focused checks and a
+bounded native run with 21 assertions pass; the native test copies the complete
+installed initializer into a small isolated arena, not an ordinary room.
+Retain the passing ABI-178 fade/audio-dispatch evidence and ABI-180 placement
+results; do not replay old builds or unchanged renderer/audio tests.
 
-Next finish the shared start-disabled placement flag, then stage/promote the
-sprinkler through the ordinary importer. Its installed callbacks/audio alone
-do not waive this missing placement rule. The original native switch initializer
-is `80937FB0..809380EB`; fresh placement sets the switch to one at `809380A8`,
-whereas donor `aMR_SetSwitchStepData` also checks `START_DISABLED` (`1000`).
-Preserve loaded save switches, native flags/gyroid behaviour, and relocation.
-The mower needs floor/contact-driven grass state. Other material and
-rigged-material categories, true acquisition routes, and ordinary gameplay/save
-verification remain required. Continue general category coverage before required
-gold-tree effects and golden-shovel acquisition. Keep both website deployments
-unchanged until the user's testing and explicit approval.
+Next continue general contact/floor, material, and rigged-material categories.
+The mower's complete prepared graphics still need grass-state updates from
+`aMR_GetContactInfoLayer1`, floor identity, and push state. Source
+`ac_nog_lawnmower.c` accepts backyard lawn/daisy meadow, back contact, and four
+push states; it eases alpha with source `add_calc` parameters `.04/.1/.001`.
+Bind the actual native contact/floor consumers and preserve full source timing.
+Other material callbacks/acquisition routes and ordinary gameplay/save checks
+remain required. Gold-tree leaf/cut effects and full golden-shovel acquisition
+follow primary importing. Keep both stable website deployments unchanged until
+the user's testing and explicit approval.
 
-There are 140 experimental choices and 27 inactive profiles. Saved format 3 is
-unchanged; saves selecting these additions require an equal/superset supported
-profile and cannot load in older builds missing their IDs. Permanent audio has
-32 conservative bytes spare; future growth must pass or extend its allocation
-check. The import blob has 1,850,928 bytes free. Full sample synthesis, GPU
-appearance, and ordinary room interaction are not established by silent callback
-recording. No physical audio is played.
+There are 141 experimental choices and 27 inactive profiles. Saved format 3 is
+unchanged; profiles selecting sprinkler require a build containing its ID.
+Missing-ID/removed-selection restrictions remain. Permanent audio has 32
+conservative bytes spare and the import blob has 1,850,928 bytes free; neither
+grows in this batch. Ordinary room interaction, full sample synthesis, GPU
+appearance, and hardware verification remain unclaimed. No physical audio is
+played.
 
 The retained draw-only proposal is ABI 174 at
 `build/v3-draw-only-scrolling-imports-01/cartridge/build-lock.json`. Shared

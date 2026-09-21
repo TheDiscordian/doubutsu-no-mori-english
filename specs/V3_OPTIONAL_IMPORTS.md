@@ -363,7 +363,7 @@ and cold-boot rejection checks. Ordinary gameplay/catalogue and Controller Pak
 integration remain required. The web patcher does not upload or edit saves.
 
 The [optional composer](V3_OPTIONAL_COMPOSITION.md) resolves per-entry
-selections for twenty installed villagers and 120 installed logical items,
+selections for twenty installed villagers and 121 installed logical items,
 including required outfits, house furnishings, and twenty-four equipment parents.
 Mannequin and equipment catalogue representations are dependencies, not separate
 choices.
@@ -385,9 +385,9 @@ actual acquisition route; neither renderer preparation nor no-op callbacks
 substitute ordinary shop stock for an unresolved source.
 Shared positioned-loop/switch-fade callbacks connect Merlion and Manekin Pis
 through the actual Gulliver route and fireplace through winter-camper trades.
-All three retain donor non-orderability and full graphics/audio. The sprinkler
-also has complete callbacks but remains disabled until native placement preserves
-its source start-disabled rule. These category implementations do not establish
+All three retain donor non-orderability and full graphics/audio. Sprinkler uses
+the shared native start-disabled placement rule with source C-stock acquisition
+and catalogue reordering. These category implementations do not establish
 ordinary gameplay or original-hardware acceptance.
 
 ## Browser implementation

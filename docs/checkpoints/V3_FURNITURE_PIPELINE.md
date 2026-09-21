@@ -1,5 +1,104 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared start-disabled placement and import
+
+ABI 180 is `build/v3-start-disabled-imports-01/cartridge/build-lock.json`.
+ABI 179 at `build/v3-start-disabled-profiles-01/` installs the shared native
+initial-switch adapter and stages the complete eligible profile. The ordinary
+bulk importer promotes sprinkler `3368`/1242 with actual donor `ftr_listC`
+shop stock, catalogue reordering, price/scoring/name records, and independent
+selection. Its complete 4,672-byte graphics object and existing fade/loop/click
+callbacks/audio are reused; no artwork compiler or audio rebuild is needed.
+The official name already has a source entry in the provenance catalogue.
+
+The adapter preserves the full native `80937FB0..809380EB` initializer except
+twenty bytes at `809380A0`. The fresh non-gyroid branch passes actor/profile to
+resident `af_v3_furniture_initial_switch` at `80483DC4`, then rejoins its existing
+epilogue. Imported indices with profile flag `1000` start switched off; original
+indices retain the native default even if that bit is present. Saved-switch
+reload, gyroid selection, and null-profile paths remain native. The step field
+still becomes `FF`, with changed flag and other actor bytes retained. The
+source rule is tied to the complete donor `aMR_SetSwitchStepData` body.
+
+The helper shares the existing seating-sound reservation `80483D00..80483FBF`.
+Its complete code grows from 208 to 280 bytes, leaving 424 bytes of reserved
+space; the new leaf function needs no stack. Resident/heap allocation, the
+4,440,528-byte import blob, every audio/model packet, and saved layouts remain
+unchanged. No overlay relocation points into the new absolute call, and the
+relocation resource is unchanged. All owner bytes outside the patch remain.
+Subsequent normal imports retain the helper entry/compile flag and verify the
+complete original function with the patch reversed, current call, source rule,
+helper bytes, and bounded reservation. No per-item branch selects this behaviour.
+
+Commands:
+
+```sh
+python3 tools/v3_furniture_install.py --refresh-runtime \
+  --base-lock build/v3-scrolling-loop-imports-01/cartridge/build-lock.json \
+  --furniture-profiles build/v3-scrolling-materials-prepared-03 \
+  --output build/v3-start-disabled-profiles-01
+python3 tools/v3_furniture_pipeline.py import \
+  --base-lock build/v3-start-disabled-profiles-01/build-lock.json \
+  --category scrolling-material-assets \
+  --reuse-assets build/v3-scrolling-materials-prepared-03 \
+  --output build/v3-start-disabled-imports-01
+```
+
+Three focused checks pass. Actual helper C runs under address/undefined-behaviour
+sanitizers with native/imported/boundary indices, interaction flags, null inputs,
+and full actor guards. Cartridge checks cover the complete owner/relocation,
+source/helper/profile bindings, unchanged graphics/audio, missing-binding
+rejection, stock/category metadata, 32 room bindings, and UPS reconstruction.
+Four browser/offline cases match: empty, all, sprinkler only, and an existing
+looping item. Empty/all reproduce the exact stable baseline/current proposal.
+
+The first host run took 15.688 seconds and passed the helper/owner tests, but a
+composition assertion incorrectly expected the installed metadata byte to be a
+selection flag. Native readers require both that installed byte and the selected
+profile word; the composer intentionally retains metadata. The corrected test
+checks that retained metadata, actual profile word, and saved selection bit.
+Its focused retry passes in 4.683 seconds. No composer or runtime workaround
+was introduced for the fixture error.
+
+The bounded native result is `build/v3-start-disabled-native-02/`: 39 records,
+21 assertions, checkpoint restoration, and graceful exit. A complete copy of
+the installed initializer executes its actual fresh-placement branch in a small
+isolated arena, reaching the installed resident helper through its real call.
+It tests imported off/default-on and original-index retention, complete actor
+writes, the installed fade constructor's off-state input, helper bytes, guards,
+and saved-data retention. The unchanged reload/gyroid callees and full room
+loader are not executed by this test. No ordinary room interaction, appearance,
+audio synthesis, or hardware acceptance is claimed.
+
+The initial native fixture stopped before initializer execution because it
+confused resident RAM with blob offsets. The corrected setup uses the canonical
+profile/package mappings and its one retry passes. The first output is retained;
+it is a classified setup failure, not a passed run or an established game crash.
+The existing ABI-178 fade/sound-dispatch evidence is retained without replay.
+No physical audio is emitted.
+
+Final hashes:
+
+- ROM: `a5d65758128834f8e7081f4731e233650249f5df053aed83558a02ab05d07bc7`.
+- UPS: `ef064749e8d7586b6162da30cf72e664cc2f37a6a9f0c5907a37f88ded50c799`.
+- Report: `80c67f6669d0ce91d93c3e3ac0b8683c09952329a5b57a3ac372d5afeba689bb`.
+- Shared behaviour code: `8bd556844e07920e38e796f52d41139dd776283fe4a63ec2bd297d294d1b7f81`.
+- Patched initializer: `7c375e380215aba81f1f3f15e87e3037d21a3117067eef5188d4311d5e2878e2`.
+
+There are 141 experimental choices: 20 villagers, 94 furniture items, 24
+equipment parents, and three shirts. Twenty-seven ordinary profiles remain
+inactive. Save format 3 is unchanged; saves selecting sprinkler need that ID in
+the target build/profile. Older builds without it are incompatible, and no new
+ordinary save/restart claim is made. The main lock retains
+`f69d44334f40335c687816ece1abf0f0d1d213ccfb52bbb433f889ff606428ef` and neither
+deployment of the stable patcher changes.
+
+Next complete the remaining general contact/floor, material, acquisition, and
+rigged-material categories. The mower's prepared artwork needs its actual
+back-contact/push-state/floor-driven grass alpha, using source smoothing and
+native consumers. Gold-tree effects and golden-shovel acquisition remain
+required after primary importing.
+
 ## Shared scroll lifecycles and ordinary imports
 
 ABI 178 is `build/v3-scrolling-loop-imports-01/cartridge/build-lock.json`.

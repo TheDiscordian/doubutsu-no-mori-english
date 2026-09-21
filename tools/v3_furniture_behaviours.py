@@ -1,5 +1,6 @@
 """Source-checked behaviour categories shared by automatic furniture imports."""
 import struct
+import copy
 from aflib import CODE_RAM, CODE_VROM, by_vrom, sha256
 from v3_asset_loader import ROOT, BLOB, compile_part
 from v3_import_storage import PACKAGE, PACKAGE_RAM, ROWS, ITEMS, slot
@@ -12,6 +13,9 @@ ENTRY, END = 0x800BED5C, 0x800BEE50
 SOURCE_SHA = 'ec58cd8da4eaf4a51e8913f75023a704995ef7f98a00a77ad08bd7a4c4e20339'
 NATIVE_CATEGORIES, NATIVE_SOUNDS = 0x8010D314, 0x8010D6C8
 CATEGORY_SHA = '6e88fc4da791a5e31e72b21c59876c4f2f5adf0d721dcb8d4b8d268c56dc0a73'
+SWITCH_FIRST,SWITCH_END,SWITCH_PATCH=0x80937FB0,0x809380EC,0x809380A0
+SWITCH_SHA='6b2851d0f6e927d1593011130e4691a7983fa6fb8172cb3aa4c32cd2396dd0ac'
+SWITCH_BEFORE=bytes.fromhex('240B0001240CFFFFA20B012C1000000AA20C012E')
 # Existing native bed geometry, entry, and exit use the expanded profile table.
 # This is a shared engine contract, not a list of approved bed identities.
 BED_HEAD, BED_FOOT_SIDES, BED_PILLOW_SIDES = 0x80940304, 0x80940498, 0x80940784
@@ -29,6 +33,78 @@ SOURCES = ('tools/v3_furniture_behaviours.py','tools/v3_four_cell_items.py','ove
            'tools/v3_asset_loader.py','overlays/v3/furniture_behaviours.c',
            'overlays/v3/furniture_behaviours.S','overlays/v3/furniture_behaviours.ld',
            'overlays/v3/fire.ld','overlays/v3/items_large.ld')
+
+
+def initial_switch_patch(entry):
+    if type(entry) is not int or entry&3 or not RAM<=entry<LIMIT:raise ValueError('Initial switch helper escapes shared behaviour reservation')
+    # The branch delay also executes on reload, where the following two native
+    # shifts overwrite a1 before use. The gyroid path never enters this block.
+    return struct.pack('>5I',0x00402825,0x0C000000|(entry>>2&0x3FFFFFF),0x02002025,0x1000000A,0)
+
+
+def initial_switch_source(source):
+    raw,receipt=source.function(0x1014D8)
+    if (receipt['symbol']!='aMR_SetSwitchStepData' or len(raw)!=316 or
+            sha256(raw)!='050371a19917f2f5533253987cee15a0aa0b3d269a8791e57a0acfbfd4aa4697'):
+        raise ValueError('Changed complete donor fresh-placement switch rule')
+    return receipt
+
+
+def checked_initial_switch(base,report,blob):
+    """Bind the complete current helper and native placement consumer."""
+    from v3_furniture_runtime import VROM,RELOC,RAM as OWNER_RAM
+    binding=report.get('furniture_initial_switch')
+    if binding is None:return None
+    code=report['furniture_behaviours']['code'];entry=code['symbols'].get('af_v3_furniture_initial_switch')
+    first=PACKAGE+RAM-PACKAGE_RAM;end=PACKAGE+LIMIT-PACKAGE_RAM
+    owner=by_vrom(base)[VROM].extract(base);rel=by_vrom(base)[RELOC].extract(base)
+    after=initial_switch_patch(entry);at=SWITCH_PATCH-OWNER_RAM
+    restored=bytearray(owner[SWITCH_FIRST-OWNER_RAM:SWITCH_END-OWNER_RAM])
+    restored[SWITCH_PATCH-SWITCH_FIRST:SWITCH_PATCH-SWITCH_FIRST+len(after)]=SWITCH_BEFORE
+    if (binding['format']!='AFV3-INITIAL-SWITCH-1' or binding['mask']!=0x1000 or
+            binding['entry']!=entry or binding['patch_address']!=SWITCH_PATCH or
+            binding['before']!=SWITCH_BEFORE.hex() or binding['after']!=after.hex() or
+            owner[at:at+len(after)]!=after or sha256(restored)!=SWITCH_SHA or
+            sha256(owner[SWITCH_FIRST-OWNER_RAM:SWITCH_END-OWNER_RAM])!=binding['function_sha256'] or
+            not 0<code['bytes']<=LIMIT-RAM or sha256(blob[first:first+code['bytes']])!=code['sha256'] or
+            any(blob[first+code['bytes']:end]) or '-DAF_V3_INITIAL_SWITCH=1' not in code['flags']):
+        raise ValueError('Changed complete imported fresh-placement rule')
+    sections=struct.unpack_from('>5I',rel)
+    if sections[:4]!=(0x10E50,0x5BE0,0x1E0,0x22F0) or len(rel)!=6208 or 20+sections[4]*4>len(rel)-4:
+        raise ValueError('Changed placement owner relocation dimensions')
+    for (word,) in struct.iter_unpack('>I',rel[20:20+sections[4]*4]):
+        address=OWNER_RAM+sum(sections[:(word>>30)-1])+(word&0xFFFFFF)
+        if SWITCH_PATCH<=address<SWITCH_PATCH+len(after):raise ValueError('Resident placement call must not relocate')
+    return dict(mask=binding['mask'],entry=entry,owner_patch_sha256=sha256(after))
+
+
+def install_initial_switch(base,prior,blob,source,output):
+    """Extend the shared behaviour helper once, preserving the whole native owner."""
+    from v3_furniture_runtime import VROM,RAM as OWNER_RAM
+    source_receipt=initial_switch_source(source)
+    if prior.get('furniture_initial_switch'):
+        return checked_initial_switch(base,prior,blob),{},{}
+    original=by_vrom(base)[VROM].extract(base);owner=bytearray(original);at=SWITCH_PATCH-OWNER_RAM
+    if sha256(owner[SWITCH_FIRST-OWNER_RAM:SWITCH_END-OWNER_RAM])!=SWITCH_SHA or owner[at:at+20]!=SWITCH_BEFORE:
+        raise ValueError('Changed native fresh-placement branch')
+    old=prior['furniture_behaviours']['code'];first=PACKAGE+RAM-PACKAGE_RAM;end=PACKAGE+LIMIT-PACKAGE_RAM
+    if sha256(blob[first:first+old['bytes']])!=old['sha256'] or any(blob[first+old['bytes']:end]):
+        raise ValueError('Changed shared behaviour helper reservation')
+    helper,compiled=compile_part('furniture_behaviours',output/'furniture_behaviours',
+        extra_sources=('overlays/v3/furniture_behaviours.S',),defines=('AF_V3_INITIAL_SWITCH=1',))
+    if not 0<len(helper)<=LIMIT-RAM or compiled['symbols']['af_v3_furniture_action_sound']!=RAM:
+        raise ValueError('Placement helper changes shared behaviour entry or capacity')
+    entry=compiled['symbols']['af_v3_furniture_initial_switch'];after=initial_switch_patch(entry)
+    owner[at:at+20]=after;blob[first:end]=helper+bytes(end-first-len(helper))
+    metadata=dict(format='AFV3-INITIAL-SWITCH-1',mask=0x1000,entry=entry,source=source_receipt,
+        patch_address=SWITCH_PATCH,before=SWITCH_BEFORE.hex(),after=after.hex(),
+        function_sha256=sha256(owner[SWITCH_FIRST-OWNER_RAM:SWITCH_END-OWNER_RAM]),
+        original_function_sha256=SWITCH_SHA,owner_before_sha256=sha256(original),owner_after_sha256=sha256(owner),
+        original_indices_unchanged=True,reload_path_unchanged=True,gyroid_path_unchanged=True,
+        additional_resident_bytes=0,saved_format_changed=False)
+    updated=copy.deepcopy(prior['furniture_behaviours']);updated['code']=compiled
+    compact=dict(mask=0x1000,entry=entry,owner_patch_sha256=sha256(after))
+    return compact,{VROM:bytes(owner)},dict(furniture_initial_switch=metadata,furniture_behaviours=updated)
 
 
 def contact_contract(base, prior, blob, imports):
@@ -166,8 +242,12 @@ def install(original, base, prior, blob, code, imports, source, output):
             raise ValueError('Changed installed shared sound reader')
     elif before!=original_body or any(blob[offset:end]):
         raise ValueError('Sound reader/reservation is not unclaimed')
+    placement=checked_initial_switch(base,prior,blob)
     helper,compiled=compile_part('furniture_behaviours',output/'furniture_behaviours',
-        extra_sources=('overlays/v3/furniture_behaviours.S',))
+        extra_sources=('overlays/v3/furniture_behaviours.S',),
+        defines=('AF_V3_INITIAL_SWITCH=1',) if placement else ())
+    if placement and compiled['symbols'].get('af_v3_furniture_initial_switch')!=placement['entry']:
+        raise ValueError('Changed live placement helper address')
     if (not 0<len(helper)<=LIMIT-RAM or compiled['symbols']['af_v3_furniture_action_sound']!=RAM
             or compiled['symbols']['af_v3_furniture_import_profile']!=0x80465000):
         raise ValueError('Invalid sound code reservation or shared profile dependency')

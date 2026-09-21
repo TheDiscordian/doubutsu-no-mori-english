@@ -18,40 +18,38 @@ served patchers retain their existing builds.
 
 ## Active development
 
-The current explicit proposal is ABI 178 at
-`build/v3-scrolling-loop-imports-01/cartridge/build-lock.json`. Shared native
-callbacks implement the complete decoded switch/fade and positioned-loop
-categories for Merlion, Manekin Pis, fireplace, and sprinkler. Constructors,
-source fade limits/rates, one switch edge per native update, positioned sounds,
-state suppression, and source-specific teardown persistence are installed.
-The sprinkler's on/off clicks use verified complete native equivalents.
-The code and tables fit existing reservations; no heap or fixed RAM grows.
+The current explicit proposal is ABI 180 at
+`build/v3-start-disabled-imports-01/cartridge/build-lock.json`. Shared native
+fresh-placement handling applies the source start-disabled flag to imported
+items while preserving original-item defaults. Loaded switches and gyroid paths
+remain native. A twenty-byte owner patch calls the existing shared behaviour
+reservation; the complete helper is 280 bytes with no additional RAM or heap.
 
-The ordinary bulk importer enables Merlion and Manekin Pis through the donor's
-Gulliver gift route, and fireplace through winter-camper trades. All three are
-non-orderable and reuse their complete installed artwork. Stable donor IDs and
-additive N64 destinations remain distinct throughout staging, promotion,
-source reads, and selection. Existing active/staged category records are reused.
-Sprinkler remains disabled because its start-disabled placement rule needs a
-native owner adaptation. The mower still requires floor/contact-driven updates.
+The ordinary bulk importer now enables sprinkler through actual donor C stock,
+with catalogue reordering, complete artwork, source switch fades/clicks/looping
+sound, and unchanged persistent identity. Its existing 4,672-byte object is
+reused; no graphics or audio is rebuilt. Merlion, Manekin Pis, and fireplace
+retain their completed shared callbacks and genuine gift/trade routes.
 
-Four focused checks pass across the changed implementation, including actual C
-under memory-safety sanitizers, complete source/audio/runtime/profile bindings,
-three ordinary imports, and four browser/offline composition cases. The native
-callback run passes 55 assertions, including complete packet/program loading,
-switch/fade timing, sound arguments, persistence, guards, state restoration, and
-clean exit. It uses silent sound-call recorders; synthesis, GPU appearance, and
-ordinary interactions remain unverified. Unchanged graphics/audio tests are
-retained, not replayed. See the
-[lifecycle/import checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-scroll-lifecycles-and-ordinary-imports).
+Three focused checks pass for the changed helper under memory-safety sanitizers,
+complete owner/source/profile bindings and asset retention, plus four matching
+browser/offline selections. A bounded native check passes 21 assertions using
+the complete installed initializer copied into an isolated small arena. It
+executes the fresh-placement path and confirms the installed fade constructor
+consumes the off state, with guards, saved state, checkpoint restoration, and
+clean exit. One setup correction resolves a test-only blob/RAM-offset mismatch.
+Unchanged rendering/fade/audio tests are retained rather than replayed. Ordinary
+room interaction, synthesis, appearance, and hardware acceptance remain separate.
+See the [placement checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-start-disabled-placement-and-import).
 
-There are 140 experimental choices and 27 inactive profiles. Saved format 3 is
-unchanged, but saves selecting the new imports require those IDs in the target
-build/profile; older builds lacking them are incompatible. All/empty composition
-retains the exact complete proposal/translation-only baseline. The main lock
-and both deployments of the stable website remain unchanged. Complete remaining
-shared placement, lifecycle, acquisition, and rigged-material categories before
-the required gold-tree effects and golden-shovel acquisition.
+There are 141 experimental choices and 27 inactive profiles. Saved format 3 is
+unchanged; saves selecting an addition require that ID in the target build and
+profile. Older builds without the sprinkler cannot load profiles selecting it.
+Empty/all selections reproduce the exact translation-only baseline/current
+proposal. The main lock and both stable website deployments remain unchanged.
+Next complete remaining contact/floor, material, acquisition, and rigged-material
+categories. Required gold-tree effects and golden-shovel acquisition follow
+primary imports.
 
 The retained draw-only proposal is ABI 174 at
 `build/v3-draw-only-scrolling-imports-01/cartridge/build-lock.json`. Shared

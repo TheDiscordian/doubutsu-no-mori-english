@@ -71,7 +71,8 @@ def profile(row, vrom, *, limit=END):
     material=adapter.get('category')==MATERIAL_CATEGORY
     scrolling=adapter.get('category')==SCROLL_CATEGORY
     if (adapter.get('category') in (FIXED_CATEGORY,PENDING_MOVE_CATEGORY) or scrolling and
-            (not profile_lifecycle(row['profile'],row.get('room_lifecycle')) or row.get('room_runtime')!={'vtable':SCROLL_VTABLE,'vrom':vrom})):
+            (not profile_lifecycle(row['profile'],row.get('room_lifecycle'),row.get('room_placement')) or
+             row.get('room_runtime')!={'vtable':SCROLL_VTABLE,'vrom':vrom})):
         raise ValueError('Prepared resources have no implemented native lifecycle')
     rigged = adapter.get('category') in RIG_CATEGORIES
     layers = tuple(offsets) if rigged else tuple(adapter['model_order']) if fading or sequence or material or scrolling else LAYERS
