@@ -18,32 +18,41 @@ served patchers retain their existing builds.
 
 ## Active development
 
-The current explicit V3 proposal is ABI 184 at
-`build/v3-surface-application-runtime-01/build-lock.json`. All ten additive
-floors/wallpapers use shared texture, name, price, category, and room-change
-readers. Selected surfaces can be queued, applied after the menu closes, stored
-in the existing full-byte home fields, and read back by the native room
-initializer. The full floor getter preserves selected identities and delegates
-special scenes to the existing campsite/native chain. Disabled imports reject
-before reservation. No artwork, RAM reservation, actor, saved format/profile,
-or choice grows. Surfaces remain disabled pending complete inventory/catalogue,
-profile validation, acquisition, sound/scoring, and composition support.
+The current explicit V3 proposal is ABI 185 at
+`build/v3-surface-save-runtime-01/build-lock.json`. Surfaces have an independent
+saved selection and four-player ownership category. Format 4 migrates valid
+older banks, retains every existing profile/catalogue/reward offset, and rejects
+missing required selections. Stable save entry points, native collection, and
+player deletion connect to the new shared code. The 16-KiB surface packet is
+12 KiB larger; the 1,232-byte state fits existing reserved memory. No artwork,
+actor, scene, native town payload, or experimental choice changes.
 
-Three cartridge checks pass: complete owner/relocation reconstruction, current
-packet/hooks/bootstrap/source bindings, and unchanged resources/save profiles with
-exact empty/all composition and UPS reconstruction. Both actual C fixtures pass
-memory-safety sanitizers, including full native-payload host save/read/commit;
-a corrected output-banner assertion is recorded separately from those results.
-The first silent native run passes 34 assertions: actual reservation/commit,
-menu deferral, complete DMA, saved-byte writes and native initializer reload,
-full floor/campsite/original-shop identity, guards, and retained saved extension.
-It restores the checkpoint and exits cleanly. Ordinary inventory transactions,
-save/restart, GPU appearance, and original hardware remain unverified.
+Five focused checks pass, including an independent complete-bank encoder,
+format migration/backward rejection, atomic failure, actual C under memory-safety
+sanitizers, host device I/O, preserved resources/APIs, exact empty/all composition,
+UPS reconstruction, and preservation of surface hooks in a future shared display
+refresh. A silent native run passes 28 assertions for startup,
+actual format-4 encoding/decoding, missing-profile and invalid-ownership rejection,
+stable save commit, native collection, and the complete player-clearing chain.
+One test-only Python import-path correction precedes the passing native run.
+No physical audio or explicit FlashRAM writes occur. Ordinary game save/restart,
+inventory transactions, GPU appearance, and hardware acceptance remain unverified.
 
-Next connect inventory dispatch, catalogue ownership, explicit surface profile
-validation, genuine acquisition, sound/scoring, and private composition. The main
-lock and both deployments of the stable web patcher stay unchanged. See the
-[room-application checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-surface-room-application-and-identity).
+Format-4 saves require a compatible newer build; V2 and format-1/2/3 V3 builds
+cannot load them. Preserve backups. Private exports carry this warning. There
+are still 141 choices and 27 inactive furniture profiles; all ten surfaces stay
+disabled. Next connect inventory use, catalogue page lists/ownership-bit dispatch,
+genuine acquisition, sound/scoring, and private surface composition. The stable
+patcher and main lock remain unchanged. See the
+[surface-save checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-surface-profile-and-ownership-persistence).
+
+All ten surfaces retain shared texture, name, price, category, and room-change
+readers. Selected surfaces queue until the menu closes, then use native texture
+swaps and full-byte home fields. The full floor getter retains selected IDs and
+special-scene/campsite behaviour. Disabled imports reject before reservation.
+The unchanged application code retains its 34-assertion native evidence in the
+[room-application checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-surface-room-application-and-identity);
+it is not replayed for the separate save-category extension.
 
 The shared room-surface pipeline prepares all ten donor-only floors/wallpapers
 in `build/v3-room-surfaces-prepared-02/`: 61,760 bytes with complete palettes,
@@ -57,8 +66,8 @@ Four focused conversion/metadata/cache checks pass. Every added palette and
 texel is checked through independent tile addressing; malformed resources and
 changed caches reject. Preparation itself changes no choices, saved layouts,
 main lock, or served website content. The room/shop installation is described
-above; item readers, room application/persistence, acquisition, sound, and scoring
-remain required. See the
+above; full inventory/catalogue integration, acquisition, sound, scoring, and
+ordinary persistence remain required. See the
 [surface specification](../specs/V3_ROOM_SURFACES.md).
 
 Shared contact/floor lifecycle preparation is available through the ordinary

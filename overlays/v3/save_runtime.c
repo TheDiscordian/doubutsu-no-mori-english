@@ -60,7 +60,19 @@ static void require_state(void) {
         if (runtime->guard[i] != 0xAF53C0DEu) af_v3_save_halt(AF_SAVE_ARGUMENT);
     for (u32 i = 0; i < AF_SAVE_PROFILE; ++i)
         if (runtime->working[i] != current[i]) af_v3_save_halt(AF_SAVE_PROFILE_MISSING);
+#ifdef AF_V3_SURFACE_PROFILE
+    for (u32 i=0;i<AF_SAVE_SURFACE_PROFILE;i++)
+        if (runtime->working[AF_SAVE_SURFACE_OFFSET+i]!=af_v3_surface_profile_byte(i))
+            af_v3_save_halt(AF_SAVE_PROFILE_MISSING);
+#endif
 }
+
+#ifdef AF_V3_SURFACE_PROFILE
+static void surface_profile(void) {
+    for (u32 i=0;i<AF_SAVE_SURFACE_PROFILE;i++)
+        runtime->working[AF_SAVE_SURFACE_OFFSET+i]=(u8)af_v3_surface_profile_byte(i);
+}
+#endif
 
 int af_v3_save_reset(void) {
     runtime->magic = 0xAF535633u;
@@ -68,6 +80,9 @@ int af_v3_save_reset(void) {
     runtime->ready = runtime->town = 0;
     for (u32 i = 0; i < AF_SAVE_STATE; ++i)
         runtime->working[i] = i < AF_SAVE_PROFILE ? current[i] : 0;
+#ifdef AF_V3_SURFACE_PROFILE
+    surface_profile();
+#endif
     for (u32 i = 0; i < 4; ++i) runtime->guard[i] = 0xAF53C0DEu;
     return 1;
 }
@@ -106,8 +121,12 @@ void af_v3_save_prepare(u8 *bank) {
     if (!bank || bank == live) af_v3_save_halt(AF_SAVE_ARGUMENT);
     native_header(bank);
     u32 town = (u32)bank[8] << 8 | bank[9];
-    if (runtime->ready && runtime->town != town)
+    if (runtime->ready && runtime->town != town) {
         for (u32 i = AF_SAVE_PROFILE; i < AF_SAVE_STATE; ++i) runtime->working[i] = 0;
+#ifdef AF_V3_SURFACE_PROFILE
+        surface_profile();
+#endif
+    }
     int result = af_v3_save_pack(bank, AF_SAVE_BANK, runtime->working);
     if (result != AF_SAVE_OK) af_v3_save_halt(result);
     runtime->town = town;

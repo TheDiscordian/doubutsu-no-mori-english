@@ -649,6 +649,7 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         import v3_surface_items as equipment
         owner_changes,report_updates=surfaces.install(base,prior,blob,core,original,output,room_surfaces_art,module=module)
         equipment_report=report_updates.get('equipment_resources')
+        if 'clothing' in report_updates:display_report=report_updates['clothing']['display']
     elif held_selection:
         import v3_held_catalogue as equipment
         equipment_report,owner_changes,report_updates=equipment.select_installed(prior,blob)
@@ -938,6 +939,11 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             if report['room_surfaces'].get('application'):
                 report['shared_runtime_refresh']['adapters'].append('surface_application')
                 report['native_test']='pending shared surface reservation/application and full floor identity; profile, catalogue, acquisition, and ordinary persistence remain incomplete'
+            if report['room_surfaces'].get('save'):
+                report['shared_runtime_refresh']['adapters'].append('surface_save')
+                report['shared_runtime_refresh'].update(saved_format_changed=True,
+                    additional_save_state_bytes=report['save_runtime']['state_bytes']-prior['save_runtime']['state_bytes'])
+                report['native_test']='pending format-4 surface codec/runtime and collection; inventory/catalogue pages, acquisition, and ordinary persistence remain incomplete'
     write_new(output/'animal-forest-v3-asset-loader.z64',result)
     write_new(output/'asset-loader.ups',patch)
     write_new(output/'build.json',(json.dumps(report,indent=2,sort_keys=True)+'\n').encode())

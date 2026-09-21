@@ -54,6 +54,14 @@ static int clothing_valid(const u8 *profile, const u8 *catalogue) {
 #endif
 #endif
 
+#ifdef AF_V3_SURFACE_PROFILE
+static int surfaces_valid(const u8 *data) {
+    for (u32 i=0;i<4*AF_SAVE_SURFACE_PROFILE;i++)
+        if (data[AF_SAVE_SURFACE_PROFILE+i] & ~data[i%AF_SAVE_SURFACE_PROFILE]) return 0;
+    return 1;
+}
+#endif
+
 int af_v3_save_check(const u8 *bank, u32 size, const u8 *current, u8 *state) {
     if (!bank || size != AF_SAVE_BANK || !current || (state &&
             (overlaps(state, AF_SAVE_STATE, bank, size) ||
@@ -69,12 +77,21 @@ int af_v3_save_check(const u8 *bank, u32 size, const u8 *current, u8 *state) {
 #ifdef AF_V3_REWARD_PROFILE
     int reward_format = 0;
 #endif
+#ifdef AF_V3_SURFACE_PROFILE
+    int surface_format = 0;
+#endif
     if (magic == 0x4E414633u) {
 #ifdef AF_V3_CLOTHING_PROFILE
 #ifdef AF_V3_REWARD_PROFILE
         u32 version=read32(ext+4), registry=read32(ext+8);
+#ifdef AF_V3_SURFACE_PROFILE
+        surface_format = version == 0x00040680u && registry == 3;
+        reward_format = surface_format || (version == 0x00030680u && registry == 2);
+        clothing_format = reward_format || (version == 0x00020680u && registry == 2);
+#else
         reward_format = version == 0x00030680u && registry == 2;
         clothing_format = (version == 0x00020680u || reward_format) && registry == 2;
+#endif
         if (read32(ext) != 0x41465333u || (!clothing_format &&
                 (version != 0x00010680u || registry != 1))) return AF_SAVE_FORMAT;
 #else
@@ -88,7 +105,9 @@ int af_v3_save_check(const u8 *bank, u32 size, const u8 *current, u8 *state) {
 #endif
         for (u32 i = 0x14; i < AF_SAVE_CAPSULE; ++i)
             if ((i < 0x18 || (i >= 0xB8 && i < 0xC0) ||
-#ifdef AF_V3_REWARD_PROFILE
+#ifdef AF_V3_SURFACE_PROFILE
+                    i >= (surface_format ? 0x4D0u : reward_format ? 0x390u : clothing_format ? 0x360u : 0x2C0u)
+#elif defined(AF_V3_REWARD_PROFILE)
                     i >= (reward_format ? 0x390u : clothing_format ? 0x360u : 0x2C0u)
 #elif defined(AF_V3_CLOTHING_PROFILE)
                     i >= (clothing_format ? 0x360u : 0x2C0u)
@@ -112,6 +131,13 @@ int af_v3_save_check(const u8 *bank, u32 size, const u8 *current, u8 *state) {
 #ifdef AF_V3_REWARD_PROFILE
         if (reward_format && !rewards_valid(ext+0x360)) return AF_SAVE_REWARD_INVALID;
 #endif
+#ifdef AF_V3_SURFACE_PROFILE
+        if (surface_format) {
+            for (u32 i=0;i<AF_SAVE_SURFACE_PROFILE;i++)
+                if (ext[0x390+i] & ~af_v3_surface_profile_byte(i)) return AF_SAVE_PROFILE_MISSING;
+            if (!surfaces_valid(ext+0x390)) return AF_SAVE_CATALOGUE_INVALID;
+        }
+#endif
         result = AF_SAVE_OK;
     }
     if (state) {
@@ -125,6 +151,12 @@ int af_v3_save_check(const u8 *bank, u32 size, const u8 *current, u8 *state) {
 #ifdef AF_V3_REWARD_PROFILE
         for (u32 i=0;i<AF_SAVE_REWARD_BYTES;++i)
             state[AF_SAVE_REWARD_OFFSET+i] = reward_format ? ext[0x360+i] : 0;
+#endif
+#ifdef AF_V3_SURFACE_PROFILE
+        for (u32 i=0;i<AF_SAVE_SURFACE_PROFILE;i++)
+            state[AF_SAVE_SURFACE_OFFSET+i]=(u8)af_v3_surface_profile_byte(i);
+        for (u32 i=0;i<4*AF_SAVE_SURFACE_PROFILE;i++)
+            state[AF_SAVE_SURFACE_OFFSET+AF_SAVE_SURFACE_PROFILE+i]=surface_format ? ext[0x3D0+i] : 0;
 #endif
     }
     return result;
@@ -140,6 +172,9 @@ int af_v3_save_pack(u8 *bank, u32 size, const u8 *state) {
 #endif
 #ifdef AF_V3_REWARD_PROFILE
     if (!rewards_valid(state+AF_SAVE_REWARD_OFFSET)) return AF_SAVE_REWARD_INVALID;
+#endif
+#ifdef AF_V3_SURFACE_PROFILE
+    if (!surfaces_valid(state+AF_SAVE_SURFACE_OFFSET)) return AF_SAVE_CATALOGUE_INVALID;
 #endif
     u8 *ext = bank + AF_SAVE_PAYLOAD;
     write32(bank + 4, 0x4E414633u);
@@ -161,6 +196,10 @@ int af_v3_save_pack(u8 *bank, u32 size, const u8 *state) {
 #endif
     copy(ext + 0x18, state, AF_SAVE_BASE_PROFILE);
     copy(ext + 0xC0, state + AF_SAVE_PROFILE, AF_SAVE_FURNITURE_CATALOGUE);
+#ifdef AF_V3_SURFACE_PROFILE
+    write32(ext+4,0x00040680u);write32(ext+8,3);
+    copy(ext+0x390,state+AF_SAVE_SURFACE_OFFSET,AF_SAVE_SURFACE_BYTES);
+#endif
     write32(ext + 0xC, crc(bank, AF_SAVE_PAYLOAD, 0x12, 2));
     write32(ext + 0x10, crc(ext, AF_SAVE_CAPSULE, 0x10, 4));
     u32 checksum = (read16(bank + 0x12) - sum(bank)) & 0xFFFFu;
@@ -169,7 +208,17 @@ int af_v3_save_pack(u8 *bank, u32 size, const u8 *state) {
 }
 
 int af_v3_save_collect(u8 *state, u32 player, u32 item, u32 mark) {
-    if (!state || player >= 4 || item < 0x3000 || item > 0x3FFF || mark > 1) return AF_SAVE_ARGUMENT;
+    if (!state || player >= 4 || mark > 1) return AF_SAVE_ARGUMENT;
+#ifdef AF_V3_SURFACE_PROFILE
+    if ((item>>8)-0x26u<2u && (item&255u)>=64u) {
+        u32 byte=((item>>8)-0x26u)*32u+((item&255u)>>3),bit=1u<<(item&7u);
+        if (!(state[AF_SAVE_SURFACE_OFFSET+byte]&bit)) return AF_SAVE_PROFILE_MISSING;
+        u8 *collected=state+AF_SAVE_SURFACE_OFFSET+AF_SAVE_SURFACE_PROFILE*(player+1)+byte;
+        if (mark) *collected|=(u8)bit;
+        return (*collected&bit)!=0;
+    }
+#endif
+    if (item < 0x3000 || item > 0x3FFF) return AF_SAVE_ARGUMENT;
 #ifdef AF_V3_CLOTHING_PROFILE
     if ((item & 0xFF00) == 0x3400) {
         u32 index = item & 255, byte = index >> 3, bit = 1u << (index & 7);

@@ -2,6 +2,12 @@
 
 ## Implemented boundary
 
+The surface-enabled variant uses the [format-4 surface extension](V3_SURFACE_SAVE.md),
+with separate selection and four-player ownership after all existing records.
+It migrates valid NAFJ and format-1/2/3 banks. Older formats cannot load its saves.
+Its 1,200-byte working state preserves every previous offset; use the active
+build's size and dispatch records rather than historical codec addresses below.
+
 The reward-enabled variant uses the [format-3 reward extension](V3_REWARD_SAVE.md),
 with 48 independent trophy/celebration bytes after the existing catalogue data.
 It migrates valid NAFJ and format-1/2 banks; those older builds reject format 3.

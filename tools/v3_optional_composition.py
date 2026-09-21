@@ -61,7 +61,7 @@ def furniture_key(row):
 def save_compatibility(report):
     """Keep exported warnings tied to the cartridge's actual saved format."""
     version = report['save_codec']['format_version']
-    if version == 3:
+    if version >= 3:
         return report['save_warning']
     return (f'Format {version}: equal or larger profiles accepted by codec; missing dependencies rejected. '
             'Do not load imported saves in V2. Ordinary cross-profile reload is unverified.')

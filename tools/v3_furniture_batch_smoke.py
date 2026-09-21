@@ -1613,6 +1613,7 @@ def exercise(debug, rom_path, record, *, section='automatic_furniture'):
     if section=='surface_consumers':return surface_consumers(debug,rom_path,record)
     if section=='surface_items':return surface_items(debug,rom_path,record)
     if section=='surface_application':return surface_application(debug,rom_path,record)
+    if section=='surface_save':return surface_save(debug,rom_path,record)
     if section=='furniture_audio':return furniture_audio(debug,rom_path,record)
     if section in ('scenery_planting_sparkle','scenery_planting_sparkle_remaining'):
         from v3_scenery_smoke import planting_sparkle
@@ -2646,6 +2647,99 @@ def held_level_sound(debug,rom_path,record):
         native_volume_pause_fade_pan_reverb=True,native_actor_registration_and_expiry=True,
         physical_audio_played=False,pcm_or_listening_verified=False,ordinary_gameplay_tested=False,
         flash_written=False,requires_checkpoint_restore=True)
+
+
+def surface_save(debug,rom_path,record):
+    """Current format-4 codec, stable runtime entries, and native collection."""
+    import sys
+    if str(runtime.ROOT) not in sys.path:sys.path.insert(0,str(runtime.ROOT))
+    from tests.test_v3_surface_save import fixture,reference_pack
+    from tests import test_v3_save_rewards as reward_reference
+    from tests import test_v3_save_codec as legacy_reference
+    from v3_surface_items import RAM
+    path=Path(rom_path);image=path.read_bytes();report=json.loads((path.parent/'build.json').read_bytes())
+    if sha256(image)!=report['output_sha256']:raise ValueError('Changed surface-save cartridge')
+    files=by_vrom(image);blob=files[runtime.BLOB].extract(image);items=report['room_surfaces']['items']
+    receipt=report['room_surfaces']['save'];saved_runtime=report['save_runtime'];boot=boot_proofs(image);assertions=0
+    packet=blob[items['blob_offset']:items['blob_offset']+items['bytes']]
+    base_profile=bytes.fromhex(saved_runtime['profile_hex'])
+    source,working=fixture(base_profile);packed=reference_pack(source,working)
+    def check(label,at,want):
+        nonlocal assertions
+        got=debug.read_memory(at,len(want));passed=got==want
+        record(dict(surface_save_check=label,address=f'{at:08X}',bytes=len(want),
+            assertion='passed' if passed else 'failed',observed_sha256=sha256(got),expected_sha256=sha256(want)))
+        if not passed:raise ValueError('Surface-save mismatch: '+label)
+        assertions+=1
+    def call(at,args=(),want=None,proof=None):
+        nonlocal assertions
+        result=debug.call(f'{at:08X}',list(args),return_address=MODULE_RAM+0x6480,
+            verified_code=proof or boot.get(at))
+        if want is not None:result['assertion']='passed' if result['return_value']==want&0xFFFFFFFF else 'failed'
+        record(result)
+        if want is not None:
+            if result['return_value']!=want&0xFFFFFFFF:raise ValueError('Surface-save return mismatch')
+            assertions+=1
+        return result['return_value']
+    check('complete expanded packet loaded by startup',RAM,packet)
+    check('startup initializes full state without surface selections',0x8046C000,
+        struct.pack('>4I',0xAF535633,0,0,0)+base_profile+bytes(1008)+bytes.fromhex('AF53C0DE')*4)
+    allocation=call(0x8009BFC0,[0x11000])
+    if allocation&15 or not MODULE_RAM+0x8000<=allocation<=0x80400000-0x11000:
+        raise ValueError('Surface-save fixture allocation failed')
+    bank,profile,state,out,bridge=(allocation+x for x in (16,0x10040,0x10120,0x10600,0x10B00))
+    edge=b'V3SS'*4;guards=(allocation,bank+0x10000,profile+192,state+1200,out+1200,allocation+0x10FF0)
+    for at in guards:debug.write_memory(at,edge)
+    targets={k:report['save_codec']['code']['symbols']['af_v3_save_'+k] for k in ('check','pack','collect')}
+    targets.update({k:saved_runtime['code']['symbols']['af_v3_save_'+k] for k in ('reset','commit')})
+    targets['owned']=report['collection']['code']['symbols']['af_v3_catalogue_owned']
+    wrappers=bytearray();entries={}
+    for name,target in targets.items():
+        entries[name]=bridge+len(wrappers);wrappers.extend(struct.pack('>4I',0x08000000|(target>>2&0x3FFFFFF),0,0,0))
+    debug.write_memory(bridge,wrappers);call(0x8002FE00,[bridge,len(wrappers)]);call(0x80034CE0,[bridge,len(wrappers)])
+    proof=(bridge,bytes(wrappers))
+    def entry(name,args=(),want=None):return call(entries[name],args,want,proof)
+    saved={at:debug.read_memory(at,n) for at,n in ((0x8046C000,1232),(0x80126EA0,0xF980),(0x80136FD8,4))}
+    try:
+        for row in items['rows']:debug.write_memory(RAM+row['offset']+4,struct.pack('>I',1))
+        debug.write_memory(profile,base_profile);debug.write_memory(state,working)
+        debug.write_memory(bank,reward_reference.reference_pack(source,working[:880]))
+        entry('check',[bank,0x10000,profile,out],1)
+        check('format-3 migration retains all old state and clears surface ownership',out,working[:944]+bytes(256))
+        debug.write_memory(bank,source);entry('pack',[bank,0x10000,state],1)
+        check('complete format-4 bank matches independent encoder',bank,packed)
+        entry('check',[bank,0x10000,profile,out],1);check('complete extended working state decodes',out,working)
+        first=RAM+items['rows'][0]['offset']+4;debug.write_memory(first,bytes(4));debug.write_memory(out,b'\xA5'*1200)
+        entry('check',[bank,0x10000,profile,out],-7);check('missing surface refuses without output writes',out,b'\xA5'*1200)
+        debug.write_memory(first,struct.pack('>I',1))
+        bad=bytearray(packed);bad[0xF980+0x3D0]=1;legacy_reference.seal_extension(bad)
+        debug.write_memory(bank,bad);entry('check',[bank,0x10000,profile,out],-8)
+        check('invalid ownership refuses without output writes',out,b'\xA5'*1200)
+        debug.write_memory(bank,packed);entry('reset',[],1);entry('commit',[bank,0x80126EA0,0xF980])
+        check('stable native commit restores full extended state',0x8046C010,working)
+        check('stable native commit preserves native payload',0x80126EA0,packed[:0xF980])
+        expected=bytearray(working);player=3;private=0x80126EC0+player*0xBD0
+        debug.write_memory(0x80136FD8,struct.pack('>I',private))
+        entry('owned',[private,0x274D],0);call(0x800B88EC,[0x274D]);entry('owned',[private,0x274D],1)
+        expected[944+player*64+41]|=32
+        check('native pocket collection records only the selected surface/player',0x8046C010,expected)
+        call(0x800B7ADC,[private])
+        expected[192+player*128:192+(player+1)*128]=bytes(128)
+        expected[704+player*32:704+(player+1)*32]=bytes(32)
+        expected[832+player*12:832+(player+1)*12]=bytes(12)
+        expected[944+player*64:944+(player+1)*64]=bytes(64)
+        check('native player deletion clears its surfaces and preserves the existing clear chain',0x8046C010,expected)
+        check('expanded state guard retained',saved_runtime['guard_ram'],bytes.fromhex('AF53C0DE')*4)
+        for at in guards:check('surface-save arena guard',at,edge)
+        check('no CPU fault',0x8003CE34,bytes(4))
+    finally:
+        for row in items['rows']:debug.write_memory(RAM+row['offset']+4,bytes(4))
+        for at,value in saved.items():debug.write_memory(at,value)
+        call(0x8009C040,[allocation])
+    check('complete packet restored',RAM,packet)
+    return dict(native_surface_save=True,assertions=assertions,actual_format4_codec_and_stable_runtime=True,
+        native_collection_and_player_clear=True,physical_audio_played=False,flash_written=False,
+        ordinary_save_restart_tested=False,requires_checkpoint_restore=True)
 
 
 def surface_application(debug,rom_path,record):

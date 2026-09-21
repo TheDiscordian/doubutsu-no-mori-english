@@ -25,7 +25,20 @@ typedef unsigned int af_save_u32;
 #else
 #define AF_SAVE_REWARD_BYTES 0u
 #endif
-#define AF_SAVE_STATE (AF_SAVE_REWARD_OFFSET + AF_SAVE_REWARD_BYTES)
+#define AF_SAVE_SURFACE_OFFSET (AF_SAVE_REWARD_OFFSET + AF_SAVE_REWARD_BYTES)
+#ifdef AF_V3_SURFACE_PROFILE
+#ifndef AF_V3_REWARD_PROFILE
+#error Surface state requires the complete reward profile
+#endif
+/* Full eight-bit identities in each group: 32 bytes floors, 32 wallpapers.
+ * Existing profile/catalogue/reward offsets remain unchanged. */
+#define AF_SAVE_SURFACE_PROFILE 64u
+#define AF_SAVE_SURFACE_BYTES (AF_SAVE_SURFACE_PROFILE * 5u)
+af_save_u32 af_v3_surface_profile_byte(af_save_u32 index);
+#else
+#define AF_SAVE_SURFACE_BYTES 0u
+#endif
+#define AF_SAVE_STATE (AF_SAVE_SURFACE_OFFSET + AF_SAVE_SURFACE_BYTES)
 
 enum {
     AF_SAVE_LEGACY = 0, AF_SAVE_OK = 1,

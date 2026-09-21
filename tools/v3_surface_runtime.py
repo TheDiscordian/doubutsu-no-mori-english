@@ -162,6 +162,11 @@ def install(base, prior, blob, core, original, output, art_path, *, module=None)
     inventory,assets=discover(source,base)
     prepared=checked_prepared(art_path,inventory,assets)
     if set(prepared)!=set(assets):raise ValueError('Install the complete prepared surface category')
+    if prior.get('room_surfaces',{}).get('application'):
+        from v3_surface_save import install as install_save
+        changes,updates=install_save(prior,blob,core,output)
+        updates['room_surfaces']['sources'].update({p:sha256((ROOT/p).read_bytes()) for p in SOURCES})
+        return changes,updates
     if prior.get('room_surfaces',{}).get('items'):
         from v3_surface_application import install as install_application
         if module is None:raise ValueError('Surface application requires the checked English module')

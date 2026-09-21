@@ -12,17 +12,17 @@ After the primary importing work, finish gold-tree leaf/cut effects and the full
 golden-shovel acquisition route. This is deferred required V3 work, not a dropped
 feature or a separate release goal.
 
-The current explicit proposal is ABI 184 at
-`build/v3-surface-application-runtime-01/build-lock.json`. Shared room reservation,
-application, and full floor identity join the complete surface texture/item
-readers. Three cartridge checks and both actual C sanitizer fixtures pass;
-the first silent native room run passes 34 assertions. Native menu deferral,
-texture DMA, full saved-byte writes, initializer reload, special-scene routing,
-and guards are covered. Ordinary inventory/save-restart are not established.
-All ten surfaces remain disabled pending inventory/catalogue, profile,
-acquisition, and scoring/sound integration. The 912-byte code uses the existing
-4-KiB packet; bootstrap/startup reservations and all artwork remain unchanged.
-Retain passing unchanged texture/item evidence rather than replaying it.
+The current explicit proposal is ABI 185 at
+`build/v3-surface-save-runtime-01/build-lock.json`. Format 4 adds independent
+surface selection/ownership, migration, native collection, and player clearing.
+Five focused checks and 28 native assertions pass; one native fixture import-path
+correction is required. Original save entry points and native payload/record
+offsets remain intact. Ordinary inventory/save-restart are not established.
+The complete surface packet is 16 KiB; runtime save state is 1,232 bytes with
+guards at `8046C4C0`, within existing reserved memory. Startup remains 960/992.
+Retain passing unchanged room/item/texture evidence instead of replaying it.
+New format-4 saves cannot load in V2 or format-1/2/3 V3 builds. Valid older saves
+migrate with surface ownership empty; equal-or-larger selections are required.
 
 The shared start-disabled placement adapter and ordinary sprinkler import are complete.
 Source C-stock acquisition and catalogue reordering are installed. Existing
@@ -39,19 +39,20 @@ Stable paired indices 73–77 preserve all original texture and special-room sou
 IDs. The shared floor getter preserves selected identities and the campsite
 route. The native home fields are complete independent bytes, not packed six-bit
 fields: only the original getter masks them. Native application and full-payload
-save copies preserve the bytes; optional-profile validation still needs its own
-explicit surface category before any surface is selectable.
+save copies preserve the bytes; format-4 validation supplies its own explicit
+surface selection/ownership category. No surface is selectable until its full
+item, catalogue, and acquisition path is complete.
 Use `specs/V3_ROOM_SURFACES.md` for the shared reader/action/save integration order.
 Catalogue preview (`03970000`, linked `808A6100`) and arranged NPC rooms
 (`00845C40`, linked `80950E50`) use the separate added resource banks, preserving
 original resources and native preview geometry. Next connect inventory dispatch,
-catalogue lists/ownership, and explicit surface profile validation. Preserve the
+catalogue lists and ownership-bit dispatch to the installed surface category. Preserve the
 full native home bytes and every unrelated field. Do not repurpose furniture
 selection/ownership bits to represent floors or wallpapers.
 The installed name/type/price hooks wrap the existing native public entries and
 retain their prior complete chains. Keep those outer hooks and the bootstrap
-when extending category readers. Replace the disabled item metadata with actual
-optional-profile validation only when the full item/persistence path is complete.
+when extending category readers. Surface profiles derive from those exact enabled
+metadata rows. Enable optional selections only when the full item path is complete.
 
 Contact/floor callbacks
 are source-bound and compiled, with four focused host/source checks passing.
@@ -74,11 +75,11 @@ remain required. Gold-tree leaf/cut effects and full golden-shovel acquisition
 follow primary importing. Keep both stable website deployments unchanged until
 the user's testing and explicit approval.
 
-There are 141 experimental choices and 27 inactive profiles. Saved format 3 is
-unchanged; profiles selecting sprinkler require a build containing its ID.
-Missing-ID/removed-selection restrictions remain. Permanent audio has 32
-conservative bytes spare and the import blob has 1,785,072 bytes free.
-Surface item readers add 4 KiB of resident RAM and no scene allocation. Ordinary room interaction, full sample synthesis, GPU
+There are 141 experimental choices and 27 inactive profiles. Saved format 4
+requires a compatible build and equal-or-larger selected profile. Surface options
+remain disabled. Permanent audio has 32 conservative bytes spare and the import
+blob has 1,772,784 bytes free. The complete surface packet occupies 16 KiB,
+with no scene allocation. Ordinary room interaction, full sample synthesis, GPU
 appearance, and hardware verification remain unclaimed. No physical audio is
 played.
 

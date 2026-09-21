@@ -2,6 +2,12 @@
 
 ## Implemented scope
 
+The [surface-enabled variant](V3_SURFACE_SAVE.md) uses format 4 and separate
+surface selection/ownership. Its 1,232-byte runtime has guards at `8046C4C0`.
+Stable entry jumps preserve the existing native I/O and caller APIs; the active
+runtime resides in the checked surface packet. Valid older formats migrate, but
+older builds reject new saves. Use this variant's actual sizes and code records.
+
 The [reward variant](V3_REWARD_SAVE.md) uses format 3, the same 192-byte immutable
 profile, and 912-byte runtime state with guards at `8046C380`. It retains all
 public runtime entries and native I/O. Valid older banks migrate on decode;

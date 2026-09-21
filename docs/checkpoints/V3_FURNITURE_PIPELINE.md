@@ -1,8 +1,85 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared surface profile and ownership persistence
+
+The current explicit proposal is ABI 185 at
+`build/v3-surface-save-runtime-01/build-lock.json`:
+
+```sh
+python3 tools/v3_furniture_install.py --refresh-runtime \
+  --base-lock build/v3-surface-application-runtime-01/build-lock.json \
+  --room-surfaces-art build/v3-room-surfaces-prepared-02 \
+  --output build/v3-surface-save-runtime-01
+```
+
+The shared [format-4 category](../../specs/V3_SURFACE_SAVE.md) adds independent
+surface selection and four-player ownership. All previous record offsets, the
+native town payload, and native FlashRAM routes remain intact. Valid NAFJ and
+formats 1–3 migrate with new ownership empty; saved selections must remain
+available. **V2 and format-1/2/3 V3 builds cannot load new format-4 saves.**
+Private exports include the actual warning. Preserve backups; ordinary
+cross-version gameplay save/restart is not claimed.
+
+The complete surface packet is 16 KiB at `804BC000`, 12 KiB more resident memory.
+Its 776-byte profile/collection helper, 2,792-byte codec, and 2,071-byte runtime
+fit checked gaps below the model pool. Full packet DMA/CRC/cache handling remains
+in the existing 128-byte equipment bootstrap; startup is 960/992 bytes. Stable
+save entry jumps preserve all caller addresses. Runtime state grows from 912 to
+1,232 bytes inside the owned C000–D000 interval, with guards at `8046C4C0`.
+The original complete D000 item/lamp resource, surface artwork, room/application
+code, actors, and scene buffers remain unchanged. The blob is 4,518,672 bytes,
+with 1,772,784 bytes free.
+
+Surface profile bits derive from the actual enabled metadata records. Both
+collection entries wrap the complete display/held/original chains; disabled
+extended IDs cannot index original ownership arrays. Player deletion clears only
+the selected player's new ownership before running the existing reward/catalogue/
+native clear chain. Shared display-reader refreshes retain the outer wrappers
+and refuse unexplained changes to predecessor entry addresses.
+
+Five focused checks pass. The initial four complete in 6.186 seconds and cover
+independent complete-bank encoding, NAFJ/format-1/2/3 migration, format-3 backward
+rejection, added/missing profiles, atomic corruption/ownership failure, actual C
+with address/undefined-behaviour sanitizers, four-player collection/clearing,
+host device-I/O round trip, new-town reset, failure-before-I/O, complete installed
+code/hooks/resources, retained payload and existing offsets, actual compatibility
+exports, exact empty/all composition, and UPS reconstruction. A focused additional
+check in 7.603 seconds rebuilds the shared display readers and verifies they keep
+the surface collection hooks. It does not replay the first four or an old ROM.
+
+The native run at `build/v3-surface-save-native-02/` passes 49 records and 28
+internal assertions. Actual startup loads the complete packet and initializes
+the expanded state. Stable codec entries match the independent full-bank encoder,
+migrate format 3, preserve existing state, and reject missing surface selections
+or inconsistent ownership without output writes. The stable native commit
+restores both the expanded state and original payload. The actual native
+collection entry marks only the active player's selected wallpaper; native
+player deletion clears that player's surfaces, furniture, clothing, and reward
+flags while retaining other players and the profile. Guards, checkpoint restore,
+fault checks, and shutdown pass. The first attempt stops before these actions
+because the fixture cannot import the tests package; adding the repository to
+that fixture's Python module path is the single concrete correction.
+
+No physical audio, existing user save, or explicit FlashRAM write is used.
+The host mock-device round trip and native private-buffer commit do not prove
+ordinary save/restart, inventory transactions, GPU appearance, or hardware
+operation. Existing device-worker and room-rendering evidence is retained,
+not relabelled or replayed.
+
+- ROM SHA-256: `51a58866c4a61ee8f35d63ab405f8595c6416fab9dfa6e294a71976292f0510f`.
+- UPS SHA-256: `3c6fe3edee3f5b0ee50e210476ab34a61757b617bfde2b8f5422b16eda49bd5d`.
+- Receipt SHA-256: `671862c97045dc6d820a425c398b4042f901ef8185aa1becda4fa339968808a1`.
+- Native results SHA-256: `a434ef79b8aea499e33e39627789192fcf59b4d51cb07ae6b62ad0580711592c`.
+
+There are 141 choices and 27 inactive furniture profiles; all ten surfaces stay
+disabled. Next connect inventory use and catalogue lists/ownership-bit dispatch,
+then genuine acquisition, sounds/scoring, and private surface selection. The main
+ABI-109 lock and both deployments of the stable web patcher remain unchanged.
+Gold-tree effects and full golden-shovel acquisition follow primary importing.
+
 ## Shared surface room application and identity
 
-The current explicit proposal is ABI 184 at
+The retained room-application proposal is ABI 184 at
 `build/v3-surface-application-runtime-01/build-lock.json`:
 
 ```sh

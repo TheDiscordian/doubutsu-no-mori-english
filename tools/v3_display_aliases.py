@@ -174,6 +174,10 @@ def install(prior, blob, core, output, *, held_items=False, held_collection=Fals
         for row in display['readers'][group]:
             suffix=row['helper'] if group=='item_hooks' else ('record' if row['entry']==0x804699C0 else 'owned')
             target=parts['display_items']['symbols'][prefix+suffix]
+            if row.get('surface_outer_target'):
+                if target!=row['surface_prior_target']:
+                    raise ValueError('Surface collection predecessor moved; rebuild its checked wrapper')
+                target=row['surface_outer_target']
             row.update(after=redirect(blob,row['entry']-0x80460000,row['after'],target),target=target)
     for row in display['conversion']['hooks']:
         target=parts['display_conversion']['symbols']['af_v3_room_'+row['kind']+'_item']

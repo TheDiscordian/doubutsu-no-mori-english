@@ -9,8 +9,9 @@ lists, and floor-sound selectors. The shared runtime installer connects complete
 artwork to player-room/shop double-buffer readers, single-buffer arranged rooms,
 and catalogue previews. Shared full-name, price, and item-category readers use
 the same ten identities. Shared room reservation/application and full saved-byte
-reading are installed. Inventory dispatch, catalogue ownership, optional-profile
-validation, acquisition, and browser composition remain required. All new item records remain disabled; installed
+reading are installed. The format-4 save category supplies optional-profile
+validation and independent ownership. Inventory dispatch, catalogue page lists
+and bit dispatch, acquisition, and browser composition remain required. All new item records remain disabled; installed
 artwork and metadata do not make a surface selectable.
 
 Use the current explicit experimental lock; keep the main lock and both stable
@@ -72,8 +73,9 @@ unrelated flags. Native initialization and application preserve all eight bits.
 The original floor getter alone masks player/NPC floor identity to six bits;
 the selected-surface wrapper preserves additive IDs and retains original masking
 for other values. Preserve the complete native home payload and establish
-optional-profile validation before enabling a surface. An eventual save-format
-extension requires an explicit compatibility warning before a test build handoff.
+complete item/profile integration before enabling a surface. The
+[format-4 extension](V3_SURFACE_SAVE.md) has an explicit compatibility warning;
+V2 and older format-1/2/3 V3 builds cannot read its saves.
 
 ## Complete metadata and preparation
 
@@ -177,11 +179,11 @@ constructor, ordinary room entry, GPU draw, item use, or save/restart.
 
 ## Runtime integration queue
 
-1. Connect full item IDs to inventory actions, catalogue lists,
-   ownership, and the existing optional-profile/save validation.
+1. Connect full item IDs to inventory actions, catalogue lists, and catalogue
+   bit dispatch, using the installed separate surface ownership/profile category.
 2. Retain the installed floor/wall reservation/application and full saved-byte
-   readers. Complete inventory exchange and ordinary save/reload with explicit
-   selected-profile validation; keep imports optional.
+   readers and format-4 profile validation. Complete inventory exchange and
+   ordinary save/reload; keep imports optional.
 3. Apply genuine acquisition categories, floor sound mapping, and matching-pair
    HRA scoring. Existing Western, Backyard, and Boxing adapters explicitly lack
    their matching surfaces and must be updated from the same registry.
@@ -207,13 +209,14 @@ the native unchecked category-table access. Original 0–63 indices retain the
 prior native/imported item dispatch chains. Name arguments retain their full
 width; type/price arguments narrow to sixteen bits like their native entries.
 
-The 4-KiB permanent packet at `804BC000..804BCFFF` follows the existing scrolling
+The 16-KiB permanent packet at `804BC000..804BFFFF` follows the existing scrolling
 packet and ends below the model pool at `80500000`. Its 912-byte reader/action code has
 24-byte stack frames. The `AFSI` metadata header at `804BC800` carries version 1,
 count 10, and stride 24. Each row stores item/price halfwords, one enable word,
 and sixteen name bytes. Only enable word 1 is accepted; all proposal records
 contain zero. The complete packet ends with four `AF5351DE` guard words.
-There is no new heap, actor, scene, profile, or saved-state allocation.
+The format-4 category extends code and saved state within owned memory;
+there is no new heap, actor, or scene allocation.
 
 A 128-byte bootstrap occupies `804A8D40..804A8DBF`, in the checked unused gap
 after parent metadata and before the retained equipment guard at `804A8FF0`.
@@ -235,15 +238,17 @@ actual public entries, all ten names/prices under temporary fixture enable flags
 disabled and invalid IDs, original-floor name/category, complete restored packet,
 guards, and unchanged saved extension. It restores an emulator checkpoint; it
 does not establish room application, acquisition, ordinary save/restart, or
-hardware operation. Optional profile/save validation must replace the disabled
-state before any surface is offered for selection.
+hardware operation. Optional profile/save validation uses the same enabled
+metadata in the format-4 category; inventory/catalogue/acquisition integration
+must finish before any surface is offered for selection.
 
 ## Room reservation, application, and complete home identities
 
 `tools/v3_surface_application.py` extends the installed category through the same
-refresh command. It reuses the 4-KiB packet, complete metadata, artwork, startup
-reservation, and equipment bootstrap. The complete item/action code occupies
-912 bytes before metadata at `804BC800`; no RAM reservation or saved format grows.
+refresh command. Its complete item/action code occupies 912 bytes before metadata
+at `804BC800`, without changing artwork, scene allocation, or native saved fields.
+The separate [save category](V3_SURFACE_SAVE.md) uses later packet storage and
+extends the saved selection/ownership format, not native room-ID storage.
 
 Both native reservation entries, `8095267C`/`809526D4`, delegate to a shared
 helper. Arguments narrow to sixteen bits. Null clips/owners, busy queues, wrong
@@ -269,8 +274,8 @@ native default initializer stores complete bytes, and the room initializer at
 `80951F14` reads complete bytes into actor halfwords `174`/`176`. The complete
 current save runtime and its installed hooks are checked; native payload-copy
 lengths remain `F980`. No extra room-ID storage is needed. Surface selection and
-catalogue ownership still need an explicit saved category; full-byte room storage
-does not supply missing profile guards.
+catalogue ownership use the explicit format-4 category; complete room bytes
+alone do not supply profile guards.
 
 Actual C sanitizer fixtures cover the shared reserve/predicate/getter, original
 scene routing, all four homes, and a host-side full-payload save/read/commit. The
