@@ -1608,6 +1608,7 @@ def tool_controls(debug,rom_path,record,*,transitions=False,capture=False,rod=Fa
 def exercise(debug, rom_path, record, *, section='automatic_furniture'):
     if section=='staged_profiles':return staged_profiles(debug,rom_path,record)
     if section=='scroll_lifecycles':return scroll_lifecycles(debug,rom_path,record)
+    if section=='contact_lifecycles':return scroll_lifecycles(debug,rom_path,record,contact_only=True)
     if section=='initial_switch':return initial_switch(debug,rom_path,record)
     if section=='room_surfaces':return room_surfaces(debug,rom_path,record)
     if section=='surface_consumers':return surface_consumers(debug,rom_path,record)
@@ -3558,7 +3559,7 @@ def initial_switch(debug,rom_path,record):
         physical_audio_played=False,requires_checkpoint_restore=True)
 
 
-def scroll_lifecycles(debug,rom_path,record):
+def scroll_lifecycles(debug,rom_path,record,*,contact_only=False):
     """One bounded shared-category callback/loader check; no ordinary play claim."""
     from aflib import CODE_RAM,CODE_VROM,u32
     from v3_import_storage import jump
@@ -3577,19 +3578,22 @@ def scroll_lifecycles(debug,rom_path,record):
     def call(at,args=(),proof=None):
         result=debug.call(f'{at:08X}',list(args),return_address=MODULE_RAM+0x6480,verified_code=proof or boot.get(at))
         record(result);return result['return_value']
-    sequence=u32(debug.read_memory(0x8014CBA8,4),0);seq=audio['sequence']
-    if not 0x80000400<=sequence<=0x80400000-seq['bytes']:raise ValueError('Unbounded native sound sequence')
-    raw=image[seq['physical']:seq['physical']+seq['bytes']]
-    for row in audio['programs']:
-        check('loaded complete positioned-loop program',sequence+row['offset'],raw[row['offset']:row['offset']+row['bytes']])
-        check('actual level dispatch binding',sequence+row['native_table']+row['native_sound_id']*2,
-              struct.pack('>H',row['offset']))
-    allocation=call(0x8009BFC0,[0x900])
-    if allocation&15 or not MODULE_RAM+0x8000<=allocation<=0x80400000-0x900:
+    if not contact_only:
+        sequence=u32(debug.read_memory(0x8014CBA8,4),0);seq=audio['sequence']
+        if not 0x80000400<=sequence<=0x80400000-seq['bytes']:raise ValueError('Unbounded native sound sequence')
+        raw=image[seq['physical']:seq['physical']+seq['bytes']]
+        for row in audio['programs']:
+            check('loaded complete positioned-loop program',sequence+row['offset'],raw[row['offset']:row['offset']+row['bytes']])
+            check('actual level dispatch binding',sequence+row['native_table']+row['native_sound_id']*2,
+                  struct.pack('>H',row['offset']))
+    size=0xC00 if contact_only else 0x900
+    allocation=call(0x8009BFC0,[size])
+    if allocation&15 or not MODULE_RAM+0x8000<=allocation<=0x80400000-size:
         raise ValueError('Scrolling callback fixture allocation failed')
     actor,capture,bridge=allocation+16,allocation+0x780,allocation+0x800
-    debug.write_memory(allocation,bytes(0x900));edge=b'V3SL'*4
-    guards=(allocation,actor+0x740,capture-16,capture+32,bridge-16,bridge+32,allocation+0x8F0)
+    debug.write_memory(allocation,bytes(size));edge=b'V3SL'*4
+    guards=(allocation,actor+0x740,capture-16,capture+32,bridge-16,bridge+32,allocation+size-16)
+    if contact_only:guards+=(allocation+0x8F0,allocation+0xAB0,allocation+0xAF0,allocation+0xB10)
     for at in guards:debug.write_memory(at,edge)
     names=('ct','mv','dt');stubs=b''.join(struct.pack('>2I',jump(rig['bootstrap']['symbols']['af_v3_room_boot_scroll_'+n]),0) for n in names)
     debug.write_memory(bridge,stubs);call(0x8002FE00,[bridge,len(stubs)]);call(0x80034CE0,[bridge,len(stubs)])
@@ -3597,15 +3601,40 @@ def scroll_lifecycles(debug,rom_path,record):
     # Observe the real MIPS callback's sound arguments without audible output.
     # Native synthesis and ordinary interactions are deliberately separate.
     saved={}
-    for entry,target in ((0x800D1D08,capture),(0x800D1D58,capture+16)):
+    for entry,target in (() if contact_only else ((0x800D1D08,capture),(0x800D1D58,capture+16))):
         original=core[entry-CODE_RAM:entry-CODE_RAM+40];check('native sound entry before recorder',entry,original)
         saved[entry]=original
         recorder=struct.pack('>10I',0x3C080000|(target>>16),0x35080000|(target&65535),
             0xAD040000,0xAD050004,0xAD060008,0x8D09000C,0x25290001,0xAD09000C,0x03E00008,0)
         debug.write_memory(entry,recorder);call(0x8002FE00,[entry,40]);call(0x80034CE0,[entry,40])
     saved_state=debug.read_memory(report['save_runtime']['state_ram'],report['save_runtime']['state_bytes'])
+    globals_saved={at:debug.read_memory(at,n) for at,n in ((0x80136F2C,4),(0x80137655,1))} if contact_only else {}
+    rows=[r for r in scroll['lifecycle_rows'] if (r['mode']==3)==contact_only]
+    if not rows:raise ValueError('No installed lifecycle rows for this focused category')
     try:
-        for row in scroll['lifecycle_rows']:
+        for row in rows:
+            if contact_only:
+                owner,clip=allocation+0x900,allocation+0xB00
+                debug.write_memory(clip,struct.pack('>I',owner))
+                # Real complete MIPS easing; expected values use single-precision
+                # rounding at each operation, not an invented linear fade.
+                def f32(value):return struct.unpack('>f',struct.pack('>f',value))[0]
+                value=f32(.04);value=f32(value+f32(f32(.04)*f32(1.0-value)))
+                for floor,state,direction,connected,expected in (
+                        (row['on'],1,0,True,value),(row['off'],4,0,True,value),
+                        (26,1,0,True,0.),(row['on'],5,0,True,0.),
+                        (row['on'],1,1,True,0.),(row['on'],1,0,False,0.)):
+                    data=bytearray(b'\xA7'*0x740)
+                    struct.pack_into('>H',data,0,row['runtime_index']);struct.pack_into('>h',data,0x3C,state)
+                    debug.write_memory(actor,data);invoke('ct');data[0x1A4:0x1A8]=bytes(4)
+                    check('contact constructor changes only private alpha',actor,data)
+                    debug.write_memory(0x80137655,bytes((floor,)))
+                    debug.write_memory(0x80136F2C,struct.pack('>I',clip if connected else 0))
+                    debug.write_memory(owner+0x1A0,struct.pack('>i',direction))
+                    invoke('mv');data[0x1A4:0x1A8]=struct.pack('>f',expected)
+                    check('source contact, state, and complete floor identity',actor,data)
+                    invoke('dt');check('contact teardown does not invent saved state',actor,data)
+                continue
             debug.write_memory(actor,bytes(0x740));debug.write_memory(actor,struct.pack('>H',row['runtime_index']))
             invoke('ct');check('constructor starts from saved off state',actor+0x1A4,bytes(6))
             debug.write_memory(actor+0x12D,b'\x01');debug.write_memory(capture,bytes(32));invoke('mv')
@@ -3627,11 +3656,12 @@ def scroll_lifecycles(debug,rom_path,record):
         check('saved data retained',report['save_runtime']['state_ram'],saved_state)
         check('no CPU fault',0x8003CE34,bytes(4))
     finally:
+        for at,data in globals_saved.items():debug.write_memory(at,data)
         for entry,original in saved.items():
             debug.write_memory(entry,original);call(0x8002FE00,[entry,len(original)]);call(0x80034CE0,[entry,len(original)])
         call(0x8009C040,[allocation])
-    return dict(native_scroll_lifecycles=True,assertions=assertions,source_shapes=len(scroll['lifecycle_rows']),
-        callback_dispatch_recorder=True,ordinary_room_interaction=False,physical_audio_played=False,
+    return dict(native_scroll_lifecycles=True,contact_only=contact_only,assertions=assertions,source_shapes=len(rows),
+        callback_dispatch_recorder=not contact_only,ordinary_room_interaction=False,physical_audio_played=False,
         synthesis_tested=False,requires_checkpoint_restore=True)
 
 

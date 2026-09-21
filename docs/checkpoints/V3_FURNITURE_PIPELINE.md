@@ -1,5 +1,86 @@
 # Automatic furniture pipeline checkpoint
 
+## Installed contact and floor lifecycles
+
+ABI 191 is `build/v3-contact-floor-runtime-04/build-lock.json`:
+
+```sh
+python3 tools/v3_furniture_install.py --refresh-runtime \
+  --base-lock build/v3-surface-selection-runtime-02/build-lock.json \
+  --scrolling-materials-art build/v3-scrolling-materials-prepared-03 \
+  --output build/v3-contact-floor-runtime-04
+```
+
+The ordinary scrolling-category installer discovers and installs complete
+contact/floor callbacks for matching records, including records whose artwork
+is first installed in that batch. It reuses all seven existing objects and
+adds the source-shaped mower lifecycle to the shared table. No per-item
+installer, new object, heap allocation, fixed reservation, or saved field is
+introduced. The module is 3,612 bytes in its existing 4-KiB code reservation,
+leaving 484 bytes; the full packet remains 8 KiB. Startup remains 964/992 bytes.
+
+Complete converted donor artwork and the registered surface/item binding map
+source lawn 26 to native additive 74. Source meadow 48 retains native 48.
+Native plank floor 26 is never replaced or accepted as lawn. The alpha callback
+uses complete source constructor/move functions, two native easing steps, real
+room contact direction, and the four source push states. Its destructor changes
+no saved data. Both floor predicates remain independent of checkbox selection;
+the native meadow does not require the optional lawn.
+
+Mower activation still fails closed because the room owner's movement sounds
+are separate from this callback. There remain 147 experimental choices and 27
+inactive profiles, with no new enabled parent. Existing profiles, artwork,
+surface packet, complete audio resources, core code, and saved format/profile
+are preserved. `shared_runtime_refresh.artwork_changed` is the installer's
+generic scrolling-mode flag, not evidence that object bytes changed; the test
+compares every retained object's source, address, size, and hash.
+
+The build exposed an outdated furniture-loop verifier: floor audio moves the
+group-zero table, but the verifier assumed its original `194` location. The
+shared verifier now checks the recorded live table, all original 80 entries,
+and the complete source/native click programs, instruments, and priorities.
+It rejects altered pointers instead of weakening those sound checks.
+
+Four focused host checks pass in `tests/test_v3_contact_runtime.py`, including
+actual contact C under address/undefined-behaviour sanitizers, changed-artwork
+and identity rejection, existing-profile rebinding, and the relocated sound
+table. Two host-fixture corrections normalize JSON relocation keys and select
+the explicit current composer lock. Added exact all/none composition and source
+fingerprint assertions use the same focused installed-category check.
+
+The native run at `build/v3-contact-floor-native-02/` passes 67 records with
+32 internal assertions. It calls the actual lazy-loaded MIPS callbacks and
+native `add_calc`, checking active lawn/meadow, original plank, wrong state,
+wrong direction, null owner, complete actor-write boundaries, unchanged saved
+state, guards, checkpoint restoration, and shutdown. `native-01` was a preflight
+failure: the build process had not yet produced its ROM. No emulator scenario
+ran there. The actual native attempt passes without a gameplay-setup retry.
+The native-tested `runtime-03` and final `runtime-04` ROM hashes are identical;
+`04` includes the complete current source receipts. Do not replay this evidence
+for unchanged code.
+
+Hashes:
+
+- ROM: `8dcf253ebe035b2531637f509fe001b688120f87c3efb19273536952087bac4b`.
+- UPS: `13d9dbed568eb16027070874d78efba83b959081731af0136facf4d34eedb61c`.
+- Final build report: `cefa95d152457e0a4a5b1616c4f6de4ed5732f85a789c26f11c13bd17dab0319`.
+- Native results: `b4e620ae8e5b6a211b5e42c9372a8ff0b98d6c0fd71751c68b56f1d823b85a34`.
+- Scroll packet: `0885c07949991c34939b5ba3ae706fb7de682583589b722734443411e7a77ccb`.
+
+No physical audio, ordinary mower use, synthesis, save/restart, GPU appearance,
+or hardware test is claimed. Saved format 4 and its existing incompatibility
+with V2/format-1/2/3 V3 remain; retain backups and equal-or-larger selections.
+The main ABI-109 lock and both stable website deployments remain unchanged.
+
+Next connect the shared `aMR_SetMoveSE` source category, including complete
+mower/stone-coin sound programs and the native room-owner call sites. The source
+also confirms that remaining delivery categories need engine work, not stock
+aliases: `ac_ev_turkey.c` awards ten Harvest furniture items plus floor/wall
+through Franklin's twelve-bit reward cycle, and `ac_npc_shop_common.c` owns
+Nook's password decoding/type checks and actual item handover. HomePage/Mario
+and Harvest delivery and full HRA themes remain required; do not mark those
+items available merely because their artwork or floor metadata is installed.
+
 ## Shared surface optional selection
 
 ABI 190 is `build/v3-surface-selection-runtime-02/build-lock.json`:

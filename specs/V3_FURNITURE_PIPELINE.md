@@ -264,7 +264,8 @@ Merlion, Manekin Pis, and fireplace use the shared ordinary profile/acquisition
 pipeline. Sprinkler's `1000` start-disabled profile flag requires the shared
 native placement binding as well as its complete move/draw/audio callbacks.
 It uses its source C-stock acquisition and supports catalogue reordering.
-The mower's separate contact/floor-driven state remains unfinished.
+The mower's contact/floor-driven alpha state is installed; its separate
+room-owner movement-sound behaviour remains required before activation.
 
 #### Shared contact and floor lifecycle preparation
 
@@ -298,18 +299,35 @@ sound, maximum, and step must be zero; floor indices must be distinct in `0..127
 There is no missing-floor sentinel and no numerical fallback. Complete contact
 support compiles within the existing 4-KiB code allowance and adds no heap or
 fixed RAM. Without its compile-time definition, existing callbacks are unchanged.
-Ordinary profile binding still refuses this category until complete surface
-dependencies and installation are connected.
+The shared scrolling installer binds this category for all matching source
+records, including newly added drawing records in the same batch. It installs
+the contact code and records within the existing reservation. Ordinary profile
+binding still refuses activation until room-owner movement sounds are connected.
 
 Floor binding compares every decoded pixel of the complete converted donor
 surface against the native room-floor bank. Zero matches require an additive
 surface import; multiple matches require identity resolution. An equal numeric
 index is not evidence. GameCube backyard lawn at 26 has no native artwork match:
 native 26 is old plank floor, independently recorded in the translation catalogue.
-Daisy meadow at 48 matches all 16,384 pixels. The prepared mower remains inactive
-until both source floor identities have complete native bindings. Missing room
-surfaces need the general item/artwork/house/catalogue/save pipeline, not a
-special-case mower substitution or replacement of original content.
+Daisy meadow at 48 matches all 16,384 pixels. Backyard lawn binds to registered
+additive identity 74 after the surface item/artwork/house/catalogue/save/audio/
+stock and optional-selection stages are present. The binding rechecks the full
+converted texture, source record, destination registry, and actual enabled item
+metadata. These are alternative floor predicates, not mandatory checkbox
+dependencies: a mower on native meadow does not require selecting backyard lawn.
+No existing native floor is replaced. Preparation accepts the checked build
+report so its dependency result reflects installed additive floors.
+
+The complete alpha callback remains independent from room movement sounds.
+Installed callbacks do not by themselves enable a parent profile or web option.
+Future batches rebind source functions and complete installed floor resources;
+a readiness flag or matching numeric index cannot stand in for those checks.
+
+Furniture switch-click validation follows the installed group-zero movement
+table. A surface-audio expansion preserves all original 80 entries while adding
+new sounds; the verifier checks the complete original entries and each click's
+program, instruments, and priority instead of assuming the table remains at its
+original address.
 
 #### Shared initial-switch placement
 

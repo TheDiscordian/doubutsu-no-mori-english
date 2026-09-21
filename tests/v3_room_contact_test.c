@@ -40,13 +40,13 @@ float add_calc(float *value,float target,float fraction,float maximum,float mini
 int main(void) {
     RoomScrollLives *table=&af_v3_test_room_scroll_lives;
     *table=(RoomScrollLives){.magic=ROOM_SCROLL_LIFE_MAGIC,.count=1,.stride=12,
-        .rows={{.index=1256,.mode=3,.on=48,.off=71}}};
+        .rows={{.index=1256,.mode=3,.on=74,.off=48}}};
     struct { u8 before[16];RoomScrollActor actor;u8 after[16]; } guarded;
     RoomContactOwner owner={0};RoomContactClip clip={&owner};
     RoomScrollActor *actor=&guarded.actor;
-    /* Synthetic second floor 71 proves that the callback consumes record
-       identities; it does not add this floor to any cartridge. */
-    for (unsigned alias=0;alias<2;++alias) for (int floor=-1;floor<=72;++floor)
+    /* Current registered lawn and native meadow identities; the Python test
+       binds these to the actual cartridge and complete donor artwork. */
+    for (unsigned alias=0;alias<2;++alias) for (int floor=-1;floor<=78;++floor)
         for (int state=-1;state<=16;++state) for (int direction=0;direction<4;++direction) {
             memset(&guarded,0xAD,sizeof(guarded));
             actor->index=1256+1024*alias;actor->state=state;
@@ -55,7 +55,7 @@ int main(void) {
             assert(!memcmp(actor,&expected,sizeof(expected)));
             af_v3_test_contact_clip=&clip;af_v3_test_contact_floor=floor;owner.direction=direction;
             steps=0;af_v3_room_scroll_mv(actor,NULL,NULL,NULL);
-            int active=(floor==48 || floor==71) && state>=1 && state<=4 && direction==0;
+            int active=(floor==48 || floor==74) && state>=1 && state<=4 && direction==0;
             float want=0.04f;want+=0.04f*(1.0f-want);
             expected.colour.f=active ? want : 0.0f;
             assert(steps==(active ? 2u : 0u) && !memcmp(actor,&expected,sizeof(expected)));

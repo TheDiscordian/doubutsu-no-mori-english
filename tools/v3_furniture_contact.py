@@ -117,7 +117,7 @@ def native_contract(image):
         alpha_offset=0x1A4, add_calc=0x8009A570, saved_fields_changed=False)
 
 
-def floor_bindings(image, contract):
+def floor_bindings(image, contract, report=None):
     from v3_villager_houses import surface_match
     raw = FLOOR_SOURCE.read_bytes()
     if sha256(raw) != FLOOR_SHA:
@@ -127,19 +127,48 @@ def floor_bindings(image, contract):
     for index in contract['source_floors']:
         match = surface_match({FLOOR_VROM: files[FLOOR_VROM]}, image, raw, index, 0x2020)
         candidates = match['native_matches']
-        records.append(dict(source_index=index, native_index=candidates[0]['index'] if len(candidates)==1 else None,
+        record=dict(source_index=index, native_index=candidates[0]['index'] if len(candidates)==1 else None,
             status='complete-native-artwork-match' if len(candidates)==1 else
                    'missing-additive-floor-import' if not candidates else 'ambiguous-native-floor-identity',
-            evidence=match))
+            evidence=match)
+        if not candidates and report and report.get('room_surfaces',{}).get('optional_selection'):
+            from v3_asset_loader import BLOB
+            from v3_registry import surface_identity
+            from v3_room_surfaces import convert_record
+            from v3_surface_selection import options
+            blob=files[BLOB].extract(image);surface=report['room_surfaces']
+            key=f'GAFE01-r0/item/{0x2600+index:04X}'
+            available=options(blob,report)
+            matches=[r for r in surface['rows'] if r['id']==key]
+            if key in available:
+                if len(matches)!=1:raise ValueError('Ambiguous installed contact floor identity')
+                row=matches[0];target,item=surface_identity(0x2600+index)
+                start=index*0x2020;original=raw[start:start+0x2020]
+                converted=convert_record(original,4);at=row['blob_offset']
+                if (row['kind']!='floor' or row['source_index']!=index or
+                        row['destination_index']!=target or row['destination_item_id']!=f'{item:04X}' or
+                        row['vrom']!=BLOB+at or row['bytes']!=len(converted) or
+                        row['source_sha256']!=sha256(original) or
+                        row['converted_sha256']!=sha256(converted) or
+                        blob[at:at+len(converted)]!=converted or not row['room_texture_installed'] or
+                        not surface['room_texture_readers_installed'] or
+                        not surface['catalogue_texture_reader_installed'] or
+                        not surface['arrange_room_reader_installed']):
+                    raise ValueError('Changed complete additive contact floor binding')
+                record.update(native_index=target,status='complete-additive-floor-import',
+                    additive=dict(id=key,item_id=f'{item:04X}',native_index=target,vrom=row['vrom'],
+                        bytes=len(converted),source_sha256=sha256(original),sha256=sha256(converted),
+                        independent_optional_selection=True))
+        records.append(record)
     return records
 
 
-def prepare_lifecycle(source, profile, image):
+def prepare_lifecycle(source, profile, image, report=None):
     contract = source_lifecycle(source, profile)
     if contract is None:
         return None
-    floors = floor_bindings(image, contract)
-    return dict(source=contract, native=native_contract(image), floors=floors,
+    floors = floor_bindings(image, contract, report)
+    return dict(category=CATEGORY,source=contract, native=native_contract(image), floors=floors,
         dependencies_complete=all(r['native_index'] is not None for r in floors),
         runtime_installed=False)
 
@@ -149,11 +178,7 @@ def lifecycle_record(row, prepared):
     floors = prepared['floors']
     if (not prepared['dependencies_complete'] or prepared['source']['category'] != CATEGORY or
             len(floors) != 2 or [r['source_index'] for r in floors] != prepared['source']['source_floors'] or
-            any(r['status'] != 'complete-native-artwork-match' or type(r['native_index']) is not int or
-                not 0 <= r['native_index'] < 128 or
-                len(r['evidence']['native_matches']) != 1 or
-                r['evidence']['native_matches'][0]['vrom'] != f'{FLOOR_VROM:08X}' or
-                r['evidence']['native_matches'][0]['index'] != r['native_index'] for r in floors)):
+            any(not checked_floor_record(r) for r in floors)):
         raise ValueError('Contact/floor lifecycle needs both complete native floor bindings')
     indices = [r['native_index'] for r in floors]
     if len(set(indices)) != 2:
@@ -163,7 +188,41 @@ def lifecycle_record(row, prepared):
         source=prepared)
 
 
-def prepare_batch(source, image, inventory, output, selected=(), category=None):
+def checked_floor_record(row):
+    """Validate recorded identities; callers separately rebind complete ROM data."""
+    from v3_registry import SURFACES,surface_identity
+    index=row['native_index'];matches=row['evidence']['native_matches']
+    if type(index) is not int or not 0<=index<128:return False
+    if row['status']=='complete-native-artwork-match':
+        return (len(matches)==1 and matches[0]['vrom']==f'{FLOOR_VROM:08X}' and
+                matches[0]['index']==index and 'additive' not in row)
+    item=0x2600+row['source_index']
+    if row['status']!='complete-additive-floor-import' or matches or item not in SURFACES:return False
+    native,destination=surface_identity(item);proof=row.get('additive',{})
+    return (index==native and proof.get('native_index')==native and
+        proof.get('id')==f'GAFE01-r0/item/{item:04X}' and proof.get('item_id')==f'{destination:04X}' and
+        proof.get('bytes')==0x2020 and proof.get('independent_optional_selection') is True and
+        all(isinstance(proof.get(k),str) and len(proof[k])==64 for k in ('source_sha256','sha256')))
+
+
+def checked_contracts(source,image,report,*,rows=None):
+    """Discover all installed draw records using this source-shaped lifecycle.
+
+    A complete alpha callback does not establish the room owner's separate
+    movement-sound behaviour, so ordinary profile activation remains gated.
+    """
+    from v3_furniture_pipeline import prepare
+    result={}
+    if rows is None:rows=report['equipment_resources']['room_rigs'].get('scrolling',{}).get('rows',[])
+    for row in rows:
+        contract=prepare_lifecycle(source,prepare(source,int(row['source_item_id'],16))[0],image,report)
+        if contract and contract['dependencies_complete']:
+            lifecycle_record(row,contract)
+            result[row['source_item_id']]=contract
+    return result
+
+
+def prepare_batch(source, image, inventory, output, selected=(), category=None, report=None):
     from apply_translation import write_new
     if category not in (None, CATEGORY):
         raise ValueError('Unsupported lifecycle preparation category')
@@ -171,7 +230,7 @@ def prepare_batch(source, image, inventory, output, selected=(), category=None):
     for row in inventory['rows']:
         if row['installed'] or selected and row['item_id'] not in selected:
             continue
-        prepared = prepare_lifecycle(source, row.get('profile', {}), image)
+        prepared = prepare_lifecycle(source, row.get('profile', {}), image, report)
         if prepared is not None:
             rows.append(dict(source_item_id=row['item_id'], name=row['name'], **prepared))
     if not rows or selected and set(selected) != {r['source_item_id'] for r in rows}:

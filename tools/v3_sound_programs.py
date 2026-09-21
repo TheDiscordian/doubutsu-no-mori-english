@@ -759,12 +759,19 @@ def checked_furniture_loops(image,code,equipment,source):
         rows[donor_id]=lifecycle;clicks.update(lifecycle['switch_clicks'])
     click_proofs=[]
     if clicks:
-        if any(struct.unpack_from('>H',seq,0x188)[0]!=0x194 for seq in (original,sequence)):
+        movement=equipment['sound_programs'].get('surface_batch',{}).get('movement_table')
+        native_table=movement['offset'] if movement else 0x194
+        if (struct.unpack_from('>H',original,0x188)[0]!=0x194 or
+                struct.unpack_from('>H',sequence,0x188)[0]!=native_table or
+                movement and (movement['previous_offset']!=0x194 or movement['previous_count']!=80 or
+                    movement['count']<80 or
+                    span(sequence,native_table,160)!=span(sequence,0x194,160))):
             raise ValueError('Changed native/source group-zero click dispatch')
         for sid in sorted(clicks):
+            if not 0<=sid<80:raise ValueError('Click exceeds retained native movement slots')
             parts=[]
-            for seq in (original,sequence):
-                offsets=struct.unpack_from('>128H',seq,0x194);at=offsets[sid]
+            for seq,table in ((original,0x194),(sequence,native_table)):
+                offsets=struct.unpack_from('>80H',seq,table);at=offsets[sid]
                 # Both channel and layer terminate inside this exact form.
                 # Unrelated programs may follow before the next table-zero entry.
                 data=span(seq,at,16)

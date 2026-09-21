@@ -12,8 +12,17 @@ After the primary importing work, finish gold-tree leaf/cut effects and the full
 golden-shovel acquisition route. This is deferred required V3 work, not a dropped
 feature or a separate release goal.
 
-The current explicit proposal is ABI 190 at
-`build/v3-surface-selection-runtime-02/build-lock.json`. Private composition
+The current explicit proposal is ABI 191 at
+`build/v3-contact-floor-runtime-04/build-lock.json`. Shared contact/floor alpha
+callbacks are installed in the existing scrolling module. Complete bindings use
+additive lawn 74 and native meadow 48; original plank floor 26 stays unchanged.
+The focused native check passes without modifying saved fields or playing audio.
+The mower remains inactive until shared room-owner movement sounds are connected.
+The existing 147 choices, artwork, sound resources, saved layout, and profile
+selection are unchanged. Retain the unchanged surface-composition evidence below.
+
+The retained ABI-190 proposal at
+`build/v3-surface-selection-runtime-02/build-lock.json` supplies private composition
 offers 147 choices, including six surfaces with genuine A/C/event stock. Separate
 surface save profiles, selected catalogue rows/counts, and data-only CRC updates
 are connected in Python and JavaScript. Five focused host checks, ten browser
@@ -21,8 +30,8 @@ unit checks, a corrected cold-startup fixture, and one focused Chromium worker/
 category-control check pass. The private export `build/v3-surface-browser-01/`
 is not deployed; the temporary test server is stopped. Retain this evidence.
 
-Next finish HomePage/Mario and Harvest delivery and complete theme categories,
-then bind prepared contact/floor lifecycles and room movement sounds. These are
+Next connect the shared room movement-sound category, then finish HomePage/Mario
+and Harvest delivery and complete theme categories. These are
 shared category dependencies, not per-item import scripts. Ordinary gameplay
 and persistence still require focused integration/human testing. Keep the stable
 deployments unchanged and retain format-4 incompatibility warnings/backups.
@@ -65,7 +74,7 @@ playthrough and save/restart are not established. No packet, menu, or saved-stat
 allocation grows. Both category lists retain 64 original rows; private composition
 packs selected imports into the reserved five-row tails and updates counts.
 The complete surface packet is 16 KiB; runtime save state is 1,232 bytes with
-guards at `8046C4C0`, within existing reserved memory. Startup remains 960/992.
+guards at `8046C4C0`, within existing reserved memory. Startup remains 964/992.
 Retain passing unchanged room/item/texture evidence instead of replaying it.
 New format-4 saves cannot load in V2 or format-1/2/3 V3 builds. Valid older saves
 migrate with surface ownership empty; equal-or-larger selections are required.
@@ -109,19 +118,14 @@ native stride, complete original consumer behaviour, and separate raw movement
 mapping when binding contact/floor lifecycles. The room owner's mower/stone-coin
 movement dispatcher remains a distinct required integration step.
 
-Contact/floor callbacks
-are source-bound and compiled, with four focused host/source checks passing.
-Their preparation identifies a missing floor, not an unfinished grass-alpha
-formula: GameCube backyard lawn (26) replaces a different N64 old plank floor.
-Preserve that native floor and add the donor surface under a stable new identity.
-Daisy meadow (48) already matches completely. Inspect the shared floor item,
-catalogue, house, saved-room, artwork, and sound readers before extending their
-bounds; do not replace native slot 26 or silently omit this source condition.
-Then connect the prepared contact lifecycle to ordinary profile installation
-through complete floor bindings. Also implement the source room owner's shared
+Contact/floor callbacks are installed through complete source/native bindings.
+GameCube backyard lawn (26) maps to additive N64 floor 74; the distinct native
+plank floor 26 is preserved. Daisy meadow (48) matches completely. Implement
+the source room owner's shared
 movement sound category (`aMR_SetMoveSE`, lawn mower/stone coin); alpha callbacks
 alone do not include that behaviour. Reuse the source/native consumer checks and
-completed mower graphics. Native callback execution is still pending, not passed.
+completed mower graphics. Native alpha-callback execution passes; ordinary room
+interaction and the movement-sound dispatcher remain unverified/unimplemented.
 The private proposal includes 147 choices; four surfaces remain unavailable.
 Continue material and rigged-material categories alongside unresolved unique
 behaviours; the floor dependency must not stall unrelated importing.
@@ -130,10 +134,11 @@ remain required. Gold-tree leaf/cut effects and full golden-shovel acquisition
 follow primary importing. Keep both stable website deployments unchanged until
 the user's testing and explicit approval.
 
-There are 141 experimental choices and 27 inactive profiles. Saved format 4
+There are 147 experimental choices and 27 inactive profiles. Saved format 4
 requires a compatible build and equal-or-larger selected profile. Surface options
-remain disabled. Permanent audio has 32 conservative bytes spare and the import
-blob has 1,772,784 bytes free. The complete surface packet occupies 16 KiB,
+include six enabled surfaces and four pending delivery routes. Permanent audio
+has 896 conservative bytes spare and the import blob has 1,738,336 bytes free.
+The complete surface packet occupies 16 KiB,
 with no scene allocation. Ordinary room interaction, full sample synthesis, GPU
 appearance, and hardware verification remain unclaimed. No physical audio is
 played.

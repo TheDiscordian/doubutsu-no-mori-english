@@ -363,6 +363,8 @@ def draw_only_lifecycle(profile,source=None):
 
 def lifecycle_record(row,contract):
     """Pack only completely implemented source lifecycle shapes."""
+    from v3_furniture_contact import CATEGORY as CONTACT,lifecycle_record as contact_record
+    if contract['category']==CONTACT:return contact_record(row,contract)
     fade=contract['category']=='switch-fade-loop'
     if contract['category'] not in ('positioned-loop','switch-fade-loop'):
         raise ValueError('Unsupported scrolling lifecycle category')
@@ -554,6 +556,8 @@ def install(base,prior,blob,core,original,output,directories):
         maximum_frame_alignment_padding=8,opaque_and_translucent_atomic_reservation=True)
     source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
         (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    from v3_furniture_contact import checked_contracts
+    contacts=checked_contracts(source,base,prior)
     profile_bindings=room.bind_profiles(source,base,prior)
     directories=[d.resolve() for d in directories];cache=PreparedAssets(source,directories)
     identities=identity_rows(ROOT/'build/item-identity-megasheet.xlsx',include_unmapped_legacy=True)
@@ -571,6 +575,7 @@ def install(base,prior,blob,core,original,output,directories):
             if actual is None:
                 from v3_sound_programs import furniture_level
                 actual=furniture_level(source,prepare(source,int(old['source_item_id'],16))[0])
+            if actual is None:actual=contacts.get(old['source_item_id'])
             if actual is None or old.get('lifecycle')!=json.loads(json.dumps(actual)):
                 raise ValueError('Changed completed scrolling lifecycle')
         if old.get('profile_installed'):
@@ -614,8 +619,11 @@ def install(base,prior,blob,core,original,output,directories):
                 raise ValueError('Occupied scrolling destination')
             occupied.add(record['item_id']);rows.append(record);assets[donor]=data
     all_rows=sorted(installed['rows']+rows,key=lambda r:r['runtime_index']);encode(all_rows)
+    contacts=checked_contracts(source,base,prior,rows=all_rows)
     from v3_sound_programs import checked_furniture_loops
     lifecycles,proof=checked_furniture_loops(base,core,result,source)
+    if lifecycles.keys()&contacts.keys():raise ValueError('Overlapping scrolling lifecycle categories')
+    lifecycles.update(contacts)
     new_lives=[]
     for row in all_rows:
         lifecycle=lifecycles.get(row['source_item_id'])

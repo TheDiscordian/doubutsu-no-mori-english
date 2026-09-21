@@ -18,7 +18,22 @@ deployments retain their existing builds.
 
 ## Active development
 
-The current explicit V3 proposal is ABI 190 at
+The current explicit V3 proposal is ABI 191 at
+`build/v3-contact-floor-runtime-04/build-lock.json`. Shared contact/floor alpha
+callbacks are installed without additional memory or saved fields. Complete
+source/artwork bindings map backyard lawn to new floor 74 and retain native
+meadow 48; native plank floor 26 is untouched. A focused silent emulator run
+passes the installed callbacks, native easing, complete actor-write boundaries,
+saved-state preservation, and guards. Ordinary room use and hardware remain
+unverified. The mower stays unavailable until its room-owner movement sounds
+are connected; installed alpha callbacks alone do not complete that behaviour.
+
+Existing import choices and resources are unchanged. Furniture validation now
+follows the expanded floor-sound table while checking all original entries and
+complete switch-click programs. No website deployment or main lock changes.
+See the [contact checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#installed-contact-and-floor-lifecycles).
+
+The retained surface-selection proposal is ABI 190 at
 `build/v3-surface-selection-runtime-02/build-lock.json`. The private selector
 offers 147 installed development choices, including three floors and three
 wallpapers. Individual/all composition updates real enabled metadata, packs

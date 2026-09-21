@@ -68,6 +68,8 @@ def install_profiles(base,prior,blob,core,original,output,directories):
     materials={r['source_item_id']:r for r in runtime.get('material_rows',[])}
     scrolling=checked_runtime(result,blob)
     contracts,_=checked_furniture_loops(base,core,result,source) if runtime.get('scrolling',{}).get('lifecycle_rows') else ({},{})
+    from v3_furniture_contact import checked_contracts
+    contracts.update(checked_contracts(source,base,prior))
     old=copy.deepcopy(prior.get('staged_furniture',dict(format='AFV3-STAGED-FURNITURE-PROFILES-1',rows=[],sources=[])))
     if old['format']!='AFV3-STAGED-FURNITURE-PROFILES-1':raise ValueError('Unknown staged furniture format')
     occupied=set();staged=[];evidence=[];deferred=[]
@@ -107,7 +109,7 @@ def install_profiles(base,prior,blob,core,original,output,directories):
                     lifecycle=checked_lifecycle(source,descriptor,scrolling[donor],runtime['scrolling'],contracts)
                 if lifecycle is None:
                     from v3_furniture_contact import prepare_lifecycle
-                    pending=prepare_lifecycle(source,descriptor,base)
+                    pending=prepare_lifecycle(source,descriptor,base,prior)
                     deferred.append(dict(source_item_id=donor,
                         reason='Contact/floor lifecycle requires additive room-surface imports' if pending and not
                             pending['dependencies_complete'] else 'Scrolling lifecycle remains incomplete',
@@ -116,7 +118,9 @@ def install_profiles(base,prior,blob,core,original,output,directories):
                 if lifecycle.get('start_disabled') and placement is None:
                     placement,owner_changes,updates=install_initial_switch(base,prior,blob,source,output)
                 if not profile_lifecycle(descriptor,lifecycle,placement):
-                    deferred.append(dict(source_item_id=donor,reason='Native start-disabled placement remains incomplete'))
+                    deferred.append(dict(source_item_id=donor,reason=
+                        'Shared room movement sounds remain incomplete' if lifecycle.get('category')=='contact-floor-alpha'
+                        else 'Native start-disabled placement remains incomplete'))
                     continue
             index,destination=furniture_identity(item);i=slot(destination)
             if index!=1024+i:
@@ -234,6 +238,8 @@ def bind_profiles(source,base,report):
     if placement and report['furniture_initial_switch']['source']!=json.loads(json.dumps(initial_switch_source(source))):
         raise ValueError('Changed source fresh-placement contract')
     contracts,_=checked_furniture_loops(base,by_vrom(base)[CODE_VROM].extract(base),e,source) if runtime.get('scrolling',{}).get('lifecycle_rows') else ({},{})
+    from v3_furniture_contact import checked_contracts
+    contracts.update(checked_contracts(source,base,report))
     for row,enabled in [(r,False) for r in staged.get('rows',[])]+[(r,True) for r in activated]:
         item=int(row['item_id'],16);donor=f'{furniture_source(row)[0]:04X}';i=slot(item);binding=bindings.get(donor)
         if (donor in source.runtime_profiles or not binding or not binding['profile_installed'] or

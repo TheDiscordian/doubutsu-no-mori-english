@@ -1295,7 +1295,7 @@ def main():
     installed = [int(r['id'].rsplit('/',1)[1],16) for r in base_report['furniture']['imports']+[base_report['speed_bag']]]
     if args.representation=='lifecycle':
         from v3_furniture_contact import prepare_batch
-        report=prepare_batch(source,base,scan(source,worksheet,installed),output,args.select,args.category)
+        report=prepare_batch(source,base,scan(source,worksheet,installed),output,args.select,args.category,base_report)
         print(json.dumps(dict(lifecycles=len(report['rows']),complete_dependencies=report['complete_dependencies'],
             code_bytes=report['code']['bytes'],runtime_installed=False)))
         return
