@@ -138,6 +138,7 @@ def compile_part(part, out, extra_sources=(), defines=(), primary_source=None):
                        'surface_save': ('af_v3_surface_profile_byte', 0x804BC900),
                        'surface_codec': ('af_v3_save_check_extended', 0x804BD000),
                        'surface_save_runtime': ('af_v3_save_reset', 0x804BE000),
+                       'surface_menu': ('af_v3_surface_catalogue_bit', 0x804BF000),
                        'inventory_equipment': ('af_v3_inventory_item_kind', 0x804A9000),
                        'inventory_aux': ('af_v3_inventory_bobber', 0x804B2180),
                        'item_categories': ('af_v3_equipment_category', 0x804AA000),

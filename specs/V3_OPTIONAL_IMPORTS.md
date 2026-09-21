@@ -110,7 +110,8 @@ wallpapers while preserving all existing surfaces and special-room identifiers.
 Complete resources, stable paired destinations, official names, source metadata,
 and acquisition dependencies are retained. Shared resource, item, room-change,
 and full home-byte readers are installed. Format-4 surface profile/ownership
-validation is installed. Inventory/catalogue-page integration, acquisition,
+validation is installed. Catalogue page lists/ownership dispatch and native full-ID
+inventory exchange are connected. Acquisition, private surface selection,
 sound/scoring, and ordinary persistence
 remain required before these become optional playable imports.
 

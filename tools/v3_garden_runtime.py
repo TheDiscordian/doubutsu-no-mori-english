@@ -323,6 +323,10 @@ def install_catalogue(base, stable, prior, imports, output, rel, symbols, *, wes
         report.update(output_sha256=sha256(changes[catalogue.VROM]),
             relocation_sha256=sha256(changes[catalogue.RELOC]),retained_surface_preview=retained,
             surface_preview_code_sha256=retained['code_sha256'])
+    if prior.get('room_surfaces',{}).get('menu'):
+        from v3_surface_menu import retain_catalogue
+        changes[catalogue.VROM],changes[catalogue.RELOC],report=retain_catalogue(
+            prior,base,changes[catalogue.VROM],changes[catalogue.RELOC],report)
     return changes, report
 
 

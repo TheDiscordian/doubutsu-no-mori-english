@@ -97,6 +97,7 @@ ownership, clearing, host device I/O, new-town reset, and failure before writes.
 
 Native results and their limits are recorded in the
 [pipeline checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md).
-Catalogue page lists/ownership-bit dispatch, inventory use, acquisition,
-floor sound/scoring, and private surface selections remain integration work.
+Catalogue page lists/ownership-bit dispatch use this category; native inventory
+actions pass complete IDs to the installed room reservations. Acquisition,
+floor sound/scoring, private surface selections, and ordinary save/restart remain work.
 No surface becomes selectable merely because its save category exists.

@@ -1,5 +1,89 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared surface catalogue and inventory exchange
+
+The current explicit proposal is ABI 186 at
+`build/v3-surface-menu-runtime-03/build-lock.json`:
+
+```sh
+python3 tools/v3_furniture_install.py --refresh-runtime \
+  --base-lock build/v3-surface-save-runtime-01/build-lock.json \
+  --room-surfaces-art build/v3-room-surfaces-prepared-02 \
+  --output build/v3-surface-menu-runtime-03
+```
+
+The shared catalogue category installs one 144-byte leaf helper at `804BF000`
+and two 138-byte list reservations inside the existing surface packet. Native
+wall/floor collection pointers use the independent surface ownership API for
+indices 64–255; invalid values cannot index original ownership arrays. The
+complete original native bit reader, including debug behaviour, handles original
+indices. Furniture and other categories retain their prior dispatch.
+
+The catalogue's original ownership entry receives a checked sixteen-byte bridge
+which passes the real relocated native function. Two HI16/LO16 relocations replace
+two surface-list pointer relocations. Neither the 62,992-byte catalogue nor its
+736-byte relocation table grows. Conservative menu use remains 281,088 of
+281,152 reserved bytes. Tables at `804BF400`/`804BF490` reserve 69 indices each;
+the counted lists remain 64 original rows while imports are disabled. Private
+composition must compact selected additions and update counts, keeping completion
+flags tied to the actual selected list. Future shared catalogue rebuilds reapply
+the complete checked category and existing surface previews.
+
+The native 152-byte wallpaper/floor inventory actions already exchange full
+halfword IDs. They call the installed room reservations through clip offsets
+4/8 and return the previous complete surface ID to the pocket. No new inventory
+format or category-specific inventory hook is needed.
+
+Three focused checks pass: actual C with address/undefined-behaviour sanitizers,
+category routing, mutation rejection, complete installation and relocation at
+three bases, rebuild retention, unchanged save/resources/allocations, exact
+empty/all composition, and UPS reconstruction. The first two pass initially.
+The last detects an inaccurate inherited save-format-change report; the builder
+is corrected. Its subsequent run catches a test-only reference to nonexistent
+`composer.options`; switching to the existing `catalogue` API makes the focused
+check pass in 5.824 seconds. The final receipt also clears the inherited top-level
+format-change flag. Build folders 01/02/03 have the same complete ROM and UPS;
+these reporting corrections do not rerun the unchanged native cartridge.
+Final source fingerprints, both false format-change flags, and equality to the
+tested cartridge are checked explicitly.
+
+The silent native run at `build/v3-surface-menu-native-01/` uses runtime-02 and
+passes on the first attempt: 85 result records and 42 internal assertions.
+It executes the complete real catalogue loader and initializer in an isolated
+68-KiB arena. Disabled/uncollected surfaces stay absent; collecting the ten
+temporary fixture-enabled items produces the full stable-ID lists and official
+English names. Original rows remain, complete/partial flags work, and removing
+one counted selection preserves completion. Invalid extended ownership returns
+zero. Both complete installed inventory action bodies execute against the real
+resident room reservations; only their UI index/close callbacks are replaced
+with inert fixture callbacks. Complete prior IDs return to pockets and the
+selected full IDs reach the deferred room queue. Guards, CPU fault checks,
+state/packet restoration, checkpoint restoration, and clean shutdown pass.
+
+No existing save, physical audio, explicit FlashRAM write, ordinary UI playthrough,
+GPU comparison, or hardware test is used. Unchanged texture, preview, application,
+codec, and save-runtime evidence is retained, not replayed. The final-ROM hash
+matches the cartridge used for native execution.
+
+- ROM SHA-256: `1613910e4331f8360eb25b0e87cc09fe3842c8213582c3c66c42fcab1fa8df92`.
+- UPS SHA-256: `0914d7e0a58294624f2a6d66d25ac08f9eef4b7d388ff63ec37d2748f6d65b8a`.
+- Final build receipt SHA-256: `b40e165cc41fe5ca5b6042e83b0c046cadee17e253b3f019cb9c31ff5865b2f8`.
+- Native results SHA-256: `e7150c6bc2d8185accd54c33f8218b3d32a2432f19bc5a1dfdbf58925c780e30`.
+
+The blob remains 4,518,672 bytes with 1,772,784 bytes free. There are still 141
+choices and 27 inactive furniture profiles; all ten surface imports are disabled.
+Format 4 and the selected profile are unchanged from ABI 185. Format-4 saves
+still require a compatible build; V2 and format-1/2/3 V3 builds cannot load them.
+Preserve backups. No ordinary save/restart or cross-version playthrough is newly
+claimed. The ABI-109 main lock, stable patcher deployments, and existing saves
+remain unchanged.
+
+Next connect genuine surface acquisition, floor-sound mapping, matching-pair
+scoring, and private surface selection. Then bind the prepared contact/floor
+category and shared movement-sound dispatcher. Continue other shared material
+and rigged categories; gold-tree effects and golden-shovel acquisition follow
+primary importing.
+
 ## Shared surface profile and ownership persistence
 
 The current explicit proposal is ABI 185 at

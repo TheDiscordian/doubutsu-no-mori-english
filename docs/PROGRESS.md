@@ -6,7 +6,7 @@ V2-12 at `build/v2-museum-header-12-final/Animal Forest English V2.z64` corrects
 the missed museum name in letter headers, both editing and reading. It uses the
 official GameCube `Museum` wording while preserving the saved Japanese identity,
 fossil delivery, and all saved formats. Existing V2-11 saves are expected to work
-in both directions without migration. Neither served patcher is changed.
+in both directions without migration. Neither web-patcher deployment changes.
 
 Focused host and cartridge checks pass. Native museum/villager/player name
 resolution, bounded writes, and code relocation pass; the native rendering
@@ -14,37 +14,37 @@ comparison remains incomplete after two fixture-setup failures. Original-hardwar
 appearance still needs confirmation. See the [checkpoint](checkpoints/MUSEUM_LETTER_HEADERS.md)
 for exact checks, limits, and hashes. The explicit V3 proposal below includes
 this correction and pins its no-import output to V2-12; the main lock and both
-served patchers retain their existing builds.
+deployments retain their existing builds.
 
 ## Active development
 
-The current explicit V3 proposal is ABI 185 at
-`build/v3-surface-save-runtime-01/build-lock.json`. Surfaces have an independent
-saved selection and four-player ownership category. Format 4 migrates valid
-older banks, retains every existing profile/catalogue/reward offset, and rejects
-missing required selections. Stable save entry points, native collection, and
-player deletion connect to the new shared code. The 16-KiB surface packet is
-12 KiB larger; the 1,232-byte state fits existing reserved memory. No artwork,
-actor, scene, native town payload, or experimental choice changes.
+The current explicit V3 proposal is ABI 186 at
+`build/v3-surface-menu-runtime-03/build-lock.json`. The catalogue's floor/wall
+lists connect to independent surface ownership through one 144-byte helper.
+Original entries, debug behaviour, complete English names, and completion flags
+remain intact. Lists and helper fit the existing surface packet; menu memory,
+relocation size, artwork, saved format, and selectable choices do not grow.
+Shared catalogue rebuilds preserve these readers and the surface previews.
 
-Five focused checks pass, including an independent complete-bank encoder,
-format migration/backward rejection, atomic failure, actual C under memory-safety
-sanitizers, host device I/O, preserved resources/APIs, exact empty/all composition,
-UPS reconstruction, and preservation of surface hooks in a future shared display
-refresh. A silent native run passes 28 assertions for startup,
-actual format-4 encoding/decoding, missing-profile and invalid-ownership rejection,
-stable save commit, native collection, and the complete player-clearing chain.
-One test-only Python import-path correction precedes the passing native run.
-No physical audio or explicit FlashRAM writes occur. Ordinary game save/restart,
-inventory transactions, GPU appearance, and hardware acceptance remain unverified.
+Three focused checks pass across the implementation and corrected receipt:
+actual C under memory-safety sanitizers, checked relocation at three addresses,
+retained rebuild hooks, unchanged resources/profiles, exact empty/all composition,
+and UPS reconstruction. A silent native run passes 42 assertions on its first
+attempt, including the actual catalogue loader/initializer, collected surface
+lists, full names, completion flags, and complete native inventory action bodies.
+The inventory already exchanges full surface IDs; no new pocket format is needed.
+Its fixture stubs UI index/close callbacks, not the pocket/room-queue exchange.
+No ordinary UI playthrough, GPU appearance, hardware acceptance, physical audio,
+or explicit FlashRAM writes are claimed. Unchanged application/save tests are
+retained, not replayed.
 
 Format-4 saves require a compatible newer build; V2 and format-1/2/3 V3 builds
 cannot load them. Preserve backups. Private exports carry this warning. There
 are still 141 choices and 27 inactive furniture profiles; all ten surfaces stay
-disabled. Next connect inventory use, catalogue page lists/ownership-bit dispatch,
-genuine acquisition, sound/scoring, and private surface composition. The stable
+disabled. Next connect genuine acquisition, sound/scoring, and private surface
+composition, including selected catalogue counts. The stable
 patcher and main lock remain unchanged. See the
-[surface-save checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-surface-profile-and-ownership-persistence).
+[surface-menu checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-surface-catalogue-and-inventory-exchange).
 
 All ten surfaces retain shared texture, name, price, category, and room-change
 readers. Selected surfaces queue until the menu closes, then use native texture
@@ -66,7 +66,7 @@ Four focused conversion/metadata/cache checks pass. Every added palette and
 texel is checked through independent tile addressing; malformed resources and
 changed caches reject. Preparation itself changes no choices, saved layouts,
 main lock, or served website content. The room/shop installation is described
-above; full inventory/catalogue integration, acquisition, sound, scoring, and
+above; private category selection, acquisition, sound, scoring, and
 ordinary persistence remain required. See the
 [surface specification](../specs/V3_ROOM_SURFACES.md).
 

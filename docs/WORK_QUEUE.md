@@ -12,12 +12,16 @@ After the primary importing work, finish gold-tree leaf/cut effects and the full
 golden-shovel acquisition route. This is deferred required V3 work, not a dropped
 feature or a separate release goal.
 
-The current explicit proposal is ABI 185 at
-`build/v3-surface-save-runtime-01/build-lock.json`. Format 4 adds independent
-surface selection/ownership, migration, native collection, and player clearing.
-Five focused checks and 28 native assertions pass; one native fixture import-path
-correction is required. Original save entry points and native payload/record
-offsets remain intact. Ordinary inventory/save-restart are not established.
+The current explicit proposal is ABI 186 at
+`build/v3-surface-menu-runtime-03/build-lock.json`. Surface catalogue lists and
+ownership dispatch connect to the independent format-4 category. Three focused
+checks pass; a native first attempt passes 42 assertions for real catalogue
+loading/initialization, names, completion, and full-ID inventory exchange bodies.
+The inventory fixture substitutes only UI index/close calls. Ordinary UI
+playthrough and save/restart are not established. No packet, menu, or saved-state
+allocation grows. Both category lists retain 64 counted original rows while
+surface selections remain disabled; private composition must compact selected
+imports into the reserved five-row tails and update the corresponding counts.
 The complete surface packet is 16 KiB; runtime save state is 1,232 bytes with
 guards at `8046C4C0`, within existing reserved memory. Startup remains 960/992.
 Retain passing unchanged room/item/texture evidence instead of replaying it.
@@ -45,8 +49,10 @@ item, catalogue, and acquisition path is complete.
 Use `specs/V3_ROOM_SURFACES.md` for the shared reader/action/save integration order.
 Catalogue preview (`03970000`, linked `808A6100`) and arranged NPC rooms
 (`00845C40`, linked `80950E50`) use the separate added resource banks, preserving
-original resources and native preview geometry. Next connect inventory dispatch,
-catalogue lists and ownership-bit dispatch to the installed surface category. Preserve the
+original resources and native preview geometry. Inventory full-ID exchange and
+catalogue lists/ownership dispatch are connected. Next implement genuine donor
+acquisition categories, floor sound mapping, matching-pair scoring, and private
+surface selection. Do not replay unchanged catalogue/application/save checks. Preserve the
 full native home bytes and every unrelated field. Do not repurpose furniture
 selection/ownership bits to represent floors or wallpapers.
 The installed name/type/price hooks wrap the existing native public entries and

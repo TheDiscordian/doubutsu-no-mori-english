@@ -1614,6 +1614,7 @@ def exercise(debug, rom_path, record, *, section='automatic_furniture'):
     if section=='surface_items':return surface_items(debug,rom_path,record)
     if section=='surface_application':return surface_application(debug,rom_path,record)
     if section=='surface_save':return surface_save(debug,rom_path,record)
+    if section=='surface_menu':return surface_menu(debug,rom_path,record)
     if section=='furniture_audio':return furniture_audio(debug,rom_path,record)
     if section in ('scenery_planting_sparkle','scenery_planting_sparkle_remaining'):
         from v3_scenery_smoke import planting_sparkle
@@ -2647,6 +2648,143 @@ def held_level_sound(debug,rom_path,record):
         native_volume_pause_fade_pan_reverb=True,native_actor_registration_and_expiry=True,
         physical_audio_played=False,pcm_or_listening_verified=False,ordinary_gameplay_tested=False,
         flash_written=False,requires_checkpoint_restore=True)
+
+
+def surface_menu(debug,rom_path,record):
+    """Actual surface catalogue initialization and native pocket exchange bodies."""
+    from v3_catalogue import VROM,RELOC,RAM as CAT_RAM
+    from catalogue_names import APPROVED,Image
+    from v3_surface_items import RAM
+    path=Path(rom_path);image=path.read_bytes();report=json.loads((path.parent/'build.json').read_bytes())
+    if sha256(image)!=report['output_sha256']:raise ValueError('Changed surface-menu cartridge')
+    files=by_vrom(image);surface=report['room_surfaces'];items=surface['items'];cat=report['catalogue']
+    blob=files[runtime.BLOB].extract(image);packet=blob[items['blob_offset']:items['blob_offset']+items['bytes']]
+    boot=boot_proofs(image);assertions=0;bridge=None
+    def check(label,at,want):
+        nonlocal assertions
+        got=debug.read_memory(at,len(want));passed=got==want
+        record(dict(surface_menu_check=label,address=f'{at:08X}',bytes=len(want),
+            assertion='passed' if passed else 'failed',observed_sha256=sha256(got),expected_sha256=sha256(want)))
+        if not passed:raise ValueError('Surface-menu mismatch: '+label)
+        assertions+=1
+    def call(at,args=(),want=None,proof=None):
+        nonlocal assertions
+        if at>=0x80400000:
+            if bridge is None:raise ValueError('Missing upper-memory bridge')
+            stub=struct.pack('>2I',0x08000000|(at>>2&0x3FFFFFF),0)
+            debug.write_memory(bridge,stub);call(0x8002FE00,[bridge,8]);call(0x80034CE0,[bridge,8])
+            at,proof=bridge,(bridge,stub)
+        result=debug.call(f'{at:08X}',list(args),return_address=MODULE_RAM+0x6480,
+            verified_code=proof or boot.get(at))
+        if want is not None:result['assertion']='passed' if result['return_value']==want&0xFFFFFFFF else 'failed'
+        record(result)
+        if want is not None:
+            if result['return_value']!=want&0xFFFFFFFF:raise ValueError('Surface-menu return mismatch')
+            assertions+=1
+        return result['return_value']
+    def put(at,*values):debug.write_memory(at,struct.pack('>'+str(len(values))+'I',*values))
+    check('complete current packet loaded by ordinary startup',RAM,packet)
+    size=0x11000;allocation=call(0x8009BFC0,[size])
+    if allocation&15 or not MODULE_RAM+0x8000<=allocation<=0x80400000-size:
+        raise ValueError('Surface-menu fixture allocation failed')
+    root,submenu,stub,bridge,tag_copy,actor=(allocation+n for n in (16,0x10A00,0x10B00,0x10B20,0x10C00,0x10E00))
+    data,reloc=(files[v].extract(image) for v in (VROM,RELOC))
+    if (sha256(data),sha256(reloc))!=(cat['output_sha256'],cat['relocation_sha256']):
+        raise ValueError('Changed complete current catalogue')
+    if root+len(data)+len(reloc)>=allocation+0x10628:raise ValueError('Catalogue overlaps private callbacks')
+    loaded=relocate_verified_data(Image(CAT_RAM,len(data),struct.unpack_from('>5I',reloc)),data,reloc,root)
+    debug.write_memory(allocation,bytes(size))
+    call(0x800262D0,[VROM,VROM+len(data),CAT_RAM,CAT_RAM+len(data),root,root+len(data),len(reloc)])
+    check('complete real loader relocation including resident table pointers',root,loaded)
+    proof=(root,loaded[:14048]);cap=cat['capacity_expansion'];state=root+cap['state_offset']
+    player=0x80126EC0
+    saved={a:debug.read_memory(a,n) for a,n in ((player,0xBD0),(0x80136FD8,4),(0x8046C000,1232),
+        (0x80136F48,4),(0x801458B8,4),(0x8010FD60,4))}
+    edge=b'V3SM'*4;guards=(allocation,allocation+0x109F0,allocation+size-16)
+    for at in guards:debug.write_memory(at,edge)
+    debug.write_memory(stub,bytes.fromhex('03E0000800001025'))
+    call(0x8002FE00,[stub,8]);call(0x80034CE0,[stub,8])
+    put(submenu+0x2C,allocation);put(allocation+0x106B0,stub);put(allocation+0x10720,state)
+    put(allocation+0x106D0,allocation+0x10400)
+    init,name_at=(APPROVED['symbols'][k]+cap['insert_bytes'] for k in ('af_catalog_init','af_catalog_name'))
+    def initialize():
+        debug.write_memory(state,bytes(cap['state_bytes']))
+        call(root+init,[submenu],proof=(root+init,loaded[init:init+40]))
+    def page(kind):return state+0xEC8+(1 if kind=='wall' else 2)*cap['page_bytes']
+    try:
+        put(0x80136FD8,player);put(0x8010FD60,0);debug.write_memory(player,bytes(0xBD0))
+        initialize()
+        for row in surface['menu']['tables']:
+            check('disabled surface imports do not change category count',root+row['descriptor']-CAT_RAM+4,struct.pack('>I',64))
+            check('empty original category stays empty',page(row['kind']),bytes(2))
+            put(root+row['descriptor']-CAT_RAM+4,69)
+        for row in items['rows']:put(RAM+row['offset']+4,1)
+        call(0x80469200,want=1)
+        initialize()
+        for row in surface['menu']['tables']:check('uncollected enabled surfaces remain absent',page(row['kind']),bytes(2))
+        for row in items['rows']:call(0x800B88EC,[int(row['item_id'],16)])
+        initialize()
+        for row in surface['menu']['tables']:
+            p=page(row['kind']);expected=b''.join(bytes.fromhex(r['item_id']) for r in row['imports'])
+            check('all five collected category identities',p,struct.pack('>H',5))
+            check('stable additive IDs in source order',p+8,expected)
+            check('partial category completion flag',p+6,bytes(1))
+            address=call(root+name_at,[p+cap['name_offset']],proof=(root+name_at,loaded[name_at:name_at+92]))
+            item=next(i for i in items['rows'] if i['item_id']==row['imports'][0]['item_id'])
+            check('full official name through actual catalogue cache',address,item['name'].encode().ljust(16,b' '))
+        debug.write_memory(player+0xB68,b'\xFF'*16);initialize()
+        for row in surface['menu']['tables']:
+            p=page(row['kind']);base=0x2700 if row['kind']=='wall' else 0x2600
+            check('original and imported complete category count',p,struct.pack('>H',69))
+            check('complete category flag',p+6,b'\x01')
+            check('all original identities retained before additions',p+8,struct.pack('>64H',*(base+i for i in range(64))))
+        # Clear one selected tail row and its required-profile bit together.
+        # Catalogue count must describe the selected list, not all reservations.
+        row=surface['menu']['tables'][0];item=next(i for i in items['rows'] if i['item_id']==row['imports'][-1]['item_id'])
+        put(RAM+item['offset']+4,0);selected=bytearray(debug.read_memory(0x8046C010+880,64));selected[41]&=~32
+        debug.write_memory(0x8046C010+880,selected);put(root+row['descriptor']-CAT_RAM+4,68)
+        initialize();check('removed surface excluded without breaking completion',page('wall'),struct.pack('>H',68))
+        check('selected catalogue completion remains correct',page('wall')+6,b'\x01')
+        put(RAM+item['offset']+4,1);selected[41]|=32;debug.write_memory(0x8046C010+880,selected)
+        bit=root+cat['code']['symbols']['af_v3_catalogue_bit']-CAT_RAM
+        call(bit,[player+0xB68,255],want=0,proof=(bit,loaded[bit-root:bit-root+84]))
+        # Copy each complete installed native action. Only UI index/close calls
+        # use inert fixture callbacks; the full-ID pocket/clip exchange is native.
+        tag=files[0x3950000].extract(image)
+        actions=((0x808726B0,'9cee59526cfdbc061ec72c5aa5595588574a8dad1be0a5530f4a3d12de7fe707','wall',0x274D,76,0x1A8,4),
+                 (0x80872748,'547dc344834b78be59ce6ec9621d22843e01129c8c22b2a6658785a62fca36bf','floor',0x264A,73,0x1B0,8))
+        put(0x80136F48,actor+0x190);put(actor+0x190,actor)
+        for number,(entry,digest,kind,new,old,pending,clip) in enumerate(actions):
+            code=bytearray(tag[entry-0x8086F310:entry-0x8086F310+152])
+            if sha256(code)!=digest:raise ValueError('Changed complete native surface inventory action')
+            seen=[]
+            for at in range(0,len(code),4):
+                word=struct.unpack_from('>I',code,at)[0]
+                if word>>26==3:
+                    target=(word&0x3FFFFFF)<<2|0x80000000;seen.append(target)
+                    struct.pack_into('>I',code,at,0x0C000000|(stub>>2&0x3FFFFFF))
+            if seen!=[0x8086F910,0x8086F4AC,0x80871760]:raise ValueError('Changed inventory UI-only calls')
+            dest=tag_copy+number*152;debug.write_memory(dest,code)
+            call(0x8002FE00,[dest,len(code)]);call(0x80034CE0,[dest,len(code)])
+            put(actor+0x190+clip,items['code']['symbols']['af_v3_surface_reserve_'+kind])
+            debug.write_memory(actor+(0x176 if kind=='wall' else 0x174),struct.pack('>H',old))
+            debug.write_memory(player+0x14,struct.pack('>H',new))
+            call(dest,[submenu,allocation+0x10628],proof=(dest,bytes(code)))
+            check('native inventory returns complete previous surface item',player+0x14,struct.pack('>H',(new&0xFF00)+old))
+            check('native action queues complete selected item',actor+pending,struct.pack('>IH',1,new))
+        for at in guards:check('private arena guard',at,edge)
+        check('complete live catalogue executable retained',root,loaded[:14048])
+        check('no CPU fault',0x8003CE34,bytes(4))
+    finally:
+        for at,value in saved.items():debug.write_memory(at,value)
+        debug.write_memory(RAM,packet)
+        call(0x8009C040,[allocation])
+    check('complete resident packet restored',RAM,packet)
+    for at,value in saved.items():check('fixture state restored',at,value)
+    return dict(native_surface_menu=True,assertions=assertions,native_catalogue_initializer=True,
+        native_inventory_exchange_bodies=True,inventory_ui_callbacks_stubbed=True,
+        imports_enabled_only_in_fixture=True,ordinary_inventory_gameplay_tested=False,
+        gpu_rendered=False,saved_data_written=False,requires_checkpoint_restore=True)
 
 
 def surface_save(debug,rom_path,record):

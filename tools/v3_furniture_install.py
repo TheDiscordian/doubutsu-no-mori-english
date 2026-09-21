@@ -941,9 +941,12 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
                 report['native_test']='pending shared surface reservation/application and full floor identity; profile, catalogue, acquisition, and ordinary persistence remain incomplete'
             if report['room_surfaces'].get('save'):
                 report['shared_runtime_refresh']['adapters'].append('surface_save')
-                report['shared_runtime_refresh'].update(saved_format_changed=True,
+                report['shared_runtime_refresh'].update(saved_format_changed=not bool(prior.get('room_surfaces',{}).get('save')),
                     additional_save_state_bytes=report['save_runtime']['state_bytes']-prior['save_runtime']['state_bytes'])
                 report['native_test']='pending format-4 surface codec/runtime and collection; inventory/catalogue pages, acquisition, and ordinary persistence remain incomplete'
+            if report['room_surfaces'].get('menu'):
+                report['shared_runtime_refresh']['adapters'].append('surface_menu')
+                report['native_test']='pending shared surface catalogue execution; inventory verification, acquisition, sound/scoring, and private selection remain incomplete'
     write_new(output/'animal-forest-v3-asset-loader.z64',result)
     write_new(output/'asset-loader.ups',patch)
     write_new(output/'build.json',(json.dumps(report,indent=2,sort_keys=True)+'\n').encode())

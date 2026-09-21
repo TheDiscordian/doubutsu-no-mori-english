@@ -10,8 +10,9 @@ artwork to player-room/shop double-buffer readers, single-buffer arranged rooms,
 and catalogue previews. Shared full-name, price, and item-category readers use
 the same ten identities. Shared room reservation/application and full saved-byte
 reading are installed. The format-4 save category supplies optional-profile
-validation and independent ownership. Inventory dispatch, catalogue page lists
-and bit dispatch, acquisition, and browser composition remain required. All new item records remain disabled; installed
+validation and independent ownership. Native inventory actions preserve full
+surface IDs; catalogue page lists and bit dispatch use the new ownership category.
+Acquisition, sound/scoring, and browser composition remain required. All new item records remain disabled; installed
 artwork and metadata do not make a surface selectable.
 
 Use the current explicit experimental lock; keep the main lock and both stable
@@ -179,20 +180,19 @@ constructor, ordinary room entry, GPU draw, item use, or save/restart.
 
 ## Runtime integration queue
 
-1. Connect full item IDs to inventory actions, catalogue lists, and catalogue
-   bit dispatch, using the installed separate surface ownership/profile category.
-2. Retain the installed floor/wall reservation/application and full saved-byte
-   readers and format-4 profile validation. Complete inventory exchange and
-   ordinary save/reload; keep imports optional.
-3. Apply genuine acquisition categories, floor sound mapping, and matching-pair
+1. Apply genuine acquisition categories, floor sound mapping, and matching-pair
    HRA scoring. Existing Western, Backyard, and Boxing adapters explicitly lack
    their matching surfaces and must be updated from the same registry.
-4. Bind the prepared contact/floor lifecycle to installed surfaces. The mower
+2. Connect private individual/all composition to enabled metadata, independent
+   required-profile bits, and counted catalogue lists. Preserve the original 64
+   rows; compact selected imports in source order without changing their IDs.
+3. Bind the prepared contact/floor lifecycle to installed surfaces. The mower
    also requires the donor room owner's movement sound dispatch in
    `aMR_SetMoveSE`; that owner handles both lawn mower and stone coin sounds.
    Colour callbacks alone do not complete the parent behaviour.
-5. Add individual/all surface browser composition privately, and run focused
-   native reader/application/save checks before a playtest handoff.
+4. Verify changed acquisition/selection paths and an ordinary menu/save cycle
+   before a private playtest handoff. Retain passing unchanged reader,
+   catalogue, inventory-body, application, and save-component evidence.
 
 Do not replay unchanged rendering or earlier cartridge tests for preparation.
 Native execution, in-game appearance, ordinary transactions, save/restart, and
@@ -239,8 +239,8 @@ disabled and invalid IDs, original-floor name/category, complete restored packet
 guards, and unchanged saved extension. It restores an emulator checkpoint; it
 does not establish room application, acquisition, ordinary save/restart, or
 hardware operation. Optional profile/save validation uses the same enabled
-metadata in the format-4 category; inventory/catalogue/acquisition integration
-must finish before any surface is offered for selection.
+metadata in the format-4 category; acquisition, sound/scoring, and private
+selection must finish before any surface is offered for selection.
 
 ## Room reservation, application, and complete home identities
 
@@ -285,3 +285,49 @@ home-byte writes, and the untouched native initializer reload pass. It restores
 all saved/transient fixture data and the emulator checkpoint. Live-player
 notification, ordinary inventory exchange, real FlashRAM restart, GPU appearance,
 and hardware operation are not established by this fixture.
+
+## Catalogue category lists and inventory exchange
+
+`tools/v3_surface_menu.py` installs one 144-byte, leaf catalogue helper at
+`804BF000` within the existing 16-KiB surface packet. It extends the actual
+ownership-bit query for the active player's wall/floor pointers (`B68`/`B70`).
+Original indices 0–63 delegate to the actual native function, including debug
+behaviour. Added indices query the stable full-item ownership entry at
+`80469AD4`; invalid surface indices cannot enter the native eight-byte arrays.
+Other catalogue categories retain the existing native/furniture dispatch.
+
+The catalogue's checked 84-byte ownership wrapper receives a sixteen-byte entry
+bridge. The bridge passes the real relocated native function to the resident
+helper. Two new HI16/LO16 relocations replace the two old surface-table pointer
+relocations; image and relocation lengths are unchanged. Both existing caller
+sites retain their targets. Original native executable code and all other menu
+resources remain intact. The installer checks the complete predecessor wrapper,
+both original lists/descriptors, occupied memory, and all changed relocations.
+
+Floor and wallpaper list reservations at `804BF400`/`804BF490` each hold 69
+halfwords: original 0–63 followed by the five stable imports in source order.
+Descriptors at catalogue addresses `808AF7B4`/`808AF7AC` point to these resident
+lists and count only available rows. With imports disabled, both counts remain
+64, preserving category completion. Private composition must compact only
+selected imports into each tail and set count `64 + selected`; reserved entries
+alone are not available imports. Native category construction retains full IDs,
+page capacities, source names, navigation, and completion logic.
+
+The shared catalogue builder reapplies these descriptors and the checked entry
+bridge after a fresh build, alongside the retained preview readers. No new
+submenu pool, actor, texture, saved-state, or artwork allocation is needed.
+The complete packet and existing equipment bootstrap retain DMA/CRC checks.
+
+The native wallpaper and floor inventory actions at `808726B0`/`80872748` each
+contain 152 bytes. They read a complete pocket halfword, invoke room clip offset
+4/8, and store the complete returned item halfword. They do not mask indices to
+six bits. The installed surface reservations therefore receive full IDs without
+another inventory patch. Focused native execution copies each complete action
+and substitutes only its UI index/close calls. The actual pocket exchange and
+installed room reservation run, but ordinary UI navigation is not established.
+
+The native catalogue fixture uses the complete real overlay loader and
+initializer. It verifies disabled/uncollected states, all ten collected
+identities, full names, original rows, complete/partial indicators, selected
+list counts, and guards. It restores private state and the emulator checkpoint;
+it performs no explicit FlashRAM write, GPU comparison, or hardware test.
