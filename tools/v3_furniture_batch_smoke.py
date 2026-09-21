@@ -1617,6 +1617,7 @@ def exercise(debug, rom_path, record, *, section='automatic_furniture'):
     if section=='surface_menu':return surface_menu(debug,rom_path,record)
     if section=='surface_scoring':return surface_scoring(debug,rom_path,record)
     if section=='surface_audio':return surface_audio(debug,rom_path,record)
+    if section=='surface_stock':return surface_stock(debug,rom_path,record)
     if section=='furniture_audio':return furniture_audio(debug,rom_path,record)
     if section in ('scenery_planting_sparkle','scenery_planting_sparkle_remaining'):
         from v3_scenery_smoke import planting_sparkle
@@ -2650,6 +2651,107 @@ def held_level_sound(debug,rom_path,record):
         native_volume_pause_fade_pan_reverb=True,native_actor_registration_and_expiry=True,
         physical_audio_played=False,pcm_or_listening_verified=False,ordinary_gameplay_tested=False,
         flash_written=False,requires_checkpoint_restore=True)
+
+
+def surface_stock(debug,rom_path,record):
+    """Real size-derived goods DMA, selected-only membership, and native RNG."""
+    from aflib import CODE_RAM,CODE_VROM
+    from flash_mail import SAVE_RAM,SAVE_BYTES
+    from runtime_layout import TEST_STACK
+    from v3_surface_items import RAM
+    path=Path(rom_path);image=path.read_bytes();report=json.loads((path.parent/'build.json').read_bytes())
+    if sha256(image)!=report['output_sha256']:raise ValueError('Changed surface-stock cartridge')
+    files=by_vrom(image);core=files[CODE_VROM].extract(image);boot=boot_proofs(image)
+    surface=report['room_surfaces'];stock=surface['stock'];items=surface['items']
+    blob=files[runtime.BLOB].extract(image)
+    packet=blob[items['blob_offset']:items['blob_offset']+items['bytes']];assertions=0
+    proofs={at:(at,core[at-CODE_RAM:at-CODE_RAM+n]) for at,n in
+        ((0x800C0490,336),(0x800C05E0,164),(0x800BFCF0,668),(0x800C1BF0,72))}
+    def check(label,at,want):
+        nonlocal assertions
+        got=debug.read_memory(at,len(want));passed=got==want
+        record(dict(surface_stock_check=label,address=f'{at:08X}',bytes=len(want),
+            expected=want.hex() if len(want)<32 else sha256(want),
+            actual=got.hex() if len(got)<32 else sha256(got),assertion='passed' if passed else 'failed'))
+        if not passed:raise ValueError('Surface-stock mismatch: '+label)
+        assertions+=1
+    def call(at,args=(),expected=None):
+        nonlocal assertions
+        result=debug.call(f'{at:08X}',list(args),return_address=MODULE_RAM+0x6480,
+            verified_code=proofs.get(at) or boot.get(at))
+        record(result);value=result['return_value']
+        if expected is not None:
+            if value!=expected&0xFFFFFFFF:raise ValueError(f'Surface-stock call {at:08X}: {value}, expected {expected}')
+            assertions+=1
+        return value
+    def put(at,value):debug.write_memory(at,struct.pack('>I',value))
+    check('complete current surface packet',RAM,packet)
+    for row in stock['resources']:
+        check('actual complete native goods descriptor',row['descriptor'],bytes.fromhex(row['descriptor_after']))
+    for at,data in proofs.values():check('complete current native stock consumer',at,data)
+    allocation=call(0x8009BFC0,[0x1000])
+    if allocation&15 or not MODULE_RAM+0x8000<=allocation<=0x803FF000:
+        raise ValueError('Surface-stock fixture allocation escapes native heap')
+    result_at,priority_at=allocation+32,allocation+64
+    edge=b'V3SS'*4;guards=(allocation,result_at+16,priority_at+16,allocation+0xFF0,
+        TEST_STACK-0x800,TEST_STACK+0x40)
+    for at in guards:debug.write_memory(at,edge)
+    saved={at:debug.read_memory(at,n) for at,n in
+        ((SAVE_RAM,SAVE_BYTES),(0x8046C000,1232),(0x8003C590,4),(0x800419F0,4),(0x801458B8,4))}
+    enabled={r['item_id']:RAM+r['offset']+4 for r in items['rows']}
+    def select(values):
+        for item,at in enabled.items():put(at,int(item in values))
+    next_random=0xFF800000
+    seed=((next_random-0x3C6EF35F)*pow(0x19660D,-1,1<<32))&0xFFFFFFFF
+    try:
+        # The title-screen fixture has no initialized town. Supply two valid
+        # native rarity permutations in its disposable RAM payload only.
+        for resource in stock['resources']:
+            category=resource['category']
+            wanted=(0,1,2) if category==3 else (2,1,0)
+            debug.write_memory(0x80135B1C+category,bytes((wanted[0]<<6|wanted[1]<<4|wanted[2]<<2,)))
+            call(0x800C1BF0,[priority_at,category])
+            priorities=tuple(debug.read_memory(priority_at,3))
+            if priorities!=wanted:raise ValueError('Invalid native surface stock priorities')
+            record(dict(surface_stock_category=category,town_priorities=priorities))
+            for group in resource['lists']:
+                list_type=priorities[group['group']] if group['group']<3 else group['group']
+                original=group['original_items'][-1];additions=group['added_items']
+                # Each category is checked all-off/all-on. The event category
+                # also tests a partial set, proving compaction before the RNG.
+                selections=[[],additions]+([additions[:1]] if len(additions)>1 else [])
+                for selected in selections:
+                    select(selected)
+                    for item in additions:
+                        call(0x800C0490,[int(item,16),category,list_type,0],int(item in selected))
+                        call(0x800C05E0,[int(item,16)],category if item in selected else -1)
+                    call(0x800C0490,[original,category,list_type,0],1)
+                    call(0x800C05E0,[original],category)
+                    put(0x8003C590,seed);debug.write_memory(result_at,bytes(2))
+                    call(0x800BFCF0,[0,result_at,1,0,0,category,list_type])
+                    expected=int(selected[-1],16) if selected else original
+                    check('complete native selector chooses the last eligible row',result_at,struct.pack('>H',expected))
+                    check('native RNG advances once',0x8003C590,struct.pack('>I',next_random))
+        select([])
+        for item in (0x2640,0x2740,0x264B,0x274D):call(0x800C05E0,[item],-1)
+        for category in (3,4):
+            at=0x80135B1C+category;off=at-SAVE_RAM
+            debug.write_memory(at,saved[SAVE_RAM][off:off+1])
+        check('game saved payload unchanged',SAVE_RAM,saved[SAVE_RAM])
+        check('import runtime saved state unchanged',0x8046C000,saved[0x8046C000])
+        check('complete restored surface packet',RAM,packet)
+        for at in guards:check('private arena/stack guard',at,edge)
+        check('translation guard',0x8019C8D0,bytes.fromhex('AF32C0DE')*4)
+        check('save guard',0x8046C4C0,bytes.fromhex('AF53C0DE')*4)
+        check('no CPU fault',0x8003CE34,bytes(4))
+    finally:
+        for row in items['rows']:
+            at=row['offset']+4;debug.write_memory(RAM+at,packet[at:at+4])
+        for at,data in saved.items():debug.write_memory(at,data)
+        call(0x8009C040,[allocation])
+    return dict(native_surface_stock=True,assertions=assertions,full_native_selector=True,
+        native_stock_membership=True,native_size_derived_goods_dma=True,
+        ordinary_purchase_or_event_delivery=False,saved_data_written=False,requires_checkpoint_restore=True)
 
 
 def surface_audio(debug,rom_path,record):

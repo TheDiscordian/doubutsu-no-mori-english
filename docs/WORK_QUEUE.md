@@ -12,7 +12,19 @@ After the primary importing work, finish gold-tree leaf/cut effects and the full
 golden-shovel acquisition route. This is deferred required V3 work, not a dropped
 feature or a separate release goal.
 
-The current explicit proposal is ABI 188 at
+The current explicit proposal is ABI 189 at
+`build/v3-surface-stock-runtime-01/build-lock.json`. The shared stock adapter
+connects six floor/wall additions to genuine A/C/event lists, filtering disabled
+imports before the complete native membership and random-selection functions.
+Three focused host checks and the corrected native fixture pass. Its one setup
+retry supplies valid rarity bytes to a disposable blank town; no player save is
+used. Temporary goods lists grow 80 bytes, with no permanent allocation growth.
+Next connect individual/all private surface selection, catalogue counts, and
+format-4 profile receipts. HomePage/Harvest acquisition and full theme categories
+remain required. Keep the stable deployments unchanged and reuse passing stock
+evidence while the code is unchanged.
+
+The retained ABI-188 audio proposal is at
 `build/v3-surface-audio-runtime-01/build-lock.json`. Complete floor audio maps
 all walking/running variants and raw movement sounds independently. Original
 floor mappings stay unchanged; eight unused complete grass programs are reused.

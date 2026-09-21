@@ -164,6 +164,7 @@ def compile_part(part, out, extra_sources=(), defines=(), primary_source=None):
                        'collection': ('af_v3_catalogue_record', BLOB_RAM + 0x99C0),
                        'catalogue': ('af_v3_catalogue_bit', 0x808B32B0),
                        'shops': ('af_v3_shop_category', BLOB_RAM + 0x9C00),
+                       'surface_stock': ('af_v3_surface_shop_category', 0x804BFE00),
                        'shop_actors': ('af_v3_shop_type_809cacbc', BLOB_RAM + 0x7600),
                        'shop_floor': ('af_v3_shop_floor_80953e54', BLOB_RAM + 0x7C00),
                        'hra': ('af_v3_hra_remaining', 0x80929C30),

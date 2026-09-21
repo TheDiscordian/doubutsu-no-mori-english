@@ -1,5 +1,54 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared surface stock
+
+ABI 189 is `build/v3-surface-stock-runtime-01/build-lock.json`, built by the
+shared refresh command from ABI 188 with `--room-surfaces-art
+build/v3-room-surfaces-prepared-02`.
+
+The complete source acquisition lists connect western desert/vista and boxing
+ring mat/ringside seating to event stock, backyard lawn to C stock, and backyard
+fence to A stock. The four Mario/Harvest surfaces retain explicit pending routes.
+Original complete 192-byte resources remain unchanged. Copied lists and updated
+segment pointers occupy 272 bytes per category, increasing each native temporary
+allocation by 80 bytes. The 480-byte helper fits at `804BFE00`, with its complete
+native-getter bridge at `804BFFD0`; the final packet guard remains intact.
+
+The selected-only filter wraps the real getter before membership/RNG processing.
+The global category wrapper preserves the complete prior furniture/clothing
+chain. Disabled/unregistered additions reject; original items remain eligible.
+No permanent allocation, saved format, enabled surface, or choice count changes.
+
+All three host tests pass in 5.655 seconds: actual C with address/undefined
+sanitizers, complete source/ROM bindings and preserved owners, packet checksums,
+unchanged profiles/save/scoring/audio, 141 choices, exact all/empty composition,
+and UPS reconstruction. No old native builds are replayed.
+
+The first native attempt stops before stock selection because the title-screen
+fixture's blank town has zero/uninitialized rarity bytes. Disassembly identifies
+the exact native saved-byte reader. The one corrected retry initializes two
+valid rarity permutations only in disposable RAM and restores those bytes.
+`build/v3-surface-stock-native-02/` passes 124 result records and 95 internal
+assertions, exercising complete
+membership, full category chains, actual size-derived goods DMA, native RNG and
+selection with all-off/all-on/partial lists, unchanged saved payload/runtime,
+guards, checkpoint restoration, and graceful shutdown. No ordinary purchase,
+event conversation/delivery, explicit FlashRAM write, or hardware claim is made.
+
+- ROM SHA-256: `111bba4237e0b11f7a6f4e78ff092da5a28d1da207ffe7ee59454b83974c69ac`.
+- UPS SHA-256: `f65993bb629365e8831ba201fe2755973b1497700448f5cb2d1e225e6eb16221`.
+- Build receipt SHA-256: `c2c0cd75a83cd245f9984870e3bd0abdc32073c7240c99a26ce27f971c4092ed`.
+- Initial native results SHA-256: `6ea1194162e29ba322a90f020eade433436949a45ea3c3d269ed01e0f086d0c2`.
+- Passing native results SHA-256: `81f182fadb3e63b748baf8556f36b8c5d218082f6d9fc8a6657e843d0f470b7f`.
+
+The next category step is private optional composition for the six supported
+routes, with independent surface saved profiles, real catalogue counts, and
+checked startup CRC propagation. HomePage/Harvest delivery, remaining complete
+themes, ordinary gameplay/persistence, contact lifecycles, other material/rigged
+categories, and deferred gold-tree/golden-shovel work remain required. Format-4
+saves cannot load in V2 or older format-1/2/3 V3; preserve backups. The main
+ABI-109 lock and both deployments of the one stable patcher remain unchanged.
+
 ## Shared surface audio
 
 The explicit ABI-188 proposal is

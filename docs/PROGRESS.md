@@ -18,7 +18,20 @@ deployments retain their existing builds.
 
 ## Active development
 
-The current explicit V3 proposal is ABI 188 at
+The current explicit V3 proposal is ABI 189 at
+`build/v3-surface-stock-runtime-01/build-lock.json`. Shared native stock lists
+include six additive floors/walls through their actual A/C and event categories.
+The complete native picker and membership query filter disabled imports before
+selection, retaining original goods, RNG, and rarity. HomePage/Mario and Harvest
+surfaces remain outside these lists, awaiting their real delivery categories.
+The helper occupies existing reserved memory; temporary goods allocations grow
+80 bytes each. Three focused host checks pass. A native run passes after one
+fixture correction to initialize rarity settings in its disposable blank town.
+Ordinary purchases/event delivery and hardware are not established. Private
+surface selection is next; all ten surface records remain disabled in this build.
+See the [stock checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-surface-stock).
+
+The retained audio proposal is ABI 188 at
 `build/v3-surface-audio-runtime-01/build-lock.json`. Player/NPC floor footsteps
 and furniture dragging use independent full-index tables. Complete donor
 programs, instruments, samples, and all eight walking/running variants are

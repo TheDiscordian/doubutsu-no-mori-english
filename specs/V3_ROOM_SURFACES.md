@@ -13,7 +13,8 @@ reading are installed. The format-4 save category supplies optional-profile
 validation and independent ownership. Native inventory actions preserve full
 surface IDs; catalogue page lists and bit dispatch use the new ownership category.
 Base scoring, three existing matching themes, and full-index footstep/drag audio
-are installed. Acquisition, complete Harvest/Mario furniture themes, and browser
+are installed. Shared A/C/event stock supports six additions with selected-only
+membership and selection. HomePage/Harvest acquisition, complete Harvest/Mario furniture themes, and browser
 composition remain required. All new item records remain disabled; installed
 artwork and metadata do not make a surface selectable.
 
@@ -34,6 +35,24 @@ and copies complete prepared objects. These are developer preparation options;
 no experimental choices are added to the served browser patcher.
 
 ## Source banks and identities
+
+### Selected-only stock
+
+The shared stock installer copies each complete original 192-byte floor/wall
+goods resource, appends expanded A/C/event lists, and updates only the affected
+segment-six pointers. Each complete replacement occupies 272 bytes. Native
+descriptors retain the table offset and use size-derived temporary allocations;
+the original DMA resources stay intact. The complete donor acquisition lists
+bind each added identity to its real category. HomePage and Harvest additions
+are not substituted into ordinary/event stock.
+
+The helper at `804BFE00` wraps the complete native list getter and existing shop
+category chain. Only short, terminated floor/wall lists are compacted, before
+native membership or random selection reads them. Original items stay; additive
+items require enabled metadata. No RNG, rarity, season, or other item-category
+behaviour is replaced. The code and bridge occupy 480 bytes of reserved packet
+memory. There is no new permanent allocation; each temporary list grows 80 bytes.
+Private selection still controls whether any imported metadata is enabled.
 
 Both donor banks contain 67 player surfaces followed by four shop surfaces.
 The original N64 banks contain 64 player surfaces and four shop surfaces. Floors
