@@ -767,6 +767,96 @@ def material_colours(debug,rom_path,record):
                 audio_calls_captured=True,skeleton_calls_captured=True,flash_written=False,requires_checkpoint_restore=True)
 
 
+def static_interactions(debug,rom_path,record):
+    """Current static callbacks, native town-melody dispatch, and complete DMA."""
+    from aflib import CODE_RAM,CODE_VROM
+    from runtime_layout import TEST_STACK
+    path=Path(rom_path);image=path.read_bytes();report=json.loads((path.parent/'build.json').read_bytes())
+    if sha256(image)!=report['output_sha256']:raise ValueError('Changed static-interaction cartridge')
+    room=report['equipment_resources']['room_rigs'];packet=room['packet'];rows=room['static_rows']
+    files=by_vrom(image);blob=files[runtime.BLOB].extract(image);boot=boot_proofs(image);assertions=0
+    def check(label,at,want):
+        nonlocal assertions
+        actual=debug.read_memory(at,len(want));passed=actual==want
+        record(dict(static_interaction_check=label,address=f'{at:08X}',bytes=len(want),assertion='passed' if passed else 'failed'))
+        if not passed:raise ValueError('Static-interaction mismatch: '+label)
+        assertions+=1
+    def call(at,args=(),proof=None):
+        result=debug.call(f'{at:08X}',list(args),return_address=MODULE_RAM+0x6480,
+            verified_code=proof or boot.get(at));record(result);return result['return_value']
+    def put(at,*values):debug.write_memory(at,struct.pack('>'+str(len(values))+'I',*values))
+    def flush(at,n):call(0x8002FE00,[at,n]);call(0x80034CE0,[at,n])
+    size=0x3800;allocation=call(0x8009BFC0,[size])
+    if allocation&15 or not MODULE_RAM+0x8000<=allocation<=0x80400000-size:
+        raise ValueError('Static-interaction fixture outside native heap')
+    actor,player,clip,bank,spies,output,owner,bridge=(allocation+n for n in
+        (0x10,0x800,0x900,0xA00,0x2F00,0x3100,0x3200,0x3300))
+    debug.write_memory(allocation,bytes(size));edge=b'V3SI'*4
+    guards=(allocation,actor+0x740,player-16,clip-16,bank-16,bank+9216,
+        spies-16,output-16,owner-16,bridge-16,allocation+size-16,TEST_STACK-0x800,TEST_STACK+0x40)
+    for at in guards:debug.write_memory(at,edge)
+    native=(0x800D1D58,0x800D1E98,0x800D252C);cache=0x804B1E00
+    saved={at:debug.read_memory(at,n) for at,n in
+        ((cache,4),(0x80136FD8,4),(0x80136F2C,4),(0x804CD000,1024),(0x804CD400,256),
+         *((at,8) for at in native))}
+    save=report['save_runtime'];saved_game=debug.read_memory(save['state_ram'],save['state_bytes'])
+    target=room['bootstrap']['symbols']['af_v3_room_boot_sound_mv']
+    jump=struct.pack('>2I',0x08000000|(target>>2&0x3FFFFFF),0);debug.write_memory(bridge,jump)
+    # Copy the two checked native melody functions; only their one local JAL
+    # changes. The native melody-data getter and positional dispatch stay native.
+    sparse=bridge+0x20;source=files[0x82D7F0].extract(image)
+    functions=bytearray(source[0x8093B418-0x80936710:0x8093B498-0x80936710])
+    if struct.unpack_from('>I',functions,0x44)[0]!=0x0C24ED06:
+        raise ValueError('Changed native room-melody local call')
+    struct.pack_into('>I',functions,0x44,0x0C000000|(sparse>>2&0x3FFFFFF))
+    debug.write_memory(sparse,functions);put(clip+0x64,sparse+0x24)
+    for i,at in enumerate(native):
+        destination=output+i*32
+        code=struct.pack('>11I',0x3C080000|(destination>>16),0x35080000|(destination&65535),
+            0x8D090010,0x25290001,0xAD090010,0xAD040000,0xAD050004,0xAD060008,0xAD07000C,
+            0x03E00008,0x00001025)
+        debug.write_memory(spies+i*64,code)
+    flush(spies,192);flush(bridge,0xA0)
+    def run():call(bridge,[actor,owner,0,bank],(bridge,jump))
+    try:
+        for i,at in enumerate(native):put(at,0x08000000|((spies+i*64)>>2&0x3FFFFFF),0);flush(at,8)
+        put(cache,0);put(0x80136FD8,player);put(0x80136F2C,clip)
+        for row in rows:
+            call(0x80026B44,[bank,row['vrom'],row['bytes']])
+            check('complete model '+row['source_item_id'],bank,blob[row['blob_offset']:row['blob_offset']+row['bytes']])
+            for alias in (0,1024):
+                debug.write_memory(actor,struct.pack('>H',row['runtime_index']+alias))
+                debug.write_memory(actor+0x3C,struct.pack('>h',13))
+                if row['mode']==1:
+                    for funds,pulse in ((0,1),(1,0),(1,1),(3,2)):
+                        debug.write_memory(player,b'\xA5'*0x38);put(player+0x38,funds)
+                        debug.write_memory(actor+0x12D,bytes((pulse,)));debug.write_memory(output,bytes(96));run()
+                        used=int(bool(funds and pulse))
+                        check('bounded native wallet subtraction',player+0x38,struct.pack('>I',funds-used))
+                        check('unchanged other private fields',player,b'\xA5'*0x38)
+                        check('one conditional sound',output+16,struct.pack('>I',used))
+                        if used:check('actual positional trigger arguments',output,struct.pack('>2I',row['native_sound_word'],actor+8))
+                elif row['mode']==2:
+                    for pulse in (0,2):
+                        debug.write_memory(actor+0x12D,bytes((pulse,)));debug.write_memory(output,bytes(96));run()
+                        check('native melody press gate',output+48,struct.pack('>I',int(bool(pulse))))
+                        if pulse:check('native town-melody data and instrument',output+32,
+                            struct.pack('>4I',actor,row['parameter'],0x80144660,actor+8))
+                        check('native position refresh without press',output+64,struct.pack('>2I',actor,actor+8))
+                        check('exactly one position refresh',output+80,struct.pack('>I',1))
+        check('CRC-checked complete shared packet',packet['ram'],blob[packet['blob_offset']:packet['blob_offset']+packet['bytes']])
+        check('save and profile state unchanged',save['state_ram'],saved_game)
+        for at in guards:check('static fixture guard',at,edge)
+        check('no CPU fault',0x8003CE34,bytes(4))
+    finally:
+        for at,value in saved.items():debug.write_memory(at,value)
+        for at in native:flush(at,8)
+        call(0x8009C040,[allocation])
+    return dict(native_static_interactions=True,assertions=assertions,records=len(rows),
+        native_room_melody_dispatch=True,audio_calls_captured=True,native_synthesis_tested=False,
+        ordinary_gameplay_tested=False,flash_written=False,requires_checkpoint_restore=True)
+
+
 def room_rigs(debug,rom_path,record,*,mode=2):
     """Manifest-selected complete room lifecycles, without enabling parent choices."""
     from runtime_layout import TEST_STACK
@@ -2000,6 +2090,7 @@ def exercise(debug, rom_path, record, *, section='automatic_furniture'):
     if section=='material_lifecycles':return material_lifecycles(debug,rom_path,record)
     if section=='material_reactions':return material_reactions(debug,rom_path,record)
     if section=='material_colours':return material_colours(debug,rom_path,record)
+    if section=='static_interactions':return static_interactions(debug,rom_path,record)
     if section=='room_effects':
         from v3_room_effects_smoke import exercise as room_effects
         return room_effects(debug,rom_path,record)

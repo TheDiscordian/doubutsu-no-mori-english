@@ -96,13 +96,13 @@ def extended_envelope(bank, address, *, minimum_steps=2):
     raise ValueError('Unterminated extended envelope')
 
 
-def instrument(bank, wave, instrument_id, instrument_count, *, extended=False):
+def instrument(bank, wave, instrument_id, instrument_count, *, extended=False, minimum_envelope_steps=2):
     if not 0 <= instrument_id < instrument_count:
         raise ValueError('Missing voice instrument')
     data = span(bank, u32(bank, 8 + instrument_id * 4), 32)
     if data[0] != 0:
         raise ValueError('Instrument unexpectedly pre-relocated')
-    envelope = extended_envelope(bank, u32(data, 4)) if extended else span(bank, u32(data, 4), 12)
+    envelope = extended_envelope(bank, u32(data, 4), minimum_steps=minimum_envelope_steps) if extended else span(bank, u32(data, 4), 12)
     if not extended and tuple(struct.unpack_from('>h', envelope, i)[0] for i in (0, 4, 8)) != (-4, 1, -1):
         raise ValueError('Pilot instrument uses an unsupported envelope')
     samples = []
@@ -190,13 +190,13 @@ def sequence_programs(data):
     return tracks
 
 
-def extended_program(track):
+def extended_program(track, *, selector=3):
     """Read the islanders' bounded channel/large-note programs, without rewriting.
 
     Only commands verified in the donor interpreter are accepted. Native
     counterpart matching and complete instrument comparison happen separately.
     """
-    if len(track) < 11 or track[:2] != b'\xEB\x03' or track[3] != 0x78:
+    if not 0<=selector<=3 or len(track) < 11 or track[:2] != bytes((0xEB,selector)) or track[3] != 0x78:
         raise ValueError('Unsupported extended melody channel prefix')
     note_at = 6 + struct.unpack_from('>h', track, 4)[0]
     if not 7 <= note_at < len(track):

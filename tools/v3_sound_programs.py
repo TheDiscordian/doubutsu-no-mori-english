@@ -15,7 +15,8 @@ from v3_villager_audio import (GC_SECTIONS, NATIVE_HEADERS, extended_envelope,
     extended_native_interpreter, header_entry, instrument, read_audio_donor, resource, span)
 from v3_room_rig_runtime import SOURCES as ROOM_SOURCES
 
-SOURCES=('tools/v3_sound_programs.py','tools/v3_villager_audio.py','tools/v3_furniture_install.py')+ROOM_SOURCES
+SOURCES=('tools/v3_sound_programs.py','tools/v3_villager_audio.py','tools/v3_furniture_install.py',
+    'tools/v3_furniture_melody.py')+ROOM_SOURCES
 
 
 def trigger_program(sequence, origin, limit):
@@ -84,7 +85,7 @@ def bind_trigger(data,description,offset,selector,instrument_index):
     return bytes(result)
 
 
-def extend_instruments(native_bank,native_wave,native_count,donors):
+def extend_instruments(native_bank,native_wave,native_count,donors,*,minimum_envelope_steps=2):
     """Grow a complete instrument-only font once for a batch of source records.
 
     The pointer table grows independently of existing data placement. Every live
@@ -93,17 +94,21 @@ def extend_instruments(native_bank,native_wave,native_count,donors):
     """
     if not donors or not 0<native_count<=126 or native_bank[:8]!=bytes(8):
         raise ValueError('Expected a nonempty instrument-only font batch')
+    def identity_of(bank,wave,index,count):
+        return instrument(bank,wave,index,count,extended=True,minimum_envelope_steps=minimum_envelope_steps)
+    def envelope_of(bank,address):
+        return extended_envelope(bank,address,minimum_steps=minimum_envelope_steps)
     identities={};before={}
     for index in range(native_count):
         if not u32(native_bank,8+4*index):continue
-        identity=instrument(native_bank,native_wave,index,native_count,extended=True)
+        identity=identity_of(native_bank,native_wave,index,native_count)
         before[index]=identity;identities.setdefault(json.dumps(identity,sort_keys=True),index)
     ordered=sorted(donors,key=lambda d:(d['bank_id'],d['instrument']))
     keys=[(d['bank_id'],d['instrument']) for d in ordered]
     if len(set(keys))!=len(keys):raise ValueError('Duplicate source instrument identity')
     mappings=[];missing=[];count=native_count
     for row in ordered:
-        identity=instrument(row['bank'],row['wave'],row['instrument'],row['instrument_count'],extended=True)
+        identity=identity_of(row['bank'],row['wave'],row['instrument'],row['instrument_count'])
         key=json.dumps(identity,sort_keys=True);target=identities.get(key)
         if target is None:
             if count>=126:raise ValueError('Complete font exceeds native instrument capacity')
@@ -124,7 +129,7 @@ def extend_instruments(native_bank,native_wave,native_count,donors):
         return target
     for index in before:
         at=pointer(8+index*4);envelope=pointer(at+4)
-        cache.setdefault(('envelope',extended_envelope(native_bank,envelope)),envelope+shift)
+        cache.setdefault(('envelope',envelope_of(native_bank,envelope)),envelope+shift)
         for field in (8,16,24):
             sample=pointer(at+field)
             if not sample:continue
@@ -144,7 +149,7 @@ def extend_instruments(native_bank,native_wave,native_count,donors):
     for row,target,identity in missing:
         bank,wave=row['bank'],row['wave'];original=span(bank,u32(bank,8+row['instrument']*4),32)
         inst=bytearray(original)
-        struct.pack_into('>I',inst,4,append(extended_envelope(bank,u32(inst,4)),'envelope'))
+        struct.pack_into('>I',inst,4,append(envelope_of(bank,u32(inst,4)),'envelope'))
         for field in (8,16,24):
             at=u32(original,field)
             if not at:continue
@@ -161,11 +166,11 @@ def extend_instruments(native_bank,native_wave,native_count,donors):
     result.extend(bytes(-len(result)%16));waves.extend(bytes(-len(waves)%16))
     for index in range(native_count):
         if index in before:
-            if instrument(result,waves,index,count,extended=True)!=before[index]:
+            if identity_of(result,waves,index,count)!=before[index]:
                 raise ValueError('Font extension changes an existing complete instrument')
         elif u32(result,8+index*4):raise ValueError('Font extension populates an original empty slot')
     for row in mappings:
-        if instrument(result,waves,row['native_instrument'],count,extended=True)!=row['identity']:
+        if identity_of(result,waves,row['native_instrument'],count)!=row['identity']:
             raise ValueError('Font extension changes a complete donor instrument')
     return bytes(result),bytes(waves),dict(native_instrument_count=native_count,instrument_count=count,
         original_data_start=first,original_data_shift=shift,imports=mappings,
@@ -257,6 +262,8 @@ def furniture_trigger(source,profile):
         # Source.profile already verifies and annotates this direct callback.
         return {k:copy.deepcopy(adapter[k]) for k in ('helpers','sound_word','excluded_states',
             'state_offset','switch_offset','switch_value','position_offset','runtime_installed')}
+    if adapter.get('category')=='static-interaction':
+        return copy.deepcopy(adapter.get('trigger'))
     elif adapter.get('category')=='material-frame-assets':
         if set(functions)!={'move','draw'}:return None
     else:return None
@@ -1128,6 +1135,9 @@ def install_furniture(image,prior,blob,code,original,output,directory):
     from v3_registry import furniture_representation_identity
     import v3_room_rig_runtime as room
     directory=directory.resolve();raw=(directory/'audio.json').read_bytes();prepared=json.loads(raw)
+    if prepared.get('format')=='AFV3-FURNITURE-MELODY-PREPARED-1':
+        from v3_furniture_melody import install
+        return install(image,prior,blob,code,directory,prepared)
     if prepared.get('format')=='AFV3-ROOM-MOVEMENT-PREPARED-1':
         from v3_room_movement import install
         return install(image,prior,blob,code,original,output,directory,prepared)

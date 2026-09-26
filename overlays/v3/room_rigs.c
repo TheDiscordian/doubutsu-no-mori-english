@@ -87,6 +87,10 @@ static void trigger_conditional(RoomRig *actor,RoomRigGame *game) {
 }
 #endif
 void af_v3_room_sound_mv(RoomSoundActor *actor,void *room,RoomRigGame *game,u8 *data) {
+#ifdef AF_V3_ROOM_STATIC
+    extern int af_v3_room_static_mv(RoomSoundActor *,void *);
+    if (af_v3_room_static_mv(actor,room)) return;
+#endif
 #if defined(AF_V3_ROOM_REACTIONS) || defined(AF_V3_ROOM_COLOURS)
     if (af_v3_room_material_mv((RoomRig *)actor,room,game,data)) return;
 #endif

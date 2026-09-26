@@ -22,9 +22,17 @@ Incomplete gameplay stays unavailable in the selector; installing assets does
 not claim that an item is playable. Reuse unchanged passing tests throughout.
 
 Current task: close shared conversion gaps in the ordinary bulk importer.
-The checked proposal is ABI 224 at
-`build/v3-material-colour-lifecycle-imports-05/profile-runtime/build-lock.json`,
+The checked proposal is ABI 227 at
+`build/v3-static-interaction-imports-02/profile-runtime/build-lock.json`,
 with 155 development choices.
+Shared static interactions install complete wallet and town-melody behaviours
+through the ordinary importer. Piggy bank and ukulele reuse all prepared artwork;
+the latter retains its full instrument, sample, and nineteen-note programme.
+Both have complete inactive profiles pending actual post-office/island delivery.
+Seven focused checks pass, including four browser/offline compositions. The
+first-attempt native check passes 60 internal assertions, including the actual
+native town-melody dispatcher with captured audio. Preserve these results.
+
 The automatic importer installs complete material render/audio/profile stages,
 reuses installed dependencies, and enables eligible source acquisition records.
 Mouth of Truth retains its complete timed reaction, shock request, and motor
@@ -59,8 +67,10 @@ player-colour consumers, and same-item switching are installed through the share
 material importer. Its actual Mario acquisition route remains phase-2 work.
 Six focused checks and the 36-assertion native check pass; the latter captures
 skeleton and sound calls, not ordinary GPU appearance or synthesis. Retain those
-results and the unchanged source/parser/audio-resource checks. Stone coin and the other prepared callback
-models retain their actual behaviour requirements. Extend shared dispatch and
+results and the unchanged source/parser/audio-resource checks. Stone coin's
+rolling lifecycle and sound are complete. Continue the remaining static effect
+callbacks, including barbecue steam and cannon projectiles, and other unsupported
+model/animation categories. Extend shared dispatch and
 reuse assets; do not divert into the parked acquisition frontend.
 
 Retain the passing 2,850-frame donor comparison, actual material dispatch under
@@ -69,10 +79,10 @@ the player callback and uses a disconnected accessory: ordinary player animation
 actual motor transfers, and physical rumble remain hardware/playtest checks.
 Do not replay unchanged candle, rig, artwork, or sound batches.
 
-Room code has 4,980 bytes spare; bootstrap has 15 bytes spare. Scroll code has
-4 bytes spare, audio has 64 conservative bytes spare, and import storage has
-1,492,544 bytes spare. Capacity extensions must preserve complete dependencies.
-See the [current checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#installed-exclusive-player-colour-lifecycle)
+Room code has 4,512 bytes spare; bootstrap has 15 bytes spare. Scroll code has
+4 bytes spare, audio has 384 conservative bytes spare, and import storage has
+1,139,376 bytes spare. Capacity extensions must preserve complete dependencies.
+See the [current checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#installed-static-interactions-and-town-tune-instruments)
 for reproduction, native limits, and save warnings. Source publication is
 allowed; the main lock and both stable web-patcher deployments stay unchanged.
 

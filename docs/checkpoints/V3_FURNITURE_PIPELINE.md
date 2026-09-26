@@ -1,8 +1,94 @@
 # Automatic furniture pipeline checkpoint
 
+## Installed static interactions and town-tune instruments
+
+Current proposal: ABI 227 at
+`build/v3-static-interaction-imports-02/profile-runtime/build-lock.json`.
+There remain 155 development choices. The ordinary importer completes the
+wallet and town-melody behaviour categories, using the prepared 3,472-byte
+piggy bank and 3,456-byte ukulele models without another graphics compilation.
+Piggy bank uses additive native identity `3C40`/1808; ukulele retains `31CC`/1139.
+The names already have official donor entries in the sole provenance catalogue.
+Actual post-office and island delivery remain phase-2 acquisition work, so these
+complete profiles remain inactive. No substitute stock route is assigned.
+
+The source recognizer matches all sixteen donor instrument callbacks through
+one parameterised implementation. The eight-byte immutable behaviour record
+dispatches before the ordinary trigger's narrower pulse/state gate. Wallet
+movement preserves nonzero pulses, empty-wallet protection, one-Bell subtraction,
+and the complete positional source sound. Its two-note programme uses native
+sound word `006C` and source priority 70. Native private offset `38` is verified;
+no GameCube actor/private layout is copied into the smaller N64 object.
+
+The musical callback uses the native room clip, including positioning updates
+without a new press. Native sequence 203 retains all fifteen instruments and
+adds the complete sixteenth program from donor sequence 246: header, flags,
+nineteen note tracks, instruments, timing, and velocity. Bank 0 preserves all
+71 original instruments and adds the full source instrument, including its
+6,534-byte sample, tuning, envelope, loop, and predictor. The complete wave-0
+resource is external to the shared archive, with checked signed-relative
+addressing and future relocation rebinding. No samples or old instruments are
+discarded. The wallet sound stage grows permanent audio allocation by 1 KiB;
+the melody stage fits the resulting reservation without another increase.
+
+Seven focused checks pass. These include all source musical callback parameters,
+sanitized execution of the actual shared dispatcher, exact complete models,
+all 71 original instrument comparisons, sample corruption rejection, future
+external-wave rebinding, unchanged save/profile data, patch reconstruction,
+and four browser/offline composition cases. A browser fixture initially looked
+in a nonexistent retained-row key; its correction reads the current furniture
+manifest. No production code changed for that fixture correction.
+
+The first silent native attempt at `build/v3-static-interaction-native-01/`
+passes 60 internal assertions across 103 recorded steps. It runs the installed
+CRC-loaded dispatcher, complete model DMA, both room/catalogue index forms,
+empty/nonempty wallets, nonstandard nonzero pulses, and native town-melody
+dispatch/position refresh. The latter executes a checked relocated copy of the
+two original room helper functions, calling the real melody-data getter; only
+audio endpoints are captured. Save/profile state, private-field boundaries,
+stack guards, checkpoint restoration, and fault checks pass. Ordinary audio
+synthesis, in-room interaction, save/reload, and original hardware are not
+newly verified. Do not replay unchanged material, rolling, or reaction tests.
+
+Reproduction with fresh output directories:
+
+```sh
+python3 tools/v3_furniture_pipeline.py import --select 1FAC --select 31CC \
+  --reuse-assets build/v3-static-callback-resources-prepared-01 \
+  --base-lock build/v3-material-colour-lifecycle-imports-05/profile-runtime/build-lock.json \
+  --output build/v3-static-interaction-imports
+python3 -m unittest tests.test_v3_room_static -v
+python3 tools/emulator_smoke.py \
+  --rom build/v3-static-interaction-imports-02/profile-runtime/animal-forest-v3-asset-loader.z64 \
+  --output build/v3-static-interaction-native \
+  --scenario tests/scenarios/v3_static_interactions.json --expansion-pak \
+  --no-initial-screenshot --seconds 240 \
+  --xvfb /home/discordian/Games/OpenRSC/headless/vendor/usr/bin/Xvfb
+```
+
+The `-02` build reuses `-01/audio-runtime` when retaining the complete external
+wave receipt; the resulting ROM is identical. No native retest is required.
+
+SHA-256:
+
+- ROM: `1bd90623328a6aeb39bb3edfdb13f63586e9acae44075adc7cf4c643ba8ede23`.
+- UPS: `fe9d080f569c3e64b6b57608d05bd6a1a6d8dd32f32efd855f863f81326ed3eb`.
+- Build report: `439dc90bd1089d6a030181cb787505112fc30cfa4e4c42d8a5302f0464f5ff55`.
+- Build lock: `576a5898f247aaae8fe00c2f75ee62a63a0a8e07b9140084d7fffc7a34dfda5c`.
+- Native results: `828e46ba7f2c946df5d0cabe61f596a2c65dd3facacd7054d3a776cd2c3828d2`.
+
+Room code is 11,872/16,384 bytes; the bootstrap remains 1,521/1,536 bytes.
+The immutable static table is 32 bytes within that code reservation. Permanent
+audio has 384 conservative bytes spare; import storage has 1,139,376 bytes spare.
+Saved format 4 and selections are unchanged. Retain backups and equal-or-larger
+selected profiles; format-4 saves cannot load in V2 or format-1/2/3 V3 builds.
+No stable deployment or main build lock changes. Continue the remaining
+source-bound effect/model/animation conversions, including barbecue steam and
+cannon projectiles. Stone coin's rolling lifecycle and sound remain complete.
+
 ## Installed exclusive player-colour lifecycle
 
-Current proposal: ABI 224 at
+Retained component: ABI 224 at
 `build/v3-material-colour-lifecycle-imports-05/profile-runtime/build-lock.json`.
 There remain 155 choices. Starman's complete material lifecycle is installed;
 its actual Mario reward route remains phase-2 acquisition work. No new item
@@ -69,7 +155,7 @@ Hashes (SHA-256):
 - Native results: `7206fdd71a59e05a2115ac6629da9aac9dc46b93dff3ba30ef71e401992e78ec`.
 
 Save format 4 is unchanged; keep backups and equal-or-larger import selections.
-V2 and format-1/2/3 V3 cannot load format-4 saves. Continue stone coin and other
+V2 and format-1/2/3 V3 cannot load format-4 saves. Continue other
 remaining model/animation/behaviour conversions. Acquisition and required
 gold-tree/golden-shovel work follow the importing pipelines.
 

@@ -24,7 +24,7 @@ from v3_registry import FURNITURE, LEGACY_FURNITURE, furniture_identity, furnitu
 from v3_room_aliases import discover as room_aliases, pending_reason as room_alias_reason
 from v3_villager_art import native_palette, normalise_vertex_flags
 
-VERSION = 21
+VERSION = 22
 PENDING_MOVE_CATEGORY = 'static-models-pending-move'
 LAYERS = ('opaque', 'opaque1', 'translucent', 'translucent1')
 BEHAVIOURS = {0: 'static', 1: 'front-seat', 2: 'any-direction-seat', 4: 'front-sofa',
@@ -360,6 +360,12 @@ class Source:
                 for p,target in pointers.items() if p-profile_at in (0,4,8,12)}
         if not models or set(pointers)-{profile_at+i for i in (0,4,8,12,48)}:
             reject('changed profile model dependencies')
+        from v3_furniture_static import discover as static_interaction
+        interaction=static_interaction(self,receipt)
+        if interaction:
+            return models,{},dict(vtable_symbol=name,vtable_offset=at,
+                functions=dict(move=receipt),**interaction,
+                null_callbacks=['create','draw','destroy','dma'])
         if size not in SWITCH_SOUND_CODE:
             # Direct profile drawing is independent of this move callback.
             # Preserve its source record and refuse gameplay installation,
@@ -585,7 +591,7 @@ class Source:
             extra.update(kind='animated-room-model',skeleton=adapter['skeleton'],joint_models=adapter['joint_models'])
         return dict(profile_symbol=name, profile_offset=at, profile_sha256=sha256(raw),
             scalar_hex=raw[32:48].hex(), behaviour=adapter.get('category') if extra.get('kind') or
-                adapter.get('category') in ('switch-trigger-sound',PENDING_MOVE_CATEGORY,MATERIAL_CATEGORY,SCROLL_CATEGORY) else BEHAVIOURS[contact], contact_action=contact,
+                adapter.get('category') in ('switch-trigger-sound','static-interaction',PENDING_MOVE_CATEGORY,MATERIAL_CATEGORY,SCROLL_CATEGORY) else BEHAVIOURS[contact], contact_action=contact,
             interaction_flags=interaction,
             size_code={3:1, 4:0, 5:2}[shape], shape=shape, models=models, **extra)
 
@@ -1028,6 +1034,8 @@ def metadata(source, item, profile, identity):
         raise ReviewRequired('Material-frame artwork is prepared; drawing, lifecycle behaviour, and acquisition need runtime adapters')
     if profile.get('callback_adapter',{}).get('category')==PENDING_MOVE_CATEGORY:
         raise ReviewRequired('Static artwork is prepared; move behaviour, profile interactions, and spawned effects need runtime adapters')
+    if profile.get('callback_adapter',{}).get('category')=='static-interaction' and not binding:
+        raise ReviewRequired('Static interaction requires its complete installed behaviour and audio')
     if profile.get('callback_adapter',{}).get('category')==FIXED_CATEGORY:
         raise ReviewRequired('Fixed rig artwork is prepared; move/destroy behaviour and spawned effects need runtime adapters')
     alias = next((row for row in room_aliases(source)['rows'] if int(row['display_item_id'],16)==item), None)
@@ -1231,6 +1239,7 @@ def rig_import_plan(inventory, report, bindings, selected=(), category=None, *, 
         (category is None or category in r['categories'])]
     rows=[r for r in candidates if r['profile'].get('callback_adapter',{}).get('category') in categories]
     material_rows=[];material_audio=[];material_loops=[]
+    static_rows=[r for r in candidates if r['profile'].get('callback_adapter',{}).get('category')=='static-interaction']
     for r in candidates:
         if r['profile'].get('callback_adapter',{}).get('category')!=MATERIAL_CATEGORY:continue
         initializer=initializer_lifecycle(source,r['profile'])
@@ -1246,10 +1255,14 @@ def rig_import_plan(inventory, report, bindings, selected=(), category=None, *, 
     loops={r['item_id'] for r in report['equipment_resources'].get('furniture_level_audio',{}).get('furniture',[])}
     plan=dict(resources=sorted(r['item_id'] for r in rows if r['item_id'] not in rigs),
         audio=sorted(({r['item_id'] for r in rows if r['profile']['callback_adapter'].get('trigger')}|
-                      set(material_audio))-audio),
+                      set(material_audio)|{r['item_id'] for r in static_rows if r['profile']['callback_adapter'].get('trigger')})-audio),
         loops=sorted(({r['item_id'] for r in rows if r['profile']['callback_adapter'].get('level_sound')}|
                       set(material_loops))-loops),
-        profiles=sorted(r['item_id'] for r in rows+material_rows if r['item_id'] not in bindings))
+        profiles=sorted(r['item_id'] for r in rows+material_rows+static_rows if r['item_id'] not in bindings))
+    if static_rows:
+        melodies={r['item_id'] for r in report['equipment_resources'].get('furniture_melody_audio',{}).get('furniture',[])}
+        plan['melodies']=sorted(r['item_id'] for r in static_rows
+            if r['profile']['callback_adapter']['mode']==2 and r['item_id'] not in melodies)
     if material_rows:
         installed={r['source_item_id'] for r in report['equipment_resources']['room_rigs'].get('material_rows',[])}
         plan['materials']=sorted(r['item_id'] for r in material_rows if r['item_id'] not in installed)
@@ -1302,6 +1315,11 @@ def import_batch(source, worksheet, output, lock, selected=(), category=None, re
             audio=output/'loop-audio'
             prepare_furniture_levels(base,report,source,inventory,audio,plan['loops'])
             refresh('loop-audio-runtime',furniture_audio_art=audio)
+        if plan.get('melodies'):
+            from v3_furniture_melody import prepare_batch as prepare_melodies
+            audio=output/'melody-audio'
+            prepare_melodies(base,report,source,inventory,audio,plan['melodies'])
+            refresh('melody-audio-runtime',furniture_audio_art=audio)
         if plan['profiles']:
             refresh('profile-runtime',furniture_profiles=[bundle(plan['profiles'],'profile-assets')])
     elif plan['audio'] or plan['loops']:

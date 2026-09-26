@@ -32,9 +32,24 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
-The checked proposal is ABI 224 at
-`build/v3-material-colour-lifecycle-imports-05/profile-runtime/build-lock.json`,
-with 155 development choices. The ordinary material importer installs starman's
+The checked proposal is ABI 227 at
+`build/v3-static-interaction-imports-02/profile-runtime/build-lock.json`,
+with 155 development choices. The shared static-interaction importer installs
+the piggy bank's one-Bell deduction and the ukulele's native town-tune callback.
+It reuses both complete models and preserves all 71 original font instruments
+while adding the full ukulele instrument/sample and nineteen-note programme.
+The callback recognizer covers all sixteen donor musical-instrument callbacks.
+Post-office and island acquisition still keep these two completed profiles
+inactive; acquisition remains phase 2.
+
+Seven focused checks pass, including four browser/offline compositions and
+sanitized wallet/position-update checks. The first native attempt passes 60
+internal assertions across 103 recorded steps, executing the installed shared
+callback and actual native room melody dispatcher. Audio calls are captured;
+ordinary synthesis, interaction, and hardware are not newly verified. See the
+[static-interaction checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#installed-static-interactions-and-town-tune-instruments).
+
+The retained material importer installs starman's
 complete constructor, positioned loop, same-item switch coordination, and player
 colour update/draw hooks. Its complete instrument and 46,900-byte sample are
 retained. A separate 256-byte transient reservation preserves native actor and
@@ -98,9 +113,9 @@ conditional effect binding. Its native particle lifetime still needs a properly
 allocated graphics fixture with the next changed effect batch; the previous
 fixture omitted that allocation. Do not repeat the passed bell checks.
 
-Room code uses 11,404 of 16,384 bytes; bootstrap uses 1,521 of 1,536 bytes.
-Scroll code has 4 bytes spare, audio has 64 conservative bytes spare, and
-the import reservation has 1,492,544 bytes spare. Live synthesis, GPU appearance,
+Room code uses 11,872 of 16,384 bytes; bootstrap uses 1,521 of 1,536 bytes.
+Scroll code has 4 bytes spare, audio has 384 conservative bytes spare, and
+the import reservation has 1,139,376 bytes spare. Live synthesis, GPU appearance,
 ordinary gameplay/save/restart, and original hardware are not newly verified.
 
 Saved format 4 is unchanged. A save using an added item requires its selected
@@ -108,8 +123,9 @@ import in the receiving build; preserve backups and equal-or-larger profiles.
 Format-4 saves cannot load in V2 or format-1/2/3 V3 builds. Translation-only output
 remains the pinned V2-12 ROM. The main lock and both stable deployments remain
 unchanged. Continue remaining model, material, animation, and behaviour
-conversion, including stone coin and other prepared callback models. The
-code-entry frontend remains parked.
+conversion, including barbecue steam, cannon projectiles, and other prepared
+callback models. Stone coin's full rolling lifecycle and sound are complete.
+The code-entry frontend remains parked.
 
 The retained password-engine component is ABI 197 at
 `build/v3-password-runtime-05/build-lock.json`. The shared password codec,

@@ -65,6 +65,7 @@ def profile(row, vrom, *, limit=END):
     fading = adapter.get('category') == 'switch-palette-fade'
     sequence = adapter.get('category') == 'constant-model-sequence'
     sound = adapter.get('category') == 'switch-trigger-sound'
+    static = adapter.get('category') == 'static-interaction'
     from v3_furniture_rigs import RIG_CATEGORIES,FIXED_CATEGORY
     from v3_furniture_materials import CATEGORY as MATERIAL_CATEGORY
     from v3_furniture_scroll import CATEGORY as SCROLL_CATEGORY,VTABLE as SCROLL_VTABLE,profile_lifecycle
@@ -92,7 +93,7 @@ def profile(row, vrom, *, limit=END):
                 at%8 or not 0<=at<=n-linked['bytes'] or linked['bytes']!=(len(offsets)+1)*8):
             raise ValueError('Invalid static model sequence bounds')
         pointers=[0x06000000+at,0,0,0]
-    if sound:
+    if sound or static:
         from v3_room_rig_runtime import SOUND_VTABLE
         if row.get('room_runtime')!={'vtable':SOUND_VTABLE,'vrom':vrom}:
             raise ValueError('Sound profile requires its complete installed room lifecycle')
@@ -112,7 +113,7 @@ def profile(row, vrom, *, limit=END):
         if set(offsets)!=set(layers):raise ValueError('Scrolling profile needs every source model')
         pointers=[0,0,0,0]
     return (struct.pack('>12I', vrom, vrom+n, 0x06000000, 0x06000000+n, *pointers, 0,0,0,0)+scalar+
-            struct.pack('>I',VTABLE if rigged else SOUND_VTABLE if sound else MATERIAL_VTABLE if material else
+            struct.pack('>I',VTABLE if rigged else SOUND_VTABLE if sound or static else MATERIAL_VTABLE if material else
                         SCROLL_VTABLE if scrolling else palette_fade.VTABLE if fading else 0))
 
 
@@ -430,7 +431,7 @@ def build(output, art_path, lock=LOCK):
         report['staged_furniture']['deferred_resources']=[r for r in report['staged_furniture'].get('deferred_resources',[])
             if r['source_item_id'] not in complete]
         runtime=report['equipment_resources']['room_rigs']
-        for row in runtime['rows']+runtime['sound_rows']+runtime.get('material_rows',[])+runtime.get('scrolling',{}).get('rows',[]):
+        for row in runtime['rows']+runtime['sound_rows']+runtime.get('material_rows',[])+runtime.get('static_rows',[])+runtime.get('scrolling',{}).get('rows',[]):
             if row['source_item_id'] in promoted_sources:row['parent_selectable']=True
     report.update(build='v3-automatic-furniture',runtime_abi=abi,input_build_sha256=sha256(base),
         output_sha256=sha256(result),patch_sha256=sha256(patch),blob_sha256=sha256(blob),
@@ -782,6 +783,9 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             storage='checked-zero-gap' if r.get('relocated') else 'checked-in-place-append',
             sha256=r['sha256'],original_sha256=r['previous_sha256'],
             **({'target_vrom':r['target_vrom']} if 'target_vrom' in r else {})) for r in growth)
+    if equipment_report and equipment_report.get('furniture_melody_audio'):
+        from v3_furniture_melody import rebind_wave_header
+        rebind_wave_header(equipment_report,core)
     abi=prior['runtime_abi']+1; struct.pack_into('>I',blob,4,abi)
     package=blob[PACKAGE:PACKAGE+PACKAGE_SIZE]; struct.pack_into('>I',blob,0xF8,zlib.crc32(package))
     old=prior['startup']
@@ -977,8 +981,10 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             report['shared_runtime_refresh']['adapters']=['room_rigs_code']
             report['sources'].update({name:sha256((ROOT/name).read_bytes()) for name in equipment.SOURCES})
         if furniture_audio_art is not None:
-            report['shared_runtime_refresh']['adapters'].append('furniture_trigger_audio')
-            report['shared_runtime_refresh']['additional_resident_bytes']=equipment_report['furniture_audio']['audio_heap_growth']
+            melody=json.loads((furniture_audio_art/'audio.json').read_bytes()).get('format')=='AFV3-FURNITURE-MELODY-PREPARED-1'
+            kind='furniture_melody_audio' if melody else 'furniture_audio'
+            report['shared_runtime_refresh']['adapters'].append('furniture_melody_audio' if melody else 'furniture_trigger_audio')
+            report['shared_runtime_refresh']['additional_resident_bytes']=equipment_report[kind]['audio_heap_growth']
         if furniture_profiles is not None:
             report['shared_runtime_refresh']['adapters'].append('inactive_furniture_profiles')
             report['shared_runtime_refresh']['artwork_changed']=True

@@ -36,6 +36,8 @@ SOURCES=('tools/v3_room_rig_runtime.py','tools/v3_asset_loader.py','tools/v3_fur
     'tools/v3_room_effects.py','overlays/v3/room_effects.c','overlays/v3/room_effects.h')
 from v3_furniture_reactions import SOURCES as REACTION_SOURCES
 SOURCES+=REACTION_SOURCES
+from v3_furniture_static import SOURCES as STATIC_SOURCES
+SOURCES+=STATIC_SOURCES
 
 
 def checked_hit_condition(base,report,trigger,sound,audio):
@@ -83,6 +85,7 @@ def install_profiles(base,prior,blob,core,original,output,directories):
                                     draw_only_lifecycle,checked_runtime,checked_lifecycle,profile_lifecycle)
     from v3_sound_programs import furniture_trigger,checked_furniture_loops
     from v3_furniture_behaviours import install_initial_switch,checked_initial_switch
+    import v3_furniture_static as static
     result=copy.deepcopy(prior['equipment_resources']);runtime=result['room_rigs']
     source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
         (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
@@ -116,7 +119,7 @@ def install_profiles(base,prior,blob,core,original,output,directories):
         for row in art['objects']:
             donor=row['item_id'];item=int(donor,16);prepared_row=prepare(source,item)
             descriptor=prepared_row[0];category=descriptor.get('callback_adapter',{}).get('category')
-            if (category not in (CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY,ROLLING_CATEGORY,'switch-trigger-sound',MATERIAL_CATEGORY,SCROLL_CATEGORY) or
+            if (category not in (CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY,ROLLING_CATEGORY,'switch-trigger-sound',static.CATEGORY,MATERIAL_CATEGORY,SCROLL_CATEGORY) or
                     donor in occupied or item not in identities or
                     row['profile']!=json.loads(json.dumps(descriptor)) or
                     row['native_profile_scalar_hex']!=descriptor['scalar_hex']):
@@ -180,7 +183,23 @@ def install_profiles(base,prior,blob,core,original,output,directories):
                 raise ValueError('Staged identity needs native correspondence review')
             if (any(blob[ROWS+i*80:ROWS+(i+1)*80]) or any(blob[ITEMS+i*32:ITEMS+(i+1)*32]) or
                     blob[0x40+i//8]&(1<<(i&7))):raise ValueError('Profile staging overwrites an existing or selected identity')
-            if category==SCROLL_CATEGORY:
+            if category==static.CATEGORY:
+                adapter=descriptor['callback_adapter']
+                installed=copy.deepcopy(sounds[donor]) if adapter['mode']==1 else dict(
+                    source_item_id=donor,item_id=f'{destination:04X}',runtime_index=index,
+                    profile_installed=False,parent_selectable=False)
+                installed.update(mode=adapter['mode'],parameter=adapter['parameter'])
+                static.checked_audio(descriptor,installed,result)
+                blob.extend(bytes(-len(blob)%16));vrom=BLOB+len(blob);blob.extend(data)
+                if vrom+len(data)>limit:raise ValueError('Complete static models exceed checked import reservation')
+                vtable=SOUND_VTABLE;reused_asset=False
+                installed.update(blob_offset=vrom-BLOB,vrom=vrom,bytes=len(data),sha256=sha256(data),source=row)
+                runtime.setdefault('static_rows',[]).append(installed)
+                runtime['static_rows'].sort(key=lambda r:r['runtime_index'])
+                runtime.setdefault('static',{})['native']=static.native_contract(base)
+                if adapter['mode']==1:sounds[donor]['profile_installed']=True
+                material_code_changed=True
+            elif category==SCROLL_CATEGORY:
                 installed=scrolling.get(donor)
                 if (not installed or installed['profile_installed'] or
                         {k:v for k,v in installed['source'].items() if k!='reused_artwork'}!=
@@ -305,6 +324,7 @@ def bind_profiles(source,base,report):
     from v3_furniture_scroll import CATEGORY as SCROLL_CATEGORY,VTABLE as SCROLL_VTABLE,checked_lifecycle,checked_runtime
     from v3_sound_programs import furniture_trigger,checked_furniture_loops
     from v3_furniture_behaviours import checked_initial_switch,initial_switch_source
+    import v3_furniture_static as static
     source.runtime_profiles={}
     staged=report.get('staged_furniture',{})
     activated=[r for r in report['furniture']['imports'] if r.get('room_runtime')]
@@ -330,6 +350,10 @@ def bind_profiles(source,base,report):
     # binding when an identity occurs in both tables.
     bindings={r['source_item_id']:r for r in runtime['sound_rows']+runtime['rows']+runtime.get('material_rows',[])}
     bindings.update(checked_runtime(e,blob))
+    bindings.update(static.checked_binding(base,report,blob))
+    if e.get('furniture_melody_audio'):
+        from v3_furniture_melody import checked_binding as checked_melodies
+        checked_melodies(base,report)
     placement=checked_initial_switch(base,report,blob)
     if placement and report['furniture_initial_switch']['source']!=json.loads(json.dumps(initial_switch_source(source))):
         raise ValueError('Changed source fresh-placement contract')
@@ -350,8 +374,9 @@ def bind_profiles(source,base,report):
             raise ValueError('Changed furniture profile identity or activation')
         descriptor=prepare(source,int(donor,16))[0];art=copy.deepcopy(binding['source']);vrom=binding['vrom']
         category=descriptor['callback_adapter']['category']
-        expected_vtable=(MATERIAL_VTABLE if category==MATERIAL_CATEGORY else SOUND_VTABLE if category=='switch-trigger-sound'
+        expected_vtable=(MATERIAL_VTABLE if category==MATERIAL_CATEGORY else SOUND_VTABLE if category in ('switch-trigger-sound',static.CATEGORY)
                          else SCROLL_VTABLE if category==SCROLL_CATEGORY else VTABLE)
+        if category==static.CATEGORY:static.checked_audio(descriptor,binding,e)
         if category==SCROLL_CATEGORY:
             lifecycle=checked_lifecycle(source,descriptor,binding,runtime['scrolling'],contracts)
             if lifecycle is None:
@@ -598,6 +623,11 @@ def publish_packet(equipment,blob,output,*,core=None):
     packet_ram,table_ram,packet_bytes=packet_layout(runtime)
     table_delta=table_ram-PACKET_TABLE
     sound_rows=runtime.get('sound_rows',[]);material_rows=runtime.get('material_rows',[])
+    static_rows=runtime.get('static_rows',[]);static_sources=()
+    if static_rows:
+        from v3_furniture_static import table_source
+        assembly,static_data=table_source(static_rows,output/'room_static_bank')
+        static_sources=('overlays/v3/room_static.c',assembly)
     reactions=runtime.get('reactions');reaction_sources=();colours=runtime.get('colours')
     if reactions:
         from v3_furniture_reactions import wave_source
@@ -615,7 +645,8 @@ def publish_packet(equipment,blob,output,*,core=None):
         raise ValueError('Colour publication requires its complete lifecycle and extended packet')
     if not colours and any(r.get('lifecycle')==3 for r in material_rows):
         raise ValueError('Colour material requires its complete player engine')
-    defines=('AF_V3_ROOM_RIG_PACKET',)+(('AF_V3_ROOM_TRIGGER_SOUND',) if sound_rows or reactions or colours else ())
+    defines=('AF_V3_ROOM_RIG_PACKET',)+(('AF_V3_ROOM_TRIGGER_SOUND',) if sound_rows or reactions or colours or static_rows else ())
+    if static_rows:defines+=('AF_V3_ROOM_STATIC',)
     if reactions:defines+=('AF_V3_ROOM_REACTIONS',)
     if colours:defines+=('AF_V3_ROOM_COLOURS',)
     if material_rows:defines+=('AF_V3_ROOM_MATERIALS',)
@@ -633,16 +664,21 @@ def publish_packet(equipment,blob,output,*,core=None):
         extra_sources=(('overlays/v3/room_materials.c',) if material_rows else ())+
             (('overlays/v3/room_billboards.c',) if billboard else ())+
             (('overlays/v3/room_effects.c',) if effects else ())+reaction_sources+
-            (('overlays/v3/room_colours.c',) if colours else ()))
+            (('overlays/v3/room_colours.c',) if colours else ())+static_sources)
     table=encode_packet(runtime['rows'],sound_rows,material_rows)
     data=code.ljust(table_ram-packet_ram,b'\0')+table
     if len(code)>table_ram-packet_ram or len(data)!=packet_bytes or not zlib.crc32(data):
         raise ValueError('Room code/table exceeds owned packet or has an invalid cache identity')
     symbols=compiled['symbols'];entries=[symbols['af_v3_room_rig_'+role] for role in ('ct','mv','dw')]
+    if static_rows:
+        address=symbols['af_v3_room_static_table'];start=address-packet_ram
+        if start<0 or code[start:start+len(static_data)]!=static_data:
+            raise ValueError('Static behaviour table escapes the immutable shared packet')
+        runtime['static'].update(address=address,bytes=len(static_data),sha256=sha256(static_data))
     if any(p&3 or not packet_ram<=p<packet_ram+len(code) for p in entries):
         raise ValueError('Room lifecycle entry escapes packet')
     sound_defines=()
-    if sound_rows or reactions or colours:
+    if sound_rows or reactions or colours or static_rows:
         entry=symbols['af_v3_room_sound_mv']
         if entry&3 or not packet_ram<=entry<packet_ram+len(code):raise ValueError('Room sound entry escapes packet')
         sound_defines=(f'AF_ROOM_SOUND_MV=0x{entry:X}u',)
@@ -717,7 +753,7 @@ def publish_packet(equipment,blob,output,*,core=None):
         module[MATERIAL_VTABLE-EQUIPMENT_RAM:MATERIAL_VTABLE-EQUIPMENT_RAM+20]=material_vtable
         runtime.update(material_vtable=MATERIAL_VTABLE,material_vtable_hex=material_vtable.hex(),material_table=MATERIAL_TABLE+table_delta)
     module[VTABLE-EQUIPMENT_RAM:VTABLE-EQUIPMENT_RAM+20]=vtable
-    if sound_rows:
+    if sound_rows or static_rows:
         entry=bootstrap['symbols']['af_v3_room_boot_sound_mv']
         if entry&3 or not RAM<=entry<RAM+len(boot):raise ValueError('Room sound bootstrap escapes reservation')
         before=module[SOUND_VTABLE-EQUIPMENT_RAM:SOUND_VTABLE-EQUIPMENT_RAM+20]

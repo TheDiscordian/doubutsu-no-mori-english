@@ -34,6 +34,53 @@ this after changing shared code when no new resource category needs installation
 profile-only staging retains existing code unless it installs a newly implemented
 material lifecycle; that stage rebuilds the shared packet and callback bindings.
 
+### Direct-model interactions and town-tune instruments
+
+`static-interaction` recognises complete move callbacks while retaining every
+direct profile model. Recognition uses checked instruction shapes, relocations,
+helper implementations, and source parameters, not item IDs. The ordinary
+`import` command installs trigger or town-melody audio before staging complete
+profiles. Prepared models are reused without recompilation. Unknown callbacks
+remain preparable artwork, not implicitly inert furniture.
+
+The shared immutable table lives in the room packet's code/constant reservation.
+Its header is magic `41464931`, count, eight-byte stride, and zero reserved word.
+Each record contains a native index, mode byte, parameter byte, native sound
+halfword, and zero reserved halfword. Mode 1 takes one Bell from the current
+player's nonempty wallet and plays its complete source sound. Mode 2 forwards the
+source instrument parameter through the native room clip's melody callback.
+Both preserve any-nonzero interaction pulses and the absence of transition-state
+exclusions. Melody position updates continue without a new press. The shared
+dispatcher handles these records before the stricter ordinary-trigger gate.
+
+Native wallet offset `38` is bound to the current private pointer at `80136FD8`;
+the donor's `8C` offset is never copied. The melody callback is clip offset `64`
+at pointer `80136F2C`. Complete native registration, dispatch, data getter, and
+two-track instrument functions are checked. No actor or saved allocation grows.
+Room and catalogue index forms resolve the same complete model/behaviour.
+
+The musical adapter extends the three complete instrument tables in native
+sequence 203 from fifteen to sixteen entries. It preserves every original
+program and changes only four verified table references. The complete donor
+sequence 246 supplies the new header, flags, nineteen notes, channel commands,
+pitch, duration, and velocity. Bank 0 grows from 71 to 72 complete instruments,
+including the source sample, loop, predictor, tuning, and envelope. The shared
+font converter explicitly permits valid one-step envelopes for this bank;
+existing consumers retain their stricter default. All original instruments are
+compared before and after relocation.
+
+The complete 239,920-byte wave-0 resource is stored externally in the import
+reservation. Its signed-relative header preserves native streaming; the shared
+wave archive and its other resources remain intact. Later archive relocation
+rebinds this external header while checking the same physical sample resource.
+Permanent audio capacity is checked against all current resources and expanded
+only in the existing bounded allocation scheme.
+
+Registry entry `1FAC` uses additive destination `3C40`, index 1808. The pinned
+identity worksheet identifies no N64 counterpart; existing IDs do not change.
+Post-office and island acquisition remain actual source requirements, not shop
+substitutions. Complete callback/audio installation alone does not enable them.
+
 ### Displacement-driven rolling rigs
 
 `contact-rolling-keyframe-rig` recognises the complete source lifecycle,
@@ -273,11 +320,11 @@ indices in these prepared records are not assigned N64 destination indices.
 
 ### Stable donor and destination records
 
-The registry reserves reviewed ordinary legacy identities in `3C10..3C2C`,
+The registry reserves reviewed ordinary legacy identities in `3C10..3C40`,
 after the balloon displays at `3C00..3C0C`. Existing native IDs, the entire
 garment display range, and every previous import reservation remain intact.
 Reservations are literal and append-only, not assigned by selection order.
-The eight current mappings identify ordinary Gulliver souvenirs; acquisition,
+The thirteen mappings identify reviewed additive furniture; acquisition,
 graphics, and behaviour still come from source records, not that registry.
 Other legacy entries remain in review until identity and representation are
 established. Unresolved worksheet cells alone do not justify a new identity.
