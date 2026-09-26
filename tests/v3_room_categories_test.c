@@ -186,5 +186,29 @@ int main(void) {
     r->first.bits=1;RoomRig saved=*actor;
     af_v3_room_rig_ct(actor,model);af_v3_room_rig_mv(actor,0,&game,model);
     assert(!memcmp(actor,&saved,sizeof(saved)));
+    /* Idle-only policies retain the initial pulse, ignore repeated hits while
+       moving, use their source speed, and stop when the evaluator ends. */
+    r->last.f=.25f;af_v3_test_room_sounds.rows[0].word=0x7B;
+    for (int variant=0;variant<2;++variant) {
+        memset(&guarded,0xA7,sizeof guarded);actor->index=(u16)(1048+variant*1024);
+        af_v3_room_rig_ct(actor,model);
+        assert(actor->keyframe.current.f==1.5f && actor->keyframe.speed.f==0 && actor->changed==0xA7);
+        for (int done=0;done<2;++done) for (int moving=0;moving<2;++moving)
+        for (int changed=0;changed<3;++changed) for (int state=-1;state<17;++state) {
+            stopped=done;actor->state=(s16)state;actor->changed=(u8)changed;
+            actor->keyframe.speed.f=moving ? .25f : 0;actor->keyframe.current.f=7;
+            unsigned old=plays,sounds=sound_calls;
+            af_v3_room_rig_mv(actor,0,&game,model);
+            int hit=!moving && changed;
+            assert(plays==old+(moving ? 1u+(unsigned)!done : (unsigned)hit));
+            assert(actor->keyframe.current.f==(moving ? 7+.25f*(1+!done) : hit ? 1 : 7));
+            assert(actor->keyframe.speed.f==((moving ? !done : hit) ? .25f : 0));
+            assert(actor->changed==changed);
+            int audible=hit && state!=5 && state!=6 && state!=13 && state!=15;
+            assert(sound_calls==sounds+(unsigned)audible);
+            if (audible)assert(last_sound==0x7B && last_position==actor->position);
+        }
+        for (int i=0;i<16;++i)assert(guarded.front[i]==0xA7 && guarded.back[i]==0xA7);
+    }
     puts("Shared clock/storage/switch/hit categories preserve dispatch, time, limits, sound, and actor guards");
 }

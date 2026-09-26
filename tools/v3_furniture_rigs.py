@@ -137,6 +137,59 @@ def discover_billboard(source, vtable_name, vtable_at, functions):
             switch_clicks=[],callback_installed=False),runtime_installed=False)
 
 
+def checked_stop_initializer(source):
+    """Bind the complete donor initializer, including its half-speed default."""
+    module=u32(source.rel,0);base,_=source.sections[4]
+    raw,receipt=source.function(0x934)
+    refs={0x0A:(6,module,4,0),0x0E:(6,module,4,0x20),0x1E:(4,module,4,0),
+        0x2E:(6,module,4,0x30),0x36:(4,module,4,0x20),0x3E:(4,module,4,0x30),
+        0x42:(6,module,4,4),0x4E:(4,module,4,4)}
+    constants=((0,'3f800000'),(4,'00000000'),(0x20,'4330000080000000'),(0x30,'3f000000'))
+    if (len(raw)!=124 or sha256(raw)!='8045cfda172f82aae9f38054c5e7844b87a7f3428bfc612252eff8e75435efa4' or
+            receipt['relocations']!=refs or any(source.rel[base+at:base+at+len(value)//2]!=bytes.fromhex(value)
+                for at,value in constants)):
+        raise ValueError('Changed source stop initializer')
+    return receipt
+
+
+def discover_idle_hit(source, adapter):
+    """Complete stopped-hit variant; resource identities remain data, not cases."""
+    functions=adapter['functions'];move=functions.get('move',{})
+    if move.get('bytes')!=208 or adapter['constructor']['mode']!='stop':return None
+    from v3_furniture_pipeline import ReviewRequired
+    def reject(reason):raise ReviewRequired('custom callbacks: idle-hit rig '+reason)
+    if (set(functions)!={'create','move','draw'} or adapter['constructor']['initial_speed']['hex']!='00000000'
+            or not adapter['constructor']['initial_play_before_speed'] or adapter['joint_callbacks']):
+        reject('changed complete lifecycle')
+    initializer=checked_stop_initializer(source);module=u32(source.rel,0)
+    expected={};constants={}
+    for hi,lo,name,value in ((0x0A,0x12,'zero',0),(0x66,0x6E,'first_frame',1),
+            (0x7A,0x7E,'speed',.25),(0xA2,0xA6,'speed',.25),(0xB2,0xB6,'zero',0)):
+        ref=move['relocations'].get(hi)
+        if ref is None or ref[:3]!=(6,module,4):reject('missing constant relocation')
+        at=ref[3];base,n=source.sections[4]
+        if not 0<=at<=n-4 or source.rel[base+at:base+at+4]!=struct.pack('>f',value):reject('changed animation constant')
+        expected.update({hi:ref,lo:(4,module,4,at)})
+        row=dict(section=4,offset=at,hex=struct.pack('>f',value).hex(),value=value)
+        if name in constants and constants[name]!=row:reject('ambiguous constant')
+        constants[name]=row
+    if constants['zero']['offset']!=adapter['constructor']['initial_speed']['offset']:reject('changed initial speed')
+    raw,_=source.function(move['offset']);sound=struct.unpack_from('>H',raw,0x5E)[0]
+    if sound&0x80 or (sound&0x7FFF)>>8 not in (0,1,4):reject('unsupported sound word')
+    helpers=source.checked_callback_code(move,208,
+        '3bde8d1b666ce0a3b94696fe6b35b7e956bb442582ebfb6606d8a4236972f1a2',expected,
+        {0x60:(0x2BDDE8,'sAdo_OngenTrgStart'),0x74:(0xE54,'cKF_SkeletonInfo_R_play'),
+         0x8C:(0xE54,'cKF_SkeletonInfo_R_play'),0x9C:(0xE54,'cKF_SkeletonInfo_R_play')},
+        'idle-hit motion',{0x5E:sound},internal_branches=True)
+    trigger=helpers['sAdo_OngenTrgStart']
+    if (trigger['bytes']!=72 or trigger['sha256']!='4fdc889bb1697c19c8f386d72b80585ea07706d9f26b328389766bec96f0f989'
+            or trigger['relocations']!={48:(10,0,4,0x8001383C)}):reject('changed trigger helper')
+    return dict(helpers=helpers,constants=constants,source_initializer=initializer,
+        hit=dict(idle_only=True,playback_speed=.25,stop_at_endpoint=True,clear_initial_pulse=False),
+        trigger=dict(sound_word=sound,excluded_states=[13,14,15,12],native_excluded_states=[5,6,13,15],
+            state_offset=0x3C,switch_offset=0x12D,switch_value='nonzero',position_offset=8,runtime_installed=False))
+
+
 def discover_hit(source, vtable_name, vtable_at, functions):
     """Convert the complete struck-animation category, including its trigger.
 
@@ -160,15 +213,7 @@ def discover_hit(source, vtable_name, vtable_at, functions):
         '9f229825fdc6bc4d5741e0b27cfdfcd047b1bd836fdb31174413d9841a8cd6d7',a|b|c|d,
         {0x38:(0x8D4,'cKF_SkeletonInfo_R_ct'),0x4C:(0x934,'cKF_SkeletonInfo_R_init_standard_stop'),
          0x54:(0xE54,'cKF_SkeletonInfo_R_play')},'hit rig constructor')
-    init,receipt=source.function(0x934);base,_=source.sections[4]
-    expected_init={0x0A:(6,module,4,0),0x0E:(6,module,4,0x20),0x1E:(4,module,4,0),
-        0x2E:(6,module,4,0x30),0x36:(4,module,4,0x20),0x3E:(4,module,4,0x30),
-        0x42:(6,module,4,4),0x4E:(4,module,4,4)}
-    if (len(init)!=124 or sha256(init)!='8045cfda172f82aae9f38054c5e7844b87a7f3428bfc612252eff8e75435efa4' or
-            receipt['relocations']!=expected_init or any(source.rel[base+at:base+at+len(raw)]!=raw
-                for at,raw in ((0,bytes.fromhex('3f800000')),(4,bytes(4)),
-                    (0x20,bytes.fromhex('4330000080000000')),(0x30,bytes.fromhex('3f000000'))))):
-        reject('changed source stop initializer')
+    checked_stop_initializer(source)
     expected={};constants={}
     for hi,lo,label,value in ((0x2E,0x36,'zero',0),(0x4A,0x4E,'speed',.5),
             (0x92,0x9A,'first_frame',1),(0xA6,0xAA,'speed',.5),
@@ -396,6 +441,13 @@ def discover_fixed(source, vtable_name, vtable_at, functions):
         resource_scope='complete fixed looping clock' if runtime_contract else
             'complete constructor rig; callback gameplay and spawned effects remain pending')
     if category==FIXED_CATEGORY:
+        idle_hit=discover_idle_hit(source,result)
+        if idle_hit:
+            result['helpers'].update(idle_hit.pop('helpers'))
+            result.update(category=HIT_CATEGORY,pending_callbacks=[],**idle_hit,
+                resource_scope='complete idle-only stopped-hit rig')
+            result['constructor']['clears_switch_pulse']=False
+            return descriptor['models'],{},result
         from v3_furniture_motion import discover
         rolling=discover(source,result)
         if rolling:

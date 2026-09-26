@@ -31,7 +31,7 @@ import v3_feng_shui as feng
 import v3_shops as shops
 import v3_resource_capacity as capacity
 
-VERSION = 20
+VERSION = 21
 LOCK = ROOT/'config/v3-import-build.json'
 STABLE = ROOT/'build/v2-keyboard-fit-11/Animal Forest English V2.z64'
 STABLE_SHA = '8bbd1955536a2a3ac9f76d6f323842f5ce25c037e1ff5fd3da9f28d6dfe20507'
@@ -210,7 +210,7 @@ def checked_assets(art_path, source, worksheet):
     raw = (art_path/'art.json').read_bytes(); art = json.loads(raw)
     # Prior objects still undergo complete current metadata and model checks;
     # a display alias cannot pass as standalone furniture through an old report.
-    if (art['format'] != 'AFV3-AUTO-FURNITURE-ASSETS-1' or art['version'] not in (7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, VERSION)
+    if (art['format'] != 'AFV3-AUTO-FURNITURE-ASSETS-1' or art['version'] not in (7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, VERSION)
             or art['source_rel_sha256'] != sha256(source.rel)
             or art['source_symbols_sha256'] != sha256(source.symbols.encode())):
         raise ValueError('Unknown converter/source revision')

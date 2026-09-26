@@ -1174,7 +1174,8 @@ def install_furniture(image,prior,blob,code,original,output,directory):
     result=copy.deepcopy(prior['equipment_resources']);runtime=result['room_rigs']
     packet=runtime['packet'];at=packet['blob_offset']
     packet_data=blob[at:at+packet['bytes']]
-    if (sha256(packet_data)!=packet['sha256'] or packet_data[4096:]!=room.encode_packet(
+    packet_ram,table_ram,_=room.packet_layout(runtime)
+    if (sha256(packet_data)!=packet['sha256'] or packet_data[table_ram-packet_ram:]!=room.encode_packet(
             runtime['rows'],runtime.get('sound_rows',[]),runtime.get('material_rows',[]))):
         raise ValueError('Changed complete shared room packet')
     old_sound_rows=runtime.get('sound_rows',[])

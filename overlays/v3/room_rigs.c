@@ -42,8 +42,9 @@ static void trigger(u32 index,float *position) {
     for (u32 i=0;i<room_sound_table->count;++i) {
         const RoomSoundRecord *r=room_sound_table->rows+i;
         if (r->index!=index) continue;
+        u32 group=(r->word>>8)&127u;
         if (r->index<1024 || r->index>=2048 || r->reserved || (r->word&0x80u) ||
-                (((r->word>>8)&127u)!=1u && ((r->word>>8)&127u)!=4u)) return;
+                (group!=0u && group!=1u && group!=4u)) return;
         /* The original N64 dispatcher lacks the donor's singleton flag.
            Its six live slots retain the full word, including that flag. */
         if (r->word&0x8000u) for (u32 j=0;j<6;++j)
@@ -85,7 +86,9 @@ static const RoomRigRecord *find(u32 index) {
 #else
         if (r->mode==ROOM_RIG_BILLBOARD) return 0;
 #endif
-        if ((r->mode==ROOM_RIG_SWITCH || r->mode==ROOM_RIG_HIT) && (r->first.bits || r->last.bits)) return 0;
+        if (r->mode==ROOM_RIG_SWITCH && (r->first.bits || r->last.bits)) return 0;
+        if (r->mode==ROOM_RIG_HIT && (r->first.bits==0 ? r->last.bits!=0 :
+                r->first.bits!=1 || r->last.bits!=0x3E800000u)) return 0;
 #ifndef AF_V3_ROOM_TRIGGER_SOUND
         if (r->mode==ROOM_RIG_HIT) return 0;
 #endif
@@ -129,7 +132,8 @@ void af_v3_room_rig_ct(RoomRig *actor,u8 *data) {
            Preserve the donor's first evaluation before stopping the motion. */
         actor->keyframe.speed.bits=0x3F000000u;
         cKF_SkeletonInfo_R_play(&actor->keyframe);
-        actor->keyframe.speed.bits=0;actor->changed=0;
+        actor->keyframe.speed.bits=0;
+        if (!r->first.bits) actor->changed=0;
         return;
     }
 #endif
@@ -162,6 +166,18 @@ void af_v3_room_rig_mv(RoomRig *actor,void *room,RoomRigGame *game,u8 *data) {
 #ifdef AF_V3_ROOM_TRIGGER_SOUND
     if (r->mode==ROOM_RIG_HIT) {
         RoomKeyframe *key=&actor->keyframe;
+        if (r->first.bits) {
+            if (!(key->speed.bits&0x7FFFFFFFu)) {
+                if (actor->changed) {
+                    if (!room_transition_state(actor->state)) trigger(actor->index,actor->position);
+                    key->current.f=1.0f;
+                    cKF_SkeletonInfo_R_play(key);key->speed=r->last;
+                }
+            } else if (cKF_SkeletonInfo_R_play(key)!=1) {
+                cKF_SkeletonInfo_R_play(key);key->speed=r->last;
+            } else key->speed.bits=0;
+            return;
+        }
         if (cKF_SkeletonInfo_R_play(key)!=1 && (key->speed.bits&0x7FFFFFFFu)) {
             cKF_SkeletonInfo_R_play(key);
             key->speed.bits=0x3F000000u;

@@ -29,7 +29,7 @@ PROFILE_OUT=ROOT/os.environ.get('V3_ROOM_PROFILE_BUILD','build/v3-shared-room-pr
 class CurrentImportedRigTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.out=ROOT/os.environ.get('V3_IMPORTED_RIG_BUILD','build/v3-rolling-category-auto-02/cartridge')
+        cls.out=ROOT/os.environ.get('V3_IMPORTED_RIG_BUILD','build/v3-idle-hit-category-auto-02/cartridge')
         cls.image,cls.report=inputs(cls.out/'build-lock.json')
         cls.blob=by_vrom(cls.image)[BLOB].extract(cls.image)
         cls.source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
@@ -52,6 +52,9 @@ class CurrentImportedRigTests(unittest.TestCase):
                 sound=next(x for x in rigs['sound_rows'] if x['source_item_id']==donor)
                 audio=next(x for x in e['furniture_audio']['furniture'] if x['item_id']==donor)
                 self.assertEqual(rig['mode'],3)
+                if descriptor['callback_adapter'].get('hit'):
+                    self.assertEqual((rig['first'],rig['last']),(1,0x3E800000))
+                    self.assertEqual(sound['native_sound_word']>>8,0)
                 self.assertTrue(sound['profile_installed']);self.assertTrue(sound['parent_selectable'])
                 self.assertEqual(audio['trigger'],json.loads(json.dumps(descriptor['callback_adapter']['trigger'])))
                 self.assertEqual(audio['trigger']['sound_word'],sound['source_sound_word'])

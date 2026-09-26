@@ -22,28 +22,29 @@ Incomplete gameplay stays unavailable in the selector; installing assets does
 not claim that an item is playable. Reuse unchanged passing tests throughout.
 
 Current task: close shared conversion gaps in the ordinary bulk importer.
-The current checked proposal is ABI 208 at
-`build/v3-rolling-category-auto-02/cartridge/build-lock.json`, with 151 private
-development choices. Automatic category installation covers complete
-displacement-driven rolling rigs and enables stone coin through its actual
-donor route. Shared mower, movement, loop, and trigger callbacks use verified
-native movement-state identities. Converted artwork and existing audio are reused.
+The current checked proposal is ABI 212 at
+`build/v3-idle-hit-category-auto-02/cartridge/build-lock.json`, with 152 private
+development choices. Automatic category installation covers complete idle-only
+struck-animation behaviour and sound. Tiger bobblehead reuses its artwork and
+uses additive identity `3C3C`, runtime index 1807, through its real Gulliver route.
 Continue unsupported model/material/animation callbacks, including required
 item-specific behaviour; do not divert into acquisition frontend work.
-The extended rig packet has 11,944 code bytes spare. The scroll module has only
+The extended rig packet has 11,756 code bytes spare. The scroll module has only
 4 code bytes spare; further scroll behaviour requires a checked capacity
-extension or relocation, not omitted functionality. Audio has 896 conservative
+extension or relocation, not omitted functionality. Audio has 672 conservative
 bytes spare. Respect these bounds when extending categories.
-See the [current checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#displacement-driven-rolling-rigs)
+See the [current checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#idle-only-struck-animation-policy)
 for commands, evidence, and save compatibility.
 
-The rolling/native packet check passes 110 internal assertions after one fixture
-variable-name correction. Retain its passed evidence. Next extend the complete
-struck-animation adapter for source lifecycles that accept a hit only while idle
-and stop at the animation endpoint, including the prepared tiger bobblehead.
-Its source uses quarter-speed playback, not the existing retriggerable half-speed
-behaviour; keep the entire callback and sound dependency. Judge's-bell material
-effects and other pending callbacks remain required as well.
+The first native hit-policy check passes 108 internal assertions. Retain its
+results and unchanged rolling/contact/material evidence. Next complete the
+endpoint-triggered hit variant and its full effect dependencies: judge's bell
+starts at half speed, accepts hits at the animation endpoint, and requests both
+a second singleton sound and a flash effect with ringside seating. Use the
+actual wall identity/artwork correspondence, not equal numeric indices. Its
+complete source is `src/furniture/ac_nog_gong.c` in the donor reference. Do not
+omit the flash/sound branch or delay it merely because it is item-specific.
+Other pending model/material callbacks remain required.
 
 Before a corrected translation-only handoff, combine the separate V2 museum
 header and official credits-title corrections. The current imported V3 already

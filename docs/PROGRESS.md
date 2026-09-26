@@ -32,30 +32,30 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
-The current explicit V3 proposal is ABI 208 at
-`build/v3-rolling-category-auto-02/cartridge/build-lock.json`. The ordinary
-importer installs complete displacement-driven rolling rigs, reusing their
-converted assets and existing sound dependencies. Stone coin retains its full
-model, directional rolling, stationary contact motion, movement sounds, and
-actual donor acquisition. There are 151 private development choices.
+The current explicit V3 proposal is ABI 212 at
+`build/v3-idle-hit-category-auto-02/cartridge/build-lock.json`. The ordinary
+importer supports the complete idle-only struck-animation policy: quarter-speed
+playback, ignored presses while moving, endpoint stopping, and source sound.
+Tiger bobblehead reuses its complete converted model and receives a new persistent
+identity without replacing an original item. It retains its actual Gulliver
+route, non-orderable catalogue status, and official English name. There are
+152 private development choices.
 
-The shared callbacks use checked N64 movement states rather than GameCube enum
-numbers. This corrects mower contact/fade, movement sounds, looping sounds, and
-trigger sounds. Rolling keeps private previous-position values because the
-native owner overwrites its own previous-position fields before callbacks.
+Seven focused host checks pass, covering source rejection, additive identity,
+sanitized animation/sound behaviour, complete installed resources, UPS
+reconstruction, and four browser/offline selection comparisons. The first native
+run passes 108 internal assertions for both hit policies, including real motion,
+stopping/restarting, complete model drawing, saved-state preservation, and guards.
+See the [idle-hit checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#idle-only-struck-animation-policy).
+Unchanged rolling, contact, and material evidence is retained.
 
-Six focused host checks pass, covering source rejection, sanitized changed
-callbacks, relocated records, installed resources, UPS reconstruction, and four
-browser/offline selection comparisons. Native construction, rolling, and drawing
-pass 110 internal assertions after one test-script variable correction;
-see the [rolling checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#displacement-driven-rolling-rigs)
-for evidence and limits. The extended shared packet reserves 20 KiB in Expansion
-Pak RAM, with 4,440 of 16,384 code bytes used. Existing record formats and model
-banks are preserved. Scroll code has 4 bytes spare; audio has 896 conservative
-bytes spare. Live sound synthesis, ordinary gameplay, and hardware are not newly
-verified.
+The shared packet uses 4,628 of its 16,384 code bytes, with no new RAM reservation
+or saved field. Scroll code has 4 bytes spare; audio has 672 conservative bytes
+spare. The new source trigger is mapped into its own sound-table group with
+complete instrument/sample data. Live synthesis, GPU appearance, ordinary
+gameplay/save/restart, and hardware are not newly verified.
 
-Saved format 4 is unchanged. A save using stone coin requires its selected import
+Saved format 4 is unchanged. A save using tiger bobblehead requires its selected import
 in the receiving build; preserve backups and equal-or-larger profiles. Format-4
 saves cannot load in V2 or format-1/2/3 V3 builds. Translation-only output remains
 the pinned V2-12 ROM. The main lock and both stable deployments remain unchanged.

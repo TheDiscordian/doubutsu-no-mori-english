@@ -376,7 +376,11 @@ def prepared_categories(source,directories):
                 mode=2;first=int(adapter['constants']['start_frame']['hex'],16)
                 last=int(adapter['constants']['end_frame']['hex'],16)
             elif category==HIT_CATEGORY:
-                mode=3;first=last=0
+                mode=3;hit=adapter.get('hit')
+                first=1 if hit else 0
+                last=struct.unpack('>I',struct.pack('>f',hit['playback_speed']))[0] if hit else 0
+                if hit and hit!=dict(idle_only=True,playback_speed=.25,stop_at_endpoint=True,clear_initial_pulse=False):
+                    raise ValueError('Unknown complete stopped-hit policy')
             elif category==BILLBOARD_CATEGORY:
                 mode=4;first=0x06000000+rig['billboard_offset'];last=0
             else:
@@ -424,7 +428,8 @@ def encode_packet(rows,sound_rows=(),material_rows=()):
     for r in rows:
         encode([r])  # Retain the complete existing object/pointer/work-area checks.
         mode,first,last=r.get('mode',0),r.get('first',0),r.get('last',0)
-        if (mode not in (0,1,2,3,4,5) or mode in (0,3) and (first or last) or
+        if (mode not in (0,1,2,3,4,5) or mode==0 and (first or last) or
+                mode==3 and (first,last) not in ((0,0),(1,0x3E800000)) or
                 mode==1 and not (0<first<r['joints'] and 0<last<r['joints'] and first!=last) or
                 mode==4 and (last or first&3 or not 0x06000000<=first<=0x06000000+r['bytes']-16) or
                 mode==5 and (last or not 0x3F800000<=first<=0x47000000) or
@@ -441,7 +446,7 @@ def encode_packet(rows,sound_rows=(),material_rows=()):
         for r in sound_rows:
             word=r['native_sound_word']
             if (not 1024<=r['runtime_index']<2048 or not 0<=word<=65535 or
-                    word&0x80 or (word&0x7FFF)>>8 not in (1,4)):
+                    word&0x80 or (word&0x7FFF)>>8 not in (0,1,4)):
                 raise ValueError('Invalid room sound identity or full native sound word')
             table.extend(struct.pack('>HHI',r['runtime_index'],word,0))
     if material_rows:

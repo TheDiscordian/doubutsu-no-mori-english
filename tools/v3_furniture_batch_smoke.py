@@ -547,6 +547,11 @@ def room_rigs(debug,rom_path,record,*,mode=2):
     if mode==4:debug.write_memory(game+0x1E5C,debug.read_memory(identity,64))
     rows=[r for r in rigs['rows'] if r.get('mode')==mode] if packet else rigs['rows']
     selected=[min(rows,key=lambda r:r['bytes']),max(rows,key=lambda r:r['bytes'])]
+    if mode==3:
+        # One complete representative of each source hit policy, independent
+        # of item identities and object size ordering.
+        policies=sorted({(r['first'],r['last']) for r in rows})
+        selected=[max((r for r in rows if (r['first'],r['last'])==policy),key=lambda r:r['bytes']) for policy in policies]
     if mode==1:
         unique={}
         for row in rows:unique.setdefault(row['source']['profile']['skeleton']['header']['donor_offset'],row)
@@ -597,10 +602,15 @@ def room_rigs(debug,rom_path,record,*,mode=2):
                 # Suppress synthesis through a native transition state; sound
                 # identity/program integrity and dispatch have separate checks.
                 debug.write_memory(actor+0x3C,struct.pack('>h',5))
-                for frame,speed,changed,want in ((1,0,1,1),(20,.5,0,21),(20,.5,1,1.5)):
+                if row['first']:
+                    end=floating(actor+0x138)
+                    cases=((1,0,0,0,1),(1,0,1,.25,1),(20,.25,0,.25,20.5),
+                        (20,.25,1,.25,20.5),(end,.25,1,0,end),(end,0,1,.25,1))
+                else:cases=((1,0,1,.5,1),(20,.5,0,.5,21),(20,.5,1,.5,1.5))
+                for frame,speed,changed,want_speed,want in cases:
                     debug.write_memory(actor+0x140,struct.pack('>2f',speed,frame))
                     debug.write_memory(actor+0x12D,bytes((changed,)));callback('mv',actor)
-                    check('hit/retrigger retains native source evaluation order',actor+0x140,struct.pack('>2f',.5,want))
+                    check('hit policy retains native source evaluation order',actor+0x140,struct.pack('>2f',want_speed,want))
                     check('room owner retains hit pulse',actor+0x12D,bytes((changed,)))
             elif mode==5:
                 # The real owner copies position to last_position before mv.

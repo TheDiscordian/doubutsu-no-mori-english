@@ -91,26 +91,46 @@ Room and catalogue frames retain the donor's wrapped and quantised scroll rates.
 ### Complete hit-animation rigs
 
 `switch-hit-keyframe-rig` checks complete donor create/move/draw implementations,
-paired resource relocations, animation constants, and both sound operands.
+paired resource relocations, animation constants, and every sound operand.
 Skeletons, all joint models, motions, textures, and the sound programme come from
 those bindings. Item identities and model names do not select the adapter.
 
-The shared 24-byte rig record uses mode 3 with zero extra parameters. It retains
+The shared 24-byte rig record uses mode 3. The retriggerable policy has zero
+extra parameters; the idle-only policy has first word 1 and second word the
+source speed 0.25 as a float. Unknown combinations reject. Both retain
 the existing six-joint limit, instance-local work vectors, frame-parity matrices,
-bounded complete model DMA, and room/catalogue index normalisation. Its complete
-sound dependency must be installed before the profile can become usable.
+bounded complete model DMA, and room/catalogue index normalisation. Complete
+sound dependencies must be installed before a profile can become usable.
 
 Construction retains the donor's stop initializer and initial evaluation at
-speed 0.5, then stops the motion and clears the hit pulse. The native initializer
-uses speed 1, so the callback explicitly supplies 0.5 before evaluating. Discovery
+speed 0.5, then stops the motion. The retriggerable policy clears the hit pulse;
+the idle-only policy preserves it, matching their complete source constructors.
+The native initializer uses speed 1, so the callback explicitly supplies 0.5
+before evaluating. Discovery
 checks the donor initializer's full code, relocations, and constants.
 
-Movement preserves the donor's evaluation order, including its second step while
-moving, restart on any nonzero hit pulse, and positioned sound. Donor excluded
+Retriggerable movement preserves the donor's evaluation order, including its
+second step while moving, restart on any nonzero hit pulse, and positioned sound. Donor excluded
 states 13/14/15/12 map to native states 5/6/13/15; the room owner retains ownership
 of clearing the pulse. Drawing uses the complete shared native rig drawer.
 Sound and rig rows may share an identity: profile binding must retain the model
 record while independently validating the complete audio record.
+
+The idle-only variant accepts a press only at zero speed. Its first evaluation
+occurs before assigning speed 0.25. While moving, it ignores further presses,
+evaluates twice unless the first evaluation reports completion, and explicitly
+sets speed to zero at that endpoint. Its complete callback shape, constants,
+initializer, and source trigger are checked independently of item identity.
+This preserves tiger bobblehead's full behaviour with its already converted
+two-joint model; it is not treated as a retriggerable mask.
+
+The shared sound records admit checked groups 0, 1, and 4. The audio importer
+retains complete source programmes, instruments, samples, and trigger priorities,
+using separate vacant slots in each group's table. It validates the actual room
+packet layout before updating sound records, including the extended code layout.
+Source `1FC4` has no native correspondence in the pinned worksheet or approved
+translation mappings. Its append-only destination is `3C3C`, runtime index 1807;
+the original furniture, display aliases, and existing imports keep their IDs.
 
 ### Shared password acquisition
 

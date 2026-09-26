@@ -1,5 +1,99 @@
 # Automatic furniture pipeline checkpoint
 
+## Idle-only struck-animation policy
+
+ABI 212 is `build/v3-idle-hit-category-auto-02/cartridge/build-lock.json`, with
+152 private development choices. The ordinary hit-category importer installs
+the complete idle-only policy, full sound dependency, inactive profile, and
+eligible item through the existing stages. Tiger bobblehead reuses its complete
+5,312-byte two-joint/two-model object; no artwork is reconverted.
+
+The source lifecycle accepts a press only at zero speed, evaluates before
+assigning speed 0.25, ignores presses while moving, and explicitly stops when
+the animation completes. The constructor preserves the existing hit pulse,
+unlike the retriggerable policy. Source code, constants, stop initializer,
+relocations, sound helper, and complete model/motion remain checked. Mode 3 uses
+policy parameter 1 and float 0.25; existing zero-parameter records are unchanged.
+
+The pinned worksheet and approved translation mappings confirm no native item
+correspondence for donor `1FC4`. Append-only destination `3C3C`, runtime index
+1807, preserves every existing furniture/display identity. The item keeps its
+2,320-Bell source price, non-orderable catalogue entry, Gulliver reward route,
+and official name in the single provenance catalogue.
+
+Source sound `007B` maps to vacant native group-0 word `006B`, with matching
+priority and a complete 28-byte programme. The shared audio importer already
+owns group-0 dispatch; room sound records now accept its checked group alongside
+1 and 4. One instrument adds 176 font bytes and 2,928 waveform bytes. Existing
+programmes, instruments, and samples remain preserved. The audio installer
+checks the actual extended room-table address rather than assuming a 4-KiB
+code prefix. No audio heap or fixed room reservation grows.
+
+Reproduction uses fresh output directories:
+
+```sh
+python3 tools/v3_furniture_pipeline.py import \
+  --category switch-hit-keyframe-rig \
+  --base-lock build/v3-rolling-category-auto-02/cartridge/build-lock.json \
+  --reuse-assets build/v3-fixed-keyframe-rigs-prepared-01 \
+  --output build/v3-idle-hit-category-auto-02
+python3 -m unittest tests.test_v3_furniture_rigs.HitResourceTests \
+  tests.test_v3_room_rig_runtime.BehaviourTests.test_extended_categories_under_sanitizers \
+  tests.test_v3_room_rig_runtime.CurrentImportedRigTests -v
+python3 tools/emulator_smoke.py \
+  --rom build/v3-idle-hit-category-auto-02/cartridge/animal-forest-v3-asset-loader.z64 \
+  --output build/v3-idle-hit-native-01 \
+  --scenario tests/scenarios/v3_hit_rigs.json \
+  --xvfb /home/discordian/Games/OpenRSC/headless/vendor/usr/bin/Xvfb \
+  --seconds 180 --expansion-pak --no-initial-screenshot
+```
+
+The actual successful build reuses the intermediate
+`build/v3-idle-hit-category-auto-01/prepared/` cache, which contains the same
+complete object from the fixed-rig preparation. The first build stops before
+creating a cartridge because the new source identity lacks a destination.
+The reviewed append-only registry entry resolves that missing dependency;
+no identity guard is bypassed.
+
+Seven host checks pass: three source checks and the sanitizer check in 3.244
+seconds, the additional identity check in 5.146 seconds, and two cartridge/
+composition checks in 19.084 seconds. They cover both complete hit policies,
+source mutation rejection, all native transition exclusions, aliases, repeated
+presses, completion, unchanged pulses, instance guards, actual installed profile/
+audio binding, UPS reconstruction, and none/all/new-category/existing-villager
+browser/offline equivalence.
+
+The first silent native run passes 146 scenario steps and 108 internal assertions.
+The shared fixture selects one full representative per hit policy rather than
+per item. Real loading, native frame evaluation, idle/active presses, endpoint
+stopping/restarting, complete model-list drawing, independent instances, packet
+CRC, saved-state preservation, and work/graphics/stack guards pass. There is no
+native retry. Sound synthesis is suppressed with an actual native transition
+state; the sound contract is covered by source/resource and host checks.
+
+GPU appearance, live synthesis, ordinary Gulliver interaction, ordinary room
+play/save/restart, and original hardware are not established by this fixture.
+No physical audio or explicit FlashRAM write is used. Retain unchanged evidence.
+
+- Room code: 4,628 of 16,384 bytes; packet: unchanged 20,480 bytes.
+- Bootstrap: 1,510 of 1,536 bytes; scrolling code: 4,092 of 4,096 bytes.
+- Audio allocation: unchanged 113,664 bytes, with 672 conservative bytes spare.
+- Cartridge import reservation: 1,531,760 bytes spare.
+- ROM SHA-256: `228de159c3dc964d9dec2c1cd543484bcdf4e0142366ee56a6f1613b59e12717`.
+- Report SHA-256: `cc092ac3f98c2bbbf0fa010b31f8c742e74023d8daa757dfc1560ba34518c040`.
+
+Saved format 4 is unchanged. Saves containing the new item require its selected
+profile in the receiving build; preserve backups and equal-or-larger selections.
+V2 and format-1/2/3 V3 cannot load format-4 saves. Unchanged format does not prove
+ordinary reload compatibility. Empty selection still produces the pinned V2-12
+ROM, SHA-256 `a09373b051cbcd93991e5dd6cb17a238a2afb1e2e2d7694d75408d24a55d4eee`.
+The main lock and both stable patcher deployments remain unchanged.
+
+Continue remaining complete behaviours and model/material conversion, including
+the judge's-bell endpoint-hit/conditional flash branch. Acquisition frontend and
+gold-tree work remain required after primary importing, without a blanket rule
+deferring item-specific importing behaviours.
+
 ## Displacement-driven rolling rigs
 
 ABI 208 is `build/v3-rolling-category-auto-02/cartridge/build-lock.json`, with

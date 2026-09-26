@@ -144,6 +144,35 @@ class HitResourceTests(unittest.TestCase):
         del changed.code_relocations[adapter['functions']['create']['offset']+0x12]
         with self.assertRaises(ValueError):changed.profile(0x3354)
 
+    def test_idle_only_variant_preserves_complete_lifecycle_and_sound(self):
+        from v3_sound_programs import furniture_trigger
+        profile=pipeline.prepare(self.source,0x1FC4)[0];a=profile['callback_adapter']
+        self.assertEqual(a['category'],rigs.HIT_CATEGORY)
+        self.assertEqual(a['hit'],dict(idle_only=True,playback_speed=.25,stop_at_endpoint=True,clear_initial_pulse=False))
+        self.assertFalse(a['constructor']['clears_switch_pulse']);self.assertEqual(a['pending_callbacks'],[])
+        self.assertEqual(len(profile['models']),2);self.assertEqual(a['skeleton']['joints'],2)
+        self.assertEqual(furniture_trigger(self.source,profile)['sound_word'],0x7B)
+        for row in [*a['functions'].values(),a['source_initializer']]:
+            changed=copy.copy(self.source);changed.rel=bytearray(changed.rel)
+            changed.rel[changed.sections[1][0]+row['offset']]^=1
+            with self.assertRaises(ValueError):changed.profile(0x1FC4)
+        for row in a['constants'].values():
+            changed=copy.copy(self.source);changed.rel=bytearray(changed.rel)
+            changed.rel[changed.sections[row['section']][0]+row['offset']]^=1
+            with self.assertRaises(ValueError):changed.profile(0x1FC4)
+
+    def test_idle_hit_legacy_identity_is_additive(self):
+        from v3_registry import LEGACY_FURNITURE,LEGACY_ROOM_ALIASES,CLOTHING_DISPLAYS,furniture_identity
+        from v3_villager_houses import item_dependencies
+        identity=pipeline.identity_rows(ROOT/'build/item-identity-megasheet.xlsx',include_unmapped_legacy=True)[0x1FC4]
+        self.assertTrue(all(identity[1].get(k)=='-' for k in ('C','H','CG','CJ')))
+        reviewed=item_dependencies((ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes(),
+            {'rel':self.source.rel},self.source.symbols,{0x1FC4})[0]
+        self.assertFalse(reviewed['reviewed_native_items']);self.assertFalse(reviewed['shared_identity_evidence'])
+        self.assertEqual(furniture_identity(0x1FC4),(1807,0x3C3C))
+        self.assertEqual(len(set(LEGACY_FURNITURE.values())),len(LEGACY_FURNITURE))
+        self.assertFalse(set(LEGACY_FURNITURE.values())&(set(LEGACY_ROOM_ALIASES.values())|set(CLOTHING_DISPLAYS.values())))
+
 
 class BillboardResourceTests(unittest.TestCase):
     @classmethod

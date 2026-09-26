@@ -24,7 +24,7 @@ from v3_registry import FURNITURE, LEGACY_FURNITURE, furniture_identity, furnitu
 from v3_room_aliases import discover as room_aliases, pending_reason as room_alias_reason
 from v3_villager_art import native_palette, normalise_vertex_flags
 
-VERSION = 20
+VERSION = 21
 PENDING_MOVE_CATEGORY = 'static-models-pending-move'
 LAYERS = ('opaque', 'opaque1', 'translucent', 'translucent1')
 BEHAVIOURS = {0: 'static', 1: 'front-seat', 2: 'any-direction-seat', 4: 'front-sofa',
