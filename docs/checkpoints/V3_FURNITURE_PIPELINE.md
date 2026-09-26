@@ -1,5 +1,46 @@
 # Automatic furniture pipeline checkpoint
 
+## Complete console-game dependencies
+
+Preparation: `build/v3-console-games-prepared-02/games.json` and `games.bin`.
+The 1,472,384-byte packet preserves nineteen complete donor images, original and
+converted metadata, sixty ordered save operations, and every default byte.
+Twenty checked furniture callbacks supply actual game/GBA IDs through shared
+fixed/indexed forms; no per-title installer is introduced. The cartridge stays
+ABI 238 with 157 choices, and both patcher deployments remain untouched.
+
+Twelve actual supplied games are additions. Eight are mapper zero; the other
+cartridges use mappers one/four/nine, and Clu Clu Land D is a complete QD image.
+The original N64 overlay has actual callbacks for those cartridge mappers, but
+execution, expanded graphics allocation, native launch/return, and persistence
+remain unfinished. QD support needs its complete disk dependency. The full save
+recipe addresses 1,623 payload bytes; the existing format-four capsule does not
+have room to append it without a new storage design.
+
+The source disk-system Zelda furniture requests game twenty, absent from both
+the English archive and its nineteen-row metadata table. It is an unused donor
+record, not a thirteenth supplied game needing only a callback. The original
+artwork and missing-payload receipt remain. Super Tortimer remains decorative.
+
+One exact source defect is corrected in prepared metadata: Baseball's six-byte
+GNM length becomes eight for its eight existing name bytes. Full original tags
+and the correction receipt remain; no arbitrary malformed tag is repaired.
+Soccer/Excitebike keep their real save IDs rather than archive-order guesses.
+
+Six focused tests pass: complete image validation and malformed-image rejection;
+ordered persistence operations and bounds; every full donor image/tag/default
+in the packet and all save ranges; the one bounded source-length correction;
+all indexed/fixed launch bindings, fallback, missing payload, and bad dependency
+rejection; and original native mapper receipts without execution claims.
+No unchanged ROM build or emulator run is repeated. Native work remains open,
+and no saved-format change has been installed.
+
+```sh
+python3 tools/v3_furniture_pipeline.py convert --representation console \
+  --assets-only --output build/v3-console-games-reproduction
+python3 -m unittest tests.test_v3_console_games -v
+```
+
 ## Bulk fixed and indexed material sequences
 
 Preparation: `build/v3-constant-materials-prepared-01/art.json`, based on the

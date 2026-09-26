@@ -24,7 +24,7 @@ from v3_registry import FURNITURE, LEGACY_FURNITURE, furniture_identity, furnitu
 from v3_room_aliases import discover as room_aliases, pending_reason as room_alias_reason
 from v3_villager_art import native_palette, normalise_vertex_flags
 
-VERSION = 25
+VERSION = 26
 PENDING_MOVE_CATEGORY = 'static-models-pending-move'
 PENDING_SEQUENCE_CATEGORY = 'constant-model-sequence-pending-lifecycle'
 LAYERS = ('opaque', 'opaque1', 'translucent', 'translucent1')
@@ -379,6 +379,8 @@ class Source:
             if role=='draw':continue
             body,_=self.function(receipt['offset'])
             if body!=bytes.fromhex('4e800020') or receipt['relocations']:pending.append(role)
+        from v3_console_games import launch_binding
+        launch=launch_binding(self,functions,index)
         return models,{0x09000000:pa},dict(
             category=PENDING_SEQUENCE_CATEGORY if pending else 'constant-model-sequence',
             vtable_symbol=name,vtable_offset=at,functions=functions,helpers=helpers,
@@ -387,7 +389,8 @@ class Source:
                 segment_address=0x08000000),
             constant_palette=dict(symbol=ps,donor_offset=pa,bytes=pn,source_sha256=sha256(self.data[pa:pa+pn]),
                 segment_address=0x09000000),
-            texture_bindings={0x08000000:ta},selection=selection)
+            texture_bindings={0x08000000:ta},selection=selection,
+            **({'console_launch':launch} if launch else {}))
 
     def static_sequence_models(self, name, at, functions):
         draw=functions['draw'];digest,pairs=STATIC_SEQUENCE_CODE[draw['bytes']]
@@ -1460,8 +1463,10 @@ def main():
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--select', action='append', default=[], help='Canonical donor ID; defaults to all supported new furniture')
     parser.add_argument('--category', help='Restrict to a discovered shared category, without an item list')
-    parser.add_argument('--representation', choices=('furniture','handheld','scenery','audio','rewards','lifecycle','surfaces'), default='furniture',
-                        help='Discover furniture, held equipment, scenery, audio, rewards, lifecycles, or room surfaces')
+    parser.add_argument('--representation', choices=('furniture','handheld','scenery','audio','rewards','lifecycle','surfaces','console'), default='furniture',
+                        help='Discover furniture, held equipment, scenery, audio, rewards, lifecycles, surfaces, or console games')
+    parser.add_argument('--donor-disc', type=Path, default=ROOT/'local/gamecube/Animal Crossing (USA, Canada).ciso',
+                        help='Verified English GameCube disc for console-game preparation')
     parser.add_argument('--assets-only', action='store_true',
                         help='convert only: prepare artwork even when metadata/acquisition is unsupported; never install')
     parser.add_argument('--base-lock', type=Path, default=ROOT/'config/v3-import-build.json')
@@ -1473,6 +1478,9 @@ def main():
         parser.error('Audio preparation requires convert --assets-only; dispatch/allocation integration is unfinished')
     if args.representation=='lifecycle' and (args.command!='convert' or not args.assets_only):
         parser.error('Lifecycle preparation requires convert --assets-only; missing dependencies remain explicit')
+    if args.representation=='console' and (args.command!='convert' or not args.assets_only
+            or args.select or args.category not in (None,'console-games')):
+        parser.error('Console preparation requires convert --assets-only and retains the complete shared game/save category')
     if args.category and args.command == 'scan': parser.error('--category requires convert or import')
     if args.reuse_assets and (args.command=='scan' or args.representation not in ('furniture','surfaces')):
         parser.error('--reuse-assets requires furniture convert/import or surface preparation')
@@ -1482,6 +1490,13 @@ def main():
     if output.exists() or not output.is_relative_to(ROOT/'build'): raise ValueError('Use a fresh ignored build path')
     source = Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
                     (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    if args.representation=='console':
+        from v3_console_games import prepare as prepare_consoles
+        report=prepare_consoles(source,args.donor_disc,output,
+            (ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes())
+        print(json.dumps(dict(games=len(report['rows']),furniture=len(report['furniture']),
+            bytes=report['bytes'],save_payload_bytes=report['save_payload_bytes'],runtime_installed=False)))
+        return
     if args.representation=='rewards':
         if args.category in ('password','password-policy'):
             if args.category=='password':from v3_password import prepare as prepare_password

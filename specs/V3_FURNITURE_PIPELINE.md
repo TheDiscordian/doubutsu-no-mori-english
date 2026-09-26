@@ -420,6 +420,13 @@ return instruction; real DMA behaviour remains unsupported, never discarded.
 The drawing-only Super Tortimer model follows its actual source semantics.
 Names and unused-game status alone do not select its behaviour.
 
+The [console-game converter](V3_CONSOLE_GAMES.md) retains complete game payloads,
+ordered save operations, source tags, and checked fixed/indexed launch arguments
+as one dependency batch. Prepared console artwork includes those launch receipts;
+missing native gameplay still prevents installation. The absent game-twenty
+payload is distinct from the twelve supplied additions. Existing native mapper
+callbacks do not by themselves establish complete launch or persistence support.
+
 The ordinary `import` dependency planner includes scrolling resources, complete
 positioned-loop/switch-fade audio, and draw-only or audio-backed profiles. Audio
 is installed before the scrolling lifecycle table; profiles follow full resource

@@ -21,15 +21,22 @@ prevent asset/data conversion or redirect work from an unfinished shared format.
 Incomplete gameplay stays unavailable in the selector; installing assets does
 not claim that an item is playable. Reuse unchanged passing tests throughout.
 
-Current task: close shared conversion gaps in the ordinary bulk importer.
-The fixed/indexed texture-palette category prepares all fourteen console models
-at `build/v3-constant-materials-prepared-01/` in one compiler container, retaining
-all label variants and complete geometry. Four focused checks pass. Thirteen
-game-bearing records keep their complete unresolved movement callbacks and stay
-ineligible; Super Tortimer's donor callback is drawing-only, with acquisition
-unresolved. Continue shared gameplay/source dependencies, including the native
-NES launch/emulator connection; do not mistake model preparation for playable
-games or add one installer per title. The checked ROM remains the proposal below.
+Current task: close shared conversion and gameplay gaps in the ordinary bulk
+importer. Console preparation at `build/v3-console-games-prepared-02/` retains
+all nineteen complete game payloads, sixty save operations, full source tags,
+and twenty furniture launch bindings. Six focused checks pass. Twelve game
+payloads are additions; the disk-system Zelda furniture requests an absent
+twentieth payload and is explicitly unused for this donor. The complete fourteen
+console models are reusable from `build/v3-constant-materials-prepared-01/`.
+Super Tortimer is drawing-only in the donor. No console import is enabled.
+
+Continue native launch/allocation/save integration and remaining unsupported
+model/material/animation categories. The N64 has actual mapper-one/four/nine
+callbacks, but their presence is not execution evidence. Its graphics allocation
+and current format-four save capsule cannot be assumed to hold the larger games
+and full 1,623-byte save payload. Keep complete data and fix those bounds; do not
+drop persistence or use per-title installers. See the
+[console specification](../specs/V3_CONSOLE_GAMES.md). The checked ROM remains below.
 
 The checked proposal is ABI 238 at
 `build/v3-scrolling-category-imports-01/profile-runtime/build-lock.json`, with

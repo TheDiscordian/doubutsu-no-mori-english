@@ -32,11 +32,21 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
+The shared console-game converter prepares all nineteen full donor games,
+sixty ordered persistence operations, original and converted metadata, and
+twenty source-derived launch bindings. Six focused checks pass. The twelve
+additional game payloads are retained; the leftover disk-system Zelda furniture
+has no corresponding payload in this donor. Native launch, larger-game memory,
+and persistent storage remain unfinished, so none is enabled. Actual native
+mapper callbacks are identified without claiming execution. See the
+[console checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#complete-console-game-dependencies).
+
 The shared fixed/indexed material converter prepares all fourteen console
 models, 68,320 bytes total, in one compiler run. It retains each source cartridge
 texture/palette, complete selector tables, and all geometry. Four focused source
-and compiled-artwork checks pass. Thirteen game-bearing models still need their
-game-launch lifecycle; their profiles remain unavailable. Super Tortimer is
+and compiled-artwork checks pass. Twelve new supplied games need their launch
+lifecycle; one unused disk-system model also lacks a game payload. Profiles
+remain unavailable. Super Tortimer is
 drawing-only in the donor, not a missing game implementation. This preparation
 does not change the cartridge or either deployment. See the
 [constant-material checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#bulk-fixed-and-indexed-material-sequences).
