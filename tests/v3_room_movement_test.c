@@ -39,7 +39,7 @@ int main(int argc,char **argv) {
     struct { u8 before[16];RoomScrollActor actor;u8 after[16]; } guarded;
     memset(&guarded,0xA7,sizeof(guarded));RoomScrollActor *actor=&guarded.actor;
     for (unsigned record=0;record<3;++record) for (unsigned alias=0;alias<2;++alias)
-        for (int floor=-1;floor<79;++floor) for (int state=0;state<9;++state)
+        for (int floor=-1;floor<79;++floor) for (int state=0;state<17;++state)
             for (int direction=0;direction<4;++direction) for (unsigned connected=0;connected<3;++connected) {
                 RoomMoveRecord *r=table->rows+(record<2 ? record : 0);
                 actor->index=record<2 ? r->index+1024*alias : 37;
@@ -49,10 +49,10 @@ int main(int argc,char **argv) {
                 RoomScrollActor original=*actor;
                 unsigned want=2,sound=26;
                 if (record==0) {
-                    want=connected==2 && state>=1 && state<=7;
+                    want=connected==2 && (state==1 || state==2 || state==9 || state==10 || state==11 || state==12 || state==14);
                     sound=direction==1 || direction==3 ? r->sound_a : r->sound_b;
                 } else if (record==1 && (floor==r->floor_a || floor==r->floor_b)) {
-                    want=connected==2 && state>=1 && state<=4 && !direction;sound=r->sound_a;
+                    want=connected==2 && (state==1 || state==9 || state==11 || state==14) && !direction;sound=r->sound_a;
                 }
                 calls=0;af_v3_room_scroll_move_sound(26,actor->position);
                 assert(calls==(want ? 1u : 0u));

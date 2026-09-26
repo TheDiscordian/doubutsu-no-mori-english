@@ -151,12 +151,12 @@ def install(base,prior,blob,core,original,output,directories):
     result=copy.deepcopy(prior['equipment_resources']);installed=result['room_rigs']
     module=blob[result['blob_offset']:result['blob_offset']+result['bytes']];packet=installed['packet']
     packet_data=blob[packet['blob_offset']:packet['blob_offset']+packet['bytes']]
-    if (installed['format']!='AFV3-ROOM-RIGS-2' or packet['bytes']!=runtime.PACKET_BYTES or
-            packet['ram']!=runtime.PACKET_RAM or sha256(module)!=result['sha256'] or
-            sha256(packet_data)!=packet['sha256'] or packet_data[4096:]!=runtime.encode_packet(
+    ram,table,size=runtime.packet_layout(installed)
+    if (installed['format']!='AFV3-ROOM-RIGS-2' or sha256(module)!=result['sha256'] or
+            sha256(packet_data)!=packet['sha256'] or packet_data[table-ram:]!=runtime.encode_packet(
                 installed['rows'],installed.get('sound_rows',[]),installed.get('material_rows',[])) or
-            EQUIPMENT_RAM+result['bytes']>runtime.PACKET_RAM or
-            runtime.PACKET_RAM+runtime.PACKET_BYTES>prior['furniture']['bank_pool']['start']):
+            EQUIPMENT_RAM+result['bytes']>ram or
+            ram+size>prior['furniture']['bank_pool']['start']):
         raise ValueError('Changed or overlapping complete shared material runtime')
     contract=native_contract(original,base,expected_sha=sha256(base))
     # Catalogue passes a null room owner; rooms pass the actual room owner.

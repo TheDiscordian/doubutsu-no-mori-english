@@ -1,5 +1,94 @@
 # Automatic furniture pipeline checkpoint
 
+## Displacement-driven rolling rigs
+
+ABI 208 is `build/v3-rolling-category-auto-02/cartridge/build-lock.json`, with
+151 private development choices. The ordinary import command installs complete
+rolling behaviour and profiles without a dedicated item installer. Stone coin
+retains its entire three-joint/two-model object, motion, existing movement audio,
+Gulliver reward route, non-orderable catalogue status, and official name.
+Its 3,168-byte object is reused; no graphics object or audio resource is rebuilt.
+
+Reproduction uses fresh output directories:
+
+```sh
+python3 tools/v3_furniture_pipeline.py import \
+  --category contact-rolling-keyframe-rig \
+  --base-lock build/v3-billboard-category-auto-02/cartridge/build-lock.json \
+  --reuse-assets build/v3-fixed-keyframe-rigs-prepared-01 \
+  --output build/v3-rolling-category-auto-02
+python3 -m unittest tests.test_v3_furniture_motion \
+  tests.test_v3_room_rig_runtime.CurrentImportedRigTests -v
+python3 tools/emulator_smoke.py \
+  --rom build/v3-rolling-category-auto-02/cartridge/animal-forest-v3-asset-loader.z64 \
+  --output build/v3-rolling-rigs-native-02 \
+  --scenario tests/scenarios/v3_rolling_rigs.json \
+  --xvfb /home/discordian/Games/OpenRSC/headless/vendor/usr/bin/Xvfb \
+  --seconds 180 --expansion-pak --no-initial-screenshot
+```
+
+Complete source callback, helper, constant, and relocation checks retain the
+source rolling directions, initial frame, speed rule, stationary contact motion,
+and stopped/null-contact cases. The importer requires the existing complete
+movement-sound binding before exposing the profile. The shared rig descriptor
+uses mode 5 and the source animation duration, not an item-specific callback.
+
+Native dispatch and transition code establish push states 9/11/14/1, pull states
+10/12/2, and sound-excluded transition states 5/6/13/15. GameCube enum values are
+not interchangeable with these. The same batch corrects the shared mower alpha,
+rolling/mower movement sounds, loop refresh, and switch-trigger sound readers.
+Native previous-position fields are overwritten before the callback, so rolling
+retains its previous X/Z in owned instance floats at `0204`/`0208`. Two source-rate
+evaluations with half displacement preserve the motion's source timing.
+
+Six host checks pass in 24.536 seconds. They cover complete source mutation
+rejection, the native square-root/state contracts, source constructor speed,
+displacement with overwritten native previous-position fields, aliases, null
+owners, all relevant movement states, memory-safety sanitizers, relocated tables,
+installed profiles, and UPS reconstruction. Existing contact, sound, movement,
+and fade fixtures run against current data and code, not historical cartridges.
+Four browser/offline comparisons cover none/all/new-category/existing-villager.
+
+The silent native retry passes 147 scenario steps, including 110 internal
+assertions. Real loading, CRC, construction, movement, forward/reverse endpoints,
+stopped motion, complete model-list drawing, both frame parities, independent
+instances, saved-state preservation, and work/graphics/stack guards pass. The
+initial attempt reached the completed rolling/drawing checks but a fixture loop
+variable shadowed its saved-state receipt. Renaming that local variable fixes
+the check; no game-code correction or third native attempt is needed.
+
+This verifies native drawing commands, not GPU appearance or an ordinary player
+pushing the item. Live sound synthesis, an ordinary Gulliver conversation,
+save/restart, and original-hardware acceptance are not newly established. No
+physical audio or explicit FlashRAM write is used. Retain unchanged evidence.
+
+The room packet moves to `804C8000..804CCFFF`, after the password packet and
+below the `80500000` model pool. It reserves 16 KiB for code and 4 KiB for the
+unchanged record formats. Sound/material addresses move with the table, while
+the stable callback vtables and checked lazy loader stay in the equipment module.
+The old rig reservation, scrolling packet, and surface packet remain intact.
+
+- Rig code: 4,440 of 16,384 bytes; complete packet: 20,480 bytes.
+- Bootstrap: 1,510 of 1,536 bytes; scrolling code: 4,092 of 4,096 bytes.
+- Cartridge import reservation: 1,572,224 bytes spare.
+- Audio allocation: unchanged 113,664 bytes, with 896 conservative bytes spare.
+- ROM SHA-256: `24021b66855449b9d9182242393799fb8ad8a91a9bde465300c3afb9e87b021e`.
+- Report SHA-256: `1bc957ca860e76277aadb3cb5878aae3aa85f50017917f9b37f3328fa9bcb527`.
+
+Saved format 4 is unchanged. A save with stone coin requires that selected import
+in the receiving profile; preserve backups and equal-or-larger selections.
+Format-4 saves cannot load in V2 or format-1/2/3 V3 builds. No ordinary cross-version
+reload is inferred from the unchanged format. Empty selection retains the pinned
+V2-12 ROM, SHA-256
+`a09373b051cbcd93991e5dd6cb17a238a2afb1e2e2d7694d75408d24a55d4eee`.
+The main lock and both stable patcher deployments remain unchanged.
+
+Continue complete model/material/animation and behaviour conversion. The
+non-retriggering, quarter-speed stopped-hit lifecycle is a remaining rig variant;
+its complete source is in `src/furniture/ac_ike_jny_hariko01.c` in the donor
+reference. Acquisition frontend and required gold-tree work remain queued after
+primary importing, without postponing item-specific importing behaviours.
+
 ## Camera-facing scrolling rigs
 
 The explicit ABI-205 proposal is

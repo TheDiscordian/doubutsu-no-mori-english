@@ -15,6 +15,7 @@ CLOCK_CATEGORY = 'indexed-loop-clock-rig'
 STORAGE_CATEGORY = 'open-close-storage-rig'
 HIT_CATEGORY = 'switch-hit-keyframe-rig'
 BILLBOARD_CATEGORY = 'billboard-scroll-keyframe-rig'
+from v3_furniture_motion import CATEGORY as ROLLING_CATEGORY
 # Complete fixed rig resources with explicit, still-unimplemented callbacks.
 # This category is deliberately not a native behaviour adapter.
 FIXED_CATEGORY = 'fixed-keyframe-rig-assets'
@@ -30,7 +31,7 @@ CLOCK_CODE = {
     'draw': (200, 'f6e60a96386c7721dcd0c894196eae1ee3e5c6339aadf921e2f95952ff7584de'),
     'destroy': (4, 'f332ea5b5437103cbb6f1508679da89eec9288ad775c96c439a17fccabe3de8e'),
 }
-RIG_CATEGORIES = (CATEGORY, CLOCK_CATEGORY, STORAGE_CATEGORY, HIT_CATEGORY, BILLBOARD_CATEGORY)
+RIG_CATEGORIES = (CATEGORY, CLOCK_CATEGORY, STORAGE_CATEGORY, HIT_CATEGORY, BILLBOARD_CATEGORY, ROLLING_CATEGORY)
 RESOURCE_CATEGORIES = RIG_CATEGORIES + (FIXED_CATEGORY,)
 CODE = {
     'create': (164, '2a86d61bc9aaf4a0a6479fe97a7f0d5dfe3dc42f9eea663eeb3fd1b8cbc35733'),
@@ -385,7 +386,7 @@ def discover_fixed(source, vtable_name, vtable_at, functions):
         runtime_contract=dict(binding='fixed',category=CLOCK_CATEGORY,
             source_initial_speed=.5,source_move_steps_per_native_update=2,
             source_initializer=init_receipt)
-    return descriptor['models'],{},dict(category=category,vtable_symbol=vtable_name,
+    result=dict(category=category,vtable_symbol=vtable_name,
         vtable_offset=vtable_at,functions=functions,helpers=helpers,joint_callbacks=callbacks,
         constructor=dict(mode=mode,initial_speed=dict(section=4,offset=speed,hex=raw_speed.hex(),value=value),
                          initial_play_before_speed=True),
@@ -394,6 +395,13 @@ def discover_fixed(source, vtable_name, vtable_at, functions):
         pending_callbacks=pending,**({'runtime_contract':runtime_contract} if runtime_contract else {}),
         resource_scope='complete fixed looping clock' if runtime_contract else
             'complete constructor rig; callback gameplay and spawned effects remain pending')
+    if category==FIXED_CATEGORY:
+        from v3_furniture_motion import discover
+        rolling=discover(source,result)
+        if rolling:
+            result.update(category=ROLLING_CATEGORY,rolling=rolling,pending_callbacks=[],
+                resource_scope='complete displacement-driven rolling rig')
+    return descriptor['models'],{},result
 
 
 def discover_clock(source, vtable_name, vtable_at, functions, index):

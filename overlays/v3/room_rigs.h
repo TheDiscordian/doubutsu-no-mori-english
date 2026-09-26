@@ -53,12 +53,15 @@ typedef struct {
 } RoomRigRecord;
 #define ROOM_RIG_MAGIC 0x41465232u
 #define ROOM_RIG_CAPACITY 128u
+#ifndef ROOM_RIG_TABLE_RAM
 #define ROOM_RIG_TABLE_RAM 0x804B9000u
+#endif
 #define ROOM_RIG_SWITCH 0u
 #define ROOM_RIG_CLOCK 1u
 #define ROOM_RIG_STORAGE 2u
 #define ROOM_RIG_HIT 3u
 #define ROOM_RIG_BILLBOARD 4u
+#define ROOM_RIG_ROLLING 5u
 #ifdef AF_V3_ROOM_BILLBOARD
 typedef struct {
     u32 flame;
@@ -115,7 +118,10 @@ typedef struct { u16 word;u8 rest[30]; } RoomNativeTrigger;
 #define ROOM_SOUND_CAPACITY 64u
 typedef struct { u32 magic,count,stride,reserved; RoomSoundRecord rows[ROOM_SOUND_CAPACITY]; } RoomSoundTable;
 #ifdef __mips__
-#define room_sound_table ((const RoomSoundTable *)0x804B9C10u)
+#ifndef ROOM_SOUND_TABLE_RAM
+#define ROOM_SOUND_TABLE_RAM 0x804B9C10u
+#endif
+#define room_sound_table ((const RoomSoundTable *)ROOM_SOUND_TABLE_RAM)
 #define room_native_triggers ((const volatile RoomNativeTrigger *)0x80113C34u)
 #else
 extern RoomSoundTable af_v3_test_room_sounds;

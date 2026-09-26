@@ -80,7 +80,7 @@ int main(void) {
         actor->index=(u16)(1070+variant*1024);actor->state=(s16)state;actor->changed=(u8)changed;
         unsigned before=sound_calls;RoomSoundActor saved=*actor;
         af_v3_room_sound_mv(actor,0,0,0);
-        unsigned added=changed==1 && !(state>=12 && state<=15);
+        unsigned added=changed==1 && !(state==5 || state==6 || state==13 || state==15);
         assert(sound_calls==before+added && !memcmp(actor,&saved,sizeof(saved)));
         if (added)assert(last_sound==0x816B && last_position==actor->position);
     }

@@ -22,20 +22,33 @@ Incomplete gameplay stays unavailable in the selector; installing assets does
 not claim that an item is playable. Reuse unchanged passing tests throughout.
 
 Current task: close shared conversion gaps in the ordinary bulk importer.
-The current checked proposal is ABI 205 at
-`build/v3-billboard-category-auto-02/cartridge/build-lock.json`, with 150 private
-development choices. Automatic rig/audio/profile installation covers the
-camera-facing scrolling category, including tiki torch's complete model,
-flame drawing, source loop, and stock route. Generic conversion also handles
-the existing campfire and bonfire without replacing their installed profiles.
-Reuse the converted assets and retained checks.
+The current checked proposal is ABI 208 at
+`build/v3-rolling-category-auto-02/cartridge/build-lock.json`, with 151 private
+development choices. Automatic category installation covers complete
+displacement-driven rolling rigs and enables stone coin through its actual
+donor route. Shared mower, movement, loop, and trigger callbacks use verified
+native movement-state identities. Converted artwork and existing audio are reused.
 Continue unsupported model/material/animation callbacks, including required
 item-specific behaviour; do not divert into acquisition frontend work.
-The shared rig packet has 144 code bytes spare. The checked audio allocator
-adds 1 KiB and has 896 conservative bytes spare. Respect these bounds when
-extending categories.
-See the [current checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#camera-facing-scrolling-rigs)
+The extended rig packet has 11,944 code bytes spare. The scroll module has only
+4 code bytes spare; further scroll behaviour requires a checked capacity
+extension or relocation, not omitted functionality. Audio has 896 conservative
+bytes spare. Respect these bounds when extending categories.
+See the [current checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#displacement-driven-rolling-rigs)
 for commands, evidence, and save compatibility.
+
+The rolling/native packet check passes 110 internal assertions after one fixture
+variable-name correction. Retain its passed evidence. Next extend the complete
+struck-animation adapter for source lifecycles that accept a hit only while idle
+and stop at the animation endpoint, including the prepared tiger bobblehead.
+Its source uses quarter-speed playback, not the existing retriggerable half-speed
+behaviour; keep the entire callback and sound dependency. Judge's-bell material
+effects and other pending callbacks remain required as well.
+
+Before a corrected translation-only handoff, combine the separate V2 museum
+header and official credits-title corrections. The current imported V3 already
+has both, but its pinned empty-selection V2-12 baseline retains `Animal Forest`.
+This does not authorise changing either stable deployment.
 
 The unfinished code-entry keyboard is parked source work, not the next task.
 Its first build stops at the V2 reconstruction helper's unrelated-resource

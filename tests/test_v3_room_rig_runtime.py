@@ -29,7 +29,7 @@ PROFILE_OUT=ROOT/os.environ.get('V3_ROOM_PROFILE_BUILD','build/v3-shared-room-pr
 class CurrentImportedRigTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.out=ROOT/os.environ.get('V3_IMPORTED_RIG_BUILD','build/v3-billboard-category-auto-02/cartridge')
+        cls.out=ROOT/os.environ.get('V3_IMPORTED_RIG_BUILD','build/v3-rolling-category-auto-02/cartridge')
         cls.image,cls.report=inputs(cls.out/'build-lock.json')
         cls.blob=by_vrom(cls.image)[BLOB].extract(cls.image)
         cls.source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
@@ -37,7 +37,7 @@ class CurrentImportedRigTests(unittest.TestCase):
         cls.rows=cls.report['automatic_furniture']['imports']
 
     def test_imported_category_keeps_rig_audio_profiles_and_reuses_assets(self):
-        from v3_furniture_rigs import HIT_CATEGORY,BILLBOARD_CATEGORY
+        from v3_furniture_rigs import HIT_CATEGORY,BILLBOARD_CATEGORY,ROLLING_CATEGORY
         from v3_furniture_pipeline import prepare
         from v3_furniture_install import profile
         r=self.report;e=r['equipment_resources'];rigs=e['room_rigs'];bindings=runtime.bind_profiles(self.source,self.image,r)
@@ -45,7 +45,7 @@ class CurrentImportedRigTests(unittest.TestCase):
         for row in self.rows:
             donor=row.get('donor_item_id',row['item_id']);descriptor=prepare(self.source,int(donor,16))[0]
             category=descriptor['callback_adapter']['category']
-            self.assertIn(category,(HIT_CATEGORY,BILLBOARD_CATEGORY))
+            self.assertIn(category,(HIT_CATEGORY,BILLBOARD_CATEGORY,ROLLING_CATEGORY))
             rig=next(x for x in rigs['rows'] if x['source_item_id']==donor)
             self.assertTrue(rig['parent_selectable'])
             if category==HIT_CATEGORY:
@@ -55,11 +55,14 @@ class CurrentImportedRigTests(unittest.TestCase):
                 self.assertTrue(sound['profile_installed']);self.assertTrue(sound['parent_selectable'])
                 self.assertEqual(audio['trigger'],json.loads(json.dumps(descriptor['callback_adapter']['trigger'])))
                 self.assertEqual(audio['trigger']['sound_word'],sound['source_sound_word'])
-            else:
+            elif category==BILLBOARD_CATEGORY:
                 audio=next(x for x in e['furniture_level_audio']['furniture'] if x['item_id']==donor)
                 self.assertEqual(rig['mode'],4)
                 self.assertEqual(audio['lifecycle'],descriptor['callback_adapter']['level_sound'])
                 self.assertEqual(rigs['billboard_contract'],runtime.billboard_contract(self.image,r))
+            else:
+                self.assertEqual(rig['mode'],5)
+                self.assertEqual(rigs['motion_contract'],runtime.motion_binding(self.source,self.image,r,rigs['rows']))
             self.assertEqual(row['object_sha256'],rig['sha256'])
             at=rig['blob_offset'];self.assertEqual(sha256(self.blob[at:at+rig['bytes']]),rig['sha256'])
             i=slot(int(row['item_id'],16));native=profile(row,rig['vrom'],limit=r['import_storage']['virtual_limit'])
@@ -67,8 +70,9 @@ class CurrentImportedRigTests(unittest.TestCase):
                 struct.pack('>HHI',row['runtime_index'],int(row['item_id'],16),1)+native+bytes(4))
             self.assertFalse(bindings[donor]['staged'])
             self.assertIn(row['id']+'/name',{x['id'] for x in json.loads((ROOT/'translations/provenance.json').read_bytes())['entries']})
-        self.assertEqual(rigs['packet']['bytes'],runtime.PACKET_BYTES)
-        self.assertLessEqual(rigs['code']['bytes'],runtime.PACKET_TABLE-runtime.PACKET_RAM)
+        ram,table,size=runtime.packet_layout(rigs)
+        self.assertEqual(rigs['packet']['bytes'],size)
+        self.assertLessEqual(rigs['code']['bytes'],table-ram)
         self.assertEqual(self.report['save_codec']['format_version'],4)
         self.assertEqual(apply_ups((ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes(),
             (self.out/'asset-loader.ups').read_bytes()),self.image)

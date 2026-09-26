@@ -8,7 +8,7 @@ extern void af_room_fault(const char *,const char *);
 static int load(void) {
     /* Startup reloads this cache word, even when Expansion Pak RAM survives a reset. */
     volatile u32 *ready=(volatile u32 *)0x804B1E00u;
-    void *packet=(void *)0x804B8000u;
+    void *packet=(void *)AF_ROOM_RAM;
     if (*ready==AF_ROOM_CRC) return 1;
     if (af_room_dma(packet,AF_ROOM_VROM,AF_ROOM_BYTES) ||
             af_room_crc(packet,AF_ROOM_BYTES)!=AF_ROOM_CRC) {

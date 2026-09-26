@@ -518,6 +518,7 @@ def room_rigs(debug,rom_path,record,*,mode=2):
     state=report['save_runtime']
     saved={at:debug.read_memory(at,n) for at,n in ((0x801458B8,4),(state['state_ram'],state['state_bytes']))}
     if mode==1:saved[0x80136FC4]=debug.read_memory(0x80136FC4,4)
+    if mode==5:saved[0x80136F2C]=debug.read_memory(0x80136F2C,4)
     size=0x8300 if mode==4 else 0x6200;allocation=call(0x8009BFC0,[size])
     if allocation&15 or not MODULE_RAM+0x8000<=allocation<=0x80400000-size:
         raise ValueError('Room-rig fixture outside native heap')
@@ -551,6 +552,8 @@ def room_rigs(debug,rom_path,record,*,mode=2):
         for row in rows:unique.setdefault(row['source']['profile']['skeleton']['header']['donor_offset'],row)
         selected=list(unique.values())
     put(game,graph)
+    if mode==5:
+        put(0x80136F2C,bridge+0x100);put(bridge+0x100,bridge+0x200)
     try:
         for iteration,row in enumerate(selected):
             parity=iteration&1
@@ -563,14 +566,15 @@ def room_rigs(debug,rom_path,record,*,mode=2):
                 debug.write_memory(target,b'\xA5'*0x740)
                 debug.write_memory(target,struct.pack('>H',row['runtime_index']))
                 if mode==4:debug.write_memory(target+0x714,struct.pack('>3f',1,1,1))
+                if mode==5:debug.write_memory(target+8,struct.pack('>3f',10,0,20))
                 debug.write_memory(target+0x12D,bytes(1));callback('ct',target)
-                check('initial per-instance speed and target',target+0x204,struct.pack('>2f',0,.5))
+                check('initial per-instance state',target+0x204,struct.pack('>2f',*((10,20) if mode==5 else (0,.5))))
                 check('native work vectors belong to this instance',target+0x158,
                       struct.pack('>2I',target+0x1A4,target+0x1DA))
-                initial=(.5,1.5) if mode in (1,4) else (0,1.5) if mode==3 else (0,1)
+                initial=(.5,1.5) if mode in (1,4) else (0,1.5) if mode in (3,5) else (0,1)
                 check('source initial speed and frame',target+0x140,struct.pack('>2f',*initial))
                 if packet:
-                    check('native category animation mode',target+0x148,struct.pack('>I',1 if mode in (1,4) else 0))
+                    check('native category animation mode',target+0x148,struct.pack('>I',1 if mode in (1,4,5) else 0))
                     check('complete lazily loaded room packet',packet['ram'],
                           blob[packet['blob_offset']:packet['blob_offset']+packet['bytes']])
                     check('startup cache remembers the verified packet',0x804B1E00,struct.pack('>I',packet['crc32']))
@@ -598,6 +602,28 @@ def room_rigs(debug,rom_path,record,*,mode=2):
                     debug.write_memory(actor+0x12D,bytes((changed,)));callback('mv',actor)
                     check('hit/retrigger retains native source evaluation order',actor+0x140,struct.pack('>2f',.5,want))
                     check('room owner retains hit pulse',actor+0x12D,bytes((changed,)))
+            elif mode==5:
+                # The real owner copies position to last_position before mv.
+                # Keep that ordering in the fixture instead of supplying a
+                # conveniently older value that the game never exposes.
+                for motion_state,direction,delta,forward in ((11,3,6,True),(12,3,8,False),(3,3,4,None),(1,0,4,None)):
+                    x=floating(actor+8)+delta
+                    debug.write_memory(actor+8,struct.pack('>3f',x,0,20))
+                    debug.write_memory(actor+0x14,struct.pack('>3f',x,0,20))
+                    debug.write_memory(actor+0x3C,struct.pack('>h',motion_state))
+                    put(bridge+0x200+0x1A0,direction);callback('mv',actor)
+                    expected=(.1+(delta*.5)/1.55)*.5 if forward is not None else 0
+                    actual=floating(actor+0x140)
+                    passed=abs(actual-expected)<.00001
+                    record(dict(rolling_motion_state=motion_state,direction=direction,speed=actual,
+                        expected_speed=expected,assertion='passed' if passed else 'failed'))
+                    if not passed:raise ValueError('Native rolling motion speed differs from source timing')
+                    assertions+=1
+                    if forward is not None:
+                        duration=struct.unpack('>f',struct.pack('>I',row['first']))[0]
+                        check('rolling forward/reverse endpoints',actor+0x134,
+                              struct.pack('>2f',*((1,duration) if forward else (duration,1))))
+                    check('per-instance previous position survives native overwrite',actor+0x204,struct.pack('>2f',x,20))
             elif mode==4:
                 # Its positional sound is unconditional. Do not call movement
                 # in this isolated fixture without the actual audio owner.
@@ -1748,6 +1774,7 @@ def exercise(debug, rom_path, record, *, section='automatic_furniture'):
     if section=='clock_rigs':return room_rigs(debug,rom_path,record,mode=1)
     if section=='hit_rigs':return room_rigs(debug,rom_path,record,mode=3)
     if section=='billboard_rigs':return room_rigs(debug,rom_path,record,mode=4)
+    if section=='rolling_rigs':return room_rigs(debug,rom_path,record,mode=5)
     if section=='item_categories':return item_categories(debug,rom_path,record)
     path = Path(rom_path)
     image = path.read_bytes()

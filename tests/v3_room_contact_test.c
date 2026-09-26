@@ -55,7 +55,7 @@ int main(void) {
             assert(!memcmp(actor,&expected,sizeof(expected)));
             af_v3_test_contact_clip=&clip;af_v3_test_contact_floor=floor;owner.direction=direction;
             steps=0;af_v3_room_scroll_mv(actor,NULL,NULL,NULL);
-            int active=(floor==48 || floor==74) && state>=1 && state<=4 && direction==0;
+            int active=(floor==48 || floor==74) && (state==1 || state==9 || state==11 || state==14) && direction==0;
             float want=0.04f;want+=0.04f*(1.0f-want);
             expected.colour.f=active ? want : 0.0f;
             assert(steps==(active ? 2u : 0u) && !memcmp(actor,&expected,sizeof(expected)));
@@ -63,7 +63,7 @@ int main(void) {
             assert(!memcmp(actor,&expected,sizeof(expected)));
             for (unsigned i=0;i<16;++i)assert(guarded.before[i]==0xAD && guarded.after[i]==0xAD);
         }
-    actor->index=1256;actor->state=4;af_v3_test_contact_floor=48;owner.direction=0;
+    actor->index=1256;actor->state=1;af_v3_test_contact_floor=48;owner.direction=0;
     for (unsigned missing=0;missing<2;++missing) {
         af_v3_test_contact_clip=missing ? &clip : NULL;clip.owner=NULL;
         actor->colour.f=1.0f;steps=0;af_v3_room_scroll_mv(actor,NULL,NULL,NULL);

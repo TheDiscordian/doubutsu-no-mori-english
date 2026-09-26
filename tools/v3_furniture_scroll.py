@@ -557,7 +557,8 @@ def install(base,prior,blob,core,original,output,directories):
             sha256(blob[packet['blob_offset']:packet['blob_offset']+packet['bytes']])!=packet['sha256'] or
             EQUIPMENT_RAM+result['bytes']>room.PACKET_RAM or
             result['scenery']['ram']+result['scenery']['additional_fixed_resident_bytes']>room.PACKET_RAM or
-            packet['ram']+packet['bytes']>RAM or RAM+BYTES>prior['furniture']['bank_pool']['start']):
+            not (packet['ram']+packet['bytes']<=RAM or RAM+BYTES<=packet['ram']) or
+            RAM+BYTES>prior['furniture']['bank_pool']['start']):
         raise ValueError('Changed shared material runtime or overlapping scroll reservation')
     contract=native_contract(original,base,expected_sha=sha256(base))
     debug_at=0x8007A0C0-CODE_RAM
@@ -685,4 +686,4 @@ SOURCES=('tools/v3_furniture_scroll.py','tools/v3_furniture_contact.py','tools/v
     'tools/v3_room_rig_runtime.py','tools/v3_sound_programs.py','overlays/v3/room_scroll.c','overlays/v3/room_scroll.h','overlays/v3/room_scroll.ld',
     'overlays/v3/room_materials.c','overlays/v3/room_materials.h','overlays/v3/room_rigs.c',
     'overlays/v3/room_rigs_packet.ld','overlays/v3/room_rigs.h','overlays/v3/room_rigs_bootstrap.c',
-    'overlays/v3/room_rigs_bootstrap.ld')
+    'overlays/v3/room_rigs_bootstrap.ld','overlays/v3/room_motion.h')

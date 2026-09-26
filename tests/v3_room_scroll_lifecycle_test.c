@@ -79,13 +79,13 @@ int main(int argc,char **argv) {
                 assert(active->saved_switch==(r->flags ? on : 2));
                 active->private_switch=1;active->colour.f=r->maximum;
             }
-            for (int state=11;state<=16;++state) {
+            for (int state=0;state<=16;++state) {
                 active->state=state;active->changed=0;loops=clicks=0;
                 af_v3_room_scroll_mv(active,NULL,NULL,NULL);
-                assert(loops==((state>=12 && state<=15) ? 0u : r->mode==1 ? 1u : 2u));
+                assert(loops==((state==5 || state==6 || state==13 || state==15) ? 0u : r->mode==1 ? 1u : 2u));
             }
             if (r->on) {
-                active->state=12;active->changed=1;loops=clicks=0;
+                active->state=5;active->changed=1;loops=clicks=0;
                 af_v3_room_scroll_mv(active,NULL,NULL,NULL);
                 assert(!loops && clicks==1 && last_click==r->off);
             }

@@ -11,15 +11,16 @@ sAdo_OngenTrgStart = 0x800D1D58;
 sAdo_OngenPos = 0x800D1D08;
 _Matrix_to_Mtx = 0x800E139C;
 osWritebackDCache = 0x8002FE00;
+sqrtf = 0x80033470;
 af_v3_fire_before = 0x80483810;
 af_v3_fire_after = 0x80483B00;
 SECTIONS {
-    . = 0x804B8000;
+    . = DEFINED(AF_ROOM_ORIGIN) ? AF_ROOM_ORIGIN : 0x804B8000;
     .text : { *(.text.af_v3_room_rig_ct) *(.text .text.*) }
     .rodata : { *(.rodata .rodata.*) }
     .data : { *(.data .data.*) }
     .bss (NOLOAD) : { *(.bss .bss.* COMMON) }
-    ASSERT(. <= 0x804B9000, "Room rig code overlaps its records")
+    ASSERT(. <= (DEFINED(AF_ROOM_CODE_LIMIT) ? AF_ROOM_CODE_LIMIT : 0x804B9000), "Room rig code overlaps its records")
     ASSERT(SIZEOF(.data) == 0 && SIZEOF(.bss) == 0, "Unexpected shared room-rig state")
     /DISCARD/ : { *(.comment .note.* .reginfo .MIPS.abiflags .pdr .gnu.attributes) }
 }

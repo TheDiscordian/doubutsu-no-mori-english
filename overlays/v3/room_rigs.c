@@ -1,5 +1,38 @@
 /* Complete shared room rigs; each record retains its actual behaviour. */
 #include "room_rigs.h"
+#include "room_motion.h"
+#ifdef AF_V3_ROOM_ROLLING
+typedef struct { u8 prefix[0x1A0];int direction; } RoomMotionOwner;
+typedef struct { RoomMotionOwner *owner; } RoomMotionClip;
+#ifdef __mips__
+#define room_motion_clip (*(RoomMotionClip *volatile *)0x80136F2Cu)
+#else
+extern RoomMotionClip *af_v3_test_motion_clip;
+#define room_motion_clip af_v3_test_motion_clip
+#endif
+extern float sqrtf(float);
+static void rolling_move(RoomRig *actor,const RoomRigRecord *r) {
+    /* The native owner overwrites last_position before invoking callbacks.
+       Retain previous X/Z in this category's instance-local spare vectors. */
+    float dx=actor->position[0]-actor->speed.f,dz=actor->position[2]-actor->target.f;
+    actor->speed.f=actor->position[0];actor->target.f=actor->position[2];
+    RoomKeyframe *key=&actor->keyframe;key->speed.f=0.0f;
+    RoomMotionClip *clip=room_motion_clip;
+    if (clip && clip->owner) {
+        int direction=clip->owner->direction;
+        int push=room_push_state(actor->state),pull=room_pull_state(actor->state);
+        if ((push || pull) && (direction==1 || direction==3)) {
+            float distance=sqrtf(dx*dx+dz*dz);
+            key->speed.f=(0.1f+(distance*0.5f)/1.55f)*0.5f;
+            int forward=push ? direction==3 : direction==1;
+            key->start=forward ? 1.0f : r->first.f;
+            key->end=forward ? r->first.f : 1.0f;
+        }
+    }
+    /* Two donor-rate evaluations preserve the movement-independent base speed. */
+    cKF_SkeletonInfo_R_play(key);cKF_SkeletonInfo_R_play(key);
+}
+#endif
 
 #ifdef AF_V3_ROOM_TRIGGER_SOUND
 static void trigger(u32 index,float *position) {
@@ -21,7 +54,7 @@ static void trigger(u32 index,float *position) {
 }
 void af_v3_room_sound_mv(RoomSoundActor *actor,void *room,RoomRigGame *game,u8 *data) {
     (void)room;(void)game;(void)data;
-    if (!actor || actor->changed!=1 || (actor->state>=12 && actor->state<=15)) return;
+    if (!actor || actor->changed!=1 || room_transition_state(actor->state)) return;
     trigger(actor->index,actor->position);
 }
 #endif
@@ -40,7 +73,12 @@ static const RoomRigRecord *find(u32 index) {
                 (r->skeleton&3) || r->skeleton<0x06000000u || r->skeleton>0x06000000u+r->bytes-8 ||
                 (r->animation&3) || r->animation<0x06000000u || r->animation>0x06000000u+r->bytes-20) return 0;
 #ifdef AF_V3_ROOM_RIG_PACKET
-        if (r->reserved || r->mode>ROOM_RIG_BILLBOARD) return 0;
+        if (r->reserved || r->mode>ROOM_RIG_ROLLING) return 0;
+#ifdef AF_V3_ROOM_ROLLING
+        if (r->mode==ROOM_RIG_ROLLING && (r->last.bits || r->first.bits<0x3F800000u || r->first.bits>0x47000000u)) return 0;
+#else
+        if (r->mode==ROOM_RIG_ROLLING) return 0;
+#endif
 #ifdef AF_V3_ROOM_BILLBOARD
         if (r->mode==ROOM_RIG_BILLBOARD && (r->last.bits || (r->first.bits&3) ||
                 r->first.bits<0x06000000u || r->first.bits>0x06000000u+r->bytes-16)) return 0;
@@ -76,6 +114,15 @@ void af_v3_room_rig_ct(RoomRig *actor,u8 *data) {
 #endif
         cKF_SkeletonInfo_R_init_standard_repeat(&actor->keyframe,animation,(void *)0);
     actor->speed.bits=0;actor->target.bits=0x3F000000u;
+#ifdef AF_V3_ROOM_ROLLING
+    if (r->mode==ROOM_RIG_ROLLING) {
+        actor->keyframe.speed.f=0.5f;
+        cKF_SkeletonInfo_R_play(&actor->keyframe);
+        actor->keyframe.speed.f=0.0f;
+        actor->speed.f=actor->position[0];actor->target.f=actor->position[2];
+        return;
+    }
+#endif
 #ifdef AF_V3_ROOM_RIG_PACKET
     if (r->mode==ROOM_RIG_HIT) {
         /* The donor initializer supplies .5; the native one supplies 1.
@@ -96,15 +143,18 @@ void af_v3_room_rig_ct(RoomRig *actor,u8 *data) {
 void af_v3_room_rig_mv(RoomRig *actor,void *room,RoomRigGame *game,u8 *data) {
     FloatWord high,idle,step;
     (void)room;(void)game;
-    if (!data || !find(actor->index)) return;
-#ifdef AF_V3_ROOM_RIG_PACKET
     const RoomRigRecord *r=find(actor->index);
+    if (!data || !r) return;
+#ifdef AF_V3_ROOM_RIG_PACKET
+#ifdef AF_V3_ROOM_ROLLING
+    if (r->mode==ROOM_RIG_ROLLING) { rolling_move(actor,r);return; }
+#endif
 #ifdef AF_V3_ROOM_BILLBOARD
     if (r->mode==ROOM_RIG_BILLBOARD) {
         const RoomBillboard *p=Lib_SegmentedToVirtual((void *)(uptr)r->first.bits);
         cKF_SkeletonInfo_R_play(&actor->keyframe);
         actor->keyframe.speed.bits=0x3F000000u;
-        if (!p->suppress_states || (actor->state!=5 && actor->state!=6 && actor->state!=13 && actor->state!=15))
+        if (!p->suppress_states || !room_transition_state(actor->state))
             sAdo_OngenPos((u32)(uptr)actor,p->sound,actor->position);
         return;
     }
@@ -117,7 +167,7 @@ void af_v3_room_rig_mv(RoomRig *actor,void *room,RoomRigGame *game,u8 *data) {
             key->speed.bits=0x3F000000u;
         }
         if (actor->changed) {
-            if (actor->state!=5 && actor->state!=6 && actor->state!=13 && actor->state!=15)
+            if (!room_transition_state(actor->state))
                 trigger(actor->index,actor->position);
             key->current.bits=0x3F800000u;
             cKF_SkeletonInfo_R_play(key);

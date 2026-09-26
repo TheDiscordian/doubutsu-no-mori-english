@@ -1,5 +1,6 @@
 /* Complete scrolling layers share immutable, frame-owned commands and matrix. */
 #include "room_scroll.h"
+#include "room_motion.h"
 
 static const RoomScrollRecord *scroll_find(u32 index) {
     if (index>=2048u && index<3072u) index-=1024u;
@@ -160,7 +161,7 @@ void af_v3_room_scroll_mv(RoomScrollActor *actor,void *room,RoomRigGame *game,u8
         RoomContactClip *clip=room_contact_clip;
         int floor=room_contact_floor;
         if (clip && clip->owner && (floor==r->on || floor==r->off) &&
-                actor->state>=1 && actor->state<=4 && clip->owner->direction==0) target=1.0f;
+                room_push_state(actor->state) && clip->owner->direction==0) target=1.0f;
         /* Two real source steps preserve both exponential easing and the
            minimum-step tail. Doubling a single fraction changes that timing. */
         for (u32 half=0;half<2;++half)
@@ -168,7 +169,7 @@ void af_v3_room_scroll_mv(RoomScrollActor *actor,void *room,RoomRigGame *game,u8
         return;
     }
 #endif
-    int audible=actor->state<12 || actor->state>15;
+    int audible=actor->state!=5 && actor->state!=6 && actor->state!=13 && actor->state!=15;
     if (r->mode==1) {
         if (audible) sAdo_OngenPos((u32)(uptr)actor,(u8)r->sound,actor->position);
         return;
@@ -213,14 +214,14 @@ void af_v3_room_scroll_move_sound(u32 floor,float *position) {
             if (r->index!=index || index<1024 || index>=2048) continue;
             RoomContactClip *clip=room_contact_clip;
             if (r->mode==1) {
-                if (actor->state>=1 && actor->state<=7 && clip && clip->owner) {
+                if ((room_push_state(actor->state) || room_pull_state(actor->state)) && clip && clip->owner) {
                     int direction=clip->owner->direction;
                     sAdo_OngenTrgStart(direction==1 || direction==3 ? r->sound_a : r->sound_b,position);
                 }
                 return;
             }
             if (r->mode==2 && (room_contact_floor==r->floor_a || room_contact_floor==r->floor_b)) {
-                if (actor->state>=1 && actor->state<=4 && clip && clip->owner && clip->owner->direction==0)
+                if (room_push_state(actor->state) && clip && clip->owner && clip->owner->direction==0)
                     sAdo_OngenTrgStart(r->sound_a,position);
                 return;
             }

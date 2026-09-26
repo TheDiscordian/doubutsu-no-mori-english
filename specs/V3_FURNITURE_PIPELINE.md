@@ -13,8 +13,9 @@ material, or rig converter. Keep incomplete gameplay out of selectable imports.
 ### Automatic category dependencies
 
 Furniture `import` plans implemented category dependencies from the selected
-source records and checked current build. Clock, storage, hit-animation, and
-camera-facing scrolling rigs share this path. Missing rig resources, required audio, and complete behaviour
+source records and checked current build. Clock, storage, hit-animation,
+camera-facing scrolling, and displacement-driven rolling rigs share this path.
+Missing rig resources, required audio, and complete behaviour
 profiles are installed through the existing guarded runtime builder in that
 order. Ordinary item installation follows a fresh eligibility check against the
 resulting build. Missing acquisition remains explicit, not fabricated shop stock.
@@ -25,6 +26,43 @@ across stages, and already installed dependencies are skipped. Every stage has
 an immutable build lock; `pipeline.json` records the dependency plan, actual
 steps, imports, pending reasons, and final lock. A dependency-only build does not
 claim that pending items are available to players.
+
+### Displacement-driven rolling rigs
+
+`contact-rolling-keyframe-rig` recognises the complete source lifecycle,
+including its repeat initializer, movement helper, contact reader, constants,
+resource relocations, skeleton, motion, and every joint model. It uses no item-ID
+switch. Existing converted artwork and movement-sound bindings are reused.
+The ordinary importer installs the missing rig and profile stages, then enables
+eligible records through their actual acquisition and catalogue metadata.
+
+Mode 5 stores the animation duration as its first floating-point parameter and
+zero as its second parameter. Construction evaluates the source's initial frame
+at speed 0.5 and then stops. Movement retains forward/reverse rolling, stationary
+contact motion, and stopped behaviour for other directions or absent contact.
+Two half-displacement evaluations per N64 update preserve source timing.
+
+Native furniture states differ from the donor's enum. Checked dispatch and
+transition code map push states to 9/11/14/1, pull states to 10/12/2, and
+birth/bye/death/birth-wait exclusions to 5/6/13/15. These mappings also govern
+the shared mower contact/fade, movement sounds, looping sounds, and trigger
+sounds; a donor state number is never used directly as a native condition.
+
+The native owner overwrites `last_position` before the item callback; the donor
+does so afterward. Mode 5 therefore retains previous X/Z in its own unused
+instance floats at `0204` and `0208`. Those fields are outside its joint/morph
+vectors and are not saved. A straightforward read of native `last_position`
+would incorrectly suppress all displacement-dependent rolling.
+
+The shared room packet supports a checked 20-KiB layout at
+`804C8000..804CCFFF`: 16 KiB of code followed by the unchanged 4-KiB table format
+at `804CC000`. Sound/material tables move with that table; stable callback
+vtables and the CRC-checked loader remain in the equipment module. The password
+packet ends at this reservation's start, and the model pool starts at `80500000`.
+The old rig, scrolling, and surface reservations remain untouched. Existing
+8-KiB packets remain valid inputs; extension migrates complete records and
+checks both cartridge capacity and neighbouring RAM reservations. No saved
+layout or scene-actor allocation grows.
 
 ### Camera-facing scrolling rigs
 
@@ -1725,11 +1763,11 @@ switch-driven repeat, clock-driven repeat, or native storage opening/closing.
 No item-specific callback or installer is needed. Actual profile/acquisition
 eligibility remains separate; installing resources does not enable items.
 
-The current runtime owns `804B8000..804B9FFF`: 4 KiB for code and 4 KiB for a
-header, up to 128 twenty-four-byte descriptors, and zero padding. This sits after
-the gold-tree code's `804B5000..804B7FFF` reservation and before the fixed model
-pool. Future reservation growth must preserve both owners. It adds 8 KiB of
-fixed Expansion Pak space without growing scene actors or model banks.
+The runtime accepts the legacy `804B8000..804B9FFF` packet and the extended
+`804C8000..804CCFFF` packet described above. Both have a 4-KiB table with a header,
+up to 128 twenty-four-byte descriptors, sound/material records, and padding.
+The larger code reservation preserves the gold-tree, scrolling, surface, and
+password owners, without growing scene actors or model banks.
 
 Each descriptor contains the canonical index, complete object length, skeleton
 and animation pointers, joint/visible counts, category, zero reserved byte, and

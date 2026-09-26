@@ -23,7 +23,10 @@ typedef struct {
 _Static_assert(sizeof(RoomMaterialRecord)==40,"Material row size");
 ROOM_CHECK(RoomMaterialPlay,play_frame,0x1EA0);
 #ifdef __mips__
-#define room_material_table ((const RoomMaterialTable *)0x804B9E20u)
+#ifndef ROOM_MATERIAL_TABLE_RAM
+#define ROOM_MATERIAL_TABLE_RAM 0x804B9E20u
+#endif
+#define room_material_table ((const RoomMaterialTable *)ROOM_MATERIAL_TABLE_RAM)
 #else
 extern RoomMaterialTable af_v3_test_room_materials;
 #define room_material_table (&af_v3_test_room_materials)

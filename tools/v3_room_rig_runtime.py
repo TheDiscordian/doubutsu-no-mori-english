@@ -8,7 +8,7 @@ from aflib import CODE_RAM,CODE_VROM,by_vrom,sha256
 from v3_asset_loader import ROOT,BLOB,compile_part
 from v3_equipment_runtime import RAM as EQUIPMENT_RAM,retired_module_space
 from v3_furniture_pipeline import Source,prepare,room_aliases,PreparedAssets
-from v3_furniture_rigs import CATEGORY,CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY,suffix
+from v3_furniture_rigs import CATEGORY,CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY,ROLLING_CATEGORY,suffix
 from v3_registry import (furniture_representation_identity,ROOM_ALIAS_REGISTRY_VERSION,
                          furniture_identity,furniture_source,furniture_source_index)
 from v3_import_storage import ROWS,ITEMS,slot,END
@@ -18,6 +18,7 @@ from v3_resource_capacity import checked_limit
 RAM,TABLE,VTABLE,LIMIT,CAPACITY = 0x804B1800,0x804B1E00,0x804B1FA0,0x804B1FE0,24
 MAGIC=0x41465231
 PACKET_RAM,PACKET_TABLE,PACKET_BYTES,PACKET_CAPACITY=0x804B8000,0x804B9000,8192,128
+EXTENDED_RAM,EXTENDED_TABLE,EXTENDED_BYTES=0x804C8000,0x804CC000,20480
 PACKET_MAGIC=0x41465232
 SOUND_TABLE,SOUND_VTABLE,SOUND_MAGIC,SOUND_CAPACITY=0x804B9C10,0x804B1FC0,0x41465331,64
 MATERIAL_TABLE,MATERIAL_VTABLE,MATERIAL_MAGIC,MATERIAL_CAPACITY=0x804B9E20,0x804B1E10,0x41464D31,11
@@ -30,7 +31,25 @@ SOURCES=('tools/v3_room_rig_runtime.py','tools/v3_asset_loader.py','tools/v3_fur
     'overlays/v3/room_materials.c','overlays/v3/room_materials.h',
     'overlays/v3/room_rigs.c','overlays/v3/room_rigs.h','overlays/v3/room_rigs.ld','overlays/v3/room_billboards.c',
     'overlays/v3/held_rigs.ld','overlays/v3/room_rigs_packet.ld',
-    'overlays/v3/room_rigs_bootstrap.c','overlays/v3/room_rigs_bootstrap.ld')
+    'overlays/v3/room_rigs_bootstrap.c','overlays/v3/room_rigs_bootstrap.ld',
+    'tools/v3_furniture_motion.py','overlays/v3/room_motion.h','overlays/v3/room_rigs_extended.ld')
+
+
+def packet_layout(runtime):
+    packet=runtime['packet'];ram=packet['ram'];table=runtime['table_ram'];size=packet['bytes']
+    if (ram,table,size) not in ((PACKET_RAM,PACKET_TABLE,PACKET_BYTES),(EXTENDED_RAM,EXTENDED_TABLE,EXTENDED_BYTES)):
+        raise ValueError('Unknown complete room packet layout')
+    return ram,table,size
+
+
+def motion_binding(source,base,report,rows):
+    from v3_furniture_motion import native_contract
+    from v3_room_movement import checked_binding
+    contract=native_contract(base);sounds=checked_binding(source,base,report)
+    ids=[r['source_item_id'] for r in rows if r.get('mode')==5]
+    if any(sounds.get(donor,{}).get('mode')!=1 for donor in ids):
+        raise ValueError('Rolling motion needs its complete movement sound integration')
+    return dict(native=contract,movement={donor:sounds[donor] for donor in ids})
 
 
 def install_profiles(base,prior,blob,core,original,output,directories):
@@ -82,7 +101,7 @@ def install_profiles(base,prior,blob,core,original,output,directories):
         for row in art['objects']:
             donor=row['item_id'];item=int(donor,16);prepared_row=prepare(source,item)
             descriptor=prepared_row[0];category=descriptor.get('callback_adapter',{}).get('category')
-            if (category not in (CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY,'switch-trigger-sound',MATERIAL_CATEGORY,SCROLL_CATEGORY) or
+            if (category not in (CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY,ROLLING_CATEGORY,'switch-trigger-sound',MATERIAL_CATEGORY,SCROLL_CATEGORY) or
                     donor in occupied or item not in identities or
                     row['profile']!=json.loads(json.dumps(descriptor)) or
                     row['native_profile_scalar_hex']!=descriptor['scalar_hex']):
@@ -138,7 +157,7 @@ def install_profiles(base,prior,blob,core,original,output,directories):
                     raise ValueError('Prepared scrolling resource is not completely installed')
                 vrom=installed['vrom'];vtable=SCROLL_VTABLE;reused_asset=True
                 installed.update(lifecycle_installed=True,lifecycle=json.loads(json.dumps(lifecycle)))
-            elif category in (CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY):
+            elif category in (CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY,ROLLING_CATEGORY):
                 installed=rigs.get(donor)
                 if (not installed or installed['profile_installed'] or installed['source']!=row or
                         installed['bytes']!=len(data) or installed['sha256']!=sha256(data) or
@@ -234,9 +253,10 @@ def bind_profiles(source,base,report):
         raise ValueError('Unknown staged furniture profile format')
     blob=by_vrom(base)[BLOB].extract(base);e=report['equipment_resources'];runtime=e['room_rigs']
     packet=runtime['packet'];raw=blob[packet['blob_offset']:packet['blob_offset']+packet['bytes']]
+    packet_ram,table_ram,_=packet_layout(runtime)
     module=blob[e['blob_offset']:e['blob_offset']+e['bytes']]
     if (sha256(blob)!=report['blob_sha256'] or sha256(raw)!=packet['sha256'] or
-            sha256(module)!=e['sha256'] or raw[PACKET_TABLE-PACKET_RAM:]!=encode_packet(runtime['rows'],runtime['sound_rows'],runtime.get('material_rows',[])) or
+            sha256(module)!=e['sha256'] or raw[table_ram-packet_ram:]!=encode_packet(runtime['rows'],runtime['sound_rows'],runtime.get('material_rows',[])) or
             module[VTABLE-EQUIPMENT_RAM:VTABLE-EQUIPMENT_RAM+20].hex()!=runtime['vtable_hex'] or
             module[SOUND_VTABLE-EQUIPMENT_RAM:SOUND_VTABLE-EQUIPMENT_RAM+20].hex()!=runtime['sound_vtable_hex'] or
             blob[0x20:0xE0].hex()!=report['save_runtime']['profile_hex']):
@@ -257,6 +277,9 @@ def bind_profiles(source,base,report):
     if any(r.get('mode')==4 for r in runtime['rows']):
         if runtime.get('billboard_contract')!=billboard_contract(base,report):
             raise ValueError('Changed installed billboard helper bindings')
+    if any(r.get('mode')==5 for r in runtime['rows']):
+        if runtime.get('motion_contract')!=motion_binding(source,base,report,runtime['rows']):
+            raise ValueError('Changed installed rolling motion bindings')
     for row,enabled in [(r,False) for r in staged.get('rows',[])]+[(r,True) for r in activated]:
         item=int(row['item_id'],16);donor=f'{furniture_source(row)[0]:04X}';i=slot(item);binding=bindings.get(donor)
         if (donor in source.runtime_profiles or not binding or not binding['profile_installed'] or
@@ -336,7 +359,7 @@ def prepared_categories(source,directories):
         for row in art['objects']:
             donor=row['item_id'];item=int(donor,16);prepared_row=prepare(source,item)
             profile=prepared_row[0];adapter=profile.get('callback_adapter',{});category=adapter.get('category')
-            if category not in (CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY):
+            if category not in (CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY,ROLLING_CATEGORY):
                 raise ValueError('Unimplemented additional room-rig category')
             if (row['profile']!=json.loads(json.dumps(profile)) or donor in assets or
                     row['native_profile_scalar_hex']!=profile['scalar_hex'] or
@@ -354,8 +377,10 @@ def prepared_categories(source,directories):
                 last=int(adapter['constants']['end_frame']['hex'],16)
             elif category==HIT_CATEGORY:
                 mode=3;first=last=0
-            else:
+            elif category==BILLBOARD_CATEGORY:
                 mode=4;first=0x06000000+rig['billboard_offset'];last=0
+            else:
+                mode=5;first=struct.unpack('>I',struct.pack('>f',adapter['rolling']['duration']))[0];last=0
             rows.append(dict(source_item_id=donor,item_id=f'{destination:04X}',runtime_index=index,
                 bytes=len(data),sha256=sha256(data),category=category,mode=mode,first=first,last=last,
                 skeleton=0x06000000+rig['skeleton_offset'],animation=0x06000000+rig['animation_offset'],
@@ -399,9 +424,10 @@ def encode_packet(rows,sound_rows=(),material_rows=()):
     for r in rows:
         encode([r])  # Retain the complete existing object/pointer/work-area checks.
         mode,first,last=r.get('mode',0),r.get('first',0),r.get('last',0)
-        if (mode not in (0,1,2,3,4) or mode in (0,3) and (first or last) or
+        if (mode not in (0,1,2,3,4,5) or mode in (0,3) and (first or last) or
                 mode==1 and not (0<first<r['joints'] and 0<last<r['joints'] and first!=last) or
                 mode==4 and (last or first&3 or not 0x06000000<=first<=0x06000000+r['bytes']-16) or
+                mode==5 and (last or not 0x3F800000<=first<=0x47000000) or
                 mode==2 and not 0x3F800000<=first<last<=0x43800000):
             raise ValueError('Invalid complete room-rig behaviour parameters')
         table.extend(struct.pack('>HHIIBBBBII',r['runtime_index'],r['bytes'],r['skeleton'],r['animation'],
@@ -470,37 +496,42 @@ def billboard_contract(base,report):
 def publish_packet(equipment,blob,output):
     """Compile shared behaviour once and publish it through the stable room vtable."""
     runtime=equipment['room_rigs'];packet=runtime['packet'];at=packet['blob_offset']
+    packet_ram,table_ram,packet_bytes=packet_layout(runtime)
+    table_delta=table_ram-PACKET_TABLE
     sound_rows=runtime.get('sound_rows',[]);material_rows=runtime.get('material_rows',[])
     defines=('AF_V3_ROOM_RIG_PACKET',)+(('AF_V3_ROOM_TRIGGER_SOUND',) if sound_rows else ())
     billboard=any(r.get('mode')==4 for r in runtime['rows'])
     if billboard:defines+=('AF_V3_ROOM_BILLBOARD',)
-    code,compiled=compile_part('room_rigs_packet',output/'room_rigs_packet',
+    if any(r.get('mode')==5 for r in runtime['rows']):defines+=('AF_V3_ROOM_ROLLING',)
+    defines+=(f'ROOM_RIG_TABLE_RAM=0x{table_ram:X}u',f'ROOM_SOUND_TABLE_RAM=0x{SOUND_TABLE+table_delta:X}u',
+              f'ROOM_MATERIAL_TABLE_RAM=0x{MATERIAL_TABLE+table_delta:X}u')
+    code,compiled=compile_part('room_rigs_extended' if packet_ram==EXTENDED_RAM else 'room_rigs_packet',output/'room_rigs_packet',
         primary_source='overlays/v3/room_rigs.c',defines=defines,
         extra_sources=(('overlays/v3/room_materials.c',) if material_rows else ())+
             (('overlays/v3/room_billboards.c',) if billboard else ()))
     table=encode_packet(runtime['rows'],sound_rows,material_rows)
-    data=code.ljust(PACKET_TABLE-PACKET_RAM,b'\0')+table
-    if len(code)>PACKET_TABLE-PACKET_RAM or len(data)!=PACKET_BYTES or not zlib.crc32(data):
+    data=code.ljust(table_ram-packet_ram,b'\0')+table
+    if len(code)>table_ram-packet_ram or len(data)!=packet_bytes or not zlib.crc32(data):
         raise ValueError('Room code/table exceeds owned packet or has an invalid cache identity')
     symbols=compiled['symbols'];entries=[symbols['af_v3_room_rig_'+role] for role in ('ct','mv','dw')]
-    if any(p&3 or not PACKET_RAM<=p<PACKET_RAM+len(code) for p in entries):
+    if any(p&3 or not packet_ram<=p<packet_ram+len(code) for p in entries):
         raise ValueError('Room lifecycle entry escapes packet')
     sound_defines=()
     if sound_rows:
         entry=symbols['af_v3_room_sound_mv']
-        if entry&3 or not PACKET_RAM<=entry<PACKET_RAM+len(code):raise ValueError('Room sound entry escapes packet')
+        if entry&3 or not packet_ram<=entry<packet_ram+len(code):raise ValueError('Room sound entry escapes packet')
         sound_defines=(f'AF_ROOM_SOUND_MV=0x{entry:X}u',)
     material_defines=()
     if material_rows:
         entry=symbols['af_v3_room_material_dw']
-        if entry&3 or not PACKET_RAM<=entry<PACKET_RAM+len(code):raise ValueError('Material entry escapes packet')
+        if entry&3 or not packet_ram<=entry<packet_ram+len(code):raise ValueError('Material entry escapes packet')
         material_defines=(f'AF_ROOM_MATERIAL_DW=0x{entry:X}u',)
     scroll_defines=()
     if runtime.get('scrolling'):
         from v3_furniture_scroll import publish as publish_scroll
         scroll_defines=publish_scroll(equipment,blob,output)
     boot,bootstrap=compile_part('room_rigs_bootstrap',output/'room_rigs_bootstrap',defines=(
-        f'AF_ROOM_VROM=0x{BLOB+at:X}u',f'AF_ROOM_BYTES={PACKET_BYTES}u',f'AF_ROOM_CRC=0x{zlib.crc32(data):X}u',
+        f'AF_ROOM_RAM=0x{packet_ram:X}u',f'AF_ROOM_VROM=0x{BLOB+at:X}u',f'AF_ROOM_BYTES={packet_bytes}u',f'AF_ROOM_CRC=0x{zlib.crc32(data):X}u',
         *(f'AF_ROOM_{role.upper()}=0x{entry:X}u' for role,entry in zip(('ct','mv','dw'),entries)),*sound_defines,*material_defines,*scroll_defines))
     start=equipment['blob_offset'];module=bytearray(blob[start:start+equipment['bytes']])
     if sha256(module)!=equipment['sha256']:raise ValueError('Changed installed equipment before room publication')
@@ -542,7 +573,7 @@ def publish_packet(equipment,blob,output):
         move=bootstrap['symbols']['af_v3_room_boot_sound_mv'] if any(r.get('move_category')=='switch-trigger-sound' for r in material_rows) else 0
         material_vtable=struct.pack('>5I',0,move,entry,0,0)
         module[MATERIAL_VTABLE-EQUIPMENT_RAM:MATERIAL_VTABLE-EQUIPMENT_RAM+20]=material_vtable
-        runtime.update(material_vtable=MATERIAL_VTABLE,material_vtable_hex=material_vtable.hex(),material_table=MATERIAL_TABLE)
+        runtime.update(material_vtable=MATERIAL_VTABLE,material_vtable_hex=material_vtable.hex(),material_table=MATERIAL_TABLE+table_delta)
     module[VTABLE-EQUIPMENT_RAM:VTABLE-EQUIPMENT_RAM+20]=vtable
     if sound_rows:
         entry=bootstrap['symbols']['af_v3_room_boot_sound_mv']
@@ -552,7 +583,7 @@ def publish_packet(equipment,blob,output):
             raise ValueError('Occupied room sound vtable reservation')
         sound_vtable=struct.pack('>5I',0,entry,0,0,0)
         module[SOUND_VTABLE-EQUIPMENT_RAM:SOUND_VTABLE-EQUIPMENT_RAM+20]=sound_vtable
-        runtime.update(sound_vtable=SOUND_VTABLE,sound_vtable_hex=sound_vtable.hex(),sound_table=SOUND_TABLE)
+        runtime.update(sound_vtable=SOUND_VTABLE,sound_vtable_hex=sound_vtable.hex(),sound_table=SOUND_TABLE+table_delta)
     blob[at:at+len(data)]=data;blob[start:start+len(module)]=module
     packet.update(sha256=sha256(data),crc32=zlib.crc32(data))
     runtime.update(code=compiled,bootstrap=bootstrap,table_sha256=sha256(table),
@@ -571,7 +602,8 @@ def extend(base,prior,blob,core,original,output,directories):
     is_packet=runtime['format']=='AFV3-ROOM-RIGS-2'
     if is_packet:
         packet=runtime['packet'];boot=runtime['bootstrap']
-        if sha256(blob[packet['blob_offset']:packet['blob_offset']+PACKET_BYTES])!=packet['sha256']:
+        packet_layout(runtime)
+        if sha256(blob[packet['blob_offset']:packet['blob_offset']+packet['bytes']])!=packet['sha256']:
             raise ValueError('Changed complete installed room packet')
     elif runtime['format']=='AFV3-ROOM-RIGS-1':
         boot=runtime['code']
@@ -594,7 +626,18 @@ def extend(base,prior,blob,core,original,output,directories):
                 any(blob[ITEMS+i*32:ITEMS+(i+1)*32]) or blob[0x40+i//8]&(1<<(i&7))):
             raise ValueError('Additional room category collides with an installed identity')
     all_rows=sorted(copy.deepcopy(runtime['rows'])+rows,key=lambda r:r['runtime_index']);encode_packet(all_rows)
-    needed=sum(len(d) for d in assets.values())+(0 if is_packet else PACKET_BYTES)
+    rolling=any(r.get('mode')==5 for r in all_rows)
+    large=rolling or is_packet and runtime['packet']['ram']==EXTENDED_RAM
+    new_packet=not is_packet or large and runtime['packet']['ram']!=EXTENDED_RAM
+    packet_ram,table_ram,packet_bytes=(EXTENDED_RAM,EXTENDED_TABLE,EXTENDED_BYTES) if large else (PACKET_RAM,PACKET_TABLE,PACKET_BYTES)
+    if large:
+        # The password packet ends at the new reservation's start; the model
+        # pool remains above it. Other resident category packets stay intact.
+        password=old.get('passwords',{})
+        if (not password or password['ram']+password['bytes']>packet_ram or
+                packet_ram+packet_bytes>prior['furniture']['bank_pool']['start']):
+            raise ValueError('Expanded room packet overlaps an existing owner')
+    needed=sum(len(d) for d in assets.values())+(packet_bytes if new_packet else 0)
     reuse=retired_module_space(base,prior,blob,needed)
     contract=extended_contract(base,core,original)
     billboard=any(r.get('mode')==4 for r in all_rows)
@@ -608,16 +651,17 @@ def extend(base,prior,blob,core,original,output,directories):
         blob.extend(bytes(cursor+needed-len(blob)))
     result=copy.deepcopy(old);installed=result['room_rigs']
     if billboard_binding:installed['billboard_contract']=billboard_binding
-    if not is_packet:
-        installed['packet']=dict(ram=PACKET_RAM,bytes=PACKET_BYTES,blob_offset=cursor,vrom=BLOB+cursor)
-        cursor+=PACKET_BYTES
+    if rolling:installed['motion_contract']=motion_binding(source,base,prior,all_rows)
+    if new_packet:
+        installed['packet']=dict(ram=packet_ram,bytes=packet_bytes,blob_offset=cursor,vrom=BLOB+cursor)
+        cursor+=packet_bytes
     for r in rows:
         data=assets[r['source_item_id']];at=cursor;cursor+=len(data)
         blob[at:cursor]=data;r.update(blob_offset=at,vrom=BLOB+at)
     installed.update(format='AFV3-ROOM-RIGS-2',categories=sorted(set(runtime.get('categories',[]))|
         {CATEGORY,CLOCK_CATEGORY,STORAGE_CATEGORY}|{r['category'] for r in rows}),rows=all_rows,
-        table_ram=PACKET_TABLE,capacity=PACKET_CAPACITY,ram=PACKET_RAM,extended_native_contract=contract,
-        additional_resident_bytes=0 if is_packet else PACKET_BYTES,
+        table_ram=table_ram,capacity=PACKET_CAPACITY,ram=packet_ram,extended_native_contract=contract,
+        additional_resident_bytes=packet_bytes if new_packet else 0,
         artwork_bytes=runtime['artwork_bytes']+sum(len(d) for d in assets.values()))
     installed.setdefault('additional_sources',[]).extend(evidence)
     installed.setdefault('reservations',[]).append(reuse or dict(
@@ -762,7 +806,8 @@ def refresh_code(equipment,blob,output):
     runtime=equipment['room_rigs']
     if runtime['format']=='AFV3-ROOM-RIGS-2':
         packet=runtime['packet'];at=packet['blob_offset']
-        if sha256(blob[at:at+PACKET_BYTES])!=packet['sha256']:raise ValueError('Changed complete room packet')
+        packet_layout(runtime)
+        if sha256(blob[at:at+packet['bytes']])!=packet['sha256']:raise ValueError('Changed complete room packet')
         return publish_packet(equipment,blob,output)
     old=runtime['code'];start=equipment['blob_offset']
     module=bytearray(blob[start:start+equipment['bytes']]);at=RAM-EQUIPMENT_RAM

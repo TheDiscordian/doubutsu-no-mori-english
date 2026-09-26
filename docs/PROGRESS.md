@@ -16,6 +16,12 @@ for exact checks, limits, and hashes. The explicit V3 proposal below includes
 this correction and pins its no-import output to V2-12; the main lock and both
 deployments retain their existing builds.
 
+The museum-header V2-12 baseline still contains `Animal Forest` in its credits.
+The separate `build/v2-official-credits-12/` image and current imported V3 use
+the official `Animal Crossing` title. These V2 corrections need combining
+before a corrected translation-only handoff; neither stable deployment changes
+without approval.
+
 ## Active development
 
 The active work is the importing pipelines: extraction, conversion, bulk
@@ -26,26 +32,30 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
-The current explicit V3 proposal is ABI 205 at
-`build/v3-billboard-category-auto-02/cartridge/build-lock.json`. The ordinary
-importer automatically installs missing rig, audio, and behaviour dependencies,
-then eligible items, while reusing converted assets and skipping installed stages.
-Its camera-facing scrolling category preserves complete skeletons, all models,
-flame transforms, texture timing, and source sound rules. Tiki torch is installed
-with its actual B-stock route and official English name. Generic preparation
-also handles campfire and bonfire; their existing specialised imports remain
-intact. There are 150 private development choices.
+The current explicit V3 proposal is ABI 208 at
+`build/v3-rolling-category-auto-02/cartridge/build-lock.json`. The ordinary
+importer installs complete displacement-driven rolling rigs, reusing their
+converted assets and existing sound dependencies. Stone coin retains its full
+model, directional rolling, stationary contact motion, movement sounds, and
+actual donor acquisition. There are 151 private development choices.
 
-Six focused host checks pass, covering source rejection, sanitized behaviour,
-complete installed resources, UPS reconstruction, and four browser/offline
-selection comparisons. Native construction and drawing pass 92 internal checks;
-see the [billboard checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#camera-facing-scrolling-rigs)
-for the result and limits. Movement with the live sound engine, GPU appearance,
-ordinary gameplay, and hardware are not newly verified. The shared packet remains
-8 KiB, with 3,952 of 4,096 code bytes used. The existing checked audio allocator
-adds 1 KiB, leaving 896 conservative bytes spare.
+The shared callbacks use checked N64 movement states rather than GameCube enum
+numbers. This corrects mower contact/fade, movement sounds, looping sounds, and
+trigger sounds. Rolling keeps private previous-position values because the
+native owner overwrites its own previous-position fields before callbacks.
 
-Saved format 4 is unchanged. A save using tiki torch requires its selected import
+Six focused host checks pass, covering source rejection, sanitized changed
+callbacks, relocated records, installed resources, UPS reconstruction, and four
+browser/offline selection comparisons. Native construction, rolling, and drawing
+pass 110 internal assertions after one test-script variable correction;
+see the [rolling checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#displacement-driven-rolling-rigs)
+for evidence and limits. The extended shared packet reserves 20 KiB in Expansion
+Pak RAM, with 4,440 of 16,384 code bytes used. Existing record formats and model
+banks are preserved. Scroll code has 4 bytes spare; audio has 896 conservative
+bytes spare. Live sound synthesis, ordinary gameplay, and hardware are not newly
+verified.
+
+Saved format 4 is unchanged. A save using stone coin requires its selected import
 in the receiving build; preserve backups and equal-or-larger profiles. Format-4
 saves cannot load in V2 or format-1/2/3 V3 builds. Translation-only output remains
 the pinned V2-12 ROM. The main lock and both stable deployments remain unchanged.
