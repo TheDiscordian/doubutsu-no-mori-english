@@ -24,7 +24,7 @@ from v3_registry import FURNITURE, LEGACY_FURNITURE, furniture_identity, furnitu
 from v3_room_aliases import discover as room_aliases, pending_reason as room_alias_reason
 from v3_villager_art import native_palette, normalise_vertex_flags
 
-VERSION = 23
+VERSION = 24
 PENDING_MOVE_CATEGORY = 'static-models-pending-move'
 LAYERS = ('opaque', 'opaque1', 'translucent', 'translucent1')
 BEHAVIOURS = {0: 'static', 1: 'front-seat', 2: 'any-direction-seat', 4: 'front-sofa',
@@ -1231,14 +1231,23 @@ def rig_import_plan(inventory, report, bindings, selected=(), category=None, *, 
     """Plan shared dependencies, not per-item installers or acquisition guesses."""
     from v3_furniture_rigs import CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY,ROLLING_CATEGORY
     from v3_furniture_materials import CATEGORY as MATERIAL_CATEGORY,initializer_lifecycle,steam_lifecycle
+    from v3_furniture_scroll import CATEGORY as SCROLL_CATEGORY,draw_only_lifecycle
     from v3_furniture_reactions import source_lifecycle as reaction_lifecycle,colour_lifecycle
-    from v3_sound_programs import furniture_trigger
+    from v3_sound_programs import furniture_trigger,furniture_level
     categories={CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY,ROLLING_CATEGORY}
     candidates=[r for r in inventory['rows'] if r.get('asset_ready') and not r['installed'] and
         not r.get('room_alias') and (not selected or r['item_id'] in selected) and
         (category is None or category in r['categories'])]
     rows=[r for r in candidates if r['profile'].get('callback_adapter',{}).get('category') in categories]
     material_rows=[];material_audio=[];material_loops=[];effects=set()
+    scroll_rows=[];scroll_loops=[]
+    for r in candidates:
+        if r['profile'].get('callback_adapter',{}).get('category')!=SCROLL_CATEGORY:continue
+        empty=draw_only_lifecycle(r['profile'],source)
+        loop=furniture_level(source,r['profile']) if source is not None and empty is None else None
+        if empty or loop:
+            scroll_rows.append(r)
+            if loop:scroll_loops.append(r['item_id'])
     static_rows=[r for r in candidates if r['profile'].get('callback_adapter',{}).get('category')=='static-interaction']
     for r in candidates:
         if r['profile'].get('callback_adapter',{}).get('category')!=MATERIAL_CATEGORY:continue
@@ -1260,8 +1269,12 @@ def rig_import_plan(inventory, report, bindings, selected=(), category=None, *, 
                       set(material_audio)|{r['item_id'] for r in static_rows if r['profile']['callback_adapter'].get('trigger')})-audio),
         loops=sorted(({r['item_id'] for r in rows if r['profile']['callback_adapter'].get('level_sound')}|
                       {r['item_id'] for r in static_rows if r['profile']['callback_adapter'].get('level_sound')}|
-                      set(material_loops))-loops),
-        profiles=sorted(r['item_id'] for r in rows+material_rows+static_rows if r['item_id'] not in bindings))
+                      set(material_loops)|set(scroll_loops))-loops),
+        profiles=sorted(r['item_id'] for r in rows+material_rows+static_rows+scroll_rows if r['item_id'] not in bindings))
+    if scroll_rows:
+        installed={r['source_item_id']:r for r in report['equipment_resources']['room_rigs'].get('scrolling',{}).get('rows',[])}
+        plan['scrolling']=sorted(r['item_id'] for r in scroll_rows if r['item_id'] not in installed or
+            r['item_id'] in scroll_loops and not installed[r['item_id']].get('lifecycle_installed'))
     if static_rows:
         melodies={r['item_id'] for r in report['equipment_resources'].get('furniture_melody_audio',{}).get('furniture',[])}
         plan['melodies']=sorted(r['item_id'] for r in static_rows
@@ -1302,7 +1315,8 @@ def import_batch(source, worksheet, output, lock, selected=(), category=None, re
         report=refresh_runtime(directory,current,**arguments);current=directory/'build-lock.json'
         base,report=inputs(current)
         steps.append(dict(stage=label,lock=str(current.relative_to(ROOT)),sha256=report['output_sha256']))
-    all_assets=sorted(set(plan['resources'])|set(plan['profiles'])|set(plan.get('materials',[])))
+    all_assets=sorted(set(plan['resources'])|set(plan['profiles'])|set(plan.get('materials',[]))|
+        set(plan.get('scrolling',[])))
     if all_assets:
         complete=output/'prepared'
         convert(source,worksheet,complete,all_assets,installed,assets_only=True,reuse_assets=cache)
@@ -1325,6 +1339,8 @@ def import_batch(source, worksheet, output, lock, selected=(), category=None, re
             audio=output/'loop-audio'
             prepare_furniture_levels(base,report,source,inventory,audio,plan['loops'])
             refresh('loop-audio-runtime',furniture_audio_art=audio)
+        if plan.get('scrolling'):
+            refresh('scrolling-runtime',scrolling_materials_art=[bundle(plan['scrolling'],'scrolling-assets')])
         if plan.get('melodies'):
             from v3_furniture_melody import prepare_batch as prepare_melodies
             audio=output/'melody-audio'

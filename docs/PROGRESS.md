@@ -32,9 +32,18 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
-The checked proposal is ABI 236 at
-`build/v3-periodic-material-imports-04/cartridge/build-lock.json`, with
-157 development choices. The ordinary importer installs chowder's complete
+The checked proposal is ABI 238 at
+`build/v3-scrolling-category-imports-01/profile-runtime/build-lock.json`, with
+157 development choices. Scrolling-material imports now automatically prepare
+complete artwork, install any required loop audio, and bind finished profiles.
+Beach table retains its complete body, translucent glass, and moving bubbles;
+its island acquisition remains unfinished, so its complete profile stays inactive.
+The existing native renderer handles all three model lists without new code.
+Four focused checks pass, including complete compiled artwork, the shared renderer
+under sanitizers, retained resources, and four browser/offline compositions.
+See the [scrolling checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#automatic-scrolling-category-imports).
+
+The ordinary importer installs chowder's complete
 three-part model, two-frame texture animation, periodic steam, complete five-note
 sound loop, both envelopes, instrument, and sample. Actual winter-camper
 acquisition is enabled without substituting shop stock. Shared material/audio
@@ -142,7 +151,7 @@ fixture omitted that allocation. Do not repeat the passed bell checks.
 
 Room code uses 15,536 of 16,384 bytes; bootstrap uses 1,521 of 1,536 bytes.
 Scroll code has 4 bytes spare, audio has 768 conservative bytes spare, and
-the import reservation has 1,016,864 bytes spare. Live synthesis, GPU appearance,
+the import reservation has 1,009,936 bytes spare. Live synthesis, GPU appearance,
 ordinary gameplay/save/restart, and original hardware are not newly verified.
 
 Saved format 4 is unchanged. A save using an added item requires its selected

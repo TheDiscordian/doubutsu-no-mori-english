@@ -1,5 +1,57 @@
 # Automatic furniture pipeline checkpoint
 
+## Automatic scrolling category imports
+
+Checked proposal: ABI 238,
+`build/v3-scrolling-category-imports-01/profile-runtime/build-lock.json`.
+ROM SHA-256:
+`fce9e03c9a7c49ae53e05e62477ec59f1e45afbebd2a32cccb1ec14e23aa94b3`.
+There remain 157 development choices. Beach table's complete rendering and
+profile are installed; actual `ftr_listIsland` acquisition remains unfinished,
+so the profile is inactive. It is not relabelled as a camping reward.
+
+The shared source recognizer handles parameterised scrolling with opaque and
+multiple translucent lists. All 135 triangles, five textures, palette, and
+195 vertices remain in the 6,928-byte object. Body, glass, and bubbles keep their
+submission order, material colours, environment-alpha contribution, primitive
+alpha, and native wrap modes. The source's two tile-origin records remain even
+though this model samples only tile zero. Rates are `(0,-1)` and `(0,0)` with
+zero phase offset and the existing room/preview clock conversion.
+
+The ordinary planner now schedules complete scrolling resources, required loop
+audio, and eligible lifecycles/profiles, reusing installed stages and artwork.
+This batch compiles one complete object once, installs the renderer records at
+ABI 237, then reuses that object for the ABI-238 profile. Native scrolling code
+and all earlier scrolling rows/lifecycles are identical to the base. No extra
+resident memory is required; code remains 4,092/4,096 bytes. Shared room code
+is 15,536/16,384, bootstrap is 1,521/1,536, and import storage has 1,009,936 bytes
+spare. Audio capacity and saved data are unchanged.
+
+Four focused tests pass: complete source/model/tile discovery and changed-input
+rejection; complete compiled artwork, retained resources, installed dispatch,
+empty remaining dependency plan, and UPS reconstruction; the existing sanitized
+renderer consuming all eight current records; and browser/offline none/all/
+chowder/existing-villager composition. The latter retains the inactive beach-table
+profile and does not make it selectable. The reusable renderer fixture accepts
+the actual bounded table count instead of assuming the previous seven rows.
+No old build or native fixture is replayed. Actual GPU appearance remains a
+playtest check, not a claimed result of command generation.
+
+```sh
+python3 tools/v3_furniture_pipeline.py import --select 31B8 \
+  --base-lock build/v3-periodic-material-imports-04/cartridge/build-lock.json \
+  --output build/v3-scrolling-category-reproduction
+python3 -m unittest tests.test_v3_room_scroll.ScrollingCategorySourceTests \
+  tests.test_v3_room_scroll.ScrollingCategoryBatchTests -v
+```
+
+The fresh inventory at `build/v3-after-scrolling-category-inventory-01.json`
+contains no supported uninstalled furniture. Continue remaining source format
+and behaviour categories; acquisition stays phase 2. Saved format 4 and selected
+profile bits are unchanged. Keep backups and equal-or-larger selections;
+format-4 saves cannot load in V2 or V3 formats 1–3. No stable deployment or main
+build-lock changes are authorised.
+
 ## Installed timed textures and periodic materials
 
 Checked proposal: ABI 236,

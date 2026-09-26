@@ -24,6 +24,97 @@ OUT=ROOT/'build/v3-scrolling-materials-runtime-04'
 ART=ROOT/'build/v3-scrolling-materials-prepared-03'
 
 
+class ScrollingCategorySourceTests(unittest.TestCase):
+    def test_parameter_sequence_preserves_all_models_and_sampled_tiles(self):
+        source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+            (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+        parts=prepare(source,0x31B8);profile=parts[0];a=profile['callback_adapter'];s=a['scrolling']
+        self.assertEqual(list(a['model_arenas'].values()),['opaque','translucent','translucent'])
+        self.assertEqual([sum(len(r.get('triangles',[])) for r in m['rows']) for m in parts[4].values()],
+                         [91,42,2])
+        self.assertEqual([r['rate'] for r in s['tiles']],[[0,-1],[0,0]])
+        self.assertEqual(scroll.bindings(a),{'part2':dict(segment=0x09000000,dimensions=[[16,16]])})
+        self.assertEqual(scroll.draw_only_lifecycle(profile,source),
+            dict(category='draw-only-scrolling',callbacks={},actor_state_used=False))
+        self.assertEqual(sum(r['kind']=='texture' for r in parts[2]),5)
+        for label,expected in [('part1',[0xFC119604,0xFFFFFBF8]),('part2',[0xFCFF9604,0xFFFCFFF8])]:
+            row=next(r for r in parts[4][label]['rows'] if r['opcode']==0xFC)
+            self.assertEqual(list(row['words']),expected)
+            self.assertEqual(len(row['combine_lerp']),16)
+        changed=copy.deepcopy(profile);changed['callback_adapter']['scrolling']['texture_tiles']=2
+        from v3_furniture_pipeline import prepare_models
+        with self.assertRaisesRegex(ValueError,'incomplete dynamic scroll call'):
+            prepare_models(source,changed)
+        changed_source=copy.copy(source);changed_source.rel=bytearray(source.rel)
+        draw=a['functions']['draw'];changed_source.rel[source.sections[1][0]+draw['offset']+3]^=4
+        with self.assertRaises(ValueError):changed_source.profile(0x31B8)
+
+
+class ScrollingCategoryBatchTests(unittest.TestCase):
+    """Current ordinary category batch; reuse the shared renderer/composer checks."""
+    @classmethod
+    def setUpClass(cls):
+        import os
+        directory=ROOT/os.environ.get('V3_SCROLL_CATEGORY_BATCH','build/v3-scrolling-category-imports-01')
+        cls.batch=json.loads((directory/'pipeline.json').read_bytes())
+        cls.out=(ROOT/cls.batch['final_lock']).parent
+        cls.image,cls.report=inputs(cls.out/'build-lock.json')
+        cls.base,cls.prior=inputs(ROOT/'build/v3-periodic-material-imports-04/cartridge/build-lock.json')
+        cls.blob=by_vrom(cls.image)[BLOB].extract(cls.image)
+        cls.scroll=cls.report['equipment_resources']['room_rigs']['scrolling']
+        cls.source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+            (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+        cls.prepared=ROOT/'build/v3-scrolling-category-imports-01/prepared'
+
+    def test_complete_batch_artwork_dispatch_and_retained_resources(self):
+        from tests.test_v3_furniture_pipeline import DonorTests
+        art=json.loads((self.prepared/'art.json').read_bytes())
+        DonorTests.check_complete_artwork(self,self.prepared,art)
+        self.assertEqual(art['batch'],dict(objects=1,compiled=1,reused=0,compiler_containers=1))
+        self.assertEqual(self.batch['imported'],[])
+        self.assertEqual(self.batch['pending'],[dict(item_id='31B8',name='beach table',
+            reason='acquisition needs an adapter: ftr_listIsland')])
+        self.assertEqual([r['stage'] for r in self.batch['steps']],
+            ['scrolling-runtime','profile-runtime'])
+        bindings=room.bind_profiles(self.source,self.image,self.report)
+        rows=scroll.checked_runtime(self.report['equipment_resources'],self.blob)
+        row=rows['31B8'];self.assertEqual(row['bytes'],6928)
+        self.assertEqual(row['opaque_models'],1);self.assertEqual(len(row['model_offsets']),3)
+        self.assertEqual(row['dimensions'],[[16,16],[16,16]])
+        self.assertEqual(row['rates'],[[0,-1],[0,0]])
+        self.assertTrue(row['lifecycle_installed'] and row['profile_installed'])
+        self.assertFalse(row['parent_selectable'])
+        self.assertEqual(self.blob[row['blob_offset']:row['blob_offset']+row['bytes']],
+            (self.prepared/'31B8.n64obj.bin').read_bytes())
+        old=self.prior['equipment_resources']['room_rigs']['scrolling']
+        self.assertEqual(self.scroll['code'],old['code'])
+        self.assertEqual(self.scroll['lifecycle_rows'],old['lifecycle_rows'])
+        for prior in old['rows']:self.assertEqual(rows[prior['source_item_id']],prior)
+        from v3_furniture_pipeline import scan,rig_import_plan
+        inventory=scan(self.source,ROOT/'build/item-identity-megasheet.xlsx',[],selected=['31B8'])
+        plan=rig_import_plan(inventory,self.report,bindings,source=self.source)
+        self.assertTrue(all(not values for values in plan.values()),plan)
+        self.assertEqual(self.report['save_codec'],self.prior['save_codec'])
+        self.assertEqual({k:v for k,v in self.report['save_runtime'].items() if not k.startswith('profile_')},
+            {k:v for k,v in self.prior['save_runtime'].items() if not k.startswith('profile_')})
+        self.assertEqual(apply_ups((ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes(),
+            (self.out/'asset-loader.ups').read_bytes()),self.image)
+
+    def test_actual_renderer_with_current_category_records(self):
+        ScrollingRuntimeTests.test_actual_renderer_under_address_and_undefined_sanitizers(self)
+
+    def test_actual_acquisition_and_optional_composition(self):
+        from tests.test_v3_room_rig_runtime import CurrentImportedRigTests
+        self.rows=[r for r in self.report['furniture']['imports'] if r['item_id']=='33C0']
+        self.assertEqual(len(self.rows),1)
+        self.assertNotIn('31B8',{r['item_id'] for r in self.report['furniture']['imports']})
+        row=next(r for r in self.scroll['rows'] if r['source_item_id']=='31B8')
+        i=slot(int(row['item_id'],16))
+        self.assertEqual(struct.unpack_from('>I',self.blob,ROWS+i*80+4)[0],0)
+        self.assertFalse(self.blob[0x40+i//8]&(1<<(i&7)))
+        CurrentImportedRigTests.test_private_browser_selection_matches_offline_and_keeps_translation_only(self)
+
+
 class ScrollingLifecycleTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):

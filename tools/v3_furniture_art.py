@@ -20,7 +20,7 @@ from v3_import_catalog import DONOR, REL_SHA, ROOT, SYMBOLS_SHA, read_donor
 from v3_villager_art import data_pointers, native_palette, normalise_vertex_flags, symbol_span
 
 SEGMENT = 0x06000000
-CONVERTER_VERSION = 13
+CONVERTER_VERSION = 14
 
 # Complete compatible RDP expressions, selected by material commands, not IDs.
 # These use one texture and retain source alpha; none introduces TEXEL1,
@@ -31,6 +31,10 @@ TRANSLUCENT_COMBINERS = {
     (0xFC341604,0x5FFEFFF8): ('PRIMITIVE','ENVIRONMENT','TEXEL0_ALPHA','ENVIRONMENT',
         'TEXEL0','0','PRIMITIVE','0','COMBINED','0','SHADE','0','0','0','0','COMBINED'),
     (0xFC119C04,0xFFFFF7F8): ('TEXEL0','0','PRIMITIVE','0','TEXEL0','0','PRIM_LOD_FRAC','PRIMITIVE',
+        'COMBINED','0','SHADE','0','0','0','0','COMBINED'),
+    (0xFC119604,0xFFFFFBF8): ('TEXEL0','0','PRIMITIVE','0','TEXEL0','0','PRIMITIVE','ENVIRONMENT',
+        'COMBINED','0','SHADE','0','0','0','0','COMBINED'),
+    (0xFCFF9604,0xFFFCFFF8): ('0','0','0','TEXEL0','TEXEL0','0','PRIMITIVE','0',
         'COMBINED','0','SHADE','0','0','0','0','COMBINED'),
 }
 

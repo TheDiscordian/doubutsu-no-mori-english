@@ -22,9 +22,17 @@ Incomplete gameplay stays unavailable in the selector; installing assets does
 not claim that an item is playable. Reuse unchanged passing tests throughout.
 
 Current task: close shared conversion gaps in the ordinary bulk importer.
-The checked proposal is ABI 236 at
-`build/v3-periodic-material-imports-04/cartridge/build-lock.json`, with
-157 development choices. Chowder has complete three-part artwork, both animated
+The checked proposal is ABI 238 at
+`build/v3-scrolling-category-imports-01/profile-runtime/build-lock.json`, with
+157 development choices. The ordinary importer plans complete scrolling models,
+sound dependencies, and profiles automatically. Beach table retains all 135
+triangles, five textures, translucent glass, and moving bubbles in a 6,928-byte
+object, using unchanged native drawing code. Its complete profile is inactive
+pending actual island acquisition. Four focused checks pass, including current
+records through the sanitized shared renderer and four browser/offline selections.
+No native fixture replay is needed for unchanged rendering code.
+
+Chowder has complete three-part artwork, both animated
 texture frames, periodic steam, its full five-note/two-envelope sound loop, and
 actual winter-camper availability through the ordinary importer. Shared timed
 audio parsing retains all instruments and samples. Source, sanitizer, installed
@@ -49,7 +57,7 @@ retain native lifecycle/rendering as unresolved for the next meaningful
 effect/combined-room batch. No ordinary-game crash is demonstrated.
 
 Continue remaining model/material/animation categories. The fresh inventory is
-`build/v3-after-particles-inventory-01.json`; it has no newly supported uninstalled
+`build/v3-after-scrolling-category-inventory-01.json`; it has no newly supported uninstalled
 furniture. Installed parent-item/display resources must not be counted as new
 missing furniture just because the furniture-only scanner reports them.
 
@@ -107,8 +115,8 @@ Do not replay unchanged candle, rig, artwork, or sound batches.
 
 Room code has 848 bytes spare; bootstrap has 15 bytes spare. Scroll code has
 4 bytes spare, audio has 768 conservative bytes spare, and import storage has
-1,016,864 bytes spare. Capacity extensions must preserve complete dependencies.
-See the [current checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#installed-timed-textures-and-periodic-materials)
+1,009,936 bytes spare. Capacity extensions must preserve complete dependencies.
+See the [current checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#automatic-scrolling-category-imports)
 for reproduction, native limits, and save warnings. Source publication is
 allowed; the main lock and both stable web-patcher deployments stay unchanged.
 

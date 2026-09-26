@@ -403,6 +403,22 @@ recompiling an entire installed category merely to add one newly supported membe
 
 ### Shared runtime categories
 
+The ordinary `import` dependency planner includes scrolling resources, complete
+positioned-loop/switch-fade audio, and draw-only or audio-backed profiles. Audio
+is installed before the scrolling lifecycle table; profiles follow full resource
+and lifecycle verification. Already installed dependencies are skipped and all
+stages reuse prepared artwork. A completed inactive profile with an unfinished
+acquisition route does not schedule another conversion.
+
+The parameterised three-model scrolling shape preserves opaque body, translucent
+glass, and translucent bubbles in source order. Its generator emits both tile
+origins even though the bubble model samples just the first tile. Descriptors
+keep the two complete generator records and separately declare the sampled tile
+count; model parsing verifies every actual texture load and dynamic call. The
+glass's additive environment alpha and the bubbles' primitive alpha are preserved
+as complete single-texture combiner expressions. The existing generic scroll
+renderer handles this shape without extra native code or allocation.
+
 Loop-audio preparation uses the ordinary `convert --assets-only --representation
 audio --category scrolling-material-assets` command with the explicit current
 lock. Complete move-function shapes select positioned loops or switch-driven

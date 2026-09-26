@@ -113,6 +113,7 @@ def evw_scroll(source, target, setter):
 EXTENDED_FORMS={
     (468,'4bbcf5a499849b0d06544ff62a78e065da22b0b131213ca4229ab945d7337665'):'evw-colour-sequence',
     (344,'6b546b76476693bdbaab15e19182f038e0f7b79a39894fffbfef582cdab21627'):'parameter-scroll-state-alpha',
+    (300,'78df4c97859c5a509f114afa731ef1d6b4f8a897f5d5fd3194671ebd8f3cf753'):'parameter-scroll-sequence',
 }
 
 
@@ -153,6 +154,23 @@ def discover_extended(source,name,at,functions,digest):
                      dict(command='environment',before_model='part1',fields=['r','g','b','a'],
                           base=[0,155,205,255],debug_indices=[52,53,54,55])],
             debug_owner=dict(section=6,offset=debug,kind='pointer-to-debug-mode',register_bank='CRV'))
+        arenas=['opaque','translucent','translucent']
+    elif kind=='parameter-scroll-sequence':
+        expected={0x10:(10,0,4,0x8009AED0),0x118:(10,0,4,0x8009AF1C)}
+        for i,(hi,lo) in enumerate(((0xA2,0xBA),(0xAA,0xCA),(0xB2,0xCE))):
+            models[f'part{i}']=source.containing(pair(hi,lo),exact=True)
+        helpers=source.checked_callback_code(draw,300,digest,expected,
+            {0x48:(0x2BE944,'fFTR_GetTwoTileGfx'),0x74:(0x9D214,'_Matrix_to_Mtx_new'),
+             0x98:(0x9D214,'_Matrix_to_Mtx_new')},'parameter scrolling sequence',internal_branches=True)
+        helper=helpers['fFTR_GetTwoTileGfx']
+        helpers.update(source.checked_callback_code(helper,160,
+            '1526a19c4fb00f3f24e833c6139daeb9a116eee0a93562185db011535577f526',{},
+            {0x84:(0x75400,'two_tex_scroll_dolphin')},'shared parameter scrolling',internal_branches=True))
+        checked_generator(source,helpers['two_tex_scroll_dolphin'])
+        scrolling=dict(segment_address=0x09000000,model='part2',input='room-or-preview-frame',
+            tiles=[dict(index=i,width=16,height=16,rate=rate) for i,rate in enumerate(([0,-1],[0,0]))],
+            source_coordinate_shift=1,allocation_failure='skip-draw',source_frame_offset=0,colour=None,
+            texture_tiles=1)
         arenas=['opaque','translucent','translucent']
     else:
         expected={0x10:(10,0,4,0x8009AECC),0x144:(10,0,4,0x8009AF18)}
@@ -252,8 +270,14 @@ def bindings(adapter):
         raise ValueError('Invalid complete scroll material binding')
     dimensions = tuple((r['width'],r['height']) for r in tiles)
     if dimensions not in WRAPPERS: raise ValueError('Unsupported complete scrolling dimensions')
+    sampled=[list(shape) for shape in dimensions if shape!=(0,0)]
+    count=row.get('texture_tiles',len(sampled))
+    if type(count) is not int or not 1<=count<=len(sampled):
+        raise ValueError('Invalid complete sampled scroll tile count')
+    # The callback can emit two tile origins while its model samples just the
+    # first tile. Keep both generator records; parse every actual texture load.
     return {row['model']:dict(segment=row['segment_address'],
-                             dimensions=[list(shape) for shape in dimensions if shape!=(0,0)])}
+                             dimensions=sampled[:count])}
 
 
 def runtime_record(row):

@@ -20,7 +20,7 @@ int main(int argc,char **argv) {
     RoomScrollTable *table=&af_v3_test_room_scroll;
     table->magic=word(input,4);table->count=word(input,4);
     table->stride=word(input,4);table->reserved=word(input,4);
-    assert(table->count==7 && table->stride==48);
+    assert(table->count>=7 && table->count<=ROOM_SCROLL_CAPACITY && table->stride==48);
     for (u32 i=0;i<table->count;++i) {
         RoomScrollRecord *r=table->rows+i;
         r->index=word(input,2);r->bytes=word(input,2);
