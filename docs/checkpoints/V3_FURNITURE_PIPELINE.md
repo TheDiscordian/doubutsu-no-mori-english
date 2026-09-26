@@ -1,5 +1,50 @@
 # Automatic furniture pipeline checkpoint
 
+## Joint-callback rig resources
+
+`build/v3-joint-callback-rigs-prepared-01/art.json` contains four complete objects
+compiled in one container, 16,480 bytes and 290 triangles total: compass (3,008
+bytes), lighthouse model (4,576), moon (3,600), and snowcone machine (5,296).
+Their full skeletons have four/eight/two/six joints respectively. Every joint,
+motion array, texture, palette, vertex, and model remains, including models hidden
+by the source before-callback and redrawn by its after-callback.
+
+The shared resource category checks four constructor shapes and one skeleton
+draw shape, with complete paired references and helper calls. It records both
+joint callbacks and their actual draw dependencies: parent-relative compass
+needle, accumulated moon rotation, translucent lighthouse glass/beam and LOD
+scaling, and translucent snowcone ice/snow with alpha and scrolling. Create,
+move, and draw gameplay remain pending; no import is enabled by preparation.
+
+Two shared material gaps are closed. Full GX I8 converts to native I8 with exact
+samples, row stride, and lookup-table state. The lighthouse keeps both source
+combiner expressions. Snowcone preserves its full 16×32 image separately from
+the 8×32 scrolling window and both generated tile records; no texture is resized.
+
+Four focused tests pass: complete compiled texels/vertices/triangles/materials
+and full keyframe arrays; callback mutation rejection, pending installation
+rejection, and asset reuse; actual donor I8 mapping, independent scroll-image
+and window bounds, and malformed format rejection; and all hidden/redrawn joint
+bindings with changed-reference rejection. These are converter/resource checks,
+not native gameplay evidence. The current ROM remains ABI 240 with 158 choices;
+no saved format or patcher deployment changes, and no old emulator run is repeated.
+
+Continue shared native joint behaviours, including their sound, parent motion,
+clock initialization, and room/catalogue drawing. Keep eight-joint state separate
+from live morph vectors: the existing runtime only reuses spare vectors for
+at-most-six-joint behaviours. Room code has 848 bytes spare, so retain explicit
+packet bounds when extending it. Remaining undiscovered custom models include
+matryoshka, aerobics radio, both house models, crab stew, treasure chest, hamster
+cage, and harvest TV. Console launch/persistence remains unfinished separately.
+
+```sh
+python3 tools/v3_furniture_pipeline.py convert --assets-only \
+  --category joint-callback-rig-assets \
+  --base-lock build/v3-large-model-imports-01/cartridge/build-lock.json \
+  --output build/v3-joint-callback-rigs-reproduction
+python3 -m unittest tests.test_v3_joint_rigs -v
+```
+
 ## Complete model-bank capacity
 
 The current proposal is ABI 240 at

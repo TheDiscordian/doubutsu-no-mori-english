@@ -2223,6 +2223,37 @@ no out-of-bounds commands or persistent tint are emitted. Sound and animation
 resources are unchanged. This material remains unavailable until its actual
 Mario reward route is installed.
 
+## Fixed rigs with joint callbacks
+
+The `joint-callback-rig-assets` category discovers complete fixed rotational
+rigs from the verified constructor and shared skeleton-draw shape. Paired
+skeleton/animation references, initializer calls, constants, complete motion
+arrays, every joint model, and both joint callbacks are retained. Constructor
+and draw shapes, rather than item identities, select the converter. The category
+prepares resources only; metadata and native profile writers reject it until
+its complete gameplay implementation exists.
+
+The callback records distinguish parent-relative needle rotation, accumulated
+joint rotation, translucent redraws with primitive LOD scaling, and translucent
+redraws with primitive alpha and scrolling. Hidden joints still retain their
+entire original model; explicit redraw references must match the corresponding
+skeleton joint. Complete create/move/draw receipts remain pending, including
+switch behaviour, parent transforms, sound, and clock-derived state. No callback
+is replaced with a static model or silently discarded.
+
+The shared material converter supports GX I8 as complete eight-by-four tiles,
+reordered into native linear I8 without changing sample values or allocation.
+The donor executable's actual format table verifies I/8 maps to GX I8. Native
+commands use an 8-bit intensity tile, the correct row stride, and no palette.
+Complete primitive-alpha and primitive-LOD combiner expressions remain intact.
+
+Texture memory layout and a callback's scrolling window are separate. One
+reviewed callback samples a full 16×32 I4 image through an 8×32 scrolling window,
+while producing two scroll-tile records. The complete image and its 16-pixel
+source pitch remain; the runtime dependency retains both 8-pixel window records,
+rates, and the exact generator. Conversion does not resize the texture or
+replace the donor's window with its image width.
+
 ## Verification policy
 
 `tests/test_v3_furniture_pipeline.py` checks shared parser rules, source

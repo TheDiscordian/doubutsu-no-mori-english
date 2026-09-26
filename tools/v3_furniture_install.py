@@ -68,12 +68,12 @@ def profile(row, vrom, *, limit=END, model_capacity=9216):
     sequence = adapter.get('category') == 'constant-model-sequence'
     sound = adapter.get('category') == 'switch-trigger-sound'
     static = adapter.get('category') == 'static-interaction'
-    from v3_furniture_rigs import RIG_CATEGORIES,FIXED_CATEGORY
+    from v3_furniture_rigs import RIG_CATEGORIES,FIXED_CATEGORY,JOINT_CATEGORY
     from v3_furniture_materials import CATEGORY as MATERIAL_CATEGORY
     from v3_furniture_scroll import CATEGORY as SCROLL_CATEGORY,VTABLE as SCROLL_VTABLE,profile_lifecycle
     material=adapter.get('category')==MATERIAL_CATEGORY
     scrolling=adapter.get('category')==SCROLL_CATEGORY
-    if (adapter.get('category') in (FIXED_CATEGORY,PENDING_MOVE_CATEGORY,PENDING_SEQUENCE_CATEGORY) or scrolling and
+    if (adapter.get('category') in (FIXED_CATEGORY,JOINT_CATEGORY,PENDING_MOVE_CATEGORY,PENDING_SEQUENCE_CATEGORY) or scrolling and
             (not profile_lifecycle(row['profile'],row.get('room_lifecycle'),row.get('room_placement')) or
              row.get('room_runtime')!={'vtable':SCROLL_VTABLE,'vrom':vrom})):
         raise ValueError('Prepared resources have no implemented native lifecycle')

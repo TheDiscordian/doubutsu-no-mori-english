@@ -258,6 +258,14 @@ def discover(source, name, at, functions):
 
 def bindings(adapter):
     """Expose only the complete model-local scroll dependency to the parser."""
+    if adapter.get('category')=='joint-callback-rig-assets' and 'scrolling' in adapter:
+        row=adapter['scrolling']
+        if (row['segment_address']!=0x09000000 or row['texture_dimensions']!=[[16,32]] or
+                [[r['width'],r['height']] for r in row['tiles']]!=[[8,32],[8,32]]):
+            raise ValueError('Changed joint-rig texture layout or scroll window')
+        # The donor samples one 16-wide image through an 8-wide scrolling
+        # window. Preserve image pitch independently of generated tile bounds.
+        return {row['model']:dict(segment=row['segment_address'],dimensions=row['texture_dimensions'])}
     if adapter.get('category')=='billboard-scroll-keyframe-rig':
         row=adapter['scrolling']
         return {row['model']:dict(segment=row['segment_address'],

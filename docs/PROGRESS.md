@@ -32,6 +32,15 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
+The shared joint-callback converter prepares the complete compass, lighthouse,
+moon, and snowcone machine together: 16,480 bytes, all 290 triangles, every
+joint/motion array, and complete callback dependencies. Shared I8 conversion and
+independent scrolling-window/image layout preserve the lighthouse beam and
+snowcone artwork without resizing or dropping resources. Four focused checks
+pass. Native joint/lifecycle behaviour remains unfinished, so these four objects
+are not selectable imports yet. See the
+[joint-rig checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#joint-callback-rig-resources).
+
 The checked proposal is ABI 240 at
 `build/v3-large-model-imports-01/cartridge/build-lock.json`, with 158 development
 choices. The complete 10,448-byte snowboard imports through the ordinary pipeline,

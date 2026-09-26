@@ -411,6 +411,7 @@ class DonorTests(unittest.TestCase):
         self.assertEqual(struct.unpack_from('>H',table,2*2)[0],5)  # RGBA/16 -> GX_RGB5A3
         self.assertEqual(struct.unpack_from('>H',table,2*4*2)[0],8)  # CI/4 -> GX_C4
         self.assertEqual(struct.unpack_from('>H',table,4*4*2)[0],0)  # I/4 -> GX_I4
+        self.assertEqual(struct.unpack_from('>H',table,(4*4+1)*2)[0],1)  # I/8 -> GX_I8
         self.assertEqual(struct.unpack_from('>H',table,(3*4+1)*2)[0],2)  # IA/8 -> GX_IA4
         self.assertEqual(struct.unpack_from('>H',table,(3*4+2)*2)[0],3)  # IA/16 -> GX_IA8
 
@@ -743,6 +744,9 @@ class DonorTests(unittest.TestCase):
                             elif r['format']=='IA8':
                                 gx=((y//4)*(r['width']//8)+x//8)*32+y%4*8+x%8
                                 self.assertEqual(native[flat],(donor[gx]&15)<<4|donor[gx]>>4)
+                            elif r['format']=='I8':
+                                gx=((y//4)*(r['width']//8)+x//8)*32+y%4*8+x%8
+                                self.assertEqual(native[flat],donor[gx])
                             else:
                                 gx=((y//8)*(r['width']//8)+x//8)*64+y%8*8+x%8
                                 self.assertEqual(donor[gx//2]>>(4 if gx%2==0 else 0)&15,
@@ -813,13 +817,14 @@ class DonorTests(unittest.TestCase):
                 for command in donor:
                     if command['opcode'] not in (0xFD,0xD2):continue
                     ia8=bool(command.get('ia8'));rgba16=bool(command.get('rgba16'));ia16=bool(command.get('ia16'))
+                    i8=bool(command.get('i8'))
                     intensity=bool(command.get('intensity'));w,h=command['shape']
                     direct=ia8 or rgba16 or ia16 or intensity
                     wraps=tuple({0:2,1:0,2:1}[v] for v in command.get('wrap_modes',(0,0)))
                     shifts=command.get('tile_shifts',(0,0))
                     expected.append((command.get('scroll_tile',0),0 if rgba16 else 3 if ia8 or ia16 else 4 if intensity else 2,
-                                     2 if rgba16 or ia16 else 1 if ia8 else 0,
-                                     w//4 if rgba16 or ia16 else w//8 if ia8 else (w+15)//16,command.get('scroll_tmem',0),
+                                     2 if rgba16 or ia16 else 1 if ia8 or i8 else 0,
+                                     w//4 if rgba16 or ia16 else w//8 if ia8 or i8 else (w+15)//16,command.get('scroll_tmem',0),
                                      0 if direct else command.get('palette_slot',15),*wraps,*shifts))
                     if command['opcode']==0xFD and direct!=last:
                         luts.append((0xE3001001,0 if direct else 0x8000));last=direct
@@ -1304,7 +1309,9 @@ class SharedMaterialTests(unittest.TestCase):
             _,_,resources,_,models,_,_=pipeline.prepare(self.source,int(row['item_id'],16))
             formats.update(r['format'] for r in resources if r['kind']=='texture')
             actual.update(r['words'] for m in models.values() for r in m['rows'] if r.get('combine_lerp'))
-        self.assertEqual(actual,set(TRANSLUCENT_COMBINERS));self.assertEqual(formats,{'CI4','IA8','IA16'})
+        self.assertEqual(actual,{(0xFC11FE04,0xFF0FF3FF),(0xFC341604,0x5FFEFFF8),
+            (0xFC119C04,0xFFFFF7F8),(0xFC119604,0xFFFFFBF8),(0xFCFF9604,0xFFFCFFF8)})
+        self.assertTrue(actual<=set(TRANSLUCENT_COMBINERS));self.assertEqual(formats,{'CI4','IA8','IA16'})
         self.assertEqual(install.provenance_patch(self.report['objects']),'')
         # Old prepared eligibility cannot bypass current metadata or the normal
         # importer, even after its graphics category becomes complete.

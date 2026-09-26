@@ -22,7 +22,16 @@ Incomplete gameplay stays unavailable in the selector; installing assets does
 not claim that an item is playable. Reuse unchanged passing tests throughout.
 
 Current task: close shared conversion and gameplay gaps in the ordinary bulk
-importer. The checked proposal is ABI 240 at
+importer. Four complete joint-callback rigs are reusable from
+`build/v3-joint-callback-rigs-prepared-01/`: compass, lighthouse, moon, and
+snowcone machine. One compiler batch retains 16,480 bytes and all 290 triangles,
+full motion arrays, and both joint callbacks. Shared I8 and distinct scrolling
+window/image conversion are implemented. Four focused checks pass. Native
+create/move/joint-draw behaviours, including all associated sound and parent
+motion, remain work; none becomes selectable from asset preparation alone.
+See the [joint-rig checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#joint-callback-rig-resources).
+
+The checked proposal is ABI 240 at
 `build/v3-large-model-imports-01/cartridge/build-lock.json`, with 158 development
 choices. Shared model banks and catalogue previews hold 12,288 bytes; the ordinary
 importer installs the complete 10,448-byte snowboard with its real winter-camper
@@ -80,7 +89,7 @@ retain native lifecycle/rendering as unresolved for the next meaningful
 effect/combined-room batch. No ordinary-game crash is demonstrated.
 
 Continue remaining model/material/animation categories. The fresh inventory is
-`build/v3-after-large-model-inventory-01.json`; it has no newly supported uninstalled
+`build/v3-after-joint-rig-inventory-01.json`; it has no newly supported uninstalled
 furniture. Installed parent-item/display resources must not be counted as new
 missing furniture just because the furniture-only scanner reports them.
 

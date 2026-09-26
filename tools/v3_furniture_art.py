@@ -20,7 +20,7 @@ from v3_import_catalog import DONOR, REL_SHA, ROOT, SYMBOLS_SHA, read_donor
 from v3_villager_art import data_pointers, native_palette, normalise_vertex_flags, symbol_span
 
 SEGMENT = 0x06000000
-CONVERTER_VERSION = 15
+CONVERTER_VERSION = 16
 
 # Complete compatible RDP expressions, selected by material commands, not IDs.
 # These use one texture and retain source alpha; none introduces TEXEL1,
@@ -36,6 +36,10 @@ TRANSLUCENT_COMBINERS = {
         'COMBINED','0','SHADE','0','0','0','0','COMBINED'),
     (0xFCFF9604,0xFFFCFFF8): ('0','0','0','TEXEL0','TEXEL0','0','PRIMITIVE','0',
         'COMBINED','0','SHADE','0','0','0','0','COMBINED'),
+    (0xFC119604,0xFFFFFFF8): ('TEXEL0','0','PRIMITIVE','0','TEXEL0','0','PRIMITIVE','0',
+        'COMBINED','0','SHADE','0','0','0','0','COMBINED'),
+    (0xFCFF9DFF,0xFFFDFE38): ('0','0','0','PRIMITIVE','TEXEL0','0','PRIM_LOD_FRAC','0',
+        '0','0','0','COMBINED','0','0','0','COMBINED'),
 }
 
 # Two independently animated intensity textures interpolate their alpha using
@@ -372,17 +376,20 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
         elif op == 0xFD:
             shape = model_texture_shape(raw[at:at + 8])
             target = row['target']
-            intensity=bool(water or fire_effect or static_materials and shape[2:]==(4,0))
+            i8=bool(static_materials and shape[2:]==(4,1))
+            intensity=bool(water or fire_effect or static_materials and shape[2:] in ((4,0),(4,1)))
             rgba16=bool(static_materials and shape[2:]==(0,2))
             ia8=bool(static_materials and shape[2:]==(3,1))
             ia16=bool(static_materials and shape[2:]==(3,2))
-            expected=(0,2) if rgba16 else (3,2) if ia16 else (3,1) if ia8 else (4 if intensity else 2,0)
+            expected=(0,2) if rgba16 else (3,2) if ia16 else (3,1) if ia8 else (4,1) if i8 else (4 if intensity else 2,0)
             if (target not in textures or (not (intensity or rgba16 or ia8 or ia16) and not have_palette) or
                     shape != (*textures[target], *expected) or
                     water and shape[:2] != (32, 16)):
                 raise ValueError('Unsupported furniture texture or palette')
             if intensity:
                 row['intensity'] = True
+            if i8:
+                row['i8'] = True
             if rgba16:
                 row['rgba16'] = True
             if ia8:
@@ -809,8 +816,10 @@ def command_source(models, offsets):
                 rgba16=bool(row.get('rgba16'))
                 ia8=bool(row.get('ia8'))
                 ia16=bool(row.get('ia16'))
+                i8=bool(row.get('i8'))
                 # Keep upper TMEM intact for CI palettes across mixed-format lists.
-                if (w*h*(4 if rgba16 or ia16 else 2 if ia8 else 1)//2 > 2048
+                if (w*h*(4 if rgba16 or ia16 else 2 if ia8 or i8 else 1)//2 > 2048
+                        or i8 and not row.get('intensity')
                         or sum(map(bool,(rgba16,ia8,ia16,row.get('intensity'))))>1):
                     raise ValueError('Furniture texture exceeds shared TMEM capacity or has conflicting formats')
                 emit('gsDPPipeSync()')
@@ -851,7 +860,7 @@ def command_source(models, offsets):
                     raise ValueError('Invalid native texture tile shifts')
                 if 'scroll_tile' in row:
                     tile,tmem=row['scroll_tile'],row['scroll_tmem']
-                    if (rgba16 or ia8 or ia16 or type(tile) is not int or tile not in (0,1) or
+                    if (rgba16 or ia8 or ia16 or i8 or type(tile) is not int or tile not in (0,1) or
                             type(tmem) is not int or not 0<=tmem<=256-((w+15)//16)*h or
                             (tile==0)!=(tmem==0)):
                         raise ValueError('Invalid complete scrolling texture allocation')
@@ -861,7 +870,7 @@ def command_source(models, offsets):
                     macro='gsDPLoadMultiTile_4b' if w%16 else 'gsDPLoadMultiBlock_4b'
                     emit(f'{macro}(0x{texture:08X}, {args})',7)
                     continue
-                if rgba16 or ia8 or ia16:
+                if rgba16 or ia8 or ia16 or i8:
                     if w%(4 if rgba16 or ia16 else 8) or h%4:
                         raise ValueError('Direct texture needs complete GX blocks')
                     size='G_IM_SIZ_16b' if rgba16 or ia16 else 'G_IM_SIZ_8b'

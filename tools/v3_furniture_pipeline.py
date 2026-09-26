@@ -24,7 +24,7 @@ from v3_registry import FURNITURE, LEGACY_FURNITURE, furniture_identity, furnitu
 from v3_room_aliases import discover as room_aliases, pending_reason as room_alias_reason
 from v3_villager_art import native_palette, normalise_vertex_flags
 
-VERSION = 27
+VERSION = 28
 PENDING_MOVE_CATEGORY = 'static-models-pending-move'
 PENDING_SEQUENCE_CATEGORY = 'constant-model-sequence-pending-lifecycle'
 LAYERS = ('opaque', 'opaque1', 'translucent', 'translucent1')
@@ -262,6 +262,9 @@ class Source:
         from v3_furniture_scroll import discover as discover_scroll
         scrolling=discover_scroll(self,name,at,functions)
         if scrolling is not None:return scrolling
+        from v3_furniture_joint_rigs import discover as discover_joint_rig
+        joint_rig=discover_joint_rig(self,name,at,functions)
+        if joint_rig is not None:return joint_rig
         from v3_furniture_rigs import (CODE as RIG_CODE, CLOCK_CODE, STORAGE_CODE,
             discover as discover_rig, discover_clock, discover_storage, discover_fixed, discover_hit, discover_billboard)
         if functions.get('create',{}).get('bytes')==116 and functions.get('draw',{}).get('bytes')==268:
@@ -645,7 +648,8 @@ class Source:
         adapter = extra.get('callback_adapter', {})
         from v3_furniture_materials import CATEGORY as MATERIAL_CATEGORY
         from v3_furniture_scroll import CATEGORY as SCROLL_CATEGORY
-        pending_move=adapter.get('category') in (PENDING_MOVE_CATEGORY,PENDING_SEQUENCE_CATEGORY,MATERIAL_CATEGORY,SCROLL_CATEGORY)
+        from v3_furniture_joint_rigs import CATEGORY as JOINT_CATEGORY
+        pending_move=adapter.get('category') in (PENDING_MOVE_CATEGORY,PENDING_SEQUENCE_CATEGORY,MATERIAL_CATEGORY,SCROLL_CATEGORY,JOINT_CATEGORY)
         pending_fields=[]
         if raw[36:40]!=struct.pack('>f',.01):pending_fields.append('scale')
         if contact not in BEHAVIOURS:pending_fields.append('contact')
@@ -662,7 +666,8 @@ class Source:
         if not pending_move and (storage and (contact or interaction not in (1,2,4)) or interaction in (1,2,4) and not storage):
             raise ReviewRequired('storage interaction requires the complete open/close category')
         if adapter.get('category') in RESOURCE_CATEGORIES:
-            if contact or interaction and not storage: raise ReviewRequired('unsupported rig contact/interaction flags')
+            if (contact or interaction and not storage) and adapter['category']!=JOINT_CATEGORY:
+                raise ReviewRequired('unsupported rig contact/interaction flags')
             extra.update(kind='animated-room-model',skeleton=adapter['skeleton'],joint_models=adapter['joint_models'])
         return dict(profile_symbol=name, profile_offset=at, profile_sha256=sha256(raw),
             scalar_hex=raw[32:48].hex(), behaviour=adapter.get('category') if extra.get('kind') or
@@ -755,9 +760,9 @@ def prepare_models(source, descriptor):
                     palettes[start] = (symbol, size)
                 elif op == 0xFD:
                     w, h, fmt, bits = model_texture_shape(raw[position:position+8])
-                    if ((fmt,bits) not in ((2,0),(4,0),(0,2),(3,1),(3,2))
+                    if ((fmt,bits) not in ((2,0),(4,0),(4,1),(0,2),(3,1),(3,2))
                             or w*h*(4<<bits)//8 != size or size>2048):
-                        raise ReviewRequired('texture is not complete TMEM-sized CI4/I4/IA8/IA16/RGBA16')
+                        raise ReviewRequired('texture is not complete TMEM-sized CI4/I4/I8/IA8/IA16/RGBA16')
                     if start in textures and textures[start][2:] != (w, h, fmt, bits):
                         raise ReviewRequired('texture has inconsistent dimensions')
                     textures[start] = (symbol, size, w, h, fmt, bits)
@@ -797,9 +802,10 @@ def prepare_models(source, descriptor):
     for at, (name, n) in sorted(palettes.items()): add(at, name, n, native_palette, kind='palette')
     for at, (name, n, w, h, fmt, bits) in sorted(textures.items()):
         add(at, name, n, lambda data, w=w, h=h, bits=bits, fmt=fmt:
-            native_rgba16(data,w,h) if (fmt,bits)==(0,2) else native_ia16(data,w,h) if bits==2 else native_ia8(data,w,h) if bits==1
+            native_rgba16(data,w,h) if (fmt,bits)==(0,2) else native_ia16(data,w,h) if bits==2
+            else untile(data,w,h,8) if (fmt,bits)==(4,1) else native_ia8(data,w,h) if bits==1
             else pack4(untile(data,w,h,4)),
-            kind='texture',width=w,height=h,format={(2,0):'CI4',(4,0):'I4',(0,2):'RGBA16',(3,1):'IA8',(3,2):'IA16'}[fmt,bits])
+            kind='texture',width=w,height=h,format={(2,0):'CI4',(4,0):'I4',(4,1):'I8',(0,2):'RGBA16',(3,1):'IA8',(3,2):'IA16'}[fmt,bits])
     vertex, (name, n) = next(iter(vertex_arrays.items()))
     add(vertex, name, n, lambda data: normalise_vertex_flags(data)[0], kind='vertices')
     models = {}
@@ -1104,7 +1110,7 @@ def name_metadata(source, item, identity):
 
 
 def metadata(source, item, profile, identity):
-    from v3_furniture_rigs import FIXED_CATEGORY
+    from v3_furniture_rigs import FIXED_CATEGORY, JOINT_CATEGORY
     from v3_furniture_materials import CATEGORY as MATERIAL_CATEGORY
     from v3_furniture_scroll import CATEGORY as SCROLL_CATEGORY
     binding=getattr(source,'runtime_profiles',{}).get(f'{item:04X}')
@@ -1120,6 +1126,8 @@ def metadata(source, item, profile, identity):
         raise ReviewRequired('Static interaction requires its complete installed behaviour and audio')
     if profile.get('callback_adapter',{}).get('category')==FIXED_CATEGORY:
         raise ReviewRequired('Fixed rig artwork is prepared; move/destroy behaviour and spawned effects need runtime adapters')
+    if profile.get('callback_adapter',{}).get('category')==JOINT_CATEGORY:
+        raise ReviewRequired('Joint-callback rig artwork is prepared; complete lifecycle and joint behaviour need runtime adapters')
     alias = next((row for row in room_aliases(source)['rows'] if int(row['display_item_id'],16)==item), None)
     if alias:
         raise ReviewRequired(room_alias_reason(alias))
@@ -1224,7 +1232,8 @@ def scan(source, worksheet, installed=None, *, selected=()):
             categories.append('animated-materials' if profile.get('kind') else 'static-materials')
             if not profile.get('kind') and formats<={'CI4','I4'}: categories.append('static-4bit')
             if not profile.get('kind') and formats=={'CI4'}: categories.append('static-ci4')
-            if 'I4' in formats: categories.append('intensity-materials')
+            if formats&{'I4','I8'}: categories.append('intensity-materials')
+            if 'I8' in formats: categories.append('i8-materials')
             if 'RGBA16' in formats: categories.append('rgba16-materials')
             if 'IA8' in formats: categories.append('ia8-materials')
             if 'IA16' in formats: categories.append('ia16-materials')

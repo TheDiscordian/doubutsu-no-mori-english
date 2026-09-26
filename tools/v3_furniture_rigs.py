@@ -19,6 +19,7 @@ from v3_furniture_motion import CATEGORY as ROLLING_CATEGORY
 # Complete fixed rig resources with explicit, still-unimplemented callbacks.
 # This category is deliberately not a native behaviour adapter.
 FIXED_CATEGORY = 'fixed-keyframe-rig-assets'
+from v3_furniture_joint_rigs import CATEGORY as JOINT_CATEGORY
 STORAGE_CODE = {
     'create': (116, '17985ba5a79cb082f421871e07eca8189d15291d08d408f4d68c257b072d166d'),
     'move': (80, '74d56a7240cc6101e429e75a9163eacb63753bfb06e944d1e80d291853fa6690'),
@@ -32,7 +33,7 @@ CLOCK_CODE = {
     'destroy': (4, 'f332ea5b5437103cbb6f1508679da89eec9288ad775c96c439a17fccabe3de8e'),
 }
 RIG_CATEGORIES = (CATEGORY, CLOCK_CATEGORY, STORAGE_CATEGORY, HIT_CATEGORY, BILLBOARD_CATEGORY, ROLLING_CATEGORY)
-RESOURCE_CATEGORIES = RIG_CATEGORIES + (FIXED_CATEGORY,)
+RESOURCE_CATEGORIES = RIG_CATEGORIES + (FIXED_CATEGORY, JOINT_CATEGORY)
 CODE = {
     'create': (164, '2a86d61bc9aaf4a0a6479fe97a7f0d5dfe3dc42f9eea663eeb3fd1b8cbc35733'),
     'move': (208, '4b36894add16ecf872c1bfdcbeed2331519049fffd5b3d1d1d5db533f7c68d89'),
