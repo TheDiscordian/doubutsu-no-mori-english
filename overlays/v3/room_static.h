@@ -23,5 +23,5 @@ _Static_assert(__builtin_offsetof(RoomPrivateWallet,wallet)==0x38,"Native wallet
 #ifdef __mips__
 _Static_assert(__builtin_offsetof(RoomStaticClip,melody)==0x64,"Native melody callback");
 #endif
-int af_v3_room_static_mv(RoomSoundActor *,void *);
+int af_v3_room_static_mv(RoomSoundActor *,void *,RoomRigGame *);
 #endif

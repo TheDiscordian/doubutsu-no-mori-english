@@ -17,6 +17,24 @@ def discover(source, receipt):
     if receipt != actual:
         raise ValueError('Changed complete static interaction callback')
     module = u32(source.rel, 0)
+    effect_forms={
+        (240,'0c0117d9e794873683e9d49315f75a8d9545650b74c92c529aaa4e112a3e8ebb'):(3,'steam'),
+        (336,'e8f6300c4ea1572cef467be6954a08c7d0c240471e0711f2a09343ba453a5181'):(4,'projectile'),
+    }
+    effect=effect_forms.get((len(raw),sha256(raw)))
+    if effect:
+        from v3_room_particles import source_contract
+        mode,kind=effect;contract=source_contract(source)
+        result=dict(category=CATEGORY,mode=mode,parameter=9 if mode==3 else 0,
+            effects=[kind],effect_source=contract,excluded_states=[13,14,15,12],runtime_installed=False)
+        if mode==3:
+            result['level_sound']=dict(category='periodic-effect-loop',source_sound_id=0x55,
+                switch_clicks=[],excluded_states=[13,14,15,12],source_period=16,native_period=8,
+                height=30.0,spread=9,source_effect=113,callback=actual)
+        else:
+            result.update(trigger=dict(sound_word=contract['projectile_source_sound']),
+                switch_test='equals-one',contact_directions=[0,2],angle_offset=0x124)
+        return result
     # Unknown callbacks must remain eligible for artwork preparation. Only
     # recognised complete instruction shapes enter an implemented category.
     normalized=bytearray(raw)
@@ -101,9 +119,11 @@ def encode(rows):
         mode, parameter = row['mode'], row['parameter']
         word = row.get('native_sound_word',0)
         if (not 1024 <= row['runtime_index'] < 2048 or
-                mode not in (1,2) or mode==1 and parameter!=1 or
+                mode not in (1,2,3,4) or mode==1 and parameter!=1 or
                 mode==2 and (not 0<=parameter<16 or word) or not 0<=word<=65535):
             raise ValueError('Unknown complete static-interaction record')
+        if mode==3 and (parameter!=9 or word!=0x55) or mode==4 and parameter:
+            raise ValueError('Changed complete static effect-emitter parameters')
         data.extend(struct.pack('>HBBHH',row['runtime_index'],mode,parameter,word,0))
     return bytes(data)
 
@@ -128,7 +148,7 @@ def checked_audio(profile, row, equipment):
     adapter = profile['callback_adapter']
     if adapter['category'] != CATEGORY or any(row.get(k)!=adapter[k] for k in ('mode','parameter')):
         raise ValueError('Changed complete static behaviour binding')
-    if adapter['mode']==1:
+    if adapter['mode'] in (1,4):
         audio = equipment.get('furniture_audio',{})
         source_word = adapter['trigger']['sound_word']
         program = next((p for p in audio.get('programs',[]) if p['source_sound_word']==source_word),None)
@@ -137,10 +157,22 @@ def checked_audio(profile, row, equipment):
                 row.get('native_sound_word')!=program['native_sound_word'] or
                 member['callback']!=json.loads(json.dumps(adapter))):
             raise ValueError('Wallet behaviour lacks its complete installed sound')
-    else:
+    elif adapter['mode']==2:
         audio = equipment.get('furniture_melody_audio',{})
         if adapter['parameter'] not in audio.get('installed_instruments',[]):
             raise ValueError('Town melody lacks its complete installed instrument')
+    elif adapter['mode']==3:
+        audio=equipment.get('furniture_level_audio',{})
+        member=next((r for r in audio.get('furniture',[]) if r['item_id']==row['source_item_id']),None)
+        if (member is None or member['lifecycle']!=json.loads(json.dumps(adapter['level_sound'])) or
+                row.get('native_sound_word')!=adapter['level_sound']['source_sound_id']):
+            raise ValueError('Periodic emitter lacks its complete loop audio')
+    if adapter['mode'] in (3,4):
+        particles=equipment['room_rigs'].get('effects',{}).get('particles')
+        if (not particles or not particles['installed'] or
+                particles['source']!=json.loads(json.dumps(adapter['effect_source'])) or
+                adapter['mode']==4 and particles['sound_word']!=row['native_sound_word']):
+            raise ValueError('Static emitter lacks complete installed particles')
     return copy.deepcopy(adapter)
 
 

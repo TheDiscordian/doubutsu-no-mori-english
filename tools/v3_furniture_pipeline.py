@@ -1257,12 +1257,20 @@ def rig_import_plan(inventory, report, bindings, selected=(), category=None, *, 
         audio=sorted(({r['item_id'] for r in rows if r['profile']['callback_adapter'].get('trigger')}|
                       set(material_audio)|{r['item_id'] for r in static_rows if r['profile']['callback_adapter'].get('trigger')})-audio),
         loops=sorted(({r['item_id'] for r in rows if r['profile']['callback_adapter'].get('level_sound')}|
+                      {r['item_id'] for r in static_rows if r['profile']['callback_adapter'].get('level_sound')}|
                       set(material_loops))-loops),
         profiles=sorted(r['item_id'] for r in rows+material_rows+static_rows if r['item_id'] not in bindings))
     if static_rows:
         melodies={r['item_id'] for r in report['equipment_resources'].get('furniture_melody_audio',{}).get('furniture',[])}
         plan['melodies']=sorted(r['item_id'] for r in static_rows
             if r['profile']['callback_adapter']['mode']==2 and r['item_id'] not in melodies)
+        effects={kind for r in static_rows for kind in r['profile']['callback_adapter'].get('effects',[])}
+        if effects and not report['equipment_resources']['room_rigs'].get('effects',{}).get('particles',{}).get('installed'):
+            plan['particles']=sorted(effects)
+            from v3_room_particles import sound_dependencies
+            existing={r['source_sound_word'] for r in report['equipment_resources'].get('furniture_audio',{}).get('programs',[])}
+            dependencies=sound_dependencies(source)
+            if any(r['sound_word'] not in existing for r in dependencies):plan['particle_audio']=dependencies
     if material_rows:
         installed={r['source_item_id'] for r in report['equipment_resources']['room_rigs'].get('material_rows',[])}
         plan['materials']=sorted(r['item_id'] for r in material_rows if r['item_id'] not in installed)
@@ -1307,9 +1315,9 @@ def import_batch(source, worksheet, output, lock, selected=(), category=None, re
             refresh('rig-runtime',room_rigs_art=[bundle(plan['resources'],'rig-assets')])
         if plan.get('materials'):
             refresh('material-runtime',material_frames_art=[bundle(plan['materials'],'material-assets')])
-        if plan['audio']:
+        if plan['audio'] or plan.get('particle_audio'):
             audio=output/'audio'
-            prepare_furniture_audio(base,report,source,inventory,audio,plan['audio'])
+            prepare_furniture_audio(base,report,source,inventory,audio,plan['audio'],effect_sounds=plan.get('particle_audio',()))
             refresh('audio-runtime',furniture_audio_art=audio)
         if plan['loops']:
             audio=output/'loop-audio'
@@ -1320,6 +1328,11 @@ def import_batch(source, worksheet, output, lock, selected=(), category=None, re
             audio=output/'melody-audio'
             prepare_melodies(base,report,source,inventory,audio,plan['melodies'])
             refresh('melody-audio-runtime',furniture_audio_art=audio)
+        if plan.get('particles'):
+            from v3_room_particles import prepare as prepare_particles
+            effects=output/'particles'
+            prepare_particles(effects,current)
+            refresh('particle-runtime',room_effects=effects)
         if plan['profiles']:
             refresh('profile-runtime',furniture_profiles=[bundle(plan['profiles'],'profile-assets')])
     elif plan['audio'] or plan['loops']:

@@ -2091,9 +2091,9 @@ def exercise(debug, rom_path, record, *, section='automatic_furniture'):
     if section=='material_reactions':return material_reactions(debug,rom_path,record)
     if section=='material_colours':return material_colours(debug,rom_path,record)
     if section=='static_interactions':return static_interactions(debug,rom_path,record)
-    if section=='room_effects':
+    if section in ('room_effects','room_particles'):
         from v3_room_effects_smoke import exercise as room_effects
-        return room_effects(debug,rom_path,record)
+        return room_effects(debug,rom_path,record,particles=section=='room_particles')
     if section=='password_runtime':
         from v3_password_smoke import exercise as passwords
         return passwords(debug,rom_path,record)

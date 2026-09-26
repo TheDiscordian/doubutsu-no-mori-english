@@ -1,5 +1,91 @@
 # Automatic furniture pipeline checkpoint
 
+## Installed steam and room projectiles
+
+Current proposal: ABI 232,
+`build/v3-particle-interaction-imports-03/cartridge/build-lock.json`.
+ROM SHA-256:
+`7f3ae0d019eb58bf46060579c0fd55304b581e86bce4f930d5e6c0b829b00287`.
+The ordinary importer installs complete periodic steam and directional
+projectiles, their source loop/trigger programmes, instruments/samples, native
+effect profiles, and full furniture models. Both furniture models are reused:
+barbecue 5,760 bytes and cannon 4,480 bytes. Barbecue uses actual B-stock,
+catalogue reordering, and scoring. Cannon remains inactive pending acquisition;
+its model, sounds, and behaviour are installed, not replaced with inert scenery.
+There are 156 development choices. Neither stable web deployment changes.
+
+Static modes 3/4 retain source cadence, height, spread, accepted contact
+directions, and transition exclusions. The native angle and play-frame fields
+are independently checked. The effect source programme `044F` is bound to its
+complete installed eleven-byte sequence, instrument, and priority. Level `55`
+uses the shared complete font extension. A particle-module sound dependency
+works independently of furniture selection and does not enable an unrelated item.
+
+The expanded native owner has 115 effect records, four imported profiles,
+25,504 bytes, and the complete retained campsite-lamp hooks. The 96,072-byte
+graphics bank moves to VROM `03FC0000` with its native reader rebound. The
+previous placement had only 408 bytes free; the two objects need 2,272 bytes.
+The full original bank prefix, segmented offsets, and DMA entry identity remain.
+No additional fixed memory or saved field is allocated. Shared room code is
+15,248/16,384 bytes; bootstrap is 1,521/1,536. Import storage has 1,056,544 bytes
+spare. Audio's conservative permanent allocation has zero spare bytes; future
+audio must extend the existing checked capacity rather than bypass its guard.
+
+Six focused checks pass:
+
+- Three static-source/dispatcher checks, including actual periodic/directional
+  C callbacks under address/undefined-behaviour sanitizers.
+- Complete installed profiles, unchanged furniture artwork, full sound binding,
+  and empty remaining dependency plans for these records.
+- Relocated bank/reader, retained native owner, all four callback profiles,
+  unchanged saved layouts, code bounds, and full UPS reconstruction.
+- Four browser/offline compositions: none, all, barbecue only, and an existing
+  villager. Cannon remains unavailable pending acquisition.
+
+The saved-profile assertion is corrected to permit the newly selected barbecue
+bit and its hash while requiring every other save-runtime field to remain equal.
+The five unchanged preparation checks below remain retained evidence.
+
+Native attempt `build/v3-room-particles-native-01/` stops during fixture graphics
+allocation: the allocator requires a strict end bound and the last slot needs
+one more alignment unit. The single retry, `build/v3-room-particles-native-02/`,
+passes actual native owner loading/relocation, all six graphics allocations,
+and public clip registration. It then stops before effect execution because
+the title-scene heap supplies seven programme slots, while the fixture asserts
+twelve. The native initializer returns zero on the next allocation and records
+the available count. This does not demonstrate an ordinary-room crash, but
+neither particle lifetime nor the new native emitter calls pass this test.
+No third setup retry is permitted in this batch. A future meaningful combined
+room/effect test must use a suitable fixture allocation or the native variable
+slot count and still verify sufficient capacity for its concurrent effects.
+Live synthesis, GPU appearance, ordinary gameplay/save, and hardware remain
+unverified for these changes.
+
+The completed build stages are retained rather than replayed: audio and loop
+audio under `build/v3-particle-interaction-imports-01/`, effects and profiles
+under `build/v3-particle-interaction-imports-02/`, and ordinary import under
+`build/v3-particle-interaction-imports-03/`. The latter's `pipeline.json` pins
+its final lock. A converter-version mismatch caught after profile installation
+is fixed by checking the converter's version rather than the installer's version.
+
+Reproduction from the checked completed profile stage:
+
+```sh
+python3 tools/v3_furniture_pipeline.py import --select 3244 --select 3324 \
+  --reuse-assets build/v3-particle-interaction-imports-02/prepared \
+  --base-lock build/v3-particle-interaction-imports-02/profile-runtime/build-lock.json \
+  --output build/v3-particle-interaction-reproduction
+python3 -m unittest tests.test_v3_room_static.StaticSourceTests \
+  tests.test_v3_room_particles.InstalledParticleTests -v
+```
+
+Saved format 4 is unchanged. Adding barbecue adds its actual selection/profile
+bit: preserve backups and use equal-or-larger selected profiles when loading.
+Format-4 saves do not load in V2 or V3 formats 1–3. The translation-only output
+remains pinned V2-12. No main-lock or stable deployment update is authorised.
+Continue remaining converter/behaviour categories; the current inventory is
+`build/v3-after-particles-inventory-01.json`.
+
 ## Prepared steam and room projectiles
 
 Preparation: `build/v3-room-particles-prepared-01/particles.json`, based on the

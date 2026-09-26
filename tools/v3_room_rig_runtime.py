@@ -38,6 +38,8 @@ from v3_furniture_reactions import SOURCES as REACTION_SOURCES
 SOURCES+=REACTION_SOURCES
 from v3_furniture_static import SOURCES as STATIC_SOURCES
 SOURCES+=STATIC_SOURCES
+from v3_room_particles import SOURCES as PARTICLE_SOURCES
+SOURCES+=PARTICLE_SOURCES
 
 
 def checked_hit_condition(base,report,trigger,sound,audio):
@@ -185,10 +187,11 @@ def install_profiles(base,prior,blob,core,original,output,directories):
                     blob[0x40+i//8]&(1<<(i&7))):raise ValueError('Profile staging overwrites an existing or selected identity')
             if category==static.CATEGORY:
                 adapter=descriptor['callback_adapter']
-                installed=copy.deepcopy(sounds[donor]) if adapter['mode']==1 else dict(
+                installed=copy.deepcopy(sounds[donor]) if adapter['mode'] in (1,4) else dict(
                     source_item_id=donor,item_id=f'{destination:04X}',runtime_index=index,
                     profile_installed=False,parent_selectable=False)
                 installed.update(mode=adapter['mode'],parameter=adapter['parameter'])
+                if adapter['mode']==3:installed['native_sound_word']=adapter['level_sound']['source_sound_id']
                 static.checked_audio(descriptor,installed,result)
                 blob.extend(bytes(-len(blob)%16));vrom=BLOB+len(blob);blob.extend(data)
                 if vrom+len(data)>limit:raise ValueError('Complete static models exceed checked import reservation')
@@ -197,7 +200,7 @@ def install_profiles(base,prior,blob,core,original,output,directories):
                 runtime.setdefault('static_rows',[]).append(installed)
                 runtime['static_rows'].sort(key=lambda r:r['runtime_index'])
                 runtime.setdefault('static',{})['native']=static.native_contract(base)
-                if adapter['mode']==1:sounds[donor]['profile_installed']=True
+                if adapter['mode'] in (1,4):sounds[donor]['profile_installed']=True
                 material_code_changed=True
             elif category==SCROLL_CATEGORY:
                 installed=scrolling.get(donor)
@@ -654,9 +657,13 @@ def publish_packet(equipment,blob,output,*,core=None):
     if billboard:defines+=('AF_V3_ROOM_BILLBOARD',)
     if any(r.get('mode')==5 for r in runtime['rows']):defines+=('AF_V3_ROOM_ROLLING',)
     effects=runtime.get('effects')
+    particles=effects.get('particles') if effects else None
     if effects:
         if packet_ram!=EXTENDED_RAM:raise ValueError('Effect callbacks require the expanded room packet')
         defines+=('AF_V3_ROOM_EFFECTS',f'AF_EFFECT_FLASH_MODEL=0x{effects["bank"]["model"]:X}u')
+    if particles:
+        from v3_room_particles import runtime_defines
+        defines+=runtime_defines(particles)
     defines+=(f'ROOM_RIG_TABLE_RAM=0x{table_ram:X}u',f'ROOM_SOUND_TABLE_RAM=0x{SOUND_TABLE+table_delta:X}u',
               f'ROOM_MATERIAL_TABLE_RAM=0x{MATERIAL_TABLE+table_delta:X}u')
     code,compiled=compile_part('room_rigs_extended' if packet_ram==EXTENDED_RAM else 'room_rigs_packet',output/'room_rigs_packet',
@@ -664,6 +671,7 @@ def publish_packet(equipment,blob,output,*,core=None):
         extra_sources=(('overlays/v3/room_materials.c',) if material_rows else ())+
             (('overlays/v3/room_billboards.c',) if billboard else ())+
             (('overlays/v3/room_effects.c',) if effects else ())+reaction_sources+
+            (('overlays/v3/room_particles.c',) if particles else ())+\
             (('overlays/v3/room_colours.c',) if colours else ())+static_sources)
     table=encode_packet(runtime['rows'],sound_rows,material_rows)
     data=code.ljust(table_ram-packet_ram,b'\0')+table

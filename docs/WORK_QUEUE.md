@@ -22,20 +22,30 @@ Incomplete gameplay stays unavailable in the selector; installing assets does
 not claim that an item is playable. Reuse unchanged passing tests throughout.
 
 Current task: close shared conversion gaps in the ordinary bulk importer.
-Steam/projectile preparation is at `build/v3-room-particles-prepared-01/`.
-The shared graphics converter handles complete two-frame intensity blends;
-both particle lifecycles compile for MIPS, and five focused checks pass.
-Complete assets are 976 and 1,280 bytes. They are not installed or selectable.
-Next connect the shared static emitters, full loop/trigger audio, additive effect
-profiles/controller, and ordinary dependency planning in one import batch.
-Use `restore_controller` to retain current campsite-lamp hooks when extending
-the effect tables. Do not replace the owner with the unmodified retail version.
-The preparation's `FFFF` projectile sound is deliberately unresolved and must
-never enter an installed profile. No native test has been attempted for this batch.
+The checked proposal is ABI 232 at
+`build/v3-particle-interaction-imports-03/cartridge/build-lock.json`, with
+156 development choices. Periodic/directional emitters, complete source audio,
+effect profiles/controller, and ordinary dependency planning are installed.
+Barbecue is enabled through actual B-stock; cannon's full behaviour is inactive
+pending acquisition. Complete 976/1,280-byte effects and both furniture models
+are retained. The graphics bank at `03FC0000` preserves every original byte and
+binds the native reader. No unresolved sound sentinel is installed.
 
-The checked proposal is ABI 227 at
-`build/v3-static-interaction-imports-02/profile-runtime/build-lock.json`,
-with 155 development choices.
+Six focused checks pass, including sanitized emitters and four browser/offline
+compositions. The changed native batch reaches owner loading/relocation, six
+graphics allocations, and the actual clip, then stops at a fixture assertion
+expecting twelve programme allocations; seven are available in the title scene.
+The first setup correction supplies the extra alignment unit required by the
+graphics allocator. Both setup attempts are used. Do not repeat the fixture now;
+retain native lifecycle/rendering as unresolved for the next meaningful
+effect/combined-room batch. No ordinary-game crash is demonstrated.
+
+Continue remaining model/material/animation categories. The fresh inventory is
+`build/v3-after-particles-inventory-01.json`; it has no newly supported uninstalled
+furniture. Installed parent-item/display resources must not be counted as new
+missing furniture just because the furniture-only scanner reports them.
+
+Retained static-interaction implementation:
 Shared static interactions install complete wallet and town-melody behaviours
 through the ordinary importer. Piggy bank and ukulele reuse all prepared artwork;
 the latter retains its full instrument, sample, and nineteen-note programme.
@@ -58,13 +68,10 @@ The native check passes 63 internal assertions. The final dependency-generalisat
 build has the identical tested ROM. Retain the unchanged candle's earlier
 22-assertion native result; do not replay it.
 
-Retain the complete bell, rolling, and contact evidence. The effect continuation
-still lacks graphics-pool allocation in its fixture. Native `80A19304` refuses
-graphics-dependent creation when the count at owner+`37A0` is zero; the fixture
-calls state/program initializers but omits graphics initializer `80A186AC`.
-This is not a demonstrated ordinary-game effect failure. Full particle lifetime
-remains unverified. Do not run a third setup retry or replay the passed bell checks.
-Include proper native graphics setup with the next changed effect integration.
+Retain the complete bell, rolling, and contact evidence. The shared effect
+fixture includes native graphics initialization. Its remaining title-scene
+programme-allocation assumption is recorded above. Native particle lifetime
+remains unverified; do not replay passed bell checks or run a third setup retry.
 
 Continue complete material lifecycles and other model/animation callbacks.
 Mouth of Truth's timed state machine, player-shock request, donor vibration
@@ -80,8 +87,8 @@ Six focused checks and the 36-assertion native check pass; the latter captures
 skeleton and sound calls, not ordinary GPU appearance or synthesis. Retain those
 results and the unchanged source/parser/audio-resource checks. Stone coin's
 rolling lifecycle and sound are complete. Continue the remaining static effect
-callbacks, including barbecue steam and cannon projectiles, and other unsupported
-model/animation categories. Extend shared dispatch and
+callbacks and unsupported model/animation categories. Steam and projectiles are
+installed through shared dispatch. Continue to
 reuse assets; do not divert into the parked acquisition frontend.
 
 Retain the passing 2,850-frame donor comparison, actual material dispatch under
@@ -90,10 +97,10 @@ the player callback and uses a disconnected accessory: ordinary player animation
 actual motor transfers, and physical rumble remain hardware/playtest checks.
 Do not replay unchanged candle, rig, artwork, or sound batches.
 
-Room code has 4,512 bytes spare; bootstrap has 15 bytes spare. Scroll code has
-4 bytes spare, audio has 384 conservative bytes spare, and import storage has
-1,139,376 bytes spare. Capacity extensions must preserve complete dependencies.
-See the [current checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#installed-static-interactions-and-town-tune-instruments)
+Room code has 1,136 bytes spare; bootstrap has 15 bytes spare. Scroll code has
+4 bytes spare, audio has no conservative bytes spare, and import storage has
+1,056,544 bytes spare. Capacity extensions must preserve complete dependencies.
+See the [current checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#installed-steam-and-room-projectiles)
 for reproduction, native limits, and save warnings. Source publication is
 allowed; the main lock and both stable web-patcher deployments stay unchanged.
 

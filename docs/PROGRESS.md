@@ -32,20 +32,26 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
-Steam and room-projectile conversion is prepared at
-`build/v3-room-particles-prepared-01/`, using the ordinary model converter.
-The converter preserves both animated intensity textures, all four steam
-frames, two source material variants, and the projectile's complete 34-triangle
-model. Source-bound callbacks preserve steam physics/colour/debug tuning and
-projectile motion, room bounds, near-wall slowdown, and drawing. Five focused
-checks pass, including sanitizer execution and full generated model checks.
-Native effect registration, actual audio binding, and furniture emitters remain
-to be installed together; this preparation does not add playable choices or
-change the current ROM. See the [particle checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#prepared-steam-and-room-projectiles).
+The checked proposal is ABI 232 at
+`build/v3-particle-interaction-imports-03/cartridge/build-lock.json`, with
+156 development choices. The ordinary importer connects periodic steam and
+directional projectiles, complete loop/trigger audio, and additive native effect
+profiles. All four steam textures, both material variants, and the complete
+projectile model remain. Both furniture models are reused without compilation.
+Barbecue uses its actual B-stock/category, catalogue ordering, and scoring.
+Cannon's complete behaviour remains inactive pending its actual acquisition.
 
-The checked proposal is ABI 227 at
-`build/v3-static-interaction-imports-02/profile-runtime/build-lock.json`,
-with 155 development choices. The shared static-interaction importer installs
+The complete effect graphics bank is relocated to VROM `03FC0000`, with its
+native reader rebound and original prefix preserved. Six focused checks pass,
+including sanitized emitters, complete installed resources, patch reconstruction,
+and four browser/offline compositions. Native owner loading/relocation, six
+graphics allocations, and public clip registration pass. The bounded native run
+stops before particle execution because the title-scene fixture obtains seven
+programme slots while its assertion expects twelve. Native lifecycles/rendering
+remain unverified; no further setup retry is queued for this batch. See the
+[particle checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#installed-steam-and-room-projectiles).
+
+The retained shared static-interaction importer installs
 the piggy bank's one-Bell deduction and the ukulele's native town-tune callback.
 It reuses both complete models and preserves all 71 original font instruments
 while adding the full ukulele instrument/sample and nineteen-note programme.
@@ -124,9 +130,9 @@ conditional effect binding. Its native particle lifetime still needs a properly
 allocated graphics fixture with the next changed effect batch; the previous
 fixture omitted that allocation. Do not repeat the passed bell checks.
 
-Room code uses 11,872 of 16,384 bytes; bootstrap uses 1,521 of 1,536 bytes.
-Scroll code has 4 bytes spare, audio has 384 conservative bytes spare, and
-the import reservation has 1,139,376 bytes spare. Live synthesis, GPU appearance,
+Room code uses 15,248 of 16,384 bytes; bootstrap uses 1,521 of 1,536 bytes.
+Scroll code has 4 bytes spare, audio has no conservative bytes spare, and
+the import reservation has 1,056,544 bytes spare. Live synthesis, GPU appearance,
 ordinary gameplay/save/restart, and original hardware are not newly verified.
 
 Saved format 4 is unchanged. A save using an added item requires its selected
@@ -134,8 +140,9 @@ import in the receiving build; preserve backups and equal-or-larger profiles.
 Format-4 saves cannot load in V2 or format-1/2/3 V3 builds. Translation-only output
 remains the pinned V2-12 ROM. The main lock and both stable deployments remain
 unchanged. Continue remaining model, material, animation, and behaviour
-conversion, including barbecue steam, cannon projectiles, and other prepared
-callback models. Stone coin's full rolling lifecycle and sound are complete.
+conversion, including remaining material lifecycles, rigged creatures, and
+model-bank capacity. Steam, projectiles, and stone coin's rolling lifecycle are
+installed; ordinary gameplay acceptance remains separate.
 The code-entry frontend remains parked.
 
 The retained password-engine component is ABI 197 at

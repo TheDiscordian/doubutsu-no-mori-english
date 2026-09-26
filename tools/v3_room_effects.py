@@ -25,6 +25,7 @@ LAMP_RELOC_SHA = '9b5119253d75fd2e3c22f86a313a56e66454862b020412de64a1bd12b09762
 NATIVE_COUNT = 111
 TABLES = ((0x2A00, 20), (0x32AC, 8), (0x3624, 1))
 INSTALLED_VROM, INSTALLED_RELOC = 0x3FA0000, 0x3FB0000
+INSTALLED_GRAPHICS = 0x3FC0000
 LOADER_BRIDGE = 0x804B1E08
 SOURCES = ('tools/v3_room_effects.py','tools/v3_room_rig_runtime.py','tools/v3_furniture_install.py',
     'tools/v3_asset_loader.py','overlays/v3/room_effects.c','overlays/v3/room_effects.h',
@@ -192,7 +193,7 @@ def conditional_binding(image,report,trigger):
     files=by_vrom(image);controller=effects['controller']
     if (sha256(files[controller['vrom']].extract(image))!=controller['sha256'] or
             sha256(files[controller['reloc']].extract(image))!=controller['reloc_sha256'] or
-            sha256(files[0x1410000].extract(image))!=effects['bank']['sha256']):
+            sha256(files[effects['bank'].get('vrom',0x1410000)].extract(image))!=effects['bank']['sha256']):
         raise ValueError('Changed installed conditional effect owners')
     wall=wall_binding(image,report)
     if wall['converted_sha256']!=effects['source']['wall']['converted_sha256']:
@@ -206,7 +207,7 @@ def conditional_binding(image,report,trigger):
     return dict(wall=wall['index'],effect=112,source_system_word=condition['system_sound_word'])
 
 
-def extend_controller(owner, reloc, additions, *, loader=None):
+def extend_controller(owner, reloc, additions, *, loader=None, graphics_vrom=0x1410000):
     """Append effect identities without replacing native effects or their pools.
 
     Materialise the original BSS as zero-filled initial data, preserving every
@@ -279,6 +280,14 @@ def extend_controller(owner, reloc, additions, *, loader=None):
             patches.append(dict(offset=at,before=u32(owner,at),after=word))
     bound=0x28C10000|(NATIVE_COUNT+len(additions));struct.pack_into('>I',image,0x1048,bound)
     patches.append(dict(offset=0x1048,before=0x28C1006F,after=bound))
+    if (not 0<graphics_vrom<0x4000000 or graphics_vrom&15 or
+            owner[0x202C:0x2034]!=bytes.fromhex('3c08014125080000')):
+        raise ValueError('Changed native effect graphics-bank reader')
+    if graphics_vrom!=0x1410000:
+        for at,word in ((0x202C,0x3C080000|((graphics_vrom+0x8000)>>16)),
+                        (0x2030,0x25080000|(graphics_vrom&65535))):
+            patches.append(dict(offset=at,before=u32(owner,at),after=word))
+            struct.pack_into('>I',image,at,word)
     sections=(*SECTIONS[:2],len(image)-sum(SECTIONS[:2]),0)
     if loader_relocations:
         old_count=u32(reloc,16)
@@ -296,7 +305,7 @@ def extend_controller(owner, reloc, additions, *, loader=None):
         additional_scene_bytes=len(image)-sum(SECTIONS),materialized_zero_bytes=SECTIONS[3],
         original_effects_preserved=True,active_pool_capacity=80,code_pool_slots=12,
         additions=additions,original=original,loader_relocations=loader_relocations,
-        loader=loader[1] if loader else None,installed=False,native_execution_tested=False)
+        loader=loader[1] if loader else None,graphics_vrom=graphics_vrom,installed=False,native_execution_tested=False)
 
 
 def restore_controller(owner,reloc,receipt):
@@ -356,6 +365,9 @@ def install(base, prior, blob, core, original, output, prepared):
     prepared=prepared.resolve()
     if not prepared.is_relative_to(ROOT/'build'):
         raise ValueError('Effects require complete local prepared resources')
+    if (prepared/'particles.json').exists():
+        from v3_room_particles import install as install_particles
+        return install_particles(base,prior,blob,core,original,output,prepared)
     receipt=json.loads((prepared/'effects.json').read_bytes())
     if receipt['format']!='AFV3-ROOM-EFFECTS-PREPARED-1':raise ValueError('Unknown effect preparation')
     files=by_vrom(base);old=prior['equipment_resources'];room=old['room_rigs']

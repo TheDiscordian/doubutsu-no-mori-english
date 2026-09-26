@@ -69,6 +69,24 @@ font converter explicitly permits valid one-step envelopes for this bank;
 existing consumers retain their stricter default. All original instruments are
 compared before and after relocation.
 
+Modes 3 and 4 implement periodic and directional effects through the same
+immutable records. Mode 3 refreshes complete source level sound `55` and emits
+steam every eight native play frames, thirty units above the furniture with
+spread nine. Mode 4 accepts exactly pulse one, reads the native contact owner,
+and fires forward/backward according to the source's two accepted directions.
+Both translate the source transition exclusions into native states 5/6/13/15.
+The angle is the checked halfword at actor offset `124`; play-frame offset
+`1EA0` is distinct from the graphics frame counter. No actor fields grow.
+
+The ordinary planner installs full trigger/level sound resources, complete
+steam/projectile effects, then the furniture profiles. Effect sound dependencies
+are explicit even when no furniture in the selected batch directly owns that
+sound; installing the shared projectile programme never enables an unselected
+cannon. Installed dependencies are skipped, and complete artwork is reused.
+The shared [effect specification](V3_ROOM_EFFECTS.md) defines bank relocation,
+native profiles, and particle lifetimes. Unresolved preparation sound `FFFF`
+cannot enter an installed callback.
+
 The complete 239,920-byte wave-0 resource is stored externally in the import
 reservation. Its signed-relative header preserves native streaming; the shared
 wave archive and its other resources remain intact. Later archive relocation

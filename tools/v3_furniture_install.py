@@ -16,6 +16,7 @@ from apply_translation import write_new
 from v3_asset_loader import BLOB, CONFIG, MODULE, STARTUP, ROOT, compile_part
 from v3_campsite_calendar import PACKAGE_SIZE
 from v3_furniture_pipeline import Source, LAYERS, prepare, metadata, identity_rows, draw_sequence, PENDING_MOVE_CATEGORY
+from v3_furniture_pipeline import VERSION as ASSET_VERSION
 from v3_garden_runtime import install_catalogue
 from v3_import_storage import PACKAGE, PACKAGE_RAM, ROWS, ROWS_RAM, ITEMS, TABLE_END, END, slot
 from v3_registry import furniture_source
@@ -217,7 +218,7 @@ def checked_assets(art_path, source, worksheet):
     raw = (art_path/'art.json').read_bytes(); art = json.loads(raw)
     # Prior objects still undergo complete current metadata and model checks;
     # a display alias cannot pass as standalone furniture through an old report.
-    if (art['format'] != 'AFV3-AUTO-FURNITURE-ASSETS-1' or art['version'] not in (7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, VERSION)
+    if (art['format'] != 'AFV3-AUTO-FURNITURE-ASSETS-1' or art['version'] not in (*range(7, 22), ASSET_VERSION)
             or art['source_rel_sha256'] != sha256(source.rel)
             or art['source_symbols_sha256'] != sha256(source.symbols.encode())):
         raise ValueError('Unknown converter/source revision')
@@ -928,7 +929,7 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             report['shared_runtime_refresh'].update(adapters=['room_effects'],artwork_changed=True,
                 additional_scene_bytes=effects['additional_scene_bytes'])
             report['sources'].update(effects['sources'])
-            report['native_test']='pending additive native effects; endpoint-hit furniture binding remains incomplete'
+            report['native_test']='pending focused integration of the changed native effects'
         if surface_items:
             report['shared_runtime_refresh'].update(adapters=['room_surfaces','surface_items'],
                 additional_resident_bytes=surface_items['additional_resident_bytes'])
@@ -981,9 +982,10 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             report['shared_runtime_refresh']['adapters']=['room_rigs_code']
             report['sources'].update({name:sha256((ROOT/name).read_bytes()) for name in equipment.SOURCES})
         if furniture_audio_art is not None:
-            melody=json.loads((furniture_audio_art/'audio.json').read_bytes()).get('format')=='AFV3-FURNITURE-MELODY-PREPARED-1'
-            kind='furniture_melody_audio' if melody else 'furniture_audio'
-            report['shared_runtime_refresh']['adapters'].append('furniture_melody_audio' if melody else 'furniture_trigger_audio')
+            audio_format=json.loads((furniture_audio_art/'audio.json').read_bytes()).get('format')
+            kind={'AFV3-FURNITURE-MELODY-PREPARED-1':'furniture_melody_audio',
+                  'AFV3-FURNITURE-LEVEL-AUDIO-PREPARED-1':'furniture_level_audio'}.get(audio_format,'furniture_audio')
+            report['shared_runtime_refresh']['adapters'].append(kind)
             report['shared_runtime_refresh']['additional_resident_bytes']=equipment_report[kind]['audio_heap_growth']
         if furniture_profiles is not None:
             report['shared_runtime_refresh']['adapters'].append('inactive_furniture_profiles')

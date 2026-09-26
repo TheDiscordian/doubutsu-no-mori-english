@@ -39,8 +39,15 @@ class StaticSourceTests(unittest.TestCase):
         wallet=self.source.profile(0x1FAC)['callback_adapter']
         self.assertEqual((wallet['mode'],wallet['parameter'],wallet['trigger']['sound_word']),(1,1,124))
         self.assertEqual(wallet['excluded_states'],[])
-        for item in (0x3244,0x3324):
-            self.assertEqual(self.source.profile(item)['callback_adapter']['category'],'static-models-pending-move')
+        for item,mode,kind in ((0x3244,3,'steam'),(0x3324,4,'projectile')):
+            adapter=self.source.profile(item)['callback_adapter']
+            self.assertEqual((adapter['category'],adapter['mode'],adapter['effects']),
+                ('static-interaction',mode,[kind]))
+            self.assertEqual(adapter['excluded_states'],[13,14,15,12])
+
+    def test_periodic_and_directional_emitters_under_sanitizers(self):
+        from tests.test_v3_equipment_runtime import HostTests
+        HostTests.sanitized(self,'v3_room_emitters_test.c')
 
     def test_actual_shared_dispatch_under_sanitizers(self):
         with tempfile.TemporaryDirectory(prefix='afv3-static-') as directory:

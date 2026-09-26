@@ -272,7 +272,7 @@ def furniture_trigger(source,profile):
     return source.switch_sound_callback(copy.deepcopy(functions['move']))
 
 
-def prepare_furniture_audio(image,report,source,inventory,output,selected=(),category=None):
+def prepare_furniture_audio(image,report,source,inventory,output,selected=(),category=None,*,effect_sounds=()):
     """Select a shared furniture behaviour once and prepare all its audio dependencies."""
     from apply_translation import write_new
     from v3_furniture_scroll import CATEGORY as SCROLL_CATEGORY
@@ -286,15 +286,22 @@ def prepare_furniture_audio(image,report,source,inventory,output,selected=(),cat
         from v3_room_movement import prepare_audio
         return prepare_audio(image,report,source,output,selected)
     installed={r['item_id'] for r in report['equipment_resources'].get('furniture_audio',{}).get('furniture',[])}
+    if effect_sounds:
+        from v3_room_particles import sound_dependencies
+        if list(effect_sounds)!=sound_dependencies(source):
+            raise ValueError('Unbound effect audio dependencies')
     rows=[];triggers={}
     for r in inventory['rows']:
+        if effect_sounds and not selected:continue
         if (r['installed'] or r['item_id'] in installed or not r.get('asset_ready') or
                 selected and r['item_id'] not in selected or category is not None and category not in r['categories']):continue
         trigger=furniture_trigger(source,r.get('profile',{}))
         if trigger is not None:rows.append(r);triggers[r['item_id']]=trigger
-    if not rows or selected and set(selected)!={r['item_id'] for r in rows}:
+    if not rows and not effect_sounds or selected and set(selected)!={r['item_id'] for r in rows}:
         raise ValueError('Unsupported or empty furniture audio selection')
-    resources,result=prepare_triggers(image,report,furniture_trigger_words(triggers.values()))
+    words=sorted(set(furniture_trigger_words(triggers.values()))|{r['sound_word'] for r in effect_sounds})
+    resources,result=prepare_triggers(image,report,words)
+    if effect_sounds:result['effect_sound_dependencies']=effect_sounds
     result['furniture']=[dict(item_id=r['item_id'],name=r['name'],
         profile_sha256=r['profile']['profile_sha256'],callback=r['profile']['callback_adapter'],
         trigger=triggers[r['item_id']]) for r in rows]
@@ -328,6 +335,8 @@ def furniture_level(source,profile):
         return colour_lifecycle(source,profile)
     if adapter.get('category')=='billboard-scroll-keyframe-rig':
         return copy.deepcopy(adapter['level_sound'])
+    if adapter.get('category')=='static-interaction':
+        return copy.deepcopy(adapter.get('level_sound'))
     move=functions.get('move')
     if adapter.get('category')!=CATEGORY or move is None or move['bytes'] not in (76,264,304):return None
     raw,actual=source.function(move['offset'])
@@ -1163,7 +1172,13 @@ def install_furniture(image,prior,blob,code,original,output,directory):
         if trigger is None or row.get('trigger',json.loads(json.dumps(trigger)))!=json.loads(json.dumps(trigger)):
             raise ValueError('Changed shared furniture trigger behaviour')
         seen.add(item);triggers[row['item_id']]=trigger
-    resources,audio=prepare_triggers(image,prior,furniture_trigger_words(triggers.values()))
+    effect_sounds=prepared.get('effect_sound_dependencies',[])
+    if effect_sounds:
+        from v3_room_particles import sound_dependencies
+        if effect_sounds!=json.loads(json.dumps(sound_dependencies(source))):
+            raise ValueError('Changed complete effect audio dependencies')
+    words=sorted(set(furniture_trigger_words(triggers.values()))|{r['sound_word'] for r in effect_sounds})
+    resources,audio=prepare_triggers(image,prior,words)
     for key in ('programs','layout','previous','font_index','wave_index','source_sequence_sha256'):
         if json.loads(json.dumps(audio[key]))!=prepared[key]:raise ValueError('Changed complete prepared audio identity')
     all_data={'font.bin':resources['font'],'wave.bin':resources['wave'],**resources['fragments']}
@@ -1251,7 +1266,8 @@ def install_furniture(image,prior,blob,code,original,output,directory):
         profiles_installed=False,ordinary_acquisition_tested=False,native_synthesis_tested=False,physical_audio_played=False)
     result['furniture_audio']['batches']=(copy.deepcopy(previous.get('batches',[])) if previous else [])+[
         dict(prepared_sha256=sha256(raw),source_items=[r['item_id'] for r in furniture],
-             programs=programs,heap_growth=heap_growth,resource_growth=growth)]
+             programs=programs,heap_growth=heap_growth,resource_growth=growth,
+             **({'effect_sound_dependencies':effect_sounds} if effect_sounds else {}))]
     speed=copy.deepcopy(prior['speed_bag_sound']);speed['sequence_group_one_count']=128
     return result,changes,dict(fire_sound=fire,speed_bag_sound=speed,resource_growth=[growth] if growth else [])
 

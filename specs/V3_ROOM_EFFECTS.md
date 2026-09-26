@@ -19,12 +19,13 @@ particle/controller lifecycles and the bell's conditional request arguments.
 The public source branch contains development work; neither web-patcher
 deployment changes until user testing and approval.
 
-`tools/v3_room_particles.py` prepares complete steam and room-projectile assets
+`tools/v3_room_particles.py` prepares and installs steam and room-projectile assets
 through the same furniture model converter, with source-bound callbacks in
 `overlays/v3/room_particles.c`. Their native identities are reserved as 113 and
-114. They remain uninstalled until complete sound binding, furniture emitters,
-and the extended owner/profile tables are connected. The preparation's unresolved
-sound word is not a permitted installed fallback.
+114. Complete sound bindings, furniture emitters, and extended owner/profile
+tables are installed in ABI 232. The ordinary pipeline enables barbecue through
+actual B-stock and leaves cannon inactive until its acquisition is implemented.
+The preparation's unresolved sound word is not a permitted installed fallback.
 
 ## Animated intensity particles
 
@@ -68,12 +69,13 @@ graphics slots. Those capacities remain unchanged.
 | Graphics ranges | `32AC` | 8 | 111 |
 | Duplicate-suppression flags | `3624` | 1 | 111 |
 
-The shared extension appends identities 111 (flash) and 112 (flash controller).
+The shared extension appends identities 111 (flash), 112 (flash controller),
+113 (steam), and 114 (projectile).
 It preserves all existing rows, active-state addresses, instructions outside the
 checked table references/bound and profile-loader call. Original BSS becomes
 explicit zero-filled initial data at the same offsets. A 384-byte relocated
-loader and the expanded tables follow that state. The installed owner is 25,440
-bytes, with 3,664 additional scene bytes and no additional fixed resident
+loader and the expanded tables follow that state. The installed owner is 25,504
+bytes, with 3,728 additional scene bytes and no additional fixed resident
 reservation. The actor descriptor at `801010B0` points to the complete owner
 at VROM `03FA0000` and its actual RAM size; the relocation resource is
 `03FB0000`. Their DMA entries retain native directory adjacency. Original
@@ -106,7 +108,7 @@ The equipment word at `804B1E08` points to the current room bootstrap loader;
 it is regenerated with every shared compilation. The same publication step
 rewrites and checks all effect-profile callbacks and checksums, so subsequent
 item categories cannot retain stale function addresses. Bootstrap code uses
-1,509 of 1,536 bytes; shared room code uses 6,508 of 16,384 bytes.
+1,521 of 1,536 bytes; shared room code uses 15,248 of 16,384 bytes.
 
 ## Camera flashes
 
@@ -146,6 +148,16 @@ original prefix. The appended range is `06016C90..06016E68`; its full model is
 `06016DD8`. Both resource pointers are rebased to the shared segment-6 convention.
 There is no unused segment-8 dependency in the donor drawing program.
 
+The complete graphics bank uses VROM `03FC0000`; its original `01410000`
+placement has insufficient space before the next virtual resource. The same DMA
+directory entry moves with its complete 96,072-byte contents. Only the native
+range reader's checked base-immediate pair changes; all original segmented
+offsets and artwork remain. Steam and projectile append 2,272 bytes after the
+installed flash. The conditional bell verifier uses the recorded bank base,
+and controller reconstruction reverses the recorded reader patch before a
+subsequent extension. Physical placement uses the existing guarded resource
+relocator. No source image, native effect, or model is shortened to fit.
+
 Ringside seating is donor wall 65 (`2741`) and additive native wall 76 (`274C`).
 Preparation compares all 8,192 converted pixels with the installed resource,
 and checks the persistent registry. Comparing against native wall 65 is wrong.
@@ -168,13 +180,14 @@ a duplicate sound does not suppress the source effect request.
 
 ## Remaining integration
 
-Complete the native particle-lifetime continuation in a changed effect batch,
-using actual graphics-pool setup. The isolated fixture currently creates twelve
-program buffers but omits the six graphics buffers. The native count at
-owner offset `37A0` remains zero, and `80A19304` consequently refuses the flash
-allocation. The real scene constructor calls graphics initializer `80A186AC`;
-the fixture does not. Do not reinterpret this as a passed particle test or a
-demonstrated ordinary-game effect defect. Retain the 57-assertion native bell
+Complete native particle-lifetime verification in a changed effect/combined-room
+batch. The isolated fixture calls graphics initializer `80A186AC` and supplies
+an object-exchange arena with an extra alignment unit beyond all six slots.
+The title-scene heap supplies seven programme slots; the fixture currently
+expects twelve and stops before particle execution. Actual native code explicitly
+permits fewer slots when an allocation fails. This is neither a passed particle
+test nor a demonstrated ordinary-game crash. Both setup attempts are used;
+do not repeat them in the same batch. Retain the 57-assertion native bell
 result and passing controller/profile loading, relocation, program caching,
 original-program loading, complete packet, and first timer-update evidence.
 Do not repeat unchanged rolling/material tests or add a third setup retry.

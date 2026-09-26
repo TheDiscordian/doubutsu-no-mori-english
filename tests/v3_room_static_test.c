@@ -47,7 +47,7 @@ int main(void) {
     af_v3_room_sound_mv(&actor,expected_room,0,0);assert(!melodies);
     af_v3_test_static_clip=&clip;clip.melody=0;
     af_v3_room_sound_mv(&actor,expected_room,0,0);assert(!melodies);
-    assert(!af_v3_room_static_mv(0,0));actor.index=100;
-    assert(!af_v3_room_static_mv(&actor,0));
+    assert(!af_v3_room_static_mv(0,0,0));actor.index=100;
+    assert(!af_v3_room_static_mv(&actor,0,0));
     return 0;
 }

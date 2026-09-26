@@ -11,7 +11,7 @@ from v3_npc_draw_smoke import boot_proofs
 from v3_room_effects import RAM
 
 
-def exercise(debug,rom_path,record):
+def exercise(debug,rom_path,record,*,particles=False):
     path=Path(rom_path);image=path.read_bytes();report=json.loads((path.parent/'build.json').read_bytes())
     if sha256(image)!=report['output_sha256']:raise ValueError('Changed shared-effects cartridge')
     room=report['equipment_resources']['room_rigs'];effects=room['effects'];controller=effects['controller']
@@ -34,10 +34,13 @@ def exercise(debug,rom_path,record):
         return at
     size=0x6A00;allocation=bounded(call(0x8009BFC0,[size]),size)
     work_size=0x3B00;work=bounded(call(0x8009BFC0,[work_size]),work_size)
+    # Native object allocation requires the aligned end to be strictly below
+    # its limit, leaving one extra alignment unit beyond all six slots.
+    graphics_size=6*3584+48;graphics=bounded(call(0x8009BFC0,[graphics_size]),graphics_size)
     owner=allocation+16
     game,gfx,actor,xlu,bridge=(work+i for i in (16,0x2200,0x2600,0x2800,0x3900))
     debug.write_memory(allocation,bytes(size));debug.write_memory(work,bytes(work_size));edge=b'V3EF'*4
-    guards=(allocation,work,gfx-16,actor-16,xlu-16,bridge-16,bridge+32,
+    guards=(allocation,work,graphics,graphics+graphics_size-16,gfx-16,actor-16,xlu-16,bridge-16,bridge+32,
             allocation+size-16,work+work_size-16,TEST_STACK-0x800,TEST_STACK+0x40)
     for at in guards:debug.write_memory(at,edge)
     state=report['save_runtime'];saved={at:debug.read_memory(at,n) for at,n in (
@@ -57,6 +60,11 @@ def exercise(debug,rom_path,record):
     # Use the native initializers and actual twelve program allocations. Scene
     # lighting/campsite setup is unchanged and not replayed by this fixture.
     call(owner+0x1404,proof=proof)
+    # The real initializer allocates six fixed graphics slots from the game's
+    # object-exchange arena; programme allocations alone cannot create sprites.
+    put(game+0x110+0x1800,graphics+16,graphics+graphics_size-16)
+    call(owner+0x151C,[game+0x110],proof)
+    check('native graphics capacity',owner+0x37A0,struct.pack('>I',6))
     call(owner+0x1604,proof=proof)
     call(owner+0x1668,[actor],proof)
     check('native public clip',0x80136F3C,struct.pack('>I',actor+0x174))
@@ -79,6 +87,18 @@ def exercise(debug,rom_path,record):
     spec=SimpleNamespace(ram=original[2],resident_bytes=original[3]-original[2],sections=struct.unpack_from('>5I',native_rel))
     want=relocate_verified_data(spec,native_data,native_rel,native_pools[index])
     check('complete original program still uses native loader',native_pools[index],want)
+    if particles:
+        particle_emitters(debug,room,effects,files,image,owner,game,gfx,actor,xlu,proof,check,call,put,word)
+        for p in native_pools:call(0x8009C040,[p])
+        for at,want in saved.items():debug.write_memory(at,want)
+        check('saved import state restored',state['state_ram'],saved[state['state_ram']])
+        for at in guards:check('private work and stack guard',at,edge)
+        check('no faulted thread',0x8003CE34,bytes(4))
+        for at in (graphics,work,allocation):call(0x8009C040,[at])
+        return dict(native_particle_emitters=True,native_graphics_loading=True,
+            complete_steam_lifetime=True,projectile_wall_cleanup=True,assertions=assertions,
+            requires_checkpoint_restore=True,audio_calls_captured=True,native_synthesis=False,
+            gpu_or_hardware=False,ordinary_room=False,saved_data_written=False)
     # The real public request drives both new initializers through the existing
     # 80-slot native pool; its controller then creates real native particles.
     call(owner+0x1028,[112,0,0,0,2,0,game,0xFFFF,0,0],proof)
@@ -111,7 +131,84 @@ def exercise(debug,rom_path,record):
     for at,want in saved.items():debug.write_memory(at,want)
     check('saved import state restored',state['state_ram'],saved[state['state_ram']])
     for at in guards:check('private work and stack guard',at,edge)
-    check('no faulted thread',0x8003CE34,bytes(4));call(0x8009C040,[work]);call(0x8009C040,[allocation])
+    check('no faulted thread',0x8003CE34,bytes(4))
+    for at in (graphics,work,allocation):call(0x8009C040,[at])
     return dict(native_effect_loading=True,native_profile_cache=True,original_program_preserved=True,
         complete_controller_lifetime=True,assertions=assertions,requires_checkpoint_restore=True,
         gpu_or_hardware=False,ordinary_room=False,saved_data_written=False)
+
+
+def particle_emitters(debug,room,effects,files,image,owner,game,gfx,actor,xlu,proof,check,call,put,word):
+    """Changed periodic/directional callbacks through the real native pool."""
+    size=0xA00;area=call(0x8009BFC0,[size])
+    if area&15 or not MODULE_RAM+0x8000<=area<=0x80400000-size:
+        raise ValueError('Particle emitter fixture escapes native heap')
+    furniture,contact,clip,spies,output,bridge=(area+n for n in (0x10,0x200,0x400,0x500,0x600,0x700))
+    debug.write_memory(area,bytes(size));edge=b'V3PE'*4
+    debug.write_memory(area,edge);debug.write_memory(area+size-16,edge)
+    native=(0x800D1D08,0x800D1D58)
+    saved={at:debug.read_memory(at,n) for at,n in ((0x80136F2C,4),(0x804B1E00,4),*((at,8) for at in native))}
+    target=room['bootstrap']['symbols']['af_v3_room_boot_sound_mv']
+    jump=struct.pack('>2I',0x08000000|(target>>2&0x3FFFFFF),0)
+    debug.write_memory(bridge,jump)
+    def flush(at,n):call(0x8002FE00,[at,n]);call(0x80034CE0,[at,n])
+    for i,at in enumerate(native):
+        destination=output+i*32
+        code=struct.pack('>11I',0x3C080000|(destination>>16),0x35080000|(destination&65535),
+            0x8D090010,0x25290001,0xAD090010,0xAD040000,0xAD050004,0xAD060008,0xAD07000C,
+            0x03E00008,0x00001025)
+        debug.write_memory(spies+i*64,code)
+    flush(spies,128);flush(bridge,8)
+    base,active=owner+0x392C,owner+0x54AC
+    def live(effect):
+        return [i for i in range(80) if debug.read_memory(active+i,1)!=b'\0' and
+            debug.read_memory(base+i*88+2,2)==struct.pack('>h',effect)]
+    def run(mode):
+        row=next(r for r in room['static_rows'] if r['mode']==mode)
+        debug.write_memory(furniture,struct.pack('>H',row['runtime_index']))
+        call(bridge,[furniture,contact,game,0],(bridge,jump))
+    try:
+        for i,at in enumerate(native):put(at,0x08000000|((spies+i*64)>>2&0x3FFFFFF),0);flush(at,8)
+        put(0x804B1E00,0);put(0x80136F2C,clip);put(clip,contact)
+        debug.write_memory(furniture+8,struct.pack('>3f',120,0,320))
+        put(game+0x1EA0,0);run(3)
+        check('periodic loop native arguments',output,struct.pack('>3I',furniture,0x55,furniture+8))
+        check('periodic loop called once',output+16,struct.pack('>I',1))
+        steam=live(113)
+        if len(steam)!=1:raise ValueError('Periodic emitter did not create one native steam particle')
+        steam_at=base+steam[0]*88
+        check('complete source steam lifetime',steam_at,struct.pack('>h',44))
+        check('source steam height',steam_at+0x14,struct.pack('>f',31))
+        put(game+0x1EA0,1);run(3)
+        if live(113)!=steam:raise ValueError('Periodic emitter ignored native frame cadence')
+        debug.write_memory(furniture+0x12D,b'\x01');put(contact+0x1A0,0);run(4)
+        projectile=live(114)
+        if len(projectile)!=1:raise ValueError('Directional emitter did not create one native projectile')
+        projectile_at=base+projectile[0]*88
+        check('complete projectile lifetime',projectile_at,struct.pack('>h',360))
+        check('complete installed projectile sound',output+32,
+            struct.pack('>2I',effects['particles']['sound_word'],projectile_at+0x10))
+        check('one projectile sound',output+48,struct.pack('>I',1))
+        bank=files[effects['bank']['vrom']].extract(image)
+        for kind,effect in (('steam',113),('projectile',114)):
+            row=effects['particles']['objects'][kind]
+            pointer=call(owner+0x1EDC,[effect],proof)
+            if not pointer:raise ValueError('Native graphics loader returned no particle model')
+            at=row['base']&0xFFFFFF
+            check('complete native graphics transfer '+kind,pointer,bank[at:at+row['bytes']])
+            call(owner+0x1FE0,[output+64,output+68,effect],proof)
+            check('relocated graphics range '+kind,output+64,
+                struct.pack('>2I',effects['bank']['vrom']+at,row['bytes']))
+        for frame in range(24):
+            put(gfx+0x2A8,xlu,xlu+0x1000)
+            call(owner+0x1CD8,[actor,game],proof)
+            if frame==0:
+                check('two source steam ticks',steam_at,struct.pack('>h',42))
+                check('two source projectile ticks',projectile_at,struct.pack('>h',358))
+                check('native projectile displacement',projectile_at+0x18,struct.pack('>f',324))
+        check('native pool cleans up both lifecycles',active,bytes(80))
+        check('emitter leading guard',area,edge);check('emitter trailing guard',area+size-16,edge)
+    finally:
+        for at,data in saved.items():debug.write_memory(at,data)
+        for at in native:flush(at,8)
+        call(0x8009C040,[area])
