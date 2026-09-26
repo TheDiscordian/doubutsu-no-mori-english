@@ -13,8 +13,8 @@ material, or rig converter. Keep incomplete gameplay out of selectable imports.
 ### Automatic category dependencies
 
 Furniture `import` plans implemented category dependencies from the selected
-source records and checked current build. Clock, storage, and hit-animation rigs
-share this path. Missing rig resources, required audio, and complete behaviour
+source records and checked current build. Clock, storage, hit-animation, and
+camera-facing scrolling rigs share this path. Missing rig resources, required audio, and complete behaviour
 profiles are installed through the existing guarded runtime builder in that
 order. Ordinary item installation follows a fresh eligibility check against the
 resulting build. Missing acquisition remains explicit, not fabricated shop stock.
@@ -25,6 +25,30 @@ across stages, and already installed dependencies are skipped. Every stage has
 an immutable build lock; `pipeline.json` records the dependency plan, actual
 steps, imports, pending reasons, and final lock. A dependency-only build does not
 claim that pending items are available to players.
+
+### Camera-facing scrolling rigs
+
+`billboard-scroll-keyframe-rig` derives complete skeletons, motions, all joint
+models, two-tile scroll parameters, and positional sound from checked source
+callbacks. The category covers tiki torch, campfire, and bonfire without an
+item-ID switch. Existing specialised camping imports retain their resources and
+profiles; ordinary installation skips them instead of installing duplicate items.
+
+The shared rig record uses mode 4. Its first parameter points to a 16-byte
+immutable object suffix: flame model pointer, four dimension bytes, four signed
+scroll-rate bytes, sound ID, state-suppression flag, joint index, and reserved byte.
+The builder requires the complete source loop programme before enabling a profile.
+Tiki torch retains unconditional sound refresh; the camping fires retain their
+source transition-state exclusions mapped to native states 5/6/13/15.
+
+Construction evaluates the repeat animation at speed 0.5; movement evaluates it
+once before restoring that speed. Drawing retains every joint, including the
+torch's extra opaque core. Checked existing camera-facing helpers replace only
+joint 2's shape, preserving its transform, camera matrix, rotation, and scale.
+Both graphics streams are bounded. Each draw owns two matrices and five scroll
+commands in a 176-byte, 16-byte-aligned frame allocation, and flushes every used
+joint matrix. Native drawing emits the hidden joint's matrix on the opaque stream.
+Room and catalogue frames retain the donor's wrapped and quantised scroll rates.
 
 ### Complete hit-animation rigs
 

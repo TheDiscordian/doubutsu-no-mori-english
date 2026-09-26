@@ -14,6 +14,7 @@ CATEGORY = 'indexed-switch-rig'
 CLOCK_CATEGORY = 'indexed-loop-clock-rig'
 STORAGE_CATEGORY = 'open-close-storage-rig'
 HIT_CATEGORY = 'switch-hit-keyframe-rig'
+BILLBOARD_CATEGORY = 'billboard-scroll-keyframe-rig'
 # Complete fixed rig resources with explicit, still-unimplemented callbacks.
 # This category is deliberately not a native behaviour adapter.
 FIXED_CATEGORY = 'fixed-keyframe-rig-assets'
@@ -29,7 +30,7 @@ CLOCK_CODE = {
     'draw': (200, 'f6e60a96386c7721dcd0c894196eae1ee3e5c6339aadf921e2f95952ff7584de'),
     'destroy': (4, 'f332ea5b5437103cbb6f1508679da89eec9288ad775c96c439a17fccabe3de8e'),
 }
-RIG_CATEGORIES = (CATEGORY, CLOCK_CATEGORY, STORAGE_CATEGORY, HIT_CATEGORY)
+RIG_CATEGORIES = (CATEGORY, CLOCK_CATEGORY, STORAGE_CATEGORY, HIT_CATEGORY, BILLBOARD_CATEGORY)
 RESOURCE_CATEGORIES = RIG_CATEGORIES + (FIXED_CATEGORY,)
 CODE = {
     'create': (164, '2a86d61bc9aaf4a0a6479fe97a7f0d5dfe3dc42f9eea663eeb3fd1b8cbc35733'),
@@ -37,6 +38,102 @@ CODE = {
     'draw': (148, 'a0546e1e4e5893a157857ce34244a4183e8991928ae34ce585f79b3da0d052bb'),
     'destroy': (4, 'f332ea5b5437103cbb6f1508679da89eec9288ad775c96c439a17fccabe3de8e'),
 }
+
+
+def discover_billboard(source, vtable_name, vtable_at, functions):
+    """Discover complete looping rigs with a camera-facing scrolling joint."""
+    from v3_furniture_pipeline import ReviewRequired
+    from v3_furniture_scroll import checked_generator
+    def reject(reason):raise ReviewRequired('custom callbacks: billboard rig '+reason)
+    if set(functions)!={'create','move','draw'}:reject('changed lifecycle slots')
+    module=u32(source.rel,0);create=functions['create'];move=functions['move'];draw=functions['draw']
+    def pair(receipt,hi,lo,section):
+        ref=receipt['relocations'].get(hi)
+        if ref is None or ref[:3]!=(6,module,section):reject('missing paired source binding')
+        return ref[3],{hi:ref,lo:(4,module,section,ref[3])}
+    def constant(at,raw):
+        base,n=source.sections[4]
+        if not 0<=at<=n-len(raw) or source.rel[base+at:base+at+len(raw)]!=raw:
+            reject('changed complete constant')
+    bones,a=pair(create,0x0E,0x1A,5);motion,b=pair(create,0x16,0x2A,5)
+    repeat,c=pair(create,0x3A,0x42,5);speed,d=pair(create,0x4E,0x56,4)
+    if motion!=repeat:reject('changed constructor motion')
+    constant(speed,struct.pack('>f',.5))
+    helpers=source.checked_callback_code(create,116,
+        '17985ba5a79cb082f421871e07eca8189d15291d08d408f4d68c257b072d166d',a|b|c|d,
+        {0x34:(0x8D4,'cKF_SkeletonInfo_R_ct'),0x48:(0xA24,'cKF_SkeletonInfo_R_init_standard_repeat'),
+         0x5C:(0xE54,'cKF_SkeletonInfo_R_play')},'billboard constructor')
+    forms={88:(0x2E,0x36,0x3C,'0ba25ef4e6aa1d922958ab14804f260f4b3c85bae06161b45c32bcc51dab5fb9'),
+        124:(0x2A,0x5E,0x60,'9b33d4bfc00c2ab1acafa1b8bd313661eb3377a321728db7e5863c5f9a409e25')}
+    if move['bytes'] not in forms:reject('unknown motion/sound implementation')
+    lo,operand,call,digest=forms[move['bytes']];at,refs=pair(move,0x26,lo,4)
+    if at!=speed:reject('changed move speed')
+    raw,_=source.function(move['offset']);sound=struct.unpack_from('>H',raw,operand)[0]
+    if not 68<=sound<96:reject('unsupported source loop sound')
+    helpers.update(source.checked_callback_code(move,move['bytes'],digest,refs,
+        {0x20:(0xE54,'cKF_SkeletonInfo_R_play'),call:(0x2BDD84,'sAdo_OngenPos')},
+        'billboard motion and sound',{operand:sound}))
+    sound_helper=helpers['sAdo_OngenPos']
+    if (sound_helper['bytes']!=100 or sound_helper['sha256']!='b982dbca7ed68e0565b554e142e64d69a1d2c47ec061169d114502a25e61f885' or
+            sound_helper['relocations']!={72:(10,0,4,0x80012E2C),10:(6,module,6,2306744),34:(4,module,6,2306744)}):
+        reject('changed positioned sound helper')
+    before,a=pair(draw,0xB6,0xC6,1);after,b=pair(draw,0xBE,0xCE,1)
+    raw,_=source.function(draw['offset']);normal=bytearray(raw)
+    for p,(kind,_,_,_) in draw['relocations'].items():
+        if kind in (4,6):normal[p:p+2]=bytes(2)
+        elif kind==10:struct.pack_into('>I',normal,p,u32(raw,p)&0xFC000003)
+        else:reject('unknown draw relocation')
+    for p in range(0,len(raw),4):
+        if u32(raw,p)&0xFC000003==0x48000001:struct.pack_into('>I',normal,p,u32(raw,p)&0xFC000003)
+    forms={
+        '233a0cce877849814d28e24b50e3fc3fbb836b60fe59d0773f42b7d67266b7b4':
+            (((32,32),(32,64)),((0,0),(0,-8)),84,0x40,'2682e7f5f1755916c666209efb4544cd130fb1a8802a250151da8c02c14dbdc9'),
+        'e3f027923c23bb0edfc2ff5e3b56c7353fd5885f4fadf9d30308e2f97553ee2c':
+            (((32,64),(32,32)),((0,-6),(0,0)),80,0x3C,'7f7f55c6d933900a391ed32f6c38ca48b280f59eb7f70d4cdd44685edf79e94b'),
+        'fa68bcdf2c223ec93650cf74ea2d0157af935e251dc8d6d47df8163e5f268fd1':
+            (((32,64),(64,32)),((0,-3),(-2,0)),84,0x40,'45538a9d6afbcec56161b084e7b365bc79fe07794fa6371daaf94baef24e1769')}
+    digest=sha256(normal)
+    if digest not in forms:reject('unknown complete scroll drawing')
+    dimensions,rates,wn,wcall,wh=forms[digest]
+    word=u32(raw,0x5C);delta=word&0x3FFFFFC
+    if delta&0x2000000:delta-=0x4000000
+    wrapper=draw['offset']+0x5C+delta;_,receipt=source.function(wrapper)
+    helpers.update(source.checked_callback_code(draw,268,digest,
+        a|b|{0x10:(10,0,4,0x8009AEC4),0xF8:(10,0,4,0x8009AF10)},
+        {0x5C:(wrapper,receipt['symbol']),0x88:(0x9D214,'_Matrix_to_Mtx_new'),
+         0xAC:(0x9D214,'_Matrix_to_Mtx_new'),0xF0:(0x1578,'cKF_Si3_draw_R_SV')},'billboard drawing'))
+    helpers.update(source.checked_callback_code(receipt,wn,wh,{},
+        {wcall:(0x75400,'two_tex_scroll_dolphin')},'billboard scroll dimensions'))
+    checked_generator(source,helpers['two_tex_scroll_dolphin'])
+    _,pre=source.function(before);_,post=source.function(after)
+    source.checked_callback_code(pre,24,'42c938f5045d988736d65f01c489ad51add9ea58363a4d7aa5b2582256ec4a4b',{}, {},'billboard hidden joint')
+    zero,a=pair(post,0x2E,0x36,4);scale,b=pair(post,0x5A,0x62,4);flame,c=pair(post,0xFA,0x106,5)
+    constant(zero,bytes(12));constant(scale,struct.pack('>f',.01))
+    helpers.update(source.checked_callback_code(post,328,
+        '681fdd9f27c937f2f0319a92497d4a42eaed981da6a711ed2fa4d4746a7fa3df',
+        a|b|c|{0x28:(10,0,4,0x8009AED4),0x134:(10,0,4,0x8009AF20)},
+        {0x84:(0x9D244,'Matrix_Position'),0x88:(0x9C014,'Matrix_push'),
+         0x9C:(0x9C140,'Matrix_translate'),0xA8:(0x9C0D8,'Matrix_mult'),
+         0xB4:(0x9C49C,'Matrix_RotateY'),0xC8:(0x9C22C,'Matrix_scale'),
+         0xE8:(0x9D214,'_Matrix_to_Mtx_new'),0xF0:(0x9C054,'Matrix_pull')},'camera-facing joint'))
+    rig=skeleton(source,bones);motion=animation(source,motion,joints=rig['joints'])
+    if not 3<=rig['joints']<=6 or rig['rows'][2].get('model',{}).get('donor_offset')!=flame:
+        reject('missing complete flame joint')
+    descriptor=model_descriptor(rig,kind='animated-room-model')
+    flame_label=next(r['model_label'] for r in descriptor['joint_models'] if r['joint_index']==2)
+    excluded=[12,13,14,15] if move['bytes']==124 else []
+    return descriptor['models'],{},dict(category=BILLBOARD_CATEGORY,vtable_symbol=vtable_name,
+        vtable_offset=vtable_at,functions=functions,helpers=helpers,joint_callbacks=[pre,post],
+        skeleton=rig,animation=motion,joint_models=descriptor['joint_models'],
+        constructor=dict(mode='repeat',initial_speed=.5,initial_play_before_speed=False),
+        billboard=dict(joint=2,model=flame_label,rotation_y=0x4000,scale=.01,
+            source_billboard_offset=0x204C,native_billboard_offset=0x1E5C),
+        scrolling=dict(segment_address=0x09000000,model=flame_label,input='room-or-preview-frame',
+            source_coordinate_shift=1,tiles=[dict(index=i,width=w,height=h,rate=list(rates[i]))
+                for i,(w,h) in enumerate(dimensions)]),
+        level_sound=dict(category='positioned-loop',source_sound_id=sound,excluded_states=excluded,
+            native_excluded_states=[5,6,13,15] if excluded else [],state_offset=0x3C,position_offset=8,
+            switch_clicks=[],callback_installed=False),runtime_installed=False)
 
 
 def discover_hit(source, vtable_name, vtable_at, functions):
@@ -423,7 +520,15 @@ def suffix(source, profile, model_offsets, *, start):
     roots = {root[1]:model_offsets[label] for label,root in profile['models'].items()}
     bones, rig = compile_skeleton(source,profile['skeleton'],roots,start=start)
     motion, animations = compile_animations(source,[adapter['animation']],start=start+len(bones))
-    return bones+motion, dict(skeleton=rig,animations=animations,
+    extra=b'';fields={}
+    if adapter['category']==BILLBOARD_CATEGORY:
+        scroll=adapter['scrolling'];sound=adapter['level_sound'];offset=start+len(bones)+len(motion)
+        extra=struct.pack('>I4B4b4B',0x06000000+model_offsets[adapter['billboard']['model']],
+            *(v for r in scroll['tiles'] for v in (r['width'],r['height'])),
+            *(v for r in scroll['tiles'] for v in r['rate']),sound['source_sound_id'],
+            bool(sound['excluded_states']),2,0)
+        fields=dict(billboard_offset=offset,billboard_hex=extra.hex())
+    return bones+motion+extra, dict(skeleton=rig,animations=animations,**fields,
         skeleton_offset=rig['header']['native_offset'],animation_offset=animations['headers'][0]['native_offset'],
         runtime_installed=False)
 
@@ -433,4 +538,4 @@ def estimated_suffix(source, profile, start):
     if adapter.get('category') not in RESOURCE_CATEGORIES: return 0
     bones = (profile['skeleton']['joint_table']['bytes']+8+15)&~15
     motion, _ = compile_animations(source,[adapter['animation']],start=start+bones)
-    return bones+len(motion)
+    return bones+len(motion)+(16 if adapter['category']==BILLBOARD_CATEGORY else 0)

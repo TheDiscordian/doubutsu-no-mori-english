@@ -240,6 +240,10 @@ def discover(source, name, at, functions):
 
 def bindings(adapter):
     """Expose only the complete model-local scroll dependency to the parser."""
+    if adapter.get('category')=='billboard-scroll-keyframe-rig':
+        row=adapter['scrolling']
+        return {row['model']:dict(segment=row['segment_address'],
+            dimensions=[[r['width'],r['height']] for r in row['tiles']])}
     if adapter.get('category') != CATEGORY: return {}
     row = adapter['scrolling']; tiles = row['tiles']
     if (row['segment_address'] not in (0x08000000,0x09000000) or len(tiles)!=2 or

@@ -22,16 +22,19 @@ Incomplete gameplay stays unavailable in the selector; installing assets does
 not claim that an item is playable. Reuse unchanged passing tests throughout.
 
 Current task: close shared conversion gaps in the ordinary bulk importer.
-The current checked proposal is ABI 201 at
-`build/v3-hit-category-auto-02/cartridge/build-lock.json`, with 149 private
-development choices. The shared hit-animation category and automatic
-rig/audio/profile installation are implemented, including sandbag's complete
-behaviour and source stock route. Reuse the converted assets and retained checks.
+The current checked proposal is ABI 205 at
+`build/v3-billboard-category-auto-02/cartridge/build-lock.json`, with 150 private
+development choices. Automatic rig/audio/profile installation covers the
+camera-facing scrolling category, including tiki torch's complete model,
+flame drawing, source loop, and stock route. Generic conversion also handles
+the existing campfire and bonfire without replacing their installed profiles.
+Reuse the converted assets and retained checks.
 Continue unsupported model/material/animation callbacks, including required
 item-specific behaviour; do not divert into acquisition frontend work.
-The shared rig packet has 968 code bytes spare and the audio allocation has
-96 conservative bytes spare. Respect these bounds when extending categories.
-See the [current checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-hit-animation-and-automatic-dependencies)
+The shared rig packet has 144 code bytes spare. The checked audio allocator
+adds 1 KiB and has 896 conservative bytes spare. Respect these bounds when
+extending categories.
+See the [current checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#camera-facing-scrolling-rigs)
 for commands, evidence, and save compatibility.
 
 The unfinished code-entry keyboard is parked source work, not the next task.

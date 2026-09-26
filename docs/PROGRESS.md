@@ -26,27 +26,26 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
-The current explicit V3 proposal is ABI 201 at
-`build/v3-hit-category-auto-02/cartridge/build-lock.json`. The ordinary importer
-automatically prepares and installs missing rig, audio, and behaviour dependencies
-for its supported clock, storage, and hit-animation categories, then installs
-eligible items. It reuses converted assets and skips installed stages.
+The current explicit V3 proposal is ABI 205 at
+`build/v3-billboard-category-auto-02/cartridge/build-lock.json`. The ordinary
+importer automatically installs missing rig, audio, and behaviour dependencies,
+then eligible items, while reusing converted assets and skipping installed stages.
+Its camera-facing scrolling category preserves complete skeletons, all models,
+flame transforms, texture timing, and source sound rules. Tiki torch is installed
+with its actual B-stock route and official English name. Generic preparation
+also handles campfire and bonfire; their existing specialised imports remain
+intact. There are 150 private development choices.
 
-The hit-animation adapter preserves complete models, initial pose, repeated-hit
-motion, positioned sound, and transition-state rules. It recognises both boxing
-bags through source callbacks rather than item IDs. Sandbag is installed through
-the ordinary pipeline with its actual B-stock route and official English name;
-the existing speed bag remains intact. There are 149 private development choices.
+Six focused host checks pass, covering source rejection, sanitized behaviour,
+complete installed resources, UPS reconstruction, and four browser/offline
+selection comparisons. Native construction and drawing pass 92 internal checks;
+see the [billboard checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#camera-facing-scrolling-rigs)
+for the result and limits. Movement with the live sound engine, GPU appearance,
+ordinary gameplay, and hardware are not newly verified. The shared packet remains
+8 KiB, with 3,952 of 4,096 code bytes used. The existing checked audio allocator
+adds 1 KiB, leaving 896 conservative bytes spare.
 
-Six focused host checks pass, including source rejection checks, sanitized
-behaviour execution, complete installed resources, UPS reconstruction, and four
-browser/offline selection comparisons. Native animation and drawing-command
-checks pass; see the [hit-category checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-hit-animation-and-automatic-dependencies)
-for the complete result and limits. Actual sound synthesis, ordinary room
-playthrough, and hardware are not newly verified. The shared packet remains
-8 KiB, with 3,128 bytes of code; conservative audio spare capacity is 96 bytes.
-
-Saved format 4 is unchanged. A save using sandbag requires its selected import
+Saved format 4 is unchanged. A save using tiki torch requires its selected import
 in the receiving build; preserve backups and equal-or-larger profiles. Format-4
 saves cannot load in V2 or format-1/2/3 V3 builds. Translation-only output remains
 the pinned V2-12 ROM. The main lock and both stable deployments remain unchanged.

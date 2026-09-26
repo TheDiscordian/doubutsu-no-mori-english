@@ -300,6 +300,8 @@ def furniture_level(source,profile):
     """
     from v3_furniture_scroll import CATEGORY
     adapter=profile.get('callback_adapter',{});functions=copy.deepcopy(adapter.get('functions',{}))
+    if adapter.get('category')=='billboard-scroll-keyframe-rig':
+        return copy.deepcopy(adapter['level_sound'])
     move=functions.get('move')
     if adapter.get('category')!=CATEGORY or move is None or move['bytes'] not in (76,264,304):return None
     raw,actual=source.function(move['offset'])

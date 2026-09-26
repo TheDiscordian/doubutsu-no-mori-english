@@ -40,7 +40,13 @@ static const RoomRigRecord *find(u32 index) {
                 (r->skeleton&3) || r->skeleton<0x06000000u || r->skeleton>0x06000000u+r->bytes-8 ||
                 (r->animation&3) || r->animation<0x06000000u || r->animation>0x06000000u+r->bytes-20) return 0;
 #ifdef AF_V3_ROOM_RIG_PACKET
-        if (r->reserved || r->mode>ROOM_RIG_HIT) return 0;
+        if (r->reserved || r->mode>ROOM_RIG_BILLBOARD) return 0;
+#ifdef AF_V3_ROOM_BILLBOARD
+        if (r->mode==ROOM_RIG_BILLBOARD && (r->last.bits || (r->first.bits&3) ||
+                r->first.bits<0x06000000u || r->first.bits>0x06000000u+r->bytes-16)) return 0;
+#else
+        if (r->mode==ROOM_RIG_BILLBOARD) return 0;
+#endif
         if ((r->mode==ROOM_RIG_SWITCH || r->mode==ROOM_RIG_HIT) && (r->first.bits || r->last.bits)) return 0;
 #ifndef AF_V3_ROOM_TRIGGER_SOUND
         if (r->mode==ROOM_RIG_HIT) return 0;
@@ -82,7 +88,7 @@ void af_v3_room_rig_ct(RoomRig *actor,u8 *data) {
 #endif
     actor->keyframe.speed.bits=0;
 #ifdef AF_V3_ROOM_RIG_PACKET
-    if (r->mode==ROOM_RIG_CLOCK) actor->keyframe.speed.bits=0x3F000000u;
+    if (r->mode==ROOM_RIG_CLOCK || r->mode==ROOM_RIG_BILLBOARD) actor->keyframe.speed.bits=0x3F000000u;
 #endif
     cKF_SkeletonInfo_R_play(&actor->keyframe);
 }
@@ -93,6 +99,16 @@ void af_v3_room_rig_mv(RoomRig *actor,void *room,RoomRigGame *game,u8 *data) {
     if (!data || !find(actor->index)) return;
 #ifdef AF_V3_ROOM_RIG_PACKET
     const RoomRigRecord *r=find(actor->index);
+#ifdef AF_V3_ROOM_BILLBOARD
+    if (r->mode==ROOM_RIG_BILLBOARD) {
+        const RoomBillboard *p=Lib_SegmentedToVirtual((void *)(uptr)r->first.bits);
+        cKF_SkeletonInfo_R_play(&actor->keyframe);
+        actor->keyframe.speed.bits=0x3F000000u;
+        if (!p->suppress_states || (actor->state!=5 && actor->state!=6 && actor->state!=13 && actor->state!=15))
+            sAdo_OngenPos((u32)(uptr)actor,p->sound,actor->position);
+        return;
+    }
+#endif
 #ifdef AF_V3_ROOM_TRIGGER_SOUND
     if (r->mode==ROOM_RIG_HIT) {
         RoomKeyframe *key=&actor->keyframe;
@@ -155,6 +171,12 @@ void af_v3_room_rig_dw(RoomRig *actor,void *room,RoomRigGame *game,u8 *data) {
     (void)room;
     const RoomRigRecord *r=find(actor->index);
     if (!r || !data) return;
+#ifdef AF_V3_ROOM_BILLBOARD
+    if (r->mode==ROOM_RIG_BILLBOARD) {
+        af_v3_room_billboard_dw(actor,room,game,r,Lib_SegmentedToVirtual((void *)(uptr)r->first.bits));
+        return;
+    }
+#endif
     RoomRigGraphics *gfx=game->gfx;
     RoomCommand *commands=gfx->head;
     uptr front=(uptr)commands,back=(uptr)gfx->tail;

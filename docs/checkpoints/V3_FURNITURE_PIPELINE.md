@@ -1,5 +1,104 @@
 # Automatic furniture pipeline checkpoint
 
+## Camera-facing scrolling rigs
+
+The explicit ABI-205 proposal is
+`build/v3-billboard-category-auto-02/cartridge/build-lock.json`, with 150 private
+development choices. The ordinary import command installs missing rig resources,
+loop audio, behaviour profiles, and eligible items through checked dependencies.
+Tiki torch is newly enabled with its complete model, source B-stock membership,
+870-Bell price, and official English name recorded in `translations/provenance.json`.
+The source-driven category also converts complete campfire and bonfire resources;
+their existing specialised imports stay intact, not counted as new additions.
+
+Reproduction uses fresh output directories:
+
+```sh
+python3 tools/v3_furniture_pipeline.py import \
+  --category billboard-scroll-keyframe-rig --select 3264 \
+  --base-lock build/v3-hit-category-auto-02/cartridge/build-lock.json \
+  --reuse-assets build/v3-billboard-rigs-prepared-01 \
+  --output build/v3-billboard-category-auto-02
+python3 -m unittest \
+  tests.test_v3_furniture_rigs.BillboardResourceTests \
+  tests.test_v3_furniture_rigs.CategoryPlanTests \
+  tests.test_v3_room_rig_runtime.BehaviourTests.test_billboard_category_under_sanitizers -v
+V3_IMPORTED_RIG_BUILD=build/v3-billboard-category-auto-02/cartridge \
+  python3 -m unittest tests.test_v3_room_rig_runtime.CurrentImportedRigTests -v
+python3 tools/emulator_smoke.py \
+  --rom build/v3-billboard-category-auto-02/cartridge/animal-forest-v3-asset-loader.z64 \
+  --output build/v3-billboard-rigs-native-02 \
+  --scenario tests/scenarios/v3_billboard_rigs.json \
+  --xvfb /home/discordian/Games/OpenRSC/headless/vendor/usr/bin/Xvfb \
+  --seconds 180 --expansion-pak --no-initial-screenshot
+```
+
+Omitting `--select` processes the matching category batch, skipping installed
+identities. Generic preparation produces full objects of 5,488 bytes for tiki
+torch, 8,016 for campfire, and 6,048 for bonfire in one compiler container.
+The import run reuses its prepared graphics, compiling zero graphics objects.
+Changed native code is compiled through the existing MIPS builders. No per-item
+installer or native scenario is introduced.
+
+Discovery verifies complete create/move/draw callbacks, joint helpers, constants,
+resource relocations, source sound programmes, and scroll generators. Mode 4
+retains an immutable 16-byte parameter suffix inside each full object. The torch
+has four joints and three models, including an additional opaque core. Its sound
+refresh remains unconditional; the camping fires retain their source transition
+exclusions. The runtime reuses verified installed camera-facing joint helpers,
+preserving full joint transforms, camera orientation, rotation, and actor scale.
+Frame-owned matrices and scrolling commands remain immutable after submission.
+
+Six focused host checks pass: three source/planner checks in 2.250 seconds, the
+sanitized renderer/lifecycle check in 0.504 seconds, and two installed-cartridge
+checks in 16.274 seconds. The latter cover complete source/profile/audio bindings,
+UPS reconstruction, and browser/offline none/all/new-category/existing-villager
+equivalence. Empty selection retains V2-12 SHA-256
+`a09373b051cbcd93991e5dd6cb17a238a2afb1e2e2d7694d75408d24a55d4eee`.
+
+Native run `build/v3-billboard-rigs-native-02/` passes 123 scenario steps,
+including 92 internal checks. It executes real construction, complete model and
+motion DMA, both frame parities, all model-list submissions, camera-facing joint
+helpers, and source-derived scroll commands. Independent instances, packet CRC,
+graphics/work/stack guards, unchanged saved state, and post-restore guards pass.
+Both representatives use the newly installed row because only one new item is
+installed. This is drawing-command execution, not GPU appearance verification.
+
+The first native attempt reached correct model lists and scroll commands, but
+the fixture omitted the native drawer's extra opaque matrix command for the
+hidden flame shape. Inspection of the native drawer established that expectation
+error; correcting the fixture and its host stub produced the passing retry.
+No game renderer change or third native attempt was needed. An earlier build
+attempt stopped at the old opaque-only skeleton guard; the builder now permits
+checked translucent joint flags for this complete category only.
+
+The native fixture deliberately does not invoke movement with its uninitialised
+sound owner: the torch's refresh is unconditional. Host sanitizer checks execute
+the movement/sound argument contract and source programme binding is verified,
+but live sound synthesis, GPU appearance, ordinary gameplay/save/restart, and
+original-hardware acceptance are not claimed. All runs are silent and isolated;
+no FlashRAM or Controller Pak is written. Retain unchanged category evidence.
+
+Memory and artifact bounds:
+
+- Shared rig code: 3,952 of 4,096 bytes; complete packet: 8,192 bytes.
+- Bootstrap: 1,510 of 1,536 bytes; no new rig reservation or saved field.
+- Checked audio allocation grows 1,024 bytes to 113,664, with 896 conservative
+  bytes spare; complete source audio resource grows 10,208 bytes.
+- Import blob spare: 1,595,872 bytes.
+- ROM SHA-256: `ce7fcfc85b871b527b904933e47748d3b8405ab42883744d8c6dc16a604c3060`.
+- UPS SHA-256: `2e0ba6f20fcb8e29d86fd62e7f3b6e1614b596f29bfc37a92ba51a2618abc0b3`.
+- Receipt SHA-256: `0dd7b0fe59a768e6d456277ddcdc5c55affed2c91dc79ff0541fb46f0c032bf5`.
+
+Saved format 4 is unchanged; saves using tiki torch need its selected import in
+the receiving build. Preserve backups and equal-or-larger selections. Format-4
+saves cannot load in V2 or format-1/2/3 V3 builds. The ABI-109 main lock, stable
+patcher deployments, and public-release status remain unchanged.
+
+Continue required importing behaviours, shared and item-specific, without a
+shared-before-unique restriction. Acquisition frontend work remains parked;
+the requested gold-tree work follows the primary importing work.
+
 ## Shared hit-animation and automatic dependencies
 
 The explicit ABI-201 proposal is

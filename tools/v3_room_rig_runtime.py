@@ -8,7 +8,7 @@ from aflib import CODE_RAM,CODE_VROM,by_vrom,sha256
 from v3_asset_loader import ROOT,BLOB,compile_part
 from v3_equipment_runtime import RAM as EQUIPMENT_RAM,retired_module_space
 from v3_furniture_pipeline import Source,prepare,room_aliases,PreparedAssets
-from v3_furniture_rigs import CATEGORY,CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,suffix
+from v3_furniture_rigs import CATEGORY,CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY,suffix
 from v3_registry import (furniture_representation_identity,ROOM_ALIAS_REGISTRY_VERSION,
                          furniture_identity,furniture_source,furniture_source_index)
 from v3_import_storage import ROWS,ITEMS,slot,END
@@ -28,7 +28,7 @@ SOURCES=('tools/v3_room_rig_runtime.py','tools/v3_asset_loader.py','tools/v3_fur
     'tools/v3_furniture_behaviours.py','overlays/v3/furniture_behaviours.c','overlays/v3/furniture_behaviours.S','overlays/v3/furniture_behaviours.ld',
     'overlays/v3/room_scroll.c','overlays/v3/room_scroll.h','overlays/v3/room_scroll.ld',
     'overlays/v3/room_materials.c','overlays/v3/room_materials.h',
-    'overlays/v3/room_rigs.c','overlays/v3/room_rigs.h','overlays/v3/room_rigs.ld',
+    'overlays/v3/room_rigs.c','overlays/v3/room_rigs.h','overlays/v3/room_rigs.ld','overlays/v3/room_billboards.c',
     'overlays/v3/held_rigs.ld','overlays/v3/room_rigs_packet.ld',
     'overlays/v3/room_rigs_bootstrap.c','overlays/v3/room_rigs_bootstrap.ld')
 
@@ -67,7 +67,7 @@ def install_profiles(base,prior,blob,core,original,output,directories):
     sounds={r['source_item_id']:r for r in runtime.get('sound_rows',[])}
     materials={r['source_item_id']:r for r in runtime.get('material_rows',[])}
     scrolling=checked_runtime(result,blob)
-    contracts,_=checked_furniture_loops(base,core,result,source) if runtime.get('scrolling',{}).get('lifecycle_rows') else ({},{})
+    contracts,_=checked_furniture_loops(base,core,result,source) if result.get('furniture_level_audio') else ({},{})
     from v3_furniture_contact import checked_contracts
     contracts.update(checked_contracts(source,base,prior))
     old=copy.deepcopy(prior.get('staged_furniture',dict(format='AFV3-STAGED-FURNITURE-PROFILES-1',rows=[],sources=[])))
@@ -82,7 +82,7 @@ def install_profiles(base,prior,blob,core,original,output,directories):
         for row in art['objects']:
             donor=row['item_id'];item=int(donor,16);prepared_row=prepare(source,item)
             descriptor=prepared_row[0];category=descriptor.get('callback_adapter',{}).get('category')
-            if (category not in (CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,'switch-trigger-sound',MATERIAL_CATEGORY,SCROLL_CATEGORY) or
+            if (category not in (CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY,'switch-trigger-sound',MATERIAL_CATEGORY,SCROLL_CATEGORY) or
                     donor in occupied or item not in identities or
                     row['profile']!=json.loads(json.dumps(descriptor)) or
                     row['native_profile_scalar_hex']!=descriptor['scalar_hex']):
@@ -138,13 +138,15 @@ def install_profiles(base,prior,blob,core,original,output,directories):
                     raise ValueError('Prepared scrolling resource is not completely installed')
                 vrom=installed['vrom'];vtable=SCROLL_VTABLE;reused_asset=True
                 installed.update(lifecycle_installed=True,lifecycle=json.loads(json.dumps(lifecycle)))
-            elif category in (CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY):
+            elif category in (CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY):
                 installed=rigs.get(donor)
                 if (not installed or installed['profile_installed'] or installed['source']!=row or
                         installed['bytes']!=len(data) or installed['sha256']!=sha256(data) or
                         blob[installed['blob_offset']:installed['blob_offset']+len(data)]!=data):
                     raise ValueError('Prepared rig is not completely installed in the current runtime')
                 vrom=installed['vrom'];vtable=VTABLE;reused_asset=True
+                if category==BILLBOARD_CATEGORY and contracts.get(donor)!=descriptor['callback_adapter']['level_sound']:
+                    raise ValueError('Billboard rig needs its complete installed source loop audio')
                 if category==HIT_CATEGORY:
                     audio=result.get('furniture_audio',{})
                     audio_row=next((r for r in audio.get('furniture',[]) if r['item_id']==donor),None)
@@ -249,9 +251,12 @@ def bind_profiles(source,base,report):
     placement=checked_initial_switch(base,report,blob)
     if placement and report['furniture_initial_switch']['source']!=json.loads(json.dumps(initial_switch_source(source))):
         raise ValueError('Changed source fresh-placement contract')
-    contracts,_=checked_furniture_loops(base,by_vrom(base)[CODE_VROM].extract(base),e,source) if runtime.get('scrolling',{}).get('lifecycle_rows') else ({},{})
+    contracts,_=checked_furniture_loops(base,by_vrom(base)[CODE_VROM].extract(base),e,source) if e.get('furniture_level_audio') else ({},{})
     from v3_furniture_contact import checked_contracts
     contracts.update(checked_contracts(source,base,report))
+    if any(r.get('mode')==4 for r in runtime['rows']):
+        if runtime.get('billboard_contract')!=billboard_contract(base,report):
+            raise ValueError('Changed installed billboard helper bindings')
     for row,enabled in [(r,False) for r in staged.get('rows',[])]+[(r,True) for r in activated]:
         item=int(row['item_id'],16);donor=f'{furniture_source(row)[0]:04X}';i=slot(item);binding=bindings.get(donor)
         if (donor in source.runtime_profiles or not binding or not binding['profile_installed'] or
@@ -283,6 +288,8 @@ def bind_profiles(source,base,report):
                     sound['source_sound_word']!=trigger['sound_word'] or
                     audio['callback']!=json.loads(json.dumps(descriptor['callback_adapter']))):
                 raise ValueError('Incomplete installed hit-rig audio/behaviour')
+        if category==BILLBOARD_CATEGORY and contracts.get(donor)!=descriptor['callback_adapter']['level_sound']:
+            raise ValueError('Incomplete installed billboard-rig audio/behaviour')
         art['room_runtime']=dict(vtable=expected_vtable,vrom=vrom)
         at=vrom-BLOB;n=art['object_bytes'];native=profile(art,vrom,limit=limit)
         current=blob[ROWS+i*80:ROWS+(i+1)*80];record=blob[ITEMS+i*32:ITEMS+(i+1)*32]
@@ -329,11 +336,12 @@ def prepared_categories(source,directories):
         for row in art['objects']:
             donor=row['item_id'];item=int(donor,16);prepared_row=prepare(source,item)
             profile=prepared_row[0];adapter=profile.get('callback_adapter',{});category=adapter.get('category')
-            if category not in (CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY):
+            if category not in (CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY):
                 raise ValueError('Unimplemented additional room-rig category')
             if (row['profile']!=json.loads(json.dumps(profile)) or donor in assets or
                     row['native_profile_scalar_hex']!=profile['scalar_hex'] or
-                    profile['skeleton']['joints']>6 or any(r.get('draw_stream') for r in profile['skeleton']['rows'])):
+                    profile['skeleton']['joints']>6 or category!=BILLBOARD_CATEGORY and
+                    any(r.get('draw_stream') for r in profile['skeleton']['rows'])):
                 raise ValueError('Changed room-rig profile or native work capacity')
             cache.reuse(source,donor,prepared_row)
             data=(directory/row['object_file']).read_bytes()
@@ -344,8 +352,10 @@ def prepared_categories(source,directories):
             elif category==STORAGE_CATEGORY:
                 mode=2;first=int(adapter['constants']['start_frame']['hex'],16)
                 last=int(adapter['constants']['end_frame']['hex'],16)
-            else:
+            elif category==HIT_CATEGORY:
                 mode=3;first=last=0
+            else:
+                mode=4;first=0x06000000+rig['billboard_offset'];last=0
             rows.append(dict(source_item_id=donor,item_id=f'{destination:04X}',runtime_index=index,
                 bytes=len(data),sha256=sha256(data),category=category,mode=mode,first=first,last=last,
                 skeleton=0x06000000+rig['skeleton_offset'],animation=0x06000000+rig['animation_offset'],
@@ -389,8 +399,9 @@ def encode_packet(rows,sound_rows=(),material_rows=()):
     for r in rows:
         encode([r])  # Retain the complete existing object/pointer/work-area checks.
         mode,first,last=r.get('mode',0),r.get('first',0),r.get('last',0)
-        if (mode not in (0,1,2,3) or mode in (0,3) and (first or last) or
+        if (mode not in (0,1,2,3,4) or mode in (0,3) and (first or last) or
                 mode==1 and not (0<first<r['joints'] and 0<last<r['joints'] and first!=last) or
+                mode==4 and (last or first&3 or not 0x06000000<=first<=0x06000000+r['bytes']-16) or
                 mode==2 and not 0x3F800000<=first<last<=0x43800000):
             raise ValueError('Invalid complete room-rig behaviour parameters')
         table.extend(struct.pack('>HHIIBBBBII',r['runtime_index'],r['bytes'],r['skeleton'],r['animation'],
@@ -436,14 +447,37 @@ def extended_contract(base,core,original):
         keyframe_api_sha256=sha256(n[a:b]),native_storage_speed=1.0,source_storage_speed=0.5)
 
 
+def billboard_contract(base,report):
+    """Verify the retained native camera-facing helpers and their dependencies."""
+    from v3_fire import ENGINE,RAM as FIRE_RAM
+    from v3_import_storage import PACKAGE,PACKAGE_RAM
+    files=by_vrom(base);blob=files[BLOB].extract(base);receipt=report['fire']['code']
+    at=PACKAGE+FIRE_RAM-PACKAGE_RAM
+    if (receipt['bytes']!=1240 or receipt['sha256']!='172bdb4e01ea1061c31bfec1c2017a8fa3eb253d790a1163eac1056c5413da9b' or
+            sha256(blob[at:at+1240])!=receipt['sha256'] or receipt['symbols']['fire_before']!=0x80483810 or
+            receipt['symbols']['fire_after']!=0x80483B00):
+        raise ValueError('Changed complete installed camera-facing helpers')
+    blocks=[]
+    for name,address,n,digest in ENGINE:
+        vrom,ram=(0x1060,0x80025C60) if name=='osWritebackDCache' else (CODE_VROM,CODE_RAM)
+        data=files[vrom].extract(base)[address-ram:address-ram+n]
+        if sha256(data)!=digest:raise ValueError('Changed native billboard dependency: '+name)
+        blocks.append(dict(name=name,address=address,bytes=n,sha256=digest))
+    return dict(code_sha256=receipt['sha256'],before=0x80483810,after=0x80483B00,blocks=blocks,
+        actor_scale=0x714,billboard=0x1E5C,room_frame=0x1EA0,preview_frame=0xA0)
+
+
 def publish_packet(equipment,blob,output):
     """Compile shared behaviour once and publish it through the stable room vtable."""
     runtime=equipment['room_rigs'];packet=runtime['packet'];at=packet['blob_offset']
     sound_rows=runtime.get('sound_rows',[]);material_rows=runtime.get('material_rows',[])
     defines=('AF_V3_ROOM_RIG_PACKET',)+(('AF_V3_ROOM_TRIGGER_SOUND',) if sound_rows else ())
+    billboard=any(r.get('mode')==4 for r in runtime['rows'])
+    if billboard:defines+=('AF_V3_ROOM_BILLBOARD',)
     code,compiled=compile_part('room_rigs_packet',output/'room_rigs_packet',
         primary_source='overlays/v3/room_rigs.c',defines=defines,
-        extra_sources=('overlays/v3/room_materials.c',) if material_rows else ())
+        extra_sources=(('overlays/v3/room_materials.c',) if material_rows else ())+
+            (('overlays/v3/room_billboards.c',) if billboard else ()))
     table=encode_packet(runtime['rows'],sound_rows,material_rows)
     data=code.ljust(PACKET_TABLE-PACKET_RAM,b'\0')+table
     if len(code)>PACKET_TABLE-PACKET_RAM or len(data)!=PACKET_BYTES or not zlib.crc32(data):
@@ -563,6 +597,8 @@ def extend(base,prior,blob,core,original,output,directories):
     needed=sum(len(d) for d in assets.values())+(0 if is_packet else PACKET_BYTES)
     reuse=retired_module_space(base,prior,blob,needed)
     contract=extended_contract(base,core,original)
+    billboard=any(r.get('mode')==4 for r in all_rows)
+    billboard_binding=billboard_contract(base,prior) if billboard else None
     if reuse:
         cursor=reuse['blob_offset']
     else:
@@ -571,6 +607,7 @@ def extend(base,prior,blob,core,original,output,directories):
             raise ValueError('Complete room category exceeds checked cartridge reservation')
         blob.extend(bytes(cursor+needed-len(blob)))
     result=copy.deepcopy(old);installed=result['room_rigs']
+    if billboard_binding:installed['billboard_contract']=billboard_binding
     if not is_packet:
         installed['packet']=dict(ram=PACKET_RAM,bytes=PACKET_BYTES,blob_offset=cursor,vrom=BLOB+cursor)
         cursor+=PACKET_BYTES

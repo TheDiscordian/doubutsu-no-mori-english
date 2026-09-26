@@ -24,7 +24,7 @@ from v3_registry import FURNITURE, LEGACY_FURNITURE, furniture_identity, furnitu
 from v3_room_aliases import discover as room_aliases, pending_reason as room_alias_reason
 from v3_villager_art import native_palette, normalise_vertex_flags
 
-VERSION = 18
+VERSION = 19
 PENDING_MOVE_CATEGORY = 'static-models-pending-move'
 LAYERS = ('opaque', 'opaque1', 'translucent', 'translucent1')
 BEHAVIOURS = {0: 'static', 1: 'front-seat', 2: 'any-direction-seat', 4: 'front-sofa',
@@ -258,7 +258,9 @@ class Source:
         scrolling=discover_scroll(self,name,at,functions)
         if scrolling is not None:return scrolling
         from v3_furniture_rigs import (CODE as RIG_CODE, CLOCK_CODE, STORAGE_CODE,
-            discover as discover_rig, discover_clock, discover_storage, discover_fixed, discover_hit)
+            discover as discover_rig, discover_clock, discover_storage, discover_fixed, discover_hit, discover_billboard)
+        if functions.get('create',{}).get('bytes')==116 and functions.get('draw',{}).get('bytes')==268:
+            return discover_billboard(self,name,at,functions)
         if (functions.get('create',{}).get('bytes')==132 and
                 functions.get('move',{}).get('bytes')==296 and functions.get('draw',{}).get('bytes')==140):
             return discover_hit(self,name,at,functions)
@@ -1219,16 +1221,18 @@ def convert(source, worksheet, output, selected=(), installed=None, *, assets_on
 
 def rig_import_plan(inventory, report, bindings, selected=(), category=None):
     """Plan shared dependencies, not per-item installers or acquisition guesses."""
-    from v3_furniture_rigs import CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY
-    categories={CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY}
+    from v3_furniture_rigs import CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY
+    categories={CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY}
     rows=[r for r in inventory['rows'] if r.get('asset_ready') and not r['installed'] and
         not r.get('room_alias') and (not selected or r['item_id'] in selected) and
         (category is None or category in r['categories']) and
         r['profile'].get('callback_adapter',{}).get('category') in categories]
     rigs={r['source_item_id'] for r in report['equipment_resources']['room_rigs']['rows']}
     audio={r['item_id'] for r in report['equipment_resources'].get('furniture_audio',{}).get('furniture',[])}
+    loops={r['item_id'] for r in report['equipment_resources'].get('furniture_level_audio',{}).get('furniture',[])}
     return dict(resources=sorted(r['item_id'] for r in rows if r['item_id'] not in rigs),
         audio=sorted(r['item_id'] for r in rows if r['profile']['callback_adapter'].get('trigger') and r['item_id'] not in audio),
+        loops=sorted(r['item_id'] for r in rows if r['profile']['callback_adapter'].get('level_sound') and r['item_id'] not in loops),
         profiles=sorted(r['item_id'] for r in rows if r['item_id'] not in bindings))
 
 
@@ -1241,7 +1245,7 @@ def import_batch(source, worksheet, output, lock, selected=(), category=None, re
     """
     from v3_furniture_install import inputs,refresh_runtime,build
     from v3_room_rig_runtime import bind_profiles
-    from v3_sound_programs import prepare_furniture_audio
+    from v3_sound_programs import prepare_furniture_audio,prepare_furniture_levels
     base,report=inputs(lock);bind_profiles(source,base,report)
     installed=[int(r['id'].rsplit('/',1)[1],16) for r in report['furniture']['imports']+[report['speed_bag']]]
     inventory=scan(source,worksheet,installed,selected=selected)
@@ -1272,9 +1276,13 @@ def import_batch(source, worksheet, output, lock, selected=(), category=None, re
             audio=output/'audio'
             prepare_furniture_audio(base,report,source,inventory,audio,plan['audio'])
             refresh('audio-runtime',furniture_audio_art=audio)
+        if plan['loops']:
+            audio=output/'loop-audio'
+            prepare_furniture_levels(base,report,source,inventory,audio,plan['loops'])
+            refresh('loop-audio-runtime',furniture_audio_art=audio)
         if plan['profiles']:
             refresh('profile-runtime',furniture_profiles=[bundle(plan['profiles'],'profile-assets')])
-    elif plan['audio']:
+    elif plan['audio'] or plan['loops']:
         raise ValueError('Audio dependency is missing from an otherwise installed rig profile')
     bind_profiles(source,base,report)
     if steps:inventory=scan(source,worksheet,installed,selected=selected)

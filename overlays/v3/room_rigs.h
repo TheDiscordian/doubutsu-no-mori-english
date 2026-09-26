@@ -58,6 +58,18 @@ typedef struct {
 #define ROOM_RIG_CLOCK 1u
 #define ROOM_RIG_STORAGE 2u
 #define ROOM_RIG_HIT 3u
+#define ROOM_RIG_BILLBOARD 4u
+#ifdef AF_V3_ROOM_BILLBOARD
+typedef struct {
+    u32 flame;
+    u8 dimensions[2][2];
+    signed char rates[2][2];
+    u8 sound,suppress_states,joint,reserved;
+} RoomBillboard;
+_Static_assert(sizeof(RoomBillboard)==16,"Billboard parameter size");
+extern void sAdo_OngenPos(u32,u8,float *);
+extern void af_v3_room_billboard_dw(RoomRig *,void *,RoomRigGame *,const RoomRigRecord *,const RoomBillboard *);
+#endif
 typedef struct {
     u8 prefix[0x34];
     void (*open_close)(RoomRig *,void *,RoomRigGame *,float,float);

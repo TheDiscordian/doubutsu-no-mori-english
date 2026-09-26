@@ -518,14 +518,16 @@ def room_rigs(debug,rom_path,record,*,mode=2):
     state=report['save_runtime']
     saved={at:debug.read_memory(at,n) for at,n in ((0x801458B8,4),(state['state_ram'],state['state_bytes']))}
     if mode==1:saved[0x80136FC4]=debug.read_memory(0x80136FC4,4)
-    size=0x6200;allocation=call(0x8009BFC0,[size])
+    size=0x8300 if mode==4 else 0x6200;allocation=call(0x8009BFC0,[size])
     if allocation&15 or not MODULE_RAM+0x8000<=allocation<=0x80400000-size:
         raise ValueError('Room-rig fixture outside native heap')
     actor,other,graph,game,identity,bridge,bank,gfx,xlu=(allocation+n for n in
         (16,0x800,0x1500,0x1900,0x1A00,0x1B00,0x2000,0x4600,0x5800))
+    game_bytes=0x1EB0 if mode==4 else 0xB0
+    if mode==4:game=allocation+0x6300
     debug.write_memory(allocation,bytes(size));edge=b'V3RR'*4
     guards=(allocation,actor+0x740,other-16,other+0x740,graph-16,graph+0x300,
-            game-16,game+0xB0,identity-16,identity+64,bridge-16,bridge+32,
+            game-16,game+game_bytes,identity-16,identity+64,bridge-16,bridge+32,
             bank-16,bank+9216,gfx-16,gfx+0x1000,xlu-16,xlu+0x800,
             allocation+size-16,TEST_STACK-0x800,TEST_STACK+0x40)
     for at in guards:debug.write_memory(at,edge)
@@ -541,6 +543,7 @@ def room_rigs(debug,rom_path,record,*,mode=2):
         return call(bridge+names.index(name)*8,args,(bridge,jumps))
     matrix=call(0x800E02AC);matrix_before=debug.read_memory(matrix,64)
     debug.write_memory(identity,struct.pack('>16f',*(1 if i%5==0 else 0 for i in range(16))))
+    if mode==4:debug.write_memory(game+0x1E5C,debug.read_memory(identity,64))
     rows=[r for r in rigs['rows'] if r.get('mode')==mode] if packet else rigs['rows']
     selected=[min(rows,key=lambda r:r['bytes']),max(rows,key=lambda r:r['bytes'])]
     if mode==1:
@@ -559,14 +562,15 @@ def room_rigs(debug,rom_path,record,*,mode=2):
             for target in (actor,other):
                 debug.write_memory(target,b'\xA5'*0x740)
                 debug.write_memory(target,struct.pack('>H',row['runtime_index']))
+                if mode==4:debug.write_memory(target+0x714,struct.pack('>3f',1,1,1))
                 debug.write_memory(target+0x12D,bytes(1));callback('ct',target)
                 check('initial per-instance speed and target',target+0x204,struct.pack('>2f',0,.5))
                 check('native work vectors belong to this instance',target+0x158,
                       struct.pack('>2I',target+0x1A4,target+0x1DA))
-                initial=(.5,1.5) if mode==1 else (0,1.5) if mode==3 else (0,1)
+                initial=(.5,1.5) if mode in (1,4) else (0,1.5) if mode==3 else (0,1)
                 check('source initial speed and frame',target+0x140,struct.pack('>2f',*initial))
                 if packet:
-                    check('native category animation mode',target+0x148,struct.pack('>I',1 if mode==1 else 0))
+                    check('native category animation mode',target+0x148,struct.pack('>I',1 if mode in (1,4) else 0))
                     check('complete lazily loaded room packet',packet['ram'],
                           blob[packet['blob_offset']:packet['blob_offset']+packet['bytes']])
                     check('startup cache remembers the verified packet',0x804B1E00,struct.pack('>I',packet['crc32']))
@@ -594,6 +598,11 @@ def room_rigs(debug,rom_path,record,*,mode=2):
                     debug.write_memory(actor+0x12D,bytes((changed,)));callback('mv',actor)
                     check('hit/retrigger retains native source evaluation order',actor+0x140,struct.pack('>2f',.5,want))
                     check('room owner retains hit pulse',actor+0x12D,bytes((changed,)))
+            elif mode==4:
+                # Its positional sound is unconditional. Do not call movement
+                # in this isolated fixture without the actual audio owner.
+                # Source bindings and sanitized argument checks cover that path.
+                pass
             elif packet:
                 stopped=debug.read_memory(actor,0x740);callback('mv',actor)
                 check('storage without a room owner remains stopped',actor,stopped)
@@ -616,16 +625,44 @@ def room_rigs(debug,rom_path,record,*,mode=2):
             if not gfx<front<=back<=gfx+0x1000:raise ValueError('Room rig escaped graphics arena')
             commands=debug.read_memory(gfx,front-gfx)
             drawn=[b for a,b in struct.iter_unpack('>2I',commands) if a>>24==0xDE]
-            expected=[0x06000000+p for p in row['source']['model_offsets'].values()]
-            passed=drawn==expected and back==gfx+0x1000-64 and len(commands)==(2+2*row['shown'])*8
+            offsets=row['source']['model_offsets']
+            expected=[0x06000000+p for p in offsets.values()]
+            if mode==4:
+                adapter=row['source']['profile']['callback_adapter'];flame=adapter['billboard']['joint']
+                opaque=[j for j in adapter['skeleton']['rows']
+                        if 'model' in j and j['index']!=flame and not j['draw_stream']]
+                expected=[0x06000000+offsets['joint'+str(j['index'])] for j in opaque]
+                # A hidden shape still emits its joint matrix to the opaque
+                # stream before the camera-facing after-callback draws it.
+                passed=drawn==expected and back==((gfx+0x1000-176)&~15) and len(commands)==(3+2*len(opaque))*8
+                xfront,xback=struct.unpack('>2I',debug.read_memory(graph+0x2A8,8))
+                if not xlu<xfront<=xback==xlu+0x800:raise ValueError('Billboard escaped translucent arena')
+                xcommands=debug.read_memory(xlu,xfront-xlu)
+                xdrawn=[b for a,b in struct.iter_unpack('>2I',xcommands) if a>>24==0xDE]
+                xexpected=[0x06000000+offsets['joint'+str(j['index'])] for j in adapter['skeleton']['rows']
+                           if 'model' in j and (j['index']==flame or j['draw_stream'])]
+                passed=passed and xdrawn==xexpected and len(xcommands)==(3+2*len(xexpected))*8
+                check('frame-owned scroll segment',xlu+8,struct.pack('>2I',0xDB060024,back+128))
+                scroll=[]
+                for tile in adapter['scrolling']['tiles']:
+                    x,y=(((parity*rate*2)&0x3FFF)>>2 for rate in tile['rate'])
+                    scroll.extend((0xE8000000,0,0xF2000000|(x<<12)|y,
+                        (tile['index']<<24)|(((x+(tile['width']-1)*4)&0xFFF)<<12)|((y+(tile['height']-1)*4)&0xFFF)))
+                scroll.extend((0xDF000000,0))
+                check('complete source-derived scroll commands',back+128,struct.pack('>10I',*scroll))
+                record(dict(room_rig_billboard_lists=xdrawn,expected=xexpected))
+            else:
+                passed=drawn==expected and back==gfx+0x1000-64 and len(commands)==(2+2*row['shown'])*8
             record(dict(room_rig_draw=row['source_item_id'],lists=drawn,expected=expected,
                         assertion='passed' if passed else 'failed'))
             if not passed:raise ValueError('Room rig omitted complete models or misused graphics allocation')
             assertions+=1
-            check('translucent stream only binds skeleton matrices',graph+0x2A8,struct.pack('>2I',xlu+8,xlu+0x800))
+            if mode!=4:check('translucent stream only binds skeleton matrices',graph+0x2A8,struct.pack('>2I',xlu+8,xlu+0x800))
             check('untouched opposite matrix bank',actor+0x210+(1-parity)*0x280,b'\xA5'*0x280)
             check('unused matrix slots retain their bytes',actor+0x210+parity*0x280+row['shown']*64,b'\xA5'*((10-row['shown'])*64))
-            check('native tail fields retain their bytes',actor+0x710,b'\xA5'*0x30)
+            tail=bytearray(b'\xA5'*0x30)
+            if mode==4:struct.pack_into('>3f',tail,4,1,1,1)
+            check('native tail fields retain their bytes',actor+0x710,tail)
             check('unused morph-vector bytes retain their bytes',actor+0x20C,b'\xA5'*4)
             check('balanced matrix stack',0x801462B4,struct.pack('>I',matrix))
             check('unchanged parent transform',matrix,debug.read_memory(identity,64))
@@ -641,6 +678,7 @@ def room_rigs(debug,rom_path,record,*,mode=2):
         call(0x8009C040,[allocation])
     return dict(native_room_rigs=True,representatives=len(selected),assertions=assertions,
         complete_model_animation_dma=True,independent_instances=True,gpu_rendered=False,
+        native_move_tested=mode!=4,native_billboard_helpers_tested=mode==4,
         storage_open_close_gameplay_tested=False,lazy_packet_tested=bool(packet),
         ordinary_room_tested=False,parent_selection_tested=False,flash_written=False,requires_checkpoint_restore=True)
 
@@ -1709,6 +1747,7 @@ def exercise(debug, rom_path, record, *, section='automatic_furniture'):
     if section=='room_rigs':return room_rigs(debug,rom_path,record)
     if section=='clock_rigs':return room_rigs(debug,rom_path,record,mode=1)
     if section=='hit_rigs':return room_rigs(debug,rom_path,record,mode=3)
+    if section=='billboard_rigs':return room_rigs(debug,rom_path,record,mode=4)
     if section=='item_categories':return item_categories(debug,rom_path,record)
     path = Path(rom_path)
     image = path.read_bytes()

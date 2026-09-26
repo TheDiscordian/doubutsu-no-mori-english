@@ -29,7 +29,7 @@ PROFILE_OUT=ROOT/os.environ.get('V3_ROOM_PROFILE_BUILD','build/v3-shared-room-pr
 class CurrentImportedRigTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.out=ROOT/os.environ.get('V3_IMPORTED_RIG_BUILD','build/v3-hit-category-auto-02/cartridge')
+        cls.out=ROOT/os.environ.get('V3_IMPORTED_RIG_BUILD','build/v3-billboard-category-auto-02/cartridge')
         cls.image,cls.report=inputs(cls.out/'build-lock.json')
         cls.blob=by_vrom(cls.image)[BLOB].extract(cls.image)
         cls.source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
@@ -37,21 +37,29 @@ class CurrentImportedRigTests(unittest.TestCase):
         cls.rows=cls.report['automatic_furniture']['imports']
 
     def test_imported_category_keeps_rig_audio_profiles_and_reuses_assets(self):
-        from v3_furniture_rigs import HIT_CATEGORY
+        from v3_furniture_rigs import HIT_CATEGORY,BILLBOARD_CATEGORY
         from v3_furniture_pipeline import prepare
         from v3_furniture_install import profile
         r=self.report;e=r['equipment_resources'];rigs=e['room_rigs'];bindings=runtime.bind_profiles(self.source,self.image,r)
         self.assertTrue(self.rows)
         for row in self.rows:
             donor=row.get('donor_item_id',row['item_id']);descriptor=prepare(self.source,int(donor,16))[0]
-            self.assertEqual(descriptor['callback_adapter']['category'],HIT_CATEGORY)
+            category=descriptor['callback_adapter']['category']
+            self.assertIn(category,(HIT_CATEGORY,BILLBOARD_CATEGORY))
             rig=next(x for x in rigs['rows'] if x['source_item_id']==donor)
-            sound=next(x for x in rigs['sound_rows'] if x['source_item_id']==donor)
-            audio=next(x for x in e['furniture_audio']['furniture'] if x['item_id']==donor)
-            self.assertEqual(rig['mode'],3);self.assertTrue(rig['parent_selectable'])
-            self.assertTrue(sound['profile_installed']);self.assertTrue(sound['parent_selectable'])
-            self.assertEqual(audio['trigger'],json.loads(json.dumps(descriptor['callback_adapter']['trigger'])))
-            self.assertEqual(audio['trigger']['sound_word'],sound['source_sound_word'])
+            self.assertTrue(rig['parent_selectable'])
+            if category==HIT_CATEGORY:
+                sound=next(x for x in rigs['sound_rows'] if x['source_item_id']==donor)
+                audio=next(x for x in e['furniture_audio']['furniture'] if x['item_id']==donor)
+                self.assertEqual(rig['mode'],3)
+                self.assertTrue(sound['profile_installed']);self.assertTrue(sound['parent_selectable'])
+                self.assertEqual(audio['trigger'],json.loads(json.dumps(descriptor['callback_adapter']['trigger'])))
+                self.assertEqual(audio['trigger']['sound_word'],sound['source_sound_word'])
+            else:
+                audio=next(x for x in e['furniture_level_audio']['furniture'] if x['item_id']==donor)
+                self.assertEqual(rig['mode'],4)
+                self.assertEqual(audio['lifecycle'],descriptor['callback_adapter']['level_sound'])
+                self.assertEqual(rigs['billboard_contract'],runtime.billboard_contract(self.image,r))
             self.assertEqual(row['object_sha256'],rig['sha256'])
             at=rig['blob_offset'];self.assertEqual(sha256(self.blob[at:at+rig['bytes']]),rig['sha256'])
             i=slot(int(row['item_id'],16));native=profile(row,rig['vrom'],limit=r['import_storage']['virtual_limit'])
@@ -354,6 +362,15 @@ class BehaviourTests(unittest.TestCase):
                 '-o',str(binary)],check=True,capture_output=True)
             result=subprocess.run([str(binary)],check=True,capture_output=True,text=True,timeout=20)
             self.assertIn('dispatch, time, limits, sound, and actor guards',result.stdout)
+
+    def test_billboard_category_under_sanitizers(self):
+        with tempfile.TemporaryDirectory(prefix='v3-room-billboards-') as temporary:
+            binary=Path(temporary)/'test'
+            subprocess.run(['cc','-std=c11','-O1','-g','-Wall','-Wextra','-Werror',
+                '-fsanitize=address,undefined','-fno-omit-frame-pointer',str(ROOT/'tests/v3_room_billboards_test.c'),
+                '-o',str(binary)],check=True,capture_output=True)
+            result=subprocess.run([str(binary)],check=True,capture_output=True,text=True,timeout=20)
+            self.assertIn('bounded immutable frames',result.stdout)
 
     def test_complete_source_movement_and_per_instance_bounds_under_sanitizers(self):
         with tempfile.TemporaryDirectory(prefix='v3-room-rigs-') as temporary:

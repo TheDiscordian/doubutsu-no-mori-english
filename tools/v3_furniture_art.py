@@ -37,6 +37,10 @@ TRANSLUCENT_COMBINERS = {
 # Scrolling models supply every referenced tile, with the second cycle's texture
 # input retaining the second tile. Expressions match the donor model sources.
 SCROLL_COMBINERS = {
+    (0xFC30FE03,0x5F1AF3E9): ('PRIMITIVE','ENVIRONMENT','TEXEL0','ENVIRONMENT','0','0','0','TEXEL0',
+        'COMBINED','0','PRIMITIVE','0','COMBINED','ENVIRONMENT','PRIM_LOD_FRAC','TEXEL0'),
+    (0xFC30FE03,0x5F06F3FF): ('PRIMITIVE','ENVIRONMENT','TEXEL0','ENVIRONMENT','0','0','0','TEXEL0',
+        'COMBINED','0','PRIMITIVE','0','COMBINED','0','TEXEL0','0'),
     (0xFC609C04,0xFFFDF7F8): ('1','0','TEXEL0','PRIMITIVE','TEXEL0','0','PRIM_LOD_FRAC','PRIMITIVE',
         'COMBINED','0','SHADE','0','0','0','0','COMBINED'),
     (0xFC30FE03,0x5F3AF3F0): ('PRIMITIVE','ENVIRONMENT','TEXEL0','ENVIRONMENT','0','0','0','TEXEL0',
