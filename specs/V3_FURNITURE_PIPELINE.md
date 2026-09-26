@@ -1890,6 +1890,15 @@ Promotion enables records through the existing shared acquisition/catalogue/
 scoring flow and removes them from the staged list. No item-specific installer
 or checkbox-dependent identity assignment is needed.
 
+## Shared room-effect dependencies
+
+The [room-effect adapter](V3_ROOM_EFFECTS.md) prepares complete camera flashes
+through the native effect controller, including both lifecycles, donor drawing
+commands, lighting, and additive effect identities. The controller extension
+retains the current campsite-lamp hooks and every original effect. These prepared
+dependencies do not enable judge's bell until cartridge installation,
+endpoint-hit animation, both sounds, and the actual wall condition are connected.
+
 ## Verification policy
 
 `tests/test_v3_furniture_pipeline.py` checks shared parser rules, source

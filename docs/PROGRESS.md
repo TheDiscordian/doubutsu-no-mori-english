@@ -32,6 +32,18 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
+The judge's bell's camera-flash dependencies are prepared at
+`build/v3-room-effects-prepared-03/`: both complete lifecycles compile to 1,332
+MIPS bytes, with a 464-byte donor sprite and native profile packets. The shared
+controller-table extension preserves all 111 original effect identities and the
+installed campsite-lamp hooks. Five focused host checks cover source/artwork,
+additive tables, relocation at two bases, full controller/particle timing,
+lighting/drawing bounds under sanitizers, and the actual ringside wall mapping.
+These effects are not installed or counted as another playable import. Continue
+cartridge integration and both bell sound bindings; see
+[the effect specification](../specs/V3_ROOM_EFFECTS.md) and
+[checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-camera-flash-effect-preparation).
+
 The current explicit V3 proposal is ABI 212 at
 `build/v3-idle-hit-category-auto-02/cartridge/build-lock.json`. The ordinary
 importer supports the complete idle-only struck-animation policy: quarter-speed

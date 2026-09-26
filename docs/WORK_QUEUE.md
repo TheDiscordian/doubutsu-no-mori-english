@@ -37,8 +37,14 @@ See the [current checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#idle-only-stru
 for commands, evidence, and save compatibility.
 
 The first native hit-policy check passes 108 internal assertions. Retain its
-results and unchanged rolling/contact/material evidence. Next complete the
-endpoint-triggered hit variant and its full effect dependencies: judge's bell
+results and unchanged rolling/contact/material evidence. Camera-flash lifecycle,
+complete sprite packing, profile packets, and additive controller-table expansion
+are prepared and host-checked at `build/v3-room-effects-prepared-03/`.
+Next integrate those shared components into the cartridge, preserving the
+current controller's campsite-lamp hooks, and connect the endpoint-triggered hit
+variant with both sound programs. Do not repeat the completed source/format
+investigation or unchanged runtime tests. Use [the effect integration steps](../specs/V3_ROOM_EFFECTS.md#remaining-installation).
+The judge's bell
 starts at half speed, accepts hits at the animation endpoint, and requests both
 a second singleton sound and a flash effect with ringside seating. Use the
 actual wall identity/artwork correspondence, not equal numeric indices. Its

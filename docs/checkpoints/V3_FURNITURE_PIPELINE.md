@@ -1,5 +1,60 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared camera-flash effect preparation
+
+The prepared bundle is `build/v3-room-effects-prepared-03/`, based on ABI 212.
+No cartridge, saved format, import profile, main lock, or deployment changes.
+The current playable-development choice count remains 152; judge's bell is not
+enabled by prepared dependencies alone.
+
+The source-bound flash and controller callbacks compile to 1,332 MIPS bytes,
+with a maximum reported individual stack frame of 80 bytes. The complete donor
+sprite is 464 bytes. Its native-header graphics-bank append adds 472 bytes,
+retaining all original graphics. Both native effect profile packets are 64
+bytes, including relocation trailers. Final shared-packet addresses must replace
+the standalone preparation addresses when installing these profiles.
+
+The shared table extension appends effect IDs 111/112, retains all native rows
+and state addresses, and adds 3,280 scene bytes. It preserves the current four
+absolute campsite-lamp hooks and their removed relocations. An original-only
+input guard correctly rejects the current wrapped owner; the checked current
+variant is now supported, not replaced with retail code. Original and wrapped
+controller expansions both pass relocation/preservation checks at two bases.
+
+Five focused host checks pass, including address/undefined-behaviour sanitizers:
+complete source callbacks/profiles and artwork, native profile/graphics packing,
+additive table bounds and relocation, current lamp/wall preservation, and the
+full flash lifecycle. Runtime checks cover 30 flashes over 120 native updates,
+all native room sizes, alternating light requests, every random light duration,
+particle scale/expiration, exact draw commands, matrix bounds, and guards.
+One initial bound assertion uses the wrong MIPS source-register encoding and is
+corrected against the actual instruction before the table test passes. There is
+no emulator retry or old-cartridge gameplay replay in this batch.
+
+The donor star texture is legacy native-linear IA8, not GX-tiled data. Its full
+texture/vertices match native resources; the complete donor display list retains
+its own culling and primitive-colour behaviour. Source wall 65 is verified against
+all 8,192 pixels of installed additive wall 76, not an equal-number assumption.
+
+```sh
+python3 tools/v3_room_effects.py \
+  --base-lock build/v3-idle-hit-category-auto-02/cartridge/build-lock.json \
+  --output build/v3-room-effects-prepared-reproduction
+python3 -m unittest tests.test_v3_room_effects.EffectTests -v
+```
+
+- Prepared report SHA-256: `2fb741850cda75d17f665514bbc79941579950f15d560f683f673a5436947d08`.
+- MIPS callback SHA-256: `31a685b051a3241e779319cdc98b1efba904f3ee84151d8727ad1d283e363dd2`.
+- Sprite SHA-256: `515fc4d4b236523599ad3271020caa37eba160d421ff9facf0d45a9a006a543d`.
+
+Next install the shared callbacks, profiles, controller, and sprite through the
+ordinary resource installer; connect endpoint-hit behaviour and both complete
+source sounds. The [specification](../../specs/V3_ROOM_EFFECTS.md) records exact
+loader, wall, timing, and memory contracts. Native loading/execution, actual
+synthesis, GPU appearance, ordinary interaction/save/restart, and hardware are
+not established by these host checks. Keep the item unselectable until its full
+requirements are connected.
+
 ## Idle-only struck-animation policy
 
 ABI 212 is `build/v3-idle-hit-category-auto-02/cartridge/build-lock.json`, with
