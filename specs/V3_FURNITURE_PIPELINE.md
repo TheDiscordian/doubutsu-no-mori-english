@@ -1836,8 +1836,11 @@ runtime index = 1024 + (saved item ID - 0x3000) / 4
 Existing native items, old explicit reservations, and display aliases remain.
 The checked build manifest records each new object's VROM; it is not a saved
 identity. Object storage is appended at 16-byte alignment with complete physical
-and virtual overlap checks, the 9,216-byte model-bank limit, ROM boundary checks,
+and virtual overlap checks, the installed model-bank limit, ROM boundary checks,
 CRC updates, and full patch reconstruction. No new DMA-directory entry is needed.
+The checked [capacity extension](V3_FURNITURE_BANKS.md) provides 12,288-byte room
+and catalogue model buffers. Without its verified native installation, the
+pipeline retains the 9,216-byte limit; it never drops geometry to make an object fit.
 
 Converter/installer revision 9 retains reuse of the preceding automatic batch's terminal
 catalogue, relocation, and shop resources, because all three are regenerated.

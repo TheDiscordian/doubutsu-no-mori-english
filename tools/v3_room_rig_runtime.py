@@ -329,6 +329,8 @@ def bind_profiles(source,base,report):
     normal acquisition, catalogue, scoring, and selection checks still apply.
     """
     from v3_furniture_install import profile
+    from v3_furniture_capacity import checked as checked_model_capacity
+    source.model_bank_capacity=checked_model_capacity(base,report)
     from v3_furniture_materials import (CATEGORY as MATERIAL_CATEGORY,initializer_lifecycle,checked_initializer,
         steam_lifecycle,checked_steam)
     import v3_furniture_reactions as reactions

@@ -24,7 +24,7 @@ from v3_registry import FURNITURE, LEGACY_FURNITURE, furniture_identity, furnitu
 from v3_room_aliases import discover as room_aliases, pending_reason as room_alias_reason
 from v3_villager_art import native_palette, normalise_vertex_flags
 
-VERSION = 26
+VERSION = 27
 PENDING_MOVE_CATEGORY = 'static-models-pending-move'
 PENDING_SEQUENCE_CATEGORY = 'constant-model-sequence-pending-lifecycle'
 LAYERS = ('opaque', 'opaque1', 'translucent', 'translucent1')
@@ -1214,7 +1214,8 @@ def scan(source, worksheet, installed=None, *, selected=()):
             _,sequence=draw_sequence(profile,len(body),sections)
             estimated = (len(body)+sum(n for _,n in sections)+len(sequence)+15)&~15
             estimated += estimated_suffix(source,profile,estimated)
-            if estimated > 9216: raise ReviewRequired('complete object exceeds native model-bank capacity')
+            if estimated > getattr(source,'model_bank_capacity',9216):
+                raise ReviewRequired('complete object exceeds native model-bank capacity')
             formats={r['format'] for r in resources if r['kind']=='texture'}
             categories = [profile['behaviour'], ('1x1','2x1','2x2')[profile['size_code']]]
             if item<0x3000:

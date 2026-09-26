@@ -337,10 +337,11 @@ installation is complete; post-office reward acquisition remains work.
 The [Western batch](V3_WESTERN_ITEMS.md) installs seven more complete models,
 English readers, true ordinary/event stock, catalogue/scoring, and optional
 saved dependencies. The [dedicated bank owner](V3_FURNITURE_BANKS.md) provides
-100 9,216-byte banks in reserved Expansion Pak memory without ordinary heap
-growth. Native reader, catalogue, event-selection, and scoring checks pass;
-bank allocation passes but paired upper-memory DMA and executed teardown remain
-unverified. Both opaque saddle-fence parts and the well's double mirrors are
+100 12,288-byte banks in reserved Expansion Pak memory without ordinary heap
+growth. Separate catalogue model buffers have the same capacity. Native reader,
+catalogue, event-selection, and scoring checks pass; bank construction and
+first/last-bank DMA pass, while executed teardown remains unverified.
+Both opaque saddle-fence parts and the well's double mirrors are
 preserved. These are experimental imports, not certified complete gameplay.
 
 The [full-sized Western batch](V3_WESTERN_LARGE_ITEMS.md) installs the remaining

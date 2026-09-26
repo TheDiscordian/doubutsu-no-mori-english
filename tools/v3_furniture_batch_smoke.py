@@ -2087,6 +2087,9 @@ def tool_controls(debug,rom_path,record,*,transitions=False,capture=False,rod=Fa
 
 
 def exercise(debug, rom_path, record, *, section='automatic_furniture'):
+    if section=='model_capacity':
+        from v3_model_capacity_smoke import exercise as model_capacity
+        return model_capacity(debug,rom_path,record)
     if section=='material_lifecycles':return material_lifecycles(debug,rom_path,record)
     if section=='material_reactions':return material_reactions(debug,rom_path,record)
     if section=='material_colours':return material_colours(debug,rom_path,record)

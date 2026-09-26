@@ -142,7 +142,7 @@ void af_v3_catalogue_program(struct Preview *preview) {
     if (index < 2048 || index > 3071 || !af_v3_furniture_import_profile(index - 1024))
         af_v3_save_halt(-7);
     /* Resident static profiles use the same native bank DMA and drawing code.
-     * No copied program is needed; the original 0x2400-byte model buffer remains. */
+     * No copied program is needed; the checked native allocator owns the model buffer. */
     preview->profile = profiles[index - 1024];
 }
 

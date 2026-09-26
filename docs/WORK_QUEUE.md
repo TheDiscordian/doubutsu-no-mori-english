@@ -22,7 +22,16 @@ Incomplete gameplay stays unavailable in the selector; installing assets does
 not claim that an item is playable. Reuse unchanged passing tests throughout.
 
 Current task: close shared conversion and gameplay gaps in the ordinary bulk
-importer. Console preparation at `build/v3-console-games-prepared-02/` retains
+importer. The checked proposal is ABI 240 at
+`build/v3-large-model-imports-01/cartridge/build-lock.json`, with 158 development
+choices. Shared model banks and catalogue previews hold 12,288 bytes; the ordinary
+importer installs the complete 10,448-byte snowboard with its real winter-camper
+route. Four focused tests and the 31-assertion native capacity check pass.
+The initial native workspace allocation failure is resolved by the one sparse
+fixture retry. Do not repeat these checks without a relevant change. See the
+[capacity checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#complete-model-bank-capacity).
+
+Console preparation at `build/v3-console-games-prepared-02/` retains
 all nineteen complete game payloads, sixty save operations, full source tags,
 and twenty furniture launch bindings. Six focused checks pass. Twelve game
 payloads are additions; the disk-system Zelda furniture requests an absent
@@ -36,11 +45,9 @@ callbacks, but their presence is not execution evidence. Its graphics allocation
 and current format-four save capsule cannot be assumed to hold the larger games
 and full 1,623-byte save payload. Keep complete data and fix those bounds; do not
 drop persistence or use per-title installers. See the
-[console specification](../specs/V3_CONSOLE_GAMES.md). The checked ROM remains below.
+[console specification](../specs/V3_CONSOLE_GAMES.md).
 
-The checked proposal is ABI 238 at
-`build/v3-scrolling-category-imports-01/profile-runtime/build-lock.json`, with
-157 development choices. The ordinary importer plans complete scrolling models,
+The ordinary importer plans complete scrolling models,
 sound dependencies, and profiles automatically. Beach table retains all 135
 triangles, five textures, translucent glass, and moving bubbles in a 6,928-byte
 object, using unchanged native drawing code. Its complete profile is inactive
@@ -73,7 +80,7 @@ retain native lifecycle/rendering as unresolved for the next meaningful
 effect/combined-room batch. No ordinary-game crash is demonstrated.
 
 Continue remaining model/material/animation categories. The fresh inventory is
-`build/v3-after-scrolling-category-inventory-01.json`; it has no newly supported uninstalled
+`build/v3-after-large-model-inventory-01.json`; it has no newly supported uninstalled
 furniture. Installed parent-item/display resources must not be counted as new
 missing furniture just because the furniture-only scanner reports them.
 
@@ -131,8 +138,9 @@ Do not replay unchanged candle, rig, artwork, or sound batches.
 
 Room code has 848 bytes spare; bootstrap has 15 bytes spare. Scroll code has
 4 bytes spare, audio has 768 conservative bytes spare, and import storage has
-1,009,936 bytes spare. Capacity extensions must preserve complete dependencies.
-See the [current checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#automatic-scrolling-category-imports)
+999,488 bytes spare. The expanded model helper has 68 bytes spare. Capacity
+extensions must preserve complete dependencies.
+See the [current checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#complete-model-bank-capacity)
 for reproduction, native limits, and save warnings. Source publication is
 allowed; the main lock and both stable web-patcher deployments stay unchanged.
 

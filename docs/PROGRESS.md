@@ -32,6 +32,17 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
+The checked proposal is ABI 240 at
+`build/v3-large-model-imports-01/cartridge/build-lock.json`, with 158 development
+choices. The complete 10,448-byte snowboard imports through the ordinary pipeline,
+including all 259 triangles, thirteen textures, and actual winter-camper route.
+Shared room banks and catalogue model buffers hold 12,288 bytes. The extension
+uses reserved Expansion Pak memory plus 6 KiB of submenu memory without changing
+saved formats. Four focused tests and 31 native capacity assertions pass,
+including complete first/last-bank DMA and the native preview allocation loop.
+Full room/catalogue construction and GPU/hardware appearance are not claimed.
+See the [capacity checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#complete-model-bank-capacity).
+
 The shared console-game converter prepares all nineteen full donor games,
 sixty ordered persistence operations, original and converted metadata, and
 twenty source-derived launch bindings. Six focused checks pass. The twelve
@@ -51,9 +62,7 @@ drawing-only in the donor, not a missing game implementation. This preparation
 does not change the cartridge or either deployment. See the
 [constant-material checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#bulk-fixed-and-indexed-material-sequences).
 
-The checked proposal is ABI 238 at
-`build/v3-scrolling-category-imports-01/profile-runtime/build-lock.json`, with
-157 development choices. Scrolling-material imports now automatically prepare
+Scrolling-material imports automatically prepare
 complete artwork, install any required loop audio, and bind finished profiles.
 Beach table retains its complete body, translucent glass, and moving bubbles;
 its island acquisition remains unfinished, so its complete profile stays inactive.

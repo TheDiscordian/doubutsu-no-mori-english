@@ -60,7 +60,7 @@ def inputs(lock=LOCK):
     return base, report
 
 
-def profile(row, vrom, *, limit=END):
+def profile(row, vrom, *, limit=END, model_capacity=9216):
     n, offsets = row['object_bytes'], row['model_offsets']
     scalar = bytes.fromhex(row['native_profile_scalar_hex'])
     adapter=row.get('profile',{}).get('callback_adapter',{})
@@ -79,7 +79,7 @@ def profile(row, vrom, *, limit=END):
         raise ValueError('Prepared resources have no implemented native lifecycle')
     rigged = adapter.get('category') in RIG_CATEGORIES
     layers = tuple(offsets) if rigged else tuple(adapter['model_order']) if fading or sequence or material or scrolling else LAYERS
-    if (limit not in (END,capacity.LIMIT) or not 0 < n <= 9216 or n%16 or vrom%16 or vrom+n > limit or len(scalar) != 16
+    if (model_capacity not in (9216,12288) or limit not in (END,capacity.LIMIT) or not 0 < n <= model_capacity or n%16 or vrom%16 or vrom+n > limit or len(scalar) != 16
             or not offsets or set(offsets)-set(layers) or (fading or sequence) and set(offsets)!=set(layers)
             or any(type(at) is not int or at%8 or not 0 <= at <= n-8 for at in offsets.values())):
         raise ValueError('Invalid complete native object/profile bounds')
@@ -321,7 +321,7 @@ def build(output, art_path, lock=LOCK):
             raise ValueError('Canonical identity is already installed')
         if existing is None:
             blob.extend(bytes(-len(blob)%16)); vrom = BLOB+len(blob)
-            native = profile(row,vrom,limit=limit); blob.extend(asset)
+            native = profile(row,vrom,limit=limit,model_capacity=source.model_bank_capacity); blob.extend(asset)
         else:vrom,native=existing
         blob[ROWS+i*80:ROWS+(i+1)*80] = struct.pack('>HHI',index,item,1)+native+bytes(4)
         record = struct.pack('>HHHBB',index,item,row['price'],row['size_code'],1)+row['name'].encode().ljust(16,b' ')+bytes(8)
@@ -566,7 +566,7 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
                     room_rigs_art=None, room_rigs_code=False, scenery_art=None, scenery_gameplay=False,
                     equipment_rigs=None, expand_storage=False, furniture_audio_art=None, furniture_profiles=None,
                     material_frames_art=None,scrolling_materials_art=None,room_surfaces_art=None,furniture_scoring=False,
-                    password_runtime=None,password_editor=False,room_effects=None):
+                    password_runtime=None,password_editor=False,room_effects=None,furniture_capacity=False):
     """Update shared readers; optionally install the shared held-resource adapter."""
     output=output.resolve()
     if output.exists() or not output.is_relative_to(ROOT/'build'):
@@ -587,9 +587,9 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
     moved=[];equipment_report=None;reused=None;owner_changes={};owner_moves=[];owner_updates=[];report_updates={};text_moves=[]
     equipment_mode=any((equipment_art is not None,equipment_rigs is not None,player_motion,equipment_kinds,player_actions,
                         item_category_art is not None,ground_categories,event_acquisition,held_collection,held_catalogue_art is not None,held_selection,room_rigs_art is not None,scenery_art is not None,scenery_gameplay))
-    resource_mode=equipment_mode or room_rigs_code or translation_updates or expand_storage or furniture_audio_art is not None or furniture_profiles is not None or material_frames_art is not None or scrolling_materials_art is not None or room_surfaces_art is not None or furniture_scoring or password_runtime is not None or password_editor or room_effects is not None
+    resource_mode=equipment_mode or room_rigs_code or translation_updates or expand_storage or furniture_audio_art is not None or furniture_profiles is not None or material_frames_art is not None or scrolling_materials_art is not None or room_surfaces_art is not None or furniture_scoring or password_runtime is not None or password_editor or room_effects is not None or furniture_capacity
     if sum((equipment_art is not None,equipment_rigs is not None,player_motion,equipment_kinds,player_actions,
-            item_category_art is not None,ground_categories,event_acquisition,held_collection,held_catalogue_art is not None,held_selection,translation_updates,room_rigs_art is not None,room_rigs_code,scenery_art is not None,scenery_gameplay,expand_storage,furniture_audio_art is not None,furniture_profiles is not None,material_frames_art is not None,scrolling_materials_art is not None,room_surfaces_art is not None,furniture_scoring,password_runtime is not None,password_editor,room_effects is not None))>1:
+            item_category_art is not None,ground_categories,event_acquisition,held_collection,held_catalogue_art is not None,held_selection,translation_updates,room_rigs_art is not None,room_rigs_code,scenery_art is not None,scenery_gameplay,expand_storage,furniture_audio_art is not None,furniture_profiles is not None,material_frames_art is not None,scrolling_materials_art is not None,room_surfaces_art is not None,furniture_scoring,password_runtime is not None,password_editor,room_effects is not None,furniture_capacity))>1:
         raise ValueError('Install shared runtime updates in dependency order')
     if resource_mode:
         blob,reused=reuse_resource_tail(base,prior,old_blob)
@@ -597,7 +597,11 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             raise ValueError('Equipment integration requires the checked shared resource tail')
     parent_readers=bool(player_actions and prior.get('equipment_resources',{}).get('player_actions',{}).get('equipment_selection'))
     wrapped_names=bool(player_actions and prior.get('equipment_resources',{}).get('wrapped_presents'))
-    if room_effects is not None:
+    if furniture_capacity:
+        import v3_furniture_capacity as model_capacity
+        display_report,alias_report=prior['clothing']['display'],prior['display_aliases']
+        owner_changes,report_updates=model_capacity.install(base,prior,blob,core,output)
+    elif room_effects is not None:
         import v3_room_effects as equipment
         display_report,alias_report=prior['clothing']['display'],prior['display_aliases']
         equipment_report,owner_changes,report_updates=equipment.install(base,prior,blob,core,original,output,room_effects)
@@ -875,6 +879,18 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         artwork_changed=False,resource_allocations_changed=False,saved_format_changed=False,
         saved_profile_changed=False,web_patcher_enabled=False)
     report['sources'].update({p:sha256((ROOT/p).read_bytes()) for p in capacity.SOURCES+display_aliases.SOURCES})
+    if furniture_capacity:
+        report['automatic_furniture']['resource_moves']=moved
+        report['import_storage']['remaining_bytes']=limit-BLOB-len(blob)
+        report['shared_runtime_refresh'].update(adapters=['furniture_capacity'],
+            resource_allocations_changed=True,resource_tail_reuse=reused,
+            unchanged_owner_moves=moved,changed_owner_moves=owner_moves,
+            in_place_owner_updates=owner_updates,
+            additional_resident_bytes=report['furniture_capacity']['additional_resident_bytes'],
+            additional_menu_bytes=report['furniture_capacity']['additional_pool_bytes'])
+        report['sources'].update(report['furniture_capacity']['sources'])
+        report['native_test']='pending enlarged room banks and catalogue model buffers'
+        model_capacity.checked(result,report)
     if expand_storage:
         report['import_storage']['remaining_bytes']=limit-BLOB-len(blob)
         report['shared_runtime_refresh'].update(adapters=['resource_capacity'],
@@ -1123,6 +1139,8 @@ if __name__=='__main__':
         help='With --refresh-runtime, install two-row code entry without enabling Nook delivery')
     parser.add_argument('--room-effects',type=Path,
         help='With --refresh-runtime, install prepared shared effects through the native controller')
+    parser.add_argument('--furniture-capacity',action='store_true',
+        help='With --refresh-runtime, extend complete room and catalogue model buffers')
     args=parser.parse_args()
     if args.equipment_art and not args.refresh_runtime:parser.error('--equipment-art requires --refresh-runtime')
     if args.equipment_rigs and not args.refresh_runtime:parser.error('--equipment-rigs requires --refresh-runtime')
@@ -1150,6 +1168,7 @@ if __name__=='__main__':
     if args.password_runtime and not args.refresh_runtime:parser.error('--password-runtime requires --refresh-runtime')
     if args.password_editor and not args.refresh_runtime:parser.error('--password-editor requires --refresh-runtime')
     if args.room_effects and not args.refresh_runtime:parser.error('--room-effects requires --refresh-runtime')
+    if args.furniture_capacity and not args.refresh_runtime:parser.error('--furniture-capacity requires --refresh-runtime')
     result=(refresh_runtime(args.output,args.base_lock,equipment_art=args.equipment_art,player_motion=args.player_motion,
                             equipment_kinds=args.equipment_kinds,player_actions=args.player_actions,
                             item_category_art=args.item_category_art,ground_categories=args.ground_categories,
@@ -1161,6 +1180,7 @@ if __name__=='__main__':
                             furniture_profiles=args.furniture_profiles,material_frames_art=args.material_frames_art,
                             scrolling_materials_art=args.scrolling_materials_art,room_surfaces_art=args.room_surfaces_art,
                             furniture_scoring=args.furniture_scoring,password_runtime=args.password_runtime,
-                            password_editor=args.password_editor,room_effects=args.room_effects)
+                            password_editor=args.password_editor,room_effects=args.room_effects,
+                            furniture_capacity=args.furniture_capacity)
             if args.refresh_runtime else build(args.output,args.art,args.base_lock))
     print(json.dumps({k:result[k] for k in ('runtime_abi','output_sha256','patch_sha256')},indent=2))

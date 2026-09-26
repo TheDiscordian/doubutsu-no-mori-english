@@ -1,5 +1,56 @@
 # Automatic furniture pipeline checkpoint
 
+## Complete model-bank capacity
+
+The current proposal is ABI 240 at
+`build/v3-large-model-imports-01/cartridge/build-lock.json`, with 158 development
+choices. The ordinary importer installs the complete snowboard: 10,448 bytes,
+259 triangles, 397 vertices, thirteen textures, and both model lists. Its actual
+winter-camper acquisition and non-orderability are retained. No dedicated item
+converter or installer is introduced.
+
+The shared capacity extension supplies 100 guarded 12,288-byte room banks and
+two matching catalogue model buffers. It adds 307,200 reserved Expansion Pak
+bytes and 6,144 submenu bytes without growing ordinary room heaps or saved fields.
+The helper occupies 1,980 of its 2,048 reserved bytes. Import storage has
+999,488 bytes spare. All prior complete models and equipment resources remain.
+Catalogue regeneration retains both the actual stride and allocation chain.
+
+- ROM SHA-256: `dd5982c702835c48c3e7f285fd01b4e8e46f7b647555bcce4ae54e017f0b94dd`.
+- UPS SHA-256: `d6e6fe45db368f340c1425b3a6c227ac186b77cf4dc16b7b0620031f09f4b6c8`.
+- Native result: `build/v3-large-model-native-02/results.json`, SHA-256
+  `ee7ffc9e735537efe8be66de9d643ea6dec0a89bde8acf6ee14b5ad947a0d694`.
+
+Four focused tests pass: complete artwork and retained resources, installed
+capacity/preview allocations and malformed-contract rejection, all bank limits
+and failed-DMA state under sanitizers, and four browser/offline selections.
+The first native fixture cannot allocate its 112,496-byte title-scene workspace;
+no item code executes in that attempt. The one justified retry uses a 12-KiB
+sparse fixture and passes 31 internal assertions across 59 recorded steps.
+It executes the installed bank constructor for zero/full demand, verifies all
+100 pointers and guards, DMAs the complete model into first/last banks, preserves
+tails, and executes the exact native two-preview allocation loop. Saved state
+and guards remain intact. No audio playback or FlashRAM write occurs.
+
+The sparse native fields and copied checked allocation loop do not establish
+full room/catalogue construction, executed teardown, GPU appearance, ordinary
+camper handover, or hardware. Retain unchanged acquisition evidence; do not
+replay historical builds. Format four is unchanged. The selected profile adds
+the snowboard: preceding format-four saves with equal/subset requirements are
+expected to load, but ordinary cross-version reload is not newly tested. Saves
+using the new item require this or a compatible superset build, not older
+cartridges, V2, or format-one/two/three V3 builds. Both deployments stay unchanged.
+
+```sh
+python3 tools/v3_furniture_install.py --refresh-runtime --furniture-capacity \
+  --base-lock build/v3-scrolling-category-imports-01/profile-runtime/build-lock.json \
+  --output build/v3-model-capacity-reproduction
+python3 tools/v3_furniture_pipeline.py import --select 31C4 \
+  --base-lock build/v3-model-capacity-reproduction/build-lock.json \
+  --output build/v3-large-model-reproduction
+python3 -m unittest tests.test_v3_model_capacity -v
+```
+
 ## Complete console-game dependencies
 
 Preparation: `build/v3-console-games-prepared-02/games.json` and `games.bin`.

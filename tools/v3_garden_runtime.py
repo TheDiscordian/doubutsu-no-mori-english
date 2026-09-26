@@ -290,7 +290,7 @@ def install_catalogue(base, stable, prior, imports, output, rel, symbols, *, wes
     equipment=prior.get('equipment_resources',{})
     retained_allocations=[r for r in (
         equipment.get('inventory_preview',{}).get('joint_work'),
-        equipment.get('player_actions',{}).get('balloon_menu')) if r]
+        equipment.get('player_actions',{}).get('balloon_menu'),prior.get('furniture_capacity')) if r]
     retained_pool=[]
     for address in (0x800C4AFC, 0x800C4B10):
         at = address - CODE_RAM
@@ -327,6 +327,9 @@ def install_catalogue(base, stable, prior, imports, output, rel, symbols, *, wes
         from v3_surface_menu import retain_catalogue
         changes[catalogue.VROM],changes[catalogue.RELOC],report=retain_catalogue(
             prior,base,changes[catalogue.VROM],changes[catalogue.RELOC],report)
+    if prior.get('furniture_capacity'):
+        from v3_furniture_capacity import retain_catalogue
+        changes[catalogue.VROM],report=retain_catalogue(prior,changes[catalogue.VROM],report)
     return changes, report
 
 
