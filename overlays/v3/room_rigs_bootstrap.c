@@ -5,7 +5,12 @@ extern void af_room_writeback(void *,u32);
 extern void af_room_invalidate(void *,u32);
 extern void af_room_fault(const char *,const char *);
 
+#ifdef AF_ROOM_EFFECTS
+int af_v3_room_boot_load(void) {
+#define load af_v3_room_boot_load
+#else
 static int load(void) {
+#endif
     /* Startup reloads this cache word, even when Expansion Pak RAM survives a reset. */
     volatile u32 *ready=(volatile u32 *)0x804B1E00u;
     void *packet=(void *)AF_ROOM_RAM;

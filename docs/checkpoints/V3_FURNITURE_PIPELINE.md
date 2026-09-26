@@ -1,5 +1,92 @@
 # Automatic furniture pipeline checkpoint
 
+## Installed shared camera-flash effects
+
+ABI 213 is `build/v3-room-effects-runtime-02/build-lock.json`. Shared effects
+are installed without enabling judge's bell or changing the 152 development
+choices. No main-lock or local/public web-patcher deployment changes are made.
+
+The existing installer now links both effect lifecycles into the shared room
+packet, appends the complete sprite, and expands the native controller to 113
+identities. Original graphics, all 111 original effect rows, original state
+addresses, and four campsite-lamp hooks remain. The controller/relocation DMA
+entries keep their original adjacency at virtual addresses `03FA0000` and
+`03FB0000`; the actual actor descriptor is updated, not just the build report.
+
+The native overlay manager derives ranges from complete DMA-directory entries
+and cannot load profiles inside the import blob. A 384-byte scene-owned bridge
+therefore uses the original overlay manager for native effects and checked DMA
+for imported 32-byte profiles. Profile CRC32, marker, callback bounds, room-code
+loading, and fault-before-publication are enforced. Shared compilation refreshes
+the bootstrap pointer and all absolute effect callbacks, including their CRCs,
+so future item batches cannot silently retain stale addresses.
+
+The first installation attempt stops on virtual overlap: an existing resource
+starting at `03F60000` extends across the proposed `03F80000/03F90000` locations.
+The free `03FA0000/03FB0000` addresses pass the same full overlap checks. No
+resource or guard is removed to obtain a successful build.
+
+Nine focused host tests pass in 7.520 seconds. These cover source/resource
+preservation, actual installed controller reconstruction and relocation at two
+bases, native profiles, sanitizer-backed lifecycles and invalid-load paths,
+subsequent callback rebinding, saved-format/profile preservation, and UPS
+reconstruction. A separate existing composition check passes four browser/offline
+comparisons in 6.916 seconds: none, all, the recent item category, and an existing
+villager. The none case retains the exact pinned translation-only baseline.
+
+The bounded native fixture has two attempts:
+
+- `build/v3-room-effects-native-01/`: the initial temporary 90,112-byte fixture
+  allocation returns null before new code runs. Splitting/reducing test scratch
+  is the justified setup correction; no game allocation or heap bound changes.
+- `build/v3-room-effects-native-02/`: 26 records, ten passing assertions, nine
+  inside the effect fixture. Complete native controller loading and relocation,
+  the original twelve program allocations, public clip, both imported profiles
+  and their cache reuse, full shared-packet loading, and complete original
+  effect-17 loading pass. The public controller request returns its actual pool
+  record. The next assertion wrongly searches for active byte `1`; native
+  `80A199B0` stores the requested priority, `2`. The fixture now accepts nonzero
+  priority, but the corrected continuation is not rerun in this batch.
+
+The complete native particle lifetime, graphics appearance, environmental
+lighting, ordinary interaction/save/restart, and hardware remain unverified.
+The partial run is not labelled a passing full scenario. Include its corrected
+continuation with the next meaningful endpoint-hit integration; do not replay
+unchanged rig, rolling, contact, or material evidence.
+
+Reproduction uses fresh output directories:
+
+```sh
+python3 tools/v3_furniture_install.py --refresh-runtime \
+  --base-lock build/v3-idle-hit-category-auto-02/cartridge/build-lock.json \
+  --room-effects build/v3-room-effects-prepared-03 \
+  --output build/v3-room-effects-runtime-reproduction
+python3 -m unittest tests.test_v3_room_effects -v
+V3_IMPORTED_RIG_BUILD=build/v3-room-effects-runtime-02 python3 -m unittest \
+  tests.test_v3_room_rig_runtime.CurrentImportedRigTests.test_private_browser_selection_matches_offline_and_keeps_translation_only -v
+python3 tools/emulator_smoke.py \
+  --rom build/v3-room-effects-runtime-02/animal-forest-v3-asset-loader.z64 \
+  --output build/v3-room-effects-native-reproduction \
+  --scenario tests/scenarios/v3_room_effects.json \
+  --xvfb /home/discordian/Games/OpenRSC/headless/vendor/usr/bin/Xvfb \
+  --seconds 180 --expansion-pak --no-initial-screenshot
+```
+
+- Complete controller: 25,440 bytes; additional scene memory: 3,664 bytes.
+- Additional fixed resident memory: zero; shared packet: unchanged 20,480 bytes.
+- Room code: 5,956/16,384 bytes; bootstrap: 1,509/1,536 bytes.
+- Sprite-bank growth: 472 bytes; two profile packets: 128 bytes.
+- Import storage spare: 1,531,632 bytes; audio allocation/data unchanged.
+- ROM SHA-256: `5269855650ca129828e3c40e0f8dce42dfeb37b7469135b36c196c903c556bac`.
+- Report SHA-256: `5e3f27d815f180d8b5b07ce40fecbee234a9db55343cac7bedc6070871063fee`.
+- UPS SHA-256: `94c89691c9ecb34e8b98216ee7644379268d0a1d8c0c1fe82778f935ec6e92d8`.
+
+Saved format 4 and selected profiles are unchanged from ABI 212; cross-build
+reload is not newly tested. Preserve existing saves and equal-or-larger matching
+selections. Format-4 saves remain incompatible with V2 and V3 formats 1–3.
+Continue the bell's endpoint-hit policy, both complete sounds, and actual
+full-index ringside-wall condition through the ordinary shared importer.
+
 ## Shared camera-flash effect preparation
 
 The prepared bundle is `build/v3-room-effects-prepared-03/`, based on ABI 212.

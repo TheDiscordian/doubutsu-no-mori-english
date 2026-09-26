@@ -553,7 +553,7 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
                     room_rigs_art=None, scenery_art=None, scenery_gameplay=False,
                     equipment_rigs=None, expand_storage=False, furniture_audio_art=None, furniture_profiles=None,
                     material_frames_art=None,scrolling_materials_art=None,room_surfaces_art=None,furniture_scoring=False,
-                    password_runtime=None,password_editor=False):
+                    password_runtime=None,password_editor=False,room_effects=None):
     """Update shared readers; optionally install the shared held-resource adapter."""
     output=output.resolve()
     if output.exists() or not output.is_relative_to(ROOT/'build'):
@@ -574,9 +574,9 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
     moved=[];equipment_report=None;reused=None;owner_changes={};owner_moves=[];owner_updates=[];report_updates={};text_moves=[]
     equipment_mode=any((equipment_art is not None,equipment_rigs is not None,player_motion,equipment_kinds,player_actions,
                         item_category_art is not None,ground_categories,event_acquisition,held_collection,held_catalogue_art is not None,held_selection,room_rigs_art is not None,scenery_art is not None,scenery_gameplay))
-    resource_mode=equipment_mode or translation_updates or expand_storage or furniture_audio_art is not None or furniture_profiles is not None or material_frames_art is not None or scrolling_materials_art is not None or room_surfaces_art is not None or furniture_scoring or password_runtime is not None or password_editor
+    resource_mode=equipment_mode or translation_updates or expand_storage or furniture_audio_art is not None or furniture_profiles is not None or material_frames_art is not None or scrolling_materials_art is not None or room_surfaces_art is not None or furniture_scoring or password_runtime is not None or password_editor or room_effects is not None
     if sum((equipment_art is not None,equipment_rigs is not None,player_motion,equipment_kinds,player_actions,
-            item_category_art is not None,ground_categories,event_acquisition,held_collection,held_catalogue_art is not None,held_selection,translation_updates,room_rigs_art is not None,scenery_art is not None,scenery_gameplay,expand_storage,furniture_audio_art is not None,furniture_profiles is not None,material_frames_art is not None,scrolling_materials_art is not None,room_surfaces_art is not None,furniture_scoring,password_runtime is not None,password_editor))>1:
+            item_category_art is not None,ground_categories,event_acquisition,held_collection,held_catalogue_art is not None,held_selection,translation_updates,room_rigs_art is not None,scenery_art is not None,scenery_gameplay,expand_storage,furniture_audio_art is not None,furniture_profiles is not None,material_frames_art is not None,scrolling_materials_art is not None,room_surfaces_art is not None,furniture_scoring,password_runtime is not None,password_editor,room_effects is not None))>1:
         raise ValueError('Install shared runtime updates in dependency order')
     if resource_mode:
         blob,reused=reuse_resource_tail(base,prior,old_blob)
@@ -584,7 +584,11 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             raise ValueError('Equipment integration requires the checked shared resource tail')
     parent_readers=bool(player_actions and prior.get('equipment_resources',{}).get('player_actions',{}).get('equipment_selection'))
     wrapped_names=bool(player_actions and prior.get('equipment_resources',{}).get('wrapped_presents'))
-    if password_editor:
+    if room_effects is not None:
+        import v3_room_effects as equipment
+        display_report,alias_report=prior['clothing']['display'],prior['display_aliases']
+        equipment_report,owner_changes,report_updates=equipment.install(base,prior,blob,core,original,output,room_effects)
+    elif password_editor:
         import v3_password_editor as password_ui
         display_report,alias_report=prior['clothing']['display'],prior['display_aliases']
         owner_changes,report_updates=password_ui.install(base,prior,core,original,output)
@@ -901,6 +905,12 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
                 additional_resident_bytes=equipment_report['passwords']['additional_resident_bytes'])
             report['sources'].update(equipment_report['passwords']['sources'])
             report['native_test']='pending linked password engine and lazy loader; Nook input/delivery remain incomplete'
+        if room_effects is not None:
+            effects=equipment_report['room_rigs']['effects']
+            report['shared_runtime_refresh'].update(adapters=['room_effects'],artwork_changed=True,
+                additional_scene_bytes=effects['additional_scene_bytes'])
+            report['sources'].update(effects['sources'])
+            report['native_test']='pending additive native effects; endpoint-hit furniture binding remains incomplete'
         if surface_items:
             report['shared_runtime_refresh'].update(adapters=['room_surfaces','surface_items'],
                 additional_resident_bytes=surface_items['additional_resident_bytes'])
@@ -1074,6 +1084,8 @@ if __name__=='__main__':
         help='With --refresh-runtime, link prepared password rules and live engine bindings without enabling delivery')
     parser.add_argument('--password-editor',action='store_true',
         help='With --refresh-runtime, install two-row code entry without enabling Nook delivery')
+    parser.add_argument('--room-effects',type=Path,
+        help='With --refresh-runtime, install prepared shared effects through the native controller')
     args=parser.parse_args()
     if args.equipment_art and not args.refresh_runtime:parser.error('--equipment-art requires --refresh-runtime')
     if args.equipment_rigs and not args.refresh_runtime:parser.error('--equipment-rigs requires --refresh-runtime')
@@ -1099,6 +1111,7 @@ if __name__=='__main__':
     if args.furniture_scoring and not args.refresh_runtime:parser.error('--furniture-scoring requires --refresh-runtime')
     if args.password_runtime and not args.refresh_runtime:parser.error('--password-runtime requires --refresh-runtime')
     if args.password_editor and not args.refresh_runtime:parser.error('--password-editor requires --refresh-runtime')
+    if args.room_effects and not args.refresh_runtime:parser.error('--room-effects requires --refresh-runtime')
     result=(refresh_runtime(args.output,args.base_lock,equipment_art=args.equipment_art,player_motion=args.player_motion,
                             equipment_kinds=args.equipment_kinds,player_actions=args.player_actions,
                             item_category_art=args.item_category_art,ground_categories=args.ground_categories,
@@ -1110,6 +1123,6 @@ if __name__=='__main__':
                             furniture_profiles=args.furniture_profiles,material_frames_art=args.material_frames_art,
                             scrolling_materials_art=args.scrolling_materials_art,room_surfaces_art=args.room_surfaces_art,
                             furniture_scoring=args.furniture_scoring,password_runtime=args.password_runtime,
-                            password_editor=args.password_editor)
+                            password_editor=args.password_editor,room_effects=args.room_effects)
             if args.refresh_runtime else build(args.output,args.art,args.base_lock))
     print(json.dumps({k:result[k] for k in ('runtime_abi','output_sha256','patch_sha256')},indent=2))

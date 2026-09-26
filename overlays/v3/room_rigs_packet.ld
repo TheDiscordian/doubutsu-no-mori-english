@@ -14,6 +14,11 @@ osWritebackDCache = 0x8002FE00;
 sqrtf = 0x80033470;
 af_v3_fire_before = 0x80483810;
 af_v3_fire_after = 0x80483B00;
+af_effect_random = 0x8002C9AC;
+Matrix_translate = 0x800E0314;
+Matrix_mult = 0x800E02BC;
+Matrix_scale = 0x800E041C;
+_texture_z_light_fog_prim_xlu = 0x800BD598;
 SECTIONS {
     . = DEFINED(AF_ROOM_ORIGIN) ? AF_ROOM_ORIGIN : 0x804B8000;
     .text : { *(.text.af_v3_room_rig_ct) *(.text .text.*) }

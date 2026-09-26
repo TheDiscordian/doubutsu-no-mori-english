@@ -1691,6 +1691,9 @@ def tool_controls(debug,rom_path,record,*,transitions=False,capture=False,rod=Fa
 
 
 def exercise(debug, rom_path, record, *, section='automatic_furniture'):
+    if section=='room_effects':
+        from v3_room_effects_smoke import exercise as room_effects
+        return room_effects(debug,rom_path,record)
     if section=='password_runtime':
         from v3_password_smoke import exercise as passwords
         return passwords(debug,rom_path,record)

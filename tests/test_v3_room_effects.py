@@ -1,10 +1,13 @@
 """Complete effect source/artwork and additive controller relocation checks."""
 import copy
+import json
+import os
 from pathlib import Path
 import struct
 import sys
 from types import SimpleNamespace
 import unittest
+import zlib
 
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'tools'))
@@ -101,6 +104,9 @@ class EffectTests(unittest.TestCase):
     def test_flash_runtime_under_sanitizers(self):
         self.sanitized('v3_room_effects_test.c')
 
+    def test_profile_loader_under_sanitizers(self):
+        self.sanitized('v3_effect_loader_test.c')
+
     def test_current_controller_retains_timed_lamp_and_installed_wall(self):
         from v3_furniture_install import inputs
         image,report=inputs(ROOT/'build/v3-idle-hit-category-auto-02/cartridge/build-lock.json')
@@ -126,6 +132,76 @@ class EffectTests(unittest.TestCase):
             self.assertEqual(new,old)
         wall=effects.wall_binding(image,report)
         self.assertEqual((wall['source_index'],wall['index'],wall['pixels']),(65,76,8192))
+
+
+OUTPUT=ROOT/os.environ.get('V3_EFFECTS_BUILD','build/v3-room-effects-runtime-02')
+
+
+@unittest.skipUnless((OUTPUT/'build-lock.json').exists(),'Installed shared effects required')
+class InstalledTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        from v3_furniture_install import inputs
+        cls.image,cls.report=inputs(OUTPUT/'build-lock.json')
+        cls.base,cls.prior=inputs(OUTPUT/'base-lock.json')
+        cls.files,cls.old=by_vrom(cls.image),by_vrom(cls.base)
+        cls.equipment=cls.report['equipment_resources'];cls.room=cls.equipment['room_rigs']
+        cls.effects=cls.room['effects'];cls.blob=cls.files[0x2200000].extract(cls.image)
+
+    def test_complete_controller_reconstruction_and_relocation(self):
+        c=self.effects['controller'];loader=c['loader']
+        data=(OUTPUT/'effect_loader/code.bin').read_bytes()
+        owner,reloc,row=effects.extend_controller(self.old[effects.VROM].extract(self.base),
+            self.old[effects.RELOC].extract(self.base),c['additions'],loader=(data,loader))
+        self.assertEqual(owner,self.files[c['vrom']].extract(self.image))
+        self.assertEqual(reloc,self.files[c['reloc']].extract(self.image))
+        self.assertEqual(self.files[c['reloc']].index,self.files[c['vrom']].index+1)
+        for base in (0x80200010,0x80328010):
+            spec=SimpleNamespace(ram=effects.RAM,resident_bytes=len(owner),sections=struct.unpack_from('>5I',reloc))
+            loaded=relocate_verified_data(spec,owner,reloc,base,memory_end=0x80800000)
+            self.assertEqual(u32(loaded,0xF64)&0x3FFFFFF,(base+sum(effects.SECTIONS))>>2&0x3FFFFFF)
+            self.assertEqual(loaded[0x36B0:0x36C0],owner[0x36B0:0x36C0])
+            from catalogue_names import elf_inventory
+            for at,kind,target,name in elf_inventory(loader['elf_relocations'],ram=effects.RAM):
+                if kind==4:
+                    dest=((effects.RAM+at)&0xF0000000)|(u32(owner,at)&0x3FFFFFF)<<2
+                    expected=dest-effects.RAM+base if effects.RAM<=dest<effects.RAM+len(owner) else dest
+                    self.assertEqual((u32(loaded,at)&0x3FFFFFF)<<2,expected&0xFFFFFFF)
+
+    def test_bound_profiles_and_retained_resources(self):
+        from aflib import CODE_RAM,CODE_VROM,apply_ups
+        changed={effects.VROM,effects.RELOC,0x1410000,0x2200000,CODE_VROM,0x1A00000,0x19D40}
+        from v3_asset_loader import MODULE
+        changed.add(MODULE)
+        for v,e in self.old.items():
+            if v not in changed:self.assertEqual(e.extract(self.base),self.files[v].extract(self.image),f'{v:08X}')
+        art=self.files[0x1410000].extract(self.image)
+        self.assertEqual(art[:self.old[0x1410000].size],self.old[0x1410000].extract(self.base))
+        self.assertEqual(len(art)-self.old[0x1410000].size,472)
+        core=bytearray(self.files[CODE_VROM].extract(self.image));hook=self.effects['controller']['descriptor']
+        at=hook['address']-CODE_RAM;self.assertEqual(core[at:at+32].hex(),hook['after'])
+        core[at:at+32]=bytes.fromhex(hook['before'])
+        self.assertEqual(core,self.old[CODE_VROM].extract(self.base))
+        for p in self.effects['profiles']:
+            actual=self.blob[p['blob_offset']:p['blob_offset']+64]
+            self.assertEqual(actual,effects.profile_overlay(self.room['code']['symbols'],p['id']==112))
+            self.assertEqual(u32(actual,24),zlib.crc32(actual[:24]))
+        module=self.blob[self.equipment['blob_offset']:self.equipment['blob_offset']+self.equipment['bytes']]
+        self.assertEqual(u32(module,effects.LOADER_BRIDGE-0x804A3000),self.effects['bootstrap_loader'])
+        self.assertEqual(self.report['save_runtime'],self.prior['save_runtime'])
+        self.assertEqual(self.report['furniture'],self.prior['furniture'])
+        original=(ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes()
+        self.assertEqual(apply_ups(original,(OUTPUT/'asset-loader.ups').read_bytes()),self.image)
+
+    def test_profiles_rebind_after_later_shared_compilation(self):
+        blob=bytearray(self.blob);receipt=copy.deepcopy(self.effects);symbols=dict(self.room['code']['symbols'])
+        for name in symbols:
+            if name.startswith('af_v3_flash_'):symbols[name]+=4
+        effects.rebind_profiles(receipt,blob,symbols)
+        for p in receipt['profiles']:
+            self.assertEqual(blob[p['blob_offset']:p['blob_offset']+64],effects.profile_overlay(symbols,p['id']==112))
+        blob[receipt['profiles'][0]['blob_offset']]^=1
+        with self.assertRaisesRegex(ValueError,'complete installed'):effects.rebind_profiles(receipt,blob,symbols)
 
 
 if __name__=='__main__':unittest.main()

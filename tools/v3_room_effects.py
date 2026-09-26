@@ -4,13 +4,15 @@ Preparation is not cartridge installation or item eligibility. Generated effect
 artwork and native owner images remain in ignored build directories.
 """
 import argparse
+import copy
 import json
 from pathlib import Path
 import struct
+import zlib
 
-from aflib import by_vrom, sha256, u32
+from aflib import CODE_RAM, CODE_VROM, by_vrom, sha256, u32
 from apply_translation import write_new
-from v3_asset_loader import ROOT, compile_part
+from v3_asset_loader import ROOT, BLOB, compile_part
 from v3_furniture_pipeline import Source
 from v3_player_actions import native_references
 
@@ -22,6 +24,12 @@ LAMP_OWNER_SHA = '7c9894ef30cf85b7e1aefdd326cbea8e7efeb79a9e0bd2ca3bdf08188571d9
 LAMP_RELOC_SHA = '9b5119253d75fd2e3c22f86a313a56e66454862b020412de64a1bd12b097624b'
 NATIVE_COUNT = 111
 TABLES = ((0x2A00, 20), (0x32AC, 8), (0x3624, 1))
+INSTALLED_VROM, INSTALLED_RELOC = 0x3FA0000, 0x3FB0000
+LOADER_BRIDGE = 0x804B1E08
+SOURCES = ('tools/v3_room_effects.py','tools/v3_room_rig_runtime.py','tools/v3_furniture_install.py',
+    'tools/v3_asset_loader.py','overlays/v3/room_effects.c','overlays/v3/room_effects.h',
+    'overlays/v3/effect_loader.c','overlays/v3/effect_loader.ld',
+    'overlays/v3/room_rigs_bootstrap.c','overlays/v3/room_rigs_packet.ld')
 REFERENCES = {
     0xEF4: ((0xEF8, RAM+0x2A00),),
     0x1050: ((0x1058, RAM+0x3624),),
@@ -141,7 +149,8 @@ def profile_overlay(symbols, controller=False):
     pointers=[symbols[prefix+role] for role in ('init','ct','mv','dw')]
     if any(type(p)!=int or p&3 or not 0x804C8000<=p<0x804CC000 for p in pointers):
         raise ValueError('Effect callback escapes checked shared room packet')
-    data=struct.pack('>4IhhI',*pointers,-2,255,0xC47A0CFF)+bytes(8)
+    data=struct.pack('>4IhhI',*pointers,-2,255,0xC47A0CFF)
+    data+=struct.pack('>2I',zlib.crc32(data),0x41464550)
     # Native descriptor's VROM end points to this relocation trailer.
     relocation=struct.pack('>5I',0,32,0,0,0)+bytes(8)+struct.pack('>I',32)
     return data+relocation
@@ -169,7 +178,7 @@ def wall_binding(image, report):
         pixels_sha256=pixel_digest(wanted),base_sha256=sha256(image))
 
 
-def extend_controller(owner, reloc, additions):
+def extend_controller(owner, reloc, additions, *, loader=None):
     """Append effect identities without replacing native effects or their pools.
 
     Materialise the original BSS as zero-filled initial data, preserving every
@@ -203,13 +212,35 @@ def extend_controller(owner, reloc, additions):
             raise ValueError('Effect resource exceeds native loader bounds')
         tails[0].extend(struct.pack('>5I',*row['overlay']))
         tails[1].extend(struct.pack('>2I',gs,ge));tails[2].append(row['unique'])
-    image=bytearray(owner)+bytes(SECTIONS[3]);tables=[];targets={}
+    image=bytearray(owner)+bytes(SECTIONS[3]);tables=[];targets={};loader_relocations=[]
+    loader_patch=None
+    if loader is not None:
+        from catalogue_names import elf_inventory
+        data,compiled=loader
+        imports=dict(af_effect_native_load=0x800263C0,af_effect_dma=0x80026B44,
+                     af_effect_crc=0x80195938,af_effect_fault=0x80029AB4)
+        if (compiled['symbols']['af_v3_effect_profile_load']!=RAM+len(image) or
+                len(data)!=compiled['bytes'] or sha256(data)!=compiled['sha256'] or
+                not 0<len(data)<=1024 or len(data)&15 or u32(owner,0xF64)!=0x0C0098F0):
+            raise ValueError('Changed native effect profile loader or linked extension')
+        for at,kind,target,name in elf_inventory(compiled['elf_relocations'],ram=RAM):
+            if not len(image)<=at<=len(image)+len(data)-4 or at&3:
+                raise ValueError('Effect loader relocation escapes complete extension')
+            if RAM+len(image)<=target<RAM+len(image)+len(data):
+                loader_relocations.append(0xC0000000|kind<<24|(at-sum(SECTIONS[:2])))
+            elif imports.get(name)!=target or kind!=4:
+                raise ValueError('Unbound effect loader external reference')
+        loader_relocations.insert(0,0x44000F64)
+        target=compiled['symbols']['af_v3_effect_profile_load']
+        loader_patch=dict(offset=0xF64,before=0x0C0098F0,after=0x0C000000|(target>>2&0x3FFFFFF))
+        struct.pack_into('>I',image,0xF64,loader_patch['after'])
+        image.extend(data)
     for (at,stride),tail in zip(TABLES,tails,strict=True):
         image.extend(bytes(-len(image)%4));dest=len(image)
         data=owner[at:at+stride*NATIVE_COUNT]+tail;image.extend(data)
         targets[RAM+at]=RAM+dest
         tables.append(dict(original_offset=at,offset=dest,stride=stride,bytes=len(data),sha256=sha256(data)))
-    image.extend(bytes(-len(image)%16));patches=[]
+    image.extend(bytes(-len(image)%16));patches=[loader_patch] if loader_patch else []
     for hi,refs in observed.items():
         high_values={(targets[t]+0x8000)>>16&65535 for _,t in refs}
         if len(high_values)!=1:raise ValueError('Effect table high-half reader has conflicting targets')
@@ -220,16 +251,108 @@ def extend_controller(owner, reloc, additions):
             patches.append(dict(offset=at,before=u32(owner,at),after=word))
     bound=0x28C10000|(NATIVE_COUNT+len(additions));struct.pack_into('>I',image,0x1048,bound)
     patches.append(dict(offset=0x1048,before=0x28C1006F,after=bound))
-    fixed=bytearray(reloc)
     sections=(*SECTIONS[:2],len(image)-sum(SECTIONS[:2]),0)
-    struct.pack_into('>4I',fixed,0,*sections)
+    if loader_relocations:
+        old_count=u32(reloc,16)
+        records=list(struct.unpack_from('>'+str(old_count)+'I',reloc,20))+loader_relocations
+        if len(set(records))!=len(records):raise ValueError('Duplicate effect-loader relocation')
+        size=(24+len(records)*4+15)&~15
+        fixed=(struct.pack('>5I',*sections,len(records))+struct.pack('>'+str(len(records))+'I',*records)
+            +bytes(size-24-len(records)*4)+struct.pack('>I',size))
+    else:
+        fixed=bytearray(reloc);struct.pack_into('>4I',fixed,0,*sections)
     native_references(image,fixed,expected_sections=sections)
     return bytes(image),bytes(fixed),dict(format='AFV3-EFFECT-CONTROLLER-1',native_count=NATIVE_COUNT,
         count=NATIVE_COUNT+len(additions),tables=tables,patches=sorted(patches,key=lambda p:p['offset']),
         sections=sections,bytes=len(image),sha256=sha256(image),reloc_sha256=sha256(fixed),
         additional_scene_bytes=len(image)-sum(SECTIONS),materialized_zero_bytes=SECTIONS[3],
         original_effects_preserved=True,active_pool_capacity=80,code_pool_slots=12,
-        additions=additions,original=original,installed=False,native_execution_tested=False)
+        additions=additions,original=original,loader_relocations=loader_relocations,
+        loader=loader[1] if loader else None,installed=False,native_execution_tested=False)
+
+
+def rebind_profiles(effects, blob, symbols):
+    """Keep absolute effect callbacks current whenever the shared packet moves code."""
+    for row in effects['profiles']:
+        at=row['blob_offset'];old=bytes(blob[at:at+row['bytes']])
+        if len(old)!=64 or (row.get('sha256') and sha256(old)!=row['sha256']) or (
+                not row.get('sha256') and any(old)):
+            raise ValueError('Changed complete installed effect profile')
+        data=profile_overlay(symbols,row['id']==112)
+        blob[at:at+64]=data;row.update(sha256=sha256(data),callbacks=list(struct.unpack_from('>4I',data)))
+
+
+def install(base, prior, blob, core, original, output, prepared):
+    """Install shared complete effects without enabling an unfinished furniture item."""
+    from v3_furniture_install import owner_tail_storage
+    from v3_room_rig_runtime import publish_packet,EXTENDED_RAM,EXTENDED_TABLE,EQUIPMENT_RAM
+    from v3_resource_capacity import checked_limit
+    prepared=prepared.resolve()
+    if not prepared.is_relative_to(ROOT/'build'):
+        raise ValueError('Effects require complete local prepared resources')
+    receipt=json.loads((prepared/'effects.json').read_bytes())
+    if receipt['format']!='AFV3-ROOM-EFFECTS-PREPARED-1':raise ValueError('Unknown effect preparation')
+    files=by_vrom(base);old=prior['equipment_resources'];room=old['room_rigs']
+    if (room.get('effects') or room['packet']['ram']!=EXTENDED_RAM or room['table_ram']!=EXTENDED_TABLE or
+            sha256(blob[old['blob_offset']:old['blob_offset']+old['bytes']])!=old['sha256'] or
+            sha256(blob[room['packet']['blob_offset']:room['packet']['blob_offset']+room['packet']['bytes']])!=room['packet']['sha256']):
+        raise ValueError('Changed, occupied, or insufficient shared room packet')
+    source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+        (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    contract=source_contract(source);contract['wall']=wall_binding(base,prior)
+    owner=files[VROM].extract(base);reloc=files[RELOC].extract(base)
+    contract['native_controller']=checked_controller(owner,reloc)
+    art,art_row=flash_art(source);bank,bank_row=append_sprite(files[0x1410000].extract(base),art,art_row)
+    if (json.loads(json.dumps(contract))!=receipt['source'] or art_row!=receipt['artwork'] or
+            bank_row!=receipt['bank'] or (prepared/'flash.bin').read_bytes()!=art or
+            (prepared/'effect-art-bank.bin').read_bytes()!=bank):
+        raise ValueError('Changed complete prepared effect source or artwork')
+    start=(len(blob)+15)&~15
+    if BLOB+start+128>checked_limit(base,prior):raise ValueError('Effect profiles exceed import storage')
+    blob.extend(bytes(start+128-len(blob)))
+    result=copy.deepcopy(old)
+    effects=dict(format='AFV3-ROOM-EFFECTS-1',source=contract,artwork=art_row,bank=bank_row,
+        prepared_directory=str(prepared.relative_to(ROOT)),profiles=[
+            dict(id=111+i,blob_offset=start+i*64,vrom=BLOB+start+i*64,bytes=64) for i in range(2)],
+        loader_bridge=LOADER_BRIDGE,installed=False,selectable_imports_added=0,native_execution_tested=False)
+    result['room_rigs']['effects']=effects
+    publish_packet(result,blob,output)
+    loader=compile_part('effect_loader',output/'effect_loader',
+        defines=(f'AF_EFFECT_PROFILES=0x{BLOB+start:X}u','AF_EFFECT_COUNT=2u'))
+    additions=[]
+    for i,row in enumerate(effects['profiles']):
+        ram=0x80700000+i*0x100
+        additions.append(dict(id=row['id'],overlay=[row['vrom'],row['vrom']+32,ram,ram+32,ram],
+            graphics=bank_row['graphics'] if i==0 else [0,0],unique=0))
+    changed,fixed,controller=extend_controller(owner,reloc,additions,loader=loader)
+    if files[RELOC].index!=files[VROM].index+1:
+        raise ValueError('Effect owner/relocation no longer have native directory adjacency')
+    # The actor descriptor is the sole core loader binding for this native owner.
+    descriptor=0x801010B0-CODE_RAM
+    before=struct.pack('>8I',VROM,RELOC,RAM,RAM+sum(SECTIONS),0,RAM+0x36A0,0,0)
+    if bytes(core[descriptor:descriptor+32])!=before:
+        raise ValueError('Changed complete native effect actor descriptor')
+    if [at for at in range(0,len(core)-3,4) if u32(core,at)==VROM]!=[descriptor]:
+        raise ValueError('Unaccounted core effect-controller ROM reader')
+    after=struct.pack('>8I',INSTALLED_VROM,INSTALLED_VROM+len(changed),RAM,RAM+len(changed),0,RAM+0x36A0,0,0)
+    core[descriptor:descriptor+32]=after
+    owner_changes={VROM:changed,RELOC:fixed,0x1410000:bank}
+    moves=owner_tail_storage(base,files,list(owner_changes.items()),minimum_end=files[BLOB].pstart+len(blob))
+    growth=[]
+    for move in moves:
+        v=move['vrom'];target={VROM:INSTALLED_VROM,RELOC:INSTALLED_RELOC}.get(v,v)
+        if any(e.vstart<target+move['bytes'] and target<e.vend for key,e in files.items() if key!=v):
+            raise ValueError('Expanded effect resources overlap live virtual data')
+        growth.append(dict(vrom=v,target_vrom=target,physical=move['physical'],previous_physical=files[v].pstart,
+            bytes=move['bytes'],previous_bytes=files[v].size,sha256=move['sha256'],
+            previous_sha256=move['original_sha256'],relocated=True,relocated_blockers=[]))
+    controller.update(installed=True,vrom=INSTALLED_VROM,reloc=INSTALLED_RELOC,ram=RAM,
+        descriptor=dict(address=0x801010B0,before=before.hex(),after=after.hex()))
+    effects.update(installed=True,controller=controller,additional_scene_bytes=controller['additional_scene_bytes'],
+        additional_fixed_resident_bytes=0,resource_growth=growth,
+        sources={p:sha256((ROOT/p).read_bytes()) for p in SOURCES})
+    write_new(output/'effects.json',(json.dumps(effects,indent=2,sort_keys=True)+'\n').encode())
+    return result,owner_changes,dict(resource_growth=growth)
 
 
 def prepare(output, base_lock):

@@ -22,28 +22,31 @@ Incomplete gameplay stays unavailable in the selector; installing assets does
 not claim that an item is playable. Reuse unchanged passing tests throughout.
 
 Current task: close shared conversion gaps in the ordinary bulk importer.
-The current checked proposal is ABI 212 at
-`build/v3-idle-hit-category-auto-02/cartridge/build-lock.json`, with 152 private
+The current checked proposal is ABI 213 at
+`build/v3-room-effects-runtime-02/build-lock.json`, with 152
 development choices. Automatic category installation covers complete idle-only
 struck-animation behaviour and sound. Tiger bobblehead reuses its artwork and
 uses additive identity `3C3C`, runtime index 1807, through its real Gulliver route.
 Continue unsupported model/material/animation callbacks, including required
 item-specific behaviour; do not divert into acquisition frontend work.
-The extended rig packet has 11,756 code bytes spare. The scroll module has only
+The extended rig packet has 10,428 code bytes spare. The scroll module has only
 4 code bytes spare; further scroll behaviour requires a checked capacity
 extension or relocation, not omitted functionality. Audio has 672 conservative
 bytes spare. Respect these bounds when extending categories.
-See the [current checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#idle-only-struck-animation-policy)
+See the [current checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#installed-shared-camera-flash-effects)
 for commands, evidence, and save compatibility.
 
 The first native hit-policy check passes 108 internal assertions. Retain its
 results and unchanged rolling/contact/material evidence. Camera-flash lifecycle,
-complete sprite packing, profile packets, and additive controller-table expansion
-are prepared and host-checked at `build/v3-room-effects-prepared-03/`.
-Next integrate those shared components into the cartridge, preserving the
-current controller's campsite-lamp hooks, and connect the endpoint-triggered hit
-variant with both sound programs. Do not repeat the completed source/format
-investigation or unchanged runtime tests. Use [the effect integration steps](../specs/V3_ROOM_EFFECTS.md#remaining-installation).
+complete sprite packing, checked profiles, and additive controller tables are
+installed. Nine host checks and four browser/offline comparisons pass. Actual
+native loading/relocation, both new profiles/cache, shared-packet loading, and
+original-program preservation pass; particle lifetime remains unverified after
+the fixture mistakes priority two for an inactive flag. The fixture correction
+belongs in the next changed integration run, not another unchanged attempt.
+Next connect the endpoint-triggered hit variant with both sound programs and
+the installed effects. Do not repeat the source/format investigation or passed
+runtime checks. Use [the effect integration steps](../specs/V3_ROOM_EFFECTS.md#remaining-integration).
 The judge's bell
 starts at half speed, accepts hits at the animation endpoint, and requests both
 a second singleton sound and a flash effect with ringside seating. Use the

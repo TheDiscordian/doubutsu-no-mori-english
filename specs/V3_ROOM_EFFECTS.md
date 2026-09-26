@@ -7,10 +7,13 @@ endpoint-triggered animation, positional bell sound, and, with ringside seating,
 a singleton camera sound and the complete camera-flash controller. None of these
 dependencies may be dropped to make the item selectable.
 
-`tools/v3_room_effects.py` supplies source-bound effect preparation, complete
-sprite packing, native profile packets, and additive controller-table expansion.
-`overlays/v3/room_effects.c` implements both flash lifecycles. These components
-are prepared and host-checked, not installed in the current ABI-212 cartridge.
+`tools/v3_room_effects.py` supplies source-bound effect preparation and installation,
+complete sprite packing, native profile packets, and additive controller-table
+expansion. `overlays/v3/room_effects.c` implements both flash lifecycles. These
+components are installed in ABI 213 at `build/v3-room-effects-runtime-02/`.
+The native loader/profile integration has focused passing evidence. Complete
+native particle lifetime and furniture binding remain incomplete; the bell is
+not selectable. Host checks cover the complete particle/controller lifecycles.
 The public source branch contains development work; neither web-patcher
 deployment changes until user testing and approval.
 
@@ -30,12 +33,14 @@ graphics slots. Those capacities remain unchanged.
 
 The shared extension appends identities 111 (flash) and 112 (flash controller).
 It preserves all existing rows, active-state addresses, instructions outside the
-checked table references/bound, and relocation records. Original BSS becomes
-explicit zero-filled initial data at the same offsets. Expanded tables follow
-that state. The resulting owner is 25,056 bytes, with 3,280 additional scene
-bytes and no additional fixed resident reservation. Installation must update
-the actual actor loader's ROM range and allocated size; producing this owner
-alone does not install it.
+checked table references/bound and profile-loader call. Original BSS becomes
+explicit zero-filled initial data at the same offsets. A 384-byte relocated
+loader and the expanded tables follow that state. The installed owner is 25,440
+bytes, with 3,664 additional scene bytes and no additional fixed resident
+reservation. The actor descriptor at `801010B0` points to the complete owner
+at VROM `03FA0000` and its actual RAM size; the relocation resource is
+`03FB0000`. Their DMA entries retain native directory adjacency. Original
+relocations remain, with six added relocations for the new loader and its hook.
 
 The current owner contains four absolute campsite-lamp profile hooks and four
 removed relocations. The extension accepts and preserves that checked variant
@@ -45,11 +50,26 @@ calls original controller functions by unchanged offsets.
 
 The effect profiles contain four absolute callbacks in the shared room packet,
 death policy `-2`, no-child value `255`, and the source no-distance-death value.
-Each native loader packet is 32 data bytes plus a 32-byte empty relocation
-trailer. Linked profile addresses do not reserve additional fixed RAM; the
-native effect code pool owns their actual loaded storage. Callbacks must be
-linked into the existing `804C8000..804CBFFF` code reservation, loaded before
-the first request, and retained for the lifetime of the effects.
+Each native profile packet is 32 data bytes plus a 32-byte empty relocation
+trailer. The first 24 bytes are the native profile; the remaining data words
+hold its CRC32 and `AFEP` marker. Linked profile addresses do not reserve
+additional fixed RAM; the native effect code pool owns actual loaded storage.
+Callbacks live in the existing `804C8000..804CBFFF` code reservation, loaded
+before the first request, and retained for the lifetime of the effects.
+
+The native `ovlmgr_Load` ignores the supplied VROM end and derives resource and
+relocation ranges from neighbouring DMA-directory entries. It cannot load
+these tiny subresources within the import file. The controller's loader hook
+therefore preserves ordinary `ovlmgr_Load` for every original effect, while
+imported profiles use bounded native DMA, CRC/marker verification, callback
+range checks, and the existing room-packet loader. Invalid profiles fault before
+the native caller can publish them. No additional DMA-directory entry is used.
+
+The equipment word at `804B1E08` points to the current room bootstrap loader;
+it is regenerated with every shared compilation. The same publication step
+rewrites and checks all effect-profile callbacks and checksums, so subsequent
+item categories cannot retain stale function addresses. Bootstrap code uses
+1,509 of 1,536 bytes; shared room code uses 5,956 of 16,384 bytes.
 
 ## Camera flashes
 
@@ -95,18 +115,18 @@ and checks the persistent registry. Comparing against native wall 65 is wrong.
 The conditional effect remains conditional on the wall; it does not require
 forcing that optional wall into every bell selection.
 
-## Remaining installation
+## Remaining integration
 
-1. Link the effect callbacks into the shared room packet and regenerate native
-   profile packets using their final addresses. Reuse the prepared sprite.
-2. Install expanded controller/relocation and graphics resources through the
-   existing shared installer, preserving the timed-lamp wrapper and native
-   actor-loader binding. Account for 3,280 additional scene bytes and full ROM
-   growth; do not overwrite neighbouring virtual resources.
-3. Bind the endpoint-hit policy to both complete source sound programs, including
+1. Bind the endpoint-hit policy to both complete source sound programs, including
    the system singleton trigger, and the actual full-index wall getter. Enable
    the bell only when all behaviour and ordinary import requirements are met.
-4. Run a focused combined native check of the changed integration. Retain passing
-   unchanged hit/rolling/material evidence. Host relocation and sanitizer checks
-   do not establish native loading, sound synthesis, GPU appearance, ordinary
-   room interaction, save/restart, or original-hardware behaviour.
+2. Include the remaining particle lifetime in the next meaningful combined
+   native integration check. The existing fixture now recognises nonzero active
+   priorities, rather than requiring a boolean `1`; that corrected continuation
+   is not yet executed. Preserve passing controller/profile loading, relocation,
+   native program caching, complete original-program loading, and shared-packet
+   evidence. Do not repeat unchanged hit/rolling/material tests.
+
+Host sanitizer checks and the partial native run do not establish complete
+native particle lifetime, sound synthesis, GPU appearance, ordinary room
+interaction, save/restart, or original-hardware behaviour.

@@ -32,7 +32,8 @@ SOURCES=('tools/v3_room_rig_runtime.py','tools/v3_asset_loader.py','tools/v3_fur
     'overlays/v3/room_rigs.c','overlays/v3/room_rigs.h','overlays/v3/room_rigs.ld','overlays/v3/room_billboards.c',
     'overlays/v3/held_rigs.ld','overlays/v3/room_rigs_packet.ld',
     'overlays/v3/room_rigs_bootstrap.c','overlays/v3/room_rigs_bootstrap.ld',
-    'tools/v3_furniture_motion.py','overlays/v3/room_motion.h','overlays/v3/room_rigs_extended.ld')
+    'tools/v3_furniture_motion.py','overlays/v3/room_motion.h','overlays/v3/room_rigs_extended.ld',
+    'tools/v3_room_effects.py','overlays/v3/room_effects.c','overlays/v3/room_effects.h')
 
 
 def packet_layout(runtime):
@@ -508,12 +509,17 @@ def publish_packet(equipment,blob,output):
     billboard=any(r.get('mode')==4 for r in runtime['rows'])
     if billboard:defines+=('AF_V3_ROOM_BILLBOARD',)
     if any(r.get('mode')==5 for r in runtime['rows']):defines+=('AF_V3_ROOM_ROLLING',)
+    effects=runtime.get('effects')
+    if effects:
+        if packet_ram!=EXTENDED_RAM:raise ValueError('Effect callbacks require the expanded room packet')
+        defines+=(f'AF_EFFECT_FLASH_MODEL=0x{effects["bank"]["model"]:X}u',)
     defines+=(f'ROOM_RIG_TABLE_RAM=0x{table_ram:X}u',f'ROOM_SOUND_TABLE_RAM=0x{SOUND_TABLE+table_delta:X}u',
               f'ROOM_MATERIAL_TABLE_RAM=0x{MATERIAL_TABLE+table_delta:X}u')
     code,compiled=compile_part('room_rigs_extended' if packet_ram==EXTENDED_RAM else 'room_rigs_packet',output/'room_rigs_packet',
         primary_source='overlays/v3/room_rigs.c',defines=defines,
         extra_sources=(('overlays/v3/room_materials.c',) if material_rows else ())+
-            (('overlays/v3/room_billboards.c',) if billboard else ()))
+            (('overlays/v3/room_billboards.c',) if billboard else ())+
+            (('overlays/v3/room_effects.c',) if effects else ()))
     table=encode_packet(runtime['rows'],sound_rows,material_rows)
     data=code.ljust(table_ram-packet_ram,b'\0')+table
     if len(code)>table_ram-packet_ram or len(data)!=packet_bytes or not zlib.crc32(data):
@@ -537,7 +543,8 @@ def publish_packet(equipment,blob,output):
         scroll_defines=publish_scroll(equipment,blob,output)
     boot,bootstrap=compile_part('room_rigs_bootstrap',output/'room_rigs_bootstrap',defines=(
         f'AF_ROOM_RAM=0x{packet_ram:X}u',f'AF_ROOM_VROM=0x{BLOB+at:X}u',f'AF_ROOM_BYTES={packet_bytes}u',f'AF_ROOM_CRC=0x{zlib.crc32(data):X}u',
-        *(f'AF_ROOM_{role.upper()}=0x{entry:X}u' for role,entry in zip(('ct','mv','dw'),entries)),*sound_defines,*material_defines,*scroll_defines))
+        *(f'AF_ROOM_{role.upper()}=0x{entry:X}u' for role,entry in zip(('ct','mv','dw'),entries)),*sound_defines,*material_defines,*scroll_defines,
+        *(('AF_ROOM_EFFECTS',) if effects else ())))
     start=equipment['blob_offset'];module=bytearray(blob[start:start+equipment['bytes']])
     if sha256(module)!=equipment['sha256']:raise ValueError('Changed installed equipment before room publication')
     entries=[bootstrap['symbols']['af_v3_room_boot_'+role] for role in ('ct','mv','dw')]
@@ -547,6 +554,9 @@ def publish_packet(equipment,blob,output):
     module[RAM-EQUIPMENT_RAM:TABLE-EQUIPMENT_RAM]=boot+bytes(TABLE-RAM-len(boot))
     if runtime.get('format')=='AFV3-ROOM-RIGS-2' and runtime.get('bootstrap'):
         expected=bytearray(VTABLE-TABLE)
+        if effects and effects.get('bootstrap_loader'):
+            from v3_room_effects import LOADER_BRIDGE
+            struct.pack_into('>I',expected,LOADER_BRIDGE-TABLE,effects['bootstrap_loader'])
         expected[MATERIAL_VTABLE-TABLE:MATERIAL_VTABLE-TABLE+20]=bytes.fromhex(runtime.get('material_vtable_hex','00'*20))
         if runtime.get('scrolling'):
             from v3_furniture_scroll import VTABLE as SCROLL_VTABLE
@@ -557,6 +567,13 @@ def publish_packet(equipment,blob,output):
         if module[TABLE-EQUIPMENT_RAM:VTABLE-EQUIPMENT_RAM]!=expected:
             raise ValueError('Occupied room cache/material vtable reservation')
     module[TABLE-EQUIPMENT_RAM:VTABLE-EQUIPMENT_RAM]=bytes(VTABLE-TABLE)
+    if effects:
+        from v3_room_effects import LOADER_BRIDGE,rebind_profiles
+        entry=bootstrap['symbols']['af_v3_room_boot_load']
+        if entry&3 or not RAM<=entry<RAM+len(boot):raise ValueError('Effect loader escapes room bootstrap')
+        struct.pack_into('>I',module,LOADER_BRIDGE-EQUIPMENT_RAM,entry)
+        effects['bootstrap_loader']=entry
+        rebind_profiles(effects,blob,symbols)
     if scroll_defines:
         from v3_furniture_scroll import VTABLE as SCROLL_VTABLE
         lifecycle=bool(runtime['scrolling'].get('lifecycle_rows'))

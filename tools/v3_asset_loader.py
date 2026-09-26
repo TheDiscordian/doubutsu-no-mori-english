@@ -47,14 +47,14 @@ def compile_part(part, out, extra_sources=(), defines=(), primary_source=None):
              '-fno-stack-protector', '-ffunction-sections', '-fdata-sections', '-fstack-usage',
              '-Wall', '-Wextra', '-Werror']
     flags += ['-D' + define for define in defines]
-    if part in ('catalogue', 'hra', 'feng_shui', 'campsite_manager', 'camper_greeting', 'camper_trade'):
+    if part in ('catalogue', 'hra', 'feng_shui', 'campsite_manager', 'camper_greeting', 'camper_trade', 'effect_loader'):
         flags += ['-fno-merge-constants', '-mno-explicit-relocs', '-mno-split-addresses']
     objects = []
     for i, source in enumerate((primary_source or f'overlays/v3/{part}.c', *extra_sources)):
         obj = 'code.o' if i == 0 else f'extra{i}.o'
         run('gcc', *flags, f'/source/{source}', '-o', obj)
         objects.append(obj)
-    run('ld', '-EB', *(['--emit-relocs'] if part in ('catalogue', 'hra', 'feng_shui', 'campsite_manager', 'camper_greeting', 'camper_trade') else []),
+    run('ld', '-EB', *(['--emit-relocs'] if part in ('catalogue', 'hra', 'feng_shui', 'campsite_manager', 'camper_greeting', 'camper_trade', 'effect_loader') else []),
         '-T', f'/source/overlays/v3/{part}.ld', '-o', 'code.elf', *objects)
     if run('nm', '--undefined-only', 'code.elf').strip():
         raise ValueError('Unresolved V3 loader symbol')
@@ -130,6 +130,7 @@ def compile_part(part, out, extra_sources=(), defines=(), primary_source=None):
                        'room_rigs_packet': ('af_v3_room_rig_ct', 0x804B8000),
                        'room_rigs_extended': ('af_v3_room_rig_ct', 0x804C8000),
                        'room_effects': ('af_v3_flash_init', 0x804C8000),
+                       'effect_loader': ('af_v3_effect_profile_load', 0x80A1C6A0),
                        'room_scroll': ('af_v3_room_scroll_dw', 0x804BA000),
                        'surface_indoor': ('af_v3_surface_floor', 0x80951BC4),
                        'surface_shop': ('af_v3_surface_floor', 0x8095A514),
@@ -184,7 +185,7 @@ def compile_part(part, out, extra_sources=(), defines=(), primary_source=None):
         defaults = (out / 'defaults.bin').read_bytes()
         report['default_extension'] = {'ram': 0x804632E0, 'bytes': len(defaults),
                                        'sha256': sha256(defaults)}
-    if part in ('catalogue', 'hra', 'feng_shui', 'campsite_manager', 'camper_greeting', 'camper_trade'):
+    if part in ('catalogue', 'hra', 'feng_shui', 'campsite_manager', 'camper_greeting', 'camper_trade', 'effect_loader'):
         report['elf_relocations'] = run('readelf', '-rW', 'code.elf')
     return code, report
 
