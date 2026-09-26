@@ -8,7 +8,7 @@ from aflib import CODE_RAM,CODE_VROM,by_vrom,sha256
 from v3_asset_loader import ROOT,BLOB,compile_part
 from v3_equipment_runtime import RAM as EQUIPMENT_RAM,retired_module_space
 from v3_furniture_pipeline import Source,prepare,room_aliases,PreparedAssets
-from v3_furniture_rigs import CATEGORY,CLOCK_CATEGORY,STORAGE_CATEGORY,suffix
+from v3_furniture_rigs import CATEGORY,CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,suffix
 from v3_registry import (furniture_representation_identity,ROOM_ALIAS_REGISTRY_VERSION,
                          furniture_identity,furniture_source,furniture_source_index)
 from v3_import_storage import ROWS,ITEMS,slot,END
@@ -82,7 +82,7 @@ def install_profiles(base,prior,blob,core,original,output,directories):
         for row in art['objects']:
             donor=row['item_id'];item=int(donor,16);prepared_row=prepare(source,item)
             descriptor=prepared_row[0];category=descriptor.get('callback_adapter',{}).get('category')
-            if (category not in (CLOCK_CATEGORY,STORAGE_CATEGORY,'switch-trigger-sound',MATERIAL_CATEGORY,SCROLL_CATEGORY) or
+            if (category not in (CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,'switch-trigger-sound',MATERIAL_CATEGORY,SCROLL_CATEGORY) or
                     donor in occupied or item not in identities or
                     row['profile']!=json.loads(json.dumps(descriptor)) or
                     row['native_profile_scalar_hex']!=descriptor['scalar_hex']):
@@ -138,13 +138,23 @@ def install_profiles(base,prior,blob,core,original,output,directories):
                     raise ValueError('Prepared scrolling resource is not completely installed')
                 vrom=installed['vrom'];vtable=SCROLL_VTABLE;reused_asset=True
                 installed.update(lifecycle_installed=True,lifecycle=json.loads(json.dumps(lifecycle)))
-            elif category in (CLOCK_CATEGORY,STORAGE_CATEGORY):
+            elif category in (CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY):
                 installed=rigs.get(donor)
                 if (not installed or installed['profile_installed'] or installed['source']!=row or
                         installed['bytes']!=len(data) or installed['sha256']!=sha256(data) or
                         blob[installed['blob_offset']:installed['blob_offset']+len(data)]!=data):
                     raise ValueError('Prepared rig is not completely installed in the current runtime')
                 vrom=installed['vrom'];vtable=VTABLE;reused_asset=True
+                if category==HIT_CATEGORY:
+                    audio=result.get('furniture_audio',{})
+                    audio_row=next((r for r in audio.get('furniture',[]) if r['item_id']==donor),None)
+                    sound=sounds.get(donor);trigger=furniture_trigger(source,descriptor)
+                    if (not audio_row or audio_row['callback']!=json.loads(json.dumps(descriptor['callback_adapter'])) or
+                            not sound or sound['source_sound_word']!=trigger['sound_word'] or
+                            not all(audio.get(k) for k in ('runtime_installed','dispatch_and_priority_installed',
+                                'allocation_installed','callback_installed'))):
+                        raise ValueError('Hit rig needs its complete installed source audio')
+                    sound['profile_installed']=True
             else:
                 installed=sounds.get(donor);audio=result.get('furniture_audio',{})
                 audio_row=next((r for r in audio.get('furniture',[]) if r['item_id']==donor),None)
@@ -232,7 +242,9 @@ def bind_profiles(source,base,report):
     if runtime.get('material_rows') and module[MATERIAL_VTABLE-EQUIPMENT_RAM:MATERIAL_VTABLE-EQUIPMENT_RAM+20].hex()!=runtime['material_vtable_hex']:
         raise ValueError('Changed installed material draw dispatch')
     limit=checked_limit(base,report)
-    bindings={r['source_item_id']:r for r in runtime['rows']+runtime['sound_rows']+runtime.get('material_rows',[])}
+    # A rig's audio dependency has its own sound row; retain the complete model
+    # binding when an identity occurs in both tables.
+    bindings={r['source_item_id']:r for r in runtime['sound_rows']+runtime['rows']+runtime.get('material_rows',[])}
     bindings.update(checked_runtime(e,blob))
     placement=checked_initial_switch(base,report,blob)
     if placement and report['furniture_initial_switch']['source']!=json.loads(json.dumps(initial_switch_source(source))):
@@ -263,6 +275,14 @@ def bind_profiles(source,base,report):
                     trigger is None or sound is None or not sound['profile_installed'] or
                     sound['source_sound_word']!=trigger['sound_word']):
                 raise ValueError('Incomplete installed material/trigger lifecycle')
+        if category==HIT_CATEGORY:
+            trigger=furniture_trigger(source,descriptor)
+            sound=next((r for r in runtime['sound_rows'] if r['source_item_id']==donor),None)
+            audio=next((r for r in e.get('furniture_audio',{}).get('furniture',[]) if r['item_id']==donor),None)
+            if (sound is None or not sound['profile_installed'] or not audio or
+                    sound['source_sound_word']!=trigger['sound_word'] or
+                    audio['callback']!=json.loads(json.dumps(descriptor['callback_adapter']))):
+                raise ValueError('Incomplete installed hit-rig audio/behaviour')
         art['room_runtime']=dict(vtable=expected_vtable,vrom=vrom)
         at=vrom-BLOB;n=art['object_bytes'];native=profile(art,vrom,limit=limit)
         current=blob[ROWS+i*80:ROWS+(i+1)*80];record=blob[ITEMS+i*32:ITEMS+(i+1)*32]
@@ -309,7 +329,7 @@ def prepared_categories(source,directories):
         for row in art['objects']:
             donor=row['item_id'];item=int(donor,16);prepared_row=prepare(source,item)
             profile=prepared_row[0];adapter=profile.get('callback_adapter',{});category=adapter.get('category')
-            if category not in (CLOCK_CATEGORY,STORAGE_CATEGORY):
+            if category not in (CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY):
                 raise ValueError('Unimplemented additional room-rig category')
             if (row['profile']!=json.loads(json.dumps(profile)) or donor in assets or
                     row['native_profile_scalar_hex']!=profile['scalar_hex'] or
@@ -321,9 +341,11 @@ def prepared_categories(source,directories):
             rig=row['rig'];index,destination=furniture_representation_identity(item)
             if category==CLOCK_CATEGORY:
                 mode=1;first=adapter['clock']['hour_joint'];last=adapter['clock']['minute_joint']
-            else:
+            elif category==STORAGE_CATEGORY:
                 mode=2;first=int(adapter['constants']['start_frame']['hex'],16)
                 last=int(adapter['constants']['end_frame']['hex'],16)
+            else:
+                mode=3;first=last=0
             rows.append(dict(source_item_id=donor,item_id=f'{destination:04X}',runtime_index=index,
                 bytes=len(data),sha256=sha256(data),category=category,mode=mode,first=first,last=last,
                 skeleton=0x06000000+rig['skeleton_offset'],animation=0x06000000+rig['animation_offset'],
@@ -367,7 +389,7 @@ def encode_packet(rows,sound_rows=(),material_rows=()):
     for r in rows:
         encode([r])  # Retain the complete existing object/pointer/work-area checks.
         mode,first,last=r.get('mode',0),r.get('first',0),r.get('last',0)
-        if (mode not in (0,1,2) or mode==0 and (first or last) or
+        if (mode not in (0,1,2,3) or mode in (0,3) and (first or last) or
                 mode==1 and not (0<first<r['joints'] and 0<last<r['joints'] and first!=last) or
                 mode==2 and not 0x3F800000<=first<last<=0x43800000):
             raise ValueError('Invalid complete room-rig behaviour parameters')
@@ -555,7 +577,8 @@ def extend(base,prior,blob,core,original,output,directories):
     for r in rows:
         data=assets[r['source_item_id']];at=cursor;cursor+=len(data)
         blob[at:cursor]=data;r.update(blob_offset=at,vrom=BLOB+at)
-    installed.update(format='AFV3-ROOM-RIGS-2',categories=[CATEGORY,CLOCK_CATEGORY,STORAGE_CATEGORY],rows=all_rows,
+    installed.update(format='AFV3-ROOM-RIGS-2',categories=sorted(set(runtime.get('categories',[]))|
+        {CATEGORY,CLOCK_CATEGORY,STORAGE_CATEGORY}|{r['category'] for r in rows}),rows=all_rows,
         table_ram=PACKET_TABLE,capacity=PACKET_CAPACITY,ram=PACKET_RAM,extended_native_contract=contract,
         additional_resident_bytes=0 if is_packet else PACKET_BYTES,
         artwork_bytes=runtime['artwork_bytes']+sum(len(d) for d in assets.values()))

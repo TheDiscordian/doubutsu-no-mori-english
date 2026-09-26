@@ -1,5 +1,104 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared hit-animation and automatic dependencies
+
+The explicit ABI-201 proposal is
+`build/v3-hit-category-auto-02/cartridge/build-lock.json`. Its ordinary `import`
+command installed the complete hit-animation category's missing rig, source
+audio, behaviour profile, and eligible item in one dependency-managed run.
+The category recognises speed bag and sandbag from their complete source
+callbacks. The existing speed bag is skipped as already installed; sandbag is
+newly selectable with its real B-stock route, price, and official English name.
+There are 149 private development choices.
+
+Reproduction uses a fresh output directory:
+
+```sh
+python3 tools/v3_furniture_pipeline.py import \
+  --category switch-hit-keyframe-rig --select 3354 \
+  --base-lock build/v3-password-runtime-05/build-lock.json \
+  --reuse-assets build/v3-hit-rigs-prepared-01 \
+  --output build/v3-hit-category-auto-02
+python3 -m unittest \
+  tests.test_v3_furniture_rigs.HitResourceTests \
+  tests.test_v3_furniture_rigs.CategoryPlanTests \
+  tests.test_v3_room_rig_runtime.BehaviourTests.test_extended_categories_under_sanitizers -v
+V3_IMPORTED_RIG_BUILD=build/v3-hit-category-auto-02/cartridge \
+  python3 -m unittest tests.test_v3_room_rig_runtime.CurrentImportedRigTests -v
+python3 tools/emulator_smoke.py \
+  --rom build/v3-hit-category-auto-02/cartridge/animal-forest-v3-asset-loader.z64 \
+  --output build/v3-hit-rigs-native-03 \
+  --scenario tests/scenarios/v3_hit_rigs.json \
+  --xvfb /home/discordian/Games/OpenRSC/headless/vendor/usr/bin/Xvfb \
+  --seconds 180 --expansion-pak --no-initial-screenshot
+```
+
+Omitting `--select` processes the matching new category batch. The dependency
+planner also supports the installed clock and storage categories. It skips
+present resources and binds each stage to its checked resulting cartridge.
+Prepared graphics are reused throughout; the final run compiles zero graphics
+objects and starts zero graphics-compiler containers. The existing MIPS builders
+still compile changed native code. `pipeline.json` records all four stages and
+the resulting immutable locks; no dedicated sandbag installer or scenario exists.
+
+The complete 4,992-byte object has three joints and all three joint models.
+Shared movement preserves initial evaluation, repeated-hit restart, stop/speed
+semantics, positioned source trigger `0175`, and the native equivalents of the
+source's excluded transition states. The installed trigger retains its complete
+programme, instrument, and sample. The shared audio helper keeps existing sound
+callback semantics and singleton suppression. Name attribution is in the single
+`translations/provenance.json` catalogue.
+
+Six focused host checks pass: four source/planner/sanitizer checks in 2.339 seconds,
+and two current-build integration checks in 17.705 seconds. They cover changed
+source rejection, both category members, complete installed bindings, original
+asset reuse, profile bits, UPS reconstruction, and browser/offline none/all/new-
+category/existing-villager equivalence. Empty selection retains V2-12 SHA-256
+`a09373b051cbcd93991e5dd6cb17a238a2afb1e2e2d7694d75408d24a55d4eee`.
+
+Native run `build/v3-hit-rigs-native-03/` passes all 137 scenario steps, including
+102 internal checks through the existing shared rig fixture. It executes real
+native construction, keyframe evaluation, hit/retrigger motion, and complete
+drawing-command generation with both matrix parities. Complete model/motion DMA,
+lazy packet CRC, independent instances, graphics/stack/work boundaries, unchanged
+saved state, and post-restore guards pass. The two representative selections use
+the same newly installed row, because this batch has one new item.
+
+The first native attempt exposed a real initial-pose mismatch: the donor stop
+initializer starts with speed 0.5, while the N64 initializer starts with speed 1.
+The shared constructor now explicitly uses 0.5 before its first evaluation;
+source validation checks the complete initializer and its constants. The second
+attempt passed all 102 internal checks but failed the final fixture read at an
+old format-3 guard address. Correcting that single read to the checked format-4
+address `8046C4C0` produced the passing final run. No old candidate was replayed.
+An initial ordinary-build attempt also rejected converter version 18 before the
+installer's accepted revision list was updated; existing asset validation stays
+intact. Earlier experimental outputs are preserved, not current handoffs.
+
+The checks do not establish GPU appearance, actual sound synthesis/listening,
+ordinary room playthrough, save/restart, or original-hardware acceptance. The
+emulator is isolated, silent, and does not write FlashRAM or a Controller Pak.
+Retain unchanged category evidence rather than replaying old builds.
+
+Memory and artifact bounds:
+
+- Shared rig code: 3,128 of 4,096 bytes; complete packet: 8,192 bytes.
+- Bootstrap: 1,510 of 1,536 bytes; no new fixed reservation or saved field.
+- Audio: 96 conservative bytes spare; import blob: 1,636,304 bytes spare.
+- ROM SHA-256: `b667a467946418fa8f4f8fd8e4811d4254393ff7ce8beeefc89fb7c55d6b7ef2`.
+- UPS SHA-256: `556943c1248c98d8665d0ff32f81f1d20f6e75c5997c0099aa356d51b0f73194`.
+- Receipt SHA-256: `010e29a0305ac859991a6ed9d6a17f0f30fba52ca4ea6d035a44ea574044b931`.
+
+Saved format 4 is unchanged, but selecting sandbag requires its import in the
+receiving build. Preserve backups and equal-or-larger selections; V2 and
+format-1/2/3 V3 cannot load format-4 saves. No new ordinary cross-version reload
+is claimed. The ABI-109 main lock and both stable patcher deployments are unchanged.
+
+Continue remaining extraction/conversion and working behaviour support,
+including item-specific behaviours. There is no rule delaying those behaviours
+until every shared category is finished. Acquisition frontend work remains
+parked; gold-tree work follows the primary importing work as requested.
+
 ## Linked password engine and native bindings
 
 The current explicit proposal is ABI 197 at

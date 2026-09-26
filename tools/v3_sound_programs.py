@@ -243,6 +243,9 @@ def furniture_trigger(source,profile):
     """Recognize move-only triggers with ordinary or complete custom drawing."""
     adapter=profile.get('callback_adapter',{})
     functions=adapter.get('functions',{})
+    if adapter.get('category')=='switch-hit-keyframe-rig':
+        if set(functions)!={'create','move','draw'}:raise ValueError('Changed complete hit-rig lifecycle')
+        return copy.deepcopy(adapter['trigger'])
     if adapter.get('category')=='switch-trigger-sound':
         if set(functions)!={'move'}:raise ValueError('Changed ordinary trigger lifecycle')
         # Source.profile already verifies and annotates this direct callback.

@@ -22,6 +22,7 @@ static RoomRigGame *expected_game;
 static float expected_end;
 static int expected_mode;
 static unsigned expected_joints;
+static int stopped;
 
 void *Lib_SegmentedToVirtual(void *value) {
     uptr at=(uptr)value;
@@ -37,7 +38,7 @@ void cKF_SkeletonInfo_R_init_standard_repeat(RoomKeyframe *key,void *animation,v
     assert(animation==model+0x200 && !diff);key->mode=1;key->current.f=1;
 }
 void cKF_SkeletonInfo_R_init_standard_stop(RoomKeyframe *key,void *animation,void *diff) {
-    assert(animation==model+0x200 && !diff);key->mode=0;key->current.f=1;
+    assert(animation==model+0x200 && !diff);key->mode=0;key->current.f=1;key->speed.f=1;
 }
 int cKF_SkeletonInfo_R_play(RoomKeyframe *key) {
     ++plays;key->current.f+=key->speed.f;
@@ -46,7 +47,7 @@ int cKF_SkeletonInfo_R_play(RoomKeyframe *key) {
         ((s16 *)expected_actor->joint)[i]=(s16)i;
         ((s16 *)expected_actor->morph)[i]=(s16)i;
     }
-    return 0;
+    return stopped;
 }
 static void storage(RoomRig *actor,void *room,RoomRigGame *game,float start,float end) {
     assert(actor==expected_actor && room==(void *)0x1234 && game==expected_game);
@@ -143,7 +144,7 @@ int main(void) {
     RoomRigRecord good=af_v3_test_room_rigs.rows[24];
     for (unsigned bad=0;bad<6;++bad) {
         RoomRigRecord *r=af_v3_test_room_rigs.rows+24;*r=good;
-        if (bad==0)r->mode=3;
+        if (bad==0)r->mode=4;
         if (bad==1)r->reserved=1;
         if (bad==2)r->last.bits=0x7FC00000;
         if (bad==3)r->first.bits=r->last.bits;
@@ -153,5 +154,37 @@ int main(void) {
         af_v3_room_rig_ct(actor,model);af_v3_room_rig_mv(actor,0,&game,model);
         assert(!memcmp(actor,&before,sizeof(before)));
     }
-    puts("Shared clock/storage/switch categories preserve dispatch, time, limits, and actor guards");
+    /* The complete hit category shares the drawer and sound dependency table.
+       Compare source call order for idle, moving, stopped, and repeated hits. */
+    af_v3_test_room_sounds=(RoomSoundTable){ROOM_SOUND_MAGIC,1,8,0,{{1048,0x175,0}}};
+    RoomRigRecord *r=af_v3_test_room_rigs.rows+24;
+    *r=(RoomRigRecord){1048,4096,0x06000100,0x06000200,3,3,ROOM_RIG_HIT,0,{.bits=0},{.bits=0}};
+    expected_mode=ROOM_RIG_HIT;expected_joints=3;model[0x100]=3;model[0x101]=3;
+    for (int variant=0;variant<2;++variant) {
+        memset(&guarded,0xA7,sizeof(guarded));actor->index=(u16)(1048+variant*1024);
+        af_v3_room_rig_ct(actor,model);
+        assert(actor->keyframe.current.f==1.5f && actor->keyframe.speed.f==0 && !actor->changed);
+        for (int done=0;done<2;++done) for (int moving=0;moving<2;++moving)
+        for (int changed=0;changed<3;++changed) for (int state=-1;state<17;++state) {
+            stopped=done;actor->state=(s16)state;actor->changed=(u8)changed;
+            float speed=moving ? .5f : 0;actor->keyframe.speed.f=speed;actor->keyframe.current.f=7;
+            unsigned old=plays,sounds=sound_calls;int running=!done && moving;
+            af_v3_room_rig_mv(actor,0,&game,model);
+            assert(plays==old+1+(unsigned)running+(changed!=0));
+            assert(actor->keyframe.current.f==(changed ? 1+(running ? .5f : speed) : 7+speed*(1+running)));
+            assert(actor->keyframe.speed.f==((changed || running) ? .5f : speed));
+            int audible=changed && state!=5 && state!=6 && state!=13 && state!=15;
+            assert(sound_calls==sounds+(unsigned)audible && actor->changed==changed);
+            if(audible)assert(last_sound==0x175 && last_position==actor->position);
+        }
+        gfx.head=(RoomCommand *)opa;gfx.tail=opa+sizeof(opa)-variant*8;
+        gfx.xlu_head=(RoomCommand *)xlu;gfx.xlu_tail=xlu+sizeof(xlu);game.frame=(u32)variant;
+        af_v3_room_rig_dw(actor,0,&game,model);
+        for (int i=0;i<16;++i)assert(guarded.front[i]==0xA7 && guarded.back[i]==0xA7);
+        for (int i=0;i<0x30;++i)assert(actor->tail[i]==0xA7);
+    }
+    r->first.bits=1;RoomRig saved=*actor;
+    af_v3_room_rig_ct(actor,model);af_v3_room_rig_mv(actor,0,&game,model);
+    assert(!memcmp(actor,&saved,sizeof(saved)));
+    puts("Shared clock/storage/switch/hit categories preserve dispatch, time, limits, sound, and actor guards");
 }

@@ -13,6 +13,7 @@ from v3_keyframes import animation, skeleton, model_descriptor, compile_skeleton
 CATEGORY = 'indexed-switch-rig'
 CLOCK_CATEGORY = 'indexed-loop-clock-rig'
 STORAGE_CATEGORY = 'open-close-storage-rig'
+HIT_CATEGORY = 'switch-hit-keyframe-rig'
 # Complete fixed rig resources with explicit, still-unimplemented callbacks.
 # This category is deliberately not a native behaviour adapter.
 FIXED_CATEGORY = 'fixed-keyframe-rig-assets'
@@ -28,7 +29,7 @@ CLOCK_CODE = {
     'draw': (200, 'f6e60a96386c7721dcd0c894196eae1ee3e5c6339aadf921e2f95952ff7584de'),
     'destroy': (4, 'f332ea5b5437103cbb6f1508679da89eec9288ad775c96c439a17fccabe3de8e'),
 }
-RIG_CATEGORIES = (CATEGORY, CLOCK_CATEGORY, STORAGE_CATEGORY)
+RIG_CATEGORIES = (CATEGORY, CLOCK_CATEGORY, STORAGE_CATEGORY, HIT_CATEGORY)
 RESOURCE_CATEGORIES = RIG_CATEGORIES + (FIXED_CATEGORY,)
 CODE = {
     'create': (164, '2a86d61bc9aaf4a0a6479fe97a7f0d5dfe3dc42f9eea663eeb3fd1b8cbc35733'),
@@ -36,6 +37,74 @@ CODE = {
     'draw': (148, 'a0546e1e4e5893a157857ce34244a4183e8991928ae34ce585f79b3da0d052bb'),
     'destroy': (4, 'f332ea5b5437103cbb6f1508679da89eec9288ad775c96c439a17fccabe3de8e'),
 }
+
+
+def discover_hit(source, vtable_name, vtable_at, functions):
+    """Convert the complete struck-animation category, including its trigger.
+
+    Models, motions, and sound words are source parameters. No item identities
+    or model names select this path, and no part of the move callback is dropped.
+    """
+    from v3_furniture_pipeline import ReviewRequired
+    def reject(reason):raise ReviewRequired('custom callbacks: hit rig '+reason)
+    if set(functions)!={'create','move','draw'}:reject('changed lifecycle slots')
+    module=u32(source.rel,0);create=functions['create'];move=functions['move']
+    def pair(role,hi,lo,section):
+        ref=functions[role]['relocations'].get(hi)
+        if ref is None or ref[:3]!=(6,module,section):reject('missing paired resource')
+        return ref[3],{hi:ref,lo:(4,module,section,ref[3])}
+    bones,a=pair('create',0x0A,0x12,5)
+    motion,b=pair('create',0x22,0x2E,5)
+    repeat,c=pair('create',0x3E,0x46,5)
+    zero,d=pair('create',0x5A,0x62,4)
+    if repeat!=motion:reject('constructor changes motion')
+    helpers=source.checked_callback_code(create,132,
+        '9f229825fdc6bc4d5741e0b27cfdfcd047b1bd836fdb31174413d9841a8cd6d7',a|b|c|d,
+        {0x38:(0x8D4,'cKF_SkeletonInfo_R_ct'),0x4C:(0x934,'cKF_SkeletonInfo_R_init_standard_stop'),
+         0x54:(0xE54,'cKF_SkeletonInfo_R_play')},'hit rig constructor')
+    init,receipt=source.function(0x934);base,_=source.sections[4]
+    expected_init={0x0A:(6,module,4,0),0x0E:(6,module,4,0x20),0x1E:(4,module,4,0),
+        0x2E:(6,module,4,0x30),0x36:(4,module,4,0x20),0x3E:(4,module,4,0x30),
+        0x42:(6,module,4,4),0x4E:(4,module,4,4)}
+    if (len(init)!=124 or sha256(init)!='8045cfda172f82aae9f38054c5e7844b87a7f3428bfc612252eff8e75435efa4' or
+            receipt['relocations']!=expected_init or any(source.rel[base+at:base+at+len(raw)]!=raw
+                for at,raw in ((0,bytes.fromhex('3f800000')),(4,bytes(4)),
+                    (0x20,bytes.fromhex('4330000080000000')),(0x30,bytes.fromhex('3f000000'))))):
+        reject('changed source stop initializer')
+    expected={};constants={}
+    for hi,lo,label,value in ((0x2E,0x36,'zero',0),(0x4A,0x4E,'speed',.5),
+            (0x92,0x9A,'first_frame',1),(0xA6,0xAA,'speed',.5),
+            (0xF2,0xFA,'first_frame',1),(0x106,0x10A,'speed',.5)):
+        at,refs=pair('move',hi,lo,4);expected.update(refs)
+        base,n=source.sections[4];raw=source.rel[base+at:base+at+4]
+        if not 0<=at<=n-4 or raw!=struct.pack('>f',value):reject('changed animation constant')
+        if label in constants and constants[label]['offset']!=at:reject('ambiguous animation constant')
+        constants[label]=dict(section=4,offset=at,hex=raw.hex(),value=value)
+    if constants['zero']['offset']!=zero:reject('changed initial zero speed')
+    raw,_=source.function(move['offset'])
+    if len(raw)!=296:reject('unknown move implementation')
+    sound=struct.unpack_from('>H',raw,0x8A)[0]
+    if (struct.unpack_from('>H',raw,0xEA)[0]!=sound or sound&0x80 or
+            (sound&0x7FFF)>>8 not in (1,4)):reject('inconsistent or unsupported sound word')
+    helpers.update(source.checked_callback_code(move,296,
+        '794e1c2365eda333908e60479b6320c1dde5672e5e7f1546ef56062772be78d3',expected,
+        {0x20:(0xE54,'cKF_SkeletonInfo_R_play'),0x44:(0xE54,'cKF_SkeletonInfo_R_play'),
+         0x8C:(0x2BDDE8,'sAdo_OngenTrgStart'),0xA0:(0xE54,'cKF_SkeletonInfo_R_play'),
+         0xEC:(0x2BDDE8,'sAdo_OngenTrgStart'),0x100:(0xE54,'cKF_SkeletonInfo_R_play')},
+        'hit rig movement',{0x8A:sound,0xEA:sound},internal_branches=True))
+    helpers.update(source.checked_callback_code(functions['draw'],*STORAGE_CODE['draw'],
+        {0x10:(10,0,4,0x8009AED0),0x78:(10,0,4,0x8009AF1C)},
+        {0x50:(0x9D214,'_Matrix_to_Mtx_new'),0x70:(0x1578,'cKF_Si3_draw_R_SV')},'hit rig drawing'))
+    rig=skeleton(source,bones);motion=animation(source,motion,joints=rig['joints'])
+    descriptor=model_descriptor(rig,kind='animated-room-model')
+    return descriptor['models'],{},dict(category=HIT_CATEGORY,vtable_symbol=vtable_name,
+        vtable_offset=vtable_at,functions=functions,helpers=helpers,constants=constants,
+        skeleton=rig,animation=motion,joint_models=descriptor['joint_models'],
+        trigger=dict(sound_word=sound,excluded_states=[13,14,15,12],
+            native_excluded_states=[5,6,13,15],state_offset=0x3C,switch_offset=0x12D,
+            switch_value='nonzero',position_offset=8,runtime_installed=False),
+        constructor=dict(mode='stop',initial_play_before_speed=True,clears_switch_pulse=True),
+        runtime_installed=False)
 
 
 def discover(source, vtable_name, vtable_at, functions, index):

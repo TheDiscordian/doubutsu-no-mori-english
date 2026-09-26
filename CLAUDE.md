@@ -93,13 +93,19 @@ Developer verification and a private playtest handoff do not satisfy that approv
   unchanged evidence. The local Xvfb executable is
   `/home/discordian/Games/OpenRSC/headless/vendor/usr/bin/Xvfb`; pass it explicitly
   when it is absent from PATH.
-- Prioritise completing general import pipelines and bulk category coverage
-  before unique-item behaviour or visual detail. Prepare supported artwork and
+- Importing includes extraction, conversion, bulk installation, and working
+  item behaviours, including item-specific behaviours. Do not impose a rule
+  postponing item-specific work until all shared categories are finished.
+  Acquisition means how players obtain an item; it is not importing pipeline
+  work and must not displace unfinished shared conversion categories. Nook's
+  code UI, gift handover, holiday rewards, and golden-tool acquisition belong
+  after the general importing pipelines. Prepare supported artwork and
   shared records even when a separate behaviour is unfinished; retain explicit
   readiness and keep incomplete gameplay out of selectable imports. Extend a
   shared category once for all matching records. Reuse passing tests for
-  unchanged components and defer unique-item verification to its implementation.
-- After primary importing is complete, finish gold-tree leaf/cut effects and
+  unchanged components.
+- After general importing pipelines and bulk asset/data installation are complete,
+  finish gold-tree leaf/cut effects and
   the full golden-shovel acquisition route. These remain required V3 work;
   deferring them does not remove them from completion criteria.
 - Use existing focused checks once per meaningful change. Reuse passing native

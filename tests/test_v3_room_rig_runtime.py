@@ -26,6 +26,75 @@ PACKET_OUT=ROOT/os.environ.get('V3_ROOM_CATEGORY_BUILD','build/v3-room-categorie
 PROFILE_OUT=ROOT/os.environ.get('V3_ROOM_PROFILE_BUILD','build/v3-shared-room-profiles-02')
 
 
+class CurrentImportedRigTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.out=ROOT/os.environ.get('V3_IMPORTED_RIG_BUILD','build/v3-hit-category-auto-02/cartridge')
+        cls.image,cls.report=inputs(cls.out/'build-lock.json')
+        cls.blob=by_vrom(cls.image)[BLOB].extract(cls.image)
+        cls.source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+            (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+        cls.rows=cls.report['automatic_furniture']['imports']
+
+    def test_imported_category_keeps_rig_audio_profiles_and_reuses_assets(self):
+        from v3_furniture_rigs import HIT_CATEGORY
+        from v3_furniture_pipeline import prepare
+        from v3_furniture_install import profile
+        r=self.report;e=r['equipment_resources'];rigs=e['room_rigs'];bindings=runtime.bind_profiles(self.source,self.image,r)
+        self.assertTrue(self.rows)
+        for row in self.rows:
+            donor=row.get('donor_item_id',row['item_id']);descriptor=prepare(self.source,int(donor,16))[0]
+            self.assertEqual(descriptor['callback_adapter']['category'],HIT_CATEGORY)
+            rig=next(x for x in rigs['rows'] if x['source_item_id']==donor)
+            sound=next(x for x in rigs['sound_rows'] if x['source_item_id']==donor)
+            audio=next(x for x in e['furniture_audio']['furniture'] if x['item_id']==donor)
+            self.assertEqual(rig['mode'],3);self.assertTrue(rig['parent_selectable'])
+            self.assertTrue(sound['profile_installed']);self.assertTrue(sound['parent_selectable'])
+            self.assertEqual(audio['trigger'],json.loads(json.dumps(descriptor['callback_adapter']['trigger'])))
+            self.assertEqual(audio['trigger']['sound_word'],sound['source_sound_word'])
+            self.assertEqual(row['object_sha256'],rig['sha256'])
+            at=rig['blob_offset'];self.assertEqual(sha256(self.blob[at:at+rig['bytes']]),rig['sha256'])
+            i=slot(int(row['item_id'],16));native=profile(row,rig['vrom'],limit=r['import_storage']['virtual_limit'])
+            self.assertEqual(self.blob[ROWS+i*80:ROWS+(i+1)*80],
+                struct.pack('>HHI',row['runtime_index'],int(row['item_id'],16),1)+native+bytes(4))
+            self.assertFalse(bindings[donor]['staged'])
+            self.assertIn(row['id']+'/name',{x['id'] for x in json.loads((ROOT/'translations/provenance.json').read_bytes())['entries']})
+        self.assertEqual(rigs['packet']['bytes'],runtime.PACKET_BYTES)
+        self.assertLessEqual(rigs['code']['bytes'],runtime.PACKET_TABLE-runtime.PACKET_RAM)
+        self.assertEqual(self.report['save_codec']['format_version'],4)
+        self.assertEqual(apply_ups((ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes(),
+            (self.out/'asset-loader.ups').read_bytes()),self.image)
+
+    def test_private_browser_selection_matches_offline_and_keeps_translation_only(self):
+        import v3_browser_composition as browser
+        pin=composer.BASE,composer.BASE_SHA,composer.REPORT_SHA,composer.ABI
+        try:
+            composer.use_build_lock(self.out/'build-lock.json')
+            catalog=composer.catalogue(self.image,self.report);plan=browser.rules(self.image,self.report)
+            keys=[r['id'] for r in self.rows];self.assertTrue(set(keys)<=catalog.keys())
+            self.assertFalse(plan['web_patcher_enabled']);cases=[]
+            for name,requested in (('none',[]),('all',list(catalog)),('new-category',keys),
+                    ('existing-villager',['GAFE01-r0/villager/00EB'])):
+                selection=composer.resolve(catalog,requested)
+                image,_,blob=composer.compose(self.image,self.report,catalog,selection)
+                if name=='none':self.assertEqual(sha256(image),self.report['translation_baseline']['sha256'])
+                elif name=='all':self.assertEqual(image,self.image)
+                if requested:
+                    for row in self.rows:
+                        i=slot(int(row['item_id'],16));active=row['id'] in selection['enabled']
+                        self.assertEqual(struct.unpack_from('>I',blob,ROWS+i*80+4)[0],active)
+                        self.assertEqual(bool(blob[0x40+i//8]&(1<<(i&7))),active)
+                cases.append(dict(name=name,requested=requested,selection=selection,sha256=sha256(image)))
+            with tempfile.TemporaryDirectory(prefix='v3-rig-composition-') as directory:
+                path=Path(directory)/'fixture.json'
+                path.write_bytes(composer.canonical(dict(plan=plan,cases=cases,
+                    base=str(self.out/'animal-forest-v3-asset-loader.z64'),stable=str(composer.stable_reference(self.report)[0]))))
+                result=subprocess.run(['node','--experimental-global-webcrypto',str(ROOT/'tests/v3_browser_equivalence.mjs'),str(path)],
+                    check=True,capture_output=True,text=True,timeout=90)
+                self.assertEqual(len(json.loads(result.stdout)['passed']),4)
+        finally:composer.BASE,composer.BASE_SHA,composer.REPORT_SHA,composer.ABI=pin
+
+
 class FixedClockIntegrationTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -284,7 +353,7 @@ class BehaviourTests(unittest.TestCase):
                 '-fsanitize=address,undefined','-fno-omit-frame-pointer',str(ROOT/'tests/v3_room_categories_test.c'),
                 '-o',str(binary)],check=True,capture_output=True)
             result=subprocess.run([str(binary)],check=True,capture_output=True,text=True,timeout=20)
-            self.assertIn('dispatch, time, limits, and actor guards',result.stdout)
+            self.assertIn('dispatch, time, limits, sound, and actor guards',result.stdout)
 
     def test_complete_source_movement_and_per_instance_bounds_under_sanitizers(self):
         with tempfile.TemporaryDirectory(prefix='v3-room-rigs-') as temporary:

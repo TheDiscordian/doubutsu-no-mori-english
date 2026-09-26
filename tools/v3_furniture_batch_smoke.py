@@ -563,7 +563,8 @@ def room_rigs(debug,rom_path,record,*,mode=2):
                 check('initial per-instance speed and target',target+0x204,struct.pack('>2f',0,.5))
                 check('native work vectors belong to this instance',target+0x158,
                       struct.pack('>2I',target+0x1A4,target+0x1DA))
-                check('source initial speed and frame',target+0x140,struct.pack('>2f',.5,1.5) if mode==1 else struct.pack('>2f',0,1))
+                initial=(.5,1.5) if mode==1 else (0,1.5) if mode==3 else (0,1)
+                check('source initial speed and frame',target+0x140,struct.pack('>2f',*initial))
                 if packet:
                     check('native category animation mode',target+0x148,struct.pack('>I',1 if mode==1 else 0))
                     check('complete lazily loaded room packet',packet['ram'],
@@ -583,6 +584,16 @@ def room_rigs(debug,rom_path,record,*,mode=2):
                     call(bridge+24,[0,actor+0x134,joint,0,0,descriptor,rotation,0],(bridge,jumps))
                     check('live clock angles and rotation guards',rotation,
                           struct.pack('>3H',123,65215,(32760-angle)&0xFFFF)+b'G'*10)
+            elif mode==3:
+                # Exercise the real keyframe evaluator and the shared callback.
+                # Suppress synthesis through a native transition state; sound
+                # identity/program integrity and dispatch have separate checks.
+                debug.write_memory(actor+0x3C,struct.pack('>h',5))
+                for frame,speed,changed,want in ((1,0,1,1),(20,.5,0,21),(20,.5,1,1.5)):
+                    debug.write_memory(actor+0x140,struct.pack('>2f',speed,frame))
+                    debug.write_memory(actor+0x12D,bytes((changed,)));callback('mv',actor)
+                    check('hit/retrigger retains native source evaluation order',actor+0x140,struct.pack('>2f',.5,want))
+                    check('room owner retains hit pulse',actor+0x12D,bytes((changed,)))
             elif packet:
                 stopped=debug.read_memory(actor,0x740);callback('mv',actor)
                 check('storage without a room owner remains stopped',actor,stopped)
@@ -1697,6 +1708,7 @@ def exercise(debug, rom_path, record, *, section='automatic_furniture'):
     if section=='inventory_rigs':return inventory_rigs(debug,rom_path,record)
     if section=='room_rigs':return room_rigs(debug,rom_path,record)
     if section=='clock_rigs':return room_rigs(debug,rom_path,record,mode=1)
+    if section=='hit_rigs':return room_rigs(debug,rom_path,record,mode=3)
     if section=='item_categories':return item_categories(debug,rom_path,record)
     path = Path(rom_path)
     image = path.read_bytes()

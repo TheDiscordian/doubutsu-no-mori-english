@@ -2,6 +2,54 @@
 
 ## Workflow
 
+Importing includes extraction, conversion, bulk asset/data installation, and
+working item behaviours. Item-specific behaviours are not automatically deferred
+until shared categories are finished. Conversion readiness is independent of how
+players obtain the result. Prepare complete source resources even when rewards
+or interactions remain unfinished, and retain explicit pending gameplay status.
+Nook code-entry and gift systems are not prerequisites for completing a model,
+material, or rig converter. Keep incomplete gameplay out of selectable imports.
+
+### Automatic category dependencies
+
+Furniture `import` plans implemented category dependencies from the selected
+source records and checked current build. Clock, storage, and hit-animation rigs
+share this path. Missing rig resources, required audio, and complete behaviour
+profiles are installed through the existing guarded runtime builder in that
+order. Ordinary item installation follows a fresh eligibility check against the
+resulting build. Missing acquisition remains explicit, not fabricated shop stock.
+
+`--category` selects a complete matching batch; `--select` limits identities.
+Internal selected stages scan only those records. Prepared artwork is reused
+across stages, and already installed dependencies are skipped. Every stage has
+an immutable build lock; `pipeline.json` records the dependency plan, actual
+steps, imports, pending reasons, and final lock. A dependency-only build does not
+claim that pending items are available to players.
+
+### Complete hit-animation rigs
+
+`switch-hit-keyframe-rig` checks complete donor create/move/draw implementations,
+paired resource relocations, animation constants, and both sound operands.
+Skeletons, all joint models, motions, textures, and the sound programme come from
+those bindings. Item identities and model names do not select the adapter.
+
+The shared 24-byte rig record uses mode 3 with zero extra parameters. It retains
+the existing six-joint limit, instance-local work vectors, frame-parity matrices,
+bounded complete model DMA, and room/catalogue index normalisation. Its complete
+sound dependency must be installed before the profile can become usable.
+
+Construction retains the donor's stop initializer and initial evaluation at
+speed 0.5, then stops the motion and clears the hit pulse. The native initializer
+uses speed 1, so the callback explicitly supplies 0.5 before evaluating. Discovery
+checks the donor initializer's full code, relocations, and constants.
+
+Movement preserves the donor's evaluation order, including its second step while
+moving, restart on any nonzero hit pulse, and positioned sound. Donor excluded
+states 13/14/15/12 map to native states 5/6/13/15; the room owner retains ownership
+of clearing the pulse. Drawing uses the complete shared native rig drawer.
+Sound and rig rows may share an identity: profile binding must retain the model
+record while independently validating the complete audio record.
+
 ### Shared password acquisition
 
 `convert --assets-only --representation rewards --category password` prepares

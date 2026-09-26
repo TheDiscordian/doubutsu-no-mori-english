@@ -2,12 +2,9 @@
 #include "room_rigs.h"
 
 #ifdef AF_V3_ROOM_TRIGGER_SOUND
-void af_v3_room_sound_mv(RoomSoundActor *actor,void *room,RoomRigGame *game,u8 *data) {
-    (void)room;(void)game;(void)data;
-    if (!actor || actor->changed!=1 || (actor->state>=12 && actor->state<=15)) return;
+static void trigger(u32 index,float *position) {
     if (room_sound_table->magic!=ROOM_SOUND_MAGIC || room_sound_table->count>ROOM_SOUND_CAPACITY ||
             room_sound_table->stride!=sizeof(RoomSoundRecord) || room_sound_table->reserved) return;
-    u32 index=actor->index;
     if (index>=2048u && index<3072u) index-=1024u;
     for (u32 i=0;i<room_sound_table->count;++i) {
         const RoomSoundRecord *r=room_sound_table->rows+i;
@@ -18,9 +15,14 @@ void af_v3_room_sound_mv(RoomSoundActor *actor,void *room,RoomRigGame *game,u8 *
            Its six live slots retain the full word, including that flag. */
         if (r->word&0x8000u) for (u32 j=0;j<6;++j)
             if (room_native_triggers[j].word==r->word) return;
-        sAdo_OngenTrgStart(r->word,actor->position);
+        sAdo_OngenTrgStart(r->word,position);
         return;
     }
+}
+void af_v3_room_sound_mv(RoomSoundActor *actor,void *room,RoomRigGame *game,u8 *data) {
+    (void)room;(void)game;(void)data;
+    if (!actor || actor->changed!=1 || (actor->state>=12 && actor->state<=15)) return;
+    trigger(actor->index,actor->position);
 }
 #endif
 
@@ -38,8 +40,11 @@ static const RoomRigRecord *find(u32 index) {
                 (r->skeleton&3) || r->skeleton<0x06000000u || r->skeleton>0x06000000u+r->bytes-8 ||
                 (r->animation&3) || r->animation<0x06000000u || r->animation>0x06000000u+r->bytes-20) return 0;
 #ifdef AF_V3_ROOM_RIG_PACKET
-        if (r->reserved || r->mode>ROOM_RIG_STORAGE) return 0;
-        if (r->mode==ROOM_RIG_SWITCH && (r->first.bits || r->last.bits)) return 0;
+        if (r->reserved || r->mode>ROOM_RIG_HIT) return 0;
+        if ((r->mode==ROOM_RIG_SWITCH || r->mode==ROOM_RIG_HIT) && (r->first.bits || r->last.bits)) return 0;
+#ifndef AF_V3_ROOM_TRIGGER_SOUND
+        if (r->mode==ROOM_RIG_HIT) return 0;
+#endif
         if (r->mode==ROOM_RIG_CLOCK && (!r->first.bits || r->first.bits>=r->joints ||
                 !r->last.bits || r->last.bits>=r->joints || r->first.bits==r->last.bits)) return 0;
         /* Positive finite floats compare in the same order as their bit words. */
@@ -59,12 +64,22 @@ void af_v3_room_rig_ct(RoomRig *actor,u8 *data) {
     if (skeleton[0]!=r->joints || skeleton[1]!=r->shown) return;
     cKF_SkeletonInfo_R_ct(&actor->keyframe,skeleton,animation,actor->joint,actor->morph);
 #ifdef AF_V3_ROOM_RIG_PACKET
-    if (r->mode==ROOM_RIG_STORAGE)
+    if (r->mode==ROOM_RIG_STORAGE || r->mode==ROOM_RIG_HIT)
         cKF_SkeletonInfo_R_init_standard_stop(&actor->keyframe,animation,(void *)0);
     else
 #endif
         cKF_SkeletonInfo_R_init_standard_repeat(&actor->keyframe,animation,(void *)0);
     actor->speed.bits=0;actor->target.bits=0x3F000000u;
+#ifdef AF_V3_ROOM_RIG_PACKET
+    if (r->mode==ROOM_RIG_HIT) {
+        /* The donor initializer supplies .5; the native one supplies 1.
+           Preserve the donor's first evaluation before stopping the motion. */
+        actor->keyframe.speed.bits=0x3F000000u;
+        cKF_SkeletonInfo_R_play(&actor->keyframe);
+        actor->keyframe.speed.bits=0;actor->changed=0;
+        return;
+    }
+#endif
     actor->keyframe.speed.bits=0;
 #ifdef AF_V3_ROOM_RIG_PACKET
     if (r->mode==ROOM_RIG_CLOCK) actor->keyframe.speed.bits=0x3F000000u;
@@ -78,6 +93,23 @@ void af_v3_room_rig_mv(RoomRig *actor,void *room,RoomRigGame *game,u8 *data) {
     if (!data || !find(actor->index)) return;
 #ifdef AF_V3_ROOM_RIG_PACKET
     const RoomRigRecord *r=find(actor->index);
+#ifdef AF_V3_ROOM_TRIGGER_SOUND
+    if (r->mode==ROOM_RIG_HIT) {
+        RoomKeyframe *key=&actor->keyframe;
+        if (cKF_SkeletonInfo_R_play(key)!=1 && (key->speed.bits&0x7FFFFFFFu)) {
+            cKF_SkeletonInfo_R_play(key);
+            key->speed.bits=0x3F000000u;
+        }
+        if (actor->changed) {
+            if (actor->state!=5 && actor->state!=6 && actor->state!=13 && actor->state!=15)
+                trigger(actor->index,actor->position);
+            key->current.bits=0x3F800000u;
+            cKF_SkeletonInfo_R_play(key);
+            key->speed.bits=0x3F000000u;
+        }
+        return;
+    }
+#endif
     if (r->mode==ROOM_RIG_STORAGE) {
         RoomRigClip *clip=room_rig_clip;
         if (room && game && clip && clip->open_close)

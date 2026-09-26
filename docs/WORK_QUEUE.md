@@ -2,20 +2,47 @@
 
 ## Active: V3 optional GameCube imports
 
-Priority: complete general extraction/conversion/integration pipelines, then
-bulk-import supported categories. Group outstanding records by shared dependency;
-do not finish individual golden-tool effects while broadly useful category work
-is available. Unique behaviour follows general support. Reuse completed checks
-and run bounded verification only for changed category machinery. Unfinished
-gameplay remains explicit and cannot be enabled merely because artwork converts.
-After the primary importing work, finish gold-tree leaf/cut effects and the full
-golden-shovel acquisition route. This is deferred required V3 work, not a dropped
-feature or a separate release goal.
+### Execution order
+
+1. Finish the importing pipelines, including working item behaviours as well as
+   extraction, conversion, and bulk asset/data installation. Group
+   remaining records by unsupported model, texture, material, skeleton, animation,
+   or storage format. Extend a category once, then convert its entire matching
+   batch. Preserve all source resources and reuse already converted assets.
+   Item-specific behaviours are part of this work, without a rule postponing
+   them until all shared categories are finished.
+2. Complete acquisition systems and the requested gold-tree work, including
+   Nook's codes, special rewards, gold-tree effects, and golden-tool acquisition.
+3. Run focused combined gameplay/save checks and deliver a private hardware
+   playtest build. Broad human testing follows the build, not the reverse.
+
+Acquisition is not importing pipeline work. A missing gift route must not
+prevent asset/data conversion or redirect work from an unfinished shared format.
+Incomplete gameplay stays unavailable in the selector; installing assets does
+not claim that an item is playable. Reuse unchanged passing tests throughout.
+
+Current task: close shared conversion gaps in the ordinary bulk importer.
+The current checked proposal is ABI 201 at
+`build/v3-hit-category-auto-02/cartridge/build-lock.json`, with 149 private
+development choices. The shared hit-animation category and automatic
+rig/audio/profile installation are implemented, including sandbag's complete
+behaviour and source stock route. Reuse the converted assets and retained checks.
+Continue unsupported model/material/animation callbacks, including required
+item-specific behaviour; do not divert into acquisition frontend work.
+The shared rig packet has 968 code bytes spare and the audio allocation has
+96 conservative bytes spare. Respect these bounds when extending categories.
+See the [current checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-hit-animation-and-automatic-dependencies)
+for commands, evidence, and save compatibility.
+
+The unfinished code-entry keyboard is parked source work, not the next task.
+Its first build stops at the V2 reconstruction helper's unrelated-resource
+guard for `02800000`, before producing a cartridge. Preserve that work for
+phase 2; do not debug its frontend or replay password fixtures during phase 1.
 
 The linked password engine is ABI 197 at
 `build/v3-password-runtime-05/build-lock.json`. Its 32-KiB packet, native RNG,
-live selected-import reader, and checked lazy loader are installed. Continue
-the actual Nook input/dialogue and gift flow; do not stop at this callable engine.
+live selected-import reader, and checked lazy loader are installed. Phase 2 must
+complete the actual Nook input/dialogue and gift flow beyond this callable engine.
 The loader entry is `804B4D00`; code input is 28 ASCII bytes and both names are
 eight-byte donor-font fields. Convert native saved/keyboard bytes explicitly.
 Complete existing-native/display correspondence and keep destination packets
@@ -53,8 +80,8 @@ and a first-attempt native run pass; the latter has 83 assertions across 17 case
 Retain unchanged theme/name evidence. Choices remain 148, with no save/profile
 change or deployment update.
 
-Next finish HomePage/Mario and Harvest delivery through their actual source
-categories, and continue shared material/rigged-material support. Base-point
+Finish shared material/rigged-material conversion before HomePage/Mario and
+Harvest delivery. Those actual acquisition categories remain phase-2 work. Base-point
 and theme storage no longer block their ordinary metadata. Missing source NPC,
 calendar, password, dialogue, or unique behaviour must not be replaced with
 unrelated shop stock. Complete required gold-tree work after the primary import

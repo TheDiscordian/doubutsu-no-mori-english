@@ -18,7 +18,42 @@ deployments retain their existing builds.
 
 ## Active development
 
-The current explicit V3 proposal is ABI 197 at
+The active work is the importing pipelines: extraction, conversion, bulk
+installation, and working item behaviours, including item-specific behaviours.
+There is no blanket postponement of item-specific work. Acquisition systems
+remain separate. The [execution order](WORK_QUEUE.md#execution-order) governs task
+selection; pending rewards must not displace unfinished conversion categories.
+The code-entry keyboard is parked, incomplete source work. Its attempted build
+stops on resource preservation before producing a ROM; it is not installed.
+
+The current explicit V3 proposal is ABI 201 at
+`build/v3-hit-category-auto-02/cartridge/build-lock.json`. The ordinary importer
+automatically prepares and installs missing rig, audio, and behaviour dependencies
+for its supported clock, storage, and hit-animation categories, then installs
+eligible items. It reuses converted assets and skips installed stages.
+
+The hit-animation adapter preserves complete models, initial pose, repeated-hit
+motion, positioned sound, and transition-state rules. It recognises both boxing
+bags through source callbacks rather than item IDs. Sandbag is installed through
+the ordinary pipeline with its actual B-stock route and official English name;
+the existing speed bag remains intact. There are 149 private development choices.
+
+Six focused host checks pass, including source rejection checks, sanitized
+behaviour execution, complete installed resources, UPS reconstruction, and four
+browser/offline selection comparisons. Native animation and drawing-command
+checks pass; see the [hit-category checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-hit-animation-and-automatic-dependencies)
+for the complete result and limits. Actual sound synthesis, ordinary room
+playthrough, and hardware are not newly verified. The shared packet remains
+8 KiB, with 3,128 bytes of code; conservative audio spare capacity is 96 bytes.
+
+Saved format 4 is unchanged. A save using sandbag requires its selected import
+in the receiving build; preserve backups and equal-or-larger profiles. Format-4
+saves cannot load in V2 or format-1/2/3 V3 builds. Translation-only output remains
+the pinned V2-12 ROM. The main lock and both stable deployments remain unchanged.
+Continue remaining model, material, animation, and behaviour conversion work;
+the code-entry frontend remains parked.
+
+The retained password-engine component is ABI 197 at
 `build/v3-password-runtime-05/build-lock.json`. The shared password codec,
 eligibility rules, and 128-import destination map are linked into a checked
 32-KiB demand-loaded packet. The 6,764-byte engine reads actual selection flags
@@ -34,11 +69,10 @@ not replayed in this batch. The new loader's startup bytes, zero cache, footer,
 and original RNG instructions pass the reached native checks. No decoder,
 keyboard, or gift-handover execution is claimed.
 
-Continue Nook's input/dialogue and animated handover, native saved-name conversion,
-and reviewed existing-item/display correspondence. Reuse the verified codec and
-policy results. The same 148 choices and saved format 4 remain: keep backups and
-every selected import when moving between V3 builds. Neither deployment nor the
-main lock changes. See the
+Nook's input/dialogue and animated handover, native saved-name conversion,
+and reviewed existing-item/display correspondence remain phase-2 work. Retain
+the verified codec and policy results. Keep its destination map aligned with
+newly installed imports before completing the frontend. See the
 [runtime checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#linked-password-engine-and-native-bindings).
 
 The retained scoring proposal is ABI 196 at

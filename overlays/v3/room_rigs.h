@@ -14,7 +14,11 @@ typedef struct {
 } RoomKeyframe;
 typedef struct {
     u16 index;
-    u8 prefix[0x12D-2];
+    u8 before_position[6];
+    float position[3];
+    u8 before_state[0x3C-20];
+    s16 state;
+    u8 before_changed[0x12D-0x3E];
     u8 changed;
     u8 before_keyframe[6];
     RoomKeyframe keyframe;
@@ -53,6 +57,7 @@ typedef struct {
 #define ROOM_RIG_SWITCH 0u
 #define ROOM_RIG_CLOCK 1u
 #define ROOM_RIG_STORAGE 2u
+#define ROOM_RIG_HIT 3u
 typedef struct {
     u8 prefix[0x34];
     void (*open_close)(RoomRig *,void *,RoomRigGame *,float,float);
@@ -111,6 +116,7 @@ ROOM_CHECK(RoomSoundActor,changed,0x12D);
 _Static_assert(sizeof(RoomSoundRecord)==8,"Room sound record stride");
 extern void sAdo_OngenTrgStart(u32,float *);
 #endif
+ROOM_CHECK(RoomRig,position,8); ROOM_CHECK(RoomRig,state,0x3C);
 ROOM_CHECK(RoomRig,changed,0x12D); ROOM_CHECK(RoomRig,keyframe,0x134);
 ROOM_CHECK(RoomRig,joint,0x1A4); ROOM_CHECK(RoomRig,morph,0x1DA);
 ROOM_CHECK(RoomRig,speed,0x204); ROOM_CHECK(RoomRig,target,0x208);

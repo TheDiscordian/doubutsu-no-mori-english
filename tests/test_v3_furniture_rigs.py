@@ -102,6 +102,71 @@ class SourceTests(unittest.TestCase):
             with self.assertRaises(ValueError):keyframes.compile_animations(self.source,[motion],start=bad)
 
 
+class HitResourceTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.source=pipeline.Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+            (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+
+    def test_shared_source_category_keeps_complete_motion_models_and_audio(self):
+        from v3_sound_programs import furniture_trigger
+        for item,joints,sound in ((0x3350,2,0x176),(0x3354,3,0x175)):
+            row=pipeline.prepare(self.source,item);profile=row[0];adapter=profile['callback_adapter']
+            self.assertEqual(adapter['category'],rigs.HIT_CATEGORY)
+            self.assertEqual(profile['skeleton']['joints'],joints)
+            self.assertEqual(len(profile['models']),joints)
+            self.assertEqual(adapter['animation']['joints'],joints)
+            self.assertEqual(adapter['trigger']['sound_word'],sound)
+            self.assertEqual(furniture_trigger(self.source,profile),adapter['trigger'])
+            self.assertEqual(set(adapter['functions']),{'create','move','draw'})
+            self.assertTrue(adapter['constructor']['clears_switch_pulse'])
+            with self.assertRaisesRegex(ValueError,'Animated room lifecycle'):
+                pipeline.metadata(self.source,item,profile,None)
+
+    def test_changed_code_constants_sound_and_paired_resources_reject(self):
+        adapter=self.source.profile(0x3354)['callback_adapter']
+        for row in adapter['functions'].values():
+            changed=copy.copy(self.source);changed.rel=bytearray(changed.rel)
+            changed.rel[changed.sections[1][0]+row['offset']]^=1
+            with self.assertRaises(ValueError):changed.profile(0x3354)
+        for row in adapter['constants'].values():
+            changed=copy.copy(self.source);changed.rel=bytearray(changed.rel)
+            changed.rel[changed.sections[row['section']][0]+row['offset']]^=1
+            with self.assertRaises(ValueError):changed.profile(0x3354)
+        for section,offset in ((1,0x934),(4,0),(4,4),(4,0x20),(4,0x30)):
+            changed=copy.copy(self.source);changed.rel=bytearray(changed.rel)
+            changed.rel[changed.sections[section][0]+offset]^=1
+            with self.assertRaisesRegex(ValueError,'source stop initializer'):changed.profile(0x3354)
+        changed=copy.copy(self.source);changed.rel=bytearray(changed.rel)
+        changed.rel[changed.sections[1][0]+adapter['functions']['move']['offset']+0xEB]^=1
+        with self.assertRaisesRegex(ValueError,'sound word'):changed.profile(0x3354)
+        changed=copy.copy(self.source);changed.code_relocations=dict(changed.code_relocations)
+        del changed.code_relocations[adapter['functions']['create']['offset']+0x12]
+        with self.assertRaises(ValueError):changed.profile(0x3354)
+
+
+class CategoryPlanTests(unittest.TestCase):
+    def test_dependency_plan_skips_installed_stages_and_keeps_item_selection(self):
+        def row(item,category,**fields):
+            return dict(item_id=item,asset_ready=True,installed=False,categories=[category],
+                profile=dict(callback_adapter=dict(category=category,**({'trigger':{'sound_word':0x175}}
+                    if category==rigs.HIT_CATEGORY else {}))),**fields)
+        inventory=dict(rows=[row('3354',rigs.HIT_CATEGORY),row('32F0',rigs.CLOCK_CATEGORY),
+                             row('3300',rigs.STORAGE_CATEGORY)])
+        report=dict(equipment_resources=dict(room_rigs=dict(rows=[{'source_item_id':'32F0'}])))
+        self.assertEqual(pipeline.rig_import_plan(inventory,report,{}),dict(
+            resources=['3300','3354'],audio=['3354'],profiles=['32F0','3300','3354']))
+        report['equipment_resources']['room_rigs']['rows'].append({'source_item_id':'3354'})
+        report['equipment_resources']['furniture_audio']={'furniture':[{'item_id':'3354'}]}
+        self.assertEqual(pipeline.rig_import_plan(inventory,report,{},category=rigs.HIT_CATEGORY),
+            dict(resources=[],audio=[],profiles=['3354']))
+        self.assertEqual(pipeline.rig_import_plan(inventory,report,{'3354':{}},selected=['3354']),
+            dict(resources=[],audio=[],profiles=[]))
+        inventory['rows'][0]['installed']=True
+        self.assertEqual(pipeline.rig_import_plan(inventory,report,{},category=rigs.HIT_CATEGORY),
+            dict(resources=[],audio=[],profiles=[]))
+
+
 class FixedResourceTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):

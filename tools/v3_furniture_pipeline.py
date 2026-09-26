@@ -24,7 +24,7 @@ from v3_registry import FURNITURE, LEGACY_FURNITURE, furniture_identity, furnitu
 from v3_room_aliases import discover as room_aliases, pending_reason as room_alias_reason
 from v3_villager_art import native_palette, normalise_vertex_flags
 
-VERSION = 17
+VERSION = 18
 PENDING_MOVE_CATEGORY = 'static-models-pending-move'
 LAYERS = ('opaque', 'opaque1', 'translucent', 'translucent1')
 BEHAVIOURS = {0: 'static', 1: 'front-seat', 2: 'any-direction-seat', 4: 'front-sofa',
@@ -258,7 +258,10 @@ class Source:
         scrolling=discover_scroll(self,name,at,functions)
         if scrolling is not None:return scrolling
         from v3_furniture_rigs import (CODE as RIG_CODE, CLOCK_CODE, STORAGE_CODE,
-            discover as discover_rig, discover_clock, discover_storage, discover_fixed)
+            discover as discover_rig, discover_clock, discover_storage, discover_fixed, discover_hit)
+        if (functions.get('create',{}).get('bytes')==132 and
+                functions.get('move',{}).get('bytes')==296 and functions.get('draw',{}).get('bytes')==140):
+            return discover_hit(self,name,at,functions)
         if functions.get('create',{}).get('bytes') == RIG_CODE['create'][0]:
             return discover_rig(self,name,at,functions,index)
         if functions.get('create',{}).get('bytes') == CLOCK_CODE['create'][0]:
@@ -1101,13 +1104,14 @@ def metadata(source, item, profile, identity):
         **({k:binding[k] for k in ('room_runtime','room_lifecycle','room_placement') if k in binding} if binding else {}))
 
 
-def scan(source, worksheet, installed=None):
+def scan(source, worksheet, installed=None, *, selected=()):
     from v3_furniture_rigs import estimated_suffix
     installed = set(FURNITURE) if installed is None else set(installed)
     alias_catalogue = room_aliases(source)
     aliases = {int(row['display_item_id'],16):row for row in alias_catalogue['rows']}
     result = []
     for item, identity in sorted(identity_rows(worksheet,extra_items=aliases,include_unmapped_legacy=True).items()):
+        if selected and f'{item:04X}' not in selected:continue
         row = dict(item_id=f'{item:04X}', name=identity[1].get('J'), installed=item in installed,
                    asset_ready=False)
         try:
@@ -1159,7 +1163,7 @@ def scan(source, worksheet, installed=None):
 
 def convert(source, worksheet, output, selected=(), installed=None, *, assets_only=False, category=None, reuse_assets=()):
     from v3_furniture_rigs import suffix
-    inventory = scan(source, worksheet, installed)
+    inventory = scan(source, worksheet, installed,selected=selected)
     rows = [r for r in inventory['rows'] if (r['asset_ready'] if assets_only else r['status']=='supported') and
             (r['item_id'] in selected if selected else not r['installed']) and
             (bool(selected) or not assets_only or r['item_id'] not in getattr(source,'runtime_profiles',{})) and
@@ -1211,6 +1215,83 @@ def convert(source, worksheet, output, selected=(), installed=None, *, assets_on
     write_new(output/'inventory.json', (json.dumps(inventory, indent=2)+'\n').encode())
     write_new(output/'art.json', (json.dumps(report, indent=2)+'\n').encode())
     return report
+
+
+def rig_import_plan(inventory, report, bindings, selected=(), category=None):
+    """Plan shared dependencies, not per-item installers or acquisition guesses."""
+    from v3_furniture_rigs import CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY
+    categories={CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY}
+    rows=[r for r in inventory['rows'] if r.get('asset_ready') and not r['installed'] and
+        not r.get('room_alias') and (not selected or r['item_id'] in selected) and
+        (category is None or category in r['categories']) and
+        r['profile'].get('callback_adapter',{}).get('category') in categories]
+    rigs={r['source_item_id'] for r in report['equipment_resources']['room_rigs']['rows']}
+    audio={r['item_id'] for r in report['equipment_resources'].get('furniture_audio',{}).get('furniture',[])}
+    return dict(resources=sorted(r['item_id'] for r in rows if r['item_id'] not in rigs),
+        audio=sorted(r['item_id'] for r in rows if r['profile']['callback_adapter'].get('trigger') and r['item_id'] not in audio),
+        profiles=sorted(r['item_id'] for r in rows if r['item_id'] not in bindings))
+
+
+def import_batch(source, worksheet, output, lock, selected=(), category=None, reuse_assets=()):
+    """Run known category dependencies and ordinary installation in one command.
+
+    Each stage uses the existing checked builder and its new immutable lock.
+    Verified installed stages are skipped; graphics are compiled once and reused.
+    Pending acquisition stays pending, never replaced with ordinary shop stock.
+    """
+    from v3_furniture_install import inputs,refresh_runtime,build
+    from v3_room_rig_runtime import bind_profiles
+    from v3_sound_programs import prepare_furniture_audio
+    base,report=inputs(lock);bind_profiles(source,base,report)
+    installed=[int(r['id'].rsplit('/',1)[1],16) for r in report['furniture']['imports']+[report['speed_bag']]]
+    inventory=scan(source,worksheet,installed,selected=selected)
+    if selected and set(selected)-{r['item_id'] for r in inventory['rows']}:
+        raise ValueError('Requested import identity is absent from the donor inventory')
+    plan=rig_import_plan(inventory,report,source.runtime_profiles,selected,category)
+    output.mkdir(parents=True,exist_ok=False);steps=[];current=lock;cache=list(reuse_assets)
+    def refresh(label,**arguments):
+        nonlocal current,base,report
+        directory=output/label
+        report=refresh_runtime(directory,current,**arguments);current=directory/'build-lock.json'
+        base,report=inputs(current)
+        steps.append(dict(stage=label,lock=str(current.relative_to(ROOT)),sha256=report['output_sha256']))
+    all_assets=sorted(set(plan['resources'])|set(plan['profiles']))
+    if all_assets:
+        complete=output/'prepared'
+        convert(source,worksheet,complete,all_assets,installed,assets_only=True,reuse_assets=cache)
+        cache.append(complete)
+        def bundle(ids,label):
+            if ids==all_assets:return complete
+            directory=output/label
+            convert(source,worksheet,directory,ids,installed,assets_only=True,reuse_assets=cache)
+            cache.append(directory)
+            return directory
+        if plan['resources']:
+            refresh('rig-runtime',room_rigs_art=[bundle(plan['resources'],'rig-assets')])
+        if plan['audio']:
+            audio=output/'audio'
+            prepare_furniture_audio(base,report,source,inventory,audio,plan['audio'])
+            refresh('audio-runtime',furniture_audio_art=audio)
+        if plan['profiles']:
+            refresh('profile-runtime',furniture_profiles=[bundle(plan['profiles'],'profile-assets')])
+    elif plan['audio']:
+        raise ValueError('Audio dependency is missing from an otherwise installed rig profile')
+    bind_profiles(source,base,report)
+    if steps:inventory=scan(source,worksheet,installed,selected=selected)
+    matches=[r for r in inventory['rows'] if not r['installed'] and
+        (not selected or r['item_id'] in selected) and (category is None or category in r.get('categories',[]))]
+    ready=[r['item_id'] for r in matches if r['status']=='supported']
+    if ready:
+        art=output/'assets'
+        convert(source,worksheet,art,ready,installed,reuse_assets=cache)
+        report=build(output/'cartridge',art,current);current=output/'cartridge'/'build-lock.json'
+        steps.append(dict(stage='ordinary-import',lock=str(current.relative_to(ROOT)),sha256=report['output_sha256']))
+    if not steps:raise ValueError('No supported new imports or missing implemented category dependencies')
+    result=dict(format='AFV3-CATEGORY-IMPORT-BATCH-1',plan=plan,steps=steps,imported=ready,
+        pending=[dict(item_id=r['item_id'],name=r['name'],reason=r['reason']) for r in matches if r['status']!='supported'],
+        final_lock=str(current.relative_to(ROOT)),runtime_abi=report['runtime_abi'],output_sha256=report['output_sha256'])
+    write_new(output/'pipeline.json',(json.dumps(result,indent=2)+'\n').encode())
+    return result
 
 
 def main():
@@ -1316,10 +1397,8 @@ def main():
     elif args.command == 'convert': convert(source, worksheet, output, args.select, installed,
                                             assets_only=args.assets_only, category=args.category,reuse_assets=args.reuse_assets)
     else:
-        output.mkdir(parents=True)
-        convert(source,worksheet,output/'assets',args.select,installed,category=args.category,reuse_assets=args.reuse_assets)
-        report = build(output/'cartridge',output/'assets',args.base_lock)
-        print(json.dumps(dict(runtime_abi=report['runtime_abi'],output_sha256=report['output_sha256'])))
+        report=import_batch(source,worksheet,output,args.base_lock,args.select,args.category,args.reuse_assets)
+        print(json.dumps({k:report[k] for k in ('runtime_abi','output_sha256','imported','pending','final_lock')}))
 
 
 if __name__ == '__main__': main()
