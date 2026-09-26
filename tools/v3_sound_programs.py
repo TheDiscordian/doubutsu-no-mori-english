@@ -332,7 +332,8 @@ def furniture_level(source,profile):
     adapter=profile.get('callback_adapter',{});functions=copy.deepcopy(adapter.get('functions',{}))
     if adapter.get('category')=='material-frame-assets':
         from v3_furniture_reactions import colour_lifecycle
-        return colour_lifecycle(source,profile)
+        from v3_furniture_materials import steam_lifecycle
+        return colour_lifecycle(source,profile) or steam_lifecycle(source,profile)
     if adapter.get('category')=='billboard-scroll-keyframe-rig':
         return copy.deepcopy(adapter['level_sound'])
     if adapter.get('category')=='static-interaction':
@@ -527,6 +528,50 @@ def reward_fanfares(image,code,source):
         new_sequences=0,new_instruments=0,new_samples=0,native_resources_retained=True)
 
 
+def timed_looping_layer(data,origin,*,prefix=False):
+    """Complete retriggering layer, retaining each envelope and timed event."""
+    start=4 if prefix else 0
+    if (not 0<=origin<=65536-len(data) or span(data,start,1)!=b'\x88' or
+            span(data,start+3,2)!=b'\xFF\xC6' or
+            struct.unpack('>H',span(data,start+1,2))[0]!=origin+start+4):
+        raise ValueError('Incomplete timed loop channel')
+    if prefix and (data[0]!=0xEB or data[1]>3 or data[2]>125 or data[3]!=0xC4):
+        raise ValueError('Unsupported explicit timed-loop bank')
+    inst=span(data,start+5,1)[0]
+    if inst>125:raise ValueError('Unsupported timed-loop instrument')
+    at=start+6;events=[];envelopes=[];pointers=[start+1];boundaries=set()
+    while span(data,at,1)!=b'\xFB':
+        here=at;boundaries.add(at);op=data[at];at+=1
+        if op==0xCB:
+            pointer=struct.unpack('>H',span(data,at,2))[0]-origin
+            decay=span(data,at+2,1)[0];pointers.append(at);at+=3
+            if (origin+pointer)&1:raise ValueError('Unaligned timed-loop envelope')
+            envelopes.append(dict(command=here,offset=pointer,decay=decay));continue
+        if not (0x40<=op<=0x7F or op==0xC0):raise ValueError('Unknown timed-loop command')
+        duration=span(data,at,1)[0];at+=1
+        if duration&128:duration=(duration&127)*256+span(data,at,1)[0];at+=1
+        if not duration:raise ValueError('Zero-time loop event')
+        if op==0xC0:events.append(dict(offset=here,duration=duration,rest=True));continue
+        velocity=span(data,at,1)[0];at+=1
+        if velocity>127:raise ValueError('Invalid timed-loop velocity')
+        events.append(dict(offset=here,note=op&63,duration=duration,velocity=velocity))
+    loop=struct.unpack('>H',span(data,at+1,2))[0]-origin;pointers.append(at+1);at+=3
+    if (not any('note' in e for e in events) or loop not in boundaries or
+            not any(e['offset']>=loop for e in events)):
+        raise ValueError('Incomplete timed-loop event or restart')
+    cursor=at
+    for offset in sorted({e['offset'] for e in envelopes}):
+        if not cursor<=offset<len(data) or offset-cursor>1 or any(data[cursor:offset]):
+            raise ValueError('Unaccounted timed-loop envelope layout')
+        envelope=extended_envelope(data,offset,minimum_steps=1);cursor=offset+len(envelope)
+        for row in envelopes:
+            if row['offset']==offset:row.update(bytes=len(envelope),sha256=sha256(envelope))
+    if len(data)-cursor>15 or any(data[cursor:]):raise ValueError('Unaccounted timed-loop tail')
+    return dict(kind='timed-retrigger-loop',origin=origin,bytes=len(data),sha256=sha256(data),
+        instrument=inst,instrument_offset=start+5,pointers=pointers,loop=loop,
+        events=events,envelopes=envelopes,duration=sum(e['duration'] for e in events))
+
+
 def looping_layer(data, origin, *, prefix=False):
     """Complete sustained note and timed loop, with default or custom envelope."""
     start=4 if prefix else 0
@@ -548,7 +593,7 @@ def looping_layer(data, origin, *, prefix=False):
         env_pointer=at+1;decay=span(data,at+3,1)[0];at+=4
     if not early_mode:
         mode=at
-        if span(data,at,1)!=b'\xC4':raise ValueError('Missing sustained-note mode')
+        if span(data,at,1)!=b'\xC4':return timed_looping_layer(data,origin,prefix=prefix)
         at+=1
     note_at=at;note=span(data,at,1)[0];at+=1
     if not 0x40<=note<=0x7F:raise ValueError('Unsupported loop note')

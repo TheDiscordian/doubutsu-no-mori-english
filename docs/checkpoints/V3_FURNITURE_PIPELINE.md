@@ -1,5 +1,70 @@
 # Automatic furniture pipeline checkpoint
 
+## Installed timed textures and periodic materials
+
+Checked proposal: ABI 236,
+`build/v3-periodic-material-imports-04/cartridge/build-lock.json`.
+ROM SHA-256:
+`79b3205e1a4450d245d1f22f37ee1fdb6409a0a37c56e1abfb6c9333dd0966b5`.
+There are 157 development choices. Chowder's complete 3,136-byte object retains
+all three model lists, 44 triangles, and both 512-byte texture frames. The source
+frame selector divides by six; native room and preview clocks preserve its
+60-Hz timing. Material lifecycle 4 uses the shared periodic emitter, with steam
+every four native play frames, height fifteen, spread ten, and the source
+transition exclusions. Its full sound is refreshed positionally. No actor or
+saved field grows.
+
+The shared sound parser supports complete retriggering multi-note loops,
+including rests, short/wide durations, every envelope, and exact restart targets.
+It rejects unknown commands, unaccounted data, and zero-time restart cycles.
+Source level `54` keeps all five notes, both envelopes, its complete instrument,
+and the 9,198-byte sample. Native bank 140 adds instrument 94; the existing audio
+capacity mechanism grows permanent allocation by 1 KiB, leaving 768 conservative
+bytes spare. The ordinary import enables actual winter-camper availability and
+non-orderable catalogue metadata. No substitute acquisition is introduced.
+
+Verification:
+
+- Complete source material/lifecycle discovery and changed-input rejection pass.
+- Actual shared steam dispatch and three-part animated drawing pass under
+  address/undefined-behaviour sanitizers, including aliases, transition states,
+  cadence, both frame clocks, and unchanged actor memory.
+- Seven audio-parser checks pass, including complete pointer rebinding and
+  rejection of malformed retrigger loops; the added zero-time-loop guard has
+  its own focused passing rerun.
+- Installed material/audio/artwork, retained earlier resources, complete empty
+  dependency plan, saved-layout preservation, code bounds, and UPS reconstruction
+  pass. The test reads fresh source descriptors rather than JSON-normalized
+  function receipts when checking source relocations.
+- Browser/offline none/all/chowder/existing-villager compositions pass.
+
+No native emulator rerun is performed. The preceding particle batch's setup
+limit remains in force; native particle execution/lifetime, synthesis, GPU
+appearance, ordinary gameplay, and hardware remain unverified.
+
+Completed stages are retained: `-01/material-runtime` is ABI 233,
+`-02/loop-audio-runtime` is ABI 234, and `-03/profile-runtime` is ABI 235.
+The final `-04` build reuses the prepared model and installed stages. The failed
+intermediate attempts exposed the unsupported timed-loop category, lifecycle-4
+profile eligibility, and JSON receipt normalization, all corrected before the
+final build. Existing stages were not rebuilt merely to rerun the final import.
+
+Reproduce the final import in fresh output storage:
+
+```sh
+python3 tools/v3_furniture_pipeline.py import --select 33C0 \
+  --base-lock build/v3-periodic-material-imports-03/profile-runtime/build-lock.json \
+  --reuse-assets build/v3-periodic-material-imports-01/prepared \
+  --output build/v3-periodic-material-reproduction
+python3 -m unittest tests.test_v3_periodic_materials.InstalledTests -v
+```
+
+Shared room code uses 15,536/16,384 bytes; bootstrap uses 1,521/1,536.
+Import storage has 1,016,864 bytes spare. Saved format 4 is unchanged, but adding
+chowder changes its selection bit. Preserve backups and equal-or-larger profiles;
+format-4 saves cannot load in V2 or V3 formats 1–3. Translation-only remains
+pinned V2-12. Neither stable deployment nor the main build lock changes.
+
 ## Installed steam and room projectiles
 
 Current proposal: ABI 232,

@@ -100,11 +100,12 @@ def profile(row, vrom, *, limit=END):
             raise ValueError('Sound profile requires its complete installed room lifecycle')
     if material:
         from v3_room_rig_runtime import MATERIAL_VTABLE
-        from v3_furniture_materials import initializer_lifecycle
+        from v3_furniture_materials import initializer_lifecycle,steam_profile_lifecycle
         from v3_furniture_reactions import profile_lifecycle as reaction_lifecycle,colour_profile_lifecycle
         initial=initializer_lifecycle(None,row['profile'])
         reaction=(reaction_lifecycle(row['profile'],row.get('room_lifecycle')) or
-                  colour_profile_lifecycle(row['profile'],row.get('room_lifecycle')))
+                  colour_profile_lifecycle(row['profile'],row.get('room_lifecycle')) or
+                  steam_profile_lifecycle(row['profile'],row.get('room_lifecycle')))
         if (row.get('room_runtime')!={'vtable':MATERIAL_VTABLE,'vrom':vrom} or
                 (row.get('room_lifecycle')!=initial if initial else not reaction and set(adapter['functions'])!={'move','draw'}) or
                 set(offsets)!=set(layers)):
@@ -218,7 +219,7 @@ def checked_assets(art_path, source, worksheet):
     raw = (art_path/'art.json').read_bytes(); art = json.loads(raw)
     # Prior objects still undergo complete current metadata and model checks;
     # a display alias cannot pass as standalone furniture through an old report.
-    if (art['format'] != 'AFV3-AUTO-FURNITURE-ASSETS-1' or art['version'] not in (*range(7, 22), ASSET_VERSION)
+    if (art['format'] != 'AFV3-AUTO-FURNITURE-ASSETS-1' or art['version'] not in range(7, ASSET_VERSION+1)
             or art['source_rel_sha256'] != sha256(source.rel)
             or art['source_symbols_sha256'] != sha256(source.symbols.encode())):
         raise ValueError('Unknown converter/source revision')

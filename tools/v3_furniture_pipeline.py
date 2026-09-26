@@ -24,7 +24,7 @@ from v3_registry import FURNITURE, LEGACY_FURNITURE, furniture_identity, furnitu
 from v3_room_aliases import discover as room_aliases, pending_reason as room_alias_reason
 from v3_villager_art import native_palette, normalise_vertex_flags
 
-VERSION = 22
+VERSION = 23
 PENDING_MOVE_CATEGORY = 'static-models-pending-move'
 LAYERS = ('opaque', 'opaque1', 'translucent', 'translucent1')
 BEHAVIOURS = {0: 'static', 1: 'front-seat', 2: 'any-direction-seat', 4: 'front-sofa',
@@ -1230,7 +1230,7 @@ def convert(source, worksheet, output, selected=(), installed=None, *, assets_on
 def rig_import_plan(inventory, report, bindings, selected=(), category=None, *, source=None):
     """Plan shared dependencies, not per-item installers or acquisition guesses."""
     from v3_furniture_rigs import CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY,ROLLING_CATEGORY
-    from v3_furniture_materials import CATEGORY as MATERIAL_CATEGORY,initializer_lifecycle
+    from v3_furniture_materials import CATEGORY as MATERIAL_CATEGORY,initializer_lifecycle,steam_lifecycle
     from v3_furniture_reactions import source_lifecycle as reaction_lifecycle,colour_lifecycle
     from v3_sound_programs import furniture_trigger
     categories={CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY,ROLLING_CATEGORY}
@@ -1238,18 +1238,20 @@ def rig_import_plan(inventory, report, bindings, selected=(), category=None, *, 
         not r.get('room_alias') and (not selected or r['item_id'] in selected) and
         (category is None or category in r['categories'])]
     rows=[r for r in candidates if r['profile'].get('callback_adapter',{}).get('category') in categories]
-    material_rows=[];material_audio=[];material_loops=[]
+    material_rows=[];material_audio=[];material_loops=[];effects=set()
     static_rows=[r for r in candidates if r['profile'].get('callback_adapter',{}).get('category')=='static-interaction']
     for r in candidates:
         if r['profile'].get('callback_adapter',{}).get('category')!=MATERIAL_CATEGORY:continue
         initializer=initializer_lifecycle(source,r['profile'])
         reaction=reaction_lifecycle(source,r['profile']) if source is not None and initializer is None else None
         colour=colour_lifecycle(source,r['profile']) if source is not None and initializer is None and reaction is None else None
+        steam=steam_lifecycle(source,r['profile']) if source is not None else None
         trigger=furniture_trigger(source,r['profile']) if source is not None else None
-        if initializer or reaction or colour or trigger:
+        if initializer or reaction or colour or steam or trigger:
             material_rows.append(r)
             if trigger:material_audio.append(r['item_id'])
-            if colour:material_loops.append(r['item_id'])
+            if colour or steam:material_loops.append(r['item_id'])
+            if steam:effects.update(steam['effects'])
     rigs={r['source_item_id'] for r in report['equipment_resources']['room_rigs']['rows']}
     audio={r['item_id'] for r in report['equipment_resources'].get('furniture_audio',{}).get('furniture',[])}
     loops={r['item_id'] for r in report['equipment_resources'].get('furniture_level_audio',{}).get('furniture',[])}
@@ -1264,13 +1266,13 @@ def rig_import_plan(inventory, report, bindings, selected=(), category=None, *, 
         melodies={r['item_id'] for r in report['equipment_resources'].get('furniture_melody_audio',{}).get('furniture',[])}
         plan['melodies']=sorted(r['item_id'] for r in static_rows
             if r['profile']['callback_adapter']['mode']==2 and r['item_id'] not in melodies)
-        effects={kind for r in static_rows for kind in r['profile']['callback_adapter'].get('effects',[])}
-        if effects and not report['equipment_resources']['room_rigs'].get('effects',{}).get('particles',{}).get('installed'):
-            plan['particles']=sorted(effects)
-            from v3_room_particles import sound_dependencies
-            existing={r['source_sound_word'] for r in report['equipment_resources'].get('furniture_audio',{}).get('programs',[])}
-            dependencies=sound_dependencies(source)
-            if any(r['sound_word'] not in existing for r in dependencies):plan['particle_audio']=dependencies
+        effects.update(kind for r in static_rows for kind in r['profile']['callback_adapter'].get('effects',[]))
+    if effects and not report['equipment_resources']['room_rigs'].get('effects',{}).get('particles',{}).get('installed'):
+        plan['particles']=sorted(effects)
+        from v3_room_particles import sound_dependencies
+        existing={r['source_sound_word'] for r in report['equipment_resources'].get('furniture_audio',{}).get('programs',[])}
+        dependencies=sound_dependencies(source)
+        if any(r['sound_word'] not in existing for r in dependencies):plan['particle_audio']=dependencies
     if material_rows:
         installed={r['source_item_id'] for r in report['equipment_resources']['room_rigs'].get('material_rows',[])}
         plan['materials']=sorted(r['item_id'] for r in material_rows if r['item_id'] not in installed)

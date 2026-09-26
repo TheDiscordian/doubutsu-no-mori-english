@@ -41,4 +41,18 @@ ROOM_CHECK(RoomEffectClip,light,0x30);
 #endif
 extern float af_effect_random(void);
 extern int af_v3_room_effect_wall(void);
+#ifdef AF_V3_ROOM_PARTICLES
+#include "room_motion.h"
+extern void sAdo_OngenPos(u32,u8,float *);
+static inline void room_emit_steam(RoomSoundActor *actor,RoomRigGame *game,u8 sound,
+        u32 period_mask,float height,s16 spread) {
+    if (!game || room_transition_state(actor->state)) return;
+    sAdo_OngenPos((u32)(uptr)actor,sound,actor->position);
+    RoomEffectClip *clip=room_effect_clip;
+    if (clip && !(*(u32 *)((u8 *)game+0x1EA0)&period_mask)) {
+        EffectPosition pos={actor->position[0],actor->position[1]+height,actor->position[2]};
+        clip->request(ROOM_EFFECT_STEAM,pos,1,0,game,0xFFFF,spread,0);
+    }
+}
+#endif
 #endif

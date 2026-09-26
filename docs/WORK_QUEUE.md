@@ -22,9 +22,17 @@ Incomplete gameplay stays unavailable in the selector; installing assets does
 not claim that an item is playable. Reuse unchanged passing tests throughout.
 
 Current task: close shared conversion gaps in the ordinary bulk importer.
-The checked proposal is ABI 232 at
-`build/v3-particle-interaction-imports-03/cartridge/build-lock.json`, with
-156 development choices. Periodic/directional emitters, complete source audio,
+The checked proposal is ABI 236 at
+`build/v3-periodic-material-imports-04/cartridge/build-lock.json`, with
+157 development choices. Chowder has complete three-part artwork, both animated
+texture frames, periodic steam, its full five-note/two-envelope sound loop, and
+actual winter-camper availability through the ordinary importer. Shared timed
+audio parsing retains all instruments and samples. Source, sanitizer, installed
+resource, UPS reconstruction, and four browser/offline composition checks pass.
+Native steam execution and GPU appearance remain unverified; do not repeat the
+exhausted particle fixture as part of this material change.
+
+Periodic/directional emitters, complete source audio,
 effect profiles/controller, and ordinary dependency planning are installed.
 Barbecue is enabled through actual B-stock; cannon's full behaviour is inactive
 pending acquisition. Complete 976/1,280-byte effects and both furniture models
@@ -97,10 +105,10 @@ the player callback and uses a disconnected accessory: ordinary player animation
 actual motor transfers, and physical rumble remain hardware/playtest checks.
 Do not replay unchanged candle, rig, artwork, or sound batches.
 
-Room code has 1,136 bytes spare; bootstrap has 15 bytes spare. Scroll code has
-4 bytes spare, audio has no conservative bytes spare, and import storage has
-1,056,544 bytes spare. Capacity extensions must preserve complete dependencies.
-See the [current checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#installed-steam-and-room-projectiles)
+Room code has 848 bytes spare; bootstrap has 15 bytes spare. Scroll code has
+4 bytes spare, audio has 768 conservative bytes spare, and import storage has
+1,016,864 bytes spare. Capacity extensions must preserve complete dependencies.
+See the [current checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#installed-timed-textures-and-periodic-materials)
 for reproduction, native limits, and save warnings. Source publication is
 allowed; the main lock and both stable web-patcher deployments stay unchanged.
 

@@ -33,6 +33,9 @@ FORMS=(
     (168,'848b13d31a924efdfd525f925d6d2456e1d4b8640f7b4cba9bc3f3b3abc08af6',
      (0x4A,0x5E),((0x4E,0x6E),),0x3C,'texture',8,2,
      dict(input='actor-s16',offset=0x82C,mask=1)),
+    (248,'1620710b94c51876518191545975071f74fa9a2dc0b517df4a4b3ec22d335602',
+     (0x66,0x7A),((0x6A,0x9A),(0x86,0x9E),(0x8A,0x96)),0x4C,'texture',8,2,
+     dict(input='room-or-preview-frame',division=6,modulo=2)),
 )
 
 
@@ -131,6 +134,57 @@ def checked_initializer(source,profile,binding):
     return lifecycle
 
 
+def steam_lifecycle(source,profile):
+    """Complete timed-texture/periodic-steam category, without item-ID switches."""
+    adapter=profile.get('callback_adapter',{});functions=adapter.get('functions',{})
+    if adapter.get('category')!=CATEGORY or set(functions)!={'create','move','draw','destroy'}:return None
+    if (functions['move']['bytes'],functions['move']['sha256'])!=(
+            240,'ce05130f00c82d7a7647337000ba94c788c0e81291f58a05efe145a05271b116'):return None
+    for role in ('create','destroy'):
+        f=functions[role]
+        if (f['bytes']!=4 or f['relocations'] or f['sha256']!=sha256(bytes.fromhex('4e800020'))):return None
+    raw,receipt=source.function(functions['move']['offset'])
+    expected={16:(10,0,4,0x8009AED4),220:(10,0,4,0x8009AF20),
+        94:(6,1,4,49768),98:(4,1,4,49768),102:(6,1,6,48192),110:(4,1,6,48192)}
+    selector=adapter['material_frames'][0]['selector']
+    at=source.sections[4][0]+49768
+    if (receipt!=functions['move'] or receipt['relocations']!=expected or
+            source.rel[at:at+4]!=struct.pack('>f',15) or
+            selector!=dict(input='room-or-preview-frame',division=6,modulo=2)):
+        raise ValueError('Changed complete periodic material lifecycle')
+    from v3_room_particles import source_contract
+    return dict(category='material-periodic-steam',source_sound_id=0x54,switch_clicks=[],
+        excluded_states=[13,14,15,12],source_period=8,native_period=4,height=15.0,spread=10,
+        source_effect=113,effects=['steam'],effect_source=source_contract(source),
+        functions={role:dict(functions[role]) for role in ('create','move','destroy')})
+
+
+def checked_steam(source,profile,binding,contracts,effects):
+    lifecycle=steam_lifecycle(source,profile)
+    if (lifecycle is None or not binding.get('lifecycle_installed') or binding.get('lifecycle')!=4 or
+            binding.get('material_lifecycle')!=json.loads(json.dumps(lifecycle)) or
+            binding.get('state_offset')!=lifecycle['source_sound_id'] or
+            json.loads(json.dumps(contracts.get(binding['source_item_id'])))!=json.loads(json.dumps(lifecycle)) or
+            not effects.get('particles',{}).get('installed') or
+            effects['particles']['source']!=json.loads(json.dumps(lifecycle['effect_source']))):
+        raise ValueError('Periodic material lacks complete source sound/effect bindings')
+    return json.loads(json.dumps(lifecycle))
+
+
+def steam_profile_lifecycle(profile,lifecycle):
+    """Profile-writer guard; installed binding checks also verify source/ROM data."""
+    if not isinstance(lifecycle,dict) or lifecycle.get('category')!='material-periodic-steam':return False
+    functions=profile.get('callback_adapter',{}).get('functions',{})
+    if set(functions)!={'create','move','draw','destroy'}:return False
+    for role in ('create','move','destroy'):
+        if json.loads(json.dumps(functions[role]))!=json.loads(json.dumps(lifecycle.get('functions',{}).get(role))):
+            return False
+    return (all(lifecycle.get(k)==v for k,v in dict(source_sound_id=0x54,source_period=8,
+        native_period=4,height=15.0,spread=10,source_effect=113,effects=['steam'],
+        excluded_states=[13,14,15,12]).items()) and
+        functions['move']['sha256']=='ce05130f00c82d7a7647337000ba94c788c0e81291f58a05efe145a05271b116')
+
+
 def runtime_record(row):
     """Translate a fully checked source descriptor into the shared draw ABI."""
     from v3_registry import furniture_identity
@@ -143,7 +197,7 @@ def runtime_record(row):
     elif selector==dict(input='room-or-preview-frame',division=10,modulo=4,signed=True,
                        stopped_in_room_when_switch_off=True):mode,divisor,state=1,10,0
     elif (set(selector)=={'input','division','modulo'} and selector['input']=='room-or-preview-frame'
-          and (selector['division'],selector['modulo']) in ((8,7),(20,4),(2,2))):
+          and (selector['division'],selector['modulo']) in ((8,7),(20,4),(2,2),(6,2))):
         mode,divisor,state=0,selector['division'],0
     else:raise ValueError('Unsupported material selector semantics')
     if mode!=2 and selector['modulo']!=len(material['frames']):raise ValueError('Incomplete material frame sequence')

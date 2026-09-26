@@ -32,9 +32,19 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
-The checked proposal is ABI 232 at
-`build/v3-particle-interaction-imports-03/cartridge/build-lock.json`, with
-156 development choices. The ordinary importer connects periodic steam and
+The checked proposal is ABI 236 at
+`build/v3-periodic-material-imports-04/cartridge/build-lock.json`, with
+157 development choices. The ordinary importer installs chowder's complete
+three-part model, two-frame texture animation, periodic steam, complete five-note
+sound loop, both envelopes, instrument, and sample. Actual winter-camper
+acquisition is enabled without substituting shop stock. Shared material/audio
+categories perform the conversion and installation; no dedicated item installer
+is added. Focused source/sanitizer checks, full installed-resource verification,
+patch reconstruction, and four browser/offline selections pass. The saved format
+is unchanged. Native particle execution, GPU appearance, and synthesis remain
+unverified. See the [material checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#installed-timed-textures-and-periodic-materials).
+
+The ordinary importer also connects periodic steam and
 directional projectiles, complete loop/trigger audio, and additive native effect
 profiles. All four steam textures, both material variants, and the complete
 projectile model remain. Both furniture models are reused without compilation.
@@ -130,9 +140,9 @@ conditional effect binding. Its native particle lifetime still needs a properly
 allocated graphics fixture with the next changed effect batch; the previous
 fixture omitted that allocation. Do not repeat the passed bell checks.
 
-Room code uses 15,248 of 16,384 bytes; bootstrap uses 1,521 of 1,536 bytes.
-Scroll code has 4 bytes spare, audio has no conservative bytes spare, and
-the import reservation has 1,056,544 bytes spare. Live synthesis, GPU appearance,
+Room code uses 15,536 of 16,384 bytes; bootstrap uses 1,521 of 1,536 bytes.
+Scroll code has 4 bytes spare, audio has 768 conservative bytes spare, and
+the import reservation has 1,016,864 bytes spare. Live synthesis, GPU appearance,
 ordinary gameplay/save/restart, and original hardware are not newly verified.
 
 Saved format 4 is unchanged. A save using an added item requires its selected

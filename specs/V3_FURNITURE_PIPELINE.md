@@ -711,7 +711,7 @@ The same native command emitter preserves explicit texture-off/on transitions
 and the primitive-times-shade, opaque untextured combiner.
 
 This shared category prepares the coin, ? block, starman, fire flower, festive
-candle, and Mouth of Truth together. Descriptors distinguish room/preview
+candle, Mouth of Truth, and chowder together. Descriptors distinguish room/preview
 counters, division/modulo timing, switch-dependent stopping, and an actor-state
 selector. Source lifecycle receipts remain attached. The artwork alone
 does not implement sounds, surprise/rumble, player colour changes, or switch
@@ -760,6 +760,19 @@ all match. Lifecycle byte 1 maps that work field to private native `1A4`; the
 renderer remains timed mode 0. It does not claim a general linear correspondence
 between donor and native actor offsets. Lifecycle 0 retains its previous no-op
 construction. Unknown lifecycle/mode/work combinations reject.
+
+Lifecycle 4 supplies periodic steam with complete level sound, timed texture
+frames, and inert source construction/destruction. Its source callback,
+relocations, height constant, and selector are checked together. The two textures
+alternate every six donor frames; all three models remain in source submission
+order, including alpha-bearing lists submitted in the source's opaque arena.
+Native movement emits steam every four play frames at height 15 and spread 10,
+while refreshing the full source level sound `54`. Transition exclusions match
+the native state map. The shared parameterised steam emitter also serves direct
+models, without adding private actor fields or a separate particle pool.
+The record's state halfword binds the sound ID for this lifecycle, not an actor
+offset. The ordinary importer requires complete material, sound, and particle
+dependencies before installing its profile and actual winter-camper acquisition.
 
 The existing room constructor dispatches non-rig records to the material
 constructor. The material vtable reuses the existing CRC-checked constructor
@@ -2131,6 +2144,16 @@ authoritative. Mode, note, duration, velocity, and restart target are retained;
 channel/layer pointers and instrument selectors alone relocate. Unknown commands,
 zero-duration events, escaping pointers, and unaccounted tails reject.
 Both envelope forms use the same source/native instrument and sample comparison.
+
+Timed retrigger loops additionally preserve multiple note/rest events and
+envelope changes without forcing sustained-note mode. Every channel/layer,
+envelope, and restart pointer relocates; notes, durations, velocities, decay,
+envelope data, and padding remain unchanged. Restart targets must be command
+boundaries with at least one timed event in the repeating section. An
+envelope-only zero-time cycle rejects. Distinct envelopes are checked in full,
+including their alignment and complete tail coverage. Source level `54` uses
+five timed notes and two envelopes; its full instrument and sample pass through
+the same font/archive importer as sustained loops.
 
 Native player-colour and exclusive-switch callbacks are installed. The player
 owner changes exactly two calls: the complete original pre-action update is

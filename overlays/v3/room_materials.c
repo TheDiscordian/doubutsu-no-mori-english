@@ -6,6 +6,11 @@
 #endif
 #ifdef AF_V3_ROOM_COLOURS
 #include "room_colours.h"
+#endif
+#ifdef AF_V3_ROOM_PARTICLES
+#include "room_effects.h"
+#define MATERIAL_LIFECYCLE_MAX 4u
+#elif defined(AF_V3_ROOM_COLOURS)
 #define MATERIAL_LIFECYCLE_MAX 3u
 #elif defined(AF_V3_ROOM_REACTIONS)
 #define MATERIAL_LIFECYCLE_MAX 2u
@@ -24,6 +29,7 @@ static const RoomMaterialRecord *material_find(u32 index) {
         if (index<1024 || index>=2048 || r->bytes<32 || r->bytes>9216 || (r->bytes&15) ||
                 r->lifecycle>MATERIAL_LIFECYCLE_MAX || (r->lifecycle==1 && r->mode!=0) ||
                 (r->lifecycle==2 && r->mode!=2) || (r->lifecycle==3 && r->mode!=1) ||
+                (r->lifecycle==4 && r->mode!=0) ||
                 r->mode>2 || (r->segment!=8 && r->segment!=9) ||
                 !r->frames || r->frames>8 || !r->models || r->models>4 ||
                 r->kind>1 || !r->frame_bytes || r->frame_bytes>r->bytes ||
@@ -31,7 +37,7 @@ static const RoomMaterialRecord *material_find(u32 index) {
         if (r->mode==2) {
             /* Private work in non-rig actors, never the donor's 0x82C offset. */
             if (r->state_offset!=0x1A4 || r->frames!=2 || r->divisor) return 0;
-        } else if ((r->lifecycle==3 ? r->state_offset>127u :
+        } else if ((r->lifecycle>=3 ? r->state_offset>127u :
                     r->state_offset!=(r->lifecycle ? 0x1A4u : 0u)) || !r->divisor ||
                 (r->mode==1 && (r->frames!=4 || r->divisor!=10))) return 0;
         for (u32 j=0;j<4;++j)
@@ -57,11 +63,18 @@ void af_v3_room_material_ct(RoomRig *actor,u8 *data) {
 #endif
 }
 
-#if defined(AF_V3_ROOM_REACTIONS) || defined(AF_V3_ROOM_COLOURS)
+#if defined(AF_V3_ROOM_REACTIONS) || defined(AF_V3_ROOM_COLOURS) || defined(AF_V3_ROOM_PARTICLES)
 int af_v3_room_material_mv(RoomRig *actor,void *room,RoomRigGame *game,u8 *data) {
+    (void)room;
     if (!actor || !data) return 0;
     const RoomMaterialRecord *r=material_find(actor->index);
     if (!r) return 0;
+#ifdef AF_V3_ROOM_PARTICLES
+    if (r->lifecycle==4) {
+        room_emit_steam((RoomSoundActor *)actor,game,(u8)r->state_offset,3u,15.0f,10);
+        return 1;
+    }
+#endif
 #ifdef AF_V3_ROOM_REACTIONS
     if (r->lifecycle==2) { af_v3_room_reaction_mv(actor,room,game);return 1; }
 #endif

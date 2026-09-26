@@ -9,13 +9,9 @@ static void emit(RoomSoundActor *actor,RoomRigGame *game,const RoomStaticRecord 
     RoomEffectClip *clip=room_effect_clip;
     EffectPosition pos={actor->position[0],actor->position[1],actor->position[2]};
     if (r->mode==3 && r->parameter==9 && r->sound==0x55) {
-        sAdo_OngenPos((u32)(uptr)actor,(u8)r->sound,actor->position);
         /* Native play_frame advances at 30 Hz; source cadence is sixteen
            updates at 60 Hz. Do not use the graphics-context frame counter. */
-        if (clip && !(*(u32 *)((u8 *)game+0x1EA0)&7u)) {
-            pos.y+=30.0f;
-            clip->request(ROOM_EFFECT_STEAM,pos,1,0,game,0xFFFF,r->parameter,0);
-        }
+        room_emit_steam(actor,game,(u8)r->sound,7u,30.0f,r->parameter);
     } else if (r->mode==4 && !r->parameter && actor->changed==1 && clip) {
         /* The native contact owner/stride are independently checked. */
         u8 **room=(u8 **)room_static_clip;

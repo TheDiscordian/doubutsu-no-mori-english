@@ -19,6 +19,30 @@ OUTPUT=ROOT/os.environ.get('V3_PLAYER_FRAME_BUILD','build/v3-player-frame-sound-
 
 
 class ProgramTests(unittest.TestCase):
+    def test_timed_loop_retains_multiple_envelopes_and_retriggered_notes(self):
+        raw=bytearray.fromhex('880004ffc607cb0000d0560c46cb0000c05681084057904044fb000a')
+        raw.extend(bytes(len(raw)&1));first=len(raw)
+        raw.extend(struct.pack('>4h',20,24000,-1,0));second=len(raw)
+        raw.extend(struct.pack('>4h',2,20000,-1,0))
+        struct.pack_into('>H',raw,7,first);struct.pack_into('>H',raw,14,second)
+        desc=sounds.looping_layer(raw,0)
+        self.assertEqual(desc['kind'],'timed-retrigger-loop')
+        self.assertEqual([e['duration'] for e in desc['events']],[12,264,4160])
+        self.assertEqual([e['offset'] for e in desc['envelopes']],[first,second])
+        bound=sounds.bind_loop(raw,desc,0x5000,12,1)
+        actual=sounds.looping_layer(bound,0x5000,prefix=True)
+        self.assertEqual(actual['duration'],desc['duration'])
+        self.assertEqual(actual['loop'],14)
+        restored=bytearray(bound[4:]);restored[5]=raw[5]
+        for at in desc['pointers']:restored[at:at+2]=raw[at:at+2]
+        self.assertEqual(restored,raw)
+        for at,value in ((6,0xCA),(10,0x80),(12,0x80),(14,0xFF),(24,0xFA),(26,11)):
+            broken=bytearray(raw);broken[at]=value
+            with self.subTest(at=at),self.assertRaises(ValueError):sounds.looping_layer(broken,0)
+        # A timed prefix must not disguise an envelope-only busy loop.
+        busy=bytes.fromhex('880004ffc607560146cb0010d0fb0009')+struct.pack('>4h',2,20000,-1,0)
+        with self.assertRaisesRegex(ValueError,'restart'):sounds.looping_layer(busy,0)
+
     def test_default_instrument_envelope_sustained_loop(self):
         # Synthetic programme with no CB command: the full instrument owns ADSR.
         for target in (6, 7):

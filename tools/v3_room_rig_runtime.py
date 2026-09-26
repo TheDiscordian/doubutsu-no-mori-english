@@ -81,7 +81,8 @@ def install_profiles(base,prior,blob,core,original,output,directories):
     from v3_furniture_install import profile,provenance_patch
     from v3_furniture_pipeline import identity_rows,name_metadata
     from v3_import_storage import ROWS_RAM
-    from v3_furniture_materials import CATEGORY as MATERIAL_CATEGORY,initializer_lifecycle,checked_initializer
+    from v3_furniture_materials import (CATEGORY as MATERIAL_CATEGORY,initializer_lifecycle,checked_initializer,
+        steam_lifecycle,checked_steam)
     import v3_furniture_reactions as reactions
     from v3_furniture_scroll import (CATEGORY as SCROLL_CATEGORY,VTABLE as SCROLL_VTABLE,
                                     draw_only_lifecycle,checked_runtime,checked_lifecycle,profile_lifecycle)
@@ -145,6 +146,11 @@ def install_profiles(base,prior,blob,core,original,output,directories):
                 if json.loads(json.dumps(contracts.get(donor)))!=json.loads(json.dumps(colour)):
                     raise ValueError('Player-colour material requires its complete installed audio')
                 initial=colour
+            steam=steam_lifecycle(source,descriptor) if category==MATERIAL_CATEGORY and initial is None else None
+            if steam:
+                if json.loads(json.dumps(contracts.get(donor)))!=json.loads(json.dumps(steam)):
+                    raise ValueError('Periodic material requires its complete installed audio')
+                initial=steam
             if category==MATERIAL_CATEGORY:
                 installed=materials.get(donor)
                 if installed and initial and not installed.get('lifecycle_installed'):
@@ -152,9 +158,9 @@ def install_profiles(base,prior,blob,core,original,output,directories):
                         runtime['reactions']=reactions.prepare_installation(source,base,prior)
                     if colour and not runtime.get('colours'):
                         runtime['colours']=reactions.prepare_colours(base,prior)
-                    installed.update(lifecycle=3 if colour else 2 if reaction else 1,
-                        state_offset=colour['source_sound_id'] if colour else initial['native_face'] if reaction else initial['native_offset'],
-                        material_lifecycle=json.loads(json.dumps(initial)) if reaction or colour else initial,lifecycle_installed=True)
+                    installed.update(lifecycle=4 if steam else 3 if colour else 2 if reaction else 1,
+                        state_offset=initial['source_sound_id'] if colour or steam else initial['native_face'] if reaction else initial['native_offset'],
+                        material_lifecycle=json.loads(json.dumps(initial)) if reaction or colour or steam else initial,lifecycle_installed=True)
                     material_code_changed=True
                 if not installed or not installed.get('lifecycle_installed'):
                     deferred.append(dict(source_item_id=donor,reason='Material lifecycle remains incomplete'))
@@ -235,7 +241,8 @@ def install_profiles(base,prior,blob,core,original,output,directories):
                     sound['profile_installed']=True
             elif category==MATERIAL_CATEGORY and initial:
                 installed=materials[donor]
-                if colour:reactions.checked_colour_lifecycle(source,descriptor,installed,contracts)
+                if steam:checked_steam(source,descriptor,installed,contracts,runtime.get('effects',{}))
+                elif colour:reactions.checked_colour_lifecycle(source,descriptor,installed,contracts)
                 elif reaction:reactions.checked_lifecycle(source,descriptor,installed)
                 else:checked_initializer(source,descriptor,installed)
                 if (installed['profile_installed'] or
@@ -322,7 +329,8 @@ def bind_profiles(source,base,report):
     normal acquisition, catalogue, scoring, and selection checks still apply.
     """
     from v3_furniture_install import profile
-    from v3_furniture_materials import CATEGORY as MATERIAL_CATEGORY,initializer_lifecycle,checked_initializer
+    from v3_furniture_materials import (CATEGORY as MATERIAL_CATEGORY,initializer_lifecycle,checked_initializer,
+        steam_lifecycle,checked_steam)
     import v3_furniture_reactions as reactions
     from v3_furniture_scroll import CATEGORY as SCROLL_CATEGORY,VTABLE as SCROLL_VTABLE,checked_lifecycle,checked_runtime
     from v3_sound_programs import furniture_trigger,checked_furniture_loops
@@ -406,6 +414,11 @@ def bind_profiles(source,base,report):
             symbols=runtime['bootstrap']['symbols']
             if callbacks[:2]!=(symbols['af_v3_room_boot_ct'],symbols['af_v3_room_boot_sound_mv']):
                 raise ValueError('Missing complete player-colour material dispatch')
+        elif category==MATERIAL_CATEGORY and steam_lifecycle(source,descriptor):
+            art['room_lifecycle']=checked_steam(source,descriptor,binding,contracts,runtime.get('effects',{}))
+            callbacks=struct.unpack('>5I',bytes.fromhex(runtime['material_vtable_hex']))
+            if callbacks[1]!=runtime['bootstrap']['symbols']['af_v3_room_boot_sound_mv']:
+                raise ValueError('Missing periodic material movement dispatch')
         elif category==MATERIAL_CATEGORY:
             trigger=furniture_trigger(source,descriptor)
             sound=next((r for r in runtime['sound_rows'] if r['source_item_id']==donor),None)
@@ -523,9 +536,9 @@ def encode_materials(rows):
                 segment not in (8,9) or not 1<=len(frames)<=8 or not 1<=len(models)<=4 or
                 kind not in (0,1) or not 0<size<=n or kind==0 and size!=32 or
                 mode==2 and (state!=0x1A4 or len(frames)!=2 or divisor) or
-                lifecycle not in (0,1,2,3) or lifecycle==1 and mode!=0 or lifecycle==2 and mode!=2 or
-                lifecycle==3 and (mode!=1 or not 0<=state<=127) or
-                mode!=2 and (lifecycle!=3 and state!=(0x1A4 if lifecycle else 0) or not 0<divisor<=65535) or
+                lifecycle not in (0,1,2,3,4) or lifecycle==1 and mode!=0 or lifecycle==2 and mode!=2 or
+                lifecycle in (3,4) and (mode!=(1 if lifecycle==3 else 0) or not 0<=state<=127) or
+                mode!=2 and (lifecycle not in (3,4) and state!=(0x1A4 if lifecycle else 0) or not 0<divisor<=65535) or
                 mode==1 and (len(frames)!=4 or divisor!=10) or
                 any(p&7 or not 0<=p<=n-size for p in frames) or
                 any(p&7 or not 0<=p<=n-8 for p in models)):
