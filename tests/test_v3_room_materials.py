@@ -1,6 +1,7 @@
 """Current shared material renderer, complete frame tables, and inactive routing."""
 import copy
 import json
+import os
 from pathlib import Path
 import struct
 import subprocess
@@ -22,6 +23,113 @@ import v3_optional_composition as composer
 
 OUT=ROOT/'build/v3-material-frames-runtime-02'
 ART=ROOT/'build/v3-material-frames-prepared-01'
+
+
+class MaterialLifecycleSourceTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+            (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+        cls.art=json.loads((ART/'art.json').read_bytes())
+
+    def test_complete_callbacks_and_private_work_mapping(self):
+        accepted=[]
+        for row in self.art['objects']:
+            profile=self.source.profile(int(row['item_id'],16))
+            lifecycle=materials.initializer_lifecycle(self.source,profile)
+            if lifecycle is None:continue
+            accepted.append(row['item_id'])
+            self.assertEqual((lifecycle['source_offset'],lifecycle['native_offset'],lifecycle['initial_value']),
+                (0x82A,0x1A4,-1))
+            for role in ('create','move','destroy'):
+                bad=copy.deepcopy(profile);bad['callback_adapter']['functions'][role]['sha256']='0'*64
+                self.assertIsNone(materials.initializer_lifecycle(self.source,bad))
+                bad=copy.deepcopy(profile);bad['callback_adapter']['functions'][role]['relocations']={0:1}
+                self.assertIsNone(materials.initializer_lifecycle(self.source,bad))
+                changed=copy.copy(self.source);changed.rel=bytearray(changed.rel)
+                changed.rel[changed.sections[1][0]+lifecycle['functions'][role]['offset']]^=1
+                with self.assertRaisesRegex(ValueError,'Changed complete material'):
+                    materials.initializer_lifecycle(changed,profile)
+        self.assertEqual(accepted,['3298'])
+
+    def test_category_plan_includes_only_complete_lifecycles_and_skips_retained_stages(self):
+        from v3_furniture_pipeline import rig_import_plan
+        inventory={'rows':[dict(item_id=r['item_id'],asset_ready=True,installed=False,
+            categories=[materials.CATEGORY],profile=self.source.profile(int(r['item_id'],16)))
+            for r in self.art['objects']]}
+        report={'equipment_resources':{'room_rigs':{'rows':[]}}}
+        wanted=['3298','3314','3318','332C']
+        self.assertEqual(rig_import_plan(inventory,report,{},source=self.source),
+            dict(resources=[],materials=wanted,audio=wanted[1:],loops=[],profiles=wanted))
+        report['equipment_resources']['room_rigs']['material_rows']=[dict(source_item_id=i) for i in wanted]
+        report['equipment_resources']['furniture_audio']={'furniture':[dict(item_id=i) for i in wanted[1:]]}
+        self.assertEqual(rig_import_plan(inventory,report,{i:{} for i in wanted[1:]},source=self.source),
+            dict(resources=[],materials=[],audio=[],loops=[],profiles=['3298']))
+        self.assertEqual(rig_import_plan(inventory,report,{},selected=['331C'],source=self.source),
+            dict(resources=[],audio=[],loops=[],profiles=[]))
+
+
+class CurrentMaterialLifecycleTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.out=ROOT/os.environ.get('V3_MATERIAL_IMPORT_BUILD','build/v3-material-lifecycle-imports-02')
+        cls.image,cls.report=inputs(cls.out/'build-lock.json')
+        cls.blob=by_vrom(cls.image)[BLOB].extract(cls.image)
+        cls.runtime=cls.report['equipment_resources']['room_rigs']
+        cls.source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+            (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+
+    def test_installed_complete_lifecycles_assets_callbacks_and_saved_format(self):
+        from v3_import_storage import slot
+        from v3_furniture_install import profile
+        bindings=runtime.bind_profiles(self.source,self.image,self.report)
+        rows=self.runtime['material_rows'];initial=[r for r in rows if r.get('lifecycle')]
+        self.assertEqual(len(initial),1)
+        self.assertFalse(set(bindings)&{r['source_item_id'] for r in self.report['staged_furniture']['deferred_resources']})
+        e=self.report['equipment_resources'];module=self.blob[e['blob_offset']:e['blob_offset']+e['bytes']]
+        self.assertEqual(struct.unpack_from('>I',module,runtime.MATERIAL_VTABLE-EQUIPMENT_RAM)[0],
+            self.runtime['bootstrap']['symbols']['af_v3_room_boot_ct'])
+        art=json.loads((ART/'art.json').read_bytes())
+        for r in rows:
+            old=next(a for a in art['objects'] if a['item_id']==r['source_item_id'])
+            self.assertEqual(self.blob[r['blob_offset']:r['blob_offset']+r['bytes']],(ART/old['object_file']).read_bytes())
+            if not r.get('lifecycle'):continue
+            p=self.source.profile(int(r['source_item_id'],16))
+            lifecycle=materials.checked_initializer(self.source,p,r)
+            row=next(x for x in self.report['furniture']['imports'] if x['item_id']==r['item_id'])
+            self.assertEqual(row['room_lifecycle'],lifecycle)
+            self.assertTrue(r['parent_selectable']);self.assertFalse(bindings[r['source_item_id']]['staged'])
+            i=slot(int(r['item_id'],16));native=profile(row,r['vrom'],limit=self.report['import_storage']['virtual_limit'])
+            self.assertEqual(self.blob[ROWS+i*80:ROWS+(i+1)*80],
+                struct.pack('>HHI',r['runtime_index'],int(r['item_id'],16),1)+native+bytes(4))
+            for key,value in (('lifecycle',0),('state_offset',0x82A),('lifecycle_installed',False)):
+                bad=copy.deepcopy(r);bad[key]=value
+                with self.assertRaises(ValueError):materials.checked_initializer(self.source,p,bad)
+        self.assertEqual(self.report['save_codec']['format_version'],4)
+        self.assertEqual(self.report['sources']['overlays/v3/room_materials.c'],
+            sha256((ROOT/'overlays/v3/room_materials.c').read_bytes()))
+        _,prior=inputs(ROOT/'build/v3-endpoint-hit-runtime-04/build-lock.json')
+        for key in ('save_codec','translation_baseline'):
+            self.assertEqual(self.report[key],prior[key])
+        expected=copy.deepcopy(prior['save_runtime'])
+        flags=bytearray.fromhex(expected['profile_hex'])
+        for row in self.report['automatic_furniture']['imports']:
+            i=slot(int(row['item_id'],16));flags[0x20+i//8]|=1<<(i&7)
+        expected.update(profile_hex=flags.hex(),profile_sha256=sha256(flags))
+        self.assertEqual(self.report['save_runtime'],expected)
+        for key in ('furniture_audio','furniture_level_audio','scenery'):
+            self.assertEqual(e[key],prior['equipment_resources'][key])
+        self.assertEqual(self.report['blob_bytes'],prior['blob_bytes'])
+
+    def test_initializer_and_complete_renderer_under_sanitizers(self):
+        MaterialRuntimeTests.test_renderer_timing_and_bounds_under_sanitizers(self)
+
+    def test_browser_composition_preserves_all_individual_and_translation_only(self):
+        from tests.test_v3_room_rig_runtime import CurrentImportedRigTests
+        self.rows=self.report['automatic_furniture']['imports']
+        CurrentImportedRigTests.test_private_browser_selection_matches_offline_and_keeps_translation_only(self)
+        self.assertEqual(apply_ups((ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes(),
+            (self.out/'asset-loader.ups').read_bytes()),self.image)
 
 
 class MaterialRuntimeTests(unittest.TestCase):

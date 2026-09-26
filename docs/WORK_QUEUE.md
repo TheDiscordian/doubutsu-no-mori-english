@@ -22,19 +22,22 @@ Incomplete gameplay stays unavailable in the selector; installing assets does
 not claim that an item is playable. Reuse unchanged passing tests throughout.
 
 Current task: close shared conversion gaps in the ordinary bulk importer.
-The checked proposal is ABI 218 at
-`build/v3-endpoint-hit-runtime-04/build-lock.json`, with 153 development choices.
-Endpoint-hit rigs retain their full native joint capacity, initial half-speed
-motion, endpoint interaction, both complete sounds, and the conditional camera
-flashes. Judge's bell reuses its prepared model through event stock and catalogue
-ordering. Its optional ringside wall is not forced into the selection.
+The checked proposal is ABI 220 at
+`build/v3-material-lifecycle-imports-02/build-lock.json`, with 154 development choices.
+The automatic importer installs complete material render/audio/profile stages,
+reuses installed dependencies, and enables festive candle through its actual
+stock/category and catalogue route. Complete source callbacks initialise only
+private native work; existing timed textures, all model lists, and light scalar
+remain. No fixed RAM, bootstrap, actor, or saved-field allocation grows.
 
-Ten focused host/current-cartridge checks pass, including four browser/offline
-composition cases. The complete native bell representative passes 57 assertions
-for animation, full-index wall reading, drawing every model, bounds, independent
-instances, and unchanged save/profile state. The effect continuation passes real
-loading/cache/relocation and its first timer update, then stops because the
-isolated fixture omits graphics-pool allocation. Native `80A19304` refuses
+Six focused source/host/cartridge checks pass, including four browser/offline
+composition cases and sanitized construction/rendering. The corrected native
+check passes 22 internal assertions for constructor dispatch, room/catalogue
+aliases, model DMA, instance boundaries, lazy loading, cache, and unchanged saves.
+The report-only final build has the identical tested ROM. Do not replay it.
+
+Retain the complete bell, rolling, and contact evidence. The effect continuation
+still lacks graphics-pool allocation in its fixture. Native `80A19304` refuses
 graphics-dependent creation when the count at owner+`37A0` is zero; the fixture
 calls state/program initializers but omits graphics initializer `80A186AC`.
 This is not a demonstrated ordinary-game effect failure. Full particle lifetime
@@ -42,17 +45,18 @@ remains unverified. Do not run a third setup retry or replay the passed bell che
 Include proper native graphics setup with the next changed effect integration.
 
 Continue complete material lifecycles and other model/animation callbacks.
-Festive candle already has complete animated artwork; its source constructor
-sets `dynamic_work_s[0] = -1`, and its move/destructor are no-ops. Bind that
-source-checked lifecycle through the shared material adapter instead of another
-dedicated item installer. Mouth of Truth, starman, stone coin, and the remaining
-prepared callback models retain their actual behaviour requirements. Do not
-divert into the parked acquisition frontend.
+Mouth of Truth needs source surprise/rumble and a two-field timed state machine;
+its renderer already reads private native `1A4`. Preserve donor `82C` as the face
+selector and map the separate `82A` countdown independently. Starman needs its
+complete loop sound, player-colour request, and same-item switch coordination,
+not just its existing palettes. Stone coin and the other prepared callback
+models retain their actual behaviour requirements. Extend shared dispatch and
+reuse assets; do not divert into the parked acquisition frontend.
 
-Room code has 9,876 bytes spare; bootstrap has 27 bytes spare. Scroll code has
+Room code has 9,672 bytes spare; bootstrap has 27 bytes spare. Scroll code has
 4 bytes spare, audio has 288 conservative bytes spare, and import storage has
 1,492,544 bytes spare. Capacity extensions must preserve complete dependencies.
-See the [current checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#complete-endpoint-hit-import)
+See the [current checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#automatic-material-lifecycle-import)
 for reproduction, native limits, and save warnings. Source publication is
 allowed; the main lock and both stable web-patcher deployments stay unchanged.
 

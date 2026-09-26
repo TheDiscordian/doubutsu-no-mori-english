@@ -11,14 +11,14 @@ static const RoomMaterialRecord *material_find(u32 index) {
         const RoomMaterialRecord *r=room_material_table->rows+i;
         if (r->index!=index) continue;
         if (index<1024 || index>=2048 || r->bytes<32 || r->bytes>9216 || (r->bytes&15) ||
-                r->reserved || r->mode>2 || (r->segment!=8 && r->segment!=9) ||
+                r->lifecycle>1 || (r->lifecycle && r->mode!=0) || r->mode>2 || (r->segment!=8 && r->segment!=9) ||
                 !r->frames || r->frames>8 || !r->models || r->models>4 ||
                 r->kind>1 || !r->frame_bytes || r->frame_bytes>r->bytes ||
                 (!r->kind && r->frame_bytes!=32)) return 0;
         if (r->mode==2) {
             /* Private work in non-rig actors, never the donor's 0x82C offset. */
             if (r->state_offset!=0x1A4 || r->frames!=2 || r->divisor) return 0;
-        } else if (r->state_offset || !r->divisor ||
+        } else if (r->state_offset!=(r->lifecycle ? 0x1A4u : 0u) || !r->divisor ||
                 (r->mode==1 && (r->frames!=4 || r->divisor!=10))) return 0;
         for (u32 j=0;j<4;++j)
             if (j<r->models ? ((r->model_offsets[j]&7) || r->model_offsets[j]>r->bytes-8u)
@@ -29,6 +29,12 @@ static const RoomMaterialRecord *material_find(u32 index) {
         return r;
     }
     return 0;
+}
+
+void af_v3_room_material_ct(RoomRig *actor,u8 *data) {
+    if (!actor || !data) return;
+    const RoomMaterialRecord *r=material_find(actor->index);
+    if (r && r->lifecycle==1) *(s16 *)((u8 *)actor+r->state_offset)=-1;
 }
 
 void af_v3_room_material_dw(RoomRig *actor,void *room,RoomRigGame *game,u8 *data) {

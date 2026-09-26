@@ -1219,21 +1219,36 @@ def convert(source, worksheet, output, selected=(), installed=None, *, assets_on
     return report
 
 
-def rig_import_plan(inventory, report, bindings, selected=(), category=None):
+def rig_import_plan(inventory, report, bindings, selected=(), category=None, *, source=None):
     """Plan shared dependencies, not per-item installers or acquisition guesses."""
     from v3_furniture_rigs import CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY,ROLLING_CATEGORY
+    from v3_furniture_materials import CATEGORY as MATERIAL_CATEGORY,initializer_lifecycle
+    from v3_sound_programs import furniture_trigger
     categories={CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY,ROLLING_CATEGORY}
-    rows=[r for r in inventory['rows'] if r.get('asset_ready') and not r['installed'] and
+    candidates=[r for r in inventory['rows'] if r.get('asset_ready') and not r['installed'] and
         not r.get('room_alias') and (not selected or r['item_id'] in selected) and
-        (category is None or category in r['categories']) and
-        r['profile'].get('callback_adapter',{}).get('category') in categories]
+        (category is None or category in r['categories'])]
+    rows=[r for r in candidates if r['profile'].get('callback_adapter',{}).get('category') in categories]
+    material_rows=[];material_audio=[]
+    for r in candidates:
+        if r['profile'].get('callback_adapter',{}).get('category')!=MATERIAL_CATEGORY:continue
+        initializer=initializer_lifecycle(source,r['profile'])
+        trigger=furniture_trigger(source,r['profile']) if source is not None else None
+        if initializer or trigger:
+            material_rows.append(r)
+            if trigger:material_audio.append(r['item_id'])
     rigs={r['source_item_id'] for r in report['equipment_resources']['room_rigs']['rows']}
     audio={r['item_id'] for r in report['equipment_resources'].get('furniture_audio',{}).get('furniture',[])}
     loops={r['item_id'] for r in report['equipment_resources'].get('furniture_level_audio',{}).get('furniture',[])}
-    return dict(resources=sorted(r['item_id'] for r in rows if r['item_id'] not in rigs),
-        audio=sorted(r['item_id'] for r in rows if r['profile']['callback_adapter'].get('trigger') and r['item_id'] not in audio),
+    plan=dict(resources=sorted(r['item_id'] for r in rows if r['item_id'] not in rigs),
+        audio=sorted(({r['item_id'] for r in rows if r['profile']['callback_adapter'].get('trigger')}|
+                      set(material_audio))-audio),
         loops=sorted(r['item_id'] for r in rows if r['profile']['callback_adapter'].get('level_sound') and r['item_id'] not in loops),
-        profiles=sorted(r['item_id'] for r in rows if r['item_id'] not in bindings))
+        profiles=sorted(r['item_id'] for r in rows+material_rows if r['item_id'] not in bindings))
+    if material_rows:
+        installed={r['source_item_id'] for r in report['equipment_resources']['room_rigs'].get('material_rows',[])}
+        plan['materials']=sorted(r['item_id'] for r in material_rows if r['item_id'] not in installed)
+    return plan
 
 
 def import_batch(source, worksheet, output, lock, selected=(), category=None, reuse_assets=()):
@@ -1251,7 +1266,7 @@ def import_batch(source, worksheet, output, lock, selected=(), category=None, re
     inventory=scan(source,worksheet,installed,selected=selected)
     if selected and set(selected)-{r['item_id'] for r in inventory['rows']}:
         raise ValueError('Requested import identity is absent from the donor inventory')
-    plan=rig_import_plan(inventory,report,source.runtime_profiles,selected,category)
+    plan=rig_import_plan(inventory,report,source.runtime_profiles,selected,category,source=source)
     output.mkdir(parents=True,exist_ok=False);steps=[];current=lock;cache=list(reuse_assets)
     def refresh(label,**arguments):
         nonlocal current,base,report
@@ -1259,7 +1274,7 @@ def import_batch(source, worksheet, output, lock, selected=(), category=None, re
         report=refresh_runtime(directory,current,**arguments);current=directory/'build-lock.json'
         base,report=inputs(current)
         steps.append(dict(stage=label,lock=str(current.relative_to(ROOT)),sha256=report['output_sha256']))
-    all_assets=sorted(set(plan['resources'])|set(plan['profiles']))
+    all_assets=sorted(set(plan['resources'])|set(plan['profiles'])|set(plan.get('materials',[])))
     if all_assets:
         complete=output/'prepared'
         convert(source,worksheet,complete,all_assets,installed,assets_only=True,reuse_assets=cache)
@@ -1272,6 +1287,8 @@ def import_batch(source, worksheet, output, lock, selected=(), category=None, re
             return directory
         if plan['resources']:
             refresh('rig-runtime',room_rigs_art=[bundle(plan['resources'],'rig-assets')])
+        if plan.get('materials'):
+            refresh('material-runtime',material_frames_art=[bundle(plan['materials'],'material-assets')])
         if plan['audio']:
             audio=output/'audio'
             prepare_furniture_audio(base,report,source,inventory,audio,plan['audio'])

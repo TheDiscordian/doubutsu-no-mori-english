@@ -483,6 +483,78 @@ def inventory_rigs(debug,rom_path,record):
         ordinary_inventory_tested=False,parent_selection_tested=False,flash_written=False,requires_checkpoint_restore=True)
 
 
+def material_lifecycles(debug,rom_path,record):
+    """Current installed material constructors; reuse unchanged renderer evidence."""
+    from runtime_layout import TEST_STACK
+    from v3_equipment_runtime import RAM
+    from v3_room_rig_runtime import RAM as BOOT_RAM,MATERIAL_VTABLE
+    path=Path(rom_path);image=path.read_bytes();report=json.loads((path.parent/'build.json').read_bytes())
+    if sha256(image)!=report['output_sha256']:raise ValueError('Changed material lifecycle cartridge')
+    e=report['equipment_resources'];room=e['room_rigs'];blob=by_vrom(image)[runtime.BLOB].extract(image)
+    boot=boot_proofs(image);assertions=0
+    def check(label,at,want):
+        nonlocal assertions
+        actual=debug.read_memory(at,len(want));passed=actual==want
+        record(dict(material_lifecycle_check=label,address=f'{at:08X}',bytes=len(want),
+            assertion='passed' if passed else 'failed',actual=actual.hex() if len(actual)<=16 else sha256(actual)))
+        if not passed:raise ValueError('Material lifecycle mismatch: '+label)
+        assertions+=1
+    def call(at,args=(),proof=None):
+        result=debug.call(f'{at:08X}',list(args),return_address=MODULE_RAM+0x6480,
+            verified_code=proof or boot.get(at));record(result);return result['return_value']
+    module=blob[e['blob_offset']:e['blob_offset']+e['bytes']]
+    n=(room['bootstrap']['bytes']+3)&~3
+    code=module[BOOT_RAM-RAM:BOOT_RAM-RAM+n]
+    check('actual immutable startup bootstrap',BOOT_RAM,code)
+    vtable=bytes.fromhex(room['material_vtable_hex'])
+    check('complete installed material callback table',MATERIAL_VTABLE,vtable)
+    ctor=struct.unpack_from('>I',vtable)[0]
+    if ctor!=room['bootstrap']['symbols']['af_v3_room_boot_ct']:
+        raise ValueError('Missing shared constructor dispatch')
+    size=0x3500;allocation=call(0x8009BFC0,[size])
+    if allocation&15 or not MODULE_RAM+0x8000<=allocation<=0x80400000-size:
+        raise ValueError('Material fixture outside native heap')
+    actor,other,bridge,bank=allocation+16,allocation+0x800,allocation+0xF80,allocation+0x1000
+    debug.write_memory(allocation,bytes(size));edge=b'V3ML'*4
+    guards=(allocation,actor+0x740,other-16,other+0x740,bridge-16,bridge+16,bank-16,bank+9216,
+        allocation+size-16,TEST_STACK-0x800,TEST_STACK+0x40)
+    for at in guards:debug.write_memory(at,edge)
+    # Debugger entry validation is limited to main RAM. Use the same bounded
+    # main-RAM jump bridge as the existing rig probe, not a relaxed validator.
+    trampoline=struct.pack('>2I',0x08000000|(ctor>>2&0x3FFFFFF),0)
+    debug.write_memory(bridge,trampoline)
+    call(0x8002FE00,[bridge,len(trampoline)]);call(0x80034CE0,[bridge,len(trampoline)])
+    ctor=bridge;proof=(bridge,trampoline)
+    state=report['save_runtime'];saved=debug.read_memory(state['state_ram'],state['state_bytes'])
+    rows=[r for r in room['material_rows'] if r.get('lifecycle')]
+    if not rows:raise ValueError('No installed material lifecycles')
+    try:
+        for row in rows:
+            call(0x80026B44,[bank,row['vrom'],row['bytes']])
+            check('complete retained model DMA',bank,blob[row['blob_offset']:row['blob_offset']+row['bytes']])
+            for target,alias in ((actor,0),(other,1024)):
+                before=bytearray(b'\xA5'*0x740);struct.pack_into('>H',before,0,row['runtime_index']+alias)
+                debug.write_memory(target,before)
+                call(ctor,[target,bank],proof)
+                struct.pack_into('>h',before,row['state_offset'],-1)
+                check('room/catalogue construction changes only private work',target,before)
+            before=debug.read_memory(actor,0x740)
+            call(ctor,[other,bank],proof)
+            check('second instance does not alter first instance',actor,before)
+        untouched=next(r for r in room['material_rows'] if not r.get('lifecycle'))
+        before=struct.pack('>H',untouched['runtime_index'])+b'\x5A'*(0x740-2)
+        debug.write_memory(actor,before);call(ctor,[actor,bank],proof)
+        check('uninitialised material category retains every actor byte',actor,before)
+        p=room['packet'];check('complete packet loaded by actual bootstrap',p['ram'],blob[p['blob_offset']:p['blob_offset']+p['bytes']])
+        check('actual verified packet cache',0x804B1E00,struct.pack('>I',p['crc32']))
+        check('save/profile state unchanged',state['state_ram'],saved)
+        for at in guards:check('actor/model/stack guard',at,edge)
+        check('no CPU fault',0x8003CE34,bytes(4))
+    finally:call(0x8009C040,[allocation])
+    return dict(native_material_lifecycles=True,assertions=assertions,ordinary_room_tested=False,
+        renderer_retested=False,physical_audio_played=False,flash_written=False,requires_checkpoint_restore=True)
+
+
 def room_rigs(debug,rom_path,record,*,mode=2):
     """Manifest-selected complete room lifecycles, without enabling parent choices."""
     from runtime_layout import TEST_STACK
@@ -1713,6 +1785,7 @@ def tool_controls(debug,rom_path,record,*,transitions=False,capture=False,rod=Fa
 
 
 def exercise(debug, rom_path, record, *, section='automatic_furniture'):
+    if section=='material_lifecycles':return material_lifecycles(debug,rom_path,record)
     if section=='room_effects':
         from v3_room_effects_smoke import exercise as room_effects
         return room_effects(debug,rom_path,record)

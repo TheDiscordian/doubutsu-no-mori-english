@@ -1,5 +1,92 @@
 # Automatic furniture pipeline checkpoint
 
+## Automatic material lifecycle import
+
+The checked proposal is ABI 220 at
+`build/v3-material-lifecycle-imports-02/build-lock.json`, with 154 development
+choices. The ordinary category importer now plans complete material renderer,
+audio, and implemented lifecycle dependencies, skipping already installed stages.
+Festive candle (`3298`) uses that path and its actual `ftr_listTrain` stock,
+catalogue ordering, scoring, official English name, and optional selection.
+All 4,448 bytes of its two-model/two-texture object are reused from the prepared
+material bundle. No manual item definition or acquisition substitute is added.
+
+The complete source constructor writes signed `-1` at donor work offset `82A`;
+move and destruction return without effects. The source adapter verifies each
+whole function, relocations, lengths, and hashes, then maps its private work to
+native `1A4`, inside the existing non-rig instance. Lifecycle selector 1 occupies
+the material record's previously reserved byte. Other lifecycle/mode/work
+combinations reject. The existing constructor bootstrap dispatches to the shared
+material implementation when no rig row matches. Its size remains 1,509 bytes;
+no new allocation, bootstrap entry, actor field, or saved format is introduced.
+
+Source receipts and prepared artwork remain unchanged. Missing renderer/audio
+stages are derived for all implemented material lifecycles, including the three
+existing trigger forms. Mouth of Truth and starman remain pending their actual
+behaviours; the three Mario trigger objects retain their acquisition requirement.
+Profile staging recompiles code only when adding an implemented material
+lifecycle. All installed effect callback profiles are rebound to that code.
+
+Verification:
+
+- Three source/planner tests pass: complete callbacks/private work mapping,
+  rejecting changed callbacks/relocations, full-category dependency planning,
+  and retaining existing rig planning. Only complete implemented lifecycles
+  enter the dependency plan; installed stages are skipped.
+- Three current material/cartridge tests pass, including complete installed
+  resources/vtables/profiles, sanitizer checks of constructor writes and timed
+  rendering, patch reconstruction, and browser/offline none/all/new-category/
+  existing-villager composition. The final report-specific check also verifies
+  unchanged saves, scenery, audio, and import-blob size.
+- `build/v3-material-lifecycle-native-01/` reaches bootstrap/vtable/model checks
+  before the debugger rejects an Expansion Pak entry proof. This is a fixture
+  restriction, not an executed constructor failure.
+- The single justified retry, `build/v3-material-lifecycle-native-02/`, uses the
+  existing main-RAM jump-bridge approach. All 22 internal assertions pass:
+  actual cartridge constructor and complete model DMA, room/catalogue aliases,
+  independent actor writes, lifecycle-zero no-op behaviour, complete packet/cache,
+  saved-state preservation, actor/model/stack bounds, and no CPU fault. Checkpoint
+  restoration and final scene guards pass. No physical audio is played.
+- The category build initially retains stale pending-report entries for already
+  completed imports. Shared profile/ordinary installation now removes those.
+  The report-corrected final build produces the identical tested ROM and UPS;
+  no emulator replay is performed for that report-only correction.
+
+No GPU appearance, actual room use, ordinary save/restart, or original-hardware
+verification is newly claimed. Retain unchanged bell/rolling/contact evidence;
+the incomplete effect graphics fixture remains recorded separately. Next extend
+material state/interaction dispatch for Mouth of Truth's surprise/rumble and
+starman's colour/switch coordination, alongside remaining model behaviours.
+
+Reproduction, using fresh output directories:
+
+```sh
+python3 tools/v3_furniture_pipeline.py import --category material-frame-assets \
+  --base-lock build/v3-endpoint-hit-runtime-04/build-lock.json \
+  --reuse-assets build/v3-material-frames-prepared-01 \
+  --output build/v3-material-lifecycle-reproduction
+python3 -m unittest tests.test_v3_furniture_rigs.CategoryPlanTests \
+  tests.test_v3_room_materials.MaterialLifecycleSourceTests \
+  tests.test_v3_room_materials.CurrentMaterialLifecycleTests -v
+python3 tools/emulator_smoke.py \
+  --rom build/v3-material-lifecycle-imports-02/animal-forest-v3-asset-loader.z64 \
+  --output build/v3-material-lifecycle-native-reproduction \
+  --scenario tests/scenarios/v3_material_lifecycles.json \
+  --xvfb /home/discordian/Games/OpenRSC/headless/vendor/usr/bin/Xvfb \
+  --seconds 150 --expansion-pak --no-initial-screenshot
+```
+
+Current room code is 6,712/16,384 bytes, with 9,672 spare. Bootstrap is
+1,509/1,536. Scroll/audio spare bounds are unchanged at 4/288 bytes respectively.
+The import blob stays 4,798,912 bytes, with 1,492,544 bytes spare. Saved format 4
+is unchanged. Saves requiring this candle need the matching or larger selection;
+preserve backups. Format-4 saves cannot load in V2 or earlier-format V3 builds.
+Neither stable web-patcher deployment nor the main lock changes.
+
+- ROM SHA-256: `bd3d70bf761067fed7d6d229aab2ebf723c6fec78c69b55c52b149851f7e164b`.
+- Report SHA-256: `89064e6acc54304eccc2813a9ad7094b442f29c28d277f9a7338b50a64401009`.
+- UPS SHA-256: `ab3cba2775e5fbe7705dce2625262b521d9950574ab411eeb26cffb7d952e160`.
+
 ## Complete endpoint-hit import
 
 The current checked proposal is ABI 218 at

@@ -32,45 +32,46 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
-The checked V3 proposal is ABI 218 at
-`build/v3-endpoint-hit-runtime-04/build-lock.json`, with 153 development choices.
-The ordinary bulk importer installs complete endpoint-hit behaviour, both sounds,
-and conditional camera flashes for judge's bell. Its seven joints and four model
-lists reuse the prepared artwork; event stock, catalogue ordering, and its official
-English name use the existing shared item consumers. Ringside seating uses full
-native wall index 76 and remains optional, not a forced dependency.
+The checked V3 proposal is ABI 220 at
+`build/v3-material-lifecycle-imports-02/build-lock.json`, with 154 development choices.
+The ordinary category importer plans complete material renderers, required audio,
+and implemented lifecycle profiles together, skipping installed dependencies.
+Festive candle is enabled through its actual donor stock/category, catalogue,
+scoring, and selection, reusing its complete 4,448-byte animated object.
 
-The shared audio converter preserves timed rests and envelopes between events.
-The camera sound retains its complete 50-tick rest, 350-tick note, envelope,
-instrument, and samples. Native actor size and saved fields are unchanged; the
-full nine-vector morph area supports up to eight joints for categories without
-private work in that area. Source/code refresh is explicit, preserving complete
-assets, audio, selections, and bound effect profiles.
+The source-checked invalid-index initializer uses private native actor storage;
+the source's larger actor offset is never written into the N64 instance. The
+existing checked constructor bootstrap dispatches material and rig callbacks.
+No extra bootstrap, allocation, or saved field is required. Full-source move and
+destructor checks retain the candle's inert callbacks. Completed imports no
+longer retain stale pending-resource entries in generated reports.
 
-Seven focused host checks pass for source validation, timed audio, complete
-endpoint/conditional behaviour, morph bounds, and shared categories. Three
-current-cartridge checks pass for code-only resource preservation, installed
-audio/effect bindings, patch reconstruction, and four browser/offline selections.
-The final native bell representative passes 57 assertions for animation, full
-wall identity, every model draw, bounds, and save-state preservation. Effect
-loading/cache/relocation and the first timer update pass, but full particle
-lifetime remains unverified: the isolated fixture omits native graphics-pool
-allocation, so the engine refuses to create a flash. No third setup retry is
-queued. Retain unchanged rolling/contact/material evidence. See
-[the checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#complete-endpoint-hit-import).
+Three source/planner checks and three current-cartridge/material checks pass,
+including sanitized construction/rendering and four browser/offline selections.
+The focused native run passes 22 internal assertions for the actual constructor,
+room/catalogue aliases, complete model DMA, independent instances, packet/cache,
+save-state preservation, and bounds. Its one setup retry uses the existing
+main-RAM entry-bridge approach. The final report correction produces the identical
+tested ROM; unchanged animation/effect/rolling/contact evidence is retained.
+See [the checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#automatic-material-lifecycle-import).
 
-Room code uses 6,508 of 16,384 bytes; bootstrap uses 1,509 of 1,536 bytes.
+Judge's bell retains its complete endpoint-hit behaviour, both sounds, and
+conditional effect binding. Its native particle lifetime still needs a properly
+allocated graphics fixture with the next changed effect batch; the previous
+fixture omitted that allocation. Do not repeat the passed bell checks.
+
+Room code uses 6,712 of 16,384 bytes; bootstrap uses 1,509 of 1,536 bytes.
 Scroll code has 4 bytes spare, audio has 288 conservative bytes spare, and
-the import reservation has 1,492,544 bytes spare. No fixed RAM or saved field
-is added in this batch. Live synthesis, GPU appearance, ordinary gameplay/
-save/restart, and original hardware are not newly verified.
+the import reservation has 1,492,544 bytes spare. Live synthesis, GPU appearance,
+ordinary gameplay/save/restart, and original hardware are not newly verified.
 
-Saved format 4 is unchanged. A save using judge's bell requires its selected import
-in the receiving build; preserve backups and equal-or-larger profiles. Format-4
-saves cannot load in V2 or format-1/2/3 V3 builds. Translation-only output remains
-the pinned V2-12 ROM. The main lock and both stable deployments remain unchanged.
-Continue remaining model, material, animation, and behaviour conversion work;
-the code-entry frontend remains parked.
+Saved format 4 is unchanged. A save using festive candle requires its selected
+import in the receiving build; preserve backups and equal-or-larger profiles.
+Format-4 saves cannot load in V2 or format-1/2/3 V3 builds. Translation-only output
+remains the pinned V2-12 ROM. The main lock and both stable deployments remain
+unchanged. Continue remaining model, material, animation, and behaviour
+conversion, including Mouth of Truth's surprise/rumble and starman's
+player-colour/switch coordination. The code-entry frontend remains parked.
 
 The retained password-engine component is ABI 197 at
 `build/v3-password-runtime-05/build-lock.json`. The shared password codec,

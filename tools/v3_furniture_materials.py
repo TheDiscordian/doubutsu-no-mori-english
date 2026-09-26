@@ -104,6 +104,33 @@ def bindings(adapter):
     return result
 
 
+def initializer_lifecycle(source,profile):
+    """Recognise a complete invalid-work-index initializer with inert updates.
+
+    Work locations belong to the adapter's private non-rig storage. The donor's
+    larger actor offsets must never be written into a native instance.
+    """
+    adapter=profile.get('callback_adapter',{});functions=adapter.get('functions',{})
+    if adapter.get('category')!=CATEGORY or set(functions)!={'create','move','draw','destroy'}:return None
+    expected={'create':bytes.fromhex('3800ffffb003082a4e800020'),
+              'move':bytes.fromhex('4e800020'),'destroy':bytes.fromhex('4e800020')}
+    for role,raw in expected.items():
+        f=functions[role]
+        if f['bytes']!=len(raw) or f['relocations'] or f['sha256']!=sha256(raw):return None
+        if source is not None and source.function(f['offset'])[0]!=raw:
+            raise ValueError('Changed complete material initializer lifecycle')
+    return dict(category='material-work-initializer',source_offset=0x82A,native_offset=0x1A4,
+        initial_value=-1,functions={role:dict(functions[role]) for role in expected})
+
+
+def checked_initializer(source,profile,binding):
+    lifecycle=initializer_lifecycle(source,profile)
+    if (lifecycle is None or not binding.get('lifecycle_installed') or binding.get('lifecycle')!=1 or
+            binding.get('material_lifecycle')!=lifecycle or binding.get('state_offset')!=lifecycle['native_offset']):
+        raise ValueError('Incomplete installed material initializer lifecycle')
+    return lifecycle
+
+
 def runtime_record(row):
     """Translate a fully checked source descriptor into the shared draw ABI."""
     from v3_registry import furniture_identity

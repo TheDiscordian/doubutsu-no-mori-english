@@ -1,6 +1,9 @@
 /* Complete shared room rigs; each record retains its actual behaviour. */
 #include "room_rigs.h"
 #include "room_motion.h"
+#ifdef AF_V3_ROOM_MATERIALS
+#include "room_materials.h"
+#endif
 #ifdef AF_V3_ROOM_EFFECTS
 #include "room_effects.h"
 #endif
@@ -143,7 +146,13 @@ static const RoomRigRecord *find(u32 index) {
 
 void af_v3_room_rig_ct(RoomRig *actor,u8 *data) {
     const RoomRigRecord *r=find(actor->index);
-    if (!r || !data) return;
+    if (!data) return;
+    if (!r) {
+#ifdef AF_V3_ROOM_MATERIALS
+        af_v3_room_material_ct(actor,data);
+#endif
+        return;
+    }
     u8 *skeleton=Lib_SegmentedToVirtual((void *)(uptr)r->skeleton);
     void *animation=Lib_SegmentedToVirtual((void *)(uptr)r->animation);
     if (skeleton[0]!=r->joints || skeleton[1]!=r->shown) return;

@@ -75,7 +75,7 @@ def install_profiles(base,prior,blob,core,original,output,directories):
     from v3_furniture_install import profile,provenance_patch
     from v3_furniture_pipeline import identity_rows,name_metadata
     from v3_import_storage import ROWS_RAM
-    from v3_furniture_materials import CATEGORY as MATERIAL_CATEGORY
+    from v3_furniture_materials import CATEGORY as MATERIAL_CATEGORY,initializer_lifecycle,checked_initializer
     from v3_furniture_scroll import (CATEGORY as SCROLL_CATEGORY,VTABLE as SCROLL_VTABLE,
                                     draw_only_lifecycle,checked_runtime,checked_lifecycle,profile_lifecycle)
     from v3_sound_programs import furniture_trigger,checked_furniture_loops
@@ -103,7 +103,7 @@ def install_profiles(base,prior,blob,core,original,output,directories):
     contracts.update(checked_contracts(source,base,prior))
     old=copy.deepcopy(prior.get('staged_furniture',dict(format='AFV3-STAGED-FURNITURE-PROFILES-1',rows=[],sources=[])))
     if old['format']!='AFV3-STAGED-FURNITURE-PROFILES-1':raise ValueError('Unknown staged furniture format')
-    occupied=set();staged=[];evidence=[];deferred=[]
+    occupied=set();staged=[];evidence=[];deferred=[];material_code_changed=False
     limit=checked_limit(base,prior)
     for directory in directories:
         if not directory.is_relative_to(ROOT/'build'):raise ValueError('Profiles require ignored prepared artwork')
@@ -129,8 +129,13 @@ def install_profiles(base,prior,blob,core,original,output,directories):
                 if (binding['object_bytes']!=len(data) or binding['object_sha256']!=sha256(data) or
                         blob[at:at+len(data)]!=data):raise ValueError('Changed retained ordinary profile artwork')
                 continue
+            initial=initializer_lifecycle(source,descriptor) if category==MATERIAL_CATEGORY else None
             if category==MATERIAL_CATEGORY:
                 installed=materials.get(donor)
+                if installed and initial and not installed.get('lifecycle_installed'):
+                    installed.update(lifecycle=1,state_offset=initial['native_offset'],
+                        material_lifecycle=initial,lifecycle_installed=True)
+                    material_code_changed=True
                 if not installed or not installed.get('lifecycle_installed'):
                     deferred.append(dict(source_item_id=donor,reason='Material lifecycle remains incomplete'))
                     continue
@@ -191,6 +196,16 @@ def install_profiles(base,prior,blob,core,original,output,directories):
                         raise ValueError('Hit rig needs its complete installed source audio')
                     checked_hit_condition(base,prior,trigger,sound,audio)
                     sound['profile_installed']=True
+            elif category==MATERIAL_CATEGORY and initial:
+                installed=materials[donor]
+                checked_initializer(source,descriptor,installed)
+                if (installed['profile_installed'] or
+                        {k:v for k,v in installed['source'].items() if k!='reused_artwork'}!=
+                        {k:v for k,v in row.items() if k!='reused_artwork'} or
+                        installed['bytes']!=len(data) or installed['sha256']!=sha256(data) or
+                        blob[installed['blob_offset']:installed['blob_offset']+len(data)]!=data):
+                    raise ValueError('Material initializer lacks its complete installed renderer/assets')
+                vrom=installed['vrom'];vtable=MATERIAL_VTABLE;reused_asset=True
             else:
                 installed=sounds.get(donor);audio=result.get('furniture_audio',{})
                 audio_row=next((r for r in audio.get('furniture',[]) if r['item_id']==donor),None)
@@ -218,6 +233,7 @@ def install_profiles(base,prior,blob,core,original,output,directories):
                     vtable=SOUND_VTABLE;reused_asset=False
                 installed.update(blob_offset=vrom-BLOB,vrom=vrom,bytes=len(data),sha256=sha256(data),source=row)
             generated=copy.deepcopy(row);generated['room_runtime']=dict(vtable=vtable,vrom=vrom)
+            if initial:generated['room_lifecycle']=initial
             if category==SCROLL_CATEGORY:generated['room_lifecycle']=lifecycle
             if category==SCROLL_CATEGORY and lifecycle.get('start_disabled'):generated['room_placement']=placement
             native=profile(generated,vrom,limit=limit)
@@ -237,14 +253,17 @@ def install_profiles(base,prior,blob,core,original,output,directories):
                 profile_ram=ROWS_RAM+i*80+8,profile_hex=native.hex(),profile_record_sha256=sha256(profile_record),
                 item_record_sha256=sha256(record),source_profile_sha256=descriptor['profile_sha256'],
                 room_runtime=generated['room_runtime'],profile_installed=True,item_record_installed=True,
+                **({'room_lifecycle':initial} if initial else {}),
                 **({'room_placement':placement} if generated.get('room_placement') else {}),
                 selected=False,acquisition_installed=False,catalogue_installed=False,scoring_installed=False))
     if not staged:raise ValueError('Empty complete furniture profile batch')
+    if material_code_changed:publish_packet(result,blob,output)
     old['rows']=sorted(old['rows']+staged,key=lambda r:r['runtime_index']);old['sources'].extend(evidence)
     old.update(profile_bits_changed=False,additional_resident_bytes=0)
-    if deferred:
+    if deferred or old.get('deferred_resources'):
         combined={r['source_item_id']:r for r in old.get('deferred_resources',[])+deferred}
-        for row in staged:combined.pop(f'{furniture_source(row)[0]:04X}',None)
+        for donor in set(retained)|{f'{furniture_source(row)[0]:04X}' for row in old['rows']}:
+            combined.pop(donor,None)
         old['deferred_resources']=sorted(combined.values(),key=lambda r:r['source_item_id'])
     patch=provenance_patch(staged)
     if patch:write_new(output/'provenance.patch',patch.encode())
@@ -258,7 +277,7 @@ def bind_profiles(source,base,report):
     normal acquisition, catalogue, scoring, and selection checks still apply.
     """
     from v3_furniture_install import profile
-    from v3_furniture_materials import CATEGORY as MATERIAL_CATEGORY
+    from v3_furniture_materials import CATEGORY as MATERIAL_CATEGORY,initializer_lifecycle,checked_initializer
     from v3_furniture_scroll import CATEGORY as SCROLL_CATEGORY,VTABLE as SCROLL_VTABLE,checked_lifecycle,checked_runtime
     from v3_sound_programs import furniture_trigger,checked_furniture_loops
     from v3_furniture_behaviours import checked_initial_switch,initial_switch_source
@@ -313,7 +332,12 @@ def bind_profiles(source,base,report):
                 raise ValueError('Incomplete installed scrolling lifecycle')
             art['room_lifecycle']=lifecycle
             if lifecycle.get('start_disabled'):art['room_placement']=placement
-        if category==MATERIAL_CATEGORY:
+        if category==MATERIAL_CATEGORY and initializer_lifecycle(source,descriptor):
+            art['room_lifecycle']=checked_initializer(source,descriptor,binding)
+            ct=int.from_bytes(bytes.fromhex(runtime['material_vtable_hex'])[:4],'big')
+            if ct!=runtime['bootstrap']['symbols']['af_v3_room_boot_ct']:
+                raise ValueError('Missing native material constructor dispatch')
+        elif category==MATERIAL_CATEGORY:
             trigger=furniture_trigger(source,descriptor)
             sound=next((r for r in runtime['sound_rows'] if r['source_item_id']==donor),None)
             if (not binding.get('lifecycle_installed') or binding.get('move_category')!='switch-trigger-sound' or
@@ -336,6 +360,7 @@ def bind_profiles(source,base,report):
         current=blob[ROWS+i*80:ROWS+(i+1)*80];record=blob[ITEMS+i*32:ITEMS+(i+1)*32]
         expected=struct.pack('>HHI',1024+i,item,int(enabled))+native+bytes(4)
         if (art['profile']!=json.loads(json.dumps(descriptor)) or row['room_runtime']!=art['room_runtime'] or
+                category==MATERIAL_CATEGORY and row.get('room_lifecycle')!=art.get('room_lifecycle') or
                 row.get('room_placement')!=art.get('room_placement') or
                 not 0<=at<at+n<=len(blob) or sha256(blob[at:at+n])!=art['object_sha256'] or
                 current!=expected or record[:8]!=struct.pack('>HHHBB',1024+i,item,row['price'],descriptor['size_code'],int(enabled)) or
@@ -424,18 +449,19 @@ def encode_materials(rows):
     for r in rows:
         index,n,mode,segment=r['runtime_index'],r['bytes'],r['mode'],r['segment']
         frames,models=r['frame_offsets'],r['model_offsets'];size=r['frame_bytes']
-        divisor,state,kind=r['divisor'],r['state_offset'],r['kind']
+        divisor,state,kind=r['divisor'],r['state_offset'],r['kind'];lifecycle=r.get('lifecycle',0)
         if (not 1024<=index<2048 or not 32<=n<=9216 or n&15 or mode not in (0,1,2) or
                 segment not in (8,9) or not 1<=len(frames)<=8 or not 1<=len(models)<=4 or
                 kind not in (0,1) or not 0<size<=n or kind==0 and size!=32 or
                 mode==2 and (state!=0x1A4 or len(frames)!=2 or divisor) or
-                mode!=2 and (state or not 0<divisor<=65535) or
+                lifecycle not in (0,1) or lifecycle and mode!=0 or
+                mode!=2 and (state!=(0x1A4 if lifecycle else 0) or not 0<divisor<=65535) or
                 mode==1 and (len(frames)!=4 or divisor!=10) or
                 any(p&7 or not 0<=p<=n-size for p in frames) or
                 any(p&7 or not 0<=p<=n-8 for p in models)):
             raise ValueError('Invalid complete material selector, resources, or native bounds')
         table.extend(struct.pack('>HH4B2H4H8HH2B',index,n,mode,segment,len(frames),len(models),divisor,size,
-            *(models+[0]*(4-len(models))),*(frames+[0]*(8-len(frames))),state,kind,0))
+            *(models+[0]*(4-len(models))),*(frames+[0]*(8-len(frames))),state,kind,lifecycle))
     return bytes(table)
 
 
@@ -531,6 +557,7 @@ def publish_packet(equipment,blob,output):
     table_delta=table_ram-PACKET_TABLE
     sound_rows=runtime.get('sound_rows',[]);material_rows=runtime.get('material_rows',[])
     defines=('AF_V3_ROOM_RIG_PACKET',)+(('AF_V3_ROOM_TRIGGER_SOUND',) if sound_rows else ())
+    if material_rows:defines+=('AF_V3_ROOM_MATERIALS',)
     billboard=any(r.get('mode')==4 for r in runtime['rows'])
     if billboard:defines+=('AF_V3_ROOM_BILLBOARD',)
     if any(r.get('mode')==5 for r in runtime['rows']):defines+=('AF_V3_ROOM_ROLLING',)
@@ -618,7 +645,8 @@ def publish_packet(equipment,blob,output):
         entry=bootstrap['symbols']['af_v3_room_boot_material_dw']
         if entry&3 or not RAM<=entry<RAM+len(boot):raise ValueError('Material bootstrap escapes reservation')
         move=bootstrap['symbols']['af_v3_room_boot_sound_mv'] if any(r.get('move_category')=='switch-trigger-sound' for r in material_rows) else 0
-        material_vtable=struct.pack('>5I',0,move,entry,0,0)
+        create=bootstrap['symbols']['af_v3_room_boot_ct'] if any(r.get('lifecycle') for r in material_rows) else 0
+        material_vtable=struct.pack('>5I',create,move,entry,0,0)
         module[MATERIAL_VTABLE-EQUIPMENT_RAM:MATERIAL_VTABLE-EQUIPMENT_RAM+20]=material_vtable
         runtime.update(material_vtable=MATERIAL_VTABLE,material_vtable_hex=material_vtable.hex(),material_table=MATERIAL_TABLE+table_delta)
     module[VTABLE-EQUIPMENT_RAM:VTABLE-EQUIPMENT_RAM+20]=vtable

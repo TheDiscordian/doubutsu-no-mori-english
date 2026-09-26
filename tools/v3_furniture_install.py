@@ -98,8 +98,11 @@ def profile(row, vrom, *, limit=END):
             raise ValueError('Sound profile requires its complete installed room lifecycle')
     if material:
         from v3_room_rig_runtime import MATERIAL_VTABLE
+        from v3_furniture_materials import initializer_lifecycle
+        initial=initializer_lifecycle(None,row['profile'])
         if (row.get('room_runtime')!={'vtable':MATERIAL_VTABLE,'vrom':vrom} or
-                set(adapter['functions'])!={'move','draw'} or set(offsets)!=set(layers)):
+                (row.get('room_lifecycle')!=initial if initial else set(adapter['functions'])!={'move','draw'}) or
+                set(offsets)!=set(layers)):
             raise ValueError('Prepared resources have no implemented native material lifecycle')
         pointers=[0,0,0,0]
     if scrolling:
@@ -420,6 +423,9 @@ def build(output, art_path, lock=LOCK):
         promoted={r['item_id'] for r in installed}
         promoted_sources={f'{furniture_source(r)[0]:04X}' for r in installed}
         report['staged_furniture']['rows']=[r for r in report['staged_furniture']['rows'] if r['item_id'] not in promoted]
+        complete={f'{furniture_source(r)[0]:04X}' for r in all_furniture['imports']+report['staged_furniture']['rows']}
+        report['staged_furniture']['deferred_resources']=[r for r in report['staged_furniture'].get('deferred_resources',[])
+            if r['source_item_id'] not in complete]
         runtime=report['equipment_resources']['room_rigs']
         for row in runtime['rows']+runtime['sound_rows']+runtime.get('material_rows',[])+runtime.get('scrolling',{}).get('rows',[]):
             if row['source_item_id'] in promoted_sources:row['parent_selectable']=True

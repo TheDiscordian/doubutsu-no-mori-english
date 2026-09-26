@@ -14,8 +14,8 @@ material, or rig converter. Keep incomplete gameplay out of selectable imports.
 
 Furniture `import` plans implemented category dependencies from the selected
 source records and checked current build. Clock, storage, hit-animation,
-camera-facing scrolling, and displacement-driven rolling rigs share this path.
-Missing rig resources, required audio, and complete behaviour
+camera-facing scrolling, displacement-driven rolling rigs, and implemented
+material lifecycles share this path. Missing rig/material resources, required audio, and complete behaviour
 profiles are installed through the existing guarded runtime builder in that
 order. Ordinary item installation follows a fresh eligibility check against the
 resulting build. Missing acquisition remains explicit, not fabricated shop stock.
@@ -31,7 +31,8 @@ claim that pending items are available to players.
 shared room code and its bound callback profiles from an explicit current build
 lock. It preserves installed models, audio, selections, and saved fields. Use
 this after changing shared code when no new resource category needs installation;
-profile-only staging does not implicitly recompile an existing code packet.
+profile-only staging retains existing code unless it installs a newly implemented
+material lifecycle; that stage rebuilds the shared packet and callback bindings.
 
 ### Displacement-driven rolling rigs
 
@@ -647,21 +648,22 @@ and the primitive-times-shade, opaque untextured combiner.
 This shared category prepares the coin, ? block, starman, fire flower, festive
 candle, and Mouth of Truth together. Descriptors distinguish room/preview
 counters, division/modulo timing, switch-dependent stopping, and an actor-state
-selector. Source lifecycle receipts remain attached and pending. The artwork
+selector. Source lifecycle receipts remain attached. The artwork alone
 does not implement sounds, surprise/rumble, player colour changes, or switch
-coordination. Ordinary metadata and the
-native profile writer both reject this category, including a forged runtime
-annotation. Use `convert --assets-only --category material-frame-assets` with the
+coordination. Ordinary metadata and the native profile writer require a complete
+checked lifecycle, not a forged runtime annotation.
+Use `convert --assets-only --category material-frame-assets` with the
 current explicit build lock; reuse the resulting complete objects through
 `--refresh-runtime --material-frames-art <prepared-directory>`.
 
 The shared native material renderer uses a checked 40-byte record containing
 stable destination index, complete object size, selector mode, segment, counts,
 division, complete frame size, four model offsets, eight frame offsets, native
-private-state offset, and material kind. All unused fields are zero. The table
-at `804B9E20` holds eleven records and fits the unused end of the existing 8-KiB
-room packet. Its header is `AFM1`, count, stride, and zero. Code uses the existing
-4-KiB code half; no new allocation or object header is needed. The stable vtable
+private-state offset, material kind, and lifecycle selector. All unused fields
+are zero. Eleven records fit at table offset `E20`: `804B9E20` in the original
+8-KiB packet, or `804CCE20` in the extended 20-KiB packet. Its header is `AFM1`,
+count, stride, and zero. Code uses the packet's existing code reservation;
+no new allocation or object header is needed. The stable vtable
 at `804B1E10` routes drawing through the same checked packet loader and caches.
 Other refresh operations retain this table and vtable.
 
@@ -680,11 +682,33 @@ one matrix and all commands together, binds an immutable complete palette or
 texture, then submits every model in donor order. Crowded or malformed arenas
 produce no partial draw. Ordinary profiles require a checked complete lifecycle
 binding, not just an installed renderer or a forged readiness annotation.
-Material objects with complete installed switch-trigger moves use the shared
-profile staging path; other lifecycles remain refused. Acquisition stays
+Material objects with complete installed switch-trigger moves or the checked
+invalid-index initializer use the shared profile staging path. Acquisition stays
 independent. Mouth of Truth's reviewed legacy source `1FD8` has the append-only
 destination `3C30`, runtime index 1804; the native worksheet correspondence and
 approved translation map contain no existing native identity for that source.
+
+The invalid-index initializer recognises complete source create/move/destroy
+callbacks: signed halfword `-1` at donor `82A`, followed by inert updates and
+destruction. Relocations, lengths, digests, and actual donor instructions must
+all match. Lifecycle byte 1 maps that work field to private native `1A4`; the
+renderer remains timed mode 0. It does not claim a general linear correspondence
+between donor and native actor offsets. Lifecycle 0 retains its previous no-op
+construction. Unknown lifecycle/mode/work combinations reject.
+
+The existing room constructor dispatches non-rig records to the material
+constructor. The material vtable reuses the existing CRC-checked constructor
+bootstrap; no extra bootstrap entry, allocation, or saved field is added.
+Construction changes only the mapped halfword, including catalogue aliases,
+while all model/frame resources remain immutable. Source frame timing and light
+scalar remain intact. `import --category material-frame-assets` discovers missing
+renderer, sound, and complete profile stages automatically, skips installed
+dependencies, and then uses ordinary eligibility. This enables festive candle
+through its donor train/Christmas stock and catalogue route, while missing
+Mario acquisition and the other material behaviours remain explicit.
+
+Completed profiles and ordinary imports are removed from deferred-resource
+reports. An old pending receipt cannot override a verified installed lifecycle.
 
 The `static-models-pending-move` resource category separates ordinary profile
 drawing from an unfinished move-only callback. It requires complete direct model

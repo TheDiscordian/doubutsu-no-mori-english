@@ -9,7 +9,7 @@ typedef struct {
     u16 divisor, frame_bytes;
     u16 model_offsets[4], frame_offsets[8];
     u16 state_offset;
-    u8 kind, reserved;
+    u8 kind, lifecycle;
 } RoomMaterialRecord;
 typedef struct {
     u32 magic,count,stride,reserved;
@@ -31,4 +31,5 @@ ROOM_CHECK(RoomMaterialPlay,play_frame,0x1EA0);
 extern RoomMaterialTable af_v3_test_room_materials;
 #define room_material_table (&af_v3_test_room_materials)
 #endif
+extern void af_v3_room_material_ct(RoomRig *,u8 *);
 #endif

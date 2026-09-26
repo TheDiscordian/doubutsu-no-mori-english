@@ -27,7 +27,7 @@ int main(int argc,char **argv) {
         r->divisor=read_word(input,2);r->frame_bytes=read_word(input,2);
         for (unsigned j=0;j<4;++j)r->model_offsets[j]=read_word(input,2);
         for (unsigned j=0;j<8;++j)r->frame_offsets[j]=read_word(input,2);
-        r->state_offset=read_word(input,2);r->kind=read_word(input,1);r->reserved=read_word(input,1);
+        r->state_offset=read_word(input,2);r->kind=read_word(input,1);r->lifecycle=read_word(input,1);
     }
     assert(fgetc(input)==EOF);fclose(input);
     _Alignas(16) u8 model[9216],arena[512];memset(model,0x83,sizeof(model));
@@ -37,6 +37,10 @@ int main(int argc,char **argv) {
         RoomMaterialRecord *r=table->rows+n;
         for (unsigned room=0;room<2;++room) for (unsigned on=0;on<2;++on) {
             memset(&guarded,0xA7,sizeof(guarded));actor->index=r->index+(room ? 0 : 1024);
+            RoomRig initialized=*actor;
+            if (r->lifecycle==1)*(s16 *)((u8 *)&initialized+0x1A4)=-1;
+            af_v3_room_material_ct(actor,model);
+            assert(!memcmp(actor,&initialized,sizeof(initialized)));
             ((u8 *)actor)[0x12C]=(u8)on;
             for (unsigned tick=0;tick<300;++tick) {
                 /* Last three samples exercise unsigned wrapping and negative
@@ -90,7 +94,7 @@ int main(int argc,char **argv) {
         if (bad==9)r->frame_bytes=r->bytes+1;
         if (bad==10)r->model_offsets[0]=r->bytes;
         if (bad==11)r->frame_offsets[0]=r->bytes;
-        if (bad==12)r->reserved=1;
+        if (bad==12)r->lifecycle=2;
         if (bad==13)r->state_offset=0x82C;
         if (bad==14)r->frame_offsets[7]=1; /* Current complete banks use at most seven entries. */
         if (bad==15)gfx.tail=arena+64;
@@ -99,9 +103,18 @@ int main(int argc,char **argv) {
         if (bad==18)gfx.tail=arena;
         RoomCommand *head=gfx.head;u8 *tail=gfx.tail;unsigned before_count=matrices;
         af_v3_room_material_dw(actor,actor,&play.game,model);
+        if (bad<15) {
+            RoomRig before=*actor;
+            af_v3_room_material_ct(actor,model);
+            assert(!memcmp(actor,&before,sizeof(before)));
+        }
         assert(matrices==before_count && gfx.head==head && gfx.tail==tail);*table=original;
     }
     unsigned before_count=matrices;
+    RoomRig before=*actor;
+    af_v3_room_material_ct(NULL,model);
+    af_v3_room_material_ct(actor,NULL);
+    assert(!memcmp(actor,&before,sizeof(before)));
     af_v3_room_material_dw(NULL,NULL,&play.game,model);
     af_v3_room_material_dw(actor,NULL,NULL,model);
     af_v3_room_material_dw(actor,NULL,&play.game,NULL);
