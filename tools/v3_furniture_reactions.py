@@ -10,6 +10,7 @@ import struct
 from aflib import CODE_RAM, CODE_VROM, by_vrom, sha256
 
 CATEGORY = 'timed-surprise-material'
+COLOUR_CATEGORY = 'exclusive-player-colour-loop'
 ENGINE_START, ENGINE_END = 0x935D4, 0x93DAC
 WAVES_START, WAVES_END, WAVE_TABLE = 0x22F0, 0x2464, 0x23C4
 ENGINE_SHA = '767cb482bcfbec50e2339f9cbf52072bad14ae55d4ef1742720a3640b9ca572e'
@@ -139,6 +140,87 @@ def source_lifecycle(source, profile):
                       angle_offset=0xDE, native_player_offset=0x1C90,
                       native_state_offset=0xCF0, native_shock_state=0x61),
         callback_installed=False)
+
+
+def colour_lifecycle(source, profile):
+    """Bind the full exclusive-switch loop and its actual player-colour consumers.
+
+    This is a source descriptor, not evidence of native player-draw integration.
+    The sound batch can be prepared while the complete lifecycle is connected.
+    """
+    from v3_furniture_materials import CATEGORY as MATERIAL
+    adapter = profile.get('callback_adapter', {})
+    functions = copy.deepcopy(adapter.get('functions', {}))
+    if (adapter.get('category') != MATERIAL or functions.get('move', {}).get('sha256') !=
+            'a7190b59a2ea0fc81a0de835efc1d7f988c999906bc4fa2094893a2c17285493'):
+        return None
+    if set(functions) != {'create', 'move', 'draw'} or adapter.get('pending_profile_fields'):
+        raise ValueError('Changed complete exclusive-colour lifecycle')
+    for role in ('create', 'move'):
+        if source.function(functions[role]['offset'])[1] != functions[role]:
+            raise ValueError('Changed complete exclusive-colour callback')
+    create = functions['create']
+    if (create['bytes'] != 12 or create['relocations'] or create['sha256'] !=
+            'aa0ae11bb7776e75009f3036e23193be2e2ca28470dcb9ebbd1eea377039ef4f'):
+        raise ValueError('Changed exclusive-colour switch initializer')
+    frames = adapter.get('material_frames', [])
+    if (len(frames) != 1 or frames[0]['selector'] != dict(input='room-or-preview-frame',
+            division=10, modulo=4, signed=True, stopped_in_room_when_switch_off=True)):
+        raise ValueError('Changed complete switched palette selector')
+    move = functions['move']
+    helpers = source.checked_callback_code(move, 144,
+        'b8bdeacdd0939d0c6adfc54e517bfce4928922ac363033572f6fb42e5e9204fb', {},
+        {0x4C: (0x2BDD84, 'sAdo_OngenPos'), 0x50: (0x6E5C4, 'mPlib_Set_change_color_request'),
+         0x70: (0x103E0C, 'aMR_SameFurnitureSwitchOFF')}, 'exclusive player colour loop')
+    loop = helpers['sAdo_OngenPos']
+    if (loop['bytes'] != 100 or loop['sha256'] !=
+            'b982dbca7ed68e0565b554e142e64d69a1d2c47ec061169d114502a25e61f885' or
+            loop['relocations'] != {72:(10,0,4,0x80012E2C),10:(6,1,6,2306744),34:(4,1,6,2306744)}):
+        raise ValueError('Changed complete exclusive-colour loop helper')
+    consumers = {}
+    for name, at, size, digest, links in (
+        ('request', 0x6E5C4, 52,
+         '4579949df53398a31f9b2fc5c7d8e198a3b46a14814df4afa781bfa0b389993a',
+         '7bae22be2ad13329fee72435fd33fd188b3c2c92b92d72b9de962d4a1a6efdc3'),
+        ('exclusive_switch', 0x103E0C, 96,
+         '5b4e4d21f6bd4bb2eeed0dff465ab8e6189a0035cdd84001ec7eedb5c4db513f',
+         'b4929e14576c094b0f571fdc94f5fa60766ce3786e8adb4670801919acea6d80'),
+        ('update', 0x16E8B8, 140,
+         'e928928d88b0a2e8186ac8653344a48ec4fa3365cbb4ddce4e5ad8b840d2710d',
+         '9898445a3b0562db17a16578af987880f4c43fba5aa7124367ebdce4d5db174c'),
+        ('draw', 0x1741C4, 1444,
+         '1d67fff479c10b2c3224bf90945128dd1855e7a14e2df32dc751864671b6ce14',
+         'fa3626f406a55b6ed514a1cc5b8bd50ddbde52ee8aae6c60fa7c126148b266fb'),
+        ('fog', 0x74EA0, 88,
+         '0ccecb8d1814b6e783bda8e869012327f06532f06b6067de4d7c17e6f389efdf',
+         '4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945')):
+        _, consumers[name] = checked_region(source, 1, at, at+size, digest, links)
+    constants = {}
+    for name, offset, expected in (
+        ('step',0x53F0,'3f800000'), ('zero',0x53F4,'00000000'), ('period',0x6B68,'429f5c29'),
+        ('colour_frames',0x71C4,'411f5c29'), ('near',0x71C8,'43520000'),
+        ('far',0x71CC,'44430000'), ('distance_bias',0x71D0,'43b00000'),
+        ('distance_scale',0x71D4,'3d913f8c'), ('distance_fraction',0x71D8,'3e800000')):
+        raw = source.rel[source.sections[4][0]+offset:source.sections[4][0]+offset+4]
+        if raw.hex() != expected:
+            raise ValueError('Changed source player-colour constant: '+name)
+        constants[name] = dict(offset=offset, hex=expected, value=struct.unpack('>f',raw)[0])
+    origin = source.sections[4][0]+0x7194
+    raw = source.rel[origin:origin+48]
+    if sha256(raw) != '6426871f1f5ddb91ca087bea8c46ba2d6831ccbdb446e6999c644f1e60b88dde':
+        raise ValueError('Changed complete player-colour table')
+    words = struct.unpack('>12I',raw)
+    # The compiled draw indexes three rows at stride 3, including column 3.
+    # Preserve the actual binary accesses through one bounded flat table;
+    # copying the decompiler's [4][3] C indexing would invoke undefined behaviour.
+    colours = [[words[channel*3+frame] for channel in range(3)] for frame in range(4)]
+    return dict(category=COLOUR_CATEGORY, functions=functions, helpers=helpers,
+        consumers=consumers, constants=constants,
+        colours=dict(offset=0x7194, bytes=48, sha256=sha256(raw), rgb=colours),
+        source_sound_id=95, exclusive_source_index=1223, source_steps_per_native_update=2,
+        excluded_states=[12,13,14,15], state_offset=0x3C, position_offset=8,
+        source_switch_offset=0x12C, source_changed_offset=0x12D, start_disabled=True,
+        switch_clicks=[], callback_installed=False)
 
 
 NATIVE_BLOCKS = (

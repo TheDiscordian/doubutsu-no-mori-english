@@ -1414,7 +1414,7 @@ def main():
         return
     if args.representation=='audio' and args.command=='convert':
         from v3_sound_programs import prepare_furniture_audio
-        report=prepare_furniture_audio(base,base_report,source,scan(source,worksheet,installed),
+        report=prepare_furniture_audio(base,base_report,source,scan(source,worksheet,installed,selected=args.select),
             output,args.select,args.category)
         print(json.dumps(dict(furniture=len(report['furniture']),programs=len(report['programs']),
             new_instruments=report['layout']['instrument_count']-report['layout']['native_instrument_count'],

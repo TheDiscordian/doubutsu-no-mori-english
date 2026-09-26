@@ -2031,6 +2031,42 @@ saved-state preservation, and bounds. Its disconnected accessory and captured
 player callback do not establish actual SI motor transfers, ordinary player
 animation, or hardware rumble.
 
+## Exclusive player-colour material loops
+
+`convert --assets-only --representation audio --category exclusive-player-colour-loop`
+uses the existing shared sound importer. Discovery checks complete create/move
+callbacks, the switched four-palette selector, positioned sound, player-colour
+request/update/draw consumers, same-furniture switch traversal, fog helper,
+and read-only timing/colour constants. No item-ID installer is added. Selected
+audio preparation scans only requested source records.
+
+The complete source lifecycle starts switched off. Non-transition updates
+refresh the positioned loop and request player colour while switched on. An
+on-transition switches every used instance of the source identity off, then
+restores the initiating instance to on. Native state numbers, list layout,
+actor size, and relocation must be mapped explicitly before enabling this
+lifecycle. A compiled source descriptor or installed sound is not that binding.
+
+The donor player effect consumes its request every update. Continuous requests
+advance a float timer by one donor tick, wrapping at the exact binary 79.68
+constant; activation starts at zero. Drawing divides by the binary 9.96
+constant, alternates disabled fog with colour phases, and restores ordinary
+scene fog immediately after the player skeleton, before drawing held items.
+The donor binary indexes three rows at stride three including column three.
+Its actual four RGB results are `(255,100,255)`, `(255,255,255)`, `(100,100,100)`,
+and `(100,255,255)`. Preserve those accesses through bounded flat indexing;
+the decompiler's `[4][3]` expression would otherwise invoke undefined behaviour.
+
+Sustained single-layer loops support an optional custom-envelope command.
+Without that command, the complete instrument's own envelope and decay remain
+authoritative. Mode, note, duration, velocity, and restart target are retained;
+channel/layer pointers and instrument selectors alone relocate. Unknown commands,
+zero-duration events, escaping pointers, and unaccounted tails reject.
+Both envelope forms use the same source/native instrument and sample comparison.
+
+Native player-colour and exclusive-switch callbacks remain uninstalled. Keep
+this material unavailable until those behaviours and real acquisition are ready.
+
 ## Verification policy
 
 `tests/test_v3_furniture_pipeline.py` checks shared parser rules, source

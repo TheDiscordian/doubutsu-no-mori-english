@@ -271,6 +271,10 @@ def prepare_furniture_audio(image,report,source,inventory,output,selected=(),cat
     from v3_furniture_scroll import CATEGORY as SCROLL_CATEGORY
     if category==SCROLL_CATEGORY:
         return prepare_furniture_levels(image,report,source,inventory,output,selected)
+    from v3_furniture_reactions import COLOUR_CATEGORY
+    if category==COLOUR_CATEGORY:
+        return prepare_furniture_levels(image,report,source,inventory,output,selected,
+                                        lifecycle_category=COLOUR_CATEGORY)
     if category=='room-movement':
         from v3_room_movement import prepare_audio
         return prepare_audio(image,report,source,output,selected)
@@ -312,6 +316,9 @@ def furniture_level(source,profile):
     """
     from v3_furniture_scroll import CATEGORY
     adapter=profile.get('callback_adapter',{});functions=copy.deepcopy(adapter.get('functions',{}))
+    if adapter.get('category')=='material-frame-assets':
+        from v3_furniture_reactions import colour_lifecycle
+        return colour_lifecycle(source,profile)
     if adapter.get('category')=='billboard-scroll-keyframe-rig':
         return copy.deepcopy(adapter['level_sound'])
     move=functions.get('move')
@@ -386,7 +393,7 @@ def furniture_level(source,profile):
         callback_installed=False)
 
 
-def prepare_furniture_levels(image,report,source,inventory,output,selected=()):
+def prepare_furniture_levels(image,report,source,inventory,output,selected=(),*,lifecycle_category=None):
     from apply_translation import write_new
     from aflib import CODE_VROM
     previous=report['equipment_resources'].get('furniture_level_audio',{})
@@ -395,7 +402,7 @@ def prepare_furniture_levels(image,report,source,inventory,output,selected=()):
         if row['installed'] or row['item_id'] in installed or not row.get('asset_ready') or selected and row['item_id'] not in selected:
             continue
         contract=furniture_level(source,row.get('profile',{}))
-        if contract is not None:
+        if contract is not None and (lifecycle_category is None or contract['category']==lifecycle_category):
             rows.append(dict(item_id=row['item_id'],name=row['name'],profile_sha256=row['profile']['profile_sha256'],
                 callback=row['profile']['callback_adapter'],lifecycle=contract))
     if not rows or selected and set(selected)!={r['item_id'] for r in rows}:
@@ -505,7 +512,7 @@ def reward_fanfares(image,code,source):
 
 
 def looping_layer(data, origin, *, prefix=False):
-    """Complete single-layer sustained note, custom envelope, and timed loop."""
+    """Complete sustained note and timed loop, with default or custom envelope."""
     start=4 if prefix else 0
     span(data,0,start+11)
     if not 0<=origin<=65536-len(data):raise ValueError('Loop exceeds sequence address space')
@@ -519,10 +526,10 @@ def looping_layer(data, origin, *, prefix=False):
         raise ValueError('Unsupported loop instrument/envelope')
     at=start+6;early_mode=span(data,at,1)==b'\xC4';mode=at
     if early_mode:at+=1
-    env_command=at
-    if span(data,at,1)!=b'\xCB':raise ValueError('Unsupported loop envelope command')
-    envelope=struct.unpack('>H',span(data,at+1,2))[0]-origin
-    env_pointer=at+1;decay=span(data,at+3,1)[0];at+=4
+    env_command=at;envelope=None;env_pointer=None;decay=None
+    if span(data,at,1)==b'\xCB':
+        envelope=struct.unpack('>H',span(data,at+1,2))[0]-origin
+        env_pointer=at+1;decay=span(data,at+3,1)[0];at+=4
     if not early_mode:
         mode=at
         if span(data,at,1)!=b'\xC4':raise ValueError('Missing sustained-note mode')
@@ -536,10 +543,12 @@ def looping_layer(data, origin, *, prefix=False):
     if (not duration or velocity>127 or span(data,at,1)!=b'\xFB'
             or loop not in ((mode,env_command,note_at) if early_mode else (mode,note_at))):
         raise ValueError('Loop target or timed event is incomplete')
-    pointers=[start+1,env_pointer,at+1];at+=3
-    if (origin+envelope)&1 or not at<=envelope<len(data) or any(data[at:envelope]):
-        raise ValueError('Loop envelope alignment or padding changed')
-    env=extended_envelope(data,envelope,minimum_steps=1);end=envelope+len(env)
+    pointers=[start+1]+([env_pointer] if envelope is not None else [])+[at+1];at+=3
+    env=b'';end=at
+    if envelope is not None:
+        if (origin+envelope)&1 or not at<=envelope<len(data) or any(data[at:envelope]):
+            raise ValueError('Loop envelope alignment or padding changed')
+        env=extended_envelope(data,envelope,minimum_steps=1);end=envelope+len(env)
     if len(data)-end>15 or any(data[end:]):raise ValueError('Unaccounted loop tail')
     return dict(origin=origin,bytes=len(data),sha256=sha256(data),instrument=instrument_index,
         pointers=pointers,instrument_offset=start+5,envelope=envelope,envelope_bytes=len(env),

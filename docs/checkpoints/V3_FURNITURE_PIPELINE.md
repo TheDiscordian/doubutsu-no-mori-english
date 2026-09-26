@@ -1,5 +1,94 @@
 # Automatic furniture pipeline checkpoint
 
+## Exclusive colour-loop source and installed audio
+
+Current proposal: ABI 223 at `build/v3-material-colour-audio-runtime-01/build-lock.json`.
+There remain 155 choices. The category's complete sound dependency is installed;
+starman (`331C`) remains inactive until its player-colour and exclusive-switch
+callbacks and actual reward route are complete. Its existing model and four
+palettes are unchanged, as are all installed room behaviours, saves, main lock,
+and stable deployments.
+
+The ordinary source adapter now checks the complete constructor and movement,
+source transition exclusions, switched palette consumer, sound helper, colour
+request and update, full player drawing, same-furniture switch traversal, fog
+helper, and all relevant constants/table entries. Its constructor starts off;
+an on-transition turns other same-identity instances off before retaining the
+initiator. Player colouring uses source fog modulation around the player skeleton,
+not a substitute palette swap affecting clothes, objects, or the whole scene.
+
+The first preparation exposed a supported interpreter form missing from the
+shared parser: a sustained note using its instrument's envelope without a custom
+`CB` command. The parser now handles both forms, preserving exact duration,
+velocity, restart, and full instrument dependencies. This is a shared format
+extension, not a starman-specific sequence rewrite. Selected audio commands
+also avoid rescanning unrelated source records.
+
+Source sound 95 keeps its native slot, using bank 140/instrument 90. The complete
+46,900-byte sample, ADPCM predictor, loop metadata, envelope, tuning, and ranges
+match the donor. Font storage grows 192 bytes and wave storage 46,912 bytes;
+sequence storage grows 32 bytes. Existing memory accommodates these additions,
+leaving 64 conservative permanent-audio bytes spare; no heap increase is needed.
+
+Seven focused checks pass: complete colour-source consumers and mutation
+rejection; four changed-parser cases across custom/default envelopes, relocation,
+truncation, timing, and malformed input; and two installed-cartridge checks for
+full programme/instrument/sample rebinding, retained room/scenery behaviour,
+unchanged artwork/selections/saves, exact empty-selection output, and UPS
+reconstruction. No native audio run, synthesis/listening, or physical playback
+is claimed. Unchanged Mouth of Truth native evidence is retained, not replayed.
+
+Reproduction with new output directories:
+
+```sh
+python3 tools/v3_furniture_pipeline.py convert --assets-only \
+  --representation audio --category exclusive-player-colour-loop --select 331C \
+  --base-lock build/v3-material-reaction-imports-03/cartridge/build-lock.json \
+  --output build/v3-material-colour-audio-prepared-01
+python3 tools/v3_furniture_install.py --refresh-runtime \
+  --furniture-audio-art build/v3-material-colour-audio-prepared-01 \
+  --base-lock build/v3-material-reaction-imports-03/cartridge/build-lock.json \
+  --output build/v3-material-colour-audio-runtime-01
+python3 -m unittest tests.test_v3_room_reactions.InstalledColourAudioTests -v
+```
+
+Hashes (SHA-256):
+
+- ROM: `c8dd73512a09e051784fd0751abcdd274bfa034e31515790dc766b7669d63e4a`.
+- UPS: `8742b9f12c1a78522f45c72b41faf261a97a522ea91b1ae0b7a1ea384d15c57e`.
+- Build report: `d99b5d6faa25c115ea1468912dbc076ce67ecb9c71bab5555d2fe4e1298248f1`.
+- Build lock: `454fe7ededded3fce35b076801074a72f2f12562c7276ec21fa0f4e8465009b7`.
+- Prepared audio report: `260ca9754fbbed177bc4bf938228dddefd6a8c263aedf41739980c00ccad730f`.
+
+Immediate implementation: connect shared material lifecycle construction and
+movement to the installed loop, actual used-instance traversal, and native
+player-colour consumers. Preserve native actor allocation; new transient work
+must have an explicit checked/reset reservation. Extend ordinary category
+planning/profile staging so this complete lifecycle is not another manual item
+installer. The pending Mario reward route remains phase-2 acquisition work.
+
+Useful verified source/inspection locations for that integration:
+
+- `colour_lifecycle` in `tools/v3_furniture_reactions.py` owns the complete source
+  receipts, timing, colours, and source index; do not rederive them from names.
+- Current player disassembly is
+  `build/v3-material-colour-native-bindings-01/player/code.asm`. Normal player
+  drawing begins at `808BFB30`; the six-argument skeleton call at `808BFC60`
+  targets `800530D8`, with actor as its sixth argument. This is a candidate
+  wrapper site, not an installed hook.
+- Native player movement starts at `808DDB5C`. Its common pre-action call at
+  `808DDB70` targets `808BD1A8`; existing action dispatch remains independent.
+  Any wrapper must preserve native relocation, original execution, and timing.
+- Native `gfx_set_fog_nosync` is `800BD37C`, its position helper is `800BD2B0`,
+  and `sqrtf` is `80033470`. The native game view starts at `1938`, eye/centre
+  at view+`28`/`34`, and scene light at game+`1C60`. Confirm full native bindings
+  and renderer bounds before patching, not only these symbols.
+- The retained room disassembly identifies the native three-field used-instance
+  work at linked `80947560..8094756B`, with actor stride `740`. Resolve its actual
+  loaded owner through native overlay metadata; never call linked overlay RAM
+  directly. Actor overlay metadata is at actor+`170`; its loaded base and
+  linked base are separate fields. Actual traversal bounds still need binding.
+
 ## Installed timed material reactions
 
 Current proposal: ABI 222 at

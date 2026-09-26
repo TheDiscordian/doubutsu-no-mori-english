@@ -19,6 +19,26 @@ OUTPUT=ROOT/os.environ.get('V3_PLAYER_FRAME_BUILD','build/v3-player-frame-sound-
 
 
 class ProgramTests(unittest.TestCase):
+    def test_default_instrument_envelope_sustained_loop(self):
+        # Synthetic programme with no CB command: the full instrument owns ADSR.
+        for target in (6, 7):
+            raw = bytearray.fromhex('880004ffc61fc465f0004afb0000')
+            struct.pack_into('>H', raw, 12, target)
+            desc = sounds.looping_layer(raw, 0)
+            self.assertIsNone(desc['envelope'])
+            self.assertIsNone(desc['decay'])
+            self.assertEqual((desc['envelope_bytes'], desc['duration'], desc['pointers']), (0, 28672, [1,12]))
+            bound = sounds.bind_loop(raw, desc, 0x5100, 9, 1)
+            actual = sounds.looping_layer(bound, 0x5100, prefix=True)
+            for key in ('duration', 'velocity', 'note', 'decay', 'envelope_bytes'):
+                self.assertEqual(actual[key], desc[key])
+            self.assertEqual(actual['loop'], target+4)
+            for length in range(len(raw)):
+                with self.assertRaises(ValueError): sounds.looping_layer(raw[:length], 0)
+            bad = raw.copy(); bad[6] = 0xC3
+            with self.assertRaises(ValueError): sounds.looping_layer(bad, 0)
+            with self.assertRaises(ValueError): sounds.looping_layer(raw+b'\x01', 0)
+
     def loop_program(self, long=True, loop_mode=False):
         # Synthetic attack/hold envelope and timed sustained note.
         data=bytearray.fromhex('880004ffc607cb0000e0c466')

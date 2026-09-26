@@ -94,6 +94,59 @@ class InstalledMaterialReactionTests(unittest.TestCase):
                                  (self.out/'asset-loader.ups').read_bytes()), self.image)
 
 
+class InstalledColourAudioTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.out = ROOT/os.environ.get('V3_COLOUR_AUDIO_BUILD', 'build/v3-material-colour-audio-runtime-01')
+        cls.image, cls.report = inputs(cls.out/'build-lock.json')
+        cls.base, cls.prior = inputs(cls.out/'base-lock.json')
+        cls.source = Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+            (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+
+    def test_complete_installed_loop_sample_and_retained_behaviours(self):
+        import v3_sound_programs as sounds
+        core = by_vrom(self.image)[CODE_VROM].extract(self.image)
+        equipment = self.report['equipment_resources']
+        contracts, _ = sounds.checked_furniture_loops(self.image, core, equipment, self.source)
+        self.assertEqual(contracts['331C']['category'], reactions.COLOUR_CATEGORY)
+        row = equipment['furniture_level_audio']['programs'][-1]
+        self.assertEqual((row['source_sound_id'], row['native_sound_id'], row['native_instrument']), (95,95,90))
+        self.assertEqual(row['instrument_identity']['samples'][1]['sample_bytes'], 46900)
+        seq, _, _ = sounds.installed_resource(self.image, core, 'seq', 199)
+        bound = seq[row['offset']:row['offset']+row['bytes']]
+        actual = sounds.looping_layer(bound, row['offset'], prefix=True)
+        self.assertIsNone(actual['envelope'])
+        self.assertEqual((actual['duration'], actual['note'], actual['velocity']), (32000,39,90))
+        budget = sounds.permanent_budget(core)
+        self.assertEqual(budget, equipment['furniture_level_audio']['after_budget'])
+        self.assertGreaterEqual(budget['conservative_spare'], 0)
+        for key in ('room_rigs', 'scenery'):
+            self.assertEqual(equipment[key], self.prior['equipment_resources'][key])
+        self.assertTrue(reactions.checked_binding(self.source, self.image, self.report)['installed'])
+
+    def test_pending_parent_preserves_selections_saves_artwork_and_patch(self):
+        import v3_optional_composition as composer
+        for key in ('furniture', 'save_codec', 'save_runtime', 'translation_baseline'):
+            self.assertEqual(self.report[key], self.prior[key])
+        before = by_vrom(self.base)[BLOB].extract(self.base)
+        after = by_vrom(self.image)[BLOB].extract(self.image)
+        for row in self.report['equipment_resources']['room_rigs']['material_rows']:
+            at = row['blob_offset']; end = at+row['bytes']
+            self.assertEqual(after[at:end], before[at:end])
+        pin = composer.BASE, composer.BASE_SHA, composer.REPORT_SHA, composer.ABI
+        try:
+            composer.use_build_lock(self.out/'build-lock.json')
+            catalogue = composer.catalogue(self.image, self.report)
+            self.assertEqual(len(catalogue), 155)
+            self.assertNotIn('GAFE01-r0/item/331C', catalogue)
+            none = composer.compose(self.image, self.report, catalogue, composer.resolve(catalogue, []))[0]
+            self.assertEqual(sha256(none), self.report['translation_baseline']['sha256'])
+        finally:
+            composer.BASE, composer.BASE_SHA, composer.REPORT_SHA, composer.ABI = pin
+        self.assertEqual(apply_ups((ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes(),
+                                 (self.out/'asset-loader.ups').read_bytes()), self.image)
+
+
 class MaterialReactionTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -125,6 +178,32 @@ class MaterialReactionTests(unittest.TestCase):
         changed = copy.copy(self.source);changed.section_relocations = dict(changed.section_relocations)
         changed.section_relocations[(4, reactions.WAVE_TABLE)] = (1, 1, 4, reactions.WAVES_START+1)
         with self.assertRaises(ValueError): reactions.vibration_bank(changed)
+
+    def test_complete_colour_lifecycle_and_player_consumers(self):
+        from v3_sound_programs import furniture_level
+        profile = self.source.profile(0x331C)
+        expected = copy.deepcopy(profile)
+        result = reactions.colour_lifecycle(self.source, profile)
+        self.assertEqual(profile, expected)
+        self.assertEqual(result['category'], reactions.COLOUR_CATEGORY)
+        self.assertEqual((result['source_sound_id'], result['exclusive_source_index']), (95, 1223))
+        self.assertTrue(result['start_disabled'])
+        self.assertFalse(result['callback_installed'])
+        self.assertEqual(result['colours']['rgb'], [[255,100,255], [255,255,255], [100,100,100], [100,255,255]])
+        self.assertEqual(furniture_level(self.source, profile), result)
+        for key in ('create', 'move'):
+            changed = copy.copy(self.source); changed.rel = bytearray(changed.rel)
+            changed.rel[changed.sections[1][0]+profile['callback_adapter']['functions'][key]['offset']] ^= 1
+            with self.assertRaises(ValueError): reactions.colour_lifecycle(changed, profile)
+        for key, row in result['consumers'].items():
+            changed = copy.copy(self.source); changed.rel = bytearray(changed.rel)
+            changed.rel[changed.sections[1][0]+row['offset']] ^= 1
+            with self.assertRaises(ValueError, msg=key): reactions.colour_lifecycle(changed, profile)
+        for row in list(result['constants'].values())+[result['colours']]:
+            changed = copy.copy(self.source); changed.rel = bytearray(changed.rel)
+            changed.rel[changed.sections[4][0]+row['offset']] ^= 1
+            with self.assertRaises(ValueError): reactions.colour_lifecycle(changed, profile)
+        self.assertIsNone(reactions.colour_lifecycle(self.source, self.source.profile(0x1FD8)))
 
     def test_native_transport_and_player_bindings(self):
         image, report = inputs(ROOT/'build/v3-material-lifecycle-imports-02/build-lock.json')
