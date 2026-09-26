@@ -20,7 +20,7 @@ from v3_import_catalog import DONOR, REL_SHA, ROOT, SYMBOLS_SHA, read_donor
 from v3_villager_art import data_pointers, native_palette, normalise_vertex_flags, symbol_span
 
 SEGMENT = 0x06000000
-CONVERTER_VERSION = 14
+CONVERTER_VERSION = 15
 
 # Complete compatible RDP expressions, selected by material commands, not IDs.
 # These use one texture and retain source alpha; none introduces TEXEL1,
@@ -262,13 +262,15 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
                 large_western=False, water=False, camping=False, tent=False,
                 campfire_body=False, fire_effect=0, school=False, static_materials=False,
                 palette_bindings=None, palette_fade=False, joint_matrices=0,
-                inherited_palette_slot=None, inherited_vertices=0, material_bindings=None, scrolling=None):
+                inherited_palette_slot=None, inherited_vertices=0, material_bindings=None, scrolling=None,
+                texture_bindings=None):
     """Decode supported static materials and explicit dynamic dependencies, never GX loads."""
     if not raw or len(raw) % 8 or sum(map(bool, (speed_bag, accessory, mirrored_s,
                                               garden, western, large_western, water, camping,
                                               tent, campfire_body, fire_effect, school, static_materials))) > 1 or fire_effect not in (0, 1, 2):
         raise ValueError('Incomplete furniture display list')
     palette_bindings = {} if palette_bindings is None else palette_bindings
+    texture_bindings={} if texture_bindings is None else texture_bindings
     if inherited_palette_slot is not None and (
             type(inherited_palette_slot) is not int or not 0 <= inherited_palette_slot <= 15
             or not static_materials or palette or palette_bindings or palette_fade):
@@ -296,9 +298,13 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
         raise ValueError('Invalid dynamic material-frame bindings')
     if palette_fade and (not static_materials or palette_bindings):
         raise ValueError('Palette fade requires the shared materials and no constant binding')
-    if palette_bindings and (not static_materials or set(palette_bindings) != {0x08000000}
+    if palette_bindings and (not static_materials or not set(palette_bindings)<={0x08000000,0x09000000}
                              or any(p not in palette for p in palette_bindings.values())):
         raise ValueError('Unsupported constant furniture palette binding')
+    if texture_bindings and (not static_materials or material_bindings or palette_fade or scrolling or
+            inherited_palette_slot is not None or not set(texture_bindings)<={0x08000000,0x09000000} or
+            set(texture_bindings)&set(palette_bindings) or any(p not in textures for p in texture_bindings.values())):
+        raise ValueError('Unsupported constant furniture texture binding')
     result, used = [], set()
     at, loaded, first_vertex, material, have_palette = (
         0, inherited_vertices, 0, None, inherited_palette_slot is not None)
@@ -333,6 +339,10 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
             if start+at+4 in pointers:
                 raise ValueError('Constant furniture palette binding also has a relocation')
             row.update(target=palette_bindings[b], bound_segment=b)
+        elif op == 0xFD and b in texture_bindings:
+            if start+at+4 in pointers:
+                raise ValueError('Constant furniture texture binding also has a relocation')
+            row.update(target=texture_bindings[b],bound_segment=b)
         elif op in (0xF0, 0xFD, 0x01):
             fixup = start + at + 4
             if b or fixup not in pointers:

@@ -32,6 +32,15 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
+The shared fixed/indexed material converter prepares all fourteen console
+models, 68,320 bytes total, in one compiler run. It retains each source cartridge
+texture/palette, complete selector tables, and all geometry. Four focused source
+and compiled-artwork checks pass. Thirteen game-bearing models still need their
+game-launch lifecycle; their profiles remain unavailable. Super Tortimer is
+drawing-only in the donor, not a missing game implementation. This preparation
+does not change the cartridge or either deployment. See the
+[constant-material checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#bulk-fixed-and-indexed-material-sequences).
+
 The checked proposal is ABI 238 at
 `build/v3-scrolling-category-imports-01/profile-runtime/build-lock.json`, with
 157 development choices. Scrolling-material imports now automatically prepare

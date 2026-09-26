@@ -403,6 +403,23 @@ recompiling an entire installed category merely to add one newly supported membe
 
 ### Shared runtime categories
 
+Fixed and indexed constant-material sequences specialise checked source draw
+callbacks into complete model lists. Both texture and palette segment bindings
+resolve to verified full resources; generated native commands use the object's
+own addresses, not unresolved donor segments. Indexed forms retain their full
+selector tables, range, fallback, and selected row. Whole-function checks and
+paired relocations identify the category without item-ID or name switches.
+
+The `constant-material-model-sequence` preparation category includes the console
+models. Their three full lists and ordinary linked draw sequence share one
+converter. A nonempty lifecycle produces
+`constant-model-sequence-pending-lifecycle`: artwork can be prepared in bulk, but
+metadata and native profile writing both reject it until gameplay is implemented.
+An explicit DMA callback is accepted only when its entire source is the empty
+return instruction; real DMA behaviour remains unsupported, never discarded.
+The drawing-only Super Tortimer model follows its actual source semantics.
+Names and unused-game status alone do not select its behaviour.
+
 The ordinary `import` dependency planner includes scrolling resources, complete
 positioned-loop/switch-fade audio, and draw-only or audio-backed profiles. Audio
 is installed before the scrolling lifecycle table; profiles follow full resource

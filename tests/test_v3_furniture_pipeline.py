@@ -26,6 +26,27 @@ import v3_feng_shui as feng
 
 
 class FormatTests(unittest.TestCase):
+    def test_constant_texture_and_palette_bindings_preserve_native_resources(self):
+        raw,pointers=fixture();raw=bytearray(raw)
+        struct.pack_into('>I',raw,0x1C,0x09000000);pointers.pop(0x11C)
+        struct.pack_into('>I',raw,0x24,0x08000000);pointers.pop(0x124)
+        def parse(textures=None,fixups=None,**kwargs):
+            return parse_model(raw,0x100,pointers if fixups is None else fixups,
+                (0x500,),{0x600:(32,32)},0x1000,48,static_materials=True,
+                palette_bindings={0x09000000:0x500},
+                texture_bindings={0x08000000:0x600} if textures is None else textures,**kwargs)
+        rows=parse();loads=[r for r in rows if r['opcode'] in (0xF0,0xFD)]
+        self.assertEqual([r['bound_segment'] for r in loads],[0x09000000,0x08000000])
+        self.assertEqual([r['target'] for r in loads],[0x500,0x600])
+        code,_=command_source({'opaque':{'rows':rows}},{0x500:0,0x600:32,0x1000:544})
+        self.assertIn('gsDPLoadTLUT_pal16(15, 0x06000000)',code)
+        self.assertNotIn('0x08000000',code);self.assertNotIn('0x09000000',code)
+        for texture in ({},{0x08000000:0x601},{0x0A000000:0x600},{0x09000000:0x600}):
+            with self.assertRaises(ValueError):parse(texture)
+        with self.assertRaisesRegex(ValueError,'also has a relocation'):
+            parse(fixups={**pointers,0x124:0x600})
+        with self.assertRaises(ValueError):parse(material_bindings={0x08000000:('texture',0x600)})
+
     def test_ia16_preserves_every_intensity_alpha_pair_and_rejects_partial_blocks(self):
         width=height=256;donor=bytearray(width*height*2);expected=bytearray(len(donor))
         for y in range(height):
@@ -847,6 +868,64 @@ class DonorTests(unittest.TestCase):
                             for a,b in words if a>>24==0xF5 and b>>24&7==0]
                     self.assertEqual(actual,expected)
                     self.assertEqual([w for w in words if w[0]==0xE3001001],luts)
+
+
+class ConstantMaterialResourceTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.source=pipeline.Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+            (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+        cls.art=ROOT/os.environ.get('V3_CONSTANT_MATERIAL_ART','build/v3-constant-materials-prepared-01')
+        cls.report=json.loads((cls.art/'art.json').read_bytes())
+
+    def test_complete_category_compiles_once_and_preserves_all_source_resources(self):
+        ids={r['item_id'] for r in self.report['objects']}
+        expected={f'{item:04X}' for item in range(0x1DC4,0x1DF4,4)}|{'1FBC','3280'}
+        self.assertEqual(ids,expected)
+        self.assertEqual(self.report['batch'],dict(objects=14,compiled=14,reused=0,compiler_containers=1))
+        DonorTests.check_complete_artwork(self,self.art,self.report)
+        for row in self.report['objects']:
+            self.assertEqual(row['object_bytes'],4880)
+            self.assertEqual(len(row['models']),3)
+            self.assertEqual(row['draw_sequence']['bytes'],32)
+            self.assertFalse(row['import_ready'])
+            self.assertEqual(row['profile']['callback_adapter']['pending_callbacks'],
+                [] if row['item_id']=='3280' else ['move'])
+            if row['item_id']!='3280':
+                with self.assertRaisesRegex(ValueError,'no implemented native lifecycle'):
+                    install.profile(row,0x02500000)
+                with self.assertRaisesRegex(ValueError,'interaction lifecycle'):
+                    pipeline.metadata(self.source,int(row['item_id'],16),row['profile'],None)
+
+    def test_checked_selectors_preserve_distinct_labels_and_complete_tables(self):
+        labels=set()
+        for row in self.report['objects']:
+            a=self.source.profile(int(row['item_id'],16))['callback_adapter'];selection=a['selection']
+            if not selection:continue
+            index=pipeline.furniture_source_index(int(row['item_id'],16))
+            self.assertEqual(selection['selected_index'],index-selection['first_runtime_index'])
+            self.assertEqual(selection['last_runtime_index']-selection['first_runtime_index']+1,20)
+            for role in ('texture','palette'):
+                table=selection['tables'][role]
+                self.assertEqual(len(table['entries']),20)
+                source_index=table['offset']+selection['selected_index']*4
+                target=self.source.pointers(table['offset'],table['bytes'])[source_index]
+                self.assertEqual(a['constant_'+role]['donor_offset'],target)
+            labels.add((a['constant_texture']['source_sha256'],a['constant_palette']['source_sha256']))
+        # Two releases of the same game can legitimately share their label.
+        self.assertGreaterEqual(len(labels),11)
+        p=self.source.profile(0x1DC4);a=p['callback_adapter'];draw=a['functions']['draw']
+        changed=copy.copy(self.source);changed.code_relocations=dict(self.source.code_relocations)
+        changed.code_relocations.pop(draw['offset']+0x56)
+        with self.assertRaises(ValueError):changed.profile(0x1DC4)
+        changed=copy.copy(self.source);changed.relocations=dict(self.source.relocations)
+        changed.relocations.pop(a['selection']['tables']['texture']['offset'])
+        changed.relocation_addresses=sorted(changed.relocations)
+        with self.assertRaisesRegex(ValueError,'incomplete selector table'):changed.profile(0x1DC4)
+        fixed=self.source.profile(0x1FBC)['callback_adapter'];dma=fixed['functions']['dma']
+        changed=copy.copy(self.source);changed.rel=bytearray(self.source.rel)
+        changed.rel[self.source.sections[1][0]+dma['offset']+3]^=4
+        with self.assertRaisesRegex(ValueError,'nonempty DMA callback'):changed.profile(0x1FBC)
 
 
 class ExtendedScrollingResourceTests(unittest.TestCase):

@@ -22,6 +22,15 @@ Incomplete gameplay stays unavailable in the selector; installing assets does
 not claim that an item is playable. Reuse unchanged passing tests throughout.
 
 Current task: close shared conversion gaps in the ordinary bulk importer.
+The fixed/indexed texture-palette category prepares all fourteen console models
+at `build/v3-constant-materials-prepared-01/` in one compiler container, retaining
+all label variants and complete geometry. Four focused checks pass. Thirteen
+game-bearing records keep their complete unresolved movement callbacks and stay
+ineligible; Super Tortimer's donor callback is drawing-only, with acquisition
+unresolved. Continue shared gameplay/source dependencies, including the native
+NES launch/emulator connection; do not mistake model preparation for playable
+games or add one installer per title. The checked ROM remains the proposal below.
+
 The checked proposal is ABI 238 at
 `build/v3-scrolling-category-imports-01/profile-runtime/build-lock.json`, with
 157 development choices. The ordinary importer plans complete scrolling models,

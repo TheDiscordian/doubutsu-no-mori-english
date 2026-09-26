@@ -24,8 +24,9 @@ from v3_registry import FURNITURE, LEGACY_FURNITURE, furniture_identity, furnitu
 from v3_room_aliases import discover as room_aliases, pending_reason as room_alias_reason
 from v3_villager_art import native_palette, normalise_vertex_flags
 
-VERSION = 24
+VERSION = 25
 PENDING_MOVE_CATEGORY = 'static-models-pending-move'
+PENDING_SEQUENCE_CATEGORY = 'constant-model-sequence-pending-lifecycle'
 LAYERS = ('opaque', 'opaque1', 'translucent', 'translucent1')
 BEHAVIOURS = {0: 'static', 1: 'front-seat', 2: 'any-direction-seat', 4: 'front-sofa',
               8: 'single-bed', 16: 'double-bed'}
@@ -244,13 +245,17 @@ class Source:
         name, at, n = self.containing(pointer[3], exact=True)
         if n != 20 or self.data[at:at+n] != bytes(n): reject('unsupported vtable')
         pointers = {p-at: r for p,r in self.relocations.items() if at <= p < at+n}
-        if (8 not in pointers or set(pointers)-{0,4,8,12} or
+        if (8 not in pointers or set(pointers)-{0,4,8,12,16} or
                 any(r[:3] != (1,True,1) for r in pointers.values())):
             reject('unsupported callback slots or DMA callback')
         functions = {}
-        for slot, role in enumerate(('create','move','draw','destroy')):
+        for slot, role in enumerate(('create','move','draw','destroy','dma')):
             if slot*4 not in pointers: continue
             raw, receipt = self.function(pointers[slot*4][3]); functions[role] = receipt
+            if role=='dma' and (raw!=bytes.fromhex('4e800020') or receipt['relocations']):
+                reject('unsupported nonempty DMA callback')
+        constant=self.constant_material_models(name,at,functions,index)
+        if constant is not None:return constant
         from v3_furniture_materials import discover as discover_materials
         materials=discover_materials(self,name,at,functions)
         if materials is not None:return materials
@@ -316,6 +321,73 @@ class Source:
             table_sha256=sha256(table_raw), table_pointers=dependencies,
             first_runtime_index=first, selected_index=selected, entries=size//stride,
             palette_symbol=palette[0], palette_offset=palette[1])
+
+    def constant_material_models(self,name,at,functions,index):
+        """Specialise checked fixed/indexed texture-palette model sequences.
+
+        Complete artwork is independent of an unresolved interaction callback.
+        Retain that callback and keep its profile ineligible until implemented.
+        """
+        draw=functions['draw'];raw,_=self.function(draw['offset'])
+        forms={240:'f5e73840d75976b34bb381a16f519e431d44da7fcef83b44eec831f8a0616709',
+               296:'291019fe47e409c46846af377a52ba77601ea520a4808dcef2dde0a8f4d52d07'}
+        if len(raw) not in forms:return None
+        normalized=bytearray(raw)
+        for loc,(kind,_,_,_) in draw['relocations'].items():
+            if kind in (4,6):normalized[loc:loc+2]=bytes(2)
+            elif kind==10:struct.pack_into('>I',normalized,loc,u32(raw,loc)&0xFC000003)
+            else:return None
+        for loc in range(0,len(raw),4):
+            word=u32(raw,loc)
+            if word&0xFC000003==0x48000001:struct.pack_into('>I',normalized,loc,word&0xFC000003)
+        if sha256(normalized)!=forms[len(raw)]:return None
+        module=u32(self.rel,0);expected={};selection={}
+        def pair(hi,lo):
+            pointer=draw['relocations'].get(hi)
+            if pointer is None or pointer[:3]!=(6,module,5):
+                raise ReviewRequired('constant materials: missing paired data binding')
+            expected.update({hi:pointer,lo:(4,module,5,pointer[3])})
+            return pointer[3]
+        if len(raw)==240:
+            texture,palette=pair(0x42,0x66),pair(0x46,0x6E)
+            model_pairs=((0x4E,0x7A),(0x52,0x7E),(0x56,0x86));matrix=0x34
+        else:
+            first,last=struct.unpack_from('>H',raw,0x1E)[0],struct.unpack_from('>H',raw,0x26)[0]
+            count=last-first+1;selected=index-first if first<=index<=last else 0
+            expected={0x10:(10,0,4,0x8009AED0),0x114:(10,0,4,0x8009AF1C)}
+            tables={}
+            for role,hi,lo in (('texture',0x46,0x56),('palette',0x4A,0x5A)):
+                symbol,base,n=self.containing(pair(hi,lo),exact=True)
+                pointers=self.pointers(base,n)
+                if (not 0<count<=256 or n!=count*4 or self.data[base:base+n]!=bytes(n) or
+                        set(pointers)!=set(range(base,base+n,4))):
+                    raise ReviewRequired('constant materials: incomplete selector table')
+                tables[role]=dict(symbol=symbol,offset=base,bytes=n,sha256=sha256(self.data[base:base+n]),
+                    entries=[self.containing(pointers[p],exact=True) for p in range(base,base+n,4)])
+            texture,palette=(tables[k]['entries'][selected][1] for k in ('texture','palette'))
+            selection=dict(first_runtime_index=first,last_runtime_index=last,selected_index=selected,
+                fallback_index=0,tables=tables)
+            model_pairs=((0x8A,0xAE),(0x8E,0xB2),(0x96,0xB6));matrix=0x7C
+        models={f'part{i}':self.containing(pair(hi,lo),exact=True) for i,(hi,lo) in enumerate(model_pairs)}
+        helpers=self.checked_callback_code(draw,len(raw),forms[len(raw)],expected,
+            {matrix:(643604,'_Matrix_to_Mtx_new')},'constant material sequence',internal_branches=True)
+        ts,ta,tn=self.containing(texture,exact=True);ps,pa,pn=self.containing(palette,exact=True)
+        if pn!=32 or self.pointers(pa,pn) or not 0<tn<=2048 or self.pointers(ta,tn):
+            raise ReviewRequired('constant materials: incomplete texture/palette resource')
+        pending=[]
+        for role,receipt in functions.items():
+            if role=='draw':continue
+            body,_=self.function(receipt['offset'])
+            if body!=bytes.fromhex('4e800020') or receipt['relocations']:pending.append(role)
+        return models,{0x09000000:pa},dict(
+            category=PENDING_SEQUENCE_CATEGORY if pending else 'constant-model-sequence',
+            vtable_symbol=name,vtable_offset=at,functions=functions,helpers=helpers,
+            model_order=list(models),draw_arena='opaque',pending_callbacks=pending,
+            constant_texture=dict(symbol=ts,donor_offset=ta,bytes=tn,source_sha256=sha256(self.data[ta:ta+tn]),
+                segment_address=0x08000000),
+            constant_palette=dict(symbol=ps,donor_offset=pa,bytes=pn,source_sha256=sha256(self.data[pa:pa+pn]),
+                segment_address=0x09000000),
+            texture_bindings={0x08000000:ta},selection=selection)
 
     def static_sequence_models(self, name, at, functions):
         draw=functions['draw'];digest,pairs=STATIC_SEQUENCE_CODE[draw['bytes']]
@@ -570,7 +642,7 @@ class Source:
         adapter = extra.get('callback_adapter', {})
         from v3_furniture_materials import CATEGORY as MATERIAL_CATEGORY
         from v3_furniture_scroll import CATEGORY as SCROLL_CATEGORY
-        pending_move=adapter.get('category') in (PENDING_MOVE_CATEGORY,MATERIAL_CATEGORY,SCROLL_CATEGORY)
+        pending_move=adapter.get('category') in (PENDING_MOVE_CATEGORY,PENDING_SEQUENCE_CATEGORY,MATERIAL_CATEGORY,SCROLL_CATEGORY)
         pending_fields=[]
         if raw[36:40]!=struct.pack('>f',.01):pending_fields.append('scale')
         if contact not in BEHAVIOURS:pending_fields.append('contact')
@@ -591,7 +663,7 @@ class Source:
             extra.update(kind='animated-room-model',skeleton=adapter['skeleton'],joint_models=adapter['joint_models'])
         return dict(profile_symbol=name, profile_offset=at, profile_sha256=sha256(raw),
             scalar_hex=raw[32:48].hex(), behaviour=adapter.get('category') if extra.get('kind') or
-                adapter.get('category') in ('switch-trigger-sound','static-interaction',PENDING_MOVE_CATEGORY,MATERIAL_CATEGORY,SCROLL_CATEGORY) else BEHAVIOURS[contact], contact_action=contact,
+                adapter.get('category') in ('switch-trigger-sound','static-interaction',PENDING_MOVE_CATEGORY,PENDING_SEQUENCE_CATEGORY,MATERIAL_CATEGORY,SCROLL_CATEGORY) else BEHAVIOURS[contact], contact_action=contact,
             interaction_flags=interaction,
             size_code={3:1, 4:0, 5:2}[shape], shape=shape, models=models, **extra)
 
@@ -638,6 +710,7 @@ def prepare_models(source, descriptor):
             for frame in frames['frames']:
                 palettes[frame['donor_offset']]=frame['symbol'],frame['bytes']
     bindings, used_bindings = descriptor.get('palette_bindings', {}), set()
+    texture_bindings,used_textures=adapter.get('texture_bindings',{}),set()
     for label, (name, at, n) in descriptor['models'].items():
         if n%8: raise ReviewRequired('unaligned display list')
         parts=adapter.get('model_sequences',{}).get(label)
@@ -666,6 +739,9 @@ def prepare_models(source, descriptor):
                 elif op == 0xF0 and b in bindings:
                     if target is not None: raise ReviewRequired('relocated constant palette binding')
                     target = bindings[b]; used_bindings.add(b)
+                elif op == 0xFD and b in texture_bindings:
+                    if target is not None:raise ReviewRequired('relocated constant texture binding')
+                    target=texture_bindings[b];used_textures.add(b)
                 elif target is None or b: raise ReviewRequired('missing model dependency relocation')
                 symbol, start, size = source.containing(target, exact=op != 0x01)
                 if source.pointers(start, size): raise ReviewRequired('pointer-bearing texture or vertex array')
@@ -700,6 +776,7 @@ def prepare_models(source, descriptor):
             if position > n: raise ReviewRequired('truncated packed model')
         raw_models[label] = name, at, raw, pointers, receipts
     if used_bindings != set(bindings): raise ReviewRequired('unused constant palette binding')
+    if used_textures!=set(texture_bindings):raise ReviewRequired('unused constant texture binding')
     if used_frames != set(material_frames):raise ReviewRequired('unused material-frame binding')
     if fading and not dynamic_used: raise ReviewRequired('unused palette-fade dependency')
     if inherited_palette is not None and (palettes or bindings or fading or not any(r[4]==2 for r in textures.values())):
@@ -735,7 +812,7 @@ def prepare_models(source, descriptor):
             **({'source_parts':receipts} if receipts else {}),
             rows=parse_model(raw, at, pointers, tuple(palettes),
                 {p:(r[2], r[3]) for p,r in textures.items()}, vertex, n, static_materials=True,
-                palette_bindings=bindings, palette_fade=fading,
+                palette_bindings=bindings, texture_bindings=texture_bindings, palette_fade=fading,
                 joint_matrices=matrices, inherited_palette_slot=inherited_palette,
                 inherited_vertices=inherited_vertices,
                 scrolling=scrolling.get(label),
@@ -977,7 +1054,7 @@ class PreparedAssets:
 def draw_sequence(profile, body_bytes, sections):
     """Link complete opaque lists in donor order, without a runtime callback."""
     adapter=profile.get('callback_adapter',{})
-    if adapter.get('category')!='constant-model-sequence': return None,b''
+    if adapter.get('category') not in ('constant-model-sequence',PENDING_SEQUENCE_CATEGORY): return None,b''
     if (adapter['draw_arena']!='opaque' or adapter['model_order']!=[label for label,_ in sections]
             or not 1<=len(sections)<=4 or body_bytes%8):
         raise ReviewRequired('invalid complete static draw sequence')
@@ -1034,6 +1111,8 @@ def metadata(source, item, profile, identity):
         raise ReviewRequired('Material-frame artwork is prepared; drawing, lifecycle behaviour, and acquisition need runtime adapters')
     if profile.get('callback_adapter',{}).get('category')==PENDING_MOVE_CATEGORY:
         raise ReviewRequired('Static artwork is prepared; move behaviour, profile interactions, and spawned effects need runtime adapters')
+    if profile.get('callback_adapter',{}).get('category')==PENDING_SEQUENCE_CATEGORY:
+        raise ReviewRequired('Constant-material artwork is prepared; complete interaction lifecycle needs a runtime adapter')
     if profile.get('callback_adapter',{}).get('category')=='static-interaction' and not binding:
         raise ReviewRequired('Static interaction requires its complete installed behaviour and audio')
     if profile.get('callback_adapter',{}).get('category')==FIXED_CATEGORY:
@@ -1149,6 +1228,8 @@ def scan(source, worksheet, installed=None, *, selected=()):
             if 'callback_adapter' in profile: categories.append(profile['callback_adapter']['category'])
             if profile.get('callback_adapter',{}).get('constant_palette'):
                 categories.append('constant-palette-model-sequence')
+            if profile.get('callback_adapter',{}).get('constant_texture'):
+                categories.append('constant-material-model-sequence')
             row.update(asset_ready=True, profile=profile,
                 object_bytes=estimated, textures=sum(r['kind']=='texture' for r in resources),
                 vertices=sum(r['bytes']//16 for r in resources if r['kind']=='vertices'),

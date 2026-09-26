@@ -1,5 +1,53 @@
 # Automatic furniture pipeline checkpoint
 
+## Bulk fixed and indexed material sequences
+
+Preparation: `build/v3-constant-materials-prepared-01/art.json`, based on the
+checked ABI-238 proposal below. Fourteen complete 4,880-byte objects total
+68,320 bytes, compiled in one container. No cartridge, selection, saved field,
+or deployed patcher changes.
+
+The shared converter recognises complete 240-byte fixed and 296-byte indexed
+draw shapes. The latter keeps both twenty-entry texture/palette tables, exact
+range and fallback selection, and each selected label. Direct segment-eight
+textures and segment-nine palettes become full object-local native resources.
+All three model lists, their 52 triangles, complete vertices/materials, and the
+32-byte linked drawing list remain in each object. Empty source DMA callbacks
+are explicitly verified rather than treated as unimplemented data transfers.
+
+The twelve additional shared-console records `1DC4..1DF0`, disk-system `1FBC`,
+and drawing-only `3280` are prepared together. The first thirteen retain their
+actual movement callback receipts and interaction flags under a pending-lifecycle
+category. Both metadata and native profile writing reject that category. Game
+launch, complete emulator/program support, reviewed additive destinations, and
+acquisition remain work before those become playable imports. Super Tortimer
+has no donor launch callback; its ordinary decorative behaviour is complete,
+but its actual acquisition is unresolved. No title is substituted or made inert
+to claim completion.
+
+Four focused checks pass: constant texture/palette binding and malformed-input
+rejection; existing constant-palette compatibility under the changed parser;
+complete compiled resources/geometry/materials for all fourteen objects plus
+pending-profile rejection; and actual selector-table/label correspondence with
+rejection of missing relocations or a nonempty DMA callback. The missing-table
+fixture updates both its relocation map and lookup index before the passing
+rerun. No unchanged ROM or emulator test is replayed.
+
+```sh
+python3 tools/v3_furniture_pipeline.py convert --assets-only \
+  --category constant-material-model-sequence \
+  --base-lock build/v3-scrolling-category-imports-01/profile-runtime/build-lock.json \
+  --output build/v3-constant-materials-reproduction
+python3 -m unittest tests.test_v3_furniture_pipeline.ConstantMaterialResourceTests -v
+```
+
+The prepared inventory records every remaining reason. Keep these assets for
+reuse when the shared lifecycle/identity support is installed. Native source
+already has `ovl_famicom_emu` and `goto_emu_game`; their existence alone does not
+establish support for the extra games or their mappers. The donor's shared move
+callback passes per-title game and GBA indices through the room clip; the N64
+connection must preserve actual game identity and safe return/save behaviour.
+
 ## Automatic scrolling category imports
 
 Checked proposal: ABI 238,

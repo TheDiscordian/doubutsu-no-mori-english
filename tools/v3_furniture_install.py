@@ -15,7 +15,8 @@ from aflib import (CODE_RAM, CODE_VROM, DMA_START, DMA_END, by_vrom, fix_checksu
 from apply_translation import write_new
 from v3_asset_loader import BLOB, CONFIG, MODULE, STARTUP, ROOT, compile_part
 from v3_campsite_calendar import PACKAGE_SIZE
-from v3_furniture_pipeline import Source, LAYERS, prepare, metadata, identity_rows, draw_sequence, PENDING_MOVE_CATEGORY
+from v3_furniture_pipeline import (Source,LAYERS,prepare,metadata,identity_rows,draw_sequence,
+    PENDING_MOVE_CATEGORY,PENDING_SEQUENCE_CATEGORY)
 from v3_furniture_pipeline import VERSION as ASSET_VERSION
 from v3_garden_runtime import install_catalogue
 from v3_import_storage import PACKAGE, PACKAGE_RAM, ROWS, ROWS_RAM, ITEMS, TABLE_END, END, slot
@@ -72,7 +73,7 @@ def profile(row, vrom, *, limit=END):
     from v3_furniture_scroll import CATEGORY as SCROLL_CATEGORY,VTABLE as SCROLL_VTABLE,profile_lifecycle
     material=adapter.get('category')==MATERIAL_CATEGORY
     scrolling=adapter.get('category')==SCROLL_CATEGORY
-    if (adapter.get('category') in (FIXED_CATEGORY,PENDING_MOVE_CATEGORY) or scrolling and
+    if (adapter.get('category') in (FIXED_CATEGORY,PENDING_MOVE_CATEGORY,PENDING_SEQUENCE_CATEGORY) or scrolling and
             (not profile_lifecycle(row['profile'],row.get('room_lifecycle'),row.get('room_placement')) or
              row.get('room_runtime')!={'vtable':SCROLL_VTABLE,'vrom':vrom})):
         raise ValueError('Prepared resources have no implemented native lifecycle')
