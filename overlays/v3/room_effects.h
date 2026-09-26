@@ -38,4 +38,5 @@ ROOM_CHECK(RoomEffectClip,adjust,0x14); ROOM_CHECK(RoomEffectClip,create,0x28);
 ROOM_CHECK(RoomEffectClip,light,0x30);
 #endif
 extern float af_effect_random(void);
+extern int af_v3_room_effect_wall(void);
 #endif

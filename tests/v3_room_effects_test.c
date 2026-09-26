@@ -5,6 +5,7 @@
 
 RoomEffectClip *af_test_effect_clip;
 u32 af_test_effect_scene;
+u8 **af_test_effect_room_clip;
 static int random_calls,requests,creates,lights,matrix_calls,writebacks;
 static float random_values[2];
 static int expected_width;
@@ -50,6 +51,14 @@ void _texture_z_light_fog_prim_xlu(void *p) {
 }
 
 int main(void) {
+    _Alignas(4) u8 room[0x180]={0};u8 *owner=room;af_test_effect_room_clip=&owner;
+    *(u16 *)(room+0x174)=65;*(u16 *)(room+0x176)=76;
+    for (u32 scene=0;scene<50;++scene) {
+        af_test_effect_scene=scene;
+        assert(af_v3_room_effect_wall()==((scene==6 || (scene>=20 && scene<=22)) ? 76 : -1));
+    }
+    owner=0;af_test_effect_scene=20;assert(af_v3_room_effect_wall()==-1);
+    af_test_effect_room_clip=0;assert(af_v3_room_effect_wall()==-1);
     RoomEffectClip clip={.request=request,.adjust=adjust,.create=create,.light=light};
     af_test_effect_clip=&clip;
     _Alignas(16) u8 game_mem[0x1EA0]={0};expected_game=game_mem;

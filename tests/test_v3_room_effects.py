@@ -107,6 +107,9 @@ class EffectTests(unittest.TestCase):
     def test_profile_loader_under_sanitizers(self):
         self.sanitized('v3_effect_loader_test.c')
 
+    def test_complete_endpoint_hit_under_sanitizers(self):
+        self.sanitized('v3_room_endpoint_test.c')
+
     def test_current_controller_retains_timed_lamp_and_installed_wall(self):
         from v3_furniture_install import inputs
         image,report=inputs(ROOT/'build/v3-idle-hit-category-auto-02/cartridge/build-lock.json')

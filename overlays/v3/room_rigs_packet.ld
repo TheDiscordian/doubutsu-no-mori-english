@@ -8,6 +8,7 @@ cKF_Si3_draw_R_SV = 0x800530D8;
 Lib_SegmentedToVirtual = 0x8009ADA8;
 _Matrix_to_Mtx_new = 0x800E13C4;
 sAdo_OngenTrgStart = 0x800D1D58;
+sAdo_SysTrgStart = 0x800D1A9C;
 sAdo_OngenPos = 0x800D1D08;
 _Matrix_to_Mtx = 0x800E139C;
 osWritebackDCache = 0x8002FE00;

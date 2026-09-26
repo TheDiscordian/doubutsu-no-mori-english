@@ -28,6 +28,30 @@ def font_fixture():
 
 
 class SharedFormatTests(unittest.TestCase):
+    def test_trigger_rests_and_late_envelope_keep_timing_and_all_bindings(self):
+        for delay in (bytes((35,)),bytes((0x81,35))):
+            raw=bytearray.fromhex('eb0102880007ffc0')+delay
+            env_at=len(raw)+1;raw.extend(bytes.fromhex('cb0000e0672146c012ff'))
+            raw.extend(bytes(len(raw)&1));envelope=len(raw)
+            struct.pack_into('>H',raw,env_at,envelope)
+            raw.extend(struct.pack('>8h',4,24000,20,12000,30,0,0,0))
+            desc=sound.trigger_program(raw,0,len(raw))
+            self.assertEqual(desc['duration'],(35 if len(delay)==1 else 291)+33+18)
+            self.assertEqual([e.get('rest',False) for e in desc['events']],[True,False,True])
+            self.assertEqual(desc['pointers'],[4,env_at])
+            bound=sound.bind_trigger(raw,desc,0x3200,2,19)
+            restored=bytearray(bound);restored[1:3]=raw[1:3]
+            for at in desc['pointers']:
+                self.assertEqual(struct.unpack_from('>H',bound,at)[0],0x3200+struct.unpack_from('>H',raw,at)[0])
+                restored[at:at+2]=raw[at:at+2]
+            self.assertEqual(restored,raw)
+            self.assertEqual(sound.trigger_program(bytes(0x3200)+bound,0x3200,0x3200+len(bound))['events'],desc['events'])
+            for at,value in ((8,0),(env_at+1,envelope+1),(env_at-1,0xCA)):
+                bad=raw.copy();bad[at]=value
+                with self.subTest(at=at),self.assertRaises(ValueError):sound.trigger_program(bad,0,len(bad))
+            for length in range(len(raw)-3):
+                with self.assertRaises(ValueError):sound.trigger_program(raw[:length],0,length)
+
     def test_trigger_keeps_every_timed_note_and_rejects_unaccounted_commands(self):
         raw=bytearray.fromhex('eb0102880007ff671a6e671a6e671a6eff')
         desc=sound.trigger_program(raw,0,len(raw))

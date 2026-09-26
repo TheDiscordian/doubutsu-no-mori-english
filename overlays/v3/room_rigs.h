@@ -23,11 +23,16 @@ typedef struct {
     u8 before_keyframe[6];
     RoomKeyframe keyframe;
     s16 joint[9][3];
-    /* Six joints plus root use seven morph vectors. The remaining twelve
-       bytes belong to this callback category, not the native engine. */
-    s16 morph[7][3];
-    FloatWord speed, target;
-    u8 unused_morph[4];
+    /* Native capacity is eight joints plus root. Only six-joint behaviours
+       may reuse the final two vectors as speed/previous-position work. */
+    union __attribute__((packed,aligned(2))) {
+        s16 morph[9][3];
+        struct __attribute__((packed)) {
+            s16 work_prefix[7][3];
+            FloatWord speed,target;
+            u8 unused_morph[4];
+        };
+    };
     u8 matrices[2][10][64];
     u8 tail[0x30];
 } RoomRig;
@@ -112,7 +117,10 @@ typedef struct {
     u8 before_changed[0x12D-0x3E];
     u8 changed;
 } RoomSoundActor;
-typedef struct { u16 index,word; u32 reserved; } RoomSoundRecord;
+typedef struct {
+    u16 index,word;
+    union { u32 reserved;struct { u8 wall,effect;u16 system; }; };
+} RoomSoundRecord;
 typedef struct { u16 word;u8 rest[30]; } RoomNativeTrigger;
 #define ROOM_SOUND_MAGIC 0x41465331u
 #define ROOM_SOUND_CAPACITY 64u
@@ -133,6 +141,7 @@ ROOM_CHECK(RoomSoundActor,position,8); ROOM_CHECK(RoomSoundActor,state,0x3C);
 ROOM_CHECK(RoomSoundActor,changed,0x12D);
 _Static_assert(sizeof(RoomSoundRecord)==8,"Room sound record stride");
 extern void sAdo_OngenTrgStart(u32,float *);
+extern void sAdo_SysTrgStart(u32);
 #endif
 ROOM_CHECK(RoomRig,position,8); ROOM_CHECK(RoomRig,state,0x3C);
 ROOM_CHECK(RoomRig,changed,0x12D); ROOM_CHECK(RoomRig,keyframe,0x134);

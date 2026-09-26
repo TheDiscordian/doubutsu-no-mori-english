@@ -190,6 +190,53 @@ def discover_idle_hit(source, adapter):
             state_offset=0x3C,switch_offset=0x12D,switch_value='nonzero',position_offset=8,runtime_installed=False))
 
 
+def discover_endpoint_hit(source, adapter):
+    """Endpoint-triggered rigs with a complete conditional wall/effect branch."""
+    functions=adapter['functions'];move=functions.get('move',{})
+    if move.get('bytes')!=300 or adapter['constructor']['mode']!='stop':return None
+    from v3_furniture_pipeline import ReviewRequired
+    def reject(reason):raise ReviewRequired('custom callbacks: endpoint-hit rig '+reason)
+    if (set(functions)!={'create','move','draw'} or adapter['constructor']['initial_speed']['hex']!='3f000000'
+            or not adapter['constructor']['initial_play_before_speed'] or adapter['joint_callbacks']):
+        reject('changed complete lifecycle')
+    expected={0x10:(10,0,4,0x8009AED4),0x118:(10,0,4,0x8009AF20),
+              0xA2:(6,1,6,0xBC40),0xAA:(4,1,6,0xBC40)}
+    constants={}
+    for hi,lo,name,value in ((0x3A,0x3E,'speed',.5),(0xF6,0xFE,'first_frame',1),
+                             (0x10A,0x10E,'speed',.5)):
+        ref=move['relocations'].get(hi)
+        if ref is None or ref[:3]!=(6,1,4):reject('missing complete animation constant')
+        base,n=source.sections[4];at=ref[3];raw=source.rel[base+at:base+at+4]
+        if not 0<=at<=n-4 or raw!=struct.pack('>f',value):reject('changed animation constant')
+        row=dict(section=4,offset=at,hex=raw.hex(),value=value)
+        if name in constants and constants[name]!=row:reject('ambiguous animation constant')
+        constants[name]=row;expected.update({hi:ref,lo:(4,1,4,at)})
+    if constants['speed']['offset']!=adapter['constructor']['initial_speed']['offset']:reject('changed initial speed')
+    raw,_=source.function(move['offset'])
+    sound,wall,system,effect=(struct.unpack_from('>H',raw,at)[0] for at in (0x7E,0x8A,0x96,0xCE))
+    if (sound&0x80 or (sound&0x7FFF)>>8 not in (0,1,4) or
+            system&0x8080!=0x8000 or (system&0x7FFF)>>8 not in (0,1,4) or (wall,effect)!=(65,121)):
+        reject('unmapped complete conditional sound/effect dependency')
+    helpers=source.checked_callback_code(move,300,
+        'de4917e31d9bc4dd662fe606ff89e3013189295e30e0f77aa8db9d3b033f786a',expected,
+        {0x24:(0xE54,'cKF_SkeletonInfo_R_play'),0x34:(0xE54,'cKF_SkeletonInfo_R_play'),
+         0x80:(0x2BDDE8,'sAdo_OngenTrgStart'),0x84:(0x76020,'mRmTp_GetWallIdx'),
+         0x98:(0x2BDB44,'sAdo_SysTrgStart'),0x104:(0xE54,'cKF_SkeletonInfo_R_play')},
+        'endpoint-hit motion',{0x7E:sound,0x8A:wall,0x96:system,0xCE:effect},internal_branches=True)
+    for name,size,digest,relocs in (
+        ('sAdo_OngenTrgStart',72,'4fdc889bb1697c19c8f386d72b80585ea07706d9f26b328389766bec96f0f989',{48:(10,0,4,0x8001383C)}),
+        ('sAdo_SysTrgStart',32,'6140ae06f5c3a5dc4c00d8452d4bf5914943df137b64f74b0771aab3bf462b6b',{12:(10,0,4,0x800111B0)}),
+        ('mRmTp_GetWallIdx',196,'5f379e08f5d1ea3d211d12365559d896689671395807b5deef1c06b3d5a81fcc',
+         {10:(6,1,6,0xBC40),18:(4,1,6,0xBC40),94:(6,1,6,0xBC40),98:(4,1,6,0xBC40)})):
+        helper=helpers[name]
+        if (helper['bytes'],helper['sha256'],helper['relocations'])!=(size,digest,relocs):reject('changed '+name)
+    return dict(helpers=helpers,constants=constants,source_initializer=checked_stop_initializer(source),
+        hit=dict(endpoint_only=True,playback_speed=.5,clear_initial_pulse=False),
+        trigger=dict(sound_word=sound,excluded_states=[13,14,15,12],native_excluded_states=[5,6,13,15],
+            state_offset=0x3C,switch_offset=0x12D,switch_value='nonzero',position_offset=8,runtime_installed=False,
+            conditional=dict(source_wall=wall,source_effect=effect,system_sound_word=system,priority=2,item=0xFFFF)))
+
+
 def discover_hit(source, vtable_name, vtable_at, functions):
     """Convert the complete struck-animation category, including its trigger.
 
@@ -441,6 +488,13 @@ def discover_fixed(source, vtable_name, vtable_at, functions):
         resource_scope='complete fixed looping clock' if runtime_contract else
             'complete constructor rig; callback gameplay and spawned effects remain pending')
     if category==FIXED_CATEGORY:
+        endpoint_hit=discover_endpoint_hit(source,result)
+        if endpoint_hit:
+            result['helpers'].update(endpoint_hit.pop('helpers'))
+            result.update(category=HIT_CATEGORY,pending_callbacks=[],**endpoint_hit,
+                resource_scope='complete endpoint-hit rig with conditional sound and effects')
+            result['constructor']['clears_switch_pulse']=False
+            return descriptor['models'],{},result
         idle_hit=discover_idle_hit(source,result)
         if idle_hit:
             result['helpers'].update(idle_hit.pop('helpers'))

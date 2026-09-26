@@ -10,10 +10,12 @@ dependencies may be dropped to make the item selectable.
 `tools/v3_room_effects.py` supplies source-bound effect preparation and installation,
 complete sprite packing, native profile packets, and additive controller-table
 expansion. `overlays/v3/room_effects.c` implements both flash lifecycles. These
-components are installed in ABI 213 at `build/v3-room-effects-runtime-02/`.
-The native loader/profile integration has focused passing evidence. Complete
-native particle lifetime and furniture binding remain incomplete; the bell is
-not selectable. Host checks cover the complete particle/controller lifecycles.
+components and the complete endpoint-hit furniture binding are installed in
+ABI 218 at `build/v3-endpoint-hit-runtime-04/`. The bell is an optional development
+choice through its real event stock and catalogue ordering. Native
+loader/profile integration has focused passing evidence; complete native
+particle lifetime remains unverified. Host checks cover the complete
+particle/controller lifecycles and the bell's conditional request arguments.
 The public source branch contains development work; neither web-patcher
 deployment changes until user testing and approval.
 
@@ -69,7 +71,7 @@ The equipment word at `804B1E08` points to the current room bootstrap loader;
 it is regenerated with every shared compilation. The same publication step
 rewrites and checks all effect-profile callbacks and checksums, so subsequent
 item categories cannot retain stale function addresses. Bootstrap code uses
-1,509 of 1,536 bytes; shared room code uses 5,956 of 16,384 bytes.
+1,509 of 1,536 bytes; shared room code uses 6,508 of 16,384 bytes.
 
 ## Camera flashes
 
@@ -115,17 +117,32 @@ and checks the persistent registry. Comparing against native wall 65 is wrong.
 The conditional effect remains conditional on the wall; it does not require
 forcing that optional wall into every bell selection.
 
+The native full-index wall reader accepts scene 6 and scenes 20–22, obtains the
+actual room owner from the clip at `80136F2C`, and reads the wall halfword at
+owner offset `0176`. The adjacent halfword at `0174` is the floor. Null clips,
+null owners, and other scenes return no wall rather than interpreting unrelated
+scene data. The original six-bit floor helper cannot supply this wall identity.
+
+The primary source sound `0174` maps to native `0174`; source singleton system
+sound `817E` maps to `8171`, retaining source priority and the singleton flag.
+The latter keeps its 50-tick rest, 350-tick note, full envelope, and complete
+instrument/sample data. The shared trigger converter accepts short/wide rests
+and envelope commands between timed events; it changes only verified bindings.
+The six native trigger slots provide the missing singleton check. Suppressing
+a duplicate sound does not suppress the source effect request.
+
 ## Remaining integration
 
-1. Bind the endpoint-hit policy to both complete source sound programs, including
-   the system singleton trigger, and the actual full-index wall getter. Enable
-   the bell only when all behaviour and ordinary import requirements are met.
-2. Include the remaining particle lifetime in the next meaningful combined
-   native integration check. The existing fixture now recognises nonzero active
-   priorities, rather than requiring a boolean `1`; that corrected continuation
-   is not yet executed. Preserve passing controller/profile loading, relocation,
-   native program caching, complete original-program loading, and shared-packet
-   evidence. Do not repeat unchanged hit/rolling/material tests.
+Complete the native particle-lifetime continuation in a changed effect batch,
+using actual graphics-pool setup. The isolated fixture currently creates twelve
+program buffers but omits the six graphics buffers. The native count at
+owner offset `37A0` remains zero, and `80A19304` consequently refuses the flash
+allocation. The real scene constructor calls graphics initializer `80A186AC`;
+the fixture does not. Do not reinterpret this as a passed particle test or a
+demonstrated ordinary-game effect defect. Retain the 57-assertion native bell
+result and passing controller/profile loading, relocation, program caching,
+original-program loading, complete packet, and first timer-update evidence.
+Do not repeat unchanged rolling/material tests or add a third setup retry.
 
 Host sanitizer checks and the partial native run do not establish complete
 native particle lifetime, sound synthesis, GPU appearance, ordinary room

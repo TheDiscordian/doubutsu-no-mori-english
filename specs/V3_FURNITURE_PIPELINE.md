@@ -27,6 +27,12 @@ an immutable build lock; `pipeline.json` records the dependency plan, actual
 steps, imports, pending reasons, and final lock. A dependency-only build does not
 claim that pending items are available to players.
 
+`v3_furniture_install.py --refresh-runtime --room-rigs-code` rebuilds only the
+shared room code and its bound callback profiles from an explicit current build
+lock. It preserves installed models, audio, selections, and saved fields. Use
+this after changing shared code when no new resource category needs installation;
+profile-only staging does not implicitly recompile an existing code packet.
+
 ### Displacement-driven rolling rigs
 
 `contact-rolling-keyframe-rig` recognises the complete source lifecycle,
@@ -97,13 +103,17 @@ those bindings. Item identities and model names do not select the adapter.
 
 The shared 24-byte rig record uses mode 3. The retriggerable policy has zero
 extra parameters; the idle-only policy has first word 1 and second word the
-source speed 0.25 as a float. Unknown combinations reject. Both retain
-the existing six-joint limit, instance-local work vectors, frame-parity matrices,
-bounded complete model DMA, and room/catalogue index normalisation. Complete
-sound dependencies must be installed before a profile can become usable.
+source speed 0.25 as a float. The endpoint-only policy has first word 2 and
+source speed 0.5. Unknown combinations reject. Hit rigs support eight joints
+plus root; only switch/rolling behaviours that reuse morph vectors for private
+work retain a six-joint limit. Callbacks retain instance-local work vectors,
+frame-parity matrices, bounded complete model DMA, and room/catalogue index
+normalisation. Complete sound dependencies must be installed before a profile
+can become usable.
 
-Construction retains the donor's stop initializer and initial evaluation at
-speed 0.5, then stops the motion. The retriggerable policy clears the hit pulse;
+For retriggerable and idle-only policies, construction retains the donor's stop
+initializer and initial evaluation at speed 0.5, then stops the motion. The
+retriggerable policy clears the hit pulse;
 the idle-only policy preserves it, matching their complete source constructors.
 The native initializer uses speed 1, so the callback explicitly supplies 0.5
 before evaluating. Discovery
@@ -123,6 +133,26 @@ sets speed to zero at that endpoint. Its complete callback shape, constants,
 initializer, and source trigger are checked independently of item identity.
 This preserves tiger bobblehead's full behaviour with its already converted
 two-joint model; it is not treated as a retriggerable mask.
+
+The endpoint-only variant starts moving at half speed and accepts presses only
+when the native evaluator reports the endpoint. It retains the source's first
+evaluation, second evaluation while moving, and restart at frame one. The bell
+uses all seven joints and four model lists; no joint is removed to fit a smaller
+runtime. The source constructor does not clear the interaction pulse.
+
+Its complete conditional dependency uses [the shared room effects](V3_ROOM_EFFECTS.md):
+positional sound `0174`, singleton system sound `817E`, and the camera-flash
+controller when the actual wall is ringside seating. Both complete programs
+and all instrument/sample dependencies enter the same audio batch. Wall 65 in
+the donor maps to full native index 76, not native wall 65. The system sound
+retains singleton suppression while effect requests still occur independently.
+The optional wall is not forced into every bell selection.
+
+Eight-byte sound rows retain their existing index and primary sound fields.
+The final word is either zero or the checked wall byte, effect byte, and full
+system-sound halfword. Unknown conditions and incomplete installed effect/audio
+bindings reject before enabling the profile. Native actor allocation, matrix
+storage, and saved formats do not grow.
 
 The shared sound records admit checked groups 0, 1, and 4. The audio importer
 retains complete source programmes, instruments, samples, and trigger priorities,
@@ -1307,8 +1337,9 @@ functions retain their own pending dependencies and cannot enter this adapter.
 `convert --representation audio --assets-only --category switch-trigger-sound`
 uses these source-derived records to prepare the whole category's audio in one
 batch. The shared `v3_sound_programs` converter retains complete explicit-font,
-single-layer note sequences, including repeated notes and optional custom
-envelopes. Durations, velocities, pitches, tuning, and envelope data remain exact;
+single-layer note sequences, including repeated notes, short/wide timed rests,
+and optional custom envelopes set before or between timed events. Durations,
+velocities, pitches, tuning, and envelope data remain exact;
 only verified instrument/selector/internal-address bindings change. Unsupported
 commands, ambiguous boundaries, and unaccounted bytes reject. Full trigger words
 retain their single-instance flag separately from the source dispatch identity.
@@ -1793,8 +1824,12 @@ Each descriptor contains the canonical index, complete object length, skeleton
 and animation pointers, joint/visible counts, category, zero reserved byte, and
 two category parameters. Switch rigs require zero parameters. Clocks supply
 distinct hour/minute joint indices; storage supplies finite start/end frames
-within the complete source motion. Current native work supports at most six
-joints. The existing complete-object and pointer bounds remain mandatory.
+within the complete source motion. Native work supports eight joints plus root;
+switch and rolling callbacks reserve the final two morph vectors as private work
+and therefore support at most six joints. Complete-object and pointer bounds
+remain mandatory. Reusing an identical prepared asset from a different cache
+does not change its source identity: only the cache-location receipt is excluded
+from profile equality, while all model bytes, hashes, and source bindings remain checked.
 
 The stable vtable at `804B1FA0` dispatches through a bootstrap in the old code
 reservation. The bootstrap loads and verifies the complete packet, updates both
@@ -1895,9 +1930,9 @@ or checkbox-dependent identity assignment is needed.
 The [room-effect adapter](V3_ROOM_EFFECTS.md) prepares complete camera flashes
 through the native effect controller, including both lifecycles, donor drawing
 commands, lighting, and additive effect identities. The controller extension
-retains the current campsite-lamp hooks and every original effect. These prepared
-dependencies do not enable judge's bell until cartridge installation,
-endpoint-hit animation, both sounds, and the actual wall condition are connected.
+retains the current campsite-lamp hooks and every original effect. Endpoint-hit
+profiles require the installed controller, complete sprite, both sounds, and
+actual full-index wall condition. Prepared resources alone cannot enable an item.
 
 ## Verification policy
 

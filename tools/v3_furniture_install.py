@@ -550,7 +550,7 @@ def relocate_resource_plan(base,files,vrom,data,*,minimum_physical,target_vrom=N
 def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=False, equipment_kinds=False,
                     player_actions=False, item_category_art=None, ground_categories=False, event_acquisition=False,
                     held_collection=False, held_catalogue_art=None, held_selection=False, translation_updates=False,
-                    room_rigs_art=None, scenery_art=None, scenery_gameplay=False,
+                    room_rigs_art=None, room_rigs_code=False, scenery_art=None, scenery_gameplay=False,
                     equipment_rigs=None, expand_storage=False, furniture_audio_art=None, furniture_profiles=None,
                     material_frames_art=None,scrolling_materials_art=None,room_surfaces_art=None,furniture_scoring=False,
                     password_runtime=None,password_editor=False,room_effects=None):
@@ -574,9 +574,9 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
     moved=[];equipment_report=None;reused=None;owner_changes={};owner_moves=[];owner_updates=[];report_updates={};text_moves=[]
     equipment_mode=any((equipment_art is not None,equipment_rigs is not None,player_motion,equipment_kinds,player_actions,
                         item_category_art is not None,ground_categories,event_acquisition,held_collection,held_catalogue_art is not None,held_selection,room_rigs_art is not None,scenery_art is not None,scenery_gameplay))
-    resource_mode=equipment_mode or translation_updates or expand_storage or furniture_audio_art is not None or furniture_profiles is not None or material_frames_art is not None or scrolling_materials_art is not None or room_surfaces_art is not None or furniture_scoring or password_runtime is not None or password_editor or room_effects is not None
+    resource_mode=equipment_mode or room_rigs_code or translation_updates or expand_storage or furniture_audio_art is not None or furniture_profiles is not None or material_frames_art is not None or scrolling_materials_art is not None or room_surfaces_art is not None or furniture_scoring or password_runtime is not None or password_editor or room_effects is not None
     if sum((equipment_art is not None,equipment_rigs is not None,player_motion,equipment_kinds,player_actions,
-            item_category_art is not None,ground_categories,event_acquisition,held_collection,held_catalogue_art is not None,held_selection,translation_updates,room_rigs_art is not None,scenery_art is not None,scenery_gameplay,expand_storage,furniture_audio_art is not None,furniture_profiles is not None,material_frames_art is not None,scrolling_materials_art is not None,room_surfaces_art is not None,furniture_scoring,password_runtime is not None,password_editor,room_effects is not None))>1:
+            item_category_art is not None,ground_categories,event_acquisition,held_collection,held_catalogue_art is not None,held_selection,translation_updates,room_rigs_art is not None,room_rigs_code,scenery_art is not None,scenery_gameplay,expand_storage,furniture_audio_art is not None,furniture_profiles is not None,material_frames_art is not None,scrolling_materials_art is not None,room_surfaces_art is not None,furniture_scoring,password_runtime is not None,password_editor,room_effects is not None))>1:
         raise ValueError('Install shared runtime updates in dependency order')
     if resource_mode:
         blob,reused=reuse_resource_tail(base,prior,old_blob)
@@ -588,6 +588,11 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         import v3_room_effects as equipment
         display_report,alias_report=prior['clothing']['display'],prior['display_aliases']
         equipment_report,owner_changes,report_updates=equipment.install(base,prior,blob,core,original,output,room_effects)
+    elif room_rigs_code:
+        import v3_room_rig_runtime as equipment
+        display_report,alias_report=prior['clothing']['display'],prior['display_aliases']
+        equipment_report=copy.deepcopy(prior['equipment_resources'])
+        equipment.refresh_code(equipment_report,blob,output)
     elif password_editor:
         import v3_password_editor as password_ui
         display_report,alias_report=prior['clothing']['display'],prior['display_aliases']
@@ -959,6 +964,9 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             report['shared_runtime_refresh']['adapters'].append('room_rigs')
             report['shared_runtime_refresh']['artwork_changed']=True
             report['shared_runtime_refresh']['additional_resident_bytes']=equipment_report['room_rigs']['additional_resident_bytes']
+        if room_rigs_code:
+            report['shared_runtime_refresh']['adapters']=['room_rigs_code']
+            report['sources'].update({name:sha256((ROOT/name).read_bytes()) for name in equipment.SOURCES})
         if furniture_audio_art is not None:
             report['shared_runtime_refresh']['adapters'].append('furniture_trigger_audio')
             report['shared_runtime_refresh']['additional_resident_bytes']=equipment_report['furniture_audio']['audio_heap_growth']
@@ -1064,6 +1072,8 @@ if __name__=='__main__':
         help='With --refresh-runtime, enable installed parents in the full experimental composition reference')
     parser.add_argument('--room-rigs-art',type=Path,action='append',
         help='With --refresh-runtime, install a complete prepared animated room category without enabling parents')
+    parser.add_argument('--room-rigs-code',action='store_true',
+        help='With --refresh-runtime, rebuild shared room code and callback bindings while preserving all assets and selections')
     parser.add_argument('--translation-updates',action='store_true',
         help='With --refresh-runtime, carry corrected translation headers and the pinned import-free baseline')
     parser.add_argument('--expand-storage',action='store_true',
@@ -1101,6 +1111,7 @@ if __name__=='__main__':
     if args.held_catalogue_art and not args.refresh_runtime:parser.error('--held-catalogue-art requires --refresh-runtime')
     if args.held_selection and not args.refresh_runtime:parser.error('--held-selection requires --refresh-runtime')
     if args.room_rigs_art and not args.refresh_runtime:parser.error('--room-rigs-art requires --refresh-runtime')
+    if args.room_rigs_code and not args.refresh_runtime:parser.error('--room-rigs-code requires --refresh-runtime')
     if args.translation_updates and not args.refresh_runtime:parser.error('--translation-updates requires --refresh-runtime')
     if args.expand_storage and not args.refresh_runtime:parser.error('--expand-storage requires --refresh-runtime')
     if args.furniture_audio_art and not args.refresh_runtime:parser.error('--furniture-audio-art requires --refresh-runtime')
@@ -1118,7 +1129,7 @@ if __name__=='__main__':
                             event_acquisition=args.event_acquisition,held_collection=args.held_collection,
                             held_catalogue_art=args.held_catalogue_art,held_selection=args.held_selection,
                             translation_updates=args.translation_updates,equipment_rigs=args.equipment_rigs,
-                            room_rigs_art=args.room_rigs_art,scenery_art=args.scenery_art,scenery_gameplay=args.scenery_gameplay,
+                            room_rigs_art=args.room_rigs_art,room_rigs_code=args.room_rigs_code,scenery_art=args.scenery_art,scenery_gameplay=args.scenery_gameplay,
                             expand_storage=args.expand_storage,furniture_audio_art=args.furniture_audio_art,
                             furniture_profiles=args.furniture_profiles,material_frames_art=args.material_frames_art,
                             scrolling_materials_art=args.scrolling_materials_art,room_surfaces_art=args.room_surfaces_art,

@@ -22,38 +22,39 @@ Incomplete gameplay stays unavailable in the selector; installing assets does
 not claim that an item is playable. Reuse unchanged passing tests throughout.
 
 Current task: close shared conversion gaps in the ordinary bulk importer.
-The current checked proposal is ABI 213 at
-`build/v3-room-effects-runtime-02/build-lock.json`, with 152
-development choices. Automatic category installation covers complete idle-only
-struck-animation behaviour and sound. Tiger bobblehead reuses its artwork and
-uses additive identity `3C3C`, runtime index 1807, through its real Gulliver route.
-Continue unsupported model/material/animation callbacks, including required
-item-specific behaviour; do not divert into acquisition frontend work.
-The extended rig packet has 10,428 code bytes spare. The scroll module has only
-4 code bytes spare; further scroll behaviour requires a checked capacity
-extension or relocation, not omitted functionality. Audio has 672 conservative
-bytes spare. Respect these bounds when extending categories.
-See the [current checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#installed-shared-camera-flash-effects)
-for commands, evidence, and save compatibility.
+The checked proposal is ABI 218 at
+`build/v3-endpoint-hit-runtime-04/build-lock.json`, with 153 development choices.
+Endpoint-hit rigs retain their full native joint capacity, initial half-speed
+motion, endpoint interaction, both complete sounds, and the conditional camera
+flashes. Judge's bell reuses its prepared model through event stock and catalogue
+ordering. Its optional ringside wall is not forced into the selection.
 
-The first native hit-policy check passes 108 internal assertions. Retain its
-results and unchanged rolling/contact/material evidence. Camera-flash lifecycle,
-complete sprite packing, checked profiles, and additive controller tables are
-installed. Nine host checks and four browser/offline comparisons pass. Actual
-native loading/relocation, both new profiles/cache, shared-packet loading, and
-original-program preservation pass; particle lifetime remains unverified after
-the fixture mistakes priority two for an inactive flag. The fixture correction
-belongs in the next changed integration run, not another unchanged attempt.
-Next connect the endpoint-triggered hit variant with both sound programs and
-the installed effects. Do not repeat the source/format investigation or passed
-runtime checks. Use [the effect integration steps](../specs/V3_ROOM_EFFECTS.md#remaining-integration).
-The judge's bell
-starts at half speed, accepts hits at the animation endpoint, and requests both
-a second singleton sound and a flash effect with ringside seating. Use the
-actual wall identity/artwork correspondence, not equal numeric indices. Its
-complete source is `src/furniture/ac_nog_gong.c` in the donor reference. Do not
-omit the flash/sound branch or delay it merely because it is item-specific.
-Other pending model/material callbacks remain required.
+Ten focused host/current-cartridge checks pass, including four browser/offline
+composition cases. The complete native bell representative passes 57 assertions
+for animation, full-index wall reading, drawing every model, bounds, independent
+instances, and unchanged save/profile state. The effect continuation passes real
+loading/cache/relocation and its first timer update, then stops because the
+isolated fixture omits graphics-pool allocation. Native `80A19304` refuses
+graphics-dependent creation when the count at owner+`37A0` is zero; the fixture
+calls state/program initializers but omits graphics initializer `80A186AC`.
+This is not a demonstrated ordinary-game effect failure. Full particle lifetime
+remains unverified. Do not run a third setup retry or replay the passed bell checks.
+Include proper native graphics setup with the next changed effect integration.
+
+Continue complete material lifecycles and other model/animation callbacks.
+Festive candle already has complete animated artwork; its source constructor
+sets `dynamic_work_s[0] = -1`, and its move/destructor are no-ops. Bind that
+source-checked lifecycle through the shared material adapter instead of another
+dedicated item installer. Mouth of Truth, starman, stone coin, and the remaining
+prepared callback models retain their actual behaviour requirements. Do not
+divert into the parked acquisition frontend.
+
+Room code has 9,876 bytes spare; bootstrap has 27 bytes spare. Scroll code has
+4 bytes spare, audio has 288 conservative bytes spare, and import storage has
+1,492,544 bytes spare. Capacity extensions must preserve complete dependencies.
+See the [current checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#complete-endpoint-hit-import)
+for reproduction, native limits, and save warnings. Source publication is
+allowed; the main lock and both stable web-patcher deployments stay unchanged.
 
 Before a corrected translation-only handoff, combine the separate V2 museum
 header and official credits-title corrections. The current imported V3 already
@@ -401,12 +402,11 @@ container at `build/v3-fixed-keyframe-rigs-prepared-01/` (15,776 bytes): tiger
 bobblehead, stone coin, harvest clock, and judge's bell. Three focused checks
 pass. Reuse these resources; do not reconvert them per item. The descriptors
 retain stop/repeat mode, initial-play ordering, and live clock joints. Harvest
-clock's lifecycle/profile is installed above; the other three retain pending
-behaviour, spawned effects/sounds, acquisition, and, for the bell, seven-joint
-native work capacity.
-General category and acquisition work takes priority over those unique details.
-The three pending rigs add no choices or save changes. Both served patchers
-remain unchanged.
+clock's lifecycle/profile is installed; tiger bobblehead and judge's bell have
+complete installed behaviours and optional development selections. Stone coin
+retains pending behaviour/material dependencies. Complete item-specific behaviour
+remains part of the importing pipelines, without a blanket deferral. Reuse the
+prepared resources and keep both served patchers unchanged.
 
 Shared IA16 and translucent-material conversion prepares complete tissue/bottled-ship artwork
 and enables the Moai statue's complete ordinary import. No effects are dropped,

@@ -518,7 +518,8 @@ def room_rigs(debug,rom_path,record,*,mode=2):
     state=report['save_runtime']
     saved={at:debug.read_memory(at,n) for at,n in ((0x801458B8,4),(state['state_ram'],state['state_bytes']))}
     if mode==1:saved[0x80136FC4]=debug.read_memory(0x80136FC4,4)
-    if mode==5:saved[0x80136F2C]=debug.read_memory(0x80136F2C,4)
+    if mode in (3,5):saved[0x80136F2C]=debug.read_memory(0x80136F2C,4)
+    if mode==3:saved[0x80126EB4]=debug.read_memory(0x80126EB4,4)
     size=0x8300 if mode==4 else 0x6200;allocation=call(0x8009BFC0,[size])
     if allocation&15 or not MODULE_RAM+0x8000<=allocation<=0x80400000-size:
         raise ValueError('Room-rig fixture outside native heap')
@@ -537,6 +538,8 @@ def room_rigs(debug,rom_path,record,*,mode=2):
     jumps=b''.join(struct.pack('>2I',jump(symbols[prefix+name]),0) for name in names)
     if mode==1:
         jumps+=struct.pack('>2I',jump(rigs['code']['symbols']['clock_before']),0)
+    if mode==3 and rigs.get('effects'):
+        jumps+=struct.pack('>2I',jump(rigs['code']['symbols']['af_v3_room_effect_wall']),0)
     debug.write_memory(bridge,jumps)
     call(0x8002FE00,[bridge,len(jumps)]);call(0x80034CE0,[bridge,len(jumps)])
     def callback(name,target):
@@ -549,7 +552,11 @@ def room_rigs(debug,rom_path,record,*,mode=2):
     selected=[min(rows,key=lambda r:r['bytes']),max(rows,key=lambda r:r['bytes'])]
     if mode==3:
         # One complete representative of each source hit policy, independent
-        # of item identities and object size ordering.
+        # of item identities and object size ordering. Prefer the changed batch;
+        # unchanged policies retain their previous native execution evidence.
+        changed={r.get('donor_item_id',r['item_id']) for r in report.get('automatic_furniture',{}).get('imports',[])}
+        new=[r for r in rows if r['source_item_id'] in changed]
+        if new:rows=new
         policies=sorted({(r['first'],r['last']) for r in rows})
         selected=[max((r for r in rows if (r['first'],r['last'])==policy),key=lambda r:r['bytes']) for policy in policies]
     if mode==1:
@@ -573,10 +580,11 @@ def room_rigs(debug,rom_path,record,*,mode=2):
                 if mode==4:debug.write_memory(target+0x714,struct.pack('>3f',1,1,1))
                 if mode==5:debug.write_memory(target+8,struct.pack('>3f',10,0,20))
                 debug.write_memory(target+0x12D,bytes(1));callback('ct',target)
-                check('initial per-instance state',target+0x204,struct.pack('>2f',*((10,20) if mode==5 else (0,.5))))
+                if row['joints']<=6:
+                    check('initial per-instance state',target+0x204,struct.pack('>2f',*((10,20) if mode==5 else (0,.5))))
                 check('native work vectors belong to this instance',target+0x158,
                       struct.pack('>2I',target+0x1A4,target+0x1DA))
-                initial=(.5,1.5) if mode in (1,4) else (0,1.5) if mode in (3,5) else (0,1)
+                initial=(.5,1.5) if mode in (1,4) or mode==3 and row['first']==2 else (0,1.5) if mode in (3,5) else (0,1)
                 check('source initial speed and frame',target+0x140,struct.pack('>2f',*initial))
                 if packet:
                     check('native category animation mode',target+0x148,struct.pack('>I',1 if mode in (1,4,5) else 0))
@@ -602,7 +610,19 @@ def room_rigs(debug,rom_path,record,*,mode=2):
                 # Suppress synthesis through a native transition state; sound
                 # identity/program integrity and dispatch have separate checks.
                 debug.write_memory(actor+0x3C,struct.pack('>h',5))
-                if row['first']:
+                if row['first']==2:
+                    end=floating(actor+0x138)
+                    cases=((1,.5,0,.5,2),(1,.5,1,.5,2),(end,.5,0,.5,end),(end,.5,1,.5,1.5))
+                    put(0x80136F2C,bridge+0x100);put(bridge+0x100,bridge+0x200)
+                    for scene,wall,want in ((20,76,76),(6,65,65),(22,77,77),(3,76,0xFFFFFFFF)):
+                        put(0x80126EB4,scene)
+                        debug.write_memory(bridge+0x200+0x174,struct.pack('>2H',65,wall))
+                        actual=call(bridge+24,proof=(bridge,jumps))
+                        record(dict(room_wall_scene=scene,wall=wall,actual=actual,
+                            assertion='passed' if actual==want else 'failed'))
+                        if actual!=want:raise ValueError('Full wall getter changed room identity')
+                        assertions+=1
+                elif row['first']:
                     end=floating(actor+0x138)
                     cases=((1,0,0,0,1),(1,0,1,.25,1),(20,.25,0,.25,20.5),
                         (20,.25,1,.25,20.5),(end,.25,1,0,end),(end,0,1,.25,1))
@@ -699,7 +719,9 @@ def room_rigs(debug,rom_path,record,*,mode=2):
             tail=bytearray(b'\xA5'*0x30)
             if mode==4:struct.pack_into('>3f',tail,4,1,1,1)
             check('native tail fields retain their bytes',actor+0x710,tail)
-            check('unused morph-vector bytes retain their bytes',actor+0x20C,b'\xA5'*4)
+            morph_tail=max(0x20C if row['joints']<=6 else 0x1DA+(row['joints']+1)*6,0x1DA)
+            if morph_tail<0x210:
+                check('unused morph-vector bytes retain their bytes',actor+morph_tail,b'\xA5'*(0x210-morph_tail))
             check('balanced matrix stack',0x801462B4,struct.pack('>I',matrix))
             check('unchanged parent transform',matrix,debug.read_memory(identity,64))
             for at in guards:check('room-rig work/graphics/stack guard',at,edge)

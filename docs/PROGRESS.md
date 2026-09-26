@@ -32,47 +32,40 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
-The shared camera-flash effects are installed in ABI 213 at
-`build/v3-room-effects-runtime-02/build-lock.json`. Complete lifecycles, the donor
-sprite, checked profile loading, and additive native effect tables preserve all
-111 original identities and campsite-lamp hooks. The scene owner grows 3,664
-bytes without another fixed RAM reservation. Shared publication also rebinds
-effect callbacks after later item-category builds.
+The checked V3 proposal is ABI 218 at
+`build/v3-endpoint-hit-runtime-04/build-lock.json`, with 153 development choices.
+The ordinary bulk importer installs complete endpoint-hit behaviour, both sounds,
+and conditional camera flashes for judge's bell. Its seven joints and four model
+lists reuse the prepared artwork; event stock, catalogue ordering, and its official
+English name use the existing shared item consumers. Ringside seating uses full
+native wall index 76 and remains optional, not a forced dependency.
 
-Nine focused host checks and four browser/offline composition comparisons pass.
-The bounded native run verifies actual controller loading/relocation, both new
-profiles and caching, the complete shared packet, and an original effect program.
-The lifetime continuation is unverified: after one allocation correction, its
-fixture wrongly expects active priorities to equal one. The native code stores
-the requested priority, two here. That fixture is corrected for the next changed
-integration batch, without a third attempt. Continue the endpoint-hit policy
-and both bell sound bindings; the bell is still not selectable. See
-[the effect specification](../specs/V3_ROOM_EFFECTS.md) and
-[checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#installed-shared-camera-flash-effects).
+The shared audio converter preserves timed rests and envelopes between events.
+The camera sound retains its complete 50-tick rest, 350-tick note, envelope,
+instrument, and samples. Native actor size and saved fields are unchanged; the
+full nine-vector morph area supports up to eight joints for categories without
+private work in that area. Source/code refresh is explicit, preserving complete
+assets, audio, selections, and bound effect profiles.
 
-The current explicit V3 proposal is ABI 213. The ordinary
-importer supports the complete idle-only struck-animation policy: quarter-speed
-playback, ignored presses while moving, endpoint stopping, and source sound.
-Tiger bobblehead reuses its complete converted model and receives a new persistent
-identity without replacing an original item. It retains its actual Gulliver
-route, non-orderable catalogue status, and official English name. There are
-152 development choices.
+Seven focused host checks pass for source validation, timed audio, complete
+endpoint/conditional behaviour, morph bounds, and shared categories. Three
+current-cartridge checks pass for code-only resource preservation, installed
+audio/effect bindings, patch reconstruction, and four browser/offline selections.
+The final native bell representative passes 57 assertions for animation, full
+wall identity, every model draw, bounds, and save-state preservation. Effect
+loading/cache/relocation and the first timer update pass, but full particle
+lifetime remains unverified: the isolated fixture omits native graphics-pool
+allocation, so the engine refuses to create a flash. No third setup retry is
+queued. Retain unchanged rolling/contact/material evidence. See
+[the checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#complete-endpoint-hit-import).
 
-Seven focused host checks pass, covering source rejection, additive identity,
-sanitized animation/sound behaviour, complete installed resources, UPS
-reconstruction, and four browser/offline selection comparisons. The first native
-run passes 108 internal assertions for both hit policies, including real motion,
-stopping/restarting, complete model drawing, saved-state preservation, and guards.
-See the [idle-hit checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#idle-only-struck-animation-policy).
-Unchanged rolling, contact, and material evidence is retained.
+Room code uses 6,508 of 16,384 bytes; bootstrap uses 1,509 of 1,536 bytes.
+Scroll code has 4 bytes spare, audio has 288 conservative bytes spare, and
+the import reservation has 1,492,544 bytes spare. No fixed RAM or saved field
+is added in this batch. Live synthesis, GPU appearance, ordinary gameplay/
+save/restart, and original hardware are not newly verified.
 
-The shared packet uses 5,956 of its 16,384 code bytes, with no new RAM reservation
-or saved field. Scroll code has 4 bytes spare; audio has 672 conservative bytes
-spare. The new source trigger is mapped into its own sound-table group with
-complete instrument/sample data. Live synthesis, GPU appearance, ordinary
-gameplay/save/restart, and hardware are not newly verified.
-
-Saved format 4 is unchanged. A save using tiger bobblehead requires its selected import
+Saved format 4 is unchanged. A save using judge's bell requires its selected import
 in the receiving build; preserve backups and equal-or-larger profiles. Format-4
 saves cannot load in V2 or format-1/2/3 V3 builds. Translation-only output remains
 the pinned V2-12 ROM. The main lock and both stable deployments remain unchanged.

@@ -21,7 +21,7 @@ SOURCES=('tools/v3_sound_programs.py','tools/v3_villager_audio.py','tools/v3_fur
 def trigger_program(sequence, origin, limit):
     """Complete explicit-font trigger with timed notes and optional envelope.
 
-    This category includes repeated notes, not only the one-note form. Unknown
+    This category includes repeated notes and rests, not only the one-note form. Unknown
     commands, unreachable bytes, incomplete dependencies, and zero times fail.
     """
     data=span(sequence,origin,limit-origin)
@@ -30,13 +30,15 @@ def trigger_program(sequence, origin, limit):
             struct.unpack_from('>H',data,4)[0]!=origin+7 or data[6]!=255):
         raise ValueError('Unsupported complete trigger channel')
     at=7;pointers=[4];envelope=None;decay=None;events=[]
-    if data[at]==0xCB:
-        envelope=struct.unpack('>H',span(data,at+1,2))[0]-origin
-        decay=span(data,at+3,1)[0];pointers.append(at+1);at+=4
-        if (origin+envelope)&1:raise ValueError('Unaligned trigger envelope')
     commands=[]
     while at<len(data) and data[at]!=255:
         start=at;op=data[at];at+=1
+        if op==0xCB:
+            if envelope is not None:raise ValueError('Multiple trigger envelopes are not supported')
+            envelope=struct.unpack('>H',span(data,at,2))[0]-origin
+            decay=span(data,at+2,1)[0];pointers.append(at);at+=3
+            if (origin+envelope)&1:raise ValueError('Unaligned trigger envelope')
+            continue
         if op==0xC2:
             transpose=span(data,at,1)[0];at+=1
             commands.append(dict(offset=start,opcode=op,transpose=transpose));continue
@@ -47,13 +49,17 @@ def trigger_program(sequence, origin, limit):
             if not mode&128 or not 1<=mode&127<=5 or target>127 or not time:
                 raise ValueError('Unsupported trigger pitch sweep')
             commands.append(dict(offset=start,opcode=op,mode=mode,target=target,time=time));continue
-        if not 0x40<=op<=0x7F:raise ValueError('Unsupported trigger note command')
+        if not (0x40<=op<=0x7F or op==0xC0):raise ValueError('Unsupported trigger note command')
         duration=span(data,at,1)[0];at+=1
         if duration&128:duration=(duration&127)*256+span(data,at,1)[0];at+=1
+        if not duration:raise ValueError('Invalid trigger duration')
+        if op==0xC0:
+            events.append(dict(offset=start,rest=True,duration=duration));continue
         velocity=span(data,at,1)[0];at+=1
-        if not duration or velocity>127:raise ValueError('Invalid trigger duration or velocity')
+        if velocity>127:raise ValueError('Invalid trigger velocity')
         events.append(dict(offset=start,note=op&63,duration=duration,velocity=velocity))
-    if not events or span(data,at,1)!=b'\xFF':raise ValueError('Unterminated trigger layer')
+    if not any('note' in e for e in events) or span(data,at,1)!=b'\xFF':
+        raise ValueError('Unterminated or empty trigger layer')
     at+=1;envelope_bytes=0
     if envelope is not None:
         if not at<=envelope<len(data) or any(data[at:envelope]):
@@ -277,7 +283,7 @@ def prepare_furniture_audio(image,report,source,inventory,output,selected=(),cat
         if trigger is not None:rows.append(r);triggers[r['item_id']]=trigger
     if not rows or selected and set(selected)!={r['item_id'] for r in rows}:
         raise ValueError('Unsupported or empty furniture audio selection')
-    resources,result=prepare_triggers(image,report,[triggers[r['item_id']]['sound_word'] for r in rows])
+    resources,result=prepare_triggers(image,report,furniture_trigger_words(triggers.values()))
     result['furniture']=[dict(item_id=r['item_id'],name=r['name'],
         profile_sha256=r['profile']['profile_sha256'],callback=r['profile']['callback_adapter'],
         trigger=triggers[r['item_id']]) for r in rows]
@@ -290,6 +296,12 @@ def prepare_furniture_audio(image,report,source,inventory,output,selected=(),cat
     for name,data in files.items():write_new(output/name,data)
     write_new(output/'audio.json',(json.dumps(result,indent=2)+'\n').encode())
     return result
+
+
+def furniture_trigger_words(triggers):
+    """Keep every primary and conditional system programme in a shared batch."""
+    return sorted({word for trigger in triggers for word in
+        [trigger['sound_word']]+([trigger['conditional']['system_sound_word']] if trigger.get('conditional') else [])})
 
 
 def furniture_level(source,profile):
@@ -1132,7 +1144,7 @@ def install_furniture(image,prior,blob,code,original,output,directory):
         if trigger is None or row.get('trigger',json.loads(json.dumps(trigger)))!=json.loads(json.dumps(trigger)):
             raise ValueError('Changed shared furniture trigger behaviour')
         seen.add(item);triggers[row['item_id']]=trigger
-    resources,audio=prepare_triggers(image,prior,[r['sound_word'] for r in triggers.values()])
+    resources,audio=prepare_triggers(image,prior,furniture_trigger_words(triggers.values()))
     for key in ('programs','layout','previous','font_index','wave_index','source_sequence_sha256'):
         if json.loads(json.dumps(audio[key]))!=prepared[key]:raise ValueError('Changed complete prepared audio identity')
     all_data={'font.bin':resources['font'],'wave.bin':resources['wave'],**resources['fragments']}
@@ -1189,6 +1201,11 @@ def install_furniture(image,prior,blob,code,original,output,directory):
             source_sound_word=triggers[row['item_id']]['sound_word'],
             native_sound_word=mapping[triggers[row['item_id']]['sound_word']]['native_sound_word'],
             profile_installed=False,parent_selectable=False))
+        from v3_room_effects import conditional_binding
+        conditional=conditional_binding(image,prior,triggers[row['item_id']])
+        if conditional:
+            conditional['native_system_word']=mapping[conditional['source_system_word']]['native_sound_word']
+            sound_rows[-1]['conditional']=conditional
         if row['callback']['category']=='material-frame-assets':
             material=next((r for r in runtime.get('material_rows',[]) if r['source_item_id']==row['item_id']),None)
             if (material is None or material['source']['profile']!=json.loads(json.dumps(source.profile(int(row['item_id'],16)))) or

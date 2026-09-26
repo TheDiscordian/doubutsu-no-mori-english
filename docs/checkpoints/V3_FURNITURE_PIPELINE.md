@@ -1,5 +1,115 @@
 # Automatic furniture pipeline checkpoint
 
+## Complete endpoint-hit import
+
+The current checked proposal is ABI 218 at
+`build/v3-endpoint-hit-runtime-04/build-lock.json`. Judge's bell (`33B8`, runtime
+1262) is installed through the ordinary shared importer, with 153 experimental
+choices. The complete seven-joint/four-model object is reused from prepared
+artwork; source event stock, catalogue ordering, scoring, selection, and official
+English naming use the existing shared consumers. No main-lock or deployment
+change is made.
+
+The source-bound endpoint-hit policy retains half-speed initial motion, endpoint
+interaction, both evaluations while moving, restart at frame one, and transition
+sound exclusions. Complete native joint/morph storage permits eight joints plus
+root for categories without private work in the final two vectors. Switch and
+rolling work retains its existing six-joint bound and exact offsets; actor size
+and matrix storage do not grow.
+
+Both source sounds are installed together. Primary `0174` retains native `0174`;
+singleton camera sound `817E` maps to `8171`. The latter requires timed rests
+and an envelope command after the rest, extending the shared trigger parser.
+Its 50-tick rest, 350-tick note, complete envelope, instruments, and samples remain.
+All prior trigger identities/resources are preserved. The conditional row binds
+the actual ringside wall (donor 65 to native 76) and native effect 112. Duplicate
+audio suppression does not suppress the effect request. The wall is not a forced
+selection dependency. The room getter reads the full wall halfword, not the
+adjacent floor or a legacy masked value.
+
+The incremental pipeline exposes two useful implementation fixes:
+
+- Asset reuse from another checked cache changes only its cache-location receipt.
+  Profile staging compares complete source/art/data while excluding that receipt,
+  rather than rejecting an identical model from a newer prepared directory.
+- Profile-only staging retains installed code. The explicit `--room-rigs-code`
+  refresh recompiles shared code and all effect callback bindings while keeping
+  full assets, sound resources, selections, and saved formats. The final proposal
+  includes the constructor change that leaves unused eight-joint morph storage
+  untouched, rather than retaining its earlier compiled work-field writes.
+
+Builds are preserved at `build/v3-endpoint-hit-category-auto-01/` (rig stage),
+`...-02/` (audio stage), `...-03/` (profile and ordinary import), and
+`build/v3-endpoint-hit-runtime-04/` (final code refresh). The first automatic
+attempt discovers the unsupported rest; the second discovers the cache-receipt
+comparison. Successful stages are reused, not re-extracted or recompiled.
+
+Seven focused source/audio/sanitizer checks pass in 2.590 seconds. Three final
+cartridge checks pass in 22.370 seconds, covering preserved code-refresh
+resources, full source-program restoration, complete instruments, rebound effect
+profiles, UPS reconstruction, and four browser/offline cases (none, all, new
+category, existing villager). Empty selection retains the pinned translation-only
+baseline; no development choice is served by either stable patcher.
+
+Native results are deliberately scoped:
+
+- `build/v3-room-behaviours-native-01/`: 55 records, 31 passed assertions. Native
+  animation, wall identity, and all model draws pass; the unused-morph check
+  exposes the earlier compiled constructor retained by profile-only staging.
+- `build/v3-room-behaviours-native-02/`: 108 records, 69 passed assertions before
+  an incomplete effect continuation. The complete current bell representative
+  passes 57 assertions: native initialization/evaluation order, full wall reader,
+  model DMA, four model lists, independent instances, graphics/stack/actor bounds,
+  unchanged save state, and no CPU fault. The effect prefix passes complete real
+  controller loading/relocation, both profiles/cache, full shared packet,
+  original effect loading, lifetime 240, and the first native update to 238.
+  It then raises `Native controller did not create its flash`.
+
+Static native inspection classifies that remaining failure as missing fixture
+graphics setup. The fixture calls `80A18594` (state), `80A18794` (program buffers),
+and `80A187F8` (clip), but not `80A186AC` (graphics buffers). Count
+owner+`37A0` remains zero. Native `80A19304` returns zero with that count;
+`80A19770` then refuses creation for a graphics-dependent effect. The controller
+itself has no graphics dependency, which explains why its timer works. The real
+scene constructor calls the graphics initializer. No third setup retry is run.
+Carry proper native graphics setup into the next changed effect batch; retain
+the passed bell checks. This is not a demonstrated ordinary-game defect, nor
+proof of working full native particle lifetime.
+
+Reproduction uses fresh ignored output directories:
+
+```sh
+python3 tools/v3_furniture_pipeline.py import \
+  --category switch-hit-keyframe-rig \
+  --base-lock build/v3-room-effects-runtime-02/build-lock.json \
+  --reuse-assets build/v3-fixed-keyframe-rigs-prepared-01 \
+  --output build/v3-endpoint-hit-reproduction
+python3 tools/v3_furniture_install.py --refresh-runtime --room-rigs-code \
+  --base-lock build/v3-endpoint-hit-category-auto-03/cartridge/build-lock.json \
+  --output build/v3-endpoint-hit-code-reproduction
+python3 -m unittest \
+  tests.test_v3_furniture_rigs.HitResourceTests.test_endpoint_hit_retains_all_joints_and_conditional_dependencies \
+  tests.test_v3_furniture_audio.SharedFormatTests \
+  tests.test_v3_room_effects.EffectTests.test_complete_endpoint_hit_under_sanitizers \
+  tests.test_v3_room_effects.EffectTests.test_flash_runtime_under_sanitizers \
+  tests.test_v3_room_rig_runtime.BehaviourTests.test_extended_categories_under_sanitizers \
+  tests.test_v3_room_rig_runtime.CurrentImportedRigTests -v
+```
+
+- Room code: 6,508/16,384 bytes; bootstrap: 1,509/1,536 bytes.
+- Scroll code spare: 4 bytes; audio conservative spare: 288 bytes.
+- Import reservation spare: 1,492,544 bytes; no fixed RAM growth in this batch.
+- ROM SHA-256: `51223435916f4209d4b0ffb74aaa1f1792edfae3c4c6071c3fba3d1e235bc23b`.
+- Report SHA-256: `80a0d9fff6efb05199e514cbca2163ac5adef6b3d5ff1ed753656be6a52de595`.
+- UPS SHA-256: `13365c7922eef56d643b21ec9cbe72b8e48e69d6b495dd0db9ace28a6524acd2`.
+
+Saved format 4 is unchanged. Saves containing the bell require its selected
+profile; retain backups and equal-or-larger matching selections. Format-4 saves
+cannot load in V2 or V3 formats 1–3. Audio synthesis, GPU appearance, ordinary
+room play/save/restart, complete native particle lifetime, and hardware are not
+newly verified. Continue remaining source-bound material/model behaviours;
+acquisition frontend and gold-tree work keep their required later position.
+
 ## Installed shared camera-flash effects
 
 ABI 213 is `build/v3-room-effects-runtime-02/build-lock.json`. Shared effects

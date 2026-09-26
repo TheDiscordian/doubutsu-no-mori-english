@@ -1,6 +1,9 @@
 /* Complete shared room rigs; each record retains its actual behaviour. */
 #include "room_rigs.h"
 #include "room_motion.h"
+#ifdef AF_V3_ROOM_EFFECTS
+#include "room_effects.h"
+#endif
 #ifdef AF_V3_ROOM_ROLLING
 typedef struct { u8 prefix[0x1A0];int direction; } RoomMotionOwner;
 typedef struct { RoomMotionOwner *owner; } RoomMotionClip;
@@ -35,24 +38,51 @@ static void rolling_move(RoomRig *actor,const RoomRigRecord *r) {
 #endif
 
 #ifdef AF_V3_ROOM_TRIGGER_SOUND
-static void trigger(u32 index,float *position) {
+static const RoomSoundRecord *sound_record(u32 index) {
     if (room_sound_table->magic!=ROOM_SOUND_MAGIC || room_sound_table->count>ROOM_SOUND_CAPACITY ||
-            room_sound_table->stride!=sizeof(RoomSoundRecord) || room_sound_table->reserved) return;
+            room_sound_table->stride!=sizeof(RoomSoundRecord) || room_sound_table->reserved) return 0;
     if (index>=2048u && index<3072u) index-=1024u;
     for (u32 i=0;i<room_sound_table->count;++i) {
         const RoomSoundRecord *r=room_sound_table->rows+i;
         if (r->index!=index) continue;
         u32 group=(r->word>>8)&127u;
-        if (r->index<1024 || r->index>=2048 || r->reserved || (r->word&0x80u) ||
-                (group!=0u && group!=1u && group!=4u)) return;
+        if (r->index<1024 || r->index>=2048 || (r->word&0x80u) ||
+                (group!=0u && group!=1u && group!=4u)) return 0;
+#ifdef AF_V3_ROOM_EFFECTS
+        if (r->reserved && (r->wall!=76 || r->effect!=ROOM_EFFECT_FLASH_CONTROLLER ||
+                (r->system&0x8080u)!=0x8000u || ((r->system>>8)&127u)!=1u)) return 0;
+#else
+        if (r->reserved) return 0;
+#endif
+        return r;
+    }
+    return 0;
+}
+static int sound_active(u32 word) {
+    if (word&0x8000u) for (u32 j=0;j<6;++j)
+        if (room_native_triggers[j].word==word) return 1;
+    return 0;
+}
+static void trigger(u32 index,float *position) {
+    const RoomSoundRecord *r=sound_record(index);
+    if (r) {
         /* The original N64 dispatcher lacks the donor's singleton flag.
            Its six live slots retain the full word, including that flag. */
-        if (r->word&0x8000u) for (u32 j=0;j<6;++j)
-            if (room_native_triggers[j].word==r->word) return;
+        if (sound_active(r->word)) return;
         sAdo_OngenTrgStart(r->word,position);
         return;
     }
 }
+#ifdef AF_V3_ROOM_EFFECTS
+static void trigger_conditional(RoomRig *actor,RoomRigGame *game) {
+    const RoomSoundRecord *r=sound_record(actor->index);
+    if (!r || !r->reserved || af_v3_room_effect_wall()!=r->wall) return;
+    if (!sound_active(r->system)) sAdo_SysTrgStart(r->system);
+    RoomEffectClip *clip=room_effect_clip;
+    if (clip) clip->request(r->effect,(EffectPosition){actor->position[0],actor->position[1],actor->position[2]},
+        2,0,game,0xFFFF,0,0);
+}
+#endif
 void af_v3_room_sound_mv(RoomSoundActor *actor,void *room,RoomRigGame *game,u8 *data) {
     (void)room;(void)game;(void)data;
     if (!actor || actor->changed!=1 || room_transition_state(actor->state)) return;
@@ -70,11 +100,12 @@ static const RoomRigRecord *find(u32 index) {
         const RoomRigRecord *r=room_rig_table->rows+i;
         if (r->index!=index) continue;
         if (r->index<1024 || r->index>=2048 || r->bytes<32 || r->bytes>9216 || (r->bytes&15) ||
-                !r->joints || r->joints>6 || !r->shown || r->shown>r->joints ||
+                !r->joints || r->joints>8 || !r->shown || r->shown>r->joints ||
                 (r->skeleton&3) || r->skeleton<0x06000000u || r->skeleton>0x06000000u+r->bytes-8 ||
                 (r->animation&3) || r->animation<0x06000000u || r->animation>0x06000000u+r->bytes-20) return 0;
 #ifdef AF_V3_ROOM_RIG_PACKET
         if (r->reserved || r->mode>ROOM_RIG_ROLLING) return 0;
+        if ((r->mode==ROOM_RIG_SWITCH || r->mode==ROOM_RIG_ROLLING) && r->joints>6) return 0;
 #ifdef AF_V3_ROOM_ROLLING
         if (r->mode==ROOM_RIG_ROLLING && (r->last.bits || r->first.bits<0x3F800000u || r->first.bits>0x47000000u)) return 0;
 #else
@@ -88,7 +119,11 @@ static const RoomRigRecord *find(u32 index) {
 #endif
         if (r->mode==ROOM_RIG_SWITCH && (r->first.bits || r->last.bits)) return 0;
         if (r->mode==ROOM_RIG_HIT && (r->first.bits==0 ? r->last.bits!=0 :
-                r->first.bits!=1 || r->last.bits!=0x3E800000u)) return 0;
+                r->first.bits==1 ? r->last.bits!=0x3E800000u :
+                r->first.bits!=2 || r->last.bits!=0x3F000000u)) return 0;
+#ifndef AF_V3_ROOM_EFFECTS
+        if (r->mode==ROOM_RIG_HIT && r->first.bits==2) return 0;
+#endif
 #ifndef AF_V3_ROOM_TRIGGER_SOUND
         if (r->mode==ROOM_RIG_HIT) return 0;
 #endif
@@ -97,6 +132,9 @@ static const RoomRigRecord *find(u32 index) {
         /* Positive finite floats compare in the same order as their bit words. */
         if (r->mode==ROOM_RIG_STORAGE && (r->first.bits<0x3F800000u ||
                 r->last.bits<=r->first.bits || r->last.bits>0x43800000u)) return 0;
+#endif
+#ifndef AF_V3_ROOM_RIG_PACKET
+        if (r->joints>6) return 0;
 #endif
         return r;
     }
@@ -116,7 +154,7 @@ void af_v3_room_rig_ct(RoomRig *actor,u8 *data) {
     else
 #endif
         cKF_SkeletonInfo_R_init_standard_repeat(&actor->keyframe,animation,(void *)0);
-    actor->speed.bits=0;actor->target.bits=0x3F000000u;
+    if (r->joints<=6) {actor->speed.bits=0;actor->target.bits=0x3F000000u;}
 #ifdef AF_V3_ROOM_ROLLING
     if (r->mode==ROOM_RIG_ROLLING) {
         actor->keyframe.speed.f=0.5f;
@@ -132,7 +170,7 @@ void af_v3_room_rig_ct(RoomRig *actor,u8 *data) {
            Preserve the donor's first evaluation before stopping the motion. */
         actor->keyframe.speed.bits=0x3F000000u;
         cKF_SkeletonInfo_R_play(&actor->keyframe);
-        actor->keyframe.speed.bits=0;
+        actor->keyframe.speed.bits=r->first.bits==2 ? 0x3F000000u : 0;
         if (!r->first.bits) actor->changed=0;
         return;
     }
@@ -166,6 +204,21 @@ void af_v3_room_rig_mv(RoomRig *actor,void *room,RoomRigGame *game,u8 *data) {
 #ifdef AF_V3_ROOM_TRIGGER_SOUND
     if (r->mode==ROOM_RIG_HIT) {
         RoomKeyframe *key=&actor->keyframe;
+#ifdef AF_V3_ROOM_EFFECTS
+        if (r->first.bits==2) {
+            if (cKF_SkeletonInfo_R_play(key)!=1) {
+                cKF_SkeletonInfo_R_play(key);key->speed=r->last;
+            } else if (actor->changed) {
+                if (!room_transition_state(actor->state)) {
+                    trigger(actor->index,actor->position);
+                    trigger_conditional(actor,game);
+                }
+                key->current.f=1.0f;
+                cKF_SkeletonInfo_R_play(key);key->speed=r->last;
+            }
+            return;
+        }
+#endif
         if (r->first.bits) {
             if (!(key->speed.bits&0x7FFFFFFFu)) {
                 if (actor->changed) {

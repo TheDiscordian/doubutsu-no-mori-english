@@ -13,6 +13,20 @@ extern void _texture_z_light_fog_prim_xlu(void *);
 #define AF_EFFECT_FLASH_MODEL 0x06000140u
 #endif
 
+int af_v3_room_effect_wall(void) {
+    u32 scene=room_effect_scene;
+    if (scene!=6u && scene-20u>=3u) return -1;
+#ifdef __mips__
+    u8 **clip=*(u8 **volatile *)0x80136F2Cu;
+#else
+    extern u8 **af_test_effect_room_clip;
+    u8 **clip=af_test_effect_room_clip;
+#endif
+    /* The active native room owns a full floor halfword at 174 and a full
+       wall halfword at 176. Never read the floor or truncate the wall to six bits. */
+    return clip && *clip ? *(u16 *)(*clip+0x176) : -1;
+}
+
 void af_v3_flash_init(EffectPosition pos,int priority,s16 angle,void *game,u16 item,s16 arg0,s16 arg1) {
     (void)arg1;
     RoomEffectClip *clip=room_effect_clip;

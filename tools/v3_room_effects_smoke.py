@@ -95,7 +95,10 @@ def exercise(debug,rom_path,record):
             check('native owner and callback jointly advance two source ticks',controlled,struct.pack('>h',238))
             particles=[i for i in range(80) if debug.read_memory(active+i,1)!=b'\0' and
                 debug.read_memory(effect_base+i*88+2,2)==b'\x00\x6f']
-            if len(particles)!=1:raise ValueError('Native controller did not create its flash')
+            if len(particles)!=1:
+                record(dict(effect_particles=len(particles),graphics_pool_count=word(owner+0x37A0),
+                    controller_requests=int.from_bytes(debug.read_memory(controlled+0x4C,2),'big')))
+                raise ValueError('Native controller did not create its flash; verify fixture graphics-pool initialization')
             # Use the actual native graphics loader for the complete new sprite.
             params=bridge
             call(owner+0x1FE0,[params,params+4,111],proof)

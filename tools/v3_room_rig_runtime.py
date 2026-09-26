@@ -36,6 +36,17 @@ SOURCES=('tools/v3_room_rig_runtime.py','tools/v3_asset_loader.py','tools/v3_fur
     'tools/v3_room_effects.py','overlays/v3/room_effects.c','overlays/v3/room_effects.h')
 
 
+def checked_hit_condition(base,report,trigger,sound,audio):
+    from v3_room_effects import conditional_binding
+    expected=conditional_binding(base,report,trigger)
+    if expected:
+        program=next((r for r in audio['programs'] if r['source_sound_word']==expected['source_system_word']),None)
+        if program is None:raise ValueError('Missing complete conditional system sound')
+        expected['native_system_word']=program['native_sound_word']
+    if sound.get('conditional')!=expected:
+        raise ValueError('Changed complete hit-rig wall/effect/system-sound binding')
+
+
 def packet_layout(runtime):
     packet=runtime['packet'];ram=packet['ram'];table=runtime['table_ram'];size=packet['bytes']
     if (ram,table,size) not in ((PACKET_RAM,PACKET_TABLE,PACKET_BYTES),(EXTENDED_RAM,EXTENDED_TABLE,EXTENDED_BYTES)):
@@ -160,7 +171,9 @@ def install_profiles(base,prior,blob,core,original,output,directories):
                 installed.update(lifecycle_installed=True,lifecycle=json.loads(json.dumps(lifecycle)))
             elif category in (CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY,ROLLING_CATEGORY):
                 installed=rigs.get(donor)
-                if (not installed or installed['profile_installed'] or installed['source']!=row or
+                if (not installed or installed['profile_installed'] or
+                        {k:v for k,v in installed['source'].items() if k!='reused_artwork'}!=
+                        {k:v for k,v in row.items() if k!='reused_artwork'} or
                         installed['bytes']!=len(data) or installed['sha256']!=sha256(data) or
                         blob[installed['blob_offset']:installed['blob_offset']+len(data)]!=data):
                     raise ValueError('Prepared rig is not completely installed in the current runtime')
@@ -176,6 +189,7 @@ def install_profiles(base,prior,blob,core,original,output,directories):
                             not all(audio.get(k) for k in ('runtime_installed','dispatch_and_priority_installed',
                                 'allocation_installed','callback_installed'))):
                         raise ValueError('Hit rig needs its complete installed source audio')
+                    checked_hit_condition(base,prior,trigger,sound,audio)
                     sound['profile_installed']=True
             else:
                 installed=sounds.get(donor);audio=result.get('furniture_audio',{})
@@ -189,7 +203,9 @@ def install_profiles(base,prior,blob,core,original,output,directories):
                     installed=materials[donor]
                     trigger=furniture_trigger(source,descriptor)
                     if (trigger is None or installed.get('move_category')!='switch-trigger-sound' or
-                            installed['profile_installed'] or installed['source']!=row or
+                            installed['profile_installed'] or
+                            {k:v for k,v in installed['source'].items() if k!='reused_artwork'}!=
+                            {k:v for k,v in row.items() if k!='reused_artwork'} or
                             installed['bytes']!=len(data) or installed['sha256']!=sha256(data) or
                             blob[installed['blob_offset']:installed['blob_offset']+len(data)]!=data or
                             sounds[donor]['source_sound_word']!=trigger['sound_word']):
@@ -312,6 +328,7 @@ def bind_profiles(source,base,report):
                     sound['source_sound_word']!=trigger['sound_word'] or
                     audio['callback']!=json.loads(json.dumps(descriptor['callback_adapter']))):
                 raise ValueError('Incomplete installed hit-rig audio/behaviour')
+            checked_hit_condition(base,report,trigger,sound,e['furniture_audio'])
         if category==BILLBOARD_CATEGORY and contracts.get(donor)!=descriptor['callback_adapter']['level_sound']:
             raise ValueError('Incomplete installed billboard-rig audio/behaviour')
         art['room_runtime']=dict(vtable=expected_vtable,vrom=vrom)
@@ -364,7 +381,7 @@ def prepared_categories(source,directories):
                 raise ValueError('Unimplemented additional room-rig category')
             if (row['profile']!=json.loads(json.dumps(profile)) or donor in assets or
                     row['native_profile_scalar_hex']!=profile['scalar_hex'] or
-                    profile['skeleton']['joints']>6 or category!=BILLBOARD_CATEGORY and
+                    profile['skeleton']['joints']>(6 if category==ROLLING_CATEGORY else 8) or category!=BILLBOARD_CATEGORY and
                     any(r.get('draw_stream') for r in profile['skeleton']['rows'])):
                 raise ValueError('Changed room-rig profile or native work capacity')
             cache.reuse(source,donor,prepared_row)
@@ -378,9 +395,10 @@ def prepared_categories(source,directories):
                 last=int(adapter['constants']['end_frame']['hex'],16)
             elif category==HIT_CATEGORY:
                 mode=3;hit=adapter.get('hit')
-                first=1 if hit else 0
+                first=2 if hit and hit.get('endpoint_only') else 1 if hit else 0
                 last=struct.unpack('>I',struct.pack('>f',hit['playback_speed']))[0] if hit else 0
-                if hit and hit!=dict(idle_only=True,playback_speed=.25,stop_at_endpoint=True,clear_initial_pulse=False):
+                if hit and hit not in (dict(idle_only=True,playback_speed=.25,stop_at_endpoint=True,clear_initial_pulse=False),
+                                      dict(endpoint_only=True,playback_speed=.5,clear_initial_pulse=False)):
                     raise ValueError('Unknown complete stopped-hit policy')
             elif category==BILLBOARD_CATEGORY:
                 mode=4;first=0x06000000+rig['billboard_offset'];last=0
@@ -430,7 +448,7 @@ def encode_packet(rows,sound_rows=(),material_rows=()):
         encode([r])  # Retain the complete existing object/pointer/work-area checks.
         mode,first,last=r.get('mode',0),r.get('first',0),r.get('last',0)
         if (mode not in (0,1,2,3,4,5) or mode==0 and (first or last) or
-                mode==3 and (first,last) not in ((0,0),(1,0x3E800000)) or
+                mode==3 and (first,last) not in ((0,0),(1,0x3E800000),(2,0x3F000000)) or
                 mode==1 and not (0<first<r['joints'] and 0<last<r['joints'] and first!=last) or
                 mode==4 and (last or first&3 or not 0x06000000<=first<=0x06000000+r['bytes']-16) or
                 mode==5 and (last or not 0x3F800000<=first<=0x47000000) or
@@ -449,7 +467,14 @@ def encode_packet(rows,sound_rows=(),material_rows=()):
             if (not 1024<=r['runtime_index']<2048 or not 0<=word<=65535 or
                     word&0x80 or (word&0x7FFF)>>8 not in (0,1,4)):
                 raise ValueError('Invalid room sound identity or full native sound word')
-            table.extend(struct.pack('>HHI',r['runtime_index'],word,0))
+            conditional=r.get('conditional')
+            extra=0
+            if conditional:
+                if (conditional['wall']!=76 or conditional['effect']!=112 or
+                        conditional['native_system_word']&0xFF80!=0x8100):
+                    raise ValueError('Unbound room sound/effect condition')
+                extra=conditional['wall']<<24|conditional['effect']<<16|conditional['native_system_word']
+            table.extend(struct.pack('>HHI',r['runtime_index'],word,extra))
     if material_rows:
         table.extend(bytes(MATERIAL_TABLE-PACKET_TABLE-len(table)))
         table.extend(encode_materials(material_rows))
@@ -512,7 +537,7 @@ def publish_packet(equipment,blob,output):
     effects=runtime.get('effects')
     if effects:
         if packet_ram!=EXTENDED_RAM:raise ValueError('Effect callbacks require the expanded room packet')
-        defines+=(f'AF_EFFECT_FLASH_MODEL=0x{effects["bank"]["model"]:X}u',)
+        defines+=('AF_V3_ROOM_EFFECTS',f'AF_EFFECT_FLASH_MODEL=0x{effects["bank"]["model"]:X}u')
     defines+=(f'ROOM_RIG_TABLE_RAM=0x{table_ram:X}u',f'ROOM_SOUND_TABLE_RAM=0x{SOUND_TABLE+table_delta:X}u',
               f'ROOM_MATERIAL_TABLE_RAM=0x{MATERIAL_TABLE+table_delta:X}u')
     code,compiled=compile_part('room_rigs_extended' if packet_ram==EXTENDED_RAM else 'room_rigs_packet',output/'room_rigs_packet',
@@ -644,6 +669,9 @@ def extend(base,prior,blob,core,original,output,directories):
             raise ValueError('Changed installed complete room artwork')
     for r in rows:
         i=slot(int(r['item_id'],16))
+        if r.get('mode')==3 and r.get('first')==2:
+            from v3_room_effects import conditional_binding
+            conditional_binding(base,prior,r['source']['profile']['callback_adapter']['trigger'])
         if (r['item_id'] in occupied or any(blob[ROWS+i*80:ROWS+(i+1)*80]) or
                 any(blob[ITEMS+i*32:ITEMS+(i+1)*32]) or blob[0x40+i//8]&(1<<(i&7))):
             raise ValueError('Additional room category collides with an installed identity')
@@ -755,7 +783,7 @@ def encode(rows):
     for r in rows:
         if (r['runtime_index']!=1024+slot(int(r['item_id'],16)) or
                 not 32<=r['bytes']<=9216 or r['bytes']%16 or
-                not 1<=r['shown']<=r['joints']<=6 or
+                not 1<=r['shown']<=r['joints']<=(6 if r.get('mode',0) in (0,5) else 8) or
                 any(p&3 or not 0x06000000<=p<=0x06000000+r['bytes']-n for p,n in
                     ((r['skeleton'],8),(r['animation'],20)))):
             raise ValueError('Invalid complete room-rig record')

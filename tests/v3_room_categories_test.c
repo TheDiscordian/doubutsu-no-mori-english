@@ -74,7 +74,7 @@ void cKF_Si3_draw_R_SV(void *value,RoomKeyframe *key,void *matrices,void *before
 int main(void) {
     struct { u8 front[16];RoomSoundActor actor;u8 back[16]; } sound_guard;
     memset(&sound_guard,0xA7,sizeof(sound_guard));
-    af_v3_test_room_sounds=(RoomSoundTable){ROOM_SOUND_MAGIC,2,8,0,{{1070,0x816B,0},{1071,0x44E,0}}};
+    af_v3_test_room_sounds=(RoomSoundTable){ROOM_SOUND_MAGIC,2,8,0,{{1070,0x816B,{0}},{1071,0x44E,{0}}}};
     for (int variant=0;variant<2;++variant) for (int state=-1;state<17;++state) for (int changed=0;changed<3;++changed) {
         RoomSoundActor *actor=&sound_guard.actor;
         actor->index=(u16)(1070+variant*1024);actor->state=(s16)state;actor->changed=(u8)changed;
@@ -156,7 +156,7 @@ int main(void) {
     }
     /* The complete hit category shares the drawer and sound dependency table.
        Compare source call order for idle, moving, stopped, and repeated hits. */
-    af_v3_test_room_sounds=(RoomSoundTable){ROOM_SOUND_MAGIC,1,8,0,{{1048,0x175,0}}};
+    af_v3_test_room_sounds=(RoomSoundTable){ROOM_SOUND_MAGIC,1,8,0,{{1048,0x175,{0}}}};
     RoomRigRecord *r=af_v3_test_room_rigs.rows+24;
     *r=(RoomRigRecord){1048,4096,0x06000100,0x06000200,3,3,ROOM_RIG_HIT,0,{.bits=0},{.bits=0}};
     expected_mode=ROOM_RIG_HIT;expected_joints=3;model[0x100]=3;model[0x101]=3;

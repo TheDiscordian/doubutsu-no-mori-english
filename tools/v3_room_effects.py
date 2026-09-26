@@ -178,6 +178,31 @@ def wall_binding(image, report):
         pixels_sha256=pixel_digest(wanted),base_sha256=sha256(image))
 
 
+def conditional_binding(image,report,trigger):
+    """Bind the complete source wall/effect condition to installed native owners."""
+    condition=trigger.get('conditional')
+    if condition is None:return None
+    if condition!=dict(source_wall=65,source_effect=121,system_sound_word=0x817E,priority=2,item=0xFFFF):
+        raise ValueError('Unsupported complete conditional room effect')
+    effects=report['equipment_resources']['room_rigs'].get('effects')
+    if not effects or not effects['installed']:raise ValueError('Missing complete installed room effects')
+    files=by_vrom(image);controller=effects['controller']
+    if (sha256(files[controller['vrom']].extract(image))!=controller['sha256'] or
+            sha256(files[controller['reloc']].extract(image))!=controller['reloc_sha256'] or
+            sha256(files[0x1410000].extract(image))!=effects['bank']['sha256']):
+        raise ValueError('Changed installed conditional effect owners')
+    wall=wall_binding(image,report)
+    if wall['converted_sha256']!=effects['source']['wall']['converted_sha256']:
+        raise ValueError('Changed complete wall condition')
+    from aflib import verified_rom
+    original=verified_rom((ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes())
+    native=by_vrom(original)[CODE_VROM].extract(original);core=files[CODE_VROM].extract(image)
+    for at,n in ((0x800D1A9C,40),(0x800F8D5C,200)):
+        offset=at-CODE_RAM
+        if core[offset:offset+n]!=native[offset:offset+n]:raise ValueError('Changed complete native system-trigger path')
+    return dict(wall=wall['index'],effect=112,source_system_word=condition['system_sound_word'])
+
+
 def extend_controller(owner, reloc, additions, *, loader=None):
     """Append effect identities without replacing native effects or their pools.
 

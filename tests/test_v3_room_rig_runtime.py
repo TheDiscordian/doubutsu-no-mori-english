@@ -29,12 +29,32 @@ PROFILE_OUT=ROOT/os.environ.get('V3_ROOM_PROFILE_BUILD','build/v3-shared-room-pr
 class CurrentImportedRigTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.out=ROOT/os.environ.get('V3_IMPORTED_RIG_BUILD','build/v3-idle-hit-category-auto-02/cartridge')
+        cls.out=ROOT/os.environ.get('V3_IMPORTED_RIG_BUILD','build/v3-endpoint-hit-runtime-04')
         cls.image,cls.report=inputs(cls.out/'build-lock.json')
         cls.blob=by_vrom(cls.image)[BLOB].extract(cls.image)
         cls.source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
             (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
         cls.rows=cls.report['automatic_furniture']['imports']
+
+    def test_code_refresh_keeps_assets_audio_selection_and_saved_state(self):
+        if self.report.get('shared_runtime_refresh',{}).get('adapters')!=['room_rigs_code']:
+            self.skipTest('Current build is not a code-only room refresh')
+        from v3_asset_loader import MODULE
+        from v3_room_effects import LOADER_BRIDGE
+        base,prior=inputs(self.out/'base-lock.json')
+        old,new=by_vrom(base),by_vrom(self.image)
+        for v,entry in old.items():
+            if v not in (BLOB,MODULE):self.assertEqual(new[v].extract(self.image),entry.extract(base),f'{v:08X}')
+        before=old[BLOB].extract(base);e=self.report['equipment_resources'];r=e['room_rigs']
+        for row in r['rows']:
+            at=row['blob_offset'];self.assertEqual(self.blob[at:at+row['bytes']],before[at:at+row['bytes']])
+        for key in ('furniture','save_runtime','save_codec','translation_baseline'):
+            self.assertEqual(self.report[key],prior[key])
+        self.assertEqual(e['furniture_audio'],prior['equipment_resources']['furniture_audio'])
+        self.assertNotEqual(r['code']['sha256'],prior['equipment_resources']['room_rigs']['code']['sha256'])
+        at=e['blob_offset']+LOADER_BRIDGE-0x804A3000
+        self.assertEqual(struct.unpack_from('>I',self.blob,at)[0],r['bootstrap']['symbols']['af_v3_room_boot_load'])
+        self.assertEqual(self.report['sources']['overlays/v3/room_rigs.c'],sha256((ROOT/'overlays/v3/room_rigs.c').read_bytes()))
 
     def test_imported_category_keeps_rig_audio_profiles_and_reuses_assets(self):
         from v3_furniture_rigs import HIT_CATEGORY,BILLBOARD_CATEGORY,ROLLING_CATEGORY
@@ -52,7 +72,36 @@ class CurrentImportedRigTests(unittest.TestCase):
                 sound=next(x for x in rigs['sound_rows'] if x['source_item_id']==donor)
                 audio=next(x for x in e['furniture_audio']['furniture'] if x['item_id']==donor)
                 self.assertEqual(rig['mode'],3)
-                if descriptor['callback_adapter'].get('hit'):
+                hit=descriptor['callback_adapter'].get('hit',{})
+                if hit.get('endpoint_only'):
+                    self.assertEqual((rig['first'],rig['last']),(2,0x3F000000))
+                    runtime.checked_hit_condition(self.image,r,audio['trigger'],sound,e['furniture_audio'])
+                    self.assertEqual((sound['conditional']['wall'],sound['conditional']['effect']),(76,112))
+                    programs={p['source_sound_word']:p for p in e['furniture_audio']['programs']}
+                    for word in (audio['trigger']['sound_word'],audio['trigger']['conditional']['system_sound_word']):
+                        self.assertIn(word,programs)
+                    from aflib import CODE_VROM
+                    from v3_sound_programs import installed_resource,trigger_program
+                    from v3_villager_audio import instrument
+                    from v3_room_effects import profile_overlay
+                    code=by_vrom(self.image)[CODE_VROM].extract(self.image)
+                    sequence,_,_=installed_resource(self.image,code,'seq',199)
+                    font,header,_=installed_resource(self.image,code,'bank',140)
+                    wave,_,_=installed_resource(self.image,code,'wave',header[10])
+                    for word in (audio['trigger']['sound_word'],audio['trigger']['conditional']['system_sound_word']):
+                        p=programs[word];at=p['offset'];raw=sequence[at:at+p['bytes']];desc=p['source_program']
+                        parsed=trigger_program(sequence,at,at+len(raw))
+                        self.assertEqual(parsed['events'],desc['events'])
+                        restored=bytearray(raw);restored[1:3]=bytes((desc['selector'],desc['instrument']))
+                        for offset in desc['pointers']:
+                            struct.pack_into('>H',restored,offset,struct.unpack_from('>H',raw,offset)[0]-at+desc['origin'])
+                        self.assertEqual(sha256(restored),desc['sha256'])
+                    for binding in e['furniture_audio']['layout']['imports']:
+                        self.assertEqual(instrument(font,wave,binding['native_instrument'],header[12],extended=True),binding['identity'])
+                    for p in rigs['effects']['profiles']:
+                        self.assertEqual(self.blob[p['blob_offset']:p['blob_offset']+64],
+                            profile_overlay(rigs['code']['symbols'],p['id']==112))
+                elif hit:
                     self.assertEqual((rig['first'],rig['last']),(1,0x3E800000))
                     self.assertEqual(sound['native_sound_word']>>8,0)
                 self.assertTrue(sound['profile_installed']);self.assertTrue(sound['parent_selectable'])

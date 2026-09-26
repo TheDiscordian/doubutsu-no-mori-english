@@ -173,6 +173,20 @@ class HitResourceTests(unittest.TestCase):
         self.assertEqual(len(set(LEGACY_FURNITURE.values())),len(LEGACY_FURNITURE))
         self.assertFalse(set(LEGACY_FURNITURE.values())&(set(LEGACY_ROOM_ALIASES.values())|set(CLOTHING_DISPLAYS.values())))
 
+    def test_endpoint_hit_retains_all_joints_and_conditional_dependencies(self):
+        from v3_sound_programs import furniture_trigger_words
+        profile=pipeline.prepare(self.source,0x33B8)[0];a=profile['callback_adapter']
+        self.assertEqual(a['category'],rigs.HIT_CATEGORY)
+        self.assertEqual(a['skeleton']['joints'],7);self.assertEqual(a['skeleton']['shown_joints'],4)
+        self.assertEqual(a['hit'],dict(endpoint_only=True,playback_speed=.5,clear_initial_pulse=False))
+        self.assertEqual(furniture_trigger_words([a['trigger']]),[0x174,0x817E])
+        self.assertEqual(a['trigger']['conditional'],dict(source_wall=65,source_effect=121,
+            system_sound_word=0x817E,priority=2,item=0xFFFF))
+        for row in [a['functions']['move'],a['helpers']['sAdo_SysTrgStart'],a['helpers']['mRmTp_GetWallIdx']]:
+            changed=copy.copy(self.source);changed.rel=bytearray(changed.rel)
+            changed.rel[changed.sections[1][0]+row['offset']]^=1
+            with self.assertRaises(ValueError):changed.profile(0x33B8)
+
 
 class BillboardResourceTests(unittest.TestCase):
     @classmethod
