@@ -143,9 +143,12 @@ def append_sprite(bank, art, receipt):
         bytes=len(output),sha256=sha256(output))
 
 
-def profile_overlay(symbols, controller=False):
+def profile_overlay(symbols, controller=False, *, kind=None):
     """Native loader packet with absolute shared callbacks and no writable state."""
-    prefix='af_v3_flash_controller_' if controller else 'af_v3_flash_'
+    kind=kind or ('flash_controller' if controller else 'flash')
+    if kind not in ('flash','flash_controller','steam','projectile'):
+        raise ValueError('Unknown complete effect profile kind')
+    prefix='af_v3_'+kind+'_'
     pointers=[symbols[prefix+role] for role in ('init','ct','mv','dw')]
     if any(type(p)!=int or p&3 or not 0x804C8000<=p<0x804CC000 for p in pointers):
         raise ValueError('Effect callback escapes checked shared room packet')
@@ -296,6 +299,42 @@ def extend_controller(owner, reloc, additions, *, loader=None):
         loader=loader[1] if loader else None,installed=False,native_execution_tested=False)
 
 
+def restore_controller(owner,reloc,receipt):
+    """Recover the checked native prefix before rebuilding additive tables.
+
+    This retains completed native profile hooks, including campsite lamps.
+    Never recover from the unmodified retail owner and lose installed changes.
+    """
+    if (receipt.get('format')!='AFV3-EFFECT-CONTROLLER-1' or
+            len(owner)!=receipt['bytes'] or sha256(owner)!=receipt['sha256'] or
+            sha256(reloc)!=receipt['reloc_sha256']):
+        raise ValueError('Changed complete installed effect controller')
+    data=bytearray(owner[:sum(SECTIONS[:3])])
+    if owner[len(data):sum(SECTIONS)]!=bytes(SECTIONS[3]):
+        raise ValueError('Effect initial-state reservation is not zero')
+    for patch in receipt['patches']:
+        at=patch['offset']
+        if not 0<=at<=len(data)-4 or u32(data,at)!=patch['after']:
+            raise ValueError('Changed effect table patch')
+        struct.pack_into('>I',data,at,patch['before'])
+    count=u32(reloc,16)
+    records=list(struct.unpack_from('>'+str(count)+'I',reloc,20))
+    removed=receipt.get('loader_relocations',[])
+    if len(set(removed))!=len(removed) or any(records.count(r)!=1 for r in removed):
+        raise ValueError('Changed effect loader relocation set')
+    records=[r for r in records if r not in removed]
+    # The lamp adapter removes four records but retains the original resource
+    # length and zero padding. Compacting it would change the checked input.
+    n=1328
+    if 24+4*len(records)>n:raise ValueError('Original effect relocation exceeds its allocation')
+    original=(struct.pack('>5I',*SECTIONS,len(records))+struct.pack('>'+str(len(records))+'I',*records)
+        +bytes(n-24-4*len(records))+struct.pack('>I',n))
+    checked=checked_controller(data,original)
+    if json.loads(json.dumps(checked))!=receipt['original']:
+        raise ValueError('Restored native effect bindings differ')
+    return bytes(data),original
+
+
 def rebind_profiles(effects, blob, symbols):
     """Keep absolute effect callbacks current whenever the shared packet moves code."""
     for row in effects['profiles']:
@@ -303,7 +342,9 @@ def rebind_profiles(effects, blob, symbols):
         if len(old)!=64 or (row.get('sha256') and sha256(old)!=row['sha256']) or (
                 not row.get('sha256') and any(old)):
             raise ValueError('Changed complete installed effect profile')
-        data=profile_overlay(symbols,row['id']==112)
+        kind=row.get('kind',{111:'flash',112:'flash_controller'}.get(row['id']))
+        if kind is None:raise ValueError('Effect identity lacks a complete callback kind')
+        data=profile_overlay(symbols,kind=kind)
         blob[at:at+64]=data;row.update(sha256=sha256(data),callbacks=list(struct.unpack_from('>4I',data)))
 
 

@@ -10,6 +10,14 @@ Matrix_scale = 0x800E041C;
 _Matrix_to_Mtx = 0x800E139C;
 osWritebackDCache = 0x8002FE00;
 _texture_z_light_fog_prim_xlu = 0x800BD598;
+_texture_z_light_fog_prim = 0x800BD4E8;
+Matrix_RotateY = 0x800E0698;
+Lib_SegmentedToVirtual = 0x8009ADA8;
+qrand = 0x8002C970;
+sin_s = 0x80099A94;
+cos_s = 0x80099A54;
+af_v3_room_debug = 0x80138E50;
+sAdo_OngenTrgStart = 0x800D1D58;
 SECTIONS {
     . = 0x804C8000;
     .text : { *(.text.af_v3_flash_init) *(.text .text.*) }

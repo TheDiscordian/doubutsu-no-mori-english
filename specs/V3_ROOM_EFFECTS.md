@@ -19,6 +19,41 @@ particle/controller lifecycles and the bell's conditional request arguments.
 The public source branch contains development work; neither web-patcher
 deployment changes until user testing and approval.
 
+`tools/v3_room_particles.py` prepares complete steam and room-projectile assets
+through the same furniture model converter, with source-bound callbacks in
+`overlays/v3/room_particles.c`. Their native identities are reserved as 113 and
+114. They remain uninstalled until complete sound binding, furniture emitters,
+and the extended owner/profile tables are connected. The preparation's unresolved
+sound word is not a permitted installed fallback.
+
+## Animated intensity particles
+
+Two typed texture-frame bindings at segments 8 and 9 select the shared
+two-texture conversion category. Each model must supply tiles 0 and 1 in order,
+with non-overlapping bounded TMEM and an explicitly supported alpha-blend
+expression. Missing frames, reordered tiles, extra pointers, and unsupported
+combiners reject. The source I4 frames are untiled without changing intensity
+values. All packed triangles become native commands; no Dolphin opcode remains.
+This category does not use item IDs or substitute a static texture.
+
+Steam keeps four 16×16 frames, 22 texture-pair/fraction records, a 44-source-tick
+lifetime, both source material variants, and debug-register adjustments.
+The projectile retains the complete source model and a 360-source-tick maximum
+lifetime. Native room identities select the equivalent source bounds; absent
+GameCube room types are not fabricated. Creation close to the firing wall is
+suppressed; movement slows once near a wall while model depth contracts.
+Physics advances twice per native update, with one explicit timer decrement and
+one owned by the native effect system. Drawing bounds both the command arena and
+its matrix allocation. These host-checked callbacks still need installed native
+and ordinary-game verification.
+
+The complete objects occupy 976 bytes for steam and 1,280 bytes for the
+projectile, within the existing native graphics-slot capacity. Global segment-6
+pointers are rebased when appending the objects; dynamic texture segments stay
+dynamic. `restore_controller` reconstructs the checked current native prefix
+before a further table expansion, preserving completed campsite-lamp hooks
+and the original relocation allocation, rather than reverting to retail code.
+
 ## Native controller integration
 
 The native controller uses VROM `008E0A30`, relocation resource `008E4170`, and

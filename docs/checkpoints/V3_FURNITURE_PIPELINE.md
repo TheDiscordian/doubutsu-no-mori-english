@@ -1,5 +1,74 @@
 # Automatic furniture pipeline checkpoint
 
+## Prepared steam and room projectiles
+
+Preparation: `build/v3-room-particles-prepared-01/particles.json`, based on the
+checked ABI-227 lock below. The playable ROM remains unchanged. There are no
+new selectable items, saved-format changes, or deployment updates.
+
+`tools/v3_room_particles.py` feeds complete effects into the shared ordinary
+model converter. The two-texture animated-intensity category retains both
+dynamic segments, distinct TMEM allocations, source alpha interpolation,
+mirroring, fog/cloud render mode, and both steam colour-combiner variants.
+All four I4 textures and all vertices remain. Steam occupies 976 bytes;
+the full projectile palette, texture, 25 vertices, and 34 triangles occupy
+1,280 bytes. Each fits the existing 3,584-byte native graphics slot.
+Appending both with native headers grows the graphics bank by 2,272 bytes.
+Complete original graphics, including the installed flash, remain unchanged.
+
+The callbacks retain the 44-tick steam and 360-tick projectile lifetimes,
+two donor physics steps per native update, actual native room dimensions,
+four-direction creation guards, near-wall slowdown, and shrinking depth.
+Steam retains all 22 texture-pair/fraction entries, both colour variants,
+billboarding, continuous random placement, and all seven debug registers.
+Opaque/translucent draws reserve their complete matrix/commands before writing.
+The standalone flash-plus-particle code is 4,348 bytes; it is not an additional
+resident allocation or an installed room packet.
+
+The shared effect-profile builder accepts both new callback kinds. Its checked
+controller reconstruction reverses only recorded table/bound/loader patches,
+retains all original native hooks, and preserves the timed-lamp relocation
+resource's padding. A focused expansion check preserves all 113 existing effect
+rows while adding two more; it does not claim native execution of that expansion.
+
+Five focused checks pass:
+
+- Complete donor callbacks/profiles/tables and rejection of changed code.
+- Full shared artwork conversion, both texture layers, and rejection of missing
+  or reordered bindings.
+- Actual C callbacks under address/undefined-behaviour sanitizers: 88 steam
+  frame states, ordinary/custom debug values, sixteen complete projectile
+  trajectories, firing-wall suppression, drawing, and exhausted arenas.
+- Complete generated bank reconstruction, retained prefix, compiled native
+  graphics commands, and MIPS callback bounds.
+- Current-owner reconstruction, retained campsite hooks/effect rows, extended
+  profile kinds, and rejection of changed owner bytes.
+
+The first test invocation also discovered three imported test-class methods;
+all passed. The import now uses a module alias, so the focused invocation runs
+only the five particle checks. No native emulator attempt has been made.
+
+Reproduction uses fresh output storage:
+
+```sh
+python3 tools/v3_room_particles.py \
+  --base-lock build/v3-static-interaction-imports-02/profile-runtime/build-lock.json \
+  --output build/v3-room-particles-prepared
+V3_PARTICLE_PREPARED=build/v3-room-particles-prepared \
+  python3 -m unittest tests.test_v3_room_particles.ParticleTests -v
+```
+
+Next install the complete sound dependencies, additive native owner/profiles,
+shared static emitters, and ordinary import-plan dependencies together. The
+standalone preparation explicitly uses unresolved sound word `FFFF`, which
+must be replaced by the complete installed source `044F` programme before
+any profile is enabled. The barbecue's source `55` loop needs its complete
+instrument dependency; the shared font extension can provide it. Reuse prepared
+furniture artwork instead of compiling it again. For the next changed native
+effect check, include the graphics-pool initializer omitted by the older
+fixture, and do not replay the passed bell checks. Ordinary rendering, synthesis,
+in-room interaction, and original hardware remain unverified for these effects.
+
 ## Installed static interactions and town-tune instruments
 
 Current proposal: ABI 227 at

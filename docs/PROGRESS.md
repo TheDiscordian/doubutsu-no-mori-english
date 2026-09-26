@@ -32,6 +32,17 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
+Steam and room-projectile conversion is prepared at
+`build/v3-room-particles-prepared-01/`, using the ordinary model converter.
+The converter preserves both animated intensity textures, all four steam
+frames, two source material variants, and the projectile's complete 34-triangle
+model. Source-bound callbacks preserve steam physics/colour/debug tuning and
+projectile motion, room bounds, near-wall slowdown, and drawing. Five focused
+checks pass, including sanitizer execution and full generated model checks.
+Native effect registration, actual audio binding, and furniture emitters remain
+to be installed together; this preparation does not add playable choices or
+change the current ROM. See the [particle checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#prepared-steam-and-room-projectiles).
+
 The checked proposal is ABI 227 at
 `build/v3-static-interaction-imports-02/profile-runtime/build-lock.json`,
 with 155 development choices. The shared static-interaction importer installs

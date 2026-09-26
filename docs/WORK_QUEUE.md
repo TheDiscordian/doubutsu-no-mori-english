@@ -22,6 +22,17 @@ Incomplete gameplay stays unavailable in the selector; installing assets does
 not claim that an item is playable. Reuse unchanged passing tests throughout.
 
 Current task: close shared conversion gaps in the ordinary bulk importer.
+Steam/projectile preparation is at `build/v3-room-particles-prepared-01/`.
+The shared graphics converter handles complete two-frame intensity blends;
+both particle lifecycles compile for MIPS, and five focused checks pass.
+Complete assets are 976 and 1,280 bytes. They are not installed or selectable.
+Next connect the shared static emitters, full loop/trigger audio, additive effect
+profiles/controller, and ordinary dependency planning in one import batch.
+Use `restore_controller` to retain current campsite-lamp hooks when extending
+the effect tables. Do not replace the owner with the unmodified retail version.
+The preparation's `FFFF` projectile sound is deliberately unresolved and must
+never enter an installed profile. No native test has been attempted for this batch.
+
 The checked proposal is ABI 227 at
 `build/v3-static-interaction-imports-02/profile-runtime/build-lock.json`,
 with 155 development choices.

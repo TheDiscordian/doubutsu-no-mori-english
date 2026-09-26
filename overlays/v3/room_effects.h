@@ -21,6 +21,8 @@ typedef struct {
 } RoomEffectClip;
 #define ROOM_EFFECT_FLASH 111
 #define ROOM_EFFECT_FLASH_CONTROLLER 112
+#define ROOM_EFFECT_STEAM 113
+#define ROOM_EFFECT_PROJECTILE 114
 #ifdef __mips__
 #define room_effect_clip (*(RoomEffectClip *volatile *)0x80136F3Cu)
 #define room_effect_scene (*(volatile u32 *)0x80126EB4u)
