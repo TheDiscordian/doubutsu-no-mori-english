@@ -32,17 +32,24 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
-The checked proposal is ABI 223 at
-`build/v3-material-colour-audio-runtime-01/build-lock.json`, with 155 development
-choices. Starman's complete loop programme, instrument, envelope, predictor,
-loop metadata, and 46,900-byte sample are installed. The shared converter handles
-both custom-envelope and instrument-envelope sustained loops. Full source
-callbacks, player-colour timing/rendering, and same-item switching are identified
-and checked. Native colour and exclusive-switch integration remain the current
-task; the item remains unavailable until its complete behaviour and acquisition
-are installed. Seven focused source/parser/cartridge checks pass; no new native
-audio run or physical playback occurs. See the
-[colour dependency checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#exclusive-colour-loop-source-and-installed-audio).
+The checked proposal is ABI 224 at
+`build/v3-material-colour-lifecycle-imports-05/profile-runtime/build-lock.json`,
+with 155 development choices. The ordinary material importer installs starman's
+complete constructor, positioned loop, same-item switch coordination, and player
+colour update/draw hooks. Its complete instrument and 46,900-byte sample are
+retained. A separate 256-byte transient reservation preserves native actor and
+saved-field sizes. The shared dispatcher starts the item off, honours transition
+states, and restores scene fog after the player skeleton without discarding
+graphics allocations. Starman remains unavailable because its actual Mario
+reward route is unfinished; acquisition stays in phase 2.
+
+Six focused checks pass, including 480 donor timing ticks under sanitizers,
+complete installed bindings, retained data, and four browser/offline compositions.
+The bounded native check passes 36 assertions after one fixture allocation
+correction. It executes the installed bridges, material callbacks, and native
+fog writer; skeleton and sound calls are captured. Ordinary in-room player
+appearance, synthesis, and hardware remain unverified. See the
+[colour lifecycle checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#installed-exclusive-player-colour-lifecycle).
 
 Mouth of Truth's complete timed reaction and shared N64 motor connection remain
 installed through the ordinary importer. Its complete 3,968-byte artwork, official name, Gulliver
@@ -91,7 +98,7 @@ conditional effect binding. Its native particle lifetime still needs a properly
 allocated graphics fixture with the next changed effect batch; the previous
 fixture omitted that allocation. Do not repeat the passed bell checks.
 
-Room code uses 9,760 of 16,384 bytes; bootstrap uses 1,517 of 1,536 bytes.
+Room code uses 11,404 of 16,384 bytes; bootstrap uses 1,521 of 1,536 bytes.
 Scroll code has 4 bytes spare, audio has 64 conservative bytes spare, and
 the import reservation has 1,492,544 bytes spare. Live synthesis, GPU appearance,
 ordinary gameplay/save/restart, and original hardware are not newly verified.
@@ -101,8 +108,8 @@ import in the receiving build; preserve backups and equal-or-larger profiles.
 Format-4 saves cannot load in V2 or format-1/2/3 V3 builds. Translation-only output
 remains the pinned V2-12 ROM. The main lock and both stable deployments remain
 unchanged. Continue remaining model, material, animation, and behaviour
-conversion, including starman's player-colour/switch
-coordination. The code-entry frontend remains parked.
+conversion, including stone coin and other prepared callback models. The
+code-entry frontend remains parked.
 
 The retained password-engine component is ABI 197 at
 `build/v3-password-runtime-05/build-lock.json`. The shared password codec,

@@ -99,9 +99,10 @@ def profile(row, vrom, *, limit=END):
     if material:
         from v3_room_rig_runtime import MATERIAL_VTABLE
         from v3_furniture_materials import initializer_lifecycle
-        from v3_furniture_reactions import profile_lifecycle as reaction_lifecycle
+        from v3_furniture_reactions import profile_lifecycle as reaction_lifecycle,colour_profile_lifecycle
         initial=initializer_lifecycle(None,row['profile'])
-        reaction=reaction_lifecycle(row['profile'],row.get('room_lifecycle'))
+        reaction=(reaction_lifecycle(row['profile'],row.get('room_lifecycle')) or
+                  colour_profile_lifecycle(row['profile'],row.get('room_lifecycle')))
         if (row.get('room_runtime')!={'vtable':MATERIAL_VTABLE,'vrom':vrom} or
                 (row.get('room_lifecycle')!=initial if initial else not reaction and set(adapter['functions'])!={'move','draw'}) or
                 set(offsets)!=set(layers)):
@@ -985,6 +986,10 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         if reaction and not prior.get('equipment_resources',{}).get('room_rigs',{}).get('reactions'):
             report['shared_runtime_refresh']['adapters'].append('timed_material_reactions')
             report['shared_runtime_refresh']['additional_resident_bytes']+=reaction['state']['bytes']
+        colour=equipment_report.get('room_rigs',{}).get('colours')
+        if colour and not prior.get('equipment_resources',{}).get('room_rigs',{}).get('colours'):
+            report['shared_runtime_refresh']['adapters'].append('player_colour_materials')
+            report['shared_runtime_refresh']['additional_resident_bytes']+=colour['state']['bytes']
         if material_frames_art is not None:
             report['shared_runtime_refresh']['adapters'].append('material_frames')
             report['shared_runtime_refresh']['artwork_changed']=True

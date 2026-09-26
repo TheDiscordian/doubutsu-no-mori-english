@@ -2,6 +2,9 @@
 #ifdef AF_ROOM_REACTIONS
 #include "room_reactions.h"
 #endif
+#ifdef AF_ROOM_COLOURS
+#include "room_colours.h"
+#endif
 extern int af_room_dma(void *,u32,u32);
 extern u32 af_room_crc(void *,u32);
 extern void af_room_writeback(void *,u32);
@@ -28,6 +31,9 @@ static int load(void) {
     /* Publish no callback until its separate mutable state is invalidated.
        The controller-side bridge checks the ready word before entering. */
     *(volatile u32 *)ROOM_REACTION_STATE_RAM=0;
+#endif
+#ifdef AF_ROOM_COLOURS
+    *(volatile u32 *)ROOM_COLOUR_RAM=0;
 #endif
     *ready=AF_ROOM_CRC;
     return 1;

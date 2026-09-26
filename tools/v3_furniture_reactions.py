@@ -11,6 +11,9 @@ from aflib import CODE_RAM, CODE_VROM, by_vrom, sha256
 
 CATEGORY = 'timed-surprise-material'
 COLOUR_CATEGORY = 'exclusive-player-colour-loop'
+COLOUR_RAM, COLOUR_BYTES = 0x804CD400, 256
+COLOUR_BRIDGE, COLOUR_BRIDGE_END = 0x804B1E60, 0x804B1F40
+COLOUR_CALLS = {0x808DDB70: 0x0C22F46A, 0x808BFC60: 0x0C014C36}
 ENGINE_START, ENGINE_END = 0x935D4, 0x93DAC
 WAVES_START, WAVES_END, WAVE_TABLE = 0x22F0, 0x2464, 0x23C4
 ENGINE_SHA = '767cb482bcfbec50e2339f9cbf52072bad14ae55d4ef1742720a3640b9ca572e'
@@ -480,11 +483,183 @@ def compile_runtime(source, output):
     return code, compiled, receipt
 
 
+def colour_profile_lifecycle(profile, lifecycle):
+    if not isinstance(lifecycle, dict) or lifecycle.get('category') != COLOUR_CATEGORY:
+        return False
+    functions = profile.get('callback_adapter', {}).get('functions', {})
+    if set(functions) != {'create', 'move', 'draw'}:
+        return False
+    for name, receipt in functions.items():
+        actual = lifecycle.get('functions', {}).get(name, {})
+        if any(json.loads(json.dumps(actual.get(k))) != json.loads(json.dumps(v))
+               for k, v in receipt.items()):
+            return False
+    return (lifecycle.get('source_sound_id') == 95 and lifecycle.get('exclusive_source_index') == 1223
+            and lifecycle.get('start_disabled') is True and lifecycle.get('source_steps_per_native_update') == 2)
+
+
+def checked_colour_lifecycle(source, profile, binding, contracts):
+    lifecycle = colour_lifecycle(source, profile)
+    canonical = json.loads(json.dumps(lifecycle))
+    if (not lifecycle or binding.get('lifecycle') != 3 or binding.get('mode') != 1 or
+            not binding.get('lifecycle_installed') or binding.get('state_offset') != lifecycle['source_sound_id'] or
+            binding.get('material_lifecycle') != canonical or
+            json.loads(json.dumps(contracts.get(binding['source_item_id']))) != canonical):
+        raise ValueError('Incomplete installed player-colour material lifecycle or audio')
+    return canonical
+
+
+def colour_state_reservation(report):
+    room = report['equipment_resources']['room_rigs']; packet = room['packet']
+    if (packet['ram'] != 0x804C8000 or packet['bytes'] != 20480 or
+            COLOUR_RAM < packet['ram']+packet['bytes'] or
+            COLOUR_RAM+COLOUR_BYTES > report['furniture']['bank_pool']['start']):
+        raise ValueError('Player-colour state overlaps code or model storage')
+    expected = dict(ram=COLOUR_RAM, bytes=COLOUR_BYTES, mutable=True, saved=False, installed=True)
+    def visit(value):
+        if isinstance(value, dict):
+            ram, n = value.get('ram'), value.get('bytes')
+            if (type(ram) is int and type(n) is int and ram < COLOUR_RAM+COLOUR_BYTES and
+                    COLOUR_RAM < ram+n and value != expected):
+                raise ValueError('Player-colour state overlaps another runtime owner')
+            for key, child in value.items():
+                if key != 'colours': visit(child)
+        elif isinstance(value, list):
+            for child in value: visit(child)
+    visit(report['equipment_resources'])
+    return expected
+
+
+def colour_native_contract(image, installed=None):
+    from v3_equipment_runtime import PLAYER_VROM, PLAYER_RAM, PLAYER_RELOC
+    from v3_npc_draw import relocation_offsets
+    files = by_vrom(image); player = bytearray(files[PLAYER_VROM].extract(image))
+    reloc = files[PLAYER_RELOC].extract(image); slots = relocation_offsets(reloc, len(player))
+    if installed:
+        hooks = installed.get('hooks', [])
+        if len(hooks) != 2 or {h['address'] for h in hooks} != set(COLOUR_CALLS):
+            raise ValueError('Incomplete native colour hooks')
+        for hook in hooks:
+            at = hook['address']-PLAYER_RAM
+            before, after = bytes.fromhex(hook['before']), bytes.fromhex(hook['after'])
+            if (before != struct.pack('>I', COLOUR_CALLS[hook['address']]) or len(after) != 4 or
+                    player[at:at+4] != after or at in slots):
+                raise ValueError('Changed installed player-colour call or relocation')
+            player[at:at+4] = before
+    elif (0x808DDB70-PLAYER_RAM not in slots or 0x808BFC60-PLAYER_RAM in slots):
+        raise ValueError('Changed original player-colour candidate relocations')
+    room = files[0x82D7F0].extract(image); core = files[CODE_VROM].extract(image)
+    blocks = []
+    for name, raw, ram, start, end, digest in (
+        ('room_instances',room,0x80936710,0x80938EF0,0x80938FD8,
+         'ba67e35dd5de723550c768e522c774cd136f62d635afd6ea58450567f5be9808'),
+        ('room_switch_traversal',room,0x80936710,0x80938554,0x809385E4,
+         '2f2586092838336c5440550d7ccd91c71b16b973e113315bd3f40fbf5ee1488b'),
+        ('room_count_table',room,0x80936710,0x8094CA7C,0x8094CAB0,
+         'fc1e02aa1acc5a13a27ae93148f9b53a69c705e9a11de46af7439510e98ad37c'),
+        ('player_move',player,PLAYER_RAM,0x808DDB5C,0x808DDBD4,
+         '1bc244f8b2b33a6dcbc27cc987da82f495a0ad9635ee3eac004d773a07749347'),
+        ('player_draw',player,PLAYER_RAM,0x808BFB30,0x808BFEB8,
+         '00675ac18207c92ee337ee290377719121aedce73ac504d40999539cba6e5da4'),
+        ('player_common',player,PLAYER_RAM,0x808BD1A8,0x808BD218,
+         '8b79ed5ac2c1b091783d26c37095e1ea705e47e42b584ad9379efc99ec33af0d'),
+        ('player_entry_initializer',core,CODE_RAM,0x800B0FC0,0x800B1048,
+         'a6068e89e7274008f80e134ad08260907dd1a8a0bac51663d2944ed010d42271'),
+        ('player_move_trampoline',core,CODE_RAM,0x800B10D8,0x800B111C,
+         '9e595176573d3622224dc8ea5a71d93e63f5ffdd7a9535f7f89e41fb24b3fe21'),
+        ('native_fog',core,CODE_RAM,0x800BD2B0,0x800BD3EC,
+         'ac9c7f7c6cf4f819288d3ca28e92feba9f86b060c24aa9115dd694cea56a6245')):
+        if sha256(raw[start-ram:end-ram]) != digest:
+            raise ValueError('Changed complete native player-colour dependency: '+name)
+        blocks.append(dict(name=name, address=start, bytes=end-start, sha256=digest))
+    return dict(blocks=blocks, room_work_offset=0x10E50, room_actor_stride=0x740,
+        maximum_room_instances=48, player_position=0x28, actor_overlay=0x170,
+        view_eye=0x1960, view_centre=0x196C, global_light=0x1C60,
+        original_move=0x808BD1A8, actor_move=0x808DDB5C, live_move_pointer=0x80143908,
+        saved_fields_changed=False)
+
+
+def prepare_colours(base, report):
+    return dict(format='AFV3-ROOM-COLOURS-1', native=colour_native_contract(base),
+        state=colour_state_reservation(report), installed=False,
+        native_execution_tested=False, hardware_tested=False)
+
+
+def publish_colours(equipment, module, packet, symbols, output):
+    from v3_asset_loader import compile_part
+    from v3_equipment_runtime import RAM
+    colours = equipment['room_rigs']['colours']
+    targets = {name:symbols['af_v3_room_colour_'+name] for name in ('update','draw')}
+    if any(address&3 or not packet['ram'] <= address < 0x804CC000 for address in targets.values()):
+        raise ValueError('Player-colour entry escapes verified room code')
+    raw, compiled = compile_part('room_colour_bridge', output/'room_colour_bridge',
+        primary_source='overlays/v3/room_colour_bridge.S',
+        defines=(f'AF_ROOM_CRC=0x{packet["crc32"]:X}',
+                 *(f'AF_ROOM_COLOUR_{name.upper()}=0x{address:X}' for name,address in targets.items())))
+    if len(raw)>COLOUR_BRIDGE_END-COLOUR_BRIDGE:
+        raise ValueError('Player-colour bridge exceeds reserved room padding')
+    at = COLOUR_BRIDGE-RAM
+    module[at:at+COLOUR_BRIDGE_END-COLOUR_BRIDGE] = raw.ljust(COLOUR_BRIDGE_END-COLOUR_BRIDGE,b'\0')
+    colours.update(bridge=compiled, bridge_hex=raw.hex(), packet_crc32=packet['crc32'], targets=targets)
+
+
+def install_colour_hooks(base, equipment):
+    from v3_equipment_runtime import PLAYER_VROM, PLAYER_RAM, PLAYER_RELOC
+    from v3_player_actions import native_references
+    colours = equipment['room_rigs']['colours']; files = by_vrom(base)
+    owner = bytearray(files[PLAYER_VROM].extract(base)); rel = bytearray(files[PLAYER_RELOC].extract(base))
+    actions = equipment['player_actions']
+    if (sha256(owner)!=actions['owner_sha256'] or sha256(rel)!=actions['relocation_sha256'] or
+            colours['native']!=colour_native_contract(base)):
+        raise ValueError('Changed player owner before colour integration')
+    _,_,rows,locations,_ = native_references(owner,rel)
+    removed = locations[0x808DDB70-PLAYER_RAM]
+    if removed!=0x4402AE20:
+        raise ValueError('Changed complete player common-call relocation')
+    hooks=[]
+    for address,name in ((0x808DDB70,'update'),(0x808BFC60,'draw')):
+        at=address-PLAYER_RAM; before=struct.pack('>I',COLOUR_CALLS[address])
+        target=colours['bridge']['symbols']['af_v3_room_colour_'+name+'_bridge']
+        after=struct.pack('>I',0x0C000000|(target>>2&0x3FFFFFF))
+        if owner[at:at+4]!=before:raise ValueError('Changed original player-colour hook')
+        owner[at:at+4]=after;hooks.append(dict(address=address,before=before.hex(),after=after.hex()))
+    kept=[r for r in rows if r!=removed]
+    if len(kept)!=len(rows)-1:raise ValueError('Duplicate player common-call relocation')
+    struct.pack_into('>I',rel,16,len(kept))
+    rel[20:20+4*len(rows)]=struct.pack('>'+str(len(kept))+'I',*kept)+bytes(4)
+    colours.update(hooks=hooks, removed_relocations=[removed], installed=True)
+    actions.update(owner_sha256=sha256(owner),relocation_sha256=sha256(rel),
+                   removed_relocations=actions['removed_relocations']+1)
+    equipment['player_motion'].update(owner_sha256=sha256(owner),reloc_sha256=sha256(rel))
+    return {PLAYER_VROM:bytes(owner),PLAYER_RELOC:bytes(rel)}
+
+
+def checked_colours(base, report):
+    from v3_asset_loader import BLOB
+    from v3_equipment_runtime import RAM
+    equipment=report['equipment_resources'];room=equipment['room_rigs'];colours=room.get('colours')
+    if colours is None:return None
+    blob=by_vrom(base)[BLOB].extract(base);at=equipment['blob_offset']+COLOUR_BRIDGE-RAM
+    bridge=bytes.fromhex(colours['bridge_hex'])
+    if (colours.get('format')!='AFV3-ROOM-COLOURS-1' or not colours.get('installed') or
+            colours['native']!=colour_native_contract(base,colours) or
+            colours['state']!=colour_state_reservation(report) or
+            colours['packet_crc32']!=room['packet']['crc32'] or
+            colours['targets']!={name:room['code']['symbols']['af_v3_room_colour_'+name] for name in ('update','draw')} or
+            sha256(bridge)!=colours['bridge']['sha256'] or len(bridge)!=colours['bridge']['bytes'] or
+            blob[at:at+COLOUR_BRIDGE_END-COLOUR_BRIDGE]!=bridge.ljust(COLOUR_BRIDGE_END-COLOUR_BRIDGE,b'\0') or
+            '-DAF_ROOM_COLOURS' not in room['bootstrap']['flags']):
+        raise ValueError('Changed installed native player-colour binding')
+    return colours
+
+
 SOURCES = ('tools/v3_furniture_reactions.py', 'tools/v3_furniture_pipeline.py',
     'tools/v3_asset_loader.py', 'overlays/v3/room_reactions.c', 'overlays/v3/room_reactions.h',
     'overlays/v3/room_reactions.ld', 'overlays/v3/room_rumble.c', 'overlays/v3/room_rumble.h',
     'overlays/v3/room_rumble_bridge.S', 'overlays/v3/room_rumble_bridge.ld',
     'overlays/v3/room_rigs_bootstrap.c', 'overlays/v3/room_rigs_bootstrap.ld')
+SOURCES += ('overlays/v3/room_colours.c','overlays/v3/room_colours.h',
+            'overlays/v3/room_colour_bridge.S','overlays/v3/room_colour_bridge.ld')
 
 
 def prepare_batch(source, image, inventory, output, selected=(), category=None, report=None):

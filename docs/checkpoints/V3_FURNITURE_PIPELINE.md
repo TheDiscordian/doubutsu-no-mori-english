@@ -1,13 +1,83 @@
 # Automatic furniture pipeline checkpoint
 
+## Installed exclusive player-colour lifecycle
+
+Current proposal: ABI 224 at
+`build/v3-material-colour-lifecycle-imports-05/profile-runtime/build-lock.json`.
+There remain 155 choices. Starman's complete material lifecycle is installed;
+its actual Mario reward route remains phase-2 acquisition work. No new item
+becomes selectable merely because its source profile is staged.
+
+The ordinary material importer reuses complete artwork and installed audio,
+then installs constructor/movement dispatch, live same-item switch traversal,
+and native player update/draw wrappers. The two player-owner call changes
+preserve original update execution and all skeleton arguments. Exactly one
+owner-local relocation is removed. The native initializer's live player function
+pointer resolves the relocated pre-action function; the actor's own update field
+is a resident trampoline and must not be used for that calculation.
+
+Explicit transient state occupies 256 bytes at `804CD400`, beside the retained
+1-KiB vibration state. Native furniture/player allocations and saved formats
+are unchanged. The 100-byte CRC-guarded bridge fits existing room padding.
+Room code uses 11,404/16,384 bytes; bootstrap uses 1,521/1,536 bytes. Scroll has
+4 bytes spare, audio has 64 conservative bytes spare, and import storage has
+1,492,544 bytes spare. Main lock and both stable deployments are unchanged.
+
+Six focused checks pass: serialized source-profile validation; category planning
+and dependency reuse; actual shared C dispatch under address/undefined-behaviour
+sanitizers with 480 donor tick comparisons; complete installed hooks/relocation;
+retained artwork/audio/saves and UPS reconstruction; and four browser/offline
+composition cases. Tests cover fog restoration, graphics-tail allocations,
+insufficient command space, continuous/deactivated requests, and player changes.
+
+The silent native check at `build/v3-material-colour-native-02/` passes 36
+assertions across 71 recorded steps. It executes cold/hot installed bridges,
+constructor and movement dispatch, full model transfer, the actual player getter,
+same-item switching, source timing, and native fog writing. It checks arguments,
+state/save boundaries, checkpoint restoration, and no CPU fault. Skeleton and
+positioned-audio calls are captured; ordinary player rendering, synthesis,
+in-room interaction, and original hardware are not claimed.
+
+The initial native setup failed because the title heap could not allocate its
+106,496-byte synthetic fixture. Its one retry uses a 32-KiB sparse fixture:
+only the actual three-field room-work address needs backing memory, not the
+unused 69-KiB prefix. No production memory requirement or code changed for it.
+Retain unchanged reaction, rig, material-frame, and audio evidence.
+
+Reproduction with new output directories:
+
+```sh
+python3 tools/v3_furniture_pipeline.py import --category material-frame-assets \
+  --select 331C --reuse-assets build/v3-material-frames-prepared-01 \
+  --base-lock build/v3-material-colour-audio-runtime-01/build-lock.json \
+  --output build/v3-material-colour-lifecycle-imports-05
+python3 -m unittest tests.test_v3_room_reactions.InstalledColourLifecycleTests -v
+python3 tools/emulator_smoke.py \
+  --rom build/v3-material-colour-lifecycle-imports-05/profile-runtime/animal-forest-v3-asset-loader.z64 \
+  --output build/v3-material-colour-native-02 \
+  --scenario tests/scenarios/v3_material_colours.json --expansion-pak \
+  --no-initial-screenshot --seconds 240 \
+  --xvfb /home/discordian/Games/OpenRSC/headless/vendor/usr/bin/Xvfb
+```
+
+Hashes (SHA-256):
+
+- ROM: `699f187988d988e96ddf4fa5b07e0dd0309819660a4986a4d5e5896d44dc5783`.
+- UPS: `a94c1e546bcb82c9d7134276bbece5f166c9dbbdfdcc15d08dc75d2939dc2baa`.
+- Build report: `ed13ea4421e6490577e146d7e867acd6e67e809d5947fc881c5bfcc3f4f9d2d9`.
+- Build lock: `a26fbe50faa1312b064be5675d7028ecb4db4763b09f24e48a2fe9b5995ab295`.
+- Native results: `7206fdd71a59e05a2115ac6629da9aac9dc46b93dff3ba30ef71e401992e78ec`.
+
+Save format 4 is unchanged; keep backups and equal-or-larger import selections.
+V2 and format-1/2/3 V3 cannot load format-4 saves. Continue stone coin and other
+remaining model/animation/behaviour conversions. Acquisition and required
+gold-tree/golden-shovel work follow the importing pipelines.
+
 ## Exclusive colour-loop source and installed audio
 
-Current proposal: ABI 223 at `build/v3-material-colour-audio-runtime-01/build-lock.json`.
-There remain 155 choices. The category's complete sound dependency is installed;
-starman (`331C`) remains inactive until its player-colour and exclusive-switch
-callbacks and actual reward route are complete. Its existing model and four
-palettes are unchanged, as are all installed room behaviours, saves, main lock,
-and stable deployments.
+Retained audio component: ABI 223 at `build/v3-material-colour-audio-runtime-01/build-lock.json`.
+Its complete sound dependency underlies the installed lifecycle above. Its
+existing model and four palettes remain unchanged.
 
 The ordinary source adapter now checks the complete constructor and movement,
 source transition exclusions, switched palette consumer, sound helper, colour
@@ -60,12 +130,9 @@ Hashes (SHA-256):
 - Build lock: `454fe7ededded3fce35b076801074a72f2f12562c7276ec21fa0f4e8465009b7`.
 - Prepared audio report: `260ca9754fbbed177bc4bf938228dddefd6a8c263aedf41739980c00ccad730f`.
 
-Immediate implementation: connect shared material lifecycle construction and
-movement to the installed loop, actual used-instance traversal, and native
-player-colour consumers. Preserve native actor allocation; new transient work
-must have an explicit checked/reset reservation. Extend ordinary category
-planning/profile staging so this complete lifecycle is not another manual item
-installer. The pending Mario reward route remains phase-2 acquisition work.
+The shared material lifecycle connects this installed loop, actual used-instance
+traversal, and native player-colour consumers without changing actor allocation.
+The pending Mario reward route remains phase-2 acquisition work.
 
 Useful verified source/inspection locations for that integration:
 
@@ -74,8 +141,8 @@ Useful verified source/inspection locations for that integration:
 - Current player disassembly is
   `build/v3-material-colour-native-bindings-01/player/code.asm`. Normal player
   drawing begins at `808BFB30`; the six-argument skeleton call at `808BFC60`
-  targets `800530D8`, with actor as its sixth argument. This is a candidate
-  wrapper site, not an installed hook.
+  targets `800530D8`, with actor as its sixth argument. The installed wrapper
+  preserves those arguments and restores scene fog before held-item drawing.
 - Native player movement starts at `808DDB5C`. Its common pre-action call at
   `808DDB70` targets `808BD1A8`; existing action dispatch remains independent.
   Any wrapper must preserve native relocation, original execution, and timing.
@@ -87,7 +154,8 @@ Useful verified source/inspection locations for that integration:
   work at linked `80947560..8094756B`, with actor stride `740`. Resolve its actual
   loaded owner through native overlay metadata; never call linked overlay RAM
   directly. Actor overlay metadata is at actor+`170`; its loaded base and
-  linked base are separate fields. Actual traversal bounds still need binding.
+  linked base are separate fields. The installed traversal uses work at loaded
+  base+`10E50`, a `740`-byte actor stride, and the checked maximum count of 48.
 
 ## Installed timed material reactions
 

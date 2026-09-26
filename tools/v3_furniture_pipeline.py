@@ -1223,29 +1223,32 @@ def rig_import_plan(inventory, report, bindings, selected=(), category=None, *, 
     """Plan shared dependencies, not per-item installers or acquisition guesses."""
     from v3_furniture_rigs import CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY,ROLLING_CATEGORY
     from v3_furniture_materials import CATEGORY as MATERIAL_CATEGORY,initializer_lifecycle
-    from v3_furniture_reactions import source_lifecycle as reaction_lifecycle
+    from v3_furniture_reactions import source_lifecycle as reaction_lifecycle,colour_lifecycle
     from v3_sound_programs import furniture_trigger
     categories={CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY,ROLLING_CATEGORY}
     candidates=[r for r in inventory['rows'] if r.get('asset_ready') and not r['installed'] and
         not r.get('room_alias') and (not selected or r['item_id'] in selected) and
         (category is None or category in r['categories'])]
     rows=[r for r in candidates if r['profile'].get('callback_adapter',{}).get('category') in categories]
-    material_rows=[];material_audio=[]
+    material_rows=[];material_audio=[];material_loops=[]
     for r in candidates:
         if r['profile'].get('callback_adapter',{}).get('category')!=MATERIAL_CATEGORY:continue
         initializer=initializer_lifecycle(source,r['profile'])
         reaction=reaction_lifecycle(source,r['profile']) if source is not None and initializer is None else None
+        colour=colour_lifecycle(source,r['profile']) if source is not None and initializer is None and reaction is None else None
         trigger=furniture_trigger(source,r['profile']) if source is not None else None
-        if initializer or reaction or trigger:
+        if initializer or reaction or colour or trigger:
             material_rows.append(r)
             if trigger:material_audio.append(r['item_id'])
+            if colour:material_loops.append(r['item_id'])
     rigs={r['source_item_id'] for r in report['equipment_resources']['room_rigs']['rows']}
     audio={r['item_id'] for r in report['equipment_resources'].get('furniture_audio',{}).get('furniture',[])}
     loops={r['item_id'] for r in report['equipment_resources'].get('furniture_level_audio',{}).get('furniture',[])}
     plan=dict(resources=sorted(r['item_id'] for r in rows if r['item_id'] not in rigs),
         audio=sorted(({r['item_id'] for r in rows if r['profile']['callback_adapter'].get('trigger')}|
                       set(material_audio))-audio),
-        loops=sorted(r['item_id'] for r in rows if r['profile']['callback_adapter'].get('level_sound') and r['item_id'] not in loops),
+        loops=sorted(({r['item_id'] for r in rows if r['profile']['callback_adapter'].get('level_sound')}|
+                      set(material_loops))-loops),
         profiles=sorted(r['item_id'] for r in rows+material_rows if r['item_id'] not in bindings))
     if material_rows:
         installed={r['source_item_id'] for r in report['equipment_resources']['room_rigs'].get('material_rows',[])}

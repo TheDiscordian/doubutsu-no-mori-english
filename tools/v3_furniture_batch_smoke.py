@@ -660,6 +660,113 @@ def material_reactions(debug,rom_path,record):
         physical_audio_played=False,flash_written=False,requires_checkpoint_restore=True)
 
 
+def material_colours(debug,rom_path,record):
+    """Installed colour bridges and shared dispatch, with captured draw/audio calls."""
+    from runtime_layout import TEST_STACK
+    from v3_furniture_reactions import COLOUR_RAM,COLOUR_BYTES
+    path=Path(rom_path);image=path.read_bytes();report=json.loads((path.parent/'build.json').read_bytes())
+    if sha256(image)!=report['output_sha256']:raise ValueError('Changed colour cartridge')
+    room=report['equipment_resources']['room_rigs'];engine=room['colours'];packet=room['packet']
+    rows=[r for r in room['material_rows'] if r.get('lifecycle')==3]
+    if not rows or not engine['installed']:raise ValueError('Missing complete player-colour category')
+    row=rows[0];blob=by_vrom(image)[runtime.BLOB].extract(image);boot=boot_proofs(image);assertions=0
+    def check(label,at,want):
+        nonlocal assertions
+        actual=debug.read_memory(at,len(want));passed=actual==want
+        record(dict(material_colour_check=label,address=f'{at:08X}',bytes=len(want),
+                    assertion='passed' if passed else 'failed'))
+        if not passed:raise ValueError('Material colour mismatch: '+label)
+        assertions+=1
+    def call(at,args=(),proof=None):
+        result=debug.call(f'{at:08X}',list(args),return_address=MODULE_RAM+0x6480,
+                          verified_code=proof or boot.get(at));record(result);return result['return_value']
+    def put(at,*values):debug.write_memory(at,struct.pack('>'+str(len(values))+'I',*values))
+    def flush(at,n):call(0x8002FE00,[at,n]);call(0x80034CE0,[at,n])
+    cache=0x804B1E00;live=engine['native']['live_move_pointer'];skeleton=0x800530D8
+    sound=room['code']['symbols']['sAdo_OngenPos']
+    saved={at:debug.read_memory(at,n) for at,n in ((cache,4),(COLOUR_RAM,COLOUR_BYTES),(live,4),(skeleton,8),(sound,8))}
+    save=report['save_runtime'];saved_game=debug.read_memory(save['state_ram'],save['state_bytes'])
+    # Only the verified three-field room work is read. A sparse overlay-base
+    # fixture avoids allocating 69 KiB of unused prefix in the title heap.
+    size=0x8000;allocation=call(0x8009BFC0,[size])
+    if allocation&15 or not MODULE_RAM+0x8000<=allocation<=0x80400000-size:
+        raise ValueError('Colour fixture outside native heap')
+    actor,owner,model,game,player,gfx,commands,output,bridges,used,meta,loaded=(allocation+n for n in
+        (16,0x2000,0x2200,0x2700,0x4800,0x5E00,0x6400,0x7600,0x7800,0x7B00,0x7C00,0x7D00-0x10E50))
+    debug.write_memory(allocation,bytes(size));edge=b'V3CL'*4
+    guards=(allocation,actor+3*0x740,owner-16,model-16,game-16,player-16,gfx-16,commands-16,
+            output-16,bridges-16,allocation+size-16,TEST_STACK-0x800,TEST_STACK+0x40)
+    for at in guards:debug.write_memory(at,edge)
+    entries=(room['bootstrap']['symbols']['af_v3_room_boot_ct'],
+             room['bootstrap']['symbols']['af_v3_room_boot_sound_mv'],
+             engine['bridge']['symbols']['af_v3_room_colour_update_bridge'],
+             engine['bridge']['symbols']['af_v3_room_colour_draw_bridge'])
+    proofs=[]
+    for i,target in enumerate(entries):
+        at=bridges+16*i;code=struct.pack('>2I',0x08000000|(target>>2&0x3FFFFFF),0)
+        debug.write_memory(at,code);proofs.append((at,code))
+    def spy(at,destination):
+        code=struct.pack('>15I',0x3C080000|(destination>>16),0x35080000|(destination&65535),
+            0x8D090018,0x25290001,0xAD090018,0xAD040000,0xAD050004,0xAD060008,0xAD07000C,
+            0x8FA90010,0xAD090010,0x8FA90014,0xAD090014,0x03E00008,0x00001025)
+        debug.write_memory(at,code)
+    original,draw_spy,sound_spy=bridges+0x40,bridges+0x80,bridges+0xC0
+    spy(original,output);spy(draw_spy,output+32);spy(sound_spy,output+64);flush(bridges,0x100)
+    def run(which,args):return call(proofs[which][0],args,proofs[which])
+    try:
+        # Native initfunc owns this pointer; actor.update itself is a trampoline.
+        put(live,original+engine['native']['actor_move']-engine['native']['original_move'])
+        for at,target in ((skeleton,draw_spy),(sound,sound_spy)):
+            put(at,0x08000000|(target>>2&0x3FFFFFF),0);flush(at,8)
+        put(cache,0);debug.write_memory(COLOUR_RAM,b'\xA5'*COLOUR_BYTES)
+        run(2,[player,game]);run(3,[game,model,commands,owner,actor,player])
+        check('cold bridges retain native calls without touching unloaded state',COLOUR_RAM,b'\xA5'*COLOUR_BYTES)
+        check('cold original pre-action arguments',output,struct.pack('>2I',player,game))
+        check('cold original skeleton six arguments',output+32,struct.pack('>6I',game,model,commands,owner,actor,player))
+        call(0x80026B44,[model,row['vrom'],row['bytes']])
+        check('complete retained colour artwork',model,blob[row['blob_offset']:row['blob_offset']+row['bytes']])
+        for i in range(3):
+            target=actor+i*0x740;before=bytearray(b'\xA5'*0x740)
+            struct.pack_into('>H',before,0,row['runtime_index']);debug.write_memory(target,before)
+            run(0,[target,model]);before[0x12C]=0;check('constructor only clears switch',target,before)
+            debug.write_memory(target+0x3C,bytes(2));debug.write_memory(target+0x12C,b'\x01\x00')
+        check('bootstrap resets colour state before publishing',COLOUR_RAM,bytes(4))
+        check('complete verified room packet',packet['ram'],blob[packet['blob_offset']:packet['blob_offset']+packet['bytes']])
+        put(owner+0x170,meta);put(meta,0x82D7F0,0,0x80936710,0x80950000,loaded)
+        put(loaded+0x10E50,actor,used,3);debug.write_memory(used,b'\x01\x01\x00')
+        put(game+0x1C90,player);debug.write_memory(actor+0x12D,b'\x01')
+        run(1,[actor,owner,game,model])
+        check('initiating switch remains on',actor+0x12C,b'\x01\x01')
+        check('same used identity switches off',actor+0x740+0x12C,b'\x00\x01')
+        check('unused instance is untouched',actor+0xE80+0x12C,b'\x01\x00')
+        check('native positioned-loop arguments',output+64,struct.pack('>3I',actor,95,actor+8))
+        run(2,[player,game])
+        check('first two donor ticks',COLOUR_RAM+4,struct.pack('>IIfI',0,1,1.0,player))
+        debug.write_memory(actor+0x12D,b'\0');run(1,[actor,owner,game,model]);run(2,[player,game])
+        check('continuous requests advance two ticks',COLOUR_RAM+12,struct.pack('>f',3.0))
+        put(game,gfx);put(gfx+0x298,commands,commands+0x1000)
+        debug.write_memory(game+0x1960,struct.pack('>6f',0,0,0,0,0,352))
+        debug.write_memory(player+0x28,struct.pack('>3f',0,0,176))
+        debug.write_memory(game+0x1C60+7,b'\x03\x04\x05'+struct.pack('>hh',900,1000))
+        run(3,[game,model,commands+0x800,owner,actor,player])
+        check('active draw preserves all six skeleton arguments',output+32,
+              struct.pack('>6I',game,model,commands+0x800,owner,actor,player))
+        check('source colour precedes skeleton',commands,struct.pack('>2I',0xF8000000,0xFF64FFFF))
+        check('scene colour restored immediately afterward',commands+16,struct.pack('>2I',0xF8000000,0x03040500))
+        check('four bounded fog commands',gfx+0x298,struct.pack('>2I',commands+32,commands+0x1000))
+        run(2,[player,game]);check('effect stops when requests stop',COLOUR_RAM+8,bytes(4))
+        check('state stays inside explicit transient reservation',COLOUR_RAM+24,b'\xA5'*(COLOUR_BYTES-24))
+        check('save and profile state unchanged',save['state_ram'],saved_game)
+        for at in guards:check('colour fixture guard',at,edge)
+        check('no CPU fault',0x8003CE34,bytes(4))
+    finally:
+        put(cache,0)
+        for at,raw in saved.items():debug.write_memory(at,raw)
+        flush(skeleton,8);flush(sound,8);call(0x8009C040,[allocation])
+    return dict(native_material_colours=True,assertions=assertions,ordinary_player_render_tested=False,
+                audio_calls_captured=True,skeleton_calls_captured=True,flash_written=False,requires_checkpoint_restore=True)
+
+
 def room_rigs(debug,rom_path,record,*,mode=2):
     """Manifest-selected complete room lifecycles, without enabling parent choices."""
     from runtime_layout import TEST_STACK
@@ -1892,6 +1999,7 @@ def tool_controls(debug,rom_path,record,*,transitions=False,capture=False,rod=Fa
 def exercise(debug, rom_path, record, *, section='automatic_furniture'):
     if section=='material_lifecycles':return material_lifecycles(debug,rom_path,record)
     if section=='material_reactions':return material_reactions(debug,rom_path,record)
+    if section=='material_colours':return material_colours(debug,rom_path,record)
     if section=='room_effects':
         from v3_room_effects_smoke import exercise as room_effects
         return room_effects(debug,rom_path,record)

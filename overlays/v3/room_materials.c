@@ -3,6 +3,11 @@
 #include "room_materials.h"
 #ifdef AF_V3_ROOM_REACTIONS
 #include "room_reactions.h"
+#endif
+#ifdef AF_V3_ROOM_COLOURS
+#include "room_colours.h"
+#define MATERIAL_LIFECYCLE_MAX 3u
+#elif defined(AF_V3_ROOM_REACTIONS)
 #define MATERIAL_LIFECYCLE_MAX 2u
 #else
 #define MATERIAL_LIFECYCLE_MAX 1u
@@ -18,14 +23,16 @@ static const RoomMaterialRecord *material_find(u32 index) {
         if (r->index!=index) continue;
         if (index<1024 || index>=2048 || r->bytes<32 || r->bytes>9216 || (r->bytes&15) ||
                 r->lifecycle>MATERIAL_LIFECYCLE_MAX || (r->lifecycle==1 && r->mode!=0) ||
-                (r->lifecycle==2 && r->mode!=2) || r->mode>2 || (r->segment!=8 && r->segment!=9) ||
+                (r->lifecycle==2 && r->mode!=2) || (r->lifecycle==3 && r->mode!=1) ||
+                r->mode>2 || (r->segment!=8 && r->segment!=9) ||
                 !r->frames || r->frames>8 || !r->models || r->models>4 ||
                 r->kind>1 || !r->frame_bytes || r->frame_bytes>r->bytes ||
                 (!r->kind && r->frame_bytes!=32)) return 0;
         if (r->mode==2) {
             /* Private work in non-rig actors, never the donor's 0x82C offset. */
             if (r->state_offset!=0x1A4 || r->frames!=2 || r->divisor) return 0;
-        } else if (r->state_offset!=(r->lifecycle ? 0x1A4u : 0u) || !r->divisor ||
+        } else if ((r->lifecycle==3 ? r->state_offset>127u :
+                    r->state_offset!=(r->lifecycle ? 0x1A4u : 0u)) || !r->divisor ||
                 (r->mode==1 && (r->frames!=4 || r->divisor!=10))) return 0;
         for (u32 j=0;j<4;++j)
             if (j<r->models ? ((r->model_offsets[j]&7) || r->model_offsets[j]>r->bytes-8u)
@@ -45,15 +52,25 @@ void af_v3_room_material_ct(RoomRig *actor,u8 *data) {
 #ifdef AF_V3_ROOM_REACTIONS
     else if (r && r->lifecycle==2) af_v3_room_reaction_ct(actor);
 #endif
+#ifdef AF_V3_ROOM_COLOURS
+    else if (r && r->lifecycle==3) af_v3_room_colour_ct(actor);
+#endif
 }
 
-#ifdef AF_V3_ROOM_REACTIONS
+#if defined(AF_V3_ROOM_REACTIONS) || defined(AF_V3_ROOM_COLOURS)
 int af_v3_room_material_mv(RoomRig *actor,void *room,RoomRigGame *game,u8 *data) {
     if (!actor || !data) return 0;
     const RoomMaterialRecord *r=material_find(actor->index);
-    if (!r || r->lifecycle!=2) return 0;
-    af_v3_room_reaction_mv(actor,room,game);
-    return 1;
+    if (!r) return 0;
+#ifdef AF_V3_ROOM_REACTIONS
+    if (r->lifecycle==2) { af_v3_room_reaction_mv(actor,room,game);return 1; }
+#endif
+#ifdef AF_V3_ROOM_COLOURS
+    /* For lifecycle 3 this immutable parameter is the bound level-sound ID,
+       not an actor offset. The renderer needs no private actor work. */
+    if (r->lifecycle==3) { af_v3_room_colour_mv(actor,room,game,(u8)r->state_offset);return 1; }
+#endif
+    return 0;
 }
 #endif
 

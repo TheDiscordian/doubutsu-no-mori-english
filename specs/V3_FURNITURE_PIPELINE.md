@@ -2043,9 +2043,12 @@ audio preparation scans only requested source records.
 The complete source lifecycle starts switched off. Non-transition updates
 refresh the positioned loop and request player colour while switched on. An
 on-transition switches every used instance of the source identity off, then
-restores the initiating instance to on. Native state numbers, list layout,
-actor size, and relocation must be mapped explicitly before enabling this
-lifecycle. A compiled source descriptor or installed sound is not that binding.
+restores the initiating instance to on. Lifecycle 3 uses the native transition
+mapping and the room owner's actual used-instance work, resolved through its
+loaded overlay base. The checked count is at most 48 with a `740`-byte stride.
+The shared frame table stores the immutable level-sound ID in `state_offset`
+for this lifecycle; it is not an actor work offset. Complete audio and source
+consumer bindings are required before profile installation.
 
 The donor player effect consumes its request every update. Continuous requests
 advance a float timer by one donor tick, wrapping at the exact binary 79.68
@@ -2064,8 +2067,30 @@ channel/layer pointers and instrument selectors alone relocate. Unknown commands
 zero-duration events, escaping pointers, and unaccounted tails reject.
 Both envelope forms use the same source/native instrument and sample comparison.
 
-Native player-colour and exclusive-switch callbacks remain uninstalled. Keep
-this material unavailable until those behaviours and real acquisition are ready.
+Native player-colour and exclusive-switch callbacks are installed. The player
+owner changes exactly two calls: the complete original pre-action update is
+preserved, and the six-argument skeleton call is wrapped. The update wrapper
+resolves the actual relocated player through `Player_actor_move_func` at
+`80143908`; actor field `164` is a resident trampoline, not that relocated entry.
+The initializer, trampoline, original update/draw bodies, room list/count table,
+and native fog functions have complete checked source-image bindings. The
+replaced owner-local update call loses its one `R_MIPS_26` relocation; the new
+fixed bridge calls are not owner-relocated.
+
+The immutable guarded bridges occupy `804B1E60..804B1F3F`; packet publication
+rebinds their CRC and update/draw targets. Cold bridges call the native routines
+without touching unloaded room code or transient state. Colour state owns
+`804CD400..804CD4FF`, outside the immutable packet and independent vibration
+state. Bootstrap clears its magic before publishing the packet. Actor sizes,
+heap allocation, saved fields, and save format 4 do not change.
+
+Two source update ticks run per native frame. Drawing inserts source fog before
+the skeleton and restores scene fog afterward, retaining all six arguments and
+graphics-tail allocations. If callbacks consume the remaining restoration
+space, the initial tint commands are replaced with ordinary scene fog instead;
+no out-of-bounds commands or persistent tint are emitted. Sound and animation
+resources are unchanged. This material remains unavailable until its actual
+Mario reward route is installed.
 
 ## Verification policy
 

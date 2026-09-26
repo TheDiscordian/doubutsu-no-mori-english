@@ -147,11 +147,123 @@ class InstalledColourAudioTests(unittest.TestCase):
                                  (self.out/'asset-loader.ups').read_bytes()), self.image)
 
 
+class InstalledColourLifecycleTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.out = ROOT/os.environ.get('V3_COLOURS_BUILD', 'build/v3-material-colour-lifecycle-imports-05/profile-runtime')
+        cls.image, cls.report = inputs(cls.out/'build-lock.json')
+        cls.base, cls.prior = inputs(cls.out/'base-lock.json')
+        cls.source = Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+            (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+
+    def test_installed_complete_lifecycle_and_exact_native_hooks(self):
+        from v3_equipment_runtime import PLAYER_VROM, PLAYER_RAM, PLAYER_RELOC
+        from v3_npc_draw import relocation_offsets
+        from v3_furniture_install import profile
+        from v3_sound_programs import checked_furniture_loops
+        equipment = self.report['equipment_resources']; room = equipment['room_rigs']
+        engine = reactions.checked_colours(self.image, self.report)
+        self.assertEqual(engine['native']['live_move_pointer'], 0x80143908)
+        self.assertEqual(engine['state'], dict(ram=0x804CD400, bytes=256, mutable=True, saved=False, installed=True))
+        bindings = runtime.bind_profiles(self.source, self.image, self.report)
+        self.assertTrue(bindings['331C']['staged'])
+        row = next(r for r in room['material_rows'] if r['source_item_id']=='331C')
+        contracts, _ = checked_furniture_loops(self.image, by_vrom(self.image)[CODE_VROM].extract(self.image),
+                                             equipment, self.source)
+        lifecycle = reactions.checked_colour_lifecycle(self.source, self.source.profile(0x331C), row, contracts)
+        self.assertEqual((row['mode'], row['lifecycle'], row['state_offset']), (1,3,95))
+        self.assertTrue(row['profile_installed']);self.assertFalse(row['parent_selectable'])
+        staged = next(r for r in self.report['staged_furniture']['rows'] if r['id']=='GAFE01-r0/item/331C')
+        self.assertEqual(staged['room_lifecycle'], lifecycle)
+        original = copy.deepcopy(row['source'])
+        original.update(room_lifecycle=lifecycle, room_runtime=staged['room_runtime'])
+        self.assertEqual(profile(original, row['vrom'], limit=self.report['import_storage']['virtual_limit']).hex(),
+                         staged['profile_hex'])
+        files = by_vrom(self.image); before = by_vrom(self.base)
+        player = bytearray(files[PLAYER_VROM].extract(self.image))
+        for hook in engine['hooks']:
+            at = hook['address']-PLAYER_RAM
+            self.assertEqual(player[at:at+4].hex(), hook['after'])
+            player[at:at+4] = bytes.fromhex(hook['before'])
+        self.assertEqual(player, before[PLAYER_VROM].extract(self.base))
+        rel = files[PLAYER_RELOC].extract(self.image); old_rel = before[PLAYER_RELOC].extract(self.base)
+        self.assertEqual(set(relocation_offsets(old_rel, len(player)))-set(relocation_offsets(rel, len(player))),
+                         {0x808DDB70-PLAYER_RAM})
+        self.assertFalse(set(relocation_offsets(rel, len(player)))-set(relocation_offsets(old_rel, len(player))))
+        for key in ('packet_crc32',):
+            bad = copy.deepcopy(self.report);bad['equipment_resources']['room_rigs']['colours'][key] ^= 4
+            with self.assertRaises(ValueError):reactions.checked_colours(self.image, bad)
+        self.assertLessEqual(room['code']['bytes'], 16384)
+        self.assertLessEqual(room['bootstrap']['bytes'], 1536)
+        self.assertLessEqual(engine['bridge']['bytes'], 224)
+
+    def test_retained_resources_saves_and_rebound_controller_bridge(self):
+        for key in ('save_codec', 'save_runtime', 'translation_baseline'):
+            self.assertEqual(self.report[key], self.prior[key])
+        equipment = self.report['equipment_resources']
+        self.assertEqual(equipment['furniture_level_audio'], self.prior['equipment_resources']['furniture_level_audio'])
+        self.assertTrue(reactions.checked_binding(self.source, self.image, self.report)['installed'])
+        before = by_vrom(self.base)[BLOB].extract(self.base)
+        after = by_vrom(self.image)[BLOB].extract(self.image)
+        for row in equipment['room_rigs']['material_rows']:
+            at = row['blob_offset'];end = at+row['bytes']
+            self.assertEqual(after[at:end], before[at:end])
+        for key, value in self.report['sources'].items():
+            if key in reactions.SOURCES:
+                self.assertEqual(sha256((ROOT/key).read_bytes()), value, key)
+        self.assertEqual(apply_ups((ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes(),
+                                 (self.out/'asset-loader.ups').read_bytes()), self.image)
+
+    def test_browser_composition_keeps_pending_reward_unavailable(self):
+        import v3_optional_composition as composer
+        from tests.test_v3_room_rig_runtime import CurrentImportedRigTests
+        pin = composer.BASE, composer.BASE_SHA, composer.REPORT_SHA, composer.ABI
+        try:
+            composer.use_build_lock(self.out/'build-lock.json')
+            catalogue = composer.catalogue(self.image, self.report)
+            self.assertEqual(len(catalogue), 155)
+            self.assertNotIn('GAFE01-r0/item/331C', catalogue)
+        finally:
+            composer.BASE, composer.BASE_SHA, composer.REPORT_SHA, composer.ABI = pin
+        # The complete retained reaction category also shares the changed packet.
+        self.rows = self.prior['automatic_furniture']['imports']
+        if not self.rows:
+            self.rows = [r for r in self.report['automatic_furniture']['retained']
+                         if r.get('donor_item_id')=='1FD8']
+        CurrentImportedRigTests.test_private_browser_selection_matches_offline_and_keeps_translation_only(self)
+
+
 class MaterialReactionTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.source = Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
             (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+
+    def test_colour_update_dispatch_and_rendering_under_sanitizers(self):
+        source = (ROOT/'local/ac-decomp/src/game/m_player_common.c_inc').read_text()
+        start = source.index('static void Player_actor_Check_player_change_color_for_main(')
+        end = source.index('\n}', start)+2
+        with tempfile.TemporaryDirectory(prefix='v3-room-colours-') as temporary:
+            directory = Path(temporary)
+            (directory/'donor_colour_update.inc').write_text(source[start:end])
+            binary = directory/'test'
+            result = subprocess.run(['cc', '-std=c11', '-O1', '-g', '-Wall', '-Wextra', '-Werror',
+                '-ffp-contract=off', '-fsanitize=address,undefined', '-fno-omit-frame-pointer',
+                '-I'+str(directory), str(ROOT/'tests/v3_room_colours_test.c'), '-lm', '-o', str(binary)],
+                capture_output=True, text=True, timeout=30)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            result = subprocess.run([str(binary)], capture_output=True, text=True, timeout=20)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertIn('480 donor ticks', result.stdout)
+
+    def test_colour_profile_guard_accepts_serialized_relocations(self):
+        profile = self.source.profile(0x331C)
+        lifecycle = reactions.colour_lifecycle(self.source, profile)
+        self.assertTrue(reactions.colour_profile_lifecycle(profile, lifecycle))
+        self.assertTrue(reactions.colour_profile_lifecycle(json.loads(json.dumps(profile)), lifecycle))
+        changed = copy.deepcopy(lifecycle)
+        changed['functions']['draw']['relocations'][16] = (10,0,4,0)
+        self.assertFalse(reactions.colour_profile_lifecycle(profile, changed))
 
     def test_complete_source_lifecycle_and_bank(self):
         profile = self.source.profile(0x1FD8)

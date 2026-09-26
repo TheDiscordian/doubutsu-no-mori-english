@@ -22,14 +22,15 @@ Incomplete gameplay stays unavailable in the selector; installing assets does
 not claim that an item is playable. Reuse unchanged passing tests throughout.
 
 Current task: close shared conversion gaps in the ordinary bulk importer.
-The checked proposal is ABI 223 at
-`build/v3-material-colour-audio-runtime-01/build-lock.json`, with 155 development choices.
+The checked proposal is ABI 224 at
+`build/v3-material-colour-lifecycle-imports-05/profile-runtime/build-lock.json`,
+with 155 development choices.
 The automatic importer installs complete material render/audio/profile stages,
 reuses installed dependencies, and enables eligible source acquisition records.
 Mouth of Truth retains its complete timed reaction, shock request, and motor
 transport; festive candle retains its constructor and full animated artwork.
-Reaction state owns 1 KiB outside the immutable packet. No actor or saved-field
-allocation grows.
+Reaction state owns 1 KiB outside the immutable packet. Player-colour state owns
+a separate 256 bytes. No actor or saved-field allocation grows.
 
 Eight focused source/host/cartridge checks pass across reaction implementation
 and installation, including four browser/offline composition cases, patch
@@ -53,11 +54,12 @@ importer. Its full artwork and actual Gulliver acquisition are retained; lifecyc
 2 uses the existing shared constructor/movement dispatch. The guarded controller
 bridge is rebound on shared-packet publication, with explicit transient state at
 `804CD000..804CD3FF`. It preserves the live native part-copy fallback and both
-replaced size-reader entry jumps. Starman's complete loop sound and instrument
-are installed, with full source colour/switch dependencies checked. Connect
-the native player-colour update/draw consumers and same-item switch coordination
-through the shared material lifecycle; preserve the native player actor size.
-Do not repeat its passing source/parser/audio-resource checks. Stone coin and the other prepared callback
+replaced size-reader entry jumps. Starman's complete loop sound, instrument,
+player-colour consumers, and same-item switching are installed through the shared
+material importer. Its actual Mario acquisition route remains phase-2 work.
+Six focused checks and the 36-assertion native check pass; the latter captures
+skeleton and sound calls, not ordinary GPU appearance or synthesis. Retain those
+results and the unchanged source/parser/audio-resource checks. Stone coin and the other prepared callback
 models retain their actual behaviour requirements. Extend shared dispatch and
 reuse assets; do not divert into the parked acquisition frontend.
 
@@ -67,10 +69,10 @@ the player callback and uses a disconnected accessory: ordinary player animation
 actual motor transfers, and physical rumble remain hardware/playtest checks.
 Do not replay unchanged candle, rig, artwork, or sound batches.
 
-Room code has 6,624 bytes spare; bootstrap has 19 bytes spare. Scroll code has
+Room code has 4,980 bytes spare; bootstrap has 15 bytes spare. Scroll code has
 4 bytes spare, audio has 64 conservative bytes spare, and import storage has
 1,492,544 bytes spare. Capacity extensions must preserve complete dependencies.
-See the [current checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#exclusive-colour-loop-source-and-installed-audio)
+See the [current checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#installed-exclusive-player-colour-lifecycle)
 for reproduction, native limits, and save warnings. Source publication is
 allowed; the main lock and both stable web-patcher deployments stay unchanged.
 

@@ -135,14 +135,21 @@ def install_profiles(base,prior,blob,core,original,output,directories):
             initial=initializer_lifecycle(source,descriptor) if category==MATERIAL_CATEGORY else None
             reaction=reactions.source_lifecycle(source,descriptor) if category==MATERIAL_CATEGORY and initial is None else None
             if reaction:initial=reaction
+            colour=reactions.colour_lifecycle(source,descriptor) if category==MATERIAL_CATEGORY and initial is None else None
+            if colour:
+                if json.loads(json.dumps(contracts.get(donor)))!=json.loads(json.dumps(colour)):
+                    raise ValueError('Player-colour material requires its complete installed audio')
+                initial=colour
             if category==MATERIAL_CATEGORY:
                 installed=materials.get(donor)
                 if installed and initial and not installed.get('lifecycle_installed'):
                     if reaction and not runtime.get('reactions'):
                         runtime['reactions']=reactions.prepare_installation(source,base,prior)
-                    installed.update(lifecycle=2 if reaction else 1,
-                        state_offset=initial['native_face'] if reaction else initial['native_offset'],
-                        material_lifecycle=json.loads(json.dumps(initial)) if reaction else initial,lifecycle_installed=True)
+                    if colour and not runtime.get('colours'):
+                        runtime['colours']=reactions.prepare_colours(base,prior)
+                    installed.update(lifecycle=3 if colour else 2 if reaction else 1,
+                        state_offset=colour['source_sound_id'] if colour else initial['native_face'] if reaction else initial['native_offset'],
+                        material_lifecycle=json.loads(json.dumps(initial)) if reaction or colour else initial,lifecycle_installed=True)
                     material_code_changed=True
                 if not installed or not installed.get('lifecycle_installed'):
                     deferred.append(dict(source_item_id=donor,reason='Material lifecycle remains incomplete'))
@@ -206,7 +213,8 @@ def install_profiles(base,prior,blob,core,original,output,directories):
                     sound['profile_installed']=True
             elif category==MATERIAL_CATEGORY and initial:
                 installed=materials[donor]
-                if reaction:reactions.checked_lifecycle(source,descriptor,installed)
+                if colour:reactions.checked_colour_lifecycle(source,descriptor,installed,contracts)
+                elif reaction:reactions.checked_lifecycle(source,descriptor,installed)
                 else:checked_initializer(source,descriptor,installed)
                 if (installed['profile_installed'] or
                         {k:v for k,v in installed['source'].items() if k!='reused_artwork'}!=
@@ -267,9 +275,14 @@ def install_profiles(base,prior,blob,core,original,output,directories):
                 selected=False,acquisition_installed=False,catalogue_installed=False,scoring_installed=False))
     if not staged:raise ValueError('Empty complete furniture profile batch')
     if material_code_changed:publish_packet(result,blob,output,core=core)
+    if runtime.get('colours') and not prior['equipment_resources']['room_rigs'].get('colours'):
+        changed=reactions.install_colour_hooks(base,result)
+        if set(changed)&set(owner_changes):raise ValueError('Overlapping native colour owner changes')
+        owner_changes.update(changed)
     old['rows']=sorted(old['rows']+staged,key=lambda r:r['runtime_index']);old['sources'].extend(evidence)
     old.update(profile_bits_changed=False,additional_resident_bytes=
-        1024 if runtime.get('reactions') and not prior['equipment_resources']['room_rigs'].get('reactions') else 0)
+        (1024 if runtime.get('reactions') and not prior['equipment_resources']['room_rigs'].get('reactions') else 0)+
+        (256 if runtime.get('colours') and not prior['equipment_resources']['room_rigs'].get('colours') else 0))
     if deferred or old.get('deferred_resources'):
         combined={r['source_item_id']:r for r in old.get('deferred_resources',[])+deferred}
         for donor in set(retained)|{f'{furniture_source(row)[0]:04X}' for row in old['rows']}:
@@ -311,6 +324,7 @@ def bind_profiles(source,base,report):
     if runtime.get('material_rows') and module[MATERIAL_VTABLE-EQUIPMENT_RAM:MATERIAL_VTABLE-EQUIPMENT_RAM+20].hex()!=runtime['material_vtable_hex']:
         raise ValueError('Changed installed material draw dispatch')
     reaction_runtime=reactions.checked_binding(source,base,report)
+    colour_runtime=reactions.checked_colours(base,report)
     limit=checked_limit(base,report)
     # A rig's audio dependency has its own sound row; retain the complete model
     # binding when an identity occurs in both tables.
@@ -357,6 +371,13 @@ def bind_profiles(source,base,report):
             symbols=runtime['bootstrap']['symbols']
             if callbacks[:2]!=(symbols['af_v3_room_boot_ct'],symbols['af_v3_room_boot_sound_mv']):
                 raise ValueError('Missing complete timed-material lifecycle dispatch')
+        elif category==MATERIAL_CATEGORY and reactions.colour_lifecycle(source,descriptor):
+            if colour_runtime is None:raise ValueError('Material lacks native player-colour integration')
+            art['room_lifecycle']=reactions.checked_colour_lifecycle(source,descriptor,binding,contracts)
+            callbacks=struct.unpack('>5I',bytes.fromhex(runtime['material_vtable_hex']))
+            symbols=runtime['bootstrap']['symbols']
+            if callbacks[:2]!=(symbols['af_v3_room_boot_ct'],symbols['af_v3_room_boot_sound_mv']):
+                raise ValueError('Missing complete player-colour material dispatch')
         elif category==MATERIAL_CATEGORY:
             trigger=furniture_trigger(source,descriptor)
             sound=next((r for r in runtime['sound_rows'] if r['source_item_id']==donor),None)
@@ -474,8 +495,9 @@ def encode_materials(rows):
                 segment not in (8,9) or not 1<=len(frames)<=8 or not 1<=len(models)<=4 or
                 kind not in (0,1) or not 0<size<=n or kind==0 and size!=32 or
                 mode==2 and (state!=0x1A4 or len(frames)!=2 or divisor) or
-                lifecycle not in (0,1,2) or lifecycle==1 and mode!=0 or lifecycle==2 and mode!=2 or
-                mode!=2 and (state!=(0x1A4 if lifecycle else 0) or not 0<divisor<=65535) or
+                lifecycle not in (0,1,2,3) or lifecycle==1 and mode!=0 or lifecycle==2 and mode!=2 or
+                lifecycle==3 and (mode!=1 or not 0<=state<=127) or
+                mode!=2 and (lifecycle!=3 and state!=(0x1A4 if lifecycle else 0) or not 0<divisor<=65535) or
                 mode==1 and (len(frames)!=4 or divisor!=10) or
                 any(p&7 or not 0<=p<=n-size for p in frames) or
                 any(p&7 or not 0<=p<=n-8 for p in models)):
@@ -576,7 +598,7 @@ def publish_packet(equipment,blob,output,*,core=None):
     packet_ram,table_ram,packet_bytes=packet_layout(runtime)
     table_delta=table_ram-PACKET_TABLE
     sound_rows=runtime.get('sound_rows',[]);material_rows=runtime.get('material_rows',[])
-    reactions=runtime.get('reactions');reaction_sources=()
+    reactions=runtime.get('reactions');reaction_sources=();colours=runtime.get('colours')
     if reactions:
         from v3_furniture_reactions import wave_source
         if core is None or packet_ram!=EXTENDED_RAM or not any(r.get('lifecycle')==2 for r in material_rows):
@@ -589,8 +611,13 @@ def publish_packet(equipment,blob,output,*,core=None):
         reaction_sources=('overlays/v3/room_reactions.c','overlays/v3/room_rumble.c',wave)
     elif any(r.get('lifecycle')==2 for r in material_rows):
         raise ValueError('Timed material requires its complete reaction engine')
-    defines=('AF_V3_ROOM_RIG_PACKET',)+(('AF_V3_ROOM_TRIGGER_SOUND',) if sound_rows or reactions else ())
+    if colours and (packet_ram!=EXTENDED_RAM or not any(r.get('lifecycle')==3 for r in material_rows)):
+        raise ValueError('Colour publication requires its complete lifecycle and extended packet')
+    if not colours and any(r.get('lifecycle')==3 for r in material_rows):
+        raise ValueError('Colour material requires its complete player engine')
+    defines=('AF_V3_ROOM_RIG_PACKET',)+(('AF_V3_ROOM_TRIGGER_SOUND',) if sound_rows or reactions or colours else ())
     if reactions:defines+=('AF_V3_ROOM_REACTIONS',)
+    if colours:defines+=('AF_V3_ROOM_COLOURS',)
     if material_rows:defines+=('AF_V3_ROOM_MATERIALS',)
     billboard=any(r.get('mode')==4 for r in runtime['rows'])
     if billboard:defines+=('AF_V3_ROOM_BILLBOARD',)
@@ -605,7 +632,8 @@ def publish_packet(equipment,blob,output,*,core=None):
         primary_source='overlays/v3/room_rigs.c',defines=defines,
         extra_sources=(('overlays/v3/room_materials.c',) if material_rows else ())+
             (('overlays/v3/room_billboards.c',) if billboard else ())+
-            (('overlays/v3/room_effects.c',) if effects else ())+reaction_sources)
+            (('overlays/v3/room_effects.c',) if effects else ())+reaction_sources+
+            (('overlays/v3/room_colours.c',) if colours else ()))
     table=encode_packet(runtime['rows'],sound_rows,material_rows)
     data=code.ljust(table_ram-packet_ram,b'\0')+table
     if len(code)>table_ram-packet_ram or len(data)!=packet_bytes or not zlib.crc32(data):
@@ -614,7 +642,7 @@ def publish_packet(equipment,blob,output,*,core=None):
     if any(p&3 or not packet_ram<=p<packet_ram+len(code) for p in entries):
         raise ValueError('Room lifecycle entry escapes packet')
     sound_defines=()
-    if sound_rows or reactions:
+    if sound_rows or reactions or colours:
         entry=symbols['af_v3_room_sound_mv']
         if entry&3 or not packet_ram<=entry<packet_ram+len(code):raise ValueError('Room sound entry escapes packet')
         sound_defines=(f'AF_ROOM_SOUND_MV=0x{entry:X}u',)
@@ -630,7 +658,8 @@ def publish_packet(equipment,blob,output,*,core=None):
     boot,bootstrap=compile_part('room_rigs_bootstrap',output/'room_rigs_bootstrap',defines=(
         f'AF_ROOM_RAM=0x{packet_ram:X}u',f'AF_ROOM_VROM=0x{BLOB+at:X}u',f'AF_ROOM_BYTES={packet_bytes}u',f'AF_ROOM_CRC=0x{zlib.crc32(data):X}u',
         *(f'AF_ROOM_{role.upper()}=0x{entry:X}u' for role,entry in zip(('ct','mv','dw'),entries)),*sound_defines,*material_defines,*scroll_defines,
-        *(('AF_ROOM_EFFECTS',) if effects else ()),*(('AF_ROOM_REACTIONS',) if reactions else ())))
+        *(('AF_ROOM_EFFECTS',) if effects else ()),*(('AF_ROOM_REACTIONS',) if reactions else ()),
+        *(('AF_ROOM_COLOURS',) if colours else ())))
     start=equipment['blob_offset'];module=bytearray(blob[start:start+equipment['bytes']])
     if sha256(module)!=equipment['sha256']:raise ValueError('Changed installed equipment before room publication')
     entries=[bootstrap['symbols']['af_v3_room_boot_'+role] for role in ('ct','mv','dw')]
@@ -640,6 +669,10 @@ def publish_packet(equipment,blob,output,*,core=None):
     module[RAM-EQUIPMENT_RAM:TABLE-EQUIPMENT_RAM]=boot+bytes(TABLE-RAM-len(boot))
     if runtime.get('format')=='AFV3-ROOM-RIGS-2' and runtime.get('bootstrap'):
         expected=bytearray(VTABLE-TABLE)
+        if colours and colours.get('bridge_hex'):
+            from v3_furniture_reactions import COLOUR_BRIDGE,COLOUR_BRIDGE_END
+            expected[COLOUR_BRIDGE-TABLE:COLOUR_BRIDGE_END-TABLE]=bytes.fromhex(colours['bridge_hex']).ljust(
+                COLOUR_BRIDGE_END-COLOUR_BRIDGE,b'\0')
         if effects and effects.get('bootstrap_loader'):
             from v3_room_effects import LOADER_BRIDGE
             struct.pack_into('>I',expected,LOADER_BRIDGE-TABLE,effects['bootstrap_loader'])
@@ -678,7 +711,7 @@ def publish_packet(equipment,blob,output,*,core=None):
     if material_rows:
         entry=bootstrap['symbols']['af_v3_room_boot_material_dw']
         if entry&3 or not RAM<=entry<RAM+len(boot):raise ValueError('Material bootstrap escapes reservation')
-        move=bootstrap['symbols']['af_v3_room_boot_sound_mv'] if reactions or any(r.get('move_category')=='switch-trigger-sound' for r in material_rows) else 0
+        move=bootstrap['symbols']['af_v3_room_boot_sound_mv'] if reactions or colours or any(r.get('move_category')=='switch-trigger-sound' for r in material_rows) else 0
         create=bootstrap['symbols']['af_v3_room_boot_ct'] if any(r.get('lifecycle') for r in material_rows) else 0
         material_vtable=struct.pack('>5I',create,move,entry,0,0)
         module[MATERIAL_VTABLE-EQUIPMENT_RAM:MATERIAL_VTABLE-EQUIPMENT_RAM+20]=material_vtable
@@ -693,6 +726,9 @@ def publish_packet(equipment,blob,output,*,core=None):
         sound_vtable=struct.pack('>5I',0,entry,0,0,0)
         module[SOUND_VTABLE-EQUIPMENT_RAM:SOUND_VTABLE-EQUIPMENT_RAM+20]=sound_vtable
         runtime.update(sound_vtable=SOUND_VTABLE,sound_vtable_hex=sound_vtable.hex(),sound_table=SOUND_TABLE+table_delta)
+    if colours:
+        from v3_furniture_reactions import publish_colours
+        publish_colours(equipment,module,dict(packet,crc32=zlib.crc32(data)),symbols,output)
     blob[at:at+len(data)]=data;blob[start:start+len(module)]=module
     packet.update(sha256=sha256(data),crc32=zlib.crc32(data))
     if reactions:
