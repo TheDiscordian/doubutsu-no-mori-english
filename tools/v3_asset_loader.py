@@ -130,6 +130,8 @@ def compile_part(part, out, extra_sources=(), defines=(), primary_source=None):
                        'room_rigs_packet': ('af_v3_room_rig_ct', 0x804B8000),
                        'room_rigs_extended': ('af_v3_room_rig_ct', 0x804C8000),
                        'room_effects': ('af_v3_flash_init', 0x804C8000),
+                       'room_reactions': ('af_v3_room_reaction_ct', 0x804C8000),
+                       'room_rumble_bridge': ('af_v3_room_rumble_bridge', 0x800B11B8),
                        'effect_loader': ('af_v3_effect_profile_load', 0x80A1C6A0),
                        'room_scroll': ('af_v3_room_scroll_dw', 0x804BA000),
                        'surface_indoor': ('af_v3_surface_floor', 0x80951BC4),

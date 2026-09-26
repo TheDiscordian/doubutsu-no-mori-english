@@ -45,13 +45,27 @@ remains unverified. Do not run a third setup retry or replay the passed bell che
 Include proper native graphics setup with the next changed effect integration.
 
 Continue complete material lifecycles and other model/animation callbacks.
-Mouth of Truth needs source surprise/rumble and a two-field timed state machine;
-its renderer already reads private native `1A4`. Preserve donor `82C` as the face
-selector and map the separate `82A` countdown independently. Starman needs its
+Mouth of Truth's complete timed state machine, player-shock request, donor
+vibration evaluator, and N64 motor transport are prepared at
+`build/v3-room-reactions-prepared-06/`, not installed. Finish its integration
+next: publish the code/wave bank in the shared room packet, reserve/reset private
+state at `804CD000`, bind the guarded main-RAM controller hook to the actual
+packet CRC/entry, and connect lifecycle 2 through the ordinary material importer.
+Revalidate the checked two-window bridge reservation before writing it; never
+overwrite the active native part-copy fallback at `800B1DF0`. Preserve source
+`82C` as face at native `1A4` and source `82A` as countdown at native `1A6`.
+Keep the item unavailable until these connections are complete. This is the
+current import, not a deferred rumble stretch goal. Starman needs its
 complete loop sound, player-colour request, and same-item switch coordination,
 not just its existing palettes. Stone coin and the other prepared callback
 models retain their actual behaviour requirements. Extend shared dispatch and
 reuse assets; do not divert into the parked acquisition frontend.
+
+Retain the passing 2,850-frame donor comparison and focused motor/reaction
+sanitizer checks. The new code has not executed in the emulator or on hardware;
+use one combined current-build check after publication, without replaying the
+unchanged candle, rig, artwork, or sound batches. The reaction checkpoint records
+the existing source/native bindings and the integration work still required.
 
 Room code has 9,672 bytes spare; bootstrap has 27 bytes spare. Scroll code has
 4 bytes spare, audio has 288 conservative bytes spare, and import storage has

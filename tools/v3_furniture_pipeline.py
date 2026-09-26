@@ -1401,8 +1401,12 @@ def main():
     bind_profiles(source,base,base_report)
     installed = [int(r['id'].rsplit('/',1)[1],16) for r in base_report['furniture']['imports']+[base_report['speed_bag']]]
     if args.representation=='lifecycle':
-        from v3_furniture_contact import prepare_batch
-        report=prepare_batch(source,base,scan(source,worksheet,installed),output,args.select,args.category,base_report)
+        from v3_furniture_reactions import CATEGORY as REACTION_CATEGORY
+        if args.category==REACTION_CATEGORY:
+            from v3_furniture_reactions import prepare_batch
+        else:
+            from v3_furniture_contact import prepare_batch
+        report=prepare_batch(source,base,scan(source,worksheet,installed,selected=args.select),output,args.select,args.category,base_report)
         print(json.dumps(dict(lifecycles=len(report['rows']),complete_dependencies=report['complete_dependencies'],
             code_bytes=report['code']['bytes'],runtime_installed=False)))
         return

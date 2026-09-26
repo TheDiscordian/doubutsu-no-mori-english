@@ -32,6 +32,22 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
+Mouth of Truth's timed reaction and shared N64 vibration code are prepared at
+`build/v3-room-reactions-prepared-06/`. The code includes the actual Rumble Pak
+initialise/start/stop calls, independent accessory state, failed-stop retries,
+and stopping during suspended gameplay or pre-NMI. The donor's complete sixteen
+waveforms, four-request envelope, source callbacks, and native player/controller
+bindings are checked. The surprise request persists until the player accepts it;
+the face and countdown use distinct private native actor fields.
+
+Focused sanitizer checks compare 2,850 frames with the actual donor evaluator
+and exercise the complete timed reaction and mocked motor transport. VR4300
+compilation and bridge placement are checked. This is prepared code, not an
+installed cartridge feature or a physical Rumble Pak test. The immediate work
+is shared-packet publication, the controller hook, and automatic material-profile
+installation. Finish those connections as part of this import. See the
+[reaction checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#timed-reaction-and-n64-motor-code).
+
 The checked V3 proposal is ABI 220 at
 `build/v3-material-lifecycle-imports-02/build-lock.json`, with 154 development choices.
 The ordinary category importer plans complete material renderers, required audio,

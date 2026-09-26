@@ -1958,6 +1958,67 @@ retains the current campsite-lamp hooks and every original effect. Endpoint-hit
 profiles require the installed controller, complete sprite, both sounds, and
 actual full-index wall condition. Prepared resources alone cannot enable an item.
 
+## Timed material reactions and N64 vibration
+
+`convert --assets-only --representation lifecycle --category timed-surprise-material`
+prepares complete reaction dependencies through the existing pipeline. Discovery
+checks the complete source callbacks, relocations, player helpers, surprise
+consumer, duration constant, and material selector, without an item-ID switch.
+The prepared component is not a selectable import; shared-packet publication,
+the controller hook, and ordinary material-profile installation remain required.
+
+The two source signed work fields are distinct: countdown at `82A` maps to
+native `1A6`, while face at `82C` maps to native `1A4`. Construction clears both.
+Two ordered source steps per native update preserve the 50-frame countdown,
+vibration at 20, and reset below zero. Only the first step consumes the native
+interaction pulse. Catalogue previews do not request player reactions. The
+source room request keeps retrying until the player reaches shock; native
+priority 14 remains authoritative. The source's 20 update-duration units become
+10 native units at 30 Hz. The native room's smaller allocation never receives
+the donor's out-of-bounds room work offsets.
+
+The shared vibration bank retains all sixteen source waveforms and their exact
+lengths. Its 272-byte representation uses relative offsets and no donor pointers.
+The complete source engine and relocation map are pinned. Four concurrent
+requests retain attack/sustain/release phases, floating-point accumulation,
+distance attenuation, removal-before-selection, and first-wins priority ties.
+The request's `100` operand means intensity percentage, not 100 frames.
+Controller retraces evaluate the envelopes at 60 Hz, independently of room
+updates. Both donor stop commands map to motor off: the N64 Rumble Pak has no
+separate active brake.
+
+The transport calls native `osMotorInit` at `80031574` and `__osMotorAccess` at
+`80031300`, using a private 104-byte `OSPfs`. It never shares a Controller Pak
+save-system instance. Only a positively recognised Rumble Pak receives motor
+commands. Disconnect/replacement invalidates the device; transient failed stops
+remain pending and retry. A positively identified other accessory does not keep
+receiving idle probes. The item still reacts without a Rumble Pak attached.
+
+The safe controller call site is `800D7150`: input and status reads are complete,
+and padmgr owns its serial queue. The earlier rumble callback runs during an
+outstanding SI read and must not perform motor transfers. Short interrupt-masked
+sections protect shared envelope updates; no interrupt mask is held while SI
+transfers block. A six-retrace heartbeat stops suspended/abandoned requests, and
+the existing pre-NMI flag stops remaining vibration. These are platform safety
+adaptations, not a new saved GameCube vibration-setting field.
+
+The proposed mutable reservation is `804CD000..804CD3FF`, immediately after the
+immutable shared packet and below the model pool. Packet publication must record
+and check that reservation. Its magic is cleared before publishing the ready
+word. The prepared main-RAM bridge retains the original Pak connection check,
+then tests successful V3 startup and the exact room-packet CRC before calling
+Expansion Pak code. It occupies only checked tails of the fully replaced size
+readers at `800B11B8..800B11F7` and `800B1324..800B1363`; their original entries
+remain. The native part-copy tail at `800B1DF0` is still active and is not spare.
+The prepared bridge's target/CRC are illustrative component bindings and must
+be rebound to the actual published packet before installation.
+
+Focused checks compare the evaluator against the donor C functions using the
+actual disc's wave data. They cover all sixteen waves, omitted phases,
+overlapping requests, malformed input, the full timed reaction, delayed shock
+acceptance, and mocked detection/start/stop/failure/disconnection. Host mocks and
+VR4300 compilation do not establish native SI execution or hardware rumble.
+
 ## Verification policy
 
 `tests/test_v3_furniture_pipeline.py` checks shared parser rules, source

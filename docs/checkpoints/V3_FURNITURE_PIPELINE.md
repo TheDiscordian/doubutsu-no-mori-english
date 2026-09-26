@@ -1,5 +1,88 @@
 # Automatic furniture pipeline checkpoint
 
+## Timed reaction and N64 motor code
+
+Prepared output: `build/v3-room-reactions-prepared-06/`. The checked cartridge
+remains ABI 220 at `build/v3-material-lifecycle-imports-02/build-lock.json`, with
+154 choices. No ROM, selection, saved format, main lock, or deployment changes.
+The preceding work produced verified source/controller bindings; this batch
+implements and compiles the reaction, envelope evaluator, and motor transport.
+
+The existing lifecycle preparation command discovers `timed-surprise-material`
+from complete callbacks. The matching donor is Mouth of Truth (`1FD8`, reserved
+destination `3C30`). Its complete prepared artwork is retained. The constructor
+and two-step movement use private face/countdown fields; shock requests retain
+the native priority system and retry until accepted. Complete source surprise
+consumers and native player bindings are pinned, not inferred from a name.
+
+The reusable vibration engine extracts all sixteen waves into 272 bytes, retains
+four overlapping envelopes, and drives actual N64 motor APIs. A private `OSPfs`
+keeps Controller Pak instances untouched. Transport detects accessory changes,
+retries communication failures, preserves failed-stop requests, and distinguishes
+a confirmed wrong accessory from a possibly still-running motor. Gameplay
+inactivity and pre-NMI stop active requests without holding interrupts disabled
+across blocking transfers.
+
+The first compile exposed compiler-generated `memcpy`/`memset` dependencies;
+the component now binds their complete checked native implementations. The
+native part-copy tail initially considered for bridge storage has an active
+fallback and is not used. Two fully replaced size-reader tails pass current-core
+incoming-control-flow checks and retained-module fallback checks. The split
+bridge preserves both original entry jumps and the original Pak connection
+check, and guards its upper-memory callback with startup and packet readiness.
+
+Verification uses four focused checks in `tests.test_v3_room_reactions`:
+
+- Complete source callbacks, helper/constant/relocation rejection, all sixteen
+  source waves, and distinct private work mappings.
+- Twelve complete native bindings, current redirected-reader ownership, and
+  rejecting a changed replacement entry.
+- Address/undefined-behaviour sanitizer execution, with 2,850 exact donor-frame
+  comparisons across all waves and phase combinations; overlapping requests,
+  request limits, complete timed reaction, delayed shock acceptance, bounds,
+  mocked motor calls, failed-stop recovery, disconnect/replacement, non-motor
+  accessories, pause stopping, and pre-NMI stopping.
+- Prepared VR4300 code, embedded wave bank, external motor entries, split bridge
+  bytes, source hashes, explicit mutable-state proposal, and bootstrap capacity.
+
+The motor calls are mocked in host tests. No native emulator execution, actual
+serial transfer, GPU appearance, ordinary gameplay, or hardware result is claimed.
+No old build is replayed. Prepared dependencies remain marked uninstalled and
+Mouth of Truth remains unavailable in the selector.
+
+The component is 2,880 bytes, including its wave bank. Its SHA-256 is
+`bab42de292ed0e50879648365a534cb95ba7fe0817f36300fdb035198e9cca4c`;
+the preparation report SHA-256 is
+`bd26ee5b9b895f56e760879d935a2a250b07f554e20f03361b3e1f8812851938`.
+The conditional state-reset bootstrap compiles to 1,517 of 1,536 bytes. Its
+disassembly clears state magic before publishing the packet-ready word. The
+split bridge is a 416-byte link span, but only its two 64-byte windows are
+eligible for installation; the intervening live code must not be overwritten.
+The largest component stack frame is 144 bytes in envelope evaluation. Total
+controller-thread stack use still needs checking with the installed call chain.
+
+Reproduction:
+
+```sh
+python3 tools/v3_furniture_pipeline.py convert --assets-only \
+  --representation lifecycle --category timed-surprise-material --select 1FD8 \
+  --base-lock build/v3-material-lifecycle-imports-02/build-lock.json \
+  --output build/v3-room-reactions-prepared-06
+python3 -m unittest tests.test_v3_room_reactions -v
+```
+
+Use a new ignored output directory when reproducing. The unselected category
+scan also identifies the same single matching lifecycle; selected preparation
+now limits discovery to the requested records. No per-item installer or native
+scenario is added.
+
+Immediate integration: publish code/waves into the shared room packet, record
+and reset the proposed `804CD000..804CD3FF` state reservation, rebind/install the
+controller bridge using the actual packet CRC and callback entry, and connect
+the complete lifecycle through ordinary material/profile planning. Reuse the
+existing bootstrap movement/constructor dispatch and prepared artwork. The
+motor connection is required for this import, not deferred to a later release.
+
 ## Automatic material lifecycle import
 
 The checked proposal is ABI 220 at
