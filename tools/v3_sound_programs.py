@@ -1213,7 +1213,7 @@ def install_furniture(image,prior,blob,code,original,output,directory):
                 raise ValueError('Trigger lifecycle requires its complete installed material renderer/assets')
             material.update(lifecycle_installed=True,move_category='switch-trigger-sound')
     runtime['sound_rows']=sorted(old_sound_rows+sound_rows,key=lambda r:r['runtime_index'])
-    room.publish_packet(result,blob,output)
+    room.publish_packet(result,blob,output,core=code)
     shared=result['sound_programs'];shared['previous_sequence']=copy.deepcopy(old_sequence);shared['sequence']=seq
     shared.setdefault('trigger_batches',[]).append(dict(programs=programs,tables=tables))
     shared.update(after_budget=permanent_budget(code),native_synthesis_tested=False)

@@ -1223,6 +1223,7 @@ def rig_import_plan(inventory, report, bindings, selected=(), category=None, *, 
     """Plan shared dependencies, not per-item installers or acquisition guesses."""
     from v3_furniture_rigs import CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY,ROLLING_CATEGORY
     from v3_furniture_materials import CATEGORY as MATERIAL_CATEGORY,initializer_lifecycle
+    from v3_furniture_reactions import source_lifecycle as reaction_lifecycle
     from v3_sound_programs import furniture_trigger
     categories={CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY,ROLLING_CATEGORY}
     candidates=[r for r in inventory['rows'] if r.get('asset_ready') and not r['installed'] and
@@ -1233,8 +1234,9 @@ def rig_import_plan(inventory, report, bindings, selected=(), category=None, *, 
     for r in candidates:
         if r['profile'].get('callback_adapter',{}).get('category')!=MATERIAL_CATEGORY:continue
         initializer=initializer_lifecycle(source,r['profile'])
+        reaction=reaction_lifecycle(source,r['profile']) if source is not None and initializer is None else None
         trigger=furniture_trigger(source,r['profile']) if source is not None else None
-        if initializer or trigger:
+        if initializer or reaction or trigger:
             material_rows.append(r)
             if trigger:material_audio.append(r['item_id'])
     rigs={r['source_item_id'] for r in report['equipment_resources']['room_rigs']['rows']}

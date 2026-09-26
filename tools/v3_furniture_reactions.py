@@ -169,11 +169,13 @@ NATIVE_BLOCKS = (
 )
 
 
-def native_contract(base):
+def native_contract(base, bridge=None):
     files = by_vrom(base)
+    core = restored_core(files[CODE_VROM].extract(base), bridge)
     result = []
     for name, vrom, ram, address, size, digest in NATIVE_BLOCKS:
-        raw = files[vrom].extract(base)[address-ram:address-ram+size]
+        owner = core if vrom == CODE_VROM else files[vrom].extract(base)
+        raw = owner[address-ram:address-ram+size]
         if sha256(raw) != digest:
             raise ValueError('Changed native reaction dependency: '+name)
         result.append(dict(name=name, vrom=vrom, ram=ram, address=address, bytes=size, sha256=digest))
@@ -190,12 +192,12 @@ BRIDGE_WINDOWS = (
 )
 
 
-def bridge_reservation(base, report):
+def bridge_reservation(base, report, bridge=None):
     """Only fully replaced readers qualify; native part-copy still has a fallback."""
     from v3_asset_loader import BLOB
     from v3_npc_clothing import guard_incoming
     files = by_vrom(base)
-    core = files[CODE_VROM].extract(base)
+    core = restored_core(files[CODE_VROM].extract(base), bridge)
     equipment = report['equipment_resources']
     blob = files[BLOB].extract(base)
     module = blob[equipment['blob_offset']:equipment['blob_offset']+equipment['bytes']]
@@ -222,14 +224,97 @@ def bridge_reservation(base, report):
     # the checked original jump's NOP delay slot so even the first reclaimed
     # instruction is forbidden as an incoming target.
     guard_incoming(core, len(core), CODE_RAM, [(a-CODE_RAM-4, b-a+4) for a, b, _, _ in BRIDGE_WINDOWS])
+    for window in windows:
+        a = window['address']-CODE_RAM
+        window['before'] = core[a:a+window['bytes']].hex()
     return dict(windows=windows, original_entries_preserved=True,
                 native_part_copy_fallback_preserved=True, installed=False)
 
 
-def compile_runtime(source, output):
-    """Compile actual VR4300 reaction and motor code with the extracted bank."""
+STATE_RAM, STATE_BYTES, SERIAL_HOOK = 0x804CD000, 1024, 0x800D7150
+ORIGINAL_SERIAL_CALL = struct.pack('>I', 0x0C000000 | (0x800D6B8C >> 2 & 0x3FFFFFF))
+
+
+def restored_core(core, bridge):
+    """Verify installed writes before restoring only those bytes for contracts."""
+    if not bridge or not bridge.get('installed'):
+        return core
+    core = bytearray(core)
+    expected = {a: (b-a, digest) for a, b, _, digest in BRIDGE_WINDOWS}
+    expected[SERIAL_HOOK] = (4, sha256(ORIGINAL_SERIAL_CALL))
+    hooks = bridge.get('hooks', [])
+    if len(hooks) != 3 or {r['address'] for r in hooks} != set(expected):
+        raise ValueError('Incomplete installed controller bridge')
+    for row in hooks:
+        a = row['address']-CODE_RAM
+        before, after = bytes.fromhex(row['before']), bytes.fromhex(row['after'])
+        n, digest = expected[row['address']]
+        if (len(before) != n or len(after) != n or sha256(before) != digest or
+                core[a:a+n] != after):
+            raise ValueError('Changed complete controller bridge write')
+        core[a:a+n] = before
+    return bytes(core)
+
+
+def profile_lifecycle(profile, lifecycle):
+    """Structural profile guard; installation independently checks actual source."""
+    if not isinstance(lifecycle, dict) or lifecycle.get('category') != CATEGORY:
+        return False
+    functions = profile.get('callback_adapter', {}).get('functions', {})
+    if set(functions) != {'create', 'move', 'draw', 'destroy'}:
+        return False
+    for role in ('create', 'move', 'destroy'):
+        expected = lifecycle.get('functions', {}).get(role, {})
+        if any(json.loads(json.dumps(functions[role].get(k))) != json.loads(json.dumps(expected.get(k))) for k in
+               ('symbol', 'offset', 'bytes', 'sha256', 'relocations')):
+            return False
+    return (lifecycle.get('native_face') == 0x1A4 and lifecycle.get('native_countdown') == 0x1A6 and
+            lifecycle.get('initial_frames') == 50 and lifecycle.get('vibration_at') == 20 and
+            lifecycle.get('source_steps_per_native_update') == 2 and
+            lifecycle.get('vibration') == dict(percent=100, waves=[1,1,13], frames=[0,7,7], distance=0.0))
+
+
+def checked_lifecycle(source, profile, binding):
+    lifecycle = source_lifecycle(source, profile)
+    if (lifecycle is None or binding.get('lifecycle') != 2 or binding.get('mode') != 2 or
+            binding.get('state_offset') != 0x1A4 or not binding.get('lifecycle_installed') or
+            binding.get('material_lifecycle') != json.loads(json.dumps(lifecycle))):
+        raise ValueError('Incomplete installed timed material reaction')
+    return json.loads(json.dumps(lifecycle))
+
+
+def state_reservation(report):
+    room = report['equipment_resources']['room_rigs']
+    packet = room['packet']
+    if (packet['ram'] != 0x804C8000 or packet['bytes'] != 20480 or
+            room['table_ram'] != 0x804CC000 or packet['ram']+packet['bytes'] != STATE_RAM or
+            STATE_RAM+STATE_BYTES > report['furniture']['bank_pool']['start']):
+        raise ValueError('Reaction state overlaps room code or model storage')
+    # Reject another explicitly owned runtime region, including future modules.
+    def visit(value):
+        if isinstance(value, dict):
+            ram, size = value.get('ram'), value.get('bytes')
+            if type(ram) is int and type(size) is int and ram < STATE_RAM+STATE_BYTES and STATE_RAM < ram+size:
+                if value != dict(ram=STATE_RAM, bytes=STATE_BYTES, mutable=True, saved=False, installed=True):
+                    raise ValueError('Reaction state overlaps another reported runtime owner')
+            for key, child in value.items():
+                if key != 'reactions': visit(child)
+        elif isinstance(value, list):
+            for child in value: visit(child)
+    visit(report['equipment_resources'])
+    return dict(ram=STATE_RAM, bytes=STATE_BYTES, mutable=True, saved=False, installed=True)
+
+
+def prepare_installation(source, base, report):
+    bank, receipt = vibration_bank(source)
+    return dict(format='AFV3-ROOM-REACTIONS-1', bank=json.loads(json.dumps(receipt)),
+        native=native_contract(base), bridge=bridge_reservation(base, report), state=state_reservation(report),
+        additional_resident_bytes=STATE_BYTES, installed=False, native_execution_tested=False, hardware_tested=False)
+
+
+def wave_source(source, output):
     from apply_translation import write_new
-    from v3_asset_loader import ROOT, compile_part
+    from v3_asset_loader import ROOT
     output = output.resolve()
     if not output.is_relative_to(ROOT/'build'):
         raise ValueError('Reaction preparation requires ignored build storage')
@@ -240,8 +325,76 @@ def compile_runtime(source, output):
         '.globl af_v3_rumble_waves\naf_v3_rumble_waves:\n'+\
         '.incbin "/source/'+str(output.relative_to(ROOT)/'waves.bin')+'"\n'
     write_new(output/'waves.S', assembly.encode())
+    return str(output.relative_to(ROOT)/'waves.S'), bank, receipt
+
+
+def publish_bridge(core, reactions, packet, symbols, output):
+    from v3_asset_loader import compile_part
+    if core is None:
+        raise ValueError('Reaction publication requires the current main-code owner')
+    bridge = reactions['bridge']
+    restored = restored_core(core, bridge)
+    target = symbols['af_v3_room_rumble_retrace']
+    crc = packet['crc32']
+    if not packet['ram'] <= target < 0x804CC000 or target & 3 or not crc:
+        raise ValueError('Controller callback escapes the published room packet')
+    raw, compiled = compile_part('room_rumble_bridge', output/'room_rumble_bridge',
+        primary_source='overlays/v3/room_rumble_bridge.S',
+        defines=(f'AF_ROOM_CRC=0x{crc:X}', f'AF_ROOM_RUMBLE_RETRACE=0x{target:X}'))
+    first = BRIDGE_WINDOWS[0][0]
+    hooks = []
+    for start, end, _, digest in BRIDGE_WINDOWS:
+        at = start-CODE_RAM
+        before = restored[at:at+end-start]
+        if sha256(before) != digest:
+            raise ValueError('Occupied native controller-bridge reservation')
+        after = raw[start-first:end-first].ljust(end-start, b'\0')
+        hooks.append(dict(address=start, before=before.hex(), after=after.hex()))
+        core[at:at+len(after)] = after
+    at = SERIAL_HOOK-CODE_RAM
+    if restored[at:at+4] != ORIGINAL_SERIAL_CALL:
+        raise ValueError('Changed serial-queue-safe controller call')
+    after = struct.pack('>I', 0x0C000000 | (first >> 2 & 0x3FFFFFF))
+    core[at:at+4] = after
+    hooks.append(dict(address=SERIAL_HOOK, before=ORIGINAL_SERIAL_CALL.hex(), after=after.hex()))
+    bridge.update(hooks=hooks, code=compiled, packet_crc32=crc, callback=target, installed=True)
+    reactions.update(installed=True)
+
+
+def checked_binding(source, base, report):
+    from v3_asset_loader import BLOB
+    room = report['equipment_resources']['room_rigs']
+    reactions = room.get('reactions')
+    if reactions is None:
+        return None
+    if reactions.get('format') != 'AFV3-ROOM-REACTIONS-1' or not reactions.get('installed'):
+        raise ValueError('Incomplete installed reaction engine')
+    bank, receipt = vibration_bank(source)
+    bridge = reactions['bridge']
+    native = native_contract(base, bridge)
+    reservation = bridge_reservation(base, report, bridge)
+    if (reactions['bank'] != json.loads(json.dumps(receipt)) or reactions['native'] != native or
+            reactions['state'] != state_reservation(report) or
+            any(bridge.get(k) != reservation[k] for k in ('windows', 'original_entries_preserved',
+                                                        'native_part_copy_fallback_preserved')) or
+            not bridge.get('installed') or bridge['packet_crc32'] != room['packet']['crc32'] or
+            bridge['callback'] != room['code']['symbols']['af_v3_room_rumble_retrace']):
+        raise ValueError('Changed complete reaction engine bindings')
+    blob = by_vrom(base)[BLOB].extract(base)
+    at = room['packet']['blob_offset']+room['code']['symbols']['af_v3_rumble_waves']-room['packet']['ram']
+    if blob[at:at+len(bank)] != bank:
+        raise ValueError('Changed complete installed vibration wave bank')
+    if '-DAF_ROOM_REACTIONS' not in room['bootstrap']['flags']:
+        raise ValueError('Missing reaction state reset on packet publication')
+    return reactions
+
+
+def compile_runtime(source, output):
+    """Compile actual VR4300 reaction and motor code with the extracted bank."""
+    from v3_asset_loader import ROOT, compile_part
+    assembly, bank, receipt = wave_source(source, output)
     code, compiled = compile_part('room_reactions', output/'code',
-        extra_sources=('overlays/v3/room_rumble.c', str(output.relative_to(ROOT)/'waves.S')))
+        extra_sources=('overlays/v3/room_rumble.c', assembly))
     return code, compiled, receipt
 
 

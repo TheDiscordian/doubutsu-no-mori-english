@@ -32,23 +32,28 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
-Mouth of Truth's timed reaction and shared N64 vibration code are prepared at
-`build/v3-room-reactions-prepared-06/`. The code includes the actual Rumble Pak
-initialise/start/stop calls, independent accessory state, failed-stop retries,
-and stopping during suspended gameplay or pre-NMI. The donor's complete sixteen
-waveforms, four-request envelope, source callbacks, and native player/controller
-bindings are checked. The surprise request persists until the player accepts it;
-the face and countdown use distinct private native actor fields.
+Mouth of Truth's complete timed reaction and shared N64 motor connection are
+installed through the ordinary importer. The checked proposal is ABI 222 at
+`build/v3-material-reaction-imports-03/cartridge/build-lock.json`, with 155
+development choices. Its complete 3,968-byte artwork, official name, Gulliver
+reward route, catalogue non-orderability, and scoring are retained.
 
-Focused sanitizer checks compare 2,850 frames with the actual donor evaluator
-and exercise the complete timed reaction and mocked motor transport. VR4300
-compilation and bridge placement are checked. This is prepared code, not an
-installed cartridge feature or a physical Rumble Pak test. The immediate work
-is shared-packet publication, the controller hook, and automatic material-profile
-installation. Finish those connections as part of this import. See the
-[reaction checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#timed-reaction-and-n64-motor-code).
+The guarded controller hook uses the actual shared-packet CRC and retrace entry.
+The complete donor waveform bank and independent motor state preserve start,
+stop, communication retries, and stopping during suspended gameplay or pre-NMI.
+The source surprise request persists until the player accepts it. One explicit
+1-KiB reservation holds transient state; saved formats and actor sizes do not grow.
 
-The checked V3 proposal is ABI 220 at
+Focused sanitizer checks compare 2,850 frames with the donor evaluator and
+exercise the actual material dispatch. The native run passes 63 internal
+assertions for the installed bridge, cold-load guard, full model transfer,
+constructors, player-request arguments, complete countdown/envelope timing,
+saved-state preservation, and bounds. Its captured player callback and
+disconnected accessory do not establish ordinary player animation, actual
+motor transfers, or physical Rumble Pak behaviour. See the
+[installed reaction checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#installed-timed-material-reactions).
+
+The retained candle integration is ABI 220 at
 `build/v3-material-lifecycle-imports-02/build-lock.json`, with 154 development choices.
 The ordinary category importer plans complete material renderers, required audio,
 and implemented lifecycle profiles together, skipping installed dependencies.
@@ -76,18 +81,18 @@ conditional effect binding. Its native particle lifetime still needs a properly
 allocated graphics fixture with the next changed effect batch; the previous
 fixture omitted that allocation. Do not repeat the passed bell checks.
 
-Room code uses 6,712 of 16,384 bytes; bootstrap uses 1,509 of 1,536 bytes.
+Room code uses 9,760 of 16,384 bytes; bootstrap uses 1,517 of 1,536 bytes.
 Scroll code has 4 bytes spare, audio has 288 conservative bytes spare, and
 the import reservation has 1,492,544 bytes spare. Live synthesis, GPU appearance,
 ordinary gameplay/save/restart, and original hardware are not newly verified.
 
-Saved format 4 is unchanged. A save using festive candle requires its selected
+Saved format 4 is unchanged. A save using an added item requires its selected
 import in the receiving build; preserve backups and equal-or-larger profiles.
 Format-4 saves cannot load in V2 or format-1/2/3 V3 builds. Translation-only output
 remains the pinned V2-12 ROM. The main lock and both stable deployments remain
 unchanged. Continue remaining model, material, animation, and behaviour
-conversion, including Mouth of Truth's surprise/rumble and starman's
-player-colour/switch coordination. The code-entry frontend remains parked.
+conversion, including starman's full loop sound and player-colour/switch
+coordination. The code-entry frontend remains parked.
 
 The retained password-engine component is ABI 197 at
 `build/v3-password-runtime-05/build-lock.json`. The shared password codec,

@@ -435,7 +435,7 @@ def install(base,prior,blob,core,original,output,directory):
     reader_changes.update(refresh_icon_reader(base,equipment,blob,output))
     if any(r.get('room_placement_uses_display') for r in installed):
         from v3_room_rig_runtime import refresh_code
-        refresh_code(equipment,blob,output)
+        refresh_code(equipment,blob,output,core=core)
     furniture=reader_updates.get('furniture',prior['furniture'])
     changes,cat_report=shared_catalogue.install_catalogue(base,stable,prior,
         furniture['imports']+[prior['speed_bag']],output,source.rel,source.symbols.encode(),

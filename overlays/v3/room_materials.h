@@ -32,4 +32,5 @@ extern RoomMaterialTable af_v3_test_room_materials;
 #define room_material_table (&af_v3_test_room_materials)
 #endif
 extern void af_v3_room_material_ct(RoomRig *,u8 *);
+extern int af_v3_room_material_mv(RoomRig *,void *,RoomRigGame *,u8 *);
 #endif

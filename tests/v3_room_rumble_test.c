@@ -4,6 +4,10 @@
 #include <string.h>
 #include "../overlays/v3/room_rumble.c"
 #include "../overlays/v3/room_reactions.c"
+#define AF_V3_ROOM_REACTIONS
+#include "../overlays/v3/room_materials.c"
+RoomMaterialTable af_v3_test_room_materials;
+void *_Matrix_to_Mtx_new(void *gfx) { (void)gfx;assert(0);return 0; }
 RoomReactionState af_v3_test_reaction_state;
 const RoomRumbleBank *af_v3_test_rumble_waves;
 static union { int align;u8 bytes[0xD00]; } player;
@@ -144,18 +148,22 @@ int main(int argc,char **argv) {
        30/60-Hz timing in one fixture, including suppressed shock requests. */
     af_v3_test_rumble_waves=bank;
     RoomRig actor,untouched;memset(&actor,0xA5,sizeof(actor));untouched=actor;
-    af_v3_room_reaction_ct(&actor);
+    af_v3_test_room_materials=(RoomMaterialTable){.magic=ROOM_MATERIAL_MAGIC,.count=1,
+        .stride=40,.rows={{.index=1804,.bytes=128,.mode=2,.segment=8,.frames=2,.models=1,
+                          .frame_bytes=32,.frame_offsets={8,40},.state_offset=0x1A4,.kind=1,.lifecycle=2}}};
+    actor.index=1804;untouched.index=1804;u8 model[128]={0};
+    af_v3_room_material_ct(&actor,model);
     untouched.joint[0][0]=0;untouched.joint[0][1]=0;
     assert(!memcmp(&actor,&untouched,sizeof(actor)));
     u8 pad[0x480]={0};pad[0x2C9]=1;pad[0x16]=1;
     RoomRigGame game={0};int room=0;
     *(s16 *)(player.bytes+0xDE)=-1234;
-    af_v3_room_reaction_mv(&actor,0,&game);
+    assert(af_v3_room_material_mv(&actor,0,&game,model));
     assert(!af_v3_test_reaction_state.magic && !shock_requests);
     for(int frame=0;frame<26;++frame) {
         actor.changed=frame==0;
         if(frame==3) *(int *)(player.bytes+0xCF0)=0x61;
-        af_v3_room_reaction_mv(&actor,&room,&game);
+        assert(af_v3_room_material_mv(&actor,&room,&game,model));
         if(frame<15) assert(!af_v3_test_reaction_state.envelope.count);
         if(frame==15) assert(af_v3_test_reaction_state.envelope.count==1);
         if(frame<25) assert(actor.joint[0][0]==1 && actor.joint[0][1]==49-frame*2);

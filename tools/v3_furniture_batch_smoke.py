@@ -555,6 +555,111 @@ def material_lifecycles(debug,rom_path,record):
         renderer_retested=False,physical_audio_played=False,flash_written=False,requires_checkpoint_restore=True)
 
 
+def material_reactions(debug,rom_path,record):
+    """Installed shared reaction, native player request, and no-Pak retraces."""
+    from aflib import CODE_RAM,CODE_VROM
+    from runtime_layout import TEST_STACK
+    from v3_furniture_reactions import SERIAL_HOOK,ORIGINAL_SERIAL_CALL
+    path=Path(rom_path);image=path.read_bytes();report=json.loads((path.parent/'build.json').read_bytes())
+    if sha256(image)!=report['output_sha256']:raise ValueError('Changed reaction cartridge')
+    room=report['equipment_resources']['room_rigs'];reaction=room['reactions'];packet=room['packet']
+    rows=[r for r in room['material_rows'] if r.get('lifecycle')==2 and r.get('parent_selectable')]
+    if len(rows)!=1 or not reaction['installed']:raise ValueError('Expected one complete new reaction category')
+    row=rows[0];files=by_vrom(image);core=files[CODE_VROM].extract(image)
+    blob=files[runtime.BLOB].extract(image);boot=boot_proofs(image);assertions=0
+    def check(label,at,want):
+        nonlocal assertions
+        actual=debug.read_memory(at,len(want));passed=actual==want
+        record(dict(material_reaction_check=label,address=f'{at:08X}',bytes=len(want),
+            assertion='passed' if passed else 'failed',actual=actual.hex() if len(actual)<=32 else sha256(actual)))
+        if not passed:raise ValueError('Material reaction mismatch: '+label)
+        assertions+=1
+    def call(at,args=(),proof=None):
+        result=debug.call(f'{at:08X}',list(args),return_address=MODULE_RAM+0x6480,
+            verified_code=proof or boot.get(at));record(result);return result['return_value']
+    def flush(at,n):
+        call(0x8002FE00,[at,n]);call(0x80034CE0,[at,n])
+    def put(at,value):debug.write_memory(at,struct.pack('>I',value))
+    state=reaction['state'];state_ram=state['ram'];cache=0x804B1E00
+    saved={at:debug.read_memory(at,n) for at,n in ((SERIAL_HOOK,4),(cache,4),(state_ram,state['bytes']))}
+    save=report['save_runtime'];saved_game=debug.read_memory(save['state_ram'],save['state_bytes'])
+    for hook in reaction['bridge']['hooks']:
+        check('installed guarded controller hook',hook['address'],bytes.fromhex(hook['after']))
+    size=0x8000;allocation=call(0x8009BFC0,[size])
+    if allocation&15 or not MODULE_RAM+0x8000<=allocation<=0x80400000-size:
+        raise ValueError('Reaction fixture outside native heap')
+    actor,other,bridges,owner,bank,game,player,pad,capture,output,queue=(allocation+n for n in
+        (16,0x800,0xF80,0xFC0,0x1000,0x3500,0x5600,0x6A00,0x6F00,0x7000,0x7040))
+    debug.write_memory(allocation,bytes(size));edge=b'V3RX'*4
+    guards=(allocation,actor+0x740,other-16,other+0x740,bridges-16,owner-16,bank-16,bank+9216,
+            game-16,game+0x2000,player-16,player+0x1310,pad-16,pad+0x480,
+            capture-16,output-16,output+32,allocation+size-16,TEST_STACK-0x800,TEST_STACK+0x40)
+    for at in guards:debug.write_memory(at,edge)
+    entries=(room['bootstrap']['symbols']['af_v3_room_boot_ct'],
+             room['bootstrap']['symbols']['af_v3_room_boot_sound_mv'],
+             room['code']['symbols']['af_v3_room_rumble_retrace'])
+    proofs=[]
+    for i,target in enumerate(entries):
+        at=bridges+16*i;code=struct.pack('>2I',0x08000000|(target>>2&0x3FFFFFF),0)
+        debug.write_memory(at,code);proofs.append((at,code))
+    # The native shock helper calls its real player callback field. This capture
+    # records all six ABI arguments without simulating the player's animation.
+    spy=struct.pack('>15I',0x3C080000|(output>>16),0x35080000|(output&65535),
+        0x8D090018,0x25290001,0xAD090018,0xAD040000,0xAD050004,0xAD060008,
+        0xAD07000C,0x8FA90010,0xAD090010,0x8FA90014,0xAD090014,0x03E00008,0x24020001)
+    debug.write_memory(capture,spy);flush(bridges,48);flush(capture,len(spy))
+    def run(which,args):return call(proofs[which][0],args,proofs[which])
+    try:
+        # Keep the real controller thread running, but suppress its automatic
+        # new callback while stepping the exact installed retrace deterministically.
+        debug.write_memory(SERIAL_HOOK,ORIGINAL_SERIAL_CALL);flush(SERIAL_HOOK,4)
+        put(cache,0);debug.write_memory(state_ram,b'\xA5'*state['bytes'])
+        bridge=reaction['bridge']['code']['symbols']['af_v3_room_rumble_bridge']
+        bridge_bytes=core[bridge-CODE_RAM:0x800B1364-CODE_RAM]
+        call(bridge,[queue],(bridge,bridge_bytes))
+        check('cold controller bridge never enters unloaded packet',state_ram,b'\xA5'*state['bytes'])
+        call(0x80026B44,[bank,row['vrom'],row['bytes']])
+        check('complete retained reaction model',bank,blob[row['blob_offset']:row['blob_offset']+row['bytes']])
+        for target,alias in ((actor,0),(other,1024)):
+            before=bytearray(b'\xA5'*0x740);struct.pack_into('>H',before,0,row['runtime_index']+alias)
+            debug.write_memory(target,before);run(0,[target,bank]);before[0x1A4:0x1A8]=bytes(4)
+            check('room and catalogue constructor private writes',target,before)
+        check('loader resets magic before publishing',state_ram,bytes(4))
+        check('complete published packet',packet['ram'],blob[packet['blob_offset']:packet['blob_offset']+packet['bytes']])
+        put(game+0x1C90,player);put(player+0x121C,capture)
+        debug.write_memory(player+0xDE,struct.pack('>h',-1234))
+        run(1,[actor,0,game,bank]);check('preview has no player reaction',output,bytes(28))
+        commands=[]
+        for frame in range(26):
+            debug.write_memory(actor+0x12D,bytes([int(frame==0)]))
+            if frame==3:put(player+0xCF0,0x61)
+            run(1,[actor,owner,game,bank])
+            check('source-rate face/countdown '+str(frame),actor+0x1A4,
+                  struct.pack('>hh',1,49-frame*2) if frame<25 else bytes(4))
+            if frame==15:check('one vibration request at source frame 20',state_ram+0x11C,struct.pack('>I',1))
+            for _ in range(2):
+                run(2,[queue,pad]) # Disconnected fixture: no SI or Pak write.
+                if 15<=frame<=21:commands.append(int.from_bytes(debug.read_memory(state_ram+0x4C,4),'big'))
+        expected=[1]*7+[0,1,1,0,2,2,0]
+        record(dict(native_vibration_commands=commands,assertion='passed' if commands==expected else 'failed'))
+        if commands!=expected:raise ValueError('Native vibration timing differs from the donor')
+        check('actual native shock callback ABI and retained priority',output,
+              struct.pack('>7I',game,0x41200000,0xFFFFFB2E,0,0,14,3))
+        check('request stops after player accepts shock',state_ram+0x198,bytes(4))
+        check('completed envelope is removed',state_ram+0x11C,bytes(4))
+        check('state stays within its explicit allocation',state_ram+416,b'\xA5'*(state['bytes']-416))
+        check('save/profile state unchanged',save['state_ram'],saved_game)
+        for at in guards:check('reaction fixture guard',at,edge)
+        check('no CPU fault',0x8003CE34,bytes(4))
+    finally:
+        put(cache,0)
+        for at in (state_ram,cache,SERIAL_HOOK):debug.write_memory(at,saved[at])
+        flush(SERIAL_HOOK,4);call(0x8009C040,[allocation])
+    return dict(native_material_reactions=True,assertions=assertions,
+        ordinary_player_animation_tested=False,connected_motor_transfer_tested=False,
+        physical_audio_played=False,flash_written=False,requires_checkpoint_restore=True)
+
+
 def room_rigs(debug,rom_path,record,*,mode=2):
     """Manifest-selected complete room lifecycles, without enabling parent choices."""
     from runtime_layout import TEST_STACK
@@ -1786,6 +1891,7 @@ def tool_controls(debug,rom_path,record,*,transitions=False,capture=False,rod=Fa
 
 def exercise(debug, rom_path, record, *, section='automatic_furniture'):
     if section=='material_lifecycles':return material_lifecycles(debug,rom_path,record)
+    if section=='material_reactions':return material_reactions(debug,rom_path,record)
     if section=='room_effects':
         from v3_room_effects_smoke import exercise as room_effects
         return room_effects(debug,rom_path,record)

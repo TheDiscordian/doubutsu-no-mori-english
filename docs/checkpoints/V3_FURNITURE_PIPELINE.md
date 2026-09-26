@@ -1,5 +1,86 @@
 # Automatic furniture pipeline checkpoint
 
+## Installed timed material reactions
+
+Current proposal: ABI 222 at
+`build/v3-material-reaction-imports-03/cartridge/build-lock.json`, with 155
+development choices. Mouth of Truth (`1FD8` to native `3C30`, runtime index
+1804) is installed through the ordinary category importer. Its complete
+3,968-byte prepared object, both face textures, official English name, Gulliver
+reward route 12, scoring, and catalogue non-orderability are retained.
+
+Lifecycle 2 binds the checked full source state machine to the existing
+material constructor and movement bootstrap. Shared publication includes the
+complete sixteen-wave bank and actual N64 motor transport, reserves transient
+state at `804CD000..804CD3FF`, and resets magic before publishing readiness.
+Every packet publisher receives the actual current main-code owner and rebinds
+the controller bridge to the new packet CRC and linked retrace address. Its
+only main-code writes are two 64-byte replaced-reader tails and the four-byte
+serial-safe call. Both reader entry jumps, intervening live code, and the active
+native part-copy fallback remain intact. This is an installed motor connection,
+not a postponed feature.
+
+Eight focused checks pass across source/planning, sanitizer execution, and
+installed-cartridge tests. The 2,850-frame donor comparison now exercises the
+actual material constructor/movement dispatch. Installed checks cover complete
+artwork reuse, profile/vtable binding, exact main-code changes, rejection of
+changed bridge bindings, official text provenance, unchanged saved format and
+prior requirements, four browser/offline selections, and UPS reconstruction.
+The retained prepared-code test is historical evidence, not replayed against
+changed source hashes.
+
+The native check at `build/v3-material-reaction-native-02/` passes 63 internal
+assertions within 170 recorded steps. It checks the installed hooks, cold bridge
+guard, complete model DMA, room/catalogue constructors, full packet, source-rate
+countdown and vibration commands, native player-shock callback arguments and
+priority, delayed acceptance, private state bounds, saved-state preservation,
+and guards. The first invocation used a nonexistent ROM filename and failed
+before launching an emulator; the one corrected retry passes. No old candidate
+or unchanged category is replayed.
+
+The native fixture temporarily suppresses asynchronous reaction stepping,
+captures the real shock helper's player callback, and invokes retraces with a
+disconnected accessory. It does not establish ordinary player animation,
+connected SI motor transfers, GPU appearance, or physical Rumble Pak behaviour.
+Host motor calls are mocked. Controller-thread full-stack and connected-accessory
+acceptance remain unverified; no hardware claim follows from this result.
+
+Room code occupies 9,760/16,384 bytes; bootstrap occupies 1,517/1,536 bytes.
+The new mutable reservation is 1 KiB, with no actor or saved-layout enlargement.
+Saved format 4 remains incompatible with V2 and format-1/2/3 V3. Saves using
+Mouth of Truth require that import in the receiving selection; preserve backups
+and equal-or-larger profiles. Ordinary cross-version reload is not newly tested.
+The main lock, translation-only baseline, and both stable patcher deployments
+remain unchanged.
+
+The final build generalises dependency publication to work without sound rows;
+the current cartridge already contains those rows, so its ROM is identical to
+the tested `...imports-02` image. No native replay is required for that correction.
+
+Hashes (SHA-256):
+
+- ROM: `54af0f7dbf7121a1d2062df697914c0a952760610f66813931285672809283b8`.
+- UPS: `d85942e8d81bfd2cad0b971ca2c940d4c7cba7e1224115e0a72789592a12b451`.
+- Build report: `9ddadc3ecae81aca2aca6e63417bc047c10ea1d4ec19426a2924878ba035d05c`.
+- Build lock: `e9377f666a22a2b5b9d057750330a20338cddfb23cdd0fc78f0fe4df13b4e530`.
+- Native results: `3bbbea034611cbb0ae7274b274af52b66276dda52d1a68fa09f1b8e5ff0f9d7d`.
+
+Reproduction, using a fresh output directory:
+
+```sh
+python3 tools/v3_furniture_pipeline.py import \
+  --category material-frame-assets --select 1FD8 \
+  --reuse-assets build/v3-material-frames-prepared-01 \
+  --base-lock build/v3-material-lifecycle-imports-02/build-lock.json \
+  --output build/v3-material-reaction-imports-03
+python3 -m unittest tests.test_v3_room_reactions.InstalledMaterialReactionTests -v
+```
+
+Continue starman's complete loop sound, player-colour request, and same-item
+switch coordination through shared dispatch, reusing its complete artwork.
+Other model/animation behaviours remain importing work. Acquisition frontend
+and required gold-tree acquisition remain in their established later phase.
+
 ## Timed reaction and N64 motor code
 
 Prepared output: `build/v3-room-reactions-prepared-06/`. The checked cartridge

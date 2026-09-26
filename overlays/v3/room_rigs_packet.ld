@@ -20,6 +20,13 @@ Matrix_translate = 0x800E0314;
 Matrix_mult = 0x800E02BC;
 Matrix_scale = 0x800E041C;
 _texture_z_light_fog_prim_xlu = 0x800BD598;
+af_rumble_motor_init = 0x80031574;
+af_rumble_motor_access = 0x80031300;
+af_rumble_mask = 0x8002E0E0;
+af_reaction_player = 0x800B1C84;
+af_reaction_shock = 0x800B2B08;
+memset = 0x8003B9B0;
+memcpy = 0x80034BF8;
 SECTIONS {
     . = DEFINED(AF_ROOM_ORIGIN) ? AF_ROOM_ORIGIN : 0x804B8000;
     .text : { *(.text.af_v3_room_rig_ct) *(.text .text.*) }

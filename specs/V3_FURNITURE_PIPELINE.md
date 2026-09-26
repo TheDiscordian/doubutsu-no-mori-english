@@ -1964,8 +1964,13 @@ actual full-index wall condition. Prepared resources alone cannot enable an item
 prepares complete reaction dependencies through the existing pipeline. Discovery
 checks the complete source callbacks, relocations, player helpers, surprise
 consumer, duration constant, and material selector, without an item-ID switch.
-The prepared component is not a selectable import; shared-packet publication,
-the controller hook, and ordinary material-profile installation remain required.
+Ordinary material import plans the implemented lifecycle automatically. It reuses
+complete prepared artwork, publishes the shared reaction code and wave bank,
+installs the controller hook, and enables eligible source acquisition records.
+Lifecycle 2 requires material mode 2 and private face offset `1A4`; incomplete
+source functions or engine bindings reject before profile installation.
+The existing material constructor and movement bootstrap dispatch this lifecycle,
+including when no sound rows are installed. No per-item installer is used.
 
 The two source signed work fields are distinct: countdown at `82A` maps to
 native `1A6`, while face at `82C` maps to native `1A4`. Construction clears both.
@@ -2002,22 +2007,29 @@ transfers block. A six-retrace heartbeat stops suspended/abandoned requests, and
 the existing pre-NMI flag stops remaining vibration. These are platform safety
 adaptations, not a new saved GameCube vibration-setting field.
 
-The proposed mutable reservation is `804CD000..804CD3FF`, immediately after the
-immutable shared packet and below the model pool. Packet publication must record
-and check that reservation. Its magic is cleared before publishing the ready
-word. The prepared main-RAM bridge retains the original Pak connection check,
+The mutable reservation is `804CD000..804CD3FF`, immediately after the
+immutable shared packet and below the model pool. Packet publication records
+and checks that reservation against other reported owners. Its magic is cleared
+before publishing the ready word. The main-RAM bridge retains the original Pak connection check,
 then tests successful V3 startup and the exact room-packet CRC before calling
 Expansion Pak code. It occupies only checked tails of the fully replaced size
 readers at `800B11B8..800B11F7` and `800B1324..800B1363`; their original entries
 remain. The native part-copy tail at `800B1DF0` is still active and is not spare.
-The prepared bridge's target/CRC are illustrative component bindings and must
-be rebound to the actual published packet before installation.
+Every shared-packet refresh receives the current main-code owner and recompiles
+the bridge against the actual packet CRC and linked retrace address. Validation
+restores only its two checked windows and four-byte call in a temporary copy,
+then checks the complete original native functions and reservation ownership.
+Intervening live code and the replaced readers' entry jumps stay untouched.
 
 Focused checks compare the evaluator against the donor C functions using the
 actual disc's wave data. They cover all sixteen waves, omitted phases,
 overlapping requests, malformed input, the full timed reaction, delayed shock
-acceptance, and mocked detection/start/stop/failure/disconnection. Host mocks and
-VR4300 compilation do not establish native SI execution or hardware rumble.
+acceptance, and mocked detection/start/stop/failure/disconnection. The shared
+native batch probe checks installed hooks, cold-load guards, constructors,
+complete model DMA, native shock-call arguments, countdown and envelope timing,
+saved-state preservation, and bounds. Its disconnected accessory and captured
+player callback do not establish actual SI motor transfers, ordinary player
+animation, or hardware rumble.
 
 ## Verification policy
 

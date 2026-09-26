@@ -99,9 +99,11 @@ def profile(row, vrom, *, limit=END):
     if material:
         from v3_room_rig_runtime import MATERIAL_VTABLE
         from v3_furniture_materials import initializer_lifecycle
+        from v3_furniture_reactions import profile_lifecycle as reaction_lifecycle
         initial=initializer_lifecycle(None,row['profile'])
+        reaction=reaction_lifecycle(row['profile'],row.get('room_lifecycle'))
         if (row.get('room_runtime')!={'vtable':MATERIAL_VTABLE,'vrom':vrom} or
-                (row.get('room_lifecycle')!=initial if initial else set(adapter['functions'])!={'move','draw'}) or
+                (row.get('room_lifecycle')!=initial if initial else not reaction and set(adapter['functions'])!={'move','draw'}) or
                 set(offsets)!=set(layers)):
             raise ValueError('Prepared resources have no implemented native material lifecycle')
         pointers=[0,0,0,0]
@@ -598,7 +600,7 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         import v3_room_rig_runtime as equipment
         display_report,alias_report=prior['clothing']['display'],prior['display_aliases']
         equipment_report=copy.deepcopy(prior['equipment_resources'])
-        equipment.refresh_code(equipment_report,blob,output)
+        equipment.refresh_code(equipment_report,blob,output,core=core)
     elif password_editor:
         import v3_password_editor as password_ui
         display_report,alias_report=prior['clothing']['display'],prior['display_aliases']
@@ -979,6 +981,10 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         if furniture_profiles is not None:
             report['shared_runtime_refresh']['adapters'].append('inactive_furniture_profiles')
             report['shared_runtime_refresh']['artwork_changed']=True
+        reaction=equipment_report.get('room_rigs',{}).get('reactions')
+        if reaction and not prior.get('equipment_resources',{}).get('room_rigs',{}).get('reactions'):
+            report['shared_runtime_refresh']['adapters'].append('timed_material_reactions')
+            report['shared_runtime_refresh']['additional_resident_bytes']+=reaction['state']['bytes']
         if material_frames_art is not None:
             report['shared_runtime_refresh']['adapters'].append('material_frames')
             report['shared_runtime_refresh']['artwork_changed']=True

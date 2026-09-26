@@ -341,7 +341,7 @@ def install(base, prior, blob, core, original, output, prepared):
             dict(id=111+i,blob_offset=start+i*64,vrom=BLOB+start+i*64,bytes=64) for i in range(2)],
         loader_bridge=LOADER_BRIDGE,installed=False,selectable_imports_added=0,native_execution_tested=False)
     result['room_rigs']['effects']=effects
-    publish_packet(result,blob,output)
+    publish_packet(result,blob,output,core=core)
     loader=compile_part('effect_loader',output/'effect_loader',
         defines=(f'AF_EFFECT_PROFILES=0x{BLOB+start:X}u','AF_EFFECT_COUNT=2u'))
     additions=[]

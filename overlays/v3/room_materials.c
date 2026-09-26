@@ -1,6 +1,12 @@
 /* Complete frame banks share one renderer. Installing a draw record does not
    install the object's interaction, audio, acquisition, or ordinary profile. */
 #include "room_materials.h"
+#ifdef AF_V3_ROOM_REACTIONS
+#include "room_reactions.h"
+#define MATERIAL_LIFECYCLE_MAX 2u
+#else
+#define MATERIAL_LIFECYCLE_MAX 1u
+#endif
 
 static const RoomMaterialRecord *material_find(u32 index) {
     if (index>=2048u && index<3072u) index-=1024u;
@@ -11,7 +17,8 @@ static const RoomMaterialRecord *material_find(u32 index) {
         const RoomMaterialRecord *r=room_material_table->rows+i;
         if (r->index!=index) continue;
         if (index<1024 || index>=2048 || r->bytes<32 || r->bytes>9216 || (r->bytes&15) ||
-                r->lifecycle>1 || (r->lifecycle && r->mode!=0) || r->mode>2 || (r->segment!=8 && r->segment!=9) ||
+                r->lifecycle>MATERIAL_LIFECYCLE_MAX || (r->lifecycle==1 && r->mode!=0) ||
+                (r->lifecycle==2 && r->mode!=2) || r->mode>2 || (r->segment!=8 && r->segment!=9) ||
                 !r->frames || r->frames>8 || !r->models || r->models>4 ||
                 r->kind>1 || !r->frame_bytes || r->frame_bytes>r->bytes ||
                 (!r->kind && r->frame_bytes!=32)) return 0;
@@ -35,7 +42,20 @@ void af_v3_room_material_ct(RoomRig *actor,u8 *data) {
     if (!actor || !data) return;
     const RoomMaterialRecord *r=material_find(actor->index);
     if (r && r->lifecycle==1) *(s16 *)((u8 *)actor+r->state_offset)=-1;
+#ifdef AF_V3_ROOM_REACTIONS
+    else if (r && r->lifecycle==2) af_v3_room_reaction_ct(actor);
+#endif
 }
+
+#ifdef AF_V3_ROOM_REACTIONS
+int af_v3_room_material_mv(RoomRig *actor,void *room,RoomRigGame *game,u8 *data) {
+    if (!actor || !data) return 0;
+    const RoomMaterialRecord *r=material_find(actor->index);
+    if (!r || r->lifecycle!=2) return 0;
+    af_v3_room_reaction_mv(actor,room,game);
+    return 1;
+}
+#endif
 
 void af_v3_room_material_dw(RoomRig *actor,void *room,RoomRigGame *game,u8 *data) {
     if (!actor || !game || !game->gfx || !data || ((uptr)data&7)) return;

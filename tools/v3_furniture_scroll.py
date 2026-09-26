@@ -676,7 +676,7 @@ def install(base,prior,blob,core,original,output,directories):
                      batch=dict(added=len(rows),retained=len(reused),compiled_artwork=0))
     installed['sources'].extend(evidence);runtime['scrolling']=installed
     runtime['artwork_bytes']+=sum(len(d) for d in assets.values())
-    room.publish_packet(result,blob,output)
+    room.publish_packet(result,blob,output,core=core)
     result['additional_resident_bytes']=BYTES if fresh else 0
     return result,{}
 

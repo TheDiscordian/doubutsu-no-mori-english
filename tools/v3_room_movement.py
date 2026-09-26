@@ -202,7 +202,7 @@ def install(image,prior,blob,code,original,output,directory,prepared):
     scroll['movement']=dict(format='AFV3-ROOM-MOVEMENT-1',source=audio['contract'],rows=rows,
         programs=programs,table_ram=TABLE,table_sha256=sha256(encode(rows)),native_contract=native_contract,
         owner_vrom=OWNER,call_address=CALL,additional_resident_bytes=0,native_execution_tested=False)
-    publish_packet(result,blob,output)
+    publish_packet(result,blob,output,core=core)
     entry=BRIDGE
     struct.pack_into('>I',owner,CALL-RAM,0x0C000000|(entry>>2&0x3FFFFFF));changes[OWNER]=bytes(owner)
     scroll['movement'].update(entry=entry,owner_function_sha256=sha256(owner[FIRST-RAM:LAST-RAM]))

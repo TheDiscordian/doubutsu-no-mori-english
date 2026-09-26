@@ -235,7 +235,7 @@ def install(base,prior,blob,core,original,output,directories):
     installed.update(material_rows=all_rows,material_native_contract=contract,material_capacity=runtime.MATERIAL_CAPACITY)
     installed.setdefault('material_sources',[]).extend(evidence)
     installed['artwork_bytes']+=needed
-    runtime.publish_packet(result,blob,output)
+    runtime.publish_packet(result,blob,output,core=core)
     result['additional_resident_bytes']=0
     return result,{}
 

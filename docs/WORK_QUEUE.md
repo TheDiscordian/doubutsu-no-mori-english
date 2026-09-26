@@ -22,19 +22,21 @@ Incomplete gameplay stays unavailable in the selector; installing assets does
 not claim that an item is playable. Reuse unchanged passing tests throughout.
 
 Current task: close shared conversion gaps in the ordinary bulk importer.
-The checked proposal is ABI 220 at
-`build/v3-material-lifecycle-imports-02/build-lock.json`, with 154 development choices.
+The checked proposal is ABI 222 at
+`build/v3-material-reaction-imports-03/cartridge/build-lock.json`, with 155 development choices.
 The automatic importer installs complete material render/audio/profile stages,
-reuses installed dependencies, and enables festive candle through its actual
-stock/category and catalogue route. Complete source callbacks initialise only
-private native work; existing timed textures, all model lists, and light scalar
-remain. No fixed RAM, bootstrap, actor, or saved-field allocation grows.
+reuses installed dependencies, and enables eligible source acquisition records.
+Mouth of Truth retains its complete timed reaction, shock request, and motor
+transport; festive candle retains its constructor and full animated artwork.
+Reaction state owns 1 KiB outside the immutable packet. No actor or saved-field
+allocation grows.
 
-Six focused source/host/cartridge checks pass, including four browser/offline
-composition cases and sanitized construction/rendering. The corrected native
-check passes 22 internal assertions for constructor dispatch, room/catalogue
-aliases, model DMA, instance boundaries, lazy loading, cache, and unchanged saves.
-The report-only final build has the identical tested ROM. Do not replay it.
+Eight focused source/host/cartridge checks pass across reaction implementation
+and installation, including four browser/offline composition cases, patch
+reconstruction, retained artwork, precise bridge writes, and saved profiles.
+The native check passes 63 internal assertions. The final dependency-generalisation
+build has the identical tested ROM. Retain the unchanged candle's earlier
+22-assertion native result; do not replay it.
 
 Retain the complete bell, rolling, and contact evidence. The effect continuation
 still lacks graphics-pool allocation in its fixture. Native `80A19304` refuses
@@ -45,32 +47,28 @@ remains unverified. Do not run a third setup retry or replay the passed bell che
 Include proper native graphics setup with the next changed effect integration.
 
 Continue complete material lifecycles and other model/animation callbacks.
-Mouth of Truth's complete timed state machine, player-shock request, donor
-vibration evaluator, and N64 motor transport are prepared at
-`build/v3-room-reactions-prepared-06/`, not installed. Finish its integration
-next: publish the code/wave bank in the shared room packet, reserve/reset private
-state at `804CD000`, bind the guarded main-RAM controller hook to the actual
-packet CRC/entry, and connect lifecycle 2 through the ordinary material importer.
-Revalidate the checked two-window bridge reservation before writing it; never
-overwrite the active native part-copy fallback at `800B1DF0`. Preserve source
-`82C` as face at native `1A4` and source `82A` as countdown at native `1A6`.
-Keep the item unavailable until these connections are complete. This is the
-current import, not a deferred rumble stretch goal. Starman needs its
+Mouth of Truth's timed state machine, player-shock request, donor vibration
+evaluator, and N64 motor transport are installed through the ordinary material
+importer. Its full artwork and actual Gulliver acquisition are retained; lifecycle
+2 uses the existing shared constructor/movement dispatch. The guarded controller
+bridge is rebound on shared-packet publication, with explicit transient state at
+`804CD000..804CD3FF`. It preserves the live native part-copy fallback and both
+replaced size-reader entry jumps. Starman needs its
 complete loop sound, player-colour request, and same-item switch coordination,
 not just its existing palettes. Stone coin and the other prepared callback
 models retain their actual behaviour requirements. Extend shared dispatch and
 reuse assets; do not divert into the parked acquisition frontend.
 
-Retain the passing 2,850-frame donor comparison and focused motor/reaction
-sanitizer checks. The new code has not executed in the emulator or on hardware;
-use one combined current-build check after publication, without replaying the
-unchanged candle, rig, artwork, or sound batches. The reaction checkpoint records
-the existing source/native bindings and the integration work still required.
+Retain the passing 2,850-frame donor comparison, actual material dispatch under
+sanitizers, and 63-assertion native reaction check. The native fixture captures
+the player callback and uses a disconnected accessory: ordinary player animation,
+actual motor transfers, and physical rumble remain hardware/playtest checks.
+Do not replay unchanged candle, rig, artwork, or sound batches.
 
-Room code has 9,672 bytes spare; bootstrap has 27 bytes spare. Scroll code has
+Room code has 6,624 bytes spare; bootstrap has 19 bytes spare. Scroll code has
 4 bytes spare, audio has 288 conservative bytes spare, and import storage has
 1,492,544 bytes spare. Capacity extensions must preserve complete dependencies.
-See the [current checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#automatic-material-lifecycle-import)
+See the [current checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#installed-timed-material-reactions)
 for reproduction, native limits, and save warnings. Source publication is
 allowed; the main lock and both stable web-patcher deployments stay unchanged.
 

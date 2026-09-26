@@ -58,13 +58,13 @@ class MaterialLifecycleSourceTests(unittest.TestCase):
             categories=[materials.CATEGORY],profile=self.source.profile(int(r['item_id'],16)))
             for r in self.art['objects']]}
         report={'equipment_resources':{'room_rigs':{'rows':[]}}}
-        wanted=['3298','3314','3318','332C']
+        wanted=['1FD8','3298','3314','3318','332C'];audio=['3314','3318','332C']
         self.assertEqual(rig_import_plan(inventory,report,{},source=self.source),
-            dict(resources=[],materials=wanted,audio=wanted[1:],loops=[],profiles=wanted))
+            dict(resources=[],materials=wanted,audio=audio,loops=[],profiles=wanted))
         report['equipment_resources']['room_rigs']['material_rows']=[dict(source_item_id=i) for i in wanted]
-        report['equipment_resources']['furniture_audio']={'furniture':[dict(item_id=i) for i in wanted[1:]]}
-        self.assertEqual(rig_import_plan(inventory,report,{i:{} for i in wanted[1:]},source=self.source),
-            dict(resources=[],materials=[],audio=[],loops=[],profiles=['3298']))
+        report['equipment_resources']['furniture_audio']={'furniture':[dict(item_id=i) for i in audio]}
+        self.assertEqual(rig_import_plan(inventory,report,{i:{} for i in audio},source=self.source),
+            dict(resources=[],materials=[],audio=[],loops=[],profiles=['1FD8','3298']))
         self.assertEqual(rig_import_plan(inventory,report,{},selected=['331C'],source=self.source),
             dict(resources=[],audio=[],loops=[],profiles=[]))
 

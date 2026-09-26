@@ -87,6 +87,9 @@ static void trigger_conditional(RoomRig *actor,RoomRigGame *game) {
 }
 #endif
 void af_v3_room_sound_mv(RoomSoundActor *actor,void *room,RoomRigGame *game,u8 *data) {
+#ifdef AF_V3_ROOM_REACTIONS
+    if (af_v3_room_material_mv((RoomRig *)actor,room,game,data)) return;
+#endif
     (void)room;(void)game;(void)data;
     if (!actor || actor->changed!=1 || room_transition_state(actor->state)) return;
     trigger(actor->index,actor->position);
