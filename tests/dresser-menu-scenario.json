@@ -1,0 +1,9 @@
+[
+  {"wait": 8},
+  {"save_state": true},
+  {"pause_game_thread": true},
+  {"test_dresser_menu": true},
+  {"load_state": true},
+  {"resume": true},
+  {"wait": 2}
+]
