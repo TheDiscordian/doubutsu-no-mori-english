@@ -144,14 +144,15 @@ def append_sprite(bank, art, receipt):
         bytes=len(output),sha256=sha256(output))
 
 
-def profile_overlay(symbols, controller=False, *, kind=None):
+def profile_overlay(symbols, controller=False, *, kind=None,code_bounds=(0x804C8000,0x804CC000)):
     """Native loader packet with absolute shared callbacks and no writable state."""
     kind=kind or ('flash_controller' if controller else 'flash')
     if kind not in ('flash','flash_controller','steam','projectile'):
         raise ValueError('Unknown complete effect profile kind')
     prefix='af_v3_'+kind+'_'
     pointers=[symbols[prefix+role] for role in ('init','ct','mv','dw')]
-    if any(type(p)!=int or p&3 or not 0x804C8000<=p<0x804CC000 for p in pointers):
+    if code_bounds not in ((0x804C8000,0x804CC000),(0x804D0000,0x804D8000)) or any(
+            type(p)!=int or p&3 or not code_bounds[0]<=p<code_bounds[1] for p in pointers):
         raise ValueError('Effect callback escapes checked shared room packet')
     data=struct.pack('>4IhhI',*pointers,-2,255,0xC47A0CFF)
     data+=struct.pack('>2I',zlib.crc32(data),0x41464550)
@@ -344,7 +345,7 @@ def restore_controller(owner,reloc,receipt):
     return bytes(data),original
 
 
-def rebind_profiles(effects, blob, symbols):
+def rebind_profiles(effects, blob, symbols,*,code_bounds=(0x804C8000,0x804CC000)):
     """Keep absolute effect callbacks current whenever the shared packet moves code."""
     for row in effects['profiles']:
         at=row['blob_offset'];old=bytes(blob[at:at+row['bytes']])
@@ -353,7 +354,7 @@ def rebind_profiles(effects, blob, symbols):
             raise ValueError('Changed complete installed effect profile')
         kind=row.get('kind',{111:'flash',112:'flash_controller'}.get(row['id']))
         if kind is None:raise ValueError('Effect identity lacks a complete callback kind')
-        data=profile_overlay(symbols,kind=kind)
+        data=profile_overlay(symbols,kind=kind,code_bounds=code_bounds)
         blob[at:at+64]=data;row.update(sha256=sha256(data),callbacks=list(struct.unpack_from('>4I',data)))
 
 

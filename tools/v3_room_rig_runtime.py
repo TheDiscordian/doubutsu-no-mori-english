@@ -8,7 +8,8 @@ from aflib import CODE_RAM,CODE_VROM,by_vrom,sha256
 from v3_asset_loader import ROOT,BLOB,compile_part
 from v3_equipment_runtime import RAM as EQUIPMENT_RAM,retired_module_space
 from v3_furniture_pipeline import Source,prepare,room_aliases,PreparedAssets
-from v3_furniture_rigs import CATEGORY,CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY,ROLLING_CATEGORY,suffix
+from v3_furniture_rigs import CATEGORY,CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY,ROLLING_CATEGORY,JOINT_CATEGORY,suffix
+import v3_furniture_joint_rigs as joints
 from v3_registry import (furniture_representation_identity,ROOM_ALIAS_REGISTRY_VERSION,
                          furniture_identity,furniture_source,furniture_source_index)
 from v3_import_storage import ROWS,ITEMS,slot,END
@@ -19,6 +20,7 @@ RAM,TABLE,VTABLE,LIMIT,CAPACITY = 0x804B1800,0x804B1E00,0x804B1FA0,0x804B1FE0,24
 MAGIC=0x41465231
 PACKET_RAM,PACKET_TABLE,PACKET_BYTES,PACKET_CAPACITY=0x804B8000,0x804B9000,8192,128
 EXTENDED_RAM,EXTENDED_TABLE,EXTENDED_BYTES=0x804C8000,0x804CC000,20480
+WIDE_RAM,WIDE_TABLE,WIDE_BYTES=0x804D0000,0x804D8000,36864
 PACKET_MAGIC=0x41465232
 SOUND_TABLE,SOUND_VTABLE,SOUND_MAGIC,SOUND_CAPACITY=0x804B9C10,0x804B1FC0,0x41465331,64
 MATERIAL_TABLE,MATERIAL_VTABLE,MATERIAL_MAGIC,MATERIAL_CAPACITY=0x804B9E20,0x804B1E10,0x41464D31,11
@@ -33,7 +35,8 @@ SOURCES=('tools/v3_room_rig_runtime.py','tools/v3_asset_loader.py','tools/v3_fur
     'overlays/v3/held_rigs.ld','overlays/v3/room_rigs_packet.ld',
     'overlays/v3/room_rigs_bootstrap.c','overlays/v3/room_rigs_bootstrap.ld',
     'tools/v3_furniture_motion.py','overlays/v3/room_motion.h','overlays/v3/room_rigs_extended.ld',
-    'tools/v3_room_effects.py','overlays/v3/room_effects.c','overlays/v3/room_effects.h')
+    'tools/v3_room_effects.py','overlays/v3/room_effects.c','overlays/v3/room_effects.h',
+    'overlays/v3/room_rigs_wide.ld','overlays/v3/room_joints.c','tools/v3_furniture_joint_rigs.py')
 from v3_furniture_reactions import SOURCES as REACTION_SOURCES
 SOURCES+=REACTION_SOURCES
 from v3_furniture_static import SOURCES as STATIC_SOURCES
@@ -55,7 +58,8 @@ def checked_hit_condition(base,report,trigger,sound,audio):
 
 def packet_layout(runtime):
     packet=runtime['packet'];ram=packet['ram'];table=runtime['table_ram'];size=packet['bytes']
-    if (ram,table,size) not in ((PACKET_RAM,PACKET_TABLE,PACKET_BYTES),(EXTENDED_RAM,EXTENDED_TABLE,EXTENDED_BYTES)):
+    if (ram,table,size) not in ((PACKET_RAM,PACKET_TABLE,PACKET_BYTES),
+            (EXTENDED_RAM,EXTENDED_TABLE,EXTENDED_BYTES),(WIDE_RAM,WIDE_TABLE,WIDE_BYTES)):
         raise ValueError('Unknown complete room packet layout')
     return ram,table,size
 
@@ -122,7 +126,7 @@ def install_profiles(base,prior,blob,core,original,output,directories):
         for row in art['objects']:
             donor=row['item_id'];item=int(donor,16);prepared_row=prepare(source,item)
             descriptor=prepared_row[0];category=descriptor.get('callback_adapter',{}).get('category')
-            if (category not in (CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY,ROLLING_CATEGORY,'switch-trigger-sound',static.CATEGORY,MATERIAL_CATEGORY,SCROLL_CATEGORY) or
+            if (category not in (CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY,ROLLING_CATEGORY,JOINT_CATEGORY,'switch-trigger-sound',static.CATEGORY,MATERIAL_CATEGORY,SCROLL_CATEGORY) or
                     donor in occupied or item not in identities or
                     row['profile']!=json.loads(json.dumps(descriptor)) or
                     row['native_profile_scalar_hex']!=descriptor['scalar_hex']):
@@ -184,6 +188,15 @@ def install_profiles(base,prior,blob,core,original,output,directories):
                         'Shared room movement sounds remain incomplete' if lifecycle.get('category')=='contact-floor-alpha'
                         else 'Native start-disabled placement remains incomplete'))
                     continue
+            if category==JOINT_CATEGORY:
+                initial=joints.lifecycle(source,descriptor)
+                if initial is None:raise ValueError('Joint-rig native lifecycle remains incomplete')
+                if initial['start_disabled'] and placement is None:
+                    placement,owner_changes,updates=install_initial_switch(base,prior,blob,source,output)
+                if not joints.profile_lifecycle(descriptor,initial,placement):
+                    raise ValueError('Missing complete joint-rig fresh-placement binding')
+                if initial['source_sound_id'] is not None and contracts.get(donor)!=initial:
+                    raise ValueError('Joint rig needs its complete installed source loop/click audio')
             index,destination=furniture_identity(item);i=slot(destination)
             if index!=1024+i:
                 raise ValueError('Parent/display aliases require their shared parent adapter')
@@ -217,7 +230,7 @@ def install_profiles(base,prior,blob,core,original,output,directories):
                     raise ValueError('Prepared scrolling resource is not completely installed')
                 vrom=installed['vrom'];vtable=SCROLL_VTABLE;reused_asset=True
                 installed.update(lifecycle_installed=True,lifecycle=json.loads(json.dumps(lifecycle)))
-            elif category in (CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY,ROLLING_CATEGORY):
+            elif category in (CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY,ROLLING_CATEGORY,JOINT_CATEGORY):
                 installed=rigs.get(donor)
                 if (not installed or installed['profile_installed'] or
                         {k:v for k,v in installed['source'].items() if k!='reused_artwork'}!=
@@ -280,6 +293,7 @@ def install_profiles(base,prior,blob,core,original,output,directories):
                 installed.update(blob_offset=vrom-BLOB,vrom=vrom,bytes=len(data),sha256=sha256(data),source=row)
             generated=copy.deepcopy(row);generated['room_runtime']=dict(vtable=vtable,vrom=vrom)
             if initial:generated['room_lifecycle']=initial
+            if category==JOINT_CATEGORY and initial['start_disabled']:generated['room_placement']=placement
             if category==SCROLL_CATEGORY:generated['room_lifecycle']=lifecycle
             if category==SCROLL_CATEGORY and lifecycle.get('start_disabled'):generated['room_placement']=placement
             native=profile(generated,vrom,limit=limit)
@@ -379,6 +393,9 @@ def bind_profiles(source,base,report):
     if any(r.get('mode')==5 for r in runtime['rows']):
         if runtime.get('motion_contract')!=motion_binding(source,base,report,runtime['rows']):
             raise ValueError('Changed installed rolling motion bindings')
+    if any(r.get('mode')==6 for r in runtime['rows']):
+        if runtime.get('joint_contract')!=joints.native_contract(base):
+            raise ValueError('Changed installed joint-rig native bindings')
     for row,enabled in [(r,False) for r in staged.get('rows',[])]+[(r,True) for r in activated]:
         item=int(row['item_id'],16);donor=f'{furniture_source(row)[0]:04X}';i=slot(item);binding=bindings.get(donor)
         if (donor in source.runtime_profiles or not binding or not binding['profile_installed'] or
@@ -390,6 +407,13 @@ def bind_profiles(source,base,report):
         expected_vtable=(MATERIAL_VTABLE if category==MATERIAL_CATEGORY else SOUND_VTABLE if category in ('switch-trigger-sound',static.CATEGORY)
                          else SCROLL_VTABLE if category==SCROLL_CATEGORY else VTABLE)
         if category==static.CATEGORY:static.checked_audio(descriptor,binding,e)
+        if category==JOINT_CATEGORY:
+            joint_lifecycle=joints.lifecycle(source,descriptor)
+            if (joint_lifecycle is None or binding.get('joint_lifecycle')!=json.loads(json.dumps(joint_lifecycle)) or
+                    joint_lifecycle['source_sound_id'] is not None and contracts.get(donor)!=joint_lifecycle):
+                raise ValueError('Incomplete installed joint lifecycle/audio')
+            art['room_lifecycle']=joint_lifecycle
+            if joint_lifecycle['start_disabled']:art['room_placement']=placement
         if category==SCROLL_CATEGORY:
             lifecycle=checked_lifecycle(source,descriptor,binding,runtime['scrolling'],contracts)
             if lifecycle is None:
@@ -444,7 +468,7 @@ def bind_profiles(source,base,report):
         current=blob[ROWS+i*80:ROWS+(i+1)*80];record=blob[ITEMS+i*32:ITEMS+(i+1)*32]
         expected=struct.pack('>HHI',1024+i,item,int(enabled))+native+bytes(4)
         if (art['profile']!=json.loads(json.dumps(descriptor)) or row['room_runtime']!=art['room_runtime'] or
-                category==MATERIAL_CATEGORY and row.get('room_lifecycle')!=art.get('room_lifecycle') or
+                category in (MATERIAL_CATEGORY,JOINT_CATEGORY) and row.get('room_lifecycle')!=json.loads(json.dumps(art.get('room_lifecycle'))) or
                 row.get('room_placement')!=art.get('room_placement') or
                 not 0<=at<at+n<=len(blob) or sha256(blob[at:at+n])!=art['object_sha256'] or
                 current!=expected or record[:8]!=struct.pack('>HHHBB',1024+i,item,row['price'],descriptor['size_code'],int(enabled)) or
@@ -486,11 +510,11 @@ def prepared_categories(source,directories):
         for row in art['objects']:
             donor=row['item_id'];item=int(donor,16);prepared_row=prepare(source,item)
             profile=prepared_row[0];adapter=profile.get('callback_adapter',{});category=adapter.get('category')
-            if category not in (CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY,ROLLING_CATEGORY):
+            if category not in (CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY,ROLLING_CATEGORY,JOINT_CATEGORY):
                 raise ValueError('Unimplemented additional room-rig category')
             if (row['profile']!=json.loads(json.dumps(profile)) or donor in assets or
                     row['native_profile_scalar_hex']!=profile['scalar_hex'] or
-                    profile['skeleton']['joints']>(6 if category==ROLLING_CATEGORY else 8) or category!=BILLBOARD_CATEGORY and
+                    profile['skeleton']['joints']>(6 if category==ROLLING_CATEGORY else 8) or category not in (BILLBOARD_CATEGORY,JOINT_CATEGORY) and
                     any(r.get('draw_stream') for r in profile['skeleton']['rows'])):
                 raise ValueError('Changed room-rig profile or native work capacity')
             cache.reuse(source,donor,prepared_row)
@@ -511,13 +535,21 @@ def prepared_categories(source,directories):
                     raise ValueError('Unknown complete stopped-hit policy')
             elif category==BILLBOARD_CATEGORY:
                 mode=4;first=0x06000000+rig['billboard_offset'];last=0
-            else:
+            elif category==ROLLING_CATEGORY:
                 mode=5;first=struct.unpack('>I',struct.pack('>f',adapter['rolling']['duration']))[0];last=0
+            else:
+                lifecycle=joints.lifecycle(source,profile)
+                if lifecycle is None:raise ValueError('Unimplemented complete joint-rig lifecycle')
+                mode=6;first=lifecycle['mode'];last=0
+                if lifecycle['source_sound_id'] is not None:
+                    first|=lifecycle['source_sound_id']<<8
+                    on,off=lifecycle['switch_clicks'];last=on<<16|off
             rows.append(dict(source_item_id=donor,item_id=f'{destination:04X}',runtime_index=index,
                 bytes=len(data),sha256=sha256(data),category=category,mode=mode,first=first,last=last,
                 skeleton=0x06000000+rig['skeleton_offset'],animation=0x06000000+rig['animation_offset'],
                 joints=rig['skeleton']['joints'],shown=rig['skeleton']['shown_joints'],source=row,
-                profile_installed=False,parent_selectable=False))
+                profile_installed=False,parent_selectable=False,
+                **({'joint_lifecycle':json.loads(json.dumps(lifecycle))} if category==JOINT_CATEGORY else {})))
             assets[donor]=data
         evidence.append(dict(directory=str(directory.relative_to(ROOT)),sha256=sha256(raw),
                              source_rel_sha256=sha256(source.rel)))
@@ -558,7 +590,8 @@ def encode_packet(rows,sound_rows=(),material_rows=()):
     for r in rows:
         encode([r])  # Retain the complete existing object/pointer/work-area checks.
         mode,first,last=r.get('mode',0),r.get('first',0),r.get('last',0)
-        if (mode not in (0,1,2,3,4,5) or mode==0 and (first or last) or
+        if (mode not in (0,1,2,3,4,5,6) or mode==0 and (first or last) or
+                mode==6 and (first,last) not in ((1,0),(2,0),(0x5103,0x00160017)) or
                 mode==3 and (first,last) not in ((0,0),(1,0x3E800000),(2,0x3F000000)) or
                 mode==1 and not (0<first<r['joints'] and 0<last<r['joints'] and first!=last) or
                 mode==4 and (last or first&3 or not 0x06000000<=first<=0x06000000+r['bytes']-16) or
@@ -649,7 +682,7 @@ def publish_packet(equipment,blob,output,*,core=None):
     reactions=runtime.get('reactions');reaction_sources=();colours=runtime.get('colours')
     if reactions:
         from v3_furniture_reactions import wave_source
-        if core is None or packet_ram!=EXTENDED_RAM or not any(r.get('lifecycle')==2 for r in material_rows):
+        if core is None or packet_ram not in (EXTENDED_RAM,WIDE_RAM) or not any(r.get('lifecycle')==2 for r in material_rows):
             raise ValueError('Reaction publication requires complete lifecycle, main code, and extended packet')
         source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
             (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
@@ -659,7 +692,7 @@ def publish_packet(equipment,blob,output,*,core=None):
         reaction_sources=('overlays/v3/room_reactions.c','overlays/v3/room_rumble.c',wave)
     elif any(r.get('lifecycle')==2 for r in material_rows):
         raise ValueError('Timed material requires its complete reaction engine')
-    if colours and (packet_ram!=EXTENDED_RAM or not any(r.get('lifecycle')==3 for r in material_rows)):
+    if colours and (packet_ram not in (EXTENDED_RAM,WIDE_RAM) or not any(r.get('lifecycle')==3 for r in material_rows)):
         raise ValueError('Colour publication requires its complete lifecycle and extended packet')
     if not colours and any(r.get('lifecycle')==3 for r in material_rows):
         raise ValueError('Colour material requires its complete player engine')
@@ -671,20 +704,24 @@ def publish_packet(equipment,blob,output,*,core=None):
     billboard=any(r.get('mode')==4 for r in runtime['rows'])
     if billboard:defines+=('AF_V3_ROOM_BILLBOARD',)
     if any(r.get('mode')==5 for r in runtime['rows']):defines+=('AF_V3_ROOM_ROLLING',)
+    joint=any(r.get('mode')==6 for r in runtime['rows'])
+    if joint:defines+=('AF_V3_ROOM_JOINT',)
     effects=runtime.get('effects')
     particles=effects.get('particles') if effects else None
     if effects:
-        if packet_ram!=EXTENDED_RAM:raise ValueError('Effect callbacks require the expanded room packet')
+        if packet_ram not in (EXTENDED_RAM,WIDE_RAM):raise ValueError('Effect callbacks require the expanded room packet')
         defines+=('AF_V3_ROOM_EFFECTS',f'AF_EFFECT_FLASH_MODEL=0x{effects["bank"]["model"]:X}u')
     if particles:
         from v3_room_particles import runtime_defines
         defines+=runtime_defines(particles)
     defines+=(f'ROOM_RIG_TABLE_RAM=0x{table_ram:X}u',f'ROOM_SOUND_TABLE_RAM=0x{SOUND_TABLE+table_delta:X}u',
               f'ROOM_MATERIAL_TABLE_RAM=0x{MATERIAL_TABLE+table_delta:X}u')
-    code,compiled=compile_part('room_rigs_extended' if packet_ram==EXTENDED_RAM else 'room_rigs_packet',output/'room_rigs_packet',
+    part={PACKET_RAM:'room_rigs_packet',EXTENDED_RAM:'room_rigs_extended',WIDE_RAM:'room_rigs_wide'}[packet_ram]
+    code,compiled=compile_part(part,output/'room_rigs_packet',
         primary_source='overlays/v3/room_rigs.c',defines=defines,
         extra_sources=(('overlays/v3/room_materials.c',) if material_rows else ())+
             (('overlays/v3/room_billboards.c',) if billboard else ())+
+            (('overlays/v3/room_joints.c',) if joint else ())+
             (('overlays/v3/room_effects.c',) if effects else ())+reaction_sources+
             (('overlays/v3/room_particles.c',) if particles else ())+\
             (('overlays/v3/room_colours.c',) if colours else ())+static_sources)
@@ -751,7 +788,7 @@ def publish_packet(equipment,blob,output,*,core=None):
         if entry&3 or not RAM<=entry<RAM+len(boot):raise ValueError('Effect loader escapes room bootstrap')
         struct.pack_into('>I',module,LOADER_BRIDGE-EQUIPMENT_RAM,entry)
         effects['bootstrap_loader']=entry
-        rebind_profiles(effects,blob,symbols)
+        rebind_profiles(effects,blob,symbols,code_bounds=(packet_ram,table_ram))
     if scroll_defines:
         from v3_furniture_scroll import VTABLE as SCROLL_VTABLE
         lifecycle=bool(runtime['scrolling'].get('lifecycle_rows'))
@@ -837,9 +874,11 @@ def extend(base,prior,blob,core,original,output,directories):
             raise ValueError('Additional room category collides with an installed identity')
     all_rows=sorted(copy.deepcopy(runtime['rows'])+rows,key=lambda r:r['runtime_index']);encode_packet(all_rows)
     rolling=any(r.get('mode')==5 for r in all_rows)
-    large=rolling or is_packet and runtime['packet']['ram']==EXTENDED_RAM
-    new_packet=not is_packet or large and runtime['packet']['ram']!=EXTENDED_RAM
-    packet_ram,table_ram,packet_bytes=(EXTENDED_RAM,EXTENDED_TABLE,EXTENDED_BYTES) if large else (PACKET_RAM,PACKET_TABLE,PACKET_BYTES)
+    wide=any(r.get('mode')==6 for r in all_rows) or is_packet and runtime['packet']['ram']==WIDE_RAM
+    large=wide or rolling or is_packet and runtime['packet']['ram']==EXTENDED_RAM
+    packet_ram,table_ram,packet_bytes=((WIDE_RAM,WIDE_TABLE,WIDE_BYTES) if wide else
+        (EXTENDED_RAM,EXTENDED_TABLE,EXTENDED_BYTES) if large else (PACKET_RAM,PACKET_TABLE,PACKET_BYTES))
+    new_packet=not is_packet or runtime['packet']['ram']!=packet_ram
     if large:
         # The password packet ends at the new reservation's start; the model
         # pool remains above it. Other resident category packets stay intact.
@@ -862,6 +901,7 @@ def extend(base,prior,blob,core,original,output,directories):
     result=copy.deepcopy(old);installed=result['room_rigs']
     if billboard_binding:installed['billboard_contract']=billboard_binding
     if rolling:installed['motion_contract']=motion_binding(source,base,prior,all_rows)
+    if any(r.get('mode')==6 for r in all_rows):installed['joint_contract']=joints.native_contract(base)
     if new_packet:
         installed['packet']=dict(ram=packet_ram,bytes=packet_bytes,blob_offset=cursor,vrom=BLOB+cursor)
         cursor+=packet_bytes

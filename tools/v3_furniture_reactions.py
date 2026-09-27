@@ -369,10 +369,10 @@ def checked_lifecycle(source, profile, binding):
 
 
 def state_reservation(report):
+    from v3_room_rig_runtime import packet_layout
     room = report['equipment_resources']['room_rigs']
-    packet = room['packet']
-    if (packet['ram'] != 0x804C8000 or packet['bytes'] != 20480 or
-            room['table_ram'] != 0x804CC000 or packet['ram']+packet['bytes'] != STATE_RAM or
+    ram,_,size = packet_layout(room)
+    if (ram < STATE_RAM+STATE_BYTES and STATE_RAM < ram+size or
             STATE_RAM+STATE_BYTES > report['furniture']['bank_pool']['start']):
         raise ValueError('Reaction state overlaps room code or model storage')
     # Reject another explicitly owned runtime region, including future modules.
@@ -421,7 +421,8 @@ def publish_bridge(core, reactions, packet, symbols, output):
     restored = restored_core(core, bridge)
     target = symbols['af_v3_room_rumble_retrace']
     crc = packet['crc32']
-    if not packet['ram'] <= target < 0x804CC000 or target & 3 or not crc:
+    limit=packet['ram']+packet['bytes']-4096
+    if not packet['ram'] <= target < limit or target & 3 or not crc:
         raise ValueError('Controller callback escapes the published room packet')
     raw, compiled = compile_part('room_rumble_bridge', output/'room_rumble_bridge',
         primary_source='overlays/v3/room_rumble_bridge.S',
@@ -510,9 +511,9 @@ def checked_colour_lifecycle(source, profile, binding, contracts):
 
 
 def colour_state_reservation(report):
-    room = report['equipment_resources']['room_rigs']; packet = room['packet']
-    if (packet['ram'] != 0x804C8000 or packet['bytes'] != 20480 or
-            COLOUR_RAM < packet['ram']+packet['bytes'] or
+    from v3_room_rig_runtime import packet_layout
+    room = report['equipment_resources']['room_rigs']; ram,_,size = packet_layout(room)
+    if (ram < COLOUR_RAM+COLOUR_BYTES and COLOUR_RAM < ram+size or
             COLOUR_RAM+COLOUR_BYTES > report['furniture']['bank_pool']['start']):
         raise ValueError('Player-colour state overlaps code or model storage')
     expected = dict(ram=COLOUR_RAM, bytes=COLOUR_BYTES, mutable=True, saved=False, installed=True)
@@ -590,7 +591,8 @@ def publish_colours(equipment, module, packet, symbols, output):
     from v3_equipment_runtime import RAM
     colours = equipment['room_rigs']['colours']
     targets = {name:symbols['af_v3_room_colour_'+name] for name in ('update','draw')}
-    if any(address&3 or not packet['ram'] <= address < 0x804CC000 for address in targets.values()):
+    limit=packet['ram']+packet['bytes']-4096
+    if any(address&3 or not packet['ram'] <= address < limit for address in targets.values()):
         raise ValueError('Player-colour entry escapes verified room code')
     raw, compiled = compile_part('room_colour_bridge', output/'room_colour_bridge',
         primary_source='overlays/v3/room_colour_bridge.S',

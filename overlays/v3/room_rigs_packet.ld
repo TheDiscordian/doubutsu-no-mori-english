@@ -24,6 +24,7 @@ _texture_z_light_fog_prim = 0x800BD4E8;
 Matrix_RotateY = 0x800E0698;
 qrand = 0x8002C970;
 sin_s = 0x80099A94;
+add_calc = 0x8009A570;
 cos_s = 0x80099A54;
 af_v3_room_debug = 0x80138E50;
 af_rumble_motor_init = 0x80031574;

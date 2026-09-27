@@ -22,20 +22,24 @@ Incomplete gameplay stays unavailable in the selector; installing assets does
 not claim that an item is playable. Reuse unchanged passing tests throughout.
 
 Current task: close shared conversion and gameplay gaps in the ordinary bulk
-importer. The working tree implements switched joint motion and translucent
+importer. The current batch implements switched joint motion and translucent
 drawing for the lighthouse, moon, and snowcone machine. The ordinary pipeline
 produces ABI 243 at
 `build/v3-switched-joint-imports-03/profile-runtime/build-lock.json`, SHA-256
 `0b9e6c7305daf96eaf53916143593bee4f5ab52f8169d874caab13a31974e348`.
 All three complete profiles are inactive pending their actual acquisition;
 the existing 158 choices remain. All artwork is reused without compilation.
-The host sanitizer check passes 9,600 motion/draw frames. Current-build
-integration/composition checks and the prepared native `joint_rigs` fixture
-remain unrun; no native setup attempts have been used for this batch. The
-compass parent-relative motion remains unfinished. The shared room packet
+The host sanitizer check passes 9,600 motion/draw frames. Three focused source,
+integration, and composition tests pass. Native execution passes 99 assertions
+for lighthouse/moon before a debugger COP1-ownership interruption; its one retry
+finds unsupported signal-passing. Native snowcone and full rendering remain
+unverified. The setup retry allowance is exhausted; do not replay this fixture.
+Continue compass parent-relative motion and remaining shared callback/model
+categories. The shared room packet
 moves to `804D0000..804D8FFF`, clear of existing reaction/colour state; joint
 working floats occupy unused matrix slot nine, outside all eight morph joints.
-Finish focused verification and documentation before committing this batch.
+See the [batch checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#installed-switched-joint-lifecycles)
+for exact evidence and outstanding gameplay/hardware limits.
 
 Four complete joint-callback rigs are reusable from
 `build/v3-joint-callback-rigs-prepared-01/`: compass, lighthouse, moon, and

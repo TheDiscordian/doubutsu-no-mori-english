@@ -1126,7 +1126,7 @@ def metadata(source, item, profile, identity):
         raise ReviewRequired('Static interaction requires its complete installed behaviour and audio')
     if profile.get('callback_adapter',{}).get('category')==FIXED_CATEGORY:
         raise ReviewRequired('Fixed rig artwork is prepared; move/destroy behaviour and spawned effects need runtime adapters')
-    if profile.get('callback_adapter',{}).get('category')==JOINT_CATEGORY:
+    if profile.get('callback_adapter',{}).get('category')==JOINT_CATEGORY and not binding:
         raise ReviewRequired('Joint-callback rig artwork is prepared; complete lifecycle and joint behaviour need runtime adapters')
     alias = next((row for row in room_aliases(source)['rows'] if int(row['display_item_id'],16)==item), None)
     if alias:
@@ -1328,11 +1328,16 @@ def rig_import_plan(inventory, report, bindings, selected=(), category=None, *, 
     from v3_furniture_scroll import CATEGORY as SCROLL_CATEGORY,draw_only_lifecycle
     from v3_furniture_reactions import source_lifecycle as reaction_lifecycle,colour_lifecycle
     from v3_sound_programs import furniture_trigger,furniture_level
+    from v3_furniture_joint_rigs import CATEGORY as JOINT_CATEGORY,lifecycle as joint_lifecycle
     categories={CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY,ROLLING_CATEGORY}
     candidates=[r for r in inventory['rows'] if r.get('asset_ready') and not r['installed'] and
         not r.get('room_alias') and (not selected or r['item_id'] in selected) and
         (category is None or category in r['categories'])]
     rows=[r for r in candidates if r['profile'].get('callback_adapter',{}).get('category') in categories]
+    rows += [r for r in candidates if r['profile'].get('callback_adapter',{}).get('category')==JOINT_CATEGORY
+             and source is not None and joint_lifecycle(source,r['profile']) is not None]
+    joint_loops={r['item_id'] for r in rows if r['profile']['callback_adapter']['category']==JOINT_CATEGORY
+                 and furniture_level(source,r['profile']) is not None}
     material_rows=[];material_audio=[];material_loops=[];effects=set()
     scroll_rows=[];scroll_loops=[]
     for r in candidates:
@@ -1363,7 +1368,7 @@ def rig_import_plan(inventory, report, bindings, selected=(), category=None, *, 
                       set(material_audio)|{r['item_id'] for r in static_rows if r['profile']['callback_adapter'].get('trigger')})-audio),
         loops=sorted(({r['item_id'] for r in rows if r['profile']['callback_adapter'].get('level_sound')}|
                       {r['item_id'] for r in static_rows if r['profile']['callback_adapter'].get('level_sound')}|
-                      set(material_loops)|set(scroll_loops))-loops),
+                      set(material_loops)|set(scroll_loops)|joint_loops)-loops),
         profiles=sorted(r['item_id'] for r in rows+material_rows+static_rows+scroll_rows if r['item_id'] not in bindings))
     if scroll_rows:
         installed={r['source_item_id']:r for r in report['equipment_resources']['room_rigs'].get('scrolling',{}).get('rows',[])}

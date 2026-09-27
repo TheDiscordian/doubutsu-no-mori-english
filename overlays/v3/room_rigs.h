@@ -14,12 +14,13 @@ typedef struct {
 } RoomKeyframe;
 typedef struct {
     u16 index;
-    u8 before_position[6];
+    s16 ctr_type;
+    u8 before_position[4];
     float position[3];
     u8 before_state[0x3C-20];
     s16 state;
-    u8 before_changed[0x12D-0x3E];
-    u8 changed;
+    u8 before_changed[0x12C-0x3E];
+    u8 switched,changed;
     u8 before_keyframe[6];
     RoomKeyframe keyframe;
     s16 joint[9][3];
@@ -33,7 +34,16 @@ typedef struct {
             u8 unused_morph[4];
         };
     };
-    u8 matrices[2][10][64];
+    union {
+        u8 matrices[2][10][64];
+        struct {
+            /* The complete native recursive drawer consumes at most one matrix
+               per shown joint (eight maximum). Slot nine is never submitted. */
+            u8 before_motion[9*64];
+            float motion_power,motion_phase;
+            u8 after_motion[20*64-9*64-8];
+        };
+    };
     u8 tail[0x30];
 } RoomRig;
 typedef struct { u32 a,b; } RoomCommand;
@@ -67,6 +77,12 @@ typedef struct {
 #define ROOM_RIG_HIT 3u
 #define ROOM_RIG_BILLBOARD 4u
 #define ROOM_RIG_ROLLING 5u
+#define ROOM_RIG_JOINT 6u
+#ifdef AF_V3_ROOM_JOINT
+extern void af_v3_room_joint_ct(RoomRig *,const RoomRigRecord *);
+extern void af_v3_room_joint_mv(RoomRig *,const RoomRigRecord *);
+extern void af_v3_room_joint_dw(RoomRig *,RoomRigGame *,const RoomRigRecord *);
+#endif
 #ifdef AF_V3_ROOM_BILLBOARD
 typedef struct {
     u32 flame;
@@ -147,6 +163,9 @@ ROOM_CHECK(RoomRig,position,8); ROOM_CHECK(RoomRig,state,0x3C);
 ROOM_CHECK(RoomRig,changed,0x12D); ROOM_CHECK(RoomRig,keyframe,0x134);
 ROOM_CHECK(RoomRig,joint,0x1A4); ROOM_CHECK(RoomRig,morph,0x1DA);
 ROOM_CHECK(RoomRig,speed,0x204); ROOM_CHECK(RoomRig,target,0x208);
+ROOM_CHECK(RoomRig,switched,0x12C); ROOM_CHECK(RoomRig,motion_power,0x450);
+ROOM_CHECK(RoomRig,ctr_type,2);
+ROOM_CHECK(RoomRig,motion_phase,0x454);
 ROOM_CHECK(RoomRig,matrices,0x210); ROOM_CHECK(RoomRigGame,frame,0xA0);
 _Static_assert(sizeof(RoomRig)==0x740,"Native furniture stride");
 #ifdef AF_V3_ROOM_RIG_PACKET

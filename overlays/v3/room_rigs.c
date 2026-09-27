@@ -114,7 +114,13 @@ static const RoomRigRecord *find(u32 index) {
                 (r->skeleton&3) || r->skeleton<0x06000000u || r->skeleton>0x06000000u+r->bytes-8 ||
                 (r->animation&3) || r->animation<0x06000000u || r->animation>0x06000000u+r->bytes-20) return 0;
 #ifdef AF_V3_ROOM_RIG_PACKET
-        if (r->reserved || r->mode>ROOM_RIG_ROLLING) return 0;
+        if (r->reserved || r->mode>ROOM_RIG_JOINT) return 0;
+#ifdef AF_V3_ROOM_JOINT
+        if (r->mode==ROOM_RIG_JOINT && !((r->first.bits==1 || r->first.bits==2) ?
+                r->last.bits==0 : r->first.bits==0x5103 && r->last.bits==0x00160017)) return 0;
+#else
+        if (r->mode==ROOM_RIG_JOINT) return 0;
+#endif
         if ((r->mode==ROOM_RIG_SWITCH || r->mode==ROOM_RIG_ROLLING) && r->joints>6) return 0;
 #ifdef AF_V3_ROOM_ROLLING
         if (r->mode==ROOM_RIG_ROLLING && (r->last.bits || r->first.bits<0x3F800000u || r->first.bits>0x47000000u)) return 0;
@@ -171,6 +177,9 @@ void af_v3_room_rig_ct(RoomRig *actor,u8 *data) {
 #endif
         cKF_SkeletonInfo_R_init_standard_repeat(&actor->keyframe,animation,(void *)0);
     if (r->joints<=6) {actor->speed.bits=0;actor->target.bits=0x3F000000u;}
+#ifdef AF_V3_ROOM_JOINT
+    if (r->mode==ROOM_RIG_JOINT) { af_v3_room_joint_ct(actor,r);return; }
+#endif
 #ifdef AF_V3_ROOM_ROLLING
     if (r->mode==ROOM_RIG_ROLLING) {
         actor->keyframe.speed.f=0.5f;
@@ -204,6 +213,9 @@ void af_v3_room_rig_mv(RoomRig *actor,void *room,RoomRigGame *game,u8 *data) {
     const RoomRigRecord *r=find(actor->index);
     if (!data || !r) return;
 #ifdef AF_V3_ROOM_RIG_PACKET
+#ifdef AF_V3_ROOM_JOINT
+    if (r->mode==ROOM_RIG_JOINT) { af_v3_room_joint_mv(actor,r);return; }
+#endif
 #ifdef AF_V3_ROOM_ROLLING
     if (r->mode==ROOM_RIG_ROLLING) { rolling_move(actor,r);return; }
 #endif
@@ -306,6 +318,9 @@ void af_v3_room_rig_dw(RoomRig *actor,void *room,RoomRigGame *game,u8 *data) {
     (void)room;
     const RoomRigRecord *r=find(actor->index);
     if (!r || !data) return;
+#ifdef AF_V3_ROOM_JOINT
+    if (r->mode==ROOM_RIG_JOINT) { af_v3_room_joint_dw(actor,game,r);return; }
+#endif
 #ifdef AF_V3_ROOM_BILLBOARD
     if (r->mode==ROOM_RIG_BILLBOARD) {
         af_v3_room_billboard_dw(actor,room,game,r,Lib_SegmentedToVirtual((void *)(uptr)r->first.bits));

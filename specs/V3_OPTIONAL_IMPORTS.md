@@ -9,13 +9,14 @@ are off by default. Existing N64 villagers, items, locations, and the translatio
 remain available; importing means adding content, not silently replacing an
 existing villager or painting a new name onto an unrelated item.
 
-The main ABI-109 lock retains V2-11, SHA-256
-`8bbd1955536a2a3ac9f76d6f323842f5ce25c037e1ff5fd3da9f28d6dfe20507`.
-The corrected-header proposal pins V2-12, SHA-256
+Both deployed patchers serve stable V2-13, SHA-256
+`f96395426808200dc6faaac0386aec9839ddcf3a4251eaaf98f371b8029a5e68`.
+The current experimental proposal still pins V2-12 for empty selection, SHA-256
 `a09373b051cbcd93991e5dd6cb17a238a2afb1e2e2d7694d75408d24a55d4eee`.
-The import-free path reproduces its build's pinned translation baseline exactly.
-V3 development uses `v3/optional-imports`; the public V2 patcher, deployment
-recipe, local V2 service, and published trailer remain unchanged.
+Align that pin with V2-13 before the V3 handoff. The import-free path must reproduce
+its build's pinned translation baseline exactly. V3 development uses
+`v3/optional-imports`; it must not replace the stable V2 deployments or edit the
+published trailer. Stable V2 corrections are published to both patchers.
 V3 source and development work may be version-tracked on GitHub. Updating the
 local or public web patcher to V3 requires the user's testing and subsequent
 explicit approval. GitHub source publication does not authorise either update.

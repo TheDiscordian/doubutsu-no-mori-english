@@ -892,6 +892,7 @@ def room_rigs(debug,rom_path,record,*,mode=2):
     state=report['save_runtime']
     saved={at:debug.read_memory(at,n) for at,n in ((0x801458B8,4),(state['state_ram'],state['state_bytes']))}
     if mode==1:saved[0x80136FC4]=debug.read_memory(0x80136FC4,4)
+    if mode==6:saved[0x80136FBC]=debug.read_memory(0x80136FBC,2)
     if mode in (3,5):saved[0x80136F2C]=debug.read_memory(0x80136F2C,4)
     if mode==3:saved[0x80126EB4]=debug.read_memory(0x80126EB4,4)
     size=0x8300 if mode==4 else 0x6200;allocation=call(0x8009BFC0,[size])
@@ -937,10 +938,25 @@ def room_rigs(debug,rom_path,record,*,mode=2):
         unique={}
         for row in rows:unique.setdefault(row['source']['profile']['skeleton']['header']['donor_offset'],row)
         selected=list(unique.values())
+    if mode==6:
+        unique={}
+        for row in rows:unique.setdefault(row['first']&255,row)
+        selected=list(unique.values())
+        debug.write_memory(0x80136FBC,bytes((59,23)))
     put(game,graph)
     if mode==5:
         put(0x80136F2C,bridge+0x100);put(bridge+0x100,bridge+0x200)
+    pass_lazy_fpu=False
     try:
+        if mode==6:
+            # The controller thread first uses COP1 after lazy room-code loading.
+            # ares maps that recoverable libultra exception to GDB SIGURG (10).
+            # Let the game's own handler enable/save the FPU; do not mask faults
+            # or edit the emulated CPU state. Final native fault checks remain.
+            if debug.command('QPassSignals:10')!='OK':
+                raise ValueError('Debugger cannot pass the native lazy-FPU exception')
+            pass_lazy_fpu=True
+            record(dict(room_rig_debugger='pass SIGURG for native lazy COP1 ownership'))
         for iteration,row in enumerate(selected):
             parity=iteration&1
             fill=b'\xA5'*9216;debug.write_memory(bank,fill)
@@ -953,20 +969,50 @@ def room_rigs(debug,rom_path,record,*,mode=2):
                 debug.write_memory(target,struct.pack('>H',row['runtime_index']))
                 if mode==4:debug.write_memory(target+0x714,struct.pack('>3f',1,1,1))
                 if mode==5:debug.write_memory(target+8,struct.pack('>3f',10,0,20))
+                if mode==6:
+                    debug.write_memory(target+2,bytes(2))
+                    debug.write_memory(target+0x12C,bytes((target==actor,)))
                 debug.write_memory(target+0x12D,bytes(1));callback('ct',target)
                 if row['joints']<=6:
                     check('initial per-instance state',target+0x204,struct.pack('>2f',*((10,20) if mode==5 else (0,.5))))
                 check('native work vectors belong to this instance',target+0x158,
                       struct.pack('>2I',target+0x1A4,target+0x1DA))
                 initial=(.5,1.5) if mode in (1,4) or mode==3 and row['first']==2 else (0,1.5) if mode in (3,5) else (0,1)
+                if mode==6:
+                    kind=row['first']&255
+                    initial=((.5 if kind==3 else 1) if target==actor else 0,1.5)
+                    phase=(23*60+59)/600 if kind==2 else 0
+                    check('joint state uses a never-drawn matrix slot',target+0x450,struct.pack('>2f',target==actor,phase))
                 check('source initial speed and frame',target+0x140,struct.pack('>2f',*initial))
                 if packet:
-                    check('native category animation mode',target+0x148,struct.pack('>I',1 if mode in (1,4,5) else 0))
+                    check('native category animation mode',target+0x148,struct.pack('>I',1 if mode in (1,4,5,6) else 0))
                     check('complete lazily loaded room packet',packet['ram'],
                           blob[packet['blob_offset']:packet['blob_offset']+packet['bytes']])
                     check('startup cache remembers the verified packet',0x804B1E00,struct.pack('>I',packet['crc32']))
             independent=debug.read_memory(other,0x740)
-            if mode==1:
+            if mode==6:
+                # Run real easing/keyframes; use the native transition exclusion
+                # to keep this isolated renderer fixture out of the audio owner.
+                debug.write_memory(actor+0x3C,struct.pack('>h',5))
+                for switched in (0,1,0):
+                    before=floating(actor+0x450);phase=floating(actor+0x454)
+                    debug.write_memory(actor+0x12C,bytes((switched,1)))
+                    callback('mv',actor)
+                    want=before
+                    for _ in range(2):
+                        if kind==3:want=max(float(switched),want-.01) if want>switched else min(float(switched),want+.01)
+                        else:want+=max(-.3,min(.3,.3*(switched-want)))
+                    actual=floating(actor+0x450)
+                    passed=abs(want-actual)<.000001
+                    record(dict(joint_motion_kind=kind,power=actual,expected=want,assertion='passed' if passed else 'failed'))
+                    if not passed:raise ValueError('Complete native joint motion differs from source')
+                    assertions+=1
+                    if kind==2:
+                        actual=floating(actor+0x454)
+                        if abs(actual-phase-2*1.8204445)>.00001:raise ValueError('Moon rotation lost source-rate updates')
+                    check('native keyframe speed follows joint state',actor+0x140,struct.pack('>f',
+                        floating(actor+0x450)*(.5 if kind==3 else 1)))
+            elif mode==1:
                 callback('mv',actor)
                 check('clock preserves source two-step timing',actor+0x140,struct.pack('>2f',.5,2.5))
                 # Call the actual installed joint callback using its immutable
@@ -1048,6 +1094,8 @@ def room_rigs(debug,rom_path,record,*,mode=2):
                 debug.write_memory(actor+0x204,struct.pack('>2f',1.24,1.25));callback('mv',actor)
                 check('source speed peak switches back to idle',actor+0x204,struct.pack('>2f',1.24,.5))
             check('second room instance remains independent',other,independent)
+            opposite=debug.read_memory(actor+0x210+(1-parity)*0x280,0x280)
+            matrix_tail=debug.read_memory(actor+0x210+parity*0x280+row['shown']*64,(10-row['shown'])*64)
             put(game+0xA0,parity);call(0x800E0284,[identity])
             put(graph+0x298,gfx,gfx+0x1000);put(graph+0x2A8,xlu,xlu+0x800)
             callback('dw',actor)
@@ -1057,7 +1105,31 @@ def room_rigs(debug,rom_path,record,*,mode=2):
             drawn=[b for a,b in struct.iter_unpack('>2I',commands) if a>>24==0xDE]
             offsets=row['source']['model_offsets']
             expected=[0x06000000+p for p in offsets.values()]
-            if mode==4:
+            if mode==6:
+                adapter=row['source']['profile']['callback_adapter'];feature=adapter['joint_features']
+                hidden=feature.get('joints',[])
+                opaque=[j for j in adapter['skeleton']['rows'] if 'model' in j and j['index'] not in hidden and not j['draw_stream']]
+                expected=[0x06000000+offsets['joint'+str(j['index'])] for j in opaque]
+                passed=drawn==expected and back==((gfx+0x1000-240)&~15)
+                xfront,xback=struct.unpack('>2I',debug.read_memory(graph+0x2A8,8))
+                if not xlu<xfront<=xback==xlu+0x800:raise ValueError('Joint callbacks escape translucent arena')
+                xcommands=list(struct.iter_unpack('>2I',debug.read_memory(xlu,xfront-xlu)))
+                xdrawn=[b for a,b in xcommands if a>>24==0xDE]
+                xexpected=[0x06000000+offsets['joint'+str(j['index'])] for j in adapter['skeleton']['rows']
+                           if 'model' in j and (j['index'] in hidden or j['draw_stream'])]
+                passed=passed and xdrawn==xexpected
+                level=int(floating(actor+0x450)*255)&255
+                if kind in (1,3):
+                    colour=(0xFA000000|level,0xFFFF96FF) if kind==1 else (0xFA0000FF,0xFFFFFF00|level)
+                    passed=passed and colour in xcommands
+                if kind==3:
+                    passed=passed and (0xDB060024,back+192) in xcommands
+                    y=((parity*16)&0x3FFF)>>2
+                    check('complete joint scrolling window',back+192,struct.pack('>10I',
+                        0xE8000000,0,0xF2000000|y,(28<<12)|((y+124)&0xFFF),
+                        0xE8000000,0,0xF2000000,0x0101C07C,0xDF000000,0))
+                record(dict(room_rig_joint_translucent_lists=xdrawn,expected=xexpected))
+            elif mode==4:
                 adapter=row['source']['profile']['callback_adapter'];flame=adapter['billboard']['joint']
                 opaque=[j for j in adapter['skeleton']['rows']
                         if 'model' in j and j['index']!=flame and not j['draw_stream']]
@@ -1087,9 +1159,10 @@ def room_rigs(debug,rom_path,record,*,mode=2):
                         assertion='passed' if passed else 'failed'))
             if not passed:raise ValueError('Room rig omitted complete models or misused graphics allocation')
             assertions+=1
-            if mode!=4:check('translucent stream only binds skeleton matrices',graph+0x2A8,struct.pack('>2I',xlu+8,xlu+0x800))
-            check('untouched opposite matrix bank',actor+0x210+(1-parity)*0x280,b'\xA5'*0x280)
-            check('unused matrix slots retain their bytes',actor+0x210+parity*0x280+row['shown']*64,b'\xA5'*((10-row['shown'])*64))
+            if mode not in (4,6):check('translucent stream only binds skeleton matrices',graph+0x2A8,struct.pack('>2I',xlu+8,xlu+0x800))
+            check('untouched opposite matrix bank',actor+0x210+(1-parity)*0x280,opposite if mode==6 else b'\xA5'*0x280)
+            check('unused matrix slots retain their bytes',actor+0x210+parity*0x280+row['shown']*64,
+                  matrix_tail if mode==6 else b'\xA5'*((10-row['shown'])*64))
             tail=bytearray(b'\xA5'*0x30)
             if mode==4:struct.pack_into('>3f',tail,4,1,1,1)
             check('native tail fields retain their bytes',actor+0x710,tail)
@@ -1108,6 +1181,8 @@ def room_rigs(debug,rom_path,record,*,mode=2):
         debug.write_memory(matrix,matrix_before)
         for at,value in saved.items():debug.write_memory(at,value)
         call(0x8009C040,[allocation])
+        if pass_lazy_fpu and debug.command('QPassSignals:')!='OK':
+            raise ValueError('Debugger did not restore exception reporting')
     return dict(native_room_rigs=True,representatives=len(selected),assertions=assertions,
         complete_model_animation_dma=True,independent_instances=True,gpu_rendered=False,
         native_move_tested=mode!=4,native_billboard_helpers_tested=mode==4,
@@ -2190,6 +2265,7 @@ def exercise(debug, rom_path, record, *, section='automatic_furniture'):
     if section=='clock_rigs':return room_rigs(debug,rom_path,record,mode=1)
     if section=='hit_rigs':return room_rigs(debug,rom_path,record,mode=3)
     if section=='billboard_rigs':return room_rigs(debug,rom_path,record,mode=4)
+    if section=='joint_rigs':return room_rigs(debug,rom_path,record,mode=6)
     if section=='rolling_rigs':return room_rigs(debug,rom_path,record,mode=5)
     if section=='item_categories':return item_categories(debug,rom_path,record)
     path = Path(rom_path)

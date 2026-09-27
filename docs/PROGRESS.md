@@ -31,18 +31,21 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
-The shared joint-callback converter prepares the complete compass, lighthouse,
-moon, and snowcone machine together: 16,480 bytes, all 290 triangles, every
-joint/motion array, and complete callback dependencies. Shared I8 conversion and
-independent scrolling-window/image layout preserve the lighthouse beam and
-snowcone artwork without resizing or dropping resources. Four focused checks
-pass. Native joint/lifecycle behaviour remains unfinished, so these four objects
-are not selectable imports yet. See the
-[joint-rig checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#joint-callback-rig-resources).
+The shared importer installs complete lighthouse, moon, and snowcone lifecycles
+in one category batch, reusing all prepared artwork. Motion, clock rotation,
+translucent joint redraws, scrolling, and full required sounds are connected.
+Three focused source/integration/composition checks pass, alongside the retained
+9,600-frame host sanitizer check. The native run passes 99 assertions for the
+lighthouse/moon before a debugger interruption; the retry encounters an
+unsupported debugger command. Native snowcone execution and full ordinary/GPU
+appearance remain unverified. The profiles stay inactive pending actual
+acquisition. Compass parent-relative motion remains required. See the
+[joint-lifecycle checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#installed-switched-joint-lifecycles).
 
-The checked proposal is ABI 240 at
-`build/v3-large-model-imports-01/cartridge/build-lock.json`, with 158 development
-choices. The complete 10,448-byte snowboard imports through the ordinary pipeline,
+The checked proposal is ABI 243 at
+`build/v3-switched-joint-imports-03/profile-runtime/build-lock.json`, with 158
+development choices and unchanged format-four saved data. The complete
+10,448-byte snowboard remains imported through the ordinary pipeline,
 including all 259 triangles, thirteen textures, and actual winter-camper route.
 Shared room banks and catalogue model buffers hold 12,288 bytes. The extension
 uses reserved Expansion Pak memory plus 6 KiB of submenu memory without changing

@@ -329,7 +329,9 @@ def furniture_level(source,profile):
     dependencies, full callbacks, and positioning helpers remain accounted for.
     """
     from v3_furniture_scroll import CATEGORY
+    from v3_furniture_joint_rigs import CATEGORY as JOINT_CATEGORY,level_sound as joint_level
     adapter=profile.get('callback_adapter',{});functions=copy.deepcopy(adapter.get('functions',{}))
+    if adapter.get('category')==JOINT_CATEGORY:return joint_level(source,profile)
     if adapter.get('category')=='material-frame-assets':
         from v3_furniture_reactions import colour_lifecycle
         from v3_furniture_materials import steam_lifecycle

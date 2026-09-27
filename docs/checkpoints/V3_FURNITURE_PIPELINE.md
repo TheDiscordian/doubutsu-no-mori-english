@@ -1,5 +1,76 @@
 # Automatic furniture pipeline checkpoint
 
+## Installed switched joint lifecycles
+
+The ordinary category importer installs lighthouse model, moon, and snowcone
+machine through one dependency plan: complete rigs, required loop audio, then
+complete profiles. All 13,472 artwork bytes are reused without compilation.
+The source create/move/draw bindings preserve easing, clock-based rotation,
+translucent joint redraws, scrolling, both switch clicks, and full loop sound.
+No model, joint, or source behaviour is dropped to fit existing memory.
+
+- Build lock: `build/v3-switched-joint-imports-03/profile-runtime/build-lock.json`, ABI 243.
+- ROM SHA-256: `0b9e6c7305daf96eaf53916143593bee4f5ab52f8169d874caab13a31974e348`.
+- UPS SHA-256: `fffe96ad33db8dfab1ac9eefcfb296db660cc196b8f8a7a7ca9fb3df86db1946`.
+- Plan: `build/v3-switched-joint-imports-03/pipeline.json`.
+- Shared packet: 36,864 bytes at `804D0000`, code 17,552 of 32,768 bytes.
+- Bootstrap: 1,509 of 1,536 bytes. All existing callback bridges are rebound.
+
+The three complete profiles stay inactive pending actual acquisition, including
+snowcone's island route. The existing 158 development choices and format-four
+saved data remain unchanged. The compass's parent-relative rotation remains
+unfinished; its already prepared complete artwork is retained.
+
+Three focused source/integration/composition tests pass. They check immutable
+prepared descriptors, rejected changes to complete motion/helpers/initializers
+and constants, actual installed profiles, preserved earlier assets and saved
+resources, safe wide-packet/state separation, relocated effect callbacks,
+original-ROM UPS reconstruction, and four browser/offline selections. The first
+test invocation exposed two test-fixture assumptions and a missing explicit
+evaluator guard. Corrected fixtures and the full evaluator/initializer guard
+pass. The prepared descriptor is deep-copied before callback validation: the
+initial pipeline attempts mutated its recorded relocation receipt and failed
+before a complete profile build. The third pipeline output is the checked one.
+
+The host sanitizer check executes 9,600 motion/draw frames over the three kinds,
+both initial switch states, and both matrix-buffer parities. It covers complete
+eight-joint work, easing/rotation, clicks/loop arguments, transition exclusions,
+translucent model ordering, tile commands, arena exhaustion, and memory guards.
+Its native evaluator and audio calls are test substitutes, not GPU/synthesis proof.
+
+Native attempt one reaches 99 passing assertions in 126 records at
+`build/v3-switched-joint-native-01/results.json`, SHA-256
+`83dcbf8edf19bc855c384c8d7b49325deacd2172298404c9c89fd7505b326514`.
+It executes actual lighthouse/moon construction, movement/easing, complete
+keyframes, and drawing commands with independent instances and buffer guards.
+During the snowcone DMA, the debugger stops at `804D2A68`, an FPU save in the
+controller callback. Cause `1000002C` identifies COP1-unusable, the normal
+libultra lazy-FPU ownership exception, mapped to GDB SIGURG by ares. This is not
+an observed item memory fault, but the run is incomplete and final restoration
+and fault checks are not established.
+
+The one justified retry requests `QPassSignals:10` so the game's own exception
+handler can run. The installed debugger does not support that command; it stops
+before item execution. The local ares source supports it, but rebuilding the
+test emulator is deferred. No further native retries are queued for this batch.
+Snowcone native execution, complete graphics/hardware appearance, synthesis,
+ordinary acquisition, and save/reload remain unverified. Neither run uses a
+user save or emits physical audio. Both stable patchers remain V2-13.
+
+```sh
+python3 tools/v3_furniture_pipeline.py import \
+  --category joint-callback-rig-assets \
+  --base-lock build/v3-large-model-imports-01/cartridge/build-lock.json \
+  --reuse-assets build/v3-joint-callback-rigs-prepared-01 \
+  --output build/v3-switched-joint-reproduction
+python3 -m unittest tests.test_v3_joint_lifecycle -v
+```
+
+Continue compass parent-relative motion, remaining unconverted callback/model
+families, and full console launch/persistence. Acquisition and gold-tree work
+remain after the primary importing pipelines, without postponing item-specific
+behaviour by policy.
+
 ## Joint-callback rig resources
 
 `build/v3-joint-callback-rigs-prepared-01/art.json` contains four complete objects

@@ -34,6 +34,47 @@ this after changing shared code when no new resource category needs installation
 profile-only staging retains existing code unless it installs a newly implemented
 material lifecycle; that stage rebuilds the shared packet and callback bindings.
 
+### Switched joint motion and translucent redraws
+
+`joint-callback-rig-assets` retains its reusable complete artwork descriptor.
+A separate checked lifecycle binds source create/move/draw code, helper code,
+relocations, constants, and audio. The ordinary `import` command installs all
+complete lifecycles in the selected category together, reusing prepared objects.
+The implemented motion kinds cover lighthouse easing, moon clock/rotation, and
+snowcone easing/scrolling/sound. Compass parent-relative motion remains pending;
+it is not converted into a stationary decorative substitute.
+
+Rig mode 6 uses first-word low byte 1/2/3 for these source motion kinds. Kind 3
+also stores complete level sound `51` in the next byte and clicks `0016/0017`
+in the last word. Unknown parameter combinations reject. The source's initial
+evaluation runs at half speed; movement performs two source steps per N64 update.
+Moon rotation starts from actual RTC minutes/seconds and retains source wrapping.
+Snowcone starts disabled through the native placement adapter, retains both
+clicks and its complete loop programme, and maps source transition exclusions
+to native states 5/6/13/15.
+
+Actor stride remains `740`. Motion floats use `450..457`, inside unused matrix
+slot nine of buffer zero, outside all nine root/joint and morph vectors. The
+complete native evaluator, drawer, and owner are bound: at most eight displayed
+joints consume one matrix each. Custom-owner drawing does not overwrite this
+work area. Both matrix-buffer parities retain independent actor state.
+
+Before/after callbacks preserve all models. Lighthouse joints 3/7 and snowcone
+joints 3/4 move to the translucent stream using the original shape pointer and
+joint transform. Lighthouse retains beam colour/LOD; snowcone retains alpha and
+both scroll tiles over its full source image. Moon retains its joint-one Z
+rotation. Each draw checks both graphics arenas and reserves 240 aligned bytes
+for parent/joint matrices and tile commands; all used matrices are flushed.
+
+The complete shared room packet has a 36-KiB layout at `804D0000..804D8FFF`,
+with a 32-KiB code reservation and the existing 4-KiB record table at `804D8000`.
+The reaction state at `804CD000..804CD3FF`, colour state at
+`804CD400..804CD4FF`, and model pool starting at `80500000` remain separate.
+Effect callbacks and controller/player bridges are rebound to the moved code.
+Older 8-/20-KiB layouts remain valid inputs; extension never shrinks a wide packet.
+No saved field or actor allocation grows. Acquisition remains a separate pending
+requirement for these three objects, so the installed profiles stay inactive.
+
 ### Direct-model interactions and town-tune instruments
 
 `static-interaction` recognises complete move callbacks while retaining every
