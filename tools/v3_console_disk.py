@@ -1,5 +1,6 @@
 """Prepare donor-backed QD services and complete BIOS through console conversion."""
 import json
+import struct
 
 from aflib import by_vrom,sha256,yaz0_decode
 from apply_translation import write_new
@@ -26,16 +27,27 @@ NATIVE_SOURCES=SOURCES+('overlays/v3/console_disk_native.c','overlays/v3/console
     'overlays/v3/console_disk_native.ld','overlays/v3/console_disk_bridge.S')
 
 
-def prepare_native(output,native):
+def prepare_native(output,native,dol):
     from v3_asset_loader import ROOT,compile_part
     from v3_console_games import NATIVE_RAM,NATIVE_SHA
     row=native[0x80836770-NATIVE_RAM+0x42*16:0x80836770-NATIVE_RAM+0x43*16]
     if sha256(native)!=NATIVE_SHA or row.hex()!='80832810000000000000000002ff0200':
         raise ValueError('Changed complete native interpreter/WDM encoding')
+    reset_sha='87f7bbad2466c41410365bb23a5f6aeebf8cfe0df5d7863f79a7a5bef2c8e4f5'
+    if sha256(dol.read(0x8003A13C,0x8C))!=reset_sha:
+        raise ValueError('Changed complete donor reset-button function')
+    motor_sha='179bb2cfb701d076fa3a77236c2e139f2a586933216370d9b15291f47d064858'
+    if sha256(dol.read(0x80039D58,0x94))!=motor_sha:
+        raise ValueError('Changed complete donor disk motor/audio synchronization')
+    io=[struct.unpack_from('>I',native,0x80835DD0-NATIVE_RAM+p)[0] for p in (0xC8,0xEC)]
+    if io!=[0x808308C4,0x808303E0]:raise ValueError('Changed native bank-2 I/O callbacks')
     code,compiled=compile_part('console_disk_native',output/'console_disk_native',
         extra_sources=('overlays/v3/console_disk.c','overlays/v3/console_disk_bridge.S'))
     receipt=dict(format='AFV3-CONSOLE-DISK-NATIVE-1',compiled=compiled,
         source_native_sha256=NATIVE_SHA,source_wdm_row=row.hex(),
+        source_reset_button=dict(address=0x8003A13C,bytes=0x8C,sha256=reset_sha),
+        source_motor_sync=dict(address=0x80039D58,bytes=0x94,sha256=motor_sha),
+        source_io_callbacks=dict(store=io[0],load=io[1]),
         planned_memory=dict(code=dict(ram=0x80630000,bytes=0x6000),
             immutable_bios=dict(ram=0x80636000,bytes=8192),context=dict(ram=0x80638000,bytes=512),
             boot_state=dict(ram=0x80638200,bytes=260),program=dict(ram=0x8063A000,bytes=32768),
@@ -45,10 +57,12 @@ def prepare_native(output,native):
         native_state_bytes=0x16F90,minimum_graphics_bytes=0x6008,bridge_stack_bytes=288,
         prepared=['bounded disjoint native buffers','full native CPU bank mapping',
             'four writable programme banks and read-only BIOS','per-instance WDM row',
-            'full-width WDM/RAM register bridges','native working/transfer CHR buffers',
-            'RSP wait and data-cache writeback calls'],
-        pending=['checked startup allocation/packet loading','native common reset and QD initializer',
-            'native image-extent correction','I/O and scanline IRQ bridges','expansion sound/motor integration',
+            'full-width WDM/RAM/read/write/IRQ register bridges','native working/transfer CHR buffers',
+            'RSP wait and data-cache writeback calls','cold native state and instruction-table initialization',
+            'donor reset-button RAM/PPU/BIOS retention','native disk I/O and scanline IRQ routes',
+            'native nametable mirroring','native timed motor audio events and timer waits'],
+        pending=['checked startup allocation/packet loading','session initialization and reset call hooks',
+            'native image-extent correction','audio initialization/DPCM banks and expansion synthesis',
             'frame/reset/close persistence and ordinary gameplay'],
         installed=False,native_execution_tested=False,
         sources={p:sha256((ROOT/p).read_bytes()) for p in NATIVE_SOURCES})
@@ -100,11 +114,11 @@ def prepare(dol,archive,output,original_rom):
             'complete fast-boot initialization span','private BIOS reset patches','five BIOS WDM services',
             'complete native CHR tile conversion',
             'disk register reads/writes','source scanline IRQ state','source frame/ready/motor state'],
-        pending=['native disk-state allocation and reset mapping','native WDM dispatch/register bridge',
-            'CPU/PPU register and scanline bindings','native CHR buffer/cache bindings','expansion sound and motor synchronization',
-            'native startup and normal room return'],
+        pending=['installation of prepared native module and complete buffer allocations',
+            'audio initialization/DPCM banks and expansion synthesis',
+            'native image-extent and session hooks','native startup and normal room return'],
         native_hooks_installed=False,choice_eligible=False,
         sources={s:sha256((ROOT/s).read_bytes()) for s in SOURCES})
-    report['native_binding']=prepare_native(output,native)
+    report['native_binding']=prepare_native(output,native,dol)
     write_new(output/'console_disk/disk.json',(json.dumps(report,indent=2)+'\n').encode())
     return report

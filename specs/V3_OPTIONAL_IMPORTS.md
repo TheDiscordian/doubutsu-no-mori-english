@@ -112,9 +112,11 @@ special-instruction services, private reset patches, bounded boot/save operation
 disk registers, interrupt state, per-frame readiness/motor state, and complete
 native-layout character conversion. A native module prepares the complete bank
 mapping, programme-RAM writes, WDM register bridges, actual character-buffer
-bindings, and RSP/cache calls. Donor C comparisons, host-adapter checks, and emitted
-bridge-instruction checks pass. Native reset/initialization, disk I/O/IRQ/audio,
-startup installation, and lifecycle integration remain required; preparation
+bindings, RSP/cache calls, cold initialization, reset-button retention, native
+disk I/O/IRQ routes, nametable mirroring, and timed motor/audio-queue synchronization.
+Donor C comparisons, host-adapter checks, and emitted bridge-instruction checks
+pass. Audio initialization/DPCM banks, expansion synthesis, startup installation,
+and lifecycle integration remain required; preparation
 does not enable the disk item or establish native execution.
 
 The [console converter](V3_CONSOLE_GAMES.md) preserves nineteen complete game

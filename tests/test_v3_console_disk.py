@@ -2,6 +2,7 @@
 import json
 from pathlib import Path
 import re
+import struct
 import subprocess
 import sys
 import tempfile
@@ -24,6 +25,17 @@ class ConsoleDiskTests(unittest.TestCase):
         self.assertEqual(len(disks),1)
         with tempfile.TemporaryDirectory(prefix='v3-console-disk-native-') as temp:
             out=Path(temp);(out/'disk.bin').write_bytes(disks[0])
+            from types import SimpleNamespace
+            from aflib import by_vrom
+            from npc_mail_show import relocate_verified_data
+            from v3_console_games import NATIVE_VROM,NATIVE_RAM,NATIVE_SHA
+            from v3_console_emulator import RELOC,RELOC_SHA
+            rom=(ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes();files=by_vrom(rom)
+            native=files[NATIVE_VROM].extract(rom);reloc=files[RELOC].extract(rom)
+            self.assertEqual(sha256(native),NATIVE_SHA);self.assertEqual(sha256(reloc),RELOC_SHA)
+            sections=struct.unpack_from('>5I',reloc)
+            spec=SimpleNamespace(ram=NATIVE_RAM,resident_bytes=len(native)+sections[3],sections=sections)
+            (out/'native.bin').write_bytes(relocate_verified_data(spec,native,reloc,0x80300000))
             run=subprocess.run(['cc','-std=c11','-O1','-g','-Wall','-Wextra','-Werror',
                 '-fsanitize=address,undefined','-fno-omit-frame-pointer','-fno-pie','-no-pie',
                 str(ROOT/'tests/v3_console_disk_native_test.c'),
@@ -31,7 +43,7 @@ class ConsoleDiskTests(unittest.TestCase):
                 '-o',str(out/'check')],capture_output=True,text=True,timeout=30)
             self.assertEqual(run.returncode,0,run.stdout+run.stderr)
             run=subprocess.run([str(out/'check'),str(out/'disk.bin'),str(prepared/'bios.bin'),
-                str(prepared/'boot-state.bin')],capture_output=True,text=True,timeout=30)
+                str(prepared/'boot-state.bin'),str(out/'native.bin')],capture_output=True,text=True,timeout=30)
             self.assertEqual(run.returncode,0,run.stdout+run.stderr)
             print(run.stdout.strip())
 
@@ -64,7 +76,7 @@ class ConsoleDiskTests(unittest.TestCase):
             print(run.stdout.strip())
 
     def test_shared_preparation_preserves_games_and_supplies_complete_bios(self):
-        out=ROOT/'build/v3-console-games-prepared-11'
+        out=ROOT/'build/v3-console-games-prepared-13'
         report=json.loads((out/'games.json').read_text());disk=report['disk_core']
         self.assertEqual(disk,json.loads((out/'console_disk/disk.json').read_text()))
         self.assertEqual(sha256((out/'console_disk/code.bin').read_bytes()),disk['sha256'])
@@ -86,11 +98,16 @@ class ConsoleDiskTests(unittest.TestCase):
         for path,digest in binding['sources'].items():self.assertEqual(sha256((ROOT/path).read_bytes()),digest,path)
         self.assertFalse(binding['installed']);self.assertFalse(binding['native_execution_tested'])
         self.assertLessEqual(len(code),binding['planned_memory']['code']['bytes'])
+        self.assertEqual(binding['source_io_callbacks'],dict(store=0x808308C4,load=0x808303E0))
+        self.assertEqual(binding['source_reset_button']['address'],0x8003A13C)
+        self.assertEqual(binding['source_motor_sync']['address'],0x80039D58)
+        for name in ('af_v3_qd_native_initialize','af_v3_qd_native_reset_button'):
+            self.assertIn(name,binding['compiled']['symbols'])
         # Verify the assembled bridges, including o32 argument space, all full
         # register stores/loads, HI/LO, and the nonstandard t6 return. This is
         # structural checking, not execution of MIPS instructions.
-        import struct
-        for name in ('af_v3_qd_wdm_bridge','af_v3_qd_ram_bridge'):
+        for short in ('wdm','ram','read','write','irq'):
+            name='af_v3_qd_'+short+'_bridge'
             at=binding['compiled']['symbols'][name]-binding['linked_ram']
             raw=code[at:at+308];words=struct.unpack('>77I',raw)
             self.assertEqual(words[0],0x27BDFEE0)
@@ -101,7 +118,7 @@ class ConsoleDiskTests(unittest.TestCase):
             self.assertEqual(words[32:38],(0x27A80120,0xFFA800F8,0x00004010,
                 0xFFA80110,0x00004012,0xFFA80118))
             self.assertEqual(words[41:45],(0xDFA80110,0x01000011,0xDFA80118,0x01000013))
-            self.assertEqual(words[-2:],(0x01C00008,0x27BD0120))
+            self.assertEqual(words[-2:],(0x01C00008 if short in ('wdm','ram') else 0x01000008,0x27BD0120))
 
 
 if __name__=='__main__':unittest.main()

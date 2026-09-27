@@ -23,21 +23,24 @@ not claim that an item is playable. Reuse unchanged passing tests throughout.
 
 Current task: complete QD execution and native console startup/return integration.
 The shared converter prepares the complete BIOS, actual 260-byte initialization
-span, and disk-service core at `build/v3-console-games-prepared-11/`. All five BIOS
+span, and disk-service core at `build/v3-console-games-prepared-13/`. All five BIOS
 WDM services, private BIOS reset patches, and native-layout character conversion
 are implemented. Donor C boot/save
 comparisons and focused WDM/register/timing/bounds checks pass. The native module
 now supplies full CPU-bank mapping, four programme-RAM store routes, the WDM
 register bridge, actual CHR working/transfer buffer bindings, and RSP/cache calls.
+Cold initialization and donor reset-button retention are implemented, along with
+native disk I/O, scanline IRQ routing, nametable mirroring, and the complete timed
+motor/audio-queue sequence. The adapter check passes 62,166 sanitized assertions.
 Two focused checks pass; native functions are stubbed in the host test and MIPS
-bridges are structurally checked, not executed. Next finish the common native
-reset and QD initializer, all three unsafe iNES-header consumers, I/O/scanline
-bridges, expansion sound/motor synchronization, startup allocation/loading, and
-complete lifecycle/persistence.
+bridges are structurally checked, not executed. Next finish audio initialization,
+DPCM bank mapping and expansion synthesis, checked module loading, the native
+image-extent consumer, and session/frame/reset/return persistence hooks. Wire the
+prepared QD initializer/reset instead of calling the unsafe native iNES paths.
 The service is not installed or selectable; do not treat returned action flags
 as completed renderer/audio integration. See the
 [disk specification](../specs/V3_CONSOLE_DISK.md).
-The native module is 7,595 bytes, linked at `80630000`; its planned code/data/work
+The native module is 10,355 bytes, linked at `80630000`; its planned code/data/work
 range ends at `80646010`. That reservation is not installed yet. Check all actual
 retained allocations during installation; do not overwrite room resources or
 silently omit disk services to fit a smaller gap.

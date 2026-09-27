@@ -33,17 +33,19 @@ stops on resource preservation before producing a ROM; it is not installed.
 
 The shared console converter prepares the complete disk BIOS, full 260-byte
 fast-boot initialization span, and 5,139-byte QD service core at
-`build/v3-console-games-prepared-11/`. All five BIOS special-instruction services,
+`build/v3-console-games-prepared-13/`. All five BIOS special-instruction services,
 private BIOS reset patches, boot/save operations, disk registers, interrupt state,
 readiness/motor updates, and complete native-layout character conversion are
-implemented. Its separate 7,595-byte native module supplies disjoint memory
+implemented. Its separate 10,355-byte native module supplies disjoint memory
 binding, all CPU banks, four writable programme banks, read-only BIOS, per-instance
 WDM dispatch, full-width register bridges, both native character buffers, and
-RSP-wait/cache calls. Two focused checks pass, including 8,671 sanitized adapter
-assertions, emitted 64-bit bridge instructions, and preservation of all nineteen
+RSP-wait/cache calls, cold initialization, reset-button retention, disk-register
+reads/writes, scanline IRQ routing, native nametable mirroring, and complete timed
+motor/audio-queue synchronization. Two focused checks pass, including 62,166 sanitized adapter
+assertions, emitted 64-bit instructions for all five bridges, and preservation of all nineteen
 game resources. The unchanged service retains its 15,594 earlier assertions.
-The module is prepared, not installed. Common reset/initialization, disk I/O/IRQ,
-expansion sound, startup allocation/loading, and lifecycle hooks remain required;
+The module is prepared, not installed. Audio initialization, DPCM bank mapping,
+expansion synthesis, startup allocation/loading, and lifecycle hooks remain required;
 no disk profile is enabled. A compatible local N64 test emulator is built.
 See the [disk-service specification](../specs/V3_CONSOLE_DISK.md).
 

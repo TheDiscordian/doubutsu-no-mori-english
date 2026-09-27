@@ -1,5 +1,40 @@
 # Work record
 
+## 2026-09-27: native disk initialization, I/O, IRQs, and motor synchronization
+
+- The preceding goal batch is progress: commit `5403a02` supplies native banks,
+  register bridges, graphics buffers, and a compatible local test emulator.
+  The intervening publication answer verified the live V2-13 manifest and patch
+  checksum; it did not implement V3 or change either deployment.
+- Completed cold native initialization without interpreting QD as an iNES
+  cartridge. The reset button follows the pinned donor routine and preserves
+  work/programme/character RAM, PPU state, disk changes, and the booted BIOS patch.
+- Added per-instance disk read/write callbacks, three full-width bridges,
+  timer/transfer scheduling, native nametable masks, and the actual native IRQ
+  request route. Other bank-2 accesses retain the checked native controller/APU
+  callbacks. Motor changes invoke all thirteen timed audio-event sequences and
+  native timer waits, not an unconsumed action flag.
+- The expanded sanitized adapter test passes 62,166 assertions, including full
+  relocated startup tables, cold/reset retention, I/O/IRQ routes, every motor
+  event/delay, register preservation, and guards. Native services are stubs;
+  no speaker output or native gameplay is claimed. The first startup-table
+  fixture incorrectly expected file-only size; consuming the actual relocated
+  image including BSS fixes the fixture, and the justified retry passes.
+- Shared preparation `build/v3-console-games-prepared-13/` passes complete source/
+  compiled receipts, actual 64-bit instructions and return paths for all five
+  bridges, and preservation of all nineteen game payloads. Native module:
+  10,355 bytes, SHA-256
+  `ab5b2d6e3f5382acf875432e5792faeea2fa1fc01270a1faff27622581b3e0e7`.
+  One check was invoked before the final preparation finished and reported a
+  missing receipt; waiting on the same live build and checking its completed
+  output passes. The unchanged disk-service tests and old native scenarios are
+  not replayed.
+- The module remains prepared, not installed. Next complete audio initialization,
+  DPCM's separate banks and wrapping, expansion synthesis, checked module loading,
+  image-extent correction, and session/frame/reset/return persistence hooks.
+  ABI 281, 163 development choices, format-five saves, the main V3 lock, and both
+  stable V2-13 patchers are retained. No disk import is enabled prematurely.
+
 ## 2026-09-27: native QD CPU/graphics bindings and compatible test emulator
 
 - Committed and pushed the completed prior graphics/handover batch as `4281572`.
