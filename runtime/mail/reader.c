@@ -43,6 +43,14 @@ static int active(const void *state) {
  */
 static unsigned int header_name(unsigned char *destination, const unsigned char *mail, unsigned int length) {
     unsigned int i;
+#ifdef AF_MUSEUM_HEADER
+    /* V2 uses museum_reader.s to add this case without shifting resident exports. */
+    if (mail[0x10] == 2u) {
+        static const unsigned char museum[] = "Museum";
+        length = 6;
+        for (i = 0; i < length; ++i) destination[i] = museum[i];
+    } else
+#endif
     if (mail[0x10] == 1u && mail[0x0C] < AF_VILLAGER_COUNT &&
             af_load_display_name(destination, AF_DISPLAY_NAME_WIDTH, 0xE000u|mail[0x0C]))
         length = AF_DISPLAY_NAME_WIDTH;

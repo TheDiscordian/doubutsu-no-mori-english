@@ -18,6 +18,9 @@ memory requirement; permission to use eight MiB does not itself change heap boun
   generated patches in ignored directories. Commit original tools, translation
   edits, specifications, provenance records, and test fixtures made for testing.
 - Never distribute a full ROM. Public releases contain patches and instructions.
+- Keep the public and local patcher deployments on the latest verified stable V2
+  corrections. Experimental V3 source may be published on its development branch,
+  but V3 must not replace either patcher until the user has tested and approved it.
 - The existing development repository is the public source and GitHub Pages
   repository; keep its name. The exact reviewed browser recipe, manifest, and
   poster under `web/` are the only generated game-derived publication assets

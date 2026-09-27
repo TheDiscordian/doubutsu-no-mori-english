@@ -2,8 +2,13 @@
 
 ## Active development
 
-The current cartridge is **V2-11** at
-`build/v2-keyboard-fit-11/Animal Forest English V2.z64`.
+The current cartridge and browser-patcher target are **V2-13** at
+`build/v2-combined-13/Animal Forest English V2.z64`. The credits use the official
+`Animal Crossing` title, and both letter editing and reading show `Museum` in
+their headers. These fixes coexist in the same cartridge. The public and local
+patchers target this build; experimental V3 is not deployed. See the
+[publication checkpoint](checkpoints/V2_13_PUBLICATION.md) for hashes, focused
+verification, and remaining hardware-test limits.
 The [compact keyboard layout](../specs/KEYBOARD_V2_LAYOUT.md) uses a key-only
 grey tray with separate attached N64-style shoulders and grips, native coloured
 buttons, and the animated N64 stick. Case-alteration/order combination hints
@@ -30,7 +35,7 @@ declines a request, and completes K.K. Western through the return to dialogue.
 Continuous analysis of 156 seconds finds no frozen game-picture interval of
 0.5 seconds or longer. The user reports improved appearance; exhaustive hardware
 and all-song testing are not claimed.
-Save formats are unchanged; compatibility with V2-10 is expected both ways
+Save formats are unchanged; compatibility with previous V2 builds is expected both ways
 without migration. Existing builds and saves remain preserved.
 The README introduces the current V2
 translation to public readers, with patching instructions, hardware requirements,

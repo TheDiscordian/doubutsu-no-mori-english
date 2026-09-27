@@ -3,7 +3,7 @@
 ## Compact N64 keyboard presentation
 
 The [key-only tray and attached N64-style sections](../specs/KEYBOARD_V2_LAYOUT.md)
-are complete in **V2-11**, at `build/v2-keyboard-fit-11/`.
+are included in **V2-13**, at `build/v2-combined-13/`.
 The Cursor shell is eight pixels narrower and four pixels left, with its
 contents re-centred. Page/Done and their icons sit four pixels lower inside
 a 30-pixel-high shell. Only position/size tables change from V2-10.
@@ -19,7 +19,11 @@ and remaining hardware/other-caller acceptance; no implementation is pending.
 
 ## Current V2 corrections
 
-**V2-11** retains the faraway museum recipient label and the credits
+**V2-13** combines the official `Animal Crossing` credits title and English
+museum letter headers. Both patcher deployments target this build; experimental
+V3 is not deployed. The [publication checkpoint](checkpoints/V2_13_PUBLICATION.md)
+records the current hashes, browser downloads, and save/hardware limits.
+The cartridge retains the faraway museum recipient label and the credits
 drawing-buffer correction. The [focused verification](checkpoints/V2_PERFORMANCE_FIXES.md)
 passes on V2-08's unchanged resources, including all sixteen credits pages, sampled
 fades, unchanged geometry, and native museum/villager/player identity handling.
@@ -40,8 +44,8 @@ edit the released trailer.
 ## Local browser patcher and map correction
 
 The [portal](WEB_PORTAL.md) is running at **http://127.0.0.1:8073/**, serving
-`build/web-portal-06/site`. Browser-only patching of both verified game inputs
-produces current V2-11. The [map correction](../specs/MAP_TOWN_SUFFIX_FIX.md)
+`build/web-portal-07/site`. Browser-only patching of both verified game inputs
+produces current V2-13. The [map correction](../specs/MAP_TOWN_SUFFIX_FIX.md)
 omits the independent Japanese `むら` image beside the town name without save,
 code, allocation, or unrelated-art changes. The released trailer is untouched.
 Implementation and focused verification are complete; user portal feedback,
@@ -83,7 +87,7 @@ The [N64-inspired keyboard](../specs/KEYBOARD_V2.md) is implemented on V1 Final:
 grey shading, native N64 button icons and pressed feedback, and a left-side
 stick graphic. The accepted key layout, sounds, proportional editor, controls,
 and saved capacities remain intact. The current development ROM is
-`build/v2-keyboard-fit-11/Animal Forest English V2.z64`, retaining the
+`build/v2-combined-13/Animal Forest English V2.z64`, retaining the
 map-suffix correction and adding the compact N64-style layout.
 
 The [fit record](checkpoints/KEYBOARD_V2_FIT.md) owns current checks,

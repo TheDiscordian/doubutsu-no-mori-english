@@ -26,7 +26,7 @@ jobs:
           PUBLIC_SITE: ${{ !github.event.repository.private }}
         run: python3 tools/prepare_pages.py --output build/pages --public="$PUBLIC_SITE"
       - name: Test website packaging
-        run: python3 -m unittest tests.test_prepare_pages -v
+        run: python3 -m unittest tests.test_prepare_pages tests.test_v2_combined_release -v
       - name: Test browser patch engine
         run: node --test tests/web_portal.test.mjs
       - name: Preserve the verified Pages artifact
