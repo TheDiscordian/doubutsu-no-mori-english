@@ -33,13 +33,18 @@ stops on resource preservation before producing a ROM; it is not installed.
 
 The shared console converter prepares the complete disk BIOS, full 260-byte
 fast-boot initialization span, and 5,139-byte QD service core at
-`build/v3-console-games-prepared-09/`. All five BIOS special-instruction services,
+`build/v3-console-games-prepared-11/`. All five BIOS special-instruction services,
 private BIOS reset patches, boot/save operations, disk registers, interrupt state,
 readiness/motor updates, and complete native-layout character conversion are
-implemented. Two focused checks pass, including
-15,594 sanitized donor/boundary assertions and preservation of all nineteen game
-resources. Native CPU/PPU/sound and instruction-dispatch bindings remain
-unfinished; no disk profile is enabled.
+implemented. Its separate 7,595-byte native module supplies disjoint memory
+binding, all CPU banks, four writable programme banks, read-only BIOS, per-instance
+WDM dispatch, full-width register bridges, both native character buffers, and
+RSP-wait/cache calls. Two focused checks pass, including 8,671 sanitized adapter
+assertions, emitted 64-bit bridge instructions, and preservation of all nineteen
+game resources. The unchanged service retains its 15,594 earlier assertions.
+The module is prepared, not installed. Common reset/initialization, disk I/O/IRQ,
+expansion sound, startup allocation/loading, and lifecycle hooks remain required;
+no disk profile is enabled. A compatible local N64 test emulator is built.
 See the [disk-service specification](../specs/V3_CONSOLE_DISK.md).
 
 The current proposal is ABI 281 at
@@ -55,8 +60,8 @@ missing room audio handover. Corrected launch reaches native console audio but
 the debugger stops on the new thread's recoverable FPU-ownership exception.
 The installed emulator lacks the required signal-pass command; both corrected
 attempts are spent. Full native gameplay/return remains unverified, not a passed
-scenario or hardware handoff. Continue QD integration; build the compatible local
-test emulator before the next relevant native check. See the
+scenario or hardware handoff. Continue QD integration; use the compatible local
+test emulator for the next relevant native check. See the
 [capacity checkpoint](checkpoints/V3_CONSOLE_CAPACITY.md).
 
 The room integration is retained from ABI 280 at

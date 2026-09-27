@@ -23,18 +23,24 @@ not claim that an item is playable. Reuse unchanged passing tests throughout.
 
 Current task: complete QD execution and native console startup/return integration.
 The shared converter prepares the complete BIOS, actual 260-byte initialization
-span, and disk-service core at `build/v3-console-games-prepared-09/`. All five BIOS
+span, and disk-service core at `build/v3-console-games-prepared-11/`. All five BIOS
 WDM services, private BIOS reset patches, and native-layout character conversion
 are implemented. Donor C boot/save
-comparisons and focused WDM/register/timing/bounds checks pass. Next connect native
-disk memory/reset, WDM dispatch/register mapping, CPU/PPU and scanline consumers, character-buffer/cache bindings,
-expansion sound/motor synchronization, and complete lifecycle/persistence.
+comparisons and focused WDM/register/timing/bounds checks pass. The native module
+now supplies full CPU-bank mapping, four programme-RAM store routes, the WDM
+register bridge, actual CHR working/transfer buffer bindings, and RSP/cache calls.
+Two focused checks pass; native functions are stubbed in the host test and MIPS
+bridges are structurally checked, not executed. Next finish the common native
+reset and QD initializer, all three unsafe iNES-header consumers, I/O/scanline
+bridges, expansion sound/motor synchronization, startup allocation/loading, and
+complete lifecycle/persistence.
 The service is not installed or selectable; do not treat returned action flags
 as completed renderer/audio integration. See the
 [disk specification](../specs/V3_CONSOLE_DISK.md).
-The 5,139-byte core already exceeds the spare gap between the resident room
-callback and its table. Plan a checked complete native-code allocation; do not
-overwrite room resources or silently omit disk services to fit that gap.
+The native module is 7,595 bytes, linked at `80630000`; its planned code/data/work
+range ends at `80646010`. That reservation is not installed yet. Check all actual
+retained allocations during installation; do not overwrite room resources or
+silently omit disk services to fit a smaller gap.
 Continue from ABI 281 at `build/v3-console-emulator-capacity-01/build-lock.json`,
 ROM SHA-256 `763bbcbeca77390e797039c79ee8ae83a2a7b7497b5768db81534ed0ce14a62d`.
 The checked allocator and safe shared-runtime refresh are installed; four
@@ -42,9 +48,9 @@ focused host/cartridge/composition checks pass. A native largest-game transition
 allocates its full image and backup, leaving 130,304 arena bytes. The original
 test wait omits the room's audio handover; the corrected helper includes it and
 reaches native console audio. The debugger then stops on normal lazy FPU ownership.
-The installed `/usr/bin/ares` lacks `QPassSignals:10`; local source supports it
-but no local executable is built. Both corrected attempts are spent. Build that
-tool before the next relevant native batch, retain graph-thread diagnostics, and
+The installed `/usr/bin/ares` lacks `QPassSignals:10`; the compatible local N64
+build is `build/ares-n64-debugger/rundir/bin/ares`. Both corrected attempts are
+spent. Use that tool for the next changed native batch, retain graph-thread diagnostics, and
 do not repeat the unsupported-command test. Full gameplay/return and ordinary
 entry remain unverified. See the [capacity checkpoint](checkpoints/V3_CONSOLE_CAPACITY.md).
 The common room callback and eleven complete console profiles/models are

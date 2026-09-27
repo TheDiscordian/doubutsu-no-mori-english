@@ -109,9 +109,11 @@ completed scenario or evidence of a game memory fault.
 The one setup retry at `build/v3-console-game-handover-02/` explicitly requests
 `QPassSignals:10` before launch so the game's own exception handler can execute.
 `/usr/bin/ares` returns an unsupported empty response, and the fixture stops.
-The local ares source supports that command, but no local executable is built.
-Both attempts are spent. Build the compatible local test tool before the next
-changed native batch; do not repeat this capability failure or edit the CPU's
+The compatible local N64 executable is
+`build/ares-n64-debugger/rundir/bin/ares`; its build and version command pass.
+The [disk specification](../../specs/V3_CONSOLE_DISK.md#compatible-local-native-test-emulator)
+records its identity and build instructions. Both attempts are spent. Use that
+tool for the next changed native batch; do not repeat this capability failure or edit the CPU's
 FPU ownership to manufacture a pass. Real fault checks remain required.
 
 Full emulator initialization, image verification, advancing gameplay, normal

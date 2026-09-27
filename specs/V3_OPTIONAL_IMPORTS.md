@@ -110,9 +110,12 @@ The [QD services](V3_CONSOLE_DISK.md) are prepared through the same console
 converter: complete donor BIOS and fast-boot initialization data, all five BIOS
 special-instruction services, private reset patches, bounded boot/save operations,
 disk registers, interrupt state, per-frame readiness/motor state, and complete
-native-layout character conversion. Donor C
-comparisons and focused WDM/register/bounds checks pass. Native dispatch, graphics, audio, and
-lifecycle integration remain required; preparation does not enable the disk item.
+native-layout character conversion. A native module prepares the complete bank
+mapping, programme-RAM writes, WDM register bridges, actual character-buffer
+bindings, and RSP/cache calls. Donor C comparisons, host-adapter checks, and emitted
+bridge-instruction checks pass. Native reset/initialization, disk I/O/IRQ/audio,
+startup installation, and lifecycle integration remain required; preparation
+does not enable the disk item or establish native execution.
 
 The [console converter](V3_CONSOLE_GAMES.md) preserves nineteen complete game
 payloads, twenty launch bindings, and sixty persistence operations. Its common

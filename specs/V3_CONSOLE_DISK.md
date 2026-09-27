@@ -12,7 +12,7 @@ python3 tools/v3_furniture_pipeline.py convert --representation console \
   --output build/v3-console-games-prepared-next
 ```
 
-The current preparation is `build/v3-console-games-prepared-09/`.
+The current preparation is `build/v3-console-games-prepared-11/`.
 Its zero-linked MIPS disk service is 5,139 bytes, SHA-256
 `14cf5bb33f41256086b24b48a5a8c152844d20e71a2ae25fe41f8b7f0bd766da`.
 It uses no mutable globals or unresolved library calls. The largest stack chain
@@ -143,9 +143,9 @@ The prepared-resource check verifies MIPS/source receipts, complete BIOS/boot-st
 identity/vectors, unchanged nineteen-game resources, and explicit non-installation.
 No historical ROM or unchanged native scenario is replayed for this preparation.
 
-Remaining implementation is required: native disk memory/reset mapping, the
-WDM dispatch/register bridge, CPU/PPU read/write and interrupt bindings,
-native character-buffer/cache bindings, expansion sound and motor synchronization, complete
+Remaining implementation is required: checked installation of the native module,
+common native reset and the QD initializer, image-extent correction, I/O and
+interrupt bridges, expansion sound and motor synchronization, complete
 save/frame/reset/return integration, and enabling the actual source furniture
 only when those dependencies work. Reuse partial native disk-register machinery
 where verified; a missing mapper-20 table entry is not an inventory of all
@@ -179,17 +179,85 @@ past one of them. Reset must still preserve native common graphics/audio setup.
 The current code reservation below `804FB000` and gap after the room callback
 cannot hold the complete disk module. The current model-pool reservation ends
 at `8062C020`; the fault framebuffer begins at `807DA800`. A separate checked
-Expansion Pak reservation above the pool is a candidate for complete code,
-32-KiB programme RAM, 8-KiB characters, private BIOS, and disk context. It is not
-allocated yet. Validate the actual build's complete reservations before choosing
-the range, and retain low-memory native game arenas and room resources unchanged.
+Expansion Pak reservation is planned at `80630000..8064600F`, containing the
+complete code, immutable/private BIOS copies, boot data, disk context, 32-KiB
+programme RAM, 8-KiB characters, and a final guard. `binding.json` records each
+subrange. It is not allocated yet. Validate the actual build's complete
+reservations before installation; retain low-memory native game arenas and
+room resources unchanged.
 
 The [capacity checkpoint](../docs/checkpoints/V3_CONSOLE_CAPACITY.md) records the
 startup-test correction and incomplete native evidence. The title-state fixture
 now supplies the real room's audio handover. Its corrected launch reaches native
 console audio, where the debugger stops on recoverable lazy FPU ownership.
-The installed debugger lacks the required signal-pass capability; its local
-source supports it. Both corrected-fixture attempts are spent. Build a compatible
-local test emulator before the next relevant native batch, without repeating the
-unsupported command or masking actual faults. No gameplay, ordinary save cycle,
-or original-hardware claim is made.
+The installed debugger lacks the required signal-pass capability. Both
+corrected-fixture attempts are spent. Use the compatible local build below for
+the next changed native batch, without replaying those scenarios or masking
+actual faults. No gameplay, ordinary save cycle, or original-hardware claim is made.
+
+## Prepared native CPU and graphics module
+
+`console_disk_native.c/.h/.ld` and `console_disk_bridge.S` compile with the complete
+service into 7,595 bytes at `80630000`, SHA-256
+`5b6a042071f540d0bd7f96dc27c31dfb360f2801eae92ef7335d08298ac21626`.
+The ordinary converter writes its source/compiler receipt to
+`console_disk_native/binding.json`. No mutable globals or unresolved calls exist.
+This module is not a standalone replacement emulator and is not loaded by the
+current cartridge.
+
+Binding checks complete native state (`16F90` bytes), graphics (`6008` minimum),
+disk, programme, character, BIOS, boot, and context extents for overlap before
+mutating them. The native bank table contains address biases, not the bounded
+service's bank-local pointers: banks 3–6 all use programme base minus `6000`,
+and bank 7 uses BIOS base minus `E000`. All four programme banks have actual
+write callbacks. The BIOS keeps a no-op store. Native cartridge/disk state and
+instruction tables are not globally replaced.
+
+The instance's WDM row retains the checked native size/cycle fields `02FF0200`:
+two fetched bytes, native cycle increment `0200`. Its assembly bridge reserves
+288 stack bytes, including the o32 argument area, and saves all full-width
+integer registers plus HI/LO. It returns through `t6`. Only service-modified CPU
+fields change; unchanged values retain their original upper halves. The maximum
+known bridge/dispatch/WDM/save/validation chain is 528 bytes. Native wrapper/OS
+stack requirements still belong in the installed runtime capacity check.
+`.set gp=64` is required: under the ordinary o32 assembler mode, `sd`/`ld` expand
+to pairs of instructions using adjacent 32-bit registers, which corrupts this
+register frame. The emitted-instruction check rejects those expansions.
+
+Character binding points the native PPU write callback at the complete private
+8-KiB raw data and retains all eight identity banks. Converted data reach both
+state+`62C8` and graphics+`2008`. The actual native RSP-wait function is called
+before conversion, followed by writeback of both buffers. The RSP completion
+word at state+`1ACC` is not copied into the donor's unrelated frame flags. The
+native dynamic-character path is selected; GPU execution is not established by
+these host adapter checks.
+
+Two focused checks pass across targeted invocations. The sanitizer fixture
+executes 8,671 checks against the complete actual donor disk/BIOS, including all
+bank edges, programme stores, full boot, register preservation, both CHR buffers,
+call order, non-mutating binding rejection, and guards. Native RSP/cache calls
+are stubs. The prepared-resource check verifies source/code receipts, actual
+64-bit bridge opcodes and return, and unchanged nineteen-game resources. The
+underlying unchanged service retains its earlier donor comparison evidence.
+Neither test executes MIPS or claims installed disk gameplay.
+
+## Compatible local native-test emulator
+
+The N64-only test executable is `build/ares-n64-debugger/rundir/bin/ares`, built
+from clean `local/ares` revision `af4cbb04f067682a8a3cf42695ff78bed634b38d`.
+Executable SHA-256:
+`4643dcbfb9ba95b4121e8f1fcb3b578b5f49c02d0835b19bb4a030d19a153c42`.
+The build completes and `--version` runs successfully. The source implements
+`QPassSignals:10`; a new native game scenario has not been run with this binary.
+No system packages, system emulator, user configuration, or saves are changed.
+
+```sh
+cmake -S local/ares -B build/ares-n64-debugger -G Ninja \
+  -DCMAKE_BUILD_TYPE=Release -DARES_CORES=n64 -DARES_SKIP_DEPS=ON \
+  -DARES_ENABLE_LIBRASHADER=OFF -DARES_ENABLE_CHD=OFF
+cmake --build build/ares-n64-debugger --parallel 4
+```
+
+Use the existing silent, isolated scenario runner and explicitly supply this
+binary for the next changed native integration batch. Do not replay exhausted
+historical fixtures solely because the tool is now available.

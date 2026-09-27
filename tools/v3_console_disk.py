@@ -22,6 +22,38 @@ FUNCTIONS=(
     ('frame_disk',0x8003B3C0,0x84,'6bd4a8cdc701decd98634377876c6cb7d488b0a9e5fe33b0fc6114dbdf33fc91'))
 SOURCES=('tools/v3_console_disk.py','tools/v3_console_games.py','tools/v3_asset_loader.py',
     'overlays/v3/console_disk.c','overlays/v3/console_disk.h','overlays/v3/console_disk.ld')
+NATIVE_SOURCES=SOURCES+('overlays/v3/console_disk_native.c','overlays/v3/console_disk_native.h',
+    'overlays/v3/console_disk_native.ld','overlays/v3/console_disk_bridge.S')
+
+
+def prepare_native(output,native):
+    from v3_asset_loader import ROOT,compile_part
+    from v3_console_games import NATIVE_RAM,NATIVE_SHA
+    row=native[0x80836770-NATIVE_RAM+0x42*16:0x80836770-NATIVE_RAM+0x43*16]
+    if sha256(native)!=NATIVE_SHA or row.hex()!='80832810000000000000000002ff0200':
+        raise ValueError('Changed complete native interpreter/WDM encoding')
+    code,compiled=compile_part('console_disk_native',output/'console_disk_native',
+        extra_sources=('overlays/v3/console_disk.c','overlays/v3/console_disk_bridge.S'))
+    receipt=dict(format='AFV3-CONSOLE-DISK-NATIVE-1',compiled=compiled,
+        source_native_sha256=NATIVE_SHA,source_wdm_row=row.hex(),
+        planned_memory=dict(code=dict(ram=0x80630000,bytes=0x6000),
+            immutable_bios=dict(ram=0x80636000,bytes=8192),context=dict(ram=0x80638000,bytes=512),
+            boot_state=dict(ram=0x80638200,bytes=260),program=dict(ram=0x8063A000,bytes=32768),
+            characters=dict(ram=0x80642000,bytes=8192),private_bios=dict(ram=0x80644000,bytes=8192),
+            guard=dict(ram=0x80646000,bytes=16)),
+        bytes=len(code),sha256=sha256(code),linked_ram=0x80630000,
+        native_state_bytes=0x16F90,minimum_graphics_bytes=0x6008,bridge_stack_bytes=288,
+        prepared=['bounded disjoint native buffers','full native CPU bank mapping',
+            'four writable programme banks and read-only BIOS','per-instance WDM row',
+            'full-width WDM/RAM register bridges','native working/transfer CHR buffers',
+            'RSP wait and data-cache writeback calls'],
+        pending=['checked startup allocation/packet loading','native common reset and QD initializer',
+            'native image-extent correction','I/O and scanline IRQ bridges','expansion sound/motor integration',
+            'frame/reset/close persistence and ordinary gameplay'],
+        installed=False,native_execution_tested=False,
+        sources={p:sha256((ROOT/p).read_bytes()) for p in NATIVE_SOURCES})
+    write_new(output/'console_disk_native/binding.json',(json.dumps(receipt,indent=2)+'\n').encode())
+    return receipt
 
 
 def donor_resources(dol,archive):
@@ -73,5 +105,6 @@ def prepare(dol,archive,output,original_rom):
             'native startup and normal room return'],
         native_hooks_installed=False,choice_eligible=False,
         sources={s:sha256((ROOT/s).read_bytes()) for s in SOURCES})
+    report['native_binding']=prepare_native(output,native)
     write_new(output/'console_disk/disk.json',(json.dumps(report,indent=2)+'\n').encode())
     return report

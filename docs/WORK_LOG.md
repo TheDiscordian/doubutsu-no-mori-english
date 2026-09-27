@@ -1,5 +1,30 @@
 # Work record
 
+## 2026-09-27: native QD CPU/graphics bindings and compatible test emulator
+
+- Committed and pushed the completed prior graphics/handover batch as `4281572`.
+  The previous goal work is progress: implemented conversion and diagnosed the
+  missing test handover. The publication clarification separately verified both
+  deployments serving stable V2-13; it did not implement V3.
+- Added the native disk memory/CPU adapter, all four programme-RAM store routes,
+  read-only BIOS mapping, per-instance WDM table entry, full-width integer-register
+  bridges, real CHR buffer bindings, and native RSP/cache calls. Common reset,
+  I/O/IRQ/audio, checked startup loading, and lifecycle installation remain open.
+- The sanitizer adapter check passes 8,671 assertions. The emitted-code check
+  caught o32 expansion of `sd`/`ld`; explicit `gp=64` fixes the actual instructions.
+  Prepared output 10 records that rejected bridge, not a passing build. Output 11
+  passes source/compiled receipts, real 64-bit bridge encoding, and retained
+  nineteen-game resources. Native module: 7,595 bytes, SHA-256
+  `5b6a042071f540d0bd7f96dc27c31dfb360f2801eae92ef7335d08298ac21626`.
+- Built the clean local ares source as an N64-only executable, using existing
+  dependencies and no installations. Its version command passes. The executable
+  supplies the source-level signal-pass support needed for the next changed
+  native batch; no exhausted scenario was replayed and no audio was played.
+- ABI 281, the main V3 lock, selections, format-five saves, and both V2-13 patcher
+  deployments remain unchanged. The new module is not loaded or selectable.
+  Continue common native reset/initialization and disk I/O/IRQ/audio integration,
+  then complete checked allocation/loading and session/save hooks.
+
 ## 2026-09-27: native disk tile conversion and startup handover diagnosis
 
 - Added complete bounded native CHR conversion, checking the actual 88-byte
