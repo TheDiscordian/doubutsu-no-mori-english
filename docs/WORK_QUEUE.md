@@ -41,6 +41,15 @@ working floats occupy unused matrix slot nine, outside all eight morph joints.
 See the [batch checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#installed-switched-joint-lifecycles)
 for exact evidence and outstanding gameplay/hardware limits.
 
+For the compass, continue from the complete donor implementation in
+`local/ac-decomp/src/furniture/ac_ike_jny_houi01.c`, including its parent motion,
+rotation kick, damped oscillation, and needle world-angle correction. Native
+state table `8094D0F4` maps wait states 7/8 through `80944D9C/80944DCC` to 4/3;
+the shared rotation code `809443FC` increases angle field `34` for state 3 and
+decreases it for state 4. These are observed native directions, not yet a
+verified donor-left/right mapping. Parent/child lookup still needs a native
+binding or a complete adapter; do not replace it with an always-null parent.
+
 Four complete joint-callback rigs are reusable from
 `build/v3-joint-callback-rigs-prepared-01/`: compass, lighthouse, moon, and
 snowcone machine. One compiler batch retains 16,480 bytes and all 290 triangles,
