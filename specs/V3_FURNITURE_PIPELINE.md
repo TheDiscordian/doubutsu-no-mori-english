@@ -774,6 +774,10 @@ as one dependency batch. Prepared console artwork includes those launch receipts
 missing native gameplay still prevents installation. The absent game-twenty
 payload is distinct from the twelve supplied additions. Existing native mapper
 callbacks do not by themselves establish complete launch or persistence support.
+Console conversion also prepares the common bounded save executor. It preserves
+all four players' separate progress and the complete score/reset/battery/disk
+semantics. Preparation and donor comparisons do not enable games or install
+FlashRAM storage; readiness still requires native integration.
 
 The ordinary `import` dependency planner includes scrolling resources, complete
 positioned-loop/switch-fade audio, and draw-only or audio-backed profiles. Audio

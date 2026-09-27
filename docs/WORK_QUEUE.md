@@ -22,6 +22,16 @@ Incomplete gameplay stays unavailable in the selector; installing assets does
 not claim that an item is playable. Reuse unchanged passing tests throughout.
 
 Current task: finish the shared console launch/storage importing category.
+The shared save executor is prepared at `build/v3-console-games-prepared-03/`:
+3,476 MIPS bytes, all sixty recipes, and four independent player blocks.
+Actual donor comparisons and compiled/source checks pass. Continue with a bounded
+native storage design for the complete 6,528 player bytes; the format-four
+capsule has only 432 spare bytes. Do not merge players, truncate progress, assume
+compression always fits, or remove the backup bank to force a fit. Then connect
+the native emulator/room launch, full graphics allocation, frame/reset/exit
+hooks, and QD dependency. Reuse the prepared models/games and passing core checks.
+See the [console checkpoint](checkpoints/V3_CONSOLE_PERSISTENCE.md).
+
 Native exercise is installed through the shared player importer in ABI 275 at
 `build/v3-player-exercise-imports-01/player-exercise-native/build-lock.json`, ROM SHA-256
 `a940dab0ff14f5fc0e0bed23c78d5500c874da7a9f269e89e321c0106453e205`.
@@ -207,9 +217,11 @@ The initial native workspace allocation failure is resolved by the one sparse
 fixture retry. Do not repeat these checks without a relevant change. See the
 [capacity checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#complete-model-bank-capacity).
 
-Console preparation at `build/v3-console-games-prepared-02/` retains
+Console preparation at `build/v3-console-games-prepared-03/` retains
 all nineteen complete game payloads, sixty save operations, full source tags,
-and twenty furniture launch bindings. Six focused checks pass. Twelve game
+and twenty furniture launch bindings. The six preparation checks are retained;
+two new targeted checks verify the common save executor and current preparation.
+Twelve game
 payloads are additions; the disk-system Zelda furniture requests an absent
 twentieth payload and is explicitly unused for this donor. The complete fourteen
 console models are reusable from `build/v3-constant-materials-prepared-01/`.
@@ -219,7 +231,7 @@ Continue native launch/allocation/save integration and remaining unsupported
 model/material/animation categories. The N64 has actual mapper-one/four/nine
 callbacks, but their presence is not execution evidence. Its graphics allocation
 and current format-four save capsule cannot be assumed to hold the larger games
-and full 1,623-byte save payload. Keep complete data and fix those bounds; do not
+and four independent 1,632-byte save blocks. Keep complete data and fix those bounds; do not
 drop persistence or use per-title installers. See the
 [console specification](../specs/V3_CONSOLE_GAMES.md).
 

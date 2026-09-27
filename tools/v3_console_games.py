@@ -16,6 +16,20 @@ TAGS_TABLE = 0x800AAA30
 GAME_COUNT = 19
 HEADER_BYTES, ENTRY_BYTES, OP_BYTES = 32, 64, 16
 SAVE_HEADER_BYTES = 8
+SAVE_PLAYER_BYTES, SAVE_PLAYERS, SAVE_CONTAINER_HEADER_BYTES = 0x660, 4, 0x40
+PERSISTENCE_FUNCTIONS = (
+    ('famicom_save_data_setup',0x80041650,0x1B4,'e1bd92f29e9d756e2b4c5bf7877d83067b5030c579095874d7aaf55eae3cdc7e'),
+    ('famicom_save_data_init',0x80041804,0x5C,'eb38ba0d8b27b1468ad3f74d50466e33c12eea56ab785591fa1f012edf2a49b1'),
+    ('famicom_save_data_check',0x80041860,0x130,'965f0b8e8752735879457a00b13bb387127f9250971f0b16baa0350870aed398'),
+    ('famicom_init',0x80043C54,0xD7C,'5efa64d552e7ac9c7b972643c8b3d9a899d27e87e8420659f8cf47907c7fa97b'),
+    ('famicom_cleanup',0x80044BE8,0x228,'0a3a929557ff2a5b7b97d65267bee40081907e5878ea4e105b247bf57774732d'),
+    ('update_highscore_raw',0x800468FC,0x128,'e580c558f843460b37cd23a381319ff6e35f8e79f3bd1754ff6c68e1019713f9'),
+    ('special_zelda',0x80046DB0,0x188,'0f607b67cbdab77dfa081c40e556a2fbc38b42690f178ba351b02bddaf08c069'),
+    ('nesinfo_tag_process1',0x80046F38,0x6E8,'ba07c1df4be07bdaf8cf6bc118627f3da80453c3818954a54956b3a2f7c50109'),
+    ('nesinfo_tag_process3',0x80047918,0x29C,'fe309d396ebdac0411d56ecf0f83d6983734ff826c7d8068110abc86b4325ca7'),
+    ('nesinfo_update_highscore',0x80047BB4,0x200,'09b3093c9b3b75df2c2927c8ce70e2aef5f83265e9e00a0fd233b02cf8183771'),
+    ('highscore_setup_flags',0x80047E0C,0x34,'62aca9c1d30e8454efad4668877faa02aa78af9f5a20d0af71dad922afb33be1'),
+)
 # This exact donor tag has a six-byte length followed by eight name bytes.
 # Repair only the length, retaining the original record and a correction receipt.
 BAD_NAME_TAG_SHA = '17e687cb235a547870053a8dbef2994523cdc1561f11caee9469c6b2e4ff07c1'
@@ -273,14 +287,45 @@ def build_bundle(dol, archive):
             name=cstring(dol, title_at), alternate_name=cstring(dol, kanji_at),
             native_launch_installed=False, persistence_installed=False))
     extent = max(occupied, default=-1)+1
+    if extent+SAVE_HEADER_BYTES > SAVE_PLAYER_BYTES:
+        raise ValueError('Complete console saves exceed their donor player allocation')
     blob.extend(bytes((-len(blob)) & 15))
     struct.pack_into('>4s7I', blob, 0, b'AFNE', 1, GAME_COUNT, ENTRY_BYTES,
                      HEADER_BYTES+GAME_COUNT*ENTRY_BYTES, extent, SAVE_HEADER_BYTES, len(blob))
     report = dict(format='AFV3-CONSOLE-GAMES-1', source_dol_sha256=sha256(dol.data),
         source_archive_sha256=sha256(archive), rows=rows, bytes=len(blob), sha256=sha256(blob),
         save_payload_bytes=extent, save_header_bytes=SAVE_HEADER_BYTES,
+        save_layout=persistence_contract(dol),
         runtime_installed=False, choice_eligible=False)
     return report, bytes(blob)
+
+
+def persistence_contract(dol):
+    functions=[]
+    for name,address,size,digest in PERSISTENCE_FUNCTIONS:
+        raw=dol.read(address,size)
+        if sha256(raw)!=digest:
+            raise ValueError('Changed complete console persistence function: '+name)
+        functions.append(dict(name=name,address=address,bytes=size,sha256=digest))
+    return dict(players=SAVE_PLAYERS, player_bytes=SAVE_PLAYER_BYTES,
+        player_header_bytes=SAVE_HEADER_BYTES,
+        all_player_bytes=SAVE_PLAYERS*SAVE_PLAYER_BYTES,
+        donor_container_header_bytes=SAVE_CONTAINER_HEADER_BYTES,
+        donor_container_bytes=SAVE_CONTAINER_HEADER_BYTES+SAVE_PLAYERS*SAVE_PLAYER_BYTES,
+        native_storage_installed=False, functions=functions)
+
+
+def prepare_persistence(output):
+    """Compile the common executor without assigning live RAM or installing it."""
+    from v3_asset_loader import ROOT, compile_part
+    code, compiled=compile_part('console_save',output/'console_save')
+    files=('tools/v3_console_games.py','tools/v3_asset_loader.py',
+           'overlays/v3/console_save.c','overlays/v3/console_save.h',
+           'overlays/v3/console_save.ld')
+    return dict(format='AFV3-CONSOLE-PERSISTENCE-1', compiled=compiled,
+        bytes=len(code),sha256=sha256(code),linked_ram=0,
+        sources={p:sha256((ROOT/p).read_bytes()) for p in files},
+        native_hooks_installed=False,flash_storage_installed=False)
 
 
 def prepare(source, path, output, original_rom):
@@ -311,5 +356,6 @@ def prepare(source, path, output, original_rom):
     report['original_native_emulator'] = native_contract(original_rom)
     output.mkdir(parents=True, exist_ok=False)
     write_new(output/'games.bin', blob)
+    report['persistence_core']=prepare_persistence(output)
     write_new(output/'games.json', (json.dumps(report, indent=2)+'\n').encode())
     return report

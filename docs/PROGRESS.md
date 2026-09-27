@@ -31,6 +31,17 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
+The console converter prepares the full nineteen-game category and a shared
+3,476-byte MIPS save engine at `build/v3-console-games-prepared-03/`. All sixty
+recipes execute against four independent player saves. Actual donor comparisons
+pass for first/repeat play, score restoration/reset, battery/disk capture, and
+Zelda checksums, with sanitizer and bounded-input checks. Current source and
+prepared-resource checks also pass. The donor needs 6,528 player-save bytes,
+not one shared 1,623-byte payload. Native storage, launch/return, graphics
+allocation, and QD emulation remain integration work; no console is enabled and
+the cartridge/save format is unchanged. See the
+[console checkpoint](checkpoints/V3_CONSOLE_PERSISTENCE.md).
+
 The current proposal is ABI 275 at
 `build/v3-player-exercise-imports-01/player-exercise-native/build-lock.json`, ROM SHA-256
 `a940dab0ff14f5fc0e0bed23c78d5500c874da7a9f269e89e321c0106453e205`.

@@ -34,7 +34,11 @@ The nineteen metadata records come from the checked DOL table at `800AAA30`.
 Keep GNO save-bit identity separate from archive identity: Soccer and Excitebike
 use save IDs thirteen and twelve respectively. The complete shared recipes
 contain sixty ordered operations and address 1,623 bytes after an eight-byte
-save header. They retain high-score defaults/reset flags, battery RAM regions,
+save header **per player**. The donor allocates four independent `660`-byte
+player blocks: 6,528 bytes, plus its separate 64-byte memory-card container
+header. The N64 container may differ, but player progress must remain independent.
+Eleven complete donor functions, including allocation, loading, saving, and
+checksum handling, are pinned in `persistence_contract`. They retain high-score defaults/reset flags, battery RAM regions,
 QD write-back regions, and Zelda's special checksum/marker restoration.
 
 High-score bit fifteen preserves the loaded-score state on reset; lower eleven
@@ -63,6 +67,39 @@ The binary preparation format is big-endian:
 - Complete images, original/converted tags, operations, and default bytes use
   sixteen-byte-aligned packet offsets. No game resource is shortened to fit.
 
+## Shared persistence executor
+
+`overlays/v3/console_save.c` executes the complete prepared recipes. The ordinary
+console conversion command compiles this dependency as well as preparing games;
+there are no per-title installers. The core is zero-linked preparation, with no
+assigned native RAM, hooks, device writes, or selectable-game claim.
+
+`af_v3_console_validate` checks the entire packet, image sizes/headers/mappers,
+all sixty operations, unique game-save bits, and disjoint saved ranges. Open
+validates buffer sizes and separation before changing anything, copies the full
+game image, and binds exactly one of four supplied player blocks. The surrounding
+save codec owns player header bytes 0–3 and the trailing padding byte; the recipe
+executor owns the played-game bits and recipe ranges. Its caller must verify
+the immutable packet's digest and retain packet/buffer lifetimes until close.
+
+First play inserts score defaults and clears only declared battery regions;
+disk data retains the complete source image. Repeat play loads all battery/disk
+ranges and performs Zelda's three-slot marker/checksum repair. The frame entry
+retains the donor's four score states, waits for each score's default RAM value,
+restores saved scores, then follows changes. Reset honours each HSC preserve bit.
+Close captures every battery/disk range and invalidates the transient session.
+It does not add an extra score-frame update absent from the donor's cleanup.
+
+The 3,476-byte MIPS core uses no mutable globals and no unresolved libraries.
+Its largest stack chain is open plus validate, 368 bytes. Preparation is
+`build/v3-console-games-prepared-03/`; all game/tag/default bytes match the
+earlier complete preparation. Two focused checks pass across targeted runs:
+26,695 assertions using actual donor source routines under address/undefined-
+behaviour sanitizers, and current MIPS/source/prepared-packet receipt checks.
+Coverage includes all nineteen games, four players, first/repeat launch,
+score states, reset, disk/battery/Zelda paths, malformed bounds, alias rejection,
+and unchanged output on errors. This is not native emulator or FlashRAM evidence.
+
 ## Native integration requirements
 
 The original N64 emulator is VROM `007492E0`, linked at `8082A070`, with SHA-256
@@ -76,9 +113,12 @@ cannot simply be assumed sufficient for larger complete character data.
 Connect checked game lookup, correct allocation, ordinary room entry/return,
 complete persistence, and QD dependencies before enabling each supported import.
 Retain original game IDs and native save regions. The current format-four
-save capsule has insufficient spare room for the full donor save payload;
+save capsule has insufficient spare room for the four-player donor save data;
 persistence needs an explicit bounded storage design, not an overwrite of its
 neighbours or a promise that unchanged formats suffice.
+Its 432 spare bytes cannot hold 6,528 player bytes. Do not combine players,
+truncate game progress, assume compression always fits, or silently remove the
+second town-save bank. Native storage integration remains the next dependency.
 
 GameCube GBA download parameters remain in receipts. N64 hardware cannot use a
 GameCube link cable; do not silently claim that functionality was imported.
