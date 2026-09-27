@@ -76,7 +76,7 @@ class ConsoleDiskTests(unittest.TestCase):
             print(run.stdout.strip())
 
     def test_shared_preparation_preserves_games_and_supplies_complete_bios(self):
-        out=ROOT/'build/v3-console-games-prepared-13'
+        out=ROOT/'build/v3-console-games-prepared-14'
         report=json.loads((out/'games.json').read_text());disk=report['disk_core']
         self.assertEqual(disk,json.loads((out/'console_disk/disk.json').read_text()))
         self.assertEqual(sha256((out/'console_disk/code.bin').read_bytes()),disk['sha256'])
@@ -101,12 +101,16 @@ class ConsoleDiskTests(unittest.TestCase):
         self.assertEqual(binding['source_io_callbacks'],dict(store=0x808308C4,load=0x808303E0))
         self.assertEqual(binding['source_reset_button']['address'],0x8003A13C)
         self.assertEqual(binding['source_motor_sync']['address'],0x80039D58)
-        for name in ('af_v3_qd_native_initialize','af_v3_qd_native_reset_button'):
+        audio=binding['source_audio']
+        self.assertFalse(audio['expansion_voice']);self.assertEqual(len(audio['channels']),5)
+        self.assertEqual(audio['initialization']['stride_bytes'],2)
+        self.assertEqual(audio['initialization']['iterations'],10)
+        for name in ('af_v3_qd_native_initialize','af_v3_qd_native_reset_button','af_v3_qd_native_audio_initialize'):
             self.assertIn(name,binding['compiled']['symbols'])
         # Verify the assembled bridges, including o32 argument space, all full
         # register stores/loads, HI/LO, and the nonstandard t6 return. This is
         # structural checking, not execution of MIPS instructions.
-        for short in ('wdm','ram','read','write','irq'):
+        for short in ('wdm','ram','read','write','irq','dpcm'):
             name='af_v3_qd_'+short+'_bridge'
             at=binding['compiled']['symbols'][name]-binding['linked_ram']
             raw=code[at:at+308];words=struct.unpack('>77I',raw)
@@ -118,7 +122,38 @@ class ConsoleDiskTests(unittest.TestCase):
             self.assertEqual(words[32:38],(0x27A80120,0xFFA800F8,0x00004010,
                 0xFFA80110,0x00004012,0xFFA80118))
             self.assertEqual(words[41:45],(0xDFA80110,0x01000011,0xDFA80118,0x01000013))
+            self.assertEqual(words[38],0x00C02025 if short=='dpcm' else 0x03C02025)
             self.assertEqual(words[-2:],(0x01C00008 if short in ('wdm','ram') else 0x01000008,0x27BD0120))
+
+    def test_optional_dpcm_hook_preserves_cartridge_owner_and_relocations(self):
+        from aflib import by_vrom
+        from v3_console_emulator import VROM,RELOC,RAM,patch
+        from v3_furniture_install import inputs
+        image,report=inputs(ROOT/'build/v3-console-emulator-capacity-01/build-lock.json')
+        images=report['equipment_resources']['console_images'];symbols=images['compiled']['symbols']
+        original=(ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes();files=by_vrom(original)
+        owner=files[VROM].extract(original);reloc=files[RELOC].extract(original)
+        base,base_reloc,base_receipt=patch(owner,reloc,symbols)
+        self.assertEqual(base,by_vrom(image)[VROM].extract(image))
+        self.assertEqual(base_reloc,by_vrom(image)[RELOC].extract(image))
+        self.assertEqual(base_receipt,images['emulator']['native'])
+        binding=json.loads((ROOT/'build/v3-console-games-prepared-14/console_disk_native/binding.json').read_text())
+        disk_symbols=binding['compiled']['symbols']
+        # patch() independently checks relocation at two distinct native bases.
+        changed,new_reloc,receipt=patch(owner,reloc,symbols,disk_symbols=disk_symbols)
+        at=0x80833DBC-RAM
+        self.assertEqual(changed[:at],base[:at]);self.assertEqual(changed[at+28:],base[at+28:])
+        target=disk_symbols['af_v3_qd_dpcm_bridge']
+        self.assertEqual(changed[at:at+28],struct.pack('>I',0x08000000|(target>>2&0x03FFFFFF))+bytes(24))
+        self.assertEqual(len(receipt['hooks']),8);self.assertEqual(len(receipt['removed_relocations']),8)
+        self.assertEqual(struct.unpack_from('>I',new_reloc,16)[0],2845)
+        self.assertEqual(receipt['hooks'][:-1],base_receipt['hooks'])
+        for target in (0x8062FFFC,0x80636000,0x80630001):
+            with self.assertRaisesRegex(ValueError,'disk bridge'):
+                patch(owner,reloc,symbols,disk_symbols={'af_v3_qd_dpcm_bridge':target})
+        corrupt=bytearray(owner);corrupt[at]^=1
+        with self.assertRaisesRegex(ValueError,'Changed complete native'):
+            patch(corrupt,reloc,symbols,disk_symbols=disk_symbols)
 
 
 if __name__=='__main__':unittest.main()

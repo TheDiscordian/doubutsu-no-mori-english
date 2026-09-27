@@ -27,7 +27,7 @@ SOURCES=('tools/v3_console_emulator.py','overlays/v3/console_emulator.c','overla
     'overlays/v3/console_save.c','overlays/v3/console_save.h')
 
 
-def patch(native,relocation,symbols):
+def patch(native,relocation,symbols,*,disk_symbols=None):
     if sha256(native)!=NATIVE_SHA or sha256(relocation)!=RELOC_SHA:
         raise ValueError('Changed complete native console emulator or relocations')
     sections=struct.unpack_from('>5I',relocation)
@@ -42,15 +42,29 @@ def patch(native,relocation,symbols):
             raise ValueError('Changed complete console call: '+name)
         data[at:at+4]=struct.pack('>I',jump(target,link=True));changed.add(at)
         hooks.append(dict(address=address,symbol=name,target=target,before=expected,after=data[at:at+8].hex()))
+    # The disk audio module replaces only the DPCM byte fetch, preserving the
+    # existing synthesizer and all other live audio registers. This is optional
+    # so installed cartridge-only revisions can still be reproduced exactly.
+    dpcm_relocs={}
+    if disk_symbols is not None:
+        name='af_v3_qd_dpcm_bridge';target=disk_symbols[name];address=0x80833DBC
+        at=address-RAM
+        expected='3c0a80838d4a7bc094c90018012a582101646021918d0000a0cd001c'
+        if data[at:at+28]!=bytes.fromhex(expected) or not 0x80630000<=target<0x80636000 or target&3:
+            raise ValueError('Changed native DPCM fetch or disk bridge')
+        data[at:at+28]=struct.pack('>I',jump(target))+bytes(24)
+        changed.update(range(at,at+28,4));dpcm_relocs={at:5,at+4:6}
+        hooks.append(dict(address=address,symbol=name,target=target,before=expected,
+            after=data[at:at+28].hex(),link=False))
     retained=[];removed=[]
     for word in struct.unpack_from('>'+str(sections[4])+'I',relocation,20):
         section,kind,offset=word>>30,word>>24&63,word&0xFFFFFF
         at=sum(sections[:section-1])+offset
         if at in changed:
-            if section!=1 or kind!=4:raise ValueError('Unexpected replaced console relocation')
+            if section!=1 or kind!=dpcm_relocs.get(at,4):raise ValueError('Unexpected replaced console relocation')
             removed.append(word)
         else:retained.append(word)
-    if sorted(w&0xFFFFFF for w in removed)!=sorted(a-RAM for a,_,_ in HOOKS):
+    if sorted(w&0xFFFFFF for w in removed)!=sorted([a-RAM for a,_,_ in HOOKS]+list(dpcm_relocs)):
         raise ValueError('Missing console call relocations or unexpected core-call relocation')
     reloc=bytearray(relocation);struct.pack_into('>I',reloc,16,len(retained))
     reloc[20:-4]=struct.pack('>'+str(len(retained))+'I',*retained)+bytes(len(reloc)-24-len(retained)*4)
@@ -62,7 +76,7 @@ def patch(native,relocation,symbols):
         if any(a!=b and at//4*4 not in changed for at,(a,b) in enumerate(zip(before,after,strict=True))):
             raise ValueError('Console hooks change unrelated relocated code/data')
         for h in hooks:
-            if u32(after,h['address']-RAM)!=jump(h['target'],link=True):
+            if u32(after,h['address']-RAM)!=jump(h['target'],link=h.get('link',True)):
                 raise ValueError('Console hook incorrectly receives native relocation')
     return bytes(data),bytes(reloc),dict(hooks=hooks,removed_relocations=removed,
         sha256=sha256(data),relocation_sha256=sha256(reloc),caller_delay_slots_retained=True)

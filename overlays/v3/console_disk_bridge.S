@@ -4,7 +4,7 @@
 .set noat
 .set gp=64
 .text
-.macro disk_bridge name, target, resume=14
+.macro disk_bridge name, target, resume=14, owner=30
 .globl \name
 .type \name,@function
 \name:
@@ -19,7 +19,7 @@
     sd $8,272($sp)
     mflo $8
     sd $8,280($sp)
-    move $4,$30
+    move $4,$\owner
     jal \target
     addiu $5,$sp,16
     ld $8,272($sp)
@@ -40,3 +40,5 @@ disk_bridge af_v3_qd_ram_bridge,af_v3_qd_native_ram_dispatch
 disk_bridge af_v3_qd_read_bridge,af_v3_qd_native_read_dispatch,8
 disk_bridge af_v3_qd_write_bridge,af_v3_qd_native_write_dispatch,8
 disk_bridge af_v3_qd_irq_bridge,af_v3_qd_native_irq_dispatch,8
+/* The audio leaf owns a2=SoundE, not s8=NES state. */
+disk_bridge af_v3_qd_dpcm_bridge,af_v3_qd_native_dpcm_dispatch,8,6

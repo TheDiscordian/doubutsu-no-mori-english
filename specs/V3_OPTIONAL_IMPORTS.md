@@ -113,10 +113,12 @@ disk registers, interrupt state, per-frame readiness/motor state, and complete
 native-layout character conversion. A native module prepares the complete bank
 mapping, programme-RAM writes, WDM register bridges, actual character-buffer
 bindings, RSP/cache calls, cold initialization, reset-button retention, native
-disk I/O/IRQ routes, nametable mirroring, and timed motor/audio-queue synchronization.
+disk I/O/IRQ routes, nametable mirroring, motor waits, donor audio initialization,
+and bounded DPCM bank reads/address wrapping with cartridge fallback.
 Donor C comparisons, host-adapter checks, and emitted bridge-instruction checks
-pass. Audio initialization/DPCM banks, expansion synthesis, startup installation,
-and lifecycle integration remain required; preparation
+pass. The verified donor and native mixers both use five channels; no separate
+disk expansion voice is present in this donor. Startup installation, the prepared
+audio/DPCM hooks, and lifecycle integration remain required; preparation
 does not enable the disk item or establish native execution.
 
 The [console converter](V3_CONSOLE_GAMES.md) preserves nineteen complete game

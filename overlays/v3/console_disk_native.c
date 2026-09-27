@@ -1,5 +1,5 @@
 /* Native CPU/CHR bindings for the complete QD service. No cartridge header is
- * fabricated. Native audio initialization and session installation
+ * fabricated. Native hook and session installation
  * must be supplied before a disk game can be enabled. */
 #include "console_disk_native.h"
 typedef unsigned char u8;
@@ -62,7 +62,7 @@ int af_v3_qd_native_bind(AFQNative *n,const AFQNativeBuffers *b) {
         b->program,b->characters,b->bios,b->boot_state);
     if(result)return result;
     n->state=b->state;n->graphics=b->graphics;n->base=b->base;
-    n->error=0;n->guard=GUARD;n->magic=MAGIC;n->initialized=0;
+    n->error=0;n->guard=GUARD;n->magic=MAGIC;n->initialized=n->audio_initialized=0;
     return 0;
 }
 
@@ -200,15 +200,12 @@ void af_v3_qd_native_read_dispatch(u8 *s,AFQNativeRegisters *r) {
     r->r[2]=(u32)result;
 }
 
-static void motor_sync(AFQNative *n) {
-    /* Complete donor ksNesQDSoundSync: timed audio events for thirteen frames.
-     * Yield to the existing native timer instead of busy-waiting on the CPU.
-     * Audio still requires its real startup/DPCM binding before installation. */
-    for(u32 frame=0;frame<13;frame++) {
-        for(u32 line=0;line<262;line++)
-            FN(n->base+0x80835098u-BASE,void,u32,u32,u32)(0,0,line*114);
-        FN(0x8002DA3Cu,void,u32)(16000);
-    }
+static void motor_sync(void) {
+    /* Donor Sound_Write(0) generates samples; native Sound_Write(0) instead
+     * queues a pulse-register write. The independent native audio thread
+     * already renders while this CPU sleeps. Preserve all thirteen delays
+     * without injecting bogus pulse writes or overflowing its event queue. */
+    for(u32 frame=0;frame<13;frame++)FN(0x8002DA3Cu,void,u32)(16000);
 }
 
 void af_v3_qd_native_write_dispatch(u8 *s,AFQNativeRegisters *r) {
@@ -223,7 +220,7 @@ void af_v3_qd_native_write_dispatch(u8 *s,AFQNativeRegisters *r) {
     int line=(short)((unsigned int)s[0x1B2E]<<8|s[0x1B2F]);
     int result=af_v3_qd_write(&n->disk,at,(u8)r->r[5],line);
     if(result<0) {n->error=(u32)-result;return;}
-    if(result&AF_QD_SOUND_SYNC)motor_sync(n);
+    if(result&AF_QD_SOUND_SYNC)motor_sync();
     schedule(n);
     if(result&AF_QD_MIRROR) {
         half(s+0x1B36,n->disk.mirror?0x800:0x400);half(s+0x1B38,0);
@@ -246,4 +243,48 @@ void af_v3_qd_native_irq_dispatch(u8 *s,AFQNativeRegisters *r) {
     /* The native IRQ request handles P's interrupt mask, its pending bit
      * (0x20, not the donor's 0x04), vector, stack, and return continuation. */
     if(result&AF_QD_IRQ)r->r[8]=pointer(n->base+0x8083100Cu-BASE);
+}
+
+int af_v3_qd_native_audio_initialize(AFQNative *n) {
+    if(!valid(n) || !n->initialized || n->audio_initialized ||
+       *native(n,0x808549CFu) || *native(n,0x808549C4u))return AF_QD_BAD_STATE;
+    u32 bridge=0x08000000u|((u32)(addr)af_v3_qd_dpcm_bridge>>2&0x03FFFFFFu);
+    if(word(native(n,0x80833DBCu))!=bridge || word(native(n,0x80833DC0u)))return AF_QD_BAD_STATE;
+    /* Actual donor loop advances one halfword per event, NOT one pair. Its
+     * zero-address calls generate transient samples; after the final reset
+     * only nonzero register writes survive. Apply them with the native event
+     * consumer, then perform the same final channel/queue reset. */
+    static const unsigned short init[]={0x4015,0,0x4008,0,0x4080,0x80,0x5015,0,0x4010,15,0x4011};
+    for(u32 i=0;i<10;i++)if(init[i]) {
+        u32 at=init[i];if(at>=0x5000 && at<=0x5015)at-=0xF40;
+        FN(n->base+0x808345B8u-BASE,void,u32,u32)(at&255,init[i+1]&255);
+    }
+    FN(n->base+0x808352D8u-BASE,void,void)();
+    FN(n->base+0x80835778u-BASE,void,void *)(n->disk.program+0x6000);
+    n->audio_initialized=1;
+    return 0;
+}
+
+void af_v3_qd_native_dpcm_dispatch(u8 *audio,AFQNativeRegisters *r) {
+    if(!audio || !r)return;
+    /* This hook is in the shared audio owner, so ordinary cartridge games
+     * must retain their original contiguous-reader behaviour. Derive the
+     * actual relocation from live a2=SoundE, never a stale disk context. */
+    u32 base=(u32)r->r[6]-(0x80854DF0u-BASE);
+    r->r[8]=pointer(base+0x80833DD8u-BASE);
+    if((base&15) || base<0x80000400u || base>0x80400000u-0x2E990u)return;
+    AFQNative *n=context;
+    u32 start=(u32)audio[0x18]<<8|audio[0x19],offset=(u32)r->r[4],value;
+    if(valid(n) && n->initialized && n->base==base) {
+        if(start>0x3FC0 || (start&63) || offset>0x1FFF) {n->error=3;value=0;}
+        else {
+            u32 at=0xC000+start+offset;
+            if(at>=0x10000)at-=0x8000; /* DMC wraps FFFF to 8000, not 0000. */
+            value=at>=0xE000?n->disk.bios[at-0xE000]:n->disk.program[at-0x6000];
+        }
+    } else {
+        u32 rom=word(MEMORY(base+0x80837BC0u-BASE));
+        value=*MEMORY(rom+start+offset);
+    }
+    audio[0x1C]=(u8)value;r->r[13]=value;
 }

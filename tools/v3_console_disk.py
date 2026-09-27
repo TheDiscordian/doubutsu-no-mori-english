@@ -24,7 +24,36 @@ FUNCTIONS=(
 SOURCES=('tools/v3_console_disk.py','tools/v3_console_games.py','tools/v3_asset_loader.py',
     'overlays/v3/console_disk.c','overlays/v3/console_disk.h','overlays/v3/console_disk.ld')
 NATIVE_SOURCES=SOURCES+('overlays/v3/console_disk_native.c','overlays/v3/console_disk_native.h',
-    'overlays/v3/console_disk_native.ld','overlays/v3/console_disk_bridge.S')
+    'overlays/v3/console_disk_native.ld','overlays/v3/console_disk_bridge.S','tools/v3_console_emulator.py')
+AUDIO_FUNCTIONS=(
+    ('Sound_Make_HVC',0x8000B000,0x114,'92d5e01865fb1dd7abc3f0dc4dfbc8bbdc95cb93004659f5d1a011a00bb21327'),
+    ('Sound_Write',0x8000B240,0x1DC,'65921ba219b4f977db752b80d061b33801dae6f9671e75738ad71cae5775d599'),
+    ('ProcessSoundE',0x8000A160,0x154,'d5e63852b34df4f817c3fa8a658501109797ac9713d772ea667fd7208bd4cf08'),
+    ('Sound_SetMMC',0x8000B900,0x3C,'afe7c03c84caa6d1d673c0c75a602eefeccb4e1eb0a7431b14f97e687421de2c'))
+
+
+def donor_audio(dol):
+    for name,address,size,digest in AUDIO_FUNCTIONS:
+        if sha256(dol.read(address,size))!=digest:raise ValueError('Changed complete donor audio function: '+name)
+    address=0x800D8644;raw=dol.read(address,40)
+    digest='d4d97a9db929a81b962158a6b8e5230bdaa18e698be3bdfade8bb386f4b7a11d'
+    if sha256(raw)!=digest:raise ValueError('Changed complete disk sound initialization table')
+    calls=[]
+    for offset,word in enumerate(struct.unpack('>69I',dol.read(0x8000B000,0x114))):
+        if word&0xFC000003==0x48000001:
+            delta=word&0x03FFFFFC
+            if delta&0x02000000:delta-=0x04000000
+            calls.append(0x8000B000+offset*4+delta)
+    if calls!=[0x8009AEC0,0x8000ACA0,0x8000AF40,0x80008EC0,0x80009580,
+               0x8000A620,0x80009D00,0x8000A160,0x8009AF0C]:
+        raise ValueError('Changed complete donor mixer dispatch')
+    return dict(functions=[dict(name=n,address=a,bytes=s,sha256=h) for n,a,s,h in AUDIO_FUNCTIONS],
+        initialization=dict(address=address,bytes=40,sha256=digest,halfwords=list(struct.unpack('>20H',raw)),
+            iterations=10,stride_bytes=2,instruction_range=[0x8003A278,0x8003A29C]),
+        mixer_calls=calls,channels=['pulse A','pulse B','triangle','noise','DPCM'],
+        expansion_voice=False,zero_event='donor generates samples; native queues a pulse-register write',
+        native_motor='thirteen 16-ms waits; native audio thread continues rendering',
+        dpcm='programme RAM at C000, private BIOS at E000, FFFF wraps to 8000')
 
 
 def prepare_native(output,native,dol):
@@ -41,12 +70,14 @@ def prepare_native(output,native,dol):
         raise ValueError('Changed complete donor disk motor/audio synchronization')
     io=[struct.unpack_from('>I',native,0x80835DD0-NATIVE_RAM+p)[0] for p in (0xC8,0xEC)]
     if io!=[0x808308C4,0x808303E0]:raise ValueError('Changed native bank-2 I/O callbacks')
+    audio=donor_audio(dol)
     code,compiled=compile_part('console_disk_native',output/'console_disk_native',
         extra_sources=('overlays/v3/console_disk.c','overlays/v3/console_disk_bridge.S'))
     receipt=dict(format='AFV3-CONSOLE-DISK-NATIVE-1',compiled=compiled,
         source_native_sha256=NATIVE_SHA,source_wdm_row=row.hex(),
         source_reset_button=dict(address=0x8003A13C,bytes=0x8C,sha256=reset_sha),
         source_motor_sync=dict(address=0x80039D58,bytes=0x94,sha256=motor_sha),
+        source_audio=audio,
         source_io_callbacks=dict(store=io[0],load=io[1]),
         planned_memory=dict(code=dict(ram=0x80630000,bytes=0x6000),
             immutable_bios=dict(ram=0x80636000,bytes=8192),context=dict(ram=0x80638000,bytes=512),
@@ -57,12 +88,14 @@ def prepare_native(output,native,dol):
         native_state_bytes=0x16F90,minimum_graphics_bytes=0x6008,bridge_stack_bytes=288,
         prepared=['bounded disjoint native buffers','full native CPU bank mapping',
             'four writable programme banks and read-only BIOS','per-instance WDM row',
-            'full-width WDM/RAM/read/write/IRQ register bridges','native working/transfer CHR buffers',
+            'full-width WDM/RAM/read/write/IRQ/DPCM register bridges','native working/transfer CHR buffers',
             'RSP wait and data-cache writeback calls','cold native state and instruction-table initialization',
             'donor reset-button RAM/PPU/BIOS retention','native disk I/O and scanline IRQ routes',
-            'native nametable mirroring','native timed motor audio events and timer waits'],
+            'native nametable mirroring','native motor waits with independent audio rendering',
+            'donor audio register initialization and reset','bounded DPCM banks and address wrapping',
+            'checked optional DPCM fetch hook with cartridge fallback'],
         pending=['checked startup allocation/packet loading','session initialization and reset call hooks',
-            'native image-extent correction','audio initialization/DPCM banks and expansion synthesis',
+            'native image-extent correction','installation of audio initializer and DPCM hook',
             'frame/reset/close persistence and ordinary gameplay'],
         installed=False,native_execution_tested=False,
         sources={p:sha256((ROOT/p).read_bytes()) for p in NATIVE_SOURCES})
@@ -115,7 +148,7 @@ def prepare(dol,archive,output,original_rom):
             'complete native CHR tile conversion',
             'disk register reads/writes','source scanline IRQ state','source frame/ready/motor state'],
         pending=['installation of prepared native module and complete buffer allocations',
-            'audio initialization/DPCM banks and expansion synthesis',
+            'installation of prepared audio initialization/DPCM hook',
             'native image-extent and session hooks','native startup and normal room return'],
         native_hooks_installed=False,choice_eligible=False,
         sources={s:sha256((ROOT/s).read_bytes()) for s in SOURCES})

@@ -11,7 +11,7 @@ typedef struct {
 typedef struct {
     AFQDisk disk;
     unsigned char *state,*graphics;
-    unsigned int magic,base,error,guard,initialized;
+    unsigned int magic,base,error,guard,initialized,audio_initialized;
 } AFQNative;
 /* Full-width integer register frame shared with console_disk_bridge.S.
  * C o32 callees do not preserve the upper halves of saved registers. */
@@ -34,14 +34,19 @@ int af_v3_qd_native_graphics(AFQNative *);
  * Audio initialization and session hooks still require installation. */
 int af_v3_qd_native_initialize(AFQNative *);
 int af_v3_qd_native_reset_button(AFQNative *);
+/* Runs before the native audio thread is enabled; requires the checked DPCM
+ * hook. Retains the donor's actual register initialization and five-channel mix. */
+int af_v3_qd_native_audio_initialize(AFQNative *);
 void af_v3_qd_native_wdm_dispatch(unsigned char *,AFQNativeRegisters *);
 void af_v3_qd_native_ram_dispatch(unsigned char *,AFQNativeRegisters *);
 void af_v3_qd_native_read_dispatch(unsigned char *,AFQNativeRegisters *);
 void af_v3_qd_native_write_dispatch(unsigned char *,AFQNativeRegisters *);
 void af_v3_qd_native_irq_dispatch(unsigned char *,AFQNativeRegisters *);
+void af_v3_qd_native_dpcm_dispatch(unsigned char *,AFQNativeRegisters *);
 void af_v3_qd_wdm_bridge(void);
 void af_v3_qd_ram_bridge(void);
 void af_v3_qd_read_bridge(void);
 void af_v3_qd_write_bridge(void);
 void af_v3_qd_irq_bridge(void);
+void af_v3_qd_dpcm_bridge(void);
 #endif

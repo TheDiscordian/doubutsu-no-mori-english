@@ -12,7 +12,7 @@ python3 tools/v3_furniture_pipeline.py convert --representation console \
   --output build/v3-console-games-prepared-next
 ```
 
-The current preparation is `build/v3-console-games-prepared-13/`.
+The current preparation is `build/v3-console-games-prepared-14/`.
 Its zero-linked MIPS disk service is 5,139 bytes, SHA-256
 `14cf5bb33f41256086b24b48a5a8c152844d20e71a2ae25fe41f8b7f0bd766da`.
 It uses no mutable globals or unresolved library calls. The largest stack chain
@@ -143,9 +143,8 @@ The prepared-resource check verifies MIPS/source receipts, complete BIOS/boot-st
 identity/vectors, unchanged nineteen-game resources, and explicit non-installation.
 No historical ROM or unchanged native scenario is replayed for this preparation.
 
-Remaining implementation is required: checked installation of the native module
-and prepared initialization/reset hooks, image-extent correction, audio
-initialization, DPCM bank mapping and expansion synthesis, complete
+Remaining implementation is required: checked installation of the native module,
+prepared initialization/reset/audio hooks, and DPCM fetch hook, image-extent correction, complete
 save/frame/reset/return integration, and enabling the actual source furniture
 only when those dependencies work. Reuse partial native disk-register machinery
 where verified; a missing mapper-20 table entry is not an inventory of all
@@ -198,8 +197,8 @@ actual faults. No gameplay, ordinary save cycle, or original-hardware claim is m
 ## Prepared native CPU and graphics module
 
 `console_disk_native.c/.h/.ld` and `console_disk_bridge.S` compile with the complete
-service into 10,355 bytes at `80630000`, SHA-256
-`ab5b2d6e3f5382acf875432e5792faeea2fa1fc01270a1faff27622581b3e0e7`.
+service into 11,323 bytes at `80630000`, SHA-256
+`7498fe789e39b54a075689127f43f4943402d304c02f2d57eb7d8e6c2565dd44`.
 The ordinary converter writes its source/compiler receipt to
 `console_disk_native/binding.json`. No mutable globals or unresolved calls exist.
 This module is not a standalone replacement emulator and is not loaded by the
@@ -232,15 +231,16 @@ word at state+`1ACC` is not copied into the donor's unrelated frame flags. The
 native dynamic-character path is selected; GPU execution is not established by
 these host adapter checks.
 
-Two focused checks pass across targeted invocations. The sanitizer fixture
-executes 62,166 checks against the complete actual donor disk/BIOS, including all
+Three focused checks pass across targeted invocations. The sanitizer fixture
+executes 56,205 checks against the complete actual donor disk/BIOS, including all
 bank edges, programme stores, full boot, register preservation, both CHR buffers,
 call order, non-mutating binding rejection, and guards. It also exercises cold
 initialization using the complete relocated native tables, reset retention,
 read/write fallback routes, timer and transfer scheduling, native mirroring,
-IRQ destinations, and all motor audio events/delays. Native RSP/cache/audio/timer
+IRQ destinations, motor delays without bogus audio events, sound initialization,
+separate DPCM banks, address wrapping, and cartridge fallback. Native RSP/cache/audio/timer
 calls are stubs. The prepared-resource check verifies source/code receipts, actual
-64-bit opcodes and returns for all five bridges, and unchanged nineteen-game resources. The
+64-bit opcodes and returns for all six bridges, and unchanged nineteen-game resources. The
 underlying unchanged service retains its earlier donor comparison evidence.
 Neither test executes MIPS or claims installed disk gameplay.
 
@@ -283,15 +283,48 @@ and continuation. The donor's different pending-bit encoding is not copied into
 native state. Source errors are retained in the context for the required session
 failure/cleanup path; no disk item is enabled while that path is absent.
 
-Motor changes run all thirteen donor synchronization frames: 262 zero-register
-audio events at `line * 114` timestamps per frame, followed by a 16-ms native
-timer wait. The complete source function at `80039D58`, size `94`, is pinned.
-The adapter calls actual native `Sound_Write` and timer functions; no unconsumed
-action flag stands in for this connection. Host checks verify every event and
-delay without playback. Real audio initialization, queue consumption, DPCM's
-separate `C000`/`E000` banks, and expansion synthesis remain required and unverified.
-Do not point DPCM at programme RAM and permit it to read past that allocation
-into unrelated character data. Both bank and address-wrap semantics need binding.
+Motor changes retain all thirteen 16-ms native timer waits. The complete source
+function at `80039D58`, size `94`, is pinned. Its 262 zero-address `Sound_Write`
+calls per frame generate samples in the donor; the native function with the same
+name instead queues a pulse-register write. Those calls must not be copied to
+the N64 event queue. The native audio thread renders independently while the
+interpreter sleeps. Host checks verify every delay and reject unwanted events;
+silent native execution and synthesis remain unverified.
+
+### Audio initialization and DPCM
+
+The source receipt pins complete `Sound_Make_HVC`, `Sound_Write`, `ProcessSoundE`,
+and `Sound_SetMMC` functions. Actual donor mixer calls include only the two pulse
+channels, triangle, noise, and DPCM. The native mixer also has these five voices;
+neither mixer renders an FDS expansion voice. Preserving this donor does not
+require inventing an extra synthesizer. Other donor revisions need their own
+verification.
+
+`af_v3_qd_native_audio_initialize` runs after disk state initialization, before
+native audio enable (`808549CF`), and rejects a busy audio callback (`808549C4`).
+It requires the installed DPCM branch. The pinned reset loop reads ten sliding
+halfword pairs from the complete 40-byte table at donor `800D8644`, advancing two
+bytes, not four. Nonzero register writes use native `HS_Event` at `808345B8`;
+the final channel/queue reset matches donor `Sound_SetMMC(2)`. Zero-address source
+calls generate transient initialization samples and are not register writes.
+The initializer binds `C000` programme RAM only with the checked bank-aware reader.
+
+The optional shared-owner hook replaces the 28-byte DPCM fetch at `80833DBC`
+with a full-width register bridge. Unlike interpreter bridges, this entry owns
+`a2=SoundE`, not `s8=NES state`. The callback derives actual owner relocation
+from that live audio pointer and returns through `t0` to `80833DD8`, retaining
+all other live registers except the original fetched-byte `t5`. It reads
+`C000..DFFF` from programme RAM and `E000..FFFF` from the private BIOS; address
+overflow wraps to `8000`, never adjacent character memory. Sample starts and
+offsets are bounded. No active disk context means the original contiguous
+cartridge reader, so this shared hook does not redirect cartridge samples.
+Session shutdown must invalidate disk context after the native audio thread stops.
+
+The patch helper removes exactly the fetch's high/low address relocations,
+preserves all unrelated owner bytes and relocations, and checks two actual load
+bases. Without disk symbols it reproduces the retained cartridge-only owner.
+These checks and the six emitted bridges are preparation evidence, not installed
+native audio or gameplay evidence.
 
 ## Compatible local native-test emulator
 

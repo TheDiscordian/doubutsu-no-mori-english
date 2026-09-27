@@ -1,5 +1,40 @@
 # Work record
 
+## 2026-09-27: disk audio initialization and bounded native DPCM reads
+
+- The preceding goal batch is progress: `e68f7b5` implements native disk
+  initialization, reset retention, I/O, and IRQ routing. The intervening status
+  answer verifies public V2-13; it makes no V3 change. Resume the unfinished
+  audio bindings, not a historical build replay.
+- Actual donor mixer and native mixer both render five channels. Pinned complete
+  donor functions and mixer calls establish that this donor does not synthesize
+  an FDS expansion voice. The earlier pending expansion-synthesizer requirement
+  was unsupported and is removed, without omitting any donor sound channel.
+- Corrected the motor adapter: donor zero-address sound calls generate samples,
+  whereas native zero-address calls enqueue pulse writes. Retain all thirteen
+  16-ms waits while native audio renders independently, without bogus writes or
+  queue flooding. This corrects the previous batch's interpretation, not a
+  passing native-audio result; native audio has not been exercised here.
+- Implemented actual donor sliding-halfword register initialization and final
+  audio reset, guarded against active audio or a missing DPCM hook. Added a sixth
+  full-width bridge owning the live SoundE pointer, bounded separate programme/
+  BIOS sample reads, address wrap, and the original cartridge-reader fallback.
+  The optional owner patch removes exactly two fetch address relocations and
+  checks unrelated code/data preservation at two load bases.
+- Sanitized adapter execution passes 56,205 assertions. The lower count replaces
+  checks of bogus motor events with correct delay/no-event checks; it does not
+  represent removed game content. Prepared-source/compiled-bridge and optional
+  DPCM-owner checks both pass. The unchanged cartridge-only owner/relocations
+  reproduce exactly; invalid bridge targets and changed source reject.
+- Shared preparation `build/v3-console-games-prepared-14/` retains all nineteen
+  images, complete BIOS/boot resources, and the unchanged 5,139-byte service.
+  Native module: 11,323 bytes, SHA-256
+  `7498fe789e39b54a075689127f43f4943402d304c02f2d57eb7d8e6c2565dd44`.
+  No native MIPS/gameplay or speaker playback is claimed. Checked module loading,
+  installation of prepared audio/DPCM hooks, native image extents, and complete
+  session/frame/reset/return remain. ABI 281, the main lock, format-five saves,
+  choices, and both stable V2-13 deployments remain unchanged.
+
 ## 2026-09-27: native disk initialization, I/O, IRQs, and motor synchronization
 
 - The preceding goal batch is progress: commit `5403a02` supplies native banks,

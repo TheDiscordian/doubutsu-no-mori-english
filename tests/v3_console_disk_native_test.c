@@ -5,7 +5,7 @@
 #include "../overlays/v3/console_disk_native.h"
 typedef unsigned char u8;
 typedef unsigned int u32;
-static unsigned checks,waits,flushes,sequence,sound_events,sound_delays;
+static unsigned checks,waits,flushes,sequence,sound_events,sound_delays,sound_resets,sound_binds;
 #define CHECK(x) do {checks++;if(!(x)){fprintf(stderr,"line %d: %s\n",__LINE__,#x);exit(1);}}while(0)
 AFQNative af_qdn_test_context;
 static _Alignas(16) u8 state[AF_QDN_STATE_BYTES+32],graphics[AF_QDN_GRAPHICS_BYTES+32];
@@ -13,6 +13,7 @@ static _Alignas(16) u8 disk[65536],original[65536],program[32768],characters[819
 static u8 expected_characters[8192];
 static u8 native_owner[0x2E990];
 u8 *af_qdn_test_memory(u32 at) {
+    if(at>=(u32)(uintptr_t)program && at<(u32)(uintptr_t)(program+sizeof(program)))return (u8 *)(uintptr_t)at;
     CHECK(at>=0x80300000 && at<0x8032E990);
     return native_owner+at-0x80300000;
 }
@@ -24,16 +25,21 @@ static void flush(void *p,u32 bytes) {
     CHECK(p==(sequence%3==1?graphics+16+0x2008:state+16+0x62C8));
     CHECK(sequence%3!=0);sequence++;flushes++;
 }
-static void sound_write(u32 at,u32 value,u32 tick) {
-    CHECK(!at && !value && tick==(sound_events%262)*114);
+static void sound_event(u32 at,u32 value) {
+    static const unsigned expected[][2]={{0x15,0},{8,0},{0x80,0x80},{0x80,0x15},{0xD5,0},{0x10,15},{15,0x11}};
+    CHECK(sound_events<7 && at==expected[sound_events][0] && value==expected[sound_events][1]);
     sound_events++;
 }
+static void sound_reset(void) {CHECK(sound_events==7 && !sound_resets && !sound_binds);sound_resets++;}
+static void sound_bind(void *p) {CHECK(p==program+0x6000 && sound_resets==1 && !sound_binds);sound_binds++;}
 static void delay(u32 us) {
-    CHECK(us==16000 && sound_events==(sound_delays+1)*262);sound_delays++;
+    CHECK(us==16000);sound_delays++;
 }
 void *af_qdn_test_function(u32 at) {
     if(at==0x80300000)return wait_rsp;
-    if(at==0x80300000+0x80835098-0x8082A070)return sound_write;
+    if(at==0x80300000+0x808345B8-0x8082A070)return sound_event;
+    if(at==0x80300000+0x808352D8-0x8082A070)return sound_reset;
+    if(at==0x80300000+0x80835778-0x8082A070)return sound_bind;
     if(at==0x8002DA3C)return delay;
     CHECK(at==0x8002FE00);return flush;
 }
@@ -42,6 +48,7 @@ void af_v3_qd_ram_bridge(void) {}
 void af_v3_qd_read_bridge(void) {}
 void af_v3_qd_write_bridge(void) {}
 void af_v3_qd_irq_bridge(void) {}
+void af_v3_qd_dpcm_bridge(void) {}
 static AFQNativeBuffers buffers(void) {
     AFQNativeBuffers b={state+16,graphics+16,disk,program,characters,bios,boot,
         AF_QDN_STATE_BYTES,AF_QDN_GRAPHICS_BYTES,65536,0x80300000};
@@ -211,7 +218,7 @@ int main(int argc,char **argv) {
     s[0x1B2E]=0;s[0x1B2F]=238;
     r=registers();r.r[4]=0x4025;r.r[5]=0xED;saved=r;
     af_v3_qd_native_write_dispatch(s,&r);untouched(&r,&saved,1u<<8);
-    CHECK(sound_events==13*262 && sound_delays==13 && r.r[8]==saved.r[14]);
+    CHECK(!sound_events && sound_delays==13 && r.r[8]==saved.r[14]);
     CHECK(s[0x1B36]==8 && !s[0x1B37] && n->disk.target==-20 && s[0x1AF9]==0x80);
     r=registers();r.r[12]=(uint64_t)(int64_t)-20;saved=r;
     af_v3_qd_native_irq_dispatch(s,&r);untouched(&r,&saved,1u<<8);
@@ -219,16 +226,54 @@ int main(int argc,char **argv) {
     CHECK(n->disk.drive[1]==disk[0] && n->disk.target==-19);
     r=registers();r.r[4]=0x4025;r.r[5]=0xE7;saved=r;
     af_v3_qd_native_write_dispatch(s,&r);untouched(&r,&saved,1u<<8);
-    CHECK(sound_events==26*262 && sound_delays==26 && s[0x1B36]==4 && !s[0x1B37]);
+    CHECK(!sound_events && sound_delays==26 && s[0x1B36]==4 && !s[0x1B37]);
     /* Invalid transfer input records an error without changing disk memory. */
     n->disk.control=0x81;n->disk.head=0;r=registers();r.r[4]=0x4024;r.r[5]=0x45;
     af_v3_qd_native_write_dispatch(s,&r);CHECK(n->error==2);
     n->error=0;n->disk.control=0xE5;n->disk.head=65536;r=registers();r.r[12]=0;
     af_v3_qd_native_irq_dispatch(s,&r);CHECK(n->error==2);
+    /* Audio cannot start on an unpatched owner or after its thread is enabled. */
+    CHECK(af_v3_qd_native_audio_initialize(n)==AF_QD_BAD_STATE && !sound_events);
+    put(native_owner+0x80833DBC-0x8082A070,0x08000000u|((u32)(uintptr_t)af_v3_qd_dpcm_bridge>>2&0x03FFFFFFu));
+    put(native_owner+0x80833DC0-0x8082A070,0);
+    native_owner[0x808549CF-0x8082A070]=255;
+    CHECK(af_v3_qd_native_audio_initialize(n)==AF_QD_BAD_STATE && !sound_events);
+    native_owner[0x808549CF-0x8082A070]=0;
+    native_owner[0x808549C4-0x8082A070]=1;
+    CHECK(af_v3_qd_native_audio_initialize(n)==AF_QD_BAD_STATE && !sound_events);
+    native_owner[0x808549C4-0x8082A070]=0;
+    CHECK(!af_v3_qd_native_audio_initialize(n) && n->audio_initialized);
+    CHECK(sound_events==7 && sound_resets==1 && sound_binds==1);
+    CHECK(af_v3_qd_native_audio_initialize(n)==AF_QD_BAD_STATE && sound_events==7);
+    /* DPCM crosses programme/BIOS boundaries and wraps FFFF -> 8000 without
+     * depending on adjacent allocations. The existing waveform code retains
+     * all registers except the fetched byte and its continuation scratch. */
+    for(unsigned i=0;i<32768;i++)program[i]=(u8)(i*13+(i>>8));
+    for(unsigned i=0;i<8192;i++)bios[i]=(u8)(0x87+i*29+(i>>7));
+    u8 *audio=native_owner+0x80854DF0-0x8082A070;
+    const u32 starts[]={0,0x1FC0,0x2000,0x3FC0};
+    const u32 offsets[]={0,63,64,127,0x1000,0x1FFF};
+    for(unsigned i=0;i<4;i++)for(unsigned j=0;j<6;j++) {
+        audio[0x18]=starts[i]>>8;audio[0x19]=starts[i];
+        r=registers();r.r[6]=b.base+0x80854DF0-0x8082A070;r.r[4]=offsets[j];saved=r;
+        af_v3_qd_native_dpcm_dispatch(audio,&r);untouched(&r,&saved,(1u<<8)|(1u<<13));
+        u32 at=0xC000+starts[i]+offsets[j];if(at>=0x10000)at-=0x8000;
+        u32 expected=at>=0xE000?bios[at-0xE000]:program[at-0x6000];
+        CHECK(r.r[13]==expected && audio[0x1C]==expected);
+        CHECK(r.r[8]==(uint64_t)(int64_t)(int32_t)(b.base+0x80833DD8u-0x8082A070u));
+    }
+    n->error=0;r.r[4]=0x2000;af_v3_qd_native_dpcm_dispatch(audio,&r);
+    CHECK(n->error==3 && !r.r[13] && !audio[0x1C]);
+    /* Closed/different sessions retain the original cartridge reader. */
+    put(native_owner+0x80837BC0-0x8082A070,(u32)(uintptr_t)program);
+    u32 magic=n->magic;n->magic=0;audio[0x18]=0x12;audio[0x19]=0x40;
+    r=registers();r.r[6]=b.base+0x80854DF0-0x8082A070;r.r[4]=0x321;saved=r;
+    af_v3_qd_native_dpcm_dispatch(audio,&r);untouched(&r,&saved,(1u<<8)|(1u<<13));
+    CHECK(r.r[13]==program[0x1561] && audio[0x1C]==program[0x1561]);n->magic=magic;
     for(unsigned i=0;i<16;i++) {
         CHECK(state[i]==0x5A && state[AF_QDN_STATE_BYTES+16+i]==0x5A);
         CHECK(graphics[i]==0xA5 && graphics[AF_QDN_GRAPHICS_BYTES+16+i]==0xA5);
     }
     CHECK(!memcmp(disk,original,sizeof(disk)));
-    printf("%u native QD adapter checks: relocated startup, reset retention, I/O/IRQ routes, motor timing, CPU/RAM/WDM, CHR/cache and guards; native calls stubbed\n",checks);
+    printf("%u native QD adapter checks: startup/reset, I/O/IRQ, motor yield, audio initialization/DPCM banks, CPU/RAM/WDM, CHR/cache and guards; native calls stubbed\n",checks);
 }
