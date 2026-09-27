@@ -15,7 +15,7 @@ from v3_villager_audio import (GC_SECTIONS, NATIVE_HEADERS, extended_envelope,
     extended_native_interpreter, header_entry, instrument, read_audio_donor, resource, span)
 from v3_room_rig_runtime import SOURCES as ROOM_SOURCES
 
-SOURCES=('tools/v3_sound_programs.py','tools/v3_villager_audio.py','tools/v3_furniture_install.py',
+SOURCES=('tools/v3_sound_programs.py','tools/v3_room_creature_audio.py','tools/v3_villager_audio.py','tools/v3_furniture_install.py',
     'tools/v3_furniture_melody.py')+ROOM_SOURCES
 
 
@@ -45,6 +45,9 @@ def trigger_program(sequence, origin, limit):
             commands.append(dict(offset=start,opcode=op,transpose=transpose));continue
         if op==0xC4:
             commands.append(dict(offset=start,opcode=op));continue
+        if op==0xCE:
+            bend=span(data,at,1)[0];at+=1
+            commands.append(dict(offset=start,opcode=op,bend=bend));continue
         if op==0xC6:
             instrument=span(data,at,1)[0];at+=1
             if instrument>125:raise ValueError('Unsupported trigger layer instrument')
@@ -212,15 +215,14 @@ def prepare_triggers(image,report,sound_words):
     native_banks=span(code,0x80115D80-CODE_RAM+native_map,5)
     if source_banks!=bytes((4,2,155,154,153)) or native_banks!=bytes((4,2,141,140,139)):
         raise ValueError('Changed trigger font selection')
-    tables={0:(0x194,128),1:(0x294,128),4:(0x394,107)};starts=set()
+    tables={0:(0x194,128),1:(0x294,128),4:(0x394,107),5:(0x46A,65)};starts=set()
     for group,(at,count) in tables.items():
         if struct.unpack_from('>H',source,0x188+group*2)[0]!=at:
             raise ValueError('Changed complete source trigger table')
         starts.update(struct.unpack_from('>'+str(count)+'H',source,at))
-    # All six dispatch groups delimit neighbouring programmes, including groups
-    # not imported here. Group five's first pointer is its terminal byte at
-    # 04EC; groups two and three each contain 81 instrument/note entries.
-    for group,at,count in ((2,0x3B7E,81),(3,0x3C20,81),(5,0x46A,65)):
+    # All six dispatch groups delimit neighbouring programmes. Groups two and
+    # three are not imported here; each contains 81 instrument/note entries.
+    for group,at,count in ((2,0x3B7E,81),(3,0x3C20,81)):
         if struct.unpack_from('>H',source,0x188+group*2)[0]!=at:
             raise ValueError('Changed neighbouring source trigger table')
         starts.update(struct.unpack_from('>'+str(count)+'H',source,at))
@@ -243,6 +245,15 @@ def prepare_triggers(image,report,sound_words):
                 donors[key]=dict(bank_id=sb,instrument=index,instrument_count=header[12],bank=bank,wave=wave)
         programs.append(dict(sound_word=word,source_sound_id=sid,singleton=bool(word&0x8000),
             source_bank=sb,source_program=description,source_data=source[origin:limit]))
+    bend_contract={}
+    if any(c['opcode']==0xCE for p in programs for c in p['source_program'].get('commands',[])):
+        curve=dol.read(0x800D28C4,1024)
+        if (sha256(curve)!='554af5f9a42bfd7d2da44793fb62bca8ff6346e497af84b4b09d4d5d9d5cd4d8' or
+                span(code,0x801122A4-CODE_RAM,1024)!=curve or
+                u32(code,0x801184EC-CODE_RAM)!=0x800F3A7C):
+            raise ValueError('Changed complete native/source note-bend mapping')
+        bend_contract=dict(handler=0x800F3A7C,dispatch=0x801184EC,
+            source_curve=0x800D28C4,native_curve=0x801122A4,bytes=1024,sha256=sha256(curve))
     bank,bank_header,bank_physical=installed_resource(image,code,'bank',native_banks[3])
     if bank_header[11]!=255 or bank_header[13]:raise ValueError('Target is not an instrument-only font')
     wave,wave_header,wave_physical=installed_resource(image,code,'wave',bank_header[10])
@@ -271,7 +282,8 @@ def prepare_triggers(image,report,sound_words):
         additional_capacity_for_font_only=max(0,font_allocation-budget['conservative_spare']),
         sequence_growth_not_included=True,runtime_installed=False,
         dispatch_and_priority_installed=False,allocation_installed=False,callback_installed=False,
-        native_synthesis_tested=False,physical_audio_played=False)
+        native_synthesis_tested=False,physical_audio_played=False,
+        **({'note_bend':bend_contract} if bend_contract else {}))
 
 
 def furniture_trigger(source,profile):
@@ -319,6 +331,11 @@ def prepare_furniture_audio(image,report,source,inventory,output,selected=(),cat
     if category=='room-movement':
         from v3_room_movement import prepare_audio
         return prepare_audio(image,report,source,output,selected)
+    creature=None
+    from v3_furniture_rigs import EMBEDDED_CATEGORY
+    if category==EMBEDDED_CATEGORY:
+        from v3_room_creature_audio import dependencies
+        creature=dependencies(source,image,report,selected)
     installed={r['item_id'] for r in report['equipment_resources'].get('furniture_audio',{}).get('furniture',[])}
     if effect_sounds:
         from v3_room_particles import sound_dependencies
@@ -326,16 +343,18 @@ def prepare_furniture_audio(image,report,source,inventory,output,selected=(),cat
             raise ValueError('Unbound effect audio dependencies')
     rows=[];triggers={}
     for r in inventory['rows']:
-        if effect_sounds and not selected:continue
+        if creature or effect_sounds and not selected:continue
         if (r['installed'] or r['item_id'] in installed or not r.get('asset_ready') or
                 selected and r['item_id'] not in selected or category is not None and category not in r['categories']):continue
         trigger=furniture_trigger(source,r.get('profile',{}))
         if trigger is not None:rows.append(r);triggers[r['item_id']]=trigger
-    if not rows and not effect_sounds or selected and set(selected)!={r['item_id'] for r in rows}:
+    if not creature and (not rows and not effect_sounds or selected and set(selected)!={r['item_id'] for r in rows}):
         raise ValueError('Unsupported or empty furniture audio selection')
     words=sorted(set(furniture_trigger_words(triggers.values()))|{r['sound_word'] for r in effect_sounds})
+    if creature:words=sorted({r['source_sound_word'] for r in creature['rows']})
     resources,result=prepare_triggers(image,report,words)
     if effect_sounds:result['effect_sound_dependencies']=effect_sounds
+    if creature:result['creature_sound_dependencies']=creature
     result['furniture']=[dict(item_id=r['item_id'],name=r['name'],
         profile_sha256=r['profile']['profile_sha256'],callback=r['profile']['callback_adapter'],
         trigger=triggers[r['item_id']]) for r in rows]
@@ -1048,7 +1067,7 @@ def grow_permanent_heap(code):
 
 def register_triggers(sequence,programs,fragments,counts,native_priority,source_priority,*,previous=None):
     """Extend whole dispatch tables while preserving shared cross-group priorities."""
-    if (len(native_priority)!=128 or len(source_priority)!=128 or not {1,4}<=set(counts)<= {0,1,4} or
+    if (len(native_priority)!=128 or len(source_priority)!=128 or not {1,4}<=set(counts)<= {0,1,4,5} or
             any(type(n) is not int or not 0<n<=128 for n in counts.values())):
         raise ValueError('Unsupported complete trigger dispatch contract')
     result=bytearray(sequence);tables={};rows=[];used=set();retained={}
@@ -1320,6 +1339,13 @@ def install_furniture(image,prior,blob,code,original,output,directory):
         if effect_sounds!=json.loads(json.dumps(sound_dependencies(source))):
             raise ValueError('Changed complete effect audio dependencies')
     words=sorted(set(furniture_trigger_words(triggers.values()))|{r['sound_word'] for r in effect_sounds})
+    creature=prepared.get('creature_sound_dependencies')
+    if creature:
+        from v3_room_creature_audio import dependencies
+        selected=[r['source_item_id'] for r in creature['rows']]
+        if creature!=json.loads(json.dumps(dependencies(source,image,prior,selected))):
+            raise ValueError('Changed complete creature sound dependencies')
+        words=sorted(set(words)|{r['source_sound_word'] for r in creature['rows']})
     resources,audio=prepare_triggers(image,prior,words)
     for key in ('programs','layout','previous','font_index','wave_index','source_sequence_sha256'):
         if json.loads(json.dumps(audio[key]))!=prepared[key]:raise ValueError('Changed complete prepared audio identity')
@@ -1337,9 +1363,10 @@ def install_furniture(image,prior,blob,code,original,output,directory):
         contracts.append(dict(address=first,bytes=last-first,sha256=sha256(old)))
     sequence,entry,physical=installed_resource(image,code,'seq',199)
     old_sequence=prior['equipment_resources']['sound_programs']['sequence']
+    insect_table=next((r['offset'] for r in previous['tables'] if r['group']==5),0x3DA) if previous else 0x3DA
     if (sha256(sequence)!=old_sequence['sha256'] or physical!=old_sequence['physical'] or
             entry.hex()!=old_sequence['header_after'] or
-            struct.unpack_from('>H',sequence,0x192)[0]!=0x3DA or
+            struct.unpack_from('>H',sequence,0x192)[0]!=insect_table or
             previous is None and (struct.unpack_from('>H',sequence,0x18A)[0]!=0x4C30 or
                 struct.unpack_from('>H',sequence,0x190)[0]!=0x33E or
                 prior['speed_bag_sound']['sequence_group_one_count']!=106)):
@@ -1354,12 +1381,27 @@ def install_furniture(image,prior,blob,code,original,output,directory):
         if (sha256(priority)!=previous['priority_table_sha256'] or prior['speed_bag_sound']['sequence_group_one_count']!=128 or
                 previous['format']!='AFV3-FURNITURE-TRIGGER-AUDIO-1'):
             raise ValueError('Changed retained furniture audio dispatch contract')
-    new_sequence,programs,tables=register_triggers(sequence,audio['programs'],resources['fragments'],
-        {r['group']:r['previous_count'] for r in previous['tables']} if previous else {1:106,4:78},
+    counts={r['group']:r['previous_count'] for r in previous['tables']} if previous else {1:106,4:78}
+    if any((word&0x7FFF)>>8==5 for word in words):counts.setdefault(5,45)
+    new_sequence,programs,tables=register_triggers(sequence,audio['programs'],resources['fragments'],counts,
         priority,dol.read(0x800A9A90,128),previous=previous)
     seq,bank,wave_record,changes,growth,heap_growth,patches,before_budget,fire=install_audio_resources(
         image,prior,blob,code,new_sequence,resources,audio)
     result=copy.deepcopy(prior['equipment_resources']);runtime=result['room_rigs']
+    if creature:
+        combined=copy.deepcopy(creature);retained_creature=result.get('creature_audio',{})
+        if retained_creature:
+            older=retained_creature['source']
+            if (retained_creature.get('native_scheduler_installed') or
+                    {k:v for k,v in older.items() if k!='rows'}!={k:v for k,v in creature.items() if k!='rows'} or
+                    {r['source_item_id'] for r in older['rows']}&{r['source_item_id'] for r in creature['rows']}):
+                raise ValueError('Changed or already installed creature audio membership')
+            combined['rows']=sorted(older['rows']+creature['rows'],key=lambda r:r['source_item_id'])
+        result['creature_audio']=dict(source=combined,
+            programs=sorted({r['source_sound_word']:r for r in retained_creature.get('programs',[])+programs}.values(),
+                key=lambda r:r['source_sound_word']),
+            resources_installed=True,native_scheduler_installed=False,callback_installed=False,
+            native_synthesis_tested=False,physical_audio_played=False)
     packet=runtime['packet'];at=packet['blob_offset']
     packet_data=blob[at:at+packet['bytes']]
     packet_ram,table_ram,_=room.packet_layout(runtime)
@@ -1413,6 +1455,8 @@ def install_furniture(image,prior,blob,code,original,output,directory):
         dict(prepared_sha256=sha256(raw),source_items=[r['item_id'] for r in furniture],
              programs=programs,heap_growth=heap_growth,resource_growth=growth,
              **({'effect_sound_dependencies':effect_sounds} if effect_sounds else {}))]
+    if creature:
+        result['furniture_audio']['batches'][-1]['creature_sound_dependencies']=creature
     speed=copy.deepcopy(prior['speed_bag_sound']);speed['sequence_group_one_count']=128
     return result,changes,dict(fire_sound=fire,speed_bag_sound=speed,resource_growth=[growth] if growth else [])
 

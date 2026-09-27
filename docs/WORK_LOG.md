@@ -1,5 +1,36 @@
 # Work record
 
+## 2026-09-27: shared creature-trigger programs and automatic dependency planning
+
+- Extended the existing trigger converter/installer for group five and native
+  note-bend commands. The source callback, complete scheduler, sound/delay tables,
+  native interpreter, and full 256-entry pitch curve are checked. The curve is
+  identical on both platforms; no pitch or envelope approximation is used.
+- Installed the three complete programs, three instruments, and 69,824 added
+  waveform bytes. Font growth is 512 bytes and audio-heap growth is 1,024 bytes.
+  Native group five grows from 45 to 128 entries while retaining every existing
+  dispatch entry and earlier imported program. Native words remain `052D`,
+  `0531`, and `0535`. Selection, graphics, parent profiles, and saves are unchanged.
+- ABI 292 lock: `build/v3-creature-trigger-audio-01/build-lock.json`; ROM SHA-256
+  `1d1ec18055570bf1d2acf4cef06ded396a3e6f96024f5cbb73803821baf60aee`.
+  Preparation lives at `build/v3-creature-trigger-audio-prepared-01/`.
+  The shared planner now adds missing creature audio independently of artwork,
+  supports selected batches, merges distinct memberships, and skips installed
+  resources. No new per-item installer or test scenario is created.
+- Two focused current cartridge/planner tests pass in 17.161 seconds, covering
+  actual donor programs, all font/wave data, retained dispatch/programs, current
+  profile bindings, unchanged save state, and complete UPS reconstruction. The
+  note-bend parser's focused check passes. No native replay or physical audio.
+- Native timed-sound table extension and room callbacks remain unfinished, as
+  do native parent identities and carried/collection/catch/release/spawn readers.
+  The native scheduler is `800FB744..800FBA90`, with sound/delay data at
+  `80113AFC`/`80113B14` and 12 entries; the donor has 17. Its full existing
+  scheduler must retain source timing and ownership while adding supported IDs.
+  Inspect the unused room-bootstrap data after the colour bridge before reserving
+  new memory, and include those arrays in every packet refresh's reservation guard.
+  Do not enable the creature profiles before parent/gameplay integration.
+  Stable V2-14 deployments and main ABI-109 lock remain unchanged.
+
 ## 2026-09-27: shared creature transition dispatch
 
 - The preceding stable dresser publication and V3 integration are concrete

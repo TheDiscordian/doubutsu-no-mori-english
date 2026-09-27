@@ -746,7 +746,7 @@ def profile_resources(source,name,address,raw,item):
         raw,move=source.function(callbacks[4][3])
         if len(raw)!=76:raise ReviewRequired('Unsupported complete creature sound callback')
         sound=struct.unpack_from('>H',raw,0x36)[0]
-        if not 0<=sound<96:raise ReviewRequired('Creature sound exceeds source dispatch table')
+        if not 54<=sound<70:raise ReviewRequired('Creature sound exceeds source dispatch table')
         helpers=source.checked_callback_code(move,76,
             'a8ceb00c834d641445a8c363b8f47074017fb7444badcc69bd4147c1b35666ff',{},
             {0x38:(0x2BE53C,'sAdo_RoomIncectPos')},'embedded creature sound',{0x36:sound})

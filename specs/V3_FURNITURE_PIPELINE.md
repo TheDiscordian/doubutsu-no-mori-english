@@ -179,6 +179,15 @@ loop audio, and profiles in dependency order; unfinished acquisition stays separ
 
 ### Multi-instrument trigger programmes
 
+Creature rigs share the same complete trigger importer. Their source-checked
+callbacks select group-five programs and randomized-delay records, not ordinary
+positioned loops. The planner stages missing creature audio independently of
+remaining artwork and retains explicit pending scheduler/callback status.
+Selected batches merge without changing existing identities. Group five retains
+all 45 native entries and uses the same priority-preserving appended slots as
+other supported groups. Note-bend commands preserve their operand and require
+the full native handler/dispatch and identical donor/native bend curve.
+
 The sound converter retains layer-level instrument commands (`C6`), including
 switches back to an earlier instrument. Every referenced complete instrument,
 envelope, sample, loop, predictor, and tuning record goes through the shared font

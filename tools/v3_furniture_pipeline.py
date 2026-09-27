@@ -1506,6 +1506,12 @@ def rig_import_plan(inventory, report, bindings, selected=(), category=None, *, 
                       set(material_loops)|set(scroll_loops)|joint_loops)-loops),
         profiles=sorted(r['item_id'] for r in rows+material_rows+static_rows+scroll_rows+console_rows+plain_rows
                         if r['item_id'] not in bindings and r['profile'].get('callback_adapter',{}).get('category')!=EMBEDDED_CATEGORY))
+    creature_audio=report['equipment_resources'].get('creature_audio',{})
+    creature_ready={r['source_item_id'] for r in creature_audio.get('source',{}).get('rows',[])}
+    creature_missing=sorted(r['item_id'] for r in rows if
+        r['profile']['callback_adapter']['category']==EMBEDDED_CATEGORY and
+        r['profile']['callback_adapter'].get('level_sound') and r['item_id'] not in creature_ready)
+    if creature_missing:plan['creature_audio']=creature_missing
     if any(r['profile']['callback_adapter']['category']==ROTATED_CATEGORY for r in rows):
         exercise=report['equipment_resources'].get('player_motion',{}).get('exercise')
         if not exercise or not exercise.get('action_installed'):
@@ -1596,6 +1602,11 @@ def import_batch(source, worksheet, output, lock, selected=(), category=None, re
             refresh('profile-runtime',furniture_profiles=[bundle(plan['profiles'],'profile-assets')])
     elif plan['audio'] or plan['loops']:
         raise ValueError('Audio dependency is missing from an otherwise installed rig profile')
+    if plan.get('creature_audio'):
+        from v3_furniture_rigs import EMBEDDED_CATEGORY
+        audio=output/'creature-audio'
+        prepare_furniture_audio(base,report,source,inventory,audio,plan['creature_audio'],EMBEDDED_CATEGORY)
+        refresh('creature-audio-runtime',furniture_audio_art=audio)
     for stage in plan.get('player_exercise',[]):
         # Follow complete room/music publication, even when artwork is present.
         refresh('player-exercise-'+stage,player_actions=True)

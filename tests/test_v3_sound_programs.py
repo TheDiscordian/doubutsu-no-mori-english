@@ -18,7 +18,85 @@ import v3_sound_programs as sounds
 OUTPUT=ROOT/os.environ.get('V3_PLAYER_FRAME_BUILD','build/v3-player-frame-sound-01')
 
 
+class CreatureAudioTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        from v3_furniture_pipeline import Source
+        cls.out=ROOT/'build/v3-creature-trigger-audio-01'
+        cls.image,cls.report=inputs(cls.out/'build-lock.json')
+        cls.base,cls.prior=inputs(cls.out/'base-lock.json')
+        cls.code=by_vrom(cls.image)[CODE_VROM].extract(cls.image)
+        cls.source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+            (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+
+    def test_complete_programs_samples_and_original_dispatch_are_retained(self):
+        from v3_villager_audio import read_audio_donor
+        from v3_room_rig_runtime import bind_profiles
+        e=self.report['equipment_resources'];creature=e['creature_audio'];audio=e['furniture_audio']
+        self.assertTrue(creature['resources_installed'])
+        self.assertFalse(creature['native_scheduler_installed'] or creature['callback_installed'])
+        self.assertEqual(sorted(r['source_sound_id'] for r in creature['source']['rows']),[65,66,67])
+        self.assertEqual(len(creature['programs']),3)
+        words=[r['source_sound_word'] for r in creature['programs']]
+        resources,prepared=sounds.prepare_triggers(self.base,self.prior,words)
+        self.assertIn('note_bend',prepared)
+        font,_,_=sounds.installed_resource(self.image,self.code,'bank',prepared['font_index'])
+        wave,_,_=sounds.installed_resource(self.image,self.code,'wave',prepared['wave_index'])
+        sequence,_,_=sounds.installed_resource(self.image,self.code,'seq',199)
+        self.assertEqual((font,wave),(resources['font'],resources['wave']))
+        source_programs={p['sound_word']:p for p in prepared['programs']}
+        for program in creature['programs']:
+            raw=sequence[program['offset']:program['offset']+program['bytes']]
+            source=source_programs[program['source_sound_word']]
+            fragment=resources['fragments'][source['fragment_file']];origin=source['fragment_origin']
+            desc=sounds.trigger_program(bytes(origin)+fragment,origin,origin+len(fragment))
+            expected=sounds.bind_trigger(fragment,desc,program['offset'],1,program['native_instrument'])
+            self.assertEqual(raw,expected)
+            parsed=sounds.trigger_program(sequence,program['offset'],program['offset']+len(raw))
+            self.assertEqual(parsed['events'],source['source_program']['events'])
+            self.assertEqual(parsed.get('commands'),source['source_program'].get('commands'))
+            self.assertEqual(program['native_sound_word']>>8,5)
+        table=next(t for t in audio['tables'] if t['group']==5)
+        self.assertEqual((table['previous_count'],table['count']),(45,128))
+        self.assertEqual(sequence[table['offset']:table['offset']+90],sequence[0x3DA:0x3DA+90])
+        donor,_=read_audio_donor(ROOT/'local/gamecube/Animal Crossing (USA, Canada).ciso')
+        again,rows,tables=sounds.register_triggers(sequence,[],{},
+            {r['group']:r['previous_count'] for r in audio['tables']},
+            sounds.span(self.code,0x80113B84-CODE_RAM,128),donor.read(0x800A9A90,128),previous=audio)
+        self.assertEqual(again,sequence);self.assertEqual(rows,[]);self.assertEqual(tables,audio['tables'])
+        old=self.prior['equipment_resources']['furniture_audio']
+        for p in old['programs']:self.assertIn(p,audio['programs'])
+        self.assertEqual(audio['furniture'],old['furniture'])
+        bind_profiles(self.source,self.image,self.report)
+        for key in ('save_runtime','save_codec','translation_baseline','staged_furniture','furniture'):
+            self.assertEqual(self.report[key],self.prior[key])
+        original=(ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes()
+        self.assertEqual(apply_ups(original,(self.out/'asset-loader.ups').read_bytes()),self.image)
+
+    def test_shared_planner_installs_missing_audio_once_without_enabling_creatures(self):
+        from v3_furniture_pipeline import scan,rig_import_plan
+        from v3_furniture_rigs import EMBEDDED_CATEGORY
+        ids=[r['source_item_id'] for r in self.report['equipment_resources']['room_rigs']['rows'] if r.get('mode')==13]
+        inventory=scan(self.source,ROOT/'build/item-identity-megasheet.xlsx',selected=ids)
+        missing=rig_import_plan(inventory,self.prior,{},category=EMBEDDED_CATEGORY,source=self.source)
+        expected=sorted(r['source_item_id'] for r in self.report['equipment_resources']['creature_audio']['source']['rows'])
+        self.assertEqual(missing,dict(resources=[],audio=[],loops=[],profiles=[],creature_audio=expected))
+        complete=rig_import_plan(inventory,self.report,{},category=EMBEDDED_CATEGORY,source=self.source)
+        self.assertEqual(complete,dict(resources=[],audio=[],loops=[],profiles=[]))
+
+
 class ProgramTests(unittest.TestCase):
+    def test_trigger_bend_is_preserved_and_requires_its_operand(self):
+        raw=bytes.fromhex('eb0019880007ffce3c5f809628ff')
+        desc=sounds.trigger_program(raw,0,len(raw))
+        self.assertEqual(desc['commands'],[dict(offset=7,opcode=0xCE,bend=60)])
+        self.assertEqual(desc['events'],[dict(offset=9,note=31,duration=150,velocity=40)])
+        bound=sounds.bind_trigger(raw,desc,0x4200,1,12)
+        actual=sounds.trigger_program(bytes(0x4200)+bound,0x4200,0x4200+len(bound))
+        self.assertEqual(actual['commands'],desc['commands'])
+        self.assertEqual(actual['events'],desc['events'])
+        with self.assertRaises(ValueError):sounds.trigger_program(raw[:8],0,8)
+
     def test_trigger_layer_instruments_are_all_mapped_without_changing_music(self):
         raw=bytes.fromhex('eb0012880007ffc00450125ac009c607c78120ff613030c612553244541d2cff')
         desc=sounds.trigger_program(raw,0,len(raw))

@@ -13,9 +13,9 @@ and `1CE8..1D04`, at four-ID intervals. Source placement and pickup functions
 resolve their actual carried parents. This is not a claim of seventeen new
 native species: the brook-trout source slot must not replace native herabuna.
 
-ABI 291 is the current cartridge at
-`build/v3-creature-motion-dispatch-02/build-lock.json`, ROM SHA-256
-`a0af7334ea964f4c82715e87dd68dc4d60cb351e71b6369519da2fa99135b093`.
+ABI 292 is the current cartridge at
+`build/v3-creature-trigger-audio-01/build-lock.json`, ROM SHA-256
+`1d1ec18055570bf1d2acf4cef06ded396a3e6f96024f5cbb73803821baf60aee`.
 The shared importer installs all sixteen animated objects, reusing 74,672 bytes
 without recompilation, and extends the room-rig packet from 42 to 58 records.
 There are still 167 selectable choices and 100 complete inactive furniture
@@ -41,10 +41,28 @@ and drawing bounds. The current cartridge check verifies installed dependencies,
 all retained objects, disabled profiles, damaged-hook rejection, and full UPS
 reconstruction. No new emulator or hardware result is claimed.
 
-The source creature sound
-helper schedules timed, randomized triggers, not ordinary furniture sound loops.
-The native tables lack all three required donor sound entries; complete sound
-programs and table integration remain required alongside carried-parent readers.
+The source creature sound helper schedules timed, randomized triggers, not
+ordinary furniture sound loops. All three required donor programs and complete
+instruments are installed. The shared trigger importer grows group five from
+45 to 128 entries, preserving the original 45 entries and existing programs.
+The new words `052D`, `0531`, and `0535` preserve their donor identities and
+priorities. The full programs contain 11, 26, and 24 bytes respectively.
+Mole cricket's note-bend command retains the identical complete 256-entry native
+and donor curve. Three instruments add 512 font bytes and 69,824 waveform bytes;
+the audio heap grows by 1,024 bytes. No saved fields change.
+
+`build/v3-creature-trigger-audio-prepared-01/` contains the complete prepared
+resources. The ordinary category planner schedules missing creature audio even
+when its graphics are already installed, supports selected records, and skips
+installed dependencies. Two current cartridge/planner checks pass, including
+complete program/font/wave comparisons, original dispatch preservation, current
+profile binding, and UPS reconstruction. A focused note-bend parser test passes.
+No audio is emitted and native synthesis is not claimed.
+
+Native timed-sound table extension, room callbacks, and carried-parent readers
+remain required. The current native scheduler has twelve sound/delay entries,
+including a zero sentinel; source scheduling has seventeen entries. Do not call
+the native function with new indices until its complete tables are extended.
 
 ## Shared conversion
 

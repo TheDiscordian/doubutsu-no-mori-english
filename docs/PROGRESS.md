@@ -31,9 +31,9 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
-The current proposal is ABI 291 at
-`build/v3-creature-motion-dispatch-02/build-lock.json`, ROM SHA-256
-`a0af7334ea964f4c82715e87dd68dc4d60cb351e71b6369519da2fa99135b093`.
+The current proposal is ABI 292 at
+`build/v3-creature-trigger-audio-01/build-lock.json`, ROM SHA-256
+`1d1ec18055570bf1d2acf4cef06ded396a3e6f96024f5cbb73803821baf60aee`.
 It contains 167 selectable development imports and 100 complete inactive furniture
 profiles whose acquisition is pending. The main lock and both stable V2-14
 deployments are retained.
@@ -70,7 +70,13 @@ disabled pending native identity, audio, and carried-creature integration.
 The shared native dispatch preserves creature animation in placement/removal
 states 6 and 13 while retaining other furniture's callback exclusions. Sanitized
 category checks and current cartridge/resource/UPS checks pass; ordinary native
-creature gameplay is not claimed. There is no new resident allocation or save change.
+creature gameplay is not claimed. The dispatch adds no allocation or save change.
+Complete frog, mole-cricket, and mosquito sound programs and three instruments
+are installed through the shared importer, including the original pitch bend and
+envelopes. Wave data grows by 69,824 bytes and the audio heap by 1,024 bytes.
+Two current resource/planner checks and the focused bend-parser check pass.
+Native creature-sound scheduling and callbacks remain pending; existing creature
+sounds and all saved formats are retained. No audible test is performed.
 The static ant remains prepared. Choice counts are unchanged. See the
 [creature checkpoint](checkpoints/V3_CREATURE_PROFILES.md).
 
