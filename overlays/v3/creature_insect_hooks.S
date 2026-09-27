@@ -17,6 +17,8 @@ af_insect_hook_ctor:
     lw $a0,24($sp)
     jal af_v3_insect_spawn_reset
     nop
+    jal af_insect_colony_reset
+    nop
     lw $ra,28($sp)
     jr $ra
     addiu $sp,$sp,32
@@ -28,6 +30,8 @@ af_insect_hook_dtor:
     sw $ra,28($sp)
     jal af_v3_insect_unbind_controller
     lw $a0,0x13E8($ra)        /* native controller global: 11690 - 102A8 */
+    jal af_insect_colony_reset
+    nop
     lw $ra,28($sp)
     addiu $t9,$ra,0x768       /* original clip destructor */
     jalr $t9
@@ -96,8 +100,8 @@ af_insect_hook_slot:
 af_insect_hook_end:
     addiu $sp,$sp,-32
     sw $ra,28($sp)
-    jal af_v3_insect_events_reset
-    nop
+    jal af_insect_controller_end
+    move $a0,$s4
     lw $t9,28($sp)
     addiu $sp,$sp,32
     lw $ra,0x54($sp)         /* restore the native caller, not this hook */
@@ -121,3 +125,22 @@ af_insect_spawn_original:
     jr $t9
     sw $ra,36($sp)
 .size af_insect_spawn_original,.-af_insect_spawn_original
+
+/* Pull-net setup must identify a colony before its next background update
+ * transfers the catch label to an individual ant. Native bees retain index 8. */
+.globl af_insect_hook_net_index
+.type af_insect_hook_net_index,@function
+af_insect_hook_net_index:
+    addiu $sp,$sp,-32
+    sw $ra,28($sp)
+    sw $a0,24($sp)
+    lb $a1,0xE6C($a0)
+    lw $a2,0xF24($a0)
+    jal af_insect_net_index
+    lw $a0,0xE68($a0)
+    move $v1,$v0
+    lw $a0,24($sp)
+    lw $ra,28($sp)
+    jr $ra
+    addiu $sp,$sp,32
+.size af_insect_hook_net_index,.-af_insect_hook_net_index

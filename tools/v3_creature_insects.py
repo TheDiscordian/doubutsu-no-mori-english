@@ -31,11 +31,13 @@ PROGRAMS = (
 )
 RUNTIME=('creature_insects','creature_insect_state','creature_insect_environment',
          'creature_insect_engine','creature_insect_collision','creature_insect_spawns',
-         'creature_insect_manager')
+         'creature_insect_manager','creature_insect_colony','creature_insect_colony_draw')
 SOURCES=('tools/v3_creature_insects.py','overlays/v3/creature_insects.h',
          'tools/v3_creature_spawns.py','overlays/v3/creature_spawns.h',
          'overlays/v3/creature_insect_spawns.h',
          'overlays/v3/creature_insect_manager.h',
+         'overlays/v3/creature_insect_colony.h',
+         'tools/v3_furniture_art.py',
          'overlays/v3/creature_insect_engine.h',
          'overlays/v3/creature_insect_collision.h',
          'overlays/v3/creature_insect_bindings.ld',
@@ -161,7 +163,7 @@ def install_controller(image,symbols,contract):
     return {CODE_VROM:bytes(core),0x8DEEC0:bytes(owner),0x8E0870:bytes(rel)},patches
 
 
-def native_contract(image):
+def native_contract(image,prior):
     owner=by_vrom(image)[0x8DEEC0].extract(image)
     functions=[]
     for start,end,digest in NATIVE_FUNCTIONS:
@@ -175,7 +177,7 @@ def native_contract(image):
     bindings=(ROOT/'overlays/v3/creature_insect_bindings.ld').read_text()
     symbols=''.join((ROOT/f'upstream/af/linker_scripts/jp/symbol_addrs_{part}.txt').read_text()
                     for part in ('boot','code','libultra'))
-    starts=sorted(set(int(s,16) for s in re.findall(r'= (0x[0-9A-Fa-f]+); // type:func',symbols)))
+    starts=sorted(set(int(s,16) for s in re.findall(r'= (0x[0-9A-Fa-f]+); //[^\n]*\btype:func',symbols)))
     resident=[]
     for name,address in re.findall(r'(?m)^(\w+) = (0x[0-9A-Fa-f]+);',bindings):
         at=int(address,16)
@@ -185,17 +187,156 @@ def native_contract(image):
         vrom,ram=(0x1060,0x80025C60) if at<CODE_RAM else (CODE_VROM,CODE_RAM)
         before=source_files[vrom].extract(original)[at-ram:end-ram]
         current=current_files[vrom].extract(image)[at-ram:end-ram]
-        if len(before)!=end-at or not before or current!=before:
+        expected=bytearray(before);adapters=[]
+        if name=='af_insect_create_actor':
+            # The existing additive descriptor chain handles CA/CB specially
+            # and delegates native IDs, including unused B5, to actor_dlftbls.
+            # Preserve it; do not restore the retail descriptor lookup.
+            hooks=[*prior['campsite_exterior']['hooks'],
+                *prior['equipment_resources']['player_actions']['balloon_actor']['patches']]
+            for hook in hooks:
+                if not at<=hook['address']<end:continue
+                pos=hook['address']-at;old=bytes.fromhex(hook['before']);new=bytes.fromhex(hook['after'])
+                if len(old)!=len(new) or expected[pos:pos+len(old)]!=old:
+                    raise ValueError('Changed installed additive actor-descriptor chain')
+                expected[pos:pos+len(new)]=new;adapters.append(hook)
+            if len(adapters)!=2:raise ValueError('Missing installed actor-descriptor chain')
+        if len(before)!=end-at or not before or current!=expected:
             raise ValueError('Changed native engine binding: '+name)
-        resident.append(dict(symbol=name,address=at,end=end,sha256=sha256(before)))
+        resident.append(dict(symbol=name,address=at,end=end,sha256=sha256(current),
+            **(dict(original_sha256=sha256(before),retained_adapters=adapters) if adapters else {})))
     return dict(rom_sha256=sha256(image),owner_vrom=0x8DEEC0,owner_ram=0x80A10210,
         engine_bindings=resident,collision_pipe_bytes=0x1C,
         controller=controller_contract(image,original),
         spawn_manager=spawn_contract(image,original),
+        colony=colony_contract(image,original),
+        intro_environment=intro_environment_contract(image,original),
         functions=functions,controller_bytes=0x8F8,slot_offset=0x174,slots=3,stride=0x280,
         offsets=dict(type=0x1CC,movement=0x1D0,animation=0x1DC,speed_step=0x1E8,
                      target_speed=0x1EC,patience=0x1F4,collision=0x1F8,item=0x21C,
                      flags=0x21E,life_time=0x220,alpha=0x258))
+
+
+def intro_environment_contract(image,original):
+    files=by_vrom(image);retail=by_vrom(original);rows=[]
+    # Complete mode setter/getter/wall consumer and both owners of the native
+    # demo clip. GC's separate demo_clip2 is not the adjacent native field.
+    for vrom,ram,spans in (
+        (CODE_VROM,CODE_RAM,((0x800741DC,0x800743EC),)),
+        (0x8477A0,0x809529B0,((0x809529B0,0x80952ACC),
+                            (0x8095308C,0x809531C8),(0x80953444,0x80953474))),
+        (0x848600,0x80953820,((0x80953820,0x8095388C),))):
+        current=files[vrom].extract(image);before=retail[vrom].extract(original)
+        for start,end in spans:
+            raw=current[start-ram:end-ram]
+            if not raw or raw!=before[start-ram:end-ram]:
+                raise ValueError('Changed native insect intro/environment binding')
+            rows.append(dict(vrom=vrom,ram=ram,address=start,end=end,sha256=sha256(raw)))
+    return dict(functions=rows,demo_clip=0x80136F4C,block_mode_getter=0x800741F4,
+        player_acre_mask=1,inset_units=1,second_demo_clip_bound=False)
+
+
+def colony_contract(image,original):
+    from v3_npc_clothing import guard_incoming
+    from v3_player_actions import native_references
+    files=by_vrom(image);retail=by_vrom(original)
+    core=files[CODE_VROM].extract(image);entry=0x80100C90+0xB5*0x20
+    if core[entry-CODE_RAM:entry-CODE_RAM+0x20]!=bytes(0x20):
+        raise ValueError('The native ground-colony actor slot is already occupied')
+    owner=files[0x7AC420].extract(image);rel=files[0x7D9BA0].extract(image)
+    native=retail[0x7AC420].extract(original);ram=0x808B2D50
+    definitions=(ROOT/'upstream/af/linker_scripts/jp/symbol_addrs_overlays.txt').read_text()
+    starts=sorted({int(at,16) for at in re.findall(r'= (0x[0-9A-Fa-f]+); // type:func',definitions)})
+    functions=[]
+    for start in (0x808B5C68,0x808B5D44,0x808B5DA4,0x808B8B54,0x808B8B90):
+        end=next(at for at in starts if at>start);raw=owner[start-ram:end-ram]
+        if raw!=native[start-ram:end-ram]: raise ValueError('Changed complete native net callback')
+        functions.append(dict(address=start,end=end,sha256=sha256(raw)))
+    # The complete callback setup span proves their relocated player slots.
+    start,end=0x808DD570,0x808DD690
+    if owner[start-ram:end-ram]!=native[start-ram:end-ram]:
+        raise ValueError('Changed native net callback installation')
+    functions.append(dict(address=start,end=end,sha256=sha256(owner[start-ram:end-ram])))
+    start,end=0x808CCDFC,0x808CCE18;at=start-ram
+    before=owner[at:end-ram]
+    if before.hex()!='80820e6c8c830f245440000424030008046100020000000024030008':
+        raise ValueError('Changed native swarm-to-insect identity selection')
+    sections=struct.unpack_from('>5I',rel)
+    guard_incoming(owner,sections[0],ram,[(at,len(before))])
+    _,_,_,locations,_=native_references(owner,rel,expected_sections=sections[:4])
+    if any(p in locations for p in range(at,at+len(before),4)):
+        raise ValueError('Unexpected relocation in native net identity span')
+    return dict(actor_id=0xB5,part=4,bank=3,table_address=entry,profile_offset=0x14,
+        core_sha256=sha256(core),owner_vrom=0x7AC420,reloc_vrom=0x7D9BA0,owner_ram=ram,
+        owner_sha256=sha256(owner),reloc_sha256=sha256(rel),functions=functions,
+        address=start,before=before.hex(),symbol='af_insect_hook_net_index',installed=False)
+
+
+def install_colony(image,symbols,contract):
+    """Compose the resident actor and catch identity, retaining current hooks."""
+    files=by_vrom(image);core=bytearray(files[CODE_VROM].extract(image))
+    owner=bytearray(files[contract['owner_vrom']].extract(image))
+    rel=files[contract['reloc_vrom']].extract(image)
+    if (sha256(core)!=contract['core_sha256'] or sha256(owner)!=contract['owner_sha256'] or
+            sha256(rel)!=contract['reloc_sha256']):
+        raise ValueError('Changed prepared colony actor or catch owner')
+    for name in ('af_insect_colony_profile',contract['symbol']):
+        if symbols[name]&3 or not 0x80000000<=symbols[name]<0x80800000:
+            raise ValueError('Colony profile/code must be resident native RAM')
+    at=contract['table_address']-CODE_RAM
+    if core[at:at+0x20]!=bytes(0x20):raise ValueError('Occupied colony profile slot')
+    struct.pack_into('>I',core,at+0x14,symbols['af_insect_colony_profile'])
+    pos=contract['address']-contract['owner_ram'];before=bytes.fromhex(contract['before'])
+    if owner[pos:pos+len(before)]!=before:raise ValueError('Changed colony identity hook')
+    after=struct.pack('>I',0x0C000000|(symbols[contract['symbol']]>>2&0x3FFFFFF))+bytes(len(before)-4)
+    owner[pos:pos+len(before)]=after
+    return {CODE_VROM:bytes(core),contract['owner_vrom']:bytes(owner)},dict(contract,
+        profile=symbols['af_insect_colony_profile'],after=after.hex())
+
+
+def colony_assets(source,cache):
+    """Reuse the full material converter for a missing field actor dependency."""
+    from map_artwork import compile_commands_batch
+    from v3_furniture_pipeline import prepare_models,assemble_models
+    from v3_furniture_scroll import evw_scroll,CATEGORY
+    path=ROOT/'local/ac-decomp/src/actor/ac_ant.c'
+    digest='08ba0ac986073c6c4464c42ba537b2f306f14caa748b7e4db25ea13f5ed4c673'
+    if sha256(path.read_bytes())!=digest:raise ValueError('Changed pinned colony behaviour')
+    functions=[]
+    for at,rows in source.functions.items():
+        if any(n.startswith('aANT_') or n in ('aINS_make_ant','aINS_check_birth_ant','aINS_chk_live_ant') for n,_ in rows):
+            functions.append(source.function(at)[1])
+    if len(functions)!=13:raise ValueError('Incomplete colony lifecycle source')
+    animation,helpers=evw_scroll(source,source.symbol('act_ant_evw_anime')[0],source.function(0x339C)[1])
+    row=animation['rows'][0]
+    if (len(animation['rows'])!=1 or row['segment_address']!=0x08000000 or
+            [(t['width'],t['height'],t['rate']) for t in row['tiles']]!=[(32,32,[2,1]),(32,32,[1,-2])]):
+        raise ValueError('Changed complete colony scrolling layout')
+    adapter=dict(category=CATEGORY,scrolling=dict(row,model='colony'),model_order=['colony'],
+        model_arenas={'colony':'translucent'})
+    descriptor=dict(kind='creature-ground-colony',callback_adapter=adapter,
+        models={'colony':('act_antT_model',*source.symbol('act_antT_model'))})
+    part=prepare_models(source,descriptor)
+    identity=dict(rel_sha256=sha256(source.rel),source_sha256=digest,
+        commands_sha256=sha256(part[5].encode()),body_sha256=sha256(part[1]),
+        converter_sha256=sha256((ROOT/'tools/v3_furniture_art.py').read_bytes()))
+    if cache.exists():
+        report=json.loads((cache/'colony.json').read_text());asset=(cache/'colony.bin').read_bytes()
+        if report['identity']!=identity or sha256(asset)!=report['object_sha256']:
+            raise ValueError('Changed prepared colony asset cache')
+        return asset,report
+    cache.mkdir(parents=True)
+    commands=cache/'commands.c';write_new(commands,part[5].encode())
+    compiled=compile_commands_batch(cache/'compiled',[('colony',commands,part[6])])
+    asset,offsets,models,sequence=assemble_models(part,compiled['colony'])
+    if sequence is not None or sum(m['triangles'] for m in models)!=12:
+        raise ValueError('Incomplete colony geometry')
+    report=dict(identity=identity,functions=functions,scrolling=animation,scroll_helpers=helpers,
+        descriptor=descriptor,resources=part[2],models=models,model_offset=offsets['colony'],
+        object_bytes=len(asset),object_sha256=sha256(asset),native_rates=[r['rate'] for r in row['tiles']])
+    write_new(cache/'colony.bin',asset)
+    write_new(cache/'colony.json',(json.dumps(report,indent=2)+'\n').encode())
+    return asset,report
 
 
 def rewrite(text):
@@ -263,6 +404,23 @@ def generate(source,output,native):
             species=[r['source_index'] for r,k in zip(rows,kinds,strict=True) if k==kind]))
     output.mkdir(parents=True,exist_ok=False)
     for name,data in generated.items():write_new(output/name,data)
+    art,colony=colony_assets(source,output.parent/'colony-assets')
+    write_new(output/'colony.bin',art)
+    write_new(output/'colony.S',('''.section .rodata
+.balign 16
+.globl af_insect_colony_art
+af_insect_colony_art:
+.incbin "colony.bin"
+.balign 4
+.globl af_insect_colony_art_bytes
+af_insect_colony_art_bytes:
+.word '''+str(len(art))+'''
+.globl af_insect_colony_model
+af_insect_colony_model:
+.word '''+str(colony['model_offset'])+'''
+.globl af_insect_colony_rates
+af_insect_colony_rates:
+.byte '''+','.join(str(n) for row in colony['native_rates'] for n in row)+'\n').encode())
     calendar,spawn_report=insect_calendars(source)
     write_new(output/'insect-calendar.bin',calendar)
     write_new(output/'insect-calendar.S',(''' .section .rodata
@@ -275,7 +433,7 @@ af_insect_calendar:
 af_insect_calendar_bytes:
 .word '''+str(len(calendar))+'\n').encode())
     return dict(format='AFV3-CREATURE-INSECT-PROGRAMS-1',source=identity,dispatch=table,native_abi=native,
-        spawning=spawn_report,
+        spawning=spawn_report,colony=colony,
         rows=[dict(r,program=k) for r,k in zip(rows,kinds,strict=True)],programs=programs,
         source_version='GAFE01_00',donor_bugfixes=False,
         source_rate=60,native_rate=30,source_substeps=2,
@@ -306,6 +464,9 @@ def compile_programs(output,report):
     objects.append('insect-calendar.o')
     commands.append(shlex.join(['/n64_toolchain/bin/mips64-elf-gcc',*flags,'-c',
         'insect-calendar.S','-o','insect-calendar.o']))
+    objects.append('colony.o')
+    commands.append(shlex.join(['/n64_toolchain/bin/mips64-elf-gcc',*flags,'-c',
+        'colony.S','-o','colony.o']))
     commands.append(shlex.join(['/n64_toolchain/bin/mips64-elf-ld','-EB','-r',
         '-T','/source/overlays/v3/creature_insect_bindings.ld',*objects,'-o','programs.o']))
     commands.append('/n64_toolchain/bin/mips64-elf-nm --undefined-only programs.o')
@@ -323,7 +484,8 @@ def compile_programs(output,report):
         'Native demo/intro-mode bindings, field sound/effects, and mosquito player response',
         'Install prepared controller, spawn-manager, and directed-column hooks with the complete runtime',
         'Digging, rock-strike, and tree-shake event producers',
-        'Persistent insect season reader/codec and full ant ground-colony actor',
+        'Persistent insect season reader/codec',
+        'Install prepared colony profile/catch hook and included art with complete runtime startup',
         'Native/GameCube population-capacity alternatives, including eight wild GameCube slots',
         'Resolve installed creature-profile export, guarded packet placement/startup, and optional/behaviour selections',
         'Connected native gameplay/save verification; existing unresolved fixtures are not reset']
@@ -337,8 +499,8 @@ def main():
     parser.add_argument('--base-lock',type=Path,required=True)
     args=parser.parse_args()
     from v3_furniture_install import inputs
-    image,_=inputs(args.base_lock)
-    native=native_contract(image)
+    image,prior=inputs(args.base_lock)
+    native=native_contract(image,prior)
     source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
                   (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
     report=compile_programs(args.output,generate(source,args.output,native))

@@ -567,7 +567,7 @@ storage, and provenance are reused; this is not another graphics importer.
 | Bagworm | `mino` | Tree hiding, shaking, suspension, retraction, falling, and release |
 | Pill bug | `dango` | Rock strikes, emergence, stress response, escape, and drowning |
 | Spider | `mino` | Species-specific tree movement, falling, backward escape, and release |
-| Ant | `dango` | Individual carried/released insect; the separate ground colony remains required |
+| Ant | `dango` plus ground colony | Carried/released insect, food colony, net handoff, and fading |
 | Mosquito | `ka` | Flying, player pursuit, attack timing, sting requests, demo avoidance, and release |
 
 The source version is explicitly GAFE01-r0, with the later Australian conditionals
@@ -616,7 +616,11 @@ queries include substep phase. The native game-view offsets have MIPS assertions
 bounds. A scoped tile filter wraps native column generation, removes only the
 matching cylinder, and restores its previous scope after the check. It does not
 change foreground items or terrain. The real native terrain/ground response is
-retained. Intro-demo acre-inset detection still requires its native binding.
+retained. Intro-demo acre-inset detection reads native mode getter `800741F4`
+and player-acre mask one, matching the complete native wall consumer. Complete
+intro functions verify the mode's producer/reset. The intro and train-arrival
+actors establish and clear the first demo clip at `80136F4C`. The GameCube's
+second demo clip is not an assumed adjacent native field; its binding remains open.
 
 `creature_insect_hooks.S` supplies constructor/destructor ownership, imported
 initialisation, per-slot dispatch, and one event reset after the full controller
@@ -629,8 +633,10 @@ removing the complete replaced relocation records and preserving unrelated
 graphics hooks. Runtime placement/startup and remaining services must be completed
 before applying this composer to a deliverable ROM.
 
-The bindings file supplies 45 native primitive functions, checked against complete
-bodies in the hash-verified original N64 ROM. Unresolved demo/intro, audio/effect,
+The bindings file supplies 53 native primitive functions, checked against complete
+bodies in the hash-verified original N64 ROM. Native actor creation retains the
+installed campsite/balloon descriptor chain, checked against its existing receipts;
+it still delegates original actor IDs to the native table. Unresolved second-demo, audio/effect,
 and mosquito-player bindings remain undefined symbols in the prepared object;
 no dummy engine routines satisfy them. Controlled host services are test fixtures,
 not evidence of native gameplay or completed mosquito stings.
@@ -665,7 +671,7 @@ The native 24-byte creation record and 16-byte clip have MIPS layout assertions;
 the clip is not enlarged over adjacent state. The constructor resets the shared
 transient calendar cache. Source mode refreshes the calendar on month/time/area
 or profile changes, not on every acre visit. Its live-acre test excludes the
-release slot and includes a required colony query. Native-population mode gives
+release slot and includes the background-actor colony query. Native-population mode gives
 the unchanged original manager a 100-weight opportunity alongside enabled added
 species' real filtered weights. Both alternatives still require selector binding
 and their population-capacity implementations before a playable claim.
@@ -678,8 +684,8 @@ the original function offset, replaying its stack/return-address prologue.
 No fixed heap address is assumed. This composer and the controller/column
 composer must be installed with the complete resident runtime and loaded data.
 
-The manager intentionally retains unresolved native season and ant-colony
-services. The current saved creature capsule uses bytes 20..22 for fish seasons
+The manager intentionally retains the unresolved native season service.
+The current saved creature capsule uses bytes 20..22 for fish seasons
 and rejects nonzero bytes 23..31; an insect season reader cannot safely start
 writing that padding without the matching codec and compatibility work.
 `af_v3_creature_profile_byte` is an existing installed shared export that the
@@ -687,9 +693,45 @@ final linker must resolve from its checked build report. The current controller
 still has two wild slots and one release slot; the GameCube eight-wild-slot
 alternative is required work, not supplied by the larger spawn plan.
 
+### Ground colony and catch handoff
+
+`creature_insect_colony.c` connects the source's separate ground actor to ordinary
+native allocation, actor lists, movement/drawing, and destruction. Actor slot
+`B5` must be unused; the composer checks the entire empty descriptor before
+binding its resident profile. The actor uses native background part four and
+the existing keep bank, with a `188`-byte allocation. It replaces no native actor.
+All thirteen complete donor colony/creation/query functions and the pinned
+source file have receipts in the prepared report.
+
+The native controller's end callback processes the source's deferred colony
+request and retries an allocation failure on the next update. Constructor and
+destructor hooks clear that pending state; the native sixteen-byte insect clip
+is not enlarged. Candy/spoiled-turnip removal, acre culling, forced/ordinary net
+requests, two source-rate action steps, carried-slot creation, label transfer,
+scale/fade, and destruction are connected. Catch requests are registered once
+per native tick so the two source steps do not duplicate entries in the native
+eight-request list. Missing players during scene teardown are not dereferenced.
+If carried creation fails, destruction clears a still-owned catch label instead
+of leaving the native player with a pointer to freed colony storage.
+
+The guarded `808CCDFC..808CCE17` replacement identifies the colony as ant index
+38 while the catch is waiting for its background update. Native bee swarms keep
+index eight. Complete relocated net callbacks and their constructor assignments
+are checked; existing official catch-message and collection hooks are untouched.
+
+The shared material converter retains the complete twelve-triangle model,
+intensity texture, both scrolling layers, alpha combiner, and cloud-surface render
+mode in a 944-byte object. Rates come from the donor EVW table; the current frame
+supplies both immutable tile command lists. Native matrix, lighting, and cache
+writeback bindings are checked. The draw reserves command/scratch capacity before
+either lighting helper writes. Prepared artwork is cached under
+`build/v3-creature-insects-work-01/colony-assets/`; existing seventeen-creature
+artwork is not rebuilt. The profile, catch hook, and resident artwork must be
+installed with the complete insect runtime, not independently enabled.
+
 ### Current prepared output and remaining connections
 
-Prepared output: `build/v3-creature-insects-work-01/programs-10/`.
+Prepared output: `build/v3-creature-insects-work-01/programs-14/`.
 The current cartridge remains ABI 305. No new ROM, save layout, browser choice,
 or deployment is produced by preparation. Reproduce against the explicit input:
 
@@ -723,15 +765,23 @@ lifetime, source season requests, native creation parameters, optional masks,
 colony routing, live-acre suppression, and original-manager fallback. Native
 engine, colony, and save services in that fixture are controlled test callbacks;
 these checks do not establish native gameplay or implement the missing services.
+The colony host check uses the actual lifecycle and draw adapters with controlled
+engine callbacks. It covers pending allocation/retry, food conditions, forced and
+ordinary net requests, single-ant label transfer, failed creation, fading, scene
+cleanup, native bee preservation, scrolling coordinates, and graphics bounds.
+The current composition check also verifies the unused profile slot and catch
+span while preserving unrelated installed code. All six focused checks pass;
+native colony gameplay, visual appearance, and hardware remain unverified.
 
 Remaining connections belong to the same creature importing task:
 
-- Finish the native demo/intro-mode bindings, field sound/effects, and the mosquito
+- Finish the second demo-state binding, field sound/effects, and the mosquito
   player sting response. Reuse the prepared native environment/terrain/controller.
 - Connect the digging, axe/shovel rock-strike, and tree-shake event producers.
   The latch/reset and donor consumers are prepared; no producer is claimed wired.
-- Complete the persistent insect-season reader/codec and ant ground-colony actor
-  using the prepared calendar-to-native-manager path. Implement the actual
+- Complete the persistent insect-season reader/codec using the prepared
+  calendar-to-native-manager path. Retain the complete colony implementation.
+  Implement the actual
   native/GameCube population-capacity alternatives; group creation is bounded by
   available slots until the larger source pool and its consumers are installed.
 - Place the complete runtime through the existing owner-storage machinery, retain

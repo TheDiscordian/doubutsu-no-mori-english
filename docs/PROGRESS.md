@@ -50,16 +50,21 @@ The complete 78-list insect calendar, seasonal blending, habitat filtering,
 weighted selection, distinct-position group creation, and native spawn-manager
 adapter compile with those programs. The shared 64-row buffer retains the full
 45-row July/August blend, including candy/turnip extras. Native creation uses the
-real relocated insect clip; colonies have a separate required creation binding.
-Five focused checks pass: complete donor behaviour and collider preservation,
+real relocated insect clip; colonies use the separate native actor-creation path.
+Six focused checks pass: complete donor behaviour and collider preservation,
 sanitized environment/controller and spawn-manager paths, all source calendars
-and shared habitat/group logic, and current-cartridge hook/relocation composition.
+and shared habitat/group logic, current-cartridge hook/relocation composition,
+and colony lifecycle/drawing.
 These are host/compiler checks, not native gameplay. Output is
-`build/v3-creature-insects-work-01/programs-10/`; no new ROM is built, the insects
+`build/v3-creature-insects-work-01/programs-14/`; no new ROM is built, the insects
 remain unavailable for selection, and ABI 305 remains the cartridge.
-Continue the same batch with the remaining native demo/intro, sound/effect, and
-mosquito-sting bindings; player-event producers; persistent insect seasons and ant
-colonies; native/GameCube population-capacity choices; and complete runtime
+The colony runtime connects creation, catching into a single ant, complete
+two-layer scrolling artwork, fading, and native actor cleanup. The opening
+sequence's movement boundary and first demo-state reader use verified native
+bindings. The colony's profile/catch hooks still require final installation.
+Continue the same batch with the remaining second demo-state, sound/effect, and
+mosquito-sting bindings; player-event producers; persistent insect seasons;
+native/GameCube population-capacity choices; and complete runtime
 placement/startup/selection. The calendar-to-manager path is prepared, not installed;
 its unresolved services remain real dependencies, not dummy implementations. Native constructor
 timeout and sound-scheduler disconnection remain unresolved. No old native

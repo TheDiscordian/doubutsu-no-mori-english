@@ -19,6 +19,7 @@ const void *af_insect_demo_clip,*af_insect_demo_clip2;
 AfInsectBgContext af_insect_bg_context;
 static u32 unit;
 static int visible=1,inset,main_index,weather_calls,body_calls,catch_calls,destructions;
+static u32 block_kind=1;
 static int bg_calls,column_excluded,ground_checks;
 static uintptr_t caught;
 static unsigned phases;
@@ -74,7 +75,8 @@ int af_insect_world_block(int *x,int *z,xyz_t pos) {
     *x=(int)pos.x/640;*z=(int)pos.z/640;return 1;
 }
 int mFI_BkNum2WposXZ(f32 *x,f32 *z,int bx,int bz) {*x=bx*640.0f;*z=bz*640.0f;return 1;}
-int af_insect_acre_inset(int bx,int bz) {(void)bx;(void)bz;return inset;}
+int af_insect_block_mode(void) {return inset;}
+u32 af_insect_block_kind(int bx,int bz) {(void)bx;(void)bz;return block_kind;}
 void af_insect_ground_check(xyz_t *rev,AfInsectBgContext *ctx,ACTOR *a,f32 height,
                             AfInsectCollisionResult *result,s_xyz *angle,int attr) {
     assert(ctx==&af_insect_bg_context && result==&a->bg_collision_check.result);
@@ -151,6 +153,9 @@ static void terrain_and_stress(void) {
     a->last_world_position=(xyz_t){620,0,320};a->world.position=(xyz_t){645,0,320};
     af_insect_acre_wall(a,6);assert(a->world.position.x==634);
     inset=1;af_insect_acre_wall(a,6);assert(a->world.position.x==594);
+    assert(af_insect_acre_inset(0,0));
+    block_kind=2;assert(!af_insect_acre_inset(0,0));block_kind=1;
+    inset=0;assert(!af_insect_acre_inset(0,0));inset=1;
     assert(ground_checks==2);
 }
 static void ownership_and_culling(void) {

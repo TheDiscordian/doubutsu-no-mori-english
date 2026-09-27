@@ -11,12 +11,27 @@ import unittest
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'tools'))
 from aflib import sha256
-from v3_creature_insects import PROGRAMS,rewrite,install_controller,install_spawn_manager
+from v3_creature_insects import PROGRAMS,rewrite,install_controller,install_spawn_manager,install_colony
+PROGRAM_DIRECTORY=ROOT/os.environ.get('V3_INSECT_PROGRAMS','build/v3-creature-insects-work-01/programs-14')
 
 
 class CreatureInsectTests(unittest.TestCase):
+    def test_colony_lifecycle_and_drawing(self):
+        with tempfile.TemporaryDirectory(prefix='af-insect-colony-') as temporary:
+            executable=Path(temporary)/'colony'
+            result=subprocess.run(['cc','-std=c11','-O1','-g','-fno-pie','-no-pie',
+                '-fsanitize=address,undefined','-fno-sanitize-recover=all','-Wall','-Wextra','-Werror',
+                '-I'+str(ROOT/'overlays/v3'),str(ROOT/'overlays/v3/creature_insect_colony.c'),
+                str(ROOT/'overlays/v3/creature_insect_colony_draw.c'),
+                str(ROOT/'tests/v3_creature_insect_colony_test.c'),'-lm','-o',str(executable)],
+                capture_output=True,text=True)
+            self.assertEqual(result.returncode,0,result.stderr)
+            result=subprocess.run([str(executable)],capture_output=True,text=True,timeout=15)
+            self.assertEqual(result.returncode,0,result.stderr)
+            self.assertIn('catch handoff, bee preservation',result.stdout)
+
     def test_native_spawn_manager(self):
-        directory=ROOT/os.environ.get('V3_INSECT_PROGRAMS','build/v3-creature-insects-work-01/programs-10')
+        directory=PROGRAM_DIRECTORY
         data=(directory/'insect-calendar.bin').read_bytes()
         with tempfile.TemporaryDirectory(prefix='af-insect-manager-') as temporary:
             temp=Path(temporary);exe=temp/'manager'
@@ -37,7 +52,7 @@ class CreatureInsectTests(unittest.TestCase):
     def test_complete_spawn_path(self):
         from v3_creature_spawns import insect_calendars
         from v3_furniture_pipeline import Source
-        directory=ROOT/os.environ.get('V3_INSECT_PROGRAMS','build/v3-creature-insects-work-01/programs-10')
+        directory=PROGRAM_DIRECTORY
         source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
             (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
         data,report=insect_calendars(source)
@@ -73,7 +88,7 @@ class CreatureInsectTests(unittest.TestCase):
             self.assertIn('complete shared habitat/creation',result.stdout)
 
     def test_complete_program_category(self):
-        directory=ROOT/os.environ.get('V3_INSECT_PROGRAMS','build/v3-creature-insects-work-01/programs-10')
+        directory=PROGRAM_DIRECTORY
         report=json.loads((directory/'programs.json').read_text())
         self.assertEqual([r['source_index'] for r in report['rows']],list(range(32,40)))
         self.assertEqual(len(report['programs']),6)
@@ -126,7 +141,7 @@ class CreatureInsectTests(unittest.TestCase):
     def test_controller_composition(self):
         from aflib import by_vrom,CODE_VROM,CODE_RAM,u32
         from v3_furniture_install import inputs
-        directory=ROOT/os.environ.get('V3_INSECT_PROGRAMS','build/v3-creature-insects-work-01/programs-10')
+        directory=PROGRAM_DIRECTORY
         report=json.loads((directory/'programs.json').read_text())
         image,_=inputs(ROOT/'build/v3-creature-world-work-01/connected-15/build-lock.json')
         contract=report['native_abi']['controller'];files=by_vrom(image)
@@ -161,6 +176,32 @@ class CreatureInsectTests(unittest.TestCase):
         self.assertEqual(restored,original,'Existing gold-tree and native manager paths changed')
         with self.assertRaises(ValueError):
             install_spawn_manager(image,{'af_v3_insect_spawn':0x80900000},contract)
+        contract=report['native_abi']['colony']
+        symbols={'af_insect_colony_profile':0x80660000,'af_insect_hook_net_index':0x80660100}
+        changed,patch=install_colony(image,symbols,contract)
+        original=files[CODE_VROM].extract(image);restored=bytearray(changed[CODE_VROM])
+        at=contract['table_address']-CODE_RAM
+        self.assertEqual(restored[at:at+0x14],bytes(0x14))
+        self.assertEqual(u32(restored,at+0x14),symbols['af_insect_colony_profile'])
+        restored[at:at+0x20]=bytes(0x20)
+        self.assertEqual(restored,original,'Existing additive actor lookup changed')
+        original=files[contract['owner_vrom']].extract(image)
+        restored=bytearray(changed[contract['owner_vrom']]);at=contract['address']-contract['owner_ram']
+        self.assertEqual(restored[at:at+28].hex(),patch['after'])
+        restored[at:at+28]=bytes.fromhex(contract['before'])
+        self.assertEqual(restored,original,'Existing catch text/collection or player hooks changed')
+        symbols['af_insect_colony_profile']=0x80900000
+        with self.assertRaises(ValueError):install_colony(image,symbols,contract)
+        colony=report['colony'];asset=(directory/'colony.bin').read_bytes()
+        self.assertEqual(sha256(asset),colony['object_sha256'])
+        self.assertEqual(len(asset),colony['object_bytes'])
+        self.assertEqual(sum(m['triangles'] for m in colony['models']),12)
+        self.assertEqual(colony['native_rates'],[[2,1],[1,-2]])
+        model=asset[colony['model_offset']:]
+        commands=list(struct.iter_unpack('>II',model))
+        self.assertIn((0xFCFFE3FF,0xFF0DF43F),commands)
+        self.assertIn((0xE200001C,0xC8104B50),commands)
+        self.assertIn((0xDE000000,0x08000000),commands)
 
 
 if __name__=='__main__':unittest.main()

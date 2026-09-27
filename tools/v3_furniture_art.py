@@ -60,6 +60,10 @@ FRAME_BLEND_COMBINERS = {
 # Scrolling models supply every referenced tile, with the second cycle's texture
 # input retaining the second tile. Expressions match the donor model sources.
 SCROLL_COMBINERS = {
+    # Both scrolling intensity layers contribute alpha; actor primitive alpha
+    # fades the combined colony without replacing either complete texture.
+    (0xFCFFE3FF,0xFF0DF43F): ('0','0','0','PRIMITIVE','1','0','TEXEL0','TEXEL1',
+        '0','0','0','COMBINED','COMBINED','0','PRIMITIVE','0'),
     (0xFC30FE03,0x5F1AF3E9): ('PRIMITIVE','ENVIRONMENT','TEXEL0','ENVIRONMENT','0','0','0','TEXEL0',
         'COMBINED','0','PRIMITIVE','0','COMBINED','ENVIRONMENT','PRIM_LOD_FRAC','TEXEL0'),
     (0xFC30FE03,0x5F06F3FF): ('PRIMITIVE','ENVIRONMENT','TEXEL0','ENVIRONMENT','0','0','0','TEXEL0',
@@ -573,7 +577,7 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
                 (0xC8104A50,) if water else ((0xC8112078, 0xC8113078)
                 if accessory else (0xC8113078, 0xC8104DD8)))
             if static_materials: modes += (0xC8104A50,0xC81049D8)
-            if frame_blend: modes += (0xC8104B50,)
+            if frame_blend or scrolling: modes += (0xC8104B50,)
             if a != 0xE200001C or b not in modes:
                 raise ValueError('Unsupported furniture render mode')
         elif op == 0xFA:
