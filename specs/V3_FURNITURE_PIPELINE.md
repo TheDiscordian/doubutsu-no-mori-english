@@ -44,6 +44,28 @@ The implemented motion kinds cover lighthouse easing, moon clock/rotation, and
 snowcone easing/scrolling/sound. Compass parent-relative motion remains pending;
 it is not converted into a stationary decorative substitute.
 
+The parent-sensitive needle conversion is in `room_needle.c/.h`, with complete
+donor bindings in `v3_furniture_needle.py`. It preserves the eighth-source-tick
+rotation kick, signed phase wrapping, damping, ordered self/parent contributions,
+and world-angle correction. One source step is explicit; the room adapter must
+execute two steps per native update. Constructor evaluation uses speed `0.5`
+before stopping the keyframe. The source debug phase/decay inputs are explicit.
+Transient work needs sixteen bytes and no saved fields.
+
+Recognition checks complete callbacks, helpers, constants, and the relocated
+status jump table. Native rotation states 3/4 correspond to donor left/right;
+wait states 8/7 precede them. The ordinary lifecycle planner validates this
+contract but keeps the compass unavailable until its parent support is installed.
+Prepared artwork remains reusable without descriptor changes.
+
+The native room move/draw loops do not perform the donor's moving-parent
+registration and carried-child transform. Complete that shared adapter, including
+foreground removal/restoration and final child positions/angles, before binding
+the needle into the installed joint dispatcher. A permanent null parent, a fixed
+needle, or merely lifting the native movement restriction is not an implementation.
+The donor routines live in `ac_my_room_move.c_inc`, `ac_my_room_draw.c_inc`, and
+`ac_my_room_action.c_inc`, alongside the parent readers in `ac_my_room.c`.
+
 Rig mode 6 uses first-word low byte 1/2/3 for these source motion kinds. Kind 3
 also stores complete level sound `51` in the next byte and clicks `0016/0017`
 in the last word. Unknown parameter combinations reject. The source's initial

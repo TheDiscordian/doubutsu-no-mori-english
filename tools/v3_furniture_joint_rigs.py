@@ -26,7 +26,11 @@ def lifecycle(source,profile):
     a=profile.get('callback_adapter',{})
     if a.get('category')!=CATEGORY:return None
     feature=a['joint_features'];move=copy.deepcopy(a['functions']['move']);n=move['bytes']
-    if feature['mode']=='parent-relative-needle':return None
+    if feature['mode']=='parent-relative-needle':
+        from v3_furniture_needle import source_contract
+        source_contract(source,profile)
+        # Prepared motion is not an installed native moving-parent adapter.
+        return None
     forms={152:(1,'6143c6d4ff30eac53bf70f5a397472a108fc8e39409c1a75ccd7f11796639d06'),
            208:(2,'f71d363b75caa817b5991c20f4e99d6d24658b1eb5ead7e8924955aa310ad90d'),
            324:(3,'c0b109b370f0f0bdb01aadb574b8bcc4a1c7f0aa157751b5cbe52a833dd8cdc0')}

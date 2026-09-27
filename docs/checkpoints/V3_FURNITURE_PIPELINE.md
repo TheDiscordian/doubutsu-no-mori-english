@@ -1,5 +1,51 @@
 # Automatic furniture pipeline checkpoint
 
+## Parent-sensitive needle motion
+
+`room_needle.c/.h` converts the donor's constructor evaluation, eighth-tick
+rotation impulse, decay, signed phase, smoothing, and world-angle subtraction.
+Self and parent rotation feed the same counter in source order. Both debug
+adjustments remain explicit inputs. One source step is exported, with two steps
+required per native frame. Sixteen bytes of transient work are sufficient; no
+saved-field change is introduced.
+
+`v3_furniture_needle.py` checks fourteen complete code blocks and their relocation
+identities, motion/trigonometric constants, the actual relocated status jump
+table, and complete stop initialization. The existing planner invokes the
+contract without changing the reusable artwork descriptor or approving an
+unfinished lifecycle. Native state-table/rotation evidence establishes donor
+left/right as native 3/4, and wait-left/right as 8/7.
+
+Three focused tests pass (`python3 -m unittest tests.test_v3_furniture_needle -v`).
+The C check extracts and compiles the actual donor constructor, status helper,
+move callback, before-draw callback, parent readers, and easing function. It
+compares 19,232 steps with the converted code under address/undefined-behaviour
+sanitizers, covering all four child slots, both directions, self/parent combined
+inputs, signed counter/angle wrapping, interrupted waits, debug adjustments,
+complete settling, genuine no-parent cases, and instance guards. Its sine and
+keyframe evaluators are test substitutes; it does not prove native execution or
+graphics. Source mutation checks reject changed code, relocations, constants,
+and state dispatch. The current cartridge's native rotation/owner blocks are
+checked, not replayed in an emulator. The existing affected source/art-reuse
+check for the three switched rigs also passes.
+
+The existing Docker compiler links the converted module alongside the shared
+rig/joint code using `room_rigs_wide`. Preparation is at
+`build/v3-parent-needle-prepared-01/motion.json`, SHA-256
+`2a1552d038da276bb9ce12ec04ac5bd46fae8a34407fff6849ab0424dd05efbd`.
+The uninstalled 4,400-byte component code has SHA-256
+`869157e043c748ef135a7567c8def11908c71cf96082fce78a237be36df13227`.
+It is a component link, not a replacement for the full installed room packet.
+
+Native integration remains required. The inspected complete N64 owner move and
+draw loops do not carry/transform registered children as the donor does. The
+donor's shared registration, relative-position update, draw, foreground-table
+restoration, and final angle release live in the room `.c_inc` files, not solely
+`ac_my_room.c`. Connect those paths before exposing the compass or accepting a
+parent-binding receipt. Do not substitute an always-null parent or stationary
+needle. The current ROM remains ABI 243; no save, cartridge, selection, or
+deployment changes occur in this preparation. Both patchers remain V2-13.
+
 ## Installed switched joint lifecycles
 
 The ordinary category importer installs lighthouse model, moon, and snowcone

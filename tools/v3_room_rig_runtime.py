@@ -36,7 +36,8 @@ SOURCES=('tools/v3_room_rig_runtime.py','tools/v3_asset_loader.py','tools/v3_fur
     'overlays/v3/room_rigs_bootstrap.c','overlays/v3/room_rigs_bootstrap.ld',
     'tools/v3_furniture_motion.py','overlays/v3/room_motion.h','overlays/v3/room_rigs_extended.ld',
     'tools/v3_room_effects.py','overlays/v3/room_effects.c','overlays/v3/room_effects.h',
-    'overlays/v3/room_rigs_wide.ld','overlays/v3/room_joints.c','tools/v3_furniture_joint_rigs.py')
+    'overlays/v3/room_rigs_wide.ld','overlays/v3/room_joints.c','tools/v3_furniture_joint_rigs.py',
+    'tools/v3_furniture_needle.py')
 from v3_furniture_reactions import SOURCES as REACTION_SOURCES
 SOURCES+=REACTION_SOURCES
 from v3_furniture_static import SOURCES as STATIC_SOURCES

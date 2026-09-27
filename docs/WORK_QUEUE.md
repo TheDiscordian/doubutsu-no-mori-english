@@ -41,14 +41,24 @@ working floats occupy unused matrix slot nine, outside all eight morph joints.
 See the [batch checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#installed-switched-joint-lifecycles)
 for exact evidence and outstanding gameplay/hardware limits.
 
-For the compass, continue from the complete donor implementation in
-`local/ac-decomp/src/furniture/ac_ike_jny_houi01.c`, including its parent motion,
-rotation kick, damped oscillation, and needle world-angle correction. Native
-state table `8094D0F4` maps wait states 7/8 through `80944D9C/80944DCC` to 4/3;
-the shared rotation code `809443FC` increases angle field `34` for state 3 and
-decreases it for state 4. These are observed native directions, not yet a
-verified donor-left/right mapping. Parent/child lookup still needs a native
-binding or a complete adapter; do not replace it with an always-null parent.
+The compass needle core is converted in `overlays/v3/room_needle.c/.h`, including
+constructor evaluation, rotation kick, damped oscillation, ordered self/parent
+states, and world-angle correction. Three focused checks pass, including 19,232
+comparisons with actual donor functions under memory/undefined-behaviour
+sanitizers. The MIPS preparation is `build/v3-parent-needle-prepared-01/motion.json`;
+it is not installed. The shared planner validates complete source bindings and
+keeps the item unavailable; its complete artwork remains reusable.
+
+Next connect shared moving-parent registration, carry, draw, and release before
+binding the needle lifecycle. Native states 3/4 are verified donor left/right,
+preceded by wait states 8/7. The native room move/draw loops do not contain the
+donor's carried-child path. Donor implementation is in
+`local/ac-decomp/src/actor/ac_my_room_move.c_inc` (registration/release near
+62–240, transforms near 2565), `ac_my_room_draw.c_inc` (parent-relative draw near
+139–240), and `ac_my_room_action.c_inc` (push/pull/rotate registration sites).
+Parent readers are in `ac_my_room.c` near 2251. Do not use an always-null parent
+or lift movement restrictions without complete carrying/foreground restoration.
+See the [needle checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#parent-sensitive-needle-motion).
 
 Four complete joint-callback rigs are reusable from
 `build/v3-joint-callback-rigs-prepared-01/`: compass, lighthouse, moon, and

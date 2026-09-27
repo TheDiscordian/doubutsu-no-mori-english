@@ -31,6 +31,16 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
+The compass needle core is converted and cross-compiled: rotation kicks,
+damping, parent-state contributions, and world-direction correction. Three
+focused checks pass, including 19,232 comparisons with the actual donor C
+functions under sanitizers. Full source/dependency guards preserve reusable
+artwork and keep the item unavailable. Native moving-table registration,
+carried-object drawing, and release still need connecting; neither a playable
+compass nor a changed cartridge is claimed. The
+[needle checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#parent-sensitive-needle-motion)
+records the prepared MIPS code and next owner integration.
+
 The shared importer installs complete lighthouse, moon, and snowcone lifecycles
 in one category batch, reusing all prepared artwork. Motion, clock rotation,
 translucent joint redraws, scrolling, and full required sounds are connected.
