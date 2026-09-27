@@ -10,7 +10,7 @@ from aflib import ROM_SHA256, verified_rom, sha256, yaz0_decode, n64_checksum
 from gamecube import Disc
 
 ROOT = Path(__file__).resolve().parents[1]
-TARGET_SHA = 'f96395426808200dc6faaac0386aec9839ddcf3a4251eaaf98f371b8029a5e68'
+TARGET_SHA = '0e81d5c62548c3a759cc89d63eba0975b1c336a3a941211a3000e317b9243bf2'
 DONORS = ('forest_1st.arc', 'forest_2nd.arc', 'foresta.rel.szs')
 WEB_FILES = ('index.html', 'style.css', 'app.mjs', 'core.mjs', 'worker.mjs', 'mark.svg')
 NOTICE_FILES = ('SOURCE_NOTES.txt', 'LICENSE-tooling.txt', '.nojekyll')
@@ -150,7 +150,7 @@ def main():
     parser.add_argument('--refresh-web', action='store_true', help='Refresh an existing verified site without rebuilding its patch or media')
     parser.add_argument('--rom', type=Path, default=ROOT/'local/rom/Doubutsu no Mori (Japan).z64')
     parser.add_argument('--disc', type=Path, default=ROOT/'local/gamecube/Animal Crossing (USA, Canada).ciso')
-    parser.add_argument('--target', type=Path, default=ROOT/'build/v2-combined-13/Animal Forest English V2.z64')
+    parser.add_argument('--target', type=Path, default=ROOT/'build/v2-dresser-14/Animal Forest English V2.z64')
     args = parser.parse_args()
     out = args.output.resolve()
     if not out.is_relative_to(ROOT/'build'):
@@ -163,7 +163,7 @@ def main():
     source = verified_rom(args.rom.read_bytes())
     target = args.target.read_bytes()
     if sha256(target) != TARGET_SHA or struct.unpack_from('>2I', target, 0x10) != n64_checksum(target):
-        raise ValueError('Expected the checksummed V2-13 combined museum-header and credits cartridge')
+        raise ValueError('Expected the checksummed V2-14 dresser-cancellation cartridge')
     resources, buffers = donor_resources(args.disc)
     recipe, stats = make_recipe(source, target, buffers)
     compressed = gzip.compress(recipe, compresslevel=9, mtime=0)
@@ -172,7 +172,7 @@ def main():
     (site/'media').mkdir()
     for name in WEB_FILES + NOTICE_FILES:
         shutil.copyfile(ROOT/'web'/name, site/name)
-    manifest = {'format': 1, 'label': 'V2 · N64 keyboard edition', 'build': 'V2-13',
+    manifest = {'format': 1, 'label': 'V2 · N64 keyboard edition', 'build': 'V2-14',
         'public_release': False, 'source_sha256': ROM_SHA256, 'source_size': len(source),
         'output_sha256': TARGET_SHA, 'output_size': len(target),
         'output_name': DOWNLOAD_NAME,
