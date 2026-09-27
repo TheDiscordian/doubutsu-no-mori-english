@@ -19,6 +19,8 @@ from v3_furniture_motion import CATEGORY as ROLLING_CATEGORY
 # Complete fixed rig resources with explicit, still-unimplemented callbacks.
 # This category is deliberately not a native behaviour adapter.
 FIXED_CATEGORY = 'fixed-keyframe-rig-assets'
+EMBEDDED_CATEGORY = 'embedded-profile-keyframe-assets'
+CREATURE_STATIC_CATEGORY = 'static-creature-profile-assets'
 from v3_furniture_joint_rigs import CATEGORY as JOINT_CATEGORY
 from v3_furniture_materials import RIG_CATEGORY as MATERIAL_RIG_CATEGORY
 from v3_furniture_reversible import CATEGORY as REVERSIBLE_CATEGORY
@@ -37,7 +39,7 @@ CLOCK_CODE = {
     'destroy': (4, 'f332ea5b5437103cbb6f1508679da89eec9288ad775c96c439a17fccabe3de8e'),
 }
 RIG_CATEGORIES = (CATEGORY, CLOCK_CATEGORY, STORAGE_CATEGORY, HIT_CATEGORY, BILLBOARD_CATEGORY, ROLLING_CATEGORY, JOINT_CATEGORY, MATERIAL_RIG_CATEGORY, REVERSIBLE_CATEGORY, EFFECT_RIG_CATEGORY, DUAL_CATEGORY)
-RESOURCE_CATEGORIES = RIG_CATEGORIES + (FIXED_CATEGORY,)
+RESOURCE_CATEGORIES = RIG_CATEGORIES + (FIXED_CATEGORY,EMBEDDED_CATEGORY)
 CODE = {
     'create': (164, '2a86d61bc9aaf4a0a6479fe97a7f0d5dfe3dc42f9eea663eeb3fd1b8cbc35733'),
     'move': (208, '4b36894add16ecf872c1bfdcbeed2331519049fffd5b3d1d1d5db533f7c68d89'),
@@ -700,14 +702,81 @@ def discover_storage(source, vtable_name, vtable_at, functions):
         skeleton=rig,animation=motion,joint_models=descriptor['joint_models'],runtime_installed=False)
 
 
+def profile_resources(source,name,address,raw,item):
+    """Preserve native profile-owned rigs without inventing callback behaviour."""
+    from v3_keyframes import resource
+    from v3_furniture_pipeline import ReviewRequired,LAYERS
+    pointers=source.pointers(address,52)
+    if (len(raw)!=52 or raw[:32]!=bytes(32) or raw[48:]!=bytes(4) or
+            not pointers or
+            not set(pointers)<={address+i for i in (0,4,8,12,24,48)}):
+        raise ReviewRequired('Embedded profile rig has unsupported additional dependencies')
+    h,scale,shape,collision,rotation,lighting,contact,pad,interaction=struct.unpack_from('>ff6BH',raw,32)
+    if (not math.isfinite(h) or not 0<h<=200 or scale!=struct.unpack('>f',bytes.fromhex('3c23d70a'))[0] or
+            shape not in (3,4,5) or collision not in (0,1,2,5) or rotation not in (0,1) or
+            lighting not in (0,1,2) or contact or pad or interaction not in (0,0x40,0x80)):
+        raise ReviewRequired('Unsupported embedded profile scalar or interaction category')
+    if address+24 in pointers:
+        at=pointers[address+24];header,receipt=resource(source,at,size=12,pointers=True)
+        bindings=source.pointers(at,12);speed=struct.unpack_from('>f',header,8)[0]
+        if header[:8]!=bytes(8) or set(bindings)!={at,at+4} or not math.isfinite(speed) or not 0<speed<=4:
+            raise ReviewRequired('Invalid embedded skeleton/animation/speed binding')
+        rig=skeleton(source,bindings[at]);motion=animation(source,bindings[at+4],joints=rig['joints'])
+        result=model_descriptor(rig,kind='animated-room-model')
+        adapter=dict(category=EMBEDDED_CATEGORY,profile_rig=receipt,skeleton=rig,
+            animation=motion,joint_models=result['joint_models'],speed=speed)
+    else:
+        if interaction not in (0x40,0x80):raise ReviewRequired('Non-creature direct profile is not an embedded rig')
+        result=dict(models={});adapter=dict(category=CREATURE_STATIC_CATEGORY)
+    for i,label in enumerate(LAYERS):
+        if address+i*4 in pointers:result['models'][label]=source.containing(pointers[address+i*4],exact=True)
+    result.update(profile_symbol=name,profile_offset=address,profile_sha256=sha256(raw),
+        scalar_hex=raw[32:48].hex(),behaviour=adapter['category'],contact_action=contact,
+        interaction_flags=interaction,size_code={3:1,4:0,5:2}[shape],shape=shape,
+        callback_adapter=dict(**adapter,interaction_flags=interaction,runtime_installed=False))
+    if interaction in (0x40,0x80):
+        from v3_room_aliases import creature_parent
+        result['creature_parent']=creature_parent(source,item,interaction)
+    if address+48 in pointers:
+        vt=pointers[address+48];vtable,vr=resource(source,vt,size=20,pointers=True)
+        callbacks={p-vt:r for p,r in source.relocations.items() if vt<=p<vt+20}
+        if vtable!=bytes(20) or set(callbacks)!={4} or callbacks[4][:3]!=(1,True,1):
+            raise ReviewRequired('Embedded profile has an unsupported lifecycle callback')
+        raw,move=source.function(callbacks[4][3])
+        if len(raw)!=76:raise ReviewRequired('Unsupported complete creature sound callback')
+        sound=struct.unpack_from('>H',raw,0x36)[0]
+        if not 0<=sound<96:raise ReviewRequired('Creature sound exceeds source dispatch table')
+        helpers=source.checked_callback_code(move,76,
+            'a8ceb00c834d641445a8c363b8f47074017fb7444badcc69bd4147c1b35666ff',{},
+            {0x38:(0x2BE53C,'sAdo_RoomIncectPos')},'embedded creature sound',{0x36:sound})
+        helper=helpers['sAdo_RoomIncectPos']
+        if (helper['bytes']!=84 or helper['sha256']!='f5274def0a230c6b67dc9615c6452e9e3d0ff4fa55e692db229a3cbaeab6032e' or
+                helper['relocations']!={56:(10,0,4,0x80014D18)}):
+            raise ReviewRequired('Changed complete creature positioning/audio helper')
+        result['callback_adapter'].update(vtable=vr,functions={'move':move},helpers=helpers,
+            level_sound=dict(category='room-creature-loop',source_sound_id=sound,
+                excluded_states=[12,13,14,15],state_offset=0x3C,position_offset=8,
+                callback_installed=False))
+    if not result['models']:raise ReviewRequired('Profile has no complete model roots')
+    return result
+
+
 def suffix(source, profile, model_offsets, *, start, resources=()):
     """Pack the real skeleton and motion after the shared complete artwork."""
     adapter = profile.get('callback_adapter',{})
     if adapter.get('category') not in RESOURCE_CATEGORIES: return b'', {}
     roots = {root[1]:model_offsets[label] for label,root in profile['models'].items()}
+    if adapter['category']==EMBEDDED_CATEGORY:
+        joint_roots={r['model']['donor_offset'] for r in profile['skeleton']['rows'] if 'model' in r}
+        roots={root:offset for root,offset in roots.items() if root in joint_roots}
     bones, rig = compile_skeleton(source,profile['skeleton'],roots,start=start)
     motion, animations = compile_animations(source,adapter.get('animations',[adapter['animation']]),start=start+len(bones))
     extra=b'';fields={}
+    if adapter['category']==EMBEDDED_CATEGORY:
+        offset=start+len(bones)+len(motion)
+        extra=struct.pack('>IIf4x',0x06000000+rig['header']['native_offset'],
+            0x06000000+animations['headers'][0]['native_offset'],adapter['speed'])
+        fields=dict(profile_rig_offset=offset,profile_rig_hex=extra[:12].hex())
     if adapter['category']==BILLBOARD_CATEGORY:
         scroll=adapter['scrolling'];sound=adapter['level_sound'];offset=start+len(bones)+len(motion)
         extra=struct.pack('>I4B4b4B',0x06000000+model_offsets[adapter['billboard']['model']],
@@ -746,4 +815,4 @@ def estimated_suffix(source, profile, start):
     if adapter.get('category') not in RESOURCE_CATEGORIES: return 0
     bones = (profile['skeleton']['joint_table']['bytes']+8+15)&~15
     motion, _ = compile_animations(source,adapter.get('animations',[adapter['animation']]),start=start+bones)
-    return bones+len(motion)+(16 if adapter['category']==BILLBOARD_CATEGORY else 32 if adapter['category'] in (MATERIAL_RIG_CATEGORY,EFFECT_RIG_CATEGORY) else 0)
+    return bones+len(motion)+(16 if adapter['category'] in (BILLBOARD_CATEGORY,EMBEDDED_CATEGORY) else 32 if adapter['category'] in (MATERIAL_RIG_CATEGORY,EFFECT_RIG_CATEGORY) else 0)

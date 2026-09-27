@@ -55,6 +55,32 @@ prices are installed inactive, with separate acquisition/catalogue/scoring flags
 Subsequent scans skip installed profiles. Later acquisition promotion verifies
 and reuses the same complete model instead of appending another copy.
 
+### Profile-owned creature resources
+
+The shared profile reader accepts complete source-owned rotational rigs as well
+as callback-owned rigs. `embedded-profile-keyframe-assets` preserves the profile's
+direct display lists, every skeleton joint/model, all motion arrays, and the
+12-byte skeleton/animation/speed descriptor. The converted descriptor uses
+segment-six pointers and an aligned 16-byte allocation. Direct tank/cage lists
+remain separate from the skeleton's model bindings. The static creature form
+uses `static-creature-profile-assets` and retains all original layers.
+
+The reader rejects unbound pointers, unsupported scalar/interaction fields,
+partial resources, invalid speeds, and unknown callbacks. The complete shared
+creature sound callback and its positioning helper are checked independently;
+the descriptor retains the actual sound ID and excluded transition states.
+Preparing this callback does not install its native audio or lifecycle.
+
+Creature displays carry source-derived parent identities. Both complete donor
+placement/pickup functions and the fish-index helper establish the carried ID,
+inverse mapping, and official carried name. Display names remain distinct where
+the donor uses a different spelling. These are representations of their parent
+creatures, not independent furniture choices. Native identity correspondence,
+room lifecycle/audio, inventory, catching/releasing, and collection readers must
+be connected before eligibility. Metadata and native profile writing reject
+these prepared-only categories until that integration is implemented. Preserve
+the native herabuna when resolving the donor brook-trout slot.
+
 ### Composite models and dual-motion resources
 
 `Source.model_graph` expands ordinary relocated display-list calls in execution

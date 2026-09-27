@@ -508,3 +508,88 @@ class PreparedTests(unittest.TestCase):
         furniture_tests.DonorTests.check_complete_artwork(self,OUTPUT,report)
         with self.assertRaisesRegex(ValueError,'Unknown converter/source revision'):
             install.checked_assets(OUTPUT,self.source,ROOT/'build/item-identity-megasheet.xlsx')
+
+
+class ProfileOwnedResourceTests(unittest.TestCase):
+    """One resource-category batch, including its actual carried-item parents."""
+    @classmethod
+    def setUpClass(cls):
+        cls.source=pipeline.Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+            (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+        cls.out=ROOT/'build/v3-creature-profiles-prepared-01'
+        cls.report=json.loads((cls.out/'art.json').read_bytes())
+
+    def test_complete_artwork_skeletons_motion_and_native_profile_bindings(self):
+        self.assertEqual(self.report['batch'],dict(objects=17,reused=16,compiled=1,compiler_containers=1))
+        furniture_tests.DonorTests.check_complete_artwork(self,self.out,self.report)
+        rigged=0;cache=pipeline.PreparedAssets(self.source,[self.out])
+        for row in self.report['objects']:
+            item=int(row['item_id'],16);prepared=pipeline.prepare(self.source,item);profile=prepared[0]
+            self.assertEqual(row['profile'],json.loads(json.dumps(profile)))
+            self.assertFalse(row['import_ready']);self.assertFalse(self.report['runtime_installed'])
+            self.assertIn('parent identity',row['pending_reason'])
+            self.assertIsNotNone(cache.reuse(self.source,row['item_id'],prepared))
+            with self.assertRaisesRegex(ValueError,'no implemented native lifecycle'):
+                install.profile(row,0x02400000,model_capacity=12288)
+            if 'rig' not in row:
+                self.assertEqual(profile['callback_adapter']['category'],rigs.CREATURE_STATIC_CATEGORY)
+                self.assertEqual(set(profile['models']),{'opaque','opaque1','translucent'});continue
+            rigged+=1;asset=(self.out/row['object_file']).read_bytes();rig=row['rig']
+            for relocation in rig['skeleton']['relocations']+rig['animations']['relocations']:
+                self.assertEqual(struct.unpack_from('>I',asset,relocation['offset'])[0],0x06000000+relocation['target_offset'])
+            for array in rig['animations']['arrays']:
+                at,n,src=array['native_offset'],array['bytes'],array['donor_offset']
+                self.assertEqual(asset[at:at+n],self.source.data[src:src+n])
+            at=rig['profile_rig_offset'];skeleton,motion,speed=struct.unpack_from('>IIf',asset,at)
+            self.assertEqual((skeleton,motion),(0x06000000+rig['skeleton_offset'],0x06000000+rig['animation_offset']))
+            self.assertEqual(speed,profile['callback_adapter']['speed'])
+            self.assertEqual(asset[at:at+12].hex(),rig['profile_rig_hex'])
+            self.assertEqual(at+16,len(asset));self.assertEqual(asset[at+12:],bytes(4))
+            self.assertEqual(rig['skeleton']['joints'],profile['skeleton']['joints'])
+            self.assertEqual(rig['skeleton']['shown_joints'],profile['skeleton']['shown_joints'])
+        self.assertEqual(rigged,16)
+
+    def test_actual_forward_inverse_parent_names_and_complete_sound_callbacks(self):
+        from v3_room_aliases import creature_parent
+        expected={i:0x2D00+(i-0x1BC8)//4 for i in range(0x1C48,0x1C68,4)}
+        expected.update({i:0x2300+(i-0x1C68)//4 for i in [0x1C6C,*range(0x1CE8,0x1D08,4)]})
+        self.assertEqual({int(r['item_id'],16) for r in self.report['objects']},set(expected))
+        sounds=[]
+        for row in self.report['objects']:
+            p=row['profile'];parent=p['creature_parent'];item=int(row['item_id'],16)
+            self.assertEqual(parent['parent_item_id'],f'{expected[item]:04X}')
+            self.assertEqual(parent['pickup_item_id'],parent['parent_item_id'])
+            self.assertEqual(parent,creature_parent(self.source,item,p['interaction_flags']))
+            raw=self.source.raw(parent['parent_name_symbol']);i=parent['parent_name_index']
+            self.assertEqual(parent['parent_name'].encode().ljust(16,b' '),raw[i*16:(i+1)*16])
+            self.assertEqual(parent['parent_name_sha256'],sha256(raw[i*16:(i+1)*16]))
+            self.assertFalse(parent['runtime_installed']);self.assertEqual(parent['native_identity'],'unreviewed')
+            adapter=p['callback_adapter']
+            if 'level_sound' in adapter:
+                sounds.append(adapter['level_sound']['source_sound_id'])
+                self.assertEqual(set(adapter['functions']),{'move'})
+                self.assertEqual(adapter['level_sound']['excluded_states'],[12,13,14,15])
+                self.assertFalse(adapter['level_sound']['callback_installed'])
+        self.assertEqual(sorted(sounds),[65,66,67])
+        for item,flags in ((0x1C49,0x80),(0x1C48,0x40),(0x1CEC,0x80),(0x1F9C,0x400)):
+            with self.assertRaises(ValueError):creature_parent(self.source,item,flags)
+
+    def test_unknown_dependencies_and_damaged_callback_or_parent_code_reject(self):
+        from v3_room_aliases import creature_parent,FUNCTIONS
+        profile=self.source.profile(0x1C4C);adapter=profile['callback_adapter']
+        for damage in ('speed','animation_pointer','interaction','extra_callback','move','helper'):
+            source=copy.copy(self.source);source.data=bytearray(source.data)
+            source.rel=bytearray(source.rel);source.relocations=dict(source.relocations)
+            if damage=='speed':struct.pack_into('>I',source.data,adapter['profile_rig']['donor_offset']+8,0x7FC00000)
+            elif damage=='animation_pointer':del source.relocations[adapter['profile_rig']['donor_offset']+4]
+            elif damage=='interaction':struct.pack_into('>H',source.data,profile['profile_offset']+46,0x140)
+            elif damage=='extra_callback':source.relocations[adapter['vtable']['donor_offset']+8]=source.relocations[adapter['vtable']['donor_offset']+4]
+            else:
+                function=adapter['functions']['move'] if damage=='move' else adapter['helpers']['sAdo_RoomIncectPos']
+                source.rel[source.sections[1][0]+function['offset']]^=1
+            source.relocation_addresses=sorted(source.relocations)
+            with self.subTest(damage=damage),self.assertRaises(ValueError):source.profile(0x1C4C)
+        for address in (FUNCTIONS['place'][0],FUNCTIONS['pickup'][0],0x58EA8):
+            source=copy.copy(self.source);source.rel=bytearray(source.rel)
+            source.rel[source.sections[1][0]+address]^=1
+            with self.assertRaises(ValueError):creature_parent(source,0x1CEC,0x40)

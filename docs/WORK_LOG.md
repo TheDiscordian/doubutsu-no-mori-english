@@ -1,5 +1,32 @@
 # Work record
 
+## 2026-09-27: complete shared creature-profile resources
+
+- The preceding goal batch is progress: complete creature model/rig conversion,
+  source-parent resolution, and focused passing checks exist in the worktree.
+  The intervening publication answer verifies latest V2-13 and its patch hash,
+  but is not V3 implementation progress. Resume the converter batch without
+  replaying completed compilations or tests.
+- Added the common embedded-profile rig category and static creature form.
+  Seventeen objects retain 78,544 bytes, 738 triangles, 96 joints, every motion
+  array, and all direct cage/tank layers. The three shared source movement/sound
+  callbacks are checked and retained as uninstalled native dependencies.
+- Actual complete placement/pickup functions and the fish-index helper resolve
+  all seventeen carried parents and inverse mappings. Thirty-four official
+  display/parent-name credits use the existing single provenance catalogue.
+  These are not seventeen independent furniture choices or proven new species.
+- Prepared batches compile thirteen, then reuse thirteen/compile three, then
+  reuse sixteen/compile one through the ordinary batch compiler. Current output
+  is `build/v3-creature-profiles-prepared-01/`. The largest object is 9,824 bytes,
+  within the current 12-KiB bank. No old assets are recompiled unnecessarily.
+- Three focused resource/parent/negative checks pass across initial and targeted
+  invocations. The negative fixture's stale relocation index is corrected once;
+  its targeted retry passes. No native scenario, cartridge build, or hardware
+  claim is made. Prepared-only profiles remain rejected by runtime installation.
+- Next: native creature identity/lifecycle and carried-item integration, with
+  the native herabuna preserved. ABI 287, its selections, format-five storage,
+  main build lock, and stable V2 patchers remain unchanged.
+
 ## 2026-09-27: native console execution and shared built-in profile batches
 
 - Previous goal work is progress: the disk room binding is committed as

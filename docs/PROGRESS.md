@@ -60,10 +60,19 @@ and resources are retained in the current proposal, so this evidence does not
 require replay for the data-only model stages.
 See the [console checkpoint](checkpoints/V3_CONSOLE_ROOM.md).
 
-Continue from the importing gaps, not from obsolete test attempts. Review the
-remaining legacy clothing, fish/insect, custom-design, and fossil representations
-against actual parent/native identities, and complete any genuinely missing
-conversion/behaviour categories. The two worksheet-mapped school-desk/bus-stop
+The shared converter prepares 17 complete creature displays: sixteen animated
+rigs and the three-layer static ant. All 78,544 bytes, 96 joints, full motion
+arrays, and three sound-callback dependencies are retained. Actual source
+placement/pickup functions establish carried-parent identities and official
+names. These are prepared resources, not seventeen playable imports; native
+identity, lifecycle/audio, and carried-creature integration remain. The current
+cartridge and choice counts are unchanged. See the
+[creature checkpoint](checkpoints/V3_CREATURE_PROFILES.md).
+
+Continue with creature parent/native integration and the remaining legacy
+clothing, custom-design, and fossil representations, not resource reconversion
+or obsolete test attempts. Complete genuine conversion/behaviour gaps.
+The two worksheet-mapped school-desk/bus-stop
 records require identity/artwork correspondence review, not automatic duplicate
 IDs. Then complete the actual acquisition routes and gold-tree work, align the
 no-import baseline with V2-13, and assemble a private combined playtest build.

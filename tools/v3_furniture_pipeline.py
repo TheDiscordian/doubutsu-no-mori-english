@@ -705,6 +705,9 @@ class Source:
         # Inspect all fields before asking for .data pointers: callback pointers
         # may target executable code, and must remain an explicit behaviour gap.
         locations = [p-at for p in self.relocations if at <= p < at+n]
+        if (24 in locations or struct.unpack_from('>H',raw,46)[0] in (0x40,0x80)) and all(p in (0,4,8,12,24,48) for p in locations):
+            from v3_furniture_rigs import profile_resources
+            return profile_resources(self,name,at,raw,item)
         if any(p >= 16 and p != 48 for p in locations):
             features = {16:'dynamic texture', 20:'dynamic palette', 24:'animation rig',
                         28:'texture animation', 48:'custom callbacks'}
@@ -1205,10 +1208,12 @@ def builtin_native_profile(profile):
 
 
 def metadata(source, item, profile, identity):
-    from v3_furniture_rigs import FIXED_CATEGORY, JOINT_CATEGORY
+    from v3_furniture_rigs import FIXED_CATEGORY, JOINT_CATEGORY,EMBEDDED_CATEGORY,CREATURE_STATIC_CATEGORY
     from v3_furniture_materials import CATEGORY as MATERIAL_CATEGORY
     from v3_furniture_scroll import CATEGORY as SCROLL_CATEGORY
     binding=getattr(source,'runtime_profiles',{}).get(f'{item:04X}')
+    if profile.get('callback_adapter',{}).get('category') in (EMBEDDED_CATEGORY,CREATURE_STATIC_CATEGORY):
+        raise ReviewRequired('Complete profile-owned resources are prepared; parent identity, native creature interaction, and lifecycle binding remain uninstalled')
     from v3_furniture_composite import PENDING_CATEGORIES,ROTATED_CATEGORY
     if profile.get('callback_adapter',{}).get('category') in PENDING_CATEGORIES and not binding:
         raise ReviewRequired('Complete composite resources are prepared; '+', '.join(profile['callback_adapter']['pending_callbacks'])+' remain uninstalled')
@@ -1336,6 +1341,7 @@ def scan(source, worksheet, installed=None, *, selected=()):
                 raise ReviewRequired('complete object exceeds native model-bank capacity')
             formats={r['format'] for r in resources if r['kind']=='texture'}
             categories = [profile['behaviour'], ('1x1','2x1','2x2')[profile['size_code']]]
+            if profile.get('creature_parent'):categories.append('creature-profile-assets')
             if item<0x3000:
                 categories.append('legacy-donor-range')
                 if profile['behaviour']=='static' and not profile.get('kind'):categories.append('legacy-static')

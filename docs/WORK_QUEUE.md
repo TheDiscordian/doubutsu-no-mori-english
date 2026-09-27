@@ -44,7 +44,15 @@ See [bulk profiles](checkpoints/V3_BUILTIN_PROFILES.md).
 
 Next importing work:
 
-- Resolve the remaining legacy clothing, fish/insect, custom-design, and fossil
+- Connect the prepared creature category to native parent identities, complete
+  room lifecycle/audio, and carried-item/collection/catching/releasing readers.
+  The common converter already retains all 17 displays, 96 joints, full motion
+  arrays, and complete source sound callbacks in
+  `build/v3-creature-profiles-prepared-01/`. Reuse these 78,544 bytes; do not
+  create independent furniture options for creature displays or overwrite the
+  native herabuna with the donor brook trout. See the
+  [creature checkpoint](checkpoints/V3_CREATURE_PROFILES.md).
+- Resolve the remaining legacy clothing, custom-design, and fossil
   representations against actual parent/native identities. Complete genuine
   missing conversion and behaviour work; do not interpret absent artwork or
   an already installed parent representation as a new furniture requirement.

@@ -192,6 +192,48 @@ def discover(source):
                 rows=[rows[item] for item in sorted(rows)])
 
 
+def creature_parent(source,item,interaction):
+    """Resolve creature displays through both actual donor conversion functions."""
+    if type(item) is not int or item&3 or interaction not in (0x40,0x80):
+        raise ValueError('Invalid canonical creature display or interaction')
+    code={};evidence={}
+    for role in ('place','pickup'):
+        address,symbol,size,digest=FUNCTIONS[role];raw,receipt=source.function(address)
+        if (receipt['symbol']!=symbol or len(raw)!=size or sha256(raw)!=digest or receipt['relocations']):
+            raise ValueError('Changed complete creature parent conversion')
+        code[role]=raw;evidence[role]=receipt
+    def immediate(role,offset,opcode):
+        word=u32(code[role],offset)
+        if word>>26!=opcode:raise ValueError('Changed creature conversion operand')
+        return word&65535
+    fish=interaction==0x40
+    lo,hi,display,back_lo,back_hi=(0xB0,0xB8,0xF0,0xBC,0xC4) if fish else (0x60,0x68,0xA0,0x6C,0x74)
+    first=immediate('place',lo,10);bound=immediate('place',hi,10)
+    start=immediate('place',display,14);inverse=immediate('pickup',back_lo,10)
+    end=immediate('pickup',back_hi,10)
+    if start!=inverse or start&3 or end&3!=3 or not start<=item<=end or (end-start+1)//4!=bound-first:
+        raise ValueError('Creature placement and pickup bounds disagree')
+    if fish:
+        target=0x58EA8;raw,receipt=source.function(target)
+        if (receipt['symbol']!='mNT_FishIdx2FishItemNo' or len(raw)!=36 or
+                receipt['sha256']!='ba9716ae392c5bc06d722d6c3160f927cc23e827d8a27cd3220de20cbe9f6eac' or
+                receipt['relocations'] or branch_target(u32(code['pickup'],0xFC),FUNCTIONS['pickup'][0]+0xFC)!=target or
+                u32(raw,0x10)!=(0x38030000|first)):
+            raise ValueError('Changed complete fish pickup helper')
+        evidence['fish_index']=receipt
+    elif immediate('pickup',0xAC,14)!=first:
+        raise ValueError('Changed insect pickup base')
+    parent=first+(item-start)//4;symbol='itemName_fish' if fish else 'itemName_insect'
+    raw=source.raw(symbol);index=parent&255;name=raw[index*16:(index+1)*16]
+    if len(name)!=16 or not name.rstrip(b' ') or any(c<32 or c>126 for c in name):
+        raise ValueError('Creature parent has no complete English donor name')
+    return dict(category='fish' if fish else 'insect',display_item_id=f'{item:04X}',
+        parent_item_id=f'{parent:04X}',parent_id=f'GAFE01-r0/item/{parent:04X}',
+        parent_name=name.decode('ascii').rstrip(),parent_name_symbol=symbol,parent_name_index=index,
+        parent_name_sha256=sha256(name),pickup_item_id=f'{parent:04X}',functions=evidence,
+        native_identity='unreviewed',runtime_installed=False)
+
+
 def pending_reason(alias):
     if alias['room_placement_uses_display']:
         return (f"Room display of {alias['parent_name']} ({alias['parent_item_id']}); "
