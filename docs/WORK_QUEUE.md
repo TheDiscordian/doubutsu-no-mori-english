@@ -21,11 +21,22 @@ prevent asset/data conversion or redirect work from an unfinished shared format.
 Incomplete gameplay stays unavailable in the selector; installing assets does
 not claim that an item is playable. Reuse unchanged passing tests throughout.
 
-Current task: finish remaining model/lifecycle and console launch/storage
-categories. Continue the actual unsupported callbacks without per-item
-installers, reusing the combined skeleton/material support. The remaining unconverted
-records also include matryoshka, aerobics radio, crab stew, and treasure chest.
-Reuse complete source resources and shared behaviours throughout.
+Current task: finish reversible-rig cartridge integration. Complete matryoshka
+artwork and the source-compared motion/destruction core are prepared; connect
+the extended joint workspace, checked native drawer/owner, sound, destruction
+callback, and stable additive identity through the shared importer. The existing
+room bootstrap has only 27 bytes spare, so retain loader verification while
+sharing its dispatch code or safely extending its reservation; do not omit
+destruction or enter unloaded resident code. Prepared art is at
+`build/v3-reversible-rigs-prepared-01/`, and the compiled core is at
+`build/v3-reversible-rig-code-01/`. Reuse both focused checks and do not replay old
+native fixtures. See the
+[reversible checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#prepared-reversible-motion-and-large-joint-work).
+
+Then continue the remaining actual model/lifecycle and console launch/storage
+categories without per-item installers. Unconverted records include aerobics
+radio, crab stew, and treasure chest. Reuse complete source resources and the
+shared skeleton/material/reversible behaviour support throughout.
 
 The checked current proposal is ABI 259 at
 `build/v3-material-rig-imports-01/cartridge/build-lock.json`, ROM SHA-256

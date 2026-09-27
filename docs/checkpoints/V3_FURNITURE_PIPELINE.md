@@ -1,5 +1,59 @@
 # Automatic furniture pipeline checkpoint
 
+## Prepared reversible motion and large joint work
+
+The shared `reversible-keyframe-rig-assets` recogniser retains complete
+constructor/move/draw/destruction code, initializer, constants, helper calls,
+sound operands, skeleton, and motion. The matryoshka converts normally through
+the category command; no dedicated item installer is added. All eleven joints,
+five models, 85 triangles, two textures, palette, vertices, and 46-frame animation
+are present, including hidden transform nodes.
+
+- Prepared bundle: `build/v3-reversible-rigs-prepared-01/`.
+- Complete object: 4,512 bytes, SHA-256 `1e09bbadf6edf02427419da8927230e2b9b510328ef52a530fc3f5c9ab13c4f1`.
+- Motion component with the basic shared dispatcher: `build/v3-reversible-rig-code-01/`,
+  2,172 bytes, SHA-256 `e9e1045116cfbf7ab286309eb386422f9c77938bca8b5d5d4aca007e33d8951c`.
+- Installed cartridge remains ABI 259; no profile is added by this preparation.
+
+The native actor's fixed arrays can hold only eight joints plus root. The
+converted component supplies two seventeen-vector arrays plus switch state in
+208 bytes at `390..45F`, inside unused first-buffer matrix slots six through
+nine. Both buffer parities retain six usable drawing matrices. This is a
+category-specific layout, not simultaneous reuse by another actor behaviour.
+Actor stride, saved format, and heap allocation do not change.
+
+Two focused tests pass on the first attempt. Complete artwork checks retain all
+resources and animation arrays, source guards reject changed callbacks/helpers,
+and the ordinary import planner leaves the unfinished category unavailable.
+The host test compiles the actual donor constructor, move, and destructor,
+comparing 4,324 states under address/undefined-behaviour sanitizers: both motion
+directions, presses while moving, any-nonzero idle presses, saved-switch values,
+full joint writes, both matrix parities, and surrounding actor guards. Keyframe
+evaluation and audio are stubbed; this does not establish native rendering or
+synthesis. The MIPS compiler links the motion component with native engine
+symbols and the basic shared dispatcher; this is a prepared component, not the
+complete current cartridge or installed callbacks.
+
+Next: bind extended work to the checked native evaluator/drawer and owner,
+connect create/move/destroy through the shared packet, install the complete sound
+programme, and reserve the additive destination after the identity worksheet
+check. The legacy source ID is not a valid additive destination. The room
+bootstrap has 27 bytes spare; a checked destructor entry must fit by sharing
+dispatch code or a verified reservation change. Do not omit destruction or call
+an unverified/unloaded packet directly. Reuse the complete prepared graphics and
+passing host evidence. Ordinary acquisition stays a separate check; no reward
+route is substituted. Nothing in this preparation changes ROMs, saves, the
+current build lock, or either stable V2 patcher.
+
+```sh
+python3 tools/v3_furniture_pipeline.py convert --assets-only \
+  --base-lock build/v3-material-rig-imports-01/cartridge/build-lock.json \
+  --category reversible-keyframe-rig-assets \
+  --output build/v3-reversible-rig-reproduction
+V3_REVERSIBLE_ART=build/v3-reversible-rig-reproduction \
+  python3 -m unittest tests.test_v3_reversible_rigs -v
+```
+
 ## Installed combined skeleton and material animation
 
 The ordinary category importer installs the complete hamster cage through

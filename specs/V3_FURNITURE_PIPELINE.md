@@ -34,6 +34,32 @@ this after changing shared code when no new resource category needs installation
 profile-only staging retains existing code unless it installs a newly implemented
 material lifecycle; that stage rebuilds the shared packet and callback bindings.
 
+### Reversible motion and larger skeleton work
+
+`reversible-keyframe-rig-assets` recognises the complete stopped/reversible
+constructor, move, draw, and destruction callbacks. It retains every skeleton
+node and motion channel, including hidden joints; it is not an installed runtime
+category yet. Prepared resources remain unavailable to ordinary imports until
+complete dispatch, audio, identity, and persistence bindings are present.
+
+The matryoshka has eleven joints and five displayed models. The native fixed
+vectors hold eight joints plus root, so using those vectors directly is unsafe.
+`room_reversible.c/.h` instead reserves two seventeen-vector arrays and a switch
+state in unused slots six through nine of matrix buffer zero, at actor offsets
+`390..45F`. This 208-byte work fits the existing allocation without changing the
+`740` actor stride or saved fields. The adapter must bind the complete native
+drawer and enforce at most six displayed matrices and sixteen joints. Both
+matrix-buffer parities keep that region untouched. Other rig categories retain
+their own layouts; this is not simultaneous needle/motion work on one actor.
+
+The converted source step accepts any nonzero press only while idle, reverses
+start/end frames at speed `0.5`, plays the complete source sound, and stops when
+the keyframe evaluator returns one. Initialization derives state from saved
+switch equal to one; destruction writes the internal state back to the native
+switch. The room adapter must perform two source steps per 30-Hz update, delivering
+the press on the first step, and retain the actual destruction-before-save path.
+It must not discard the destruction callback or replay presses during motion.
+
 ### Combined skeleton and timed materials
 
 `material-keyframe-rig` combines the complete skeleton/motion converter with the

@@ -31,6 +31,16 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
+Reversible-rig preparation retains the complete matryoshka: eleven joints, five
+models, 85 triangles, and all 46-frame motion channels in 4,512 bytes. Converted
+motion and destruction code preserve idle-only switching, both directions,
+sound, and the saved switch. Larger joint work fits unused matrix slots instead
+of overrunning the eight-joint native arrays. Two focused checks pass, including
+4,324 comparisons with the actual donor lifecycle under sanitizers; the MIPS
+component also compiles. This category is not installed or selectable yet.
+Next is complete cartridge dispatch/destruction, audio, and additive identity
+integration. See the [reversible checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#prepared-reversible-motion-and-large-joint-work).
+
 The shared importer installs combined skeleton/timed-material behaviour for the
 hamster cage: all five models and 61 triangles, seven joints, the complete motion,
 both texture frames, and positioned loop audio. Its actual lottery availability,

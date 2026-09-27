@@ -24,7 +24,7 @@ from v3_registry import FURNITURE, LEGACY_FURNITURE, furniture_identity, furnitu
 from v3_room_aliases import discover as room_aliases, pending_reason as room_alias_reason
 from v3_villager_art import native_palette, normalise_vertex_flags
 
-VERSION = 31
+VERSION = 32
 PENDING_MOVE_CATEGORY = 'static-models-pending-move'
 PENDING_SEQUENCE_CATEGORY = 'constant-model-sequence-pending-lifecycle'
 SELECTED_PALETTE_CATEGORY = 'selected-palette-fade-assets'
@@ -273,6 +273,9 @@ class Source:
         from v3_furniture_joint_rigs import discover as discover_joint_rig
         joint_rig=discover_joint_rig(self,name,at,functions)
         if joint_rig is not None:return joint_rig
+        from v3_furniture_reversible import discover as discover_reversible
+        reversible=discover_reversible(self,name,at,functions)
+        if reversible is not None:return reversible
         from v3_furniture_rigs import (CODE as RIG_CODE, CLOCK_CODE, STORAGE_CODE,
             discover as discover_rig, discover_clock, discover_storage, discover_fixed, discover_hit, discover_billboard,
             discover_material_rig)
