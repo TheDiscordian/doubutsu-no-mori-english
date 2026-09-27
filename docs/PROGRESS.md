@@ -2,12 +2,13 @@
 
 ## Active development
 
-The current cartridge and browser-patcher target are **V2-13** at
-`build/v2-combined-13/Animal Forest English V2.z64`. The credits use the official
+The current cartridge and browser-patcher target are **V2-14** at
+`build/v2-dresser-14/Animal Forest English V2.z64`. B dismisses the dresser prompt;
+Remove and Swap retain their matching deliberate actions. The credits use the official
 `Animal Crossing` title, and both letter editing and reading show `Museum` in
 their headers. These fixes coexist in the same cartridge. The public and local
 patchers target this build; experimental V3 is not deployed. See the
-[publication checkpoint](checkpoints/V2_13_PUBLICATION.md) for hashes, focused
+[publication checkpoint](checkpoints/V2_14_DRESSER.md) for hashes, focused
 verification, and remaining hardware-test limits.
 The [compact keyboard layout](../specs/KEYBOARD_V2_LAYOUT.md) uses a key-only
 grey tray with separate attached N64-style shoulders and grips, native coloured
@@ -69,7 +70,7 @@ The upload copy includes the planned public patcher address,
 The published trailer remains unchanged.
 
 The [local browser patcher](WEB_PORTAL.md) is running at
-**http://127.0.0.1:8073/**. It builds the current V2-11 from the original N64 ROM
+**http://127.0.0.1:8073/**. It builds the current V2-14 from the original N64 ROM
 and actual English GC donor data inside the browser, without uploads. The
 corrected output includes the reported map `むら` omission. The
 [combined checkpoint](checkpoints/MAP_SUFFIX_AND_PORTAL.md) records four
