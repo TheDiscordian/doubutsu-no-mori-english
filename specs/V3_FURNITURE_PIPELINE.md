@@ -66,6 +66,37 @@ needle, or merely lifting the native movement restriction is not an implementati
 The donor routines live in `ac_my_room_move.c_inc`, `ac_my_room_draw.c_inc`, and
 `ac_my_room_action.c_inc`, alongside the parent readers in `ac_my_room.c`.
 
+`room_carry.c/.h` provides the converted carrying core. Its 152-byte transient
+state contains a parent ID/captured angle and four 36-byte slots. Each slot
+retains relative/world positions, a child actor ID or loose-item identity, and
+the captured loose-item angle. The six footprint shapes use a 16×16 grid of
+40-unit cells. Actor layout assertions preserve the native `740` stride.
+
+The owner supplies actual foreground, actor/used arrays, lookup, placement,
+tabletop height, angle, and drawing operations. Missing operations reject
+registration; they are not no-op fallbacks. All children validate before any
+foreground mutation. Duplicate actor references use one slot and clear each
+occupied source cell. Negative/out-of-grid footprints reject. World transforms
+follow `T(parent) R(angle delta) T(parent base) T(relative)`. Furniture drawing
+uses the carried world position and its own angle plus the parent delta; the
+needle still receives its own angle and the separate parent delta.
+
+The movement hook must update carrying after the parent's final position/angle
+snap, then release. Release validates all destination cells before restoring
+foreground and placement, snaps child furniture to cell centres, and updates
+its short/float/target angles. A failed restoration retains active carrying
+state; the adapter must handle failure without losing the detached items.
+Native `kept_item` at `73A` is storage/music content, not a tabletop child, and
+its movement restriction stays intact.
+
+The N64 `Shop_Goods` clip is eight bytes with only single-draw and drop callbacks.
+Its single and ordinary drawing paths lack the donor's loose-item Y rotation.
+Complete native integration requires a transient 512-byte angle grid, clear-on-
+drop behaviour, both drawing paths, and the actual donor per-category rotation
+flags. The donor angle grid is transient, not a new save-format requirement.
+The carrying core is prepared but not installed; movement checks remain native
+until these dependencies and the owner hooks are complete.
+
 Rig mode 6 uses first-word low byte 1/2/3 for these source motion kinds. Kind 3
 also stores complete level sound `51` in the next byte and clicks `0016/0017`
 in the last word. Unknown parameter combinations reject. The source's initial

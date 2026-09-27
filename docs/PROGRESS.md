@@ -31,15 +31,22 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
-The compass needle core is converted and cross-compiled: rotation kicks,
-damping, parent-state contributions, and world-direction correction. Three
-focused checks pass, including 19,232 comparisons with the actual donor C
-functions under sanitizers. Full source/dependency guards preserve reusable
-artwork and keep the item unavailable. Native moving-table registration,
-carried-object drawing, and release still need connecting; neither a playable
-compass nor a changed cartridge is claimed. The
-[needle checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#parent-sensitive-needle-motion)
-records the prepared MIPS code and next owner integration.
+The shared moving-table core is converted and cross-compiled alongside the
+compass needle: all six footprints, four carried slots, mixed furniture/loose
+items, relative transforms, parent readers, drawing arguments, and final
+placement/angle restoration. The carrying comparison runs 90 donor cases and
+1,890 move/draw frames under sanitizers. Source and native dependency guards
+also pass, as do the affected needle and joint-source checks: seven focused
+tests in total. No historical emulator fixture is replayed.
+
+Native owner hooks and loose-item rendering still need connecting. The N64
+loose-item renderer lacks the donor's transient angle grid and rotation paths;
+this is a concrete remaining dependency, not an assumed existing callback.
+The compass remains unavailable and the cartridge remains ABI 243. The
+[carrying checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-moving-table-carrying)
+records the prepared code, source comparisons, and next bindings. The needle's
+rotation kicks, damping, parent contributions, and world-direction correction
+retain their 19,232 donor comparisons.
 
 The shared importer installs complete lighthouse, moon, and snowcone lifecycles
 in one category batch, reusing all prepared artwork. Motion, clock rotation,

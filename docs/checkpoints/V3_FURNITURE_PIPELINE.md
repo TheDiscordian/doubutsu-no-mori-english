@@ -1,5 +1,91 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared moving-table carrying
+
+The shared `room_carry.c/.h` core implements donor footprint collection,
+registration, relative/world transforms, furniture-parent lookup, parent-angle
+lookup, loose-item drawing arguments, and foreground/placement restoration.
+It retains four complete slots and all six table shapes. Native furniture
+fields receive named declarations and offset assertions without changing the
+`740` stride or any saved field. Callback access requires real operations;
+missing lookup/drawing/angle/placement functions reject registration.
+
+Registration validates the complete collection before detaching anything.
+Restoration validates all destinations before writing and keeps carrying state
+on failure. The donor's repeated-slot-zero duplicate check is corrected to
+scan all occupied slots; every source cell for a repeated actor is cleared.
+Negative/out-of-grid cells and invalid actors reject. Stored music/storage
+content at actor `73A` remains a restriction; it is not the tabletop child.
+
+Seven focused tests pass:
+
+```sh
+python3 -m unittest tests.test_v3_room_carry tests.test_v3_furniture_needle \
+  tests.test_v3_joint_lifecycle.JointLifecycleTests.test_complete_source_motion_audio_and_immutable_prepared_art -v
+```
+
+The new host test extracts the actual donor collection, registration, release,
+transform, draw, and parent-reader functions unchanged. It compares 90 cases
+and 1,890 move/draw frames under address/undefined-behaviour sanitizers: all
+shapes, empty/full/mixed tops, translation, both rotations, angle wrapping,
+foreground/placement contents, restored angles, and independent memory guards.
+Additional rejection cases cover unresolved/missing actors, kept items, missing
+operations, occupied/invalid restoration cells, and duplicate references.
+Matrix, foreground, and graphics-call backends are test substitutes; these
+checks do not establish native execution, GPU appearance, or save/restart.
+
+`v3_room_carry.py` pins twelve complete donor functions/relocations, all used
+numeric constants, the six footprint records and their relocation table, and
+the slot initializer. The needle planner requires this source contract while
+keeping the lifecycle pending. Eight full current native owner/shop functions
+are checked. Mutation tests reject changes to code, relocations, constants,
+footprints, and native dependencies. No historical native fixture is replayed.
+
+The existing Docker toolchain links rig, joint, needle, and carrying code at
+`build/v3-room-carry-prepared-01/carrying.json`, SHA-256
+`45791b8a8cf6b2dddcb86371c340a730cab831e08eb621de3c5ba99b27470b6d`.
+Its component code is 7,808 bytes, SHA-256
+`1e51802ab2082aee4ba709d68457ddaf099e08019abf9ec0e12b72f4eff1c51c`.
+The largest new individual stack frame is 296 bytes for registration, excluding
+callees. This is not the full installed packet or a new ROM. ABI 243, 158 choices,
+existing saves, and both stable V2-13 deployments remain unchanged.
+
+### Native connections still required
+
+The owner is VROM `82D7F0`, linked `80936710`, with original actor allocation
+`4E0`. Resolve its real loaded address through actor `170`; never call its linked
+addresses as if fixed. Actor/used/count work is at loaded offset `10E50`.
+Verified native helpers are `80937ABC` (placement, no-ID `C8`), `80943C10`
+(foreground), and `80945ED8` (cell-to-child lookup). Top foreground is obtained
+through `80936A10(1)`. Keep unrelated pickup/storage checks intact.
+
+The occupied-top check is `8093C5C0`, with contact wrapper `8093E190`. Only
+movement sites `8093F18C` (pull), `8093F598` (push), and `80941524` (rotate)
+are candidates for replacement. Register after native destination permission
+and before movement state changes. Rotation permission calls are `809415EC`
+and `80941744`; push permission is `8093F608`. Pull needs its later permission
+path bound, not merely the earlier occupied-top test. Release only after the
+final snapped position and derived short angle have updated carrying. The
+owner move loop is `80944DFC..80945028`; its per-actor tail is `80944FD0`.
+The ordinary furniture Y-rotation call at `809471CC` can incorporate the
+parent delta after the carried world position is updated.
+
+The native `Shop_Goods` overlay is VROM `8576C0`, linked `80962A20`. Its clip at
+`80136F58` has only two pointers and an eight-byte allocation. `80963320`
+single-draw delegates to `809630C8`; the matrix path translates then scales,
+without rotating. The ordinary item renderer also needs the angle path.
+The donor supplies a transient 16×16 signed-halfword `SG_angle_y` grid, clears
+angles on drops, and applies angles only to rows with `aSG_DATA_ROTATE_Y_FLAG`.
+Use actual donor table flags, not a rotate-everything approximation. These
+angles are not donor saved fields. Complete both native drawing paths and
+the angle-grid lifetime before enabling occupied-table movement.
+
+The full room packet still has a 32-KiB code reservation, while the resident
+bootstrap has only 27 spare bytes. Plan the owner bridges against those bounds;
+do not blindly append callbacks to the bootstrap. Owner allocation, lifetime
+initialization, bridge installation, the loose-item paths, and the needle's
+joint-dispatch binding remain the next implementation, not completed work.
+
 ## Parent-sensitive needle motion
 
 `room_needle.c/.h` converts the donor's constructor evaluation, eighth-tick

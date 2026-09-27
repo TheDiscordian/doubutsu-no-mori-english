@@ -21,10 +21,18 @@ prevent asset/data conversion or redirect work from an unfinished shared format.
 Incomplete gameplay stays unavailable in the selector; installing assets does
 not claim that an item is playable. Reuse unchanged passing tests throughout.
 
-Current task: close shared conversion and gameplay gaps in the ordinary bulk
-importer. The current batch implements switched joint motion and translucent
-drawing for the lighthouse, moon, and snowcone machine. The ordinary pipeline
-produces ABI 243 at
+Current task: connect shared moving-table support, then bind the compass's
+parent-sensitive needle into the ordinary importer. Registration, transforms,
+parent lookup, drawing arguments, and placement restoration are converted in
+`room_carry.c/.h`. Three focused carrying checks pass, including 90 donor
+comparisons spanning 1,890 move/draw frames under sanitizers. The MIPS component
+links with the needle and joint code at `build/v3-room-carry-prepared-01/`.
+Owner hooks and loose-item rendering remain uninstalled; do not enable movement
+on occupied tables yet. See the
+[carrying checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-moving-table-carrying).
+
+The ordinary pipeline installs switched joint motion and translucent drawing
+for the lighthouse, moon, and snowcone machine. Its checked ROM remains ABI 243 at
 `build/v3-switched-joint-imports-03/profile-runtime/build-lock.json`, SHA-256
 `0b9e6c7305daf96eaf53916143593bee4f5ab52f8169d874caab13a31974e348`.
 All three complete profiles are inactive pending their actual acquisition;
@@ -49,8 +57,13 @@ sanitizers. The MIPS preparation is `build/v3-parent-needle-prepared-01/motion.j
 it is not installed. The shared planner validates complete source bindings and
 keeps the item unavailable; its complete artwork remains reusable.
 
-Next connect shared moving-parent registration, carry, draw, and release before
-binding the needle lifecycle. Native states 3/4 are verified donor left/right,
+Next bind the converted carrying functions to the relocated room owner, its
+push/pull/rotation calls, final movement update, and drawing. The native
+`Shop_Goods` clip has only drawing/drop callbacks: it lacks the donor's transient
+angle grid and both its single-item and ordinary-item Y rotation. Supply those
+paths using the donor's per-category rotation flags before enabling occupied
+table movement. Keep native stored-item restrictions at actor `73A`; that field
+is not the tabletop object. Native states 3/4 are verified donor left/right,
 preceded by wait states 8/7. The native room move/draw loops do not contain the
 donor's carried-child path. Donor implementation is in
 `local/ac-decomp/src/actor/ac_my_room_move.c_inc` (registration/release near
@@ -58,7 +71,8 @@ donor's carried-child path. Donor implementation is in
 139–240), and `ac_my_room_action.c_inc` (push/pull/rotate registration sites).
 Parent readers are in `ac_my_room.c` near 2251. Do not use an always-null parent
 or lift movement restrictions without complete carrying/foreground restoration.
-See the [needle checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#parent-sensitive-needle-motion).
+See the carrying checkpoint for the resolved native calls, code-size constraints,
+and required final-position-before-release ordering.
 
 Four complete joint-callback rigs are reusable from
 `build/v3-joint-callback-rigs-prepared-01/`: compass, lighthouse, moon, and

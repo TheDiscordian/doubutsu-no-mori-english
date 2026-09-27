@@ -15,11 +15,22 @@ typedef struct {
 typedef struct {
     u16 index;
     s16 ctr_type;
-    u8 before_position[4];
+    union { u8 before_position[4]; int id; };
     float position[3];
-    u8 before_state[0x3C-20];
+    union {
+        u8 before_state[0x3C-20];
+        struct {
+            float previous_position[3],target_position[3];
+            u8 before_angle[8];
+            float angle_y,angle_y_target;
+        };
+    };
     s16 state;
-    u8 before_changed[0x12C-0x3E];
+    u8 shape_type,shape_padding;
+    float base_position[3];
+    u8 before_s_angle[0x124-0x4C];
+    s16 s_angle_y;
+    u8 angle_padding[6];
     u8 switched,changed;
     u8 before_keyframe[6];
     RoomKeyframe keyframe;
@@ -44,7 +55,10 @@ typedef struct {
             u8 after_motion[20*64-9*64-8];
         };
     };
-    u8 tail[0x30];
+    union {
+        u8 tail[0x30];
+        struct { u8 before_layer[0x28];s16 layer;u16 kept_item;u8 tail_end[4]; };
+    };
 } RoomRig;
 typedef struct { u32 a,b; } RoomCommand;
 typedef struct {
@@ -160,6 +174,11 @@ extern void sAdo_OngenTrgStart(u32,float *);
 extern void sAdo_SysTrgStart(u32);
 #endif
 ROOM_CHECK(RoomRig,position,8); ROOM_CHECK(RoomRig,state,0x3C);
+ROOM_CHECK(RoomRig,id,4); ROOM_CHECK(RoomRig,previous_position,0x14);
+ROOM_CHECK(RoomRig,target_position,0x20); ROOM_CHECK(RoomRig,angle_y,0x34);
+ROOM_CHECK(RoomRig,angle_y_target,0x38); ROOM_CHECK(RoomRig,shape_type,0x3E);
+ROOM_CHECK(RoomRig,base_position,0x40); ROOM_CHECK(RoomRig,s_angle_y,0x124);
+ROOM_CHECK(RoomRig,layer,0x738); ROOM_CHECK(RoomRig,kept_item,0x73A);
 ROOM_CHECK(RoomRig,changed,0x12D); ROOM_CHECK(RoomRig,keyframe,0x134);
 ROOM_CHECK(RoomRig,joint,0x1A4); ROOM_CHECK(RoomRig,morph,0x1DA);
 ROOM_CHECK(RoomRig,speed,0x204); ROOM_CHECK(RoomRig,target,0x208);

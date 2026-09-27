@@ -64,7 +64,9 @@ def source_contract(source,profile):
     if (source.data[0x88CC0:0x88CF0]!=bytes(48) or
             refs!={i*4:(1,True,1,target) for i,target in enumerate(expected)}):
         raise ValueError('Changed needle status dispatch')
+    from v3_room_carry import source_contract as carrying_contract
     return dict(category='parent-sensitive-needle-motion',functions=checked,initializer=initializer,
+        carrying=carrying_contract(source),
         constants={f'{at:X}':value for at,value in CONSTANTS.items()},
         status_dispatch=dict(offset=0x88CC0,bytes=48,targets=expected),
         source_wait_states=[8,10],source_rotation_states=[9,11],
