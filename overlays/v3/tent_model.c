@@ -9,11 +9,22 @@ typedef unsigned int u32;
 typedef __UINTPTR_TYPE__ uptr;
 typedef union { float f; u32 bits; } FloatWord;
 typedef struct {
+#ifdef AF_V3_SELECTED_PALETTE
+    u16 index;
+    signed short ctr_type;
+    u8 before_switch[0x12C-4];
+#else
     u8 before_switch[0x12C];
+#endif
     u8 switch_bit;
     u8 before_fade[0x1A4 - 0x12D];
     FloatWord fade;
+#ifdef AF_V3_SELECTED_PALETTE
+    u32 roof;
+    u8 rest[0x740 - 0x1AC];
+#else
     u8 rest[0x740 - 0x1A8];
+#endif
 } Tent;
 typedef struct { u32 a, b; } Command;
 typedef struct {
@@ -41,10 +52,16 @@ _Static_assert(__builtin_offsetof(TentGfx, tail) == 0x29C, "Native opaque alloca
 #endif
 extern void *_Matrix_to_Mtx(void *destination);
 extern void osWritebackDCache(void *address, int bytes);
+#ifdef AF_V3_SELECTED_PALETTE
+extern u32 af_v3_roof_index(signed short control);
+#endif
 
 void af_v3_tent_model_ct(Tent *actor, u8 *data) {
     (void)data;
     actor->fade.bits = actor->switch_bit == 1 ? 0x3F800000u : 0;
+#ifdef AF_V3_SELECTED_PALETTE
+    actor->roof = af_v3_roof_index(actor->ctr_type);
+#endif
 }
 
 void af_v3_tent_model_mv(Tent *actor, void *room, void *game, u8 *data) {
@@ -61,6 +78,9 @@ void af_v3_tent_model_mv(Tent *actor, void *room, void *game, u8 *data) {
         if (now > target.f) now = target.f;
     }
     actor->fade.f = now;
+#ifdef AF_V3_SELECTED_PALETTE
+    actor->roof = af_v3_roof_index(actor->ctr_type);
+#endif
 }
 
 void af_v3_tent_model_dt(Tent *actor, u8 *data) {
@@ -82,10 +102,20 @@ void af_v3_tent_model_dw(Tent *actor, void *room, TentGame *game, u8 *data) {
     u16 *palette;
 #ifdef AF_V3_SHARED_PALETTE_FADE
     u32 count = layout->count;
+#ifdef AF_V3_SELECTED_PALETTE
+    const u32 palette_bytes=12u*32u;
+    if (layout->magic != 0x41465032u || count != 3 || layout->models[3] != 12 ||
+            layout->bytes < 32+2*palette_bytes || layout->bytes > 9216 ||
+            layout->on < 32 || layout->off < 32 ||
+            (layout->on & 31) || (layout->off & 31) ||
+            layout->on > (u32)layout->bytes-palette_bytes ||
+            layout->off > (u32)layout->bytes-palette_bytes || actor->roof >= 12) return;
+#else
     if (layout->magic != 0x41465031u || count < 1 || count > 4 ||
             layout->bytes < 96 || layout->bytes > 9216 ||
             (layout->on & 31) || (layout->off & 31) ||
             layout->on > (u32)layout->bytes - 32 || layout->off > (u32)layout->bytes - 32) return;
+#endif
     for (u32 i = 0; i < count; ++i)
         if ((layout->models[i] & 7) || layout->models[i] < 0x06000000u ||
                 layout->models[i] > 0x06000000u + layout->bytes - 8) return;
@@ -96,7 +126,14 @@ void af_v3_tent_model_dw(Tent *actor, void *room, TentGame *game, u8 *data) {
     /* Six commands, a 64-byte matrix, and a 32-byte palette. Round the shared
      * allocation down to 32 bytes, keeping both resources properly aligned.
      * Do not modify either arena end or issue a draw if there is no room. */
-    if (!data || (head & 7) || (tail & 15) || tail < head || tail - head < 96+(count+2)*8) return;
+#ifdef AF_V3_SELECTED_PALETTE
+    /* Native graphics tails may be only eight-byte aligned. The allocation
+       below provides the stronger matrix/palette alignment itself. */
+    const uptr tail_mask=7;
+#else
+    const uptr tail_mask=15;
+#endif
+    if (!data || (head & 7) || (tail & tail_mask) || tail < head || tail - head < 96+(count+2)*8) return;
     allocation = (tail - 96) & ~(uptr)31;
     if (allocation < head + (count+2)*8) return;
     gfx->tail = (u8 *)allocation;
@@ -105,6 +142,10 @@ void af_v3_tent_model_dw(Tent *actor, void *room, TentGame *game, u8 *data) {
 #ifdef AF_V3_SHARED_PALETTE_FADE
     on = (const u16 *)(data + layout->on);
     off = (const u16 *)(data + layout->off);
+#ifdef AF_V3_SELECTED_PALETTE
+    on += actor->roof*16u;
+    off += actor->roof*16u;
+#endif
 #else
     on = (const u16 *)(data + 0x20);
     off = (const u16 *)(data + 0x40);
@@ -133,11 +174,13 @@ void af_v3_tent_model_dw(Tent *actor, void *room, TentGame *game, u8 *data) {
 }
 
 #ifdef AF_V3_SHARED_PALETTE_FADE
+#ifndef AF_V3_SELECTED_PALETTE
 void __attribute__((section(".text.layout_entry")))
 af_v3_tent_model_dw(Tent *actor, void *room, TentGame *game, u8 *data) {
     (void)room;
     if (data) draw(actor, game, data, &af_v3_legacy_tent_layout);
 }
+#endif
 
 void __attribute__((section(".text.layout_entry")))
 af_v3_palette_fade_dw(Tent *actor, void *room, TentGame *game, u8 *data) {

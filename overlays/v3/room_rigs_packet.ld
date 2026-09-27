@@ -35,6 +35,8 @@ af_reaction_shock = 0x800B2B08;
 memset = 0x8003B9B0;
 memcpy = 0x80034BF8;
 gfx_set_fog_nosync = 0x800BD37C;
+mFI_GetFieldId = 0x80087C88;
+mHS_get_arrange_idx = 0x80094BF4;
 SECTIONS {
     . = DEFINED(AF_ROOM_ORIGIN) ? AF_ROOM_ORIGIN : 0x804B8000;
     .text : { *(.text.af_v3_room_rig_ct) *(.text .text.*) }

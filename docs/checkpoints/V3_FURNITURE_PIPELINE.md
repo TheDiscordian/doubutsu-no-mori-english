@@ -1,5 +1,80 @@
 # Automatic furniture pipeline checkpoint
 
+## Installed selected-roof-palette lifecycle
+
+The ordinary importer installs both complete house/manor profiles and their
+shared roof-colour/light behaviour. It reuses all 9,344 prepared artwork bytes
+without another graphics compiler run. The shared room dispatcher adds mode
+seven; no generic skeleton or texture-animation pointer is invented for these
+callback-owned models. The fixed-palette renderer supplies fade interpolation,
+full model ordering, bounded graphics allocation, and frame-owned palettes.
+
+- Current build: `build/v3-selected-palette-runtime-04/build-lock.json`, ABI 252.
+- ROM SHA-256: `9671bf6949638fc1842b7b277c4c5e0a526ec6a20bedd26b843df5fa61a1e8f4`.
+- UPS SHA-256: `ed425d1af7ce0e37aad0ca1c69d4a805ae44b1d5966c2d72cc4b43de67a272f6`.
+- Room code: 20,128 of 32,768 bytes; bootstrap: 1,509 of 1,536.
+- Code SHA-256: `743e474d773c667de1a240d1c5a790d793f3313c7ad9d05cdd850bb7b04f3c2b`.
+- Room packet SHA-256: `0d5426c21ac8a24d49569340b8d209a810c46210cca24551b416f65533507177`.
+- Actor work: eight bytes at `1A4..1AB`, already unused by these non-rig
+  profiles. No additional resident, heap, or saved-state reservation.
+
+`v3_furniture_roofs.py` verifies the actual N64 field getter, player-to-home
+mapping, home initialization/upgrade/current-player code, and exterior house
+constructor. The native saved colour is home byte `24`, not the GameCube offset.
+All twelve native summer/winter exterior palette identities match the official
+donor; the model uses the corresponding three roof shades. Winter snow replaces
+two exterior shades, leaving the third colour identity intact. Gameplay uses the
+current room's home; previews use the current player's assigned home. Invalid
+players/colours and non-player gameplay fields use colour zero. No GameCube
+island-cottage scene number is copied into the N64 engine.
+
+Seven focused checks pass. `tests.test_v3_roof_runtime` covers the actual shared
+dispatcher/renderer under sanitizers for 4,800 frames: both complete models,
+all twelve colours, all four room identities, reversed player-home arrangements,
+room/menu indices, initial on/off states, light reversals, roof changes during
+fades, retained submitted palettes, complete actor-write guards, malformed
+headers/models/tables, invalid saved indices, and crowded graphics arenas at
+both eight-byte alignment parities. The selected renderer accepts native tails
+ending in eight and aligns its own palette allocation instead of skipping draws.
+The native backend and matrix/cache functions are stubbed in this host test.
+Installed tests verify complete resources, real source/native dependency guards,
+unchanged carrying/goods/previous room records, UPS reconstruction, and four
+private browser/offline compositions. The two source-resource tests retain every
+palette/model/texture/vertex/triangle check. The affected fixed-palette host
+renderer test also passes with its prepared assets explicitly supplied.
+
+The first installation exposed a nested relocation-key serialization mismatch;
+lifecycle receipts now use a consistent JSON representation. The host test
+exposed a packed-header endianness assumption; the dispatcher now reads the two
+actual 16-bit fields. The final code refresh preserves all installed resources.
+No historical emulator fixture is replayed. Native execution, ordinary in-room
+GPU appearance, save/restart with these models, and hardware remain unverified.
+
+Both profiles remain inactive because the actual HRA reward delivery in donor
+`m_mark_room_ovl.c` is not installed. This is acquisition work, not unfinished
+model/behaviour conversion. No shop substitute is added. All 159 enabled choices
+and format-four saved fields/profile bits remain unchanged. Existing V3 saves
+still require an equal-or-larger enabled import set; imported saves are not V2
+saves. No existing ROM/save, main build lock, or stable V2 deployment is changed.
+
+Reproduction uses the ordinary category path, not an item-specific installer:
+
+```sh
+python3 tools/v3_furniture_pipeline.py import \
+  --base-lock build/v3-parent-needle-imports-02/cartridge/build-lock.json \
+  --category selected-palette-fade-assets \
+  --reuse-assets build/v3-selected-palette-assets-01 \
+  --output build/v3-selected-palette-reproduction
+V3_ROOF_BUILD=build/v3-selected-palette-reproduction/profile-runtime \
+  python3 -m unittest tests.test_v3_roof_runtime tests.test_v3_selected_palettes -v
+V3_FURNITURE_PREPARED_ART=build/v3-furniture-palette-fade-prepared-02 \
+  python3 -m unittest \
+  tests.test_v3_furniture_pipeline.DonorTests.test_shared_palette_runtime_with_prepared_source_objects_under_sanitizers -v
+```
+
+Continue the remaining combined rig/material, switched-texture, other callback,
+and console launch/storage categories before acquisition and gold-tree work.
+
 ## Complete selected-roof-palette resources
 
 The existing palette-fade converter also recognises the indexed-endpoint form.

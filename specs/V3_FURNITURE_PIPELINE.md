@@ -1892,8 +1892,9 @@ recording a loaded bank. There is no per-item DMA case for this category.
 Acquisition remains independent: an eligible winter-camping model can install
 through the existing reward category; models needing other source routes remain
 prepared-only. Model conversion never substitutes shop stock for an unknown
-reward. Roof-colour selectors and additional effects remain separate unsupported
-categories, not static substitutions. Clocked rigs have complete installed assets
+reward. Selected roof colours use the shared lifecycle described below;
+additional effects require their complete adapters, not static substitutions.
+Clocked rigs have complete installed assets
 and a shared native lifecycle; ordinary profiles/acquisition remain separate
 requirements.
 
@@ -1926,11 +1927,40 @@ native roof selection and full lifecycle are bound.
 
 The donor selector uses the current room's home roof colour during gameplay,
 the current player's assigned home in previews, and colour zero where neither
-applies. Its GameCube cottage condition must be reviewed against actual native
-room identities, not copied as a scene number. Native field IDs, player/house
-arrangement, stored roof indices, and their correspondence to the twelve donor
-palettes remain required integration. The source's interpolation and complete
-model order remain required; resource conversion is not static-colour gameplay.
+applies. Native field IDs, player/house arrangement, stored roof indices, and
+their correspondence to the twelve donor palettes are bound by
+`tools/v3_furniture_roofs.py`. Complete compiled native field, arrangement,
+home-initialization/upgrade/current-player, and exterior constructor blocks are
+checked before installation. Common data is at `80126EA0`, player number at
+offset `10003`, homes at `3588` with stride `B48`, and current roof colour at home
+offset `24`. Gameplay control type is one; other control types use the preview
+player's arranged home. Invalid colour or player values safely select zero.
+There is no GameCube island cottage among the native N64 scene identities.
+
+The native exterior pointer tables start at offsets `8` and `174` in resource
+`D5D000`; player-home palettes start at index 25. Every summer and winter
+palette agrees with the official donor apart from the transparent first entry.
+Summer roof shades 10..12 match model shades 11..13; winter snow covers the first
+two but retains the third. This verifies all twelve numerical identities,
+including the differently ordered C/D resource symbols.
+
+The ordinary importer installs these as shared room mode seven with no skeleton
+or animation pointers. `room_palettes.c` reuses `tent_model.c` under a separate
+selected-palette build define inside the checked room packet, leaving fixed
+palette code and its reservation unchanged. The actor's unused non-rig work
+holds the fade at `1A4` and selected roof at `1A8`. Construction initializes both;
+movement re-reads the current home colour and approaches the switch by the
+source float `0.1`. Drawing checks the full `AFP2` header/table/model bounds and
+submits all three lists in source order with a frame-owned palette. Both native
+eight-byte tail alignments are accepted; the allocation itself is aligned to 32.
+No heap or
+saved allocation is added, so teardown has nothing to free.
+
+The runtime catalogue binds complete resources, source helpers, native selectors,
+callbacks, profiles, names, and optional-record guards. Actual HRA reward
+delivery remains a separate acquisition requirement; installed profiles stay
+inactive until that route exists. Resource preparation alone still rejects at
+the metadata/profile boundary without the verified installed lifecycle.
 
 ## Shared installation
 

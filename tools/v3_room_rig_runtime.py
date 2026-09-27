@@ -10,6 +10,7 @@ from v3_equipment_runtime import RAM as EQUIPMENT_RAM,retired_module_space
 from v3_furniture_pipeline import Source,prepare,room_aliases,PreparedAssets
 from v3_furniture_rigs import CATEGORY,CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY,ROLLING_CATEGORY,JOINT_CATEGORY,suffix
 import v3_furniture_joint_rigs as joints
+import v3_furniture_roofs as roofs
 from v3_registry import (furniture_representation_identity,ROOM_ALIAS_REGISTRY_VERSION,
                          furniture_identity,furniture_source,furniture_source_index)
 from v3_import_storage import ROWS,ITEMS,slot,END
@@ -45,6 +46,7 @@ from v3_furniture_static import SOURCES as STATIC_SOURCES
 SOURCES+=STATIC_SOURCES
 from v3_room_particles import SOURCES as PARTICLE_SOURCES
 SOURCES+=PARTICLE_SOURCES
+SOURCES+=roofs.SOURCES
 
 
 def checked_hit_condition(base,report,trigger,sound,audio):
@@ -128,7 +130,7 @@ def install_profiles(base,prior,blob,core,original,output,directories):
         for row in art['objects']:
             donor=row['item_id'];item=int(donor,16);prepared_row=prepare(source,item)
             descriptor=prepared_row[0];category=descriptor.get('callback_adapter',{}).get('category')
-            if (category not in (CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY,ROLLING_CATEGORY,JOINT_CATEGORY,'switch-trigger-sound',static.CATEGORY,MATERIAL_CATEGORY,SCROLL_CATEGORY) or
+            if (category not in (CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY,ROLLING_CATEGORY,JOINT_CATEGORY,roofs.CATEGORY,'switch-trigger-sound',static.CATEGORY,MATERIAL_CATEGORY,SCROLL_CATEGORY) or
                     donor in occupied or item not in identities or
                     row['profile']!=json.loads(json.dumps(descriptor)) or
                     row['native_profile_scalar_hex']!=descriptor['scalar_hex']):
@@ -203,6 +205,10 @@ def install_profiles(base,prior,blob,core,original,output,directories):
                     raise ValueError('Missing complete joint-rig fresh-placement binding')
                 if initial['source_sound_id'] is not None and contracts.get(donor)!=initial:
                     raise ValueError('Joint rig needs its complete installed source loop/click audio')
+            if category==roofs.CATEGORY:
+                initial=roofs.lifecycle(descriptor)
+                if runtime.get('roof_contract')!=roofs.native_contract(source,base):
+                    raise ValueError('Missing complete native house-colour selection')
             index,destination=furniture_identity(item);i=slot(destination)
             if index!=1024+i:
                 raise ValueError('Parent/display aliases require their shared parent adapter')
@@ -236,7 +242,7 @@ def install_profiles(base,prior,blob,core,original,output,directories):
                     raise ValueError('Prepared scrolling resource is not completely installed')
                 vrom=installed['vrom'];vtable=SCROLL_VTABLE;reused_asset=True
                 installed.update(lifecycle_installed=True,lifecycle=json.loads(json.dumps(lifecycle)))
-            elif category in (CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY,ROLLING_CATEGORY,JOINT_CATEGORY):
+            elif category in (CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY,ROLLING_CATEGORY,JOINT_CATEGORY,roofs.CATEGORY):
                 installed=rigs.get(donor)
                 if (not installed or installed['profile_installed'] or
                         {k:v for k,v in installed['source'].items() if k!='reused_artwork'}!=
@@ -406,6 +412,9 @@ def bind_profiles(source,base,report):
         from v3_furniture_needle import native_contract as needle_contract
         if runtime.get('needle_contract')!=needle_contract(base,report):
             raise ValueError('Changed installed needle carrying bindings')
+    if any(r.get('mode')==7 for r in runtime['rows']):
+        if runtime.get('roof_contract')!=roofs.native_contract(source,base):
+            raise ValueError('Changed installed house-colour selection')
     for row,enabled in [(r,False) for r in staged.get('rows',[])]+[(r,True) for r in activated]:
         item=int(row['item_id'],16);donor=f'{furniture_source(row)[0]:04X}';i=slot(item);binding=bindings.get(donor)
         if (donor in source.runtime_profiles or not binding or not binding['profile_installed'] or
@@ -417,6 +426,11 @@ def bind_profiles(source,base,report):
         expected_vtable=(MATERIAL_VTABLE if category==MATERIAL_CATEGORY else SOUND_VTABLE if category in ('switch-trigger-sound',static.CATEGORY)
                          else SCROLL_VTABLE if category==SCROLL_CATEGORY else VTABLE)
         if category==static.CATEGORY:static.checked_audio(descriptor,binding,e)
+        if category==roofs.CATEGORY:
+            lifecycle=roofs.lifecycle(descriptor)
+            if binding.get('roof_lifecycle')!=lifecycle:
+                raise ValueError('Incomplete installed roof-palette lifecycle')
+            art['room_lifecycle']=lifecycle
         if category==JOINT_CATEGORY:
             joint_lifecycle=joints.lifecycle(source,descriptor)
             if (joint_lifecycle is None or binding.get('joint_lifecycle')!=json.loads(json.dumps(joint_lifecycle)) or
@@ -478,7 +492,7 @@ def bind_profiles(source,base,report):
         current=blob[ROWS+i*80:ROWS+(i+1)*80];record=blob[ITEMS+i*32:ITEMS+(i+1)*32]
         expected=struct.pack('>HHI',1024+i,item,int(enabled))+native+bytes(4)
         if (art['profile']!=json.loads(json.dumps(descriptor)) or row['room_runtime']!=art['room_runtime'] or
-                category in (MATERIAL_CATEGORY,JOINT_CATEGORY) and row.get('room_lifecycle')!=json.loads(json.dumps(art.get('room_lifecycle'))) or
+                category in (MATERIAL_CATEGORY,JOINT_CATEGORY,roofs.CATEGORY) and row.get('room_lifecycle')!=json.loads(json.dumps(art.get('room_lifecycle'))) or
                 row.get('room_placement')!=art.get('room_placement') or
                 not 0<=at<at+n<=len(blob) or sha256(blob[at:at+n])!=art['object_sha256'] or
                 current!=expected or record[:8]!=struct.pack('>HHHBB',1024+i,item,row['price'],descriptor['size_code'],int(enabled)) or
@@ -520,17 +534,26 @@ def prepared_categories(source,directories):
         for row in art['objects']:
             donor=row['item_id'];item=int(donor,16);prepared_row=prepare(source,item)
             profile=prepared_row[0];adapter=profile.get('callback_adapter',{});category=adapter.get('category')
-            if category not in (CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY,ROLLING_CATEGORY,JOINT_CATEGORY):
+            if category not in (CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY,ROLLING_CATEGORY,JOINT_CATEGORY,roofs.CATEGORY):
                 raise ValueError('Unimplemented additional room-rig category')
             if (row['profile']!=json.loads(json.dumps(profile)) or donor in assets or
                     row['native_profile_scalar_hex']!=profile['scalar_hex'] or
-                    profile['skeleton']['joints']>(6 if category==ROLLING_CATEGORY else 8) or category not in (BILLBOARD_CATEGORY,JOINT_CATEGORY) and
-                    any(r.get('draw_stream') for r in profile['skeleton']['rows'])):
+                    category!=roofs.CATEGORY and (profile['skeleton']['joints']>(6 if category==ROLLING_CATEGORY else 8) or
+                    category not in (BILLBOARD_CATEGORY,JOINT_CATEGORY) and
+                    any(r.get('draw_stream') for r in profile['skeleton']['rows']))):
                 raise ValueError('Changed room-rig profile or native work capacity')
             cache.reuse(source,donor,prepared_row)
             data=(directory/row['object_file']).read_bytes()
             if len(data)>9216:raise ValueError('Complete rig exceeds room bank')
-            rig=row['rig'];index,destination=furniture_representation_identity(item)
+            index,destination=furniture_representation_identity(item)
+            if category==roofs.CATEGORY:
+                rows.append(dict(source_item_id=donor,item_id=f'{destination:04X}',runtime_index=index,
+                    bytes=len(data),sha256=sha256(data),category=category,mode=7,first=12,last=0,
+                    skeleton=0,animation=0,joints=0,shown=0,source=row,
+                    roof_lifecycle=roofs.lifecycle(profile),profile_installed=False,parent_selectable=False))
+                assets[donor]=data
+                continue
+            rig=row['rig']
             if category==CLOCK_CATEGORY:
                 mode=1;first=adapter['clock']['hour_joint'];last=adapter['clock']['minute_joint']
             elif category==STORAGE_CATEGORY:
@@ -598,6 +621,12 @@ def encode_packet(rows,sound_rows=(),material_rows=()):
         raise ValueError('Unordered or duplicate room-rig records')
     table=bytearray(struct.pack('>4I',PACKET_MAGIC,len(rows),24,0))
     for r in rows:
+        if r.get('mode')==7:
+            if (r['runtime_index']!=1024+slot(int(r['item_id'],16)) or not 800<=r['bytes']<=9216 or
+                    r['bytes']%16 or any(r[k] for k in ('skeleton','animation','joints','shown','last')) or r['first']!=12):
+                raise ValueError('Invalid complete selected-palette record')
+            table.extend(struct.pack('>HHIIBBBBII',r['runtime_index'],r['bytes'],0,0,0,0,7,0,12,0))
+            continue
         encode([r])  # Retain the complete existing object/pointer/work-area checks.
         mode,first,last=r.get('mode',0),r.get('first',0),r.get('last',0)
         if (mode not in (0,1,2,3,4,5,6) or mode==0 and (first or last) or
@@ -716,6 +745,10 @@ def publish_packet(equipment,blob,output,*,core=None):
     if any(r.get('mode')==5 for r in runtime['rows']):defines+=('AF_V3_ROOM_ROLLING',)
     joint=any(r.get('mode')==6 for r in runtime['rows'])
     if joint:defines+=('AF_V3_ROOM_JOINT',)
+    roof=any(r.get('mode')==7 for r in runtime['rows'])
+    if roof:
+        if not runtime.get('roof_contract'):raise ValueError('Selected palettes require a checked native selector')
+        defines+=('AF_V3_SELECTED_PALETTE','AF_V3_SHARED_PALETTE_FADE')
     needle=any(r.get('mode')==6 and r.get('first')==4 for r in runtime['rows'])
     if needle:
         from v3_room_carry_native import checked_packet
@@ -742,6 +775,7 @@ def publish_packet(equipment,blob,output,*,core=None):
             (('overlays/v3/room_billboards.c',) if billboard else ())+
             (('overlays/v3/room_joints.c',) if joint else ())+
             (('overlays/v3/room_needle.c',) if needle else ())+
+            (('overlays/v3/room_palettes.c',) if roof else ())+
             (('overlays/v3/room_effects.c',) if effects else ())+reaction_sources+
             (('overlays/v3/room_particles.c',) if particles else ())+\
             (('overlays/v3/room_colours.c',) if colours else ())+static_sources)
@@ -922,6 +956,7 @@ def extend(base,prior,blob,core,original,output,directories):
     if billboard_binding:installed['billboard_contract']=billboard_binding
     if rolling:installed['motion_contract']=motion_binding(source,base,prior,all_rows)
     if any(r.get('mode')==6 for r in all_rows):installed['joint_contract']=joints.native_contract(base)
+    if any(r.get('mode')==7 for r in all_rows):installed['roof_contract']=roofs.native_contract(source,base)
     if any(r.get('mode')==6 and r.get('first')==4 for r in all_rows):
         from v3_furniture_needle import native_contract as needle_contract
         installed['needle_contract']=needle_contract(base,prior)

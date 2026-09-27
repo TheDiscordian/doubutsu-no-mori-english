@@ -102,6 +102,12 @@ typedef struct {
 #define ROOM_RIG_BILLBOARD 4u
 #define ROOM_RIG_ROLLING 5u
 #define ROOM_RIG_JOINT 6u
+#define ROOM_RIG_ROOF 7u
+#ifdef AF_V3_SELECTED_PALETTE
+extern void af_v3_roof_ct(void *,u8 *);
+extern void af_v3_roof_mv(void *,void *,void *,u8 *);
+extern void af_v3_roof_dw(void *,void *,void *,u8 *);
+#endif
 #ifdef AF_V3_ROOM_JOINT
 extern void af_v3_room_joint_ct(RoomRig *,const RoomRigRecord *);
 extern void af_v3_room_joint_mv(RoomRig *,const RoomRigRecord *);

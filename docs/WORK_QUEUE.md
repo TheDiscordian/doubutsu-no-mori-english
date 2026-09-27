@@ -21,16 +21,25 @@ prevent asset/data conversion or redirect work from an unfinished shared format.
 Incomplete gameplay stays unavailable in the selector; installing assets does
 not claim that an item is playable. Reuse unchanged passing tests throughout.
 
-Current task: connect the selected-roof-palette lifecycle, then continue the
-remaining model/lifecycle and console launch/storage categories. Both complete
-house models are prepared at `build/v3-selected-palette-assets-01/`: 9,344 bytes,
-93 triangles, all twelve roof colours and both light endpoints. Two focused
-checks pass. Reuse these objects; do not reconvert one item at a time. Bind actual
-native room/player/home selection and verify the roof index correspondence.
-Known native entries are `mFI_GetFieldId` at `80087C88` and
-`mHS_get_arrange_idx` at `80094BF4`; symbols alone are not verified call bindings.
-Extend the shared palette lifecycle or move shared code into a checked reservation
-if the existing 1-KiB palette owner cannot fit it. Do not use a fixed roof colour.
+Current task: finish remaining model/lifecycle and console launch/storage
+categories. Extend combined rig/material callbacks for the hamster cage and
+switched texture animation for the harvest TV, then continue the other actual
+unsupported callbacks without per-item installers. The remaining unconverted
+records also include matryoshka, aerobics radio, crab stew, and treasure chest.
+Reuse complete source resources and shared behaviours throughout.
+
+The checked current proposal is ABI 252 at
+`build/v3-selected-palette-runtime-04/build-lock.json`, ROM SHA-256
+`9671bf6949638fc1842b7b277c4c5e0a526ec6a20bedd26b843df5fa61a1e8f4`.
+Both complete house models and selected-roof/light lifecycles are installed:
+9,344 reused artwork bytes, 93 triangles, and all twelve roof colours at both
+light endpoints. Real native room/player/home readers and exterior palette
+correspondence are bound. Host checks cover 4,800 frames and complete private
+composition. Native execution/GPU appearance remain unverified. Their actual
+HRA rewards remain phase-2 acquisition work; the 159 enabled choices and saved
+format are unchanged. The room packet uses 20,128 of 32,768 code bytes; bootstrap
+uses 1,509 of 1,536. See the
+[roof-lifecycle checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#installed-selected-roof-palette-lifecycle).
 
 The compass's parent-sensitive needle is
 installed through the ordinary importer in ABI 248 at

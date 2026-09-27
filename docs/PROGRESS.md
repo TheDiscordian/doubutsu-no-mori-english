@@ -31,15 +31,18 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
-The selected-palette category converts both house/manor models in one compiler
-batch: 9,344 bytes, all 93 triangles, three ordered model lists each, and every
-lights-on/off palette for all twelve roof colours. Two focused checks pass for
-complete compiled artwork/palettes, source callback/selector guards, reusable
-objects, and rejection before the native house-colour lifecycle is installed.
-The current task is that native selector/lifecycle, followed by remaining
-model/behaviour and console categories. No cartridge or selection changes occur
-in this resource preparation. See the
-[selected-palette checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#complete-selected-roof-palette-resources).
+The shared importer installs both complete house/manor models and their selected
+roof/light lifecycle. All 9,344 artwork bytes and 93 triangles are reused. The
+native room identity or preview player's actual assigned home selects among all
+twelve roof colours; colour ordering is checked against both games' exterior
+palettes. Lights use the shared fade renderer and frame-owned palette storage.
+Both complete profiles remain inactive pending their actual HRA reward route.
+Seven focused checks cover 4,800 host-rendered frames, all colours/homes/previews,
+native dependency guards, complete installed resources, and private browser
+composition. Native execution and GPU/hardware appearance remain unverified.
+Continue remaining model/behaviour and console categories; do not divert into
+reward acquisition. See the
+[roof-lifecycle checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#installed-selected-roof-palette-lifecycle).
 
 The shared moving-table core is converted and cross-compiled alongside the
 compass needle: all six footprints, four carried slots, mixed furniture/loose
@@ -80,8 +83,8 @@ appearance remain unverified. The profiles stay inactive pending actual
 acquisition. The compass uses the same dispatcher with installed parent support. See the
 [joint-lifecycle checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#installed-switched-joint-lifecycles).
 
-The checked proposal is ABI 248 at
-`build/v3-parent-needle-imports-02/cartridge/build-lock.json`, with 159
+The checked proposal is ABI 252 at
+`build/v3-selected-palette-runtime-04/build-lock.json`, with 159
 development choices and unchanged format-four saved data. The complete
 10,448-byte snowboard remains imported through the ordinary pipeline,
 including all 259 triangles, thirteen textures, and actual winter-camper route.

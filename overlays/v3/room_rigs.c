@@ -109,6 +109,14 @@ static const RoomRigRecord *find(u32 index) {
     for (u32 i=0;i<room_rig_table->count;++i) {
         const RoomRigRecord *r=room_rig_table->rows+i;
         if (r->index!=index) continue;
+#ifdef AF_V3_SELECTED_PALETTE
+        if (r->mode==ROOM_RIG_ROOF) {
+            if (index<1024 || index>=2048 || r->bytes<800 || r->bytes>9216 || (r->bytes&15) ||
+                    r->skeleton || r->animation || r->joints || r->shown || r->reserved ||
+                    r->first.bits!=12 || r->last.bits) return 0;
+            return r;
+        }
+#endif
         if (r->index<1024 || r->index>=2048 || r->bytes<32 || r->bytes>9216 || (r->bytes&15) ||
                 !r->joints || r->joints>8 || !r->shown || r->shown>r->joints ||
                 (r->skeleton&3) || r->skeleton<0x06000000u || r->skeleton>0x06000000u+r->bytes-8 ||
@@ -170,6 +178,9 @@ void af_v3_room_rig_ct(RoomRig *actor,u8 *data) {
 #endif
         return;
     }
+#ifdef AF_V3_SELECTED_PALETTE
+    if (r->mode==ROOM_RIG_ROOF) { af_v3_roof_ct(actor,data);return; }
+#endif
     u8 *skeleton=Lib_SegmentedToVirtual((void *)(uptr)r->skeleton);
     void *animation=Lib_SegmentedToVirtual((void *)(uptr)r->animation);
     if (skeleton[0]!=r->joints || skeleton[1]!=r->shown) return;
@@ -217,6 +228,9 @@ void af_v3_room_rig_mv(RoomRig *actor,void *room,RoomRigGame *game,u8 *data) {
     (void)room;(void)game;
     const RoomRigRecord *r=find(actor->index);
     if (!data || !r) return;
+#ifdef AF_V3_SELECTED_PALETTE
+    if (r->mode==ROOM_RIG_ROOF) { af_v3_roof_mv(actor,room,game,data);return; }
+#endif
 #ifdef AF_V3_ROOM_RIG_PACKET
 #ifdef AF_V3_ROOM_JOINT
     if (r->mode==ROOM_RIG_JOINT) { af_v3_room_joint_mv(actor,r);return; }
@@ -323,6 +337,13 @@ void af_v3_room_rig_dw(RoomRig *actor,void *room,RoomRigGame *game,u8 *data) {
     (void)room;
     const RoomRigRecord *r=find(actor->index);
     if (!r || !data) return;
+#ifdef AF_V3_SELECTED_PALETTE
+    if (r->mode==ROOM_RIG_ROOF) {
+        const u16 *layout=(const u16 *)data;
+        if (((uptr)data&7) || layout[2]!=r->bytes || layout[3]!=3) return;
+        af_v3_roof_dw(actor,room,game,data);return;
+    }
+#endif
 #ifdef AF_V3_ROOM_JOINT
     if (r->mode==ROOM_RIG_JOINT) { af_v3_room_joint_dw(actor,game,r);return; }
 #endif
