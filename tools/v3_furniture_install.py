@@ -67,7 +67,9 @@ def profile(row, vrom, *, limit=END, model_capacity=9216):
     scalar = bytes.fromhex(row['native_profile_scalar_hex'])
     adapter=row.get('profile',{}).get('callback_adapter',{})
     fading = adapter.get('category') == 'switch-palette-fade'
-    sequence = adapter.get('category') == 'constant-model-sequence'
+    from v3_console_room import CATEGORY as CONSOLE_CATEGORY,VTABLE as CONSOLE_VTABLE,profile_lifecycle as console_lifecycle
+    console = adapter.get('category') == CONSOLE_CATEGORY and console_lifecycle(row['profile'],row.get('room_lifecycle'))
+    sequence = adapter.get('category') == 'constant-model-sequence' or console
     sound = adapter.get('category') == 'switch-trigger-sound'
     static = adapter.get('category') == 'static-interaction'
     from v3_furniture_rigs import RIG_CATEGORIES,FIXED_CATEGORY,JOINT_CATEGORY
@@ -86,7 +88,8 @@ def profile(row, vrom, *, limit=END, model_capacity=9216):
             roof and not roof_lifecycle(row['profile'],row.get('room_lifecycle')) or
             adapter.get('category')==DUAL_CATEGORY and not dual_profile_lifecycle(row['profile'],row.get('room_lifecycle'),row.get('room_placement')) or
             radio and row.get('room_lifecycle')!=music_lifecycle(row['profile']) or
-            adapter.get('category') in (FIXED_CATEGORY,PENDING_MOVE_CATEGORY,PENDING_SEQUENCE_CATEGORY) or scrolling and
+            adapter.get('category') in (FIXED_CATEGORY,PENDING_MOVE_CATEGORY) or
+            adapter.get('category')==PENDING_SEQUENCE_CATEGORY and not console or scrolling and
             (not profile_lifecycle(row['profile'],row.get('room_lifecycle'),row.get('room_placement')) or
              row.get('room_runtime')!={'vtable':SCROLL_VTABLE,'vrom':vrom})):
         raise ValueError('Prepared resources have no implemented native lifecycle')
@@ -108,6 +111,8 @@ def profile(row, vrom, *, limit=END, model_capacity=9216):
                 at%8 or not 0<=at<=n-linked['bytes'] or linked['bytes']!=(len(offsets)+1)*8):
             raise ValueError('Invalid static model sequence bounds')
         pointers=[0x06000000+at,0,0,0]
+    if console and row.get('room_runtime')!={'vtable':CONSOLE_VTABLE,'vrom':vrom}:
+        raise ValueError('Console furniture needs its complete installed room dispatch')
     if sound or static:
         from v3_room_rig_runtime import SOUND_VTABLE
         if row.get('room_runtime')!={'vtable':SOUND_VTABLE,'vrom':vrom}:
@@ -136,7 +141,7 @@ def profile(row, vrom, *, limit=END, model_capacity=9216):
         pointers=[0,0,0,0]
     return (struct.pack('>12I', vrom, vrom+n, 0x06000000, 0x06000000+n, *pointers, 0,0,0,0)+scalar+
             struct.pack('>I',VTABLE if rigged or roof or radio else SOUND_VTABLE if sound or static else MATERIAL_VTABLE if material else
-                        SCROLL_VTABLE if scrolling else palette_fade.VTABLE if fading else 0))
+                        SCROLL_VTABLE if scrolling else CONSOLE_VTABLE if console else palette_fade.VTABLE if fading else 0))
 
 
 def catalogue_record(row):

@@ -1,5 +1,25 @@
 # Work record
 
+## 2026-09-27: shared console furniture profiles and room interaction
+
+- Extended the ordinary category planner/stager instead of adding per-console
+  installers. Reused every complete model, installed eleven native profiles and
+  one 344-byte guarded move callback, and retained the native prompt/return flow.
+  Excitebike promotes through its actual lottery route; ten other iNES consoles
+  retain explicit reward dependencies, and QD remains unfinished.
+- Added fixed additive identities and eleven official-name provenance records.
+  ABI 280, full hashes, commands, and remaining work are in the
+  [room checkpoint](checkpoints/V3_CONSOLE_ROOM.md). Both V2 deployments stay live.
+- Five focused checks pass across targeted runs, including private composition
+  and repeat-plan skipping. Corrected one test expectation for the shared
+  startup's changed packet CRC; no unchanged test suite replay.
+- Two native attempts pass startup comparisons but stop before callback
+  execution: general allocation returns null, then the checked game arena has
+  no free fixture space. No native scenario or gameplay pass is claimed.
+- Found that native THA allocation itself lacks a capacity check. Add the
+  required pre-allocation check next; measure real emulator-state capacity and
+  continue complete QD/gameplay integration. No hardware handoff is authorised.
+
 ## 2026-09-27: shared native iNES lifecycle
 
 - Installed six checked emulator calls and removed only their native jump

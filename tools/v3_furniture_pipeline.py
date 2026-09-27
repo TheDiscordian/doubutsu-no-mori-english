@@ -1214,7 +1214,10 @@ def metadata(source, item, profile, identity):
         raise ReviewRequired('Material-frame artwork is prepared; drawing, lifecycle behaviour, and acquisition need runtime adapters')
     if profile.get('callback_adapter',{}).get('category')==PENDING_MOVE_CATEGORY:
         raise ReviewRequired('Static artwork is prepared; move behaviour, profile interactions, and spawned effects need runtime adapters')
-    if profile.get('callback_adapter',{}).get('category')==PENDING_SEQUENCE_CATEGORY:
+    if profile.get('callback_adapter',{}).get('category')==PENDING_SEQUENCE_CATEGORY and not binding:
+        console=getattr(source,'console_runtime_bindings',{}).get(f'{item:04X}')
+        if console and console['image_kind']==2 and not console['engine_installed']:
+            raise ReviewRequired('Complete disk image and artwork are prepared; QD disk engine remains uninstalled')
         raise ReviewRequired('Constant-material artwork is prepared; complete interaction lifecycle needs a runtime adapter')
     if profile.get('callback_adapter',{}).get('category')=='static-interaction' and not binding:
         raise ReviewRequired('Static interaction requires its complete installed behaviour and audio')
@@ -1464,13 +1467,19 @@ def rig_import_plan(inventory, report, bindings, selected=(), category=None, *, 
     rigs={r['source_item_id'] for r in report['equipment_resources']['room_rigs']['rows']}
     audio={r['item_id'] for r in report['equipment_resources'].get('furniture_audio',{}).get('furniture',[])}
     loops={r['item_id'] for r in report['equipment_resources'].get('furniture_level_audio',{}).get('furniture',[])}
+    from v3_console_room import lifecycle as console_lifecycle
+    console_rows=[r for r in candidates if console_lifecycle(r['profile']) is not None] if source is not None else []
+    prepared_consoles={r['source_item_id']:r for r in report['equipment_resources'].get('console_images',{}).get('room',{}).get('rows',[])}
+    console_rows=[r for r in console_rows if r['item_id'] not in prepared_consoles or prepared_consoles[r['item_id']]['engine_installed']]
+    if console_rows and not report['equipment_resources'].get('console_images',{}).get('emulator',{}).get('installed'):
+        console_rows=[]
     plan=dict(resources=sorted(r['item_id'] for r in rows if r['item_id'] not in rigs),
         audio=sorted(({r['item_id'] for r in rows if furniture_trigger(source,r['profile']) is not None}|
                       set(material_audio)|{r['item_id'] for r in static_rows if r['profile']['callback_adapter'].get('trigger')})-audio),
         loops=sorted(({r['item_id'] for r in rows if furniture_level(source,r['profile']) is not None}|
                       {r['item_id'] for r in static_rows if r['profile']['callback_adapter'].get('level_sound')}|
                       set(material_loops)|set(scroll_loops)|joint_loops)-loops),
-        profiles=sorted(r['item_id'] for r in rows+material_rows+static_rows+scroll_rows if r['item_id'] not in bindings))
+        profiles=sorted(r['item_id'] for r in rows+material_rows+static_rows+scroll_rows+console_rows if r['item_id'] not in bindings))
     if any(r['profile']['callback_adapter']['category']==ROTATED_CATEGORY for r in rows):
         exercise=report['equipment_resources'].get('player_motion',{}).get('exercise')
         if not exercise or not exercise.get('action_installed'):

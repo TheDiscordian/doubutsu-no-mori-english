@@ -153,6 +153,16 @@ both stable V2 deployments remain unchanged.
 
 ## Native integration requirements
 
+The ordinary furniture pipeline installs source-mapped console room callbacks
+and complete profiles through its shared category staging. It reuses every
+prepared model and the native interaction clip, preserving the prompt and normal
+return flow. Eleven iNES profiles are installed; actual reward dependencies
+remain independent. QD's complete assets stay pending its engine. The
+[room checkpoint](../docs/checkpoints/V3_CONSOLE_ROOM.md) records current host/
+cartridge evidence and the two incomplete native setups. Explicit arena-capacity
+checks are required before a gameplay/hardware handoff: native allocation can
+return a non-null pointer after subtracting past the arena head.
+
 The shared `--console-emulator` stage installs six checked native calls for
 graphics/loading and initialization/frame/reset/cleanup. Full images and save
 metadata reuse the existing packet; transient session memory occupies 2,048

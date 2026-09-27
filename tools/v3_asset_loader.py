@@ -63,7 +63,8 @@ def compile_part(part, out, extra_sources=(), defines=(), primary_source=None):
     run('objcopy', '-O', 'binary', '-j', '.text', '-j', '.rodata',
         *(['-j', '.fallbacks'] if part=='scenery_bootstrap' else []), 'code.elf', 'code.bin')
     code = (out / 'code.bin').read_bytes()
-    entry, expected = {'console_emulator': ('af_v3_console_image_native_load', 0x804F9020),
+    entry, expected = {'console_room': ('af_v3_console_room_move', 0x804FB000),
+                       'console_emulator': ('af_v3_console_image_native_load', 0x804F9020),
                        'console_image_native': ('af_v3_console_image_native_load', 0x804F9020),
                        'console_image': ('af_v3_console_load_image', 0),
                        'console_storage': ('af_v3_save_reset', 0x804DE200),

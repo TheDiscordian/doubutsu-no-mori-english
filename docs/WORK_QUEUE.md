@@ -21,10 +21,19 @@ prevent asset/data conversion or redirect work from an unfinished shared format.
 Incomplete gameplay stays unavailable in the selector; installing assets does
 not claim that an item is playable. Reuse unchanged passing tests throughout.
 
-Current task: connect the shared console furniture launch and normal return,
-verify real game-heap capacity, and implement complete QD execution. Continue
-from ABI 278 at `build/v3-console-emulator-native-01/build-lock.json`, ROM SHA-256
-`5a714a18c3d6037f07bd9664bae456fcf85cd7ba290aebfe35370e42aea41ad1`.
+Current task: add explicit capacity checks before imported emulator allocations,
+then verify the real game-state heap and native launch/rendering/reset/return,
+and implement complete QD execution. Continue from ABI 280 at
+`build/v3-console-room-imports-01/cartridge/build-lock.json`, ROM SHA-256
+`b1080db8248385f85ddd9f68a5ba36ce83fb083a6f5b7061b60b8fa34fa47786`.
+The common room callback and eleven complete console profiles/models are
+installed. Excitebike adds one experimental choice through its actual lottery
+route; the other ten retain pending acquisition. Five focused checks pass;
+two native setup attempts stop before callback execution due to unavailable
+fixture memory. Do not replay that title-state fixture. Native `THA_alloc16`
+does not check remaining capacity, so non-null allocation checks alone are
+insufficient for the imported game's buffers. See the
+[room checkpoint](checkpoints/V3_CONSOLE_ROOM.md).
 Full iNES loading, graphics allocation, and frame/reset/exit save hooks are
 installed. Three focused checks pass, including actual-image host adapter
 execution, checked native hooks/relocations, resource preservation, and four
@@ -36,8 +45,8 @@ checks, six-packet startup checks, and four private compositions pass. Native
 reads reproduce a complete iNES image and complete QD image with guards/save
 state intact. The scenario subsequently fails in fixture cleanup; its corrected
 helper is not rerun after two setup attempts. Retain the successful read evidence
-and verify actual launch/return with the next changed gameplay batch. No new
-console choice is enabled. See the [streaming checkpoint](checkpoints/V3_CONSOLE_IMAGES.md).
+and verify actual launch/return with the next changed gameplay batch.
+See the [streaming checkpoint](checkpoints/V3_CONSOLE_IMAGES.md).
 
 The shared save executor is prepared at `build/v3-console-games-prepared-06/`:
 3,988 MIPS bytes, all sixty recipes, and four independent player blocks.
@@ -123,14 +132,14 @@ Continue the remaining console launch/storage category without per-item
 installers. Radio room behaviour and indoor player exercise are installed;
 its acquisition remains unfinished. Reuse complete resources and shared runtimes.
 
-The checked current proposal is ABI 278 at
-`build/v3-console-emulator-native-01/build-lock.json`, ROM SHA-256
-`5a714a18c3d6037f07bd9664bae456fcf85cd7ba290aebfe35370e42aea41ad1`.
+The checked current proposal is ABI 280 at
+`build/v3-console-room-imports-01/cartridge/build-lock.json`, ROM SHA-256
+`b1080db8248385f85ddd9f68a5ba36ce83fb083a6f5b7061b60b8fa34fa47786`.
 The combined skeleton/material category imports the complete hamster cage,
 including source movement/texture timing, positioned sound, actual lottery
 availability, catalogue ordering, scoring, and official English text. Five focused
 checks pass; native execution, ordinary appearance/synthesis, and hardware remain
-unverified. There are 162 enabled development choices and no saved-format change.
+unverified. The current proposal has 163 development choices and save format five.
 Shared room code uses 27,856 of 32,768 bytes; bootstrap uses 1,182 of 1,536.
 See the [combined-animation checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#installed-combined-skeleton-and-material-animation).
 

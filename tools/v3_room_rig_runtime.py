@@ -106,6 +106,7 @@ def install_profiles(base,prior,blob,core,original,output,directories):
     from v3_sound_programs import furniture_trigger,checked_furniture_loops
     from v3_furniture_behaviours import install_initial_switch,checked_initial_switch
     import v3_furniture_static as static
+    import v3_console_room as consoles
     result=copy.deepcopy(prior['equipment_resources']);runtime=result['room_rigs']
     source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
         (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
@@ -124,6 +125,7 @@ def install_profiles(base,prior,blob,core,original,output,directories):
     sounds={r['source_item_id']:r for r in runtime.get('sound_rows',[])}
     materials={r['source_item_id']:r for r in runtime.get('material_rows',[])}
     scrolling=checked_runtime(result,blob)
+    console_rows=consoles.checked_runtime(result,blob,base)
     contracts,_=checked_furniture_loops(base,core,result,source) if result.get('furniture_level_audio') else ({},{})
     from v3_furniture_contact import checked_contracts
     contracts.update(checked_contracts(source,base,prior))
@@ -139,7 +141,7 @@ def install_profiles(base,prior,blob,core,original,output,directories):
         for row in art['objects']:
             donor=row['item_id'];item=int(donor,16);prepared_row=prepare(source,item)
             descriptor=prepared_row[0];category=descriptor.get('callback_adapter',{}).get('category')
-            if (category not in (CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY,ROLLING_CATEGORY,JOINT_CATEGORY,MATERIAL_RIG_CATEGORY,REVERSIBLE_CATEGORY,EFFECT_RIG_CATEGORY,DUAL_CATEGORY,ROTATED_CATEGORY,roofs.CATEGORY,'switch-trigger-sound',static.CATEGORY,MATERIAL_CATEGORY,SCROLL_CATEGORY) or
+            if (category not in (CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY,ROLLING_CATEGORY,JOINT_CATEGORY,MATERIAL_RIG_CATEGORY,REVERSIBLE_CATEGORY,EFFECT_RIG_CATEGORY,DUAL_CATEGORY,ROTATED_CATEGORY,roofs.CATEGORY,'switch-trigger-sound',static.CATEGORY,MATERIAL_CATEGORY,SCROLL_CATEGORY,consoles.CATEGORY) or
                     donor in occupied or item not in identities or
                     row['profile']!=json.loads(json.dumps(descriptor)) or
                     row['native_profile_scalar_hex']!=descriptor['scalar_hex']):
@@ -233,6 +235,16 @@ def install_profiles(base,prior,blob,core,original,output,directories):
                     raise ValueError('Missing complete dual-motion scene/contact readers')
                 if placement is None:
                     placement,owner_changes,updates=install_initial_switch(base,prior,blob,source,output)
+            if category==consoles.CATEGORY:
+                initial=consoles.lifecycle(descriptor)
+                if initial is None:
+                    deferred.append(dict(source_item_id=donor,reason='Console payload or source interaction is unavailable'))
+                    continue
+                if not console_rows:console_rows=consoles.install(source,base,result,blob,output)
+                installed=console_rows.get(donor)
+                if not installed or not installed['engine_installed']:
+                    deferred.append(dict(source_item_id=donor,reason='Complete QD disk engine remains uninstalled'))
+                    continue
             index,destination=furniture_identity(item);i=slot(destination)
             if index!=1024+i:
                 raise ValueError('Parent/display aliases require their shared parent adapter')
@@ -240,7 +252,14 @@ def install_profiles(base,prior,blob,core,original,output,directories):
                 raise ValueError('Staged identity needs native correspondence review')
             if (any(blob[ROWS+i*80:ROWS+(i+1)*80]) or any(blob[ITEMS+i*32:ITEMS+(i+1)*32]) or
                     blob[0x40+i//8]&(1<<(i&7))):raise ValueError('Profile staging overwrites an existing or selected identity')
-            if category==static.CATEGORY:
+            if category==consoles.CATEGORY:
+                if installed['profile_installed'] or installed['room_lifecycle']!=initial:
+                    raise ValueError('Console source profile differs from its complete native binding')
+                blob.extend(bytes(-len(blob)%16));vrom=BLOB+len(blob);blob.extend(data)
+                if vrom+len(data)>limit:raise ValueError('Complete console models exceed checked import reservation')
+                vtable=consoles.VTABLE;reused_asset=False
+                installed.update(blob_offset=vrom-BLOB,vrom=vrom,bytes=len(data),sha256=sha256(data),source=row)
+            elif category==static.CATEGORY:
                 adapter=descriptor['callback_adapter']
                 installed=copy.deepcopy(sounds[donor]) if adapter['mode'] in (1,4) else dict(
                     source_item_id=donor,item_id=f'{destination:04X}',runtime_index=index,
@@ -397,6 +416,7 @@ def bind_profiles(source,base,report):
     from v3_sound_programs import furniture_trigger,checked_furniture_loops
     from v3_furniture_behaviours import checked_initial_switch,initial_switch_source
     import v3_furniture_static as static
+    import v3_console_room as consoles
     source.runtime_profiles={}
     staged=report.get('staged_furniture',{})
     activated=[r for r in report['furniture']['imports'] if r.get('room_runtime')]
@@ -423,6 +443,8 @@ def bind_profiles(source,base,report):
     bindings={r['source_item_id']:r for r in runtime['sound_rows']+runtime['rows']+runtime.get('material_rows',[])}
     bindings.update(checked_runtime(e,blob))
     bindings.update(static.checked_binding(base,report,blob))
+    source.console_runtime_bindings=consoles.checked_runtime(e,blob,base)
+    bindings.update(source.console_runtime_bindings)
     if e.get('furniture_melody_audio'):
         from v3_furniture_melody import checked_binding as checked_melodies
         checked_melodies(base,report)
@@ -468,9 +490,15 @@ def bind_profiles(source,base,report):
             raise ValueError('Changed furniture profile identity or activation')
         descriptor=prepare(source,int(donor,16))[0];art=copy.deepcopy(binding['source']);vrom=binding['vrom']
         category=descriptor['callback_adapter']['category']
-        expected_vtable=(MATERIAL_VTABLE if category==MATERIAL_CATEGORY else SOUND_VTABLE if category in ('switch-trigger-sound',static.CATEGORY)
+        expected_vtable=(consoles.VTABLE if category==consoles.CATEGORY else MATERIAL_VTABLE if category==MATERIAL_CATEGORY else SOUND_VTABLE if category in ('switch-trigger-sound',static.CATEGORY)
                          else SCROLL_VTABLE if category==SCROLL_CATEGORY else VTABLE)
         if category==static.CATEGORY:static.checked_audio(descriptor,binding,e)
+        if category==consoles.CATEGORY:
+            life=consoles.lifecycle(descriptor)
+            if (not binding['engine_installed'] or life is None or binding['room_lifecycle']!=life or
+                    binding['source_profile_sha256']!=descriptor['profile_sha256']):
+                raise ValueError('Console profile lacks its complete room/image binding')
+            art['room_lifecycle']=life
         if category==ROTATED_CATEGORY:
             first,last,life=music.parameters(art)
             callbacks=struct.unpack('>5I',bytes.fromhex(runtime['vtable_hex']))
@@ -572,7 +600,7 @@ def bind_profiles(source,base,report):
         current=blob[ROWS+i*80:ROWS+(i+1)*80];record=blob[ITEMS+i*32:ITEMS+(i+1)*32]
         expected=struct.pack('>HHI',1024+i,item,int(enabled))+native+bytes(4)
         if (art['profile']!=json.loads(json.dumps(descriptor)) or row['room_runtime']!=art['room_runtime'] or
-                category in (MATERIAL_CATEGORY,JOINT_CATEGORY,DUAL_CATEGORY,ROTATED_CATEGORY,roofs.CATEGORY) and row.get('room_lifecycle')!=json.loads(json.dumps(art.get('room_lifecycle'))) or
+                category in (MATERIAL_CATEGORY,JOINT_CATEGORY,DUAL_CATEGORY,ROTATED_CATEGORY,roofs.CATEGORY,consoles.CATEGORY) and row.get('room_lifecycle')!=json.loads(json.dumps(art.get('room_lifecycle'))) or
                 row.get('room_placement')!=art.get('room_placement') or
                 not 0<=at<at+n<=len(blob) or sha256(blob[at:at+n])!=art['object_sha256'] or
                 current!=expected or record[:8]!=struct.pack('>HHHBB',1024+i,item,row['price'],descriptor['size_code'],int(enabled)) or

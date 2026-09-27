@@ -31,7 +31,22 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
-The shared native console lifecycle is installed in ABI 278 at
+The current proposal is ABI 280 at
+`build/v3-console-room-imports-01/cartridge/build-lock.json`, ROM SHA-256
+`b1080db8248385f85ddd9f68a5ba36ce83fb083a6f5b7061b60b8fa34fa47786`.
+The shared pipeline installs eleven complete cartridge-console models/profiles
+and connects source game IDs to the native room interaction. Excitebike adds its
+real lottery/catalogue/scoring route and one experimental selection; the other
+ten await their actual acquisition routes. QD remains unfinished. The development
+catalogue has 163 choices. Five focused checks pass across targeted runs,
+including retained resources and four private compositions. Two native attempts
+verify startup but stop on insufficient test
+allocation space before callback execution. No native gameplay is claimed.
+Next add explicit imported-emulator arena capacity checks, then verify real
+game-state launch/rendering/return and complete QD support. See the
+[room checkpoint](checkpoints/V3_CONSOLE_ROOM.md).
+
+The retained native console lifecycle is installed in ABI 278 at
 `build/v3-console-emulator-native-01/build-lock.json`, ROM SHA-256
 `5a714a18c3d6037f07bd9664bae456fcf85cd7ba290aebfe35370e42aea41ad1`.
 Six checked native calls connect complete iNES image loading, expanded graphics,
@@ -39,9 +54,7 @@ initialization, frame/reset, and cleanup to independent player progress. Three
 focused checks pass, including sanitized host-adapter execution for all eleven
 additional iNES games, retained resources/relocations, and four private browser
 compositions. Native CPU/graphics/audio are stubbed in the host check; native
-gameplay is not claimed. Continue source furniture launch, real heap capacity,
-ordinary launch/return, and the complete QD disk dependency. No console choice
-is enabled. See the [lifecycle checkpoint](checkpoints/V3_CONSOLE_EMULATOR.md).
+gameplay is not claimed. See the [lifecycle checkpoint](checkpoints/V3_CONSOLE_EMULATOR.md).
 
 The retained image-reader installation has its evidence in ABI 277.
 All nineteen complete images use a separately tracked 770,144-byte ROM pool,
@@ -73,7 +86,7 @@ per-player clearing. Four focused host/cartridge/composition checks pass,
 including 85,426 sanitized adapter assertions and all ten startup failure paths.
 Actual native synchronous and asynchronous two-bank writing, followed by both
 native load routes in a fresh process, pass. Room launch/return, real heap
-capacity, native gameplay verification, and QD emulation remain work; no console is enabled.
+capacity, native gameplay verification, and QD emulation remain work.
 Format-five saves require this or a newer compatible build, and cannot be loaded
 by V2 or format-one/two/three/four V3. Preserve backups before any handoff. See the
 [console checkpoint](checkpoints/V3_CONSOLE_PERSISTENCE.md) and
@@ -109,8 +122,7 @@ Room code uses 27,856 of 32,768 bytes; bootstrap uses 1,182 of 1,536.
 
 The radio remains unavailable because its original reward route remains
 acquisition work. Its indoor exercise interaction is installed and recognized
-by the shared eligibility reader. The current build retains 162 choices and
-saved format 4. Continue console launch/storage importing work. See the
+by the shared eligibility reader. Continue console launch/storage importing work. See the
 [radio lifecycle checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#installed-radio-room-music-lifecycle).
 
 The shared converter prepares the complete aerobics radio and treasure chest

@@ -122,7 +122,12 @@ save state intact; the scenario's later fixture-cleanup failure is recorded
 separately. ABI 278 installs full iNES loading, expanded graphics allocation,
 and initialization/frame/reset/exit save hooks. Host-adapter and cartridge/
 composition checks pass; room launch, real heap capacity, native gameplay, and
-QD execution remain integration work;
+QD execution remain integration work. ABI 280 adds shared native room dispatch
+and eleven complete console models/profiles through the ordinary importer.
+Excitebike has its actual lottery route and an experimental optional selection;
+the other ten retain their actual pending reward routes. Host/cartridge checks
+pass, but native callback execution remains unverified. Explicit arena bounds
+are required before a playable handoff;
 no console is selectable from storage
 installation alone. Format-five saves require the explicit compatibility warning.
 
