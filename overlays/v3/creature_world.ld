@@ -12,6 +12,12 @@ af_patrol_random2 = 0x8002CA00;
 af_patrol_sin = 0x80099A94;
 af_patrol_chase_angle = 0x80099AD4;
 af_patrol_chase_float = 0x80099C18;
+PROVIDE(af_spawn_collision = 0x80089538);
+PROVIDE(af_spawn_event = 0x8007FF08);
+PROVIDE(af_spawn_weather = 0x80098EE4);
+PROVIDE(af_spawn_rank = 0x80084DE0);
+PROVIDE(af_v3_creature_profile_byte = 0x80654000);
+PROVIDE(af_v3_creature_season = 0x80654600);
 SECTIONS {
     . = 0x8064A000;
     .text : { *(.text.af_v3_patrol_swim) *(.text .text.*) }

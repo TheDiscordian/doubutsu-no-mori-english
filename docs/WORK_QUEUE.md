@@ -39,16 +39,21 @@ commits. Batch connected verification, rather than creating another independent
 table/reader deliverable. Insects and the other importing categories remain
 required work, not removed scope.
 
-Use the shared converter and the current ABI-297 proposal:
-`build/v3-creature-world-work-01/runtime/build-lock.json`.
-ROM SHA-256: `e27a841921b7f2d6e124aa8d49d8f0977f7f4aed725fac35cdb0f25ea380ef7b`.
-The next consumer is the native fish-spawn manager at VROM `8253C0`, RAM
-`8092DBC0`, whose entry is `8092ECAC`. Connect it to the installed calendar,
-season, selection, and terrain functions, with persisted term/transition state
-and the explicit behaviour choice. The native manager has twenty-row monthly
-lists, not the donor's forty-row half-month lists; do not append to its old
-buffers. Reuse the new bounded plan. Keep the constructor timeout unresolved
-while completing this same task; do not restart the exhausted native fixture.
+Use the shared converter and the current ABI-298 proposal:
+`build/v3-creature-world-work-01/connected-02/build-lock.json`.
+ROM SHA-256: `5ab69cca4ab27d9395d75a78fcecf17b86a70bdd738f213a51dea99bc767b8c1`.
+The GameCube calendar is connected through native manager entry `8092ECAC`,
+terrain selection, and real actor creation. The complete seventeen-creature
+saved-profile/collection extension and town seasonal state are installed.
+The exact next work is the native additive spawning alternative and resolved
+behaviour settings, followed by catch/collection UI readers and pocket icons.
+Native mode currently calls the preserved original manager; it does not yet
+spawn additions and must not be advertised as a completed import alternative.
+Keep the shared bounded plan, not appended entries in the native twenty-row
+buffers. The active task and exhausted native harness budget are unchanged.
+This private build writes format-7 compressed saves (canonical format six).
+Older saves migrate forward; V2 and older V3 builds cannot load its new saves.
+Preserve backups. Native save/reload for this extension is not verified.
 The dresser cancellation correction is installed in V2 and V3; empty import
 selection returns stable V2-14. Continue the importing work without replaying
 unchanged dresser or museum checks.
@@ -92,11 +97,11 @@ Next importing work:
   The source coastal patrol/shoreline alternative and original-behaviour
   callbacks are installed in one shared world packet. Its mode remains N64;
   browser choice resolution is pending. Complete donor calendars and the shared
-  season/selection/placement code are installed, but the spawn-manager and saved
-  season connections are not. Three focused current checks pass for the complete
-  calendars, sanitized patrol/terrain/selection, installed hooks, preservation,
-  and optional composition; native world execution is unverified. Continue
-  those connections, pocket icons, collection/profile persistence, and the new
+  season/selection/placement code are connected to native creation and persisted
+  seasons. Three focused current checks pass for sanitized manager/save paths,
+  forward migration and rejection, installed hooks, preservation, and optional
+  composition; native world execution is unverified. Continue the native additive
+  spawning alternative, behaviour selection, pocket icons, collection UI, and new
   insect behaviour programs. Do not reconvert frames or create per-fish tools.
   The common converter already retains all 17 displays, 96 joints, full motion
   arrays, and complete source sound callbacks in

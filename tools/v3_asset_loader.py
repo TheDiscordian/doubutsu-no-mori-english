@@ -35,7 +35,7 @@ def texture_slot(donor_index):
     return OBJECT_COUNT + slot, TEXTURE_BASE + slot * TEXTURE_STRIDE
 
 
-def compile_part(part, out, extra_sources=(), defines=(), primary_source=None):
+def compile_part(part, out, extra_sources=(), defines=(), primary_source=None, link_symbols=None):
     out.mkdir(parents=True, exist_ok=False)
     docker = ['docker', 'run', '--rm', '--network', 'none', '--user', f'{os.getuid()}:{os.getgid()}',
               '-v', f'{ROOT}:/source:ro', '-v', f'{out.resolve()}:/out', '-w', '/out', '--entrypoint']
@@ -54,7 +54,12 @@ def compile_part(part, out, extra_sources=(), defines=(), primary_source=None):
         obj = 'code.o' if i == 0 else f'extra{i}.o'
         run('gcc', *flags, f'/source/{source}', '-o', obj)
         objects.append(obj)
-    run('ld', '-EB', *(['--emit-relocs'] if part in ('catalogue', 'hra', 'feng_shui', 'campsite_manager', 'camper_greeting', 'camper_trade', 'effect_loader') else []),
+    bindings=[]
+    for name,value in (link_symbols or {}).items():
+        if not name.replace('_','').isalnum() or not isinstance(value,int) or not 0<=value<=0xFFFFFFFF:
+            raise ValueError('Invalid checked linker binding')
+        bindings.append(f'--defsym={name}=0x{value:X}')
+    run('ld', '-EB', *bindings, *(['--emit-relocs'] if part in ('catalogue', 'hra', 'feng_shui', 'campsite_manager', 'camper_greeting', 'camper_trade', 'effect_loader') else []),
         '-T', f'/source/overlays/v3/{part}.ld', '-o', 'code.elf', *objects)
     if run('nm', '--undefined-only', 'code.elf').strip():
         raise ValueError('Unresolved V3 loader symbol')
@@ -63,7 +68,10 @@ def compile_part(part, out, extra_sources=(), defines=(), primary_source=None):
     run('objcopy', '-O', 'binary', '-j', '.text', '-j', '.rodata',
         *(['-j', '.fallbacks'] if part=='scenery_bootstrap' else []), 'code.elf', 'code.bin')
     code = (out / 'code.bin').read_bytes()
-    entry, expected = {'creature_world': ('af_v3_patrol_swim', 0x8064A000),
+    entry, expected = {'creature_save': ('af_v3_creature_profile_byte', 0x80654000),
+                       'creature_codec': ('af_v3_save_check_extended', 0x8064E000),
+                       'creature_storage': ('af_v3_save_reset', 0x80650000),
+                       'creature_world': ('af_v3_patrol_swim', 0x8064A000),
                        'creature_spawns': ('af_v3_spawn_plan', 0),
                        'creature_fish': ('af_v3_fish_position', 0x80647400),
                        'console_disk_native': ('af_v3_qd_native_bind', 0x80630000),
@@ -202,6 +210,7 @@ def compile_part(part, out, extra_sources=(), defines=(), primary_source=None):
     report = {'bytes': len(code), 'sha256': sha256(code), 'symbols': symbols,
               'toolchain': IMAGE, 'flags': flags,
               'stack_usage': ''.join(p.read_text() for p in sorted(out.glob('*.su')))}
+    if link_symbols: report['link_symbols']=link_symbols
     if part == 'villager':
         run('objcopy', '-O', 'binary', '-j', '.defaults', 'code.elf', 'defaults.bin')
         defaults = (out / 'defaults.bin').read_bytes()

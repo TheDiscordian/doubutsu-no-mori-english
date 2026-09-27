@@ -75,6 +75,11 @@ static void require_state(void) {
         if (runtime->working[AF_SAVE_SURFACE_OFFSET+i]!=af_v3_surface_profile_byte(i))
             af_v3_save_halt(AF_SAVE_PROFILE_MISSING);
 #endif
+#ifdef AF_V3_CREATURE_PROFILE
+    for (u32 i=0;i<4;i++)
+        if (runtime->working[AF_SAVE_CREATURE_OFFSET+i]!=af_v3_creature_profile_byte(i))
+            af_v3_save_halt(AF_SAVE_PROFILE_MISSING);
+#endif
 }
 
 #ifdef AF_V3_CONSOLE_STORAGE
@@ -85,6 +90,10 @@ void af_v3_require_save_state(void) { require_state(); }
 static void surface_profile(void) {
     for (u32 i=0;i<AF_SAVE_SURFACE_PROFILE;i++)
         runtime->working[AF_SAVE_SURFACE_OFFSET+i]=(u8)af_v3_surface_profile_byte(i);
+#ifdef AF_V3_CREATURE_PROFILE
+    for (u32 i=0;i<4;i++)
+        runtime->working[AF_SAVE_CREATURE_OFFSET+i]=(u8)af_v3_creature_profile_byte(i);
+#endif
 }
 #endif
 

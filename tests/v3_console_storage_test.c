@@ -21,6 +21,24 @@ static unsigned assertions;
 extern int af_console_canonical_check(const u8 *,u32,const u8 *,u8 *);
 extern int af_console_canonical_pack(u8 *,u32,const u8 *);
 u32 af_v3_surface_profile_byte(u32 i) {(void)i;return 0;}
+#ifdef AF_V3_CREATURE_PROFILE
+#include "../overlays/v3/creature_spawns.h"
+#define af_creature_test_state af_save_runtime
+#include "../overlays/v3/creature_save.c"
+static u32 creature_mask=0x1FFFFu;
+int af_creature_item_type(u32 item) {
+    u32 index=item<0x2D00 ? item-0x2320 : item-0x2D20+9;
+    return index<17 && (creature_mask&(1u<<index)) ? (index<9 ? 8 : 18) : 0;
+}
+static unsigned random_calls;
+static float season_random(void *ctx) {(void)ctx;random_calls++;return 0.25f;}
+extern int af_console_canonical_collect(u8 *,u32,u32,u32);
+extern int af_legacy_pack(u8 *,u32,const u8 *),af_legacy_check(const u8 *,u32,const u8 *,u8 *);
+extern int af_legacy_compress(u8 *,u32,const u8 *,u32,const u8 *,u32,u32 *,u32);
+#define DISK_FORMAT 7
+#else
+#define DISK_FORMAT 5
+#endif
 void af_save_copy(const void *src,void *dst,u32 n) {memcpy(dst,src,n);}
 u32 af_save_sum(const u8 *p,u32 n) {
     u32 s=0;for(u32 i=0;i<n;i+=2)s+=((u32)p[i]<<8)|p[i+1];return s&65535;
@@ -54,8 +72,21 @@ static void fill_console(void) {
 }
 int main(void) {
     init();fill_console();memcpy(town_before,af_save_live,AF_SAVE_PAYLOAD);
+#ifdef AF_V3_CREATURE_PROFILE
+    CHECK(AF_SAVE_STATE==1232 && sizeof(af_save_runtime)==1264);
+    for(u32 p=0;p<4;p++)for(u32 i=0;i<17;i++) {
+        u32 item=i<9 ? 0x2320+i : 0x2D20+i-9;
+        CHECK(af_console_canonical_collect(af_save_runtime.working,p,item,0)==0);
+        CHECK(af_console_canonical_collect(af_save_runtime.working,p,item,1)==1);
+    }
+    SpawnTerms terms;SpawnDate date={2006,1,14};
+    CHECK(af_v3_creature_season(&terms,date,season_random,NULL)==1);
+    CHECK(random_calls==1 && terms.next==1);
+    CHECK(af_v3_creature_season(&terms,date,season_random,NULL)==1 && random_calls==1);
+    u8 creatures_before[32];memcpy(creatures_before,af_save_runtime.working+AF_SAVE_CREATURE_OFFSET,32);
+#endif
     memcpy(bank,af_save_live,AF_SAVE_PAYLOAD);af_v3_save_prepare(bank);
-    CHECK(bank[AF_SAVE_PAYLOAD+5]==5 && af_save_sum(bank,AF_SAVE_PAYLOAD)==0);
+    CHECK(bank[AF_SAVE_PAYLOAD+5]==DISK_FORMAT && af_save_sum(bank,AF_SAVE_PAYLOAD)==0);
     memcpy(saved,bank,65536);memcpy(chip,bank,65536);memcpy(chip+65536,bank,65536);
     CHECK(af_v3_save_expand(bank,65536,decoded,AF_CZ_RAW)==0);
     CHECK(memcmp(decoded+20,town_before+20,AF_SAVE_PAYLOAD-20)==0);
@@ -74,12 +105,46 @@ int main(void) {
     CHECK(!memcmp(console_before,af_console_storage.players,6528));
     CHECK(af_save_runtime.working[AF_SAVE_PROFILE+2*128+17]==2);
     CHECK(af_save_runtime.ready && af_save_runtime.town==0x3001);
+#ifdef AF_V3_CREATURE_PROFILE
+    CHECK(!memcmp(creatures_before,af_save_runtime.working+AF_SAVE_CREATURE_OFFSET,32));
+    CHECK(af_v3_creature_season(&terms,date,season_random,NULL)==1 && random_calls==1);
+    creature_mask=0xFFFF;
+    CHECK(af_v3_save_check(bank,65536,af_save_current,NULL)==AF_SAVE_PROFILE_MISSING);
+    creature_mask=0x1FFFF;
+    /* Generate a prior-format bank with the same codec built without the new
+     * extension. This tests migration, not a replay of an old game build. */
+    u8 legacy_canonical[65536],legacy_disk[65536],migrated[AF_SAVE_STATE];
+    u8 legacy_state[AF_SAVE_STATE];memset(legacy_state,0x52,sizeof(legacy_state));
+    CHECK(af_legacy_check(decoded,65536,af_save_current,legacy_state)==AF_SAVE_FORMAT);
+    for(u32 i=0;i<AF_SAVE_STATE;i++)CHECK(legacy_state[i]==0x52);
+    memcpy(legacy_canonical,decoded,65536);
+    CHECK(af_legacy_pack(legacy_canonical,65536,af_save_runtime.working)==AF_SAVE_OK);
+    CHECK(af_legacy_compress(legacy_disk,65536,legacy_canonical,65536,console_before,6528,
+                            af_console_hash,AF_CZ_WORK_BYTES)>0);
+    CHECK(af_v3_save_check(legacy_disk,65536,af_save_current,migrated)==AF_SAVE_OK);
+    CHECK(!memcmp(migrated,af_save_runtime.working,AF_SAVE_CREATURE_OFFSET));
+    for(u32 i=4;i<32;i++)CHECK(migrated[AF_SAVE_CREATURE_OFFSET+i]==0);
+    memcpy(working_before,af_save_runtime.working,AF_SAVE_STATE);
+    working_before[AF_SAVE_CREATURE_OFFSET+21]=6;
+    memcpy(legacy_canonical,bank,65536);
+    CHECK(af_console_canonical_pack(legacy_canonical,65536,working_before)==AF_SAVE_CATALOGUE_INVALID);
+    CHECK(!memcmp(legacy_canonical,bank,65536));
+#endif
     // Player deletion preserves every other console record and the prior chain.
     for(u32 player=0;player<4;player++) {
         memcpy(af_console_storage.players,console_before,6528);
+#ifdef AF_V3_CREATURE_PROFILE
+        memcpy(af_save_runtime.working+AF_SAVE_CREATURE_OFFSET,creatures_before,32);
+#endif
         af_v3_console_player_clear(af_console_players+player*0xBD0);
         for(u32 other=0;other<4;other++)for(u32 i=0;i<1632;i++)
             CHECK(af_console_storage.players[other*1632+i]==(other==player?0:console_before[other*1632+i]));
+#ifdef AF_V3_CREATURE_PROFILE
+        for(u32 other=0;other<4;other++)for(u32 i=0;i<4;i++)
+            CHECK(af_save_runtime.working[AF_SAVE_CREATURE_OFFSET+4+other*4+i]==
+                (other==player?0:creatures_before[4+other*4+i]));
+        CHECK(!memcmp(af_save_runtime.working+AF_SAVE_CREATURE_OFFSET+20,creatures_before+20,12));
+#endif
     }
     CHECK(clears==4);
     // Existing synchronous save path writes only after complete preparation.

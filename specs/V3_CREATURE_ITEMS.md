@@ -1,5 +1,4 @@
 # V3 creature parents and room displays
-
 ## Connected category
 
 `tools/v3_creature_items.py` connects the carried identity, official name,
@@ -214,8 +213,9 @@ world, icon, and collection readers are complete.
 ### Connected fish world implementation
 
 The same `--creature-fish` builder continues the category into a shared world
-packet at `8064A000..8064DFFF`. The ordinary dependency planner installs missing
-reader and world code in order within the same category task. Existing installed
+packet at `8064A000..80654FFF`, including the shared creature-save extension.
+The ordinary dependency planner installs missing reader, world, and save code
+in order within the same category task. Existing installed
 stages and prepared models are reused. Ten startup loads fit the retained
 bootstrap reservation; the full new packet is checked before any callback runs.
 
@@ -233,8 +233,8 @@ and bounded candidate-position scanning. GAFE01-r0's river-mouth rule is retaine
 not the later Australian rule. Both terms plus the extra herabuna records fit
 the 64-row plan; the converter checks the complete category maximum. Invalid
 calendar/state inputs reject rather than truncating to the native twenty-row
-buffer. The native caller must persist both season fields, not redraw the
-transition offset on each visit. That manager and save binding remains pending.
+buffer. The native caller persists both season fields, without redrawing the
+transition offset on each visit.
 
 `creature_water.c` binds native collision/field APIs for waterfall, pond, river,
 and marine placement, donor sand/depth exclusion, and four-direction shoreline
@@ -249,18 +249,74 @@ program pointer at `244`, not a fixed heap address.
 The behaviour word defaults to zero (N64); one selects GameCube patrol for
 imported-origin coastal actors. Native fish always retain their existing path.
 The real alternatives are installed, but no browser choice is exposed until its
-composition and complete playable-import dependencies are connected. This word
-does not yet select a spawning policy. Season/save binding, source-vs-native spawn
-policy, icons, collection/profile readers, and ordinary gameplay remain unfinished.
+composition and complete playable-import dependencies are connected. A separate
+spawn-mode word selects the preserved original manager or source calendar path.
+Its N64 value currently has no additive fish support; that alternative remains
+unfinished, not an advertised supported choice. Icons, catch/collection UI,
+behaviour composition, and ordinary gameplay remain unfinished.
 
-The 5,944-byte compiled world code and its complete calendars occupy one 16-KiB
-reservation; source data begins at `8064D000`. Original room/frame resources,
-saved layouts, actor sizes, and the stable translation output remain unchanged.
+The 6,908-byte compiled world code and its complete calendars share one 44-KiB
+reservation with creature persistence; source data begins at `8064D000`.
+Original room/frame resources, actor sizes, and the stable translation output
+remain unchanged. The native manager hook preserves its two overwritten
+instructions in the fallback and derives the actual relocated program from
+`Set_Manager+178`. Native make-fish uses that same program's retained creation
+function. Repeated-acre protection is retained; the N64 engine has no donor
+island/offing location, and the adapter does not enable those retained calendars.
+The normal GameCube path uses selected-only spawn weights, native event/weather
+and terrain queries, saved seasonal blending, and the existing actor allocator.
 `test_v3_creature_spawns.py` checks the complete source calendar, sanitizer-bound
 selection/terrain/patrol paths and fallbacks, installed pointers/relocations,
 source/output binding, startup arguments, unchanged persistence, UPS, planning,
 and all/empty composition. Native execution and hardware remain unverified;
 these checks do not classify the earlier constructor or scheduler failures.
+
+### Shared creature persistence
+
+`creature_save.c` derives the seventeen readiness/profile bits from the installed
+parent readers: fish bits 0..8, insect bits 9..16. Four independent collection
+records and the town's seasonal transition live in a 32-byte extension. Native
+player deletion clears only that player's new collection, retaining other players
+and town season state. Native capture/UI consumers still need to call the added
+collection API before species become selectable.
+
+| Extension offset | Meaning |
+| --- | --- |
+| `0..3` | Selected creature profile, LSB-first stable identities |
+| `4..19` | Four players' collected bits, four bytes each |
+| `20..22` | Saved term `0..23`, transition offset `0..5`, initialization flag |
+| `23..31` | Reserved zero bytes |
+
+The extension begins at working offset 1200 and canonical capsule offset `4D0`.
+Working state is 1,232 bytes; the complete runtime is 1,264 bytes at `8046C000`,
+with guards at `8046C4E0`. Existing furniture, clothing, rewards, surfaces, console
+data, and native town bytes keep their offsets. The canonical codec uses format
+six/registry four. Its compressed two-bank envelope uses format seven, distinct
+from the canonical format so corrupted envelope fields cannot be mistaken for
+an uncompressed bank. Both banks remain 64 KiB; capacity is checked before writes.
+
+Valid older saves migrate forward with empty added-creature collections and
+uninitialized seasonal state. Missing creature profiles, invalid collection
+bits, malformed seasons, damaged checksums, and insufficient capacity reject
+without committing live state or beginning save I/O. V2 and older V3 readers
+reject new saves; preserve backups. Native ordinary save/reload is unverified.
+
+The new canonical codec is at `8064E000`, storage runtime at `80650000`, and
+profile/season helpers at `80654000`/`80654600`. Every previously published console
+and save entry retains its address through a checked tail jump, including the
+indirect `require_state` entry used by older adapters. Complete predecessor
+packets are verified before these changes. Startup loads and verifies the entire
+world/save packet before entering initialization. No existing console scratch,
+player record, or native manager buffer is borrowed for persistent creature data.
+
+`tests/test_v3_creature_connected.py` reuses the existing save-I/O host fixture
+with the new extension, rather than replaying old cartridges. Sanitized checks
+cover all seventeen identities, independent players/deletion, forward migration,
+season stability, invalid data/profile/capacity rejection, and the source calendar
+through the native-bound manager. Cartridge checks cover relocated hook targets,
+all stable save entries, complete code/packets, unchanged graphics resources,
+patch reconstruction, and all/empty private composition. Native engine calls are
+stubbed in the host fixtures; native execution and hardware are not established.
 
 ### Native integration constraints
 

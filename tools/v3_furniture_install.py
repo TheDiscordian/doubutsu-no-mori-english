@@ -649,7 +649,11 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
     if creature_fish:
         import v3_creature_fish as equipment
         display_report,alias_report=prior['clothing']['display'],prior['display_aliases']
-        equipment_report,owner_changes=equipment.install(base,prior,blob,output)
+        result=equipment.install(base,prior,blob,output)
+        equipment_report,owner_changes=result[:2]
+        if len(result)==3:
+            report_updates=result[2]
+            display_report=report_updates['clothing']['display']
     elif creature_field is not None:
         import v3_creature_field_native as equipment
         display_report,alias_report=prior['clothing']['display'],prior['display_aliases']
@@ -1208,6 +1212,9 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             additional_resident_bytes=equipment_report['creature_fish']['additional_resident_bytes'],
             additional_scene_bytes=0,resource_allocations_changed=bool(equipment_report['creature_fish'].get('world')))
         report['sources'].update(equipment_report['creature_fish']['sources'])
+        if report_updates.get('saved_format_changed'):
+            report['shared_runtime_refresh'].update(saved_format_changed=True,
+                additional_save_state_bytes=report['save_runtime']['state_bytes']-prior['save_runtime']['state_bytes'])
     if console_images is not None:
         images=equipment_report['console_images']
         report['shared_runtime_refresh'].update(adapters=['console_images'],

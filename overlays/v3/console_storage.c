@@ -68,7 +68,12 @@ static int leave(int result) {
 }
 static int expand(const u8 *bank,const u8 **logical) {
     *logical=bank;
-    if(word(bank+4)==0x4E414633 && word(bank+AF_SAVE_PAYLOAD+4)==0x00050680) {
+    u32 version=word(bank+AF_SAVE_PAYLOAD+4);
+    if(word(bank+4)==0x4E414633 && (version==0x00050680
+#ifdef AF_V3_CREATURE_PROFILE
+        || version==0x00070680
+#endif
+        )) {
         int result=af_v3_save_expand(bank,AF_SAVE_BANK,scratch,AF_CZ_RAW);
         if(result<0)return result==AF_CZ_FORMAT?AF_SAVE_FORMAT:
             result==AF_CZ_ARGUMENT?AF_SAVE_ARGUMENT:AF_SAVE_CRC;
@@ -132,6 +137,10 @@ void af_v3_console_player_clear(u8 *player) {
     for(u32 i=0;i<4;i++)if(player==native_players+i*0xBD0)slot=i;
     if(slot<4) {
         af_v3_require_save_state();zero(storage->players+slot*0x660,0x660);
+#ifdef AF_V3_CREATURE_PROFILE
+        extern void af_v3_creature_player_clear(u32);
+        af_v3_creature_player_clear(slot);
+#endif
     }
     original_clear(player);
 }

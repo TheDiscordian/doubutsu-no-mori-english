@@ -38,7 +38,19 @@ af_save_u32 af_v3_surface_profile_byte(af_save_u32 index);
 #else
 #define AF_SAVE_SURFACE_BYTES 0u
 #endif
-#define AF_SAVE_STATE (AF_SAVE_SURFACE_OFFSET + AF_SAVE_SURFACE_BYTES)
+#define AF_SAVE_CREATURE_OFFSET (AF_SAVE_SURFACE_OFFSET + AF_SAVE_SURFACE_BYTES)
+#ifdef AF_V3_CREATURE_PROFILE
+#ifndef AF_V3_SURFACE_PROFILE
+#error Creature state requires the complete surface profile
+#endif
+/* Stable bits: nine added fish, then eight added insects. Four independent
+ * player collections; town-wide source seasonal term/offset/initialized flag. */
+#define AF_SAVE_CREATURE_BYTES 32u
+af_save_u32 af_v3_creature_profile_byte(af_save_u32 index);
+#else
+#define AF_SAVE_CREATURE_BYTES 0u
+#endif
+#define AF_SAVE_STATE (AF_SAVE_CREATURE_OFFSET + AF_SAVE_CREATURE_BYTES)
 
 enum {
     AF_SAVE_LEGACY = 0, AF_SAVE_OK = 1,

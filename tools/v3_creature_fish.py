@@ -97,6 +97,7 @@ def rewrite(owner,reloc,ram,targets,windows):
 def install(base,prior,blob,output):
     from v3_furniture_pipeline import Source
     e=copy.deepcopy(prior['equipment_resources']);field=e.get('creature_field')
+    if e.get('creature_fish',{}).get('world'):return install_manager(base,prior,blob,output)
     if e.get('creature_fish'):return install_world(base,prior,blob,output)
     if not field:raise ValueError('Fish world readers require installed field frames')
     source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
@@ -300,3 +301,71 @@ def install_world(base,prior,blob,output):
         pending=['spawn manager and saved seasons','behaviour-choice composition','pocket icons',
                  'collection/profile persistence','ordinary gameplay'])
     return e,{old['vrom']:bytes(updated),old['reloc']:fixed}
+
+
+def install_manager(base,prior,blob,output):
+    """Continue calendars through native creation and complete-category saving."""
+    from v3_console_disk_install import reservations
+    from v3_import_storage import jump
+    import v3_creature_save as saves
+    e=copy.deepcopy(prior['equipment_resources']);fish=e['creature_fish'];world=fish['world']
+    if world.get('spawn_manager_installed'):raise ValueError('Fish spawn manager is already installed')
+    p=world['packet'];at=p['blob_offset'];oldpacket=bytes(blob[at:at+p['bytes']])
+    if (p['ram']!=WORLD_RAM or p['bytes']!=WORLD_SIZE or at+p['bytes']!=len(blob) or
+            sha256(oldpacket)!=p['sha256'] or zlib.crc32(oldpacket)!=p['crc32']):
+        raise ValueError('Creature world growth requires the verified resource tail')
+    size=0xB000
+    if any(a<WORLD_RAM+size and WORLD_RAM+WORLD_SIZE<b for a,b in reservations(prior)):
+        raise ValueError('Creature world/save growth overlaps a retained reservation')
+    if WORLD_RAM+size>0x807DA800 or 0x8046C000+saves.STATE_BYTES>0x8046D000:
+        raise ValueError('Creature persistence exceeds checked memory bounds')
+    code,compiled=compile_part('creature_world',output/'creature_world',
+        primary_source='overlays/v3/creature_patrol.c',defines=(f'AF_FISH_CALENDAR_BYTES={world["calendar"]["bytes"]}',),
+        extra_sources=('overlays/v3/creature_water.c','overlays/v3/creature_spawns.c',
+            'overlays/v3/creature_patrol.S','overlays/v3/creature_manager.c','overlays/v3/creature_manager.S'))
+    if len(code)>WORLD_TABLE:raise ValueError('Connected fish manager overlaps calendars')
+    packet=bytearray(oldpacket+bytes(size-len(oldpacket)))
+    packet[:WORLD_TABLE]=code+bytes(WORLD_TABLE-len(code))
+    packet[-16:]=struct.pack('>4I',*([0xAF465748]*4))
+    record,updates=saves.install(prior,e,blob,compiled,packet,output)
+    files=by_vrom(base);changes={};owners=[]
+    sea=next(o for o in fish['owners'] if o['name']=='sea')
+    owner=files[sea['vrom']].extract(base);raw=bytearray(owner)
+    if sha256(owner)!=sea['sha256']:raise ValueError('Changed complete coastal callbacks')
+    patches=[]
+    for row in world['owners'][0]['patches']:
+        name=next(n for n,a in world['compiled']['symbols'].items() if a==row['after'] and n.startswith('af_v3_patrol_'))
+        off=row['address']-sea['ram'];target=compiled['symbols'][name]
+        if u32(raw,off)!=row['after']:raise ValueError('Changed coastal callback target')
+        struct.pack_into('>I',raw,off,target)
+        patches.append(dict(address=row['address'],before=row['after'],after=target))
+    sea['patches'].extend(patches);sea['sha256']=sha256(raw);changes[sea['vrom']]=bytes(raw)
+    owners.append(dict(name='sea',vrom=sea['vrom'],ram=sea['ram'],original_sha256=sha256(owner),
+        sha256=sha256(raw),patches=patches))
+    vrom,reloc,ram=0x8253C0,0x827BE0,0x8092DBC0
+    owner=files[vrom].extract(base);rel=files[reloc].extract(base)
+    if sha256(owner)!=world['calendar']['native_owner_sha256']:
+        raise ValueError('Changed complete native fish spawn manager')
+    sections=struct.unpack_from('>4I',rel)
+    _,_,_,locations,_=native_references(owner,rel,expected_sections=sections)
+    entry=0x8092ECAC;off=entry-ram
+    if owner[off:off+8]!=struct.pack('>2I',0x27BDFFB0,0xAFB00020) or off in locations or off+4 in locations:
+        raise ValueError('Changed relocation-free native spawn prologue')
+    after=struct.pack('>2I',jump(compiled['symbols']['af_v3_fish_spawn']),0)
+    raw=bytearray(owner);raw[off:off+8]=after;changes[vrom]=bytes(raw)
+    owners.append(dict(name='spawn',vrom=vrom,reloc=reloc,ram=ram,sections=list(sections),
+        original_sha256=sha256(owner),sha256=sha256(raw),reloc_sha256=sha256(rel),
+        patches=[dict(address=entry,before=owner[off:off+8].hex(),after=after.hex())]))
+    blob[at:]=packet
+    p.update(bytes=size,sha256=sha256(packet),crc32=zlib.crc32(packet))
+    world.update(compiled=compiled,manager_owners=owners,save=record,spawn_manager_installed=True,
+        native_execution_tested=False,spawn_mode=dict(ram=compiled['symbols']['af_v3_fish_spawn_mode'],
+            value=0,browser_selection_installed=False,source_calendar_connected=True,
+            native_additive_policy_installed=False,native_acre_protection_retained=True))
+    world['patrol_mode']['ram']=compiled['symbols']['af_v3_fish_patrol_mode']
+    sources=(*WORLD_SOURCES,*saves.SOURCES,'overlays/v3/creature_manager.c','overlays/v3/creature_manager.S')
+    fish.update(sources={path:sha256((ROOT/path).read_bytes()) for path in sources},
+        additional_resident_bytes=size-WORLD_SIZE,
+        pending=['native additive spawning and behaviour-choice composition','pocket icons',
+            'catch/collection UI readers','ordinary gameplay'])
+    return e,changes,updates

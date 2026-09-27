@@ -243,7 +243,7 @@ def publish_bootstrap(equipment,blob,surface,output):
         from v3_creature_fish import WORLD_RAM,WORLD_SIZE
         p=fish_world['packet'];raw=blob[p['blob_offset']:p['blob_offset']+p['bytes']]
         if (sha256(raw)!=p['sha256'] or zlib.crc32(raw)!=p['crc32'] or
-                p['ram']!=WORLD_RAM or p['bytes']!=WORLD_SIZE):
+                p['ram']!=WORLD_RAM or p['bytes'] not in (WORLD_SIZE,0xB000)):
             raise ValueError('Changed complete fish world packet')
         extra+=(f'AF_FISH_WORLD_VROM=0x{p["vrom"]:X}u',f'AF_FISH_WORLD_CRC=0x{p["crc32"]:X}u',
                 f'AF_FISH_WORLD_BYTES=0x{p["bytes"]:X}u')
