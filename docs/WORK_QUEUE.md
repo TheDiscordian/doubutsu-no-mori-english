@@ -29,18 +29,24 @@ prepares a 3,368-byte lossless format-five envelope: the full canonical bank plu
 6,528 player bytes inside one 64-KiB bank, with pre-write capacity checks.
 Sanitized round trips, malformed-data checks, independent decoding, and dense
 synthetic capacity pass. Arbitrary uncompressible input rejects without output
-changes. Continue native integration from [the exact format and plan](../specs/V3_CONSOLE_STORAGE.md),
-not another compressor or per-game save implementation. Preserve both banks and
-keep capacity failure ahead of all FlashRAM writes. Then connect
-the native emulator/room launch, full graphics allocation, frame/reset/exit
-hooks, and QD dependency. Reuse the prepared models/games and passing core checks.
+changes. The native format-five storage adapter is installed and host-checked;
+actual native synchronous and asynchronous two-bank writing, followed by both
+native load routes in a fresh process, pass. Continue
+from ABI 276 at `build/v3-console-storage-native-04/build-lock.json`, ROM SHA-256
+`f876fc31541db21297e6c5b27f62af790e32ea33850d700f15f3cdd1291f070f`.
+Connect the native emulator/room launch, full graphics allocation, frame/reset/exit
+hooks, and QD dependency. Reuse the installed storage and prepared models/games,
+not another compressor or per-game save implementation. Keep capacity failure
+ahead of all FlashRAM writes. Format-five saves cannot load in V2 or older V3
+formats; warn explicitly before any handoff and preserve backups.
 See the [console checkpoint](checkpoints/V3_CONSOLE_PERSISTENCE.md) and
 [storage checkpoint](checkpoints/V3_CONSOLE_STORAGE.md).
 
 Native exercise is installed through the shared player importer in ABI 275 at
 `build/v3-player-exercise-imports-01/player-exercise-native/build-lock.json`, ROM SHA-256
 `a940dab0ff14f5fc0e0bed23c78d5500c874da7a9f269e89e321c0106453e205`.
-Use that immutable proposal, retaining the main lock and stable deployments.
+Its complete player resources and hooks are retained in the ABI-276 proposal;
+retain the main lock and stable deployments.
 All 18 gestures, full motions, wait/action dispatch, camera callbacks, eligibility,
 real audio timing, and transient initialization are connected. Five focused checks
 pass, including donor/host comparisons, all 18 interaction paths, preload failure
@@ -100,9 +106,9 @@ Continue the remaining console launch/storage category without per-item
 installers. Radio room behaviour and indoor player exercise are installed;
 its acquisition remains unfinished. Reuse complete resources and shared runtimes.
 
-The checked current proposal is ABI 275 at
-`build/v3-player-exercise-imports-01/player-exercise-native/build-lock.json`, ROM SHA-256
-`a940dab0ff14f5fc0e0bed23c78d5500c874da7a9f269e89e321c0106453e205`.
+The checked current proposal is ABI 276 at
+`build/v3-console-storage-native-04/build-lock.json`, ROM SHA-256
+`f876fc31541db21297e6c5b27f62af790e32ea33850d700f15f3cdd1291f070f`.
 The combined skeleton/material category imports the complete hamster cage,
 including source movement/texture timing, positioned sound, actual lottery
 availability, catalogue ordering, scoring, and official English text. Five focused

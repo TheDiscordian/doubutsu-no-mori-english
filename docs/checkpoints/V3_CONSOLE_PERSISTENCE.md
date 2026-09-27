@@ -60,20 +60,18 @@ implementation still compiles with warnings treated as errors.
 
 ## Required continuation
 
-The active cartridge remains ABI 275 at
-`build/v3-player-exercise-imports-01/player-exercise-native/build-lock.json`.
-No ROM, saved format, selectable profile, deployment, or existing save changes.
+Native format-five storage is installed and verified in ABI 276 at
+`build/v3-console-storage-native-04/build-lock.json`. See the
+[storage checkpoint](V3_CONSOLE_STORAGE.md) for complete hashes, compatibility,
+native writing/fresh-process loading, and remaining test limits. The common
+recipe executor is linked there but is not connected to NES gameplay yet.
 
-1. Establish bounded native persistence for all 6,528 bytes. The current
-   format-four bank extension has only 432 spare bytes. Preserve independent
-   player progress, existing town data, and safe two-bank saving. Do not assume
-   arbitrary compression fits or use one player's record for the whole town.
-2. Connect checked game lookup, full allocation, room launch/return, and the
+1. Connect checked game lookup, full allocation, room launch/return, and the
    common open/frame/reset/close calls. Preserve original native game IDs and
    their saved state; do not discard native scores during migration.
-3. Complete the QD/disk engine dependency and verify representative native
+2. Complete the QD/disk engine dependency and verify representative native
    execution. Static mapper callbacks do not establish correct gameplay.
-4. Reuse all fourteen prepared console models and complete game resources;
+3. Reuse all fourteen prepared console models and complete game resources;
    enable only records with complete gameplay/persistence dependencies.
 
 Useful original-emulator anchors from the checked `007492E0` overlay:

@@ -4,9 +4,10 @@
 
 `save_compressed.c` supplies a bounded, lossless format-five disk envelope around
 one complete format-four bank and four independent console-save records. The
-ordinary console converter prepares it alongside the recipe executor. It does
-not install native hooks, write FlashRAM, allocate live RAM, or enable consoles.
-The active cartridge remains format four.
+ordinary console converter prepares it alongside the recipe executor. The shared
+runtime builder's `--console-storage` stage installs probing, packing, decoded
+commit, reset, and player clearing around the retained canonical codec. The
+experimental cartridge uses format five; console launch remains unfinished.
 
 Input is 65,536 canonical bank bytes plus 6,528 console bytes: 72,064 total.
 Output remains one 65,536-byte bank, preserving two independent banks on the
@@ -73,15 +74,17 @@ failure; do not commit any scratch content until success. The existing
 `save_codec` must additionally validate profile/ownership before live-state
 copying. CRC validity is not profile compatibility or semantic game validity.
 
-The 3,368-byte MIPS core has no mutable globals or unresolved symbols. Its longest
-stack chain is 152 bytes (pack, encode, key). It links at zero for preparation;
-no native RAM location is assigned.
+The prepared 3,368-byte MIPS core has no mutable globals or unresolved symbols.
+Its longest stack chain is 152 bytes (pack, encode, key). The installed packet
+links it with the native save adapter/runtime and common console-save executor.
 
-## Native integration plan
+## Native integration
 
-Retain stable codec/runtime entries, logical town size, and native two-bank I/O.
-Add checked startup loading and independently initialized console state. Preserve
-surface, goods, carrying, and exercise packets in every bootstrap refresh.
+Stable codec/runtime entries, logical town size, and native two-bank I/O remain.
+Checked startup loads the complete console packet before save-state reset,
+preserving surface, goods, carrying, and exercise loads. Every shared bootstrap
+refresh verifies and retains the console packet. Console state has an independent
+magic, re-entry flag, town identity, ready flag, and end guard.
 
 - Check: expand format five into private scratch, then invoke the checked
   existing format-four decoder. Older formats use the existing decoder.
@@ -99,15 +102,27 @@ surface, goods, carrying, and exercise packets in every bootstrap refresh.
 - Synchronous/travel-related town saving: retain the same complete bounds and
   pre-write gates. Controller Pak travel remains separately incomplete.
 
-Candidate free space follows carrying state `804DC400..804DC7FF` and precedes
-the `80500000` model pool. A possible layout is console state at `804DC800`,
-code at `804DE200`, decode/canonical scratch at `804E3000`, and hash scratch at
-`804F5000`. These are **not installed allocations**. Prove and guard every actual
-packet/state boundary against the current immutable build before assigning them.
-The decode area can serve as the canonical pack buffer because these operations
-are not concurrent; guard against re-entry explicitly.
+The checked allocations follow carrying state `804DC400..804DC7FF` and precede
+the `80500000` model pool:
+
+| RAM | Bytes | Purpose |
+| --- | ---: | --- |
+| `804DC800` | 6,560 | Four console records, state header, and end guard |
+| `804DE200` | 19,968 | Immutable code packet, padding, and end guard |
+| `804E3000` | 72,064 + 16 | Decoded/canonical bank plus console data and guard |
+| `804F5000` | 16,384 + 16 | Encoder hash workspace and guard |
+
+The installer rejects intersections with existing equipment reservations and
+the model pool. Linked code occupies 11,308 bytes. Runtime entry points reject
+re-entry and damaged workspace/state guards. The decode area also serves as
+the canonical pack buffer; bank probes never commit its console bytes. Exact
+native player pointers select one `660`-byte record to clear before chaining to
+the existing surface/reward/catalogue/player reset. Native game scores stay in
+the complete original town payload.
 
 Format-five saves cannot load in V2 or older format-one/two/three/four V3 builds.
-The eventual handoff must warn and preserve backups. Native integration, a fresh
-save/reload, and original hardware remain unverified. The main lock and deployed
-V2 patchers do not change during this experimental work.
+The eventual handoff must warn and preserve backups. See the
+[checkpoint](../docs/checkpoints/V3_CONSOLE_STORAGE.md) for current execution
+evidence and remaining limits. Console launch and original hardware remain
+unverified. The main lock and deployed V2 patchers do not change during this
+experimental work.

@@ -1,5 +1,28 @@
 # Work record
 
+## 2026-09-27: native four-player console storage
+
+- Installed the common format-five storage adapter through the shared runtime
+  builder, retaining the complete canonical town, independent console records,
+  original native scores, stable entry points, and native I/O. ABI 276 lives at
+  `build/v3-console-storage-native-04/build-lock.json`; the main lock and both
+  stable V2-13 patchers remain unchanged.
+- Connected checked five-packet startup, state/workspace guards, non-mutating
+  bank probes, fully decoded commit, older-save migration, new-town clearing,
+  and exact player-clear chaining. Capacity failures stop before flash writes.
+  The English diagnostic is credited in the single provenance catalogue.
+- Four targeted host/cartridge/composition checks pass, including 85,426
+  sanitizer assertions. Actual native synchronous and two-bank asynchronous
+  writes pass, followed by both native load routes in a fresh emulator process.
+  The initial writer/reader fixtures consume memory needed by native bank
+  allocations; each corrected retry releases the diagnostic buffer first.
+- Format-five saves cannot load in V2 or older V3 formats; backups and an
+  explicit handoff warning are required. No new console choice is enabled.
+  Continue complete game loading, graphics allocation, room launch/return,
+  frame/reset/exit bindings, and QD. Ordinary console gameplay, save-menu use,
+  and hardware remain unverified. Exact evidence and commands are in the
+  [storage checkpoint](checkpoints/V3_CONSOLE_STORAGE.md).
+
 ## 2026-09-21: linked shared item-code engine
 
 - Installed the donor-verified password codec and eligibility rules, complete

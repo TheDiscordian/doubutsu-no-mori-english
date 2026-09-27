@@ -45,7 +45,7 @@ enum {
     AF_SAVE_ARGUMENT = -1, AF_SAVE_HEADER = -2, AF_SAVE_CHECKSUM = -3,
     AF_SAVE_FORMAT = -4, AF_SAVE_BINDING = -5, AF_SAVE_CRC = -6,
     AF_SAVE_PROFILE_MISSING = -7, AF_SAVE_CATALOGUE_INVALID = -8,
-    AF_SAVE_REWARD_INVALID = -9
+    AF_SAVE_REWARD_INVALID = -9, AF_SAVE_CAPACITY = -10
 };
 
 /* Exact bank-sized input. Output state may be null, but must not overlap input

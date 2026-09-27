@@ -71,8 +71,9 @@ The binary preparation format is big-endian:
 
 `overlays/v3/console_save.c` executes the complete prepared recipes. The ordinary
 console conversion command compiles this dependency as well as preparing games;
-there are no per-title installers. The core is zero-linked preparation, with no
-assigned native RAM, hooks, device writes, or selectable-game claim.
+there are no per-title installers. The standalone core is zero-linked preparation.
+The native storage packet also links it for later launch/frame/exit integration;
+linking does not install those game hooks or make a console selectable.
 
 `af_v3_console_validate` checks the entire packet, image sizes/headers/mappers,
 all sixty operations, unique game-save bits, and disjoint saved ranges. Open
@@ -112,20 +113,24 @@ cannot simply be assumed sufficient for larger complete character data.
 
 Connect checked game lookup, correct allocation, ordinary room entry/return,
 complete persistence, and QD dependencies before enabling each supported import.
-Retain original game IDs and native save regions. The current format-four
+Retain original game IDs and native save regions. The inner format-four
 save capsule has insufficient spare room for the four-player donor save data;
 persistence needs an explicit bounded storage design, not an overwrite of its
 neighbours or a promise that unchanged formats suffice.
 Its 432 spare bytes cannot hold 6,528 player bytes. Do not combine players,
 truncate game progress, assume compression always fits, or silently remove the
-second town-save bank. Native storage integration remains the next dependency.
+second town-save bank. Native storage is installed as a format-five wrapper
+around the complete canonical bank.
 The [compressed bank envelope](V3_CONSOLE_STORAGE.md) is prepared by the same
 converter. It retains the complete canonical bank and four console records,
 with explicit pre-write capacity checks and bounded lossless decoding. Host
-checks pass; native hooks, initialization, and commit are not installed.
+checks pass. Native probing, packing, decoded commit, initialization, and player
+clearing are installed. Native synchronous and asynchronous two-bank writing,
+followed by both native load routes in a fresh process, pass.
 
 GameCube GBA download parameters remain in receipts. N64 hardware cannot use a
 GameCube link cable; do not silently claim that functionality was imported.
-The current preparation changes no cartridge, saved format, selected profile,
-or deployed patcher. Any later save-format change needs the normal compatibility
-warning before a playtest handoff.
+Preparation alone changes no cartridge. The installed format-five storage stage
+changes the experimental cartridge's save format, retaining selected profiles
+and both deployed V2 patchers. These saves cannot load in V2 or older V3 formats;
+the compatibility warning and backups are required before a handoff.

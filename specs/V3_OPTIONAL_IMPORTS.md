@@ -112,8 +112,11 @@ MIPS save executor retains four independent player records and passes actual
 donor comparisons for scores, reset, battery/disk data, and Zelda checksums.
 The complete records require 6,528 bytes. A bounded lossless disk envelope retains
 the full town and console records within two existing save banks, with explicit
-pre-write capacity checks. Its host checks pass; native storage/launch/graphics
-and QD remain integration work. No console is selectable from preparation alone.
+pre-write capacity checks. Native storage, checked startup, decoded town commit,
+and individual player clearing are installed. Host safety checks, private
+composition, native synchronous/two-bank writing, and fresh-process loading pass. Console launch,
+graphics, and QD remain integration work; no console is selectable from storage
+installation alone. Format-five saves require the explicit compatibility warning.
 
 The shared furniture converter prepares complete nested-model and dual-motion
 resources for the aerobics radio and treasure chest. The ordinary importer

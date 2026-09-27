@@ -1,5 +1,8 @@
 /* Complete-bank FlashRAM integration; original payload RAM stays F980 bytes. */
 #include "save_runtime.h"
+#ifdef AF_V3_CONSOLE_STORAGE
+#include "console_storage.h"
+#endif
 typedef af_save_u8 u8;
 typedef af_save_u32 u32;
 extern int af_v3_original_save_read(u8 *, u32);
@@ -42,6 +45,10 @@ void af_v3_save_halt(int reason) {
 #ifdef __mips__
     const char *message = reason == AF_SAVE_PROFILE_MISSING ?
         "V3 save needs other imports.\n\nPower off. Rebuild with the\nsame imports, or add the\nmissing ones. Keep your save." :
+#ifdef AF_V3_CONSOLE_STORAGE
+        reason == AF_SAVE_CAPACITY ?
+        "V3 save needs more space.\n\nNo save data was written.\nPower off and keep a backup.\nReport this with your profile." :
+#endif
         reason == AF_SAVE_FORMAT ?
         "V3 save format is different.\n\nPower off and use the V3\nbuild that created this save.\nKeep your original save file." :
         "V3 save check failed.\n\nNo further save writes.\nPower off and keep a backup.\nReport this with your profile.";
@@ -56,6 +63,9 @@ void af_v3_save_halt(int reason) {
 
 static void require_state(void) {
     if (runtime->magic != 0xAF535633u || runtime->error) af_v3_save_halt(AF_SAVE_ARGUMENT);
+#ifdef AF_V3_CONSOLE_STORAGE
+    if (!af_v3_console_storage_valid()) af_v3_save_halt(AF_SAVE_ARGUMENT);
+#endif
     for (u32 i = 0; i < 4; ++i)
         if (runtime->guard[i] != 0xAF53C0DEu) af_v3_save_halt(AF_SAVE_ARGUMENT);
     for (u32 i = 0; i < AF_SAVE_PROFILE; ++i)
@@ -67,6 +77,10 @@ static void require_state(void) {
 #endif
 }
 
+#ifdef AF_V3_CONSOLE_STORAGE
+void af_v3_require_save_state(void) { require_state(); }
+#endif
+
 #ifdef AF_V3_SURFACE_PROFILE
 static void surface_profile(void) {
     for (u32 i=0;i<AF_SAVE_SURFACE_PROFILE;i++)
@@ -75,6 +89,9 @@ static void surface_profile(void) {
 #endif
 
 int af_v3_save_reset(void) {
+#ifdef AF_V3_CONSOLE_STORAGE
+    af_v3_console_storage_reset();
+#endif
     runtime->magic = 0xAF535633u;
     runtime->error = 0;
     runtime->ready = runtime->town = 0;
@@ -136,10 +153,15 @@ void af_v3_save_prepare(u8 *bank) {
 void af_v3_save_commit(const u8 *bank, u8 *destination, u32 count) {
     require_state();
     if (!bank || destination != live || count != AF_SAVE_PAYLOAD) af_v3_save_halt(AF_SAVE_ARGUMENT);
+    const u8 *logical = bank;
+#ifdef AF_V3_CONSOLE_STORAGE
+    int result = af_v3_console_storage_commit(bank, current, runtime->working, &logical);
+#else
     int result = af_v3_save_check(bank, AF_SAVE_BANK, current, runtime->working);
+#endif
     if (result < 0) af_v3_save_halt(result);
-    native_copy(bank, destination, count);
-    runtime->town = (u32)bank[8] << 8 | bank[9];
+    native_copy(logical, destination, count);
+    runtime->town = (u32)logical[8] << 8 | logical[9];
     runtime->ready = 1;
 }
 

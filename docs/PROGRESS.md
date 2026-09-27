@@ -42,13 +42,22 @@ prepares the complete canonical bank and console bytes inside one 64-KiB
 format-five bank, retaining the backup bank. Capacity is checked before output
 writes; oversized input rejects safely. Sanitized checks and an independent
 decoder pass; dense synthetic storage retains 5,151 spare bytes. This is not a
-universal capacity or native persistence claim. Native storage, launch/return, graphics
-allocation, and QD emulation remain integration work; no console is enabled and
-the cartridge/save format is unchanged. See the
+universal capacity claim. Native storage is installed in ABI 276 at
+`build/v3-console-storage-native-04/build-lock.json`, ROM SHA-256
+`f876fc31541db21297e6c5b27f62af790e32ea33850d700f15f3cdd1291f070f`.
+It retains complete canonical town data and four independent console records,
+with checked startup, non-mutating bank probes, decoded commit, migration, and
+per-player clearing. Four focused host/cartridge/composition checks pass,
+including 85,426 sanitized adapter assertions and all ten startup failure paths.
+Actual native synchronous and asynchronous two-bank writing, followed by both
+native load routes in a fresh process, pass. Launch/return,
+graphics allocation, and QD emulation remain work; no console is enabled.
+Format-five saves require this or a newer compatible build, and cannot be loaded
+by V2 or format-one/two/three/four V3. Preserve backups before any handoff. See the
 [console checkpoint](checkpoints/V3_CONSOLE_PERSISTENCE.md) and
 [storage checkpoint](checkpoints/V3_CONSOLE_STORAGE.md).
 
-The current proposal is ABI 275 at
+The exercise integration retained by the current proposal is ABI 275 at
 `build/v3-player-exercise-imports-01/player-exercise-native/build-lock.json`, ROM SHA-256
 `a940dab0ff14f5fc0e0bed23c78d5500c874da7a9f269e89e321c0106453e205`.
 The shared importer installs the complete exercise action: all 18 gestures,
