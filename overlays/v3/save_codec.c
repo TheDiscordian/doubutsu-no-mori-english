@@ -63,11 +63,21 @@ static int surfaces_valid(const u8 *data) {
 #endif
 
 #ifdef AF_V3_CREATURE_PROFILE
-static int creatures_valid(const u8 *data) {
+static int creatures_valid(const u8 *data,int insect_format) {
     if ((data[2]&~1u) || data[3] || data[20]>23 || data[21]>5 || data[22]>1) return 0;
     if (!data[22] && (data[20] || data[21])) return 0;
     for (u32 i=0;i<16;i++) if (data[4+i]&~data[i%4]) return 0;
-    for (u32 i=23;i<AF_SAVE_CREATURE_BYTES;i++) if (data[i]) return 0;
+    u32 reserved=23;
+#ifdef AF_V3_INSECT_SEASONS
+    if (insect_format) {
+        if (data[23]>11 || data[24]>5 || data[25]>1 ||
+                (!data[25] && (data[23] || data[24]))) return 0;
+        reserved=26;
+    }
+#else
+    (void)insect_format;
+#endif
+    for (u32 i=reserved;i<AF_SAVE_CREATURE_BYTES;i++) if (data[i]) return 0;
     return 1;
 }
 #endif
@@ -92,6 +102,7 @@ int af_v3_save_check(const u8 *bank, u32 size, const u8 *current, u8 *state) {
 #endif
 #ifdef AF_V3_CREATURE_PROFILE
     int creature_format = 0;
+    int insect_format = 0;
 #endif
     if (magic == 0x4E414633u) {
 #ifdef AF_V3_CLOTHING_PROFILE
@@ -101,6 +112,10 @@ int af_v3_save_check(const u8 *bank, u32 size, const u8 *current, u8 *state) {
         surface_format = version == 0x00040680u && registry == 3;
 #ifdef AF_V3_CREATURE_PROFILE
         creature_format = version == 0x00060680u && registry == 4;
+#ifdef AF_V3_INSECT_SEASONS
+        insect_format = version == 0x00080680u && registry == 5;
+        creature_format |= insect_format;
+#endif
         surface_format |= creature_format;
 #endif
         reward_format = surface_format || (version == 0x00030680u && registry == 2);
@@ -162,7 +177,7 @@ int af_v3_save_check(const u8 *bank, u32 size, const u8 *current, u8 *state) {
         if (creature_format) {
             for (u32 i=0;i<4;i++)
                 if (ext[0x4D0+i]&~af_v3_creature_profile_byte(i)) return AF_SAVE_PROFILE_MISSING;
-            if (!creatures_valid(ext+0x4D0)) return AF_SAVE_CATALOGUE_INVALID;
+            if (!creatures_valid(ext+0x4D0,insect_format)) return AF_SAVE_CATALOGUE_INVALID;
         }
 #endif
     }
@@ -208,7 +223,13 @@ int af_v3_save_pack(u8 *bank, u32 size, const u8 *state) {
     if (!surfaces_valid(state+AF_SAVE_SURFACE_OFFSET)) return AF_SAVE_CATALOGUE_INVALID;
 #endif
 #ifdef AF_V3_CREATURE_PROFILE
-    if (!creatures_valid(state+AF_SAVE_CREATURE_OFFSET)) return AF_SAVE_CATALOGUE_INVALID;
+    if (!creatures_valid(state+AF_SAVE_CREATURE_OFFSET,
+#ifdef AF_V3_INSECT_SEASONS
+            1
+#else
+            0
+#endif
+            )) return AF_SAVE_CATALOGUE_INVALID;
     for (u32 i=0;i<4;i++)
         if (state[AF_SAVE_CREATURE_OFFSET+i]!=af_v3_creature_profile_byte(i)) return AF_SAVE_PROFILE_MISSING;
 #endif
@@ -238,6 +259,9 @@ int af_v3_save_pack(u8 *bank, u32 size, const u8 *state) {
 #endif
 #ifdef AF_V3_CREATURE_PROFILE
     write32(ext+4,0x00060680u);write32(ext+8,4);
+#ifdef AF_V3_INSECT_SEASONS
+    write32(ext+4,0x00080680u);write32(ext+8,5);
+#endif
     copy(ext+0x4D0,state+AF_SAVE_CREATURE_OFFSET,AF_SAVE_CREATURE_BYTES);
 #endif
     write32(ext + 0xC, crc(bank, AF_SAVE_PAYLOAD, 0x12, 2));

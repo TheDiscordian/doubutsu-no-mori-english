@@ -12,8 +12,15 @@ typedef __UINTPTR_TYPE__ address;
 #define scratch_guard ((u32 *)0x804F4980u)
 #define hash_guard ((u32 *)0x804F9000u)
 #define native_players ((u8 *)0x80126EC0u)
+#ifdef AF_V3_LINKED_CANONICAL
+extern int af_v3_save_check_extended(const u8 *,u32,const u8 *,u8 *);
+extern int af_v3_save_pack_extended(u8 *,u32,const u8 *);
+#define canonical_check af_v3_save_check_extended
+#define canonical_pack af_v3_save_pack_extended
+#else
 #define canonical_check ((int (*)(const u8 *,u32,const u8 *,u8 *))AF_CONSOLE_CANONICAL_CHECK)
 #define canonical_pack ((int (*)(u8 *,u32,const u8 *))AF_CONSOLE_CANONICAL_PACK)
+#endif
 #define original_clear ((void (*)(u8 *))AF_CONSOLE_PRIOR_PLAYER_CLEAR)
 #else
 extern struct AFConsoleStorage af_console_storage;
@@ -72,6 +79,9 @@ static int expand(const u8 *bank,const u8 **logical) {
     if(word(bank+4)==0x4E414633 && (version==0x00050680
 #ifdef AF_V3_CREATURE_PROFILE
         || version==0x00070680
+#endif
+#ifdef AF_V3_INSECT_SEASONS
+        || version==0x00090680
 #endif
         )) {
         int result=af_v3_save_expand(bank,AF_SAVE_BANK,scratch,AF_CZ_RAW);

@@ -12,10 +12,56 @@ ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'tools'))
 from aflib import sha256
 from v3_creature_insects import PROGRAMS,rewrite,install_controller,install_spawn_manager,install_colony
-PROGRAM_DIRECTORY=ROOT/os.environ.get('V3_INSECT_PROGRAMS','build/v3-creature-insects-work-01/programs-25')
+PROGRAM_DIRECTORY=ROOT/os.environ.get('V3_INSECT_PROGRAMS','build/v3-creature-insects-work-01/programs-29')
 
 
 class CreatureInsectTests(unittest.TestCase):
+    def test_persistent_season_resource_composition(self):
+        import copy
+        import zlib
+        from aflib import by_vrom
+        from v3_asset_loader import BLOB
+        from v3_furniture_install import inputs
+        from v3_creature_save import compose_insects
+        image,prior=inputs(ROOT/'build/v3-creature-world-work-01/connected-15/build-lock.json')
+        report=json.loads((PROGRAM_DIRECTORY/'programs.json').read_text());prepared=report['persistent_seasons']
+        original=by_vrom(image)[BLOB].extract(image);blob=bytearray(original)
+        e=copy.deepcopy(prior['equipment_resources'])
+        compiled=report['linked'];data=(PROGRAM_DIRECTORY/compiled['file']).read_bytes()
+        self.assertEqual(sha256(data),compiled['sha256']);self.assertEqual(len(data),compiled['bytes'])
+        self.assertEqual(report['compiled']['unbound_engine_adapters'],[])
+        self.assertFalse(any(data[compiled['bss_start']-compiled['ram']:]))
+        root=compose_insects(prior,e,blob,prepared,compiled)
+        self.assertEqual(root['save_codec']['format_version'],9)
+        self.assertEqual(root['save_codec']['canonical_format_version'],8)
+        self.assertEqual(root['save_codec']['registry_version'],5)
+        self.assertEqual(root['save_runtime']['state_bytes'],1264)
+        self.assertEqual(root['save_runtime']['guard_ram'],0x8046C4E0)
+        self.assertEqual(prepared['bindings']['af_v3_creature_profile_byte'],0x80654000)
+        spans=[];world=e['creature_fish']['world'];p=world['packet']
+        data=blob[p['blob_offset']:p['blob_offset']+p['bytes']]
+        self.assertEqual(sha256(data),p['sha256']);self.assertEqual(zlib.crc32(data),p['crc32'])
+        self.assertEqual(data,original[p['blob_offset']:p['blob_offset']+p['bytes']])
+        for p,d in ((e['console_storage']['packet'],e['console_storage']['compiled']),
+                    (root['room_surfaces']['items'],root['room_surfaces']['save']['codec'])):
+            raw=blob[p['blob_offset']:p['blob_offset']+p['bytes']]
+            self.assertEqual(sha256(raw),p['sha256']);self.assertEqual(zlib.crc32(raw),p['crc32'])
+            for row in d['dispatch']:
+                at=row['address']-p['ram'];self.assertEqual(raw[at:at+8].hex(),row['after'])
+                self.assertEqual(original[p['blob_offset']+at:p['blob_offset']+at+8].hex(),row['before'])
+                spans.append((p['blob_offset']+at,p['blob_offset']+at+8))
+        # Mark exactly the rewritten stable jumps; all other imported
+        # objects, fish helpers, resources, and profiles must remain untouched.
+        restored=bytearray(blob)
+        for first,last in spans:restored[first:last]=original[first:last]
+        self.assertEqual(restored,original)
+        for key in ('creature_field','creature_items','player_motion','player_actions'):
+            self.assertEqual(e[key],prior['equipment_resources'][key])
+        damaged=copy.deepcopy(prepared);damaged['prior_runtime_sha256']='0'*64
+        with self.assertRaises(ValueError):
+            compose_insects(prior,copy.deepcopy(prior['equipment_resources']),bytearray(original),
+                            damaged,compiled)
+
     def test_mosquito_resource_composition(self):
         import copy
         from aflib import by_vrom,u32,CODE_VROM,CODE_RAM

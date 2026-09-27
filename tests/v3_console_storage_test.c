@@ -36,6 +36,14 @@ extern int af_console_canonical_collect(u8 *,u32,u32,u32);
 extern int af_legacy_pack(u8 *,u32,const u8 *),af_legacy_check(const u8 *,u32,const u8 *,u8 *);
 extern int af_legacy_compress(u8 *,u32,const u8 *,u32,const u8 *,u32,u32 *,u32);
 #define DISK_FORMAT 7
+#ifdef AF_V3_INSECT_SEASONS
+#include "../overlays/v3/creature_insect_save.c"
+extern int af_fish_canonical_pack(u8 *,u32,const u8 *),af_fish_canonical_check(const u8 *,u32,const u8 *,u8 *);
+extern int af_fish_compress(u8 *,u32,const u8 *,u32,const u8 *,u32,u32 *,u32);
+extern int af_fish_expand(const u8 *,u32,u8 *,u32);
+#undef DISK_FORMAT
+#define DISK_FORMAT 9
+#endif
 #else
 #define DISK_FORMAT 5
 #endif
@@ -83,6 +91,12 @@ int main(void) {
     CHECK(af_v3_creature_season(&terms,date,season_random,NULL)==1);
     CHECK(random_calls==1 && terms.next==1);
     CHECK(af_v3_creature_season(&terms,date,season_random,NULL)==1 && random_calls==1);
+#ifdef AF_V3_INSECT_SEASONS
+    CHECK(af_insect_saved_season(&terms,date,season_random,NULL)==1 && random_calls==2);
+    CHECK(terms.current==0 && terms.next==0 && terms.rate==1.0f);
+    CHECK(af_save_runtime.working[AF_SAVE_INSECT_SEASON_OFFSET]==1);
+    CHECK(af_insect_saved_season(&terms,date,season_random,NULL)==1 && random_calls==2);
+#endif
     u8 creatures_before[32];memcpy(creatures_before,af_save_runtime.working+AF_SAVE_CREATURE_OFFSET,32);
 #endif
     memcpy(bank,af_save_live,AF_SAVE_PAYLOAD);af_v3_save_prepare(bank);
@@ -107,7 +121,41 @@ int main(void) {
     CHECK(af_save_runtime.ready && af_save_runtime.town==0x3001);
 #ifdef AF_V3_CREATURE_PROFILE
     CHECK(!memcmp(creatures_before,af_save_runtime.working+AF_SAVE_CREATURE_OFFSET,32));
-    CHECK(af_v3_creature_season(&terms,date,season_random,NULL)==1 && random_calls==1);
+    unsigned calls_before=random_calls;
+    CHECK(af_v3_creature_season(&terms,date,season_random,NULL)==1 && random_calls==calls_before);
+#ifdef AF_V3_INSECT_SEASONS
+    CHECK(af_insect_saved_season(&terms,date,season_random,NULL)==1 && random_calls==calls_before);
+    CHECK(af_fish_expand(bank,65536,decoded,AF_CZ_RAW)==AF_CZ_FORMAT);
+    CHECK(af_fish_canonical_check(decoded,65536,af_save_current,NULL)==AF_SAVE_FORMAT);
+    /* Migrate the complete preceding creature bank, including all caught
+     * species, fish season, and four console records. Only insect state is new. */
+    u8 fish_state[AF_SAVE_STATE],fish_canonical[65536],fish_disk[65536],fish_migrated[AF_SAVE_STATE];
+    memcpy(fish_state,af_save_runtime.working,AF_SAVE_STATE);
+    memset(fish_state+AF_SAVE_INSECT_SEASON_OFFSET,0,3);
+    memcpy(fish_canonical,decoded,65536);
+    CHECK(af_fish_canonical_pack(fish_canonical,65536,fish_state)==AF_SAVE_OK);
+    CHECK(af_fish_compress(fish_disk,65536,fish_canonical,65536,console_before,6528,
+                          af_console_hash,AF_CZ_WORK_BYTES)>0);
+    CHECK(af_v3_save_check(fish_disk,65536,af_save_current,fish_migrated)==AF_SAVE_OK);
+    CHECK(!memcmp(fish_state,fish_migrated,AF_SAVE_STATE));
+    /* Every newly assigned byte and the remaining padding is validated before
+     * changing output. Invalid dates and RNG cannot change saved seasons. */
+    const unsigned offsets[]={23,24,25,26,31};const u8 invalid[]={12,6,2,1,1};
+    for(unsigned i=0;i<sizeof(invalid);i++) {
+        memcpy(fish_state,af_save_runtime.working,AF_SAVE_STATE);
+        fish_state[AF_SAVE_CREATURE_OFFSET+offsets[i]]=invalid[i];
+        memcpy(fish_canonical,decoded,65536);
+        CHECK(af_console_canonical_pack(fish_canonical,65536,fish_state)==AF_SAVE_CATALOGUE_INVALID);
+        CHECK(!memcmp(fish_canonical,decoded,65536));
+    }
+    CHECK(!af_insect_saved_season(&terms,(SpawnDate){2006,2,30},season_random,NULL));
+    CHECK(!memcmp(creatures_before,af_save_runtime.working+AF_SAVE_CREATURE_OFFSET,32));
+    /* Month/year transitions use their own state, never the fish bytes. */
+    CHECK(af_insect_saved_season(&terms,(SpawnDate){2006,12,29},season_random,NULL));
+    CHECK(af_insect_saved_season(&terms,(SpawnDate){2007,1,1},season_random,NULL));
+    CHECK(!memcmp(creatures_before,af_save_runtime.working+AF_SAVE_CREATURE_OFFSET,23));
+    memcpy(af_save_runtime.working+AF_SAVE_CREATURE_OFFSET,creatures_before,32);
+#endif
     creature_mask=0xFFFF;
     CHECK(af_v3_save_check(bank,65536,af_save_current,NULL)==AF_SAVE_PROFILE_MISSING);
     creature_mask=0x1FFFF;

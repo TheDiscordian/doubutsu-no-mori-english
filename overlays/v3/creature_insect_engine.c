@@ -4,13 +4,17 @@
 
 extern const xyz_t af_insect_ball;
 extern const void *af_insect_demo_clip;
-extern const void *af_insect_demo_clip2;
+extern const u8 af_insect_reset_flag;
 extern int af_insect_player_main(GAME *);
 extern int af_insect_block_mode(void);
 extern u32 af_insect_block_kind(int,int);
 
 const xyz_t *af_insect_ball_position(void) {return &af_insect_ball;}
-int af_insect_demo_active(void) {return af_insect_demo_clip || af_insect_demo_clip2;}
+/* GC's second clip belongs to ResetDemo, PresentDemo, and BoatDemo. N64 owns
+ * the reset sequence directly through its common event flag; the other two
+ * sequences do not exist in this cartridge. Never alias the neighbouring clip
+ * field, which belongs to an unrelated native subsystem. */
+int af_insect_demo_active(void) {return af_insect_demo_clip || af_insect_reset_flag;}
 int af_insect_acre_inset(int x,int z) {
     return af_insect_block_mode()==1 && (af_insect_block_kind(x,z)&1u)!=0;
 }

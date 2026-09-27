@@ -16,7 +16,8 @@ static union { max_align_t alignment; u8 bytes[0x1400]; } player_storage;
 static PLAYER_ACTOR *player=(PLAYER_ACTOR *)player_storage.bytes;
 static ACTOR neighbour;
 const xyz_t af_insect_ball={100,200,300};
-const void *af_insect_demo_clip,*af_insect_demo_clip2;
+const void *af_insect_demo_clip;
+u8 af_insect_reset_flag;
 AfInsectBgContext af_insect_bg_context;
 static u32 unit;
 static int visible=1,inset,main_index,weather_calls,body_calls,catch_calls,destructions;
@@ -197,8 +198,10 @@ static void ownership_and_culling(void) {
 }
 static void primitives(void) {
     assert(af_insect_ball_position()==&af_insect_ball);
-    af_insect_demo_clip=af_insect_demo_clip2=NULL;assert(!af_insect_demo_active());
-    af_insect_demo_clip2=&game;assert(af_insect_demo_active());
+    af_insect_demo_clip=NULL;af_insect_reset_flag=0;assert(!af_insect_demo_active());
+    af_insect_reset_flag=1;assert(af_insect_demo_active());
+    af_insect_reset_flag=0;af_insect_demo_clip=&game;assert(af_insect_demo_active());
+    af_insect_demo_clip=NULL;assert(!af_insect_demo_active());
     for (unsigned i=0;i<128;i++) assert(af_insect_is_stump(i)==((i>=1&&i<=4)||(i>=123&&i<=126)));
     assert(!af_insect_is_flower(0x83B) && af_insect_is_flower(0x83C));
     assert(af_insect_is_flower(0x84D) && !af_insect_is_flower(0x84E));

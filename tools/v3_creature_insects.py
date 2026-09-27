@@ -20,6 +20,7 @@ from v3_asset_loader import ROOT, IMAGE
 from v3_creature_field import named_table
 from v3_creature_items import source_records
 from v3_furniture_pipeline import Source
+from v3_creature_save import SOURCES as SAVE_SOURCES
 
 PROGRAMS = (
     ('tentou','aITT',3,'190408d3b79fb5573c0f0be83ef9a2317cf3526aacc4d20970cee9cad65f6b4b'),
@@ -33,7 +34,7 @@ RUNTIME=('creature_insects','creature_insect_state','creature_insect_environment
          'creature_insect_engine','creature_insect_collision','creature_insect_spawns',
          'creature_insect_manager','creature_insect_colony','creature_insect_colony_draw',
          'creature_insect_audio','creature_insect_effects','creature_insect_player',
-         'creature_insect_mosquito')
+         'creature_insect_mosquito','creature_insect_save')
 SOURCES=('tools/v3_creature_insects.py','overlays/v3/creature_insects.h',
          'tools/v3_creature_spawns.py','overlays/v3/creature_spawns.h',
          'overlays/v3/creature_insect_spawns.h',
@@ -48,8 +49,9 @@ SOURCES=('tools/v3_creature_insects.py','overlays/v3/creature_insects.h',
          'overlays/v3/creature_insect_engine.h',
          'overlays/v3/creature_insect_collision.h',
          'overlays/v3/creature_insect_bindings.ld',
+         'overlays/v3/creature_insects.ld',
          'overlays/v3/creature_insect_hooks.S',
-         *(f'overlays/v3/{name}.c' for name in RUNTIME))
+         *(f'overlays/v3/{name}.c' for name in RUNTIME),*SAVE_SOURCES)
 NATIVE_FUNCTIONS=(
     (0x80A10210,0x80A102B8,'ceceb00fbf78bfb02831e6f0073c38b968e03dac21b2a17c02a0f7cadbd835aa'),
     (0x80A10558,0x80A108AC,'c2f75fbcf8e4e2414740bc1455ee41ab4966832d69f3a222f9cc6daea563432e'),
@@ -229,10 +231,15 @@ def intro_environment_contract(image,original):
     # Complete mode setter/getter/wall consumer and both owners of the native
     # demo clip. GC's separate demo_clip2 is not the adjacent native field.
     for vrom,ram,spans in (
-        (CODE_VROM,CODE_RAM,((0x800741DC,0x800743EC),)),
+        (CODE_VROM,CODE_RAM,((0x800741DC,0x800743EC),(0x800953B0,0x80095414),
+                            (0x800B5CD4,0x800B5D34))),
         (0x8477A0,0x809529B0,((0x809529B0,0x80952ACC),
                             (0x8095308C,0x809531C8),(0x80953444,0x80953474))),
-        (0x848600,0x80953820,((0x80953820,0x8095388C),))):
+        (0x848600,0x80953820,((0x80953820,0x8095388C),)),
+        (0x896A30,0x809B3220,((0x809B32BC,0x809B3324),)),
+        (0x897450,0x809B3C40,((0x809B3CDC,0x809B3D44),)),
+        (0x898220,0x809B4A10,((0x809B4AAC,0x809B4B14),)),
+        (0x8991B0,0x809B59A0,((0x809B5A3C,0x809B5AA4),))):
         current=files[vrom].extract(image);before=retail[vrom].extract(original)
         for start,end in spans:
             raw=current[start-ram:end-ram]
@@ -240,7 +247,9 @@ def intro_environment_contract(image,original):
                 raise ValueError('Changed native insect intro/environment binding')
             rows.append(dict(vrom=vrom,ram=ram,address=start,end=end,sha256=sha256(raw)))
     return dict(functions=rows,demo_clip=0x80136F4C,block_mode_getter=0x800741F4,
-        player_acre_mask=1,inset_units=1,second_demo_clip_bound=False)
+        player_acre_mask=1,inset_units=1,reset_flag=0x80137908,
+        second_demo_state='native-reset-event-flag',
+        absent_native_sequences=['PresentDemo','BoatDemo'])
 
 
 def colony_contract(image,original):
@@ -383,6 +392,13 @@ def rewrite(text):
 def generate(source,output,native):
     from v3_creature_spawns import insect_calendars
     parents,identity=source_records(source)
+    demo=[]
+    for name in ('aRSD_actor_ct','aRSD_actor_dt','aRSD_first_set_init','aRSD_retire_npc_wait',
+                 'aPRD_actor_ct','aPRD_actor_dt','aBTD_actor_ct','aBTD_actor_dt'):
+        matches=[at for at,rows in source.functions.items() if any(n==name for n,_ in rows)]
+        if len(matches)!=1:raise ValueError('Ambiguous donor demo-state owner: '+name)
+        demo.append(source.function(matches[0])[1])
+    native['intro_environment']['donor_functions']=demo
     raw,table=named_table(source,'aINS_program_type',41*4)
     rows=[r for r in parents if r['category']=='insect']
     if [r['source_index'] for r in rows]!=list(range(32,40)):
@@ -449,7 +465,7 @@ af_insect_calendar_bytes:
         installed=False,selectable=False,native_execution_tested=False)
 
 
-def compile_programs(output,report):
+def compile_programs(output,report,link_ram=None,link_limit=None):
     """One compiler container for the whole category, without invented bindings."""
     flags=['-Os','-EB','-mabi=32','-march=vr4300','-mfix4300','-G0','-mno-abicalls',
         '-fno-pic','-ffreestanding','-fno-builtin','-fno-common','-fno-stack-protector',
@@ -465,6 +481,11 @@ def compile_programs(output,report):
         objects.append(source+'.o')
         commands.append(shlex.join(['/n64_toolchain/bin/mips64-elf-gcc',*flags,'-c',
             '/source/overlays/v3/'+source+'.c','-o',source+'.o']))
+    for source in report['persistent_seasons']['compilation']:
+        name=source['file'];objects.append(name+'.o')
+        commands.append(shlex.join(['/n64_toolchain/bin/mips64-elf-gcc',*flags,
+            *['-D'+d for d in source['defines']],'-c',
+            '/source/overlays/v3/'+name+'.c','-o',name+'.o']))
     objects.append('creature_insect_hooks.o')
     commands.append(shlex.join(['/n64_toolchain/bin/mips64-elf-gcc',*flags,'-c',
         '/source/overlays/v3/creature_insect_hooks.S','-o','creature_insect_hooks.o']))
@@ -478,29 +499,54 @@ def compile_programs(output,report):
     commands.append(shlex.join(['/n64_toolchain/bin/mips64-elf-gcc',*flags,'-c',
         'field-audio.S','-o','field-audio.o']))
     commands.append(shlex.join(['/n64_toolchain/bin/mips64-elf-ld','-EB','-r',
-        '-T','/source/overlays/v3/creature_insect_bindings.ld',*objects,'-o','programs.o']))
+        *objects,'-o','programs.o']))
     commands.append('/n64_toolchain/bin/mips64-elf-nm --undefined-only programs.o')
     docker=['docker','run','--rm','--network','none','--user',f'{os.getuid()}:{os.getgid()}',
             '-v',f'{ROOT}:/source:ro','-v',f'{output.resolve()}:/out','-w','/out',
             '--entrypoint','/bin/sh',IMAGE,'-ec','\n'.join(commands)]
     result=subprocess.run(docker,text=True,capture_output=True,timeout=60)
     if result.returncode: raise RuntimeError(result.stderr)
-    undefined=sorted(line.split()[-1] for line in result.stdout.splitlines() if line.strip())
+    required=sorted(line.split()[-1] for line in result.stdout.splitlines() if line.strip())
+    bindings={name:int(value,16) for name,value in re.findall(r'^(\w+) = (0x[0-9A-Fa-f]+);',
+        (ROOT/'overlays/v3/creature_insect_bindings.ld').read_text(),re.M)}
+    bindings.update(report['persistent_seasons']['bindings'])
+    undefined=sorted(set(required)-bindings.keys())
     report['compiled']=dict(object='programs.o',sha256=sha256((output/'programs.o').read_bytes()),
         bytes=(output/'programs.o').stat().st_size,toolchain=IMAGE,flags=flags,donor_flags=donor_flags,
-        unbound_engine_adapters=undefined,
+        unbound_engine_adapters=undefined,engine_bindings={n:bindings[n] for n in required if n in bindings},
         stack_usage=''.join(p.read_text() for p in sorted(output.glob('*.su'))))
+    if link_ram is not None:
+        if undefined or link_ram&15 or not 0x80000000<=link_ram<link_limit<=0x80800000:
+            raise ValueError('Unbound or invalid complete insect runtime placement')
+        commands=[shlex.join(['/n64_toolchain/bin/mips64-elf-ld','-EB',
+            f'--defsym=AF_INSECT_RAM={link_ram}',f'--defsym=AF_INSECT_LIMIT={link_limit}',
+            *[f'--defsym={name}={address}' for name,address in report['persistent_seasons']['bindings'].items()],
+            '-T','/source/overlays/v3/creature_insect_bindings.ld',
+            '-T','/source/overlays/v3/creature_insects.ld','programs.o','-o','programs.elf']),
+            '/n64_toolchain/bin/mips64-elf-objcopy -O binary -j .text -j .rodata -j .data programs.elf programs-code.bin',
+            '/n64_toolchain/bin/mips64-elf-nm --defined-only programs.elf']
+        result=subprocess.run([*docker[:-1],'\n'.join(commands)],text=True,capture_output=True,timeout=60)
+        if result.returncode:raise RuntimeError(result.stderr)
+        symbols={name:int(address,16) for address,kind,name in
+            (line.split() for line in result.stdout.splitlines())
+            if name.startswith('af_') or name=='require_state'}
+        code=(output/'programs-code.bin').read_bytes();end=symbols['af_insect_runtime_end']
+        if len(code)>symbols['af_insect_bss_start']-link_ram or end>link_limit:
+            raise ValueError('Complete insect initialized data overlaps BSS')
+        data=code+bytes(end-link_ram-len(code));write_new(output/'programs.bin',data)
+        report['linked']=dict(ram=link_ram,bytes=len(data),sha256=sha256(data),symbols=symbols,
+            file='programs.bin',bss_start=symbols['af_insect_bss_start'],bss_zeroed=True,
+            cartridge_allocation_verified=False,installed=False)
     report['pending']=[
-        'Second demo-state binding',
         'Install prepared mosquito actions, full motions/face timelines, and official message with the runtime',
         'Install complete prepared field sound resources together with the runtime',
         'Install prepared small-mud constructor bridge with the complete runtime',
         'Install prepared controller, spawn-manager, and directed-column hooks with the complete runtime',
         'Install prepared digging, rock-strike, and all-season tree-shake event producers',
-        'Persistent insect season reader/codec',
+        'Install prepared format-nine persistence and all stable save-entry redirects with the runtime',
         'Install prepared colony profile/catch hook and included art with complete runtime startup',
         'Native/GameCube population-capacity alternatives, including eight wild GameCube slots',
-        'Resolve installed creature-profile export, guarded packet placement/startup, and optional/behaviour selections',
+        'Guarded packet placement/startup and optional/behaviour selections',
         'Connected native gameplay/save verification; existing unresolved fixtures are not reset']
     write_new(output/'programs.json',(json.dumps(report,indent=2)+'\n').encode())
     return report
@@ -510,7 +556,10 @@ def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output',type=Path,required=True)
     parser.add_argument('--base-lock',type=Path,required=True)
+    parser.add_argument('--link-ram',type=lambda x:int(x,0))
+    parser.add_argument('--link-limit',type=lambda x:int(x,0))
     args=parser.parse_args()
+    if (args.link_ram is None)!=(args.link_limit is None):parser.error('Supply both link bounds')
     from v3_furniture_install import inputs
     image,prior=inputs(args.base_lock)
     native=native_contract(image,prior)
@@ -524,6 +573,8 @@ def main():
     from v3_creature_insect_player import contract as player_contract,prepare_mosquito
     report['player_interactions']=player_contract(image,prior,source)
     report['mosquito_player']=prepare_mosquito(image,prior,source,args.output/'mosquito-player')
+    from v3_creature_save import prepare_insects
+    report['persistent_seasons']=prepare_insects(prior)
     write_new(args.output/'field-audio.S',b'''.section .rodata
 .balign 4
 .globl af_insect_trigger_words
@@ -539,7 +590,7 @@ af_insect_mosquito_message:
 af_insect_player_faces:
 .incbin "mosquito-player/face-data.bin"
 ''')
-    report=compile_programs(args.output,report)
+    report=compile_programs(args.output,report,args.link_ram,args.link_limit)
     print(json.dumps(dict(programs=len(report['programs']),species=len(report['rows']),
         unbound_engine_adapters=report['compiled']['unbound_engine_adapters'],installed=False),indent=2))
 

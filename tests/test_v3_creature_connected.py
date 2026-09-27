@@ -48,24 +48,39 @@ class ConnectedTests(unittest.TestCase):
             self.assertEqual(p.returncode,0,p.stdout+p.stderr)
 
     def test_complete_save_extension_and_forward_migration(self):
+        self.check_save_extension(False)
+
+    def test_insect_seasons_complete_save_path_and_forward_migration(self):
+        self.check_save_extension(True)
+
+    def check_save_extension(self,insects):
         with tempfile.TemporaryDirectory(prefix='af-creature-save-') as directory:
             out=Path(directory)
             flags=['-std=c11','-O1','-g','-Wall','-Wextra','-Werror','-fno-pie','-no-pie',
                 '-fsanitize=address,undefined','-fno-omit-frame-pointer',
+                '-ffunction-sections','-fdata-sections','-Wl,--gc-sections',
                 '-DAF_V3_CLOTHING_PROFILE=1','-DAF_V3_REWARD_PROFILE=1','-DAF_V3_SURFACE_PROFILE=1']
             def run(args):
                 p=subprocess.run(args,capture_output=True,text=True,timeout=30)
                 self.assertEqual(p.returncode,0,p.stdout+p.stderr)
                 return p.stdout
-            for label,extra in (('legacy',[]),('console_canonical',['-DAF_V3_CREATURE_PROFILE=1'])):
+            insect_flags=['-DAF_V3_INSECT_SEASONS=1'] if insects else []
+            variants=[('legacy',[]),('console_canonical',['-DAF_V3_CREATURE_PROFILE=1',*insect_flags])]
+            if insects:variants.append(('fish_canonical',['-DAF_V3_CREATURE_PROFILE=1']))
+            for label,extra in variants:
                 run(['cc',*flags,*extra,f'-Daf_v3_save_check=af_{label}_check',
                     f'-Daf_v3_save_pack=af_{label}_pack',f'-Daf_v3_save_collect=af_{label}_collect',
                     '-c',str(ROOT/'overlays/v3/save_codec.c'),'-o',str(out/(label+'.o'))])
             run(['cc',*flags,'-Daf_v3_save_compress=af_legacy_compress','-Daf_v3_save_expand=af_legacy_expand',
                  '-c',str(ROOT/'overlays/v3/save_compressed.c'),'-o',str(out/'legacy-compress.o')])
-            run(['cc',*flags,'-DAF_V3_CREATURE_PROFILE=1','-DAF_V3_CONSOLE_STORAGE=1',
+            if insects:
+                run(['cc',*flags,'-DAF_V3_CREATURE_PROFILE=1',
+                    '-Daf_v3_save_compress=af_fish_compress','-Daf_v3_save_expand=af_fish_expand',
+                    '-c',str(ROOT/'overlays/v3/save_compressed.c'),'-o',str(out/'fish-compress.o')])
+            run(['cc',*flags,*insect_flags,'-DAF_V3_CREATURE_PROFILE=1','-DAF_V3_CONSOLE_STORAGE=1',
                 *[str(ROOT/p) for p in ('tests/v3_console_storage_test.c','overlays/v3/save_runtime.c',
                     'overlays/v3/console_storage.c','overlays/v3/save_compressed.c','overlays/v3/creature_spawns.c')],
+                *([str(ROOT/'overlays/v3/creature_insect_spawns.c')] if insects else []),
                 *map(str,out.glob('*.o')),'-o',str(out/'check')])
             self.assertIn('native-adapter host assertions',run([str(out/'check')]))
 

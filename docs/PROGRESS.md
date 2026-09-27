@@ -56,7 +56,7 @@ sanitized environment/controller and spawn-manager paths, all source calendars
 and shared habitat/group logic, current-cartridge hook/relocation composition,
 colony lifecycle/drawing, and connected field-service routing/resource composition.
 These are host/compiler checks, not native gameplay. Output is
-`build/v3-creature-insects-work-01/programs-25/`; no new ROM is built, the insects
+`build/v3-creature-insects-work-01/programs-29/`; no new ROM is built, the insects
 remain unavailable for selection, and ABI 305 remains the cartridge.
 The colony runtime connects creation, catching into a single ant, complete
 two-layer scrolling artwork, fading, and native actor cleanup. The opening
@@ -79,10 +79,18 @@ the complete insect runtime's placement/startup and message installation.
 Four current changed-path host/composition checks and nine shared keyframe checks
 pass; six unchanged insect checks retain their previous evidence. No native or
 hardware execution is claimed for these changes.
-Continue the same batch with the remaining second demo-state binding; persistent insect seasons;
-native/GameCube population-capacity choices; and complete runtime
+The complete runtime now links with no missing engine symbols, including the
+native Resetti-event flag and persistent insect-season reader. Its 53,168-byte
+linked image includes all six insect programs and the complete save path.
+The prepared format-nine save adapter preserves existing creature icons and
+redirects all stable save exports to that runtime. It assigns separate insect
+season bytes, migrates preceding saves, and rejects invalid data before writing.
+Focused sanitized save/migration, cutscene, and current-resource composition
+checks pass. This is linked preparation, not an allocated or installed cartridge
+runtime; the installed ABI-305 save format remains seven.
+Continue the same batch with native/GameCube population-capacity choices and complete runtime
 placement/startup/selection. The calendar-to-manager path is prepared, not installed;
-its unresolved services remain real dependencies, not dummy implementations. Native constructor
+its remaining installation and capacity work remain required. Native constructor
 timeout and sound-scheduler disconnection remain unresolved. No old native
 fixture is replayed. See the
 [insect program contract](../specs/V3_CREATURE_ITEMS.md#added-insect-behaviour-programs).

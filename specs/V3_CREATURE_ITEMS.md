@@ -685,14 +685,43 @@ the original function offset, replaying its stack/return-address prologue.
 No fixed heap address is assumed. This composer and the controller/column
 composer must be installed with the complete resident runtime and loaded data.
 
-The manager intentionally retains the unresolved native season service.
-The current saved creature capsule uses bytes 20..22 for fish seasons
-and rejects nonzero bytes 23..31; an insect season reader cannot safely start
-writing that padding without the matching codec and compatibility work.
-`af_v3_creature_profile_byte` is an existing installed shared export that the
-final linker must resolve from its checked build report. The current controller
+`creature_insect_save.c` connects monthly terms to separate town-wide bytes
+23..25 of the existing creature capsule: term `0..11`, offset `0..5`, and an
+initialization flag. Fish bytes 20..22 and all profiles/collections are unchanged;
+26..31 remain reserved zero. A new or migrated town initializes once, wrapping
+December's next term to January. Each successful calculation persists its result;
+bad dates, RNG values, or saved fields leave the saved season unchanged.
+
+The prepared codec uses canonical format eight/registry five and compressed
+format nine. It accepts prior canonical and compressed formats, validates their
+original padding requirements, preserves their complete data, and initializes
+only the new insect state. Both 64-KiB banks, working-state size 1,232, runtime
+size 1,264, guards, and all native/console data layouts remain. Earlier V3 readers,
+including format-seven builds, reject new saves. Preserve backups. Native ordinary
+save/reload remains unverified; ABI 305 still uses format seven.
+
+The new canonical and storage functions link into the complete insect runtime.
+Growing them in their old locations would overwrite the pocket-icon table and
+artwork occupying that padding. `v3_creature_save.compose_insects` verifies the
+old complete packets/code, retains all their bytes, and redirects all 23 stable
+console/storage exports plus three canonical exports to the linked runtime.
+The enclosing builder must load that complete runtime before any redirected call,
+update enclosing startup checksums, and carry the compatibility warning forward.
+The composition check proves existing icon, UI, travel, fish, and other resource
+bytes remain intact. The sanitized existing save-I/O fixture covers both banks,
+all residents/collections, console records, migration from format seven and five,
+season persistence, player deletion, malformed fields, and rejection before I/O.
+
+`af_v3_creature_profile_byte` binds to its checked installed export. The current controller
 still has two wild slots and one release slot; the GameCube eight-wild-slot
 alternative is required work, not supplied by the larger spawn plan.
+
+The mosquito's demo guard binds native intro/ride-off clip `80136F4C` and the
+native Resetti-event byte `80137908`. The latter is checked against the complete
+original reset setter, player eligibility reader, and four Resetti destructor
+clear paths. The donor second-clip constructor/destructor owners are retained as
+source evidence. Its PresentDemo and BoatDemo sequences do not exist in the
+N64 cartridge; an unrelated neighbouring clip field is not their substitute.
 
 ### Ground colony and catch handoff
 
@@ -848,17 +877,27 @@ resident face pool, runtime, hooks, message bank, and reader bounds together.
 
 ### Current prepared output and remaining connections
 
-Prepared output: `build/v3-creature-insects-work-01/programs-25/`.
+Prepared output: `build/v3-creature-insects-work-01/programs-29/`.
 The current cartridge remains ABI 305. No new ROM, save layout, browser choice,
 or deployment is produced by preparation. Reproduce against the explicit input:
 
 ```sh
 python3 tools/v3_creature_insects.py \
   --base-lock build/v3-creature-world-work-01/connected-15/build-lock.json \
-  --output build/v3-creature-insects-work-01/programs-new
+  --output build/v3-creature-insects-work-01/programs-new \
+  --link-ram 0x80656000 --link-limit 0x80680000
 V3_INSECT_PROGRAMS=build/v3-creature-insects-work-01/programs-new \
   python3 -m unittest discover -s tests -p 'test_v3_creature_insects.py' -v
 ```
+
+The linked image is 53,168 bytes, SHA-256
+`1b4ab2b7c66b78e0990031a53ffa81c1363c85eb7478e8a76c773611583512e0`.
+It has no missing engine symbols and zero-filled BSS from `80662D30`; its range
+ends at `80662FB0`. This establishes linking, not cartridge memory reservation,
+startup loading, native execution, or hardware suitability. Absolute engine
+bindings are applied at final placement, not during the relocatable link, so
+MIPS call relocations retain valid addends. The same image contains the whole
+save path; no legacy artwork or code is discarded to fit it.
 
 The combined test covers all eight release/despawn paths, two-substep timing,
 correct/wrong-tile shovel and rock events, both tree species, tree cutting, snail
@@ -887,21 +926,20 @@ engine callbacks. It covers pending allocation/retry, food conditions, forced an
 ordinary net requests, single-ant label transfer, failed creation, fading, scene
 cleanup, native bee preservation, scrolling coordinates, and graphics bounds.
 The current composition check also verifies the unused profile slot and catch
-span while preserving unrelated installed code. Four changed-path checks pass;
-six unchanged checks retain their passing evidence. Nine shared keyframe checks pass;
+span while preserving unrelated installed code. The player/field checks retain
+their passing evidence, alongside the current cutscene, full save/migration, and
+stable-save-entry composition checks. Nine shared keyframe checks pass;
 native colony gameplay, visual appearance, and hardware remain unverified.
 
 Remaining connections belong to the same creature importing task:
 
-- Finish the second demo-state binding. Retain the prepared native environment,
-  terrain, controller, player-event producers, and complete mosquito response.
-- Complete the persistent insect-season reader/codec using the prepared
-  calendar-to-native-manager path. Retain the complete colony implementation.
+- Retain the prepared native environment, demo guard, terrain, controller,
+  player-event producers, complete mosquito response, persistence, and colony.
   Implement the actual
   native/GameCube population-capacity alternatives; group creation is bounded by
   available slots until the larger source pool and its consumers are installed.
 - Place the complete runtime through the existing owner-storage machinery, retain
-  overlap guards, install its prepared field audio/effect and player consumers, connect
+  overlap guards, install its prepared field audio/effect, player, and save consumers, connect
   startup loading, and promote per-insect selection only
   when the gameplay dependencies are implemented.
 - Verify the connected current cartridge/save path and fix actual defects. Keep

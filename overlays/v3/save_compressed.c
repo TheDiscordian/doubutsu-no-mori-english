@@ -37,6 +37,9 @@ static int canonical_valid(const u8 *p) {
 #ifdef AF_V3_CREATURE_PROFILE
     version |= word(e+4)==0x00060680 && word(e+8)==4;
 #endif
+#ifdef AF_V3_INSECT_SEASONS
+    version |= word(e+4)==0x00080680 && word(e+8)==5;
+#endif
     return town(p) && !sum(p) && word(e)==0x41465333 && version &&
         word(e+12)==crc(p,PAYLOAD,0x12,2) &&
         word(e+16)==crc(e,EXT,16,4);
@@ -114,7 +117,7 @@ int af_v3_save_compress(u8 *bank,u32 bank_bytes,const u8 *canonical,u32 canonica
     copy(bank,canonical,START);copy(bank+MIRROR,canonical+MIRROR,2);
     encode(bank,canonical,console,hash);
     put(bank+PAYLOAD,0x41465333);
-    put(bank+PAYLOAD+4,word(canonical+PAYLOAD+4)==0x00040680 ? 0x00050680 : 0x00070680);
+    put(bank+PAYLOAD+4,word(canonical+PAYLOAD+4)+0x10000u);
     put(bank+PAYLOAD+8,word(canonical+PAYLOAD+8));put(bank+PAYLOAD+12,AF_CZ_RAW);
     put(bank+PAYLOAD+16,(u32)length);put(bank+PAYLOAD+20,1);
     put(bank+PAYLOAD+28,crc(canonical,AF_CZ_BANK,AF_CZ_BANK,0));
@@ -133,6 +136,9 @@ int af_v3_save_expand(const u8 *bank,u32 bank_bytes,u8 *scratch,u32 scratch_byte
     int version=word(e+4)==0x00050680 && word(e+8)==3;
 #ifdef AF_V3_CREATURE_PROFILE
     version |= word(e+4)==0x00070680 && word(e+8)==4;
+#endif
+#ifdef AF_V3_INSECT_SEASONS
+    version |= word(e+4)==0x00090680 && word(e+8)==5;
 #endif
     if(!town(bank) || word(e)!=0x41465333 || !version ||
        word(e+12)!=AF_CZ_RAW || !length || length>CAPACITY ||
@@ -169,7 +175,8 @@ int af_v3_save_expand(const u8 *bank,u32 bank_bytes,u8 *scratch,u32 scratch_byte
     if(crc(scratch,AF_CZ_BANK,AF_CZ_BANK,0)!=word(e+28) ||
        crc(scratch+AF_CZ_BANK,AF_CZ_CONSOLE,AF_CZ_CONSOLE,0)!=word(e+32))return AF_CZ_CHECKSUM;
     if(!canonical_valid(scratch))return AF_CZ_FORMAT;
-    if(word(scratch+PAYLOAD+8)!=word(e+8))return AF_CZ_FORMAT;
+    if(word(scratch+PAYLOAD+8)!=word(e+8) ||
+       word(scratch+PAYLOAD+4)+0x10000u!=word(e+4))return AF_CZ_FORMAT;
     for(i=0;i<START;i++)if(i!=0x12 && i!=0x13 && scratch[i]!=bank[i])return AF_CZ_FORMAT;
     return 0;
 }

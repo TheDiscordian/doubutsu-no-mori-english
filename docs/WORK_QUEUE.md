@@ -72,7 +72,7 @@ Continue the eight insects' shared field behaviour/spawn programs while that
 native test remains unresolved. Keep fish gameplay verification open, not waived.
 The six complete donor behaviour programs and the shared native environment,
 stress, capture, culling, and directed-collision adapters compile together at
-`build/v3-creature-insects-work-01/programs-25/`. Controller ownership, source-rate
+`build/v3-creature-insects-work-01/programs-29/`. Controller ownership, source-rate
 stepping, event latching, and current-owner hook/relocation composition are
 prepared. The same object contains complete calendar/habitat/group spawning and
 the native manager adapter, including optional species masks, source cache timing,
@@ -102,17 +102,24 @@ the insect runtime; its version-two reader/table avoids the occupied password
 bootstrap at `804B4D00`. These consumers require final installation together.
 Nine shared keyframe checks pass, retaining unusual donor keys without sorting,
 clipping, or replacing the animation. No native fixture is restarted.
-Continue directly with the second demo-state and persistent insect-season
-bindings. Retain the prepared player interactions, full field services, and their
-passing host/compiler/composition evidence.
-Continue spawning at its actual remaining consumers: persistent insect-season
-reader/codec and native/GameCube population
+The second demo-state binding uses the checked native Resetti-event flag,
+including its original setter, reader, and four destructor clear paths. The
+separate insect season reader and complete format-eight canonical/format-nine
+compressed codec link in the shared runtime. Stable save-entry composition and
+sanitized full save/migration tests pass, preserving town, collections, fish
+seasons, and all console records. The old save-code padding contains creature
+icons: retain it unchanged, and install the new save code with the insect runtime.
+The 53,168-byte image links at `80656000..80662FAF`, with zero-filled BSS and no
+missing engine symbols; cartridge reservation and startup installation remain
+required. Its report records this distinction. No new ROM is produced.
+Continue spawning at its actual remaining consumer: native/GameCube population
 capacity (two versus eight wild slots, plus the release slot). The prepared
 calendar, terrain/weather, group, and native creation adapter, including the
 colony, are retained.
-The season reader must not write the existing save's reserved bytes: the current
-codec rejects nonzero creature bytes 23..31. Complete the codec/layout decision
-and compatibility warning with that binding, not a volatile substitute.
+Install the season reader with its prepared codec and every stable save redirect,
+never with the old format-seven codec. New format-nine saves migrate forward
+from earlier versions but cannot be loaded by those versions. Preserve backups;
+native save/reload remains unverified. Installed ABI 305 still writes format seven.
 The prepared directed collision filter needs its checked
 `80070398` call-site hook when the complete runtime is installed. Do not replace
 it with ordinary collision or mark the disabled imports playable. Native manager

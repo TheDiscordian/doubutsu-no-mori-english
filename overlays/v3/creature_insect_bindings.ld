@@ -62,4 +62,5 @@ af_insect_bg_context = 0x80126CF8;
 af_insect_native_clip = 0x80136F28;
 af_insect_rtc = 0x80136FBC;
 af_insect_demo_clip = 0x80136F4C;
+af_insect_reset_flag = 0x80137908;
 af_insect_effect_clip = 0x80136F3C;

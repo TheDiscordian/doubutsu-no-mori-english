@@ -51,6 +51,14 @@ af_save_u32 af_v3_creature_profile_byte(af_save_u32 index);
 #define AF_SAVE_CREATURE_BYTES 0u
 #endif
 #define AF_SAVE_STATE (AF_SAVE_CREATURE_OFFSET + AF_SAVE_CREATURE_BYTES)
+#ifdef AF_V3_INSECT_SEASONS
+#ifndef AF_V3_CREATURE_PROFILE
+#error Insect seasons require the complete creature profile
+#endif
+/* Format eight/registry five assigns three formerly reserved creature bytes.
+ * Fish state and every other saved field retain their offsets and sizes. */
+#define AF_SAVE_INSECT_SEASON_OFFSET (AF_SAVE_CREATURE_OFFSET + 23u)
+#endif
 
 enum {
     AF_SAVE_LEGACY = 0, AF_SAVE_OK = 1,
