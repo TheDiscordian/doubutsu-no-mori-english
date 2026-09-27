@@ -71,6 +71,14 @@ creature sound callback and its positioning helper are checked independently;
 the descriptor retains the actual sound ID and excluded transition states.
 Preparing this callback does not install its native audio or lifecycle.
 
+The shared embedded-rig callback owns construction, motion, and both draw streams.
+A checked owner predicate permits mode 13 during native states 6 and 13, where
+ordinary custom callbacks are suppressed. Other modes keep that suppression;
+other states dispatch once as before. Its lazy bootstrap uses the existing packet
+reservation. Every relink restores and verifies the complete original dispatch
+before rebinding the predicate. Original movement/particle/palette/carrying
+contracts normalize only checked installed hooks, retaining all remaining guards.
+
 Creature displays carry source-derived parent identities. Both complete donor
 placement/pickup functions and the fish-index helper establish the carried ID,
 inverse mapping, and official carried name. Display names remain distinct where

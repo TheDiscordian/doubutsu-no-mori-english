@@ -223,6 +223,7 @@ int main(void) {
         assert(plays==old+1 && actor->keyframe.current.f==1.5f && actor->keyframe.speed.f==.5f);
         for (int state=0;state<16;++state) {
             actor->state=(s16)state;actor->changed=1;actor->keyframe.current.f=7;
+            assert(af_v3_room_rig_move_allowed(actor)==1);
             old=plays;af_v3_room_rig_mv(actor,0,&game,model);
             assert(plays==old+2 && actor->keyframe.current.f==8 && actor->changed==1);
         }
@@ -254,5 +255,14 @@ int main(void) {
         af_v3_room_rig_ct(actor,model);af_v3_room_rig_mv(actor,0,&game,model);
         assert(!memcmp(actor,&saved_actor,sizeof saved_actor));*r=good_r;
     }
+    for (unsigned mode=0;mode<=ROOM_RIG_EMBEDDED;++mode) for (int state=-1;state<17;++state) {
+        r->mode=(u8)mode;actor->state=(s16)state;
+        assert(af_v3_room_rig_move_allowed(actor)==(mode==ROOM_RIG_EMBEDDED || (state!=6 && state!=13)));
+    }
+    actor->index=0;actor->state=6;
+    assert(!af_v3_room_rig_move_allowed(actor));
+    actor->index=1048;actor->state=13;af_v3_test_room_rigs.magic=0;
+    assert(!af_v3_room_rig_move_allowed(actor));
+    assert(!af_v3_room_rig_move_allowed(0));
     puts("Shared clock/storage/switch/hit/embedded categories preserve dispatch, time, limits, sound, and actor guards");
 }

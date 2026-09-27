@@ -1,5 +1,31 @@
 # Work record
 
+## 2026-09-27: shared creature transition dispatch
+
+- The preceding stable dresser publication and V3 integration are concrete
+  progress, retained without replay. Continue primary imports, not acquisition.
+- Installed the shared mode-13 exception to native states 6/13. It preserves
+  placement/removal animation without enabling custom movement for other modes.
+  Full owner bytes and relocations guard the hook; ordinary packet refreshes
+  rebind the compiled predicate automatically.
+- The sanitized category test passes after correcting a signedness warning in
+  its new loop. Current-cartridge checks exposed movement-contract overlaps:
+  carrying, needle movement, and palette guards now normalize the exact checked
+  predicate. The carrying guard also normalizes the verified dresser correction;
+  its original full-owner receipt predates that fix. No assertion is removed.
+- ABI 291 at `build/v3-creature-motion-dispatch-02/build-lock.json` passes the
+  current cartridge/dependency/resource/UPS check in 15.218 seconds. ROM SHA-256:
+  `a0af7334ea964f4c82715e87dd68dc4d60cb351e71b6369519da2fa99135b093`.
+  The rebuild from the first dispatch installation also exercises checked
+  rebinding. All sixteen creature objects and 167 existing choices remain;
+  creature profiles stay disabled. Code uses 28,176/32,768 bytes and bootstrap
+  1,294/1,536. Saved format five and existing allocations are unchanged.
+- No native harness construction or emulator replay is performed for these
+  still-disabled profiles. Ordinary creature gameplay and hardware are unverified.
+  Continue shared creature sound conversion/native scheduling and parent readers.
+  Initial donor inspection identifies three category-five triggers; mole cricket
+  needs the native note-bend command, not a truncated replacement sound.
+
 ## 2026-09-27: dresser B cancellation in stable V2 and experimental V3
 
 - Traced the reported issue to the original three-row storage menu and native

@@ -31,9 +31,9 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
-The current proposal is ABI 289 at
-`build/v3-dresser-cancel-03/build-lock.json`, ROM SHA-256
-`627c26ced95dc84b4ce3b6c14bcdcc9525f2e7e0aa8ac54681a385d5763fe2af`.
+The current proposal is ABI 291 at
+`build/v3-creature-motion-dispatch-02/build-lock.json`, ROM SHA-256
+`a0af7334ea964f4c82715e87dd68dc4d60cb351e71b6369519da2fa99135b093`.
 It contains 167 selectable development imports and 100 complete inactive furniture
 profiles whose acquisition is pending. The main lock and both stable V2-14
 deployments are retained.
@@ -66,7 +66,11 @@ arrays, and three sound-callback dependencies are retained. Actual source
 placement/pickup functions establish carried-parent identities and official
 names. These are not seventeen playable imports. All sixteen animated objects
 (74,672 bytes) and the shared embedded-rig callback are installed, with profiles
-disabled pending native identity, lifecycle/audio, and carried-creature integration.
+disabled pending native identity, audio, and carried-creature integration.
+The shared native dispatch preserves creature animation in placement/removal
+states 6 and 13 while retaining other furniture's callback exclusions. Sanitized
+category checks and current cartridge/resource/UPS checks pass; ordinary native
+creature gameplay is not claimed. There is no new resident allocation or save change.
 The static ant remains prepared. Choice counts are unchanged. See the
 [creature checkpoint](checkpoints/V3_CREATURE_PROFILES.md).
 

@@ -6,6 +6,8 @@ CATEGORY='contact-rolling-keyframe-rig'
 PUSH_STATES=(9,11,14,1)
 PULL_STATES=(10,12,2)
 OWNER,OWNER_RAM=0x82D7F0,0x80936710
+DISPATCH=0x80944F7C
+DISPATCH_BEFORE=bytes.fromhex('24010006104100132401000D1041001100000000')
 NATIVE_BLOCKS=(
     ('state_dispatch_table',0x8094D0F4,64,'7a92b223bba1da2db031c25cf15cd144efb9dd44254a00d58498a5e6cceebb5f'),
     ('wait_state_transitions',0x809442CC,140,'a247eb1d17d6035a4a23e75ed315174176c7abde3d894494b0618fd52f22866e'),
@@ -15,9 +17,69 @@ NATIVE_BLOCKS=(
     ('move_callback_dispatch',0x80944F78,88,'88a82e1c648c3e672dd22378e8ab8bc72c095beee1579de0c142c3f479e2ae4d'),
 )
 
-def native_contract(image):
+def embedded_dispatch_bytes(entry):
+    if type(entry) is not int or entry&3 or not 0x804B1800<=entry<0x804B1E00:
+        raise ValueError('Creature motion predicate escapes its checked bootstrap')
+    # a0=s0; call predicate; original zero-result skip to 80944FD0.
+    return struct.pack('>5I',0x02002025,0x0C000000|(entry>>2&0x3FFFFFF),0,0x10400011,0)
+
+
+def restore_embedded_dispatch(owner,runtime):
+    binding=runtime.get('embedded_dispatch')
+    if not binding: return owner
+    entry=runtime['bootstrap']['symbols']['af_v3_room_boot_move_allowed']
+    patch=embedded_dispatch_bytes(entry);at=DISPATCH-OWNER_RAM
+    if (binding.get('address')!=DISPATCH or binding.get('entry')!=entry or
+            binding.get('before')!=DISPATCH_BEFORE.hex() or binding.get('after')!=patch.hex() or
+            not binding.get('installed') or owner[at:at+len(patch)]!=patch):
+        raise ValueError('Changed installed creature transition dispatch')
+    restored=bytearray(owner);restored[at:at+len(patch)]=DISPATCH_BEFORE
+    return bytes(restored)
+
+
+def publish_embedded_dispatch(base,prior,equipment,changes):
+    """Rebind a shared movement-state predicate after every room packet link."""
+    files=by_vrom(base);runtime=equipment['room_rigs']
+    if not any(row.get('mode')==13 for row in runtime['rows']):return
+    owner=changes.get(OWNER,files[OWNER].extract(base))
+    old=prior['equipment_resources']['room_rigs']
+    owner=restore_embedded_dispatch(owner,old)
+    span=next(row for row in NATIVE_BLOCKS if row[0]=='move_callback_dispatch')
+    _,address,size,digest=span
+    if sha256(owner[address-OWNER_RAM:address-OWNER_RAM+size])!=digest:
+        raise ValueError('Changed complete native furniture callback dispatch')
+    relocation=changes.get(0x844400,files[0x844400].extract(base))
+    text,writable,rodata,bss,count=struct.unpack_from('>5I',relocation)
+    for (word,) in struct.iter_unpack('>I',relocation[20:20+count*4]):
+        section,offset=word>>30,word&0xFFFFFF
+        if section not in (1,2,3):raise ValueError('Invalid native room relocation section')
+        at=(0,text,text+writable)[section-1]+offset
+        if DISPATCH-OWNER_RAM<=at<DISPATCH-OWNER_RAM+20:
+            raise ValueError('Creature predicate would overwrite a relocated instruction')
+    entry=runtime['bootstrap']['symbols']['af_v3_room_boot_move_allowed']
+    target=runtime['code']['symbols']['af_v3_room_rig_move_allowed']
+    if f'-DAF_ROOM_MOVE_ALLOWED=0x{target:X}u' not in runtime['bootstrap']['flags']:
+        raise ValueError('Creature predicate lacks its complete checked packet destination')
+    patch=embedded_dispatch_bytes(entry);data=bytearray(owner)
+    data[DISPATCH-OWNER_RAM:DISPATCH-OWNER_RAM+len(patch)]=patch
+    changes[OWNER]=bytes(data)
+    runtime['embedded_dispatch']=dict(address=DISPATCH,entry=entry,target=target,
+        before=DISPATCH_BEFORE.hex(),after=patch.hex(),installed=True,
+        complete_native_dispatch_sha256=digest,relocation_sha256=sha256(relocation),
+        excluded_native_states=[6,13],generic_motion_preserved=True,
+        other_modes_unchanged=True,additional_resident_bytes=0,saved_format_changed=False)
+    runtime['embedded_engine']['runtime_dispatch_installed']=True
+    for row in runtime['rows']:
+        if row.get('mode')==13:
+            row['pending_dependencies']=[s for s in row['pending_dependencies'] if s!='generic native motion dispatch']
+    if runtime.get('music',{}).get('binding'):
+        runtime['music']['binding']['owner_sha256']=sha256(data)
+
+
+def native_contract(image, runtime=None):
     from v3_furniture_contact import native_contract as contact_contract
     contract=contact_contract(image);owner=by_vrom(image)[OWNER].extract(image)
+    if runtime:owner=restore_embedded_dispatch(owner,runtime)
     blocks=[]
     for name,at,n,digest in NATIVE_BLOCKS:
         if sha256(owner[at-OWNER_RAM:at-OWNER_RAM+n])!=digest:

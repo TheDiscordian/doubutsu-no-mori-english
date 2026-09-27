@@ -88,6 +88,8 @@ def native_contract(image,report=None):
         # instruction in the original complete move/draw dependencies.
         for address,name,before in HOOKS:
             owner[address-RAM:address-RAM+8]=bytes.fromhex(before)
+        from v3_furniture_motion import restore_embedded_dispatch
+        owner=restore_embedded_dispatch(owner,report['equipment_resources']['room_rigs'])
     for name,at,n,digest in (
         ('rotation',0x80944358,400,'0b2ec06376e2deefa120ca4dc149b48caaf66869d2c699d856b271ca5fd829a2'),
         ('rotation_waits',0x80944D9C,96,'cdd06a67366b4b6ac64e735671345c797730b79575a69e1042f66f4923bf38d4'),

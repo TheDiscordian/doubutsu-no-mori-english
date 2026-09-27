@@ -22,6 +22,17 @@ AFTER = bytes.fromhex('7F17007E00E9000D')
 SOURCES = ('tools/dresser_menu_fix.py',)
 
 
+def restore_handler(room):
+    """Normalize only the fully checked correction for older owner contracts."""
+    if struct.unpack_from('>I',room,DECISION-ROOM_RAM)[0]!=0x24010002:
+        raise ValueError('Changed installed dresser cancellation comparison')
+    restored=bytearray(room)
+    struct.pack_into('>I',restored,DECISION-ROOM_RAM,0x24010001)
+    if sha256(restored[HANDLER-ROOM_RAM:END-ROOM_RAM])!=HANDLER_SHA:
+        raise ValueError('Changed complete installed dresser action handler')
+    return bytes(restored)
+
+
 def resources(native, base):
     """Resolve banks by original DMA identity, including relocated V3 banks."""
     verified_rom(native)

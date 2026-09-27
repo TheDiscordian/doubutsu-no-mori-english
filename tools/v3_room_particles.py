@@ -46,10 +46,11 @@ def runtime_defines(particles):
         f'AF_EFFECT_PROJECTILE_SOUND=0x{word:X}u')
 
 
-def native_contract(image,original):
-    from v3_furniture_motion import native_contract as motion_contract
+def native_contract(image,original,report=None):
+    from v3_furniture_motion import native_contract as motion_contract,restore_embedded_dispatch
     # Reuse the checked native contact owner, frame cadence, and state mapping.
-    contract=motion_contract(image);files=by_vrom(image);native=by_vrom(original)
+    runtime=report.get('equipment_resources',{}).get('room_rigs') if report else None
+    contract=motion_contract(image,runtime);files=by_vrom(image);native=by_vrom(original)
     blocks=[]
     for name,vrom,ram,at,n in (
         ('random',0x1060,0x80025C60,0x8002C970,48),
@@ -57,7 +58,9 @@ def native_contract(image,original):
         ('debug_initialization',CODE_VROM,CODE_RAM,0x8007A0C0,144),
         ('rotation_and_move',0x82D7F0,0x80936710,0x80944ED4,252)):
         raw=native[vrom].extract(original)[at-ram:at-ram+n]
-        if len(raw)!=n or files[vrom].extract(image)[at-ram:at-ram+n]!=raw:
+        current=files[vrom].extract(image)
+        if vrom==0x82D7F0 and runtime:current=restore_embedded_dispatch(current,runtime)
+        if len(raw)!=n or current[at-ram:at-ram+n]!=raw:
             raise ValueError('Changed native particle binding: '+name)
         blocks.append(dict(name=name,address=at,bytes=n,sha256=sha256(raw)))
     # Rotation is written into the same native halfword before move dispatch.
@@ -121,7 +124,7 @@ def install(base,prior,blob,core,original,output,directory):
         raise ValueError('Changed full particle graphics bank')
     sound=installed_sound(base,prior,core)
     particles=dict(format='AFV3-ROOM-PARTICLES-1',objects=prepared['objects'],source=prepared['source'],
-        native=native_contract(base,original),sound=sound,sound_word=sound['native_sound_word'],
+        native=native_contract(base,original,prior),sound=sound,sound_word=sound['native_sound_word'],
         prepared_directory=str(directory.relative_to(ROOT)),prepared_sha256=sha256((directory/'particles.json').read_bytes()),
         installed=True,native_execution_tested=False)
     start=(len(blob)+15)&~15

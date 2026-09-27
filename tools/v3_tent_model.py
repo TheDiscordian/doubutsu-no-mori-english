@@ -32,13 +32,16 @@ BLOCKS = (
 SOURCES = ('tools/v3_tent_model.py', 'overlays/v3/tent_model.c', 'overlays/v3/tent_model.ld')
 
 
-def native_contract(original, current, *, expected_sha=BASE_SHA):
+def native_contract(original, current, *, expected_sha=BASE_SHA, runtime=None):
     verified_rom(original)
     if sha256(current) != expected_sha:
         raise ValueError('Palette callbacks require the checked source cartridge')
     old, new = by_vrom(original), by_vrom(current)
     room = old[0x82D7F0].extract(original)
     room_now = new[0x82D7F0].extract(current)
+    if runtime:
+        from v3_furniture_motion import restore_embedded_dispatch
+        room_now=restore_embedded_dispatch(room_now,runtime)
     if sha256(room) != '4c67db43a7cebe9a35119621a13bac2fe8cb977cd7ab894b6b5e6b08e1d296a0':
         raise ValueError('Changed complete original furniture owner')
     blocks = []

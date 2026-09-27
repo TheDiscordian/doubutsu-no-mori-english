@@ -80,7 +80,7 @@ def packet_layout(runtime):
 def motion_binding(source,base,report,rows):
     from v3_furniture_motion import native_contract
     from v3_room_movement import checked_binding
-    contract=native_contract(base);sounds=checked_binding(source,base,report)
+    contract=native_contract(base,report['equipment_resources']['room_rigs']);sounds=checked_binding(source,base,report)
     ids=[r['source_item_id'] for r in rows if r.get('mode')==5]
     if any(sounds.get(donor,{}).get('mode')!=1 for donor in ids):
         raise ValueError('Rolling motion needs its complete movement sound integration')
@@ -226,7 +226,7 @@ def install_profiles(base,prior,blob,core,original,output,directories):
                     raise ValueError('Joint rig needs its complete installed source loop/click audio')
             if category==roofs.CATEGORY:
                 initial=roofs.lifecycle(descriptor)
-                if runtime.get('roof_contract')!=roofs.native_contract(source,base):
+                if runtime.get('roof_contract')!=roofs.native_contract(source,base,prior):
                     raise ValueError('Missing complete native house-colour selection')
             if category==ROTATED_CATEGORY:
                 initial=music.lifecycle(descriptor);music.checked_binding(source,base,prior)
@@ -488,16 +488,25 @@ def bind_profiles(source,base,report):
         if runtime.get('needle_contract')!=needle_contract(base,report):
             raise ValueError('Changed installed needle carrying bindings')
     if any(r.get('mode')==7 for r in runtime['rows']):
-        if runtime.get('roof_contract')!=roofs.native_contract(source,base):
+        if runtime.get('roof_contract')!=roofs.native_contract(source,base,report):
             raise ValueError('Changed installed house-colour selection')
     if any(r.get('mode') in (9,10,11) for r in runtime['rows']):
         if runtime.get('reversible_contract')!=reversible.native_contract(base):
             raise ValueError('Changed installed reversible work/persistence binding')
     if any(r.get('mode')==10 for r in runtime['rows']):effect_rigs.checked_native(base)
     if any(r.get('mode')==13 for r in runtime['rows']):
-        if (runtime.get('embedded_engine')!=json.loads(json.dumps(embedded_engine(source))) or
+        expected_engine=json.loads(json.dumps(embedded_engine(source)))
+        expected_engine['runtime_dispatch_installed']=bool(runtime.get('embedded_dispatch',{}).get('installed'))
+        if (runtime.get('embedded_engine')!=expected_engine or
                 '-DAF_V3_ROOM_EMBEDDED' not in runtime['code']['flags']):
             raise ValueError('Changed profile-owned rig source engine or native dispatcher')
+        if runtime.get('embedded_dispatch'):
+            from v3_furniture_motion import native_contract as motion_contract
+            motion_contract(base,runtime)
+            target=runtime['code']['symbols']['af_v3_room_rig_move_allowed']
+            if (runtime['embedded_dispatch']['target']!=target or
+                    f'-DAF_ROOM_MOVE_ALLOWED=0x{target:X}u' not in runtime['bootstrap']['flags']):
+                raise ValueError('Changed complete creature predicate binding')
     if any(r.get('mode')==11 for r in runtime['rows']):
         if runtime.get('dual_contract')!=composite.dual_native_contract(base,report):
             raise ValueError('Changed installed dual-motion scene/contact readers')
@@ -1018,6 +1027,12 @@ def publish_packet(equipment,blob,output,*,core=None):
         material_defines=(f'AF_ROOM_MATERIAL_DW=0x{entry:X}u',)
     scroll_defines=()
     music_defines=()
+    embedded_defines=()
+    if any(row.get('mode')==13 for row in runtime['rows']):
+        entry=symbols['af_v3_room_rig_move_allowed']
+        if entry&3 or not packet_ram<=entry<packet_ram+len(code):
+            raise ValueError('Creature motion predicate escapes its packet')
+        embedded_defines=(f'AF_ROOM_MOVE_ALLOWED=0x{entry:X}u',)
     if radio:
         music_defines=tuple(f'AF_ROOM_MUSIC_{key}=0x{symbols["af_v3_room_music_native_"+name]:X}u'
             for key,name in (('APPLY','apply'),('DISK_DT','disk_dt')))
@@ -1026,7 +1041,7 @@ def publish_packet(equipment,blob,output,*,core=None):
         scroll_defines=publish_scroll(equipment,blob,output)
     boot,bootstrap=compile_part('room_rigs_bootstrap',output/'room_rigs_bootstrap',defines=(
         f'AF_ROOM_RAM=0x{packet_ram:X}u',f'AF_ROOM_VROM=0x{BLOB+at:X}u',f'AF_ROOM_BYTES={packet_bytes}u',f'AF_ROOM_CRC=0x{zlib.crc32(data):X}u',
-        *(f'AF_ROOM_{role.upper()}=0x{entry:X}u' for role,entry in zip(('ct','mv','dw'),entries)),*destroy_defines,*sound_defines,*material_defines,*scroll_defines,*music_defines,
+        *(f'AF_ROOM_{role.upper()}=0x{entry:X}u' for role,entry in zip(('ct','mv','dw'),entries)),*destroy_defines,*sound_defines,*material_defines,*scroll_defines,*music_defines,*embedded_defines,
         *(('AF_ROOM_EFFECTS',) if effects else ()),*(('AF_ROOM_REACTIONS',) if reactions else ()),
         *(('AF_ROOM_COLOURS',) if colours else ())))
     start=equipment['blob_offset'];module=bytearray(blob[start:start+equipment['bytes']])
@@ -1177,7 +1192,7 @@ def extend(base,prior,blob,core,original,output,directories):
     if billboard_binding:installed['billboard_contract']=billboard_binding
     if rolling:installed['motion_contract']=motion_binding(source,base,prior,all_rows)
     if any(r.get('mode')==6 for r in all_rows):installed['joint_contract']=joints.native_contract(base)
-    if any(r.get('mode')==7 for r in all_rows):installed['roof_contract']=roofs.native_contract(source,base)
+    if any(r.get('mode')==7 for r in all_rows):installed['roof_contract']=roofs.native_contract(source,base,prior)
     if any(r.get('mode') in (9,10,11) for r in all_rows):installed['reversible_contract']=reversible.native_contract(base)
     if any(r.get('mode')==10 for r in all_rows):effect_rigs.checked_native(base)
     if any(r.get('mode')==11 for r in all_rows):installed['dual_contract']=composite.dual_native_contract(base,prior)

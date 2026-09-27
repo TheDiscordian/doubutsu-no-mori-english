@@ -33,10 +33,11 @@ def profile_lifecycle(profile,installed):
     return installed is not None and installed==lifecycle(profile)
 
 
-def native_contract(source,base):
+def native_contract(source,base,report=None):
     """Check compiled consumers, not decompilation field names or guessed offsets."""
     original=(ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes()
-    contract=palette_contract(original,base,expected_sha=sha256(base))
+    runtime=report.get('equipment_resources',{}).get('room_rigs') if report else None
+    contract=palette_contract(original,base,expected_sha=sha256(base),runtime=runtime)
     contract.pop('current_source_sha256')
     files=by_vrom(base);core=files[CODE_VROM].extract(base);blocks=[]
     for name,address,n,digest in BLOCKS:

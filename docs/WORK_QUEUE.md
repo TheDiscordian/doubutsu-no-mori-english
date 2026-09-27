@@ -22,9 +22,9 @@ Incomplete gameplay stays unavailable in the selector; installing assets does
 not claim that an item is playable. Reuse unchanged passing tests throughout.
 
 Current task: finish remaining genuine importing categories and representation
-mappings, using the shared converter and the current ABI-289 proposal:
-`build/v3-dresser-cancel-03/build-lock.json`.
-ROM SHA-256: `627c26ced95dc84b4ce3b6c14bcdcc9525f2e7e0aa8ac54681a385d5763fe2af`.
+mappings, using the shared converter and the current ABI-291 proposal:
+`build/v3-creature-motion-dispatch-02/build-lock.json`.
+ROM SHA-256: `a0af7334ea964f4c82715e87dd68dc4d60cb351e71b6369519da2fa99135b093`.
 The dresser cancellation correction is installed in V2 and V3; empty import
 selection returns stable V2-14. Continue the importing work without replaying
 unchanged dresser or museum checks.
@@ -53,7 +53,8 @@ Next importing work:
   arrays, and complete source sound callbacks in
   `build/v3-creature-profiles-prepared-01/`. Sixteen animated objects are installed
   with shared rig callbacks, but profiles remain disabled pending complete native
-  motion dispatch, parent readers, and sound support. Reuse these resources; do not
+  parent readers and sound support. Native motion dispatch is installed, including
+  placement/removal states; reuse its focused checks and these resources. Do not
   create independent furniture options for creature displays or overwrite the
   native herabuna with the donor brook trout. See the
   [creature checkpoint](checkpoints/V3_CREATURE_PROFILES.md).

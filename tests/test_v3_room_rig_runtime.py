@@ -213,6 +213,59 @@ class EmbeddedResourceTests(unittest.TestCase):
         self.assertTrue(all(i not in self.source.runtime_profiles for i in ids))
 
 
+class EmbeddedDispatchTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.out=ROOT/'build/v3-creature-motion-dispatch-02'
+        cls.image,cls.report=inputs(cls.out/'build-lock.json')
+        cls.base,cls.prior=inputs(cls.out/'base-lock.json')
+        cls.blob=by_vrom(cls.image)[BLOB].extract(cls.image)
+        cls.old=by_vrom(cls.base)[BLOB].extract(cls.base)
+        cls.source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+            (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+
+    def test_checked_native_dispatch_retains_resources_and_selection(self):
+        from v3_furniture_motion import OWNER,DISPATCH,OWNER_RAM,restore_embedded_dispatch,native_contract
+        r=self.report['equipment_resources']['room_rigs'];old=self.prior['equipment_resources']['room_rigs']
+        runtime.bind_profiles(self.source,self.image,self.report)
+        native_contract(self.image,r)
+        self.assertTrue(r['embedded_engine']['runtime_dispatch_installed'])
+        self.assertEqual(r['packet']['ram'],old['packet']['ram'])
+        self.assertLessEqual(r['code']['bytes'],r['table_ram']-r['packet']['ram'])
+        self.assertLessEqual(r['bootstrap']['bytes'],runtime.TABLE-runtime.RAM)
+        owner=by_vrom(self.image)[OWNER].extract(self.image)
+        before=by_vrom(self.base)[OWNER].extract(self.base)
+        restored=restore_embedded_dispatch(owner,r)
+        # The shared refresh also relinks the two existing music entries.
+        from v3_room_music import restore_owner
+        before=restore_embedded_dispatch(before,old)
+        self.assertEqual(restore_owner(restored,r['music'],r),restore_owner(before,old['music'],old))
+        at=DISPATCH-OWNER_RAM
+        self.assertEqual(struct.unpack_from('>I',owner,at+12)[0],0x10400011)
+        self.assertEqual(DISPATCH+12+4+17*4,0x80944FD0)
+        for damage in ('instruction','receipt','entry'):
+            data=bytearray(owner);record=copy.deepcopy(r)
+            if damage=='instruction':data[at+8]^=1
+            elif damage=='receipt':record['embedded_dispatch']['before']='00'*20
+            else:record['embedded_dispatch']['entry']+=4
+            with self.subTest(damage=damage),self.assertRaises(ValueError):restore_embedded_dispatch(data,record)
+        creatures=[row for row in r['rows'] if row.get('mode')==13]
+        self.assertEqual((len(creatures),sum(row['bytes'] for row in creatures)),(16,74672))
+        for row in r['rows']:
+            at,n=row['blob_offset'],row['bytes']
+            self.assertEqual(self.blob[at:at+n],self.old[at:at+n])
+            if row.get('mode')!=13:continue
+            self.assertNotIn('generic native motion dispatch',row['pending_dependencies'])
+            self.assertFalse(row['profile_installed'] or row['parent_selectable'])
+            i=slot(int(row['item_id'],16))
+            self.assertEqual(self.blob[ROWS+i*80:ROWS+(i+1)*80],bytes(80))
+        for key in ('save_runtime','save_codec','translation_baseline','staged_furniture','furniture'):
+            self.assertEqual(self.report[key],self.prior[key])
+        self.assertEqual(self.blob[0x20:0xE0],self.old[0x20:0xE0])
+        original=(ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes()
+        self.assertEqual(apply_ups(original,(self.out/'asset-loader.ups').read_bytes()),self.image)
+
+
 class FixedClockIntegrationTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):

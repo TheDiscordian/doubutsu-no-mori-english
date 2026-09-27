@@ -340,6 +340,15 @@ void af_v3_room_rig_ct(RoomRig *actor,u8 *data) {
     cKF_SkeletonInfo_R_play(&actor->keyframe);
 }
 
+#ifdef AF_V3_ROOM_EMBEDDED
+int af_v3_room_rig_move_allowed(const RoomRig *actor) {
+    if (!actor) return 0;
+    if (actor->state!=6 && actor->state!=13) return 1;
+    const RoomRigRecord *r=find(actor->index);
+    return r && r->mode==ROOM_RIG_EMBEDDED;
+}
+#endif
+
 void af_v3_room_rig_mv(RoomRig *actor,void *room,RoomRigGame *game,u8 *data) {
     FloatWord high,idle,step;
     (void)room;(void)game;

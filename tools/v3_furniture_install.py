@@ -763,6 +763,15 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
     if equipment_report and equipment_report.get('room_rigs',{}).get('music'):
         from v3_room_music import publish_owner
         publish_owner(base,prior,equipment_report,owner_changes)
+    if equipment_report and equipment_report.get('room_rigs',{}).get('embedded_engine'):
+        from v3_furniture_motion import publish_embedded_dispatch,OWNER as room_owner
+        publish_embedded_dispatch(base,prior,equipment_report,owner_changes)
+        digest=sha256(owner_changes[room_owner])
+        for name,path in (('furniture_placement',('owner_sha256',)),
+                          ('furniture_behaviours',('contacts','native_owner_sha256'))):
+            updated=copy.deepcopy(report_updates.get(name,prior[name]));row=updated
+            for key in path[:-1]:row=row[key]
+            row[path[-1]]=digest;report_updates[name]=updated
     if equipment_report:
         if held_catalogue_art is not None or wrapped_names:
             display_report,alias_report=display_aliases.install(

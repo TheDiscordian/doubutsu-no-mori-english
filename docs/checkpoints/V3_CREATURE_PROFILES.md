@@ -13,14 +13,14 @@ and `1CE8..1D04`, at four-ID intervals. Source placement and pickup functions
 resolve their actual carried parents. This is not a claim of seventeen new
 native species: the brook-trout source slot must not replace native herabuna.
 
-ABI 288 is the current cartridge at
-`build/v3-creature-rig-resources-01/rig-runtime/build-lock.json`, ROM SHA-256
-`0c06c17001c78c63ef39a615be3458cbe95e3eb023518a48f2257ad430702937`.
+ABI 291 is the current cartridge at
+`build/v3-creature-motion-dispatch-02/build-lock.json`, ROM SHA-256
+`a0af7334ea964f4c82715e87dd68dc4d60cb351e71b6369519da2fa99135b093`.
 The shared importer installs all sixteen animated objects, reusing 74,672 bytes
 without recompilation, and extends the room-rig packet from 42 to 58 records.
 There are still 167 selectable choices and 100 complete inactive furniture
 profiles. Creature profiles remain disabled, and the static ant is prepared only.
-Neither the main lock nor either stable V2-13 deployment changes.
+Neither the main lock nor either stable V2-14 deployment changes.
 
 The common embedded-rig callback preserves initial half-frame advancement, two
 half-frame updates per native tick, complete joint arrays, and opaque/translucent
@@ -29,8 +29,19 @@ furniture options. Four focused source, sanitized callback, cartridge retention,
 UPS, and repeat-planning checks pass. No emulator or hardware result is claimed.
 The current 12-KiB bank and format-five saved data are unchanged.
 
-Before enabling profiles, connect the native generic motion path during fade
-states: ordinary custom callbacks skip states 6 and 13. The source creature sound
+The native generic motion path preserves animation during fade states 6 and 13.
+Its guarded 20-byte owner hook calls a resident predicate; only validated mode-13
+records bypass those states' custom-callback exclusion. Other furniture retains
+the original rule. Complete native movement contracts verify and normalize only
+the exact installed hook. Shared packet refreshes rebind it automatically.
+The room packet uses 28,176 of 32,768 code bytes; its bootstrap uses 1,294 of
+1,536 bytes. No additional RAM, object copies, selection, or save bytes are added.
+The sanitized category check covers the state predicate, constructor, motion,
+and drawing bounds. The current cartridge check verifies installed dependencies,
+all retained objects, disabled profiles, damaged-hook rejection, and full UPS
+reconstruction. No new emulator or hardware result is claimed.
+
+The source creature sound
 helper schedules timed, randomized triggers, not ordinary furniture sound loops.
 The native tables lack all three required donor sound entries; complete sound
 programs and table integration remain required alongside carried-parent readers.
@@ -46,8 +57,8 @@ those lists from the object.
 
 Mole cricket, mosquito, and frog share a checked complete movement callback,
 with source sound IDs 66, 67, and 65 respectively. Their full callback and
-positioning-helper receipts remain explicit dependencies; native playback and
-transition-state mapping are not yet installed. No callback is replaced with
+positioning-helper receipts remain explicit dependencies; native playback is
+not yet installed. No callback is replaced with
 a static approximation.
 
 The source parent resolver checks both complete forward/inverse functions and

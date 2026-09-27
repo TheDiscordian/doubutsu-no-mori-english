@@ -125,6 +125,12 @@ def checked_binding(image,report):
     if runtime.get('music'):
         from v3_room_music import restore_owner
         owner=restore_owner(owner,runtime['music'],runtime)
+    if runtime.get('embedded_dispatch'):
+        from v3_furniture_motion import restore_embedded_dispatch
+        owner=restore_embedded_dispatch(owner,runtime)
+    if report.get('translation_updates',{}).get('dresser_menu'):
+        from dresser_menu_fix import restore_handler
+        owner=restore_handler(owner)
     if (sha256(owner)!=binding['owner_sha256'] or sha256(reloc)!=binding['relocation_sha256'] or
             not binding['installed'] or len(binding['hooks'])!=len(HOOKS)):
         raise ValueError('Changed complete installed carrying owner')

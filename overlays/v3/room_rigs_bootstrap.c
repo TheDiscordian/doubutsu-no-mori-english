@@ -60,6 +60,14 @@ void af_v3_room_boot_dt(RoomRig *actor,u8 *data) {
 void af_v3_room_boot_mv(RoomRig *actor,void *room,RoomRigGame *game,u8 *data) {
     call4(actor,room,game,data,(RoomEntry4)AF_ROOM_MV,load);
 }
+#ifdef AF_ROOM_MOVE_ALLOWED
+int af_v3_room_boot_move_allowed(const RoomRig *actor) {
+    if (!actor) return 0;
+    if (actor->state!=6 && actor->state!=13) return 1;
+    if (!load()) return 0;
+    return ((int (*)(const RoomRig *))AF_ROOM_MOVE_ALLOWED)(actor);
+}
+#endif
 void af_v3_room_boot_dw(RoomRig *actor,void *room,RoomRigGame *game,u8 *data) {
     call4(actor,room,game,data,(RoomEntry4)AF_ROOM_DW,load);
 }
