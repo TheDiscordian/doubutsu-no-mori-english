@@ -1,5 +1,82 @@
 # Automatic furniture pipeline checkpoint
 
+## Installed reversible lifecycle and save capture
+
+The ordinary category importer installs the complete matryoshka, reusing the
+4,512-byte prepared object without graphics recompilation. Mode 9 retains eleven
+joints, five shown models, 85 triangles, all motion channels, idle-only reversal,
+both sound triggers, and destruction. Legacy source `1FB8` receives append-only
+destination `3C44`, runtime index 1809; worksheet row 1156 has no native mapping.
+The actual `ftr_listJonason` reward route, non-orderable catalogue entry, scoring,
+3,920-Bell source price, and official `ftrName_table` name are connected. The
+single provenance catalogue credits that name to the supplied official donor.
+
+- Checked lock: `build/v3-reversible-rig-imports-03/cartridge/build-lock.json`, ABI 263.
+- ROM SHA-256: `2b26b5ff628d850baeade5b536eacaaf331943debc936624d9e6cda56d531232`.
+- UPS SHA-256: `6f1a7f142148cade1d2b07738cdcd61bb0564b33ea6fa584717509a7a3275a31`.
+- Complete object SHA-256: `1e09bbadf6edf02427419da8927230e2b9b510328ef52a530fc3f5c9ab13c4f1`.
+- Room code: 21,792 of 32,768 bytes, SHA-256 `a1a546a2ca5f02b03a2310ad98452b91c2995a8bd6dc8b032d06e3b54d5725dc`.
+- Bootstrap: 1,142 of 1,536 bytes, SHA-256 `6da49a2e6920381942a7a8f0d16a4b6c5052505946f7cd0242a8dad5fe3a7ced`.
+- Room packet SHA-256: `49e4bfcbe91969d343f685bb58595cdc597806ecf0a1f8d88ede116819e0572a`.
+- Development choices: 161. Neither stable V2 deployment changes.
+
+N64 captures switch flags before destruction. The adapter therefore synchronizes
+the native switch with the accepted internal state after construction and each
+two-step update. Busy presses do not change the saved state. The real destructor
+is also connected for all three native removal paths. Complete native keyframe,
+drawing, input-toggle, switch-capture, and removal code are guarded. The larger
+joint arrays occupy `390..45F` in unused matrix slots; all existing actors,
+saved fields, and carrying/loose-item packets retain their layouts.
+
+The shared bootstrap uses two- and four-argument helpers to retain arguments
+while loading and verifying the correct packet. It preserves DMA/CRC rejection,
+writeback/invalidation order, cold state reset, and independent scrolling cache.
+No callback enters an unverified packet. The complete trigger programme adds
+one instrument, bringing the shared font to 97. Its valid one-step envelope
+extends the shared parser, retaining all notes, rests, and source durations;
+empty or malformed envelopes remain rejected.
+
+Ten focused checks pass: three changed resource/dispatch/bootstrap tests, two
+installed/composition tests, the new short-envelope check, three shared audio
+format checks, and the affected shared rig-category dispatcher. The dispatcher
+runs 1,440 updates under address/undefined-behaviour sanitizers, checking both
+index forms, initial states, ignored/accepted presses, all hidden-joint writes,
+both matrix buffers, saved switches before destruction, and guards. The loader
+check exercises eleven entries under UBSan, with cold/warm and DMA/CRC-failure
+paths. The fixed native addresses are explicitly mapped; ASan is not used for
+that loader fixture. Installed checks verify complete artwork, restored source
+sound programme, full instrument/sample identities, retained resources, unchanged
+saved codec, only the new profile bit, and original-ROM UPS reconstruction.
+Four private browser/offline compositions match, including no-import output.
+The unchanged reversible core retains its recorded 4,324 actual donor comparisons;
+that historical test is not replayed or called new native evidence.
+
+The first category run leaves a complete rig-only lock under
+`build/v3-reversible-rig-imports-01/rig-runtime/`. Resuming from that lock exposes
+the one-step envelope rejection; `-03` completes audio, profiles, and ordinary
+imports after the parser correction, without replaying the completed rig build.
+The first dispatcher compile finds two signedness warnings in the fixture;
+the corrected single retry passes. No historical emulator build is replayed.
+
+This remains experimental. Native execution, ordinary graphics/audio synthesis,
+a save/reload with this item, and original hardware are unverified. Saved format
+4 is unchanged, but saves using this added profile require matching or larger
+compatible selections; they must not be loaded in ABI 259 or V2 as though the new
+item existed there. Preserve backups. Empty selection still reproduces the
+pinned V2-12 baseline; align it with V2-13 before the V3 handoff. The main lock
+and both stable deployments are unchanged. Continue full crab-stew, radio,
+treasure-chest, and console behaviours before acquisition-only work.
+
+```sh
+python3 tools/v3_furniture_pipeline.py import \
+  --base-lock build/v3-material-rig-imports-01/cartridge/build-lock.json \
+  --category reversible-keyframe-rig-assets \
+  --reuse-assets build/v3-reversible-rigs-prepared-01 \
+  --output build/v3-reversible-rig-reproduction
+V3_REVERSIBLE_BATCH=build/v3-reversible-rig-reproduction \
+  python3 -m unittest tests.test_v3_reversible_rigs.InstalledTests -v
+```
+
 ## Prepared reversible motion and large joint work
 
 The shared `reversible-keyframe-rig-assets` recogniser retains complete

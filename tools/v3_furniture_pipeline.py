@@ -24,7 +24,7 @@ from v3_registry import FURNITURE, LEGACY_FURNITURE, furniture_identity, furnitu
 from v3_room_aliases import discover as room_aliases, pending_reason as room_alias_reason
 from v3_villager_art import native_palette, normalise_vertex_flags
 
-VERSION = 32
+VERSION = 33
 PENDING_MOVE_CATEGORY = 'static-models-pending-move'
 PENDING_SEQUENCE_CATEGORY = 'constant-model-sequence-pending-lifecycle'
 SELECTED_PALETTE_CATEGORY = 'selected-palette-fade-assets'
@@ -1363,13 +1363,13 @@ def convert(source, worksheet, output, selected=(), installed=None, *, assets_on
 
 def rig_import_plan(inventory, report, bindings, selected=(), category=None, *, source=None):
     """Plan shared dependencies, not per-item installers or acquisition guesses."""
-    from v3_furniture_rigs import CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY,ROLLING_CATEGORY,MATERIAL_RIG_CATEGORY
+    from v3_furniture_rigs import CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY,ROLLING_CATEGORY,MATERIAL_RIG_CATEGORY,REVERSIBLE_CATEGORY
     from v3_furniture_materials import CATEGORY as MATERIAL_CATEGORY,initializer_lifecycle,steam_lifecycle,switched_lifecycle
     from v3_furniture_scroll import CATEGORY as SCROLL_CATEGORY,draw_only_lifecycle
     from v3_furniture_reactions import source_lifecycle as reaction_lifecycle,colour_lifecycle
     from v3_sound_programs import furniture_trigger,furniture_level
     from v3_furniture_joint_rigs import CATEGORY as JOINT_CATEGORY,lifecycle as joint_lifecycle
-    categories={CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY,ROLLING_CATEGORY,MATERIAL_RIG_CATEGORY,SELECTED_PALETTE_CATEGORY}
+    categories={CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY,ROLLING_CATEGORY,MATERIAL_RIG_CATEGORY,REVERSIBLE_CATEGORY,SELECTED_PALETTE_CATEGORY}
     candidates=[r for r in inventory['rows'] if r.get('asset_ready') and not r['installed'] and
         not r.get('room_alias') and (not selected or r['item_id'] in selected) and
         (category is None or category in r['categories'])]

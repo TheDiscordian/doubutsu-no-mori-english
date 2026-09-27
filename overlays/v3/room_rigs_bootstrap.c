@@ -38,18 +38,34 @@ static int load(void) {
     *ready=AF_ROOM_CRC;
     return 1;
 }
-void af_v3_room_boot_ct(RoomRig *actor,u8 *data) {
-    if (load()) ((void (*)(RoomRig *,u8 *))AF_ROOM_CT)(actor,data);
+typedef void (*RoomEntry2)(RoomRig *,u8 *);
+typedef void (*RoomEntry4)(RoomRig *,void *,RoomRigGame *,u8 *);
+/* Share argument preservation and checked loading across callback entries.
+   Every entry, including destruction, still validates its resident packet. */
+static __attribute__((noinline)) void call2(RoomRig *actor,u8 *data,RoomEntry2 entry,int (*loader)(void)) {
+    if (loader()) entry(actor,data);
 }
+static __attribute__((noinline)) void call4(RoomRig *actor,void *room,RoomRigGame *game,u8 *data,
+                                          RoomEntry4 entry,int (*loader)(void)) {
+    if (loader()) entry(actor,room,game,data);
+}
+void af_v3_room_boot_ct(RoomRig *actor,u8 *data) {
+    call2(actor,data,(RoomEntry2)AF_ROOM_CT,load);
+}
+#ifdef AF_ROOM_DT
+void af_v3_room_boot_dt(RoomRig *actor,u8 *data) {
+    call2(actor,data,(RoomEntry2)AF_ROOM_DT,load);
+}
+#endif
 void af_v3_room_boot_mv(RoomRig *actor,void *room,RoomRigGame *game,u8 *data) {
-    if (load()) ((void (*)(RoomRig *,void *,RoomRigGame *,u8 *))AF_ROOM_MV)(actor,room,game,data);
+    call4(actor,room,game,data,(RoomEntry4)AF_ROOM_MV,load);
 }
 void af_v3_room_boot_dw(RoomRig *actor,void *room,RoomRigGame *game,u8 *data) {
-    if (load()) ((void (*)(RoomRig *,void *,RoomRigGame *,u8 *))AF_ROOM_DW)(actor,room,game,data);
+    call4(actor,room,game,data,(RoomEntry4)AF_ROOM_DW,load);
 }
 #ifdef AF_ROOM_SOUND_MV
 void af_v3_room_boot_sound_mv(void *actor,void *room,RoomRigGame *game,u8 *data) {
-    if (load()) ((void (*)(void *,void *,RoomRigGame *,u8 *))AF_ROOM_SOUND_MV)(actor,room,game,data);
+    call4(actor,room,game,data,(RoomEntry4)AF_ROOM_SOUND_MV,load);
 }
 #endif
 #ifdef AF_ROOM_SCROLL_DW
@@ -68,17 +84,17 @@ static int load_scroll(void) {
     return 1;
 }
 void af_v3_room_boot_scroll_dw(RoomRig *actor,void *room,RoomRigGame *game,u8 *data) {
-    if (load_scroll()) ((void (*)(RoomRig *,void *,RoomRigGame *,u8 *))AF_ROOM_SCROLL_DW)(actor,room,game,data);
+    call4(actor,room,game,data,(RoomEntry4)AF_ROOM_SCROLL_DW,load_scroll);
 }
 #ifdef AF_ROOM_SCROLL_CT
 void af_v3_room_boot_scroll_ct(RoomRig *actor,u8 *data) {
-    if (load_scroll()) ((void (*)(RoomRig *,u8 *))AF_ROOM_SCROLL_CT)(actor,data);
+    call2(actor,data,(RoomEntry2)AF_ROOM_SCROLL_CT,load_scroll);
 }
 void af_v3_room_boot_scroll_mv(RoomRig *actor,void *room,RoomRigGame *game,u8 *data) {
-    if (load_scroll()) ((void (*)(RoomRig *,void *,RoomRigGame *,u8 *))AF_ROOM_SCROLL_MV)(actor,room,game,data);
+    call4(actor,room,game,data,(RoomEntry4)AF_ROOM_SCROLL_MV,load_scroll);
 }
 void af_v3_room_boot_scroll_dt(RoomRig *actor,u8 *data) {
-    if (load_scroll()) ((void (*)(RoomRig *,u8 *))AF_ROOM_SCROLL_DT)(actor,data);
+    call2(actor,data,(RoomEntry2)AF_ROOM_SCROLL_DT,load_scroll);
 }
 #ifdef AF_ROOM_SCROLL_MOVE_SOUND
 void af_v3_room_boot_scroll_move_sound(u32 floor,float *position) {
@@ -89,6 +105,6 @@ void af_v3_room_boot_scroll_move_sound(u32 floor,float *position) {
 #endif
 #ifdef AF_ROOM_MATERIAL_DW
 void af_v3_room_boot_material_dw(RoomRig *actor,void *room,RoomRigGame *game,u8 *data) {
-    if (load()) ((void (*)(RoomRig *,void *,RoomRigGame *,u8 *))AF_ROOM_MATERIAL_DW)(actor,room,game,data);
+    call4(actor,room,game,data,(RoomEntry4)AF_ROOM_MATERIAL_DW,load);
 }
 #endif

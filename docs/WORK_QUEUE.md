@@ -21,32 +21,35 @@ prevent asset/data conversion or redirect work from an unfinished shared format.
 Incomplete gameplay stays unavailable in the selector; installing assets does
 not claim that an item is playable. Reuse unchanged passing tests throughout.
 
-Current task: finish reversible-rig cartridge integration. Complete matryoshka
-artwork and the source-compared motion/destruction core are prepared; connect
-the extended joint workspace, checked native drawer/owner, sound, destruction
-callback, and stable additive identity through the shared importer. The existing
-room bootstrap has only 27 bytes spare, so retain loader verification while
-sharing its dispatch code or safely extending its reservation; do not omit
-destruction or enter unloaded resident code. Prepared art is at
-`build/v3-reversible-rigs-prepared-01/`, and the compiled core is at
-`build/v3-reversible-rig-code-01/`. Reuse both focused checks and do not replay old
-native fixtures. See the
-[reversible checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#prepared-reversible-motion-and-large-joint-work).
+Current task: complete the remaining combined reversible/material/effect
+lifecycles, beginning with crab stew's full fire/steam and delayed switching,
+then continue the actual radio/chest and console launch/storage categories.
+Reuse installed skeleton, reversible, material, audio, and effect machinery;
+do not add per-item installers or omit unique behaviour.
+
+The complete matryoshka is installed through the ordinary category importer,
+including all eleven joints, both motion directions, full sound, destruction,
+saved-switch synchronization, and the actual Gulliver route. Ten focused checks
+pass; the unchanged core retains its 4,324 donor comparisons. No native gameplay,
+ordinary save cycle with this item, GPU/audio synthesis, or hardware evidence is
+claimed. The shared callback loader uses 1,142 of 1,536 bytes, including checked
+destruction dispatch. See the
+[reversible checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#installed-reversible-lifecycle-and-save-capture).
 
 Then continue the remaining actual model/lifecycle and console launch/storage
 categories without per-item installers. Unconverted records include aerobics
 radio, crab stew, and treasure chest. Reuse complete source resources and the
 shared skeleton/material/reversible behaviour support throughout.
 
-The checked current proposal is ABI 259 at
-`build/v3-material-rig-imports-01/cartridge/build-lock.json`, ROM SHA-256
-`ca2fe179ac59068159f24120d402e43d0818f7f19427f281696bed08b270cd76`.
+The checked current proposal is ABI 263 at
+`build/v3-reversible-rig-imports-03/cartridge/build-lock.json`, ROM SHA-256
+`2b26b5ff628d850baeade5b536eacaaf331943debc936624d9e6cda56d531232`.
 The combined skeleton/material category imports the complete hamster cage,
 including source movement/texture timing, positioned sound, actual lottery
 availability, catalogue ordering, scoring, and official English text. Five focused
 checks pass; native execution, ordinary appearance/synthesis, and hardware remain
-unverified. There are 160 enabled development choices and no saved-format change.
-Shared room code uses 21,136 of 32,768 bytes; bootstrap uses 1,509 of 1,536.
+unverified. There are 161 enabled development choices and no saved-format change.
+Shared room code uses 21,792 of 32,768 bytes; bootstrap uses 1,142 of 1,536.
 See the [combined-animation checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#installed-combined-skeleton-and-material-animation).
 
 The harvest TV's complete switched-screen lifecycle is installed through the

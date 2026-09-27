@@ -1,6 +1,9 @@
 /* Complete shared room rigs; each record retains its actual behaviour. */
 #include "room_rigs.h"
 #include "room_motion.h"
+#ifdef AF_V3_ROOM_REVERSIBLE
+#include "room_reversible.h"
+#endif
 #ifdef AF_V3_ROOM_MATERIALS
 #include "room_materials.h"
 #endif
@@ -135,11 +138,21 @@ static const RoomRigRecord *find(u32 index) {
         }
 #endif
         if (r->index<1024 || r->index>=2048 || r->bytes<32 || r->bytes>9216 || (r->bytes&15) ||
-                !r->joints || r->joints>8 || !r->shown || r->shown>r->joints ||
+                !r->joints || !r->shown || r->shown>r->joints ||
+#ifdef AF_V3_ROOM_REVERSIBLE
+                (r->mode==ROOM_RIG_REVERSIBLE ? (r->joints>16 || r->shown>6) : r->joints>8) ||
+#else
+                r->joints>8 ||
+#endif
                 (r->skeleton&3) || r->skeleton<0x06000000u || r->skeleton>0x06000000u+r->bytes-8 ||
                 (r->animation&3) || r->animation<0x06000000u || r->animation>0x06000000u+r->bytes-20) return 0;
 #ifdef AF_V3_ROOM_RIG_PACKET
-        if (r->reserved || r->mode>ROOM_RIG_MATERIAL || r->mode==ROOM_RIG_ROOF) return 0;
+        if (r->reserved || r->mode>ROOM_RIG_REVERSIBLE || r->mode==ROOM_RIG_ROOF) return 0;
+#if defined(AF_V3_ROOM_REVERSIBLE) && defined(AF_V3_ROOM_TRIGGER_SOUND)
+        if (r->mode==ROOM_RIG_REVERSIBLE && (r->last.bits || r->first.bits<0x3F800000u || r->first.bits>0x46FFFE00u)) return 0;
+#else
+        if (r->mode==ROOM_RIG_REVERSIBLE) return 0;
+#endif
 #ifdef AF_V3_ROOM_MATERIAL_RIG
         if (r->mode==ROOM_RIG_MATERIAL && (r->last.bits || (r->first.bits&3) ||
                 r->first.bits<0x06000000u || r->first.bits>0x06000000u+r->bytes-32)) return 0;
@@ -210,6 +223,14 @@ void af_v3_room_rig_ct(RoomRig *actor,u8 *data) {
     u8 *skeleton=Lib_SegmentedToVirtual((void *)(uptr)r->skeleton);
     void *animation=Lib_SegmentedToVirtual((void *)(uptr)r->animation);
     if (skeleton[0]!=r->joints || skeleton[1]!=r->shown) return;
+#ifdef AF_V3_ROOM_REVERSIBLE
+    if (r->mode==ROOM_RIG_REVERSIBLE) {
+        af_v3_room_reverse_ct(actor,skeleton,animation,r->first.f);
+        /* N64 captures switch flags before destruction, unlike the donor.
+           Keep its persistence input equal to the accepted internal state. */
+        af_v3_room_reverse_dt(actor);return;
+    }
+#endif
     cKF_SkeletonInfo_R_ct(&actor->keyframe,skeleton,animation,actor->joint,actor->morph);
 #ifdef AF_V3_ROOM_RIG_PACKET
     if (r->mode==ROOM_RIG_STORAGE || r->mode==ROOM_RIG_HIT ||
@@ -259,6 +280,16 @@ void af_v3_room_rig_mv(RoomRig *actor,void *room,RoomRigGame *game,u8 *data) {
     if (r->mode==ROOM_RIG_ROOF) { af_v3_roof_mv(actor,room,game,data);return; }
 #endif
 #ifdef AF_V3_ROOM_RIG_PACKET
+#if defined(AF_V3_ROOM_REVERSIBLE) && defined(AF_V3_ROOM_TRIGGER_SOUND)
+    if (r->mode==ROOM_RIG_REVERSIBLE) {
+        const RoomSoundRecord *sound=sound_record(actor->index);
+        if (!sound) return;
+        af_v3_room_reverse_step(actor,r->first.f,sound->word,actor->changed);
+        af_v3_room_reverse_step(actor,r->first.f,sound->word,0);
+        af_v3_room_reverse_dt(actor);
+        return;
+    }
+#endif
 #ifdef AF_V3_ROOM_MATERIAL_RIG
     if (r->mode==ROOM_RIG_MATERIAL) {
         const RoomRigMaterial *p=rig_material(r,data);
@@ -424,8 +455,16 @@ void af_v3_room_rig_dw(RoomRig *actor,void *room,RoomRigGame *game,u8 *data) {
     cKF_Si3_draw_R_SV(game,&actor->keyframe,actor->matrices[game->frame&1],
 #ifdef AF_V3_ROOM_RIG_PACKET
                     r->mode==ROOM_RIG_CLOCK ? (void *)clock_before : (void *)0,(void *)0,
-                    r->mode==ROOM_RIG_MATERIAL ? (void *)actor : (void *)r);
+                    r->mode==ROOM_RIG_MATERIAL ? (void *)actor : r->mode==ROOM_RIG_REVERSIBLE ? (void *)0 : (void *)r);
 #else
                     (void *)0,(void *)0,(void *)0);
 #endif
 }
+
+#ifdef AF_V3_ROOM_REVERSIBLE
+void af_v3_room_rig_dt(RoomRig *actor,u8 *data) {
+    if (!actor || !data) return;
+    const RoomRigRecord *r=find(actor->index);
+    if (r && r->mode==ROOM_RIG_REVERSIBLE) af_v3_room_reverse_dt(actor);
+}
+#endif

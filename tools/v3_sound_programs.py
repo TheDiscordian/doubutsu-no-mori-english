@@ -65,7 +65,7 @@ def trigger_program(sequence, origin, limit):
     if envelope is not None:
         if not at<=envelope<len(data) or any(data[at:envelope]):
             raise ValueError('Unaccounted trigger layer bytes')
-        envelope_bytes=len(extended_envelope(data,envelope));at=envelope+envelope_bytes
+        envelope_bytes=len(extended_envelope(data,envelope,minimum_steps=1));at=envelope+envelope_bytes
     if len(data)-at>15 or any(data[at:]):raise ValueError('Unaccounted complete trigger tail')
     return dict(origin=origin,bytes=len(data),sha256=sha256(data),selector=data[1],instrument=data[2],
         pointers=pointers,envelope=envelope,envelope_bytes=envelope_bytes,decay=decay,events=events,
@@ -256,6 +256,9 @@ def furniture_trigger(source,profile):
     functions=adapter.get('functions',{})
     if adapter.get('category')=='switch-hit-keyframe-rig':
         if set(functions)!={'create','move','draw'}:raise ValueError('Changed complete hit-rig lifecycle')
+        return copy.deepcopy(adapter['trigger'])
+    if adapter.get('category')=='reversible-keyframe-rig-assets':
+        if set(functions)!={'create','move','draw','destroy'}:raise ValueError('Changed complete reversible-rig lifecycle')
         return copy.deepcopy(adapter['trigger'])
     if adapter.get('category')=='switch-trigger-sound':
         if set(functions)!={'move'}:raise ValueError('Changed ordinary trigger lifecycle')

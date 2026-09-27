@@ -19,6 +19,22 @@ OUTPUT=ROOT/os.environ.get('V3_PLAYER_FRAME_BUILD','build/v3-player-frame-sound-
 
 
 class ProgramTests(unittest.TestCase):
+    def test_trigger_preserves_one_step_envelope_repeated_notes_and_rests(self):
+        raw=bytearray.fromhex('eb0102880007ffcb0000ff64023cc00270033cc01464023cff')
+        raw.extend(bytes(len(raw)&1));envelope=len(raw)
+        struct.pack_into('>H',raw,8,envelope);raw.extend(struct.pack('>4h',1,32000,-1,0))
+        desc=sounds.trigger_program(raw,0,len(raw))
+        self.assertEqual(desc['envelope_bytes'],8);self.assertEqual(desc['duration'],29)
+        bound=sounds.bind_trigger(raw,desc,0x4200,1,7)
+        actual=sounds.trigger_program(bytes(0x4200)+bound,0x4200,0x4200+len(bound))
+        self.assertEqual(actual['events'],desc['events'])
+        restored=bytearray(bound);restored[2]=raw[2]
+        for at in desc['pointers']:restored[at:at+2]=raw[at:at+2]
+        self.assertEqual(restored,raw)
+        for tail in (struct.pack('>2h',-1,0),struct.pack('>4h',0,32000,-1,0),struct.pack('>4h',1,32000,-1,1)):
+            bad=raw[:envelope]+tail
+            with self.assertRaises(ValueError):sounds.trigger_program(bad,0,len(bad))
+
     def test_leading_rests_and_odd_program_origin_preserve_timing_and_envelope_alignment(self):
         origin=1
         raw=bytearray(b'\x88'+struct.pack('>H',origin+4)+b'\xFF\xC0\x07\xC0\x81\x02\xC6\x09\xCB\x00\x00\xE0\xC4')

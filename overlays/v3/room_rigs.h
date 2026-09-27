@@ -104,6 +104,7 @@ typedef struct {
 #define ROOM_RIG_JOINT 6u
 #define ROOM_RIG_ROOF 7u
 #define ROOM_RIG_MATERIAL 8u
+#define ROOM_RIG_REVERSIBLE 9u
 #ifdef AF_V3_ROOM_MATERIAL_RIG
 /* Explicit big-endian halfwords keep immutable object data portable to the
    host checks as well as the native big-endian target. */

@@ -4,10 +4,43 @@ The category retains larger skeletons without dropping hidden joints. Runtime
 installation remains separate from complete artwork preparation.
 """
 import struct
-from aflib import sha256,u32
+from aflib import sha256,u32,by_vrom,CODE_RAM,CODE_VROM
 from v3_keyframes import skeleton,animation,model_descriptor
 
 CATEGORY='reversible-keyframe-rig-assets'
+
+
+def native_contract(image):
+    """Bind complete joint writes/drawing, switch capture, and removal calls.
+
+    N64 captures switches before running destruction callbacks. The adapter
+    mirrors the source's accepted state at construction and after each update,
+    so native capture sees exactly what the donor destructor would save.
+    """
+    files=by_vrom(image);blocks=[]
+    for name,vrom,ram,first,end,digest in (
+        ('complete_keyframe',CODE_VROM,CODE_RAM,0x80052228,0x80053170,
+         'a679eb71044555e00abb8c4d209c643c3060dd1e19bfe0fc327397ee38d2d98c'),
+        ('custom_draw',0x82D7F0,0x80936710,0x80946F40,0x80947024,
+         'ef2702cf6e4dfba3ad3e09cf2aa01ea5feaf4484e1b0dc32e47244214129698c'),
+        ('switch_capture',0x82D7F0,0x80936710,0x80937020,0x80937140,
+         '734f8fb7c2fe2d7e1ec4945f9e86bdf365a3d6e39723d194f10e6db999dd4f74'),
+        ('toggle_input',0x82D7F0,0x80936710,0x80936E74,0x80936E98,
+         '4dbc0892ba2cebfe2ee0a343779b9a56be3ea59035edac1eb33ee403d2b4061b'),
+        ('destroy_all',0x82D7F0,0x80936710,0x8093B88C,0x8093B9B4,
+         '95f7b73f8bf9e5bb78fe46e6b829afbfec9c9acaa10ed06aecf4cf3b64a80b23'),
+        ('remove_actor',0x82D7F0,0x80936710,0x80944B74,0x80944CA0,
+         'a779103d669954c65b93987f0e56f031ff8d96237bd4fb57472dcd834f731717'),
+        ('remove_secondary',0x82D7F0,0x80936710,0x80944CA0,0x80944D9C,
+         'c28be397392b8b1a979cd54a2e0df5b29613efaa5952fd2d624e2d09b666e91f')):
+        data=files[vrom].extract(image)[first-ram:end-ram]
+        if len(data)!=end-first or sha256(data)!=digest:
+            raise ValueError('Changed native reversible-rig dependency: '+name)
+        blocks.append(dict(name=name,vrom=vrom,address=first,bytes=len(data),sha256=digest))
+    return dict(blocks=blocks,actor_bytes=0x740,state_offset=0x390,state_bytes=208,
+        work_vectors=17,maximum_joints=16,maximum_shown_matrices=6,
+        matrices_per_buffer=10,per_joint_matrix_limit=1,switch_offset=0x12C,
+        persistence='mirror-accepted-state-before-native-capture',saved_fields_changed=False)
 
 
 def discover(source,name,at,functions):

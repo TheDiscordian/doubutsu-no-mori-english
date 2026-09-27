@@ -38,9 +38,11 @@ material lifecycle; that stage rebuilds the shared packet and callback bindings.
 
 `reversible-keyframe-rig-assets` recognises the complete stopped/reversible
 constructor, move, draw, and destruction callbacks. It retains every skeleton
-node and motion channel, including hidden joints; it is not an installed runtime
-category yet. Prepared resources remain unavailable to ordinary imports until
-complete dispatch, audio, identity, and persistence bindings are present.
+node and motion channel, including hidden joints. Prepared artwork alone does
+not enable ordinary imports. The ordinary category importer
+installs its complete dispatch, audio, identity, and persistence bindings before
+allowing selection. Mode 9 stores the animation duration as a float in the first
+word and requires a zero last word. It uses the shared trigger-sound table.
 
 The matryoshka has eleven joints and five displayed models. The native fixed
 vectors hold eight joints plus root, so using those vectors directly is unsafe.
@@ -56,9 +58,22 @@ The converted source step accepts any nonzero press only while idle, reverses
 start/end frames at speed `0.5`, plays the complete source sound, and stops when
 the keyframe evaluator returns one. Initialization derives state from saved
 switch equal to one; destruction writes the internal state back to the native
-switch. The room adapter must perform two source steps per 30-Hz update, delivering
-the press on the first step, and retain the actual destruction-before-save path.
-It must not discard the destruction callback or replay presses during motion.
+switch. The room adapter performs two source steps per 30-Hz update, delivering
+the press on the first step. N64 captures switch flags before destroying actors,
+so the adapter mirrors the accepted internal state after construction and each
+update, including rejected presses while moving. The actual destruction callback
+also remains connected. This preserves the switch that the donor destructor
+would save without changing the N64 owner's save order or other furniture.
+The complete native evaluator/drawer, switch capture, input toggle, and three
+removal paths are checked before installing this layout.
+
+The bootstrap shares checked two- and four-argument dispatch helpers across
+ordinary, material, and scrolling callbacks. Destruction has its own checked
+entry, and every entry still loads and verifies its packet before calling it.
+Cache publication follows data writeback and instruction invalidation; failed
+DMA or checksum verification cannot dispatch. The sound converter accepts a
+complete one-step envelope followed by its terminator, retaining all timed notes
+and rests. Empty or malformed envelopes remain rejected.
 
 ### Combined skeleton and timed materials
 
