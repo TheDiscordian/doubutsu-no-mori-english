@@ -38,6 +38,19 @@ It contains 176 selectable development imports, including all nine fish, and 100
 profiles whose acquisition is pending. The main lock and both stable V2-14
 deployments are retained.
 
+The active creature batch prepares all eight added insects' field behaviour
+together. Six complete pinned donor programs compile against a checked N64 actor
+layout, with a source-rate update driver, controller-owned extra state, shared
+dig/rock/tree event handling, and catchability. One combined sanitized host check
+passes for every added species and these interactions, including mosquito pursuit
+and the request for a player sting response. The native response itself is not
+implemented by that fixture. Output is
+`build/v3-creature-insects-work-01/programs-03/`; the prepared code is not installed,
+the insects remain unavailable for selection, and ABI 305 remains the cartridge.
+Continue the same batch with native bindings/controller hooks, full spawning,
+and the ant's ground-colony actor. No old native fixture is replayed. See the
+[insect program contract](../specs/V3_CREATURE_ITEMS.md#added-insect-behaviour-programs).
+
 Four additional paintings use the ordinary shared importer: full models, original
 shop/event lists, catalogue, scoring, official names, and fixed additive IDs.
 The shared native-profile stage also installs 49 complete objects independently

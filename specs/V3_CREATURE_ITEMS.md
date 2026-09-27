@@ -547,3 +547,99 @@ field/release timing, missing/disagreeing-pointer rejection, complete converted
 resources and command bounds, and reuse of all seventeen existing room objects.
 The native integration tests above cover cartridge installation; neither set
 claims ordinary carried/field execution or original-hardware verification.
+
+## Added-insect behaviour programs
+
+`tools/v3_creature_insects.py` converts the entire eight-species behaviour category
+from the pinned GAFE01-r0 source in one compiler batch. It retains all 122 complete
+donor functions across six programs and records the corresponding actual donor
+function hashes/relocations. Source file hashes reject unreviewed edits. Generated
+donor C and compiled objects stay under ignored `build/`; committed files contain
+the converter, native ABI declarations, platform adapters, and original fixtures.
+Existing artwork, official names/text, prices, room displays, icons, collection
+storage, and provenance are reused; this is not another graphics importer.
+
+| Added species | Donor program | Included behaviour |
+| --- | --- | --- |
+| Snail | `tentou` | Flower movement, flower removal, escape, and release |
+| Mole cricket | `kera` | Hidden sound requests, digging, emergence, escape, burrowing, and drowning |
+| Pond skater | `amenbo` | Water-surface movement, rest, ripple requests, and release |
+| Bagworm | `mino` | Tree hiding, shaking, suspension, retraction, falling, and release |
+| Pill bug | `dango` | Rock strikes, emergence, stress response, escape, and drowning |
+| Spider | `mino` | Species-specific tree movement, falling, backward escape, and release |
+| Ant | `dango` | Individual carried/released insect; the separate ground colony remains required |
+| Mosquito | `ka` | Flying, player pursuit, attack timing, sting requests, demo avoidance, and release |
+
+The source version is explicitly GAFE01-r0, with the later Australian conditionals
+and optional source bugfixes disabled. The source snail's caught-state escape
+choice is retained and documented, not silently attributed to a different donor.
+Necessary native layout/timing adaptations do not change the source action bodies.
+
+### Native layout and lifecycle
+
+The native controller is `8F8` bytes: the `174`-byte actor, three `280`-byte insect
+slots, and its native object-bank field. The GameCube's nine `288`-byte slots are
+not compatible. Five complete native constructor/movement functions are checked
+against the input cartridge before preparation. MIPS compile-time assertions cover
+the controller size, actor size, stride, and actual offsets for movement, animation,
+speed, stress, collisions, items, lifetime, and alpha. In particular, donor
+`_1E0` names the animation field at native `1DC`; casting to GC structs is unsafe.
+
+`creature_insect_state.c` keeps the added tile coordinates outside native slots
+and their light/program storage. Constructor/destructor ownership binds exactly
+three slots. Foreign pointers reject; no unchecked slot arithmetic or shared
+per-insect scratch state is used. The player-action latch is shared across all
+slots and both substeps, and resets after the complete controller update, not
+after the first insect. All eight added species use the donor's eight-unit catch
+range, with its action-controlled uncatchable flag.
+
+`creature_insects.c` dispatches the complete source programs by fixed species
+identity and runs two ordered source substeps per native tick. This retains both
+60-Hz integer timers and source half-speed movement/gravity/animation increments.
+Held-object movement suppression, lifetime, fade, and destruction remain part of
+that shared path. The native controller hook must bypass its original updates
+for imported objects; otherwise movement and timers would run twice. Original
+species continue through their original native paths.
+
+Source accesses to GC global/game/player fields are explicit adapter calls.
+Unresolved terrain, weather, player, audio/effect, and interaction bindings remain
+undefined symbols in the prepared object; no dummy engine routines satisfy them.
+The host fixture supplies controlled inputs solely to execute and observe the
+converted actions. A passing host check is not evidence that these bindings or
+native gameplay are complete.
+
+### Current prepared output and remaining connections
+
+Prepared output: `build/v3-creature-insects-work-01/programs-03/`.
+The current cartridge remains ABI 305. No new ROM, save layout, browser choice,
+or deployment is produced by preparation. Reproduce against the explicit input:
+
+```sh
+python3 tools/v3_creature_insects.py \
+  --base-lock build/v3-creature-world-work-01/connected-15/build-lock.json \
+  --output build/v3-creature-insects-work-01/programs-new
+V3_INSECT_PROGRAMS=build/v3-creature-insects-work-01/programs-new \
+  python3 -m unittest discover -s tests -p 'test_v3_creature_insects.py' -v
+```
+
+The combined test covers all eight release/despawn paths, two-substep timing,
+correct/wrong-tile shovel and rock events, both tree species, tree cutting, snail
+flower removal, pond-skater rest/ripple cycles, drowning, mosquito pursuit and
+sting requests, catchability, controller ownership, and invalid identities.
+Address/undefined-behaviour sanitizers pass. MIPS compilation verifies the native
+layout; the host fixture does not pretend its wider pointers share that layout.
+
+Remaining connections belong to the same creature importing task:
+
+- Bind native environment/terrain/player helpers, complete directed-unit collision
+  handling, field sound/effects, and the mosquito player sting response.
+- Connect native construction, destruction, source-rate dispatch, catch requests,
+  and the digging, axe/shovel rock-strike, and tree-shake event producers.
+- Convert/connect the complete insect calendar, terrain/weather selection, and
+  spawning, including the ant ground-colony actor rather than just its release form.
+- Place the complete runtime through the existing owner-storage machinery, retain
+  overlap guards, connect startup loading, and promote per-insect selection only
+  when the gameplay dependencies are implemented.
+- Verify the connected current cartridge/save path and fix actual defects. Keep
+  the unresolved fish constructor timeout and scheduler disconnect open; the
+  existing exhausted native harness budget does not reset for these source files.

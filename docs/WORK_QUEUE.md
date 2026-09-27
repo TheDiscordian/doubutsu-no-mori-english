@@ -28,17 +28,16 @@ Implement the actual alternatives and bind selections to the build receipt.
 Fish population and imported coastal movement have installed controls and runtime
 alternatives; other substantial differences still need their own real bindings.
 
-Current implementation task: complete all nine added fish through the connected
-fish-importing path, reusing shared seventeen-creature infrastructure. This means
-source season/time/water spawning, working field behaviour with the required
-N64/GameCube choice, catching, pocket identity/icon, placing/picking up, releasing,
+Current implementation task: complete the connected seventeen-creature importing
+path. Its remaining implementation is the eight insects' shared field behaviours
+and spawning; the nine fish still need connected native verification and fixes
+for any defects found. Retain source season/time/terrain rules, required
+N64/GameCube choices, catching, pocket identity/icon, placing/picking up, releasing,
 collection and saved-profile readers, and optional per-species composition.
 Required species-specific behaviour is included. Native constructor execution
 has an unresolved timeout; retain it as unresolved, not a successful test.
-The fish task stays active across intermediate code changes, build locks, and
-commits. Batch connected verification, rather than creating another independent
-table/reader deliverable. Insects and the other importing categories remain
-required work, not removed scope.
+The creature task and native harness budget persist across intermediate changes,
+build locks, and commits. Reuse completed consumers and check the connected result.
 
 Use the shared converter and the current ABI-305 proposal:
 `build/v3-creature-world-work-01/connected-15/build-lock.json`.
@@ -71,6 +70,18 @@ real defects it exposes, including classification of the constructor timeout.
 Do not restart the exhausted fixture or declare an unclassified failure harmless.
 Continue the eight insects' shared field behaviour/spawn programs while that
 native test remains unresolved. Keep fish gameplay verification open, not waived.
+The six complete donor behaviour programs are converted and MIPS-compiled together
+at `build/v3-creature-insects-work-01/programs-03/`. Their source-rate driver,
+native-sized actor view, controller-owned extra state, action event latch, and
+catchability reader pass a combined sanitized host check across all eight species.
+These programs are **not installed** and do not change the available imports.
+Continue directly with their native engine bindings and controller/event hooks,
+then connect the complete insect spawn path and ant ground-colony actor. The
+mosquito's player sting response, field sound/effect bindings, and directed-unit
+collision checks remain required, not optional substitutes or deferred exceptions.
+The checked source bodies and native ABI map are reusable; do not rewrite them or
+restart art conversion. Full dependencies and the exact preparation command live
+in the [insect program contract](../specs/V3_CREATURE_ITEMS.md#added-insect-behaviour-programs).
 Reuse complete room, field, calendar, catch, icon, and UI resources. All seventeen
 source house-rating/feng shui records are converted through the ordinary shared
 scoring writer; the nine selected fish are installed and follow checkbox state.
