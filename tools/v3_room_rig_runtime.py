@@ -455,7 +455,11 @@ def bind_profiles(source,base,report):
     if any(r.get('mode')==11 for r in runtime['rows']):
         if runtime.get('dual_contract')!=composite.dual_native_contract(base,report):
             raise ValueError('Changed installed dual-motion scene/contact readers')
-    if any(r.get('mode')==12 for r in runtime['rows']):music.checked_binding(source,base,report)
+    exercise_installed=False
+    if any(r.get('mode')==12 for r in runtime['rows']):
+        from v3_player_exercise import checked_native as checked_exercise
+        music.checked_binding(source,base,report)
+        exercise_installed=checked_exercise(base,report)
     for row,enabled in [(r,False) for r in staged.get('rows',[])]+[(r,True) for r in activated]:
         item=int(row['item_id'],16);donor=f'{furniture_source(row)[0]:04X}';i=slot(item);binding=bindings.get(donor)
         if (donor in source.runtime_profiles or not binding or not binding['profile_installed'] or
@@ -475,6 +479,7 @@ def bind_profiles(source,base,report):
                     callbacks[3]!=runtime['bootstrap']['symbols'].get('af_v3_room_boot_dt')):
                 raise ValueError('Incomplete installed radio drawing or lifecycle')
             art['room_lifecycle']=life
+            art['indoor_aerobics_installed']=exercise_installed
         if category==roofs.CATEGORY:
             lifecycle=roofs.lifecycle(descriptor)
             if binding.get('roof_lifecycle')!=lifecycle:
@@ -578,7 +583,7 @@ def bind_profiles(source,base,report):
         source.runtime_profiles[donor]=dict(room_runtime=art['room_runtime'],
             source_profile_sha256=descriptor['profile_sha256'],category=descriptor['callback_adapter']['category'],
             object_sha256=art['object_sha256'],object_bytes=n,profile_hex=native.hex(),staged=not enabled,
-            **({k:art[k] for k in ('room_lifecycle','room_placement') if k in art}))
+            **({k:art[k] for k in ('room_lifecycle','room_placement','indoor_aerobics_installed') if k in art}))
     return source.runtime_profiles
 
 

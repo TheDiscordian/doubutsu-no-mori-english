@@ -31,21 +31,23 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
-The current proposal is ABI 274 at
-`build/v3-player-exercise-resources-03/build-lock.json`, ROM SHA-256
-`bad8b00bf461a7132d8c0214e9ebb06c6a3900048e59e1780a3f37baf51d7e8e`.
-The shared player importer installs all twelve complete exercise motions,
-23,568 bytes, with all 26 joints and the full 161-frame long motion. Both actual
-animation banks support 4,848 bytes; their containing scene arena includes the
-corresponding 1,984-byte growth. Existing player/equipment resources, native
-animation identities, faces, registered actions, and saved format 4 are retained.
-The 18-gesture recognition, chaining, tempo, end/exit, and C-button direction core
-is converted and compiled, but not registered in the game yet. Four focused checks
-pass, including actual-donor comparisons, complete installed resources, and four
-private browser/offline compositions. Native execution and hardware are unverified.
-Next, connect the core to native wait/action, eligibility, camera, and audio-clock
-readers without rebuilding the unchanged music/artwork. See the
-[exercise checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#installed-exercise-motions-and-prepared-player-action).
+The current proposal is ABI 275 at
+`build/v3-player-exercise-imports-01/player-exercise-native/build-lock.json`, ROM SHA-256
+`a940dab0ff14f5fc0e0bed23c78d5500c874da7a9f269e89e321c0106453e205`.
+The shared importer installs the complete exercise action: all 18 gestures,
+chaining/exit, C-button input, source eligibility, both camera readers, real native
+audio tempo/counters, and existing movement/collision/face/item updates. Two
+gesture/animation steps run per native update; physics runs once. All twelve
+complete motions and the existing radio music/artwork are reused unchanged.
+Checked startup loads 4,192 packet bytes into an unused 8-KiB reservation.
+The player actor grows by 48 transient bytes, with explicit constructor reset;
+the scene arena is 610,736 bytes. Saved format 4 and 162 choices are unchanged.
+Five focused checks pass, including 256 actual-donor eligibility comparisons,
+all 18 host-adapter gesture/animation/exit paths under sanitizers, preload failure
+handling, installed resources/hooks, and four private browser/offline compositions.
+Native execution, ordinary appearance/synthesis, a new save cycle, and hardware
+remain unverified. Continue console launch/storage importing work. See the
+[native exercise checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#installed-native-player-exercise).
 
 The radio's room-music lifecycle is installed through the ordinary importer.
 All 5,152 prepared artwork bytes are reused. Source-equivalent music reservation,
@@ -57,10 +59,10 @@ relocated owner hooks, preserved existing resources/saves, and four private
 browser/offline compositions. This is not native execution or hardware evidence.
 Room code uses 27,856 of 32,768 bytes; bootstrap uses 1,182 of 1,536.
 
-The radio remains unavailable: its source indoor player-aerobics interaction is
-unfinished, and its original reward route remains acquisition work. The current
-build retains 162 choices and saved format 4. Finish indoor exercise as part
-of importing behaviour, then continue console launch/storage. See the
+The radio remains unavailable because its original reward route remains
+acquisition work. Its indoor exercise interaction is installed and recognized
+by the shared eligibility reader. The current build retains 162 choices and
+saved format 4. Continue console launch/storage importing work. See the
 [radio lifecycle checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#installed-radio-room-music-lifecycle).
 
 The shared converter prepares the complete aerobics radio and treasure chest
@@ -91,7 +93,7 @@ dependencies, four browser/offline selections, and the affected shared reversibl
 core. Native execution, ordinary rendering/audio synthesis, a save cycle with
 this item, and hardware remain unverified. See the
 [combined-effect checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#installed-combined-reversible-material-and-effects).
-Continue indoor radio exercise and console launch/storage importing behaviours.
+Continue console launch/storage importing behaviours.
 
 The ordinary category importer installs the complete matryoshka: eleven joints,
 five models, 85 triangles, and all 46-frame motion channels in 4,512 reused bytes.

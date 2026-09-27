@@ -2153,6 +2153,9 @@ def expanded_tables(source,owner,reloc,*,categories=CATEGORIES,native_count=NATI
 
 def install(base,prior,blob,core,original,output):
     old=prior.get('equipment_resources',{})
+    exercise=old.get('player_motion',{}).get('exercise')
+    if exercise and not exercise.get('action_installed'):
+        return v3_player_exercise.install_native(base,prior,blob,core,original,output)
     if (old.get('room_rigs',{}).get('music',{}).get('installed') and
             old.get('player_actions',{}).get('balloon_menu') and not old['player_motion'].get('exercise')):
         return v3_player_exercise.install_resources(base,prior,blob,core,original,output)

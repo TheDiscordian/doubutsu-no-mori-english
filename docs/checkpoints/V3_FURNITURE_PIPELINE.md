@@ -1,5 +1,80 @@
 # Automatic furniture pipeline checkpoint
 
+## Installed native player exercise
+
+The shared player-action stage installs the complete radio exercise interaction
+as ABI 275. The ordinary furniture importer schedules missing exercise motions
+and native integration by callback category, after room/music publication, even
+when all artwork and profiles are already installed. No item-specific installer,
+model reconversion, new choice, or acquisition shortcut is added.
+
+Current build:
+`build/v3-player-exercise-imports-01/player-exercise-native/build-lock.json`.
+The ordinary `import --select 1FCC` command uses the ABI-274 motion proposal and
+executes just the missing native-player dependency. Its `pipeline.json` records
+zero missing artwork/profile stages, no activated item, and acquisition pending.
+
+Cartridge SHA-256:
+`a940dab0ff14f5fc0e0bed23c78d5500c874da7a9f269e89e321c0106453e205`.
+UPS SHA-256:
+`ccb443215cfc75053cff11948ce4119eb2f3fa8472a5bf5afbec62e99aad5927`.
+The direct integration outputs `build/v3-player-exercise-native-01/` and `-02/`
+produce this same cartridge. Output 02 records the updated shared-dependency
+checks and resource accounting; passing unchanged runtime evidence is retained.
+The ordinary-import output has the same cartridge and current source receipts.
+
+The immutable native adapter/core/pattern packet uses 4,192 bytes (4,184 linked)
+at `804CE000`, within a checked 8-KiB gap before shared room code. The existing
+surface/goods/carrying startup chain loads and validates it before actors can
+call its helpers. Startup is 412/688 bytes, preserving all previous loads.
+Explicit constructor reset owns 44 transient exercise bytes at player `13B0`;
+aligned actor allocation is `13E0`, and the containing scene arena is 610,736
+bytes. The existing 4,848-byte animation banks and all twelve motions are reused.
+
+Action 111 registers native net reset, empty submenu/settlement, and converted
+setup/main callbacks. WAIT setup/main wrappers preserve the existing native
+action, movement, collision, facial, held-item, and priority paths. Native
+camera suppression covers both the direct call and the constructor's stored
+callback. The constructor wrapper retains the existing native/balloon initializer;
+the post-action wrapper updates the actual audio clock on every player update.
+Four exact relocation entries are removed; three relocated load bases retain
+all unrelated player bytes. The actual profile constructor pointer is unchanged.
+
+Two gesture/animation steps run per native update, but native physics runs once.
+The live audio-task counter at `8014BDA0` is split across those steps. The current
+BGM handle selects a bounded native group; enabled sequence 181 supplies tempo
+from its actual `+8` field, divided by 48. Thirty-three complete native helpers
+are pinned. Eligibility preserves GAFE01-r0's event-first branch, native
+morning/sports event IDs 16/8, original shrine/block helpers, logical BGM 27,
+field type, and empty hands. C-button directions/diagonals replace the GC C-stick;
+the original title-demo/movement/pickup/shake exclusions remain.
+
+The shared profile reader verifies installed code/preload, player allocation,
+callbacks, and hooks before recording indoor interaction readiness. The colour
+dependency checker restores only the exact verified exercise post-action call
+before checking its complete native player body. Unrelated mutations still fail.
+The radio remains inactive pending its original acquisition route.
+
+Five focused checks in `tests/test_v3_player_exercise_native.py` pass across
+targeted runs: 256 comparisons with the actual donor eligibility functions;
+all 18 host-adapter gesture/animation/exit paths with memory/undefined-behaviour
+sanitizers; four-packet preload order and all eight DMA/checksum rejection paths;
+installed callbacks/resources/allocation and UPS reconstruction; shared profile
+binding; and the existing four private browser/offline compositions. The first
+host-adapter attempt exposed a fixture macro that shadowed the donor's local
+field-type variable. Its single corrected retry passes. An actual shared
+dependency rejection identified the new post-action call, now handled explicitly.
+The added planner case initially assumed every existing rig has a mode field;
+its corrected retry uses the established optional-mode convention.
+No unchanged music/artwork/core-donor tests are replayed.
+
+Saved format 4, profile bits, and 162 available choices are unchanged. Forward
+and backward save compatibility with the preceding format-4 proposal is expected;
+no migration is introduced. A save/restart cycle with this action, native
+execution, ordinary skeletal/GPU appearance, audio synthesis, and original
+hardware remain unverified. Continue console launch/storage, then acquisition
+and gold-tree work. Stable V2 deployments and the main V3 lock stay untouched.
+
 ## Installed exercise motions and prepared player action
 
 The shared player-action refresh produces ABI 274 at

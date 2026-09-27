@@ -187,6 +187,14 @@ def publish_bootstrap(equipment,blob,surface,output):
             raise ValueError('Changed resident carrying packet')
         extra=(f'AF_ROOM_CARRY_VROM=0x{p["vrom"]:X}u',f'AF_ROOM_CARRY_CRC=0x{p["crc32"]:X}u',
                f'AF_ROOM_CARRY_BYTES=0x{p["bytes"]:X}u')
+    exercise=equipment.get('player_motion',{}).get('exercise',{}).get('native')
+    if exercise:
+        p=exercise['packet'];raw=blob[p['blob_offset']:p['blob_offset']+p['bytes']]
+        if (sha256(raw)!=p['sha256'] or zlib.crc32(raw)!=p['crc32'] or
+                p['ram']!=0x804CE000 or p['bytes']>0x2000):
+            raise ValueError('Changed resident player-exercise packet')
+        extra+=(f'AF_PLAYER_EXERCISE_VROM=0x{p["vrom"]:X}u',f'AF_PLAYER_EXERCISE_CRC=0x{p["crc32"]:X}u',
+                f'AF_PLAYER_EXERCISE_BYTES=0x{p["bytes"]:X}u')
     boot,compiled=compile_part('surface_bootstrap',output/'goods_surface_bootstrap',defines=(
         'AF_V3_EDITABLE_CHECKSUMS=1',f'AF_SURFACE_ITEMS_VROM=0x{items["vrom"]:X}u',
         f'AF_SURFACE_ITEMS_CRC=0x{items["crc32"]:X}u',f'AF_SURFACE_ITEMS_BYTES=0x{items["bytes"]:X}u',
@@ -202,3 +210,4 @@ def publish_bootstrap(equipment,blob,surface,output):
     equipment.update(sha256=sha256(module),crc32=zlib.crc32(module),surface_bootstrap=copy.deepcopy(items['bootstrap']))
     goods['startup']=dict(ram=BOOT,bytes=len(boot),capacity=BOOT_END-BOOT,sha256=sha256(boot))
     if carrying:carrying['startup']=copy.deepcopy(goods['startup'])
+    if exercise:exercise['startup']=copy.deepcopy(goods['startup'])

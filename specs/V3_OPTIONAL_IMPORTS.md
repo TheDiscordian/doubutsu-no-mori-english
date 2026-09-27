@@ -114,13 +114,13 @@ saved-switch capture. Its actual island acquisition remains separate unfinished
 work, so the profile remains unavailable for selection. The radio's
 music-owner/emitter/drawing lifecycle is installed through the ordinary importer,
 including original stereo interoperability and checked packet loading. Its source
-indoor player-aerobics interaction remains importing work; its original reward
-route remains acquisition work. All twelve complete player motions are installed
-through the shared resource loader, with enlarged animation banks and scene arena.
-The converted 18-gesture/chaining/tempo core is prepared, not registered; native
-player controls, eligibility, camera, and audio-clock integration remain required.
-Installed-resource
-and private composition checks do not claim native gameplay or hardware testing.
+indoor player-aerobics interaction is installed; its original reward route remains
+acquisition work. All twelve complete player motions use the shared resource
+loader, with enlarged animation banks and scene arena. The 18-gesture/chaining/
+tempo core is registered with native controls, eligibility, camera, audio-clock
+integration, and transient initialization. Source/host-adapter comparisons,
+installed-resource checks, and private compositions do not claim native gameplay
+or hardware testing.
 
 The [combined rig importer](V3_FURNITURE_PIPELINE.md#reversible-material-and-particle-rigs)
 installs complete reversible motion, delayed material selection, translucent

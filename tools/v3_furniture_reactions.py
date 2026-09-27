@@ -7,7 +7,7 @@ import copy
 import json
 import struct
 
-from aflib import CODE_RAM, CODE_VROM, by_vrom, sha256
+from aflib import CODE_RAM, CODE_VROM, by_vrom, sha256, u32
 
 CATEGORY = 'timed-surprise-material'
 COLOUR_CATEGORY = 'exclusive-player-colour-loop'
@@ -531,7 +531,7 @@ def colour_state_reservation(report):
     return expected
 
 
-def colour_native_contract(image, installed=None, *, music_runtime=None):
+def colour_native_contract(image, installed=None, *, music_runtime=None, exercise_runtime=None):
     from v3_equipment_runtime import PLAYER_VROM, PLAYER_RAM, PLAYER_RELOC
     from v3_npc_draw import relocation_offsets
     files = by_vrom(image); player = bytearray(files[PLAYER_VROM].extract(image))
@@ -549,6 +549,15 @@ def colour_native_contract(image, installed=None, *, music_runtime=None):
             player[at:at+4] = before
     elif (0x808DDB70-PLAYER_RAM not in slots or 0x808BFC60-PLAYER_RAM in slots):
         raise ValueError('Changed original player-colour candidate relocations')
+    if exercise_runtime:
+        from v3_import_storage import jump
+        address=0x808DDBBC;at=address-PLAYER_RAM
+        target=exercise_runtime['code']['symbols']['af_v3_exercise_native_after']
+        expected=dict(address=address,before=jump(0x808BD218,link=True),after=jump(target,link=True))
+        if (expected not in exercise_runtime['owner_hooks'] or at in slots or
+                u32(player,at)!=expected['after']):
+            raise ValueError('Changed exercise clock wrapper around player-colour update')
+        struct.pack_into('>I',player,at,expected['before'])
     room = files[0x82D7F0].extract(image); core = files[CODE_VROM].extract(image)
     if music_runtime and music_runtime.get('music'):
         from v3_room_music import restore_owner
@@ -647,7 +656,8 @@ def checked_colours(base, report):
     blob=by_vrom(base)[BLOB].extract(base);at=equipment['blob_offset']+COLOUR_BRIDGE-RAM
     bridge=bytes.fromhex(colours['bridge_hex'])
     if (colours.get('format')!='AFV3-ROOM-COLOURS-1' or not colours.get('installed') or
-            colours['native']!=colour_native_contract(base,colours,music_runtime=room) or
+            colours['native']!=colour_native_contract(base,colours,music_runtime=room,
+                exercise_runtime=equipment.get('player_motion',{}).get('exercise',{}).get('native')) or
             colours['state']!=colour_state_reservation(report) or
             colours['packet_crc32']!=room['packet']['crc32'] or
             colours['targets']!={name:room['code']['symbols']['af_v3_room_colour_'+name] for name in ('update','draw')} or

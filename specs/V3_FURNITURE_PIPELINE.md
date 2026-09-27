@@ -20,6 +20,11 @@ profiles are installed through the existing guarded runtime builder in that
 order. Ordinary item installation follows a fresh eligibility check against the
 resulting build. Missing acquisition remains explicit, not fabricated shop stock.
 
+Rotated radio records also plan missing shared player-exercise stages: complete
+motion resources, then native interaction. These stages run after room/music
+profiles and also run when no graphics remain to convert. Installed stages are
+skipped; a stage must publish its expected dependency before the plan advances.
+
 `--category` selects a complete matching batch; `--select` limits identities.
 Internal selected stages scan only those records. Prepared artwork is reused
 across stages, and already installed dependencies are skipped. Every stage has
@@ -70,16 +75,16 @@ data reject. The complete native effect 32 supplies all three note models and fi
 colours. Its native growth/debug scaling is retained as a documented platform
 adaptation, not claimed to reproduce the donor particle trajectory exactly.
 
-The source indoor player-aerobics interaction remains required importing work.
-The shared player-action refresh installs its complete twelve-motion category,
-including the 161-frame motion, and expands both native animation banks plus their
-containing arena. The converted gesture/chaining/tempo core remains unregistered;
-native controls, wait/action dispatch, eligibility, camera, and timing integration
-must be complete before publishing an installed-interaction binding. See
+The source indoor player-aerobics interaction is installed through the shared
+player-action refresh. Its complete twelve-motion category includes the 161-frame
+motion and enlarged native animation banks. The registered gesture/chaining/tempo
+core uses native controls, wait/action dispatch, eligibility, both camera readers,
+and actual audio-clock/tempo fields. Checked startup and constructor reset own
+its immutable code and transient state. The shared profile reader verifies these
+bindings before recording `indoor_aerobics_installed`. See
 [exercise motions](V3_HANDHELD_ITEMS.md#shared-exercise-motions-and-player-controls).
-Room music alone cannot make this item eligible for selection. The eligibility
-guard retains that concrete missing behaviour; original acquisition remains a
-separate requirement. See the
+Room music alone cannot make this item eligible for selection. Original
+acquisition remains a separate requirement. See the
 [radio checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#installed-radio-room-music-lifecycle).
 
 `dual-motion-scroll-rig-assets` retains both complete animation headers and all

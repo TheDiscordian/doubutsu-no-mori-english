@@ -21,29 +21,24 @@ prevent asset/data conversion or redirect work from an unfinished shared format.
 Incomplete gameplay stays unavailable in the selector; installing assets does
 not claim that an item is playable. Reuse unchanged passing tests throughout.
 
-Current task: connect the converted exercise core to native player wait/action,
-eligibility, camera, and audio-clock readers, then continue console launch/storage.
-Indoor exercise is importing behaviour, not its later reward/acquisition route.
-All twelve full motions are installed through the shared player importer in
-ABI 274 at `build/v3-player-exercise-resources-03/build-lock.json`, ROM SHA-256
-`bad8b00bf461a7132d8c0214e9ebb06c6a3900048e59e1780a3f37baf51d7e8e`.
+Current task: finish the shared console launch/storage importing category.
+Native exercise is installed through the shared player importer in ABI 275 at
+`build/v3-player-exercise-imports-01/player-exercise-native/build-lock.json`, ROM SHA-256
+`a940dab0ff14f5fc0e0bed23c78d5500c874da7a9f269e89e321c0106453e205`.
 Use that immutable proposal, retaining the main lock and stable deployments.
-The 18-gesture core passes actual-donor comparisons, and complete resources,
-bank/arena growth, retained saves, and four private compositions pass. Do not
-rebuild or retest the completed prefix without a relevant change. The core's
-zero-address MIPS object is preparation only: choose checked native placement,
-initialize transient state, bind source-rate updates and real audio counters,
-and register complete callbacks before marking the action installed. Action code
-space after `804A5A50` is occupied by tool motion; it is not a free reservation.
-Do not omit the interaction or add per-item installers. See the
-[exercise checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#installed-exercise-motions-and-prepared-player-action).
-The actual source entry is `Player_actor_Check_InBlockRadioExercise` in
-`local/ac-decomp/src/game/m_player_common.c_inc`, followed by command buffering,
-recognition, and action requests. Inspect the complete command/action/motion
-dependencies and native counterparts before claiming this is only an eligibility
-change. No direct calls to event checks, shrine lookup, or current-BGM lookup occur
-in the current native player's complete `2AF00`-byte text section; a matching
-native exercise implementation is not established.
+All 18 gestures, full motions, wait/action dispatch, camera callbacks, eligibility,
+real audio timing, and transient initialization are connected. Five focused checks
+pass, including donor/host comparisons, all 18 interaction paths, preload failure
+handling, complete installed resources, and four private compositions. Native
+execution, GPU/audio appearance, a new save cycle, and hardware remain unverified.
+Do not rebuild or retest unchanged music, artwork, or completed motion conversion.
+The code occupies `804CE000..804CFFFF`; the player is `13E0` bytes and the scene
+arena is 610,736 bytes. Preserve both the 1,984-byte animation-bank growth and
+48-byte transient-state growth in later allocation changes. Source eligibility
+keeps GAFE01-r0's event-first rule; native morning/sports aerobics IDs are 16/8,
+not donor 35/13. The radio's original reward is phase-2 acquisition, not a missing
+player interaction. See the
+[native exercise checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#installed-native-player-exercise).
 
 Room music ownership, radio/stereo exclusive playback, native common destruction,
 constructor reset, source-rate notes, and rotated drawing are installed in ABI 273
@@ -52,7 +47,7 @@ at `build/v3-room-music-imports-04/profile-runtime/build-lock.json`, ROM SHA-256
 Five focused checks pass, including 289 actual-donor comparisons and four private
 browser/offline compositions. All 5,152 artwork bytes are reused; the native song
 and complete four-instrument font/samples are verified. Keep the option inactive
-until indoor exercise and actual acquisition work. The native note effect retains
+until actual acquisition works. The native note effect retains
 its native growth/debug scaling; exact donor particle integration is not claimed.
 See the [installed radio checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#installed-radio-room-music-lifecycle).
 Do not repeat the passing music checks without a relevant code/resource change.
@@ -86,13 +81,13 @@ claimed. The shared callback loader uses 1,142 of 1,536 bytes, including checked
 destruction dispatch. See the
 [reversible checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#installed-reversible-lifecycle-and-save-capture).
 
-Continue the remaining actual lifecycle and console launch/storage categories
-without per-item installers. Radio room behaviour is installed; its indoor player
-exercise remains unfinished. Reuse complete resources and shared runtime categories.
+Continue the remaining console launch/storage category without per-item
+installers. Radio room behaviour and indoor player exercise are installed;
+its acquisition remains unfinished. Reuse complete resources and shared runtimes.
 
-The checked current proposal is ABI 274 at
-`build/v3-player-exercise-resources-03/build-lock.json`, ROM SHA-256
-`bad8b00bf461a7132d8c0214e9ebb06c6a3900048e59e1780a3f37baf51d7e8e`.
+The checked current proposal is ABI 275 at
+`build/v3-player-exercise-imports-01/player-exercise-native/build-lock.json`, ROM SHA-256
+`a940dab0ff14f5fc0e0bed23c78d5500c874da7a9f269e89e321c0106453e205`.
 The combined skeleton/material category imports the complete hamster cage,
 including source movement/texture timing, positioned sound, actual lottery
 availability, catalogue ordering, scoring, and official English text. Five focused

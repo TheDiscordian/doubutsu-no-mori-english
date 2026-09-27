@@ -63,5 +63,17 @@ int af_v3_surface_init(void) {
     af_test_carry_magic=0;
 #endif
 #endif
+#ifdef AF_PLAYER_EXERCISE_VROM
+#ifdef __mips__
+    void *exercise=(void *)0x804CE000u;
+#else
+    extern unsigned char af_test_exercise_code[AF_PLAYER_EXERCISE_BYTES];
+    void *exercise=af_test_exercise_code;
+#endif
+    if (af_surface_dma(exercise,AF_PLAYER_EXERCISE_VROM,AF_PLAYER_EXERCISE_BYTES) ||
+            af_surface_crc(exercise,AF_PLAYER_EXERCISE_BYTES)!=AF_PLAYER_EXERCISE_CRC) return 0;
+    af_surface_writeback(exercise,AF_PLAYER_EXERCISE_BYTES);
+    af_surface_invalidate(exercise,AF_PLAYER_EXERCISE_BYTES);
+#endif
     return af_surface_prior_init();
 }

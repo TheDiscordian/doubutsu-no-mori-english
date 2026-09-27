@@ -1,6 +1,5 @@
-"""Shared gesture/action preparation and complete player-animation installation.
+"""Shared exercise motion, command, and native player integration.
 
-Native controls/action registration remain a separate required integration stage.
 No furniture choice is enabled by installing these dependencies.
 """
 import copy
@@ -18,6 +17,45 @@ from v3_resource_capacity import checked_limit
 SOURCES=('tools/v3_player_exercise.py','overlays/v3/player_exercise.c',
     'overlays/v3/player_exercise.h','overlays/v3/player_exercise.ld',
     'tools/v3_equipment_runtime.py','overlays/v3/equipment_resources.c')
+SOURCES+=('overlays/v3/player_exercise_native.c','overlays/v3/player_exercise_native.h',
+    'overlays/v3/player_exercise_native.ld','tools/v3_room_goods.py',
+    'overlays/v3/surface_bootstrap.c','tools/v3_asset_loader.py',
+    'tools/v3_furniture_reactions.py','tools/v3_room_rig_runtime.py','tools/v3_furniture_install.py')
+NATIVE_FUNCTIONS=(
+    (0x8005EAFC,0x8005EB74,'06f47a7514046f28056417d7dc9ccc4ec1a09eabb13ff21d923a251484a2c52e'),
+    (0x80078D30,0x80078D78,'64caa4eba4dac0d0259e292053a2463d65322310384dd2e790a067ea10da8d77'),
+    (0x8007D90C,0x8007D91C,'f36a165b7d65a6ce4b7e25d3a9cc40585f08edd0738b8c924d75b3435c70690a'),
+    (0x8007FF08,0x8007FF8C,'4df1b83227b8be1d64d705375c576db58d8fe854291a29c06d57193918913064'),
+    (0x80088710,0x80088780,'b210ff697057c37be97eeb9de1db4088a55ab9917f5e12d57852d081959435d8'),
+    (0x80089440,0x800894D0,'07344cb8b43778bf17910045b809400f8071bdf413c65ca43e88b5311f729473'),
+    (0x800EE050,0x800EE7C4,'e8ad9860db541546d85cc839a35494cd02a6c5066685d7d51b2c11a0990e9c7c'),
+    (0x800F5660,0x800F6034,'22a22ddbe01bd668356b5efefaf71464ae7228a77db98d0b8900ce22103c7e72'),
+    (0x800F6034,0x800F60F0,'3edbcbaacd51474aa69e5d7b2647aef43d5a4537951adba3db5bbc6960ec4058'),
+    (0x800F6140,0x800F6210,'4ae11e9da8ef4b676c8dd5035a9c42770a0b97694bf6c9d09fb2f2baf19cb8b3'),
+    (0x800FCAD8,0x800FCE80,'01228029d2dcd19deb2e31b3184c3273f7b6cddfc9796e556e7e70ef855adc31'),
+    (0x808B2D50,0x808B2DE4,'2906967329726565873420b3c20a320ea8240c11c6b4347475ca0a3a51c8dc81'),
+    (0x808B3010,0x808B30B4,'d52913c08d05bc1c438ee09353a305740977d9d7b2562121aa16f5f76eea218d'),
+    (0x808B32C4,0x808B3308,'73dbca69b6bd3dca07428ae27b3d9f1238a5130e0095e2ef11603d2db0b5fc8b'),
+    (0x808B3334,0x808B3370,'0d4a8b915d523b0c6bcea7e8c26cb1e38e5d4fffc98209af6d13db02081c6068'),
+    (0x808B3648,0x808B36E8,'3b7d669b96713b70f8aba44f0b98d854b08ea996198cd1a149c594e2d2435e00'),
+    (0x808B36F4,0x808B37D4,'17bfc9af274efd1bef2eef32b63b19bfa69482bcce99ecdcb08a03aac0bacf28'),
+    (0x808B3AF0,0x808B3B08,'b77ae0ded3c1dd5a476da8bac2f471f07622d948d3481913007a1204f988489a'),
+    (0x808B3BD0,0x808B3BF0,'8945e8562bd722d10343775638b56a4391be19e767c26ec9dde1c7b24352f2a7'),
+    (0x808B3C74,0x808B3C94,'3e86a92e686923b0a8584f32589ec20f8b630da9d90f9090f73b19337fa16bdf'),
+    (0x808B48F0,0x808B4924,'305b9f55995ea42f93fc3a36306e4adff4db3468cb793084dd14c3f48d22c4cc'),
+    (0x808B4A44,0x808B4B6C,'cf4f3f502e0bc29fa474219bb116f5566cc62dcb4d764686aa3c9bcd7f169650'),
+    (0x808B4DAC,0x808B4DE8,'57ee59f746b0f74a5346e1421e5e6d6b853fc70c0415df76c76cd5c16b38dab8'),
+    (0x808B5310,0x808B5348,'eaa31c9678d3f5d7ab56cec33e42c99a2370caabc3fde1ce36303ed7fa8251d9'),
+    (0x808B5FB0,0x808B5FFC,'a66426054251c28831b3495fb799973b208885c106ec8d17ae01851f586f49f6'),
+    (0x808B61E4,0x808B6234,'2da374a85ae8adce8117b3f6a62b26dda7b3d1cb1534024f83b24acbea4c3427'),
+    (0x808B8874,0x808B88D4,'d33203657dfe300f88b32a1cd4204f2a751a4c6f2b696b4d0bdb0ec19c16caef'),
+    (0x808BBDE8,0x808BBE50,'647c5485d0c1bc0074aee05a9ffcf35489f5b703dbc0f79772b7bf716a1d4f8e'),
+    (0x808BD218,0x808BD320,'8bdd6a968f915f0f676b61cfb5b6df602b66489800a2b7ac2b878d66c1c3df55'),
+    (0x808BF410,0x808BF494,'3e5bfc3ce6ac9e6b0eacc746204209bec24b325881fcf5d49d135e60e796a55d'),
+    (0x808C1064,0x808C10E4,'671817fabfe8142d2de949e4657cd3605892f00b7139015a955430059ca29811'),
+    (0x808C1118,0x808C11EC,'b68e5709b312229c1fe343af2d20853448c358633c025c35da0b93697a12abdf'),
+    (0x808C1370,0x808C13F0,'41ad4f959ae1e31586a4e44b768a60ddafff11f4a8d7a984ada694c873c99e14'),
+)
 FUNCTIONS=(
     (0x164A1C,324,'03d551b78a29ea8d1390d487e9ee3c243d4640b5f745fb09ca3a72c45ac1e026'),
     (0x16E944,240,'bcac7896bfd81416edb8e5a088a6d9d888057b237d2cfffd6a5319c12b28a914'),
@@ -196,3 +234,172 @@ def install_resources(base,prior,blob,core,original,output):
     blob[start:start+len(module)]=module
     report.update(code=compiled,sha256=sha256(module),crc32=zlib.crc32(module),additional_resident_bytes=0)
     return report,{}
+
+
+def native_contract(core,owner):
+    functions=[]
+    for address,end,digest in NATIVE_FUNCTIONS:
+        data,origin=(owner,PLAYER_RAM) if address>=PLAYER_RAM else (core,CODE_RAM)
+        raw=data[address-origin:end-origin]
+        if sha256(raw)!=digest:raise ValueError(f'Changed complete exercise native dependency {address:08X}')
+        functions.append(dict(address=address,end=end,sha256=digest))
+    calendars=[]
+    for address,expected,donor,native in (
+            (0x80104D64,'07190086081f008600000010',35,16),
+            (0x80104E24,'0a9100090a91000a00000008',13,8)):
+        if core[address-CODE_RAM:address-CODE_RAM+12].hex()!=expected:
+            raise ValueError('Changed native aerobics calendar identity')
+        calendars.append(dict(address=address,hex=expected,source_event=donor,native_event=native))
+    return dict(functions=functions,event_calendars=calendars,field_type=0x80136EA1,
+        audio=dict(context=0x801494E0,clock=0x8014BDA0,handle=0x80113848,
+            group_count=0x8014BD60,groups=0x8014CB90,stride=0x160,sequence_offset=4,
+            tempo_offset=8,tempo_divisor=48,sequence=181),
+        source_steps_per_update=2,physics_steps_per_update=1,
+        source_event_first_condition_retained=True,saved_format_changed=False)
+
+
+def checked_native(image,report):
+    equipment=report['equipment_resources'];exercise=equipment.get('player_motion',{}).get('exercise',{})
+    if not exercise.get('action_installed'):return False
+    native=exercise['native'];packet=native['packet'];files=by_vrom(image)
+    blob=files[BLOB].extract(image);core=files[CODE_VROM].extract(image);owner=files[PLAYER_VROM].extract(image)
+    raw=blob[packet['blob_offset']:packet['blob_offset']+packet['bytes']]
+    module=blob[equipment['blob_offset']:equipment['blob_offset']+equipment['bytes']]
+    if (sha256(raw)!=packet['sha256'] or zlib.crc32(raw)!=packet['crc32'] or
+            sha256(raw[:native['code']['bytes']])!=native['code']['sha256'] or
+            native['binding']!=native_contract(core,owner) or
+            sha256(module)!=equipment['sha256'] or not exercise['prepared_core_installed']):
+        raise ValueError('Changed installed player exercise dependencies')
+    if u32(core,native['player_allocation_address']-CODE_RAM)!=native['player_bytes']:
+        raise ValueError('Player exercise state exceeds the actual actor allocation')
+    for row in native['owner_hooks']:
+        if u32(owner,row['address']-PLAYER_RAM)!=row['after']:
+            raise ValueError('Missing player exercise hook')
+    for row in native['callback_patches']:
+        if u32(module,row['offset'])!=row['after']:raise ValueError('Missing exercise/WAIT callback')
+    flags=equipment['surface_bootstrap']['code']['flags']
+    for name,key in (('VROM','vrom'),('CRC','crc32'),('BYTES','bytes')):
+        if f'-DAF_PLAYER_EXERCISE_{name}=0x{packet[key]:X}u' not in flags:
+            raise ValueError('Missing checked player exercise preload')
+    return True
+
+
+def install_native(base,prior,blob,core,original,output):
+    from apply_translation import write_new
+    from types import SimpleNamespace
+    from npc_mail_show import relocate_verified_data
+    from v3_player_actions import native_references
+    from v3_import_storage import jump
+    from v3_room_rig_runtime import packet_layout
+    from v3_furniture_pipeline import Source
+    files=by_vrom(base);old=prior['equipment_resources'];start=old['blob_offset']
+    module=bytearray(blob[start:start+old['bytes']]);owner=bytearray(files[PLAYER_VROM].extract(base))
+    reloc=files[0x7D9BA0].extract(base);actions=old['player_actions'];exercise=old['player_motion']['exercise']
+    if (sha256(module)!=old['sha256'] or sha256(owner)!=actions['owner_sha256'] or
+            sha256(reloc)!=actions['relocation_sha256'] or exercise.get('action_installed') or
+            not old['room_rigs']['music']['installed'] or not old.get('room_carry')):
+        raise ValueError('Incomplete or changed player exercise installation input')
+    source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+        (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    contract=source_contract(source);patterns=pattern_bytes(contract)
+    if patterns.hex()!=exercise['pattern_hex'] or len(exercise['records'])!=12:
+        raise ValueError('Changed installed complete exercise resources')
+    binding=native_contract(core,owner)
+    # Separate immutable code uses the gap after reaction/colour state and before
+    # the current room packet. It never borrows the occupied tool-action region.
+    ram,_,_=packet_layout(old['room_rigs']);code_ram,code_end=0x804CE000,0x804D0000
+    if (ram!=code_end or old['ram']+old['bytes']>0x804C0000 or
+            old['room_rigs']['colours']['state']['ram']+old['room_rigs']['colours']['state']['bytes']>code_ram):
+        raise ValueError('Player exercise code overlaps resident resources')
+    assembly=output/'exercise-patterns.S'
+    write_new(assembly,('.section .rodata\n.balign 4\n.global af_v3_exercise_patterns\n'
+        'af_v3_exercise_patterns:\n.byte '+','.join(map(str,patterns))+'\n').encode())
+    init=actions['balloon_actor']['code']['symbols']['af_v3_balloon_player_init']
+    code,compiled=compile_part('player_exercise_native',output/'player_exercise_native',
+        extra_sources=('overlays/v3/player_exercise.c',str(assembly.relative_to(ROOT))),
+        defines=(f'AF_EXERCISE_PRIOR_INIT=0x{init:X}u',))
+    symbols=compiled['symbols'];pattern_at=symbols['af_v3_exercise_patterns']-code_ram
+    if (len(code)>code_end-code_ram or code[pattern_at:pattern_at+len(patterns)]!=patterns or
+            not 0<=pattern_at<len(code)):
+        raise ValueError('Incomplete compiled exercise packet')
+    packet=code.ljust((len(code)+15)&~15,b'\0')
+    blob.extend(bytes(-len(blob)%16));at=len(blob);blob.extend(packet)
+    if BLOB+len(blob)>checked_limit(base,prior):raise ValueError('Exercise packet exceeds checked resource storage')
+    groups,absolute,rows,locations,slots=native_references(owner,reloc)
+    patches=[];removed=set()
+    def patch(address,before,after,remove=False):
+        offset=address-PLAYER_RAM
+        if u32(owner,offset)!=before:raise ValueError(f'Changed player exercise hook {address:08X}')
+        struct.pack_into('>I',owner,offset,after)
+        patches.append(dict(address=address,before=before,after=after))
+        if remove:
+            if offset not in slots:raise ValueError('Missing native exercise-hook relocation')
+            removed.add(locations[offset])
+        elif offset in slots:raise ValueError('Unexpected exercise-hook relocation')
+    for address,before,name,remove in (
+            (0x808DD79C,init,'init',False),
+            (0x808DDBBC,0x808BD218,'after',True),
+            (0x808BBE60,0x808BBDE8,'camera',True)):
+        patch(address,jump(before,link=True),jump(symbols['af_v3_exercise_native_'+name],link=True),remove)
+    matches=[(hi,lo) for hi,consumers in groups.items() for lo,target in consumers if target==0x808BBDE8]
+    if matches!=[(0x2A958,0x2A980)] or any(v==0x808BBDE8 for v in absolute.values()):
+        raise ValueError('Changed complete player camera callback references')
+    target=symbols['af_v3_exercise_native_camera']
+    for offset,value in ((matches[0][0],(target+0x8000)>>16),(matches[0][1],target&65535)):
+        before=u32(owner,offset);patch(PLAYER_RAM+offset,before,before&0xFFFF0000|value,True)
+    kept=[r for r in rows if r not in removed];new_reloc=bytearray(reloc)
+    struct.pack_into('>I',new_reloc,16,len(kept))
+    new_reloc[20:20+len(rows)*4]=struct.pack('>'+str(len(kept))+'I',*kept)+bytes(4*len(removed))
+    sections=struct.unpack_from('>5I',reloc);changed={p['address']-PLAYER_RAM+i for p in patches for i in range(4)}
+    original_owner=files[PLAYER_VROM].extract(base)
+    old_spec=SimpleNamespace(ram=PLAYER_RAM,resident_bytes=sum(sections[:4]),sections=sections)
+    new_spec=SimpleNamespace(ram=PLAYER_RAM,resident_bytes=sum(sections[:4]),sections=(*sections[:4],len(kept)))
+    for loaded in (0x801A0010,0x802F8010,0x803B0010):
+        before=relocate_verified_data(old_spec,original_owner,reloc,loaded)
+        after=relocate_verified_data(new_spec,owner,new_reloc,loaded)
+        if any(a!=b and i not in changed for i,(a,b) in enumerate(zip(before,after,strict=True))):
+            raise ValueError('Exercise hooks change unrelated relocated player code')
+        if any(u32(after,p['address']-PLAYER_RAM)!=p['after'] for p in patches):
+            raise ValueError('Exercise hook was incorrectly relocated')
+    report=copy.deepcopy(old);current=report['player_actions'];table_patches=[]
+    callbacks={0x808BE620:0x808BE140,0x808DD874:0,0x808DD9B4:0,
+        0x808DDA18:symbols['af_v3_exercise_native_setup'],0x808DDB5C:symbols['af_v3_exercise_native_main']}
+    for table in current['tables']:
+        if table['width']!=4:continue
+        offset,size=table['offset'],table['bytes']
+        if sha256(module[offset:offset+size])!=table['sha256']:raise ValueError('Changed complete player dispatch table')
+        edits=[(111,0,callbacks[table['native_entry']])]
+        if table['native_entry']==0x808DDA18:edits.append((7,0x808C1118,symbols['af_v3_exercise_native_wait_setup']))
+        if table['native_entry']==0x808DDB5C:edits.append((7,0x808C1370,symbols['af_v3_exercise_native_wait']))
+        for index,before,after in edits:
+            p=offset+index*4
+            if u32(module,p)!=before:raise ValueError('Changed exercise/WAIT callback')
+            struct.pack_into('>I',module,p,after)
+            table_patches.append(dict(offset=p,index=index,before=before,after=after))
+        table['sha256']=sha256(module[offset:offset+size])
+    allocation=report['held_rig_actions']['player_allocation'];address=allocation['address']
+    if allocation['bytes']!=0x13B0 or u32(core,address-CODE_RAM)!=0x13B0:
+        raise ValueError('Changed transient player extension allocation')
+    struct.pack_into('>I',core,address-CODE_RAM,0x13E0);allocation['bytes']=0x13E0
+    arena=old['player_motion']['allocation']['scene_arena_bytes'];core_patches=[]
+    for addr,prefix in ((0x800C6618,0x34A50000),(0x800C6628,0x34210000)):
+        before=prefix|(arena&65535);after=prefix|((arena+48)&65535)
+        if arena>>16!=(arena+48)>>16 or u32(core,addr-CODE_RAM)!=before:
+            raise ValueError('Changed scene arena before transient exercise state')
+        struct.pack_into('>I',core,addr-CODE_RAM,after)
+        core_patches.append(dict(address=addr,before=before,after=after))
+    current.update(owner_sha256=sha256(owner),relocation_sha256=sha256(new_reloc),
+        removed_relocations=current['removed_relocations']+len(removed))
+    current['enabled_imported_actions']=sorted(current['enabled_imported_actions']+[111])
+    current['disabled_indices'].remove(111)
+    motion=report['player_motion'];motion.update(owner_sha256=sha256(owner),reloc_sha256=sha256(new_reloc))
+    motion['exercise'].update(action_installed=True,prepared_core_installed=True,native=dict(
+        code=compiled,binding=binding,packet=dict(ram=code_ram,capacity=code_end-code_ram,
+            blob_offset=at,vrom=BLOB+at,bytes=len(packet),sha256=sha256(packet),crc32=zlib.crc32(packet)),
+        player_bytes=0x13E0,state_offset=0x13B0,state_bytes=44,additional_scene_bytes=48,
+        previous_scene_arena_bytes=arena,scene_arena_bytes=arena+48,core_patches=core_patches,
+        player_allocation_address=address,owner_hooks=patches,callback_patches=table_patches,
+        removed_relocations=sorted(removed),native_execution_tested=False,saved_format_changed=False))
+    blob[start:start+len(module)]=module
+    report.update(sha256=sha256(module),crc32=zlib.crc32(module),additional_resident_bytes=len(packet))
+    return report,{PLAYER_VROM:bytes(owner),0x7D9BA0:bytes(new_reloc)}

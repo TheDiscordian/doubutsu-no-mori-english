@@ -1471,6 +1471,10 @@ def rig_import_plan(inventory, report, bindings, selected=(), category=None, *, 
                       {r['item_id'] for r in static_rows if r['profile']['callback_adapter'].get('level_sound')}|
                       set(material_loops)|set(scroll_loops)|joint_loops)-loops),
         profiles=sorted(r['item_id'] for r in rows+material_rows+static_rows+scroll_rows if r['item_id'] not in bindings))
+    if any(r['profile']['callback_adapter']['category']==ROTATED_CATEGORY for r in rows):
+        exercise=report['equipment_resources'].get('player_motion',{}).get('exercise')
+        if not exercise or not exercise.get('action_installed'):
+            plan['player_exercise']=(['motions'] if not exercise else [])+['native']
     if scroll_rows:
         installed={r['source_item_id']:r for r in report['equipment_resources']['room_rigs'].get('scrolling',{}).get('rows',[])}
         plan['scrolling']=sorted(r['item_id'] for r in scroll_rows if r['item_id'] not in installed or
@@ -1557,6 +1561,12 @@ def import_batch(source, worksheet, output, lock, selected=(), category=None, re
             refresh('profile-runtime',furniture_profiles=[bundle(plan['profiles'],'profile-assets')])
     elif plan['audio'] or plan['loops']:
         raise ValueError('Audio dependency is missing from an otherwise installed rig profile')
+    for stage in plan.get('player_exercise',[]):
+        # Follow complete room/music publication, even when artwork is present.
+        refresh('player-exercise-'+stage,player_actions=True)
+        exercise=report['equipment_resources']['player_motion'].get('exercise')
+        if not exercise or stage=='native' and not exercise.get('action_installed'):
+            raise ValueError('Shared player stage did not install its planned exercise dependency')
     bind_profiles(source,base,report)
     if steps:inventory=scan(source,worksheet,installed,selected=selected)
     matches=[r for r in inventory['rows'] if not r['installed'] and

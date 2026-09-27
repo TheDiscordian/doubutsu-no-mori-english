@@ -999,6 +999,10 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             if exercise and not prior['equipment_resources']['player_motion'].get('exercise'):
                 report['shared_runtime_refresh'].update(artwork_changed=True,resource_allocations_changed=True,
                     additional_scene_resident_bytes=equipment_report['player_motion']['allocation']['additional_scene_bytes'])
+            if exercise and exercise.get('action_installed') and not prior['equipment_resources']['player_motion'].get('exercise',{}).get('action_installed'):
+                report['shared_runtime_refresh'].update(resource_allocations_changed=True,
+                    additional_scene_resident_bytes=exercise['native']['additional_scene_bytes'],
+                    additional_resident_bytes=exercise['native']['packet']['bytes'])
             if 'save_codec' in report_updates:
                 report['shared_runtime_refresh'].update(saved_format_changed=True,
                     additional_save_state_bytes=report['save_runtime']['state_bytes']-prior['save_runtime']['state_bytes'])

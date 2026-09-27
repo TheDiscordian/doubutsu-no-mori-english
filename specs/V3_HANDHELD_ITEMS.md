@@ -705,14 +705,45 @@ directions; opposite pairs cancel. Actual eligibility must disable camera change
 only while exercise is available and must reject held items, title demos,
 movement, pickup, and tree-shake input as appropriate to the source.
 
-The core is compiled for preparation and has no installed callback or resident
-address. Its internal updates use source ticks. The native adapter must supply
-the correct update rate, real BGM tempo/audio counters, safe transient lifetime,
-wait hooks, request/setup/main/settle callbacks, and all ordinary player physics,
-collision, facial, and item updates. Do not register action 111 or mark the radio
-selectable until that integration is complete. Native execution, graphics,
-ordinary save cycles with this item, and hardware remain unverified. See the
-[exercise checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#installed-exercise-motions-and-prepared-player-action).
+The next normal player-action stage registers action 111, replaces WAIT setup/main
+callbacks with wrappers, and redirects both the direct camera call and the stored
+camera callback. Original action identities and the profile constructor pointer
+stay intact. The constructor wrapper calls the existing native/balloon initializer,
+then resets all exercise state. A wrapper around the global post-action update
+captures the real audio clock even when another action is running.
+
+`player_exercise_native.c` uses the native movement, collision, facial, held-item,
+animation, request-priority, and bee-status routines. Two source gesture/animation
+steps run per native frame, with one ordinary native physics update. Audio clock
+samples split across those steps; native animation speed stores source-step speed,
+not a doubled speed that would compound the tempo calculation. WAIT submits the
+exercise request after native competing-action checks. Source empty settlement
+and absent submenu callbacks stay empty; native net-reset behavior is retained.
+
+Checked startup loads the immutable 4,192-byte packet into the 8-KiB reservation
+at `804CE000`, after colour state and before room code. Startup rejects DMA or
+checksum failures before the prior initialization chain. Code/cache checks remain
+enabled on future shared startup rebuilds. Transient state uses 44 bytes at player
+offset `13B0`; aligned player size is `13E0`. The extra 48 bytes also grow the scene
+arena to 610,736 bytes. This is separate from the existing motion-bank growth;
+both must survive later arena changes. No saved player record changes.
+
+The native audio context is `801494E0`: audio-task counter `+28C0`, configured group
+count `+2880`, groups `+36B0` with stride `160`. Current BGM handle is `80113848`.
+An enabled group with sequence 181 supplies its tempo at `+8`, divided by 48.
+These fields are bound to complete native task/group/sequence helpers, not the
+different GameCube group layout. Logical room BGM remains 27. Calendar rows bind
+native morning/sports aerobics to 16/8, preserving the source event-first branch,
+including its indoor restriction during an active aerobics event. Shrine and
+player block comparison use original native helpers.
+
+The shared profile reader verifies installed code, preload, callbacks, allocation,
+and hooks before marking indoor exercise installed. Original radio acquisition
+still gates selection. The colour dependency reader restores only the checked
+post-action wrapper before comparing its complete native dependency; unrelated
+changes still reject. Native execution, graphics, ordinary save cycles with this
+item, and hardware remain unverified. See the
+[native exercise checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#installed-native-player-exercise).
 
 ### Kind-indexed readers
 
