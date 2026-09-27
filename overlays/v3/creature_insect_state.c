@@ -5,8 +5,13 @@
 static AfInsectController *controller;
 static AfInsectExtra extra[3];
 static AfInsectEvents events;
+static unsigned substep;
+
+void af_insect_begin_step(unsigned step) {substep=step&1u;}
+unsigned af_insect_step(void) {return substep;}
 
 void af_v3_insect_events_reset(void) {
+    substep=0;
     events.pl_action=aINS_PL_ACT_NONE;
     events.pl_action_ut_x=events.pl_action_ut_z=-1;
     events.position_move_proc=af_v3_insect_position;
@@ -14,7 +19,7 @@ void af_v3_insect_events_reset(void) {
 
 void af_v3_insect_bind_controller(AfInsectController *owner) {
     controller=owner;
-    for (unsigned i=0;i<3;i++) extra[i]=(AfInsectExtra){-1,-1};
+    for (unsigned i=0;i<3;i++) extra[i]=(AfInsectExtra){-1,-1,12.0f};
     af_v3_insect_events_reset();
 }
 

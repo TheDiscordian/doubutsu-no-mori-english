@@ -585,8 +585,11 @@ the controller size, actor size, stride, and actual offsets for movement, animat
 speed, stress, collisions, items, lifetime, and alpha. In particular, donor
 `_1E0` names the animation field at native `1DC`; casting to GC structs is unsafe.
 
-`creature_insect_state.c` keeps the added tile coordinates outside native slots
-and their light/program storage. Constructor/destructor ownership binds exactly
+`creature_insect_state.c` keeps the added tile coordinates and collision radius
+outside native slots and their collider/light/program storage. The native
+`ClObjPipe` occupies `1F8..213` (28 bytes), followed by height at `214`. There is
+no spare radius field at `210`. Donor initialisation must not alter those final
+collider bytes. Constructor/destructor ownership binds exactly
 three slots. Foreign pointers reject; no unchecked slot arithmetic or shared
 per-insect scratch state is used. The player-action latch is shared across all
 slots and both substeps, and resets after the complete controller update, not
@@ -602,15 +605,39 @@ for imported objects; otherwise movement and timers would run twice. Original
 species continue through their original native paths.
 
 Source accesses to GC global/game/player fields are explicit adapter calls.
-Unresolved terrain, weather, player, audio/effect, and interaction bindings remain
-undefined symbols in the prepared object; no dummy engine routines satisfy them.
-The host fixture supplies controlled inputs solely to execute and observe the
-converted actions. A passing host check is not evidence that these bindings or
-native gameplay are complete.
+`creature_insect_environment.c` supplies player distance/angle, nearby-actor stress,
+source-rate movement, catch requests through the relocated player's callback,
+projection, culling, and native collider cleanup. Other actors' full-frame movement
+is halved for source stress sampling. Native nature callbacks run once per native
+tick, object-collision displacement is split across both substeps, and source frame
+queries include substep phase. The native game-view offsets have MIPS assertions.
+
+`creature_insect_collision.c` supplies directed-tile collision and source acre
+bounds. A scoped tile filter wraps native column generation, removes only the
+matching cylinder, and restores its previous scope after the check. It does not
+change foreground items or terrain. The real native terrain/ground response is
+retained. Intro-demo acre-inset detection still requires its native binding.
+
+`creature_insect_hooks.S` supplies constructor/destructor ownership, imported
+initialisation, per-slot dispatch, and one event reset after the full controller
+loop. It derives native continuations/tables from the relocated return address,
+not a fixed heap address. The original path replays complete table-address pairs;
+added species bypass the original 32-entry program lookup. Invalid imported
+ownership/identity halts instead of entering an out-of-range native lookup.
+`install_controller` composes the five owner hooks and column call-site hook,
+removing the complete replaced relocation records and preserving unrelated
+graphics hooks. Runtime placement/startup and remaining services must be completed
+before applying this composer to a deliverable ROM.
+
+The bindings file supplies 38 native primitive functions, checked against complete
+bodies in the hash-verified original N64 ROM. Unresolved demo/intro, audio/effect,
+and mosquito-player bindings remain undefined symbols in the prepared object;
+no dummy engine routines satisfy them. Controlled host services are test fixtures,
+not evidence of native gameplay or completed mosquito stings.
 
 ### Current prepared output and remaining connections
 
-Prepared output: `build/v3-creature-insects-work-01/programs-03/`.
+Prepared output: `build/v3-creature-insects-work-01/programs-06/`.
 The current cartridge remains ABI 305. No new ROM, save layout, browser choice,
 or deployment is produced by preparation. Reproduce against the explicit input:
 
@@ -626,15 +653,22 @@ The combined test covers all eight release/despawn paths, two-substep timing,
 correct/wrong-tile shovel and rock events, both tree species, tree cutting, snail
 flower removal, pond-skater rest/ripple cycles, drowning, mosquito pursuit and
 sting requests, catchability, controller ownership, and invalid identities.
-Address/undefined-behaviour sanitizers pass. MIPS compilation verifies the native
-layout; the host fixture does not pretend its wider pointers share that layout.
+Address/undefined-behaviour sanitizers pass. A second host check covers actual
+shared environment/slot logic, source phase, native-rate nature/displacement,
+stress, directed collision restoration, acre walls, catch requests, held/caught
+objects, lifetime, cleanup, and original/foreign ownership rejection. A third
+check composes hooks against the current cartridge in memory and checks preservation,
+relocation removal, and invalid targets. It uses synthetic resident addresses only
+to test composition: it does not build a ROM or execute synthetic code.
+MIPS compilation verifies native layouts and assembles all controller bridges;
+host pointer sizes are not treated as the cartridge ABI.
 
 Remaining connections belong to the same creature importing task:
 
-- Bind native environment/terrain/player helpers, complete directed-unit collision
-  handling, field sound/effects, and the mosquito player sting response.
-- Connect native construction, destruction, source-rate dispatch, catch requests,
-  and the digging, axe/shovel rock-strike, and tree-shake event producers.
+- Finish the native demo/intro-mode bindings, field sound/effects, and the mosquito
+  player sting response. Reuse the prepared native environment/terrain/controller.
+- Connect the digging, axe/shovel rock-strike, and tree-shake event producers.
+  The latch/reset and donor consumers are prepared; no producer is claimed wired.
 - Convert/connect the complete insect calendar, terrain/weather selection, and
   spawning, including the ant ground-colony actor rather than just its release form.
 - Place the complete runtime through the existing owner-storage machinery, retain

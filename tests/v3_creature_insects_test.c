@@ -81,6 +81,7 @@ static aINS_INSECT_ACTOR *start(unsigned n,int release) {
     assert(n<8);
     aINS_INSECT_ACTOR *i=controller.insects+n%3;
     memset(i,0,sizeof(*i));
+    memset(i->col_pipe,0xA5,sizeof(i->col_pipe));
     af_v3_insect_bind_controller(&controller);
     caught=0;stung=NULL;demo=stump=wet=grounded=away=environment_calls=effects=requests=0;
     flower=1;
@@ -91,6 +92,7 @@ static aINS_INSECT_ACTOR *start(unsigned n,int release) {
     a->world.position=(xyz_t){320,20,320};a->home=a->world;
     a->scale=(xyz_t){0.01f,0.01f,0.01f};a->drawn=1;
     assert(af_v3_insect_init(i,&game)==1);
+    for (unsigned p=0;p<sizeof(i->col_pipe);p++) assert(i->col_pipe[p]==0xA5);
     assert(i->item==0x2D20+n);
     return i;
 }

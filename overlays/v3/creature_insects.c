@@ -1,6 +1,6 @@
 /* Category dispatch and source-rate stepping. The controller hook must bypass
  * native movement/lifetime updates for these objects; originals stay native. */
-#include "creature_insects.h"
+#include "creature_insect_engine.h"
 
 int af_v3_insect_init(aINS_INSECT_ACTOR *insect,GAME *game) {
     static const mActor_proc init[8]={
@@ -11,10 +11,15 @@ int af_v3_insect_init(aINS_INSECT_ACTOR *insect,GAME *game) {
     AfInsectExtra *extra=af_insect_extra(insect);
     if (!extra) return -1;
     extra->ut_x=extra->ut_z=-1;
+    extra->bg_range=12.0f;
     insect->move_proc=af_v3_insect_position;
     insect->life_time=216000;
     insect->alpha0=255;
     insect->insect_flags.bit_4=1;
+    ACTOR *actor=(ACTOR *)insect;
+    actor->drawn=1;
+    f32 shadow=insect->type==38?2.0f:insect->type>=35?4.0f:6.0f;
+    actor->shape_info.shadow_size_x=actor->shape_info.shadow_size_z=shadow;
     init[insect->type-32]((ACTOR *)insect,game);
     return 1;
 }
@@ -38,6 +43,7 @@ int af_v3_insect_tick(aINS_INSECT_ACTOR *insect,GAME *game) {
      * timers. Run two full ordered substeps, not blanket constant replacement. */
     for (unsigned step=0;step<2;step++) {
         if (!insect->exist_flag || insect->insect_flags.destruct) break;
+        af_insect_begin_step(step);
         if (!insect->tools_actor.init_matrix) insect->move_proc(actor);
         af_insect_environment(insect,game);
         if (insect->life_time>0) insect->life_time--;
@@ -53,5 +59,6 @@ int af_v3_insect_tick(aINS_INSECT_ACTOR *insect,GAME *game) {
         }
         actor->mv_proc(actor,game);
     }
+    af_insect_begin_step(0);
     return 1;
 }

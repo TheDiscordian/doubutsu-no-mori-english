@@ -60,7 +60,7 @@ struct ACTOR {
     u8 unknown_b4,drawn;
     s16 player_angle_y;
     f32 player_distance,player_distance_xz,player_distance_y;
-    u8 status_data[0x18];
+    struct { xyz_t displacement; u8 tail[0xC]; } status_data;
     AfInsectShape shape_info;
     xyz_t camera_position;
     f32 camera_w,cull_width,cull_height,cull_distance,cull_radius,talk_distance;
@@ -81,8 +81,8 @@ typedef struct aINS_INSECT_ACTOR {
     f32 _1E0,_1E4; /* donor names; native animation fields are 1DC/1E0 */
     int native_1E4;
     f32 speed_step,target_speed,native_1F0,patience;
-    u8 col_pipe[0x18];
-    f32 bg_range,bg_height;
+    u8 col_pipe[0x1C];
+    f32 bg_height;
     int bg_type;
     mActor_name_t item;
     struct { u8 destruct:1,bit_1:1,bit_2:1,bit_3:1,bit_4:1,bit_5:1,bit_6:1,bit_7:1; } insect_flags;
@@ -95,8 +95,8 @@ typedef struct aINS_INSECT_ACTOR {
     u8 native_light[0x1C];
 } aINS_INSECT_ACTOR;
 
-/* Source-only tile coordinates do not occupy native object/light storage. */
-typedef struct { s16 ut_x,ut_z; } AfInsectExtra;
+/* Source-only fields do not occupy native collider/object/light storage. */
+typedef struct { s16 ut_x,ut_z; f32 bg_range; } AfInsectExtra;
 typedef struct {
     ACTOR actor_class;
     aINS_INSECT_ACTOR insects[3];
@@ -215,6 +215,8 @@ AF_OFFSET(aINS_INSECT_ACTOR,speed_step,0x1E8);
 AF_OFFSET(aINS_INSECT_ACTOR,target_speed,0x1EC);
 AF_OFFSET(aINS_INSECT_ACTOR,patience,0x1F4);
 AF_OFFSET(aINS_INSECT_ACTOR,col_pipe,0x1F8);
+_Static_assert(sizeof(((aINS_INSECT_ACTOR *)0)->col_pipe)==0x1C,"native pipe size");
+AF_OFFSET(aINS_INSECT_ACTOR,bg_height,0x214);
 AF_OFFSET(aINS_INSECT_ACTOR,bg_type,0x218);
 AF_OFFSET(aINS_INSECT_ACTOR,item,0x21C);
 AF_OFFSET(aINS_INSECT_ACTOR,life_time,0x220);

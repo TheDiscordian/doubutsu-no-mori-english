@@ -70,17 +70,22 @@ real defects it exposes, including classification of the constructor timeout.
 Do not restart the exhausted fixture or declare an unclassified failure harmless.
 Continue the eight insects' shared field behaviour/spawn programs while that
 native test remains unresolved. Keep fish gameplay verification open, not waived.
-The six complete donor behaviour programs are converted and MIPS-compiled together
-at `build/v3-creature-insects-work-01/programs-03/`. Their source-rate driver,
-native-sized actor view, controller-owned extra state, action event latch, and
-catchability reader pass a combined sanitized host check across all eight species.
-These programs are **not installed** and do not change the available imports.
-Continue directly with their native engine bindings and controller/event hooks,
-then connect the complete insect spawn path and ant ground-colony actor. The
-mosquito's player sting response, field sound/effect bindings, and directed-unit
-collision checks remain required, not optional substitutes or deferred exceptions.
-The checked source bodies and native ABI map are reusable; do not rewrite them or
-restart art conversion. Full dependencies and the exact preparation command live
+The six complete donor behaviour programs and the shared native environment,
+stress, capture, culling, and directed-collision adapters compile together at
+`build/v3-creature-insects-work-01/programs-06/`. Controller ownership, source-rate
+stepping, event latching, and current-owner hook/relocation composition are
+prepared. Three focused host/compiler/composition checks pass; the collider
+preservation check covers all eight donor initialisers. These programs are
+**not installed** and do not change the available imports.
+Continue directly with the remaining native demo/intro-mode, field sound/effect,
+and mosquito player-response bindings, plus the actual player-event producers.
+The complete insect spawn path and ant ground-colony actor remain required in
+the same task. The prepared directed collision filter needs its checked
+`80070398` call-site hook when the complete runtime is installed. Do not replace
+it with ordinary collision or mark the disabled imports playable.
+Reuse the checked source bodies, native bindings, controller bridges, and
+relocation-aware composer rather than rewriting them or restarting art conversion.
+Full dependencies and the exact preparation command live
 in the [insect program contract](../specs/V3_CREATURE_ITEMS.md#added-insect-behaviour-programs).
 Reuse complete room, field, calendar, catch, icon, and UI resources. All seventeen
 source house-rating/feng shui records are converted through the ordinary shared

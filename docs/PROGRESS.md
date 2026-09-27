@@ -39,16 +39,24 @@ profiles whose acquisition is pending. The main lock and both stable V2-14
 deployments are retained.
 
 The active creature batch prepares all eight added insects' field behaviour
-together. Six complete pinned donor programs compile against a checked N64 actor
-layout, with a source-rate update driver, controller-owned extra state, shared
-dig/rock/tree event handling, and catchability. One combined sanitized host check
-passes for every added species and these interactions, including mosquito pursuit
-and the request for a player sting response. The native response itself is not
-implemented by that fixture. Output is
-`build/v3-creature-insects-work-01/programs-03/`; the prepared code is not installed,
-the insects remain unavailable for selection, and ABI 305 remains the cartridge.
-Continue the same batch with native bindings/controller hooks, full spawning,
-and the ant's ground-colony actor. No old native fixture is replayed. See the
+together. Six complete donor programs compile with the native environment,
+movement, stress, catch, culling, and collider-cleanup adapters. The prepared
+controller bridges retain original insects' updates and prevent added species
+from reaching the old bounded program table. Directed collision excludes only
+the hiding tile's cylinder; ordinary terrain and neighbouring obstacles remain.
+The native collider is 28 bytes, and the donor-only collision radius lives in
+controller-owned extra state rather than overlapping its final four bytes.
+Three focused checks pass: complete donor behaviour with collider-preservation
+checks, the shared environment/controller path under sanitizers, and guarded
+current-cartridge hook/relocation composition. These are host/compiler checks,
+not native gameplay. Output is
+`build/v3-creature-insects-work-01/programs-06/`; no new ROM is built, the insects
+remain unavailable for selection, and ABI 305 remains the cartridge.
+Continue the same batch with the remaining native demo/intro, sound/effect, and
+mosquito-sting bindings; player-event producers; complete insect spawning and ant
+colonies; and complete runtime placement/startup/selection. Native constructor
+timeout and sound-scheduler disconnection remain unresolved. No old native
+fixture is replayed. See the
 [insect program contract](../specs/V3_CREATURE_ITEMS.md#added-insect-behaviour-programs).
 
 Four additional paintings use the ordinary shared importer: full models, original
