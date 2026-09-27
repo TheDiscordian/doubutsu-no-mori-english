@@ -73,10 +73,23 @@ The core uses the existing larger joint workspace without changing actor size
 or saved fields. Drawing reserves an aligned parent matrix, all three tile lists,
 and the complete opaque/translucent command requirements before mutating arenas.
 Room and preview counters both convert to the source rate with unsigned wrap.
-The caller supplies the actual basement/light predicate; a fabricated constant
-must not hide an existing native context. No new basement/cottage scene is implied.
-Actual room dispatch, audio/profile binding, and scene correspondence remain
-integration work; the prepared core is not installed in the current cartridge.
+The installed mode-11 dispatcher binds front contact through the actual room clip
+at `80136F2C`, its owner, and direction at owner offset `1A0`. Scene selection uses
+the native saved scene at `80126EB4`; NPC house 6 forces closed. The complete
+35-scene table and added campsite selector are hash-checked. Neither provides a
+GameCube basement or cottage, so the source basement-only scroll pause cannot
+occur in the supported native scenes. New scene support must revisit this binding.
+
+The 24-byte rig record retains the full opening pointer in `animation`, the full
+closing pointer in `first`, both mapped trigger words in `last` (opening high,
+closing low), and the complete source loop ID in the previously reserved byte.
+This byte remains zero for every other mode. Both motion headers must be distinct,
+aligned, within the object, and retain their complete valid frame counts. A
+resource-only record has zero trigger words and cannot dispatch. Profile staging
+binds and checks both complete programmes, full instruments, native scene/contact
+readers, start-disabled placement, destruction, and save-state mirroring before
+republishing the shared packet. The ordinary importer handles resources, triggers,
+loop audio, and profiles in dependency order; unfinished acquisition stays separate.
 
 ### Multi-instrument trigger programmes
 

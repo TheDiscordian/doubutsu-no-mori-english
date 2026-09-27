@@ -34,14 +34,20 @@ stops on resource preservation before producing a ROM; it is not installed.
 The shared converter prepares the complete aerobics radio and treasure chest
 together: 13,824 bytes, 174 triangles, all textures/palettes, nested model parts,
 six chest joints, both distinct 51-frame motions, and three scrolling layers.
-The chest's converted interaction/draw core passes donor comparisons and N64
-compilation. Shared audio conversion retains both full multi-instrument trigger
-programmes and the continuous sound. Fourteen focused resource, lifecycle, and
-audio checks pass. These are prepared dependencies, not installed item gameplay.
-Next: connect the chest's room/contact/context readers, mapped sounds, destruction,
-and native save capture; finish the radio's room-music ownership, note emitter,
-and rotated drawing through the ordinary importer. See the
-[composite checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#prepared-composite-models-and-dual-motion).
+The ordinary importer installs the chest's complete native behaviour, including
+room/contact readers, both mapped multi-instrument sounds, continuous sound,
+destruction, and saved-state capture. The current proposal is ABI 271 at
+`build/v3-dual-motion-imports-01/profile-runtime/build-lock.json`, SHA-256
+`a93384de48092aa3180f484602bc4fb57b0e0037635dbec6c8a4fc03025343e3`.
+Installed-resource and four private browser/offline composition checks pass;
+162 choices and saved format 4 are retained. The chest's island acquisition is
+still pending, so it remains unavailable in the selector. The prepared core's
+donor comparisons are retained, not relabelled as full native execution. A new
+dispatch fixture stops at its two setup attempts before C execution; do not loop
+on it. Native gameplay/rendering/synthesis, saving with this item, and hardware
+remain unverified. Next: finish radio music ownership, note emission, and rotated
+drawing, then console launch/storage. See the
+[installed chest checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#installed-dual-motion-lifecycle).
 
 The ordinary category importer installs crab stew's combined reversible animation,
 delayed fire textures, translucent joint, randomized steam, and complete audio.

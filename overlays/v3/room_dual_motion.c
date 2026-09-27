@@ -11,6 +11,35 @@ static RoomReversible *dual_work(RoomRig *actor) {
     return (RoomReversible *)(void *)actor->matrices[0][6];
 }
 
+#ifdef AF_V3_ROOM_DUAL_MOTION
+int af_v3_room_dual_resolve(const RoomRigRecord *r,u8 *data,RoomDualMotion *out) {
+    if (!r || !data || !out || r->mode!=ROOM_RIG_DUAL || r->bytes<32 || r->bytes>9216 ||
+            (r->bytes&15) || !r->last.bits ||
+            r->animation==r->first.bits || !r->reserved || r->reserved>127) return 0;
+    u32 headers[2]={r->first.bits,r->animation};
+    for (u32 i=0;i<2;++i) {
+        u32 at=headers[i];u16 sound=(u16)(r->last.bits>>(i*16));
+        if ((at&3) || at<0x06000000u || at>0x06000000u+r->bytes-20u ||
+                !sound || (sound&0x8080u) || (sound>>8)!=1) return 0;
+        u8 *a=data+at-0x06000000u;u32 frames=(u32)a[18]*256u+a[19];
+        if (a[16]!=255 || a[17]!=255 || !frames || frames>32767) return 0;
+        out->animation[i]=Lib_SegmentedToVirtual((void *)(uptr)at);
+        out->duration[i]=(float)frames;out->click[i]=sound;
+    }
+    out->loop=r->reserved;return 1;
+}
+
+int af_v3_room_dual_front(void) {
+#ifdef __mips__
+    void **clip=*(void **volatile *)0x80136F2Cu;
+    void *owner=clip ? *clip : (void *)0;
+#else
+    void *owner=af_v3_test_dual_owner;
+#endif
+    return owner && *(int *)((u8 *)owner+0x1A0)==0;
+}
+#endif
+
 void af_v3_room_dual_ct(RoomRig *actor,void *skeleton,const RoomDualMotion *motion,int force_closed) {
     RoomReversible *w=dual_work(actor);RoomKeyframe *key=&actor->keyframe;
     if (force_closed) actor->switched=0;

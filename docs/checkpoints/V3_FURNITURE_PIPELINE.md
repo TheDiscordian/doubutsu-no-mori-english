@@ -1,5 +1,69 @@
 # Automatic furniture pipeline checkpoint
 
+## Installed dual-motion lifecycle
+
+The ordinary importer installs the complete treasure chest through mode 11:
+all 8,672 prepared bytes, six joints/five models, both distinct 51-frame motions,
+three scrolling layers, full opening/closing/continuous sounds, front-only idle
+interaction, NPC forced-closed initialization, destruction, and native saved-switch
+capture. Source/destination `31B0` uses runtime index 1132. The official English
+name is in the single provenance catalogue. Island acquisition (`ftr_listIsland`)
+remains pending, so the complete profile stays inactive rather than becoming
+fabricated Nook stock. Radio behaviour and console launch/storage are the next
+importing work; acquisition and gold-tree work follow the importing pipelines.
+
+- Checked lock: `build/v3-dual-motion-imports-01/profile-runtime/build-lock.json`, ABI 271.
+- ROM SHA-256: `a93384de48092aa3180f484602bc4fb57b0e0037635dbec6c8a4fc03025343e3`.
+- UPS SHA-256: `7ceca02df1bbf6858407f37df3e38fb180efd2b97f44c153eee1b62a49def7fa`.
+- Shared room code: 25,824 of 32,768 bytes, SHA-256 `45147e5a65edf5f4f7c0603f087ceecda5c9bae937bd2e55d1c2aee3b2370d56`.
+- Bootstrap: 1,142 of 1,536 bytes, SHA-256 `69f7fbdff418b7ae2756ce1a408f9f0272989dff3d759489807c074e682ad448`.
+- Room packet: 36,864 bytes, SHA-256 `d834c186367379d3d9ba47147b76f4763211d017b6723edd3fd0d8d547fa0926`.
+- Development choices: 162. Saved format: 4. Both deployed patchers retain V2-13.
+
+The importer reuses every prepared artwork byte without recompilation, installs
+both triggers, prepares the loop against the resulting expanded font, and binds
+the inactive profile. Source trigger words `016A`/`016B` map to native `0172`/`0173`;
+all four complete instruments and sample dependencies remain. Mode 11 checks both
+animation headers and mapped words before dispatch. Resource-only records cannot
+execute. The dispatcher mirrors accepted state after construction/movement and
+through the actual destruction export, without growing actors or saved fields.
+
+Front contact is bound to the real room clip/owner and direction field. The full
+native 35-scene table and installed campsite selector establish the scene set:
+NPC house 6 forces closed, and no GameCube cottage or basement exists. Consequently
+the source's basement-only scroll pause cannot occur in these scenes. This
+correspondence must be revisited if a future import adds such rooms.
+
+Two assembled-build checks pass: complete installed assets, both motion pointers,
+mapped programmes/instruments, loop binding, scene/contact contracts, invalid
+binding rejection, unchanged earlier records/assets/carrying/save codec, matching
+encoded packet, no remaining importing dependencies, and original-ROM UPS
+reconstruction; plus four private browser/offline compositions with unavailable
+acquisition kept disabled. The affected existing reversible-dispatch check also
+passes. Full room MIPS compilation includes the current source hashes.
+
+The additional dual-dispatch fixture has two setup failures before C execution:
+an escaped symlink, then missing cached command-source files. Its revised input
+uses the ordinary importer's complete prepared bundle; it is not rerun in this
+batch. Full host/native dispatch execution remains unverified. The unchanged core
+retains its 9,612 actual-donor comparisons and 4,800 simulated draw frames; those
+are not new full-dispatch or GPU evidence. No old emulator fixture is replayed.
+Ordinary play, rendering, audio synthesis, save/restart with the item, and hardware
+remain unverified for the combined gameplay pass.
+
+No saved-format or enabled-profile change occurs relative to ABI 267. V3 saves
+still require matching supported selections and must not be treated as V2 saves.
+Preserve backups. Empty selection still pins V2-12 and must align with V2-13 before
+handoff. The main build lock, deployed patchers, existing ROMs, and saves stay intact.
+
+```sh
+python3 tools/v3_furniture_pipeline.py import \
+  --base-lock build/v3-effect-rig-imports-01/cartridge/build-lock.json \
+  --select 31B0 --reuse-assets build/v3-composite-rigs-prepared-01 \
+  --output build/v3-dual-motion-reproduction
+python3 -m unittest -v tests.test_v3_composite_rigs.InstalledTests
+```
+
 ## Prepared composite models and dual motion
 
 `build/v3-composite-rigs-prepared-01/` contains the complete two-record asset
@@ -66,22 +130,13 @@ Both audio bundles pin ABI 267 separately; when installing sequentially, regener
 the second bundle against the resulting checked build, preserving any new font
 resources. Do not apply its older font snapshot over the first stage.
 
-Remaining integration: chest native room/contact/context readers, explicit mapping
-of both sounds, complete dispatch, saved-switch capture/destruction, profile and
-ordinary category planning; radio constructor/destructor music ownership, exclusive
-playback, note emission, and rotated drawing. The original native scene enum has
-NPC house 6 but no GameCube basement or cottage; establish actual correspondence
-against the current room/scene runtime before binding those predicates. Continue
-console launch/storage after these importing behaviours, then acquisition and gold
-tree work. No emulator scenario or old cartridge test is replayed.
-
-The installed proposal remains ABI 267 with 162 choices and saved format 4. This
-preparation changes no ROM, existing save, main lock, or deployed patcher. Both
-served patchers retain V2-13. V3 saves still require matching supported profiles
-and are not suitable for V2. Ordinary native gameplay, save/restart, synthesis,
-GPU appearance, and hardware are not claimed for these two prepared records.
-The current cartridge's 57 complete shared profile bindings still validate with
-the changed converter/audio code; this does not replay historical cartridges.
+The prepared component's base is ABI 267 with 162 choices and saved format 4.
+Chest installation and remaining verification are recorded in the installed
+dual-motion section above. Radio constructor/destructor music ownership,
+exclusive playback, note emission, and rotated drawing remain importing work.
+Prepared assets alone change no ROM, save, main lock, or deployment. The ABI-267
+cartridge's 57 complete shared profile bindings validate with this converter/audio
+code; that preparation evidence does not replay historical cartridges.
 
 ```sh
 python3 tools/v3_furniture_pipeline.py convert --assets-only \

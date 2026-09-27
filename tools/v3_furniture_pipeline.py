@@ -1202,7 +1202,7 @@ def metadata(source, item, profile, identity):
     from v3_furniture_scroll import CATEGORY as SCROLL_CATEGORY
     binding=getattr(source,'runtime_profiles',{}).get(f'{item:04X}')
     from v3_furniture_composite import PENDING_CATEGORIES
-    if profile.get('callback_adapter',{}).get('category') in PENDING_CATEGORIES:
+    if profile.get('callback_adapter',{}).get('category') in PENDING_CATEGORIES and not binding:
         raise ReviewRequired('Complete composite resources are prepared; '+', '.join(profile['callback_adapter']['pending_callbacks'])+' remain uninstalled')
     if profile.get('callback_adapter',{}).get('category')==SELECTED_PALETTE_CATEGORY and not binding:
         raise ReviewRequired('Complete roof palettes and models are prepared; native house-colour selection/lifecycle remains uninstalled')
@@ -1421,7 +1421,8 @@ def rig_import_plan(inventory, report, bindings, selected=(), category=None, *, 
     from v3_furniture_reactions import source_lifecycle as reaction_lifecycle,colour_lifecycle
     from v3_sound_programs import furniture_trigger,furniture_level
     from v3_furniture_joint_rigs import CATEGORY as JOINT_CATEGORY,lifecycle as joint_lifecycle
-    categories={CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY,ROLLING_CATEGORY,MATERIAL_RIG_CATEGORY,REVERSIBLE_CATEGORY,EFFECT_RIG_CATEGORY,SELECTED_PALETTE_CATEGORY}
+    from v3_furniture_composite import DUAL_CATEGORY
+    categories={CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY,ROLLING_CATEGORY,MATERIAL_RIG_CATEGORY,REVERSIBLE_CATEGORY,EFFECT_RIG_CATEGORY,SELECTED_PALETTE_CATEGORY,DUAL_CATEGORY}
     candidates=[r for r in inventory['rows'] if r.get('asset_ready') and not r['installed'] and
         not r.get('room_alias') and (not selected or r['item_id'] in selected) and
         (category is None or category in r['categories'])]
@@ -1462,9 +1463,9 @@ def rig_import_plan(inventory, report, bindings, selected=(), category=None, *, 
     audio={r['item_id'] for r in report['equipment_resources'].get('furniture_audio',{}).get('furniture',[])}
     loops={r['item_id'] for r in report['equipment_resources'].get('furniture_level_audio',{}).get('furniture',[])}
     plan=dict(resources=sorted(r['item_id'] for r in rows if r['item_id'] not in rigs),
-        audio=sorted(({r['item_id'] for r in rows if r['profile']['callback_adapter'].get('trigger')}|
+        audio=sorted(({r['item_id'] for r in rows if furniture_trigger(source,r['profile']) is not None}|
                       set(material_audio)|{r['item_id'] for r in static_rows if r['profile']['callback_adapter'].get('trigger')})-audio),
-        loops=sorted(({r['item_id'] for r in rows if r['profile']['callback_adapter'].get('level_sound')}|
+        loops=sorted(({r['item_id'] for r in rows if furniture_level(source,r['profile']) is not None}|
                       {r['item_id'] for r in static_rows if r['profile']['callback_adapter'].get('level_sound')}|
                       set(material_loops)|set(scroll_loops)|joint_loops)-loops),
         profiles=sorted(r['item_id'] for r in rows+material_rows+static_rows+scroll_rows if r['item_id'] not in bindings))

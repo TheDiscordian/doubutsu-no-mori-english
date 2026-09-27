@@ -21,14 +21,20 @@ prevent asset/data conversion or redirect work from an unfinished shared format.
 Incomplete gameplay stays unavailable in the selector; installing assets does
 not claim that an item is playable. Reuse unchanged passing tests throughout.
 
-Current task: integrate the prepared radio/chest models and complete behaviours,
-then continue console launch/storage. Both complete models, both chest motions,
-three scroll layers, the chest's converted interaction/draw core, and full sound
-dependencies are prepared. Connect chest room/contact/context readers, mapped
-opening/closing sounds, destruction, and native save capture; finish radio
-room-music ownership, note emission, and rotated drawing. Reuse the existing
-ordinary category importer. Do not add per-item installers or omit unique behaviour.
-See the [composite checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#prepared-composite-models-and-dual-motion).
+Current task: finish the prepared radio's complete room-music ownership,
+constructor/destructor interactions, exclusive playback, note emission, and rotated
+drawing; then continue console launch/storage. Reuse the ordinary category importer
+and complete prepared assets. Do not add per-item installers or omit unique behaviour.
+
+The chest's complete native lifecycle is installed: both motions, all three scroll
+layers, distinct mapped sounds, actual room/contact readers, destruction, and saved
+switch capture. Installed-resource and four private browser/offline compositions
+pass. Its actual island acquisition remains pending, so it adds no selectable
+choice. The new host dispatcher fixture exhausts its two setup attempts before
+executing C; the prepared core's donor comparisons remain valid, but full dispatch
+execution, ordinary appearance/synthesis, saving with this item, and hardware stay
+unverified. Do not loop on that fixture. See the
+[installed chest checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#installed-dual-motion-lifecycle).
 
 The complete crab stew uses mode 10: all four joints and three models, delayed
 on/off fire frames, full motion, translucent drawing, randomized steam, complete
@@ -50,19 +56,18 @@ destruction dispatch. See the
 [reversible checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#installed-reversible-lifecycle-and-save-capture).
 
 Continue the remaining actual lifecycle and console launch/storage categories
-without per-item installers. Radio and chest resources are converted; their
-native gameplay integration is unfinished. Reuse these complete resources and
-the shared skeleton/material/reversible behaviour support throughout.
+without per-item installers. Radio resources are converted; its native behaviour
+integration is unfinished. Reuse complete resources and shared runtime categories.
 
-The checked current proposal is ABI 267 at
-`build/v3-effect-rig-imports-01/cartridge/build-lock.json`, ROM SHA-256
-`63da46dba20aca042324ca58ff231cc257ec73a26ec36fe56cf4c98f56b129af`.
+The checked current proposal is ABI 271 at
+`build/v3-dual-motion-imports-01/profile-runtime/build-lock.json`, ROM SHA-256
+`a93384de48092aa3180f484602bc4fb57b0e0037635dbec6c8a4fc03025343e3`.
 The combined skeleton/material category imports the complete hamster cage,
 including source movement/texture timing, positioned sound, actual lottery
 availability, catalogue ordering, scoring, and official English text. Five focused
 checks pass; native execution, ordinary appearance/synthesis, and hardware remain
 unverified. There are 162 enabled development choices and no saved-format change.
-Shared room code uses 23,776 of 32,768 bytes; bootstrap uses 1,142 of 1,536.
+Shared room code uses 25,824 of 32,768 bytes; bootstrap uses 1,142 of 1,536.
 See the [combined-animation checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#installed-combined-skeleton-and-material-animation).
 
 The harvest TV's complete switched-screen lifecycle is installed through the

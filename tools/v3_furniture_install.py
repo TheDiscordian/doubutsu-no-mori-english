@@ -76,11 +76,12 @@ def profile(row, vrom, *, limit=END, model_capacity=9216):
     roof=adapter.get('category')==SELECTED_PALETTE_CATEGORY
     from v3_furniture_roofs import profile_lifecycle as roof_lifecycle
     from v3_furniture_joint_rigs import profile_lifecycle as joint_lifecycle
-    from v3_furniture_composite import PENDING_CATEGORIES
+    from v3_furniture_composite import ROTATED_CATEGORY,DUAL_CATEGORY,dual_profile_lifecycle
     if (adapter.get('category')==JOINT_CATEGORY and not joint_lifecycle(
             row['profile'],row.get('room_lifecycle'),row.get('room_placement')) or
             roof and not roof_lifecycle(row['profile'],row.get('room_lifecycle')) or
-            adapter.get('category') in (FIXED_CATEGORY,PENDING_MOVE_CATEGORY,PENDING_SEQUENCE_CATEGORY)+PENDING_CATEGORIES or scrolling and
+            adapter.get('category')==DUAL_CATEGORY and not dual_profile_lifecycle(row['profile'],row.get('room_lifecycle'),row.get('room_placement')) or
+            adapter.get('category') in (FIXED_CATEGORY,PENDING_MOVE_CATEGORY,PENDING_SEQUENCE_CATEGORY,ROTATED_CATEGORY) or scrolling and
             (not profile_lifecycle(row['profile'],row.get('room_lifecycle'),row.get('room_placement')) or
              row.get('room_runtime')!={'vtable':SCROLL_VTABLE,'vrom':vrom})):
         raise ValueError('Prepared resources have no implemented native lifecycle')

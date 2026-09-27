@@ -12,6 +12,82 @@ DUAL_CATEGORY='dual-motion-scroll-rig-assets'
 PENDING_CATEGORIES=(ROTATED_CATEGORY,DUAL_CATEGORY)
 
 
+def dual_lifecycle(profile):
+    a=profile.get('callback_adapter',{})
+    if (a.get('category')!=DUAL_CATEGORY or profile['contact_action'] or
+            profile['interaction_flags']!=0x1000 or a['skeleton']['shown_joints']>6 or
+            len(a['animations'])!=2):raise ValueError('Incomplete dual-motion lifecycle')
+    return dict(category=DUAL_CATEGORY,mode=11,start_disabled=True,
+        movement=a['movement'],constructor=a['constructor'],
+        scroll_phases=a['scroll_phases'],state_offset=0x390,state_bytes=208,
+        native_npc_scene=6,absent_native_scenes=['island cottage','basement'])
+
+
+def dual_profile_lifecycle(profile,receipt,placement):
+    return (receipt is not None and receipt==dual_lifecycle(profile) and
+        placement is not None and placement.get('mask')==0x1000)
+
+
+def dual_native_contract(image,report):
+    from aflib import CODE_RAM,CODE_VROM,by_vrom
+    from v3_asset_loader import BLOB
+    from v3_furniture_contact import native_contract
+    from v3_import_storage import PACKAGE,PACKAGE_RAM
+    files=by_vrom(image);core=files[CODE_VROM].extract(image);blob=files[BLOB].extract(image)
+    scene=core[0x8010EAA0-CODE_RAM:0x8010EAA0-CODE_RAM+700]
+    if sha256(scene)!='fd43cc4051ad106cfb491617337a1db44ee92706ed1ba4a85dd5dab4557f9d5d':
+        raise ValueError('Changed complete native scene set')
+    campsite=report.get('campsite',{});at=PACKAGE+0x804A0100-PACKAGE_RAM
+    if (not campsite.get('scene_loading_installed') or
+            campsite.get('native_contract',{}).get('scene')!=35 or
+            sha256(blob[at:at+580])!='744685bfa708808c700dabac0fb22ac0a6878766cf8ede0c7020763e03cc1735'):
+        raise ValueError('Changed complete added-scene selector')
+    return dict(contact=native_contract(image),scene_pointer=0x80126EB4,npc_scene=6,
+        original_scene_table_sha256=sha256(scene),original_scene_count=35,additional_scene=35,
+        additional_scene_kind='summer campsite',additional_scene_code_sha256=sha256(blob[at:at+580]),
+        absent_native_scenes=['island cottage','basement'],native_basement_scroll_stop=False)
+
+
+def dual_sound_words(source,profile,image,report):
+    """Rebuild both complete programmes and rebind every layer instrument."""
+    from aflib import by_vrom,CODE_RAM,CODE_VROM
+    from v3_asset_loader import ROOT
+    from v3_sound_programs import prepare_triggers,installed_resource,register_triggers,read_audio_donor
+    audio=report['equipment_resources'].get('furniture_audio',{})
+    if not all(audio.get(k) for k in ('runtime_installed','dispatch_and_priority_installed','allocation_installed','callback_installed')):
+        raise ValueError('Dual-motion triggers need complete audio installation')
+    words=profile['callback_adapter']['movement']['source_clicks']
+    resources,prepared=prepare_triggers(image,report,words)
+    code=by_vrom(image)[CODE_VROM].extract(image);sequence,_,_=installed_resource(image,code,'seq',199)
+    dol,_=read_audio_donor(ROOT/'local/gamecube/Animal Crossing (USA, Canada).ciso')
+    programs={r['source_sound_word']:r for r in audio['programs']}
+    if any(word not in programs for word in words):raise ValueError('Missing distinct dual-motion sound')
+    registered,bound,_=register_triggers(sequence,prepared['programs'],resources['fragments'],
+        {r['group']:r['previous_count'] for r in audio['tables']},
+        code[0x80113B84-CODE_RAM:0x80113B84-CODE_RAM+128],dol.read(0x800A9A90,128),previous=audio)
+    if registered!=sequence:raise ValueError('Dual-motion audio needs uninstalled programme changes')
+    by_source={r['source_sound_word']:r for r in bound}
+    return [by_source[word]['native_sound_word'] for word in words]
+
+
+def checked_dual_binding(source,profile,binding,contracts,equipment):
+    from v3_sound_programs import furniture_level
+    r=profile['callback_adapter'];runtime=equipment['room_rigs'];donor=binding['source_item_id']
+    rig=binding['source']['rig'];sound=next((s for s in runtime['sound_rows'] if s['source_item_id']==donor),{})
+    extra=sound.get('additional_triggers',[]);words=r['movement']['source_clicks']
+    callbacks=struct.unpack('>5I',bytes.fromhex(runtime['vtable_hex']))
+    if (binding.get('mode')!=11 or binding.get('animation')!=0x06000000+rig['motion_offsets'][0] or
+            binding.get('first')!=0x06000000+rig['motion_offsets'][1] or
+            binding.get('loop')!=r['movement']['source_loop'] or
+            sound.get('source_sound_word')!=words[0] or len(extra)!=1 or extra[0]['source_sound_word']!=words[1] or
+            binding.get('last')!=(sound['native_sound_word']<<16|extra[0]['native_sound_word']) or
+            contracts.get(donor)!=furniture_level(source,profile) or
+            binding.get('dual_lifecycle')!=dual_lifecycle(profile) or
+            any('-D'+flag not in runtime['code']['flags'] for flag in ('AF_V3_ROOM_DUAL_MOTION','AF_V3_ROOM_REVERSIBLE')) or
+            not callbacks[3] or callbacks[3]!=runtime['bootstrap']['symbols'].get('af_v3_room_boot_dt')):
+        raise ValueError('Incomplete dual-motion artwork/audio/lifecycle binding')
+
+
 def discover(source,name,at,functions):
     sizes=tuple(functions.get(role,{}).get('bytes') for role in ('create','move','draw','destroy'))
     if sizes not in ((4,236,168,4),(436,508,492,36)):return None

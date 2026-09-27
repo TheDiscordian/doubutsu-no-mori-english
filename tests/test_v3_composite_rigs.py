@@ -1,6 +1,7 @@
 """Complete nested models and dual-motion lifecycles, without enabling stubs."""
 import copy
 import json
+import os
 from pathlib import Path
 import struct
 import subprocess
@@ -141,6 +142,99 @@ class CompositeTests(unittest.TestCase):
         self.assertEqual(sha256(data),loop['sequence']['sha256'])
         for row in loop['programs']:
             self.assertEqual(sha256(data[row['offset']:row['offset']+row['bytes']]),row['sha256'])
+
+    def test_dual_motion_shared_dispatch_and_native_save_capture(self):
+        from v3_room_rig_runtime import prepared_categories,encode_packet
+        bundle=ROOT/'build/v3-dual-motion-imports-01/prepared'
+        row=json.loads((bundle/'art.json').read_bytes())['objects'][0]
+        with tempfile.TemporaryDirectory(prefix='v3-dual-dispatch-',dir=ROOT/'build') as d:
+            directory=Path(d)
+            rows,_,_=prepared_categories(self.source,[bundle])
+            self.assertEqual((rows[0]['mode'],rows[0]['first'],rows[0]['last'],rows[0]['loop']),
+                (11,0x06000000+8652,0,0x52))
+            rows[0]['last']=0x016A016B
+            table=directory/'table';table.write_bytes(encode_packet(rows));binary=directory/'check'
+            run=subprocess.run(['cc','-std=c11','-O1','-g','-Wall','-Wextra','-Werror',
+                '-DAF_V3_ROOM_DUAL_MOTION','-fsanitize=address,undefined','-fno-omit-frame-pointer',
+                '-fno-pie','-no-pie',str(ROOT/'tests/v3_reversible_dispatch_test.c'),'-o',str(binary)],
+                capture_output=True,text=True,timeout=30)
+            self.assertEqual(run.returncode,0,run.stderr)
+            run=subprocess.run([str(binary),str(table),str(ART/row['object_file'])],
+                capture_output=True,text=True,timeout=20)
+            self.assertEqual(run.returncode,0,run.stdout+run.stderr)
+            self.assertIn('2880 dual-motion dispatch frames',run.stdout)
+
+
+class InstalledTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        from v3_furniture_install import inputs
+        from aflib import by_vrom
+        from v3_asset_loader import BLOB
+        cls.batch=ROOT/os.environ.get('V3_DUAL_MOTION_BATCH','build/v3-dual-motion-imports-01')
+        pipeline=json.loads((cls.batch/'pipeline.json').read_bytes())
+        cls.out=(ROOT/pipeline['final_lock']).parent
+        cls.image,cls.report=inputs(cls.out/'build-lock.json')
+        cls.base,cls.prior=inputs(ROOT/'build/v3-effect-rig-imports-01/cartridge/build-lock.json')
+        cls.source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+            (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+        cls.blob=by_vrom(cls.image)[BLOB].extract(cls.image)
+
+    def test_complete_installed_motion_sound_contexts_save_bindings_and_retention(self):
+        from aflib import by_vrom,apply_ups,CODE_VROM
+        from v3_asset_loader import BLOB
+        from v3_furniture_composite import dual_native_contract,dual_sound_words,checked_dual_binding
+        from v3_sound_programs import checked_furniture_loops,installed_resource
+        from v3_room_rig_runtime import bind_profiles,encode_packet
+        from v3_furniture_pipeline import scan,rig_import_plan
+        from v3_villager_audio import instrument
+        e=self.report['equipment_resources'];room=e['room_rigs']
+        bindings=bind_profiles(self.source,self.image,self.report)
+        row=next(r for r in room['rows'] if r['source_item_id']=='31B0')
+        self.assertTrue(bindings['31B0']['staged']);self.assertTrue(row['profile_installed'])
+        self.assertFalse(row['parent_selectable']);self.assertEqual((row['mode'],row['joints'],row['shown']),(11,6,5))
+        self.assertEqual((row['animation'],row['first'],row['loop']),(0x06000000+8632,0x06000000+8652,0x52))
+        self.assertEqual(self.blob[row['blob_offset']:row['blob_offset']+row['bytes']],(ART/'31B0.n64obj.bin').read_bytes())
+        self.assertEqual(room['dual_contract'],dual_native_contract(self.image,self.report))
+        words=dual_sound_words(self.source,self.source.profile(0x31B0),self.image,self.report)
+        self.assertEqual(row['last'],words[0]<<16|words[1]);self.assertNotEqual(words[0],words[1])
+        core=by_vrom(self.image)[CODE_VROM].extract(self.image)
+        contracts,_=checked_furniture_loops(self.image,core,e,self.source)
+        for key,value in (('last',0),('first',row['animation']),('loop',0),('dual_lifecycle',None)):
+            bad=copy.deepcopy(row);bad[key]=value
+            with self.assertRaises(ValueError):checked_dual_binding(self.source,self.source.profile(0x31B0),bad,contracts,e)
+        packet=encode_packet(room['rows'],room['sound_rows'],room['material_rows'])
+        at=room['packet']['blob_offset']+0x8000
+        self.assertEqual(self.blob[at:at+len(packet)],packet)
+        audio=e['furniture_audio'];font,header,_=installed_resource(self.image,core,'bank',140)
+        wave,_,_=installed_resource(self.image,core,'wave',header[10])
+        for r in audio['layout']['imports']:
+            self.assertEqual(instrument(font,wave,r['native_instrument'],header[12],extended=True),r['identity'])
+        source_audio=json.loads((self.batch/'audio/audio.json').read_bytes())
+        imported={r['source_instrument'] for r in source_audio['layout']['imports']}
+        self.assertTrue({4,5,73,74}<=imported)
+        old=self.prior['equipment_resources'];blob=by_vrom(self.base)[BLOB].extract(self.base)
+        for key in ('rows','sound_rows','material_rows'):
+            for previous in old['room_rigs'][key]:
+                kept=next(r for r in room[key] if r['source_item_id']==previous['source_item_id'])
+                self.assertEqual(kept,previous)
+                if 'blob_offset' in previous:
+                    at=previous['blob_offset'];n=previous['bytes'];self.assertEqual(self.blob[at:at+n],blob[at:at+n])
+        for key in ('room_goods','room_carry'):self.assertEqual(e[key],old[key])
+        self.assertEqual(self.report['save_codec'],self.prior['save_codec'])
+        self.assertEqual(self.report['save_runtime'],self.prior['save_runtime'])
+        inventory=scan(self.source,ROOT/'build/item-identity-megasheet.xlsx',[],selected=['31B0'])
+        self.assertTrue(all(not v for v in rig_import_plan(inventory,self.report,bindings,source=self.source).values()))
+        self.assertEqual(inventory['rows'][0]['reason'],'acquisition needs an adapter: ftr_listIsland')
+        self.assertEqual(apply_ups((ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes(),
+            (self.out/'asset-loader.ups').read_bytes()),self.image)
+        self.assertLessEqual(room['code']['bytes'],32768);self.assertLessEqual(room['bootstrap']['bytes'],1536)
+
+    def test_private_browser_compositions_keep_unavailable_acquisition_disabled(self):
+        from tests.test_v3_room_rig_runtime import CurrentImportedRigTests
+        self.rows=self.report['automatic_furniture']['imports']
+        self.assertNotIn('31B0',{r.get('donor_item_id') for r in self.rows})
+        CurrentImportedRigTests.test_private_browser_selection_matches_offline_and_keeps_translation_only(self)
 
 
 if __name__=='__main__':unittest.main()
