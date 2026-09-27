@@ -20,12 +20,16 @@ from v3_import_catalog import DONOR, REL_SHA, ROOT, SYMBOLS_SHA, read_donor
 from v3_villager_art import data_pointers, native_palette, normalise_vertex_flags, symbol_span
 
 SEGMENT = 0x06000000
-CONVERTER_VERSION = 18
+CONVERTER_VERSION = 19
 
 # Complete compatible RDP expressions, selected by material commands, not IDs.
 # These use one texture and retain source alpha; none introduces TEXEL1,
 # noise, keying, or an unprovided external render dependency.
 TRANSLUCENT_COMBINERS = {
+    # Creature fading: texture alpha is multiplied by the caller's environment
+    # alpha, independently of primitive colour and second-cycle lighting.
+    (0xFC119A04,0xFFFFFFF8): ('TEXEL0','0','PRIMITIVE','0','TEXEL0','0','ENVIRONMENT','0',
+        'COMBINED','0','SHADE','0','0','0','0','COMBINED'),
     (0xFC3097FF,0x5FFEFE38): ('PRIMITIVE','ENVIRONMENT','TEXEL0','ENVIRONMENT',
         'TEXEL0','0','PRIMITIVE','0','0','0','0','COMBINED','0','0','0','COMBINED'),
     (0xFC11FE04,0xFF0FF3FF): ('TEXEL0','0','PRIMITIVE','0','0','0','0','TEXEL0',

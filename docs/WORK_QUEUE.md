@@ -49,6 +49,15 @@ Next importing work:
 
 - Finish the creature category's carried models/icons, catching/releasing,
   collection/profile persistence, and spawn readers as a connected path.
+  All seventeen field/carry model sets are prepared in
+  `build/v3-creature-field-prepared-01/`, preserving 59 frame references and
+  43 distinct models in 25,504 bytes. Six focused checks pass. Reuse these
+  conversions while connecting native loading, drawing, capture, and release;
+  preparation alone does not enable a creature. Preserve native rubbish/salmon
+  actor slots and herabuna, handle the donor's short arapaima shadow tables
+  safely, and use the existing external resource allocator where the nearly
+  full ordinary import file cannot hold the complete category. Relevant native
+  addresses and capacity are in the creature contract, not a new audit task.
   The common converter already retains all 17 displays, 96 joints, full motion
   arrays, and complete source sound callbacks in
   `build/v3-creature-profiles-prepared-01/`. All seventeen complete room profiles,

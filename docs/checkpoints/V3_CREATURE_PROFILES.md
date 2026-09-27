@@ -2,6 +2,18 @@
 
 ## Current output
 
+The complete field/carry artwork is prepared in
+`build/v3-creature-field-prepared-01/art.json`: seventeen objects, 59 frame
+references, 43 distinct poses, and 25,504 bytes. All three fish model-table
+consumers agree; repeated insect poses remain repeated frame references, not
+duplicated geometry. Fish field/release timing selectors remain independent.
+Six focused checks pass in 1.595 seconds, covering the complete category,
+resource/command bounds, damaged-table rejection, environment-alpha conversion,
+and unchanged cached room artwork. This is prepared graphics, not an installed
+field renderer, native gameplay evidence, or a new ROM. ABI 294 stays current.
+Continue the category's native readers and behaviours using the
+[recorded integration constraints](../../specs/V3_CREATURE_ITEMS.md#native-integration-constraints).
+
 `build/v3-creature-profiles-prepared-01/art.json` records seventeen complete
 display objects, 78,544 bytes, and 738 triangles. Sixteen objects have embedded
 rotational rigs: 96 joints and 79 shown-joint bindings, with every motion array

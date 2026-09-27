@@ -24,7 +24,7 @@ from v3_registry import FURNITURE, LEGACY_FURNITURE, furniture_identity, furnitu
 from v3_room_aliases import discover as room_aliases, pending_reason as room_alias_reason
 from v3_villager_art import native_palette, normalise_vertex_flags
 
-VERSION = 35
+VERSION = 36
 PENDING_MOVE_CATEGORY = 'static-models-pending-move'
 PENDING_SEQUENCE_CATEGORY = 'constant-model-sequence-pending-lifecycle'
 SELECTED_PALETTE_CATEGORY = 'selected-palette-fade-assets'
@@ -773,7 +773,7 @@ def prepare_models(source, descriptor):
     the same complete resource/material/geometry converter.
     This function supplies artwork, never gameplay or installation eligibility.
     """
-    palettes, textures, vertex_arrays, raw_models = {}, {}, {}, {}
+    palettes, textures, vertex_arrays, raw_models, model_vertices = {}, {}, {}, {}, {}
     context = descriptor.get('render_context', {})
     if set(context) - {'palette_slot', 'external_vertices'}:
         raise ReviewRequired('Unknown inherited render context')
@@ -808,6 +808,7 @@ def prepare_models(source, descriptor):
     bindings, used_bindings = descriptor.get('palette_bindings', {}), set()
     texture_bindings,used_textures=adapter.get('texture_bindings',{}),set()
     for label, (name, at, n) in descriptor['models'].items():
+        model_vertices[label] = set(vertex_arrays) if inherited_vertices else set()
         if n%8: raise ReviewRequired('unaligned display list')
         parts=adapter.get('model_sequences',{}).get(label)
         if parts:
@@ -866,6 +867,7 @@ def prepare_models(source, descriptor):
                         raise ReviewRequired('Model overwrites its inherited vertex contract')
                     if size%16: raise ReviewRequired('invalid complete vertex array')
                     vertex_arrays[start] = (symbol, size)
+                    model_vertices[label].add(start)
             if op == 0x0A:
                 count = (a >> 17 & 127)+1
                 position += (1 + (max(0, count-3)+3)//4)*8
@@ -878,8 +880,10 @@ def prepare_models(source, descriptor):
     if fading and not dynamic_used: raise ReviewRequired('unused palette-fade dependency')
     if inherited_palette is not None and (palettes or bindings or fading or not any(r[4]==2 for r in textures.values())):
         raise ReviewRequired('Unused or conflicting inherited palette contract')
-    if (any(r[4]==2 for r in textures.values()) and not palettes and inherited_palette is None) or len(vertex_arrays) != 1:
-        raise ReviewRequired('static materials need CI4 palettes and one complete vertex array')
+    if ((any(r[4]==2 for r in textures.values()) and not palettes and inherited_palette is None)
+            or not model_vertices
+            or any(len(vertices)!=1 for vertices in model_vertices.values())):
+        raise ReviewRequired('static materials need CI4 palettes and one complete vertex array per model')
     body, resources, offsets = bytearray(32 if fading else 0), [], {}
     def add(at, name, n, convert, **details):
         raw = source.data[at:at+n]
@@ -895,10 +899,12 @@ def prepare_models(source, descriptor):
             else untile(data,w,h,8) if (fmt,bits)==(4,1) else native_ia8(data,w,h) if bits==1
             else pack4(untile(data,w,h,4)),
             kind='texture',width=w,height=h,format={(2,0):'CI4',(4,0):'I4',(4,1):'I8',(0,2):'RGBA16',(3,1):'IA8',(3,2):'IA16'}[fmt,bits])
-    vertex, (name, n) = next(iter(vertex_arrays.items()))
-    add(vertex, name, n, lambda data: normalise_vertex_flags(data)[0], kind='vertices')
+    for vertex, (name, n) in vertex_arrays.items():
+        add(vertex, name, n, lambda data: normalise_vertex_flags(data)[0], kind='vertices')
     models = {}
     for label, (name, at, raw, pointers, receipts) in raw_models.items():
+        vertex = next(iter(model_vertices[label]))
+        n = vertex_arrays[vertex][1]
         matrices = 0
         if descriptor.get('kind') in ('animated-held-model','animated-room-model'):
             # The native skeleton drawer publishes each visible joint matrix
@@ -1660,8 +1666,8 @@ def main():
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--select', action='append', default=[], help='Canonical donor ID; defaults to all supported new furniture')
     parser.add_argument('--category', help='Restrict to a discovered shared category, without an item list')
-    parser.add_argument('--representation', choices=('furniture','handheld','scenery','audio','rewards','lifecycle','surfaces','console'), default='furniture',
-                        help='Discover furniture, held equipment, scenery, audio, rewards, lifecycles, surfaces, or console games')
+    parser.add_argument('--representation', choices=('furniture','handheld','scenery','audio','rewards','lifecycle','surfaces','console','creatures'), default='furniture',
+                        help='Discover furniture, held equipment, scenery, audio, rewards, lifecycles, surfaces, console games, or field creatures')
     parser.add_argument('--donor-disc', type=Path, default=ROOT/'local/gamecube/Animal Crossing (USA, Canada).ciso',
                         help='Verified English GameCube disc for console-game preparation')
     parser.add_argument('--assets-only', action='store_true',
@@ -1678,6 +1684,10 @@ def main():
     if args.representation=='console' and (args.command!='convert' or not args.assets_only
             or args.select or args.category not in (None,'console-games')):
         parser.error('Console preparation requires convert --assets-only and retains the complete shared game/save category')
+    if args.representation=='creatures' and (args.command=='import' or args.select
+            or args.category not in (None,'creature-field-frames')
+            or args.command=='convert' and not args.assets_only):
+        parser.error('Creature preparation retains the complete field-frame category; use convert --assets-only')
     if args.category and args.command == 'scan': parser.error('--category requires convert or import')
     if args.reuse_assets and (args.command=='scan' or args.representation not in ('furniture','surfaces')):
         parser.error('--reuse-assets requires furniture convert/import or surface preparation')
@@ -1687,6 +1697,14 @@ def main():
     if output.exists() or not output.is_relative_to(ROOT/'build'): raise ValueError('Use a fresh ignored build path')
     source = Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
                     (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    if args.representation=='creatures':
+        from v3_creature_field import discover as discover_creatures, convert as convert_creatures
+        if args.command=='scan':
+            report=discover_creatures(source);output.parent.mkdir(parents=True,exist_ok=True)
+            write_new(output,(json.dumps(report,indent=2)+'\n').encode())
+        else:report=convert_creatures(source,output)
+        print(json.dumps(report['counts']))
+        return
     if args.representation=='console':
         from v3_console_games import prepare as prepare_consoles
         report=prepare_consoles(source,args.donor_disc,output,

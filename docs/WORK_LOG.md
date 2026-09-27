@@ -1,5 +1,34 @@
 # Work record
 
+## 2026-09-27: complete shared creature field-frame conversion
+
+- Extended the common graphics converter for independently bounded per-model
+  vertex arrays and the donor insect environment-alpha expression. No per-item
+  converter, model allowlist, or simplified replacement artwork is added.
+- The ordinary pipeline's `creatures` representation derives every frame from
+  actual donor pointer tables. All three fish consumers agree; repeated insect
+  poses share complete geometry while preserving every frame-table entry.
+  Field/release animation selectors, both complete sequences, fish height, and
+  insect behaviour indices remain source-derived and separate.
+- One batch compiler invocation prepares seventeen complete objects, 59 frame
+  references, 43 distinct models, and 25,504 bytes in
+  `build/v3-creature-field-prepared-01/`. All models fit the existing native
+  category buffers. Six focused tests pass in 1.595 seconds, including unchanged
+  reuse of all seventeen room models. No previous cartridge or exhausted native
+  scenario is replayed. No audio is emitted.
+- Native reader inspection identifies an important category constraint: fish
+  actor slots 32–34 already hold rubbish and slot 35 selects coastal salmon.
+  They cannot be replaced by the added fish's carried-item indices. Recorded
+  actual loader/model/timing addresses for the connected integration, the donor
+  arapaima release-shadow bounds defect, and the ordinary import file's 61,568
+  remaining bytes. Bulk copying complete native banks and enlarged owners into
+  that file is not viable; the existing external physical-resource allocator
+  is the appropriate shared mechanism.
+- Field graphics remain prepared, not installed. The current ROM is still ABI
+  294, with creature selection disabled. Native graphics/capture/release,
+  collection/profile persistence, and spawn integration remain unfinished.
+  Stable V2-14, both deployments, the main lock, and saved formats are unchanged.
+
 ## 2026-09-27: connected creature parent and room category
 
 - The preceding goal turn is no progress: it answered the workflow/latency

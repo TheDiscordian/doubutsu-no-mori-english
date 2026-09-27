@@ -85,3 +85,67 @@ The preceding scheduler test's unexplained debugger disconnect remains open;
 host checks do not classify it. The active queue continues with carried models,
 icons, catching/releasing, collection/profile persistence, and spawn readers as
 one connected creature path, retaining the completed room and sound work.
+
+## Field and carried graphics
+
+`v3_furniture_pipeline.py convert --representation creatures --assets-only`
+prepares the complete seventeen-species field-frame category through the common
+resource parser, material conversion, and one batch compiler invocation.
+`tools/v3_creature_field.py` follows the donor's actual model-pointer arrays;
+it does not define models by species name. All three fish consumers must agree
+on their complete frames. Two-, four-, and six-entry insect frame arrays retain
+their repeated poses and ordering. The result contains 59 frame references to
+43 distinct models, 25,504 bytes, with no independent creature-display choices.
+
+The common converter supports a different complete vertex array per model in
+one object. Each model still requires exactly one bounded vertex array; arbitrary
+cross-array loads remain unsupported. Textures and palettes shared by frames
+are stored once. The insect colour expression preserves texture alpha multiplied
+by environment alpha, primitive colour, and second-cycle shading. This keeps
+the drawing caller's fading controls rather than making the insects opaque.
+
+The prepared category retains both independently sourced fish animation selectors,
+both complete frame sequences, height corrections, and insect behaviour indices.
+Field and release selectors are not interchangeable: jellyfish and several sea
+fish use different selectors. The largest converted fish is 2,192 bytes, within
+the native 2,560-byte fish buffer; every added insect fits its 3,072-byte buffer.
+These sizes describe complete converted objects, not estimates from donor size.
+The prepared assets are not installed runtime readers or playable species.
+
+### Native integration constraints
+
+- Native fish actor indices `0..31` are ordinary fish, `32..34` are rubbish,
+  and `35` selects the coastal salmon path. New carried IDs `2320..2328` must
+  not become those existing actor indices. Preserve the original actor slots;
+  map added fish to separate actor indices at capture and release boundaries.
+  The prepared `native_index` field describes the carried-item index only.
+- The field fish owner is VROM `922A10`, relocation `924590`, RAM `80A5AF70`;
+  its start/end/model arrays are `80A5C568`, `80A5C5F8`, and `80A5C82C` (36
+  entries), with animation selectors at `80A5C984` and height at `80A5CA14`.
+  The fish graphics bank is VROM `1871000`, 61,344 bytes. The native loader
+  skips each object's eight-byte header and subtracts its bank offset when
+  publishing segment six. Converted lists need that same address convention.
+- The release owner is VROM `93A920`, relocation `93BBC0`, RAM `80A7A680`;
+  its start/end/model arrays are `80A7B444`, `80A7B4D4`, and `80A7B708`.
+  The constructor at `80A7A934` directly subtracts `2300` from the carried ID;
+  this boundary needs the explicit actor mapping. Its size table at `80A7B324`
+  and animation table at `80A7B7C8` also need extended readers.
+- The insect owner is VROM `8DEEC0`, relocation `8E0870`, RAM `80A10210`;
+  start/end/model arrays are `80A116B8`, `80A11738`, and `80A119B8` (32 entries).
+  Its graphics bank is VROM `113D000`, 39,248 bytes. Behaviour dispatch and the
+  added insects' orientation rules are required alongside the graphics readers.
+- The donor release-shadow code itself has only six correction entries despite
+  adding XXL arapaima. The port must supply bounded XXL handling, not reproduce
+  that out-of-bounds read. The separate native `Gyo_Kage` actor (`85`) also
+  needs its size reader extended. Existing fish timing and golden-rod hooks
+  must survive the category integration.
+- The ABI-294 shared resource file ends at `27F0F80`, only 61,568 bytes below
+  its `2800000` limit. Copying both complete native graphics banks and enlarged
+  actor owners into that file does not fit. Reuse the existing checked external
+  physical-resource allocator for a complete category resource layout; do not
+  repeatedly grow the ordinary import file or overwrite its neighbouring data.
+
+`tests/test_v3_creature_field.py` checks every source/frame binding, differing
+field/release timing, missing/disagreeing-pointer rejection, complete converted
+resources and command bounds, and reuse of all seventeen existing room objects.
+No native carried/field execution or new cartridge installation is claimed.

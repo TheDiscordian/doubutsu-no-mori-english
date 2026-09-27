@@ -95,6 +95,19 @@ collection/profile readers, and spawn tables remain required before selection.
 Native connected-path execution remains unverified. Choice counts are unchanged. See the
 [creature checkpoint](checkpoints/V3_CREATURE_PROFILES.md).
 
+The carried/field graphics category is prepared at
+`build/v3-creature-field-prepared-01/`: all seventeen species, 59 frame references,
+43 distinct models, and 25,504 bytes. One batch compiler invocation handles the
+whole category. Shared conversion now retains separate frame vertex arrays and
+the insects' environment-alpha fading. Six focused checks pass, including full
+resource/frame bounds and unchanged reuse of the existing room artwork. These
+field graphics are not installed yet; ABI 294 remains the current cartridge.
+The [creature contract](../specs/V3_CREATURE_ITEMS.md#native-integration-constraints)
+records the actual native consumers, preserved rubbish/salmon actor identities,
+the donor's arapaima shadow-bound defect, and the shared resource-file capacity
+constraint. Continue the connected native integration without reconverting the
+prepared models or replaying previous builds.
+
 Continue with creature parent/native integration and the remaining legacy
 clothing, custom-design, and fossil representations, not resource reconversion
 or obsolete test attempts. Complete genuine conversion/behaviour gaps.
