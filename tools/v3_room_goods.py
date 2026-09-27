@@ -211,6 +211,15 @@ def publish_bootstrap(equipment,blob,surface,output):
             raise ValueError('Changed complete console image-loader packet')
         extra+=(f'AF_CONSOLE_IMAGES_VROM=0x{p["vrom"]:X}u',f'AF_CONSOLE_IMAGES_CRC=0x{p["crc32"]:X}u',
                 f'AF_CONSOLE_IMAGES_BYTES=0x{p["bytes"]:X}u')
+    disk=equipment.get('console_disk')
+    if disk:
+        from v3_console_disk_install import RAM,END,LAYOUT
+        p=disk['packet'];raw=blob[p['blob_offset']:p['blob_offset']+p['bytes']]
+        if (sha256(raw)!=p['sha256'] or zlib.crc32(raw)!=p['crc32'] or
+                p['ram']!=RAM or p['bytes']!=END-RAM or disk['layout']!=LAYOUT):
+            raise ValueError('Changed complete resident disk module')
+        extra+=(f'AF_CONSOLE_DISK_VROM=0x{p["vrom"]:X}u',f'AF_CONSOLE_DISK_CRC=0x{p["crc32"]:X}u',
+                f'AF_CONSOLE_DISK_BYTES=0x{p["bytes"]:X}u')
     boot,compiled=compile_part('surface_bootstrap',output/'goods_surface_bootstrap',defines=(
         'AF_V3_EDITABLE_CHECKSUMS=1',f'AF_SURFACE_ITEMS_VROM=0x{items["vrom"]:X}u',
         f'AF_SURFACE_ITEMS_CRC=0x{items["crc32"]:X}u',f'AF_SURFACE_ITEMS_BYTES=0x{items["bytes"]:X}u',
@@ -229,3 +238,4 @@ def publish_bootstrap(equipment,blob,surface,output):
     if exercise:exercise['startup']=copy.deepcopy(goods['startup'])
     if console:console['startup']=copy.deepcopy(goods['startup'])
     if images:images['startup']=copy.deepcopy(goods['startup'])
+    if disk:disk['startup']=copy.deepcopy(goods['startup'])

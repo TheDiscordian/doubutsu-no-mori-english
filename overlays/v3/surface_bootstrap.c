@@ -99,5 +99,19 @@ int af_v3_surface_init(void) {
     af_surface_writeback(images,AF_CONSOLE_IMAGES_BYTES);
     af_surface_invalidate(images,AF_CONSOLE_IMAGES_BYTES);
 #endif
+#ifdef AF_CONSOLE_DISK_VROM
+#ifdef __mips__
+    void *disk=(void *)0x80630000u;
+#else
+    extern unsigned char af_test_console_disk[AF_CONSOLE_DISK_BYTES];
+    void *disk=af_test_console_disk;
+#endif
+    /* Complete code, both BIOS copies, boot data, zeroed transient buffers,
+     * and guard load together. No hook can enter partially verified code. */
+    if (af_surface_dma(disk,AF_CONSOLE_DISK_VROM,AF_CONSOLE_DISK_BYTES) ||
+            af_surface_crc(disk,AF_CONSOLE_DISK_BYTES)!=AF_CONSOLE_DISK_CRC) return 0;
+    af_surface_writeback(disk,AF_CONSOLE_DISK_BYTES);
+    af_surface_invalidate(disk,AF_CONSOLE_DISK_BYTES);
+#endif
     return af_surface_prior_init();
 }

@@ -20,8 +20,10 @@ is WDM plus save plus validation: 192 bytes. `console_disk/disk.json` records co
 source and compiled identities. The nineteen-game bundle, compact metadata,
 and compressed image pool are identical to the retained complete preparation.
 
-This is prepared engine code, not installed QD emulation. The current cartridge
-remains ABI 281. No profile, selection, save, or patcher deployment changes.
+The complete module is preloaded in ABI 282, not yet connected to QD game
+sessions. The current cartridge is `build/v3-console-disk-resident-01/`, SHA-256
+`02d8e97b3a2d157a428b9bd5602467e68231c3f8baec241b61482d429be6d19a`.
+No profile, selection, save, main-lock, or patcher deployment changes.
 
 ## Donor resources and contract
 
@@ -143,8 +145,8 @@ The prepared-resource check verifies MIPS/source receipts, complete BIOS/boot-st
 identity/vectors, unchanged nineteen-game resources, and explicit non-installation.
 No historical ROM or unchanged native scenario is replayed for this preparation.
 
-Remaining implementation is required: checked installation of the native module,
-prepared initialization/reset/audio hooks, and DPCM fetch hook, image-extent correction, complete
+Remaining implementation is required: connecting the prepared
+initialization/reset/audio hooks and DPCM fetch hook, image-extent correction, complete
 save/frame/reset/return integration, and enabling the actual source furniture
 only when those dependencies work. Reuse partial native disk-register machinery
 where verified; a missing mapper-20 table entry is not an inventory of all
@@ -178,12 +180,12 @@ past one of them. Reset must still preserve native common graphics/audio setup.
 The current code reservation below `804FB000` and gap after the room callback
 cannot hold the complete disk module. The current model-pool reservation ends
 at `8062C020`; the fault framebuffer begins at `807DA800`. A separate checked
-Expansion Pak reservation is planned at `80630000..8064600F`, containing the
+Expansion Pak reservation at `80630000..8064600F` contains the
 complete code, immutable/private BIOS copies, boot data, disk context, 32-KiB
 programme RAM, 8-KiB characters, and a final guard. `binding.json` records each
-subrange. It is not allocated yet. Validate the actual build's complete
-reservations before installation; retain low-memory native game arenas and
-room resources unchanged.
+subrange. The installer validates all recorded resident ranges and actual
+model-bank bindings before appending the packet. Low-memory native game arenas
+and room resources remain unchanged.
 
 The [capacity checkpoint](../docs/checkpoints/V3_CONSOLE_CAPACITY.md) records the
 startup-test correction and incomplete native evidence. The title-state fixture
@@ -201,8 +203,8 @@ service into 11,323 bytes at `80630000`, SHA-256
 `7498fe789e39b54a075689127f43f4943402d304c02f2d57eb7d8e6c2565dd44`.
 The ordinary converter writes its source/compiler receipt to
 `console_disk_native/binding.json`. No mutable globals or unresolved calls exist.
-This module is not a standalone replacement emulator and is not loaded by the
-current cartridge.
+This module is not a standalone replacement emulator. The current cartridge
+preloads it, but no disk game session calls it yet.
 
 Binding checks complete native state (`16F90` bytes), graphics (`6008` minimum),
 disk, programme, character, BIOS, boot, and context extents for overlap before
@@ -242,7 +244,37 @@ separate DPCM banks, address wrapping, and cartridge fallback. Native RSP/cache/
 calls are stubs. The prepared-resource check verifies source/code receipts, actual
 64-bit opcodes and returns for all six bridges, and unchanged nineteen-game resources. The
 underlying unchanged service retains its earlier donor comparison evidence.
-Neither test executes MIPS or claims installed disk gameplay.
+These tests do not execute MIPS or claim installed disk gameplay.
+
+### Resident installation
+
+The shared runtime refresh installs the prepared format dependency:
+
+```sh
+python3 tools/v3_furniture_install.py --refresh-runtime \
+  --console-disk build/v3-console-games-prepared-14 \
+  --base-lock build/v3-console-emulator-capacity-01/build-lock.json \
+  --output build/v3-console-disk-resident-next
+```
+
+`console_disk_install.py` validates the complete compiled/source receipts, BIOS,
+boot data, memory layout, and current model-bank bindings. It rejects overlapping
+resident ranges before changing the resource blob. One 90,128-byte packet supplies
+code, immutable/private BIOS copies, boot state, zeroed context/work areas, and
+the final guard. Native startup reads and verifies the entire packet before
+cache writeback/invalidation and the prior init chain. A failed read or checksum
+stops initialization. Later shared refreshes preserve this seventh preload.
+The bootstrap occupies 668 of its 688 reserved bytes; do not silently overrun it
+when adding another dependency.
+
+Four focused checks in `tests.test_v3_console_disk_install` pass: complete installed
+resources and preservation of unrelated ROM files, overlap refusal without blob
+mutation, seven-packet startup and all fourteen failure paths, and four private
+browser/offline compositions. The host preload fixture stubs DMA/cache calls;
+native preload, game launch, ordinary return, and hardware remain unverified.
+Game hooks and choices stay disabled. Format-five saves are unchanged from ABI
+281, but remain incompatible with V2 and V3 formats one through four; preserve
+backups and warn explicitly before a hardware handoff.
 
 ### Cold initialization and Reset
 

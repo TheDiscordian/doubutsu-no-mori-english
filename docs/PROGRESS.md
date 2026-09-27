@@ -47,12 +47,22 @@ sanitized adapter assertions, all six emitted 64-bit bridges, checked optional
 DPCM hook/relocations, and preservation of all nineteen game resources. Both
 verified mixers use five audio channels; this donor has no expansion voice.
 The unchanged service retains its 15,594 earlier assertions.
-The module is prepared, not installed. Startup allocation/loading, installation
-of the prepared audio/DPCM hooks, image-extent correction, and lifecycle hooks remain required;
+The complete module, both BIOS copies, boot data, transient buffers, and final
+guard are installed in ABI 282 through a checked 90,128-byte startup packet at
+`80630000..8064600F`. Four focused installation checks pass: complete resources
+and retained cartridge, overlapping-reservation rejection, seven-packet startup
+with fourteen DMA/checksum failure paths, and four private browser/offline
+compositions. Startup uses 668 of 688 bytes. Native preload execution is unverified.
+Installation of the prepared audio/DPCM hooks, image-extent correction, and lifecycle hooks remain required;
 no disk profile is enabled. A compatible local N64 test emulator is built.
 See the [disk-service specification](../specs/V3_CONSOLE_DISK.md).
 
-The current proposal is ABI 281 at
+The current proposal is ABI 282 at
+`build/v3-console-disk-resident-01/build-lock.json`, ROM SHA-256
+`02d8e97b3a2d157a428b9bd5602467e68231c3f8baec241b61482d429be6d19a`.
+The main lock, 163 choices, format-five saved layouts, and both V2-13 deployments
+are retained. No disk game is enabled. The current proposal retains the checked
+allocator and native evidence from ABI 281 at
 `build/v3-console-emulator-capacity-01/build-lock.json`, ROM SHA-256
 `763bbcbeca77390e797039c79ee8ae83a2a7b7497b5768db81534ed0ce14a62d`.
 Every console game-arena allocation now checks full aligned capacity before

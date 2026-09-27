@@ -117,9 +117,11 @@ disk I/O/IRQ routes, nametable mirroring, motor waits, donor audio initializatio
 and bounded DPCM bank reads/address wrapping with cartridge fallback.
 Donor C comparisons, host-adapter checks, and emitted bridge-instruction checks
 pass. The verified donor and native mixers both use five channels; no separate
-disk expansion voice is present in this donor. Startup installation, the prepared
-audio/DPCM hooks, and lifecycle integration remain required; preparation
-does not enable the disk item or establish native execution.
+disk expansion voice is present in this donor. ABI 282 installs the complete
+checked resident packet and seventh startup preload, preserving all game assets,
+selections, and saved layouts. The prepared audio/DPCM hooks, image-extent reader,
+and lifecycle integration still need connecting. Installation does not enable
+the disk item or establish native execution.
 
 The [console converter](V3_CONSOLE_GAMES.md) preserves nineteen complete game
 payloads, twenty launch bindings, and sixty persistence operations. Its common

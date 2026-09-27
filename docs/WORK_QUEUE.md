@@ -36,17 +36,25 @@ The adapter check passes 56,205 sanitized assertions. Three focused checks pass
 across targeted runs, including all six bridges and the optional DPCM patch at
 two relocation bases. Native functions are stubbed and MIPS bridges are checked,
 not executed. Both verified mixers use five channels; this donor has no expansion
-voice. Next finish checked module loading, installation of the prepared audio/DPCM
-hooks, the native image-extent consumer, and session/frame/reset/return persistence hooks. Wire the
+voice. Complete checked module loading is installed in ABI 282. Next connect
+the prepared audio/DPCM hooks, the native image-extent consumer, and
+session/frame/reset/return persistence hooks. Wire the
 prepared QD initializer/reset instead of calling the unsafe native iNES paths.
-The service is not installed or selectable; do not treat returned action flags
+The module is resident but its game hooks are not installed or selectable; do not treat returned action flags
 as completed renderer/audio integration. See the
 [disk specification](../specs/V3_CONSOLE_DISK.md).
 The native module is 11,323 bytes, linked at `80630000`; its planned code/data/work
-range ends at `80646010`. That reservation is not installed yet. Check all actual
-retained allocations during installation; do not overwrite room resources or
-silently omit disk services to fit a smaller gap.
-Continue from ABI 281 at `build/v3-console-emulator-capacity-01/build-lock.json`,
+range ends at `80646010`. The complete 90,128-byte packet retains separate code,
+immutable/private BIOS, boot data, context, programme/character RAM, and guard.
+All recorded resident ranges and actual model-bank bindings are checked for
+overlap. Startup is 668 of 688 bytes; further preload additions need capacity work.
+Four focused installation checks pass: full resources and retained cartridge,
+overlap refusal, all fourteen seven-packet startup failure paths, and four private
+compositions. Native preload execution remains unverified. No old scenario is replayed.
+Continue from ABI 282 at `build/v3-console-disk-resident-01/build-lock.json`,
+ROM SHA-256 `02d8e97b3a2d157a428b9bd5602467e68231c3f8baec241b61482d429be6d19a`.
+The retained allocator evidence belongs to ABI 281 at
+`build/v3-console-emulator-capacity-01/build-lock.json`,
 ROM SHA-256 `763bbcbeca77390e797039c79ee8ae83a2a7b7497b5768db81534ed0ce14a62d`.
 The checked allocator and safe shared-runtime refresh are installed; four
 focused host/cartridge/composition checks pass. A native largest-game transition

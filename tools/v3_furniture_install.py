@@ -598,7 +598,7 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
                     equipment_rigs=None, expand_storage=False, furniture_audio_art=None, furniture_profiles=None,
                     material_frames_art=None,scrolling_materials_art=None,room_surfaces_art=None,furniture_scoring=False,
                     password_runtime=None,password_editor=False,room_effects=None,furniture_capacity=False,console_storage=False,
-                    console_images=None,console_emulator=False):
+                    console_images=None,console_emulator=False,console_disk=None):
     """Update shared readers; optionally install the shared held-resource adapter."""
     output=output.resolve()
     if output.exists() or not output.is_relative_to(ROOT/'build'):
@@ -623,13 +623,20 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
     if sum((equipment_art is not None,equipment_rigs is not None,player_motion,equipment_kinds,player_actions,
             item_category_art is not None,ground_categories,event_acquisition,held_collection,held_catalogue_art is not None,held_selection,translation_updates,room_rigs_art is not None,room_rigs_code,room_goods is not None,room_carry is not None,scenery_art is not None,scenery_gameplay,expand_storage,furniture_audio_art is not None,furniture_profiles is not None,material_frames_art is not None,scrolling_materials_art is not None,room_surfaces_art is not None,furniture_scoring,password_runtime is not None,password_editor,room_effects is not None,furniture_capacity,console_storage,console_images is not None,console_emulator))>1:
         raise ValueError('Install shared runtime updates in dependency order')
+    if console_disk is not None:
+        if resource_mode:raise ValueError('Install shared runtime updates in dependency order')
+        resource_mode=True
     if resource_mode:
         blob,reused=reuse_resource_tail(base,prior,old_blob)
         if not reused['reused_bytes']:
             raise ValueError('Equipment integration requires the checked shared resource tail')
     parent_readers=bool(player_actions and prior.get('equipment_resources',{}).get('player_actions',{}).get('equipment_selection'))
     wrapped_names=bool(player_actions and prior.get('equipment_resources',{}).get('wrapped_presents'))
-    if console_emulator:
+    if console_disk is not None:
+        import v3_console_disk_install as equipment
+        display_report,alias_report=prior['clothing']['display'],prior['display_aliases']
+        equipment_report,owner_changes=equipment.install(base,prior,blob,output,console_disk)
+    elif console_emulator:
         import v3_console_emulator as equipment
         display_report,alias_report=prior['clothing']['display'],prior['display_aliases']
         equipment_report,owner_changes=equipment.install(base,prior,blob,output,original)
@@ -1164,6 +1171,12 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         report['shared_runtime_refresh'].update(adapters=['console_emulator'],additional_resident_bytes=stage['state']['bytes'])
         report['sources'].update(stage['sources'])
         report['native_test']='pending installed console lifecycle execution; room furniture launch and QD remain incomplete'
+    if console_disk is not None:
+        stage=equipment_report['console_disk']
+        report['shared_runtime_refresh'].update(adapters=['console_disk'],
+            additional_resident_bytes=stage['packet']['bytes'],saved_format_changed=False)
+        report['sources'].update(stage['sources'])
+        report['native_test']='pending native disk preload; session hooks and disk gameplay remain incomplete'
     if room_goods is not None:
         report['native_test']='pending loose-item bridge execution; moving-table owner hooks remain uninstalled'
     if room_carry is not None:
@@ -1257,6 +1270,8 @@ if __name__=='__main__':
         help='With --refresh-runtime, install the complete prepared console game pool and bounded native reader')
     parser.add_argument('--console-emulator',action='store_true',
         help='With --refresh-runtime, connect the native full-image iNES lifecycle and save hooks')
+    parser.add_argument('--console-disk',type=Path,
+        help='With --refresh-runtime, preload the prepared shared disk engine without enabling unfinished games')
     args=parser.parse_args()
     if args.equipment_art and not args.refresh_runtime:parser.error('--equipment-art requires --refresh-runtime')
     if args.equipment_rigs and not args.refresh_runtime:parser.error('--equipment-rigs requires --refresh-runtime')
@@ -1290,6 +1305,7 @@ if __name__=='__main__':
     if args.console_storage and not args.refresh_runtime:parser.error('--console-storage requires --refresh-runtime')
     if args.console_images is not None and not args.refresh_runtime:parser.error('--console-images requires --refresh-runtime')
     if args.console_emulator and not args.refresh_runtime:parser.error('--console-emulator requires --refresh-runtime')
+    if args.console_disk is not None and not args.refresh_runtime:parser.error('--console-disk requires --refresh-runtime')
     result=(refresh_runtime(args.output,args.base_lock,equipment_art=args.equipment_art,player_motion=args.player_motion,
                             equipment_kinds=args.equipment_kinds,player_actions=args.player_actions,
                             item_category_art=args.item_category_art,ground_categories=args.ground_categories,
@@ -1303,6 +1319,7 @@ if __name__=='__main__':
                             furniture_scoring=args.furniture_scoring,password_runtime=args.password_runtime,
                             password_editor=args.password_editor,room_effects=args.room_effects,
                             furniture_capacity=args.furniture_capacity,console_storage=args.console_storage,
-                            console_images=args.console_images,console_emulator=args.console_emulator)
+                            console_images=args.console_images,console_emulator=args.console_emulator,
+                            console_disk=args.console_disk)
             if args.refresh_runtime else build(args.output,args.art,args.base_lock))
     print(json.dumps({k:result[k] for k in ('runtime_abi','output_sha256','patch_sha256')},indent=2))

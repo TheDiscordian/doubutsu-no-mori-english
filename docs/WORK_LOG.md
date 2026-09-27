@@ -1,5 +1,34 @@
 # Work record
 
+## 2026-09-27: complete shared disk module reservation and startup loading
+
+- Audio work is committed/pushed as `a87c8e1`. Continue from its immutable
+  prepared output 14, without rebuilding the unchanged service or game assets.
+- Added the common disk dependency to the existing runtime refresh. It validates
+  complete prepared sources/code/BIOS/boot data, actual model-bank bindings, and
+  recorded resident allocations before appending a 90,128-byte packet at
+  `80630000..8064600F`. This is a format dependency, not a per-game importer.
+- Startup now reads and checks the complete seventh packet, then writes back
+  data and invalidates instructions before continuing. It includes both BIOS
+  copies, zeroed context/programme/character buffers, and a final guard. Later
+  shared refreshes preserve its preload. Compiled bootstrap: 668/688 bytes.
+- Built ABI 282 at `build/v3-console-disk-resident-01/build-lock.json`, ROM SHA-256
+  `02d8e97b3a2d157a428b9bd5602467e68231c3f8baec241b61482d429be6d19a`.
+  Four focused checks pass in one invocation: complete installation/resources,
+  rejection of overlapping allocations without mutation, seven-packet startup
+  and fourteen failure paths, and four private browser/offline compositions.
+  No historical native scenario or unchanged service test is replayed.
+- Source inspection identifies the remaining native iNES extent reader at
+  `8082E194..8082E1C0` and confirms startup enables audio after initialization.
+  Frame/reset/close hooks must call the prepared disk services and retain the
+  source's motor/readiness timing; the default reset cannot consume QD bytes.
+  The final native close hook follows audio shutdown and must invalidate disk
+  context only after that shutdown, before freeing buffers.
+- The module is resident, not a playable disk import. No native preload execution
+  or hardware claim. Continue connecting session/audio/DPCM/image-extent hooks
+  and complete frame/reset/return persistence. The main lock, 163 choices,
+  format-five saved layouts, and both stable V2-13 patchers stay unchanged.
+
 ## 2026-09-27: disk audio initialization and bounded native DPCM reads
 
 - The preceding goal batch is progress: `e68f7b5` implements native disk
