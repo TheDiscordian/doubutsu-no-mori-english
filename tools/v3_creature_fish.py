@@ -97,6 +97,12 @@ def rewrite(owner,reloc,ram,targets,windows):
 def install(base,prior,blob,output,core=None):
     from v3_furniture_pipeline import Source
     e=copy.deepcopy(prior['equipment_resources']);field=e.get('creature_field')
+    if e.get('creature_fish',{}).get('world',{}).get('collection_ui_installed'):
+        from v3_creature_choices import install as install_choices
+        return install_choices(base,prior,blob)
+    if e.get('creature_fish',{}).get('world',{}).get('pocket_icons'):
+        from v3_creature_ui import install as install_ui
+        return install_ui(base,prior,blob,output,core)
     if e.get('creature_fish',{}).get('world',{}).get('spawn_manager_installed'):
         return connect_catches(base,prior,blob,output,core)
     if e.get('creature_fish',{}).get('world'):return install_manager(base,prior,blob,output)

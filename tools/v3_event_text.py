@@ -2,7 +2,7 @@
 import json
 import struct
 
-from aflib import CODE_RAM,DMA_START,DMA_END,by_vrom,sha256,u32
+from aflib import CODE_RAM,CODE_VROM,DMA_START,DMA_END,by_vrom,sha256,u32
 from apply_translation import write_new
 from gc_text import decode_gc
 from runtime_module import module_command_info
@@ -138,12 +138,20 @@ def patch_bounds(core,first=FIRST,count=4):
     return patches
 
 
-def install(image,base,output,text):
-    """Repack the existing four-file text region, never grow the import blob."""
+def install(image,base,output,text,*,relocate=False,physical_resources=(),reserved_end=0):
+    """Repack the four-file text region, retaining virtual reader identities.
+
+    Later builds may have an owner immediately after the region. In that case
+    use checked unused physical ROM space, not that owner's bytes or import RAM.
+    """
     files=by_vrom(base);rows=text['resources'];moving={r['vrom'] for r in rows}
     ordered=sorted(rows,key=lambda r:files[r['vrom']].pstart)
     start=files[ordered[0]['vrom']].pstart;cursor=start;loaded={};placements=[]
-    if moving!={MESSAGE,TABLE,CHOICES,CHOICE_TABLE} or start!=0x3000000:
+    choices=text.get('choice_vrom',CHOICES)
+    from v3_resource_capacity import TEXT,reader_pair
+    core=files[CODE_VROM].extract(base);reader=0x80065614-CODE_RAM
+    if (choices not in (CHOICES,TEXT[0][2]) or core[reader:reader+8]!=reader_pair(choices) or
+            moving!={MESSAGE,TABLE,choices,CHOICE_TABLE} or (not relocate and start!=0x3000000)):
         raise ValueError('Changed event text region ownership')
     for row in ordered:
         v=row['vrom'];entry=files[v];data=(output/row['file']).read_bytes()
@@ -158,7 +166,16 @@ def install(image,base,output,text):
            for i,a in enumerate(placements) for b in placements[i+1:]):
         raise ValueError('Expanded text resources overlap each other virtually')
     old_end=max(files[v].pstart+files[v].size for v in moving)
-    if (cursor>len(image) or cursor<old_end or any(base[old_end:cursor]) or
+    if relocate:
+        from v3_physical_resources import allocate
+        region=b''.join(loaded[row['vrom']] for row in ordered)
+        allocation=allocate(image,physical_resources,region,'relocated-English-text')
+        if allocation['physical']<reserved_end:
+            raise ValueError('Relocated text overlaps the reserved import growth range')
+        delta=allocation['physical']-start
+        for row in placements:row['physical']+=delta
+        text['physical_relocation']=dict(previous_start=start,previous_end=old_end,**allocation)
+    elif (cursor>len(image) or cursor<old_end or any(base[old_end:cursor]) or
             any(e.pstart<cursor and start<(e.pend or e.pstart+e.size) for v,e in files.items()
                 if v not in moving and e.pstart!=0xFFFFFFFF)):
         raise ValueError('Event text physical growth overlaps another resource')

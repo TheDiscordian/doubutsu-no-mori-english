@@ -248,8 +248,8 @@ program pointer at `244`, not a fixed heap address.
 
 The behaviour word defaults to zero (N64); one selects GameCube patrol for
 imported-origin coastal actors. Native fish always retain their existing path.
-The real alternatives are installed, but no browser choice is exposed until its
-composition and complete playable-import dependencies are connected. A separate
+The private composers resolve these settings from the installed bindings below;
+per-species composition and remaining gameplay work stay unfinished. A separate
 spawn-mode word selects the additive native policy or source calendar path.
 The native policy gives the unmodified native manager a weight of 100 against
 the sum of selected added species' actual current-half-month/time weights.
@@ -371,6 +371,66 @@ disabled records, and foreign-write rejection. Current-cartridge checks compare
 all icon resources with the donor, verify both palettes, hooks/relocations,
 retained code/assets, UPS reconstruction, and unchanged all/empty composition.
 These are not native icon-rendering, ordinary gameplay, or hardware results.
+
+### Collection UI, official text, and behaviour composition
+
+`creature_ui.c/.S` occupies `80654800..80654B6F` in the existing loaded packet.
+The 240-byte table at `80654F00` ends before its final guard. No saved field,
+actor, packet allocation, or original creature resource grows for this path.
+The table carries complete fish/insect ordering, nine column coordinates,
+five row coordinates, and seventeen message IDs. Native herabuna keeps index one;
+brook trout uses added index forty. Empty cells use `FF` and resolve to no item.
+
+The inventory's common collection lookup serves both drawing and names. It checks
+collection/profile readiness, including independent added records, instead of
+shifting an added index into the original 32-bit native field. Drawing iterates
+45 cells at 0.875 icon scale. Navigation uses nine columns and five rows; side
+entry sets column eight without changing collection table ID seven. The native
+generic cursor movement remains intact. Original ordering matches both games.
+Added insect ordering and vertical coordinates come from GAFE01-r0; horizontal
+positions fit within the native range. Native visual fit remains unverified.
+
+The constructors retain their animation, message window, camera, fanfare, and
+delay-slot paths. Their final message calls redirect added identities through the
+shared reader; native, rubbish, and disabled cases preserve the original message.
+Final-catch text uses the existing full-name bridge. Normal added catches use
+native messages `2EEF..2EFF`, sourced from donor fish `2FC9..2FD0`, brook trout
+`1328`, and insects `2FC1..2FC8`. Complete donor selector functions establish
+these mappings. Wording, manual line/page breaks, pauses, colours, and effects
+remain; maximum expansion is 264 bytes. The single provenance catalogue owns
+every source/output identity. Both native message-count readers advance together.
+
+The shared text installer recognizes the relocated English choice resource at
+`029E0000` and can move the complete four-file text region into verified free
+physical space. Virtual identities, all old messages/choices, and unrelated
+directory entries remain. Allocation checks physical-only resources and the
+reserved import-growth range, not just zero-looking bytes. The complete
+2,166,256-byte region does not overwrite the owner after its original location.
+
+`v3_creature_choices.py` supplies shared installed definitions for
+`fish-population` and `coastal-fish-movement`. Both offer N64 and GameCube, with
+explicit N64 defaults. Population applies to original and imported fish;
+coastal movement applies only to imported coastal fish and has no effect without
+one. Runtime mode words remain separate from import enable words. Offline
+`--behaviour SETTING=VALUE` and experimental browser controls resolve these same
+definitions, reject unknown names/values, and record resolved values in receipts.
+Defaults plus empty imports return pinned V2; a changed behaviour uses V3.
+
+Composition updates mode data, the world-packet CRC, its enclosing equipment CRC,
+and existing startup/package checksums in dependency order. The world CRC is an
+explicit read-only bootstrap field, not a patched instruction immediate. Original
+assets and saved identities remain. Switching modes retains saved seasonal state
+and changes rules, not the layout; native switch/reload remains unverified and
+the interface says so. These controls do not enable unfinished species or
+authorize deployment.
+
+`tests/test_v3_creature_ui.py` covers all 81 identities and seventeen catch routes,
+native/disabled/final-catch cases, official text preservation, complete installed
+owners/relocations, and UPS reconstruction. Its unchanged evidence is retained
+across the behaviour-binding build. `test_v3_creature_choices.py` checks both
+mode words, five browser/offline compositions, ordered checksums, invalid settings
+and receipts, and unchanged UI/art/save resources. Actual field execution,
+Controller Pak transport, and hardware remain unfinished or unverified.
 
 ### Native integration constraints
 

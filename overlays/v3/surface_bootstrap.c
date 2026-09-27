@@ -19,6 +19,12 @@ const u32 af_v3_surface_crc_expected = AF_SURFACE_ITEMS_CRC;
 #else
 #define surface_crc AF_SURFACE_ITEMS_CRC
 #endif
+#if defined(AF_V3_EDITABLE_CHECKSUMS) && defined(AF_FISH_WORLD_VROM)
+const u32 af_v3_fish_world_crc_expected = AF_FISH_WORLD_CRC;
+#define fish_world_crc (*(volatile const u32 *)&af_v3_fish_world_crc_expected)
+#else
+#define fish_world_crc AF_FISH_WORLD_CRC
+#endif
 
 static __attribute__((noinline)) int load_code(void *p,u32 vrom,u32 bytes,u32 crc) {
     if (af_surface_dma(p,vrom,bytes) || af_surface_crc(p,bytes)!=crc) return 0;
@@ -124,7 +130,7 @@ int af_v3_surface_init(void) {
     extern unsigned char af_test_fish_world[AF_FISH_WORLD_BYTES];
     void *fish_world=af_test_fish_world;
 #endif
-    if (!load_code(fish_world,AF_FISH_WORLD_VROM,AF_FISH_WORLD_BYTES,AF_FISH_WORLD_CRC)) return 0;
+    if (!load_code(fish_world,AF_FISH_WORLD_VROM,AF_FISH_WORLD_BYTES,fish_world_crc)) return 0;
 #endif
     return af_surface_prior_init();
 }

@@ -5,6 +5,7 @@ import { resolveSelection } from './composer.mjs';
 const $ = id => document.getElementById(id);
 const inputs = [$('n64'), $('gamecube')];
 const requested = new Set(), cards = new Map(), reviews = [];
+const behaviours = {};
 const kinds = { villager: 'Villager', furniture: 'Furniture', clothing: 'Clothing', equipment: 'Equipment', floor: 'Floor', wall: 'Wallpaper' };
 let loaded, selection, worker, generation = 0, romURL, receiptURL;
 const status = message => { $('status').textContent = message; };
@@ -15,7 +16,7 @@ function fileError() {
 }
 function ready() {
   $('build').disabled = !loaded || Boolean(worker) || !inputs.every(input => input.files[0]) ||
-    Boolean(fileError()) || (Boolean(selection?.enabled.length) && !$('save-ack').checked);
+    Boolean(fileError()) || (Boolean(selection?.enabled.length || selection?.behaviours_changed) && !$('save-ack').checked);
 }
 function clearDownloads() {
   for (const url of [romURL, receiptURL]) if (url) URL.revokeObjectURL(url);
@@ -52,7 +53,8 @@ function filter() {
   $('select-visible').disabled = !visible; $('clear-visible').disabled = !visible;
 }
 function renderSelection() {
-  selection = resolveSelection(loaded.plan, [...requested]);
+  selection = resolveSelection(loaded.plan, [...requested], behaviours);
+  const custom = Boolean(selection.enabled.length || selection.behaviours_changed);
   const enabled = new Set(selection.enabled), required = new Set(selection.required);
   for (const [id, { checkbox, card, note }] of cards) {
     checkbox.checked = enabled.has(id); checkbox.disabled = required.has(id);
@@ -64,6 +66,7 @@ function renderSelection() {
   $('selection-heading').textContent = selection.enabled.length ? `${selection.enabled.length} imports included` : 'No imports selected';
   $('selection-summary').textContent = selection.enabled.length ?
     `${selection.requested.length} chosen by you · ${selection.required.length} added as requirements` :
+    selection.behaviours_changed ? 'No added items or villagers. Your build uses the selected V3 behaviour settings.' :
     'Your build will be the unchanged V2 English translation.';
   $('dependencies').hidden = !selection.required.length;
   $('dependency-list').replaceChildren(...selection.required.map(id => {
@@ -71,8 +74,8 @@ function renderSelection() {
     li.textContent = `${cards.get(id).row.name} — required by ${selection.dependency_reasons[id].map(key => cards.get(key).row.name).join(', ')}`;
     return li;
   }));
-  $('save-warning').hidden = !selection.enabled.length; $('baseline-note').hidden = Boolean(selection.enabled.length);
-  $('build').textContent = selection.enabled.length ? 'Build with selected imports' : 'Build translation only';
+  $('save-warning').hidden = !custom; $('baseline-note').hidden = custom;
+  $('build').textContent = custom ? 'Build with selected options' : 'Build translation only';
   ready();
 }
 function changeSelection(change) {
@@ -82,6 +85,24 @@ function changeSelection(change) {
   }
 }
 function addChoices(plan, review) {
+  for (const row of plan.behaviours || []) {
+    const label = document.createElement('label'), select = document.createElement('select');
+    const caption = document.createElement('strong'), description = document.createElement('p');
+    caption.textContent = row.name; description.textContent = row.description;
+    description.id = `behaviour-description-${row.id}`; select.setAttribute('aria-describedby', description.id);
+    for (const value of Object.keys(row.values)) {
+      const option = document.createElement('option'); option.value = value; option.textContent = value;
+      select.append(option);
+    }
+    select.value = row.default; behaviours[row.id] = row.default;
+    select.addEventListener('change', () => {
+      behaviours[row.id] = select.value;
+      invalidate('Behaviour settings changed. Review the save warning before building.', true); renderSelection();
+    });
+    label.append(caption, select); $('behaviour-options').append(label, description);
+  }
+  $('behaviour-controls').hidden = !plan.behaviours?.length;
+  $('behaviour-note').textContent = plan.behaviour_save_note || '';
   for (const row of [...plan.options].sort((a, b) => a.kind.localeCompare(b.kind) || a.name.localeCompare(b.name))) {
     const card = document.createElement('label'), checkbox = document.createElement('input');
     const text = document.createElement('span'), name = document.createElement('strong'), detail = document.createElement('small');
@@ -121,7 +142,8 @@ $('cancel').addEventListener('click', () => invalidate('Cancelled. Your original
 $('build').addEventListener('click', () => {
   ready(); if ($('build').disabled) return;
   clearDownloads(); $('error').hidden = true;
-  const job = ++generation, chosen = [...selection.requested];
+  const job = ++generation, chosen = [...selection.requested], chosenBehaviours = { ...selection.behaviours };
+  const custom = Boolean(selection.enabled.length || selection.behaviours_changed);
   try { worker = new Worker(new URL('./worker.mjs', import.meta.url), { type: 'module' }); }
   catch { error('This browser could not start the patcher. Use a current browser over localhost or HTTPS.'); return; }
   $('working').hidden = false; $('progress').value = 0; $('patcher').setAttribute('aria-busy', 'true');
@@ -135,12 +157,15 @@ $('build').addEventListener('click', () => {
           JSON.stringify(data.receipt.requested) !== JSON.stringify(chosen) || !/^[0-9a-f]{64}$/.test(data.receipt.output_sha256)) {
         error('The returned build does not match your selected profile. No download was created.'); return;
       }
+      if (JSON.stringify(data.receipt.behaviours || {}) !== JSON.stringify(chosenBehaviours)) {
+        error('The returned behaviour settings do not match your choices. No download was created.'); return;
+      }
       stop();
       try {
         romURL = URL.createObjectURL(new Blob([data.buffer], { type: 'application/octet-stream' }));
         receiptURL = URL.createObjectURL(new Blob([JSON.stringify(data.receipt, null, 2) + '\n'], { type: 'application/json' }));
         $('download').href = romURL; $('receipt').href = receiptURL;
-        $('download').download = chosen.length ? `Animal Crossing N64 - V3 ${data.receipt.output_sha256.slice(0, 8)}.z64` : 'Animal Crossing N64 - English.z64';
+        $('download').download = custom ? `Animal Crossing N64 - V3 ${data.receipt.output_sha256.slice(0, 8)}.z64` : 'Animal Crossing N64 - English.z64';
         $('receipt').download = `Animal Crossing N64 - ${data.receipt.output_sha256.slice(0, 8)} profile.json`;
         $('output-sha').textContent = data.receipt.output_sha256; $('success').hidden = false;
         status('Build complete. Download the ROM and keep its selection profile.'); $('success-heading').focus({ preventScroll: true });
@@ -148,7 +173,7 @@ $('build').addEventListener('click', () => {
     }
   };
   worker.onerror = () => { if (job === generation) error('The patcher stopped unexpectedly. No input files were changed.'); };
-  worker.postMessage({ requested: chosen, plan_sha256: loaded.bundle.plan.sha256, n64: inputs[0].files[0], gamecube: inputs[1].files[0] });
+  worker.postMessage({ requested: chosen, behaviours: chosenBehaviours, plan_sha256: loaded.bundle.plan.sha256, n64: inputs[0].files[0], gamecube: inputs[1].files[0] });
 });
 window.addEventListener('pagehide', () => { stop(); clearDownloads(); });
 

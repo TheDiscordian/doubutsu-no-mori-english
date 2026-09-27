@@ -101,6 +101,18 @@ export function validatePlan(plan) {
       require(parseInt(count.before, 16) === count.base + table.rows.length, 'Changed catalogue count.');
     }
   }
+  const behaviourIds = new Set();
+  if (plan.behaviours !== undefined) array(plan.behaviours, 1, 32);
+  for (const row of plan.behaviours || []) {
+    require(typeof row.id === 'string' && /^[a-z][a-z0-9-]{0,63}$/.test(row.id) && !behaviourIds.has(row.id),
+      'Invalid or repeated behaviour setting.');
+    behaviourIds.add(row.id);
+    for (const key of ['name', 'scope', 'description']) require(typeof row[key] === 'string' &&
+      row[key].length > 0 && row[key].length < 1024, 'Invalid behaviour description.');
+    require(row.values && Object.keys(row.values).length === 2 && row.values.N64 === 0 && row.values.GameCube === 1 &&
+      row.default === 'N64', 'Unsupported behaviour choices.');
+    field(row, 4, 4); require(row.before === '00000000', 'Changed behaviour default.');
+  }
   for (const row of plan.crc32) {
     field(row, 4, 4); integer(row.length, 1, MAX);
     integer(row.start, 0, plan.base_size - row.length);
@@ -118,7 +130,7 @@ export function validatePlan(plan) {
   return options;
 }
 
-export function resolveSelection(plan, requested) {
+export function resolveSelection(plan, requested, behaviours = {}) {
   const options = validatePlan(plan);
   array(requested, 0, 4096);
   require(requested.every(id => typeof id === 'string' && options.has(id)), 'Unknown or unimplemented import.');
@@ -136,10 +148,21 @@ export function resolveSelection(plan, requested) {
   for (const id of enabled) bytes(options.get(id).profile_hex).forEach((n, i) => { profile[i] |= n; });
   if (plan.surface_profile_hex !== undefined) for (const id of enabled)
     bytes(options.get(id).surface_profile_hex).forEach((n, i) => { surfaceProfile[i] |= n; });
+  require(behaviours !== null && typeof behaviours === 'object' && !Array.isArray(behaviours), 'Invalid behaviour settings.');
+  const definitions = new Map((plan.behaviours || []).map(row => [row.id, row]));
+  require(Object.keys(behaviours).every(id => definitions.has(id)), 'Unknown or unavailable behaviour setting.');
+  const resolved = {}, rows = [...definitions.values()].sort((a, b) => a.id < b.id ? -1 : 1);
+  for (const row of rows) {
+    const value = Object.hasOwn(behaviours, row.id) ? behaviours[row.id] : row.default;
+    require(typeof value === 'string' && Object.hasOwn(row.values, value), 'Unsupported behaviour value.');
+    resolved[row.id] = value;
+  }
   return { requested: chosen, enabled: [...enabled].sort(), required: [...enabled].filter(id => !chosen.includes(id)).sort(),
     dependency_reasons: Object.fromEntries([...reasons].sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0)
       .map(([key, parents]) => [key, [...parents].sort()])), profile_hex: hex(profile),
-    ...(plan.surface_profile_hex === undefined ? {} : { surface_profile_hex: hex(surfaceProfile) }) };
+    ...(plan.surface_profile_hex === undefined ? {} : { surface_profile_hex: hex(surfaceProfile) }),
+    ...(plan.behaviours === undefined ? {} : { behaviours: resolved,
+      behaviours_changed: rows.some(row => resolved[row.id] !== row.default) }) };
 }
 
 const crcTable = Uint32Array.from({ length: 256 }, (_, index) => {
@@ -171,13 +194,13 @@ export function n64Checksum(data) {
   return result;
 }
 
-export async function composeSelection(source, plan, requested) {
+export async function composeSelection(source, plan, requested, behaviours = {}) {
   // Take copies before awaiting crypto so a caller cannot change selections or
   // source data while the original build is being verified.
   plan = structuredClone(plan);
-  const selection = resolveSelection(plan, [...requested]);
+  const selection = resolveSelection(plan, [...requested], structuredClone(behaviours));
   require(source instanceof Uint8Array, 'Invalid composition source.');
-  const empty = !selection.enabled.length;
+  const empty = !selection.enabled.length && !selection.behaviours_changed;
   require(source.length === (empty ? plan.stable_size : plan.base_size), 'Wrong composition cartridge size.');
   const output = source.slice();
   require(await sha256(output) === (empty ? plan.stable_sha256 : plan.base_sha256), 'Composition base checksum mismatch.');
@@ -186,7 +209,7 @@ export async function composeSelection(source, plan, requested) {
     // Check every declared field, including selected records that remain
     // untouched, before applying the first write to this private copy.
     const fields = [plan.profile, plan.header, ...plan.options.flatMap(row => row.disable),
-      ...plan.tables.flatMap(row => [row, ...row.counts]), ...plan.crc32];
+      ...plan.tables.flatMap(row => [row, ...row.counts]), ...plan.crc32, ...(plan.behaviours || [])];
     for (const field of fields) {
       const before = bytes(field.before);
       require(equal(output.subarray(field.offset, field.offset + before.length), before), 'Changed composition field.');
@@ -199,6 +222,10 @@ export async function composeSelection(source, plan, requested) {
       writes.push({ offset: field.offset, before: field.before, after: hex(after) }); output.set(after, field.offset);
     }
     write(plan.profile, bytes(selection.profile_hex));
+    for (const row of plan.behaviours || []) {
+      const value = new Uint8Array(4); view(value).setUint32(0, row.values[selection.behaviours[row.id]]);
+      write(row, value);
+    }
     for (const option of plan.options) if (!enabled.has(option.id)) {
       for (const field of option.disable) write(field, bytes(field.after));
     }
@@ -218,13 +245,15 @@ export async function composeSelection(source, plan, requested) {
     write(plan.header, n64Checksum(output));
   }
   const outputHash = await sha256(output);
-  if (selection.enabled.length === plan.options.length) require(outputHash === plan.base_sha256, 'All-selected output differs from the pinned cartridge.');
+  if (selection.enabled.length === plan.options.length && !selection.behaviours_changed)
+    require(outputHash === plan.base_sha256, 'All-selected output differs from the pinned cartridge.');
   return { output, receipt: { format: 'AFV3-BROWSER-SELECTION-1', ...selection,
     profile_sha256: await sha256(bytes(selection.profile_hex)), output_sha256: outputHash,
     ...(selection.surface_profile_hex === undefined ? {} : {
       surface_profile_sha256: await sha256(bytes(selection.surface_profile_hex)) }),
     base_sha256: empty ? plan.stable_sha256 : plan.base_sha256, base_report_sha256: plan.base_report_sha256,
     runtime_abi: empty ? null : plan.runtime_abi, writes: writes.sort((a, b) => a.offset - b.offset),
+    ...(plan.behaviour_save_note ? { behaviour_save_note: plan.behaviour_save_note } : {}),
     experimental: true, web_patcher_enabled: false, playable_handoff: false,
     save_compatibility: empty ? 'V2 baseline. Do not load V3 import saves.' :
       (plan.save_compatibility || 'Retain every import selected for your save. Removing imports is not a save migration. Do not load imported saves in V2 or an older incompatible build. Ordinary cross-profile reload is unverified.') } };

@@ -132,7 +132,9 @@ def rules(image, report):
         raise ValueError('Unassigned catalogue changes')
 
     from v3_surface_selection import checksum_fields
-    crcs = checksum_fields(image,report)
+    from v3_creature_choices import options as behaviour_options,checksum_fields as behaviour_checksums,SAVE_NOTE
+    behaviours=behaviour_options(image,report)
+    crcs = behaviour_checksums(image,report)+checksum_fields(image,report)
     for at, start, length in ((blob.pstart + 0xF8, blob.pstart + composition.PACKAGE, composition.PACKAGE_SIZE),
                               (module.pstart + composition.CONFIG + 8, blob.pstart, composition.PREFIX_SIZE)):
         value = field(at, 4)
@@ -149,6 +151,7 @@ def rules(image, report):
             'options': entries, 'profile': field(blob.pstart + 0x20, 192), 'tables': packed,
             'crc32': crcs, 'header': field(0x10, 8),
             'save_compatibility':composition.save_compatibility(report),
+            **({'behaviours':behaviours,'behaviour_save_note':SAVE_NOTE} if behaviours else {}),
             **({'surface_profile_hex':surfaces['profile_hex']} if surfaces else {})}
 
 

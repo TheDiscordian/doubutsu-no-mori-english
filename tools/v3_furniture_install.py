@@ -963,6 +963,9 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         result=equipment.finish(result,base,output,equipment_report)
     if player_actions and equipment_report:
         result=equipment.finish(result,base,prior,output,equipment_report)
+    if creature_fish and equipment_report:
+        from v3_creature_ui import finish as finish_creature_text
+        result=finish_creature_text(result,base,prior,output,equipment_report)
     installed=by_vrom(result)
     for vrom,data in owner_changes.items():
         target=next((r.get('target_vrom',vrom) for r in owner_moves if r['vrom']==vrom),vrom)

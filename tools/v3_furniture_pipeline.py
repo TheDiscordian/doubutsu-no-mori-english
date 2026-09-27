@@ -1532,7 +1532,7 @@ def rig_import_plan(inventory, report, bindings, selected=(), category=None, *, 
         plan['creature_parents']=[f'{item:04X}' for item in sorted(CREATURE_DISPLAYS)]
     if any(r['profile'].get('creature_parent') for r in candidates) and not report['equipment_resources'].get('creature_field'):
         plan['creature_field']=True
-    if any(r['profile'].get('creature_parent') for r in candidates) and not report['equipment_resources'].get('creature_fish',{}).get('world',{}).get('pocket_icons'):
+    if any(r['profile'].get('creature_parent') for r in candidates) and not report['equipment_resources'].get('creature_fish',{}).get('world',{}).get('behaviour_choices'):
         plan['creature_fish']=True
     if any(r['profile']['callback_adapter']['category']==ROTATED_CATEGORY for r in rows):
         exercise=report['equipment_resources'].get('player_motion',{}).get('exercise')
@@ -1658,7 +1658,12 @@ def import_batch(source, worksheet, output, lock, selected=(), category=None, re
             refresh('creature-world-runtime',creature_fish=True)
         if not report['equipment_resources'].get('creature_fish',{}).get('world',{}).get('spawn_manager_installed'):
             refresh('creature-world-connected',creature_fish=True)
-        refresh('creature-world-consumers',creature_fish=True)
+        if not report['equipment_resources'].get('creature_fish',{}).get('world',{}).get('pocket_icons'):
+            refresh('creature-world-consumers',creature_fish=True)
+        if not report['equipment_resources'].get('creature_fish',{}).get('world',{}).get('collection_ui_installed'):
+            refresh('creature-collection-ui',creature_fish=True)
+        if not report['equipment_resources'].get('creature_fish',{}).get('world',{}).get('behaviour_choices'):
+            refresh('creature-behaviour-choices',creature_fish=True)
     for stage in plan.get('player_exercise',[]):
         # Follow complete room/music publication, even when artwork is present.
         refresh('player-exercise-'+stage,player_actions=True)

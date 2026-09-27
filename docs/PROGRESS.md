@@ -31,9 +31,9 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
-The current proposal is ABI 300 at
-`build/v3-creature-world-work-01/connected-05/build-lock.json`, ROM SHA-256
-`a867bd2f5b42b814aeba5f29ed11eef1be46ad9975e2f3ded589b7b748a73142`.
+The current proposal is ABI 302 at
+`build/v3-creature-world-work-01/connected-10/build-lock.json`, ROM SHA-256
+`1b019471c4eabb56e4c1f71b0c4b9d749011f421b53cf1858f8ae7c1d83ef172`.
 It contains 167 selectable development imports and 100 complete inactive furniture
 profiles whose acquisition is pending. The main lock and both stable V2-14
 deployments are retained.
@@ -90,8 +90,8 @@ preserved at `2301`. The ordinary category pipeline reuses all seventeen prepare
 models without graphics compilation. Three focused tests pass, including two
 sanitized C fixtures, installed-resource/hooks/UPS checks, and all/empty optional
 composition. The 3,840-byte reader packet adds no save change; the shared startup
-fits its existing reservation. Field behaviours, pocket icons,
-collection/profile readers, and spawn tables remain required before selection.
+fits its existing reservation. Fish per-species composition and remaining
+gameplay integration are unfinished; added insect field behaviours remain required.
 Native connected-path execution remains unverified. Choice counts are unchanged. See the
 [creature checkpoint](checkpoints/V3_CREATURE_PROFILES.md).
 
@@ -137,15 +137,32 @@ records and profile bits for all seventeen additions. The N64 alternative adds
 selected donor fish while retaining the complete native manager for original
 species. Its 100-weight native opportunity competes with actual donor seasonal
 weights; source mode uses the complete donor population and saved seasonal blend.
-The behaviour words remain N64, and WebUI/composer choices are unfinished.
+The private offline/browser composers expose population and imported coastal
+movement settings separately from item selection. Both default to N64 and bind
+to real runtime alternatives; receipts record the resolved values. No deployed
+patcher is changed.
 Native catch recording, prospective final-catch checks, and completion dialogue
 include all selected additions without aliasing original 32-bit records.
 All seventeen complete pocket icons retain their two donor palettes. The 9,792
 artwork bytes and 152-byte descriptor table use existing world/save packet
 padding, with no new RAM or ROM allocation. Original icons, tool/gift paths,
-native herabuna, and existing model assets remain intact. No additional fish
-are selectable yet; collection navigation and official catch messages still
-need integration.
+native herabuna, and existing model assets remain intact. Collection drawing,
+navigation, and names cover all 41 fish and 40 insects in a nine-by-five grid.
+All seventeen complete official catch messages retain line/page breaks, timing,
+and effects, with source credits in the single catalogue. The 880-byte UI reader
+and 240-byte table fit the existing world packet. The complete English text
+region moves into verified unused ROM space because its original end is occupied;
+no existing owner, artwork, or save layout is overwritten.
+
+Three UI/text checks pass on ABI 301, covering every collection identity and
+catch-message route, complete official bank preservation, hooks/relocations,
+patch reconstruction, and optional composition. ABI 302 retains those complete
+resources and consumers. Three current behaviour checks pass, including five
+matching browser/offline profiles, both runtime settings, empty/default V2,
+nested checksums, invalid values, and retained save/assets. An actual offline
+behaviour-only build also completes. New native execution or visual acceptance
+is not claimed. The next work is per-species composition for the entire nine-fish
+category; the fish remain inactive and selectable counts are unchanged.
 
 Three changed-path checks pass for both population modes, all seventeen native
 catch/collection readers across four players, completion timing, disabled/foreign

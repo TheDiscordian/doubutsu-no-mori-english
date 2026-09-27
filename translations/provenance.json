@@ -89,6 +89,397 @@
     ]
   },
   "entries": [
+    {
+      "id": "message:2EEF",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_creature_ui.py:messages",
+            "N64/message/2EEF"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "message:2FC9",
+            "reference_sha256": "b07a0e60ac2b8b30fcd01f6c32735ac3e14ee862ca81775257bdfa4280fddba7"
+          },
+          "adaptations": [
+            "Native encoding; retain official wording, line and page breaks, pauses, colours, and text effects"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "b07a0e60ac2b8b30fcd01f6c32735ac3e14ee862ca81775257bdfa4280fddba7"
+        }
+      }
+    },
+    {
+      "id": "message:2EF0",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_creature_ui.py:messages",
+            "N64/message/2EF0"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "message:2FCA",
+            "reference_sha256": "d244960057f10347f6bd84b75a008f7d3dcae956f273528f1d807036c371407b"
+          },
+          "adaptations": [
+            "Native encoding; retain official wording, line and page breaks, pauses, colours, and text effects"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "d244960057f10347f6bd84b75a008f7d3dcae956f273528f1d807036c371407b"
+        }
+      }
+    },
+    {
+      "id": "message:2EF1",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_creature_ui.py:messages",
+            "N64/message/2EF1"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "message:2FCB",
+            "reference_sha256": "1452d12abc242694b686bfb52d45ae4e4da49cfe999d4500d4c7869b604dbdbc"
+          },
+          "adaptations": [
+            "Native encoding; retain official wording, line and page breaks, pauses, colours, and text effects"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "1452d12abc242694b686bfb52d45ae4e4da49cfe999d4500d4c7869b604dbdbc"
+        }
+      }
+    },
+    {
+      "id": "message:2EF2",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_creature_ui.py:messages",
+            "N64/message/2EF2"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "message:2FCC",
+            "reference_sha256": "66803eff2cd63aabf56f75307c49d25a5f0a63f6b57f181f73eedb412e807177"
+          },
+          "adaptations": [
+            "Native encoding; retain official wording, line and page breaks, pauses, colours, and text effects"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "66803eff2cd63aabf56f75307c49d25a5f0a63f6b57f181f73eedb412e807177"
+        }
+      }
+    },
+    {
+      "id": "message:2EF3",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_creature_ui.py:messages",
+            "N64/message/2EF3"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "message:2FCD",
+            "reference_sha256": "db717bcba2cfbfd6df1404178c07879861b6542e5f8b1fdb3862b76921c3a2bc"
+          },
+          "adaptations": [
+            "Native encoding; retain official wording, line and page breaks, pauses, colours, and text effects"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "db717bcba2cfbfd6df1404178c07879861b6542e5f8b1fdb3862b76921c3a2bc"
+        }
+      }
+    },
+    {
+      "id": "message:2EF4",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_creature_ui.py:messages",
+            "N64/message/2EF4"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "message:2FCE",
+            "reference_sha256": "71088b3a10a2a4f9da376f244075b42c62045840a52546f9f5bf9c76b6fcf29a"
+          },
+          "adaptations": [
+            "Native encoding; retain official wording, line and page breaks, pauses, colours, and text effects"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "71088b3a10a2a4f9da376f244075b42c62045840a52546f9f5bf9c76b6fcf29a"
+        }
+      }
+    },
+    {
+      "id": "message:2EF5",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_creature_ui.py:messages",
+            "N64/message/2EF5"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "message:2FCF",
+            "reference_sha256": "f6a7fb7369b175f6461547f0b47647f23eaa080c3b3078a78b686f64ab677436"
+          },
+          "adaptations": [
+            "Native encoding; retain official wording, line and page breaks, pauses, colours, and text effects"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "f6a7fb7369b175f6461547f0b47647f23eaa080c3b3078a78b686f64ab677436"
+        }
+      }
+    },
+    {
+      "id": "message:2EF6",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_creature_ui.py:messages",
+            "N64/message/2EF6"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "message:2FD0",
+            "reference_sha256": "26798149d442b4e65af152796cf9738496b86925c5574bd10cc42d0f77ed93a5"
+          },
+          "adaptations": [
+            "Native encoding; retain official wording, line and page breaks, pauses, colours, and text effects"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "26798149d442b4e65af152796cf9738496b86925c5574bd10cc42d0f77ed93a5"
+        }
+      }
+    },
+    {
+      "id": "message:2EF7",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_creature_ui.py:messages",
+            "N64/message/2EF7"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "message:1328",
+            "reference_sha256": "9edb5356656b3adc362f2552e5868bf797d02410855d63f9f93093aeb1866bd6"
+          },
+          "adaptations": [
+            "Native encoding; retain official wording, line and page breaks, pauses, colours, and text effects"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "9edb5356656b3adc362f2552e5868bf797d02410855d63f9f93093aeb1866bd6"
+        }
+      }
+    },
+    {
+      "id": "message:2EF8",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_creature_ui.py:messages",
+            "N64/message/2EF8"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "message:2FC1",
+            "reference_sha256": "7474158f2e20b17a570a3c2ab2b970a2956c0b0f45aad56cfa5aeb0781d7b195"
+          },
+          "adaptations": [
+            "Native encoding; retain official wording, line and page breaks, pauses, colours, and text effects"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "7474158f2e20b17a570a3c2ab2b970a2956c0b0f45aad56cfa5aeb0781d7b195"
+        }
+      }
+    },
+    {
+      "id": "message:2EF9",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_creature_ui.py:messages",
+            "N64/message/2EF9"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "message:2FC2",
+            "reference_sha256": "3959efcaa9887b6522a56d6a889269a28d60deecaf83f63cf3b2ae29e9ec620b"
+          },
+          "adaptations": [
+            "Native encoding; retain official wording, line and page breaks, pauses, colours, and text effects"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "3959efcaa9887b6522a56d6a889269a28d60deecaf83f63cf3b2ae29e9ec620b"
+        }
+      }
+    },
+    {
+      "id": "message:2EFA",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_creature_ui.py:messages",
+            "N64/message/2EFA"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "message:2FC3",
+            "reference_sha256": "b0f380033337b495929c8964e55b504256a2aa68d972235f177bf5f305d61f45"
+          },
+          "adaptations": [
+            "Native encoding; retain official wording, line and page breaks, pauses, colours, and text effects"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "b0f380033337b495929c8964e55b504256a2aa68d972235f177bf5f305d61f45"
+        }
+      }
+    },
+    {
+      "id": "message:2EFB",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_creature_ui.py:messages",
+            "N64/message/2EFB"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "message:2FC4",
+            "reference_sha256": "4236c9141ff3ae1e4d20c15985d36003ce219e0a3252eb41c9965c468850cbd9"
+          },
+          "adaptations": [
+            "Native encoding; retain official wording, line and page breaks, pauses, colours, and text effects"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "4236c9141ff3ae1e4d20c15985d36003ce219e0a3252eb41c9965c468850cbd9"
+        }
+      }
+    },
+    {
+      "id": "message:2EFC",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_creature_ui.py:messages",
+            "N64/message/2EFC"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "message:2FC5",
+            "reference_sha256": "6902da67a45a9498b250c6f3b4ea178e9facf25ef515d3249160d91d34a72341"
+          },
+          "adaptations": [
+            "Native encoding; retain official wording, line and page breaks, pauses, colours, and text effects"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "6902da67a45a9498b250c6f3b4ea178e9facf25ef515d3249160d91d34a72341"
+        }
+      }
+    },
+    {
+      "id": "message:2EFD",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_creature_ui.py:messages",
+            "N64/message/2EFD"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "message:2FC6",
+            "reference_sha256": "881024e1ee53c7f56ad3940b2b93511d71b6dfaa4d2557117c3c75e88fb6c9f0"
+          },
+          "adaptations": [
+            "Native encoding; retain official wording, line and page breaks, pauses, colours, and text effects"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "881024e1ee53c7f56ad3940b2b93511d71b6dfaa4d2557117c3c75e88fb6c9f0"
+        }
+      }
+    },
+    {
+      "id": "message:2EFE",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_creature_ui.py:messages",
+            "N64/message/2EFE"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "message:2FC7",
+            "reference_sha256": "603f8a45e493b2dcc77a2a167786b06794924c12cc2b63ca6fffaa29009df034"
+          },
+          "adaptations": [
+            "Native encoding; retain official wording, line and page breaks, pauses, colours, and text effects"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "603f8a45e493b2dcc77a2a167786b06794924c12cc2b63ca6fffaa29009df034"
+        }
+      }
+    },
+    {
+      "id": "message:2EFF",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_creature_ui.py:messages",
+            "N64/message/2EFF"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "message:2FC8",
+            "reference_sha256": "ae1e7016455a79ca42925bb22a0271b4c8568eb9e46d7a7b3fad8fa65e54ecd2"
+          },
+          "adaptations": [
+            "Native encoding; retain official wording, line and page breaks, pauses, colours, and text effects"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "ae1e7016455a79ca42925bb22a0271b4c8568eb9e46d7a7b3fad8fa65e54ecd2"
+        }
+      }
+    },
     {"id":"GAFE01-r0/item/1C48/name","native_sha256":null,"locales":{"en":{"credit":"official","locator":["tools/v3_furniture_pipeline.py","tools/v3_furniture_rigs.py","tools/v3_room_aliases.py"],"source":{"source":"user-supplied GAFE01 revision 0 disc","symbol":"ftrName_table","index":786,"reference_sha256":"459390980650df5df8330b56b53af94ff323e06e46fb15c7a00a3e4c5a6207d5"},"text":"snail","evidence_id":"GAFE01-r0/item/1C48/name","human_review":"not_recorded","encoded_sha256":"459390980650df5df8330b56b53af94ff323e06e46fb15c7a00a3e4c5a6207d5"}}},
     {"id":"GAFE01-r0/item/1C4C/name","native_sha256":null,"locales":{"en":{"credit":"official","locator":["tools/v3_furniture_pipeline.py","tools/v3_furniture_rigs.py","tools/v3_room_aliases.py"],"source":{"source":"user-supplied GAFE01 revision 0 disc","symbol":"ftrName_table","index":787,"reference_sha256":"bace5cb0b24fdadf2e016166bb2b5ffe6ad8f824561416b1ebf0283353f9264d"},"text":"mole cricket","evidence_id":"GAFE01-r0/item/1C4C/name","human_review":"not_recorded","encoded_sha256":"bace5cb0b24fdadf2e016166bb2b5ffe6ad8f824561416b1ebf0283353f9264d"}}},
     {"id":"GAFE01-r0/item/1C50/name","native_sha256":null,"locales":{"en":{"credit":"official","locator":["tools/v3_furniture_pipeline.py","tools/v3_furniture_rigs.py","tools/v3_room_aliases.py"],"source":{"source":"user-supplied GAFE01 revision 0 disc","symbol":"ftrName_table","index":788,"reference_sha256":"4cce7ee8df2e2bdfaec5a03e394bcdd8f6627763f5777784e90a5683f8cd779d"},"text":"pondskater","evidence_id":"GAFE01-r0/item/1C50/name","human_review":"not_recorded","encoded_sha256":"4cce7ee8df2e2bdfaec5a03e394bcdd8f6627763f5777784e90a5683f8cd779d"}}},
@@ -181,7 +572,7 @@
     {"id":"GAFE01-r0/item/1DE8/name","native_sha256":null,"locales":{"en":{"credit":"official","locator":["tools/v3_furniture_pipeline.py","tools/v3_furniture_install.py"],"source":{"source":"user-supplied GAFE01 revision 0 disc","symbol":"ftrName_table","index":890,"reference_sha256":"71dbc3159484f4d15fa4c516b2d925a629cab564dcaa72251b74012655c9e796"},"text":"Mario Bros","evidence_id":"GAFE01-r0/item/1DE8/name","human_review":"not_recorded","encoded_sha256":"71dbc3159484f4d15fa4c516b2d925a629cab564dcaa72251b74012655c9e796"}}},
     {"id":"GAFE01-r0/item/1DEC/name","native_sha256":null,"locales":{"en":{"credit":"official","locator":["tools/v3_furniture_pipeline.py","tools/v3_furniture_install.py"],"source":{"source":"user-supplied GAFE01 revision 0 disc","symbol":"ftrName_table","index":891,"reference_sha256":"e825fe6939104ab3e17580551ce5fde80b07217649f7d336ac77ab10234715dc"},"text":"Super Mario Bros","evidence_id":"GAFE01-r0/item/1DEC/name","human_review":"not_recorded","encoded_sha256":"e825fe6939104ab3e17580551ce5fde80b07217649f7d336ac77ab10234715dc"}}},
     {"id":"GAFE01-r0/item/1DF0/name","native_sha256":null,"locales":{"en":{"credit":"official","locator":["tools/v3_furniture_pipeline.py","tools/v3_furniture_install.py"],"source":{"source":"user-supplied GAFE01 revision 0 disc","symbol":"ftrName_table","index":892,"reference_sha256":"ba2effed7f3fb3c812c71eb6e40b675419f1925b480012a1606c9b4c0d5154c9"},"text":"Legend of Zelda","evidence_id":"GAFE01-r0/item/1DF0/name","human_review":"not_recorded","encoded_sha256":"ba2effed7f3fb3c812c71eb6e40b675419f1925b480012a1606c9b4c0d5154c9"}}},
-    {"id":"project/v3/save/capacity-error","native_sha256":null,"locales":{"en":{"credit":"assistant","locator":["overlays/v3/save_runtime.c"],"source":{"source":"Project-authored format-five capacity diagnostic; not a translation of donor game dialogue"},"text":"V3 save needs more space.\n\nNo save data was written.\nPower off and keep a backup.\nReport this with your profile.","evidence_id":"project/v3/save/capacity-error","human_review":"not_recorded"}}},
+    {"id":"project/v3/save/capacity-error","native_sha256":null,"locales":{"en":{"credit":"assistant","locator":["overlays/v3/save_runtime.c"],"source":{"source":"Project-authored format-five capacity diagnostic; not a translation of donor game dialogue"},"text":"V3 save needs more space.\n\nNo save data was written.\nPower off and keep a backup.\nReport this with your profile.","evidence_id":"project/v3/save/capacity-error","human_review":"not_recorded","encoded_sha256":"3959af038fd31f8407f7525bd4d525d43bbf792d988d78390f562293ef9b01e9"}}},
     {"id":"GAFE01-r0/item/1FCC/name","native_sha256":null,"locales":{"en":{"credit":"official","locator":["tools/v3_furniture_pipeline.py","tools/v3_furniture_install.py"],"source":{"source":"user-supplied GAFE01 revision 0 disc","symbol":"ftrName_table","index":1011,"reference_sha256":"2c104565ae1d9910b30344bf24333138ad5fc158b27225986551a7098e4d3752"},"text":"aerobics radio","evidence_id":"GAFE01-r0/item/1FCC/name","human_review":"not_recorded","encoded_sha256":"2c104565ae1d9910b30344bf24333138ad5fc158b27225986551a7098e4d3752"}}},
     {"id":"GAFE01-r0/item/31B0/name","native_sha256":null,"locales":{"en":{"credit":"official","locator":["tools/v3_furniture_pipeline.py","tools/v3_furniture_install.py"],"source":{"source":"user-supplied GAFE01 revision 0 disc","symbol":"ftrName2_table","index":108,"reference_sha256":"f967d76efe710d439c5e5941e829da03e66a6fa22754acc726b2f86c2ddbfd83"},"text":"treasure chest","evidence_id":"GAFE01-r0/item/31B0/name","human_review":"not_recorded","encoded_sha256":"f967d76efe710d439c5e5941e829da03e66a6fa22754acc726b2f86c2ddbfd83"}}},
     {"id":"GAFE01-r0/item/319C/name","native_sha256":null,"locales":{"en":{"credit":"official","locator":["tools/v3_furniture_pipeline.py","tools/v3_furniture_install.py"],"source":{"source":"user-supplied GAFE01 revision 0 disc","symbol":"ftrName2_table","index":103,"reference_sha256":"2a265c5fad96a877af962e7b190d4d0154ed51473a5188b0c18f5d1e3d9eded3"},"text":"crab stew","evidence_id":"GAFE01-r0/item/319C/name","human_review":"not_recorded","encoded_sha256":"2a265c5fad96a877af962e7b190d4d0154ed51473a5188b0c18f5d1e3d9eded3"}}},

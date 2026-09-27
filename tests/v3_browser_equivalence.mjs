@@ -7,15 +7,25 @@ import { sha256 } from '../web/core.mjs';
 const fixture = JSON.parse(readFileSync(process.argv[2]));
 const base = new Uint8Array(readFileSync(fixture.base)), stable = new Uint8Array(readFileSync(fixture.stable));
 const results = [];
+if (fixture.plan.behaviours?.length) {
+  const setting = fixture.plan.behaviours[0].id;
+  for (const invalid of [{ unknown: 'N64' }, { [setting]: 'Unknown' }, { [setting]: 1 }, null, []]) {
+    assert.throws(() => resolveSelection(fixture.plan, [], invalid), /behaviour/i);
+  }
+}
 for (const row of fixture.cases) {
-  const resolution = resolveSelection(fixture.plan, row.requested);
+  const resolution = resolveSelection(fixture.plan, row.requested, row.behaviours);
   for (const key of ['requested', 'enabled', 'required', 'dependency_reasons', 'profile_hex']) {
     assert.deepEqual(resolution[key], row.selection[key], `${row.name}: ${key}`);
   }
-  const source = row.requested.length ? base : stable;
-  const { output, receipt } = await composeSelection(source, fixture.plan, row.requested);
+  const source = resolution.enabled.length || resolution.behaviours_changed ? base : stable;
+  const { output, receipt } = await composeSelection(source, fixture.plan, row.requested, row.behaviours);
   assert.equal(receipt.output_sha256, row.sha256, row.name);
   assert.equal(receipt.profile_sha256, row.selection.profile_sha256, row.name);
+  if (row.selection.behaviours !== undefined) {
+    assert.deepEqual(receipt.behaviours, row.selection.behaviours, row.name);
+    assert.equal(receipt.behaviours_changed, row.selection.behaviours_changed, row.name);
+  }
   if (row.selection.surface_profile_hex !== undefined) {
     assert.equal(resolution.surface_profile_hex, row.selection.surface_profile_hex, row.name);
     assert.equal(receipt.surface_profile_hex, row.selection.surface_profile_hex, row.name);

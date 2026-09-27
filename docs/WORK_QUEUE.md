@@ -39,25 +39,28 @@ commits. Batch connected verification, rather than creating another independent
 table/reader deliverable. Insects and the other importing categories remain
 required work, not removed scope.
 
-Use the shared converter and the current ABI-300 proposal:
-`build/v3-creature-world-work-01/connected-05/build-lock.json`.
-ROM SHA-256: `a867bd2f5b42b814aeba5f29ed11eef1be46ad9975e2f3ded589b7b748a73142`.
+Use the shared converter and the current ABI-302 proposal:
+`build/v3-creature-world-work-01/connected-10/build-lock.json`.
+ROM SHA-256: `1b019471c4eabb56e4c1f71b0c4b9d749011f421b53cf1858f8ae7c1d83ef172`.
 The GameCube calendar is connected through native manager entry `8092ECAC`,
 terrain selection, and real actor creation. The complete seventeen-creature
 saved-profile/collection extension and town seasonal state are installed.
 Both population alternatives are installed: source seasonal blending and an
 additive native policy retaining the original native-species manager. All
-seventeen added species have native catch/last-catch/completion readers and full
-dual-palette pocket icons. These remain inactive until the full path is usable.
-The exact next consumers are the collection grid/navigation/name reader,
-official donor catch messages, and resolved browser/offline behaviour settings.
-The collection grid is still 32 slots; nine added fish plus native herabuna need
-41 identities. Extend its layout and navigation together, not just its loop bound.
-The native fish message selector at `808CF92C` still bounds ordinary fish at 32
-and uses actor-index arithmetic; added actor indices must map to official donor
-messages, not existing rubbish/unrelated text. Reuse the existing translation
-framework and single provenance catalogue. GameCube source
-`m_player_main_notice_rod.c_inc` defines the donor message mapping.
+seventeen added species have native catch/last-catch/completion readers, full
+dual-palette pocket icons, and official donor catch messages with single-catalogue
+credits. Collection drawing, navigation, and name lookup cover all 41 fish and
+40 insects without replacing native herabuna. Both behaviour settings connect to
+the private offline/browser composers and their receipts. Five browser/offline
+profiles agree, including both modes and a behaviour-only build. Empty imports
+with default settings return stable V2. Neither deployment is changed.
+The exact next consumer is per-species optional composition for all nine fish:
+connect the existing carried readiness words, display-profile enable words,
+saved profile, and nested packet checksums together. Reuse the complete room,
+field, calendar, catch, icon, and UI resources; do not reconvert them or reopen
+their unchanged tests. Fish remain inactive in this proposal, and its 167
+selectable development choices are unchanged. Complete the connected fish path
+and required gameplay fixes; its finished components do not finish the import.
 Controller Pak transport of added catch records remains unfinished; the record
 adapter rejects foreign-player writes rather than crediting another resident.
 Keep the shared bounded plan, not appended entries in the native twenty-row
@@ -106,8 +109,8 @@ Next importing work:
   geometry, and separates rubbish from imported IDs at release creation.
   Reuse it and its origin marker instead of another parameter-table stage.
   The source coastal patrol/shoreline alternative and original-behaviour
-  callbacks are installed in one shared world packet. Its mode remains N64;
-  browser choice resolution is pending. Complete donor calendars and the shared
+  callbacks are installed in one shared world packet. The private composers
+  resolve both behaviour settings, defaulting to N64. Complete donor calendars and the shared
   season/selection/placement code are connected to native creation and persisted
   seasons. Three focused current checks pass for sanitized manager/save paths,
   forward migration and rejection, installed hooks, preservation, and optional
@@ -116,8 +119,9 @@ Next importing work:
   connected. Current host checks cover every added identity/four players,
   completion timing, disabled/foreign records, both population modes, complete
   donor icon conversion, current hooks, and optional composition. Continue the
-  collection UI, official catch messages, behaviour selection, and new insect
-  behaviour programs. Do not reconvert frames or create per-fish tools.
+  per-species fish selection and remaining gameplay integration; new insect
+  behaviour programs remain required. The collection UI, official catch messages,
+  and behaviour settings are connected. Do not reconvert frames or create per-fish tools.
   The common converter already retains all 17 displays, 96 joints, full motion
   arrays, and complete source sound callbacks in
   `build/v3-creature-profiles-prepared-01/`. All seventeen complete room profiles,

@@ -218,7 +218,7 @@ def catalogue(image, report):
     return dict(sorted(result.items()))
 
 
-def resolve(catalog, selected):
+def resolve(catalog, selected, *, behaviours=None, behaviour_options=None):
     if not isinstance(selected, (list, tuple)) or any(type(key) is not str for key in selected):
         raise ValueError('Selections must be a list of fixed source identities')
     requested = sorted(set(selected))
@@ -256,6 +256,12 @@ def resolve(catalog, selected):
         bits=surface_profile([catalog[k] for k in enabled if catalog[k]['kind'] in ('floor','wall')])
         result.update(surface_profile_hex=bits.hex(),surface_profile_sha256=sha256(bits))
         result['registry_versions']['surfaces']=1
+    if behaviour_options is not None:
+        from v3_creature_choices import resolve as resolve_behaviours,changed
+        result['behaviours']=resolve_behaviours(behaviour_options,behaviours)
+        result['behaviours_changed']=changed(behaviour_options,result['behaviours'])
+    elif behaviours:
+        raise ValueError('Behaviour values require the checked installed choices')
     return result
 
 
@@ -331,9 +337,14 @@ def catalogue_selection(image, report, enabled):
 
 def compose(image, report, catalog, selection):
     # Re-resolve instead of trusting a caller-supplied enabled set or profile.
-    if selection != resolve(catalog, selection['requested']):
+    from v3_creature_choices import options as behaviour_options,resolve as resolve_behaviours,checksum_fields as behaviour_checksums
+    choices=behaviour_options(image,report)
+    values=resolve_behaviours(choices,selection.get('behaviours'))
+    expected=resolve(catalog,selection['requested'],behaviours=selection.get('behaviours'),
+        behaviour_options=choices if 'behaviours' in selection else None)
+    if selection != expected:
         raise ValueError('Selection receipt does not match its dependency resolution')
-    if not selection['enabled']:
+    if not selection['enabled'] and not selection.get('behaviours_changed',False):
         path, checksum, _ = stable_reference(report)
         stable = path.read_bytes()
         if sha256(stable) != checksum:
@@ -360,6 +371,8 @@ def compose(image, report, catalog, selection):
             raise ValueError('Selection field escapes reviewed resident enable words')
         change(files[BLOB].pstart+offset, value, label)
     prefix(0x20, bytes.fromhex(selection['profile_hex']), 'complete saved import profile')
+    for row in choices:
+        change(row['offset'],struct.pack('>I',row['values'][values[row['id']]]),'behaviour: '+row['id'])
     enabled = set(selection['enabled'])
     for key, row in catalog.items():
         active = int(key in enabled)
@@ -373,10 +386,10 @@ def compose(image, report, catalog, selection):
     scoring_writes, _ = scoring_selection(image, report, catalog, enabled)
     writes.extend(scoring_writes)
     from v3_surface_selection import checksum_fields
-    for field in checksum_fields(image,report):
+    for field in behaviour_checksums(image,report)+checksum_fields(image,report):
         intermediate=apply_writes(image,writes);at=field['start']
         change(field['offset'],struct.pack('>I',zlib.crc32(intermediate[at:at+field['length']])),
-            'selected surface resource CRC')
+            'selected resource CRC')
     intermediate = apply_writes(image, writes)
     start = files[BLOB].pstart
     new_blob = intermediate[start:start+len(blob)]
@@ -426,14 +439,17 @@ def scoring_selection(image, report, catalog, enabled):
     return writes, rows
 
 
-def build(output, selected=(), *, select_all=False):
+def build(output, selected=(), *, select_all=False, behaviours=None):
     if not output.resolve().is_relative_to(ROOT/'build') or output.exists():
         raise ValueError('A fresh ignored build/ output directory is required')
     if select_all and selected:
         raise ValueError('Choose explicit identities or all installed development entries')
     image, report = inputs()
     catalog = catalogue(image, report)
-    selection = resolve(catalog, list(catalog) if select_all else list(selected))
+    from v3_creature_choices import options as behaviour_options,SAVE_NOTE
+    choices=behaviour_options(image,report)
+    selection = resolve(catalog, list(catalog) if select_all else list(selected),
+        behaviours=behaviours,behaviour_options=choices if choices or behaviours else None)
     result, writes, blob = compose(image, report, catalog, selection)
     native = verified_rom((ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes())
     patch = make_ups(native, result)
@@ -445,6 +461,7 @@ def build(output, selected=(), *, select_all=False):
         'patch_sha256':sha256(patch), 'rom_bytes':len(result), 'writes':writes,
         'retains_unselected_resource_storage':blob is not None,
         'save_compatibility':'V2 baseline' if blob is None else save_compatibility(report)}
+    if choices:receipt['behaviour_save_note']=SAVE_NOTE
     if blob is None:
         current = {'build':'v2-import-free', 'output_sha256':sha256(result), 'composition':receipt}
     else:
@@ -538,6 +555,9 @@ def build(output, selected=(), *, select_all=False):
         if 'surfaces' in selected_cat:
             from v3_surface_selection import update_report
             update_report(result,blob,current,selection,selected_cat['surfaces'])
+        if choices:
+            from v3_creature_choices import update_report as update_behaviours
+            update_behaviours(result,blob,current,selection['behaviours'])
     output.mkdir(parents=True, exist_ok=False)
     write_new(output/'animal-forest-v3-asset-loader.z64', result)
     write_new(output/'asset-loader.ups', patch)
@@ -552,7 +572,14 @@ if __name__ == '__main__':
     parser.add_argument('--select', action='append', default=[], help='Fixed GAFE01-r0 identity; repeat as needed')
     parser.add_argument('--all', action='store_true', help='All installed experimental entries, not the whole donor disc')
     parser.add_argument('--base-lock',type=Path,help='Explicit checked proposal lock; leave the main development lock unchanged')
+    parser.add_argument('--behaviour',action='append',default=[],metavar='SETTING=N64|GameCube',
+        help='Shared installed behaviour setting; repeat for distinct mechanics')
     args = parser.parse_args()
     if args.base_lock:use_build_lock(args.base_lock)
-    result = build(args.output, args.select, select_all=args.all)
+    behaviours={}
+    for argument in args.behaviour:
+        key,separator,value=argument.partition('=')
+        if not separator or not key or key in behaviours:parser.error('Use distinct SETTING=VALUE behaviour choices')
+        behaviours[key]=value
+    result = build(args.output, args.select, select_all=args.all,behaviours=behaviours)
     print(json.dumps({key:result[key] for key in ('requested','required','output_sha256','save_compatibility')}, indent=2))
