@@ -31,17 +31,26 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
-The console images and bounded native reader are installed in ABI 277 at
-`build/v3-console-images-native-01/build-lock.json`, ROM SHA-256
-`f346aa8f41e8b4e1e9dad2159ed625f7c10aad4148bdec870dc34c92a602f1d4`.
+The shared native console lifecycle is installed in ABI 278 at
+`build/v3-console-emulator-native-01/build-lock.json`, ROM SHA-256
+`5a714a18c3d6037f07bd9664bae456fcf85cd7ba290aebfe35370e42aea41ad1`.
+Six checked native calls connect complete iNES image loading, expanded graphics,
+initialization, frame/reset, and cleanup to independent player progress. Three
+focused checks pass, including sanitized host-adapter execution for all eleven
+additional iNES games, retained resources/relocations, and four private browser
+compositions. Native CPU/graphics/audio are stubbed in the host check; native
+gameplay is not claimed. Continue source furniture launch, real heap capacity,
+ordinary launch/return, and the complete QD disk dependency. No console choice
+is enabled. See the [lifecycle checkpoint](checkpoints/V3_CONSOLE_EMULATOR.md).
+
+The retained image-reader installation has its evidence in ABI 277.
 All nineteen complete images use a separately tracked 770,144-byte ROM pool,
 6,336-byte metadata, and a 1-KiB streaming input buffer. Six-packet startup,
 resource preservation, physical allocation, and four private compositions pass.
 Native ROM reads reproduce a complete iNES image and complete QD image with
 guards and saved state intact; the scenario fails afterwards in fixture cleanup,
 so full scenario success is not claimed. The helper is corrected without another
-replay. Room launch, graphics allocation, frame/reset/exit hooks, and QD execution
-remain unfinished. No console choice is enabled. See the
+replay. See the
 [streaming checkpoint](checkpoints/V3_CONSOLE_IMAGES.md).
 
 The console converter prepares the full nineteen-game category and a shared

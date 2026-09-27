@@ -1,5 +1,20 @@
 # Work record
 
+## 2026-09-27: shared native iNES lifecycle
+
+- Installed six checked emulator calls and removed only their native jump
+  relocations. ABI 278 connects full images, correctly sized graphics, and
+  common initialization/frame/reset/close persistence. Reset retains the full
+  battery region despite native reset clearing it. Original game paths remain.
+- Three focused tests pass: sanitized adapter execution against actual images
+  for eleven new iNES games and four players, cartridge/relocation/resource
+  preservation and UPS reconstruction, and four private compositions. Host
+  CPU/PPU/audio calls are stubs; native gameplay remains unverified.
+- No new native harness or historical test replay. Room launch, real game-heap
+  capacity, normal gameplay/return, and complete QD support remain. No console
+  choice is enabled, format five is retained, and both patchers serve V2-13.
+  Continue from the [lifecycle checkpoint](checkpoints/V3_CONSOLE_EMULATOR.md).
+
 ## 2026-09-27: complete console pool and native streaming reader
 
 - Installed all nineteen original compressed images and compact metadata through

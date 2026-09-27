@@ -21,10 +21,15 @@ prevent asset/data conversion or redirect work from an unfinished shared format.
 Incomplete gameplay stays unavailable in the selector; installing assets does
 not claim that an item is playable. Reuse unchanged passing tests throughout.
 
-Current task: connect the shared console room launch, emulator memory, and
-frame/reset/exit behaviour. Continue from ABI 277 at
-`build/v3-console-images-native-01/build-lock.json`, ROM SHA-256
-`f346aa8f41e8b4e1e9dad2159ed625f7c10aad4148bdec870dc34c92a602f1d4`.
+Current task: connect the shared console furniture launch and normal return,
+verify real game-heap capacity, and implement complete QD execution. Continue
+from ABI 278 at `build/v3-console-emulator-native-01/build-lock.json`, ROM SHA-256
+`5a714a18c3d6037f07bd9664bae456fcf85cd7ba290aebfe35370e42aea41ad1`.
+Full iNES loading, graphics allocation, and frame/reset/exit save hooks are
+installed. Three focused checks pass, including actual-image host adapter
+execution, checked native hooks/relocations, resource preservation, and four
+private compositions. CPU/PPU/audio are stubbed in that host fixture; actual
+gameplay remains unverified. See the [lifecycle checkpoint](checkpoints/V3_CONSOLE_EMULATOR.md).
 All nineteen complete compressed images, compact metadata, and the native
 streamed reader are installed. Host donor comparisons, cartridge/ownership
 checks, six-packet startup checks, and four private compositions pass. Native
@@ -118,9 +123,9 @@ Continue the remaining console launch/storage category without per-item
 installers. Radio room behaviour and indoor player exercise are installed;
 its acquisition remains unfinished. Reuse complete resources and shared runtimes.
 
-The checked current proposal is ABI 277 at
-`build/v3-console-images-native-01/build-lock.json`, ROM SHA-256
-`f346aa8f41e8b4e1e9dad2159ed625f7c10aad4148bdec870dc34c92a602f1d4`.
+The checked current proposal is ABI 278 at
+`build/v3-console-emulator-native-01/build-lock.json`, ROM SHA-256
+`5a714a18c3d6037f07bd9664bae456fcf85cd7ba290aebfe35370e42aea41ad1`.
 The combined skeleton/material category imports the complete hamster cage,
 including source movement/texture timing, positioned sound, actual lottery
 availability, catalogue ordering, scoring, and official English text. Five focused

@@ -153,13 +153,25 @@ both stable V2 deployments remain unchanged.
 
 ## Native integration requirements
 
+The shared `--console-emulator` stage installs six checked native calls for
+graphics/loading and initialization/frame/reset/cleanup. Full images and save
+metadata reuse the existing packet; transient session memory occupies 2,048
+bytes below the model pool. Original game paths remain, while additional iNES
+games use complete decoded images and independent progress. Native reset's
+battery-memory clearing is surrounded by a full 8-KiB backup/restore.
+Wario's Woods receives `42008` graphics bytes. The source/host adapter and
+cartridge/composition checks pass; native execution, room launch, actual heap
+capacity, and QD remain required. See the
+[lifecycle checkpoint](../docs/checkpoints/V3_CONSOLE_EMULATOR.md).
+
 The original N64 emulator is VROM `007492E0`, linked at `8082A070`, with SHA-256
 `12a57f84c4a600f5cf319f5be82c489ba2c137eada1ed5d4ddb6458ca6c7d1df`.
 Its game-range function `8082A91C` handles seven games. Mapper dispatch starts
 at `8082E950`, using twenty-byte records at `80836010`. Actual callbacks exist
 for mappers zero, one, four, and nine; this is static evidence, not execution
-proof for the new games. The existing graphics allocation is `25008` bytes and
-cannot simply be assumed sufficient for larger complete character data.
+proof for the new games. The original graphics allocation is `25008` bytes;
+additional games request enough for complete character data plus the existing
+graphics prefix.
 
 Connect checked game lookup, correct allocation, ordinary room entry/return,
 complete persistence, and QD dependencies before enabling each supported import.

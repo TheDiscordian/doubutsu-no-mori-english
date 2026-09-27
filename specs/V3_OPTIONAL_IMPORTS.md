@@ -119,7 +119,10 @@ All nineteen compressed images, compact metadata, and a bounded physical-ROM
 reader are installed in ABI 277. Full/streamed donor comparisons and private
 composition pass. Native reads decode complete iNES/QD images with guards and
 save state intact; the scenario's later fixture-cleanup failure is recorded
-separately. Console launch, graphics, and QD execution remain integration work;
+separately. ABI 278 installs full iNES loading, expanded graphics allocation,
+and initialization/frame/reset/exit save hooks. Host-adapter and cartridge/
+composition checks pass; room launch, real heap capacity, native gameplay, and
+QD execution remain integration work;
 no console is selectable from storage
 installation alone. Format-five saves require the explicit compatibility warning.
 
