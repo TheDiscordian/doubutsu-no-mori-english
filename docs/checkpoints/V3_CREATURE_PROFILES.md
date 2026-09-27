@@ -13,9 +13,9 @@ and `1CE8..1D04`, at four-ID intervals. Source placement and pickup functions
 resolve their actual carried parents. This is not a claim of seventeen new
 native species: the brook-trout source slot must not replace native herabuna.
 
-ABI 292 is the current cartridge at
-`build/v3-creature-trigger-audio-01/build-lock.json`, ROM SHA-256
-`1d1ec18055570bf1d2acf4cef06ded396a3e6f96024f5cbb73803821baf60aee`.
+ABI 293 is the current cartridge at
+`build/v3-creature-scheduler-imports-01/creature-audio-runtime/build-lock.json`, ROM SHA-256
+`1a1f81cdab801acdf84d399b0583e0f5b33432bcfca43c3f0dbd84eddc4ebf40`.
 The shared importer installs all sixteen animated objects, reusing 74,672 bytes
 without recompilation, and extends the room-rig packet from 42 to 58 records.
 There are still 167 selectable choices and 100 complete inactive furniture
@@ -34,7 +34,7 @@ Its guarded 20-byte owner hook calls a resident predicate; only validated mode-1
 records bypass those states' custom-callback exclusion. Other furniture retains
 the original rule. Complete native movement contracts verify and normalize only
 the exact installed hook. Shared packet refreshes rebind it automatically.
-The room packet uses 28,176 of 32,768 code bytes; its bootstrap uses 1,294 of
+The room packet uses 28,288 of 32,768 code bytes; its bootstrap uses 1,294 of
 1,536 bytes. No additional RAM, object copies, selection, or save bytes are added.
 The sanitized category check covers the state predicate, constructor, motion,
 and drawing bounds. The current cartridge check verifies installed dependencies,
@@ -59,10 +59,32 @@ complete program/font/wave comparisons, original dispatch preservation, current
 profile binding, and UPS reconstruction. A focused note-bend parser test passes.
 No audio is emitted and native synthesis is not claimed.
 
-Native timed-sound table extension, room callbacks, and carried-parent readers
-remain required. The current native scheduler has twelve sound/delay entries,
-including a zero sentinel; source scheduling has seventeen entries. Do not call
-the native function with new indices until its complete tables are extended.
+Native timed-sound table extension and room callbacks are installed. All seventeen
+source sound/delay entries occupy 68 bytes at `804B1F40..804B1F83`, after the
+colour bridge and before the room vtable. Nine checked native operands connect
+the arrays and scan bound. The native 50-instance owner table, randomization,
+heartbeat, phase changes, repeat countdown, and trigger prioritization remain.
+The room callback uses the native positioned helper once per native tick, outside
+states 5, 6, 13, and 15; animation continues in every state.
+
+The full scheduler category also includes `0539` and `053D`, reusing existing
+instruments and samples without further heap growth. The ordinary importer
+prepares and installs the entire category together, reuses the existing three
+programs, and publishes the sound/delay arrays on every shared packet refresh.
+No sound-bearing rig enables its callback without complete source metadata and
+native tables. Sound IDs use the checked final word of mode-13 records; zero
+means no source callback. Saved fields and actor sizes are unchanged.
+
+The current pipeline run lives at `build/v3-creature-scheduler-imports-01/`.
+Three focused cartridge/guard/planner tests pass in 17.537 seconds; the sanitized
+callback test passes in 0.891 seconds. Full dependency binding and UPS
+reconstruction pass. The native scenario has an initial wrong-path setup failure,
+then a debugger disconnect before game-thread pause or scheduler assertions.
+The checkpoint exists; logs contain no native fault result, and no host coredump
+is found. Its cause is unclassified. Preserve
+`build/v3-creature-scheduler-native-02/`; do not claim native execution, replay
+the exhausted setup, or waive a possible defect. The shared fixture is available
+for the next meaningful combined integration. No physical audio is emitted.
 
 ## Shared conversion
 
@@ -75,9 +97,9 @@ those lists from the object.
 
 Mole cricket, mosquito, and frog share a checked complete movement callback,
 with source sound IDs 66, 67, and 65 respectively. Their full callback and
-positioning-helper receipts remain explicit dependencies; native playback is
-not yet installed. No callback is replaced with
-a static approximation.
+positioning-helper receipts bind the installed native timing/positioned callback.
+No callback is replaced with a static approximation. Audible quality and ordinary
+native room execution remain unverified.
 
 The source parent resolver checks both complete forward/inverse functions and
 the fish-index helper. It retains canonical carried IDs and official names,

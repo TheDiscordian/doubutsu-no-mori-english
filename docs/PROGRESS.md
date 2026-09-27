@@ -31,9 +31,9 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
-The current proposal is ABI 292 at
-`build/v3-creature-trigger-audio-01/build-lock.json`, ROM SHA-256
-`1d1ec18055570bf1d2acf4cef06ded396a3e6f96024f5cbb73803821baf60aee`.
+The current proposal is ABI 293 at
+`build/v3-creature-scheduler-imports-01/creature-audio-runtime/build-lock.json`, ROM SHA-256
+`1a1f81cdab801acdf84d399b0583e0f5b33432bcfca43c3f0dbd84eddc4ebf40`.
 It contains 167 selectable development imports and 100 complete inactive furniture
 profiles whose acquisition is pending. The main lock and both stable V2-14
 deployments are retained.
@@ -66,7 +66,7 @@ arrays, and three sound-callback dependencies are retained. Actual source
 placement/pickup functions establish carried-parent identities and official
 names. These are not seventeen playable imports. All sixteen animated objects
 (74,672 bytes) and the shared embedded-rig callback are installed, with profiles
-disabled pending native identity, audio, and carried-creature integration.
+disabled pending native identity and carried-creature integration.
 The shared native dispatch preserves creature animation in placement/removal
 states 6 and 13 while retaining other furniture's callback exclusions. Sanitized
 category checks and current cartridge/resource/UPS checks pass; ordinary native
@@ -75,8 +75,14 @@ Complete frog, mole-cricket, and mosquito sound programs and three instruments
 are installed through the shared importer, including the original pitch bend and
 envelopes. Wave data grows by 69,824 bytes and the audio heap by 1,024 bytes.
 Two current resource/planner checks and the focused bend-parser check pass.
-Native creature-sound scheduling and callbacks remain pending; existing creature
-sounds and all saved formats are retained. No audible test is performed.
+Native creature-sound scheduling and callbacks are installed, with the complete
+17-entry sound/delay tables, all five added programs, and original per-instance
+timing. The 68-byte arrays use an existing startup-loaded reservation; the two
+additional programs need no new instruments, waveform data, or heap growth.
+Three current resource/guard/planner checks and the sanitized callback check pass.
+The bounded native attempt disconnects before assertions, so native execution
+is inconclusive, not passed. Existing creature sounds and saved formats are
+retained; no audible test is performed.
 The static ant remains prepared. Choice counts are unchanged. See the
 [creature checkpoint](checkpoints/V3_CREATURE_PROFILES.md).
 

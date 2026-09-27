@@ -1,0 +1,9 @@
+[
+  {"wait":8},
+  {"save_state":true},
+  {"pause_game_thread":true},
+  {"test_v3_furniture_batch":true,"item_batch_section":"creature_audio"},
+  {"load_state":true},
+  {"resume":true},
+  {"wait":2}
+]

@@ -1,5 +1,45 @@
 # Work record
 
+## 2026-09-27: native creature sound timing and room callbacks
+
+- The preceding goal turn is progress: commits `870f018` and `0d6da71` install
+  transition dispatch, sound resources, and shared dependency planning. Continued
+  primary importing by connecting those resources to native timed sound playback.
+- The ordinary category import installs all seventeen source sound/delay records
+  in 68 existing startup-loaded bytes and changes nine checked native operands.
+  It retains the complete native instance ownership, randomization, heartbeat,
+  audio-phase/countdown behavior, queue priority, and existing sound identities.
+  Both additional category programs reuse installed instruments and samples;
+  this batch adds no heap, actor, or saved allocation.
+- Mode-13 callbacks now call the verified native positioned helper outside
+  states 5/6/13/15. Animation still runs in every state. The source sound ID uses
+  the record's final word, with checked zero/no-callback and `54..69` bounds.
+  The planner merges identical source rows, stages missing scheduler integration,
+  and skips complete installed dependencies. Profiles remain disabled pending
+  native parent identities and carried-creature gameplay.
+- ABI 293 is `build/v3-creature-scheduler-imports-01/creature-audio-runtime/build-lock.json`;
+  ROM SHA-256 `1a1f81cdab801acdf84d399b0583e0f5b33432bcfca43c3f0dbd84eddc4ebf40`.
+  Three current cartridge/guard/planner tests pass in 17.537 seconds, including
+  all five complete programs, retained samples, source dependencies, damaged-hook
+  rejection, preserved native tables/save state, and UPS reconstruction. The
+  sanitized callback check passes after moving the new test's sound assignment
+  from an accidentally matched older loop into its intended embedded-rig loop.
+- Bounded native setup: first invocation names the wrong generated ROM; the
+  corrected attempt creates its emulator checkpoint, then the debugger disconnects
+  before game-thread pause or any scheduler assertion. No host coredump is found;
+  logs contain no native fault evidence. Cause remains unclassified, and no
+  native success or crash-safety conclusion is claimed. Both attempts are retained;
+  stop this setup batch without a third launch. No physical audio or user-save
+  access occurs. Continue parent integration, retaining the unresolved result.
+- Source/native conversion review confirms native fish/insect parent ranges are
+  based at `2300`/`2D00`, with 32 ordinary display slots each. Prepared additions
+  use `2320..2327` and `2D20..2D27`; static ant `2D26` remains prepared only.
+  Donor brook trout `2301` conflicts with native herabuna and needs a distinct
+  additive identity, not reuse of that parent slot. Native conversion functions
+  are `800BEFCC`, `800BF10C`, and fish-index helper `800A56CC`; verify the actual
+  ROM functions when implementing the shared parent adapter. Runtime readers,
+  collection, catching/releasing, spawn rules, and prices remain primary imports.
+
 ## 2026-09-27: shared creature-trigger programs and automatic dependency planning
 
 - Extended the existing trigger converter/installer for group five and native

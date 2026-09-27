@@ -351,7 +351,9 @@ def prepare_furniture_audio(image,report,source,inventory,output,selected=(),cat
     if not creature and (not rows and not effect_sounds or selected and set(selected)!={r['item_id'] for r in rows}):
         raise ValueError('Unsupported or empty furniture audio selection')
     words=sorted(set(furniture_trigger_words(triggers.values()))|{r['sound_word'] for r in effect_sounds})
-    if creature:words=sorted({r['source_sound_word'] for r in creature['rows']})
+    if creature:
+        from v3_room_creature_audio import required_words
+        words=sorted(set(required_words(creature)))
     resources,result=prepare_triggers(image,report,words)
     if effect_sounds:result['effect_sound_dependencies']=effect_sounds
     if creature:result['creature_sound_dependencies']=creature
@@ -1341,11 +1343,11 @@ def install_furniture(image,prior,blob,code,original,output,directory):
     words=sorted(set(furniture_trigger_words(triggers.values()))|{r['sound_word'] for r in effect_sounds})
     creature=prepared.get('creature_sound_dependencies')
     if creature:
-        from v3_room_creature_audio import dependencies
+        from v3_room_creature_audio import dependencies,required_words
         selected=[r['source_item_id'] for r in creature['rows']]
         if creature!=json.loads(json.dumps(dependencies(source,image,prior,selected))):
             raise ValueError('Changed complete creature sound dependencies')
-        words=sorted(set(words)|{r['source_sound_word'] for r in creature['rows']})
+        words=sorted(set(words)|set(required_words(creature)))
     resources,audio=prepare_triggers(image,prior,words)
     for key in ('programs','layout','previous','font_index','wave_index','source_sequence_sha256'):
         if json.loads(json.dumps(audio[key]))!=prepared[key]:raise ValueError('Changed complete prepared audio identity')
@@ -1392,11 +1394,14 @@ def install_furniture(image,prior,blob,code,original,output,directory):
         combined=copy.deepcopy(creature);retained_creature=result.get('creature_audio',{})
         if retained_creature:
             older=retained_creature['source']
-            if (retained_creature.get('native_scheduler_installed') or
-                    {k:v for k,v in older.items() if k!='rows'}!={k:v for k,v in creature.items() if k!='rows'} or
-                    {r['source_item_id'] for r in older['rows']}&{r['source_item_id'] for r in creature['rows']}):
-                raise ValueError('Changed or already installed creature audio membership')
-            combined['rows']=sorted(older['rows']+creature['rows'],key=lambda r:r['source_item_id'])
+            if {k:v for k,v in older.items() if k!='rows'}!={k:v for k,v in creature.items() if k!='rows'}:
+                raise ValueError('Changed complete creature sound source contract')
+            rows_by_id={r['source_item_id']:r for r in older['rows']}
+            for row in creature['rows']:
+                if row['source_item_id'] in rows_by_id and rows_by_id[row['source_item_id']]!=row:
+                    raise ValueError('Changed retained creature audio membership')
+                rows_by_id[row['source_item_id']]=row
+            combined['rows']=sorted(rows_by_id.values(),key=lambda r:r['source_item_id'])
         result['creature_audio']=dict(source=combined,
             programs=sorted({r['source_sound_word']:r for r in retained_creature.get('programs',[])+programs}.values(),
                 key=lambda r:r['source_sound_word']),
@@ -1434,6 +1439,9 @@ def install_furniture(image,prior,blob,code,original,output,directory):
                 raise ValueError('Trigger lifecycle requires its complete installed material renderer/assets')
             material.update(lifecycle_installed=True,move_category='switch-trigger-sound')
     runtime['sound_rows']=sorted(old_sound_rows+sound_rows,key=lambda r:r['runtime_index'])
+    if creature:
+        from v3_room_creature_audio import install_scheduler
+        install_scheduler(result,code,prior['equipment_resources'].get('creature_audio'))
     room.publish_packet(result,blob,output,core=code)
     shared=result['sound_programs'];shared['previous_sequence']=copy.deepcopy(old_sequence);shared['sequence']=seq
     shared.setdefault('trigger_batches',[]).append(dict(programs=programs,tables=tables))

@@ -188,6 +188,18 @@ all 45 native entries and uses the same priority-preserving appended slots as
 other supported groups. Note-bend commands preserve their operand and require
 the full native handler/dispatch and identical donor/native bend curve.
 
+The complete native creature scheduler uses source-equivalent per-instance
+countdowns on the native room-audio phase. Its 50 owner slots and original
+randomization, heartbeat, and trigger queue remain. The complete seventeen-entry
+sound and delay tables use `804B1F40..804B1F83`, inside the existing startup-loaded
+equipment packet. Nine guarded native operands change only the two array bases
+and scan bound. Packet refreshes check and republish the complete arrays.
+Mode-13 records retain zero in `first`; `last` is zero or a source creature sound
+ID in `54..69`. The compiled callback runs once outside native states 5/6/13/15,
+after the two half-speed animation steps. Its arguments are actor identity,
+sound ID, and world position. Complete programs, tables, and source callback
+membership are required together before this path is compiled.
+
 The sound converter retains layer-level instrument commands (`C6`), including
 switches back to an earlier instrument. Every referenced complete instrument,
 envelope, sample, loop, predictor, and tuning record goes through the shared font

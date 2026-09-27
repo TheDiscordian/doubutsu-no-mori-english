@@ -22,9 +22,9 @@ Incomplete gameplay stays unavailable in the selector; installing assets does
 not claim that an item is playable. Reuse unchanged passing tests throughout.
 
 Current task: finish remaining genuine importing categories and representation
-mappings, using the shared converter and the current ABI-292 proposal:
-`build/v3-creature-trigger-audio-01/build-lock.json`.
-ROM SHA-256: `1d1ec18055570bf1d2acf4cef06ded396a3e6f96024f5cbb73803821baf60aee`.
+mappings, using the shared converter and the current ABI-293 proposal:
+`build/v3-creature-scheduler-imports-01/creature-audio-runtime/build-lock.json`.
+ROM SHA-256: `1a1f81cdab801acdf84d399b0583e0f5b33432bcfca43c3f0dbd84eddc4ebf40`.
 The dresser cancellation correction is installed in V2 and V3; empty import
 selection returns stable V2-14. Continue the importing work without replaying
 unchanged dresser or museum checks.
@@ -53,10 +53,11 @@ Next importing work:
   arrays, and complete source sound callbacks in
   `build/v3-creature-profiles-prepared-01/`. Sixteen animated objects are installed
   with shared rig callbacks, but profiles remain disabled pending complete native
-  parent readers and timed-sound scheduling. Complete frog, mole-cricket, and
-  mosquito programs/instruments are installed and automatically planned by the
-  shared importer. Native motion dispatch is installed, including placement/removal
-  states; reuse these resources and their focused checks. Do not
+  parent readers. The full creature sound category, native per-instance scheduling,
+  and room sound callbacks are installed through the shared planner. Native motion
+  dispatch includes placement/removal states. Retain the passing resource/callback
+  checks and the inconclusive native-disconnection record; do not replay the
+  exhausted scheduler fixture before more implementation. Do not
   create independent furniture options for creature displays or overwrite the
   native herabuna with the donor brook trout. See the
   [creature checkpoint](checkpoints/V3_CREATURE_PROFILES.md).

@@ -10,6 +10,7 @@ _Matrix_to_Mtx_new = 0x800E13C4;
 sAdo_OngenTrgStart = 0x800D1D58;
 sAdo_SysTrgStart = 0x800D1A9C;
 sAdo_OngenPos = 0x800D1D08;
+sAdo_RoomIncectPos = 0x800D24EC;
 _Matrix_to_Mtx = 0x800E139C;
 osWritebackDCache = 0x8002FE00;
 sqrtf = 0x80033470;

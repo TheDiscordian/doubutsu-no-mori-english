@@ -1,6 +1,9 @@
 /* Complete shared room rigs; each record retains its actual behaviour. */
 #include "room_rigs.h"
 #include "room_motion.h"
+#ifdef AF_V3_ROOM_CREATURE_SOUND
+extern void sAdo_RoomIncectPos(void *,u8,float *);
+#endif
 #ifdef AF_V3_ROOM_MUSIC
 #include "room_music_native.h"
 #endif
@@ -175,7 +178,13 @@ static const RoomRigRecord *find(u32 index) {
         if ((r->mode==ROOM_RIG_DUAL ? !r->reserved || r->reserved>127 : r->reserved) ||
                 r->mode>ROOM_RIG_EMBEDDED || r->mode==ROOM_RIG_ROOF || r->mode==ROOM_RIG_RADIO) return 0;
 #ifdef AF_V3_ROOM_EMBEDDED
-        if (r->mode==ROOM_RIG_EMBEDDED && (r->first.bits || r->last.bits)) return 0;
+        if (r->mode==ROOM_RIG_EMBEDDED && (r->first.bits ||
+#ifdef AF_V3_ROOM_CREATURE_SOUND
+                (r->last.bits && (r->last.bits<54 || r->last.bits>=70))
+#else
+                r->last.bits
+#endif
+                )) return 0;
 #else
         if (r->mode==ROOM_RIG_EMBEDDED) return 0;
 #endif
@@ -362,6 +371,10 @@ void af_v3_room_rig_mv(RoomRig *actor,void *room,RoomRigGame *game,u8 *data) {
             cKF_SkeletonInfo_R_play(&actor->keyframe);
             actor->keyframe.speed.f=0.5f;
         }
+#ifdef AF_V3_ROOM_CREATURE_SOUND
+        if (r->last.bits && actor->state!=5 && actor->state!=6 && actor->state!=13 && actor->state!=15)
+            sAdo_RoomIncectPos(actor,(u8)r->last.bits,actor->position);
+#endif
         return;
     }
 #endif

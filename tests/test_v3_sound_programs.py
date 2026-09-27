@@ -22,7 +22,7 @@ class CreatureAudioTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         from v3_furniture_pipeline import Source
-        cls.out=ROOT/'build/v3-creature-trigger-audio-01'
+        cls.out=ROOT/'build/v3-creature-scheduler-imports-01/creature-audio-runtime'
         cls.image,cls.report=inputs(cls.out/'build-lock.json')
         cls.base,cls.prior=inputs(cls.out/'base-lock.json')
         cls.code=by_vrom(cls.image)[CODE_VROM].extract(cls.image)
@@ -34,9 +34,9 @@ class CreatureAudioTests(unittest.TestCase):
         from v3_room_rig_runtime import bind_profiles
         e=self.report['equipment_resources'];creature=e['creature_audio'];audio=e['furniture_audio']
         self.assertTrue(creature['resources_installed'])
-        self.assertFalse(creature['native_scheduler_installed'] or creature['callback_installed'])
+        self.assertTrue(creature['native_scheduler_installed'] and creature['callback_installed'])
         self.assertEqual(sorted(r['source_sound_id'] for r in creature['source']['rows']),[65,66,67])
-        self.assertEqual(len(creature['programs']),3)
+        self.assertEqual(len(creature['programs']),5)
         words=[r['source_sound_word'] for r in creature['programs']]
         resources,prepared=sounds.prepare_triggers(self.base,self.prior,words)
         self.assertIn('note_bend',prepared)
@@ -72,6 +72,23 @@ class CreatureAudioTests(unittest.TestCase):
             self.assertEqual(self.report[key],self.prior[key])
         original=(ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes()
         self.assertEqual(apply_ups(original,(self.out/'asset-loader.ups').read_bytes()),self.image)
+
+    def test_scheduler_rejects_changed_hooks_helper_or_complete_tables(self):
+        import copy
+        from v3_room_creature_audio import checked_scheduler,table_bytes,scheduler_hooks,TABLE,END
+        audio=self.report['equipment_resources']['creature_audio']
+        checked_scheduler(self.code,audio)
+        self.assertEqual(table_bytes(audio,self.code).hex(),audio['table']['hex'])
+        self.assertEqual(END-TABLE,68)
+        for location in (scheduler_hooks()[0]['address'],0x800FB8F4,0x800FB870,0x800D2500):
+            core=bytearray(self.code);core[location-CODE_RAM]^=1
+            with self.subTest(location=hex(location)),self.assertRaises(ValueError):checked_scheduler(core,audio)
+        for damage in ('program','source','count'):
+            bad=copy.deepcopy(audio)
+            if damage=='program':bad['programs']=bad['programs'][:-1]
+            elif damage=='source':bad['source']['source_sounds'][0]^=1
+            else:bad['source']['source_random_offsets'].pop()
+            with self.subTest(damage=damage),self.assertRaises(ValueError):table_bytes(bad,self.code)
 
     def test_shared_planner_installs_missing_audio_once_without_enabling_creatures(self):
         from v3_furniture_pipeline import scan,rig_import_plan

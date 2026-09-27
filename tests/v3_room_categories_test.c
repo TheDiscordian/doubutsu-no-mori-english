@@ -4,6 +4,7 @@
 #define AF_V3_ROOM_RIG_PACKET
 #define AF_V3_ROOM_TRIGGER_SOUND
 #define AF_V3_ROOM_EMBEDDED
+#define AF_V3_ROOM_CREATURE_SOUND
 #include "../overlays/v3/room_rigs.c"
 
 RoomRigTable af_v3_test_room_rigs;
@@ -19,6 +20,11 @@ u16 af_v3_test_room_hour,af_v3_test_room_minute;
 static u8 model[12288];
 static unsigned constructs,plays,draws,storage_calls;
 static RoomRig *expected_actor;
+static unsigned creature_calls;
+void sAdo_RoomIncectPos(void *actor,u8 sound,float *position) {
+    assert(actor==expected_actor && position==expected_actor->position);
+    assert(sound>=54 && sound<70);last_sound=sound;++creature_calls;
+}
 static RoomRigGame *expected_game;
 static float expected_end;
 static int expected_mode;
@@ -218,14 +224,19 @@ int main(void) {
     expected_joints=8;expected_mode=ROOM_RIG_EMBEDDED;
     model[0x100]=8;model[0x101]=8;
     for (int variant=0;variant<2;++variant) {
+        r->last.bits=variant ? 66 : 0;
         memset(&guarded,0xA7,sizeof guarded);actor->index=(u16)(1048+variant*1024);
         unsigned old=plays;af_v3_room_rig_ct(actor,model);
         assert(plays==old+1 && actor->keyframe.current.f==1.5f && actor->keyframe.speed.f==.5f);
         for (int state=0;state<16;++state) {
             actor->state=(s16)state;actor->changed=1;actor->keyframe.current.f=7;
             assert(af_v3_room_rig_move_allowed(actor)==1);
+            unsigned sounds_before=creature_calls;
             old=plays;af_v3_room_rig_mv(actor,0,&game,model);
             assert(plays==old+2 && actor->keyframe.current.f==8 && actor->changed==1);
+            unsigned audible=variant && state!=5 && state!=6 && state!=13 && state!=15;
+            assert(creature_calls==sounds_before+audible);
+            if (audible)assert(last_sound==66);
         }
         gfx.head=(RoomCommand *)opa;gfx.tail=opa+sizeof opa-variant*8;
         gfx.xlu_head=(RoomCommand *)translucent;gfx.xlu_tail=translucent+sizeof translucent;
@@ -250,7 +261,7 @@ int main(void) {
         if (damage==0)r->bytes=12304;
         if (damage==1)r->joints=9;
         if (damage==2)r->first.bits=1;
-        if (damage==3)r->last.bits=65;
+        if (damage==3)r->last.bits=70;
         RoomRig saved_actor=*actor;
         af_v3_room_rig_ct(actor,model);af_v3_room_rig_mv(actor,0,&game,model);
         assert(!memcmp(actor,&saved_actor,sizeof saved_actor));*r=good_r;

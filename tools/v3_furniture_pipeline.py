@@ -1213,7 +1213,7 @@ def metadata(source, item, profile, identity):
     from v3_furniture_scroll import CATEGORY as SCROLL_CATEGORY
     binding=getattr(source,'runtime_profiles',{}).get(f'{item:04X}')
     if profile.get('callback_adapter',{}).get('category') in (EMBEDDED_CATEGORY,CREATURE_STATIC_CATEGORY):
-        raise ReviewRequired('Complete profile-owned resources are prepared; parent identity, native creature interaction, and lifecycle binding remain uninstalled')
+        raise ReviewRequired('Creature displays need native parent identity and carried-creature gameplay integration before selection')
     from v3_furniture_composite import PENDING_CATEGORIES,ROTATED_CATEGORY
     if profile.get('callback_adapter',{}).get('category') in PENDING_CATEGORIES and not binding:
         raise ReviewRequired('Complete composite resources are prepared; '+', '.join(profile['callback_adapter']['pending_callbacks'])+' remain uninstalled')
@@ -1507,7 +1507,8 @@ def rig_import_plan(inventory, report, bindings, selected=(), category=None, *, 
         profiles=sorted(r['item_id'] for r in rows+material_rows+static_rows+scroll_rows+console_rows+plain_rows
                         if r['item_id'] not in bindings and r['profile'].get('callback_adapter',{}).get('category')!=EMBEDDED_CATEGORY))
     creature_audio=report['equipment_resources'].get('creature_audio',{})
-    creature_ready={r['source_item_id'] for r in creature_audio.get('source',{}).get('rows',[])}
+    creature_ready=({r['source_item_id'] for r in creature_audio.get('source',{}).get('rows',[])}
+        if creature_audio.get('native_scheduler_installed') and creature_audio.get('callback_installed') else set())
     creature_missing=sorted(r['item_id'] for r in rows if
         r['profile']['callback_adapter']['category']==EMBEDDED_CATEGORY and
         r['profile']['callback_adapter'].get('level_sound') and r['item_id'] not in creature_ready)

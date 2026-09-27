@@ -2267,6 +2267,7 @@ def exercise(debug, rom_path, record, *, section='automatic_furniture'):
     if section=='billboard_rigs':return room_rigs(debug,rom_path,record,mode=4)
     if section=='joint_rigs':return room_rigs(debug,rom_path,record,mode=6)
     if section=='rolling_rigs':return room_rigs(debug,rom_path,record,mode=5)
+    if section=='creature_audio':return creature_audio(debug,rom_path,record)
     if section=='item_categories':return item_categories(debug,rom_path,record)
     path = Path(rom_path)
     image = path.read_bytes()
@@ -4495,6 +4496,91 @@ def staged_profiles(debug,rom_path,record):
         call(0x8009C040,[allocation])
     return dict(native_staged_profiles=True,assertions=assertions,records=len(rows),
         category_representatives=len(selected),acquisition_tested=False,ordinary_gameplay_tested=False)
+
+
+def creature_audio(debug,rom_path,record):
+    """Run the installed scheduler with controlled phase and trigger capture."""
+    from aflib import CODE_RAM,CODE_VROM
+    from v3_room_creature_audio import TABLE,END,SCHEDULER,SCHEDULER_BYTES
+    from runtime_layout import TEST_STACK
+    path=Path(rom_path);image=path.read_bytes();report=json.loads((path.parent/'build.json').read_bytes())
+    if sha256(image)!=report['output_sha256']:raise ValueError('Changed creature-audio cartridge')
+    equipment=report['equipment_resources'];audio=equipment['creature_audio'];files=by_vrom(image)
+    if not audio.get('native_scheduler_installed') or not audio.get('callback_installed'):
+        raise ValueError('Native creature sound integration is not installed')
+    core=files[CODE_VROM].extract(image);boot=boot_proofs(image);assertions=0
+    def check(label,at,want):
+        nonlocal assertions
+        actual=debug.read_memory(at,len(want));passed=actual==want
+        record(dict(creature_audio_check=label,address=f'{at:08X}',bytes=len(want),
+            assertion='passed' if passed else 'failed',actual=actual.hex() if len(actual)<=32 else sha256(actual)))
+        if not passed:raise ValueError('Creature sound mismatch: '+label)
+        assertions+=1
+    def call(at,args=(),proof=None):
+        result=debug.call(f'{at:08X}',list(args),return_address=MODULE_RAM+0x6480,verified_code=proof or boot.get(at))
+        record(result);return result['return_value']
+    def flush(at,n):call(0x8002FE00,[at,n]);call(0x80034CE0,[at,n])
+    check('complete startup-loaded sound/delay tables',TABLE,bytes.fromhex(audio['table']['hex']))
+    check('complete native scheduler',SCHEDULER,core[SCHEDULER-CODE_RAM:SCHEDULER-CODE_RAM+SCHEDULER_BYTES])
+    phase,trigger,owners,queue=0x800EF404,0x800FA354,0x8011412C,0x80113C34
+    phase_code=core[phase-CODE_RAM:phase-CODE_RAM+12]
+    trigger_code=core[trigger-CODE_RAM:trigger-CODE_RAM+32]
+    check('original phase reader',phase,phase_code);check('original trigger dispatcher',trigger,trigger_code)
+    size=0x100;allocation=call(0x8009BFC0,[size])
+    if allocation&15 or not MODULE_RAM+0x8000<=allocation<=0x80400000-size:
+        raise ValueError('Creature-sound test allocation escapes native heap')
+    capture=allocation+32;identity=allocation+80;edge=b'V3CA'*4
+    guards=(allocation,allocation+size-16,TEST_STACK-0x800,TEST_STACK+0x40)
+    for at in guards:debug.write_memory(at,edge)
+    saved={at:debug.read_memory(at,n) for at,n in ((owners,400),(queue,192))}
+    state=report['save_runtime'];saved_game=debug.read_memory(state['state_ram'],state['state_bytes'])
+    capture_code=struct.pack('>8I',0x3C080000|(capture>>16),0x35080000|(capture&65535),
+        0xAD040000,0xAD050004,0xAD060008,0x03E00008,0,0)
+    words=struct.unpack('>17H',bytes.fromhex(audio['table']['hex'])[:34])
+    delays=audio['source']['source_random_offsets']
+    def set_phase(value):
+        debug.write_memory(phase,struct.pack('>3I',0x03E00008,0x24020000|value,0));flush(phase,12)
+    def schedule(sid,want):
+        debug.write_memory(capture,bytes(12))
+        result=call(SCHEDULER,[identity,sid,0x1234,0x3F800000],
+            (SCHEDULER,core[SCHEDULER-CODE_RAM:SCHEDULER-CODE_RAM+SCHEDULER_BYTES]))
+        if result!=int(want):raise ValueError('Native scheduler returned the wrong emission flag')
+        check('correct full trigger and positional arguments',capture,
+            struct.pack('>3I',words[sid-54],0x1234,0x3F800000) if want else bytes(12))
+    try:
+        if debug.command('QPassSignals:10')!='OK':raise ValueError('Native lazy-FPU support unavailable')
+        debug.write_memory(trigger,capture_code);flush(trigger,32)
+        selected=[54]+sorted({r['source_sound_id'] for r in audio['source']['rows']})
+        for sid in selected:
+            set_phase(2);debug.write_memory(owners,bytes(400));debug.write_memory(queue,b'\xFF'*192)
+            schedule(sid,True)
+            first=debug.read_memory(owners,8)
+            check('new instance identity and audio-phase ownership',owners,struct.pack('>I3B',identity,1,0,2)+first[7:])
+            delay=first[7]
+            if not delays[sid-54]<=delay<=delays[sid-54]+15:raise ValueError('Random creature delay escaped source range')
+            schedule(sid,False)
+            check('same phase updates heartbeat without reducing delay',owners+4,bytes((2,0,2,delay)))
+            debug.write_memory(owners+4,bytes((2,0,0,2)));schedule(sid,False)
+            check('changed even phase decrements countdown once',owners+4,bytes((3,0,2,1)))
+            debug.write_memory(owners+4,bytes((3,0,0,1)));schedule(sid,True)
+            after=debug.read_memory(owners,8)
+            if not delays[sid-54]-1<=after[7]<=delays[sid-54]+14:
+                raise ValueError('Repeat creature trigger lost its randomized countdown')
+            set_phase(3);before=after[7];schedule(sid,False)
+            check('odd phase retains countdown and advances heartbeat',owners+4,bytes((5,0,3,before)))
+            check('other native creature slots stay untouched',owners+8,bytes(392))
+        for at in guards:check('native scheduler allocation/stack guard',at,edge)
+        check('saved town and profile retained',state['state_ram'],saved_game)
+        check('no native CPU fault',0x8003CE34,bytes(4))
+    finally:
+        debug.write_memory(phase,phase_code);flush(phase,12)
+        debug.write_memory(trigger,trigger_code);flush(trigger,32)
+        for at,data in saved.items():debug.write_memory(at,data)
+        check('phase reader restored',phase,phase_code);check('trigger dispatcher restored',trigger,trigger_code)
+        debug.command('QPassSignals:');call(0x8009C040,[allocation])
+    return dict(native_creature_scheduler=True,assertions=assertions,representatives=len(selected),
+        controlled_phase=True,captured_trigger_dispatch=True,ordinary_room_gameplay=False,
+        physical_audio_played=False,native_synthesis_tested=False,requires_checkpoint_restore=True)
 
 
 def furniture_audio(debug,rom_path,record):

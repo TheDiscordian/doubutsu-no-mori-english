@@ -507,6 +507,9 @@ def bind_profiles(source,base,report):
             if (runtime['embedded_dispatch']['target']!=target or
                     f'-DAF_ROOM_MOVE_ALLOWED=0x{target:X}u' not in runtime['bootstrap']['flags']):
                 raise ValueError('Changed complete creature predicate binding')
+        if e.get('creature_audio',{}).get('native_scheduler_installed'):
+            from v3_room_creature_audio import checked_binding
+            checked_binding(source,base,report)
     if any(r.get('mode')==11 for r in runtime['rows']):
         if runtime.get('dual_contract')!=composite.dual_native_contract(base,report):
             raise ValueError('Changed installed dual-motion scene/contact readers')
@@ -814,7 +817,8 @@ def encode_packet(rows,sound_rows=(),material_rows=()):
             continue
         encode([r])  # Retain the complete existing object/pointer/work-area checks.
         mode,first,last=r.get('mode',0),r.get('first',0),r.get('last',0)
-        if (mode not in (0,1,2,3,4,5,6,8,9,10,11,13) or mode in (0,13) and (first or last) or
+        if (mode not in (0,1,2,3,4,5,6,8,9,10,11,13) or mode==0 and (first or last) or
+                mode==13 and (first or last and not 54<=last<70) or
                 mode==11 and (first&3 or first==r['animation'] or not 0x06000000<=first<=0x06000000+r['bytes']-20 or
                     not 0<r.get('loop',0)<128 or last and any(w&0x8080 or w>>8!=1 for w in (last>>16,last&65535))) or
                 mode==9 and (last or not 0x3F800000<=first<=0x46FFFE00) or
@@ -939,6 +943,8 @@ def publish_packet(equipment,blob,output,*,core=None):
         if not runtime.get('embedded_engine'):
             raise ValueError('Embedded rigs require the complete source animation engine')
         defines+=('AF_V3_ROOM_EMBEDDED',)
+        if equipment.get('creature_audio',{}).get('native_scheduler_installed'):
+            defines+=('AF_V3_ROOM_CREATURE_SOUND',)
     if reverse:
         if not runtime.get('reversible_contract'):raise ValueError('Reversible rigs require checked native work/save ownership')
         defines+=('AF_V3_ROOM_REVERSIBLE',)
@@ -1063,6 +1069,10 @@ def publish_packet(equipment,blob,output,*,core=None):
             from v3_room_effects import LOADER_BRIDGE
             struct.pack_into('>I',expected,LOADER_BRIDGE-TABLE,effects['bootstrap_loader'])
         expected[MATERIAL_VTABLE-TABLE:MATERIAL_VTABLE-TABLE+20]=bytes.fromhex(runtime.get('material_vtable_hex','00'*20))
+        creature=equipment.get('creature_audio',{})
+        if creature.get('table_published'):
+            from v3_room_creature_audio import TABLE as CREATURE_TABLE,END as CREATURE_END,table_bytes
+            expected[CREATURE_TABLE-TABLE:CREATURE_END-TABLE]=table_bytes(creature,core)
         if runtime.get('scrolling'):
             from v3_furniture_scroll import VTABLE as SCROLL_VTABLE
             expected[SCROLL_VTABLE-TABLE:SCROLL_VTABLE-TABLE+20]=bytes.fromhex(runtime['scrolling'].get('vtable_hex','00'*20))
@@ -1072,6 +1082,11 @@ def publish_packet(equipment,blob,output,*,core=None):
         if module[TABLE-EQUIPMENT_RAM:VTABLE-EQUIPMENT_RAM]!=expected:
             raise ValueError('Occupied room cache/material vtable reservation')
     module[TABLE-EQUIPMENT_RAM:VTABLE-EQUIPMENT_RAM]=bytes(VTABLE-TABLE)
+    creature=equipment.get('creature_audio',{})
+    if creature.get('native_scheduler_installed'):
+        from v3_room_creature_audio import TABLE as CREATURE_TABLE,END as CREATURE_END,table_bytes
+        module[CREATURE_TABLE-EQUIPMENT_RAM:CREATURE_END-EQUIPMENT_RAM]=table_bytes(creature,core)
+        creature['table_published']=True
     if effects:
         from v3_room_effects import LOADER_BRIDGE,rebind_profiles
         entry=bootstrap['symbols']['af_v3_room_boot_load']
