@@ -2,17 +2,17 @@
 
 ## Current cartridge
 
-ABI 280 is `build/v3-console-room-imports-01/cartridge/build-lock.json`.
+ABI 284 is `build/v3-console-disk-room-imports-01/profile-runtime/build-lock.json`.
 
-- ROM SHA-256: `b1080db8248385f85ddd9f68a5ba36ce83fb083a6f5b7061b60b8fa34fa47786`.
-- UPS SHA-256: `971a2c46d3e4e69c4c3eee9168afeb1e9937bf3a0e734480e88dc2d08e920a56`.
-- Shared category plan: `build/v3-console-room-imports-01/pipeline.json`.
-- Eleven complete cartridge-console profiles and models are installed. Ten
+- ROM SHA-256: `38dfbe6905917d5f0792cbad451d1d1f29b39bc2f3bfb4deac0e5625c3bc09d5`.
+- UPS SHA-256: `a5e1a762dacaacfbd2859b1dbac89e4f2ebedec81fb822697103840f6b4a3e40`.
+- Shared category plan: `build/v3-console-disk-room-imports-01/pipeline.json`.
+- Twelve complete additional console profiles and models are installed. Eleven
   remain inactive pending their actual reward routes. Excitebike uses the donor
   lottery route, catalogue reordering, source scoring, and its individual
   experimental selection. It is not gameplay-certified.
-- Clu Clu Land D retains its complete prepared model and installed disk image;
-  its disk engine and profile remain unfinished. The separate game-twenty disk
+- Clu Clu Land D has its complete model, disk image, native engine, and profile
+  installed. Native gameplay and acquisition remain. The separate game-twenty disk
   furniture has no payload in the supplied donor and stays explicitly unused.
 
 The import-free baseline, main V3 lock, trailer, and both V2-13 patcher deployments
@@ -21,14 +21,14 @@ are unchanged. V3 publication still requires user testing and approval.
 ## Shared import path
 
 The ordinary category command prepares the whole matching batch, reuses every
-complete 4,880-byte model, installs the shared callback once, stages all eleven
+complete 4,880-byte model, installs the shared callback once, stages all twelve
 implemented profiles, and promotes the item whose acquisition is implemented:
 
 ```sh
 python3 tools/v3_furniture_pipeline.py import \
   --category constant-model-sequence-pending-lifecycle \
-  --base-lock build/v3-console-emulator-native-01/build-lock.json \
-  --reuse-assets build/v3-constant-materials-prepared-01 \
+  --base-lock build/v3-console-disk-session-01/build-lock.json \
+  --reuse-assets build/v3-console-room-imports-01/prepared \
   --output build/v3-console-room-imports-next
 ```
 
@@ -36,13 +36,16 @@ No model compilation is repeated. All three model lists, their textures/palettes
 and the linked draw sequence are retained per console. The category name records
 the source callback shape; checked runtime bindings separately establish which
 profiles have their lifecycle installed. No per-game installer is introduced.
-Subsequent planning skips already installed profiles and the still-unimplemented
-QD engine instead of repeatedly staging either. Acquisition remains explicit:
+Planning verifies the complete installed disk dependency before admitting QD.
+Staging changes one readiness byte, publishes its startup checksum, and writes
+the full canonical profile/item records. The disk code, room callback, all prior
+models/profiles, and nineteen game payloads are retained. Subsequent planning
+skips installed profiles. Acquisition remains explicit:
 HomePage codes, island rewards, and special presents are not ordinary shop stock.
 
 Registry version ten reserves source IDs `1DC4..1DF0` at additive destinations
 `3C4C..3C78`, preserving all prior destinations. The single provenance catalogue
-credits eleven installed names to the actual English donor's `ftrName_table`.
+credits all twelve installed names to the actual English donor's `ftrName_table`.
 These are fixed identities, not checkbox-order assignments.
 
 ## Native dispatch
@@ -62,7 +65,13 @@ receipts; N64 cannot supply the GameCube link-cable feature.
 
 ## Evidence and limits
 
-Five focused tests pass across targeted runs in `tests.test_v3_console_room`:
+Five focused checks in `tests.test_v3_console_disk_room` pass across two targeted
+invocations: complete staged profile/artwork, retained runtime/resources/saves,
+damaged-dependency rejection without mutation, idempotent binding and planning,
+explicit absent-donor classification, and four private browser/offline builds.
+The art receipt records one reused model and zero compiler containers.
+
+The unchanged callback retains five checks from `tests.test_v3_console_room`:
 sanitized callback boundaries, complete installed models/profile bindings and
 retained resources, malformed-binding rejection, repeat-plan skipping, and four
 private browser/offline compositions. The retained-resource test initially
@@ -88,16 +97,14 @@ fixture. Use a real console game-state transition for the next execution batch.
 
 ## Next work and compatibility
 
-First add explicit capacity checks around imported emulator allocations.
-Native `THA_alloc16` at `800D17D4` subtracts from the arena tail without checking
-the head; a non-null result does not prove an allocation fits. The current
-adapter checks allocation results but must also check the available region.
-Keep failed allocation ahead of image binding and saved-state changes. Measure
-the real emulator game-state arena, which replaces the title/gameplay arena,
-with the largest image and full graphics/audio needs.
+The checked allocator rejects insufficient complete aligned arena space before
+native subtraction, image binding, or saved-state changes. The disk engine and
+session hooks are installed; see [disk services](../../specs/V3_CONSOLE_DISK.md)
+for native interpreter-entry evidence and the remaining execution checks.
 
-Then verify ordinary native launch/rendering/reset/return and complete QD disk
-emulation. Do not turn the unchecked allocator into a hardware handoff. Continue
+Verify native launch/rendering/reset/return for disk and representative cartridge
+games using the current combined build. Retain the exhausted title-room fixture
+evidence without replay. Ordinary room entry remains unverified. Continue
 other import requirements and real acquisition routes without replacing them
 with easier stock lists.
 

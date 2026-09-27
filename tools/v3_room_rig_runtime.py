@@ -240,7 +240,8 @@ def install_profiles(base,prior,blob,core,original,output,directories):
                 if initial is None:
                     deferred.append(dict(source_item_id=donor,reason='Console payload or source interaction is unavailable'))
                     continue
-                if not console_rows:console_rows=consoles.install(source,base,result,blob,output)
+                if not console_rows or not console_rows.get(donor,{}).get('engine_installed'):
+                    console_rows=consoles.install(source,base,result,blob,output)
                 installed=console_rows.get(donor)
                 if not installed or not installed['engine_installed']:
                     deferred.append(dict(source_item_id=donor,reason='Complete QD disk engine remains uninstalled'))
@@ -418,12 +419,15 @@ def bind_profiles(source,base,report):
     import v3_furniture_static as static
     import v3_console_room as consoles
     source.runtime_profiles={}
+    blob=by_vrom(base)[BLOB].extract(base);e=report['equipment_resources']
+    source.console_runtime_bindings=consoles.checked_runtime(e,blob,base)
+    source.console_disk_engine_ready=consoles.disk_engine_ready(e,blob,base)
     staged=report.get('staged_furniture',{})
     activated=[r for r in report['furniture']['imports'] if r.get('room_runtime')]
     if not staged and not activated:return source.runtime_profiles
     if staged and staged['format']!='AFV3-STAGED-FURNITURE-PROFILES-1':
         raise ValueError('Unknown staged furniture profile format')
-    blob=by_vrom(base)[BLOB].extract(base);e=report['equipment_resources'];runtime=e['room_rigs']
+    runtime=e['room_rigs']
     packet=runtime['packet'];raw=blob[packet['blob_offset']:packet['blob_offset']+packet['bytes']]
     packet_ram,table_ram,_=packet_layout(runtime)
     module=blob[e['blob_offset']:e['blob_offset']+e['bytes']]
@@ -443,7 +447,6 @@ def bind_profiles(source,base,report):
     bindings={r['source_item_id']:r for r in runtime['sound_rows']+runtime['rows']+runtime.get('material_rows',[])}
     bindings.update(checked_runtime(e,blob))
     bindings.update(static.checked_binding(base,report,blob))
-    source.console_runtime_bindings=consoles.checked_runtime(e,blob,base)
     bindings.update(source.console_runtime_bindings)
     if e.get('furniture_melody_audio'):
         from v3_furniture_melody import checked_binding as checked_melodies

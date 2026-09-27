@@ -62,14 +62,21 @@ A silent native run verifies the complete preloaded packet and reaches the disk
 interpreter with an active save session, no session error, and no CPU fault.
 The test stops on an incorrect active-state assertion; the corrected assertion
 is not replayed. Frame continuity, graphics, native reset/return, ordinary entry,
-and hardware remain unverified. Both setup attempts are spent; continue the
-shared furniture binding, then use a changed combined batch for the remaining
-native checks. No disk profile is enabled.
+and hardware remain unverified. Both setup attempts are spent; use a changed
+combined batch for the remaining native checks, not an unchanged fixture replay.
+ABI 284 binds the installed disk engine to the common room table and installs
+the full Clu Clu Land D profile through the ordinary category importer. Its
+4,880-byte, three-list model is reused without compilation. All twelve supplied
+additional console profiles are installed. Five focused checks pass across two
+targeted invocations: complete binding/artwork, unchanged resources and saves,
+non-mutating dependency rejection, repeat-plan skipping, explicit absent-payload
+classification, and four private browser/offline compositions. The disk item
+remains inactive pending its actual HomePage reward route; no new choice is added.
 See the [disk-service specification](../specs/V3_CONSOLE_DISK.md).
 
-The current proposal is ABI 283 at
-`build/v3-console-disk-session-01/build-lock.json`, ROM SHA-256
-`3d37a9d2fd0b3305843056a5443d8061247ca5a159425caf6f81e9930ab5f1f9`.
+The current proposal is ABI 284 at
+`build/v3-console-disk-room-imports-01/profile-runtime/build-lock.json`, ROM SHA-256
+`38dfbe6905917d5f0792cbad451d1d1f29b39bc2f3bfb4deac0e5625c3bc09d5`.
 The main lock, 163 choices, format-five saved layouts, and both V2-13 deployments
 are retained. No disk game is enabled. The current proposal retains the checked
 allocator and native evidence from ABI 281 at
@@ -95,7 +102,8 @@ The room integration is retained from ABI 280 at
 The shared pipeline installs eleven complete cartridge-console models/profiles
 and connects source game IDs to the native room interaction. Excitebike adds its
 real lottery/catalogue/scoring route and one experimental selection; the other
-ten await their actual acquisition routes. QD remains unfinished. The development
+ten await their actual acquisition routes. ABI 284 adds the complete QD profile;
+native execution verification and acquisition remain. The development
 catalogue has 163 choices. Five focused checks pass across targeted runs,
 including retained resources and four private compositions. Two native attempts
 verify startup but stop on insufficient test

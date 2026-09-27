@@ -156,7 +156,9 @@ def install(base,prior,blob,output,original):
             sources={s:sha256((ROOT/s).read_bytes()) for s in dict.fromkeys((*disk['sources'],*NATIVE_SOURCES,*SOURCES))})
         images['emulator'].update(native=binding,qd_engine_installed=True,native_gameplay_tested=False,
             disk_lifecycle_ram=DISK_RAM,sources={s:sha256((ROOT/s).read_bytes()) for s in SOURCES})
-        checked_runtime(equipment,blob,base)
+        # The caller installs these newly generated owners after this returns.
+        # The old owners were verified above; validate the updated packet here.
+        checked_runtime(equipment,blob)
         return equipment,{VROM:owner,RELOC:reloc}
     code,compiled=compile_part('console_emulator',output/'console_emulator',
         primary_source='overlays/v3/console_image_native.c',defines=tuple(flags),

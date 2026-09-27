@@ -1,5 +1,36 @@
 # Work record
 
+## 2026-09-27: shared disk furniture binding and complete category profile
+
+- The previous goal batch is progress (`8f38b9b`, full disk sessions). The
+  intervening user answer verifies V2-13 publication but makes no V3 progress.
+- Connected verified disk-engine readiness to the existing category planner and
+  profile staging. Validation checks complete packets, compiled code, BIOS/boot
+  data, lower shared calls, ten hook targets, and native owner/relocation hashes.
+  Older unbound room tables remain valid inputs; flags alone cannot enable QD.
+- The ordinary category command stages Clu Clu Land D using its full retained
+  4,880-byte three-list model. No art, room callback, or disk code recompilation.
+  Only one readiness byte changes in the console packet; all prior models,
+  profiles, game images, save fields, and selected imports remain intact.
+- ABI 284: `build/v3-console-disk-room-imports-01/profile-runtime/build-lock.json`.
+  ROM SHA-256 `38dfbe6905917d5f0792cbad451d1d1f29b39bc2f3bfb4deac0e5625c3bc09d5`;
+  UPS SHA-256 `a5e1a762dacaacfbd2859b1dbac89e4f2ebedec81fb822697103840f6b4a3e40`.
+  All twelve supplied additional console profiles are installed. The disk item
+  stays inactive pending its actual HomePage acquisition route. Its official
+  English name/source is added to the single provenance catalogue.
+- Four current-build checks pass in one invocation (31.241 s): full installation
+  and preservation, damaged-dependency refusal, repeat-plan skipping, and four
+  private browser/offline compositions. A fifth targeted check passes (2.485 s)
+  after explicitly classifying the unused absent-payload source record. No
+  historical emulator build or unchanged native scenario is replayed.
+- Fresh furniture scan: 105 supported / 285 review records, with no supported
+  uninstalled furniture. Review records include absent data, parent displays,
+  legacy identity questions, and acquisition; this is not a whole-import
+  completion claim. Continue native console continuity/graphics/reset/return
+  and the required legacy identity review, then real acquisition and gold-tree
+  work in the agreed order. The main lock, 163 choices, format-five saves, and
+  both V2-13 deployments are retained.
+
 ## 2026-09-27: complete disk session hooks and first native interpreter entry
 
 - The previous goal turn is progress: `a87c8e1` implements audio/DPCM bindings,

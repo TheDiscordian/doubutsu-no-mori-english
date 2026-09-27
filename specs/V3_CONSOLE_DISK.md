@@ -20,10 +20,11 @@ is WDM plus save plus validation: 192 bytes. `console_disk/disk.json` records co
 source and compiled identities. The nineteen-game bundle, compact metadata,
 and compressed image pool are identical to the retained complete preparation.
 
-The complete module and disk session hooks are installed in ABI 283.
-The current cartridge is `build/v3-console-disk-session-01/`, SHA-256
-`3d37a9d2fd0b3305843056a5443d8061247ca5a159425caf6f81e9930ab5f1f9`.
-No profile, selection, save, main-lock, or patcher deployment changes.
+The complete module and disk session hooks are installed. ABI 284 also binds the
+shared room table and complete furniture profile. The current cartridge is
+`build/v3-console-disk-room-imports-01/profile-runtime/`, SHA-256
+`38dfbe6905917d5f0792cbad451d1d1f29b39bc2f3bfb4deac0e5625c3bc09d5`.
+Selection, saved layouts, the main lock, and patcher deployments are unchanged.
 
 ## Donor resources and contract
 
@@ -145,9 +146,10 @@ The prepared-resource check verifies MIPS/source receipts, complete BIOS/boot-st
 identity/vectors, unchanged nineteen-game resources, and explicit non-installation.
 No historical ROM or unchanged native scenario is replayed for this preparation.
 
-Remaining work is the shared room-readiness binding and complete furniture
-profile/acquisition, plus native frame-continuity, drawing, reset/return, and
-ordinary gameplay verification. Installed session hooks are described below.
+Remaining work is actual acquisition, plus native frame-continuity, drawing,
+reset/return, and ordinary gameplay verification. The common furniture importer
+installs the complete room binding/profile; it does not invent a shop-stock route.
+Installed session hooks are described below.
 Preserve the complete source image and BIOS; no substituted cartridge is used.
 
 ## Native integration bindings
@@ -417,10 +419,35 @@ These are entry/execution observations, not a complete gameplay pass.
 The helper incorrectly expected active marker `1`, so it stops before later
 frame/graphics/context checks or checkpoint restoration. The actual save core
 uses `41464E53`; the helper is corrected without a third attempt. Both setup
-attempts are spent. Retain this evidence, finish shared room/profile binding,
-and exercise continuity, graphics, reset/return with the next changed combined
+attempts are spent. Retain this evidence and exercise continuity, graphics,
+reset/return with the next changed combined
 batch. No speaker output, ordinary room entry, saved-game reload, or hardware
 claim is made.
+
+### Shared room/profile binding
+
+ABI 284 uses the ordinary furniture category importer, with retained complete art
+from `build/v3-console-room-imports-01/prepared/`. It verifies installed disk and
+lower save code, complete BIOS/boot/work packet, all ten hook targets, native owner
+and relocation identities, and the existing room callback/table. The common
+table gains its disk readiness byte; code, image metadata/pool, and all eleven
+existing console profiles/models stay intact. The shared startup embeds the
+updated packet checksum. All twelve complete supplied additional console models
+now have profiles; no per-game code or model recompilation is introduced.
+
+The full Clu Clu Land D profile and official name occupy their reserved additive
+slots, with the parent-selection bit still clear. Its actual `ftr_listHomePage`
+reward route remains required. The unused game-twenty record is explicitly
+classified as missing from the donor, not missing engine support.
+
+Five focused checks in `tests.test_v3_console_disk_room` pass across two targeted
+invocations. They check complete art/profile installation, the single changed
+readiness byte, retained runtime/assets/saves, patch reconstruction, non-mutating
+rejection of damaged dependencies, idempotent binding and planning, missing-donor
+classification, and four private browser/offline compositions. Existing native
+session evidence is retained without another unchanged fixture run. The main
+lock and public/local V2-13 deployments remain stable. This is not a hardware
+handoff or a completed native gameplay test.
 
 ## Compatible local native-test emulator
 

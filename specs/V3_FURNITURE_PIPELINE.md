@@ -774,13 +774,20 @@ as one dependency batch. Prepared console artwork includes those launch receipts
 missing native gameplay still prevents installation. The absent game-twenty
 payload is distinct from the twelve supplied additions. Existing native mapper
 callbacks do not by themselves establish complete launch or persistence support.
-Checked native iNES loading/storage now permits ordinary category staging of
-eleven complete console profiles. The shared room dispatcher uses actual source
+Checked native iNES/QD loading/storage permits ordinary category staging of
+all twelve supplied additional console profiles. The shared room dispatcher uses actual source
 game mappings and the native interaction clip; constant draw lists remain the
 same prepared resources. All acquisition gates still apply. The repeat planner
-skips installed profiles and unimplemented QD rather than repeatedly rebuilding
-those records. Native gameplay and explicit game-arena capacity checks remain
-required; see the [room checkpoint](../docs/checkpoints/V3_CONSOLE_ROOM.md).
+skips installed profiles rather than repeatedly rebuilding those records.
+Planning verifies the complete installed disk packet, both BIOS copies, boot
+data, common save-call bindings, and native owner/relocation hashes. Profile
+staging publishes the QD readiness bit through the existing room table and
+rebuilds the startup checksum, without recompiling callback, engine, or art.
+An installed engine is distinct from an installed room binding; both are
+required before profile activation. Missing donor payloads remain explicitly
+unavailable, not pending emulator implementation. The checked arena allocator
+is installed; native gameplay remains unverified. See the
+[room checkpoint](../docs/checkpoints/V3_CONSOLE_ROOM.md).
 Console conversion also prepares the common bounded save executor. It preserves
 all four players' separate progress and the complete score/reset/battery/disk
 semantics. Preparation and donor comparisons do not enable games or install

@@ -124,8 +124,11 @@ per-frame disk timing, reset, and final-save lifecycle hooks, reusing the lower
 image/save executor. Host session and cartridge/composition checks pass. Native
 preload and interpreter entry are observed, but the test's stale active-marker
 assertion prevents full scenario completion. Frame continuity, drawing, native
-reset/return, and ordinary gameplay remain unverified. Shared room readiness and
-the complete furniture profile still need binding; no disk item is selectable.
+reset/return, and ordinary gameplay remain unverified. ABI 284 binds shared room
+readiness and stages the complete furniture profile through the ordinary category
+importer, reusing all artwork. Five focused checks pass, including four private
+compositions and preserved saves/resources. Its real reward route remains
+unimplemented; no disk item is selectable.
 
 The [console converter](V3_CONSOLE_GAMES.md) preserves nineteen complete game
 payloads, twenty launch bindings, and sixty persistence operations. Its common

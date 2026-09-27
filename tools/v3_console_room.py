@@ -55,6 +55,48 @@ def table_bytes(rows):
     return out
 
 
+def disk_engine_ready(equipment,blob,base=None):
+    """Verify the installed shared disk dependency, independently of room rows."""
+    from v3_console_disk_install import RAM as DISK_RAM,END as DISK_END,LAYOUT
+    from v3_console_disk import BIOS_SHA,BOOT_STATE_SHA
+    from v3_console_emulator import VROM,RELOC
+    images=equipment.get('console_images',{});engine=images.get('emulator',{})
+    disk=equipment.get('console_disk',{})
+    if bool(engine.get('qd_engine_installed'))!=bool(disk.get('session_hooks_installed')):
+        raise ValueError('Inconsistent installed disk lifecycle readiness')
+    if not disk.get('session_hooks_installed'):return False
+    p=disk['packet'];raw=blob[p['blob_offset']:p['blob_offset']+p['bytes']]
+    low=images['packet'];lower=blob[low['blob_offset']:low['blob_offset']+low['bytes']]
+    code=disk['compiled'];shared=images['compiled'];symbols=code['symbols']
+    calls=('af_v3_console_validate','af_v3_console_image_native_load',
+           'af_v3_console_open_loaded','af_v3_console_frame','af_v3_console_close')
+    expected={name:shared['symbols'][name] for name in calls}
+    hooks=engine['native']['hooks']
+    required={'af_v3_console_'+name for name in ('graphics','setup','initialize',
+        'frame_native','reset_native','close_native','arena_allocate','extent','cpu_frame')}
+    required.add('af_v3_qd_dpcm_bridge')
+    if (not disk.get('installed') or not engine.get('installed') or disk['layout']!=LAYOUT or
+            p['ram']!=DISK_RAM or p['bytes']!=DISK_END-DISK_RAM or len(raw)!=p['bytes'] or
+            sha256(raw)!=p['sha256'] or zlib.crc32(raw)!=p['crc32'] or
+            not 0<code['bytes']<=0x6000 or sha256(raw[:code['bytes']])!=code['sha256'] or
+            any(raw[code['bytes']:0x6000]) or
+            sha256(raw[0x6000:0x8000])!=BIOS_SHA or sha256(raw[0x14000:0x16000])!=BIOS_SHA or
+            sha256(raw[0x8200:0x8304])!=BOOT_STATE_SHA or any(raw[0x8000:0x8200]) or
+            any(raw[0xA000:0x14000]) or raw[-16:]!=bytes.fromhex('51444721')*4 or
+            sha256(lower)!=low['sha256'] or sha256(lower[:shared['bytes']])!=shared['sha256'] or
+            disk['shared_calls']!=expected or len(hooks)!=len(required) or
+            {h['symbol'] for h in hooks}!=required or
+            any(h['target']!=symbols[h['symbol']] or not DISK_RAM<=h['target']<DISK_RAM+code['bytes']
+                or h['target']&3 for h in hooks)):
+        raise ValueError('Changed complete installed disk engine binding')
+    if base is not None:
+        files=by_vrom(base)
+        if (sha256(files[VROM].extract(base))!=engine['native']['sha256'] or
+                sha256(files[RELOC].extract(base))!=engine['native']['relocation_sha256']):
+            raise ValueError('Disk engine is not connected to the installed native emulator')
+    return True
+
+
 def checked_runtime(equipment,blob,base=None):
     images=equipment.get('console_images',{});room=images.get('room')
     if not room:return {}
@@ -67,18 +109,37 @@ def checked_runtime(equipment,blob,base=None):
             struct.unpack_from('>5I',raw,vtable)!=(0,code['symbols']['af_v3_console_room_move'],0,0,0) or
             base is not None and room['native']!=native_contract(base)):
         raise ValueError('Changed complete console room dispatch/bindings')
+    disk_bound=room.get('disk_engine_bound',False)
+    if type(disk_bound) is not bool or disk_bound and not disk_engine_ready(equipment,blob,base):
+        raise ValueError('Console room requires its complete installed disk engine')
     metadata=raw[images['metadata']['ram']-p['ram']:]
     for r in room['rows']:
         entry=metadata[32+(r['game_index']-1)*64:32+r['game_index']*64]
         kind=struct.unpack_from('>I',entry,4)[0]
-        if r['image_kind']!=kind or r['engine_installed']!=(kind==1):
+        if r['image_kind']!=kind or r['engine_installed']!=(kind==1 or kind==2 and disk_bound):
             raise ValueError('Console room readiness differs from installed emulator')
     return {r['source_item_id']:r for r in room['rows']}
 
 
+def bind_engines(equipment,blob,base):
+    """Publish newly installed engine readiness without rebuilding code or art."""
+    rows=checked_runtime(equipment,blob,base)
+    if not rows or not disk_engine_ready(equipment,blob,base):return rows
+    images=equipment['console_images'];room=images['room']
+    if room.get('disk_engine_bound'):return rows
+    room['disk_engine_bound']=True
+    for row in rows.values():row['engine_installed']=row['image_kind'] in (1,2)
+    p=images['packet'];at=p['blob_offset'];raw=bytearray(blob[at:at+p['bytes']])
+    data=table_bytes(room['rows']);start=TABLE-p['ram'];raw[start:start+len(data)]=data
+    blob[at:at+len(raw)]=raw;p.update(sha256=sha256(raw),crc32=zlib.crc32(raw))
+    room['engine_binding_sources']={s:sha256((ROOT/s).read_bytes()) for s in
+        ('tools/v3_console_room.py','tools/v3_room_rig_runtime.py','tools/v3_furniture_pipeline.py')}
+    return checked_runtime(equipment,blob,base)
+
+
 def install(source,base,equipment,blob,output):
     if equipment.get('console_images',{}).get('room'):
-        return checked_runtime(equipment,blob,base)
+        return bind_engines(equipment,blob,base)
     images=equipment.get('console_images',{})
     if not images.get('emulator',{}).get('installed'):
         raise ValueError('Console room profiles require installed full-image emulator/storage')
@@ -107,7 +168,7 @@ def install(source,base,equipment,blob,output):
     images['room']=dict(format='AFV3-CONSOLE-ROOM-1',compiled=compiled,native=native,rows=rows,
         vtable_hex=vtable.hex(),additional_resident_bytes=0,source_mapping_installed=True,
         ordinary_gameplay_tested=False,sources={s:sha256((ROOT/s).read_bytes()) for s in SOURCES})
-    return checked_runtime(equipment,blob,base)
+    return bind_engines(equipment,blob,base)
 
 
 def profile_lifecycle(profile,life):

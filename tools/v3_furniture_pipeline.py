@@ -1215,8 +1215,13 @@ def metadata(source, item, profile, identity):
     if profile.get('callback_adapter',{}).get('category')==PENDING_MOVE_CATEGORY:
         raise ReviewRequired('Static artwork is prepared; move behaviour, profile interactions, and spawned effects need runtime adapters')
     if profile.get('callback_adapter',{}).get('category')==PENDING_SEQUENCE_CATEGORY and not binding:
+        launch=profile['callback_adapter'].get('console_launch',{})
+        if launch.get('payload_status')=='absent-from-donor':
+            raise ReviewRequired('Unused console source record: complete game payload is absent from this donor')
         console=getattr(source,'console_runtime_bindings',{}).get(f'{item:04X}')
         if console and console['image_kind']==2 and not console['engine_installed']:
+            if getattr(source,'console_disk_engine_ready',False):
+                raise ReviewRequired('Complete QD disk engine is installed; shared room/profile binding remains uninstalled')
             raise ReviewRequired('Complete disk image and artwork are prepared; QD disk engine remains uninstalled')
         raise ReviewRequired('Constant-material artwork is prepared; complete interaction lifecycle needs a runtime adapter')
     if profile.get('callback_adapter',{}).get('category')=='static-interaction' and not binding:
@@ -1470,7 +1475,9 @@ def rig_import_plan(inventory, report, bindings, selected=(), category=None, *, 
     from v3_console_room import lifecycle as console_lifecycle
     console_rows=[r for r in candidates if console_lifecycle(r['profile']) is not None] if source is not None else []
     prepared_consoles={r['source_item_id']:r for r in report['equipment_resources'].get('console_images',{}).get('room',{}).get('rows',[])}
-    console_rows=[r for r in console_rows if r['item_id'] not in prepared_consoles or prepared_consoles[r['item_id']]['engine_installed']]
+    console_rows=[r for r in console_rows if r['item_id'] not in prepared_consoles or
+        prepared_consoles[r['item_id']]['engine_installed'] or
+        prepared_consoles[r['item_id']]['image_kind']==2 and getattr(source,'console_disk_engine_ready',False)]
     if console_rows and not report['equipment_resources'].get('console_images',{}).get('emulator',{}).get('installed'):
         console_rows=[]
     plan=dict(resources=sorted(r['item_id'] for r in rows if r['item_id'] not in rigs),

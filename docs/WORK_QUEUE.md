@@ -40,11 +40,16 @@ voice. ABI 283 installs the complete audio/DPCM, image-extent, initialization,
 per-CPU-frame timing, reset, and final-save hooks. Three focused checks pass:
 117,058 sanitized session assertions with the actual donor image, ten installed
 hooks/thirteen removed relocations and retained resources, and four private
-compositions. Next bind the shared console-room readiness table to the installed
-disk engine, then run the ordinary category/profile importer on the retained
-complete console artwork. `v3_console_room.checked_runtime` still deliberately
-recognizes only iNES readiness; update that shared binding without changing
-identities, room callbacks, or acquisition rules. No per-game installer is needed.
+compositions. ABI 284 connects the shared console-room readiness table to the
+verified installed disk code and native hooks, then stages the full profile with
+the ordinary category importer. All twelve supplied additional console profiles
+are installed. The complete 4,880-byte disk model is reused without compilation;
+only its table readiness byte changes in the retained console packet. Five
+focused checks pass, including four private compositions, rejected damaged
+dependencies, repeat-plan skipping, and explicit absent-donor classification.
+No per-game installer is used. Next check native frame continuity, drawing,
+reset/return, and a representative cartridge game in one bounded current-build
+batch. Do not replay the old room-allocation fixture or unchanged session tests.
 The disk game remains unavailable in the selector. See the
 [disk specification](../specs/V3_CONSOLE_DISK.md).
 The combined native module is 14,295 bytes, linked at `80630000`; its code/data/work
@@ -61,8 +66,15 @@ on the helper's wrong active marker (`1` instead of `41464E53`). The helper is
 fixed, but both attempts are spent: do not replay unchanged setup. Retain the
 snapshot and verify frame continuity, graphics, reset/return in the next changed
 combined gameplay batch. Ordinary entry and hardware stay unverified.
-Continue from ABI 283 at `build/v3-console-disk-session-01/build-lock.json`,
-ROM SHA-256 `3d37a9d2fd0b3305843056a5443d8061247ca5a159425caf6f81e9930ab5f1f9`.
+Continue from ABI 284 at
+`build/v3-console-disk-room-imports-01/profile-runtime/build-lock.json`,
+ROM SHA-256 `38dfbe6905917d5f0792cbad451d1d1f29b39bc2f3bfb4deac0e5625c3bc09d5`.
+The fresh furniture scan is `build/v3-furniture-post-console-scan-01.json`:
+105 supported records, 285 review records, and no supported uninstalled furniture.
+These counts include absent/dummy resources, parent representations, unresolved
+identity mappings, and acquisition; they are not counts of unfinished behaviours.
+Remaining primary work includes the explicit legacy identity review below and
+native console execution. Do not use this scan to declare all importing complete.
 The retained allocator evidence belongs to ABI 281 at
 `build/v3-console-emulator-capacity-01/build-lock.json`,
 ROM SHA-256 `763bbcbeca77390e797039c79ee8ae83a2a7b7497b5768db81534ed0ce14a62d`.
