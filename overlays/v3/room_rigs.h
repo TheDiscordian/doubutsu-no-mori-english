@@ -37,7 +37,9 @@ typedef struct {
     s16 s_angle_y;
     u8 angle_padding[6];
     u8 switched,changed;
-    u8 before_keyframe[6];
+    u8 before_haniwa[2];
+    s16 haniwa_state;
+    u8 before_keyframe[2];
     RoomKeyframe keyframe;
     s16 joint[9][3];
     /* Native capacity is eight joints plus root. Only six-joint behaviours
@@ -107,6 +109,7 @@ typedef struct {
 #define ROOM_RIG_REVERSIBLE 9u
 #define ROOM_RIG_EFFECT 10u
 #define ROOM_RIG_DUAL 11u
+#define ROOM_RIG_RADIO 12u
 #ifdef AF_V3_ROOM_MATERIAL_RIG
 /* Explicit big-endian halfwords keep immutable object data portable to the
    host checks as well as the native big-endian target. */
@@ -210,6 +213,7 @@ ROOM_CHECK(RoomRig,angle_y_target,0x38); ROOM_CHECK(RoomRig,shape_type,0x3E);
 ROOM_CHECK(RoomRig,base_position,0x40); ROOM_CHECK(RoomRig,s_angle_y,0x124);
 ROOM_CHECK(RoomRig,layer,0x738); ROOM_CHECK(RoomRig,kept_item,0x73A);
 ROOM_CHECK(RoomRig,changed,0x12D); ROOM_CHECK(RoomRig,keyframe,0x134);
+ROOM_CHECK(RoomRig,haniwa_state,0x130);
 ROOM_CHECK(RoomRig,joint,0x1A4); ROOM_CHECK(RoomRig,morph,0x1DA);
 ROOM_CHECK(RoomRig,speed,0x204); ROOM_CHECK(RoomRig,target,0x208);
 ROOM_CHECK(RoomRig,switched,0x12C); ROOM_CHECK(RoomRig,motion_power,0x450);

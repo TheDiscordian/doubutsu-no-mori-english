@@ -531,7 +531,7 @@ def colour_state_reservation(report):
     return expected
 
 
-def colour_native_contract(image, installed=None):
+def colour_native_contract(image, installed=None, *, music_runtime=None):
     from v3_equipment_runtime import PLAYER_VROM, PLAYER_RAM, PLAYER_RELOC
     from v3_npc_draw import relocation_offsets
     files = by_vrom(image); player = bytearray(files[PLAYER_VROM].extract(image))
@@ -550,6 +550,9 @@ def colour_native_contract(image, installed=None):
     elif (0x808DDB70-PLAYER_RAM not in slots or 0x808BFC60-PLAYER_RAM in slots):
         raise ValueError('Changed original player-colour candidate relocations')
     room = files[0x82D7F0].extract(image); core = files[CODE_VROM].extract(image)
+    if music_runtime and music_runtime.get('music'):
+        from v3_room_music import restore_owner
+        room=restore_owner(room,music_runtime['music'],music_runtime)
     blocks = []
     for name, raw, ram, start, end, digest in (
         ('room_instances',room,0x80936710,0x80938EF0,0x80938FD8,
@@ -644,7 +647,7 @@ def checked_colours(base, report):
     blob=by_vrom(base)[BLOB].extract(base);at=equipment['blob_offset']+COLOUR_BRIDGE-RAM
     bridge=bytes.fromhex(colours['bridge_hex'])
     if (colours.get('format')!='AFV3-ROOM-COLOURS-1' or not colours.get('installed') or
-            colours['native']!=colour_native_contract(base,colours) or
+            colours['native']!=colour_native_contract(base,colours,music_runtime=room) or
             colours['state']!=colour_state_reservation(report) or
             colours['packet_crc32']!=room['packet']['crc32'] or
             colours['targets']!={name:room['code']['symbols']['af_v3_room_colour_'+name] for name in ('update','draw')} or

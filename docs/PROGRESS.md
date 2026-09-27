@@ -31,12 +31,30 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
+The radio's room-music lifecycle is installed through the ordinary importer in
+ABI 273 at `build/v3-room-music-imports-04/profile-runtime/build-lock.json`, ROM
+SHA-256 `170adf7a335f7aa3a246d20d3f229089932841346758d7cc8c96437c26f0c417`.
+All 5,152 prepared artwork bytes are reused. Source-equivalent music reservation,
+radio/stereo exclusivity, constructor/destructor handling, source-rate note
+emission, and rotated drawing are connected. The source track and four complete
+instrument/sample bindings reuse native audio with the native volume mix.
+Five focused checks pass, including 289 actual-donor lifecycle comparisons,
+relocated owner hooks, preserved existing resources/saves, and four private
+browser/offline compositions. This is not native execution or hardware evidence.
+Room code uses 27,856 of 32,768 bytes; bootstrap uses 1,182 of 1,536.
+
+The radio remains unavailable: its source indoor player-aerobics interaction is
+unfinished, and its original reward route remains acquisition work. The current
+build retains 162 choices and saved format 4. Next, finish indoor exercise as part
+of importing behaviour, then continue console launch/storage. See the
+[radio lifecycle checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#installed-radio-room-music-lifecycle).
+
 The shared converter prepares the complete aerobics radio and treasure chest
 together: 13,824 bytes, 174 triangles, all textures/palettes, nested model parts,
 six chest joints, both distinct 51-frame motions, and three scrolling layers.
 The ordinary importer installs the chest's complete native behaviour, including
 room/contact readers, both mapped multi-instrument sounds, continuous sound,
-destruction, and saved-state capture. The current proposal is ABI 271 at
+destruction, and saved-state capture. Its retained implementation evidence is ABI 271 at
 `build/v3-dual-motion-imports-01/profile-runtime/build-lock.json`, SHA-256
 `a93384de48092aa3180f484602bc4fb57b0e0037635dbec6c8a4fc03025343e3`.
 Installed-resource and four private browser/offline composition checks pass;
@@ -45,8 +63,7 @@ still pending, so it remains unavailable in the selector. The prepared core's
 donor comparisons are retained, not relabelled as full native execution. A new
 dispatch fixture stops at its two setup attempts before C execution; do not loop
 on it. Native gameplay/rendering/synthesis, saving with this item, and hardware
-remain unverified. Next: finish radio music ownership, note emission, and rotated
-drawing, then console launch/storage. See the
+remain unverified. See the
 [installed chest checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#installed-dual-motion-lifecycle).
 
 The ordinary category importer installs crab stew's combined reversible animation,
@@ -60,7 +77,7 @@ dependencies, four browser/offline selections, and the affected shared reversibl
 core. Native execution, ordinary rendering/audio synthesis, a save cycle with
 this item, and hardware remain unverified. See the
 [combined-effect checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#installed-combined-reversible-material-and-effects).
-Next: complete radio/chest and console launch/storage importing behaviours.
+Continue indoor radio exercise and console launch/storage importing behaviours.
 
 The ordinary category importer installs the complete matryoshka: eleven joints,
 five models, 85 triangles, and all 46-frame motion channels in 4,512 reused bytes.

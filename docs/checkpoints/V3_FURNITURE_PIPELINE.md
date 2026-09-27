@@ -1,5 +1,95 @@
 # Automatic furniture pipeline checkpoint
 
+## Installed radio room-music lifecycle
+
+The ordinary category importer installs the aerobics radio's room lifecycle in
+ABI 273, without enabling its unfinished player interaction or acquisition.
+Source `1FCC` has append-only legacy destination `3C48`, index 1810, registry
+version 9. The worksheet and reviewed N64 correspondence both confirm no existing
+native furniture identity. All 5,152 prepared bytes, both nested models, both
+textures, shared vertices, fixed palette, and 24 triangles are reused unchanged.
+Official `aerobics radio` wording is credited in `translations/provenance.json`.
+
+Build: `build/v3-room-music-imports-04/profile-runtime/build-lock.json`.
+ROM SHA-256: `170adf7a335f7aa3a246d20d3f229089932841346758d7cc8c96437c26f0c417`.
+UPS SHA-256: `4adc039ce50385230bc28a59e93cfe8833c4383ae5b27cd3ee9dd6afbeee1757`.
+Room code: 27,856/32,768 bytes, SHA-256
+`8f2ffb8bc0e57092aa0cd2d80c211b5b21b3b4fe4c51f5e0e6684028adda0e76`.
+Bootstrap: 1,182/1,536 bytes, SHA-256
+`d2fe4b739558ed728dcbda3c651d99b3c12417f14156d40f560f85b16d26a893`.
+Packet: 36,864 bytes, SHA-256
+`1cd69d611042ff448435e967bf03d50a66aa5b5a8f733c154178cfeb78d24a7d`.
+
+`room_music.c/.h` and `room_music_native.c/.h` convert all nine checked donor
+room-music helpers: constructor reset, radio and disk destruction, reservation,
+default restoration, active/reserved actor ownership, and exclusive switching.
+The complete all-off traversal now includes `4000` as well as `0008`; original
+stereos and the imported radio share the existing owner fields at `45C..473`.
+Radio song 27 avoids positional minidisk playback exactly where the donor does.
+The haniwa-start branch reserves for the ordinary owner timer; changed switches
+apply immediately. Common disk destruction clears the donor's active-owner state.
+The mode-12 callback emits a note every 36 source ticks, performs two source ticks
+per native update, and retains source position/angle/metadata. Drawing rotates by
+`-7000`, binds segment 8's palette, and submits the entire prepared model. Matrix
+and command arena space is checked before either allocation or matrix changes.
+
+Native hooks at `8093837C` and `809383EC` enter the checked packet loader even for
+original stereos before an imported callback. `809385B0..B7` changes only the
+all-off bit test. Three relocated load bases preserve all unrelated instructions
+and data, and no relocation or allocation grows. Every shared runtime refresh
+rebinds hooks to its compiled bootstrap. Existing carrying and player-colour
+contracts verify and undo only the exact music patches before retaining their
+original full-function/full-owner checks.
+
+The complete aerobics BGM is present in both games: source sequence 218, native
+181, 4,736 bytes. All channel/note data match. The only differences are initial
+mute scale (source 60/native 70 at byte 3) and volume (70/90 at byte 20). Native
+mix is retained explicitly. Source bank 129/native bank 121 retain all four
+instruments, both envelope addresses, tuning/loops/predictors, and 14,168 bytes of
+verified samples. No new music/font/sample allocation is required. The native
+musical-note effect retains its full 2,112-byte code/profile and 1,400-byte artwork,
+three models, five colours, and original native lifetime/damping/growth/debug
+scaling. This is a native effect adaptation, not exact donor particle integration.
+
+Verification: `python3 -m unittest tests.test_v3_room_music -v` passes five checks
+in 20.9 seconds. The host C check compiles the actual donor helper bodies and
+passes 289 state/event-order comparisons under address/undefined-behaviour
+sanitizers. It also checks relocated owner access, missing-owner rejection,
+note cadence/pausing, and bounded draw commands. Installed checks cover source
+and asset bindings, invalid records, unchanged prior artwork and save/profile
+data, exact owner restoration, current UPS reconstruction, and four private
+browser/offline compositions. The current complete MIPS packet and bootstrap
+compile successfully. Native callback execution, ordinary GPU/audio synthesis,
+a save cycle with the radio, and hardware are unverified. No new emulator harness
+is introduced, and exhausted older fixtures are not replayed.
+
+The 162 existing choices and save format 4 remain. This build does not change the
+main lock or either V2-13 patcher deployment. Imported V3 saves remain unsuitable
+for V2; unchanged V3 formats do not constitute a new hardware save-cycle test.
+
+Remaining radio behaviour: source `Player_actor_Check_InBlockRadioExercise`
+(`16E944`, 240 bytes), `Check_AbleRadioExercise` (`16EA34`, 60 bytes), command
+buffer/recognition (`16EA70..16ED2C`), and action requests (`16ED2C`, `196950`, etc.)
+in `local/ac-decomp/src/game/m_player_common.c_inc`. The supplied US source checks
+current BGM indoors and permits the player to perform aerobics. No direct calls
+to `mEv_check_status=8007FF08`, `mFI_BlockKind2BkNum=80089440`, or current BGM
+`8005EAFC` occur in the current native player's complete `2AF00`-byte text section.
+That rules out blindly patching a presumed matching eligibility call; it does not
+establish absence of all native exercise assets. Inspect complete source actions,
+animations, and native counterparts, and extend the shared player-motion/action
+pipeline. The option is explicitly blocked on this interaction. Its actual
+morning-aerobics reward route follows the primary import work with other acquisition.
+
+Build record: attempt 01 exposed the missing stable legacy ID; it was reserved
+after checking native identity correspondence. Attempt 02 caught a mode check
+inserted into the sound-record finder rather than the rig finder; the check was
+moved before the combined MIPS build. Attempt 03 produced ABI 272, then profile
+staging correctly rejected the changed all-off traversal in the colour contract.
+The contract now checks and normalizes the exact music hooks. Attempt 04 resumed
+from that completed rig stage, skipped recompiling unchanged code/assets, and
+completed profile staging and all focused checks. These were implementation/build
+failures, not failed emulator harness attempts.
+
 ## Installed dual-motion lifecycle
 
 The ordinary importer installs the complete treasure chest through mode 11:

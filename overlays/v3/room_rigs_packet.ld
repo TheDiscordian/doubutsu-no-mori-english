@@ -37,6 +37,10 @@ memcpy = 0x80034BF8;
 gfx_set_fog_nosync = 0x800BD37C;
 mFI_GetFieldId = 0x80087C88;
 mHS_get_arrange_idx = 0x80094BF4;
+mBGMPsComp_make_ps_room = 0x8005E0DC;
+mBGMPsComp_delete_ps_room = 0x8005E69C;
+mBGMPsComp_MDPlayerPos_make = 0x8005EA24;
+mBGMPsComp_MDPlayerPos_delete = 0x8005EA38;
 SECTIONS {
     . = DEFINED(AF_ROOM_ORIGIN) ? AF_ROOM_ORIGIN : 0x804B8000;
     .text : { *(.text.af_v3_room_rig_ct) *(.text .text.*) }

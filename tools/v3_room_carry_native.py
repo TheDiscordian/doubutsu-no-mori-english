@@ -121,6 +121,10 @@ def checked_binding(image,report):
     if goods_contract(image,report)!=carry['goods']:
         raise ValueError('Changed installed carrying goods dependency')
     owner=files[VROM].extract(image);reloc=files[RELOC].extract(image);binding=carry['binding']
+    runtime=equipment.get('room_rigs',{})
+    if runtime.get('music'):
+        from v3_room_music import restore_owner
+        owner=restore_owner(owner,runtime['music'],runtime)
     if (sha256(owner)!=binding['owner_sha256'] or sha256(reloc)!=binding['relocation_sha256'] or
             not binding['installed'] or len(binding['hooks'])!=len(HOOKS)):
         raise ValueError('Changed complete installed carrying owner')

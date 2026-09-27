@@ -538,6 +538,13 @@ def reward_fanfares(image,code,source):
         raise ValueError('Changed complete reward fanfare selector')
     ordered=[w&65535 for w in struct.unpack('>17I',raw) if w>>16==0x3860]
     if ordered!=[73,75,76,74]:raise ValueError('Changed reward fanfare order')
+    return dict(selector=selector,type_bgms=ordered,**shared_bgms(image,code,ordered))
+
+
+def shared_bgms(image,code,bgms,*,native_mix=False):
+    """Bind complete common music sequences, fonts, and samples by source identity."""
+    if not bgms or any(type(b)!=int or not 0<=b<256 for b in bgms) or len(set(bgms))!=len(bgms):
+        raise ValueError('Invalid shared music identities')
     dol,audio=read_audio_donor(ROOT/'local/gamecube/Animal Crossing (USA, Canada).ciso')
     donor={k:span(audio,*struct.unpack_from('>II',header_entry(dol.read,0x800CE450,i)))
            for i,k in enumerate(('seq','bank','wave'))}
@@ -547,11 +554,31 @@ def reward_fanfares(image,code,source):
             or sha256(native_table)!='d0ded694c8643bc28abf25d7cc743ce84ea73d022d8af60d08f8aae0033e5e53'):
         raise ValueError('Changed complete BGM selector table')
     rows=[]
-    for bgm in ordered:
+    for bgm in bgms:
         gi,ni=source_table[bgm],native_table[bgm]
         g,gh=resource(dol.read,GC_SECTIONS,donor,'seq',gi)
         n,nh,physical=installed_resource(image,code,'seq',ni)
-        if len(g) not in (len(n),len(n)+16) or g[:len(n)]!=n:
+        if len(g) not in (len(n),len(n)+16):
+            raise ValueError('Native music is not the complete common sequence')
+        common=bytearray(g);mix=[]
+        if native_mix:
+            # Only the initial linear setup may adapt volume/mute scale. Do
+            # not reinterpret operands or bytes within note/channel programmes.
+            pos=0;allowed={}
+            while pos<len(n):
+                op=g[pos]
+                size=2 if op in (0xD3,0xD5,0xDB) else 3 if op==0xD7 or 0x90<=op<=0x9F else 0
+                if not size or pos+size>len(n):break
+                if op in (0xD5,0xDB):allowed[pos+1]=op
+                pos+=size
+            for at,(a,b) in enumerate(zip(g,n)):
+                if a==b:continue
+                if at not in allowed or max(a,b)>127:
+                    raise ValueError('Shared music differs beyond initial volume settings')
+                mix.append(dict(offset=at,command=allowed[at],source=a,native=b,
+                    meaning='mute scale' if allowed[at]==0xD5 else 'volume'))
+                common[at]=b
+        if common[:len(n)]!=n:
             raise ValueError('Native fanfare is not the complete common sequence')
         def bank_id(reader,base,index):
             offset=struct.unpack('>H',reader(base+index*2,2))[0];data=reader(base+offset,2)
@@ -566,8 +593,9 @@ def reward_fanfares(image,code,source):
         font=shared_font_samples(gbank,nbank,gwave,nwave,nbh[8:])
         rows.append(dict(bgm=bgm,source_sequence=gi,native_sequence=ni,source_bytes=len(g),native_bytes=len(n),
             source_sha256=sha256(g),native_sha256=sha256(n),source_trailing_hex=g[len(n):].hex(),
-            native_physical=physical,source_bank=gb,native_bank=nb,font=font))
-    return dict(selector=selector,type_bgms=ordered,rows=rows,source_table=0x800A9838,native_table=0x80113964,
+            native_physical=physical,source_bank=gb,native_bank=nb,font=font,
+            **(dict(native_mix=mix) if native_mix else {})))
+    return dict(rows=rows,source_table=0x800A9838,native_table=0x80113964,
         source_table_sha256=sha256(source_table),native_table_sha256=sha256(native_table),
         new_sequences=0,new_instruments=0,new_samples=0,native_resources_retained=True)
 

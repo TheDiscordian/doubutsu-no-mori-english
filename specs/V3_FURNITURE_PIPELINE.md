@@ -49,7 +49,32 @@ this does not permit arbitrary unresolved calls.
 drawing functions. Both nested models, their shared vertices, both textures,
 the fixed palette, and the -157.5-degree draw rotation remain. Room music
 ownership, its constructor/destructor interactions, exclusive playback, and the
-36-source-tick note emitter are mandatory integration dependencies.
+36-source-tick note emitter are installed integration dependencies. Mode 12 uses
+the first/last words for the complete model and fixed palette, with zero skeleton,
+animation, joint, and shown fields. Every pointer is aligned and bounded by the
+complete object. The ordinary importer reuses the prepared object, reserves the
+append-only legacy identity, and installs the inactive profile and official name.
+
+`room_music.c` shares the original owner's 24-byte music state with native stereos.
+The all-off mask includes both music bits (`4008`); general song reservation does
+not call the native minidisk-item decoder. Checked loader entries replace music
+application and common disk destruction, including the source aerobics exception
+to positional playback. Rebuilds rebind the actual owner entries to the current
+bootstrap. Carrying/colour checks restore only these verified hooks before checking
+their original complete owner dependencies; arbitrary owner changes still reject.
+The original actor stride, heaps, and saved fields do not change.
+
+The complete source sequence/font/samples are compared with native audio. Only
+initial volume/mute-scale operands may use the native mix; changed channel or note
+data reject. The complete native effect 32 supplies all three note models and five
+colours. Its native growth/debug scaling is retained as a documented platform
+adaptation, not claimed to reproduce the donor particle trajectory exactly.
+
+The source indoor player-aerobics interaction remains required importing work.
+Room music alone cannot make this item eligible for selection. The eligibility
+guard retains that concrete missing behaviour; original acquisition remains a
+separate requirement. See the
+[radio checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#installed-radio-room-music-lifecycle).
 
 `dual-motion-scroll-rig-assets` retains both complete animation headers and all
 motion arrays, in addition to every skeleton joint and model. `motion_offsets`

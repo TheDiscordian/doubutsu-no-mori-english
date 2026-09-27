@@ -1,6 +1,9 @@
 /* Complete shared room rigs; each record retains its actual behaviour. */
 #include "room_rigs.h"
 #include "room_motion.h"
+#ifdef AF_V3_ROOM_MUSIC
+#include "room_music_native.h"
+#endif
 #ifdef AF_V3_ROOM_DUAL_MOTION
 #include "room_dual_motion.h"
 #endif
@@ -135,6 +138,16 @@ static const RoomRigRecord *find(u32 index) {
     for (u32 i=0;i<room_rig_table->count;++i) {
         const RoomRigRecord *r=room_rig_table->rows+i;
         if (r->index!=index) continue;
+#ifdef AF_V3_ROOM_MUSIC
+        if (r->mode==ROOM_RIG_RADIO) {
+            if (index<1024 || index>=2048 || r->bytes<32 || r->bytes>9216 || (r->bytes&15) ||
+                    r->skeleton || r->animation || r->joints || r->shown || r->reserved ||
+                    (r->first.bits&7) || (r->last.bits&7) ||
+                    r->first.bits<0x06000000u || r->first.bits>0x06000000u+r->bytes-8 ||
+                    r->last.bits<0x06000000u || r->last.bits>0x06000000u+r->bytes-32) return 0;
+            return r;
+        }
+#endif
 #ifdef AF_V3_SELECTED_PALETTE
         if (r->mode==ROOM_RIG_ROOF) {
             if (index<1024 || index>=2048 || r->bytes<800 || r->bytes>9216 || (r->bytes&15) ||
@@ -236,6 +249,9 @@ void af_v3_room_rig_ct(RoomRig *actor,u8 *data) {
 #ifdef AF_V3_SELECTED_PALETTE
     if (r->mode==ROOM_RIG_ROOF) { af_v3_roof_ct(actor,data);return; }
 #endif
+#ifdef AF_V3_ROOM_MUSIC
+    if (r->mode==ROOM_RIG_RADIO) { af_v3_room_radio_ct(actor);return; }
+#endif
 #ifdef AF_V3_ROOM_MATERIAL_RIG
     if (r->mode==ROOM_RIG_MATERIAL && !rig_material(r,data)) return;
 #endif
@@ -311,6 +327,12 @@ void af_v3_room_rig_mv(RoomRig *actor,void *room,RoomRigGame *game,u8 *data) {
     (void)room;(void)game;
     const RoomRigRecord *r=find(actor->index);
     if (!data || !r) return;
+#ifdef AF_V3_ROOM_MUSIC
+    if (r->mode==ROOM_RIG_RADIO) {
+        af_v3_room_music_native_move(actor,room);
+        af_v3_room_radio_notes(actor,game,AF_ROOM_RADIO_SOURCE_ITEM);return;
+    }
+#endif
 #ifdef AF_V3_ROOM_DUAL_MOTION
     if (r->mode==ROOM_RIG_DUAL) {
         RoomDualMotion motion;
@@ -461,6 +483,11 @@ void af_v3_room_rig_dw(RoomRig *actor,void *room,RoomRigGame *game,u8 *data) {
     if (!actor || !game || !game->gfx || !data) return;
     const RoomRigRecord *r=find(actor->index);
     if (!r) return;
+#ifdef AF_V3_ROOM_MUSIC
+    if (r->mode==ROOM_RIG_RADIO) {
+        af_v3_room_radio_draw(actor,game,r->first.bits,r->last.bits);return;
+    }
+#endif
 #ifdef AF_V3_ROOM_DUAL_MOTION
     if (r->mode==ROOM_RIG_DUAL) {
         RoomDualMotion motion;
@@ -531,10 +558,13 @@ void af_v3_room_rig_dw(RoomRig *actor,void *room,RoomRigGame *game,u8 *data) {
 #endif
 }
 
-#ifdef AF_V3_ROOM_REVERSIBLE
+#if defined(AF_V3_ROOM_REVERSIBLE) || defined(AF_V3_ROOM_MUSIC)
 void af_v3_room_rig_dt(RoomRig *actor,u8 *data) {
     if (!actor || !data) return;
     const RoomRigRecord *r=find(actor->index);
+#ifdef AF_V3_ROOM_MUSIC
+    if (r && r->mode==ROOM_RIG_RADIO) { af_v3_room_music_native_radio_dt(actor);return; }
+#endif
 #ifdef AF_V3_ROOM_DUAL_MOTION
     if (r && r->mode==ROOM_RIG_DUAL) {
         RoomDualMotion motion;
@@ -542,6 +572,8 @@ void af_v3_room_rig_dt(RoomRig *actor,u8 *data) {
         return;
     }
 #endif
+#ifdef AF_V3_ROOM_REVERSIBLE
     if (r && (r->mode==ROOM_RIG_REVERSIBLE || r->mode==ROOM_RIG_EFFECT || r->mode==ROOM_RIG_DUAL)) af_v3_room_reverse_dt(actor);
+#endif
 }
 #endif

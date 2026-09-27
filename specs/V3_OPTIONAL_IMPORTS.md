@@ -111,8 +111,11 @@ resources for the aerobics radio and treasure chest. The ordinary importer
 installs the chest's full scene/contact/motion/drawing lifecycle, both complete
 multi-instrument trigger programmes, continuous sound, destruction, and native
 saved-switch capture. Its actual island acquisition remains separate unfinished
-work, so the profile remains unavailable for selection. The radio's complete
-music-owner/emitter/drawing lifecycle remains importing work. Installed-resource
+work, so the profile remains unavailable for selection. The radio's
+music-owner/emitter/drawing lifecycle is installed through the ordinary importer,
+including original stereo interoperability and checked packet loading. Its source
+indoor player-aerobics interaction remains importing work; its original reward
+route remains acquisition work. Installed-resource
 and private composition checks do not claim native gameplay or hardware testing.
 
 The [combined rig importer](V3_FURNITURE_PIPELINE.md#reversible-material-and-particle-rigs)

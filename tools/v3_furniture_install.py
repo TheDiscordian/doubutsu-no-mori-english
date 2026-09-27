@@ -77,16 +77,19 @@ def profile(row, vrom, *, limit=END, model_capacity=9216):
     from v3_furniture_roofs import profile_lifecycle as roof_lifecycle
     from v3_furniture_joint_rigs import profile_lifecycle as joint_lifecycle
     from v3_furniture_composite import ROTATED_CATEGORY,DUAL_CATEGORY,dual_profile_lifecycle
+    from v3_room_music import lifecycle as music_lifecycle
+    radio=adapter.get('category')==ROTATED_CATEGORY
     if (adapter.get('category')==JOINT_CATEGORY and not joint_lifecycle(
             row['profile'],row.get('room_lifecycle'),row.get('room_placement')) or
             roof and not roof_lifecycle(row['profile'],row.get('room_lifecycle')) or
             adapter.get('category')==DUAL_CATEGORY and not dual_profile_lifecycle(row['profile'],row.get('room_lifecycle'),row.get('room_placement')) or
-            adapter.get('category') in (FIXED_CATEGORY,PENDING_MOVE_CATEGORY,PENDING_SEQUENCE_CATEGORY,ROTATED_CATEGORY) or scrolling and
+            radio and row.get('room_lifecycle')!=music_lifecycle(row['profile']) or
+            adapter.get('category') in (FIXED_CATEGORY,PENDING_MOVE_CATEGORY,PENDING_SEQUENCE_CATEGORY) or scrolling and
             (not profile_lifecycle(row['profile'],row.get('room_lifecycle'),row.get('room_placement')) or
              row.get('room_runtime')!={'vtable':SCROLL_VTABLE,'vrom':vrom})):
         raise ValueError('Prepared resources have no implemented native lifecycle')
     rigged = adapter.get('category') in RIG_CATEGORIES
-    layers = tuple(offsets) if rigged else tuple(adapter['model_order']) if fading or sequence or material or scrolling or roof else LAYERS
+    layers = tuple(offsets) if rigged else tuple(adapter['model_order']) if fading or sequence or material or scrolling or roof or radio else LAYERS
     if (model_capacity not in (9216,12288) or limit not in (END,capacity.LIMIT) or not 0 < n <= model_capacity or n%16 or vrom%16 or vrom+n > limit or len(scalar) != 16
             or not offsets or set(offsets)-set(layers) or (fading or sequence) and set(offsets)!=set(layers)
             or any(type(at) is not int or at%8 or not 0 <= at <= n-8 for at in offsets.values())):
@@ -124,13 +127,13 @@ def profile(row, vrom, *, limit=END, model_capacity=9216):
     if scrolling:
         if set(offsets)!=set(layers):raise ValueError('Scrolling profile needs every source model')
         pointers=[0,0,0,0]
-    if roof:
+    if roof or radio:
         from v3_room_rig_runtime import VTABLE
         if row.get('room_runtime')!={'vtable':VTABLE,'vrom':vrom} or set(offsets)!=set(layers):
             raise ValueError('Selected roof profile requires its complete installed native lifecycle')
         pointers=[0,0,0,0]
     return (struct.pack('>12I', vrom, vrom+n, 0x06000000, 0x06000000+n, *pointers, 0,0,0,0)+scalar+
-            struct.pack('>I',VTABLE if rigged or roof else SOUND_VTABLE if sound or static else MATERIAL_VTABLE if material else
+            struct.pack('>I',VTABLE if rigged or roof or radio else SOUND_VTABLE if sound or static else MATERIAL_VTABLE if material else
                         SCROLL_VTABLE if scrolling else palette_fade.VTABLE if fading else 0))
 
 
@@ -724,6 +727,9 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
     elif held_selection:
         import v3_held_catalogue as equipment
         equipment_report,owner_changes,report_updates=equipment.select_installed(prior,blob)
+    if equipment_report and equipment_report.get('room_rigs',{}).get('music'):
+        from v3_room_music import publish_owner
+        publish_owner(base,prior,equipment_report,owner_changes)
     if equipment_report:
         if held_catalogue_art is not None or wrapped_names:
             display_report,alias_report=display_aliases.install(

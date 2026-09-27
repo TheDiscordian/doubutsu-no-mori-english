@@ -21,16 +21,29 @@ prevent asset/data conversion or redirect work from an unfinished shared format.
 Incomplete gameplay stays unavailable in the selector; installing assets does
 not claim that an item is playable. Reuse unchanged passing tests throughout.
 
-Current task: finish the prepared radio's complete room-music ownership,
-constructor/destructor interactions, exclusive playback, note emission, and rotated
-drawing; then continue console launch/storage. Reuse the ordinary category importer
-and complete prepared assets. Do not add per-item installers or omit unique behaviour.
-The [radio binding checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#radio-room-music-binding)
-identifies actual native state/functions and the important differences: native
-reservation accepts minidisk item IDs, all-off excludes the radio interaction bit,
-and music application lacks the donor's aerobics positional-playback exception.
-Connect these shared paths, including checked packet loading and relocated owner
-access, rather than starting a separate music player.
+Current task: finish the radio's indoor player-aerobics interaction, then continue
+console launch/storage. Indoor exercise is importing behaviour, not its later
+reward/acquisition route. Use the existing player-motion/action machinery and
+ordinary category importer; do not omit the interaction or add per-item installers.
+The actual source entry is `Player_actor_Check_InBlockRadioExercise` in
+`local/ac-decomp/src/game/m_player_common.c_inc`, followed by command buffering,
+recognition, and action requests. Inspect the complete command/action/motion
+dependencies and native counterparts before claiming this is only an eligibility
+change. No direct calls to event checks, shrine lookup, or current-BGM lookup occur
+in the current native player's complete `2AF00`-byte text section; a matching
+native exercise implementation is not established.
+
+Room music ownership, radio/stereo exclusive playback, native common destruction,
+constructor reset, source-rate notes, and rotated drawing are installed in ABI 273
+at `build/v3-room-music-imports-04/profile-runtime/build-lock.json`, ROM SHA-256
+`170adf7a335f7aa3a246d20d3f229089932841346758d7cc8c96437c26f0c417`.
+Five focused checks pass, including 289 actual-donor comparisons and four private
+browser/offline compositions. All 5,152 artwork bytes are reused; the native song
+and complete four-instrument font/samples are verified. Keep the option inactive
+until indoor exercise and actual acquisition work. The native note effect retains
+its native growth/debug scaling; exact donor particle integration is not claimed.
+See the [installed radio checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#installed-radio-room-music-lifecycle).
+Do not repeat the passing music checks without a relevant code/resource change.
 
 The chest's complete native lifecycle is installed: both motions, all three scroll
 layers, distinct mapped sounds, actual room/contact readers, destruction, and saved
@@ -62,18 +75,18 @@ destruction dispatch. See the
 [reversible checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#installed-reversible-lifecycle-and-save-capture).
 
 Continue the remaining actual lifecycle and console launch/storage categories
-without per-item installers. Radio resources are converted; its native behaviour
-integration is unfinished. Reuse complete resources and shared runtime categories.
+without per-item installers. Radio room behaviour is installed; its indoor player
+exercise remains unfinished. Reuse complete resources and shared runtime categories.
 
-The checked current proposal is ABI 271 at
-`build/v3-dual-motion-imports-01/profile-runtime/build-lock.json`, ROM SHA-256
-`a93384de48092aa3180f484602bc4fb57b0e0037635dbec6c8a4fc03025343e3`.
+The checked current proposal is ABI 273 at
+`build/v3-room-music-imports-04/profile-runtime/build-lock.json`, ROM SHA-256
+`170adf7a335f7aa3a246d20d3f229089932841346758d7cc8c96437c26f0c417`.
 The combined skeleton/material category imports the complete hamster cage,
 including source movement/texture timing, positioned sound, actual lottery
 availability, catalogue ordering, scoring, and official English text. Five focused
 checks pass; native execution, ordinary appearance/synthesis, and hardware remain
 unverified. There are 162 enabled development choices and no saved-format change.
-Shared room code uses 25,824 of 32,768 bytes; bootstrap uses 1,142 of 1,536.
+Shared room code uses 27,856 of 32,768 bytes; bootstrap uses 1,182 of 1,536.
 See the [combined-animation checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#installed-combined-skeleton-and-material-animation).
 
 The harvest TV's complete switched-screen lifecycle is installed through the

@@ -1201,9 +1201,11 @@ def metadata(source, item, profile, identity):
     from v3_furniture_materials import CATEGORY as MATERIAL_CATEGORY
     from v3_furniture_scroll import CATEGORY as SCROLL_CATEGORY
     binding=getattr(source,'runtime_profiles',{}).get(f'{item:04X}')
-    from v3_furniture_composite import PENDING_CATEGORIES
+    from v3_furniture_composite import PENDING_CATEGORIES,ROTATED_CATEGORY
     if profile.get('callback_adapter',{}).get('category') in PENDING_CATEGORIES and not binding:
         raise ReviewRequired('Complete composite resources are prepared; '+', '.join(profile['callback_adapter']['pending_callbacks'])+' remain uninstalled')
+    if profile.get('callback_adapter',{}).get('category')==ROTATED_CATEGORY and not binding.get('indoor_aerobics_installed'):
+        raise ReviewRequired('Radio room music is installed; the source indoor player-aerobics interaction remains uninstalled')
     if profile.get('callback_adapter',{}).get('category')==SELECTED_PALETTE_CATEGORY and not binding:
         raise ReviewRequired('Complete roof palettes and models are prepared; native house-colour selection/lifecycle remains uninstalled')
     if profile.get('callback_adapter',{}).get('category')==SCROLL_CATEGORY and not binding:
@@ -1421,8 +1423,8 @@ def rig_import_plan(inventory, report, bindings, selected=(), category=None, *, 
     from v3_furniture_reactions import source_lifecycle as reaction_lifecycle,colour_lifecycle
     from v3_sound_programs import furniture_trigger,furniture_level
     from v3_furniture_joint_rigs import CATEGORY as JOINT_CATEGORY,lifecycle as joint_lifecycle
-    from v3_furniture_composite import DUAL_CATEGORY
-    categories={CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY,ROLLING_CATEGORY,MATERIAL_RIG_CATEGORY,REVERSIBLE_CATEGORY,EFFECT_RIG_CATEGORY,SELECTED_PALETTE_CATEGORY,DUAL_CATEGORY}
+    from v3_furniture_composite import DUAL_CATEGORY,ROTATED_CATEGORY
+    categories={CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY,ROLLING_CATEGORY,MATERIAL_RIG_CATEGORY,REVERSIBLE_CATEGORY,EFFECT_RIG_CATEGORY,SELECTED_PALETTE_CATEGORY,DUAL_CATEGORY,ROTATED_CATEGORY}
     candidates=[r for r in inventory['rows'] if r.get('asset_ready') and not r['installed'] and
         not r.get('room_alias') and (not selected or r['item_id'] in selected) and
         (category is None or category in r['categories'])]

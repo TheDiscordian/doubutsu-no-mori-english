@@ -63,6 +63,15 @@ void af_v3_room_boot_mv(RoomRig *actor,void *room,RoomRigGame *game,u8 *data) {
 void af_v3_room_boot_dw(RoomRig *actor,void *room,RoomRigGame *game,u8 *data) {
     call4(actor,room,game,data,(RoomEntry4)AF_ROOM_DW,load);
 }
+#ifdef AF_ROOM_MUSIC_APPLY
+/* These entries also serve original stereos before any imported draw callback. */
+void af_v3_room_boot_music_apply(RoomRig *owner,u8 *actor) {
+    call2(owner,actor,(RoomEntry2)AF_ROOM_MUSIC_APPLY,load);
+}
+void af_v3_room_boot_music_disk_dt(RoomRig *actor,u8 *owner) {
+    call2(actor,owner,(RoomEntry2)AF_ROOM_MUSIC_DISK_DT,load);
+}
+#endif
 #ifdef AF_ROOM_SOUND_MV
 void af_v3_room_boot_sound_mv(void *actor,void *room,RoomRigGame *game,u8 *data) {
     call4(actor,room,game,data,(RoomEntry4)AF_ROOM_SOUND_MV,load);
