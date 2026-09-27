@@ -1532,6 +1532,8 @@ def rig_import_plan(inventory, report, bindings, selected=(), category=None, *, 
         plan['creature_parents']=[f'{item:04X}' for item in sorted(CREATURE_DISPLAYS)]
     if any(r['profile'].get('creature_parent') for r in candidates) and not report['equipment_resources'].get('creature_field'):
         plan['creature_field']=True
+    if any(r['profile'].get('creature_parent') for r in candidates) and not report['equipment_resources'].get('creature_fish'):
+        plan['creature_fish']=True
     if any(r['profile']['callback_adapter']['category']==ROTATED_CATEGORY for r in rows):
         exercise=report['equipment_resources'].get('player_motion',{}).get('exercise')
         if not exercise or not exercise.get('action_installed'):
@@ -1649,6 +1651,8 @@ def import_batch(source, worksheet, output, lock, selected=(), category=None, re
         else:
             field_assets=output/'creature-field-assets';convert_field(source,field_assets)
         refresh('creature-field-runtime',creature_field=field_assets)
+    if plan.get('creature_fish'):
+        refresh('creature-fish-runtime',creature_fish=True)
     for stage in plan.get('player_exercise',[]):
         # Follow complete room/music publication, even when artwork is present.
         refresh('player-exercise-'+stage,player_actions=True)

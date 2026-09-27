@@ -2,8 +2,8 @@
 
 ## Current output
 
-ABI 295 is installed at `build/v3-creature-field-runtime-02/build-lock.json`.
-ROM SHA-256: `08da8e1c0fe1552a4a83890bfc8eb837ca2b5835314bb9fe36c027cc018cad20`.
+ABI 296 is installed at `build/v3-creature-fish-runtime-02/build-lock.json`.
+ROM SHA-256: `58e5af9f8c96ab9e8db1dbdd15f9cbf41239aa912bd584c12c18a3a95fe27183`.
 The shared field stage connects all seventeen frame objects, fish capture/release
 identities and parameters, source insect poses, and bounded XXL release shadows.
 It retains native actor/buffer allocations, original fish/insect identities,
@@ -12,20 +12,28 @@ only added models use external physical ROM storage. Neither saved format nor
 selectable-import count changes. See the
 [native field contract](../../specs/V3_CREATURE_ITEMS.md#connected-native-field-stage).
 
-Two focused tests pass in 7.716 seconds, covering sanitized loading/transforms/
-startup, complete installed resources and relocations, shared planning, UPS,
-and all/empty composition. The two silent native attempts at
-`build/v3-creature-field-native-01/` and `build/v3-creature-field-native-02/`
-verify the complete startup packet but reject the fixture's direct resident-code
-call before model transfers. Alignment and the debugger's ordinary-RAM proof
-bound explain those setup failures. The revised fixture enters through real
-relocated native actors; no third attempt is made in this batch. Native
-transfers, capture/release execution, GPU output, and hardware remain unverified.
-The separate earlier scheduler disconnect remains unclassified.
+The fish world stage retains that packet and artwork while adding 1,500 code
+bytes and 428 table bytes in reserved padding. All nine imported fish connect to
+species readers, full river size arrays, coastal approach/nibble/bite parameters,
+effects, and release creation. The source-sized coastal path retains original
+fish values; a constructor-set origin byte survives substitution with rubbish.
+Real rubbish IDs cannot collide with new carried fish at the release constructor.
+The ordinary category planner installs this shared stage once, with no new
+allocation, saved layout, standalone item option, or model compilation.
 
-All seventeen creatures remain inactive pending field behaviours/spawning,
-pocket icons, and collection/profile persistence. This is an installed connected
-field/carry integration stage, not seventeen completed playable imports.
+Focused host checks cover sanitized position/approach readers, native fallback
+values, source arrays, all changed owner relocations, golden-rod retention, UPS,
+planning, and all/empty composition. Native evidence in
+`build/v3-creature-fish-native-02/` verifies the complete startup packet, relocated
+fish owner/BSS, and all nine fish model transfers and segment bases. The first
+constructor-window case times out; the cause remains unresolved. Later insect,
+capture/release, and coastal reader cases do not execute. Ordinary gameplay,
+GPU output, and hardware are unverified. Do not replay the exhausted fixture.
+The separate scheduler disconnect also remains unclassified.
+
+All seventeen creatures remain inactive pending source coastal patrol/shoreline
+alternatives, insect behaviours, spawning, pocket icons, and collection/profile
+persistence. Parameter and model integration is not a completed playable import.
 
 The complete field/carry artwork is prepared in
 `build/v3-creature-field-prepared-01/art.json`: seventeen objects, 59 frame
@@ -50,7 +58,7 @@ and `1CE8..1D04`, at four-ID intervals. Source placement and pickup functions
 resolve their actual carried parents. This is not a claim of seventeen new
 native species: the brook-trout source slot must not replace native herabuna.
 
-ABI 294 is the current cartridge at
+The retained parent/room layer is recorded in ABI 294 at
 `build/v3-creature-parent-imports-01/creature-parent-runtime/build-lock.json`, ROM SHA-256
 `9367925b6c4354fa3504d57256ca6977d33584baf240aaf87672ff9dd10a523f`.
 The shared importer installs all sixteen animated objects, reusing 74,672 bytes

@@ -28,9 +28,9 @@ Implement the actual alternatives and bind selections to the build receipt;
 the controls and runtime selection remain pending, not completed by this policy.
 
 Current task: finish remaining genuine importing categories and representation
-mappings, using the shared converter and the current ABI-295 proposal:
-`build/v3-creature-field-runtime-02/build-lock.json`.
-ROM SHA-256: `08da8e1c0fe1552a4a83890bfc8eb837ca2b5835314bb9fe36c027cc018cad20`.
+mappings, using the shared converter and the current ABI-296 proposal:
+`build/v3-creature-fish-runtime-02/build-lock.json`.
+ROM SHA-256: `58e5af9f8c96ab9e8db1dbdd15f9cbf41239aa912bd584c12c18a3a95fe27183`.
 The dresser cancellation correction is installed in V2 and V3; empty import
 selection returns stable V2-14. Continue the importing work without replaying
 unchanged dresser or museum checks.
@@ -62,10 +62,18 @@ Next importing work:
   intact; XXL release shadows have bounded entries. Reuse these consumers and
   the cache at `build/v3-creature-field-prepared-01/`, not a new loader or capacity
   investigation. Two focused host tests cover resources, relocation, transforms,
-  startup, planning, and optional composition. Native startup is verified, but
-  direct-call fixture bounds stop the execution check before transfers. The
-  fixture uses native actor entries for the next changed-path check; do not
-  perform a third setup attempt in this batch or claim those transfers passed.
+  startup, planning, and optional composition. Native startup and all nine fish
+  model transfers/segment bases pass through the real loader. The constructor
+  register window times out; game-versus-fixture cause remains unresolved, and
+  later cases do not execute. Preserve the evidence at
+  `build/v3-creature-fish-native-02/`; do not replay that exhausted fixture.
+  The installed fish world adapter already extends both species tables and all
+  river size readers, supplies source coastal approach/nibble/bite effects and
+  geometry, and separates rubbish from imported IDs at release creation.
+  Reuse it and its origin marker instead of another parameter-table stage.
+  Finish the source coastal patrol/shoreline path with its substantial behaviour
+  choice, the new insect behaviour programs, and shared season/time/environment
+  spawn readers. Then connect pocket icons and collection/profile persistence.
   The common converter already retains all 17 displays, 96 joints, full motion
   arrays, and complete source sound callbacks in
   `build/v3-creature-profiles-prepared-01/`. All seventeen complete room profiles,

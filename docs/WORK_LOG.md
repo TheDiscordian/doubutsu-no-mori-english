@@ -1,5 +1,54 @@
 # Work record
 
+## 2026-09-27: shared fish approach, bite, effects, and release identities
+
+- The intervening acknowledgement of behaviour choices is no progress by itself.
+  Resumed implementation against the clean ABI-295 worktree and advanced the
+  complete nine-fish category, rather than preparing per-species installers.
+- Installed both field species tables, complete river size readers including
+  XXL effects, and source-sized coastal approach/nibble/bite parameters and
+  geometry. Coastal bridges retain original fish values, and an unused transient
+  actor byte tracks imported origin through rubbish substitution. The constructor
+  selects the coastal owner for the four added sea species.
+- Corrected the unfinished release path's actor/carried-ID collision: native
+  rubbish indices map to actual rubbish items, not the additive fish IDs.
+  Both field creation calls and the release constructor use the matching mapping.
+  Herabuna, coastal salmon, native fish values, and golden-rod hooks are retained.
+- The existing field packet provides all space: 1,500 compiled code bytes and
+  428 table bytes, with no new resource allocation, actor growth, or save change.
+  River/coastal donor arrays are compared in full; callback receipts identify
+  the source consumers and switches. The common category planner installs the
+  stage once and reuses all prepared graphics.
+- Current ABI 296 is `build/v3-creature-fish-runtime-02/build-lock.json`.
+  ROM SHA-256: `58e5af9f8c96ab9e8db1dbdd15f9cbf41239aa912bd584c12c18a3a95fe27183`.
+  UPS SHA-256: `50ca5884a16010fa221d3a07f59896cb6edf680bb837cd49994d043d2f03d063`.
+  The `-01` build has the same ROM/patch; `-02` additionally binds both donor
+  parameter sets and callback receipts. No native replay of identical output is
+  performed for that metadata change.
+- Two focused tests pass in 6.786 seconds. They cover sanitized approach/position
+  execution, native fallback values and bounds, source arrays, complete owner
+  preservation and relocation changes, retained golden-rod hooks, UPS, shared
+  planning, and all/empty optional composition. No historic suite replay occurs.
+- Bounded silent native checking: attempt `build/v3-creature-fish-native-01/`
+  stops before actor loading because the fixture rejects the original fish BSS
+  loop's one-past-end relocation constant. The exact sentinel is admitted after
+  checking all seven owners; no broad address guard is relaxed. The one retry at
+  `build/v3-creature-fish-native-02/` passes twenty assertions: startup packet,
+  complete relocated fish owner/BSS, and all nine actual field-model transfers
+  and segment bases. The first constructor register window then times out, and
+  cleanup cannot restore the required paused frame. Its cause is unresolved,
+  not asserted to be a fixture defect or a successful constructor test. Later
+  insect/capture/release/coastal checks do not execute. The fixture now records
+  window entry details for the next relevant changed-path check; no third attempt
+  is made in this batch. No physical audio, FlashRAM write, or hardware test occurs.
+- This does not complete creature world behaviour: source coastal patrol/shoreline
+  alternatives, insect programs, spawning, icons, and collection/profile readers
+  remain required. Substantial coastal differences need the requested actual
+  N64/GameCube choice, not an implicit native fallback or a decorative toggle.
+  All seventeen creatures remain inactive. The main build lock, 167 selectable
+  development choices, stable V2-14 deployments, existing saves, and old builds
+  are retained. Format-five V3 remains incompatible with V2 and older V3 formats.
+
 ## 2026-09-27: connected creature field loading, capture, and release tables
 
 - The preceding turn is progress: `7756992` records the user's requirement for

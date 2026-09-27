@@ -161,13 +161,55 @@ category planning, UPS reconstruction, and all/empty composition. Sanitized C
 covers all seventeen transfers, native fallbacks, CRC/I/O/bounds failures, the
 nine-packet startup chain, and original/added insect transforms.
 
-The silent native attempts verify the complete startup-loaded packet but stop
-before model transfers because the test helper rejects direct calls outside
-ordinary RAM. The fixture enters through the actual relocated native consumers
-for the next relevant combined check; it is not rerun after the batch's setup
-retry limit. Native transfers, capture/release execution, and GPU rendering are
-not claimed as passed. This classified fixture failure does not classify the
-separate scheduler disconnect. Ordinary gameplay and hardware remain unverified.
+Native execution verifies the complete startup-loaded packet, relocated fish
+owner/BSS, and all nine added fish transfers and segment bases. The constructor
+register window times out before later assertions. Its cause remains unresolved;
+this result does not establish native insect transfers, capture/release execution,
+ordinary gameplay, or GPU rendering. Retain the test limits and the independent
+unclassified scheduler disconnect. Hardware remains unverified.
+
+### Shared fish world readers
+
+`tools/v3_creature_fish.py` installs both complete field parameter tables and
+source-sized river/coastal readers as one category stage. Native owner dimensions
+and all original golden-rod hooks remain intact. Every native river size array
+gets the donor XXL entry; existing effect switches map XXL to their largest
+defined effect, which matches the source's XXL splash/ripple values.
+
+Added coastal fish use source approach/nibble speeds, touch distances/counts,
+backing speeds, shadow scales, bobber offsets, rubbish classes, splash radii,
+and splash/ripple arguments. Full river and coastal donor arrays must agree
+before shared values are installed. Complete donor callback receipts bind the
+two source switches and the consumers. Native timers retain the N64 30-Hz units.
+
+The fish constructor writes an imported-origin marker in unused transient
+padding at `1DA`, immediately after the size halfword at `1D8`. Checked native
+owners must leave that byte unused. The marker survives a fish's substitution
+with rubbish, so its original size-dependent behaviour remains available.
+Original fish retain native coastal values; source-sized parameters do not
+silently rebalance them. This is not the complete source coastal patrol/shoreline
+port. That substantial shared behaviour difference still requires both runtime
+alternatives and the explicit WebUI choice, not a nonfunctional toggle.
+
+Both native fish-to-release actor creation calls translate actor indices through
+the installed capture-identity table. Original rubbish slots `32..34` become
+their real carried IDs `250E..2510`, while added fish `36..44` become `2320..2328`.
+The release constructor reverses those identities without confusing a can with
+a crawfish. Coastal salmon and native herabuna retain their original identities.
+
+The 1,500-byte code occupies `80647400..806479DB`, inside the field packet's
+reserved code padding. The 428-byte table region begins at `80649400`. No new
+resident packet, scene allocation, DMA entry, model resource, or saved field is
+introduced. Native data pointers retained inside rewritten constructor code keep
+their relocations; references to resident tables and hooks do not.
+
+`tests/test_v3_creature_fish.py` covers sanitized position/approach execution,
+all native fallbacks and size bounds, source table bindings, complete owner
+changes and relocation removal/retention, unchanged golden-rod hooks, category
+planning, UPS reconstruction, and optional all/empty composition. Assembly-hook
+execution is not inferred from those host checks. The native constructor timeout
+remains unresolved, and creature selection stays disabled until the remaining
+world, icon, and collection readers are complete.
 
 ### Native integration constraints
 

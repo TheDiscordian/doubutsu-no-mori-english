@@ -4528,12 +4528,35 @@ def creature_field(debug,rom_path,record):
             allocation+size-16,TEST_STACK-0x800,TEST_STACK+0x40)
     for at in guards:debug.write_memory(at,edge)
     saved=report['save_runtime'];saved_bytes=debug.read_memory(saved['state_ram'],saved['state_bytes'])
+    def window(first,last,registers):
+        """Execute the installed native instruction window, restoring registers."""
+        record(dict(creature_field_window_start=f'{first:08X}',end=f'{last:08X}',registers=registers))
+        before=debug.command('g');regs=[int(before[i:i+16],16) for i in range(0,len(before),16)]
+        if len(regs)!=71 or regs[37]&0xFFFFFFFF!=0x800D334C:
+            raise ValueError('Fish window requires a paused native frame')
+        regs[29]=extend(TEST_STACK);regs[37]=extend(first)
+        for index,value in registers.items():regs[index]=extend(value)
+        breakpoint=f'0,{last:x},4'
+        if debug.command('Z'+breakpoint)!='OK':raise ValueError('Fish window breakpoint rejected')
+        try:
+            if debug.command('G'+''.join(f'{value:016x}' for value in regs))!='OK':
+                raise ValueError('Fish window register setup rejected')
+            stop=debug.command('c');observed=debug.command('g')
+            values=[int(observed[i:i+16],16) for i in range(0,len(observed),16)]
+            if stop[:3] not in ('T05','S05') or values[37]&0xFFFFFFFF!=last:
+                raise ValueError('Fish window did not reach its native continuation')
+            return values
+        finally:
+            debug.command('z'+breakpoint);debug.command('G'+before)
     try:
         pool=r['pool'];physical=image[pool['physical']:pool['physical']+pool['bytes']]
-        for owner in r['owners']:
+        world=report['equipment_resources'].get('creature_fish')
+        owners=r['owners']+([o for o in world['owners'] if o['name'] in ('river','sea')] if world else [])
+        for owner in owners:
             data=files[owner['vrom']].extract(image);reloc=files[owner['reloc']].extract(image)
             sections=struct.unpack_from('>5I',reloc);resident=sum(sections[:4]);ram=owner['ram']
-            expected=relocate_verified_data(SimpleNamespace(ram=ram,resident_bytes=resident,sections=sections),data,reloc,root)
+            expected=relocate_verified_data(SimpleNamespace(ram=ram,resident_bytes=resident,sections=sections),data,reloc,root,
+                address_constants=(ram+resident,) if owner['name']=='fish' else ())
             call(0x800262D0,[owner['vrom'],owner['vrom']+len(data),ram,ram+resident,root,root+resident,len(reloc)])
             check('complete relocated '+owner['name']+' actor and BSS',root,expected)
             # Enter through the real relocated consumers. The debugger's direct
@@ -4558,7 +4581,8 @@ def creature_field(debug,rom_path,record):
                     if value!=want:raise ValueError('Native fish capture identity mismatch')
             if owner['name']=='release':
                 start=root+0x80A7A934-ram;end=root+0x80A7A93C-ram
-                for item,want in ((0x2301,1),(0x231F,31),(0x2320,36),(0x2328,44)):
+                for item,want in ((0x2301,1),(0x231F,31),(0x2320,36),(0x2328,44),
+                                  *((((0x250E,32),(0x250F,33),(0x2510,34))) if world else ())):
                     before=debug.command('g');regs=[int(before[i:i+16],16) for i in range(0,len(before),16)]
                     if len(regs)!=71 or regs[37]&0xFFFFFFFF!=0x800D334C:
                         raise ValueError('Release bridge requires a paused native frame')
@@ -4574,6 +4598,39 @@ def creature_field(debug,rom_path,record):
                         check('native release identity '+hex(item),actor+0x178,struct.pack('>I',want))
                     finally:
                         debug.command('z'+breakpoint);debug.command('G'+before)
+            if world and owner['name']=='fish':
+                for index,sea in ((1,False),(22,False),(31,True),(35,True),(36,False),
+                                  (39,True),(40,True),(41,True),(42,True),(43,False),(44,False)):
+                    debug.write_memory(actor+0x1D4,struct.pack('>I',index))
+                    result=window(root+0x80A5B72C-ram,root+0x80A5B76C-ram,{16:actor})
+                    want=root+(0x80A5C8D0 if sea else 0x80A5C8BC)-ram
+                    if result[2]&0xFFFFFFFF!=want:raise ValueError('Fish behaviour descriptor not correctly relocated')
+                    check('native fish behaviour/origin '+str(index),actor+0x1DA,bytes([int(index>=36)]))
+                    check('coastal salmon retained '+str(index),actor+0x1D4,struct.pack('>I',22 if index==35 else index))
+            if world and owner['name']=='sea':
+                from v3_creature_fish import TABLE
+                arrays=packet[TABLE:TABLE+384]
+                for index,size,origin in ((22,4,0),(31,5,0),(39,1,1),(40,4,1),(34,5,1),(43,6,1)):
+                    debug.write_memory(actor+0x1D4,struct.pack('>IHB',index,size,origin))
+                    debug.write_memory(actor+0x23C,struct.pack('>H',0x400))
+                    call(root+0x80A9AADC-ram,[actor],proof)
+                    speed=arrays[size*4:size*4+4] if origin else struct.pack('>f',2 if index==31 else 1.25)
+                    check('native fish approach speed '+str(index),actor+0x74,speed)
+                    check('native fish approach flags '+str(index),actor+0x23C,struct.pack('>H',0x402))
+                    check('native fish approach vertical limit '+str(index),actor+0x7C,struct.pack('>f',12))
+                    debug.write_memory(actor+0x28,struct.pack('>3f',100,200,300));debug.write_memory(actor+0x36,b'\0\0')
+                    call(root+0x80A99680-ram,[actor],proof)
+                    correction=struct.unpack_from('>f',arrays,192+size*4)[0] if origin else -20
+                    check('native fish bobber correction '+str(index),actor+0x28,struct.pack('>3f',100,200,300+correction))
+                    if index!=31:
+                        window(root+0x80A9A2D0-ram,root+0x80A9A2E8-ram,{16:actor})
+                        check('native nibble speed '+str(index),actor+0x74,speed)
+                        distance=arrays[96+size*4:100+size*4] if origin else struct.pack('>f',15)
+                        check('native nibble distance '+str(index),TEST_STACK+0x30,distance)
+                debug.write_memory(actor+0x1D4,struct.pack('>IHB',39,1,1))
+                result=window(root+0x80A9A3A0-ram,root+0x80A9A3C0-ram,{16:actor})
+                check('source small-fish rubbish class',actor+0x1D4,struct.pack('>I',32))
+                check('rubbish retains imported origin',actor+0x1DA,b'\1')
         for at in guards:check('allocation/stack guard',at,edge)
         check('retained save state',saved['state_ram'],saved_bytes)
         check('retained field packet',RAM,packet)

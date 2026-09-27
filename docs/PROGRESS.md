@@ -31,9 +31,9 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
-The current proposal is ABI 295 at
-`build/v3-creature-field-runtime-02/build-lock.json`, ROM SHA-256
-`08da8e1c0fe1552a4a83890bfc8eb837ca2b5835314bb9fe36c027cc018cad20`.
+The current proposal is ABI 296 at
+`build/v3-creature-fish-runtime-02/build-lock.json`, ROM SHA-256
+`58e5af9f8c96ab9e8db1dbdd15f9cbf41239aa912bd584c12c18a3a95fe27183`.
 It contains 167 selectable development imports and 100 complete inactive furniture
 profiles whose acquisition is pending. The main lock and both stable V2-14
 deployments are retained.
@@ -108,10 +108,26 @@ source held/world poses, and release shadows include safe XXL entries. The
 [creature contract](../specs/V3_CREATURE_ITEMS.md#connected-native-field-stage)
 owns layout and verification details. Two focused tests pass, including sanitized
 loading/transforms/startup, all resources/relocations, shared planning, UPS, and
-all/empty composition. The native attempts verify startup but hit a classified
-fixture address restriction before transfers; execution/GPU claims remain open.
-Do not rerun that setup in this batch. Continue field behaviours, spawning,
-pocket icons, and collection/profile readers without reconverting assets.
+all/empty composition. Native execution verifies all nine added fish transfers
+and segment bases through the actual field loader. The constructor-window check
+times out; its cause is unresolved, and later checks do not execute. Insect
+transfers, ordinary gameplay, and GPU rendering remain unverified.
+
+The shared fish world stage connects all nine size/search/bite records to the
+river and coastal owners, including XXL river parameters/effects. Added coastal
+fish have donor-sized approach/nibble speed, distance, wait count, backing speed,
+shadow scale, bobber correction, rubbish selection, and splash/ripple parameters.
+Constructor dispatch selects the coastal owner for the added sea species.
+Capture-to-release creation maps real carried IDs, keeping rubbish separate from
+the added fish. Original fish values and golden-rod hooks are retained. A transient
+origin byte retains imported behaviour if a hooked fish becomes rubbish.
+The code and tables occupy existing field-packet padding: no new ROM resource,
+resident allocation, actor growth, or save change. Two focused host tests cover
+the readers, source arrays, relocation, preservation, planning, and optional
+composition. The constructor timeout is not classified as a game or harness bug;
+do not loop on the exhausted native fixture or claim the new hooks passed it.
+Coastal patrol/shoreline alternatives, insect behaviours, spawning, pocket icons,
+and collection/profile readers remain required before creature selection.
 
 Continue with creature parent/native integration and the remaining legacy
 clothing, custom-design, and fossil representations, not resource reconversion
