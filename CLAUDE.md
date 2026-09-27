@@ -121,6 +121,11 @@ the experimental V3 publication hold does not apply to V2 fixes.
   readiness and keep incomplete gameplay out of selectable imports. Extend a
   shared category once for all matching records. Reuse passing tests for
   unchanged components.
+- Substantial N64/GameCube behaviour differences are explicit WebUI choices,
+  not silent decisions to keep one version. Follow the behaviour-choice contract
+  in `specs/V3_OPTIONAL_IMPORTS.md`; share a setting across the affected mechanic
+  where appropriate, and implement both behaviours rather than offering a
+  cosmetic toggle or treating an unfinished port as a completed alternative.
 - After general importing pipelines and bulk asset/data installation are complete,
   finish gold-tree leaf/cut effects and
   the full golden-shovel acquisition route. These remain required V3 work;

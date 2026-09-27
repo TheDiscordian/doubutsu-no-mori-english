@@ -21,6 +21,12 @@ prevent asset/data conversion or redirect work from an unfinished shared format.
 Incomplete gameplay stays unavailable in the selector; installing assets does
 not claim that an item is playable. Reuse unchanged passing tests throughout.
 
+Carry substantial N64/GameCube behaviour differences through the shared import
+path as explicit WebUI choices, following the
+[behaviour-choice contract](../specs/V3_OPTIONAL_IMPORTS.md#n64-and-gamecube-behaviour-choices).
+Implement the actual alternatives and bind selections to the build receipt;
+the controls and runtime selection remain pending, not completed by this policy.
+
 Current task: finish remaining genuine importing categories and representation
 mappings, using the shared converter and the current ABI-294 proposal:
 `build/v3-creature-parent-imports-01/creature-parent-runtime/build-lock.json`.

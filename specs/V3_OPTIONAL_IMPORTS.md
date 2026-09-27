@@ -28,6 +28,31 @@ resources before enabling their options. Do not download game images. The
 currently supplied English disc is enough to begin the main implementation.
 An e/e+ input requirement must not stop unrelated English-donor work.
 
+## N64 and GameCube behaviour choices
+
+When a substantial player-facing difference would otherwise require choosing
+N64 behaviour over GameCube behaviour, expose an explicit **N64 / GameCube**
+choice in the V3 WebUI. Describe the actual difference in outcomes, interactions,
+or timing. Do not silently replace donor behaviour with native behaviour and
+call the import faithful. Necessary platform-format conversions alone do not
+need a toggle; crashes and broken behaviour are defects to fix, not alternatives.
+
+Use shared mechanic/category settings where the same difference affects several
+imports, rather than duplicating implementation for every item. Keep these
+settings distinct from the per-villager/item inclusion checkboxes. Record source
+evidence, affected content, available values, and the explicit default alongside
+the existing import records; derive offline and browser choices from that same
+data. Both labelled behaviours require real runtime support. If a behaviour is
+unfinished, record the missing work instead of presenting a nonfunctional choice.
+
+Resolve behaviour settings together with import dependencies, include the
+resolved values in the deterministic build receipt, and explain any save impact
+before patching. Do not assume switching behaviours is save-compatible. With no
+imports or behaviour changes selected, retain the pinned translation-only output.
+Verify the changed shared path in each supported mode with focused checks, reusing
+unchanged evidence. These settings follow the existing V3 playtest and deployment
+approval requirement; they do not authorise a live-patcher update.
+
 ## Verified starting facts
 
 The pinned source references are N64 decompilation
