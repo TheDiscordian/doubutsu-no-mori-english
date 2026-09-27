@@ -30,8 +30,12 @@ PROGRAMS = (
     ('ka','aIKA',10,'d46aa8b6a6835c05a9c71d9e96b4d1c5b2fb193fa0c73350a7a1c5cd2a208c08'),
 )
 RUNTIME=('creature_insects','creature_insect_state','creature_insect_environment',
-         'creature_insect_engine','creature_insect_collision')
+         'creature_insect_engine','creature_insect_collision','creature_insect_spawns',
+         'creature_insect_manager')
 SOURCES=('tools/v3_creature_insects.py','overlays/v3/creature_insects.h',
+         'tools/v3_creature_spawns.py','overlays/v3/creature_spawns.h',
+         'overlays/v3/creature_insect_spawns.h',
+         'overlays/v3/creature_insect_manager.h',
          'overlays/v3/creature_insect_engine.h',
          'overlays/v3/creature_insect_collision.h',
          'overlays/v3/creature_insect_bindings.ld',
@@ -81,6 +85,48 @@ def controller_contract(image,original):
         hooks=hooks,removed_relocations=[locations[at] for at in sorted(covered) if at in locations],
         column_hook=dict(address=0x80070398,before=core[at:at+8].hex(),symbol='af_insect_columns'),
         installed=False)
+
+
+def spawn_contract(image,original):
+    from v3_npc_clothing import guard_incoming
+    from v3_player_actions import native_references
+    files=by_vrom(image);retail=by_vrom(original)
+    owner=files[0x821B40].extract(image);rel=files[0x8240D0].extract(image)
+    native=retail[0x821B40].extract(original);ram=0x8092A030
+    sections=struct.unpack_from('>5I',rel)
+    functions=[]
+    for start,end in ((0x8092AE10,0x8092AF0C),(0x8092AF0C,0x8092B014)):
+        raw=owner[start-ram:end-ram]
+        if raw!=native[start-ram:end-ram] or len(raw)!=end-start:
+            raise ValueError('Changed complete native insect spawning consumer')
+        functions.append(dict(address=start,end=end,sha256=sha256(raw)))
+    at=0x8092AF0C-ram
+    if owner[at:at+8]!=bytes.fromhex('27BDFFC0 AFBF0024'):
+        raise ValueError('Changed native insect manager prologue')
+    guard_incoming(owner,sections[0],ram,[(at,8)])
+    _,_,_,locations,_=native_references(owner,rel,expected_sections=sections[:4])
+    if at in locations or at+4 in locations:
+        raise ValueError('Unexpected relocated insect manager prologue')
+    return dict(owner_vrom=0x821B40,reloc_vrom=0x8240D0,owner_ram=ram,
+        owner_sha256=sha256(owner),reloc_sha256=sha256(rel),functions=functions,
+        address=0x8092AF0C,before=owner[at:at+8].hex(),symbol='af_v3_insect_spawn',
+        installed=False)
+
+
+def install_spawn_manager(image,symbols,contract):
+    from v3_import_storage import jump
+    files=by_vrom(image);vrom=contract['owner_vrom'];ram=contract['owner_ram']
+    owner=bytearray(files[vrom].extract(image));rel=files[contract['reloc_vrom']].extract(image)
+    if sha256(owner)!=contract['owner_sha256'] or sha256(rel)!=contract['reloc_sha256']:
+        raise ValueError('Changed prepared insect spawn owner')
+    target=symbols[contract['symbol']]
+    if target&3 or not 0x80000000<=target<0x80800000:
+        raise ValueError('Insect manager target is not resident executable RAM')
+    at=contract['address']-ram
+    if owner[at:at+8]!=bytes.fromhex(contract['before']):
+        raise ValueError('Changed insect manager entry')
+    after=struct.pack('>II',jump(target),0);owner[at:at+8]=after
+    return {vrom:bytes(owner)},dict(contract,target=target,after=after.hex())
 
 
 def install_controller(image,symbols,contract):
@@ -145,6 +191,7 @@ def native_contract(image):
     return dict(rom_sha256=sha256(image),owner_vrom=0x8DEEC0,owner_ram=0x80A10210,
         engine_bindings=resident,collision_pipe_bytes=0x1C,
         controller=controller_contract(image,original),
+        spawn_manager=spawn_contract(image,original),
         functions=functions,controller_bytes=0x8F8,slot_offset=0x174,slots=3,stride=0x280,
         offsets=dict(type=0x1CC,movement=0x1D0,animation=0x1DC,speed_step=0x1E8,
                      target_speed=0x1EC,patience=0x1F4,collision=0x1F8,item=0x21C,
@@ -186,6 +233,7 @@ def rewrite(text):
 
 
 def generate(source,output,native):
+    from v3_creature_spawns import insect_calendars
     parents,identity=source_records(source)
     raw,table=named_table(source,'aINS_program_type',41*4)
     rows=[r for r in parents if r['category']=='insect']
@@ -215,7 +263,19 @@ def generate(source,output,native):
             species=[r['source_index'] for r,k in zip(rows,kinds,strict=True) if k==kind]))
     output.mkdir(parents=True,exist_ok=False)
     for name,data in generated.items():write_new(output/name,data)
+    calendar,spawn_report=insect_calendars(source)
+    write_new(output/'insect-calendar.bin',calendar)
+    write_new(output/'insect-calendar.S',(''' .section .rodata
+.balign 4
+.globl af_insect_calendar
+af_insect_calendar:
+.incbin "insect-calendar.bin"
+.balign 4
+.globl af_insect_calendar_bytes
+af_insect_calendar_bytes:
+.word '''+str(len(calendar))+'\n').encode())
     return dict(format='AFV3-CREATURE-INSECT-PROGRAMS-1',source=identity,dispatch=table,native_abi=native,
+        spawning=spawn_report,
         rows=[dict(r,program=k) for r,k in zip(rows,kinds,strict=True)],programs=programs,
         source_version='GAFE01_00',donor_bugfixes=False,
         source_rate=60,native_rate=30,source_substeps=2,
@@ -243,6 +303,9 @@ def compile_programs(output,report):
     objects.append('creature_insect_hooks.o')
     commands.append(shlex.join(['/n64_toolchain/bin/mips64-elf-gcc',*flags,'-c',
         '/source/overlays/v3/creature_insect_hooks.S','-o','creature_insect_hooks.o']))
+    objects.append('insect-calendar.o')
+    commands.append(shlex.join(['/n64_toolchain/bin/mips64-elf-gcc',*flags,'-c',
+        'insect-calendar.S','-o','insect-calendar.o']))
     commands.append(shlex.join(['/n64_toolchain/bin/mips64-elf-ld','-EB','-r',
         '-T','/source/overlays/v3/creature_insect_bindings.ld',*objects,'-o','programs.o']))
     commands.append('/n64_toolchain/bin/mips64-elf-nm --undefined-only programs.o')
@@ -258,10 +321,11 @@ def compile_programs(output,report):
         stack_usage=''.join(p.read_text() for p in sorted(output.glob('*.su'))))
     report['pending']=[
         'Native demo/intro-mode bindings, field sound/effects, and mosquito player response',
-        'Install prepared controller and directed-column hooks with the complete runtime',
+        'Install prepared controller, spawn-manager, and directed-column hooks with the complete runtime',
         'Digging, rock-strike, and tree-shake event producers',
-        'Complete insect calendar/terrain spawning and ant ground-colony actor',
-        'Guarded packet placement/startup and optional selection promotion',
+        'Persistent insect season reader/codec and full ant ground-colony actor',
+        'Native/GameCube population-capacity alternatives, including eight wild GameCube slots',
+        'Resolve installed creature-profile export, guarded packet placement/startup, and optional/behaviour selections',
         'Connected native gameplay/save verification; existing unresolved fixtures are not reset']
     write_new(output/'programs.json',(json.dumps(report,indent=2)+'\n').encode())
     return report

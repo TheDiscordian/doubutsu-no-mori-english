@@ -15,6 +15,8 @@ af_insect_hook_ctor:
     nop
     jal af_v3_insect_bind_controller
     lw $a0,24($sp)
+    jal af_v3_insect_spawn_reset
+    nop
     lw $ra,28($sp)
     jr $ra
     addiu $sp,$sp,32
@@ -107,3 +109,15 @@ af_insect_hook_fault:
     break 7                  /* invalid imported identity/owner: fail closed */
     b af_insect_hook_fault
     nop
+
+/* Set_Manager loads the insect manager into actor+178. Replay the two
+ * displaced prologue instructions, then continue the real original manager.
+ */
+.globl af_insect_spawn_original
+.type af_insect_spawn_original,@function
+af_insect_spawn_original:
+    addiu $t9,$a0,(0x178+0x8092AF14-0x8092A030)
+    addiu $sp,$sp,-64
+    jr $t9
+    sw $ra,36($sp)
+.size af_insect_spawn_original,.-af_insect_spawn_original

@@ -16,6 +16,80 @@ CAPACITY = 64
 NATIVE_VROM, NATIVE_RAM = 0x8253C0, 0x8092DBC0
 
 
+def insect_calendars(source):
+    """Extract the whole insect schedule, extras, and group sizes from the REL.
+
+    Type 41 is the source's explicit no-spawn weight, not an animal. Type 40
+    belongs to Wisp's event and is not silently added to ordinary populations.
+    Island lists are retained without inventing an island in the N64 town.
+    """
+    from v3_creature_field import named_table
+    receipts = {}
+
+    def read(name, size):
+        raw, receipt = named_table(source, name, size)
+        receipts[receipt['offset']] = receipt
+        return raw, receipt
+
+    schedule = []
+    for name, count in (('l_insect_month', 72), ('l_insect_island', 6)):
+        raw, receipt = read(name, count*8)
+        at = receipt['offset']; refs = receipt['pointers']
+        if set(refs) != set(range(at+4, at+count*8, 8)):
+            raise ValueError('Incomplete insect calendar pointers')
+        for i in range(count):
+            size = raw[i*8]
+            if raw[i*8+1:i*8+8] != bytes(7) or not 1 <= size <= 21:
+                raise ValueError('Changed insect time-list layout')
+            name2, start, n = source.containing(refs[at+i*8+4], exact=True)
+            if n != size*8:
+                raise ValueError('Changed complete insect spawn rows')
+            rows, row_receipt = read(name2, n)
+            if row_receipt['pointers']:
+                raise ValueError('Unexpected pointer in insect spawn row')
+            values = []
+            for actor, area, weight, pad in struct.iter_unpack('>IBBH', rows):
+                if (actor > 41 or actor == 40 or area > 13 or not weight or pad or
+                        (actor == 41) != (area == 13)):
+                    raise ValueError('Changed insect identity/area/weight')
+                values.append((actor, area, weight))
+            schedule.append(values)
+    extra, _ = read('additional_data$559', 36)
+    extras = list(struct.iter_unpack('>IB3xf', extra))
+    if extras != [(38, 8, 1.0), (38, 9, 1.0), (28, 9, 1.0)]:
+        raise ValueError('Changed ant/cockroach food spawns')
+    birth, _ = read('l_insect_birth_sum', 82)
+    if list(struct.iter_unpack('>BB', birth)) != [
+            (6, 3) if i in (10, 27) else (1, 0) for i in range(41)]:
+        raise ValueError('Changed complete insect group sizes')
+    packed = bytearray(32+78*4)
+    unique = {}
+    for i, rows in enumerate(schedule):
+        key = tuple(rows)
+        if key not in unique:
+            unique[key] = len(packed)
+            for row in rows:
+                packed.extend(struct.pack('>HBB', *row))
+        struct.pack_into('>HH', packed, 32+i*4, unique[key], len(rows))
+    extra_at = len(packed)
+    for actor, area, weight in extras:
+        packed.extend(struct.pack('>HBB', actor, area, int(weight)))
+    birth_at = len(packed); packed.extend(birth)
+    struct.pack_into('>8I', packed, 0, 0x41464953, 1, len(packed), 78,
+                     extra_at, birth_at, 41, CAPACITY)
+    maximum = max(len(schedule[m*6+t])+len(schedule[((m+1)%12)*6+t])+3
+                  for m in range(12) for t in range(6))
+    if maximum > CAPACITY or len(packed) > 65535:
+        raise ValueError('Insect schedule exceeds shared plan capacity')
+    callbacks = [source.function(at)[1] for at, names in source.functions.items()
+                 if any(name.startswith('aSOI_') for name, _ in names)]
+    return bytes(packed), dict(format='AFV3-INSECT-CALENDARS-1', bytes=len(packed),
+        sha256=sha256(packed), calendars=schedule, additional_spawns=extras,
+        group_sizes=list(struct.iter_unpack('>BB', birth)), maximum_rows=maximum,
+        source_tables=list(receipts.values()), source_functions=callbacks,
+        installed=False)
+
+
 def calendars(source, native_rom):
     """Follow every half-month/time list; keep official weights and locations."""
     parents, _ = source_records(source)

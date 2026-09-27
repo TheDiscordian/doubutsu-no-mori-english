@@ -72,17 +72,29 @@ Continue the eight insects' shared field behaviour/spawn programs while that
 native test remains unresolved. Keep fish gameplay verification open, not waived.
 The six complete donor behaviour programs and the shared native environment,
 stress, capture, culling, and directed-collision adapters compile together at
-`build/v3-creature-insects-work-01/programs-06/`. Controller ownership, source-rate
+`build/v3-creature-insects-work-01/programs-10/`. Controller ownership, source-rate
 stepping, event latching, and current-owner hook/relocation composition are
-prepared. Three focused host/compiler/composition checks pass; the collider
+prepared. The same object contains complete calendar/habitat/group spawning and
+the native manager adapter, including optional species masks, source cache timing,
+and the original-manager population alternative. The full 45-row seasonal blend
+fits the shared 64-row plan; no native twenty-row array is extended in place.
+Five focused host/compiler/composition checks pass; the collider
 preservation check covers all eight donor initialisers. These programs are
 **not installed** and do not change the available imports.
 Continue directly with the remaining native demo/intro-mode, field sound/effect,
 and mosquito player-response bindings, plus the actual player-event producers.
-The complete insect spawn path and ant ground-colony actor remain required in
-the same task. The prepared directed collision filter needs its checked
+Continue spawning at its actual remaining consumers: persistent insect-season
+reader/codec, complete ant ground-colony actor, and native/GameCube population
+capacity (two versus eight wild slots, plus the release slot). The prepared
+calendar, terrain/weather, group, and native creation adapter are retained.
+The season reader must not write the existing save's reserved bytes: the current
+codec rejects nonzero creature bytes 23..31. Complete the codec/layout decision
+and compatibility warning with that binding, not a volatile substitute.
+The prepared directed collision filter needs its checked
 `80070398` call-site hook when the complete runtime is installed. Do not replace
-it with ordinary collision or mark the disabled imports playable.
+it with ordinary collision or mark the disabled imports playable. Native manager
+entry `8092AF0C` has a guarded composer and relocation-safe original fallback;
+install it with the complete resident runtime, not by itself.
 Reuse the checked source bodies, native bindings, controller bridges, and
 relocation-aware composer rather than rewriting them or restarting art conversion.
 Full dependencies and the exact preparation command live

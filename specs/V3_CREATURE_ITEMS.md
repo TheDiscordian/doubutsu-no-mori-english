@@ -629,15 +629,67 @@ removing the complete replaced relocation records and preserving unrelated
 graphics hooks. Runtime placement/startup and remaining services must be completed
 before applying this composer to a deliverable ROM.
 
-The bindings file supplies 38 native primitive functions, checked against complete
+The bindings file supplies 45 native primitive functions, checked against complete
 bodies in the hash-verified original N64 ROM. Unresolved demo/intro, audio/effect,
 and mosquito-player bindings remain undefined symbols in the prepared object;
 no dummy engine routines satisfy them. Controlled host services are test fixtures,
 not evidence of native gameplay or completed mosquito stings.
 
+### Complete spawning and native manager adapter
+
+`insect_calendars` in the existing shared calendar converter follows all 72 town
+month/time lists and six island lists in the actual donor REL. The 2,394-byte
+pointer-free packet retains every weight, explicit no-spawn row, all three
+candy/spoiled-turnip extras, and complete group-size data. Wisp's event actor is
+not an ordinary imported insect; retained island data does not supply an island.
+The greatest adjacent-month blend has 45 rows, including extras. The common
+64-row plan preserves all of them without copying into either the native
+twenty-row buffer or the donor's undersized 43-row buffer.
+
+`creature_insect_spawns.c` implements all six time bands and monthly five-day
+blending, including December/year and leap-day boundaries. Its shared habitat
+path covers all fourteen areas, native foreground IDs, two-unit acre margins,
+buried-item eligibility, rain/snow rules, pond-acre restrictions, field rank,
+explicit no-spawn mass, and source-order flower-to-flight fallback. Candy and
+spoiled turnips suppress other weights as in the donor. Position selection retains
+the source's separate eligibility and final tile checks, consumes group-size RNG
+even for one birth, removes every chosen tile, and stops on creation failure.
+The final attempt's result is separate from the number already created; a partial
+group must not be reported as a successful final attempt. Cockroach tree/spoiled
+turnip states and ant-colony creation remain distinct from ordinary creation.
+
+`creature_insect_manager.c` connects that path to the native manager's acre fields
+at `4180`, complete native foreground/deposit/collision queries, weather, field
+rank, coordinate conversion, and the relocated insect clip at `80136F28`.
+The native 24-byte creation record and 16-byte clip have MIPS layout assertions;
+the clip is not enlarged over adjacent state. The constructor resets the shared
+transient calendar cache. Source mode refreshes the calendar on month/time/area
+or profile changes, not on every acre visit. Its live-acre test excludes the
+release slot and includes a required colony query. Native-population mode gives
+the unchanged original manager a 100-weight opportunity alongside enabled added
+species' real filtered weights. Both alternatives still require selector binding
+and their population-capacity implementations before a playable claim.
+
+`spawn_contract` checks complete original creation/manager bodies and entry
+instructions against the verified ROM. Its composer changes only `8092AF0C`'s
+eight-byte entry; existing gold-tree hooks and relocation records remain intact.
+The assembly fallback resumes at the actual manager-owned overlay buffer plus
+the original function offset, replaying its stack/return-address prologue.
+No fixed heap address is assumed. This composer and the controller/column
+composer must be installed with the complete resident runtime and loaded data.
+
+The manager intentionally retains unresolved native season and ant-colony
+services. The current saved creature capsule uses bytes 20..22 for fish seasons
+and rejects nonzero bytes 23..31; an insect season reader cannot safely start
+writing that padding without the matching codec and compatibility work.
+`af_v3_creature_profile_byte` is an existing installed shared export that the
+final linker must resolve from its checked build report. The current controller
+still has two wild slots and one release slot; the GameCube eight-wild-slot
+alternative is required work, not supplied by the larger spawn plan.
+
 ### Current prepared output and remaining connections
 
-Prepared output: `build/v3-creature-insects-work-01/programs-06/`.
+Prepared output: `build/v3-creature-insects-work-01/programs-10/`.
 The current cartridge remains ABI 305. No new ROM, save layout, browser choice,
 or deployment is produced by preparation. Reproduce against the explicit input:
 
@@ -662,6 +714,15 @@ relocation removal, and invalid targets. It uses synthetic resident addresses on
 to test composition: it does not build a ROM or execute synthetic code.
 MIPS compilation verifies native layouts and assembles all controller bridges;
 host pointer sizes are not treated as the cartridge ABI.
+The spawning check compares 99 complete-calendar/blend/selection cases against
+the extracted donor data and exercises all eight added species through habitat
+selection and their appropriate creation callback, groups, source RNG ordering,
+weather, deposits, field rank, no-spawn mass, bounds, and invalid data. The native
+manager host check verifies real shared calendar-to-manager execution, cache
+lifetime, source season requests, native creation parameters, optional masks,
+colony routing, live-acre suppression, and original-manager fallback. Native
+engine, colony, and save services in that fixture are controlled test callbacks;
+these checks do not establish native gameplay or implement the missing services.
 
 Remaining connections belong to the same creature importing task:
 
@@ -669,8 +730,10 @@ Remaining connections belong to the same creature importing task:
   player sting response. Reuse the prepared native environment/terrain/controller.
 - Connect the digging, axe/shovel rock-strike, and tree-shake event producers.
   The latch/reset and donor consumers are prepared; no producer is claimed wired.
-- Convert/connect the complete insect calendar, terrain/weather selection, and
-  spawning, including the ant ground-colony actor rather than just its release form.
+- Complete the persistent insect-season reader/codec and ant ground-colony actor
+  using the prepared calendar-to-native-manager path. Implement the actual
+  native/GameCube population-capacity alternatives; group creation is bounded by
+  available slots until the larger source pool and its consumers are installed.
 - Place the complete runtime through the existing owner-storage machinery, retain
   overlap guards, connect startup loading, and promote per-insect selection only
   when the gameplay dependencies are implemented.

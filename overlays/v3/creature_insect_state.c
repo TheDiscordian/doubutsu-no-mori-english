@@ -33,6 +33,15 @@ AfInsectExtra *af_insect_extra(aINS_INSECT_ACTOR *insect) {
     return NULL;
 }
 
+int af_insect_occupied_acre(int x,int z) {
+    if (controller) for (unsigned i=0;i<2;i++) {
+        const aINS_INSECT_ACTOR *insect=controller->insects+i;
+        const ACTOR *actor=&insect->tools_actor.actor_class;
+        if (insect->exist_flag==1 && actor->block_x==x && actor->block_z==z) return 1;
+    }
+    return 0;
+}
+
 const AfInsectEvents *af_insect_events(void) {return &events;}
 
 /* The event stays available to all slots and both substeps. Reset once after

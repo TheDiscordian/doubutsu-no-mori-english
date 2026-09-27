@@ -46,15 +46,22 @@ from reaching the old bounded program table. Directed collision excludes only
 the hiding tile's cylinder; ordinary terrain and neighbouring obstacles remain.
 The native collider is 28 bytes, and the donor-only collision radius lives in
 controller-owned extra state rather than overlapping its final four bytes.
-Three focused checks pass: complete donor behaviour with collider-preservation
-checks, the shared environment/controller path under sanitizers, and guarded
-current-cartridge hook/relocation composition. These are host/compiler checks,
-not native gameplay. Output is
-`build/v3-creature-insects-work-01/programs-06/`; no new ROM is built, the insects
+The complete 78-list insect calendar, seasonal blending, habitat filtering,
+weighted selection, distinct-position group creation, and native spawn-manager
+adapter compile with those programs. The shared 64-row buffer retains the full
+45-row July/August blend, including candy/turnip extras. Native creation uses the
+real relocated insect clip; colonies have a separate required creation binding.
+Five focused checks pass: complete donor behaviour and collider preservation,
+sanitized environment/controller and spawn-manager paths, all source calendars
+and shared habitat/group logic, and current-cartridge hook/relocation composition.
+These are host/compiler checks, not native gameplay. Output is
+`build/v3-creature-insects-work-01/programs-10/`; no new ROM is built, the insects
 remain unavailable for selection, and ABI 305 remains the cartridge.
 Continue the same batch with the remaining native demo/intro, sound/effect, and
-mosquito-sting bindings; player-event producers; complete insect spawning and ant
-colonies; and complete runtime placement/startup/selection. Native constructor
+mosquito-sting bindings; player-event producers; persistent insect seasons and ant
+colonies; native/GameCube population-capacity choices; and complete runtime
+placement/startup/selection. The calendar-to-manager path is prepared, not installed;
+its unresolved services remain real dependencies, not dummy implementations. Native constructor
 timeout and sound-scheduler disconnection remain unresolved. No old native
 fixture is replayed. See the
 [insect program contract](../specs/V3_CREATURE_ITEMS.md#added-insect-behaviour-programs).

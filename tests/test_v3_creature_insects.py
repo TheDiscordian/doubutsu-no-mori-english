@@ -3,6 +3,7 @@ import json
 import os
 from pathlib import Path
 import subprocess
+import struct
 import sys
 import tempfile
 import unittest
@@ -10,12 +11,69 @@ import unittest
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'tools'))
 from aflib import sha256
-from v3_creature_insects import PROGRAMS,rewrite,install_controller
+from v3_creature_insects import PROGRAMS,rewrite,install_controller,install_spawn_manager
 
 
 class CreatureInsectTests(unittest.TestCase):
+    def test_native_spawn_manager(self):
+        directory=ROOT/os.environ.get('V3_INSECT_PROGRAMS','build/v3-creature-insects-work-01/programs-10')
+        data=(directory/'insect-calendar.bin').read_bytes()
+        with tempfile.TemporaryDirectory(prefix='af-insect-manager-') as temporary:
+            temp=Path(temporary);exe=temp/'manager'
+            (temp/'calendar.h').write_text('const u8 af_insect_calendar[]={'+
+                ','.join(str(b) for b in data)+'};\nconst u32 af_insect_calendar_bytes='+str(len(data))+';\n')
+            result=subprocess.run(['cc','-std=c11','-O1','-g','-fno-pie','-no-pie',
+                '-fsanitize=address,undefined','-fno-sanitize-recover=all','-Wall','-Wextra','-Werror',
+                '-I'+str(ROOT/'overlays/v3'),'-I'+str(temp),
+                str(ROOT/'overlays/v3/creature_insect_spawns.c'),
+                str(ROOT/'overlays/v3/creature_insect_manager.c'),
+                str(ROOT/'tests/v3_creature_insect_manager_test.c'),'-lm','-o',str(exe)],
+                capture_output=True,text=True)
+            self.assertEqual(result.returncode,0,result.stderr)
+            result=subprocess.run([str(exe)],capture_output=True,text=True,timeout=15)
+            self.assertEqual(result.returncode,0,result.stderr)
+            self.assertIn('Native insect manager:',result.stdout)
+
+    def test_complete_spawn_path(self):
+        from v3_creature_spawns import insect_calendars
+        from v3_furniture_pipeline import Source
+        directory=ROOT/os.environ.get('V3_INSECT_PROGRAMS','build/v3-creature-insects-work-01/programs-10')
+        source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+            (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+        data,report=insect_calendars(source)
+        self.assertEqual((directory/'insect-calendar.bin').read_bytes(),data)
+        self.assertEqual(json.loads((directory/'programs.json').read_text())['spawning'],
+                         json.loads(json.dumps(report)))
+        schedule=report['calendars'];cases=[]
+        # Every source month/time list, a complete seasonal blend, and individual
+        # source masks. No native/emulator replay or per-species fixture.
+        inputs=[(m,m,t,255,0,1.0) for m in range(12) for t in range(6)]
+        inputs += [(0,0,t,255,1,1.0) for t in range(6)]
+        inputs += [(m,(m+1)%12,2,255,0,0.5) for m in range(12)]
+        inputs += [(6,7,2,mask,0,0.5) for mask in [0,*[1<<i for i in range(8)]]]
+        for m,n,t,mask,island,rate in inputs:
+            lists=[(schedule[72+t if island else m*6+t],rate)]
+            if rate!=1 and not island: lists.append((schedule[n*6+t],1-rate))
+            expected=[(actor,area,weight*r) for rows,r in lists for actor,area,weight in rows]
+            expected+=report['additional_spawns']
+            expected=[row for row in expected if not 32<=row[0]<=39 or mask&(1<<(row[0]-32))]
+            case=struct.pack('>5IfI',m,n,t,mask,island,rate,len(expected))
+            case+=b''.join(struct.pack('>IIf',*row) for row in expected);cases.append(case)
+        payload=struct.pack('>I',len(data))+data+struct.pack('>I',len(cases))+b''.join(cases)
+        with tempfile.TemporaryDirectory(prefix='af-insect-spawns-') as temporary:
+            exe=Path(temporary)/'spawns';fixture=Path(temporary)/'calendar.bin';fixture.write_bytes(payload)
+            result=subprocess.run(['cc','-std=c11','-O1','-g','-fno-pie','-no-pie',
+                '-fsanitize=address,undefined','-fno-sanitize-recover=all','-Wall','-Wextra','-Werror',
+                '-I'+str(ROOT/'overlays/v3'),str(ROOT/'overlays/v3/creature_insect_spawns.c'),
+                str(ROOT/'tests/v3_creature_insect_spawns_test.c'),'-lm','-o',str(exe)],
+                capture_output=True,text=True)
+            self.assertEqual(result.returncode,0,result.stderr)
+            result=subprocess.run([str(exe),str(fixture)],capture_output=True,text=True,timeout=15)
+            self.assertEqual(result.returncode,0,result.stderr)
+            self.assertIn('complete shared habitat/creation',result.stdout)
+
     def test_complete_program_category(self):
-        directory=ROOT/os.environ.get('V3_INSECT_PROGRAMS','build/v3-creature-insects-work-01/programs-06')
+        directory=ROOT/os.environ.get('V3_INSECT_PROGRAMS','build/v3-creature-insects-work-01/programs-10')
         report=json.loads((directory/'programs.json').read_text())
         self.assertEqual([r['source_index'] for r in report['rows']],list(range(32,40)))
         self.assertEqual(len(report['programs']),6)
@@ -68,7 +126,7 @@ class CreatureInsectTests(unittest.TestCase):
     def test_controller_composition(self):
         from aflib import by_vrom,CODE_VROM,CODE_RAM,u32
         from v3_furniture_install import inputs
-        directory=ROOT/os.environ.get('V3_INSECT_PROGRAMS','build/v3-creature-insects-work-01/programs-06')
+        directory=ROOT/os.environ.get('V3_INSECT_PROGRAMS','build/v3-creature-insects-work-01/programs-10')
         report=json.loads((directory/'programs.json').read_text())
         image,_=inputs(ROOT/'build/v3-creature-world-work-01/connected-15/build-lock.json')
         contract=report['native_abi']['controller'];files=by_vrom(image)
@@ -94,6 +152,15 @@ class CreatureInsectTests(unittest.TestCase):
         self.assertEqual(rel[:16],previous[:16]);self.assertEqual(rel[-4:],previous[-4:])
         symbols[names[0]]=0x80900000
         with self.assertRaises(ValueError): install_controller(image,symbols,contract)
+        contract=report['native_abi']['spawn_manager']
+        changed,patch=install_spawn_manager(image,{'af_v3_insect_spawn':0x80660000},contract)
+        original=files[0x821B40].extract(image);restored=bytearray(changed[0x821B40])
+        at=patch['address']-patch['owner_ram']
+        self.assertEqual(restored[at:at+8].hex(),patch['after'])
+        restored[at:at+8]=bytes.fromhex(patch['before'])
+        self.assertEqual(restored,original,'Existing gold-tree and native manager paths changed')
+        with self.assertRaises(ValueError):
+            install_spawn_manager(image,{'af_v3_insect_spawn':0x80900000},contract)
 
 
 if __name__=='__main__':unittest.main()

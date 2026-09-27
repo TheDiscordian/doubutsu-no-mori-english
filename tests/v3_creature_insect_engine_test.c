@@ -2,6 +2,7 @@
  * Complete donor actions have the companion category fixture; this fixture
  * checks their environment, per-slot controller, and collision connections. */
 #include "creature_insect_collision.h"
+#include "creature_insect_manager.h"
 #include <assert.h>
 #include <math.h>
 #include <stdio.h>
@@ -154,6 +155,11 @@ static void terrain_and_stress(void) {
 }
 static void ownership_and_culling(void) {
     aINS_INSECT_ACTOR *i=reset();ACTOR *a=(ACTOR *)i;visible=0;
+    assert(af_insect_occupied_acre(0,0) && !af_insect_occupied_acre(1,0));
+    i->exist_flag=0;controller.insects[2].exist_flag=1;
+    assert(!af_insect_occupied_acre(0,0)); /* release/held slot is excluded */
+    controller.insects[1].exist_flag=1;assert(af_insect_occupied_acre(0,0));
+    controller.insects[1].exist_flag=controller.insects[2].exist_flag=0;i->exist_flag=1;
     a->actor_specific=1;af_v3_insect_slot(i,af_insect_game);assert(destructions==1);
     i=reset();a=(ACTOR *)i;visible=0;a->state_bitfield=0;a->player_distance_xz=601;a->block_x=1;
     af_v3_insect_slot(i,af_insect_game);assert(destructions==1 && !body_calls);

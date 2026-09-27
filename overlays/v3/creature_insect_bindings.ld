@@ -37,7 +37,16 @@ af_insect_native_columns = 0x8006D3B0;
 af_insect_world_block = 0x80088710;
 af_insect_ground_check = 0x80071064;
 af_insect_apply_reverse = 0x80069580;
+af_insect_foreground = 0x8008A33C;
+af_insect_deposits = 0x8008C1E0;
+af_insect_collision_map = 0x80089538;
+af_insect_block_kind = 0x80089348;
+af_insect_weather = 0x80098EE4;
+af_insect_rank = 0x80084DE0;
+af_insect_tile_position = 0x80088BFC;
 /* Native global fields; no GC common-data addresses. */
 af_insect_game = 0x8010EF90;
 af_insect_ball = 0x8013790C;
 af_insect_bg_context = 0x80126CF8;
+af_insect_native_clip = 0x80136F28;
+af_insect_rtc = 0x80136FBC;
