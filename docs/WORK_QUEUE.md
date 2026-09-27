@@ -72,14 +72,14 @@ Continue the eight insects' shared field behaviour/spawn programs while that
 native test remains unresolved. Keep fish gameplay verification open, not waived.
 The six complete donor behaviour programs and the shared native environment,
 stress, capture, culling, and directed-collision adapters compile together at
-`build/v3-creature-insects-work-01/programs-17/`. Controller ownership, source-rate
+`build/v3-creature-insects-work-01/programs-25/`. Controller ownership, source-rate
 stepping, event latching, and current-owner hook/relocation composition are
 prepared. The same object contains complete calendar/habitat/group spawning and
 the native manager adapter, including optional species masks, source cache timing,
 and the original-manager population alternative. The full 45-row seasonal blend
 fits the shared 64-row plan; no native twenty-row array is extended in place.
-Eight focused host/compiler/composition checks pass; the collider
-preservation check covers all eight donor initialisers. These programs are
+Four current changed-path checks pass, with six unchanged category checks retained;
+the collider preservation check covers all eight donor initialisers. These programs are
 **not installed** and do not change the available imports.
 The ground colony includes deferred actor creation, live-acre lookup, full
 scrolling artwork, net-to-single-ant handoff, fading, and cleanup. Its guarded
@@ -93,9 +93,18 @@ missing loops and both triggers, and supplies the actual trigger remap to the
 runtime. The small-mud constructor bridge preserves ordinary digging variants.
 Install these prepared resources and the mud call-site hook with the complete
 runtime; they are not installed in ABI 305. Twelve sound-parser checks pass.
-Continue directly with the second demo-state and mosquito player-response
-bindings, plus the actual player-event producers. Retain the prepared field
-services and their passing host/compiler/composition evidence.
+The same runtime includes complete mosquito player actions, fishing interruption,
+both full motions, bounded face timelines, official message `3063` mapped to
+native `2F00`, and prepared native action/resource composition. All three impact
+producers and all four seasonal tree-shake producers have guarded composers that
+preserve the colony catch and optional gold-tree paths. The face pool lives in
+the insect runtime; its version-two reader/table avoids the occupied password
+bootstrap at `804B4D00`. These consumers require final installation together.
+Nine shared keyframe checks pass, retaining unusual donor keys without sorting,
+clipping, or replacing the animation. No native fixture is restarted.
+Continue directly with the second demo-state and persistent insect-season
+bindings. Retain the prepared player interactions, full field services, and their
+passing host/compiler/composition evidence.
 Continue spawning at its actual remaining consumers: persistent insect-season
 reader/codec and native/GameCube population
 capacity (two versus eight wild slots, plus the release slot). The prepared

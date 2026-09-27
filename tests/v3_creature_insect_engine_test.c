@@ -3,6 +3,7 @@
  * checks their environment, per-slot controller, and collision connections. */
 #include "creature_insect_collision.h"
 #include "creature_insect_manager.h"
+#include "creature_insect_player.h"
 #include <assert.h>
 #include <math.h>
 #include <stdio.h>
@@ -23,6 +24,27 @@ static u32 block_kind=1;
 static int bg_calls,column_excluded,ground_checks;
 static uintptr_t caught;
 static unsigned phases;
+const u32 af_insect_tree_bee_query=0x804B6BB4;
+static int footprints,frame_hit,unit_valid=1,bee_checks;
+static float expected_frame;
+static void footprint(void *a,GAME *g,int l,int r) {
+    assert(a==player && g==af_insect_game && !l && !r);footprints++;
+}
+static int crossing(void *fc,float frame) {
+    assert(fc==player_storage.bytes+0x174 && frame==expected_frame);
+    return frame_hit;
+}
+static int bee_query(u32 item) {bee_checks++;return item==0x5E || item==0x81;}
+void *af_test_insect_player_resolve(u32 address) {
+    if (address==0x808B9594) return footprint;
+    if (address==0x808B5844) return crossing;
+    if (address==af_insect_tree_bee_query) return bee_query;
+    assert(!"Unexpected native insect-player binding");return NULL;
+}
+int mFI_Wpos2UtNum(int *x,int *z,xyz_t pos) {
+    assert(pos.x==120 && pos.y==5 && pos.z==200);
+    *x=3;*z=5;return unit_valid;
+}
 
 PLAYER_ACTOR *af_insect_native_player(GAME *g) {assert(g==af_insect_game);return player;}
 f32 af_insect_distance_xz(const xyz_t *a,const xyz_t *b) {
@@ -186,7 +208,41 @@ static void primitives(void) {
     assert(mCoBG_CheckHole_OrgAttr(22) && mCoBG_CheckHole_OrgAttr(62));
     assert(!mCoBG_CheckHole_OrgAttr(3) && !mCoBG_CheckHole_OrgAttr(12));
 }
+static void player_events(void) {
+    reset();
+    *(xyz_t *)(player_storage.bytes+0xD10)=(xyz_t){120,5,200};
+    void (*calls[])(void *,GAME *,int,int)={af_insect_player_axe,af_insect_player_rock,af_insect_player_dig};
+    const float frames[]={15,13,14};
+    for (unsigned i=0;i<3;i++) {
+        expected_frame=frames[i];frame_hit=0;af_v3_insect_events_reset();
+        calls[i](player,af_insect_game,0,0);assert(!af_insect_events()->pl_action);
+        frame_hit=1;unit_valid=0;calls[i](player,af_insect_game,0,0);
+        assert(!af_insect_events()->pl_action);unit_valid=1;
+        calls[i](player,af_insect_game,0,0);
+        assert(af_insect_events()->pl_action==(int)i+1);
+        assert(af_insect_events()->pl_action_ut_x==3 && af_insect_events()->pl_action_ut_z==5);
+        for (int step=0;step<2;step++) {
+            af_insect_begin_step(step);assert(af_insect_events()->pl_action==(int)i+1);
+        }
+    }
+    assert(footprints==9);
+    const u32 plain[]={0x804,0x861,0x868};
+    for (unsigned i=0;i<3;i++) {
+        af_v3_insect_events_reset();assert(!af_insect_player_tree(plain[i],4,6));
+        assert(af_insect_events()->pl_action==aINS_PL_ACT_SHAKE_TREE);
+        assert(af_insect_events()->pl_action_ut_x==4 && af_insect_events()->pl_action_ut_z==6);
+    }
+    const u32 other[]={0x800,0x803,0x80C,0x831,0x867,0x7F,0x80,0x5E,0x81};
+    for (unsigned i=0;i<sizeof(other)/sizeof(*other);i++) {
+        af_v3_insect_events_reset();int result=af_insect_player_tree(other[i],4,6);
+        assert(result==(other[i]==0x5E || other[i]==0x81));assert(!af_insect_events()->pl_action);
+    }
+    assert(bee_checks==12);
+    af_v3_insect_unbind_controller(&controller);expected_frame=14;
+    af_insect_player_dig(player,af_insect_game,0,0);af_insect_player_tree(0x804,4,6);
+    assert(!af_insect_events()->pl_action && footprints==10);
+}
 int main(void) {
-    connected_slot();terrain_and_stress();ownership_and_culling();primitives();
+    connected_slot();terrain_and_stress();ownership_and_culling();primitives();player_events();
     puts("Shared native adapter: movement, collision, stress, capture, lifetime, and cleanup pass");
 }

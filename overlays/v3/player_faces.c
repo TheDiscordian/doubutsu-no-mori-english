@@ -5,7 +5,7 @@ typedef unsigned int u32;
 #define native_mouth ((const u32 *)0x8010C2F0u)
 #define faces ((const u32 *)0x804B4700u)
 #else
-extern u32 af_test_native_eye[130], af_test_native_mouth[130], af_test_player_faces[318];
+extern u32 af_test_native_eye[130], af_test_native_mouth[130], af_test_player_faces[];
 #define native_eye af_test_native_eye
 #define native_mouth af_test_native_mouth
 #define faces af_test_player_faces
@@ -13,10 +13,22 @@ extern u32 af_test_native_eye[130], af_test_native_mouth[130], af_test_player_fa
 
 static u32 imported_face(int index, u32 column) {
     u32 slot=(u32)index-130u;
+#ifdef AF_V3_EXTENDED_PLAYER_FACES
+    if (slot>=157u || faces[0]!=0x41465046u || (faces[1]!=1u && faces[1]!=2u) ||
+            faces[2]!=157u || faces[3]!=8u) return 0;
+    u32 first=0x804B4C00u,end=0x804B4F00u;
+    if (faces[1]==2u) {
+        first=faces[318];end=faces[319];
+        if (first<0x80000000u || first>=end || end>0x80800000u) return 0;
+    }
+    u32 address=faces[4+slot*2+column];
+    return address>=first && address<end ? address : 0;
+#else
     if (slot>=157u || faces[0]!=0x41465046u || faces[1]!=1u ||
             faces[2]!=157u || faces[3]!=8u) return 0;
     u32 address=faces[4+slot*2+column];
     return address>=0x804B4C00u && address<0x804B4F00u ? address : 0;
+#endif
 }
 
 u32 af_v3_player_eye_sequence(int index) {

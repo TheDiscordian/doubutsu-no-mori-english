@@ -51,12 +51,12 @@ weighted selection, distinct-position group creation, and native spawn-manager
 adapter compile with those programs. The shared 64-row buffer retains the full
 45-row July/August blend, including candy/turnip extras. Native creation uses the
 real relocated insect clip; colonies use the separate native actor-creation path.
-Eight focused checks pass: complete donor behaviour and collider preservation,
+Retained focused checks cover complete donor behaviour and collider preservation,
 sanitized environment/controller and spawn-manager paths, all source calendars
 and shared habitat/group logic, current-cartridge hook/relocation composition,
 colony lifecycle/drawing, and connected field-service routing/resource composition.
 These are host/compiler checks, not native gameplay. Output is
-`build/v3-creature-insects-work-01/programs-17/`; no new ROM is built, the insects
+`build/v3-creature-insects-work-01/programs-25/`; no new ROM is built, the insects
 remain unavailable for selection, and ABI 305 remains the cartridge.
 The colony runtime connects creation, catching into a single ant, complete
 two-layer scrolling artwork, fading, and native actor cleanup. The opening
@@ -68,8 +68,18 @@ reuse, trigger remapping, hidden-cricket scheduling, and mosquito buzz mode.
 The small-dirt-puff bridge retains the native effect loader and ordinary digging
 variants. Their resource/call-site installers are prepared, not applied to the
 cartridge. Twelve focused sound-parser checks pass without native test replays.
-Continue the same batch with the remaining second demo-state and mosquito-sting
-bindings; player-event producers; persistent insect seasons;
+Player interactions compile into the same object: impact-frame notifications for
+axe/shovel rock strikes and digging, all-season tree shaking, and complete
+mosquito sting/notice actions with fishing interruption and official English text.
+Both source motions retain all 2,640 bytes and irregular keyframe records.
+The 279-byte face pool and bounded version-two reader preserve the existing
+password bootstrap rather than growing through it. Prepared composers connect
+the action tables, motions, faces, and native face-reader hooks; they still need
+the complete insect runtime's placement/startup and message installation.
+Four current changed-path host/composition checks and nine shared keyframe checks
+pass; six unchanged insect checks retain their previous evidence. No native or
+hardware execution is claimed for these changes.
+Continue the same batch with the remaining second demo-state binding; persistent insect seasons;
 native/GameCube population-capacity choices; and complete runtime
 placement/startup/selection. The calendar-to-manager path is prepared, not installed;
 its unresolved services remain real dependencies, not dummy implementations. Native constructor

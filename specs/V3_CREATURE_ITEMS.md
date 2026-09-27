@@ -636,10 +636,11 @@ before applying this composer to a deliverable ROM.
 The bindings file supplies native primitive functions, checked against complete
 bodies in the hash-verified original N64 ROM. Native actor creation retains the
 installed campsite/balloon descriptor chain, checked against its existing receipts;
-it still delegates original actor IDs to the native table. Unresolved second-demo,
-season, and mosquito-player bindings remain undefined symbols in the prepared object;
-no dummy engine routines satisfy them. Controlled host services are test fixtures,
-not evidence of native gameplay or completed mosquito stings.
+it still delegates original actor IDs to the native table. Unresolved second-demo
+and season bindings remain undefined symbols in the prepared object; no dummy
+engine routines satisfy them. The existing creature-profile export needs its
+checked final link binding. Controlled host services are test fixtures, not
+evidence of native gameplay.
 
 ### Complete spawning and native manager adapter
 
@@ -780,9 +781,74 @@ capacity, and composes the mud call-site hook. These are not native synthesis or
 gameplay evidence. Final placement must install the complete prepared resources,
 binding table, and mud hook together with the insect runtime.
 
+### Player impacts, tree shaking, and mosquito response
+
+`creature_insect_player.c` adds notifications after the existing footprints in
+the native changed-animation-frame branches: axe `808CB160`, shovel-on-rock
+`808D1F9C`, and digging `808D0798`. All use the actual native crossing helper
+`808B5844`, respective source frames 15/13/14, and the action's target at player
+`D10`. They retain original effects, sound, target selection, and paused-frame
+suppression. Native player action numbers differ from donor numbers; no shared
+index assumption or held-tool polling supplies these events.
+
+All four seasonal owners notify at their actual tree drop/bee-query call,
+owner offset `2960`. Plain mature tree/cedar/gold-tree identities `0804/0861/0868`
+produce action four; fruit, money, furniture, bee, and immature variants do not.
+The bridge preserves the existing bee-query return and `a0` contract. Coordinates
+come from the original call's live arguments. Guarded composition removes only
+the three replaced player JAL relocations, preserves the native delay slots, and
+merges with the colony's different player hook. Relocation checks at three load
+addresses retain resident targets.
+
+`creature_insect_mosquito.c` implements source actions 107/108 on the existing
+main/request unions. Requests retain title/demo/status/priority rejection,
+source requested-label identity, and the transition from sting to notice to
+WAIT. Native RELAX_ROD is 51: its setup clears the existing interruption flag
+at `D10`, and its complete command consumer treats it exactly like the donor's
+`bee_flag || mosquito_flag`, including event-warp and player-input precedence.
+Setting it cancels fishing; it does not trigger bee injury. No new player tail
+or saved field is needed. Source animation and message control take two steps
+per native update; native movement, collision, and held-item updates run once,
+with both source ticks' braking applied.
+
+Both full 26-joint motions, donor 132/133 to native 262/263, occupy 2,640 bytes
+and fit the existing 4,848-byte motion banks. The shared converter retains repeated,
+descending, and out-of-duration keys in their original order. Both real keyframe
+consumers clamp first/last, then find the first subsequent key beyond the current
+frame; the last-key clamp proves the search stays inside the complete track.
+Sorting, deduplication, or clipping would change the source curve. Array counts,
+complete consumption, signed native index bounds, and source identities remain
+checked. The source includes eleven irregular tracks across these two motions.
+
+The complete combined face timelines occupy 279 bytes. The fixed old face pool
+has only 256 bytes before the occupied password bootstrap at `804B4D00`, so the
+pool is linked into the insect runtime. The existing face table's eight padding
+bytes hold its explicit start/end, with table version two. A bounded reader accepts
+that pool and the original version-one format, retains native animation lookups,
+and rejects pointers outside the declared pool. Its prepared 280-byte code fits
+the existing reader reservation; composition updates both actual core hooks.
+Existing face data and password code remain untouched. Runtime preload must
+complete before these new pointers become usable.
+
+The official donor message `3063` maps to additive native `2F00`, retaining all
+78 encoded bytes, line breaks, colours, and pauses. Its source credit is in
+`translations/provenance.json`. The prepared complete message resources use the
+current relocated choice-bank identity. The response uses native report type
+nine, item camera, colour `225/165/255/255`, music 68, and ordinary music cleanup.
+The N64 has no GameCube museum insect-room scene/music owner; none is fabricated.
+
+The combined player-response check covers request rejection, fishing interruption,
+label identity, both setups, source-rate animation, notice/report completion,
+music cleanup, WAIT, face lookup bounds, and retained player extension bytes.
+The resource check composes actual action/motion/face tables and native hooks
+against the current cartridge, preserving the password bootstrap and unrelated
+module/core bytes. Synthetic addresses test composition only, not installed
+storage or native execution. Final installation must place both motions, the
+resident face pool, runtime, hooks, message bank, and reader bounds together.
+
 ### Current prepared output and remaining connections
 
-Prepared output: `build/v3-creature-insects-work-01/programs-17/`.
+Prepared output: `build/v3-creature-insects-work-01/programs-25/`.
 The current cartridge remains ABI 305. No new ROM, save layout, browser choice,
 or deployment is produced by preparation. Reproduce against the explicit input:
 
@@ -821,22 +887,21 @@ engine callbacks. It covers pending allocation/retry, food conditions, forced an
 ordinary net requests, single-ant label transfer, failed creation, fading, scene
 cleanup, native bee preservation, scrolling coordinates, and graphics bounds.
 The current composition check also verifies the unused profile slot and catch
-span while preserving unrelated installed code. All eight focused checks pass;
+span while preserving unrelated installed code. Four changed-path checks pass;
+six unchanged checks retain their passing evidence. Nine shared keyframe checks pass;
 native colony gameplay, visual appearance, and hardware remain unverified.
 
 Remaining connections belong to the same creature importing task:
 
-- Finish the second demo-state binding and the mosquito
-  player sting response. Reuse the prepared native environment/terrain/controller.
-- Connect the digging, axe/shovel rock-strike, and tree-shake event producers.
-  The latch/reset and donor consumers are prepared; no producer is claimed wired.
+- Finish the second demo-state binding. Retain the prepared native environment,
+  terrain, controller, player-event producers, and complete mosquito response.
 - Complete the persistent insect-season reader/codec using the prepared
   calendar-to-native-manager path. Retain the complete colony implementation.
   Implement the actual
   native/GameCube population-capacity alternatives; group creation is bounded by
   available slots until the larger source pool and its consumers are installed.
 - Place the complete runtime through the existing owner-storage machinery, retain
-  overlap guards, install its prepared field audio/effect consumers, connect
+  overlap guards, install its prepared field audio/effect and player consumers, connect
   startup loading, and promote per-insect selection only
   when the gameplay dependencies are implemented.
 - Verify the connected current cartridge/save path and fix actual defects. Keep

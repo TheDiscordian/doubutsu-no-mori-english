@@ -120,8 +120,7 @@ class MotionTests(unittest.TestCase):
     def test_malformed_channels_and_tracks_reject(self):
         row = self.motion['player_animations'][140];root = row['header']['donor_offset']
         for label,offset,value in (('flags',0,b'\x80'),('flags',1,b'\x08'),
-                ('counts',0,b'\0\0'),('counts',0,b'\xff\xff'),
-                ('keys',0,b'\0\0'),('keys',6,b'\0\1'),('keys',0,b'\x7f\xff')):
+                ('counts',0,b'\0\0'),('counts',0,b'\xff\xff'),('counts',0,b'\x7f\xff')):
             source = self.mutable_data();at=row['arrays'][label]['donor_offset']+offset
             source.data[at:at+len(value)]=value
             with self.assertRaises(ValueError):keyframes.animation(source,root)
@@ -130,6 +129,34 @@ class MotionTests(unittest.TestCase):
         del source.relocations[root+4]
         source.relocation_addresses=[at for at in self.source.relocation_addresses if at!=root+4]
         with self.assertRaisesRegex(ValueError,'complete key data'):keyframes.animation(source,root)
+
+    def test_irregular_source_tracks_keep_complete_native_curve(self):
+        from v3_equipment_runtime import player_animation_sources
+        assets,records,_=player_animation_sources(self.source,[132,133],capacity=65520)
+        self.assertEqual({r['source_index'] for r in records},{132,133})
+        irregular=0
+        for record in records:
+            row=record['source'];array=row['arrays']['keys']
+            keys=list(struct.iter_unpack('>3h',self.source.data[
+                array['donor_offset']:array['donor_offset']+array['bytes']]))
+            asset=assets[record['source_index']]
+            compiled=next(r for r in record['compiled']['arrays'] if r['donor_offset']==array['donor_offset'])
+            self.assertEqual(asset[compiled['native_offset']:compiled['native_offset']+array['bytes']],
+                self.source.data[array['donor_offset']:array['donor_offset']+array['bytes']])
+            for track in row['tracks']:
+                irregular+='retained_source_frames' in track
+                sequence=keys[track['first_key']:track['first_key']+track['keys']]
+                # Every boundary and open interval of this piecewise lookup,
+                # not just the animation's usual half-frame sample points.
+                nodes=sorted({1,row['duration'],*(k[0] for k in sequence)})
+                samples=nodes+[(a+b)/2 for a,b in zip(nodes,nodes[1:])]
+                for frame in samples:
+                    if frame<=sequence[0][0] or sequence[-1][0]<=frame:continue
+                    next_key=next(i for i in range(1,len(sequence)) if frame<sequence[i][0])
+                    self.assertLess(next_key,len(sequence))
+                    self.assertLessEqual(sequence[next_key-1][0],frame)
+                    self.assertGreater(sequence[next_key][0]-sequence[next_key-1][0],0)
+        self.assertEqual(irregular,11)
 
     def test_malformed_skeleton_and_stale_descriptions_reject(self):
         rig = self.motion['skeletons'][33];root=rig['header']['donor_offset']

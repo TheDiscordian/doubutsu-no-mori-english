@@ -144,3 +144,20 @@ af_insect_hook_net_index:
     jr $ra
     addiu $sp,$sp,32
 .size af_insect_hook_net_index,.-af_insect_hook_net_index
+
+/* Retain the existing tree query's a0-preserving contract. Native seasonal
+ * callers still use that item in their ordinary drop/bee path after this call.
+ * Tile coordinates are still live in a1/a2 at all four guarded call sites. */
+.globl af_insect_hook_tree
+.type af_insect_hook_tree,@function
+af_insect_hook_tree:
+    addiu $sp,$sp,-32
+    sw $ra,28($sp)
+    sw $a0,24($sp)
+    jal af_insect_player_tree
+    nop
+    lw $a0,24($sp)
+    lw $ra,28($sp)
+    jr $ra
+    addiu $sp,$sp,32
+.size af_insect_hook_tree,.-af_insect_hook_tree

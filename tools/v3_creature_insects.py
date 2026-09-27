@@ -32,7 +32,8 @@ PROGRAMS = (
 RUNTIME=('creature_insects','creature_insect_state','creature_insect_environment',
          'creature_insect_engine','creature_insect_collision','creature_insect_spawns',
          'creature_insect_manager','creature_insect_colony','creature_insect_colony_draw',
-         'creature_insect_audio','creature_insect_effects')
+         'creature_insect_audio','creature_insect_effects','creature_insect_player',
+         'creature_insect_mosquito')
 SOURCES=('tools/v3_creature_insects.py','overlays/v3/creature_insects.h',
          'tools/v3_creature_spawns.py','overlays/v3/creature_spawns.h',
          'overlays/v3/creature_insect_spawns.h',
@@ -41,6 +42,9 @@ SOURCES=('tools/v3_creature_insects.py','overlays/v3/creature_insects.h',
          'tools/v3_furniture_art.py',
          'tools/v3_creature_insect_audio.py','tools/v3_sound_programs.py',
          'tools/v3_creature_insect_effects.py','overlays/v3/creature_insect_effects.h',
+         'tools/v3_creature_insect_player.py','overlays/v3/creature_insect_player.h',
+         'tools/v3_keyframes.py','tools/v3_equipment_runtime.py','translations/provenance.json',
+         'overlays/v3/player_faces.c','overlays/v3/player_faces.ld',
          'overlays/v3/creature_insect_engine.h',
          'overlays/v3/creature_insect_collision.h',
          'overlays/v3/creature_insect_bindings.ld',
@@ -487,11 +491,12 @@ def compile_programs(output,report):
         unbound_engine_adapters=undefined,
         stack_usage=''.join(p.read_text() for p in sorted(output.glob('*.su'))))
     report['pending']=[
-        'Second demo-state binding and mosquito player response',
+        'Second demo-state binding',
+        'Install prepared mosquito actions, full motions/face timelines, and official message with the runtime',
         'Install complete prepared field sound resources together with the runtime',
         'Install prepared small-mud constructor bridge with the complete runtime',
         'Install prepared controller, spawn-manager, and directed-column hooks with the complete runtime',
-        'Digging, rock-strike, and tree-shake event producers',
+        'Install prepared digging, rock-strike, and all-season tree-shake event producers',
         'Persistent insect season reader/codec',
         'Install prepared colony profile/catch hook and included art with complete runtime startup',
         'Native/GameCube population-capacity alternatives, including eight wild GameCube slots',
@@ -516,11 +521,23 @@ def main():
     report['field_audio']=write_prepared(image,prior,source,args.output/'field-audio')
     from v3_creature_insect_effects import contract as effect_contract
     report['field_effects']=effect_contract(image,prior,source)
+    from v3_creature_insect_player import contract as player_contract,prepare_mosquito
+    report['player_interactions']=player_contract(image,prior,source)
+    report['mosquito_player']=prepare_mosquito(image,prior,source,args.output/'mosquito-player')
     write_new(args.output/'field-audio.S',b'''.section .rodata
 .balign 4
 .globl af_insect_trigger_words
 af_insect_trigger_words:
 .incbin "field-audio/bindings.bin"
+.balign 4
+.globl af_insect_tree_bee_query
+af_insect_tree_bee_query:
+'''+f".word {report['player_interactions']['bee_query']}\n".encode()+b'''.globl af_insect_mosquito_message
+af_insect_mosquito_message:
+'''+f".word {report['mosquito_player']['text']['id']}\n".encode()+b'''.balign 4
+.globl af_insect_player_faces
+af_insect_player_faces:
+.incbin "mosquito-player/face-data.bin"
 ''')
     report=compile_programs(args.output,report)
     print(json.dumps(dict(programs=len(report['programs']),species=len(report['rows']),

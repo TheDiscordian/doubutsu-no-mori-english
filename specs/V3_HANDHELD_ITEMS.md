@@ -112,8 +112,11 @@ format handling. It follows complete header relocations, preserves every joint's
 translation, child count, model root, and draw stream, and checks the complete
 preorder hierarchy. Animation traversal accounts for root translation and every
 joint rotation, consuming exactly the declared constant values, track counts,
-and frame/value/velocity triples. Tracks must be ordered and within duration;
-signed native index limits are enforced. Constant-only poses retain null key
+and frame/value/velocity triples. Source tracks retain repeated, descending,
+and out-of-duration keys: both engines clamp first/last and scan for the first
+subsequent key beyond the current frame, keeping the search inside the track.
+The converter records these source irregularities without sorting or clipping.
+Complete array consumption and signed native index limits are enforced. Constant-only poses retain null key
 and count pointers instead of inventing unused arrays.
 
 The converter copies complete arrays without resampling or shortening motion.

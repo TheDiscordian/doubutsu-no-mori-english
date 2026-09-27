@@ -12,10 +12,83 @@ ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'tools'))
 from aflib import sha256
 from v3_creature_insects import PROGRAMS,rewrite,install_controller,install_spawn_manager,install_colony
-PROGRAM_DIRECTORY=ROOT/os.environ.get('V3_INSECT_PROGRAMS','build/v3-creature-insects-work-01/programs-17')
+PROGRAM_DIRECTORY=ROOT/os.environ.get('V3_INSECT_PROGRAMS','build/v3-creature-insects-work-01/programs-25')
 
 
 class CreatureInsectTests(unittest.TestCase):
+    def test_mosquito_resource_composition(self):
+        import copy
+        from aflib import by_vrom,u32,CODE_VROM,CODE_RAM
+        from v3_asset_loader import BLOB
+        from v3_furniture_install import inputs
+        from v3_creature_insect_player import compose_mosquito
+        from v3_equipment_runtime import PLAYER_TABLE,FACE_CODE,FACE_TABLE,FACE_DATA,FACE_END
+        from v3_camper_text import donor
+        from gc_text import decode_gc
+        from textcodec import encode
+        from runtime_module import module_command_info
+        base,prior=inputs(ROOT/'build/v3-creature-world-work-01/connected-15/build-lock.json')
+        report=json.loads((PROGRAM_DIRECTORY/'programs.json').read_text());prepared=report['mosquito_player']
+        self.assertEqual(len(prepared['source_functions']),23)
+        self.assertEqual(prepared['animation_bytes'],2640)
+        self.assertFalse(prepared['text']['provenance_missing'])
+        self.assertNotIn('mPlib_Check_stung_mosquito',report['compiled']['unbound_engine_adapters'])
+        directory=PROGRAM_DIRECTORY/'mosquito-player';e=prior['equipment_resources'];files=by_vrom(base)
+        module=files[BLOB].extract(base)[e['blob_offset']:e['blob_offset']+e['bytes']]
+        # Synthetic placements exercise table composition, not storage/ROM installation.
+        placed=[dict(r,vrom=0x02700000+i*0x1000,storage='test-only') for i,r in enumerate(prepared['records'])]
+        names=('setup','notice_setup','main','notice_main','settle')
+        symbols={'af_insect_mosquito_'+name:0x80670000+64*i for i,name in enumerate(names)}
+        symbols['af_insect_player_faces']=0x80671000
+        core=files[CODE_VROM].extract(base)
+        result,updated,receipt,changed_core=compose_mosquito(e,module,symbols,prepared,directory,placed,core)
+        self.assertEqual(len(result),len(module));self.assertEqual(sha256(result),updated['sha256'])
+        self.assertEqual(updated['player_motion']['allocation'],e['player_motion']['allocation'])
+        self.assertEqual(set(updated['player_actions']['enabled_imported_actions']),
+                         set(e['player_actions']['enabled_imported_actions'])|{107,108})
+        self.assertEqual(len(receipt['callback_patches']),10)
+        spans=[(FACE_CODE,FACE_DATA)]
+        restored=bytearray(changed_core)
+        for p in receipt['face_hooks']:
+            at=p['entry']-CODE_RAM;self.assertEqual(restored[at:at+8].hex(),p['after'])
+            restored[at:at+8]=bytes.fromhex(p['before'])
+        self.assertEqual(restored,core)
+        self.assertEqual(struct.unpack_from('>II',result,FACE_TABLE+1272),(0x80671000,0x80671000+279))
+        self.assertEqual(result[FACE_DATA:FACE_END],module[FACE_DATA:FACE_END],
+            'Existing face data or password bootstrap changed')
+        for row in updated['player_motion']['faces']['rows']:
+            for ptr in row['pointers']:
+                self.assertTrue(ptr==0 or 0x80671000<=ptr<0x80671000+prepared['faces']['data_bytes'])
+        for p in receipt['callback_patches']:
+            self.assertEqual(u32(result,p['offset']),p['after']);spans.append((p['offset'],p['offset']+4))
+        for r in placed:
+            at=PLAYER_TABLE+16+r['source_index']*16;spans.append((at,at+16))
+            self.assertEqual(struct.unpack_from('>4I',result,at),(r['vrom'],r['bytes'],r['pointer'],r['type']))
+        self.assertFalse(any(a!=b and not any(lo<=i<hi for lo,hi in spans)
+            for i,(a,b) in enumerate(zip(result,module,strict=True))))
+        bank,_,decoder=donor();official=encode(decode_gc(bank[0x3063],decoder),module_command_info(base))
+        self.assertEqual(sha256(official),prepared['text']['sha256'])
+        for r in prepared['text']['resources']:
+            raw=(directory/r['file']).read_bytes()
+            self.assertEqual(sha256(raw),r['sha256']);self.assertEqual(len(raw),r['bytes'])
+            self.assertEqual(sha256(files[r['vrom']].extract(base)),r['original_sha256'])
+        wrong=copy.deepcopy(placed);wrong[0]['sha256']='0'*64
+        with self.assertRaises(ValueError):compose_mosquito(e,module,symbols,prepared,directory,wrong,core)
+        symbols['af_insect_mosquito_main']=0x80900000
+        with self.assertRaises(ValueError):compose_mosquito(e,module,symbols,prepared,directory,placed,core)
+
+    def test_connected_mosquito_player(self):
+        with tempfile.TemporaryDirectory(prefix='af-insect-player-') as temporary:
+            executable=Path(temporary)/'mosquito'
+            result=subprocess.run(['cc','-std=c11','-O1','-g','-fno-pie','-no-pie',
+                '-fsanitize=address,undefined','-fno-sanitize-recover=all','-Wall','-Wextra','-Werror',
+                '-I'+str(ROOT/'overlays/v3'),str(ROOT/'overlays/v3/creature_insect_mosquito.c'),
+                str(ROOT/'tests/v3_creature_mosquito_test.c'),'-o',str(executable)],capture_output=True,text=True)
+            self.assertEqual(result.returncode,0,result.stderr)
+            result=subprocess.run([str(executable)],capture_output=True,text=True,timeout=15)
+            self.assertEqual(result.returncode,0,result.stderr)
+            self.assertIn('Complete mosquito request',result.stdout)
+
     def test_connected_field_services(self):
         with tempfile.TemporaryDirectory(prefix='af-insect-services-') as temporary:
             executable=Path(temporary)/'services'
@@ -181,7 +254,7 @@ class CreatureInsectTests(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix='af-insect-engine-') as temporary:
             executable=Path(temporary)/'engine'
             inputs=['creature_insects','creature_insect_state','creature_insect_environment',
-                    'creature_insect_engine','creature_insect_collision']
+                    'creature_insect_engine','creature_insect_collision','creature_insect_player']
             result=subprocess.run(['cc','-std=c11','-O1','-g','-fno-pie','-no-pie',
                 '-fsanitize=address,undefined','-fno-sanitize-recover=all','-Wall','-Wextra','-Werror',
                 '-I'+str(ROOT/'overlays/v3'),
@@ -247,6 +320,41 @@ class CreatureInsectTests(unittest.TestCase):
         self.assertEqual(restored,original,'Existing catch text/collection or player hooks changed')
         symbols['af_insect_colony_profile']=0x80900000
         with self.assertRaises(ValueError):install_colony(image,symbols,contract)
+        from v3_creature_insect_player import install as install_player
+        event_contract=report['player_interactions']
+        event_symbols={p['symbol']:0x80660200+64*i for i,p in enumerate(
+            [*event_contract['player']['hooks'],event_contract['tree_owners'][0]['hooks'][0]])}
+        # Merge with the colony's different hooks in this SAME player owner.
+        combined,event_patches=install_player(image,event_symbols,event_contract,changed)
+        self.assertEqual(len(event_patches),7)
+        for row in [event_contract['player'],*event_contract['tree_owners']]:
+            vrom=row['vrom'];before=changed.get(vrom,files[vrom].extract(image))
+            restored=bytearray(combined[vrom])
+            for p in event_patches:
+                if p['vrom']!=vrom:continue
+                at=p['offset'];self.assertEqual(restored[at:at+4].hex(),p['after'])
+                restored[at:at+4]=bytes.fromhex(p['before'])
+                self.assertEqual(combined[vrom][at+4:at+8],before[at+4:at+8])
+            self.assertEqual(restored,before)
+        rv=event_contract['player']['reloc'];before=files[rv].extract(image);after=combined[rv]
+        self.assertEqual(after[:16],before[:16]);self.assertEqual(after[-4:],before[-4:])
+        old_records=list(struct.unpack_from('>'+str(u32(before,16))+'I',before,20))
+        removed=[p['removed_relocation'] for p in event_contract['player']['hooks']]
+        self.assertEqual(list(struct.unpack_from('>'+str(u32(after,16))+'I',after,20)),
+            [r for r in old_records if r not in removed])
+        from types import SimpleNamespace
+        from npc_mail_show import relocate_verified_data
+        row=event_contract['player'];sections=struct.unpack_from('>5I',before)
+        for loaded in (0x801A0010,0x802F8010,0x803B0010):
+            descriptor=SimpleNamespace(ram=row['ram'],resident_bytes=sum(sections[:4]),
+                                       sections=struct.unpack_from('>5I',after))
+            relocated=relocate_verified_data(descriptor,combined[row['vrom']],after,loaded)
+            for p in event_patches:
+                if p['vrom']==row['vrom']:
+                    self.assertEqual(relocated[p['offset']:p['offset']+4].hex(),p['after'])
+        with self.assertRaises(ValueError):install_player(image,event_symbols,event_contract,combined)
+        event_symbols['af_insect_player_axe']=0x80900000
+        with self.assertRaises(ValueError):install_player(image,event_symbols,event_contract)
         colony=report['colony'];asset=(directory/'colony.bin').read_bytes()
         self.assertEqual(sha256(asset),colony['object_sha256'])
         self.assertEqual(len(asset),colony['object_bytes'])

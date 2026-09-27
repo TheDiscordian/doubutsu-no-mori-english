@@ -50,10 +50,18 @@ def animation(source, address, *, joints=None):
     tracks, cursor = [], 0
     for length in lengths:
         frames = [struct.unpack_from('>h', keys, (cursor+i)*6)[0] for i in range(length)]
-        if (frames[0] < 1 or frames[-1] > duration
-                or any(a >= b for a, b in zip(frames, frames[1:]))):
-            raise ValueError('Keyframe track has unordered or out-of-duration frames')
-        tracks.append(dict(first_key=cursor, keys=length, first_frame=frames[0], last_frame=frames[-1]))
+        track=dict(first_key=cursor, keys=length, first_frame=frames[0], last_frame=frames[-1])
+        # Both actual cKF_KeyCalc consumers clamp against the first/last keys,
+        # then scan for the FIRST subsequent key strictly beyond the frame.
+        # Repeated, descending, or out-of-duration keys are not an array overrun:
+        # if neither clamp returned, the last key necessarily ends that scan.
+        # Real donor motions contain all three. Sorting/deduplicating or clipping
+        # them changes the curve, so preserve every source key and its order.
+        irregular=dict(repeated=any(a==b for a,b in zip(frames,frames[1:])),
+            descending=any(a>b for a,b in zip(frames,frames[1:])),
+            outside_duration=any(f<1 or f>duration for f in frames))
+        if any(irregular.values()):track['retained_source_frames']=irregular
+        tracks.append(track)
         cursor += length
     # cKF_KeyCalc uses signed 16-bit start and length arguments on N64.
     if cursor > 32767:
