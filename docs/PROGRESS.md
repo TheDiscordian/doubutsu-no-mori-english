@@ -1,26 +1,25 @@
 # Current progress
 
-## Local V2 museum-header correction
+## Stable V2 publication
 
-V2-12 at `build/v2-museum-header-12-final/Animal Forest English V2.z64` corrects
-the missed museum name in letter headers, both editing and reading. It uses the
-official GameCube `Museum` wording while preserving the saved Japanese identity,
-fossil delivery, and all saved formats. Existing V2-11 saves are expected to work
-in both directions without migration. Neither web-patcher deployment changes.
+V2-13 at `build/v2-combined-13/Animal Forest English V2.z64` combines the official
+`Animal Crossing` credits title with English `Museum` headers while editing and
+reading letters. Both the public and local patchers target this build. The
+publication hold applies only to experimental V3, not stable V2 fixes.
 
-Focused host and cartridge checks pass. Native museum/villager/player name
-resolution, bounded writes, and code relocation pass; the native rendering
-comparison remains incomplete after two fixture-setup failures. Original-hardware
-appearance still needs confirmation. See the [checkpoint](checkpoints/MUSEUM_LETTER_HEADERS.md)
-for exact checks, limits, and hashes. The explicit V3 proposal below includes
-this correction and pins its no-import output to V2-12; the main lock and both
-deployments retain their existing builds.
+Eight focused cartridge/packaging checks and eleven browser-engine checks pass.
+Silent real-browser downloads from CISO, ISO, and a Pages-style subpath all match
+the combined ROM. The trailer and poster remain unchanged. See the
+[publication checkpoint](checkpoints/V2_13_PUBLICATION.md) for hashes and limits.
+V2 saved formats and fossil processing are unchanged; compatibility with V2-11
+and V2-12 is expected in both directions without migration. A fresh hardware
+playthrough and save cycle are not claimed. The earlier museum rendering-fixture
+comparison remains incomplete; its name-resolution and relocation evidence is
+retained, not replayed.
 
-The museum-header V2-12 baseline still contains `Animal Forest` in its credits.
-The separate `build/v2-official-credits-12/` image and current imported V3 use
-the official `Animal Crossing` title. These V2 corrections need combining
-before a corrected translation-only handoff; neither stable deployment changes
-without approval.
+The current imported V3 already includes both translation fixes. Its pinned
+empty-selection baseline still returns V2-12 and needs aligning with V2-13
+before a V3 handoff. This does not change the main V3 lock or publish V3.
 
 ## Active development
 

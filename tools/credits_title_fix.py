@@ -13,6 +13,8 @@ from textbanks import Bank
 ROOT = Path(__file__).resolve().parents[1]
 DATA, TABLE, TITLE = 0x02600000, 0x00D18000, 0x4EA
 BASES = {
+    'v2-13': ('build/v2-museum-header-12-final', 'Animal Forest English V2',
+              'a09373b051cbcd93991e5dd6cb17a238a2afb1e2e2d7694d75408d24a55d4eee'),
     'v2': ('build/v2-keyboard-fit-11', 'Animal Forest English V2',
            '8bbd1955536a2a3ac9f76d6f323842f5ce25c037e1ff5fd3da9f28d6dfe20507'),
     'v3': ('build/v3-camper-greeting-runtime-02', 'animal-forest-v3-asset-loader',
@@ -65,14 +67,13 @@ def build(kind, output):
     if apply_ups(native,ups) != image: raise ValueError('Credit-title UPS reconstruction failed')
     previous = json.loads((ROOT/folder/'build.json').read_bytes())
     report = copy.deepcopy(previous)
-    report.update(build=kind+'-official-credits-title', output_sha256=sha256(image),
+    report.update(build='V2-13' if kind == 'v2-13' else kind+'-official-credits-title', output_sha256=sha256(image),
                   patch_sha256=sha256(ups), input_build_sha256=digest)
     report['credits_title'] = dict(native_id='string:04EA', reference_id='string:077B',
         reference_sha256=sha256(ADAPTED_REFERENCES[TITLE][1]), translation='Animal Crossing',
         source='Nintendo, Animal Crossing GAFE01 revision 0, active English credits',
         wording_changed=True, executable_code_changed=False, saved_format_changed=False,
-        bank_growth=2, native_retest='not run; data-only change within the existing 25-byte row',
-        web_patcher_updated=False)
+        bank_growth=2, native_retest='not run; data-only change within the existing 25-byte row')
     report.setdefault('sources',{}).update({p:sha256((ROOT/p).read_bytes()) for p in
         ('tools/credits_title_fix.py','tools/credits_strings.py')})
     output.mkdir(parents=True)

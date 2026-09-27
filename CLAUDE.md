@@ -20,6 +20,8 @@ Do not switch either the local or public deployment to V3 until the user has
 tested the build and explicitly approved the switch. GitHub source publication
 does not authorise updating either deployment's recipe, assets, or service.
 Developer verification and a private playtest handoff do not satisfy that approval.
+Keep both patcher deployments on the latest verified stable V2 corrections;
+the experimental V3 publication hold does not apply to V2 fixes.
 
 ## Workflow
 

@@ -29,6 +29,21 @@ submodule and fetches the pinned GameCube reference checkout if missing.
 
 ## Current V2 correction
 
+The released V2-13 combines museum letter-header rendering and the official
+`Animal Crossing` credits title. With the verified V2-11 build available:
+
+```sh
+python3 tools/v2_museum_header_fix.py --output build/v2-museum-header-12-final
+python3 tools/credits_title_fix.py --base v2-13 --output build/v2-combined-13
+```
+
+Each command requires a fresh output directory. The second command consumes the
+first command's exact pinned output; it preserves the museum fix and changes
+only the credits title and associated text-bank metadata. Existing outputs need
+not be rebuilt. The [publication checkpoint](checkpoints/V2_13_PUBLICATION.md)
+records the current ROM, patch, and browser identities. The
+[portal guide](WEB_PORTAL.md) covers regenerating and publishing its recipe.
+
 `python3 tools/keyboard_v2_layout.py --output build/v2-layout-rebuilt` installs
 the compact key tray and smoothly rounded N64-style controller sections on the exact
 V2-08 cartridge at `build/v2-performance-fix-08/Animal Forest English V2.z64`.

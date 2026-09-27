@@ -22,7 +22,22 @@ Incomplete gameplay stays unavailable in the selector; installing assets does
 not claim that an item is playable. Reuse unchanged passing tests throughout.
 
 Current task: close shared conversion and gameplay gaps in the ordinary bulk
-importer. Four complete joint-callback rigs are reusable from
+importer. The working tree implements switched joint motion and translucent
+drawing for the lighthouse, moon, and snowcone machine. The ordinary pipeline
+produces ABI 243 at
+`build/v3-switched-joint-imports-03/profile-runtime/build-lock.json`, SHA-256
+`0b9e6c7305daf96eaf53916143593bee4f5ab52f8169d874caab13a31974e348`.
+All three complete profiles are inactive pending their actual acquisition;
+the existing 158 choices remain. All artwork is reused without compilation.
+The host sanitizer check passes 9,600 motion/draw frames. Current-build
+integration/composition checks and the prepared native `joint_rigs` fixture
+remain unrun; no native setup attempts have been used for this batch. The
+compass parent-relative motion remains unfinished. The shared room packet
+moves to `804D0000..804D8FFF`, clear of existing reaction/colour state; joint
+working floats occupy unused matrix slot nine, outside all eight morph joints.
+Finish focused verification and documentation before committing this batch.
+
+Four complete joint-callback rigs are reusable from
 `build/v3-joint-callback-rigs-prepared-01/`: compass, lighthouse, moon, and
 snowcone machine. One compiler batch retains 16,480 bytes and all 290 triangles,
 full motion arrays, and both joint callbacks. Shared I8 and distinct scrolling
@@ -153,10 +168,11 @@ See the [current checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#complete-model
 for reproduction, native limits, and save warnings. Source publication is
 allowed; the main lock and both stable web-patcher deployments stay unchanged.
 
-Before a corrected translation-only handoff, combine the separate V2 museum
-header and official credits-title corrections. The current imported V3 already
-has both, but its pinned empty-selection V2-12 baseline retains `Animal Forest`.
-This does not authorise changing either stable deployment.
+The stable V2-13 cartridge combines museum headers and the official credits title,
+and both patcher deployments target it. See the
+[publication checkpoint](checkpoints/V2_13_PUBLICATION.md). The V3 publication
+hold does not apply to stable V2 fixes. Current imported V3 already includes both
+fixes; align its pinned empty-selection V2-12 baseline with V2-13 before handoff.
 
 The unfinished code-entry keyboard is parked source work, not the next task.
 Its first build stops at the V2 reconstruction helper's unrelated-resource
@@ -2119,8 +2135,8 @@ edit the released trailer.
 ## Local browser patcher and map correction
 
 The [portal](WEB_PORTAL.md) is running at **http://127.0.0.1:8073/**, serving
-`build/web-portal-06/site`. Browser-only patching of both verified game inputs
-produces current V2-11. The [map correction](../specs/MAP_TOWN_SUFFIX_FIX.md)
+`build/web-portal-07/site`. Browser-only patching of both verified game inputs
+produces current V2-13. The [map correction](../specs/MAP_TOWN_SUFFIX_FIX.md)
 omits the independent Japanese `むら` image beside the town name without save,
 code, allocation, or unrelated-art changes. The released trailer is untouched.
 Implementation and focused verification are complete; user portal feedback,

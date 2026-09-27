@@ -20,14 +20,17 @@ offline-composition checks also pass. All/empty composition remains exact for
 the corrected V3 and unchanged stable V2 respectively. These checks do not
 claim new gameplay, hardware, or save/restart verification.
 
-- Local V2: `build/v2-official-credits-12/Animal Forest English V2.z64`.
-- V2 SHA-256: `3f0788bfc9094b0fc380d8d76bfa5f86e9852f2a5f5e44bd61d848fd35f1fa05`.
-- Current V3: `build/v3-official-credits-01/animal-forest-v3-asset-loader.z64`.
+- Current V2: `build/v2-combined-13/Animal Forest English V2.z64`.
+- V2 SHA-256: `f96395426808200dc6faaac0386aec9839ddcf3a4251eaaf98f371b8029a5e68`.
+- Initial corrected V3 evidence: `build/v3-official-credits-01/animal-forest-v3-asset-loader.z64`.
 - V3 SHA-256: `dfac082b4a900711aedf19b2e0cc869ee8622e1eb110e04be66591a448ea1d4e`.
 - V3 report SHA-256: `4a0d360e39e68bb9da6e20b79ee107b5e559b991705f2d78d22ef5300d4aa9fa`.
 
-The offline composer uses the corrected V3 image. Its empty selection still
-returns the exact stable served V2 baseline; neither served patcher changes.
+Both served patchers target V2-13, combining this title correction with the
+English museum letter headers. See the
+[publication checkpoint](V2_13_PUBLICATION.md). The experimental V3 composer
+retains the title in imported builds; its empty-selection V2-12 pin needs
+aligning with V2-13 before a V3 handoff.
 No saved field, profile, or executable code changes. V2 save compatibility is
 expected without migration, not newly playtested. Imported V3 saves still need
 matching/superset import profiles and must not be loaded in V2.
@@ -39,6 +42,6 @@ and further-language entries. Its explicit coverage queue retains remaining
 UI/artwork and other unindexed resources; resolved covered records are not
 misrepresented as complete whole-ROM attribution.
 
-Resume actual camper trade selection and selected camping rewards using this
-V3 image, preserving the unresolved ABI-80 caller-dispatch diagnostic. The
-data-only title change does not resolve or invalidate that diagnostic.
+The [active queue](../WORK_QUEUE.md) identifies the current V3 importing work
+and checked cartridge; the initial title-correction image is retained evidence,
+not the current V3 development build.
