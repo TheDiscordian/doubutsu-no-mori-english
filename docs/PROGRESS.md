@@ -31,9 +31,9 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
-The current proposal is ABI 298 at
-`build/v3-creature-world-work-01/connected-02/build-lock.json`, ROM SHA-256
-`5ab69cca4ab27d9395d75a78fcecf17b86a70bdd738f213a51dea99bc767b8c1`.
+The current proposal is ABI 300 at
+`build/v3-creature-world-work-01/connected-05/build-lock.json`, ROM SHA-256
+`a867bd2f5b42b814aeba5f29ed11eef1be46ad9975e2f3ded589b7b748a73142`.
 It contains 167 selectable development imports and 100 complete inactive furniture
 profiles whose acquisition is pending. The main lock and both stable V2-14
 deployments are retained.
@@ -133,22 +133,35 @@ separate records. Six coastal callbacks connect donor patrol/wait/escape code
 with preserved original-function fallbacks. The GameCube calendar now reaches
 the native spawn-manager entry, terrain selection, and native fish creation.
 The town's season/transition fields persist alongside independent collection
-records and profile bits for all seventeen additions. The behaviour words remain
-N64; its additive spawning policy and the WebUI/composer choices are unfinished.
-No additional fish are selectable yet.
+records and profile bits for all seventeen additions. The N64 alternative adds
+selected donor fish while retaining the complete native manager for original
+species. Its 100-weight native opportunity competes with actual donor seasonal
+weights; source mode uses the complete donor population and saved seasonal blend.
+The behaviour words remain N64, and WebUI/composer choices are unfinished.
+Native catch recording, prospective final-catch checks, and completion dialogue
+include all selected additions without aliasing original 32-bit records.
+All seventeen complete pocket icons retain their two donor palettes. The 9,792
+artwork bytes and 152-byte descriptor table use existing world/save packet
+padding, with no new RAM or ROM allocation. Original icons, tool/gift paths,
+native herabuna, and existing model assets remain intact. No additional fish
+are selectable yet; collection navigation and official catch messages still
+need integration.
 
-Three current focused checks pass for sanitized spawning through the calendar
-and saved season, all seventeen saved identities/four players, older-format
-migration and pre-write rejection, installed code/hooks, retained artwork,
-UPS reconstruction, and all/empty optional composition. The shared world/save
+Three changed-path checks pass for both population modes, all seventeen native
+catch/collection readers across four players, completion timing, disabled/foreign
+record handling, all dual-palette icons, installed code/hooks, retained assets,
+UPS reconstruction, and all/empty optional composition. The unchanged format-seven
+save codec retains its forward-migration, deletion, capacity, and pre-write
+rejection evidence; it is not rebuilt or replayed for these consumer changes.
+The shared world/save
 packet uses 44 KiB; the working save state grows by 32 bytes without actor growth.
 This build writes format-7 compressed saves with canonical format six. Valid
 older saves migrate forward, preserving existing collections and console data;
 V2 and older V3 builds cannot read its new saves. Preserve backups. These host
 and cartridge checks do not establish native execution or ordinary save/reload;
 the constructor timeout and scheduler disconnect remain unresolved. Continue the
-same fish task through the native additive policy, behaviour choices, icons, and
-catch/collection UI; insect behaviours also remain required. Do not replay old
+same fish task through collection UI, official catch messages, behaviour choices,
+and required save transport; insect behaviours also remain required. Do not replay old
 builds or recompile unchanged artwork.
 
 Continue with creature parent/native integration and the remaining legacy

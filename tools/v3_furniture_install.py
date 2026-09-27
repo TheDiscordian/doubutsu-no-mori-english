@@ -649,7 +649,7 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
     if creature_fish:
         import v3_creature_fish as equipment
         display_report,alias_report=prior['clothing']['display'],prior['display_aliases']
-        result=equipment.install(base,prior,blob,output)
+        result=equipment.install(base,prior,blob,output,core=core)
         equipment_report,owner_changes=result[:2]
         if len(result)==3:
             report_updates=result[2]

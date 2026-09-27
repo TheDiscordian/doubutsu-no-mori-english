@@ -48,7 +48,20 @@ int main(int argc,char **argv) {
     af_spawn_test_calendar=data;
     union {unsigned align;u8 data[0x42E8];} m;memset(&m,0,sizeof(m));
     int *acre=(int *)(m.data+0x4180);acre[0]=3;acre[1]=4;
+    mask=0;
     assert(af_v3_fish_spawn(m.data,&m)==73 && original_calls==1 && draws==0);
+    mask=0x1FFFF;
+    value=0.0f;
+    assert(af_v3_fish_spawn(m.data,&m)==73 && original_calls==2);
+    assert(!af_spawn_test_history_slot && !af_spawn_test_history[0]);
+    assert(!af_creature_test_state.working[AF_SAVE_CREATURE_OFFSET+22]);
+    value=0.99f;
+    assert(af_v3_fish_spawn(m.data,&m)==1 && last.actor>=39 && last.actor<=42);
+    assert(!af_creature_test_state.working[AF_SAVE_CREATURE_OFFSET+22]);
+    history_clear();block=0;
+    assert(af_v3_fish_spawn(m.data,&m)==1 && last.actor>=36 && last.actor<=38);
+    assert(original_calls==2); /* Pond has no artificial native/no-fish mass. */
+    history_clear();block=0x800;value=0.9f;creates=0;
     af_v3_fish_spawn_mode=1;
     assert(af_v3_fish_spawn(m.data,&m)==1 && last.actor>=39 && last.actor<=42);
     assert(creates==1 && af_creature_test_state.working[AF_SAVE_CREATURE_OFFSET+22]==1);
@@ -64,5 +77,5 @@ int main(int argc,char **argv) {
     assert(af_v3_fish_spawn(m.data,&m)==0 && creates==previous);
     af_spawn_test_rtc[2]=24;history_clear();previous=draws;
     assert(af_v3_fish_spawn(m.data,&m)==0 && draws==previous);
-    puts("pass: native fallback, selected sea/pond spawning, tournament, acre protection, saved seasons, invalid inputs");
+    puts("pass: both population alternatives, selected sea/pond spawning, tournament, acre protection, saved seasons, invalid inputs");
 }

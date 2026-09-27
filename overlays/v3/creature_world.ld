@@ -18,6 +18,11 @@ PROVIDE(af_spawn_weather = 0x80098EE4);
 PROVIDE(af_spawn_rank = 0x80084DE0);
 PROVIDE(af_v3_creature_profile_byte = 0x80654000);
 PROVIDE(af_v3_creature_season = 0x80654600);
+PROVIDE(af_creature_item_type = AF_CREATURE_ITEM_TYPE);
+PROVIDE(af_creature_save_collect = AF_CREATURE_SAVE_COLLECT);
+PROVIDE(af_v3_require_save_state = AF_CREATURE_REQUIRE_STATE);
+PROVIDE(af_v3_save_halt = AF_CREATURE_SAVE_HALT);
+PROVIDE(af_creature_icons = AF_CREATURE_ICONS);
 SECTIONS {
     . = 0x8064A000;
     .text : { *(.text.af_v3_patrol_swim) *(.text .text.*) }

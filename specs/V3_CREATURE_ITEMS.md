@@ -250,12 +250,21 @@ The behaviour word defaults to zero (N64); one selects GameCube patrol for
 imported-origin coastal actors. Native fish always retain their existing path.
 The real alternatives are installed, but no browser choice is exposed until its
 composition and complete playable-import dependencies are connected. A separate
-spawn-mode word selects the preserved original manager or source calendar path.
-Its N64 value currently has no additive fish support; that alternative remains
-unfinished, not an advertised supported choice. Icons, catch/collection UI,
-behaviour composition, and ordinary gameplay remain unfinished.
+spawn-mode word selects the additive native policy or source calendar path.
+The native policy gives the unmodified native manager a weight of 100 against
+the sum of selected added species' actual current-half-month/time weights.
+If the native opportunity wins, its complete original calendar, tournament,
+weather, frame-counter selection, and placement execute. Native species retain
+their relative distribution; their total share changes when additions compete.
+Added fish use donor terrain and current-term weights without seasonal blending
+or environment-rank penalties. A pond without a native spawning opportunity
+does not receive an artificial 100-weight no-fish outcome. No eligible additions
+means direct original fallback without an extra random draw. Only the winning
+manager changes acre history; native mode leaves saved transition state intact.
+Browser/offline resolution, collection UI, official catch-message routing, and
+ordinary gameplay remain unfinished.
 
-The 6,908-byte compiled world code and its complete calendars share one 44-KiB
+The 9,564-byte compiled world code and its complete calendars share one 44-KiB
 reservation with creature persistence; source data begins at `8064D000`.
 Original room/frame resources, actor sizes, and the stable translation output
 remain unchanged. The native manager hook preserves its two overwritten
@@ -277,8 +286,8 @@ these checks do not classify the earlier constructor or scheduler failures.
 parent readers: fish bits 0..8, insect bits 9..16. Four independent collection
 records and the town's seasonal transition live in a 32-byte extension. Native
 player deletion clears only that player's new collection, retaining other players
-and town season state. Native capture/UI consumers still need to call the added
-collection API before species become selectable.
+and town season state. Native capture and completion consumers call the added
+collection API; collection UI and foreign-player transport remain required.
 
 | Extension offset | Meaning |
 | --- | --- |
@@ -317,6 +326,51 @@ through the native-bound manager. Cartridge checks cover relocated hook targets,
 all stable save entries, complete code/packets, unchanged graphics resources,
 patch reconstruction, and all/empty private composition. Native engine calls are
 stubbed in the host fixtures; native execution and hardware are not established.
+
+### Catch records, completion, and inventory icons
+
+`creature_collection.c` connects fish and insect catch events to their own native
+or extended collection identities. The native player windows at `808CF704`,
+`808CCE18`, and `808CD568` preserve the full-pocket path: collection is recorded
+when caught, not inferred from successfully inserting an item into inventory.
+Fish actor slots `36..44` map to added indices `32..40`; rubbish remains excluded,
+and coastal salmon retains ordinary salmon identity. Insects use indices `32..39`.
+No shift by an added index reaches the native 32-bit collection fields.
+
+Native final-catch flags consider the prospective catch without writing early,
+require every native species and every selected addition, and do not trigger
+again for duplicates. The three original completion/start/talk functions use
+the same predicate. Their original flag meanings and offsets remain unchanged.
+Unselected additions do not count toward completion. Foreign private blocks may
+retain native records, but cannot write added records into a resident's slot;
+the existing explicit save-error path stops such writes. Controller Pak transport
+must be completed before declaring the full travel/save path supported.
+
+The shared converter reads actual donor fish/insect icon-pointer tables and
+category bindings for all seventeen added parents. Each icon retains the full
+32-by-32 CI4 texture and both sixteen-colour palettes. Palette conversion and
+untile/packing reuse the existing inventory-art tooling. The complete 9,792-byte
+resource set and 152-byte descriptor table occupy verified unused gaps in the
+world/save packet. Each descriptor/resource has source/output hashes and exact
+bounds in the build report; no original texture, table, calendar, or codec is
+overwritten. Future world-code changes must repack these gaps, not assume that
+padding below the calendar or after a codec is still free.
+
+The default native descriptor window at `8085C968` routes only extended fish and
+insects through the readiness/profile-aware lookup. Gifts and tools retain their
+existing branches. Original species retain their native descriptors. The native
+palette selection still adds 32 bytes for collection rendering; the second
+palette is not discarded. Disabled or invalid added IDs skip drawing without
+indexing past the native table. The original drawing function is checked in full,
+normalizing its two existing hooks; unrelated menu-allocation metadata remains
+unchanged. Exactly two obsolete descriptor-table relocations are removed.
+
+Sanitized checks cover all seventeen catch/icon identities, four independent
+players, native high bits, duplicate/final catches, completion dialogue,
+disabled records, and foreign-write rejection. Current-cartridge checks compare
+all icon resources with the donor, verify both palettes, hooks/relocations,
+retained code/assets, UPS reconstruction, and unchanged all/empty composition.
+These are not native icon-rendering, ordinary gameplay, or hardware results.
 
 ### Native integration constraints
 

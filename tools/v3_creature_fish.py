@@ -94,9 +94,11 @@ def rewrite(owner,reloc,ram,targets,windows):
     return bytes(image),fixed,receipt
 
 
-def install(base,prior,blob,output):
+def install(base,prior,blob,output,core=None):
     from v3_furniture_pipeline import Source
     e=copy.deepcopy(prior['equipment_resources']);field=e.get('creature_field')
+    if e.get('creature_fish',{}).get('world',{}).get('spawn_manager_installed'):
+        return connect_catches(base,prior,blob,output,core)
     if e.get('creature_fish',{}).get('world'):return install_manager(base,prior,blob,output)
     if e.get('creature_fish'):return install_world(base,prior,blob,output)
     if not field:raise ValueError('Fish world readers require installed field frames')
@@ -369,3 +371,216 @@ def install_manager(base,prior,blob,output):
         pending=['native additive spawning and behaviour-choice composition','pocket icons',
             'catch/collection UI readers','ordinary gameplay'])
     return e,changes,updates
+
+
+def pocket_icons(source,equipment,packet,regions,descriptor_offset):
+    """Convert the complete creature icon category into verified unused padding."""
+    from title_assets import pack4,untile
+    from v3_villager_art import native_palette
+    from v3_creature_items import source_records
+    rows,_=source_records(source)
+    if rows!=equipment['creature_items']['rows']:raise ValueError('Changed complete creature parent records')
+    tables={};receipts=[]
+    parent,n=source.symbol('item_tex_data_table$779');bindings=source.pointers(parent,n)
+    if n!=64:raise ValueError('Changed complete icon category map')
+    for kind,name,count,category in (('fish','fish_tex_table$766',40,3),('insect','insect_tex_table$776',45,13)):
+        start,size=source.symbol(name);pointers=source.pointers(start,size)
+        if (size!=count*8 or source.data[start:start+size]!=bytes(size) or
+                set(pointers)!=set(range(start,start+size,4)) or bindings.get(parent+category*4)!=start):
+            raise ValueError('Changed complete creature icon/category binding')
+        tables[kind]=(start,pointers)
+        receipts.append(dict(symbol=name,offset=start,bytes=size,pointers=pointers))
+    functions=[]
+    for at,n,digest in ((0x27DDCC,1364,'6d4d8f5f7c64617bb068d63f77b0b776010670245f113ef466e9494b712c7738'),
+                        (0x27E320,672,'e357f68f7a995bf8f989c6fb7da6ad47f803b151b1ab9c34662eae8f0b9f1814')):
+        data,function=source.function(at)
+        if len(data)!=n or sha256(data)!=digest:raise ValueError('Changed complete source icon drawing consumer')
+        functions.append(function)
+    cursors=[(a+31)&~31 for a,b in regions];resources=[];offsets={};descriptors=[]
+    table=bytearray(struct.pack('>4I',0x41464350,1,17,8)+bytes(17*8))
+    if descriptor_offset&31 or any(packet[descriptor_offset:descriptor_offset+len(table)]):
+        raise ValueError('Creature icon descriptors overlap occupied data')
+    def store(data):
+        for i,(_,end) in enumerate(regions):
+            pos=cursors[i]
+            if pos+len(data)<=end:
+                if any(packet[pos:pos+len(data)]):raise ValueError('Creature icons overlap retained packet code/data')
+                packet[pos:pos+len(data)]=data;cursors[i]=(pos+len(data)+31)&~31
+                return pos
+        raise ValueError('Complete creature icons exceed checked packet padding')
+    for i,row in enumerate(rows):
+        start,pointers=tables[row['category']];pair=[]
+        for lane,kind,n in ((0,'palette',64),(4,'texture',512)):
+            target=pointers[start+row['source_index']*8+lane]
+            name,begin,size=source.containing(target,exact=True)
+            if begin!=target or size!=n or source.pointers(target,n):
+                raise ValueError('Incomplete creature CI4 icon or dual palette')
+            key=(target,kind)
+            if key not in offsets:
+                raw=source.data[target:target+n]
+                data=(native_palette(raw[:32])+native_palette(raw[32:]) if kind=='palette'
+                      else pack4(untile(raw,32,32,4)))
+                pos=store(data);offsets[key]=WORLD_RAM+pos
+                resources.append(dict(symbol=name,source_offset=target,kind=kind,bytes=n,
+                    offset=pos,ram=WORLD_RAM+pos,sha256=sha256(data),source_sha256=sha256(raw)))
+            pair.append(offsets[key])
+        struct.pack_into('>2I',table,16+i*8,*pair)
+        descriptors.append(dict(item_id=row['item_id'],source_item_id=row['source_item_id'],
+            descriptor_ram=WORLD_RAM+descriptor_offset+16+i*8,palette=pair[0],texture=pair[1]))
+    packet[descriptor_offset:descriptor_offset+len(table)]=table
+    return dict(rows=descriptors,resources=resources,source_tables=receipts,source_functions=functions,
+        table_ram=WORLD_RAM+descriptor_offset,table_bytes=len(table),table_sha256=sha256(table),
+        resource_bytes=sum(r['bytes'] for r in resources),width=32,height=32,palettes_per_icon=2,
+        format_native='CI4/RGBA5551',native_drawing_tested=False)
+
+
+def connect_catches(base,prior,blob,output,core):
+    """Continue the category through native catches and completion consumers.
+
+    Reuse the current world/save allocation and every converted resource. No
+    species-specific installer, new saved layout, or additional DMA is needed.
+    """
+    from aflib import CODE_RAM,CODE_VROM
+    from v3_import_storage import jump
+    from v3_equipment_runtime import PLAYER_VROM,PLAYER_RELOC,PLAYER_RAM
+    import v3_creature_save as saves
+    e=copy.deepcopy(prior['equipment_resources']);fish=e['creature_fish'];world=fish['world']
+    if world.get('pocket_icons'):raise ValueError('Creature pocket consumers are already connected')
+    files=by_vrom(base)
+    if core is None or bytes(core)!=files[CODE_VROM].extract(base):
+        raise ValueError('Catch integration requires the complete checked native core')
+    p=world['packet'];at=p['blob_offset'];packet=bytearray(blob[at:at+p['bytes']])
+    if p['ram']!=WORLD_RAM or p['bytes']!=0xB000 or sha256(packet)!=p['sha256'] or zlib.crc32(packet)!=p['crc32']:
+        raise ValueError('Changed complete connected world/save packet')
+    save=world['save'];oldcompiled=world['compiled'];oldsymbols=oldcompiled['symbols']
+    stable=e['console_storage']['compiled']['symbols']
+    icon_offset=(0x4000+save['codec']['bytes']+31)&~31
+    code,compiled=compile_part('creature_world',output/'creature_world',
+        primary_source='overlays/v3/creature_patrol.c',defines=saves.DEFINES+(
+            f'AF_FISH_CALENDAR_BYTES={world["calendar"]["bytes"]}',),
+        extra_sources=('overlays/v3/creature_water.c','overlays/v3/creature_spawns.c',
+            'overlays/v3/creature_patrol.S','overlays/v3/creature_manager.c',
+            'overlays/v3/creature_manager.S','overlays/v3/creature_collection.c',
+            'overlays/v3/creature_icon.c','overlays/v3/creature_icon.S'),
+        link_symbols={
+            'AF_CREATURE_ITEM_TYPE':e['creature_items']['code']['symbols']['af_v3_creature_item_type'],
+            'AF_CREATURE_SAVE_COLLECT':save['codec']['symbols']['af_v3_save_collect_extended'],
+            'AF_CREATURE_REQUIRE_STATE':stable['af_v3_require_save_state'],
+            'AF_CREATURE_SAVE_HALT':stable['af_v3_save_halt'],
+            'AF_CREATURE_ICONS':WORLD_RAM+icon_offset})
+    if len(code)>WORLD_TABLE:raise ValueError('Connected creature consumers overlap calendars')
+    symbols=compiled['symbols'];packet[:WORLD_TABLE]=code+bytes(WORLD_TABLE-len(code))
+    # The saved season helper calls this shared core. Preserve its complete
+    # binding; a moved core requires a deliberate helper relink, not stale code.
+    if symbols['af_v3_spawn_terms']!=oldsymbols['af_v3_spawn_terms']:
+        raise ValueError('Connected world moves the retained saved-season dependency')
+    changes={};owners=[]
+    sea=next(o for o in fish['owners'] if o['name']=='sea')
+    raw=bytearray(files[sea['vrom']].extract(base));before=bytes(raw)
+    if sha256(raw)!=sea['sha256']:raise ValueError('Changed complete coastal owner')
+    patches=[]
+    for row in world['manager_owners'][0]['patches']:
+        name=next(n for n,a in oldsymbols.items() if a==row['after'] and n.startswith('af_v3_patrol_'))
+        pos=row['address']-sea['ram'];target=symbols[name]
+        if u32(raw,pos)!=row['after']:raise ValueError('Changed installed coastal callback')
+        struct.pack_into('>I',raw,pos,target)
+        patches.append(dict(address=row['address'],before=row['after'],after=target))
+    sea['patches'].extend(patches);sea['sha256']=sha256(raw);changes[sea['vrom']]=bytes(raw)
+    owners.append(dict(name='sea',vrom=sea['vrom'],ram=sea['ram'],original_sha256=sha256(before),
+        sha256=sha256(raw),patches=patches))
+    spawn=next(o for o in world['manager_owners'] if o['name']=='spawn')
+    raw=bytearray(files[spawn['vrom']].extract(base));before=bytes(raw)
+    if sha256(raw)!=spawn['sha256']:raise ValueError('Changed installed spawn owner')
+    pos=0x8092ECAC-spawn['ram'];expected=struct.pack('>2I',jump(oldsymbols['af_v3_fish_spawn']),0)
+    if raw[pos:pos+8]!=expected:raise ValueError('Changed installed spawn entry')
+    after=struct.pack('>2I',jump(symbols['af_v3_fish_spawn']),0);raw[pos:pos+8]=after
+    changes[spawn['vrom']]=bytes(raw)
+    owners.append(dict(spawn,original_sha256=sha256(before),sha256=sha256(raw),
+        patches=[dict(address=0x8092ECAC,before=expected.hex(),after=after.hex())]))
+
+    jal=lambda name:0x0C000000|(symbols[name]>>2&0x3FFFFFF)
+    windows=[]
+    for address,expected,after in (
+        (0x808CCE18,'8dce6fd8241800010078c8048dcf0ac001f94026250900012d290001ac890d14',
+            (0x00602825,jal('af_v3_creature_last_insect'),0,0x00402025)),
+        (0x808CD568,'3c0280138c426fd824190001007948048c580ac003095025ac4a0ac0',
+            (0x00E02025,0x00602825,jal('af_v3_creature_notice_insect'),0,0x00403825)),
+        (0x808CF704,'28e10020102000113c05801324a56ea08ca801382418000100f818048d090abc01235026254b00012d6b0001ac8b00148ca201388c4c0abc01836825ac4d0abc',
+            (0x02002025,0x00E02825,jal('af_v3_creature_notice_fish'),0))):
+        raw=bytes.fromhex(expected);words=struct.unpack('>'+str(len(raw)//4)+'I',raw)
+        windows.append((address,words,after+(0,)*(len(words)-len(after))))
+    raw=files[PLAYER_VROM].extract(base);reloc=files[PLAYER_RELOC].extract(base)
+    normalized=bytearray(raw)
+    if world.get('catch_records_installed'):
+        old=next(o for o in world['manager_owners'] if o['name']=='player_catches')
+        if sha256(raw)!=old['sha256'] or sha256(reloc)!=old['reloc_sha256'] or old['removed_relocations']:
+            raise ValueError('Changed installed catch consumer/relocations')
+        for patch in old['patches']:
+            pos=patch['address']-PLAYER_RAM
+            if u32(normalized,pos)!=patch['after']:raise ValueError('Changed installed catch call')
+            struct.pack_into('>I',normalized,pos,patch['before'])
+    data,fixed,receipt=rewrite(bytes(normalized),reloc,PLAYER_RAM,{},windows)
+    for patch in receipt['patches']:patch['before']=u32(raw,patch['address']-PLAYER_RAM)
+    receipt.update(name='player_catches',vrom=PLAYER_VROM,reloc=PLAYER_RELOC,ram=PLAYER_RAM,
+        original_sha256=sha256(raw),original_reloc_sha256=sha256(reloc))
+    changes[PLAYER_VROM]=data;changes[PLAYER_RELOC]=fixed;owners.append(receipt)
+
+    core_before=bytes(core);patches=[]
+    if world.get('catch_records_installed'):
+        old=next(o for o in world['manager_owners'] if o['name']=='completion')
+        if sha256(core)!=old['sha256']:raise ValueError('Changed installed completion owner')
+        for patch in old['patches']:
+            pos=patch['address']-CODE_RAM
+            if core[pos:pos+8].hex()!=patch['after']:raise ValueError('Changed installed completion entry')
+            core[pos:pos+8]=bytes.fromhex(patch['before'])
+    for address,size,digest,name in (
+        (0x800B9E44,76,'d538e61f701de16c39d5e16da01d4010b11239055690f4d25fb0a839a23303f9','af_v3_creature_start_complete'),
+        (0x800BA054,72,'7d1e68fc3f347558fd7560399a3402a17543f4cfeb7acd1ae00f478c313da9c4','af_v3_creature_fish_talk'),
+        (0x800BA09C,72,'b89f49facdd38fdfc1cfc6f74005fb0ab2e4377a2ee2a81a2df0d6a982ff2f25','af_v3_creature_insect_talk')):
+        pos=address-CODE_RAM
+        if sha256(core[pos:pos+size])!=digest:raise ValueError('Changed native completion consumer')
+        guard_incoming(core,len(core),CODE_RAM,[(pos,8)])
+        old=core_before[pos:pos+8];new=struct.pack('>2I',jump(symbols[name]),0)
+        core[pos:pos+8]=new
+        patches.append(dict(address=address,before=old.hex(),after=new.hex(),function_sha256=digest))
+    owners.append(dict(name='completion',vrom=CODE_VROM,ram=CODE_RAM,
+        original_sha256=sha256(core_before),sha256=sha256(core),patches=patches))
+    from v3_furniture_pipeline import Source
+    source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+        (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    icons=pocket_icons(source,e,packet,[(len(code),WORLD_TABLE),
+        (icon_offset+16+17*8,0x6000),(0x6000+save['runtime']['bytes'],0xA000),
+        (0xA000+save['helpers']['bytes'],0xAFF0)],icon_offset)
+    from v3_furniture_icon import VROM as MENU,RELOC as MENU_RELOC,RAM as MENU_RAM
+    raw=files[MENU].extract(base);reloc=files[MENU_RELOC].extract(base)
+    # Other categories legitimately resize menu allocations outside this draw
+    # function. Verify the entire drawing consumer and its installed hooks,
+    # rather than treating an old category's whole-owner receipt as current.
+    normalized=bytearray(raw)
+    for address,expected,original in (
+        (0x8085C880,struct.pack('>2I',jump(0x8046AB00),0),bytes.fromhex('00194b0324010001')),
+        (0x8085C954,bytes.fromhex(e['pocket_icons']['hook']['after']),bytes.fromhex('3c0f808625efdd68'))):
+        pos=address-MENU_RAM
+        if normalized[pos:pos+8]!=expected:raise ValueError('Changed installed shared icon hook')
+        normalized[pos:pos+8]=original
+    if (sha256(normalized[0x8085C7B8-MENU_RAM:0x8085CE18-MENU_RAM])!=e['pocket_icons']['native_consumer_sha256'] or
+            sha256(reloc)!=e['pocket_icons']['relocation_sha256']):
+        raise ValueError('Changed complete shared pocket icon consumer/relocations')
+    data,fixed,receipt=rewrite(raw,reloc,MENU_RAM,{},[(0x8085C968,
+        (0x3C198086,0x0338C821,0x8F39E460,0x000248C0,0x8FA400CC,0x03292821),
+        (jump(symbols['af_v3_creature_icon_hook']),0,0,0,0,0))])
+    receipt.update(name='pocket_icons',vrom=MENU,reloc=MENU_RELOC,ram=MENU_RAM,
+        original_sha256=sha256(raw),original_reloc_sha256=sha256(reloc))
+    changes[MENU]=data;changes[MENU_RELOC]=fixed;owners.append(receipt)
+    e['pocket_icons'].update(owner_sha256=sha256(data),relocation_sha256=sha256(fixed))
+    blob[at:at+p['bytes']]=packet;p.update(sha256=sha256(packet),crc32=zlib.crc32(packet))
+    world.update(compiled=compiled,manager_owners=owners,catch_records_installed=True,pocket_icons=icons,
+        collection_ui_installed=False,native_execution_tested=False)
+    world['patrol_mode']['ram']=symbols['af_v3_fish_patrol_mode']
+    world['spawn_mode'].update(ram=symbols['af_v3_fish_spawn_mode'],native_additive_policy_installed=True,
+        native_opportunity_weight=100,values={'N64':0,'GameCube':1})
+    fish.update(additional_resident_bytes=0,
+        sources={path:sha256((ROOT/path).read_bytes()) for path in (*fish['sources'],
+            'overlays/v3/creature_collection.c','overlays/v3/creature_icon.c','overlays/v3/creature_icon.S')},
+        pending=['behaviour-choice composition','collection UI','ordinary gameplay'])
+    return e,changes

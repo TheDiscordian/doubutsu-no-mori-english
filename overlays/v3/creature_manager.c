@@ -33,12 +33,39 @@ extern const u8 *af_spawn_test_calendar;
 #endif
 static float random_value(void *unused) {(void)unused;return af_patrol_random();}
 
+/* Additions compete against the original 100-weight native opportunity. When
+ * that opportunity wins, execute the complete original manager: its calendars,
+ * tournament choice, frame-counter selection, weather, and positions survive.
+ * Added species use their actual donor half-month/time/water weights, without
+ * changing the identities or relative weights inside the native opportunity.
+ * Return -2 for the original manager, -1 for no valid imported spawn. */
+int af_v3_spawn_native_additions(const SpawnPlan *source,unsigned block) {
+    SpawnPlan added;added.count=0;
+    float total=0.0f;
+    if (!source || source->count>AF_SPAWN_CAPACITY) return -1;
+    for (unsigned i=0;i<source->count;i++) {
+        SpawnRow row=source->rows[i];
+        if (row.actor<36 || row.actor>44) continue;
+        if (!(row.weight>=0.0f && row.weight<=255.0f) || row.area>6) return -1;
+        added.rows[added.count++]=row;total+=row.weight;
+    }
+    if (!added.count || total==0.0f) return -2;
+    unsigned native=!!(block&(0x800u|0x80u|0x100u|0x8000u));
+    if (native) {
+        float r=af_patrol_random();
+        if (!(r>=0.0f && r<1.0f)) return -1;
+        if (r*(100.0f+total)<100.0f) return -2;
+    }
+    int pick=af_v3_spawn_pick(&added,block,3,random_value,0);
+    return pick<0 ? -1 : (int)added.rows[pick].actor;
+}
+
 int af_v3_fish_spawn(void *manager,void *game) {
     if (!manager || !game) return 0;
-    /* Native mode is deliberately not advertised as supporting added fish yet.
-     * The private composer keeps creature choices disabled until both spawning
-     * alternatives, icons, and collection consumers are complete. */
-    if (*(const volatile u32 *)&af_v3_fish_spawn_mode!=1) return af_spawn_original(manager,game);
+    unsigned mode=*(const volatile u32 *)&af_v3_fish_spawn_mode;
+    if (mode>1) return 0;
+    unsigned selected=af_v3_creature_profile_byte(0)|(af_v3_creature_profile_byte(1)&1u)<<8;
+    if (!mode && !selected) return af_spawn_original(manager,game);
     int *acre=(int *)((u8 *)manager+0x4180);
     if (acre[0]<0 || acre[0]>255 || acre[1]<0 || acre[1]>255 || history_slot>1) return 0;
     for (unsigned i=0;i<2;i++) if (history[i]==acre[0] && history[2+i]==acre[1]) return 0;
@@ -51,20 +78,33 @@ int af_v3_fish_spawn(void *manager,void *game) {
     if (block&0x400000u) return 0;
     SpawnDate date={(int)rtc[6]*256+rtc[7],rtc[5],rtc[3]};
     int time=af_v3_spawn_time(rtc[2]);SpawnTerms terms;
-    if (time<0 || !af_v3_creature_season(&terms,date,random_value,0)) return 0;
-    if (water==0 && (af_spawn_event(20,1) || af_spawn_event(2,1)) &&
+    if (time<0 || date.month<1 || date.month>12 || date.day<1 || date.day>31) return 0;
+    if (mode) {
+        if (!af_v3_creature_season(&terms,date,random_value,0)) return 0;
+    } else {
+        unsigned now=(date.month-1)*2u+(date.day>15);
+        terms=(SpawnTerms){now,now,1.0f};
+    }
+    if (mode && water==0 && (af_spawn_event(20,1) || af_spawn_event(2,1)) &&
         ((event_area==0 && (block&0x8000)) || (event_area==1 && (block&0x200)) ||
          (event_area==2 && (block&0x100))) && af_patrol_random()<0.75f) water=3;
-    unsigned selected=af_v3_creature_profile_byte(0)|(af_v3_creature_profile_byte(1)&1u)<<8;
     SpawnPlan plan;
     if (!af_v3_spawn_plan(&plan,calendar,AF_FISH_CALENDAR_BYTES,water,terms,(unsigned)time,
                           selected,af_spawn_weather()==1)) return 0;
-    /* Retain native repeated-acre protection and native actor creation limits. */
+    int actor;
+    if (mode) {
+        int pick=af_v3_spawn_pick(&plan,block,af_spawn_rank(),random_value,0);
+        actor=pick<0 ? -1 : (int)plan.rows[pick].actor;
+    } else {
+        actor=af_v3_spawn_native_additions(&plan,block);
+        if (actor==-2) return af_spawn_original(manager,game);
+    }
+    /* Retain native repeated-acre protection and native actor creation limits.
+     * Only the winning manager updates history, so fallback cannot self-block. */
     history[history_slot]=(u8)acre[0];history[2+history_slot]=(u8)acre[1];history_slot^=1;
-    int pick=af_v3_spawn_pick(&plan,block,af_spawn_rank(),random_value,0);
-    if (pick<0) return 0;
+    if (actor<0) return 0;
     FishWaterBlock context={acre[0],acre[1],collision};SpawnPosition position;
-    if (!af_v3_spawn_position(&position,plan.rows[pick].actor,af_v3_water_site,random_value,&context)) return 0;
+    if (!af_v3_spawn_position(&position,(unsigned)actor,af_v3_water_site,random_value,&context)) return 0;
     SpawnNativeData data={(u8)position.actor,(u8)position.x,(u8)position.z,1,0};
     return af_spawn_make(manager,&data,game);
 }

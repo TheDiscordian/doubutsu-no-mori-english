@@ -39,16 +39,27 @@ commits. Batch connected verification, rather than creating another independent
 table/reader deliverable. Insects and the other importing categories remain
 required work, not removed scope.
 
-Use the shared converter and the current ABI-298 proposal:
-`build/v3-creature-world-work-01/connected-02/build-lock.json`.
-ROM SHA-256: `5ab69cca4ab27d9395d75a78fcecf17b86a70bdd738f213a51dea99bc767b8c1`.
+Use the shared converter and the current ABI-300 proposal:
+`build/v3-creature-world-work-01/connected-05/build-lock.json`.
+ROM SHA-256: `a867bd2f5b42b814aeba5f29ed11eef1be46ad9975e2f3ded589b7b748a73142`.
 The GameCube calendar is connected through native manager entry `8092ECAC`,
 terrain selection, and real actor creation. The complete seventeen-creature
 saved-profile/collection extension and town seasonal state are installed.
-The exact next work is the native additive spawning alternative and resolved
-behaviour settings, followed by catch/collection UI readers and pocket icons.
-Native mode currently calls the preserved original manager; it does not yet
-spawn additions and must not be advertised as a completed import alternative.
+Both population alternatives are installed: source seasonal blending and an
+additive native policy retaining the original native-species manager. All
+seventeen added species have native catch/last-catch/completion readers and full
+dual-palette pocket icons. These remain inactive until the full path is usable.
+The exact next consumers are the collection grid/navigation/name reader,
+official donor catch messages, and resolved browser/offline behaviour settings.
+The collection grid is still 32 slots; nine added fish plus native herabuna need
+41 identities. Extend its layout and navigation together, not just its loop bound.
+The native fish message selector at `808CF92C` still bounds ordinary fish at 32
+and uses actor-index arithmetic; added actor indices must map to official donor
+messages, not existing rubbish/unrelated text. Reuse the existing translation
+framework and single provenance catalogue. GameCube source
+`m_player_main_notice_rod.c_inc` defines the donor message mapping.
+Controller Pak transport of added catch records remains unfinished; the record
+adapter rejects foreign-player writes rather than crediting another resident.
 Keep the shared bounded plan, not appended entries in the native twenty-row
 buffers. The active task and exhausted native harness budget are unchanged.
 This private build writes format-7 compressed saves (canonical format six).
@@ -100,9 +111,13 @@ Next importing work:
   season/selection/placement code are connected to native creation and persisted
   seasons. Three focused current checks pass for sanitized manager/save paths,
   forward migration and rejection, installed hooks, preservation, and optional
-  composition; native world execution is unverified. Continue the native additive
-  spawning alternative, behaviour selection, pocket icons, collection UI, and new
-  insect behaviour programs. Do not reconvert frames or create per-fish tools.
+  composition; native world execution is unverified. Native additive spawning,
+  complete-category catch records, completion checks, and dual-palette icons are
+  connected. Current host checks cover every added identity/four players,
+  completion timing, disabled/foreign records, both population modes, complete
+  donor icon conversion, current hooks, and optional composition. Continue the
+  collection UI, official catch messages, behaviour selection, and new insect
+  behaviour programs. Do not reconvert frames or create per-fish tools.
   The common converter already retains all 17 displays, 96 joints, full motion
   arrays, and complete source sound callbacks in
   `build/v3-creature-profiles-prepared-01/`. All seventeen complete room profiles,
