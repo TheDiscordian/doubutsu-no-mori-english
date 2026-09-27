@@ -20,11 +20,15 @@ const u32 af_v3_surface_crc_expected = AF_SURFACE_ITEMS_CRC;
 #define surface_crc AF_SURFACE_ITEMS_CRC
 #endif
 
+static __attribute__((noinline)) int load_code(void *p,u32 vrom,u32 bytes,u32 crc) {
+    if (af_surface_dma(p,vrom,bytes) || af_surface_crc(p,bytes)!=crc) return 0;
+    af_surface_writeback(p,bytes);
+    af_surface_invalidate(p,bytes);
+    return 1;
+}
+
 int af_v3_surface_init(void) {
-    if (af_surface_dma(memory,AF_SURFACE_ITEMS_VROM,AF_SURFACE_ITEMS_BYTES) ||
-            af_surface_crc(memory,AF_SURFACE_ITEMS_BYTES)!=surface_crc) return 0;
-    af_surface_writeback(memory,AF_SURFACE_ITEMS_BYTES);
-    af_surface_invalidate(memory,AF_SURFACE_ITEMS_BYTES);
+    if (!load_code(memory,AF_SURFACE_ITEMS_VROM,AF_SURFACE_ITEMS_BYTES,surface_crc)) return 0;
 #ifdef AF_ROOM_GOODS_VROM
     /* Room-item hooks are resident before native actors can call them. This
        immutable packet is independent of the selected import profile. */
@@ -34,10 +38,7 @@ int af_v3_surface_init(void) {
     extern unsigned char af_test_goods_code[AF_ROOM_GOODS_BYTES];
     void *goods=af_test_goods_code;
 #endif
-    if (af_surface_dma(goods,AF_ROOM_GOODS_VROM,AF_ROOM_GOODS_BYTES) ||
-            af_surface_crc(goods,AF_ROOM_GOODS_BYTES)!=AF_ROOM_GOODS_CRC) return 0;
-    af_surface_writeback(goods,AF_ROOM_GOODS_BYTES);
-    af_surface_invalidate(goods,AF_ROOM_GOODS_BYTES);
+    if (!load_code(goods,AF_ROOM_GOODS_VROM,AF_ROOM_GOODS_BYTES,AF_ROOM_GOODS_CRC)) return 0;
 #ifdef __mips__
     *(volatile u32 *)0x804DC000u=0;
 #else
@@ -52,10 +53,7 @@ int af_v3_surface_init(void) {
     extern unsigned char af_test_carry_code[AF_ROOM_CARRY_BYTES];
     void *carrying=af_test_carry_code;
 #endif
-    if (af_surface_dma(carrying,AF_ROOM_CARRY_VROM,AF_ROOM_CARRY_BYTES) ||
-            af_surface_crc(carrying,AF_ROOM_CARRY_BYTES)!=AF_ROOM_CARRY_CRC) return 0;
-    af_surface_writeback(carrying,AF_ROOM_CARRY_BYTES);
-    af_surface_invalidate(carrying,AF_ROOM_CARRY_BYTES);
+    if (!load_code(carrying,AF_ROOM_CARRY_VROM,AF_ROOM_CARRY_BYTES,AF_ROOM_CARRY_CRC)) return 0;
 #ifdef __mips__
     *(volatile u32 *)0x804DC400u=0;
 #else
@@ -70,10 +68,7 @@ int af_v3_surface_init(void) {
     extern unsigned char af_test_exercise_code[AF_PLAYER_EXERCISE_BYTES];
     void *exercise=af_test_exercise_code;
 #endif
-    if (af_surface_dma(exercise,AF_PLAYER_EXERCISE_VROM,AF_PLAYER_EXERCISE_BYTES) ||
-            af_surface_crc(exercise,AF_PLAYER_EXERCISE_BYTES)!=AF_PLAYER_EXERCISE_CRC) return 0;
-    af_surface_writeback(exercise,AF_PLAYER_EXERCISE_BYTES);
-    af_surface_invalidate(exercise,AF_PLAYER_EXERCISE_BYTES);
+    if (!load_code(exercise,AF_PLAYER_EXERCISE_VROM,AF_PLAYER_EXERCISE_BYTES,AF_PLAYER_EXERCISE_CRC)) return 0;
 #endif
 #ifdef AF_CONSOLE_STORAGE_VROM
 #ifdef __mips__
@@ -82,10 +77,7 @@ int af_v3_surface_init(void) {
     extern unsigned char af_test_console_code[AF_CONSOLE_STORAGE_BYTES];
     void *console=af_test_console_code;
 #endif
-    if (af_surface_dma(console,AF_CONSOLE_STORAGE_VROM,AF_CONSOLE_STORAGE_BYTES) ||
-            af_surface_crc(console,AF_CONSOLE_STORAGE_BYTES)!=AF_CONSOLE_STORAGE_CRC) return 0;
-    af_surface_writeback(console,AF_CONSOLE_STORAGE_BYTES);
-    af_surface_invalidate(console,AF_CONSOLE_STORAGE_BYTES);
+    if (!load_code(console,AF_CONSOLE_STORAGE_VROM,AF_CONSOLE_STORAGE_BYTES,AF_CONSOLE_STORAGE_CRC)) return 0;
 #endif
 #ifdef AF_CONSOLE_IMAGES_VROM
 #ifdef __mips__
@@ -94,10 +86,7 @@ int af_v3_surface_init(void) {
     extern unsigned char af_test_console_images[AF_CONSOLE_IMAGES_BYTES];
     void *images=af_test_console_images;
 #endif
-    if (af_surface_dma(images,AF_CONSOLE_IMAGES_VROM,AF_CONSOLE_IMAGES_BYTES) ||
-            af_surface_crc(images,AF_CONSOLE_IMAGES_BYTES)!=AF_CONSOLE_IMAGES_CRC) return 0;
-    af_surface_writeback(images,AF_CONSOLE_IMAGES_BYTES);
-    af_surface_invalidate(images,AF_CONSOLE_IMAGES_BYTES);
+    if (!load_code(images,AF_CONSOLE_IMAGES_VROM,AF_CONSOLE_IMAGES_BYTES,AF_CONSOLE_IMAGES_CRC)) return 0;
 #endif
 #ifdef AF_CONSOLE_DISK_VROM
 #ifdef __mips__
@@ -108,10 +97,16 @@ int af_v3_surface_init(void) {
 #endif
     /* Complete code, both BIOS copies, boot data, zeroed transient buffers,
      * and guard load together. No hook can enter partially verified code. */
-    if (af_surface_dma(disk,AF_CONSOLE_DISK_VROM,AF_CONSOLE_DISK_BYTES) ||
-            af_surface_crc(disk,AF_CONSOLE_DISK_BYTES)!=AF_CONSOLE_DISK_CRC) return 0;
-    af_surface_writeback(disk,AF_CONSOLE_DISK_BYTES);
-    af_surface_invalidate(disk,AF_CONSOLE_DISK_BYTES);
+    if (!load_code(disk,AF_CONSOLE_DISK_VROM,AF_CONSOLE_DISK_BYTES,AF_CONSOLE_DISK_CRC)) return 0;
+#endif
+#ifdef AF_CREATURE_ITEMS_VROM
+#ifdef __mips__
+    void *creatures=(void *)0x804FF100u;
+#else
+    extern unsigned char af_test_creature_code[AF_CREATURE_ITEMS_BYTES];
+    void *creatures=af_test_creature_code;
+#endif
+    if (!load_code(creatures,AF_CREATURE_ITEMS_VROM,AF_CREATURE_ITEMS_BYTES,AF_CREATURE_ITEMS_CRC)) return 0;
 #endif
     return af_surface_prior_init();
 }

@@ -220,6 +220,15 @@ def publish_bootstrap(equipment,blob,surface,output):
             raise ValueError('Changed complete resident disk module')
         extra+=(f'AF_CONSOLE_DISK_VROM=0x{p["vrom"]:X}u',f'AF_CONSOLE_DISK_CRC=0x{p["crc32"]:X}u',
                 f'AF_CONSOLE_DISK_BYTES=0x{p["bytes"]:X}u')
+    creatures=equipment.get('creature_items')
+    if creatures:
+        from v3_creature_items import RAM as CREATURE_RAM,SIZE as CREATURE_SIZE
+        p=creatures['packet'];raw=blob[p['blob_offset']:p['blob_offset']+p['bytes']]
+        if (sha256(raw)!=p['sha256'] or zlib.crc32(raw)!=p['crc32'] or
+                p['ram']!=CREATURE_RAM or p['bytes']!=CREATURE_SIZE):
+            raise ValueError('Changed complete creature item packet')
+        extra+=(f'AF_CREATURE_ITEMS_VROM=0x{p["vrom"]:X}u',f'AF_CREATURE_ITEMS_CRC=0x{p["crc32"]:X}u',
+                f'AF_CREATURE_ITEMS_BYTES=0x{p["bytes"]:X}u')
     boot,compiled=compile_part('surface_bootstrap',output/'goods_surface_bootstrap',defines=(
         'AF_V3_EDITABLE_CHECKSUMS=1',f'AF_SURFACE_ITEMS_VROM=0x{items["vrom"]:X}u',
         f'AF_SURFACE_ITEMS_CRC=0x{items["crc32"]:X}u',f'AF_SURFACE_ITEMS_BYTES=0x{items["bytes"]:X}u',
@@ -239,3 +248,4 @@ def publish_bootstrap(equipment,blob,surface,output):
     if console:console['startup']=copy.deepcopy(goods['startup'])
     if images:images['startup']=copy.deepcopy(goods['startup'])
     if disk:disk['startup']=copy.deepcopy(goods['startup'])
+    if creatures:creatures['startup']=copy.deepcopy(goods['startup'])

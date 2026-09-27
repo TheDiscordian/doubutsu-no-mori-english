@@ -435,6 +435,10 @@ def bind_profiles(source,base,report):
     import v3_furniture_static as static
     import v3_console_room as consoles
     source.runtime_profiles={}
+    source.creature_runtime_bindings=None
+    if report.get('equipment_resources',{}).get('creature_items'):
+        from v3_creature_items import checked as checked_creatures
+        source.creature_runtime_bindings=checked_creatures(base,report,source)
     blob=by_vrom(base)[BLOB].extract(base);e=report['equipment_resources']
     source.console_runtime_bindings=consoles.checked_runtime(e,blob,base)
     source.console_disk_engine_ready=consoles.disk_engine_ready(e,blob,base)

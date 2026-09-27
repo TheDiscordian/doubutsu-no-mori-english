@@ -120,6 +120,21 @@ CREATURE_DISPLAYS = {
     0x1D04: (1846, 0x3CD8),
 }
 
+# Carried identities are fixed independently of selection. Native 2301 is
+# herabuna; the donor's brook trout gets a new slot after its eight additions.
+CREATURE_PARENT_REGISTRY_VERSION = 1
+CREATURE_PARENTS = {
+    **{0x2D20+i: 0x2D20+i for i in range(8)},
+    **{0x2320+i: 0x2320+i for i in range(8)},
+    0x2301: 0x2328,
+}
+
+
+def creature_parent_identity(donor_item):
+    if type(donor_item) is not int or donor_item not in CREATURE_PARENTS:
+        raise ValueError('Not an additive creature parent')
+    return CREATURE_PARENTS[donor_item]
+
 
 def furniture_representation_identity(donor_item):
     if type(donor_item) is int and donor_item in CREATURE_DISPLAYS:

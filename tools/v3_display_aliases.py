@@ -181,6 +181,12 @@ def install(prior, blob, core, output, *, held_items=False, held_collection=Fals
             row.update(after=redirect(blob,row['entry']-0x80460000,row['after'],target),target=target)
     for row in display['conversion']['hooks']:
         target=parts['display_conversion']['symbols']['af_v3_room_'+row['kind']+'_item']
+        outer=next((h for h in prior.get('equipment_resources',{}).get('creature_items',{}).get('hooks',[])
+            if h['address']==row['entry']),None)
+        if outer:
+            if (target!=outer['prior'] or core[row['entry']-CODE_RAM:row['entry']-CODE_RAM+8].hex()!=outer['after']):
+                raise ValueError('Creature conversion predecessor moved; rebuild its checked wrapper')
+            continue
         row.update(after=redirect(core,row['entry']-CODE_RAM,row['after'],target),target=target)
     display['readers']['code']=parts['display_items']
     display['readers']['held_parent_readers']=held_items

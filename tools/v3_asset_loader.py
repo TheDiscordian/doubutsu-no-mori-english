@@ -154,6 +154,7 @@ def compile_part(part, out, extra_sources=(), defines=(), primary_source=None):
                        'surface_arrange': ('af_v3_single_wall', 0x80950EC8),
                        'surface_preview': ('af_v3_preview_wall', 0x808A6854),
                        'surface_items': ('af_v3_surface_item_name', 0x804BC000),
+                       'creature_items': ('af_v3_creature_item_name', 0x804FF100),
                        'surface_bootstrap': ('af_v3_surface_init', 0x804A8D40),
                        'room_rigs_bootstrap': ('af_v3_room_boot_ct', 0x804B1800),
                        'held_collection': ('af_v3_held_catalogue_record', 0x804AFA00),

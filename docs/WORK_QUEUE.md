@@ -22,9 +22,9 @@ Incomplete gameplay stays unavailable in the selector; installing assets does
 not claim that an item is playable. Reuse unchanged passing tests throughout.
 
 Current task: finish remaining genuine importing categories and representation
-mappings, using the shared converter and the current ABI-293 proposal:
-`build/v3-creature-scheduler-imports-01/creature-audio-runtime/build-lock.json`.
-ROM SHA-256: `1a1f81cdab801acdf84d399b0583e0f5b33432bcfca43c3f0dbd84eddc4ebf40`.
+mappings, using the shared converter and the current ABI-294 proposal:
+`build/v3-creature-parent-imports-01/creature-parent-runtime/build-lock.json`.
+ROM SHA-256: `9367925b6c4354fa3504d57256ca6977d33584baf240aaf87672ff9dd10a523f`.
 The dresser cancellation correction is installed in V2 and V3; empty import
 selection returns stable V2-14. Continue the importing work without replaying
 unchanged dresser or museum checks.
@@ -47,13 +47,18 @@ See [bulk profiles](checkpoints/V3_BUILTIN_PROFILES.md).
 
 Next importing work:
 
-- Connect the prepared creature category to native parent identities, complete
-  room lifecycle/audio, and carried-item/collection/catching/releasing readers.
+- Finish the creature category's carried models/icons, catching/releasing,
+  collection/profile persistence, and spawn readers as a connected path.
   The common converter already retains all 17 displays, 96 joints, full motion
   arrays, and complete source sound callbacks in
-  `build/v3-creature-profiles-prepared-01/`. Sixteen animated objects are installed
-  with shared rig callbacks, but profiles remain disabled pending complete native
-  parent readers. The full creature sound category, native per-instance scheduling,
+  `build/v3-creature-profiles-prepared-01/`. All seventeen complete room profiles,
+  including the static ant, are installed. Fixed parent IDs, names, prices,
+  categories, placement, and pickup are connected through one adapter. Three
+  focused checks cover the complete category, startup failures, installed output,
+  and optional composition. Profiles stay inactive until carried gameplay and
+  collection are complete. Reuse this path instead of rebuilding its individual
+  dependencies; see [the shared contract](../specs/V3_CREATURE_ITEMS.md).
+  The full creature sound category, native per-instance scheduling,
   and room sound callbacks are installed through the shared planner. Native motion
   dispatch includes placement/removal states. Retain the passing resource/callback
   checks and the inconclusive native-disconnection record; do not replay the

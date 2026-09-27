@@ -1213,6 +1213,8 @@ def metadata(source, item, profile, identity):
     from v3_furniture_scroll import CATEGORY as SCROLL_CATEGORY
     binding=getattr(source,'runtime_profiles',{}).get(f'{item:04X}')
     if profile.get('callback_adapter',{}).get('category') in (EMBEDDED_CATEGORY,CREATURE_STATIC_CATEGORY):
+        if getattr(source,'creature_runtime_bindings',None):
+            raise ReviewRequired('Creature parent/room path installed; carried models, catching/releasing, collection, and spawn readers remain')
         raise ReviewRequired('Creature displays need native parent identity and carried-creature gameplay integration before selection')
     from v3_furniture_composite import PENDING_CATEGORIES,ROTATED_CATEGORY
     if profile.get('callback_adapter',{}).get('category') in PENDING_CATEGORIES and not binding:
@@ -1450,6 +1452,10 @@ def rig_import_plan(inventory, report, bindings, selected=(), category=None, *, 
     candidates=[r for r in inventory['rows'] if r.get('asset_ready') and not r['installed'] and
         not r.get('room_alias') and (not selected or r['item_id'] in selected) and
         (category is None or category in r['categories'])]
+    if any(r['profile'].get('creature_parent') for r in candidates):
+        ids={r['item_id'] for r in candidates}
+        candidates+=[r for r in inventory['rows'] if r.get('asset_ready') and not r['installed'] and
+            r['profile'].get('creature_parent') and r['item_id'] not in ids]
     rows=[r for r in candidates if r['profile'].get('callback_adapter',{}).get('category') in categories]
     for r in candidates:
         if r['profile'].get('callback_adapter',{}).get('category')!=JOINT_CATEGORY or source is None:continue
@@ -1513,6 +1519,11 @@ def rig_import_plan(inventory, report, bindings, selected=(), category=None, *, 
         r['profile']['callback_adapter']['category']==EMBEDDED_CATEGORY and
         r['profile']['callback_adapter'].get('level_sound') and r['item_id'] not in creature_ready)
     if creature_missing:plan['creature_audio']=creature_missing
+    if any(r['profile'].get('creature_parent') for r in candidates) and not report['equipment_resources'].get('creature_items'):
+        # Parent identities, names, prices, static and animated displays form
+        # one category installation, independent of eventual checkbox choices.
+        from v3_registry import CREATURE_DISPLAYS
+        plan['creature_parents']=[f'{item:04X}' for item in sorted(CREATURE_DISPLAYS)]
     if any(r['profile']['callback_adapter']['category']==ROTATED_CATEGORY for r in rows):
         exercise=report['equipment_resources'].get('player_motion',{}).get('exercise')
         if not exercise or not exercise.get('action_installed'):
@@ -1550,7 +1561,12 @@ def import_batch(source, worksheet, output, lock, selected=(), category=None, re
     from v3_sound_programs import prepare_furniture_audio,prepare_furniture_levels
     base,report=inputs(lock);bind_profiles(source,base,report)
     installed=[int(r['id'].rsplit('/',1)[1],16) for r in report['furniture']['imports']+[report['speed_bag']]]
-    inventory=scan(source,worksheet,installed,selected=selected)
+    from v3_registry import CREATURE_DISPLAYS
+    creature_ids={f'{item:04X}' for item in CREATURE_DISPLAYS}
+    # Selected creatures still need the complete shared parent category; this
+    # expands dependencies only, never the user's selectable/imported choices.
+    discovery=sorted(set(selected)|creature_ids) if set(selected)&creature_ids else selected
+    inventory=scan(source,worksheet,installed,selected=discovery)
     if selected and set(selected)-{r['item_id'] for r in inventory['rows']}:
         raise ValueError('Requested import identity is absent from the donor inventory')
     plan=rig_import_plan(inventory,report,source.runtime_profiles,selected,category,source=source)
@@ -1562,7 +1578,7 @@ def import_batch(source, worksheet, output, lock, selected=(), category=None, re
         base,report=inputs(current)
         steps.append(dict(stage=label,lock=str(current.relative_to(ROOT)),sha256=report['output_sha256']))
     all_assets=sorted(set(plan['resources'])|set(plan['profiles'])|set(plan.get('materials',[]))|
-        set(plan.get('scrolling',[])))
+        set(plan.get('scrolling',[]))|set(plan.get('creature_parents',[])))
     if all_assets:
         complete=output/'prepared'
         convert(source,worksheet,complete,all_assets,installed,assets_only=True,reuse_assets=cache)
@@ -1608,6 +1624,8 @@ def import_batch(source, worksheet, output, lock, selected=(), category=None, re
         audio=output/'creature-audio'
         prepare_furniture_audio(base,report,source,inventory,audio,plan['creature_audio'],EMBEDDED_CATEGORY)
         refresh('creature-audio-runtime',furniture_audio_art=audio)
+    if plan.get('creature_parents'):
+        refresh('creature-parent-runtime',creature_items=bundle(plan['creature_parents'],'creature-assets'))
     for stage in plan.get('player_exercise',[]):
         # Follow complete room/music publication, even when artwork is present.
         refresh('player-exercise-'+stage,player_actions=True)
@@ -1615,7 +1633,11 @@ def import_batch(source, worksheet, output, lock, selected=(), category=None, re
         if not exercise or stage=='native' and not exercise.get('action_installed'):
             raise ValueError('Shared player stage did not install its planned exercise dependency')
     bind_profiles(source,base,report)
-    if steps:inventory=scan(source,worksheet,installed,selected=selected)
+    if steps:
+        refresh_ids=[r['item_id'] for r in inventory['rows'] if not r['installed'] and
+            (not selected or r['item_id'] in selected) and (category is None or category in r.get('categories',[]))]
+        # Reassess only this batch's candidates, not every unrelated source item.
+        inventory=scan(source,worksheet,installed,selected=refresh_ids) if refresh_ids else dict(rows=[])
     matches=[r for r in inventory['rows'] if not r['installed'] and
         (not selected or r['item_id'] in selected) and (category is None or category in r.get('categories',[]))]
     ready=[r['item_id'] for r in matches if r['status']=='supported']

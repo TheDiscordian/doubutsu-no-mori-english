@@ -31,9 +31,9 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
-The current proposal is ABI 293 at
-`build/v3-creature-scheduler-imports-01/creature-audio-runtime/build-lock.json`, ROM SHA-256
-`1a1f81cdab801acdf84d399b0583e0f5b33432bcfca43c3f0dbd84eddc4ebf40`.
+The current proposal is ABI 294 at
+`build/v3-creature-parent-imports-01/creature-parent-runtime/build-lock.json`, ROM SHA-256
+`9367925b6c4354fa3504d57256ca6977d33584baf240aaf87672ff9dd10a523f`.
 It contains 167 selectable development imports and 100 complete inactive furniture
 profiles whose acquisition is pending. The main lock and both stable V2-14
 deployments are retained.
@@ -66,7 +66,7 @@ arrays, and three sound-callback dependencies are retained. Actual source
 placement/pickup functions establish carried-parent identities and official
 names. These are not seventeen playable imports. All sixteen animated objects
 (74,672 bytes) and the shared embedded-rig callback are installed, with profiles
-disabled pending native identity and carried-creature integration.
+disabled pending carried-creature gameplay and collection integration.
 The shared native dispatch preserves creature animation in placement/removal
 states 6 and 13 while retaining other furniture's callback exclusions. Sanitized
 category checks and current cartridge/resource/UPS checks pass; ordinary native
@@ -83,7 +83,16 @@ Three current resource/guard/planner checks and the sanitized callback check pas
 The bounded native attempt disconnects before assertions, so native execution
 is inconclusive, not passed. Existing creature sounds and saved formats are
 retained; no audible test is performed.
-The static ant remains prepared. Choice counts are unchanged. See the
+All seventeen room profiles are installed, including the complete static ant.
+One shared adapter connects fixed carried identities, official names, prices,
+categories, placement, and pickup, with brook trout at `2328` and native herabuna
+preserved at `2301`. The ordinary category pipeline reuses all seventeen prepared
+models without graphics compilation. Three focused tests pass, including two
+sanitized C fixtures, installed-resource/hooks/UPS checks, and all/empty optional
+composition. The 3,840-byte reader packet adds no save change; the shared startup
+fits its existing reservation. Catching, releasing, carried models/icons,
+collection/profile readers, and spawn tables remain required before selection.
+Native connected-path execution remains unverified. Choice counts are unchanged. See the
 [creature checkpoint](checkpoints/V3_CREATURE_PROFILES.md).
 
 Continue with creature parent/native integration and the remaining legacy

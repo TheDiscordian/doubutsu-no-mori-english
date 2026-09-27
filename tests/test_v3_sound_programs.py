@@ -97,9 +97,11 @@ class CreatureAudioTests(unittest.TestCase):
         inventory=scan(self.source,ROOT/'build/item-identity-megasheet.xlsx',selected=ids)
         missing=rig_import_plan(inventory,self.prior,{},category=EMBEDDED_CATEGORY,source=self.source)
         expected=sorted(r['source_item_id'] for r in self.report['equipment_resources']['creature_audio']['source']['rows'])
-        self.assertEqual(missing,dict(resources=[],audio=[],loops=[],profiles=[],creature_audio=expected))
+        from v3_registry import CREATURE_DISPLAYS
+        parents=[f'{item:04X}' for item in sorted(CREATURE_DISPLAYS)]
+        self.assertEqual(missing,dict(resources=[],audio=[],loops=[],profiles=[],creature_audio=expected,creature_parents=parents))
         complete=rig_import_plan(inventory,self.report,{},category=EMBEDDED_CATEGORY,source=self.source)
-        self.assertEqual(complete,dict(resources=[],audio=[],loops=[],profiles=[]))
+        self.assertEqual(complete,dict(resources=[],audio=[],loops=[],profiles=[],creature_parents=parents))
 
 
 class ProgramTests(unittest.TestCase):

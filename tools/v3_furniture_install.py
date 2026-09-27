@@ -73,6 +73,9 @@ def profile(row, vrom, *, limit=END, model_capacity=9216):
     sound = adapter.get('category') == 'switch-trigger-sound'
     static = adapter.get('category') == 'static-interaction'
     from v3_furniture_rigs import RIG_CATEGORIES,FIXED_CATEGORY,JOINT_CATEGORY,EMBEDDED_CATEGORY,CREATURE_STATIC_CATEGORY
+    from v3_creature_items import lifecycle as creature_lifecycle
+    creature=adapter.get('category') in (EMBEDDED_CATEGORY,CREATURE_STATIC_CATEGORY)
+    embedded=creature and adapter['category']==EMBEDDED_CATEGORY
     from v3_furniture_materials import CATEGORY as MATERIAL_CATEGORY
     from v3_furniture_scroll import CATEGORY as SCROLL_CATEGORY,VTABLE as SCROLL_VTABLE,profile_lifecycle
     material=adapter.get('category')==MATERIAL_CATEGORY
@@ -88,12 +91,14 @@ def profile(row, vrom, *, limit=END, model_capacity=9216):
             roof and not roof_lifecycle(row['profile'],row.get('room_lifecycle')) or
             adapter.get('category')==DUAL_CATEGORY and not dual_profile_lifecycle(row['profile'],row.get('room_lifecycle'),row.get('room_placement')) or
             radio and row.get('room_lifecycle')!=music_lifecycle(row['profile']) or
-            adapter.get('category') in (FIXED_CATEGORY,EMBEDDED_CATEGORY,CREATURE_STATIC_CATEGORY,PENDING_MOVE_CATEGORY) or
+            creature and (creature_lifecycle(row['profile']) is None or
+                row.get('room_lifecycle')!=creature_lifecycle(row['profile'])) or
+            adapter.get('category') in (FIXED_CATEGORY,PENDING_MOVE_CATEGORY) or
             adapter.get('category')==PENDING_SEQUENCE_CATEGORY and not console or scrolling and
             (not profile_lifecycle(row['profile'],row.get('room_lifecycle'),row.get('room_placement')) or
              row.get('room_runtime')!={'vtable':SCROLL_VTABLE,'vrom':vrom})):
         raise ValueError('Prepared resources have no implemented native lifecycle')
-    rigged = adapter.get('category') in RIG_CATEGORIES
+    rigged = embedded or adapter.get('category') in RIG_CATEGORIES
     layers = tuple(offsets) if rigged else tuple(adapter['model_order']) if fading or sequence or material or scrolling or roof or radio else LAYERS
     if (model_capacity not in (9216,12288) or limit not in (END,capacity.LIMIT) or not 0 < n <= model_capacity or n%16 or vrom%16 or vrom+n > limit or len(scalar) != 16
             or not offsets or set(offsets)-set(layers) or (fading or sequence) and set(offsets)!=set(layers)
@@ -598,7 +603,7 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
                     equipment_rigs=None, expand_storage=False, furniture_audio_art=None, furniture_profiles=None,
                     material_frames_art=None,scrolling_materials_art=None,room_surfaces_art=None,furniture_scoring=False,
                     password_runtime=None,password_editor=False,room_effects=None,furniture_capacity=False,console_storage=False,
-                    console_images=None,console_emulator=False,console_disk=None):
+                    console_images=None,console_emulator=False,console_disk=None,creature_items=None):
     """Update shared readers; optionally install the shared held-resource adapter."""
     output=output.resolve()
     if output.exists() or not output.is_relative_to(ROOT/'build'):
@@ -626,13 +631,20 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
     if console_disk is not None:
         if resource_mode:raise ValueError('Install shared runtime updates in dependency order')
         resource_mode=True
+    if creature_items is not None:
+        if resource_mode:raise ValueError('Install shared runtime updates in dependency order')
+        resource_mode=True
     if resource_mode:
         blob,reused=reuse_resource_tail(base,prior,old_blob)
         if not reused['reused_bytes']:
             raise ValueError('Equipment integration requires the checked shared resource tail')
     parent_readers=bool(player_actions and prior.get('equipment_resources',{}).get('player_actions',{}).get('equipment_selection'))
     wrapped_names=bool(player_actions and prior.get('equipment_resources',{}).get('wrapped_presents'))
-    if console_disk is not None:
+    if creature_items is not None:
+        import v3_creature_items as equipment
+        display_report,alias_report=prior['clothing']['display'],prior['display_aliases']
+        equipment_report,owner_changes=equipment.install(base,prior,blob,core,module,output,creature_items)
+    elif console_disk is not None:
         import v3_console_disk_install as equipment
         display_report,alias_report=prior['clothing']['display'],prior['display_aliases']
         equipment_report,owner_changes=equipment.install(base,prior,blob,output,console_disk)
@@ -1129,6 +1141,10 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         if equipment_report.get('parent_readers'):
             report['sources']['translations/provenance.json']=sha256((ROOT/'translations/provenance.json').read_bytes())
         report['native_test']='pending shared equipment resource DMA/readers'
+        if creature_items is not None:
+            report['shared_runtime_refresh'].update(adapters=['creature_items'],artwork_changed=True,
+                additional_resident_bytes=equipment_report['creature_items']['additional_resident_bytes'])
+            report['native_test']='pending connected creature parent/room execution; catching, release, collection, and selection remain incomplete'
         if material_frames_art is not None:
             report['native_test']='pending material-frame renderer native execution and GPU appearance; lifecycle/acquisition remain incomplete'
         if scrolling_materials_art is not None:
@@ -1279,6 +1295,8 @@ if __name__=='__main__':
         help='With --refresh-runtime, install the complete prepared console game pool and bounded native reader')
     parser.add_argument('--console-emulator',action='store_true',
         help='With --refresh-runtime, connect the native full-image iNES lifecycle and save hooks')
+    parser.add_argument('--creature-items',type=Path,
+        help='With --refresh-runtime, connect the complete prepared creature parent/room category')
     parser.add_argument('--console-disk',type=Path,
         help='With --refresh-runtime, preload the prepared shared disk engine without enabling unfinished games')
     args=parser.parse_args()
@@ -1315,6 +1333,7 @@ if __name__=='__main__':
     if args.console_images is not None and not args.refresh_runtime:parser.error('--console-images requires --refresh-runtime')
     if args.console_emulator and not args.refresh_runtime:parser.error('--console-emulator requires --refresh-runtime')
     if args.console_disk is not None and not args.refresh_runtime:parser.error('--console-disk requires --refresh-runtime')
+    if args.creature_items is not None and not args.refresh_runtime:parser.error('--creature-items requires --refresh-runtime')
     result=(refresh_runtime(args.output,args.base_lock,equipment_art=args.equipment_art,player_motion=args.player_motion,
                             equipment_kinds=args.equipment_kinds,player_actions=args.player_actions,
                             item_category_art=args.item_category_art,ground_categories=args.ground_categories,
@@ -1329,6 +1348,6 @@ if __name__=='__main__':
                             password_editor=args.password_editor,room_effects=args.room_effects,
                             furniture_capacity=args.furniture_capacity,console_storage=args.console_storage,
                             console_images=args.console_images,console_emulator=args.console_emulator,
-                            console_disk=args.console_disk)
+                            console_disk=args.console_disk,creature_items=args.creature_items)
             if args.refresh_runtime else build(args.output,args.art,args.base_lock))
     print(json.dumps({k:result[k] for k in ('runtime_abi','output_sha256','patch_sha256')},indent=2))

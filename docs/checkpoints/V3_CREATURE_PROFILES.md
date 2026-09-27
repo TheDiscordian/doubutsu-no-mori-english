@@ -13,14 +13,36 @@ and `1CE8..1D04`, at four-ID intervals. Source placement and pickup functions
 resolve their actual carried parents. This is not a claim of seventeen new
 native species: the brook-trout source slot must not replace native herabuna.
 
-ABI 293 is the current cartridge at
-`build/v3-creature-scheduler-imports-01/creature-audio-runtime/build-lock.json`, ROM SHA-256
-`1a1f81cdab801acdf84d399b0583e0f5b33432bcfca43c3f0dbd84eddc4ebf40`.
+ABI 294 is the current cartridge at
+`build/v3-creature-parent-imports-01/creature-parent-runtime/build-lock.json`, ROM SHA-256
+`9367925b6c4354fa3504d57256ca6977d33584baf240aaf87672ff9dd10a523f`.
 The shared importer installs all sixteen animated objects, reusing 74,672 bytes
 without recompilation, and extends the room-rig packet from 42 to 58 records.
 There are still 167 selectable choices and 100 complete inactive furniture
-profiles. Creature profiles remain disabled, and the static ant is prepared only.
+profiles. All seventeen creature room profiles are installed but remain disabled
+pending carried models/icons, catching/releasing, collection/profile persistence,
+and spawn readers. The static ant retains its three complete drawing layers.
 Neither the main lock nor either stable V2-14 deployment changes.
+
+The connected parent/room path supplies official names, price words, categories,
+placement, and pickup through five shared native hooks. Source-derived identities
+use `2320..2328` and `2D20..2D27`. Brook trout uses `2328`; native herabuna and its
+room model remain unchanged. All display rotations return the same carried item.
+Disabled additions cannot fall through to short native tables. Names retain the
+existing single-catalogue donor credits; no new translation is written.
+
+The ordinary category import reuses all seventeen prepared assets with zero
+graphics compiler jobs and installs one parent/runtime batch. The immutable
+reader module uses 3,840 bytes at `804FF100`, below the model banks and after the
+console session. Code occupies 916 bytes; metadata occupies 492. Shared startup
+uses 496 of its existing 688 bytes with all eight packet loads and checksum/cache
+checks preserved. No saved layout or selection bits change.
+
+Three focused tests pass in 17.700 seconds: source identities, sanitized reader
+and eight-packet startup fixtures, and current cartridge/resource/hook/UPS and
+optional all/empty composition checks. This establishes implementation and host
+behaviour, not native gameplay or hardware. See
+[the parent/room contract](../../specs/V3_CREATURE_ITEMS.md).
 
 The common embedded-rig callback preserves initial half-frame advancement, two
 half-frame updates per native tick, complete joint arrays, and opaque/translucent
@@ -122,9 +144,9 @@ and compiled the three sound-bearing objects. The combined batch reused sixteen
 and compiled the static ant in one container. Complete prepared assets remain
 reusable by the ordinary importer.
 
-Connect native parent identities and room rig/audio lifecycle, then the carried
-item, price, collection, catch/release, and spawn readers. Do not expose creature
-displays as standalone furniture. Metadata and profile writers reject the
-prepared-only categories until implementation exists. Ordinary rendering,
-gameplay, save/reload with these additions, and hardware remain unverified.
-No saved format changes are introduced by this resource preparation.
+Continue with carried models/icons, collection/profile persistence, catch/release,
+and spawn readers, retaining the installed parent, price, and room rig/audio path.
+Do not expose creature displays as standalone furniture. Selection remains off
+until these readers are connected. Ordinary rendering, gameplay, save/reload with
+these additions, and hardware remain unverified. The parent/room integration
+does not change saved formats.

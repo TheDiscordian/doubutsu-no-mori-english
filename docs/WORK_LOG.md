@@ -1,5 +1,46 @@
 # Work record
 
+## 2026-09-27: connected creature parent and room category
+
+- The preceding goal turn is no progress: it answered the workflow/latency
+  question without implementation. Revalidated the clean branch and continued
+  with one connected placement/display/pickup batch, not individual dependency
+  handoffs. The user reiterated the requirement to work in larger paths.
+- Added a fixed parent registry preserving herabuna `2301` and assigning donor
+  brook trout `2328`. Shared extraction consumes complete donor name/price tables
+  and actual placement/pickup functions. Existing official-name provenance covers
+  every added parent; no new assistant translation or parallel catalogue is added.
+- Installed all seventeen complete room profiles, retaining sixteen existing
+  animated resources and adding the static ant's full three-layer object. Five
+  checked outer hooks connect names, prices, categories, placement, and pickup.
+  Both carried and all rotated display forms resolve to the same identity.
+  Original readers remain for existing items, including herabuna.
+- The ordinary category planner performs this dependency as a complete batch and
+  reuses all seventeen models without graphics compilation. Shared dependency
+  expansion does not expand the user's import selection. Post-install discovery
+  now reassesses only the requested batch, avoiding an unrelated full-inventory
+  rescan. Completed stages are skipped on subsequent planning.
+- ABI 294: `build/v3-creature-parent-imports-01/creature-parent-runtime/build-lock.json`;
+  ROM SHA-256 `9367925b6c4354fa3504d57256ca6977d33584baf240aaf87672ff9dd10a523f`;
+  UPS SHA-256 `78103f6b7d090fae8418b805f439063af30e98804a0732521c6719d3e6bfd372`.
+  The connected module uses 3,840 checked resident bytes after console session
+  memory and before model banks. Factoring the existing checked-load sequence
+  reduces shared startup from 668 to 496 bytes while adding the eighth packet.
+- Three focused tests pass in 17.700 seconds. Sanitized C covers parent/display
+  names and prices, all rotations, category dispatch, bounds, unavailable IDs,
+  native fallbacks, and every packet's DMA/checksum failure before execution.
+  Cartridge checks cover all resources/profiles, complete native conversion
+  bodies, hooks, UPS reconstruction, unchanged saves, and optional all/empty
+  composition. A first damaged-function assertion used the wrong test-only
+  core origin; switching it to `CODE_RAM` fixes the assertion, not game code.
+- No native execution or hardware result is claimed. The earlier debugger
+  disconnect remains unresolved; no exhausted scenario is replayed. The seventeen
+  creature additions remain inactive until carried models/icons, catching,
+  releasing, collection/profile persistence, and spawn readers are connected.
+  The 167 selectable imports, 100 inactive ordinary furniture profiles, main
+  ABI-109 lock, V2-14 deployments, and user saves are unchanged. Format-five V3
+  saves remain incompatible with V2 and older V3 formats.
+
 ## 2026-09-27: native creature sound timing and room callbacks
 
 - The preceding goal turn is progress: commits `870f018` and `0d6da71` install
