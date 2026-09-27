@@ -28,9 +28,9 @@ Implement the actual alternatives and bind selections to the build receipt;
 the controls and runtime selection remain pending, not completed by this policy.
 
 Current task: finish remaining genuine importing categories and representation
-mappings, using the shared converter and the current ABI-294 proposal:
-`build/v3-creature-parent-imports-01/creature-parent-runtime/build-lock.json`.
-ROM SHA-256: `9367925b6c4354fa3504d57256ca6977d33584baf240aaf87672ff9dd10a523f`.
+mappings, using the shared converter and the current ABI-295 proposal:
+`build/v3-creature-field-runtime-02/build-lock.json`.
+ROM SHA-256: `08da8e1c0fe1552a4a83890bfc8eb837ca2b5835314bb9fe36c027cc018cad20`.
 The dresser cancellation correction is installed in V2 and V3; empty import
 selection returns stable V2-14. Continue the importing work without replaying
 unchanged dresser or museum checks.
@@ -53,17 +53,19 @@ See [bulk profiles](checkpoints/V3_BUILTIN_PROFILES.md).
 
 Next importing work:
 
-- Finish the creature category's carried models/icons, catching/releasing,
-  collection/profile persistence, and spawn readers as a connected path.
-  All seventeen field/carry model sets are prepared in
-  `build/v3-creature-field-prepared-01/`, preserving 59 frame references and
-  43 distinct models in 25,504 bytes. Six focused checks pass. Reuse these
-  conversions while connecting native loading, drawing, capture, and release;
-  preparation alone does not enable a creature. Preserve native rubbish/salmon
-  actor slots and herabuna, handle the donor's short arapaima shadow tables
-  safely, and use the existing external resource allocator where the nearly
-  full ordinary import file cannot hold the complete category. Relevant native
-  addresses and capacity are in the creature contract, not a new audit task.
+- Finish the creature category's field behaviours/spawning, pocket icons,
+  and collection/profile persistence as a connected path. All seventeen
+  field/carry model sets are installed: 59 frame references and 43 distinct
+  models in 25,504 physical-ROM bytes. Shared resident tables connect drawing,
+  fish capture identities, release parameters, and source insect poses without
+  resizing actors or buffers. Native rubbish/salmon slots and herabuna remain
+  intact; XXL release shadows have bounded entries. Reuse these consumers and
+  the cache at `build/v3-creature-field-prepared-01/`, not a new loader or capacity
+  investigation. Two focused host tests cover resources, relocation, transforms,
+  startup, planning, and optional composition. Native startup is verified, but
+  direct-call fixture bounds stop the execution check before transfers. The
+  fixture uses native actor entries for the next changed-path check; do not
+  perform a third setup attempt in this batch or claim those transfers passed.
   The common converter already retains all 17 displays, 96 joints, full motion
   arrays, and complete source sound callbacks in
   `build/v3-creature-profiles-prepared-01/`. All seventeen complete room profiles,

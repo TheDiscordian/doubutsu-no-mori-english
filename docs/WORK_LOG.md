@@ -1,5 +1,46 @@
 # Work record
 
+## 2026-09-27: connected creature field loading, capture, and release tables
+
+- The preceding turn is progress: `7756992` records the user's requirement for
+  selectable substantial N64/GameCube behaviour differences. Continued primary
+  importing across the full seventeen-creature category, retaining that policy
+  and the V3 deployment hold.
+- Reused all 25,504 converted bytes without compiling graphics again. Expanded
+  field/carry frames, independently sourced animation/height readers, fish
+  capture identities, release mapping and sizes, and bounded XXL shadows are
+  installed together. Added insects use donor held/world transforms, including
+  spider and mole-cricket special cases. Original transforms, herabuna, rubbish,
+  coastal salmon, and golden-rod hooks remain intact.
+- Resident lookup tables avoid materializing or enlarging actor BSS. Five native
+  owners keep their original allocations; exact replaced table relocations are
+  removed. One physical resource stores only added models, not copies of native
+  banks. The shared checked PI adapter preserves native DMA for original spans.
+  The shared importer schedules this stage and reuses field/room caches by format.
+- ABI 295 is `build/v3-creature-field-runtime-02/build-lock.json`, ROM SHA-256
+  `08da8e1c0fe1552a4a83890bfc8eb837ca2b5835314bb9fe36c027cc018cad20`, UPS SHA-256
+  `c2e2f1a22f548a010a6792560dd5bcfaedfe93381457f2233f9e40d029c67af8`.
+  The field packet uses 12,288 resident bytes at `80647000`, with 1,018 compiled
+  bytes and 3,830 table bytes. Startup uses 532/688 bytes. The import file retains
+  49,280 free bytes. Neither scene buffers nor saved formats grow.
+- Two current focused tests pass in 7.716 seconds, including sanitized resource
+  loading, checksum/I/O/bounds failures, all original/added insect transforms,
+  and nine-packet startup failures. Cartridge checks bind all resources,
+  relocations, capture identities, retained rod hooks, source-derived fields,
+  category planning, UPS, and all/empty composition. No old-build replay occurs.
+- Two silent native attempts verify the complete startup-loaded packet. The
+  direct-call test proof first violates alignment and then the helper's ordinary
+  four-MiB address bound; no model transfer executes. The fixture is corrected
+  to enter through relocated native actor loaders, exercising their installed
+  hooks without weakening debugger safeguards. It is not run a third time in
+  this batch. Native transfers/capture/release/GPU results stay unverified. This
+  classified setup issue does not explain the earlier scheduler disconnect.
+- Field behaviours/spawning, pocket icons, and collection/profile persistence
+  remain required. All seventeen creatures remain inactive, not playable imports.
+  The 167 selectable development choices, main lock, stable V2-14 deployments,
+  and existing saves/builds are preserved. Format-five V3 remains incompatible
+  with V2 and older V3 formats; no new compatibility claim is made.
+
 ## 2026-09-27: complete shared creature field-frame conversion
 
 - Extended the common graphics converter for independently bounded per-model

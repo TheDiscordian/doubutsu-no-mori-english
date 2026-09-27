@@ -66,7 +66,7 @@ count seventeen, and stride 28. Each row is:
 
 The final sixteen packet bytes contain four `AF435249` guard words. Startup
 loads and checks the full packet before the native initialization chain. All
-eight shared packet loads use the same DMA/checksum/cache-flush function. A
+nine shared packet loads use the same DMA/checksum/cache-flush function. A
 failed DMA or checksum stops initialization before executing unchecked code.
 The bootstrap stays inside its existing 688-byte reservation. No saved layout,
 profile bits, or actor sizes change.
@@ -78,13 +78,14 @@ profiles/resources, five hook targets, preservation of the native conversion
 bodies, UPS reconstruction, retained saves, and optional all/empty composition.
 Sanitized C checks exercise names, prices, categories, placement/pickup with
 rotations, readiness/selection rejection, output bounds, native fallbacks, and
-the eight-packet startup chain including DMA/checksum failures.
+the checked startup chain including DMA/checksum failures.
 
-Native execution of this connected path and original hardware remain unverified.
-The preceding scheduler test's unexplained debugger disconnect remains open;
-host checks do not classify it. The active queue continues with carried models,
-icons, catching/releasing, collection/profile persistence, and spawn readers as
-one connected creature path, retaining the completed room and sound work.
+Ordinary native execution of this connected path and original hardware remain
+unverified. The scheduler test's unexplained debugger disconnect remains open;
+host checks do not classify it. Field/carry model loading, drawing tables, fish
+capture identities, and release adapters are installed as described below.
+The active queue continues with field behaviours, spawn readers, pocket icons,
+and collection/profile persistence, retaining the completed room and sound work.
 
 ## Field and carried graphics
 
@@ -110,7 +111,63 @@ Field and release selectors are not interchangeable: jellyfish and several sea
 fish use different selectors. The largest converted fish is 2,192 bytes, within
 the native 2,560-byte fish buffer; every added insect fits its 3,072-byte buffer.
 These sizes describe complete converted objects, not estimates from donor size.
-The prepared assets are not installed runtime readers or playable species.
+The shared native stage installs these assets without recompiling them. That
+integration does not make the species selectable while field behaviours, spawn
+readers, pocket icons, and collection/profile persistence remain unfinished.
+
+### Connected native field stage
+
+`tools/v3_creature_field_native.py` installs all seventeen complete frame objects,
+field and release lookup tables, source animation selectors and height correction,
+fish capture identities, release mapping, size parameters, and bounded XXL
+shadows. Added insects retain source held poses and world rotation order,
+including mole-cricket Y/X/Z and the spider's frame-specific X/Z path. Original
+insects retain their native transforms. Source timing arrays remain independently
+bound for field and release; neither is substituted for the other.
+
+Added fish use actor slots `36..44`, corresponding to carried IDs `2320..2328`.
+The complete original 36-slot capture mapping, including rubbish and coastal
+salmon, is preserved. Brook trout does not replace native herabuna. Added insects
+use slots `32..39`. Readiness and selections remain disabled until the complete
+gameplay paths can safely consume these identities.
+
+The immutable packet occupies `80647000..80649FFF`: 12,288 bytes, including
+1,018 compiled code bytes, 3,830 lookup-table bytes, resource descriptors, and
+guards. Expanded pointers target this resident packet; their obsolete overlay
+relocations are removed. Five actor owners keep their original code/data/BSS
+dimensions and allocation lifetimes. No scene-buffer enlargement or new native
+DMA-directory entry is necessary. Shared startup is 532 of its 688 reserved bytes.
+
+Only the 25,504 bytes of added models occupy an externally allocated physical
+ROM resource. Original banks stay in place. The checked loader retains native
+DMA for original bank spans and uses synchronous PI transfers with exact
+descriptor, size, capacity, and CRC checks for added objects. Display-list
+segment-six references are rebased to the native bank-offset convention; native
+loaders still publish the matching segment base. The complete ordinary import
+file has 49,280 bytes remaining below `2800000`.
+
+The source supplies the XXL scale but lacks a seventh release-shadow correction.
+The adapter explicitly extends each correction array with its largest defined
+entry. This prevents the donor's out-of-bounds read without changing any existing
+fish correction; it is a documented safety adaptation, not a selectable bug.
+
+The ordinary category planner schedules field integration after the parent/room
+stage, accepts the prepared field cache alongside room caches, and skips installed
+stages. No per-species installer or independent furniture choice is added.
+
+`tests/test_v3_creature_field_native.py` covers all resource and relocation changes,
+native capture identities, retained golden-rod hooks, save/profile retention,
+category planning, UPS reconstruction, and all/empty composition. Sanitized C
+covers all seventeen transfers, native fallbacks, CRC/I/O/bounds failures, the
+nine-packet startup chain, and original/added insect transforms.
+
+The silent native attempts verify the complete startup-loaded packet but stop
+before model transfers because the test helper rejects direct calls outside
+ordinary RAM. The fixture enters through the actual relocated native consumers
+for the next relevant combined check; it is not rerun after the batch's setup
+retry limit. Native transfers, capture/release execution, and GPU rendering are
+not claimed as passed. This classified fixture failure does not classify the
+separate scheduler disconnect. Ordinary gameplay and hardware remain unverified.
 
 ### Native integration constraints
 
@@ -139,13 +196,13 @@ The prepared assets are not installed runtime readers or playable species.
   that out-of-bounds read. The separate native `Gyo_Kage` actor (`85`) also
   needs its size reader extended. Existing fish timing and golden-rod hooks
   must survive the category integration.
-- The ABI-294 shared resource file ends at `27F0F80`, only 61,568 bytes below
-  its `2800000` limit. Copying both complete native graphics banks and enlarged
-  actor owners into that file does not fit. Reuse the existing checked external
-  physical-resource allocator for a complete category resource layout; do not
-  repeatedly grow the ordinary import file or overwrite its neighbouring data.
+- Retain the external added-model resource and resident lookup tables. Copying
+  both complete native graphics banks or materializing enlarged actor BSS inside
+  the nearly full ordinary import file is unnecessary. Do not repeat that
+  capacity investigation or replace the installed shared loading path.
 
 `tests/test_v3_creature_field.py` checks every source/frame binding, differing
 field/release timing, missing/disagreeing-pointer rejection, complete converted
 resources and command bounds, and reuse of all seventeen existing room objects.
-No native carried/field execution or new cartridge installation is claimed.
+The native integration tests above cover cartridge installation; neither set
+claims ordinary carried/field execution or original-hardware verification.

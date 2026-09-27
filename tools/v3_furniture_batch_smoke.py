@@ -2268,6 +2268,7 @@ def exercise(debug, rom_path, record, *, section='automatic_furniture'):
     if section=='joint_rigs':return room_rigs(debug,rom_path,record,mode=6)
     if section=='rolling_rigs':return room_rigs(debug,rom_path,record,mode=5)
     if section=='creature_audio':return creature_audio(debug,rom_path,record)
+    if section=='creature_field':return creature_field(debug,rom_path,record)
     if section=='item_categories':return item_categories(debug,rom_path,record)
     path = Path(rom_path)
     image = path.read_bytes()
@@ -4496,6 +4497,90 @@ def staged_profiles(debug,rom_path,record):
         call(0x8009C040,[allocation])
     return dict(native_staged_profiles=True,assertions=assertions,records=len(rows),
         category_representatives=len(selected),acquisition_tested=False,ordinary_gameplay_tested=False)
+
+
+def creature_field(debug,rom_path,record):
+    """One combined current-build PI/table/capture/release check; no save writes."""
+    from runtime_layout import TEST_STACK
+    from v3_creature_field_native import RAM,SIZE
+    from v3_furniture_room_smoke import extend
+    path=Path(rom_path);image=path.read_bytes();report=json.loads((path.parent/'build.json').read_bytes())
+    if sha256(image)!=report['output_sha256']:raise ValueError('Changed creature-field cartridge')
+    r=report['equipment_resources']['creature_field'];files=by_vrom(image);boot=boot_proofs(image)
+    blob=files[runtime.BLOB].extract(image);p=r['packet'];packet=blob[p['blob_offset']:p['blob_offset']+SIZE]
+    assertions=0
+    def check(label,at,want):
+        nonlocal assertions
+        actual=debug.read_memory(at,len(want));passed=actual==want
+        record(dict(creature_field_check=label,address=f'{at:08X}',bytes=len(want),assertion='passed' if passed else 'failed'))
+        if not passed:raise ValueError('Creature field mismatch: '+label)
+        assertions+=1
+    def call(at,args=(),proof=None):
+        result=debug.call(f'{at:08X}',list(args),return_address=MODULE_RAM+0x6480,verified_code=proof or boot.get(at))
+        record(result);return result['return_value']
+    check('complete startup-loaded field packet',RAM,packet)
+    size=0x12000;allocation=call(0x8009BFC0,[size])
+    if allocation&15 or not MODULE_RAM+0x8000<=allocation<=0x80400000-size:
+        raise ValueError('Creature-field fixture allocation outside native heap')
+    root=allocation+16;controller=allocation+0xF000;graphics=allocation+0x10000;actor=allocation+0x11000;edge=b'V3CF'*4
+    debug.write_memory(allocation,bytes(size))
+    guards=(allocation,controller-16,controller+0x680,graphics-16,graphics+0xC00,actor-16,actor+0x400,
+            allocation+size-16,TEST_STACK-0x800,TEST_STACK+0x40)
+    for at in guards:debug.write_memory(at,edge)
+    saved=report['save_runtime'];saved_bytes=debug.read_memory(saved['state_ram'],saved['state_bytes'])
+    try:
+        pool=r['pool'];physical=image[pool['physical']:pool['physical']+pool['bytes']]
+        for owner in r['owners']:
+            data=files[owner['vrom']].extract(image);reloc=files[owner['reloc']].extract(image)
+            sections=struct.unpack_from('>5I',reloc);resident=sum(sections[:4]);ram=owner['ram']
+            expected=relocate_verified_data(SimpleNamespace(ram=ram,resident_bytes=resident,sections=sections),data,reloc,root)
+            call(0x800262D0,[owner['vrom'],owner['vrom']+len(data),ram,ram+resident,root,root+resident,len(reloc)])
+            check('complete relocated '+owner['name']+' actor and BSS',root,expected)
+            # Enter through the real relocated consumers. The debugger's direct
+            # call guard intentionally accepts only ordinary-RAM native code;
+            # the installed hook itself enters the verified Expansion Pak code.
+            proof=(root,expected[:sections[0]])
+            if owner['name'] in ('fish','insect'):
+                if owner['name']=='fish':debug.write_memory(root+0x80A5C540-ram,struct.pack('>I',controller))
+                for row in (r for r in r['rows'] if r['category']==owner['name']):
+                    if owner['name']=='fish':
+                        call(root+0x80A5B180-ram,[graphics,0,row['actor_index']],proof);segment=controller+0x61C
+                    else:
+                        debug.write_memory(actor+0x1CC,struct.pack('>I',row['actor_index']))
+                        call(root+0x80A1035C-ram,[graphics,actor],proof);segment=actor+0x1F0
+                    at=row['pool_offset'];check('complete field object '+row['item_id'],graphics,physical[at:at+row['bytes']])
+                    check('native segment base '+row['item_id'],segment,struct.pack('>I',graphics-(row['start']-0x06000000+8)))
+            if owner['name']=='uki':
+                for index,want in ((1,0x2301),(32,0x250E),(35,0x2316),(36,0x2320),(44,0x2328),(45,0),(-1,0)):
+                    debug.write_memory(actor+0x290,struct.pack('>I',index&0xFFFFFFFF))
+                    value=call(root+0x80A64BAC-ram,[actor],(root,expected[:sections[0]]))
+                    record(dict(capture_actor=index,item=value,assertion='passed' if value==want else 'failed'))
+                    if value!=want:raise ValueError('Native fish capture identity mismatch')
+            if owner['name']=='release':
+                start=root+0x80A7A934-ram;end=root+0x80A7A93C-ram
+                for item,want in ((0x2301,1),(0x231F,31),(0x2320,36),(0x2328,44)):
+                    before=debug.command('g');regs=[int(before[i:i+16],16) for i in range(0,len(before),16)]
+                    if len(regs)!=71 or regs[37]&0xFFFFFFFF!=0x800D334C:
+                        raise ValueError('Release bridge requires a paused native frame')
+                    regs[14]=item;regs[16]=extend(actor);regs[37]=extend(start)
+                    breakpoint=f'0,{end:x},4'
+                    if debug.command('Z'+breakpoint)!='OK':raise ValueError('Release breakpoint rejected')
+                    try:
+                        if debug.command('G'+''.join(f'{value:016x}' for value in regs))!='OK':
+                            raise ValueError('Release register window rejected')
+                        stop=debug.command('c');observed=debug.command('g')
+                        if stop[:3] not in ('T05','S05') or int(observed[37*16:38*16],16)&0xFFFFFFFF!=end:
+                            raise ValueError('Release bridge did not reach its native continuation')
+                        check('native release identity '+hex(item),actor+0x178,struct.pack('>I',want))
+                    finally:
+                        debug.command('z'+breakpoint);debug.command('G'+before)
+        for at in guards:check('allocation/stack guard',at,edge)
+        check('retained save state',saved['state_ram'],saved_bytes)
+        check('retained field packet',RAM,packet)
+    finally:call(0x8009C010,[allocation])
+    return dict(native_creature_field=True,assertions=assertions,models=17,
+        ordinary_capture_release_tested=False,gpu_or_hardware_tested=False,
+        flash_written=False,physical_audio_played=False,requires_checkpoint_restore=True)
 
 
 def creature_audio(debug,rom_path,record):

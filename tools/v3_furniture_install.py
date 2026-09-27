@@ -603,7 +603,7 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
                     equipment_rigs=None, expand_storage=False, furniture_audio_art=None, furniture_profiles=None,
                     material_frames_art=None,scrolling_materials_art=None,room_surfaces_art=None,furniture_scoring=False,
                     password_runtime=None,password_editor=False,room_effects=None,furniture_capacity=False,console_storage=False,
-                    console_images=None,console_emulator=False,console_disk=None,creature_items=None):
+                    console_images=None,console_emulator=False,console_disk=None,creature_items=None,creature_field=None):
     """Update shared readers; optionally install the shared held-resource adapter."""
     output=output.resolve()
     if output.exists() or not output.is_relative_to(ROOT/'build'):
@@ -634,13 +634,20 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
     if creature_items is not None:
         if resource_mode:raise ValueError('Install shared runtime updates in dependency order')
         resource_mode=True
+    if creature_field is not None:
+        if resource_mode:raise ValueError('Install shared runtime updates in dependency order')
+        resource_mode=True
     if resource_mode:
         blob,reused=reuse_resource_tail(base,prior,old_blob)
         if not reused['reused_bytes']:
             raise ValueError('Equipment integration requires the checked shared resource tail')
     parent_readers=bool(player_actions and prior.get('equipment_resources',{}).get('player_actions',{}).get('equipment_selection'))
     wrapped_names=bool(player_actions and prior.get('equipment_resources',{}).get('wrapped_presents'))
-    if creature_items is not None:
+    if creature_field is not None:
+        import v3_creature_field_native as equipment
+        display_report,alias_report=prior['clothing']['display'],prior['display_aliases']
+        equipment_report,owner_changes,report_updates,physical_writes=equipment.install(base,prior,blob,output,creature_field)
+    elif creature_items is not None:
         import v3_creature_items as equipment
         display_report,alias_report=prior['clothing']['display'],prior['display_aliases']
         equipment_report,owner_changes=equipment.install(base,prior,blob,core,module,output,creature_items)
@@ -1184,6 +1191,11 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             additional_scratch_bytes=storage['scratch']['bytes']+storage['hash']['bytes']+32)
         report['sources'].update(storage['sources'])
         report['native_test']='pending format-five native storage execution and fresh save/reload; console launch remains uninstalled'
+    if creature_field is not None:
+        field=equipment_report['creature_field']
+        report['shared_runtime_refresh'].update(adapters=['creature_field'],artwork_changed=True,
+            additional_resident_bytes=field['additional_resident_bytes'],additional_scene_bytes=0,
+            resource_allocations_changed=True)
     if console_images is not None:
         images=equipment_report['console_images']
         report['shared_runtime_refresh'].update(adapters=['console_images'],
@@ -1297,6 +1309,8 @@ if __name__=='__main__':
         help='With --refresh-runtime, connect the native full-image iNES lifecycle and save hooks')
     parser.add_argument('--creature-items',type=Path,
         help='With --refresh-runtime, connect the complete prepared creature parent/room category')
+    parser.add_argument('--creature-field',type=Path,
+        help='With --refresh-runtime, install the complete field frames and capture/release tables')
     parser.add_argument('--console-disk',type=Path,
         help='With --refresh-runtime, preload the prepared shared disk engine without enabling unfinished games')
     args=parser.parse_args()
@@ -1334,6 +1348,7 @@ if __name__=='__main__':
     if args.console_emulator and not args.refresh_runtime:parser.error('--console-emulator requires --refresh-runtime')
     if args.console_disk is not None and not args.refresh_runtime:parser.error('--console-disk requires --refresh-runtime')
     if args.creature_items is not None and not args.refresh_runtime:parser.error('--creature-items requires --refresh-runtime')
+    if args.creature_field is not None and not args.refresh_runtime:parser.error('--creature-field requires --refresh-runtime')
     result=(refresh_runtime(args.output,args.base_lock,equipment_art=args.equipment_art,player_motion=args.player_motion,
                             equipment_kinds=args.equipment_kinds,player_actions=args.player_actions,
                             item_category_art=args.item_category_art,ground_categories=args.ground_categories,
@@ -1348,6 +1363,6 @@ if __name__=='__main__':
                             password_editor=args.password_editor,room_effects=args.room_effects,
                             furniture_capacity=args.furniture_capacity,console_storage=args.console_storage,
                             console_images=args.console_images,console_emulator=args.console_emulator,
-                            console_disk=args.console_disk,creature_items=args.creature_items)
+                            console_disk=args.console_disk,creature_items=args.creature_items,creature_field=args.creature_field)
             if args.refresh_runtime else build(args.output,args.art,args.base_lock))
     print(json.dumps({k:result[k] for k in ('runtime_abi','output_sha256','patch_sha256')},indent=2))

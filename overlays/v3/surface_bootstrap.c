@@ -108,5 +108,14 @@ int af_v3_surface_init(void) {
 #endif
     if (!load_code(creatures,AF_CREATURE_ITEMS_VROM,AF_CREATURE_ITEMS_BYTES,AF_CREATURE_ITEMS_CRC)) return 0;
 #endif
+#ifdef AF_CREATURE_FIELD_VROM
+#ifdef __mips__
+    void *field=(void *)0x80647000u;
+#else
+    extern unsigned char af_test_creature_field[AF_CREATURE_FIELD_BYTES];
+    void *field=af_test_creature_field;
+#endif
+    if (!load_code(field,AF_CREATURE_FIELD_VROM,AF_CREATURE_FIELD_BYTES,AF_CREATURE_FIELD_CRC)) return 0;
+#endif
     return af_surface_prior_init();
 }

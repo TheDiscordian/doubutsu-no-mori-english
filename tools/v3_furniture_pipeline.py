@@ -1530,6 +1530,8 @@ def rig_import_plan(inventory, report, bindings, selected=(), category=None, *, 
         # one category installation, independent of eventual checkbox choices.
         from v3_registry import CREATURE_DISPLAYS
         plan['creature_parents']=[f'{item:04X}' for item in sorted(CREATURE_DISPLAYS)]
+    if any(r['profile'].get('creature_parent') for r in candidates) and not report['equipment_resources'].get('creature_field'):
+        plan['creature_field']=True
     if any(r['profile']['callback_adapter']['category']==ROTATED_CATEGORY for r in rows):
         exercise=report['equipment_resources'].get('player_motion',{}).get('exercise')
         if not exercise or not exercise.get('action_installed'):
@@ -1576,7 +1578,13 @@ def import_batch(source, worksheet, output, lock, selected=(), category=None, re
     if selected and set(selected)-{r['item_id'] for r in inventory['rows']}:
         raise ValueError('Requested import identity is absent from the donor inventory')
     plan=rig_import_plan(inventory,report,source.runtime_profiles,selected,category,source=source)
-    output.mkdir(parents=True,exist_ok=False);steps=[];current=lock;cache=list(reuse_assets)
+    output.mkdir(parents=True,exist_ok=False);steps=[];current=lock
+    # Field and room forms belong to the same import but have different cache
+    # formats. Reuse either without sending field objects to the room compiler.
+    field_cache=[];cache=[]
+    for directory in reuse_assets:
+        format=json.loads((directory/'art.json').read_bytes()).get('format')
+        (field_cache if format=='AFV3-CREATURE-FIELD-ASSETS-1' else cache).append(directory)
     def refresh(label,**arguments):
         nonlocal current,base,report
         directory=output/label
@@ -1632,6 +1640,15 @@ def import_batch(source, worksheet, output, lock, selected=(), category=None, re
         refresh('creature-audio-runtime',furniture_audio_art=audio)
     if plan.get('creature_parents'):
         refresh('creature-parent-runtime',creature_items=bundle(plan['creature_parents'],'creature-assets'))
+    if plan.get('creature_field'):
+        from v3_creature_field import convert as convert_field
+        from v3_creature_field_native import prepared_pool
+        if field_cache:
+            field_assets=field_cache[0]
+            prepared_pool(source,field_assets)
+        else:
+            field_assets=output/'creature-field-assets';convert_field(source,field_assets)
+        refresh('creature-field-runtime',creature_field=field_assets)
     for stage in plan.get('player_exercise',[]):
         # Follow complete room/music publication, even when artwork is present.
         refresh('player-exercise-'+stage,player_actions=True)

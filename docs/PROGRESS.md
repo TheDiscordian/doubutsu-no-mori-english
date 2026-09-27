@@ -31,9 +31,9 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
-The current proposal is ABI 294 at
-`build/v3-creature-parent-imports-01/creature-parent-runtime/build-lock.json`, ROM SHA-256
-`9367925b6c4354fa3504d57256ca6977d33584baf240aaf87672ff9dd10a523f`.
+The current proposal is ABI 295 at
+`build/v3-creature-field-runtime-02/build-lock.json`, ROM SHA-256
+`08da8e1c0fe1552a4a83890bfc8eb837ca2b5835314bb9fe36c027cc018cad20`.
 It contains 167 selectable development imports and 100 complete inactive furniture
 profiles whose acquisition is pending. The main lock and both stable V2-14
 deployments are retained.
@@ -90,7 +90,7 @@ preserved at `2301`. The ordinary category pipeline reuses all seventeen prepare
 models without graphics compilation. Three focused tests pass, including two
 sanitized C fixtures, installed-resource/hooks/UPS checks, and all/empty optional
 composition. The 3,840-byte reader packet adds no save change; the shared startup
-fits its existing reservation. Catching, releasing, carried models/icons,
+fits its existing reservation. Field behaviours, pocket icons,
 collection/profile readers, and spawn tables remain required before selection.
 Native connected-path execution remains unverified. Choice counts are unchanged. See the
 [creature checkpoint](checkpoints/V3_CREATURE_PROFILES.md).
@@ -101,12 +101,17 @@ The carried/field graphics category is prepared at
 whole category. Shared conversion now retains separate frame vertex arrays and
 the insects' environment-alpha fading. Six focused checks pass, including full
 resource/frame bounds and unchanged reuse of the existing room artwork. These
-field graphics are not installed yet; ABI 294 remains the current cartridge.
-The [creature contract](../specs/V3_CREATURE_ITEMS.md#native-integration-constraints)
-records the actual native consumers, preserved rubbish/salmon actor identities,
-the donor's arapaima shadow-bound defect, and the shared resource-file capacity
-constraint. Continue the connected native integration without reconverting the
-prepared models or replaying previous builds.
+field graphics are installed through one checked physical-ROM loader and shared
+resident tables, with native actor/buffer sizes retained. Fish capture/release
+mapping preserves rubbish, coastal salmon, and herabuna. The added insects use
+source held/world poses, and release shadows include safe XXL entries. The
+[creature contract](../specs/V3_CREATURE_ITEMS.md#connected-native-field-stage)
+owns layout and verification details. Two focused tests pass, including sanitized
+loading/transforms/startup, all resources/relocations, shared planning, UPS, and
+all/empty composition. The native attempts verify startup but hit a classified
+fixture address restriction before transfers; execution/GPU claims remain open.
+Do not rerun that setup in this batch. Continue field behaviours, spawning,
+pocket icons, and collection/profile readers without reconverting assets.
 
 Continue with creature parent/native integration and the remaining legacy
 clothing, custom-design, and fossil representations, not resource reconversion

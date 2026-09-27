@@ -2,6 +2,31 @@
 
 ## Current output
 
+ABI 295 is installed at `build/v3-creature-field-runtime-02/build-lock.json`.
+ROM SHA-256: `08da8e1c0fe1552a4a83890bfc8eb837ca2b5835314bb9fe36c027cc018cad20`.
+The shared field stage connects all seventeen frame objects, fish capture/release
+identities and parameters, source insect poses, and bounded XXL release shadows.
+It retains native actor/buffer allocations, original fish/insect identities,
+and golden-rod hooks. Expanded tables use one checked 12-KiB resident packet;
+only added models use external physical ROM storage. Neither saved format nor
+selectable-import count changes. See the
+[native field contract](../../specs/V3_CREATURE_ITEMS.md#connected-native-field-stage).
+
+Two focused tests pass in 7.716 seconds, covering sanitized loading/transforms/
+startup, complete installed resources and relocations, shared planning, UPS,
+and all/empty composition. The two silent native attempts at
+`build/v3-creature-field-native-01/` and `build/v3-creature-field-native-02/`
+verify the complete startup packet but reject the fixture's direct resident-code
+call before model transfers. Alignment and the debugger's ordinary-RAM proof
+bound explain those setup failures. The revised fixture enters through real
+relocated native actors; no third attempt is made in this batch. Native
+transfers, capture/release execution, GPU output, and hardware remain unverified.
+The separate earlier scheduler disconnect remains unclassified.
+
+All seventeen creatures remain inactive pending field behaviours/spawning,
+pocket icons, and collection/profile persistence. This is an installed connected
+field/carry integration stage, not seventeen completed playable imports.
+
 The complete field/carry artwork is prepared in
 `build/v3-creature-field-prepared-01/art.json`: seventeen objects, 59 frame
 references, 43 distinct poses, and 25,504 bytes. All three fish model-table
@@ -9,9 +34,9 @@ consumers agree; repeated insect poses remain repeated frame references, not
 duplicated geometry. Fish field/release timing selectors remain independent.
 Six focused checks pass in 1.595 seconds, covering the complete category,
 resource/command bounds, damaged-table rejection, environment-alpha conversion,
-and unchanged cached room artwork. This is prepared graphics, not an installed
-field renderer, native gameplay evidence, or a new ROM. ABI 294 stays current.
-Continue the category's native readers and behaviours using the
+and unchanged cached room artwork. The native stage reuses that prepared artwork;
+the conversion checks alone do not establish gameplay. Continue field behaviours
+and the remaining readers using the
 [recorded integration constraints](../../specs/V3_CREATURE_ITEMS.md#native-integration-constraints).
 
 `build/v3-creature-profiles-prepared-01/art.json` records seventeen complete
