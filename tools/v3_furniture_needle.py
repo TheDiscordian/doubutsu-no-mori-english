@@ -79,8 +79,15 @@ def source_contract(source,profile):
                  'joint dispatcher and complete constructor/move/draw binding'])
 
 
-def native_contract(image):
-    files=by_vrom(image);owner=files[0x82D7F0].extract(image);rows=[]
+def native_contract(image,report=None):
+    files=by_vrom(image);owner=bytearray(files[0x82D7F0].extract(image));rows=[];carrying=None
+    if report is not None:
+        from v3_room_carry_native import checked_binding,HOOKS,RAM
+        carrying=checked_binding(image,report)
+        # Check the actual installed hooks first, then compare every remaining
+        # instruction in the original complete move/draw dependencies.
+        for address,name,before in HOOKS:
+            owner[address-RAM:address-RAM+8]=bytes.fromhex(before)
     for name,at,n,digest in (
         ('rotation',0x80944358,400,'0b2ec06376e2deefa120ca4dc149b48caaf66869d2c699d856b271ca5fd829a2'),
         ('rotation_waits',0x80944D9C,96,'cdd06a67366b4b6ac64e735671345c797730b79575a69e1042f66f4923bf38d4'),
@@ -93,6 +100,10 @@ def native_contract(image):
     code=files[CODE_VROM].extract(image);at=0x80099A94
     if sha256(code[at-CODE_RAM:at-CODE_RAM+64])!='ec2069784200594b9c741825ffd65c9449dba4d613b26fac7c3e8768d74f52de':
         raise ValueError('Changed needle native sine')
+    debug=code[0x8007A0C0-CODE_RAM:0x8007A150-CODE_RAM]
+    if sha256(debug)!='8ff8f035c40cae35db40b0f6e33422620870608e15a4356ca2ed08e512fb09ed':
+        raise ValueError('Changed needle debug register initialization')
     return dict(blocks=rows,source_left_native=3,source_right_native=4,
         native_wait_left=8,native_wait_right=7,angle_float_offset=0x34,angle_short_offset=0x124,
-        parent_binding_installed=False)
+        debug_owner_ram=0x80138E50,debug_register_offset=0x14,debug_group=11,debug_group_stride=96,
+        parent_binding_installed=carrying is not None,**({'carrying':carrying} if carrying else {}))

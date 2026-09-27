@@ -94,6 +94,45 @@ def goods_contract(image,prior):
     return dict(packet_sha256=packet['sha256'],exports=exports)
 
 
+def checked_packet(equipment,blob):
+    """Validate the installed dependency before linking parent readers to it."""
+    carry=equipment.get('room_carry',{})
+    if (carry.get('format')!='AFV3-ROOM-CARRY-1' or not carry.get('installed') or
+            not carry.get('occupied_table_movement_enabled')):
+        raise ValueError('Needle requires complete installed moving-table support')
+    packet=carry['packet'];compiled=carry['compiled'];start=packet['blob_offset']
+    data=blob[start:start+packet['bytes']]
+    if (packet['ram']!=CODE_RAM or packet['capacity']!=CODE_END-CODE_RAM or
+            packet['vrom']!=BLOB+start or not 0<compiled['bytes']<=packet['bytes']<=CODE_END-CODE_RAM or
+            sha256(data)!=packet['sha256'] or zlib.crc32(data)!=packet['crc32'] or
+            sha256(data[:compiled['bytes']])!=compiled['sha256'] or
+            any(data[compiled['bytes']:]) or carry['state']!=dict(
+                ram=STATE_RAM,bytes=STATE_BYTES,used=172,mutable=True,saved=False)):
+        raise ValueError('Changed complete installed moving-table packet/state')
+    exports={name:compiled['symbols'][name] for name in ('af_v3_carry_parent','af_v3_carry_angle')}
+    if any(at&3 or not CODE_RAM<=at<CODE_RAM+compiled['bytes'] for at in exports.values()):
+        raise ValueError('Changed moving-table parent export bounds')
+    return dict(packet_sha256=packet['sha256'],exports=exports)
+
+
+def checked_binding(image,report):
+    files=by_vrom(image);equipment=report['equipment_resources'];carry=equipment.get('room_carry',{})
+    result=checked_packet(equipment,files[BLOB].extract(image))
+    if goods_contract(image,report)!=carry['goods']:
+        raise ValueError('Changed installed carrying goods dependency')
+    owner=files[VROM].extract(image);reloc=files[RELOC].extract(image);binding=carry['binding']
+    if (sha256(owner)!=binding['owner_sha256'] or sha256(reloc)!=binding['relocation_sha256'] or
+            not binding['installed'] or len(binding['hooks'])!=len(HOOKS)):
+        raise ValueError('Changed complete installed carrying owner')
+    for (address,name,before),row in zip(HOOKS,binding['hooks'],strict=True):
+        target=carry['compiled']['symbols'][name]
+        after=struct.pack('>I',jump(target,link=True))+(bytes(4) if address==0x80944FD0 else bytes.fromhex(before)[4:])
+        if (row!=dict(address=address,symbol=name,target=target,before=before,after=after.hex()) or
+                owner[address-RAM:address-RAM+8]!=after):
+            raise ValueError('Changed installed carrying call binding')
+    return dict(**result,owner_sha256=sha256(owner),relocation_sha256=sha256(reloc))
+
+
 def prepare(source,image,prior,output):
     files=by_vrom(image);native=files[VROM].extract(image);reloc=files[RELOC].extract(image)
     contract=source_contract(source);goods=goods_contract(image,prior);exports=goods['exports']

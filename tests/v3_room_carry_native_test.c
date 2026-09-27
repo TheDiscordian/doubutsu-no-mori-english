@@ -2,6 +2,10 @@
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
+#ifdef AF_V3_ROOM_NEEDLE
+#define AF_V3_ROOM_RIG_PACKET
+#define AF_V3_ROOM_JOINT
+#endif
 #include "../overlays/v3/room_carry_native.h"
 
 RoomCarryNative af_test_carry_native;
@@ -132,6 +136,10 @@ void af_surface_writeback(void *p,u32 n) {check_io(p,n,2);stage++;}
 void af_surface_invalidate(void *p,u32 n) {check_io(p,n,3);stage++;}
 int af_surface_prior_init(void) {assert(stage++==12 && !af_test_goods_magic && !af_test_carry_magic);init_calls++;return 1;}
 
+#ifdef AF_V3_ROOM_NEEDLE
+#include "v3_room_needle_binding.inc"
+#endif
+
 int main(void) {
     assert(af_v3_carry_blocked(contact));assert(!af_v3_carry_parent(actors));
     setup(1);
@@ -187,5 +195,8 @@ int main(void) {
         assert(af_test_goods_magic==(fail_stage && fail_stage<9));
     }
     printf("native carrying adapters: permissions, translation, both rotations, parent drawing, cleanup, retry, and startup pass (%u numeric checks)\n",checks);
+#ifdef AF_V3_ROOM_NEEDLE
+    test_needle_binding();
+#endif
     return 0;
 }

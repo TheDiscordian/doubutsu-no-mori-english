@@ -28,9 +28,12 @@ def lifecycle(source,profile):
     feature=a['joint_features'];move=copy.deepcopy(a['functions']['move']);n=move['bytes']
     if feature['mode']=='parent-relative-needle':
         from v3_furniture_needle import source_contract
-        source_contract(source,profile)
-        # Prepared motion is not an installed native moving-parent adapter.
-        return None
+        contract=source_contract(source,profile)
+        return dict(category='switched-joint-motion',mode=4,functions=copy.deepcopy(a['functions']),
+            needle=contract,joint_features=copy.deepcopy(feature),
+            source_steps_per_native_update=2,initial_speed=.5,start_disabled=False,
+            state_offset=0x450,state_bytes=16,maximum_draw_matrices=8,
+            source_sound_id=None,switch_clicks=[],parent_required=True,callback_installed=False)
     forms={152:(1,'6143c6d4ff30eac53bf70f5a397472a108fc8e39409c1a75ccd7f11796639d06'),
            208:(2,'f71d363b75caa817b5991c20f4e99d6d24658b1eb5ead7e8924955aa310ad90d'),
            324:(3,'c0b109b370f0f0bdb01aadb574b8bcc4a1c7f0aa157751b5cbe52a833dd8cdc0')}
@@ -104,9 +107,9 @@ def profile_lifecycle(profile,receipt,placement):
     a=profile.get('callback_adapter',{})
     if not receipt or a.get('category')!=CATEGORY or receipt.get('category')!='switched-joint-motion':return False
     mode=receipt.get('mode')
-    return (mode in (1,2,3) and json.loads(json.dumps(receipt.get('functions')))==json.loads(json.dumps(a['functions'])) and
+    return (mode in (1,2,3,4) and json.loads(json.dumps(receipt.get('functions')))==json.loads(json.dumps(a['functions'])) and
         receipt.get('joint_features')==a['joint_features'] and receipt.get('state_offset')==0x450 and
-        receipt.get('state_bytes')==8 and receipt.get('maximum_draw_matrices')==8 and
+        receipt.get('state_bytes')==(16 if mode==4 else 8) and receipt.get('maximum_draw_matrices')==8 and
         receipt.get('start_disabled')==(mode==3) and
         (mode!=3 or placement is not None and placement.get('mask')==0x1000))
 

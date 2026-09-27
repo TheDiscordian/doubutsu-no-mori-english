@@ -21,8 +21,20 @@ prevent asset/data conversion or redirect work from an unfinished shared format.
 Incomplete gameplay stays unavailable in the selector; installing assets does
 not claim that an item is playable. Reuse unchanged passing tests throughout.
 
-Current task: bind the compass's
-parent-sensitive needle into the ordinary importer. Registration, transforms,
+Current task: continue the remaining shared model/lifecycle categories and
+console launch/storage integration. The compass's parent-sensitive needle is
+installed through the ordinary importer in ABI 248 at
+`build/v3-parent-needle-imports-02/cartridge/build-lock.json`, ROM SHA-256
+`7305352828576a26a780485956122af0612e39e29ab85bd703091303663adec9`.
+All 3,008 artwork bytes are reused; complete behaviour, actual Gulliver
+acquisition, catalogue/scoring, official text, and optional profile integration
+are connected. There are 159 development choices. Five focused checks pass,
+including combined carrying/needle adapters under sanitizers and four
+browser/offline compositions. Native bridge execution and ordinary GPU appearance
+remain unverified; do not replay the exhausted switched-joint fixture.
+See the [needle checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#installed-parent-sensitive-needle).
+
+Registration, transforms,
 parent lookup, drawing arguments, and placement restoration are converted in
 `room_carry.c/.h`. Three focused carrying checks pass, including 90 donor
 comparisons spanning 1,890 move/draw frames under sanitizers. The MIPS component
@@ -53,7 +65,7 @@ integration, and composition tests pass. Native execution passes 99 assertions
 for lighthouse/moon before a debugger COP1-ownership interruption; its one retry
 finds unsupported signal-passing. Native snowcone and full rendering remain
 unverified. The setup retry allowance is exhausted; do not replay this fixture.
-Continue compass parent-relative motion and remaining shared callback/model
+Continue remaining shared callback/model
 categories. The shared room packet
 moves to `804D0000..804D8FFF`, clear of existing reaction/colour state; joint
 working floats occupy unused matrix slot nine, outside all eight morph joints.
@@ -65,8 +77,9 @@ constructor evaluation, rotation kick, damped oscillation, ordered self/parent
 states, and world-angle correction. Three focused checks pass, including 19,232
 comparisons with actual donor functions under memory/undefined-behaviour
 sanitizers. The MIPS preparation is `build/v3-parent-needle-prepared-01/motion.json`;
-it is not installed. The shared planner validates complete source bindings and
-keeps the item unavailable; its complete artwork remains reusable.
+its source-motion evidence is retained in the installed ABI 248 lifecycle.
+The shared planner requires installed carrying before preparing this profile;
+packet publication and profile binding check actual parent exports and owner hooks.
 
 The converted carrying functions bind the relocated room owner, its
 push/pull/rotation calls, final movement update, and drawing. The native
@@ -95,7 +108,7 @@ create/move/joint-draw behaviours, including all associated sound and parent
 motion, remain work; none becomes selectable from asset preparation alone.
 See the [joint-rig checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#joint-callback-rig-resources).
 
-The checked proposal is ABI 240 at
+The retained capacity proposal is ABI 240 at
 `build/v3-large-model-imports-01/cartridge/build-lock.json`, with 158 development
 choices. Shared model banks and catalogue previews hold 12,288 bytes; the ordinary
 importer installs the complete 10,448-byte snowboard with its real winter-camper

@@ -37,7 +37,8 @@ SOURCES=('tools/v3_room_rig_runtime.py','tools/v3_asset_loader.py','tools/v3_fur
     'tools/v3_furniture_motion.py','overlays/v3/room_motion.h','overlays/v3/room_rigs_extended.ld',
     'tools/v3_room_effects.py','overlays/v3/room_effects.c','overlays/v3/room_effects.h',
     'overlays/v3/room_rigs_wide.ld','overlays/v3/room_joints.c','tools/v3_furniture_joint_rigs.py',
-    'tools/v3_furniture_needle.py','tools/v3_room_carry.py')
+    'tools/v3_furniture_needle.py','tools/v3_room_carry.py','tools/v3_room_carry_native.py',
+    'overlays/v3/room_needle.c','overlays/v3/room_needle.h')
 from v3_furniture_reactions import SOURCES as REACTION_SOURCES
 SOURCES+=REACTION_SOURCES
 from v3_furniture_static import SOURCES as STATIC_SOURCES
@@ -192,6 +193,10 @@ def install_profiles(base,prior,blob,core,original,output,directories):
             if category==JOINT_CATEGORY:
                 initial=joints.lifecycle(source,descriptor)
                 if initial is None:raise ValueError('Joint-rig native lifecycle remains incomplete')
+                if initial.get('parent_required'):
+                    from v3_furniture_needle import native_contract as needle_contract
+                    if runtime.get('needle_contract')!=needle_contract(base,prior):
+                        raise ValueError('Missing complete needle carrying binding')
                 if initial['start_disabled'] and placement is None:
                     placement,owner_changes,updates=install_initial_switch(base,prior,blob,source,output)
                 if not joints.profile_lifecycle(descriptor,initial,placement):
@@ -397,6 +402,10 @@ def bind_profiles(source,base,report):
     if any(r.get('mode')==6 for r in runtime['rows']):
         if runtime.get('joint_contract')!=joints.native_contract(base):
             raise ValueError('Changed installed joint-rig native bindings')
+    if any(r.get('mode')==6 and r.get('first')==4 for r in runtime['rows']):
+        from v3_furniture_needle import native_contract as needle_contract
+        if runtime.get('needle_contract')!=needle_contract(base,report):
+            raise ValueError('Changed installed needle carrying bindings')
     for row,enabled in [(r,False) for r in staged.get('rows',[])]+[(r,True) for r in activated]:
         item=int(row['item_id'],16);donor=f'{furniture_source(row)[0]:04X}';i=slot(item);binding=bindings.get(donor)
         if (donor in source.runtime_profiles or not binding or not binding['profile_installed'] or
@@ -592,7 +601,7 @@ def encode_packet(rows,sound_rows=(),material_rows=()):
         encode([r])  # Retain the complete existing object/pointer/work-area checks.
         mode,first,last=r.get('mode',0),r.get('first',0),r.get('last',0)
         if (mode not in (0,1,2,3,4,5,6) or mode==0 and (first or last) or
-                mode==6 and (first,last) not in ((1,0),(2,0),(0x5103,0x00160017)) or
+                mode==6 and (first,last) not in ((1,0),(2,0),(4,0),(0x5103,0x00160017)) or
                 mode==3 and (first,last) not in ((0,0),(1,0x3E800000),(2,0x3F000000)) or
                 mode==1 and not (0<first<r['joints'] and 0<last<r['joints'] and first!=last) or
                 mode==4 and (last or first&3 or not 0x06000000<=first<=0x06000000+r['bytes']-16) or
@@ -707,6 +716,15 @@ def publish_packet(equipment,blob,output,*,core=None):
     if any(r.get('mode')==5 for r in runtime['rows']):defines+=('AF_V3_ROOM_ROLLING',)
     joint=any(r.get('mode')==6 for r in runtime['rows'])
     if joint:defines+=('AF_V3_ROOM_JOINT',)
+    needle=any(r.get('mode')==6 and r.get('first')==4 for r in runtime['rows'])
+    if needle:
+        from v3_room_carry_native import checked_packet
+        carrying=checked_packet(equipment,blob)
+        if any(runtime.get('needle_contract',{}).get('carrying',{}).get(k)!=v for k,v in carrying.items()):
+            raise ValueError('Needle packet has no checked carrying contract')
+        exports=carrying['exports']
+        defines+=('AF_V3_ROOM_NEEDLE',f'AF_CARRY_PARENT=0x{exports["af_v3_carry_parent"]:X}u',
+                  f'AF_CARRY_ANGLE=0x{exports["af_v3_carry_angle"]:X}u')
     effects=runtime.get('effects')
     particles=effects.get('particles') if effects else None
     if effects:
@@ -723,6 +741,7 @@ def publish_packet(equipment,blob,output,*,core=None):
         extra_sources=(('overlays/v3/room_materials.c',) if material_rows else ())+
             (('overlays/v3/room_billboards.c',) if billboard else ())+
             (('overlays/v3/room_joints.c',) if joint else ())+
+            (('overlays/v3/room_needle.c',) if needle else ())+
             (('overlays/v3/room_effects.c',) if effects else ())+reaction_sources+
             (('overlays/v3/room_particles.c',) if particles else ())+\
             (('overlays/v3/room_colours.c',) if colours else ())+static_sources)
@@ -903,6 +922,9 @@ def extend(base,prior,blob,core,original,output,directories):
     if billboard_binding:installed['billboard_contract']=billboard_binding
     if rolling:installed['motion_contract']=motion_binding(source,base,prior,all_rows)
     if any(r.get('mode')==6 for r in all_rows):installed['joint_contract']=joints.native_contract(base)
+    if any(r.get('mode')==6 and r.get('first')==4 for r in all_rows):
+        from v3_furniture_needle import native_contract as needle_contract
+        installed['needle_contract']=needle_contract(base,prior)
     if new_packet:
         installed['packet']=dict(ram=packet_ram,bytes=packet_bytes,blob_offset=cursor,vrom=BLOB+cursor)
         cursor+=packet_bytes

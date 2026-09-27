@@ -41,8 +41,8 @@ A separate checked lifecycle binds source create/move/draw code, helper code,
 relocations, constants, and audio. The ordinary `import` command installs all
 complete lifecycles in the selected category together, reusing prepared objects.
 The implemented motion kinds cover lighthouse easing, moon clock/rotation, and
-snowcone easing/scrolling/sound. Compass parent-relative motion remains pending;
-it is not converted into a stationary decorative substitute.
+snowcone easing/scrolling/sound, and parent-sensitive compass motion. Parent-sensitive
+motion requires the installed carrying adapter and its actual parent readers.
 
 The parent-sensitive needle conversion is in `room_needle.c/.h`, with complete
 donor bindings in `v3_furniture_needle.py`. It preserves the eighth-source-tick
@@ -55,13 +55,13 @@ Transient work needs sixteen bytes and no saved fields.
 Recognition checks complete callbacks, helpers, constants, and the relocated
 status jump table. Native rotation states 3/4 correspond to donor left/right;
 wait states 8/7 precede them. The ordinary lifecycle planner validates this
-contract but keeps the compass unavailable until its parent support is installed.
+contract and rejects installation without complete installed parent support.
 Prepared artwork remains reusable without descriptor changes.
 
-The native room move/draw loops do not perform the donor's moving-parent
-registration and carried-child transform. Complete that shared adapter, including
-foreground removal/restoration and final child positions/angles, before binding
-the needle into the installed joint dispatcher. A permanent null parent, a fixed
+The native room move/draw loops use the installed shared adapter for the donor's
+moving-parent registration and carried-child transform, including foreground
+removal/restoration and final child positions/angles. The joint dispatcher binds
+the actual parent and angle-delta exports from that verified packet. A permanent null parent, a fixed
 needle, or merely lifting the native movement restriction is not an implementation.
 The donor routines live in `ac_my_room_move.c_inc`, `ac_my_room_draw.c_inc`, and
 `ac_my_room_action.c_inc`, alongside the parent readers in `ac_my_room.c`.
@@ -121,9 +121,21 @@ Teardown completes an accepted in-flight movement before native persistence.
 Installed-resource and host checks do not
 establish ordinary native drawing or original-hardware behaviour.
 
-Rig mode 6 uses first-word low byte 1/2/3 for these source motion kinds. Kind 3
+Rig mode 6 uses first-word low byte 1/2/3/4 for these source motion kinds. Kind 3
 also stores complete level sound `51` in the next byte and clicks `0016/0017`
-in the last word. Unknown parameter combinations reject. The source's initial
+in the last word. Kind 4 has no sound and a zero last word. It uses the native
+stopped initializer, evaluates once at speed `0.5`, then stops. Each update runs
+two source steps with the actual carried parent's state; joint three subtracts
+own angle, parent delta, and damped needle offset. Its sixteen-byte work occupies
+`450..45F` inside unused matrix slot nine. Native debug registers CRV 80/81 retain
+source phase/decay adjustments without allocating a new debug owner.
+
+The complete carrying packet, goods dependency, all twelve installed owner
+hooks, relocations, and exported reader bounds are checked before enabling this
+lifecycle. The original complete movement/draw dependency hashes are compared
+after verifying and reversing only those known hook windows. Artwork alone or
+an `installed` flag alone does not satisfy the dependency. Unknown parameter
+combinations reject. The source's initial
 evaluation runs at half speed; movement performs two source steps per N64 update.
 Moon rotation starts from actual RTC minutes/seconds and retains source wrapping.
 Snowcone starts disabled through the native placement adapter, retains both

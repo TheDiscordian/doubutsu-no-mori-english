@@ -116,7 +116,11 @@ static const RoomRigRecord *find(u32 index) {
 #ifdef AF_V3_ROOM_RIG_PACKET
         if (r->reserved || r->mode>ROOM_RIG_JOINT) return 0;
 #ifdef AF_V3_ROOM_JOINT
-        if (r->mode==ROOM_RIG_JOINT && !((r->first.bits==1 || r->first.bits==2) ?
+        if (r->mode==ROOM_RIG_JOINT && !((r->first.bits==1 || r->first.bits==2
+#ifdef AF_V3_ROOM_NEEDLE
+                || r->first.bits==4
+#endif
+                ) ?
                 r->last.bits==0 : r->first.bits==0x5103 && r->last.bits==0x00160017)) return 0;
 #else
         if (r->mode==ROOM_RIG_JOINT) return 0;
@@ -171,7 +175,8 @@ void af_v3_room_rig_ct(RoomRig *actor,u8 *data) {
     if (skeleton[0]!=r->joints || skeleton[1]!=r->shown) return;
     cKF_SkeletonInfo_R_ct(&actor->keyframe,skeleton,animation,actor->joint,actor->morph);
 #ifdef AF_V3_ROOM_RIG_PACKET
-    if (r->mode==ROOM_RIG_STORAGE || r->mode==ROOM_RIG_HIT)
+    if (r->mode==ROOM_RIG_STORAGE || r->mode==ROOM_RIG_HIT ||
+            (r->mode==ROOM_RIG_JOINT && r->first.bits==4))
         cKF_SkeletonInfo_R_init_standard_stop(&actor->keyframe,animation,(void *)0);
     else
 #endif

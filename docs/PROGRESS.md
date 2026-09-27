@@ -48,12 +48,16 @@ resources, UPS reconstruction, and four browser/offline selections. Native bridg
 execution and GPU appearance remain unverified. See the
 [loose-item checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#installed-loose-item-rotation).
 
-The moving-table owner hooks still need connecting; occupied-table movement is
-not enabled and the compass remains unavailable. The
-[carrying checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-moving-table-carrying)
-records the prepared code, source comparisons, and next bindings. The needle's
-rotation kicks, damping, parent contributions, and world-direction correction
-retain their 19,232 donor comparisons.
+The moving-table owner hooks and compass lifecycle are installed. Twelve guarded
+owner replacements connect carrying, parent-relative drawing, and final item
+restoration. The ordinary importer reuses the complete 3,008-byte compass model
+and enables its actual Gulliver route, non-orderable catalogue entry, scoring,
+official English name, and optional save-profile bit. Five focused checks pass
+for source/dependency guards, the combined carrying/needle dispatcher under
+sanitizers, complete installed resources, UPS reconstruction, and four
+browser/offline selections. The needle retains its 19,232 donor comparisons.
+Native bridge execution, ordinary gameplay, and GPU/hardware appearance remain
+unverified. See the [needle checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#installed-parent-sensitive-needle).
 
 The shared importer installs complete lighthouse, moon, and snowcone lifecycles
 in one category batch, reusing all prepared artwork. Motion, clock rotation,
@@ -63,11 +67,11 @@ Three focused source/integration/composition checks pass, alongside the retained
 lighthouse/moon before a debugger interruption; the retry encounters an
 unsupported debugger command. Native snowcone execution and full ordinary/GPU
 appearance remain unverified. The profiles stay inactive pending actual
-acquisition. Compass parent-relative motion remains required. See the
+acquisition. The compass uses the same dispatcher with installed parent support. See the
 [joint-lifecycle checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#installed-switched-joint-lifecycles).
 
-The checked proposal is ABI 244 at
-`build/v3-room-goods-runtime-03/build-lock.json`, with 158
+The checked proposal is ABI 248 at
+`build/v3-parent-needle-imports-02/cartridge/build-lock.json`, with 159
 development choices and unchanged format-four saved data. The complete
 10,448-byte snowboard remains imported through the ordinary pipeline,
 including all 259 triangles, thirteen textures, and actual winter-camper route.
@@ -212,7 +216,7 @@ conditional effect binding. Its native particle lifetime still needs a properly
 allocated graphics fixture with the next changed effect batch; the previous
 fixture omitted that allocation. Do not repeat the passed bell checks.
 
-Room code uses 15,536 of 16,384 bytes; bootstrap uses 1,521 of 1,536 bytes.
+Room code uses 18,688 of 32,768 bytes; bootstrap uses 1,509 of 1,536 bytes.
 Scroll code has 4 bytes spare, audio has 768 conservative bytes spare, and
 the import reservation has 1,009,936 bytes spare. Live synthesis, GPU appearance,
 ordinary gameplay/save/restart, and original hardware are not newly verified.

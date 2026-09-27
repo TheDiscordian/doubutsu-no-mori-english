@@ -46,8 +46,8 @@ static float reference_ease(float value,float target) {
     else {value-=.0001f;if (value<target)value=target;}
     return value;
 }
-void add_calc(float *v,float target,float rate,float maximum,float minimum) {
-    assert(rate==.3f && maximum==.3f && minimum==.0001f);*v=reference_ease(*v,target);
+float add_calc(float *v,float target,float rate,float maximum,float minimum) {
+    assert(rate==.3f && maximum==.3f && minimum==.0001f);*v=reference_ease(*v,target);return target-*v;
 }
 void sAdo_OngenTrgStart(u32 word,float *position) {assert(position);++clicks;click=word;}
 void sAdo_OngenPos(u32 owner,u8 sound,float *position) {assert(owner && sound==0x51 && position);++loops;}

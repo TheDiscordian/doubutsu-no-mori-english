@@ -1,5 +1,53 @@
 # Automatic furniture pipeline checkpoint
 
+## Installed parent-sensitive needle
+
+The ordinary importer installs the compass as joint-motion kind four, using the
+actual carrying parent and angle-delta exports. Its complete 3,008-byte artwork
+is reused from the category preparation without a compiler run. The constructor
+uses stopped keyframes, evaluates at half speed, then stops. Movement performs
+two source steps, including both self and parent contributions and the existing
+debug-register adjustments. Joint three preserves world direction and damped
+motion without hiding geometry or drawing it in the wrong graphics stream.
+
+- Build: `build/v3-parent-needle-imports-02/cartridge/build-lock.json`, ABI 248.
+- ROM SHA-256: `7305352828576a26a780485956122af0612e39e29ab85bd703091303663adec9`.
+- UPS SHA-256: `2dca4a1fe1538502097802c587b828bd1ff826c4702d1394ba329c2055ad7088`.
+- Shared room code: 18,688 of 32,768 bytes; bootstrap: 1,509 of 1,536 bytes.
+- Shared code SHA-256: `868a1375954d4f03c335f15f8c3e0143e12d831645017b0774ae68d30fe05ca4`.
+- Joint state: sixteen bytes in unused matrix slot nine; no new allocation.
+- Development choices: 159. Actual Gulliver list `ftr_listJonason`, reward route
+  12, non-orderable catalogue entry, donor scoring, and official name are retained.
+
+Five focused checks pass: `tests.test_v3_needle_runtime` and the source-motion
+guard in `tests.test_v3_furniture_needle`. The combined sanitizer check runs the
+shared dispatcher with actual carrying/goods adapters and stubbed native backend.
+It covers stopped construction, both parent turns, eighth-tick kick, final
+release, world-relative drawing, debug inputs, independent catalogue preview,
+and both matrix-buffer parities. Installed checks cover full artwork, code,
+dependency rejection, retained room/goods/carry resources, source metadata,
+original-ROM UPS reconstruction, and four browser/offline selections. The
+existing 19,232 donor comparisons remain retained evidence, not a new run.
+
+The initial ordinary import identified JSON integer-key normalization in nested
+lifecycle metadata. The shared source-metadata comparison now compares canonical
+JSON forms, retaining every value check. The completed profile/artifact stage is
+reused for the successful ordinary import; no previous ROM is overwritten. The
+host integration's first compile needed its packet-layout defines before the
+shared header; the corrected retry passes. No historical emulator run is repeated.
+
+Native bridge execution, ordinary in-room movement/rendering, save/restart with
+the compass, and original hardware remain unverified. The shared native joint
+fixture still has the recorded debugger signal-passing limitation; it also needs
+kind-four expectations before a useful future combined run.
+
+Format-four saved fields are unchanged. A save containing the compass needs it
+enabled in the receiving profile; an older or smaller profile cannot load it.
+Back up saves and use equal-or-larger import selections. No V2 compatibility is
+claimed for imported saves. The main lock, V2 deployments, and existing saves
+are unchanged. Continue remaining model/lifecycle categories and console
+launch/storage, then the acquisition and gold-tree work in the main queue.
+
 ## Installed moving-table owner hooks
 
 ABI 245 connects the shared carrying core to the actual native room owner,

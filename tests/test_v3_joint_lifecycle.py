@@ -50,7 +50,7 @@ class JointLifecycleTests(unittest.TestCase):
             offset=int(next(iter(lifecycle['constants'])),16)
             bad.rel[self.source.sections[4][0]+offset]^=1
             with self.assertRaises(ValueError):joints.lifecycle(bad,descriptor)
-        self.assertIsNone(joints.lifecycle(self.source,prepare(self.source,0x3064)[0]))
+        self.assertEqual(joints.lifecycle(self.source,prepare(self.source,0x3064)[0])['mode'],4)
 
     def test_complete_profiles_relocated_packet_and_preserved_save_resources(self):
         bindings=runtime.bind_profiles(self.source,self.image,self.report)

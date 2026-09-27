@@ -1,7 +1,28 @@
 /* Complete switched joint motion and source-ordered translucent redraws. */
 #include "room_rigs.h"
 #include "room_motion.h"
-extern void add_calc(float *,float,float,float,float);
+extern float add_calc(float *,float,float,float,float);
+#ifdef AF_V3_ROOM_NEEDLE
+#include "room_needle.h"
+extern u8 *af_v3_room_debug;
+#ifdef __mips__
+#define needle_parent ((RoomRig *(*)(RoomRig *))AF_CARRY_PARENT)
+#define needle_parent_angle ((s16 (*)(RoomRig *))AF_CARRY_ANGLE)
+#else
+extern RoomRig *af_v3_carry_parent(RoomRig *);
+extern s16 af_v3_carry_angle(RoomRig *);
+#define needle_parent af_v3_carry_parent
+#define needle_parent_angle af_v3_carry_angle
+#endif
+static s16 needle_debug(int index) {
+    uptr at=(uptr)af_v3_room_debug;
+    if (!at || (at&1)) return 0;
+#ifdef __mips__
+    if (at<0x80000000u || at>0x80800000u-0x1C94u) return 0;
+#endif
+    return ((const s16 *)(at+0x14))[11*96+index];
+}
+#endif
 extern void sAdo_OngenPos(u32,u8,float *);
 extern void sAdo_OngenTrgStart(u32,float *);
 extern void *_Matrix_to_Mtx(void *);
@@ -15,6 +36,9 @@ extern u8 af_v3_test_joint_clock[8];
 
 void af_v3_room_joint_ct(RoomRig *actor,const RoomRigRecord *r) {
     u32 kind=r->first.bits&255u;
+#ifdef AF_V3_ROOM_NEEDLE
+    if (kind==4) {af_v3_room_needle_ct(&actor->needle,&actor->keyframe,actor->state);return;}
+#endif
     actor->motion_power=actor->switched==1 ? 1.0f : 0.0f;
     actor->motion_phase=kind==2 ? (float)(joint_clock[1]*60u+joint_clock[0])/600.0f : 0.0f;
     actor->keyframe.speed.f=.5f;
@@ -24,6 +48,15 @@ void af_v3_room_joint_ct(RoomRig *actor,const RoomRigRecord *r) {
 
 void af_v3_room_joint_mv(RoomRig *actor,const RoomRigRecord *r) {
     u32 kind=r->first.bits&255u;
+#ifdef AF_V3_ROOM_NEEDLE
+    if (kind==4) {
+        RoomRig *parent=needle_parent(actor);
+        for (u32 i=0;i<2;++i)
+            af_v3_room_needle_step(&actor->needle,&actor->keyframe,actor->state,
+                parent ? &parent->state : 0,needle_debug(80),needle_debug(81));
+        return;
+    }
+#endif
     float target=actor->switched==1 ? 1.0f : 0.0f;
     for (u32 i=0;i<2;++i) {
         if (kind==3) {
@@ -63,7 +96,12 @@ static int joint_before(void *game,RoomKeyframe *key,int joint,void *list,
                         void *flags,void *arg,s16 *rotation,void *position) {
     (void)game;(void)key;(void)flags;(void)position;
     JointDraw *d=arg;
-    if (d->kind==2) {
+    if (d->kind==4) {
+#ifdef AF_V3_ROOM_NEEDLE
+        if (joint==3) rotation[1]=af_v3_room_needle_angle(&d->actor->needle,
+            rotation[1],d->actor->s_angle_y,needle_parent_angle(d->actor));
+#endif
+    } else if (d->kind==2) {
         if (joint==1) rotation[2]=(s16)((u16)rotation[2]+(int)d->actor->motion_phase);
     } else if (joint==3 || joint==(d->kind==1 ? 7 : 4)) {
         d->hidden=*(void **)list;
@@ -76,7 +114,7 @@ static int joint_after(RoomRigGame *game,RoomKeyframe *key,int joint,void *list,
                        void *flags,void *arg,void *rotation,void *position) {
     (void)key;(void)list;(void)flags;(void)rotation;(void)position;
     JointDraw *d=arg;
-    if (d->kind==2 || !(joint==3 || joint==(d->kind==1 ? 7 : 4))) return 1;
+    if (d->kind==2 || d->kind==4 || !(joint==3 || joint==(d->kind==1 ? 7 : 4))) return 1;
     RoomRigGraphics *g=game->gfx;
     void *matrix=d->allocation+(joint==3 ? 64 : 128);
     _Matrix_to_Mtx(matrix);

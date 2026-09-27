@@ -1334,8 +1334,12 @@ def rig_import_plan(inventory, report, bindings, selected=(), category=None, *, 
         not r.get('room_alias') and (not selected or r['item_id'] in selected) and
         (category is None or category in r['categories'])]
     rows=[r for r in candidates if r['profile'].get('callback_adapter',{}).get('category') in categories]
-    rows += [r for r in candidates if r['profile'].get('callback_adapter',{}).get('category')==JOINT_CATEGORY
-             and source is not None and joint_lifecycle(source,r['profile']) is not None]
+    for r in candidates:
+        if r['profile'].get('callback_adapter',{}).get('category')!=JOINT_CATEGORY or source is None:continue
+        lifecycle=joint_lifecycle(source,r['profile'])
+        if lifecycle and (not lifecycle.get('parent_required') or
+                report.get('equipment_resources',{}).get('room_carry',{}).get('installed')):
+            rows.append(r)
     joint_loops={r['item_id'] for r in rows if r['profile']['callback_adapter']['category']==JOINT_CATEGORY
                  and furniture_level(source,r['profile']) is not None}
     material_rows=[];material_audio=[];material_loops=[];effects=set()

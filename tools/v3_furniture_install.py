@@ -234,7 +234,9 @@ def checked_assets(art_path, source, worksheet):
         if item in seen: raise ValueError('Duplicate batch identity')
         seen.add(item)
         prepared=prepare(source,item);descriptor=prepared[0]
-        meta = metadata(source,item,descriptor,identities[item])
+        # Generated metadata is JSON: relocation offsets inside full lifecycle
+        # receipts become string keys, just as in the checked model descriptor.
+        meta = json.loads(json.dumps(metadata(source,item,descriptor,identities[item])))
         if any(row.get(k) != v for k,v in meta.items()) or row['profile'] != json.loads(json.dumps(descriptor)):
             raise ValueError('Import metadata differs from source discovery')
         if (row['native_profile_scalar_hex']!=descriptor['scalar_hex'] or

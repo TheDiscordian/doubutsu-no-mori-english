@@ -7,6 +7,11 @@ typedef unsigned int u32;
 typedef __UINTPTR_TYPE__ uptr;
 typedef union { float f; u32 bits; } FloatWord;
 typedef struct {
+    float amplitude,smoothed;
+    s16 previous_state,rotation_ticks,phase;
+    u16 reserved;
+} RoomNeedle;
+typedef struct {
     float start, end, duration;
     FloatWord speed, current;
     int mode;
@@ -47,6 +52,11 @@ typedef struct {
     };
     union {
         u8 matrices[2][10][64];
+        struct {
+            u8 before_needle[9*64];
+            RoomNeedle needle;
+            u8 after_needle[20*64-9*64-sizeof(RoomNeedle)];
+        };
         struct {
             /* The complete native recursive drawer consumes at most one matrix
                per shown joint (eight maximum). Slot nine is never submitted. */
