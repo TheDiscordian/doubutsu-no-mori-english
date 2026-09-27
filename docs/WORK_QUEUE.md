@@ -25,13 +25,13 @@ Carry substantial N64/GameCube behaviour differences through the shared import
 path as explicit WebUI choices, following the
 [behaviour-choice contract](../specs/V3_OPTIONAL_IMPORTS.md#n64-and-gamecube-behaviour-choices).
 Implement the actual alternatives and bind selections to the build receipt.
-Fish population and imported coastal movement have installed controls and runtime
-alternatives; other substantial differences still need their own real bindings.
+Fish/insect population and imported coastal movement have installed controls and
+runtime alternatives; other substantial differences still need real bindings.
 
 Current implementation task: complete the connected seventeen-creature importing
-path. Its remaining implementation is the eight insects' shared field behaviours
-and spawning; the nine fish still need connected native verification and fixes
-for any defects found. Retain source season/time/terrain rules, required
+path. Field behaviours, spawning, and optional selections are installed for all
+seventeen species; connected native verification and fixes for any defects found
+remain required. Retain source season/time/terrain rules, required
 N64/GameCube choices, catching, pocket identity/icon, placing/picking up, releasing,
 collection and saved-profile readers, and optional per-species composition.
 Required species-specific behaviour is included. Native constructor execution
@@ -39,111 +39,59 @@ has an unresolved timeout; retain it as unresolved, not a successful test.
 The creature task and native harness budget persist across intermediate changes,
 build locks, and commits. Reuse completed consumers and check the connected result.
 
-Use the shared converter and the current ABI-305 proposal:
-`build/v3-creature-world-work-01/connected-15/build-lock.json`.
-ROM SHA-256: `a971864a1ed6c92f0e56f15df1b86d4d88e8026b3cb4864afb3118c8016d84ad`.
-The GameCube calendar is connected through native manager entry `8092ECAC`,
-terrain selection, and real actor creation. The complete seventeen-creature
-saved-profile/collection extension and town seasonal state are installed.
-Both population alternatives are installed: source seasonal blending and an
-additive native policy retaining the original native-species manager. All
-seventeen added species have native catch/last-catch/completion readers, full
-dual-palette pocket icons, and official donor catch messages with single-catalogue
-credits. Collection drawing, navigation, and name lookup cover all 41 fish and
-40 insects without replacing native herabuna. Both behaviour settings connect to
-the private offline/browser composers and their receipts. Six current browser/offline
-profiles agree, including all nine fish, individual/subset profiles, and both modes. Empty imports
-with default settings return stable V2. Neither deployment is changed.
-Per-species composition connects all nine fish's carried readiness, room-display
-enable words, saved profile, and nested checksums. The private composer has 176
-experimental choices. Eight insects remain inactive pending their field behaviours.
-The shared passport adapter connects visitor catch records, export/import, and
-return to the matching resident without altering another player. It retains
-the native player, animal, letter, and note sizes. Host checks cover all seventeen
-identities, four residents, compatible round trips, legacy return, device errors,
-and corruption/profile/identity rejection; native travel is not verified.
-Other imported catalogue/console travel remains unfinished, so this does not
-claim complete V3 Controller Pak support. A smaller selected creature profile
-rejects the passport; V2 and older V3 passport readers are incompatible.
-The remaining fish work is connected native gameplay/save verification and any
-real defects it exposes, including classification of the constructor timeout.
-Do not restart the exhausted fixture or declare an unclassified failure harmless.
-Continue the eight insects' shared field behaviour/spawn programs while that
-native test remains unresolved. Keep fish gameplay verification open, not waived.
-The six complete donor behaviour programs and the shared native environment,
-stress, capture, culling, and directed-collision adapters compile together at
-`build/v3-creature-insects-work-01/programs-29/`. Controller ownership, source-rate
-stepping, event latching, and current-owner hook/relocation composition are
-prepared. The same object contains complete calendar/habitat/group spawning and
-the native manager adapter, including optional species masks, source cache timing,
-and the original-manager population alternative. The full 45-row seasonal blend
-fits the shared 64-row plan; no native twenty-row array is extended in place.
-Four current changed-path checks pass, with six unchanged category checks retained;
-the collider preservation check covers all eight donor initialisers. These programs are
-**not installed** and do not change the available imports.
-The ground colony includes deferred actor creation, live-acre lookup, full
-scrolling artwork, net-to-single-ant handoff, fading, and cleanup. Its guarded
-actor registration and catch-identity composer preserve native bees and the
-existing additive actor lookup. The intro-acre boundary and first demo clip
-are bound to their real native owners. These remain prepared runtime consumers,
-not newly playable imports.
-The same prepared runtime connects the full field-sound set and native water/mud
-effects. Its shared audio installer preserves existing sounds, imports both
-missing loops and both triggers, and supplies the actual trigger remap to the
-runtime. The small-mud constructor bridge preserves ordinary digging variants.
-Install these prepared resources and the mud call-site hook with the complete
-runtime; they are not installed in ABI 305. Twelve sound-parser checks pass.
-The same runtime includes complete mosquito player actions, fishing interruption,
-both full motions, bounded face timelines, official message `3063` mapped to
-native `2F00`, and prepared native action/resource composition. All three impact
-producers and all four seasonal tree-shake producers have guarded composers that
-preserve the colony catch and optional gold-tree paths. The face pool lives in
-the insect runtime; its version-two reader/table avoids the occupied password
-bootstrap at `804B4D00`. These consumers require final installation together.
-Nine shared keyframe checks pass, retaining unusual donor keys without sorting,
-clipping, or replacing the animation. No native fixture is restarted.
-The second demo-state binding uses the checked native Resetti-event flag,
-including its original setter, reader, and four destructor clear paths. The
-separate insect season reader and complete format-eight canonical/format-nine
-compressed codec link in the shared runtime. Stable save-entry composition and
-sanitized full save/migration tests pass, preserving town, collections, fish
-seasons, and all console records. The old save-code padding contains creature
-icons: retain it unchanged, and install the new save code with the insect runtime.
-The 53,168-byte image links at `80656000..80662FAF`, with zero-filled BSS and no
-missing engine symbols; cartridge reservation and startup installation remain
-required. Its report records this distinction. No new ROM is produced.
-Continue spawning at its actual remaining consumer: native/GameCube population
-capacity (two versus eight wild slots, plus the release slot). The prepared
-calendar, terrain/weather, group, and native creation adapter, including the
-colony, are retained.
-Install the season reader with its prepared codec and every stable save redirect,
-never with the old format-seven codec. New format-nine saves migrate forward
-from earlier versions but cannot be loaded by those versions. Preserve backups;
-native save/reload remains unverified. Installed ABI 305 still writes format seven.
-The prepared directed collision filter needs its checked
-`80070398` call-site hook when the complete runtime is installed. Do not replace
-it with ordinary collision or mark the disabled imports playable. Native manager
-entry `8092AF0C` has a guarded composer and relocation-safe original fallback;
-install it with the complete resident runtime, not by itself.
-Reuse the checked source bodies, native bindings, controller bridges, and
-relocation-aware composer rather than rewriting them or restarting art conversion.
-Full dependencies and the exact preparation command live
-in the [insect program contract](../specs/V3_CREATURE_ITEMS.md#added-insect-behaviour-programs).
-Reuse complete room, field, calendar, catch, icon, and UI resources. All seventeen
-source house-rating/feng shui records are converted through the ordinary shared
-scoring writer; the nine selected fish are installed and follow checkbox state.
-Eight inactive insects retain prepared records without entering rating groups.
-The virtual import tail has 128 bytes left. Reuse the existing owner-storage
-placement machinery when adding insect code; do not drop resources or weaken
-overlap checks to fit the remaining space.
-Keep the shared bounded plan, not appended entries in the native twenty-row
-buffers. The active task and exhausted native harness budget are unchanged.
-This private build writes format-7 compressed saves (canonical format six).
-Older saves migrate forward; V2 and older V3 builds cannot load its new saves.
-Preserve backups. Native save/reload for this extension is not verified.
-The dresser cancellation correction is installed in V2 and V3; empty import
-selection returns stable V2-14. Continue the importing work without replaying
-unchanged dresser or museum checks.
+Use the shared converter and current ABI-306 proposal:
+`build/v3-creature-insects-work-01/connected-04/build-lock.json`.
+ROM SHA-256: `49a00572262ed21f2f84b1484a7c88c22658b67b48434a6bc031d09ac6614017`.
+All seventeen creatures now have installed field and room artwork, complete
+behaviour/spawn readers, catch/release identities, pocket icons, collection UI,
+official catch messages, saved profiles, scoring, and per-species composition.
+All eight insect behaviours are installed as one category, including the ant
+colony, full field audio/effects, player impacts and tree shaking, mosquito
+responses/motions/faces/dialogue, and seasonal persistence.
+
+The shared insect controller has nine independent native-sized slots/buffers.
+The private composers expose actual N64 two-wild-slot and GameCube eight-wild-slot
+population alternatives, with a separate release slot in either mode.
+The nine fish retain their installed population and coastal-movement choices.
+There are 184 selectable development imports; both deployed patchers remain V2-14.
+Six browser/offline profiles agree, including individual/all insect selections,
+both insect population modes, select all, and empty/default V2 output.
+Current cartridge/resource/planner checks and focused sanitized population,
+controller, complete-program, and eleven-packet startup checks pass.
+These are not ordinary native gameplay or hardware results.
+
+The shared importer installs the entire insect runtime/resource/selection path in
+one refresh, called by the general creature pipeline. Prepared source output is
+`build/v3-creature-insects-work-01/programs-30/`; reuse its complete programs and
+the installed room/field/audio resources. The 96,880-byte resident packet and
+guard are loaded from checked physical-ROM storage. Regenerated catalogue/shop
+owners use checked external storage, leaving 23,248 bytes of reusable item-data
+padding. Preserve these allocation and overlap checks; do not reconvert artwork.
+
+**Next consumer in the same active creature task:** resolve connected native
+gameplay and save verification, including the expanded insect scene-bank
+allocation and actual hook/catch/place/release paths. Inspect retained failure
+evidence before choosing a bounded current-build check. The fish constructor
+timeout and sound-scheduler disconnection remain unclassified; do not restart
+their exhausted fixtures, reset the harness budget, or claim their later
+assertions passed. Fix actual game defects rather than bypassing them.
+Do not reopen completed conversion, source-program, or browser-composition work
+without a relevant defect.
+
+The complete shared save path is installed with format-nine compressed saves,
+canonical eight, and registry five. Insect seasons use separate bytes from fish
+seasons. Stable codec entry points redirect into the loaded runtime; old code
+padding and creature icons remain intact. Valid older saves migrate forward;
+V2 and earlier V3 builds cannot load new saves. Preserve backups. Native
+save/reload remains unverified.
+
+The passport adapter retains the seventeen-species profile/collection extension,
+matching-resident restoration, independent visitor records, and unchanged native
+note/player/animal/letter sizes. Host travel checks are retained; native travel
+and other imported catalogue/console transport remain unfinished. Compatible
+V3 profiles are required; V2 and older V3 readers do not understand the extension.
+Preserve Controller Pak backups. Keep the main lock and deployments unchanged
+until the private handoff and the user's subsequent approval.
 
 The complete console engines, image loading, persistence, and room bindings are
 installed. Native Clu Clu Land D and Wario's Woods title execution, rendering,

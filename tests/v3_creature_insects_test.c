@@ -79,7 +79,7 @@ void af_insect_position_integrate(ACTOR *a) {
 
 static aINS_INSECT_ACTOR *start(unsigned n,int release) {
     assert(n<8);
-    aINS_INSECT_ACTOR *i=controller.insects+n%3;
+    aINS_INSECT_ACTOR *i=controller.insects+n%AF_INSECT_SLOTS;
     memset(i,0,sizeof(*i));
     memset(i->col_pipe,0xA5,sizeof(i->col_pipe));
     af_v3_insect_bind_controller(&controller);

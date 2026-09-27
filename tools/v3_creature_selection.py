@@ -30,9 +30,13 @@ def profile(rows):
 
 def selected_identities(creatures):
     selection=creatures.get('optional_selection',{})
-    expected=sorted(r['id'] for r in creatures['rows'] if r['category']=='fish')
+    categories=selection.get('categories')
+    if categories not in (['fish'],['fish','insect']):raise ValueError('Unknown selectable creature categories')
+    if 'insect' in categories and not selection.get('insect_field_runtime_installed'):
+        raise ValueError('Insect selection lacks its field implementation')
+    expected=sorted(r['id'] for r in creatures['rows'] if r['category'] in categories)
     selected=selection.get('selected_identities')
-    if (selection.get('format')!=FORMAT or selection.get('categories')!=['fish'] or
+    if (selection.get('format')!=FORMAT or
             selection.get('identities')!=expected or not isinstance(selected,list) or
             selected!=sorted(set(selected)) or set(selected)-set(expected) or
             selection.get('web_patcher_enabled') is not False or selection.get('playable_handoff') is not False):
@@ -41,6 +45,44 @@ def selected_identities(creatures):
     if bits.hex()!=selection.get('profile_hex') or sha256(bits)!=selection.get('profile_sha256'):
         raise ValueError('Changed creature selection/save profile')
     return set(selected)
+
+
+def connect_insects(base,prior,equipment,blob):
+    """Promote all eight parents/displays through the existing shared selection."""
+    from v3_furniture_pipeline import Source
+    from v3_furniture_install import scoring
+    source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+        (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    checked(base,prior,source)
+    insects=equipment['creature_insects'];r=equipment['creature_items'];selection=r['optional_selection']
+    if (not insects['installed'] or not insects['population']['installed'] or
+            not equipment['insect_field_audio']['runtime_installed'] or
+            selection['categories']!=['fish']):raise ValueError('Incomplete connected insect category')
+    displays={v['parent_item_id']:v for v in r['profiles']}
+    for row in r['rows']:
+        if row['category']!='insect':continue
+        d=displays[row['item_id']];n=slot(int(d['item_id'],16));at=ROWS+n*80
+        if row['ready'] or row['selected'] or d['selected'] or u32(blob,at+4) or blob[0x40+n//8]&(1<<(n&7)):
+            raise ValueError('Insect activation overwrites an existing identity')
+        struct.pack_into('>I',blob,at+4,1);blob[0x40+n//8]|=1<<(n&7)
+        row['ready']=row['selected']=d['selected']=True;d['profile_record_sha256']=sha256(blob[at:at+80])
+    p=r['packet'];packet=bytearray(blob[p['blob_offset']:p['blob_offset']+p['bytes']])
+    if sha256(packet)!=p['sha256']:raise ValueError('Changed complete creature selection packet')
+    table=encode(r['rows']);packet[TABLE:TABLE+len(table)]=table
+    blob[p['blob_offset']:p['blob_offset']+p['bytes']]=packet
+    p.update(sha256=sha256(packet),crc32=zlib.crc32(packet));r['table_sha256']=sha256(table)
+    bits=profile([dict(kind=v['category'],item_id=v['item_id']) for v in r['rows']])
+    identities=sorted(v['id'] for v in r['rows'])
+    selection.update(categories=['fish','insect'],identities=identities,selected_identities=identities,
+        profile_hex=bits.hex(),profile_sha256=sha256(bits),insect_field_runtime_installed=True)
+    r.update(ready_items=17,profile_bits_enabled=17,remaining=['Connected native gameplay and save/reload'])
+    score=r['room_scoring'];pending=[row for row in score['rows'] if not row['installed']]
+    if len(pending)!=8:raise ValueError('Incomplete inactive insect scoring category')
+    changes,updates=scoring(base,prior,pending,source)
+    for row in score['rows']:row['installed']=True
+    score['installed_identities']=identities
+    selected_identities(r)
+    return changes,updates
 
 
 def install(base,prior,blob):

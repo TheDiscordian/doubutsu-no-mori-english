@@ -31,69 +31,50 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
-The current proposal is ABI 305 at
-`build/v3-creature-world-work-01/connected-15/build-lock.json`, ROM SHA-256
-`a971864a1ed6c92f0e56f15df1b86d4d88e8026b3cb4864afb3118c8016d84ad`.
-It contains 176 selectable development imports, including all nine fish, and 100 complete inactive furniture
-profiles whose acquisition is pending. The main lock and both stable V2-14
-deployments are retained.
+The current proposal is ABI 306 at
+`build/v3-creature-insects-work-01/connected-04/build-lock.json`, ROM SHA-256
+`49a00572262ed21f2f84b1484a7c88c22658b67b48434a6bc031d09ac6614017`.
+It contains 184 independently selectable development imports, including all nine
+fish and eight insects, and 100 inactive furniture profiles whose acquisition
+is pending. The main lock and both stable V2-14 deployments are unchanged.
 
-The active creature batch prepares all eight added insects' field behaviour
-together. Six complete donor programs compile with the native environment,
-movement, stress, catch, culling, and collider-cleanup adapters. The prepared
-controller bridges retain original insects' updates and prevent added species
-from reaching the old bounded program table. Directed collision excludes only
-the hiding tile's cylinder; ordinary terrain and neighbouring obstacles remain.
-The native collider is 28 bytes, and the donor-only collision radius lives in
-controller-owned extra state rather than overlapping its final four bytes.
-The complete 78-list insect calendar, seasonal blending, habitat filtering,
-weighted selection, distinct-position group creation, and native spawn-manager
-adapter compile with those programs. The shared 64-row buffer retains the full
-45-row July/August blend, including candy/turnip extras. Native creation uses the
-real relocated insect clip; colonies use the separate native actor-creation path.
-Retained focused checks cover complete donor behaviour and collider preservation,
-sanitized environment/controller and spawn-manager paths, all source calendars
-and shared habitat/group logic, current-cartridge hook/relocation composition,
-colony lifecycle/drawing, and connected field-service routing/resource composition.
-These are host/compiler checks, not native gameplay. Output is
-`build/v3-creature-insects-work-01/programs-29/`; no new ROM is built, the insects
-remain unavailable for selection, and ABI 305 remains the cartridge.
-The colony runtime connects creation, catching into a single ant, complete
-two-layer scrolling artwork, fading, and native actor cleanup. The opening
-sequence's movement boundary and first demo-state reader use verified native
-bindings. The colony's profile/catch hooks still require final installation.
-Field audio and water/mud effects compile into that same runtime. Complete
-source loops and triggers use the shared sound importer, with checked instrument
-reuse, trigger remapping, hidden-cricket scheduling, and mosquito buzz mode.
-The small-dirt-puff bridge retains the native effect loader and ordinary digging
-variants. Their resource/call-site installers are prepared, not applied to the
-cartridge. Twelve focused sound-parser checks pass without native test replays.
-Player interactions compile into the same object: impact-frame notifications for
-axe/shovel rock strikes and digging, all-season tree shaking, and complete
-mosquito sting/notice actions with fishing interruption and official English text.
-Both source motions retain all 2,640 bytes and irregular keyframe records.
-The 279-byte face pool and bounded version-two reader preserve the existing
-password bootstrap rather than growing through it. Prepared composers connect
-the action tables, motions, faces, and native face-reader hooks; they still need
-the complete insect runtime's placement/startup and message installation.
-Four current changed-path host/composition checks and nine shared keyframe checks
-pass; six unchanged insect checks retain their previous evidence. No native or
-hardware execution is claimed for these changes.
-The complete runtime now links with no missing engine symbols, including the
-native Resetti-event flag and persistent insect-season reader. Its 53,168-byte
-linked image includes all six insect programs and the complete save path.
-The prepared format-nine save adapter preserves existing creature icons and
-redirects all stable save exports to that runtime. It assigns separate insect
-season bytes, migrates preceding saves, and rejects invalid data before writing.
-Focused sanitized save/migration, cutscene, and current-resource composition
-checks pass. This is linked preparation, not an allocated or installed cartridge
-runtime; the installed ABI-305 save format remains seven.
-Continue the same batch with native/GameCube population-capacity choices and complete runtime
-placement/startup/selection. The calendar-to-manager path is prepared, not installed;
-its remaining installation and capacity work remain required. Native constructor
-timeout and sound-scheduler disconnection remain unresolved. No old native
-fixture is replayed. See the
-[insect program contract](../specs/V3_CREATURE_ITEMS.md#added-insect-behaviour-programs).
+The complete insect category is installed together: six full donor programs,
+calendar/habitat/group spawning, collision, the ground ant colony, field sounds
+and water/mud effects, player rock/dig/tree events, mosquito responses, both full
+player motions, bounded face timelines, official dialogue, and persistent seasons.
+Its controller retains native actor sizes and extends allocation, graphics
+reload, movement, drawing, and cleanup to nine slots with independent code buffers.
+The N64 population choice keeps two wild insects and its proximity exclusion;
+GameCube uses eight wild insects and source groups. Both have a separate release
+slot. The choice is connected to the same private browser/offline composition
+rules as individual insect inclusion, parent/display identities, scoring, and
+saved-profile bits. Empty/default selections still produce stable V2-14.
+
+The 96,880-byte runtime/guard packet is allocated in reserved Expansion Pak RAM
+and stored in checked physical ROM space. The eleven-packet startup verifies
+transfer/checksum/cache ordering before entering the game; its code uses 652 of
+688 reserved bytes. The common importer moves the complete regenerated
+catalogue/shop owners outside the nearly full item-data area and retains 23,248
+bytes of checked reusable padding. Existing artwork, names, console resources,
+and both native/imported species identities are preserved.
+
+Current cartridge/resource/planner checks pass, as do six matching browser/offline
+profiles: empty, select all, all insects in either mode, one insect, and population
+changes without imported items. Focused sanitized checks cover both population
+limits, independent buffers, releases, profile rejection, all eight behaviour
+programs, the changed controller adapter, and the expanded startup chain.
+The earlier save/migration, audio, player, colony, and graphics checks remain
+retained evidence; they are not repeated as new native tests.
+
+This build writes format-nine compressed saves (canonical eight, registry five).
+Valid older saves migrate forward; V2 and earlier V3 builds cannot load its new
+saves. Preserve backups. Native scene-bank capacity, ordinary creature gameplay,
+save/reload, and hardware remain unverified. The fish constructor timeout and
+sound-scheduler disconnection remain unresolved, not waived or labelled harmless.
+The active creature task continues with those connected native consumers and any
+real defects found, without restarting exhausted fixtures. This is an experimental
+development build, not a playtest handoff or deployment approval. See the
+[insect contract](../specs/V3_CREATURE_ITEMS.md#added-insect-behaviour-programs).
 
 Four additional paintings use the ordinary shared importer: full models, original
 shop/event lists, catalogue, scoring, official names, and fixed additive IDs.
@@ -123,8 +104,8 @@ arrays, and three sound-callback dependencies are retained. Actual source
 placement/pickup functions establish carried-parent identities and official
 names. These are not seventeen playable imports. All sixteen animated objects
 (74,672 bytes) and the shared embedded-rig callback are installed. Nine fish
-profiles participate in private composition; eight insects remain disabled
-pending their field behaviours and spawning.
+and eight insect profiles participate in private composition through their
+installed field behaviours and spawning.
 The shared native dispatch preserves creature animation in placement/removal
 states 6 and 13 while retaining other furniture's callback exclusions. Sanitized
 category checks and current cartridge/resource/UPS checks pass; ordinary native
@@ -237,7 +218,7 @@ and four residents. Incompatible profiles, corrupt records, wrong identities,
 and device errors reject; legacy returns preserve existing resident catches.
 Complete donor house-rating and feng shui records use the existing shared
 converter and native category mappings. Nine selected fish have installed
-ratings; eight inactive insects have prepared records. Disabled fish leave
+ratings alongside all eight added insects. Disabled creatures leave
 rating-group searches through the same offline/browser selection writes.
 No model, sound, saved layout, or resident allocation changes for scoring.
 Native travel and other imports' catalogue/console transport remain unfinished

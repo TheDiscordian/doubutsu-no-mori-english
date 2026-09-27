@@ -288,6 +288,29 @@ def reuse_resource_tail(base, prior, old_blob):
     if (len(moves)!=3 or {r['vrom'] for r in moves}!=owners
             or sha256(old_blob)!=prior['blob_sha256'] or files[BLOB].pend):
         raise ValueError('Changed regenerated resource tail inventory')
+    padding=previous.get('resource_tail_padding')
+    if padding is not None:
+        first=padding['blob_offset'];end=files[BLOB].pstart+len(old_blob)
+        if (first%16 or not PACKAGE+PACKAGE_SIZE<=first<=len(old_blob) or
+                padding['bytes']!=len(old_blob)-first or any(old_blob[first:]) or
+                any(e.pstart<end and files[BLOB].pstart+first<(e.pend or e.pstart+e.size)
+                    for v,e in files.items() if v!=BLOB and e.pstart!=0xFFFFFFFF)):
+            raise ValueError('Changed reusable zero padding or overlapping DMA owner')
+        for row in moves:
+            entry=files[row['vrom']]
+            if (entry.pend or entry.pstart!=row['physical'] or entry.size!=row['bytes'] or
+                    sha256(entry.extract(base))!=row['sha256'] or 'blob_offset' in row or
+                    entry.pstart<end and files[BLOB].pstart<entry.pstart+entry.size):
+                raise ValueError('Changed external regenerated resource')
+        for at in range(ROWS,ITEMS,80):
+            if any(old_blob[at:at+80]):
+                lo,hi=struct.unpack_from('>II',old_blob,at+8)
+                if lo<BLOB+len(old_blob) and BLOB+first<hi:
+                    raise ValueError('Reusable zero padding overlaps retained furniture')
+        return bytearray(old_blob[:first]),dict(reused_bytes=len(old_blob)-first,
+            blob_offset=first,source_blob_sha256=sha256(old_blob),
+            retained_prefix_sha256=sha256(old_blob[:first]),retired_resources=[],
+            external_resources=copy.deepcopy(moves))
     first=min(r['blob_offset'] for r in moves);cursor=first
     if first%16 or not PACKAGE+PACKAGE_SIZE <= first < len(old_blob):
         raise ValueError('Regenerated resource tail overlaps resident data')
@@ -312,6 +335,42 @@ def reuse_resource_tail(base, prior, old_blob):
     return bytearray(old_blob[:first]),dict(reused_bytes=len(old_blob)-first,
         blob_offset=first,source_blob_sha256=sha256(old_blob),
         retained_prefix_sha256=sha256(old_blob[:first]),retired_resources=copy.deepcopy(moves))
+
+
+def place_resource_tail(base,prior,blob,resources,limit,*,reservations=()):
+    """Keep regenerated owners outside item storage when the common tail fills.
+
+    Preserve their DMA identities and complete contents. Reclaimed item storage
+    remains a checked zero tail, reusable by ordinary imports and runtime batches.
+    """
+    files=by_vrom(base);order=(catalogue.VROM,catalogue.RELOC,shops.VROM)
+    if set(resources)!=set(order):raise ValueError('Incomplete regenerated owner batch')
+    old_bytes=files[BLOB].size;after=len(blob)
+    for vrom in order:after=((after+15)&~15)+len(resources[vrom])
+    external=prior.get('automatic_furniture',{}).get('resource_tail_padding') is not None
+    if not external and old_bytes<=after<=limit-BLOB:
+        moves=[]
+        for vrom in order:
+            data=resources[vrom];blob.extend(bytes(-len(blob)%16));at=len(blob);blob.extend(data)
+            moves.append(dict(vrom=vrom,blob_offset=at,bytes=len(data),
+                physical=files[BLOB].pstart+at,sha256=sha256(data)))
+        return moves,{},None
+    blob.extend(bytes(-len(blob)%16));first=len(blob)
+    if max(first,old_bytes)>limit-BLOB:raise ValueError('Complete resources exceed reusable item storage')
+    blob.extend(bytes(max(0,old_bytes-len(blob))))
+    moved=[];pending=[];writes={}
+    for vrom in order:
+        entry=files[vrom];data=resources[vrom]
+        if not data:raise ValueError('Empty regenerated resource')
+        if external and not entry.pend and data==entry.extract(base):
+            moved.append(dict(vrom=vrom,bytes=len(data),physical=entry.pstart,
+                storage='retained-external',sha256=sha256(data),original_sha256=sha256(data)))
+        else:pending.append((vrom,data));writes[vrom]=data
+    moved.extend(owner_tail_storage(base,files,pending,
+        minimum_end=max(files[BLOB].pstart+len(blob),
+            prior.get('resource_capacity',{}).get('reserved_physical_end',0)),reservations=reservations))
+    moved.sort(key=lambda r:order.index(r['vrom']))
+    return moved,writes,dict(blob_offset=first,bytes=len(blob)-first)
 
 
 def build(output, art_path, lock=LOCK):
@@ -414,10 +473,9 @@ def build(output, art_path, lock=LOCK):
             blob.extend(bytes(-len(blob)%16));at=len(blob);blob.extend(changes.pop(vrom))
             owner_moves.append(dict(vrom=vrom,blob_offset=at,bytes=len(data),
                 physical=files[BLOB].pstart+at,sha256=sha256(data)))
-    moves = []
-    for vrom in (catalogue.VROM,catalogue.RELOC,shops.VROM):
-        blob.extend(bytes(-len(blob)%16)); at=len(blob); data=changes.pop(vrom); blob.extend(data)
-        moves.append(dict(vrom=vrom,blob_offset=at,bytes=len(data),physical=files[BLOB].pstart+at,sha256=sha256(data)))
+    tail_resources={v:changes.pop(v) for v in (catalogue.VROM,catalogue.RELOC,shops.VROM)}
+    moves,tail_writes,tail_padding=place_resource_tail(base,prior,blob,tail_resources,limit,
+        reservations=prior.get('physical_resources',[]))
     for vrom,data in list(changes.items()):
         entry=files[vrom]; at=entry.pstart-files[BLOB].pstart
         if entry.pend or len(data)!=entry.size: raise ValueError('Unexpected fixed-owner allocation change')
@@ -448,6 +506,9 @@ def build(output, art_path, lock=LOCK):
         raise ValueError('Batch overlaps a live physical or virtual resource')
     changes.update({BLOB:blob,MODULE:module}); result=bytearray(base)
     for vrom,data in changes.items(): result[files[vrom].pstart:files[vrom].pstart+len(data)]=data
+    for row in moves:
+        if row['vrom'] in tail_writes:
+            result[row['physical']:row['physical']+row['bytes']]=tail_writes[row['vrom']]
     struct.pack_into('>I',result,DMA_START+files[BLOB].index*16+4,BLOB+len(blob))
     for row in owner_moves+moves:
         struct.pack_into('>4I',result,DMA_START+files[row['vrom']].index*16,
@@ -502,7 +563,7 @@ def build(output, art_path, lock=LOCK):
             row['layer_type']=source.raw('aMR_layer_set_info')[furniture_source(row)[1]]
     report['automatic_furniture']=dict(version=VERSION,imports=installed,art_report_sha256=art_sha,
         base=base_pin,art_directory=str(art_path.resolve().relative_to(ROOT)),
-        resource_moves=moves,owner_moves=owner_moves,resource_tail_reuse=reused,additional_resident_bytes=0,saved_format_changed=False,
+        resource_moves=moves,resource_tail_padding=tail_padding,owner_moves=owner_moves,resource_tail_reuse=reused,additional_resident_bytes=0,saved_format_changed=False,
         saved_profile_changed=True,older_builds_accept_new_saves=False,web_patcher_enabled=False,
         catalogue_masks_sha256=sha256(bytes(blob[ITEMS+i*32+24] for i in range(1024))),
         provenance_catalogue_complete=not bool(text_patch))
@@ -603,7 +664,7 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
                     equipment_rigs=None, expand_storage=False, furniture_audio_art=None, furniture_profiles=None,
                     material_frames_art=None,scrolling_materials_art=None,room_surfaces_art=None,furniture_scoring=False,
                     password_runtime=None,password_editor=False,room_effects=None,furniture_capacity=False,console_storage=False,
-                    console_images=None,console_emulator=False,console_disk=None,creature_items=None,creature_field=None,creature_fish=False):
+                    console_images=None,console_emulator=False,console_disk=None,creature_items=None,creature_field=None,creature_fish=False,creature_insects=None):
     """Update shared readers; optionally install the shared held-resource adapter."""
     output=output.resolve()
     if output.exists() or not output.is_relative_to(ROOT/'build'):
@@ -621,7 +682,7 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             or struct.unpack_from('>4I',blob,0xF0)!=(BLOB+PACKAGE,PACKAGE_SIZE,zlib.crc32(package),PACKAGE_RAM)):
         raise ValueError('Changed shared runtime package')
     output.mkdir(parents=True)
-    moved=[];equipment_report=None;reused=None;owner_changes={};owner_moves=[];owner_updates=[];report_updates={};text_moves=[];physical_writes=[]
+    moved=[];tail_writes={};tail_padding=None;equipment_report=None;reused=None;owner_changes={};owner_moves=[];owner_updates=[];report_updates={};text_moves=[];physical_writes=[]
     equipment_mode=any((equipment_art is not None,equipment_rigs is not None,player_motion,equipment_kinds,player_actions,
                         item_category_art is not None,ground_categories,event_acquisition,held_collection,held_catalogue_art is not None,held_selection,room_rigs_art is not None,scenery_art is not None,scenery_gameplay))
     resource_mode=equipment_mode or room_rigs_code or room_goods is not None or room_carry is not None or translation_updates or expand_storage or furniture_audio_art is not None or furniture_profiles is not None or material_frames_art is not None or scrolling_materials_art is not None or room_surfaces_art is not None or furniture_scoring or password_runtime is not None or password_editor or room_effects is not None or furniture_capacity or console_storage or console_images is not None or console_emulator
@@ -640,13 +701,22 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
     if creature_fish:
         if resource_mode:raise ValueError('Install shared runtime updates in dependency order')
         resource_mode=True
+    if creature_insects is not None:
+        if resource_mode:raise ValueError('Install shared runtime updates in dependency order')
+        resource_mode=True
     if resource_mode:
         blob,reused=reuse_resource_tail(base,prior,old_blob)
-        if not reused['reused_bytes']:
+        if not reused['reused_bytes'] and not reused.get('external_resources'):
             raise ValueError('Equipment integration requires the checked shared resource tail')
     parent_readers=bool(player_actions and prior.get('equipment_resources',{}).get('player_actions',{}).get('equipment_selection'))
     wrapped_names=bool(player_actions and prior.get('equipment_resources',{}).get('wrapped_presents'))
-    if creature_fish:
+    if creature_insects is not None:
+        import v3_creature_insect_install as equipment
+        display_report,alias_report=prior['clothing']['display'],prior['display_aliases']
+        equipment_report,owner_changes,report_updates,physical_writes=equipment.install(
+            base,prior,blob,output,creature_insects,core)
+        display_report=report_updates['clothing']['display']
+    elif creature_fish:
         import v3_creature_fish as equipment
         display_report,alias_report=prior['clothing']['display'],prior['display_aliases']
         result=equipment.install(base,prior,blob,output,core=core)
@@ -854,6 +924,10 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
                             target<r.get('target_vrom',r['vrom'])+r['bytes'] for r in growth)):
                     raise ValueError('Changed resource virtual destination overlaps a live owner')
                 continue
+            if vrom in (catalogue.VROM,catalogue.RELOC,shops.VROM):
+                # These complete owners are placed once by the shared tail
+                # planner, including when their prior mapping is external.
+                continue
             if vrom in forced_moves:
                 if data!=entry.extract(base):raise ValueError('Relocated blocker changes its complete contents')
                 external.append((vrom,data));continue
@@ -881,13 +955,13 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
                 blob[at:at+len(data)]=data
                 owner_updates.append(dict(vrom=vrom,blob_offset=at,bytes=len(data),
                     sha256=sha256(data),original_sha256=sha256(entry.extract(base))))
-        for row in sorted(reused['retired_resources'],key=lambda r:r['blob_offset']):
-            data=owner_changes.get(row['vrom'],files[row['vrom']].extract(base))
-            blob.extend(bytes(-len(blob)%16));at=len(blob);blob.extend(data)
-            moved.append(dict(vrom=row['vrom'],blob_offset=at,bytes=len(data),
-                              physical=files[BLOB].pstart+at,sha256=sha256(data)))
+        tail_resources={v:owner_changes.get(v,files[v].extract(base))
+            for v in (catalogue.VROM,catalogue.RELOC,shops.VROM)}
+        moved,tail_writes,tail_padding=place_resource_tail(base,prior,blob,tail_resources,limit,
+            reservations=report_updates.get('physical_resources',prior.get('physical_resources',[]))+growth)
+        external=[(v,d) for v,d in external if v not in tail_resources]
         owner_moves=owner_tail_storage(base,files,external,
-            minimum_end=max([files[BLOB].pstart+len(blob)]+[r['physical']+r['bytes'] for r in growth]),
+            minimum_end=max([files[BLOB].pstart+len(blob)]+[r['physical']+r['bytes'] for r in growth+moved]),
             reservations=report_updates.get('physical_resources',prior.get('physical_resources',[])))
         owner_moves.extend(dict(vrom=r['vrom'],bytes=r['bytes'],physical=r['physical'],
             storage='checked-zero-gap' if r.get('relocated') else 'checked-in-place-append',
@@ -941,6 +1015,9 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             raise ValueError('Runtime update changes an undeclared resource allocation')
         result[entry.pstart:entry.pstart+len(data)]=data
     if resource_mode:
+        for row in moved:
+            if row['vrom'] in tail_writes:
+                result[row['physical']:row['physical']+row['bytes']]=tail_writes[row['vrom']]
         for row in owner_moves:
             result[row['physical']:row['physical']+row['bytes']]=owner_changes[row['vrom']]
         struct.pack_into('>I',result,DMA_START+files[BLOB].index*16+4,BLOB+len(blob))
@@ -975,12 +1052,16 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         first=row['physical'];end=first+row['bytes']
         if any(result[first:end]):raise ValueError('Physical resource write overlaps changed cartridge bytes')
         result[first:end]=data
+    if creature_insects is not None:
+        result=equipment.finish(result,base,prior,output,equipment_report,report_updates['physical_resources'])
     physical.verify(result,report_updates.get('physical_resources',prior.get('physical_resources',[])))
     fix_checksum(result);result=bytes(result)
     patch=make_ups(original,result)
     if apply_ups(original,patch)!=result: raise ValueError('Runtime patch reconstruction failed')
     report=copy.deepcopy(prior)
     report.update(report_updates)
+    if resource_mode:
+        report['automatic_furniture'].update(resource_moves=moved,resource_tail_padding=tail_padding)
     report.update(build='v3-shared-item-runtime',runtime_abi=abi,input_build_sha256=sha256(base),
         output_sha256=sha256(result),patch_sha256=sha256(patch),blob_sha256=sha256(blob),
         blob_bytes=len(blob),blob_file_bytes=len(blob),
@@ -1219,6 +1300,15 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         if report_updates.get('saved_format_changed'):
             report['shared_runtime_refresh'].update(saved_format_changed=True,
                 additional_save_state_bytes=report['save_runtime']['state_bytes']-prior['save_runtime']['state_bytes'])
+    if creature_insects is not None:
+        insects=equipment_report['creature_insects']
+        report['shared_runtime_refresh'].update(adapters=['creature_insects'],artwork_changed=True,
+            additional_resident_bytes=insects['additional_resident_bytes'],
+            additional_scene_bytes=insects['additional_scene_bytes'],resource_allocations_changed=True,
+            saved_format_changed=True,
+            saved_profile_changed=report['save_runtime']['profile_hex']!=prior['save_runtime']['profile_hex'])
+        report['sources'].update(insects['sources'])
+        report['native_test']='pending connected insect gameplay/save verification; fish constructor and sound-scheduler failures remain unresolved'
     if console_images is not None:
         images=equipment_report['console_images']
         report['shared_runtime_refresh'].update(adapters=['console_images'],
@@ -1333,6 +1423,7 @@ if __name__=='__main__':
     parser.add_argument('--creature-items',type=Path,
         help='With --refresh-runtime, connect the complete prepared creature parent/room category')
     parser.add_argument('--creature-fish',action='store_true',help='Install shared fish world behaviours')
+    parser.add_argument('--creature-insects',type=Path,help='Install the complete prepared insect runtime and resources together')
     parser.add_argument('--creature-field',type=Path,
         help='With --refresh-runtime, install the complete field frames and capture/release tables')
     parser.add_argument('--console-disk',type=Path,
@@ -1374,6 +1465,7 @@ if __name__=='__main__':
     if args.creature_items is not None and not args.refresh_runtime:parser.error('--creature-items requires --refresh-runtime')
     if args.creature_field is not None and not args.refresh_runtime:parser.error('--creature-field requires --refresh-runtime')
     if args.creature_fish and not args.refresh_runtime:parser.error('--creature-fish requires --refresh-runtime')
+    if args.creature_insects is not None and not args.refresh_runtime:parser.error('--creature-insects requires --refresh-runtime')
     result=(refresh_runtime(args.output,args.base_lock,equipment_art=args.equipment_art,player_motion=args.player_motion,
                             equipment_kinds=args.equipment_kinds,player_actions=args.player_actions,
                             item_category_art=args.item_category_art,ground_categories=args.ground_categories,
@@ -1389,6 +1481,6 @@ if __name__=='__main__':
                             furniture_capacity=args.furniture_capacity,console_storage=args.console_storage,
                             console_images=args.console_images,console_emulator=args.console_emulator,
                             console_disk=args.console_disk,creature_items=args.creature_items,creature_field=args.creature_field,
-                            creature_fish=args.creature_fish)
+                            creature_fish=args.creature_fish,creature_insects=args.creature_insects)
             if args.refresh_runtime else build(args.output,args.art,args.base_lock))
     print(json.dumps({k:result[k] for k in ('runtime_abi','output_sha256','patch_sha256')},indent=2))

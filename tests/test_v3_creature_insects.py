@@ -12,10 +12,59 @@ ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'tools'))
 from aflib import sha256
 from v3_creature_insects import PROGRAMS,rewrite,install_controller,install_spawn_manager,install_colony
-PROGRAM_DIRECTORY=ROOT/os.environ.get('V3_INSECT_PROGRAMS','build/v3-creature-insects-work-01/programs-29')
+PROGRAM_DIRECTORY=ROOT/os.environ.get('V3_INSECT_PROGRAMS','build/v3-creature-insects-work-01/programs-30')
 
 
 class CreatureInsectTests(unittest.TestCase):
+    def test_connected_population_pool(self):
+        with tempfile.TemporaryDirectory(prefix='af-insect-pool-') as temporary:
+            executable=Path(temporary)/'pool'
+            result=subprocess.run(['cc','-std=c11','-O1','-g','-fno-pie','-no-pie',
+                '-fsanitize=address,undefined','-fno-sanitize-recover=all','-Wall','-Wextra','-Werror',
+                '-I'+str(ROOT/'overlays/v3'),str(ROOT/'overlays/v3/creature_insect_pool.c'),
+                str(ROOT/'overlays/v3/creature_insect_state.c'),
+                str(ROOT/'tests/v3_creature_insect_pool_test.c'),'-o',str(executable)],
+                capture_output=True,text=True)
+            self.assertEqual(result.returncode,0,result.stderr)
+            result=subprocess.run([str(executable)],capture_output=True,text=True,timeout=15)
+            self.assertEqual(result.returncode,0,result.stderr)
+            self.assertIn('Complete population creator:',result.stdout)
+
+    def test_population_resource_composition(self):
+        import copy
+        from aflib import by_vrom,u32
+        from v3_furniture_install import inputs
+        from v3_creature_insect_pool import install,VROM,RELOC,RAM
+        report=json.loads((PROGRAM_DIRECTORY/'programs.json').read_text())
+        image,_=inputs(ROOT/'build/v3-creature-world-work-01/connected-15/build-lock.json')
+        files=by_vrom(image);symbols=report['linked']['symbols'];prepared=report['population']
+        self.assertEqual(prepared['slots'],9)
+        self.assertEqual(prepared['wild_slots'],{'N64':2,'GameCube':8})
+        self.assertEqual(prepared['release_slot'],8)
+        self.assertEqual(prepared['resident_program_buffer_bytes'],6*0x1C00)
+        self.assertEqual(prepared['controller_bytes'],0x174+9*0x280+4)
+        controller,controller_patches=install_controller(image,symbols,report['native_abi']['controller'])
+        changed,receipt=install(image,prepared,controller)
+        self.assertTrue(receipt['runtime_installation_required']);self.assertFalse(receipt['installed'])
+        restored=bytearray(changed[VROM])
+        for p in prepared['patches']:
+            at=p['address']-RAM
+            self.assertEqual(u32(restored,at),p['after'])
+            struct.pack_into('>I',restored,at,p['before'])
+        self.assertEqual(restored,controller[VROM])
+        self.assertEqual(changed[RELOC],controller[RELOC])
+        for vrom,data in controller.items():
+            if vrom!=VROM:self.assertEqual(changed[vrom],data)
+        self.assertEqual(len(changed[VROM]),len(files[VROM].extract(image)))
+        for p in controller_patches:
+            if p['address']>=RAM:
+                self.assertEqual(changed[VROM][p['address']-RAM:p['address']-RAM+p['bytes']].hex(),p['after'])
+        with self.assertRaises(ValueError):install(image,prepared,changed)
+        wrong=copy.deepcopy(prepared);wrong['patches'][0]['after']+=4
+        with self.assertRaises(ValueError):install(image,wrong)
+        wrong=copy.deepcopy(prepared);wrong['owner_sha256']='0'*64
+        with self.assertRaises(ValueError):install(image,wrong)
+
     def test_persistent_season_resource_composition(self):
         import copy
         import zlib

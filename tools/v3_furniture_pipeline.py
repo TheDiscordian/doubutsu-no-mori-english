@@ -1534,6 +1534,8 @@ def rig_import_plan(inventory, report, bindings, selected=(), category=None, *, 
         plan['creature_field']=True
     if any(r['profile'].get('creature_parent') for r in candidates) and not report['equipment_resources'].get('creature_items',{}).get('room_scoring'):
         plan['creature_fish']=True
+    if any(r['profile'].get('creature_parent') for r in candidates) and not report['equipment_resources'].get('creature_insects',{}).get('installed'):
+        plan['creature_insects']=True
     if any(r['profile']['callback_adapter']['category']==ROTATED_CATEGORY for r in rows):
         exercise=report['equipment_resources'].get('player_motion',{}).get('exercise')
         if not exercise or not exercise.get('action_installed'):
@@ -1670,6 +1672,16 @@ def import_batch(source, worksheet, output, lock, selected=(), category=None, re
             refresh('creature-travel',creature_fish=True)
         if not report['equipment_resources'].get('creature_items',{}).get('room_scoring'):
             refresh('creature-room-scoring',creature_fish=True)
+    if plan.get('creature_insects'):
+        # Complete shared behaviour/resource preparation and one connected
+        # installation for every species, not a new stage for each dependency.
+        import subprocess
+        import sys
+        directory=output/'creature-insect-programs'
+        subprocess.run([sys.executable,str(ROOT/'tools/v3_creature_insects.py'),
+            '--base-lock',str(current),'--output',str(directory),
+            '--link-ram','0x80656000','--link-limit','0x80680000'],check=True)
+        refresh('creature-insects-connected',creature_insects=directory)
     for stage in plan.get('player_exercise',[]):
         # Follow complete room/music publication, even when artwork is present.
         refresh('player-exercise-'+stage,player_actions=True)

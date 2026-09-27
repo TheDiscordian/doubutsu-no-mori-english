@@ -19,8 +19,11 @@ CHOICES=(
          symbol='af_v3_fish_patrol_mode',scope='Imported coastal fish only',
          description='Choose N64 movement or GameCube swimming and shoreline avoidance for imported coastal fish. Original N64 fish keep their movement. This setting has no effect without an imported coastal fish.'),
 )
+INSECT_CHOICE=dict(id='insect-population',name='Insect population',binding='spawn_mode',
+    symbol='af_v3_insect_spawn_mode',scope='Original and imported insects',
+    description='N64 keeps two wild insect slots and its original population rules, adding selected species. GameCube uses eight wild slots, seasonal blending, habitat weights, and groups. Both keep a separate release slot.')
 SAVE_NOTE=('These behaviour settings keep the same saved layout and imported identities. '
-    'Changing them changes fish population or movement rules; the saved seasonal state is retained. '
+    'Changing them changes population or movement rules; the saved seasonal state is retained. '
     'A native save/reload after switching settings is not yet verified.')
 
 
@@ -67,6 +70,19 @@ def options(image,report):
         at=start+row['ram']-p['ram']
         if image[at:at+4]!=bytes(4):raise ValueError('Changed pinned behaviour default')
         result.append({**row,'offset':at,'before':image[at:at+4].hex()})
+    insects=report.get('equipment_resources',{}).get('creature_insects')
+    if insects and insects.get('behaviour_choice'):
+        row=insects['behaviour_choice'];p=insects['packet'];start=p['physical']
+        if (not insects['installed'] or not insects['population']['installed'] or
+                any(row.get(k)!=v for k,v in INSECT_CHOICE.items()) or row['default']!='N64' or
+                row['values']!={'N64':0,'GameCube':1} or
+                row['ram']!=insects['compiled']['symbols'][row['symbol']] or
+                not p['ram']<=row['ram']<p['ram']+insects['compiled']['bytes'] or
+                sha256(image[start:start+p['bytes']])!=p['sha256']):
+            raise ValueError('Changed installed insect population choice')
+        at=start+row['ram']-p['ram']
+        if image[at:at+4]!=bytes(4):raise ValueError('Changed pinned insect population default')
+        result.append({**row,'offset':at,'before':image[at:at+4].hex()})
     return result
 
 
@@ -95,7 +111,15 @@ def checksum_fields(image,report):
     at=blob.pstart+e['blob_offset']+ram-e['ram'];start=blob.pstart+p['blob_offset']
     if at&3 or u32(image,at)!=p['crc32'] or zlib.crc32(image[start:start+p['bytes']])!=p['crc32']:
         raise ValueError('Changed installed editable world checksum')
-    return [dict(offset=at,before=image[at:at+4].hex(),start=start,length=p['bytes'])]
+    fields=[dict(offset=at,before=image[at:at+4].hex(),start=start,length=p['bytes'])]
+    insects=e.get('creature_insects')
+    if insects and insects.get('behaviour_choice'):
+        p=insects['packet'];ram=boot['symbols']['af_v3_insect_crc_expected']
+        at=blob.pstart+e['blob_offset']+ram-e['ram'];start=p['physical']
+        if u32(image,at)!=p['crc32'] or zlib.crc32(image[start:start+p['bytes']])!=p['crc32']:
+            raise ValueError('Changed installed insect checksum')
+        fields.append(dict(offset=at,before=image[at:at+4].hex(),start=start,length=p['bytes']))
+    return fields
 
 
 def update_report(image,blob,report,resolved):
@@ -109,6 +133,16 @@ def update_report(image,blob,report,resolved):
         if u32(packet,row['ram']-p['ram'])!=value:raise ValueError('Lost composed behaviour setting')
         world[row['binding']]['value']=value
     e=report['equipment_resources'];ep=blob[e['blob_offset']:e['blob_offset']+e['bytes']]
+    insects=e.get('creature_insects')
+    if insects and insects.get('behaviour_choice'):
+        p=insects['packet'];packet=image[p['physical']:p['physical']+p['bytes']]
+        row=insects['behaviour_choice'];value=resolved[row['id']]
+        if u32(packet,row['ram']-p['ram'])!=row['values'][value]:raise ValueError('Lost insect behaviour setting')
+        row['resolved']=value;p.update(sha256=sha256(packet),crc32=zlib.crc32(packet))
+        insects['compiled']['sha256']=sha256(packet[:insects['compiled']['bytes']])
+        insects['physical_resource']['sha256']=p['sha256']
+        resource=next(r for r in report['physical_resources'] if r['id']==insects['physical_resource']['id'])
+        resource['sha256']=p['sha256']
     e.update(sha256=sha256(ep),crc32=zlib.crc32(ep))
     for boot in (e['surface_bootstrap'],report['room_surfaces']['items']['bootstrap']):
         c=boot['code'];start=c['symbols']['af_v3_surface_init']-e['ram']

@@ -83,8 +83,8 @@ Ordinary native execution of this connected path and original hardware remain
 unverified. The scheduler test's unexplained debugger disconnect remains open;
 host checks do not classify it. Field/carry model loading, drawing tables, fish
 capture identities, and release adapters are installed as described below.
-The active queue retains unresolved fish gameplay verification and continues the
-eight insects' shared field behaviours and spawning. Complete room, sound, field
+The active queue retains unresolved native creature gameplay verification.
+All eight insects' field behaviours and spawning are installed. Room, sound, field
 art, collection, text, composition, and creature transport consumers are retained.
 
 ## Field and carried graphics
@@ -128,8 +128,8 @@ bound for field and release; neither is substituted for the other.
 Added fish use actor slots `36..44`, corresponding to carried IDs `2320..2328`.
 The complete original 36-slot capture mapping, including rubbish and coastal
 salmon, is preserved. Brook trout does not replace native herabuna. Added insects
-use slots `32..39`. Fish have experimental selections; insects remain inactive
-until their field gameplay paths can consume these identities.
+use species indices `32..39`. All seventeen creatures have experimental selections
+and installed field consumers; ordinary native gameplay remains unverified.
 
 The immutable packet occupies `80647000..80649FFF`: 12,288 bytes, including
 1,018 compiled code bytes, 3,830 lookup-table bytes, resource descriptors, and
@@ -435,11 +435,11 @@ ordinary travel, and hardware remain unverified.
 
 ### Per-species optional composition
 
-`v3_creature_selection.py` binds each of the nine fish choices to its fixed
+`v3_creature_selection.py` binds each of the seventeen creature choices to its fixed
 carried identity and room display. A selection controls the parent table's
 readiness word, display enable word, and existing sparse saved-profile bit.
 The four-byte creature mask uses bits 0..8 for fish and 9..16 for insects.
-All nine fish are `ff010000`; inactive insects contribute no selected bits.
+All nine fish are `ff010000`; all seventeen creatures are `ffff0100`.
 The parent reader already gates spawning, names, prices, placement, pickup,
 collection, and icons through this same availability check. No per-fish
 installer or second browser list is introduced.
@@ -449,7 +449,8 @@ it before the world and enclosing equipment/package/prefix checksums. Browser
 options contain both required enable writes and the explicit creature mask;
 validation checks category, disjoint identities, and the complete mask union.
 The receipt records the resolved mask/hash. All 176 choices reproduce the full
-cartridge; empty/default choices reproduce stable V2. The private experimental
+cartridge for its fish-stage input. The combined insect build has 184 choices;
+empty/default choices reproduce stable V2. The private experimental
 selector is not a deployed patcher or a gameplay certification.
 
 Sanitized checks use actual selected parent/display tables through the item,
@@ -462,8 +463,8 @@ Artwork, world behaviour, icons, text, and canonical save code remain unchanged.
 Room scoring uses the ordinary `v3_furniture_install.scoring` writer, not a
 separate fish evaluator. Complete donor HRA and feng shui tables are hash-checked;
 all seventeen display identities retain their exact series, birth-category
-mapping, surface bits, and colours. The nine available fish receive active rows;
-eight insects retain prepared records until field gameplay is implemented.
+mapping, surface bits, and colours. All nine fish and eight insects receive active
+rows through the shared scorer alongside their optional profiles.
 Native herabuna and all other original scoring rows remain unchanged. Disabled
 fish receive the same inert HRA row as other deselected imports, including in
 browser builds, so they cannot enter group searches or recommendations.
@@ -577,10 +578,11 @@ Necessary native layout/timing adaptations do not change the source action bodie
 
 ### Native layout and lifecycle
 
-The native controller is `8F8` bytes: the `174`-byte actor, three `280`-byte insect
-slots, and its native object-bank field. The GameCube's nine `288`-byte slots are
-not compatible. Five complete native constructor/movement functions are checked
-against the input cartridge before preparation. MIPS compile-time assertions cover
+The original controller is `8F8` bytes, containing a `174`-byte actor, three
+`280`-byte insect slots, and an object-bank field. The expanded controller is
+`17F8` bytes with nine native-sized slots and its bank at `17F4`; it does not use
+the incompatible GameCube `288`-byte stride. Complete native functions are checked
+against the input cartridge before installation. MIPS compile-time assertions cover
 the controller size, actor size, stride, and actual offsets for movement, animation,
 speed, stress, collisions, items, lifetime, and alpha. In particular, donor
 `_1E0` names the animation field at native `1DC`; casting to GC structs is unsafe.
@@ -590,11 +592,31 @@ outside native slots and their collider/light/program storage. The native
 `ClObjPipe` occupies `1F8..213` (28 bytes), followed by height at `214`. There is
 no spare radius field at `210`. Donor initialisation must not alter those final
 collider bytes. Constructor/destructor ownership binds exactly
-three slots. Foreign pointers reject; no unchecked slot arithmetic or shared
+nine slots. Foreign pointers reject; no unchecked slot arithmetic or shared
 per-insect scratch state is used. The player-action latch is shared across all
 slots and both substeps, and resets after the complete controller update, not
 after the first insect. All eight added species use the donor's eight-unit catch
 range, with its action-controlled uncatchable flag.
+
+`creature_insect_pool.c` replaces the native clip's creator after its ordinary
+initialisation. Both the native manager and release/colony consumers use that
+clip; checked call/address references establish that the old two-slot creator
+has no remaining direct consumer. Native setup remains the complete relocated
+function at owner `10558`, obtained from the constructor return address plus
+`2FC`. All original species retain their native programs. The original three
+`1C00`-byte program buffers remain in the native owner; six independent buffers
+live in the loaded insect runtime. The graphics bank grows from `2400` to `6C00`.
+Ten guarded words extend controller allocation, bank offsets, graphics reload,
+movement, drawing, and cleanup together; all unrelated graphics hooks remain.
+The added scene allocation is 22,272 bytes. Its ordinary native allocation is
+not yet executed and remains a verification requirement.
+
+The N64 mode uses two wild slots and retains its inclusive forty-unit square
+proximity exclusion. The GameCube mode uses eight wild slots without that
+exclusion, allowing source groups. Slot eight is reserved for releases and
+colony catches in both modes; it does not suppress wild-acre spawning. Selection
+bits gate every added species at creation, including releases. Failed allocation,
+invalid parameters, unknown modes, and exhausted pools reject before setup.
 
 `creature_insects.c` dispatches the complete source programs by fixed species
 identity and runs two ordered source substeps per native tick. This retains both
@@ -674,8 +696,8 @@ transient calendar cache. Source mode refreshes the calendar on month/time/area
 or profile changes, not on every acre visit. Its live-acre test excludes the
 release slot and includes the background-actor colony query. Native-population mode gives
 the unchanged original manager a 100-weight opportunity alongside enabled added
-species' real filtered weights. Both alternatives still require selector binding
-and their population-capacity implementations before a playable claim.
+species' real filtered weights. Both alternatives have installed capacity and
+private browser/offline selector bindings; native gameplay remains unverified.
 
 `spawn_contract` checks complete original creation/manager bodies and entry
 instructions against the verified ROM. Its composer changes only `8092AF0C`'s
@@ -875,29 +897,48 @@ module/core bytes. Synthetic addresses test composition only, not installed
 storage or native execution. Final installation must place both motions, the
 resident face pool, runtime, hooks, message bank, and reader bounds together.
 
-### Current prepared output and remaining connections
+### Current installed output and remaining verification
 
-Prepared output: `build/v3-creature-insects-work-01/programs-29/`.
-The current cartridge remains ABI 305. No new ROM, save layout, browser choice,
-or deployment is produced by preparation. Reproduce against the explicit input:
+The current cartridge is ABI 306 at
+`build/v3-creature-insects-work-01/connected-04/build-lock.json`, ROM SHA-256
+`49a00572262ed21f2f84b1484a7c88c22658b67b48434a6bc031d09ac6614017`.
+The complete preparation at `build/v3-creature-insects-work-01/programs-30/`
+links all six programs and the save path without unresolved engine symbols.
 
-```sh
-python3 tools/v3_creature_insects.py \
-  --base-lock build/v3-creature-world-work-01/connected-15/build-lock.json \
-  --output build/v3-creature-insects-work-01/programs-new \
-  --link-ram 0x80656000 --link-limit 0x80680000
-V3_INSECT_PROGRAMS=build/v3-creature-insects-work-01/programs-new \
-  python3 -m unittest discover -s tests -p 'test_v3_creature_insects.py' -v
-```
+`v3_creature_insect_install.py` composes controller/population, spawn-manager,
+collision, colony, player events, mosquito actions, faces/motions/dialogue,
+field audio/effects, persistence, scoring, and all eight optional identities in
+one shared refresh. The general creature importer invokes this connected path.
+No per-species installer or second selector is added.
 
-The linked image is 53,168 bytes, SHA-256
-`1b4ab2b7c66b78e0990031a53ffa81c1363c85eb7478e8a76c773611583512e0`.
-It has no missing engine symbols and zero-filled BSS from `80662D30`; its range
-ends at `80662FB0`. This establishes linking, not cartridge memory reservation,
-startup loading, native execution, or hardware suitability. Absolute engine
-bindings are applied at final placement, not during the relocatable link, so
-MIPS call relocations retain valid addends. The same image contains the whole
-save path; no legacy artwork or code is discarded to fit it.
+The linked code/data/BSS image is 96,864 bytes, SHA-256
+`900701fe10e16b17cb9340fb4f485566cd1cd76147a8fabb8152c4cbfa32ed56`.
+Its guard completes a 96,880-byte packet at `80656000..8066DA6F`, with initial
+BSS explicitly zeroed. Complete physical-ROM storage is checked against native
+DMA owners and retained physical resources. The real native PI transfer function
+is checked as a whole; it retains its original aligned, chunked transfer path.
+Startup loads and verifies this packet before the existing init chain and
+performs the ordinary data/instruction-cache operations. The combined startup
+occupies 652 of its existing 688 bytes.
+
+The common resource planner preserves catalogue/shop DMA identities while moving
+their whole owners outside item storage when its terminal region fills. The
+current cartridge retains 23,248 bytes of checked reusable zero padding, with
+all prior models, textures, audio, and console resources intact. Subsequent
+category batches use the same planner rather than adding storage per item.
+
+All seventeen creatures participate in the existing private browser/offline
+selection. `insect-population` selects the actual two/eight-wild-slot alternatives,
+defaulting to N64. The editable physical-packet CRC is updated before enclosing
+equipment/startup checksums; selected receipts retain its changed hash. Empty
+imports with default behaviours reproduce stable V2-14. Neither deployment is
+changed, and no playtest/hardware acceptance is implied.
+
+The installed save writer is format nine, canonical eight, registry five.
+Older valid saves migrate forward; V2 and earlier V3 builds cannot read new
+saves. Preserve backups. Native scene-bank capacity, ordinary gameplay, and
+save/reload remain unverified. The constructor timeout and scheduler disconnect
+remain open without resetting their exhausted native harness budget.
 
 The combined test covers all eight release/despawn paths, two-substep timing,
 correct/wrong-tile shovel and rock events, both tree species, tree cutting, snail
@@ -931,17 +972,8 @@ their passing evidence, alongside the current cutscene, full save/migration, and
 stable-save-entry composition checks. Nine shared keyframe checks pass;
 native colony gameplay, visual appearance, and hardware remain unverified.
 
-Remaining connections belong to the same creature importing task:
-
-- Retain the prepared native environment, demo guard, terrain, controller,
-  player-event producers, complete mosquito response, persistence, and colony.
-  Implement the actual
-  native/GameCube population-capacity alternatives; group creation is bounded by
-  available slots until the larger source pool and its consumers are installed.
-- Place the complete runtime through the existing owner-storage machinery, retain
-  overlap guards, install its prepared field audio/effect, player, and save consumers, connect
-  startup loading, and promote per-insect selection only
-  when the gameplay dependencies are implemented.
-- Verify the connected current cartridge/save path and fix actual defects. Keep
-  the unresolved fish constructor timeout and scheduler disconnect open; the
-  existing exhausted native harness budget does not reset for these source files.
+Remaining verification belongs to the same creature importing task. Retain the
+complete installed category and six passing browser/offline profile comparisons.
+Inspect the retained constructor/scheduler failure evidence and verify current
+native scene allocation, actual hook/catch/place/release behaviour, and save/reload.
+Fix real defects; do not replay exhausted fixtures or reset the harness budget.

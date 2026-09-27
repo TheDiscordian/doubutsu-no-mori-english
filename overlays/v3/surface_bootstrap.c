@@ -31,9 +31,19 @@ const u32 af_v3_creature_items_crc_expected = AF_CREATURE_ITEMS_CRC;
 #else
 #define creature_items_crc AF_CREATURE_ITEMS_CRC
 #endif
+#ifdef AF_INSECT_PHYSICAL
+extern int af_surface_pi(u32,void *,u32);
+const u32 af_v3_insect_crc_expected = AF_INSECT_CRC;
+#define insect_crc (*(volatile const u32 *)&af_v3_insect_crc_expected)
+#endif
 
 static __attribute__((noinline)) int load_code(void *p,u32 vrom,u32 bytes,u32 crc) {
+#ifdef AF_INSECT_PHYSICAL
+    int status=(vrom&0x80000000u)?af_surface_pi(vrom&0x7FFFFFFFu,p,bytes):af_surface_dma(p,vrom,bytes);
+    if (status || af_surface_crc(p,bytes)!=crc) return 0;
+#else
     if (af_surface_dma(p,vrom,bytes) || af_surface_crc(p,bytes)!=crc) return 0;
+#endif
     af_surface_writeback(p,bytes);
     af_surface_invalidate(p,bytes);
     return 1;
@@ -137,6 +147,15 @@ int af_v3_surface_init(void) {
     void *fish_world=af_test_fish_world;
 #endif
     if (!load_code(fish_world,AF_FISH_WORLD_VROM,AF_FISH_WORLD_BYTES,fish_world_crc)) return 0;
+#endif
+#ifdef AF_INSECT_PHYSICAL
+#ifdef __mips__
+    void *insects=(void *)AF_INSECT_RAM;
+#else
+    extern unsigned char af_test_insect_code[AF_INSECT_BYTES];
+    void *insects=af_test_insect_code;
+#endif
+    if (!load_code(insects,AF_INSECT_PHYSICAL|0x80000000u,AF_INSECT_BYTES,insect_crc)) return 0;
 #endif
     return af_surface_prior_init();
 }

@@ -32,6 +32,8 @@ extern int af_insect_saved_season(SpawnTerms *,SpawnDate,SpawnRandom,void *);
 int af_insect_occupied_acre(int,int);
 void af_v3_insect_spawn_reset(void);
 int af_v3_insect_spawn(void *,GAME *);
+void af_insect_pool_bind(AfInsectController *,void (*)(AfInsectInit *,int));
+void af_insect_pool_unbind(AfInsectController *);
 #ifdef __mips__
 _Static_assert(sizeof(AfInsectInit)==24,"native insect creation parameters");
 _Static_assert(sizeof(AfNativeInsectClip)==16,"native insect clip is not expanded");

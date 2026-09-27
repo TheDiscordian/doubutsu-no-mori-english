@@ -34,9 +34,10 @@ RUNTIME=('creature_insects','creature_insect_state','creature_insect_environment
          'creature_insect_engine','creature_insect_collision','creature_insect_spawns',
          'creature_insect_manager','creature_insect_colony','creature_insect_colony_draw',
          'creature_insect_audio','creature_insect_effects','creature_insect_player',
-         'creature_insect_mosquito','creature_insect_save')
+         'creature_insect_mosquito','creature_insect_save','creature_insect_pool')
 SOURCES=('tools/v3_creature_insects.py','overlays/v3/creature_insects.h',
          'tools/v3_creature_spawns.py','overlays/v3/creature_spawns.h',
+         'tools/v3_creature_insect_pool.py',
          'overlays/v3/creature_insect_spawns.h',
          'overlays/v3/creature_insect_manager.h',
          'overlays/v3/creature_insect_colony.h',
@@ -460,7 +461,7 @@ af_insect_calendar_bytes:
         rows=[dict(r,program=k) for r,k in zip(rows,kinds,strict=True)],programs=programs,
         source_version='GAFE01_00',donor_bugfixes=False,
         source_rate=60,native_rate=30,source_substeps=2,
-        native_actor_bytes=0x174,native_insect_bytes=0x280,native_controller_slots=3,
+        native_actor_bytes=0x174,native_insect_bytes=0x280,native_controller_slots=9,
         sources={p:sha256((ROOT/p).read_bytes()) for p in SOURCES},
         installed=False,selectable=False,native_execution_tested=False)
 
@@ -545,7 +546,7 @@ def compile_programs(output,report,link_ram=None,link_limit=None):
         'Install prepared digging, rock-strike, and all-season tree-shake event producers',
         'Install prepared format-nine persistence and all stable save-entry redirects with the runtime',
         'Install prepared colony profile/catch hook and included art with complete runtime startup',
-        'Native/GameCube population-capacity alternatives, including eight wild GameCube slots',
+        'Install prepared two/eight wild-slot population alternatives and complete expanded controller',
         'Guarded packet placement/startup and optional/behaviour selections',
         'Connected native gameplay/save verification; existing unresolved fixtures are not reset']
     write_new(output/'programs.json',(json.dumps(report,indent=2)+'\n').encode())
@@ -575,6 +576,8 @@ def main():
     report['mosquito_player']=prepare_mosquito(image,prior,source,args.output/'mosquito-player')
     from v3_creature_save import prepare_insects
     report['persistent_seasons']=prepare_insects(prior)
+    from v3_creature_insect_pool import contract as pool_contract
+    report['population']=pool_contract(image,source)
     write_new(args.output/'field-audio.S',b'''.section .rodata
 .balign 4
 .globl af_insect_trigger_words

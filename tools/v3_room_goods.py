@@ -247,6 +247,17 @@ def publish_bootstrap(equipment,blob,surface,output):
             raise ValueError('Changed complete fish world packet')
         extra+=(f'AF_FISH_WORLD_VROM=0x{p["vrom"]:X}u',f'AF_FISH_WORLD_CRC=0x{p["crc32"]:X}u',
                 f'AF_FISH_WORLD_BYTES=0x{p["bytes"]:X}u')
+    insects=equipment.get('creature_insects')
+    if insects:
+        p=insects['packet'];compiled=insects['compiled']
+        if (p['ram']!=compiled['ram'] or p['bytes']!=compiled['bytes']+16 or
+                p['bytes']&15 or p['physical']&15 or not 0x100000<=p['physical']<0x4000000-p['bytes'] or
+                p['ram']!=0x80656000 or p['ram']+p['bytes']>0x807DA800 or
+                p['sha256']!=insects['physical_resource']['sha256'] or
+                p['physical']!=insects['physical_resource']['physical']):
+            raise ValueError('Changed complete insect startup packet')
+        extra+=(f'AF_INSECT_PHYSICAL=0x{p["physical"]:X}u',f'AF_INSECT_CRC=0x{p["crc32"]:X}u',
+                f'AF_INSECT_BYTES=0x{p["bytes"]:X}u',f'AF_INSECT_RAM=0x{p["ram"]:X}u')
     boot,compiled=compile_part('surface_bootstrap',output/'goods_surface_bootstrap',defines=(
         'AF_V3_EDITABLE_CHECKSUMS=1',f'AF_SURFACE_ITEMS_VROM=0x{items["vrom"]:X}u',
         f'AF_SURFACE_ITEMS_CRC=0x{items["crc32"]:X}u',f'AF_SURFACE_ITEMS_BYTES=0x{items["bytes"]:X}u',
@@ -269,3 +280,4 @@ def publish_bootstrap(equipment,blob,surface,output):
     if creatures:creatures['startup']=copy.deepcopy(goods['startup'])
     if field:field['startup']=copy.deepcopy(goods['startup'])
     if fish_world:fish_world['startup']=copy.deepcopy(goods['startup'])
+    if insects:insects['startup']=copy.deepcopy(goods['startup'])

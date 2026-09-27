@@ -3,7 +3,7 @@
  */
 #include "creature_insects.h"
 static AfInsectController *controller;
-static AfInsectExtra extra[3];
+static AfInsectExtra extra[AF_INSECT_SLOTS];
 static AfInsectEvents events;
 static unsigned substep;
 
@@ -19,7 +19,7 @@ void af_v3_insect_events_reset(void) {
 
 void af_v3_insect_bind_controller(AfInsectController *owner) {
     controller=owner;
-    for (unsigned i=0;i<3;i++) extra[i]=(AfInsectExtra){-1,-1,12.0f};
+    for (unsigned i=0;i<AF_INSECT_SLOTS;i++) extra[i]=(AfInsectExtra){-1,-1,12.0f};
     af_v3_insect_events_reset();
 }
 
@@ -29,12 +29,12 @@ void af_v3_insect_unbind_controller(AfInsectController *owner) {
 
 AfInsectExtra *af_insect_extra(aINS_INSECT_ACTOR *insect) {
     if (controller)
-        for (unsigned i=0;i<3;i++) if (insect==controller->insects+i) return extra+i;
+        for (unsigned i=0;i<AF_INSECT_SLOTS;i++) if (insect==controller->insects+i) return extra+i;
     return NULL;
 }
 
 int af_insect_occupied_acre(int x,int z) {
-    if (controller) for (unsigned i=0;i<2;i++) {
+    if (controller) for (unsigned i=0;i<AF_INSECT_WILD_SLOTS;i++) {
         const aINS_INSECT_ACTOR *insect=controller->insects+i;
         const ACTOR *actor=&insect->tools_actor.actor_class;
         if (insect->exist_flag==1 && actor->block_x==x && actor->block_z==z) return 1;

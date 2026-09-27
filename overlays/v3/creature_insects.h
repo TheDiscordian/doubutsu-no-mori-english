@@ -1,6 +1,7 @@
 /* Native insect ABI for the complete added-species behaviour category.
  * Donor C is compiled locally against this header, never against GC GAME/ACTOR.
- * The native controller owns three 0x280-byte objects; it is not resized here.
+ * The expanded controller owns nine native 0x280-byte objects. The guarded
+ * installer extends all native allocations/loops; individual actors keep size.
  */
 #ifndef AF_V3_CREATURE_INSECTS_H
 #define AF_V3_CREATURE_INSECTS_H
@@ -97,9 +98,10 @@ typedef struct aINS_INSECT_ACTOR {
 
 /* Source-only fields do not occupy native collider/object/light storage. */
 typedef struct { s16 ut_x,ut_z; f32 bg_range; } AfInsectExtra;
+enum { AF_INSECT_WILD_SLOTS=8,AF_INSECT_RELEASE_SLOT=8,AF_INSECT_SLOTS=9 };
 typedef struct {
     ACTOR actor_class;
-    aINS_INSECT_ACTOR insects[3];
+    aINS_INSECT_ACTOR insects[AF_INSECT_SLOTS];
     int native_bank;
 } AfInsectController;
 typedef struct {
@@ -202,7 +204,8 @@ void af_insect_position_integrate(ACTOR *);
 #define AF_OFFSET(t,f,n) _Static_assert(offsetof(t,f)==n,"insect ABI: " #f)
 _Static_assert(sizeof(ACTOR)==0x174,"native actor size");
 _Static_assert(sizeof(aINS_INSECT_ACTOR)==0x280,"native insect stride");
-_Static_assert(sizeof(AfInsectController)==0x8F8,"native insect controller size");
+_Static_assert(sizeof(AfInsectController)==0x17F8,"expanded native insect controller size");
+_Static_assert(offsetof(AfInsectController,native_bank)==0x17F4,"expanded graphics bank field");
 AF_OFFSET(ACTOR,world,0x28);
 AF_OFFSET(ACTOR,bg_collision_check.result,0x98);
 AF_OFFSET(ACTOR,shape_info,0xDC);

@@ -13,7 +13,9 @@ af_insect_hook_ctor:
     addiu $t9,$ra,0x748        /* original clip init: 109A4 - 1025C */
     jalr $t9
     nop
-    jal af_v3_insect_bind_controller
+    lw $a1,28($sp)
+    addiu $a1,$a1,0x2FC       /* relocated complete setup: 10558 - 1025C */
+    jal af_insect_pool_bind
     lw $a0,24($sp)
     jal af_v3_insect_spawn_reset
     nop
@@ -28,7 +30,7 @@ af_insect_hook_ctor:
 af_insect_hook_dtor:
     addiu $sp,$sp,-32
     sw $ra,28($sp)
-    jal af_v3_insect_unbind_controller
+    jal af_insect_pool_unbind
     lw $a0,0x13E8($ra)        /* native controller global: 11690 - 102A8 */
     jal af_insect_colony_reset
     nop

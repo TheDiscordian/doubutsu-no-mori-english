@@ -1,6 +1,7 @@
 OUTPUT_ARCH(mips)
 ENTRY(af_v3_surface_init)
 af_surface_dma = 0x80026B44;
+af_surface_pi = 0x80026500;
 af_surface_crc = 0x80195938;
 af_surface_writeback = 0x8002FE00;
 af_surface_invalidate = 0x80034CE0;
