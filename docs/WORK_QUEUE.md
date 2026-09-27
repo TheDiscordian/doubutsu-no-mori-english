@@ -22,9 +22,9 @@ Incomplete gameplay stays unavailable in the selector; installing assets does
 not claim that an item is playable. Reuse unchanged passing tests throughout.
 
 Current task: finish remaining genuine importing categories and representation
-mappings, using the shared converter and the current ABI-287 proposal:
-`build/v3-builtin-model-profiles-01/profile-runtime/build-lock.json`.
-ROM SHA-256: `3326f6b88da257ca5adaad7b6b0f11b38705215a87907c0179d4337eb19c60ff`.
+mappings, using the shared converter and the current ABI-288 proposal:
+`build/v3-creature-rig-resources-01/rig-runtime/build-lock.json`.
+ROM SHA-256: `0c06c17001c78c63ef39a615be3458cbe95e3eb023518a48f2257ad430702937`.
 
 The complete console engines, image loading, persistence, and room bindings are
 installed. Native Clu Clu Land D and Wario's Woods title execution, rendering,
@@ -48,7 +48,9 @@ Next importing work:
   room lifecycle/audio, and carried-item/collection/catching/releasing readers.
   The common converter already retains all 17 displays, 96 joints, full motion
   arrays, and complete source sound callbacks in
-  `build/v3-creature-profiles-prepared-01/`. Reuse these 78,544 bytes; do not
+  `build/v3-creature-profiles-prepared-01/`. Sixteen animated objects are installed
+  with shared rig callbacks, but profiles remain disabled pending complete native
+  motion dispatch, parent readers, and sound support. Reuse these resources; do not
   create independent furniture options for creature displays or overwrite the
   native herabuna with the donor brook trout. See the
   [creature checkpoint](checkpoints/V3_CREATURE_PROFILES.md).

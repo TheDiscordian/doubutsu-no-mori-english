@@ -8,7 +8,7 @@ from aflib import CODE_RAM,CODE_VROM,by_vrom,sha256
 from v3_asset_loader import ROOT,BLOB,compile_part
 from v3_equipment_runtime import RAM as EQUIPMENT_RAM,retired_module_space
 from v3_furniture_pipeline import Source,prepare,room_aliases,PreparedAssets,builtin_native_profile
-from v3_furniture_rigs import CATEGORY,CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY,ROLLING_CATEGORY,JOINT_CATEGORY,MATERIAL_RIG_CATEGORY,REVERSIBLE_CATEGORY,EFFECT_RIG_CATEGORY,suffix
+from v3_furniture_rigs import CATEGORY,CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY,ROLLING_CATEGORY,JOINT_CATEGORY,MATERIAL_RIG_CATEGORY,REVERSIBLE_CATEGORY,EFFECT_RIG_CATEGORY,EMBEDDED_CATEGORY,embedded_engine,suffix
 import v3_furniture_joint_rigs as joints
 import v3_furniture_roofs as roofs
 import v3_furniture_reversible as reversible
@@ -494,6 +494,10 @@ def bind_profiles(source,base,report):
         if runtime.get('reversible_contract')!=reversible.native_contract(base):
             raise ValueError('Changed installed reversible work/persistence binding')
     if any(r.get('mode')==10 for r in runtime['rows']):effect_rigs.checked_native(base)
+    if any(r.get('mode')==13 for r in runtime['rows']):
+        if (runtime.get('embedded_engine')!=json.loads(json.dumps(embedded_engine(source))) or
+                '-DAF_V3_ROOM_EMBEDDED' not in runtime['code']['flags']):
+            raise ValueError('Changed profile-owned rig source engine or native dispatcher')
     if any(r.get('mode')==11 for r in runtime['rows']):
         if runtime.get('dual_contract')!=composite.dual_native_contract(base,report):
             raise ValueError('Changed installed dual-motion scene/contact readers')
@@ -665,18 +669,18 @@ def prepared_categories(source,directories):
         for row in art['objects']:
             donor=row['item_id'];item=int(donor,16);prepared_row=prepare(source,item)
             profile=prepared_row[0];adapter=profile.get('callback_adapter',{});category=adapter.get('category')
-            if category not in (CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY,ROLLING_CATEGORY,JOINT_CATEGORY,MATERIAL_RIG_CATEGORY,REVERSIBLE_CATEGORY,EFFECT_RIG_CATEGORY,DUAL_CATEGORY,ROTATED_CATEGORY,roofs.CATEGORY):
+            if category not in (CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY,ROLLING_CATEGORY,JOINT_CATEGORY,MATERIAL_RIG_CATEGORY,REVERSIBLE_CATEGORY,EFFECT_RIG_CATEGORY,DUAL_CATEGORY,ROTATED_CATEGORY,roofs.CATEGORY,EMBEDDED_CATEGORY):
                 raise ValueError('Unimplemented additional room-rig category')
             if (row['profile']!=json.loads(json.dumps(profile)) or donor in assets or
                     row['native_profile_scalar_hex']!=profile['scalar_hex'] or
                     category not in (roofs.CATEGORY,ROTATED_CATEGORY) and (profile['skeleton']['joints']>(16 if category in (REVERSIBLE_CATEGORY,EFFECT_RIG_CATEGORY,DUAL_CATEGORY) else 6 if category==ROLLING_CATEGORY else 8) or
                     category in (REVERSIBLE_CATEGORY,EFFECT_RIG_CATEGORY,DUAL_CATEGORY) and profile['skeleton']['shown_joints']>6 or
-                    category not in (BILLBOARD_CATEGORY,JOINT_CATEGORY) and
+                    category not in (BILLBOARD_CATEGORY,JOINT_CATEGORY,EMBEDDED_CATEGORY) and
                     any(r.get('draw_stream') for r in profile['skeleton']['rows']))):
                 raise ValueError('Changed room-rig profile or native work capacity')
             cache.reuse(source,donor,prepared_row)
             data=(directory/row['object_file']).read_bytes()
-            if len(data)>9216:raise ValueError('Complete rig exceeds room bank')
+            if len(data)>(12288 if category==EMBEDDED_CATEGORY else 9216):raise ValueError('Complete rig exceeds room bank')
             index,destination=furniture_representation_identity(item)
             if category==ROTATED_CATEGORY:
                 first,last,life=music.parameters(row)
@@ -694,7 +698,11 @@ def prepared_categories(source,directories):
                 assets[donor]=data
                 continue
             rig=row['rig']
-            if category==CLOCK_CATEGORY:
+            if category==EMBEDDED_CATEGORY:
+                mode=13;first=last=0
+                if not profile.get('creature_parent'):
+                    raise ValueError('Embedded rig lacks its complete creature parent mapping')
+            elif category==CLOCK_CATEGORY:
                 mode=1;first=adapter['clock']['hour_joint'];last=adapter['clock']['minute_joint']
             elif category==STORAGE_CATEGORY:
                 mode=2;first=int(adapter['constants']['start_frame']['hex'],16)
@@ -735,6 +743,10 @@ def prepared_categories(source,directories):
                 skeleton=0x06000000+rig['skeleton_offset'],animation=0x06000000+rig['animation_offset'],
                 joints=rig['skeleton']['joints'],shown=rig['skeleton']['shown_joints'],source=row,
                 profile_installed=False,parent_selectable=False,
+                **(dict(embedded_engine=json.loads(json.dumps(embedded_engine(source))),
+                    pending_dependencies=['parent identity and item readers','generic native motion dispatch']+
+                        (['complete room-creature sound engine and programs'] if adapter.get('level_sound') else []))
+                   if category==EMBEDDED_CATEGORY else {}),
                 **(dict(dual_lifecycle=composite.dual_lifecycle(profile),loop=adapter['movement']['source_loop']) if category==DUAL_CATEGORY else {}),
                 **({'joint_lifecycle':json.loads(json.dumps(lifecycle))} if category==JOINT_CATEGORY else {})))
             assets[donor]=data
@@ -793,7 +805,7 @@ def encode_packet(rows,sound_rows=(),material_rows=()):
             continue
         encode([r])  # Retain the complete existing object/pointer/work-area checks.
         mode,first,last=r.get('mode',0),r.get('first',0),r.get('last',0)
-        if (mode not in (0,1,2,3,4,5,6,8,9,10,11) or mode==0 and (first or last) or
+        if (mode not in (0,1,2,3,4,5,6,8,9,10,11,13) or mode in (0,13) and (first or last) or
                 mode==11 and (first&3 or first==r['animation'] or not 0x06000000<=first<=0x06000000+r['bytes']-20 or
                     not 0<r.get('loop',0)<128 or last and any(w&0x8080 or w>>8!=1 for w in (last>>16,last&65535))) or
                 mode==9 and (last or not 0x3F800000<=first<=0x46FFFE00) or
@@ -914,6 +926,10 @@ def publish_packet(equipment,blob,output,*,core=None):
         source_items={r['music_lifecycle']['emitter']['source_item'] for r in runtime['rows'] if r.get('mode')==12}
         if len(source_items)!=1:raise ValueError('Radio note effects require one checked source metadata identity')
         defines+=('AF_V3_ROOM_MUSIC',f'AF_ROOM_RADIO_SONG={music.SONG}',f'AF_ROOM_RADIO_SOURCE_ITEM={source_items.pop()}')
+    if any(r.get('mode')==13 for r in runtime['rows']):
+        if not runtime.get('embedded_engine'):
+            raise ValueError('Embedded rigs require the complete source animation engine')
+        defines+=('AF_V3_ROOM_EMBEDDED',)
     if reverse:
         if not runtime.get('reversible_contract'):raise ValueError('Reversible rigs require checked native work/save ownership')
         defines+=('AF_V3_ROOM_REVERSIBLE',)
@@ -1168,6 +1184,10 @@ def extend(base,prior,blob,core,original,output,directories):
     if any(r.get('mode')==12 for r in all_rows):
         installed.setdefault('music',dict(source=json.loads(json.dumps(music.source_contract(source))),
             native=music.native_contract(base,prior),installed=False))
+    if any(r.get('mode')==13 for r in all_rows):
+        if prior['furniture']['bank_pool']['bank_bytes']<max(r['bytes'] for r in all_rows if r.get('mode')==13):
+            raise ValueError('Profile-owned rigs exceed the installed complete model bank')
+        installed['embedded_engine']=json.loads(json.dumps(embedded_engine(source)))
     if any(r.get('mode')==6 and r.get('first')==4 for r in all_rows):
         from v3_furniture_needle import native_contract as needle_contract
         installed['needle_contract']=needle_contract(base,prior)
@@ -1251,7 +1271,7 @@ def encode(rows):
     table=bytearray(struct.pack('>4I',MAGIC,len(rows),16,0))
     for r in rows:
         if (r['runtime_index']!=1024+slot(int(r['item_id'],16)) or
-                not 32<=r['bytes']<=9216 or r['bytes']%16 or
+                not 32<=r['bytes']<=(12288 if r.get('mode')==13 else 9216) or r['bytes']%16 or
                 not 1<=r['shown']<=r['joints']<=(16 if r.get('mode') in (9,10,11) else 6 if r.get('mode',0) in (0,5) else 8) or
                 r.get('mode') in (9,10,11) and r['shown']>6 or
                 any(p&3 or not 0x06000000<=p<=0x06000000+r['bytes']-n for p,n in

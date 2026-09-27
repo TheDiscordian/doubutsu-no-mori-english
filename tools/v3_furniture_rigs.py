@@ -6,6 +6,7 @@ install its lifecycle callbacks or make its parent selectable.
 import re
 import math
 import struct
+import json
 
 from aflib import sha256, u32
 from v3_keyframes import animation, skeleton, model_descriptor, compile_skeleton, compile_animations
@@ -759,6 +760,33 @@ def profile_resources(source,name,address,raw,item):
                 callback_installed=False))
     if not result['models']:raise ReviewRequired('Profile has no complete model roots')
     return result
+
+
+def embedded_engine(source):
+    """Bind the source generic rig engine, not merely an object's profile."""
+    functions={}
+    for role,at,n,digest,relocs in (
+        ('create',0x101614,192,'367f03587cab5fe4c32953dcd9b5ac78353bb83655af47952180c837b31ba82e',
+         'cb555e68785484665169b354d396b28b51dfbd0c8288041f7ac7ae0baa71f662'),
+        ('move',0x10CC60,424,'8cdc21fb34cef415effd16c795b008e3f22635412a699b8825b1f8f16891a0a7',
+         '95a76e107982d15c9ef32147b3c465bbb8dc18435d2461b662ee4154b4029fc8'),
+        ('draw',0x112024,188,'dd607f0f2f99c87774ed59fb990a9598ede0efad401e6b9c1a40c5a16c89525d',
+         '7d0e1c1540ebec5c1708c900cd809be579163b1df039437fa81926e0b42cafed'),
+        ('repeat',0xA24,124,'5c600ed1925e67be3f776252b5cb4617389ee5612133e188505d05ba28e3bd7c',
+         '8a12d73effd1e9616526c1f48afdaf9b9edf91c89c224db2d35f0b9e179800d7')):
+        raw,receipt=source.function(at)
+        if len(raw)!=n or sha256(raw)!=digest or sha256(json.dumps(
+                sorted(receipt['relocations'].items()),separators=(',',':')).encode())!=relocs:
+            raise ValueError('Changed complete profile-owned rig engine: '+role)
+        functions[role]=receipt
+    base,_=source.sections[4]
+    for at,data in ((14480,'3f000000'),(0,'3f800000'),(4,'00000000'),(32,'4330000080000000'),(48,'3f000000')):
+        if source.rel[base+at:base+at+len(data)//2]!=bytes.fromhex(data):
+            raise ValueError('Changed generic source rig timing constant')
+    return dict(functions=functions,initial_speed=.5,move_speed=.5,
+        source_steps_per_native_update=2,generic_motion_in_transition_states=True,
+        direct_models_drawn_by_owner=True,opaque_and_translucent_parent_matrices=True,
+        runtime_dispatch_installed=False)
 
 
 def suffix(source, profile, model_offsets, *, start, resources=()):

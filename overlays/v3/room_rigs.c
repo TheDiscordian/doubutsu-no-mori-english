@@ -156,7 +156,13 @@ static const RoomRigRecord *find(u32 index) {
             return r;
         }
 #endif
-        if (r->index<1024 || r->index>=2048 || r->bytes<32 || r->bytes>9216 || (r->bytes&15) ||
+        if (r->index<1024 || r->index>=2048 || r->bytes<32 ||
+#ifdef AF_V3_ROOM_EMBEDDED
+                r->bytes>(r->mode==ROOM_RIG_EMBEDDED ? 12288 : 9216) ||
+#else
+                r->bytes>9216 ||
+#endif
+                (r->bytes&15) ||
                 !r->joints || !r->shown || r->shown>r->joints ||
 #ifdef AF_V3_ROOM_REVERSIBLE
                 (r->mode==ROOM_RIG_REVERSIBLE || r->mode==ROOM_RIG_EFFECT || r->mode==ROOM_RIG_DUAL ? (r->joints>16 || r->shown>6) : r->joints>8) ||
@@ -167,7 +173,12 @@ static const RoomRigRecord *find(u32 index) {
                 (r->animation&3) || r->animation<0x06000000u || r->animation>0x06000000u+r->bytes-20) return 0;
 #ifdef AF_V3_ROOM_RIG_PACKET
         if ((r->mode==ROOM_RIG_DUAL ? !r->reserved || r->reserved>127 : r->reserved) ||
-                r->mode>ROOM_RIG_DUAL || r->mode==ROOM_RIG_ROOF) return 0;
+                r->mode>ROOM_RIG_EMBEDDED || r->mode==ROOM_RIG_ROOF || r->mode==ROOM_RIG_RADIO) return 0;
+#ifdef AF_V3_ROOM_EMBEDDED
+        if (r->mode==ROOM_RIG_EMBEDDED && (r->first.bits || r->last.bits)) return 0;
+#else
+        if (r->mode==ROOM_RIG_EMBEDDED) return 0;
+#endif
 #ifdef AF_V3_ROOM_DUAL_MOTION
         if (r->mode==ROOM_RIG_DUAL && ((r->first.bits&3) || r->first.bits==r->animation ||
                 r->first.bits<0x06000000u || r->first.bits>0x06000000u+r->bytes-20)) return 0;
@@ -290,6 +301,13 @@ void af_v3_room_rig_ct(RoomRig *actor,u8 *data) {
     else
 #endif
         cKF_SkeletonInfo_R_init_standard_repeat(&actor->keyframe,animation,(void *)0);
+#ifdef AF_V3_ROOM_EMBEDDED
+    if (r->mode==ROOM_RIG_EMBEDDED) {
+        actor->keyframe.speed.f=0.5f;
+        cKF_SkeletonInfo_R_play(&actor->keyframe);
+        return;
+    }
+#endif
     if (r->joints<=6) {actor->speed.bits=0;actor->target.bits=0x3F000000u;}
 #ifdef AF_V3_ROOM_JOINT
     if (r->mode==ROOM_RIG_JOINT) { af_v3_room_joint_ct(actor,r);return; }
@@ -327,6 +345,17 @@ void af_v3_room_rig_mv(RoomRig *actor,void *room,RoomRigGame *game,u8 *data) {
     (void)room;(void)game;
     const RoomRigRecord *r=find(actor->index);
     if (!data || !r) return;
+#ifdef AF_V3_ROOM_EMBEDDED
+    if (r->mode==ROOM_RIG_EMBEDDED) {
+        /* Generic source motion runs even while an item appears/disappears.
+           The native owner dispatch must preserve that when profiles enable. */
+        for (u32 i=0;i<2;++i) {
+            cKF_SkeletonInfo_R_play(&actor->keyframe);
+            actor->keyframe.speed.f=0.5f;
+        }
+        return;
+    }
+#endif
 #ifdef AF_V3_ROOM_MUSIC
     if (r->mode==ROOM_RIG_RADIO) {
         af_v3_room_music_native_move(actor,room);
@@ -533,15 +562,30 @@ void af_v3_room_rig_dw(RoomRig *actor,void *room,RoomRigGame *game,u8 *data) {
     RoomCommand *commands=gfx->head;
     uptr front=(uptr)commands,back=(uptr)gfx->tail;
     uptr xlu=(uptr)gfx->xlu_head,xlu_back=(uptr)gfx->xlu_tail;
+    u32 xlu_bytes=8,matrix_bytes=64;
+#ifdef AF_V3_ROOM_EMBEDDED
+    /* Profile-owned skeletons can contain translucent joints. Their source
+       drawer supplies a parent matrix and enough command space in both lists. */
+    if (r->mode==ROOM_RIG_EMBEDDED) {
+        xlu_bytes=(2u+2u*r->shown)*8u;matrix_bytes=128;
+    }
+#endif
     /* Parent matrix plus the skeleton's segment, matrix, and list commands.
        Both joint callbacks are verified no-ops in this source category. */
     /* Native graph allocations are eight-byte aligned. A valid tail ending
        in eight must not suppress an entire room model. */
     if (!front || !back || !xlu || !xlu_back || (front&7) || (back&7) || (xlu&7) || back<front ||
-            back-front<64u+(prefix+1u+2u*r->shown)*8u ||
-            xlu_back<xlu || xlu_back-xlu<8) return;
+            back-front<matrix_bytes+(prefix+1u+2u*r->shown)*8u ||
+            xlu_back<xlu || xlu_back-xlu<xlu_bytes) return;
     gfx->head=commands+prefix;
     commands[0]=(RoomCommand){0xDA380003,(u32)(uptr)_Matrix_to_Mtx_new(gfx)};
+#ifdef AF_V3_ROOM_EMBEDDED
+    if (r->mode==ROOM_RIG_EMBEDDED) {
+        RoomCommand *parent=gfx->xlu_head++;
+        /* Native matrix allocation uses the opaque tail for both streams. */
+        *parent=(RoomCommand){0xDA380003,(u32)(uptr)_Matrix_to_Mtx_new(gfx)};
+    }
+#endif
 #ifdef AF_V3_ROOM_MATERIAL_RIG
     if (material) {
         u32 frame=((game->frame*2u)/rig_frame_u16(material->divisor))%material->frames;

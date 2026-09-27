@@ -3,6 +3,7 @@
 #include <string.h>
 #define AF_V3_ROOM_RIG_PACKET
 #define AF_V3_ROOM_TRIGGER_SOUND
+#define AF_V3_ROOM_EMBEDDED
 #include "../overlays/v3/room_rigs.c"
 
 RoomRigTable af_v3_test_room_rigs;
@@ -15,7 +16,7 @@ void sAdo_OngenTrgStart(u32 word,float *position) {
 }
 RoomRigClip *af_v3_test_room_clip;
 u16 af_v3_test_room_hour,af_v3_test_room_minute;
-static u8 model[9216];
+static u8 model[12288];
 static unsigned constructs,plays,draws,storage_calls;
 static RoomRig *expected_actor;
 static RoomRigGame *expected_game;
@@ -210,5 +211,48 @@ int main(void) {
         }
         for (int i=0;i<16;++i)assert(guarded.front[i]==0xA7 && guarded.back[i]==0xA7);
     }
-    puts("Shared clock/storage/switch/hit categories preserve dispatch, time, limits, sound, and actor guards");
+    /* Profile-owned rigs retain all eight joints and both drawing streams.
+       Sound and owner dispatch are separate dependencies, not mocked success. */
+    _Alignas(16) u8 translucent[512];
+    *r=(RoomRigRecord){1048,9824,0x06000100,0x06000200,8,8,ROOM_RIG_EMBEDDED,0,{.bits=0},{.bits=0}};
+    expected_joints=8;expected_mode=ROOM_RIG_EMBEDDED;
+    model[0x100]=8;model[0x101]=8;
+    for (int variant=0;variant<2;++variant) {
+        memset(&guarded,0xA7,sizeof guarded);actor->index=(u16)(1048+variant*1024);
+        unsigned old=plays;af_v3_room_rig_ct(actor,model);
+        assert(plays==old+1 && actor->keyframe.current.f==1.5f && actor->keyframe.speed.f==.5f);
+        for (int state=0;state<16;++state) {
+            actor->state=(s16)state;actor->changed=1;actor->keyframe.current.f=7;
+            old=plays;af_v3_room_rig_mv(actor,0,&game,model);
+            assert(plays==old+2 && actor->keyframe.current.f==8 && actor->changed==1);
+        }
+        gfx.head=(RoomCommand *)opa;gfx.tail=opa+sizeof opa-variant*8;
+        gfx.xlu_head=(RoomCommand *)translucent;gfx.xlu_tail=translucent+sizeof translucent;
+        game.frame=(u32)variant;u8 *tail=gfx.tail;old=draws;
+        af_v3_room_rig_dw(actor,0,&game,model);
+        assert(draws==old+1 && gfx.tail==tail-128);
+        assert(((RoomCommand *)opa)->a==0xDA380003 && ((RoomCommand *)translucent)->a==0xDA380003);
+        assert(gfx.xlu_head==(RoomCommand *)translucent+1);
+        for (int i=0;i<16;++i)assert(guarded.front[i]==0xA7 && guarded.back[i]==0xA7);
+        for (int i=0;i<0x30;++i)assert(actor->tail[i]==0xA7);
+        /* Both arena limits are checked before any allocation/command. */
+        for (int small=0;small<2;++small) {
+            gfx.head=(RoomCommand *)opa;gfx.tail=opa+(small ? 1024 : 271);
+            gfx.xlu_head=(RoomCommand *)translucent;gfx.xlu_tail=translucent+(small ? 143 : 512);
+            RoomRigGraphics saved_gfx=gfx;old=draws;
+            af_v3_room_rig_dw(actor,0,&game,model);
+            assert(draws==old && !memcmp(&gfx,&saved_gfx,sizeof gfx));
+        }
+    }
+    for (int damage=0;damage<4;++damage) {
+        RoomRigRecord good_r=*r;
+        if (damage==0)r->bytes=12304;
+        if (damage==1)r->joints=9;
+        if (damage==2)r->first.bits=1;
+        if (damage==3)r->last.bits=65;
+        RoomRig saved_actor=*actor;
+        af_v3_room_rig_ct(actor,model);af_v3_room_rig_mv(actor,0,&game,model);
+        assert(!memcmp(actor,&saved_actor,sizeof saved_actor));*r=good_r;
+    }
+    puts("Shared clock/storage/switch/hit/embedded categories preserve dispatch, time, limits, sound, and actor guards");
 }

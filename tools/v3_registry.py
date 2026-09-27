@@ -104,8 +104,26 @@ LEGACY_ROOM_ALIASES = {
     0x1FFC: (1795, 0x3C0C),
 }
 
+# Creature room representations occupy distinct, append-only display slots.
+# This reserves neither carried IDs nor playable species. In particular, the
+# donor brook-trout display cannot reuse the native herabuna identity.
+CREATURE_DISPLAY_REGISTRY_VERSION = 1
+CREATURE_DISPLAYS = {
+    0x1C48: (1830, 0x3C98), 0x1C4C: (1831, 0x3C9C),
+    0x1C50: (1832, 0x3CA0), 0x1C54: (1833, 0x3CA4),
+    0x1C58: (1834, 0x3CA8), 0x1C5C: (1835, 0x3CAC),
+    0x1C60: (1836, 0x3CB0), 0x1C64: (1837, 0x3CB4),
+    0x1C6C: (1838, 0x3CB8), 0x1CE8: (1839, 0x3CBC),
+    0x1CEC: (1840, 0x3CC0), 0x1CF0: (1841, 0x3CC4),
+    0x1CF4: (1842, 0x3CC8), 0x1CF8: (1843, 0x3CCC),
+    0x1CFC: (1844, 0x3CD0), 0x1D00: (1845, 0x3CD4),
+    0x1D04: (1846, 0x3CD8),
+}
+
 
 def furniture_representation_identity(donor_item):
+    if type(donor_item) is int and donor_item in CREATURE_DISPLAYS:
+        return CREATURE_DISPLAYS[donor_item]
     if type(donor_item) is int and donor_item in LEGACY_ROOM_ALIASES:
         return LEGACY_ROOM_ALIASES[donor_item]
     return furniture_identity(donor_item)

@@ -31,9 +31,9 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
-The current proposal is ABI 287 at
-`build/v3-builtin-model-profiles-01/profile-runtime/build-lock.json`, ROM SHA-256
-`3326f6b88da257ca5adaad7b6b0f11b38705215a87907c0179d4337eb19c60ff`.
+The current proposal is ABI 288 at
+`build/v3-creature-rig-resources-01/rig-runtime/build-lock.json`, ROM SHA-256
+`0c06c17001c78c63ef39a615be3458cbe95e3eb023518a48f2257ad430702937`.
 It contains 167 selectable development imports and 100 complete inactive furniture
 profiles whose acquisition is pending. The main lock and both stable V2-13
 deployments are retained.
@@ -64,9 +64,10 @@ The shared converter prepares 17 complete creature displays: sixteen animated
 rigs and the three-layer static ant. All 78,544 bytes, 96 joints, full motion
 arrays, and three sound-callback dependencies are retained. Actual source
 placement/pickup functions establish carried-parent identities and official
-names. These are prepared resources, not seventeen playable imports; native
-identity, lifecycle/audio, and carried-creature integration remain. The current
-cartridge and choice counts are unchanged. See the
+names. These are not seventeen playable imports. All sixteen animated objects
+(74,672 bytes) and the shared embedded-rig callback are installed, with profiles
+disabled pending native identity, lifecycle/audio, and carried-creature integration.
+The static ant remains prepared. Choice counts are unchanged. See the
 [creature checkpoint](checkpoints/V3_CREATURE_PROFILES.md).
 
 Continue with creature parent/native integration and the remaining legacy

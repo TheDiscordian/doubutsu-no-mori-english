@@ -13,11 +13,27 @@ and `1CE8..1D04`, at four-ID intervals. Source placement and pickup functions
 resolve their actual carried parents. This is not a claim of seventeen new
 native species: the brook-trout source slot must not replace native herabuna.
 
-ABI 287 remains the current cartridge at
-`build/v3-builtin-model-profiles-01/profile-runtime/build-lock.json`, with 167
-selectable choices and 100 complete inactive furniture profiles. These creature
-resources are not installed or selectable. Neither the main lock nor either
-stable V2-13 deployment changes.
+ABI 288 is the current cartridge at
+`build/v3-creature-rig-resources-01/rig-runtime/build-lock.json`, ROM SHA-256
+`0c06c17001c78c63ef39a615be3458cbe95e3eb023518a48f2257ad430702937`.
+The shared importer installs all sixteen animated objects, reusing 74,672 bytes
+without recompilation, and extends the room-rig packet from 42 to 58 records.
+There are still 167 selectable choices and 100 complete inactive furniture
+profiles. Creature profiles remain disabled, and the static ant is prepared only.
+Neither the main lock nor either stable V2-13 deployment changes.
+
+The common embedded-rig callback preserves initial half-frame advancement, two
+half-frame updates per native tick, complete joint arrays, and opaque/translucent
+parent matrices. Fixed additive display reservations do not create standalone
+furniture options. Four focused source, sanitized callback, cartridge retention,
+UPS, and repeat-planning checks pass. No emulator or hardware result is claimed.
+The current 12-KiB bank and format-five saved data are unchanged.
+
+Before enabling profiles, connect the native generic motion path during fade
+states: ordinary custom callbacks skip states 6 and 13. The source creature sound
+helper schedules timed, randomized triggers, not ordinary furniture sound loops.
+The native tables lack all three required donor sound entries; complete sound
+programs and table integration remain required alongside carried-parent readers.
 
 ## Shared conversion
 

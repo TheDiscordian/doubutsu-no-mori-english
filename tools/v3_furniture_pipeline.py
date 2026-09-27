@@ -1439,14 +1439,14 @@ def convert(source, worksheet, output, selected=(), installed=None, *, assets_on
 
 def rig_import_plan(inventory, report, bindings, selected=(), category=None, *, source=None):
     """Plan shared dependencies, not per-item installers or acquisition guesses."""
-    from v3_furniture_rigs import CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY,ROLLING_CATEGORY,MATERIAL_RIG_CATEGORY,REVERSIBLE_CATEGORY,EFFECT_RIG_CATEGORY
+    from v3_furniture_rigs import CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY,ROLLING_CATEGORY,MATERIAL_RIG_CATEGORY,REVERSIBLE_CATEGORY,EFFECT_RIG_CATEGORY,EMBEDDED_CATEGORY
     from v3_furniture_materials import CATEGORY as MATERIAL_CATEGORY,initializer_lifecycle,steam_lifecycle,switched_lifecycle
     from v3_furniture_scroll import CATEGORY as SCROLL_CATEGORY,draw_only_lifecycle
     from v3_furniture_reactions import source_lifecycle as reaction_lifecycle,colour_lifecycle
     from v3_sound_programs import furniture_trigger,furniture_level
     from v3_furniture_joint_rigs import CATEGORY as JOINT_CATEGORY,lifecycle as joint_lifecycle
     from v3_furniture_composite import DUAL_CATEGORY,ROTATED_CATEGORY
-    categories={CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY,ROLLING_CATEGORY,MATERIAL_RIG_CATEGORY,REVERSIBLE_CATEGORY,EFFECT_RIG_CATEGORY,SELECTED_PALETTE_CATEGORY,DUAL_CATEGORY,ROTATED_CATEGORY}
+    categories={CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY,ROLLING_CATEGORY,MATERIAL_RIG_CATEGORY,REVERSIBLE_CATEGORY,EFFECT_RIG_CATEGORY,SELECTED_PALETTE_CATEGORY,DUAL_CATEGORY,ROTATED_CATEGORY,EMBEDDED_CATEGORY}
     candidates=[r for r in inventory['rows'] if r.get('asset_ready') and not r['installed'] and
         not r.get('room_alias') and (not selected or r['item_id'] in selected) and
         (category is None or category in r['categories'])]
@@ -1504,7 +1504,8 @@ def rig_import_plan(inventory, report, bindings, selected=(), category=None, *, 
         loops=sorted(({r['item_id'] for r in rows if furniture_level(source,r['profile']) is not None}|
                       {r['item_id'] for r in static_rows if r['profile']['callback_adapter'].get('level_sound')}|
                       set(material_loops)|set(scroll_loops)|joint_loops)-loops),
-        profiles=sorted(r['item_id'] for r in rows+material_rows+static_rows+scroll_rows+console_rows+plain_rows if r['item_id'] not in bindings))
+        profiles=sorted(r['item_id'] for r in rows+material_rows+static_rows+scroll_rows+console_rows+plain_rows
+                        if r['item_id'] not in bindings and r['profile'].get('callback_adapter',{}).get('category')!=EMBEDDED_CATEGORY))
     if any(r['profile']['callback_adapter']['category']==ROTATED_CATEGORY for r in rows):
         exercise=report['equipment_resources'].get('player_motion',{}).get('exercise')
         if not exercise or not exercise.get('action_installed'):

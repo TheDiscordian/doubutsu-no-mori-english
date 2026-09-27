@@ -593,3 +593,21 @@ class ProfileOwnedResourceTests(unittest.TestCase):
             source=copy.copy(self.source);source.rel=bytearray(source.rel)
             source.rel[source.sections[1][0]+address]^=1
             with self.assertRaises(ValueError):creature_parent(source,0x1CEC,0x40)
+
+    def test_source_generic_engine_and_fixed_display_reservations(self):
+        from v3_registry import CREATURE_DISPLAYS,LEGACY_ROOM_ALIASES,LEGACY_FURNITURE,CLOTHING_DISPLAYS,furniture_representation_identity,furniture_identity
+        engine=rigs.embedded_engine(self.source)
+        self.assertEqual((engine['initial_speed'],engine['move_speed'],engine['source_steps_per_native_update']),(.5,.5,2))
+        self.assertTrue(engine['generic_motion_in_transition_states'])
+        self.assertFalse(engine['runtime_dispatch_installed'])
+        occupied={v[1] for rows in (LEGACY_ROOM_ALIASES,LEGACY_FURNITURE,CLOTHING_DISPLAYS) for v in rows.values()}
+        self.assertEqual(len(CREATURE_DISPLAYS),17)
+        for item,(index,destination) in CREATURE_DISPLAYS.items():
+            self.assertNotIn(destination,occupied);occupied.add(destination)
+            self.assertEqual(index,1024+(destination-0x3000)//4)
+            self.assertEqual(furniture_representation_identity(item),(index,destination))
+            with self.assertRaises(ValueError):furniture_identity(item)
+        for at in (0x101614,0x10CC60,0x112024,0xA24):
+            source=copy.copy(self.source);source.rel=bytearray(source.rel)
+            source.rel[source.sections[1][0]+at]^=1
+            with self.assertRaises(ValueError):rigs.embedded_engine(source)

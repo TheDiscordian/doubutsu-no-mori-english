@@ -1,5 +1,21 @@
 # Work record
 
+## 2026-09-27: installed shared creature rig resources
+
+- ABI 288 installs sixteen complete animated objects (74,672 bytes), all reused,
+  and the common embedded-rig callback. Packet records increase from 42 to 58;
+  existing resources, fixed IDs, selection counts, and saved data are retained.
+- Four focused tests pass: two source/sanitized callback checks in 1.145 seconds
+  and two current cartridge/UPS/planning checks in 17.279 seconds. No emulator
+  replay or hardware claim. The main ABI-109 lock remains untouched.
+- Current lock is `build/v3-creature-rig-resources-01/rig-runtime/build-lock.json`;
+  ROM SHA-256 `0c06c17001c78c63ef39a615be3458cbe95e3eb023518a48f2257ad430702937`.
+  Native fade-state dispatch, timed creature sounds, and parent integration
+  remain required; all creature profiles stay disabled meanwhile.
+- The user reports B selecting Swap instead of Never mind for dressers and
+  requests the correction in V2. Prioritise the targeted fix for stable V2 and
+  both patcher deployments, retaining the experimental V3 publication hold.
+
 ## 2026-09-27: complete shared creature-profile resources
 
 - The preceding goal batch is progress: complete creature model/rig conversion,

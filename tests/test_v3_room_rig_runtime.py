@@ -159,6 +159,60 @@ class CurrentImportedRigTests(unittest.TestCase):
         finally:composer.BASE,composer.BASE_SHA,composer.REPORT_SHA,composer.ABI=pin
 
 
+class EmbeddedResourceTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.out=ROOT/'build/v3-creature-rig-resources-01/rig-runtime'
+        cls.image,cls.report=inputs(cls.out/'build-lock.json')
+        cls.base,cls.prior=inputs(cls.out/'base-lock.json')
+        cls.blob=by_vrom(cls.image)[BLOB].extract(cls.image)
+        cls.old=by_vrom(cls.base)[BLOB].extract(cls.base)
+        cls.source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+            (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+
+    def test_complete_category_code_resources_and_retained_cartridge(self):
+        from v3_furniture_rigs import embedded_engine
+        report=self.report;rigs=report['equipment_resources']['room_rigs']
+        before=self.prior['equipment_resources']['room_rigs'];old_ids={r['source_item_id'] for r in before['rows']}
+        added=[r for r in rigs['rows'] if r['source_item_id'] not in old_ids]
+        self.assertEqual(len(added),16);self.assertEqual(sum(r['bytes'] for r in added),74672)
+        self.assertEqual(rigs['embedded_engine'],json.loads(json.dumps(embedded_engine(self.source))))
+        self.assertIn('-DAF_V3_ROOM_EMBEDDED',rigs['code']['flags'])
+        for row in rigs['rows']:
+            at,n=row['blob_offset'],row['bytes'];data=self.blob[at:at+n]
+            self.assertEqual(sha256(data),row['sha256'])
+            if row['source_item_id'] in old_ids:
+                self.assertEqual(data,self.old[at:at+n]);continue
+            self.assertEqual((row['mode'],row['first'],row['last']),(13,0,0))
+            self.assertFalse(row['profile_installed']);self.assertFalse(row['parent_selectable'])
+            self.assertIn('generic native motion dispatch',row['pending_dependencies'])
+            self.assertEqual(data,(ROOT/'build/v3-creature-profiles-prepared-01'/row['source']['object_file']).read_bytes())
+            i=slot(int(row['item_id'],16))
+            self.assertEqual(self.blob[ROWS+i*80:ROWS+(i+1)*80],bytes(80))
+            self.assertEqual(self.blob[ITEMS+i*32:ITEMS+(i+1)*32],bytes(32))
+            self.assertFalse(self.blob[0x40+i//8]&(1<<(i&7)))
+        for key in ('furniture','save_runtime','save_codec','translation_baseline','staged_furniture'):
+            self.assertEqual(report[key],self.prior[key])
+        self.assertEqual(self.blob[0x20:0xE0],self.old[0x20:0xE0])
+        self.assertEqual(rigs['packet']['ram'],before['packet']['ram'])
+        self.assertLessEqual(rigs['code']['bytes'],rigs['table_ram']-rigs['packet']['ram'])
+        original=(ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes()
+        patches=list(self.out.glob('*.ups'));self.assertEqual(len(patches),1)
+        self.assertEqual(apply_ups(original,patches[0].read_bytes()),self.image)
+
+    def test_installed_resource_plan_skips_without_enabling_incomplete_profiles(self):
+        from v3_furniture_pipeline import scan,rig_import_plan
+        from v3_furniture_rigs import EMBEDDED_CATEGORY
+        runtime.bind_profiles(self.source,self.image,self.report)
+        ids=[r['source_item_id'] for r in self.report['equipment_resources']['room_rigs']['rows'] if r.get('mode')==13]
+        inventory=scan(self.source,ROOT/'build/item-identity-megasheet.xlsx',selected=ids)
+        plan=rig_import_plan(inventory,self.report,self.source.runtime_profiles,category=EMBEDDED_CATEGORY,source=self.source)
+        self.assertEqual(plan,dict(resources=[],audio=[],loops=[],profiles=[]))
+        self.assertEqual(len(inventory['rows']),16)
+        self.assertTrue(all(r['asset_ready'] and r['status']=='review' for r in inventory['rows']))
+        self.assertTrue(all(i not in self.source.runtime_profiles for i in ids))
+
+
 class FixedClockIntegrationTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
