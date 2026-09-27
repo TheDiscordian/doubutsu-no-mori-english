@@ -27,12 +27,19 @@ parent lookup, drawing arguments, and placement restoration are converted in
 `room_carry.c/.h`. Three focused carrying checks pass, including 90 donor
 comparisons spanning 1,890 move/draw frames under sanitizers. The MIPS component
 links with the needle and joint code at `build/v3-room-carry-prepared-01/`.
-Owner hooks and loose-item rendering remain uninstalled; do not enable movement
-on occupied tables yet. See the
+Loose-item rotation is installed in ABI 244 at
+`build/v3-room-goods-runtime-03/build-lock.json`, ROM SHA-256
+`12e62a9ae0d433ed06765e77e05c138e6160e497d683af5c148cee7445c9513e`.
+Both native drawing paths, donor category flags, angle-grid lifetime, drop
+clearing, and checked startup loading are connected. Four focused checks pass;
+native execution/GPU appearance remain unverified. Owner movement hooks remain
+uninstalled; do not enable movement on occupied tables yet. See the
+[loose-item checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#installed-loose-item-rotation)
+and the
 [carrying checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-moving-table-carrying).
 
 The ordinary pipeline installs switched joint motion and translucent drawing
-for the lighthouse, moon, and snowcone machine. Its checked ROM remains ABI 243 at
+for the lighthouse, moon, and snowcone machine. The retained lifecycle evidence is ABI 243 at
 `build/v3-switched-joint-imports-03/profile-runtime/build-lock.json`, SHA-256
 `0b9e6c7305daf96eaf53916143593bee4f5ab52f8169d874caab13a31974e348`.
 All three complete profiles are inactive pending their actual acquisition;
@@ -59,10 +66,11 @@ keeps the item unavailable; its complete artwork remains reusable.
 
 Next bind the converted carrying functions to the relocated room owner, its
 push/pull/rotation calls, final movement update, and drawing. The native
-`Shop_Goods` clip has only drawing/drop callbacks: it lacks the donor's transient
-angle grid and both its single-item and ordinary-item Y rotation. Supply those
-paths using the donor's per-category rotation flags before enabling occupied
-table movement. Keep native stored-item restrictions at actor `73A`; that field
+`Shop_Goods` clip retains its original eight-byte drawing/drop interface. Use the
+installed `room_goods` exports for actual grid angles and scoped single drawing;
+do not grow the clip or substitute null operations. Its resident code occupies
+`804D9000..804D9FFF`, with transient state at `804DC000..804DC3FF`. Keep native
+stored-item restrictions at actor `73A`; that field
 is not the tabletop object. Native states 3/4 are verified donor left/right,
 preceded by wait states 8/7. The native room move/draw loops do not contain the
 donor's carried-child path. Donor implementation is in

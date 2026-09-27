@@ -39,10 +39,17 @@ placement/angle restoration. The carrying comparison runs 90 donor cases and
 also pass, as do the affected needle and joint-source checks: seven focused
 tests in total. No historical emulator fixture is replayed.
 
-Native owner hooks and loose-item rendering still need connecting. The N64
-loose-item renderer lacks the donor's transient angle grid and rotation paths;
-this is a concrete remaining dependency, not an assumed existing callback.
-The compass remains unavailable and the cartridge remains ABI 243. The
+The loose-item dependency is installed in ABI 244: both native drawing paths,
+the donor's category rotation flags, transient angle-grid lifetime, and successful
+drop clearing. The existing startup chain loads and checks the resident code
+before native actors run. Four focused checks cover 768 donor angle comparisons,
+all 34 native categories, startup failures, installed hooks/relocations, retained
+resources, UPS reconstruction, and four browser/offline selections. Native bridge
+execution and GPU appearance remain unverified. See the
+[loose-item checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#installed-loose-item-rotation).
+
+The moving-table owner hooks still need connecting; occupied-table movement is
+not enabled and the compass remains unavailable. The
 [carrying checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-moving-table-carrying)
 records the prepared code, source comparisons, and next bindings. The needle's
 rotation kicks, damping, parent contributions, and world-direction correction
@@ -59,8 +66,8 @@ appearance remain unverified. The profiles stay inactive pending actual
 acquisition. Compass parent-relative motion remains required. See the
 [joint-lifecycle checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#installed-switched-joint-lifecycles).
 
-The checked proposal is ABI 243 at
-`build/v3-switched-joint-imports-03/profile-runtime/build-lock.json`, with 158
+The checked proposal is ABI 244 at
+`build/v3-room-goods-runtime-03/build-lock.json`, with 158
 development choices and unchanged format-four saved data. The complete
 10,448-byte snowboard remains imported through the ordinary pipeline,
 including all 259 triangles, thirteen textures, and actual winter-camper route.

@@ -1,5 +1,65 @@
 # Automatic furniture pipeline checkpoint
 
+## Installed loose-item rotation
+
+The shared runtime builder installs the missing loose-item rotation dependency
+for moving furniture. Native single-object and ordinary tabletop drawing use
+the donor's category flags; the 16×16 signed-halfword angle grid has actual owner
+initialization, destruction, and successful-drop clearing. Scoped single drawing
+preserves nested calls and leaves unrelated draw requests in their native pose.
+The original eight-byte clip and all native models remain intact.
+
+- Build lock: `build/v3-room-goods-runtime-03/build-lock.json`, ABI 244.
+- ROM SHA-256: `12e62a9ae0d433ed06765e77e05c138e6160e497d683af5c148cee7445c9513e`.
+- UPS SHA-256: `3fa816ab98015c2de83aed2c2e6fc9979e0081dcc02fc8cbf49606a9c3fddb30`.
+- Preparation: `build/v3-room-goods-prepared-04/goods.json`.
+- Resident code: 1,268 bytes, SHA-256
+  `41597d02d93ab10134e13eaf397eeb5595256857e598468466ba5d4a3cbe03fd`.
+- Code reservation: `804D9000..804D9FFF`; transient state:
+  `804DC000..804DC3FF`, 524 bytes used. Total additional reservation: 5 KiB.
+- Shared surface startup: 224/688 bytes. Main startup and room bootstrap
+  reservations do not grow.
+
+Source verification covers six complete donor functions/relocations, all ninety
+donor drawing rows, all thirty-four native categories, and the complete native
+owner/relocation data. The three unmatched native categories retain native
+orientation. Rotation masks are `EF000FD9` and `00000003`; they are generated
+from checked tables, not a hand-maintained item switch.
+
+Native hook calls are `8096344C` (construct), `80963554` (dropped-object cleanup),
+`80963214` (single scale), `809636DC` (ordinary scale), and `80962BE0` (successful
+top-layer drop). Bridges preserve original stack arguments, scale floats, and
+delay instructions. Cleanup clears state even when no native clip exists.
+Only constructor/destructor call relocations `44000A2C` and `44000B34` are
+removed; unrelated relocated bytes are compared at three load addresses.
+
+Four focused tests pass:
+
+```sh
+python3 -m unittest tests.test_v3_room_goods -v
+```
+
+The sanitizer check compares 768 angle reads/writes with the actual donor
+functions, checks every category's ordinary/single draw decisions, nested angle
+scopes, bounds, drop call ordering, lifetime reset, and startup DMA/CRC failures.
+The installed check verifies all hooks, complete code/loading/checksums, memory
+reservations, retained unrelated resources, unchanged save/profile data, and
+original-ROM UPS reconstruction. Four browser/offline profiles agree, including
+empty/all selection. Native bridge execution, GPU appearance, and hardware are
+not claimed. No historical emulator fixture is replayed.
+
+The first assembly attempt found a relative-path handling defect before emitting
+a ROM. The next complete ROM exposed incorrect memory-accounting metadata and
+a test that failed to exempt the deliberately updated DMA directory. Those are
+corrected; the final ROM is unchanged from the second build. Existing artifacts
+are retained. The main development lock and deployed V2-13 patchers are untouched.
+
+The 158 experimental choices and format-four saves are unchanged. This does not
+establish V2/V3 or cross-profile save compatibility: keep isolated test saves.
+Next connect the room owner's movement permission/registration, final transform
+and release, carried-item drawing, and parent readers. Occupied-table movement
+and the compass remain unavailable until those actual paths are complete.
+
 ## Shared moving-table carrying
 
 The shared `room_carry.c/.h` core implements donor footprint collection,

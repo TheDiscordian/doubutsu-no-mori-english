@@ -25,5 +25,25 @@ int af_v3_surface_init(void) {
             af_surface_crc(memory,AF_SURFACE_ITEMS_BYTES)!=surface_crc) return 0;
     af_surface_writeback(memory,AF_SURFACE_ITEMS_BYTES);
     af_surface_invalidate(memory,AF_SURFACE_ITEMS_BYTES);
+#ifdef AF_ROOM_GOODS_VROM
+    /* Room-item hooks are resident before native actors can call them. This
+       immutable packet is independent of the selected import profile. */
+#ifdef __mips__
+    void *goods=(void *)0x804D9000u;
+#else
+    extern unsigned char af_test_goods_code[AF_ROOM_GOODS_BYTES];
+    void *goods=af_test_goods_code;
+#endif
+    if (af_surface_dma(goods,AF_ROOM_GOODS_VROM,AF_ROOM_GOODS_BYTES) ||
+            af_surface_crc(goods,AF_ROOM_GOODS_BYTES)!=AF_ROOM_GOODS_CRC) return 0;
+    af_surface_writeback(goods,AF_ROOM_GOODS_BYTES);
+    af_surface_invalidate(goods,AF_ROOM_GOODS_BYTES);
+#ifdef __mips__
+    *(volatile u32 *)0x804DC000u=0;
+#else
+    extern u32 af_test_goods_magic;
+    af_test_goods_magic=0;
+#endif
+#endif
     return af_surface_prior_init();
 }

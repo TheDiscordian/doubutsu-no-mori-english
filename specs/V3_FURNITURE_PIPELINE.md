@@ -91,11 +91,29 @@ its movement restriction stays intact.
 
 The N64 `Shop_Goods` clip is eight bytes with only single-draw and drop callbacks.
 Its single and ordinary drawing paths lack the donor's loose-item Y rotation.
-Complete native integration requires a transient 512-byte angle grid, clear-on-
+`room_goods.c/.h` supplies a transient 512-byte angle grid, clear-on-successful-
 drop behaviour, both drawing paths, and the actual donor per-category rotation
-flags. The donor angle grid is transient, not a new save-format requirement.
+flags. It scopes carried-object angles around the complete native single draw,
+preserving nesting and unrelated dropped-item drawing. The grid clears when the
+owner is constructed and becomes unavailable during destruction, including when
+there is no allocated clip. The original category count, dropped-object cleanup,
+clip allocation/free, model table, and call delay instructions are retained.
+
+`v3_room_goods.py` checks six complete donor functions and relocations, the full
+90-row donor drawing table, and the complete native owner. Native category flags
+come from matching category ranges; conflicting flags reject. The three native
+categories absent from the generic donor table retain native orientation.
+Five call replacements remove only the two affected overlay relocations.
+
+The resident code has a 4-KiB reservation at `804D9000`; transient state reserves
+1 KiB at `804DC000`, using 524 bytes. The checked surface startup loads the
+independent code packet before the native actor chain, without growing the main
+startup or existing room bootstrap. Every shared runtime refresh retains this
+preload and the editable surface checksum field. The donor angle grid is
+transient, not a new save-format requirement.
 The carrying core is prepared but not installed; movement checks remain native
-until these dependencies and the owner hooks are complete.
+until the owner hooks are complete. Installed-resource and host checks do not
+establish ordinary native drawing or original-hardware behaviour.
 
 Rig mode 6 uses first-word low byte 1/2/3 for these source motion kinds. Kind 3
 also stores complete level sound `51` in the next byte and clicks `0016/0017`
