@@ -339,7 +339,7 @@ def furniture_level(source,profile):
         from v3_furniture_reactions import colour_lifecycle
         from v3_furniture_materials import steam_lifecycle,switched_lifecycle
         return colour_lifecycle(source,profile) or steam_lifecycle(source,profile) or switched_lifecycle(source,profile)
-    if adapter.get('category') in ('billboard-scroll-keyframe-rig','material-keyframe-rig'):
+    if adapter.get('category') in ('billboard-scroll-keyframe-rig','material-keyframe-rig','reversible-material-effect-rig'):
         return copy.deepcopy(adapter['level_sound'])
     if adapter.get('category')=='static-interaction':
         return copy.deepcopy(adapter.get('level_sound'))

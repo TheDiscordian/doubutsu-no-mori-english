@@ -31,6 +31,19 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
+The ordinary category importer installs crab stew's combined reversible animation,
+delayed fire textures, translucent joint, randomized steam, and complete audio.
+All three models, 62 triangles, four joints, motion channels, and five on/off frame
+entries are retained in 4,384 reused bytes. Its actual winter-camper route,
+non-orderable catalogue entry, scoring, official name, and optional profile are
+connected. Five focused checks pass: complete resources/planning, 8,008 donor
+lifecycle comparisons and 4,000 host draw frames under sanitizers, installed
+dependencies, four browser/offline selections, and the affected shared reversible
+core. Native execution, ordinary rendering/audio synthesis, a save cycle with
+this item, and hardware remain unverified. See the
+[combined-effect checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#installed-combined-reversible-material-and-effects).
+Next: complete radio/chest and console launch/storage importing behaviours.
+
 The ordinary category importer installs the complete matryoshka: eleven joints,
 five models, 85 triangles, and all 46-frame motion channels in 4,512 reused bytes.
 Idle-only reversal, complete sound, destruction, native switch capture, actual
@@ -42,8 +55,7 @@ private browser/offline compositions. The existing 4,324 donor lifecycle
 comparisons remain applicable to the unchanged core. Native gameplay/drawing,
 audio synthesis, ordinary saving with this item, and hardware remain unverified.
 See the [installed reversible checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#installed-reversible-lifecycle-and-save-capture).
-Next: remaining combined reversible/material/effect behaviours and console
-launch/storage; acquisition-only work must not displace these imports.
+Acquisition-only work must not displace the remaining importing behaviours.
 
 The shared importer installs combined skeleton/timed-material behaviour for the
 hamster cage: all five models and 61 triangles, seven joints, the complete motion,
@@ -119,8 +131,8 @@ appearance remain unverified. The profiles stay inactive pending actual
 acquisition. The compass uses the same dispatcher with installed parent support. See the
 [joint-lifecycle checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#installed-switched-joint-lifecycles).
 
-The checked proposal is ABI 263 at
-`build/v3-reversible-rig-imports-03/cartridge/build-lock.json`, with 161
+The checked proposal is ABI 267 at
+`build/v3-effect-rig-imports-01/cartridge/build-lock.json`, with 162
 development choices and unchanged format-four saved data. The complete
 10,448-byte snowboard remains imported through the ordinary pipeline,
 including all 259 triangles, thirteen textures, and actual winter-camper route.

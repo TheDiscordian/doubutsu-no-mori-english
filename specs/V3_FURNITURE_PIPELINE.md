@@ -75,6 +75,45 @@ DMA or checksum verification cannot dispatch. The sound converter accepts a
 complete one-step envelope followed by its terminator, retaining all timed notes
 and rests. Empty or malformed envelopes remain rejected.
 
+### Reversible material and particle rigs
+
+`reversible-material-effect-rig` recognises a complete stopped/reversible rig
+with delayed material selection and a particle emitter. Full callback instruction
+shapes, relocations, constants, source helpers, joint callbacks, motion channels,
+and dynamic texture tables establish the category. Every source model remains,
+including the joint hidden from opaque drawing and explicitly redrawn translucent.
+The generic graphics converter retains the complete texture/primitive/environment
+colour interpolation and alpha formula. No item-ID switch chooses these conversions.
+
+Mode 10's first word points to a 32-byte immutable block; its last word is zero.
+The block stores big-endian duration float and fire-model pointer, segment/frame
+count/sound/joint bytes, delay and frame-size halfwords, five frame-offset halfwords,
+and six zero padding bytes. Parameters, model pointer, complete frames, and memory
+bounds are checked before dispatch. Profile binding requires installed complete
+loop/click audio, the complete steam engine and source, extended joint work, and
+destruction. Missing particle dependencies install before rig code is published.
+
+The category reuses the larger reversible workspace and adds delayed state,
+steam countdown, and switch-delay halfwords in the same unused matrix slots.
+Actor size, heaps, and saved fields do not change. Its source constructor uses
+`saved switch != 1`, distinct from the plain reversible category. Any nonzero
+press is accepted only when both animation speed and delay are zero. Each native
+update performs two source steps, with the press delivered on the first. The
+19-tick delay, .5 motion speed, exact loop/trigger order, and randomized steam
+countdown are preserved. Loop and steam pause during the mapped transition
+states; click acceptance does not. Steam appears 18 units above the actor with
+spread six and a new `int(10 + random * 20)` interval. The complete native float
+random routine is bound at `8002C9AC`. Accepted state is mirrored before native
+save capture, and the source destructor remains connected.
+
+Drawing uses delayed state in gameplay and the source end-frame test in previews.
+It selects from all four on-table entries or the separate off image, using twice
+the native room/graphics frame. It reserves command space in both streams and
+two aligned matrices before changing the arenas. The hidden joint is redrawn
+with its original fire model and current joint matrix; both matrices and the
+skeleton's submitted matrices are written back. Crowded arenas leave drawing
+unchanged. Ordinary GPU appearance and hardware behaviour require playtesting.
+
 ### Combined skeleton and timed materials
 
 `material-keyframe-rig` combines the complete skeleton/motion converter with the

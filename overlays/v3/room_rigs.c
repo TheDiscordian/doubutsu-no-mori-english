@@ -1,6 +1,9 @@
 /* Complete shared room rigs; each record retains its actual behaviour. */
 #include "room_rigs.h"
 #include "room_motion.h"
+#ifdef AF_V3_ROOM_EFFECT_RIG
+#include "room_effect_rigs.h"
+#endif
 #ifdef AF_V3_ROOM_REVERSIBLE
 #include "room_reversible.h"
 #endif
@@ -140,14 +143,20 @@ static const RoomRigRecord *find(u32 index) {
         if (r->index<1024 || r->index>=2048 || r->bytes<32 || r->bytes>9216 || (r->bytes&15) ||
                 !r->joints || !r->shown || r->shown>r->joints ||
 #ifdef AF_V3_ROOM_REVERSIBLE
-                (r->mode==ROOM_RIG_REVERSIBLE ? (r->joints>16 || r->shown>6) : r->joints>8) ||
+                (r->mode==ROOM_RIG_REVERSIBLE || r->mode==ROOM_RIG_EFFECT ? (r->joints>16 || r->shown>6) : r->joints>8) ||
 #else
                 r->joints>8 ||
 #endif
                 (r->skeleton&3) || r->skeleton<0x06000000u || r->skeleton>0x06000000u+r->bytes-8 ||
                 (r->animation&3) || r->animation<0x06000000u || r->animation>0x06000000u+r->bytes-20) return 0;
 #ifdef AF_V3_ROOM_RIG_PACKET
-        if (r->reserved || r->mode>ROOM_RIG_REVERSIBLE || r->mode==ROOM_RIG_ROOF) return 0;
+        if (r->reserved || r->mode>ROOM_RIG_EFFECT || r->mode==ROOM_RIG_ROOF) return 0;
+#ifdef AF_V3_ROOM_EFFECT_RIG
+        if (r->mode==ROOM_RIG_EFFECT && (r->last.bits || (r->first.bits&3) ||
+                r->first.bits<0x06000000u || r->first.bits>0x06000000u+r->bytes-32)) return 0;
+#else
+        if (r->mode==ROOM_RIG_EFFECT) return 0;
+#endif
 #if defined(AF_V3_ROOM_REVERSIBLE) && defined(AF_V3_ROOM_TRIGGER_SOUND)
         if (r->mode==ROOM_RIG_REVERSIBLE && (r->last.bits || r->first.bits<0x3F800000u || r->first.bits>0x46FFFE00u)) return 0;
 #else
@@ -223,6 +232,14 @@ void af_v3_room_rig_ct(RoomRig *actor,u8 *data) {
     u8 *skeleton=Lib_SegmentedToVirtual((void *)(uptr)r->skeleton);
     void *animation=Lib_SegmentedToVirtual((void *)(uptr)r->animation);
     if (skeleton[0]!=r->joints || skeleton[1]!=r->shown) return;
+#ifdef AF_V3_ROOM_EFFECT_RIG
+    if (r->mode==ROOM_RIG_EFFECT) {
+        const RoomEffectRigParams *p=af_v3_room_effect_rig_params(r,data);
+        if (!p) return;
+        af_v3_room_effect_rig_ct(actor,skeleton,animation,p);
+        af_v3_room_reverse_dt(actor);return;
+    }
+#endif
 #ifdef AF_V3_ROOM_REVERSIBLE
     if (r->mode==ROOM_RIG_REVERSIBLE) {
         af_v3_room_reverse_ct(actor,skeleton,animation,r->first.f);
@@ -276,6 +293,15 @@ void af_v3_room_rig_mv(RoomRig *actor,void *room,RoomRigGame *game,u8 *data) {
     (void)room;(void)game;
     const RoomRigRecord *r=find(actor->index);
     if (!data || !r) return;
+#ifdef AF_V3_ROOM_EFFECT_RIG
+    if (r->mode==ROOM_RIG_EFFECT) {
+        const RoomEffectRigParams *p=af_v3_room_effect_rig_params(r,data);
+        if (!p) return;
+        af_v3_room_effect_rig_step(actor,game,p,actor->changed);
+        af_v3_room_effect_rig_step(actor,game,p,0);
+        af_v3_room_reverse_dt(actor);return;
+    }
+#endif
 #ifdef AF_V3_SELECTED_PALETTE
     if (r->mode==ROOM_RIG_ROOF) { af_v3_roof_mv(actor,room,game,data);return; }
 #endif
@@ -407,6 +433,13 @@ void af_v3_room_rig_dw(RoomRig *actor,void *room,RoomRigGame *game,u8 *data) {
     if (!actor || !game || !game->gfx || !data) return;
     const RoomRigRecord *r=find(actor->index);
     if (!r) return;
+#ifdef AF_V3_ROOM_EFFECT_RIG
+    if (r->mode==ROOM_RIG_EFFECT) {
+        const RoomEffectRigParams *p=af_v3_room_effect_rig_params(r,data);
+        if (p) af_v3_room_effect_rig_dw(actor,game,r,p,data);
+        return;
+    }
+#endif
 #ifdef AF_V3_SELECTED_PALETTE
     if (r->mode==ROOM_RIG_ROOF) {
         const u16 *layout=(const u16 *)data;
@@ -465,6 +498,6 @@ void af_v3_room_rig_dw(RoomRig *actor,void *room,RoomRigGame *game,u8 *data) {
 void af_v3_room_rig_dt(RoomRig *actor,u8 *data) {
     if (!actor || !data) return;
     const RoomRigRecord *r=find(actor->index);
-    if (r && r->mode==ROOM_RIG_REVERSIBLE) af_v3_room_reverse_dt(actor);
+    if (r && (r->mode==ROOM_RIG_REVERSIBLE || r->mode==ROOM_RIG_EFFECT)) af_v3_room_reverse_dt(actor);
 }
 #endif

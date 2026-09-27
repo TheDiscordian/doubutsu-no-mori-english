@@ -6,7 +6,7 @@ static RoomReversible *work(RoomRig *actor) {
     return (RoomReversible *)(void *)actor->matrices[0][6];
 }
 
-void af_v3_room_reverse_ct(RoomRig *actor,void *skeleton,void *animation,float duration) {
+void af_v3_room_reverse_init(RoomRig *actor,void *skeleton,void *animation,float duration,int initial) {
     RoomReversible *state=work(actor);
     RoomKeyframe *key=&actor->keyframe;
     cKF_SkeletonInfo_R_ct(key,skeleton,animation,state->joint,state->morph);
@@ -14,10 +14,14 @@ void af_v3_room_reverse_ct(RoomRig *actor,void *skeleton,void *animation,float d
     key->speed.f=0;
     key->start=1;
     key->end=duration;
-    state->state=actor->switched==1;
+    state->state=initial!=0;
     state->reserved=0;
     if (!state->state) key->current.f=duration;
     cKF_SkeletonInfo_R_play(key);
+}
+
+void af_v3_room_reverse_ct(RoomRig *actor,void *skeleton,void *animation,float duration) {
+    af_v3_room_reverse_init(actor,skeleton,animation,duration,actor->switched==1);
 }
 
 void af_v3_room_reverse_step(RoomRig *actor,float duration,u32 sound,int pressed) {

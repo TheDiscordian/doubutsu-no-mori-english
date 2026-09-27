@@ -1,5 +1,72 @@
 # Automatic furniture pipeline checkpoint
 
+## Installed combined reversible material and effects
+
+The ordinary category importer installs crab stew's complete four-joint motion,
+three models, 62 triangles, and five on/off texture entries in 4,384 reused bytes.
+Mode 10 connects the donor's 19-tick delayed switch, translucent fire redraw,
+randomized steam, full positioned loop and both clicks, and native save capture.
+Source `319C` retains destination `319C`, runtime index 1127. Its actual
+`ftr_listKamakura` route, stock group 19, birth category 3, non-orderable catalogue
+entry, scoring, 1,380-Bell price, and official `ftrName2_table` name are connected.
+The name's source is recorded in the single provenance catalogue.
+
+- Checked lock: `build/v3-effect-rig-imports-01/cartridge/build-lock.json`, ABI 267.
+- ROM SHA-256: `63da46dba20aca042324ca58ff231cc257ec73a26ec36fe56cf4c98f56b129af`.
+- UPS SHA-256: `48cf1ac209be350573f6957d54a7f3598a5fd62811a8b68f21ef1e701849eca8`.
+- Complete object SHA-256: `660bf66a278ffee2b5751dd3216c0b7ba3991bfc0372f32b06df0dff07397b0b`.
+- Room code: 23,776 of 32,768 bytes, SHA-256 `9821f0325b30d7f004dd201c9cc1ed1af6e3f4c319bbca999b15eb90d3f4b863`.
+- Bootstrap: 1,142 of 1,536 bytes, SHA-256 `f156261aeddebf006cd73b4ef158be342417d21b82ea7f2163df3fa0707a2e13`.
+- Room packet SHA-256: `adc43b2da7977144d2920d08abcf051bd142dc3df713fa099d0dbabe2636a013`.
+- Development choices: 162. Both deployed patchers retain stable V2-13.
+
+The callback-shape recogniser verifies complete create/move/draw/destroy and
+before/after joint functions, constants, helpers, skeleton, and motion. The
+graphics converter adds the exact fire combiner expression, retaining source
+colour and alpha. The source constructor's inverted saved-switch test remains
+distinct from the plain reversible category. Shared motion initialization gains
+an explicit initial-state argument without changing existing reversible behaviour.
+Counters occupy unused matrix slots; actors and saved fields do not grow.
+
+Five focused checks pass. Resource/planner checks compare all converted texture,
+palette, vertex, triangle, material, skeleton, and motion data; corrupt lifecycle
+and joint callback inputs reject. The combined C dispatcher runs under address/
+undefined-behaviour sanitizers against actual donor create/move/destroy functions:
+8,008 state comparisons, 4,000 simulated draw frames, both room/preview indices,
+four initial switch values, mapped transition states, busy presses, delayed fire,
+sound/effect ordering, random state, and native save capture. It verifies both
+graphics streams, full hidden-joint work, parameter rejection, crowded arenas,
+and memory guards. Engine evaluation, audio, and particle request boundaries
+are controlled stubs; this is not native rendering or synthesis evidence.
+
+Installed checks rebind full loop programme/instrument/click identities, complete
+particle resources and relocated callback profiles, retained imports and carrying
+code, unchanged format-four codec, exactly the added selection bit, and original
+ROM UPS reconstruction. Four private browser/offline compositions match: empty,
+all, new category only, and an existing villager. The affected shared reversible
+core also passes its 4,324 donor comparisons after the initializer refactor.
+The initial installed fixture incorrectly expects unchanged callback addresses
+after shared code grows and an optional legacy-ID field on a non-legacy item;
+the corrected single retry validates actual rebinding and canonical identity.
+No old emulator build or exhausted native scenario is replayed.
+
+Native execution, ordinary GPU appearance/audio synthesis, a save/reload with
+this item, and original hardware remain unverified. Saved format 4 is unchanged,
+but saves containing this profile require matching or larger compatible V3
+selections; do not load them in ABI 263 or V2 as though this item existed there.
+Preserve backups. Empty selection retains its pinned V2-12 baseline; align that
+with V2-13 before handoff. The main build lock and deployed V2 patchers are not
+changed. Continue radio/chest and console behaviours before acquisition-only work.
+
+```sh
+python3 tools/v3_furniture_pipeline.py import \
+  --base-lock build/v3-reversible-rig-imports-03/cartridge/build-lock.json \
+  --select 319C --reuse-assets build/v3-effect-rigs-prepared-01 \
+  --output build/v3-effect-rig-reproduction
+V3_EFFECT_RIG_BATCH=build/v3-effect-rig-reproduction \
+  python3 -m unittest tests.test_v3_effect_rigs -v
+```
+
 ## Installed reversible lifecycle and save capture
 
 The ordinary category importer installs the complete matryoshka, reusing the

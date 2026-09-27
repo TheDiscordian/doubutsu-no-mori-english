@@ -14,6 +14,7 @@ _Static_assert(sizeof(RoomReversible)<=4*64,"Unused matrix-slot capacity");
 _Static_assert(__builtin_offsetof(RoomRig,matrices)+6*64==0x390,"Extended rig work offset");
 
 void af_v3_room_reverse_ct(RoomRig *,void *,void *,float);
+void af_v3_room_reverse_init(RoomRig *,void *,void *,float,int);
 void af_v3_room_reverse_step(RoomRig *,float,u32,int);
 void af_v3_room_reverse_dt(RoomRig *);
 #endif

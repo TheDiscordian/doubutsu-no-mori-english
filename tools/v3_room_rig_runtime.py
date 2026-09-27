@@ -8,10 +8,11 @@ from aflib import CODE_RAM,CODE_VROM,by_vrom,sha256
 from v3_asset_loader import ROOT,BLOB,compile_part
 from v3_equipment_runtime import RAM as EQUIPMENT_RAM,retired_module_space
 from v3_furniture_pipeline import Source,prepare,room_aliases,PreparedAssets
-from v3_furniture_rigs import CATEGORY,CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY,ROLLING_CATEGORY,JOINT_CATEGORY,MATERIAL_RIG_CATEGORY,REVERSIBLE_CATEGORY,suffix
+from v3_furniture_rigs import CATEGORY,CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY,ROLLING_CATEGORY,JOINT_CATEGORY,MATERIAL_RIG_CATEGORY,REVERSIBLE_CATEGORY,EFFECT_RIG_CATEGORY,suffix
 import v3_furniture_joint_rigs as joints
 import v3_furniture_roofs as roofs
 import v3_furniture_reversible as reversible
+import v3_furniture_effect_rigs as effect_rigs
 from v3_registry import (furniture_representation_identity,ROOM_ALIAS_REGISTRY_VERSION,
                          furniture_identity,furniture_source,furniture_source_index)
 from v3_import_storage import ROWS,ITEMS,slot,END
@@ -49,6 +50,7 @@ from v3_room_particles import SOURCES as PARTICLE_SOURCES
 SOURCES+=PARTICLE_SOURCES
 SOURCES+=roofs.SOURCES
 SOURCES+=('tools/v3_furniture_reversible.py','overlays/v3/room_reversible.c','overlays/v3/room_reversible.h')
+SOURCES+=('tools/v3_furniture_effect_rigs.py','overlays/v3/room_effect_rigs.c','overlays/v3/room_effect_rigs.h')
 
 
 def checked_hit_condition(base,report,trigger,sound,audio):
@@ -132,7 +134,7 @@ def install_profiles(base,prior,blob,core,original,output,directories):
         for row in art['objects']:
             donor=row['item_id'];item=int(donor,16);prepared_row=prepare(source,item)
             descriptor=prepared_row[0];category=descriptor.get('callback_adapter',{}).get('category')
-            if (category not in (CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY,ROLLING_CATEGORY,JOINT_CATEGORY,MATERIAL_RIG_CATEGORY,REVERSIBLE_CATEGORY,roofs.CATEGORY,'switch-trigger-sound',static.CATEGORY,MATERIAL_CATEGORY,SCROLL_CATEGORY) or
+            if (category not in (CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY,ROLLING_CATEGORY,JOINT_CATEGORY,MATERIAL_RIG_CATEGORY,REVERSIBLE_CATEGORY,EFFECT_RIG_CATEGORY,roofs.CATEGORY,'switch-trigger-sound',static.CATEGORY,MATERIAL_CATEGORY,SCROLL_CATEGORY) or
                     donor in occupied or item not in identities or
                     row['profile']!=json.loads(json.dumps(descriptor)) or
                     row['native_profile_scalar_hex']!=descriptor['scalar_hex']):
@@ -251,7 +253,7 @@ def install_profiles(base,prior,blob,core,original,output,directories):
                     raise ValueError('Prepared scrolling resource is not completely installed')
                 vrom=installed['vrom'];vtable=SCROLL_VTABLE;reused_asset=True
                 installed.update(lifecycle_installed=True,lifecycle=json.loads(json.dumps(lifecycle)))
-            elif category in (CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY,ROLLING_CATEGORY,JOINT_CATEGORY,MATERIAL_RIG_CATEGORY,REVERSIBLE_CATEGORY,roofs.CATEGORY):
+            elif category in (CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY,ROLLING_CATEGORY,JOINT_CATEGORY,MATERIAL_RIG_CATEGORY,REVERSIBLE_CATEGORY,EFFECT_RIG_CATEGORY,roofs.CATEGORY):
                 installed=rigs.get(donor)
                 if (not installed or installed['profile_installed'] or
                         {k:v for k,v in installed['source'].items() if k!='reused_artwork'}!=
@@ -260,8 +262,10 @@ def install_profiles(base,prior,blob,core,original,output,directories):
                         blob[installed['blob_offset']:installed['blob_offset']+len(data)]!=data):
                     raise ValueError('Prepared rig is not completely installed in the current runtime')
                 vrom=installed['vrom'];vtable=VTABLE;reused_asset=True
-                if category in (BILLBOARD_CATEGORY,MATERIAL_RIG_CATEGORY) and contracts.get(donor)!=descriptor['callback_adapter']['level_sound']:
+                if category in (BILLBOARD_CATEGORY,MATERIAL_RIG_CATEGORY,EFFECT_RIG_CATEGORY) and contracts.get(donor)!=descriptor['callback_adapter']['level_sound']:
                     raise ValueError('Animated material rig needs its complete installed source loop audio')
+                if category==EFFECT_RIG_CATEGORY:
+                    effect_rigs.checked_binding(descriptor,installed,contracts,runtime,data)
                 if category in (HIT_CATEGORY,REVERSIBLE_CATEGORY):
                     audio=result.get('furniture_audio',{})
                     audio_row=next((r for r in audio.get('furniture',[]) if r['item_id']==donor),None)
@@ -426,9 +430,10 @@ def bind_profiles(source,base,report):
     if any(r.get('mode')==7 for r in runtime['rows']):
         if runtime.get('roof_contract')!=roofs.native_contract(source,base):
             raise ValueError('Changed installed house-colour selection')
-    if any(r.get('mode')==9 for r in runtime['rows']):
+    if any(r.get('mode') in (9,10) for r in runtime['rows']):
         if runtime.get('reversible_contract')!=reversible.native_contract(base):
             raise ValueError('Changed installed reversible work/persistence binding')
+    if any(r.get('mode')==10 for r in runtime['rows']):effect_rigs.checked_native(base)
     for row,enabled in [(r,False) for r in staged.get('rows',[])]+[(r,True) for r in activated]:
         item=int(row['item_id'],16);donor=f'{furniture_source(row)[0]:04X}';i=slot(item);binding=bindings.get(donor)
         if (donor in source.runtime_profiles or not binding or not binding['profile_installed'] or
@@ -512,8 +517,10 @@ def bind_profiles(source,base,report):
                     '-DAF_V3_ROOM_REVERSIBLE' not in runtime['code']['flags'] or
                     callbacks[3]!=runtime['bootstrap']['symbols'].get('af_v3_room_boot_dt') or not callbacks[3]):
                 raise ValueError('Incomplete reversible motion/destruction dispatch')
-        if category in (BILLBOARD_CATEGORY,MATERIAL_RIG_CATEGORY) and contracts.get(donor)!=descriptor['callback_adapter']['level_sound']:
+        if category in (BILLBOARD_CATEGORY,MATERIAL_RIG_CATEGORY,EFFECT_RIG_CATEGORY) and contracts.get(donor)!=descriptor['callback_adapter']['level_sound']:
             raise ValueError('Incomplete installed animated-material audio/behaviour')
+        if category==EFFECT_RIG_CATEGORY:
+            effect_rigs.checked_binding(descriptor,binding,contracts,runtime,blob[vrom-BLOB:vrom-BLOB+art['object_bytes']])
         if category==MATERIAL_RIG_CATEGORY:
             parameters=art['rig'];offset=parameters['material_offset']
             if (binding.get('mode')!=8 or binding.get('first')!=0x06000000+offset or binding.get('last') or
@@ -567,12 +574,12 @@ def prepared_categories(source,directories):
         for row in art['objects']:
             donor=row['item_id'];item=int(donor,16);prepared_row=prepare(source,item)
             profile=prepared_row[0];adapter=profile.get('callback_adapter',{});category=adapter.get('category')
-            if category not in (CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY,ROLLING_CATEGORY,JOINT_CATEGORY,MATERIAL_RIG_CATEGORY,REVERSIBLE_CATEGORY,roofs.CATEGORY):
+            if category not in (CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY,ROLLING_CATEGORY,JOINT_CATEGORY,MATERIAL_RIG_CATEGORY,REVERSIBLE_CATEGORY,EFFECT_RIG_CATEGORY,roofs.CATEGORY):
                 raise ValueError('Unimplemented additional room-rig category')
             if (row['profile']!=json.loads(json.dumps(profile)) or donor in assets or
                     row['native_profile_scalar_hex']!=profile['scalar_hex'] or
-                    category!=roofs.CATEGORY and (profile['skeleton']['joints']>(16 if category==REVERSIBLE_CATEGORY else 6 if category==ROLLING_CATEGORY else 8) or
-                    category==REVERSIBLE_CATEGORY and profile['skeleton']['shown_joints']>6 or
+                    category!=roofs.CATEGORY and (profile['skeleton']['joints']>(16 if category in (REVERSIBLE_CATEGORY,EFFECT_RIG_CATEGORY) else 6 if category==ROLLING_CATEGORY else 8) or
+                    category in (REVERSIBLE_CATEGORY,EFFECT_RIG_CATEGORY) and profile['skeleton']['shown_joints']>6 or
                     category not in (BILLBOARD_CATEGORY,JOINT_CATEGORY) and
                     any(r.get('draw_stream') for r in profile['skeleton']['rows']))):
                 raise ValueError('Changed room-rig profile or native work capacity')
@@ -606,6 +613,10 @@ def prepared_categories(source,directories):
                 mode=5;first=struct.unpack('>I',struct.pack('>f',adapter['rolling']['duration']))[0];last=0
             elif category==MATERIAL_RIG_CATEGORY:
                 mode=8;first=0x06000000+rig['material_offset'];last=0
+            elif category==EFFECT_RIG_CATEGORY:
+                if profile['interaction_flags'] or profile['contact_action']:
+                    raise ValueError('Effect rig requires the complete ordinary switch lifecycle')
+                mode=10;first=0x06000000+rig['material_offset'];last=0
             elif category==REVERSIBLE_CATEGORY:
                 if profile['interaction_flags'] or profile['contact_action']:
                     raise ValueError('Reversible saved-state adapter requires the complete ordinary switch lifecycle')
@@ -671,13 +682,13 @@ def encode_packet(rows,sound_rows=(),material_rows=()):
             continue
         encode([r])  # Retain the complete existing object/pointer/work-area checks.
         mode,first,last=r.get('mode',0),r.get('first',0),r.get('last',0)
-        if (mode not in (0,1,2,3,4,5,6,8,9) or mode==0 and (first or last) or
+        if (mode not in (0,1,2,3,4,5,6,8,9,10) or mode==0 and (first or last) or
                 mode==9 and (last or not 0x3F800000<=first<=0x46FFFE00) or
                 mode==6 and (first,last) not in ((1,0),(2,0),(4,0),(0x5103,0x00160017)) or
                 mode==3 and (first,last) not in ((0,0),(1,0x3E800000),(2,0x3F000000)) or
                 mode==1 and not (0<first<r['joints'] and 0<last<r['joints'] and first!=last) or
                 mode==4 and (last or first&3 or not 0x06000000<=first<=0x06000000+r['bytes']-16) or
-                mode==8 and (last or first&3 or not 0x06000000<=first<=0x06000000+r['bytes']-32) or
+                mode in (8,10) and (last or first&3 or not 0x06000000<=first<=0x06000000+r['bytes']-32) or
                 mode==5 and (last or not 0x3F800000<=first<=0x47000000) or
                 mode==2 and not 0x3F800000<=first<last<=0x43800000):
             raise ValueError('Invalid complete room-rig behaviour parameters')
@@ -780,7 +791,8 @@ def publish_packet(equipment,blob,output,*,core=None):
     if not colours and any(r.get('lifecycle')==3 for r in material_rows):
         raise ValueError('Colour material requires its complete player engine')
     switched=any(r.get('lifecycle')==5 for r in material_rows)
-    reverse=any(r.get('mode')==9 for r in runtime['rows'])
+    effect_rig=any(r.get('mode')==10 for r in runtime['rows'])
+    reverse=effect_rig or any(r.get('mode')==9 for r in runtime['rows'])
     defines=('AF_V3_ROOM_RIG_PACKET',)+(('AF_V3_ROOM_TRIGGER_SOUND',) if sound_rows or reactions or colours or static_rows or switched or reverse else ())
     if reverse:
         if not runtime.get('reversible_contract'):raise ValueError('Reversible rigs require checked native work/save ownership')
@@ -811,6 +823,10 @@ def publish_packet(equipment,blob,output,*,core=None):
                   f'AF_CARRY_ANGLE=0x{exports["af_v3_carry_angle"]:X}u')
     effects=runtime.get('effects')
     particles=effects.get('particles') if effects else None
+    if effect_rig:
+        if not particles or not particles.get('installed'):
+            raise ValueError('Effect rigs require the complete installed particle engine')
+        defines+=('AF_V3_ROOM_EFFECT_RIG',)
     if effects:
         if packet_ram not in (EXTENDED_RAM,WIDE_RAM):raise ValueError('Effect callbacks require the expanded room packet')
         defines+=('AF_V3_ROOM_EFFECTS',f'AF_EFFECT_FLASH_MODEL=0x{effects["bank"]["model"]:X}u')
@@ -827,6 +843,7 @@ def publish_packet(equipment,blob,output,*,core=None):
             (('overlays/v3/room_joints.c',) if joint else ())+
             (('overlays/v3/room_needle.c',) if needle else ())+
             (('overlays/v3/room_reversible.c',) if reverse else ())+
+            (('overlays/v3/room_effect_rigs.c',) if effect_rig else ())+
             (('overlays/v3/room_palettes.c',) if roof else ())+
             (('overlays/v3/room_effects.c',) if effects else ())+reaction_sources+
             (('overlays/v3/room_particles.c',) if particles else ())+\
@@ -1016,7 +1033,8 @@ def extend(base,prior,blob,core,original,output,directories):
     if rolling:installed['motion_contract']=motion_binding(source,base,prior,all_rows)
     if any(r.get('mode')==6 for r in all_rows):installed['joint_contract']=joints.native_contract(base)
     if any(r.get('mode')==7 for r in all_rows):installed['roof_contract']=roofs.native_contract(source,base)
-    if any(r.get('mode')==9 for r in all_rows):installed['reversible_contract']=reversible.native_contract(base)
+    if any(r.get('mode') in (9,10) for r in all_rows):installed['reversible_contract']=reversible.native_contract(base)
+    if any(r.get('mode')==10 for r in all_rows):effect_rigs.checked_native(base)
     if any(r.get('mode')==6 and r.get('first')==4 for r in all_rows):
         from v3_furniture_needle import native_contract as needle_contract
         installed['needle_contract']=needle_contract(base,prior)
@@ -1101,8 +1119,8 @@ def encode(rows):
     for r in rows:
         if (r['runtime_index']!=1024+slot(int(r['item_id'],16)) or
                 not 32<=r['bytes']<=9216 or r['bytes']%16 or
-                not 1<=r['shown']<=r['joints']<=(16 if r.get('mode')==9 else 6 if r.get('mode',0) in (0,5) else 8) or
-                r.get('mode')==9 and r['shown']>6 or
+                not 1<=r['shown']<=r['joints']<=(16 if r.get('mode') in (9,10) else 6 if r.get('mode',0) in (0,5) else 8) or
+                r.get('mode') in (9,10) and r['shown']>6 or
                 any(p&3 or not 0x06000000<=p<=0x06000000+r['bytes']-n for p,n in
                     ((r['skeleton'],8),(r['animation'],20)))):
             raise ValueError('Invalid complete room-rig record')

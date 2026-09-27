@@ -106,6 +106,14 @@ Keep source hashes and conversion revisions attached to each compiled import.
 
 ## Runtime work
 
+The [combined rig importer](V3_FURNITURE_PIPELINE.md#reversible-material-and-particle-rigs)
+installs complete reversible motion, delayed material selection, translucent
+joint drawing, particle emission, and source audio through the shared category
+pipeline. Crab stew retains all resources and its actual winter-camper route,
+official text, scoring, and optional profile. Donor lifecycle comparisons,
+sanitized host drawing, installed resources, and browser composition pass;
+ordinary native play, saving with the item, and hardware remain unverified.
+
 The [room-surface pipeline](V3_ROOM_SURFACES.md) prepares ten additive floors and
 wallpapers while preserving all existing surfaces and special-room identifiers.
 Complete resources, stable paired destinations, official names, source metadata,

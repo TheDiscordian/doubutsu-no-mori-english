@@ -22,6 +22,7 @@ FIXED_CATEGORY = 'fixed-keyframe-rig-assets'
 from v3_furniture_joint_rigs import CATEGORY as JOINT_CATEGORY
 from v3_furniture_materials import RIG_CATEGORY as MATERIAL_RIG_CATEGORY
 from v3_furniture_reversible import CATEGORY as REVERSIBLE_CATEGORY
+from v3_furniture_effect_rigs import CATEGORY as EFFECT_RIG_CATEGORY
 STORAGE_CODE = {
     'create': (116, '17985ba5a79cb082f421871e07eca8189d15291d08d408f4d68c257b072d166d'),
     'move': (80, '74d56a7240cc6101e429e75a9163eacb63753bfb06e944d1e80d291853fa6690'),
@@ -34,7 +35,7 @@ CLOCK_CODE = {
     'draw': (200, 'f6e60a96386c7721dcd0c894196eae1ee3e5c6339aadf921e2f95952ff7584de'),
     'destroy': (4, 'f332ea5b5437103cbb6f1508679da89eec9288ad775c96c439a17fccabe3de8e'),
 }
-RIG_CATEGORIES = (CATEGORY, CLOCK_CATEGORY, STORAGE_CATEGORY, HIT_CATEGORY, BILLBOARD_CATEGORY, ROLLING_CATEGORY, JOINT_CATEGORY, MATERIAL_RIG_CATEGORY, REVERSIBLE_CATEGORY)
+RIG_CATEGORIES = (CATEGORY, CLOCK_CATEGORY, STORAGE_CATEGORY, HIT_CATEGORY, BILLBOARD_CATEGORY, ROLLING_CATEGORY, JOINT_CATEGORY, MATERIAL_RIG_CATEGORY, REVERSIBLE_CATEGORY, EFFECT_RIG_CATEGORY)
 RESOURCE_CATEGORIES = RIG_CATEGORIES + (FIXED_CATEGORY,)
 CODE = {
     'create': (164, '2a86d61bc9aaf4a0a6479fe97a7f0d5dfe3dc42f9eea663eeb3fd1b8cbc35733'),
@@ -713,7 +714,7 @@ def suffix(source, profile, model_offsets, *, start, resources=()):
             *(v for r in scroll['tiles'] for v in r['rate']),sound['source_sound_id'],
             bool(sound['excluded_states']),2,0)
         fields=dict(billboard_offset=offset,billboard_hex=extra.hex())
-    if adapter['category']==MATERIAL_RIG_CATEGORY:
+    if adapter['category'] in (MATERIAL_RIG_CATEGORY,EFFECT_RIG_CATEGORY):
         material=adapter['material_frames'][0];frames=material['frames'];offsets=[]
         for frame in frames:
             matches=[r for r in resources if r['symbol']==frame['symbol'] and r['kind']=='texture']
@@ -721,9 +722,15 @@ def suffix(source, profile, model_offsets, *, start, resources=()):
                 raise ValueError('Material rig suffix requires complete converted texture resources')
             offsets.append(matches[0]['native_offset'])
         offset=start+len(bones)+len(motion)
-        extra=struct.pack('>4B2H8H2I',material['segment_address']>>24,len(frames),
-            adapter['level_sound']['source_sound_id'],0,material['selector']['division'],frames[0]['bytes'],
-            *(offsets+[0]*(8-len(offsets))),0,0)
+        if adapter['category']==EFFECT_RIG_CATEGORY:
+            extra=struct.pack('>fI4B2H5H6x',adapter['animation']['duration'],
+                0x06000000+model_offsets[adapter['translucent_model']],material['segment_address']>>24,len(frames),
+                adapter['level_sound']['source_sound_id'],adapter['translucent_joint'],
+                adapter['reversible']['delay'],frames[0]['bytes'],*offsets)
+        else:
+            extra=struct.pack('>4B2H8H2I',material['segment_address']>>24,len(frames),
+                adapter['level_sound']['source_sound_id'],0,material['selector']['division'],frames[0]['bytes'],
+                *(offsets+[0]*(8-len(offsets))),0,0)
         fields=dict(material_offset=offset,material_hex=extra.hex(),frame_offsets=offsets)
     return bones+motion+extra, dict(skeleton=rig,animations=animations,**fields,
         skeleton_offset=rig['header']['native_offset'],animation_offset=animations['headers'][0]['native_offset'],
@@ -735,4 +742,4 @@ def estimated_suffix(source, profile, start):
     if adapter.get('category') not in RESOURCE_CATEGORIES: return 0
     bones = (profile['skeleton']['joint_table']['bytes']+8+15)&~15
     motion, _ = compile_animations(source,[adapter['animation']],start=start+bones)
-    return bones+len(motion)+(16 if adapter['category']==BILLBOARD_CATEGORY else 32 if adapter['category']==MATERIAL_RIG_CATEGORY else 0)
+    return bones+len(motion)+(16 if adapter['category']==BILLBOARD_CATEGORY else 32 if adapter['category'] in (MATERIAL_RIG_CATEGORY,EFFECT_RIG_CATEGORY) else 0)

@@ -24,7 +24,7 @@ from v3_registry import FURNITURE, LEGACY_FURNITURE, furniture_identity, furnitu
 from v3_room_aliases import discover as room_aliases, pending_reason as room_alias_reason
 from v3_villager_art import native_palette, normalise_vertex_flags
 
-VERSION = 33
+VERSION = 34
 PENDING_MOVE_CATEGORY = 'static-models-pending-move'
 PENDING_SEQUENCE_CATEGORY = 'constant-model-sequence-pending-lifecycle'
 SELECTED_PALETTE_CATEGORY = 'selected-palette-fade-assets'
@@ -276,6 +276,9 @@ class Source:
         from v3_furniture_reversible import discover as discover_reversible
         reversible=discover_reversible(self,name,at,functions)
         if reversible is not None:return reversible
+        from v3_furniture_effect_rigs import discover as discover_effect_rig
+        effect_rig=discover_effect_rig(self,name,at,functions)
+        if effect_rig is not None:return effect_rig
         from v3_furniture_rigs import (CODE as RIG_CODE, CLOCK_CODE, STORAGE_CODE,
             discover as discover_rig, discover_clock, discover_storage, discover_fixed, discover_hit, discover_billboard,
             discover_material_rig)
@@ -1363,13 +1366,13 @@ def convert(source, worksheet, output, selected=(), installed=None, *, assets_on
 
 def rig_import_plan(inventory, report, bindings, selected=(), category=None, *, source=None):
     """Plan shared dependencies, not per-item installers or acquisition guesses."""
-    from v3_furniture_rigs import CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY,ROLLING_CATEGORY,MATERIAL_RIG_CATEGORY,REVERSIBLE_CATEGORY
+    from v3_furniture_rigs import CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY,ROLLING_CATEGORY,MATERIAL_RIG_CATEGORY,REVERSIBLE_CATEGORY,EFFECT_RIG_CATEGORY
     from v3_furniture_materials import CATEGORY as MATERIAL_CATEGORY,initializer_lifecycle,steam_lifecycle,switched_lifecycle
     from v3_furniture_scroll import CATEGORY as SCROLL_CATEGORY,draw_only_lifecycle
     from v3_furniture_reactions import source_lifecycle as reaction_lifecycle,colour_lifecycle
     from v3_sound_programs import furniture_trigger,furniture_level
     from v3_furniture_joint_rigs import CATEGORY as JOINT_CATEGORY,lifecycle as joint_lifecycle
-    categories={CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY,ROLLING_CATEGORY,MATERIAL_RIG_CATEGORY,REVERSIBLE_CATEGORY,SELECTED_PALETTE_CATEGORY}
+    categories={CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY,ROLLING_CATEGORY,MATERIAL_RIG_CATEGORY,REVERSIBLE_CATEGORY,EFFECT_RIG_CATEGORY,SELECTED_PALETTE_CATEGORY}
     candidates=[r for r in inventory['rows'] if r.get('asset_ready') and not r['installed'] and
         not r.get('room_alias') and (not selected or r['item_id'] in selected) and
         (category is None or category in r['categories'])]
@@ -1382,7 +1385,8 @@ def rig_import_plan(inventory, report, bindings, selected=(), category=None, *, 
             rows.append(r)
     joint_loops={r['item_id'] for r in rows if r['profile']['callback_adapter']['category']==JOINT_CATEGORY
                  and furniture_level(source,r['profile']) is not None}
-    material_rows=[];material_audio=[];material_loops=[];effects=set()
+    material_rows=[];material_audio=[];material_loops=[]
+    effects={kind for r in rows for kind in r['profile']['callback_adapter'].get('effects',[])}
     scroll_rows=[];scroll_loops=[]
     for r in candidates:
         if r['profile'].get('callback_adapter',{}).get('category')!=SCROLL_CATEGORY:continue
@@ -1471,7 +1475,7 @@ def import_batch(source, worksheet, output, lock, selected=(), category=None, re
             convert(source,worksheet,directory,ids,installed,assets_only=True,reuse_assets=cache)
             cache.append(directory)
             return directory
-        if plan['resources']:
+        if plan['resources'] and not plan.get('particles'):
             refresh('rig-runtime',room_rigs_art=[bundle(plan['resources'],'rig-assets')])
         if plan.get('materials'):
             refresh('material-runtime',material_frames_art=[bundle(plan['materials'],'material-assets')])
@@ -1495,6 +1499,8 @@ def import_batch(source, worksheet, output, lock, selected=(), category=None, re
             effects=output/'particles'
             prepare_particles(effects,current)
             refresh('particle-runtime',room_effects=effects)
+            if plan['resources']:
+                refresh('rig-runtime',room_rigs_art=[bundle(plan['resources'],'rig-assets')])
         if plan['profiles']:
             refresh('profile-runtime',furniture_profiles=[bundle(plan['profiles'],'profile-assets')])
     elif plan['audio'] or plan['loops']:
