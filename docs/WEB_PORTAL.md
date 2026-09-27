@@ -7,7 +7,7 @@ part of the site's visitor instructions.
 
 The portal is running at **http://127.0.0.1:8073/** through the enabled
 `animal-forest-portal.service` user service. It remains local-only. The service
-serves `build/web-portal-07/site`, not the repository or its game inputs.
+serves `build/web-portal-08/site`, not the repository or its game inputs.
 
 The public address is
 **https://thediscordian.github.io/doubutsu-no-mori-english/**, matching the YouTube
@@ -33,15 +33,15 @@ Select **Build my English ROM**, then download the verified result.
   YouTube before Play. A direct Watch on YouTube link is always available.
   YouTube controls its player/network behaviour after the visitor opens it.
 
-The browser download is **Animal Crossing N64 - English.z64**, build **V2-13**,
+The browser download is **Animal Crossing N64 - English.z64**, build **V2-14**,
 including English museum names in recipient lists and letter headers, the official
 `Animal Crossing` credits title, the credits-buffer correction, the map-suffix
-fix, and the polished N64 keyboard with smooth controller shells and reordered controls.
+fix, the polished N64 keyboard, and correct B-button cancellation at dressers.
 It is an N64 ROM; this does not patch the GameCube game. The existing local
-cartridge artifact keeps its filename under `build/v2-combined-13/`.
+cartridge artifact keeps its filename under `build/v2-dresser-14/`.
 
 Output SHA-256:
-`f96395426808200dc6faaac0386aec9839ddcf3a4251eaaf98f371b8029a5e68`.
+`0e81d5c62548c3a759cc89d63eba0975b1c336a3a941211a3000e317b9243bf2`.
 
 Expansion Pak, 128-KiB FlashRAM, and RTC remain required. Saved formats are
 unchanged from previous V2 builds, including V2-11 and V2-12; compatibility is expected both ways without
@@ -66,7 +66,7 @@ its result against the existing target ROM, and copies only explicitly selected
 website/media/source-note files. Do not serve the repository or the parent of
 `build/`. Point the local unit at the new export's `site` directory when switching.
 
-For copy/style changes, `python3 tools/build_portal.py --output build/web-portal-07
+For copy/style changes, `python3 tools/build_portal.py --output build/web-portal-08
 --refresh-web` updates the verified live export from `web/`, including current
 download metadata. It rejects unrecorded edits to the served files and checks
 the existing patch identity. It does not rebuild the ROM, regenerate the patch,
@@ -87,7 +87,7 @@ for manual file identification, not a replacement for those safeguards.
 The GameCube input supplies **2,783,500 bytes** used in the output. The browser
 reads and hashes `forest_1st.arc`, `forest_2nd.arc`, and Yaz0-decoded
 `foresta.rel.szs`. The recipe contains 23,085 copy/literal commands and is
-1,890,148 bytes compressed. This is a genuine two-input reconstruction, not a
+1,890,149 bytes compressed. This is a genuine two-input reconstruction, not a
 disc-header gate in front of an otherwise independent patch.
 
 ## GitHub Pages publication
@@ -130,7 +130,7 @@ remaining game-derived patch material. The released trailer is unchanged.
 - `python3 -m unittest tests.test_v2_combined_release -v` checks the published
   V2 identity and, when private inputs exist, the combined credits/museum fixes,
   retained resources, ROM checksum, and complete patch reconstruction. See the
-  [V2-13 publication checkpoint](checkpoints/V2_13_PUBLICATION.md).
+  [V2-14 checkpoint](checkpoints/V2_14_DRESSER.md).
 - `python3 tools/check_portal_trailer.py` checks the live page at four widths,
   no pre-click third-party requests, mouse/keyboard activation, unmuted playback
   parameters, origin-only Referer, minimum player size, and the direct link.

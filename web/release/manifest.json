@@ -1,11 +1,11 @@
 {
   "format": 1,
   "label": "V2 \u00b7 N64 keyboard edition",
-  "build": "V2-13",
+  "build": "V2-14",
   "public_release": false,
   "source_sha256": "d9417be056534fcc0bdff2e6cd5f1135511be7c0a4dace04a96a2649596ce908",
   "source_size": 16777216,
-  "output_sha256": "f96395426808200dc6faaac0386aec9839ddcf3a4251eaaf98f371b8029a5e68",
+  "output_sha256": "0e81d5c62548c3a759cc89d63eba0975b1c336a3a941211a3000e317b9243bf2",
   "output_size": 33554432,
   "output_name": "Animal Crossing N64 - English.z64",
   "disc_id": "GAFE01",
@@ -38,9 +38,9 @@
   ],
   "recipe": {
     "file": "patch.afwp.gz",
-    "sha256": "40c9a6217f3d79cc8e4a0a67456da3a0f841fe32e2c239df516cde28046064c2",
-    "size": 1890148,
-    "decoded_sha256": "eb3a59ad8e3f71bd7c91dafd92d22972bb938aa8fb81cb116756f2364a99e96b",
+    "sha256": "24c7b84a089f55a6ecff6ea9e4ff9efcd361f87f9b874ea49d08d785008c6a5f",
+    "size": 1890149,
+    "decoded_sha256": "3934d982731f2bbe6551f37647a0f75f65c6d6cf17995be27f0c1839389abdf7",
     "decoded_size": 5459156
   },
   "requirements": {
