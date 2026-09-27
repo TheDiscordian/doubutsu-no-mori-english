@@ -1,7 +1,7 @@
 #ifndef AF_V3_CONSOLE_DISK_H
 #define AF_V3_CONSOLE_DISK_H
 
-/* GAFE01 QD disk services. CPU instruction dispatch, CHR conversion, BIOS
+/* GAFE01 QD disk services. CPU instruction dispatch, CHR buffer binding, BIOS
  * mapping, and expansion sound remain responsibilities of the native adapter.
  * All buffers must outlive the context. Boot/save preserve complete disk sides.
  * No resident memory, FlashRAM writes, or game enablement is implied here. */
@@ -48,6 +48,10 @@ int af_v3_qd_save(AFQDisk *q,const unsigned char request[27]);
  * reflected in CPU registers; negative API returns mean unsafe input. The
  * caller still owns native instruction dispatch and CHR conversion. */
 int af_v3_qd_wdm(AFQDisk *q,AFQCpu *cpu,unsigned int buttons);
+/* Convert all raw CHR into the native interpreter/RSP's tiled, paired-plane
+ * layout. The caller binds the actual native working buffer and handles its
+ * cache/RSP lifetime. No native state or graphics pointer is inferred here. */
+int af_v3_qd_native_characters(AFQDisk *q,unsigned char *patterns,unsigned int bytes);
 int af_v3_qd_read(AFQDisk *q,unsigned int address,unsigned int pc);
 /* Positive return bits request work by the native CPU/PPU/audio adapter. */
 int af_v3_qd_write(AFQDisk *q,unsigned int address,unsigned int value,int scanline);

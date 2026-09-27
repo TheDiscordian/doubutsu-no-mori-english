@@ -13,6 +13,19 @@ from runtime_layout import MODULE_RAM
 from v3_asset_loader import BLOB
 from v3_console_games import NATIVE_RAM
 
+HANDOVER=(0x800D20B4,32,'d84dc83756b24c65fa3eaf674d26684786090b342450e5c1cdd390841408b743')
+
+
+def graph_snapshot(debug):
+    """Saved OS context locates graph-thread waits when another thread runs."""
+    raw=debug.read_memory(0x80145630,0x1B0)
+    sp=struct.unpack_from('>Q',raw,0xF0)[0]&0xFFFFFFFF
+    return dict(pointer='80145630',state=struct.unpack_from('>H',raw,16)[0],
+        id=struct.unpack_from('>I',raw,20)[0],pc=f'{struct.unpack_from(">I",raw,0x11C)[0]:08X}',
+        ra=f'{struct.unpack_from(">Q",raw,0x100)[0]&0xFFFFFFFF:08X}',sp=f'{sp:08X}',
+        context=raw.hex(),stack=debug.read_memory(sp,128).hex()
+        if not sp&7 and 0x80000400<=sp<=0x80400000-128 else None)
+
 
 def exercise(debug,rom_path,action,state,record):
     path=Path(rom_path);image=path.read_bytes();report=json.loads((path.parent/'build.json').read_bytes())
@@ -39,8 +52,16 @@ def exercise(debug,rom_path,action,state,record):
         debug.write_memory(0x80136EA3,b'\0')
         state['game']=game
         state['metadata']=actual[images['metadata']['ram']-packet['ram']:]
+        # The real room calls sAdo_SubGameStart after requesting the transition
+        # (8093A4F8..8093A518). Title-state launch must provide the same handover;
+        # otherwise initialization waits for an audio command never submitted.
+        at,size,digest=HANDOVER;core=files[CODE_VROM].extract(image)
+        if sha256(core[at-CODE_RAM:at-CODE_RAM+size])!=digest:
+            raise ValueError('Changed complete native console audio handover')
         core_call(0x800D36F4,32,[owner])
+        core_call(at,size,[])
         return dict(console_native_launch=game,transition='native_game_state_manager',
+                    source_audio_handover=True,
                     ordinary_room_entry_tested=False)
     header=words(0x804FE820,18)
     magic,base,game,player,image_bytes,error,image_ram,emulator,battery=header[:9]
@@ -50,6 +71,7 @@ def exercise(debug,rom_path,action,state,record):
         heap=dict(size=size,start=f'{start:08X}',head=f'{head:08X}',tail=f'{tail:08X}',free=tail-head),
         fault_thread=f'{fault:08X}',owner=f'{owner:08X}',
         current_registers=debug.command('g'),thread=debug.thread_snapshot(),
+        graph_thread=graph_snapshot(debug),
         fault_context=debug.read_memory(fault,0x1B0).hex() if 0x80000400<=fault<=0x80400000-0x1B0 else None)))
     if (magic!=0x41464E45 or game!=state['game'] or player!=0 or error or not emulator or
             header[17]!=1 or fault or base&15 or not 0x80000400<=base<=0x80400000-0x2E990):

@@ -53,6 +53,11 @@ the experimental V3 publication hold does not apply to V2 fixes.
   patch bytes, and unsupported ROM revisions. Never truncate text silently.
 - Keep save format changes out of the initial rendering work.
 - Emulator tests must be silent, isolated from existing saves, and time bounded.
+- `/usr/bin/ares` lacks `QPassSignals:10`, needed to pass normal libultra lazy-FPU
+  exceptions in newly created native threads. The local `local/ares` source
+  supports it, but requires a local build before such tests. Do not repeat the
+  unsupported-command probe, substitute CPU-register edits, or suppress real
+  memory/illegal-instruction faults. Retain ordinary native fault checks.
 - Document what is complete, what is experimental, and what is untested.
 - Every release-candidate handoff states save compatibility with the preceding
   candidate. Explicitly warn before using a build whose saves cannot safely be

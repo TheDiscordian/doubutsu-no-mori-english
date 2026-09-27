@@ -1,5 +1,27 @@
 # Work record
 
+## 2026-09-27: native disk tile conversion and startup handover diagnosis
+
+- Added complete bounded native CHR conversion, checking the actual 88-byte
+  N64 converter and full emulator before preparation. All 8-KiB raw character
+  data become the native paired-plane/tiled layout; source buffers and guards
+  remain intact. Actual native buffer/cache/RSP bindings remain required.
+- Preparation `build/v3-console-games-prepared-09/` contains 5,139 MIPS bytes,
+  SHA-256 `14cf5bb33f41256086b24b48a5a8c152844d20e71a2ae25fe41f8b7f0bd766da`.
+  Two focused checks pass: 15,594 sanitized assertions, complete prepared
+  dependencies, and preservation of all nineteen game images. CPU, reset,
+  graphics, and native memory bindings are recorded in the disk specification.
+- Traced the earlier native startup wait to the test's missing room audio
+  handover. Corrected the helper using the checked actual native call and added
+  graph-thread context capture. One corrected run reaches native audio, where
+  ares stops on the recoverable lazy-FPU exception before libultra handles it.
+  The single retry rejects the installed debugger's unsupported signal-pass
+  command. Neither scenario passes; no further attempt is queued. Full evidence
+  and the local-emulator requirement are in the capacity checkpoint and CLAUDE.md.
+- ABI 281, the main V3 build lock, selections, saved format five, and both stable
+  V2-13 deployments remain unchanged. Continue native disk integration; do not
+  replay these fixtures or treat source conversion as playable disk support.
+
 ## 2026-09-27: complete shared BIOS special-instruction services
 
 - Implemented all five donor WDM services, including actual stacked save

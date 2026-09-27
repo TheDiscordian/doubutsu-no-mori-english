@@ -189,6 +189,22 @@ int af_v3_qd_wdm(AFQDisk *q,AFQCpu *cpu,u32 buttons) {
     return 0;
 }
 
+int af_v3_qd_native_characters(AFQDisk *q,u8 *patterns,u32 bytes) {
+    if(!valid(q) || bytes<AF_QD_CHARACTER)return AF_QD_BAD_STATE;
+    const void *buffers[]={q,q->disk,q->work,q->program,q->characters,q->bios,q->boot_state};
+    const u32 sizes[]={sizeof(*q),q->disk_bytes,AF_QD_WORK,AF_QD_PROGRAM,AF_QD_CHARACTER,AF_QD_BIOS,AF_QD_BOOT_STATE};
+    for(u32 i=0;i<7;i++)if(!separate(patterns,AF_QD_CHARACTER,buffers[i],sizes[i]))return AF_QD_BAD_STATE;
+    /* Native 808328DC takes 16-byte tile offsets, interleaves plane bytes,
+     * and lays out sixty-four tiles across each 1-KiB block. Native PPU
+     * writes at 8083055C update this same representation in working memory. */
+    for(u32 tile=0;tile<AF_QD_CHARACTER;tile+=16)for(u32 row=0;row<8;row++) {
+        u32 at=(tile&0x1C00)|((tile&0x3F0)>>3)|(row<<7);
+        patterns[at]=q->characters[tile+row+8];
+        patterns[at+1]=q->characters[tile+row];
+    }
+    q->chr_dirty=0;return 0;
+}
+
 int af_v3_qd_read(AFQDisk *q,u32 address,u32 pc) {
     if(!valid(q) || address<0x4030 || address>0x4033 || pc>65535)return AF_QD_BAD_STATE;
     int value=q->drive[address-0x4030];

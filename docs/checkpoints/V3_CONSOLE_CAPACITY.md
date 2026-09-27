@@ -63,7 +63,7 @@ Four tests pass across targeted runs in `tests.test_v3_console_emulator`:
 - Four private browser/offline compositions match, including empty selection.
   The pinned empty-selection baseline still needs its V2-13 alignment.
 
-## Native evidence and unresolved startup
+## Native evidence and incomplete startup verification
 
 `tests/scenarios/v3_console_game.json` uses the actual native game-state manager
 from a disposable title checkpoint, with Wario's Woods as the largest image.
@@ -87,13 +87,40 @@ Two attempts are retained:
 Neither scenario passes. There is no complete image comparison, running-game,
 reset/return, or checkpoint-restoration claim from these attempts. Both attempts
 are spent: do not repeat this setup unchanged or dismiss the stall as harmless.
-The next relevant native run should capture the graph thread's saved context
-and the startup boundary before audio/CPU initialization to identify the wait.
-A credible unresolved startup defect remains a playable-handoff blocker.
+The helper captures the graph thread's saved OS context and stack as well as
+the currently running thread. No startup pass follows from the original attempts.
+
+The corrected title-state fixture calls the complete native `sAdo_SubGameStart`
+at `800D20B4` after requesting the game-state transition. The real room does this
+at `8093A50C`, after its transition call at `8093A4F8`. The wrapper's 32-byte
+SHA-256 is `d84dc83756b24c65fa3eaf674d26684786090b342450e5c1cdd390841408b743`.
+Without that command, console initialization polls `sAdo_SubGameOK` at
+`8082E244..8082E280` indefinitely. This is a missing test transition step,
+not a required change to the real room's already-present handover.
+
+`build/v3-console-game-handover-01/` reaches native console audio beyond that
+wait. The debugger emits `S10` at `803B4D30` (linked `80832F80`, `mtc1`), with
+Cause `1000002C`, in the newly created console audio thread. The emulator maps
+COP1-unusable to SIGURG; libultra's `handle_CpU` enables the FPU for that thread
+and resumes it. Debugger stop/reply ordering then prevents the normal snapshot;
+the raw diagnostic preserves the registers and shifted replies. This is not a
+completed scenario or evidence of a game memory fault.
+
+The one setup retry at `build/v3-console-game-handover-02/` explicitly requests
+`QPassSignals:10` before launch so the game's own exception handler can execute.
+`/usr/bin/ares` returns an unsupported empty response, and the fixture stops.
+The local ares source supports that command, but no local executable is built.
+Both attempts are spent. Build the compatible local test tool before the next
+changed native batch; do not repeat this capability failure or edit the CPU's
+FPU ownership to manufacture a pass. Real fault checks remain required.
+
+Full emulator initialization, image verification, advancing gameplay, normal
+room return, and checkpoint restoration are still unverified. The missing test
+handover explains the original wait, but does not prove those later steps.
 
 ## Next implementation and compatibility
 
-Continue the QD disk engine and the unresolved native startup/normal room return.
+Continue the QD disk engine and native startup/normal room return integration.
 The local donor reference contains QD fast loading/saving, disk registers,
 interrupt timing, and sound in `src/static/Famicom/ks_nes_core.cpp` and
 `src/static/jaudio_NES/game/emusound.c`; these need native bindings, not a renamed

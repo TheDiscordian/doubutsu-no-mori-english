@@ -32,11 +32,12 @@ The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
 The shared console converter prepares the complete disk BIOS, full 260-byte
-fast-boot initialization span, and 4,815-byte QD service core at
-`build/v3-console-games-prepared-08/`. All five BIOS special-instruction services,
+fast-boot initialization span, and 5,139-byte QD service core at
+`build/v3-console-games-prepared-09/`. All five BIOS special-instruction services,
 private BIOS reset patches, boot/save operations, disk registers, interrupt state,
-and readiness/motor updates are converted. Two focused checks pass, including
-11,473 sanitized donor/boundary assertions and preservation of all nineteen game
+readiness/motor updates, and complete native-layout character conversion are
+implemented. Two focused checks pass, including
+15,594 sanitized donor/boundary assertions and preservation of all nineteen game
 resources. Native CPU/PPU/sound and instruction-dispatch bindings remain
 unfinished; no disk profile is enabled.
 See the [disk-service specification](../specs/V3_CONSOLE_DISK.md).
@@ -49,10 +50,13 @@ native subtraction. The shared refresh verifies the previous hooks and retains
 complete room callbacks, models, images, and saves. Four focused checks pass,
 including 110,902 sanitized host assertions and four private compositions.
 Native Wario's Woods startup allocates its full image and backup with 130,304
-arena bytes remaining, but stalls before emulator initialization completes.
-No CPU fault is recorded; the cause is unresolved. Both diagnostic attempts are
-spent, and no gameplay pass or hardware handoff is claimed. Continue QD engine
-conversion and diagnosis of the native startup/return path. See the
+arena bytes remaining. The title-state fixture's original wait is traced to its
+missing room audio handover. Corrected launch reaches native console audio but
+the debugger stops on the new thread's recoverable FPU-ownership exception.
+The installed emulator lacks the required signal-pass command; both corrected
+attempts are spent. Full native gameplay/return remains unverified, not a passed
+scenario or hardware handoff. Continue QD integration; build the compatible local
+test emulator before the next relevant native check. See the
 [capacity checkpoint](checkpoints/V3_CONSOLE_CAPACITY.md).
 
 The room integration is retained from ABI 280 at

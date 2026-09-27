@@ -21,28 +21,32 @@ prevent asset/data conversion or redirect work from an unfinished shared format.
 Incomplete gameplay stays unavailable in the selector; installing assets does
 not claim that an item is playable. Reuse unchanged passing tests throughout.
 
-Current task: complete QD execution and resolve native console startup/return.
+Current task: complete QD execution and native console startup/return integration.
 The shared converter prepares the complete BIOS, actual 260-byte initialization
-span, and disk-service core at `build/v3-console-games-prepared-08/`. All five BIOS
-WDM services and private BIOS reset patches are implemented. Donor C boot/save
+span, and disk-service core at `build/v3-console-games-prepared-09/`. All five BIOS
+WDM services, private BIOS reset patches, and native-layout character conversion
+are implemented. Donor C boot/save
 comparisons and focused WDM/register/timing/bounds checks pass. Next connect native
-disk memory/reset, WDM dispatch/register mapping, CPU/PPU and scanline consumers, character conversion,
+disk memory/reset, WDM dispatch/register mapping, CPU/PPU and scanline consumers, character-buffer/cache bindings,
 expansion sound/motor synchronization, and complete lifecycle/persistence.
 The service is not installed or selectable; do not treat returned action flags
 as completed renderer/audio integration. See the
 [disk specification](../specs/V3_CONSOLE_DISK.md).
-The 4,815-byte core already exceeds the spare gap between the resident room
+The 5,139-byte core already exceeds the spare gap between the resident room
 callback and its table. Plan a checked complete native-code allocation; do not
 overwrite room resources or silently omit disk services to fit that gap.
 Continue from ABI 281 at `build/v3-console-emulator-capacity-01/build-lock.json`,
 ROM SHA-256 `763bbcbeca77390e797039c79ee8ae83a2a7b7497b5768db81534ed0ce14a62d`.
 The checked allocator and safe shared-runtime refresh are installed; four
 focused host/cartridge/composition checks pass. A native largest-game transition
-allocates its full image and backup, leaving 130,304 arena bytes, but stalls
-before emulator initialization. No CPU fault is recorded. Two attempts are
-spent; do not rerun unchanged. Inspect the graph thread's saved context/startup
-boundary in the next relevant native batch. This unresolved stall blocks a
-playable handoff. See the [capacity checkpoint](checkpoints/V3_CONSOLE_CAPACITY.md).
+allocates its full image and backup, leaving 130,304 arena bytes. The original
+test wait omits the room's audio handover; the corrected helper includes it and
+reaches native console audio. The debugger then stops on normal lazy FPU ownership.
+The installed `/usr/bin/ares` lacks `QPassSignals:10`; local source supports it
+but no local executable is built. Both corrected attempts are spent. Build that
+tool before the next relevant native batch, retain graph-thread diagnostics, and
+do not repeat the unsupported-command test. Full gameplay/return and ordinary
+entry remain unverified. See the [capacity checkpoint](checkpoints/V3_CONSOLE_CAPACITY.md).
 The common room callback and eleven complete console profiles/models are
 installed. Excitebike adds one experimental choice through its actual lottery
 route; the other ten retain pending acquisition. Five focused checks pass;

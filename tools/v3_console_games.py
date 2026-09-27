@@ -439,6 +439,6 @@ def prepare(source, path, output, original_rom):
     report['persistence_core']=prepare_persistence(output)
     report['storage_core']=prepare_storage(output)
     from v3_console_disk import prepare as prepare_disk
-    report['disk_core']=prepare_disk(dol,archive,output)
+    report['disk_core']=prepare_disk(dol,archive,output,original_rom)
     write_new(output/'games.json', (json.dumps(report, indent=2)+'\n').encode())
     return report

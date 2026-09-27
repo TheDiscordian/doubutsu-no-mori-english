@@ -46,7 +46,7 @@ class ConsoleDiskTests(unittest.TestCase):
             print(run.stdout.strip())
 
     def test_shared_preparation_preserves_games_and_supplies_complete_bios(self):
-        out=ROOT/'build/v3-console-games-prepared-08'
+        out=ROOT/'build/v3-console-games-prepared-09'
         report=json.loads((out/'games.json').read_text());disk=report['disk_core']
         self.assertEqual(disk,json.loads((out/'console_disk/disk.json').read_text()))
         self.assertEqual(sha256((out/'console_disk/code.bin').read_bytes()),disk['sha256'])
@@ -55,6 +55,8 @@ class ConsoleDiskTests(unittest.TestCase):
         self.assertEqual(sha256((out/'console_disk/boot-state.bin').read_bytes()),disk['source']['boot_state']['sha256'])
         self.assertEqual(disk['source']['boot_state']['bytes'],260)
         self.assertIn('af_v3_qd_wdm',disk['compiled']['symbols'])
+        self.assertIn('af_v3_qd_native_characters',disk['compiled']['symbols'])
+        self.assertEqual(disk['source']['native_character_converter']['address'],0x808328DC)
         for path,digest in disk['sources'].items():self.assertEqual(sha256((ROOT/path).read_bytes()),digest,path)
         for name in ('games.bin','games-metadata.bin','games-pool.bin'):
             self.assertEqual((out/name).read_bytes(),(ROOT/'build/v3-console-games-prepared-06'/name).read_bytes())

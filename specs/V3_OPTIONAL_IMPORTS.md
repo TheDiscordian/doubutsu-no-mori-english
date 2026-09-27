@@ -109,7 +109,8 @@ Keep source hashes and conversion revisions attached to each compiled import.
 The [QD services](V3_CONSOLE_DISK.md) are prepared through the same console
 converter: complete donor BIOS and fast-boot initialization data, all five BIOS
 special-instruction services, private reset patches, bounded boot/save operations,
-disk registers, interrupt state, and per-frame readiness/motor state. Donor C
+disk registers, interrupt state, per-frame readiness/motor state, and complete
+native-layout character conversion. Donor C
 comparisons and focused WDM/register/bounds checks pass. Native dispatch, graphics, audio, and
 lifecycle integration remain required; preparation does not enable the disk item.
 
@@ -136,8 +137,10 @@ the other ten retain their actual pending reward routes. Host/cartridge checks
 pass, but native callback execution remains unverified. ABI 281 checks every
 console game-arena allocation before native subtraction and preserves installed
 room code during shared runtime refresh. Host and composition checks pass.
-The largest-image native startup retains free arena space but stalls before
-initialization completes; this is unresolved, not a gameplay pass. No console
+The largest-image native startup retains free arena space. Its title-state test
+needs the real room audio handover; corrected launch reaches native audio but
+the installed debugger stops on lazy FPU ownership. Full execution remains
+unverified, not a gameplay pass. No console
 is selectable from storage installation alone. Format-five saves require the
 explicit compatibility warning.
 

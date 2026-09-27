@@ -12,9 +12,9 @@ python3 tools/v3_furniture_pipeline.py convert --representation console \
   --output build/v3-console-games-prepared-next
 ```
 
-The current preparation is `build/v3-console-games-prepared-08/`.
-Its zero-linked MIPS disk service is 4,815 bytes, SHA-256
-`08a312925a3bff870eeb20066d0147f4aa5c402c97ccdc6e6aecc8779c62d8e3`.
+The current preparation is `build/v3-console-games-prepared-09/`.
+Its zero-linked MIPS disk service is 5,139 bytes, SHA-256
+`14cf5bb33f41256086b24b48a5a8c152844d20e71a2ae25fe41f8b7f0bd766da`.
 It uses no mutable globals or unresolved library calls. The largest stack chain
 is WDM plus save plus validation: 192 bytes. `console_disk/disk.json` records complete
 source and compiled identities. The nineteen-game bundle, compact metadata,
@@ -66,8 +66,8 @@ header, substitute another release, or reduce the saved game to a score label.
   `42` and selects the donor's normal or `koro` disk-specific BIOS mask.
 - Boot follows the first side's actual file count and boot-file ID, retains
   protected-load refusal, clears the source work range, and loads complete
-  eligible files. It marks character conversion pending; the native renderer
-  must actually perform that conversion.
+  eligible files. It marks character conversion pending; the native adapter
+  must invoke the converted native-layout operation on its actual buffers.
 - Fast saving consumes the complete 27-byte BIOS request, matches a real side's
   ten-byte identity, preserves the source file-slot/count and header writes,
   and reads complete data through bounded CPU-bank views. The source does not
@@ -104,8 +104,18 @@ The stacked descriptor read follows the donor's linear work-RAM fetch; the
 resulting stack pointer wraps to eight bits. Source BIOS errors are written to
 CPU result registers without pretending that a save succeeded. Unsafe input
 returns a negative API result before changing the CPU or disk; temporary slot
-writes are restored on malformed requests. Character conversion still requires
-the native consumer of `chr_dirty` after fast boot.
+writes are restored on malformed requests.
+
+`af_v3_qd_native_characters` converts the complete 8-KiB character data into the
+native interpreter/RSP's paired-plane tile layout. The complete 88-byte native
+converter at `808328DC` is checked against SHA-256
+`9fa9e3ec527d580461933ab99d188678992496f44d8dc15e1ba9d92a1c162126`.
+The full native emulator is also pinned. Destination capacity and separation
+from every disk-service buffer are checked before writing; successful conversion
+clears `chr_dirty`. Native PPU writes at `8083055C` use the same layout. The
+adapter must bind the actual working patterns at state+`62C8`, graphics transfer
+buffers, cache updates, and RSP lifetime; a converted private buffer does not
+establish drawing or install those consumers.
 
 Invalid/truncated blocks, cross-buffer boot writes, overlong save requests,
 unmapped/aliased CPU views, invalid side/slot values, and disk-head underflow or
@@ -125,7 +135,8 @@ Register/timing checks cover all control-byte values, transfer and timer
 interrupts, acknowledgement, readiness, and motor state. BIOS checks cover all
 five services, complete boot output, reset patches, no-op/error paths, descriptor
 bank boundaries, stack wrap, and malformed-request/alias rejection. There are
-11,473 checks. Register and WDM expectations derive from the checked donor
+15,594 checks, including reconstruction of every tile/plane in the native CHR
+layout and untouched buffer guards. Register and WDM expectations derive from the checked donor
 assembly, not execution of that PowerPC assembly or proof of native N64 operation.
 
 The prepared-resource check verifies MIPS/source receipts, complete BIOS/boot-state
@@ -134,13 +145,51 @@ No historical ROM or unchanged native scenario is replayed for this preparation.
 
 Remaining implementation is required: native disk memory/reset mapping, the
 WDM dispatch/register bridge, CPU/PPU read/write and interrupt bindings,
-character conversion, expansion sound and motor synchronization, complete
+native character-buffer/cache bindings, expansion sound and motor synchronization, complete
 save/frame/reset/return integration, and enabling the actual source furniture
 only when those dependencies work. Reuse partial native disk-register machinery
 where verified; a missing mapper-20 table entry is not an inventory of all
 native disk code. Preserve the complete source image and BIOS.
 
-The unresolved native console startup stall remains tracked in the
-[capacity checkpoint](../docs/checkpoints/V3_CONSOLE_CAPACITY.md). Its two attempts
-are spent; this preparation is not a reason to replay an unchanged cartridge.
-No new gameplay, ordinary save cycle, or original-hardware claim is made.
+## Native integration bindings
+
+The existing native interpreter keeps a per-instance 4-KiB opcode table at
+state+`0800`; WDM `42` occupies the sixteen-byte row at state+`0C20`. Dispatch
+loads its callback and size/cycle fields at `8082F274..8082F290`. Native register
+ownership is accumulator/X/Y in `s0/s1/s2`, PC in `s3`, stack in `s4`, zero-result
+in `s5`, carry/overflow in `s6/s7`, negative in `gp`, and cycles in `t9`.
+The instruction returns through `t6`, not an ordinary C return address. The
+bridge must preserve those live values around C service calls and bind only the
+disk instance; replacing a global table would also affect cartridge games.
+
+CPU bank pointers start at state+`1A38`; native load/store callback tables start
+at `18E4`/`18C0`. Raw character memory is pointed to by `1A78`; the native PPU
+working patterns begin at `62C8`. The native converter accepts a raw character
+base, a sixteen-byte tile offset, and a destination pattern base. The native
+reset initially converts graphics+`2008`, then copies into its working patterns.
+The real adapter must handle both initialization and later PPU writes.
+
+The native reset at `8082E590` mixes common state initialization with iNES header
+parsing, programme/vector selection, and mapper callbacks. Calling it unchanged
+on QD bytes is unsafe. The earlier initializer at `8082A6EC` also derives iNES
+sizes, and startup at `8082E194` recalculates image extents from header bytes.
+All three consumers need a real QD path; do not create a fake iNES header to get
+past one of them. Reset must still preserve native common graphics/audio setup.
+
+The current code reservation below `804FB000` and gap after the room callback
+cannot hold the complete disk module. The current model-pool reservation ends
+at `8062C020`; the fault framebuffer begins at `807DA800`. A separate checked
+Expansion Pak reservation above the pool is a candidate for complete code,
+32-KiB programme RAM, 8-KiB characters, private BIOS, and disk context. It is not
+allocated yet. Validate the actual build's complete reservations before choosing
+the range, and retain low-memory native game arenas and room resources unchanged.
+
+The [capacity checkpoint](../docs/checkpoints/V3_CONSOLE_CAPACITY.md) records the
+startup-test correction and incomplete native evidence. The title-state fixture
+now supplies the real room's audio handover. Its corrected launch reaches native
+console audio, where the debugger stops on recoverable lazy FPU ownership.
+The installed debugger lacks the required signal-pass capability; its local
+source supports it. Both corrected-fixture attempts are spent. Build a compatible
+local test emulator before the next relevant native batch, without repeating the
+unsupported command or masking actual faults. No gameplay, ordinary save cycle,
+or original-hardware claim is made.

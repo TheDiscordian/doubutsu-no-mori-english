@@ -1,7 +1,7 @@
 """Prepare donor-backed QD services and complete BIOS through console conversion."""
 import json
 
-from aflib import sha256,yaz0_decode
+from aflib import by_vrom,sha256,yaz0_decode
 from apply_translation import write_new
 from gamecube import rarc_files
 from v3_villager_audio import DOL_SHA
@@ -47,9 +47,16 @@ def donor_resources(dol,archive):
             private_reset_patches=[dict(offset=0xEBD,value=0x42),dict(offset=0x1A0,default=0x7F,koro=0xFF)])),bios
 
 
-def prepare(dol,archive,output):
+def prepare(dol,archive,output,original_rom):
     from v3_asset_loader import ROOT,compile_part
+    from v3_console_games import NATIVE_VROM,NATIVE_RAM,NATIVE_SHA
     source,bios=donor_resources(dol,archive)
+    native=by_vrom(original_rom)[NATIVE_VROM].extract(original_rom)
+    at=0x808328DC-NATIVE_RAM;digest='9fa9e3ec527d580461933ab99d188678992496f44d8dc15e1ba9d92a1c162126'
+    if sha256(native)!=NATIVE_SHA or sha256(native[at:at+0x58])!=digest:
+        raise ValueError('Changed complete native CHR converter dependency')
+    source['native_character_converter']=dict(address=0x808328DC,bytes=0x58,sha256=digest,
+        source_vrom=NATIVE_VROM,source_sha256=NATIVE_SHA)
     code,compiled=compile_part('console_disk',output/'console_disk')
     write_new(output/'console_disk/bios.bin',bios)
     write_new(output/'console_disk/boot-state.bin',dol.read(BOOT_STATE_ADDRESS,BOOT_STATE_BYTES))
@@ -59,9 +66,10 @@ def prepare(dol,archive,output):
             character_bytes=8192,bios_bytes=8192,boot_state_bytes=BOOT_STATE_BYTES),
         prepared=['complete donor BIOS','bounded boot loading','bounded BIOS save requests',
             'complete fast-boot initialization span','private BIOS reset patches','five BIOS WDM services',
+            'complete native CHR tile conversion',
             'disk register reads/writes','source scanline IRQ state','source frame/ready/motor state'],
         pending=['native disk-state allocation and reset mapping','native WDM dispatch/register bridge',
-            'CPU/PPU register and scanline bindings','character conversion','expansion sound and motor synchronization',
+            'CPU/PPU register and scanline bindings','native CHR buffer/cache bindings','expansion sound and motor synchronization',
             'native startup and normal room return'],
         native_hooks_installed=False,choice_eligible=False,
         sources={s:sha256((ROOT/s).read_bytes()) for s in SOURCES})

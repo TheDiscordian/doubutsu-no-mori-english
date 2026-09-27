@@ -151,6 +151,26 @@ static void wdm_checks(void) {
     disk_before=q;CHECK(af_v3_qd_bind(&q,disk,65536,work,prg,chr,bios,bios)<0);
     CHECK(!std::memcmp(&q,&disk_before,sizeof(q)));
 }
+static void native_characters(void) {
+    setup();CHECK(!af_v3_qd_boot(&q));CHECK(q.chr_dirty);
+    u8 patterns[AF_QD_CHARACTER+32];std::memset(patterns,0x5A,sizeof(patterns));
+    AFQDisk before=q;
+    CHECK(af_v3_qd_native_characters(&q,patterns,8191)==AF_QD_BAD_STATE);
+    CHECK(!std::memcmp(&q,&before,sizeof(q)));
+    CHECK(af_v3_qd_native_characters(&q,chr,8192)==AF_QD_BAD_STATE);
+    CHECK(!std::memcmp(&q,&before,sizeof(q)));
+    CHECK(!af_v3_qd_native_characters(&q,patterns+16,8192) && !q.chr_dirty);
+    /* Read the native rows back as 64 paired tiles per block; reconstruct
+     * both raw planes and compare every tile to the actual donor boot output. */
+    for(unsigned group=0;group<8;group++)for(unsigned row=0;row<8;row++)
+        for(unsigned column=0;column<64;column++) {
+            unsigned dest=16+group*1024+row*128+column*2;
+            unsigned src=(group*64+column)*16+row;
+            CHECK(patterns[dest]==chr[src+8] && patterns[dest+1]==chr[src]);
+        }
+    for(unsigned i=0;i<16;i++)CHECK(patterns[i]==0x5A && patterns[8208+i]==0x5A);
+    CHECK(!std::memcmp(chr,original+0x815B,8192));
+}
 int main(int argc,char **argv) {
     CHECK(argc==4);load(argv[1],original,sizeof(original));load(argv[2],original_bios,sizeof(original_bios));
     load(argv[3],boot_state,sizeof(boot_state));
@@ -227,5 +247,6 @@ int main(int argc,char **argv) {
     before=q;CHECK(af_v3_qd_write(&q,0x4025,0,INT_MAX)==AF_QD_BAD_STATE);
     CHECK(!std::memcmp(&q,&before,sizeof(q)));
     wdm_checks();
-    std::printf("%u QD checks: donor boot/save comparisons, BIOS WDM services/reset, disk registers/timing, malformed bounds; no native execution\n",checks);
+    native_characters();
+    std::printf("%u QD checks: donor boot/save, BIOS WDM/reset, native CHR conversion, disk timing/bounds; no native execution\n",checks);
 }
