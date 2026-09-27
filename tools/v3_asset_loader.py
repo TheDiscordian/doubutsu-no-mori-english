@@ -63,7 +63,9 @@ def compile_part(part, out, extra_sources=(), defines=(), primary_source=None):
     run('objcopy', '-O', 'binary', '-j', '.text', '-j', '.rodata',
         *(['-j', '.fallbacks'] if part=='scenery_bootstrap' else []), 'code.elf', 'code.bin')
     code = (out / 'code.bin').read_bytes()
-    entry, expected = {'creature_fish': ('af_v3_fish_position', 0x80647400),
+    entry, expected = {'creature_world': ('af_v3_patrol_swim', 0x8064A000),
+                       'creature_spawns': ('af_v3_spawn_plan', 0),
+                       'creature_fish': ('af_v3_fish_position', 0x80647400),
                        'console_disk_native': ('af_v3_qd_native_bind', 0x80630000),
                        'console_disk': ('af_v3_qd_validate', 0),
                        'console_room': ('af_v3_console_room_move', 0x804FB000),

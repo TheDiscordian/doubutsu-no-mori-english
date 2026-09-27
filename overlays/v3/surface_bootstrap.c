@@ -117,5 +117,14 @@ int af_v3_surface_init(void) {
 #endif
     if (!load_code(field,AF_CREATURE_FIELD_VROM,AF_CREATURE_FIELD_BYTES,AF_CREATURE_FIELD_CRC)) return 0;
 #endif
+#ifdef AF_FISH_WORLD_VROM
+#ifdef __mips__
+    void *fish_world=(void *)0x8064A000u;
+#else
+    extern unsigned char af_test_fish_world[AF_FISH_WORLD_BYTES];
+    void *fish_world=af_test_fish_world;
+#endif
+    if (!load_code(fish_world,AF_FISH_WORLD_VROM,AF_FISH_WORLD_BYTES,AF_FISH_WORLD_CRC)) return 0;
+#endif
     return af_surface_prior_init();
 }

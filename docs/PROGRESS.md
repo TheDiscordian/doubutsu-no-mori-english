@@ -31,9 +31,9 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
-The current proposal is ABI 296 at
-`build/v3-creature-fish-runtime-02/build-lock.json`, ROM SHA-256
-`58e5af9f8c96ab9e8db1dbdd15f9cbf41239aa912bd584c12c18a3a95fe27183`.
+The current proposal is ABI 297 at
+`build/v3-creature-world-work-01/runtime/build-lock.json`, ROM SHA-256
+`e27a841921b7f2d6e124aa8d49d8f0977f7f4aed725fac35cdb0f25ea380ef7b`.
 It contains 167 selectable development imports and 100 complete inactive furniture
 profiles whose acquisition is pending. The main lock and both stable V2-14
 deployments are retained.
@@ -126,8 +126,22 @@ resident allocation, actor growth, or save change. Two focused host tests cover
 the readers, source arrays, relocation, preservation, planning, and optional
 composition. The constructor timeout is not classified as a game or harness bug;
 do not loop on the exhausted native fixture or claim the new hooks passed it.
-Coastal patrol/shoreline alternatives, insect behaviours, spawning, pocket icons,
-and collection/profile readers remain required before creature selection.
+The connected fish task includes an installed world packet containing complete
+donor calendars, seasonal blending, weighted selection, spawn-position scanning,
+and shared native-bound terrain checks. Brook trout and native herabuna have
+separate records. Six coastal callbacks connect donor patrol/wait/escape code
+with preserved original-function fallbacks. The behaviour word remains N64;
+the WebUI/composer choice, spawn-manager entry, and persisted season fields are
+still pending. No additional fish are selectable yet.
+
+Three focused checks pass for complete calendar conversion, sanitized spawning,
+terrain and both patrol alternatives, installed code/data/relocations, unchanged
+saves/resources, UPS reconstruction, and all/empty optional composition. The
+16-KiB world reservation adds no actor growth or save-format change. These host
+and cartridge checks do not establish native execution; the constructor timeout
+and scheduler disconnect remain unresolved. Continue the same fish task through
+the manager/save connections, icons, collection, and selection; insect behaviours
+also remain required. Do not replay old builds or recompile unchanged artwork.
 
 Continue with creature parent/native integration and the remaining legacy
 clothing, custom-design, and fossil representations, not resource reconversion

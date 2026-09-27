@@ -211,6 +211,57 @@ execution is not inferred from those host checks. The native constructor timeout
 remains unresolved, and creature selection stays disabled until the remaining
 world, icon, and collection readers are complete.
 
+### Connected fish world implementation
+
+The same `--creature-fish` builder continues the category into a shared world
+packet at `8064A000..8064DFFF`. The ordinary dependency planner installs missing
+reader and world code in order within the same category task. Existing installed
+stages and prepared models are reused. Ten startup loads fit the retained
+bootstrap reservation; the full new packet is checked before any callback runs.
+
+`v3_creature_spawns.py` follows all river, coastal, pond, tournament, and island
+calendar pointers in the verified donor. The 296 time/half-month descriptors
+retain every source weight and spawn area, with shared lists stored once.
+The 3,340-byte packed calendar includes native herabuna's independent monthly
+weights, including late September. Brook trout maps to added actor 44, not to
+herabuna. Retaining both is an explicit additive-identity adaptation. Island
+calendar extraction does not add an island to N64 or enable island-only spawns.
+
+`creature_spawns.c` implements source five-day seasonal blending, time periods,
+selected-only weights, environment-rank selection with source rejection/retry,
+and bounded candidate-position scanning. GAFE01-r0's river-mouth rule is retained,
+not the later Australian rule. Both terms plus the extra herabuna records fit
+the 64-row plan; the converter checks the complete category maximum. Invalid
+calendar/state inputs reject rather than truncating to the native twenty-row
+buffer. The native caller must persist both season fields, not redraw the
+transition offset on each visit. That manager and save binding remains pending.
+
+`creature_water.c` binds native collision/field APIs for waterfall, pond, river,
+and marine placement, donor sand/depth exclusion, and four-direction shoreline
+checks. `creature_patrol.c` uses native actor fields for all four donor swimming
+states, waiting, approaching a bobber, and escape. Counters/phase increments use
+30-Hz units; source movement is half-scaled at 60 Hz. Three action and three
+initializer pointers in the coastal owner select shared wrappers. Their original
+functions and program dimensions remain intact, with only those six absolute
+pointer relocations removed. The fallback thunks use the actor's actual relocated
+program pointer at `244`, not a fixed heap address.
+
+The behaviour word defaults to zero (N64); one selects GameCube patrol for
+imported-origin coastal actors. Native fish always retain their existing path.
+The real alternatives are installed, but no browser choice is exposed until its
+composition and complete playable-import dependencies are connected. This word
+does not yet select a spawning policy. Season/save binding, source-vs-native spawn
+policy, icons, collection/profile readers, and ordinary gameplay remain unfinished.
+
+The 5,944-byte compiled world code and its complete calendars occupy one 16-KiB
+reservation; source data begins at `8064D000`. Original room/frame resources,
+saved layouts, actor sizes, and the stable translation output remain unchanged.
+`test_v3_creature_spawns.py` checks the complete source calendar, sanitizer-bound
+selection/terrain/patrol paths and fallbacks, installed pointers/relocations,
+source/output binding, startup arguments, unchanged persistence, UPS, planning,
+and all/empty composition. Native execution and hardware remain unverified;
+these checks do not classify the earlier constructor or scheduler failures.
+
 ### Native integration constraints
 
 - Native fish actor indices `0..31` are ordinary fish, `32..34` are rubbish,

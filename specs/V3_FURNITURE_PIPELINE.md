@@ -10,6 +10,15 @@ or interactions remain unfinished, and retain explicit pending gameplay status.
 Nook code-entry and gift systems are not prerequisites for completing a model,
 material, or rig converter. Keep incomplete gameplay out of selectable imports.
 
+The implementation task is the complete category path recorded in the active
+queue, not an individual dependency stage. Map its missing consumers, implement
+shared changes for all matching records, and check the connected result together.
+Immutable stage locks, compiler checks, and safety guards remain useful during
+implementation; they do not require a separate native scenario or documentation
+cycle for each stage. Finished components remain finished while missing consumers
+remain explicitly pending. An interruption resumes the same category task and
+test budget. Required item-specific behaviours stay inside that task.
+
 ### Automatic category dependencies
 
 Furniture `import` plans implemented category dependencies from the selected

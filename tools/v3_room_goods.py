@@ -238,6 +238,15 @@ def publish_bootstrap(equipment,blob,surface,output):
             raise ValueError('Changed complete creature field packet')
         extra+=(f'AF_CREATURE_FIELD_VROM=0x{p["vrom"]:X}u',f'AF_CREATURE_FIELD_CRC=0x{p["crc32"]:X}u',
                 f'AF_CREATURE_FIELD_BYTES=0x{p["bytes"]:X}u')
+    fish_world=equipment.get('creature_fish',{}).get('world')
+    if fish_world:
+        from v3_creature_fish import WORLD_RAM,WORLD_SIZE
+        p=fish_world['packet'];raw=blob[p['blob_offset']:p['blob_offset']+p['bytes']]
+        if (sha256(raw)!=p['sha256'] or zlib.crc32(raw)!=p['crc32'] or
+                p['ram']!=WORLD_RAM or p['bytes']!=WORLD_SIZE):
+            raise ValueError('Changed complete fish world packet')
+        extra+=(f'AF_FISH_WORLD_VROM=0x{p["vrom"]:X}u',f'AF_FISH_WORLD_CRC=0x{p["crc32"]:X}u',
+                f'AF_FISH_WORLD_BYTES=0x{p["bytes"]:X}u')
     boot,compiled=compile_part('surface_bootstrap',output/'goods_surface_bootstrap',defines=(
         'AF_V3_EDITABLE_CHECKSUMS=1',f'AF_SURFACE_ITEMS_VROM=0x{items["vrom"]:X}u',
         f'AF_SURFACE_ITEMS_CRC=0x{items["crc32"]:X}u',f'AF_SURFACE_ITEMS_BYTES=0x{items["bytes"]:X}u',
@@ -259,3 +268,4 @@ def publish_bootstrap(equipment,blob,surface,output):
     if disk:disk['startup']=copy.deepcopy(goods['startup'])
     if creatures:creatures['startup']=copy.deepcopy(goods['startup'])
     if field:field['startup']=copy.deepcopy(goods['startup'])
+    if fish_world:fish_world['startup']=copy.deepcopy(goods['startup'])

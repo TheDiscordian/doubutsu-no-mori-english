@@ -103,13 +103,25 @@ the experimental V3 publication hold does not apply to V2 fixes.
   unchanged evidence. The local Xvfb executable is
   `/home/discordian/Games/OpenRSC/headless/vendor/usr/bin/Xvfb`; pass it explicitly
   when it is absent from PATH.
-- Organize implementation batches around connected player-facing paths across a
-  whole category. Carry the required extraction, identities, readers, models,
-  and behaviour hooks through that path before the batch checkpoint. Supporting
-  tables, hashes, receipts, and individual hooks are implementation steps, not
-  normal stopping points. Verify the connected change together, reuse unchanged
-  evidence and prepared assets, and avoid rescanning unrelated categories after
-  a scoped import. Keep required item-specific behaviours in scope.
+- Keep one active category-wide implementation task in `docs/WORK_QUEUE.md`,
+  with its complete player-facing path and remaining consumers. Implement shared
+  changes across every matching record, including required individual behaviours.
+  A completed table or hook stays complete; the category stays unfinished until
+  its connected path works. Do not turn each dependency into a separate
+  implementation, testing, and reporting cycle.
+- Map the missing consumers once, then work through that map. Run cheap compiler,
+  bounds, and source checks during implementation; batch native integration checks
+  around the connected change. Reuse unchanged resources and passing evidence.
+  Do not rescan unrelated categories or rebuild prepared assets without a concrete
+  dependency or defect. Fix discovered game defects without postponing them to
+  make the batch look complete.
+- Internal build locks and commits are durability checkpoints, not new tasks or
+  completion claims. If interrupted, record the exact next consumer and resume
+  the same task; do not start a fresh audit or reset the harness budget. Keep
+  detailed technical evidence in its existing build reports. Update the current
+  queue and progress once per connected batch or necessary handoff, rather than
+  repeating each sub-step across several documents. Report newly usable paths
+  and remaining work, not receipt counts as a substitute for usable content.
 - Importing includes extraction, conversion, bulk installation, and working
   item behaviours, including item-specific behaviours. Do not impose a rule
   postponing item-specific work until all shared categories are finished.

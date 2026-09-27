@@ -8,7 +8,7 @@ import struct
 import zlib
 
 from aflib import by_vrom,sha256,u32
-from v3_asset_loader import ROOT,compile_part
+from v3_asset_loader import ROOT,BLOB,compile_part
 from v3_creature_field import table
 from v3_creature_field_native import RAM,SIZE,retarget
 from v3_player_actions import native_references
@@ -25,6 +25,12 @@ OWNERS={
 }
 SOURCES=('tools/v3_creature_fish.py','overlays/v3/creature_fish.c',
     'overlays/v3/creature_fish.S','overlays/v3/creature_fish.ld')
+WORLD_RAM,WORLD_SIZE,WORLD_TABLE=0x8064A000,0x4000,0x3000
+WORLD_SOURCES=SOURCES+('tools/v3_creature_spawns.py','overlays/v3/creature_spawns.c',
+    'overlays/v3/creature_spawns.h','overlays/v3/creature_water.c','overlays/v3/creature_water.h',
+    'overlays/v3/creature_patrol.c','overlays/v3/creature_patrol.S','overlays/v3/creature_world.ld',
+    'tools/v3_asset_loader.py','tools/v3_room_goods.py','tools/v3_furniture_pipeline.py',
+    'tools/v3_furniture_install.py','overlays/v3/surface_bootstrap.c')
 
 
 def parameters(source):
@@ -91,7 +97,8 @@ def rewrite(owner,reloc,ram,targets,windows):
 def install(base,prior,blob,output):
     from v3_furniture_pipeline import Source
     e=copy.deepcopy(prior['equipment_resources']);field=e.get('creature_field')
-    if not field or e.get('creature_fish'):raise ValueError('Fish world readers require installed field frames, once')
+    if e.get('creature_fish'):return install_world(base,prior,blob,output)
+    if not field:raise ValueError('Fish world readers require installed field frames')
     source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
         (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
     files=by_vrom(base);p=field['packet'];at=p['blob_offset'];packet=bytearray(blob[at:at+SIZE])
@@ -213,3 +220,83 @@ def install(base,prior,blob,output):
             'pocket icons','collection/profile persistence','ordinary gameplay'],
         sources={p:sha256((ROOT/p).read_bytes()) for p in SOURCES})
     return e,changes
+
+
+def install_world(base,prior,blob,output):
+    """Continue the same category with real patrol alternatives and spawn code.
+
+    Calendars/selection are installed together with the terrain consumers. The
+    manager and saved season binding remain explicit pending work, not enabled
+    fish. The mode word is zero until the private composer can resolve choices.
+    """
+    from v3_furniture_pipeline import Source
+    from v3_console_disk_install import reservations
+    from v3_creature_spawns import calendars
+    from aflib import verified_rom
+    e=copy.deepcopy(prior['equipment_resources']);fish=e['creature_fish']
+    if fish.get('world'):raise ValueError('Fish world category is already installed')
+    if any(a<WORLD_RAM+WORLD_SIZE and WORLD_RAM<b for a,b in reservations(prior)):
+        raise ValueError('Fish world packet overlaps a retained allocation')
+    if WORLD_RAM+WORLD_SIZE>0x807DA800:raise ValueError('Fish world exceeds Expansion Pak reservation')
+    source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+        (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    original=verified_rom((ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes())
+    data,calendar=calendars(source,original)
+    code,compiled=compile_part('creature_world',output/'creature_world',
+        primary_source='overlays/v3/creature_patrol.c',extra_sources=(
+            'overlays/v3/creature_water.c','overlays/v3/creature_spawns.c','overlays/v3/creature_patrol.S'))
+    if len(code)>WORLD_TABLE or WORLD_TABLE+len(data)>WORLD_SIZE-16:
+        raise ValueError('Complete world code/calendar exceeds packet bounds')
+    packet=bytearray(WORLD_SIZE);packet[:len(code)]=code
+    packet[WORLD_TABLE:WORLD_TABLE+len(data)]=data;packet[-16:]=struct.pack('>4I',*([0xAF465748]*4))
+    old=next(o for o in fish['owners'] if o['name']=='sea')
+    files=by_vrom(base);owner=files[old['vrom']].extract(base);reloc=files[old['reloc']].extract(base)
+    if sha256(owner)!=old['sha256'] or sha256(reloc)!=old['reloc_sha256']:
+        raise ValueError('Changed complete installed coastal behaviour owner')
+    sections=struct.unpack_from('>4I',reloc)
+    _,absolute,records,locations,_=native_references(owner,reloc,expected_sections=sections)
+    updated=bytearray(owner);patches=[];removed=set()
+    bindings=((0x80A9AE9C,0x80A9A9A4,'swim_init'),(0x80A9AEA0,0x80A9AC0C,'wait_init'),
+              (0x80A9AEA4,0x80A9AC88,'escape_init'),(0x80A9AEB8,0x80A99F58,'swim'),
+              (0x80A9AEBC,0x80A99E6C,'wait'),(0x80A9AEC0,0x80A9A910,'escape'))
+    for address,before,name in bindings:
+        at=address-old['ram'];after=compiled['symbols']['af_v3_patrol_'+name]
+        if u32(updated,at)!=before or absolute.get(at)!=before:
+            raise ValueError('Changed full coastal patrol callback table')
+        struct.pack_into('>I',updated,at,after);removed.add(locations[at])
+        patches.append(dict(address=address,before=before,after=after))
+    keep=[r for r in records if r not in removed]
+    fixed=(struct.pack('>5I',*sections,len(keep))+struct.pack('>'+str(len(keep))+'I',*keep)
+           +bytes(len(reloc)-24-4*len(keep))+struct.pack('>I',len(reloc)))
+    native_references(updated,fixed,expected_sections=sections)
+    receipt=dict(name='sea',vrom=old['vrom'],reloc=old['reloc'],ram=old['ram'],sections=list(sections),
+        original_sha256=sha256(owner),original_reloc_sha256=sha256(reloc),
+        sha256=sha256(updated),reloc_sha256=sha256(fixed),patches=patches,removed_relocations=sorted(removed))
+    # Keep the complete original functions: the N64 alternative calls these
+    # through the actor's actual relocated program buffer.
+    old.update(sha256=sha256(updated),reloc_sha256=sha256(fixed))
+    old['patches'].extend(patches);old['removed_relocations']=sorted(set(old['removed_relocations'])|removed)
+    mode=compiled['symbols']['af_v3_fish_patrol_mode']
+    if u32(packet,mode-WORLD_RAM)!=0:raise ValueError('Unapproved source patrol mode default')
+    names=('aGKK_swim','aGKK_swim2','aGKK_swim3','aGKK_swim4','aGKK_wait','aGKK_escape',
+           'aGKK_swim_init','aGKK_swim2_init','aGKK_swim3_init','aGKK_swim4_init',
+           'aGKK_wait_init','aGKK_escape_init','aGKK_check_wall','aGKK_check_offing',
+           'aGKK_check_uki','mCoBG_CheckSandUt_ForFish','Actor_position_move','chase_angle')
+    callbacks=[]
+    for name in names:
+        found=[at for at,rows in source.functions.items() if any(n==name for n,_ in rows)]
+        if len(found)!=1:raise ValueError('Missing full world source consumer: '+name)
+        callbacks.append(source.function(found[0])[1])
+    blob.extend(bytes(-len(blob)%16));offset=len(blob);blob.extend(packet)
+    fish['world']=dict(format='AFV3-FISH-WORLD-1',compiled=compiled,calendar=calendar,
+        calendar_ram=WORLD_RAM+WORLD_TABLE,source_functions=callbacks,owners=[receipt],
+        packet=dict(ram=WORLD_RAM,bytes=WORLD_SIZE,blob_offset=offset,vrom=BLOB+offset,
+            sha256=sha256(packet),crc32=zlib.crc32(packet)),
+        patrol_mode=dict(ram=mode,value=0,values={'N64':0,'GameCube':1},scope='imported coastal fish',
+            browser_selection_installed=False),patrol_callbacks_installed=True,spawn_manager_installed=False,
+        native_execution_tested=False,hardware_tested=False)
+    fish.update(sources={p:sha256((ROOT/p).read_bytes()) for p in WORLD_SOURCES},
+        additional_resident_bytes=WORLD_SIZE,
+        pending=['spawn manager and saved seasons','behaviour-choice composition','pocket icons',
+                 'collection/profile persistence','ordinary gameplay'])
+    return e,{old['vrom']:bytes(updated),old['reloc']:fixed}

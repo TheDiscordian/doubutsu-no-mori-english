@@ -1205,7 +1205,8 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             resource_allocations_changed=True)
     if creature_fish:
         report['shared_runtime_refresh'].update(adapters=['creature_fish'],artwork_changed=False,
-            additional_resident_bytes=0,additional_scene_bytes=0,resource_allocations_changed=False)
+            additional_resident_bytes=equipment_report['creature_fish']['additional_resident_bytes'],
+            additional_scene_bytes=0,resource_allocations_changed=bool(equipment_report['creature_fish'].get('world')))
         report['sources'].update(equipment_report['creature_fish']['sources'])
     if console_images is not None:
         images=equipment_report['console_images']

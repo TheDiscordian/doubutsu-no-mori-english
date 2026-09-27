@@ -27,10 +27,28 @@ path as explicit WebUI choices, following the
 Implement the actual alternatives and bind selections to the build receipt;
 the controls and runtime selection remain pending, not completed by this policy.
 
-Current task: finish remaining genuine importing categories and representation
-mappings, using the shared converter and the current ABI-296 proposal:
-`build/v3-creature-fish-runtime-02/build-lock.json`.
-ROM SHA-256: `58e5af9f8c96ab9e8db1dbdd15f9cbf41239aa912bd584c12c18a3a95fe27183`.
+Current implementation task: complete all nine added fish through the connected
+fish-importing path, reusing shared seventeen-creature infrastructure. This means
+source season/time/water spawning, working field behaviour with the required
+N64/GameCube choice, catching, pocket identity/icon, placing/picking up, releasing,
+collection and saved-profile readers, and optional per-species composition.
+Required species-specific behaviour is included. Native constructor execution
+has an unresolved timeout; retain it as unresolved, not a successful test.
+The fish task stays active across intermediate code changes, build locks, and
+commits. Batch connected verification, rather than creating another independent
+table/reader deliverable. Insects and the other importing categories remain
+required work, not removed scope.
+
+Use the shared converter and the current ABI-297 proposal:
+`build/v3-creature-world-work-01/runtime/build-lock.json`.
+ROM SHA-256: `e27a841921b7f2d6e124aa8d49d8f0977f7f4aed725fac35cdb0f25ea380ef7b`.
+The next consumer is the native fish-spawn manager at VROM `8253C0`, RAM
+`8092DBC0`, whose entry is `8092ECAC`. Connect it to the installed calendar,
+season, selection, and terrain functions, with persisted term/transition state
+and the explicit behaviour choice. The native manager has twenty-row monthly
+lists, not the donor's forty-row half-month lists; do not append to its old
+buffers. Reuse the new bounded plan. Keep the constructor timeout unresolved
+while completing this same task; do not restart the exhausted native fixture.
 The dresser cancellation correction is installed in V2 and V3; empty import
 selection returns stable V2-14. Continue the importing work without replaying
 unchanged dresser or museum checks.
@@ -71,9 +89,15 @@ Next importing work:
   river size readers, supplies source coastal approach/nibble/bite effects and
   geometry, and separates rubbish from imported IDs at release creation.
   Reuse it and its origin marker instead of another parameter-table stage.
-  Finish the source coastal patrol/shoreline path with its substantial behaviour
-  choice, the new insect behaviour programs, and shared season/time/environment
-  spawn readers. Then connect pocket icons and collection/profile persistence.
+  The source coastal patrol/shoreline alternative and original-behaviour
+  callbacks are installed in one shared world packet. Its mode remains N64;
+  browser choice resolution is pending. Complete donor calendars and the shared
+  season/selection/placement code are installed, but the spawn-manager and saved
+  season connections are not. Three focused current checks pass for the complete
+  calendars, sanitized patrol/terrain/selection, installed hooks, preservation,
+  and optional composition; native world execution is unverified. Continue
+  those connections, pocket icons, collection/profile persistence, and the new
+  insect behaviour programs. Do not reconvert frames or create per-fish tools.
   The common converter already retains all 17 displays, 96 joints, full motion
   arrays, and complete source sound callbacks in
   `build/v3-creature-profiles-prepared-01/`. All seventeen complete room profiles,

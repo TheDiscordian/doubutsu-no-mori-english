@@ -80,7 +80,9 @@ class FishTests(unittest.TestCase):
             categories=['creature-profile-assets'],profile=p['source']['profile']) for p in parents['profiles']])
         pending=rig_import_plan(inventory,prior,{},selected=['1C48'],category='creature-profile-assets',source=source)
         self.assertTrue(pending['creature_fish']);self.assertNotIn('creature_field',pending)
-        self.assertNotIn('creature_fish',rig_import_plan(inventory,report,{},category='creature-profile-assets',source=source))
+        # This reader-only historical stage still needs the connected world
+        # implementation; its tables are not completion of the fish category.
+        self.assertTrue(rig_import_plan(inventory,report,{},category='creature-profile-assets',source=source)['creature_fish'])
         import v3_optional_composition as composer
         old_config=composer.BASE,composer.BASE_SHA,composer.REPORT_SHA,composer.ABI
         try:
