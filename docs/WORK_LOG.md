@@ -1,5 +1,26 @@
 # Work record
 
+## 2026-09-27: complete shared BIOS special-instruction services
+
+- Implemented all five donor WDM services, including actual stacked save
+  descriptors, return/stack handling, side selection, wait/status behaviour,
+  fast boot, and private BIOS reset patches. Source BIOS errors and unsafe
+  input have distinct handling; malformed requests do not alter disk/CPU state.
+- Disassembled the checked donor executable to resolve its unusual boot loop:
+  it copies 260 bytes from `800D6671`, not merely the declared eleven-byte table.
+  The ordinary converter extracts and checks the complete span, while preserving
+  the complete archived BIOS and all nineteen game images.
+- Preparation `build/v3-console-games-prepared-08/` contains 4,815 MIPS bytes,
+  with a 192-byte maximum stack chain and no mutable globals/unresolved calls.
+  Two focused tests pass across targeted runs, including 11,473 sanitized
+  donor/WDM/bounds checks. Corrected one C++ test literal-spacing compile error;
+  no old native scenario or gameplay test is replayed.
+- Native instruction dispatch, disk memory/reset mapping, graphics/interrupt
+  consumers, expansion sound, and lifecycle remain required. The core exceeds
+  the small resident room-code gap, so native installation needs a checked full
+  allocation. The native startup stall remains unresolved. ABI 281, existing
+  saves, the main V3 lock, and both V2-13 deployments are unchanged.
+
 ## 2026-09-27: shared QD disk services and complete donor BIOS
 
 - Added bounded boot/save services, disk register and interrupt state, and

@@ -12,11 +12,11 @@ python3 tools/v3_furniture_pipeline.py convert --representation console \
   --output build/v3-console-games-prepared-next
 ```
 
-The current preparation is `build/v3-console-games-prepared-07/`.
-Its zero-linked MIPS disk service is 3,659 bytes, SHA-256
-`d72cfab92348d6265c996bf986b20b3509541182be1db76ab9babd98c328e385`.
+The current preparation is `build/v3-console-games-prepared-08/`.
+Its zero-linked MIPS disk service is 4,815 bytes, SHA-256
+`08a312925a3bff870eeb20066d0147f4aa5c402c97ccdc6e6aecc8779c62d8e3`.
 It uses no mutable globals or unresolved library calls. The largest stack chain
-is bind plus validation: 112 bytes. `console_disk/disk.json` records complete
+is WDM plus save plus validation: 192 bytes. `console_disk/disk.json` records complete
 source and compiled identities. The nineteen-game bundle, compact metadata,
 and compressed image pool are identical to the retained complete preparation.
 
@@ -34,9 +34,19 @@ receipt includes the BIOS vectors and the donor's private reset modifications.
 `noise.bin.szs` supplies the complete 8,192-byte disk BIOS at decoded offset zero.
 Its SHA-256 is `eef78986e952e1b3bdac95d9a627768632e75853f538d2fb17bb31b6c6ebce38`;
 NMI/reset/IRQ vectors are `E18B`, `EE24`, and `E1C7`. The converter writes the
-unmodified region to ignored `console_disk/bios.bin`. The eventual native reset
-must copy it privately before applying the donor's `EBD=42` and `1A0` changes.
+unmodified region to ignored `console_disk/bios.bin`. Binding requires a private
+writable copy; service reset applies the donor's `EBD=42` and `1A0` changes.
+The native adapter must provide that copy and its actual lifetime.
 No additional game or BIOS download is required.
+
+The fast-boot initialization span is the complete 260 bytes at donor executable
+address `800D6671`, SHA-256
+`05177da7b020892c9a592d39a9d67562661ece6958a79c71bedf0cf26e3f558b`.
+The converter writes it to ignored `console_disk/boot-state.bin`. Actual checked
+instructions at `8003C4B4..8003C4CC` copy this span to work RAM `00FA..01FD`.
+The eleven-byte `ksNesInitQDDataTbl` declaration does not describe the whole read:
+the loop starts at symbol+1 and advances 260 times. Preserve the checked span,
+not just the declaration or a guessed replacement initialization table.
 
 The actual complete Clu Clu Land D side is 65,536 bytes with four files:
 copyright/nametable data, 32-KiB programme data, 8-KiB character data, and 84 bytes
@@ -51,7 +61,9 @@ header, substitute another release, or reduce the saved game to a score label.
 
 - Binding validates one to four complete sides and disjoint context, work,
   programme, character, BIOS, and image buffers. Required work/programme/character
-  sizes are 2,048/32,768/8,192 bytes. The BIOS is another 8,192-byte input.
+  sizes are 2,048/32,768/8,192 bytes. The private BIOS and immutable boot state
+  require another 8,192 and 260 bytes, all disjoint. Reset restores BIOS opcode
+  `42` and selects the donor's normal or `koro` disk-specific BIOS mask.
 - Boot follows the first side's actual file count and boot-file ID, retains
   protected-load refusal, clears the source work range, and loads complete
   eligible files. It marks character conversion pending; the native renderer
@@ -74,6 +86,27 @@ header, substitute another release, or reduce the saved game to a score label.
 - Frame updates retain the donor's button-gated readiness counter and motor
   countdown. They do not replace native frame timing or synthesize disk sound.
 
+`af_v3_qd_wdm` supplies all five source BIOS special-instruction services. Its
+`AFQCpu` view contains the fetched-next PC, accumulator, stack pointer, internal
+zero-result value, and cycle counter. Unmentioned registers/flags remain owned
+by the native interpreter and unchanged. The adapter must call this only for
+the disk CPU, after the two-byte WDM instruction fetch:
+
+| PC | Source operation |
+| --- | --- |
+| `E7A6` | Retain the low three cycle bits and rewind PC by two to wait. |
+| `E408` | Store accumulator in work byte 1, match an eight-byte disk identity, and select the complete side. |
+| `EEBF` | Skip accumulator `6x`; otherwise perform fast boot, change the private BIOS opcode to `A9`, and set the internal zero result. Success sets both drive-status bytes, clears work `0000..00F9`, copies the full initialization span, and rewinds PC by `24`. Accumulator is unchanged. |
+| `EEF6` | Update disk status unless the controller's top nibble is six; load accumulator from work `90` without changing flags. |
+| `E23B` | Consume the stacked return and both descriptor pointers, perform the complete fast save, and update accumulator/zero result. Success pops two stack bytes and returns to the saved address plus five. Accumulator `FF` only writes the slot sentinel. |
+
+The stacked descriptor read follows the donor's linear work-RAM fetch; the
+resulting stack pointer wraps to eight bits. Source BIOS errors are written to
+CPU result registers without pretending that a save succeeded. Unsafe input
+returns a negative API result before changing the CPU or disk; temporary slot
+writes are restored on malformed requests. Character conversion still requires
+the native consumer of `chr_dirty` after fast boot.
+
 Invalid/truncated blocks, cross-buffer boot writes, overlong save requests,
 unmapped/aliased CPU views, invalid side/slot values, and disk-head underflow or
 overflow reject before the affected operation mutates output. Unsafe source
@@ -89,16 +122,18 @@ the complete supplied disk and compares full output buffers and disk sides.
 It covers boot, score-file saving, a programme-bank boundary, a second-side
 identity, protected/locked states, and non-mutating malformed-input rejection.
 Register/timing checks cover all control-byte values, transfer and timer
-interrupts, acknowledgement, readiness, and motor state. There are 2,935 checks.
-The register cases are expectations derived from the checked donor assembly,
-not execution of that PowerPC assembly or proof of native N64 operation.
+interrupts, acknowledgement, readiness, and motor state. BIOS checks cover all
+five services, complete boot output, reset patches, no-op/error paths, descriptor
+bank boundaries, stack wrap, and malformed-request/alias rejection. There are
+11,473 checks. Register and WDM expectations derive from the checked donor
+assembly, not execution of that PowerPC assembly or proof of native N64 operation.
 
-The prepared-resource check verifies MIPS/source receipts, complete BIOS
+The prepared-resource check verifies MIPS/source receipts, complete BIOS/boot-state
 identity/vectors, unchanged nineteen-game resources, and explicit non-installation.
 No historical ROM or unchanged native scenario is replayed for this preparation.
 
 Remaining implementation is required: native disk memory/reset mapping, the
-BIOS special-instruction bridge, CPU/PPU read/write and interrupt bindings,
+WDM dispatch/register bridge, CPU/PPU read/write and interrupt bindings,
 character conversion, expansion sound and motor synchronization, complete
 save/frame/reset/return integration, and enabling the actual source furniture
 only when those dependencies work. Reuse partial native disk-register machinery

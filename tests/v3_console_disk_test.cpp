@@ -26,7 +26,7 @@ struct ksNesStateObj {
 static AFQDisk q;
 static ksNesStateObj sp;
 static ksNesCommonWorkObj wp;
-static u8 original[65536],disk[2*65536],donor_disk[2*65536],bios[8192];
+static u8 original[65536],disk[2*65536],donor_disk[2*65536],bios[8192],original_bios[8192],boot_state[AF_QD_BOOT_STATE];
 static u8 work[2048],prg[32768],chr[8192],donor_prg[32768],donor_chr[8192];
 static void ksNesConvertChrToI8(ksNesCommonWorkObj *,const u8 *data,u32 tile) {
     CHECK(tile==conversions && data==donor_chr+tile*16);conversions++;
@@ -44,7 +44,8 @@ static void setup(unsigned sides=1) {
     std::memset(&sp,0,sizeof(sp));std::memset(work,0xA5,sizeof(work));std::memset(prg,0x5A,sizeof(prg));
     std::memset(chr,0xC3,sizeof(chr));std::memcpy(sp.wram,work,sizeof(work));
     std::memcpy(donor_prg,prg,sizeof(prg));std::memcpy(donor_chr,chr,sizeof(chr));
-    CHECK(!af_v3_qd_bind(&q,disk,sides*65536,work,prg,chr,bios));
+    std::memcpy(bios,original_bios,sizeof(bios));
+    CHECK(!af_v3_qd_bind(&q,disk,sides*65536,work,prg,chr,bios,boot_state));
     sp.nesromp=donor_disk;sp.chrramp=donor_chr;sp.bbramp=donor_prg;sp.fds_disk_count=(u8)sides;
     /* Donor pointer tables use address-biased native views. Construct their
      * numeric biases without C pointer subtraction outside an object. */
@@ -64,8 +65,95 @@ static void compare_save(unsigned side,unsigned slot,u32 source,u32 size) {
     CHECK(af_v3_qd_save(&q,request)==ksNesQDFastSave(&wp,&sp));
     CHECK(!std::memcmp(disk,donor_disk,q.disk_bytes));CHECK(q.changed==sp.qd_irq_acknowledged_flag);
 }
+static void save_call(AFQCpu *cpu,u32 ret=0x7FFD) {
+    /* Descriptor pointers straddle a CPU bank; payload itself remains the
+     * actual score file. Neither the request nor return address is fabricated
+     * by the service being tested. */
+    le(work+0x101+cpu->stack,ret);
+    le(prg+ret+1-0x6000,0x8200);le(prg+ret+3-0x6000,0x8400);
+    std::memcpy(prg+0x2200,disk+15,10);
+    std::memcpy(prg+0x2400,original+0xA15D+2,14);
+    le(prg+0x2400+14,0x750);prg[0x2400+16]=0;
+    for(unsigned i=0;i<84;i++)work[0x750+i]=(u8)(i*9+7);
+}
+static void wdm_checks(void) {
+    setup();
+    for(unsigned i=0;i<sizeof(bios);i++)
+        CHECK(bios[i]==(i==0xEBD?0x42:i==0x1A0?0x7F:original_bios[i]));
+    AFQCpu cpu={0xE7A6,0x22,0xFD,0x8080,0xFFFF1235},before=cpu;
+    CHECK(!af_v3_qd_wdm(&q,&cpu,0));CHECK(cpu.pc==0xE7A4 && cpu.cycles==5);
+    CHECK(cpu.a==before.a && cpu.stack==before.stack && cpu.zero==before.zero);
+    cpu.pc=0xEEBF;cpu.a=0x61;before=cpu;AFQDisk disk_before=q;
+    CHECK(!af_v3_qd_wdm(&q,&cpu,0));CHECK(!std::memcmp(&cpu,&before,sizeof(cpu)));
+    CHECK(!std::memcmp(&q,&disk_before,sizeof(q)));
+    cpu.a=0x40;
+    CHECK(!af_v3_qd_wdm(&q,&cpu,0));CHECK(cpu.pc==0xEE9B && !cpu.zero && cpu.a==0x40);
+    CHECK(cpu.stack==0xFD && cpu.cycles==5 && q.chr_dirty);
+    CHECK(q.drive[2]==0x46 && q.disk_status==0x46 && bios[0xEBD]==0xA9);
+    for(unsigned i=0;i<0xFA;i++)CHECK(!work[i]);
+    CHECK(!std::memcmp(work+0xFA,boot_state,sizeof(boot_state)));
+    CHECK(work[0x1FE]==0xA5 && work[0x1FF]==0xA5);
+    CHECK(!std::memcmp(prg,original+0x146,sizeof(prg)));
+    CHECK(!std::memcmp(chr,original+0x815B,sizeof(chr)));
+    CHECK(!std::memcmp(work+0x750,original+0xA170,84));
+    af_v3_qd_reset(&q);CHECK(bios[0xEBD]==0x42 && q.disk_status==0x47);
+    std::memcpy(disk+16,"koro",4);af_v3_qd_reset(&q);CHECK(bios[0x1A0]==0xFF);
+    for(unsigned failure=0;failure<3;failure++) {
+        setup();cpu={0xEEBF,0x40,0xFD,0x88,0x99};before=cpu;
+        if(failure==0)disk[21]=1;
+        if(failure==1)q.frame_flags=0x400;
+        if(failure==2)le(disk+0x8148+11,1);
+        CHECK(af_v3_qd_wdm(&q,&cpu,0)==(failure==2?AF_QD_BAD_DATA:0));
+        CHECK(cpu.pc==before.pc && cpu.a==before.a && cpu.stack==before.stack && cpu.cycles==before.cycles);
+        CHECK(cpu.zero==(failure==0?0x5C:failure==1?0xFF:before.zero));
+        CHECK(bios[0xEBD]==(failure==2?0x42:0xA9) && !q.chr_dirty);
+        CHECK(!std::memcmp(prg,donor_prg,sizeof(prg)) && !std::memcmp(chr,donor_chr,sizeof(chr)));
+    }
+    setup(2);disk[65536+16]^=1;cpu={0xE408,0x60,0xFD,0xFFFF,0xFFFF1234};
+    work[0]=0x20;std::memcpy(prg+0x21,disk+65536+16,8);before=cpu;
+    CHECK(!af_v3_qd_wdm(&q,&cpu,0));CHECK(q.head==65536 && work[1]==0x60);
+    CHECK(!std::memcmp(&cpu,&before,sizeof(cpu)));
+    q.head=123;std::memset(prg+0x21,255,4);
+    CHECK(!af_v3_qd_wdm(&q,&cpu,0) && q.head==123);
+    std::memset(prg+0x21,0,8);
+    CHECK(!af_v3_qd_wdm(&q,&cpu,0) && q.head==123);
+    cpu.a=255;work[0]=255;work[1]=0x55;disk_before=q;before=cpu;
+    CHECK(af_v3_qd_wdm(&q,&cpu,0)==AF_QD_BAD_DATA && work[1]==0x55);
+    CHECK(!std::memcmp(&q,&disk_before,sizeof(q)) && !std::memcmp(&cpu,&before,sizeof(cpu)));
+    setup();cpu={0xEEF6,0x22,0xFD,0x8080,0x1234};work[0x90]=0x55;
+    CHECK(!af_v3_qd_wdm(&q,&cpu,0x60000000));CHECK(cpu.a==0x55 && q.disk_status==0x47);
+    CHECK(cpu.zero==0x8080 && cpu.cycles==0x1234 && cpu.pc==0xEEF6 && cpu.stack==0xFD);
+    CHECK(!af_v3_qd_wdm(&q,&cpu,0));CHECK(q.disk_status==0x46);
+    setup();cpu={0xE23B,3,0xFD,0x1234,0xF001};save_call(&cpu);
+    CHECK(!af_v3_qd_wdm(&q,&cpu,0));CHECK(cpu.pc==0x8002 && cpu.stack==255 && !cpu.zero && !cpu.a);
+    CHECK(cpu.cycles==0xF001 && q.changed && disk[0x3B]==4);
+    CHECK(!std::memcmp(disk+0xA170,work+0x750,84));
+    for(unsigned path=0;path<4;path++) {
+        setup();cpu={0xE23B,3,255,0x1234,0xF001};save_call(&cpu);before=cpu;
+        if(path==0) {cpu.a=255;before=cpu;}
+        if(path==1)q.fast_locked=1;
+        if(path==2)prg[0x2200]^=1;
+        if(path==3)le(prg+0x7FFE - 0x6000,65532);
+        u8 old=work[14];
+        CHECK(af_v3_qd_wdm(&q,&cpu,0)==(path==3?AF_QD_BAD_DATA:0));
+        CHECK(cpu.pc==before.pc && cpu.stack==before.stack && cpu.cycles==before.cycles);
+        CHECK(cpu.a==(path==1 || path==2?255:before.a));
+        CHECK(cpu.zero==(path==1 || path==2?255:before.zero));
+        CHECK(!q.changed && !std::memcmp(disk,donor_disk,65536));
+        CHECK(work[14]==(path==3?old:before.a));
+    }
+    setup();cpu={0xE23B,3,255,0,0};save_call(&cpu);
+    CHECK(!af_v3_qd_wdm(&q,&cpu,0) && cpu.stack==1 && cpu.pc==0x8002);
+    setup();cpu={0x1234,0,0,1,0};before=cpu;disk_before=q;
+    CHECK(!af_v3_qd_wdm(&q,&cpu,0));CHECK(!std::memcmp(&cpu,&before,sizeof(cpu)));
+    CHECK(!std::memcmp(&q,&disk_before,sizeof(q)));
+    CHECK(af_v3_qd_wdm(&q,(AFQCpu *)work,0)==AF_QD_BAD_STATE);
+    disk_before=q;CHECK(af_v3_qd_bind(&q,disk,65536,work,prg,chr,bios,bios)<0);
+    CHECK(!std::memcmp(&q,&disk_before,sizeof(q)));
+}
 int main(int argc,char **argv) {
-    CHECK(argc==3);load(argv[1],original,sizeof(original));load(argv[2],bios,sizeof(bios));
+    CHECK(argc==4);load(argv[1],original,sizeof(original));load(argv[2],original_bios,sizeof(original_bios));
+    load(argv[3],boot_state,sizeof(boot_state));
     setup();compare_boot();CHECK(conversions==512 && q.chr_dirty);
     for(unsigned i=0;i<84;i++)work[0x750+i]=sp.wram[0x750+i]=(u8)(i*7+3);
     compare_save(0,3,0x750,84);
@@ -92,7 +180,7 @@ int main(int argc,char **argv) {
         CHECK(!std::memcmp(prg,donor_prg,sizeof(prg)));CHECK(!std::memcmp(chr,donor_chr,sizeof(chr)));
     }
     setup();AFQDisk before=q;
-    CHECK(af_v3_qd_bind(&q,disk,65536,work,prg,prg,bios)<0);CHECK(!std::memcmp(&q,&before,sizeof(q)));
+    CHECK(af_v3_qd_bind(&q,disk,65536,work,prg,prg,bios,boot_state)<0);CHECK(!std::memcmp(&q,&before,sizeof(q)));
     for(unsigned bad=0;bad<5;bad++) {
         setup();u8 request[27]={};std::memcpy(request,disk+15,10);
         std::memcpy(request+10,original+0xA15D+2,14);le(request+21,84);le(request+24,0x750);work[14]=3;
@@ -138,5 +226,6 @@ int main(int argc,char **argv) {
     q.control|=2;af_v3_qd_frame(&q,0);CHECK(q.motor==88);
     before=q;CHECK(af_v3_qd_write(&q,0x4025,0,INT_MAX)==AF_QD_BAD_STATE);
     CHECK(!std::memcmp(&q,&before,sizeof(q)));
-    std::printf("%u QD checks: complete donor boot/save comparisons, disk registers/timing, malformed bounds; no native execution\n",checks);
+    wdm_checks();
+    std::printf("%u QD checks: donor boot/save comparisons, BIOS WDM services/reset, disk registers/timing, malformed bounds; no native execution\n",checks);
 }

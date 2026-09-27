@@ -10,6 +10,9 @@ ARCHIVE_SHA='3ac09f56fcd3d6cb0c3cad65a9343b951573d5713a6c88515b2afe12b662e9cf'
 NOISE_SHA='e1364feb3964247056c6e507393b2860b5834bc46ac48ceb15e954278037cc6a'
 DECODED_SHA='11d338e00df0a4dfa2487180be74a07b1d126bbfef941969b6764141599af97b'
 BIOS_SHA='eef78986e952e1b3bdac95d9a627768632e75853f538d2fb17bb31b6c6ebce38'
+BOOT_STATE_ADDRESS=0x800D6671
+BOOT_STATE_BYTES=260
+BOOT_STATE_SHA='05177da7b020892c9a592d39a9d67562661ece6958a79c71bedf0cf26e3f558b'
 FUNCTIONS=(
     ('fast_load',0x80039DEC,0x1B0,'5c3368ed8f572d7bf54d1b4b024e01279df96e90ad47913d0dfaf8f8e538ac59'),
     ('fast_save',0x80039F9C,0x1A0,'312f6eade5dc8c1ff46f6e3102e10fc207c63810f11d7dee8f24f273314c4ad2'),
@@ -31,7 +34,12 @@ def donor_resources(dol,archive):
     decoded=yaz0_decode(packed);bios=decoded[:8192]
     if len(decoded)!=0x7F000 or sha256(decoded)!=DECODED_SHA or sha256(bios)!=BIOS_SHA:
         raise ValueError('Changed complete decoded noise/BIOS resource')
+    if sha256(dol.read(BOOT_STATE_ADDRESS,BOOT_STATE_BYTES))!=BOOT_STATE_SHA:
+        raise ValueError('Changed complete BIOS fast-boot initialization span')
     return dict(donor='GAFE01-r0',source_dol_sha256=DOL_SHA,source_archive_sha256=ARCHIVE_SHA,
+        boot_state=dict(address=BOOT_STATE_ADDRESS,bytes=BOOT_STATE_BYTES,sha256=BOOT_STATE_SHA,
+            destination=0xFA,instruction_range=[0x8003C4B4,0x8003C4D0],
+            note='Actual loop reads 260 bytes from symbol+1, beyond its eleven-byte declaration'),
         functions=[dict(name=n,address=a,bytes=s,sha256=h) for n,a,s,h in FUNCTIONS],
         bios=dict(path='noise.bin.szs',source_bytes=len(packed),source_sha256=NOISE_SHA,
             decoded_bytes=len(decoded),decoded_sha256=DECODED_SHA,offset=0,bytes=len(bios),sha256=BIOS_SHA,
@@ -44,13 +52,15 @@ def prepare(dol,archive,output):
     source,bios=donor_resources(dol,archive)
     code,compiled=compile_part('console_disk',output/'console_disk')
     write_new(output/'console_disk/bios.bin',bios)
+    write_new(output/'console_disk/boot-state.bin',dol.read(BOOT_STATE_ADDRESS,BOOT_STATE_BYTES))
     report=dict(format='AFV3-CONSOLE-DISK-1',source=source,compiled=compiled,
         bytes=len(code),sha256=sha256(code),linked_ram=0,
         memory=dict(side_bytes=65536,maximum_sides=4,work_bytes=2048,program_bytes=32768,
-            character_bytes=8192,bios_bytes=8192),
+            character_bytes=8192,bios_bytes=8192,boot_state_bytes=BOOT_STATE_BYTES),
         prepared=['complete donor BIOS','bounded boot loading','bounded BIOS save requests',
+            'complete fast-boot initialization span','private BIOS reset patches','five BIOS WDM services',
             'disk register reads/writes','source scanline IRQ state','source frame/ready/motor state'],
-        pending=['native disk-state allocation and reset mapping','BIOS WDM instruction bridge',
+        pending=['native disk-state allocation and reset mapping','native WDM dispatch/register bridge',
             'CPU/PPU register and scanline bindings','character conversion','expansion sound and motor synchronization',
             'native startup and normal room return'],
         native_hooks_installed=False,choice_eligible=False,

@@ -31,12 +31,14 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
-The shared console converter prepares the complete disk BIOS and 3,659-byte
-QD service core at `build/v3-console-games-prepared-07/`. Boot/save operations,
-disk registers, interrupt state, and readiness/motor updates are converted.
-Two focused checks pass, including 2,935 sanitized donor/boundary assertions
-and preservation of all nineteen existing game resources. Native CPU/PPU/sound
-and BIOS instruction bindings remain unfinished; no disk profile is enabled.
+The shared console converter prepares the complete disk BIOS, full 260-byte
+fast-boot initialization span, and 4,815-byte QD service core at
+`build/v3-console-games-prepared-08/`. All five BIOS special-instruction services,
+private BIOS reset patches, boot/save operations, disk registers, interrupt state,
+and readiness/motor updates are converted. Two focused checks pass, including
+11,473 sanitized donor/boundary assertions and preservation of all nineteen game
+resources. Native CPU/PPU/sound and instruction-dispatch bindings remain
+unfinished; no disk profile is enabled.
 See the [disk-service specification](../specs/V3_CONSOLE_DISK.md).
 
 The current proposal is ABI 281 at

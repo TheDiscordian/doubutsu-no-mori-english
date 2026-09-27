@@ -16,6 +16,7 @@ static int separate(const void *a,u32 an,const void *b,u32 bn) {
 }
 static int valid(const AFQDisk *q) {
     return q && q->magic==MAGIC && q->disk && q->work && q->program && q->characters &&
+        q->bios && q->boot_state &&
         q->disk_bytes && q->disk_bytes<=4*AF_QD_SIDE && !(q->disk_bytes&(AF_QD_SIDE-1));
 }
 static int block(const u8 *disk,u32 at) {
@@ -39,20 +40,24 @@ void af_v3_qd_reset(AFQDisk *q) {
     if(!valid(q))return;
     q->timer_lo=q->timer_hi=q->timer_control=q->irq_enable=0;
     q->head=0;q->control=0x27;q->motor=0;q->ready=120;q->target=0x7FFF;
+    q->drive[2]=q->disk_status=0x47;q->drive[3]=0x80;
+    q->bios[0xEBD]=0x42;
+    q->bios[0x1A0]=same(q->disk+16,(const u8 *)"koro",4)?0xFF:0x7F;
 }
-int af_v3_qd_bind(AFQDisk *q,u8 *disk,u32 bytes,u8 *work,u8 *program,u8 *characters,const u8 *bios) {
-    const void *buffers[]={q,disk,work,program,characters,bios};
-    const u32 sizes[]={sizeof(*q),bytes,AF_QD_WORK,AF_QD_PROGRAM,AF_QD_CHARACTER,AF_QD_BIOS};
-    for(u32 i=0;i<6;i++)for(u32 j=i+1;j<6;j++)
+int af_v3_qd_bind(AFQDisk *q,u8 *disk,u32 bytes,u8 *work,u8 *program,u8 *characters,
+    u8 *bios,const u8 *boot_state) {
+    const void *buffers[]={q,disk,work,program,characters,bios,boot_state};
+    const u32 sizes[]={sizeof(*q),bytes,AF_QD_WORK,AF_QD_PROGRAM,AF_QD_CHARACTER,AF_QD_BIOS,AF_QD_BOOT_STATE};
+    for(u32 i=0;i<7;i++)for(u32 j=i+1;j<7;j++)
         if(!separate(buffers[i],sizes[i],buffers[j],sizes[j]))return AF_QD_BAD_STATE;
     if(af_v3_qd_validate(disk,bytes))return AF_QD_BAD_DATA;
     zero(q,sizeof(*q));q->magic=MAGIC;q->disk=disk;q->disk_bytes=bytes;
     q->work=work;q->program=program;q->characters=characters;
+    q->bios=bios;q->boot_state=boot_state;
     for(u32 i=0;i<8;i++) {
         q->cpu[i]=i<3?work:i==7?bios:program+(i-3)*8192;
         q->cpu_bytes[i]=i<3?AF_QD_WORK:8192;
     }
-    q->drive[2]=q->disk_status=0x47;q->drive[3]=0x80;
     af_v3_qd_reset(q);return 0;
 }
 
@@ -115,6 +120,73 @@ int af_v3_qd_save(AFQDisk *q,const u8 request[27]) {
         disk[at+19+i]=q->cpu[bank][address&(q->cpu_bytes[bank]-1)];
     }
     disk[0x3B]=(u8)(slot+1);q->changed=1;return 0;
+}
+
+static int cpu_copy(const AFQDisk *q,u32 address,u8 *out,u32 bytes) {
+    if(address>65535 || bytes>65536-address)return AF_QD_BAD_DATA;
+    for(u32 i=0;i<bytes;i++) {
+        u32 at=address+i,bank=at>>13,n=q->cpu_bytes[bank];
+        if(!n || n>8192 || (n&(n-1)) ||
+           !separate(q->cpu[bank],n,q->disk,q->disk_bytes))return AF_QD_BAD_DATA;
+        out[i]=q->cpu[bank][at&(n-1)];
+    }
+    return 0;
+}
+int af_v3_qd_wdm(AFQDisk *q,AFQCpu *cpu,u32 buttons) {
+    if(!valid(q))return AF_QD_BAD_STATE;
+    const void *buffers[]={q,q->disk,q->work,q->program,q->characters,q->bios,q->boot_state};
+    const u32 sizes[]={sizeof(*q),q->disk_bytes,AF_QD_WORK,AF_QD_PROGRAM,AF_QD_CHARACTER,AF_QD_BIOS,AF_QD_BOOT_STATE};
+    for(u32 i=0;i<7;i++)if(!separate(cpu,sizeof(*cpu),buffers[i],sizes[i]))return AF_QD_BAD_STATE;
+    switch(cpu->pc) {
+    case 0xE7A6:
+        cpu->cycles&=7;cpu->pc-=2;break;
+    case 0xE408: {
+        u8 id[8],old=q->work[1];u32 at=((u32)cpu->a<<8)|q->work[0];
+        q->work[1]=cpu->a;
+        if(cpu_copy(q,at+1,id,8)) {q->work[1]=old;return AF_QD_BAD_DATA;}
+        if(id[0]==255 && id[1]==255 && id[2]==255 && id[3]==255)break;
+        for(u32 side=0;side<q->disk_bytes;side+=AF_QD_SIDE)
+            if(same(id,q->disk+side+16,8)) {q->head=side;break;}
+        break;
+    }
+    case 0xEEBF: {
+        if((cpu->a&0xF0)==0x60)break;
+        int result=af_v3_qd_boot(q);
+        if(result==AF_QD_BAD_DATA)return result;
+        q->bios[0xEBD]=0xA9;cpu->zero=(u8)result;
+        if(!result) {
+            q->drive[2]=q->disk_status=0x46;
+            zero(q->work,0xFA);
+            /* Actual donor instructions read table+1 for 0x104 bytes, not
+             * just the declared 11-byte symbol. Preserve the checked span. */
+            copy(q->work+0xFA,q->boot_state,AF_QD_BOOT_STATE);
+            cpu->pc-=0x24;
+        }
+        break;
+    }
+    case 0xEEF6:
+        if((buttons>>28)!=6)q->disk_status=0x46;
+        cpu->a=q->work[0x90];break;
+    case 0xE23B: {
+        u8 old=q->work[14],pointers[4],request[27];
+        q->work[14]=cpu->a;
+        if(cpu->a==255)break;
+        /* Source stack fetches are linear within work RAM; the final RTS
+         * wraps S to eight bits and replaces PC with the saved return+5. */
+        u32 ret=le16(q->work+0x101+cpu->stack);
+        if(cpu_copy(q,ret+1,pointers,4) ||
+           cpu_copy(q,le16(pointers),request,10) ||
+           cpu_copy(q,le16(pointers+2),request+10,17)) {
+            q->work[14]=old;return AF_QD_BAD_DATA;
+        }
+        int result=af_v3_qd_save(q,request);
+        if(result==AF_QD_BAD_DATA) {q->work[14]=old;return result;}
+        cpu->zero=cpu->a=(u8)result;
+        if(!result) {cpu->stack+=2;cpu->pc=(unsigned short)(ret+5);}
+        break;
+    }
+    }
+    return 0;
 }
 
 int af_v3_qd_read(AFQDisk *q,u32 address,u32 pc) {

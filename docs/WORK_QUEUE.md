@@ -22,14 +22,18 @@ Incomplete gameplay stays unavailable in the selector; installing assets does
 not claim that an item is playable. Reuse unchanged passing tests throughout.
 
 Current task: complete QD execution and resolve native console startup/return.
-The shared converter prepares the complete BIOS and disk-service core at
-`build/v3-console-games-prepared-07/`. Donor C boot/save comparisons and focused
-register/timing/bounds checks pass. Next connect native disk memory/reset,
-BIOS special instructions, CPU/PPU and scanline consumers, character conversion,
+The shared converter prepares the complete BIOS, actual 260-byte initialization
+span, and disk-service core at `build/v3-console-games-prepared-08/`. All five BIOS
+WDM services and private BIOS reset patches are implemented. Donor C boot/save
+comparisons and focused WDM/register/timing/bounds checks pass. Next connect native
+disk memory/reset, WDM dispatch/register mapping, CPU/PPU and scanline consumers, character conversion,
 expansion sound/motor synchronization, and complete lifecycle/persistence.
 The service is not installed or selectable; do not treat returned action flags
 as completed renderer/audio integration. See the
 [disk specification](../specs/V3_CONSOLE_DISK.md).
+The 4,815-byte core already exceeds the spare gap between the resident room
+callback and its table. Plan a checked complete native-code allocation; do not
+overwrite room resources or silently omit disk services to fit that gap.
 Continue from ABI 281 at `build/v3-console-emulator-capacity-01/build-lock.json`,
 ROM SHA-256 `763bbcbeca77390e797039c79ee8ae83a2a7b7497b5768db81534ed0ce14a62d`.
 The checked allocator and safe shared-runtime refresh are installed; four

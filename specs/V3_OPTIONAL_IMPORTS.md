@@ -107,9 +107,10 @@ Keep source hashes and conversion revisions attached to each compiled import.
 ## Runtime work
 
 The [QD services](V3_CONSOLE_DISK.md) are prepared through the same console
-converter: complete donor BIOS, bounded boot/save operations, disk registers,
-interrupt state, and per-frame readiness/motor state. Donor C comparisons and
-focused register/bounds checks pass. Native instruction, graphics, audio, and
+converter: complete donor BIOS and fast-boot initialization data, all five BIOS
+special-instruction services, private reset patches, bounded boot/save operations,
+disk registers, interrupt state, and per-frame readiness/motor state. Donor C
+comparisons and focused WDM/register/bounds checks pass. Native dispatch, graphics, audio, and
 lifecycle integration remain required; preparation does not enable the disk item.
 
 The [console converter](V3_CONSOLE_GAMES.md) preserves nineteen complete game
