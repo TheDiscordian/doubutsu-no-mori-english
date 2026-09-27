@@ -31,6 +31,14 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
+The shared console converter prepares the complete disk BIOS and 3,659-byte
+QD service core at `build/v3-console-games-prepared-07/`. Boot/save operations,
+disk registers, interrupt state, and readiness/motor updates are converted.
+Two focused checks pass, including 2,935 sanitized donor/boundary assertions
+and preservation of all nineteen existing game resources. Native CPU/PPU/sound
+and BIOS instruction bindings remain unfinished; no disk profile is enabled.
+See the [disk-service specification](../specs/V3_CONSOLE_DISK.md).
+
 The current proposal is ABI 281 at
 `build/v3-console-emulator-capacity-01/build-lock.json`, ROM SHA-256
 `763bbcbeca77390e797039c79ee8ae83a2a7b7497b5768db81534ed0ce14a62d`.

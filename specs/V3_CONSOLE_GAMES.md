@@ -8,6 +8,10 @@ prepares the complete English donor's games and persistence recipes in one pass.
 `famicom.arc` hashes must match. Outputs remain in ignored `build/` directories.
 Preparation does not enable furniture or claim that the games run on N64.
 
+The same conversion prepares the [QD disk services](V3_CONSOLE_DISK.md) and
+complete donor BIOS. Boot/save comparisons and register/bounds checks pass;
+native CPU/PPU/sound bindings remain required before disk furniture is enabled.
+
 Archive traversal order supplies nineteen one-based game IDs. Do not sort the
 filenames or derive game identity from an English title. All eighteen iNES
 images retain their headers, full programme/character data, mirroring, battery,

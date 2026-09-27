@@ -106,6 +106,12 @@ Keep source hashes and conversion revisions attached to each compiled import.
 
 ## Runtime work
 
+The [QD services](V3_CONSOLE_DISK.md) are prepared through the same console
+converter: complete donor BIOS, bounded boot/save operations, disk registers,
+interrupt state, and per-frame readiness/motor state. Donor C comparisons and
+focused register/bounds checks pass. Native instruction, graphics, audio, and
+lifecycle integration remain required; preparation does not enable the disk item.
+
 The [console converter](V3_CONSOLE_GAMES.md) preserves nineteen complete game
 payloads, twenty launch bindings, and sixty persistence operations. Its common
 MIPS save executor retains four independent player records and passes actual

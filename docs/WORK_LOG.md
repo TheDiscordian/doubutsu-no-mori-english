@@ -1,5 +1,21 @@
 # Work record
 
+## 2026-09-27: shared QD disk services and complete donor BIOS
+
+- Added bounded boot/save services, disk register and interrupt state, and
+  frame-owned readiness/motor updates. Six complete donor instruction spans and
+  the full executable/archive/noise identities are pinned in preparation.
+- Extended the ordinary console converter to compile the 3,659-byte MIPS core
+  and extract the complete 8-KiB donor BIOS. Existing game, metadata, and pool
+  outputs are unchanged. No additional ROM/BIOS input is needed.
+- Two focused checks pass: 2,935 sanitized actual-donor boot/save and focused
+  register/bounds assertions, plus complete prepared-resource preservation.
+  Assembly-derived register expectations are not native execution evidence.
+- Native CPU/PPU/sound consumers, BIOS special instructions, and full lifecycle
+  remain required. No disk item is enabled, no cartridge is rebuilt, and no
+  unchanged native test is replayed. ABI 281 and both V2-13 deployments remain.
+  Details and next work are in `specs/V3_CONSOLE_DISK.md`.
+
 ## 2026-09-27: checked native console allocation and shared refresh
 
 - Fixed the unchecked native arena path for all console allocations, including
