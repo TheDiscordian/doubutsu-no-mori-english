@@ -34,6 +34,32 @@ this after changing shared code when no new resource category needs installation
 profile-only staging retains existing code unless it installs a newly implemented
 material lifecycle; that stage rebuilds the shared packet and callback bindings.
 
+### Combined skeleton and timed materials
+
+`material-keyframe-rig` combines the complete skeleton/motion converter with the
+typed dynamic-texture converter. Callback instruction shapes, relocations,
+repeat initializer, sound helper, and full resource tables identify the category;
+item IDs do not select the conversion. The ordinary category importer installs
+graphics, complete loop audio, and profiles before checking actual acquisition.
+The hamster cage supplies seven joints, five models, two complete texture frames,
+and a positioned loop. Nothing is replaced with an inert display model.
+
+Rig mode 8 points its first word at a 32-byte immutable parameter block; its last
+word is zero. The block contains segment/frame-count/sound/reserved bytes,
+big-endian divisor and frame-size halfwords, eight frame-offset halfwords, and
+eight zero padding bytes. Every used frame is aligned and wholly in the object;
+unused offsets and padding must be zero. Installed bindings verify the complete
+block, graphics, sound resources, and compiled dispatch feature.
+
+Construction evaluates the repeating motion once at speed `0.5`. Each native
+30-Hz update runs two source evaluations at speed `1.0`, then refreshes the
+positioned sound, including transition states as in the donor. Drawing selects
+`((graphics_frame * 2u) / 5u) % 2u`, with unsigned wrapping, independent of room
+play-frame or on/off state. Segment 8 precedes the complete skeleton draw. The
+actual actor remains the draw callback argument, and the graphics-frame parity
+selects the existing matrix buffer. Bounds reserve the extra segment command;
+no actor, saved field, or heap allocation grows.
+
 ### Switched joint motion and translucent redraws
 
 `joint-callback-rig-assets` retains its reusable complete artwork descriptor.

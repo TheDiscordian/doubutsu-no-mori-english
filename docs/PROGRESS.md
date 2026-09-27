@@ -31,6 +31,16 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
+The shared importer installs combined skeleton/timed-material behaviour for the
+hamster cage: all five models and 61 triangles, seven joints, the complete motion,
+both texture frames, and positioned loop audio. Its actual lottery availability,
+catalogue ordering, scoring, official English name, and optional profile bit are
+connected. Five focused checks pass, including 600 sanitized host motion/draw
+frames, complete installed resources, retained dependencies, UPS reconstruction,
+and four private browser/offline selections. Native execution, ordinary drawing
+and audio synthesis, a save cycle with this item, and hardware remain unverified.
+See the [combined-animation checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#installed-combined-skeleton-and-material-animation).
+
 The shared material importer installs the harvest TV's complete switched-screen
 lifecycle: both models and all 37 triangles, four timed on-frame entries plus the
 off image, complete positioned loop and both clicks, and native start-disabled
@@ -95,8 +105,8 @@ appearance remain unverified. The profiles stay inactive pending actual
 acquisition. The compass uses the same dispatcher with installed parent support. See the
 [joint-lifecycle checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#installed-switched-joint-lifecycles).
 
-The checked proposal is ABI 255 at
-`build/v3-switched-material-imports-02/profile-runtime/build-lock.json`, with 159
+The checked proposal is ABI 259 at
+`build/v3-material-rig-imports-01/cartridge/build-lock.json`, with 160
 development choices and unchanged format-four saved data. The complete
 10,448-byte snowboard remains imported through the ordinary pipeline,
 including all 259 triangles, thirteen textures, and actual winter-camper route.

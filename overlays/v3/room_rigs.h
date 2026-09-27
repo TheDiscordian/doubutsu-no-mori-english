@@ -103,6 +103,17 @@ typedef struct {
 #define ROOM_RIG_ROLLING 5u
 #define ROOM_RIG_JOINT 6u
 #define ROOM_RIG_ROOF 7u
+#define ROOM_RIG_MATERIAL 8u
+#ifdef AF_V3_ROOM_MATERIAL_RIG
+/* Explicit big-endian halfwords keep immutable object data portable to the
+   host checks as well as the native big-endian target. */
+typedef struct {
+    u8 segment,frames,sound,reserved;
+    u8 divisor[2],frame_bytes[2],offsets[8][2],padding[8];
+} RoomRigMaterial;
+_Static_assert(sizeof(RoomRigMaterial)==32,"Rig material parameters");
+extern void sAdo_OngenPos(u32,u8,float *);
+#endif
 #ifdef AF_V3_SELECTED_PALETTE
 extern void af_v3_roof_ct(void *,u8 *);
 extern void af_v3_roof_mv(void *,void *,void *,u8 *);

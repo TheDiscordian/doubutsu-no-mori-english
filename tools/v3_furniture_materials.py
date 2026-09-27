@@ -11,6 +11,7 @@ import json
 from aflib import sha256, u32
 
 CATEGORY='material-frame-assets'
+RIG_CATEGORY='material-keyframe-rig'
 # size, complete normalized draw digest, table pair, model pairs in actual
 # submission order, matrix call, material kind, segment, table entries, selector.
 FORMS=(
@@ -101,7 +102,7 @@ def discover(source,name,at,functions):
 
 def bindings(adapter):
     """Require complete typed frame records before exposing dynamic segments."""
-    if adapter.get('category')!=CATEGORY:return {}
+    if adapter.get('category') not in (CATEGORY,RIG_CATEGORY):return {}
     result={}
     for row in adapter['material_frames']:
         address=row['segment_address']

@@ -22,22 +22,28 @@ Incomplete gameplay stays unavailable in the selector; installing assets does
 not claim that an item is playable. Reuse unchanged passing tests throughout.
 
 Current task: finish remaining model/lifecycle and console launch/storage
-categories. Extend combined rig/material callbacks for the hamster cage,
-then continue the other actual
-unsupported callbacks without per-item installers. The remaining unconverted
+categories. Continue the actual unsupported callbacks without per-item
+installers, reusing the combined skeleton/material support. The remaining unconverted
 records also include matryoshka, aerobics radio, crab stew, and treasure chest.
 Reuse complete source resources and shared behaviours throughout.
 
-The checked current proposal is ABI 255 at
-`build/v3-switched-material-imports-02/profile-runtime/build-lock.json`, ROM SHA-256
-`2872c0b37a63df9d162c42b157c83b6053b2447e223b7a90cda564629f43e606`.
+The checked current proposal is ABI 259 at
+`build/v3-material-rig-imports-01/cartridge/build-lock.json`, ROM SHA-256
+`ca2fe179ac59068159f24120d402e43d0818f7f19427f281696bed08b270cd76`.
+The combined skeleton/material category imports the complete hamster cage,
+including source movement/texture timing, positioned sound, actual lottery
+availability, catalogue ordering, scoring, and official English text. Five focused
+checks pass; native execution, ordinary appearance/synthesis, and hardware remain
+unverified. There are 160 enabled development choices and no saved-format change.
+Shared room code uses 21,136 of 32,768 bytes; bootstrap uses 1,509 of 1,536.
+See the [combined-animation checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#installed-combined-skeleton-and-material-animation).
+
 The harvest TV's complete switched-screen lifecycle is installed through the
 shared material importer: both models, 37 triangles, all on/off frames, positioned
 loop and switch clicks, and checked start-disabled placement. Its profile stays
 inactive pending the actual Harvest reward route. Thirteen focused checks pass;
 native execution, ordinary appearance/synthesis, and hardware remain unverified.
-The 159 enabled choices and saved format/profile bits are unchanged. Shared room
-code uses 20,384 of 32,768 bytes; bootstrap uses 1,509 of 1,536. See the
+The Harvest profile does not add a selectable option. See the
 [switched-screen checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#installed-switched-texture-lifecycle).
 
 Both complete house models and selected-roof/light lifecycles are installed:

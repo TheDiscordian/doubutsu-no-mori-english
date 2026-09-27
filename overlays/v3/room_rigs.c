@@ -100,6 +100,23 @@ void af_v3_room_sound_mv(RoomSoundActor *actor,void *room,RoomRigGame *game,u8 *
 }
 #endif
 
+#ifdef AF_V3_ROOM_MATERIAL_RIG
+static u32 rig_frame_u16(const u8 *p) { return ((u32)p[0]<<8)|p[1]; }
+static const RoomRigMaterial *rig_material(const RoomRigRecord *r,const u8 *data) {
+    if (!data || ((uptr)data&7) || (r->first.bits&3) ||
+            r->first.bits<0x06000000u || r->first.bits>0x06000000u+r->bytes-32u) return 0;
+    const RoomRigMaterial *p=(const RoomRigMaterial *)(data+(r->first.bits-0x06000000u));
+    u32 size=rig_frame_u16(p->frame_bytes);
+    if ((p->segment!=8 && p->segment!=9) || !p->frames || p->frames>8 || p->reserved ||
+            p->sound<68 || p->sound>=96 || !rig_frame_u16(p->divisor) || !size || size>r->bytes) return 0;
+    for (u32 i=0;i<8;++i) {
+        u32 offset=rig_frame_u16(p->offsets[i]);
+        if (p->padding[i] || (i<p->frames ? ((offset&7) || offset>r->bytes-size) : offset!=0)) return 0;
+    }
+    return p;
+}
+#endif
+
 static const RoomRigRecord *find(u32 index) {
     /* Catalogue actors retain the catalogue's index, 1024 above the room
        index for imported furniture. Both contexts use the same full model. */
@@ -122,7 +139,13 @@ static const RoomRigRecord *find(u32 index) {
                 (r->skeleton&3) || r->skeleton<0x06000000u || r->skeleton>0x06000000u+r->bytes-8 ||
                 (r->animation&3) || r->animation<0x06000000u || r->animation>0x06000000u+r->bytes-20) return 0;
 #ifdef AF_V3_ROOM_RIG_PACKET
-        if (r->reserved || r->mode>ROOM_RIG_JOINT) return 0;
+        if (r->reserved || r->mode>ROOM_RIG_MATERIAL || r->mode==ROOM_RIG_ROOF) return 0;
+#ifdef AF_V3_ROOM_MATERIAL_RIG
+        if (r->mode==ROOM_RIG_MATERIAL && (r->last.bits || (r->first.bits&3) ||
+                r->first.bits<0x06000000u || r->first.bits>0x06000000u+r->bytes-32)) return 0;
+#else
+        if (r->mode==ROOM_RIG_MATERIAL) return 0;
+#endif
 #ifdef AF_V3_ROOM_JOINT
         if (r->mode==ROOM_RIG_JOINT && !((r->first.bits==1 || r->first.bits==2
 #ifdef AF_V3_ROOM_NEEDLE
@@ -181,6 +204,9 @@ void af_v3_room_rig_ct(RoomRig *actor,u8 *data) {
 #ifdef AF_V3_SELECTED_PALETTE
     if (r->mode==ROOM_RIG_ROOF) { af_v3_roof_ct(actor,data);return; }
 #endif
+#ifdef AF_V3_ROOM_MATERIAL_RIG
+    if (r->mode==ROOM_RIG_MATERIAL && !rig_material(r,data)) return;
+#endif
     u8 *skeleton=Lib_SegmentedToVirtual((void *)(uptr)r->skeleton);
     void *animation=Lib_SegmentedToVirtual((void *)(uptr)r->animation);
     if (skeleton[0]!=r->joints || skeleton[1]!=r->shown) return;
@@ -218,7 +244,8 @@ void af_v3_room_rig_ct(RoomRig *actor,u8 *data) {
 #endif
     actor->keyframe.speed.bits=0;
 #ifdef AF_V3_ROOM_RIG_PACKET
-    if (r->mode==ROOM_RIG_CLOCK || r->mode==ROOM_RIG_BILLBOARD) actor->keyframe.speed.bits=0x3F000000u;
+    if (r->mode==ROOM_RIG_CLOCK || r->mode==ROOM_RIG_BILLBOARD || r->mode==ROOM_RIG_MATERIAL)
+        actor->keyframe.speed.bits=0x3F000000u;
 #endif
     cKF_SkeletonInfo_R_play(&actor->keyframe);
 }
@@ -232,6 +259,17 @@ void af_v3_room_rig_mv(RoomRig *actor,void *room,RoomRigGame *game,u8 *data) {
     if (r->mode==ROOM_RIG_ROOF) { af_v3_roof_mv(actor,room,game,data);return; }
 #endif
 #ifdef AF_V3_ROOM_RIG_PACKET
+#ifdef AF_V3_ROOM_MATERIAL_RIG
+    if (r->mode==ROOM_RIG_MATERIAL) {
+        const RoomRigMaterial *p=rig_material(r,data);
+        if (!p) return;
+        actor->keyframe.speed.f=1.0f;
+        cKF_SkeletonInfo_R_play(&actor->keyframe);
+        cKF_SkeletonInfo_R_play(&actor->keyframe);
+        sAdo_OngenPos((u32)(uptr)actor,p->sound,actor->position);
+        return;
+    }
+#endif
 #ifdef AF_V3_ROOM_JOINT
     if (r->mode==ROOM_RIG_JOINT) { af_v3_room_joint_mv(actor,r);return; }
 #endif
@@ -335,8 +373,9 @@ static int clock_before(void *game,RoomKeyframe *key,int joint,void *list,
 
 void af_v3_room_rig_dw(RoomRig *actor,void *room,RoomRigGame *game,u8 *data) {
     (void)room;
+    if (!actor || !game || !game->gfx || !data) return;
     const RoomRigRecord *r=find(actor->index);
-    if (!r || !data) return;
+    if (!r) return;
 #ifdef AF_V3_SELECTED_PALETTE
     if (r->mode==ROOM_RIG_ROOF) {
         const u16 *layout=(const u16 *)data;
@@ -353,6 +392,15 @@ void af_v3_room_rig_dw(RoomRig *actor,void *room,RoomRigGame *game,u8 *data) {
         return;
     }
 #endif
+    u32 prefix=1;
+#ifdef AF_V3_ROOM_MATERIAL_RIG
+    const RoomRigMaterial *material=0;
+    if (r->mode==ROOM_RIG_MATERIAL) {
+        material=rig_material(r,data);
+        if (!material) return;
+        prefix=2;
+    }
+#endif
     RoomRigGraphics *gfx=game->gfx;
     RoomCommand *commands=gfx->head;
     uptr front=(uptr)commands,back=(uptr)gfx->tail;
@@ -361,13 +409,22 @@ void af_v3_room_rig_dw(RoomRig *actor,void *room,RoomRigGame *game,u8 *data) {
        Both joint callbacks are verified no-ops in this source category. */
     /* Native graph allocations are eight-byte aligned. A valid tail ending
        in eight must not suppress an entire room model. */
-    if ((front&7) || (back&7) || (xlu&7) || back<front || back-front<64u+(2u+2u*r->shown)*8u ||
+    if (!front || !back || !xlu || !xlu_back || (front&7) || (back&7) || (xlu&7) || back<front ||
+            back-front<64u+(prefix+1u+2u*r->shown)*8u ||
             xlu_back<xlu || xlu_back-xlu<8) return;
-    gfx->head=commands+1;
+    gfx->head=commands+prefix;
     commands[0]=(RoomCommand){0xDA380003,(u32)(uptr)_Matrix_to_Mtx_new(gfx)};
+#ifdef AF_V3_ROOM_MATERIAL_RIG
+    if (material) {
+        u32 frame=((game->frame*2u)/rig_frame_u16(material->divisor))%material->frames;
+        commands[1]=(RoomCommand){0xDB060000u+4u*material->segment,
+            (u32)(uptr)(data+rig_frame_u16(material->offsets[frame]))&0x1FFFFFFFu};
+    }
+#endif
     cKF_Si3_draw_R_SV(game,&actor->keyframe,actor->matrices[game->frame&1],
 #ifdef AF_V3_ROOM_RIG_PACKET
-                    r->mode==ROOM_RIG_CLOCK ? (void *)clock_before : (void *)0,(void *)0,(void *)r);
+                    r->mode==ROOM_RIG_CLOCK ? (void *)clock_before : (void *)0,(void *)0,
+                    r->mode==ROOM_RIG_MATERIAL ? (void *)actor : (void *)r);
 #else
                     (void *)0,(void *)0,(void *)0);
 #endif

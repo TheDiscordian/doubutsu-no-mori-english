@@ -1,5 +1,63 @@
 # Automatic furniture pipeline checkpoint
 
+## Installed combined skeleton and material animation
+
+The ordinary category importer installs the complete hamster cage through
+`material-keyframe-rig`. Shared skeleton, animation, material, audio, and optional
+item machinery perform the conversion; no dedicated item installer is added.
+All five models, 61 triangles, seven joints, complete 100-frame motion, both
+128-byte texture frames, and positioned loop `56` are retained. Its actual
+`ftr_listLottery` availability, catalogue ordering, scoring, and official donor
+name are connected, bringing the development selector to 160 choices.
+
+- Build: `build/v3-material-rig-imports-01/cartridge/build-lock.json`, ABI 259.
+- ROM SHA-256: `ca2fe179ac59068159f24120d402e43d0818f7f19427f281696bed08b270cd76`.
+- UPS SHA-256: `f046edfdf840c5a0aade41cbc1d41fb93f7a6dfbf7259b6d5fc38953a7b34ff6`.
+- Complete object: 4,048 bytes, SHA-256 `c1527cf9f4558cfa1e21854c932c744c754441fa6083bd5c434ed8b995132f19`.
+- Room code: 21,136 of 32,768 bytes; bootstrap: 1,509 of 1,536.
+- Code SHA-256: `d4f964d01f925d0e15021d357b15930f20cf63a9c95bc9c05b2900b23f656e10`.
+- Room packet SHA-256: `d52cadd6819e62f54688e851772255030cc0756640db8921ab789f3815a9dd71`.
+
+The constructor evaluates once at source speed `0.5`. Movement performs two
+speed-`1.0` source steps per native update. The frame selector uses the graphics
+counter divided by five, with doubled native time and unsigned wrapping. Loop
+sound remains unconditional, including movement transitions, as in the donor.
+Mode 8 adds a checked immutable material block and one graphics segment command,
+without adding actor work, heap storage, or saved fields.
+
+Five focused tests pass: the four `tests.test_v3_material_rigs` checks and the
+affected shared rig host-dispatch test. Source checks reject changed complete
+callbacks/helpers; prepared-artwork checks compare every resource and relocation.
+The actual C dispatcher runs 600 combined move/draw frames under address and
+undefined-behaviour sanitizers, spanning both index forms, all native movement
+states, frame wrapping, matrix-buffer parity, full joint writes, and invalid
+material/graphics bounds. Keyframe, matrix, and audio calls are stubbed.
+Installed checks bind complete graphics/audio, retained room/goods/carrying
+resources, unchanged saved codec, only the intended new profile bit, and UPS
+reconstruction. Four private browser/offline compositions agree, including the
+import-free baseline. Initial test corrections fix a signedness warning, the
+insufficient-space boundary, and an incorrect shop-stock assertion: the donor
+uses the lottery list. The focused corrected checks pass without rebuilding the
+unchanged ROM or replaying a historical emulator fixture.
+
+Native execution, ordinary GPU rendering/audio synthesis, save/restart with this
+item, and original hardware remain unverified. Format-four saved data is
+unchanged, but enabling this import adds a profile bit: existing V3 saves require
+an equal-or-larger enabled import set, and saves containing this selection cannot
+be taken back to a build/profile that lacks it. V3 saves remain unsuitable for
+V2. Existing ROMs/saves, the main lock, and both stable V2 deployments are untouched.
+
+```sh
+python3 tools/v3_furniture_pipeline.py import \
+  --base-lock build/v3-switched-material-imports-02/profile-runtime/build-lock.json \
+  --category material-keyframe-rig \
+  --output build/v3-material-rig-reproduction
+V3_MATERIAL_RIG_BATCH=build/v3-material-rig-reproduction \
+  python3 -m unittest tests.test_v3_material_rigs -v
+python3 -m unittest \
+  tests.test_v3_room_rig_runtime.BehaviourTests.test_complete_source_movement_and_per_instance_bounds_under_sanitizers -v
+```
+
 ## Installed switched-texture lifecycle
 
 The ordinary material-category importer installs complete harvest TV graphics

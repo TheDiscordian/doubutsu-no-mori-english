@@ -20,6 +20,7 @@ from v3_furniture_motion import CATEGORY as ROLLING_CATEGORY
 # This category is deliberately not a native behaviour adapter.
 FIXED_CATEGORY = 'fixed-keyframe-rig-assets'
 from v3_furniture_joint_rigs import CATEGORY as JOINT_CATEGORY
+from v3_furniture_materials import RIG_CATEGORY as MATERIAL_RIG_CATEGORY
 STORAGE_CODE = {
     'create': (116, '17985ba5a79cb082f421871e07eca8189d15291d08d408f4d68c257b072d166d'),
     'move': (80, '74d56a7240cc6101e429e75a9163eacb63753bfb06e944d1e80d291853fa6690'),
@@ -32,7 +33,7 @@ CLOCK_CODE = {
     'draw': (200, 'f6e60a96386c7721dcd0c894196eae1ee3e5c6339aadf921e2f95952ff7584de'),
     'destroy': (4, 'f332ea5b5437103cbb6f1508679da89eec9288ad775c96c439a17fccabe3de8e'),
 }
-RIG_CATEGORIES = (CATEGORY, CLOCK_CATEGORY, STORAGE_CATEGORY, HIT_CATEGORY, BILLBOARD_CATEGORY, ROLLING_CATEGORY, JOINT_CATEGORY)
+RIG_CATEGORIES = (CATEGORY, CLOCK_CATEGORY, STORAGE_CATEGORY, HIT_CATEGORY, BILLBOARD_CATEGORY, ROLLING_CATEGORY, JOINT_CATEGORY, MATERIAL_RIG_CATEGORY)
 RESOURCE_CATEGORIES = RIG_CATEGORIES + (FIXED_CATEGORY,)
 CODE = {
     'create': (164, '2a86d61bc9aaf4a0a6479fe97a7f0d5dfe3dc42f9eea663eeb3fd1b8cbc35733'),
@@ -136,6 +137,74 @@ def discover_billboard(source, vtable_name, vtable_at, functions):
         level_sound=dict(category='positioned-loop',source_sound_id=sound,excluded_states=excluded,
             native_excluded_states=[5,6,13,15] if excluded else [],state_offset=0x3C,position_offset=8,
             switch_clicks=[],callback_installed=False),runtime_installed=False)
+
+
+def discover_material_rig(source,vtable_name,vtable_at,functions):
+    """Complete repeating skeleton plus timed texture frames and positioned loop."""
+    from v3_furniture_pipeline import ReviewRequired
+    if set(functions)!={'create','move','draw'}:
+        raise ReviewRequired('material rig: changed lifecycle slots')
+    module=u32(source.rel,0);create,move,draw=(functions[r] for r in ('create','move','draw'))
+    def pair(receipt,hi,lo,section):
+        p=receipt['relocations'].get(hi)
+        if p is None or p[:3]!=(6,module,section):raise ReviewRequired('material rig: missing paired resource')
+        return p[3],{hi:p,lo:(4,module,section,p[3])}
+    bones,a=pair(create,0x0E,0x1A,5);motion,b=pair(create,0x16,0x2A,5)
+    repeat,c=pair(create,0x3A,0x42,5)
+    if repeat!=motion:raise ReviewRequired('material rig: changed repeating motion')
+    helpers=source.checked_callback_code(create,104,
+        'fc678c71c1c0835469d98eaea1157b5685dc0a068575d56fe08721f9def9c656',a|b|c,
+        {0x34:(0x8D4,'cKF_SkeletonInfo_R_ct'),0x48:(0xA24,'cKF_SkeletonInfo_R_init_standard_repeat'),
+         0x50:(0xE54,'cKF_SkeletonInfo_R_play')},'material rig constructor')
+    # The donor repeat initializer supplies half speed before its first play.
+    init_raw,init=source.function(0xA24);base,_=source.sections[4]
+    refs={0x0A:(6,module,4,0),0x0E:(6,module,4,0x20),0x1E:(4,module,4,0),
+          0x2E:(6,module,4,0x30),0x36:(4,module,4,0x20),0x3E:(4,module,4,0x30),
+          0x42:(6,module,4,4),0x4E:(4,module,4,4)}
+    constants=((0,'3f800000'),(4,'00000000'),(0x20,'4330000080000000'),(0x30,'3f000000'))
+    if (len(init_raw)!=124 or sha256(init_raw)!='5c600ed1925e67be3f776252b5cb4617389ee5612133e188505d05ba28e3bd7c' or
+            init['relocations']!=refs or any(source.rel[base+at:base+at+len(v)//2]!=bytes.fromhex(v) for at,v in constants)):
+        raise ReviewRequired('material rig: changed repeat initializer')
+    speed,a=pair(move,0x0A,0x12,4)
+    if source.rel[base+speed:base+speed+4]!=struct.pack('>f',1):
+        raise ReviewRequired('material rig: changed source motion speed')
+    raw,_=source.function(move['offset']);sound=struct.unpack_from('>H',raw,0x32)[0]
+    if not 68<=sound<96:raise ReviewRequired('material rig: unsupported positioned loop')
+    helpers.update(source.checked_callback_code(move,76,
+        'b65e9b81f73a629c82ad7ee37f2ee0b733bd46d1b9f351f470bf47f8719c90c5',a,
+        {0x24:(0xE54,'cKF_SkeletonInfo_R_play'),0x34:(0x2BDD84,'sAdo_OngenPos')},
+        'material rig movement',{0x32:sound}))
+    sound_helper=helpers['sAdo_OngenPos']
+    if (sound_helper['bytes']!=100 or sound_helper['sha256']!='b982dbca7ed68e0565b554e142e64d69a1d2c47ec061169d114502a25e61f885' or
+            sound_helper['relocations']!={72:(10,0,4,0x80012E2C),10:(6,module,6,2306744),34:(4,module,6,2306744)}):
+        raise ReviewRequired('material rig: changed complete positioned sound helper')
+    table,a=pair(draw,0x5E,0x6E,5)
+    helpers.update(source.checked_callback_code(draw,196,
+        'be069d741cc457b7c2cee9f486c31b26b06a2dc274491349af119bc7e9f06efe',
+        a|{0x10:(10,0,4,0x8009AECC),0xB0:(10,0,4,0x8009AF18)},
+        {0x50:(0x9D214,'_Matrix_to_Mtx_new'),0xA8:(0x1578,'cKF_Si3_draw_R_SV')},'material rig drawing'))
+    symbol,at,n=source.containing(table,exact=True);pointers=source.pointers(at,n)
+    if n!=8 or any(source.data[at:at+n]) or set(pointers)!=set(range(at,at+n,4)):
+        raise ReviewRequired('material rig: incomplete texture sequence')
+    frames=[]
+    for offset in range(at,at+n,4):
+        name,target,size=source.containing(pointers[offset],exact=True)
+        if size!=128 or source.pointers(target,size):raise ReviewRequired('material rig: incomplete texture frame')
+        frames.append(dict(symbol=name,donor_offset=target,bytes=size,source_sha256=sha256(source.data[target:target+size])))
+    rig=skeleton(source,bones);animated=animation(source,motion,joints=rig['joints'])
+    if rig['joints']>8 or any(r['draw_stream'] for r in rig['rows']):
+        raise ReviewRequired('material rig: unsupported complete skeleton bounds or draw streams')
+    descriptor=model_descriptor(rig,kind='animated-room-model')
+    material=dict(kind='texture',segment_address=0x08000000,frames=frames,
+        selector=dict(input='graphics-frame',division=5,modulo=2),
+        table=dict(symbol=symbol,donor_offset=at,bytes=n,source_sha256=sha256(source.data[at:at+n]),
+                   targets=[pointers[offset] for offset in range(at,at+n,4)]))
+    return descriptor['models'],{},dict(category=MATERIAL_RIG_CATEGORY,vtable_symbol=vtable_name,
+        vtable_offset=vtable_at,functions=functions,helpers=helpers,joint_callbacks=[],
+        constructor=dict(mode='repeat',initial_speed=.5),move_speed=1.0,source_steps_per_native_update=2,
+        skeleton=rig,animation=animated,joint_models=descriptor['joint_models'],material_frames=[material],
+        level_sound=dict(category='positioned-loop',source_sound_id=sound,excluded_states=[],native_excluded_states=[],
+            state_offset=0x3C,position_offset=8,switch_clicks=[],callback_installed=False),runtime_installed=False)
 
 
 def checked_stop_initializer(source):
@@ -628,7 +697,7 @@ def discover_storage(source, vtable_name, vtable_at, functions):
         skeleton=rig,animation=motion,joint_models=descriptor['joint_models'],runtime_installed=False)
 
 
-def suffix(source, profile, model_offsets, *, start):
+def suffix(source, profile, model_offsets, *, start, resources=()):
     """Pack the real skeleton and motion after the shared complete artwork."""
     adapter = profile.get('callback_adapter',{})
     if adapter.get('category') not in RESOURCE_CATEGORIES: return b'', {}
@@ -643,6 +712,18 @@ def suffix(source, profile, model_offsets, *, start):
             *(v for r in scroll['tiles'] for v in r['rate']),sound['source_sound_id'],
             bool(sound['excluded_states']),2,0)
         fields=dict(billboard_offset=offset,billboard_hex=extra.hex())
+    if adapter['category']==MATERIAL_RIG_CATEGORY:
+        material=adapter['material_frames'][0];frames=material['frames'];offsets=[]
+        for frame in frames:
+            matches=[r for r in resources if r['symbol']==frame['symbol'] and r['kind']=='texture']
+            if len(matches)!=1 or any(matches[0][k]!=frame[k] for k in ('donor_offset','bytes','source_sha256')):
+                raise ValueError('Material rig suffix requires complete converted texture resources')
+            offsets.append(matches[0]['native_offset'])
+        offset=start+len(bones)+len(motion)
+        extra=struct.pack('>4B2H8H2I',material['segment_address']>>24,len(frames),
+            adapter['level_sound']['source_sound_id'],0,material['selector']['division'],frames[0]['bytes'],
+            *(offsets+[0]*(8-len(offsets))),0,0)
+        fields=dict(material_offset=offset,material_hex=extra.hex(),frame_offsets=offsets)
     return bones+motion+extra, dict(skeleton=rig,animations=animations,**fields,
         skeleton_offset=rig['header']['native_offset'],animation_offset=animations['headers'][0]['native_offset'],
         runtime_installed=False)
@@ -653,4 +734,4 @@ def estimated_suffix(source, profile, start):
     if adapter.get('category') not in RESOURCE_CATEGORIES: return 0
     bones = (profile['skeleton']['joint_table']['bytes']+8+15)&~15
     motion, _ = compile_animations(source,[adapter['animation']],start=start+bones)
-    return bones+len(motion)+(16 if adapter['category']==BILLBOARD_CATEGORY else 0)
+    return bones+len(motion)+(16 if adapter['category']==BILLBOARD_CATEGORY else 32 if adapter['category']==MATERIAL_RIG_CATEGORY else 0)

@@ -8,7 +8,7 @@ from aflib import CODE_RAM,CODE_VROM,by_vrom,sha256
 from v3_asset_loader import ROOT,BLOB,compile_part
 from v3_equipment_runtime import RAM as EQUIPMENT_RAM,retired_module_space
 from v3_furniture_pipeline import Source,prepare,room_aliases,PreparedAssets
-from v3_furniture_rigs import CATEGORY,CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY,ROLLING_CATEGORY,JOINT_CATEGORY,suffix
+from v3_furniture_rigs import CATEGORY,CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY,ROLLING_CATEGORY,JOINT_CATEGORY,MATERIAL_RIG_CATEGORY,suffix
 import v3_furniture_joint_rigs as joints
 import v3_furniture_roofs as roofs
 from v3_registry import (furniture_representation_identity,ROOM_ALIAS_REGISTRY_VERSION,
@@ -130,7 +130,7 @@ def install_profiles(base,prior,blob,core,original,output,directories):
         for row in art['objects']:
             donor=row['item_id'];item=int(donor,16);prepared_row=prepare(source,item)
             descriptor=prepared_row[0];category=descriptor.get('callback_adapter',{}).get('category')
-            if (category not in (CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY,ROLLING_CATEGORY,JOINT_CATEGORY,roofs.CATEGORY,'switch-trigger-sound',static.CATEGORY,MATERIAL_CATEGORY,SCROLL_CATEGORY) or
+            if (category not in (CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY,ROLLING_CATEGORY,JOINT_CATEGORY,MATERIAL_RIG_CATEGORY,roofs.CATEGORY,'switch-trigger-sound',static.CATEGORY,MATERIAL_CATEGORY,SCROLL_CATEGORY) or
                     donor in occupied or item not in identities or
                     row['profile']!=json.loads(json.dumps(descriptor)) or
                     row['native_profile_scalar_hex']!=descriptor['scalar_hex']):
@@ -249,7 +249,7 @@ def install_profiles(base,prior,blob,core,original,output,directories):
                     raise ValueError('Prepared scrolling resource is not completely installed')
                 vrom=installed['vrom'];vtable=SCROLL_VTABLE;reused_asset=True
                 installed.update(lifecycle_installed=True,lifecycle=json.loads(json.dumps(lifecycle)))
-            elif category in (CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY,ROLLING_CATEGORY,JOINT_CATEGORY,roofs.CATEGORY):
+            elif category in (CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY,ROLLING_CATEGORY,JOINT_CATEGORY,MATERIAL_RIG_CATEGORY,roofs.CATEGORY):
                 installed=rigs.get(donor)
                 if (not installed or installed['profile_installed'] or
                         {k:v for k,v in installed['source'].items() if k!='reused_artwork'}!=
@@ -258,8 +258,8 @@ def install_profiles(base,prior,blob,core,original,output,directories):
                         blob[installed['blob_offset']:installed['blob_offset']+len(data)]!=data):
                     raise ValueError('Prepared rig is not completely installed in the current runtime')
                 vrom=installed['vrom'];vtable=VTABLE;reused_asset=True
-                if category==BILLBOARD_CATEGORY and contracts.get(donor)!=descriptor['callback_adapter']['level_sound']:
-                    raise ValueError('Billboard rig needs its complete installed source loop audio')
+                if category in (BILLBOARD_CATEGORY,MATERIAL_RIG_CATEGORY) and contracts.get(donor)!=descriptor['callback_adapter']['level_sound']:
+                    raise ValueError('Animated material rig needs its complete installed source loop audio')
                 if category==HIT_CATEGORY:
                     audio=result.get('furniture_audio',{})
                     audio_row=next((r for r in audio.get('furniture',[]) if r['item_id']==donor),None)
@@ -500,8 +500,14 @@ def bind_profiles(source,base,report):
                     audio['callback']!=json.loads(json.dumps(descriptor['callback_adapter']))):
                 raise ValueError('Incomplete installed hit-rig audio/behaviour')
             checked_hit_condition(base,report,trigger,sound,e['furniture_audio'])
-        if category==BILLBOARD_CATEGORY and contracts.get(donor)!=descriptor['callback_adapter']['level_sound']:
-            raise ValueError('Incomplete installed billboard-rig audio/behaviour')
+        if category in (BILLBOARD_CATEGORY,MATERIAL_RIG_CATEGORY) and contracts.get(donor)!=descriptor['callback_adapter']['level_sound']:
+            raise ValueError('Incomplete installed animated-material audio/behaviour')
+        if category==MATERIAL_RIG_CATEGORY:
+            parameters=art['rig'];offset=parameters['material_offset']
+            if (binding.get('mode')!=8 or binding.get('first')!=0x06000000+offset or binding.get('last') or
+                    blob[vrom-BLOB+offset:vrom-BLOB+offset+32].hex()!=parameters['material_hex'] or
+                    '-DAF_V3_ROOM_MATERIAL_RIG' not in runtime['code']['flags']):
+                raise ValueError('Incomplete installed rig material selector or dispatch')
         art['room_runtime']=dict(vtable=expected_vtable,vrom=vrom)
         at=vrom-BLOB;n=art['object_bytes'];native=profile(art,vrom,limit=limit)
         current=blob[ROWS+i*80:ROWS+(i+1)*80];record=blob[ITEMS+i*32:ITEMS+(i+1)*32]
@@ -549,7 +555,7 @@ def prepared_categories(source,directories):
         for row in art['objects']:
             donor=row['item_id'];item=int(donor,16);prepared_row=prepare(source,item)
             profile=prepared_row[0];adapter=profile.get('callback_adapter',{});category=adapter.get('category')
-            if category not in (CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY,ROLLING_CATEGORY,JOINT_CATEGORY,roofs.CATEGORY):
+            if category not in (CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY,ROLLING_CATEGORY,JOINT_CATEGORY,MATERIAL_RIG_CATEGORY,roofs.CATEGORY):
                 raise ValueError('Unimplemented additional room-rig category')
             if (row['profile']!=json.loads(json.dumps(profile)) or donor in assets or
                     row['native_profile_scalar_hex']!=profile['scalar_hex'] or
@@ -585,6 +591,8 @@ def prepared_categories(source,directories):
                 mode=4;first=0x06000000+rig['billboard_offset'];last=0
             elif category==ROLLING_CATEGORY:
                 mode=5;first=struct.unpack('>I',struct.pack('>f',adapter['rolling']['duration']))[0];last=0
+            elif category==MATERIAL_RIG_CATEGORY:
+                mode=8;first=0x06000000+rig['material_offset'];last=0
             else:
                 lifecycle=joints.lifecycle(source,profile)
                 if lifecycle is None:raise ValueError('Unimplemented complete joint-rig lifecycle')
@@ -646,11 +654,12 @@ def encode_packet(rows,sound_rows=(),material_rows=()):
             continue
         encode([r])  # Retain the complete existing object/pointer/work-area checks.
         mode,first,last=r.get('mode',0),r.get('first',0),r.get('last',0)
-        if (mode not in (0,1,2,3,4,5,6) or mode==0 and (first or last) or
+        if (mode not in (0,1,2,3,4,5,6,8) or mode==0 and (first or last) or
                 mode==6 and (first,last) not in ((1,0),(2,0),(4,0),(0x5103,0x00160017)) or
                 mode==3 and (first,last) not in ((0,0),(1,0x3E800000),(2,0x3F000000)) or
                 mode==1 and not (0<first<r['joints'] and 0<last<r['joints'] and first!=last) or
                 mode==4 and (last or first&3 or not 0x06000000<=first<=0x06000000+r['bytes']-16) or
+                mode==8 and (last or first&3 or not 0x06000000<=first<=0x06000000+r['bytes']-32) or
                 mode==5 and (last or not 0x3F800000<=first<=0x47000000) or
                 mode==2 and not 0x3F800000<=first<last<=0x43800000):
             raise ValueError('Invalid complete room-rig behaviour parameters')
@@ -761,6 +770,7 @@ def publish_packet(equipment,blob,output,*,core=None):
     if material_rows:defines+=('AF_V3_ROOM_MATERIALS',)
     billboard=any(r.get('mode')==4 for r in runtime['rows'])
     if billboard:defines+=('AF_V3_ROOM_BILLBOARD',)
+    if any(r.get('mode')==8 for r in runtime['rows']):defines+=('AF_V3_ROOM_MATERIAL_RIG',)
     if any(r.get('mode')==5 for r in runtime['rows']):defines+=('AF_V3_ROOM_ROLLING',)
     joint=any(r.get('mode')==6 for r in runtime['rows'])
     if joint:defines+=('AF_V3_ROOM_JOINT',)

@@ -24,7 +24,7 @@ from v3_registry import FURNITURE, LEGACY_FURNITURE, furniture_identity, furnitu
 from v3_room_aliases import discover as room_aliases, pending_reason as room_alias_reason
 from v3_villager_art import native_palette, normalise_vertex_flags
 
-VERSION = 30
+VERSION = 31
 PENDING_MOVE_CATEGORY = 'static-models-pending-move'
 PENDING_SEQUENCE_CATEGORY = 'constant-model-sequence-pending-lifecycle'
 SELECTED_PALETTE_CATEGORY = 'selected-palette-fade-assets'
@@ -274,7 +274,10 @@ class Source:
         joint_rig=discover_joint_rig(self,name,at,functions)
         if joint_rig is not None:return joint_rig
         from v3_furniture_rigs import (CODE as RIG_CODE, CLOCK_CODE, STORAGE_CODE,
-            discover as discover_rig, discover_clock, discover_storage, discover_fixed, discover_hit, discover_billboard)
+            discover as discover_rig, discover_clock, discover_storage, discover_fixed, discover_hit, discover_billboard,
+            discover_material_rig)
+        if functions.get('create',{}).get('bytes')==104 and functions.get('draw',{}).get('bytes')==196:
+            return discover_material_rig(self,name,at,functions)
         if functions.get('create',{}).get('bytes')==116 and functions.get('draw',{}).get('bytes')==268:
             return discover_billboard(self,name,at,functions)
         if (functions.get('create',{}).get('bytes')==132 and
@@ -1081,7 +1084,7 @@ class PreparedAssets:
                     raise ValueError('Prepared cache model differs from complete source/layout')
                 compiled[label]=raw
             packed,destinations,records,sequence=assemble_models(prepared,compiled)
-            extra,rig=suffix(source,profile,destinations,start=len(packed));packed+=extra
+            extra,rig=suffix(source,profile,destinations,start=len(packed),resources=resources);packed+=extra
             if (packed!=asset or row['model_offsets']!=destinations or row['models']!=records
                     or row.get('draw_sequence')!=sequence or row.get('rig',{})!=rig):
                 raise ValueError(f'Prepared cache {item} differs from complete reconstructed object')
@@ -1330,7 +1333,7 @@ def convert(source, worksheet, output, selected=(), installed=None, *, assets_on
     for row,prepared,reused in plans:
         profile, body, resources, offsets, models, commands, sections = prepared
         asset, destinations, records, sequence_record = assemble_models(prepared,reused[0] if reused else compiled[row['item_id']])
-        rig_bytes, rig_record = suffix(source,profile,destinations,start=len(asset))
+        rig_bytes, rig_record = suffix(source,profile,destinations,start=len(asset),resources=resources)
         asset += rig_bytes
         if len(asset) != row['object_bytes']: raise ValueError('Compiled object size differs from preflight')
         name = row['item_id']+'.n64obj.bin'; write_new(output/name, asset)
@@ -1357,13 +1360,13 @@ def convert(source, worksheet, output, selected=(), installed=None, *, assets_on
 
 def rig_import_plan(inventory, report, bindings, selected=(), category=None, *, source=None):
     """Plan shared dependencies, not per-item installers or acquisition guesses."""
-    from v3_furniture_rigs import CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY,ROLLING_CATEGORY
+    from v3_furniture_rigs import CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY,ROLLING_CATEGORY,MATERIAL_RIG_CATEGORY
     from v3_furniture_materials import CATEGORY as MATERIAL_CATEGORY,initializer_lifecycle,steam_lifecycle,switched_lifecycle
     from v3_furniture_scroll import CATEGORY as SCROLL_CATEGORY,draw_only_lifecycle
     from v3_furniture_reactions import source_lifecycle as reaction_lifecycle,colour_lifecycle
     from v3_sound_programs import furniture_trigger,furniture_level
     from v3_furniture_joint_rigs import CATEGORY as JOINT_CATEGORY,lifecycle as joint_lifecycle
-    categories={CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY,ROLLING_CATEGORY,SELECTED_PALETTE_CATEGORY}
+    categories={CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY,ROLLING_CATEGORY,MATERIAL_RIG_CATEGORY,SELECTED_PALETTE_CATEGORY}
     candidates=[r for r in inventory['rows'] if r.get('asset_ready') and not r['installed'] and
         not r.get('room_alias') and (not selected or r['item_id'] in selected) and
         (category is None or category in r['categories'])]
