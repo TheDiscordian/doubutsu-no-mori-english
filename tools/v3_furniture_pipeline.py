@@ -24,9 +24,10 @@ from v3_registry import FURNITURE, LEGACY_FURNITURE, furniture_identity, furnitu
 from v3_room_aliases import discover as room_aliases, pending_reason as room_alias_reason
 from v3_villager_art import native_palette, normalise_vertex_flags
 
-VERSION = 28
+VERSION = 29
 PENDING_MOVE_CATEGORY = 'static-models-pending-move'
 PENDING_SEQUENCE_CATEGORY = 'constant-model-sequence-pending-lifecycle'
+SELECTED_PALETTE_CATEGORY = 'selected-palette-fade-assets'
 LAYERS = ('opaque', 'opaque1', 'translucent', 'translucent1')
 BEHAVIOURS = {0: 'static', 1: 'front-seat', 2: 'any-direction-seat', 4: 'front-sofa',
               8: 'single-bed', 16: 'double-bed'}
@@ -48,6 +49,13 @@ PALETTE_FADE_CODE = {
              {0x38: (643604, '_Matrix_to_Mtx_new')}),
     'destroy': (44, '93027b93411e9383050c763e5b19a0123d44f51d044e0bab85623c4022c9cce7',
                 {0x18: (312052, 'zelda_free')}),
+}
+SELECTED_PALETTE_CODE = {
+    'create': (112,'4570c17161188a8b0fc0747584efb5621e944a16fa39a41115dde4044d08686f',
+        {0x18:(0x2C3414,'fNM2_GetPalletIndex'),0x28:(311912,'zelda_malloc_align'),
+         0x54:(2877692,'fFTR_MorphHousepaletteCt')}),
+    'move': (84,'a831c67f0a3760f0f3e9b3965f1e7e7cf84a426f06a1083cb3bc6cfaa88a0a3a',
+        {0x14:(0x2C3414,'fNM2_GetPalletIndex'),0x3C:(2877124,'fFTR_MorphHousePalette')}),
 }
 # Reviewed pure opaque draw sequences: model addresses are data, never item IDs.
 STATIC_SEQUENCE_CODE = {
@@ -282,7 +290,7 @@ class Source:
             if functions.get('move',{}).get('bytes')!=STORAGE_CODE['move'][0]:
                 return discover_fixed(self,name,at,functions)
             return discover_storage(self,name,at,functions)
-        if functions.get('create',{}).get('bytes') == PALETTE_FADE_CODE['create'][0]:
+        if functions.get('create',{}).get('bytes') in (PALETTE_FADE_CODE['create'][0],112):
             if set(pointers) != {0,4,8,12}: reject('unsupported palette-fade callback slots')
             return self.palette_fade_models(name, at, functions)
         for role, receipt in functions.items():
@@ -548,12 +556,15 @@ class Source:
             fix = functions[role]['relocations'].get(location)
             if fix is None or fix[:3] != (6, module, 5): reject('missing data dependency')
             return fix[3]
-        off, on = address('create', 0x26), address('create', 0x2A)
+        selected=functions['create']['bytes']==112
+        off, on = address('create', 0x32 if selected else 0x26), address('create', 0x36 if selected else 0x2A)
         model_addresses = [address('draw', loc) for loc in (0x46, 0x4A, 0x52)]
         def pair(high, low, target): return {high: (6,module,5,target), low: (4,module,5,target)}
         expected = {
-            'create': pair(0x26,0x32,off) | pair(0x2A,0x3A,on),
-            'move': pair(0x0A,0x1A,off) | pair(0x0E,0x1E,on),
+            'create': (pair(0x32,0x3E,off) | pair(0x36,0x46,on)) if selected else
+                pair(0x26,0x32,off) | pair(0x2A,0x3A,on),
+            'move': (pair(0x1A,0x2A,off) | pair(0x1E,0x2E,on)) if selected else
+                pair(0x0A,0x1A,off) | pair(0x0E,0x1E,on),
             'draw': {0x10:(10,0,4,0x8009AED4), 0xB8:(10,0,4,0x8009AF20)} |
                     pair(0x46,0x62,model_addresses[0]) | pair(0x4A,0x6A,model_addresses[1]) |
                     pair(0x52,0x6E,model_addresses[2]),
@@ -561,23 +572,40 @@ class Source:
         }
         helpers = {}
         for role, receipt in functions.items():
-            size, digest, calls = PALETTE_FADE_CODE[role]
+            size, digest, calls = (SELECTED_PALETTE_CODE if selected and role in SELECTED_PALETTE_CODE else PALETTE_FADE_CODE)[role]
             helpers.update(self.checked_callback_code(receipt,size,digest,expected[role],calls,'palette fade '+role))
+        selector={}
+        if selected:
+            for target,size,digest,relocs in (
+                (0x2C3414,196,'3498fcbf2a2f7516b96f06b72db0b5285a06f7f8b1e67ebb3454619961f9030c',
+                 'f1656f19da94f2bf63bbae8603a3cf9da4a2e19e3ea956c699643aba6fefbbf7'),
+                (2877124,568,'918a836267c2cc55becaa33d2d6b2f96a0b3c53ecb9a8bfe321b710dc408a5ae',
+                 '26b429c9de2100658872bfe53456b0b7d0e561b43a59ef20c7eb612965ebf6a0'),
+                (2877692,72,'33b1ec83c2a930817274ace1724fad79eec4be562f9c25f04e54ef16747e3d4f',
+                 '037caab0bb1f919c6e4ed14ba94da5a32e6a282d1478ed28bb867bffcc5704b8')):
+                raw,receipt=self.function(target)
+                if (len(raw)!=size or sha256(raw)!=digest or
+                        sha256(json.dumps(sorted(receipt['relocations'].items()),separators=(',',':')).encode())!=relocs):
+                    reject('changed complete palette selector/morph helper')
+                selector[receipt['symbol']]=receipt
         endpoints = {}
+        count=12 if selected else 1
         for role, target in (('off',off), ('on',on)):
             symbol, start, size = self.containing(target,exact=True)
-            if size != 32 or self.pointers(start,size): reject('invalid endpoint palette')
+            if size != 32*count or self.pointers(start,size): reject('invalid endpoint palette')
             raw = self.data[start:start+size]
-            native_palette(raw)  # Reject partial alpha, even in unchanged entries.
+            for p in range(0,size,32):native_palette(raw[p:p+32])
             endpoints[role] = dict(symbol=symbol, donor_offset=start, bytes=size, sha256=sha256(raw))
-        off_words = struct.unpack_from('>16H', self.data, off)
-        on_words = struct.unpack_from('>16H', self.data, on)
+        off_words = struct.unpack_from('>'+str(count*16)+'H', self.data, off)
+        on_words = struct.unpack_from('>'+str(count*16)+'H', self.data, on)
         if any(a != b and not (a & b & 0x8000) for a,b in zip(off_words,on_words)):
             reject('changing colours must both be opaque RGB5A3')
         models = {f'part{i}': self.containing(target,exact=True) for i,target in enumerate(model_addresses)}
-        return models, {}, dict(category='switch-palette-fade', vtable_symbol=name, vtable_offset=at,
+        return models, {}, dict(category=SELECTED_PALETTE_CATEGORY if selected else 'switch-palette-fade', vtable_symbol=name, vtable_offset=at,
             functions=functions, helpers=helpers, endpoints=endpoints, dynamic_palette_segment=0x08000000,
-            model_order=list(models), draw_arena='opaque', fade_step_hex='3dcccccd')
+            model_order=list(models), draw_arena='opaque', fade_step_hex='3dcccccd',
+            **(dict(palette_count=count,selector=selector,pending_callbacks=['create','move','draw','destroy'],
+                selection='current-room-home-or-preview-player-roof',runtime_installed=False) if selected else {}))
 
     def pointers(self, at, n):
         if at < 0 or n <= 0 or at+n > self.size: raise ValueError('Out-of-range dependency')
@@ -649,7 +677,7 @@ class Source:
         from v3_furniture_materials import CATEGORY as MATERIAL_CATEGORY
         from v3_furniture_scroll import CATEGORY as SCROLL_CATEGORY
         from v3_furniture_joint_rigs import CATEGORY as JOINT_CATEGORY
-        pending_move=adapter.get('category') in (PENDING_MOVE_CATEGORY,PENDING_SEQUENCE_CATEGORY,MATERIAL_CATEGORY,SCROLL_CATEGORY,JOINT_CATEGORY)
+        pending_move=adapter.get('category') in (PENDING_MOVE_CATEGORY,PENDING_SEQUENCE_CATEGORY,SELECTED_PALETTE_CATEGORY,MATERIAL_CATEGORY,SCROLL_CATEGORY,JOINT_CATEGORY)
         pending_fields=[]
         if raw[36:40]!=struct.pack('>f',.01):pending_fields.append('scale')
         if contact not in BEHAVIOURS:pending_fields.append('contact')
@@ -658,7 +686,7 @@ class Source:
             raise ReviewRequired('unsupported scalar/contact/interaction profile category')
         if pending_move:
             adapter['pending_profile_fields']=pending_fields
-        fading = adapter.get('category') == 'switch-palette-fade'
+        fading = adapter.get('category') in ('switch-palette-fade',SELECTED_PALETTE_CATEGORY)
         if not pending_move and (fading and (interaction != 0x8000 or contact) or interaction == 0x8000 and not fading):
             raise ReviewRequired('contact/interaction requires a checked palette-fade callback')
         from v3_furniture_rigs import RESOURCE_CATEGORIES, STORAGE_CATEGORY
@@ -671,7 +699,7 @@ class Source:
             extra.update(kind='animated-room-model',skeleton=adapter['skeleton'],joint_models=adapter['joint_models'])
         return dict(profile_symbol=name, profile_offset=at, profile_sha256=sha256(raw),
             scalar_hex=raw[32:48].hex(), behaviour=adapter.get('category') if extra.get('kind') or
-                adapter.get('category') in ('switch-trigger-sound','static-interaction',PENDING_MOVE_CATEGORY,PENDING_SEQUENCE_CATEGORY,MATERIAL_CATEGORY,SCROLL_CATEGORY) else BEHAVIOURS[contact], contact_action=contact,
+            adapter.get('category') in ('switch-trigger-sound','static-interaction',PENDING_MOVE_CATEGORY,PENDING_SEQUENCE_CATEGORY,SELECTED_PALETTE_CATEGORY,MATERIAL_CATEGORY,SCROLL_CATEGORY) else BEHAVIOURS[contact], contact_action=contact,
             interaction_flags=interaction,
             size_code={3:1, 4:0, 5:2}[shape], shape=shape, models=models, **extra)
 
@@ -708,11 +736,14 @@ def prepare_models(source, descriptor):
     from v3_furniture_scroll import bindings as scroll_bindings
     material_frames=frame_bindings(adapter);used_frames=set()
     scrolling=scroll_bindings(adapter)
-    fading = adapter.get('category') == 'switch-palette-fade'
+    fading = adapter.get('category') in ('switch-palette-fade',SELECTED_PALETTE_CATEGORY)
+    selected_palette=adapter.get('category')==SELECTED_PALETTE_CATEGORY
     dynamic_used = False
     if fading:
         for endpoint in adapter['endpoints'].values():
-            palettes[endpoint['donor_offset']] = endpoint['symbol'], endpoint['bytes']
+            for p in range(0,endpoint['bytes'],32):
+                name=endpoint['symbol']+(f'[{p//32}]' if selected_palette else '')
+                palettes[endpoint['donor_offset']+p] = name,32
     for frames in material_frames.values():
         if frames['kind']=='palette':
             for frame in frames['frames']:
@@ -836,9 +867,10 @@ def prepare_models(source, descriptor):
         if len(destinations) != 3: raise ReviewRequired('changed palette-fade model count')
         # Self-describing immutable object header; palettes/models remain in
         # this complete DMA object. This does not imply runtime installation.
-        body[:32] = struct.pack('>IHH6I',0x41465031,(cursor+15)&~15,3,
+        body[:32] = struct.pack('>IHH6I',0x41465032 if selected_palette else 0x41465031,(cursor+15)&~15,3,
             offsets[adapter['endpoints']['on']['donor_offset']],
-            offsets[adapter['endpoints']['off']['donor_offset']],*destinations,0)
+            offsets[adapter['endpoints']['off']['donor_offset']],*destinations,
+            adapter['palette_count'] if selected_palette else 0)
     return descriptor, bytes(body), resources, offsets, models, commands, sections
 
 
@@ -1114,6 +1146,8 @@ def metadata(source, item, profile, identity):
     from v3_furniture_materials import CATEGORY as MATERIAL_CATEGORY
     from v3_furniture_scroll import CATEGORY as SCROLL_CATEGORY
     binding=getattr(source,'runtime_profiles',{}).get(f'{item:04X}')
+    if profile.get('callback_adapter',{}).get('category')==SELECTED_PALETTE_CATEGORY:
+        raise ReviewRequired('Complete roof palettes and models are prepared; native house-colour selection/lifecycle remains uninstalled')
     if profile.get('callback_adapter',{}).get('category')==SCROLL_CATEGORY and not binding:
         raise ReviewRequired('Scrolling artwork is prepared; drawing, lifecycle behaviour, and acquisition need runtime adapters')
     if profile.get('callback_adapter',{}).get('category')==MATERIAL_CATEGORY and not binding:

@@ -1,5 +1,35 @@
 # Automatic furniture pipeline checkpoint
 
+## Complete selected-roof-palette resources
+
+The existing palette-fade converter also recognises the indexed-endpoint form.
+Its source guards cover all four complete lifecycle callbacks, paired tables and
+model addresses, each helper call, and complete roof selector/morph code and
+relocations. The ordinary category conversion prepares both matching records in
+one compiler run, retaining all three model lists in their individual donor order.
+
+Preparation: `build/v3-selected-palette-assets-01/`, converter version 29.
+
+- House model `3024`: 4,272 bytes, 36 triangles, SHA-256
+  `526dc6557a16331139315c5f32876114a337d287c9375fbebda4a51836902448`.
+- Manor model `3028`: 5,072 bytes, 57 triangles, SHA-256
+  `5ece524c8749e22882faf83289ada10384776af4aa5a3c7a70d22695412a71f1`.
+- Each contains all twelve roof palettes at both light endpoints: twenty-four
+  complete native palettes, not one chosen colour or a static substitute.
+
+The distinct `AFP2` resource header keeps the complete table offsets/count and
+three drawing pointers. Existing fixed-endpoint `AFP1` objects keep their layout.
+Two focused checks in `tests.test_v3_selected_palettes` pass: complete texture,
+vertex, triangle, graphics-state, and all-palette comparisons; reusable object
+reconstruction; source callback/selector mutations; truncated-table rejection;
+and explicit metadata/profile refusal without the native lifecycle.
+
+No ROM, saved format, selector eligibility, or deployment changes. The current
+cartridge remains ABI 248. Native roof selection and drawing integration are
+next; use actual field/player/home readers and verify roof-index correspondence.
+The prepared descriptor retains every callback and pending requirement. Reuse
+the complete objects when installing that shared behaviour.
+
 ## Installed parent-sensitive needle
 
 The ordinary importer installs the compass as joint-motion kind four, using the

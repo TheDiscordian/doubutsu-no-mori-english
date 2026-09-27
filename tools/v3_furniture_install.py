@@ -16,7 +16,7 @@ from apply_translation import write_new
 from v3_asset_loader import BLOB, CONFIG, MODULE, STARTUP, ROOT, compile_part
 from v3_campsite_calendar import PACKAGE_SIZE
 from v3_furniture_pipeline import (Source,LAYERS,prepare,metadata,identity_rows,draw_sequence,
-    PENDING_MOVE_CATEGORY,PENDING_SEQUENCE_CATEGORY)
+    PENDING_MOVE_CATEGORY,PENDING_SEQUENCE_CATEGORY,SELECTED_PALETTE_CATEGORY)
 from v3_furniture_pipeline import VERSION as ASSET_VERSION
 from v3_garden_runtime import install_catalogue
 from v3_import_storage import PACKAGE, PACKAGE_RAM, ROWS, ROWS_RAM, ITEMS, TABLE_END, END, slot
@@ -76,7 +76,7 @@ def profile(row, vrom, *, limit=END, model_capacity=9216):
     from v3_furniture_joint_rigs import profile_lifecycle as joint_lifecycle
     if (adapter.get('category')==JOINT_CATEGORY and not joint_lifecycle(
             row['profile'],row.get('room_lifecycle'),row.get('room_placement')) or
-            adapter.get('category') in (FIXED_CATEGORY,PENDING_MOVE_CATEGORY,PENDING_SEQUENCE_CATEGORY) or scrolling and
+            adapter.get('category') in (FIXED_CATEGORY,PENDING_MOVE_CATEGORY,PENDING_SEQUENCE_CATEGORY,SELECTED_PALETTE_CATEGORY) or scrolling and
             (not profile_lifecycle(row['profile'],row.get('room_lifecycle'),row.get('room_placement')) or
              row.get('room_runtime')!={'vtable':SCROLL_VTABLE,'vrom':vrom})):
         raise ValueError('Prepared resources have no implemented native lifecycle')

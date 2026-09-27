@@ -1903,6 +1903,35 @@ or different-format artwork, and framing outside the checked source table remain
 categories. Unsupported does not mean unused or unimportant. A successfully
 converted object is not automatically evidence of complete gameplay.
 
+### Selected roof palettes
+
+`selected-palette-fade-assets` extends the existing palette-fade converter for
+indexed endpoint tables. Category recognition binds complete create/move/draw/
+destroy functions, paired table/model references, calls, and full selector/morph
+helpers. Both house models share the same lifecycle and twelve-entry endpoint
+tables; their complete three-list drawing order comes from their actual callbacks.
+No item ID or model-name suffix selects the implementation.
+
+The converter retains both complete 384-byte tables as twenty-four aligned
+sixteen-colour native palettes per object. Every roof colour and transparency
+entry survives; changed on/off entries must both be opaque. Both complete models
+use the existing geometry/texture/material emitter and one bulk compiler run.
+
+The prepared object has a 32-byte `AFP2` header: magic, 16-bit full object length,
+16-bit model count, two 32-bit offsets for the on/off palette tables, three
+segmented model pointers in source drawing order, and the 32-bit palette count.
+This is distinct from `AFP1`; existing fixed-endpoint runtime code must not accept
+it as an ordinary pair. The metadata and profile builders reject it until the
+native roof selection and full lifecycle are bound.
+
+The donor selector uses the current room's home roof colour during gameplay,
+the current player's assigned home in previews, and colour zero where neither
+applies. Its GameCube cottage condition must be reviewed against actual native
+room identities, not copied as a scene number. Native field IDs, player/house
+arrangement, stored roof indices, and their correspondence to the twelve donor
+palettes remain required integration. The source's interpolation and complete
+model order remain required; resource conversion is not static-colour gameplay.
+
 ## Shared installation
 
 ### Shared holiday reward preparation

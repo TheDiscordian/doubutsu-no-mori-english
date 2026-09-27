@@ -21,8 +21,18 @@ prevent asset/data conversion or redirect work from an unfinished shared format.
 Incomplete gameplay stays unavailable in the selector; installing assets does
 not claim that an item is playable. Reuse unchanged passing tests throughout.
 
-Current task: continue the remaining shared model/lifecycle categories and
-console launch/storage integration. The compass's parent-sensitive needle is
+Current task: connect the selected-roof-palette lifecycle, then continue the
+remaining model/lifecycle and console launch/storage categories. Both complete
+house models are prepared at `build/v3-selected-palette-assets-01/`: 9,344 bytes,
+93 triangles, all twelve roof colours and both light endpoints. Two focused
+checks pass. Reuse these objects; do not reconvert one item at a time. Bind actual
+native room/player/home selection and verify the roof index correspondence.
+Known native entries are `mFI_GetFieldId` at `80087C88` and
+`mHS_get_arrange_idx` at `80094BF4`; symbols alone are not verified call bindings.
+Extend the shared palette lifecycle or move shared code into a checked reservation
+if the existing 1-KiB palette owner cannot fit it. Do not use a fixed roof colour.
+
+The compass's parent-sensitive needle is
 installed through the ordinary importer in ABI 248 at
 `build/v3-parent-needle-imports-02/cartridge/build-lock.json`, ROM SHA-256
 `7305352828576a26a780485956122af0612e39e29ab85bd703091303663adec9`.
