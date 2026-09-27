@@ -64,6 +64,61 @@ python3 tools/v3_furniture_pipeline.py import \
 python3 -m unittest -v tests.test_v3_composite_rigs.InstalledTests
 ```
 
+## Radio room-music binding
+
+Inspection of the actual ABI-271 room owner identifies the music state at owner
+offset `45C`: current song (`45C`), previous song (`460`), reservation flag (`464`),
+timer (`466`), reserved actor (`468`), active actor (`46C`), and active flag (`470`).
+These are existing native fields, not proposed extra saved state. Complete native
+functions and current SHA-256 identities are:
+
+| Function | Native range, end exclusive | SHA-256 |
+| --- | --- | --- |
+| Minidisk destruction | `8093837C..809383EC` | `248ad49d5d1a4fef55fcc148e4b13aeb9625eaff5af65b23417e6bbdea0a9cb2` |
+| Apply music reservation | `809383EC..809384F0` | `43fcffd00a5852eca165ecb45ed2dd9ec506202b9683bf99f35c7ec78938243d` |
+| Reserve minidisk | `809384F0..80938534` | `e9f16f3d8d17add234ced34a34221426a075ca0c9658217f6fc9095acfa262ea` |
+| Reserve default | `80938534..80938554` | `d977dd3c0f023da3d9091deced99d5b014700432546d1917b5615a3fafaaad33` |
+| Switch all players off | `80938554..809385E4` | `2f2586092838336c5440550d7ccd91c71b16b973e113315bd3f40fbf5ee1488b` |
+| Switch one player on | `809385E4..80938614` | `65f5f6b09a10272d5a2f110654dbb01b82a13f6e04f988eaef68e6a7a49ebb54` |
+
+The native reservation function accepts minidisk item IDs `2A00..2A37`, subtracts
+`2980`, and rejects other arguments. It cannot be called with the donor's aerobics
+BGM number as though it were the general GameCube `aMR_ReserveBgm`. The all-off
+routine recognises interaction bit `0008` only; the radio needs bit `4000` included
+without losing existing stereos. Its checked mask instructions are at `809385B0`
+and `809385B4`. Existing stereo calls go through `809385E4`, which calls all-off,
+then sets the chosen actor's switch and changed bytes to one.
+
+Native music application always starts/stops positional MD playback. The donor's
+complete `aMR_ChangeMDBgm` excludes aerobics music from those positional calls.
+The implementation must preserve that distinction, reservation timing, active
+actor ownership, and radio destruction/default restoration. Core helpers are
+`mBGMPsComp_make_ps_room=8005E0DC`, `delete_ps_room=8005E69C`,
+`MDPlayerPos_make=8005EA24`, and `MDPlayerPos_delete=8005EA38`. Song/audio identity
+still needs checking; matching the donor enum's value 27 alone is insufficient.
+
+The source helpers are complete GAFE01-r0 REL functions: radio constructor at
+`1019E8` (72 bytes), destructor `101A30` (108), apply music `101A9C` (296), reserve
+music `101BC4` (24), reserve default `101BDC` (32), all-off `101BFC` (148), one-on
+`101C90` (56), and radio movement `103ACC` (204). Source code is in
+`local/ac-decomp/src/actor/ac_my_room.c`, with the model/note callback in
+`src/furniture/ac_radio_test.c`. The radio movement's haniwa-state-one branch
+reserves playback and clears that state; ordinary changed-switch handling applies
+the reservation immediately and retains exclusive playback.
+
+The existing outdoor N64 radio requests effect `20` with argument 0 equal to one
+every 18 native ticks, corresponding to the donor's 36 source ticks. This is a
+candidate shared note-effect dependency, not a verified indoor binding. Check the
+complete native effect before reuse. Drawing retains the prepared complete model,
+fixed palette, and `-7000` Y rotation; source notes use Y minus 3 and angle minus
+`1000` with no transition-state suppression.
+
+Native owner calls/globals relocate. Use the verified owner overlay descriptor
+as in `room_carry_native.c`, not fixed `8093xxxx` runtime calls. A replacement used
+by ordinary stereos must load the shared packet before entering it; the existing
+checked bootstrap loader supplies that mechanism. These identified dependencies
+are not installed radio behaviour, and no radio option is enabled yet.
+
 ## Prepared composite models and dual motion
 
 `build/v3-composite-rigs-prepared-01/` contains the complete two-record asset

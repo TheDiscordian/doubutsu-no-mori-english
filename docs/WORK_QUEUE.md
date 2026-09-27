@@ -25,6 +25,12 @@ Current task: finish the prepared radio's complete room-music ownership,
 constructor/destructor interactions, exclusive playback, note emission, and rotated
 drawing; then continue console launch/storage. Reuse the ordinary category importer
 and complete prepared assets. Do not add per-item installers or omit unique behaviour.
+The [radio binding checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#radio-room-music-binding)
+identifies actual native state/functions and the important differences: native
+reservation accepts minidisk item IDs, all-off excludes the radio interaction bit,
+and music application lacks the donor's aerobics positional-playback exception.
+Connect these shared paths, including checked packet loading and relocated owner
+access, rather than starting a separate music player.
 
 The chest's complete native lifecycle is installed: both motions, all three scroll
 layers, distinct mapped sounds, actual room/contact readers, destruction, and saved
