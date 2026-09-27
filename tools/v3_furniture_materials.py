@@ -36,6 +36,10 @@ FORMS=(
     (248,'1620710b94c51876518191545975071f74fa9a2dc0b517df4a4b3ec22d335602',
      (0x66,0x7A),((0x6A,0x9A),(0x86,0x9E),(0x8A,0x96)),0x4C,'texture',8,2,
      dict(input='room-or-preview-frame',division=6,modulo=2)),
+    (280,'e79ad86f7d24f2c98ad5dc0bb27f693c947b885871173abf925d4295561cb21c',
+     (0x7E,0x92),((0xCA,0xDA),(0xCE,0xE2)),0x3C,'texture',8,4,
+     dict(input='switch-and-room-or-preview-frame',division=6,modulo=4,signed=True,off_frame=4),
+     dict(off_pair=(0xAA,0xBA),save=0x8009AED0,restore=0x8009AF1C)),
 )
 
 
@@ -57,9 +61,10 @@ def discover(source,name,at,functions):
             struct.pack_into('>I',normalized,loc,word&0xFC000003)
     form=next((r for r in forms if sha256(normalized)==r[1]),None)
     if form is None:return None
-    size,digest,table_pair,model_pairs,call,kind,segment,count,selector=form
+    size,digest,table_pair,model_pairs,call,kind,segment,count,selector,*options=form
+    options=options[0] if options else {}
     module=u32(source.rel,0)
-    expected={0x10:(10,0,4,0x8009AED4),size-20:(10,0,4,0x8009AF20)}
+    expected={0x10:(10,0,4,options.get('save',0x8009AED4)),size-20:(10,0,4,options.get('restore',0x8009AF20))}
     def pair(hi,lo):
         pointer=draw['relocations'].get(hi)
         if pointer is None or pointer[:3]!=(6,module,5):
@@ -72,8 +77,9 @@ def discover(source,name,at,functions):
             set(pointers)!=set(range(table_at,table_at+n,4))):
         raise ReviewRequired('material frames: incomplete source frame table')
     frames=[]
-    for pos in range(table_at,table_at+n,4):
-        symbol,target,length=source.containing(pointers[pos],exact=True)
+    frame_resources=[source.containing(pointers[pos],exact=True) for pos in range(table_at,table_at+n,4)]
+    if 'off_pair' in options:frame_resources.append(pair(*options['off_pair']))
+    for symbol,target,length in frame_resources:
         if source.pointers(target,length) or (kind=='palette' and length!=32):
             raise ReviewRequired('material frames: incomplete frame resource')
         frames.append(dict(symbol=symbol,donor_offset=target,bytes=length,
@@ -185,6 +191,62 @@ def steam_profile_lifecycle(profile,lifecycle):
         functions['move']['sha256']=='ce05130f00c82d7a7647337000ba94c788c0e81291f58a05efe145a05271b116')
 
 
+def switched_lifecycle(source,profile):
+    """Bind complete switched-screen drawing, positioned loop, and both clicks."""
+    adapter=profile.get('callback_adapter',{});functions=adapter.get('functions',{})
+    if adapter.get('category')!=CATEGORY or set(functions)!={'create','move','draw','destroy'}:return None
+    move=functions['move']
+    if (move['bytes'],move['sha256'])!=(152,'1da445c1c4c638e79e0c099eb3e02c25ebebc0733cb84fa1f2b44c35c9db8129'):return None
+    for role in ('create','destroy'):
+        f=functions[role]
+        raw,actual=source.function(f['offset'])
+        if raw!=bytes.fromhex('4e800020') or actual!=f or f['relocations']:
+            raise ValueError('Changed switched material empty lifecycle')
+    raw,actual=source.function(move['offset'])
+    selector=dict(input='switch-and-room-or-preview-frame',division=6,modulo=4,signed=True,off_frame=4)
+    if (actual!=move or profile['contact_action'] or profile['interaction_flags']!=0x1000 or
+            adapter['pending_profile_fields']!=['interaction'] or
+            len(adapter['material_frames'])!=1 or adapter['material_frames'][0]['selector']!=selector):
+        raise ValueError('Changed switched material source profile or selector')
+    helpers=source.checked_callback_code(copy.deepcopy(move),152,
+        '0901d3f6d71220092b394216d0207fdcad3a13703fbcc5cb90d8b21b7e5815bd',{},
+        {0x4C:(0x2BDD84,'sAdo_OngenPos'),0x70:(0x2BDDE8,'sAdo_OngenTrgStart'),
+         0x80:(0x2BDDE8,'sAdo_OngenTrgStart')},'switched material',internal_branches=True)
+    expected={
+        'sAdo_OngenPos':(100,'b982dbca7ed68e0565b554e142e64d69a1d2c47ec061169d114502a25e61f885',
+            {72:(10,0,4,0x80012E2C),10:(6,1,6,2306744),34:(4,1,6,2306744)}),
+        'sAdo_OngenTrgStart':(72,'4fdc889bb1697c19c8f386d72b80585ea07706d9f26b328389766bec96f0f989',
+            {48:(10,0,4,0x8001383C)})}
+    for name,(size,digest,relocs) in expected.items():
+        if any(helpers[name][k]!=v for k,v in dict(bytes=size,sha256=digest,relocations=relocs).items()):
+            raise ValueError('Changed switched material complete sound helper')
+    return json.loads(json.dumps(dict(category='switched-material-loop',source_sound_id=0x5E,
+        switch_clicks=[0x16,0x17],start_disabled=True,excluded_states=[13,14,15,12],
+        click_excluded_states=[],click_pulse='any-nonzero',selector=selector,
+        functions=functions,helpers=helpers)))
+
+
+def switched_profile_lifecycle(profile,lifecycle,placement):
+    if not isinstance(lifecycle,dict) or lifecycle.get('category')!='switched-material-loop':return False
+    adapter=profile.get('callback_adapter',{})
+    return (bool(placement) and profile.get('interaction_flags')==0x1000 and not profile.get('contact_action') and
+        lifecycle.get('functions')==json.loads(json.dumps(adapter.get('functions'))) and
+        all(lifecycle.get(k)==v for k,v in dict(source_sound_id=0x5E,switch_clicks=[0x16,0x17],
+            start_disabled=True,excluded_states=[13,14,15,12],click_excluded_states=[],
+            click_pulse='any-nonzero').items()) and
+        lifecycle.get('selector')==adapter['material_frames'][0]['selector'])
+
+
+def checked_switched(source,profile,binding,contracts,placement):
+    lifecycle=switched_lifecycle(source,profile)
+    if (lifecycle is None or not switched_profile_lifecycle(profile,lifecycle,placement) or
+            not binding.get('lifecycle_installed') or binding.get('lifecycle')!=5 or binding.get('mode')!=3 or
+            binding.get('state_offset')!=lifecycle['source_sound_id'] or
+            binding.get('material_lifecycle')!=lifecycle or contracts.get(binding['source_item_id'])!=lifecycle):
+        raise ValueError('Switched material lacks complete sound, selector, or fresh-placement binding')
+    return lifecycle
+
+
 def runtime_record(row):
     """Translate a fully checked source descriptor into the shared draw ABI."""
     from v3_registry import furniture_identity
@@ -196,11 +258,13 @@ def runtime_record(row):
     if selector==dict(input='actor-s16',offset=0x82C,mask=1):mode,divisor,state=2,0,0x1A4
     elif selector==dict(input='room-or-preview-frame',division=10,modulo=4,signed=True,
                        stopped_in_room_when_switch_off=True):mode,divisor,state=1,10,0
+    elif selector==dict(input='switch-and-room-or-preview-frame',division=6,modulo=4,signed=True,off_frame=4):
+        mode,divisor,state=3,6,0
     elif (set(selector)=={'input','division','modulo'} and selector['input']=='room-or-preview-frame'
           and (selector['division'],selector['modulo']) in ((8,7),(20,4),(2,2),(6,2))):
         mode,divisor,state=0,selector['division'],0
     else:raise ValueError('Unsupported material selector semantics')
-    if mode!=2 and selector['modulo']!=len(material['frames']):raise ValueError('Incomplete material frame sequence')
+    if mode!=2 and selector['modulo']+(mode==3)!=len(material['frames']):raise ValueError('Incomplete material frame sequence')
     resources={r['symbol']:r for r in row['resources']};frames=[]
     for frame in material['frames']:
         r=resources[frame['symbol']]

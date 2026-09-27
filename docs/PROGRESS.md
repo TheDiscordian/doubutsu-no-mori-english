@@ -31,6 +31,18 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
+The shared material importer installs the harvest TV's complete switched-screen
+lifecycle: both models and all 37 triangles, four timed on-frame entries plus the
+off image, complete positioned loop and both clicks, and native start-disabled
+placement. The audio converter retains the source lead-in rest and correct
+envelope alignment for odd-address programmes. Thirteen focused checks pass,
+including host draw/sound dispatch, complete donor asset comparison, installed
+dependencies, unchanged saved data/profile bits, and private browser composition.
+The profile stays inactive pending the actual Harvest reward route. Native
+execution, ordinary GPU appearance/audio synthesis, and hardware remain
+unverified. See the
+[switched-screen checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#installed-switched-texture-lifecycle).
+
 The shared importer installs both complete house/manor models and their selected
 roof/light lifecycle. All 9,344 artwork bytes and 93 triangles are reused. The
 native room identity or preview player's actual assigned home selects among all
@@ -83,8 +95,8 @@ appearance remain unverified. The profiles stay inactive pending actual
 acquisition. The compass uses the same dispatcher with installed parent support. See the
 [joint-lifecycle checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#installed-switched-joint-lifecycles).
 
-The checked proposal is ABI 252 at
-`build/v3-selected-palette-runtime-04/build-lock.json`, with 159
+The checked proposal is ABI 255 at
+`build/v3-switched-material-imports-02/profile-runtime/build-lock.json`, with 159
 development choices and unchanged format-four saved data. The complete
 10,448-byte snowboard remains imported through the ordinary pipeline,
 including all 259 triangles, thirteen textures, and actual winter-camper route.

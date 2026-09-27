@@ -1,5 +1,76 @@
 # Automatic furniture pipeline checkpoint
 
+## Installed switched-texture lifecycle
+
+The ordinary material-category importer installs complete harvest TV graphics
+and behaviour, without a dedicated item installer. The frame bank contains the
+source `g,h,i,h` sequence and separate `f` off image. Both opaque models retain
+all 37 triangles and their source draw order. Lifecycle 5 connects the positioned
+loop, both switch clicks, and native fresh-placement rule; no actor work or saved
+field is added. The official donor name is recorded in the sole provenance
+catalogue.
+
+- Current build: `build/v3-switched-material-imports-02/profile-runtime/build-lock.json`, ABI 255.
+- ROM SHA-256: `2872c0b37a63df9d162c42b157c83b6053b2447e223b7a90cda564629f43e606`.
+- UPS SHA-256: `79bc671bee0ad26f1f0a8242555f803f16e858039490c08806f462376a82257a`.
+- Complete object: 4,272 bytes, SHA-256 `48952f0c03bcd8a8376bb80fb62550d711aa45738bc1544e1af88a2ed24e39f1`.
+- Room code: 20,384 of 32,768 bytes; bootstrap: 1,509 of 1,536.
+- Code SHA-256: `5fd79f397b388cf7925b3bb245b5263df44c6171fcce02e69074b65a60f89c24`.
+- Room packet SHA-256: `70ffdff285b3f6dc7ceff9497b7bf5be9de5edde530a1fa04eeee41261bf1af2`.
+
+The initial material stage reached ABI 253 and exposed an unsupported audio
+lead-in. The shared parser now retains timed rests before the instrument,
+including the donor's seven-unit rest. Its 29-byte programme begins at an odd
+address; the complete 33-byte bound programme preserves that parity so the
+internal envelope remains halfword aligned. Channels without an internal
+envelope retain their established layout. The matching complete instrument and
+15,858-byte sample are reused from the installed bank. No physical audio plays.
+The ordinary importer resumes from the completed material lock, reuses artwork,
+installs complete audio at ABI 254, and stages the full profile at ABI 255.
+
+Thirteen focused checks pass: four switched-material checks, eight shared audio
+parser checks, and the existing complete prepared-artwork comparison. The host
+test runs the actual renderer and sound dispatcher for 1,200 draws and 256
+sound/switch cases under address/undefined-behaviour sanitizers. It covers both
+index forms, on/off state, distinct gameplay/preview counters, counter wrapping,
+room-pointer/control-type disagreement, any-nonzero click pulses, all sixteen
+native movement states, complete model order, unchanged actor/resources, and
+malformed/crowded graphics inputs. Audio and matrix calls are stubbed.
+Source checks reject changed callbacks/helpers. Integration checks verify the
+complete loop/instrument/sample and clicks, placement binding, installed data,
+retained room/goods/carrying records, unchanged saved format/profile, UPS
+reconstruction, and four private browser/offline compositions. A test initially
+requested a profile field absent from the compact binding record; it now reads
+the actual source descriptor, and the affected test passes on rerun.
+
+No native emulator fixture is replayed. Ordinary drawing, audio synthesis,
+save/restart with this item, and original hardware remain unverified. The actual
+`ftr_listHarvest` acquisition route is unfinished, so the profile is inactive,
+not substituted with shop stock. All 159 enabled choices and format-four saves
+are unchanged. Existing V3 saves still require an equal-or-larger enabled import
+set and remain unsuitable for V2. Existing ROMs/saves, the main build lock, and
+both stable V2 deployments are untouched.
+
+Reproduction from the prior complete proposal uses the normal category command:
+
+```sh
+python3 tools/v3_furniture_pipeline.py import \
+  --base-lock build/v3-selected-palette-runtime-04/build-lock.json \
+  --category material-frame-assets \
+  --reuse-assets build/v3-switched-material-imports-01/prepared \
+  --output build/v3-switched-material-reproduction
+V3_SWITCHED_MATERIAL_BATCH=build/v3-switched-material-reproduction \
+  python3 -m unittest tests.test_v3_switched_materials -v
+python3 -m unittest tests.test_v3_sound_programs.ProgramTests -v
+V3_FURNITURE_PREPARED_ART=build/v3-switched-material-imports-01/prepared \
+  python3 -m unittest \
+  tests.test_v3_furniture_pipeline.DonorTests.test_prepared_artwork_cannot_bypass_missing_gameplay_or_acquisition -v
+```
+
+Next: combined skeleton/material animation for the hamster cage, followed by
+remaining callback/model and full console launch/storage categories. Acquisition
+and gold-tree work remain after the primary importing pipelines.
+
 ## Installed selected-roof-palette lifecycle
 
 The ordinary importer installs both complete house/manor profiles and their

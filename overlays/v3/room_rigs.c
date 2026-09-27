@@ -91,7 +91,7 @@ void af_v3_room_sound_mv(RoomSoundActor *actor,void *room,RoomRigGame *game,u8 *
     extern int af_v3_room_static_mv(RoomSoundActor *,void *,RoomRigGame *);
     if (af_v3_room_static_mv(actor,room,game)) return;
 #endif
-#if defined(AF_V3_ROOM_REACTIONS) || defined(AF_V3_ROOM_COLOURS) || defined(AF_V3_ROOM_PARTICLES)
+#if defined(AF_V3_ROOM_REACTIONS) || defined(AF_V3_ROOM_COLOURS) || defined(AF_V3_ROOM_PARTICLES) || defined(AF_V3_ROOM_SWITCHED_MATERIAL)
     if (af_v3_room_material_mv((RoomRig *)actor,room,game,data)) return;
 #endif
     (void)room;(void)game;(void)data;

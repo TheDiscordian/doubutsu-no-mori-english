@@ -24,7 +24,7 @@ from v3_registry import FURNITURE, LEGACY_FURNITURE, furniture_identity, furnitu
 from v3_room_aliases import discover as room_aliases, pending_reason as room_alias_reason
 from v3_villager_art import native_palette, normalise_vertex_flags
 
-VERSION = 29
+VERSION = 30
 PENDING_MOVE_CATEGORY = 'static-models-pending-move'
 PENDING_SEQUENCE_CATEGORY = 'constant-model-sequence-pending-lifecycle'
 SELECTED_PALETTE_CATEGORY = 'selected-palette-fade-assets'
@@ -1358,7 +1358,7 @@ def convert(source, worksheet, output, selected=(), installed=None, *, assets_on
 def rig_import_plan(inventory, report, bindings, selected=(), category=None, *, source=None):
     """Plan shared dependencies, not per-item installers or acquisition guesses."""
     from v3_furniture_rigs import CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY,ROLLING_CATEGORY
-    from v3_furniture_materials import CATEGORY as MATERIAL_CATEGORY,initializer_lifecycle,steam_lifecycle
+    from v3_furniture_materials import CATEGORY as MATERIAL_CATEGORY,initializer_lifecycle,steam_lifecycle,switched_lifecycle
     from v3_furniture_scroll import CATEGORY as SCROLL_CATEGORY,draw_only_lifecycle
     from v3_furniture_reactions import source_lifecycle as reaction_lifecycle,colour_lifecycle
     from v3_sound_programs import furniture_trigger,furniture_level
@@ -1392,11 +1392,12 @@ def rig_import_plan(inventory, report, bindings, selected=(), category=None, *, 
         reaction=reaction_lifecycle(source,r['profile']) if source is not None and initializer is None else None
         colour=colour_lifecycle(source,r['profile']) if source is not None and initializer is None and reaction is None else None
         steam=steam_lifecycle(source,r['profile']) if source is not None else None
+        switched=switched_lifecycle(source,r['profile']) if source is not None else None
         trigger=furniture_trigger(source,r['profile']) if source is not None else None
-        if initializer or reaction or colour or steam or trigger:
+        if initializer or reaction or colour or steam or switched or trigger:
             material_rows.append(r)
             if trigger:material_audio.append(r['item_id'])
-            if colour or steam:material_loops.append(r['item_id'])
+            if colour or steam or switched:material_loops.append(r['item_id'])
             if steam:effects.update(steam['effects'])
     rigs={r['source_item_id'] for r in report['equipment_resources']['room_rigs']['rows']}
     audio={r['item_id'] for r in report['equipment_resources'].get('furniture_audio',{}).get('furniture',[])}

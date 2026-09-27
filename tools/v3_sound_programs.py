@@ -334,8 +334,8 @@ def furniture_level(source,profile):
     if adapter.get('category')==JOINT_CATEGORY:return joint_level(source,profile)
     if adapter.get('category')=='material-frame-assets':
         from v3_furniture_reactions import colour_lifecycle
-        from v3_furniture_materials import steam_lifecycle
-        return colour_lifecycle(source,profile) or steam_lifecycle(source,profile)
+        from v3_furniture_materials import steam_lifecycle,switched_lifecycle
+        return colour_lifecycle(source,profile) or steam_lifecycle(source,profile) or switched_lifecycle(source,profile)
     if adapter.get('category')=='billboard-scroll-keyframe-rig':
         return copy.deepcopy(adapter['level_sound'])
     if adapter.get('category')=='static-interaction':
@@ -530,18 +530,32 @@ def reward_fanfares(image,code,source):
         new_sequences=0,new_instruments=0,new_samples=0,native_resources_retained=True)
 
 
+def loop_header(data,origin,*,prefix=False):
+    """Retain timed lead-in rests before the layer's instrument command."""
+    start=4 if prefix else 0
+    if (not 0<=origin<=65536-len(data) or span(data,start,1)!=b'\x88' or
+            span(data,start+3,1)!=b'\xFF' or
+            struct.unpack('>H',span(data,start+1,2))[0]!=origin+start+4):
+        raise ValueError('Incomplete single-layer loop channel')
+    if prefix and (data[0]!=0xEB or data[1]>3 or data[2]>125 or data[3]!=0xC4):
+        raise ValueError('Unsupported explicit loop bank')
+    at=start+4;intro=[]
+    while span(data,at,1)==b'\xC0':
+        here=at;duration=span(data,at+1,1)[0];at+=2
+        if duration&128:duration=(duration&127)*256+span(data,at,1)[0];at+=1
+        if not duration:raise ValueError('Zero-time loop introduction')
+        intro.append(dict(offset=here,duration=duration,rest=True))
+    if span(data,at,1)!=b'\xC6':raise ValueError('Missing complete loop instrument command')
+    return at+1,intro
+
+
 def timed_looping_layer(data,origin,*,prefix=False):
     """Complete retriggering layer, retaining each envelope and timed event."""
     start=4 if prefix else 0
-    if (not 0<=origin<=65536-len(data) or span(data,start,1)!=b'\x88' or
-            span(data,start+3,2)!=b'\xFF\xC6' or
-            struct.unpack('>H',span(data,start+1,2))[0]!=origin+start+4):
-        raise ValueError('Incomplete timed loop channel')
-    if prefix and (data[0]!=0xEB or data[1]>3 or data[2]>125 or data[3]!=0xC4):
-        raise ValueError('Unsupported explicit timed-loop bank')
-    inst=span(data,start+5,1)[0]
+    instrument_at,intro=loop_header(data,origin,prefix=prefix)
+    inst=span(data,instrument_at,1)[0]
     if inst>125:raise ValueError('Unsupported timed-loop instrument')
-    at=start+6;events=[];envelopes=[];pointers=[start+1];boundaries=set()
+    at=instrument_at+1;events=[];envelopes=[];pointers=[start+1];boundaries=set()
     while span(data,at,1)!=b'\xFB':
         here=at;boundaries.add(at);op=data[at];at+=1
         if op==0xCB:
@@ -570,7 +584,8 @@ def timed_looping_layer(data,origin,*,prefix=False):
             if row['offset']==offset:row.update(bytes=len(envelope),sha256=sha256(envelope))
     if len(data)-cursor>15 or any(data[cursor:]):raise ValueError('Unaccounted timed-loop tail')
     return dict(kind='timed-retrigger-loop',origin=origin,bytes=len(data),sha256=sha256(data),
-        instrument=inst,instrument_offset=start+5,pointers=pointers,loop=loop,
+        instrument=inst,instrument_offset=instrument_at,pointers=pointers,loop=loop,
+        **({'intro_events':intro} if intro else {}),
         events=events,envelopes=envelopes,duration=sum(e['duration'] for e in events))
 
 
@@ -581,13 +596,11 @@ def looping_layer(data, origin, *, prefix=False):
     if not 0<=origin<=65536-len(data):raise ValueError('Loop exceeds sequence address space')
     if prefix and (span(data,0,1)!=b'\xEB' or data[1]>3 or data[2]>125 or data[3]!=0xC4):
         raise ValueError('Unsupported explicit loop bank')
-    if (span(data,start,1)!=b'\x88' or span(data,start+3,2)!=b'\xFF\xC6'
-            or struct.unpack_from('>H',data,start+1)[0]!=origin+start+4):
-        raise ValueError('Incomplete single-layer loop channel')
-    instrument_index=span(data,start+5,1)[0]
+    instrument_at,intro=loop_header(data,origin,prefix=prefix)
+    instrument_index=span(data,instrument_at,1)[0]
     if instrument_index>125:
         raise ValueError('Unsupported loop instrument/envelope')
-    at=start+6;early_mode=span(data,at,1)==b'\xC4';mode=at
+    at=instrument_at+1;early_mode=span(data,at,1)==b'\xC4';mode=at
     if early_mode:at+=1
     env_command=at;envelope=None;env_pointer=None;decay=None
     if span(data,at,1)==b'\xCB':
@@ -614,12 +627,17 @@ def looping_layer(data, origin, *, prefix=False):
         env=extended_envelope(data,envelope,minimum_steps=1);end=envelope+len(env)
     if len(data)-end>15 or any(data[end:]):raise ValueError('Unaccounted loop tail')
     return dict(origin=origin,bytes=len(data),sha256=sha256(data),instrument=instrument_index,
-        pointers=pointers,instrument_offset=start+5,envelope=envelope,envelope_bytes=len(env),
+        pointers=pointers,instrument_offset=instrument_at,envelope=envelope,envelope_bytes=len(env),
+        **({'intro_events':intro} if intro else {}),
         decay=decay,note=note&63,duration=duration,velocity=velocity,loop=loop)
 
 
+def loop_parity(description):
+    return description['origin']&1 if description.get('envelope') is not None or description.get('envelopes') else 0
+
+
 def bind_loop(data,description,offset,instrument_index,selector=0):
-    if (looping_layer(data,description['origin'])!=description or offset&1
+    if (looping_layer(data,description['origin'])!=description or (offset&1)!=loop_parity(description)
             or not 0<=offset<=65536-len(data)-4 or not 0<=instrument_index<=125
             or not 0<=selector<=3):raise ValueError('Loop binding exceeds checked structure')
     output=bytearray(bytes((0xEB,selector,instrument_index,0xC4))+data)
@@ -705,7 +723,10 @@ def prepare_levels(image,prior,code,source_ids,*,font_resources=None):
             inst=u32(font,8+target*4)
             samples=[u32(font,inst+field) for field in (8,16,24)]
             new_sample=any(p and u32(font,p+4)>=len(extra_wave) for p in samples)
-        result.extend(bytes(len(result)&1));at=len(result);bound=bind_loop(data,description,at,target,selector)
+        # Envelopes are halfword aligned in absolute sequence space. Some
+        # complete channels begin at odd addresses; preserve that parity.
+        result.extend(bytes((len(result)&1)^loop_parity(description)));at=len(result)
+        bound=bind_loop(data,description,at,target,selector)
         result.extend(bound);struct.pack_into('>H',result,table+sid*2,at)
         rows.append(dict(kind='level',source_sound_id=sid,native_sound_id=sid,source_program=description,
             source_bank=sb,native_bank=selected_bank,native_instrument=target,instrument_identity=identity,

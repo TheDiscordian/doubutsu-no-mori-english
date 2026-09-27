@@ -2,6 +2,23 @@
 #include <stdio.h>
 #include <string.h>
 #include "../overlays/v3/room_materials.c"
+#ifdef AF_V3_ROOM_SWITCHED_MATERIAL
+#include "../overlays/v3/room_rigs.c"
+RoomRigTable af_v3_test_room_rigs;
+RoomSoundTable af_v3_test_room_sounds;
+RoomNativeTrigger af_v3_test_room_triggers[6];
+static unsigned loops,clicks;
+static RoomRig *expected_actor;
+static u32 expected_sound;
+void sAdo_OngenPos(u32 id,u8 sound,float *position) {
+    assert(id==(u32)(uptr)expected_actor && sound==expected_sound && position==expected_actor->position);
+    ++loops;
+}
+void sAdo_OngenTrgStart(u32 sound,float *position) {
+    assert(sound==(expected_actor->switched ? 0x16u : 0x17u) && position==expected_actor->position);
+    ++clicks;
+}
+#endif
 RoomMaterialTable af_v3_test_room_materials;
 static unsigned matrices;
 void *_Matrix_to_Mtx_new(void *value) {
@@ -37,6 +54,7 @@ int main(int argc,char **argv) {
         RoomMaterialRecord *r=table->rows+n;
         for (unsigned room=0;room<2;++room) for (unsigned on=0;on<2;++on) {
             memset(&guarded,0xA7,sizeof(guarded));actor->index=r->index+(room ? 0 : 1024);
+            actor->ctr_type=(s16)room;
             RoomRig initialized=*actor;
             if (r->lifecycle==1)*(s16 *)((u8 *)&initialized+0x1A4)=-1;
             af_v3_room_material_ct(actor,model);
@@ -52,15 +70,17 @@ int main(int argc,char **argv) {
                 source_frame&=0xFFFFFFFFu;
                 unsigned wanted;
                 if (r->mode==2)wanted=(unsigned)(tick-150)&1;
-                else if (r->mode==1) {
+                else if (r->mode==1 || r->mode==3) {
                     long long signed_frame=(long long)source_frame;
                     if (signed_frame>=0x80000000LL)signed_frame-=0x100000000LL;
-                    wanted=room && !on ? 0 : (unsigned)(signed_frame/10)&3;
+                    wanted=r->mode==3 ? (!on ? 4 : (unsigned)(signed_frame/6)&3) :
+                        room && !on ? 0 : (unsigned)(signed_frame/10)&3;
                 } else wanted=(unsigned)(source_frame/r->divisor)%r->frames;
                 RoomRig before=*actor;unsigned before_count=matrices;
                 gfx.head=(RoomCommand *)arena;gfx.tail=arena+sizeof(arena)-(tick&1)*8;
                 u8 *end=gfx.tail;memset(arena,0x42,sizeof(arena));
-                af_v3_room_material_dw(actor,room ? actor : NULL,&play.game,model);
+                /* Switched screens use ctr_type, not the room argument. */
+                af_v3_room_material_dw(actor,(r->mode==3 ? !room : room) ? actor : NULL,&play.game,model);
                 assert(matrices==before_count+1 && gfx.tail==end-64);
                 assert(gfx.head==(RoomCommand *)arena+2+r->models);
                 RoomCommand *commands=(RoomCommand *)arena;
@@ -77,6 +97,22 @@ int main(int argc,char **argv) {
                 for (u8 *p=(u8 *)gfx.head;p<gfx.tail;++p)assert(*p==0x42);
             }
         }
+#ifdef AF_V3_ROOM_SWITCHED_MATERIAL
+        if (r->lifecycle==5) {
+            expected_actor=actor;expected_sound=r->state_offset;
+            const u8 pulses[]={0,1,2,255};
+            for (unsigned alias=0;alias<2;++alias) for (unsigned on=0;on<2;++on)
+            for (int state=0;state<16;++state) for (unsigned p=0;p<4;++p) {
+                actor->index=r->index+alias*1024;actor->switched=on;
+                actor->changed=pulses[p];actor->state=(s16)state;
+                RoomRig before=*actor;loops=clicks=0;
+                af_v3_room_sound_mv((RoomSoundActor *)actor,actor,&play.game,model);
+                assert(loops==(unsigned)(on && state!=5 && state!=6 && state!=13 && state!=15));
+                assert(clicks==(unsigned)(pulses[p]!=0));
+                assert(!memcmp(actor,&before,sizeof(before)));
+            }
+        }
+#endif
     }
     actor->index=table->rows[0].index;
     for (unsigned bad=0;bad<19;++bad) {
@@ -87,7 +123,7 @@ int main(int argc,char **argv) {
         if (bad==2)table->stride++;
         if (bad==3)table->reserved=1;
         if (bad==4)r->bytes=0xFFFF;
-        if (bad==5)r->mode=3;
+        if (bad==5)r->mode=4;
         if (bad==6)r->segment=7;
         if (bad==7)r->frames=9;
         if (bad==8)r->models=5;

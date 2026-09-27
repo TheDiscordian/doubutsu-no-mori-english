@@ -90,7 +90,7 @@ def install_profiles(base,prior,blob,core,original,output,directories):
     from v3_furniture_pipeline import identity_rows,name_metadata
     from v3_import_storage import ROWS_RAM
     from v3_furniture_materials import (CATEGORY as MATERIAL_CATEGORY,initializer_lifecycle,checked_initializer,
-        steam_lifecycle,checked_steam)
+        steam_lifecycle,checked_steam,switched_lifecycle,checked_switched)
     import v3_furniture_reactions as reactions
     from v3_furniture_scroll import (CATEGORY as SCROLL_CATEGORY,VTABLE as SCROLL_VTABLE,
                                     draw_only_lifecycle,checked_runtime,checked_lifecycle,profile_lifecycle)
@@ -159,6 +159,13 @@ def install_profiles(base,prior,blob,core,original,output,directories):
                 if json.loads(json.dumps(contracts.get(donor)))!=json.loads(json.dumps(steam)):
                     raise ValueError('Periodic material requires its complete installed audio')
                 initial=steam
+            switched=switched_lifecycle(source,descriptor) if category==MATERIAL_CATEGORY and initial is None else None
+            if switched:
+                if contracts.get(donor)!=switched:
+                    raise ValueError('Switched material requires its complete installed loop and clicks')
+                if placement is None:
+                    placement,owner_changes,updates=install_initial_switch(base,prior,blob,source,output)
+                initial=switched
             if category==MATERIAL_CATEGORY:
                 installed=materials.get(donor)
                 if installed and initial and not installed.get('lifecycle_installed'):
@@ -166,9 +173,9 @@ def install_profiles(base,prior,blob,core,original,output,directories):
                         runtime['reactions']=reactions.prepare_installation(source,base,prior)
                     if colour and not runtime.get('colours'):
                         runtime['colours']=reactions.prepare_colours(base,prior)
-                    installed.update(lifecycle=4 if steam else 3 if colour else 2 if reaction else 1,
-                        state_offset=initial['source_sound_id'] if colour or steam else initial['native_face'] if reaction else initial['native_offset'],
-                        material_lifecycle=json.loads(json.dumps(initial)) if reaction or colour or steam else initial,lifecycle_installed=True)
+                    installed.update(lifecycle=5 if switched else 4 if steam else 3 if colour else 2 if reaction else 1,
+                        state_offset=initial['source_sound_id'] if colour or steam or switched else initial['native_face'] if reaction else initial['native_offset'],
+                        material_lifecycle=json.loads(json.dumps(initial)) if reaction or colour or steam or switched else initial,lifecycle_installed=True)
                     material_code_changed=True
                 if not installed or not installed.get('lifecycle_installed'):
                     deferred.append(dict(source_item_id=donor,reason='Material lifecycle remains incomplete'))
@@ -266,7 +273,8 @@ def install_profiles(base,prior,blob,core,original,output,directories):
                     sound['profile_installed']=True
             elif category==MATERIAL_CATEGORY and initial:
                 installed=materials[donor]
-                if steam:checked_steam(source,descriptor,installed,contracts,runtime.get('effects',{}))
+                if switched:checked_switched(source,descriptor,installed,contracts,placement)
+                elif steam:checked_steam(source,descriptor,installed,contracts,runtime.get('effects',{}))
                 elif colour:reactions.checked_colour_lifecycle(source,descriptor,installed,contracts)
                 elif reaction:reactions.checked_lifecycle(source,descriptor,installed)
                 else:checked_initializer(source,descriptor,installed)
@@ -305,6 +313,7 @@ def install_profiles(base,prior,blob,core,original,output,directories):
                 installed.update(blob_offset=vrom-BLOB,vrom=vrom,bytes=len(data),sha256=sha256(data),source=row)
             generated=copy.deepcopy(row);generated['room_runtime']=dict(vtable=vtable,vrom=vrom)
             if initial:generated['room_lifecycle']=initial
+            if switched:generated['room_placement']=placement
             if category==JOINT_CATEGORY and initial['start_disabled']:generated['room_placement']=placement
             if category==SCROLL_CATEGORY:generated['room_lifecycle']=lifecycle
             if category==SCROLL_CATEGORY and lifecycle.get('start_disabled'):generated['room_placement']=placement
@@ -358,7 +367,7 @@ def bind_profiles(source,base,report):
     from v3_furniture_capacity import checked as checked_model_capacity
     source.model_bank_capacity=checked_model_capacity(base,report)
     from v3_furniture_materials import (CATEGORY as MATERIAL_CATEGORY,initializer_lifecycle,checked_initializer,
-        steam_lifecycle,checked_steam)
+        steam_lifecycle,checked_steam,switched_lifecycle,checked_switched)
     import v3_furniture_reactions as reactions
     from v3_furniture_scroll import CATEGORY as SCROLL_CATEGORY,VTABLE as SCROLL_VTABLE,checked_lifecycle,checked_runtime
     from v3_sound_programs import furniture_trigger,checked_furniture_loops
@@ -469,6 +478,12 @@ def bind_profiles(source,base,report):
             callbacks=struct.unpack('>5I',bytes.fromhex(runtime['material_vtable_hex']))
             if callbacks[1]!=runtime['bootstrap']['symbols']['af_v3_room_boot_sound_mv']:
                 raise ValueError('Missing periodic material movement dispatch')
+        elif category==MATERIAL_CATEGORY and switched_lifecycle(source,descriptor):
+            art['room_lifecycle']=checked_switched(source,descriptor,binding,contracts,placement)
+            art['room_placement']=placement
+            callbacks=struct.unpack('>5I',bytes.fromhex(runtime['material_vtable_hex']))
+            if callbacks[1]!=runtime['bootstrap']['symbols']['af_v3_room_boot_sound_mv']:
+                raise ValueError('Missing switched material movement dispatch')
         elif category==MATERIAL_CATEGORY:
             trigger=furniture_trigger(source,descriptor)
             sound=next((r for r in runtime['sound_rows'] if r['source_item_id']==donor),None)
@@ -599,14 +614,16 @@ def encode_materials(rows):
         index,n,mode,segment=r['runtime_index'],r['bytes'],r['mode'],r['segment']
         frames,models=r['frame_offsets'],r['model_offsets'];size=r['frame_bytes']
         divisor,state,kind=r['divisor'],r['state_offset'],r['kind'];lifecycle=r.get('lifecycle',0)
-        if (not 1024<=index<2048 or not 32<=n<=9216 or n&15 or mode not in (0,1,2) or
+        if (not 1024<=index<2048 or not 32<=n<=9216 or n&15 or mode not in (0,1,2,3) or
                 segment not in (8,9) or not 1<=len(frames)<=8 or not 1<=len(models)<=4 or
                 kind not in (0,1) or not 0<size<=n or kind==0 and size!=32 or
                 mode==2 and (state!=0x1A4 or len(frames)!=2 or divisor) or
-                lifecycle not in (0,1,2,3,4) or lifecycle==1 and mode!=0 or lifecycle==2 and mode!=2 or
+                lifecycle not in (0,1,2,3,4,5) or lifecycle==1 and mode!=0 or lifecycle==2 and mode!=2 or
                 lifecycle in (3,4) and (mode!=(1 if lifecycle==3 else 0) or not 0<=state<=127) or
-                mode!=2 and (lifecycle not in (3,4) and state!=(0x1A4 if lifecycle else 0) or not 0<divisor<=65535) or
+                lifecycle==5 and (mode!=3 or not 0<=state<=127) or
+                mode!=2 and (lifecycle not in (3,4,5) and state!=(0x1A4 if lifecycle else 0) or not 0<divisor<=65535) or
                 mode==1 and (len(frames)!=4 or divisor!=10) or
+                mode==3 and (len(frames)!=5 or divisor!=6 or kind!=1 or lifecycle not in (0,5)) or
                 any(p&7 or not 0<=p<=n-size for p in frames) or
                 any(p&7 or not 0<=p<=n-8 for p in models)):
             raise ValueError('Invalid complete material selector, resources, or native bounds')
@@ -735,7 +752,9 @@ def publish_packet(equipment,blob,output,*,core=None):
         raise ValueError('Colour publication requires its complete lifecycle and extended packet')
     if not colours and any(r.get('lifecycle')==3 for r in material_rows):
         raise ValueError('Colour material requires its complete player engine')
-    defines=('AF_V3_ROOM_RIG_PACKET',)+(('AF_V3_ROOM_TRIGGER_SOUND',) if sound_rows or reactions or colours or static_rows else ())
+    switched=any(r.get('lifecycle')==5 for r in material_rows)
+    defines=('AF_V3_ROOM_RIG_PACKET',)+(('AF_V3_ROOM_TRIGGER_SOUND',) if sound_rows or reactions or colours or static_rows or switched else ())
+    if switched:defines+=('AF_V3_ROOM_SWITCHED_MATERIAL',)
     if static_rows:defines+=('AF_V3_ROOM_STATIC',)
     if reactions:defines+=('AF_V3_ROOM_REACTIONS',)
     if colours:defines+=('AF_V3_ROOM_COLOURS',)
@@ -861,7 +880,7 @@ def publish_packet(equipment,blob,output,*,core=None):
     if material_rows:
         entry=bootstrap['symbols']['af_v3_room_boot_material_dw']
         if entry&3 or not RAM<=entry<RAM+len(boot):raise ValueError('Material bootstrap escapes reservation')
-        move=bootstrap['symbols']['af_v3_room_boot_sound_mv'] if reactions or colours or any(r.get('move_category')=='switch-trigger-sound' for r in material_rows) else 0
+        move=bootstrap['symbols']['af_v3_room_boot_sound_mv'] if reactions or colours or any(r.get('lifecycle') in (4,5) or r.get('move_category')=='switch-trigger-sound' for r in material_rows) else 0
         create=bootstrap['symbols']['af_v3_room_boot_ct'] if any(r.get('lifecycle') for r in material_rows) else 0
         material_vtable=struct.pack('>5I',create,move,entry,0,0)
         module[MATERIAL_VTABLE-EQUIPMENT_RAM:MATERIAL_VTABLE-EQUIPMENT_RAM+20]=material_vtable

@@ -2268,6 +2268,39 @@ retains the current campsite-lamp hooks and every original effect. Endpoint-hit
 profiles require the installed controller, complete sprite, both sounds, and
 actual full-index wall condition. Prepared resources alone cannot enable an item.
 
+## Switched texture frames and positioned sound
+
+The complete switched-screen draw form extends `material-frame-assets`; there
+is no item-specific converter or installer. It preserves both opaque models in
+source order, every on-frame table entry (including duplicates), and the separate
+off image. Material mode 3 uses five frame offsets: four timed on frames followed
+by the off frame. The full source draw function, pointer relocations, frame
+resources, matrix helper, and selector are checked before conversion.
+
+The source control type chooses the gameplay or preview counter. Native counters
+advance at half the donor rate, so the renderer doubles the selected counter,
+performs signed division by six, and selects the low two quotient bits. Counter
+wrapping retains the source result without signed C overflow. The off image is
+selected in both rooms and previews; it is not a frozen on-frame. Native actor
+control type at offset two supplies the selector, independently of a room pointer.
+
+Lifecycle 5 stores the complete bound level-sound identity in `state_offset`.
+It refreshes the positioned loop while switched on, excluding native transition
+states 5/6/13/15. Both source switch clicks remain: any nonzero change pulse plays
+the appropriate click, including during those transition states. No private actor
+work, allocation, or new saved fields are required. The checked native placement
+adapter honours the donor's start-disabled flag without changing reload state.
+The ordinary importer plans complete artwork, loop/click dependencies, and the
+shared profile together. Actual missing reward acquisition remains explicit.
+
+The sound converter accepts timed lead-in rests before a layer's instrument.
+The initial rests, note timing, envelope, loop target, and full sample are retained.
+Channel/layer/envelope/restart pointers and instrument bindings alone relocate.
+Channels with internal envelopes preserve source address parity so their absolute
+envelope addresses remain halfword aligned; channels without internal envelopes
+retain the established even-address layout. Unknown commands, zero-time lead-ins,
+escaping pointers, partial envelopes, and unexplained trailing data reject.
+
 ## Timed material reactions and N64 vibration
 
 `convert --assets-only --representation lifecycle --category timed-surprise-material`

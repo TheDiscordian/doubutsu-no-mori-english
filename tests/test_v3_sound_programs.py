@@ -19,6 +19,29 @@ OUTPUT=ROOT/os.environ.get('V3_PLAYER_FRAME_BUILD','build/v3-player-frame-sound-
 
 
 class ProgramTests(unittest.TestCase):
+    def test_leading_rests_and_odd_program_origin_preserve_timing_and_envelope_alignment(self):
+        origin=1
+        raw=bytearray(b'\x88'+struct.pack('>H',origin+4)+b'\xFF\xC0\x07\xC0\x81\x02\xC6\x09\xCB\x00\x00\xE0\xC4')
+        note=len(raw);raw.extend(bytes((0x64,0x82,0,41,0xFB)))
+        loop_pointer=len(raw);raw.extend(struct.pack('>H',origin+note))
+        raw.extend(bytes(-(origin+len(raw))%2));envelope=len(raw)
+        raw.extend(struct.pack('>4h',6,24000,-1,0));struct.pack_into('>H',raw,12,origin+envelope)
+        desc=sounds.looping_layer(raw,origin)
+        self.assertEqual([r['duration'] for r in desc['intro_events']],[7,258])
+        self.assertEqual(desc['duration'],512);self.assertEqual((origin+desc['envelope'])%2,0)
+        bound=sounds.bind_loop(raw,desc,0x5101,12,1)
+        actual=sounds.looping_layer(bound,0x5101,prefix=True)
+        self.assertEqual(actual['intro_events'],[dict(r,offset=r['offset']+4) for r in desc['intro_events']])
+        self.assertEqual((0x5101+actual['envelope'])%2,0)
+        restored=bytearray(bound[4:]);restored[desc['instrument_offset']]=desc['instrument']
+        for at in desc['pointers']:restored[at:at+2]=raw[at:at+2]
+        self.assertEqual(restored,raw)
+        with self.assertRaises(ValueError):sounds.bind_loop(raw,desc,0x5100,12,1)
+        for at,value in ((5,0),(8,0),(9,0xC5),(12,255)):
+            broken=raw.copy();broken[at]=value
+            if at==8:broken[7]=0x80
+            with self.subTest(at=at),self.assertRaises(ValueError):sounds.looping_layer(broken,origin)
+
     def test_timed_loop_retains_multiple_envelopes_and_retriggered_notes(self):
         raw=bytearray.fromhex('880004ffc607cb0000d0560c46cb0000c05681084057904044fb000a')
         raw.extend(bytes(len(raw)&1));first=len(raw)

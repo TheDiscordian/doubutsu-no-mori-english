@@ -22,23 +22,30 @@ Incomplete gameplay stays unavailable in the selector; installing assets does
 not claim that an item is playable. Reuse unchanged passing tests throughout.
 
 Current task: finish remaining model/lifecycle and console launch/storage
-categories. Extend combined rig/material callbacks for the hamster cage and
-switched texture animation for the harvest TV, then continue the other actual
+categories. Extend combined rig/material callbacks for the hamster cage,
+then continue the other actual
 unsupported callbacks without per-item installers. The remaining unconverted
 records also include matryoshka, aerobics radio, crab stew, and treasure chest.
 Reuse complete source resources and shared behaviours throughout.
 
-The checked current proposal is ABI 252 at
-`build/v3-selected-palette-runtime-04/build-lock.json`, ROM SHA-256
-`9671bf6949638fc1842b7b277c4c5e0a526ec6a20bedd26b843df5fa61a1e8f4`.
+The checked current proposal is ABI 255 at
+`build/v3-switched-material-imports-02/profile-runtime/build-lock.json`, ROM SHA-256
+`2872c0b37a63df9d162c42b157c83b6053b2447e223b7a90cda564629f43e606`.
+The harvest TV's complete switched-screen lifecycle is installed through the
+shared material importer: both models, 37 triangles, all on/off frames, positioned
+loop and switch clicks, and checked start-disabled placement. Its profile stays
+inactive pending the actual Harvest reward route. Thirteen focused checks pass;
+native execution, ordinary appearance/synthesis, and hardware remain unverified.
+The 159 enabled choices and saved format/profile bits are unchanged. Shared room
+code uses 20,384 of 32,768 bytes; bootstrap uses 1,509 of 1,536. See the
+[switched-screen checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#installed-switched-texture-lifecycle).
+
 Both complete house models and selected-roof/light lifecycles are installed:
 9,344 reused artwork bytes, 93 triangles, and all twelve roof colours at both
 light endpoints. Real native room/player/home readers and exterior palette
 correspondence are bound. Host checks cover 4,800 frames and complete private
 composition. Native execution/GPU appearance remain unverified. Their actual
-HRA rewards remain phase-2 acquisition work; the 159 enabled choices and saved
-format are unchanged. The room packet uses 20,128 of 32,768 code bytes; bootstrap
-uses 1,509 of 1,536. See the
+HRA rewards remain phase-2 acquisition work. See the
 [roof-lifecycle checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#installed-selected-roof-palette-lifecycle).
 
 The compass's parent-sensitive needle is

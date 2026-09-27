@@ -1,6 +1,10 @@
 /* Complete frame banks share one renderer. Installing a draw record does not
    install the object's interaction, audio, acquisition, or ordinary profile. */
 #include "room_materials.h"
+#include "room_motion.h"
+#ifdef AF_V3_ROOM_SWITCHED_MATERIAL
+extern void sAdo_OngenPos(u32,u8,float *);
+#endif
 #ifdef AF_V3_ROOM_REACTIONS
 #include "room_reactions.h"
 #endif
@@ -9,14 +13,24 @@
 #endif
 #ifdef AF_V3_ROOM_PARTICLES
 #include "room_effects.h"
-#define MATERIAL_LIFECYCLE_MAX 4u
-#elif defined(AF_V3_ROOM_COLOURS)
-#define MATERIAL_LIFECYCLE_MAX 3u
-#elif defined(AF_V3_ROOM_REACTIONS)
-#define MATERIAL_LIFECYCLE_MAX 2u
-#else
-#define MATERIAL_LIFECYCLE_MAX 1u
 #endif
+
+static int lifecycle_supported(u32 kind) {
+    if (kind<=1u) return 1;
+#ifdef AF_V3_ROOM_REACTIONS
+    if (kind==2u) return 1;
+#endif
+#ifdef AF_V3_ROOM_COLOURS
+    if (kind==3u) return 1;
+#endif
+#ifdef AF_V3_ROOM_PARTICLES
+    if (kind==4u) return 1;
+#endif
+#ifdef AF_V3_ROOM_SWITCHED_MATERIAL
+    if (kind==5u) return 1;
+#endif
+    return 0;
+}
 
 static const RoomMaterialRecord *material_find(u32 index) {
     if (index>=2048u && index<3072u) index-=1024u;
@@ -27,10 +41,13 @@ static const RoomMaterialRecord *material_find(u32 index) {
         const RoomMaterialRecord *r=room_material_table->rows+i;
         if (r->index!=index) continue;
         if (index<1024 || index>=2048 || r->bytes<32 || r->bytes>9216 || (r->bytes&15) ||
-                r->lifecycle>MATERIAL_LIFECYCLE_MAX || (r->lifecycle==1 && r->mode!=0) ||
+                !lifecycle_supported(r->lifecycle) || (r->lifecycle==1 && r->mode!=0) ||
                 (r->lifecycle==2 && r->mode!=2) || (r->lifecycle==3 && r->mode!=1) ||
                 (r->lifecycle==4 && r->mode!=0) ||
-                r->mode>2 || (r->segment!=8 && r->segment!=9) ||
+                (r->lifecycle==5 && r->mode!=3) ||
+                r->mode>3 || (r->segment!=8 && r->segment!=9) ||
+                (r->mode==3 && (r->frames!=5 || r->divisor!=6 || r->kind!=1 ||
+                    (r->lifecycle!=0 && r->lifecycle!=5))) ||
                 !r->frames || r->frames>8 || !r->models || r->models>4 ||
                 r->kind>1 || !r->frame_bytes || r->frame_bytes>r->bytes ||
                 (!r->kind && r->frame_bytes!=32)) return 0;
@@ -63,12 +80,23 @@ void af_v3_room_material_ct(RoomRig *actor,u8 *data) {
 #endif
 }
 
-#if defined(AF_V3_ROOM_REACTIONS) || defined(AF_V3_ROOM_COLOURS) || defined(AF_V3_ROOM_PARTICLES)
+#if defined(AF_V3_ROOM_REACTIONS) || defined(AF_V3_ROOM_COLOURS) || defined(AF_V3_ROOM_PARTICLES) || defined(AF_V3_ROOM_SWITCHED_MATERIAL)
 int af_v3_room_material_mv(RoomRig *actor,void *room,RoomRigGame *game,u8 *data) {
-    (void)room;
+    (void)room;(void)game;
     if (!actor || !data) return 0;
     const RoomMaterialRecord *r=material_find(actor->index);
     if (!r) return 0;
+#ifdef AF_V3_ROOM_SWITCHED_MATERIAL
+    if (r->lifecycle==5) {
+        u8 on=actor->switched,changed=actor->changed;
+        if (on && !room_transition_state(actor->state))
+            sAdo_OngenPos((u32)(uptr)actor,r->state_offset,actor->position);
+        /* Source clicks accept any nonzero pulse, including while entering or
+           leaving. Only the continuous programme has transition exclusions. */
+        if (changed) sAdo_OngenTrgStart(on ? 0x16 : 0x17,actor->position);
+        return 1;
+    }
+#endif
 #ifdef AF_V3_ROOM_PARTICLES
     if (r->lifecycle==4) {
         room_emit_steam((RoomSoundActor *)actor,game,(u8)r->state_offset,3u,15.0f,10);
@@ -96,12 +124,14 @@ void af_v3_room_material_dw(RoomRig *actor,void *room,RoomRigGame *game,u8 *data
     else {
         /* Donor material counters advance at 60 Hz, native counters at 30 Hz.
            Room ownership distinguishes the play context from menu previews. */
-        frame=(room ? ((RoomMaterialPlay *)game)->play_frame : game->frame)*2u;
-        if (r->mode==1) {
+        int gameplay=r->mode==3 ? actor->ctr_type==1 : room!=0;
+        frame=(gameplay ? ((RoomMaterialPlay *)game)->play_frame : game->frame)*2u;
+        if (r->mode==1 || r->mode==3) {
             /* Signed source division, including wrapping, without signed
                overflow. Only a room instance is stopped by its switch. */
             u32 q=(frame&0x80000000u) ? 0u-((0u-frame)/r->divisor) : frame/r->divisor;
-            index=room && !((u8 *)actor)[0x12C] ? 0u : q&3u;
+            index=r->mode==3 ? (!((u8 *)actor)[0x12C] ? 4u : q&3u) :
+                room && !((u8 *)actor)[0x12C] ? 0u : q&3u;
         } else index=(frame/r->divisor)%r->frames;
     }
     RoomRigGraphics *gfx=game->gfx;
