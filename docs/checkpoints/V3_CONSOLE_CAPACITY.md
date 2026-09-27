@@ -100,6 +100,24 @@ interrupt timing, and sound in `src/static/Famicom/ks_nes_core.cpp` and
 cartridge header. Do not replace the complete Clu Clu Land D image with another
 release. Acquisition remains after primary importing work.
 
+The verified donor `famicom.arc` also supplies `noise.bin.szs`, not an additional
+ROM the user must obtain. Its 298,507 compressed bytes have SHA-256
+`e1364feb3964247056c6e507393b2860b5834bc46ac48ceb15e954278037cc6a`;
+decoding yields 520,192 bytes, SHA-256
+`11d338e00df0a4dfa2487180be74a07b1d126bbfef941969b6764141599af97b`.
+The donor maps its first 8,192 bytes at NES `E000..FFFF` for QD execution; this
+BIOS region has SHA-256
+`eef78986e952e1b3bdac95d9a627768632e75853f538d2fb17bb31b6c6ebce38`.
+Keep extraction in the shared console conversion. The donor patches offsets
+`EBD` and `1A0` in its private BIOS copy during reset; those are runtime
+adaptations, not permission to alter the archived source. Its QD branch needs
+32-KiB programme RAM and 8-KiB character RAM, rather than the cartridge
+adapter's 8-KiB battery range. Native code at `808303FC` already contains partial
+`4030..4033` disk-register reads, but the checked native reset follows iNES
+headers and does not establish a complete QD path. A null mapper-20 row alone
+is not proof that every disk component is absent. Inventory and reuse verified
+native pieces while implementing the missing full lifecycle.
+
 The save layout remains format five. V2 and older-format V3 cannot load these
 saves. Removing a selected imported profile is not safe compatibility merely
 because the layout is unchanged. Preserve original saves and provide the explicit
