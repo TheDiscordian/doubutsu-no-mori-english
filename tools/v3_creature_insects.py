@@ -31,13 +31,16 @@ PROGRAMS = (
 )
 RUNTIME=('creature_insects','creature_insect_state','creature_insect_environment',
          'creature_insect_engine','creature_insect_collision','creature_insect_spawns',
-         'creature_insect_manager','creature_insect_colony','creature_insect_colony_draw')
+         'creature_insect_manager','creature_insect_colony','creature_insect_colony_draw',
+         'creature_insect_audio','creature_insect_effects')
 SOURCES=('tools/v3_creature_insects.py','overlays/v3/creature_insects.h',
          'tools/v3_creature_spawns.py','overlays/v3/creature_spawns.h',
          'overlays/v3/creature_insect_spawns.h',
          'overlays/v3/creature_insect_manager.h',
          'overlays/v3/creature_insect_colony.h',
          'tools/v3_furniture_art.py',
+         'tools/v3_creature_insect_audio.py','tools/v3_sound_programs.py',
+         'tools/v3_creature_insect_effects.py','overlays/v3/creature_insect_effects.h',
          'overlays/v3/creature_insect_engine.h',
          'overlays/v3/creature_insect_collision.h',
          'overlays/v3/creature_insect_bindings.ld',
@@ -467,6 +470,9 @@ def compile_programs(output,report):
     objects.append('colony.o')
     commands.append(shlex.join(['/n64_toolchain/bin/mips64-elf-gcc',*flags,'-c',
         'colony.S','-o','colony.o']))
+    objects.append('field-audio.o')
+    commands.append(shlex.join(['/n64_toolchain/bin/mips64-elf-gcc',*flags,'-c',
+        'field-audio.S','-o','field-audio.o']))
     commands.append(shlex.join(['/n64_toolchain/bin/mips64-elf-ld','-EB','-r',
         '-T','/source/overlays/v3/creature_insect_bindings.ld',*objects,'-o','programs.o']))
     commands.append('/n64_toolchain/bin/mips64-elf-nm --undefined-only programs.o')
@@ -481,7 +487,9 @@ def compile_programs(output,report):
         unbound_engine_adapters=undefined,
         stack_usage=''.join(p.read_text() for p in sorted(output.glob('*.su'))))
     report['pending']=[
-        'Native demo/intro-mode bindings, field sound/effects, and mosquito player response',
+        'Second demo-state binding and mosquito player response',
+        'Install complete prepared field sound resources together with the runtime',
+        'Install prepared small-mud constructor bridge with the complete runtime',
         'Install prepared controller, spawn-manager, and directed-column hooks with the complete runtime',
         'Digging, rock-strike, and tree-shake event producers',
         'Persistent insect season reader/codec',
@@ -503,7 +511,18 @@ def main():
     native=native_contract(image,prior)
     source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
                   (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
-    report=compile_programs(args.output,generate(source,args.output,native))
+    from v3_creature_insect_audio import write_prepared
+    report=generate(source,args.output,native)
+    report['field_audio']=write_prepared(image,prior,source,args.output/'field-audio')
+    from v3_creature_insect_effects import contract as effect_contract
+    report['field_effects']=effect_contract(image,prior,source)
+    write_new(args.output/'field-audio.S',b'''.section .rodata
+.balign 4
+.globl af_insect_trigger_words
+af_insect_trigger_words:
+.incbin "field-audio/bindings.bin"
+''')
+    report=compile_programs(args.output,report)
     print(json.dumps(dict(programs=len(report['programs']),species=len(report['rows']),
         unbound_engine_adapters=report['compiled']['unbound_engine_adapters'],installed=False),indent=2))
 

@@ -72,13 +72,13 @@ Continue the eight insects' shared field behaviour/spawn programs while that
 native test remains unresolved. Keep fish gameplay verification open, not waived.
 The six complete donor behaviour programs and the shared native environment,
 stress, capture, culling, and directed-collision adapters compile together at
-`build/v3-creature-insects-work-01/programs-14/`. Controller ownership, source-rate
+`build/v3-creature-insects-work-01/programs-17/`. Controller ownership, source-rate
 stepping, event latching, and current-owner hook/relocation composition are
 prepared. The same object contains complete calendar/habitat/group spawning and
 the native manager adapter, including optional species masks, source cache timing,
 and the original-manager population alternative. The full 45-row seasonal blend
 fits the shared 64-row plan; no native twenty-row array is extended in place.
-Six focused host/compiler/composition checks pass; the collider
+Eight focused host/compiler/composition checks pass; the collider
 preservation check covers all eight donor initialisers. These programs are
 **not installed** and do not change the available imports.
 The ground colony includes deferred actor creation, live-acre lookup, full
@@ -87,8 +87,15 @@ actor registration and catch-identity composer preserve native bees and the
 existing additive actor lookup. The intro-acre boundary and first demo clip
 are bound to their real native owners. These remain prepared runtime consumers,
 not newly playable imports.
-Continue directly with the second demo-state binding, field sound/effect,
-and mosquito player-response bindings, plus the actual player-event producers.
+The same prepared runtime connects the full field-sound set and native water/mud
+effects. Its shared audio installer preserves existing sounds, imports both
+missing loops and both triggers, and supplies the actual trigger remap to the
+runtime. The small-mud constructor bridge preserves ordinary digging variants.
+Install these prepared resources and the mud call-site hook with the complete
+runtime; they are not installed in ABI 305. Twelve sound-parser checks pass.
+Continue directly with the second demo-state and mosquito player-response
+bindings, plus the actual player-event producers. Retain the prepared field
+services and their passing host/compiler/composition evidence.
 Continue spawning at its actual remaining consumers: persistent insect-season
 reader/codec and native/GameCube population
 capacity (two versus eight wild slots, plus the release slot). The prepared

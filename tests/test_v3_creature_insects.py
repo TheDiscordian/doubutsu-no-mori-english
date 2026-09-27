@@ -12,10 +12,65 @@ ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'tools'))
 from aflib import sha256
 from v3_creature_insects import PROGRAMS,rewrite,install_controller,install_spawn_manager,install_colony
-PROGRAM_DIRECTORY=ROOT/os.environ.get('V3_INSECT_PROGRAMS','build/v3-creature-insects-work-01/programs-14')
+PROGRAM_DIRECTORY=ROOT/os.environ.get('V3_INSECT_PROGRAMS','build/v3-creature-insects-work-01/programs-17')
 
 
 class CreatureInsectTests(unittest.TestCase):
+    def test_connected_field_services(self):
+        with tempfile.TemporaryDirectory(prefix='af-insect-services-') as temporary:
+            executable=Path(temporary)/'services'
+            result=subprocess.run(['cc','-std=c11','-O1','-g','-fno-pie','-no-pie',
+                '-fsanitize=address,undefined','-fno-sanitize-recover=all','-Wall','-Wextra','-Werror',
+                '-I'+str(ROOT/'overlays/v3'),str(ROOT/'overlays/v3/creature_insect_audio.c'),
+                str(ROOT/'overlays/v3/creature_insect_effects.c'),
+                str(ROOT/'tests/v3_creature_insect_services_test.c'),'-o',str(executable)],
+                capture_output=True,text=True)
+            self.assertEqual(result.returncode,0,result.stderr)
+            result=subprocess.run([str(executable)],capture_output=True,text=True,timeout=15)
+            self.assertEqual(result.returncode,0,result.stderr)
+            self.assertIn('Complete field sound routing',result.stdout)
+
+    def test_prepared_field_audio_and_effect_composition(self):
+        import copy
+        from aflib import CODE_RAM,CODE_VROM,by_vrom
+        from v3_asset_loader import BLOB
+        from v3_furniture_install import inputs
+        from v3_furniture_pipeline import Source
+        from v3_creature_insect_audio import prepare,install
+        from v3_creature_insect_effects import contract,install as install_effects
+        import v3_sound_programs as sounds
+        directory=PROGRAM_DIRECTORY/'field-audio'
+        base,prior=inputs(ROOT/'build/v3-creature-world-work-01/connected-15/build-lock.json')
+        source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+            (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+        files,report=prepare(base,prior,source)
+        self.assertEqual(json.loads((directory/'audio.json').read_text()),json.loads(json.dumps(report)))
+        for name,data in files.items():self.assertEqual((directory/name).read_bytes(),data)
+        native=by_vrom(base);code=bytearray(native[CODE_VROM].extract(base))
+        blob=bytearray(native[BLOB].extract(base))
+        equipment,changes,extra=install(base,prior,blob,code,directory,report)
+        field=equipment['insect_field_audio'];mapping={p['source_sound_word']:p for p in field['programs']}
+        self.assertEqual(set(mapping),{0x6A,0x438})
+        self.assertNotEqual(mapping[0x6A]['native_sound_word'],0x6A)
+        self.assertEqual({p['source_sound_id'] for p in field['levels']},{0x45,0x4F})
+        self.assertTrue(field['resources_installed']);self.assertFalse(field['runtime_installed'])
+        seq=field['sequence'];self.assertEqual(blob[seq['blob_offset']:seq['blob_offset']+seq['bytes']],files['sequence.bin'])
+        previous=prior['equipment_resources']['furniture_audio']
+        for old in previous['programs']:
+            self.assertIn(old,equipment['furniture_audio']['programs'])
+            self.assertEqual(sha256(files['sequence.bin'][old['offset']:old['offset']+old['bytes']]),old['sha256'])
+        self.assertEqual(equipment['room_rigs'],prior['equipment_resources']['room_rigs'])
+        self.assertGreaterEqual(sounds.permanent_budget(code)['conservative_spare'],0)
+        effects=contract(base,prior,source)
+        self.assertEqual(json.loads((PROGRAM_DIRECTORY/'programs.json').read_text())['field_effects'],
+            json.loads(json.dumps(effects)))
+        modified,hook=install_effects(base,{'af_insect_mud_create':0x804E0000},effects)
+        vrom=effects['mud_hook']['vrom'];expected=bytearray(native[vrom].extract(base));at=hook['offset']
+        expected[at:at+4]=bytes.fromhex(hook['after']);self.assertEqual(modified[vrom],expected)
+        # Both preparation and final composition reject damaged dependencies.
+        bad=copy.deepcopy(report);bad['files']['bindings.bin']['sha256']='0'*64
+        with self.assertRaises(ValueError):install(base,prior,blob,code,directory,bad)
+
     def test_colony_lifecycle_and_drawing(self):
         with tempfile.TemporaryDirectory(prefix='af-insect-colony-') as temporary:
             executable=Path(temporary)/'colony'

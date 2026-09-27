@@ -52,6 +52,9 @@ af_insect_hilite = 0x80058928;
 af_insect_matrix = 0x800E139C;
 af_insect_writeback = 0x8002FE00;
 af_insect_block_mode = 0x800741F4;
+af_insect_native_sound = 0x800D1D08;
+af_insect_native_trigger = 0x800D1D58;
+af_insect_native_chirp = 0x800D24EC;
 /* Native global fields; no GC common-data addresses. */
 af_insect_game = 0x8010EF90;
 af_insect_ball = 0x8013790C;
@@ -59,3 +62,4 @@ af_insect_bg_context = 0x80126CF8;
 af_insect_native_clip = 0x80136F28;
 af_insect_rtc = 0x80136FBC;
 af_insect_demo_clip = 0x80136F4C;
+af_insect_effect_clip = 0x80136F3C;

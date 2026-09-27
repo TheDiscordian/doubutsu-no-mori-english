@@ -105,6 +105,26 @@ class CreatureAudioTests(unittest.TestCase):
 
 
 class ProgramTests(unittest.TestCase):
+    def test_continuous_note_with_timed_rest_loop_preserves_all_commands(self):
+        raw=bytearray.fromhex('880004ffc609cb0000c0c45f807830c08520fb000f')
+        raw.extend(bytes(len(raw)&1));envelope=len(raw)
+        raw.extend(struct.pack('>8h',2,22000,160,22000,80,0,-1,0))
+        struct.pack_into('>H',raw,7,envelope)
+        description=sounds.looping_layer(raw,0)
+        self.assertEqual(description['commands'],[dict(offset=10,opcode=0xC4)])
+        self.assertEqual(description['loop'],15)
+        self.assertEqual(description['events'],[dict(offset=11,note=31,duration=120,velocity=48),
+            dict(offset=15,duration=1312,rest=True)])
+        bound=sounds.bind_loop(raw,description,0x4200,18,1)
+        parsed=sounds.looping_layer(bound,0x4200,prefix=True)
+        self.assertEqual(parsed['duration'],1432)
+        restored=bytearray(bound[4:]);restored[5]=raw[5]
+        for at in description['pointers']:restored[at:at+2]=raw[at:at+2]
+        self.assertEqual(restored,raw)
+        for offset,value in ((10,0xC5),(18,0xFE),(20,16)):
+            bad=bytearray(raw);bad[offset]=value
+            with self.assertRaises(ValueError):sounds.looping_layer(bad,0)
+
     def test_trigger_bend_is_preserved_and_requires_its_operand(self):
         raw=bytes.fromhex('eb0019880007ffce3c5f809628ff')
         desc=sounds.trigger_program(raw,0,len(raw))

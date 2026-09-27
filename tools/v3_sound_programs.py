@@ -646,9 +646,11 @@ def timed_looping_layer(data,origin,*,prefix=False):
     instrument_at,intro=loop_header(data,origin,prefix=prefix)
     inst=span(data,instrument_at,1)[0]
     if inst>125:raise ValueError('Unsupported timed-loop instrument')
-    at=instrument_at+1;events=[];envelopes=[];pointers=[start+1];boundaries=set()
+    at=instrument_at+1;events=[];envelopes=[];pointers=[start+1];boundaries=set();commands=[]
     while span(data,at,1)!=b'\xFB':
         here=at;boundaries.add(at);op=data[at];at+=1
+        if op==0xC4:
+            commands.append(dict(offset=here,opcode=op));continue
         if op==0xCB:
             pointer=struct.unpack('>H',span(data,at,2))[0]-origin
             decay=span(data,at+2,1)[0];pointers.append(at);at+=3
@@ -677,6 +679,7 @@ def timed_looping_layer(data,origin,*,prefix=False):
     return dict(kind='timed-retrigger-loop',origin=origin,bytes=len(data),sha256=sha256(data),
         instrument=inst,instrument_offset=instrument_at,pointers=pointers,loop=loop,
         **({'intro_events':intro} if intro else {}),
+        **({'commands':commands} if commands else {}),
         events=events,envelopes=envelopes,duration=sum(e['duration'] for e in events))
 
 
@@ -706,6 +709,8 @@ def looping_layer(data, origin, *, prefix=False):
     duration=span(data,at,1)[0];at+=1
     if duration&128:duration=(duration&127)*256+span(data,at,1)[0];at+=1
     velocity=span(data,at,1)[0];at+=1
+    if span(data,at,1)!=b'\xFB':
+        return timed_looping_layer(data,origin,prefix=prefix)
     loop=struct.unpack('>H',span(data,at+1,2))[0]-origin
     if (not duration or velocity>127 or span(data,at,1)!=b'\xFB'
             or loop not in ((mode,env_command,note_at) if early_mode else (mode,note_at))):
@@ -1307,6 +1312,9 @@ def install_furniture(image,prior,blob,code,original,output,directory):
     from v3_registry import furniture_representation_identity
     import v3_room_rig_runtime as room
     directory=directory.resolve();raw=(directory/'audio.json').read_bytes();prepared=json.loads(raw)
+    if prepared.get('format')=='AFV3-INSECT-FIELD-AUDIO-PREPARED-1':
+        from v3_creature_insect_audio import install
+        return install(image,prior,blob,code,directory,prepared)
     if prepared.get('format')=='AFV3-FURNITURE-MELODY-PREPARED-1':
         from v3_furniture_melody import install
         return install(image,prior,blob,code,directory,prepared)

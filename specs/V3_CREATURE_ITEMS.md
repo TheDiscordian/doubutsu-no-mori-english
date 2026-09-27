@@ -633,11 +633,11 @@ removing the complete replaced relocation records and preserving unrelated
 graphics hooks. Runtime placement/startup and remaining services must be completed
 before applying this composer to a deliverable ROM.
 
-The bindings file supplies 53 native primitive functions, checked against complete
+The bindings file supplies native primitive functions, checked against complete
 bodies in the hash-verified original N64 ROM. Native actor creation retains the
 installed campsite/balloon descriptor chain, checked against its existing receipts;
-it still delegates original actor IDs to the native table. Unresolved second-demo, audio/effect,
-and mosquito-player bindings remain undefined symbols in the prepared object;
+it still delegates original actor IDs to the native table. Unresolved second-demo,
+season, and mosquito-player bindings remain undefined symbols in the prepared object;
 no dummy engine routines satisfy them. Controlled host services are test fixtures,
 not evidence of native gameplay or completed mosquito stings.
 
@@ -729,9 +729,60 @@ either lighting helper writes. Prepared artwork is cached under
 artwork is not rebuilt. The profile, catch hook, and resident artwork must be
 installed with the complete insect runtime, not independently enabled.
 
+### Complete field sound and effect services
+
+`v3_creature_insect_audio.py` resolves every sound call across the six pinned
+programs. Shared loops `25` and `26` retain their complete native channels after
+checking all relocated pointers and full instrument/sample identities against
+the donor. Added loops `45` and `4F` use the ordinary complete-program converter.
+Its timed-layer parser retains continuous-note mode followed by a repeating
+rest, including every envelope and duration; it does not replace that channel
+with a generic sustained tone.
+
+The two triggers use the existing priority-preserving slot allocator. Against
+ABI 305, source `006A` maps to native `006E`, and source `0438` maps to `0450`.
+Native `006A` already belongs to a different imported sound and is preserved.
+The generated four-byte binding table is linked into the same insect object.
+Complete loop instruments are checked against the final shared trigger font;
+existing font indices, addressed samples, and retained programs remain intact.
+Preparation writes the full sequence, font, wave archive, fragments, and binding
+table under the program output's `field-audio/` directory. The shared audio
+installer accepts this category and updates the existing resource/dispatch
+records without changing furniture callbacks or selecting an insect.
+
+`creature_insect_audio.c` routes hidden-cricket `44` to the already installed
+per-instance randomized chirp scheduler. Exposed-cricket `45` uses positioned
+loop playback. Mosquito `CF` retains its high-bit mode through the native queue,
+which stores that mode before masking to program `4F`. Native coordinate,
+queue, trigger, and scheduler consumers are checked, not inferred from sound IDs.
+No audio is played during preparation or host checks.
+
+`creature_insect_effects.c` routes ripples and splashes to native effects 69/70,
+and donor digging effect 84 to native 85. The complete water owners already
+handle the required size-one ripple and size-four splash with ordinary native
+lifetime, subeffects, and rendering. The digging owner lacks donor flag `4000`.
+A guarded resident-call bridge at `80A2736C` strips only that size flag before
+the ordinary constructor and sets the returned effect's three scale axes to
+`0.005`. Normal variants and the separate `8000` flag are preserved. The ordinary
+request loads the effect code before the bridge runs; direct creation without
+that loader is not used. Both games discard the late-life scale-adjust result,
+so the bridge retains that behaviour. Native 30-Hz effect lifetimes/movement and
+existing artwork remain; there is no new pool, effect identity, or saved field.
+Complete source callback receipts come from profile relocations, avoiding the
+unrelated donor effect that shares local `eTM_*` function names.
+
+The combined host check covers every field sound route, mode-bit preservation,
+null services, both water calls, all nine normal/small digging variants with and
+without the mole flag, and effect-allocation failure. The resource/composition
+check uses the current cartridge, verifies actual prepared bytes, exercises the
+shared audio installer in memory, retains all previous triggers, checks audio
+capacity, and composes the mud call-site hook. These are not native synthesis or
+gameplay evidence. Final placement must install the complete prepared resources,
+binding table, and mud hook together with the insect runtime.
+
 ### Current prepared output and remaining connections
 
-Prepared output: `build/v3-creature-insects-work-01/programs-14/`.
+Prepared output: `build/v3-creature-insects-work-01/programs-17/`.
 The current cartridge remains ABI 305. No new ROM, save layout, browser choice,
 or deployment is produced by preparation. Reproduce against the explicit input:
 
@@ -770,12 +821,12 @@ engine callbacks. It covers pending allocation/retry, food conditions, forced an
 ordinary net requests, single-ant label transfer, failed creation, fading, scene
 cleanup, native bee preservation, scrolling coordinates, and graphics bounds.
 The current composition check also verifies the unused profile slot and catch
-span while preserving unrelated installed code. All six focused checks pass;
+span while preserving unrelated installed code. All eight focused checks pass;
 native colony gameplay, visual appearance, and hardware remain unverified.
 
 Remaining connections belong to the same creature importing task:
 
-- Finish the second demo-state binding, field sound/effects, and the mosquito
+- Finish the second demo-state binding and the mosquito
   player sting response. Reuse the prepared native environment/terrain/controller.
 - Connect the digging, axe/shovel rock-strike, and tree-shake event producers.
   The latch/reset and donor consumers are prepared; no producer is claimed wired.
@@ -785,7 +836,8 @@ Remaining connections belong to the same creature importing task:
   native/GameCube population-capacity alternatives; group creation is bounded by
   available slots until the larger source pool and its consumers are installed.
 - Place the complete runtime through the existing owner-storage machinery, retain
-  overlap guards, connect startup loading, and promote per-insect selection only
+  overlap guards, install its prepared field audio/effect consumers, connect
+  startup loading, and promote per-insect selection only
   when the gameplay dependencies are implemented.
 - Verify the connected current cartridge/save path and fix actual defects. Keep
   the unresolved fish constructor timeout and scheduler disconnect open; the
