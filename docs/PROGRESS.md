@@ -72,8 +72,8 @@ with checked startup, non-mutating bank probes, decoded commit, migration, and
 per-player clearing. Four focused host/cartridge/composition checks pass,
 including 85,426 sanitized adapter assertions and all ten startup failure paths.
 Actual native synchronous and asynchronous two-bank writing, followed by both
-native load routes in a fresh process, pass. Launch/return,
-graphics allocation, and QD emulation remain work; no console is enabled.
+native load routes in a fresh process, pass. Room launch/return, real heap
+capacity, native gameplay verification, and QD emulation remain work; no console is enabled.
 Format-five saves require this or a newer compatible build, and cannot be loaded
 by V2 or format-one/two/three/four V3. Preserve backups before any handoff. See the
 [console checkpoint](checkpoints/V3_CONSOLE_PERSISTENCE.md) and

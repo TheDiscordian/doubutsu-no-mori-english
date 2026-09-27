@@ -51,8 +51,8 @@ actual native synchronous and asynchronous two-bank writing, followed by both
 native load routes in a fresh process, pass. Retain their evidence
 from ABI 276 at `build/v3-console-storage-native-04/build-lock.json`, ROM SHA-256
 `f876fc31541db21297e6c5b27f62af790e32ea33850d700f15f3cdd1291f070f`.
-Connect the native emulator/room launch, full graphics allocation, frame/reset/exit
-hooks, and QD dependency. Reuse the installed storage and prepared models/games,
+Connect the native room launch and QD dependency, then verify the installed
+graphics and frame/reset/exit hooks in actual gameplay. Reuse storage and prepared models/games,
 not another compressor or per-game save implementation. Keep capacity failure
 ahead of all FlashRAM writes. Format-five saves cannot load in V2 or older V3
 formats; warn explicitly before any handoff and preserve backups.

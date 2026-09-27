@@ -78,6 +78,18 @@ QD currently rejects instead of being treated as a cartridge image. The complete
 disk payload remains installed and its gameplay is still required. Neither
 static mapper callbacks nor host-adapter success establish gameplay support.
 
+The native room owner is VROM `0082D7F0`, linked at `80936710`. Its console
+move callback at `8093BD60` checks the furniture switch-change byte at `12D`,
+then dispatches to the existing request function at `8093BC30` for a nonzero
+game ID. That function retains message-hide/busy checks, stores the game ID at
+room offset `480`, and requests message state 31. The normal room handler calls
+`goto_emu_game` at `800C6D5C` from `8093A4F8`, taking the ID from room offset
+`482`. Native `goto_emu_game` saves the player's doorway/position; native
+`return_emu_game` at `800C6E14` restores that room transition. Connect source
+game mappings to this existing lifecycle, not an immediate game-state jump.
+Confirm the clip-table binding and current complete-function hashes before
+installing callbacks; these located addresses are not installed room support.
+
 Save format remains five. Saves from this build cannot load in V2 or older
 format-one/two/three/four V3 builds. Preserve backups and include that warning
 before handoff. Ordinary save-menu use with imported games and hardware remain
