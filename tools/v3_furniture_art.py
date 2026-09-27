@@ -20,7 +20,7 @@ from v3_import_catalog import DONOR, REL_SHA, ROOT, SYMBOLS_SHA, read_donor
 from v3_villager_art import data_pointers, native_palette, normalise_vertex_flags, symbol_span
 
 SEGMENT = 0x06000000
-CONVERTER_VERSION = 17
+CONVERTER_VERSION = 18
 
 # Complete compatible RDP expressions, selected by material commands, not IDs.
 # These use one texture and retain source alpha; none introduces TEXEL1,
@@ -291,7 +291,7 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
     material_bindings={} if material_bindings is None else material_bindings
     if scrolling is not None and (not static_materials or material_bindings or palette_fade or palette_bindings or
             inherited_palette_slot is not None or set(scrolling)!={'segment','dimensions'} or
-            scrolling['segment'] not in (0x08000000,0x09000000) or
+            scrolling['segment'] not in (0x08000000,0x09000000,0x0A000000) or
             not 1<=len(scrolling['dimensions'])<=2 or
             any(len(shape)!=2 or any(type(n) is not int or n<8 or n>64 or n&(n-1) for n in shape)
                 for shape in scrolling['dimensions'])):
@@ -918,7 +918,7 @@ def command_source(models, offsets):
                         emit('gsSP1Triangle(' + ', '.join(map(str, (*triangles[i], 0))) + ')')
             elif op == 0xDE:
                 segment=row.get('dynamic_scroll')
-                if segment not in (0x08000000,0x09000000) or row['words'] != (0xDE000000,segment):
+                if segment not in (0x08000000,0x09000000,0x0A000000) or row['words'] != (0xDE000000,segment):
                     raise ValueError('Unreviewed dynamic scroll list')
                 emit(f'gsSPDisplayList(0x{segment:08X})')
             elif op == 0xDA:

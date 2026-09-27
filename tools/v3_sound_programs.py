@@ -45,6 +45,10 @@ def trigger_program(sequence, origin, limit):
             commands.append(dict(offset=start,opcode=op,transpose=transpose));continue
         if op==0xC4:
             commands.append(dict(offset=start,opcode=op));continue
+        if op==0xC6:
+            instrument=span(data,at,1)[0];at+=1
+            if instrument>125:raise ValueError('Unsupported trigger layer instrument')
+            commands.append(dict(offset=start,opcode=op,instrument=instrument));continue
         if op==0xC7:
             mode,target,time=span(data,at,3);at+=3
             if not mode&128 or not 1<=mode&127<=5 or target>127 or not time:
@@ -72,13 +76,19 @@ def trigger_program(sequence, origin, limit):
         duration=sum(e['duration'] for e in events),**({'commands':commands} if commands else {}))
 
 
-def bind_trigger(data,description,offset,selector,instrument_index):
+def bind_trigger(data,description,offset,selector,instrument_index,*,instrument_map=None):
     origin=description['origin']
     if (trigger_program(bytes(origin)+data,origin,origin+len(data))!=description or
             not 0<=offset<=65536-len(data) or not 0<=selector<=3 or
             not 0<=instrument_index<=125 or description['envelope'] is not None and (offset-origin)&1):
         raise ValueError('Trigger binding exceeds its complete checked structure')
     result=bytearray(data);result[1:3]=bytes((selector,instrument_index))
+    for command in description.get('commands',[]):
+        if command['opcode']!=0xC6:continue
+        old=command['instrument']
+        if instrument_map is None or old not in instrument_map or not 0<=instrument_map[old]<=125:
+            raise ValueError('Missing complete layer instrument mapping')
+        result[command['offset']+1]=instrument_map[old]
     for at in description['pointers']:
         struct.pack_into('>H',result,at,offset+struct.unpack_from('>H',data,at)[0]-origin)
     trigger_program(bytes(offset)+result,offset,offset+len(result))
@@ -207,6 +217,13 @@ def prepare_triggers(image,report,sound_words):
         if struct.unpack_from('>H',source,0x188+group*2)[0]!=at:
             raise ValueError('Changed complete source trigger table')
         starts.update(struct.unpack_from('>'+str(count)+'H',source,at))
+    # All six dispatch groups delimit neighbouring programmes, including groups
+    # not imported here. Group five's first pointer is its terminal byte at
+    # 04EC; groups two and three each contain 81 instrument/note entries.
+    for group,at,count in ((2,0x3B7E,81),(3,0x3C20,81),(5,0x46A,65)):
+        if struct.unpack_from('>H',source,0x188+group*2)[0]!=at:
+            raise ValueError('Changed neighbouring source trigger table')
+        starts.update(struct.unpack_from('>'+str(count)+'H',source,at))
     donors={};programs=[]
     for word in sorted(set(sound_words)):
         sid=word&0x7FFF;group,index=sid>>8,sid&255
@@ -215,12 +232,15 @@ def prepare_triggers(image,report,sound_words):
         ends=[at for at in starts if at>origin]
         if not ends:raise ValueError('Trigger lacks a complete source program boundary')
         limit=min(ends);description=trigger_program(source,origin,limit)
-        sb=source_banks[4-description['selector']];key=sb,description['instrument']
-        if key not in donors:
-            bank,header=resource(dol.read,GC_SECTIONS,donor,'bank',sb)
-            if header[11]!=255 or header[13]:raise ValueError('Unsupported trigger font dependencies')
-            wave,_=resource(dol.read,GC_SECTIONS,donor,'wave',header[10])
-            donors[key]=dict(bank_id=sb,instrument=description['instrument'],instrument_count=header[12],bank=bank,wave=wave)
+        sb=source_banks[4-description['selector']]
+        indices={description['instrument']}|{c['instrument'] for c in description.get('commands',[]) if c['opcode']==0xC6}
+        for index in sorted(indices):
+            key=sb,index
+            if key not in donors:
+                bank,header=resource(dol.read,GC_SECTIONS,donor,'bank',sb)
+                if header[11]!=255 or header[13]:raise ValueError('Unsupported trigger font dependencies')
+                wave,_=resource(dol.read,GC_SECTIONS,donor,'wave',header[10])
+                donors[key]=dict(bank_id=sb,instrument=index,instrument_count=header[12],bank=bank,wave=wave)
         programs.append(dict(sound_word=word,source_sound_id=sid,singleton=bool(word&0x8000),
             source_bank=sb,source_program=description,source_data=source[origin:limit]))
     bank,bank_header,bank_physical=installed_resource(image,code,'bank',native_banks[3])
@@ -232,10 +252,14 @@ def prepare_triggers(image,report,sound_words):
     for row in programs:
         desc=row['source_program'];target=targets[row['source_bank'],desc['instrument']]
         offset=desc['origin']&1 if desc['envelope'] is not None else 0
-        data=bind_trigger(row.pop('source_data'),desc,offset,1,target)
+        layer_map={c['instrument']:targets[row['source_bank'],c['instrument']]
+            for c in desc.get('commands',[]) if c['opcode']==0xC6}
+        data=bind_trigger(row.pop('source_data'),desc,offset,1,target,instrument_map=layer_map)
         filename=f"trigger-{row['sound_word']:04X}.bin";fragments[filename]=data
         row.update(native_selector=1,native_instrument=target,fragment_file=filename,
             fragment_origin=offset,bytes=len(data),sha256=sha256(data),dispatch_binding_required=True)
+        if layer_map:
+            row['layer_instruments']=[dict(source_instrument=i,native_instrument=n) for i,n in sorted(layer_map.items())]
     budget=permanent_budget(code)
     font_allocation=((len(font)+31)&~31)-((len(bank)+31)&~31)
     return dict(font=font,wave=waves,fragments=fragments),dict(format='AFV3-TRIGGER-AUDIO-PREPARED-1',
@@ -254,6 +278,13 @@ def furniture_trigger(source,profile):
     """Recognize move-only triggers with ordinary or complete custom drawing."""
     adapter=profile.get('callback_adapter',{})
     functions=adapter.get('functions',{})
+    from v3_furniture_composite import DUAL_CATEGORY
+    if adapter.get('category')==DUAL_CATEGORY:
+        if set(functions)!={'create','move','draw','destroy'}:raise ValueError('Changed complete dual-motion lifecycle')
+        opening,closing=adapter['movement']['source_clicks']
+        return dict(sound_word=opening,additional_sound_words=[closing],
+            event_order=['open','close'],accept=adapter['movement']['accept'],
+            excluded_states=[],runtime_installed=False)
     if adapter.get('category')=='switch-hit-keyframe-rig':
         if set(functions)!={'create','move','draw'}:raise ValueError('Changed complete hit-rig lifecycle')
         return copy.deepcopy(adapter['trigger'])
@@ -322,7 +353,8 @@ def prepare_furniture_audio(image,report,source,inventory,output,selected=(),cat
 def furniture_trigger_words(triggers):
     """Keep every primary and conditional system programme in a shared batch."""
     return sorted({word for trigger in triggers for word in
-        [trigger['sound_word']]+([trigger['conditional']['system_sound_word']] if trigger.get('conditional') else [])})
+        [trigger['sound_word']]+trigger.get('additional_sound_words',[])+
+        ([trigger['conditional']['system_sound_word']] if trigger.get('conditional') else [])})
 
 
 def furniture_level(source,profile):
@@ -334,6 +366,13 @@ def furniture_level(source,profile):
     from v3_furniture_scroll import CATEGORY
     from v3_furniture_joint_rigs import CATEGORY as JOINT_CATEGORY,level_sound as joint_level
     adapter=profile.get('callback_adapter',{});functions=copy.deepcopy(adapter.get('functions',{}))
+    from v3_furniture_composite import DUAL_CATEGORY
+    if adapter.get('category')==DUAL_CATEGORY:
+        move=adapter['movement']
+        return dict(category='dual-motion-loop',source_sound_id=move['source_loop'],
+            switch_clicks=[],imported_clicks=move['source_clicks'],excluded_states=move['excluded_states'],
+            native_excluded_states=[5,6,13,15],loop_state='selected-motion-threshold',
+            sound_threshold=move['sound_threshold'],sound_order=move['sound_order'],callback_installed=False)
     if adapter.get('category')==JOINT_CATEGORY:return joint_level(source,profile)
     if adapter.get('category')=='material-frame-assets':
         from v3_furniture_reactions import colour_lifecycle
@@ -1032,11 +1071,14 @@ def register_triggers(sequence,programs,fragments,counts,native_priority,source_
         raw=fragments[row['fragment_file']];origin=row['fragment_origin']
         if len(raw)!=row['bytes'] or sha256(raw)!=row['sha256']:raise ValueError('Changed complete prepared trigger')
         desc=trigger_program(bytes(origin)+raw,origin,origin+len(raw))
+        # Fragments already bind every instrument to the expanded native font.
+        layer_map={c['instrument']:c['instrument'] for c in desc.get('commands',[]) if c['opcode']==0xC6}
         if source_word in retained:
             old=retained[source_word]
-            bound=bind_trigger(raw,desc,old['offset'],row['native_selector'],row['native_instrument'])
+            bound=bind_trigger(raw,desc,old['offset'],row['native_selector'],row['native_instrument'],instrument_map=layer_map)
             if (old['source_program']!=row['source_program'] or old['trigger_priority']!=priority or
                     old['native_instrument']!=row['native_instrument'] or
+                    old.get('layer_instruments')!=row.get('layer_instruments') or
                     span(sequence,old['offset'],old['bytes'])!=bound):
                 raise ValueError('Reused trigger differs from complete current source')
             rows.append(copy.deepcopy(old));continue
@@ -1045,12 +1087,13 @@ def register_triggers(sequence,programs,fragments,counts,native_priority,source_
         target=index if index in available else available[0];used.add((group,target))
         native_word=(source_word&0x8000)|(group<<8)|target
         result.extend(bytes((len(result)^origin)&1));at=len(result)
-        bound=bind_trigger(raw,desc,at,row['native_selector'],row['native_instrument']);result.extend(bound)
+        bound=bind_trigger(raw,desc,at,row['native_selector'],row['native_instrument'],instrument_map=layer_map);result.extend(bound)
         struct.pack_into('>H',result,tables[group]['offset']+target*2,at)
         rows.append(dict(source_sound_word=source_word,native_sound_word=native_word,
             source_sound_id=sid,native_sound_id=native_word&0x7FFF,trigger_priority=priority,
             singleton=bool(source_word&0x8000),offset=at,bytes=len(bound),sha256=sha256(bound),
-            source_program=row['source_program'],native_bank=140,native_instrument=row['native_instrument']))
+            source_program=row['source_program'],native_bank=140,native_instrument=row['native_instrument'],
+            **({'layer_instruments':row['layer_instruments']} if row.get('layer_instruments') else {})))
     result.extend(bytes(-len(result)%16))
     if len(result)>65536:raise ValueError('Complete trigger sequence exceeds native pointer capacity')
     return bytes(result),rows,list(tables.values())
@@ -1306,6 +1349,9 @@ def install_furniture(image,prior,blob,code,original,output,directory):
             source_sound_word=triggers[row['item_id']]['sound_word'],
             native_sound_word=mapping[triggers[row['item_id']]['sound_word']]['native_sound_word'],
             profile_installed=False,parent_selectable=False))
+        if extra:=triggers[row['item_id']].get('additional_sound_words'):
+            sound_rows[-1]['additional_triggers']=[dict(source_sound_word=word,
+                native_sound_word=mapping[word]['native_sound_word']) for word in extra]
         from v3_room_effects import conditional_binding
         conditional=conditional_binding(image,prior,triggers[row['item_id']])
         if conditional:

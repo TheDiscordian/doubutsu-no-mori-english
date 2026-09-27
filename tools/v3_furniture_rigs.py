@@ -23,6 +23,7 @@ from v3_furniture_joint_rigs import CATEGORY as JOINT_CATEGORY
 from v3_furniture_materials import RIG_CATEGORY as MATERIAL_RIG_CATEGORY
 from v3_furniture_reversible import CATEGORY as REVERSIBLE_CATEGORY
 from v3_furniture_effect_rigs import CATEGORY as EFFECT_RIG_CATEGORY
+from v3_furniture_composite import DUAL_CATEGORY
 STORAGE_CODE = {
     'create': (116, '17985ba5a79cb082f421871e07eca8189d15291d08d408f4d68c257b072d166d'),
     'move': (80, '74d56a7240cc6101e429e75a9163eacb63753bfb06e944d1e80d291853fa6690'),
@@ -36,7 +37,7 @@ CLOCK_CODE = {
     'destroy': (4, 'f332ea5b5437103cbb6f1508679da89eec9288ad775c96c439a17fccabe3de8e'),
 }
 RIG_CATEGORIES = (CATEGORY, CLOCK_CATEGORY, STORAGE_CATEGORY, HIT_CATEGORY, BILLBOARD_CATEGORY, ROLLING_CATEGORY, JOINT_CATEGORY, MATERIAL_RIG_CATEGORY, REVERSIBLE_CATEGORY, EFFECT_RIG_CATEGORY)
-RESOURCE_CATEGORIES = RIG_CATEGORIES + (FIXED_CATEGORY,)
+RESOURCE_CATEGORIES = RIG_CATEGORIES + (FIXED_CATEGORY,DUAL_CATEGORY)
 CODE = {
     'create': (164, '2a86d61bc9aaf4a0a6479fe97a7f0d5dfe3dc42f9eea663eeb3fd1b8cbc35733'),
     'move': (208, '4b36894add16ecf872c1bfdcbeed2331519049fffd5b3d1d1d5db533f7c68d89'),
@@ -705,7 +706,7 @@ def suffix(source, profile, model_offsets, *, start, resources=()):
     if adapter.get('category') not in RESOURCE_CATEGORIES: return b'', {}
     roots = {root[1]:model_offsets[label] for label,root in profile['models'].items()}
     bones, rig = compile_skeleton(source,profile['skeleton'],roots,start=start)
-    motion, animations = compile_animations(source,[adapter['animation']],start=start+len(bones))
+    motion, animations = compile_animations(source,adapter.get('animations',[adapter['animation']]),start=start+len(bones))
     extra=b'';fields={}
     if adapter['category']==BILLBOARD_CATEGORY:
         scroll=adapter['scrolling'];sound=adapter['level_sound'];offset=start+len(bones)+len(motion)
@@ -732,6 +733,9 @@ def suffix(source, profile, model_offsets, *, start, resources=()):
                 adapter['level_sound']['source_sound_id'],0,material['selector']['division'],frames[0]['bytes'],
                 *(offsets+[0]*(8-len(offsets))),0,0)
         fields=dict(material_offset=offset,material_hex=extra.hex(),frame_offsets=offsets)
+    if adapter['category']==DUAL_CATEGORY:
+        fields['motion_offsets']=[next(r['native_offset'] for r in animations['headers']
+            if r['donor_offset']==a['header']['donor_offset']) for a in adapter['animations']]
     return bones+motion+extra, dict(skeleton=rig,animations=animations,**fields,
         skeleton_offset=rig['header']['native_offset'],animation_offset=animations['headers'][0]['native_offset'],
         runtime_installed=False)
@@ -741,5 +745,5 @@ def estimated_suffix(source, profile, start):
     adapter = profile.get('callback_adapter',{})
     if adapter.get('category') not in RESOURCE_CATEGORIES: return 0
     bones = (profile['skeleton']['joint_table']['bytes']+8+15)&~15
-    motion, _ = compile_animations(source,[adapter['animation']],start=start+bones)
+    motion, _ = compile_animations(source,adapter.get('animations',[adapter['animation']]),start=start+bones)
     return bones+len(motion)+(16 if adapter['category']==BILLBOARD_CATEGORY else 32 if adapter['category'] in (MATERIAL_RIG_CATEGORY,EFFECT_RIG_CATEGORY) else 0)

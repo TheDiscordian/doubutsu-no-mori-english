@@ -106,6 +106,13 @@ Keep source hashes and conversion revisions attached to each compiled import.
 
 ## Runtime work
 
+The shared furniture converter prepares complete nested-model and dual-motion
+resources for the aerobics radio and treasure chest. The chest's converted
+interaction/draw core, both multi-instrument trigger programmes, and continuous
+sound are prepared and checked. Native scene/contact/audio/profile/persistence
+bindings and the radio's complete music/emitter lifecycle remain work. Neither
+record is selectable merely because artwork and a core have been prepared.
+
 The [combined rig importer](V3_FURNITURE_PIPELINE.md#reversible-material-and-particle-rigs)
 installs complete reversible motion, delayed material selection, translucent
 joint drawing, particle emission, and source audio through the shared category

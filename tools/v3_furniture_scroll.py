@@ -258,6 +258,12 @@ def discover(source, name, at, functions):
 
 def bindings(adapter):
     """Expose only the complete model-local scroll dependency to the parser."""
+    if adapter.get('category')=='dual-motion-scroll-rig-assets':
+        rows=adapter['model_scrolls']
+        if (sorted(r['segment'] for r in rows.values())!=[0x08000000,0x09000000,0x0A000000] or
+                any(r['dimensions']!=[[32,8]] for r in rows.values())):
+            raise ValueError('Changed complete multi-segment scrolling dependencies')
+        return rows
     if adapter.get('category')=='joint-callback-rig-assets' and 'scrolling' in adapter:
         row=adapter['scrolling']
         if (row['segment_address']!=0x09000000 or row['texture_dimensions']!=[[16,32]] or

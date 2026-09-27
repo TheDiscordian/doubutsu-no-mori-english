@@ -771,7 +771,7 @@ class DonorTests(unittest.TestCase):
                     op=a>>24
                     self.assertNotIn(op,(0x0A,0xD2))
                     if op==0xDE:
-                        self.assertEqual(a,0xDE000000);self.assertIn(b,(0x08000000,0x09000000));calls.append((a,b))
+                        self.assertEqual(a,0xDE000000);self.assertIn(b,(0x08000000,0x09000000,0x0A000000));calls.append((a,b))
                     if op in (0xFC,0xE2,0xFA,0xFB,0xD9):state.append((a,b))
                     if op==0xDA:
                         self.assertEqual(a,0xDA380003);matrices.append((a,b));matrix=(b&0xFFFFFF)//64

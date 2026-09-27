@@ -34,6 +34,69 @@ this after changing shared code when no new resource category needs installation
 profile-only staging retains existing code unless it installs a newly implemented
 material lifecycle; that stage rebuilds the shared packet and callback bindings.
 
+### Composite models and dual-motion resources
+
+`Source.model_graph` expands ordinary relocated display-list calls in execution
+order. It retains every caller state command and every callee geometry/state
+command, removing only calls and their matching returns. Full-symbol receipts
+and flattened relocation positions accompany the result. Cycles, tail branches,
+early returns, incomplete commands, depth beyond eight, and output above 64 KiB
+reject. Direct models retain their established absolute-address convention.
+The parser accepts a third explicitly bound scrolling display-list segment, 10;
+this does not permit arbitrary unresolved calls.
+
+`rotated-fixed-material-assets` identifies the complete radio lifecycle and
+drawing functions. Both nested models, their shared vertices, both textures,
+the fixed palette, and the -157.5-degree draw rotation remain. Room music
+ownership, its constructor/destructor interactions, exclusive playback, and the
+36-source-tick note emitter are mandatory integration dependencies.
+
+`dual-motion-scroll-rig-assets` retains both complete animation headers and all
+motion arrays, in addition to every skeleton joint and model. `motion_offsets`
+uses semantic opening/closing order independently of physical header sorting.
+The chest supplies six joints, five displayed models, and two 51-frame motions.
+Its three independent 32-by-8 scrolling layers retain source phases 0, 5, and
+15. Preparation never enables the ordinary import or native profile.
+
+`room_dual_motion.c/.h` converts the complete source-order constructor, movement,
+destructor, and draw behaviour. The caller resolves closed/open animation
+pointers, durations, mapped clicks, full positioned-loop ID, actual front contact,
+and context predicates. NPC contexts force closed; other contexts use saved
+switch equal to one. A nonzero press toggles only at the front while idle;
+the newly selected motion starts at frame one and speed 0.5. Sound threshold
+tests precede animation evaluation, matching GAFE01 revision 0, not the later
+Australian callback. Two source steps are required per native room update, with
+the press delivered only on the first. Accepted state must be mirrored before
+native save capture, and the actual destruction callback must remain connected.
+
+The core uses the existing larger joint workspace without changing actor size
+or saved fields. Drawing reserves an aligned parent matrix, all three tile lists,
+and the complete opaque/translucent command requirements before mutating arenas.
+Room and preview counters both convert to the source rate with unsigned wrap.
+The caller supplies the actual basement/light predicate; a fabricated constant
+must not hide an existing native context. No new basement/cottage scene is implied.
+Actual room dispatch, audio/profile binding, and scene correspondence remain
+integration work; the prepared core is not installed in the current cartridge.
+
+### Multi-instrument trigger programmes
+
+The sound converter retains layer-level instrument commands (`C6`), including
+switches back to an earlier instrument. Every referenced complete instrument,
+envelope, sample, loop, predictor, and tuning record goes through the shared font
+importer. Binding requires an explicit mapping for every layer instrument;
+missing or out-of-range mappings reject. Notes, rests, pitch sweeps, and timing
+stay intact. Re-registering a bound fragment preserves its native instrument
+selectors and source receipts.
+
+All six source dispatch tables contribute programme boundaries even though only
+the supported groups are imported. This prevents a sound's extent from absorbing
+unrelated following programmes reached through another table. No unaccounted
+tail is silently removed. Furniture behaviours can request additional trigger
+words together; one shared font expansion handles the whole batch and records
+every mapped word. The chest needs distinct opening and closing triggers plus
+its separate continuous level sound. Preparing these resources does not install
+its gameplay profile or establish audio synthesis.
+
 ### Reversible motion and larger skeleton work
 
 `reversible-keyframe-rig-assets` recognises the complete stopped/reversible

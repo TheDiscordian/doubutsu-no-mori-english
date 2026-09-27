@@ -39,7 +39,7 @@ STABLE = ROOT/'build/v2-keyboard-fit-11/Animal Forest English V2.z64'
 STABLE_SHA = '8bbd1955536a2a3ac9f76d6f323842f5ce25c037e1ff5fd3da9f28d6dfe20507'
 SOURCES = capacity.SOURCES + ('tools/v3_furniture_pipeline.py', 'tools/v3_furniture_install.py', 'tools/map_artwork.py', 'tools/v3_room_aliases.py',
     'tools/v3_furniture_rigs.py', 'tools/v3_furniture_materials.py', 'tools/v3_furniture_scroll.py', 'tools/v3_keyframes.py',
-    'tools/v3_furniture_art.py', 'tools/v3_registry.py', 'tools/v3_catalogue.py',
+    'tools/v3_furniture_art.py', 'tools/v3_furniture_composite.py', 'tools/v3_registry.py', 'tools/v3_catalogue.py',
     'tools/v3_garden_runtime.py', 'tools/v3_shops.py', 'overlays/v3/catalogue.c',
     'overlays/v3/startup.c', 'translations/provenance.json',
     'tools/v3_camper_trade.py','tools/v3_camping_items.py','overlays/v3/camper_trade.c',
@@ -76,10 +76,11 @@ def profile(row, vrom, *, limit=END, model_capacity=9216):
     roof=adapter.get('category')==SELECTED_PALETTE_CATEGORY
     from v3_furniture_roofs import profile_lifecycle as roof_lifecycle
     from v3_furniture_joint_rigs import profile_lifecycle as joint_lifecycle
+    from v3_furniture_composite import PENDING_CATEGORIES
     if (adapter.get('category')==JOINT_CATEGORY and not joint_lifecycle(
             row['profile'],row.get('room_lifecycle'),row.get('room_placement')) or
             roof and not roof_lifecycle(row['profile'],row.get('room_lifecycle')) or
-            adapter.get('category') in (FIXED_CATEGORY,PENDING_MOVE_CATEGORY,PENDING_SEQUENCE_CATEGORY) or scrolling and
+            adapter.get('category') in (FIXED_CATEGORY,PENDING_MOVE_CATEGORY,PENDING_SEQUENCE_CATEGORY)+PENDING_CATEGORIES or scrolling and
             (not profile_lifecycle(row['profile'],row.get('room_lifecycle'),row.get('room_placement')) or
              row.get('room_runtime')!={'vtable':SCROLL_VTABLE,'vrom':vrom})):
         raise ValueError('Prepared resources have no implemented native lifecycle')

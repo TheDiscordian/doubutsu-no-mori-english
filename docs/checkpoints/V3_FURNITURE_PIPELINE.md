@@ -1,5 +1,96 @@
 # Automatic furniture pipeline checkpoint
 
+## Prepared composite models and dual motion
+
+`build/v3-composite-rigs-prepared-01/` contains the complete two-record asset
+batch, produced by one compiler container through the ordinary pipeline:
+
+- Aerobics radio `1FCC`: 5,152 bytes, 24 triangles, two nested model parts,
+  complete shared vertices, both textures, and fixed palette. Object SHA-256
+  `b2a4002d78541fa47c63b94f99f871f5343768cd6568ce0a6e41e08da3624af1`.
+- Treasure chest `31B0`: 8,672 bytes, 150 triangles, six joints, five displayed
+  models, both distinct 51-frame motions, and all three scroll layers. Object
+  SHA-256 `5b63635486ffe0f15d2b7e224f37d69facf31b5adf4e46da9e0f568e6e0c6c87`.
+  Opening/closing animation offsets are 8,632 and 8,652; all eight motion arrays
+  are retained. It fits the existing 9,216-byte object allocation.
+
+Pipeline revision 35 and graphics-converter revision 18 support nested ordinary
+display-list graphs and explicitly bound scroll segment 10. Full callback shapes,
+relocations, source helpers/constants, every model, and all motion channels are
+checked. Caller state and callee geometry remain in source order. Complete direct
+models retain their established preparation output. Unfinished profiles reject
+both metadata approval and native profile installation.
+
+The chest core in `overlays/v3/room_dual_motion.c/.h` preserves selected open/closed
+motions, front-contact and idle-only press acceptance, source-order sound timing,
+NPC forced-closed initialization, destruction state, and three independent scroll
+phases. Existing unused matrix slots hold complete joint/morph work. No actor or
+save allocation grows. `build/v3-dual-motion-core-01/` cross-compiles the core with
+the baseline shared dispatcher at `804D0000`: 3,015 bytes, SHA-256
+`784416477f5e09b05e049774db1d88a5aa06549546c6216aff2ae6700338a075`.
+This is a prepared component, not the installed full room packet; its four exported
+functions are not yet connected to an item profile. Maximum reported stack use
+is 56 bytes.
+
+Fourteen focused checks pass: complete independent texel/vertex/triangle/material
+comparison, both motion arrays/headers, prepared-art reuse, nested state/relocation
+order, cycle/branch rejection, changed source callback rejection, unavailable
+profile enforcement, complete source audio, and shared synthetic sound parsing.
+Actual US donor constructor/movement/destructor functions run against the converted
+core under address/undefined-behaviour sanitizers: 9,612 comparisons and 4,800
+simulated draw frames. Cases include four saved-switch values, ordinary/NPC/cottage
+contexts, busy and wrong-side presses, transition exclusions, two source ticks per
+native update, save-state mirroring, both counters, unsigned wrap, stopped scroll,
+crowded arenas, matrix-work retention, and actor guards. Engine/audio/GPU boundaries
+are controlled stubs; these checks do not establish native gameplay or rendering.
+
+`build/v3-dual-motion-audio-01/` prepares both full trigger programmes and the
+continuous sound from the current ABI-267 base. Opening `016A` is 32 bytes with
+four notes, two rests, a pitch sweep, and two instrument changes. Closing `016B`
+is 20 bytes with two notes, two rests, and one instrument change. Four complete
+source instruments map to native slots 97..100. Their complete prepared font is
+15,584 bytes, SHA-256
+`5e64d84df9a8754107e93d184b87eb9d94f15f6e46fcf8334892b4631a599b3c`;
+the complete wave archive is 3,318,640 bytes, SHA-256
+`252ffe47e36b695f816d735bb9f6b92bc68fba39383808ebb574c3698f78d10f`.
+Full source loop `52` converts to a 30-byte programme using the already equivalent
+native bank-139 instrument 119 and complete 23,914-byte sample. Registration checks
+bind both triggers with source-matched priorities and retain every existing
+installed trigger programme. No sound is played through hardware.
+
+The source sound preparation identifies two missing general features: layer
+instrument changes and complete neighbouring programme boundaries across all six
+dispatch tables. Both are implemented without cutting down the sound. Fourteen
+focused checks pass; the final two changed sound/registration checks also pass.
+Both audio bundles pin ABI 267 separately; when installing sequentially, regenerate
+the second bundle against the resulting checked build, preserving any new font
+resources. Do not apply its older font snapshot over the first stage.
+
+Remaining integration: chest native room/contact/context readers, explicit mapping
+of both sounds, complete dispatch, saved-switch capture/destruction, profile and
+ordinary category planning; radio constructor/destructor music ownership, exclusive
+playback, note emission, and rotated drawing. The original native scene enum has
+NPC house 6 but no GameCube basement or cottage; establish actual correspondence
+against the current room/scene runtime before binding those predicates. Continue
+console launch/storage after these importing behaviours, then acquisition and gold
+tree work. No emulator scenario or old cartridge test is replayed.
+
+The installed proposal remains ABI 267 with 162 choices and saved format 4. This
+preparation changes no ROM, existing save, main lock, or deployed patcher. Both
+served patchers retain V2-13. V3 saves still require matching supported profiles
+and are not suitable for V2. Ordinary native gameplay, save/restart, synthesis,
+GPU appearance, and hardware are not claimed for these two prepared records.
+The current cartridge's 57 complete shared profile bindings still validate with
+the changed converter/audio code; this does not replay historical cartridges.
+
+```sh
+python3 tools/v3_furniture_pipeline.py convert --assets-only \
+  --base-lock build/v3-effect-rig-imports-01/cartridge/build-lock.json \
+  --select 1FCC --select 31B0 --output build/v3-composite-rigs-reproduction
+python3 -m unittest -v tests.test_v3_composite_rigs \
+  tests.test_v3_sound_programs.ProgramTests
+```
+
 ## Installed combined reversible material and effects
 
 The ordinary category importer installs crab stew's complete four-joint motion,

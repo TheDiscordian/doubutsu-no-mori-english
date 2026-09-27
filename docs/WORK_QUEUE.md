@@ -21,10 +21,14 @@ prevent asset/data conversion or redirect work from an unfinished shared format.
 Incomplete gameplay stays unavailable in the selector; installing assets does
 not claim that an item is playable. Reuse unchanged passing tests throughout.
 
-Current task: complete the actual radio/chest and console launch/storage
-categories. Crab stew's combined reversible/material/effect lifecycle is installed.
-Reuse installed skeleton, reversible, material, audio, and effect machinery;
-do not add per-item installers or omit unique behaviour.
+Current task: integrate the prepared radio/chest models and complete behaviours,
+then continue console launch/storage. Both complete models, both chest motions,
+three scroll layers, the chest's converted interaction/draw core, and full sound
+dependencies are prepared. Connect chest room/contact/context readers, mapped
+opening/closing sounds, destruction, and native save capture; finish radio
+room-music ownership, note emission, and rotated drawing. Reuse the existing
+ordinary category importer. Do not add per-item installers or omit unique behaviour.
+See the [composite checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#prepared-composite-models-and-dual-motion).
 
 The complete crab stew uses mode 10: all four joints and three models, delayed
 on/off fire frames, full motion, translucent drawing, randomized steam, complete
@@ -45,10 +49,10 @@ claimed. The shared callback loader uses 1,142 of 1,536 bytes, including checked
 destruction dispatch. See the
 [reversible checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#installed-reversible-lifecycle-and-save-capture).
 
-Then continue the remaining actual model/lifecycle and console launch/storage
-categories without per-item installers. Unconverted records include aerobics
-radio and treasure chest. Reuse complete source resources and the
-shared skeleton/material/reversible behaviour support throughout.
+Continue the remaining actual lifecycle and console launch/storage categories
+without per-item installers. Radio and chest resources are converted; their
+native gameplay integration is unfinished. Reuse these complete resources and
+the shared skeleton/material/reversible behaviour support throughout.
 
 The checked current proposal is ABI 267 at
 `build/v3-effect-rig-imports-01/cartridge/build-lock.json`, ROM SHA-256

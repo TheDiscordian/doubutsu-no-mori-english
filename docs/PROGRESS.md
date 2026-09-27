@@ -31,6 +31,18 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
+The shared converter prepares the complete aerobics radio and treasure chest
+together: 13,824 bytes, 174 triangles, all textures/palettes, nested model parts,
+six chest joints, both distinct 51-frame motions, and three scrolling layers.
+The chest's converted interaction/draw core passes donor comparisons and N64
+compilation. Shared audio conversion retains both full multi-instrument trigger
+programmes and the continuous sound. Fourteen focused resource, lifecycle, and
+audio checks pass. These are prepared dependencies, not installed item gameplay.
+Next: connect the chest's room/contact/context readers, mapped sounds, destruction,
+and native save capture; finish the radio's room-music ownership, note emitter,
+and rotated drawing through the ordinary importer. See the
+[composite checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#prepared-composite-models-and-dual-motion).
+
 The ordinary category importer installs crab stew's combined reversible animation,
 delayed fire textures, translucent joint, randomized steam, and complete audio.
 All three models, 62 triangles, four joints, motion channels, and five on/off frame

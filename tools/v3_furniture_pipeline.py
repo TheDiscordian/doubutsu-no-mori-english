@@ -24,7 +24,7 @@ from v3_registry import FURNITURE, LEGACY_FURNITURE, furniture_identity, furnitu
 from v3_room_aliases import discover as room_aliases, pending_reason as room_alias_reason
 from v3_villager_art import native_palette, normalise_vertex_flags
 
-VERSION = 34
+VERSION = 35
 PENDING_MOVE_CATEGORY = 'static-models-pending-move'
 PENDING_SEQUENCE_CATEGORY = 'constant-model-sequence-pending-lifecycle'
 SELECTED_PALETTE_CATEGORY = 'selected-palette-fade-assets'
@@ -279,6 +279,9 @@ class Source:
         from v3_furniture_effect_rigs import discover as discover_effect_rig
         effect_rig=discover_effect_rig(self,name,at,functions)
         if effect_rig is not None:return effect_rig
+        from v3_furniture_composite import discover as discover_composite
+        composite=discover_composite(self,name,at,functions)
+        if composite is not None:return composite
         from v3_furniture_rigs import (CODE as RIG_CODE, CLOCK_CODE, STORAGE_CODE,
             discover as discover_rig, discover_clock, discover_storage, discover_fixed, discover_hit, discover_billboard,
             discover_material_rig)
@@ -538,6 +541,47 @@ class Source:
             selected_index=selected,entries=count,model_sequences=sequences,
             conditional_translucent=conditional)
 
+    def model_graph(self, root):
+        """Expand bounded ordinary display-list calls in source execution order.
+
+        Keep every caller state command and every callee command. Only the call
+        and its matching return disappear; unresolved dynamic calls remain for
+        the explicitly bound material parser. Cycles and tail branches reject.
+        """
+        output=bytearray();pointers={};receipts=[];calls=[]
+        def visit(part,stack):
+            name,at,n=part
+            if (len(stack)>=8 or at in stack or n<8 or n%8 or
+                    self.containing(at,exact=True)!=tuple(part)):
+                raise ReviewRequired('invalid or recursive model graph')
+            raw=self.data[at:at+n];refs=self.pointers(at,n)
+            if raw[-8:]!=struct.pack('>II',0xDF000000,0) or any(p>=at+n-8 for p in refs):
+                raise ReviewRequired('model graph lacks a complete terminal return')
+            receipts.append(dict(symbol=name,donor_offset=at,bytes=n,sha256=sha256(raw),joined_offset=len(output)))
+            position=0
+            while position<n:
+                first,last=struct.unpack_from('>II',raw,position);op=first>>24;size=8
+                if op==0xDF and position!=n-8:raise ReviewRequired('model graph has an early return')
+                if op==0xDE and at+position+4 in refs:
+                    if first!=0xDE000000 or last:raise ReviewRequired('unsupported model branch/call form')
+                    target=refs[at+position+4]
+                    calls.append(dict(caller=at,offset=position,target=target))
+                    visit(self.containing(target,exact=True),stack+(at,))
+                elif op!=0xDF or not stack:
+                    if op==0x0A:
+                        count=(first>>17&127)+1;size=(1+(max(0,count-3)+3)//4)*8
+                    if position+size>n:raise ReviewRequired('truncated packed model graph command')
+                    pointers.update({len(output)+p-at-position:v for p,v in refs.items()
+                        if at+position<=p<at+position+size})
+                    output.extend(raw[position:position+size])
+                position+=size
+                if len(output)>65536:raise ReviewRequired('expanded model exceeds conversion bounds')
+        visit(root,())
+        if not calls:
+            _,at,n=root;return self.data[at:at+n],self.pointers(at,n),None
+        receipts[0]['calls']=calls
+        return bytes(output),pointers,receipts
+
     def model_sequence(self, parts):
         """Join ordered state/geometry lists, removing only intermediate returns."""
         joined=bytearray();pointers={};receipts=[]
@@ -686,7 +730,8 @@ class Source:
         from v3_furniture_materials import CATEGORY as MATERIAL_CATEGORY
         from v3_furniture_scroll import CATEGORY as SCROLL_CATEGORY
         from v3_furniture_joint_rigs import CATEGORY as JOINT_CATEGORY
-        pending_move=adapter.get('category') in (PENDING_MOVE_CATEGORY,PENDING_SEQUENCE_CATEGORY,SELECTED_PALETTE_CATEGORY,MATERIAL_CATEGORY,SCROLL_CATEGORY,JOINT_CATEGORY)
+        from v3_furniture_composite import PENDING_CATEGORIES
+        pending_move=adapter.get('category') in (PENDING_MOVE_CATEGORY,PENDING_SEQUENCE_CATEGORY,SELECTED_PALETTE_CATEGORY,MATERIAL_CATEGORY,SCROLL_CATEGORY,JOINT_CATEGORY)+PENDING_CATEGORIES
         pending_fields=[]
         if raw[36:40]!=struct.pack('>f',.01):pending_fields.append('scale')
         if contact not in BEHAVIOURS:pending_fields.append('contact')
@@ -703,12 +748,12 @@ class Source:
         if not pending_move and (storage and (contact or interaction not in (1,2,4)) or interaction in (1,2,4) and not storage):
             raise ReviewRequired('storage interaction requires the complete open/close category')
         if adapter.get('category') in RESOURCE_CATEGORIES:
-            if (contact or interaction and not storage) and adapter['category']!=JOINT_CATEGORY:
+            if (contact or interaction and not storage) and adapter['category'] not in (JOINT_CATEGORY,)+PENDING_CATEGORIES:
                 raise ReviewRequired('unsupported rig contact/interaction flags')
             extra.update(kind='animated-room-model',skeleton=adapter['skeleton'],joint_models=adapter['joint_models'])
         return dict(profile_symbol=name, profile_offset=at, profile_sha256=sha256(raw),
             scalar_hex=raw[32:48].hex(), behaviour=adapter.get('category') if extra.get('kind') or
-            adapter.get('category') in ('switch-trigger-sound','static-interaction',PENDING_MOVE_CATEGORY,PENDING_SEQUENCE_CATEGORY,SELECTED_PALETTE_CATEGORY,MATERIAL_CATEGORY,SCROLL_CATEGORY) else BEHAVIOURS[contact], contact_action=contact,
+            adapter.get('category') in ('switch-trigger-sound','static-interaction',PENDING_MOVE_CATEGORY,PENDING_SEQUENCE_CATEGORY,SELECTED_PALETTE_CATEGORY,MATERIAL_CATEGORY,SCROLL_CATEGORY)+PENDING_CATEGORIES else BEHAVIOURS[contact], contact_action=contact,
             interaction_flags=interaction,
             size_code={3:1, 4:0, 5:2}[shape], shape=shape, models=models, **extra)
 
@@ -765,7 +810,8 @@ def prepare_models(source, descriptor):
         if parts:
             raw,pointers,receipts=source.model_sequence(parts);at=0;n=len(raw)
         else:
-            raw,pointers,receipts=source.data[at:at+n],source.pointers(at,n),None
+            raw,pointers,receipts=source.model_graph((name,at,n))
+            if receipts:at=0;n=len(raw)
         position = 0
         while position < n:
             a, b = struct.unpack_from('>II', raw, position)
@@ -1155,6 +1201,9 @@ def metadata(source, item, profile, identity):
     from v3_furniture_materials import CATEGORY as MATERIAL_CATEGORY
     from v3_furniture_scroll import CATEGORY as SCROLL_CATEGORY
     binding=getattr(source,'runtime_profiles',{}).get(f'{item:04X}')
+    from v3_furniture_composite import PENDING_CATEGORIES
+    if profile.get('callback_adapter',{}).get('category') in PENDING_CATEGORIES:
+        raise ReviewRequired('Complete composite resources are prepared; '+', '.join(profile['callback_adapter']['pending_callbacks'])+' remain uninstalled')
     if profile.get('callback_adapter',{}).get('category')==SELECTED_PALETTE_CATEGORY and not binding:
         raise ReviewRequired('Complete roof palettes and models are prepared; native house-colour selection/lifecycle remains uninstalled')
     if profile.get('callback_adapter',{}).get('category')==SCROLL_CATEGORY and not binding:

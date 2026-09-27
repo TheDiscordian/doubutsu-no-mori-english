@@ -51,6 +51,7 @@ SOURCES+=PARTICLE_SOURCES
 SOURCES+=roofs.SOURCES
 SOURCES+=('tools/v3_furniture_reversible.py','overlays/v3/room_reversible.c','overlays/v3/room_reversible.h')
 SOURCES+=('tools/v3_furniture_effect_rigs.py','overlays/v3/room_effect_rigs.c','overlays/v3/room_effect_rigs.h')
+SOURCES+=('tools/v3_furniture_composite.py','overlays/v3/room_dual_motion.c','overlays/v3/room_dual_motion.h')
 
 
 def checked_hit_condition(base,report,trigger,sound,audio):

@@ -19,6 +19,25 @@ OUTPUT=ROOT/os.environ.get('V3_PLAYER_FRAME_BUILD','build/v3-player-frame-sound-
 
 
 class ProgramTests(unittest.TestCase):
+    def test_trigger_layer_instruments_are_all_mapped_without_changing_music(self):
+        raw=bytes.fromhex('eb0012880007ffc00450125ac009c607c78120ff613030c612553244541d2cff')
+        desc=sounds.trigger_program(raw,0,len(raw))
+        self.assertEqual([c['instrument'] for c in desc['commands'] if c['opcode']==0xC6],[7,18])
+        self.assertEqual([e['duration'] for e in desc['events']],[4,18,9,48,50,29])
+        bound=sounds.bind_trigger(raw,desc,0x4200,1,12,instrument_map={7:13,18:12})
+        converted=sounds.trigger_program(bytes(0x4200)+bound,0x4200,0x4200+len(bound))
+        self.assertEqual(converted['events'],desc['events'])
+        self.assertEqual([c['instrument'] for c in converted['commands'] if c['opcode']==0xC6],[13,12])
+        restored=bytearray(bound);restored[1:3]=raw[1:3]
+        for at in desc['pointers']:restored[at:at+2]=raw[at:at+2]
+        for c in desc['commands']:
+            if c['opcode']==0xC6:restored[c['offset']+1]=c['instrument']
+        self.assertEqual(restored,raw)
+        for mapping in (None,{7:13},{7:13,18:126}):
+            with self.assertRaises(ValueError):sounds.bind_trigger(raw,desc,0x4200,1,12,instrument_map=mapping)
+        bad=bytearray(raw);bad[15]=126
+        with self.assertRaises(ValueError):sounds.trigger_program(bad,0,len(bad))
+
     def test_trigger_preserves_one_step_envelope_repeated_notes_and_rests(self):
         raw=bytearray.fromhex('eb0102880007ffcb0000ff64023cc00270033cc01464023cff')
         raw.extend(bytes(len(raw)&1));envelope=len(raw)
