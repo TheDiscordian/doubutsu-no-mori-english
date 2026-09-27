@@ -60,6 +60,44 @@ Next connect the room owner's movement permission/registration, final transform
 and release, carried-item drawing, and parent readers. Occupied-table movement
 and the compass remain unavailable until those actual paths are complete.
 
+### Next native owner bindings
+
+The checked ABI-244 owner is disassembled at
+`build/disassembly/v3-room-carry-owner-01/code.asm`. Its pull permission call is
+`8093F28C → 8093CAF8`, after bottom-layer foreground removal and before state
+changes; push uses `8093F608` with the same callee. In both callers `s0` is the
+moving furniture. Preserve the original shape/destination arguments, then
+register carrying only after permission succeeds. Existing failure branches
+restore the parent's native foreground/placement. Rotation permission calls
+remain `809415EC → 8093FBE0` and `80941744 → 8093FD14`. Their native arguments
+are complete before the calls; registration belongs after their success.
+
+The three early contact checks call only occupied-top detection; the separate
+`lhu ...,073A(s0)` stored-item checks follow and must remain. The per-actor tail
+`80944FD0/4` reloads the room list count into `v0`. A replacement must update
+carried positions after the native final snap/short-angle conversion and return
+that same count, preserving the loop's unused-actor branch. Here `s0` is the
+furniture, `s6` the owner, and `s7` the game. Both replaced count-load relocations
+need removing together if this pair becomes a call.
+
+`809471CC` rotates the furniture matrix with its own short angle; add the parent
+delta while retaining the original multiply mode. `s0` is the child. The last
+draw call, `809472B4 → 80946F40`, receives furniture, owner, profile, and game;
+its wrapper can retain the complete original custom draw before drawing loose
+carried items. Final constructor call `8093B6D8 → 8093B498` has the actual owner
+and runs after the work arrays exist. Destruction starts at `8093BB04`, with
+first helper call `8093BB14 → 80937140`; resolve carrying before native room
+foreground persistence and actor cleanup, including interrupted movement.
+
+Use the existing expanded profile table from `furniture_tables.h` for tabletop
+height (`profile+30`) and the real native ground-height query. `80937520` is an
+object-bank reader, not the profile reader. The installed goods functions are
+in the build receipt's symbol map. A separate resident carrying packet can use
+the unoccupied space after `804DA000` and the existing 464 spare surface-startup
+bytes; check exact reservations before installing. This avoids squeezing more
+entry code into the 27 spare room-bootstrap bytes. Owner hooks, startup loading,
+final-position restoration, and complete parent callbacks must ship together.
+
 ## Shared moving-table carrying
 
 The shared `room_carry.c/.h` core implements donor footprint collection,
