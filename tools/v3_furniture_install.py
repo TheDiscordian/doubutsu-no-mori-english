@@ -632,7 +632,7 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
     if console_emulator:
         import v3_console_emulator as equipment
         display_report,alias_report=prior['clothing']['display'],prior['display_aliases']
-        equipment_report,owner_changes=equipment.install(base,prior,blob,output)
+        equipment_report,owner_changes=equipment.install(base,prior,blob,output,original)
     elif console_images is not None:
         import v3_console_image_native as equipment
         display_report,alias_report=prior['clothing']['display'],prior['display_aliases']

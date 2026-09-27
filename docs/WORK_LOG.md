@@ -1,5 +1,26 @@
 # Work record
 
+## 2026-09-27: checked native console allocation and shared refresh
+
+- Fixed the unchecked native arena path for all console allocations, including
+  those before import-session initialization. Invalid/full arenas reject before
+  subtraction and preserve the native fallback-pool route.
+- Extended the ordinary emulator runtime refresh to verify previous hooks
+  against the original ROM, rebind changed targets, and preserve installed room
+  callbacks/metadata. ABI 281 and hashes are in the
+  [capacity checkpoint](checkpoints/V3_CONSOLE_CAPACITY.md).
+- Four focused checks pass across targeted runs: 110,902 sanitized adapter
+  assertions, complete cartridge/resource/UPS checks, changed-input rejection,
+  and four private compositions. No unchanged historical suite replay.
+- A silent real game-state transition allocates the largest full image and
+  backup with 130,304 arena bytes free, but initialization stalls. Initial
+  frame observation times out; the single diagnostic retry records an inactive
+  emulator session, native audio-thread context, and no CPU fault. Neither run
+  passes; the cause remains unresolved and blocks playable handoff.
+- Continue complete QD execution and native startup/return diagnosis. Donor QD
+  routines are present in the local reference. Both V2-13 deployments, the main
+  V3 lock, existing ROMs, and saves remain unchanged.
+
 ## 2026-09-27: shared console furniture profiles and room interaction
 
 - Extended the ordinary category planner/stager instead of adding per-console

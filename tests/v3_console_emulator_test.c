@@ -13,6 +13,7 @@ static _Alignas(16) u8 arena[0x160000],players[AF_CONSOLE_SAVE_BYTES];
 static u8 pool[770144],full[1472384],game_number,player_number,failure;
 static u8 saved_snapshot[AF_CONSOLE_SAVE_BYTES],battery_snapshot[8192];
 static u32 used,calls,fail_allocation,alloc_sizes[12],init_calls,frame_calls,reset_calls,close_calls,setup_calls,return_calls;
+static u32 arena_calls;
 static int valid_storage=1,fail_read;
 static u8 *state_pointer;
 const u8 *af_test_console_metadata=meta;
@@ -29,10 +30,22 @@ void *af_console_test_memory(u32 at) {
     if(at==0x80137899u)return &failure;
     fprintf(stderr,"unexpected native data address %08x\n",at);abort();
 }
+static u32 *native_word(u32 linked) {return (u32 *)(native+linked-BASE);}
+static void *native_arena(void *heap,u32 bytes) {
+    u32 *h=heap;arena_calls++;h[3]=((h[3]&~15u)-bytes)&~15u;
+    return (void *)(uintptr_t)h[3];
+}
 static void *native_alloc(u32 bytes) {
     CHECK(calls<12);alloc_sizes[calls++]=bytes;
     if(calls==fail_allocation)return 0;
-    bytes=(bytes+15)&~15u;CHECK(used+bytes+16<=sizeof(arena));
+    u32 aligned=(bytes+15)&~15u,*primary=native_word(0x80854A34),*fallback=native_word(0x80854A2C);
+    int available=0;
+    if(primary[0] && primary[1]>=aligned) {primary[0]+=aligned;primary[1]-=aligned;available=1;}
+    else if(*native_word(0x80854A28))
+        available=af_v3_console_arena_allocate(*native_word(0x80854A28)+0x78,bytes)!=0;
+    if(!available && fallback[0] && fallback[1]>=aligned) {fallback[0]+=aligned;fallback[1]-=aligned;available=1;}
+    if(!available)return 0;
+    bytes=aligned;CHECK(used+bytes+16<=sizeof(arena));
     void *p=arena+used;memset(p,0,bytes);memset(arena+used+bytes,0xA6,16);used+=bytes+16;return p;
 }
 static void native_init(u8 *state,void *header,void *graphics,u8 *image) {
@@ -49,6 +62,7 @@ static void *native_setup(void) {setup_calls++;return native;}
 static void native_return(void *game) {CHECK(game==native);return_calls++;}
 void *af_console_test_function(u32 at) {
     if(at==0x800C6E14)return native_return;
+    if(at==0x800D17D4)return native_arena;
     switch(at-RELOCATED+BASE) {
     case 0x8082A814:return native_alloc;
     case 0x8082A6EC:return native_init;
@@ -81,6 +95,7 @@ static void check_guards(void) {
 static void *start(u32 game,u32 player) {
     memset(native,0,sizeof(native));memset(session_memory,0xA7,sizeof(session_memory));
     used=calls=0;game_number=game;player_number=player;
+    *native_word(0x80854A34)=0x80240000;*native_word(0x80854A38)=sizeof(arena);
     state_pointer=native_alloc(0x16F90);
     void *graphics=af_v3_console_graphics(0x25008);
     void *header=native_alloc(0x210);
@@ -91,9 +106,66 @@ static void *start(u32 game,u32 player) {
 static void load_file(const char *path,u8 *out,size_t bytes) {
     FILE *f=fopen(path,"rb");CHECK(f);CHECK(fread(out,1,bytes,f)==bytes);CHECK(fgetc(f)==EOF);CHECK(!fclose(f));
 }
+static void allocation_boundaries(void) {
+    const u32 heap=RELOCATED+0x78,start=0x80240000;
+    u32 *h=af_console_test_memory(heap),before[4];
+    /* The native allocator reaches this hook before graphics initializes the
+     * session; bounds must not depend on a current session or game identity. */
+    memset(session_memory,0,sizeof(session_memory));
+    for(u32 n=1;n<=33;n++) {
+        u32 aligned=(n+15)&~15u;
+        h[0]=0x100;h[1]=start;h[2]=start+0x100-aligned;h[3]=start+0x100;
+        u32 prior=arena_calls;
+        CHECK((uintptr_t)af_v3_console_arena_allocate(heap,n)==h[2]);
+        CHECK(arena_calls==prior+1 && h[3]==h[2]);
+        h[3]=start+0x100;h[2]++;memcpy(before,h,sizeof(before));prior=arena_calls;
+        CHECK(!af_v3_console_arena_allocate(heap,n));
+        CHECK(arena_calls==prior && !memcmp(before,h,sizeof(before)));
+    }
+    for(u32 bad=0;bad<12;bad++) {
+        h[0]=0x100;h[1]=start;h[2]=start;h[3]=start+0x100;
+        u32 request=16,at=heap;
+        switch(bad) {
+        case 0:request=0;break;
+        case 1:request=0xFFFFFFF1u;break;
+        case 2:h[0]=0xFFFFFFFFu;break;
+        case 3:h[1]=0x7FFFFFF0;break;
+        case 4:h[1]=0x80400010;break;
+        case 5:h[2]=start-1;break;
+        case 6:h[3]=h[2]-1;break;
+        case 7:h[3]=start+0x101;break;
+        case 8:h[2]=start+0xF1;h[3]=start+0xFF;request=1;break;
+        case 9:at++;break;
+        case 10:at=0x803FFFF4;break;
+        case 11:at=0x800003FC;break;
+        }
+        memcpy(before,h,sizeof(before));u32 prior=arena_calls;
+        CHECK(!af_v3_console_arena_allocate(at,request));
+        CHECK(arena_calls==prior && !memcmp(before,h,sizeof(before)));
+    }
+    h[0]=0x100;h[1]=start;h[2]=start;h[3]=start+0xFF;
+    CHECK((uintptr_t)af_v3_console_arena_allocate(heap,0xF0)==start);
+    /* Exact high-end arena, with no address wrap. */
+    h[0]=16;h[1]=h[2]=0x803FFFF0;h[3]=0x80400000;
+    CHECK((uintptr_t)af_v3_console_arena_allocate(heap,16)==0x803FFFF0);
+    /* Preserve native selection order: primary pool, checked arena, fallback.
+     * A full arena rejects without moving its tail, allowing a real fallback. */
+    memset(native,0,sizeof(native));used=calls=0;
+    *native_word(0x80854A28)=RELOCATED;
+    h[0]=16;h[1]=h[2]=start;h[3]=start+16;
+    *native_word(0x80854A34)=start+0x100;*native_word(0x80854A38)=16;
+    *native_word(0x80854A2C)=start+0x200;*native_word(0x80854A30)=16;
+    u32 prior=arena_calls;
+    CHECK(native_alloc(16));CHECK(arena_calls==prior && h[3]==start+16);
+    CHECK(native_alloc(16));CHECK(arena_calls==prior+1 && h[3]==start);
+    CHECK(native_alloc(16));CHECK(arena_calls==prior+1 && h[3]==start);
+    CHECK(!native_alloc(16));CHECK(arena_calls==prior+1 && h[3]==start);
+    CHECK(*native_word(0x80854A38)==0 && *native_word(0x80854A30)==0);
+}
 int main(int argc,char **argv) {
     CHECK(argc==4);load_file(argv[1],meta,sizeof(meta));load_file(argv[2],pool,sizeof(pool));load_file(argv[3],full,sizeof(full));
     CHECK(af_v3_console_validate(meta,sizeof(meta))==0);
+    allocation_boundaries();
     for(u32 game=0;game<8;game++) {
         memset(players,0x57,sizeof(players));memcpy(saved_snapshot,players,sizeof(players));
         void *graphics=start(game,0);CHECK(alloc_sizes[1]==0x25008);

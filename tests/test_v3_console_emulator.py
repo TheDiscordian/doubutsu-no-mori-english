@@ -1,5 +1,7 @@
 """Focused native lifecycle adapter, installation, and private composition."""
 from pathlib import Path
+import copy
+import os
 import subprocess
 import sys
 import tempfile
@@ -10,14 +12,14 @@ ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'tools'))
 from aflib import by_vrom,sha256,apply_ups
 from v3_asset_loader import BLOB,MODULE
-from v3_console_emulator import SOURCES,VROM,RELOC,patch
+from v3_console_emulator import SOURCES,VROM,RELOC,CODE_BYTES,patch,install
 from v3_furniture_install import inputs
 
 
 class ConsoleEmulatorTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.out=ROOT/'build/v3-console-emulator-native-01'
+        cls.out=ROOT/os.environ.get('V3_CONSOLE_EMULATOR_BUILD','build/v3-console-emulator-capacity-01')
         cls.image,cls.report=inputs(cls.out/'build-lock.json')
         cls.base,cls.prior=inputs(cls.out/'base-lock.json')
         cls.images=cls.report['equipment_resources']['console_images']
@@ -41,11 +43,14 @@ class ConsoleEmulatorTests(unittest.TestCase):
 
     def test_checked_hooks_and_retained_resources(self):
         files=by_vrom(self.image);old=by_vrom(self.base);images=self.images;p=images['packet']
-        expected_owner,expected_reloc,receipt=patch(old[VROM].extract(self.base),old[RELOC].extract(self.base),images['compiled']['symbols'])
+        original=(ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes();original_files=by_vrom(original)
+        expected_owner,expected_reloc,receipt=patch(original_files[VROM].extract(original),
+            original_files[RELOC].extract(original),images['compiled']['symbols'])
         self.assertEqual(files[VROM].extract(self.image),expected_owner)
         self.assertEqual(files[RELOC].extract(self.image),expected_reloc)
         self.assertEqual(images['emulator']['native'],receipt)
         self.assertEqual(len(receipt['removed_relocations']),6)
+        self.assertEqual(len(receipt['hooks']),7)
         self.assertEqual(set(files),set(old))
         for v in files:
             if v not in (BLOB,MODULE,0x19D40,VROM,RELOC):
@@ -55,7 +60,8 @@ class ConsoleEmulatorTests(unittest.TestCase):
         self.assertEqual(sha256(data[:images['compiled']['bytes']]),images['compiled']['sha256'])
         previous=self.prior['equipment_resources']['console_images'];q=previous['packet']
         prior_blob=old[BLOB].extract(self.base);prior_data=prior_blob[q['blob_offset']:q['blob_offset']+q['bytes']]
-        self.assertEqual(data[0x3800:],prior_data[0x3800:])
+        self.assertEqual(data[CODE_BYTES:],prior_data[CODE_BYTES:])
+        self.assertEqual(images['room'],previous['room'])
         pool=images['pool'];start=pool['physical'];end=start+pool['bytes']
         self.assertEqual(self.image[start:end],self.base[start:end])
         for path in SOURCES:self.assertEqual(images['emulator']['sources'][path],sha256((ROOT/path).read_bytes()),path)
@@ -63,10 +69,29 @@ class ConsoleEmulatorTests(unittest.TestCase):
             self.assertEqual(self.report['equipment_resources'][key]['packet'],self.prior['equipment_resources'][key]['packet'])
         self.assertEqual(self.report['save_runtime'],self.prior['save_runtime'])
         self.assertEqual(self.report['automatic_furniture']['imports'],self.prior['automatic_furniture']['imports'])
-        self.assertFalse(images['launch_installed']);self.assertEqual(images['choices_added'],0)
+        self.assertTrue(images['launch_installed'])
+        self.assertTrue(images['emulator']['arena_capacity_checked'])
+        self.assertTrue(images['emulator']['room_launch_installed'])
         self.assertFalse(images['emulator']['save_format_changed'])
         self.assertEqual(apply_ups((ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes(),
             (self.out/'asset-loader.ups').read_bytes()),self.image)
+
+    def test_refresh_rejects_changed_installed_code(self):
+        # Failure must precede compilation or writing a new packet.
+        original=(ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes()
+        raw=by_vrom(self.image)[BLOB].extract(self.image)
+        with tempfile.TemporaryDirectory(prefix='v3-console-refresh-') as temp:
+            for field in ('sha256','relocation_sha256'):
+                changed=copy.deepcopy(self.report)
+                changed['equipment_resources']['console_images']['emulator']['native'][field]='0'*64
+                blob=bytearray(raw)
+                with self.assertRaisesRegex(ValueError,'Changed installed console lifecycle'):
+                    install(self.image,changed,blob,Path(temp),original)
+                self.assertEqual(blob,raw)
+            changed=copy.deepcopy(self.report)
+            changed['equipment_resources']['console_images']['compiled']['sha256']='0'*64
+            with self.assertRaisesRegex(ValueError,'Changed installed console lifecycle'):
+                install(self.image,changed,bytearray(raw),Path(temp),original)
 
     def test_private_browser_composition(self):
         from tests.test_v3_room_rig_runtime import CurrentImportedRigTests

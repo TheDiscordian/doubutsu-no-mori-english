@@ -159,9 +159,12 @@ prepared model and the native interaction clip, preserving the prompt and normal
 return flow. Eleven iNES profiles are installed; actual reward dependencies
 remain independent. QD's complete assets stay pending its engine. The
 [room checkpoint](../docs/checkpoints/V3_CONSOLE_ROOM.md) records current host/
-cartridge evidence and the two incomplete native setups. Explicit arena-capacity
-checks are required before a gameplay/hardware handoff: native allocation can
-return a non-null pointer after subtracting past the arena head.
+cartridge evidence and the two incomplete native setups. The
+[checked allocator](../docs/checkpoints/V3_CONSOLE_CAPACITY.md) guards all console
+arena allocations before native subtraction, retaining real fallback pools.
+Shared refresh preserves installed room callbacks while rebinding changed
+emulator calls. The largest-game native transition has positive remaining
+capacity but stalls before initialization completes; the cause remains unresolved.
 
 The shared `--console-emulator` stage installs six checked native calls for
 graphics/loading and initialization/frame/reset/cleanup. Full images and save
@@ -170,8 +173,8 @@ bytes below the model pool. Original game paths remain, while additional iNES
 games use complete decoded images and independent progress. Native reset's
 battery-memory clearing is surrounded by a full 8-KiB backup/restore.
 Wario's Woods receives `42008` graphics bytes. The source/host adapter and
-cartridge/composition checks pass; native execution, room launch, actual heap
-capacity, and QD remain required. See the
+cartridge/composition checks pass; completed native execution, ordinary room
+launch/return, and QD remain required. See the
 [lifecycle checkpoint](../docs/checkpoints/V3_CONSOLE_EMULATOR.md).
 
 The original N64 emulator is VROM `007492E0`, linked at `8082A070`, with SHA-256

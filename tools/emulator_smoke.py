@@ -916,6 +916,7 @@ def main():
         font_preview_state = {}
         transition_preview_state = {}
         keyboard_v2_preview_state = {}
+        console_game_state = {}
         def record(snapshot):
             results.append(snapshot)
             write_results(out, results)
@@ -1383,6 +1384,12 @@ def main():
                 if not args.seed_save or args.seed_state or args.allow_test_flash_write:
                     raise ValueError('V3 warning probe requires only a disposable cartridge seed')
                 results.append(verify(debug, args.rom, args.seed_save))
+            if action.get('test_v3_console_game'):
+                from v3_console_game_smoke import exercise
+                if not (out/'test.bs1').is_file():
+                    raise ValueError('Console game probes require a saved checkpoint')
+                needs_checkpoint_restore = True
+                record(exercise(debug,args.rom,action['test_v3_console_game'],console_game_state,record))
             if action.get('test_v3_console_room'):
                 from v3_console_room_smoke import exercise
                 if not (out/'test.bs1').is_file() or args.seed_save or args.allow_test_flash_write:

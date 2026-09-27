@@ -21,18 +21,21 @@ prevent asset/data conversion or redirect work from an unfinished shared format.
 Incomplete gameplay stays unavailable in the selector; installing assets does
 not claim that an item is playable. Reuse unchanged passing tests throughout.
 
-Current task: add explicit capacity checks before imported emulator allocations,
-then verify the real game-state heap and native launch/rendering/reset/return,
-and implement complete QD execution. Continue from ABI 280 at
-`build/v3-console-room-imports-01/cartridge/build-lock.json`, ROM SHA-256
-`b1080db8248385f85ddd9f68a5ba36ce83fb083a6f5b7061b60b8fa34fa47786`.
+Current task: complete QD execution and resolve native console startup/return.
+Continue from ABI 281 at `build/v3-console-emulator-capacity-01/build-lock.json`,
+ROM SHA-256 `763bbcbeca77390e797039c79ee8ae83a2a7b7497b5768db81534ed0ce14a62d`.
+The checked allocator and safe shared-runtime refresh are installed; four
+focused host/cartridge/composition checks pass. A native largest-game transition
+allocates its full image and backup, leaving 130,304 arena bytes, but stalls
+before emulator initialization. No CPU fault is recorded. Two attempts are
+spent; do not rerun unchanged. Inspect the graph thread's saved context/startup
+boundary in the next relevant native batch. This unresolved stall blocks a
+playable handoff. See the [capacity checkpoint](checkpoints/V3_CONSOLE_CAPACITY.md).
 The common room callback and eleven complete console profiles/models are
 installed. Excitebike adds one experimental choice through its actual lottery
 route; the other ten retain pending acquisition. Five focused checks pass;
 two native setup attempts stop before callback execution due to unavailable
-fixture memory. Do not replay that title-state fixture. Native `THA_alloc16`
-does not check remaining capacity, so non-null allocation checks alone are
-insufficient for the imported game's buffers. See the
+fixture memory. Do not replay that title-state fixture. See the
 [room checkpoint](checkpoints/V3_CONSOLE_ROOM.md).
 Full iNES loading, graphics allocation, and frame/reset/exit save hooks are
 installed. Three focused checks pass, including actual-image host adapter
@@ -132,9 +135,9 @@ Continue the remaining console launch/storage category without per-item
 installers. Radio room behaviour and indoor player exercise are installed;
 its acquisition remains unfinished. Reuse complete resources and shared runtimes.
 
-The checked current proposal is ABI 280 at
-`build/v3-console-room-imports-01/cartridge/build-lock.json`, ROM SHA-256
-`b1080db8248385f85ddd9f68a5ba36ce83fb083a6f5b7061b60b8fa34fa47786`.
+The checked current proposal is ABI 281 at
+`build/v3-console-emulator-capacity-01/build-lock.json`, ROM SHA-256
+`763bbcbeca77390e797039c79ee8ae83a2a7b7497b5768db81534ed0ce14a62d`.
 The combined skeleton/material category imports the complete hamster cage,
 including source movement/texture timing, positioned sound, actual lottery
 availability, catalogue ordering, scoring, and official English text. Five focused

@@ -1,5 +1,5 @@
 /* Shared native iNES lifecycle. QD engine support remains a separate dependency.
- * Original IDs 0..7 retain their original data, score logic, and allocation. */
+ * Original IDs 0..7 retain their original data and score logic. */
 #include "console_image.h"
 typedef unsigned char u8;
 typedef unsigned int u32;
@@ -44,7 +44,23 @@ static int valid(void) {
     for(u32 i=0;i<4;i++)if(session->guard[i]!=GUARD)return 0;
     return 1;
 }
-static void *allocate(u32 n) {return FN(native_address(0x8082A814u),void *,u32)(n);}
+/* The native emulator calls THA_alloc16 for every game-arena allocation.
+ * THA_alloc16 subtracts without checking head/tail overlap. Intercept that
+ * call, including allocations before this adapter's session is initialized.
+ * A null return retains the native allocator's optional fallback-pool path. */
+void *af_v3_console_arena_allocate(u32 heap,u32 n) {
+    if(!n || n>0x400000u || (heap&3) || heap<0x80000400u || heap>0x803FFFF0u)return 0;
+    const u32 *h=MEMORY(heap);
+    u32 start=h[1],head=h[2],tail=h[3],size=h[0],aligned=(n+15)&~15u;
+    if(start<0x80000400u || start>0x80400000u || size>0x80400000u-start ||
+       head<start || tail<head || tail>start+size || (tail&~15u)<head ||
+       aligned>(tail&~15u)-head)return 0;
+    return FN(0x800D17D4u,void *,void *,u32)(MEMORY(heap),n);
+}
+static void *allocate(u32 n) {
+    if(!n || n>0x400000u)return 0;
+    return FN(native_address(0x8082A814u),void *,u32)(n);
+}
 static int imported(void) {return valid() && session->game>7;}
 
 void *af_v3_console_graphics(u32 requested) {

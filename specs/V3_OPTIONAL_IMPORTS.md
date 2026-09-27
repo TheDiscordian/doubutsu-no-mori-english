@@ -126,10 +126,13 @@ QD execution remain integration work. ABI 280 adds shared native room dispatch
 and eleven complete console models/profiles through the ordinary importer.
 Excitebike has its actual lottery route and an experimental optional selection;
 the other ten retain their actual pending reward routes. Host/cartridge checks
-pass, but native callback execution remains unverified. Explicit arena bounds
-are required before a playable handoff;
-no console is selectable from storage
-installation alone. Format-five saves require the explicit compatibility warning.
+pass, but native callback execution remains unverified. ABI 281 checks every
+console game-arena allocation before native subtraction and preserves installed
+room code during shared runtime refresh. Host and composition checks pass.
+The largest-image native startup retains free arena space but stalls before
+initialization completes; this is unresolved, not a gameplay pass. No console
+is selectable from storage installation alone. Format-five saves require the
+explicit compatibility warning.
 
 The shared furniture converter prepares complete nested-model and dual-motion
 resources for the aerobics radio and treasure chest. The ordinary importer

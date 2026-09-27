@@ -31,7 +31,21 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
-The current proposal is ABI 280 at
+The current proposal is ABI 281 at
+`build/v3-console-emulator-capacity-01/build-lock.json`, ROM SHA-256
+`763bbcbeca77390e797039c79ee8ae83a2a7b7497b5768db81534ed0ce14a62d`.
+Every console game-arena allocation now checks full aligned capacity before
+native subtraction. The shared refresh verifies the previous hooks and retains
+complete room callbacks, models, images, and saves. Four focused checks pass,
+including 110,902 sanitized host assertions and four private compositions.
+Native Wario's Woods startup allocates its full image and backup with 130,304
+arena bytes remaining, but stalls before emulator initialization completes.
+No CPU fault is recorded; the cause is unresolved. Both diagnostic attempts are
+spent, and no gameplay pass or hardware handoff is claimed. Continue QD engine
+conversion and diagnosis of the native startup/return path. See the
+[capacity checkpoint](checkpoints/V3_CONSOLE_CAPACITY.md).
+
+The room integration is retained from ABI 280 at
 `build/v3-console-room-imports-01/cartridge/build-lock.json`, ROM SHA-256
 `b1080db8248385f85ddd9f68a5ba36ce83fb083a6f5b7061b60b8fa34fa47786`.
 The shared pipeline installs eleven complete cartridge-console models/profiles
@@ -42,8 +56,7 @@ catalogue has 163 choices. Five focused checks pass across targeted runs,
 including retained resources and four private compositions. Two native attempts
 verify startup but stop on insufficient test
 allocation space before callback execution. No native gameplay is claimed.
-Next add explicit imported-emulator arena capacity checks, then verify real
-game-state launch/rendering/return and complete QD support. See the
+Native game-state launch/rendering/return and complete QD support remain. See the
 [room checkpoint](checkpoints/V3_CONSOLE_ROOM.md).
 
 The retained native console lifecycle is installed in ABI 278 at
