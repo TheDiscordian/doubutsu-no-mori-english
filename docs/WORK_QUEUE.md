@@ -22,15 +22,20 @@ Incomplete gameplay stays unavailable in the selector; installing assets does
 not claim that an item is playable. Reuse unchanged passing tests throughout.
 
 Current task: finish the shared console launch/storage importing category.
-The shared save executor is prepared at `build/v3-console-games-prepared-03/`:
+The shared save executor is prepared at `build/v3-console-games-prepared-04/`:
 3,476 MIPS bytes, all sixty recipes, and four independent player blocks.
-Actual donor comparisons and compiled/source checks pass. Continue with a bounded
-native storage design for the complete 6,528 player bytes; the format-four
-capsule has only 432 spare bytes. Do not merge players, truncate progress, assume
-compression always fits, or remove the backup bank to force a fit. Then connect
+Actual donor comparisons and compiled/source checks pass. The converter also
+prepares a 3,368-byte lossless format-five envelope: the full canonical bank plus
+6,528 player bytes inside one 64-KiB bank, with pre-write capacity checks.
+Sanitized round trips, malformed-data checks, independent decoding, and dense
+synthetic capacity pass. Arbitrary uncompressible input rejects without output
+changes. Continue native integration from [the exact format and plan](../specs/V3_CONSOLE_STORAGE.md),
+not another compressor or per-game save implementation. Preserve both banks and
+keep capacity failure ahead of all FlashRAM writes. Then connect
 the native emulator/room launch, full graphics allocation, frame/reset/exit
 hooks, and QD dependency. Reuse the prepared models/games and passing core checks.
-See the [console checkpoint](checkpoints/V3_CONSOLE_PERSISTENCE.md).
+See the [console checkpoint](checkpoints/V3_CONSOLE_PERSISTENCE.md) and
+[storage checkpoint](checkpoints/V3_CONSOLE_STORAGE.md).
 
 Native exercise is installed through the shared player importer in ABI 275 at
 `build/v3-player-exercise-imports-01/player-exercise-native/build-lock.json`, ROM SHA-256
@@ -217,7 +222,7 @@ The initial native workspace allocation failure is resolved by the one sparse
 fixture retry. Do not repeat these checks without a relevant change. See the
 [capacity checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#complete-model-bank-capacity).
 
-Console preparation at `build/v3-console-games-prepared-03/` retains
+Console preparation at `build/v3-console-games-prepared-04/` retains
 all nineteen complete game payloads, sixty save operations, full source tags,
 and twenty furniture launch bindings. The six preparation checks are retained;
 two new targeted checks verify the common save executor and current preparation.

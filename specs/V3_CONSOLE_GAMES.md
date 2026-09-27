@@ -92,7 +92,7 @@ It does not add an extra score-frame update absent from the donor's cleanup.
 
 The 3,476-byte MIPS core uses no mutable globals and no unresolved libraries.
 Its largest stack chain is open plus validate, 368 bytes. Preparation is
-`build/v3-console-games-prepared-03/`; all game/tag/default bytes match the
+`build/v3-console-games-prepared-04/`; all game/tag/default bytes match the
 earlier complete preparation. Two focused checks pass across targeted runs:
 26,695 assertions using actual donor source routines under address/undefined-
 behaviour sanitizers, and current MIPS/source/prepared-packet receipt checks.
@@ -119,6 +119,10 @@ neighbours or a promise that unchanged formats suffice.
 Its 432 spare bytes cannot hold 6,528 player bytes. Do not combine players,
 truncate game progress, assume compression always fits, or silently remove the
 second town-save bank. Native storage integration remains the next dependency.
+The [compressed bank envelope](V3_CONSOLE_STORAGE.md) is prepared by the same
+converter. It retains the complete canonical bank and four console records,
+with explicit pre-write capacity checks and bounded lossless decoding. Host
+checks pass; native hooks, initialization, and commit are not installed.
 
 GameCube GBA download parameters remain in receipts. N64 hardware cannot use a
 GameCube link cable; do not silently claim that functionality was imported.

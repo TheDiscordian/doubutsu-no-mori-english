@@ -110,8 +110,10 @@ The [console converter](V3_CONSOLE_GAMES.md) preserves nineteen complete game
 payloads, twenty launch bindings, and sixty persistence operations. Its common
 MIPS save executor retains four independent player records and passes actual
 donor comparisons for scores, reset, battery/disk data, and Zelda checksums.
-The complete records require 6,528 bytes; native storage/launch/graphics and QD
-support remain integration work. No console is selectable from preparation alone.
+The complete records require 6,528 bytes. A bounded lossless disk envelope retains
+the full town and console records within two existing save banks, with explicit
+pre-write capacity checks. Its host checks pass; native storage/launch/graphics
+and QD remain integration work. No console is selectable from preparation alone.
 
 The shared furniture converter prepares complete nested-model and dual-motion
 resources for the aerobics radio and treasure chest. The ordinary importer

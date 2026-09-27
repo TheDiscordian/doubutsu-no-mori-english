@@ -1625,7 +1625,8 @@ def main():
         print(json.dumps(dict(games=len(report['rows']),furniture=len(report['furniture']),
             bytes=report['bytes'],save_payload_bytes_per_player=report['save_payload_bytes'],
             save_all_player_bytes=report['save_layout']['all_player_bytes'],
-            persistence_core_bytes=report['persistence_core']['bytes'],runtime_installed=False)))
+            persistence_core_bytes=report['persistence_core']['bytes'],
+            storage_core_bytes=report['storage_core']['bytes'],runtime_installed=False)))
         return
     if args.representation=='rewards':
         if args.category in ('password','password-policy'):

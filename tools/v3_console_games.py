@@ -328,6 +328,22 @@ def prepare_persistence(output):
         native_hooks_installed=False,flash_storage_installed=False)
 
 
+def prepare_storage(output):
+    """Prepare the lossless bank envelope; native I/O integration stays separate."""
+    from v3_asset_loader import ROOT, compile_part
+    code,compiled=compile_part('save_compressed',output/'save_compressed')
+    files=('tools/v3_console_games.py','tools/v3_asset_loader.py',
+           'overlays/v3/save_compressed.c','overlays/v3/save_compressed.h',
+           'overlays/v3/save_compressed.ld')
+    return dict(format='AFV3-CONSOLE-STORAGE-1',compiled=compiled,bytes=len(code),
+        sha256=sha256(code),linked_ram=0,bank_bytes=65536,canonical_bytes=65536,
+        console_bytes=6528,decoded_bytes=72064,hash_workspace_bytes=16384,
+        compressed_capacity=63850,save_format=5,
+        sources={p:sha256((ROOT/p).read_bytes()) for p in files},
+        capacity_failure='reject-before-output-or-flash-writes',
+        native_storage_installed=False)
+
+
 def prepare(source, path, output, original_rom):
     dol, archive = read_donor(path)
     report, blob = build_bundle(dol, archive)
@@ -357,5 +373,6 @@ def prepare(source, path, output, original_rom):
     output.mkdir(parents=True, exist_ok=False)
     write_new(output/'games.bin', blob)
     report['persistence_core']=prepare_persistence(output)
+    report['storage_core']=prepare_storage(output)
     write_new(output/'games.json', (json.dumps(report, indent=2)+'\n').encode())
     return report

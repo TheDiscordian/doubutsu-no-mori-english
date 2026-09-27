@@ -777,7 +777,9 @@ callbacks do not by themselves establish complete launch or persistence support.
 Console conversion also prepares the common bounded save executor. It preserves
 all four players' separate progress and the complete score/reset/battery/disk
 semantics. Preparation and donor comparisons do not enable games or install
-FlashRAM storage; readiness still requires native integration.
+FlashRAM storage; readiness still requires native integration. The same command
+prepares the [bounded compressed bank envelope](V3_CONSOLE_STORAGE.md), retaining
+all four records and both town-save banks with explicit capacity rejection.
 
 The ordinary `import` dependency planner includes scrolling resources, complete
 positioned-loop/switch-fade audio, and draw-only or audio-backed profiles. Audio

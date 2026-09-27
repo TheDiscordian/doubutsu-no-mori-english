@@ -49,7 +49,7 @@ class ConsoleSaveTests(unittest.TestCase):
             print(run.stdout.strip())
 
     def test_prepared_mips_core_matches_current_sources_without_install_claim(self):
-        out=ROOT/'build/v3-console-games-prepared-03'
+        out=ROOT/'build/v3-console-games-prepared-04'
         report=json.loads((out/'games.json').read_text())
         core=report['persistence_core']
         self.assertEqual(core['sha256'],sha256((out/'console_save/code.bin').read_bytes()))

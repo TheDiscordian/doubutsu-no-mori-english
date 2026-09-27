@@ -63,7 +63,8 @@ def compile_part(part, out, extra_sources=(), defines=(), primary_source=None):
     run('objcopy', '-O', 'binary', '-j', '.text', '-j', '.rodata',
         *(['-j', '.fallbacks'] if part=='scenery_bootstrap' else []), 'code.elf', 'code.bin')
     code = (out / 'code.bin').read_bytes()
-    entry, expected = {'console_save': ('af_v3_console_validate', 0),
+    entry, expected = {'save_compressed': ('af_v3_save_compress', 0),
+                       'console_save': ('af_v3_console_validate', 0),
                        'player_exercise': ('af_v3_exercise_init', 0),
                        'player_exercise_native': ('af_v3_exercise_native_init', 0x804CE000),
                        'password_runtime': ('af_v3_password_check', 0x804C0000),

@@ -1,0 +1,165 @@
+#include "save_compressed.h"
+typedef unsigned char u8;
+typedef unsigned int u32;
+typedef __UINTPTR_TYPE__ address;
+enum { PAYLOAD=0xF980, EXT=0x680, MIRROR=0x2F68, START=0x14,
+       CAPACITY=PAYLOAD-START-2, HEADER=40 };
+static u32 half(const u8 *p) { return (u32)p[0]<<8|p[1]; }
+static u32 word(const u8 *p) { return half(p)<<16|half(p+2); }
+static void put(u8 *p,u32 n) { p[0]=n>>24;p[1]=n>>16;p[2]=n>>8;p[3]=n; }
+static void copy(u8 *d,const u8 *s,u32 n) { while(n--) *d++=*s++; }
+static void zero(u8 *d,u32 n) { while(n--) *d++=0; }
+static u32 crc(const u8 *p,u32 n,u32 omit,u32 skip) {
+    u32 v=~0u,i,b;
+    for(i=0;i<n;i++) {
+        v^=(i>=omit && i-omit<skip)?0:p[i];
+        for(b=0;b<8;b++) v=(v>>1)^(0xEDB88320u&(0u-(v&1)));
+    }
+    return ~v;
+}
+static u32 disk_crc(const u8 *p) {
+    u32 v=~0u,i,b;
+    for(i=0;i<AF_CZ_BANK;i++) {
+        v^=(i==0x12 || i==0x13 || (i>=PAYLOAD+24 && i<PAYLOAD+28))?0:p[i];
+        for(b=0;b<8;b++) v=(v>>1)^(0xEDB88320u&(0u-(v&1)));
+    }
+    return ~v;
+}
+static u32 sum(const u8 *p) {
+    u32 v=0,i;for(i=0;i<PAYLOAD;i+=2)v+=half(p+i);return v&0xFFFF;
+}
+static int town(const u8 *p) {
+    return word(p+4)==0x4E414633 && p[8]==0x30 && half(p+8)==half(p+MIRROR);
+}
+static int canonical_valid(const u8 *p) {
+    const u8 *e=p+PAYLOAD;
+    return town(p) && !sum(p) && word(e)==0x41465333 && word(e+4)==0x00040680 &&
+        word(e+8)==3 && word(e+12)==crc(p,PAYLOAD,0x12,2) &&
+        word(e+16)==crc(e,EXT,16,4);
+}
+static int disjoint(const void *a,u32 an,const void *b,u32 bn) {
+    address x=(address)a,y=(address)b;
+    if(an>(address)-1-x || bn>(address)-1-y) return 0;
+    return x<=y ? y-x>=an : x-y>=bn;
+}
+static u8 source(const u8 *a,const u8 *b,u32 at) {
+    return at<AF_CZ_BANK?a[at]:b[at-AF_CZ_BANK];
+}
+static u32 physical(u32 logical) {
+    u32 at=START+logical;return at>=MIRROR?at+2:at;
+}
+static void emit(u8 *bank,u32 at,u8 value) { if(bank) bank[physical(at)]=value; }
+static u32 key(const u8 *a,const u8 *b,u32 at) {
+    return ((u32)source(a,b,at)*0x1E35A7BDu ^
+        (u32)source(a,b,at+1)*0x9E3779B1u ^ source(a,b,at+2))>>20;
+}
+/* Yaz0 token grammar without a file header: eight flags, then literals or a
+ * 12-bit distance and 4-bit length; zero length introduces an extra byte +18.
+ * One bounded hash candidate per byte keeps encoder work linear and bounded. */
+static int encode(u8 *bank,const u8 *a,const u8 *b,u32 *hash) {
+    u32 i,at=0,out=0;
+    for(i=0;i<AF_CZ_HASH_WORDS;i++)hash[i]=~0u;
+    while(at<AF_CZ_RAW) {
+        u32 mask=0x80,flag_at=out++,flags=0;
+        if(out>CAPACITY)return AF_CZ_SPACE;
+        while(mask && at<AF_CZ_RAW) {
+            u32 match=0,distance=0;
+            if(at+2<AF_CZ_RAW) {
+                u32 k=key(a,b,at),previous=hash[k],limit=AF_CZ_RAW-at;
+                hash[k]=at;
+                if(limit>273)limit=273;
+                if(previous<at && at-previous<=4096) {
+                    while(match<limit && source(a,b,previous+match)==source(a,b,at+match))match++;
+                    distance=at-previous-1;
+                }
+            }
+            if(match>=3) {
+                u32 length=match>=18?3:2,end=at+match;
+                if(length>CAPACITY-out)return AF_CZ_SPACE;
+                emit(bank,out++,((match>=18?0:match-2)<<4)|(distance>>8));
+                emit(bank,out++,distance);
+                if(match>=18)emit(bank,out++,match-18);
+                for(i=at+1;i<end && i+2<AF_CZ_RAW;i++)hash[key(a,b,i)]=i;
+                at=end;
+            } else {
+                if(out==CAPACITY)return AF_CZ_SPACE;
+                flags|=mask;emit(bank,out++,source(a,b,at++));
+            }
+            mask>>=1;
+        }
+        emit(bank,flag_at,flags);
+    }
+    return (int)out;
+}
+
+int af_v3_save_compress(u8 *bank,u32 bank_bytes,const u8 *canonical,u32 canonical_bytes,
+    const u8 *console,u32 console_bytes,u32 *hash,u32 hash_bytes) {
+    const void *buffers[4]={bank,canonical,console,hash};
+    const u32 sizes[4]={AF_CZ_BANK,AF_CZ_BANK,AF_CZ_CONSOLE,AF_CZ_WORK_BYTES};
+    u32 i,j,checksum;int length;
+    if(!bank || !canonical || !console || !hash || bank_bytes!=AF_CZ_BANK ||
+       canonical_bytes!=AF_CZ_BANK || console_bytes!=AF_CZ_CONSOLE ||
+       hash_bytes!=AF_CZ_WORK_BYTES || ((address)hash&3))return AF_CZ_ARGUMENT;
+    for(i=0;i<4;i++)for(j=0;j<i;j++)
+        if(!disjoint(buffers[i],sizes[i],buffers[j],sizes[j]))return AF_CZ_ARGUMENT;
+    if(!canonical_valid(canonical))return AF_CZ_FORMAT;
+    /* Capacity is measured BEFORE modifying output; never write a partial save. */
+    length=encode(0,canonical,console,hash);
+    if(length<0)return length;
+    zero(bank,AF_CZ_BANK);
+    copy(bank,canonical,START);copy(bank+MIRROR,canonical+MIRROR,2);
+    encode(bank,canonical,console,hash);
+    put(bank+PAYLOAD,0x41465333);put(bank+PAYLOAD+4,0x00050680);
+    put(bank+PAYLOAD+8,3);put(bank+PAYLOAD+12,AF_CZ_RAW);
+    put(bank+PAYLOAD+16,(u32)length);put(bank+PAYLOAD+20,1);
+    put(bank+PAYLOAD+28,crc(canonical,AF_CZ_BANK,AF_CZ_BANK,0));
+    put(bank+PAYLOAD+32,crc(console,AF_CZ_CONSOLE,AF_CZ_CONSOLE,0));
+    put(bank+PAYLOAD+24,disk_crc(bank));
+    checksum=(half(bank+0x12)-sum(bank))&0xFFFF;
+    bank[0x12]=checksum>>8;bank[0x13]=checksum;
+    return length;
+}
+
+int af_v3_save_expand(const u8 *bank,u32 bank_bytes,u8 *scratch,u32 scratch_bytes) {
+    const u8 *e;u32 length,i,at=0,out=0;
+    if(!bank || !scratch || bank_bytes!=AF_CZ_BANK || scratch_bytes!=AF_CZ_RAW ||
+       !disjoint(bank,AF_CZ_BANK,scratch,AF_CZ_RAW))return AF_CZ_ARGUMENT;
+    e=bank+PAYLOAD;length=word(e+16);
+    if(!town(bank) || word(e)!=0x41465333 || word(e+4)!=0x00050680 ||
+       word(e+8)!=3 || word(e+12)!=AF_CZ_RAW || !length || length>CAPACITY ||
+       word(e+20)!=1 || word(e+36))return AF_CZ_FORMAT;
+    if(sum(bank) || word(e+24)!=disk_crc(bank))return AF_CZ_CHECKSUM;
+    for(i=HEADER;i<EXT;i++)if(e[i])return AF_CZ_FORMAT;
+    for(i=length;i<CAPACITY;i++)if(bank[physical(i)])return AF_CZ_FORMAT;
+    while(out<AF_CZ_RAW) {
+        u32 flags,mask=0x80;
+        if(at==length)return AF_CZ_STREAM;
+        flags=bank[physical(at++)];
+        while(mask && out<AF_CZ_RAW) {
+            if(flags&mask) {
+                if(at==length)return AF_CZ_STREAM;
+                scratch[out++]=bank[physical(at++)];
+            } else {
+                u32 first,second,n,distance;
+                if(length-at<2)return AF_CZ_STREAM;
+                first=bank[physical(at++)];second=bank[physical(at++)];
+                n=first>>4;distance=((first&15)<<8)+second+1;
+                if(n)n+=2;
+                else {
+                    if(at==length)return AF_CZ_STREAM;
+                    n=bank[physical(at++)]+18;
+                }
+                if(distance>out || n>AF_CZ_RAW-out)return AF_CZ_STREAM;
+                while(n--) { scratch[out]=scratch[out-distance];out++; }
+            }
+            mask>>=1;
+        }
+        if(out==AF_CZ_RAW && mask && (flags&(mask*2-1)))return AF_CZ_STREAM;
+    }
+    if(at!=length)return AF_CZ_STREAM;
+    if(crc(scratch,AF_CZ_BANK,AF_CZ_BANK,0)!=word(e+28) ||
+       crc(scratch+AF_CZ_BANK,AF_CZ_CONSOLE,AF_CZ_CONSOLE,0)!=word(e+32))return AF_CZ_CHECKSUM;
+    if(!canonical_valid(scratch))return AF_CZ_FORMAT;
+    for(i=0;i<START;i++)if(i!=0x12 && i!=0x13 && scratch[i]!=bank[i])return AF_CZ_FORMAT;
+    return 0;
+}
