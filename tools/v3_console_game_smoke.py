@@ -55,7 +55,7 @@ def exercise(debug,rom_path,action,state,record):
         if words(0x804DC800,1)!=(0x41464335,):raise ValueError('Console storage is not initialized')
         debug.write_memory(0x80137898,bytes((game,0)))
         debug.write_memory(0x80136EA3,b'\0')
-        state['game']=game
+        state.clear();state['game']=game
         state['metadata']=actual[images['metadata']['ram']-packet['ram']:]
         # The real room calls sAdo_SubGameStart after requesting the transition
         # (8093A4F8..8093A518). Title-state launch must provide the same handover;
@@ -110,8 +110,44 @@ def exercise(debug,rom_path,action,state,record):
                 words(base+0x80854B74-NATIVE_RAM,1)!=(65536,)):
             raise ValueError('Native disk context, guard, audio, or complete image extent is invalid')
     work=debug.read_memory(emulator,2048)
-    if 'work' in state and state['work']==work:raise ValueError('Native console work RAM did not advance')
+    if action.get('inspect') and 'work' in state and state['work']==work:
+        raise ValueError('Native console work RAM did not advance')
     state['work']=work
+    def stop_at(linked,request=None):
+        address=base+linked-NATIVE_RAM;breakpoint=f'0,{address:x},4'
+        if debug.command('Z'+breakpoint)!='OK':raise ValueError('Rejected console lifecycle breakpoint')
+        try:
+            if request:request()
+            stopped=debug.command('c');registers=debug.command('g')
+            if stopped[:3] not in ('T05','S05') or int(registers[37*16:38*16],16)&0xFFFFFFFF!=address:
+                raise ValueError('Console lifecycle did not reach its checked native continuation')
+        finally:debug.command('z'+breakpoint)
+        record(dict(console_lifecycle_breakpoint=f'{linked:08X}',actual=f'{address:08X}'))
+    if action.get('reset'):
+        # Request the native reset-menu operation, then observe the real call
+        # and its return. Do not jump directly into high code or fabricate CPU
+        # registers. The isolated checkpoint restores this test-only request.
+        stop_at(0x8082DF04,lambda:debug.write_memory(base+0x808549D2-NATIVE_RAM,b'\x01'))
+        retained=[(emulator,2048),(0x8063A000,0xC000)] if values[1]==2 else [(emulator+0x20A0,8192)]
+        snapshots=[debug.read_memory(at,length) for at,length in retained]
+        stop_at(0x8082DF0C)
+        if any(debug.read_memory(at,length)!=saved for (at,length),saved in zip(retained,snapshots,strict=True)):
+            raise ValueError('Native console Reset changed retained RAM or BIOS')
+        if words(0x804FE820,6)[5] or words(0x8003CE34,1)[0]:
+            raise ValueError('Native console Reset raised a session error or CPU fault')
+        state.pop('work',None)
+        return dict(console_native_reset='passed',game=game,retained_bytes=sum(n for _,n in retained),
+                    native_menu_request=True,ordinary_controller_input_tested=False)
+    if action.get('close'):
+        # Observe cleanup before returning to a world: the title fixture has
+        # no initialized town, so loading that world would not be a valid test.
+        # The real state-manager path stops/joins audio before the close hook.
+        stop_at(0x8082E498,lambda:core_call(0x800C6E14,92,[owner]))
+        if (words(0x804FE820,1)[0] or words(0x8003CE34,1)[0] or
+                values[1]==2 and words(0x80638088,1)[0]):
+            raise ValueError('Native console close retained an active context or fault')
+        return dict(console_native_close='passed',game=game,audio_shutdown_path=True,
+                    world_return_tested=False,checkpoint_restore_required=True)
     return dict(console_native_execution='passed',game=game,full_image_bytes=image_bytes,
         graphics_bytes=graphics_bytes,arena_free_bytes=tail-head,work_sha256=sha256(work),
         ordinary_room_entry_tested=False,reset_return_tested=False,hardware_tested=False)

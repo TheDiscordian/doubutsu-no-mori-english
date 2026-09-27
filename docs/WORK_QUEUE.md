@@ -21,93 +21,48 @@ prevent asset/data conversion or redirect work from an unfinished shared format.
 Incomplete gameplay stays unavailable in the selector; installing assets does
 not claim that an item is playable. Reuse unchanged passing tests throughout.
 
-Current task: complete QD execution and native console startup/return integration.
-The shared converter prepares the complete BIOS, actual 260-byte initialization
-span, and disk-service core at `build/v3-console-games-prepared-14/`. All five BIOS
-WDM services, private BIOS reset patches, and native-layout character conversion
-are implemented. Donor C boot/save
-comparisons and focused WDM/register/timing/bounds checks pass. The native module
-now supplies full CPU-bank mapping, four programme-RAM store routes, the WDM
-register bridge, actual CHR working/transfer buffer bindings, and RSP/cache calls.
-Cold initialization and donor reset-button retention are implemented, along with
-native disk I/O, scanline IRQ routing, nametable mirroring, motor waits, donor
-audio initialization, and bounded DPCM banks/wrapping with cartridge fallback.
-The adapter check passes 56,205 sanitized assertions. Three focused checks pass
-across targeted runs, including all six bridges and the optional DPCM patch at
-two relocation bases. Native functions are stubbed and MIPS bridges are checked,
-not executed. Both verified mixers use five channels; this donor has no expansion
-voice. ABI 283 installs the complete audio/DPCM, image-extent, initialization,
-per-CPU-frame timing, reset, and final-save hooks. Three focused checks pass:
-117,058 sanitized session assertions with the actual donor image, ten installed
-hooks/thirteen removed relocations and retained resources, and four private
-compositions. ABI 284 connects the shared console-room readiness table to the
-verified installed disk code and native hooks, then stages the full profile with
-the ordinary category importer. All twelve supplied additional console profiles
-are installed. The complete 4,880-byte disk model is reused without compilation;
-only its table readiness byte changes in the retained console packet. Five
-focused checks pass, including four private compositions, rejected damaged
-dependencies, repeat-plan skipping, and explicit absent-donor classification.
-No per-game installer is used. Next check native frame continuity, drawing,
-reset/return, and a representative cartridge game in one bounded current-build
-batch. Do not replay the old room-allocation fixture or unchanged session tests.
-The disk game remains unavailable in the selector. See the
-[disk specification](../specs/V3_CONSOLE_DISK.md).
-The combined native module is 14,295 bytes, linked at `80630000`; its code/data/work
-range ends at `80646010`. The complete 90,128-byte packet retains separate code,
-immutable/private BIOS, boot data, context, programme/character RAM, and guard.
-All recorded resident ranges and actual model-bank bindings are checked for
-overlap. Startup is 668 of 688 bytes; further preload additions need capacity work.
-Four focused installation checks pass: full resources and retained cartridge,
-overlap refusal, all fourteen seven-packet startup failure paths, and four private
-compositions. A silent native run checks the complete preload and reaches the
-disk interpreter with an active save marker, no session error, and no CPU fault.
-Its first attempt exits on renamed debugger settings; the corrected retry stops
-on the helper's wrong active marker (`1` instead of `41464E53`). The helper is
-fixed, but both attempts are spent: do not replay unchanged setup. Retain the
-snapshot and verify frame continuity, graphics, reset/return in the next changed
-combined gameplay batch. Ordinary entry and hardware stay unverified.
-Continue from ABI 284 at
-`build/v3-console-disk-room-imports-01/profile-runtime/build-lock.json`,
-ROM SHA-256 `38dfbe6905917d5f0792cbad451d1d1f29b39bc2f3bfb4deac0e5625c3bc09d5`.
-The fresh furniture scan is `build/v3-furniture-post-console-scan-01.json`:
-105 supported records, 285 review records, and no supported uninstalled furniture.
-These counts include absent/dummy resources, parent representations, unresolved
-identity mappings, and acquisition; they are not counts of unfinished behaviours.
-Remaining primary work includes the explicit legacy identity review below and
-native console execution. Do not use this scan to declare all importing complete.
-The retained allocator evidence belongs to ABI 281 at
-`build/v3-console-emulator-capacity-01/build-lock.json`,
-ROM SHA-256 `763bbcbeca77390e797039c79ee8ae83a2a7b7497b5768db81534ed0ce14a62d`.
-The checked allocator and safe shared-runtime refresh are installed; four
-focused host/cartridge/composition checks pass. A native largest-game transition
-allocates its full image and backup, leaving 130,304 arena bytes. The original
-test wait omits the room's audio handover; the corrected helper includes it and
-reaches native console audio. The debugger then stops on normal lazy FPU ownership.
-The installed `/usr/bin/ares` lacks `QPassSignals:10`; the compatible local N64
-build is `build/ares-n64-debugger/rundir/bin/ares`, with runner flag
-`--ares-debug-settings developer`. Both corrected attempts are
-spent. Use that tool for the next changed native batch, retain graph-thread diagnostics, and
-do not repeat the unsupported-command test. Full gameplay/return and ordinary
-entry remain unverified. See the [capacity checkpoint](checkpoints/V3_CONSOLE_CAPACITY.md).
-The common room callback and eleven complete console profiles/models are
-installed. Excitebike adds one experimental choice through its actual lottery
-route; the other ten retain pending acquisition. Five focused checks pass;
-two native setup attempts stop before callback execution due to unavailable
-fixture memory. Do not replay that title-state fixture. See the
-[room checkpoint](checkpoints/V3_CONSOLE_ROOM.md).
-Full iNES loading, graphics allocation, and frame/reset/exit save hooks are
-installed. Three focused checks pass, including actual-image host adapter
-execution, checked native hooks/relocations, resource preservation, and four
-private compositions. CPU/PPU/audio are stubbed in that host fixture; actual
-gameplay remains unverified. See the [lifecycle checkpoint](checkpoints/V3_CONSOLE_EMULATOR.md).
-All nineteen complete compressed images, compact metadata, and the native
-streamed reader are installed. Host donor comparisons, cartridge/ownership
-checks, six-packet startup checks, and four private compositions pass. Native
-reads reproduce a complete iNES image and complete QD image with guards/save
-state intact. The scenario subsequently fails in fixture cleanup; its corrected
-helper is not rerun after two setup attempts. Retain the successful read evidence
-and verify actual launch/return with the next changed gameplay batch.
-See the [streaming checkpoint](checkpoints/V3_CONSOLE_IMAGES.md).
+Current task: finish remaining genuine importing categories and representation
+mappings, using the shared converter and the current ABI-287 proposal:
+`build/v3-builtin-model-profiles-01/profile-runtime/build-lock.json`.
+ROM SHA-256: `3326f6b88da257ca5adaad7b6b0f11b38705215a87907c0179d4337eb19c60ff`.
+
+The complete console engines, image loading, persistence, and room bindings are
+installed. Native Clu Clu Land D and Wario's Woods title execution, rendering,
+Reset retention, and cleanup pass in one silent 54-record combined scenario.
+Ordinary room entry, actual town return, user-controlled gameplay, and hardware
+remain unverified; do not replay the exhausted title-room allocation fixtures.
+See [console evidence](checkpoints/V3_CONSOLE_ROOM.md).
+
+The ordinary importer adds four paintings with their real stock/event lists,
+catalogue/scoring, and official names. Shared native-profile staging installs
+49 more full models and inactive profiles across direct drawing, seating/beds,
+constant sequences, indexed flower palettes, and building-palette fades.
+All 183,408 artwork bytes are retained, with 48 cached conversions and one shared
+compiler job. There are 167 selectable development choices and 100 inactive
+furniture profiles. No new resident allocation or saved format is added.
+See [bulk profiles](checkpoints/V3_BUILTIN_PROFILES.md).
+
+Next importing work:
+
+- Resolve the remaining legacy clothing, fish/insect, custom-design, and fossil
+  representations against actual parent/native identities. Complete genuine
+  missing conversion and behaviour work; do not interpret absent artwork or
+  an already installed parent representation as a new furniture requirement.
+- Review source school desk `3208` and bus stop `3270` against their worksheet
+  native counterparts `1200` and `10A0`; do not create duplicate imports solely
+  because their GC-added names are missing from the older approved mapping.
+- Keep item-specific behaviours in scope alongside shared categories. Acquisition
+  follows primary importing; pending rewards do not block complete asset staging.
+- Finish source acquisition and gold-tree effects/acquisition, align the empty
+  selection with V2-13, then run bounded combined checks and provide a private
+  hardware-test build with explicit save incompatibility warnings.
+
+The existing metadata scan at `build/v3-furniture-post-plain-scan-01.json` has
+109 supported and 281 review records; it precedes the final 24 profile stages.
+These are metadata categories, not remaining-import counts. Review includes
+parent representations, absent/dummy resources, native counterparts, and rewards.
+Neither deployment switches to experimental V3 without user testing and approval.
+The main build lock and stable V2-13 patchers remain unchanged.
 
 The shared save executor is prepared at `build/v3-console-games-prepared-06/`:
 3,988 MIPS bytes, all sixty recipes, and four independent player blocks.
@@ -189,18 +144,17 @@ claimed. The shared callback loader uses 1,142 of 1,536 bytes, including checked
 destruction dispatch. See the
 [reversible checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#installed-reversible-lifecycle-and-save-capture).
 
-Continue the remaining console launch/storage category without per-item
-installers. Radio room behaviour and indoor player exercise are installed;
+Retain the installed shared console launch/storage category. Radio room behaviour and indoor player exercise are installed;
 its acquisition remains unfinished. Reuse complete resources and shared runtimes.
 
-The checked current proposal is ABI 281 at
+Retained allocator evidence is ABI 281 at
 `build/v3-console-emulator-capacity-01/build-lock.json`, ROM SHA-256
 `763bbcbeca77390e797039c79ee8ae83a2a7b7497b5768db81534ed0ce14a62d`.
 The combined skeleton/material category imports the complete hamster cage,
 including source movement/texture timing, positioned sound, actual lottery
 availability, catalogue ordering, scoring, and official English text. Five focused
 checks pass; native execution, ordinary appearance/synthesis, and hardware remain
-unverified. The current proposal has 163 development choices and save format five.
+unverified. The current proposal is identified at the top of this queue and uses save format five.
 Shared room code uses 27,856 of 32,768 bytes; bootstrap uses 1,182 of 1,536.
 See the [combined-animation checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#installed-combined-skeleton-and-material-animation).
 
@@ -820,13 +774,13 @@ artwork, and fish/insect/NES/display dependencies; do not count all of them as
 new furniture or alias native IDs by number. Twelve supported static objects
 are prepared at `build/v3-legacy-static-prepared-01/` (46,272 bytes, one compiler
 container); two complete focused checks pass and official names have provenance.
-Eight prepared souvenirs have stable additive destinations and shared integration.
-Review the remaining paintings/chocolates and other legacy representations before
-assigning additional destinations; extend shared categories, not item installers.
-Preserve all furniture, clothing, and display reservations. The holiday program also requires bottled
-ship `1FC0`, whose complete artwork is prepared but native correspondence and
-acquisition remain unresolved. This is primary importing work, not a stretch goal or an
-optional audit.
+The reviewed souvenirs, four additional paintings, chocolates, tissue, and bottled
+ship have stable additive destinations. All have complete profiles; the four
+paintings use their actual shop/event routes, while pending gifts remain inactive.
+Their identity checks and shared integration are recorded in the
+[bulk-profile checkpoint](checkpoints/V3_BUILTIN_PROFILES.md). Preserve all prior
+furniture, clothing, and display reservations. Review the remaining parent/native
+representations without inventing independent furniture identities.
 
 The bulk converter reuses validated prepared artwork and compiles all missing
 objects in one container. The current combined prepared bundle is
@@ -1728,9 +1682,10 @@ Full catalogue construction, ordinary GPU appearance, interactions, and
 save/restart remain for the gameplay pass. Saved format 2 is unchanged, but saves
 using the ABI-95 additions must not be loaded in older builds or V2.
 
-Current integration:
+The retained main-lock baseline is:
 `build/v3-player-action-tables-03/animal-forest-v3-asset-loader.z64`, pinned
-by `config/v3-import-build.json` for both the pipeline and offline composer.
+by `config/v3-import-build.json`. Pass the current proposal lock at the top of
+this queue explicitly; do not build new imports on this older main-lock baseline.
 
 The [school desks](checkpoints/V3_SCHOOL_DESKS.md) are installed in ABI 84 with
 complete artwork, native metadata/readers, stock, catalogue/scoring, profile

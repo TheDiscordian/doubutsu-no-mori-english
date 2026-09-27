@@ -23,7 +23,7 @@ CANONICAL_FURNITURE_VERSION = 2
 # native correspondence in the pinned worksheet or approved translation map.
 # Keep reservations literal and append-only; membership is not an acquisition
 # or behaviour rule. 3C00..3C0C belong to balloon representations below this range.
-LEGACY_FURNITURE_VERSION = 10
+LEGACY_FURNITURE_VERSION = 11
 LEGACY_FURNITURE = {
     0x1FA0: (1796, 0x3C10),
     0x1FB4: (1797, 0x3C14),
@@ -52,6 +52,13 @@ LEGACY_FURNITURE = {
     0x1DE8: (1820, 0x3C70),
     0x1DEC: (1821, 0x3C74),
     0x1DF0: (1822, 0x3C78),
+    0x12B0: (1823, 0x3C7C),
+    0x12B4: (1824, 0x3C80),
+    0x12C4: (1825, 0x3C84),
+    0x12D8: (1826, 0x3C88),
+    0x1FA4: (1827, 0x3C8C),
+    0x1FB0: (1828, 0x3C90),
+    0x1FC0: (1829, 0x3C94),
 }
 
 

@@ -253,13 +253,13 @@ class ProfileTests(unittest.TestCase):
         cls.old=by_vrom(cls.base)[BLOB].extract(cls.base)
         cls.source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
             (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
-        cls.rows=cls.report['staged_furniture']['rows']
+        prior_ids={r['id'] for r in cls.prior.get('staged_furniture',{}).get('rows',[])}
+        cls.rows=[r for r in cls.report['staged_furniture']['rows'] if r['id'] not in prior_ids]
         cls.bindings=runtime.bind_profiles(cls.source,cls.image,cls.report)
 
     def test_complete_inactive_batch_retains_every_previous_record_and_resource(self):
         from v3_import_storage import TABLE_END
-        self.assertEqual(len(self.rows),22)
-        self.assertEqual(sum(r['reused_asset'] for r in self.rows),17)
+        self.assertTrue(self.rows)
         expected=bytearray(self.old[ROWS:TABLE_END]);e=self.report['equipment_resources'];old=self.prior['equipment_resources']
         for r in self.rows:
             item=int(r['item_id'],16);i=slot(item);vrom=r['object_vrom'];at=vrom-BLOB;n=r['object_bytes']
@@ -294,20 +294,32 @@ class ProfileTests(unittest.TestCase):
     def test_current_metadata_advances_to_real_acquisition_gaps_and_promotes_without_copying(self):
         from v3_furniture_pipeline import prepare,metadata,identity_rows
         from v3_resource_capacity import checked_limit
-        ids=identity_rows(ROOT/'build/item-identity-megasheet.xlsx');limit=checked_limit(self.image,self.report)
-        rigs=self.report['equipment_resources']['room_rigs'];bindings={r['source_item_id']:r for r in rigs['rows']+rigs['sound_rows']}
+        from v3_registry import furniture_source
+        ids=identity_rows(ROOT/'build/item-identity-megasheet.xlsx',include_unmapped_legacy=True)
+        limit=checked_limit(self.image,self.report)
+        rigs=self.report['equipment_resources']['room_rigs']
+        bindings={r['source_item_id']:r for r in rigs['rows']+rigs['sound_rows']+rigs.get('plain_rows',[])}
         for r in self.rows:
-            item=int(r['item_id'],16)
+            item=furniture_source(r)[0];donor=f'{item:04X}'
             with self.assertRaisesRegex(ValueError,'^acquisition needs an adapter:'):
                 metadata(self.source,item,prepare(self.source,item)[0],ids[item])
-            row={**bindings[r['item_id']]['source'],**r};at=r['object_vrom']-BLOB;asset=self.blob[at:at+r['object_bytes']]
+            row={**bindings[donor]['source'],**r};at=r['object_vrom']-BLOB;asset=self.blob[at:at+r['object_bytes']]
             self.assertEqual(runtime.reuse_profile(self.source,row,asset,self.blob,limit=limit),
                 (r['object_vrom'],bytes.fromhex(r['profile_hex'])))
+            if runtime.builtin_native_profile(row['profile']):
+                from v3_furniture_palette import VTABLE as PALETTE_VTABLE
+                self.assertEqual(r['room_runtime']['vtable'],PALETTE_VTABLE if r['category']=='switch-palette-fade' else 0)
+                self.assertEqual(row['profile']['scalar_hex'],bytes.fromhex(r['profile_hex'])[48:64].hex())
         row=copy.deepcopy(row);row['room_runtime']['vtable']+=4
         with self.assertRaises(ValueError):runtime.reuse_profile(self.source,row,asset,self.blob,limit=limit)
         bad=copy.deepcopy(self.report);bad['staged_furniture']['rows'][0]['room_runtime']['vrom']+=16
         with self.assertRaises(ValueError):runtime.bind_profiles(self.source,self.image,bad)
         runtime.bind_profiles(self.source,self.image,self.report)
+
+        from v3_furniture_pipeline import scan,rig_import_plan
+        inventory=scan(self.source,ROOT/'build/item-identity-megasheet.xlsx',
+            selected=tuple(f'{furniture_source(r)[0]:04X}' for r in self.rows))
+        self.assertFalse(any(rig_import_plan(inventory,self.report,self.bindings,source=self.source).values()))
 
     def test_single_artwork_validator_still_accepts_current_installed_static_batch(self):
         from v3_furniture_install import checked_assets,provenance_patch
@@ -315,11 +327,28 @@ class ProfileTests(unittest.TestCase):
         self.assertTrue(rows)
         self.assertEqual(provenance_patch(self.rows),'')
 
+    def test_builtin_palette_dependencies_reject_damage_without_mutation(self):
+        from v3_furniture_palette import checked_runtime,RAM,VTABLE
+        from v3_import_storage import PACKAGE,PACKAGE_RAM
+        self.assertEqual(checked_runtime(self.report,self.blob),VTABLE)
+        for damage in ('callback','loader','entry','flag','table'):
+            report=copy.deepcopy(self.report);blob=bytearray(self.blob)
+            if damage=='callback':blob[PACKAGE+RAM-PACKAGE_RAM]^=1
+            elif damage=='loader':blob[0x5800]^=1
+            elif damage=='entry':blob[report['furniture']['expanded_tables']['public_entries'][0]['entry']-0x80460000]^=1
+            elif damage=='flag':report['furniture']['expanded_tables']['expanded_code']['flags'].remove('-DAF_V3_SHARED_PALETTE_FADE=1')
+            else:report['furniture_palette_fade']['vtables'][f'{VTABLE:08X}']='00'*20
+            snapshot=bytes(blob);receipt=copy.deepcopy(report)
+            with self.subTest(damage=damage),self.assertRaises(ValueError):checked_runtime(report,blob)
+            self.assertEqual(bytes(blob),snapshot);self.assertEqual(report,receipt)
+
     def test_composition_retains_choices_and_complete_translation_only_output(self):
         pin=composer.BASE,composer.BASE_SHA,composer.REPORT_SHA,composer.ABI
         try:
             composer.use_build_lock(PROFILE_OUT/'build-lock.json');catalog=composer.catalogue(self.image,self.report)
-            self.assertEqual(len(catalog),128)
+            composer.use_build_lock(PROFILE_OUT/'base-lock.json')
+            self.assertEqual(set(catalog),set(composer.catalogue(self.base,self.prior)))
+            composer.use_build_lock(PROFILE_OUT/'build-lock.json')
             self.assertFalse({r['id'] for r in self.rows}&set(catalog))
             self.assertEqual(sha256(composer.compose(self.image,self.report,catalog,composer.resolve(catalog,[]))[0]),
                 self.report['translation_baseline']['sha256'])

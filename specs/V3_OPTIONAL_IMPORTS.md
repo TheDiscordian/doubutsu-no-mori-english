@@ -106,59 +106,34 @@ Keep source hashes and conversion revisions attached to each compiled import.
 
 ## Runtime work
 
-The [QD services](V3_CONSOLE_DISK.md) are prepared through the same console
-converter: complete donor BIOS and fast-boot initialization data, all five BIOS
-special-instruction services, private reset patches, bounded boot/save operations,
-disk registers, interrupt state, per-frame readiness/motor state, and complete
-native-layout character conversion. A native module prepares the complete bank
-mapping, programme-RAM writes, WDM register bridges, actual character-buffer
-bindings, RSP/cache calls, cold initialization, reset-button retention, native
-disk I/O/IRQ routes, nametable mirroring, motor waits, donor audio initialization,
-and bounded DPCM bank reads/address wrapping with cartridge fallback.
-Donor C comparisons, host-adapter checks, and emitted bridge-instruction checks
-pass. The verified donor and native mixers both use five channels; no separate
-disk expansion voice is present in this donor. ABI 282 installs the complete
-checked resident packet and seventh startup preload, preserving all game assets,
-selections, and saved layouts. ABI 283 installs audio/DPCM, complete image extents,
-per-frame disk timing, reset, and final-save lifecycle hooks, reusing the lower
-image/save executor. Host session and cartridge/composition checks pass. Native
-preload and interpreter entry are observed, but the test's stale active-marker
-assertion prevents full scenario completion. Frame continuity, drawing, native
-reset/return, and ordinary gameplay remain unverified. ABI 284 binds shared room
-readiness and stages the complete furniture profile through the ordinary category
-importer, reusing all artwork. Five focused checks pass, including four private
-compositions and preserved saves/resources. Its real reward route remains
-unimplemented; no disk item is selectable.
+The [QD services](V3_CONSOLE_DISK.md), complete BIOS/boot data, native CPU/PPU/audio
+bindings, disk I/O/IRQ/motor timing, reset retention, final-save capture, and
+common room bindings are installed. The console converter retains nineteen full
+game images, twenty launch records, and sixty save operations. All twelve
+supplied additional console furniture models have complete profiles; Excitebike
+has a real lottery route, while eleven await their source reward systems.
+The absent game-twenty payload is a donor limitation, not unfinished emulation.
 
-The [console converter](V3_CONSOLE_GAMES.md) preserves nineteen complete game
-payloads, twenty launch bindings, and sixty persistence operations. Its common
-MIPS save executor retains four independent player records and passes actual
-donor comparisons for scores, reset, battery/disk data, and Zelda checksums.
-The complete records require 6,528 bytes. A bounded lossless disk envelope retains
-the full town and console records within two existing save banks, with explicit
-pre-write capacity checks. Native storage, checked startup, decoded town commit,
-and individual player clearing are installed. Host safety checks, private
-composition, native synchronous/two-bank writing, and fresh-process loading pass.
-All nineteen compressed images, compact metadata, and a bounded physical-ROM
-reader are installed in ABI 277. Full/streamed donor comparisons and private
-composition pass. Native reads decode complete iNES/QD images with guards and
-save state intact; the scenario's later fixture-cleanup failure is recorded
-separately. ABI 278 installs full iNES loading, expanded graphics allocation,
-and initialization/frame/reset/exit save hooks. Host-adapter and cartridge/
-composition checks pass; room launch, real heap capacity, native gameplay, and
-QD execution remain integration work. ABI 280 adds shared native room dispatch
-and eleven complete console models/profiles through the ordinary importer.
-Excitebike has its actual lottery route and an experimental optional selection;
-the other ten retain their actual pending reward routes. Host/cartridge checks
-pass, but native callback execution remains unverified. ABI 281 checks every
-console game-arena allocation before native subtraction and preserves installed
-room code during shared runtime refresh. Host and composition checks pass.
-The largest-image native startup retains free arena space. Its title-state test
-needs the real room audio handover; corrected launch reaches native audio but
-the installed debugger stops on lazy FPU ownership. Full execution remains
-unverified, not a gameplay pass. No console
-is selectable from storage installation alone. Format-five saves require the
-explicit compatibility warning.
+Format-five storage retains the full town and all four players' console records
+inside the existing two banks, with capacity rejection before FlashRAM writes.
+Native synchronous/asynchronous writing and fresh-process loading have recorded
+evidence. A separate silent combined scenario at
+`build/v3-console-combined-native-01/` verifies Clu Clu Land D and Wario's Woods
+title execution/rendering, native Reset retention, and cleanup. Test-only menu/
+return requests drive the real native callers; ordinary controller input, room
+entry/world return, a new game-progress save cycle, audible quality, and hardware
+are not established. Preserve this passing evidence for unchanged code/data.
+See the [console checkpoint](../docs/checkpoints/V3_CONSOLE_ROOM.md).
+
+Four additional paintings use full ordinary import integration. Shared built-in
+profile staging installs complete resources even when acquisition is pending:
+direct native models/contact, constant sequences, indexed flower palettes, and
+the verified existing building-palette callback. Source identity, sounds/layers,
+complete artwork, canonical records, callback dependencies, and inactive flags
+are checked. No unfinished reward becomes substitute shop stock. The current
+ABI-287 proposal has 167 selectable choices and 100 inactive furniture profiles;
+the [bulk checkpoint](../docs/checkpoints/V3_BUILTIN_PROFILES.md) records its
+identity and evidence. All official names use the single source catalogue.
 
 The shared furniture converter prepares complete nested-model and dual-motion
 resources for the aerobics radio and treasure chest. The ordinary importer

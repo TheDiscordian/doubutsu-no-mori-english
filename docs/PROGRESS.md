@@ -31,85 +31,42 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
-The shared console converter prepares the complete disk BIOS, full 260-byte
-fast-boot initialization span, and 5,139-byte QD service core at
-`build/v3-console-games-prepared-14/`. All five BIOS special-instruction services,
-private BIOS reset patches, boot/save operations, disk registers, interrupt state,
-readiness/motor updates, and complete native-layout character conversion are
-implemented. Its separate 11,323-byte native module supplies disjoint memory
-binding, all CPU banks, four writable programme banks, read-only BIOS, per-instance
-WDM dispatch, full-width register bridges, both native character buffers, and
-RSP-wait/cache calls, cold initialization, reset-button retention, disk-register
-reads/writes, scanline IRQ routing, native nametable mirroring, motor waits,
-donor audio initialization, and bounded DPCM bank reads/wrapping with cartridge
-fallback. Three focused checks pass across targeted runs, including 56,205
-sanitized adapter assertions, all six emitted 64-bit bridges, checked optional
-DPCM hook/relocations, and preservation of all nineteen game resources. Both
-verified mixers use five audio channels; this donor has no expansion voice.
-The unchanged service retains its 15,594 earlier assertions.
-The complete module, both BIOS copies, boot data, transient buffers, and final
-guard are installed in ABI 282 through a checked 90,128-byte startup packet at
-`80630000..8064600F`. Four focused installation checks pass: complete resources
-and retained cartridge, overlapping-reservation rejection, seven-packet startup
-with fourteen DMA/checksum failure paths, and four private browser/offline
-compositions. Startup uses 668 of 688 bytes.
-ABI 283 connects startup, audio/DPCM, complete image extents, per-CPU-frame disk
-timing, reset retention, and final disk-save capture. Its combined native module
-is 14,295 bytes. Three focused checks pass, including 117,058 sanitized session
-assertions, ten installed hooks/thirteen removed relocations, retained resources,
-and four private compositions. The common lower image/save code is reused.
-A silent native run verifies the complete preloaded packet and reaches the disk
-interpreter with an active save session, no session error, and no CPU fault.
-The test stops on an incorrect active-state assertion; the corrected assertion
-is not replayed. Frame continuity, graphics, native reset/return, ordinary entry,
-and hardware remain unverified. Both setup attempts are spent; use a changed
-combined batch for the remaining native checks, not an unchanged fixture replay.
-ABI 284 binds the installed disk engine to the common room table and installs
-the full Clu Clu Land D profile through the ordinary category importer. Its
-4,880-byte, three-list model is reused without compilation. All twelve supplied
-additional console profiles are installed. Five focused checks pass across two
-targeted invocations: complete binding/artwork, unchanged resources and saves,
-non-mutating dependency rejection, repeat-plan skipping, explicit absent-payload
-classification, and four private browser/offline compositions. The disk item
-remains inactive pending its actual HomePage reward route; no new choice is added.
-See the [disk-service specification](../specs/V3_CONSOLE_DISK.md).
+The current proposal is ABI 287 at
+`build/v3-builtin-model-profiles-01/profile-runtime/build-lock.json`, ROM SHA-256
+`3326f6b88da257ca5adaad7b6b0f11b38705215a87907c0179d4337eb19c60ff`.
+It contains 167 selectable development imports and 100 complete inactive furniture
+profiles whose acquisition is pending. The main lock and both stable V2-13
+deployments are retained.
 
-The current proposal is ABI 284 at
-`build/v3-console-disk-room-imports-01/profile-runtime/build-lock.json`, ROM SHA-256
-`38dfbe6905917d5f0792cbad451d1d1f29b39bc2f3bfb4deac0e5625c3bc09d5`.
-The main lock, 163 choices, format-five saved layouts, and both V2-13 deployments
-are retained. No disk game is enabled. The current proposal retains the checked
-allocator and native evidence from ABI 281 at
-`build/v3-console-emulator-capacity-01/build-lock.json`, ROM SHA-256
-`763bbcbeca77390e797039c79ee8ae83a2a7b7497b5768db81534ed0ce14a62d`.
-Every console game-arena allocation now checks full aligned capacity before
-native subtraction. The shared refresh verifies the previous hooks and retains
-complete room callbacks, models, images, and saves. Four focused checks pass,
-including 110,902 sanitized host assertions and four private compositions.
-Native Wario's Woods startup allocates its full image and backup with 130,304
-arena bytes remaining. The title-state fixture's original wait is traced to its
-missing room audio handover. Corrected launch reaches native console audio but
-the debugger stops on the new thread's recoverable FPU-ownership exception.
-The installed emulator lacks the required signal-pass command; both corrected
-attempts are spent. Full native gameplay/return remains unverified, not a passed
-scenario or hardware handoff. Continue QD integration; use the compatible local
-test emulator for the next relevant native check. See the
-[capacity checkpoint](checkpoints/V3_CONSOLE_CAPACITY.md).
+Four additional paintings use the ordinary shared importer: full models, original
+shop/event lists, catalogue, scoring, official names, and fixed additive IDs.
+The shared native-profile stage also installs 49 complete objects independently
+of acquisition: direct models, seating/beds, constant model sequences, flowers,
+and palette-fading building models. These retain 183,408 artwork bytes; 48 models
+reuse prepared conversions and one compiles through the common batch compiler.
+No new per-item installer, callback code, resident reservation, or saved format
+is introduced. All names have official-donor credits in the single catalogue.
+See the [bulk-profile checkpoint](checkpoints/V3_BUILTIN_PROFILES.md).
 
-The room integration is retained from ABI 280 at
-`build/v3-console-room-imports-01/cartridge/build-lock.json`, ROM SHA-256
-`b1080db8248385f85ddd9f68a5ba36ce83fb083a6f5b7061b60b8fa34fa47786`.
-The shared pipeline installs eleven complete cartridge-console models/profiles
-and connects source game IDs to the native room interaction. Excitebike adds its
-real lottery/catalogue/scoring route and one experimental selection; the other
-ten await their actual acquisition routes. ABI 284 adds the complete QD profile;
-native execution verification and acquisition remain. The development
-catalogue has 163 choices. Five focused checks pass across targeted runs,
-including retained resources and four private compositions. Two native attempts
-verify startup but stop on insufficient test
-allocation space before callback execution. No native gameplay is claimed.
-Native game-state launch/rendering/return and complete QD support remain. See the
-[room checkpoint](checkpoints/V3_CONSOLE_ROOM.md).
+The complete console image/save/disk/room integration is installed. A silent
+54-record native scenario at `build/v3-console-combined-native-01/` verifies
+Clu Clu Land D and Wario's Woods execution and title rendering, native Reset
+with required RAM retained, and native cleanup with no CPU fault. Disk work RAM
+advances between observations. Reset requests use test-only menu writes; cleanup
+uses the actual native return request and stops before loading an uninitialized
+town. Ordinary room entry/world return, user-controlled play, save/reload with
+these games, audible quality, and hardware remain unverified. The checked code
+and resources are retained in the current proposal, so this evidence does not
+require replay for the data-only model stages.
+See the [console checkpoint](checkpoints/V3_CONSOLE_ROOM.md).
+
+Continue from the importing gaps, not from obsolete test attempts. Review the
+remaining legacy clothing, fish/insect, custom-design, and fossil representations
+against actual parent/native identities, and complete any genuinely missing
+conversion/behaviour categories. The two worksheet-mapped school-desk/bus-stop
+records require identity/artwork correspondence review, not automatic duplicate
+IDs. Then complete the actual acquisition routes and gold-tree work, align the
+no-import baseline with V2-13, and assemble a private combined playtest build.
 
 The retained native console lifecycle is installed in ABI 278 at
 `build/v3-console-emulator-native-01/build-lock.json`, ROM SHA-256

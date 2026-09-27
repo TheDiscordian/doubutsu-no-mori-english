@@ -13,6 +13,30 @@ SOURCES = ('tools/v3_furniture_palette.py','tools/v3_tent_model.py',
     'overlays/v3/furniture_expanded.ld','tools/v3_asset_loader.py')
 
 
+def checked_runtime(report,blob):
+    """Reuse a complete installed category without rebuilding its unchanged code."""
+    palette=report.get('furniture_palette_fade')
+    expanded=report['furniture']['expanded_tables'];loader=expanded['expanded_code']
+    at=PACKAGE+RAM-PACKAGE_RAM;resident=blob[at:at+LIMIT-RAM]
+    if (not palette or palette['ram']!=RAM or palette['bytes']!=LIMIT-RAM or
+            sha256(resident)!=palette['resident_sha256'] or
+            '-DAF_V3_SHARED_PALETTE_FADE=1' not in loader['flags'] or
+            sha256(blob[0x5800:0x5800+loader['bytes']])!=loader['sha256']):
+        raise ValueError('Missing or changed complete native palette runtime')
+    symbols=palette['code']['symbols']
+    for address,draw in ((LEGACY_VTABLE,'af_v3_tent_model_dw'),(VTABLE,'af_v3_palette_fade_dw')):
+        expected=struct.pack('>5I',symbols['af_v3_tent_model_ct'],symbols['af_v3_tent_model_mv'],
+            symbols[draw],symbols['af_v3_tent_model_dt'],0)
+        if (resident[address-RAM:address-RAM+20]!=expected or
+                palette['vtables'][f'{address:08X}']!=expected.hex()):
+            raise ValueError('Changed native palette callback table')
+    for entry in expanded['public_entries']:
+        at=entry['entry']-0x80460000
+        expected=struct.pack('>2I',jump(loader['symbols'][entry['name']]),0)
+        if blob[at:at+8]!=expected:raise ValueError('Changed native palette loader entry')
+    return VTABLE
+
+
 def install(original, base, prior, blob, source, output, rows):
     if not any(r.get('profile',{}).get('callback_adapter',{}).get('category') == 'switch-palette-fade'
                for r in rows):

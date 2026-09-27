@@ -461,7 +461,7 @@ def build(output, art_path, lock=LOCK):
         report['staged_furniture']['deferred_resources']=[r for r in report['staged_furniture'].get('deferred_resources',[])
             if r['source_item_id'] not in complete]
         runtime=report['equipment_resources']['room_rigs']
-        for row in runtime['rows']+runtime['sound_rows']+runtime.get('material_rows',[])+runtime.get('static_rows',[])+runtime.get('scrolling',{}).get('rows',[]):
+        for row in runtime['rows']+runtime['sound_rows']+runtime.get('material_rows',[])+runtime.get('static_rows',[])+runtime.get('plain_rows',[])+runtime.get('scrolling',{}).get('rows',[]):
             if row['source_item_id'] in promoted_sources:row['parent_selectable']=True
     report.update(build='v3-automatic-furniture',runtime_abi=abi,input_build_sha256=sha256(base),
         output_sha256=sha256(result),patch_sha256=sha256(patch),blob_sha256=sha256(blob),

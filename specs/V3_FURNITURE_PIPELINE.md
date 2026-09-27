@@ -39,6 +39,22 @@ this after changing shared code when no new resource category needs installation
 profile-only staging retains existing code unless it installs a newly implemented
 material lifecycle; that stage rebuilds the shared packet and callback bindings.
 
+### Built-in native profile staging
+
+The same dependency planner stages complete native drawing/contact profiles,
+constant model sequences, indexed static model/palette selections, and building
+palette fades when their remaining metadata gate is acquisition. This stage
+does not enable the selector or fabricate a reward. Identity correspondence,
+source behaviour, placement layer, and action-sound checks precede eligibility.
+Shared prepared-artwork validation retains every layer, scalar field, and palette.
+The room runtime's `plain_rows` records these complete built-in paths; direct
+models and flattened sequences use a zero vtable. Building fades reuse the
+checked shared callback, complete resident packet, loader, and public entries.
+Unchanged category code is not recompiled. Full canonical profiles, names, and
+prices are installed inactive, with separate acquisition/catalogue/scoring flags.
+Subsequent scans skip installed profiles. Later acquisition promotion verifies
+and reuses the same complete model instead of appending another copy.
+
 ### Composite models and dual-motion resources
 
 `Source.model_graph` expands ordinary relocated display-list calls in execution
@@ -686,14 +702,20 @@ indices in these prepared records are not assigned N64 destination indices.
 
 ### Stable donor and destination records
 
-The registry reserves reviewed ordinary legacy identities in `3C10..3C40`,
+The registry reserves reviewed ordinary legacy identities in `3C10..3C94`,
 after the balloon displays at `3C00..3C0C`. Existing native IDs, the entire
 garment display range, and every previous import reservation remain intact.
 Reservations are literal and append-only, not assigned by selection order.
-The thirteen mappings identify reviewed additive furniture; acquisition,
+The mappings identify reviewed additive furniture; acquisition,
 graphics, and behaviour still come from source records, not that registry.
 Other legacy entries remain in review until identity and representation are
 established. Unresolved worksheet cells alone do not justify a new identity.
+Registry version eleven includes four paintings and three gifts. The checked
+worksheet has no N64 ID/name/model/texture correspondence for these seven, and
+the original-ROM/donor dependency check finds no approved native translation or
+shared-identity evidence. Their append-only destinations do not change any
+previous mapping. The four paintings retain their actual event/ordinary stock;
+the gifts have complete inactive profiles while acquisition remains pending.
 
 Installed records keep `id` as the canonical GameCube identity. `item_id` and
 `runtime_index` identify the N64 destination; differing mappings also require
@@ -786,7 +808,9 @@ rebuilds the startup checksum, without recompiling callback, engine, or art.
 An installed engine is distinct from an installed room binding; both are
 required before profile activation. Missing donor payloads remain explicitly
 unavailable, not pending emulator implementation. The checked arena allocator
-is installed; native gameplay remains unverified. See the
+is installed; native title execution, rendering, Reset retention, and cleanup
+pass for the disk game and a cartridge game. Ordinary room entry/world return,
+user-controlled gameplay, and hardware remain unverified. See the
 [room checkpoint](../docs/checkpoints/V3_CONSOLE_ROOM.md).
 Console conversion also prepares the common bounded save executor. It preserves
 all four players' separate progress and the complete score/reset/battery/disk

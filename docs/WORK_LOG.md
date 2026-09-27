@@ -1,5 +1,48 @@
 # Work record
 
+## 2026-09-27: native console execution and shared built-in profile batches
+
+- Previous goal work is progress: the disk room binding is committed as
+  `c39ed2a`, and the interrupted batch produces actual native evidence and
+  immutable builds. The intervening publication answer confirms latest V2-13
+  but makes no V3 implementation change. The resumed build process is terminal;
+  its complete ABI-286 lock/plan are inspected rather than starting another copy.
+- The first combined silent console run passes all 54 records: disk/cartridge
+  title rendering/execution, real native Reset retention, and audio-stop/cleanup
+  hooks without CPU faults. Requests are test-only, not controller input; the
+  title fixture stops before loading an uninitialized town. The disk snapshot
+  includes 8 KiB beyond required RAM/BIOS; the helper narrows future snapshots
+  to the required span without rerunning this successful superset check.
+- Reviewed seven legacy identities against pinned worksheet and actual native/
+  donor dependency mappings. Added append-only reservations; four paintings
+  import through ordinary source stock/event/catalogue/scoring machinery in
+  ABI 285 with all four full models reused. Two shared checks pass, including
+  four browser/offline compositions. A hard-coded old allocation assertion is
+  corrected to retained current allocations; its retry handle is terminal with
+  completion output unavailable after context recovery, so that result is not
+  claimed. Current-stage preservation checks cover the retained resources.
+- Added common acquisition-independent native profile staging. ABI 286 installs
+  25 complete direct models, all reused. Four focused checks pass across initial
+  and targeted invocations; the only initial failure is a new test slicing 12
+  instead of the full 16 scalar bytes. The corrected targeted check passes.
+- Extended the same stage to native contact/seating, constant sequences, indexed
+  flowers, and the existing verified palette-fade callback. ABI 287 adds 24
+  profiles: 23 cached assets and one common compiler job. Together the two stages
+  install 49 complete objects/183,408 bytes without new resident space or saved
+  fields. The actual selector has 167 choices; 100 staged profiles stay inactive.
+- All five current-build profile checks pass in 37.256 seconds, including full
+  retained resources/UPS, malformed dependencies, all scalar bytes, promotion
+  without duplicate models, repeat-plan skipping, provenance, and empty/all
+  selection. No historical emulator scenario or unchanged engine test is replayed.
+- Current lock: `build/v3-builtin-model-profiles-01/profile-runtime/build-lock.json`.
+  ROM SHA-256 `3326f6b88da257ca5adaad7b6b0f11b38705215a87907c0179d4337eb19c60ff`;
+  UPS SHA-256 `92d521ae6f4b35aea233fa972792d70f6c3227d5e33df628b4363c77407301a2`.
+  Name sources enter the single catalogue; main lock and V2-13 patchers stay intact.
+- Next: resolve remaining parent/native representations and genuine conversion/
+  behaviour gaps, then source acquisition and gold-tree work. V3 remains withheld
+  from both patchers pending the user's testing and approval. No hardware or
+  ordinary game-progress save/reload claim is made.
+
 ## 2026-09-27: shared disk furniture binding and complete category profile
 
 - The previous goal batch is progress (`8f38b9b`, full disk sessions). The

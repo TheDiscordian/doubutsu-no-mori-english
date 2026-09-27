@@ -12,7 +12,8 @@ ABI 284 is `build/v3-console-disk-room-imports-01/profile-runtime/build-lock.jso
   lottery route, catalogue reordering, source scoring, and its individual
   experimental selection. It is not gameplay-certified.
 - Clu Clu Land D has its complete model, disk image, native engine, and profile
-  installed. Native gameplay and acquisition remain. The separate game-twenty disk
+  installed. Native title execution/rendering, Reset, and cleanup have the evidence
+  below; ordinary gameplay and acquisition remain. The separate game-twenty disk
   furniture has no payload in the supplied donor and stays explicitly unused.
 
 The import-free baseline, main V3 lock, trailer, and both V2-13 patcher deployments
@@ -65,6 +66,26 @@ receipts; N64 cannot supply the GameCube link-cable feature.
 
 ## Evidence and limits
 
+The silent combined scenario `tests/scenarios/v3_console_combined_game.json`
+passes 54 records on this cartridge at `build/v3-console-combined-native-01/`.
+Clu Clu Land D and Wario's Woods execute and render their complete title screens.
+Disk work RAM advances between observations. The full images occupy 65,536 and
+524,304 bytes; native graphics allocations occupy 151,560 and 270,344 bytes,
+leaving 707,856 and 130,304 arena bytes respectively.
+
+Native Reset retains the disk's work/programme/CHR RAM and private BIOS, and the
+cartridge's 8,192-byte battery region. The test writes the native reset-menu
+request, then breaks before and after the actual reset call; this is not ordinary
+controller-input evidence. Native cleanup follows the real state-manager return
+request, audio-thread stop/join, and final save hook. Both sessions clear their
+active contexts without a CPU fault. Cleanup stops before loading a world because
+the isolated title fixture has no initialized town. Checkpoints restore both
+sessions and the emulator shuts down normally; no speaker audio is emitted.
+
+Ordinary furniture entry/world return, user-controlled gameplay, a console-progress
+save/reload cycle, audible quality, and hardware remain unverified. Later data-only
+staging retains these complete code/resources and does not require replay.
+
 Five focused checks in `tests.test_v3_console_disk_room` pass across two targeted
 invocations: complete staged profile/artwork, retained runtime/resources/saves,
 damaged-dependency rejection without mutation, idempotent binding and planning,
@@ -102,9 +123,9 @@ native subtraction, image binding, or saved-state changes. The disk engine and
 session hooks are installed; see [disk services](../../specs/V3_CONSOLE_DISK.md)
 for native interpreter-entry evidence and the remaining execution checks.
 
-Verify native launch/rendering/reset/return for disk and representative cartridge
-games using the current combined build. Retain the exhausted title-room fixture
-evidence without replay. Ordinary room entry remains unverified. Continue
+Retain the passing native title/rendering/reset/cleanup evidence without replay.
+Ordinary room entry and return to an initialized town remain for the combined
+gameplay pass. Do not replay the exhausted title-room allocation fixture. Continue
 other import requirements and real acquisition routes without replacing them
 with easier stock lists.
 

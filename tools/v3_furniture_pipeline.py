@@ -1196,6 +1196,14 @@ def name_metadata(source, item, identity):
                 **({'name_source_symbol':symbol} if index < 1024 else {}))
 
 
+def builtin_native_profile(profile):
+    """Complete profiles supported by native drawing or the shared palette code."""
+    return (not profile.get('kind') and
+            profile.get('callback_adapter',{}).get('category') in
+            (None,'indexed-static-model-palette','constant-model-sequence','switch-palette-fade') and
+            profile.get('behaviour') in BEHAVIOURS.values())
+
+
 def metadata(source, item, profile, identity):
     from v3_furniture_rigs import FIXED_CATEGORY, JOINT_CATEGORY
     from v3_furniture_materials import CATEGORY as MATERIAL_CATEGORY
@@ -1456,6 +1464,10 @@ def rig_import_plan(inventory, report, bindings, selected=(), category=None, *, 
             scroll_rows.append(r)
             if loop:scroll_loops.append(r['item_id'])
     static_rows=[r for r in candidates if r['profile'].get('callback_adapter',{}).get('category')=='static-interaction']
+    # These have passed identity, sound, layer, and native scalar checks. Their
+    # remaining acquisition gate must not prevent complete resource staging.
+    plain_rows=[r for r in candidates if builtin_native_profile(r['profile']) and
+                r.get('reason','').startswith('acquisition needs an adapter:')]
     for r in candidates:
         if r['profile'].get('callback_adapter',{}).get('category')!=MATERIAL_CATEGORY:continue
         initializer=initializer_lifecycle(source,r['profile'])
@@ -1486,7 +1498,7 @@ def rig_import_plan(inventory, report, bindings, selected=(), category=None, *, 
         loops=sorted(({r['item_id'] for r in rows if furniture_level(source,r['profile']) is not None}|
                       {r['item_id'] for r in static_rows if r['profile']['callback_adapter'].get('level_sound')}|
                       set(material_loops)|set(scroll_loops)|joint_loops)-loops),
-        profiles=sorted(r['item_id'] for r in rows+material_rows+static_rows+scroll_rows+console_rows if r['item_id'] not in bindings))
+        profiles=sorted(r['item_id'] for r in rows+material_rows+static_rows+scroll_rows+console_rows+plain_rows if r['item_id'] not in bindings))
     if any(r['profile']['callback_adapter']['category']==ROTATED_CATEGORY for r in rows):
         exercise=report['equipment_resources'].get('player_motion',{}).get('exercise')
         if not exercise or not exercise.get('action_installed'):

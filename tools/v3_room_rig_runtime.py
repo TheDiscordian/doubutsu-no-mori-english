@@ -7,7 +7,7 @@ import zlib
 from aflib import CODE_RAM,CODE_VROM,by_vrom,sha256
 from v3_asset_loader import ROOT,BLOB,compile_part
 from v3_equipment_runtime import RAM as EQUIPMENT_RAM,retired_module_space
-from v3_furniture_pipeline import Source,prepare,room_aliases,PreparedAssets
+from v3_furniture_pipeline import Source,prepare,room_aliases,PreparedAssets,builtin_native_profile
 from v3_furniture_rigs import CATEGORY,CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY,ROLLING_CATEGORY,JOINT_CATEGORY,MATERIAL_RIG_CATEGORY,REVERSIBLE_CATEGORY,EFFECT_RIG_CATEGORY,suffix
 import v3_furniture_joint_rigs as joints
 import v3_furniture_roofs as roofs
@@ -141,7 +141,8 @@ def install_profiles(base,prior,blob,core,original,output,directories):
         for row in art['objects']:
             donor=row['item_id'];item=int(donor,16);prepared_row=prepare(source,item)
             descriptor=prepared_row[0];category=descriptor.get('callback_adapter',{}).get('category')
-            if (category not in (CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY,ROLLING_CATEGORY,JOINT_CATEGORY,MATERIAL_RIG_CATEGORY,REVERSIBLE_CATEGORY,EFFECT_RIG_CATEGORY,DUAL_CATEGORY,ROTATED_CATEGORY,roofs.CATEGORY,'switch-trigger-sound',static.CATEGORY,MATERIAL_CATEGORY,SCROLL_CATEGORY,consoles.CATEGORY) or
+            plain=builtin_native_profile(descriptor)
+            if ((not plain and category not in (CLOCK_CATEGORY,STORAGE_CATEGORY,HIT_CATEGORY,BILLBOARD_CATEGORY,ROLLING_CATEGORY,JOINT_CATEGORY,MATERIAL_RIG_CATEGORY,REVERSIBLE_CATEGORY,EFFECT_RIG_CATEGORY,DUAL_CATEGORY,ROTATED_CATEGORY,roofs.CATEGORY,'switch-trigger-sound',static.CATEGORY,MATERIAL_CATEGORY,SCROLL_CATEGORY,consoles.CATEGORY)) or
                     donor in occupied or item not in identities or
                     row['profile']!=json.loads(json.dumps(descriptor)) or
                     row['native_profile_scalar_hex']!=descriptor['scalar_hex']):
@@ -253,7 +254,22 @@ def install_profiles(base,prior,blob,core,original,output,directories):
                 raise ValueError('Staged identity needs native correspondence review')
             if (any(blob[ROWS+i*80:ROWS+(i+1)*80]) or any(blob[ITEMS+i*32:ITEMS+(i+1)*32]) or
                     blob[0x40+i//8]&(1<<(i&7))):raise ValueError('Profile staging overwrites an existing or selected identity')
-            if category==consoles.CATEGORY:
+            if plain:
+                # Reuse native drawing/contact or the installed palette callback.
+                # Source geometry and scalar fields stay complete.
+                vtable=0
+                if category=='switch-palette-fade':
+                    from v3_furniture_palette import checked_runtime as checked_palette
+                    vtable=checked_palette(prior,blob)
+                blob.extend(bytes(-len(blob)%16));vrom=BLOB+len(blob);blob.extend(data)
+                if vrom+len(data)>limit:raise ValueError('Complete native models exceed checked import reservation')
+                reused_asset=False
+                installed=dict(source_item_id=donor,item_id=f'{destination:04X}',runtime_index=index,
+                    blob_offset=vrom-BLOB,vrom=vrom,bytes=len(data),sha256=sha256(data),source=row,
+                    profile_installed=False,parent_selectable=False)
+                runtime.setdefault('plain_rows',[]).append(installed)
+                runtime['plain_rows'].sort(key=lambda r:r['runtime_index'])
+            elif category==consoles.CATEGORY:
                 if installed['profile_installed'] or installed['room_lifecycle']!=initial:
                     raise ValueError('Console source profile differs from its complete native binding')
                 blob.extend(bytes(-len(blob)%16));vrom=BLOB+len(blob);blob.extend(data)
@@ -445,6 +461,7 @@ def bind_profiles(source,base,report):
     # A rig's audio dependency has its own sound row; retain the complete model
     # binding when an identity occurs in both tables.
     bindings={r['source_item_id']:r for r in runtime['sound_rows']+runtime['rows']+runtime.get('material_rows',[])}
+    bindings.update({r['source_item_id']:r for r in runtime.get('plain_rows',[])})
     bindings.update(checked_runtime(e,blob))
     bindings.update(static.checked_binding(base,report,blob))
     bindings.update(source.console_runtime_bindings)
@@ -492,9 +509,12 @@ def bind_profiles(source,base,report):
                 bool(blob[0x40+i//8]&(1<<(i&7)))!=enabled):
             raise ValueError('Changed furniture profile identity or activation')
         descriptor=prepare(source,int(donor,16))[0];art=copy.deepcopy(binding['source']);vrom=binding['vrom']
-        category=descriptor['callback_adapter']['category']
-        expected_vtable=(consoles.VTABLE if category==consoles.CATEGORY else MATERIAL_VTABLE if category==MATERIAL_CATEGORY else SOUND_VTABLE if category in ('switch-trigger-sound',static.CATEGORY)
+        category=descriptor.get('callback_adapter',{}).get('category')
+        expected_vtable=(0 if builtin_native_profile(descriptor) else consoles.VTABLE if category==consoles.CATEGORY else MATERIAL_VTABLE if category==MATERIAL_CATEGORY else SOUND_VTABLE if category in ('switch-trigger-sound',static.CATEGORY)
                          else SCROLL_VTABLE if category==SCROLL_CATEGORY else VTABLE)
+        if category=='switch-palette-fade':
+            from v3_furniture_palette import checked_runtime as checked_palette
+            expected_vtable=checked_palette(report,blob)
         if category==static.CATEGORY:static.checked_audio(descriptor,binding,e)
         if category==consoles.CATEGORY:
             life=consoles.lifecycle(descriptor)
@@ -612,7 +632,7 @@ def bind_profiles(source,base,report):
                 not enabled and (sha256(current)!=row['profile_record_sha256'] or row['selected'])):
             raise ValueError('Changed complete installed furniture profile, artwork, or item record')
         source.runtime_profiles[donor]=dict(room_runtime=art['room_runtime'],
-            source_profile_sha256=descriptor['profile_sha256'],category=descriptor['callback_adapter']['category'],
+            source_profile_sha256=descriptor['profile_sha256'],category=category,
             object_sha256=art['object_sha256'],object_bytes=n,profile_hex=native.hex(),staged=not enabled,
             **({k:art[k] for k in ('room_lifecycle','room_placement','indoor_aerobics_installed') if k in art}))
     return source.runtime_profiles

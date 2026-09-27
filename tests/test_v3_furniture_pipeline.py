@@ -1422,7 +1422,9 @@ class MappedIdentityTests(unittest.TestCase):
             self.assertEqual(row['name'].encode().ljust(16,b' '),raw)
             self.assertEqual(row['price'],struct.unpack_from('>H',self.source.raw('ftr_price_table'),idx*2)[0])
             record=self.blob[install.ITEMS+slot*32:install.ITEMS+(slot+1)*32]
-            self.assertEqual(record[8:24],raw);self.assertEqual(record[24],0);self.assertEqual(record[27],12)
+            self.assertEqual(record[8:24],raw)
+            self.assertEqual(record[24],install.order_mask(install.catalogue_record(row)))
+            self.assertEqual(record[27],row.get('reward_route',0))
             self.assertEqual(record[25],self.source.raw('mRmTp_ftr_se_type')[idx])
             placement=self.report['furniture_placement']['table_ram']
             offset=install.PACKAGE+placement-install.PACKAGE_RAM+row['runtime_index']
@@ -1449,7 +1451,19 @@ class MappedIdentityTests(unittest.TestCase):
             self.assertEqual(self.blob[install.ROWS+i*80:install.ROWS+(i+1)*80],self.old[install.ROWS+i*80:install.ROWS+(i+1)*80])
             self.assertEqual(self.blob[install.ITEMS+i*32:install.ITEMS+(i+1)*32],self.old[install.ITEMS+i*32:install.ITEMS+(i+1)*32])
             self.assertEqual(self.blob[a:a+n],self.old[a:a+n])
-        self.assertEqual(self.report['shops'],self.prior['shops'])
+        def stock_lists(image,report):
+            data=by_vrom(image)[shops.VROM].extract(image);groups=[]
+            for pointer in struct.unpack_from('>11I',data,report['shops']['table_offset']):
+                at=pointer&0xFFFFFF;items=[]
+                while (item:=struct.unpack_from('>H',data,at)[0]):items.append(item);at+=2
+                groups.append(items)
+            return groups
+        groups=stock_lists(self.image,self.report);ids={int(r['item_id'],16) for r in self.rows}
+        self.assertEqual([[i for i in group if i not in ids] for group in groups],stock_lists(self.base,self.prior))
+        for row in self.rows:
+            item=int(row['item_id'],16)
+            if row.get('reward_route'):self.assertFalse(any(item in group for group in groups))
+            else:self.assertIn(item,groups[row['stock_group']])
         self.assertEqual(self.report['equipment_resources'],self.prior['equipment_resources'])
         self.assertEqual(self.report['staged_furniture'],self.prior['staged_furniture'])
         self.assertEqual(self.report['save_codec'],self.prior['save_codec'])
@@ -1458,7 +1472,7 @@ class MappedIdentityTests(unittest.TestCase):
         core=self.files[CODE_VROM].extract(self.image);old=by_vrom(self.base)[CODE_VROM].extract(self.base)
         for a in (0x800C4AFC,0x800C4B10):self.assertEqual(core[a-CODE_RAM:a-CODE_RAM+4],old[a-CODE_RAM:a-CODE_RAM+4])
         patches=self.report['catalogue']['retained_submenu_pool_patches']
-        self.assertEqual(sum(r['after']-r['before'] for r in patches),448)
+        self.assertEqual(patches,self.prior['catalogue']['retained_submenu_pool_patches'])
         all_rows=self.report['furniture']['imports']+[self.report['speed_bag']]
         contract=contact_contract(self.image,self.report,self.blob,all_rows)
         self.assertEqual(contract,self.report['furniture_behaviours']['contacts'])
@@ -1471,10 +1485,13 @@ class MappedIdentityTests(unittest.TestCase):
         import v3_browser_composition as browser
         pin=composer.BASE,composer.BASE_SHA,composer.REPORT_SHA,composer.ABI
         try:
+            composer.use_build_lock(self.out/'base-lock.json')
+            prior_keys=set(composer.catalogue(self.base,self.prior))
             composer.use_build_lock(self.out/'build-lock.json')
             catalog=composer.catalogue(self.image,self.report);plan=browser.rules(self.image,self.report)
             keys=[r['id'] for r in self.rows]
-            self.assertEqual(len(catalog),len(self.report['furniture']['imports'])+1+20+24+3)
+            self.assertEqual(set(catalog),prior_keys|set(keys))
+            self.assertFalse(prior_keys&set(keys))
             self.assertFalse({composer.item_key(int(r['item_id'],16)) for r in self.rows}&catalog.keys())
             self.assertTrue(set(keys)<=catalog.keys());self.assertFalse(plan['web_patcher_enabled'])
             cases=[]

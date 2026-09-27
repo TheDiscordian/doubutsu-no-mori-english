@@ -146,8 +146,9 @@ The prepared-resource check verifies MIPS/source receipts, complete BIOS/boot-st
 identity/vectors, unchanged nineteen-game resources, and explicit non-installation.
 No historical ROM or unchanged native scenario is replayed for this preparation.
 
-Remaining work is actual acquisition, plus native frame-continuity, drawing,
-reset/return, and ordinary gameplay verification. The common furniture importer
+Remaining work is actual acquisition and ordinary room/gameplay/save verification.
+Native title execution/rendering, Reset retention, and cleanup have the combined
+scenario evidence below. The common furniture importer
 installs the complete room binding/profile; it does not invent a shop-stock route.
 Installed session hooks are described below.
 Preserve the complete source image and BIOS; no substituted cartridge is used.
@@ -418,11 +419,18 @@ These are entry/execution observations, not a complete gameplay pass.
 
 The helper incorrectly expected active marker `1`, so it stops before later
 frame/graphics/context checks or checkpoint restoration. The actual save core
-uses `41464E53`; the helper is corrected without a third attempt. Both setup
-attempts are spent. Retain this evidence and exercise continuity, graphics,
-reset/return with the next changed combined
-batch. No speaker output, ordinary room entry, saved-game reload, or hardware
-claim is made.
+uses `41464E53`; both setup attempts remain recorded without replay.
+
+The changed combined native scenario at `build/v3-console-combined-native-01/`
+passes 54 records with disk and cartridge games. Both render complete title
+screens, execute native Reset with required RAM retained, and complete the
+native cleanup hook after audio shutdown with no CPU fault. Disk work RAM
+advances between observations. Test-only menu/return requests reach the actual
+native call sites; the test does not synthesize successful core registers.
+Cleanup stops before loading an uninitialized world, then restores the isolated
+checkpoint. Ordinary controller input, room entry/world return, saved-game reload,
+audible quality, and hardware remain unverified. See the
+[console checkpoint](../docs/checkpoints/V3_CONSOLE_ROOM.md).
 
 ### Shared room/profile binding
 
