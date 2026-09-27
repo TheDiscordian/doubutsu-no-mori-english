@@ -93,6 +93,12 @@ u32 af_v3_equipment_vrom(int index) {
 }
 
 #ifdef AF_V3_PLAYER_MOTION
+#ifndef AF_V3_PLAYER_CAPACITY
+#define AF_V3_PLAYER_CAPACITY 3848u
+#endif
+#ifndef AF_V3_PLAYER_RESOURCE_END
+#define AF_V3_PLAYER_RESOURCE_END 0x025F0000u
+#endif
 #ifdef __mips__
 #define player_bounds ((const u32 *)0x8010BD20u)
 #define player_header ((const u32 *)0x804A4340u)
@@ -112,9 +118,9 @@ static const Resource *player_imported(int index) {
     if (slot>=157u || player_header[0]!=0x4146504Du || player_header[1]!=1u
             || player_header[2]!=157u || player_header[3]!=16u) return 0;
     const Resource *row=(const Resource *)(player_header+4)+slot;
-    if (row->vrom<0x02200000u || row->vrom>=0x025F0000u || (row->vrom&15u)
-            || row->bytes<32u || row->bytes>3848u || (row->bytes&15u)
-            || row->bytes>0x025F0000u-row->vrom || row->type>4u
+    if (row->vrom<0x02200000u || row->vrom>=AF_V3_PLAYER_RESOURCE_END || (row->vrom&15u)
+            || row->bytes<32u || row->bytes>AF_V3_PLAYER_CAPACITY || (row->bytes&15u)
+            || row->bytes>AF_V3_PLAYER_RESOURCE_END-row->vrom || row->type>4u
             || row->pointer<0x06000000u || (row->pointer&3u)
             || row->pointer-0x06000000u>row->bytes-20u) return 0;
     return row;

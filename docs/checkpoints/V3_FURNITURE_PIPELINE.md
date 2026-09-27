@@ -1,5 +1,79 @@
 # Automatic furniture pipeline checkpoint
 
+## Installed exercise motions and prepared player action
+
+The shared player-action refresh produces ABI 274 at
+`build/v3-player-exercise-resources-03/build-lock.json`.
+ROM SHA-256: `bad8b00bf461a7132d8c0214e9ebb06c6a3900048e59e1780a3f37baf51d7e8e`.
+UPS SHA-256: `bd9821ee63cc93e2b84b154d7a0af771743fdfac50dbbc89634d33f7242fb457`.
+The stable patchers, V2 files, main lock, existing saves, and 162 experimental
+choices remain unchanged. Saved format 4 is retained, without a new compatibility
+or hardware claim. The radio remains inactive.
+
+All twelve donor exercise animations are installed using the existing player
+loader and sparse identity scheme: donor indices 144–155 become 274–285. Their
+complete 26-joint conversions total 23,568 bytes. Eleven last 81 frames, while
+TAISOU3 retains all 161 frames and 4,848 bytes. Complete eye/mouth source tables
+contain null entries for this category; the existing 213 expression bytes and
+neighbouring password bootstrap are preserved. No registered action changes.
+
+The actual maximum-size reader at `800B11F8` scans 287 sparse original/imported
+indices instead of only the original 130. Its native cache starts at zero.
+Both bank registrations at `800C5C48/800C5C50` use that maximum through `800B190C`.
+The full allocation helper, transfer routine, and player cache-copy consumer
+are checked against the original. Their two aligned banks grow by 992 bytes
+each; the containing scene arena grows from 608,704 to 610,688 bytes. Only three
+core words change. Shared player readers retain all public symbol addresses,
+accept 4,848-byte motions, and use the checked expanded VROM limit `02800000`.
+Existing resource content, room code, callbacks, saved fields, and profiles match
+the preceding proposal. Native execution of the larger banks is not claimed.
+
+The converted action core retains the eight-command ring, repeated-command hold
+timeout, all 18 gestures, six-tick extension window, wait chaining/reset,
+animation selection, tempo easing, late recognition, priority/bee settlement,
+chained requests, and wait exit. Complete tables are resolved from donor REL
+pointers, not independently maintained gesture data. Twenty-one source helpers
+are pinned. N64 C-button directions/diagonals substitute the GC C-stick; opposite
+pairs cancel. Tempo preserves the donor's counter-wrap convention. The native
+adapter still needs real eligibility/input/camera/audio readers and source-rate
+updates; no native action is registered by this batch.
+
+The prepared VR4300 core is 1,532 bytes, SHA-256
+`1a82c6324f3b7cddfae155bd668e136ad3c9bfcda3c6df8bdf1820f55cf174b2`.
+It links at zero solely for preparation, not as a claimed resident address.
+Actual placement must respect existing tool motion starting at `804A5A50` and
+all other shared module reservations. Per-player transient storage also requires
+checked lifetime/initialization; the current actor allocation is `13B0` bytes.
+
+Verification: the four checks in `tests/test_v3_player_exercise.py` pass across
+focused runs. The sanitized host comparison executes actual donor functions
+for 45,976 command, recognition, timing, and transition comparisons; it also
+checks C-button mapping and reset/setup. Shared resource readers pass with the
+new limits. Installed-source/data comparisons retain all complete motions and
+existing resources, check exact allocation changes and UPS reconstruction, and
+retain saved state. Four private browser/offline compositions agree (empty,
+all, category, and existing-villager selections). These checks do not establish
+native execution, skeletal/GPU appearance, audio synthesis, a new save cycle, or
+hardware behaviour. Unchanged music tests are retained, not replayed.
+
+The first composition-test invocation omitted the existing helper's `out`
+attribute. Its single corrected retry passes; no further fixture work is needed.
+Build attempts 01/02 stop before cartridge publication on implementation guards:
+the newer audio sequence invalidates retired-tail reuse, and code occupies part
+of the older face reservation. The shared allocator now appends when the old
+tail proof is inapplicable; face extension preserves unrelated bytes. Build 03
+contains both corrections. These are implementation corrections, not native
+crashes or passed gameplay tests.
+
+Next: register the complete native player interaction using this proposal,
+reusing the installed motions and converted core. Bind wait setup/frame/end,
+action 111, eligible-room/current-BGM/held-item rules, C-button/camera handling,
+actual audio counters/tempo, source-rate timing, ordinary physics/collision/face/
+item updates, and transient initialization. Only then mark indoor exercise
+installed; original radio acquisition remains the later acquisition phase.
+Continue console launch/storage after this importing behaviour. A later held-bank
+refresh must preserve `player_motion.allocation` and the enlarged reader limits.
+
 ## Installed radio room-music lifecycle
 
 The ordinary category importer installs the aerobics radio's room lifecycle in

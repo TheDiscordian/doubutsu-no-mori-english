@@ -60,22 +60,32 @@ def reward_animation_sources(source):
             or sha256(raw)!='5954e79412efe934cb5f528e87fa3d3434677dc4aafc08c47e4ce53763c19041'
             or u32(raw,0x5C)!=0x38800080 or u32(raw,0x88)!=0x38000082 or u32(raw,0x8C)!=0x3B600082):
         raise ValueError('Changed complete source reward animation setup')
+    indices=sorted({u32(raw,0x5C)&65535,u32(raw,0x88)&65535})
+    assets,records,evidence=player_animation_sources(source,indices)
+    return assets,records,dict(setup=setup,**evidence)
+
+
+def player_animation_sources(source,indices,*,capacity=PLAYER_CAPACITY):
+    """Convert whole player-motion categories with one canonical resource format."""
+    indices=sorted(set(indices))
+    if not indices or any(type(i) is not int or not 0<=i<PLAYER_COUNT for i in indices):
+        raise ValueError('Invalid complete player animation selection')
     functions,tables,values=selector_tables(source,{
         'player_data':(0x68A44,'mPlib_Get_Pointer_Animation',48,
             '869d78d47d9b401bab78a6b6c6ede7327e07c65aec23380d7927258b7b59ebc1',5,0x1A),
         'player_part':(0x68A9C,'mPlib_Get_BasicPartTableIndex_fromAnimeIndex',44,
             'b86a74a6d599ce78aab4e428b83f87f14124396a953d3d3b5b3fd11b5f7b50bf',4,0x16)})
-    indices=sorted({u32(raw,0x5C)&65535,u32(raw,0x88)&65535});assets={};records=[]
-    if any(t['count']!=PLAYER_COUNT for t in tables.values()):raise ValueError('Changed complete reward motion tables')
+    assets={};records=[]
+    if any(t['count']!=PLAYER_COUNT for t in tables.values()):raise ValueError('Changed complete player motion tables')
     for index in indices:
         desc=animation(source,tables['player_data']['pointers'][index*4][3],joints=26)
         asset,compiled=compile_animations(source,[desc]);part=values['player_part'][index]
-        if not 0<len(asset)<=PLAYER_CAPACITY or part>=5:raise ValueError('Complete reward motion exceeds native bank/mask')
+        if not 0<len(asset)<=capacity or part>=5:raise ValueError('Complete player motion exceeds native bank/mask')
         assets[index]=asset
         records.append(dict(source_index=index,index=PLAYER_FIRST+index,bytes=len(asset),
             pointer=0x06000000+compiled['headers'][0]['native_offset'],type=part,
             sha256=sha256(asset),source=desc,compiled=compiled))
-    return assets,records,dict(setup=setup,functions=functions,tables=tables,source_indices=indices)
+    return assets,records,dict(functions=functions,tables=tables,source_indices=indices)
 
 
 def player_face_sources(source,records):
@@ -122,20 +132,23 @@ def player_face_sources(source,records):
         table_bytes=len(table),table_sha256=sha256(table),data_bytes=len(data),data_sha256=sha256(data))
 
 
-def store_player_assets(base,old,blob,core,assets,records):
+def store_player_assets(base,old,blob,core,assets,records,*,limit=END):
     """Reuse verified retired sequence tail for complete resources, then append."""
     import v3_sound_programs as sound
     moved=old['held_rig_actions']['balloon']['sequence_relocation'];retired=moved['previous']
     current=old['sound_programs']['sequence'];files=by_vrom(base)
     raw,header,physical=sound.installed_resource(base,core,'seq',current['index'])
     first=old['blob_offset']+old['bytes'];last=retired['blob_offset']+retired['bytes']
-    if (current!=moved['current'] or retired['blob_offset']!=old['blob_offset']+0xE000
-            or retired['bytes']!=20240 or retired['sha256']!=current['sha256']
+    if (retired['blob_offset']!=old['blob_offset']+0xE000
+            or retired['bytes']!=20240 or retired['sha256']!=moved['current']['sha256']
             or len(raw)!=current['bytes'] or sha256(raw)!=current['sha256'] or header.hex()!=current['header_after']
             or physical!=files[BLOB].pstart+current['blob_offset']
             or blob[current['blob_offset']:current['blob_offset']+len(raw)]!=raw
             or not 0<=first<=last<=len(blob)):
         raise ValueError('Player resources require the checked retired sequence tail')
+    # Later audio categories may replace the live sequence. Its original tail
+    # proof no longer establishes free storage, so use bounded append storage.
+    reusable=current==moved['current']
     occupied=[(r['blob_offset'],r['blob_offset']+r['bytes']) for r in
               old['records']+old['player_motion']['records']]
     occupied.append((current['blob_offset'],current['blob_offset']+current['bytes']))
@@ -143,7 +156,7 @@ def store_player_assets(base,old,blob,core,assets,records):
         asset=assets[row['source_index']];position=(first+15)&~15
         for lo,hi in sorted(occupied):
             if position<hi and lo<position+len(asset):position=(hi+15)&~15
-        recycled=position+len(asset)<=last
+        recycled=reusable and position+len(asset)<=last
         if recycled:
             a,b=files[BLOB].pstart+position,files[BLOB].pstart+position+len(asset)
             if (any(blob[position:position+len(asset)]) or any(e.pstart<b and a<(e.pend or e.pstart+e.size)
@@ -155,7 +168,7 @@ def store_player_assets(base,old,blob,core,assets,records):
         occupied.append((position,position+len(asset)))
         row.update(vrom=BLOB+position,blob_offset=position,
                    storage='retired-sequence-tail' if recycled else 'appended')
-    if BLOB+len(blob)>END:raise ValueError('Player resources exceed protected import range')
+    if BLOB+len(blob)>limit:raise ValueError('Player resources exceed protected import range')
     return dict(first=first,end=last,retired_sequence=copy.deepcopy(retired),
                 current_sequence=copy.deepcopy(current))
 

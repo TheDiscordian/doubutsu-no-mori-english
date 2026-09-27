@@ -31,9 +31,23 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
-The radio's room-music lifecycle is installed through the ordinary importer in
-ABI 273 at `build/v3-room-music-imports-04/profile-runtime/build-lock.json`, ROM
-SHA-256 `170adf7a335f7aa3a246d20d3f229089932841346758d7cc8c96437c26f0c417`.
+The current proposal is ABI 274 at
+`build/v3-player-exercise-resources-03/build-lock.json`, ROM SHA-256
+`bad8b00bf461a7132d8c0214e9ebb06c6a3900048e59e1780a3f37baf51d7e8e`.
+The shared player importer installs all twelve complete exercise motions,
+23,568 bytes, with all 26 joints and the full 161-frame long motion. Both actual
+animation banks support 4,848 bytes; their containing scene arena includes the
+corresponding 1,984-byte growth. Existing player/equipment resources, native
+animation identities, faces, registered actions, and saved format 4 are retained.
+The 18-gesture recognition, chaining, tempo, end/exit, and C-button direction core
+is converted and compiled, but not registered in the game yet. Four focused checks
+pass, including actual-donor comparisons, complete installed resources, and four
+private browser/offline compositions. Native execution and hardware are unverified.
+Next, connect the core to native wait/action, eligibility, camera, and audio-clock
+readers without rebuilding the unchanged music/artwork. See the
+[exercise checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#installed-exercise-motions-and-prepared-player-action).
+
+The radio's room-music lifecycle is installed through the ordinary importer.
 All 5,152 prepared artwork bytes are reused. Source-equivalent music reservation,
 radio/stereo exclusivity, constructor/destructor handling, source-rate note
 emission, and rotated drawing are connected. The source track and four complete
@@ -45,7 +59,7 @@ Room code uses 27,856 of 32,768 bytes; bootstrap uses 1,182 of 1,536.
 
 The radio remains unavailable: its source indoor player-aerobics interaction is
 unfinished, and its original reward route remains acquisition work. The current
-build retains 162 choices and saved format 4. Next, finish indoor exercise as part
+build retains 162 choices and saved format 4. Finish indoor exercise as part
 of importing behaviour, then continue console launch/storage. See the
 [radio lifecycle checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#installed-radio-room-music-lifecycle).
 

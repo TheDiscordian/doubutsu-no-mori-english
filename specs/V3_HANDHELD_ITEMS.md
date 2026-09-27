@@ -665,6 +665,55 @@ native limit is 130 continue to reject imported animations; action-specific
 sound needs its explicit donor timing, not an unrelated original sound table.
 This installs resource readers and masks, not player actions or selectable fans.
 
+### Shared exercise motions and player controls
+
+The normal `--refresh-runtime --player-actions` stage installs complete radio
+exercise motion dependencies after room music. `player_animation_sources` is the
+shared converter for reward and exercise motion categories; it preserves complete
+26-joint channels and source split-body/face tables. Donor indices 144–155 map to
+native extended indices 274–285. The twelve resources total 23,568 bytes. Eleven
+have 81 frames; TAISOU3 has 161 frames and occupies 4,848 bytes. No frame/channel
+reduction or native-animation substitution is permitted.
+
+Both actual animation banks use the native maximum reader at `800B11F8`.
+Its checked loop covers the complete sparse 287-index namespace, retaining its
+zero-initialized cache and every original meaning. The two registrations at
+`800C5C48/800C5C50`, the allocation helper, transfer routine, and player cache-copy
+consumer remain intact. Both banks hold 4,848 bytes. Accounting for 16-byte
+alignment, their containing scene arena grows by 1,984 bytes to 610,688 bytes.
+`player_motion.allocation` records these changes independently of held-model bank
+growth. A later held-bank resize must preserve this additional animation budget.
+Do not restore an older equipment-only arena size or reset the player-reader
+capacity/resource-bound defines during any shared-code refresh.
+
+The resource reader uses the actual checked import reservation ending at
+`02800000`. Larger virtual bounds require the existing English-resource relocation
+proof, not just a compile-time constant. Installed public helper addresses remain
+fixed. The allocator verifies the current audio sequence before placement; if the
+original retired-tail proof no longer describes that sequence, complete new
+motions use bounded append storage. Existing model, animation, and audio data
+remain untouched. Complete face discovery preserves null exercise sequences and
+the existing 213 timeline bytes without overwriting neighbouring runtime code.
+
+`player_exercise.c/.h` converts the eight-command ring, duplicate-hold timeout,
+all 18 patterns, six-tick continuation window, wait reset/chaining, animation
+selection, tempo easing, late-action recognition, settlement, and exit requests.
+`v3_player_exercise.py` derives the patterns, lengths, continuation indices,
+animations, and speeds from actual relocated source tables and verifies 21
+complete source helpers. N64 C buttons provide the donor's eight C-stick
+directions; opposite pairs cancel. Actual eligibility must disable camera changes
+only while exercise is available and must reject held items, title demos,
+movement, pickup, and tree-shake input as appropriate to the source.
+
+The core is compiled for preparation and has no installed callback or resident
+address. Its internal updates use source ticks. The native adapter must supply
+the correct update rate, real BGM tempo/audio counters, safe transient lifetime,
+wait hooks, request/setup/main/settle callbacks, and all ordinary player physics,
+collision, facial, and item updates. Do not register action 111 or mark the radio
+selectable until that integration is complete. Native execution, graphics,
+ordinary save cycles with this item, and hardware remain unverified. See the
+[exercise checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#installed-exercise-motions-and-prepared-player-action).
+
 ### Kind-indexed readers
 
 `--refresh-runtime --equipment-kinds` adds the six native kind-indexed consumers

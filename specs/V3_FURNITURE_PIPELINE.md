@@ -71,6 +71,12 @@ colours. Its native growth/debug scaling is retained as a documented platform
 adaptation, not claimed to reproduce the donor particle trajectory exactly.
 
 The source indoor player-aerobics interaction remains required importing work.
+The shared player-action refresh installs its complete twelve-motion category,
+including the 161-frame motion, and expands both native animation banks plus their
+containing arena. The converted gesture/chaining/tempo core remains unregistered;
+native controls, wait/action dispatch, eligibility, camera, and timing integration
+must be complete before publishing an installed-interaction binding. See
+[exercise motions](V3_HANDHELD_ITEMS.md#shared-exercise-motions-and-player-controls).
 Room music alone cannot make this item eligible for selection. The eligibility
 guard retains that concrete missing behaviour; original acquisition remains a
 separate requirement. See the

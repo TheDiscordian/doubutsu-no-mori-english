@@ -12,6 +12,7 @@ import zlib
 import v3_save_rewards
 import v3_balloon_actor
 import v3_balloon_release
+import v3_player_exercise
 
 from aflib import CODE_RAM, CODE_VROM, by_vrom, sha256, u32
 from v3_asset_loader import BLOB, ROOT, compile_part
@@ -95,6 +96,7 @@ SOURCES+=('tools/v3_event_text.py','tools/v3_camper_text.py',
 SOURCES+=v3_save_rewards.SOURCES
 SOURCES+=v3_balloon_actor.SOURCES
 SOURCES+=v3_balloon_release.SOURCES
+SOURCES+=v3_player_exercise.SOURCES
 SOURCES+=('overlays/v3/reward_requests.c','overlays/v3/reward_requests.ld',
           'overlays/v3/reward_wait.c','overlays/v3/reward_wait.ld',
           'overlays/v3/reward_pickup.c','overlays/v3/reward_pickup.ld',
@@ -2151,6 +2153,9 @@ def expanded_tables(source,owner,reloc,*,categories=CATEGORIES,native_count=NATI
 
 def install(base,prior,blob,core,original,output):
     old=prior.get('equipment_resources',{})
+    if (old.get('room_rigs',{}).get('music',{}).get('installed') and
+            old.get('player_actions',{}).get('balloon_menu') and not old['player_motion'].get('exercise')):
+        return v3_player_exercise.install_resources(base,prior,blob,core,original,output)
     if old.get('player_actions',{}).get('balloon_release') and not old['player_actions'].get('balloon_menu'):
         return v3_balloon_release.install_menu(base,prior,blob,core,original,output)
     if old.get('player_actions',{}).get('balloon_actor') and not old['player_actions'].get('balloon_release'):

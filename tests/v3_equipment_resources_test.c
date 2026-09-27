@@ -102,14 +102,17 @@ static void player_tests(void) {
     for(int i=0;i<6;++i) {
         rows[139]=good;
         if(i==0)rows[139].bytes=16;
-        if(i==1)rows[139].bytes=3856;
+        if(i==1)rows[139].bytes=(AF_V3_PLAYER_CAPACITY+16u)&~15u;
         if(i==2)rows[139].pointer=0x060001F0;
         if(i==3)rows[139].type=5;
-        if(i==4)rows[139].vrom=0x025EFFF0;
+        if(i==4)rows[139].vrom=AF_V3_PLAYER_RESOURCE_END-16u;
         if(i==5)rows[139].vrom+=1;
         assert(!af_v3_player_animation_size(269));
     }
     rows[139]=good;
+    rows[147]=(Resource){AF_V3_PLAYER_RESOURCE_END-0x2000u,AF_V3_PLAYER_CAPACITY&~15u,0x06000000,0};
+    assert(af_v3_player_animation_size(277)==(AF_V3_PLAYER_CAPACITY&~15u));
+    assert(af_v3_player_animation_vrom(277)==AF_V3_PLAYER_RESOURCE_END-0x2000u);
     for(int i=0;i<27;++i)af_player_fan_mask[i]=i&1;
     u8 out[29];memset(out,0xA5,sizeof(out));
     for(int i=0;i<4;++i) {

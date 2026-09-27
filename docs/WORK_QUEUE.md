@@ -21,10 +21,22 @@ prevent asset/data conversion or redirect work from an unfinished shared format.
 Incomplete gameplay stays unavailable in the selector; installing assets does
 not claim that an item is playable. Reuse unchanged passing tests throughout.
 
-Current task: finish the radio's indoor player-aerobics interaction, then continue
-console launch/storage. Indoor exercise is importing behaviour, not its later
-reward/acquisition route. Use the existing player-motion/action machinery and
-ordinary category importer; do not omit the interaction or add per-item installers.
+Current task: connect the converted exercise core to native player wait/action,
+eligibility, camera, and audio-clock readers, then continue console launch/storage.
+Indoor exercise is importing behaviour, not its later reward/acquisition route.
+All twelve full motions are installed through the shared player importer in
+ABI 274 at `build/v3-player-exercise-resources-03/build-lock.json`, ROM SHA-256
+`bad8b00bf461a7132d8c0214e9ebb06c6a3900048e59e1780a3f37baf51d7e8e`.
+Use that immutable proposal, retaining the main lock and stable deployments.
+The 18-gesture core passes actual-donor comparisons, and complete resources,
+bank/arena growth, retained saves, and four private compositions pass. Do not
+rebuild or retest the completed prefix without a relevant change. The core's
+zero-address MIPS object is preparation only: choose checked native placement,
+initialize transient state, bind source-rate updates and real audio counters,
+and register complete callbacks before marking the action installed. Action code
+space after `804A5A50` is occupied by tool motion; it is not a free reservation.
+Do not omit the interaction or add per-item installers. See the
+[exercise checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#installed-exercise-motions-and-prepared-player-action).
 The actual source entry is `Player_actor_Check_InBlockRadioExercise` in
 `local/ac-decomp/src/game/m_player_common.c_inc`, followed by command buffering,
 recognition, and action requests. Inspect the complete command/action/motion
@@ -78,9 +90,9 @@ Continue the remaining actual lifecycle and console launch/storage categories
 without per-item installers. Radio room behaviour is installed; its indoor player
 exercise remains unfinished. Reuse complete resources and shared runtime categories.
 
-The checked current proposal is ABI 273 at
-`build/v3-room-music-imports-04/profile-runtime/build-lock.json`, ROM SHA-256
-`170adf7a335f7aa3a246d20d3f229089932841346758d7cc8c96437c26f0c417`.
+The checked current proposal is ABI 274 at
+`build/v3-player-exercise-resources-03/build-lock.json`, ROM SHA-256
+`bad8b00bf461a7132d8c0214e9ebb06c6a3900048e59e1780a3f37baf51d7e8e`.
 The combined skeleton/material category imports the complete hamster cage,
 including source movement/texture timing, positioned sound, actual lottery
 availability, catalogue ordering, scoring, and official English text. Five focused
