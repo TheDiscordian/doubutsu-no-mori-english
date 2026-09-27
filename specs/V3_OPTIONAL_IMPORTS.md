@@ -114,8 +114,13 @@ The complete records require 6,528 bytes. A bounded lossless disk envelope retai
 the full town and console records within two existing save banks, with explicit
 pre-write capacity checks. Native storage, checked startup, decoded town commit,
 and individual player clearing are installed. Host safety checks, private
-composition, native synchronous/two-bank writing, and fresh-process loading pass. Console launch,
-graphics, and QD remain integration work; no console is selectable from storage
+composition, native synchronous/two-bank writing, and fresh-process loading pass.
+All nineteen compressed images, compact metadata, and a bounded physical-ROM
+reader are installed in ABI 277. Full/streamed donor comparisons and private
+composition pass. Native reads decode complete iNES/QD images with guards and
+save state intact; the scenario's later fixture-cleanup failure is recorded
+separately. Console launch, graphics, and QD execution remain integration work;
+no console is selectable from storage
 installation alone. Format-five saves require the explicit compatibility warning.
 
 The shared furniture converter prepares complete nested-model and dual-motion

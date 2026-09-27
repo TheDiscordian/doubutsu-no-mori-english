@@ -5,6 +5,7 @@ and emulator bindings must be installed before a furniture profile is enabled.
 """
 import json
 import struct
+import zlib
 
 from aflib import by_vrom, sha256, u32, verified_rom, yaz0_decode
 from apply_translation import write_new
@@ -315,6 +316,52 @@ def persistence_contract(dol):
         native_storage_installed=False, functions=functions)
 
 
+def streaming_bundle(report, bundle, archive):
+    """Keep all recipes resident, but load only the selected complete image.
+
+    Version-two entries reference 32-byte image descriptors. Their first sixteen
+    bytes are the actual image header; the rest records compressed CRC, offset,
+    and length in the separate, aligned original-Yaz0 pool, then reserved zero.
+    The entry's former flags word binds the complete uncompressed image CRC.
+    """
+    if len(bundle)!=report['bytes'] or sha256(bundle)!=report['sha256']:
+        raise ValueError('Changed complete console preparation')
+    packed_files=dict(rarc_files(archive))
+    metadata=bytearray(HEADER_BYTES+GAME_COUNT*ENTRY_BYTES);pool=bytearray();rows=[]
+    def append(raw):
+        metadata.extend(bytes(-len(metadata)%16));at=len(metadata);metadata.extend(raw);return at
+    for row in report['rows']:
+        game=row['game_index'];entry=list(struct.unpack_from('>16I',bundle,HEADER_BYTES+(game-1)*ENTRY_BYTES))
+        image=bundle[entry[4]:entry[4]+entry[5]];packed=packed_files[row['path']]
+        if (sha256(image)!=row['sha256'] or sha256(packed)!=row['packed_sha256'] or
+                yaz0_decode(packed)!=image):raise ValueError('Changed complete streamed console image')
+        pool.extend(bytes(-len(pool)%16));offset=len(pool);pool.extend(packed)
+        pool.extend(bytes(-len(pool)%16))
+        entry[3]=zlib.crc32(image)
+        entry[4]=append(image[:16]+struct.pack('>4I',zlib.crc32(packed),offset,len(packed),0))
+        entry[6]=append(bundle[entry[6]:entry[6]+entry[7]])
+        entry[8]=append(bundle[entry[8]:entry[8]+entry[9]])
+        ops=bytearray(bundle[entry[10]:entry[10]+entry[11]*OP_BYTES])
+        for i in range(entry[11]):
+            at=i*OP_BYTES;size=struct.unpack_from('>H',ops,at+2)[0];default=u32(ops,at+12)
+            if default:struct.pack_into('>I',ops,at+12,append(bundle[default:default+size]))
+        entry[10]=append(ops) if ops else 0
+        struct.pack_into('>16I',metadata,HEADER_BYTES+(game-1)*ENTRY_BYTES,*entry)
+        rows.append(dict(game_index=game,pool_offset=offset,packed_bytes=len(packed),
+            stored_bytes=(len(packed)+15)&~15,packed_sha256=sha256(packed),
+            packed_crc32=zlib.crc32(packed),image_bytes=len(image),
+            image_sha256=sha256(image),image_crc32=zlib.crc32(image)))
+    metadata.extend(bytes(-len(metadata)%16))
+    struct.pack_into('>4s7I',metadata,0,b'AFNE',2,GAME_COUNT,ENTRY_BYTES,
+        HEADER_BYTES+GAME_COUNT*ENTRY_BYTES,report['save_payload_bytes'],SAVE_HEADER_BYTES,len(metadata))
+    result=dict(format='AFV3-CONSOLE-STREAM-1',metadata_bytes=len(metadata),
+        metadata_sha256=sha256(metadata),pool_bytes=len(pool),pool_sha256=sha256(pool),
+        rows=rows,source_bundle_sha256=sha256(bundle),
+        maximum_image_bytes=max(r['image_bytes'] for r in rows),
+        native_storage_installed=False,launch_installed=False)
+    return result,bytes(metadata),bytes(pool)
+
+
 def prepare_persistence(output):
     """Compile the common executor without assigning live RAM or installing it."""
     from v3_asset_loader import ROOT, compile_part
@@ -342,6 +389,18 @@ def prepare_storage(output):
         sources={p:sha256((ROOT/p).read_bytes()) for p in files},
         capacity_failure='reject-before-output-or-flash-writes',
         native_storage_installed=False)
+
+
+def prepare_image_loader(output):
+    from v3_asset_loader import ROOT,compile_part
+    code,compiled=compile_part('console_image',output/'console_image',
+        extra_sources=('overlays/v3/console_save.c',))
+    files=('tools/v3_console_games.py','tools/v3_asset_loader.py',
+        'overlays/v3/console_image.c','overlays/v3/console_image.h','overlays/v3/console_image.ld',
+        'overlays/v3/console_save.c','overlays/v3/console_save.h')
+    return dict(compiled=compiled,bytes=len(code),sha256=sha256(code),
+        workspace_bytes=1024,linked_ram=0,native_hooks_installed=False,
+        sources={p:sha256((ROOT/p).read_bytes()) for p in files})
 
 
 def prepare(source, path, output, original_rom):
@@ -372,6 +431,11 @@ def prepare(source, path, output, original_rom):
     report['original_native_emulator'] = native_contract(original_rom)
     output.mkdir(parents=True, exist_ok=False)
     write_new(output/'games.bin', blob)
+    streaming,metadata,pool=streaming_bundle(report,blob,archive)
+    write_new(output/'games-metadata.bin',metadata)
+    write_new(output/'games-pool.bin',pool)
+    report['streaming']=streaming
+    report['streaming']['loader']=prepare_image_loader(output)
     report['persistence_core']=prepare_persistence(output)
     report['storage_core']=prepare_storage(output)
     write_new(output/'games.json', (json.dumps(report, indent=2)+'\n').encode())

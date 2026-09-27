@@ -1,5 +1,24 @@
 # Work record
 
+## 2026-09-27: complete console pool and native streaming reader
+
+- Installed all nineteen original compressed images and compact metadata through
+  the shared runtime builder. ABI 277 is
+  `build/v3-console-images-native-01/build-lock.json`; complete ROM/patch hashes
+  and continuation bindings are in the [checkpoint](checkpoints/V3_CONSOLE_IMAGES.md).
+- Added bounded selected-image decoding and the shared loaded-image save API.
+  The complete donor comparison passes 90,001 assertions. Five current-source
+  checks pass, including six-packet preload, physical ownership, retained game/
+  save resources, patch reconstruction, and four private compositions.
+- Actual native ROM transfers decode complete iNES and QD images with fifteen
+  memory comparisons passing. The initial harness rejects an upper-memory call
+  proof; its retry uses the existing jump stub and passes all image/guard/save
+  checks, then faults because cleanup mistakenly calls inside `zelda_realloc`.
+  Corrected the helper to `zelda_free`; no third run or full-scenario pass claim.
+- Existing format-five storage is unchanged; no new choice or public V3 update.
+  Continue native room launch, full graphics/game-memory allocation, common
+  frame/reset/exit saves, and QD execution. Prepared artwork remains reusable.
+
 ## 2026-09-27: native four-player console storage
 
 - Installed the common format-five storage adapter through the shared runtime

@@ -35,12 +35,21 @@ static int valid_image(const u8 *p, u32 length, u32 kind, u32 mapper) {
     return length==expected && mapper==((p[7]&240)|(p[6]>>4)) &&
         (mapper==0 || mapper==1 || mapper==4 || mapper==9);
 }
+static u32 image_crc(const u8 *p,u32 bytes) {
+    u32 v=~0u,i,b;
+    for(i=0;i<bytes;i++) {
+        v^=p[i];
+        for(b=0;b<8;b++)v=(v>>1)^(0xEDB88320u&(0u-(v&1)));
+    }
+    return ~v;
+}
 
 int af_v3_console_validate(const u8 *packet, u32 bytes) {
     u8 used[(AF_CONSOLE_PAYLOAD_BYTES+7)/8];
-    u32 game, game_bits=0, total_ops=0, extent=0;
+    u32 game, game_bits=0, total_ops=0, extent=0, version;
     if(!packet || bytes<DATA || bytes>0x800000) return AF_CONSOLE_BAD_ARGUMENT;
-    if(word(packet)!=0x41464E45 || word(packet+4)!=1 || word(packet+8)!=GAMES ||
+    version=word(packet+4);
+    if(word(packet)!=0x41464E45 || (version!=1 && version!=2) || word(packet+8)!=GAMES ||
        word(packet+12)!=STRIDE || word(packet+16)!=DATA ||
        word(packet+20)!=AF_CONSOLE_PAYLOAD_BYTES || word(packet+24)!=8 ||
        word(packet+28)!=bytes) return AF_CONSOLE_BAD_PACKET;
@@ -48,14 +57,21 @@ int af_v3_console_validate(const u8 *packet, u32 bytes) {
     for(game=0;game<GAMES;game++) {
         const u8 *e=packet+HEADER+game*STRIDE;
         u32 n=word(e+44), ops=word(e+40), bit=word(e+48), i, end=0, had_battery=0;
-        if(word(e)!=game+1 || word(e+12) || word(e+56) || word(e+60) || bit>=32 ||
+        if(word(e)!=game+1 || (version==1 && word(e+12)) || word(e+56) || word(e+60) || bit>=32 ||
            (game_bits&(1u<<bit)) || n>AF_CONSOLE_MAX_OPS ||
            (n ? !data_range(ops,n*OP_BYTES,bytes) : ops!=0) ||
-           !data_range(word(e+16),word(e+20),bytes) ||
+           !data_range(word(e+16),version==2?32:word(e+20),bytes) ||
            !data_range(word(e+24),word(e+28),bytes) ||
            !data_range(word(e+32),word(e+36),bytes)) return AF_CONSOLE_BAD_PACKET;
         if(!valid_image(packet+word(e+16),word(e+20),word(e+4),word(e+8)))
             return AF_CONSOLE_BAD_PACKET;
+        if(version==2) {
+            const u8 *descriptor=packet+word(e+16);
+            u32 packed=word(descriptor+24),offset=word(descriptor+20);
+            if((offset&15) || packed<16 || packed>0x800000 ||
+                offset>0x4000000u-((packed+15)&~15u) || word(descriptor+28))
+                return AF_CONSOLE_BAD_PACKET;
+        }
         game_bits|=1u<<bit;
         for(i=0;i<n;i++) {
             const u8 *op=packet+ops+i*OP_BYTES;
@@ -110,10 +126,10 @@ static void zelda(u8 *b) {
     }
 }
 
-int af_v3_console_open(AFConsoleSave *s, const u8 *packet, u32 bytes,
+static int open_game(AFConsoleSave *s, const u8 *packet, u32 bytes,
     u32 game, u32 player, u8 *save, u32 save_bytes,
     u8 *work, u32 work_bytes, u8 *battery, u32 battery_bytes,
-    u8 *image, u32 image_bytes) {
+    u8 *image, u32 image_bytes, u32 version) {
     const void *buffers[6]; u32 lengths[6],i,j,bit,first;
     const u8 *entry;
     int result;
@@ -123,6 +139,7 @@ int af_v3_console_open(AFConsoleSave *s, const u8 *packet, u32 bytes,
     if(!game || game>GAMES) return AF_CONSOLE_BAD_GAME;
     result=af_v3_console_validate(packet,bytes);
     if(result<0) return result;
+    if(word(packet+4)!=version)return AF_CONSOLE_BAD_PACKET;
     entry=packet+HEADER+(game-1)*STRIDE;
     if(image_bytes!=word(entry+20)) return AF_CONSOLE_BAD_ARGUMENT;
     buffers[0]=s; lengths[0]=sizeof(*s); buffers[1]=packet; lengths[1]=bytes;
@@ -133,13 +150,15 @@ int af_v3_console_open(AFConsoleSave *s, const u8 *packet, u32 bytes,
         for(j=0;j<i;j++) if(overlap(buffers[i],lengths[i],buffers[j],lengths[j]))
             return AF_CONSOLE_BAD_ARGUMENT;
     }
+    if(version==2 && (!equal(image,packet+word(entry+16),16) ||
+       image_crc(image,image_bytes)!=word(entry+12)))return AF_CONSOLE_BAD_PACKET;
     /* All error exits precede writes. Never reuse another player's save bytes. */
     fill((u8 *)s,0,sizeof(*s));
     s->packet=packet; s->operations=word(entry+44)?packet+word(entry+40):0;
     s->operation_count=word(entry+44); s->image_bytes=image_bytes;
     s->save=save+player*AF_CONSOLE_PLAYER_BYTES;
     s->work=work; s->battery=battery; s->image=image;
-    copy(image,packet+word(entry+16),image_bytes);
+    if(version==1)copy(image,packet+word(entry+16),image_bytes);
     bit=1u<<word(entry+48); first=!(word(s->save+4)&bit);
     put(s->save+4,word(s->save+4)|bit);
     for(i=0;i<s->operation_count;i++) {
@@ -155,6 +174,21 @@ int af_v3_console_open(AFConsoleSave *s, const u8 *packet, u32 bytes,
     }
     s->active=ACTIVE;
     return first ? 1 : 0;
+}
+
+int af_v3_console_open(AFConsoleSave *s, const u8 *packet, u32 bytes,
+    u32 game, u32 player, u8 *save, u32 save_bytes,
+    u8 *work, u32 work_bytes, u8 *battery, u32 battery_bytes,
+    u8 *image, u32 image_bytes) {
+    return open_game(s,packet,bytes,game,player,save,save_bytes,work,work_bytes,
+        battery,battery_bytes,image,image_bytes,1);
+}
+int af_v3_console_open_loaded(AFConsoleSave *s, const u8 *packet, u32 bytes,
+    u32 game, u32 player, u8 *save, u32 save_bytes,
+    u8 *work, u32 work_bytes, u8 *battery, u32 battery_bytes,
+    u8 *image, u32 image_bytes) {
+    return open_game(s,packet,bytes,game,player,save,save_bytes,work,work_bytes,
+        battery,battery_bytes,image,image_bytes,2);
 }
 
 int af_v3_console_frame(AFConsoleSave *s, int reset) {

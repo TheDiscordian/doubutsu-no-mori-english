@@ -25,7 +25,7 @@ typedef struct {
     unsigned char score_state[AF_CONSOLE_MAX_OPS];
 } AFConsoleSave;
 
-/* Validates the full nineteen-game packet and all disjoint recipe ranges. */
+/* Validates the full v1 packet or compact v2 metadata and disjoint recipes. */
 int af_v3_console_validate(const unsigned char *packet, unsigned int bytes);
 /* Loads the complete game image and applies first-play/returning-player data.
  * On failure neither the context nor any supplied buffer changes. The save
@@ -33,6 +33,17 @@ int af_v3_console_validate(const unsigned char *packet, unsigned int bytes);
  * and byte 0x65F of each player remain owned by the surrounding codec. */
 int af_v3_console_open(AFConsoleSave *state,
     const unsigned char *packet, unsigned int packet_bytes,
+    unsigned int game, unsigned int player,
+    unsigned char *save, unsigned int save_bytes,
+    unsigned char *work, unsigned int work_bytes,
+    unsigned char *battery, unsigned int battery_bytes,
+    unsigned char *image, unsigned int image_bytes);
+/* Version-two metadata contains checked headers and image CRCs, not all game
+ * bodies. The loader supplies one complete writable image. Its CRC is checked
+ * before any context/save/work/battery/image mutation. All other semantics and
+ * lifetimes match open; this never treats a header-only packet as a full image. */
+int af_v3_console_open_loaded(AFConsoleSave *state,
+    const unsigned char *metadata, unsigned int metadata_bytes,
     unsigned int game, unsigned int player,
     unsigned char *save, unsigned int save_bytes,
     unsigned char *work, unsigned int work_bytes,

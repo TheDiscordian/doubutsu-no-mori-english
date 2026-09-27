@@ -1383,6 +1383,12 @@ def main():
                 if not args.seed_save or args.seed_state or args.allow_test_flash_write:
                     raise ValueError('V3 warning probe requires only a disposable cartridge seed')
                 results.append(verify(debug, args.rom, args.seed_save))
+            if action.get('test_v3_console_images'):
+                from v3_console_image_smoke import exercise
+                if not (out/'test.bs1').is_file() or args.seed_save or args.allow_test_flash_write:
+                    raise ValueError('Console image probes require a checkpoint and blank isolated storage')
+                needs_checkpoint_restore = True
+                results.append(exercise(debug,args.rom,record))
             if 'test_v3_save_runtime' in action:
                 from v3_save_runtime_smoke import exercise
                 mode = action['test_v3_save_runtime']

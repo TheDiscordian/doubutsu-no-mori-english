@@ -60,6 +60,14 @@ implementation still compiles with warnings treated as errors.
 
 ## Required continuation
 
+The current cartridge is ABI 277 at
+`build/v3-console-images-native-01/build-lock.json`. Its
+[streaming reader](V3_CONSOLE_IMAGES.md) installs the complete compressed game
+pool and compact metadata, with actual native iNES/QD decode evidence. It links
+the shared version-two open API without duplicating per-game save logic. Reuse
+these installed resources for launch/frame/exit integration; do not rebuild the
+earlier full-packet-only executor or rerun its unchanged checks.
+
 Native format-five storage is installed and verified in ABI 276 at
 `build/v3-console-storage-native-04/build-lock.json`. See the
 [storage checkpoint](V3_CONSOLE_STORAGE.md) for complete hashes, compatibility,

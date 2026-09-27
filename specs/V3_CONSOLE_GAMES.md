@@ -67,6 +67,23 @@ The binary preparation format is big-endian:
 - Complete images, original/converted tags, operations, and default bytes use
   sixteen-byte-aligned packet offsets. No game resource is shortened to fit.
 
+The installed streaming representation uses version two. It retains the same
+header, nineteen entries, all original/converted tags, and all sixty operations.
+Entry word three contains the full decoded image CRC instead of zero flags;
+entry word four points to a local 32-byte image descriptor instead of a body.
+The descriptor contains the actual first sixteen image bytes, compressed CRC,
+offset and exact length in the separate game pool, and a reserved zero word.
+Offsets to tags, operations, and defaults remain local to the compact metadata.
+Game-pool entries retain the complete original Yaz0 sources with sixteen-byte
+alignment. Pool alignment bytes are not included in each compressed CRC.
+
+Metadata occupies 6,336 bytes; the complete compressed pool occupies 770,144.
+Only the selected full game is decoded, using a 1,024-byte input workspace.
+Wario's Woods needs the largest image buffer: 524,304 bytes. Decoder bounds,
+Yaz0 header, both CRCs, exact image length, and actual image header are checked.
+Read failures or malformed data may change private output/workspace, never the
+metadata or saved records; callers must not bind failed output to an emulator.
+
 ## Shared persistence executor
 
 `overlays/v3/console_save.c` executes the complete prepared recipes. The ordinary
@@ -75,13 +92,16 @@ there are no per-title installers. The standalone core is zero-linked preparatio
 The native storage packet also links it for later launch/frame/exit integration;
 linking does not install those game hooks or make a console selectable.
 
-`af_v3_console_validate` checks the entire packet, image sizes/headers/mappers,
+`af_v3_console_validate` checks the entire v1 packet or v2 metadata, image sizes/headers/mappers,
 all sixty operations, unique game-save bits, and disjoint saved ranges. Open
 validates buffer sizes and separation before changing anything, copies the full
 game image, and binds exactly one of four supplied player blocks. The surrounding
 save codec owns player header bytes 0–3 and the trailing padding byte; the recipe
 executor owns the played-game bits and recipe ranges. Its caller must verify
 the immutable packet's digest and retain packet/buffer lifetimes until close.
+`af_v3_console_open_loaded` accepts only version-two metadata and a complete
+already decoded image, validating its CRC before changing any supplied buffer.
+The two open APIs reject the other representation; they share all save logic.
 
 First play inserts score defaults and clears only declared battery regions;
 disk data retains the complete source image. Repeat play loads all battery/disk
@@ -91,15 +111,45 @@ restores saved scores, then follows changes. Reset honours each HSC preserve bit
 Close captures every battery/disk range and invalidates the transient session.
 It does not add an extra score-frame update absent from the donor's cleanup.
 
-The 3,476-byte MIPS core uses no mutable globals and no unresolved libraries.
-Its largest stack chain is open plus validate, 368 bytes. Preparation is
-`build/v3-console-games-prepared-04/`; all game/tag/default bytes match the
-earlier complete preparation. Two focused checks pass across targeted runs:
-26,695 assertions using actual donor source routines under address/undefined-
+The 3,988-byte MIPS core uses no mutable globals and no unresolved libraries.
+Its largest stack chain is open, shared open, and validate: 432 bytes. Preparation
+is `build/v3-console-games-prepared-06/`; all full game/tag/default bytes match
+the earlier complete preparation. Focused checks pass across targeted runs:
+90,001 assertions using actual donor source routines under address/undefined-
 behaviour sanitizers, and current MIPS/source/prepared-packet receipt checks.
 Coverage includes all nineteen games, four players, first/repeat launch,
 score states, reset, disk/battery/Zelda paths, malformed bounds, alias rejection,
-and unchanged output on errors. This is not native emulator or FlashRAM evidence.
+and unchanged save/context output on errors. Both complete-packet and streamed
+paths are compared. This is not native emulator or FlashRAM evidence.
+
+## Installed image storage and reading
+
+The shared runtime builder accepts `--console-images <prepared-directory>`.
+ABI 277 at `build/v3-console-images-native-01/build-lock.json` installs all
+nineteen images without enlarging the full DMA directory or moving game/audio
+resources. A hashed `physical_resources` record owns `03F43FA0..03FFFFFF` in the
+64-MiB cartridge. Shared input/output validation rejects damaged or overlapping
+allocations, including zero-filled owned bytes. Owner-tail allocation skips
+these reservations. Original image sources and full decoded hashes remain in
+the conversion receipt.
+
+The 22,528-byte startup packet at `804F9020..804FE81F` contains 5,660 linked
+code bytes, complete metadata at `804FC820`, zero padding, and an end guard.
+It is clear of the save hash workspace and the `80500000` model pool. Checked
+six-packet startup verifies the complete packet and updates instruction/data
+caches before native callers can execute it. The reader binds the verified
+physical-ROM routine at `80026500`, making aligned transfers of at most 1,024
+bytes. Its caller supplies the separate input workspace and full output buffer;
+no permanent game-image allocation or console launch is implied by this stage.
+
+Cartridge/resource checks, all twelve preload rejection paths, and four private
+browser/offline compositions pass. Native direct calls decode one complete
+iNES image and the complete QD image, with guards and save-state preservation
+passing. The combined native scenario fails afterwards in fixture cleanup;
+complete scenario success is not claimed. See the
+[streaming checkpoint](../docs/checkpoints/V3_CONSOLE_IMAGES.md) for evidence,
+the corrected helper, and remaining work. Existing format-five save code and
+both stable V2 deployments remain unchanged.
 
 ## Native integration requirements
 

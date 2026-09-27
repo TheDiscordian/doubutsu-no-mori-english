@@ -87,5 +87,17 @@ int af_v3_surface_init(void) {
     af_surface_writeback(console,AF_CONSOLE_STORAGE_BYTES);
     af_surface_invalidate(console,AF_CONSOLE_STORAGE_BYTES);
 #endif
+#ifdef AF_CONSOLE_IMAGES_VROM
+#ifdef __mips__
+    void *images=(void *)0x804F9020u;
+#else
+    extern unsigned char af_test_console_images[AF_CONSOLE_IMAGES_BYTES];
+    void *images=af_test_console_images;
+#endif
+    if (af_surface_dma(images,AF_CONSOLE_IMAGES_VROM,AF_CONSOLE_IMAGES_BYTES) ||
+            af_surface_crc(images,AF_CONSOLE_IMAGES_BYTES)!=AF_CONSOLE_IMAGES_CRC) return 0;
+    af_surface_writeback(images,AF_CONSOLE_IMAGES_BYTES);
+    af_surface_invalidate(images,AF_CONSOLE_IMAGES_BYTES);
+#endif
     return af_surface_prior_init();
 }
