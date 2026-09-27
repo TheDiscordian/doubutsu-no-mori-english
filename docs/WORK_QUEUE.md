@@ -22,9 +22,12 @@ Incomplete gameplay stays unavailable in the selector; installing assets does
 not claim that an item is playable. Reuse unchanged passing tests throughout.
 
 Current task: finish remaining genuine importing categories and representation
-mappings, using the shared converter and the current ABI-288 proposal:
-`build/v3-creature-rig-resources-01/rig-runtime/build-lock.json`.
-ROM SHA-256: `0c06c17001c78c63ef39a615be3458cbe95e3eb023518a48f2257ad430702937`.
+mappings, using the shared converter and the current ABI-289 proposal:
+`build/v3-dresser-cancel-03/build-lock.json`.
+ROM SHA-256: `627c26ced95dc84b4ce3b6c14bcdcc9525f2e7e0aa8ac54681a385d5763fe2af`.
+The dresser cancellation correction is installed in V2 and V3; empty import
+selection returns stable V2-14. Continue the importing work without replaying
+unchanged dresser or museum checks.
 
 The complete console engines, image loading, persistence, and room bindings are
 installed. Native Clu Clu Land D and Wario's Woods title execution, rendering,
@@ -63,8 +66,8 @@ Next importing work:
   because their GC-added names are missing from the older approved mapping.
 - Keep item-specific behaviours in scope alongside shared categories. Acquisition
   follows primary importing; pending rewards do not block complete asset staging.
-- Finish source acquisition and gold-tree effects/acquisition, align the empty
-  selection with V2-13, then run bounded combined checks and provide a private
+- Finish source acquisition and gold-tree effects/acquisition, then run bounded
+  combined checks and provide a private
   hardware-test build with explicit save incompatibility warnings.
 
 The existing metadata scan at `build/v3-furniture-post-plain-scan-01.json` has
@@ -72,7 +75,7 @@ The existing metadata scan at `build/v3-furniture-post-plain-scan-01.json` has
 These are metadata categories, not remaining-import counts. Review includes
 parent representations, absent/dummy resources, native counterparts, and rewards.
 Neither deployment switches to experimental V3 without user testing and approval.
-The main build lock and stable V2-13 patchers remain unchanged.
+The main build lock is unchanged; both patchers serve stable V2-14 only.
 
 The shared save executor is prepared at `build/v3-console-games-prepared-06/`:
 3,988 MIPS bytes, all sixty recipes, and four independent player blocks.

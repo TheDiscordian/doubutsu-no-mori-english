@@ -2,24 +2,24 @@
 
 ## Stable V2 publication
 
-V2-13 at `build/v2-combined-13/Animal Forest English V2.z64` combines the official
-`Animal Crossing` credits title with English `Museum` headers while editing and
-reading letters. Both the public and local patchers target this build. The
+V2-14 at `build/v2-dresser-14/Animal Forest English V2.z64` fixes B-button
+cancellation at dressers and retains the official `Animal Crossing` credits
+title and English `Museum` letter headers. Both patchers target this build. The
 publication hold applies only to experimental V3, not stable V2 fixes.
 
-Eight focused cartridge/packaging checks and eleven browser-engine checks pass.
-Silent real-browser downloads from CISO, ISO, and a Pages-style subpath all match
-the combined ROM. The trailer and poster remain unchanged. See the
-[publication checkpoint](checkpoints/V2_13_PUBLICATION.md) for hashes and limits.
+Three dresser checks, eight cartridge/packaging checks, and 29 silent native
+assertions pass. A current Chromium download using the real CISO and N64 inputs
+matches V2-14. The trailer and poster remain unchanged. See the
+[publication checkpoint](checkpoints/V2_14_DRESSER.md) for hashes and limits.
 V2 saved formats and fossil processing are unchanged; compatibility with V2-11
 and V2-12 is expected in both directions without migration. A fresh hardware
 playthrough and save cycle are not claimed. The earlier museum rendering-fixture
 comparison remains incomplete; its name-resolution and relocation evidence is
 retained, not replayed.
 
-The current imported V3 already includes both translation fixes. Its pinned
-empty-selection baseline still returns V2-12 and needs aligning with V2-13
-before a V3 handoff. This does not change the main V3 lock or publish V3.
+The current imported V3 includes the dresser, credits, and museum corrections.
+Its empty-selection baseline returns V2-14. This does not change the main V3
+lock or publish experimental V3.
 
 ## Active development
 
@@ -31,11 +31,11 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
-The current proposal is ABI 288 at
-`build/v3-creature-rig-resources-01/rig-runtime/build-lock.json`, ROM SHA-256
-`0c06c17001c78c63ef39a615be3458cbe95e3eb023518a48f2257ad430702937`.
+The current proposal is ABI 289 at
+`build/v3-dresser-cancel-03/build-lock.json`, ROM SHA-256
+`627c26ced95dc84b4ce3b6c14bcdcc9525f2e7e0aa8ac54681a385d5763fe2af`.
 It contains 167 selectable development imports and 100 complete inactive furniture
-profiles whose acquisition is pending. The main lock and both stable V2-13
+profiles whose acquisition is pending. The main lock and both stable V2-14
 deployments are retained.
 
 Four additional paintings use the ordinary shared importer: full models, original
@@ -75,8 +75,8 @@ clothing, custom-design, and fossil representations, not resource reconversion
 or obsolete test attempts. Complete genuine conversion/behaviour gaps.
 The two worksheet-mapped school-desk/bus-stop
 records require identity/artwork correspondence review, not automatic duplicate
-IDs. Then complete the actual acquisition routes and gold-tree work, align the
-no-import baseline with V2-13, and assemble a private combined playtest build.
+IDs. Then complete the actual acquisition routes and gold-tree work, and
+assemble a private combined playtest build.
 
 The retained native console lifecycle is installed in ABI 278 at
 `build/v3-console-emulator-native-01/build-lock.json`, ROM SHA-256

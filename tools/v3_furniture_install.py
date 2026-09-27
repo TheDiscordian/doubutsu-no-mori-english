@@ -977,12 +977,12 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
     if translation_updates:
         report['automatic_furniture']['resource_moves']=moved
         report['import_storage']['remaining_bytes']=limit-BLOB-len(blob)
-        report['shared_runtime_refresh'].update(adapters=['translation_headers'],
+        report['shared_runtime_refresh'].update(adapters=['translation_dresser' if report['translation_updates'].get('dresser_menu') else 'translation_headers'],
             resource_allocations_changed=True,resource_tail_reuse=reused,
             unchanged_owner_moves=moved,changed_owner_moves=owner_moves,
             in_place_owner_updates=owner_updates,additional_resident_bytes=0)
         report['sources'].update(report['translation_updates']['sources'])
-        report['native_test']='pending changed translation headers; inherited gameplay limits retained'
+        report['native_test']=report['translation_updates']['native_test']+'; inherited gameplay limits retained'
     if furniture_scoring:
         report['automatic_furniture']['resource_moves']=moved
         report['import_storage']['remaining_bytes']=limit-BLOB-len(blob)

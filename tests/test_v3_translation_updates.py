@@ -138,4 +138,58 @@ class TranslationIntegrationTests(unittest.TestCase):
         browser_tests.BrowserCompositionTests.test_browser_output_matches_authoritative_composition_for_representative_profiles(self)
 
 
+@unittest.skipUnless((ROOT/'build/v3-dresser-cancel-03/build-lock.json').is_file(), 'Current dresser integration required')
+class DresserIntegrationTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.directory=ROOT/'build/v3-dresser-cancel-03'
+        cls.pin=(composer.BASE,composer.BASE_SHA,composer.REPORT_SHA,composer.ABI)
+        composer.use_build_lock(cls.directory/'build-lock.json')
+        cls.base,cls.report=inputs(cls.directory/'build-lock.json')
+        cls.old,cls.prior=inputs(cls.directory/'base-lock.json')
+
+    @classmethod
+    def tearDownClass(cls):
+        composer.BASE,composer.BASE_SHA,composer.REPORT_SHA,composer.ABI=cls.pin
+
+    def test_exact_shared_fix_and_retained_imports(self):
+        import dresser_menu_fix as dresser
+        native=(ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes()
+        changes,receipt=dresser.resources(native,self.old)
+        before,after=by_vrom(self.old),by_vrom(self.base)
+        self.assertEqual(set(before),set(after))
+        changed={BLOB,MODULE,0x19D40,*changes}
+        for v in set(after)-changed:
+            self.assertEqual(before[v].extract(self.old),after[v].extract(self.base),hex(v))
+        for v,data in changes.items():self.assertEqual(after[v].extract(self.base),data)
+        self.assertEqual(self.report['translation_updates']['dresser_menu'],receipt)
+        self.assertEqual(self.report['save_runtime'],self.prior['save_runtime'])
+        equipment=copy.deepcopy(self.report['equipment_resources'])
+        equipment['room_rigs']['music']['binding']['owner_sha256']=self.prior['equipment_resources']['room_rigs']['music']['binding']['owner_sha256']
+        self.assertEqual(equipment,self.prior['equipment_resources'])
+        for path,digest in self.report['translation_updates']['sources'].items():
+            self.assertEqual(sha256((ROOT/path).read_bytes()),digest,path)
+        retained,tail=reuse_resource_tail(self.base,self.report,after[BLOB].extract(self.base))
+        self.assertGreater(tail['reused_bytes'],0)
+        self.assertEqual(apply_ups(native,(self.directory/'asset-loader.ups').read_bytes()),self.base)
+        with self.assertRaises(ValueError):updates.install_dresser(self.base,self.report)
+
+    def test_empty_and_selected_outputs_use_corrected_translation(self):
+        import dresser_menu_fix as dresser
+        catalogue=composer.catalogue(self.base,self.report)
+        self.assertEqual(len(catalogue),167)
+        empty,_,blob=composer.compose(self.base,self.report,catalogue,composer.resolve(catalogue,[]))
+        self.assertIsNone(blob)
+        self.assertEqual(sha256(empty),updates.DRESSER_BASELINE['sha256'])
+        all_image,_,_=composer.compose(self.base,self.report,catalogue,composer.resolve(catalogue,list(catalogue)))
+        self.assertEqual(all_image,self.base)
+        selected,_,_=composer.compose(self.base,self.report,catalogue,composer.resolve(catalogue,[next(iter(catalogue))]))
+        for v in (dresser.ROOM,self.report['translation_updates']['dresser_menu']['message_vrom']):
+            self.assertEqual(by_vrom(selected)[v].extract(selected),by_vrom(self.base)[v].extract(self.base))
+        import json
+        provenance=json.loads((ROOT/'translations/provenance.json').read_bytes())
+        row=next(r for r in provenance['entries'] if r['id']=='message:0A0B')['locales']['en']
+        self.assertEqual(row['encoded_sha256'],self.report['translation_updates']['dresser_menu']['message_sha256'])
+
+
 if __name__=='__main__':unittest.main()

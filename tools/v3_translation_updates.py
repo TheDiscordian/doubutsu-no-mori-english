@@ -13,6 +13,8 @@ import v2_museum_header_fix as museum
 ROOT = museum.ROOT
 BASELINE = dict(path='build/v2-museum-header-12-final/Animal Forest English V2.z64',
     sha256='a09373b051cbcd93991e5dd6cb17a238a2afb1e2e2d7694d75408d24a55d4eee', build='V2-12')
+DRESSER_BASELINE = dict(path='build/v2-dresser-14/Animal Forest English V2.z64',
+    sha256='0e81d5c62548c3a759cc89d63eba0975b1c336a3a941211a3000e317b9243bf2', build='V2-14')
 BOARD_SHA = '947308fd0d1df3aba78b75b57b78436b32a6ca9eaae9c789ab6a5c6b9a2a9fbe'
 READER_BOUND = 0x80198548-MODULE_RAM
 SOURCES = ('tools/v3_translation_updates.py', 'tools/letter_ui_fix.py',
@@ -22,7 +24,7 @@ SOURCES = ('tools/v3_translation_updates.py', 'tools/letter_ui_fix.py',
 def stable_reference(report):
     """Resolve a supported explicit baseline, without changing any served build."""
     row = report.get('translation_baseline')
-    if row != BASELINE:
+    if row not in (BASELINE, DRESSER_BASELINE):
         raise ValueError('Unknown corrected translation baseline')
     path = ROOT/row['path']
     if sha256(path.read_bytes()) != row['sha256']:
@@ -48,7 +50,7 @@ def patch_reader(module, gate, stable_before, stable_after):
 
 def install(base, prior, module, output):
     if 'translation_updates' in prior:
-        raise ValueError('Translation corrections already installed')
+        return install_dresser(base, prior)
     stable_path, stable_sha, stable_build = stable_reference({'translation_baseline':BASELINE})
     fixed = stable_path.read_bytes()
     before = (ROOT/'build/v2-keyboard-fit-11/Animal Forest English V2.z64').read_bytes()
@@ -112,3 +114,40 @@ def install(base, prior, module, output):
         sources={p:sha256((ROOT/p).read_bytes()) for p in SOURCES})
     return changes,dict(translation_updates=report,villager_readers=readers,
         translation_baseline=dict(path=str(stable_path.relative_to(ROOT)),sha256=stable_sha,build=stable_build))
+
+
+def install_dresser(base, prior):
+    """Carry the stable action/menu correction without changing V3 item logic."""
+    import dresser_menu_fix as dresser
+    if prior['translation_updates'].get('dresser_menu'):
+        raise ValueError('Dresser correction already installed')
+    path, _, _ = stable_reference({'translation_baseline': DRESSER_BASELINE})
+    stable = path.read_bytes()
+    native = (ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes()
+    changes, receipt = dresser.resources(native, base)
+    files = by_vrom(base)
+    # The current V3 already has the official credits title. Refuse to align an
+    # older English baseline by merely changing a receipt.
+    from textbanks import Bank
+    from credits_title_fix import TITLE
+    native_files = by_vrom(native)
+    for image in (base, stable):
+        indexed = {e.index:e for e in by_vrom(image).values()}
+        data, table = (indexed[native_files[v].index] for v in (0xD16000,0xD18000))
+        if Bank('string',data.vstart,table.vstart,data.extract(image),table.extract(image)).entries()[TITLE] != b'Animal Crossing':
+            raise ValueError('Corrected translation baseline requires official credits title')
+    before, after = sha256(files[dresser.ROOM].extract(base)), sha256(changes[dresser.ROOM])
+    updates = {key:copy.deepcopy(prior[key]) for key in
+               ('equipment_resources','furniture_behaviours','furniture_placement','translation_updates')}
+    for owner, key in ((updates['equipment_resources']['room_rigs']['music']['binding'],'owner_sha256'),
+                       (updates['furniture_behaviours']['contacts'],'native_owner_sha256'),
+                       (updates['furniture_placement'],'owner_sha256')):
+        if owner[key] != before: raise ValueError('Changed complete native room receipt')
+        owner[key] = after
+    updates['translation_baseline'] = dict(DRESSER_BASELINE)
+    stage = updates['translation_updates']
+    stage['dresser_menu'] = receipt
+    stage['changed_resources'].update(receipt['changed_resources'])
+    stage['sources'].update({p:sha256((ROOT/p).read_bytes()) for p in dresser.SOURCES+SOURCES})
+    stage['native_test'] = 'V2-14 native dresser input/cancel passed; unchanged V3 handler, V3 gameplay unverified'
+    return changes, updates

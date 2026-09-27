@@ -1,5 +1,41 @@
 # Work record
 
+## 2026-09-27: dresser B cancellation in stable V2 and experimental V3
+
+- Traced the reported issue to the original three-row storage menu and native
+  action handler. B selects last; Never mind is originally second. Moved its
+  label and action comparison together. Exactly two text bytes and one code
+  byte change; Remove, Swap, other menus, allocations, and saved formats remain.
+- V2-14 is `build/v2-dresser-14/Animal Forest English V2.z64`, SHA-256
+  `0e81d5c62548c3a759cc89d63eba0975b1c336a3a941211a3000e317b9243bf2`.
+  Original-ROM UPS reconstruction and three focused correction tests pass.
+- Native B from every row and A from every row pass. The first fixture attempt
+  omitted native BSS from its host relocation bound. One corrected retry passes
+  all 29 assertions, including actual room-handler cancellation, saved town and
+  inventory retention, guards, checkpoint restoration, and graceful shutdown.
+  No ordinary hardware playthrough or fresh save cycle is claimed.
+- Eight cartridge/Pages packaging checks pass. The browser recipe reconstructs
+  V2-14, and a silent Chromium download through port 8073 with the supplied CISO
+  and N64 inputs has the exact expected hash and no browser errors. Export:
+  `build/web-portal-08/site`. Stable main receives only the V2 correction and
+  publication files; workflow `36324394050` succeeds. Trailer/media are unchanged.
+- The existing V3 translation-update stage installs the same correction and
+  refreshes the three checked full-room receipts. Empty imports now return
+  V2-14. Current ABI 289 lock: `build/v3-dresser-cancel-03/build-lock.json`;
+  ROM SHA-256 `627c26ced95dc84b4ce3b6c14bcdcc9525f2e7e0aa8ac54681a385d5763fe2af`.
+  All 167 choices, prepared creature resources, inactive profiles, and format-five
+  persistence remain. Main ABI-109 lock is untouched; V3 is not deployed.
+- Two targeted V3 checks pass across initial and corrected invocations: complete
+  resource/UPS/source retention, repeat rejection, unchanged save state, empty,
+  all, and one-selection output, and the final dresser provenance entry. The
+  fixture initially omitted composer pinning; corrected that setup. A broad
+  catalogue check found a pre-existing missing output hash on the project save
+  capacity diagnostic, so the dresser test checks its own entry instead. Keep
+  that unrelated metadata issue recorded, not disguised as a game defect.
+- Continue creature native lifecycle/audio/parent readers and remaining import
+  categories. Do not replay this stable correction's passing tests during
+  unrelated conversion work.
+
 ## 2026-09-27: installed shared creature rig resources
 
 - ABI 288 installs sixteen complete animated objects (74,672 bytes), all reused,

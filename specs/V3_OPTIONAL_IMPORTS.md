@@ -9,11 +9,10 @@ are off by default. Existing N64 villagers, items, locations, and the translatio
 remain available; importing means adding content, not silently replacing an
 existing villager or painting a new name onto an unrelated item.
 
-Both deployed patchers serve stable V2-13, SHA-256
-`f96395426808200dc6faaac0386aec9839ddcf3a4251eaaf98f371b8029a5e68`.
-The current experimental proposal still pins V2-12 for empty selection, SHA-256
-`a09373b051cbcd93991e5dd6cb17a238a2afb1e2e2d7694d75408d24a55d4eee`.
-Align that pin with V2-13 before the V3 handoff. The import-free path must reproduce
+Both deployed patchers serve stable V2-14, SHA-256
+`0e81d5c62548c3a759cc89d63eba0975b1c336a3a941211a3000e317b9243bf2`.
+The current experimental proposal pins this same V2-14 for empty selection.
+The import-free path must reproduce
 its build's pinned translation baseline exactly. V3 development uses
 `v3/optional-imports`; it must not replace the stable V2 deployments or edit the
 published trailer. Stable V2 corrections are published to both patchers.
