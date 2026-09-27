@@ -47,6 +47,11 @@ def exercise(debug,rom_path,action,state,record):
         actual=debug.read_memory(packet['ram'],packet['bytes'])
         if actual!=blob[packet['blob_offset']:packet['blob_offset']+packet['bytes']]:
             raise ValueError('Console startup packet differs from cartridge')
+        disk=report['equipment_resources'].get('console_disk')
+        if disk:
+            p=disk['packet']
+            if debug.read_memory(p['ram'],p['bytes'])!=blob[p['blob_offset']:p['blob_offset']+p['bytes']]:
+                raise ValueError('Complete disk startup packet differs from cartridge')
         if words(0x804DC800,1)!=(0x41464335,):raise ValueError('Console storage is not initialized')
         debug.write_memory(0x80137898,bytes((game,0)))
         debug.write_memory(0x80136EA3,b'\0')
@@ -74,7 +79,7 @@ def exercise(debug,rom_path,action,state,record):
         graph_thread=graph_snapshot(debug),
         fault_context=debug.read_memory(fault,0x1B0).hex() if 0x80000400<=fault<=0x80400000-0x1B0 else None)))
     if (magic!=0x41464E45 or game!=state['game'] or player!=0 or error or not emulator or
-            header[17]!=1 or fault or base&15 or not 0x80000400<=base<=0x80400000-0x2E990):
+            header[17]!=0x41464E53 or fault or base&15 or not 0x80000400<=base<=0x80400000-0x2E990):
         raise ValueError('Native console did not reach an active healthy imported session')
     if not 0x80000400<=start<=head<=tail<=start+size<=0x80400000:
         raise ValueError('Native console game arena is out of bounds')
@@ -83,7 +88,7 @@ def exercise(debug,rom_path,action,state,record):
     entry=state['metadata'][32+(game-1)*64:32+game*64]
     values=struct.unpack('>16I',entry)
     header_at=values[4];chr_banks=state['metadata'][header_at+5]
-    graphics_bytes=max(0x25008,0x2008+(chr_banks<<13))
+    graphics_bytes=0x25008 if values[1]==2 else max(0x25008,0x2008+(chr_banks<<13))
     ranges=((image_ram,image_bytes),(emulator,0x16F90),(battery,8192),(graphics,graphics_bytes))
     for address,length in ranges:
         if not start<=address<address+length<=start+size:
@@ -93,6 +98,17 @@ def exercise(debug,rom_path,action,state,record):
             if a<b+m and b<a+n:raise ValueError('Native console buffers overlap')
     if image_bytes!=values[5] or zlib.crc32(debug.read_memory(image_ram,image_bytes))!=values[3]:
         raise ValueError('Native console image differs from the full donor image')
+    if values[1]==2:
+        context=debug.read_memory(0x80638000,0xA0)
+        disk_header=struct.unpack_from('>6I',context,0x88)
+        disk_guard=debug.read_memory(0x80646000,16)
+        record(dict(console_disk_snapshot=dict(context=context.hex(),guard=disk_guard.hex(),
+            native_frame=words(emulator+0x1A6C,1)[0],
+            native_pc=debug.read_memory(emulator+0x1B3E,2).hex())))
+        if (disk_header!=(0x51444E31,base,0,0x51444721,1,1) or
+                disk_guard!=bytes.fromhex('51444721')*4 or
+                words(base+0x80854B74-NATIVE_RAM,1)!=(65536,)):
+            raise ValueError('Native disk context, guard, audio, or complete image extent is invalid')
     work=debug.read_memory(emulator,2048)
     if 'work' in state and state['work']==work:raise ValueError('Native console work RAM did not advance')
     state['work']=work

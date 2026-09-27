@@ -1,5 +1,41 @@
 # Work record
 
+## 2026-09-27: complete disk session hooks and first native interpreter entry
+
+- The previous goal turn is progress: `a87c8e1` implements audio/DPCM bindings,
+  and `6e4fde3` installs the checked resident module and seventh preload.
+- Connected startup, full image extents, audio/DPCM, each CPU frame, normal
+  motor-controlled frame continuation, soft reset, and final save/close. The
+  combined session handlers use the reserved high code area; five checked calls
+  reuse the retained low image/save executor. Room callbacks and complete data
+  stay intact. Ten native hooks remove thirteen obsolete relocations, with
+  unrelated code/data checked at two load bases.
+- Built ABI 283 at `build/v3-console-disk-session-01/build-lock.json`, ROM SHA-256
+  `3d37a9d2fd0b3305843056a5443d8061247ca5a159425caf6f81e9930ab5f1f9`.
+  Combined module: 14,295 bytes, SHA-256
+  `801c243277dcc23d7d45e0c5b66dcdc6c13292287913dc387dcf682afd80265e`.
+- Three focused checks pass in one invocation: 117,058 sanitized session
+  assertions with the complete donor images and real save executor, installed
+  hooks/resources/UPS reconstruction, and four browser/offline compositions.
+  The host fixture stubs native CPU/PPU/audio; it verifies four-player first/
+  repeat disk entry, boot, per-frame timing, reset retention, and final capture.
+- The first silent native attempt exits on the local emulator's renamed debugger
+  settings. Added an explicit runner option and made one justified retry.
+  `build/v3-console-disk-game-native-02/` accepts signal passing, checks the
+  complete preloaded packet, and reaches the disk interpreter. Snapshot: full
+  image 65,536 bytes at `80302060`, state `80337280`, base `803ABE20`, no session
+  error, no CPU fault, active save `41464E53`, and 707,856 free arena bytes. Native
+  PC maps to interpreter `8082FA00`, emulated PC `A352` in programme RAM.
+- The retry stops because the helper wrongly expects active marker `1` instead
+  of the real core's `41464E53`. Corrected the assertion but did not replay.
+  Both setup attempts are spent. Later context/guard/frame-continuity checks,
+  checkpoint restoration, drawing, native reset/return, and hardware remain
+  unverified. The captured entry evidence is retained, not called a full pass.
+- Next connect shared console-room engine readiness to the installed disk hooks,
+  then reuse the ordinary category/profile importer and retained complete art.
+  The main lock, 163 choices, saved format five, and stable V2-13 patchers remain
+  unchanged. No disk item is exposed before its full profile/acquisition works.
+
 ## 2026-09-27: complete shared disk module reservation and startup loading
 
 - Audio work is committed/pushed as `a87c8e1`. Continue from its immutable

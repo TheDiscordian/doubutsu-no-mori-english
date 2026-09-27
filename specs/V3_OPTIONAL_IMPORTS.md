@@ -119,9 +119,13 @@ Donor C comparisons, host-adapter checks, and emitted bridge-instruction checks
 pass. The verified donor and native mixers both use five channels; no separate
 disk expansion voice is present in this donor. ABI 282 installs the complete
 checked resident packet and seventh startup preload, preserving all game assets,
-selections, and saved layouts. The prepared audio/DPCM hooks, image-extent reader,
-and lifecycle integration still need connecting. Installation does not enable
-the disk item or establish native execution.
+selections, and saved layouts. ABI 283 installs audio/DPCM, complete image extents,
+per-frame disk timing, reset, and final-save lifecycle hooks, reusing the lower
+image/save executor. Host session and cartridge/composition checks pass. Native
+preload and interpreter entry are observed, but the test's stale active-marker
+assertion prevents full scenario completion. Frame continuity, drawing, native
+reset/return, and ordinary gameplay remain unverified. Shared room readiness and
+the complete furniture profile still need binding; no disk item is selectable.
 
 The [console converter](V3_CONSOLE_GAMES.md) preserves nineteen complete game
 payloads, twenty launch bindings, and sixty persistence operations. Its common

@@ -36,23 +36,33 @@ The adapter check passes 56,205 sanitized assertions. Three focused checks pass
 across targeted runs, including all six bridges and the optional DPCM patch at
 two relocation bases. Native functions are stubbed and MIPS bridges are checked,
 not executed. Both verified mixers use five channels; this donor has no expansion
-voice. Complete checked module loading is installed in ABI 282. Next connect
-the prepared audio/DPCM hooks, the native image-extent consumer, and
-session/frame/reset/return persistence hooks. Wire the
-prepared QD initializer/reset instead of calling the unsafe native iNES paths.
-The module is resident but its game hooks are not installed or selectable; do not treat returned action flags
-as completed renderer/audio integration. See the
+voice. ABI 283 installs the complete audio/DPCM, image-extent, initialization,
+per-CPU-frame timing, reset, and final-save hooks. Three focused checks pass:
+117,058 sanitized session assertions with the actual donor image, ten installed
+hooks/thirteen removed relocations and retained resources, and four private
+compositions. Next bind the shared console-room readiness table to the installed
+disk engine, then run the ordinary category/profile importer on the retained
+complete console artwork. `v3_console_room.checked_runtime` still deliberately
+recognizes only iNES readiness; update that shared binding without changing
+identities, room callbacks, or acquisition rules. No per-game installer is needed.
+The disk game remains unavailable in the selector. See the
 [disk specification](../specs/V3_CONSOLE_DISK.md).
-The native module is 11,323 bytes, linked at `80630000`; its planned code/data/work
+The combined native module is 14,295 bytes, linked at `80630000`; its code/data/work
 range ends at `80646010`. The complete 90,128-byte packet retains separate code,
 immutable/private BIOS, boot data, context, programme/character RAM, and guard.
 All recorded resident ranges and actual model-bank bindings are checked for
 overlap. Startup is 668 of 688 bytes; further preload additions need capacity work.
 Four focused installation checks pass: full resources and retained cartridge,
 overlap refusal, all fourteen seven-packet startup failure paths, and four private
-compositions. Native preload execution remains unverified. No old scenario is replayed.
-Continue from ABI 282 at `build/v3-console-disk-resident-01/build-lock.json`,
-ROM SHA-256 `02d8e97b3a2d157a428b9bd5602467e68231c3f8baec241b61482d429be6d19a`.
+compositions. A silent native run checks the complete preload and reaches the
+disk interpreter with an active save marker, no session error, and no CPU fault.
+Its first attempt exits on renamed debugger settings; the corrected retry stops
+on the helper's wrong active marker (`1` instead of `41464E53`). The helper is
+fixed, but both attempts are spent: do not replay unchanged setup. Retain the
+snapshot and verify frame continuity, graphics, reset/return in the next changed
+combined gameplay batch. Ordinary entry and hardware stay unverified.
+Continue from ABI 283 at `build/v3-console-disk-session-01/build-lock.json`,
+ROM SHA-256 `3d37a9d2fd0b3305843056a5443d8061247ca5a159425caf6f81e9930ab5f1f9`.
 The retained allocator evidence belongs to ABI 281 at
 `build/v3-console-emulator-capacity-01/build-lock.json`,
 ROM SHA-256 `763bbcbeca77390e797039c79ee8ae83a2a7b7497b5768db81534ed0ce14a62d`.
@@ -62,7 +72,8 @@ allocates its full image and backup, leaving 130,304 arena bytes. The original
 test wait omits the room's audio handover; the corrected helper includes it and
 reaches native console audio. The debugger then stops on normal lazy FPU ownership.
 The installed `/usr/bin/ares` lacks `QPassSignals:10`; the compatible local N64
-build is `build/ares-n64-debugger/rundir/bin/ares`. Both corrected attempts are
+build is `build/ares-n64-debugger/rundir/bin/ares`, with runner flag
+`--ares-debug-settings developer`. Both corrected attempts are
 spent. Use that tool for the next changed native batch, retain graph-thread diagnostics, and
 do not repeat the unsupported-command test. Full gameplay/return and ordinary
 entry remain unverified. See the [capacity checkpoint](checkpoints/V3_CONSOLE_CAPACITY.md).

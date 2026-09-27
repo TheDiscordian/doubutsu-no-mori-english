@@ -16,12 +16,21 @@ static u32 used,calls,fail_allocation,alloc_sizes[12],init_calls,frame_calls,res
 static u32 arena_calls;
 static int valid_storage=1,fail_read;
 static u8 *state_pointer;
+#ifdef AF_CONSOLE_DISK
+AFQNative af_qdn_test_context;
+static _Alignas(16) u8 disk_memory[0x16010],native_reference[0x2E990];
+static u32 disk_cpu_calls,disk_waits,disk_events;
+#endif
 const u8 *af_test_console_metadata=meta;
 u32 af_console_test_caller=RELOCATED+0x8082E0E0u-BASE;
 static unsigned checks;
 #define CHECK(test) do {checks++;if(!(test)){fprintf(stderr,"line %d: %s\n",__LINE__,#test);abort();}} while(0)
 
 void *af_console_test_memory(u32 at) {
+#ifdef AF_CONSOLE_DISK
+    if(at==0x80638000)return &af_qdn_test_context;
+    if(at>=0x80630000 && at<0x80646010)return disk_memory+at-0x80630000;
+#endif
     if(at>=RELOCATED && at<RELOCATED+sizeof(native))return native+at-RELOCATED;
     if(at==0x804FE820u)return session_memory;
     if(at==0x804FC820u)return meta;
@@ -52,15 +61,53 @@ static void native_init(u8 *state,void *header,void *graphics,u8 *image) {
     CHECK(state==state_pointer && header && graphics && image);init_calls++;
     memset(state,0,0x16F90);memset(state+0x20A0,0xC3,8192);
 }
-static void native_frame(void *controls) {CHECK(controls==native);frame_calls++;}
+static void native_frame(void *controls) {
+    CHECK(controls==native);frame_calls++;
+#ifdef AF_CONSOLE_DISK
+    af_v3_console_cpu_frame(state_pointer);
+#endif
+}
 static void native_reset(void) {reset_calls++;memset(state_pointer+0x20A0,0xD8,8192);}
 static void native_close(void) {
     /* RSP completion happens before progress capture; simulate a final write. */
     close_calls++;state_pointer[0x20A0+2]^=0x5A;
+#ifdef AF_CONSOLE_DISK
+    if(disk_game())CHECK(qd()->magic && qd()->initialized);
+#endif
 }
 static void *native_setup(void) {setup_calls++;return native;}
 static void native_return(void *game) {CHECK(game==native);return_calls++;}
+#ifdef AF_CONSOLE_DISK
+static void native_cpu(u8 *state) {
+    CHECK(state==state_pointer);
+    if(disk_game()) {
+        CHECK(qd()->initialized && qd()->audio_initialized);
+        if(++disk_cpu_calls%2==0)qd()->disk.control|=2;
+    }
+}
+static void disk_wait(void) {disk_waits++;}
+static void disk_flush(void *p,u32 bytes) {
+    CHECK(bytes==8192 && (p==state_pointer+0x62C8 || p==qd()->graphics+0x2008));
+}
+static void disk_event(u32 at,u32 value) {
+    static const u32 expected[][2]={{0x15,0},{8,0},{0x80,0x80},{0x80,0x15},{0xD5,0},{0x10,15},{15,0x11}};
+    CHECK(at==expected[disk_events%7][0] && value==expected[disk_events%7][1]);disk_events++;
+}
+static void disk_sound_reset(void) {CHECK(disk_events && disk_events%7==0);}
+static void disk_sound_bind(void *p) {CHECK(p==disk_memory+0x10000);}
+void af_v3_qd_wdm_bridge(void) {}
+void af_v3_qd_ram_bridge(void) {}
+void af_v3_qd_read_bridge(void) {}
+void af_v3_qd_write_bridge(void) {}
+void af_v3_qd_irq_bridge(void) {}
+void af_v3_qd_dpcm_bridge(void) {}
+u8 *af_qdn_test_memory(u32 at) {return af_console_test_memory(at);}
+void *af_qdn_test_function(u32 at) {return af_console_test_function(at);}
+#endif
 void *af_console_test_function(u32 at) {
+#ifdef AF_CONSOLE_DISK
+    if(at==0x8002FE00)return disk_flush;
+#endif
     if(at==0x800C6E14)return native_return;
     if(at==0x800D17D4)return native_arena;
     switch(at-RELOCATED+BASE) {
@@ -70,6 +117,13 @@ void *af_console_test_function(u32 at) {
     case 0x8082A648:return native_reset;
     case 0x8082A10C:return native_close;
     case 0x8082D29C:return native_setup;
+#ifdef AF_CONSOLE_DISK
+    case 0x8082F09C:return native_cpu;
+    case 0x8082A070:return disk_wait;
+    case 0x808345B8:return disk_event;
+    case 0x808352D8:return disk_sound_reset;
+    case 0x80835778:return disk_sound_bind;
+#endif
     default:fprintf(stderr,"unexpected native function %08x\n",at);abort();
     }
 }
@@ -94,6 +148,13 @@ static void check_guards(void) {
 }
 static void *start(u32 game,u32 player) {
     memset(native,0,sizeof(native));memset(session_memory,0xA7,sizeof(session_memory));
+#ifdef AF_CONSOLE_DISK
+    memcpy(native,native_reference,sizeof(native));
+    u32 branch=0x08000000|((u32)(uintptr_t)af_v3_qd_dpcm_bridge>>2&0x03FFFFFF);
+    u8 *p=native+0x80833DBC-BASE;
+    p[0]=branch>>24;p[1]=branch>>16;p[2]=branch>>8;p[3]=branch;
+    memset(p+4,0,4);disk_cpu_calls=0;
+#endif
     used=calls=0;game_number=game;player_number=player;
     *native_word(0x80854A34)=0x80240000;*native_word(0x80854A38)=sizeof(arena);
     state_pointer=native_alloc(0x16F90);
@@ -163,7 +224,13 @@ static void allocation_boundaries(void) {
     CHECK(*native_word(0x80854A38)==0 && *native_word(0x80854A30)==0);
 }
 int main(int argc,char **argv) {
-    CHECK(argc==4);load_file(argv[1],meta,sizeof(meta));load_file(argv[2],pool,sizeof(pool));load_file(argv[3],full,sizeof(full));
+#ifdef AF_CONSOLE_DISK
+    CHECK(argc==6);load_file(argv[4],native_reference,sizeof(native_reference));
+    load_file(argv[5],disk_memory,sizeof(disk_memory));
+#else
+    CHECK(argc==4);
+#endif
+    load_file(argv[1],meta,sizeof(meta));load_file(argv[2],pool,sizeof(pool));load_file(argv[3],full,sizeof(full));
     CHECK(af_v3_console_validate(meta,sizeof(meta))==0);
     allocation_boundaries();
     for(u32 game=0;game<8;game++) {
@@ -217,16 +284,53 @@ int main(int argc,char **argv) {
         }
     }
     CHECK(imported_games==11 && setup_calls==8 && !return_calls);
+#ifdef AF_CONSOLE_DISK
+    u32 prior_inits=init_calls,prior_resets=reset_calls;
+    for(u32 player=0;player<4;player++)for(u32 repeat=0;repeat<2;repeat++) {
+        memcpy(saved_snapshot,players,sizeof(players));
+        void *graphics=start(10,player);u8 *image=af_v3_console_setup();CHECK(image && disk_game());
+        CHECK(session->image_bytes==65536);
+        af_v3_console_extent(image);CHECK(*global(0x80854B74)==65536);
+        CHECK(*global(0x80854B7C)==addr(image+65536));
+        af_v3_console_initialize(state_pointer,native,graphics,image);
+        CHECK(!session->error && session->save.active && qd()->initialized && qd()->audio_initialized);
+        CHECK(init_calls==prior_inits && qd()->disk.disk==image && !qd()->disk.frame_flags);
+        CHECK(session->save.operation_count==1 && session->save.operations[0]==3);
+        const u8 *op=session->save.operations;u32 from=word(op+8),to=8+word(op+4),length=(u32)op[2]<<8|op[3];
+        if(repeat)CHECK(!memcmp(image+from,players+player*AF_CONSOLE_PLAYER_BYTES+to,length));
+        CHECK(!af_v3_qd_boot(&qd()->disk));
+        qd()->disk.ready=119;qd()->disk.control=0;disk_cpu_calls=0;
+        af_v3_console_frame_native(native);
+        CHECK(disk_cpu_calls==2 && qd()->disk.ready==120 && qd()->disk.motor==88);
+        state_pointer[19]=0xA6;qd()->disk.program[44]=0x8B;qd()->disk.bios[0xEBD]=0xA9;
+        u32 waits=disk_waits;
+        af_v3_console_reset_native();
+        CHECK(reset_calls==prior_resets && disk_waits==waits+1);
+        CHECK(state_pointer[19]==0xA6 && qd()->disk.program[44]==0x8B && qd()->disk.bios[0xEBD]==0xA9);
+        for(u32 i=0;i<length;i++)image[from+i]=(u8)(i+player+repeat*17);
+        af_v3_console_close_native();CHECK(!qd()->magic && !session->magic && !session->save.active);
+        CHECK(!memcmp(players+player*AF_CONSOLE_PLAYER_BYTES+to,image+from,length));
+        for(u32 other=0;other<4;other++)if(other!=player)
+            CHECK(!memcmp(players+other*AF_CONSOLE_PLAYER_BYTES,saved_snapshot+other*AF_CONSOLE_PLAYER_BYTES,AF_CONSOLE_PLAYER_BYTES));
+        check_guards();
+    }
+#endif
     for(u32 failure_case=0;failure_case<10;failure_case++) {
         memcpy(saved_snapshot,players,sizeof(players));
         fail_allocation=(failure_case>=5&&failure_case<=8)?failure_case-3:0;
         fail_read=failure_case==4;valid_storage=failure_case!=3;
+#ifdef AF_CONSOLE_DISK
+        if(failure_case==1)disk_memory[0x16000]^=1;
+#endif
         start(failure_case==0?20:failure_case==1?10:8,failure_case==2?4:0);
         if(failure_case==9)meta[0]^=1;
         CHECK(!af_v3_console_setup());CHECK(!*global(0x80854B78));
         CHECK(!memcmp(players,saved_snapshot,sizeof(players)));
         if(failure_case==9)meta[0]^=1;
         check_guards();
+#ifdef AF_CONSOLE_DISK
+        if(failure_case==1)disk_memory[0x16000]^=1;
+#endif
     }
     valid_storage=1;fail_read=0;fail_allocation=0;
     void *graphics=start(8,0);u8 *image=af_v3_console_setup();CHECK(image);image[16]^=1;
@@ -234,6 +338,10 @@ int main(int argc,char **argv) {
     af_v3_console_initialize(state_pointer,native,graphics,image);
     CHECK(session->error==4 && failure==1 && return_calls==1 && !session->save.active);
     CHECK(!memcmp(players,saved_snapshot,sizeof(players)));af_v3_console_close_native();check_guards();
+#ifdef AF_CONSOLE_DISK
+    printf("%u disk-session checks: original/iNES routes, full QD boot, four-player repeat play, image extent, per-frame motor timing, soft reset, close capture and rejection; CPU/PPU/audio stubbed\n",checks);
+#else
     printf("%u native-adapter checks: original paths, eleven full iNES images, four players, reset, close, and rejection; CPU/PPU/audio stubbed\n",checks);
+#endif
     return 0;
 }

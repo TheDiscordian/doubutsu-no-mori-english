@@ -20,9 +20,9 @@ is WDM plus save plus validation: 192 bytes. `console_disk/disk.json` records co
 source and compiled identities. The nineteen-game bundle, compact metadata,
 and compressed image pool are identical to the retained complete preparation.
 
-The complete module is preloaded in ABI 282, not yet connected to QD game
-sessions. The current cartridge is `build/v3-console-disk-resident-01/`, SHA-256
-`02d8e97b3a2d157a428b9bd5602467e68231c3f8baec241b61482d429be6d19a`.
+The complete module and disk session hooks are installed in ABI 283.
+The current cartridge is `build/v3-console-disk-session-01/`, SHA-256
+`3d37a9d2fd0b3305843056a5443d8061247ca5a159425caf6f81e9930ab5f1f9`.
 No profile, selection, save, main-lock, or patcher deployment changes.
 
 ## Donor resources and contract
@@ -145,12 +145,10 @@ The prepared-resource check verifies MIPS/source receipts, complete BIOS/boot-st
 identity/vectors, unchanged nineteen-game resources, and explicit non-installation.
 No historical ROM or unchanged native scenario is replayed for this preparation.
 
-Remaining implementation is required: connecting the prepared
-initialization/reset/audio hooks and DPCM fetch hook, image-extent correction, complete
-save/frame/reset/return integration, and enabling the actual source furniture
-only when those dependencies work. Reuse partial native disk-register machinery
-where verified; a missing mapper-20 table entry is not an inventory of all
-native disk code. Preserve the complete source image and BIOS.
+Remaining work is the shared room-readiness binding and complete furniture
+profile/acquisition, plus native frame-continuity, drawing, reset/return, and
+ordinary gameplay verification. Installed session hooks are described below.
+Preserve the complete source image and BIOS; no substituted cartridge is used.
 
 ## Native integration bindings
 
@@ -174,8 +172,8 @@ The native reset at `8082E590` mixes common state initialization with iNES heade
 parsing, programme/vector selection, and mapper callbacks. Calling it unchanged
 on QD bytes is unsafe. The earlier initializer at `8082A6EC` also derives iNES
 sizes, and startup at `8082E194` recalculates image extents from header bytes.
-All three consumers need a real QD path; do not create a fake iNES header to get
-past one of them. Reset must still preserve native common graphics/audio setup.
+All three consumers have a QD path in the session integration; no fake iNES
+header is created. Disk reset retains native common graphics/audio state.
 
 The current code reservation below `804FB000` and gap after the room callback
 cannot hold the complete disk module. The current model-pool reservation ends
@@ -187,14 +185,10 @@ subrange. The installer validates all recorded resident ranges and actual
 model-bank bindings before appending the packet. Low-memory native game arenas
 and room resources remain unchanged.
 
-The [capacity checkpoint](../docs/checkpoints/V3_CONSOLE_CAPACITY.md) records the
-startup-test correction and incomplete native evidence. The title-state fixture
-now supplies the real room's audio handover. Its corrected launch reaches native
-console audio, where the debugger stops on recoverable lazy FPU ownership.
-The installed debugger lacks the required signal-pass capability. Both
-corrected-fixture attempts are spent. Use the compatible local build below for
-the next changed native batch, without replaying those scenarios or masking
-actual faults. No gameplay, ordinary save cycle, or original-hardware claim is made.
+The title-state fixture supplies the real room's audio handover. Use the compatible
+local build below, without replaying exhausted historical scenarios or masking
+actual faults. The retained native evidence and its limits are recorded below
+and in the [capacity checkpoint](../docs/checkpoints/V3_CONSOLE_CAPACITY.md).
 
 ## Prepared native CPU and graphics module
 
@@ -203,8 +197,10 @@ service into 11,323 bytes at `80630000`, SHA-256
 `7498fe789e39b54a075689127f43f4943402d304c02f2d57eb7d8e6c2565dd44`.
 The ordinary converter writes its source/compiler receipt to
 `console_disk_native/binding.json`. No mutable globals or unresolved calls exist.
-This module is not a standalone replacement emulator. The current cartridge
-preloads it, but no disk game session calls it yet.
+This prepared module is not a standalone replacement emulator. The installed
+14,295-byte module adds the complete session handlers while reusing the lower
+image loader and save executor. Installed code SHA-256:
+`801c243277dcc23d7d45e0c5b66dcdc6c13292287913dc387dcf682afd80265e`.
 
 Binding checks complete native state (`16F90` bytes), graphics (`6008` minimum),
 disk, programme, character, BIOS, boot, and context extents for overlap before
@@ -271,8 +267,8 @@ Four focused checks in `tests.test_v3_console_disk_install` pass: complete insta
 resources and preservation of unrelated ROM files, overlap refusal without blob
 mutation, seven-packet startup and all fourteen failure paths, and four private
 browser/offline compositions. The host preload fixture stubs DMA/cache calls;
-native preload, game launch, ordinary return, and hardware remain unverified.
-Game hooks and choices stay disabled. Format-five saves are unchanged from ABI
+native game completion, ordinary return, and hardware remain unverified.
+The session installation below adds game hooks; choices stay disabled. Format-five saves are unchanged from ABI
 281, but remain incompatible with V2 and V3 formats one through four; preserve
 backups and warn explicitly before a hardware handoff.
 
@@ -350,13 +346,81 @@ all other live registers except the original fetched-byte `t5`. It reads
 overflow wraps to `8000`, never adjacent character memory. Sample starts and
 offsets are bounded. No active disk context means the original contiguous
 cartridge reader, so this shared hook does not redirect cartridge samples.
-Session shutdown must invalidate disk context after the native audio thread stops.
+Session shutdown invalidates disk context after the native audio thread stops.
 
 The patch helper removes exactly the fetch's high/low address relocations,
 preserves all unrelated owner bytes and relocations, and checks two actual load
 bases. Without disk symbols it reproduces the retained cartridge-only owner.
-These checks and the six emitted bridges are preparation evidence, not installed
-native audio or gameplay evidence.
+These checks and the six emitted bridges do not establish native audio quality
+or complete gameplay.
+
+## Installed session lifecycle
+
+The standard `--refresh-runtime --console-emulator` command detects the resident
+disk packet and builds combined handlers in its `80630000..80635FFF` code range.
+The complete low reader/save packet, room callbacks, metadata, and its guard stay
+unchanged. Five explicitly bound shared calls reuse the checked native loader,
+metadata validator, save opener, score updater, and final capture. No save layout
+changes. The installer verifies the old full owner/relocations before rebinding
+and updates the existing disk packet and startup checksum.
+
+Ten hooks cover the six ordinary lifecycle calls, safe arena allocation, each
+CPU frame, complete image extent, and DPCM fetch. Exactly thirteen original
+relocations are removed. All unrelated relocated owner bytes are checked at two
+load bases. The image-extent replacement at `8082E194..8082E1C0` passes the live
+image to a normal C callback: original cartridges keep the original expression,
+while imports use the authenticated full size. Its two obsolete address pairs
+are removed, not left to relocate the replacement instructions.
+
+Disk initialization copies the immutable BIOS to the private copy, binds the
+complete native buffers, initializes CPU/PPU and audio, and opens the common save
+session before the native caller enables audio. QD bytes never reach the iNES
+initializer or reset. Saved disk ranges restore into the complete image before
+the first BIOS load; programme RAM is not confused with cartridge battery RAM.
+The persistent profile and all four players retain the existing format-five layout.
+
+The call at `8082A554` enters a wrapper around the original CPU-frame function.
+After each actual CPU frame it updates disk readiness/motor state using the
+native controller latch. The outer wrapper retains the donor's normal zero-flag
+behaviour: continue frames while the motor control requests loading. Per-frame
+timing is not collapsed into one update per displayed frame. Service errors or
+guard damage request the native return path and disable further save capture.
+
+Disk Reset captures the source reset recipe, waits for RSP completion, and uses
+the donor reset-button operation, retaining work/programme/character data and
+the completed BIOS patch. Exit follows the native audio-thread stop/join, waits
+for RSP completion, captures final disk save ranges, and then invalidates context
+before the native arena is released. The shared DPCM reader consequently falls
+back to ordinary cartridge data on the next non-disk session.
+
+### Session verification
+
+Three checks in `tests.test_v3_console_disk_session` pass. Sanitized execution
+performs 117,058 assertions across original and imported cartridge routes plus
+the actual QD image, four-player first/repeat entry, full boot loading, image
+extent, per-frame motor timing, soft-reset retention, close capture, guards,
+and rejection paths. Native CPU/PPU/audio are stubs. Cartridge checks verify all
+hooks/relocations, six emitted full-width bridges, current sources, complete
+code/data, retained assets, and patch reconstruction. Four private compositions
+match and retain the pinned no-import baseline.
+
+The silent native attempt `build/v3-console-disk-game-native-01/` exits before
+connection because the local emulator uses renamed debugger settings. The retry
+at `build/v3-console-disk-game-native-02/` accepts `QPassSignals:10`, verifies
+the complete preloaded disk packet, and launches game 10 through the actual
+state manager and audio handover. Its snapshot shows base `803ABE20`, full
+65,536-byte image at `80302060`, native state at `80337280`, active save marker
+`41464E53`, zero session error, and zero fault-thread pointer. The interpreter
+is executing native `8082FA00` with emulated PC `A352`; 707,856 arena bytes remain.
+These are entry/execution observations, not a complete gameplay pass.
+
+The helper incorrectly expected active marker `1`, so it stops before later
+frame/graphics/context checks or checkpoint restoration. The actual save core
+uses `41464E53`; the helper is corrected without a third attempt. Both setup
+attempts are spent. Retain this evidence, finish shared room/profile binding,
+and exercise continuity, graphics, reset/return with the next changed combined
+batch. No speaker output, ordinary room entry, saved-game reload, or hardware
+claim is made.
 
 ## Compatible local native-test emulator
 
@@ -364,8 +428,10 @@ The N64-only test executable is `build/ares-n64-debugger/rundir/bin/ares`, built
 from clean `local/ares` revision `af4cbb04f067682a8a3cf42695ff78bed634b38d`.
 Executable SHA-256:
 `4643dcbfb9ba95b4121e8f1fcb3b578b5f49c02d0835b19bb4a030d19a153c42`.
-The build completes and `--version` runs successfully. The source implements
-`QPassSignals:10`; a new native game scenario has not been run with this binary.
+The build completes and `--version` runs successfully. Native disk launch accepts
+`QPassSignals:10`. The runner requires `--ares-debug-settings developer`, because
+this build uses `Developer/DebugServerEnabled`, `Developer/DebugServerPort`, and
+`Developer/DebugServerUseIPv4` rather than the legacy setting paths.
 No system packages, system emulator, user configuration, or saves are changed.
 
 ```sh

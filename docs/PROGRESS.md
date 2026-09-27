@@ -52,14 +52,24 @@ guard are installed in ABI 282 through a checked 90,128-byte startup packet at
 `80630000..8064600F`. Four focused installation checks pass: complete resources
 and retained cartridge, overlapping-reservation rejection, seven-packet startup
 with fourteen DMA/checksum failure paths, and four private browser/offline
-compositions. Startup uses 668 of 688 bytes. Native preload execution is unverified.
-Installation of the prepared audio/DPCM hooks, image-extent correction, and lifecycle hooks remain required;
-no disk profile is enabled. A compatible local N64 test emulator is built.
+compositions. Startup uses 668 of 688 bytes.
+ABI 283 connects startup, audio/DPCM, complete image extents, per-CPU-frame disk
+timing, reset retention, and final disk-save capture. Its combined native module
+is 14,295 bytes. Three focused checks pass, including 117,058 sanitized session
+assertions, ten installed hooks/thirteen removed relocations, retained resources,
+and four private compositions. The common lower image/save code is reused.
+A silent native run verifies the complete preloaded packet and reaches the disk
+interpreter with an active save session, no session error, and no CPU fault.
+The test stops on an incorrect active-state assertion; the corrected assertion
+is not replayed. Frame continuity, graphics, native reset/return, ordinary entry,
+and hardware remain unverified. Both setup attempts are spent; continue the
+shared furniture binding, then use a changed combined batch for the remaining
+native checks. No disk profile is enabled.
 See the [disk-service specification](../specs/V3_CONSOLE_DISK.md).
 
-The current proposal is ABI 282 at
-`build/v3-console-disk-resident-01/build-lock.json`, ROM SHA-256
-`02d8e97b3a2d157a428b9bd5602467e68231c3f8baec241b61482d429be6d19a`.
+The current proposal is ABI 283 at
+`build/v3-console-disk-session-01/build-lock.json`, ROM SHA-256
+`3d37a9d2fd0b3305843056a5443d8061247ca5a159425caf6f81e9930ab5f1f9`.
 The main lock, 163 choices, format-five saved layouts, and both V2-13 deployments
 are retained. No disk game is enabled. The current proposal retains the checked
 allocator and native evidence from ABI 281 at

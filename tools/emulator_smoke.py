@@ -764,6 +764,8 @@ def main():
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--xvfb", default=os.environ.get("AF_XVFB", "Xvfb"))
     parser.add_argument("--ares", default="/usr/bin/ares")
+    parser.add_argument('--ares-debug-settings',choices=('legacy','developer'),default='legacy',
+                        help='Use the debugger setting names supported by the selected emulator build')
     parser.add_argument("--seconds", type=int, default=40)
     parser.add_argument('--expansion-pak', action='store_true', help='Enable eight MiB for an explicitly compatible test build')
     parser.add_argument("--scenario", type=Path)
@@ -871,11 +873,12 @@ def main():
             recording.configure(env)
         log = (out / "ares.log").open("wb")
         logs.append(log)
+        debug_settings=('Developer/DebugServer' if args.ares_debug_settings=='developer' else 'DebugServer/')
         command = ["timeout", "-s", "KILL", str(args.seconds+10), args.ares,
                    "--settings-file", str(settings), "--no-file-prompt", "--system", "Nintendo 64",
                    "--setting", "Audio/Driver=None", "--setting", "Audio/Mute=true",
-                   "--setting", "DebugServer/Enabled=true", "--setting", "DebugServer/UseIPv4=true",
-                   "--setting", f"DebugServer/Port={args.port}",
+                   "--setting", f"{debug_settings}Enabled=true", "--setting", f"{debug_settings}UseIPv4=true",
+                   "--setting", f"{debug_settings}Port={args.port}",
                    "--setting", f"Nintendo64/ExpansionPak={str(args.expansion_pak).lower()}", str(rom)]
         if args.seed_state:
             command[5:5] = ["--save-state", "1"]

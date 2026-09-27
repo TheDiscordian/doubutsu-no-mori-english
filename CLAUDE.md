@@ -56,6 +56,8 @@ the experimental V3 publication hold does not apply to V2 fixes.
 - `/usr/bin/ares` lacks `QPassSignals:10`, needed to pass normal libultra lazy-FPU
   exceptions in newly created native threads. Use the local N64 build at
   `build/ares-n64-debugger/rundir/bin/ares`, whose pinned source supports it.
+  Pass `--ares-debug-settings developer` to the scenario runner for that build;
+  its debugger settings use `Developer/DebugServer*`, not the older path.
   Its build instructions and identity are in `specs/V3_CONSOLE_DISK.md`.
   Do not repeat the unsupported-command probe, substitute CPU-register edits, or suppress real
   memory/illegal-instruction faults. Retain ordinary native fault checks.

@@ -1,0 +1,19 @@
+[
+  {"wait": 10},
+  {"save_state": true},
+  {"pause_game_thread": true},
+  {"command": "QPassSignals:10", "expect_result": "OK"},
+  {"test_v3_console_game": {"launch": 10}},
+  {"resume": true},
+  {"wait": 10},
+  {"command": "?"},
+  {"test_v3_console_game": {"inspect": true}},
+  {"resume": true},
+  {"wait": 4},
+  {"command": "?"},
+  {"test_v3_console_game": {"inspect": true}},
+  {"load_state": true},
+  {"command": "QPassSignals:", "expect_result": "OK"},
+  {"wait": 2},
+  {"read": ["8003CE34", 4], "expect": "00000000"}
+]
