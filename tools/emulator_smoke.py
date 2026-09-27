@@ -1191,6 +1191,12 @@ def main():
                     raise ValueError('Resident-word probes require a saved emulator checkpoint')
                 needs_checkpoint_restore = True
                 results.append(exercise(debug,action['test_resident_words'],record))
+            if action.get('test_dresser_menu'):
+                from dresser_menu_smoke import exercise
+                if not (out/'test.bs1').is_file():
+                    raise ValueError('Dresser probe requires an isolated checkpoint')
+                needs_checkpoint_restore = True
+                results.append(exercise(debug, args.rom, record))
             if 'test_v2_performance' in action:
                 from v2_performance_smoke import exercise
                 if not (out/'test.bs1').is_file():

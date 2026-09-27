@@ -1,5 +1,9 @@
 # Native storage, raffle, and offering dialogue
 
+The source draft retains original controls. The final cartridge applies the
+[dresser cancellation correction](DRESSER_CANCELLATION.md), moving Never mind…
+and its native action to the last row so B dismisses the menu.
+
 ## Complete native messages
 
 `translations/n64-storage-raffle.json` contains six complete original drafts.
