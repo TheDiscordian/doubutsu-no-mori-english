@@ -45,5 +45,23 @@ int af_v3_surface_init(void) {
     af_test_goods_magic=0;
 #endif
 #endif
+#ifdef AF_ROOM_CARRY_VROM
+#ifdef __mips__
+    void *carrying=(void *)0x804DA000u;
+#else
+    extern unsigned char af_test_carry_code[AF_ROOM_CARRY_BYTES];
+    void *carrying=af_test_carry_code;
+#endif
+    if (af_surface_dma(carrying,AF_ROOM_CARRY_VROM,AF_ROOM_CARRY_BYTES) ||
+            af_surface_crc(carrying,AF_ROOM_CARRY_BYTES)!=AF_ROOM_CARRY_CRC) return 0;
+    af_surface_writeback(carrying,AF_ROOM_CARRY_BYTES);
+    af_surface_invalidate(carrying,AF_ROOM_CARRY_BYTES);
+#ifdef __mips__
+    *(volatile u32 *)0x804DC400u=0;
+#else
+    extern u32 af_test_carry_magic;
+    af_test_carry_magic=0;
+#endif
+#endif
     return af_surface_prior_init();
 }

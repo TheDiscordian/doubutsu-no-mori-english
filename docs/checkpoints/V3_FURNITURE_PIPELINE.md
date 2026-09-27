@@ -1,5 +1,36 @@
 # Automatic furniture pipeline checkpoint
 
+## Installed moving-table owner hooks
+
+ABI 245 connects the shared carrying core to the actual native room owner,
+retaining native destination permissions and stored-item restrictions. Twelve
+checked call/count replacements and twelve removed relocations preserve all
+unrelated relocated bytes at three independently checked load addresses.
+
+- Build: `build/v3-room-carry-native-runtime-01/build-lock.json`.
+- ROM SHA-256: `bb5b52c24d31e79a63cda0f966bce952ab6f7338ea220469dc526cd0a89e7edc`.
+- UPS SHA-256: `7207416bdeff730979e5af89ddd237c47a767431c84afee623c0c5dbae5d371a`.
+- Preparation: `build/v3-room-carry-native-prepared-01/carrying.json`.
+- Native code: 6,380 bytes, SHA-256
+  `c655e1076efbef08635ffd3048c4b73f4d11e19df083f723c2bb38799bb9e0f8`.
+- Reservations: 8 KiB code at `804DA000`, 1 KiB state at `804DC400` (172 used).
+- Startup: 328 of 688 bytes; main startup and room bootstrap remain within bounds.
+
+Three focused tests in `tests.test_v3_room_carry_native` pass. The sanitizer
+check executes the actual adapter/core with a stubbed native backend: permissions,
+mixed children/loose items, translation, both rotations, parent readers, drawing,
+final snap/release, interrupted movement teardown, restoration retry, empty-table
+movement without a goods clip, and three-packet startup failure paths. Installed
+checks cover every hook, relocation, packet/CRC, retained resources, original-ROM
+UPS reconstruction, and four browser/offline compositions. Existing source-core
+comparison results are retained, not replayed.
+
+This is not native bridge execution, GPU appearance, ordinary gameplay, or
+hardware verification. Teardown restoration under an unexpected destination
+collision remains an unresolved edge case; normal movement permission reserves
+the destination. Compass dispatch is not yet connected. All 158 choices and
+format-four saved fields are unchanged. No stable deployment or main lock changes.
+
 ## Installed loose-item rotation
 
 The shared runtime builder installs the missing loose-item rotation dependency

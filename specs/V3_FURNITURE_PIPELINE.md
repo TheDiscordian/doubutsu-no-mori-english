@@ -111,8 +111,14 @@ independent code packet before the native actor chain, without growing the main
 startup or existing room bootstrap. Every shared runtime refresh retains this
 preload and the editable surface checksum field. The donor angle grid is
 transient, not a new save-format requirement.
-The carrying core is prepared but not installed; movement checks remain native
-until the owner hooks are complete. Installed-resource and host checks do not
+The carrying adapter is installed through twelve checked owner call/count
+replacements, preserving native destination permission and stored-item checks.
+It occupies `804DA000..804DBFFF` plus transient state at
+`804DC400..804DC7FF`. The shared startup loads and verifies its independent
+packet after loose-item code. Final position/angle snaps precede restoration;
+failed ordinary restoration retains the carrying state for a later retry.
+Teardown completes an accepted in-flight movement before native persistence.
+Installed-resource and host checks do not
 establish ordinary native drawing or original-hardware behaviour.
 
 Rig mode 6 uses first-word low byte 1/2/3 for these source motion kinds. Kind 3

@@ -21,7 +21,7 @@ prevent asset/data conversion or redirect work from an unfinished shared format.
 Incomplete gameplay stays unavailable in the selector; installing assets does
 not claim that an item is playable. Reuse unchanged passing tests throughout.
 
-Current task: connect shared moving-table support, then bind the compass's
+Current task: bind the compass's
 parent-sensitive needle into the ordinary importer. Registration, transforms,
 parent lookup, drawing arguments, and placement restoration are converted in
 `room_carry.c/.h`. Three focused carrying checks pass, including 90 donor
@@ -32,8 +32,12 @@ Loose-item rotation is installed in ABI 244 at
 `12e62a9ae0d433ed06765e77e05c138e6160e497d683af5c148cee7445c9513e`.
 Both native drawing paths, donor category flags, angle-grid lifetime, drop
 clearing, and checked startup loading are connected. Four focused checks pass;
-native execution/GPU appearance remain unverified. Owner movement hooks remain
-uninstalled; do not enable movement on occupied tables yet. See the
+native execution/GPU appearance remain unverified. Owner movement hooks are
+installed in ABI 245 at `build/v3-room-carry-native-runtime-01/build-lock.json`,
+ROM SHA-256 `bb5b52c24d31e79a63cda0f966bce952ab6f7338ea220469dc526cd0a89e7edc`.
+Twelve checked replacements connect occupied-table permission, carrying,
+parent-relative drawing, final restoration, and teardown. Three focused checks
+pass; native execution remains unverified. See the
 [loose-item checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#installed-loose-item-rotation)
 and the
 [carrying checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-moving-table-carrying).
@@ -64,7 +68,7 @@ sanitizers. The MIPS preparation is `build/v3-parent-needle-prepared-01/motion.j
 it is not installed. The shared planner validates complete source bindings and
 keeps the item unavailable; its complete artwork remains reusable.
 
-Next bind the converted carrying functions to the relocated room owner, its
+The converted carrying functions bind the relocated room owner, its
 push/pull/rotation calls, final movement update, and drawing. The native
 `Shop_Goods` clip retains its original eight-byte drawing/drop interface. Use the
 installed `room_goods` exports for actual grid angles and scoped single drawing;

@@ -131,6 +131,7 @@ def compile_part(part, out, extra_sources=(), defines=(), primary_source=None):
                        'room_rigs_extended': ('af_v3_room_rig_ct', 0x804C8000),
                        'room_rigs_wide': ('af_v3_room_rig_ct', 0x804D0000),
                        'room_goods': ('af_v3_goods_ctor', 0x804D9000),
+                       'room_carry_native': ('af_v3_carry_ctor', 0x804DA000),
                        'room_effects': ('af_v3_flash_init', 0x804C8000),
                        'room_reactions': ('af_v3_room_reaction_ct', 0x804C8000),
                        'room_rumble_bridge': ('af_v3_room_rumble_bridge', 0x800B11B8),

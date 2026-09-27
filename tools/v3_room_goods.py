@@ -180,11 +180,18 @@ def publish_bootstrap(equipment,blob,surface,output):
         raise ValueError('Changed resident loose-item packet')
     at=equipment['blob_offset'];module=bytearray(blob[at:at+equipment['bytes']])
     if sha256(module)!=equipment['sha256']:raise ValueError('Changed equipment before goods startup')
+    carrying=equipment.get('room_carry');extra=()
+    if carrying:
+        p=carrying['packet'];raw=blob[p['blob_offset']:p['blob_offset']+p['bytes']]
+        if sha256(raw)!=p['sha256'] or zlib.crc32(raw)!=p['crc32']:
+            raise ValueError('Changed resident carrying packet')
+        extra=(f'AF_ROOM_CARRY_VROM=0x{p["vrom"]:X}u',f'AF_ROOM_CARRY_CRC=0x{p["crc32"]:X}u',
+               f'AF_ROOM_CARRY_BYTES=0x{p["bytes"]:X}u')
     boot,compiled=compile_part('surface_bootstrap',output/'goods_surface_bootstrap',defines=(
         'AF_V3_EDITABLE_CHECKSUMS=1',f'AF_SURFACE_ITEMS_VROM=0x{items["vrom"]:X}u',
         f'AF_SURFACE_ITEMS_CRC=0x{items["crc32"]:X}u',f'AF_SURFACE_ITEMS_BYTES=0x{items["bytes"]:X}u',
         f'AF_ROOM_GOODS_VROM=0x{packet["vrom"]:X}u',f'AF_ROOM_GOODS_CRC=0x{packet["crc32"]:X}u',
-        f'AF_ROOM_GOODS_BYTES=0x{packet["bytes"]:X}u'))
+        f'AF_ROOM_GOODS_BYTES=0x{packet["bytes"]:X}u',*extra))
     if len(boot)>BOOT_END-BOOT:raise ValueError('Combined surface/goods startup exceeds its reservation')
     begin,end=BOOT-equipment['ram'],BOOT_END-equipment['ram']
     previous=items['bootstrap']['code']
@@ -194,3 +201,4 @@ def publish_bootstrap(equipment,blob,surface,output):
     items['bootstrap']['code']=compiled
     equipment.update(sha256=sha256(module),crc32=zlib.crc32(module),surface_bootstrap=copy.deepcopy(items['bootstrap']))
     goods['startup']=dict(ram=BOOT,bytes=len(boot),capacity=BOOT_END-BOOT,sha256=sha256(boot))
+    if carrying:carrying['startup']=copy.deepcopy(goods['startup'])
