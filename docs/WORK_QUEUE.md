@@ -28,16 +28,28 @@ Implement the actual alternatives and bind selections to the build receipt.
 Fish/insect population and imported coastal movement have installed controls and
 runtime alternatives; other substantial differences still need real bindings.
 
-Current implementation task: complete the connected seventeen-creature importing
-path. Field behaviours, spawning, and optional selections are installed for all
-seventeen species; connected native verification and fixes for any defects found
-remain required. Retain source season/time/terrain rules, required
-N64/GameCube choices, catching, pocket identity/icon, placing/picking up, releasing,
-collection and saved-profile readers, and optional per-species composition.
-Required species-specific behaviour is included. Native constructor execution
-has an unresolved timeout; retain it as unresolved, not a successful test.
-The creature task and native harness budget persist across intermediate changes,
-build locks, and commits. Reuse completed consumers and check the connected result.
+Current implementation task: complete the connected clothing importing category.
+The shared converter compares all 255 named donor garments with all 256 native
+images, retaining every pixel and palette entry. It prepares all eight distinct
+donor appearances; three are installed, and five need runtime integration.
+Use `build/v3-clothing-category-work-01/prepared-02/`, not a new item-by-item
+conversion. The remaining garments are fish bone shirt, fortune shirt,
+houndstooth tee, G logo shirt, and the donor puzzling-shirt variant. Keep the
+native puzzling shirt available. All five have real donor stock and catalogue
+entries. Mannequins are parent representations, not additional choices.
+Connect the whole set through shared loading, names/prices, wearing, NPC outfits,
+room placement/pickup, catalogue/scoring, stock seasons, save profiles, and
+browser/offline composition. The concrete consumer map and memory constraints
+are in [the clothing contract](../specs/V3_CLOTHING_IMPORTS.md).
+
+The connected seventeen-creature path remains unfinished at ordinary native
+gameplay/save verification. Installed field behaviours, spawning, selections,
+catching, room displays, and persistence consumers stay installed. The retained
+constructor timeout and sound-scheduler disconnection do not identify a faulting
+instruction or prove a harness cause. Keep both unresolved and the native
+harness budget exhausted; no old fixture replay is authorised by this clothing
+work. Fix any identified game defect. This does not defer required creature
+behaviours or classify their gameplay as verified.
 
 Use the shared converter and current ABI-306 proposal:
 `build/v3-creature-insects-work-01/connected-04/build-lock.json`.
@@ -68,10 +80,9 @@ guard are loaded from checked physical-ROM storage. Regenerated catalogue/shop
 owners use checked external storage, leaving 23,248 bytes of reusable item-data
 padding. Preserve these allocation and overlap checks; do not reconvert artwork.
 
-**Next consumer in the same active creature task:** resolve connected native
-gameplay and save verification, including the expanded insect scene-bank
-allocation and actual hook/catch/place/release paths. Inspect retained failure
-evidence before choosing a bounded current-build check. The fish constructor
+**Retained creature verification:** resolve connected native gameplay and save
+verification, including the expanded insect scene-bank allocation and actual
+hook/catch/place/release paths. The fish constructor
 timeout and sound-scheduler disconnection remain unclassified; do not restart
 their exhausted fixtures, reset the harness budget, or claim their later
 assertions passed. Fix actual game defects rather than bypassing them.

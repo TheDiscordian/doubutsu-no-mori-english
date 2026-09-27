@@ -1,4 +1,4 @@
-"""Convert Punchy's actual shirt and install the bounded shared resource reader."""
+"""Convert verified donor garments and retain the original shared reader installer."""
 import struct
 
 from aflib import CODE_RAM, by_vrom, sha256, verified_rom
@@ -16,7 +16,8 @@ SOURCE_SHA = 'bc35c64e7d10f51813c50f8523f1aa31a2ac54f5a3481bc5ef59b21cfd38f736'
 SOURCES = ('tools/v3_clothing.py', 'tools/v3_registry.py', 'overlays/v3/clothing.c', 'overlays/v3/clothing.h')
 
 
-def convert(native, first, rel, symbols, *, donor_item=0x24BF):
+def source_assets(native, first, rel, symbols):
+    """Read the complete category once; identities are independent of selection."""
     verified_rom(native)
     if (sha256(first), sha256(rel), sha256(symbols)) != (FIRST_SHA, REL_SHA, SYMBOLS_SHA):
         raise ValueError('Clothing conversion requires the verified English donor')
@@ -26,32 +27,47 @@ def convert(native, first, rel, symbols, *, donor_item=0x24BF):
     prices = symbol_data(rel, symbols.decode(), 'cloth_price_table')
     if tuple(map(len, (raw_textures, raw_palettes, names, prices))) != (0x20000, 0x2000, 255*16, 512):
         raise ValueError('Changed donor clothing dimensions')
-    item, index, vrom = clothing_slot(donor_item)
-    donor_index = donor_item-0x2400
+    files = by_vrom(native)
+    native_tex, native_pal = (files[v].extract(native) for v in (TEXTURES, PALETTES))
+    if (len(native_tex), len(native_pal)) != (0x20000, 0x2000):
+        raise ValueError('Changed native clothing dimensions')
+    return raw_textures, raw_palettes, names, prices, native_tex, native_pal
+
+
+def garment(assets, donor_item):
+    """One format conversion for every complete named source garment."""
+    if type(donor_item) is not int or not 0x2400 <= donor_item < 0x24FF:
+        raise ValueError('Clothing identity is outside the complete donor category')
+    raw_textures, raw_palettes, names, prices, _, _ = assets
+    donor_index = donor_item - 0x2400
     raw_tex = raw_textures[donor_index*512:(donor_index+1)*512]
     raw_pal = raw_palettes[donor_index*32:(donor_index+1)*32]
     texture, palette = pack4(untile(raw_tex, 32, 32, 4)), native_palette(raw_pal)
-    expected_name, expected = {
-        0x24BF: (b'cherry shirt    ',
-            ('bc444e2665e530c51d7049facfd29db145410854c53c4927da286ba70354b9f0',
-             '505f8de9046453227685d0ea19ea21576528b4f527404027d43e83f2d6e679a7')),
-        0x241A: (b'red aloha shirt ',
-            ('9be1b9563fbe3890a74e9c49eb59d6abb4c1e6631c1e63e031fdcb919f391768',
-             'e0ed37453e0e32b4939acfc7ebde815d40277c73c17d36eeec019213560ed79d')),
-        0x241B: (b'blue aloha shirt',
-            ('9be1b9563fbe3890a74e9c49eb59d6abb4c1e6631c1e63e031fdcb919f391768',
-             '70d36ccaccc6bb494d92586a43146bd41815807516f991c67902da0a9173eb5a')),
-    }[donor_item]
-    if (sha256(texture), sha256(palette)) != expected:
-        raise ValueError('Changed complete imported-shirt artwork')
-    files = by_vrom(native)
-    native_tex, native_pal = (files[v].extract(native) for v in (TEXTURES, PALETTES))
+    name = names[donor_index*16:(donor_index+1)*16]
+    if len(name) != 16 or not name.rstrip(b' ') or any(c < 32 or c > 126 for c in name):
+        raise ValueError('Garment lacks a complete English donor name')
+    return texture+palette, dict(donor_item_id=f'{donor_item:04X}',
+        name=name.decode('ascii').rstrip(), name_sha256=sha256(name),
+        name_source_symbol='itemName_cloth', name_source_index=donor_index,
+        price=struct.unpack_from('>H', prices, donor_index*2)[0], bytes=544,
+        donor_texture_sha256=sha256(raw_tex), donor_palette_sha256=sha256(raw_pal),
+        texture_sha256=sha256(texture), palette_sha256=sha256(palette),
+        resource_sha256=sha256(texture+palette))
+
+
+def convert(native, first, rel, symbols, *, donor_item=0x24BF):
+    assets = source_assets(native, first, rel, symbols)
+    resource, source = garment(assets, donor_item)
+    texture, palette = resource[:512], resource[512:]
+    item, index, vrom = clothing_slot(donor_item)
+    donor_index = donor_item-0x2400
+    native_tex, native_pal = assets[-2:]
     wanted = pixels(texture, palette)
     if any(wanted == pixels(native_tex[i*512:(i+1)*512], native_pal[i*32:(i+1)*32]) for i in range(256)):
         raise ValueError('Imported shirt unexpectedly aliases an existing native garment')
-    name = names[donor_index*16:(donor_index+1)*16]
-    price = struct.unpack_from('>H', prices, donor_index*2)[0]
-    if name != expected_name or index != item-0x2400:
+    name = assets[2][donor_index*16:(donor_index+1)*16]
+    price = source['price']
+    if index != item-0x2400:
         raise ValueError('Changed clothing name or fixed index assignment')
     # Native item type 3 is unused, and reviewed donor furniture ends below
     # 3400. Never claim an extended clothing record is furniture.
@@ -62,7 +78,7 @@ def convert(native, first, rel, symbols, *, donor_item=0x24BF):
     return texture+palette, record, {'donor_item_id': f'{donor_item:04X}', 'item_id': f'{item:04X}',
         'resource_index': index, 'name': name.decode('ascii').rstrip(), 'price': price,
         'vrom': f'{vrom:08X}', 'bytes': 544, 'registry_version': CLOTHING_REGISTRY_VERSION,
-        'donor_texture_sha256': sha256(raw_tex), 'donor_palette_sha256': sha256(raw_pal),
+        'donor_texture_sha256': source['donor_texture_sha256'], 'donor_palette_sha256': source['donor_palette_sha256'],
         'texture_sha256': sha256(texture), 'palette_sha256': sha256(palette),
         'resource_sha256': sha256(texture+palette), 'metadata_sha256': sha256(record),
         'original_garments_retained': 256, 'playable': False, 'save_profile_installed': False}

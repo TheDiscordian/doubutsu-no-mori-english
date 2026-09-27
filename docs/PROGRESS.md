@@ -38,6 +38,21 @@ It contains 184 independently selectable development imports, including all nine
 fish and eight insects, and 100 inactive furniture profiles whose acquisition
 is pending. The main lock and both stable V2-14 deployments are unchanged.
 
+The active implementation batch completes clothing importing. The shared
+converter accounts for all 255 donor garments: 247 existing native appearances,
+seven additive appearances, and one donor variant. Three distinct appearances
+are already installed; five remain to connect to runtime and selection.
+Complete category output is `build/v3-clothing-category-work-01/prepared-02/`.
+It retains all eight complete textures/palettes, official names and prices,
+source seasons, catalogue identities, and reversible mannequin relationships.
+The furniture scan routes mannequins to their carried parents instead of using
+stale display names or requesting an independent furniture conversion. The five
+additional names have official credits in `translations/provenance.json`.
+Five focused checks cover all source pixels/palettes, current installed-resource
+preservation, real stock seasons, parent routing, and damaged-input rejection.
+This prepares the whole category; it does not install or enable the five new
+garments. See [the connected consumer map](../specs/V3_CLOTHING_IMPORTS.md).
+
 The complete insect category is installed together: six full donor programs,
 calendar/habitat/group spawning, collision, the ground ant colony, field sounds
 and water/mud effects, player rock/dig/tree events, mosquito responses, both full
@@ -71,8 +86,8 @@ Valid older saves migrate forward; V2 and earlier V3 builds cannot load its new
 saves. Preserve backups. Native scene-bank capacity, ordinary creature gameplay,
 save/reload, and hardware remain unverified. The fish constructor timeout and
 sound-scheduler disconnection remain unresolved, not waived or labelled harmless.
-The active creature task continues with those connected native consumers and any
-real defects found, without restarting exhausted fixtures. This is an experimental
+The creature path still requires those native consumers and fixes for any real
+defects found, without restarting exhausted fixtures. This is an experimental
 development build, not a playtest handoff or deployment approval. See the
 [insect contract](../specs/V3_CREATURE_ITEMS.md#added-insect-behaviour-programs).
 

@@ -64,6 +64,17 @@ prices are installed inactive, with separate acquisition/catalogue/scoring flags
 Subsequent scans skip installed profiles. Later acquisition promotion verifies
 and reuses the same complete model instead of appending another copy.
 
+### Clothing parents and mannequin forms
+
+`convert --representation clothing --assets-only` compares the complete donor
+garment category against original N64 artwork and prepares every distinct
+appearance together. Source names, prices, stock seasons, catalogue entries,
+and reversible display identities accompany the textures and palettes.
+The furniture scan routes mannequin records to their carried garment parents;
+stale furniture-table names do not create independent item identities. The
+[clothing contract](V3_CLOTHING_IMPORTS.md) records prepared resources and the
+remaining connected runtime work. Preparation does not enable new choices.
+
 ### Profile-owned creature resources
 
 The shared profile reader accepts complete source-owned rotational rigs as well

@@ -24,7 +24,7 @@ from v3_registry import FURNITURE, LEGACY_FURNITURE, furniture_identity, furnitu
 from v3_room_aliases import discover as room_aliases, pending_reason as room_alias_reason
 from v3_villager_art import native_palette, normalise_vertex_flags
 
-VERSION = 36
+VERSION = 37
 PENDING_MOVE_CATEGORY = 'static-models-pending-move'
 PENDING_SEQUENCE_CATEGORY = 'constant-model-sequence-pending-lifecycle'
 SELECTED_PALETTE_CATEGORY = 'selected-palette-fade-assets'
@@ -1329,14 +1329,25 @@ def metadata(source, item, profile, identity):
 
 def scan(source, worksheet, installed=None, *, selected=()):
     from v3_furniture_rigs import estimated_suffix
+    from v3_clothing_batch import representations as clothing_representations
     installed = set(FURNITURE) if installed is None else set(installed)
     alias_catalogue = room_aliases(source)
     aliases = {int(row['display_item_id'],16):row for row in alias_catalogue['rows']}
+    clothes = clothing_representations(source)
     result = []
     for item, identity in sorted(identity_rows(worksheet,extra_items=aliases,include_unmapped_legacy=True).items()):
         if selected and f'{item:04X}' not in selected:continue
         row = dict(item_id=f'{item:04X}', name=identity[1].get('J'), installed=item in installed,
                    asset_ready=False)
+        if item in clothes:
+            if row['installed']:
+                raise ValueError('Clothing mannequin is incorrectly installed as independent furniture')
+            parent=clothes[item]
+            row.update(status='parent-representation', name=parent['parent_name'],
+                parent_representation=parent,
+                reason='Clothing mannequin; use the shared clothing category and its parent selection.')
+            result.append(row)
+            continue
         try:
             profile, body, resources, offsets, models, commands, sections = prepare(source, item)
             # Prepared batches also require a real, unambiguous donor identity.
@@ -1716,8 +1727,8 @@ def main():
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--select', action='append', default=[], help='Canonical donor ID; defaults to all supported new furniture')
     parser.add_argument('--category', help='Restrict to a discovered shared category, without an item list')
-    parser.add_argument('--representation', choices=('furniture','handheld','scenery','audio','rewards','lifecycle','surfaces','console','creatures'), default='furniture',
-                        help='Discover furniture, held equipment, scenery, audio, rewards, lifecycles, surfaces, console games, or field creatures')
+    parser.add_argument('--representation', choices=('furniture','handheld','scenery','audio','rewards','lifecycle','surfaces','console','creatures','clothing'), default='furniture',
+                        help='Discover furniture, equipment, scenery, audio, rewards, lifecycles, surfaces, console games, creatures, or clothing')
     parser.add_argument('--donor-disc', type=Path, default=ROOT/'local/gamecube/Animal Crossing (USA, Canada).ciso',
                         help='Verified English GameCube disc for console-game preparation')
     parser.add_argument('--assets-only', action='store_true',
@@ -1727,6 +1738,10 @@ def main():
         help='Reuse a verified artwork bundle without recompilation; repeat for multiple bundles')
     args = parser.parse_args(); output = args.output.resolve()
     if args.assets_only and args.command != 'convert': parser.error('--assets-only requires convert')
+    if args.representation=='clothing' and (args.command=='import' or args.select
+            or args.category not in (None,'clothing-appearances')
+            or args.command=='convert' and not args.assets_only):
+        parser.error('Clothing preparation retains the complete category; use convert --assets-only')
     if args.representation=='audio' and args.command!='convert':
         parser.error('Audio preparation requires convert --assets-only; dispatch/allocation integration is unfinished')
     if args.representation=='lifecycle' and (args.command!='convert' or not args.assets_only):
@@ -1747,6 +1762,21 @@ def main():
     if output.exists() or not output.is_relative_to(ROOT/'build'): raise ValueError('Use a fresh ignored build path')
     source = Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
                     (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    if args.representation=='clothing':
+        from v3_clothing_batch import discover as discover_clothing, convert as convert_clothing
+        from v3_villager_text import read_text_donor
+        from v3_furniture_install import inputs
+        native=(ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes()
+        first=read_text_donor(args.donor_disc)
+        worksheet=ROOT/'build/item-identity-megasheet.xlsx'
+        installed=inputs(args.base_lock)
+        if args.command=='scan':
+            report,_=discover_clothing(source,native,first,worksheet,installed=installed)
+            output.parent.mkdir(parents=True,exist_ok=True)
+            write_new(output,(json.dumps(report,indent=2)+'\n').encode())
+        else:report=convert_clothing(source,native,first,worksheet,output,installed=installed)
+        print(json.dumps(dict(report['counts'],new_resources=report['new_resource_count'])))
+        return
     if args.representation=='creatures':
         from v3_creature_field import discover as discover_creatures, convert as convert_creatures
         if args.command=='scan':
