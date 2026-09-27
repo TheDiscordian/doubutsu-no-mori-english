@@ -36,7 +36,7 @@
       </div>
       <div class="warning" id="save-warning" hidden>
         <h3>Keep your save and selections together</h3>
-        <p>Removing an import used by this profile is not a save migration. Do not load an imported save in V2 or an older build missing these imports. Ordinary reloads between different profiles remain unverified.</p>
+        <p id="save-detail">Removing an import used by this profile is not a save migration. Do not load an imported save in V2 or an older build missing these imports. Ordinary reloads between different profiles remain unverified.</p>
         <label class="ack"><input type="checkbox" id="save-ack"> <span>I’ll use a separate test save and keep its selection profile.</span></label>
       </div>
       <p class="small" id="baseline-note">No imports produces the unchanged V2 English translation. Do not load a V3 import save in V2.</p>
@@ -61,7 +61,7 @@
         <legend class="sr-only">Find and select installed development imports</legend>
         <div class="filters">
           <label for="search">Search by name or donor ID<input id="search" type="search" placeholder="Try Punchy, sleigh, or 31E0" autocomplete="off"></label>
-          <label for="kind">Category<select id="kind"><option value="all">All categories</option><option value="villager">Villagers</option><option value="furniture">Furniture</option><option value="clothing">Clothing</option><option value="equipment">Equipment</option><option value="floor">Floors</option><option value="wall">Wallpapers</option></select></label>
+          <label for="kind">Category<select id="kind"><option value="all">All categories</option><option value="villager">Villagers</option><option value="furniture">Furniture</option><option value="clothing">Clothing</option><option value="equipment">Equipment</option><option value="floor">Floors</option><option value="wall">Wallpapers</option><option value="fish">Fish</option><option value="insect">Insects</option></select></label>
         </div>
         <div class="actions"><button id="select-visible" type="button">Select visible</button><button id="clear-visible" type="button">Clear visible</button><button id="select-all" type="button">Select all installed</button><button id="clear-all" type="button">Clear all</button></div>
       </fieldset>

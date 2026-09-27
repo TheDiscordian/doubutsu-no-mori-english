@@ -6,7 +6,7 @@ const $ = id => document.getElementById(id);
 const inputs = [$('n64'), $('gamecube')];
 const requested = new Set(), cards = new Map(), reviews = [];
 const behaviours = {};
-const kinds = { villager: 'Villager', furniture: 'Furniture', clothing: 'Clothing', equipment: 'Equipment', floor: 'Floor', wall: 'Wallpaper' };
+const kinds = { villager: 'Villager', furniture: 'Furniture', clothing: 'Clothing', equipment: 'Equipment', floor: 'Floor', wall: 'Wallpaper', fish: 'Fish', insect: 'Insect' };
 let loaded, selection, worker, generation = 0, romURL, receiptURL;
 const status = message => { $('status').textContent = message; };
 function fileError() {
@@ -85,6 +85,7 @@ function changeSelection(change) {
   }
 }
 function addChoices(plan, review) {
+  if (plan.save_compatibility) $('save-detail').textContent = plan.save_compatibility;
   for (const row of plan.behaviours || []) {
     const label = document.createElement('label'), select = document.createElement('select');
     const caption = document.createElement('strong'), description = document.createElement('p');

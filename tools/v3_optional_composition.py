@@ -62,7 +62,8 @@ def save_compatibility(report):
     """Keep exported warnings tied to the cartridge's actual saved format."""
     version = report['save_codec']['format_version']
     if version >= 3:
-        return report['save_warning']
+        travel=report.get('equipment_resources',{}).get('creature_fish',{}).get('world',{}).get('creature_travel',{})
+        return report['save_warning']+(' '+travel['warning'] if travel else '')
     return (f'Format {version}: equal or larger profiles accepted by codec; missing dependencies rejected. '
             'Do not load imported saves in V2. Ordinary cross-profile reload is unverified.')
 
@@ -178,6 +179,10 @@ def catalogue(image, report):
     surfaces=surface_options(blob,report)
     if result.keys()&surfaces.keys():raise ValueError('Surface identity collides with another import')
     result.update(surfaces)
+    from v3_creature_selection import options as creature_options
+    creatures=creature_options(blob,report)
+    if result.keys()&creatures.keys():raise ValueError('Creature identity collides with another import')
+    result.update(creatures)
     for row in report['villager_text']['imports']:
         donor = int(row['id'].rsplit('/', 1)[1], 16)
         actor = villager_actor(donor)
@@ -212,8 +217,8 @@ def catalogue(image, report):
     # installs them. Its catalogue must cover its actual installed records only.
     expected = ({row['id'] for row in report['villager_text']['imports']} |
                 {row['id'] for row in furniture_rows} |
-                {item_key(int(row['donor_item_id'], 16)) for row in report['clothing']['imports']} | held.keys() | surfaces.keys())
-    if (set(result) != expected or len(result) != len(VILLAGERS)+len(furniture_rows)+len(CLOTHING)+len(held)+len(surfaces)):
+                {item_key(int(row['donor_item_id'], 16)) for row in report['clothing']['imports']} | held.keys() | surfaces.keys() | creatures.keys())
+    if (set(result) != expected or len(result) != len(VILLAGERS)+len(furniture_rows)+len(CLOTHING)+len(held)+len(surfaces)+len(creatures)):
         raise ValueError('Incomplete or duplicated installed development catalogue')
     return dict(sorted(result.items()))
 
@@ -239,7 +244,7 @@ def resolve(catalog, selected, *, behaviours=None, behaviour_options=None):
     furniture = [catalog[key] for key in sorted(enabled) if catalog[key]['kind']=='furniture']
     shirts = [catalog[key] for key in sorted(enabled) if catalog[key]['kind']=='clothing']
     displays = [{'item_id':row['display_item_id'], 'runtime_index':row['display_runtime_index']}
-                for row in catalog.values() if row['id'] in enabled and row['kind'] in ('clothing','equipment')]
+                for row in catalog.values() if row['id'] in enabled and row['kind'] in ('clothing','equipment','fish','insect')]
     profile = profile_bytes(villagers, furniture+displays, [row['source_record'] for row in shirts])
     result={'format':'AFV3-LOCAL-SELECTION-1', 'donor':'GAFE01-r0',
         'registry_versions':{'villagers':1, 'furniture':1, 'clothing':1, 'displays':1},
@@ -262,6 +267,11 @@ def resolve(catalog, selected, *, behaviours=None, behaviour_options=None):
         result['behaviours_changed']=changed(behaviour_options,result['behaviours'])
     elif behaviours:
         raise ValueError('Behaviour values require the checked installed choices')
+    if any(r['kind'] in ('fish','insect') for r in catalog.values()):
+        from v3_creature_selection import profile as creature_profile
+        bits=creature_profile([catalog[k] for k in enabled if catalog[k]['kind'] in ('fish','insect')])
+        result.update(creature_profile_hex=bits.hex(),creature_profile_sha256=sha256(bits))
+        result['registry_versions']['creatures']=1
     return result
 
 
@@ -367,7 +377,8 @@ def compose(image, report, catalog, selection):
     def prefix(offset, value, label):
         if not (0x20 <= offset < offset+len(value) <= PREFIX_SIZE or
                 len(value) == 4 and (offset in (STATIC_ROWS + slot * 80 + 4 for slot in range(STATIC_COUNT)) or
-                    offset in {r['enable_offset'] for r in catalog.values() if r['kind'] in ('floor','wall')})):
+                    offset in {r['enable_offset'] for r in catalog.values() if r['kind'] in ('floor','wall')} or
+                    offset in {r['carried_enable_offset'] for r in catalog.values() if r['kind'] in ('fish','insect')})):
             raise ValueError('Selection field escapes reviewed resident enable words')
         change(files[BLOB].pstart+offset, value, label)
     prefix(0x20, bytes.fromhex(selection['profile_hex']), 'complete saved import profile')
@@ -381,12 +392,15 @@ def compose(image, report, catalog, selection):
             prefix(row['town_flag_offset'], bytes((active,)), key+' town eligibility')
         if row['kind']=='clothing':
             prefix(row['display_enable_offset'], active.to_bytes(4, 'big'), key+' mannequin')
+        if row['kind'] in ('fish','insect'):
+            prefix(row['carried_enable_offset'],active.to_bytes(4,'big'),key+' carried creature')
     catalogue_writes, _ = catalogue_selection(image, report, enabled)
     writes.extend(catalogue_writes)
     scoring_writes, _ = scoring_selection(image, report, catalog, enabled)
     writes.extend(scoring_writes)
     from v3_surface_selection import checksum_fields
-    for field in behaviour_checksums(image,report)+checksum_fields(image,report):
+    from v3_creature_selection import checksum_fields as creature_checksums
+    for field in creature_checksums(image,report)+behaviour_checksums(image,report)+checksum_fields(image,report):
         intermediate=apply_writes(image,writes);at=field['start']
         change(field['offset'],struct.pack('>I',zlib.crc32(intermediate[at:at+field['length']])),
             'selected resource CRC')
@@ -424,7 +438,7 @@ def scoring_selection(image, report, catalog, enabled):
     if entry.pend or sha256(data) != hr['output_sha256']:
         raise ValueError('Changed complete source scoring image')
     indices = {catalog[key]['runtime_index'] for key in enabled if catalog[key]['kind'] == 'furniture'}
-    indices |= {catalog[key]['display_runtime_index'] for key in enabled if catalog[key]['kind'] == 'clothing'}
+    indices |= {catalog[key]['display_runtime_index'] for key in enabled if catalog[key]['kind'] in ('clothing','equipment','fish','insect')}
     writes, rows = [], []
     for row in hr['imports']:
         at = hr['metadata_address'] - hra.RAM + row['runtime_index'] * 4
@@ -558,6 +572,9 @@ def build(output, selected=(), *, select_all=False, behaviours=None):
         if choices:
             from v3_creature_choices import update_report as update_behaviours
             update_behaviours(result,blob,current,selection['behaviours'])
+        if 'creature_profile_hex' in selection:
+            from v3_creature_selection import update_report as update_creatures
+            update_creatures(blob,current,selection)
     output.mkdir(parents=True, exist_ok=False)
     write_new(output/'animal-forest-v3-asset-loader.z64', result)
     write_new(output/'asset-loader.ups', patch)

@@ -24,8 +24,9 @@ not claim that an item is playable. Reuse unchanged passing tests throughout.
 Carry substantial N64/GameCube behaviour differences through the shared import
 path as explicit WebUI choices, following the
 [behaviour-choice contract](../specs/V3_OPTIONAL_IMPORTS.md#n64-and-gamecube-behaviour-choices).
-Implement the actual alternatives and bind selections to the build receipt;
-the controls and runtime selection remain pending, not completed by this policy.
+Implement the actual alternatives and bind selections to the build receipt.
+Fish population and imported coastal movement have installed controls and runtime
+alternatives; other substantial differences still need their own real bindings.
 
 Current implementation task: complete all nine added fish through the connected
 fish-importing path, reusing shared seventeen-creature infrastructure. This means
@@ -39,9 +40,9 @@ commits. Batch connected verification, rather than creating another independent
 table/reader deliverable. Insects and the other importing categories remain
 required work, not removed scope.
 
-Use the shared converter and the current ABI-302 proposal:
-`build/v3-creature-world-work-01/connected-10/build-lock.json`.
-ROM SHA-256: `1b019471c4eabb56e4c1f71b0c4b9d749011f421b53cf1858f8ae7c1d83ef172`.
+Use the shared converter and the current ABI-305 proposal:
+`build/v3-creature-world-work-01/connected-15/build-lock.json`.
+ROM SHA-256: `a971864a1ed6c92f0e56f15df1b86d4d88e8026b3cb4864afb3118c8016d84ad`.
 The GameCube calendar is connected through native manager entry `8092ECAC`,
 terrain selection, and real actor creation. The complete seventeen-creature
 saved-profile/collection extension and town seasonal state are installed.
@@ -51,18 +52,32 @@ seventeen added species have native catch/last-catch/completion readers, full
 dual-palette pocket icons, and official donor catch messages with single-catalogue
 credits. Collection drawing, navigation, and name lookup cover all 41 fish and
 40 insects without replacing native herabuna. Both behaviour settings connect to
-the private offline/browser composers and their receipts. Five browser/offline
-profiles agree, including both modes and a behaviour-only build. Empty imports
+the private offline/browser composers and their receipts. Six current browser/offline
+profiles agree, including all nine fish, individual/subset profiles, and both modes. Empty imports
 with default settings return stable V2. Neither deployment is changed.
-The exact next consumer is per-species optional composition for all nine fish:
-connect the existing carried readiness words, display-profile enable words,
-saved profile, and nested packet checksums together. Reuse the complete room,
-field, calendar, catch, icon, and UI resources; do not reconvert them or reopen
-their unchanged tests. Fish remain inactive in this proposal, and its 167
-selectable development choices are unchanged. Complete the connected fish path
-and required gameplay fixes; its finished components do not finish the import.
-Controller Pak transport of added catch records remains unfinished; the record
-adapter rejects foreign-player writes rather than crediting another resident.
+Per-species composition connects all nine fish's carried readiness, room-display
+enable words, saved profile, and nested checksums. The private composer has 176
+experimental choices. Eight insects remain inactive pending their field behaviours.
+The shared passport adapter connects visitor catch records, export/import, and
+return to the matching resident without altering another player. It retains
+the native player, animal, letter, and note sizes. Host checks cover all seventeen
+identities, four residents, compatible round trips, legacy return, device errors,
+and corruption/profile/identity rejection; native travel is not verified.
+Other imported catalogue/console travel remains unfinished, so this does not
+claim complete V3 Controller Pak support. A smaller selected creature profile
+rejects the passport; V2 and older V3 passport readers are incompatible.
+The remaining fish work is connected native gameplay/save verification and any
+real defects it exposes, including classification of the constructor timeout.
+Do not restart the exhausted fixture or declare an unclassified failure harmless.
+Continue the eight insects' shared field behaviour/spawn programs while that
+native test remains unresolved. Keep fish gameplay verification open, not waived.
+Reuse complete room, field, calendar, catch, icon, and UI resources. All seventeen
+source house-rating/feng shui records are converted through the ordinary shared
+scoring writer; the nine selected fish are installed and follow checkbox state.
+Eight inactive insects retain prepared records without entering rating groups.
+The virtual import tail has 128 bytes left. Reuse the existing owner-storage
+placement machinery when adding insect code; do not drop resources or weaken
+overlap checks to fit the remaining space.
 Keep the shared bounded plan, not appended entries in the native twenty-row
 buffers. The active task and exhausted native harness budget are unchanged.
 This private build writes format-7 compressed saves (canonical format six).
@@ -84,7 +99,7 @@ catalogue/scoring, and official names. Shared native-profile staging installs
 49 more full models and inactive profiles across direct drawing, seating/beds,
 constant sequences, indexed flower palettes, and building-palette fades.
 All 183,408 artwork bytes are retained, with 48 cached conversions and one shared
-compiler job. There are 167 selectable development choices and 100 inactive
+compiler job. There are 176 selectable development choices and 100 inactive
 furniture profiles. No new resident allocation or saved format is added.
 See [bulk profiles](checkpoints/V3_BUILTIN_PROFILES.md).
 
@@ -119,7 +134,7 @@ Next importing work:
   connected. Current host checks cover every added identity/four players,
   completion timing, disabled/foreign records, both population modes, complete
   donor icon conversion, current hooks, and optional composition. Continue the
-  per-species fish selection and remaining gameplay integration; new insect
+  remaining gameplay integration; new insect
   behaviour programs remain required. The collection UI, official catch messages,
   and behaviour settings are connected. Do not reconvert frames or create per-fish tools.
   The common converter already retains all 17 displays, 96 joints, full motion
@@ -128,8 +143,8 @@ Next importing work:
   including the static ant, are installed. Fixed parent IDs, names, prices,
   categories, placement, and pickup are connected through one adapter. Three
   focused checks cover the complete category, startup failures, installed output,
-  and optional composition. Profiles stay inactive until carried gameplay and
-  collection are complete. Reuse this path instead of rebuilding its individual
+  and optional composition. Nine fish profiles are available for private experimental
+  composition; eight insect profiles stay inactive. Reuse this path instead of rebuilding its individual
   dependencies; see [the shared contract](../specs/V3_CREATURE_ITEMS.md).
   The full creature sound category, native per-instance scheduling,
   and room sound callbacks are installed through the shared planner. Native motion

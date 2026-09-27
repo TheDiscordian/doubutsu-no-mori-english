@@ -31,10 +31,10 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
-The current proposal is ABI 302 at
-`build/v3-creature-world-work-01/connected-10/build-lock.json`, ROM SHA-256
-`1b019471c4eabb56e4c1f71b0c4b9d749011f421b53cf1858f8ae7c1d83ef172`.
-It contains 167 selectable development imports and 100 complete inactive furniture
+The current proposal is ABI 305 at
+`build/v3-creature-world-work-01/connected-15/build-lock.json`, ROM SHA-256
+`a971864a1ed6c92f0e56f15df1b86d4d88e8026b3cb4864afb3118c8016d84ad`.
+It contains 176 selectable development imports, including all nine fish, and 100 complete inactive furniture
 profiles whose acquisition is pending. The main lock and both stable V2-14
 deployments are retained.
 
@@ -65,8 +65,9 @@ rigs and the three-layer static ant. All 78,544 bytes, 96 joints, full motion
 arrays, and three sound-callback dependencies are retained. Actual source
 placement/pickup functions establish carried-parent identities and official
 names. These are not seventeen playable imports. All sixteen animated objects
-(74,672 bytes) and the shared embedded-rig callback are installed, with profiles
-disabled pending carried-creature gameplay and collection integration.
+(74,672 bytes) and the shared embedded-rig callback are installed. Nine fish
+profiles participate in private composition; eight insects remain disabled
+pending their field behaviours and spawning.
 The shared native dispatch preserves creature animation in placement/removal
 states 6 and 13 while retaining other furniture's callback exclusions. Sanitized
 category checks and current cartridge/resource/UPS checks pass; ordinary native
@@ -90,9 +91,9 @@ preserved at `2301`. The ordinary category pipeline reuses all seventeen prepare
 models without graphics compilation. Three focused tests pass, including two
 sanitized C fixtures, installed-resource/hooks/UPS checks, and all/empty optional
 composition. The 3,840-byte reader packet adds no save change; the shared startup
-fits its existing reservation. Fish per-species composition and remaining
-gameplay integration are unfinished; added insect field behaviours remain required.
-Native connected-path execution remains unverified. Choice counts are unchanged. See the
+fits its existing reservation. Fish per-species composition is connected to the
+carried and displayed forms, saved profile, and packet checksums. Added insect
+field behaviours remain required; native connected-path execution remains unverified. See the
 [creature checkpoint](checkpoints/V3_CREATURE_PROFILES.md).
 
 The carried/field graphics category is prepared at
@@ -161,8 +162,29 @@ resources and consumers. Three current behaviour checks pass, including five
 matching browser/offline profiles, both runtime settings, empty/default V2,
 nested checksums, invalid values, and retained save/assets. An actual offline
 behaviour-only build also completes. New native execution or visual acceptance
-is not claimed. The next work is per-species composition for the entire nine-fish
-category; the fish remain inactive and selectable counts are unchanged.
+is not claimed. All nine fish have fixed, independently selectable source
+identities. Brook trout retains its separate N64 identity and native herabuna
+is preserved. Three selection checks cover current actual parent/display tables,
+four-player catch/save readers, rejection of a missing saved species, and six
+matching browser/offline profiles. These checks do not establish native gameplay.
+
+The shared passport adapter connects added catch records to visiting players
+and restores them to the matching resident on return. A versioned, checksummed
+48-byte record uses native passport padding without resizing private data,
+animals, letters, or the Controller Pak note. A separate 28-byte visitor record
+prevents writes to another resident's collection. The current cartridge adds
+one 4-KiB world-packet extension; existing artwork and save codecs are retained.
+Three current checks pass for installed hooks/packet/UPS preservation, six
+browser/offline compositions, and sanitized travel across all seventeen identities
+and four residents. Incompatible profiles, corrupt records, wrong identities,
+and device errors reject; legacy returns preserve existing resident catches.
+Complete donor house-rating and feng shui records use the existing shared
+converter and native category mappings. Nine selected fish have installed
+ratings; eight inactive insects have prepared records. Disabled fish leave
+rating-group searches through the same offline/browser selection writes.
+No model, sound, saved layout, or resident allocation changes for scoring.
+Native travel and other imports' catalogue/console transport remain unfinished
+or unverified. This is not complete V3 travel support or a playtest handoff.
 
 Three changed-path checks pass for both population modes, all seventeen native
 catch/collection readers across four players, completion timing, disabled/foreign
@@ -171,15 +193,17 @@ UPS reconstruction, and all/empty optional composition. The unchanged format-sev
 save codec retains its forward-migration, deletion, capacity, and pre-write
 rejection evidence; it is not rebuilt or replayed for these consumer changes.
 The shared world/save
-packet uses 44 KiB; the working save state grows by 32 bytes without actor growth.
+packet uses 48 KiB; the working save state includes 32 added creature bytes without actor growth.
 This build writes format-7 compressed saves with canonical format six. Valid
 older saves migrate forward, preserving existing collections and console data;
 V2 and older V3 builds cannot read its new saves. Preserve backups. These host
 and cartridge checks do not establish native execution or ordinary save/reload;
 the constructor timeout and scheduler disconnect remain unresolved. Continue the
-same fish task through collection UI, official catch messages, behaviour choices,
-and required save transport; insect behaviours also remain required. Do not replay old
-builds or recompile unchanged artwork.
+fish gameplay/save verification and classify those failures without restarting
+the exhausted native fixture. Continue the eight insects' shared behaviour/spawn
+programs using their installed resources. Do not replay old builds or recompile
+unchanged artwork. Passport travel requires compatible V3 creature profiles;
+V2 and older V3 readers do not understand its extension. Preserve Pak backups too.
 
 Continue with creature parent/native integration and the remaining legacy
 clothing, custom-design, and fossil representations, not resource reconversion

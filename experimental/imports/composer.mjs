@@ -28,6 +28,8 @@ export function validatePlan(plan) {
   for (const key of ['base_sha256', 'stable_sha256', 'base_report_sha256']) hash(plan[key]);
   const surfaces = plan.surface_profile_hex !== undefined;
   if (surfaces) hexSize(plan.surface_profile_hex, 64, 64);
+  const creatures = plan.creature_profile_hex !== undefined;
+  if (creatures) hexSize(plan.creature_profile_hex, 4, 4);
   if (plan.save_compatibility !== undefined) require(typeof plan.save_compatibility === 'string' &&
     plan.save_compatibility.length > 0 && plan.save_compatibility.length <= 2048, 'Invalid save compatibility warning.');
   array(plan.options, 1, 2048); array(plan.tables, 1, 16); array(plan.crc32, 1, 16);
@@ -40,13 +42,17 @@ export function validatePlan(plan) {
   for (const option of plan.options) {
     require(typeof option.id === 'string' && /^GAFE01-r0\/(item|villager)\/[0-9A-F]{4}$/.test(option.id) &&
       !options.has(option.id), 'Invalid or repeated import identity.');
-    require(['furniture', 'clothing', 'equipment', 'villager', 'floor', 'wall'].includes(option.kind) &&
+    require(['furniture', 'clothing', 'equipment', 'villager', 'floor', 'wall', 'fish', 'insect'].includes(option.kind) &&
       option.id.includes(option.kind === 'villager' ? '/villager/' : '/item/'), 'Invalid import kind.');
     require(typeof option.name === 'string' && option.name.length > 0 && option.name.length <= 128,
       'Invalid import name.');
     array(option.dependencies, 0, 2048); array(option.disable, 1, 16);
     hexSize(option.profile_hex, 192, 192);
     if (surfaces) hexSize(option.surface_profile_hex, 64, 64);
+    if (creatures) hexSize(option.creature_profile_hex, 4, 4);
+    const isCreature = ['fish', 'insect'].includes(option.kind);
+    require(isCreature ? creatures && bytes(option.creature_profile_hex).some(n => n) :
+      !creatures || !bytes(option.creature_profile_hex).some(n => n), 'Wrong-category creature profile.');
     const isSurface = ['floor', 'wall'].includes(option.kind);
     require(isSurface ? surfaces && bytes(option.surface_profile_hex).some(n => n) && !bytes(option.profile_hex).some(n => n) :
       bytes(option.profile_hex).some(n => n) && (!surfaces || !bytes(option.surface_profile_hex).some(n => n)),
@@ -84,6 +90,14 @@ export function validatePlan(plan) {
       require(!(fullSurface[i] & n), 'Two surface options own the same saved identity.'); fullSurface[i] |= n;
     });
     require(hex(fullSurface) === plan.surface_profile_hex, 'Incomplete installed surface profile.');
+  }
+  if (creatures) {
+    const fullCreature = new Uint8Array(4);
+    for (const option of options.values()) bytes(option.creature_profile_hex).forEach((n, i) => {
+      require(!(fullCreature[i] & n), 'Two creature options own the same saved identity.'); fullCreature[i] |= n;
+    });
+    require(hex(fullCreature) === plan.creature_profile_hex, 'Incomplete installed creature profile.');
+    require(fullCreature[2] < 2 && fullCreature[3] === 0, 'Invalid creature saved identity range.');
   }
   for (const table of plan.tables) {
     integer(table.width, 1, 16); array(table.rows, 1, 2048); array(table.counts, 1, 16);
@@ -145,9 +159,12 @@ export function resolveSelection(plan, requested, behaviours = {}) {
   }
   const profile = new Uint8Array(192);
   const surfaceProfile = new Uint8Array(64);
+  const creatureProfile = new Uint8Array(4);
   for (const id of enabled) bytes(options.get(id).profile_hex).forEach((n, i) => { profile[i] |= n; });
   if (plan.surface_profile_hex !== undefined) for (const id of enabled)
     bytes(options.get(id).surface_profile_hex).forEach((n, i) => { surfaceProfile[i] |= n; });
+  if (plan.creature_profile_hex !== undefined) for (const id of enabled)
+    bytes(options.get(id).creature_profile_hex).forEach((n, i) => { creatureProfile[i] |= n; });
   require(behaviours !== null && typeof behaviours === 'object' && !Array.isArray(behaviours), 'Invalid behaviour settings.');
   const definitions = new Map((plan.behaviours || []).map(row => [row.id, row]));
   require(Object.keys(behaviours).every(id => definitions.has(id)), 'Unknown or unavailable behaviour setting.');
@@ -161,6 +178,7 @@ export function resolveSelection(plan, requested, behaviours = {}) {
     dependency_reasons: Object.fromEntries([...reasons].sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0)
       .map(([key, parents]) => [key, [...parents].sort()])), profile_hex: hex(profile),
     ...(plan.surface_profile_hex === undefined ? {} : { surface_profile_hex: hex(surfaceProfile) }),
+    ...(plan.creature_profile_hex === undefined ? {} : { creature_profile_hex: hex(creatureProfile) }),
     ...(plan.behaviours === undefined ? {} : { behaviours: resolved,
       behaviours_changed: rows.some(row => resolved[row.id] !== row.default) }) };
 }
@@ -251,6 +269,8 @@ export async function composeSelection(source, plan, requested, behaviours = {})
     profile_sha256: await sha256(bytes(selection.profile_hex)), output_sha256: outputHash,
     ...(selection.surface_profile_hex === undefined ? {} : {
       surface_profile_sha256: await sha256(bytes(selection.surface_profile_hex)) }),
+    ...(selection.creature_profile_hex === undefined ? {} : {
+      creature_profile_sha256: await sha256(bytes(selection.creature_profile_hex)) }),
     base_sha256: empty ? plan.stable_sha256 : plan.base_sha256, base_report_sha256: plan.base_report_sha256,
     runtime_abi: empty ? null : plan.runtime_abi, writes: writes.sort((a, b) => a.offset - b.offset),
     ...(plan.behaviour_save_note ? { behaviour_save_note: plan.behaviour_save_note } : {}),

@@ -39,11 +39,11 @@ fields and interactions are preserved, including full-height tanks/cages and
 the existing creature audio/motion integration. No simplified replacement model
 or independent furniture option is created.
 
-Each profile is installed inactive in its canonical sparse slot. Metadata keeps
-the parent relationship. The reader additionally requires readiness and the
-selected native profile. Readiness, profile activation, and selection remain off
-until carried models/icons, catching/releasing, collection/profile persistence,
-and spawn readers are complete. Prepared room support is not a playable species.
+Each profile has its canonical sparse slot and parent relationship. The reader
+requires both carried readiness and the selected native display profile. All
+nine fish have connected private composition; the eight insect profiles remain
+inactive pending field behaviours and spawning. Prepared room support alone is
+not a playable species, and private selection does not establish hardware testing.
 
 ## Memory and startup
 
@@ -83,8 +83,9 @@ Ordinary native execution of this connected path and original hardware remain
 unverified. The scheduler test's unexplained debugger disconnect remains open;
 host checks do not classify it. Field/carry model loading, drawing tables, fish
 capture identities, and release adapters are installed as described below.
-The active queue continues with field behaviours, spawn readers, pocket icons,
-and collection/profile persistence, retaining the completed room and sound work.
+The active queue retains unresolved fish gameplay verification and continues the
+eight insects' shared field behaviours and spawning. Complete room, sound, field
+art, collection, text, composition, and creature transport consumers are retained.
 
 ## Field and carried graphics
 
@@ -110,9 +111,9 @@ Field and release selectors are not interchangeable: jellyfish and several sea
 fish use different selectors. The largest converted fish is 2,192 bytes, within
 the native 2,560-byte fish buffer; every added insect fits its 3,072-byte buffer.
 These sizes describe complete converted objects, not estimates from donor size.
-The shared native stage installs these assets without recompiling them. That
-integration does not make the species selectable while field behaviours, spawn
-readers, pocket icons, and collection/profile persistence remain unfinished.
+The shared native stage installs these assets without recompiling them. Graphics
+alone do not make a species selectable: the connected gameplay consumers below
+are required too. Insect field behaviours and spawning remain unfinished.
 
 ### Connected native field stage
 
@@ -127,8 +128,8 @@ bound for field and release; neither is substituted for the other.
 Added fish use actor slots `36..44`, corresponding to carried IDs `2320..2328`.
 The complete original 36-slot capture mapping, including rubbish and coastal
 salmon, is preserved. Brook trout does not replace native herabuna. Added insects
-use slots `32..39`. Readiness and selections remain disabled until the complete
-gameplay paths can safely consume these identities.
+use slots `32..39`. Fish have experimental selections; insects remain inactive
+until their field gameplay paths can consume these identities.
 
 The immutable packet occupies `80647000..80649FFF`: 12,288 bytes, including
 1,018 compiled code bytes, 3,830 lookup-table bytes, resource descriptors, and
@@ -207,8 +208,8 @@ all native fallbacks and size bounds, source table bindings, complete owner
 changes and relocation removal/retention, unchanged golden-rod hooks, category
 planning, UPS reconstruction, and optional all/empty composition. Assembly-hook
 execution is not inferred from those host checks. The native constructor timeout
-remains unresolved, and creature selection stays disabled until the remaining
-world, icon, and collection readers are complete.
+remains unresolved. World, icon, collection, and selection readers are connected;
+that does not turn the timeout into a passed native test.
 
 ### Connected fish world implementation
 
@@ -249,7 +250,7 @@ program pointer at `244`, not a fixed heap address.
 The behaviour word defaults to zero (N64); one selects GameCube patrol for
 imported-origin coastal actors. Native fish always retain their existing path.
 The private composers resolve these settings from the installed bindings below;
-per-species composition and remaining gameplay work stay unfinished. A separate
+per-species composition uses the same fixed identities. A separate
 spawn-mode word selects the additive native policy or source calendar path.
 The native policy gives the unmodified native manager a weight of 100 against
 the sum of selected added species' actual current-half-month/time weights.
@@ -261,11 +262,11 @@ or environment-rank penalties. A pond without a native spawning opportunity
 does not receive an artificial 100-weight no-fish outcome. No eligible additions
 means direct original fallback without an extra random draw. Only the winning
 manager changes acre history; native mode leaves saved transition state intact.
-Browser/offline resolution, collection UI, official catch-message routing, and
-ordinary gameplay remain unfinished.
+Browser/offline resolution, collection UI, and official catch-message routing
+are connected. Ordinary native gameplay verification remains unfinished.
 
-The 9,564-byte compiled world code and its complete calendars share one 44-KiB
-reservation with creature persistence; source data begins at `8064D000`.
+The 9,564-byte world code and complete calendars share the 48-KiB reservation
+with creature persistence and passport transport; source data begins at `8064D000`.
 Original room/frame resources, actor sizes, and the stable translation output
 remain unchanged. The native manager hook preserves its two overwritten
 instructions in the fallback and derives the actual relocated program from
@@ -287,7 +288,8 @@ parent readers: fish bits 0..8, insect bits 9..16. Four independent collection
 records and the town's seasonal transition live in a 32-byte extension. Native
 player deletion clears only that player's new collection, retaining other players
 and town season state. Native capture and completion consumers call the added
-collection API; collection UI and foreign-player transport remain required.
+collection API. Collection UI and creature passport transport use these same
+identities; other imported travel records remain separate unfinished consumers.
 
 | Extension offset | Meaning |
 | --- | --- |
@@ -341,10 +343,9 @@ Native final-catch flags consider the prospective catch without writing early,
 require every native species and every selected addition, and do not trigger
 again for duplicates. The three original completion/start/talk functions use
 the same predicate. Their original flag meanings and offsets remain unchanged.
-Unselected additions do not count toward completion. Foreign private blocks may
-retain native records, but cannot write added records into a resident's slot;
-the existing explicit save-error path stops such writes. Controller Pak transport
-must be completed before declaring the full travel/save path supported.
+Unselected additions do not count toward completion. Foreign private blocks use
+the separate identity-bound visitor record described below, never a resident's
+slot. An unknown foreign identity still rejects through the save-error path.
 
 The shared converter reads actual donor fish/insect icon-pointer tables and
 category bindings for all seventeen added parents. Each icon retains the full
@@ -430,7 +431,84 @@ owners/relocations, and UPS reconstruction. Its unchanged evidence is retained
 across the behaviour-binding build. `test_v3_creature_choices.py` checks both
 mode words, five browser/offline compositions, ordered checksums, invalid settings
 and receipts, and unchanged UI/art/save resources. Actual field execution,
-Controller Pak transport, and hardware remain unfinished or unverified.
+ordinary travel, and hardware remain unverified.
+
+### Per-species optional composition
+
+`v3_creature_selection.py` binds each of the nine fish choices to its fixed
+carried identity and room display. A selection controls the parent table's
+readiness word, display enable word, and existing sparse saved-profile bit.
+The four-byte creature mask uses bits 0..8 for fish and 9..16 for insects.
+All nine fish are `ff010000`; inactive insects contribute no selected bits.
+The parent reader already gates spawning, names, prices, placement, pickup,
+collection, and icons through this same availability check. No per-fish
+installer or second browser list is introduced.
+
+The parent-packet CRC is an editable bootstrap constant. Both composers update
+it before the world and enclosing equipment/package/prefix checksums. Browser
+options contain both required enable writes and the explicit creature mask;
+validation checks category, disjoint identities, and the complete mask union.
+The receipt records the resolved mask/hash. All 176 choices reproduce the full
+cartridge; empty/default choices reproduce stable V2. The private experimental
+selector is not a deployed patcher or a gameplay certification.
+
+Sanitized checks use actual selected parent/display tables through the item,
+catch, and save readers. All-fish and partial profiles preserve fixed identities;
+removing either half of a saved fish's availability rejects without changing
+the input bank or destination. Six browser/offline profiles agree, including
+all fish, brook trout alone, mixed villagers/fish, and GameCube behaviours.
+Artwork, world behaviour, icons, text, and canonical save code remain unchanged.
+
+Room scoring uses the ordinary `v3_furniture_install.scoring` writer, not a
+separate fish evaluator. Complete donor HRA and feng shui tables are hash-checked;
+all seventeen display identities retain their exact series, birth-category
+mapping, surface bits, and colours. The nine available fish receive active rows;
+eight insects retain prepared records until field gameplay is implemented.
+Native herabuna and all other original scoring rows remain unchanged. Disabled
+fish receive the same inert HRA row as other deselected imports, including in
+browser builds, so they cannot enter group searches or recommendations.
+Current source/installed comparisons and all six composition cases check this
+path; native house evaluation is not claimed.
+
+### Creature passport transport
+
+`creature_travel.c` connects native clear/save/load/private-copy entry points at
+`80079080`, `800793B8`, `8007942C`, and `800B7F48`. The complete original Pak
+implementation and each replaced function are checked against the verified
+retail cartridge. The native `1200`-byte note, `BD0`-byte private structure,
+`528`-byte animal, all letters, and nonce at `1100` retain their layouts.
+
+Unused passport header bytes `2..7` contain `AFV3CT`. A 48-byte capsule at
+`11C0` contains magic `AFCT`, version one, size, the full sixteen-byte native
+player/town identity, four profile bytes, four catch bytes, CRC32, its complement,
+and eight reserved zero bytes. Native whole-note checksum validation and capsule
+validation precede private/animal copies or collection changes. The independent
+header marker prevents a damaged capsule magic from becoming a legacy record.
+Original passports initialize an empty visitor collection; returning legacy
+records never erase an existing resident's added catches.
+
+Code starts at `80655000` in a 4-KiB extension of the existing world packet.
+The separate 28-byte visitor state at `80655FC0` is zero on startup; the final
+guard stays at `80655FF0`. A checked jump at the old collection-reader entry
+preserves all existing capture/completion/UI bindings. Native residents still
+use their own format-seven working records. Visitors require the exact native
+foreign-private address and matching identity; successful captures update only
+the visitor record. Return copies merge into the matched resident, never another
+player. Export includes the full selected creature profile because pockets and
+letters can contain creatures without a catch event.
+
+Smaller receiving profiles reject before committing private/animal/collection
+data. Device errors return failure and do not claim successful persistence.
+V2 and older V3 passport readers do not understand the extension; use compatible
+V3 profiles and preserve Pak backups. Other import categories' catalogue/console
+travel remains unfinished. No native travel, new FlashRAM cycle, or original
+hardware result is claimed by this creature-specific adapter.
+
+`test_v3_creature_travel.py` checks the current installed hooks, complete unchanged
+resources, patch reconstruction, six browser/offline profiles, and sanitized
+transport of all seventeen records across four residents. The host fixture uses
+the actual adapter and collection reader with memory-backed device calls; it
+does not execute libultra, an emulator, or hardware.
 
 ### Native integration constraints
 

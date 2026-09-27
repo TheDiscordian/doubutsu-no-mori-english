@@ -1214,6 +1214,7 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         report['shared_runtime_refresh'].update(adapters=['creature_fish'],artwork_changed=False,
             additional_resident_bytes=equipment_report['creature_fish']['additional_resident_bytes'],
             additional_scene_bytes=0,resource_allocations_changed=bool(equipment_report['creature_fish'].get('world')))
+        report['shared_runtime_refresh']['saved_profile_changed']=report['save_runtime']['profile_hex']!=prior['save_runtime']['profile_hex']
         report['sources'].update(equipment_report['creature_fish']['sources'])
         if report_updates.get('saved_format_changed'):
             report['shared_runtime_refresh'].update(saved_format_changed=True,

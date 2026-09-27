@@ -17,6 +17,9 @@ extern int af_creature_item_type(u32);
 extern int af_creature_save_collect(u8 *,u32,u32,u32);
 extern void af_v3_require_save_state(void);
 extern void af_v3_save_halt(int) __attribute__((noreturn));
+#ifdef AF_V3_CREATURE_VISITORS
+extern int af_v3_creature_visitor_collect(u8 *,unsigned,unsigned);
+#endif
 
 static u32 read_word(const u8 *p) {
     return (u32)p[0]<<24|(u32)p[1]<<16|(u32)p[2]<<8|p[3];
@@ -45,12 +48,16 @@ int af_v3_creature_collected(u8 *private,unsigned kind,unsigned index,unsigned m
         return !!(bits&bit);
     }
     unsigned player=slot(private);
+#ifdef AF_V3_CREATURE_VISITORS
+    if (player==4) return af_v3_creature_visitor_collect(private,item(kind,index),mark);
+#else
     /* A visitor's extra collections need Controller Pak transport. Never put
      * those records in another player's slot or discard a successful catch. */
     if (player==4) {
         if (mark) af_v3_save_halt(AF_SAVE_ARGUMENT);
         return 0;
     }
+#endif
     af_v3_require_save_state();
     int result=af_creature_save_collect(state->working,player,item(kind,index),mark);
     if (result<0) af_v3_save_halt(result);

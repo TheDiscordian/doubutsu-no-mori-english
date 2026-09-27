@@ -76,9 +76,10 @@ def encode(rows):
         if (row['item_id']!=f'{parent:04X}' or row['display_item_id']!=f'{display:04X}' or
                 row['runtime_index']!=index or len(name)!=16 or sha256(name)!=row['name_sha256'] or
                 row['native_category']!=(8 if parent>>8==0x23 else 18) or
-                row['ready'] is not False or row['selected'] is not False):
+                type(row['ready']) is not bool or type(row['selected']) is not bool or
+                row['ready']!=row['selected']):
             raise ValueError('Changed creature identity, official name, or incomplete readiness')
-        raw.extend(struct.pack('>HHHBBI',parent,display,row['price_word'],row['native_category'],row['source_index'],0)+name)
+        raw.extend(struct.pack('>HHHBBI',parent,display,row['price_word'],row['native_category'],row['source_index'],int(row['ready']))+name)
     return bytes(raw)
 
 
@@ -222,7 +223,13 @@ def checked(base,report,source):
     if not r:return None
     files=by_vrom(base);blob=files[BLOB].extract(base);core=files[CODE_VROM].extract(base)
     module=files[MODULE].extract(base);p=r['packet'];packet=blob[p['blob_offset']:p['blob_offset']+p['bytes']]
-    rows,receipt=source_records(source);table=encode(rows);code=r['code']
+    rows,receipt=source_records(source);selected=set()
+    selection=r.get('optional_selection')
+    if selection:
+        from v3_creature_selection import selected_identities
+        selected=selected_identities(r)
+        for row in rows:row['ready']=row['selected']=row['id'] in selected
+    table=encode(rows);code=r['code']
     if (r['format']!='AFV3-CREATURE-ITEMS-1' or r['rows']!=json.loads(json.dumps(rows)) or
             r['source']!=json.loads(json.dumps(receipt)) or p['ram']!=RAM or p['bytes']!=SIZE or
             p['vrom']!=BLOB+p['blob_offset'] or sha256(packet)!=p['sha256'] or
@@ -244,12 +251,14 @@ def checked(base,report,source):
         if row['parent_item_id']!=parent['item_id']:raise ValueError('Changed creature display parent')
         art.update(room_runtime=row['room_runtime'],room_lifecycle=row['room_lifecycle'])
         raw=profile(art,row['object_vrom'],limit=limit,model_capacity=bank)
-        profile_record=struct.pack('>HHI',row['runtime_index'],int(row['item_id'],16),0)+raw+bytes(4)
+        active=parent['id'] in selected
+        profile_record=struct.pack('>HHI',row['runtime_index'],int(row['item_id'],16),int(active))+raw+bytes(4)
         data=blob[row['object_vrom']-BLOB:row['object_vrom']-BLOB+row['object_bytes']]
         metadata=blob[ITEMS+i*32:ITEMS+(i+1)*32]
         if (row['runtime_index']!=parent['runtime_index'] or sha256(data)!=row['object_sha256'] or
                 blob[ROWS+i*80:ROWS+(i+1)*80]!=profile_record or
                 sha256(profile_record)!=row['profile_record_sha256'] or sha256(metadata)!=row['item_record_sha256'] or
-                row['profile_hex']!=raw.hex() or blob[0x40+i//8]&(1<<(i&7))):
+                row['profile_hex']!=raw.hex() or bool(blob[0x40+i//8]&(1<<(i&7)))!=active or
+                row['selected']!=active):
             raise ValueError('Changed complete creature display profile, artwork, or activation')
     return r

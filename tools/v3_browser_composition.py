@@ -34,6 +34,7 @@ def rules(image, report):
         raise ValueError('Selection resources must be uncompressed')
     entries, slots = [], {}
     surfaces=report.get('room_surfaces',{}).get('optional_selection')
+    creatures=report.get('equipment_resources',{}).get('creature_items',{}).get('optional_selection')
 
     def field(at, size):
         if type(at) is not int or not 0 <= at <= len(image) - size or size <= 0:
@@ -57,6 +58,9 @@ def rules(image, report):
             off.append(disable(blob.pstart + row['display_enable_offset'], 4))
         elif row['kind']=='equipment':
             furniture.append({'item_id':row['display_item_id'],'runtime_index':row['display_runtime_index']})
+        elif row['kind'] in ('fish','insect'):
+            furniture.append({'item_id':row['display_item_id'],'runtime_index':row['display_runtime_index']})
+            off.append(disable(blob.pstart+row['carried_enable_offset'],4))
         for item in furniture:
             index = item['runtime_index']
             if index in slots:
@@ -69,6 +73,9 @@ def rules(image, report):
         if surfaces:
             from v3_surface_selection import profile as surface_profile
             entries[-1]['surface_profile_hex']=surface_profile([row] if row['kind'] in ('floor','wall') else []).hex()
+        if creatures:
+            from v3_creature_selection import profile as creature_profile
+            entries[-1]['creature_profile_hex']=creature_profile([row] if row['kind'] in ('fish','insect') else []).hex()
 
     # Reuse the authoritative HRA write generator, assigning each disabled row
     # to the option that owns its fixed furniture/mannequin runtime identity.
@@ -133,8 +140,9 @@ def rules(image, report):
 
     from v3_surface_selection import checksum_fields
     from v3_creature_choices import options as behaviour_options,checksum_fields as behaviour_checksums,SAVE_NOTE
+    from v3_creature_selection import checksum_fields as creature_checksums
     behaviours=behaviour_options(image,report)
-    crcs = behaviour_checksums(image,report)+checksum_fields(image,report)
+    crcs = creature_checksums(image,report)+behaviour_checksums(image,report)+checksum_fields(image,report)
     for at, start, length in ((blob.pstart + 0xF8, blob.pstart + composition.PACKAGE, composition.PACKAGE_SIZE),
                               (module.pstart + composition.CONFIG + 8, blob.pstart, composition.PREFIX_SIZE)):
         value = field(at, 4)
@@ -152,6 +160,7 @@ def rules(image, report):
             'crc32': crcs, 'header': field(0x10, 8),
             'save_compatibility':composition.save_compatibility(report),
             **({'behaviours':behaviours,'behaviour_save_note':SAVE_NOTE} if behaviours else {}),
+            **({'creature_profile_hex':creatures['profile_hex']} if creatures else {}),
             **({'surface_profile_hex':surfaces['profile_hex']} if surfaces else {})}
 
 

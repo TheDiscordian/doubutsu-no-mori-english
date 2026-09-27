@@ -97,6 +97,15 @@ def rewrite(owner,reloc,ram,targets,windows):
 def install(base,prior,blob,output,core=None):
     from v3_furniture_pipeline import Source
     e=copy.deepcopy(prior['equipment_resources']);field=e.get('creature_field')
+    if e.get('creature_fish',{}).get('world',{}).get('creature_travel'):
+        from v3_creature_selection import install_scoring
+        return install_scoring(base,prior,blob)
+    if e.get('creature_items',{}).get('optional_selection'):
+        from v3_creature_travel import install as install_travel
+        return install_travel(base,prior,blob,output,core)
+    if e.get('creature_fish',{}).get('world',{}).get('behaviour_choices'):
+        from v3_creature_selection import install as install_selection
+        return install_selection(base,prior,blob)
     if e.get('creature_fish',{}).get('world',{}).get('collection_ui_installed'):
         from v3_creature_choices import install as install_choices
         return install_choices(base,prior,blob)

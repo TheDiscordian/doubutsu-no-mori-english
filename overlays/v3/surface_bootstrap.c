@@ -25,6 +25,12 @@ const u32 af_v3_fish_world_crc_expected = AF_FISH_WORLD_CRC;
 #else
 #define fish_world_crc AF_FISH_WORLD_CRC
 #endif
+#if defined(AF_V3_EDITABLE_CHECKSUMS) && defined(AF_CREATURE_ITEMS_VROM)
+const u32 af_v3_creature_items_crc_expected = AF_CREATURE_ITEMS_CRC;
+#define creature_items_crc (*(volatile const u32 *)&af_v3_creature_items_crc_expected)
+#else
+#define creature_items_crc AF_CREATURE_ITEMS_CRC
+#endif
 
 static __attribute__((noinline)) int load_code(void *p,u32 vrom,u32 bytes,u32 crc) {
     if (af_surface_dma(p,vrom,bytes) || af_surface_crc(p,bytes)!=crc) return 0;
@@ -112,7 +118,7 @@ int af_v3_surface_init(void) {
     extern unsigned char af_test_creature_code[AF_CREATURE_ITEMS_BYTES];
     void *creatures=af_test_creature_code;
 #endif
-    if (!load_code(creatures,AF_CREATURE_ITEMS_VROM,AF_CREATURE_ITEMS_BYTES,AF_CREATURE_ITEMS_CRC)) return 0;
+    if (!load_code(creatures,AF_CREATURE_ITEMS_VROM,AF_CREATURE_ITEMS_BYTES,creature_items_crc)) return 0;
 #endif
 #ifdef AF_CREATURE_FIELD_VROM
 #ifdef __mips__
