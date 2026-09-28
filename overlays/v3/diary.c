@@ -20,11 +20,25 @@ static u32 length(const u8 *p) {u32 n=AF_DIARY_PAGE;while(n && p[n-1]==32)n--;re
 void af_diary_reset(AFDiary *d) {
     if(!d)return;
     fill(d,0,sizeof(*d));copy(d->bytes,"AFDY\0\1",6);
+#ifdef AF_V3_HOLIDAY_STORAGE
+    d->bytes[5]=2;
+#endif
     for(u32 p=0;p<AF_DIARY_PLAYERS;p++)fill(page(d,p,0),32,AF_DIARY_MONTHS*AF_DIARY_PAGE);
 }
 int af_diary_valid(const AFDiary *d) {
-    if(!d || !equal(d->bytes,(const u8 *)"AFDY\0\1",6))return 0;
-    for(u32 i=6;i<AF_DIARY_HEADER;i++)if(d->bytes[i])return 0;
+    if(!d || !equal(d->bytes,(const u8 *)"AFDY\0",5))return 0;
+    if(d->bytes[5]==1) {
+        for(u32 i=6;i<AF_DIARY_HEADER;i++)if(d->bytes[i])return 0;
+    }
+#ifdef AF_V3_HOLIDAY_STORAGE
+    else if(d->bytes[5]==2) {
+        const u8 *s=d->bytes;
+        if(s[6]>31 || s[6]==4 || s[7] || s[15] || s[12]&128 || s[14]&240)return 0;
+        if(!s[11]) {for(u32 i=8;i<15;i++)if(s[i])return 0;}
+        else if(!s[6] || s[11]>af_diary_days((u32)s[8]*256+s[9],s[10]))return 0;
+    }
+#endif
+    else return 0;
     for(u32 p=0;p<AF_DIARY_PLAYERS;p++) {
         const u8 *c=cal(d,p);
         /* Bit 31 cannot represent a day. Reserved calendar bytes stay zero. */
@@ -34,9 +48,19 @@ int af_diary_valid(const AFDiary *d) {
     }
     return 1;
 }
+#ifdef AF_V3_HOLIDAY_STORAGE
+int af_diary_upgrade(AFDiary *d) {
+    if(!af_diary_valid(d))return AF_DIARY_ARGUMENT;
+    d->bytes[5]=2;return AF_DIARY_OK;
+}
+#endif
 int af_diary_player_clear(AFDiary *d,u32 p) {
     if(p>=AF_DIARY_PLAYERS || !af_diary_valid(d))return AF_DIARY_ARGUMENT;
     fill(calendar(d,p),0,AF_DIARY_CALENDAR);fill(page(d,p,0),32,AF_DIARY_MONTHS*AF_DIARY_PAGE);
+#ifdef AF_V3_HOLIDAY_STORAGE
+    /* Exact donor mSC_LightHouse_Delete_Player: remove contribution only. */
+    if(d->bytes[5]==2)d->bytes[13]&=(u8)~(1u<<(p+4));
+#endif
     return AF_DIARY_OK;
 }
 int af_diary_lock(AFDiary *d,u32 viewer,u32 owner,int locked) {

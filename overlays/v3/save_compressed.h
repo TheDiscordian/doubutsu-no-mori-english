@@ -34,6 +34,9 @@ enum { AF_CZ_DIARY_RAW=AF_CZ_RAW+AF_DIARY_BYTES };
 /* Format eleven adds all monthly pages and calendar/lock state without changing
  * the canonical format-eight town. No device writes. Older envelopes migrate
  * with empty diary pages; old readers reject format eleven. */
+/* AF_V3_HOLIDAY_STORAGE writes format twelve with AFDY-v2 metadata, retaining
+ * these buffer sizes. Valid format-eleven diaries migrate before live commit;
+ * old readers reject the newer envelope. */
 int af_v3_save_compress_diary(unsigned char *bank,unsigned int bank_bytes,
     const unsigned char *canonical,unsigned int canonical_bytes,
     const unsigned char *console,unsigned int console_bytes,const AFDiary *diary,

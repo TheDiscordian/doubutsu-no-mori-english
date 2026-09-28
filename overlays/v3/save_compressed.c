@@ -117,6 +117,9 @@ static int compress(u8 *bank,u32 bank_bytes,const u8 *canonical,u32 canonical_by
 #ifdef AF_V3_DIARY_STORAGE
     if(extra_bytes && (extra_bytes!=AF_DIARY_BYTES || !af_diary_valid((const AFDiary *)extra) ||
         word(canonical+PAYLOAD+4)!=0x00080680 || word(canonical+PAYLOAD+8)!=5))return AF_CZ_FORMAT;
+#ifdef AF_V3_HOLIDAY_STORAGE
+    if(extra_bytes && extra[5]!=2)return AF_CZ_FORMAT;
+#endif
 #else
     if(extra_bytes)return AF_CZ_ARGUMENT;
 #endif
@@ -127,7 +130,11 @@ static int compress(u8 *bank,u32 bank_bytes,const u8 *canonical,u32 canonical_by
     copy(bank,canonical,START);copy(bank+MIRROR,canonical+MIRROR,2);
     encode(bank,&input,hash);
     put(bank+PAYLOAD,0x41465333);
+#ifdef AF_V3_HOLIDAY_STORAGE
+    put(bank+PAYLOAD+4,extra_bytes?0x000C0680:word(canonical+PAYLOAD+4)+0x10000u);
+#else
     put(bank+PAYLOAD+4,extra_bytes?0x000B0680:word(canonical+PAYLOAD+4)+0x10000u);
+#endif
     put(bank+PAYLOAD+8,word(canonical+PAYLOAD+8));put(bank+PAYLOAD+12,AF_CZ_RAW+extra_bytes);
     put(bank+PAYLOAD+16,(u32)length);put(bank+PAYLOAD+20,1);
     put(bank+PAYLOAD+28,crc(canonical,AF_CZ_BANK,AF_CZ_BANK,0));
@@ -158,6 +165,9 @@ static int expand(const u8 *bank,u32 bank_bytes,u8 *scratch,u32 scratch_bytes,u3
 #endif
 #ifdef AF_V3_DIARY_STORAGE
     extended=extra_bytes==AF_DIARY_BYTES && word(e+4)==0x000B0680 && word(e+8)==5;
+#ifdef AF_V3_HOLIDAY_STORAGE
+    extended |= extra_bytes==AF_DIARY_BYTES && word(e+4)==0x000C0680 && word(e+8)==5;
+#endif
     version |= extended;
 #endif
     total=AF_CZ_RAW+(extended?extra_bytes:0);
@@ -204,6 +214,10 @@ static int expand(const u8 *bank,u32 bank_bytes,u8 *scratch,u32 scratch_bytes,u3
     if(extended) {
         if(crc(scratch+AF_CZ_RAW,extra_bytes,extra_bytes,0)!=word(e+36))return AF_CZ_CHECKSUM;
         if(!af_diary_valid((const AFDiary *)(scratch+AF_CZ_RAW)))return AF_CZ_FORMAT;
+#ifdef AF_V3_HOLIDAY_STORAGE
+        if(scratch[AF_CZ_RAW+5]!=(word(e+4)==0x000B0680?1:2))return AF_CZ_FORMAT;
+        if(af_diary_upgrade((AFDiary *)(scratch+AF_CZ_RAW))!=AF_DIARY_OK)return AF_CZ_FORMAT;
+#endif
     } else if(extra_bytes)af_diary_reset((AFDiary *)(scratch+AF_CZ_RAW));
 #endif
     return 0;

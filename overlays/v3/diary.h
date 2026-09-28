@@ -34,6 +34,10 @@ typedef struct {
 
 void af_diary_reset(AFDiary *);
 int af_diary_valid(const AFDiary *);
+#ifdef AF_V3_HOLIDAY_STORAGE
+/* Version two uses the ten reviewed header bytes, not native save padding. */
+int af_diary_upgrade(AFDiary *);
+#endif
 int af_diary_player_clear(AFDiary *,unsigned int player);
 int af_diary_lock(AFDiary *,unsigned int viewer,unsigned int owner,int locked);
 /* Months are zero-based, matching the donor's actual page consumer. */

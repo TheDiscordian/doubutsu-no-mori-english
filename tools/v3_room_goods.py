@@ -299,6 +299,15 @@ def publish_bootstrap(equipment,blob,surface,output):
         extra+=tuple(f'AF_NPC_EXTRA_{label}=0x{p[key]:X}u' for label,key in
             (('PHYSICAL','physical'),('CRC','crc32'),('BYTES','bytes'),('RAM','ram')))
         extra+=(f'AF_NPC_EXTRA_INIT=0x{npc_extra["code"]["symbols"]["af_v3_npc_dma_init"]:X}u',)
+    holiday_state=equipment.get('holiday_state')
+    if holiday_state:
+        from v3_holiday_state import RAM as HOLIDAY_RAM,SIZE as HOLIDAY_SIZE
+        p=holiday_state['packet']
+        if (not npc_extra or p['ram']!=HOLIDAY_RAM or p['bytes']!=HOLIDAY_SIZE or p['physical']&15 or
+                p['storage']!='physical-ROM' or not 0x100000<=p['physical']<p['physical']+p['bytes']<=0x4000000):
+            raise ValueError('Changed complete holiday-state startup packet')
+        extra+=tuple(f'AF_HOLIDAY_STATE_{label}=0x{p[key]:X}u' for label,key in
+            (('PHYSICAL','physical'),('CRC','crc32'),('BYTES','bytes'),('RAM','ram')))
     boot,compiled=compile_part('surface_bootstrap',output/'goods_surface_bootstrap',defines=(
         'AF_V3_EDITABLE_CHECKSUMS=1',f'AF_SURFACE_ITEMS_VROM=0x{items["vrom"]:X}u',
         f'AF_SURFACE_ITEMS_CRC=0x{items["crc32"]:X}u',f'AF_SURFACE_ITEMS_BYTES=0x{items["bytes"]:X}u',
@@ -325,3 +334,4 @@ def publish_bootstrap(equipment,blob,surface,output):
     if insects:insects['startup']=copy.deepcopy(goods['startup'])
     if diaries:diaries['startup']=copy.deepcopy(goods['startup'])
     if npc_extra:npc_extra['startup']=copy.deepcopy(goods['startup'])
+    if holiday_state:holiday_state['startup']=copy.deepcopy(goods['startup'])

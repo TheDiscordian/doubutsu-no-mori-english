@@ -115,6 +115,9 @@ static int expand(const u8 *bank,const u8 **logical) {
 #endif
 #ifdef AF_V3_DIARY_STORAGE
         || version==0x000B0680
+#ifdef AF_V3_HOLIDAY_STORAGE
+        || version==0x000C0680
+#endif
 #endif
         )) {
 #ifdef AF_V3_DIARY_STORAGE

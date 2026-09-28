@@ -222,6 +222,9 @@ def contract(source,base):
 
 
 def install(base,prior,blob,core,output):
+    if prior['equipment_resources']['npc_extra'].get('events',{}).get('placement',{}).get('observers'):
+        from v3_holiday_state import install as install_state
+        return install_state(base,prior,blob,core,output)
     del blob
     equipment=copy.deepcopy(prior['equipment_resources']);npc=equipment['npc_extra'];events=npc['events']
     if not events.get('native_directory'):

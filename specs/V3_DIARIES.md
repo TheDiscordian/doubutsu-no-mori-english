@@ -12,10 +12,10 @@ The calendar/reading/editing/storage controller and shared native-save adapter
 are implemented in source and compile for VR4300. Host checks cover room surface
 selection, calendar navigation, editing/privacy/capacity admission, and the
 save → probe → reload path. They do not establish in-game UI operation,
-native FlashRAM timing, ordinary gameplay, or hardware compatibility. ABI 320
+native FlashRAM timing, ordinary gameplay, or hardware compatibility. ABI 321
 contains menus, resident packets, room/visit hooks, save dispatch, carried readers,
 complete room covers, and catalogue/scoring integration at
-`build/v3-diary-category-work-01/tortimer-observers-01/`. Neither patcher changes.
+`build/v3-diary-category-work-01/tortimer-state-05/`. Neither patcher changes.
 
 ## Donor contract
 
@@ -579,10 +579,11 @@ the native bridge is compiler/source checked, not executed. No native fixture is
 started and the exhausted diary title-fixture budget is unchanged.
 
 `af_holiday_npc_bind` and `af_holiday_npc_unregister` are installed in the shared
-placement/observation packet. The remaining installation service is
-`af_holiday_npc_event_world`, supplying actual special dates and saved vacation
-state. The prepared lifecycle still needs linking and activation after its
-required event owners work.
+placement/observation packet. `af_holiday_npc_event_world` supplies actual special
+dates and saved vacation state from the shared state packet. The full lifecycle
+is linked against these installed exports, with all four profile callbacks bound.
+The native calendar caller is installed; activation remains gated on required
+event owners and the calendar behaviour choice.
 The native world wrapper, saved reward bindings, and full-voice resource check
 are implemented below. The installed dialogue/continuation, walking/cane/resource
 exports, and elapsed-tick controller are reused; allocation and drawing are
@@ -642,8 +643,8 @@ Remaining owner connections share one category task:
   and morning exercise. Date occurrence alone is not native RUN/SHOW state.
 - Reuse the installed native event directory/campsite infrastructure: 128 index
   entries, 64 today slots, and 80 manager references. Shared shrine/wandering
-  callbacks are connected; dedicated owners and the schedule caller still need
-  connection. Camper event 70 stays reserved.
+  callbacks and the schedule caller are connected; dedicated owners remain.
+  Camper event 70 stays reserved.
 - Bind the installed shared shrine and wandering owners from `ac_event_manager.c`
   (`soncho_start/stop/in`, `sonchowandar_start/stop`) to native placement. New Year's, sports,
   cherry blossom, meteor, harvest moon, and Harvest Festival have event-specific
@@ -679,8 +680,9 @@ and validate it again. Unknown resource/reader changes still reject.
 `806EB400` inside the existing NPC packet. The complete code is 3,824 bytes;
 the 812-byte `AFHE` source packet is at `806ED800`. The native directory bridge
 also uses this packet. No allocation, profile bit, saved format, or artwork
-changes. The current build is
-`build/v3-diary-category-work-01/tortimer-observers-01/`, ABI 320.
+changes to this packet. The current build is
+`build/v3-diary-category-work-01/tortimer-state-05/`, ABI 321; its additional state
+packet and save extension are described below.
 
 `v3_holiday_events.py` derives all 49 relevant rows from the complete checked
 GAFE01 schedule and all 44 associated ownership records from the relocated
@@ -718,9 +720,10 @@ donor priority and cleanup functions execute beside the port. The current
 browser/offline empty, all-supported, and mixed compositions also agree.
 Host event/placement services are doubles, not native gameplay. The maximum
 individual scheduler frame is 656 bytes, with a 56-byte decoder before further
-callees; actual native stack use remains unverified. Native schedule-caller and
-actor-owner binding, dedicated owners, special-state persistence, exercise/card integration,
-and actor activation remain unfinished. No native test budget is reset, no
+callees; actual native stack use remains unverified. The native schedule caller
+and special-state persistence are installed below. Dedicated actor owners,
+calendar behaviour choice, exercise/card integration, and actor activation remain
+unfinished. No native test budget is reset, no
 diary is selectable, and neither patcher deployment changes.
 
 ### Native event directory connection
@@ -827,9 +830,9 @@ and execution of both original and changed common-reset instructions. Native I/O
 is doubled in host checks; native gameplay remains unverified. Current private
 browser/offline empty, mixed, and all-supported compositions agree. Saved format
 eleven and selection flags stay unchanged; all sixteen diary choices remain
-inactive. The live calendar caller, dedicated/costume/exercise actors, actual
-special-state persistence, remaining NPC lifecycle providers, and activation
-remain part of this same category task. No native fixture is restarted.
+inactive. The calendar caller and state/provider connections are installed below.
+Dedicated/costume/exercise actors, calendar behaviour choice, and activation remain
+part of this same category task. No native fixture is restarted.
 
 ### Shared NPC observations and cleanup
 
@@ -869,9 +872,52 @@ are retained. No additional resident allocation or save-format change is needed.
 Three focused current checks cover the corrected landmark decoder, all mapped
 observation/cleanup paths, clip bounds/rejection, source/native dependencies,
 and retained cartridge data. Native I/O is doubled in the sanitized host check.
-Browser/offline empty, mixed, and all-supported outputs agree. The next consumer
-is `af_holiday_npc_event_world`; calendar calling, saved special state, required
-dedicated/costume/exercise actors, and activation remain unfinished.
+Browser/offline empty, mixed, and all-supported outputs agree. The event-world
+provider and native calendar caller are installed below; required dedicated/
+costume/exercise actors, calendar behaviour choice, and activation remain unfinished.
+
+### Saved holiday state and connected lifecycle
+
+`holiday_state.c` supplies saved Town Day and the complete lighthouse quest
+state, following the checked `m_soncho.c`, `lb_reki.c`, and town initialization
+source. Town Day is chosen once from the donor's thirty July dates excluding
+July 4. Harvest Moon uses the complete 2002–2030 source table; the native lunar
+fallback is bounded to its actual 2000–2032 table. Equinoxes use the source
+formulas. The shared clock provider does not clear vacation state while working.
+
+The quest preserves day zero, the seven working days, the return period through
+day seventeen, the six-o'clock rollover, entry hours, each player's contribution
+and completion flags, and the donor's completion/check order. Player deletion
+removes that player's contribution flag, not the town's quest. Date/time changes
+follow the source availability check. These helpers are not a claim that the
+lighthouse building or its interaction owner is implemented.
+
+`tools/v3_holiday_state.py` installs one guarded 32-KiB packet at `806F4000`,
+links the complete prepared NPC lifecycle, and redirects 25 public entries in the
+existing diary/save module. All old callers and function pointers keep their
+addresses; only their eight-byte entry windows change. The original NPC packet,
+profile bits, calendars, pages, buffers, and canonical codec remain in place.
+Startup validates and loads all eighteen packets before initialization. The
+actor descriptor's four callbacks are bound, but selection flags stay zero until
+the remaining owner connections work.
+
+The complete checked native scheduling function is `8007F358..8007F6A0`.
+Its call at `8007F630` reaches `af_holiday_calendar_before_cleanup`, inside the
+unchanged native working-player gate. The wrapper plans the complete source
+batch through the installed shared directory bridge, then retains the existing
+camper scheduling and native first-entry result. Native cleanup and hourly
+activation still own event status. A disabled actor selection changes no dates,
+RNG state, or daily records. The caller does not bypass the unfinished event-owner
+or behaviour-choice requirements to make imports selectable.
+
+`tests/test_v3_holiday_state.py` uses the existing save-device doubles with
+address/undefined sanitizers for actual diary editing/preflight, full-town/
+console/diary saving, format-eleven migration, and legacy-reader rejection.
+It covers source dates, quest boundaries, four players, deletion, working/visitor
+rules, and malformed state. Native RTC/RNG/lunar/FlashRAM calls are doubles.
+The current-cartridge check verifies the new packet, retained data, all entry
+redirects, and startup descriptor/CRC. Browser/offline composition agrees for
+empty, mixed, and all-supported selections. No native fixture is restarted.
 
 ## Serialized diary state
 
@@ -880,21 +926,29 @@ dedicated/costume/exercise actors, and activation remain unfinished.
 | Offset | Content |
 | --- | --- |
 | `0..3` | `AFDY` |
-| `4..5` | Big-endian diary schema 1 |
-| `6..15` | Reserved zero |
+| `4..5` | Big-endian diary schema 2 |
+| `6` | Town Day; zero before initialization, otherwise 1–31 excluding 4 |
+| `7`, `15` | Reserved zero |
+| `8..11` | Lighthouse start year (big-endian), month, day; zero when absent |
+| `12` | Seven daily light flags |
+| `13` | Low four started-player bits, high four contribution bits |
+| `14` | Low four completed-player bits |
 | `16 + player × 12008` | Complete 104-byte calendar |
 | Player record + `104 + month × 992` | Complete monthly page, months 0–11 |
 
 The calendar uses source big-endian field order. Invalid reserved bytes, lock
 values, day high bits, and month metadata reject. Text layout is validated before
 editing or drawing; arbitrary saved glyph data must not index outside the
-font/line buffers. Player deletion clears only that player's calendar and pages.
+font/line buffers. Schema one requires zero bytes `6..15` and upgrades without
+moving player data. Player deletion clears that player's calendar, pages, and
+lighthouse contribution bit, preserving the other players and town state.
 New towns/reset initialize all pages to spaces. All covers access the same data.
 
 ## Save envelope and edit admission
 
 The optional `AF_V3_DIARY_STORAGE` build extends the shared compressor, retaining
-its old API for console-only envelopes. Format eleven contains:
+its old API for console-only envelopes. `AF_V3_HOLIDAY_STORAGE` writes format
+twelve with schema two. The payload contains:
 
 - The complete canonical format-eight, registry-five town: 65,536 bytes.
 - All four existing console records: 6,528 bytes.
@@ -903,16 +957,18 @@ its old API for console-only envelopes. Format eleven contains:
 Decoded size is **120,112 bytes**. Stored size remains one 65,536-byte bank;
 both independent FlashRAM banks remain. The existing stream area, town header,
 town-ID mirror, native checksum, disk CRC, canonical CRC, and console CRC remain.
-Envelope word `F9A4` (header offset 36) contains the diary CRC in format eleven;
-older envelopes retain zero there. Format eleven requires canonical format
-eight/registry five, the exact expanded size, and a valid diary schema. Unknown
+Envelope word `F9A4` (header offset 36) contains the diary CRC in formats eleven
+and twelve; earlier envelopes retain zero there. Both require canonical format
+eight/registry five and the exact expanded size. Format eleven requires schema
+one; format twelve requires schema two. Unknown
 formats, corrupted streams, padding, lengths, and checksum failures reject.
 
 `af_v3_save_expand_diary` reads existing supported compressed formats and
-initializes only the newly introduced diary state. The canonical decoder still
-validates/migrates the complete town/profile. Older save readers reject format
-eleven. **New saves require this or a newer compatible V3 build;
-V2 and earlier V3 cannot load them. Preserve backups.** Only the experimental
+initializes diary state when absent. Format-eleven migration validates all CRCs
+before upgrading the existing diary header, retaining pages and console progress.
+The canonical decoder still validates/migrates the complete town/profile.
+**New saves require this or a newer compatible V3 build; V2 and format-eleven-or-
+earlier V3 cannot load them. Preserve backups.** Only the experimental
 cartridge uses this format; the stable deployments and user's saves are untouched.
 
 Writing first measures the complete encoded save. Failure leaves the output
@@ -939,9 +995,10 @@ These are installed guarded allocations:
 
 | RAM | Bytes | Purpose |
 | --- | ---: | --- |
-| `80670000` | `6000` hex, including end guard | Code reservation |
+| `80670000` | `6000` hex, including end guard | Retained code and stable redirected entries |
 | `80676000` | 48,048 + 16 | Live diary state and guard |
 | `80682000` | 120,112 + 16 | Expanded save workspace and guard |
+| `806F4000` | `8000` hex, including end guard | Holiday state, updated storage, and linked NPC lifecycle |
 
 The existing console records and compression hash workspace retain their
 allocations. The old decode buffer is not grown into neighbouring console/model

@@ -31,9 +31,9 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
-The current proposal is ABI 320 at
-`build/v3-diary-category-work-01/tortimer-observers-01/build-lock.json`, ROM SHA-256
-`869db1d26fdb9fb94131c49d879dd53e8f63387651b66dd6122a8fbef48ddaa7`.
+The current proposal is ABI 321 at
+`build/v3-diary-category-work-01/tortimer-state-05/build-lock.json`, ROM SHA-256
+`5663403d40a013da4314fabb7c47814d11a315410e430c2acda5f67e8af22b77`.
 It contains 191 independently selectable development imports, including all nine
 fish and eight insects, and 100 inactive furniture profiles whose acquisition
 is pending, plus sixteen inactive diary cover profiles. The main lock and both
@@ -68,10 +68,28 @@ and cleanup are installed. The outdoor clip is checked against its live relocate
 owner before binding; imported New Year cleanup uses a separate reserved Miko
 profile and cannot remove native Miko. That imported actor remains unimplemented.
 Placement reads the shrine at manager offsets `22C/230`, not the pool at `214/218`.
-The native schedule caller, actual special dates/vacation state, event-specific
-actors, the event-world provider, lifecycle linking, and separate exercise/card conversation
-remain required before activation. Installed code is not a claim that Tortimer
-or any diary is playable.
+The event-world provider supplies actual saved Town Day, source harvest dates,
+and lighthouse vacation state. The complete prepared NPC lifecycle links against
+the installed motion, dialogue, world, observation, and date/state services.
+The native calendar caller uses the real date/state provider, preserving camper
+scheduling, the working-player gate, and native cleanup/hourly dispatch. All four
+NPC profile callbacks reach the linked lifecycle. Its actor stays inactive:
+event-specific actors, the calendar behaviour choice, and the separate exercise/
+card conversation remain required. Installed code is not
+a claim that Tortimer or any diary is playable.
+
+The shared holiday state occupies the versioned diary header without moving any
+calendar or page. Format-12 saves preserve the full town, four players' console
+progress, and all 48 pages. Compatible old saves migrate forward, including
+format eleven; V2 and format-eleven-or-earlier V3 cannot load new saves. Existing
+ROMs/saves and both stable patchers remain untouched. A sanitized connected host
+check covers actual edit/preflight, save/reload, migration, rejection by the old
+reader, date/quest state, and the calendar caller through actual planning/native
+directory code. The current cartridge check verifies all 25 stable-entry
+redirects, the native caller and four profile callbacks, retained NPC resources,
+and the eighteenth startup packet.
+Browser/offline empty, mixed, and all-191 compositions agree. Native diary/holiday
+gameplay, FlashRAM execution, and hardware remain unverified.
 
 Three current focused checks pass: all 44 mapped observation/cleanup paths and
 clip/resource rejection; 54 comparisons with complete donor search functions,
@@ -88,9 +106,8 @@ resource retention; sanitized all-owner admission, capacity rejection, status,
 and cleanup; and execution of the changed MIPS capacity branch with delay-slot
 handling.
 The 1,360-byte bridge, 256-byte identity map, and expanded temporary storage use
-the existing packet. Save format eleven and all profile bits are unchanged.
-Older compatible saves retain forward migration; V2 and earlier V3 formats cannot
-read format-eleven saves. Preserve existing saves. No native fixture is restarted,
+the existing packet. Profile bits are unchanged; the saved holiday state uses
+format twelve as described above. Preserve existing saves. No native fixture is restarted,
 and native diary gameplay, ordinary save/reload, and hardware remain unverified.
 
 Retained event checks cover sanitized calendar boundaries,
@@ -98,9 +115,9 @@ all 28 priority/cleanup comparisons against the complete donor functions,
 placement/culling failure handling, and scheduled owner → accepted conversation →
 attendance → guarded reward delivery. Placement and event I/O are host doubles.
 The source event kernel remains unchanged: its 3,824-byte code and 812-byte
-source packet use existing reserved RAM; saved
-formats/profiles, previously installed components, and all sixteen inactive diary
-selections are unchanged. No native fixture is attempted.
+source packet use existing reserved RAM. The state extension retains these
+components, profile identities, and all sixteen inactive diary selections.
+No native fixture is attempted.
 
 One connected sanitized host check passes all 65 candidates and 128 handovers,
 four-player trophy isolation, visitors, repeat delivery, full/stale inventory,

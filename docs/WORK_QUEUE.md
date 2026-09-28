@@ -170,7 +170,7 @@ native common-data reset, leaving original keep storage untouched. Focused
 sanitized donor/owner checks, current cartridge/relocation/reset checks, and
 browser/offline empty/mixed/all-supported composition pass. No native fixture
 is restarted. These components stay complete; actor activation remains unfinished.
-The current ABI-320 proposal at
+The observation bindings at
 `build/v3-diary-category-work-01/tortimer-observers-01/build-lock.json` installs
 `af_holiday_npc_bind` and `af_holiday_npc_unregister` with checked live outdoor
 clip binding, event/field observations, actual shrine lookup, mapped race-state
@@ -179,13 +179,22 @@ reading, and native cleanup. The field decoder uses shrine `22C/230`, not pool
 native Miko but remains unimplemented; cleanup never deletes native profile `84`.
 Three focused current checks and empty/mixed/all-supported browser/offline
 composition pass. Native I/O is doubled; no emulator fixture is restarted.
-The remaining provider is `af_holiday_npc_event_world`. Connect the native
-event manager's remaining event-specific owners and calendar caller, bind actual
-special dates/vacation persistence, and finish the costume/exercise identities.
-The next consumer is the event-world provider: actual special dates and saved
-vacation state, shared with the native schedule caller. Then link the prepared
-NPC lifecycle against the installed exports; retain actor activation gates until
-the required event owners work. The race reader expects the mapped donor-15/id-8
+The current ABI-321 proposal is
+`build/v3-diary-category-work-01/tortimer-state-05/build-lock.json`.
+`af_holiday_npc_event_world` supplies saved Town Day, complete source harvest
+dates, and lighthouse vacation callbacks. The prepared NPC lifecycle is linked
+against all installed providers, without reconverting its resources. The shared
+save path writes format twelve and reads/migrates compatible earlier saves,
+including format eleven, preserving pages and console progress. Older V3/V2
+readers cannot load new saves. Focused sanitized save/state/migration and current
+cartridge checks pass; current browser/offline compositions agree.
+The native calendar caller uses this actual date/state provider and retains the
+existing camper/native dispatch. All four prepared profile callbacks are bound.
+The next consumers are the remaining event-specific owners and costume/exercise
+identities in the existing owner map, alongside the calendar behaviour choice.
+Complete these within the same category-wide path, retaining finished assets,
+conversations, placement, storage, and scheduling. Retain actor activation gates
+until the required event owners work. The race reader expects the mapped donor-15/id-8
 payload; the imported race owner still needs to produce it. Native event 10 is
 not a substitute for that owner.
 `af_holiday_world_bind` already supplies `af_holiday_world_variant`; reuse it.

@@ -1437,11 +1437,16 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         report['native_test']='pending connected Tortimer event/conversation/animation providers and diary gameplay/save verification'
     if holiday_actor_services:
         npc=equipment_report['npc_extra']
+        holiday_state=equipment_report.get('holiday_state')
         report['shared_runtime_refresh'].update(adapters=['holiday_actor_services'],artwork_changed=False,
-            additional_resident_bytes=0,resource_allocations_changed=False,
-            saved_format_changed=False,saved_profile_changed=False)
+            additional_resident_bytes=holiday_state['additional_resident_bytes'] if holiday_state else 0,
+            resource_allocations_changed=bool(holiday_state),
+            saved_format_changed=bool(holiday_state),saved_profile_changed=False)
         report['sources'].update(npc['sources'])
-        report['native_test']='pending Tortimer event/world/cleanup providers, separate exercise/card route, and connected diary gameplay/save verification'
+        report['native_test']=('pending dedicated/costume/exercise owners, calendar behaviour choice, actor activation, '
+            'and connected diary gameplay/save verification' if holiday_state else
+            'pending native calendar caller, dedicated/costume/exercise owners, actor activation, '
+            'and connected diary gameplay/save verification')
     if console_images is not None:
         images=equipment_report['console_images']
         report['shared_runtime_refresh'].update(adapters=['console_images'],

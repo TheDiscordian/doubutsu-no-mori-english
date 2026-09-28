@@ -58,6 +58,9 @@ static const u32 diary_items_crc=AF_DIARY_ITEMS_CRC;
 #ifdef AF_NPC_EXTRA_PHYSICAL
 static const u32 npc_extra_crc=AF_NPC_EXTRA_CRC;
 #endif
+#ifdef AF_HOLIDAY_STATE_PHYSICAL
+static const u32 holiday_state_crc=AF_HOLIDAY_STATE_CRC;
+#endif
 
 #ifdef __mips__
 #define DEST(name,address) ((void *)(address))
@@ -72,6 +75,7 @@ extern unsigned char af_test_insect_code[],af_test_clothing_code[];
 extern unsigned char af_test_diary_storage[],af_test_diary_ui[],af_test_diary_art[];
 extern unsigned char af_test_diary_items[];
 extern unsigned char af_test_npc_extra[];
+extern unsigned char af_test_holiday_state[];
 #define DEST(name,address) (af_test_##name)
 #define CLEAR(name,address) (&af_test_##name)
 #endif
@@ -127,6 +131,9 @@ static const struct StartupPacket packets[]={
 #endif
 #ifdef AF_NPC_EXTRA_PHYSICAL
     {DEST(npc_extra,AF_NPC_EXTRA_RAM),AF_NPC_EXTRA_PHYSICAL|0x80000000u,AF_NPC_EXTRA_BYTES,&npc_extra_crc,0},
+#endif
+#ifdef AF_HOLIDAY_STATE_PHYSICAL
+    {DEST(holiday_state,AF_HOLIDAY_STATE_RAM),AF_HOLIDAY_STATE_PHYSICAL|0x80000000u,AF_HOLIDAY_STATE_BYTES,&holiday_state_crc,0},
 #endif
 };
 
