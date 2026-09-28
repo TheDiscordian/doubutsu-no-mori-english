@@ -300,9 +300,12 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
     texture_bindings={} if texture_bindings is None else texture_bindings
     vertex_bindings={} if vertex_bindings is None else vertex_bindings
     if vertex_bindings and (not static_materials or inherited_vertices or joint_matrices or
-            len(vertex_bindings)!=1 or any(address not in (0x08000000,0x09000000,0x0A000000)
-                or target!=vertex for address,target in vertex_bindings.items()) or
-            set(vertex_bindings)&(set(palette_bindings)|set(texture_bindings))):
+            len({address>>24 for address in vertex_bindings})!=1 or
+            any(type(address) is not int or address>>24 not in (8,9,10) or
+                address&15 or type(target) is not int or
+                target-vertex!=address&0xFFFFFF or not 0<=target-vertex<vertex_size
+                for address,target in vertex_bindings.items()) or
+            {p>>24 for p in vertex_bindings}&{p>>24 for p in (*palette_bindings,*texture_bindings)}):
         raise ValueError('Invalid complete projected-vertex binding')
     if inherited_palette_slot is not None and (
             type(inherited_palette_slot) is not int or not 0 <= inherited_palette_slot <= 15
@@ -316,6 +319,10 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
             or joint_matrices and not static_materials):
         raise ValueError('Joint matrices require a bounded shared skeleton material')
     material_bindings={} if material_bindings is None else material_bindings
+    if vertex_bindings and ({p>>24 for p in vertex_bindings}&{p>>24 for p in material_bindings} or
+            palette_fade and 8 in {p>>24 for p in vertex_bindings} or
+            scrolling and scrolling.get('segment',0)>>24 in {p>>24 for p in vertex_bindings}):
+        raise ValueError('Dynamic vertices conflict with another segment owner')
     if scrolling is not None and (not static_materials or material_bindings or palette_fade or
             scrolling.get('segment') in palette_bindings or
             inherited_palette_slot is not None or set(scrolling)!={'segment','dimensions'} or
@@ -982,7 +989,8 @@ def command_source(models, offsets):
                 address=SEGMENT+target
                 if 'dynamic_vertices' in row:
                     address=row['dynamic_vertices']
-                    if address not in (0x08000000,0x09000000,0x0A000000) or first:
+                    if (type(address) is not int or address>>24 not in (8,9,10) or
+                            address&0xFFFFFF!=first*16 or address&15):
                         raise ValueError('Unreviewed projected vertex segment')
                 emit(f"gsSPVertex(0x{address:08X}, {row['count']}, {slot})")
             elif op == 0x0A:

@@ -26,6 +26,33 @@ import v3_feng_shui as feng
 
 
 class FormatTests(unittest.TestCase):
+    def test_dynamic_vertex_slices_preserve_offsets_and_bounds(self):
+        raw,pointers=fixture();raw=bytearray(raw)
+        at=next(p for p in range(0,len(raw),8) if raw[p]==1)
+        target=pointers.pop(0x100+at+4)
+        struct.pack_into('>I',raw,at+4,0x08000000)
+        # Keep both complete draws, loading a different slice for the second.
+        tail=bytearray(raw[at:-8]);struct.pack_into('>I',tail,4,0x08000200)
+        raw[-8:-8]=tail
+        def parse(bindings=None,size=560,**kwargs):
+            return parse_model(raw,0x100,pointers,(0x500,),{0x600:(32,32)},target,size,
+                static_materials=True,vertex_bindings=bindings or
+                {0x08000000:target,0x08000200:target+512},**kwargs)
+        rows=parse()
+        code,_=command_source({'opaque':{'rows':rows}},{0x500:0,0x600:32,target:544})
+        self.assertIn('gsSPVertex(0x08000000, 3, 0)',code)
+        self.assertIn('gsSPVertex(0x08000200, 3, 0)',code)
+        for bindings in ({0x08000000:target,0x08000200:target+496},
+                         {0x08000000:target,0x09000200:target+512},
+                         {0x08000000:target,0x08000201:target+513}):
+            with self.assertRaises(ValueError):parse(bindings)
+        with self.assertRaises(ValueError):parse(size=559)
+        with self.assertRaises(ValueError):parse(texture_bindings={0x08000000:0x600})
+        with self.assertRaises(ValueError):parse(scrolling={'segment':0x08000000,'dimensions':[[32,32]]})
+        bad=copy.deepcopy(rows)
+        next(r for r in bad if r.get('dynamic_vertices')==0x08000200)['dynamic_vertices']=0x080001F0
+        with self.assertRaises(ValueError):command_source({'opaque':{'rows':bad}},{0x500:0,0x600:32,target:544})
+
     def test_projected_vertices_keep_caller_segment_and_reject_unsafe_bindings(self):
         raw,pointers=fixture();raw=bytearray(raw)
         loads=[p for p in range(0,len(raw),8) if raw[p]==1]

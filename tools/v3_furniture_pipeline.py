@@ -807,8 +807,10 @@ def prepare_models(source, descriptor):
                 palettes[frame['donor_offset']]=frame['symbol'],frame['bytes']
     bindings, used_bindings = descriptor.get('palette_bindings', {}), set()
     vertex_bindings=descriptor.get('vertex_bindings',{})
+    vertex_uses={};used_vertex_bindings=set()
     texture_bindings,used_textures=adapter.get('texture_bindings',{}),set()
     for label, (name, at, n) in descriptor['models'].items():
+        vertex_uses[label]={}
         model_vertices[label] = set(vertex_arrays) if inherited_vertices else set()
         if n%8: raise ReviewRequired('unaligned display list')
         parts=adapter.get('model_sequences',{}).get(label)
@@ -844,6 +846,7 @@ def prepare_models(source, descriptor):
                 elif op == 0x01 and b in vertex_bindings:
                     if target is not None:raise ReviewRequired('Relocated projected vertex binding')
                     target=vertex_bindings[b]
+                    vertex_uses[label][b]=target;used_vertex_bindings.add(b)
                 elif target is None or b: raise ReviewRequired('missing model dependency relocation')
                 symbol, start, size = source.containing(target, exact=op != 0x01)
                 if source.pointers(start, size): raise ReviewRequired('pointer-bearing texture or vertex array')
@@ -879,6 +882,7 @@ def prepare_models(source, descriptor):
             if position > n: raise ReviewRequired('truncated packed model')
         raw_models[label] = name, at, raw, pointers, receipts
     if used_bindings != set(bindings): raise ReviewRequired('unused constant palette binding')
+    if used_vertex_bindings!=set(vertex_bindings):raise ReviewRequired('unused projected vertex binding')
     if used_textures!=set(texture_bindings):raise ReviewRequired('unused constant texture binding')
     if used_frames != set(material_frames):raise ReviewRequired('unused material-frame binding')
     if fading and not dynamic_used: raise ReviewRequired('unused palette-fade dependency')
@@ -923,7 +927,7 @@ def prepare_models(source, descriptor):
                 palette_bindings=bindings, texture_bindings=texture_bindings, palette_fade=fading,
                 joint_matrices=matrices, inherited_palette_slot=inherited_palette,
                 inherited_vertices=inherited_vertices,
-                vertex_bindings=vertex_bindings,
+                vertex_bindings=vertex_uses[label],
                 independent_material_frames=adapter.get('independent_material_frames',False),
                 scrolling=scrolling.get(label),
                 material_bindings={address:(row['kind'],row['frames'][0]['donor_offset'])

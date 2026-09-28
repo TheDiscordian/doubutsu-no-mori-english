@@ -23,6 +23,23 @@ SPECIAL_NPCS = {
         name=0xD091, profile=0xCD),
 }
 
+# Shared event actors are resident villagers in temporary roles, not additional
+# villagers. Keep their identities independent of the donor/native event numbers.
+# New Year uses four residents; the source's fifth slot is not spawned.
+PARTICIPANT_REGISTRY_VERSION = 1
+PARTICIPANTS = {
+    'tokyoso_control': dict(profile=0xD9, event=15, save=8, name=0, source=0, count=0),
+    'tunahiki_control': dict(profile=0xDA, event=14, save=9, name=0, source=0, count=0),
+    'hatumode_control': dict(profile=0xDB, event=1, save=7, name=0, source=0, count=0),
+    'tokyoso_npc0': dict(profile=0xDC, event=15, save=8, name=0xD0A0, source=0xD02D, count=1),
+    'tokyoso_npc1': dict(profile=0xDD, event=15, save=8, name=0xD0A1, source=0xD02E, count=4),
+    'tunahiki_npc0': dict(profile=0xDE, event=14, save=9, name=0xD0A5, source=0xD05F, count=1),
+    'tunahiki_npc1': dict(profile=0xDF, event=14, save=9, name=0xD0A6, source=0xD060, count=4),
+    'hatumode_npc0': dict(profile=0xE0, event=1, save=7, name=0xD0AA, source=0xD058, count=4),
+    'rope': dict(profile=0xE1, event=14, save=9, name=0, source=0, count=0),
+}
+PARTICIPANT_ROPE_PROFILE = 0xE1
+
 # Additive event structures retain the native structure allocation category.
 # Their source variants are separate identities, never positions in a selection.
 DECORATION_REGISTRY_VERSION = 1

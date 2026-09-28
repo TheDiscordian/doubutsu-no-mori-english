@@ -53,6 +53,19 @@ holiday participants/controllers and calendar admission remain unfinished.
 No native fixture is restarted, and these checks do not establish in-game
 rendering or make diaries selectable.
 
+The shared race, tug-of-war, and New Year participant module is prepared at
+`build/v3-diary-category-work-01/participants-prepared-14/`, not installed.
+All three controllers, five resident roles, and the rope compile together from
+245 complete donor functions. The preparation includes 279 official messages,
+two choices, offering payment, matched motions, the full prayer motion, tools,
+and native effect/sound mappings. The complete deforming rope and shadow use
+the shared model converter. Fixed identities, ordinary NPC allocation, guarded
+callbacks, and deferred identity cleanup share one registry. A sanitized host
+check and 23 shared conversion checks pass; native gameplay remains unverified.
+Next connect the shared town-selection/placement readers, offering-coin effect,
+animation hook, and actual calendar admission. The current ROM, saved format,
+selectable imports, and patcher deployments remain unchanged.
+
 All fourteen dedicated event owners have live manager callbacks through the
 shared dispatcher and existing common state. Their 85 identity requirements
 come from every source layout variant and actual profile/effect calls. Missing

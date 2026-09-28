@@ -987,6 +987,59 @@ fixture is restarted. The dispatcher resolves the complete effect identities,
 but missing participants/controllers keep owner admission inactive. Saved format
 13, profile bits, and both stable patcher deployments remain unchanged.
 
+### Shared resident participants and controllers
+
+`tools/v3_holiday_participants.py` prepares the complete race, tug-of-war, and
+New Year family together. `participants-prepared-14/` contains three controllers,
+five NPC roles, and the required rope: 245 complete donor functions, checked
+profile relocations, and one 42,951-byte MIPS object including data/BSS. This is
+uninstalled preparation, not an active event or a new cartridge.
+
+`tools/v3_registry.py` owns fixed profiles `D9..E1` and temporary resident names
+`D0A0..D0AD`. The five role types fit the existing 2,400-byte NPC allocation;
+the rope uses the native background category. Every temporary name binds the
+actual resident's appearance, identity, and clothing rather than a new static
+villager. The registry rejects duplicate resident assignments, includes original
+native event slots in that check, and retains retiring records until the native
+NPC destructor finishes. Post-initialization movement/drawing callbacks remain
+inside the admission checks. Failed births are deleted. The two source
+destructors that assume live event storage gain null checks; the referee still
+deletes its rope even when that storage has already gone.
+
+The preparation appends the complete 279-message/two-choice graph, preserving
+official wording, pages, pauses, and demo orders. Twelve exact location edits
+use `shrine` instead of the donor's wishing well; the prepared provenance records
+explicitly credit those assistant adaptations. Merge those records into the
+single `translations/provenance.json` catalogue when installing the final IDs.
+Offering payment uses the complete source routines and native wallet/bag readers.
+Twenty-one motions match complete native keyframe arrays; the different prayer
+motion is converted completely. Its global native animation hook is required.
+Native face/effect/audio programmes remain attached to the reused motions.
+
+The shared graphics converter supports multiple bounded slices of one mutable
+vertex segment. The 2,720-byte rope object preserves all 60 vertices, both source
+loads, 36 body triangles, and 22 shadow triangles. Complete source deformation
+reads mapped tug state; source construction/destruction updates all three
+collision units. Drawing checks matrix, vertex, and command space and retains
+the source's static-vertex fallback. No coin or other missing effect becomes a
+same-number native alias. The visible offering coin remains a required provider.
+
+Timers use elapsed native ticks; the tug controller executes its complete shared
+state update per tick, including its odd-length counter wrap. NPC physics and
+sounds are not doubled. Native timing/rendering remains unverified. A sanitized
+host check covers all fourteen temporary bindings, duplicate rejection, callback
+replacement, cancellation, missing-state cleanup, and original fallbacks. All
+23 shared converter checks pass. Native services are doubles in the host check.
+
+Remaining connections are town event selection/placement, native descriptor and
+temporary-name readers/reset, the prayer-animation hook, offering-coin effect,
+and actual calendar admission. Native selection helpers `800821B0`, `800824A4`,
+and `8008256C` match the complete donor selection/removal/refill algorithms and
+can be reused with validated counts. Native resident stride is `528`, with
+memories at `10`; source-header offset comments are not layout evidence.
+The installed ABI remains 342, saved format remains 13, and both deployments
+stay on stable V2-14. No diary becomes selectable through this preparation.
+
 ### Reserved layouts and dedicated owners
 
 `tools/v3_holiday_maps.py` converts the complete donor event-layout graph and
