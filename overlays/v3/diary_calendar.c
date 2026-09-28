@@ -18,8 +18,9 @@ int af_diary_weekday(AFDiaryDate d) {
     return (int)((y+y/4-y/100+y/400+month_offsets[d.month-1]+d.day)%7);
 }
 static int dates_valid(AFDiaryDates dates,AFDiaryDate current) {
-    return dates.town_day>=1 && dates.town_day<=31 &&
-        date_valid((AFDiaryDate){current.year,dates.harvest_month,dates.harvest_day});
+    return dates.town_day<=31 &&
+        ((!dates.harvest_month && !dates.harvest_day) ||
+         date_valid((AFDiaryDate){current.year,dates.harvest_month,dates.harvest_day}));
 }
 static u8 *calendar(AFDiary *d,u32 player) {return d->bytes+16+player*AF_DIARY_PLAYER;}
 static const u8 *cal(const AFDiary *d,u32 player) {return d->bytes+16+player*AF_DIARY_PLAYER;}

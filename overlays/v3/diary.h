@@ -17,7 +17,8 @@ typedef unsigned char af_diary_u8;
 typedef unsigned int af_diary_u32;
 typedef struct { af_diary_u8 bytes[AF_DIARY_BYTES]; } AFDiary;
 typedef struct { unsigned short year; af_diary_u8 month,day; } AFDiaryDate;
-/* Special dates come from the game's existing date/event calculations. */
+/* Special dates come from the game's existing date/event calculations. Zero
+ * means the event does not exist in that game, not an invented fallback date. */
 typedef struct { af_diary_u8 town_day,harvest_month,harvest_day; } AFDiaryDates;
 typedef struct {
     af_diary_u8 text[AF_DIARY_PAGE], original[AF_DIARY_PAGE];

@@ -117,7 +117,7 @@ class DiaryScreenTests(unittest.TestCase):
             print(run.stdout.strip())
 
     def test_prepared_native_owner_and_keyboard_hooks(self):
-        output=ROOT/'build/v3-diary-category-work-01/ui-04'
+        output=ROOT/'build/v3-diary-category-work-01/ui-06'
         report=json.loads((output/'ui.json').read_bytes())
         base,prior=inputs(ROOT/'build/v3-native-variants-work-01/connected-02/cartridge/build-lock.json')
         self.assertEqual(report['base_rom_sha256'],sha256(base))

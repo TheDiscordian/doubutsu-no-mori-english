@@ -66,8 +66,8 @@ owner by full personal ID using native `mPr_GetPrivateIdx`. Vacant houses and
 failed menu opening cannot accidentally activate the supporting furniture.
 The original controller handles non-diary interactions unchanged. Exact consumers,
 caller bytes, and the one removable relocation are bound in the preparation.
-The menu-open and selected-style exports still need real native bindings; no stub
-or unfinished hook is installed in the cartridge.
+`diary_native.c` binds the menu-open and selected-style exports to actual native
+data and the compiled screen owner. No unfinished hook is installed in the cartridge.
 
 `diary_menu.c` provides one transient controller for all covers:
 
@@ -86,7 +86,8 @@ or unfinished hook is installed in the cartridge.
 
 Native drawing, full-page keyboard handling, submenu ownership, transitions, and
 sound/lifecycle adapters are implemented and linked for VR4300. Native date/event
-bindings and installation remain unfinished. Eight official prompt strings
+reading and room entry are linked; participation callers and installation remain
+unfinished. Eight official prompt strings
 and three project-authored error strings are
 credited in `translations/provenance.json` under `v3/diary/`; preparation verifies
 each source location and encoded text. Month/day artwork and event labels remain
@@ -117,8 +118,8 @@ furniture defaults and its stricter material rules stay unchanged.
 warning draw paths with the converted packet. It preserves source matrices,
 colours, selection geometry, and prompt text. Graphics-space checks precede drawing;
 the source packet's segment binding is restored before returning. The native owner
-provides projection/animation positions; actual event labels/day types remain a
-required native provider. Paper and text use the same absolute scrolling offset,
+provides projection/animation positions; the native calendar provider supplies
+actual event labels/day types. Paper and text use the same absolute scrolling offset,
 including during transitions. Native cursor/end-marker callbacks use proportional
 positions and explicitly bind the keyboard's marker assets before drawing. These
 functions are not an installed or visually verified screen. The compiled largest
@@ -154,12 +155,17 @@ constructor, dispatch, and destructor.
 
 `tools/v3_diary_ui.py` links the owner/drawing code and prepares additive hooks
 against the checked current cartridge. Output is
-`build/v3-diary-category-work-01/ui-04/`: 12,496 code bytes, SHA-256
-`3066fc1fe6ee8588c4f43db37b73422c9db2f7079a62f77bdd58a7c39f59bc0d`,
-and 2,240 bytes of screen state. Planned code/state/art reservations start at
+`build/v3-diary-category-work-01/ui-06/`: 18,416 code bytes, SHA-256
+`dbb5951b0e50f1b94326ec05955062740cfe43c1f239c0a7be315bbda2782077`,
+2,240 bytes of screen state, and 488 bytes of native context. Planned code/state/art reservations start at
 `806A0000`, `806A8000`, and `806B0000`; each has a guard and is checked against
 existing reservations plus the prepared diary save workspace. No mutable state
 is hidden in the linked code packet.
+
+The context occupies `806A8900` inside the state reservation, after the complete
+screen. Transactional editing uses a separate candidate at `806D4000`, 48,048 bytes
+plus a sixteen-byte guard. It cannot reuse the compressor's 120,112-byte scratch:
+the preflight constructs a complete save there while reading the candidate.
 
 The prepared HBOARD overlay is 2,304 bytes and the keyboard is 39,936 bytes.
 Together they require 1,600 additional aligned menu-arena bytes. The current
@@ -187,6 +193,49 @@ and renderer bindings do not force another graphics compilation. The prepared
 save core and carried model remain unchanged; current carried commands and relevant
 prompt provenance are checked directly rather than treating unrelated catalogue
 additions as a reason to rebuild the save module.
+
+### Native dates and entry
+
+`diary_events.c` reads the complete 81-row native event master at `80104B60`.
+Nineteen calendar rules identify actual holidays rather than duplicating their
+crowd/weather/sports actors or advertising rumour periods as holidays. They retain
+N64 fixed dates, recurring Sundays/Saturdays, ordinal weekdays, seasonal ranges,
+and both lunar moon-viewing dates. Overnight festivities appear on their named
+date rather than on the next day's midnight endpoint. The owner's birthday is
+read from the actual `BD0`-byte player record, not the current viewer's birthday.
+Calendar colours retain Sunday/event/current-day meanings and the donor's
+birthday colour rule. Monthly results are cached; drawing does not repeatedly
+decode the full schedule or change the live RTC to browse other dates.
+
+The real native lunar conversion at `800D60E4` is guarded to years 2000–2032.
+Its own lower-bound test is insufficient for its lookup table. Gregorian dates
+in adjacent browsing years still work without an out-of-bounds lunar lookup.
+Native Town Day and other absent GameCube-only dates are explicitly absent, not
+assigned invented dates. Zero-valued optional special dates preserve the core's
+original donor behaviour when actual special dates are supplied.
+
+`tools/v3_diary_events.py` checks native decoder/conversion functions, their
+complete lookup tables, and native player/date readers. Twenty labels are bound
+to the single provenance catalogue. Official calendar strings are preferred;
+Valentine's Day, mushroom season, and Jingle use identified official passages.
+White Day, Children's Day, and the second Moon Viewing label retain the existing
+explicitly assistant-authored N64 credits. This does not claim human review.
+
+`diary_native.c` connects the real `game + 1CBC` submenu to the resident screen,
+selected style/profile rows, current player/RTC, owner birthday, glyph-width
+reader, and complete-save preflight. A prepared hook at `8007FA20` calls the
+original live-player predicate and records the current play day only after the
+native title, player-selection, demo, and player-control gates. An already-marked
+day avoids another calendar refresh. The original predicate result is preserved.
+The hook is not installed. Event participation remains a separate actual-player
+caller requirement: calendar occurrence does not set attendance. Native event IDs
+cannot index the donor's differently numbered special-event flags.
+
+The combined sanitized host check uses actual native schedule data and the local
+N64 lunar implementation, covering 420 months, boundary years, recurring events,
+overlapping holidays, birthdays, style selection, real entry, and guarded preflight.
+Current linked menu/visit hooks and the donor-calendar comparison also pass.
+These checks do not execute native graphics, FlashRAM, or ordinary gameplay.
 
 ## Serialized diary state
 
@@ -247,8 +296,8 @@ renderer and native keyboard binding remain unfinished.
 
 ## Memory and prepared code
 
-`build/v3-diary-category-work-01/prepared-04/diaries.json` binds the complete
-22,588-byte save/calendar/menu module to ABI 308 and current source hashes. Preparation uses
+`build/v3-diary-category-work-01/prepared-05/diaries.json` binds the complete
+22,544-byte save/calendar/menu module to ABI 308 and current source hashes. Preparation uses
 the existing Docker toolchain and checks the current report's RAM reservations.
 These are checked **planned** allocations, not installed startup reservations:
 
@@ -271,9 +320,9 @@ The prepared packet has no mutable globals or unresolved symbols.
 | --- | --- |
 | Category identity/data | All sixteen donor IDs, names, prices, and aliases bound; additive native identity/readers still required |
 | Carried/collection artwork | Shared carried model converted with the general split material/geometry converter; reuse cover conversions and install correct room/collection contexts |
-| Calendar entry | Surface A-tap adapter, house-owner resolution, controller/markers, privacy, native drawing, and owned native menu linked; actual room entry, event/date callers, and installation remain |
+| Calendar entry | Surface A-tap, owner/player resolution, actual room entry, native dates/events/birthdays, drawing, and owned menu linked; visit hook prepared, actual participation callers and installation remain |
 | Reading/editing | Controller, ownership, wrapping/scrolling, cursor, keyboard child, confirmation/privacy, transitions, and atomic commit linked; overlay/DMA/arena installation and native execution remain |
-| English UI | Official prompts, project errors, and all screen textures extracted/credited/checked; actual native event labels remain in screen integration |
+| English UI | Official prompts, project errors, all screen textures, and native event labels extracted/credited/checked; native rendering remains unverified |
 | Persistence | Shared reset, clear, probe, pack, commit, forward migration, and preflight implemented/tested on host; startup loading and stable native dispatch still need installation |
 | Selection | Bind carried/display profile dependencies, catalogue/scoring, and independent/all choices only after the complete path is connected |
 | Verification | Run bounded combined current-ROM UI/save checks after integration; no separate style-by-style native scenarios |

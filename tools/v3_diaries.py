@@ -171,7 +171,7 @@ def discover(source):
         shared_across_styles=True, native_installed=False,ui_text=ui_text(source),references=REFERENCES)
 
 
-def prepare(base_lock, output):
+def prepare(base_lock, output, reuse_carried=None):
     """Compile the connected category core once; do not install or enable it."""
     from v3_furniture_install import inputs
     from v3_furniture_pipeline import Source,prepare_material_pair,compile_models
@@ -200,10 +200,26 @@ def prepare(base_lock, output):
     parts=[(name,*source.symbol(name)) for name in ('obj_item_diaryT_mat_model','obj_item_diaryT_gfx_model')]
     prepared=prepare_material_pair(source,parts)
     (output/'carried').mkdir(parents=True,exist_ok=False)
-    artwork,offsets,models,_=compile_models(output/'carried',prepared)
+    if reuse_carried:
+        cached=json.loads((reuse_carried/'diaries.json').read_bytes())['carried_artwork']
+        artwork=(reuse_carried/cached['file']).read_bytes()
+        if (sha256(artwork)!=cached['sha256'] or len(artwork)!=cached['bytes'] or
+                cached['resources']!=prepared[2] or artwork[:len(prepared[1])]!=prepared[1] or
+                (reuse_carried/'carried/commands.c').read_text()!=prepared[5]):
+            raise ValueError('Changed shared carried diary resources/commands')
+        for row in cached['models']:
+            spec=prepared[4][row['layer']];at=row['native_offset'];n=row['bytes']
+            if (row['symbol']!=spec['symbol'] or row['source_sha256']!=spec['source_sha256'] or
+                    row['source_parts']!=spec['source_parts'] or sha256(artwork[at:at+n])!=row['output_sha256']):
+                raise ValueError('Changed shared carried diary model')
+        offsets,models=cached['offsets'],cached['models']
+        write_new(output/'carried/commands.c',prepared[5].encode())
+    else:
+        artwork,offsets,models,_=compile_models(output/'carried',prepared)
     write_new(output/'carried.bin',artwork)
     report['carried_artwork']=dict(file='carried.bin',bytes=len(artwork),sha256=sha256(artwork),
         models=models,offsets=offsets,resources=prepared[2],shared_styles=16,installed=False)
+    if reuse_carried:report['carried_artwork']['reused_from']=str(reuse_carried.relative_to(ROOT))
     symbols = prior['save_codec']['active_codec_code']['symbols']
     helpers = prior['equipment_resources']['creature_fish']['world']['save']['helpers']['symbols']
     clear = prior['room_surfaces']['save']['helpers']['symbols']['af_v3_surface_player_clear']
@@ -237,8 +253,9 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--base-lock',type=Path,required=True)
     parser.add_argument('--output',type=Path,required=True)
+    parser.add_argument('--reuse-carried',type=Path)
     args = parser.parse_args()
-    report = prepare(args.base_lock,args.output)
+    report = prepare(args.base_lock,args.output,args.reuse_carried.resolve() if args.reuse_carried else None)
     print(json.dumps(dict(styles=len(report['rows']),compiled_bytes=report['compiled']['bytes'],
         installed=report['native_installed'],output=str(args.output))))
 

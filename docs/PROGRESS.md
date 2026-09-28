@@ -45,8 +45,8 @@ saved contents. The actual surface A-tap adapter resolves the resident from the
 house owner ID and preserves native furniture handling when no selected diary
 is present. The shared carried model is converted, and official prompts plus
 project safety messages have per-text provenance. Preparation is
-`build/v3-diary-category-work-01/prepared-04/`; the linked MIPS save/calendar/menu
-core is 22,588 bytes. The calendar matches the donor C in focused host comparisons.
+`build/v3-diary-category-work-01/prepared-05/`; the linked MIPS save/calendar/menu
+core is 22,544 bytes. The calendar matches the donor C in focused host comparisons.
 The adapter and controller pass a combined sanitized host check across all styles,
 all player access modes, navigation, privacy, and rejected edits. These are not
 installed screens or ordinary gameplay results.
@@ -63,20 +63,37 @@ bounds, caller tables, and rejection of missing state. These screens and hooks
 are not installed or visually verified; no new cartridge is claimed.
 
 The shared native menu owner is linked at
-`build/v3-diary-category-work-01/ui-04/`. It connects opening, calendar/read views,
+`build/v3-diary-category-work-01/ui-06/`. It connects opening, calendar/read views,
 scrolling, the actual keyboard child, first-A answer reveal, Rewrite, privacy,
 capacity rejection, closing, and session cleanup. The paper and text share the
 same scrolling position; the cursor uses proportional glyph positions. The
-keyboard adapter retains blinking and character alteration. The linked UI is
-12,496 bytes, with 2,240 bytes of caller-owned state. Prepared HBOARD and keyboard
+keyboard adapter retains blinking and character alteration. The linked UI and
+native entry/calendar adapter occupy 18,416 bytes, with 2,240 bytes of screen state
+and 488 bytes of native context. Prepared HBOARD and keyboard
 hooks add 1,600 bytes to the native menu arena and preserve unrelated existing
 code/graphics at two relocation addresses. Three focused source/compiler/host
 checks pass, including the connected interaction with rejected and accepted
 commits. Native UI execution and visual verification remain pending.
 
+The native entry resolves all sixteen selected styles, actual house/player
+identity, owner birthdays, real RTC dates, current proportional glyph widths,
+and the full-town save preflight. Its separate 48,048-byte candidate buffer at
+`806D4000` cannot overlap the save compressor's workspace. The calendar uses the
+checked N64 holiday schedule and lunar conversion, with bounds protecting the
+adjacent browsing years. Twenty labels have source credits, including seventeen
+official-source labels and three reusing explicitly assistant-authored N64 text.
+A prepared play-day hook retains the native title/player-select/demo gates and
+live-player result. Actual event-participation callbacks remain unbound.
+
+Four focused checks pass: current linked packets/hooks, the combined native-data
+entry/calendar host check, and retained donor-calendar comparison. The host check
+covers 420 months, lunar boundaries, all style bits, separate owner birthdays,
+overlapping holidays, and guarded preflight. The converted screen/carried artwork
+is reused. These are host/compiler results, not installed native gameplay.
+
 The shared save adapter retains the complete town, console progress, calendars,
-and pages within the existing two FlashRAM banks. Live native date/event and
-room-entry bindings, prepared menu-hook installation, carried readers, resident
+and pages within the existing two FlashRAM banks. Prepared menu/room/visit-hook
+installation, actual participation callers, carried readers, resident
 loading/save dispatch, and selection
 remain in the same [diary consumer map](../specs/V3_DIARIES.md). No new playable
 imports or cartridge completion is claimed. Planned format-eleven saves require

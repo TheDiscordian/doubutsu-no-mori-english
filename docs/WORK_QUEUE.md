@@ -32,7 +32,7 @@ Current implementation task: complete the shared diary importing path for all
 sixteen donor styles (`2B00..2B0F`). The 48 monthly pages, calendar/read/edit/
 confirmation/privacy controller, calendar persistence, transactional page/lock
 admission, and shared save adapter are prepared for MIPS at
-`build/v3-diary-category-work-01/prepared-04/`. The source implements the actual
+`build/v3-diary-category-work-01/prepared-05/`. The source implements the actual
 surface A-tap adapter for every style, including house-owner identity and native
 furniture fallback. It is not installed. The shared carried model is converted;
 official prompts and project safety messages have catalogue provenance.
@@ -40,12 +40,16 @@ The complete shared screen packet is converted at
 `build/v3-diary-category-work-01/screen-04/`, with the donor month/day artwork,
 paper, controls, and confirmation/privacy graphics. The shared native menu owner,
 page/keyboard/confirmation transitions, drawing, and keyboard hooks are linked at
-`build/v3-diary-category-work-01/ui-04/`. The ordinary house-message fallback and
+`build/v3-diary-category-work-01/ui-06/`. The ordinary house-message fallback and
 the accepted keyboard's complete graphics/input prefix are preserved. These
-packets are not installed. Resume at the real native date/event provider and
-room-entry binding, then connect resident startup/save dispatch, carried readers,
+packets are not installed. Native room entry, selected-style resolution, owner
+birthdays, real clock/holiday dates, glyph widths, and guarded edit preflight are
+linked with the UI. Its play-day hook preserves the native live-player predicate
+inside the gated event-update path. Actual event-participation callers remain
+unbound; a scheduled event must not count as attendance. Resume at resident
+startup/save dispatch and overlay/room-hook installation, then carried readers
 and selection. Follow the [connected consumer map](../specs/V3_DIARIES.md#connected-consumer-map).
-Carried identity/readers, live date/event callers, resident loading/dispatch, and
+Carried identity/readers, participation callers, resident loading/dispatch, and
 selection remain required in this same category. Reuse the prepared core, screen
 packet, linked UI, and passing save checks; do not restart source discovery or call covers playable.
 
