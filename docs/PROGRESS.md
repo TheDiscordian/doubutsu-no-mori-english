@@ -31,9 +31,9 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
-The current proposal is ABI 317 at
-`build/v3-diary-category-work-01/tortimer-events-02/build-lock.json`, ROM SHA-256
-`54381c5ff97bdd6aff90f0117ce9b3f8196429e8eb5447cf76357d5b018e4eeb`.
+The current proposal is ABI 318 at
+`build/v3-diary-category-work-01/tortimer-native-01/build-lock.json`, ROM SHA-256
+`77c953cf5ad3021d2ea56d4aa17547af7fc33e0e2b5792b42036ef1f8276fd22`.
 It contains 191 independently selectable development imports, including all nine
 fish and eight insects, and 100 inactive furniture profiles whose acquisition
 is pending, plus sixteen inactive diary cover profiles. The main lock and both
@@ -51,17 +51,33 @@ The native lifecycle bridge calls these services. The event scheduler and shared
 owner lifecycle also reside in the existing packet: 49 source schedule rows,
 44 owner records, live RUN/SHOW priority, and source cleanup selection. Calendar
 planning, shrine/wandering/costume placement requests, event start/stop, and acre
-entry/exit are connected through the shared owner interface. Native event-manager
-binding, actual special dates/vacation state, event-specific owners, and the
-separate exercise/card conversation remain required before activation. Installed
+entry/exit are connected through the shared owner interface. Native daily storage
+and its readers are expanded together to 64 rows and 80 manager references. The
+camper retains its own event and uses the same expanded directory. The manager's
+capacity check precedes its write, fixing the original delay-slot overrun.
+All 44 donor owners have fixed additive IDs, with a transactional native insertion
+bridge and live status/cleanup mapping. The bridge does not manufacture ACTIVE,
+RUN, SHOW, or attendance from calendar dates. Its native schedule caller and
+actor-manager callbacks, actual special dates/vacation state, event-specific
+owners, and the separate exercise/card conversation remain required before activation. Installed
 code is not a claim that Tortimer or any diary is playable.
 
-Two focused current event checks pass, including sanitized calendar boundaries,
+Three focused current directory checks pass: installed readers and relocation/
+resource retention; sanitized all-owner admission, capacity rejection, status,
+and cleanup; and execution of the changed MIPS capacity branch with delay-slot
+handling. Current browser/offline empty, mixed, and all-191 compositions agree.
+The 1,360-byte bridge, 256-byte identity map, and expanded temporary storage use
+the existing packet. Save format eleven and all profile bits are unchanged.
+Older compatible saves retain forward migration; V2 and earlier V3 formats cannot
+read format-eleven saves. Preserve existing saves. No native fixture is restarted,
+and native diary gameplay, ordinary save/reload, and hardware remain unverified.
+
+Retained event checks cover sanitized calendar boundaries,
 all 28 priority/cleanup comparisons against the complete donor functions,
 placement/culling failure handling, and scheduled owner → accepted conversation →
 attendance → guarded reward delivery. Placement and event I/O are host doubles.
-Current browser/offline empty, mixed, and all-191 compositions agree. The new
-3,824-byte code and 812-byte source packet use existing reserved RAM; saved
+The source event kernel remains unchanged: its 3,824-byte code and 812-byte
+source packet use existing reserved RAM; saved
 formats/profiles, previously installed components, and all sixteen inactive diary
 selections are unchanged. No native fixture is attempted.
 

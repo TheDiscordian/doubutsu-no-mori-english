@@ -107,6 +107,9 @@ def encode(contract):
 
 
 def install(base,prior,blob,core,output):
+    if prior['equipment_resources']['npc_extra'].get('events'):
+        from v3_holiday_native import install as install_native
+        return install_native(base,prior,blob,core,output)
     del blob,core
     equipment=copy.deepcopy(prior['equipment_resources']);npc=equipment['npc_extra']
     if not npc.get('world') or npc.get('events'):

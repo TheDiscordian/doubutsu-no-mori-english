@@ -639,9 +639,9 @@ Remaining owner connections share one category task:
   athlete, melody restoration, and cleanup. `m_soncho.c` prioritises active
   events except autumn fishing, then autumn fishing, January/February vacation,
   and morning exercise. Date occurrence alone is not native RUN/SHOW state.
-- Reuse the installed native event directory/campsite infrastructure. Its index
-  has 128 entries, but the event-manager dispatch and 16 today slots still need
-  checked ownership/capacity when extending it. Camper event 70 stays reserved.
+- Reuse the installed native event directory/campsite infrastructure: 128 index
+  entries, 64 today slots, and 80 manager references. The actual actor-owner
+  callbacks and schedule caller still need connection. Camper event 70 stays reserved.
 - Bind the installed shared shrine and wandering owners from `ac_event_manager.c`
   (`soncho_start/stop/in`, `sonchowandar_start/stop`) to native placement. New Year's, sports,
   cherry blossom, meteor, harvest moon, and Harvest Festival have event-specific
@@ -675,9 +675,10 @@ and validate it again. Unknown resource/reader changes still reject.
 
 `holiday_events.c` supplies the connected scheduler and owner controller at
 `806EB400` inside the existing NPC packet. The complete code is 3,824 bytes;
-the 812-byte `AFHE` source packet is at `806ED800`. No allocation, profile bit,
-saved format, existing code, or artwork changes. The current build is
-`build/v3-diary-category-work-01/tortimer-events-02/`, ABI 317.
+the 812-byte `AFHE` source packet is at `806ED800`. The native directory bridge
+also uses this packet. No allocation, profile bit, saved format, or artwork
+changes. The current build is
+`build/v3-diary-category-work-01/tortimer-native-01/`, ABI 318.
 
 `v3_holiday_events.py` derives all 49 relevant rows from the complete checked
 GAFE01 schedule and all 44 associated ownership records from the relocated
@@ -694,8 +695,8 @@ The caller supplies actual equinox/lunar/town dates and lighthouse availability;
 the scheduler does not create those saved values or start a vacation quest.
 Bridge-event preemption still belongs to the native calendar adapter. A source
 working-player gate returns no events. Insufficient output capacity or invalid
-inputs leave the destination unchanged. The 48-row caller-owned planner is not
-permission to overrun the native 16-row directory or 32-reference manager.
+inputs leave the destination unchanged. The 48-row caller-owned planner feeds
+the separately checked 64-row native directory; their row layouts differ.
 
 Owner start/stop, acre entry/exit, keep flags, and placement/culling outcomes feed
 RUN and SHOW separately. Being on the calendar never implies either state or
@@ -715,10 +716,61 @@ donor priority and cleanup functions execute beside the port. The current
 browser/offline empty, all-supported, and mixed compositions also agree.
 Host event/placement services are doubles, not native gameplay. The maximum
 individual scheduler frame is 656 bytes, with a 56-byte decoder before further
-callees; actual native stack use remains unverified. Native directory/manager
-binding, dedicated owners, special-state persistence, exercise/card integration,
+callees; actual native stack use remains unverified. Native schedule-caller and
+actor-owner binding, dedicated owners, special-state persistence, exercise/card integration,
 and actor activation remain unfinished. No native test budget is reset, no
 diary is selectable, and neither patcher deployment changes.
+
+### Native event directory connection
+
+`holiday_native.c` occupies 1,360 bytes at `806EC300`. Version-one identity maps
+at `806F1A80` assign all 44 sorted donor owner IDs to native IDs 71..114. Native
+0..69 and camper 70 remain independent. The mapping does not depend on selections
+or daily schedule order. The 128-byte forward and inverse maps are checked
+against the complete source-derived owner set before installation.
+
+The native 16-byte row layout is `type, hours, begin, end, status, reserved`, not
+the portable planner's 12-byte layout. Sixty-four rows at `806F1500` and eighty
+manager references at `806F1900` fit after both guarded actor slots and before
+the packet's final guard. All 21 native base consumers and four end consumers
+move together: initialization, four-row reset, slot admission, hourly update,
+special insertion, status readers/writers, cleanup, and debug display. Both
+cleanup loops include all mapped IDs. The adjacent original index initializer
+stays untouched; the existing campsite wrapper clears the live 128-entry index.
+The camper's reader moves with the array and accepts all 64 slots.
+
+All three manager reference readers use the resident array. Their six original
+HI/LO relocations are removed, so loading the owner at a different address cannot
+move those resident pointers. All other relocated bytes and the 29 existing
+owner controls are retained. The manager collector uses the current control
+pointer directly and tests capacity before its store; the taken branch's delay
+slot only calculates an index. Counts 80 and above cannot write past the list.
+The complete owner remains 40,048 bytes and its relocation allocation is unchanged.
+
+`af_holiday_native_merge` validates the complete directory, source identities,
+unique plan rows, flags, and free-slot count before any mutation. Failed admission
+leaves native rows, index, and count intact. Existing events retain their live
+flags; planned rows add hours/dates/EXIST only. The native hourly/acre logic owns
+ACTIVE. Snapshot/current/field/cleanup readers translate native IDs back to donor
+IDs and preserve the native ERROR masking rule. Death notification calls the real
+`800814B8` helper with the mapped identity. New Year's Miko deletion remains an
+explicit separate owner action, not an ordinary notification substitute.
+
+The compiled schedule bridge connects the installed source planner to this native
+insertion path. Its live caller remains unbound pending actual special dates,
+vacation state, calendar behaviour selection, and complete owner callbacks.
+Keep-bit capacity also needs verification before new owners call native keep
+services. Installing storage and the bridge does not activate actors or diary
+choices, fabricate missing dates, or count scheduled events as attendance.
+
+Three focused checks pass in `tests/test_v3_holiday_native.py`: complete installed
+reader/relocation retention; sanitized all-44 insertion alongside twenty retained
+native rows, overflow/malformed rejection, status, scheduling, and cleanup; and
+the actual patched MIPS collector block at capacity boundaries, including branch
+delay execution. Host death notification is a double. Current browser/offline
+empty, mixed, and all-191 compositions agree. Maximum individual bridge frames
+are 608 bytes for scheduling and 600 for status snapshots, before callees;
+native stack use and gameplay remain unverified. No native fixture is attempted.
 
 ## Serialized diary state
 

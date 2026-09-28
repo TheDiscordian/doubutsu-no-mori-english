@@ -148,14 +148,30 @@ the donor's cleanup selection. The connected sanitized host check reaches the
 existing conversation, attendance, and handover code; native placement calls
 remain host doubles. Two focused checks and current browser/offline empty,
 mixed, and all-supported compositions pass. No native fixture is restarted.
-These compiled components stay complete; native event-manager binding remains
+Native daily storage and its complete reader set are connected at
+`build/v3-diary-category-work-01/tortimer-native-01/`. The 64-row native directory,
+80-reference manager list, camper reader, initialization, hourly update, status,
+and cleanup consumers share the existing packet reservation. The manager checks
+capacity before writing, including its MIPS branch delay slot. Fixed additive
+IDs 71..114 map all 44 donor owners without replacing native events or camper 70.
+The compiled bridge admits the complete planned batch transactionally, preserves
+native RUN/SHOW and hourly activation, and maps actual status/death notification
+back to donor identities. Its calendar caller and actor owners remain unbound.
+Three focused cartridge/host checks pass, including the actual changed MIPS
+capacity branch; browser/offline empty, mixed, and all-supported outputs agree.
+No native fixture is restarted and no diary becomes selectable.
+These components stay complete; live placement and actor binding remain
 unfinished. The remaining providers are `af_holiday_npc_bind`,
 `af_holiday_npc_event_world`, and `af_holiday_npc_unregister`. Connect the native
-event directory/manager to the installed event exports, bind actual special dates
-and vacation state, and supply native placement/culling and event-specific owners.
-Preserve the existing camper and native event storage; the current 16 today slots
-and 32 manager references are not implicitly enlarged by the new caller-owned
-planner. Native actor-death notification is identified at `800814B8..800815F0`;
+event manager's owner callbacks to the installed event exports, bind actual
+special dates and vacation state, and supply native placement/culling and
+event-specific owners. The next consumer is the shared shrine/wandering placement
+path: port the donor's selected/free-unit search and margin rules, bind native
+placement reservation/show/culling, and retain actual error outcomes. Do not
+substitute the differently shaped native free-block helper or activate calendar
+rows without their owners. Verify keep-bit capacity and special-date persistence
+before binding the new owner IDs. Native actor-death notification at `800814B8..800815F0`
+is callable through the destination-ID bridge;
 it updates matching placement coordinates, sets STOP, and schedules cleanup.
 The native world wrapper supplies the inventory/diary/reward fields; do not
 recreate them. Continue the separate exercise/card route and activation as part
@@ -214,9 +230,9 @@ harness budget exhausted; no old fixture replay is authorised by this clothing
 work. Fix any identified game defect. This does not defer required creature
 behaviours or classify their gameplay as verified.
 
-Use the shared converter and current ABI-317 proposal:
-`build/v3-diary-category-work-01/tortimer-events-02/build-lock.json`.
-ROM SHA-256: `54381c5ff97bdd6aff90f0117ce9b3f8196429e8eb5447cf76357d5b018e4eeb`.
+Use the shared converter and current ABI-318 proposal:
+`build/v3-diary-category-work-01/tortimer-native-01/build-lock.json`.
+ROM SHA-256: `77c953cf5ad3021d2ea56d4aa17547af7fc33e0e2b5792b42036ef1f8276fd22`.
 The two static variants use ordinary stock, catalogue/scoring, save-profile bits,
 and independent browser/offline selection. Their 7,840 artwork bytes are installed
 together; neither native counterpart nor any existing imported object is replaced.
