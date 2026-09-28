@@ -33,6 +33,14 @@ extern int af_v3_native_catalogue_available(u32, int, int, void *);
 extern u32 af_v3_held_item_collection(u32);
 extern u32 af_v3_catalogue_item_price(u32);
 #endif
+#ifdef AF_V3_DIARY_CATALOGUE_QUERY
+#ifdef __mips__
+#define diary_collection ((u32 (*)(u32))AF_V3_DIARY_CATALOGUE_QUERY)
+#else
+extern u32 af_test_diary_collection(u32);
+#define diary_collection af_test_diary_collection
+#endif
+#endif
 #ifdef AF_V3_CATALOGUE_PREVIEW_RECORDS
 #define AF_V3_PREVIEW_COUNT 41u
 struct PreviewFraming { float scale, model_y; };
@@ -82,7 +90,11 @@ static __attribute__((noinline)) u32 display_pocket(u32 item) {
 void af_v3_catalogue_furniture_init(struct Preview *preview, u32 argument) {
     af_v3_original_catalogue_furniture_init(preview, argument);
 #ifdef AF_V3_HELD_CATALOGUE
-    if (af_v3_held_item_collection((u16)argument)) {
+    if (af_v3_held_item_collection((u16)argument)
+#ifdef AF_V3_DIARY_CATALOGUE_QUERY
+            || diary_collection((u16)argument)
+#endif
+            ) {
         /* Source shared handheld branch; price resolves the actual parent. */
         preview->model_y=0.0f;
         preview->scale=1.0f;

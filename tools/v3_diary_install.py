@@ -213,6 +213,7 @@ def install(base, prior, blob, core, output, directories):
     equipment = copy.deepcopy(prior['equipment_resources'])
     updates, dispatch = redirect_storage(prior, equipment, blob, prepared)
     changes, hooks = install_menus(base, core, paths, ui)
+    hooks['catalogue_pool_bytes_at_install']=prior['catalogue'].get('category_pool_bytes',0)
     files = by_vrom(base)
     interaction = native_contract(base)
     if interaction != prepared['native_interaction']:

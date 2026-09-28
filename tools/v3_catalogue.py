@@ -54,8 +54,18 @@ def install_preview_records(blob, prior, source, records):
         raise ValueError('Catalogue preview reservation is occupied')
     ordering=list(struct.iter_unpack('>HH',source.raw('mCL_furniture_list')))
     previous_modes={r['item_id']:r['mode']+1 for r in previous['imports']} if previous else {}
+    diary_rows={}
+    if any(r.get('representation')=='diary' for r in records):
+        from v3_diary_items import catalogue_rows
+        diary_rows={r['item_id']:r for r in catalogue_rows(source)}
     rows=[]; seen=set()
     for record in records:
+        if record.get('representation') == 'diary':
+            # Diary previews use their source parent-price branch, not the
+            # ordinary furniture framing selector or stock-list metadata.
+            if record != diary_rows.get(record['item_id']):
+                raise ValueError('Changed diary catalogue representation')
+            continue
         item=int(record['item_id'],16); index=1024+slot(item)
         donor_item,donor_index=furniture_source(record)
         found=[(p,m) for p,(i,m) in enumerate(ordering) if i==donor_index]
@@ -110,9 +120,19 @@ def table_from_records(base, rel, symbols, furniture, records):
             or {r['item_id'] for r in records} != set(identities)):
         raise ValueError('Incomplete or duplicate catalogue records')
     result = []
+    diary_rows = {}
+    if any(r.get('representation') == 'diary' for r in records):
+        from v3_furniture_pipeline import Source
+        from v3_diary_items import catalogue_rows
+        diary_rows = {r['item_id']: r for r in catalogue_rows(Source(rel, symbols))}
     for record in records:
         row = dict(record)
         item, index = int(row['item_id'], 16), identities[row['item_id']]
+        if row.get('representation') == 'diary':
+            if row != diary_rows.get(row['item_id']) or index != row['runtime_index']:
+                raise ValueError('Changed source-bound diary catalogue row')
+            result.append(row)
+            continue
         mode = row.get('donor_preview_mode', 0)
         donor_item,donor_index = furniture_source(row)
         found = [(n,m) for n,(i,m) in enumerate(donor) if i == donor_index]
@@ -257,7 +277,7 @@ def install(base, parent, suffix, compiled, ordering, records, collection, runti
     imports={**IMPORTS,**(HELD_IMPORTS if handheld is not None else {})}
     if '-DAF_V3_BATCH_CLOTHING_DISPLAY=1' in compiled['flags']:
         imports['af_v3_display_clothing_index']=0x80466200
-    limit = 0xF50 if handheld is not None else (0xE50 if '-DAF_V3_WESTERN_LARGE=1' in compiled['flags'] else 0xC50)
+    limit = (0xF50 if handheld is not None else (0xE50 if '-DAF_V3_WESTERN_LARGE=1' in compiled['flags'] else 0xC50))+pool_slack
     if (len(suffix) != compiled['bytes'] or not suffix or len(suffix) > limit or len(suffix) % 16
             or collection['symbols']['af_v3_catalogue_owned'] != IMPORTS['af_v3_catalogue_owned']
             or runtime['symbols']['af_v3_save_halt'] != IMPORTS['af_v3_save_halt']

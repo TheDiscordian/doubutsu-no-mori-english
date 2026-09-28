@@ -57,18 +57,25 @@ is preserved. Surface A-tap uses the same additive range. Seasonal descriptor
 banks sit after the retained scenery banks, leaving scenery resources and
 addresses unchanged. Four focused carried-cartridge/host checks and the connected
 surface/menu host check pass; native UI/save execution remains unverified.
-Resume at loose-room drawing, cover profiles/artwork and catalogue/scoring,
-participation, and selection, following the
+All sixteen covers, loose-room drawing, catalogue framing/prices/order, and
+scoring metadata are installed at `build/v3-diary-category-work-01/catalogue-03/`.
+The HRA upper-layer query exempts selected diaries from table clutter, retaining
+the donor's floor penalty and every other scoring query. Four focused room/art
+and catalogue/scoring cartridge/host checks pass across the two connected steps.
+Resume at actual event-participation callers, selection, and connected native
+UI/save verification, following the
 [connected consumer map](../specs/V3_DIARIES.md#connected-consumer-map).
 These are remaining consumers of this same category, not new per-style tasks.
 The source/identity, global readers, icon branch, collection hooks, category
 artwork, and room-ID rebind stay installed. Reuse these, the installed
 menus/storage, and prepared artwork; do not restart conversion.
-The next native drawing consumer is Shop_Goods (`8576C0`), whose 34-row loose-item
-table lacks the additive diary range. It must use the installed shared carried
-model at `806E2600`, including the existing room rotation adapter. The sixteen
-prepared covers total 35,616 bytes in `build/v3-furniture-all-static-prepared-02/`;
-install them together without overwriting the nearly full item-data area.
+Shop_Goods uses each individual donor cover, not the generic ground/handover
+model. Its complete 50-row owner is at logical `01A50000`, with relocation at
+`01A60000`, retaining the original DMA indices. All 35,616 prepared artwork bytes
+are installed once and reused by catalogue DMA. Only the loaded room copy's
+resource pointers are rebased. No new permanent allocation is required; the
+catalogue menu allowance grows by 256 bytes. The native diary UI, save/reload,
+and drawing remain unverified; none of the sixteen styles is selectable yet.
 
 The room-representation review identifies sixteen player-saved design forms and
 nine museum fossil placeholders. Custom designs require a design editor and
@@ -101,9 +108,9 @@ harness budget exhausted; no old fixture replay is authorised by this clothing
 work. Fix any identified game defect. This does not defer required creature
 behaviours or classify their gameplay as verified.
 
-Use the shared converter and current ABI-310 proposal:
-`build/v3-diary-category-work-01/carried-03/build-lock.json`.
-ROM SHA-256: `9f2b847858e9852b1e67fa2888ae34f2ad4ffed0fb5dac44652a9887bddced15`.
+Use the shared converter and current ABI-312 proposal:
+`build/v3-diary-category-work-01/catalogue-03/build-lock.json`.
+ROM SHA-256: `f61dd92710d80fc6197d754902abd7aedb45516effc9e3a1185d7a1acb976d0a`.
 The two static variants use ordinary stock, catalogue/scoring, save-profile bits,
 and independent browser/offline selection. Their 7,840 artwork bytes are installed
 together; neither native counterpart nor any existing imported object is replaced.

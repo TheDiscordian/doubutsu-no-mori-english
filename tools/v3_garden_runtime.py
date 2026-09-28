@@ -223,12 +223,24 @@ def extend_letters(source, module, report, rel, symbols, *, theme=56):
 
 def install_catalogue(base, stable, prior, imports, output, rel, symbols, *, western=False,
                       western_large=False, camping=False, tent_model=False, fire=False, school_desks=False,
-                      reviewed_rows=None, handheld=None, clothing=None):
+                      reviewed_rows=None, handheld=None, clothing=None, diaries=None):
     from v3_catalogue_capacity import GROWTH, shifted
     files = by_vrom(base)
     old = files[catalogue.VROM].extract(base)
     if sha256(old) != prior['catalogue']['output_sha256']:
         raise ValueError('Changed current complete catalogue')
+    diaries = diaries or prior.get('equipment_resources', {}).get('diary_items', {}).get('catalogue')
+    if diaries:
+        if reviewed_rows is None:
+            raise ValueError('Diary catalogue requires the shared record-driven path')
+        by_item = {r['item_id']: r for r in imports}
+        reviewed = {r['item_id']: r for r in reviewed_rows}
+        for row in diaries['imports']:
+            if row['item_id'] in reviewed and reviewed[row['item_id']] != row:
+                raise ValueError('Changed retained diary catalogue row')
+            by_item.setdefault(row['item_id'], row)
+            reviewed[row['item_id']] = row
+        imports, reviewed_rows = list(by_item.values()), list(reviewed.values())
     ordering, rows = catalogue.table(stable, rel, symbols, imports, expanded=True, garden=True,
         western=western, western_large=western_large, camping=camping, tent_model=tent_model,
         fire=fire, school_desks=school_desks, reviewed_rows=reviewed_rows)
@@ -266,6 +278,8 @@ def install_catalogue(base, stable, prior, imports, output, rel, symbols, *, wes
         + (('AF_V3_TENT_MODEL=1',) if tent_model else ())
         + (('AF_V3_FIRE=1',) if fire else ()))
     if clothing is not None:defines+=('AF_V3_BATCH_CLOTHING_DISPLAY=1',)
+    if diaries:
+        defines+=(f'AF_V3_DIARY_CATALOGUE_QUERY=0x{diaries["query"]:X}u',)
     suffix, compiled = compile_part('catalogue', output / 'catalogue',
         extra_sources=('overlays/v3/catalogue_bridge.S', str((output / 'catalogue_tables.S').relative_to(ROOT))),
         defines=tuple(dict.fromkeys(defines+(('AF_V3_HELD_CATALOGUE=1',) if handheld is not None else ()))))
@@ -290,7 +304,7 @@ def install_catalogue(base, stable, prior, imports, output, rel, symbols, *, wes
             source_owner_sha256=sha256(parent),reason='retained icon refresh overwrote catalogue descriptor')
     parent[catalogue.OWNER:catalogue.OWNER + 32] = native_parent[catalogue.OWNER:catalogue.OWNER + 32]
     old_slack=prior['catalogue'].get('category_pool_bytes',0)
-    pool_slack=max(old_slack,128 if clothing is not None else 0)
+    pool_slack=max(old_slack,128 if clothing is not None else 0,384 if diaries else 0)
     changes, report = catalogue.install(stable, parent, suffix, compiled, ordering, rows,
         prior['collection']['code'], prior['save_runtime']['code'], prior['furniture_room']['code'],
         clothing=(cloth, clothes), expanded=True,handheld=handheld,pool_slack=pool_slack)
@@ -312,7 +326,22 @@ def install_catalogue(base, stable, prior, imports, output, rel, symbols, *, wes
                         or patch.get('after')!=word+extra or (word^(word+extra))&0xFFFF8000):
                     raise ValueError('Changed retained submenu allocation chain')
                 word=patch['after'];retained_pool.append(copy.deepcopy(patch))
-            if word+(old_slack if address==0x800C4B10 else 0)!=struct.unpack_from('>I',current_code,at)[0]:
+            word += old_slack if address==0x800C4B10 else 0
+            diary_arena=equipment.get('diaries',{}).get('hooks',{}).get('arena_patches',[])
+            for patch in diary_arena:
+                if patch['address'] != address:continue
+                before,after=(int(patch[k],16) for k in ('before','after'))
+                # Catalogue allowance may already have grown since diary UI
+                # installation. The current report records that later delta.
+                delta=old_slack-equipment['diaries']['hooks'].get('catalogue_pool_bytes_at_install',128)
+                if address==0x800C4B10:before+=delta;after+=delta
+                if word!=before:raise ValueError('Changed retained diary menu allocation')
+                word=after
+                if after!=before:
+                    # Keep retained owners in one chain before the separately
+                    # reported catalogue allowance, so it is counted once.
+                    retained_pool.append(dict(address=address,before=before-old_slack,after=after-old_slack))
+            if word!=struct.unpack_from('>I',current_code,at)[0]:
                 raise ValueError(f'Catalogue allocation mismatch at {address:08X}')
     if pool_slack!=old_slack:
         at=0x800C4B10-CODE_RAM;before=u32(current_code,at);after=before+pool_slack-old_slack

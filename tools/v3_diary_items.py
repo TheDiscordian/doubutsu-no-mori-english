@@ -290,3 +290,304 @@ def install(base, prior, blob, core, module, output):
     for name, data in (('diary-items.bin', packet), ('diary-ui.bin', writes[0][1])):
         write_new(output/name, bytes(data))
     return e, owners, dict(clothing=display, physical_resources=records_rom), writes
+
+
+def install_room(base, prior, blob, core, output, directory):
+    """Use every real cover in rooms and ordinary DMA-backed preview profiles."""
+    from v3_furniture_pipeline import Source, PreparedAssets, prepare
+    from v3_furniture_install import profile, owner_tail_storage
+    from v3_furniture_capacity import checked as model_capacity
+    from v3_resource_capacity import checked_limit
+    from v3_import_storage import ROWS, ITEMS, slot, ROWS_RAM
+    from v3_player_actions import native_references
+    from v3_room_goods import VROM, RELOC, RAM as GOODS_RAM, TABLE_AT, TABLE_BYTES, TABLE_SHA
+    from npc_mail_show import relocate_verified_data
+    from types import SimpleNamespace
+    e = copy.deepcopy(prior['equipment_resources']); d = e['diary_items']; goods = e['room_goods']
+    if d.get('room_art'):
+        raise ValueError('Complete diary room artwork is already installed')
+    directory = directory.resolve()
+    if not directory.is_relative_to(ROOT/'build'):
+        raise ValueError('Diary covers require ignored complete prepared assets')
+    source = Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+        (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    prepared = json.loads((directory/'art.json').read_bytes())
+    assets = {r['item_id']: r for r in prepared['objects']}
+    cache = PreparedAssets(source, [directory]); files = by_vrom(base)
+    old, old_rel = files[VROM].extract(base), files[RELOC].extract(base)
+    if (sha256(old) != goods['binding']['owner_sha256'] or
+            sha256(old_rel) != goods['binding']['relocation_sha256']):
+        raise ValueError('Changed complete native loose-item predecessor')
+    groups, absolute, relocations, _, _ = native_references(old, old_rel,
+        expected_sections=(0xFB0, 0x2E0, 0x10, 0x10))
+    # Keep native BSS at its linked offsets by materializing it as zero data.
+    # The additional table and complete models follow it, never overwrite it.
+    table_at = 0x12B0; count = 50; target_vrom, target_rel = 0x1A50000, 0x1A60000
+    data = bytearray(old+bytes(16)+old[0xFB0:0xFB0+34*20]+bytes(17*20))
+    data.extend(bytes(-len(data)%16)); first_model = len(data)
+    s4 = source.sections[4][0]; table = source.rel[s4+TABLE_AT:s4+TABLE_AT+TABLE_BYTES]
+    if sha256(table) != TABLE_SHA:
+        raise ValueError('Changed complete donor room model table')
+    limit, bank = checked_limit(base, prior), model_capacity(base, prior)
+    profiles, fixes, added_relocations = [], [], []
+    for style, parent in enumerate(d['rows']):
+        item = parent['display_item_id']; r = assets[item]; donor = 0x2B00+style
+        current = prepare(source, int(item, 16))
+        if cache.reuse(source, item, current) is None:
+            raise ValueError('Changed prepared diary cover: '+item)
+        raw = (directory/r['object_file']).read_bytes(); offset = len(data)
+        matches = [i for i in range(0, len(table), 40) if struct.unpack_from('>HH', table, i) == (donor, donor)]
+        if len(matches) != 1 or u32(table, matches[0]+36) != 1:
+            raise ValueError('Unsupported complete diary room drawing row')
+        at = TABLE_AT+matches[0]
+        pointers = [source.section_relocations.get((4, at+4+i*4)) for i in range(8)]
+        if table[matches[0]+4:matches[0]+36] != bytes(32):
+            raise ValueError('Unrelocated diary room model pointer')
+        models = []
+        for lane in range(4):
+            pointer, alternate = pointers[lane*2:lane*2+2]
+            if pointer != alternate:
+                raise ValueError('Diary source room/shop modes have different artwork')
+            if pointer is None:
+                models.append(0);continue
+            layers = [k for k,v in r['profile']['models'].items() if v[1] == pointer[3]]
+            if pointer[:3] != (1,u32(source.rel,0),5) or len(layers) != 1:
+                raise ValueError('Room model is absent from complete cover preparation')
+            models.append(GOODS_RAM+offset+r['model_offsets'][layers[0]])
+        # Validate every resource reference, including interior vertex loads.
+        used = set()
+        for model in r['models']:
+            a, n = model['native_offset'], model['bytes']
+            if sha256(raw[a:a+n]) != model['output_sha256']:
+                raise ValueError('Changed complete cover drawing commands')
+            for word_at in range(a, a+n, 8):
+                op = raw[word_at]; pointer = u32(raw, word_at+4)
+                if op not in (1, 0xFD):
+                    if pointer>>24 == 6:
+                        raise ValueError('Unbound non-resource diary pointer')
+                    continue
+                off = pointer & 0xFFFFFF
+                resources = [x for x in r['resources'] if x['native_offset'] <= off < x['native_offset']+x['bytes']]
+                if pointer>>24 != 6 or len(resources) != 1:
+                    raise ValueError('Unbound complete cover resource')
+                resource = resources[0]
+                if (op == 1 and (resource['kind'] != 'vertices' or
+                        off+((u32(raw, word_at)>>12)&255)*16 > resource['native_offset']+resource['bytes']) or
+                        op == 0xFD and resource['kind'] not in ('texture', 'palette')):
+                    raise ValueError('Cover resource reference exceeds its source')
+                used.add(resource['native_offset'])
+                fixes.append((offset+word_at+4, pointer, offset+off))
+        if used != {x['native_offset'] for x in r['resources']}:
+            raise ValueError('Cover room binding omits a source resource')
+        data.extend(raw)
+        row_at = table_at+(34+style)*20
+        struct.pack_into('>HH4I', data, row_at, 0x2B10+style, 0x2B10+style,*models)
+        added_relocations.extend(0xC2000000|(row_at+4+lane*4-0x1290) for lane,value in enumerate(models) if value)
+        cover = int(item, 16); index = 1087+style; s = slot(cover)
+        if (any(blob[ROWS+s*80:ROWS+(s+1)*80]) or any(blob[ITEMS+s*32:ITEMS+(s+1)*32]) or
+                blob[0x40+s//8] & (1 << (s&7))):
+            raise ValueError('Diary cover overwrites an existing furniture identity')
+        native = profile(r, target_vrom+offset, limit=limit, model_capacity=bank)
+        record = struct.pack('>HHI', index, cover, 0)+native+bytes(4)
+        metadata = (struct.pack('>HHHBB', index, cover, parent['price'], r['profile']['size_code'], 0)+
+            parent['name'].encode('ascii').ljust(16,b' ')+bytes(4)+struct.pack('>HH', 0x2B10+style, 0))
+        blob[ROWS+s*80:ROWS+(s+1)*80] = record; blob[ITEMS+s*32:ITEMS+(s+1)*32] = metadata
+        profiles.append(dict(source_item_id=item,item_id=item,parent_item_id=parent['item_id'],
+            runtime_index=index,profile_ram=ROWS_RAM+s*80+8,profile_hex=native.hex(),
+            profile_record_sha256=sha256(record),item_record_sha256=sha256(metadata),
+            object_vrom=target_vrom+offset,object_offset=offset,object_bytes=len(raw),
+            object_sha256=sha256(raw),selected=False,source=r))
+    # All eight high/low reference groups, including the terminator's +2 reader.
+    patches = []
+    observed = []
+    for hi, lows in groups.items():
+        if not any(GOODS_RAM+0xFB0 <= v < GOODS_RAM+0xFB0+700 for _,v in lows):
+            continue
+        if any(v not in (GOODS_RAM+0xFB0,GOODS_RAM+0xFB2) for _,v in lows):
+            raise ValueError('Mixed or interior native diary table reference')
+        for lo, value in lows:
+            replacement = GOODS_RAM+table_at+value-(GOODS_RAM+0xFB0)
+            for pos, half in ((hi,(replacement+0x8000)>>16),(lo,replacement&65535)):
+                before = u32(data,pos); after = before & 0xFFFF0000 | half
+                struct.pack_into('>I',data,pos,after); patches.append(dict(offset=pos,before=before,after=after))
+            observed.append((hi,lo))
+    if observed != [(0x710,0x744),(0x868,0x86C),(0x9C4,0x9C8),(0x9DC,0x9E0),
+                    (0xDB0,0xDBC),(0xDE0,0xDE4),(0xE70,0xE78),(0xEA8,0xEAC)] or any(
+            GOODS_RAM+0xFB0 <= v < GOODS_RAM+0xFB0+700 for v in absolute.values()):
+        raise ValueError('Incomplete native diary drawing-table consumers')
+    data.extend(bytes(-len(data)%16))
+    sections = (0xFB0,0x2E0,len(data)-0x1290,0,len(relocations)+len(added_relocations))
+    rel = struct.pack('>5I',*sections)+struct.pack('>'+str(sections[4])+'I',*(relocations+added_relocations))
+    rel_size = (len(rel)+4+15)&~15; rel = rel.ljust(rel_size-4,b'\0')+struct.pack('>I',rel_size)
+    for address in (0x801A0010,0x80310010):
+        old_loaded = relocate_verified_data(SimpleNamespace(ram=GOODS_RAM,resident_bytes=len(old)+16,
+            sections=struct.unpack_from('>5I',old_rel)),old,old_rel,address)
+        loaded = relocate_verified_data(SimpleNamespace(ram=GOODS_RAM,resident_bytes=len(data),sections=sections),data,rel,address)
+        changed = {i for p in patches for i in range(p['offset'],p['offset']+4)}
+        if any(a!=b and i not in changed for i,(a,b) in enumerate(zip(old_loaded,loaded))):
+            raise ValueError('Diary table changes unrelated relocated native data')
+    descriptor = 0x80101330-CODE_RAM
+    before = (VROM,VROM+len(old),GOODS_RAM,GOODS_RAM+len(old)+16)
+    if struct.unpack_from('>4I',core,descriptor) != before:
+        raise ValueError('Changed native room graphics allocation descriptor')
+    struct.pack_into('>4I',core,descriptor,target_vrom,target_vrom+len(data),GOODS_RAM,GOODS_RAM+len(data))
+    config = struct.pack('>8I',0x41464452,1,len(fixes),len(data),table_at,count,first_model,len(data))
+    config += b''.join(struct.pack('>3I',*x) for x in fixes)
+    p = d['packet']; packet = bytearray(base[p['physical']:p['physical']+p['bytes']])
+    if len(config)>0xFF0 or any(packet[0x3000:0x3FF0]) or d['code']['bytes']>0x800:
+        raise ValueError('Complete diary room binding exceeds packet reservation')
+    code, compiled = compile_part('diary_goods',output/'diary-goods',primary_source='overlays/v3/room_goods.c',
+        extra_sources=('overlays/v3/room_goods_bridge.S',),defines=(
+            'AF_DIARY_GOODS=1',f'AF_GOODS_TABLE_OFFSET=0x{table_at:X}u',f'AF_GOODS_ROW_COUNT={count}u',
+            f'AF_GOODS_VROM=0x{target_vrom:X}u',f'AF_GOODS_ROTATE_LOW=0x{goods["source"]["mask_low"]:X}u',
+            'AF_GOODS_ROTATE_HIGH=0x3FFFFu'),
+        link_symbols={'af_v3_save_halt':d['code']['symbols']['af_v3_save_halt']})
+    if len(code)>0x1800 or any(packet[0x800:0x2000]):
+        raise ValueError('Diary room code overwrites existing item readers')
+    packet[0x800:0x800+len(code)] = code; packet[0x3000:0x3000+len(config)] = config
+    old_packet = goods['packet']; at = old_packet['blob_offset']
+    original = bytes(blob[at:at+old_packet['bytes']]); dispatch = []
+    if sha256(original)!=old_packet['sha256']:
+        raise ValueError('Changed existing room entry packet')
+    for name, address in goods['compiled']['symbols'].items():
+        if not name.startswith('af_v3_goods_'): continue
+        target = compiled['symbols'][name]; pos = at+address-old_packet['ram']
+        before_bytes = bytes(blob[pos:pos+8]); after = struct.pack('>2I',jump(target),0)
+        blob[pos:pos+8] = after
+        dispatch.append(dict(name=name,address=address,target=target,before=before_bytes.hex(),after=after.hex()))
+    raw = blob[at:at+old_packet['bytes']]
+    old_packet.update(sha256=sha256(raw),crc32=zlib.crc32(raw))
+    goods['compiled'].update(sha256=sha256(raw[:goods['compiled']['bytes']]),diary_dispatch=dispatch)
+    record = dict(p,sha256=sha256(packet),crc32=zlib.crc32(packet)); d['packet']=record
+    physical_records = [dict(record) if x['id']==record['id'] else x for x in prior['physical_resources']]
+    owners = {VROM:bytes(data),RELOC:rel}
+    growth = []
+    for move in owner_tail_storage(base,files,list(owners.items()),reservations=physical_records):
+        entry=files[move['vrom']]
+        growth.append(dict(move,previous_bytes=entry.size,previous_physical=entry.pstart,
+            previous_compressed_end=entry.pend,previous_sha256=sha256(entry.extract(base)),
+            target_vrom=target_vrom if move['vrom']==VROM else target_rel,
+            relocated=True,relocated_blockers=[],retains_old_allocation=True))
+    d['profiles']=profiles
+    d['room_art']=dict(vrom=target_vrom,reloc=target_rel,ram=GOODS_RAM,bytes=len(data),
+        sha256=sha256(data),relocation_sha256=sha256(rel),table_offset=table_at,rows=count,
+        art_offset=first_model,art_bytes=sum(r['object_bytes'] for r in profiles),
+        fixups=fixes,config_bytes=len(config),compiled=compiled,dispatch=dispatch,table_patches=patches,
+        previous_vrom=VROM,previous_reloc=RELOC,previous_bytes=len(old),
+        prepared=str(directory.relative_to(ROOT)),prepared_sha256=sha256((directory/'art.json').read_bytes()),
+        installed=True,native_execution_tested=False)
+    d['pending']=['catalogue/scoring and ordering', 'participation callers', 'selection and connected native verification']
+    d['sources'].update({s:sha256((ROOT/s).read_bytes()) for s in (*SOURCES,
+        'overlays/v3/room_goods.c','overlays/v3/room_goods.h','overlays/v3/room_goods_bridge.S',
+        'overlays/v3/diary_goods.ld')})
+    goods['diary_room_art']=dict(vrom=target_vrom,reloc=target_rel,bytes=len(data),compiled=compiled)
+    write_new(output/'diary-items.bin',bytes(packet))
+    return e,owners,dict(physical_resources=physical_records,resource_growth=growth),[
+        (dict(record,previous_sha256=p['sha256']),bytes(packet))]
+
+
+def catalogue_rows(source):
+    """All covers share the donor furniture page and parent-price preview."""
+    raw = source.raw('mCL_furniture_list')
+    if sha256(raw) != '91bad7d2198f5da32b464547c3a3c15df9cc77e1969ad7eebc7c0fa45f66956f':
+        raise ValueError('Changed complete donor furniture ordering')
+    _, init = source.function(0x259014)
+    if init['sha256'] != '6bfe84fd17e661290e19a263a63a0299614f9ea7b7f091598434328245957e73':
+        raise ValueError('Changed donor diary catalogue presentation')
+    order = list(struct.iter_unpack('>HH', raw)); rows = []
+    for parent in records(source)[0]:
+        style = parent['style']; item = parent['display_item_id']; index = 1087+style
+        matches = [(p,m) for p,(i,m) in enumerate(order) if i==index]
+        if len(matches)!=1 or matches[0][1]!=0:
+            raise ValueError('Changed diary furniture-page membership')
+        rows.append(dict(item_id=item,runtime_index=index,catalogue_index=index+1024,
+            donor_position=matches[0][0],mode=0,representation='diary',
+            parent_item_id=parent['item_id'],donor_parent_item_id=parent['donor_item_id'],
+            selection_id=parent['id'],catalogue_orderable=True,price=parent['price']))
+    return sorted(rows,key=lambda r:r['donor_position'])
+
+
+def install_catalogue(base, prior, blob, core, output):
+    """Connect all prepared covers to the shared catalogue and scoring owners."""
+    from v3_furniture_pipeline import Source
+    from v3_furniture_install import scoring, STABLE, STABLE_SHA
+    from v3_garden_runtime import install_catalogue as shared_catalogue
+    from v3_hra_birth import checked_categories
+    import v3_hra as hra
+    import v3_feng_shui as feng
+    e=copy.deepcopy(prior['equipment_resources']);d=e['diary_items']
+    if not d.get('room_art') or d.get('catalogue'):
+        raise ValueError('Diary catalogue requires installed covers and an uninstalled catalogue')
+    e['diaries']['hooks'].setdefault('catalogue_pool_bytes_at_install',prior['catalogue']['category_pool_bytes'])
+    source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+        (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    rows=catalogue_rows(source);files=by_vrom(base)
+    query=d['code']['symbols']['af_diary_item_collection']
+    category=dict(imports=rows,query=query,preview_height=36.0,preview_scale=1.0,preview_y=0.0,
+        source_initializer=source.function(0x259014)[1],selected=0,installed=True,
+        ordinary_order_delivery_tested=False)
+    stable=STABLE.read_bytes()
+    if sha256(stable)!=STABLE_SHA:raise ValueError('Changed common catalogue source baseline')
+    changes,cat=shared_catalogue(base,stable,prior,prior['catalogue']['imports'],output,
+        source.rel,source.symbols.encode(),reviewed_rows=prior['catalogue']['imports'],diaries=category)
+    changed_core=changes.pop(CODE_VROM,None)
+    if changed_core is not None:
+        old_core=files[CODE_VROM].extract(base)
+        for i,(a,b) in enumerate(zip(old_core,changed_core,strict=True)):
+            if a!=b:
+                if core[i]!=a:raise ValueError('Conflicting diary catalogue allocation change')
+                core[i]=b
+    mapping,_=checked_categories(files[hra.NEW_VROM].extract(base),prior['hra'],source)
+    if (sha256(source.data[0x4FAFC:0x4FAFC+1266*4])!=hra.DONOR_SHA or
+            sha256(source.data[0x4EBF0:0x4EBF0+1266*2])!=feng.DONOR_SHA):
+        raise ValueError('Changed complete donor diary scoring tables')
+    score_rows=[]
+    for row in rows:
+        index=row['runtime_index'];value=u32(source.data,0x4FAFC+index*4)
+        donor=value>>8&63;birth=mapping[donor];surface=value>>6&3;series=value>>26
+        score_rows.append(dict(item_id=row['item_id'],runtime_index=index,
+            donor_birth_category=donor,birth_category=birth,surface=surface,series=series,
+            donor_hra_hex=f'{value:08x}',native_hra_hex=f'{(value&0xFFFFC000)|(birth<<9)|(surface<<7):08x}',
+            donor_series_hex=source.raw('mMkRm_series_info')[series*3:series*3+3].hex(),
+            feng_hex=source.data[0x4EBF0+index*2:0x4EBF0+index*2+2].hex()))
+    scored,reports=scoring(base,prior,score_rows,source);changes.update(scored)
+    # Only the upper-layer clutter test exempts diaries. Calling this through
+    # the shared full-register bridge leaves the floor test and every other
+    # range/index consumer untouched.
+    _,clean=source.function(0x162450)
+    if clean['sha256']!='6309d7f4ffb1cbcaab4c16dcbb1aa789cca891261ecae0b2627f113995dc873a':
+        raise ValueError('Changed complete donor diary clutter rule')
+    p=d['packet'];packet=bytearray(base[p['physical']:p['physical']+p['bytes']])
+    if (sha256(packet)!=p['sha256'] or any(packet[0x1000:0x2000]) or
+            d['room_art']['compiled']['bytes']>0x800):
+        raise ValueError('Diary clutter code overlaps the installed room adapter')
+    clutter_code,clutter=compile_part('diary_catalogue',output/'diary-catalogue',
+        extra_sources=('overlays/v3/room_entry.S',),defines=('AF_DIARY_CLUTTER=1',),
+        link_symbols=dict(af_diary_prior_room_value=prior['furniture_room']['code']['symbols']['af_v3_room_value'],
+            af_diary_item_collection=query))
+    packet[0x1000:0x1000+len(clutter_code)]=clutter_code
+    data=bytearray(changes[hra.NEW_VROM]);h=reports['hra']
+    start=h['code']['symbols']['af_v3_hra_range_809261c4']-hra.RAM
+    before=bytes.fromhex('2ac11ecd1420000b0000000027bdffe0ffbf0018afb60000241f0000afbf0004')
+    call=jump(prior['furniture_room']['code']['symbols']['af_v3_room_query'],link=True)
+    if (data[start:start+32]!=before or u32(data,start+32)!=call or u32(data,start+36) or
+            any((v&0xFFFFFF)==start+32 for v in struct.unpack_from('>'+str(u32(files[hra.NEW_RELOC].extract(base),16))+'I',
+                files[hra.NEW_RELOC].extract(base),20))):
+        raise ValueError('Changed complete native upper-layer clutter query')
+    target=clutter['symbols']['af_diary_clutter_query'];after=jump(target,link=True)
+    struct.pack_into('>I',data,start+32,after)
+    h.update(output_sha256=sha256(data),diary_clutter=dict(address=hra.RAM+start+32,
+        before=call,after=after,target=target,source=clean,compiled=clutter,
+        floor_query_unchanged=True,all_other_queries_unchanged=True))
+    changes[hra.NEW_VROM]=bytes(data)
+    record=dict(p,sha256=sha256(packet),crc32=zlib.crc32(packet));d['packet']=record
+    physical_records=[dict(record) if x['id']==record['id'] else x for x in prior['physical_resources']]
+    write_new(output/'diary-items.bin',bytes(packet))
+    d['catalogue']=category;d['scoring']=dict(rows=score_rows,metadata_installed=True,
+        parent_clutter_exception_installed=True,clutter=h['diary_clutter'])
+    d['pending']=['participation callers','selection and connected native verification']
+    d['sources'].update({s:sha256((ROOT/s).read_bytes()) for s in (*SOURCES,
+        'tools/v3_catalogue.py','tools/v3_garden_runtime.py','overlays/v3/catalogue.c','overlays/v3/catalogue.ld',
+        'overlays/v3/diary_catalogue.c','overlays/v3/diary_catalogue.ld','overlays/v3/room_entry.S')})
+    return e,changes,dict(catalogue=cat,physical_resources=physical_records,**reports),[
+        (dict(record,previous_sha256=p['sha256']),bytes(packet))]

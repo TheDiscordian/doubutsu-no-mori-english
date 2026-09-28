@@ -23,7 +23,7 @@ SECTIONS
     .bss (NOLOAD) : { *(.bss .bss.* COMMON) }
     /* Another 512 bytes fit the existing expanded menu reservation. The
        builder checks the full image, relocation DMA, and all menu owners. */
-    ASSERT(. <= 0x808B4200, "V3 catalogue suffix exceeds its bounded pool allowance")
+    ASSERT(. <= 0x808B4600, "V3 catalogue suffix exceeds its bounded pool allowance")
     ASSERT(SIZEOF(.data) == 0 && SIZEOF(.bss) == 0, "Unexpected V3 catalogue state")
     /DISCARD/ : { *(.comment .note.* .reginfo .MIPS.abiflags .pdr .gnu.attributes) }
 }

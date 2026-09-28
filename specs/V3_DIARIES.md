@@ -12,9 +12,10 @@ The calendar/reading/editing/storage controller and shared native-save adapter
 are implemented in source and compile for VR4300. Host checks cover room surface
 selection, calendar navigation, editing/privacy/capacity admission, and the
 save → probe → reload path. They do not establish in-game UI operation,
-native FlashRAM timing, ordinary gameplay, or hardware compatibility. ABI 310
-contains the menus, resident packets, room/visit hooks, save dispatch, and carried
-readers at `build/v3-diary-category-work-01/carried-03/`. Neither patcher changes.
+native FlashRAM timing, ordinary gameplay, or hardware compatibility. ABI 312
+contains menus, resident packets, room/visit hooks, save dispatch, carried readers,
+complete room covers, and catalogue/scoring integration at
+`build/v3-diary-category-work-01/catalogue-03/`. Neither patcher changes.
 
 ## Donor contract
 
@@ -365,16 +366,17 @@ hardware evidence. No diary choices are enabled by this installation.
 | Consumer | Current implementation / remaining work |
 | --- | --- |
 | Category identity/data | Fixed `2B10..2B1F` destinations preserve native `2B00`; shared names/prices/types, placement/pickup, and collection record/check readers installed |
-| Carried/collection artwork | Shared pocket icon and ground/police/handover model installed; loose-room drawing and prepared collection-cover installation remain |
+| Carried/collection artwork | Shared pocket icon and ground/police/handover model installed; all sixteen distinct room/catalogue covers installed once and shared between consumers |
 | Calendar entry | Surface A-tap uses additive carried IDs; owner/player resolution, dates/events/birthdays, drawing, owned menu, and visit hook installed; actual participation callers remain |
 | Reading/editing | Controller, ownership, wrapping/scrolling, cursor, keyboard child, confirmation/privacy, transitions, atomic commit, overlays/DMA/arena installed; native execution remains |
 | English UI | Official prompts, project errors, all screen textures, and native event labels extracted/credited/checked; native rendering remains unverified |
 | Persistence | Shared reset, clear, probe, pack, commit, forward migration, and preflight implemented/tested on host; startup and both stable/direct native dispatch installed; native UI/save verification remains |
-| Selection | Bind carried/display profile dependencies, catalogue/scoring, and independent/all choices only after the complete path is connected |
+| Catalogue/scoring | All sixteen furniture-page records, donor framing/prices, scoring metadata, and upper-layer clutter exemption installed; native execution remains |
+| Selection | Bind carried/display profile dependencies and independent/all choices after participation is connected; profiles remain disabled |
 | Verification | Run bounded combined current-ROM UI/save checks after integration; no separate style-by-style native scenarios |
 
-Resume this same connected category at loose-room drawing, cover installation,
-catalogue/scoring, actual event participation, and independent/all selection.
+Resume this same connected category at actual event participation and
+independent/all selection, followed by connected native UI/save checks.
 The native `item1_B_tableNo` retains its existing `2B00` entry of type 21.
 Names/type/price and display/pocket conversion wrap the current shared readers,
 with disabled-import rejection. Ordinary placement retains the carried diary;
@@ -428,8 +430,61 @@ four-player collection routing, disabled/malformed records, the complete startup
 failure paths, and all four seasonal descriptor banks beyond 64 KiB. The connected
 surface/menu host check uses additive IDs. These checks do not establish ordinary
 native diary use, menu appearance, saving, or hardware behaviour. Diary choices
-remain disabled until loose-room drawing, cover/catalogue/scoring integration,
-participation, selection, and connected native checks are complete.
+remain disabled while participation, selection, and connected native checks
+remain unfinished.
+
+### Shared room covers and catalogue
+
+`--diary-room-art build/v3-furniture-all-static-prepared-02` installs all sixteen
+complete prepared models through the shared runtime builder. The donor's
+Shop_Goods table uses the individual covers in rooms and shops; its generic
+diary graphic belongs to ground/police/handover consumers. Both donor modes and
+all four drawing lanes are checked, including models using the second opaque
+lane and the scroll's different room/catalogue layer bindings.
+
+The native Shop_Goods owner moves to logical VROM `01A50000`, with relocation
+at `01A60000`, retaining its original consecutive DMA indices and linked RAM
+`80962A20`. The original 34 rows and code remain, with eight checked table-reference
+groups pointing to the expanded 50-row table. Materialising the original sixteen
+BSS bytes preserves their linked offsets. Appended cover models total 35,616
+bytes; the complete owner is 41,424 bytes. Native overlay allocation includes
+the complete image, without adding a permanent model buffer.
+
+The room constructor uses 108 checked fixups to rebase the **loaded** model
+resources and flush the changed cache range. ROM commands retain segment-six
+pointers so normal catalogue DMA reads the same complete resources. No unknown
+VROM fallback or second copy of the artwork is required. The source-derived
+50-category rotation flags preserve original categories and all diary styles.
+The 1,648-byte adapter at `806E0800` and configuration at `806E3000` use existing
+diary packet padding. Original room helper addresses retain eight-byte dispatch
+entries; all their other bytes and existing lifetime state remain.
+
+`--diary-catalogue` connects furniture-page ordering, ownership, selected profile
+loading, names, parent prices, and the donor's diary preview framing: scale 1,
+model Y 0, and height 36. Representation rows are checked against the complete
+donor table and initializer; they do not invent ordinary furniture stock.
+All sixteen HRA/feng-shui metadata rows use the existing category conversion.
+The donor does not score carried diaries as ordinary room furniture. Its
+upper-layer clutter rule exempts diaries on surfaces while retaining the floor
+penalty. A 400-byte adapter at `806E1000`, using the existing full-register
+query bridge, replaces only that upper-layer call. Every other scoring query,
+including the floor call, is retained.
+
+Catalogue suffix code/data occupies 3,984 bytes. An additional 256-byte menu
+allowance is checked together with existing model, clothing, and diary UI
+allocations, without double-counting the retained diary reservation. There is
+no new permanent RAM or saved-format change in these two installation steps.
+The canonical cover profiles and parent metadata stay inactive until selection
+is connected. Neither converted art nor an installed catalogue row claims a
+usable diary by itself.
+
+`tests/test_v3_diary_room.py` covers complete room models/profiles, actual DMA
+indices, relocation at two addresses, retained bytes/exports, all sixteen styles
+and rotations, invalid resource gates, actual catalogue/scoring/startup CRCs,
+menu allocation, prices/framing, disabled-style handling, and the scoped clutter
+query. Four focused cartridge/host checks pass for the connected installations.
+No native UI execution, actual catalogue order delivery, save/reload, or hardware
+verification is claimed.
 
 ## Focused evidence
 

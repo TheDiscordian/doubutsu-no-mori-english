@@ -665,7 +665,7 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
                     equipment_rigs=None, expand_storage=False, furniture_audio_art=None, furniture_profiles=None,
                     material_frames_art=None,scrolling_materials_art=None,room_surfaces_art=None,furniture_scoring=False,
                     password_runtime=None,password_editor=False,room_effects=None,furniture_capacity=False,console_storage=False,
-                    console_images=None,console_emulator=False,console_disk=None,creature_items=None,creature_field=None,creature_fish=False,creature_insects=None,clothing_batch=None,diaries=None,diary_items=False):
+                    console_images=None,console_emulator=False,console_disk=None,creature_items=None,creature_field=None,creature_fish=False,creature_insects=None,clothing_batch=None,diaries=None,diary_items=False,diary_room_art=None,diary_catalogue=False):
     """Update shared readers; optionally install the shared held-resource adapter."""
     output=output.resolve()
     if output.exists() or not output.is_relative_to(ROOT/'build'):
@@ -714,13 +714,28 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
     if diary_items:
         if resource_mode:raise ValueError('Install shared runtime updates in dependency order')
         resource_mode=True
+    if diary_room_art is not None:
+        if resource_mode:raise ValueError('Install shared runtime updates in dependency order')
+        resource_mode=True
+    if diary_catalogue:
+        if resource_mode:raise ValueError('Install shared runtime updates in dependency order')
+        resource_mode=True
     if resource_mode:
         blob,reused=reuse_resource_tail(base,prior,old_blob)
         if not reused['reused_bytes'] and not reused.get('external_resources'):
             raise ValueError('Equipment integration requires the checked shared resource tail')
     parent_readers=bool(player_actions and prior.get('equipment_resources',{}).get('player_actions',{}).get('equipment_selection'))
     wrapped_names=bool(player_actions and prior.get('equipment_resources',{}).get('wrapped_presents'))
-    if diary_items:
+    if diary_catalogue:
+        import v3_diary_items as equipment
+        equipment_report,owner_changes,report_updates,physical_writes=equipment.install_catalogue(base,prior,blob,core,output)
+        display_report=prior['clothing']['display'];alias_report=prior['display_aliases']
+    elif diary_room_art is not None:
+        import v3_diary_items as equipment
+        equipment_report,owner_changes,report_updates,physical_writes=equipment.install_room(
+            base,prior,blob,core,output,diary_room_art)
+        display_report=prior['clothing']['display'];alias_report=prior['display_aliases']
+    elif diary_items:
         import v3_diary_items as equipment
         equipment_report,owner_changes,report_updates,physical_writes=equipment.install(
             base,prior,blob,core,module,output)
@@ -1372,6 +1387,19 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             additional_resident_bytes=diary['additional_resident_bytes'],saved_format_changed=False)
         report['sources'].update(diary['sources'])
         report['native_test']='pending connected diary gameplay; room artwork, catalogue, participation, and selection remain unfinished'
+    if diary_room_art is not None:
+        diary=equipment_report['diary_items']
+        report['shared_runtime_refresh'].update(adapters=['diary_room_art'],artwork_changed=True,
+            additional_resident_bytes=0,additional_owner_bytes=diary['room_art']['bytes']-diary['room_art']['previous_bytes']-16)
+        report['sources'].update(diary['sources'])
+        report['native_test']='pending connected diary gameplay; catalogue/scoring, participation, and selection remain unfinished'
+    if diary_catalogue:
+        diary=equipment_report['diary_items']
+        report['shared_runtime_refresh'].update(adapters=['diary_catalogue'],artwork_changed=False,
+            additional_resident_bytes=0,additional_menu_pool_bytes=
+                report['catalogue']['category_pool_bytes']-prior['catalogue'].get('category_pool_bytes',0))
+        report['sources'].update(diary['sources'])
+        report['native_test']='pending diary participation, selection, and connected gameplay/save verification'
     if console_images is not None:
         images=equipment_report['console_images']
         report['shared_runtime_refresh'].update(adapters=['console_images'],
@@ -1425,6 +1453,7 @@ if __name__=='__main__':
     parser.add_argument('--diary-ui',type=Path,help='Prepared diary native UI and menu hooks directory')
     parser.add_argument('--diary-screen',type=Path,help='Prepared complete diary screen artwork directory')
     parser.add_argument('--diary-items',action='store_true',help='Install all shared carried diary readers and artwork')
+    parser.add_argument('--diary-room-art',type=Path,help='Install all prepared diary covers in room and preview contexts')
     parser.add_argument('--equipment-art',type=Path,
         help='With --refresh-runtime, install prepared shared held models and source-derived motion resources')
     parser.add_argument('--equipment-rigs',type=Path,
@@ -1475,6 +1504,8 @@ if __name__=='__main__':
         help='With --refresh-runtime, install prepared floor/wall artwork and shared room readers without enabling items')
     parser.add_argument('--furniture-scoring',action='store_true',
         help='With --refresh-runtime, install complete donor themes, names, and source-mapped base-point categories')
+    parser.add_argument('--diary-catalogue',action='store_true',
+        help='With --refresh-runtime, connect all installed diary covers to catalogue previews and scoring metadata')
     parser.add_argument('--password-runtime',type=Path,
         help='With --refresh-runtime, link prepared password rules and live engine bindings without enabling delivery')
     parser.add_argument('--password-editor',action='store_true',
@@ -1503,6 +1534,8 @@ if __name__=='__main__':
         parser.error('Diary installation requires --refresh-runtime and all three --diary-* directories')
     if args.diary_items and not args.refresh_runtime:
         parser.error('--diary-items requires --refresh-runtime')
+    if args.diary_room_art is not None and not args.refresh_runtime:
+        parser.error('--diary-room-art requires --refresh-runtime')
     if args.equipment_art and not args.refresh_runtime:parser.error('--equipment-art requires --refresh-runtime')
     if args.equipment_rigs and not args.refresh_runtime:parser.error('--equipment-rigs requires --refresh-runtime')
     if args.player_motion and not args.refresh_runtime:parser.error('--player-motion requires --refresh-runtime')
@@ -1528,6 +1561,7 @@ if __name__=='__main__':
     if args.scrolling_materials_art and not args.refresh_runtime:parser.error('--scrolling-materials-art requires --refresh-runtime')
     if args.room_surfaces_art and not args.refresh_runtime:parser.error('--room-surfaces-art requires --refresh-runtime')
     if args.furniture_scoring and not args.refresh_runtime:parser.error('--furniture-scoring requires --refresh-runtime')
+    if args.diary_catalogue and not args.refresh_runtime:parser.error('--diary-catalogue requires --refresh-runtime')
     if args.password_runtime and not args.refresh_runtime:parser.error('--password-runtime requires --refresh-runtime')
     if args.password_editor and not args.refresh_runtime:parser.error('--password-editor requires --refresh-runtime')
     if args.room_effects and not args.refresh_runtime:parser.error('--room-effects requires --refresh-runtime')
@@ -1558,6 +1592,6 @@ if __name__=='__main__':
                             console_disk=args.console_disk,creature_items=args.creature_items,creature_field=args.creature_field,
                             creature_fish=args.creature_fish,creature_insects=args.creature_insects,clothing_batch=args.clothing_batch,
                             diaries=dict(zip(('core','ui','screen'),diary_paths)) if all(diary_paths) else None,
-                            diary_items=args.diary_items)
+                            diary_items=args.diary_items,diary_room_art=args.diary_room_art,diary_catalogue=args.diary_catalogue)
             if args.refresh_runtime else build(args.output,args.art,args.base_lock))
     print(json.dumps({k:result[k] for k in ('runtime_abi','output_sha256','patch_sha256')},indent=2))

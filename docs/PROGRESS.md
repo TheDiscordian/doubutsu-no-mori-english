@@ -31,12 +31,13 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
-The current proposal is ABI 310 at
-`build/v3-diary-category-work-01/carried-03/build-lock.json`, ROM SHA-256
-`9f2b847858e9852b1e67fa2888ae34f2ad4ffed0fb5dac44652a9887bddced15`.
+The current proposal is ABI 312 at
+`build/v3-diary-category-work-01/catalogue-03/build-lock.json`, ROM SHA-256
+`f61dd92710d80fc6197d754902abd7aedb45516effc9e3a1185d7a1acb976d0a`.
 It contains 191 independently selectable development imports, including all nine
 fish and eight insects, and 100 inactive furniture profiles whose acquisition
-is pending. The main lock and both stable V2-14 deployments are unchanged.
+is pending, plus sixteen inactive diary cover profiles. The main lock and both
+stable V2-14 deployments are unchanged.
 
 The active diary category has a source-bound calendar → read → edit → finish →
 privacy controller for all sixteen styles and all 48 monthly pages. Capacity
@@ -116,10 +117,30 @@ outer diary hooks and retains the original reader bodies. The complete menu
 capacity check includes the diary arena reservation. These are build/host results,
 not native diary gameplay, save/reload, or hardware verification.
 
+All sixteen distinct covers are installed together for loose-room drawing and
+catalogue previews, using the existing converted artwork. The 35,616 artwork
+bytes are stored once in the expanded Shop_Goods owner; its loaded room copy
+rebases resource pointers, while catalogue DMA retains segment-six pointers.
+The original 34 room rows, native BSS, DMA indices, rotation exports, and unrelated
+resources remain intact. The complete owner is 41,424 bytes, with 1,648 bytes of
+room adapter code inside the existing diary reservation.
+
+The shared catalogue includes donor ordering, special framing, and parent prices
+for all sixteen styles. Source-derived HRA/feng-shui metadata is installed. The
+400-byte diary clutter adapter exempts a selected diary on a table, while
+retaining the donor's floor penalty and other item handling. The catalogue's
+menu allowance grows by 256 bytes; retained diary/clothing/model allocations
+are checked together. No profile is enabled by these changes.
+
+Four focused checks pass for the connected room-art and catalogue steps:
+complete current resources/profiles/relocation, all-style rotation and resource
+rebasing under sanitizers, actual catalogue/scoring/CRC/allocation bindings, and
+sanitized framing/prices/selection/clutter behaviour. These checks do not prove
+native rendering, ordinary diary use, save/reload, or hardware compatibility.
+
 The shared save adapter retains the complete town, console progress, calendars,
-and pages within the existing two FlashRAM banks. Loose-room drawing, collection
-cover installation, catalogue/scoring/selection, actual participation callers, and connected
-native UI/save verification remain in the same
+and pages within the existing two FlashRAM banks. Actual participation callers,
+independent/all selection, and connected native UI/save verification remain in the same
 [diary consumer map](../specs/V3_DIARIES.md). No diary choices are enabled yet.
 New format-eleven saves require this or a newer compatible build; earlier V3
 and V2 cannot load them. Both deployments remain V2-14, and the user's saves

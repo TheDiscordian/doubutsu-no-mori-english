@@ -1,10 +1,18 @@
 /* Preserve complete 64-bit registers and HI/LO across an o32 value query.
  * Caller: 32-byte frame, input word +0, mode +4, output +8, saved RA +24.
  */
+#ifdef AF_DIARY_CLUTTER
+#define af_v3_room_query af_diary_clutter_query
+#define af_v3_room_value af_diary_clutter_value
+#endif
 .set noreorder
 .set noat
 .set gp=64
+#ifdef AF_DIARY_CLUTTER
+.section .text.af_diary_clutter_query,"ax",@progbits
+#else
 .text
+#endif
 .globl af_v3_room_query
 .ent af_v3_room_query
 af_v3_room_query:

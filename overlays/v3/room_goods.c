@@ -4,10 +4,15 @@
 #error Missing checked native category rotation flags
 #endif
 extern void af_goods_fg2(u16,RoomGoodsPoint);
+#ifndef AF_GOODS_TABLE_OFFSET
+#define AF_GOODS_TABLE_OFFSET 0xFB0u
+#define AF_GOODS_ROW_COUNT 34u
+#define AF_GOODS_VROM 0x8576C0u
+#endif
 
 static u8 *owner_base(RoomGoodsActor *owner) {
     RoomGoodsOverlay *o=owner ? owner->overlay : 0;
-    if (!o || o->vrom_start!=0x8576C0u || o->vram_start!=0x80962A20u ||
+    if (!o || o->vrom_start!=AF_GOODS_VROM || o->vram_start!=0x80962A20u ||
             o->vram_end<0x80963CD0u || !o->loaded) return 0;
     return o->loaded;
 }
@@ -17,9 +22,42 @@ static RoomGoodsState *live(void) {
     return state->magic==ROOM_GOODS_MAGIC && state->owner ? state : 0;
 }
 
+#ifdef AF_DIARY_GOODS
+/* Model resources stay unchanged in ROM for normal catalogue DMA. Only this
+ * loaded room owner's display-list pointers become physical RDRAM pointers. */
+#ifdef __mips__
+#define model_config ((const u32 *)0x806E3000u)
+#else
+extern u32 af_test_goods_model_config[];
+#define model_config af_test_goods_model_config
+#endif
+extern void af_goods_writeback(void *,u32);
+extern void af_v3_save_halt(int) __attribute__((noreturn));
+static void models(u8 *base) {
+    const u32 *c=model_config;
+    if(c[0]!=0x41464452u || c[1]!=1 || c[2]>320 || c[3]>0x10000u ||
+       c[4]!=AF_GOODS_TABLE_OFFSET || c[5]!=AF_GOODS_ROW_COUNT ||
+       c[6]<c[4]+(c[5]+1)*20u || c[7]>c[3] || c[6]>=c[7])af_v3_save_halt(-1);
+    for(u32 i=0;i<c[2];i++) {
+        const u32 *r=c+8+i*3;
+        if((r[0]&3u) || r[0]<c[6] || r[0]>c[7]-4 ||
+           r[1]>>24!=6 || r[2]<c[6] || r[2]>=c[7])af_v3_save_halt(-1);
+        u32 target=((u32)(uptr)base&0x1FFFFFFFu)+r[2];
+        u32 *word=(u32 *)(base+r[0]);
+        if(*word!=r[1] && *word!=target)af_v3_save_halt(-1);
+        *word=target;
+    }
+    af_goods_writeback(base+c[6],c[7]-c[6]);
+}
+#endif
+
 int af_v3_goods_ctor(RoomGoodsActor *owner) {
     u8 *base=owner_base(owner);
     if (!base) return 0;
+#ifdef AF_DIARY_GOODS
+    if(owner->overlay->vram_end!=0x80962A20u+model_config[3])af_v3_save_halt(-1);
+    models(base);
+#endif
     /* Preserve the original category-count operation and initialise only this
        overlay lifetime's transient angles. No save fields are allocated. */
 #ifdef __mips__
@@ -66,7 +104,7 @@ void af_v3_goods_drop_fg(u16 item,RoomGoodsPoint position,int x,int z) {
 }
 
 static int rotating(int row) {
-    if (row<0 || row>=34) return 0;
+    if (row<0 || (u32)row>=AF_GOODS_ROW_COUNT) return 0;
     return row<32 ? ((AF_GOODS_ROTATE_LOW>>row)&1u) : ((AF_GOODS_ROTATE_HIGH>>(row-32))&1u);
 }
 
@@ -79,8 +117,8 @@ s16 af_v3_goods_grid_angle(RoomGoodsActor *owner,int x,int z,int layer,const Roo
     RoomGoodsState *state=live();
     if (!state || state->owner!=owner || layer!=1 || !row) return 0;
     u8 *base=owner_base(owner);
-    uptr first=(uptr)base+0xFB0,at=(uptr)row;
-    if (!base || at<first || at>=first+34*sizeof(*row) || (at-first)%sizeof(*row)) return 0;
+    uptr first=(uptr)base+AF_GOODS_TABLE_OFFSET,at=(uptr)row;
+    if (!base || at<first || at>=first+AF_GOODS_ROW_COUNT*sizeof(*row) || (at-first)%sizeof(*row)) return 0;
     return rotating((int)((at-first)/sizeof(*row))) ? af_v3_goods_get(z,x,layer) : 0;
 }
 
