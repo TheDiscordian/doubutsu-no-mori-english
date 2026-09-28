@@ -303,7 +303,16 @@ def publish_bootstrap(equipment,blob,surface,output):
     if holiday_state:
         from v3_holiday_state import RAM as HOLIDAY_RAM,SIZE as HOLIDAY_SIZE
         p=holiday_state['packet']
-        if (not npc_extra or p['ram']!=HOLIDAY_RAM or p['bytes']!=HOLIDAY_SIZE or p['physical']&15 or
+        transition=npc_extra.get('events',{}).get('transition') if npc_extra else None
+        size=HOLIDAY_SIZE
+        if transition:
+            if (not transition.get('installed') or transition['packet_ram']!=HOLIDAY_RAM or
+                transition['packet_bytes']!=0xC000 or transition['loaded_code']['ram']!=0x806FC000 or
+                not 0<transition['loaded_code']['bytes']<=0x3000 or
+                transition['preserved_prefix_bytes']!=HOLIDAY_SIZE or p['id']!='holiday-transition-GAFE01-r0'):
+                raise ValueError('Changed complete scene-transition packet contract')
+            size=transition['packet_bytes']
+        if (not npc_extra or p['ram']!=HOLIDAY_RAM or p['bytes']!=size or p['physical']&15 or
                 p['storage']!='physical-ROM' or not 0x100000<=p['physical']<p['physical']+p['bytes']<=0x4000000):
             raise ValueError('Changed complete holiday-state startup packet')
         extra+=tuple(f'AF_HOLIDAY_STATE_{label}=0x{p[key]:X}u' for label,key in

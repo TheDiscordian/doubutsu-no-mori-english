@@ -1026,7 +1026,9 @@ and every unfinished diary still unavailable.
 ### Shared transition and native scene bridge
 
 `tools/v3_holiday_transition.py` prepares the complete shared collision, escape,
-and fade path at `build/v3-diary-category-work-01/transition-native-06/`. It compiles
+and fade path at `build/v3-diary-category-work-01/transition-native-06/`. The same
+code is installed in the ABI-324 proposal at
+`build/v3-diary-category-work-01/state-transition-connected-01/`. It compiles
 six whole donor functions, including `title_fade`, `player_lap_check`, and
 `mEvMN_CheckLapPlayer`, through an explicit normalized context. The two complete
 escape-offset arrays are checked against actual donor relocations and data:
@@ -1060,12 +1062,15 @@ zero-filled gate, or no-op side effect is an implemented service.
 
 The linked module is 6,592 bytes, SHA-256
 `2c19448ef951fab59e98d602581629baa8a7b3fed029653449b7537ffbe0dc47`,
-with a 328-byte largest individual frame. It is prepared for `806FC000`, within
-a checked but **not yet allocated/loaded** 16-KiB extension of the holiday packet.
-No cartridge installation or owner activation is claimed; ABI 322 remains the
-current cartridge. The next connected work is the remaining service providers,
-common-state lifetime, packet integration, and live manager dispatch. Retain the
-separate costume/exercise/Miko/race requirements of this same diary category.
+with a 328-byte largest individual frame. It occupies `806FC000` within the
+installed 16-KiB extension of the holiday packet, ending at `80700000`. The
+complete preceding 32 KiB and its guard are preserved, as is the original physical
+ROM resource. The replacement 48-KiB packet has a new physical allocation and
+final guard. Its actual startup descriptor transfers/checks/invalidates the
+whole packet. Every prepared native binding and source hash is checked before
+reuse; the module is not recompiled. Installed code does not activate incomplete
+owners. Remaining service providers and live manager dispatch stay unfinished,
+along with costume/exercise/Miko/race behaviour in this same diary category.
 
 `tests/test_v3_holiday_transition.py` runs one sanitized host check of the actual
 generated functions and both native adapters. It covers every layout placement,
@@ -1075,6 +1080,42 @@ missing-provider rejection. Native I/O, installed identities, and imported
 services are doubles. Total dynamic stack, in-game transitions, native diary
 gameplay, and hardware remain unverified. The exhausted native fixture budget is
 unchanged; no old build or fixture is replayed.
+
+### Shared hourly activation and event-state lifetime
+
+`tools/v3_holiday_active.py` connects the full native hourly updater to donor
+sports state, without treating scheduling as attendance. The 784-byte module
+occupies `806F3000` in the existing NPC packet; its largest individual frame is
+64 bytes. `AFHolidayDedicatedCommon` occupies four bytes at `806F3FE0`, initialized
+to two signed `-1` values. `af_holiday_dedicated_current` passes that same state
+to the complete dedicated-owner adapter. It is transient, not a saved extension.
+
+The native `common_data_reinit` and `mEv_ClearEventInfo` both reset the imported
+state inline. Neither calls unloaded packet code. The latter retains every
+native reset operation, replacing seven zero stores with the checked native
+28-byte `memset` and preserving the remaining function. Scene/manager changes
+retain the state until an actual reset. These two callers and the complete native
+hourly/status/place/rumour functions are guarded before patching.
+
+All 64 daily rows share the native ACTIVE/START/CLEAR, short-event, occupied-acre,
+ERROR/RUN, change-count, and rumour rules. Original identities and camper 70
+retain native cancellation. Imported identities 71..114 use the fixed reverse
+map: source sports umbrella 16 is suppressed until the donor over-status matches;
+ball toss 12, tug-of-war 14, and foot race 15 stop while over-status is not `-1`.
+The source START precedence and early-continue behaviour are retained. The
+complete donor source initializes over-status but supplies no further direct
+assignment; no invented completion writer is installed.
+
+The focused sanitized host comparison compiles the complete donor hourly
+function with engine-I/O doubles, comparing the connected sports paths. It also
+checks native/camper cancellation, last-slot handling, rumours, and the shared
+owner-state entry. The current cartridge check executes the rewritten reset
+prefix with bounded native-call doubles and inspects installed code, unchanged
+saved format/profile, full packet preservation, and the actual startup descriptor.
+Both checks pass. Browser/offline output agrees for empty, mixed, and all-supported
+selections. No native scene/event execution, hardware test, owner activation,
+or newly playable diary is claimed. Save format twelve and diary schema two
+remain unchanged; older V2/format-eleven readers cannot read these saves.
 
 ## Serialized diary state
 

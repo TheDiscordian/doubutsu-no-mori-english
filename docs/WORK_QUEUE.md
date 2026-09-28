@@ -179,8 +179,8 @@ reading, and native cleanup. The field decoder uses shrine `22C/230`, not pool
 native Miko but remains unimplemented; cleanup never deletes native profile `84`.
 Three focused current checks and empty/mixed/all-supported browser/offline
 composition pass. Native I/O is doubled; no emulator fixture is restarted.
-The current ABI-322 proposal is
-`build/v3-diary-category-work-01/reserved-installed-01/build-lock.json`.
+The current ABI-324 proposal is
+`build/v3-diary-category-work-01/state-transition-connected-01/build-lock.json`.
 `af_holiday_npc_event_world` supplies saved Town Day, complete source harvest
 dates, and lighthouse vacation callbacks. The prepared NPC lifecycle is linked
 against all installed providers, without reconverting its resources. The shared
@@ -198,13 +198,17 @@ relinked against all five placement exports, preserving public caller addresses.
 Reuse this installation, the unchanged art, and passing focused checks.
 
 The complete shared collision/escape/fade algorithms and native scene bridge
-are prepared at `build/v3-diary-category-work-01/transition-native-06/`, not
-installed. The source/host and MIPS checks pass; reuse these components. Next
+are installed unchanged from `build/v3-diary-category-work-01/transition-native-06/`.
+The checked 48-KiB packet and actual startup descriptor include the 16-KiB
+extension. Sports common state survives scene changes, resets through both native
+initialization callers, and reaches the complete hourly updater and dedicated
+owner entry. Source/host/current-cartridge checks and empty/mixed/all-supported
+browser/offline composition pass. Reuse these components and their evidence. Next
 connect checked actor/decoration/profile/effect identities and source/native
 ACTIVE status, actual present-demo/room-message and Groundhog state, climate/
-rhythm services, and the alternate event-message lifecycle. Bind common-state
-lifetime and the live dedicated-owner calls while integrating the packet; do not
-activate callbacks with missing providers. The
+rhythm services, and the alternate event-message lifecycle. Connect the live
+dedicated-owner calls using the installed common-state entry; do not activate
+callbacks with missing providers. The
 [transition contract](../specs/V3_DIARIES.md#shared-transition-and-native-scene-bridge)
 records completed native scene/return-state bindings and remaining consumers.
 Include costume,

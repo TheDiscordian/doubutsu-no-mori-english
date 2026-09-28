@@ -1439,8 +1439,10 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         npc=equipment_report['npc_extra']
         holiday_state=equipment_report.get('holiday_state')
         new_state=holiday_state and not prior['equipment_resources'].get('holiday_state')
+        state_growth=(holiday_state['packet']['bytes']-
+            prior['equipment_resources'].get('holiday_state',{}).get('packet',{}).get('bytes',0)) if holiday_state else 0
         report['shared_runtime_refresh'].update(adapters=['holiday_actor_services'],artwork_changed=False,
-            additional_resident_bytes=holiday_state['additional_resident_bytes'] if new_state else 0,
+            additional_resident_bytes=state_growth,
             resource_allocations_changed=bool(new_state or npc['events'].get('reserved')),
             saved_format_changed=bool(new_state),saved_profile_changed=False)
         report['sources'].update(npc['sources'])

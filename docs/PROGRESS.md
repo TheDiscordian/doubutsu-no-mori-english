@@ -31,27 +31,34 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
-The current proposal is ABI 322 at
-`build/v3-diary-category-work-01/reserved-installed-01/build-lock.json`, ROM SHA-256
-`c0a022310833ad22e11ccdaf42d62944daad9762c868fefdcbd745ef01ac2b93`.
+The current proposal is ABI 324 at
+`build/v3-diary-category-work-01/state-transition-connected-01/build-lock.json`, ROM SHA-256
+`f0ebfca14ccd00431ea75b402b52e79e2916cdfcb42f1a52a68626a48ad62408`.
 It contains 191 independently selectable development imports, including all nine
 fish and eight insects, and 100 inactive furniture profiles whose acquisition
 is pending, plus sixteen inactive diary cover profiles. The main lock and both
 stable V2-14 deployments are unchanged.
 
-The shared collision/escape/fade path and native scene bridge are prepared at
-`build/v3-diary-category-work-01/transition-native-06/`, not installed. The complete
-source algorithms retain every layout's ACTIVE precedence, escape ordering,
-transition gate, and Groundhog branch. The native bridge handles announcement
-type mapping, rejected scene requests, return-door writes, and ordered warp/BGM
-calls. A focused sanitized host check passes, and the 6,592-byte MIPS module
-links against checked native functions. Native I/O and unfinished imported
-services are doubles; no in-game execution or newly playable diary is claimed.
-Remaining work is the actual identity/state/gate/climate/rhythm providers,
-alternate announcement lifecycle, packet loading, and live owner dispatch, plus
-the existing event-actor and calendar-choice requirements. See the
+The shared hourly event path connects the donor sports-ending rules, original
+N64/camper activation and cleanup, and persistent transient sports state. Both
+native reset callers initialize that state to `-1`; scene changes do not reset
+it. Dedicated owners have a shared-state entry instead of callback-local copies.
+The complete 6,592-byte collision/escape/fade module is installed unchanged from
+its prepared output. Its 16-KiB packet extension has checked startup transfer,
+CRC, instruction-cache invalidation, and retained prefix resources. The holiday
+packet is 48 KiB; no saved field or format changes.
+
+Two focused source/host/current-cartridge checks pass, including the actual
+reset instructions, donor sports comparison, native cleanup, and startup
+descriptor. Empty, mixed, and all-supported browser/offline compositions agree.
+Native I/O and unfinished services are doubles; no in-game execution or newly
+playable diary is claimed. Remaining work is the actual identity/scene-state/
+gate/climate/rhythm providers, alternate announcement lifecycle, live owner
+dispatch, event actors, and calendar choice. See the
 [transition contract](../specs/V3_DIARIES.md#shared-transition-and-native-scene-bridge).
-Existing saves, the ABI-322 cartridge, and the native test budget are unchanged.
+Format-twelve/profile compatibility is unchanged from ABI 322; native reload
+is not newly verified. Existing saves/builds and the native test budget are
+preserved. V2 and format-eleven-or-earlier V3 cannot load new format-twelve saves.
 
 The complete dedicated-owner code, native primitive adapter, and all shared
 event layouts are installed in the existing holiday packet. The placement

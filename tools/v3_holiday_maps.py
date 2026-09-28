@@ -248,6 +248,9 @@ def prepare(output,build_lock=None,*,base=None,prior=None):
 
 def install(base,prior,blob,core,output):
     """Connect prepared shared resources and existing callers without activation."""
+    if prior['equipment_resources']['npc_extra']['events'].get('reserved'):
+        from v3_holiday_active import install as install_active
+        return install_active(base,prior,blob,core,output)
     del blob
     from v3_event_text import patch_bounds
     from v3_import_storage import replace_checked
