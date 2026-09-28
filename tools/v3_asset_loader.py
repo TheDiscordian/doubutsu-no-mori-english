@@ -68,7 +68,8 @@ def compile_part(part, out, extra_sources=(), defines=(), primary_source=None, l
     run('objcopy', '-O', 'binary', '-j', '.text', '-j', '.rodata',
         *(['-j', '.fallbacks'] if part=='scenery_bootstrap' else []), 'code.elf', 'code.bin')
     code = (out / 'code.bin').read_bytes()
-    entry, expected = {'holiday_dialogue': ('af_holiday_message', 0x806E6800),
+    entry, expected = {'holiday_world': ('af_holiday_world_bind', 0x806E8000),
+                      'holiday_dialogue': ('af_holiday_message', 0x806E6800),
                       'holiday_motion': ('af_holiday_motion_animation', 0x806E6000),
                       'npc_registry': ('af_v3_npc_extra_descriptor', 0x806E4000),
                       'diary_catalogue': ('af_diary_clutter_query', 0x806E1000),

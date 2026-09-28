@@ -13,6 +13,12 @@ typedef struct {
     AFHolidayWorld world;
 } AFHolidayNpc;
 extern const unsigned int af_holiday_npc_bytes;
+typedef struct {
+    AFDiaryDates dates;
+    /* Both callbacks receive this AFHolidayNpc, as do the shared world ops. */
+    int (*lighthouse_after)(void *);
+    void (*lighthouse_start)(void *);
+} AFHolidayEventWorld;
 
 /* Required installation services, deliberately unresolved until their complete
  * resources and event owner are installed. The binding fills the remaining ops
@@ -21,6 +27,9 @@ extern const unsigned int af_holiday_npc_bytes;
  * validates the actual outdoor clip, complete allocated actor size, selected
  * profile, full voice, and cane resources before native construction. */
 int af_holiday_npc_bind(AFHolidayNpc *);
+/* Event ownership supplies real dates/vacation state; the native world adapter
+ * supplies player identity, inventory, diary storage, and trophy receipts. */
+int af_holiday_npc_event_world(AFHolidayNpc *,AFHolidayEventWorld *);
 int af_holiday_npc_world(AFHolidayNpc *,AFHolidayWorld *,unsigned int *gender);
 int af_holiday_npc_resources(AFHolidayNpc *); /* apply voice/cane after native ctor */
 void af_holiday_npc_unregister(AFHolidayNpc *);

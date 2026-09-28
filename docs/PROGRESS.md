@@ -31,13 +31,33 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
-The current proposal is ABI 315 at
-`build/v3-diary-category-work-01/tortimer-dialogue-02/build-lock.json`, ROM SHA-256
-`a0959619e78f6c4cb13f63ae30965f5fcfb1e46a1dcc23f6d46e9fd2f206b908`.
+The current proposal is ABI 316 at
+`build/v3-diary-category-work-01/tortimer-world-02/build-lock.json`, ROM SHA-256
+`0cece7101ca3cccffb78603be138f178f4071d180ecd605bb2bcf35bb9df36d5`.
 It contains 191 independently selectable development imports, including all nine
 fish and eight insects, and 100 inactive furniture profiles whose acquisition
 is pending, plus sixteen inactive diary cover profiles. The main lock and both
 stable V2-14 deployments are unchanged.
+
+The same diary category now has the connected holiday conversation, movement,
+calendar, and reward kernels installed with the actual native player/inventory/
+trophy bindings. All 65 donor reward candidates map to their installed records;
+diaries resolve to carried IDs rather than cover furniture, and the bottled ship
+uses its reserved additive identity. Both selection fields must be enabled.
+Actual handover calls the existing native insertion/collection path and only
+then marks the active resident's trophy. Visitors cannot write resident state;
+pointer/slot mismatches, full pockets, and stale selections reject delivery.
+The native lifecycle bridge calls these services, but event ownership still
+prevents activation. Real special dates/vacation state, scheduling/spawning/
+cleanup, and the separate exercise/card conversation remain required.
+
+One connected sanitized host check passes all 65 candidates and 128 handovers,
+four-player trophy isolation, visitors, repeat delivery, full/stale inventory,
+and resource gates. Current cartridge/manifest checks and browser/offline empty,
+mixed, and all-191 compositions pass. The exact appended-choice resource hashes
+and reader changes repair the stale choice-bank manifest without weakening the
+build guards. No native fixture is repeated, no new style is selectable, and
+these results do not establish native diary gameplay or save/reload.
 
 The active diary category has a source-bound calendar → read → edit → finish →
 privacy controller for all sixteen styles and all 48 monthly pages. Capacity
@@ -140,7 +160,7 @@ native rendering, ordinary diary use, save/reload, or hardware compatibility.
 
 The installed diary bindings connect every carried parent to its cover, single
 save-profile bit, catalogue ordering, and scoring. Browser and offline composition
-agree for empty, mixed, and all-supported selections on ABI 315. Prepared diaries
+agree for empty, mixed, and all-supported selections on ABI 316. Prepared diaries
 remain unavailable, including under select all; inactive catalogue/scoring rows
 are removed from composed builds. The shared save/profile host check uses real
 carried readers, selected-style resolution, canonical codec, and format-eleven

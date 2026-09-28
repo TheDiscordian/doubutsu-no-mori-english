@@ -1466,6 +1466,9 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             resource_allocations_changed=True,changed_owner_moves=owner_moves)
         report['sources'].update(report['password_editor']['sources'])
         report['native_test']='pending two-row code-entry UI; Nook conversation and gift delivery remain incomplete'
+    if report.get('resource_capacity'):
+        report['resource_capacity']['resources']=capacity.text_records(result,report)
+        capacity.checked_limit(result,report)
     write_new(output/'animal-forest-v3-asset-loader.z64',result)
     write_new(output/'asset-loader.ups',patch)
     write_new(output/'build.json',(json.dumps(report,indent=2,sort_keys=True)+'\n').encode())

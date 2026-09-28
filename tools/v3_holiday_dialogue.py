@@ -155,6 +155,9 @@ def check_provenance(text):
 
 
 def install(base,prior,blob,core,output):
+    if prior['equipment_resources']['npc_extra'].get('dialogue'):
+        from v3_holiday_world import install as install_world
+        return install_world(base,prior,blob,core,output)
     del blob
     from v3_furniture_pipeline import Source
     e=copy.deepcopy(prior['equipment_resources']);npc=e['npc_extra'];packet=npc['packet']

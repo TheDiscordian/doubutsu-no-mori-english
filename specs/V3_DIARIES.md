@@ -353,7 +353,7 @@ Handover sets NPC1 orders `0=item`, `1=7` (PUTAWAY), and `2=0`; only the existin
 reward transaction inserts the item and marks the trophy. Invalid fields or
 message IDs reject before the first demo mutation.
 
-The current build is `build/v3-diary-category-work-01/tortimer-dialogue-02/`.
+The current build is `build/v3-diary-category-work-01/tortimer-world-02/`.
 Focused checks compare every converted message token against the official source
 after reversing declared adaptations, inspect installed resources/bounds/guards,
 and connect the actual talk/reward/transport code under sanitizers across all 28
@@ -578,16 +578,98 @@ conversation/calendar/reward functions pass one sanitized combined host check;
 the native bridge is compiler/source checked, not executed. No native fixture is
 started and the exhausted diary title-fixture budget is unchanged.
 
-Four installation services remain unresolved:
-`af_holiday_npc_bind`, `af_holiday_npc_world`, `af_holiday_npc_resources`,
-and `af_holiday_npc_unregister`. Binding must supply the actual event owner,
-live world/reward data, cleanup, and validation of the active outdoor clip and
-full voice. The installed dialogue/continuation, walking/cane/resource exports, and elapsed-tick controller
-are reused; allocation and drawing are already connected. The separate
+Three installation services remain unresolved:
+`af_holiday_npc_bind`, `af_holiday_npc_event_world`, and
+`af_holiday_npc_unregister`. Binding must supply the actual event owner,
+special dates/vacation state, cleanup, and validation of the active outdoor clip.
+The native world wrapper, saved reward bindings, and full-voice resource check
+are implemented below. The installed dialogue/continuation, walking/cane/resource
+exports, and elapsed-tick controller are reused; allocation and drawing are
+already connected. The separate
 exercise/card route remains required.
 These are remaining consumers of the same diary category, not new per-event
 tasks. Keep the existing art, draw, and conversation objects; link and install
 the connected path before enabling diary choices.
+
+### Live player and reward connection
+
+`holiday_world.c` links the complete movement, conversation, reward, and calendar
+kernels to real N64 player/inventory/trophy readers. The shared actor-service
+refresh installs this 13,072-byte module at `806E8000`, reusing the existing NPC
+packet and leaving its registry, cane, graphics, pool, and guards unchanged.
+The 370-byte source reward table is at `806E7B00`; the 536-byte `AFHW` destination
+map is at `806E7C80`. This map contains all 65 source candidates, checked against
+the installed inactive records, not merely the currently selectable catalogue.
+No record is promoted by installation.
+
+The stable registry maps source `1FC0` to additive `3C94`. Source diaries map to
+carried `2B10..2B1E`, sharing their respective cover/profile selections; the donor
+New Year's selector still has its fifteen-style range. The sixteenth diary is
+not silently added to that source distribution. All ordinary furniture rewards
+use their canonical imported IDs. Runtime lookup requires matching index/item
+identities and enabled fields in both the 80-byte profile and 32-byte metadata
+record. A diary also requires the correct carried-parent field. Disabled or
+unknown candidates return no reward; they never fall through to a native item
+with the same numeric ID. Fixed/gender rewards do not consume RNG; source-random
+groups select uniformly among their selected candidates.
+
+World binding reads the actual RTC, player number (`80136EA3`), active pointer
+(`80136FD8`), and gender (`PrivateInfo + 10`). The four resident records start at
+`80126EC0`, stride `BD0`; visitor four must point to `g_foreigner_private` at
+`801439A0`. Every free-slot, trophy, and handover callback rechecks pointer/slot
+identity. An active conversation cannot transfer to another player. Visitors
+retain the official visitor dialogue without altering a resident's diary,
+inventory, or trophy state.
+
+The ordinary free-slot reader is `800B83D4`; handover uses `800B8B8C`, including
+the installed wrapped-present adapter and collection hooks. Its true success
+result precedes the saved trophy mark. The reward module calls the installed
+`af_v3_reward_flag`, preserving the four independent 12-byte saved flag records.
+No separate insertion, fake animation-completion timer, saved-format change, or
+new state allocation is introduced. The native lifecycle wrapper calls the
+world binding and full registry/voice checks; its prepared object is
+`tortimer-world-02/actor/holiday_npc.o`, SHA-256
+`44a1c1cd50bf0ddaccae2dc2881553a7b6a0d3d39ff328ea5daaa69d73488035`.
+Maximum individual frames are 144 bytes for the controller/bridge and 128 bytes
+for world binding, before callees. Actual stack high-water use remains unverified.
+
+Remaining owner connections share one category task:
+
+- Bind actual event state to `event`/`field_event`, shrine position, running
+  athlete, melody restoration, and cleanup. `m_soncho.c` prioritises active
+  events except autumn fishing, then autumn fishing, January/February vacation,
+  and morning exercise. Date occurrence alone is not native RUN/SHOW state.
+- Reuse the installed native event directory/campsite infrastructure. Its index
+  has 128 entries, but the event-manager dispatch and 16 today slots still need
+  checked ownership/capacity when extending it. Camper event 70 stays reserved.
+- Port shared shrine and wandering owners from `ac_event_manager.c`
+  (`soncho_start/stop/in`, `sonchowandar_start/stop`). New Year's, sports,
+  cherry blossom, meteor, harvest moon, and Harvest Festival have event-specific
+  owners; New Year's cleanup targets Ev_Miko. Sports cleanup selects the active
+  ball-toss/foot-race/tug owner, not an arbitrary holiday row. Halloween spawns
+  `SP_NPC_SONCHO_D079`, not the ordinary Ev_Soncho2 identity.
+- `af_holiday_npc_event_world` supplies the actual Town Day/harvest dates and
+  vacation-state callbacks. Zero special dates mean absent events. It must not
+  invent saved dates, start an unsupported lighthouse quest, or duplicate the
+  already-connected player/reward binding. N64/GameCube calendar differences
+  need the specified real behaviour choice, not mismatched native event IDs.
+- Connect the separate Tortimer exercise/card actor and its actual talk-init
+  attendance gate. Neither an exercise villager nor the ordinary police actor
+  substitutes for that source gate.
+
+Focused cartridge and manifest checks pass. One sanitized host test exercises
+the actual world/talk/reward/calendar/flag implementations: all 65 mappings,
+128 handovers, four-player isolation, visitors, full/stale inventory, repeated
+delivery, invalid dates/identity, and resource gates. Inventory calls are host
+doubles; these are not native gameplay or save-I/O results. Browser/offline empty,
+mixed, and all-191 composition agrees, with all diaries still unavailable.
+No native fixture is attempted. The existing title-fixture result stays open.
+
+The shared capacity manifest tracks the complete appended choice bank and table.
+Its legacy record is accepted only when exact predecessor hashes and the one
+declared reader-bound change reconstruct the checked old reader; current bytes
+must then match the declared new resources. New builds store the updated record
+and validate it again. Unknown resource/reader changes still reject.
 
 ## Serialized diary state
 

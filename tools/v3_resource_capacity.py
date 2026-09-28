@@ -22,6 +22,41 @@ def reader_pair(vrom):
     return struct.pack('>2I',0x3C180000|(vrom>>16),0x27180000)
 
 
+def text_records(image,report):
+    """Account for a checked additive choice bank, including older build receipts.
+
+    Verify its exact predecessor hashes and bound changes before deriving the
+    current record. This is not permission to bless arbitrary changed readers.
+    """
+    records=copy.deepcopy(report.get('resource_capacity',{}).get('resources',[]))
+    text=report.get('equipment_resources',{}).get('npc_extra',{}).get('dialogue',{}).get('text')
+    if not text:return records
+    files=by_vrom(image);core=files[CODE_VROM].extract(image)
+    for row in records:
+        if row['name']!='select':continue
+        resources={r['vrom']:r for r in text['resources']}
+        data=resources.get(row['vrom']);table=resources.get(row['table_vrom'])
+        if not data or not table:raise ValueError('Incomplete appended choice receipt')
+        if (row['sha256'],row['table_sha256'])==(data['sha256'],table['sha256']):continue
+        if (row['sha256'],row['table_sha256'])!=(data['original_sha256'],table['original_sha256']):
+            raise ValueError('Changed appended choice predecessor')
+        start=row['reader_start'];current=core[start-CODE_RAM:start-CODE_RAM+0x140]
+        before=bytearray(current);changes=[]
+        for hook in text['hooks']:
+            a=hook['address']
+            if start<=a<start+len(before):
+                if (a!=0x80065544 or hook['before']!=0x2A010000|text['first_choice'] or
+                        hook['after']!=0x2A010000|(text['first_choice']+text['choice_count']) or
+                        u32(before,a-start)!=hook['after']):
+                    raise ValueError('Changed appended choice bound')
+                struct.pack_into('>I',before,a-start,hook['before']);changes.append(a)
+        if changes!=[0x80065544] or sha256(before)!=row['reader_sha256']:
+            raise ValueError('Changed complete appended choice reader')
+        row.update(bytes=data['bytes'],sha256=data['sha256'],table_sha256=table['sha256'],
+            entries=text['first_choice']+text['choice_count'],reader_sha256=sha256(current))
+    return records
+
+
 def checked_limit(image,report):
     """A declared larger bound is valid only with its actual relocated readers."""
     limit=report['import_storage']['virtual_limit'];files=by_vrom(image)
@@ -31,7 +66,7 @@ def checked_limit(image,report):
         raise ValueError('Unknown import-storage reservation')
     core=files[CODE_VROM].extract(image)
     if len(capacity.get('resources',[]))!=len(TEXT):raise ValueError('Incomplete relocated text records')
-    for spec,row in zip(TEXT,capacity['resources'],strict=True):
+    for spec,row in zip(TEXT,text_records(image,report),strict=True):
         name,old,new,table,first,reader,_=spec
         entry=files.get(new)
         if (entry is None or old in files or row['name']!=name or row['vrom']!=new or row['table_vrom']!=table

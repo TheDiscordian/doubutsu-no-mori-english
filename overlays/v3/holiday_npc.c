@@ -2,6 +2,7 @@
  * must link together before any descriptor can expose these entry points. */
 #include "holiday_npc.h"
 #include "holiday_motion.h"
+#include "holiday_world.h"
 #ifndef __mips__
 #error Native NPC bridge requires the checked o32 target
 #endif
@@ -24,6 +25,14 @@ static void remove_actor(void *context) {
     FN(0x800567E8u,void,void *)(a);
 }
 static int fail(AFHolidayNpc *a) {a->failed=1;remove_actor(a);return 0;}
+int af_holiday_npc_world(AFHolidayNpc *a,AFHolidayWorld *w,unsigned int *gender) {
+    if(!a || w!=&a->world)return 0;
+    AFHolidayEventWorld event={0};
+    if(!af_holiday_npc_event_world(a,&event) ||
+            !af_holiday_world_bind(a,event.dates,gender))return 0;
+    w->lighthouse_after=event.lighthouse_after;w->lighthouse_start=event.lighthouse_start;
+    return 1;
+}
 static int refresh(AFHolidayNpc *a,void *game) {
     unsigned int gender;
     if(!a || !a->constructed || a->failed || a->actor.deleted)return 0;
@@ -82,7 +91,7 @@ void af_holiday_npc_ctor(AFHolidayNpc *a,void *game) {
     a->game=game;a->constructed=a->failed=0;a->actor=(AFHolidayActor){0};
     a->ops=(AFHolidayActorOps){0};a->world=(AFHolidayWorld){0};
     unsigned int gender;
-    if(!af_holiday_motion_bind(a) || !af_holiday_dialogue_bind(a) ||
+    if(!af_holiday_world_resources(a) || !af_holiday_motion_bind(a) || !af_holiday_dialogue_bind(a) ||
             !af_holiday_npc_bind(a) || !a->ops.motion ||
             !af_holiday_npc_world(a,&a->world,&gender)) {fail(a);return;}
     if(FN(clip(0xBC),int,void *,void *)(a,game)!=1)return;

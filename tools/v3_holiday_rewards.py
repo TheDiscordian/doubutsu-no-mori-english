@@ -120,7 +120,8 @@ def compile_kernel(output, *, name='holiday_rewards'):
         expected=sorted(('af_holiday_actor_construct','af_holiday_actor_think_init',
             'af_holiday_actor_think_elapsed','af_holiday_actor_request','af_holiday_actor_prepare',
             'af_holiday_actor_start','af_holiday_actor_talk','af_holiday_npc_bind',
-            'af_holiday_npc_world','af_holiday_npc_resources','af_holiday_npc_unregister',
+            'af_holiday_npc_event_world','af_holiday_world_bind','af_holiday_world_resources',
+            'af_holiday_npc_resources','af_holiday_npc_unregister',
             'af_holiday_npc_continue','af_holiday_dialogue_bind','af_holiday_motion_bind','af_holiday_motion_resources','memcpy','memset'))
     if imports!=expected:raise ValueError('Unexpected acquisition kernel dependencies: '+str(imports))
     return dict(format='ELF-o32-MIPS-big-endian',sha256=sha256((output/(name+'.o')).read_bytes()),

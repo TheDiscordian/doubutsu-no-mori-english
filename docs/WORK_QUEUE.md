@@ -128,12 +128,28 @@ The shared transport supplies full item/event fields, dates, continuation,
 camera/turn, listen/start, and actual handover orders. Focused source/cartridge
 and sanitized connected talk/reward/transport checks pass across all 28 holiday
 events. Browser/offline empty, mixed, and all-supported compositions agree.
-The native bridge calls these installed exports; its remaining providers are
-`af_holiday_npc_bind`, `af_holiday_npc_world`, `af_holiday_npc_resources`, and
-`af_holiday_npc_unregister`: event ownership/scheduling, live calendar/reward
-data, resource validation, and cleanup. Connect these and the separate
-exercise/card route next, then activate the assembled actor/diary path.
-Motion, dialogue, continuation, and resource exports are available in the packet.
+The connected movement/talk/calendar/reward kernels and native world bindings
+are installed at `build/v3-diary-category-work-01/tortimer-world-02/`. All 65 reward
+candidates resolve through checked installed profiles/metadata, including carried
+diaries and the bottled ship's additive identity. The native inventory/collection
+path and saved trophy flags share active-player pointer validation. The prepared
+lifecycle bridge calls these exports and validates full voice/resources.
+One sanitized connected check passes 128 handovers plus all-candidate selection,
+four-player isolation, visitor, full/stale pocket, repeat, and resource gates.
+Current cartridge/manifest and browser/offline compositions pass. The appended
+choice-bank manifest follows its exact declared text/reader changes, so the
+current build remains a checked input to subsequent shared refreshes.
+The remaining providers are `af_holiday_npc_bind`,
+`af_holiday_npc_event_world`, and `af_holiday_npc_unregister`: event ownership/
+scheduling, real special dates and vacation state, and cleanup. The native
+world wrapper supplies the inventory/diary/reward fields; do not recreate them
+in the event owner. Connect the remaining event ownership and separate exercise/
+card route, then activate the assembled actor/diary path. The
+[owner connection map](../specs/V3_DIARIES.md#live-player-and-reward-connection)
+identifies shrine, wandering, and event-specific owners; ordinary festival chats
+or a calendar-only spawn are not substitutes.
+Motion, dialogue, continuation, world/reward, and resource exports are available
+in the packet.
 Reuse the installed allocation/loading/drawing path and complete resources; do not rebuild
 them as separate tasks or restart the exhausted native title fixture.
 The [native connection notes](../specs/V3_DIARIES.md#tortimer-artwork-and-native-actor-connection)
@@ -183,9 +199,9 @@ harness budget exhausted; no old fixture replay is authorised by this clothing
 work. Fix any identified game defect. This does not defer required creature
 behaviours or classify their gameplay as verified.
 
-Use the shared converter and current ABI-315 proposal:
-`build/v3-diary-category-work-01/tortimer-dialogue-02/build-lock.json`.
-ROM SHA-256: `a0959619e78f6c4cb13f63ae30965f5fcfb1e46a1dcc23f6d46e9fd2f206b908`.
+Use the shared converter and current ABI-316 proposal:
+`build/v3-diary-category-work-01/tortimer-world-02/build-lock.json`.
+ROM SHA-256: `0cece7101ca3cccffb78603be138f178f4071d180ecd605bb2bcf35bb9df36d5`.
 The two static variants use ordinary stock, catalogue/scoring, save-profile bits,
 and independent browser/offline selection. Their 7,840 artwork bytes are installed
 together; neither native counterpart nor any existing imported object is replaced.
