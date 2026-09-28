@@ -188,7 +188,7 @@ FURNITURE = {
 
 # Additive clothing reservations, independent of donor furniture and native
 # clothing identities. These are not enabled items or saved-profile support.
-CLOTHING_REGISTRY_VERSION = 1
+CLOTHING_REGISTRY_VERSION = 2
 CLOTHING = {
     0x24BF: (0x34BF, 0x10BF, STORAGE+0xF000),
     0x241A: (0x341A, 0x101A, STORAGE+0xE2000),
@@ -203,6 +203,14 @@ CLOTHING_DISPLAYS = {
     0x241A: (1562, 0x3868),
     0x241B: (1563, 0x386C),
 }
+
+# Append-only identities for the complete remaining donor-appearance category.
+# Resource addresses are allocated by the checked common item-data writer and
+# bound in each build report; they are not save identities or checkbox indices.
+for _garment in (0x244B, 0x2469, 0x24B6, 0x24CB, 0x24E3):
+    _index = _garment-0x2400
+    CLOTHING[_garment] = (0x3400+_index, 0x1000+_index, None)
+    CLOTHING_DISPLAYS[_garment] = (1536+_index, 0x3800+_index*4)
 
 
 def clothing_slot(donor_item):

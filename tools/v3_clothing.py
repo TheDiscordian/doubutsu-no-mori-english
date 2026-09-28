@@ -60,6 +60,8 @@ def convert(native, first, rel, symbols, *, donor_item=0x24BF):
     resource, source = garment(assets, donor_item)
     texture, palette = resource[:512], resource[512:]
     item, index, vrom = clothing_slot(donor_item)
+    if vrom is None:
+        raise ValueError('Allocate new clothing through the complete category installer')
     donor_index = donor_item-0x2400
     native_tex, native_pal = assets[-2:]
     wanted = pixels(texture, palette)

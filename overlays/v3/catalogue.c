@@ -63,11 +63,19 @@ void af_v3_catalogue_frame(struct Preview *preview, u32 argument) {
 #ifdef AF_V3_CLOTHING_CATALOGUE
 extern void af_v3_original_catalogue_furniture_init(struct Preview *, u32);
 #ifdef AF_V3_ALOHA_DISPLAY
-static u32 display_pocket(u32 item) {
+#ifdef AF_V3_BATCH_CLOTHING_DISPLAY
+#include "clothing_display.h"
+#endif
+static __attribute__((noinline)) u32 display_pocket(u32 item) {
+#ifdef AF_V3_BATCH_CLOTHING_DISPLAY
+    u32 index=af_v3_display_clothing_index(item);
+    return index>=0x1000u && index<0x1100u ? index+0x2400u : 0;
+#else
     item&=0xFFFCu;
     if (item==0x3AFCu || item==0x3868u || item==0x386Cu)
         return 0x3400u+((item-0x3800u)>>2);
     return 0;
+#endif
 }
 #endif
 

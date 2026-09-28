@@ -1,4 +1,4 @@
-/* Loaded with the existing equipment packet before the startup init chain. */
+/* Load every complete packet before entering the shared initialization chain. */
 typedef unsigned int u32;
 #ifndef AF_SURFACE_ITEMS_BYTES
 #define AF_SURFACE_ITEMS_BYTES 4096u
@@ -7,155 +7,118 @@ extern int af_surface_dma(void *,u32,u32);
 extern u32 af_surface_crc(const void *,u32);
 extern void af_surface_writeback(void *,u32),af_surface_invalidate(void *,u32);
 extern int af_surface_prior_init(void);
-#ifdef __mips__
-#define memory ((u32 *)0x804BC000u)
-#else
-extern u32 af_test_surface_memory[AF_SURFACE_ITEMS_BYTES/4];
-#define memory af_test_surface_memory
-#endif
-#ifdef AF_V3_EDITABLE_CHECKSUMS
-const u32 af_v3_surface_crc_expected = AF_SURFACE_ITEMS_CRC;
-#define surface_crc (*(volatile const u32 *)&af_v3_surface_crc_expected)
-#else
-#define surface_crc AF_SURFACE_ITEMS_CRC
-#endif
-#if defined(AF_V3_EDITABLE_CHECKSUMS) && defined(AF_FISH_WORLD_VROM)
-const u32 af_v3_fish_world_crc_expected = AF_FISH_WORLD_CRC;
-#define fish_world_crc (*(volatile const u32 *)&af_v3_fish_world_crc_expected)
-#else
-#define fish_world_crc AF_FISH_WORLD_CRC
-#endif
-#if defined(AF_V3_EDITABLE_CHECKSUMS) && defined(AF_CREATURE_ITEMS_VROM)
-const u32 af_v3_creature_items_crc_expected = AF_CREATURE_ITEMS_CRC;
-#define creature_items_crc (*(volatile const u32 *)&af_v3_creature_items_crc_expected)
-#else
-#define creature_items_crc AF_CREATURE_ITEMS_CRC
-#endif
 #ifdef AF_INSECT_PHYSICAL
 extern int af_surface_pi(u32,void *,u32);
-const u32 af_v3_insect_crc_expected = AF_INSECT_CRC;
-#define insect_crc (*(volatile const u32 *)&af_v3_insect_crc_expected)
 #endif
 
-static __attribute__((noinline)) int load_code(void *p,u32 vrom,u32 bytes,u32 crc) {
-#ifdef AF_INSECT_PHYSICAL
-    int status=(vrom&0x80000000u)?af_surface_pi(vrom&0x7FFFFFFFu,p,bytes):af_surface_dma(p,vrom,bytes);
-    if (status || af_surface_crc(p,bytes)!=crc) return 0;
-#else
-    if (af_surface_dma(p,vrom,bytes) || af_surface_crc(p,bytes)!=crc) return 0;
-#endif
-    af_surface_writeback(p,bytes);
-    af_surface_invalidate(p,bytes);
-    return 1;
-}
-
-int af_v3_surface_init(void) {
-    if (!load_code(memory,AF_SURFACE_ITEMS_VROM,AF_SURFACE_ITEMS_BYTES,surface_crc)) return 0;
+/* Named words remain editable by the offline and browser profile composers.
+ * A single descriptor loop avoids duplicating the checked transfer sequence. */
+const u32 af_v3_surface_crc_expected=AF_SURFACE_ITEMS_CRC;
 #ifdef AF_ROOM_GOODS_VROM
-    /* Room-item hooks are resident before native actors can call them. This
-       immutable packet is independent of the selected import profile. */
-#ifdef __mips__
-    void *goods=(void *)0x804D9000u;
-#else
-    extern unsigned char af_test_goods_code[AF_ROOM_GOODS_BYTES];
-    void *goods=af_test_goods_code;
-#endif
-    if (!load_code(goods,AF_ROOM_GOODS_VROM,AF_ROOM_GOODS_BYTES,AF_ROOM_GOODS_CRC)) return 0;
-#ifdef __mips__
-    *(volatile u32 *)0x804DC000u=0;
-#else
-    extern u32 af_test_goods_magic;
-    af_test_goods_magic=0;
-#endif
+static const u32 goods_crc=AF_ROOM_GOODS_CRC;
 #endif
 #ifdef AF_ROOM_CARRY_VROM
-#ifdef __mips__
-    void *carrying=(void *)0x804DA000u;
-#else
-    extern unsigned char af_test_carry_code[AF_ROOM_CARRY_BYTES];
-    void *carrying=af_test_carry_code;
-#endif
-    if (!load_code(carrying,AF_ROOM_CARRY_VROM,AF_ROOM_CARRY_BYTES,AF_ROOM_CARRY_CRC)) return 0;
-#ifdef __mips__
-    *(volatile u32 *)0x804DC400u=0;
-#else
-    extern u32 af_test_carry_magic;
-    af_test_carry_magic=0;
-#endif
+static const u32 carry_crc=AF_ROOM_CARRY_CRC;
 #endif
 #ifdef AF_PLAYER_EXERCISE_VROM
-#ifdef __mips__
-    void *exercise=(void *)0x804CE000u;
-#else
-    extern unsigned char af_test_exercise_code[AF_PLAYER_EXERCISE_BYTES];
-    void *exercise=af_test_exercise_code;
-#endif
-    if (!load_code(exercise,AF_PLAYER_EXERCISE_VROM,AF_PLAYER_EXERCISE_BYTES,AF_PLAYER_EXERCISE_CRC)) return 0;
+static const u32 exercise_crc=AF_PLAYER_EXERCISE_CRC;
 #endif
 #ifdef AF_CONSOLE_STORAGE_VROM
-#ifdef __mips__
-    void *console=(void *)0x804DE200u;
-#else
-    extern unsigned char af_test_console_code[AF_CONSOLE_STORAGE_BYTES];
-    void *console=af_test_console_code;
-#endif
-    if (!load_code(console,AF_CONSOLE_STORAGE_VROM,AF_CONSOLE_STORAGE_BYTES,AF_CONSOLE_STORAGE_CRC)) return 0;
+static const u32 storage_crc=AF_CONSOLE_STORAGE_CRC;
 #endif
 #ifdef AF_CONSOLE_IMAGES_VROM
-#ifdef __mips__
-    void *images=(void *)0x804F9020u;
-#else
-    extern unsigned char af_test_console_images[AF_CONSOLE_IMAGES_BYTES];
-    void *images=af_test_console_images;
-#endif
-    if (!load_code(images,AF_CONSOLE_IMAGES_VROM,AF_CONSOLE_IMAGES_BYTES,AF_CONSOLE_IMAGES_CRC)) return 0;
+static const u32 images_crc=AF_CONSOLE_IMAGES_CRC;
 #endif
 #ifdef AF_CONSOLE_DISK_VROM
-#ifdef __mips__
-    void *disk=(void *)0x80630000u;
-#else
-    extern unsigned char af_test_console_disk[AF_CONSOLE_DISK_BYTES];
-    void *disk=af_test_console_disk;
-#endif
-    /* Complete code, both BIOS copies, boot data, zeroed transient buffers,
-     * and guard load together. No hook can enter partially verified code. */
-    if (!load_code(disk,AF_CONSOLE_DISK_VROM,AF_CONSOLE_DISK_BYTES,AF_CONSOLE_DISK_CRC)) return 0;
+static const u32 disk_crc=AF_CONSOLE_DISK_CRC;
 #endif
 #ifdef AF_CREATURE_ITEMS_VROM
-#ifdef __mips__
-    void *creatures=(void *)0x804FF100u;
-#else
-    extern unsigned char af_test_creature_code[AF_CREATURE_ITEMS_BYTES];
-    void *creatures=af_test_creature_code;
-#endif
-    if (!load_code(creatures,AF_CREATURE_ITEMS_VROM,AF_CREATURE_ITEMS_BYTES,creature_items_crc)) return 0;
+const u32 af_v3_creature_items_crc_expected=AF_CREATURE_ITEMS_CRC;
 #endif
 #ifdef AF_CREATURE_FIELD_VROM
-#ifdef __mips__
-    void *field=(void *)0x80647000u;
-#else
-    extern unsigned char af_test_creature_field[AF_CREATURE_FIELD_BYTES];
-    void *field=af_test_creature_field;
-#endif
-    if (!load_code(field,AF_CREATURE_FIELD_VROM,AF_CREATURE_FIELD_BYTES,AF_CREATURE_FIELD_CRC)) return 0;
+static const u32 field_crc=AF_CREATURE_FIELD_CRC;
 #endif
 #ifdef AF_FISH_WORLD_VROM
-#ifdef __mips__
-    void *fish_world=(void *)0x8064A000u;
-#else
-    extern unsigned char af_test_fish_world[AF_FISH_WORLD_BYTES];
-    void *fish_world=af_test_fish_world;
-#endif
-    if (!load_code(fish_world,AF_FISH_WORLD_VROM,AF_FISH_WORLD_BYTES,fish_world_crc)) return 0;
+const u32 af_v3_fish_world_crc_expected=AF_FISH_WORLD_CRC;
 #endif
 #ifdef AF_INSECT_PHYSICAL
+const u32 af_v3_insect_crc_expected=AF_INSECT_CRC;
+#endif
+#ifdef AF_CLOTHING_VROM
+const u32 af_v3_clothing_crc_expected=AF_CLOTHING_CRC;
+#endif
+
 #ifdef __mips__
-    void *insects=(void *)AF_INSECT_RAM;
+#define DEST(name,address) ((void *)(address))
+#define CLEAR(name,address) ((volatile u32 *)(address))
 #else
-    extern unsigned char af_test_insect_code[AF_INSECT_BYTES];
-    void *insects=af_test_insect_code;
+extern u32 af_test_surface_memory[AF_SURFACE_ITEMS_BYTES/4];
+extern u32 af_test_goods_magic,af_test_carry_magic;
+extern unsigned char af_test_goods_code[],af_test_carry_code[],af_test_exercise_code[];
+extern unsigned char af_test_console_code[],af_test_console_images[],af_test_console_disk[];
+extern unsigned char af_test_creature_code[],af_test_creature_field[],af_test_fish_world[];
+extern unsigned char af_test_insect_code[],af_test_clothing_code[];
+#define DEST(name,address) (af_test_##name)
+#define CLEAR(name,address) (&af_test_##name)
 #endif
-    if (!load_code(insects,AF_INSECT_PHYSICAL|0x80000000u,AF_INSECT_BYTES,insect_crc)) return 0;
+
+struct StartupPacket {
+    void *destination;
+    u32 source,bytes;
+    const u32 *crc;
+    volatile u32 *clear;
+};
+static const struct StartupPacket packets[]={
+    {DEST(surface_memory,0x804BC000u),AF_SURFACE_ITEMS_VROM,AF_SURFACE_ITEMS_BYTES,&af_v3_surface_crc_expected,0},
+#ifdef AF_ROOM_GOODS_VROM
+    {DEST(goods_code,0x804D9000u),AF_ROOM_GOODS_VROM,AF_ROOM_GOODS_BYTES,&goods_crc,CLEAR(goods_magic,0x804DC000u)},
 #endif
+#ifdef AF_ROOM_CARRY_VROM
+    {DEST(carry_code,0x804DA000u),AF_ROOM_CARRY_VROM,AF_ROOM_CARRY_BYTES,&carry_crc,CLEAR(carry_magic,0x804DC400u)},
+#endif
+#ifdef AF_PLAYER_EXERCISE_VROM
+    {DEST(exercise_code,0x804CE000u),AF_PLAYER_EXERCISE_VROM,AF_PLAYER_EXERCISE_BYTES,&exercise_crc,0},
+#endif
+#ifdef AF_CONSOLE_STORAGE_VROM
+    {DEST(console_code,0x804DE200u),AF_CONSOLE_STORAGE_VROM,AF_CONSOLE_STORAGE_BYTES,&storage_crc,0},
+#endif
+#ifdef AF_CONSOLE_IMAGES_VROM
+    {DEST(console_images,0x804F9020u),AF_CONSOLE_IMAGES_VROM,AF_CONSOLE_IMAGES_BYTES,&images_crc,0},
+#endif
+#ifdef AF_CONSOLE_DISK_VROM
+    {DEST(console_disk,0x80630000u),AF_CONSOLE_DISK_VROM,AF_CONSOLE_DISK_BYTES,&disk_crc,0},
+#endif
+#ifdef AF_CREATURE_ITEMS_VROM
+    {DEST(creature_code,0x804FF100u),AF_CREATURE_ITEMS_VROM,AF_CREATURE_ITEMS_BYTES,&af_v3_creature_items_crc_expected,0},
+#endif
+#ifdef AF_CREATURE_FIELD_VROM
+    {DEST(creature_field,0x80647000u),AF_CREATURE_FIELD_VROM,AF_CREATURE_FIELD_BYTES,&field_crc,0},
+#endif
+#ifdef AF_FISH_WORLD_VROM
+    {DEST(fish_world,0x8064A000u),AF_FISH_WORLD_VROM,AF_FISH_WORLD_BYTES,&af_v3_fish_world_crc_expected,0},
+#endif
+#ifdef AF_INSECT_PHYSICAL
+    {DEST(insect_code,AF_INSECT_RAM),AF_INSECT_PHYSICAL|0x80000000u,AF_INSECT_BYTES,&af_v3_insect_crc_expected,0},
+#endif
+#ifdef AF_CLOTHING_VROM
+    {DEST(clothing_code,AF_CLOTHING_RAM),AF_CLOTHING_VROM,AF_CLOTHING_BYTES,&af_v3_clothing_crc_expected,0},
+#endif
+};
+
+int af_v3_surface_init(void) {
+    for (u32 i=0;i<sizeof(packets)/sizeof(*packets);i++) {
+        const struct StartupPacket *p=packets+i;
+#ifdef AF_INSECT_PHYSICAL
+        int status=(p->source&0x80000000u)?
+            af_surface_pi(p->source&0x7FFFFFFFu,p->destination,p->bytes):
+            af_surface_dma(p->destination,p->source,p->bytes);
+#else
+        int status=af_surface_dma(p->destination,p->source,p->bytes);
+#endif
+        if (status || af_surface_crc(p->destination,p->bytes)!=*(volatile const u32 *)p->crc) return 0;
+        af_surface_writeback(p->destination,p->bytes);
+        af_surface_invalidate(p->destination,p->bytes);
+        if (p->clear) *p->clear=0;
+    }
     return af_surface_prior_init();
 }

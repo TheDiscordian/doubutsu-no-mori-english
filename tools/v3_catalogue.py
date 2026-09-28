@@ -242,7 +242,9 @@ def table(base, rel, donor_symbols, furniture, *, expanded=False, garden=False, 
 
 
 def install(base, parent, suffix, compiled, ordering, records, collection, runtime, room, *, clothing=None, expanded=False,
-            handheld=None):
+            handheld=None,pool_slack=0):
+    if type(pool_slack) is not int or not 0<=pool_slack<=1024 or pool_slack%64:
+        raise ValueError('Invalid shared catalogue code allowance')
     old, reloc, source_parent = sources(base)
     symbols = compiled['symbols']
     if any(row.get('preview_override') for row in records) and (
@@ -253,6 +255,8 @@ def install(base, parent, suffix, compiled, ordering, records, collection, runti
            not in compiled['flags'] for row in records):
         raise ValueError('Catalogue preview lacks its reviewed item-family override')
     imports={**IMPORTS,**(HELD_IMPORTS if handheld is not None else {})}
+    if '-DAF_V3_BATCH_CLOTHING_DISPLAY=1' in compiled['flags']:
+        imports['af_v3_display_clothing_index']=0x80466200
     limit = 0xF50 if handheld is not None else (0xE50 if '-DAF_V3_WESTERN_LARGE=1' in compiled['flags'] else 0xC50)
     if (len(suffix) != compiled['bytes'] or not suffix or len(suffix) > limit or len(suffix) % 16
             or collection['symbols']['af_v3_catalogue_owned'] != IMPORTS['af_v3_catalogue_owned']
@@ -304,7 +308,8 @@ def install(base, parent, suffix, compiled, ordering, records, collection, runti
         from v3_clothing_catalogue import POINTER, COUNT, TABLE as CLOTH_TABLE, NATIVE_COUNT
         from v3_npc_clothing import guard_incoming
         clothing_table, clothing_report = clothing
-        extra_clothes=3 if '-DAF_V3_ALOHA_DISPLAY=1' in compiled['flags'] else 1
+        extra_clothes=(len(clothing_report['imports']) if '-DAF_V3_BATCH_CLOTHING_DISPLAY=1' in compiled['flags']
+                       else 3 if '-DAF_V3_ALOHA_DISPLAY=1' in compiled['flags'] else 1)
         cloth_address = symbols['af_v3_catalogue_clothing_order']
         cloth_at = cloth_address-RAM
         if ('-DAF_V3_CLOTHING_CATALOGUE=1' not in compiled['flags']
@@ -383,11 +388,11 @@ def install(base, parent, suffix, compiled, ordering, records, collection, runti
     struct.pack_into('>I', changed_parent, OWNER + 12, RAM + len(data))
     align = lambda value: (value + 63) & ~63
     growth, relocation_growth = align(len(data)) - align(SIZE), align(len(new_rel)) - align(len(reloc))
-    required, reserved = 253696 + 0x4400 + 64 + growth + relocation_growth, 257152 + 0x4400 + (POOL_EXTRA if expanded else 0)
+    required, reserved = 253696 + 0x4400 + 64 + growth + relocation_growth, 257152 + 0x4400 + (POOL_EXTRA if expanded else 0)+pool_slack
     code = by_vrom(base)[CODE_VROM].extract(base)
     if (required > reserved or u32(code, 0x800C4AFC - CODE_RAM) != 0x3C0E8089
             or u32(code, 0x800C4B10 - CODE_RAM) != 0x25CE7620):
-        raise ValueError('Extended catalogue exceeds the actual shared menu reservation')
+        raise ValueError(f'Extended catalogue needs {required} menu bytes; reserved {reserved}, or source allocation changed')
     allowed = {i for p in patches for i in range(p['address'] - RAM, p['address'] - RAM + 4)}
     if expanded:
         allowed |= {i for p in capacity_report['patches'] for i in range(p['address'] - RAM, p['address'] - RAM + 4)}
@@ -402,7 +407,7 @@ def install(base, parent, suffix, compiled, ordering, records, collection, runti
     if expanded:
         # The native allocator takes this checked endpoint through a signed
         # ADDIU: growing past 8000 also requires the matching LUI carry.
-        endpoint = 0x80897620 + POOL_EXTRA
+        endpoint = 0x80897620 + POOL_EXTRA + pool_slack
         code = bytearray(code)
         struct.pack_into('>I', code, 0x800C4AFC - CODE_RAM, 0x3C0E0000 | ((endpoint + 32768) >> 16))
         struct.pack_into('>I', code, 0x800C4B10 - CODE_RAM, 0x25CE0000 | (endpoint & 65535))
@@ -415,7 +420,8 @@ def install(base, parent, suffix, compiled, ordering, records, collection, runti
         'bytes': len(data), 'relocation_bytes': len(new_rel), 'patches': patches,
         'rounded_growth': growth, 'rounded_relocation_growth': relocation_growth,
         'conservative_pool_required': required, 'pool_reserved': reserved,
-        'additional_pool_allocation': POOL_EXTRA if expanded else 0, 'save_format_changed': False,
+        'additional_pool_allocation': (POOL_EXTRA if expanded else 0)+pool_slack,
+        'category_pool_bytes':pool_slack,'save_format_changed': False,
         'native_preview_tested': False, 'ordinary_order_delivery_tested': False,
         **({'clothing': clothing_report} if clothing_report is not None else {}),
         **({'handheld': handheld_report} if handheld_report is not None else {}),

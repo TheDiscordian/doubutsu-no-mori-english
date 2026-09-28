@@ -19,19 +19,19 @@ artwork stays available rather than being silently replaced.
 `build/v3-clothing-category-work-01/prepared-02/` contains all eight distinct
 appearances in 4,352 bytes. Resource SHA-256:
 `89b3e8f1899446baf1a39f9420ab776fd6916d2d4201110eff6b207a696a7fb4`.
-The three installed resources match the current ABI-306 cartridge. Prepared
-content is not evidence of installed gameplay or selectable new content.
+The prepared resources are installed in the current ABI-307 cartridge. Preparation
+and installation remain separate operations; actual evidence is recorded below.
 
 | Donor ID | Official name | State | Source stock |
 | --- | --- | --- | --- |
-| `241A` | red aloha shirt | Installed resource | Exclusive outfit |
-| `241B` | blue aloha shirt | Installed resource | Exclusive outfit |
-| `244B` | fish bone shirt | Runtime pending | C, all seasons |
-| `2469` | fortune shirt | Runtime pending | B, all seasons |
-| `24B6` | houndstooth tee | Runtime pending | B, all seasons |
-| `24BF` | cherry shirt | Installed resource | A, all seasons |
-| `24CB` | G logo shirt | Runtime pending | A, summer |
-| `24E3` | puzzling shirt | Additive donor variant, runtime pending | A, all seasons |
+| `241A` | red aloha shirt | Installed | Exclusive outfit |
+| `241B` | blue aloha shirt | Installed | Exclusive outfit |
+| `244B` | fish bone shirt | Installed | C, all seasons |
+| `2469` | fortune shirt | Installed | B, all seasons |
+| `24B6` | houndstooth tee | Installed | B, all seasons |
+| `24BF` | cherry shirt | Installed | A, all seasons |
+| `24CB` | G logo shirt | Installed | A, summer |
+| `24E3` | puzzling shirt | Installed additive donor variant | A, all seasons |
 
 Names, price words, complete stock lists, season partitions, and catalogue
 positions come from the actual donor. Existing credits and five added name
@@ -47,54 +47,93 @@ calls it a tomato shirt. The ordinary furniture scan classifies these forms as
 mannequins starting at `1BA8` are not ordinary garments and remain separate
 unfinished importing work.
 
-## Connected runtime work
+## Connected runtime
 
-Keep this as one implementation batch for all five remaining appearances. Do
-not add individual garment installers or new native scenarios for each shirt.
+Install the complete prepared category through the shared pipeline:
 
-- Extend the fixed clothing/display registry without reassigning existing
-  identities. Optional inclusion must not overwrite any native shirt.
-- Replace the three-item dispatch in `clothing_roster.c` with checked category
-  records. Its existing bridges preserve all live caller-saved registers;
-  retain that contract for native DMA, player/NPC wearing, and default outfits.
-  The old name/price readers already consume the returned metadata pointer.
-- The prefix reservation `80462820..804628FF` fits only seven 32-byte records,
-  not eight. Do not overwrite the melody table at `80462900`. The current
-  1,076-byte roster begins at `80473A00`; town eligibility starts at `80473E40`.
-  The linker's broader `80474000` limit is not free space. Allocate/rebind the
-  complete table/helper once with the existing packet/reservation machinery.
-- Install all five full texture/palette resources through the existing checked
-  item-data allocation. The current build has 23,248 bytes of reusable padding;
-  preserve the externally stored catalogue/shop owners and their DMA mappings.
-- Reuse the complete native mannequin profile and callback. Add canonical
-  sparse display profiles and parent metadata, then let the furniture loader
-  identify clothing through its parent relationship instead of its three
-  special profile addresses. The shared alias index has 11 of 58 rows occupied.
-  Placement, pickup, names, pricing, and footprint readers already share it.
-- Extend catalogue and source HRA/feng-shui rows in the same installation.
-  Preserve all 245 original catalogue garments and the three installed additions.
-  Reuse the shared scoring-category mapping and resource-tail writer.
-- Extend the shared clothing stock reader for actual A/B/C source membership
-  and season partitions. Preserve original rows, weights, selected-profile
-  rejection, and the exclusive aloha outfits. The G logo shirt is summer-only.
-- Extend browser/offline composition to use each reported metadata address,
-  not `2820 + slot*32`, and include every garment/display pair together.
-  Keep the translation-only output unchanged. Do not assume a current build
-  installs every identity merely because the source registry reserves it.
-- Reuse the existing 256-bit clothing and display-profile spaces. Inspect the
-  actual current format-nine readers rather than introducing another save
-  format merely for extra records. A larger selected profile still requires
-  compatibility warnings and rejection by builds missing those resources.
+```sh
+python3 tools/v3_furniture_pipeline.py import --representation clothing \
+  --base-lock build/v3-creature-insects-work-01/connected-04/build-lock.json \
+  --reuse-assets build/v3-clothing-category-work-01/prepared-02 \
+  --output build/v3-clothing-category-work-01/connected-09
+```
+
+The output directory must be fresh. The current built proposal is that
+`connected-09/build-lock.json`; it does not change the main lock or deployments.
+
+- Append-only registry identities retain the original three garments and add the
+  other five without replacing native shirts. Resource addresses come from the
+  checked common allocator, not checkbox order.
+- One 4-KiB packet at `8066E000..8066EFFF` holds the complete eight-record reader,
+  metadata, independent identity tuples, and A/B/C stock descriptors. A final
+  16-byte guard follows the code/data. Existing register-preserving bridges
+  redirect to it. Names/prices, native texture/palette DMA, player/NPC wearing,
+  and default outfits consume the same returned records.
+- The prefix `80462820..804628FF` and old roster `80473A00..80473E33` are not
+  enlarged into neighbouring melody or town-eligibility data. The eight records
+  live at `8066E800..8066E8FF`.
+- Complete textures/palettes use the existing import-data allocation. The shared
+  planner preserves external catalogue/shop owners and physical-only resources,
+  including zero-filled bytes inside their reservations. Remaining reusable
+  item-data padding is 16,432 bytes.
+- Canonical sparse mannequin profiles reuse the complete native profile and
+  callback. The loader follows the parent relationship, and recompilation rebinds
+  both public reader entries and the actual room bank-constructor call.
+  Shared forward/inverse aliases handle placement, pickup, names, prices, and
+  footprints. The complete index has 16 of 58 rows occupied.
+- All 245 original catalogue garments and three existing additions are retained;
+  five appended entries bring the clothing catalogue to 253 rows. Official
+  HRA/feng-shui metadata uses the shared category mapping. The actual menu pool
+  grows by 128 bytes, with complete-image/relocation bounds checked.
+- Original A/B/C stock and season groups remain intact. Added records use their
+  actual donor list and season; disabled profiles do not enter the draw.
+  The G logo shirt is summer-only. Exclusive aloha outfits are not inserted into
+  ordinary shop lists. Every selection uses one native random draw.
+- Browser/offline composers use reported metadata/profile addresses and enable
+  garment/mannequin pairs together. The clothing packet checksum is updated
+  before the containing equipment checksum. Empty/default composition produces
+  the unchanged V2-14 translation-only build.
+- Twelve startup descriptors share one transfer/checksum/cache loop in the
+  existing 688-byte reservation; code and descriptors occupy 504 bytes.
+  Physical-ROM insect transfers and native-DMA packets retain their complete
+  ranges and ordering. Initialization does not run after a failed packet.
+- Existing 256-bit clothing/display profiles and format-nine saves remain.
+  Added garments require their matching selected resources. Builds or profiles
+  missing those bits reject the save; forward loading with the required imports
+  is supported by the retained codec. Preserve backups. Native save/reload of
+  this clothing batch is not claimed.
 
 ## Evidence and limits
 
-Five focused `tests.test_v3_clothing_batch` checks cover the complete category,
-independent donor block addressing for all pixels, all palette entries,
-preservation of the three current resources and metadata, stock seasons,
-mannequin routing, and corrupted source/prepared-content rejection. These are
-conversion and identity checks, not new emulator or hardware results.
+Current build: ABI 307, ROM SHA-256
+`76381bfe94508f6c521c5fff56246943f45914ba6d06a03438a19b84acb6643a`.
+UPS SHA-256:
+`b08c39f462b1e812bcc030bda14ad428302ef20272558276ff7af4f40f2e3327`.
 
-The current cartridge remains ABI 306. No new garments are enabled yet, no save
-format changes are made by preparation, and neither stable V2-14 patcher changes.
-The creature constructor timeout and sound-scheduler disconnect remain
-unclassified; their exhausted fixtures are not repeated by this work.
+Three `tests.test_v3_clothing_install` checks pass on this cartridge:
+
+- Complete resources, stock seasons, canonical profiles, hooks, saved-layout
+  preservation, actual startup descriptors/checksums, menu bounds, and UPS
+  reconstruction.
+- Sanitized actual C readers for all eight garments, wearing/fallbacks, mannequin
+  DMA in every rotation, all three stock groups and twelve months under empty,
+  individual, and complete selections; twelve-packet startup and all failed
+  transfer/checksum positions.
+- Five browser/offline profiles agree: empty, select all, all clothing, summer
+  shirt alone, and donor puzzling-shirt variant alone. An actual offline output
+  at `build/v3-clothing-category-work-01/selected-summer-01/` also succeeds.
+
+The existing `v3_clothing_resources.json` scenario uses the generalized shared
+probe, not a new per-garment scenario. One silent current-ROM run at
+`build/v3-clothing-category-work-01/native-01/` passes 80 records and 50
+assertions: complete startup packet, actual native DMA of all eight imported
+textures/palettes plus an original garment, disabled-import no-write behaviour,
+unchanged saved state, guard preservation, checkpoint restoration, and no fault.
+No existing save is used or modified. This is reader/startup execution, not a
+claim of ordinary shop purchases, worn GPU appearance, room interaction,
+save/reload, or original-hardware acceptance.
+
+The five complete source-conversion checks remain retained evidence, not a new
+historical-build replay. The creature constructor timeout and sound-scheduler
+disconnect remain unresolved; their exhausted fixtures are not repeated.
+Neither stable V2-14 deployment changes.

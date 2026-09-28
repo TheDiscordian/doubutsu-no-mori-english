@@ -31,27 +31,41 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
-The current proposal is ABI 306 at
-`build/v3-creature-insects-work-01/connected-04/build-lock.json`, ROM SHA-256
-`49a00572262ed21f2f84b1484a7c88c22658b67b48434a6bc031d09ac6614017`.
-It contains 184 independently selectable development imports, including all nine
+The current proposal is ABI 307 at
+`build/v3-clothing-category-work-01/connected-09/build-lock.json`, ROM SHA-256
+`76381bfe94508f6c521c5fff56246943f45914ba6d06a03438a19b84acb6643a`.
+It contains 189 independently selectable development imports, including all nine
 fish and eight insects, and 100 inactive furniture profiles whose acquisition
 is pending. The main lock and both stable V2-14 deployments are unchanged.
 
-The active implementation batch completes clothing importing. The shared
-converter accounts for all 255 donor garments: 247 existing native appearances,
-seven additive appearances, and one donor variant. Three distinct appearances
-are already installed; five remain to connect to runtime and selection.
-Complete category output is `build/v3-clothing-category-work-01/prepared-02/`.
-It retains all eight complete textures/palettes, official names and prices,
-source seasons, catalogue identities, and reversible mannequin relationships.
-The furniture scan routes mannequins to their carried parents instead of using
-stale display names or requesting an independent furniture conversion. The five
-additional names have official credits in `translations/provenance.json`.
-Five focused checks cover all source pixels/palettes, current installed-resource
-preservation, real stock seasons, parent routing, and damaged-input rejection.
-This prepares the whole category; it does not install or enable the five new
-garments. See [the connected consumer map](../specs/V3_CLOTHING_IMPORTS.md).
+The complete clothing category is installed together. All eight distinct donor
+appearances use shared loading, official names/prices, player/NPC outfit readers,
+reversible mannequins, catalogue/scoring, real stock seasons, save-profile bits,
+and browser/offline selection. The native puzzling shirt remains alongside its
+optional donor variant; the G logo shirt appears in summer stock only.
+The converter accounts for all 255 named donor garments, including 247 existing
+native appearances, and reuses `build/v3-clothing-category-work-01/prepared-02/`.
+Mannequins are representations of their carried garments, not separate choices.
+
+Three focused current-build tests pass: complete resource/stock/profile/hook/UPS
+checks, five matching browser/offline selections, and sanitized readers covering
+all eight garments, mannequin DMA in every rotation, all stock groups/months,
+and twelve-packet startup including failed transfers/checksums. A real composed
+summer-shirt build also succeeds. The shared startup uses 504 of 688 bytes,
+including its new descriptor table; clothing adds 4 KiB of reserved resident
+memory and 128 bytes to the actual catalogue menu allocation. Saved format nine
+is unchanged. Profiles missing selected garments/mannequins reject those saves;
+preserve backups. Ordinary gameplay, shop purchases, save/reload, and hardware
+remain unverified. See [the clothing contract](../specs/V3_CLOTHING_IMPORTS.md).
+
+One silent native run at `build/v3-clothing-category-work-01/native-01/` passes
+80 records and 50 assertions. It exercises the current cartridge's startup and
+actual clothing DMA for all eight imports plus an original N64 garment,
+disabled-record rejection, saved-state preservation, guards, and checkpoint
+restoration without a CPU fault. It does not establish ordinary gameplay or
+save/reload. The active importing work moves to the remaining custom-design
+representation category, followed by fossil identities; clothing reader tests
+are retained rather than repeated.
 
 The complete insect category is installed together: six full donor programs,
 calendar/habitat/group spawning, collision, the ground ant colony, field sounds
@@ -65,11 +79,11 @@ slot. The choice is connected to the same private browser/offline composition
 rules as individual insect inclusion, parent/display identities, scoring, and
 saved-profile bits. Empty/default selections still produce stable V2-14.
 
-The 96,880-byte runtime/guard packet is allocated in reserved Expansion Pak RAM
-and stored in checked physical ROM space. The eleven-packet startup verifies
-transfer/checksum/cache ordering before entering the game; its code uses 652 of
-688 reserved bytes. The common importer moves the complete regenerated
-catalogue/shop owners outside the nearly full item-data area and retains 23,248
+The 96,880-byte insect runtime/guard packet is allocated in reserved Expansion Pak
+RAM and stored in checked physical ROM space. Shared startup verifies complete
+transfer/checksum/cache ordering before entering the game. The common importer
+moves the complete regenerated catalogue/shop owners outside the nearly full
+item-data area and retains 16,432
 bytes of checked reusable padding. Existing artwork, names, console resources,
 and both native/imported species identities are preserved.
 

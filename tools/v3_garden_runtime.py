@@ -223,7 +223,7 @@ def extend_letters(source, module, report, rel, symbols, *, theme=56):
 
 def install_catalogue(base, stable, prior, imports, output, rel, symbols, *, western=False,
                       western_large=False, camping=False, tent_model=False, fire=False, school_desks=False,
-                      reviewed_rows=None, handheld=None):
+                      reviewed_rows=None, handheld=None, clothing=None):
     from v3_catalogue_capacity import GROWTH, shifted
     files = by_vrom(base)
     old = files[catalogue.VROM].extract(base)
@@ -234,9 +234,15 @@ def install_catalogue(base, stable, prior, imports, output, rel, symbols, *, wes
         fire=fire, school_desks=school_desks, reviewed_rows=reviewed_rows)
     clothes = copy.deepcopy(prior['catalogue']['clothing'])
     at = clothes['table_address'] - catalogue.RAM
-    cloth = old[at:at + 496]
-    if sha256(cloth) != clothes['table_sha256'] or clothes['total_rows'] != 248:
+    cloth = old[at:at + clothes['total_rows']*2]
+    if sha256(cloth) != clothes['table_sha256'] or clothes['total_rows'] < 248:
         raise ValueError('Changed complete clothing catalogue')
+    if clothing is not None:
+        expanded, expanded_report=clothing
+        if (not expanded.startswith(cloth) or len(expanded)!=expanded_report['total_rows']*2
+                or expanded_report['imports'][:len(clothes['imports'])]!=clothes['imports']):
+            raise ValueError('Clothing category does not preserve installed catalogue rows')
+        cloth,clothes=expanded,copy.deepcopy(expanded_report)
     assembly = ('.section .rodata.catalogue_order\n.balign 4\n.globl af_v3_catalogue_order\n'
         'af_v3_catalogue_order:\n.byte ' + ','.join(map(str, ordering)) + '\n'
         '.balign 2\n.globl af_v3_catalogue_clothing_order\naf_v3_catalogue_clothing_order:\n.byte ' +
@@ -259,6 +265,7 @@ def install_catalogue(base, stable, prior, imports, output, rel, symbols, *, wes
         + (('AF_V3_CAMPING_ITEMS=1',) if camping else ())
         + (('AF_V3_TENT_MODEL=1',) if tent_model else ())
         + (('AF_V3_FIRE=1',) if fire else ()))
+    if clothing is not None:defines+=('AF_V3_BATCH_CLOTHING_DISPLAY=1',)
     suffix, compiled = compile_part('catalogue', output / 'catalogue',
         extra_sources=('overlays/v3/catalogue_bridge.S', str((output / 'catalogue_tables.S').relative_to(ROOT))),
         defines=tuple(dict.fromkeys(defines+(('AF_V3_HELD_CATALOGUE=1',) if handheld is not None else ()))))
@@ -282,9 +289,11 @@ def install_catalogue(base, stable, prior, imports, output, rel, symbols, *, wes
         owner_repair=dict(before=before.hex(),after=expected.hex(),restored_bytes=16,
             source_owner_sha256=sha256(parent),reason='retained icon refresh overwrote catalogue descriptor')
     parent[catalogue.OWNER:catalogue.OWNER + 32] = native_parent[catalogue.OWNER:catalogue.OWNER + 32]
+    old_slack=prior['catalogue'].get('category_pool_bytes',0)
+    pool_slack=max(old_slack,128 if clothing is not None else 0)
     changes, report = catalogue.install(stable, parent, suffix, compiled, ordering, rows,
         prior['collection']['code'], prior['save_runtime']['code'], prior['furniture_room']['code'],
-        clothing=(cloth, clothes), expanded=True,handheld=handheld)
+        clothing=(cloth, clothes), expanded=True,handheld=handheld,pool_slack=pool_slack)
     rebuilt_code = changes.pop(CODE_VROM)
     current_code = files[CODE_VROM].extract(base)
     equipment=prior.get('equipment_resources',{})
@@ -295,7 +304,7 @@ def install_catalogue(base, stable, prior, imports, output, rel, symbols, *, wes
     for address in (0x800C4AFC, 0x800C4B10):
         at = address - CODE_RAM
         if rebuilt_code[at:at + 4] != current_code[at:at + 4]:
-            word=struct.unpack_from('>I',rebuilt_code,at)[0]
+            word=struct.unpack_from('>I',rebuilt_code,at)[0]-(pool_slack if address==0x800C4B10 else 0)
             for retained in retained_allocations:
                 patch=retained.get('pool_patch',{});extra=retained.get('additional_pool_bytes',0)
                 if (address!=0x800C4B10 or patch.get('address')!=address or patch.get('before')!=word
@@ -303,8 +312,14 @@ def install_catalogue(base, stable, prior, imports, output, rel, symbols, *, wes
                         or patch.get('after')!=word+extra or (word^(word+extra))&0xFFFF8000):
                     raise ValueError('Changed retained submenu allocation chain')
                 word=patch['after'];retained_pool.append(copy.deepcopy(patch))
-            if word!=struct.unpack_from('>I',current_code,at)[0]:
+            if word+(old_slack if address==0x800C4B10 else 0)!=struct.unpack_from('>I',current_code,at)[0]:
                 raise ValueError(f'Catalogue allocation mismatch at {address:08X}')
+    if pool_slack!=old_slack:
+        at=0x800C4B10-CODE_RAM;before=u32(current_code,at);after=before+pool_slack-old_slack
+        if (before^after)&0xFFFF8000:raise ValueError('Catalogue code allowance crosses signed allocation bound')
+        changed=bytearray(current_code);struct.pack_into('>I',changed,at,after)
+        changes[CODE_VROM]=bytes(changed)
+        report['category_pool_patch']=dict(address=0x800C4B10,before=before,after=after)
     if retained_pool:
         growth=sum(p['after']-p['before'] for p in retained_pool)
         report['conservative_pool_required']+=growth

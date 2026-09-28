@@ -9,7 +9,7 @@ import zlib
 from aflib import apply_ups, by_vrom, fix_checksum, make_ups, sha256, verified_rom
 from apply_translation import write_new
 from v3_asset_loader import BLOB, CONFIG, MODULE, ROOT
-from v3_registry import (CLOTHING, CLOTHING_DISPLAYS, FURNITURE, VILLAGERS,
+from v3_registry import (CLOTHING, CLOTHING_DISPLAYS, CLOTHING_REGISTRY_VERSION, FURNITURE, VILLAGERS,
                          villager_actor, villager_house_layers, furniture_identity, furniture_source)
 from v3_save_runtime import profile_bytes
 from v3_villager_houses import layers
@@ -156,13 +156,18 @@ def catalogue(image, report):
         result[row['id']] = {'id':row['id'], 'name':row['name'], 'kind':'furniture',
             'item_id':row['item_id'], 'runtime_index':index, 'dependencies':[],
             'enable_offset':at+4, 'enable_bytes':4, 'enable_ram':row_ram+4}
-    for slot, row in enumerate(report['clothing']['imports']):
+    from v3_clothing_install import metadata_offset
+    for row in report['clothing']['imports']:
         donor = int(row['donor_item_id'], 16)
         item, index, source = CLOTHING[donor]
-        at = 0x2820+slot*32
+        at = metadata_offset(blob,report,row)
+        if source is None:
+            source=int(row['vrom'],16)
+            if not BLOB<=source<=BLOB+len(blob)-544:
+                raise ValueError('Clothing resource escapes installed storage')
         display = next(r for r in report['aloha_display']['rows'] if r['donor_item_id']==f'{donor:04X}')
         display_index, display_item = CLOTHING_DISPLAYS[donor]
-        display_at = int(display['profile_ram'], 16)-0x80460000-8
+        display_at = resident_offset(blob,int(display['profile_ram'], 16)-8,80)
         if (struct.unpack_from('>HHI', blob, at) != (item, index, source) or blob[at+10] != 1
                 or row['item_id'] != f'{item:04X}' or row['resource_index'] != index
                 or struct.unpack_from('>HHI', blob, display_at) != (display_index, display_item, 1)):
@@ -218,7 +223,7 @@ def catalogue(image, report):
     expected = ({row['id'] for row in report['villager_text']['imports']} |
                 {row['id'] for row in furniture_rows} |
                 {item_key(int(row['donor_item_id'], 16)) for row in report['clothing']['imports']} | held.keys() | surfaces.keys() | creatures.keys())
-    if (set(result) != expected or len(result) != len(VILLAGERS)+len(furniture_rows)+len(CLOTHING)+len(held)+len(surfaces)+len(creatures)):
+    if (set(result) != expected or len(result) != len(VILLAGERS)+len(furniture_rows)+len(report['clothing']['imports'])+len(held)+len(surfaces)+len(creatures)):
         raise ValueError('Incomplete or duplicated installed development catalogue')
     return dict(sorted(result.items()))
 
@@ -247,7 +252,7 @@ def resolve(catalog, selected, *, behaviours=None, behaviour_options=None):
                 for row in catalog.values() if row['id'] in enabled and row['kind'] in ('clothing','equipment','fish','insect')]
     profile = profile_bytes(villagers, furniture+displays, [row['source_record'] for row in shirts])
     result={'format':'AFV3-LOCAL-SELECTION-1', 'donor':'GAFE01-r0',
-        'registry_versions':{'villagers':1, 'furniture':1, 'clothing':1, 'displays':1},
+        'registry_versions':{'villagers':1, 'furniture':1, 'clothing':CLOTHING_REGISTRY_VERSION, 'displays':1},
         'requested':requested, 'enabled':sorted(enabled),
         'required':sorted(enabled-set(requested)),
         'dependency_reasons':{key:sorted(value) for key,value in sorted(reasons.items())},
@@ -378,7 +383,8 @@ def compose(image, report, catalog, selection):
         if not (0x20 <= offset < offset+len(value) <= PREFIX_SIZE or
                 len(value) == 4 and (offset in (STATIC_ROWS + slot * 80 + 4 for slot in range(STATIC_COUNT)) or
                     offset in {r['enable_offset'] for r in catalog.values() if r['kind'] in ('floor','wall')} or
-                    offset in {r['carried_enable_offset'] for r in catalog.values() if r['kind'] in ('fish','insect')})):
+                    offset in {r['carried_enable_offset'] for r in catalog.values() if r['kind'] in ('fish','insect')}) or
+                len(value)==1 and offset in {r['enable_offset'] for r in catalog.values() if r['kind']=='clothing'}):
             raise ValueError('Selection field escapes reviewed resident enable words')
         change(files[BLOB].pstart+offset, value, label)
     prefix(0x20, bytes.fromhex(selection['profile_hex']), 'complete saved import profile')
@@ -400,7 +406,8 @@ def compose(image, report, catalog, selection):
     writes.extend(scoring_writes)
     from v3_surface_selection import checksum_fields
     from v3_creature_selection import checksum_fields as creature_checksums
-    for field in creature_checksums(image,report)+behaviour_checksums(image,report)+checksum_fields(image,report):
+    from v3_clothing_install import checksum_fields as clothing_checksums
+    for field in clothing_checksums(image,report)+creature_checksums(image,report)+behaviour_checksums(image,report)+checksum_fields(image,report):
         intermediate=apply_writes(image,writes);at=field['start']
         change(field['offset'],struct.pack('>I',zlib.crc32(intermediate[at:at+field['length']])),
             'selected resource CRC')
@@ -505,9 +512,12 @@ def build(output, selected=(), *, select_all=False, behaviours=None):
             row['enabled'] = furniture_key(row) in selection['enabled']
         current['speed_bag']['saved_profile_included'] = current['speed_bag']['enabled']
         current['clothing']['punchy_defaults_enabled'] = 'E0ED' in actors
-        for slot,row in enumerate(current['clothing']['imports']):
+        from v3_clothing_install import metadata_offset,update_report as update_clothing
+        update_clothing(blob,current)
+        for row in current['clothing']['imports']:
             row['selected_for_profile'] = item_key(int(row['donor_item_id'],16)) in selection['enabled']
-            row['metadata_sha256'] = sha256(blob[0x2820+slot*32:0x2840+slot*32])
+            at=metadata_offset(blob,current,row)
+            row['metadata_sha256'] = sha256(blob[at:at+32])
         _, selected_cat = catalogue_selection(image, report, set(selection['enabled']))
         from v3_catalogue import VROM, RAM
         from v3_import_storage import ROWS, ITEMS, ITEMS_RAM, TABLE_END, slot

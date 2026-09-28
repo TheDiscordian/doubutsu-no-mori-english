@@ -11,6 +11,7 @@ af_v3_furniture_import_profile = 0x80465000;
 af_v3_save_halt = 0x80469270;
 af_v3_held_item_collection = 0x804A6600;
 af_v3_catalogue_item_price = 0x80467574;
+af_v3_display_clothing_index = 0x80466200;
 SECTIONS
 {
     . = 0x808B32B0;

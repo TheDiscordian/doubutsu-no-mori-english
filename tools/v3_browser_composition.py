@@ -142,7 +142,8 @@ def rules(image, report):
     from v3_creature_choices import options as behaviour_options,checksum_fields as behaviour_checksums,SAVE_NOTE
     from v3_creature_selection import checksum_fields as creature_checksums
     behaviours=behaviour_options(image,report)
-    crcs = creature_checksums(image,report)+behaviour_checksums(image,report)+checksum_fields(image,report)
+    from v3_clothing_install import checksum_fields as clothing_checksums
+    crcs = clothing_checksums(image,report)+creature_checksums(image,report)+behaviour_checksums(image,report)+checksum_fields(image,report)
     for at, start, length in ((blob.pstart + 0xF8, blob.pstart + composition.PACKAGE, composition.PACKAGE_SIZE),
                               (module.pstart + composition.CONFIG + 8, blob.pstart, composition.PREFIX_SIZE)):
         value = field(at, 4)

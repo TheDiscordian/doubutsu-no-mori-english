@@ -1,18 +1,39 @@
 /* Checked additive garments shared by item, NPC, player, and default readers. */
 #include "clothing.h"
+#ifdef AF_V3_CLOTHING_BATCH
+#include "clothing_batch.h"
+#endif
 typedef unsigned char u8;
 typedef unsigned int u32;
 #ifdef __mips__
+#ifndef AF_V3_CLOTHING_BATCH
 #define records ((const struct Clothing *)0x80462820u)
+#endif
 #define profile ((const u8 *)0x80460020u)
 #else
+#ifndef AF_V3_CLOTHING_BATCH
 extern struct Clothing af_v3_roster_clothing[3];
-extern u8 af_v3_roster_profile[192];
 #define records af_v3_roster_clothing
+#endif
+extern u8 af_v3_roster_profile[192];
 #define profile af_v3_roster_profile
 #endif
 
 const struct Clothing *af_v3_roster_clothing_record(u32 item) {
+#ifdef AF_V3_CLOTHING_BATCH
+    for (u32 i=0;i<AF_CLOTHING_COUNT;i++) {
+        const struct ClothingIdentity *identity=af_v3_batch_identities+i;
+        if (identity->item!=item) continue;
+        const struct Clothing *row=af_v3_batch_clothing+i;
+        u32 bit=item&255u;
+        if (item<0x3400u || item>=0x3500u || row->item!=item ||
+                row->index!=item-0x2400u || row->index!=identity->index ||
+                row->vrom!=identity->vrom || row->enabled!=1 || row->reserved || row->padding ||
+                !(profile[160+(bit>>3)]&(1u<<(bit&7)))) return 0;
+        return row;
+    }
+    return 0;
+#else
     u32 slot, source;
     if (item==0x34BFu) { slot=0; source=0x0220F000u; }
     else if (item==0x341Au) { slot=1; source=0x022E2000u; }
@@ -24,6 +45,7 @@ const struct Clothing *af_v3_roster_clothing_record(u32 item) {
             row->enabled!=1 || row->reserved || row->padding ||
             !(profile[160+(bit>>3)] & (1u<<(bit&7u)))) return 0;
     return row;
+#endif
 }
 
 u32 af_v3_roster_clothing_source(int index, u32 palette) {

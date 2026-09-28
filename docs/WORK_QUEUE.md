@@ -28,19 +28,24 @@ Implement the actual alternatives and bind selections to the build receipt.
 Fish/insect population and imported coastal movement have installed controls and
 runtime alternatives; other substantial differences still need real bindings.
 
-Current implementation task: complete the connected clothing importing category.
-The shared converter compares all 255 named donor garments with all 256 native
-images, retaining every pixel and palette entry. It prepares all eight distinct
-donor appearances; three are installed, and five need runtime integration.
-Use `build/v3-clothing-category-work-01/prepared-02/`, not a new item-by-item
-conversion. The remaining garments are fish bone shirt, fortune shirt,
-houndstooth tee, G logo shirt, and the donor puzzling-shirt variant. Keep the
-native puzzling shirt available. All five have real donor stock and catalogue
-entries. Mannequins are parent representations, not additional choices.
-Connect the whole set through shared loading, names/prices, wearing, NPC outfits,
-room placement/pickup, catalogue/scoring, stock seasons, save profiles, and
-browser/offline composition. The concrete consumer map and memory constraints
-are in [the clothing contract](../specs/V3_CLOTHING_IMPORTS.md).
+Current implementation task: resolve and complete the remaining custom-design
+representation category against its actual parent/native identities. Carry its
+full graphics and editing/display behaviour through the shared importing path;
+do not turn existing native equivalents into duplicate imported items.
+The complete clothing category and its bounded native check are installed. All
+eight donor appearances are
+installed together through loading, official names/prices, wearing, NPC outfits,
+room placement/pickup, catalogue/scoring, A/B/C stock seasons, save profiles,
+and browser/offline composition. The native puzzling shirt is retained; its donor
+variant is optional. Mannequins follow parent selection rather than independent
+checkboxes. Do not reconvert the prepared category or reopen installed consumers
+without a concrete defect. Three current tests pass, including all eight shared
+readers and five browser/offline profiles. One silent current-ROM native run
+passes 80 records and 50 assertions covering actual garment DMA, startup,
+disabled-import rejection, guards, and saved-state preservation.
+Ordinary gameplay and persistence
+remain unverified. The concrete consumer map and limits are in
+[the clothing contract](../specs/V3_CLOTHING_IMPORTS.md).
 
 The connected seventeen-creature path remains unfinished at ordinary native
 gameplay/save verification. Installed field behaviours, spawning, selections,
@@ -51,9 +56,9 @@ harness budget exhausted; no old fixture replay is authorised by this clothing
 work. Fix any identified game defect. This does not defer required creature
 behaviours or classify their gameplay as verified.
 
-Use the shared converter and current ABI-306 proposal:
-`build/v3-creature-insects-work-01/connected-04/build-lock.json`.
-ROM SHA-256: `49a00572262ed21f2f84b1484a7c88c22658b67b48434a6bc031d09ac6614017`.
+Use the shared converter and current ABI-307 proposal:
+`build/v3-clothing-category-work-01/connected-09/build-lock.json`.
+ROM SHA-256: `76381bfe94508f6c521c5fff56246943f45914ba6d06a03438a19b84acb6643a`.
 All seventeen creatures now have installed field and room artwork, complete
 behaviour/spawn readers, catch/release identities, pocket icons, collection UI,
 official catch messages, saved profiles, scoring, and per-species composition.
@@ -65,7 +70,7 @@ The shared insect controller has nine independent native-sized slots/buffers.
 The private composers expose actual N64 two-wild-slot and GameCube eight-wild-slot
 population alternatives, with a separate release slot in either mode.
 The nine fish retain their installed population and coastal-movement choices.
-There are 184 selectable development imports; both deployed patchers remain V2-14.
+There are 189 selectable development imports; both deployed patchers remain V2-14.
 Six browser/offline profiles agree, including individual/all insect selections,
 both insect population modes, select all, and empty/default V2 output.
 Current cartridge/resource/planner checks and focused sanitized population,
@@ -77,7 +82,7 @@ one refresh, called by the general creature pipeline. Prepared source output is
 `build/v3-creature-insects-work-01/programs-30/`; reuse its complete programs and
 the installed room/field/audio resources. The 96,880-byte resident packet and
 guard are loaded from checked physical-ROM storage. Regenerated catalogue/shop
-owners use checked external storage, leaving 23,248 bytes of reusable item-data
+owners use checked external storage, leaving 16,432 bytes of reusable item-data
 padding. Preserve these allocation and overlap checks; do not reconvert artwork.
 
 **Retained creature verification:** resolve connected native gameplay and save
@@ -122,56 +127,15 @@ See [bulk profiles](checkpoints/V3_BUILTIN_PROFILES.md).
 
 Next importing work:
 
-- Finish the creature category's field behaviours/spawning, pocket icons,
-  and collection/profile persistence as a connected path. All seventeen
-  field/carry model sets are installed: 59 frame references and 43 distinct
-  models in 25,504 physical-ROM bytes. Shared resident tables connect drawing,
-  fish capture identities, release parameters, and source insect poses without
-  resizing actors or buffers. Native rubbish/salmon slots and herabuna remain
-  intact; XXL release shadows have bounded entries. Reuse these consumers and
-  the cache at `build/v3-creature-field-prepared-01/`, not a new loader or capacity
-  investigation. Two focused host tests cover resources, relocation, transforms,
-  startup, planning, and optional composition. Native startup and all nine fish
-  model transfers/segment bases pass through the real loader. The constructor
-  register window times out; game-versus-fixture cause remains unresolved, and
-  later cases do not execute. Preserve the evidence at
-  `build/v3-creature-fish-native-02/`; do not replay that exhausted fixture.
-  The installed fish world adapter already extends both species tables and all
-  river size readers, supplies source coastal approach/nibble/bite effects and
-  geometry, and separates rubbish from imported IDs at release creation.
-  Reuse it and its origin marker instead of another parameter-table stage.
-  The source coastal patrol/shoreline alternative and original-behaviour
-  callbacks are installed in one shared world packet. The private composers
-  resolve both behaviour settings, defaulting to N64. Complete donor calendars and the shared
-  season/selection/placement code are connected to native creation and persisted
-  seasons. Three focused current checks pass for sanitized manager/save paths,
-  forward migration and rejection, installed hooks, preservation, and optional
-  composition; native world execution is unverified. Native additive spawning,
-  complete-category catch records, completion checks, and dual-palette icons are
-  connected. Current host checks cover every added identity/four players,
-  completion timing, disabled/foreign records, both population modes, complete
-  donor icon conversion, current hooks, and optional composition. Continue the
-  remaining gameplay integration; new insect
-  behaviour programs remain required. The collection UI, official catch messages,
-  and behaviour settings are connected. Do not reconvert frames or create per-fish tools.
-  The common converter already retains all 17 displays, 96 joints, full motion
-  arrays, and complete source sound callbacks in
-  `build/v3-creature-profiles-prepared-01/`. All seventeen complete room profiles,
-  including the static ant, are installed. Fixed parent IDs, names, prices,
-  categories, placement, and pickup are connected through one adapter. Three
-  focused checks cover the complete category, startup failures, installed output,
-  and optional composition. Nine fish profiles are available for private experimental
-  composition; eight insect profiles stay inactive. Reuse this path instead of rebuilding its individual
-  dependencies; see [the shared contract](../specs/V3_CREATURE_ITEMS.md).
-  The full creature sound category, native per-instance scheduling,
-  and room sound callbacks are installed through the shared planner. Native motion
-  dispatch includes placement/removal states. Retain the passing resource/callback
-  checks and the inconclusive native-disconnection record; do not replay the
-  exhausted scheduler fixture before more implementation. Do not
-  create independent furniture options for creature displays or overwrite the
-  native herabuna with the donor brook trout. See the
-  [creature checkpoint](checkpoints/V3_CREATURE_PROFILES.md).
-- Resolve the remaining legacy clothing, custom-design, and fossil
+- Finish the creature category's ordinary native gameplay and save verification,
+  including scene-bank allocation and actual catch/place/release paths. Complete
+  field/room resources, behaviours, spawning, sound scheduling, player actions,
+  icons, collection UI/text, persistence, and all seventeen choices are installed.
+  Reuse those consumers and their recorded passing checks. The constructor timeout
+  and sound-scheduler disconnection remain unresolved; do not restart their
+  exhausted fixtures. Fix any identified game defect. See
+  [the creature contract](../specs/V3_CREATURE_ITEMS.md).
+- Resolve the remaining custom-design and fossil
   representations against actual parent/native identities. Complete genuine
   missing conversion and behaviour work; do not interpret absent artwork or
   an already installed parent representation as a new furniture requirement.

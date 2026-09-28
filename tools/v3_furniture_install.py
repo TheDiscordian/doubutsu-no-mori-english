@@ -629,7 +629,7 @@ def append_resource_plan(base,files,vrom,data,relocatable,*,target_vrom=None):
     return changes,record
 
 
-def relocate_resource_plan(base,files,vrom,data,*,minimum_physical,target_vrom=None):
+def relocate_resource_plan(base,files,vrom,data,*,minimum_physical,target_vrom=None,reservations=()):
     """Keep a whole growing resource in verified zero, unmapped cartridge space.
 
     Logical identity is retained unless the caller declares a new virtual base.
@@ -643,7 +643,8 @@ def relocate_resource_plan(base,files,vrom,data,*,minimum_physical,target_vrom=N
             type(destination) is not int or destination&15 or not 0<=destination<destination+len(data)<=0x100000000 or
             any(e.vstart<destination+len(data) and destination<e.vend for v,e in files.items() if v!=vrom)):
         raise ValueError('Relocation needs a complete non-overlapping append')
-    occupied=sorted((e.pstart,e.pend or e.pstart+e.size) for e in files.values() if e.pstart!=0xFFFFFFFF)
+    occupied=sorted([(e.pstart,e.pend or e.pstart+e.size) for e in files.values() if e.pstart!=0xFFFFFFFF]+
+        [(r['physical'],r['physical']+r['bytes']) for r in reservations])
     cursor=minimum_physical
     for first,last in occupied+[(len(base),len(base))]:
         start=(cursor+15)&~15
@@ -664,7 +665,7 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
                     equipment_rigs=None, expand_storage=False, furniture_audio_art=None, furniture_profiles=None,
                     material_frames_art=None,scrolling_materials_art=None,room_surfaces_art=None,furniture_scoring=False,
                     password_runtime=None,password_editor=False,room_effects=None,furniture_capacity=False,console_storage=False,
-                    console_images=None,console_emulator=False,console_disk=None,creature_items=None,creature_field=None,creature_fish=False,creature_insects=None):
+                    console_images=None,console_emulator=False,console_disk=None,creature_items=None,creature_field=None,creature_fish=False,creature_insects=None,clothing_batch=None):
     """Update shared readers; optionally install the shared held-resource adapter."""
     output=output.resolve()
     if output.exists() or not output.is_relative_to(ROOT/'build'):
@@ -704,13 +705,22 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
     if creature_insects is not None:
         if resource_mode:raise ValueError('Install shared runtime updates in dependency order')
         resource_mode=True
+    if clothing_batch is not None:
+        if resource_mode:raise ValueError('Install shared runtime updates in dependency order')
+        resource_mode=True
     if resource_mode:
         blob,reused=reuse_resource_tail(base,prior,old_blob)
         if not reused['reused_bytes'] and not reused.get('external_resources'):
             raise ValueError('Equipment integration requires the checked shared resource tail')
     parent_readers=bool(player_actions and prior.get('equipment_resources',{}).get('player_actions',{}).get('equipment_selection'))
     wrapped_names=bool(player_actions and prior.get('equipment_resources',{}).get('wrapped_presents'))
-    if creature_insects is not None:
+    if clothing_batch is not None:
+        import v3_clothing_install as equipment
+        equipment_report,owner_changes,report_updates=equipment.install(
+            base,prior,blob,core,output,clothing_batch.resolve())
+        display_report=report_updates['clothing']['display']
+        alias_report=report_updates['display_aliases']
+    elif creature_insects is not None:
         import v3_creature_insect_install as equipment
         display_report,alias_report=prior['clothing']['display'],prior['display_aliases']
         equipment_report,owner_changes,report_updates,physical_writes=equipment.install(
@@ -1309,6 +1319,15 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             saved_profile_changed=report['save_runtime']['profile_hex']!=prior['save_runtime']['profile_hex'])
         report['sources'].update(insects['sources'])
         report['native_test']='pending connected insect gameplay/save verification; fish constructor and sound-scheduler failures remain unresolved'
+    if clothing_batch is not None:
+        clothing=equipment_report['clothing_batch']
+        report['shared_runtime_refresh'].update(adapters=['clothing_batch'],artwork_changed=True,
+            additional_resident_bytes=clothing['additional_resident_bytes'],
+            additional_scene_bytes=0,resource_allocations_changed=True,saved_format_changed=False,
+            additional_menu_pool_bytes=report['catalogue']['category_pool_bytes']-prior['catalogue'].get('category_pool_bytes',0),
+            saved_profile_changed=report['save_runtime']['profile_hex']!=prior['save_runtime']['profile_hex'])
+        report['sources'].update(clothing['sources'])
+        report['native_test']='pending connected clothing gameplay/save verification; retained creature failures remain unresolved'
     if console_images is not None:
         images=equipment_report['console_images']
         report['shared_runtime_refresh'].update(adapters=['console_images'],
@@ -1356,6 +1375,8 @@ if __name__=='__main__':
     mode.add_argument('--art',type=Path)
     mode.add_argument('--refresh-runtime',action='store_true')
     parser.add_argument('--base-lock',type=Path,default=LOCK)
+    parser.add_argument('--clothing-batch',type=Path,
+        help='With --refresh-runtime, install the complete prepared clothing category')
     parser.add_argument('--equipment-art',type=Path,
         help='With --refresh-runtime, install prepared shared held models and source-derived motion resources')
     parser.add_argument('--equipment-rigs',type=Path,
@@ -1466,6 +1487,7 @@ if __name__=='__main__':
     if args.creature_field is not None and not args.refresh_runtime:parser.error('--creature-field requires --refresh-runtime')
     if args.creature_fish and not args.refresh_runtime:parser.error('--creature-fish requires --refresh-runtime')
     if args.creature_insects is not None and not args.refresh_runtime:parser.error('--creature-insects requires --refresh-runtime')
+    if args.clothing_batch is not None and not args.refresh_runtime:parser.error('--clothing-batch requires --refresh-runtime')
     result=(refresh_runtime(args.output,args.base_lock,equipment_art=args.equipment_art,player_motion=args.player_motion,
                             equipment_kinds=args.equipment_kinds,player_actions=args.player_actions,
                             item_category_art=args.item_category_art,ground_categories=args.ground_categories,
@@ -1481,6 +1503,6 @@ if __name__=='__main__':
                             furniture_capacity=args.furniture_capacity,console_storage=args.console_storage,
                             console_images=args.console_images,console_emulator=args.console_emulator,
                             console_disk=args.console_disk,creature_items=args.creature_items,creature_field=args.creature_field,
-                            creature_fish=args.creature_fish,creature_insects=args.creature_insects)
+                            creature_fish=args.creature_fish,creature_insects=args.creature_insects,clothing_batch=args.clothing_batch)
             if args.refresh_runtime else build(args.output,args.art,args.base_lock))
     print(json.dumps({k:result[k] for k in ('runtime_abi','output_sha256','patch_sha256')},indent=2))

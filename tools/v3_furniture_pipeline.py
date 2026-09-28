@@ -1738,10 +1738,10 @@ def main():
         help='Reuse a verified artwork bundle without recompilation; repeat for multiple bundles')
     args = parser.parse_args(); output = args.output.resolve()
     if args.assets_only and args.command != 'convert': parser.error('--assets-only requires convert')
-    if args.representation=='clothing' and (args.command=='import' or args.select
+    if args.representation=='clothing' and (args.select
             or args.category not in (None,'clothing-appearances')
             or args.command=='convert' and not args.assets_only):
-        parser.error('Clothing preparation retains the complete category; use convert --assets-only')
+        parser.error('Clothing conversion/import retains the complete category; select garments when composing the patch')
     if args.representation=='audio' and args.command!='convert':
         parser.error('Audio preparation requires convert --assets-only; dispatch/allocation integration is unfinished')
     if args.representation=='lifecycle' and (args.command!='convert' or not args.assets_only):
@@ -1754,8 +1754,8 @@ def main():
             or args.command=='convert' and not args.assets_only):
         parser.error('Creature preparation retains the complete field-frame category; use convert --assets-only')
     if args.category and args.command == 'scan': parser.error('--category requires convert or import')
-    if args.reuse_assets and (args.command=='scan' or args.representation not in ('furniture','surfaces')):
-        parser.error('--reuse-assets requires furniture convert/import or surface preparation')
+    if args.reuse_assets and (args.command=='scan' or args.representation not in ('furniture','surfaces','clothing')):
+        parser.error('--reuse-assets requires furniture/clothing convert/import or surface preparation')
     if args.representation in ('handheld','scenery','audio','rewards','surfaces') and (args.command == 'import' or
             args.command == 'convert' and not args.assets_only):
         parser.error('This representation requires convert --assets-only; runtime integration is unfinished')
@@ -1763,6 +1763,12 @@ def main():
     source = Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
                     (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
     if args.representation=='clothing':
+        if args.command=='import':
+            from v3_furniture_install import refresh_runtime
+            if len(args.reuse_assets)!=1:parser.error('Clothing import requires one complete --reuse-assets bundle')
+            report=refresh_runtime(output,args.base_lock,clothing_batch=args.reuse_assets[0])
+            print(json.dumps({k:report[k] for k in ('runtime_abi','output_sha256','patch_sha256')}))
+            return
         from v3_clothing_batch import discover as discover_clothing, convert as convert_clothing
         from v3_villager_text import read_text_donor
         from v3_furniture_install import inputs

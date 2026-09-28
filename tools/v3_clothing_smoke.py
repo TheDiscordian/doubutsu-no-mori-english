@@ -5,7 +5,7 @@ from pathlib import Path
 from aflib import by_vrom, sha256
 from runtime_layout import MODULE_RAM, RESERVATION, TEST_STACK
 from v3_asset_loader import BLOB, BLOB_RAM
-from v3_clothing import DATA, ENTRY
+from v3_clothing import ENTRY
 
 
 def exercise(debug, rom_path, record):
@@ -40,32 +40,46 @@ def exercise(debug, rom_path, record):
     guards = (allocation, texture+512, palette-16, palette+32, allocation+size-16,
               TEST_STACK-0x800, TEST_STACK+0x40)
     for at in guards: debug.write_memory(at, edge)
-    enabled = BLOB_RAM+DATA+10
-    saved = debug.read_memory(enabled, 1)
+    clothing=report['clothing'];batch=clothing.get('batch')
+    if batch:
+        packet=batch['packet'];at=packet['blob_offset']
+        check('complete clothing runtime packet',packet['ram'],blob_file[at:at+packet['bytes']])
+    save=report['save_runtime'];state_address=save['state_ram']
+    if isinstance(state_address,str):state_address=int(state_address,16)
+    state=debug.read_memory(state_address,save['state_bytes'])
     try:
         # Native BF is deliberately a different garment; preserve its exact
         # texture/palette before checking the donor-only 10BF index.
         call(ENTRY, (texture, palette, 0xBF))
         check('original BF texture', texture, files[0xB68000].extract(rom)[0x17E00:0x18000])
         check('original BF palette', palette, files[0xB88000].extract(rom)[0x17E0:0x1800])
-        call(ENTRY, (texture, palette, 0x10BF))
-        expected_tex, expected_pal = blob_file[0xF000:0xF200], blob_file[0xF200:0xF220]
-        check('complete imported cherry-shirt texture', texture, expected_tex)
-        check('complete imported cherry-shirt palette', palette, expected_pal)
-        call(ENTRY, (0, palette, 0x10BF))
-        call(ENTRY, (texture, 0, 0x10BF))
-        call(ENTRY, (texture, palette, 0x10C0))
-        debug.write_memory(enabled, b'\0')
-        call(ENTRY, (texture, palette, 0x10BF))
-        check('invalid and disabled calls leave texture intact', texture, expected_tex)
-        check('invalid and disabled calls leave palette intact', palette, expected_pal)
-    finally:
-        debug.write_memory(enabled, saved)
+        for row in clothing['imports']:
+            index=row['resource_index'];at=int(row['vrom'],16)-BLOB
+            expected_tex,expected_pal=blob_file[at:at+512],blob_file[at+512:at+544]
+            call(ENTRY,(texture,palette,index))
+            check(row['name']+' complete texture',texture,expected_tex)
+            check(row['name']+' complete palette',palette,expected_pal)
+            enabled=int(row['metadata_ram'],16)+10;saved=debug.read_memory(enabled,1)
+            try:
+                debug.write_memory(enabled,b'\0')
+                debug.write_memory(texture,b'\xA5'*512);debug.write_memory(palette,b'\x5A'*32)
+                call(ENTRY,(texture,palette,index))
+                check('disabled texture untouched',texture,b'\xA5'*512)
+                check('disabled palette untouched',palette,b'\x5A'*32)
+            finally:debug.write_memory(enabled,saved)
+        call(ENTRY,(0,palette,index));call(ENTRY,(texture,0,index))
+        call(ENTRY,(texture,palette,0x10C0))
+        check('invalid texture untouched',texture,b'\xA5'*512)
+        check('invalid palette untouched',palette,b'\x5A'*32)
+    except Exception:
+        call(0x8009C040,(allocation,))
+        raise
+    check('save state unchanged',state_address,state)
     for at in guards: check('fixture guard', at, edge)
     check('resident prefix restored', BLOB_RAM, prefix)
     check('translation guard', 0x8019C8D0, bytes.fromhex('AF32C0DE')*4)
     check('no faulted thread', 0x8003CE34, bytes(4))
-    call(0x8009C040, (allocation,))
-    return {'native_reader_entries': 1, 'native_and_imported_complete_garments': 2,
+    call(0x8009C040,(allocation,))
+    return {'native_reader_entries': 1, 'native_and_imported_complete_garments': 1+len(clothing['imports']),
             'saved_data_written': False, 'npc_or_wearing_gameplay_tested': False,
             'requires_checkpoint_restore': True}

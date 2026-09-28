@@ -43,9 +43,10 @@ def profile_bytes(villagers, furniture, clothing=None):
         from v3_registry import CLOTHING_REGISTRY_VERSION, clothing_slot
         for row in clothing:
             item, index, vrom = clothing_slot(int(row['donor_item_id'], 16))
-            if (row['registry_version'] != CLOTHING_REGISTRY_VERSION
+            if (row['registry_version'] not in range(1,CLOTHING_REGISTRY_VERSION+1)
                     or row['item_id'] != f'{item:04X}' or row['resource_index'] != index
-                    or row['vrom'] != f'{vrom:08X}' or item in seen):
+                    or (row['vrom'] != f'{vrom:08X}' if vrom is not None else
+                        not 0x02200000 <= int(row['vrom'],16) <= 0x02800000-544) or item in seen):
                 raise ValueError('Changed clothing profile identity or duplicate')
             seen.add(item)
             bit = item & 255

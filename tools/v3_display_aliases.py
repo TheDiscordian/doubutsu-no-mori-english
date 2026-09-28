@@ -41,7 +41,11 @@ def records(prior, blob):
     for row in display['imports']:
         parent=parents[row['pocket_item_id']]
         item=int(row['item_id'],16); pocket=int(parent['item_id'],16)
-        index=row['runtime_index']; at=int(row['profile_ram'],16)-0x80460000-8
+        index=row['runtime_index']; address=int(row['profile_ram'],16)-8
+        at=(address-0x80460000 if 0x80460000<=address<0x8046C000
+            else PACKAGE+address-PACKAGE_RAM)
+        if not (0<=at<=0xC000-80 or ROWS<=at<=ITEMS-80):
+            raise ValueError('Clothing profile escapes canonical resident records')
         # These existing profiles all use the complete native mannequin and
         # its verified footprint. Other categories supply their own records;
         # no tool/fan is accepted as a garment by numerical proximity alone.

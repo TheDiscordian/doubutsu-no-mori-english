@@ -1,7 +1,10 @@
-/* Preserve native B/C seasons while adding the selected all-season A garment. */
+/* Select enabled garments from their actual A/B/C season partitions. */
 typedef unsigned char u8;
 typedef unsigned short u16;
 typedef unsigned int u32;
+#ifdef AF_V3_CLOTHING_BATCH
+#include "clothing_batch.h"
+#endif
 #ifdef __mips__
 #define segment ((const void *(*)(u32))0x8009ADA8u)
 #define native_index ((int (*)(int *))0x800BFAA8u)
@@ -22,6 +25,35 @@ extern u8 af_stock_month, af_stock_selected;
 extern u32 af_v3_clothing_source(int, u32);
 
 int af_v3_clothing_stock_index(int *index, const u16 *list) {
+#ifdef AF_V3_CLOTHING_BATCH
+    if (!index) return 0;
+    const struct ClothingStock *stock=0;
+    for (u32 i=0;i<3;i++)
+        if (list==segment(af_v3_batch_stock[i].pointer)) stock=af_v3_batch_stock+i;
+    if (!stock) return native_index(index);
+    u32 season=((month+9u)%12u)/3u+1u;
+    u32 first=stock->counts[0],last;
+    for (u32 i=1;i<season;i++) first+=stock->counts[i];
+    last=first+stock->counts[season];
+    u32 count=0;
+    for (u32 i=0;i<last;i++) {
+        if (i>=stock->counts[0] && i<first) continue;
+        u32 item=list[i];
+        if ((item>=0x2400u && item<0x2500u) || af_v3_roster_clothing_record(item)) count++;
+    }
+    if (!count) return 0;
+    u32 chosen=(u32)(random_float()*(float)count);
+    if (chosen>=count) chosen=count-1;
+    for (u32 i=0;i<last;i++) {
+        if (i>=stock->counts[0] && i<first) continue;
+        u32 item=list[i];
+        if ((item>=0x2400u && item<0x2500u) || af_v3_roster_clothing_record(item)) {
+            if (!chosen) {*index=(int)i;return (int)count;}
+            chosen--;
+        }
+    }
+    return 0;
+#else
     if (!index) return 0;
     if (list != segment(0x06000230u)) return native_index(index);
     if (!selected || !af_v3_clothing_source(0x10BF, 0)) {
@@ -37,4 +69,5 @@ int af_v3_clothing_stock_index(int *index, const u16 *list) {
         for (u32 i = 1; i < season; ++i) chosen += counts[i];
     *index = chosen;
     return (int)count;
+#endif
 }

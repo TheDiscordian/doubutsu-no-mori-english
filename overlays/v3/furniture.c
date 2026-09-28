@@ -206,6 +206,10 @@ int af_v3_furniture_import_dma(u32 argument, u32 item, u32 bank, int bank_index)
 #ifdef AF_V3_ALOHA_DISPLAY
             || row==red_display || row==blue_display
 #endif
+#ifdef AF_V3_BATCH_CLOTHING_DISPLAY
+            || (row->profile[16]==AF_V3_CLOTHING_DISPLAY_VTABLE &&
+                af_v3_display_clothing_index(row->item)>=0x1000u)
+#endif
             ) {
         if (row->profile[16] != AF_V3_CLOTHING_DISPLAY_VTABLE) return 0;
         display_dma(row->item | (item & 3u), bank);
