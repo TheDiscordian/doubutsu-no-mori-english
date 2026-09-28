@@ -116,6 +116,9 @@ def patch(base,symbols):
 
 
 def install(base,prior,blob,core,output):
+    if prior['equipment_resources']['npc_extra'].get('motion'):
+        from v3_holiday_dialogue import install as install_dialogue
+        return install_dialogue(base,prior,blob,core,output)
     del blob,core
     equipment=copy.deepcopy(prior['equipment_resources']);npc=equipment['npc_extra']
     if not npc['installed'] or npc.get('motion'):raise ValueError('NPC motion needs the installed registry without duplicate services')

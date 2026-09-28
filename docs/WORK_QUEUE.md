@@ -120,9 +120,20 @@ edge initialization, original fallbacks, and elapsed-tick pauses pass focused
 host checks; current cartridge hooks/resources and browser/offline composition
 pass. The updated lifecycle/controller objects are prepared under
 `tortimer-services-03/actor/`; their event/conversation providers remain unresolved.
-Next connect those five providers: the event owner, live calendar/reward data,
-English messages/demo transport, cleanup, continuation, and separate exercise/card
-route. Motion and resource exports are already available in the installed packet.
+The complete official holiday/vacation/exercise message group and native transport
+are installed at `build/v3-diary-category-work-01/tortimer-dialogue-02/`: 347 messages,
+four choices, 31 ordinal dates, and 29 event labels, all individually credited.
+Complete branch/choice remapping retains wording, pages, waits, and demo orders.
+The shared transport supplies full item/event fields, dates, continuation,
+camera/turn, listen/start, and actual handover orders. Focused source/cartridge
+and sanitized connected talk/reward/transport checks pass across all 28 holiday
+events. Browser/offline empty, mixed, and all-supported compositions agree.
+The native bridge calls these installed exports; its remaining providers are
+`af_holiday_npc_bind`, `af_holiday_npc_world`, `af_holiday_npc_resources`, and
+`af_holiday_npc_unregister`: event ownership/scheduling, live calendar/reward
+data, resource validation, and cleanup. Connect these and the separate
+exercise/card route next, then activate the assembled actor/diary path.
+Motion, dialogue, continuation, and resource exports are available in the packet.
 Reuse the installed allocation/loading/drawing path and complete resources; do not rebuild
 them as separate tasks or restart the exhausted native title fixture.
 The [native connection notes](../specs/V3_DIARIES.md#tortimer-artwork-and-native-actor-connection)
@@ -172,9 +183,9 @@ harness budget exhausted; no old fixture replay is authorised by this clothing
 work. Fix any identified game defect. This does not defer required creature
 behaviours or classify their gameplay as verified.
 
-Use the shared converter and current ABI-314 proposal:
-`build/v3-diary-category-work-01/tortimer-services-03/build-lock.json`.
-ROM SHA-256: `195c0a4da5bd05e39e2ea4ad34aa46cae58a287e9e998d3c4e49e8e3ae86a426`.
+Use the shared converter and current ABI-315 proposal:
+`build/v3-diary-category-work-01/tortimer-dialogue-02/build-lock.json`.
+ROM SHA-256: `a0959619e78f6c4cb13f63ae30965f5fcfb1e46a1dcc23f6d46e9fd2f206b908`.
 The two static variants use ordinary stock, catalogue/scoring, save-profile bits,
 and independent browser/offline selection. Their 7,840 artwork bytes are installed
 together; neither native counterpart nor any existing imported object is replaced.

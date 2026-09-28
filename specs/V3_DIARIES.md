@@ -12,10 +12,10 @@ The calendar/reading/editing/storage controller and shared native-save adapter
 are implemented in source and compile for VR4300. Host checks cover room surface
 selection, calendar navigation, editing/privacy/capacity admission, and the
 save → probe → reload path. They do not establish in-game UI operation,
-native FlashRAM timing, ordinary gameplay, or hardware compatibility. ABI 314
+native FlashRAM timing, ordinary gameplay, or hardware compatibility. ABI 315
 contains menus, resident packets, room/visit hooks, save dispatch, carried readers,
 complete room covers, and catalogue/scoring integration at
-`build/v3-diary-category-work-01/tortimer-services-03/`. Neither patcher changes.
+`build/v3-diary-category-work-01/tortimer-dialogue-02/`. Neither patcher changes.
 
 ## Donor contract
 
@@ -290,8 +290,9 @@ Changing players or removing the selected item cannot award or mark it. If
 pockets become full after the initial dialogue check, delivery rejects and
 retains the offer without awarding a trophy. Repeated delivery signals cannot
 give the same reward again. This is a no-loss platform guard, not a substituted
-event reward. Native demo transport still must apply message/continuation,
-listen/start, item/event name, handover, camera/turn, and actor-return actions.
+event reward. The installed shared transport applies message/continuation,
+listen/start, item/event name, handover, and camera/turn. The source actor
+controller owns think/melody restoration; the actor/event owner remains unlinked.
 
 `tools/v3_holiday_talk.py` binds the complete donor talk functions, relocations,
 and pinned C references. The ordinary holiday preparation command compiles both
@@ -299,8 +300,9 @@ the selector and controller. External diary/reward calls and compiler-generated
 `memcpy` remain explicit link dependencies, not guessed resident addresses.
 The current prepared objects and source receipts are in
 `build/v3-diary-category-work-01/tortimer-talk-03/`.
-Prepared objects do not install a Tortimer actor, event scheduling, artwork,
-message resources, or native demo transport, and enable no imports.
+The prepared controller does not install an active Tortimer actor or event
+schedule. Installed artwork, official messages, and transport are reused when
+linking that controller; no import is enabled by preparation.
 
 The sanitized connected check compiles the complete donor talk file beside the
 port. Every holiday uses first/repeat/claimed/full-pocket/visitor branches and
@@ -309,6 +311,57 @@ player/profile changes, and real calendar effects are checked together. The
 calendar query separately matches the actual donor calendar C, including all
 event IDs and out-of-window dates. Existing selector/handover checks pass for
 the changed shared selector. These are host results, not native conversations.
+
+### Shared official dialogue and native transport
+
+`tools/v3_holiday_dialogue.py` converts all 28 holiday groups plus the vacation
+and exercise/card conversations in one pass. Starting with 344 selector records,
+following every branch adds `338E..3390`, giving 347 messages. Donor intervals
+`3280..339A`, `33F4..3415`, and `3422..343F` map to native IDs starting at
+`2F01`; four required choices start at `01FF`. IDs do not depend on selection
+order. Unknown commands, incomplete closure, unsupported characters, and native
+buffer overflow reject. All branch/choice targets are rewritten, not just the
+first message selected by the actor.
+
+Official wording, manual lines/pages, pauses, and NPC0 orders remain intact.
+Redundant donor article-suppression flags are removed because native insertions
+do not add articles. Two horizontal dash glyphs in `33F4` become the native
+halfwidth hyphen. These changes are explicit in the 411 per-text provenance
+entries, alongside the four choices, 31 ordinal dates, and 29 event names.
+No new English passage is authored. The maximum expanded message is 867 bytes,
+inside the existing 1,024-byte buffer; no pagination or timing changes are needed.
+
+The ordinary four-resource text installer repacks the expanded banks into checked
+free physical ROM space, preserving virtual identities and every previous text
+record. Both message bounds and both choice bounds increase together. The source
+event-name permutation binds to the actual donor table; Town Day inserts the
+actual six-character N64 town name before the official suffix.
+
+The 1,824-byte stateless adapter at `806E6800` and 640-byte field/ID packet at
+`806E7800` fit the existing additional-NPC reservation. Registry, cane, artwork,
+actor guards, and inactive flags are retained. No resident allocation or saved
+format changes. The native bridge binds the transport before actor construction.
+
+Continuation uses the actual `MainNormalContinue` function at `8009E908`, which
+checks main state two and the next `7F01` command. The continuation setter is
+`8009DBA4`. Message preparation uses native turn/camera/message calls; talk-init
+uses ListenAble/Start. Complete item names use the selected-category reader at
+`801969C8`, bypassing the old quest helper's native-ID precheck. The normal
+16-byte item-field setter receives item slot zero and event slot one. The
+startup-restored free-field setter receives the two four-byte ordinal dates.
+Handover sets NPC1 orders `0=item`, `1=7` (PUTAWAY), and `2=0`; only the existing
+reward transaction inserts the item and marks the trophy. Invalid fields or
+message IDs reject before the first demo mutation.
+
+The current build is `build/v3-diary-category-work-01/tortimer-dialogue-02/`.
+Focused checks compare every converted message token against the official source
+after reversing declared adaptations, inspect installed resources/bounds/guards,
+and connect the actual talk/reward/transport code under sanitizers across all 28
+events, visitors, full pockets, duplicate delivery, and dates. Browser/offline
+empty, mixed, and all-supported composition agrees. Individual transport frames
+are at most 96 bytes, before callees. Native conversation execution and complete
+dynamic stack use are not established. Event/world/cleanup and separate card
+integration remain required before actor or diary activation.
 
 ### Tortimer artwork and native actor connection
 
@@ -440,9 +493,11 @@ described below.
 
 `--holiday-actor-services` connects the motion adapter through the shared builder,
 using the existing registry packet rather than allocating or converting more art.
-The current ABI-314 proposal is `build/v3-diary-category-work-01/tortimer-services-03/`.
+The motion resource receipt is `build/v3-diary-category-work-01/tortimer-services-03/`;
+the current proposal retains this complete code and resource path.
 The 2,016-byte adapter begins at `806E6000`; the remainder of the actor-code
-reservation through `806EE000` is available for the event/conversation bridge.
+reservation contains the dialogue code/fields described above, with remaining
+space through `806EE000` for the event/actor bridge.
 All packet bytes outside that code remain unchanged, including inactive profile
 flags, original registry code, complete cane data, and actor guards.
 
@@ -501,8 +556,8 @@ Think and schedule callbacks live at `7A4` and `7C0`, interrupt flags at `7A8`,
 action/step at `7C5`/`7C6`, destination at `8BC`/`8C0`, and talk request at `91C`.
 The actual NPC0 delivery signal and native SPEAK/TALK checks reach the shared
 controller. Full-pocket or stale-profile delivery stays pending instead of
-silently completing. English message/continuation and handover transport remain
-required provider callbacks; the bridge does not pretend they are installed.
+silently completing. English message/continuation and handover callbacks use
+the installed transport described above; event/world providers remain required.
 
 The actor's complete o32 size is `A34` hex (2,612 bytes). Native
 `Actor_malloc_actor_class` sends D/E identities to clip `0C` without a heap
@@ -512,7 +567,7 @@ path, not merely enlarge the profile's size. Do not grow the nine original slots
 or write the new transient state beyond an original slot. The existing native
 free path also routes D/E identities through clip `10`.
 
-Preparation at `build/v3-diary-category-work-01/tortimer-services-03/actor/` contains the
+Preparation at `build/v3-diary-category-work-01/tortimer-dialogue-02/actor/` contains the
 shared controller and native bridge, with maximum individual frames of 88 and
 144 bytes respectively. Their complete dynamic stack and native execution
 remain unverified. Cadence adaptation has source and host evidence above.
@@ -523,12 +578,11 @@ conversation/calendar/reward functions pass one sanitized combined host check;
 the native bridge is compiler/source checked, not executed. No native fixture is
 started and the exhausted diary title-fixture budget is unchanged.
 
-Five installation services remain explicit linker dependencies:
+Four installation services remain unresolved:
 `af_holiday_npc_bind`, `af_holiday_npc_world`, `af_holiday_npc_resources`,
-`af_holiday_npc_unregister`, and `af_holiday_npc_continue`. Binding must supply
-the actual event owner, live world/reward data, complete English messages/demo
-transport, cleanup, continuation, and validation of the active outdoor clip and
-full voice. The installed walking/cane/resource exports and elapsed-tick controller
+and `af_holiday_npc_unregister`. Binding must supply the actual event owner,
+live world/reward data, cleanup, and validation of the active outdoor clip and
+full voice. The installed dialogue/continuation, walking/cane/resource exports, and elapsed-tick controller
 are reused; allocation and drawing are already connected. The separate
 exercise/card route remains required.
 These are remaining consumers of the same diary category, not new per-event

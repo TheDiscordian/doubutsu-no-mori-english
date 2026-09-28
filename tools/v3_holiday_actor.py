@@ -103,6 +103,14 @@ def prepare(source,output,lock):
         report['native'].update(motion_services=motion,
             motion_indices_bound=True,walking_only_schedule_bound=True,
             callback_cadence_verified=True,native_callback_cadence_executed=False)
+    dialogue=prior.get('equipment_resources',{}).get('npc_extra',{}).get('dialogue')
+    if dialogue:
+        npc=prior['equipment_resources']['npc_extra'];packet=npc['packet'];code=dialogue['code']
+        at=packet['physical']+0x2800
+        if sha256(base[at:at+code['bytes']])!=code['sha256']:
+            raise ValueError('Changed installed holiday dialogue transport')
+        report['native'].update(dialogue_transport=dialogue,
+            message_transport_bound=True,continuation_bound=True,native_conversation_executed=False)
     report['base_sha256']=sha256(base);report['base_abi']=prior['runtime_abi']
     output.mkdir(parents=True)
     report['kernel']=compile_kernel(output,name='holiday_actor')

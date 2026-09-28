@@ -82,7 +82,8 @@ void af_holiday_npc_ctor(AFHolidayNpc *a,void *game) {
     a->game=game;a->constructed=a->failed=0;a->actor=(AFHolidayActor){0};
     a->ops=(AFHolidayActorOps){0};a->world=(AFHolidayWorld){0};
     unsigned int gender;
-    if(!af_holiday_motion_bind(a) || !af_holiday_npc_bind(a) || !a->ops.motion ||
+    if(!af_holiday_motion_bind(a) || !af_holiday_dialogue_bind(a) ||
+            !af_holiday_npc_bind(a) || !a->ops.motion ||
             !af_holiday_npc_world(a,&a->world,&gender)) {fail(a);return;}
     if(FN(clip(0xBC),int,void *,void *)(a,game)!=1)return;
     if(af_holiday_actor_construct(&a->actor,&a->world,gender)<0) {fail(a);return;}
@@ -136,13 +137,13 @@ void af_holiday_npc_request(AFHolidayNpc *a,void *game) {
 void af_holiday_npc_prepare(AFHolidayNpc *a) {
     if(!refresh(a,a->game))return;
     AFHolidayActorOps o=operations(a);
-    if(af_holiday_actor_prepare(&a->actor,&a->world,&o)<0)fail(a);
+    if(af_holiday_actor_prepare(&a->actor,&a->world,&o)<0 || a->failed)fail(a);
 }
 int af_holiday_npc_start(AFHolidayNpc *a,void *game) {
     if(!refresh(a,game))return 0;
     AFHolidayActorOps o=operations(a);
     int r=af_holiday_actor_start(&a->actor,&a->world,&o);
-    return r<0?fail(a):r;
+    return r<0 || a->failed?fail(a):r;
 }
 int af_holiday_npc_end(AFHolidayNpc *a,void *game) {
     if(!refresh(a,game))return 0;
@@ -154,5 +155,5 @@ int af_holiday_npc_end(AFHolidayNpc *a,void *game) {
     /* A full/stale handover is recoverable; do not destroy a speaking actor or
      * pretend delivery succeeded. Keep the offer for the transport to recover. */
     if(r==AF_DIARY_CHANGED)return 0;
-    return r<0?fail(a):r;
+    return r<0 || a->failed?fail(a):r;
 }

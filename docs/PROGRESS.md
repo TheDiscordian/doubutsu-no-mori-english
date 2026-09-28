@@ -31,9 +31,9 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
-The current proposal is ABI 314 at
-`build/v3-diary-category-work-01/tortimer-services-03/build-lock.json`, ROM SHA-256
-`195c0a4da5bd05e39e2ea4ad34aa46cae58a287e9e998d3c4e49e8e3ae86a426`.
+The current proposal is ABI 315 at
+`build/v3-diary-category-work-01/tortimer-dialogue-02/build-lock.json`, ROM SHA-256
+`a0959619e78f6c4cb13f63ae30965f5fcfb1e46a1dcc23f6d46e9fd2f206b908`.
 It contains 191 independently selectable development imports, including all nine
 fish and eight insects, and 100 inactive furniture profiles whose acquisition
 is pending, plus sixteen inactive diary cover profiles. The main lock and both
@@ -140,7 +140,7 @@ native rendering, ordinary diary use, save/reload, or hardware compatibility.
 
 The installed diary bindings connect every carried parent to its cover, single
 save-profile bit, catalogue ordering, and scoring. Browser and offline composition
-agree for empty, mixed, and all-supported selections on ABI 314. Prepared diaries
+agree for empty, mixed, and all-supported selections on ABI 315. Prepared diaries
 remain unavailable, including under select all; inactive catalogue/scoring rows
 are removed from composed builds. The shared save/profile host check uses real
 carried readers, selected-style resolution, canonical codec, and format-eleven
@@ -170,8 +170,19 @@ visitors, full pockets, vacation callbacks/dates, and duplicate handover handlin
 are implemented together. Four focused host checks pass, including the complete
 donor conversation comparison and the donor calendar query comparison. The
 VR4300 controller compiles with explicit diary/reward/library link dependencies.
-It is not installed: Tortimer's actor/event owner, official message
-routing, native demo transport, and exercise-card route remain necessary.
+The controller is not linked into an active actor: Tortimer's event owner,
+live world/reward bindings, cleanup, and exercise-card route remain necessary.
+The complete official dialogue group and native transport are installed in the
+current proposal: 347 messages, four choices, all 31 ordinal dates, and 29 event
+labels, with 411 per-text credits in the single provenance catalogue. Branch IDs
+are remapped together; wording, manual lines/pages, pauses, and demo orders are
+retained. Two donor dash glyphs use the halfwidth hyphen, explicitly credited.
+The largest expanded message is 867 bytes within the existing 1,024-byte buffer.
+The native transport uses actual continuation, turn/camera, listen/start, complete
+16-byte item/event fields, and PUTAWAY handover orders. No inventory award is
+duplicated in the transport. Source/cartridge checks, sanitized connected
+conversation/reward/transport checks for all 28 events, and browser/offline
+composition pass. Native conversations remain unverified; no diary is enabled.
 
 Tortimer's complete model and expressions are converted within the existing NPC
 buffers, with no discarded source pixels. The shared per-material texture path
@@ -191,11 +202,11 @@ compares the complete donor think file and exercises request → conversation �
 attendance → delivery → resumed movement. The native lifecycle bridge supplies
 the checked N64 callbacks, actor fields, requests, and real demo-end/delivery
 signals. Both VR4300 objects are prepared at
-`build/v3-diary-category-work-01/tortimer-services-03/actor/`, not linked or installed.
-They call the installed walking-only and cane-animation exports. Timed pauses
+`build/v3-diary-category-work-01/tortimer-dialogue-02/actor/`, not linked or installed.
+They call the installed motion and English dialogue exports. Timed pauses
 consume elapsed 60 Hz ticks rather than doubling in duration at native 30 Hz.
-The remaining services include the event owner, live world/reward data, and
-English message/demo transport.
+The remaining services are the event owner, live world/reward data, cleanup,
+and separate exercise/card integration.
 The actor needs 2,612 bytes; the ordinary NPC pool rejects sizes above 2,400,
 so it uses a separate guarded pool instead of growing the original nine slots.
 Diaries remain unavailable, and no native gameplay is claimed.

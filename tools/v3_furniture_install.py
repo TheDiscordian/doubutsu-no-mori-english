@@ -1108,6 +1108,9 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
     if creature_fish and equipment_report:
         from v3_creature_ui import finish as finish_creature_text
         result=finish_creature_text(result,base,prior,output,equipment_report)
+    if holiday_actor_services and equipment_report:
+        from v3_holiday_dialogue import finish as finish_holiday_text
+        result=finish_holiday_text(result,base,prior,output,equipment_report)
     installed=by_vrom(result)
     for vrom,data in owner_changes.items():
         target=next((r.get('target_vrom',vrom) for r in owner_moves if r['vrom']==vrom),vrom)
@@ -1432,7 +1435,7 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             additional_resident_bytes=0,resource_allocations_changed=False,
             saved_format_changed=False,saved_profile_changed=False)
         report['sources'].update(npc['sources'])
-        report['native_test']='pending Tortimer event/conversation/exercise providers and connected diary gameplay/save verification'
+        report['native_test']='pending Tortimer event/world/cleanup providers, separate exercise/card route, and connected diary gameplay/save verification'
     if console_images is not None:
         images=equipment_report['console_images']
         report['shared_runtime_refresh'].update(adapters=['console_images'],

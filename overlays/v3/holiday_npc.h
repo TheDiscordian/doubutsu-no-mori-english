@@ -25,6 +25,7 @@ int af_holiday_npc_world(AFHolidayNpc *,AFHolidayWorld *,unsigned int *gender);
 int af_holiday_npc_resources(AFHolidayNpc *); /* apply voice/cane after native ctor */
 void af_holiday_npc_unregister(AFHolidayNpc *);
 int af_holiday_npc_continue(AFHolidayNpc *); /* actual MainNormalContinue */
+int af_holiday_dialogue_bind(AFHolidayNpc *);
 
 void af_holiday_npc_ctor(AFHolidayNpc *,void *);
 void af_holiday_npc_dtor(AFHolidayNpc *,void *);
