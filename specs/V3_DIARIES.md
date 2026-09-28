@@ -234,6 +234,27 @@ The hook is installed. Event participation remains a separate actual-player
 caller requirement: calendar occurrence does not set attendance. Native event IDs
 cannot index the donor's differently numbered special-event flags.
 
+The complete donor text-section direct-call inventory for
+`mCD_calendar_event_on` (`0000D4A0`) contains exactly two calls:
+
+- `001B4C90`, inside `aES2_talk_init` (`001B4C08`, 164 bytes), marks attendance
+  when Tortimer's holiday conversation starts. Function SHA-256:
+  `6e7d254653e58a7b937d09914bd760904523252b442a287e34cb6f5641d7b2a6`.
+- `00219398`, inside `aTS0_talk_init` (`0021933C`, 184 bytes), is gated on the
+  actor being Tortimer, not Copper or an ordinary exercise participant.
+  Function SHA-256:
+  `2a2d4d791098405e7222b4d689653c9133904e6893d3c847b68534e7a5dd55da`.
+
+The corresponding source is
+`src/actor/npc/event/ac_ev_soncho2_talk.c_inc` and
+`src/actor/npc/ac_taisou_npc0_talk.c_inc` in the pinned donor checkout. The native
+game lacks Tortimer; his shared event/conversation support is also required for
+imported holiday gifts. Attendance therefore depends on that shared actor path,
+not an unidentified native festival caller. Keep this dependency explicit while
+finishing diary selection and native UI/save integration. Ordinary NPC dialogue,
+scheduled events, or merely visiting a festival cannot stand in for these donor
+conversations. This does not mark attendance implementation complete or waive it.
+
 The combined sanitized host check uses actual native schedule data and the local
 N64 lunar implementation, covering 420 months, boundary years, recurring events,
 overlapping holidays, birthdays, style selection, real entry, and guarded preflight.
@@ -375,8 +396,11 @@ hardware evidence. No diary choices are enabled by this installation.
 | Selection | Bind carried/display profile dependencies and independent/all choices after participation is connected; profiles remain disabled |
 | Verification | Run bounded combined current-ROM UI/save checks after integration; no separate style-by-style native scenarios |
 
-Resume this same connected category at actual event participation and
-independent/all selection, followed by connected native UI/save checks.
+Continue this same category with carried-ID save/profile and independent/all
+selection wiring, then connected native UI/save checks. Actual attendance
+requires the shared Tortimer conversation path identified above; keep that
+remaining behaviour explicit rather than searching for a nonexistent native
+calendar caller. The category remains unfinished until that dependency works.
 The native `item1_B_tableNo` retains its existing `2B00` entry of type 21.
 Names/type/price and display/pocket conversion wrap the current shared readers,
 with disabled-import rejection. Ordinary placement retains the carried diary;

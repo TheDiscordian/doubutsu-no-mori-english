@@ -62,10 +62,16 @@ scoring metadata are installed at `build/v3-diary-category-work-01/catalogue-03/
 The HRA upper-layer query exempts selected diaries from table clutter, retaining
 the donor's floor penalty and every other scoring query. Four focused room/art
 and catalogue/scoring cartridge/host checks pass across the two connected steps.
-Resume at actual event-participation callers, selection, and connected native
+Continue with carried-ID save/profile and selection wiring, then connected native
 UI/save verification, following the
 [connected consumer map](../specs/V3_DIARIES.md#connected-consumer-map).
 These are remaining consumers of this same category, not new per-style tasks.
+The donor's two attendance calls both require Tortimer conversations, including
+the exercise actor's explicit Tortimer gate. Native festival conversations are
+not equivalent. The [diary contract](../specs/V3_DIARIES.md#native-dates-and-entry)
+records both complete functions and calls. Attendance shares the required
+Tortimer event/conversation dependency with holiday gifts; it remains unfinished,
+without blocking the remaining diary integration or authorising a substitute.
 The source/identity, global readers, icon branch, collection hooks, category
 artwork, and room-ID rebind stay installed. Reuse these, the installed
 menus/storage, and prepared artwork; do not restart conversion.
