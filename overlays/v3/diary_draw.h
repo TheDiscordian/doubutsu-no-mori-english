@@ -7,6 +7,8 @@ typedef struct {
     const void *art;
     float x,y,scale,answer_scale,arrow_x;
     unsigned int alpha,answers_visible,event_attended;
+    unsigned int editing,read_controls,prompt_state;
+    float control_y;
     int stick_direction;
     const unsigned char *event_label;
     unsigned int event_length;

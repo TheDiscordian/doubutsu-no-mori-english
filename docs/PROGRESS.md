@@ -62,10 +62,22 @@ ordinary keyboard dispatch. The screen conversion checks complete resource/load
 bounds, caller tables, and rejection of missing state. These screens and hooks
 are not installed or visually verified; no new cartridge is claimed.
 
+The shared native menu owner is linked at
+`build/v3-diary-category-work-01/ui-04/`. It connects opening, calendar/read views,
+scrolling, the actual keyboard child, first-A answer reveal, Rewrite, privacy,
+capacity rejection, closing, and session cleanup. The paper and text share the
+same scrolling position; the cursor uses proportional glyph positions. The
+keyboard adapter retains blinking and character alteration. The linked UI is
+12,496 bytes, with 2,240 bytes of caller-owned state. Prepared HBOARD and keyboard
+hooks add 1,600 bytes to the native menu arena and preserve unrelated existing
+code/graphics at two relocation addresses. Three focused source/compiler/host
+checks pass, including the connected interaction with rejected and accepted
+commits. Native UI execution and visual verification remain pending.
+
 The shared save adapter retains the complete town, console progress, calendars,
-and pages within the existing two FlashRAM banks. Native submenu ownership,
-transitions and editor-hook installation, carried readers, live date/event
-callers, resident loading, and selection
+and pages within the existing two FlashRAM banks. Live native date/event and
+room-entry bindings, prepared menu-hook installation, carried readers, resident
+loading/save dispatch, and selection
 remain in the same [diary consumer map](../specs/V3_DIARIES.md). No new playable
 imports or cartridge completion is claimed. Planned format-eleven saves require
 this or a newer compatible build; ABI 308 remains format nine, both deployments

@@ -14,6 +14,11 @@ from aflib import sha256
 from v3_furniture_pipeline import Source
 from v3_diary_screen import prepare,source_tables,provenance,draw_header
 from v3_ui_art import Packet,validate_state
+from v3_furniture_install import inputs
+from aflib import by_vrom
+from npc_mail_show import relocate_verified_data
+from catalogue_names import Image
+from editor_pixel_fix import flat_rows
 
 
 class DiaryScreenTests(unittest.TestCase):
@@ -96,6 +101,55 @@ class DiaryScreenTests(unittest.TestCase):
             run=subprocess.run([str(binary)],capture_output=True,text=True,timeout=30)
             self.assertEqual(run.returncode,0,run.stdout+run.stderr)
             print(run.stdout.strip())
+
+    def test_connected_screen_ownership_under_sanitizers(self):
+        with tempfile.TemporaryDirectory(prefix='v3-diary-screen-') as tmp:
+            binary=Path(tmp)/'check'
+            compile=subprocess.run(['cc','-std=c11','-O1','-g','-Wall','-Wextra','-Werror',
+                '-fno-pie','-no-pie','-fsanitize=address,undefined','-fno-omit-frame-pointer',
+                'tests/v3_diary_screen_test.c','overlays/v3/diary_screen.c','overlays/v3/diary_hboard.c',
+                'overlays/v3/diary_editor.c','overlays/v3/diary_menu.c',
+                'overlays/v3/diary_calendar.c','overlays/v3/diary.c','-o',str(binary)],
+                cwd=ROOT,capture_output=True,text=True,timeout=30)
+            self.assertEqual(compile.returncode,0,compile.stdout+compile.stderr)
+            run=subprocess.run([str(binary)],capture_output=True,text=True,timeout=30)
+            self.assertEqual(run.returncode,0,run.stdout+run.stderr)
+            print(run.stdout.strip())
+
+    def test_prepared_native_owner_and_keyboard_hooks(self):
+        output=ROOT/'build/v3-diary-category-work-01/ui-04'
+        report=json.loads((output/'ui.json').read_bytes())
+        base,prior=inputs(ROOT/'build/v3-native-variants-work-01/connected-02/cartridge/build-lock.json')
+        self.assertEqual(report['base_rom_sha256'],sha256(base))
+        self.assertEqual(report['base_runtime_abi'],prior['runtime_abi'])
+        self.assertFalse(report['installed']);self.assertFalse(report['native_execution_tested'])
+        for path,digest in report['sources'].items():self.assertEqual(sha256((ROOT/path).read_bytes()),digest,path)
+        code=(output/'resident/code.bin').read_bytes()
+        self.assertEqual(sha256(code),report['compiled']['sha256'])
+        self.assertLess(report['compiled']['state_bytes'],4096-16)
+        self.assertEqual(report['hooks']['additional_pool_bytes'],1600)
+        files=by_vrom(base)
+        for name,row in report['hooks']['menus'].items():
+            data=(output/name/'prepared.bin').read_bytes()
+            rel=(output/name/'relocation.bin').read_bytes()
+            old=files[row['vrom']].extract(base);old_rel=files[row['reloc']].extract(base)
+            self.assertEqual(sha256(data),row['overlay_sha256'])
+            self.assertEqual(sha256(rel),row['relocation_sha256'])
+            allowed=set(row['touched_offsets']);ram=row['ram']
+            expected=({0x808830C8,0x808830D0} if name=='hboard' else {0x80888484,0x8088883C})
+            self.assertEqual(allowed,{address-ram+i for address in expected for i in range(4)})
+            for address in (0x80200010,0x80370010):
+                a=relocate_verified_data(Image(ram,len(old),struct.unpack_from('>5I',old_rel)),old,old_rel,address)
+                b=relocate_verified_data(Image(ram,len(data),struct.unpack_from('>5I',rel)),data,rel,address)
+                self.assertTrue(all(a[i]==b[i] for i in range(len(a)) if i not in allowed))
+            if name=='keyboard':
+                at=0x8088883C-ram
+                self.assertEqual(struct.unpack_from('>I',data,at)[0],ram+row['symbols']['af_diary_editor_update'])
+                self.assertIn(0x42000000|at,flat_rows(rel,len(data)))
+                self.assertEqual(row['imports']['af_diary_keyboard_exchange'],0x8088A8FC)
+            else:
+                self.assertEqual(row['owner_after'][5],ram+row['symbols']['af_diary_hboard_destruct'])
+                self.assertEqual(row['owner_after'][6],ram+row['symbols']['af_diary_hboard_proc'])
 
 
 if __name__=='__main__':unittest.main()

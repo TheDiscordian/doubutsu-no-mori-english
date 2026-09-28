@@ -13,7 +13,6 @@ static struct af_hboard_native_editor editor;
 struct af_grid_context af_grid_context;
 static void *session_arg,*input_arg;
 static unsigned int initialized,updated,feedback,finished,rejected,command,code;
-static int exchange;
 #define WORD(p,o) (*(unsigned int *)((unsigned char *)(p)+(o)))
 static void *native_menu(void) {return ovl+0x10358;}
 void *af_diary_editor_test_pointer(void *p,unsigned int at) {
@@ -40,13 +39,18 @@ void af_diary_keyboard_init(void *s,void *m) {
 }
 void af_diary_keyboard_update(void *s,void *m) {(void)s;(void)m;updated++;}
 void af_diary_keyboard_input(void *s) {
-    assert(s==sub);editor.command=command;editor.code=code;editor.exchange=exchange;
+    assert(s==sub);editor.command=command;editor.code=code;
+}
+int af_diary_keyboard_exchange(struct af_hboard_native_editor *ed) {
+    if(!ed->index)return -1;
+    int ch=ed->input[ed->index-1];
+    return ch>='a' && ch<='z'?ch-32:ch>='A' && ch<='Z'?ch+32:-1;
 }
 void af_diary_keyboard_feedback(void *s) {assert(s==sub);feedback++;}
 void af_diary_keyboard_done(void *s,void *m) {assert(s==sub && m==native_menu());finished++;}
 void af_diary_keyboard_sound(unsigned int id) {assert(id==0x1003);rejected++;}
 static void key(unsigned int c,int ch) {
-    command=c;code=ch;exchange=ch;
+    command=c;code=ch;
     af_diary_editor_update(sub,native_menu());
 }
 int main(void) {
@@ -70,8 +74,10 @@ int main(void) {
     assert(af_diary_editor_active(sub) && WORD(m,0x38)==6 && WORD(m,0x3C)==992 && session_arg==&owned);
     assert(editor.rows==31 && editor.columns==32 && editor.length==0 && editor.index==0);
     key(0,0);assert(!feedback && !rejected);
+    assert(*(short *)(void *)(editor.prefix+0xC)==1);
     key(8,'W');key(8,'i');key(8,'i');key(8,0xCD);key(8,'a');
     assert(menu.draft.length==5 && editor.row==1 && editor.column==1 && editor.index==5);
+    assert(editor.exchange=='A' && !*(short *)(void *)(editor.prefix+0xC));
     key(7,'A');assert(menu.draft.text[4]=='A');
     key(1,0);assert(editor.index==4 && !editor.column);
     key(4,0);key(4,0);assert(menu.draft.length==6 && menu.draft.text[5]==' ' && editor.command==8);

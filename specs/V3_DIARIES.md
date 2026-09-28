@@ -84,9 +84,9 @@ or unfinished hook is installed in the cartridge.
   shows an explicitly project-authored warning and returns to the intact draft.
   Changed/corrupt source data returns to the calendar instead of overwriting it.
 
-Native drawing functions and the full-page keyboard adapter are implemented and
-compile for VR4300. Submenu ownership, source transitions, sound/lifecycle
-bindings, and installation remain adapter work. Eight official prompt strings
+Native drawing, full-page keyboard handling, submenu ownership, transitions, and
+sound/lifecycle adapters are implemented and linked for VR4300. Native date/event
+bindings and installation remain unfinished. Eight official prompt strings
 and three project-authored error strings are
 credited in `translations/provenance.json` under `v3/diary/`; preparation verifies
 each source location and encoded text. Month/day artwork and event labels remain
@@ -117,10 +117,13 @@ furniture defaults and its stricter material rules stay unchanged.
 warning draw paths with the converted packet. It preserves source matrices,
 colours, selection geometry, and prompt text. Graphics-space checks precede drawing;
 the source packet's segment binding is restored before returning. The native owner
-must provide the real projection/animation positions and actual event labels/day
-types. It must also connect the keyboard's cursor drawing; these functions are not
-an installed or visually verified screen. The compiled largest local frame is
-288 bytes; engine callees and the menu-thread stack remain installation checks.
+provides projection/animation positions; actual event labels/day types remain a
+required native provider. Paper and text use the same absolute scrolling offset,
+including during transitions. Native cursor/end-marker callbacks use proportional
+positions and explicitly bind the keyboard's marker assets before drawing. These
+functions are not an installed or visually verified screen. The compiled largest
+draw frame is 304 bytes; engine callees and actual stack high-water use remain
+installation checks.
 
 `diary_editor.c` adds mode six around the accepted English keyboard. Mode four
 initializes a bounded caller buffer before the adapter restores all 992 characters,
@@ -128,10 +131,55 @@ initializes a bounded caller buffer before the adapter restores all 992 characte
 five-entry handler tables. Existing modes pass to the previous implementation.
 Case/page/repeat/feedback input remains the accepted keyboard's implementation;
 diary commands, including Done, go to the shared transactional controller.
-Done opens confirmation without saving; Rewrite retains the draft. The owner
+Done opens confirmation without saving; Rewrite retains the draft. The adapter
+preserves the native twenty-update cursor blink and recomputes the accepted
+character-alteration mapping after successful commands. The owner
 passes an explicit resident session through editor `data3`, with matching submenu,
 owner, and input-buffer checks. Its native init/update hooks remain uninstalled.
 The largest compiled adapter frame is 240 bytes, before its diary callees.
+
+### Native ownership and prepared hooks
+
+`diary_screen.c` owns an explicit `AFDY` mode of native HBOARD program two.
+Its resident state retains the menu, draft, view animation, access provider, and
+keyboard session. Calendar/read/finish/privacy views share this owner; editor
+program ten, mode six, is a genuine native child. The child's pre-move/pre-draw
+callbacks keep the paper active, while all input belongs to the child until
+native return restores the diary owner. An A press is consumed once across the
+two donor animation steps per native menu update. Prompt answers require their
+initial reveal; Rewrite does not commit or reconstruct the draft. Read-only and
+locked access, capacity rejection, native end/return, and invalid-session closure
+retain explicit handling. Ordinary house-message mode uses the original native
+constructor, dispatch, and destructor.
+
+`tools/v3_diary_ui.py` links the owner/drawing code and prepares additive hooks
+against the checked current cartridge. Output is
+`build/v3-diary-category-work-01/ui-04/`: 12,496 code bytes, SHA-256
+`3066fc1fe6ee8588c4f43db37b73422c9db2f7079a62f77bdd58a7c39f59bc0d`,
+and 2,240 bytes of screen state. Planned code/state/art reservations start at
+`806A0000`, `806A8000`, and `806B0000`; each has a guard and is checked against
+existing reservations plus the prepared diary save workspace. No mutable state
+is hidden in the linked code packet.
+
+The prepared HBOARD overlay is 2,304 bytes and the keyboard is 39,936 bytes.
+Together they require 1,600 additional aligned menu-arena bytes. The current
+arena term is `8089A860`, not an older keyboard build's bound; the proposed term
+is `8089AEA0`. The accepted keyboard lives at VROM `03E70000`, with relocation
+`03E80000`. The builder preserves its complete previous prefix, including accepted
+graphics, changing only the init call and PLAY dispatch entry. HBOARD changes
+only its constructor's init/set-proc calls; prepared owner metadata also replaces
+set-proc and destructor so native child return cannot restore house-message
+handling. Complete retained-prefix checks pass at two real relocation bases.
+Installation must reserve DMA storage and apply owner/arena updates together;
+these prepared overlays are not installed in ABI 308.
+
+Native call inspection confirms the keyboard's once-only resource initializer
+does not index the mode table. Its drawing calls the parent's draw callback and
+the accepted grid renderer; its PLAY dispatcher is the replaced entry. The
+adapter retains blink advancement and the actual character-alteration reader
+without entering native mode-six command tables. The N64 graph-thread stack is
+`1800` hex bytes (`sys_stacks.h`/`sys_stacks.c`); the complete dynamic call path
+and runtime high-water margin are not yet verified.
 
 The screen builder can reuse a prepared packet when current complete resources,
 generated commands, source identities, and every compiled section agree. Metadata
@@ -223,16 +271,17 @@ The prepared packet has no mutable globals or unresolved symbols.
 | --- | --- |
 | Category identity/data | All sixteen donor IDs, names, prices, and aliases bound; additive native identity/readers still required |
 | Carried/collection artwork | Shared carried model converted with the general split material/geometry converter; reuse cover conversions and install correct room/collection contexts |
-| Calendar entry | Surface A-tap adapter, house-owner resolution, controller/markers, privacy, and native drawing implemented in source; native menu ownership/opening, event/date callers, and installation remain |
-| Reading/editing | Full controller, access rules, wrapping, scrolling, atomic page/privacy commit, native drawing, and keyboard adapter implemented; view ownership, cursor/overlay hooks, and source transitions remain |
+| Calendar entry | Surface A-tap adapter, house-owner resolution, controller/markers, privacy, native drawing, and owned native menu linked; actual room entry, event/date callers, and installation remain |
+| Reading/editing | Controller, ownership, wrapping/scrolling, cursor, keyboard child, confirmation/privacy, transitions, and atomic commit linked; overlay/DMA/arena installation and native execution remain |
 | English UI | Official prompts, project errors, and all screen textures extracted/credited/checked; actual native event labels remain in screen integration |
 | Persistence | Shared reset, clear, probe, pack, commit, forward migration, and preflight implemented/tested on host; startup loading and stable native dispatch still need installation |
 | Selection | Bind carried/display profile dependencies, catalogue/scoring, and independent/all choices only after the complete path is connected |
 | Verification | Run bounded combined current-ROM UI/save checks after integration; no separate style-by-style native scenarios |
 
-Resume this same connected category at the owned HBOARD-mode constructor/move/
-draw/destructor, source transitions, and native editor hooks. Reuse the prepared
-core, screen packet, and source catalogue, and
+Resume this same connected category at the real native date/event provider and
+room-entry binding, followed by resident/startup/save dispatch, prepared menu-hook
+installation, carried readers, and selection. Reuse the prepared
+core, screen packet, linked UI, and source catalogue, and
 retain passing save evidence unless those paths change. Do not redirect to
 acquisition, gold-tree work, or replay exhausted creature/console fixtures.
 
@@ -270,3 +319,9 @@ owner/read-only/locked access, month/day/event navigation, confirmation/privacy,
 and rejected edits. Native interaction fallbacks, vacant houses, failed menu
 opening, and disabled styles are included. The room adapter also compiles as a
 VR4300 object; its installed native execution is not claimed.
+
+Three focused UI checks cover the complete host menu/keyboard interaction,
+accepted/rejected commit and draft retention, first-A answer reveal, native child
+return, ordinary HBOARD fallback, read-only/locked access, invalid-session closure,
+and retained-prefix/relocation checks on both prepared native overlays. Host
+callbacks model menu lifecycle; they do not execute the game or verify pixels.

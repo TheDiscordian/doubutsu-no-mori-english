@@ -21,6 +21,7 @@ extern void af_diary_keyboard_init(void *,void *);
 extern void af_diary_keyboard_update(void *,void *);
 extern void af_diary_keyboard_input(void *);
 extern void af_diary_keyboard_feedback(void *);
+extern int af_diary_keyboard_exchange(struct af_hboard_native_editor *);
 extern void af_diary_keyboard_done(void *,void *);
 extern void af_diary_keyboard_sound(unsigned int);
 #ifndef __mips__

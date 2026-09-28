@@ -38,14 +38,16 @@ furniture fallback. It is not installed. The shared carried model is converted;
 official prompts and project safety messages have catalogue provenance.
 The complete shared screen packet is converted at
 `build/v3-diary-category-work-01/screen-04/`, with the donor month/day artwork,
-paper, controls, and confirmation/privacy graphics. Native drawing functions and
-the full-page keyboard adapter compile for VR4300; neither is installed.
-Resume at the owned HBOARD-mode constructor/move/draw/destructor and its editor
-overlay hooks, preserving the source transitions and actual native date/event
-providers. Follow the [connected consumer map](../specs/V3_DIARIES.md#connected-consumer-map).
+paper, controls, and confirmation/privacy graphics. The shared native menu owner,
+page/keyboard/confirmation transitions, drawing, and keyboard hooks are linked at
+`build/v3-diary-category-work-01/ui-04/`. The ordinary house-message fallback and
+the accepted keyboard's complete graphics/input prefix are preserved. These
+packets are not installed. Resume at the real native date/event provider and
+room-entry binding, then connect resident startup/save dispatch, carried readers,
+and selection. Follow the [connected consumer map](../specs/V3_DIARIES.md#connected-consumer-map).
 Carried identity/readers, live date/event callers, resident loading/dispatch, and
 selection remain required in this same category. Reuse the prepared core, screen
-packet, and passing save checks; do not restart source discovery or call covers playable.
+packet, linked UI, and passing save checks; do not restart source discovery or call covers playable.
 
 The room-representation review identifies sixteen player-saved design forms and
 nine museum fossil placeholders. Custom designs require a design editor and

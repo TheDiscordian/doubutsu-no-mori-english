@@ -56,7 +56,7 @@ static int sync(AFDiaryEditorSession *s,struct af_hboard_native_editor *ed) {
     int result=af_diary_layout(d->text,d->length,d->cursor,s->access->widths,&layout);
     if(result!=AF_DIARY_OK)return result;
     ed->columns=32;ed->rows=AF_DIARY_ROWS;ed->length=d->length;ed->index=d->cursor;
-    ed->column=layout.cursor.column;ed->row=layout.cursor.row;ed->exchange=-1;
+    ed->column=layout.cursor.column;ed->row=layout.cursor.row;
     /* Reopening Rewrite preserves the draft/cursor and reveals its actual
      * proportional row; reading's scroll is not used as a byte offset. */
     if(layout.cursor.row<d->scroll)d->scroll=layout.cursor.row;
@@ -83,6 +83,10 @@ void af_diary_editor_init(void *submenu,void *menu) {
     }
     int result=sync(s,af_grid_context.editor);
     if(result<0) {s->menu->error=result;s->menu->state=AF_DIARY_ERROR;}
+    else {
+        af_grid_context.editor->exchange=af_diary_keyboard_exchange(af_grid_context.editor);
+        *(short *)(void *)(af_grid_context.editor->prefix+0xC)=0;
+    }
 }
 
 void af_diary_editor_update(void *submenu,void *menu) {
@@ -94,7 +98,10 @@ void af_diary_editor_update(void *submenu,void *menu) {
     if(!af_diary_editor_active(submenu) || af_grid_context.menu!=menu)return;
     s=session(submenu,menu);ed=af_grid_context.editor;ed->processed=0;
     if(s->menu->state!=AF_DIARY_EDIT || s->menu->error<0)return;
+    short *blink=(short *)(void *)(ed->prefix+0xC);
+    *blink=(*blink+1)%20;
     af_grid_editor_prepare(submenu);
+    if(ed->animation)ed->animation--;
     af_diary_keyboard_input(submenu); /* existing repeat, case, page, and sounds */
     command=ed->command;
     if(!command)return;
@@ -109,6 +116,8 @@ void af_diary_editor_update(void *submenu,void *menu) {
             ed->command=8;ed->code=command==4?' ':0xCD;
         }
         af_diary_keyboard_feedback(submenu);
+        ed->exchange=af_diary_keyboard_exchange(ed);
+        if(command<=4 || command==6 || command==8)*blink=0;
         if(command==5)af_diary_keyboard_done(submenu,menu);
     } else if(result<0)af_diary_keyboard_sound(0x1003);
 }

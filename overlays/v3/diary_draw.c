@@ -39,6 +39,7 @@ static int valid(const AFDiaryDraw *d) {
     return d && d->art && !((unsigned int)d->art&15) && d->x>=-320 && d->x<=320 &&
         d->y>=-480 && d->y<=480 && d->scale>=0 && d->scale<=1 &&
         d->answer_scale>=0 && d->answer_scale<=1 && d->alpha<=255 &&
+        d->control_y>=-300 && d->control_y<=300 &&
         d->arrow_x>=-320 && d->arrow_x<=320 &&
         d->event_length<=48 && (!d->event_length || d->event_label);
 }
@@ -119,8 +120,11 @@ int af_diary_draw_page(void *submenu,void *game,const AFDiaryMenu *m,const unsig
     AFDiaryLayout layout;
     if(!submenu || !PTR(submenu,0x2C) || !game || !valid(d) || !m || m->draft.month>=12 ||
        af_diary_layout(m->draft.text,m->draft.length,m->draft.cursor,widths,&layout)!=AF_DIARY_OK)return AF_DIARY_ARGUMENT;
-    unsigned int start=m->draft.scroll,n=0;
-    for(unsigned int i=start;i<layout.rows && i<start+AF_DIARY_VISIBLE;i++)n+=layout.lines[i].length;
+    unsigned int n=0;
+    for(unsigned int i=0;i<layout.rows;i++) {
+        float y=64-d->y+16*i;
+        if(y>=-12 && y<228)n+=layout.lines[i].length;
+    }
     void *g=PTR(game,0);if(!g || !room(g,5000+n*256))return AF_DIARY_FULL;
     unsigned int saved=*(unsigned int *)0x801458B8u;
     push();segment(g,d->art);position(g,d->x,d->y,1);dl(g,ART_dia_init_mode_letter);
@@ -128,13 +132,37 @@ int af_diary_draw_page(void *submenu,void *game,const AFDiaryMenu *m,const unsig
     push();translate(diary_month_adjust[m->draft.month],0,0);matrix(g);dl(g,ART_dia_win_moji_model);pop();
     translate(0,-194,0);matrix(g);dl(g,ART_dia_win2_wT_model);dl(g,ART_dia_win2_fusenT_model);
     translate(0,-164,0);matrix(g);dl(g,ART_dia_win3_wT_model);dl(g,ART_dia_win3_fusenT_model);
+    if(d->read_controls) {
+        position(g,d->x,d->control_y,1);dl(g,ART_dia_init_mode);
+        dl(g,ART_diary_read_button);dl(g,ART_diary_read_label);
+        dl(g,ART_dia_win_bb_model);dl(g,ART_dia_win_mojiT_model);
+    }
     pop();segment(g,(void *)saved);
     static const unsigned char ink[]={60,60,85};
-    for(unsigned int i=start;i<layout.rows && i<start+AF_DIARY_VISIBLE;i++) {
+    for(unsigned int i=0;i<layout.rows;i++) {
+        float y=64-d->y+16*i;
+        if(y<-12 || y>=228)continue;
         AFDiaryLine *line=&layout.lines[i];unsigned int length=line->length;
         const unsigned char *text=m->draft.text+line->start;
         if(length && text[length-1]==0xCD)length--;
-        if(length)font(submenu,g,game,text,length,64+d->x,64-d->y+16*(i-start),ink,1);
+        if(length)font(submenu,g,game,text,length,64+d->x,y,ink,1);
+    }
+    if(d->editing) {
+        unsigned char *o=PTR(submenu,0x2C),*menu=o+0x10358;
+        struct af_hboard_native_editor *ed=PTR(o,0x106E0);
+        if(!ed || ed->input!=m->draft.text || *(unsigned int *)(menu+0x38)!=6 ||
+           !ed->cursor_draw || !ed->end_draw)return AF_DIARY_ARGUMENT;
+        /* Parent drawing precedes the keyboard. Bind its actual marker assets
+         * here instead of relying on whatever segment twelve held last frame. */
+        unsigned int previous=*(unsigned int *)0x801458D0u;
+        unsigned int art=(unsigned int)PTR(menu,0x28)&0x1FFFFFFFu;
+        *(unsigned int *)0x801458D0u=art;
+        Gfx *p=PTR(g,0x298);gSPSegment(p++,12,art);PTR(g,0x298)=p;
+        ((struct af_hboard_matrix_pointer *)(o+0x106B4))->function(g);
+        ed->cursor_draw(submenu,game,64+d->x+layout.cursor.x-7,64-d->y+16*layout.cursor.row);
+        ed->end_draw(submenu,game,64+d->x+layout.end.x+1-160,120-(64-d->y+16*layout.end.row));
+        *(unsigned int *)0x801458D0u=previous;
+        p=PTR(g,0x298);gSPSegment(p++,12,previous&0x1FFFFFFFu);PTR(g,0x298)=p;
     }
     return AF_DIARY_OK;
 }
@@ -145,41 +173,43 @@ int af_diary_draw_prompt(void *submenu,void *game,const AFDiaryMenu *m,const AFD
     unsigned int saved=*(unsigned int *)0x801458B8u;
     static const unsigned char red[]={95,20,20},selected[]={30,30,215},faded[]={110,110,140};
     push();segment(g,d->art);
-    if(m->state==AF_DIARY_CONFIRM) {
+    unsigned int state=d->prompt_state?d->prompt_state:m->state;
+    if(state==AF_DIARY_CONFIRM) {
         static const unsigned char blue[]={80,80,230};
-        position(g,d->x,d->y,1);dl(g,ART_lat_kakunin_DL_mode);dl(g,ART_lat_kakunin_wakuT_model);
+        float y=d->y-300*(1-d->scale);
+        position(g,d->x,y,1);dl(g,ART_lat_kakunin_DL_mode);dl(g,ART_lat_kakunin_wakuT_model);
         colour(g,blue,0,d->alpha);dl(g,ART_lat_kakunin_c_model);
         if(d->answers_visible) {
-            position(g,d->x+65,d->y-74,1);
+            position(g,d->x+65,y-74,1);
             CALL(0x800E041Cu,void,float,float,float,int)(d->answer_scale,d->answer_scale,1,1);
             matrix(g);dl(g,ART_lat_kakunin_DL_mode);dl(g,ART_lat_sentaku2_winT_model);
-            if(d->answer_scale==1) {position(g,d->x+65,d->y-74-16*m->choice,1);dl(g,ART_lat_sentaku2_c_model);}
+            if(d->answer_scale==1) {position(g,d->x+65,y-74-16*m->choice,1);dl(g,ART_lat_sentaku2_c_model);}
         }
         pop();segment(g,(void *)saved);
-        font(submenu,g,game,diary_text_finish_question,sizeof(diary_text_finish_question),107+d->x,194-d->y,blue,1);
+        font(submenu,g,game,diary_text_finish_question,sizeof(diary_text_finish_question),107+d->x,194-y,blue,1);
         if(d->answers_visible) {
-            float x=225+d->x-45*d->answer_scale,y=194-d->y-43*d->answer_scale;
-            font(submenu,g,game,diary_text_finish_yes,sizeof(diary_text_finish_yes),x,y,m->choice?faded:selected,d->answer_scale);
-            font(submenu,g,game,diary_text_finish_rewrite,sizeof(diary_text_finish_rewrite),x,y+16*d->answer_scale,m->choice?selected:faded,d->answer_scale);
+            float x=225+d->x-45*d->answer_scale,text_y=194-y-43*d->answer_scale;
+            font(submenu,g,game,diary_text_finish_yes,sizeof(diary_text_finish_yes),x,text_y,m->choice?faded:selected,d->answer_scale);
+            font(submenu,g,game,diary_text_finish_rewrite,sizeof(diary_text_finish_rewrite),x,text_y+16*d->answer_scale,m->choice?selected:faded,d->answer_scale);
         }
         return AF_DIARY_OK;
     }
     position(g,d->x,d->y,d->scale);
     Gfx *p=PTR(g,0x298);gDPSetBlendColor(p++,255,255,255,40);PTR(g,0x298)=p;
     dl(g,ART_dia_att_winT_model);
-    if(m->state==AF_DIARY_PRIVACY) {
+    if(state==AF_DIARY_PRIVACY) {
         translate(m->choice?19:-19,-29,0);matrix(g);dl(g,ART_dia_att_cursor_model);
     }
     pop();segment(g,(void *)saved);
     float s=d->scale,x=160+d->x-112*s,y=120-d->y-56*s;
-    if(m->state==AF_DIARY_PRIVACY) {
+    if(state==AF_DIARY_PRIVACY) {
         font(submenu,g,game,diary_text_privacy_question_1,sizeof(diary_text_privacy_question_1),x+54*s,y+28*s,red,s);
         font(submenu,g,game,diary_text_privacy_question_2,sizeof(diary_text_privacy_question_2),x+30*s,y+52*s,red,s);
         font(submenu,g,game,diary_text_privacy_yes,sizeof(diary_text_privacy_yes),x+94*s,y+76*s,m->choice?faded:selected,s);
         font(submenu,g,game,diary_text_privacy_no,sizeof(diary_text_privacy_no),x+133*s,y+76*s,m->choice?selected:faded,s);
     } else {
         const unsigned char *text=diary_text_invalid;unsigned int n=sizeof(diary_text_invalid);
-        if(m->state==AF_DIARY_WARNING) {text=diary_text_locked;n=sizeof(diary_text_locked);}
+        if(state==AF_DIARY_WARNING) {text=diary_text_locked;n=sizeof(diary_text_locked);}
         else if(m->error==AF_DIARY_CAPACITY) {text=diary_text_capacity;n=sizeof(diary_text_capacity);}
         else if(m->error==AF_DIARY_CHANGED) {text=diary_text_changed;n=sizeof(diary_text_changed);}
         for(unsigned int first=0,i=0;i<=n;i++)if(i==n || text[i]==0xCD) {
