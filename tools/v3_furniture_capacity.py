@@ -79,6 +79,20 @@ def checked(base, report):
                 or (word^(word+extra))&0xFFFF8000):
             raise ValueError('Broken category submenu allocation binding')
         word += extra
+    diary = report.get('equipment_resources', {}).get('diaries')
+    if diary:
+        hooks = diary['hooks']; bound = hooks['pool_bound']
+        patches = {p['address']: p for p in hooks['arena_patches']}
+        core = files[CODE_VROM].extract(base)
+        if (set(patches) != {0x800C4AFC, POOL_WORD} or
+                int(patches[POOL_WORD]['before'], 16) != word or
+                bound-hooks['previous_pool_bound'] != hooks['additional_pool_bytes'] or
+                hooks['additional_pool_bytes'] <= 0 or
+                int(patches[POOL_WORD]['after'], 16) != 0x25CE0000|(bound & 0xFFFF) or
+                int(patches[0x800C4AFC]['after'], 16) != 0x3C0E0000|((bound+0x8000)>>16) or
+                any(u32(core, a-CODE_RAM) != int(p['after'], 16) for a,p in patches.items())):
+            raise ValueError('Broken diary submenu allocation binding')
+        word = int(patches[POOL_WORD]['after'], 16)
     if u32(files[CODE_VROM].extract(base), POOL_WORD-CODE_RAM) != word:
         raise ValueError('Model previews lack their complete submenu allocation')
     hook = pool['hook']

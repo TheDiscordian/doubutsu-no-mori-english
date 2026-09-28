@@ -1,5 +1,6 @@
 /* GAFE01 surface interaction, preserving the native N64 hold/move controller. */
 #include "diary_room.h"
+#include "diary_items.h"
 
 int af_diary_on_surface(const RoomRig *actor,const u16 *fg,const u8 *layers,
     u32 capacity,u16 selected,const float player[3]) {
@@ -8,7 +9,8 @@ int af_diary_on_surface(const RoomRig *actor,const u16 *fg,const u8 *layers,
     int cells[4],count=af_v3_room_carry_cells(cells,actor->position,actor->shape_type);
     for(int i=0;i<count;i++) {
         u16 item=fg[cells[i]];
-        if(item<0x2B00 || item>0x2B0F || !(selected&(1u<<(item-0x2B00))))continue;
+        if(item<AF_DIARY_ITEM_FIRST || item>=AF_DIARY_ITEM_FIRST+AF_DIARY_ITEM_COUNT ||
+           !(selected&(1u<<(item-AF_DIARY_ITEM_FIRST))))continue;
         float dx=(cells[i]&15)*40.0f+20.0f-player[0];
         float dz=(cells[i]>>4)*40.0f+20.0f-player[2];
         /* Donor uses OR: the player stands beside one edge, not inside a 12px

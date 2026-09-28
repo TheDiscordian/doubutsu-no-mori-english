@@ -281,6 +281,14 @@ def publish_bootstrap(equipment,blob,surface,output):
             prefix='AF_DIARY_'+name.upper()
             extra+=tuple(f'{prefix}_{label}=0x{p[key]:X}u' for label,key in
                 (('PHYSICAL','physical'),('CRC','crc32'),('BYTES','bytes'),('RAM','ram')))
+    diary_items=equipment.get('diary_items')
+    if diary_items:
+        p=diary_items['packet']
+        if (not diaries or p['ram']!=0x806E0000 or p['bytes']!=0x4000 or p['physical']&15 or
+                p['storage']!='physical-ROM' or not 0x100000<=p['physical']<p['physical']+p['bytes']<=0x4000000):
+            raise ValueError('Changed complete diary item startup packet')
+        extra+=tuple(f'AF_DIARY_ITEMS_{label}=0x{p[key]:X}u' for label,key in
+            (('PHYSICAL','physical'),('CRC','crc32'),('BYTES','bytes'),('RAM','ram')))
     boot,compiled=compile_part('surface_bootstrap',output/'goods_surface_bootstrap',defines=(
         'AF_V3_EDITABLE_CHECKSUMS=1',f'AF_SURFACE_ITEMS_VROM=0x{items["vrom"]:X}u',
         f'AF_SURFACE_ITEMS_CRC=0x{items["crc32"]:X}u',f'AF_SURFACE_ITEMS_BYTES=0x{items["bytes"]:X}u',

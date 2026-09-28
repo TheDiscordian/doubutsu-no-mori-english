@@ -6,12 +6,12 @@
 Ground af_test_ground_config[4];
 u8 af_test_ground_mapping[53], *af_test_ground_owners[4];
 u32 af_test_ground_materials[71], af_test_ground_geometry[71];
-static u32 storage[4][0x1000], calls;
+static u32 storage[4][0x6000], calls;
 void af_test_ground_constructor(void *actor, void *game, u32 variant) {
     assert(actor==(void *)1 && game==(void *)2 && variant<4); ++calls;
 }
 int main(void) {
-    const u8 sources[]={19,33,37,38,39,40,41,42,43};
+    const u8 sources[]={17,19,33,37,38,39,40,41,42,43};
     for (u32 i=0;i<sizeof(sources);i++) {
         u32 category=27+sources[i];mapping[sources[i]]=category;
         materials[category]=0x4AA600+816*i+608;
@@ -21,7 +21,7 @@ int main(void) {
     for (u32 variant=0;variant<4;variant++) {
         u32 native=variant==1?63:64,total=native+44;
         Ground *r=config+variant;
-        *r=(Ground){0,0,16,native,total,0x400,0x400+total*8+32,0x300,native-27};
+        *r=(Ground){0,0,16,native,total,0x400,0x13000,0x300,native-27};
         u8 *owner=(u8 *)storage[variant];af_test_ground_owners[variant]=owner;
         memset(owner,0xA5,sizeof(storage[variant]));
         u32 *old=(u32 *)(owner+16);
@@ -47,8 +47,11 @@ int main(void) {
             assert(part[12]==(u32)(uptr)(part+10));
         }
         assert(storage[variant][0]==0xA5A5A5A5 && part[0]==0xA5A5A5A5);
+        /* Appended descriptors may lie above 64 KiB. Retained scenery between
+         * the category table and the new bank must remain untouched. */
+        for(u32 i=0x800;i<r->parts-32;i++)assert(owner[i]==0xA5);
         /* A reloaded owner rebuilds pointers from its new address. */
-        u32 moved[0x1000];memcpy(moved,storage[variant],sizeof(moved));
+        u32 moved[0x6000];memcpy(moved,storage[variant],sizeof(moved));
         af_test_ground_owners[variant]=(u8 *)moved;
         assert(af_v3_ground_prepare(variant)==(u8 *)moved);
         assert(*(u32 *)((u8 *)moved+r->parts)==(u32)(uptr)((u8 *)moved+r->parts+32));

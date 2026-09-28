@@ -30,7 +30,7 @@ SOURCES=('tools/v3_diary_ui.py','overlays/v3/diary_screen.c','overlays/v3/diary_
     'overlays/v3/diary_editor.h','overlays/v3/diary_hboard.c',
     'tools/v3_diary_events.py','overlays/v3/diary_events.c','overlays/v3/diary_events.h',
     'overlays/v3/diary_native.c','overlays/v3/diary_native.h',
-    'overlays/v3/diary_room.c','overlays/v3/diary_room.h')
+    'overlays/v3/diary_room.c','overlays/v3/diary_room.h','overlays/v3/diary_items.h')
 
 
 def resident(out,prepared,screen,base,prior):

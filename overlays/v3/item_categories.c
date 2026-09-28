@@ -24,6 +24,16 @@ extern int af_test_category_selected(u32), af_test_category_original(u32);
 
 int af_v3_equipment_category(u32 argument) {
     u32 item=(u16)argument, index=item-0x2224u;
+#ifdef AF_V3_DIARY_CATEGORY_QUERY
+    if(item-0x2B10u<16u) {
+#ifdef __mips__
+        return ((int (*)(u32))AF_V3_DIARY_CATEGORY_QUERY)(item);
+#else
+        extern int af_diary_item_type(u32);
+        return af_diary_item_type(item);
+#endif
+    }
+#endif
 #ifdef AF_V3_PRESENT_DECODE
     if (item-0x251Fu<4u) {
 #ifdef __mips__

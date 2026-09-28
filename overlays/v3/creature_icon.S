@@ -3,9 +3,22 @@
 .set noat
 .set gp=64
 .text
-.globl af_v3_creature_icon_hook
-.type af_v3_creature_icon_hook,@function
-af_v3_creature_icon_hook:
+#ifdef AF_DIARY_ICON
+#define ICON_HOOK af_diary_icon_hook
+#define ICON_QUERY af_diary_item_icon
+#else
+#define ICON_HOOK af_v3_creature_icon_hook
+#define ICON_QUERY af_v3_creature_icon
+#endif
+.globl ICON_HOOK
+.type ICON_HOOK,@function
+ICON_HOOK:
+#ifdef AF_DIARY_ICON
+    addiu $t9,$s0,-0x2B10
+    sltiu $t9,$t9,16
+    beqz $t9,native
+    nop
+#else
     addiu $t9,$v1,-3
     beqz $t9,creature
     addiu $t9,$v1,-13
@@ -15,6 +28,7 @@ creature:
     sltiu $t9,$v0,32
     bnez $t9,native
     nop
+#endif
     addiu $sp,$sp,-256
     sd $at,16($sp)
     sd $v0,24($sp)
@@ -47,7 +61,7 @@ creature:
     sd $s7,232($sp)
     sd $gp,240($sp)
     sd $fp,248($sp)
-    jal af_v3_creature_icon
+    jal ICON_QUERY
     move $a0,$s0
     move $t9,$v0
     ld $t0,160($sp)
@@ -91,6 +105,10 @@ creature:
     jr $t9
     nop
 native:
+#ifdef AF_DIARY_ICON
+    j af_diary_prior_icon
+    nop
+#else
     lui $t9,0x8011
     lw $t9,-0x2314($t9)
     addiu $t9,$t9,0x29A0 /* Actual relocated item_tex_data_table, 8085E460. */
@@ -104,10 +122,11 @@ native:
     addiu $t9,$t9,0xEC0
     jr $t9
     nop
+#endif
 unavailable:
     lui $t9,0x8011
     lw $t9,-0x2314($t9)
     addiu $t9,$t9,0x1344 /* Native draw epilogue; never index past a table. */
     jr $t9
     nop
-.size af_v3_creature_icon_hook,.-af_v3_creature_icon_hook
+.size ICON_HOOK,.-ICON_HOOK

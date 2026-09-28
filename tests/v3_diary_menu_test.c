@@ -123,7 +123,7 @@ static void room_flow(void) {
     float position[3]={100,0,140};memcpy(player+0x28,position,sizeof(position));
     AFDiaryContact lo={1,0},hi={1,1};
     for(int i=0;i<16;i++) {
-        foreground[34]=0x2B00+i;
+        foreground[34]=0x2B10+i;
         assert(af_diary_room_tap(&af_test_carry_work,&lo,&hi,foreground,layers,
             af_test_carry_profiles,AF_V3_FURNITURE_CAPACITY,1u<<i,position)==1);
         assert(!af_diary_room_tap(&af_test_carry_work,&lo,&hi,foreground,layers,

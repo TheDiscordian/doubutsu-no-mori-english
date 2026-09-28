@@ -12,9 +12,9 @@ The calendar/reading/editing/storage controller and shared native-save adapter
 are implemented in source and compile for VR4300. Host checks cover room surface
 selection, calendar navigation, editing/privacy/capacity admission, and the
 save → probe → reload path. They do not establish in-game UI operation,
-native FlashRAM timing, ordinary gameplay, or hardware compatibility. ABI 309
-installs the menus, resident packets, room/visit hooks, and save dispatch at
-`build/v3-diary-category-work-01/connected-03/`. Neither patcher changes.
+native FlashRAM timing, ordinary gameplay, or hardware compatibility. ABI 310
+contains the menus, resident packets, room/visit hooks, save dispatch, and carried
+readers at `build/v3-diary-category-work-01/carried-03/`. Neither patcher changes.
 
 ## Donor contract
 
@@ -321,15 +321,15 @@ The packet has no mutable globals or unresolved symbols.
 `tools/v3_diary_install.py` is called by the existing shared runtime builder with
 the explicit `--diary-core`, `--diary-ui`, and `--diary-screen` preparations.
 It reuses the complete checked core, screen, and menu packets without reconversion.
-The current installed build is ABI 309, ROM SHA-256
-`e34f0aa348126344ca615cadb5102a8714993de5f55e4be29a52e5dbe8641909`,
-at `build/v3-diary-category-work-01/connected-03/`. Its build lock pins the report
+The current installed build is ABI 310, ROM SHA-256
+`9f2b847858e9852b1e67fa2888ae34f2ad4ffed0fb5dac44652a9887bddced15`,
+at `build/v3-diary-category-work-01/carried-03/`. Its build lock pins the report
 and cartridge; it is an implementation checkpoint, not a playtest release.
 
 Three physical-ROM resources load the 24,576-byte storage reservation, 36,864-byte
 UI/code/state reservation, and 144,256-byte artwork/guard packet. The shared
 startup retains all existing packets and checks every transfer and CRC before
-entering initialization. Fifteen descriptors and their loader fit in 576 of 688
+entering initialization. Sixteen descriptors and their loader fit in 600 of 688
 reserved bytes. Live diary state, compression workspace, and separate edit
 candidate have independent guards. Total added reserved RAM is 421,952 bytes,
 including code, artwork, state, scratch, and guards, below the framebuffer.
@@ -364,24 +364,22 @@ hardware evidence. No diary choices are enabled by this installation.
 
 | Consumer | Current implementation / remaining work |
 | --- | --- |
-| Category identity/data | All sixteen donor IDs, names, prices, and aliases bound; additive native identity/readers still required |
-| Carried/collection artwork | Shared carried model converted with the general split material/geometry converter; reuse cover conversions and install correct room/collection contexts |
-| Calendar entry | Surface A-tap, owner/player resolution, dates/events/birthdays, drawing, owned menu, and visit hook installed; carried-ID rebinding and actual participation callers remain |
+| Category identity/data | Fixed `2B10..2B1F` destinations preserve native `2B00`; shared names/prices/types, placement/pickup, and collection record/check readers installed |
+| Carried/collection artwork | Shared pocket icon and ground/police/handover model installed; loose-room drawing and prepared collection-cover installation remain |
+| Calendar entry | Surface A-tap uses additive carried IDs; owner/player resolution, dates/events/birthdays, drawing, owned menu, and visit hook installed; actual participation callers remain |
 | Reading/editing | Controller, ownership, wrapping/scrolling, cursor, keyboard child, confirmation/privacy, transitions, atomic commit, overlays/DMA/arena installed; native execution remains |
 | English UI | Official prompts, project errors, all screen textures, and native event labels extracted/credited/checked; native rendering remains unverified |
 | Persistence | Shared reset, clear, probe, pack, commit, forward migration, and preflight implemented/tested on host; startup and both stable/direct native dispatch installed; native UI/save verification remains |
 | Selection | Bind carried/display profile dependencies, catalogue/scoring, and independent/all choices only after the complete path is connected |
 | Verification | Run bounded combined current-ROM UI/save checks after integration; no separate style-by-style native scenarios |
 
-Resume this same connected category at carried identity/readers and artwork
-contexts, catalogue/scoring, actual event participation, and independent/all
-selection. The native `item1_B_tableNo` has an existing `2B00` entry of type 21;
-preserve that identity and reserve additive carried IDs rather than silently
-reusing donor IDs. Rebind the room adapter's donor-range comparison to the
-reserved destination range before enabling profiles. Names/type/price and
-display/pocket conversion wrap the current shared readers, with disabled-import
-rejection; loose-room, ground, pocket/handover, and catalogue artwork use their
-proper carried/cover contexts. Reuse the installed
+Resume this same connected category at loose-room drawing, cover installation,
+catalogue/scoring, actual event participation, and independent/all selection.
+The native `item1_B_tableNo` retains its existing `2B00` entry of type 21.
+Names/type/price and display/pocket conversion wrap the current shared readers,
+with disabled-import rejection. Ordinary placement retains the carried diary;
+collection record/check uses its cover. The surface predicate uses the same
+fixed registry range. Reuse the installed
 core, screen packet, UI, and source catalogue, and
 retain passing save evidence unless those paths change. Do not redirect to
 acquisition, gold-tree work, or replay exhausted creature/console fixtures.
@@ -394,6 +392,44 @@ explicit inherited textures; the ordinary furniture mode still rejects unsupport
 states. Do not flatten away unknown commands or substitute a generic screen.
 Current room/core disassembly is retained under
 `build/v3-diary-category-work-01/native-{room,core}-map/`; do not remap these callers.
+
+### Shared carried installation
+
+`tools/v3_furniture_install.py --refresh-runtime --diary-items` installs all
+sixteen carried styles through `tools/v3_diary_items.py`. The current ABI-310
+proposal is `build/v3-diary-category-work-01/carried-03/build-lock.json`, ROM
+SHA-256 `9f2b847858e9852b1e67fa2888ae34f2ad4ffed0fb5dac44652a9887bddced15`.
+The guarded `806E0000..806E4000` physical-ROM packet holds 1,680 code bytes,
+the complete 400-byte identity/name/price table at `806E2000`, the shared donor
+icon at `806E2300`, and the reused 816-byte carried model at `806E2600`.
+It does not enable profiles or change the save format/profile.
+
+Seven checked entry replacements chain to existing name/type/price, placement,
+pickup, and collection readers. Disabled diaries cannot index native short
+tables or write collection bits. Collection recording resolves the actual player
+and uses the existing shared save extension. Cover rotations map to the same
+carried identity and collection bit. The default pocket-icon branch preserves
+the native 64-bit register state and delegates non-diaries to the installed
+creature branch. Native tools and gifts retain their own branches.
+
+Shared category 44 (`27 + donor category 17`) uses the existing 71-entry
+ground/police/handover tables. Each seasonal overlay receives a complete new
+descriptor bank after its retained scenery bank; changing the ground configuration
+does not relocate scenery resources or change actor/index-array capacities.
+Both the actual overlay allocation and relocation BSS size include the new bank.
+The room A-tap predicate is relinked with the new identities; only its checked
+constant changes, and all installed UI exports and other UI bytes remain intact.
+The complete sixteen-packet startup fits in 600 of 688 reserved bytes.
+
+`tests/test_v3_diary_items.py` verifies the current source data, installed packets,
+reader chains, unchanged native identities/scenery, startup CRCs, and guarded
+allocation. Sanitized host checks cover all sixteen styles and rotations,
+four-player collection routing, disabled/malformed records, the complete startup
+failure paths, and all four seasonal descriptor banks beyond 64 KiB. The connected
+surface/menu host check uses additive IDs. These checks do not establish ordinary
+native diary use, menu appearance, saving, or hardware behaviour. Diary choices
+remain disabled until loose-room drawing, cover/catalogue/scoring integration,
+participation, selection, and connected native checks are complete.
 
 ## Focused evidence
 

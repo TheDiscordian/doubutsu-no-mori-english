@@ -31,9 +31,9 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
-The current proposal is ABI 309 at
-`build/v3-diary-category-work-01/connected-03/build-lock.json`, ROM SHA-256
-`e34f0aa348126344ca615cadb5102a8714993de5f55e4be29a52e5dbe8641909`.
+The current proposal is ABI 310 at
+`build/v3-diary-category-work-01/carried-03/build-lock.json`, ROM SHA-256
+`9f2b847858e9852b1e67fa2888ae34f2ad4ffed0fb5dac44652a9887bddced15`.
 It contains 191 independently selectable development imports, including all nine
 fish and eight insects, and 100 inactive furniture profiles whose acquisition
 is pending. The main lock and both stable V2-14 deployments are unchanged.
@@ -92,16 +92,33 @@ overlapping holidays, and guarded preflight. The converted screen/carried artwor
 is reused. These are host/compiler results, not installed native gameplay.
 
 The shared builder installs diary menus, room/visit hooks, three guarded resident
-packets, and format-eleven storage together. Its fifteen-packet startup occupies
-576 of 688 reserved bytes. Both stable save exports and direct calls from the
+packets, and format-eleven storage together. Its sixteen-packet startup occupies
+600 of 688 reserved bytes. Both stable save exports and direct calls from the
 insect runtime reach diary-aware storage, preserving canonical-codec bodies and
 existing artwork. Three focused checks pass for the current cartridge, including
 native menu relocation, unchanged surrounding code/resources, packet checksums,
 and sanitized startup failure gates. They do not establish native UI/save execution.
 
+All sixteen diary styles have additive carried identities (`2B10..2B1F`) and
+installed shared names, prices, categories, placement/pickup conversion, collection
+record/check routing, and pocket icons. The original native `2B00` remains intact.
+The room A-tap predicate uses those destination IDs. Official name credits live
+in the single provenance catalogue. The 16-KiB guarded packet reuses the complete
+carried model; ground, police storage, and handover use its category artwork.
+Expanded seasonal descriptor banks follow the retained scenery allocations,
+without changing scenery code, resource contents, or bank addresses. Startup
+loads sixteen checked packets in 600 of 688 reserved bytes.
+
+Four focused checks pass for the current carried cartridge and sanitized host
+readers/startup/ground tables. The connected menu/surface host check passes for
+all sixteen additive IDs. Existing creature reader validation recognises the
+outer diary hooks and retains the original reader bodies. The complete menu
+capacity check includes the diary arena reservation. These are build/host results,
+not native diary gameplay, save/reload, or hardware verification.
+
 The shared save adapter retains the complete town, console progress, calendars,
-and pages within the existing two FlashRAM banks. Carried identity/readers,
-artwork contexts, catalogue/selection, actual participation callers, and connected
+and pages within the existing two FlashRAM banks. Loose-room drawing, collection
+cover installation, catalogue/scoring/selection, actual participation callers, and connected
 native UI/save verification remain in the same
 [diary consumer map](../specs/V3_DIARIES.md). No diary choices are enabled yet.
 New format-eleven saves require this or a newer compatible build; earlier V3

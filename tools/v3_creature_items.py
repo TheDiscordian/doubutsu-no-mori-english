@@ -85,6 +85,11 @@ def encode(rows):
 
 def native_contract(core,prior):
     normalized=bytearray(core);proof=[]
+    for hook in prior.get('equipment_resources',{}).get('diary_items',{}).get('hooks',[]):
+        if hook['kind'] not in ('display','pocket'):continue
+        at=hook['address']-CODE_RAM
+        if normalized[at:at+8].hex()!=hook['after']:raise ValueError('Changed outer diary conversion wrapper')
+        normalized[at:at+8]=bytes.fromhex(hook['before'])
     for hook in prior.get('equipment_resources',{}).get('creature_items',{}).get('hooks',[]):
         if hook['kind'] not in ('display','pocket'):continue
         at=hook['address']-CODE_RAM
@@ -241,8 +246,19 @@ def checked(base,report,source):
     for hook in r['hooks']:
         owner,origin=(module,MODULE_RAM) if hook['address']>=MODULE_RAM else (core,CODE_RAM)
         target=code['symbols'][hook['symbol']]
+        expected=struct.pack('>2I',jump(target),0)
+        diary=report['equipment_resources'].get('diary_items')
+        if diary:
+            outer=next((h for h in diary['hooks'] if h['address']==hook['address']),None)
+            if (outer is None or outer['prior']!=target or outer['before']!=expected.hex() or
+                    outer['symbol']!='af_diary_item_'+hook['kind'] or
+                    outer['target']!=diary['code']['symbols'][outer['symbol']] or
+                    not diary['packet']['ram']<=outer['target']<diary['packet']['ram']+diary['code']['bytes']):
+                raise ValueError('Changed connected diary/creature dispatch chain')
+            expected=struct.pack('>2I',jump(outer['target']),0)
+            if outer['after']!=expected.hex():raise ValueError('Changed diary hook receipt')
         if (hook['target']!=target or not RAM<=target<RAM+code['bytes'] or
-                owner[hook['address']-origin:hook['address']-origin+8]!=struct.pack('>2I',jump(target),0)):
+                owner[hook['address']-origin:hook['address']-origin+8]!=expected):
             raise ValueError('Changed connected native creature hook')
     by_display={row['display_item_id']:row for row in rows}
     bank=checked_capacity(base,report);limit=checked_limit(base,report)

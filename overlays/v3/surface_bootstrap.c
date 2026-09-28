@@ -52,6 +52,9 @@ static const u32 diary_storage_crc=AF_DIARY_STORAGE_CRC;
 static const u32 diary_ui_crc=AF_DIARY_UI_CRC;
 static const u32 diary_art_crc=AF_DIARY_ART_CRC;
 #endif
+#ifdef AF_DIARY_ITEMS_PHYSICAL
+static const u32 diary_items_crc=AF_DIARY_ITEMS_CRC;
+#endif
 
 #ifdef __mips__
 #define DEST(name,address) ((void *)(address))
@@ -64,6 +67,7 @@ extern unsigned char af_test_console_code[],af_test_console_images[],af_test_con
 extern unsigned char af_test_creature_code[],af_test_creature_field[],af_test_fish_world[];
 extern unsigned char af_test_insect_code[],af_test_clothing_code[];
 extern unsigned char af_test_diary_storage[],af_test_diary_ui[],af_test_diary_art[];
+extern unsigned char af_test_diary_items[];
 #define DEST(name,address) (af_test_##name)
 #define CLEAR(name,address) (&af_test_##name)
 #endif
@@ -113,6 +117,9 @@ static const struct StartupPacket packets[]={
     {DEST(diary_storage,AF_DIARY_STORAGE_RAM),AF_DIARY_STORAGE_PHYSICAL|0x80000000u,AF_DIARY_STORAGE_BYTES,&diary_storage_crc,0},
     {DEST(diary_ui,AF_DIARY_UI_RAM),AF_DIARY_UI_PHYSICAL|0x80000000u,AF_DIARY_UI_BYTES,&diary_ui_crc,0},
     {DEST(diary_art,AF_DIARY_ART_RAM),AF_DIARY_ART_PHYSICAL|0x80000000u,AF_DIARY_ART_BYTES,&diary_art_crc,0},
+#endif
+#ifdef AF_DIARY_ITEMS_PHYSICAL
+    {DEST(diary_items,AF_DIARY_ITEMS_RAM),AF_DIARY_ITEMS_PHYSICAL|0x80000000u,AF_DIARY_ITEMS_BYTES,&diary_items_crc,0},
 #endif
 };
 

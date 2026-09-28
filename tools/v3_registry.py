@@ -129,6 +129,17 @@ CREATURE_PARENTS = {
     0x2301: 0x2328,
 }
 
+# Native category B already owns 2B00. Keep its identity; diary covers retain
+# their canonical furniture slots, while carried styles use an additive range.
+DIARY_PARENT_REGISTRY_VERSION = 1
+DIARY_PARENTS = {0x2B00+i: 0x2B10+i for i in range(16)}
+
+
+def diary_parent_identity(donor_item):
+    if type(donor_item) is not int or donor_item not in DIARY_PARENTS:
+        raise ValueError('Not a donor diary parent')
+    return DIARY_PARENTS[donor_item]
+
 
 def creature_parent_identity(donor_item):
     if type(donor_item) is not int or donor_item not in CREATURE_PARENTS:
