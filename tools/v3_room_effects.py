@@ -352,6 +352,13 @@ def rebind_profiles(effects, blob, symbols,*,code_bounds=(0x804C8000,0x804CC000)
         if len(old)!=64 or (row.get('sha256') and sha256(old)!=row['sha256']) or (
                 not row.get('sha256') and any(old)):
             raise ValueError('Changed complete installed effect profile')
+        if row.get('callback_owner')=='holiday-sky':
+            # Independent startup-loaded callbacks do not move when the room
+            # packet is relinked. Still validate the whole packet, not just skip it.
+            from v3_holiday_sky import profile_packet
+            if old!=profile_packet(row['callbacks'],row['policy_hex']):
+                raise ValueError('Changed complete resident sky-effect profile')
+            continue
         kind=row.get('kind',{111:'flash',112:'flash_controller'}.get(row['id']))
         if kind is None:raise ValueError('Effect identity lacks a complete callback kind')
         data=profile_overlay(symbols,kind=kind,code_bounds=code_bounds)

@@ -61,6 +61,9 @@ static const u32 npc_extra_crc=AF_NPC_EXTRA_CRC;
 #ifdef AF_HOLIDAY_STATE_PHYSICAL
 static const u32 holiday_state_crc=AF_HOLIDAY_STATE_CRC;
 #endif
+#ifdef AF_HOLIDAY_SKY_PHYSICAL
+static const u32 holiday_sky_crc=AF_HOLIDAY_SKY_CRC;
+#endif
 
 #ifdef __mips__
 #define DEST(name,address) ((void *)(address))
@@ -76,6 +79,7 @@ extern unsigned char af_test_diary_storage[],af_test_diary_ui[],af_test_diary_ar
 extern unsigned char af_test_diary_items[];
 extern unsigned char af_test_npc_extra[];
 extern unsigned char af_test_holiday_state[];
+extern unsigned char af_test_holiday_sky[];
 #define DEST(name,address) (af_test_##name)
 #define CLEAR(name,address) (&af_test_##name)
 #endif
@@ -135,11 +139,13 @@ static const struct StartupPacket packets[]={
 #ifdef AF_HOLIDAY_STATE_PHYSICAL
     {DEST(holiday_state,AF_HOLIDAY_STATE_RAM),AF_HOLIDAY_STATE_PHYSICAL|0x80000000u,AF_HOLIDAY_STATE_BYTES,&holiday_state_crc,0},
 #endif
+#ifdef AF_HOLIDAY_SKY_PHYSICAL
+    {DEST(holiday_sky,AF_HOLIDAY_SKY_RAM),AF_HOLIDAY_SKY_PHYSICAL|0x80000000u,AF_HOLIDAY_SKY_BYTES,&holiday_sky_crc,0},
+#endif
 };
 
 int af_v3_surface_init(void) {
-    for (u32 i=0;i<sizeof(packets)/sizeof(*packets);i++) {
-        const struct StartupPacket *p=packets+i;
+    for (const struct StartupPacket *p=packets;p<packets+sizeof(packets)/sizeof(*packets);p++) {
 #if defined(AF_INSECT_PHYSICAL) || defined(AF_DIARY_STORAGE_PHYSICAL) || defined(AF_NPC_EXTRA_PHYSICAL)
         int status=(p->source&0x80000000u)?
             af_surface_pi(p->source&0x7FFFFFFFu,p->destination,p->bytes):
@@ -154,7 +160,8 @@ int af_v3_surface_init(void) {
     }
 #ifdef AF_NPC_EXTRA_PHYSICAL
 #ifdef __mips__
-    if(!((int (*)(void))AF_NPC_EXTRA_INIT)())return 0;
+    extern int af_surface_npc_init(void);
+    if(!af_surface_npc_init())return 0;
 #else
     extern int af_test_npc_extra_init(void);
     if(!af_test_npc_extra_init())return 0;

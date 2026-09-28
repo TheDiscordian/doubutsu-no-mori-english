@@ -13,11 +13,17 @@ typedef struct {
 } Decoration;
 extern const Decoration af_decor_actor_records[18];
 extern const unsigned int af_holiday_decoration_ready;
+#ifdef AF_HOLIDAY_SKY
+extern int af_sky_identity(unsigned int);
+#endif
 #ifdef __mips__
 _Static_assert(sizeof(Decoration)==32,"Installed decoration record stride");
 #endif
 static int resolve(void *context,unsigned int kind,unsigned int source) {
     (void)context;
+#ifdef AF_HOLIDAY_SKY
+    if(kind==AF_HD_EFFECT_ID)return af_sky_identity(source);
+#endif
     if(kind!=AF_HD_NAME || source>65535)return -1;
     for(unsigned int i=0;i<18;i++) {
         const Decoration *r=&af_decor_actor_records[i];

@@ -305,6 +305,7 @@ def publish_bootstrap(equipment,blob,surface,output):
         from v3_holiday_state import RAM as HOLIDAY_RAM,SIZE as HOLIDAY_SIZE
         p=holiday_state['packet']
         transition=npc_extra.get('events',{}).get('transition') if npc_extra else None
+        sky=npc_extra.get('events',{}).get('sky') if npc_extra else None
         size=HOLIDAY_SIZE
         if transition:
             if (not transition.get('installed') or transition['packet_ram']!=HOLIDAY_RAM or
@@ -346,7 +347,17 @@ def publish_bootstrap(equipment,blob,surface,output):
                     fishing['preserved_prefix_bytes']!=size or HOLIDAY_RAM+size!=FISHING_RAM or
                     p['bytes']!=size+FISHING_SIZE or fishing['loaded_code']['ram']!=FISHING_RAM):
                 raise ValueError('Changed combined fishing startup packet')
-            size=p['bytes']
+            size+=FISHING_SIZE
+        if sky:
+            from v3_holiday_sky import RAM as SKY_RAM,END as SKY_END,PACKET_END
+            sp=sky['packet']
+            if (not sky.get('installed') or sp['ram']!=SKY_RAM or sp['bytes']!=PACKET_END-SKY_RAM or
+                    sp['physical']&15 or sp['storage']!='physical-ROM' or
+                    sky['loaded_code']['ram']!=SKY_RAM or not 0<sky['loaded_code']['bytes']<=SKY_END-SKY_RAM or
+                    sky['guard_ram']!=SKY_END):
+                raise ValueError('Changed complete sky-effect startup packet')
+            extra+=tuple(f'AF_HOLIDAY_SKY_{label}=0x{sp[key]:X}u' for label,key in
+                (('PHYSICAL','physical'),('CRC','crc32'),('BYTES','bytes'),('RAM','ram')))
         if (not npc_extra or p['ram']!=HOLIDAY_RAM or p['bytes']!=size or p['physical']&15 or
                 p['storage']!='physical-ROM' or not 0x100000<=p['physical']<p['physical']+p['bytes']<=0x4000000):
             raise ValueError('Changed complete holiday-state startup packet')
@@ -356,7 +367,8 @@ def publish_bootstrap(equipment,blob,surface,output):
         'AF_V3_EDITABLE_CHECKSUMS=1',f'AF_SURFACE_ITEMS_VROM=0x{items["vrom"]:X}u',
         f'AF_SURFACE_ITEMS_CRC=0x{items["crc32"]:X}u',f'AF_SURFACE_ITEMS_BYTES=0x{items["bytes"]:X}u',
         f'AF_ROOM_GOODS_VROM=0x{packet["vrom"]:X}u',f'AF_ROOM_GOODS_CRC=0x{packet["crc32"]:X}u',
-        f'AF_ROOM_GOODS_BYTES=0x{packet["bytes"]:X}u',*extra))
+        f'AF_ROOM_GOODS_BYTES=0x{packet["bytes"]:X}u',*extra),link_symbols=(
+            {'af_surface_npc_init':npc_extra['code']['symbols']['af_v3_npc_dma_init']} if npc_extra else None))
     if len(boot)>BOOT_END-BOOT:raise ValueError('Combined surface/goods startup exceeds its reservation')
     begin,end=BOOT-equipment['ram'],BOOT_END-equipment['ram']
     previous=items['bootstrap']['code']

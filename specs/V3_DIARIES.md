@@ -954,6 +954,39 @@ per-frame speed and counter timing. Event IDs and native overlay layouts also
 differ. Complete behaviour adaptation is required before resolving their source
 profiles; profile-number substitution is not sufficient.
 
+### Moon and meteor effect family
+
+`sky-installed-05/` (ABI 342) installs all four source effects through
+`tools/v3_holiday_sky.py`: moon `65 → 115`, meteor emitter `116 → 116`, trail
+`115 → 117`, and sparkle `117 → 118`. Source profile policies, unique flags,
+full constructor/movement/initialization functions, and drawing receipts are
+checked together. Generated donor source stays in ignored output. Two source
+steps per native update retain complete lifetimes, continuous renewal, child
+spawning, pool/clock positioning, player filtering, and NPC attention.
+
+The shared converter preserves the moon's two intensity textures and combiner,
+its scrolling reflection, the meteor's 256-pixel IA8 trail and I4 mask, and the
+complete sparkle sprite. Native drawing checks command/matrix capacity before
+writing. It emits source-equivalent material, transform, colour, and scroll
+commands, without claiming visual hardware acceptance.
+
+The 7,248-byte code module occupies the guarded `80738000..8073C010` packet,
+loaded independently of the unchanged 272-KiB holiday/fishing packet. Artwork
+appends to the retained effects bank. Controller/resource replacements use
+verified free ROM space, preserving original resources. All 111 original
+effects and four imported room effects retain their profiles and policies.
+The shared loader validates room callbacks at `804D0000..804D8000` and sky
+callbacks within their own code module, preserving native fallback and rejecting
+cross-owner pointers. Startup has nineteen descriptors and fits the existing
+688-byte allocation with all transfer, CRC, cache, and initialization checks.
+
+Source/sanitized-host lifecycle and rendering checks, profile-loader failure
+checks, current-cartridge preservation/bounds checks, and empty/mixed/all-191
+browser/offline comparison pass. Native I/O is doubled in host checks; no native
+fixture is restarted. The dispatcher resolves the complete effect identities,
+but missing participants/controllers keep owner admission inactive. Saved format
+13, profile bits, and both stable patcher deployments remain unchanged.
+
 ### Reserved layouts and dedicated owners
 
 `tools/v3_holiday_maps.py` converts the complete donor event-layout graph and

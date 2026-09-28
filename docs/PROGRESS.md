@@ -31,13 +31,27 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
-The current proposal is ABI 341 at
-`build/v3-diary-category-work-01/event-owner-connected-02/build-lock.json`, ROM SHA-256
-`7a4f0af030414eb58138a98fafb8389825bd76275bc019cee8322d58fe8cde59`.
+The current proposal is ABI 342 at
+`build/v3-diary-category-work-01/sky-installed-05/build-lock.json`, ROM SHA-256
+`7cdc6a1e0a87618a9bfedc0ac4571b982215e4063c83352f21cb1c645daf7fe0`.
 It contains 191 independently selectable development imports, including all nine
 fish and eight insects, and 100 inactive furniture profiles whose acquisition
 is pending, plus sixteen inactive diary cover profiles. The main lock and both
 stable V2-14 deployments are unchanged.
+
+The complete moon/meteor effect family is installed: moon reflection, meteor
+emitter, moving trail, and sparkle. Complete source lifecycles, native drawing,
+scrolling, actor attention, and 60-to-30-Hz timing share one 16,400-byte guarded
+packet. All original effects and the four imported room effects are retained.
+The shared model converter handles the family's complete mixed-intensity
+textures and 256-pixel scrolling. The effect loader validates room and sky
+callbacks against their actual separate code ranges. The nineteen-packet startup
+fits its existing reservation; the large holiday packet and saved format stay
+unchanged. Focused source/sanitized-host, current-cartridge, and browser/offline
+composition checks pass. These effects are bound to the dedicated dispatcher;
+holiday participants/controllers and calendar admission remain unfinished.
+No native fixture is restarted, and these checks do not establish in-game
+rendering or make diaries selectable.
 
 All fourteen dedicated event owners have live manager callbacks through the
 shared dispatcher and existing common state. Their 85 identity requirements

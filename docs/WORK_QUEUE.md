@@ -298,8 +298,8 @@ fade results also reject rather than becoming successful boolean values.
 The complete live transition, including decoration
 identities, actual ACTIVE status, original-layout collision, scene read/commit,
 console request gating, and native room rhythm/gyroid capture, is installed at
-`build/v3-diary-category-work-01/event-owner-connected-02/build-lock.json`, ABI 341,
-ROM `7a4f0af030414eb58138a98fafb8389825bd76275bc019cee8322d58fe8cde59`.
+`build/v3-diary-category-work-01/sky-installed-05/build-lock.json`, ABI 342,
+ROM `7cdc6a1e0a87618a9bfedc0ac4571b982215e4063c83352f21cb1c645daf7fe0`.
 Use `af_holiday_transition_live_fade` from that module for the dedicated-owner
 fade provider. It binds the current relocated event index at `804A2B00`, not
 the original `8013A098` table. The `event-transition-bound-01` output is an
@@ -337,9 +337,15 @@ Retain the native controller comparison at
 `build/v3-diary-category-work-01/event-owner-native-map/`: race state begins with
 a native `u16`, but the source uses two byte fields; tug timing also differs.
 Both race versions use four laps. Do not reuse those controllers by profile
-number alone. Continue the complete moon/meteor effect family with the existing
-effect/model importer, then the remaining owner services; do not reconvert
-installed decorations or restart native fixtures.
+number alone. The complete moon/meteor family is installed through the shared
+effect/model importer, including reflection, emitter, trail, and sparkle. All
+source lifecycles and complete models are bound to native services and the
+dispatcher. A separate guarded 16,400-byte packet preserves the entire holiday/
+fishing packet; all 111 native and four room effects remain intact. The room
+callback loader uses its actual relocated code bounds. Focused source/host,
+cartridge, and empty/mixed/all-191 composition checks pass. Continue the remaining
+controller/participant services using the retained native map; do not reconvert
+these effects or installed decorations, or restart native fixtures.
 `af_holiday_world_bind` already supplies `af_holiday_world_variant`; reuse it.
 The complete donor actor initializes `melody_inst` to zero and never assigns a
 nonzero value; preserve that actual contract rather than inventing a new melody

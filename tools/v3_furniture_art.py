@@ -20,7 +20,7 @@ from v3_import_catalog import DONOR, REL_SHA, ROOT, SYMBOLS_SHA, read_donor
 from v3_villager_art import data_pointers, native_palette, normalise_vertex_flags, symbol_span
 
 SEGMENT = 0x06000000
-CONVERTER_VERSION = 19
+CONVERTER_VERSION = 20
 
 # Complete compatible RDP expressions, selected by material commands, not IDs.
 # These use one texture and retain source alpha; none introduces TEXEL1,
@@ -67,6 +67,10 @@ FRAME_BLEND_COMBINERS = {
 # Scrolling models supply every referenced tile, with the second cycle's texture
 # input retaining the second tile. Expressions match the donor model sources.
 SCROLL_COMBINERS = {
+    # Moon reflection: the second intensity layer subtracts from the first
+    # before primitive alpha, while the complete first layer colours the moon.
+    (0xFC3097FF,0x5FFEAE38): ('PRIMITIVE','ENVIRONMENT','TEXEL0','ENVIRONMENT',
+        'TEXEL0','TEXEL1','PRIMITIVE','0','0','0','0','COMBINED','0','0','0','COMBINED'),
     (0xFCFF95FF,0xFF0DFE3F): ('0','0','0','PRIMITIVE','TEXEL0','0','TEXEL1','0',
         '0','0','0','COMBINED','COMBINED','0','PRIMITIVE','0'),
     # Both scrolling intensity layers contribute alpha; actor primitive alpha
@@ -317,7 +321,7 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
             inherited_palette_slot is not None or set(scrolling)!={'segment','dimensions'} or
             scrolling['segment'] not in (0x08000000,0x09000000,0x0A000000) or
             not 1<=len(scrolling['dimensions'])<=2 or
-            any(len(shape)!=2 or any(type(n) is not int or n<8 or n>64 or n&(n-1) for n in shape)
+            any(len(shape)!=2 or any(type(n) is not int or n<8 or n>256 or n&(n-1) for n in shape)
                 for shape in scrolling['dimensions'])):
         raise ValueError('Invalid complete scrolling-material binding')
     if material_bindings and (not static_materials or palette_fade or
@@ -459,11 +463,13 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
                 if scrolling:
                     if (scroll_call or tile_index!=scroll_tiles or scroll_tiles>=len(scrolling['dimensions']) or
                             tuple(shape[:2])!=tuple(scrolling['dimensions'][scroll_tiles]) or
-                            shape[2:] not in ((2,0),(4,0)) or scroll_format not in (None,shape[2:])):
+                            shape[2:] not in ((2,0),(4,0),(4,1),(3,1)) or
+                            scroll_format is not None and (scroll_format==(2,0))!=(shape[2:]==(2,0))):
                         raise ValueError('Incomplete, reordered, or mismatched scrolling texture layers')
                     row.update(scroll_tile=tile_index,scroll_tmem=scroll_tmem)
-                    scroll_tmem+=((shape[0]+15)//16)*shape[1]
-                    if scroll_tmem>256:raise ValueError('Scrolling textures overlap palette TMEM')
+                    scroll_tmem+=((shape[0]*(4<<shape[3])+63)//64)*shape[1]
+                    if scroll_tmem>(256 if shape[2:]==(2,0) else 512):
+                        raise ValueError('Scrolling textures exceed texture/palette TMEM')
                     scroll_tiles+=1;scroll_format=shape[2:]
                 if inherited_palette_slot is not None and not (intensity or rgba16 or ia8 or ia16):
                     row['palette_slot'] = inherited_palette_slot
@@ -920,14 +926,22 @@ def command_source(models, offsets):
                     continue
                 if 'scroll_tile' in row:
                     tile,tmem=row['scroll_tile'],row['scroll_tmem']
-                    if (rgba16 or ia8 or ia16 or i8 or type(tile) is not int or tile not in (0,1) or
-                            type(tmem) is not int or not 0<=tmem<=256-((w+15)//16)*h or
+                    bits=8 if ia8 or i8 else 4
+                    capacity=512 if row.get('intensity') or ia8 else 256
+                    words=((w*bits+63)//64)*h
+                    if (rgba16 or ia16 or type(tile) is not int or tile not in (0,1) or
+                            type(tmem) is not int or not 0<=tmem<=capacity-words or
                             (tile==0)!=(tmem==0)):
                         raise ValueError('Invalid complete scrolling texture allocation')
-                    args=(f'{tmem}, {tile}, {fmt}, {w}, {h}, '+
-                          (f'0, 0, {w-1}, {h-1}, ' if w%16 else '')+
-                          f'{pal}, {wrap_s}, {wrap_t}, {mask_s}, {mask_t}, {shifts[0]}, {shifts[1]}')
-                    macro='gsDPLoadMultiTile_4b' if w%16 else 'gsDPLoadMultiBlock_4b'
+                    if bits==4:
+                        args=(f'{tmem}, {tile}, {fmt}, {w}, {h}, '+
+                              (f'0, 0, {w-1}, {h-1}, ' if w%16 else '')+
+                              f'{pal}, {wrap_s}, {wrap_t}, {mask_s}, {mask_t}, {shifts[0]}, {shifts[1]}')
+                        macro='gsDPLoadMultiTile_4b' if w%16 else 'gsDPLoadMultiBlock_4b'
+                    else:
+                        args=(f'{tmem}, {tile}, {fmt}, G_IM_SIZ_8b, {w}, {h}, 0, '
+                              f'{wrap_s}, {wrap_t}, {mask_s}, {mask_t}, {shifts[0]}, {shifts[1]}')
+                        macro='gsDPLoadMultiBlock'
                     emit(f'{macro}(0x{texture:08X}, {args})',7)
                     continue
                 if rgba16 or ia8 or ia16 or i8:

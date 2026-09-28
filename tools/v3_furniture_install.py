@@ -629,7 +629,7 @@ def append_resource_plan(base,files,vrom,data,relocatable,*,target_vrom=None):
     return changes,record
 
 
-def relocate_resource_plan(base,files,vrom,data,*,minimum_physical,target_vrom=None,reservations=()):
+def relocate_resource_plan(base,files,vrom,data,*,minimum_physical,target_vrom=None,reservations=(),append_only=True):
     """Keep a whole growing resource in verified zero, unmapped cartridge space.
 
     Logical identity is retained unless the caller declares a new virtual base.
@@ -639,10 +639,10 @@ def relocate_resource_plan(base,files,vrom,data,*,minimum_physical,target_vrom=N
     """
     entry=files[vrom];before=entry.extract(base)
     destination=vrom if target_vrom is None else target_vrom
-    if (entry.pend or len(data)<=len(before) or data[:len(before)]!=before or
+    if (entry.pend or not data or append_only and (len(data)<=len(before) or data[:len(before)]!=before) or
             type(destination) is not int or destination&15 or not 0<=destination<destination+len(data)<=0x100000000 or
             any(e.vstart<destination+len(data) and destination<e.vend for v,e in files.items() if v!=vrom)):
-        raise ValueError('Relocation needs a complete non-overlapping append')
+        raise ValueError('Relocation needs a complete non-overlapping resource')
     occupied=sorted([(e.pstart,e.pend or e.pstart+e.size) for e in files.values() if e.pstart!=0xFFFFFFFF]+
         [(r['physical'],r['physical']+r['bytes']) for r in reservations])
     cursor=minimum_physical
@@ -779,6 +779,10 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         elif not current_events.get('dispatch'):
             import v3_holiday_active as equipment
             equipment_report,owner_changes,report_updates,physical_writes=equipment.install_dispatch(
+                base,prior,blob,core,output)
+        elif not current_events.get('sky'):
+            import v3_holiday_sky as equipment
+            equipment_report,owner_changes,report_updates,physical_writes=equipment.install(
                 base,prior,blob,core,output)
         else:
             import v3_holiday_motion as equipment
@@ -1492,8 +1496,9 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             prior['equipment_resources'].get('holiday_state',{}).get('packet',{}).get('bytes',0)) if holiday_state else 0
         event_items=equipment_report.get('holiday_items') and not prior['equipment_resources'].get('holiday_items')
         fishing=equipment_report.get('holiday_fishing') and not prior['equipment_resources'].get('holiday_fishing')
-        report['shared_runtime_refresh'].update(adapters=['holiday_actor_services'],artwork_changed=bool(decorations or event_items),
-            additional_resident_bytes=state_growth+(176 if fishing else 0),
+        sky=npc['events'].get('sky') and not prior['equipment_resources']['npc_extra']['events'].get('sky')
+        report['shared_runtime_refresh'].update(adapters=['holiday_actor_services'],artwork_changed=bool(decorations or event_items or sky),
+            additional_resident_bytes=state_growth+(176 if fishing else 0)+(npc['events']['sky']['additional_resident_bytes'] if sky else 0),
             resource_allocations_changed=bool(new_state or fishing or npc['events'].get('reserved')),
             saved_format_changed=bool(new_state or fishing),saved_profile_changed=False)
         report['sources'].update(npc['sources'])
