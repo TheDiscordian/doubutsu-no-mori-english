@@ -31,27 +31,32 @@ runtime alternatives; other substantial differences still need real bindings.
 Current implementation task: complete the shared diary importing path for all
 sixteen donor styles (`2B00..2B0F`). The 48 monthly pages, calendar/read/edit/
 confirmation/privacy controller, calendar persistence, transactional page/lock
-admission, and shared save adapter are prepared for MIPS at
+admission, and shared save adapter use the prepared MIPS core at
 `build/v3-diary-category-work-01/prepared-05/`. The source implements the actual
 surface A-tap adapter for every style, including house-owner identity and native
-furniture fallback. It is not installed. The shared carried model is converted;
+furniture fallback. The shared carried model is converted;
 official prompts and project safety messages have catalogue provenance.
 The complete shared screen packet is converted at
 `build/v3-diary-category-work-01/screen-04/`, with the donor month/day artwork,
 paper, controls, and confirmation/privacy graphics. The shared native menu owner,
 page/keyboard/confirmation transitions, drawing, and keyboard hooks are linked at
 `build/v3-diary-category-work-01/ui-06/`. The ordinary house-message fallback and
-the accepted keyboard's complete graphics/input prefix are preserved. These
-packets are not installed. Native room entry, selected-style resolution, owner
+the accepted keyboard's complete graphics/input prefix are preserved. The core,
+UI, screen, room/visit hooks, and menu allocations are installed together in
+`build/v3-diary-category-work-01/connected-03/`. Native room entry, selected-style resolution, owner
 birthdays, real clock/holiday dates, glyph widths, and guarded edit preflight are
 linked with the UI. Its play-day hook preserves the native live-player predicate
 inside the gated event-update path. Actual event-participation callers remain
-unbound; a scheduled event must not count as attendance. Resume at resident
-startup/save dispatch and overlay/room-hook installation, then carried readers
-and selection. Follow the [connected consumer map](../specs/V3_DIARIES.md#connected-consumer-map).
-Carried identity/readers, participation callers, resident loading/dispatch, and
-selection remain required in this same category. Reuse the prepared core, screen
-packet, linked UI, and passing save checks; do not restart source discovery or call covers playable.
+unbound; a scheduled event must not count as attendance. All 23 stable save exports
+and their 23 directly called insect-runtime counterparts reach diary-aware storage.
+Three focused installed-cartridge/startup checks pass; native UI/save execution
+remains unverified. Resume at carried identity/readers, artwork contexts,
+catalogue/scoring, participation, and selection, following the
+[connected consumer map](../specs/V3_DIARIES.md#connected-consumer-map).
+These are remaining consumers of this same category, not new per-style tasks.
+Preserve the existing native `2B00` identity when reserving additive carried IDs;
+the current unselected room adapter still uses donor IDs and must be rebound.
+Reuse installed menus/storage and prepared artwork; do not restart conversion.
 
 The room-representation review identifies sixteen player-saved design forms and
 nine museum fossil placeholders. Custom designs require a design editor and
@@ -84,9 +89,9 @@ harness budget exhausted; no old fixture replay is authorised by this clothing
 work. Fix any identified game defect. This does not defer required creature
 behaviours or classify their gameplay as verified.
 
-Use the shared converter and current ABI-308 proposal:
-`build/v3-native-variants-work-01/connected-02/cartridge/build-lock.json`.
-ROM SHA-256: `131498d875bd07ca168b3bd1590796c78b9f9cb1cde2421894bbac6e16d17d50`.
+Use the shared converter and current ABI-309 proposal:
+`build/v3-diary-category-work-01/connected-03/build-lock.json`.
+ROM SHA-256: `e34f0aa348126344ca615cadb5102a8714993de5f55e4be29a52e5dbe8641909`.
 The two static variants use ordinary stock, catalogue/scoring, save-profile bits,
 and independent browser/offline selection. Their 7,840 artwork bytes are installed
 together; neither native counterpart nor any existing imported object is replaced.
@@ -129,7 +134,7 @@ assertions passed. Fix actual game defects rather than bypassing them.
 Do not reopen completed conversion, source-program, or browser-composition work
 without a relevant defect.
 
-The complete shared save path is installed with format-nine compressed saves,
+The complete shared save path is installed with format-eleven compressed saves,
 canonical eight, and registry five. Insect seasons use separate bytes from fish
 seasons. Stable codec entry points redirect into the loaded runtime; old code
 padding and creature icons remain intact. Valid older saves migrate forward;

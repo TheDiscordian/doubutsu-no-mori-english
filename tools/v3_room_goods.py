@@ -266,6 +266,21 @@ def publish_bootstrap(equipment,blob,surface,output):
             raise ValueError('Changed complete clothing startup packet')
         extra+=(f'AF_CLOTHING_VROM=0x{p["vrom"]:X}u',f'AF_CLOTHING_CRC=0x{p["crc32"]:X}u',
                 f'AF_CLOTHING_BYTES=0x{p["bytes"]:X}u',f'AF_CLOTHING_RAM=0x{p["ram"]:X}u')
+    diaries=equipment.get('diaries')
+    if diaries:
+        from v3_diary_install import LAYOUT,MEMORY
+        expected={'storage':(LAYOUT['code']['ram'],LAYOUT['code']['bytes']),
+            'ui':(MEMORY['code'][0],MEMORY['code'][1]+MEMORY['state'][1]),'art':MEMORY['art']}
+        if set(diaries['packets'])!=set(expected):raise ValueError('Incomplete diary startup packets')
+        for name,(ram,size) in expected.items():
+            p=diaries['packets'][name]
+            if (p['ram']!=ram or p['bytes']!=size or p['physical']&15 or
+                    not 0x100000<=p['physical']<p['physical']+size<=0x4000000 or
+                    p['storage']!='physical-ROM'):
+                raise ValueError('Changed complete diary startup packet: '+name)
+            prefix='AF_DIARY_'+name.upper()
+            extra+=tuple(f'{prefix}_{label}=0x{p[key]:X}u' for label,key in
+                (('PHYSICAL','physical'),('CRC','crc32'),('BYTES','bytes'),('RAM','ram')))
     boot,compiled=compile_part('surface_bootstrap',output/'goods_surface_bootstrap',defines=(
         'AF_V3_EDITABLE_CHECKSUMS=1',f'AF_SURFACE_ITEMS_VROM=0x{items["vrom"]:X}u',
         f'AF_SURFACE_ITEMS_CRC=0x{items["crc32"]:X}u',f'AF_SURFACE_ITEMS_BYTES=0x{items["bytes"]:X}u',
@@ -290,3 +305,4 @@ def publish_bootstrap(equipment,blob,surface,output):
     if fish_world:fish_world['startup']=copy.deepcopy(goods['startup'])
     if clothing:clothing['startup']=copy.deepcopy(goods['startup'])
     if insects:insects['startup']=copy.deepcopy(goods['startup'])
+    if diaries:diaries['startup']=copy.deepcopy(goods['startup'])

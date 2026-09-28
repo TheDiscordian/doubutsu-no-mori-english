@@ -12,8 +12,9 @@ The calendar/reading/editing/storage controller and shared native-save adapter
 are implemented in source and compile for VR4300. Host checks cover room surface
 selection, calendar navigation, editing/privacy/capacity admission, and the
 save → probe → reload path. They do not establish in-game UI operation,
-native FlashRAM timing, ordinary gameplay, or hardware compatibility. ABI 308
-remains the current cartridge; this preparation does not change either patcher.
+native FlashRAM timing, ordinary gameplay, or hardware compatibility. ABI 309
+installs the menus, resident packets, room/visit hooks, and save dispatch at
+`build/v3-diary-category-work-01/connected-03/`. Neither patcher changes.
 
 ## Donor contract
 
@@ -67,7 +68,8 @@ failed menu opening cannot accidentally activate the supporting furniture.
 The original controller handles non-diary interactions unchanged. Exact consumers,
 caller bytes, and the one removable relocation are bound in the preparation.
 `diary_native.c` binds the menu-open and selected-style exports to actual native
-data and the compiled screen owner. No unfinished hook is installed in the cartridge.
+data and the compiled screen owner. The shared room hook is installed; diary
+selection remains disabled until carried-item handling is connected.
 
 `diary_menu.c` provides one transient controller for all covers:
 
@@ -86,7 +88,7 @@ data and the compiled screen owner. No unfinished hook is installed in the cartr
 
 Native drawing, full-page keyboard handling, submenu ownership, transitions, and
 sound/lifecycle adapters are implemented and linked for VR4300. Native date/event
-reading and room entry are linked; participation callers and installation remain
+reading and room entry are installed; participation callers remain
 unfinished. Eight official prompt strings
 and three project-authored error strings are
 credited in `translations/provenance.json` under `v3/diary/`; preparation verifies
@@ -122,9 +124,9 @@ provides projection/animation positions; the native calendar provider supplies
 actual event labels/day types. Paper and text use the same absolute scrolling offset,
 including during transitions. Native cursor/end-marker callbacks use proportional
 positions and explicitly bind the keyboard's marker assets before drawing. These
-functions are not an installed or visually verified screen. The compiled largest
+functions are installed, but not visually verified. The compiled largest
 draw frame is 304 bytes; engine callees and actual stack high-water use remain
-installation checks.
+native execution checks.
 
 `diary_editor.c` adds mode six around the accepted English keyboard. Mode four
 initializes a bounded caller buffer before the adapter restores all 992 characters,
@@ -136,7 +138,7 @@ Done opens confirmation without saving; Rewrite retains the draft. The adapter
 preserves the native twenty-update cursor blink and recomputes the accepted
 character-alteration mapping after successful commands. The owner
 passes an explicit resident session through editor `data3`, with matching submenu,
-owner, and input-buffer checks. Its native init/update hooks remain uninstalled.
+owner, and input-buffer checks. Its native init/update hooks are installed.
 The largest compiled adapter frame is 240 bytes, before its diary callees.
 
 ### Native ownership and prepared hooks
@@ -176,8 +178,8 @@ graphics, changing only the init call and PLAY dispatch entry. HBOARD changes
 only its constructor's init/set-proc calls; prepared owner metadata also replaces
 set-proc and destructor so native child return cannot restore house-message
 handling. Complete retained-prefix checks pass at two real relocation bases.
-Installation must reserve DMA storage and apply owner/arena updates together;
-these prepared overlays are not installed in ABI 308.
+Installation reserves DMA storage and applies owner/arena updates together;
+both overlays are installed in the current experimental cartridge.
 
 Native call inspection confirms the keyboard's once-only resource initializer
 does not index the mode table. Its drawing calls the parent's draw callback and
@@ -227,7 +229,7 @@ reader, and complete-save preflight. A prepared hook at `8007FA20` calls the
 original live-player predicate and records the current play day only after the
 native title, player-selection, demo, and player-control gates. An already-marked
 day avoids another calendar refresh. The original predicate result is preserved.
-The hook is not installed. Event participation remains a separate actual-player
+The hook is installed. Event participation remains a separate actual-player
 caller requirement: calendar occurrence does not set attendance. Native event IDs
 cannot index the donor's differently numbered special-event flags.
 
@@ -275,9 +277,9 @@ formats, corrupted streams, padding, lengths, and checksum failures reject.
 `af_v3_save_expand_diary` reads existing supported compressed formats and
 initializes only the newly introduced diary state. The canonical decoder still
 validates/migrates the complete town/profile. Older save readers reject format
-eleven. **Once installed, new saves require this or a newer compatible V3 build;
-V2 and earlier V3 cannot load them. Preserve backups.** The preparation itself
-has not changed any cartridge's save format or the user's save files.
+eleven. **New saves require this or a newer compatible V3 build;
+V2 and earlier V3 cannot load them. Preserve backups.** Only the experimental
+cartridge uses this format; the stable deployments and user's saves are untouched.
 
 Writing first measures the complete encoded save. Failure leaves the output
 bank unchanged. The diary editor additionally stages the changed page in
@@ -291,15 +293,15 @@ This is a capacity check for the current town, not a proof that every possible
 future combination fits. Future town/console growth can still exceed FlashRAM;
 the existing pre-write failure gate remains. Do not claim that compression gives
 unlimited storage or that a synthetic vocabulary represents every player's text.
-The controller implements rejection and return-to-editor; the in-game warning
-renderer and native keyboard binding remain unfinished.
+The controller, warning renderer, and native keyboard implement rejection and
+return-to-editor; their connected native execution remains unverified.
 
 ## Memory and prepared code
 
 `build/v3-diary-category-work-01/prepared-05/diaries.json` binds the complete
 22,544-byte save/calendar/menu module to ABI 308 and current source hashes. Preparation uses
 the existing Docker toolchain and checks the current report's RAM reservations.
-These are checked **planned** allocations, not installed startup reservations:
+These are installed guarded allocations:
 
 | RAM | Bytes | Purpose |
 | --- | ---: | --- |
@@ -312,7 +314,51 @@ allocations. The old decode buffer is not grown into neighbouring console/model
 memory. The largest compiled local frame is 2,264 bytes in the editor command
 handler; its layout helper adds 232 bytes. Native menu-thread stack capacity and
 transient candidate/edit allocations must be checked during UI installation.
-The prepared packet has no mutable globals or unresolved symbols.
+The packet has no mutable globals or unresolved symbols.
+
+## Shared cartridge installation
+
+`tools/v3_diary_install.py` is called by the existing shared runtime builder with
+the explicit `--diary-core`, `--diary-ui`, and `--diary-screen` preparations.
+It reuses the complete checked core, screen, and menu packets without reconversion.
+The current installed build is ABI 309, ROM SHA-256
+`e34f0aa348126344ca615cadb5102a8714993de5f55e4be29a52e5dbe8641909`,
+at `build/v3-diary-category-work-01/connected-03/`. Its build lock pins the report
+and cartridge; it is an implementation checkpoint, not a playtest release.
+
+Three physical-ROM resources load the 24,576-byte storage reservation, 36,864-byte
+UI/code/state reservation, and 144,256-byte artwork/guard packet. The shared
+startup retains all existing packets and checks every transfer and CRC before
+entering initialization. Fifteen descriptors and their loader fit in 576 of 688
+reserved bytes. Live diary state, compression workspace, and separate edit
+candidate have independent guards. Total added reserved RAM is 421,952 bytes,
+including code, artwork, state, scratch, and guards, below the framebuffer.
+
+All 23 stable console/storage entries redirect to the new save module. Their
+23 corresponding exports inside the insect packet also redirect: insect seasonal
+code calls its local save-state checker directly, so changing only the stable
+entries would leave calls to the obsolete scratch/guard implementation. The
+complete predecessor packet is checked before replacement; only those eight-byte
+entry windows change. Canonical format-eight codec bodies, creature artwork,
+and all other packet bytes remain. Both packet hashes and the startup CRC are
+updated. Canonical-code and storage-code ownership remain distinct in the report.
+
+HBOARD code/relocation move to logical VROM `04600000`/`04610000`; keyboard
+code/relocation move to `04620000`/`04630000`. Their original DMA indices remain
+adjacent, as required by the native overlay manager. Old physical allocations
+are preserved. Each new physical destination is checked against DMA owners,
+physical resources, and nonzero data. The submenu owner descriptors and the
+1,600-byte arena growth are installed together. The room hook removes exactly
+one owner relocation while preserving the relocation footer, all other rows,
+and its original delay slot. The native played-day call retains its delay slot.
+
+`tests/test_v3_diary_install.py` checks complete installed packets, both save
+dispatch routes, current checksums, all fifteen startup descriptors, menu DMA
+identities, owner descriptors, room relocation at two load addresses, and unchanged
+surrounding data. The shared sanitized startup test checks transfer/CRC failure
+before initialization for every descriptor. Three focused tests pass. These are
+cartridge and host checks, not native menu rendering, FlashRAM execution, or
+hardware evidence. No diary choices are enabled by this installation.
 
 ## Connected consumer map
 
@@ -320,17 +366,23 @@ The prepared packet has no mutable globals or unresolved symbols.
 | --- | --- |
 | Category identity/data | All sixteen donor IDs, names, prices, and aliases bound; additive native identity/readers still required |
 | Carried/collection artwork | Shared carried model converted with the general split material/geometry converter; reuse cover conversions and install correct room/collection contexts |
-| Calendar entry | Surface A-tap, owner/player resolution, actual room entry, native dates/events/birthdays, drawing, and owned menu linked; visit hook prepared, actual participation callers and installation remain |
-| Reading/editing | Controller, ownership, wrapping/scrolling, cursor, keyboard child, confirmation/privacy, transitions, and atomic commit linked; overlay/DMA/arena installation and native execution remain |
+| Calendar entry | Surface A-tap, owner/player resolution, dates/events/birthdays, drawing, owned menu, and visit hook installed; carried-ID rebinding and actual participation callers remain |
+| Reading/editing | Controller, ownership, wrapping/scrolling, cursor, keyboard child, confirmation/privacy, transitions, atomic commit, overlays/DMA/arena installed; native execution remains |
 | English UI | Official prompts, project errors, all screen textures, and native event labels extracted/credited/checked; native rendering remains unverified |
-| Persistence | Shared reset, clear, probe, pack, commit, forward migration, and preflight implemented/tested on host; startup loading and stable native dispatch still need installation |
+| Persistence | Shared reset, clear, probe, pack, commit, forward migration, and preflight implemented/tested on host; startup and both stable/direct native dispatch installed; native UI/save verification remains |
 | Selection | Bind carried/display profile dependencies, catalogue/scoring, and independent/all choices only after the complete path is connected |
 | Verification | Run bounded combined current-ROM UI/save checks after integration; no separate style-by-style native scenarios |
 
-Resume this same connected category at the real native date/event provider and
-room-entry binding, followed by resident/startup/save dispatch, prepared menu-hook
-installation, carried readers, and selection. Reuse the prepared
-core, screen packet, linked UI, and source catalogue, and
+Resume this same connected category at carried identity/readers and artwork
+contexts, catalogue/scoring, actual event participation, and independent/all
+selection. The native `item1_B_tableNo` has an existing `2B00` entry of type 21;
+preserve that identity and reserve additive carried IDs rather than silently
+reusing donor IDs. Rebind the room adapter's donor-range comparison to the
+reserved destination range before enabling profiles. Names/type/price and
+display/pocket conversion wrap the current shared readers, with disabled-import
+rejection; loose-room, ground, pocket/handover, and catalogue artwork use their
+proper carried/cover contexts. Reuse the installed
+core, screen packet, UI, and source catalogue, and
 retain passing save evidence unless those paths change. Do not redirect to
 acquisition, gold-tree work, or replay exhausted creature/console fixtures.
 

@@ -665,7 +665,7 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
                     equipment_rigs=None, expand_storage=False, furniture_audio_art=None, furniture_profiles=None,
                     material_frames_art=None,scrolling_materials_art=None,room_surfaces_art=None,furniture_scoring=False,
                     password_runtime=None,password_editor=False,room_effects=None,furniture_capacity=False,console_storage=False,
-                    console_images=None,console_emulator=False,console_disk=None,creature_items=None,creature_field=None,creature_fish=False,creature_insects=None,clothing_batch=None):
+                    console_images=None,console_emulator=False,console_disk=None,creature_items=None,creature_field=None,creature_fish=False,creature_insects=None,clothing_batch=None,diaries=None):
     """Update shared readers; optionally install the shared held-resource adapter."""
     output=output.resolve()
     if output.exists() or not output.is_relative_to(ROOT/'build'):
@@ -708,13 +708,22 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
     if clothing_batch is not None:
         if resource_mode:raise ValueError('Install shared runtime updates in dependency order')
         resource_mode=True
+    if diaries is not None:
+        if resource_mode:raise ValueError('Install shared runtime updates in dependency order')
+        resource_mode=True
     if resource_mode:
         blob,reused=reuse_resource_tail(base,prior,old_blob)
         if not reused['reused_bytes'] and not reused.get('external_resources'):
             raise ValueError('Equipment integration requires the checked shared resource tail')
     parent_readers=bool(player_actions and prior.get('equipment_resources',{}).get('player_actions',{}).get('equipment_selection'))
     wrapped_names=bool(player_actions and prior.get('equipment_resources',{}).get('wrapped_presents'))
-    if clothing_batch is not None:
+    if diaries is not None:
+        import v3_diary_install as equipment
+        equipment_report,owner_changes,report_updates,physical_writes=equipment.install(
+            base,prior,blob,core,output,diaries)
+        display_report=report_updates['clothing']['display']
+        alias_report=prior['display_aliases']
+    elif clothing_batch is not None:
         import v3_clothing_install as equipment
         equipment_report,owner_changes,report_updates=equipment.install(
             base,prior,blob,core,output,clothing_batch.resolve())
@@ -916,13 +925,16 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             entry=files[vrom]
             if vrom in growth_vroms:
                 row=next(r for r in growth if r['vrom']==vrom)
-                if (entry.pend or entry.size!=row['previous_bytes'] or entry.pstart!=row.get('previous_physical',row['physical'])
+                if (entry.pend!=row.get('previous_compressed_end',0) or
+                        (entry.pend and not row.get('relocated')) or
+                        entry.size!=row['previous_bytes'] or entry.pstart!=row.get('previous_physical',row['physical'])
                         or len(data)!=row['bytes'] or sha256(data)!=row['sha256']
                         or sha256(entry.extract(base))!=row['previous_sha256']):
                     raise ValueError('Changed complete resource growth plan')
                 if row.get('relocated'):
                     start,end=row['physical'],row['physical']+row['bytes']
                     if (start&15 or not 0<=start<end<=len(base) or any(base[start:end]) or
+                            physical.overlaps(report_updates.get('physical_resources',prior.get('physical_resources',[])),start,end) or
                             any(e.pstart<end and start<(e.pend or e.pstart+e.size)
                                 for e in files.values() if e.pstart!=0xFFFFFFFF) or
                             any(r is not row and r['physical']<end and start<r['physical']+r['bytes'] for r in growth)):
@@ -1060,7 +1072,15 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             raise ValueError('Shared runtime loses a complete changed owner')
     for row,data in physical_writes:
         first=row['physical'];end=first+row['bytes']
-        if any(result[first:end]):raise ValueError('Physical resource write overlaps changed cartridge bytes')
+        if 'previous_sha256' in row:
+            old=next((r for r in prior.get('physical_resources',[]) if r['id']==row['id']),None)
+            if (old is None or (old['physical'],old['bytes'],old['sha256'])!=
+                    (first,row['bytes'],row['previous_sha256']) or
+                    sha256(result[first:end])!=row['previous_sha256']):
+                raise ValueError('Changed declared physical-resource predecessor')
+        elif any(result[first:end]):raise ValueError('Physical resource write overlaps changed cartridge bytes')
+        if len(data)!=row['bytes'] or sha256(data)!=row['sha256']:
+            raise ValueError('Changed complete physical-resource replacement')
         result[first:end]=data
     if creature_insects is not None:
         result=equipment.finish(result,base,prior,output,equipment_report,report_updates['physical_resources'])
@@ -1328,6 +1348,15 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             saved_profile_changed=report['save_runtime']['profile_hex']!=prior['save_runtime']['profile_hex'])
         report['sources'].update(clothing['sources'])
         report['native_test']='pending connected clothing gameplay/save verification; retained creature failures remain unresolved'
+    if diaries is not None:
+        diary=equipment_report['diaries']
+        report['shared_runtime_refresh'].update(adapters=['diaries'],artwork_changed=True,
+            additional_resident_bytes=diary['additional_resident_bytes'],
+            additional_menu_pool_bytes=diary['hooks']['additional_pool_bytes'],
+            resource_allocations_changed=True,saved_format_changed=True,saved_profile_changed=False,
+            changed_owner_moves=owner_moves)
+        report['sources'].update(diary['sources'])
+        report['native_test']='pending connected diary UI/save verification; carried readers and selection remain unfinished'
     if console_images is not None:
         images=equipment_report['console_images']
         report['shared_runtime_refresh'].update(adapters=['console_images'],
@@ -1377,6 +1406,9 @@ if __name__=='__main__':
     parser.add_argument('--base-lock',type=Path,default=LOCK)
     parser.add_argument('--clothing-batch',type=Path,
         help='With --refresh-runtime, install the complete prepared clothing category')
+    parser.add_argument('--diary-core',type=Path,help='Prepared shared diary save/controller directory')
+    parser.add_argument('--diary-ui',type=Path,help='Prepared diary native UI and menu hooks directory')
+    parser.add_argument('--diary-screen',type=Path,help='Prepared complete diary screen artwork directory')
     parser.add_argument('--equipment-art',type=Path,
         help='With --refresh-runtime, install prepared shared held models and source-derived motion resources')
     parser.add_argument('--equipment-rigs',type=Path,
@@ -1450,6 +1482,9 @@ if __name__=='__main__':
     parser.add_argument('--console-disk',type=Path,
         help='With --refresh-runtime, preload the prepared shared disk engine without enabling unfinished games')
     args=parser.parse_args()
+    diary_paths=(args.diary_core,args.diary_ui,args.diary_screen)
+    if any(diary_paths) and (not all(diary_paths) or not args.refresh_runtime):
+        parser.error('Diary installation requires --refresh-runtime and all three --diary-* directories')
     if args.equipment_art and not args.refresh_runtime:parser.error('--equipment-art requires --refresh-runtime')
     if args.equipment_rigs and not args.refresh_runtime:parser.error('--equipment-rigs requires --refresh-runtime')
     if args.player_motion and not args.refresh_runtime:parser.error('--player-motion requires --refresh-runtime')
@@ -1503,6 +1538,7 @@ if __name__=='__main__':
                             furniture_capacity=args.furniture_capacity,console_storage=args.console_storage,
                             console_images=args.console_images,console_emulator=args.console_emulator,
                             console_disk=args.console_disk,creature_items=args.creature_items,creature_field=args.creature_field,
-                            creature_fish=args.creature_fish,creature_insects=args.creature_insects,clothing_batch=args.clothing_batch)
+                            creature_fish=args.creature_fish,creature_insects=args.creature_insects,clothing_batch=args.clothing_batch,
+                            diaries=dict(zip(('core','ui','screen'),diary_paths)) if all(diary_paths) else None)
             if args.refresh_runtime else build(args.output,args.art,args.base_lock))
     print(json.dumps({k:result[k] for k in ('runtime_abi','output_sha256','patch_sha256')},indent=2))

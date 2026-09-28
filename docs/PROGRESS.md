@@ -31,9 +31,9 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
-The current proposal is ABI 308 at
-`build/v3-native-variants-work-01/connected-02/cartridge/build-lock.json`, ROM SHA-256
-`131498d875bd07ca168b3bd1590796c78b9f9cb1cde2421894bbac6e16d17d50`.
+The current proposal is ABI 309 at
+`build/v3-diary-category-work-01/connected-03/build-lock.json`, ROM SHA-256
+`e34f0aa348126344ca615cadb5102a8714993de5f55e4be29a52e5dbe8641909`.
 It contains 191 independently selectable development imports, including all nine
 fish and eight insects, and 100 inactive furniture profiles whose acquisition
 is pending. The main lock and both stable V2-14 deployments are unchanged.
@@ -49,7 +49,7 @@ project safety messages have per-text provenance. Preparation is
 core is 22,544 bytes. The calendar matches the donor C in focused host comparisons.
 The adapter and controller pass a combined sanitized host check across all styles,
 all player access modes, navigation, privacy, and rejected edits. These are not
-installed screens or ordinary gameplay results.
+ordinary native gameplay results.
 
 The shared screen packet retains all twelve calendar/diary month labels, 31 day
 numbers, year digits, backgrounds, paper, controls, and prompt graphics. Preparation
@@ -59,8 +59,8 @@ official-source credits in the single provenance catalogue. The native drawing
 functions and full-page keyboard adapter compile for VR4300. The focused keyboard
 check covers proportional rows, full pages, Rewrite, ownership, and unchanged
 ordinary keyboard dispatch. The screen conversion checks complete resource/load
-bounds, caller tables, and rejection of missing state. These screens and hooks
-are not installed or visually verified; no new cartridge is claimed.
+bounds, caller tables, and rejection of missing state. The screens and hooks are
+installed in the experimental cartridge, but not visually verified.
 
 The shared native menu owner is linked at
 `build/v3-diary-category-work-01/ui-06/`. It connects opening, calendar/read views,
@@ -69,7 +69,7 @@ capacity rejection, closing, and session cleanup. The paper and text share the
 same scrolling position; the cursor uses proportional glyph positions. The
 keyboard adapter retains blinking and character alteration. The linked UI and
 native entry/calendar adapter occupy 18,416 bytes, with 2,240 bytes of screen state
-and 488 bytes of native context. Prepared HBOARD and keyboard
+and 488 bytes of native context. Installed HBOARD and keyboard
 hooks add 1,600 bytes to the native menu arena and preserve unrelated existing
 code/graphics at two relocation addresses. Three focused source/compiler/host
 checks pass, including the connected interaction with rejected and accepted
@@ -82,7 +82,7 @@ and the full-town save preflight. Its separate 48,048-byte candidate buffer at
 checked N64 holiday schedule and lunar conversion, with bounds protecting the
 adjacent browsing years. Twenty labels have source credits, including seventeen
 official-source labels and three reusing explicitly assistant-authored N64 text.
-A prepared play-day hook retains the native title/player-select/demo gates and
+The installed play-day hook retains the native title/player-select/demo gates and
 live-player result. Actual event-participation callbacks remain unbound.
 
 Four focused checks pass: current linked packets/hooks, the combined native-data
@@ -91,14 +91,22 @@ covers 420 months, lunar boundaries, all style bits, separate owner birthdays,
 overlapping holidays, and guarded preflight. The converted screen/carried artwork
 is reused. These are host/compiler results, not installed native gameplay.
 
+The shared builder installs diary menus, room/visit hooks, three guarded resident
+packets, and format-eleven storage together. Its fifteen-packet startup occupies
+576 of 688 reserved bytes. Both stable save exports and direct calls from the
+insect runtime reach diary-aware storage, preserving canonical-codec bodies and
+existing artwork. Three focused checks pass for the current cartridge, including
+native menu relocation, unchanged surrounding code/resources, packet checksums,
+and sanitized startup failure gates. They do not establish native UI/save execution.
+
 The shared save adapter retains the complete town, console progress, calendars,
-and pages within the existing two FlashRAM banks. Prepared menu/room/visit-hook
-installation, actual participation callers, carried readers, resident
-loading/save dispatch, and selection
-remain in the same [diary consumer map](../specs/V3_DIARIES.md). No new playable
-imports or cartridge completion is claimed. Planned format-eleven saves require
-this or a newer compatible build; ABI 308 remains format nine, both deployments
-remain V2-14, and the user's saves are untouched.
+and pages within the existing two FlashRAM banks. Carried identity/readers,
+artwork contexts, catalogue/selection, actual participation callers, and connected
+native UI/save verification remain in the same
+[diary consumer map](../specs/V3_DIARIES.md). No diary choices are enabled yet.
+New format-eleven saves require this or a newer compatible build; earlier V3
+and V2 cannot load them. Both deployments remain V2-14, and the user's saves
+are untouched.
 
 Both source artwork variants, school desk and bus stop, are installed through
 the ordinary shared importer. Complete original-N64 profile/model comparison
