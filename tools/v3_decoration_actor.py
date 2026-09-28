@@ -247,12 +247,19 @@ def native_markers(base):
     return rows
 
 
-def marker_consumers(base):
+def marker_consumers(base,prior=None):
     files=by_vrom(base);rows=[]
     for purpose,vrom,ram,start,end,digest in MARKER_CONSUMERS:
-        body=files[vrom].extract(base)[start-ram:end-ram]
+        body=bytearray(files[vrom].extract(base)[start-ram:end-ram])
+        installed_sha256=sha256(body);wrappers=[]
+        for hook in (prior or {}).get('equipment_resources',{}).get('holiday_items',{}).get('hooks',[]):
+            if hook['kind']!='type' or not start<=hook['address']<end:continue
+            at=hook['address']-start
+            if body[at:at+8]!=bytes.fromhex(hook['after']):raise ValueError('Changed event category wrapper')
+            body[at:at+8]=bytes.fromhex(hook['before']);wrappers.append(hook)
         if sha256(body)!=digest: raise ValueError('Changed native marker consumer: '+purpose)
-        rows.append(dict(purpose=purpose,vrom=vrom,ram=ram,start=start,end=end,sha256=digest))
+        rows.append(dict(purpose=purpose,vrom=vrom,ram=ram,start=start,end=end,sha256=digest,
+            installed_sha256=installed_sha256,wrappers=wrappers))
     return rows
 
 
@@ -262,7 +269,7 @@ def prepare(base, prior, directory):
     _, art = prepared_packet(source, PREPARED)
     renderer = prior['equipment_resources']['npc_extra']['events']['decorations']['renderer']
     directory.mkdir(parents=True, exist_ok=False)
-    markers=native_markers(base);consumers=marker_consumers(base)
+    markers=native_markers(base);consumers=marker_consumers(base,prior)
     files, link, owners, headers = controller_sources(art, renderer, directory)
     native, receipts = native_bindings(base, prior); link.update(native)
     try:

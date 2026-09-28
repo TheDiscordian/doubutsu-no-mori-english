@@ -211,7 +211,7 @@ are compiled and installed together in the current proposal: eighteen drawing
 bindings and fifteen collision bindings. Both countdown rigs, digit frames,
 seasonal palettes, shadow passes, and projection flags have shared native drawing
 bindings. The current proposal at
-`build/v3-diary-category-work-01/decoration-services-installed-02/build-lock.json`
+`build/v3-diary-category-work-01/event-items-installed-03/build-lock.json`
 also installs all eleven owners' source constructors, movement, destruction, and
 local interactions through shared native setup and original structure allocation.
 The four owner patches preserve the existing actor/campsite chains and account
@@ -225,8 +225,23 @@ preserve the donor's 60-Hz timing on the native 30-Hz engine without drawing
 geometry twice or reviving deleted actors. The same installer supports guarded
 refreshes in its existing packet, preserving complete converted art and the
 original fallback chain.
-Next connect normalized fishing records and all forty message identities, and
-the full Harvest fork item/player pickup path. The countdown's
+All fourteen carried event records are installed through the shared category
+importer: exercise-card states `2523..252F` and knife and fork `2530`. Their
+official names, zero-price rules, inventory icons, placement readers, and
+ground/police/handover models share two categories. Fixed native rendering slots
+45/47 retain the existing 71-entry capacity. All four seasonal descriptor banks
+append after their current allocation without moving scenery. The current
+cartridge check and empty/mixed/all-supported browser comparison pass; the
+readiness mask stays zero and save/profile data is unchanged. Reuse the prepared
+batch at `build/v3-diary-category-work-01/event-items-prepared-03/`.
+
+Next connect Harvest pickup at the native ordinary-item search boundary
+`808BC1E0`, retaining the existing action-31 table-pickup request/setup and
+actual pocket insertion. The complete native functions are mapped in the
+[carried-item contract](../specs/V3_DIARIES.md#carried-event-items-and-player-connection).
+Finish tabletop height, full-pocket dialogue, exercise-card menu/state handling,
+and profile/save admission. Continue normalized fishing records and all forty
+message identities within this same task. The countdown's
 shared clip and both controllers are installed; retain them while connecting
 event activation. Native/source saved personal IDs differ (16 versus 20 bytes);
 do not cast them or send donor message IDs to native text readers. This is the

@@ -29,20 +29,22 @@ FUNCTIONS=(
 PENDING='Native seasonal ground, police, and handover table/array integration is required; no item is enabled.'
 
 
-def discover(source):
+def discover(source, parent_records=None):
     functions=[]
     for at,n,digest in FUNCTIONS:
         raw,receipt=source.function(at)
         if len(raw)!=n or sha256(raw)!=digest:raise ValueError('Changed complete category consumer')
         functions.append(receipt)
-    parent_inventory=equipment(source)
-    types=source.raw('item1_2_tableNo');type_at,_=source.symbol('item1_2_tableNo')
-    if len(types)!=92 or sha256(types)!='d07c0e001d578fc1bb754c8b24ad7eb782c6bf94ba1ddff2b2c3239f97767975':
-        raise ValueError('Changed complete equipment categories')
     main=source.symbol('item1_tableNo$430')[0]
-    if (functions[0]['relocations']!={134:(6,1,5,main),142:(4,1,5,main)} or
-            source.pointers(main,64).get(main+8)!=type_at):
-        raise ValueError('Changed equipment category binding')
+    if functions[0]['relocations']!={134:(6,1,5,main),142:(4,1,5,main)}:
+        raise ValueError('Changed shared item-category binding')
+    bindings=source.pointers(main,64)
+    if parent_records is None:
+        types=source.raw('item1_2_tableNo');type_at,_=source.symbol('item1_2_tableNo')
+        if (len(types)!=92 or sha256(types)!='d07c0e001d578fc1bb754c8b24ad7eb782c6bf94ba1ddff2b2c3239f97767975'
+                or bindings.get(main+8)!=type_at):
+            raise ValueError('Changed complete equipment categories')
+        parent_records=[r for r in equipment(source)['rows'] if int(r['item_id'],16)>=0x2224]
     tables=[]
     for role in ('mode_DL_table','vtx_DL_table'):
         spans=sorted(source.names[role])
@@ -54,9 +56,19 @@ def discover(source):
             tables.append(dict(role=role,offset=at,bytes=n,pointers=pointers,
                                sha256=sha256(source.data[at:at+n])))
     parents=defaultdict(list)
-    for row in parent_inventory['rows']:
-        item=int(row['item_id'],16)
-        if item>=0x2224:parents[types[item&255]].append(row)
+    seen=set()
+    for row in parent_records:
+        item=int(row.get('donor_item_id',row['item_id']),16)
+        if item>>12!=2 or item in seen:
+            raise ValueError('Category parents require unique carried donor identities')
+        seen.add(item)
+        table=bindings.get(main+4*((item>>8)&15))
+        if table is None:raise ValueError('Missing carried category binding')
+        _,_,width=source.containing(table,exact=True)
+        if item&255>=width:raise ValueError('Carried item exceeds donor category table')
+        category=source.data[table+(item&255)]
+        if not 0<category<53:raise ValueError('Unsupported carried drawing category')
+        parents[category].append(row)
     grounds=sorted(source.names['draw_part_table_a'])
     if len(grounds)!=4:raise ValueError('Incomplete seasonal ground owners')
     rows=[]
@@ -114,8 +126,8 @@ def discover(source):
         native_tables_installed=False,logical_imports_added=0)
 
 
-def convert(source,output,selected=()):
-    inventory=discover(source);requested=set(selected)
+def convert(source,output,selected=(),*,parent_records=None):
+    inventory=discover(source,parent_records);requested=set(selected)
     available={item for row in inventory['rows'] for item in row['parent_item_ids']}
     if requested-available:raise ValueError('Unknown or original-only item-category selection')
     rows=[r for r in inventory['rows'] if not requested or requested.intersection(r['parent_item_ids'])]

@@ -85,6 +85,11 @@ def encode(rows):
 
 def native_contract(core,prior):
     normalized=bytearray(core);proof=[]
+    for hook in prior.get('equipment_resources',{}).get('holiday_items',{}).get('hooks',[]):
+        if hook['kind'] not in ('display','pocket'):continue
+        at=hook['address']-CODE_RAM
+        if normalized[at:at+8].hex()!=hook['after']:raise ValueError('Changed outer event conversion wrapper')
+        normalized[at:at+8]=bytes.fromhex(hook['before'])
     for hook in prior.get('equipment_resources',{}).get('diary_items',{}).get('hooks',[]):
         if hook['kind'] not in ('display','pocket'):continue
         at=hook['address']-CODE_RAM

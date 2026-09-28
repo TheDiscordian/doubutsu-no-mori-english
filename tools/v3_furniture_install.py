@@ -733,9 +733,16 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
     parent_readers=bool(player_actions and prior.get('equipment_resources',{}).get('player_actions',{}).get('equipment_selection'))
     wrapped_names=bool(player_actions and prior.get('equipment_resources',{}).get('wrapped_presents'))
     if holiday_actor_services:
-        import v3_holiday_motion as equipment
-        equipment_report,owner_changes,report_updates,physical_writes=equipment.install(
-            base,prior,blob,core,output)
+        current_events=prior['equipment_resources'].get('npc_extra',{}).get('events',{})
+        if (current_events.get('decorations',{}).get('controllers') and
+                not prior['equipment_resources'].get('holiday_items')):
+            import v3_holiday_items as equipment
+            equipment_report,owner_changes,report_updates,physical_writes=equipment.install(
+                base,prior,blob,core,module,output)
+        else:
+            import v3_holiday_motion as equipment
+            equipment_report,owner_changes,report_updates,physical_writes=equipment.install(
+                base,prior,blob,core,output)
         display_report=prior['clothing']['display'];alias_report=prior['display_aliases']
     elif npc_registry_art is not None:
         import v3_npc_registry as equipment
@@ -1442,7 +1449,8 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         new_state=holiday_state and not prior['equipment_resources'].get('holiday_state')
         state_growth=(holiday_state['packet']['bytes']-
             prior['equipment_resources'].get('holiday_state',{}).get('packet',{}).get('bytes',0)) if holiday_state else 0
-        report['shared_runtime_refresh'].update(adapters=['holiday_actor_services'],artwork_changed=bool(decorations),
+        event_items=equipment_report.get('holiday_items') and not prior['equipment_resources'].get('holiday_items')
+        report['shared_runtime_refresh'].update(adapters=['holiday_actor_services'],artwork_changed=bool(decorations or event_items),
             additional_resident_bytes=state_growth,
             resource_allocations_changed=bool(new_state or npc['events'].get('reserved')),
             saved_format_changed=bool(new_state),saved_profile_changed=False)

@@ -13,6 +13,86 @@ from apply_translation import write_new
 
 
 class HolidayMapsTests(unittest.TestCase):
+    def test_connected_event_item_category_batch(self):
+        """Current cartridge/data checks; no replay of native scenario fixtures."""
+        import json
+        import struct
+        import zlib
+        from aflib import by_vrom,CODE_RAM,CODE_VROM,sha256,u32
+        from v3_asset_loader import BLOB,MODULE,MODULE_RAM
+        from v3_furniture_install import inputs,provenance_patch
+        from v3_holiday_items import RAM,TABLE,ICON,ART,END,records,pocket_icons,CATEGORIES
+        from v3_decoration_actor import marker_consumers
+        from v3_creature_items import native_contract
+        current=ROOT/'build/v3-diary-category-work-01/event-items-installed-03'
+        image,r=inputs(current/'build-lock.json');base,prior=inputs(current/'base-lock.json')
+        e=r['equipment_resources'];old_e=prior['equipment_resources'];d=e['holiday_items']
+        p=e['holiday_state']['packet'];old_p=old_e['holiday_state']['packet']
+        raw=image[p['physical']:p['physical']+p['bytes']]
+        old=base[old_p['physical']:old_p['physical']+old_p['bytes']]
+        self.assertEqual((p['physical'],p['bytes']),(old_p['physical'],old_p['bytes']))
+        self.assertEqual((sha256(raw),zlib.crc32(raw)),(p['sha256'],p['crc32']))
+        self.assertEqual(raw[:RAM-p['ram']],old[:RAM-p['ram']])
+        self.assertEqual(raw[END-p['ram']:],old[END-p['ram']:])
+        self.assertFalse(any(old[RAM-p['ram']:END-p['ram']]))
+        self.assertEqual(sha256(raw[RAM-p['ram']:END-p['ram']]),d['sha256'])
+        self.assertEqual(sha256(raw[RAM-p['ram']:RAM-p['ram']+d['code']['bytes']]),d['code']['sha256'])
+        source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+            (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+        rows,_=records(source);icons,icon_report=pocket_icons(source,rows)
+        self.assertEqual(d['rows'],rows);self.assertEqual(len(rows),14)
+        self.assertEqual(provenance_patch(rows,('tools/v3_holiday_items.py',)),'')
+        self.assertEqual(raw[ICON-p['ram']:ICON-p['ram']+len(icons)],icons)
+        self.assertEqual(icon_report['unique_icons'],2)
+        table=raw[TABLE-p['ram']:TABLE-p['ram']+d['table_bytes']]
+        self.assertEqual(struct.unpack_from('>4I',table),(0x41464849,2,14,0))
+        for i,row in enumerate(rows):
+            values=struct.unpack_from('>HHBBHI16s',table,16+i*28)
+            self.assertEqual(values,(int(row['item_id'],16),0,row['native_category'],1 if i<13 else 2,
+                0,icon_report['bindings'][i]['address'],row['name'].encode().ljust(16,b' ')))
+        files=by_vrom(image);old_files=by_vrom(base)
+        blob=files[BLOB].extract(image);core=files[CODE_VROM].extract(image);module=files[MODULE].extract(image)
+        for h in d['hooks']:
+            owner,origin=(blob,0x80460000) if h['address']>=0x80460000 else (
+                (module,MODULE_RAM) if h['address']>=MODULE_RAM else (core,CODE_RAM))
+            self.assertEqual(owner[h['address']-origin:h['address']-origin+8].hex(),h['after'])
+        h=d['icon_hook'];expected=bytearray(old_files[h['vrom']].extract(base))
+        pos=h['address']-h['ram'];self.assertEqual(expected[pos:pos+8].hex(),h['before'])
+        expected[pos:pos+8]=bytes.fromhex(h['after'])
+        self.assertEqual(files[h['vrom']].extract(image),expected)
+        data=blob[e['blob_offset']:e['blob_offset']+e['bytes']];c=e['item_categories']
+        self.assertEqual(c['count'],71);self.assertEqual(len(c['objects']),12)
+        self.assertEqual(c['objects'][:-2],old_e['item_categories']['objects'])
+        for row in d['artwork']:
+            cat=row['source_category'];native=CATEGORIES[cat]
+            self.assertEqual(data[c['map_offset']+16+cat],native)
+            self.assertEqual(sha256(raw[row['ram']-p['ram']:row['ram']-p['ram']+row['object_bytes']]),
+                row['installed_sha256'])
+            for table in c['tables']:
+                self.assertEqual(u32(data,table['offset']+native*4),
+                    (row['ram']&0x1FFFFFFF)+row['model_offsets'][table['role']])
+        g=e['ground_categories']
+        for i,(row,previous) in enumerate(zip(g['owners'],old_e['ground_categories']['owners'])):
+            cap=row['capacity'];self.assertGreaterEqual(cap['empty_offset'],previous['capacity']['resident_bytes'])
+            self.assertLessEqual(cap['parts_offset']+52*12,cap['resident_bytes'])
+            self.assertEqual(u32(data,g['config_offset']+i*36+24),cap['parts_offset'])
+            self.assertEqual(u32(core,row['allocation_descriptor']-CODE_RAM+12),row['ram']+cap['resident_bytes'])
+            rel=bytearray(old_files[row['reloc']].extract(base));struct.pack_into('>I',rel,12,cap['bss_bytes'])
+            self.assertEqual(files[row['reloc']].extract(image),rel)
+            self.assertEqual(files[row['vrom']].extract(image),old_files[row['vrom']].extract(base))
+        self.assertEqual(e['scenery'],old_e['scenery'])
+        self.assertEqual(r['save_codec'],prior['save_codec'])
+        self.assertEqual(r['save_runtime']['profile_hex'],prior['save_runtime']['profile_hex'])
+        self.assertEqual((d['selected'],d['ready_mask']),(0,0))
+        self.assertFalse(d['native_execution_verified'])
+        self.assertEqual(len(marker_consumers(image,r)),3)
+        self.assertIsNotNone(native_contract(core,r))
+        boot=e['surface_bootstrap']['code'];at=e['blob_offset']+boot['symbols']['packets']-e['ram']
+        descriptors=list(struct.iter_unpack('>5I',blob[at:at+18*20]))
+        dest,address,size,crc,clear=descriptors[-1]
+        self.assertEqual((dest,address,size),(p['ram'],p['physical']|0x80000000,p['bytes']))
+        self.assertEqual(u32(blob,e['blob_offset']+crc-e['ram']),zlib.crc32(raw))
+
     def test_connected_decoration_lifecycles_and_native_owners(self):
         import json
         import struct

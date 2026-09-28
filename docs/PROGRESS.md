@@ -31,9 +31,9 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
-The current proposal is ABI 329 at
-`build/v3-diary-category-work-01/decoration-services-installed-02/build-lock.json`, ROM SHA-256
-`200a8c2b6d7e17a4d8d792eb94da74eec325d2882b9734e84c672ef5ca69ddf9`.
+The current proposal is ABI 330 at
+`build/v3-diary-category-work-01/event-items-installed-03/build-lock.json`, ROM SHA-256
+`1e150244094be4b073a39d0df18fd1f80edc7335ccd66a0af14524a3e847b907`.
 It contains 191 independently selectable development imports, including all nine
 fish and eight insects, and 100 inactive furniture profiles whose acquisition
 is pending, plus sixteen inactive diary cover profiles. The main lock and both
@@ -69,15 +69,34 @@ reservation. It validates the predecessor, rebinds the four owner hooks, retains
 the original fallback chain and complete artwork, and updates startup CRC.
 No new packet allocation or saved-format change is needed for a refresh.
 
+The shared carried-item importer also contains all thirteen exercise-card states
+and the Harvest knife and fork. Source-derived official names, zero-price rules,
+two complete models, two pocket icons, and the name/type/price/placement readers
+are installed together. The generic converter accepts carried parent records
+from their actual donor category tables; existing equipment preparation is
+retained. One additive category installer binds both new categories to the
+existing police/handover tables and all four seasonal ground owners. It appends
+complete descriptor banks without moving scenery or existing artwork. The
+loaded holiday packet does not grow. All fourteen names have official-disc
+attribution in the single provenance catalogue.
+
+The item readiness mask is zero. Exercise-card menus, Harvest tabletop height
+and player pickup/completion, and profile/save admission remain unfinished;
+these resources do not add selectable or playable event items yet. Current
+cartridge checks cover all fourteen records, five reader hooks, the chained icon
+branch, both complete models, seasonal allocation/relocation changes, startup
+CRC, and unchanged save/profile data. The retained nine equipment preparations
+still match their source and compiled resources. No native fixture is restarted.
+
 The right fireworks stall uses the checked seven-entry projection bound. The
 renderer retains both donor shadow passes, independently selected digit textures,
 scrolling, joint colours, and frame-phase updates. Fishing-record/text consumers,
-the Harvest fork item and player pickup, and event activation remain unfinished.
+the Harvest player interaction, and event activation remain unfinished.
 Fishing/Harvest service admission remains closed; live event activation remains
 disconnected for the whole batch. Installed controllers do not make these events
 or diaries playable, and native gameplay/rendering have not been verified.
 
-The focused current-cartridge lifecycle/owner/startup check passes. It covers all
+The retained lifecycle/owner/startup check passes on its recorded input build. It covers all
 eighteen records, eleven profiles, source-controller references, four exact native
 hook changes, all foreground identities, native marker consumers, the source
 draw-state tail, retained resources, and unchanged save/profile data. Private

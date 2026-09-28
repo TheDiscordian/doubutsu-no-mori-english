@@ -8,7 +8,7 @@ import json
 import struct
 import zlib
 
-from aflib import by_vrom,sha256,u32
+from aflib import CODE_RAM,by_vrom,sha256,u32
 from v3_asset_loader import ROOT,BLOB,compile_part
 from v3_equipment_runtime import RAM,GUARD
 from v3_furniture_pipeline import Source,prepare_material_pair
@@ -32,10 +32,10 @@ OWNERS=(
          reloc_sha256='b0efd203da52f4f6896eeb228438942130507f24df55cf2cab5be6deeac19f8b'))
 
 
-def prepared(source,path):
+def prepared(source,path,*,parent_records=None):
     """Reuse complete prepared categories, retaining full source dependencies."""
     path=path.resolve();raw=(path/'art.json').read_bytes();art=json.loads(raw)
-    expected=discover(source);by_type={r['source_category']:r for r in expected['rows']}
+    expected=discover(source,parent_records);by_type={r['source_category']:r for r in expected['rows']}
     if (art['format']!='AFV3-ITEM-CATEGORY-PREPARED-ASSETS-1' or art['version']!=1
             or art['source_rel_sha256']!=sha256(source.rel)
             or art['source_symbols_sha256']!=sha256(source.symbols.encode())):
@@ -93,6 +93,77 @@ def rebase_art(data,row,ram):
     if {f['before']&0xFFFFFF for f in fixes}!=set(resources):
         raise ValueError('Category rebasing misses a complete resource')
     return bytes(result),fixes
+
+
+def append_categories(base, equipment, blob, core, output, artwork, *, query_defines=()):
+    """Bind a complete additive category batch without moving existing art.
+
+    Artwork must already have checked resident addresses. Fixed empty category
+    slots are supplied by its registry; this does not allocate item identities.
+    Every seasonal owner receives one complete descriptor bank after its current
+    BSS allocation, preserving retained scenery and all earlier category banks.
+    """
+    e=equipment;at=e['blob_offset'];data=bytearray(blob[at:at+e['bytes']])
+    if sha256(data)!=e['sha256']:raise ValueError('Changed shared category packet')
+    c=e['item_categories'];offset=c['code_offset'];old=c['code'];count=c['count']
+    if sha256(data[offset:offset+old['bytes']])!=old['sha256']:
+        raise ValueError('Changed installed category entry')
+    flags=[s[2:] for s in old['flags'] if s.startswith('-D')]
+    if {s.split('=')[0] for s in flags}&{s.split('=')[0] for s in query_defines}:
+        raise ValueError('New category query replaces an installed query')
+    code,compiled=compile_part('item_categories',output/'item-categories',defines=(*flags,*query_defines))
+    if len(code)>c['map_offset']-offset or compiled['symbols']!=old['symbols']:
+        raise ValueError('Category extension changes installed exports or exceeds code bounds')
+    data[offset:c['map_offset']]=code.ljust(c['map_offset']-offset,b'\0')
+    if sha256(data[c['map_offset']:c['map_offset']+c['map_bytes']])!=c['map_sha256']:
+        raise ValueError('Changed complete category map')
+    for table in c['tables']:
+        start,n=table['offset'],table['bytes']
+        if n!=count*4 or sha256(data[start:start+n])!=table['sha256']:
+            raise ValueError('Changed complete material/geometry table')
+    used_source={r['source_category'] for r in c['objects']}
+    used_native={r['native_category'] for r in c['objects']}
+    for row in artwork:
+        source,native=row['source_category'],row['native_category']
+        if (not 0<source<53 or not NATIVE_COUNT<=native<count or
+                source in used_source or native in used_native or data[c['map_offset']+16+source]):
+            raise ValueError('Additive category overwrites a used or invalid slot')
+        used_source.add(source);used_native.add(native)
+        for table in c['tables']:
+            pos=table['offset']+native*4
+            if u32(data,pos):raise ValueError('Category destination contains retained graphics')
+            struct.pack_into('>I',data,pos,(row['ram']&0x1FFFFFFF)+row['model_offsets'][table['role']])
+        data[c['map_offset']+16+source]=native
+        c['objects'].append(dict(row,handover_police_installed=True,ground_installed=True,runtime_installed=True))
+    for table in c['tables']:
+        table['sha256']=sha256(data[table['offset']:table['offset']+table['bytes']])
+    c.update(code=compiled,map_sha256=sha256(data[c['map_offset']:c['map_offset']+c['map_bytes']]))
+    files=by_vrom(base);owners={};ground=e['ground_categories'];cfg=ground['config_offset']
+    if sha256(data[cfg:cfg+ground['config_bytes']])!=ground['config_sha256']:
+        raise ValueError('Changed complete seasonal category configuration')
+    for variant,row in enumerate(ground['owners']):
+        cap=row['capacity'];rel=bytearray(files[row['reloc']].extract(base))
+        pos=row['allocation_descriptor']-CODE_RAM+12;old_resident=cap['resident_bytes']
+        if (sha256(rel)!=row['output_reloc_sha256'] or
+                u32(rel,12)!=old_resident-files[row['vrom']].size or
+                u32(core,pos)!=row['ram']+old_resident or
+                u32(data,cfg+variant*36+24)!=cap['parts_offset']):
+            raise ValueError('Changed complete seasonal descriptor allocation')
+        empty=(old_resident+15)&~15;parts=empty+32
+        resident=(parts+52*len(c['objects'])+15)&~15
+        if resident>=0x20000:raise ValueError('Invalid seasonal category growth')
+        growth=resident-old_resident
+        cap.update(resident_bytes=resident,bss_bytes=u32(rel,12)+growth,empty_offset=empty,parts_offset=parts)
+        struct.pack_into('>I',data,cfg+variant*36+24,parts)
+        struct.pack_into('>I',rel,12,cap['bss_bytes'])
+        struct.pack_into('>I',core,pos,row['ram']+resident)
+        row.update(output_reloc_sha256=sha256(rel))
+        row.setdefault('category_extensions',[]).append(dict(sources=[r['source_category'] for r in artwork],
+            previous_resident_bytes=old_resident,additional_bytes=growth,parts_offset=parts))
+        owners[row['reloc']]=bytes(rel)
+    ground['config_sha256']=sha256(data[cfg:cfg+ground['config_bytes']])
+    blob[at:at+len(data)]=data;e.update(sha256=sha256(data),crc32=zlib.crc32(data))
+    return owners
 
 
 def police_capacity(count):

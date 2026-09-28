@@ -1,5 +1,6 @@
 /* Shared ground/handover category identities. Native types keep their values;
-   imported types use native-count + donor-type, independently of selections. */
+   equipment uses native-count + donor-type. Other carried categories have
+   checked fixed empty-slot reservations, independent of selections. */
 typedef unsigned char u8;
 typedef unsigned short u16;
 typedef unsigned int u32;
@@ -24,6 +25,16 @@ extern int af_test_category_selected(u32), af_test_category_original(u32);
 
 int af_v3_equipment_category(u32 argument) {
     u32 item=(u16)argument, index=item-0x2224u;
+#ifdef AF_V3_HOLIDAY_CATEGORY_QUERY
+    if(item-0x2523u<14u) {
+#ifdef __mips__
+        return ((int (*)(u32))AF_V3_HOLIDAY_CATEGORY_QUERY)(item);
+#else
+        extern int af_holiday_item_type(u32);
+        return af_holiday_item_type(item);
+#endif
+    }
+#endif
 #ifdef AF_V3_DIARY_CATEGORY_QUERY
     if(item-0x2B10u<16u) {
 #ifdef __mips__

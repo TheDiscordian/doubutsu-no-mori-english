@@ -176,6 +176,16 @@ CREATURE_PARENTS = {
 DIARY_PARENT_REGISTRY_VERSION = 1
 DIARY_PARENTS = {0x2B00+i: 0x2B10+i for i in range(16)}
 
+# Additive miscellaneous items follow the original thirty native entries and
+# the separately reserved wrapped presents. Exercise-card stamps are states of
+# one carried item, not thirteen independent selector choices.
+HOLIDAY_ITEM_REGISTRY_VERSION = 1
+HOLIDAY_ITEMS = {item: item for item in range(0x2523, 0x2531)}
+# Renderer slots only; no existing item or drawing category is replaced. Source
+# categories 18/20 already use native insect/fossil types, leaving these unused
+# slots available within the installed 71-entry renderer capacity.
+HOLIDAY_ITEM_CATEGORIES = {47: 45, 52: 47}
+
 
 def diary_parent_identity(donor_item):
     if type(donor_item) is not int or donor_item not in DIARY_PARENTS:

@@ -1188,8 +1188,9 @@ startup transfer/CRC, and unchanged save/profile data. Current private browser
 composition agrees with offline empty, mixed, and all-191 profiles. Native
 rendering and collision execution are not verified. Constructors, movement,
 destruction, and local interactions are installed through the shared lifecycle
-adapter below. Foreground mappings, interaction providers, and activation remain
-unfinished; installed entries do not establish working decoration actors.
+adapter below. Foreground mappings and radio effects are bound; the remaining
+interaction providers and activation are unfinished. Installed entries do not
+establish working decoration actors.
 The current proposal retains save format twelve and diary schema two. Compatible
 earlier saves migrate forward; V2 and format-eleven-or-earlier readers cannot
 load format-twelve saves. No profile bit, saved field, or patcher deployment changes.
@@ -1268,13 +1269,79 @@ the overwritten version of this module. The startup descriptor receives the
 new CRC without growing the packet or changing saved data.
 
 The current proposal is
-`build/v3-diary-category-work-01/decoration-services-installed-02/build-lock.json`.
-The focused lifecycle check covers all records/profiles, preserved code/artwork,
+`build/v3-diary-category-work-01/event-items-installed-03/build-lock.json`.
+The retained lifecycle check covers all records/profiles, preserved code/artwork,
 exact native owner changes, startup CRC, and unchanged save/profile fields.
 Empty/mixed/all-191 private browser compositions match offline output. This is
 not a native execution test. Continue the remaining fishing/Harvest interaction
 providers, then shared event activation, attendance, and calendar choice; do not
 replace an unfinished interaction with an unrelated native behaviour.
+
+### Carried event items and player connection
+
+`tools/v3_holiday_items.py` prepares all thirteen exercise-card stamp states
+(`2523..252F`) and knife and fork (`2530`) as one complete batch. These are two
+item families, not fourteen proposed independent selector options. Their
+official sixteen-byte names come from `itemName_etc`; every record has its
+own official-disc source in `translations/provenance.json`. The complete donor
+price function leaves these miscellaneous items at zero: the category's price
+table pointer is null, and neither family is a shell or signboard exception.
+
+The generic category converter follows each parent's actual `item1_tableNo`
+binding. Prepared models at `event-items-prepared-03/categories/` contain both
+complete 816-byte objects. Thirteen card states share one icon; cutlery uses
+the other. Both icons retain the complete 32-by-32 CI4 texture and palette.
+Prepared source relationships and complete compiled resources are validated
+before reuse, without reconverting the nine existing equipment categories.
+
+The loaded reservation is `80705600..80708000`, inside the existing guarded
+240-KiB holiday packet. Code occupies 1,008 bytes at `80705600`; the 408-byte
+metadata table is at `80705E00`, both 576-byte icon descriptors/resources are at
+`80706000`, and the two models start at `80706500`. The installer checks that
+the entire reservation is initially empty and retains everything outside it.
+The packet's physical owner/startup CRC is updated without another allocation.
+
+Five ordinary readers chain to the installed diary/creature/native readers.
+The inventory branch uses the same register-preserving icon adapter and retains
+the original tool/gift branches. Fixed free category slots 45/47 represent donor
+categories 47/52; native items and the 71-entry police/handover capacities stay
+unchanged. `append_categories` extends both material/geometry tables and all
+four seasonal owners together. Each owner appends a complete twelve-descriptor
+bank, adding 656 B beyond its current allocation. Existing scenery, category
+artwork, actor arrays, and native fallback entries remain in place.
+
+The table's readiness mask is zero. The fourteen records are not selectable or
+admitted to player saves. This installation keeps AFS3 format twelve, AFDY
+schema two, and the existing selection profile unchanged. It does not establish
+save/reload or native gameplay verification for the new items. The focused
+current-cartridge check covers the complete records, icon branch, five reader
+hooks, both models, seasonal relocation/allocation changes, startup CRC, and
+save/profile preservation. Empty/mixed/all-191 browser/offline compositions agree.
+
+Remaining connected player consumers are mapped in
+`build/v3-diary-category-work-01/harvest-native-player/code.asm`:
+
+- Ordinary pickup controller: `808BBFD4..808BC2D8`. Its input/field/priority
+  checks precede the room-item logic. `808BC1E0` is the outdoor search boundary
+  after room pickup; retain those admission checks when inserting Harvest.
+- Table-pickup request: `808C8218..808C82A8`, native action 31, priority 8.
+  Requested inventory slot/item/position/furniture flag occupy player
+  `D58/D5C/D60/D6C`. The native request has no donor knife/fork flag.
+- Table-pickup setup starts at `808C82A8`. Its non-furniture path calls
+  `808B55E8` at `808C8398`; this inserts into the pocket through `808B5544`
+  and clears layer two through `8008AA98`. Harvest must set its two-source-tick
+  removal counter after actual insertion, not merely after a successful request.
+- Native matching-pocket search is `800B80B4`, with item and condition arguments.
+  Preserve the donor full-pocket refusal branch; do not substitute a generic
+  message while silently dropping the fork-specific behaviour.
+- All four source seasonal ground generators special-case knife/fork height
+  through the actual collision height at its world position. Ordinary flat-item
+  drawing alone does not place the fork correctly on the Harvest table.
+
+The installed source Htable controller already owns the exact three-direction
+search, 56-unit reach, fork placement, clip lifetime, and delayed removal. Bind
+its real pocket/player/ground consumers before enabling its readiness bit.
+Exercise-card menus/state handling and profile/save admission remain required.
 
 The original native event-layout directory has fifteen types at `80105030` and
 fifteen pointers at `801055E8`. Its readers are `80081E60..80082168`; the existing

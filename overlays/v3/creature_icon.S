@@ -3,7 +3,10 @@
 .set noat
 .set gp=64
 .text
-#ifdef AF_DIARY_ICON
+#ifdef AF_HOLIDAY_ICON
+#define ICON_HOOK af_holiday_icon_hook
+#define ICON_QUERY af_holiday_item_icon
+#elif defined(AF_DIARY_ICON)
 #define ICON_HOOK af_diary_icon_hook
 #define ICON_QUERY af_diary_item_icon
 #else
@@ -13,7 +16,12 @@
 .globl ICON_HOOK
 .type ICON_HOOK,@function
 ICON_HOOK:
-#ifdef AF_DIARY_ICON
+#ifdef AF_HOLIDAY_ICON
+    addiu $t9,$s0,-0x2523
+    sltiu $t9,$t9,14
+    beqz $t9,native
+    nop
+#elif defined(AF_DIARY_ICON)
     addiu $t9,$s0,-0x2B10
     sltiu $t9,$t9,16
     beqz $t9,native
@@ -105,7 +113,10 @@ creature:
     jr $t9
     nop
 native:
-#ifdef AF_DIARY_ICON
+#ifdef AF_HOLIDAY_ICON
+    j af_holiday_prior_icon
+    nop
+#elif defined(AF_DIARY_ICON)
     j af_diary_prior_icon
     nop
 #else
