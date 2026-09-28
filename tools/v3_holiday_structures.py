@@ -357,6 +357,9 @@ def install(base, prior, output):
     """Bulk-stage resources without enabling actors with missing services."""
     import copy
     import v3_physical_resources as physical
+    if prior['equipment_resources']['npc_extra']['events'].get('decorations'):
+        from v3_decoration_draw import install as install_draw
+        return install_draw(base,prior,output)
     equipment=copy.deepcopy(prior['equipment_resources'])
     events=equipment['npc_extra']['events']
     if not events.get('transition') or events.get('decorations'):

@@ -179,8 +179,8 @@ reading, and native cleanup. The field decoder uses shrine `22C/230`, not pool
 native Miko but remains unimplemented; cleanup never deletes native profile `84`.
 Three focused current checks and empty/mixed/all-supported browser/offline
 composition pass. Native I/O is doubled; no emulator fixture is restarted.
-The current ABI-325 proposal is
-`build/v3-diary-category-work-01/decorations-installed-01/build-lock.json`.
+The current ABI-326 proposal is
+`build/v3-diary-category-work-01/decoration-draw-installed-04/build-lock.json`.
 `af_holiday_npc_event_world` supplies saved Town Day, complete source harvest
 dates, and lighthouse vacation callbacks. The prepared NPC lifecycle is linked
 against all installed providers, without reconverting its resources. The shared
@@ -199,21 +199,27 @@ Reuse this installation, the unchanged art, and passing focused checks.
 
 The complete shared collision/escape/fade algorithms and native scene bridge
 are installed unchanged from `build/v3-diary-category-work-01/transition-native-06/`.
-The checked 48-KiB packet and actual startup descriptor include the 16-KiB
-extension. Sports common state survives scene changes, resets through both native
+The retained 48-KiB prefix includes the 16-KiB transition extension. Sports common
+state survives scene changes, resets through both native
 initialization callers, and reaches the complete hourly updater and dedicated
 owner entry. Source/host/current-cartridge checks and empty/mixed/all-supported
 browser/offline composition pass. Reuse these components and their evidence.
-The complete eighteen-decoration batch is converted at
-`build/v3-diary-category-work-01/decorations-01/` and stored in the current
-cartridge, including both countdown rigs, all digit frames, seasonal palettes,
-shadows, and projection flags. Five focused changed-format/source/cartridge
-checks and current empty/mixed/all-supported compositions pass. Reuse this full
-bundle without another compiler run. Next connect its eleven actual owner
-lifecycles to the shared native structure setup/allocation/drawing path, preserving
-the existing campsite hook. Carry collision and interactions with those owners;
-the Harvest tables are not static substitutes. Source/native layouts differ,
-and native moon events 21/22 must not be relabelled as donor meteor event 37.
+The complete eighteen-decoration batch at
+`build/v3-diary-category-work-01/decorations-01/` is reused without reconversion.
+All eleven complete source draw controllers and nine source collision initializers
+are compiled and installed together in the current proposal: eighteen drawing
+bindings and fifteen collision bindings. Both countdown rigs, digit frames,
+seasonal palettes, shadow passes, and projection flags have shared native drawing
+bindings. The holiday packet is 216 KiB; its existing startup descriptor loads
+the whole guarded packet. Current resource/dispatch/startup/save-preservation
+checks and empty/mixed/all-supported compositions pass. Reuse this installation.
+Next connect the actual constructors, movement/destruction, and interaction
+controllers to these shared drawing/collision entries and native structure
+setup/allocation. Preserve the existing campsite hook. This is the same unfinished
+category, not a new per-owner task: Harvest fork pickup, radio effects, countdown
+control, and fishing ownership all remain required. Native rendering is unverified.
+Source/native layouts differ, and native moon events 21/22 must not be relabelled
+as donor meteor event 37.
 The [decoration contract](../specs/V3_DIARIES.md#shared-event-decoration-resources)
 identifies the checked resources and native consumer addresses.
 Continue checked actor/decoration/profile/effect identities and source/native

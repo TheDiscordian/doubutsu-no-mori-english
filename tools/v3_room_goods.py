@@ -309,9 +309,24 @@ def publish_bootstrap(equipment,blob,surface,output):
             if (not transition.get('installed') or transition['packet_ram']!=HOLIDAY_RAM or
                 transition['packet_bytes']!=0xC000 or transition['loaded_code']['ram']!=0x806FC000 or
                 not 0<transition['loaded_code']['bytes']<=0x3000 or
-                transition['preserved_prefix_bytes']!=HOLIDAY_SIZE or p['id']!='holiday-transition-GAFE01-r0'):
+                transition['preserved_prefix_bytes']!=HOLIDAY_SIZE):
                 raise ValueError('Changed complete scene-transition packet contract')
             size=transition['packet_bytes']
+            renderer=npc_extra['events'].get('decorations',{}).get('renderer')
+            if renderer:
+                from v3_decoration_draw import RAM as DRAW_RAM,ART as DRAW_ART,END as DRAW_END
+                if (not renderer['installed'] or renderer['packet_ram']!=HOLIDAY_RAM or
+                    renderer['packet_bytes']!=DRAW_END-HOLIDAY_RAM or
+                    renderer['preserved_prefix_bytes']!=size or
+                    renderer['loaded_code']['ram']!=DRAW_RAM or
+                    not 0<renderer['loaded_code']['bytes']<=0x4000 or
+                    renderer['artwork']['ram']!=DRAW_ART or
+                    DRAW_ART+renderer['artwork']['bytes']>DRAW_END-16 or
+                    p['id']!='holiday-decoration-runtime-GAFE01-r0'):
+                    raise ValueError('Changed complete decoration loading contract')
+                size=renderer['packet_bytes']
+            elif p['id']!='holiday-transition-GAFE01-r0':
+                raise ValueError('Changed scene-transition physical identity')
         if (not npc_extra or p['ram']!=HOLIDAY_RAM or p['bytes']!=size or p['physical']&15 or
                 p['storage']!='physical-ROM' or not 0x100000<=p['physical']<p['physical']+p['bytes']<=0x4000000):
             raise ValueError('Changed complete holiday-state startup packet')

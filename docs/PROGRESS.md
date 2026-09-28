@@ -31,28 +31,35 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
-The current proposal is ABI 325 at
-`build/v3-diary-category-work-01/decorations-installed-01/build-lock.json`, ROM SHA-256
-`2e9b515dd7bfafbebd3b36d1fa974481e99798b8d84541a5b29492650a9edc9a`.
+The current proposal is ABI 326 at
+`build/v3-diary-category-work-01/decoration-draw-installed-04/build-lock.json`, ROM SHA-256
+`d8eb373100d45b072b1a9f3c2ffd5890425317a8a8773e2c112f295d29e6aa71`.
 It contains 191 independently selectable development imports, including all nine
 fish and eight insects, and 100 inactive furniture profiles whose acquisition
 is pending, plus sixteen inactive diary cover profiles. The main lock and both
 stable V2-14 deployments are unchanged.
 
-The complete eighteen-decoration event batch is converted and stored through
-the shared model pipeline: eleven source owners, both countdown rigs and their
-motions, every digit texture, seasonal palettes, and projected shadows. The
-135,520-byte cartridge resource includes twelve complete projection-flag arrays.
-One compiler invocation handles the entire batch; installation reuses its output.
-The right fireworks-stall descriptor records a bounded seven-vertex projection
-instead of the donor's ten reads from seven-entry arrays. Native owner behaviours,
-additive identity/loading/drawing, and event activation remain unfinished; these
-are stored resources, not newly playable events or diaries.
+The complete eighteen-decoration event batch has installed source-derived draw
+controllers and collision routines. One shared native adapter connects all eleven
+owners to their complete converted objects, projected shadows, countdown rigs,
+four changing digit displays, and source footprints. All fifteen decorations with
+source collision initializers have those routines; the other three have none in
+the donor. The same startup transfer loads the 10,504-byte code, 1,700-byte binding
+directory, and unchanged 135,520-byte artwork bundle. The holiday packet occupies
+216 KiB, including 168 KiB of additional checked reserved RAM.
 
-Five focused changed-format/source/current-cartridge checks pass, covering
-complete compiled geometry, source colour expressions, dynamic vertices, digit
-banks, rig relocation, and retained native code/resident packets/save data.
-Current private browser/offline empty, mixed, and all-supported compositions agree.
+The right fireworks stall uses the checked seven-entry projection bound. The
+renderer retains both donor shadow passes, independently selected digit textures,
+scrolling, joint colours, and frame-phase updates. Native constructors, additive
+identities, movement/destruction, actual interactions, and event activation remain
+unfinished. Installed drawing/collision entry points do not make these events or
+diaries playable, and native rendering has not been verified.
+
+The focused current-cartridge resource/dispatch/startup check passes. It covers
+all eighteen draw bindings, fifteen collision bindings, full retained artwork,
+bounded projection, unchanged native code and save/profile data, and the actual
+expanded startup descriptor/CRC. Private browser/offline empty, mixed, and all-191
+compositions agree. Unchanged conversion evidence is retained, not replayed.
 No native fixture or old build is executed. The
 [decoration contract](../specs/V3_DIARIES.md#shared-event-decoration-resources)
 records the actual source/native layout differences and the next connected owner.
@@ -63,8 +70,9 @@ native reset callers initialize that state to `-1`; scene changes do not reset
 it. Dedicated owners have a shared-state entry instead of callback-local copies.
 The complete 6,592-byte collision/escape/fade module is installed unchanged from
 its prepared output. Its 16-KiB packet extension has checked startup transfer,
-CRC, instruction-cache invalidation, and retained prefix resources. The holiday
-packet is 48 KiB; no saved field or format changes.
+CRC, instruction-cache invalidation, and retained prefix resources. The transition
+retains its original 48-KiB prefix inside the expanded holiday packet; no saved
+field or format changes.
 
 Two focused source/host/current-cartridge checks pass, including the actual
 reset instructions, donor sports comparison, native cleanup, and startup

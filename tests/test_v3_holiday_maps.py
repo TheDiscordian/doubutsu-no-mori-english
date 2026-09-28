@@ -13,6 +13,70 @@ from apply_translation import write_new
 
 
 class HolidayMapsTests(unittest.TestCase):
+    def test_connected_decoration_render_collision_and_startup(self):
+        import json
+        import struct
+        from aflib import by_vrom,CODE_RAM,CODE_VROM,sha256,u32
+        from v3_asset_loader import BLOB
+        from v3_furniture_install import inputs
+        from v3_holiday_structures import PREPARED,prepared_packet
+        from v3_decoration_draw import RAM,TABLE,ART,END,resources,BOUNDS
+        source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+            (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+        current=ROOT/'build/v3-diary-category-work-01/decoration-draw-installed-04'
+        image,report=inputs(current/'build-lock.json')
+        # Read the unchanged input for preservation; never run an old build.
+        base,prior=inputs(current/'base-lock.json')
+        e=report['equipment_resources'];d=e['npc_extra']['events']['decorations'];r=d['renderer']
+        p=e['holiday_state']['packet'];raw=image[p['physical']:p['physical']+p['bytes']]
+        old=r['original_packet'];prefix=base[old['physical']:old['physical']+old['bytes']]
+        self.assertEqual(raw[:len(prefix)],prefix)
+        self.assertEqual(p['ram']+len(raw),END)
+        self.assertEqual(raw[-16:],bytes.fromhex('41464853')*4)
+        art,metadata=prepared_packet(source,PREPARED)
+        self.assertEqual(raw[ART-p['ram']:ART-p['ram']+len(art)],art)
+        table,symbols,rigs,palettes,shadows=resources(source,metadata)
+        self.assertEqual(set(BOUNDS),set(metadata['owners']))
+        self.assertEqual(len(rigs),2)
+        self.assertEqual(shadows,r['shadows'])
+        self.assertEqual(len(r['bindings']),18)
+        self.assertEqual(sum(bool(b['collision']) for b in r['bindings']),15)
+        for i,b in enumerate(r['bindings']):
+            o=next(o for o in r['owners'] if o['owner']==b['owner']);rig=rigs.get(b['owner'],{})
+            self.assertEqual(b['draw'],r['code']['symbols'][o['entry']])
+            self.assertEqual(b['collision'],r['code']['symbols'][o['collision_entry']] if o['collision_entry'] else 0)
+            struct.pack_into('>HH5I',table,i*24,b['source_name'],list(metadata['owners']).index(b['owner']),
+                rig.get('base',0),rig.get('skeleton',0),rig.get('animation',0),b['draw'],b['collision'])
+        self.assertEqual(raw[TABLE-p['ram']:TABLE-p['ram']+len(table)],table)
+        for part in ('loaded_code','tables','artwork'):
+            block=r[part];at=block['ram']-p['ram']
+            self.assertEqual(sha256(raw[at:at+block['bytes']]),block['sha256'])
+        for name,address in symbols.items():
+            if not name.startswith('af_decor_list_'):continue
+            words=struct.unpack_from('>6I',table,address-TABLE)
+            self.assertEqual(words[::2],(0xDB060018,0xDE000000,0xDF000000))
+            self.assertTrue((ART&0x1FFFFFFF)<=words[1]<((ART+len(art))&0x1FFFFFFF))
+            self.assertTrue(ART<=words[3]<ART+len(art))
+        corrected=next(s for s in shadows if s['symbol']=='aYAT_shadow_data_r')
+        self.assertEqual(corrected['count'],7)
+        # Native functions and the old actor-hook chain are untouched.
+        core=by_vrom(image)[CODE_VROM].extract(image)
+        self.assertEqual(core,by_vrom(base)[CODE_VROM].extract(base))
+        for row in r['native_functions']:
+            self.assertEqual(sha256(core[row['start']-CODE_RAM:row['end']-CODE_RAM]),row['sha256'])
+        self.assertEqual(report['save_codec'],prior['save_codec'])
+        self.assertEqual(report['save_runtime']['profile_hex'],prior['save_runtime']['profile_hex'])
+        boot=e['surface_bootstrap']['code'];blob=by_vrom(image)[BLOB].extract(image)
+        boot_ram=e['surface_bootstrap']['ram'];offset=e['blob_offset']+boot_ram-e['ram']
+        code=blob[offset:offset+boot['bytes']];s=boot['symbols']
+        self.assertEqual(sha256(code),boot['sha256'])
+        self.assertEqual(u32(code,s['holiday_state_crc']-boot_ram),p['crc32'])
+        self.assertEqual(struct.unpack_from('>5I',code,s['packets']-boot_ram+17*20),
+            (p['ram'],p['physical']|0x80000000,p['bytes'],s['holiday_state_crc'],0))
+        self.assertFalse(d['actors_installed']);self.assertFalse(d['selectable'])
+        self.assertFalse(r['native_execution_verified'])
+        self.assertEqual(json.loads((current/'decoration-draw/installed.json').read_bytes()),r)
+
     def test_complete_decoration_batch_and_current_cartridge(self):
         import json
         import struct

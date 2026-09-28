@@ -1146,11 +1146,51 @@ bounds correction, not omitted artwork or a gameplay behaviour choice.
 The ordinary holiday-services refresh installs the prepared objects and twelve
 projection-flag arrays as `holiday-decorations-GAFE01-r0`: 135,520 bytes, SHA-256
 `89d6a15d6fb339273fefa0e03b77c4c2edcb29007262d19b4bcde9221c12593b`.
-It reconstructs and checks the prepared objects without compiling again. No
-resident reservation, actor callback, profile bit, saved field, or public patcher
-changes. Artwork storage does not establish working decoration actors. The
-current proposal retains save format twelve and diary schema two; ordinary
-native execution, reload, and hardware remain unverified.
+It reconstructs and checks the prepared objects without compiling again. The
+shared runtime at `build/v3-diary-category-work-01/decoration-draw-installed-04/`
+also loads this complete bundle with all eleven source draw controllers and all
+nine source collision initializers. Eighteen draw records and fifteen collision
+records share one adapter; the three remaining variants have no donor collision
+initializer. Generated donor C and artwork remain ignored, with complete source
+references and generated hashes in `decoration-draw/installed.json`.
+
+The native renderer occupies `80700000..80702908` (10,504 bytes), its descriptors
+occupy 1,700 bytes at `80704000`, and its unchanged artwork occupies 135,520 bytes
+at `80708000`. The guarded holiday packet ends at `8072A000`: 216 KiB total,
+168 KiB more reserved RAM. The complete prior 48-KiB prefix is retained. The
+existing eighteenth startup descriptor transfers and checks the complete packet;
+no new DMA-directory slot or startup packet is required.
+
+Each static display-list wrapper establishes its own segment-six object, allowing
+one controller to use multiple complete objects without stale texture/vertex
+references. The native rig adapter binds both graphics streams and the CPU
+segment table, restoring the CPU binding after the call. Source countdown code
+retains all four independent digit displays, joint colour/rotation callbacks,
+spotlight scrolling, and the source draw-time flip-phase update. Source index
+and phase bounds reject invalid state before drawing or collision mutation.
+The native shadow adapter projects the checked complete arrays, uses the actual
+game light/alpha values, and retains both passes requested by donor type one.
+That argument is not forwarded to the original native helper, whose third
+argument selects a structure bank. The stall projection consumes the corrected
+seven-entry bound. Matrix and projected-vertex data receive cache writeback.
+
+Collision functions use the real native seven-byte offset-table ABI and both
+native height-setting primitives. The generated source initializes otherwise
+indeterminate `pos.y` values in X/Z-only source loops; all supplied coordinates,
+cell masks, heights, and skipped cells are retained. It does not replace table or
+stall footprints with generic bounding boxes. All generated constant directories
+are read-only; the renderer has no shared writable actor state.
+
+The focused current-cartridge check validates the entire installed artwork,
+eighteen draw and fifteen collision bindings, bounded shadows, native-function retention,
+startup transfer/CRC, and unchanged save/profile data. Current private browser
+composition agrees with offline empty, mixed, and all-191 profiles. Native
+rendering and collision execution are not verified. Constructors, movement,
+destruction, actual interactions, additive identities, and activation remain
+unfinished; installed entries do not establish working decoration actors.
+The current proposal retains save format twelve and diary schema two. Compatible
+earlier saves migrate forward; V2 and format-eleven-or-earlier readers cannot
+load format-twelve saves. No profile bit, saved field, or patcher deployment changes.
 
 Continue the connected actor path through the existing structure owner:
 VROM `008CB690`, RAM `809E7ED0`, relocation `008CD350`. Its setup pointer at
