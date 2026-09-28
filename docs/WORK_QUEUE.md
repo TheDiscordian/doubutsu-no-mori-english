@@ -28,10 +28,19 @@ Implement the actual alternatives and bind selections to the build receipt.
 Fish/insect population and imported coastal movement have installed controls and
 runtime alternatives; other substantial differences still need real bindings.
 
-Current implementation task: resolve and complete the remaining custom-design
-representation category against its actual parent/native identities. Carry its
-full graphics and editing/display behaviour through the shared importing path;
-do not turn existing native equivalents into duplicate imported items.
+Current implementation task: complete the shared diary importing path for all
+sixteen donor styles (`2B00..2B0F`). Their catalogue models exist, but carried-item
+identity, inventory use, reading/writing, and persistent entries remain missing.
+Map those consumers once, then implement the connected category with the actual
+source behaviour. Do not count a displayed diary cover as a working diary.
+
+The room-representation review identifies sixteen player-saved design forms and
+nine museum fossil placeholders. Custom designs require a design editor and
+saved-pattern system; that feature's V3 scope is awaiting the user's choice,
+without blocking diary work. The fossil placeholders are museum scenery, not new
+collectibles. The ordinary importer installs both real donor artwork variants,
+school desk and bus stop, while retaining their N64 counterparts. See
+[the representation and variant contract](../specs/V3_ROOM_REPRESENTATIONS.md).
 The complete clothing category and its bounded native check are installed. All
 eight donor appearances are
 installed together through loading, official names/prices, wearing, NPC outfits,
@@ -56,9 +65,16 @@ harness budget exhausted; no old fixture replay is authorised by this clothing
 work. Fix any identified game defect. This does not defer required creature
 behaviours or classify their gameplay as verified.
 
-Use the shared converter and current ABI-307 proposal:
-`build/v3-clothing-category-work-01/connected-09/build-lock.json`.
-ROM SHA-256: `76381bfe94508f6c521c5fff56246943f45914ba6d06a03438a19b84acb6643a`.
+Use the shared converter and current ABI-308 proposal:
+`build/v3-native-variants-work-01/connected-02/cartridge/build-lock.json`.
+ROM SHA-256: `131498d875bd07ca168b3bd1590796c78b9f9cb1cde2421894bbac6e16d17d50`.
+The two static variants use ordinary stock, catalogue/scoring, save-profile bits,
+and independent browser/offline selection. Their 7,840 artwork bytes are installed
+together; neither native counterpart nor any existing imported object is replaced.
+The original palette runtime and furniture loader remain unchanged. The generic
+builder recognises checked creature dispatch and retains the catalogue's 128-byte
+clothing allowance. Source/build checks and five browser/offline profiles pass;
+ordinary gameplay and persistence with these variants remain unverified.
 All seventeen creatures now have installed field and room artwork, complete
 behaviour/spawn readers, catch/release identities, pocket icons, collection UI,
 official catch messages, saved profiles, scoring, and per-species composition.
@@ -70,7 +86,7 @@ The shared insect controller has nine independent native-sized slots/buffers.
 The private composers expose actual N64 two-wild-slot and GameCube eight-wild-slot
 population alternatives, with a separate release slot in either mode.
 The nine fish retain their installed population and coastal-movement choices.
-There are 189 selectable development imports; both deployed patchers remain V2-14.
+There are 191 selectable development imports; both deployed patchers remain V2-14.
 Six browser/offline profiles agree, including individual/all insect selections,
 both insect population modes, select all, and empty/default V2 output.
 Current cartridge/resource/planner checks and focused sanitized population,
@@ -82,7 +98,7 @@ one refresh, called by the general creature pipeline. Prepared source output is
 `build/v3-creature-insects-work-01/programs-30/`; reuse its complete programs and
 the installed room/field/audio resources. The 96,880-byte resident packet and
 guard are loaded from checked physical-ROM storage. Regenerated catalogue/shop
-owners use checked external storage, leaving 16,432 bytes of reusable item-data
+owners use checked external storage, leaving 8,592 bytes of reusable item-data
 padding. Preserve these allocation and overlap checks; do not reconvert artwork.
 
 **Retained creature verification:** resolve connected native gameplay and save
@@ -135,13 +151,12 @@ Next importing work:
   and sound-scheduler disconnection remain unresolved; do not restart their
   exhausted fixtures. Fix any identified game defect. See
   [the creature contract](../specs/V3_CREATURE_ITEMS.md).
-- Resolve the remaining custom-design and fossil
-  representations against actual parent/native identities. Complete genuine
-  missing conversion and behaviour work; do not interpret absent artwork or
-  an already installed parent representation as a new furniture requirement.
-- Review source school desk `3208` and bus stop `3270` against their worksheet
-  native counterparts `1200` and `10A0`; do not create duplicate imports solely
-  because their GC-added names are missing from the older approved mapping.
+- Complete the sixteen-style diary category's carried-item, editing, and storage
+  behaviour. Catalogue artwork alone does not implement those items.
+- Keep the custom-design scope choice explicit. Its sixteen forms are not fixed
+  ROM appearances; do not invent patterns or native equivalents. Museum fossil
+  placeholders and both native artwork variants are resolved by the shared
+  identity/conversion path and must not restart as missing ordinary furniture.
 - Keep item-specific behaviours in scope alongside shared categories. Acquisition
   follows primary importing; pending rewards do not block complete asset staging.
 - Finish source acquisition and gold-tree effects/acquisition, then run bounded

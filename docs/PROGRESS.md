@@ -31,12 +31,31 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
-The current proposal is ABI 307 at
-`build/v3-clothing-category-work-01/connected-09/build-lock.json`, ROM SHA-256
-`76381bfe94508f6c521c5fff56246943f45914ba6d06a03438a19b84acb6643a`.
-It contains 189 independently selectable development imports, including all nine
+The current proposal is ABI 308 at
+`build/v3-native-variants-work-01/connected-02/cartridge/build-lock.json`, ROM SHA-256
+`131498d875bd07ca168b3bd1590796c78b9f9cb1cde2421894bbac6e16d17d50`.
+It contains 191 independently selectable development imports, including all nine
 fish and eight insects, and 100 inactive furniture profiles whose acquisition
 is pending. The main lock and both stable V2-14 deployments are unchanged.
+
+Both source artwork variants, school desk and bus stop, are installed through
+the ordinary shared importer. Complete original-N64 profile/model comparison
+establishes different geometry, with the original items retained. The 7,840
+converted bytes, official names and prices, B/C stock, catalogue/scoring, saved
+profile bits, and independent browser choices are connected. Source/build checks
+and five browser/offline profiles pass. The save codec, resident furniture loader,
+and palette runtime are unchanged; ordinary gameplay and saving with these items
+remain unverified. Profiles lacking the selected variants are incompatible with
+saves that use them. Preserve backups.
+
+The shared representation catalogue identifies sixteen saved-design forms and
+nine museum placeholders rather than treating them as fixed missing furniture.
+Their complete source consumers bind inventory, scan, and browser review data.
+Three focused tests cover classification, malformed-source rejection, and shared
+consumer behaviour. Adding the custom-design editor/saved-pattern feature to V3
+is an open scope choice; it does not block other importing work. The next connected
+category is all sixteen diaries, including actual reading, writing, and persistent
+entries. See [the representation contract](../specs/V3_ROOM_REPRESENTATIONS.md).
 
 The complete clothing category is installed together. All eight distinct donor
 appearances use shared loading, official names/prices, player/NPC outfit readers,
@@ -63,9 +82,8 @@ One silent native run at `build/v3-clothing-category-work-01/native-01/` passes
 actual clothing DMA for all eight imports plus an original N64 garment,
 disabled-record rejection, saved-state preservation, guards, and checkpoint
 restoration without a CPU fault. It does not establish ordinary gameplay or
-save/reload. The active importing work moves to the remaining custom-design
-representation category, followed by fossil identities; clothing reader tests
-are retained rather than repeated.
+save/reload. Clothing reader tests remain retained rather than repeated while
+the diary category is implemented.
 
 The complete insect category is installed together: six full donor programs,
 calendar/habitat/group spawning, collision, the ground ant colony, field sounds
@@ -83,7 +101,7 @@ The 96,880-byte insect runtime/guard packet is allocated in reserved Expansion P
 RAM and stored in checked physical ROM space. Shared startup verifies complete
 transfer/checksum/cache ordering before entering the game. The common importer
 moves the complete regenerated catalogue/shop owners outside the nearly full
-item-data area and retains 16,432
+item-data area and retains 8,592
 bytes of checked reusable padding. Existing artwork, names, console resources,
 and both native/imported species identities are preserved.
 

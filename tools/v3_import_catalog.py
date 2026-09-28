@@ -175,11 +175,14 @@ def build_catalog(n64_path, disc_path, decomp):
     from v3_furniture_pipeline import Source
     from v3_room_aliases import discover, annotate_inventory
     from v3_handheld_items import discover as discover_held, annotate_inventory as annotate_held
+    from v3_room_representations import discover as discover_representations, annotate_inventory as annotate_representations
     source = Source(rel, symbol_bytes)
     aliases = discover(source)
     annotate_inventory(items, aliases)
     handheld = discover_held(source)
     annotate_held(items, handheld)
+    representations = discover_representations(source)
+    annotate_representations(items, representations)
     return {
         'format': 'AFV3-INVENTORY-1',
         'status': 'research_inventory_not_patch_or_supported_options',
@@ -197,6 +200,7 @@ def build_catalog(n64_path, disc_path, decomp):
         },
         'villagers': villagers, 'item_groups': groups, 'items': items, 'room_aliases': aliases,
         'handheld_equipment': handheld,
+        'room_representations': representations,
     }
 
 

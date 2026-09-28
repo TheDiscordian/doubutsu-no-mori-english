@@ -41,7 +41,8 @@ def install(original, base, prior, blob, source, output, rows):
     if not any(r.get('profile',{}).get('callback_adapter',{}).get('category') == 'switch-palette-fade'
                for r in rows):
         return None, copy.deepcopy(prior['furniture']['expanded_tables'])
-    contract = native_contract(original,base,expected_sha=sha256(base))
+    contract = native_contract(original,base,expected_sha=sha256(base),
+        runtime=prior.get('equipment_resources',{}).get('room_rigs'))
     legacy, _ = asset_contract(source.rel,source.symbols.encode())
     # The compatibility layout describes the already-installed complete object;
     # neither the existing object nor its profile/identity is rewritten.
@@ -53,8 +54,13 @@ def install(original, base, prior, blob, source, output, rows):
     at = PACKAGE+RAM-PACKAGE_RAM
     previous = prior.get('furniture_palette_fade')
     if previous:
-        if sha256(blob[at:at+LIMIT-RAM]) != previous['resident_sha256']:
-            raise ValueError('Changed shared palette callback reservation')
+        checked_runtime(prior,blob)
+        if (prior['sources'].get('overlays/v3/tent_model.c') == sha256((ROOT/'overlays/v3/tent_model.c').read_bytes())
+                and previous['legacy_layout_hex']==legacy_layout.hex()):
+            retained=copy.deepcopy(previous)
+            retained.update(native_contract=contract,installed=[r['item_id'] for r in rows
+                if r.get('profile',{}).get('callback_adapter',{}).get('category')=='switch-palette-fade'])
+            return retained,copy.deepcopy(prior['furniture']['expanded_tables'])
     else:
         old = prior['tent_model']['code']; table = bytes.fromhex(prior['tent_model']['vtable_hex'])
         expected = bytearray(LIMIT-RAM)

@@ -319,7 +319,11 @@ def install_catalogue(base, stable, prior, imports, output, rel, symbols, *, wes
         if (before^after)&0xFFFF8000:raise ValueError('Catalogue code allowance crosses signed allocation bound')
         changed=bytearray(current_code);struct.pack_into('>I',changed,at,after)
         changes[CODE_VROM]=bytes(changed)
-        report['category_pool_patch']=dict(address=0x800C4B10,before=before,after=after)
+    if pool_slack:
+        # Preserve the complete allowance, not only the delta of this build.
+        # Subsequent ordinary furniture imports must retain its code binding.
+        before=u32(current_code,0x800C4B10-CODE_RAM)-old_slack
+        report['category_pool_patch']=dict(address=0x800C4B10,before=before,after=before+pool_slack)
     if retained_pool:
         growth=sum(p['after']-p['before'] for p in retained_pool)
         report['conservative_pool_required']+=growth

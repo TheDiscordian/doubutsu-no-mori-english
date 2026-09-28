@@ -70,6 +70,8 @@ def rules(image, report):
         entries.append({'id': key, 'name': row['name'], 'kind': row['kind'],
                         'dependencies': row['dependencies'], 'profile_hex': profile.hex(),
                         'disable': off})
+        if row.get('native_artwork_variant'):
+            entries[-1]['native_artwork_variant']=row['native_artwork_variant']
         if surfaces:
             from v3_surface_selection import profile as surface_profile
             entries[-1]['surface_profile_hex']=surface_profile([row] if row['kind'] in ('floor','wall') else []).hex()
@@ -181,13 +183,16 @@ def review_catalogue(plan, report):
     unavailable = []
     for row in scan['rows']:
         key = composition.item_key(int(row['item_id'], 16))
-        if key in options or row.get('room_alias',{}).get('parent_id') in options:
+        parent = (row.get('parent_representation') or row.get('room_alias')
+                  or row.get('profile',{}).get('creature_parent') or {})
+        if key in options or parent.get('parent_id') in options:
             continue
         if row['installed']:
             raise ValueError('Installed furniture is missing from the composition plan')
         unavailable.append({'id': key, 'name': row['name'] or 'Unnamed donor furniture',
             'kind': 'furniture', 'selectable': False,
             **({'room_alias':row['room_alias']} if 'room_alias' in row else {}),
+            **({'room_representation':row['room_representation']} if 'room_representation' in row else {}),
             'reason': row.get('reason') or 'Conversion supported; runtime installation is pending.'})
     surface=report.get('room_surfaces',{})
     if surface.get('optional_selection'):

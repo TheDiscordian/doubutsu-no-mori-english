@@ -112,6 +112,7 @@ function addChoices(plan, review) {
     checkbox.type = 'checkbox'; checkbox.setAttribute('aria-label', row.name);
     note.className = 'requirement'; note.id = `requirement-${cards.size}`; checkbox.setAttribute('aria-describedby', note.id);
     name.textContent = row.name; detail.textContent = `${kinds[row.kind]} · ${row.id.split('/').at(-1)}`;
+    if (row.native_artwork_variant) detail.textContent += ' · GameCube appearance; N64 version retained';
     text.append(name, detail, note); card.append(checkbox, text); $('options').append(card);
     cards.set(row.id, { row, card, checkbox, note });
     checkbox.addEventListener('change', () => changeSelection(() => {

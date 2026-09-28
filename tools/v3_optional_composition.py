@@ -156,6 +156,8 @@ def catalogue(image, report):
         result[row['id']] = {'id':row['id'], 'name':row['name'], 'kind':'furniture',
             'item_id':row['item_id'], 'runtime_index':index, 'dependencies':[],
             'enable_offset':at+4, 'enable_bytes':4, 'enable_ram':row_ram+4}
+        if row.get('native_artwork_variant'):
+            result[row['id']]['native_artwork_variant']=row['native_artwork_variant']
     from v3_clothing_install import metadata_offset
     for row in report['clothing']['imports']:
         donor = int(row['donor_item_id'], 16)
@@ -257,7 +259,7 @@ def resolve(catalog, selected, *, behaviours=None, behaviour_options=None):
         'required':sorted(enabled-set(requested)),
         'dependency_reasons':{key:sorted(value) for key,value in sorted(reasons.items())},
         'destinations':[{key:row[key] for key in ('id','name','kind','actor_id','item_id',
-            'house_layers','display_item_id') if key in row} for row in
+            'house_layers','display_item_id','native_artwork_variant') if key in row} for row in
             (catalog[key] for key in sorted(enabled))],
         'profile_hex':profile.hex(), 'profile_sha256':sha256(profile),
         'experimental':True, 'web_patcher_enabled':False, 'playable_handoff':False}

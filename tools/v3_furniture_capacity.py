@@ -71,6 +71,14 @@ def checked(base, report):
             if patch['address'] != POOL_WORD or patch['before'] != word or patch['after'] <= word:
                 raise ValueError('Broken model-capacity submenu allocation chain')
             word = patch['after']
+    extra = report['catalogue'].get('category_pool_bytes',0)
+    if extra:
+        patch = report['catalogue'].get('category_pool_patch',{})
+        if (type(extra) is not int or not 0 < extra <= 1024 or extra%64
+                or patch != dict(address=POOL_WORD,before=word,after=word+extra)
+                or (word^(word+extra))&0xFFFF8000):
+            raise ValueError('Broken category submenu allocation binding')
+        word += extra
     if u32(files[CODE_VROM].extract(base), POOL_WORD-CODE_RAM) != word:
         raise ValueError('Model previews lack their complete submenu allocation')
     hook = pool['hook']

@@ -77,6 +77,14 @@ remaining connected runtime work. Preparation does not enable new choices.
 
 ### Profile-owned creature resources
 
+Saved player designs and museum placeholders use the shared
+[room-representation catalogue](V3_ROOM_REPRESENTATIONS.md), not ordinary fixed-item
+approval. Static donor appearances with worksheet-native counterparts use a
+complete profile/model comparison and the same bulk importer. Verified differing
+geometry permits an optional variant while retaining the native item; unknown
+behaviour or matching geometry still requires review. The browser explains the
+variant and does not duplicate an installed parent as unfinished display furniture.
+
 The shared profile reader accepts complete source-owned rotational rigs as well
 as callback-owned rigs. `embedded-profile-keyframe-assets` preserves the profile's
 direct display lists, every skeleton joint/model, all motion arrays, and the

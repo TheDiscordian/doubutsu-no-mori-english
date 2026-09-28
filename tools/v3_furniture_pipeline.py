@@ -24,7 +24,7 @@ from v3_registry import FURNITURE, LEGACY_FURNITURE, furniture_identity, furnitu
 from v3_room_aliases import discover as room_aliases, pending_reason as room_alias_reason
 from v3_villager_art import native_palette, normalise_vertex_flags
 
-VERSION = 37
+VERSION = 38
 PENDING_MOVE_CATEGORY = 'static-models-pending-move'
 PENDING_SEQUENCE_CATEGORY = 'constant-model-sequence-pending-lifecycle'
 SELECTED_PALETTE_CATEGORY = 'selected-palette-fade-assets'
@@ -1213,6 +1213,89 @@ def builtin_native_profile(profile):
             profile.get('behaviour') in BEHAVIOURS.values())
 
 
+def native_artwork_variant(source, descriptor, identity):
+    """Resolve worksheet counterparts without replacing them or duplicating art.
+
+    This category covers complete static models with differing geometry and no
+    interactive behaviour on either platform. Other counterpart relationships
+    still require review; a changed name or binary layout alone is insufficient.
+    """
+    from aflib import by_vrom, verified_rom
+    from v3_furniture_runtime import RAM, VROM, SOURCE_SHA
+    native_id = identity[1].get('C','-')
+    if (not re.fullmatch(r'1[0-9A-F]{3}',native_id) or int(native_id,16)&3
+            or descriptor['behaviour']!='static' or descriptor.get('callback_adapter')
+            or descriptor.get('kind') or descriptor['interaction_flags']):
+        raise ReviewRequired('native identity/artwork correspondence needs review')
+    if not hasattr(source,'native_variant_input'):
+        original=verified_rom((ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes())
+        source.native_variant_input=original,by_vrom(original)
+    original,files=source.native_variant_input
+    room=files[VROM].extract(original)
+    if sha256(room)!=SOURCE_SHA:raise ValueError('Changed original furniture owner')
+    index=(int(native_id,16)-0x1000)//4
+    if index>=947:raise ReviewRequired('Native counterpart exceeds original furniture range')
+    vrom,end,ram,limit=struct.unpack_from('>4I',room,0x80947638-RAM+index*16)
+    pointer=u32(room,0x8094B168-RAM+index*4)
+    program=files[vrom].extract(original);offset=pointer-ram
+    if len(program)!=end-vrom or not 0<=offset<=len(program)-68 or limit-ram<len(program):
+        raise ValueError('Native counterpart profile escapes its owner')
+    raw=program[offset:offset+68];words=struct.unpack('>17I',raw)
+    if words[10] or words[11] or words[15] or words[16] or raw[58:60]!=bytes(2):
+        raise ReviewRequired('Native counterpart requires behaviour correspondence review')
+    model=files[words[0]].extract(original)
+    if len(model)!=words[1]-words[0] or words[2]!=SEGMENT or words[3]!=SEGMENT+len(model):
+        raise ValueError('Native counterpart model bounds disagree')
+    positions=[];lists=[]
+    def resolve(address):
+        segment=address>>24;at=address&0xFFFFFF
+        if segment in (8,9):address=words[segment]+at
+        if address>>24!=6 or address&0xFFFFFF>=len(model):
+            raise ReviewRequired('Native counterpart has an unresolved graphics dependency')
+        return address&0xFFFFFF
+    def walk(address,stack=()):
+        at=resolve(address);start=at
+        if at in stack or len(stack)>=8:raise ValueError('Recursive native counterpart model')
+        for _ in range(4096):
+            if at+8>len(model):raise ValueError('Unterminated native counterpart model')
+            first,last=struct.unpack_from('>II',model,at);op=first>>24
+            if op==1:
+                vertex=resolve(last);count=first>>12&255
+                if not 0<count<=32 or vertex+count*16>len(model):
+                    raise ValueError('Native counterpart vertices exceed their resource')
+                positions.extend(struct.unpack_from('>3h',model,vertex+i*16) for i in range(count))
+            elif op==0xDE:
+                walk(last,stack+(start,))
+                if first&0x10000:break
+            elif op==0xDF:break
+            elif op in (2,4,0xDA):
+                raise ReviewRequired('Native counterpart needs transformed-geometry comparison')
+            at+=8
+        else:raise ValueError('Native counterpart exceeds display-list bounds')
+        lists.append(dict(offset=start,bytes=at+8-start,sha256=sha256(model[start:at+8])))
+    for address in words[4:8]:
+        if address:walk(address)
+    _,body,resources,*_=prepare_models(source,descriptor)
+    donor=[]
+    for resource in resources:
+        if resource['kind']=='vertices':
+            donor.extend(struct.unpack_from('>3h',body,resource['native_offset']+i)
+                         for i in range(0,resource['bytes'],16))
+    if not donor or not positions:raise ValueError('Missing complete counterpart geometry')
+    if set(donor)==set(positions):
+        raise ReviewRequired('Matching native geometry needs material/identity review, not an automatic duplicate')
+    def geometry(points):
+        return dict(distinct_positions=len(set(points)),
+            bounds=[[min(p[i] for p in points),max(p[i] for p in points)] for i in range(3)],
+            positions_sha256=sha256(b''.join(struct.pack('>3h',*p) for p in sorted(set(points)))))
+    return dict(kind='donor-artwork-variant',native_item_id=native_id,
+        original_preserved=True,worksheet_row=identity[0],worksheet_sha256=SHEET_SHA,
+        native_program_vrom=vrom,native_program_sha256=sha256(program),native_profile_offset=offset,
+        native_profile_sha256=sha256(raw),native_model_vrom=words[0],native_model_sha256=sha256(model),
+        native_draw_lists=lists,native_geometry=geometry(positions),donor_geometry=geometry(donor),
+        behaviour='static on both platforms; source profile dimensions retained')
+
+
 def metadata(source, item, profile, identity):
     from v3_furniture_rigs import FIXED_CATEGORY, JOINT_CATEGORY,EMBEDDED_CATEGORY,CREATURE_STATIC_CATEGORY
     from v3_furniture_materials import CATEGORY as MATERIAL_CATEGORY
@@ -1264,8 +1347,9 @@ def metadata(source, item, profile, identity):
     if profile.get('callback_adapter',{}).get('category')=='switch-trigger-sound' and not binding:
         raise ReviewRequired('Switch-triggered sound needs the shared native sound/runtime adapter')
     number, sheet = identity
+    variant = None
     if any(sheet.get(k) != '-' for k in ('C', 'H', 'CG', 'CJ')):
-        raise ReviewRequired('native identity/artwork correspondence needs review')
+        variant = native_artwork_variant(source,profile,identity)
     names = name_metadata(source,item,identity); index = names['runtime_index']
     action_sound = source.raw('mRmTp_ftr_se_type')[index]
     if action_sound not in (0,1,2):
@@ -1314,6 +1398,7 @@ def metadata(source, item, profile, identity):
         names.update(item_id=f'{destination:04X}',runtime_index=runtime_index,
                      donor_item_id=f'{item:04X}',donor_runtime_index=index)
     return dict(**names, action_sound=action_sound,
+        **({'native_artwork_variant':variant} if variant else {}),
         layer_type=layer_type, interaction_flags=profile['interaction_flags'],
         price=price, size_code=profile['size_code'], footprint=('1x1','2x1','2x2')[profile['size_code']],
         donor_list=lists[0][0], donor_list_sha256=lists[0][1], stock_group=group,
@@ -1330,15 +1415,26 @@ def metadata(source, item, profile, identity):
 def scan(source, worksheet, installed=None, *, selected=()):
     from v3_furniture_rigs import estimated_suffix
     from v3_clothing_batch import representations as clothing_representations
+    from v3_room_representations import discover as room_representations
     installed = set(FURNITURE) if installed is None else set(installed)
     alias_catalogue = room_aliases(source)
     aliases = {int(row['display_item_id'],16):row for row in alias_catalogue['rows']}
     clothes = clothing_representations(source)
+    representations = room_representations(source)
+    special = {int(row['item_id'],16):row for row in representations['rows']}
     result = []
-    for item, identity in sorted(identity_rows(worksheet,extra_items=aliases,include_unmapped_legacy=True).items()):
+    for item, identity in sorted(identity_rows(worksheet,extra_items=set(aliases)|set(special),include_unmapped_legacy=True).items()):
         if selected and f'{item:04X}' not in selected:continue
         row = dict(item_id=f'{item:04X}', name=identity[1].get('J'), installed=item in installed,
                    asset_ready=False)
+        if item in special:
+            representation = special[item]
+            if row['installed']:
+                raise ValueError('Room representation is incorrectly installed as independent furniture')
+            row.update(status=representation['category'], name=representation['name'],
+                room_representation=representation, reason=representation['reason'])
+            result.append(row)
+            continue
         if item in clothes:
             if row['installed']:
                 raise ValueError('Clothing mannequin is incorrectly installed as independent furniture')
@@ -1396,7 +1492,7 @@ def scan(source, worksheet, installed=None, *, selected=()):
         result.append(row)
     return dict(format='AFV3-AUTO-FURNITURE-1', version=VERSION,
                 source_rel_sha256=sha256(source.rel), source_symbols_sha256=sha256(source.symbols.encode()),
-                worksheet_sha256=SHEET_SHA, room_aliases=alias_catalogue,
+                worksheet_sha256=SHEET_SHA, room_aliases=alias_catalogue, room_representations=representations,
                 counts=dict(Counter(r['status'] for r in result)), rows=result)
 
 
@@ -1873,7 +1969,7 @@ def main():
             runtime_installed=False)))
         return
     if args.command == 'scan':
-        report = scan(source, worksheet, installed); output.parent.mkdir(parents=True, exist_ok=True)
+        report = scan(source, worksheet, installed, selected=args.select); output.parent.mkdir(parents=True, exist_ok=True)
         write_new(output, (json.dumps(report, indent=2)+'\n').encode())
         print(json.dumps(dict(counts=report['counts'], supported_new=[r['item_id'] for r in report['rows']
                          if r['status']=='supported' and not r['installed']])))
