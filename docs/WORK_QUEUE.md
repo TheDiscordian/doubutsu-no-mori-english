@@ -235,8 +235,8 @@ cartridge check and empty/mixed/all-supported browser comparison pass; the
 readiness mask stays zero and save/profile data is unchanged. Reuse the prepared
 batch at `build/v3-diary-category-work-01/event-items-prepared-03/`.
 
-The current proposal is ABI 332 at
-`build/v3-diary-category-work-01/fishing-storage-installed-04/build-lock.json`.
+The current proposal is ABI 333 at
+`build/v3-diary-category-work-01/fishing-live-installed-05/build-lock.json`.
 Harvest pickup connects the native ordinary-item search boundary `808BC1E0`,
 action-31 animation, and actual pocket insertion to the source removal counter.
 Full-pocket refusal retains the native animation and official donor message;
@@ -254,9 +254,18 @@ current controller-refresh retention pass; native I/O remains doubled. New
 format-13 saves are not readable by V2 or format-12-or-earlier V3. Compatible
 older saves migrate forward, retaining town, console, and diary data.
 
-Next connect the actual fishing actor/record/name/size consumers and all forty message identities,
-exercise-card menu/state handling, and profile/save admission within this same
-task. Complete winner-mail delivery through the source record acknowledgement
+The complete forty-fish dialogue graph (74 messages/seven choices) and native
+event/name/size/record providers are installed and checked. Reuse these providers,
+the retained storage, and the current passing browser/offline comparison.
+The native angler map is retained at
+`build/v3-diary-category-work-01/fishing-native-map/angler/angler.asm`;
+do not restart that investigation. Its actual clip pointer is `80136F8C`, whereas
+the imported controller currently owns a private clip. Connect that lifecycle,
+the host's measurement/record/name and dialogue calls, then exercise-card
+menu/state handling and profile/save admission within this same task.
+Preserve the native herabuna identity and existing saved-name recovery when
+mapping all forty donor fish, including the additive brook trout at `2328`.
+Complete winner-mail delivery through the source record acknowledgement
 path. Source inches and native centimetres require the
 behaviour choice, not a silent conversion of saved values. The countdown's
 shared clip and both controllers are installed; retain them while connecting

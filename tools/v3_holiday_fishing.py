@@ -19,6 +19,7 @@ from v3_password_policy import function
 
 RAM,SIZE,STATE=0x80730000,0x8000,0x7C00
 GUARD=bytes.fromhex('41464846')*4
+MESSAGE_FIRST,CHOICE_FIRST=0x3061,515
 
 REFERENCES={
     'src/game/m_fishrecord.c':'bc732633475940b258dbe5b7d5bee64e2e31703192d5f6aba24097a003dcdae6',
@@ -76,6 +77,270 @@ enum {lbRTC_LESS=-1,lbRTC_EQUAL=0,lbRTC_OVER=1,lbRTC_WEEK=7,lbRTC_JUNE=6,lbRTC_N
 #define lbRTC_Sub_YY af_hf_sub_year
 #define mTM_set_renew_time(p,t) (*(p)=(AFDiaryDate){(t)->year,(t)->month,(t)->day})
 '''
+
+
+def dialogue(base):
+    """Convert the complete controller-selected conversation and branch closure."""
+    from gc_adapter import remove_redundant_article_suppression
+    from gc_text import decode_gc
+    from runtime_module import module_command_info
+    from textcodec import encode,tokenize,LATIN
+    from textvalidate import expanded_bound
+    from v3_camper_text import donor,DONOR_FILES
+    from v3_holiday_dialogue import credit
+    root=ROOT/'local/ac-decomp'
+    paths=('src/actor/ac_turi_clip.c_inc','src/actor/npc/event/ac_ev_angler_move.c_inc')
+    sources={p:(root/p).read_text() for p in paths}
+    clip=sources[paths[0]];angler=sources[paths[1]]
+    selector=function(clip,'aTRC_clip_get_msgno')
+    cases=re.findall(r'case ITM_FISH(\d+):\s*return (0x[0-9A-Fa-f]+);',selector)
+    if [int(n) for n,_ in cases]!=list(range(40)):
+        raise ValueError('Changed complete forty-fish message selector')
+    fish=[int(n,16) for _,n in cases]
+    roots=set(fish)|{int(n,16) for n in re.findall(r'return (0x[0-9A-Fa-f]+);',selector)}
+    roots.update(int(n,16) for n in re.findall(r'(?:msg_no\s*=|return|case)\s*(0x[0-9A-Fa-f]+)',angler))
+    # The source bass result readers add one/two to the entry-message number.
+    for name,delta in (('get_message_number_fish_zannen',1),('get_message_number_fish_omedeto',2)):
+        body=function(angler,name)
+        if f'return aTRC_clip_get_msgno(item) + {delta};' not in body:
+            raise ValueError('Changed bass result-message arithmetic')
+        roots.update(fish[i]+delta for i in (5,6,7))
+    messages,choices,decoder=donor();info=module_command_info(base)
+    pending=set(roots);ready={};edits={};selects=set();orders=set()
+    allowed={0,1,2,3,4,5,9,13,14,15,16,22,25,36,37,38,49,80,83,84,94,114,115}
+    while pending:
+        n=min(pending);pending.remove(n)
+        if not 0<=n<len(messages):raise ValueError('Fishing branch escapes donor bank')
+        text,edits[n]=remove_redundant_article_suppression(decode_gc(messages[n],decoder))
+        data=encode(text,info);tokens=list(tokenize(data,info))
+        if (not tokens or tokens[-1].data not in (b'\x7f\0',b'\x7f\1') or
+                sum(t.kind=='cmd' and t.data[1] in (0,1) for t in tokens)!=1 or
+                any(t.kind!='cmd' and (t.kind!='text' or t.data[0] not in LATIN|{0xCD}) for t in tokens) or
+                any(t.kind=='cmd' and t.data[1] not in allowed for t in tokens) or expanded_bound(data,info)>1024):
+            raise ValueError(f'Unreviewed fishing text/control/buffer bound: {n:04X}')
+        ready[n]=data
+        for t in tokens:
+            if t.kind!='cmd':continue
+            op=t.data[1]
+            if op==9:
+                index,value=t.data[2],int.from_bytes(t.data[3:],'big')
+                if not (index==0 and value in {*range(1,24),255} or
+                        index==1 and value in (2,10,11,12,14) or index==9 and 1<=value<=4):
+                    raise ValueError('Unreviewed fishing NPC demo order')
+                orders.add((index,value))
+            if 14<=op<=24:
+                refs=struct.unpack('>'+'H'*((len(t.data)-2)//2),t.data[2:])
+                if op<=21:pending.update(set(refs)-ready.keys())
+                else:selects.update(refs)
+    if sorted(ready)!=[*range(0x10E8,0x1124),*range(0x17E5,0x17EB),*range(0x2FAF,0x2FB7)]:
+        raise ValueError('Changed complete fishing conversation closure')
+    if sorted(selects)!=[0xB,0x18,0x30,0x44,0xE2,0xE5,0xE6]:
+        raise ValueError('Changed complete fishing choices')
+    mapping={n:MESSAGE_FIRST+i for i,n in enumerate(sorted(ready))}
+    choice_map={n:CHOICE_FIRST+i for i,n in enumerate(sorted(selects))}
+    rows=[];extra=[];new_choices=[];choice_rows=[];credits=[]
+    def attribution(identity,n,original,data,adaptations):
+        row=credit(identity,n,original,data,adaptations)
+        row['locales']['en']['locator']=['tools/v3_holiday_fishing.py:dialogue',identity]
+        return row
+    for n,data in sorted(ready.items()):
+        out=bytearray(data)
+        for t in tokenize(data,info):
+            if t.kind=='cmd' and 14<=t.data[1]<=24:
+                refs=mapping if t.data[1]<=21 else choice_map
+                for at in range(2,len(t.data),2):
+                    struct.pack_into('>H',out,t.offset+at,refs[int.from_bytes(t.data[at:at+2],'big')])
+        out=bytes(out);extra.append(out)
+        adaptations=['Native encoding; preserve official wording, pages, pauses, formatting, and handover controls',
+                     'Remap the complete message/choice graph to stable additive native IDs']
+        if edits[n]:adaptations.append('Remove redundant article-suppression flags before native string insertions')
+        credits.append(attribution(f'message:{mapping[n]:04X}',f'message:{n:04X}',messages[n],out,adaptations))
+        rows.append(dict(donor_id=n,id=mapping[n],source_sha256=sha256(messages[n]),
+            sha256=sha256(out),bytes=len(out),expanded_bound=expanded_bound(out,info)))
+    for n,target in choice_map.items():
+        data=encode(decode_gc(choices[n],decoder),info)
+        if not 1<=len(data)<=20 or any(c not in LATIN for c in data):raise ValueError('Invalid fishing choice')
+        new_choices.append(data);choice_rows.append(dict(donor_id=n,id=target,bytes=len(data),sha256=sha256(data)))
+        credits.append(attribution(f'select:{target:04X}',f'select:{n:04X}',choices[n],data,
+            ['Native encoding; unchanged official choice']))
+    from textbanks import Bank
+    from v3_holiday_dialogue import STRING_FILES
+    directory=ROOT/'build/gamecube/files/forest_1st.arc.unpacked/data'
+    strings={n:(directory/n).read_bytes() for n in STRING_FILES}
+    if any(sha256(data)!=STRING_FILES[n] for n,data in strings.items()):raise ValueError('Changed donor units bank')
+    bank=Bank('string',0,0,strings['string_data.bin'],strings['string_data_table.bin']).entries()
+    inches=encode(decode_gc(bank[0x29E],decoder),info)
+    from aflib import CODE_RAM,CODE_VROM
+    files=by_vrom(base);core=files[CODE_VROM].extract(base)
+    hi,lo=struct.unpack_from('>2I',core,0x800C3F1C-CODE_RAM)
+    if hi>>16!=0x3C18 or lo>>16!=0x2718:raise ValueError('Changed complete native unit bank reader')
+    vrom=((hi&65535)<<16)+((lo&32767)-(lo&32768))
+    cm=Bank('string',0,0,files[vrom].extract(base),files[0xD18000].extract(base)).entries()[0x29E]
+    if cm!=b'cm' or inches!=b'inches':raise ValueError('Changed official measurement labels')
+    credits.append(attribution('v3/fishing/unit/inches','string:029E',bank[0x29E],inches,
+        ['Native encoding; unchanged official measurement label']))
+    credits.append(dict(id='v3/fishing/unit/cm',native_sha256=sha256(cm),locales=dict(en=dict(
+        credit='original',locator=['tools/v3_holiday_fishing.py:dialogue','N64/string/029E'],
+        encoded_sha256=sha256(cm)))))
+    return extra,new_choices,dict(first_id=MESSAGE_FIRST,count=len(extra),first_choice=CHOICE_FIRST,
+        choice_count=len(new_choices),rows=rows,choices=choice_rows,roots=sorted(roots),
+        fish_messages=[dict(source_index=i,donor_id=n,id=mapping[n]) for i,n in enumerate(fish)],
+        mapping=mapping,default_message=mapping[0x10F2],npc_orders=sorted(orders),
+        max_expanded_bytes=max(r['expanded_bound'] for r in rows),source_banks={**DONOR_FILES,**STRING_FILES},
+        units=[cm.hex(),inches.hex()],
+        source_files={p:sha256(s.encode()) for p,s in sources.items()},provenance_entries=credits)
+
+
+def prepare_live(base,prior,output):
+    """Link all record/name/size/text providers against the installed storage."""
+    from aflib import CODE_RAM,CODE_VROM
+    from v3_furniture_effect_rigs import checked_native
+    output=output.resolve()
+    fishing=prior['equipment_resources']['holiday_fishing']
+    if not fishing['storage_installed'] or fishing['loaded_code']['bytes']>0x4000:
+        raise ValueError('Live fishing readers require retained storage below their reservation')
+    packet=fishing['packet'];raw=base[packet['physical']:packet['physical']+packet['bytes']]
+    at=0x80734000-packet['ram']
+    if sha256(raw)!=packet['sha256'] or any(raw[at:-16]):
+        raise ValueError('Occupied fishing reader/state reservation')
+    output.mkdir(parents=True,exist_ok=False)
+    messages,choices,text=dialogue(base)
+    mapping='const unsigned short af_hf_message_map[][2] = {'+','.join(
+        '{'+str(n)+','+str(target)+'}' for n,target in text['mapping'].items())+'};\n'
+    mapping+='const unsigned int af_hf_message_count = 74;\n'
+    mapping+='const unsigned char af_hf_unit_text[2][16] = {'+','.join(
+        '{'+','.join(str(c) for c in bytes.fromhex(value))+'}' for value in text['units'])+'};\n'
+    generated=output/'text-map.c';write_new(generated,mapping.encode())
+    native=(
+        ('af_hf_native_event_area',0x8008033C,0x800804AC,'e3f773780ce82da3b43a46975c07e1c0c37815fbc95bca00f3b00ce8869adec3'),
+        ('af_hf_native_event_npc',0x80082DA0,0x80082E40,'7320c27a330d9a1af4abd372c83a41c1bdc315ddab337547630c3472276339c1'),
+        ('af_hf_native_window',0x8009D1F0,0x8009D200,'e4e54e5f3fc74caca37c6c0fdda0b5684e6e68d753495d23a868e75faf6af1f3'),
+        ('random resident selection',0x800ACE90,0x800ACF84,'4b884aa4eb36432b9c7f5be2b2fb8cfcfe7880d17bf673ded51074d4315c242b'))
+    core=by_vrom(base)[CODE_VROM].extract(base);checked_native(base)
+    for name,a,b,digest in native:
+        if sha256(core[a-CODE_RAM:b-CODE_RAM])!=digest:raise ValueError('Changed complete native fishing provider: '+name)
+    bindings={n:v for n,v in fishing['code']['symbols'].items()
+        if n.startswith(('af_holiday_fish_','af_hf_')) or n in ('af_v3_fishing_data','memcpy')}
+    bindings.update({n:a for n,a,_,_ in native if n.startswith('af_')})
+    bindings.update(af_hf_live=RAM+STATE+AFHF_BYTES,af_hf_controller_person=0x8070501C,af_hf_native_clock=0x80136FBC,
+        af_hf_native_player=0x80136FD8,af_hf_native_players=0x80126EC0,
+        af_hf_native_animals=0x80130DB8,af_hf_native_random=0x8002C9AC,
+        af_hf_native_name=prior['villager_text']['code']['symbols']['af_v3_load_name'],
+        af_hf_native_string=0x8009D6D0)
+    try:
+        code,compiled=compile_part('holiday_fishing_live',output/'code',
+            extra_sources=(str(generated.relative_to(ROOT)),),link_symbols=bindings)
+    except subprocess.CalledProcessError as error:raise ValueError(error.stderr) from error
+    report=dict(text=text,code=compiled,bindings=bindings,
+        native_functions=[dict(symbol=n,start=a,end=b,sha256=s) for n,a,b,s in native],
+        installed=False,actors_active=False,native_execution_verified=False,
+        memory=dict(code=dict(ram=0x80734000,bytes=0x3C00),state=dict(ram=RAM+STATE+AFHF_BYTES,bytes=768)),
+        pending=['controller enter/leave and native angler/clip bindings','winner mail',
+            'measurement/calendar selection and activation'])
+    write_new(output/'prepared.json',(json.dumps(report,indent=2)+'\n').encode())
+    for label,rows in (('messages',messages),('choices',choices)):
+        write_new(output/(label+'.json'),(json.dumps([d.hex() for d in rows])+'\n').encode())
+    return report
+
+
+AFHF_BYTES=176
+
+
+def install_live(base,prior,blob,core,output):
+    from aflib import CODE_RAM,CODE_VROM,u32
+    from v3_decoration_actor import install as controllers
+    from v3_camper_text import extend_bank
+    from v3_event_text import MESSAGE,TABLE,CHOICE_TABLE,patch_bounds
+    from v3_holiday_dialogue import check_provenance
+    del blob
+    if prior['equipment_resources']['holiday_fishing'].get('live'):
+        raise ValueError('Fishing live providers are already installed')
+    directory=output/'fishing-live'
+    live=prepare_live(base,prior,directory);text=live['text'];check_provenance(text)
+    equipment,changes,updates,writes=controllers(base,prior,output,fishing_live=live)
+    # The controller owns native descriptor hooks in the same core as the text
+    # readers. Merge those edits into the shared buffer; a separate full-core
+    # replacement would overwrite this installation's new reader bounds.
+    previous_core=by_vrom(base)[CODE_VROM].extract(base)
+    controller_core=changes.pop(CODE_VROM)
+    if len(controller_core)!=len(previous_core) or len(core)!=len(previous_core):
+        raise ValueError('Changed native core extent during controller refresh')
+    for at in range(0,len(previous_core),4):
+        before,after=previous_core[at:at+4],controller_core[at:at+4]
+        if before!=after:
+            if core[at:at+4] not in (before,after):
+                raise ValueError('Controller refresh conflicts with another native core edit')
+            core[at:at+4]=after
+    if len(writes)!=1:raise ValueError('Controller refresh must retain the single holiday packet')
+    resource,raw=writes[0];raw=bytearray(raw);fish=equipment['holiday_fishing'];packet=fish['packet']
+    code=(directory/'code/code.bin').read_bytes();at=0x80734000-packet['ram']
+    if any(raw[at:at+len(code)]):raise ValueError('Occupied live fishing code allocation')
+    raw[at:at+len(code)]=code
+    # Storage installation combines the entire old holiday packet and the new
+    # fishing code under one startup descriptor. Retire only that proven complete
+    # duplicate, leaving every prior cartridge file untouched on disk.
+    old=prior['equipment_resources']['holiday_fishing']['input_packet']
+    previous=next(r for r in updates['physical_resources'] if r['id']==old['id'])
+    original=base[old['physical']:old['physical']+old['bytes']]
+    current=prior['equipment_resources']['holiday_fishing']['packet']
+    from v3_asset_loader import BLOB
+    boot=prior['equipment_resources']['surface_bootstrap']['code']
+    e=prior['equipment_resources'];resident=by_vrom(base)[BLOB].extract(base)
+    table=e['blob_offset']+boot['symbols']['packets']-e['ram']
+    descriptors=[struct.unpack_from('>5I',resident,table+i*20) for i in range(18)]
+    if (old['id']!='holiday-decoration-actors-GAFE01-r0' or old['ram']!=current['ram'] or
+            old['bytes']!=prior['equipment_resources']['holiday_fishing']['preserved_prefix_bytes'] or
+            sha256(original)!=old['sha256'] or previous['sha256']!=old['sha256'] or
+            base[current['physical']:current['physical']+len(original)]!=original or
+            any(p&0x80000000 and (p&0x7FFFFFFF)<old['physical']+old['bytes']
+                and old['physical']<(p&0x7FFFFFFF)+n
+                for _,p,n,_,_ in descriptors) or
+            descriptors[17][:3]!=(current['ram'],current['physical']|0x80000000,current['bytes'])):
+        raise ValueError('Superseded holiday packet is not a complete unloaded duplicate')
+    live['retired_duplicate']=copy.deepcopy(previous)
+    updates['physical_resources']=[r for r in updates['physical_resources'] if r['id']!=old['id']]
+    text['choice_vrom']=prior['import_storage']['choice_vrom'];text['hooks']=patch_bounds(core,MESSAGE_FIRST,text['count'])
+    for a,op in ((0x80065544,0x2A010000),(0x80065DAC,0x28810000)):
+        if u32(core,a-CODE_RAM)!=op|CHOICE_FIRST:raise ValueError('Changed fishing choice predecessor')
+        after=op|(CHOICE_FIRST+text['choice_count']);struct.pack_into('>I',core,a-CODE_RAM,after)
+        text['hooks'].append(dict(address=a,before=op|CHOICE_FIRST,after=after))
+    messages=[bytes.fromhex(s) for s in json.loads((directory/'messages.json').read_bytes())]
+    choices=[bytes.fromhex(s) for s in json.loads((directory/'choices.json').read_bytes())]
+    files=by_vrom(base);cv=text['choice_vrom']
+    new_m,new_t=extend_bank(files[MESSAGE].extract(base),files[TABLE].extract(base),messages,MESSAGE_FIRST)
+    new_c,new_ct=extend_bank(files[cv].extract(base),files[CHOICE_TABLE].extract(base),choices,CHOICE_FIRST)
+    text['resources']=[]
+    for v,data in ((MESSAGE,new_m),(TABLE,new_t),(cv,new_c),(CHOICE_TABLE,new_ct)):
+        filename=f'fishing-live/text-{v:08X}.bin';write_new(output/filename,data)
+        text['resources'].append(dict(vrom=v,file=filename,bytes=len(data),sha256=sha256(data),
+            original_sha256=sha256(files[v].extract(base))))
+    packet.update(sha256=sha256(raw),crc32=zlib.crc32(raw))
+    equipment['holiday_state']['packet']=copy.deepcopy(packet)
+    resource.update(sha256=packet['sha256'])
+    for r in updates['physical_resources']:
+        if r['id']==packet['id']:r['sha256']=packet['sha256']
+    live.update(installed=True,services_installed=True,service_admission=False,
+        loaded_code=dict(ram=0x80734000,bytes=len(code),sha256=sha256(code)),
+        sources={s:sha256((ROOT/s).read_bytes()) for s in (
+            'tools/v3_holiday_fishing.py','tools/v3_decoration_actor.py','tools/v3_holiday_dialogue.py',
+            'tools/v3_event_text.py','tools/v3_resource_capacity.py',
+            'overlays/v3/holiday_fishing_live.c','overlays/v3/holiday_fishing_live.h',
+            'overlays/v3/holiday_fishing_live.ld','overlays/v3/decoration_actor.c','overlays/v3/decoration_actor.h',
+            'translations/provenance.json')})
+    live['pending']=['native angler/clip and winner-mail bindings','measurement/calendar selection and event activation']
+    # The controller refresh retains the original fishing core, not the region
+    # deliberately filled by this connected provider installation.
+    controller=equipment['npc_extra']['events']['decorations']['controllers']
+    controller['preserved']=[r for r in controller['preserved'] if r['ram']!=RAM]
+    controller['preserved'].append(dict(ram=RAM,bytes=0x4000,sha256=sha256(raw[RAM-packet['ram']:at])))
+    fish['live']=live
+    fish['pending']=['native angler/clip and winner-mail consumers',
+        'measurement/calendar WebUI choice and event activation','connected native gameplay/save verification']
+    controller['pending']=copy.deepcopy(fish['pending'])+['Harvest profile/save admission and exercise-card menus']
+    equipment['npc_extra']['sources'].update(live['sources'])
+    write_new(directory/'installed.json',(json.dumps(live,indent=2)+'\n').encode())
+    write_new(directory/'packet.bin',raw)
+    return equipment,changes,updates,[(resource,bytes(raw))]
 
 
 def generate(source,directory):

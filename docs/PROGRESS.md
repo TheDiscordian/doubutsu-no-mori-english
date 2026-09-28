@@ -31,9 +31,9 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
-The current proposal is ABI 332 at
-`build/v3-diary-category-work-01/fishing-storage-installed-04/build-lock.json`, ROM SHA-256
-`f5ed27cd238f2236e36e8f4b2855a9558ece3bc0f8ddcef3768044dce91ace5f`.
+The current proposal is ABI 333 at
+`build/v3-diary-category-work-01/fishing-live-installed-05/build-lock.json`, ROM SHA-256
+`2a75688eadbbf029e2a85c5883332ce35e2a7a9a6c4bc9b1ef01e080a6158204`.
 It contains 191 independently selectable development imports, including all nine
 fish and eight insects, and 100 inactive furniture profiles whose acquisition
 is pending, plus sixteen inactive diary cover profiles. The main lock and both
@@ -103,8 +103,28 @@ rules. A separate 176-byte record block preserves full eight-character identitie
 without changing diary/page offsets. All 28 original/direct storage entry points
 reach the new code; player deletion, capacity checks, migration, and town changes
 include the records. Controller refreshes preserve this appended module and both
-packet references. Actual fishing actor/name/text consumers, winner-mail delivery,
-the measurement/calendar choices, and event activation remain unfinished.
+packet references. The native event/name/size/record providers and complete
+official fishing dialogue are installed in the current proposal. The tournament
+host's clip/call connections, winner-mail delivery, measurement/calendar choices,
+and event activation remain unfinished.
+
+The 2,992-byte provider module uses the existing fishing code reservation. It
+converts native event records explicitly, preserves complete eight-character
+record names, formats both units, and retains records when a provider fails.
+All forty donor fish messages and their complete conversation branches form
+74 installed messages and seven choices, retaining official pages and timing.
+The single provenance catalogue credits each message, choice, and unit label.
+The maximum expanded message is 995 bytes within the 1,024-byte buffer.
+
+The text bank grows by 29,456 bytes into a verified unloaded duplicate of the
+holiday packet. Startup descriptors distinguish virtual from physical addresses;
+the loaded combined packet stays intact. Controller and text-reader core edits
+are merged, and the connected Harvest pickup resolver is relinked while its
+public entries stay fixed. No artwork is reconverted or old ROM file overwritten.
+The sanitized provider check and current-cartridge service/text/startup/retention
+check pass; empty/mixed/all-191 browser/offline outputs agree. Unchanged storage
+and source-lifecycle evidence is retained. Fishing service admission remains
+closed, and this does not establish native tournament gameplay.
 
 Two sanitized host checks, the current-cartridge/storage/startup check, and a
 current-packet controller-refresh check pass. Empty/mixed/all-191 browser/offline

@@ -166,7 +166,11 @@ def install(image,base,output,text,*,relocate=False,physical_resources=(),reserv
            for i,a in enumerate(placements) for b in placements[i+1:]):
         raise ValueError('Expanded text resources overlap each other virtually')
     old_end=max(files[v].pstart+files[v].size for v in moving)
-    if relocate:
+    can_grow=(cursor<=len(image) and cursor>=old_end and not any(image[old_end:cursor]) and
+        not any(e.pstart<cursor and start<(e.pend or e.pstart+e.size) for v,e in files.items()
+            if v not in moving and e.pstart!=0xFFFFFFFF) and
+        not any(r['physical']<cursor and start<r['physical']+r['bytes'] for r in physical_resources))
+    if relocate and not can_grow:
         from v3_physical_resources import allocate
         region=b''.join(loaded[row['vrom']] for row in ordered)
         allocation=allocate(image,physical_resources,region,'relocated-English-text')
@@ -175,10 +179,11 @@ def install(image,base,output,text,*,relocate=False,physical_resources=(),reserv
         delta=allocation['physical']-start
         for row in placements:row['physical']+=delta
         text['physical_relocation']=dict(previous_start=start,previous_end=old_end,**allocation)
-    elif (cursor>len(image) or cursor<old_end or any(base[old_end:cursor]) or
-            any(e.pstart<cursor and start<(e.pend or e.pstart+e.size) for v,e in files.items()
-                if v not in moving and e.pstart!=0xFFFFFFFF)):
+    elif not can_grow:
         raise ValueError('Event text physical growth overlaps another resource')
+    elif relocate:
+        if start<reserved_end:raise ValueError('Text growth overlaps reserved imports')
+        text['physical_growth']=dict(start=start,previous_end=old_end,end=cursor,bytes=cursor-old_end)
     # Every overwritten pre-existing byte belongs to one of these four files.
     covered=start
     for row in ordered:

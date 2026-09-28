@@ -155,6 +155,12 @@ def controller_sources(art, renderer, directory):
         combined = re.sub(r'static\s+(?!const\b)((?:aSTR_MOVE_PROC|RADIO_PROC|float|s16|int|u8)\s+)(?=\w+\s*\[)',
             r'static const \1', combined)
         combined = combined.replace('static void* process[]', 'static void* const process[]')
+        if owner=='Turi_Profile':
+            selector=function(combined,'aTRC_clip_get_msgno')
+            mapped,count=re.subn(r'return (0x[0-9A-Fa-f]+);',
+                r'return af_decor_actor_services.fish_message(\1);',selector)
+            if count!=41:raise ValueError('Changed complete fishing message selector')
+            combined=combined.replace(selector,mapped)
         decl = []
         for kind, name in re.findall(r'extern\s+(cKF_Skeleton_R_c|cKF_Animation_R_c)\s+(\w+)\s*;', text):
             rig = next(b['rig'] for b in renderer['bindings'] if b['owner'] == owner)
@@ -353,7 +359,7 @@ def patch_owners(base, prior, symbols):
     return changed, hooks
 
 
-def install(base, prior, output):
+def install(base, prior, output, *, fishing_live=None):
     from v3_console_disk_install import reservations
     from v3_furniture_capacity import checked
     from v3_holiday_state import RAM as STATE_RAM, GUARD
@@ -410,23 +416,50 @@ def install(base, prior, output):
     # The installed renderer already records the verified complete source batch.
     art = json.loads((PREPARED/'art.json').read_bytes())
     data, profiles = actor_data(source,art,report['code'])
-    pickup=equipment.get('holiday_items',{}).get('pickup')
+    pickup=equipment.get('holiday_items',{}).get('pickup');pickup_code=None
     if pickup:
         # The pickup resolver chains directly to this controller's resolver.
         # Retain both installed providers; never replace them with null slots
         # during a controller refresh. A moved target requires relinking.
         old_symbols=installed['code']['symbols'];new_symbols=report['code']['symbols']
         if new_symbols['af_decor_actor_resolve']!=old_symbols['af_decor_actor_resolve']:
-            raise ValueError('Controller refresh must relink the connected pickup resolver')
+            from v3_holiday_items import PICKUP_NATIVE,PICKUP_RAM,END as PICKUP_END
+            at=PICKUP_RAM-STATE_RAM
+            if sha256(prefix[at:at+pickup['bytes']])!=pickup['code']['sha256']:
+                raise ValueError('Changed connected pickup code')
+            bindings={name:a for name,a,_,_ in PICKUP_NATIVE}
+            bindings.update(af_holiday_item_type=equipment['holiday_items']['code']['symbols']['af_holiday_item_type'],
+                af_holiday_pickup_prior_resolve=new_symbols['af_decor_actor_resolve'],
+                af_decor_actor_context=CONTEXT,af_holiday_pickup_active=0x80136FD8,
+                af_holiday_pickup_player_ctor=0x80143900)
+            pickup_code,compiled=compile_part('holiday_pickup',directory/'pickup-refresh',
+                extra_sources=('overlays/v3/holiday_pickup.S',),
+                defines=(f'AF_HOLIDAY_FORK_REFUSAL={pickup["text"]["first_id"]}',),link_symbols=bindings)
+            if len(pickup_code)!=pickup['bytes'] or PICKUP_RAM+len(pickup_code)>PICKUP_END or any(
+                    compiled['symbols'].get(n)!=v for n,v in pickup['code']['symbols'].items()
+                    if PICKUP_RAM<=v<PICKUP_END):
+                raise ValueError('Pickup refresh changes installed public entry addresses')
+            pickup['code']=compiled
         symbols=pickup['code']['symbols']
         struct.pack_into('>I',data,SERVICES-CONTEXT+8,symbols['af_holiday_pickup_resolve'])
         struct.pack_into('>I',data,SERVICES-CONTEXT+16,symbols['af_holiday_pickup_pocket'])
+    live=fishing_live or (fishing or {}).get('live')
+    if live:
+        symbols=live['code']['symbols'];bindings=live['bindings']
+        providers=[symbols['af_hf_live_'+n] for n in ('event','size','npc_size','event_npc','name','random_name','record')]
+        providers += [bindings['af_hf_native_window'],symbols['af_hf_live_number'],bindings['af_hf_native_string']]
+        providers += [symbols['af_hf_live_'+n] for n in ('enter','leave','message')]
+        struct.pack_into('>13I',data,SERVICES-CONTEXT+20,*providers)
     changes, hooks = patch_owners(base,prior,report['code']['symbols'])
     raw = bytearray(prefix[:RAM-STATE_RAM])+bytearray(END-RAM)
     raw[RAM-STATE_RAM:RAM-STATE_RAM+len(code)] = code
     raw[CONTEXT-STATE_RAM:DATA_END-STATE_RAM] = data
     raw[-16:] = GUARD
     raw.extend(prefix[END-STATE_RAM:])
+    if pickup_code:
+        at=pickup['ram']-STATE_RAM;raw[at:at+len(pickup_code)]=pickup_code
+        from v3_holiday_items import RAM as ITEM_RAM,END as ITEM_END
+        equipment['holiday_items']['sha256']=sha256(raw[ITEM_RAM-STATE_RAM:ITEM_END-STATE_RAM])
     resources = copy.deepcopy(prior['physical_resources'])
     if installed:
         physical.verify(base,resources)
@@ -442,8 +475,12 @@ def install(base, prior, output):
         storage='physical-ROM',guard=packet_guard.hex())
     if fishing:
         fishing['packet'] = copy.deepcopy(equipment['holiday_state']['packet'])
+    retained=[(STATE_RAM,CONTEXT),(DATA_END,RAM),(END,packet_end)]
+    if pickup_code:
+        retained=[(STATE_RAM,CONTEXT),(DATA_END,pickup['ram']),
+            (pickup['ram']+len(pickup_code),RAM),(END,packet_end)]
     preserved = [dict(ram=a,bytes=b-a,sha256=sha256(prefix[a-STATE_RAM:b-STATE_RAM]))
-        for a,b in ((STATE_RAM,CONTEXT),(DATA_END,RAM),(END,packet_end)) if a<b]
+        for a,b in retained if a<b]
     report.update(installed=True,actors_active=False,profiles=profiles,hooks=hooks,
         original_packet=installed['original_packet'] if installed else old,input_packet=old,refresh=bool(installed),
         bound_services=['native ordinary/scripted acre-transition predicates',

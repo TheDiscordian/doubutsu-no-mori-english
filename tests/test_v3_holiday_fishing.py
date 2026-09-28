@@ -13,6 +13,103 @@ from v3_holiday_fishing import generate
 
 
 class HolidayFishingTests(unittest.TestCase):
+    def test_current_live_connections_and_text_growth(self):
+        import os
+        import struct
+        import zlib
+        from aflib import CODE_RAM,CODE_VROM,by_vrom,sha256,u32
+        from textbanks import Bank
+        from v3_asset_loader import BLOB
+        from v3_decoration_actor import SERVICES
+        from v3_event_text import MESSAGE,TABLE,CHOICE_TABLE
+        from v3_furniture_install import inputs
+        from v3_holiday_fishing import dialogue
+        from v3_physical_resources import verify
+        directory=ROOT/os.environ.get('V3_FISHING_LIVE_BUILD',
+            'build/v3-diary-category-work-01/fishing-live-installed-05')
+        image,report=inputs(directory/'build-lock.json')
+        base,prior=inputs(directory/'base-lock.json')
+        equipment=report['equipment_resources'];fish=equipment['holiday_fishing']
+        live=fish['live'];packet=fish['packet'];text=live['text']
+        raw=image[packet['physical']:packet['physical']+packet['bytes']]
+        old=base[packet['physical']:packet['physical']+packet['bytes']]
+        self.assertEqual(sha256(raw),packet['sha256'])
+        self.assertEqual(packet,equipment['holiday_state']['packet'])
+        for row in (fish['loaded_code'],live['loaded_code']):
+            at=row['ram']-packet['ram']
+            self.assertEqual(sha256(raw[at:at+row['bytes']]),row['sha256'])
+        self.assertEqual(raw[0x80730000-packet['ram']:0x80734000-packet['ram']],
+                         old[0x80730000-packet['ram']:0x80734000-packet['ram']])
+        for row in equipment['npc_extra']['events']['decorations']['controllers']['preserved']:
+            at=row['ram']-packet['ram']
+            self.assertEqual(sha256(raw[at:at+row['bytes']]),row['sha256'])
+        sy=live['code']['symbols'];bindings=live['bindings']
+        providers=[sy['af_hf_live_'+n] for n in ('event','size','npc_size','event_npc','name','random_name','record')]
+        providers += [bindings['af_hf_native_window'],sy['af_hf_live_number'],bindings['af_hf_native_string']]
+        providers += [sy['af_hf_live_'+n] for n in ('enter','leave','message')]
+        self.assertEqual(struct.unpack_from('>13I',raw,SERVICES-packet['ram']+20),tuple(providers))
+        self.assertEqual(u32(raw,SERVICES-packet['ram']),7)
+        pickup=equipment['holiday_items']['pickup'];at=pickup['ram']-packet['ram']
+        self.assertEqual(sha256(raw[at:at+pickup['bytes']]),pickup['code']['sha256'])
+        self.assertEqual(pickup['code']['symbols']['af_holiday_pickup_prior_resolve'],
+                         equipment['npc_extra']['events']['decorations']['controllers']['code']['symbols']['af_decor_actor_resolve'])
+        messages,choices,expected=dialogue(base)
+        files=by_vrom(image);before=by_vrom(base)
+        for v,table,first,extra in ((MESSAGE,TABLE,expected['first_id'],messages),
+                (text['choice_vrom'],CHOICE_TABLE,expected['first_choice'],choices)):
+            entries=Bank('test',0,0,files[v].extract(image),files[table].extract(image)).entries()
+            previous=Bank('test',0,0,before[v].extract(base),before[table].extract(base)).entries()
+            self.assertEqual(entries[:first],previous)
+            self.assertEqual(entries[first:],extra)
+        core=files[CODE_VROM].extract(image)
+        for row in text['hooks']:self.assertEqual(u32(core,row['address']-CODE_RAM),row['after'])
+        retired=live['retired_duplicate'];growth=text['physical_growth']
+        self.assertEqual(growth['previous_end'],retired['physical'])
+        self.assertLessEqual(growth['end'],retired['physical']+retired['bytes'])
+        self.assertEqual(image[growth['end']:retired['physical']+retired['bytes']],
+                         bytes(retired['physical']+retired['bytes']-growth['end']))
+        self.assertEqual(sha256(base[retired['physical']:retired['physical']+retired['bytes']]),retired['sha256'])
+        self.assertNotIn(retired['id'],{r['id'] for r in report['physical_resources']})
+        verify(image,report['physical_resources'])
+        blob=files[BLOB].extract(image);boot=equipment['surface_bootstrap']['code']
+        at=equipment['blob_offset']+boot['symbols']['packets']-equipment['ram']
+        descriptors=[struct.unpack_from('>5I',blob,at+i*20) for i in range(18)]
+        for _,address,size,_,_ in descriptors:
+            if address&0x80000000:
+                physical=address&0x7FFFFFFF
+                self.assertFalse(physical<retired['physical']+retired['bytes'] and retired['physical']<physical+size)
+        dest,address,size,crc,clear=descriptors[17]
+        self.assertEqual((dest,address,size,clear),(packet['ram'],packet['physical']|0x80000000,packet['bytes'],0))
+        self.assertEqual(u32(blob,equipment['blob_offset']+crc-equipment['ram']),zlib.crc32(raw))
+        self.assertEqual(report['save_codec']['format_version'],prior['save_codec']['format_version'])
+        self.assertEqual(report['save_runtime']['profile_hex'],prior['save_runtime']['profile_hex'])
+        self.assertFalse(live['actors_active']);self.assertFalse(live['service_admission'])
+
+    def test_live_record_name_size_and_text_bridge(self):
+        import json
+        prepared=ROOT/'build/v3-diary-category-work-01/fishing-live-prepared-02'
+        report=json.loads((prepared/'prepared.json').read_bytes())
+        self.assertEqual((report['text']['count'],report['text']['choice_count']),(74,7))
+        self.assertEqual(len(report['text']['fish_messages']),40)
+        self.assertLessEqual(report['text']['max_expanded_bytes'],1024)
+        source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+            (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+        with tempfile.TemporaryDirectory(prefix='v3-fishing-live-') as temp:
+            out=Path(temp);generated,_=generate(source,out)
+            local=out/'local-records.c'
+            write_new(local,generated.read_bytes().replace(b'"/source/',('"'+str(ROOT)+'/').encode()))
+            flags=['-std=c11','-O1','-g','-Wall','-Wextra','-Werror','-fno-pie','-no-pie',
+                '-fsanitize=address,undefined','-fno-omit-frame-pointer',
+                '-ffunction-sections','-fdata-sections','-Wl,--gc-sections']
+            commands=[['cc',*flags,'tests/v3_holiday_fishing_live_test.c',
+                'overlays/v3/holiday_fishing.c','overlays/v3/holiday_fishing_live.c',
+                'overlays/v3/diary_calendar.c',str(local),str(prepared/'text-map.c'),
+                '-o',str(out/'check')],[str(out/'check')]]
+            for command in commands:
+                result=subprocess.run(command,cwd=ROOT,capture_output=True,text=True,timeout=30)
+                self.assertEqual(result.returncode,0,result.stdout+result.stderr)
+                if result.stdout:print(result.stdout.strip())
+
     def test_controller_refresh_preserves_fishing_storage(self):
         import copy
         import os

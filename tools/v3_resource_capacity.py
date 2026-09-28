@@ -29,7 +29,9 @@ def text_records(image,report):
     current record. This is not permission to bless arbitrary changed readers.
     """
     records=copy.deepcopy(report.get('resource_capacity',{}).get('resources',[]))
-    text=report.get('equipment_resources',{}).get('npc_extra',{}).get('dialogue',{}).get('text')
+    equipment=report.get('equipment_resources',{})
+    text=(equipment.get('holiday_fishing',{}).get('live',{}).get('text') or
+          equipment.get('npc_extra',{}).get('dialogue',{}).get('text'))
     if not text:return records
     files=by_vrom(image);core=files[CODE_VROM].extract(image)
     for row in records:

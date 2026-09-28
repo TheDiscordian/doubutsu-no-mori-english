@@ -1388,7 +1388,7 @@ remain intact, including documented source quirks. Inches and centimetres are
 explicit state values; changing units with nonempty records rejects rather than
 silently reinterpreting saved measurements. Winner finalisation returns a delivery
 mask; acknowledgement removes a matching record only after actual mail succeeds.
-Native mail delivery and live actor/text providers remain unfinished.
+Native mail delivery and the tournament host connection remain unfinished.
 
 The `AFHF` version-one wire block is 176 bytes: a sixteen-byte header followed
 by five thirty-two-byte records. Header bytes 4–7 are version, units, count (5),
@@ -1419,6 +1419,57 @@ scratch bounds, and startup transfer/CRC. The refresh check exercises the actual
 installer using the retained compiled controller. Empty/mixed/all-191 browser
 and offline outputs agree. Native I/O is doubled; native fishing gameplay,
 FlashRAM execution, and hardware are not verified. No native fixture is restarted.
+
+### Live providers and complete fishing dialogue
+
+The current ABI-333 proposal at `fishing-live-installed-05/build-lock.json`
+installs `holiday_fishing_live.c`: 2,992 bytes at `80734000`, inside the existing
+code reservation ending at `80737C00`. Its transient context occupies at most
+768 bytes at `80737CB0`, after the 176-byte saved wire block, without moving the
+outer guard. Native event records retain their 28-byte allocation and all
+unowned padding. Source event types 29/54 use explicit native save areas 20/2.
+The current player view uses the checked context offset 28. Full winner names
+are recovered by date, size, and native identity, not a global prefix match.
+
+The provider directory installs thirteen record/name/size/text/frame functions;
+the controller enters/leaves the normalised view around both source movement
+steps. Service readiness stays 7: fishing and Harvest admission are still off.
+The complete source selector maps forty fish and its fallback to additive native
+message identities. Seventy-four official messages occupy `3061..30AA`, and
+seven official choices occupy `203..209`. All branch/choice targets, pages,
+pauses, formatting, and handover controls are retained or explicitly remapped.
+The maximum expanded message is 995 bytes. All 83 message/choice/unit credits
+are in `translations/provenance.json`; no second authorship list is maintained.
+
+The four-file text region grows in place by 29,456 bytes. Its new tail uses
+only the unloaded 240-KiB duplicate of the combined holiday packet. Retirement
+verifies the complete duplicate against the retained loaded prefix, all actual
+startup descriptors, the physical resource record, and its hash. Descriptor
+bit 31 selects physical PI loading; other addresses use the virtual DMA table.
+No existing ROM is overwritten. Remaining physical resources, text virtual
+ranges, native choice/message bounds, and startup CRC remain checked.
+
+The sanitized host provider check covers full names, event/record persistence,
+both units, and failure preservation with native I/O doubles. The current
+cartridge check covers every installed provider, all appended text and retained
+entries, core hooks, pickup relinking, retired-space bounds, and startup transfer.
+Empty/mixed/all-191 browser/offline outputs agree. Saved format remains thirteen;
+no event is newly admitted or native gameplay claimed.
+
+The native tournament host is VROM `008B8FC0`, RAM `809D57D0`, 4,816 bytes,
+SHA-256 `9fde230c54d1e9ffc4433fe044200cdd8e188f9e9dc58461c58d157311f01f7a`.
+Its relocation at `008BA290` is 288 bytes, SHA-256
+`b0f511d58bbff2bdf8a0b6a7d1f7bc57631e94c3072f1c1f2d7d310ae3e42572`.
+The mapped current disassembly is retained under `fishing-native-map/angler/`.
+The native host reads the four-function clip at `80136F8C`; the source controller
+currently owns a private clip, so merely installing providers does not connect it.
+Relevant consumers are initialisation `809D5A58`, winner identity `809D5CFC`,
+measurement/prize `809D5F68`, measurement display `809D6694`, and the complete
+dialogue callbacks through `809D69E4`. Native identity writes use sixteen-byte
+values; source record capture must explicitly convert them. Preserve the native
+herabuna message and V2 saved NPC-name recovery while mapping the brook trout
+to additive item `2328`. Winner-mail delivery and unit/calendar selection remain
+part of this same unfinished category.
 
 ## Serialized diary state
 

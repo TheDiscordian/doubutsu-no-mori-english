@@ -213,6 +213,15 @@ def install(base,prior,blob,core,output):
 
 def finish(image,base,prior,output,equipment):
     from v3_event_text import install as install_text
+    fishing=equipment.get('holiday_fishing',{}).get('live')
+    if fishing and not prior['equipment_resources'].get('holiday_fishing',{}).get('live'):
+        retired=fishing['retired_duplicate'];at=retired['physical'];end=at+retired['bytes']
+        if (sha256(image[at:end])!=retired['sha256'] or image[at:end]!=base[at:end]):
+            raise ValueError('Changed duplicate holiday packet before text-space reuse')
+        image[at:end]=bytes(retired['bytes'])
+        return install_text(image,base,output,fishing['text'],relocate=True,
+            physical_resources=[r for r in prior['physical_resources'] if r['id']!=retired['id']],
+            reserved_end=prior.get('resource_capacity',{}).get('reserved_physical_end',0))
     pickup=equipment.get('holiday_items',{}).get('pickup')
     if pickup and not prior['equipment_resources'].get('holiday_items',{}).get('pickup'):
         return install_text(image,base,output,pickup['text'],relocate=True,
