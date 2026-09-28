@@ -139,12 +139,27 @@ four-player isolation, visitor, full/stale pocket, repeat, and resource gates.
 Current cartridge/manifest and browser/offline compositions pass. The appended
 choice-bank manifest follows its exact declared text/reader changes, so the
 current build remains a checked input to subsequent shared refreshes.
-The remaining providers are `af_holiday_npc_bind`,
-`af_holiday_npc_event_world`, and `af_holiday_npc_unregister`: event ownership/
-scheduling, real special dates and vacation state, and cleanup. The native
-world wrapper supplies the inventory/diary/reward fields; do not recreate them
-in the event owner. Connect the remaining event ownership and separate exercise/
-card route, then activate the assembled actor/diary path. The
+The source-derived event scheduler and shared owner lifecycle are installed at
+`build/v3-diary-category-work-01/tortimer-events-02/`: all 49 relevant schedule
+rows, 44 ownership records, and the complete 28-event priority order. The shared
+code covers equinox/weekday/lunar/town dates, overnight hours, overlapping-event
+precedence, shrine/wandering/costume ownership, actual RUN/SHOW observations, and
+the donor's cleanup selection. The connected sanitized host check reaches the
+existing conversation, attendance, and handover code; native placement calls
+remain host doubles. Two focused checks and current browser/offline empty,
+mixed, and all-supported compositions pass. No native fixture is restarted.
+These compiled components stay complete; native event-manager binding remains
+unfinished. The remaining providers are `af_holiday_npc_bind`,
+`af_holiday_npc_event_world`, and `af_holiday_npc_unregister`. Connect the native
+event directory/manager to the installed event exports, bind actual special dates
+and vacation state, and supply native placement/culling and event-specific owners.
+Preserve the existing camper and native event storage; the current 16 today slots
+and 32 manager references are not implicitly enlarged by the new caller-owned
+planner. Native actor-death notification is identified at `800814B8..800815F0`;
+it updates matching placement coordinates, sets STOP, and schedules cleanup.
+The native world wrapper supplies the inventory/diary/reward fields; do not
+recreate them. Continue the separate exercise/card route and activation as part
+of this same connected task. The
 [owner connection map](../specs/V3_DIARIES.md#live-player-and-reward-connection)
 identifies shrine, wandering, and event-specific owners; ordinary festival chats
 or a calendar-only spawn are not substitutes.
@@ -199,9 +214,9 @@ harness budget exhausted; no old fixture replay is authorised by this clothing
 work. Fix any identified game defect. This does not defer required creature
 behaviours or classify their gameplay as verified.
 
-Use the shared converter and current ABI-316 proposal:
-`build/v3-diary-category-work-01/tortimer-world-02/build-lock.json`.
-ROM SHA-256: `0cece7101ca3cccffb78603be138f178f4071d180ecd605bb2bcf35bb9df36d5`.
+Use the shared converter and current ABI-317 proposal:
+`build/v3-diary-category-work-01/tortimer-events-02/build-lock.json`.
+ROM SHA-256: `54381c5ff97bdd6aff90f0117ce9b3f8196429e8eb5447cf76357d5b018e4eeb`.
 The two static variants use ordinary stock, catalogue/scoring, save-profile bits,
 and independent browser/offline selection. Their 7,840 artwork bytes are installed
 together; neither native counterpart nor any existing imported object is replaced.

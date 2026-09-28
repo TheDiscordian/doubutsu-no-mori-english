@@ -642,8 +642,8 @@ Remaining owner connections share one category task:
 - Reuse the installed native event directory/campsite infrastructure. Its index
   has 128 entries, but the event-manager dispatch and 16 today slots still need
   checked ownership/capacity when extending it. Camper event 70 stays reserved.
-- Port shared shrine and wandering owners from `ac_event_manager.c`
-  (`soncho_start/stop/in`, `sonchowandar_start/stop`). New Year's, sports,
+- Bind the installed shared shrine and wandering owners from `ac_event_manager.c`
+  (`soncho_start/stop/in`, `sonchowandar_start/stop`) to native placement. New Year's, sports,
   cherry blossom, meteor, harvest moon, and Harvest Festival have event-specific
   owners; New Year's cleanup targets Ev_Miko. Sports cleanup selects the active
   ball-toss/foot-race/tug owner, not an arbitrary holiday row. Halloween spawns
@@ -670,6 +670,55 @@ Its legacy record is accepted only when exact predecessor hashes and the one
 declared reader-bound change reconstruct the checked old reader; current bytes
 must then match the declared new resources. New builds store the updated record
 and validate it again. Unknown resource/reader changes still reject.
+
+### Event schedule and owner lifecycle
+
+`holiday_events.c` supplies the connected scheduler and owner controller at
+`806EB400` inside the existing NPC packet. The complete code is 3,824 bytes;
+the 812-byte `AFHE` source packet is at `806ED800`. No allocation, profile bit,
+saved format, existing code, or artwork changes. The current build is
+`build/v3-diary-category-work-01/tortimer-events-02/`, ABI 317.
+
+`v3_holiday_events.py` derives all 49 relevant rows from the complete checked
+GAFE01 schedule and all 44 associated ownership records from the relocated
+event-manager directory. The data retains source ordering, dates/hours, the
+28-event actor priority, callback presence, and the distinct shared shrine,
+wandering, Halloween-costume, and dedicated event owners. Nineteen complete
+binary source functions are checked. Null source callbacks remain null; a
+dedicated callback is an actual required binding, not a successful no-op.
+
+Planning preserves equinox replacement, weekly/day-after encoding, Town Day,
+lunar dates, inclusive hours, daily exercise, and overnight/year boundaries.
+Father's Day and Officer's Day suppress their overlapping fishing appearance.
+The caller supplies actual equinox/lunar/town dates and lighthouse availability;
+the scheduler does not create those saved values or start a vacation quest.
+Bridge-event preemption still belongs to the native calendar adapter. A source
+working-player gate returns no events. Insufficient output capacity or invalid
+inputs leave the destination unchanged. The 48-row caller-owned planner is not
+permission to overrun the native 16-row directory or 32-reference manager.
+
+Owner start/stop, acre entry/exit, keep flags, and placement/culling outcomes feed
+RUN and SHOW separately. Being on the calendar never implies either state or
+diary attendance. Failed search/reservation sets ERROR, whereas the source's
+outside-field early return does not. An actor appears only on a successful
+native show callback; delayed culling leaves SHOW set. Priority and cleanup
+match `mSC_get_soncho_event`, `mSC_get_soncho_field_event`, and
+`mSC_delete_soncho`, including delayed autumn-fishing priority, New Year's Miko
+cleanup, and sports-owner SHOW priority. The native death-notification helper
+at `800814B8..800815F0` preserves matching placement coordinates before setting
+STOP and the cleanup countdown; its caller must use the verified destination
+event identity, not the donor number.
+
+Two current checks pass: source/current-cartridge preservation, and a sanitized
+connected calendar/owner/conversation/attendance/handover check. The complete
+donor priority and cleanup functions execute beside the port. The current
+browser/offline empty, all-supported, and mixed compositions also agree.
+Host event/placement services are doubles, not native gameplay. The maximum
+individual scheduler frame is 656 bytes, with a 56-byte decoder before further
+callees; actual native stack use remains unverified. Native directory/manager
+binding, dedicated owners, special-state persistence, exercise/card integration,
+and actor activation remain unfinished. No native test budget is reset, no
+diary is selectable, and neither patcher deployment changes.
 
 ## Serialized diary state
 

@@ -75,6 +75,9 @@ def destinations(base,prior,rewards):
 
 
 def install(base,prior,blob,core,output):
+    if prior['equipment_resources']['npc_extra'].get('world'):
+        from v3_holiday_events import install as install_events
+        return install_events(base,prior,blob,core,output)
     del blob
     equipment=copy.deepcopy(prior['equipment_resources']);npc=equipment['npc_extra']
     if not npc.get('dialogue') or npc.get('world'):
