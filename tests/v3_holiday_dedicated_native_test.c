@@ -72,11 +72,11 @@ static int fade_event(void *c,void *m,unsigned int donor,unsigned int type,unsig
     (void)c;assert(m==manager && (int)type==af_holiday_native_type(donor));
     assert(title==1 || title==9);assert(kind==0 || kind==4 || kind==32768);return fade_ok;
 }
-static void lock_wade(void *c,int v) {(void)c;wade=v;}
+void af_holiday_native_unable_wade(int v) {wade=v;}
 int main(void) {
     manager[0x214/4]=4;manager[0x218/4]=3;manager[0x21C/4]=1;
     manager[0x22C/4]=3;manager[0x230/4]=2;manager[0x234/4]=1;
-    AFHolidayDedicatedServices s={0,identity,fade_event,lock_wade,maps,sizeof(maps)};
+    AFHolidayDedicatedServices s={0,identity,fade_event,maps,sizeof(maps)};
     AFHolidayDedicatedCommon common={-1,-1};AFHolidayControl ctrl={0};
     const unsigned int donors[]={64,12,13,15,14,16,20,1,35,11,41,43,56,37};
     for(unsigned int i=0;i<14;i++) {

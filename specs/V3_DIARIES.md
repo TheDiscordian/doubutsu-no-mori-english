@@ -12,10 +12,10 @@ The calendar/reading/editing/storage controller and shared native-save adapter
 are implemented in source and compile for VR4300. Host checks cover room surface
 selection, calendar navigation, editing/privacy/capacity admission, and the
 save → probe → reload path. They do not establish in-game UI operation,
-native FlashRAM timing, ordinary gameplay, or hardware compatibility. ABI 321
+native FlashRAM timing, ordinary gameplay, or hardware compatibility. ABI 322
 contains menus, resident packets, room/visit hooks, save dispatch, carried readers,
 complete room covers, and catalogue/scoring integration at
-`build/v3-diary-category-work-01/tortimer-state-05/`. Neither patcher changes.
+`build/v3-diary-category-work-01/reserved-installed-01/`. Neither patcher changes.
 
 ## Donor contract
 
@@ -681,7 +681,7 @@ and validate it again. Unknown resource/reader changes still reject.
 the 812-byte `AFHE` source packet is at `806ED800`. The native directory bridge
 also uses this packet. No allocation, profile bit, saved format, or artwork
 changes to this packet. The current build is
-`build/v3-diary-category-work-01/tortimer-state-05/`, ABI 321; its additional state
+`build/v3-diary-category-work-01/reserved-installed-01/`, ABI 322; its additional state
 packet and save extension are described below.
 
 `v3_holiday_events.py` derives all 49 relevant rows from the complete checked
@@ -922,9 +922,10 @@ empty, mixed, and all-supported selections. No native fixture is restarted.
 ### Reserved layouts and dedicated owners
 
 `tools/v3_holiday_maps.py` converts the complete donor event-layout graph and
-compiles all 14 dedicated owners through one native adapter. Preparation is
-`build/v3-diary-category-work-01/reserved-native-02/`; the actual cartridge remains
-ABI 321 at `tortimer-state-05`. No prepared owner is installed or enabled.
+compiles all 14 dedicated owners through one native adapter. The shared runtime
+installer installs the complete code and layouts in ABI 322 at
+`build/v3-diary-category-work-01/reserved-installed-01/`. The manager's dedicated
+callbacks remain disabled while the required services are unfinished.
 
 The source directory contains 17 entries, including the explicit null Halloween
 map. Its 52 variants cover all seven pool shapes and 341 logical placements.
@@ -952,22 +953,22 @@ identities reject explicitly. Strict foreground deletion retains placement and
 sets ERROR on failure; the donor's separate sports-cleanup variant clears its
 placement after the removal attempt. Those behaviours are not merged.
 
-The combined module is 10,304 bytes at `806F8800`; the map packet fits at
-`806FB800..806FBDD8`, below existing harvest dates and the packet guard. These
-are prepared destinations, not installed resources. The updated 4,480-byte
+The combined module is 10,288 bytes at `806F8800`; the map packet resides at
+`806FB800..806FBDD8`, below existing harvest dates and the packet guard. The
+installed 4,480-byte
 placement module retains the shared search/observation implementation and adds
 an explicit placement-ID appearance entry. Its corrected game-context pointer
 is `8010EF90`, verified against both the native symbol and the signed-offset load
-at `8095E0D0`. The current ABI-321 module's `8011EF90` binding is wrong and remains
-behind the inactive actor gate. Installation must apply the correction and
-relink the shared owner and saved-state lifecycle; `maps.json` records all five
-affected public exports. Do not overwrite the placement code while retaining
-callers to moved function addresses.
+at `8095E0D0`. The shared owner and saved-state lifecycle bind the five current
+placement exports; installation verifies their unchanged public entries.
+No caller retains a moved placement address. The complete packet occupancy,
+dates, guards, bootstrap transfer/CRC entries, and unchanged save/profile fields
+are checked together. No additional resident allocation is required.
 
-The adapter still requires checked installed identities, imported event-title
-transitions, the sports acre-transition lock and its player consumer, persistent
-imported common state, and live manager dispatch. The native title transition
-cannot safely receive additive event IDs while its text readers are unchanged.
+The adapter still requires checked installed identities, imported scene fade
+and escape-position handling, persistent imported common state, and live manager
+dispatch. The announcement reader and native acre lock are bound below; those
+completed components do not finish the whole scene-transition path.
 Control/effect identities must name their actual converted behaviour; a native
 counterpart's integer is not a completed imported controller. These requirements
 include costume, exercise/card, Miko, race-state production, event participants,
@@ -978,9 +979,58 @@ selection is claimed until the connected path works.
 callbacks, actual adapter dispatch, distinct cleanup semantics, unavailable
 identities, indoor gates, malformed layouts, and native/source game-pointer
 agreement. The host check uses address/undefined sanitizers; native I/O and
-identity/title/player-lock providers are doubles. The MIPS build passes, with a
+identity/fade providers are doubles. The MIPS build passes, with a
 160-byte largest new individual frame; total dynamic stack, native gameplay,
 and hardware remain unverified. The exhausted diary fixture is not restarted.
+
+### Event announcements and acre lock
+
+`tools/v3_holiday_scene.py` derives the complete 18-event/16-title mapping from
+the checked donor initializer. `AFHT` at `806FB700` is 208 bytes: a 16-byte header,
+128 event-to-title bytes, and 32 big-endian message IDs. The first sixteen IDs
+are opening messages; the last sixteen are conclusions. A source flag of one
+selects opening; other values select conclusion. Unnamed events produce no
+message. The sports umbrella event retains its actual source title mapping.
+
+The installed 512-byte reader at `806FB200` replaces only the native initializer
+table pointer at `80104ADC`; the original `8007C484` function remains intact.
+Native event IDs retain their original path. Additive IDs map back to source
+events before choosing a message. The original door copy, colours, camera,
+message delay, and thirty-frame scene delay are preserved. The actual message
+field is a 32-bit value at demo offset `300`, not a donor structure cast.
+
+Twenty-eight messages reuse the installed complete English records. Morning
+exercise and New Year's announcements retain the reviewed shrine-plaza wording
+and existing credits. Four complete official Groundhog Day/Harvest opening and
+closing messages occupy `305C..305F`, with source records `1751`, `1752`, `17A7`,
+and `17A8` recorded in `translations/provenance.json`. Manual newlines, colours,
+pauses, and the individual automatic-close delays remain intact. All previous
+messages and choice resources are retained; both native message bounds cover
+the four additions. No assistant-authored replacement announcement is used.
+
+Sports callbacks call the native setter `800B21D0`. Its matching getter
+`800B21E0` reads the existing common-state byte `801378DC`. The complete native
+`mEv_PlayerOK` and four player functions are checked, including all seven getter
+calls for directional movement, ordinary/snowball acre transitions, and reset.
+No new player hook, guessed common-data field, or copied lock state is needed.
+
+`tests/test_v3_holiday_scene.py` compiles the actual donor title switch alongside
+the port for every event value and relevant flag. A sanitized initializer check
+preserves non-message fields and original-event fallback. Cartridge checks cover
+complete resources, actual reader hooks, both changed startup packet entries,
+retained public exports, and all five relinked placement callers. Native I/O is
+doubled; these are not executed in-game transition tests. Current empty, mixed,
+and all-supported browser/offline outputs agree, with 191 supported selections
+and every unfinished diary still unavailable.
+
+The next transition consumers remain the source `title_fade`, `player_lap_check`,
+and `mEvMN_CheckLapPlayer` paths. The native fade is `8095EC24..8095EDE4`; its
+escape search is `8095E63C..8095EC24`, using collision reader `80082E40`.
+The imported collision reader must follow the source layout directory's ACTIVE
+precedence and resolve decoration identities before calling structure-area
+tests. Tortimer's field-category query is not that layout selector. Retain
+source present-demo/room-message gates, climate/rhythm handling, and the actual
+return-door state; do not claim that replacing title text alone ports the fade.
 
 ## Serialized diary state
 

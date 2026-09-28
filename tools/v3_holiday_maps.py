@@ -1,9 +1,11 @@
 """Convert the complete shared event-layout graph, without guessing native IDs."""
 import argparse
+import copy
 import json
 from pathlib import Path
 import re
 import struct
+import zlib
 
 from aflib import CODE_RAM,CODE_VROM,by_vrom,sha256
 from apply_translation import write_new
@@ -178,7 +180,7 @@ def owner_source(source):
         field_day_context_explicit=True,primitive_adapter_bound=False)
 
 
-def prepare(output,build_lock=None):
+def prepare(output,build_lock=None,*,base=None,prior=None):
     output=output.resolve()
     if output.exists() or not output.is_relative_to(ROOT/'build'):
         raise ValueError('Use a fresh ignored preparation directory')
@@ -190,12 +192,16 @@ def prepare(output,build_lock=None):
         '"/source/overlays/v3/holiday_dedicated_source.h"')
     generated_path=output/'owners.c';write_new(generated_path,generated.encode())
     extra=(str(generated_path.relative_to(ROOT)),);bindings={}
-    if build_lock:
+    if build_lock or base is not None:
         from v3_furniture_install import inputs
         from v3_holiday_placement import BINDINGS,contract
+        from v3_holiday_scene import prepare as prepare_scene
         from v3_registry import SPECIAL_NPCS
-        base,prior=inputs(build_lock);npc=prior['equipment_resources']['npc_extra']
+        if build_lock:base,prior=inputs(build_lock)
+        npc=prior['equipment_resources']['npc_extra']
         checked=native_contract(base);contract(source,base)
+        scene=prepare_scene(base,prior,source,output/'scene')
+        checked['player_wade_lock_provider_bound']=True
         place_bindings=dict(npc['events']['placement']['bindings'])
         place_bindings.update(BINDINGS)
         if place_bindings['af_holiday_native_game']!=checked['game_context']:
@@ -214,16 +220,17 @@ def prepare(output,build_lock=None):
             af_holiday_native_check_field=0x80087C40,af_holiday_native_pool_variant=0x8008930C,
             af_holiday_native_landmark=0x80089440,af_holiday_native_clear_place=0x80080F0C,
             af_holiday_native_structure=0x8008D3A4,af_holiday_native_clear_status=0x8007FE74,
+            af_holiday_native_unable_wade=scene['contract']['wade_setter'],
             af_holiday_placement_native_show_id=place['symbols']['af_holiday_placement_native_show_id'])
         extra+=('overlays/v3/holiday_dedicated_native.c',)
         report['native']=dict(contract=checked,placement=place,placement_bindings=place_bindings,
-            bindings=bindings,base_rom_sha256=sha256(base),installed=False,
+            bindings=bindings,scene=scene,base_rom_sha256=sha256(base),installed=False,
             placement_callers_to_relink={name:dict(previous=npc['events']['placement']['code']['symbols'][name],
                 prepared=place['symbols'][name]) for name in (
                     'af_holiday_placement_native_make','af_holiday_placement_native_show',
                     'af_holiday_placement_native_cull','af_holiday_npc_bind','af_holiday_npc_unregister')},
             remaining_providers=['installed actor/decoration/profile/effect identities',
-                'imported event titles and fade transition','player acre-transition lock',
+                'imported fade transition (announcement reader prepared)',
                 'imported common-state lifetime and manager dispatch'])
     code,compiled=compile_part('holiday_reserved',output/'code',extra_sources=extra,link_symbols=bindings)
     report.update(packet_bytes=len(data),packet_sha256=sha256(data),code=compiled,
@@ -237,6 +244,103 @@ def prepare(output,build_lock=None):
     write_new(output/'maps.bin',data);write_new(output/'code.bin',code)
     write_new(output/'maps.json',(json.dumps(report,indent=2)+'\n').encode())
     return report
+
+
+def install(base,prior,blob,core,output):
+    """Connect prepared shared resources and existing callers without activation."""
+    del blob
+    from v3_event_text import patch_bounds
+    from v3_import_storage import replace_checked
+    from v3_holiday_state import RAM as STATE_RAM,SIZE as STATE_SIZE
+    from v3_holiday_placement import RAM as NPC_RAM,SIZE as NPC_SIZE,ADDRESS,OWNER_CODE
+    import v3_physical_resources as physical
+    e=copy.deepcopy(prior['equipment_resources']);npc=e['npc_extra'];state=e.get('holiday_state')
+    if not state or npc['events'].get('reserved') or prior['save_codec']['format_version']!=12:
+        raise ValueError('Reserved event integration requires installed format-twelve state, once')
+    prepared=prepare(output/'holiday-reserved',base=base,prior=prior)
+    checked=prepared['native'];place=npc['events']['placement'];scene=checked['scene']
+    records=copy.deepcopy(prior['physical_resources']);physical.verify(base,records)
+    writes=[]
+    def packet(p,size):
+        raw=base[p['physical']:p['physical']+size]
+        if p['bytes']!=size or sha256(raw)!=p['sha256']:
+            raise ValueError('Changed complete shared event packet')
+        return bytearray(raw)
+    def replace_code(data,offset,limit,old,new,compiled,bindings):
+        if (offset+old['bytes']>limit or offset+len(new)>limit or
+            sha256(data[offset:offset+old['bytes']])!=old['sha256'] or
+            any(data[offset+old['bytes']:limit])):
+            raise ValueError('Changed event code or occupied expansion tail')
+        for name,address in old['symbols'].items():
+            if name.startswith('af_') and name not in bindings and compiled['symbols'].get(name)!=address:
+                raise ValueError('Relink moved a retained shared entry: '+name)
+        data[offset:limit]=new+bytes(limit-offset-len(new))
+    def publish(p,data):
+        previous=p['sha256'];p.update(sha256=sha256(data),crc32=zlib.crc32(data))
+        matches=[r for r in records if r['id']==p['id']]
+        if len(matches)!=1:raise ValueError('Ambiguous complete event packet')
+        matches[0]['sha256']=p['sha256']
+        writes.append((dict(matches[0],previous_sha256=previous),bytes(data)))
+    np=npc['packet'];nd=packet(np,NPC_SIZE)
+    flag=npc['record']['flags_offset']
+    if nd[flag:flag+4]!=bytes(4):raise ValueError('Cannot relink an active unfinished holiday actor')
+    # Placement exports may move. All callers are recompiled against their new
+    # addresses; exported owner/state entries themselves must remain fixed.
+    fresh=checked['placement'];raw=(output/'holiday-reserved/placement.bin').read_bytes()
+    off=ADDRESS-NPC_RAM
+    if (sha256(nd[off:off+place['code']['bytes']])!=place['code']['sha256'] or
+        any(nd[off+place['code']['bytes']:NPC_SIZE-16]) or len(raw)>NPC_SIZE-16-off):
+        raise ValueError('Changed placement code/reservation')
+    nd[off:NPC_SIZE-16]=raw+bytes(NPC_SIZE-16-off-len(raw))
+    owner_bindings=dict(place['owner_bindings'])
+    for name,row in checked['placement_callers_to_relink'].items():
+        if name in owner_bindings:owner_bindings[name]=row['prepared']
+    owner_code,owner=compile_part('holiday_owner',output/'holiday-reserved/owner',link_symbols=owner_bindings)
+    replace_code(nd,OWNER_CODE-NPC_RAM,0x9800,place['owner_code'],owner_code,owner,owner_bindings)
+    sp=state['packet'];sd=packet(sp,STATE_SIZE);state_bindings=dict(state['bindings'])
+    for name in ('af_holiday_npc_bind','af_holiday_npc_unregister'):
+        state_bindings[name]=fresh['symbols'][name]
+    defines=tuple(f[2:] for f in state['code']['flags'] if f.startswith('-D'))
+    state_code,linked=compile_part('holiday_state',output/'holiday-reserved/state',
+        defines=defines,link_symbols=state_bindings,extra_sources=('overlays/v3/diary.c',
+            'overlays/v3/console_storage.c','overlays/v3/save_compressed.c','overlays/v3/holiday_npc.c'))
+    replace_code(sd,0,0x4800,state['code'],state_code,linked,state_bindings)
+    # Single bounds/occupancy check for the entire shared payload. Existing
+    # dates, guards, saved fields, and resources are not relocated or rewritten.
+    additions=((0x4800,0x7200,output/'holiday-reserved/code.bin'),
+        (0x7200,0x7700,output/'holiday-reserved/scene/code/code.bin'),
+        (0x7700,0x7800,output/'holiday-reserved/scene/titles.bin'),
+        (0x7800,0x7F80,output/'holiday-reserved/maps.bin'))
+    installed=[]
+    for start,end,path in additions:
+        data=path.read_bytes()
+        if len(data)>end-start or any(sd[start:end]):raise ValueError('Event payload overlaps live services')
+        sd[start:start+len(data)]=data
+        installed.append(dict(ram=STATE_RAM+start,bytes=len(data),sha256=sha256(data),file=str(path.relative_to(output))))
+    hook=scene['native_init_pointer_hook']
+    replace_checked(core,hook['address']-CODE_RAM,struct.pack('>I',hook['before']),struct.pack('>I',hook['after']))
+    scene['text']['hooks']=patch_bounds(core,scene['text']['first_id'],scene['text']['count'])
+    scene.update(installed=True,native_execution_verified=False)
+    place.update(code=fresh,bindings=checked['placement_bindings'],owner_code=owner,owner_bindings=owner_bindings)
+    state.update(code=linked,bindings=state_bindings)
+    npc['lifecycle']['code']=copy.deepcopy(linked)
+    reserved=dict(prepared,installed=True,actor_owners_installed=False,resources=installed,
+        additional_resident_bytes=0,saved_format_changed=False,native_execution_verified=False)
+    reserved['native']['installed']=True
+    reserved['owners']['primitive_adapter_bound']=True
+    npc['events']['reserved']=reserved
+    publish(np,nd);publish(sp,sd)
+    sources={p:sha256((ROOT/p).read_bytes()) for p in (*prepared['sources'],
+        'tools/v3_holiday_scene.py','overlays/v3/holiday_scene.c','overlays/v3/holiday_scene.h',
+        'overlays/v3/holiday_scene.ld','tools/v3_holiday_state.py','tools/v3_holiday_dialogue.py',
+        'tools/v3_resource_capacity.py','tools/v3_furniture_install.py','translations/provenance.json')}
+    npc['sources'].update(sources);reserved['sources']=sources
+    updates=dict(physical_resources=records,save_codec=copy.deepcopy(prior['save_codec']))
+    updates['save_codec']['holiday_state_code']=copy.deepcopy(linked)
+    write_new(output/'holiday-reserved/installed.json',(json.dumps(reserved,indent=2)+'\n').encode())
+    write_new(output/'holiday-reserved/npc-packet.bin',nd)
+    write_new(output/'holiday-reserved/state-packet.bin',sd)
+    return e,{},updates,writes
 
 
 if __name__=='__main__':

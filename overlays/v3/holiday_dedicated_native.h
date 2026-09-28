@@ -12,9 +12,6 @@ typedef struct {
      * cannot consume additive event IDs without updating its title readers. */
     int (*fade)(void *,void *manager,unsigned int donor,unsigned int native,
         unsigned int title,unsigned int landmark);
-    /* The donor sports closing ceremony locks acre transitions. Its player
-     * consumer must be installed; an absent native equivalent is not a no-op. */
-    void (*unable_wade)(void *,int);
     const unsigned char *maps;
     unsigned int map_bytes;
 } AFHolidayDedicatedServices;

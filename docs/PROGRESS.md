@@ -31,28 +31,34 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
-The current proposal is ABI 321 at
-`build/v3-diary-category-work-01/tortimer-state-05/build-lock.json`, ROM SHA-256
-`5663403d40a013da4314fabb7c47814d11a315410e430c2acda5f67e8af22b77`.
+The current proposal is ABI 322 at
+`build/v3-diary-category-work-01/reserved-installed-01/build-lock.json`, ROM SHA-256
+`c0a022310833ad22e11ccdaf42d62944daad9762c868fefdcbd745ef01ac2b93`.
 It contains 191 independently selectable development imports, including all nine
 fish and eight insects, and 100 inactive furniture profiles whose acquisition
 is pending, plus sixteen inactive diary cover profiles. The main lock and both
 stable V2-14 deployments are unchanged.
 
-The remaining event-specific owners use one prepared adapter at
-`build/v3-diary-category-work-01/reserved-native-02/`. It carries the complete
-donor callbacks and layouts into native status, reserved placement, foreground
-setup/removal, actor creation, effects, and acre-entry handling. Both source
-cleanup variants are preserved. Focused sanitized host checks pass across all
-14 owners and 341 layout placements; native I/O and missing providers are doubles.
-The N64 compilation passes. This preparation is not installed: checked content
-identities, event-title transitions, the sports acre-transition lock, imported
-common-state lifetime, and manager dispatch remain to connect. No diary becomes
-selectable. The prepared placement module corrects its game-context binding to
-`8010EF90`; ABI 321 still contains the wrong `8011EF90` binding behind its inactive
-actor gate. Install that correction and relink its recorded callers together
-before activation. The [shared owner contract](../specs/V3_DIARIES.md#reserved-layouts-and-dedicated-owners)
-records the remaining connected work; no native fixture is restarted.
+The complete dedicated-owner code, native primitive adapter, and all shared
+event layouts are installed in the existing holiday packet. The placement
+adapter uses the checked `8010EF90` game-context pointer; its shared owner and
+saved-state lifecycle are relinked together while retaining public entry
+addresses. Sports callbacks reach the existing native acre-transition lock,
+including its unchanged player consumers. The event-announcement initializer
+uses the full donor mapping and preserves native door/camera/timer setup.
+Twenty-eight announcements reuse installed English; four additional official
+messages have individual source credits. Reviewed shrine wording is retained.
+
+Five focused checks pass: source/host announcement comparison, connected
+cartridge/startup bindings, shared native-pointer guards, complete owner/layout
+host dispatch, and current browser/offline empty/mixed/all-supported composition.
+Native I/O and unresolved identity/fade services are host doubles. No native
+fixture is restarted. No diary becomes selectable: checked content identities,
+the fade/escape-position path, imported common-state lifetime, live manager
+dispatch, costume/exercise actors, and calendar behaviour choice remain required.
+The [shared owner contract](../specs/V3_DIARIES.md#reserved-layouts-and-dedicated-owners)
+records the connected work. Saved format/profile and resident allocation are
+unchanged; gameplay and hardware verification remain open.
 
 The same diary category now has the connected holiday conversation, movement,
 calendar, and reward kernels installed with the actual native player/inventory/

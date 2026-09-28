@@ -52,6 +52,9 @@ def contract(source):
 
 
 def install(base,prior,blob,core,output):
+    if prior['equipment_resources'].get('holiday_state'):
+        from v3_holiday_maps import install as install_reserved
+        return install_reserved(base,prior,blob,core,output)
     del blob
     e=copy.deepcopy(prior['equipment_resources']);npc=e['npc_extra'];d=e['diaries']
     if e.get('holiday_state') or prior['save_codec']['format_version']!=11:

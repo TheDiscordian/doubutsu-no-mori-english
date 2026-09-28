@@ -19,6 +19,7 @@ extern int af_holiday_native_structure(u16,int,int,int,int,int);
 extern int af_holiday_native_check_status(int,int);
 extern void af_holiday_native_set_status(int,int);
 extern void af_holiday_native_clear_status(int,int);
+extern void af_holiday_native_unable_wade(int);
 #ifndef FN
 #define FN(at,ret,...) ((ret (*)(__VA_ARGS__))(at))
 #endif
@@ -104,14 +105,14 @@ static iptr operation(void *c,u32 op,int donor,int a,int b,int id) {
             n->manager,n->control,native);
         FN(n->owner+(op==AF_HD_EFFECT?0x2B54:0x2BEC),void,int)(native);return 0;
     }
-    case AF_HD_UNABLE_WADE:s->unable_wade(s->context,a);return 0;
+    case AF_HD_UNABLE_WADE:af_holiday_native_unable_wade(a);return 0;
     default:error(c,type);return 0;
     }
 }
 int af_holiday_dedicated_native(void *manager,AFHolidayControl *control,AFHolidayDedicatedCommon *common,
         const AFHolidayDedicatedServices *services,u32 phase) {
     const u32 *d=af_holiday_manager_descriptor;
-    if(!manager || !control || !common || !services || !services->resolve || !services->fade || !services->unable_wade ||
+    if(!manager || !control || !common || !services || !services->resolve || !services->fade ||
        !services->maps || services->map_bytes<356 || phase>=5 ||
        control->type<AF_HN_FIRST || control->type>=AF_HN_END ||
        d[0]!=0x03800000 || d[2]!=0x8095B8B0 || d[3]-d[2]!=d[1]-d[0] ||

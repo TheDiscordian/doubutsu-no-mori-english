@@ -218,4 +218,9 @@ def finish(image,base,prior,output,equipment):
         return install_text(image,base,output,npc['dialogue']['text'],relocate=True,
             physical_resources=prior['physical_resources'],
             reserved_end=prior.get('resource_capacity',{}).get('reserved_physical_end',0))
+    scene=npc.get('events',{}).get('reserved',{}).get('native',{}).get('scene')
+    if scene and not old.get('events',{}).get('reserved'):
+        return install_text(image,base,output,scene['text'],relocate=True,
+            physical_resources=prior['physical_resources'],
+            reserved_end=prior.get('resource_capacity',{}).get('reserved_physical_end',0))
     return image

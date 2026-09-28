@@ -179,8 +179,8 @@ reading, and native cleanup. The field decoder uses shrine `22C/230`, not pool
 native Miko but remains unimplemented; cleanup never deletes native profile `84`.
 Three focused current checks and empty/mixed/all-supported browser/offline
 composition pass. Native I/O is doubled; no emulator fixture is restarted.
-The current ABI-321 proposal is
-`build/v3-diary-category-work-01/tortimer-state-05/build-lock.json`.
+The current ABI-322 proposal is
+`build/v3-diary-category-work-01/reserved-installed-01/build-lock.json`.
 `af_holiday_npc_event_world` supplies saved Town Day, complete source harvest
 dates, and lighthouse vacation callbacks. The prepared NPC lifecycle is linked
 against all installed providers, without reconverting its resources. The shared
@@ -190,20 +190,25 @@ readers cannot load new saves. Focused sanitized save/state/migration and curren
 cartridge checks pass; current browser/offline compositions agree.
 The native calendar caller uses this actual date/state provider and retains the
 existing camper/native dispatch. All four prepared profile callbacks are bound.
-The complete event-specific owner callbacks, all shared reserved layouts, and
-their native primitive adapter are prepared together at
-`build/v3-diary-category-work-01/reserved-native-02/`. Reuse these resources and
-their passing sanitized checks. The next consumers are the checked source-to-
-installed actor/decoration/profile/effect identities, event-title/scene transition,
-sports acre-transition lock, and imported common-state lifetime/manager dispatch.
-Connect these to the prepared adapter, including the costume/exercise identities
-and calendar behaviour choice. Do not activate an owner whose required services
-are missing. This is the same diary-category task, not one task per event.
-The prepared placement module fixes the game-context pointer to `8010EF90`;
-ABI 321's inactive adapter still uses `8011EF90`. Install the corrected module
-and relink the shared owner and saved-state lifecycle against all five public
-exports recorded in `maps.json` before activation. Preserve the existing packet,
-save format, resources, and public entry callers. No native fixture is restarted.
+The complete dedicated-owner code, reserved layouts, native primitive adapter,
+and announcement reader are installed in the current proposal. Sports callbacks
+use the existing native acre lock and all of its actual player consumers.
+Placement uses `8010EF90`; the shared owner and saved-state lifecycle are
+relinked against all five placement exports, preserving public caller addresses.
+Reuse this installation, the unchanged art, and passing focused checks.
+
+Next connect the checked source-to-installed actor/decoration/profile/effect
+identities and the scene fade/escape-position path, then imported common-state
+lifetime and live manager dispatch. The title reader is complete, not the fade
+caller. The native `8095EC24` fade uses `8095E63C` escape search and `80082E40`
+layout collision; imported layouts need their actual identity-aware collision
+reader. Preserve source ACTIVE layout precedence, not Tortimer's field-category
+query, and retain the source present-demo/room-message gates and transition
+side effects. The [scene connection](../specs/V3_DIARIES.md#event-announcements-and-acre-lock)
+records exact completed bindings and remaining consumers. Include costume,
+exercise/card, Miko, race/participant behaviour, and the calendar choice in this
+same category; do not activate an owner with missing services. Preserve the
+existing save format, resources, and native test budget. No fixture is restarted.
 The race reader expects the mapped donor-15/id-8
 payload; the imported race owner still needs to produce it. Native event 10 is
 not a substitute for that owner.
