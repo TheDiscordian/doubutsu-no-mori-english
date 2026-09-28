@@ -125,6 +125,11 @@ static void native_scene_check(void) {
         .alternate_demo=alternate_demo,.climate=climate,.tempo=native_tempo};
     native_fresh();assert(af_holiday_transition_native_fade(&services,native_manager,20,91,1,4)==1);
     assert(native_calls==1 && commit_before==1 && commit_return==1 && !memcmp(order,"GCTWB",5));
+    services.alternate_demo=0;native_fresh();
+    assert(af_holiday_transition_native_fade(&services,native_manager,20,91,1,4)==1);
+    native_fresh();native_groundhog=1;
+    assert(af_holiday_transition_native_fade(&services,native_manager,7,78,1,4)==-1 && !native_calls);
+    native_groundhog=0;services.alternate_demo=alternate_demo;
     native_fresh();go_ok=0;
     assert(af_holiday_transition_native_fade(&services,native_manager,20,91,1,4)==0);
     assert(native_calls==1 && commit_before==1 && !commit_return && order_count==1);

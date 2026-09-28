@@ -20,7 +20,9 @@ from v3_password_policy import function
 
 FIRST=12380
 SOURCES=('tools/v3_holiday_scene.py','overlays/v3/holiday_demo.c','overlays/v3/holiday_demo.h',
-    'overlays/v3/holiday_demo.ld','tools/v3_asset_loader.py','tools/v3_furniture_install.py')
+    'overlays/v3/holiday_demo.ld','overlays/v3/holiday_groundhog.c','overlays/v3/holiday_groundhog.h',
+    'overlays/v3/holiday_scene_native.c','overlays/v3/holiday_scene_native.h',
+    'tools/v3_asset_loader.py','tools/v3_furniture_install.py')
 REFERENCES={
     'src/game/m_demo.c':'71982f49f9380a7fe108595fe2ee18380a26c58c378006364f01c772650a1212',
     'src/game/m_player_lib.c':'76ef6299f5b1e1a1eef7ee783212e2c4db6d35db3c32db330723ece21ebca847',
@@ -171,20 +173,41 @@ DEMO_HOOKS=(
     (0x800641CC,'camera_reverse'),(0x8006447C,'camera_counter'))
 
 
-def install_demo(base,prior,blob,core,output):
+def install_demo(base,prior,blob,core,output,*,scene_services=False):
     """Connect all additional announcement/speech consumers in one module."""
     from v3_import_storage import jump
     from v3_furniture_pipeline import Source
     del blob
     e=copy.deepcopy(prior['equipment_resources']);events=e['npc_extra']['events']
-    if events.get('demo') or not e['holiday_fishing']['live'].get('measurement_choice'):
+    previous_demo=events.get('demo');groundhog=bool(previous_demo and previous_demo.get('groundhog'))
+    if ((previous_demo and (not scene_services or previous_demo.get('scene_services'))) or
+            not e['holiday_fishing']['live'].get('measurement_choice')):
         raise ValueError('Unexpected shared announcement predecessor')
+    if previous_demo:
+        # Restore only this module's checked entry patches for the complete
+        # original guards, then rebind all callers to the refreshed module.
+        for hook in previous_demo['hooks']:
+            at=hook['address']-CODE_RAM
+            if core[at:at+8]!=bytes.fromhex(hook['after']):raise ValueError('Changed installed demo caller')
+            core[at:at+8]=bytes.fromhex(hook['before'])
     references={
         'local/ac-decomp/src/game/m_demo.c':REFERENCES['src/game/m_demo.c'],
         'local/ac-decomp/src/game/m_camera2.c':'053942e40b0cc7b4212302a2c51b50fa421446441b3b69f8124e22dbdfb4e6fc',
         'local/ac-decomp/include/m_camera2.h':'ec7bc2f1efc05b14736ce3d169cf708b6d9e10d850ee37dee6f0625ad3f0b4a9',
         'upstream/af/src/code/m_demo.c':'0000cb13810b84141b670fcedde07c38c4a96ce981994dd2ae18c76ffe9651dd',
         'upstream/af/include/m_demo.h':'9332283a877036b8134c27004a688b61bbb61da47507298eeccfa895b60226a4'}
+    if groundhog:
+        references.update({
+            'local/ac-decomp/src/actor/ac_groundhog_control.c':'e8ed5dba08279843b1842f0558f37cd66cf98eb5e5098a26e06b8c222a8492e8',
+            'local/ac-decomp/include/ac_groundhog_control.h':'6b1b68a041c2673b9e1b0992ea942a8fbb06487bc0d63613ecc07721a69a2cdc',
+            'local/ac-decomp/include/ac_groundhog_control_h.h':'8c04b892c4507ab13188ac2d634442593c14eeea918449ef64caf2d80f07311e'})
+    if scene_services:
+        references.update({
+            'local/ac-decomp/src/actor/ac_my_room.c':'4543f92a35a19c393bba5479573a4535d4c9a7cf02d437de858f510739e43b5a',
+            'local/ac-decomp/src/actor/ac_my_room_msg_ctrl.c_inc':'56b9e7965f1e225b5a99d6fefd261109a0ecbc438dd6bfa26fde438469bd3931',
+            'local/ac-decomp/src/game/m_field_info.c':'6b89a2f8de448cf2beda42da58c17d696d46b2f73e6ccf0a365c64769af9b10f',
+            'upstream/af/include/tables/actor_table.h':'7e8705925749254a11fa2f0d04934a7774ea24eadb02c065c516d6486e797c22',
+            'overlays/v3/console_room.c':'37e9266f44d6175b4fb7c1256602a55a60ef45e48ee5a8d8fbb5db1221fddbe1'})
     for path,digest in references.items():
         if sha256((ROOT/path).read_bytes())!=digest:raise ValueError('Changed announcement reference: '+path)
     guards=(
@@ -205,6 +228,10 @@ def install_demo(base,prior,blob,core,output):
     names=('set_emsg2_default','wait_emsg2_start','wait_emsg2_end','set_speech_default',
         'choice_demo_sub','choice_demo','init_demo','run_demo','main_proc','mDemo_Request',
         'change_camera','Camera2_Inter_CounterProc','Camera2_Inter_set_reverse_mode')
+    if groundhog:
+        control=(ROOT/'local/ac-decomp/src/actor/ac_groundhog_control.c').read_text()
+        names+=tuple(re.findall(r'^static (?:int|void) (aGHC_\w+)\([^;{]*\)\s*\{',control,re.M))
+        if len(names)!=28:raise ValueError('Incomplete Groundhog controller functions')
     donors=[]
     for name in names:
         offsets=[at for at,rows in source.functions.items() if any(n==name for n,_ in rows)]
@@ -220,11 +247,39 @@ def install_demo(base,prior,blob,core,output):
         af_hd_camera_inter=0x800641F8,af_hd_camera_normal=0x80062690,
         af_hd_landmark=0x80089440,af_hd_origin=0x80088B3C,af_hd_goto=0x800C6C10,
         af_hd_bgm_end=0x8005EDD8,memcpy=0x80034BF8,memset=0x8003B9B0)
-    directory=output/'holiday-demo';code,compiled=compile_part('holiday_demo',directory/'code',link_symbols=bindings)
+    if groundhog:bindings['af_hg_live']=DEMO_STATE+24
+    extra_sources=('overlays/v3/holiday_groundhog.c',) if groundhog else ()
+    if scene_services:
+        owner=by_vrom(base)[0x82D7F0].extract(base)
+        room_guards=(
+            (0x80936ADC,0x80936B68,'7c998a46bb3a7d3775ea516aa179def8223f664b55f239c9f8b68d926f5eadbb'),
+            (0x80936E98,0x80937020,'a369c5c46de52034d043757142b86c07e4ecbb53b8b53be7376cca84c5caaff4'),
+            (0x80939050,0x8093919C,'829a1b5c83b3284fe2e0174932f22be1ad56e184b4540017259fe6b229ed381a'),
+            (0x8093A728,0x8093A7F4,'a8a41a9a91665059875ae31cfff0beb2950134d1d7566a3b47d25db682886cb8'),
+            (0x8093BC30,0x8093BC94,'5b6cdeaefec7e22482d34e9c00c5bc1b10a7f1cb4e47755b547f41f592e1f7ab'),
+            (0x8093BB04,0x8093BB5C,'3265c801e3dfdaacae731a6532d9c73eef2462f655b9f3c09554e00bf43f06cf'))
+        for a,b,digest in room_guards:
+            if sha256(owner[a-0x80936710:b-0x80936710])!=digest:
+                raise ValueError('Changed live room transition service: '+hex(a))
+        if struct.unpack_from('>8I',core,0x80100DF0-CODE_RAM)!=(
+                0x82D7F0,0x844400,0x80936710,0x8094F610,0,0x8094756C,0,0):
+            raise ValueError('Changed room owner descriptor for scene services')
+        from v3_console_room import native_contract
+        native_contract(base)
+        bindings.update(af_holiday_scene_room_descriptor=0x80100DF0,
+            af_holiday_scene_room_clip=0x80136F2C,af_holiday_scene_pool_variant=0x8008930C)
+        extra_sources+=('overlays/v3/holiday_scene_native.c',)
+    directory=output/'holiday-demo';code,compiled=compile_part('holiday_demo',directory/'code',link_symbols=bindings,
+        extra_sources=extra_sources)
     p=e['holiday_state']['packet'];data=bytearray(base[p['physical']:p['physical']+p['bytes']])
     at=DEMO_RAM-p['ram'];end=DEMO_END-p['ram']
     transition=events['transition']['loaded_code']
-    if (sha256(data)!=p['sha256'] or p!=e['holiday_fishing']['packet'] or
+    if previous_demo:
+        old=previous_demo['code'];count=old['bytes']
+        if old['symbols']['af_holiday_demo_main']!=DEMO_RAM or sha256(data[at:at+count])!=old['sha256']:
+            raise ValueError('Changed complete demo module before refresh')
+        data[at:at+count]=bytes(count)
+    if (sha256(base[p['physical']:p['physical']+p['bytes']])!=p['sha256'] or p!=e['holiday_fishing']['packet'] or
             transition['ram']+transition['bytes']>DEMO_RAM or len(code)>DEMO_STATE-DEMO_RAM or
             any(data[at:end])):raise ValueError('Occupied or changed event-demo reservation')
     data[at:at+len(code)]=code
@@ -233,6 +288,7 @@ def install_demo(base,prior,blob,core,output):
         symbol='af_holiday_demo_'+name;offset=address-CODE_RAM
         before=bytes(core[offset:offset+8]);after=struct.pack('>2I',jump(compiled['symbols'][symbol]),0)
         core[offset:offset+8]=after;hooks.append(dict(address=address,symbol=symbol,before=before.hex(),after=after.hex()))
+        if previous_demo:hooks[-1]['previous']=next(h['after'] for h in previous_demo['hooks'] if h['address']==address)
     previous=p['sha256'];p.update(sha256=sha256(data),crc32=zlib.crc32(data))
     e['holiday_fishing']['packet']=copy.deepcopy(p)
     records=copy.deepcopy(prior['physical_resources']);matches=[r for r in records if r['id']==p['id']]
@@ -245,9 +301,38 @@ def install_demo(base,prior,blob,core,output):
         speech_camera=dict(native_interpolation_type=10,source_morph_ticks=14,native_morph_ticks=7,
             source_return_flag=4,original_return_flag=2),
         sources={p:sha256((ROOT/p).read_bytes()) for p in SOURCES},
-        pending=['Live transition read/commit, Groundhog producer, dedicated-owner dispatch, and event admission'])
+        pending=['Live transition read/commit for scheduled owners, dedicated-owner dispatch, and event admission'])
+    if groundhog:
+        from v3_holiday_events import TYPES
+        schedule=source.raw('event_schedule_data')
+        scope_rows={event:[schedule[i:i+12].hex() for i in range(0,len(schedule),12)
+            if int.from_bytes(schedule[i+10:i+12],'big')==event] for event in (7,81)}
+        if (7 in TYPES or 81 not in TYPES or scope_rows!={
+                7:['020200070202000800000007'],81:['020200090202001000000051']}):
+            raise ValueError('Changed independent ceremony/diary-attendance scope')
+        stage['groundhog']=dict(installed=True,actor_services_bound=False,native_execution_verified=False,
+            source_functions=names[13:],states=9,source_updates_per_native_frame=2,
+            clip_pointer_ram=DEMO_STATE+24,source_names={'speaker':0xD087,'groundhog':0xD081},
+            source_music=252,common_area_bytes=4,
+            required_for_diary_attendance=False,scope_schedule_rows=scope_rows,
+            pending=['Inactive preparation; ceremony owner 7 is outside the diary owner set',
+                'Native control actor lifecycle and required NPC/music services are not implemented'])
+    if scene_services:
+        stage['scene_services']=dict(installed=True,native_execution_verified=False,
+            room_functions=room_guards,room_descriptor=0x80100DF0,room_clip=0x80136F2C,
+            room_console_request_offset=0x47C,current_acre_offsets=[0xE4,0xE5],
+            room_tempo=0x8093A7C4,room_gyroid_steps=0x80936E98,
+            source_mainland_climate_states=[0,2,4],source_mainland_climate_results=[0,0,0],
+            present_demo_imported=False,ceremony_owner_in_scope=False,
+            pending=['Identity/status graph and live dedicated-owner dispatch'])
     events['demo']=stage;e['npc_extra']['sources'].update(stage['sources'])
-    events['decorations']['controllers']['preserved'].append(dict(ram=DEMO_RAM,bytes=len(code),sha256=sha256(code)))
+    preserved=events['decorations']['controllers']['preserved']
+    if previous_demo:
+        entries=[row for row in preserved if row['ram']==DEMO_RAM]
+        if len(entries)!=1 or entries[0]['sha256']!=previous_demo['code']['sha256']:
+            raise ValueError('Changed preserved demo module')
+        preserved.remove(entries[0])
+    preserved.append(dict(ram=DEMO_RAM,bytes=len(code),sha256=sha256(code)))
     write_new(directory/'installed.json',(json.dumps(stage,indent=2)+'\n').encode())
     write_new(directory/'packet.bin',data)
     return e,{},dict(physical_resources=records),[(dict(matches[0],previous_sha256=previous),bytes(data))]

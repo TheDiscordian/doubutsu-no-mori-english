@@ -31,9 +31,9 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
-The current proposal is ABI 337 at
-`build/v3-diary-category-work-01/event-demo-installed-03/build-lock.json`, ROM SHA-256
-`dd2000c78633c5a331922c1f39cf8802036cb0fbe4f32275dd90b3967153c721`.
+The current proposal is ABI 339 at
+`build/v3-diary-category-work-01/event-scene-services-01/build-lock.json`, ROM SHA-256
+`9193244276f01595a90c2f3f3ecd338a11b0aaf4fb354af7fead27801c75b7ff`.
 It contains 191 independently selectable development imports, including all nine
 fish and eight insects, and 100 inactive furniture profiles whose acquisition
 is pending, plus sixteen inactive diary cover profiles. The main lock and both
@@ -162,7 +162,7 @@ selection/retention check and current-cartridge binding/checksum check pass.
 The definition stays unavailable in the selector until tournament actors and
 mail delivery are admitted together; it is not a nonfunctional selectable toggle.
 The separate donor announcement/speech handover is installed in the same packet.
-The 3,728-byte module preserves all fourteen original demo identities and adds
+The 6,096-byte combined module preserves all fourteen original demo identities and adds
 alternate announcement 14 and speech 15. Its 23 native connections include
 request priority, saved announcement/resume, speech readers, shrine/interpolated
 camera return, and actual return-door acceptance. A rejected return retains the
@@ -170,9 +170,17 @@ announcement for retry. The original callback tables and unrelated code remain
 unchanged; no new allocation or saved format is needed.
 The focused sanitized host sequence and current-cartridge hooks/bounds/retention
 check pass, as does current empty/mixed/all-191 browser/offline composition.
-Native demo execution is not claimed. Live transition read/commit, the Groundhog
-state producer, dedicated-owner dispatch, and calendar selection/admission remain
-unfinished. Reuse completed fishing and demo paths; do not restart native fixtures.
+The same module contains live signed-acre/pool-shape readers, the existing
+console-request gate, and relocated native room tempo/gyroid capture. Return
+state is committed only after scene acceptance. A focused sanitized check
+passes with native I/O doubled; source comparison confirms that all three
+mainland climate states retain the N64 mainland result. The current-cartridge
+check and empty/mixed/all-191 browser/offline comparison pass. Native gameplay
+is not claimed. Identity/status binding, dedicated-owner dispatch, and calendar
+selection/admission remain unfinished. The separate Groundhog ceremony is outside
+those scheduled owners; its prepared controller stays inactive and does not
+block diary attendance.
+Reuse completed fishing and demo paths; do not restart native fixtures.
 
 Two sanitized host checks, the current-cartridge/storage/startup check, and a
 current-packet controller-refresh check pass. Empty/mixed/all-191 browser/offline

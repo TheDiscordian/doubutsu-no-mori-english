@@ -290,21 +290,29 @@ as donor meteor event 37.
 The [decoration contract](../specs/V3_DIARIES.md#shared-event-decoration-resources)
 identifies the checked resources and native consumer addresses.
 Continue checked actor/decoration/profile/effect identities and source/native
-ACTIVE status, actual present-demo/room-message and Groundhog state, and climate/
-rhythm services. Connect the live
+ACTIVE status for the scheduled owners. Live transition read/commit, console
+request gating, and native room rhythm/gyroid capture are installed at
+`build/v3-diary-category-work-01/event-scene-services-01/build-lock.json`, ABI 339,
+ROM `9193244276f01595a90c2f3f3ecd338a11b0aaf4fb354af7fead27801c75b7ff`.
+Reuse the passing focused host/current-cartridge/browser checks. Connect the live
 dedicated-owner calls using the installed common-state entry; do not activate
 callbacks with missing providers. The
 [transition contract](../specs/V3_DIARIES.md#shared-transition-and-native-scene-bridge)
 records completed native scene/return-state bindings and remaining consumers.
 The alternate announcement and speech lifecycle is installed at `806FE000`,
-using 3,728 bytes and 23 checked native entry points. Added modes 14/15 preserve
+in the 6,096-byte combined module with 23 checked native entry points. Added modes 14/15 preserve
 the fourteen original identities and callback tables. Request priority,
 choice/init/run, saved announcement/resume, shrine and interpolated camera,
 event-busy filtering, speech readers, and successful/rejected return transitions
 are connected. Focused sanitized host and current-cartridge checks pass; current
-browser/offline empty/mixed/all-191 output agrees. Live Groundhog/fading-title
-producers and transition service admission remain unbound, so the additional
-modes do not claim an active imported event or native gameplay verification.
+browser/offline empty/mixed/all-191 output agrees. Transition service admission
+remains unbound, so the additional modes do not claim an active imported event
+or native gameplay verification. Groundhog ceremony owner 7 is not among the
+44 scheduled diary owners. Diary attendance on that date uses the separate
+Tortimer owner 81, from 9 a.m. to 4 p.m.; the ceremony is from 7 to 8 a.m.
+Its prepared controller and alternate announcement are inactive optional
+preparation, not prerequisites for diary attendance. Do not expand this task
+into ceremony actors or ceremony music.
 Reuse the retained core map and installed transition reservation rather than
 reinvestigating native geometry, fishing mail, or existing announcement text.
 Include costume,

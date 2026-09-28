@@ -79,7 +79,7 @@ int af_holiday_transition_ready(AFHolidayTransition *);
  * the caller's actual identity/status and transition-lifecycle operations. */
 int af_holiday_transition_native_geometry(AFHolidayTransitionOps *);
 /* Imported state and services absent from the original N64 fade. Every
- * provider is mandatory; read must verify that the complete service set is
+ * applicable provider is mandatory; read must verify that the complete service set is
  * ready. No zero-filled stand-in for present/room-message/holiday state. */
 enum {AF_HT_BEFORE_SCENE,AF_HT_RETURN_STATE};
 typedef struct {
@@ -91,7 +91,8 @@ typedef struct {
     int (*read)(void *,AFHolidayTransition *);
     void (*commit)(void *,const AFHolidayTransition *,unsigned int phase);
     /* Source EVENTMSG2 has no original N64 counterpart. Return the installed
-     * alternate demo identity, or -1; never alias it to native demo 13. */
+     * alternate demo identity, or -1; never alias it to native demo 13.
+     * Required only when the source requests EVENTMSG2 (ceremony owner 7). */
     int (*alternate_demo)(void *);
     void (*climate)(void *,int);
     void (*tempo)(void *);

@@ -69,7 +69,7 @@ static int go(void *c,AFHolidayTransition *s,const AFHolidayDoor *door,int flags
     int type=s->common.start_demo_request.type;
     if(type==13)type=12;
     else if(type==14) {
-        type=o->alternate_demo(o->context);
+        type=o->alternate_demo?o->alternate_demo(o->context):-1;
         if(type<14)type=-1; /* All original native types have other meanings. */
     }
     else type=-1;
@@ -104,7 +104,7 @@ int af_holiday_transition_native_fade(void *context,void *manager,unsigned int d
         unsigned int native,unsigned int title,unsigned int landmark_kind) {
     const AFHolidayTransitionServices *o=context;
     if(!manager || !o || !o->maps || !o->status || !o->resolve || !o->read || !o->commit ||
-       !o->alternate_demo || !o->climate || !o->tempo || !af_holiday_native_game ||
+       !o->climate || !o->tempo || !af_holiday_native_game ||
        donor>=128 || native<AF_HN_FIRST || native>=AF_HN_END || title>32767 ||
        af_holiday_native_type(donor)!=(int)native)return -1;
     unsigned char *player=af_holiday_transition_player(af_holiday_native_game);

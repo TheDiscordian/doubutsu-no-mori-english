@@ -25,12 +25,23 @@ CURRENT=ROOT/os.environ.get('V3_HOLIDAY_SCENE_BUILD','build/v3-diary-category-wo
 
 
 class HolidaySceneTests(unittest.TestCase):
+    def test_groundhog_complete_ceremony(self):
+        with tempfile.TemporaryDirectory(prefix='v3-holiday-groundhog-') as temp:
+            executable=str(Path(temp)/'check')
+            command=['cc','-std=c11','-O1','-g','-Wall','-Wextra','-Werror','-fno-pie','-no-pie',
+                '-fsanitize=address,undefined','-fno-omit-frame-pointer','-I'+str(ROOT/'overlays/v3'),
+                'tests/v3_holiday_groundhog_test.c','overlays/v3/holiday_groundhog.c','-o',executable]
+            for cmd in (command,[executable]):
+                r=subprocess.run(cmd,cwd=ROOT,capture_output=True,text=True,timeout=30)
+                self.assertEqual(r.returncode,0,r.stdout+r.stderr)
+                if r.stdout:print(r.stdout.strip())
+
     def test_additional_installed_demo_connections(self):
         import zlib
         from v3_asset_loader import BLOB
         from v3_holiday_scene import DEMO_RAM,DEMO_END,DEMO_STATE,DEMO_HOOKS
         directory=ROOT/os.environ.get('V3_HOLIDAY_DEMO_BUILD',
-            'build/v3-diary-category-work-01/event-demo-installed-03')
+            'build/v3-diary-category-work-01/event-scene-services-01')
         image,r=inputs(directory/'build-lock.json');base,prior=inputs(directory/'base-lock.json')
         e=r['equipment_resources'];stage=e['npc_extra']['events']['demo'];packet=e['holiday_state']['packet']
         self.assertTrue(stage['installed']);self.assertFalse(stage['event_owners_enabled'])
@@ -53,7 +64,7 @@ class HolidaySceneTests(unittest.TestCase):
             at=address-CODE_RAM
             self.assertEqual(core[at:at+8],bytes.fromhex(hook['after']))
             self.assertEqual(u32(core,at),0x08000000|(stage['code']['symbols'][hook['symbol']]>>2&0x3FFFFFF))
-            core[at:at+8]=bytes.fromhex(hook['before'])
+            core[at:at+8]=bytes.fromhex(hook.get('previous',hook['before']))
         self.assertEqual(core,before[CODE_VROM].extract(base))
         # Original tables still own the original modes and official announcement reader.
         self.assertEqual(core[0x80104A74-CODE_RAM:0x80104B58-CODE_RAM],
@@ -67,6 +78,31 @@ class HolidaySceneTests(unittest.TestCase):
         self.assertEqual(r['save_runtime']['profile_hex'],prior['save_runtime']['profile_hex'])
         self.assertEqual(files[MESSAGE].extract(image),before[MESSAGE].extract(base))
         self.assertEqual(files[0x30A0000].extract(image),before[0x30A0000].extract(base))
+        if stage.get('groundhog'):
+            g=stage['groundhog']
+            self.assertEqual(len(g['source_functions']),15)
+            self.assertFalse(g['actor_services_bound'])
+            self.assertEqual((g['states'],g['source_updates_per_native_frame']),(9,2))
+            self.assertEqual(g['clip_pointer_ram'],DEMO_STATE+24)
+            self.assertEqual(stage['bindings']['af_hg_live'],g['clip_pointer_ram'])
+            for name in ('begin','end','step','signal','read','commit'):
+                self.assertIn('af_holiday_groundhog_'+name,stage['code']['symbols'])
+            if stage.get('scene_services'):
+                self.assertFalse(g['required_for_diary_attendance'])
+                self.assertEqual(g['scope_schedule_rows'],{
+                    '7':['020200070202000800000007'],'81':['020200090202001000000051']})
+        if stage.get('scene_services'):
+            live=stage['scene_services'];self.assertTrue(live['installed'])
+            self.assertFalse(live['native_execution_verified'])
+            self.assertFalse(live['present_demo_imported']);self.assertFalse(live['ceremony_owner_in_scope'])
+            self.assertEqual(live['room_console_request_offset'],0x47C)
+            self.assertEqual(live['current_acre_offsets'],[0xE4,0xE5])
+            for name in ('read','commit','tempo','climate','bind'):
+                self.assertIn('af_holiday_scene_'+name,stage['code']['symbols'])
+            room=files[0x82D7F0].extract(image)
+            for a,b,digest in live['room_functions']:
+                self.assertEqual(sha256(room[a-0x80936710:b-0x80936710]),digest)
+            self.assertEqual(room,before[0x82D7F0].extract(base))
 
     def test_additional_announcement_speech_lifecycle(self):
         with tempfile.TemporaryDirectory(prefix='v3-holiday-demo-') as temp:

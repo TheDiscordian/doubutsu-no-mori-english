@@ -1055,9 +1055,14 @@ Unrelated native fields and existing door padding are preserved.
 
 The native bridge still requires actual imported common-state providers. These
 must supply source/native ACTIVE identities, current acre and pool shape,
-present-demo and room-message gates, Groundhog state, and climate/rhythm handling.
-The alternate event-message lifecycle is installed as described below; its
-live transition read/commit and Groundhog producer remain unbound.
+applicable present-demo and room-message gates, and climate/rhythm handling.
+Groundhog ceremony owner 7 is not in the 44 scheduled diary owners. Its source
+schedule is February 2, 7–8 a.m. (`020200070202000800000007`); diary attendance
+uses Tortimer owner 81, 9 a.m.–4 p.m. (`020200090202001000000051`). The alternate
+event-message lifecycle and prepared ceremony controller remain inactive
+preparation, not diary-attendance prerequisites. The scheduled-owner scene
+providers are installed in ABI 339 as described below; their identity/status
+graph and live dedicated-owner caller remain unbound.
 Missing providers reject explicitly;
 native demo 13 is **not** treated as source event-message-2. No substitute owner,
 zero-filled gate, or no-op side effect is an implemented service.
@@ -1085,8 +1090,10 @@ unchanged; no old build or fixture is replayed.
 
 ### Additional announcement and speech lifecycle
 
-The ABI-337 proposal at `event-demo-installed-03/build-lock.json` installs the
-complete alternate announcement/speech dispatch in 3,728 bytes at `806FE000`.
+The ABI-339 proposal at `event-scene-services-01/build-lock.json` installs the
+complete alternate announcement/speech dispatch and scene providers in
+6,096 bytes at `806FE000`, SHA-256
+`1506db07b4c45276b4766d950aed159e17ca8787ea73fa4b310d665b440fcb92`.
 The owned transient state reserves `806FFF80..806FFFC0`; the original inner
 guard and the 272-KiB combined packet allocation remain unchanged. Saved format
 thirteen is unchanged. Native modes `0..13` retain their original meanings,
@@ -1114,8 +1121,33 @@ check verifies all hooks, unchanged original tables and unrelated core bytes,
 code/state bounds, both packet references, startup CRC, and retained save/text
 resources. Current empty/mixed/all-191 browser/offline compositions agree.
 Native execution remains unverified; no emulator fixture is restarted. Actual
-transition read/commit, fading-title/Groundhog producers, and dedicated-owner
-dispatch must still be connected before admitting the imported events.
+identity/status binding and dedicated-owner dispatch must still be connected
+before admitting the scheduled imported events. The ceremony-only fading-title
+producer is outside those owners and stays inactive.
+
+`holiday_scene_native.c` supplies signed native acre coordinates at `E4/E5`,
+all seven actual pool shapes, and the live console request at room offset `47C`.
+The same native request path owns imported consoles. Room tempo and gyroid-step
+capture call checked native `8093A7C4` and `80936E98` through the loaded descriptor
+at `80100DF0`; unloaded overlay addresses are never called. The live room clip
+at `80136F2C` determines whether capture applies. The source mainland climate
+cycle `0 -> 2 -> 4 -> 0` returns zero for both climate queries throughout,
+matching the N64 mainland without introducing island weather. The installed
+owners have no separate donor `PRESENT_DEMO` or second demo clip; their handovers
+use the ordinary demo gate. Adding that separate actor requires extending this
+reader, not aliasing an unrelated native profile.
+
+The scene binder preserves its caller's identity/status graph, binds these live
+services, and commits fading-title state only after an accepted scene change.
+The sanitized combined check covers pool shapes, signed coordinates, live and
+absent room owners, console requests, relocated capture calls, and commit order.
+The complete source climate functions verify the mainland equivalence. Cartridge
+checks retain the complete room code, packet guards, both physical references,
+startup CRC, official text, and format-13 profile. Native gameplay remains
+unverified. The source transition adapter requires an alternate-demo provider
+only when that actual branch is requested; this small change awaits the next
+transition-module refresh, while the current scene binder supplies the installed
+alternate demo identity.
 
 ### Shared hourly activation and event-state lifetime
 

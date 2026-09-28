@@ -4,6 +4,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+import re
 
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'tools'))
@@ -11,9 +12,29 @@ from apply_translation import write_new
 from v3_furniture_pipeline import Source
 from v3_holiday_maps import discover,encode
 from v3_holiday_transition import generate
+from v3_password_policy import function
 
 
 class HolidayTransitionTests(unittest.TestCase):
+    def test_live_scene_services(self):
+        with tempfile.TemporaryDirectory(prefix='v3-holiday-scene-native-') as temp:
+            target=Path(temp)/'check'
+            field=(ROOT/'local/ac-decomp/src/game/m_field_info.c').read_text()
+            header=(ROOT/'local/ac-decomp/include/m_field_info.h').read_text()
+            enum=re.search(r'enum\s*\{\s*mFI_CLIMATE_0[^}]+\};',header)[0]
+            fixture='#define FALSE 0\n#define TRUE 1\n'+enum+'\nstatic int l_mFI_climate;\n'
+            fixture+='static void mCoBG_InitBoatCollision(void) {}\n'
+            fixture+='\n'.join(function(field,n) for n in (
+                'mFI_GetClimate','mFI_SetClimate','mFI_CheckBeforeScenePerpetual','mFI_ChangeClimate_ForEventNotice'))
+            write_new(Path(temp)/'holiday_scene_climate_source.h',fixture.encode())
+            command=['cc','-std=c11','-O1','-g','-Wall','-Wextra','-Werror','-fno-pie','-no-pie',
+                '-fsanitize=address,undefined','-fno-omit-frame-pointer',
+                '-I'+str(ROOT/'overlays/v3'),'-I'+temp,'tests/v3_holiday_scene_native_test.c','-o',str(target)]
+            for cmd in (command,[str(target)]):
+                result=subprocess.run(cmd,cwd=ROOT,capture_output=True,text=True,timeout=30)
+                self.assertEqual(result.returncode,0,result.stdout+result.stderr)
+                if result.stdout:print(result.stdout.strip())
+
     def test_connected_source_transition_and_geometry(self):
         source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
             (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
