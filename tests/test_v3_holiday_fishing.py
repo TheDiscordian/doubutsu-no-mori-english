@@ -26,7 +26,7 @@ class HolidayFishingTests(unittest.TestCase):
         from v3_holiday_fishing import dialogue
         from v3_physical_resources import verify
         directory=ROOT/os.environ.get('V3_FISHING_LIVE_BUILD',
-            'build/v3-diary-category-work-01/fishing-live-installed-05')
+            'build/v3-diary-category-work-01/fishing-angler-installed-01')
         image,report=inputs(directory/'build-lock.json')
         base,prior=inputs(directory/'base-lock.json')
         equipment=report['equipment_resources'];fish=equipment['holiday_fishing']
@@ -48,6 +48,7 @@ class HolidayFishingTests(unittest.TestCase):
         providers += [bindings['af_hf_native_window'],sy['af_hf_live_number'],bindings['af_hf_native_string']]
         providers += [sy['af_hf_live_'+n] for n in ('enter','leave','message')]
         self.assertEqual(struct.unpack_from('>13I',raw,SERVICES-packet['ram']+20),tuple(providers))
+        self.assertEqual(u32(raw,SERVICES-packet['ram']+72),sy['af_hf_clip_lifecycle'])
         self.assertEqual(u32(raw,SERVICES-packet['ram']),7)
         pickup=equipment['holiday_items']['pickup'];at=pickup['ram']-packet['ram']
         self.assertEqual(sha256(raw[at:at+pickup['bytes']]),pickup['code']['sha256'])
@@ -59,8 +60,9 @@ class HolidayFishingTests(unittest.TestCase):
                 (text['choice_vrom'],CHOICE_TABLE,expected['first_choice'],choices)):
             entries=Bank('test',0,0,files[v].extract(image),files[table].extract(image)).entries()
             previous=Bank('test',0,0,before[v].extract(base),before[table].extract(base)).entries()
-            self.assertEqual(entries[:first],previous)
+            self.assertEqual(entries[:first],previous[:first])
             self.assertEqual(entries[first:],extra)
+            if live.get('angler'):self.assertEqual(entries,previous)
         core=files[CODE_VROM].extract(image)
         for row in text['hooks']:self.assertEqual(u32(core,row['address']-CODE_RAM),row['after'])
         retired=live['retired_duplicate'];growth=text['physical_growth']
@@ -68,7 +70,12 @@ class HolidayFishingTests(unittest.TestCase):
         self.assertLessEqual(growth['end'],retired['physical']+retired['bytes'])
         self.assertEqual(image[growth['end']:retired['physical']+retired['bytes']],
                          bytes(retired['physical']+retired['bytes']-growth['end']))
-        self.assertEqual(sha256(base[retired['physical']:retired['physical']+retired['bytes']]),retired['sha256'])
+        if live.get('angler'):
+            self.assertEqual(retired,prior['equipment_resources']['holiday_fishing']['live']['retired_duplicate'])
+            self.assertEqual(image[retired['physical']:retired['physical']+retired['bytes']],
+                             base[retired['physical']:retired['physical']+retired['bytes']])
+        else:
+            self.assertEqual(sha256(base[retired['physical']:retired['physical']+retired['bytes']]),retired['sha256'])
         self.assertNotIn(retired['id'],{r['id'] for r in report['physical_resources']})
         verify(image,report['physical_resources'])
         blob=files[BLOB].extract(image);boot=equipment['surface_bootstrap']['code']
@@ -84,10 +91,34 @@ class HolidayFishingTests(unittest.TestCase):
         self.assertEqual(report['save_codec']['format_version'],prior['save_codec']['format_version'])
         self.assertEqual(report['save_runtime']['profile_hex'],prior['save_runtime']['profile_hex'])
         self.assertFalse(live['actors_active']);self.assertFalse(live['service_admission'])
+        connection=live['angler'];v=connection['vrom'];rv=connection['relocation_vrom'];ram=connection['ram']
+        host=bytearray(files[v].extract(image));old_host=before[v].extract(base)
+        self.assertEqual(len(connection['hooks']),8)
+        for row in connection['hooks']:
+            at=row['address']-ram
+            self.assertEqual(u32(host,at),row['after'])
+            self.assertEqual(row['after'],0x0C000000|((sy['af_hf_angler_'+row['name']]>>2)&0x3FFFFFF))
+            struct.pack_into('>I',host,at,row['before'])
+        self.assertEqual(host,old_host)
+        rel=files[rv].extract(image);old_rel=before[rv].extract(base)
+        count=u32(rel,16);old_count=u32(old_rel,16)
+        self.assertEqual(count,old_count-1)
+        words=struct.unpack_from('>'+str(old_count)+'I',old_rel,20)
+        self.assertEqual(struct.unpack_from('>'+str(count)+'I',rel,20),
+                         tuple(w for w in words if w not in connection['removed_relocations']))
+        self.assertEqual(connection['removed_relocations'],[0x44000000|(0x809D604C-ram)])
+        from fishing_name import APPROVED,ALIASES_SHA
+        names_at=APPROVED['symbols']['af_fishing_aliases'];at=sy['af_fishing_aliases']-packet['ram']
+        self.assertEqual(raw[at:at+6368],files[0x3B40000].extract(image)[names_at:names_at+6368])
+        self.assertEqual(sha256(raw[at:at+6368]),ALIASES_SHA)
+        self.assertEqual(bindings['af_hf_native_clip'],0x80136F8C)
+        self.assertEqual(bindings['af_hf_source_clip'],0x80705038)
+        for pointer in struct.unpack_from('>4I',raw,sy['af_hf_bridge_clip']-packet['ram']):
+            self.assertTrue(live['loaded_code']['ram']<=pointer<live['loaded_code']['ram']+live['loaded_code']['bytes'])
 
     def test_live_record_name_size_and_text_bridge(self):
         import json
-        prepared=ROOT/'build/v3-diary-category-work-01/fishing-live-prepared-02'
+        prepared=ROOT/'build/v3-diary-category-work-01/fishing-angler-installed-01/fishing-angler'
         report=json.loads((prepared/'prepared.json').read_bytes())
         self.assertEqual((report['text']['count'],report['text']['choice_count']),(74,7))
         self.assertEqual(len(report['text']['fish_messages']),40)
@@ -103,6 +134,7 @@ class HolidayFishingTests(unittest.TestCase):
                 '-ffunction-sections','-fdata-sections','-Wl,--gc-sections']
             commands=[['cc',*flags,'tests/v3_holiday_fishing_live_test.c',
                 'overlays/v3/holiday_fishing.c','overlays/v3/holiday_fishing_live.c',
+                'overlays/v3/holiday_fishing_angler.c','overlays/fishing/name.c',str(prepared/'legacy-names.c'),
                 'overlays/v3/diary_calendar.c',str(local),str(prepared/'text-map.c'),
                 '-o',str(out/'check')],[str(out/'check')]]
             for command in commands:

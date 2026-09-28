@@ -752,6 +752,10 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             import v3_holiday_fishing as equipment
             equipment_report,owner_changes,report_updates,physical_writes=equipment.install_live(
                 base,prior,blob,core,output)
+        elif not prior['equipment_resources']['holiday_fishing']['live'].get('angler'):
+            import v3_holiday_fishing as equipment
+            equipment_report,owner_changes,report_updates,physical_writes=equipment.install_angler(
+                base,prior,blob,core,output)
         else:
             import v3_holiday_motion as equipment
             equipment_report,owner_changes,report_updates,physical_writes=equipment.install(

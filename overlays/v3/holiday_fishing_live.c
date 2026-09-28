@@ -78,13 +78,20 @@ int af_hf_live_enter(void) {
     s->event.talk=p[24];s->event.flag=p[25];
     /* Recover the exact full winner for today's native event, not an ambiguous
        global name-prefix search or a cast over the native save allocation. */
+    int recovered=0;
     for(u32 i=0;i<5;i++) {
         const AFHFRecord *r=s->records.fishRecord+i;AFHFB key[16];
         if(r->size!=s->event.size || !r->size || r->time.year!=af_hf_native_clock.year ||
            r->time.month!=af_hf_native_clock.month || r->time.day!=af_hf_native_clock.day)continue;
         native_person(key,&r->pid);
-        if(equal(key,p+4,16)) {s->event.person=r->pid;break;}
+        if(equal(key,p+4,16)) {s->event.person=r->pid;recovered=1;break;}
     }
+    if(!recovered) {
+        const AFHFB *legacy=af_fishing_resolve(p+4,af_fishing_aliases+64,394);
+        if(legacy)af_hf_copy(s->event.person.player_name,legacy,8);
+    }
+    s->initial_person=s->event.person;
+    af_hf_controller_clock=af_hf_native_clock;
     af_holiday_fish_native_person(&af_hf_controller_person,af_hf_native_player);
     s->active=1;return 1;
 }
@@ -92,7 +99,9 @@ void af_hf_live_leave(void) {
     AFHFLive *s=&af_hf_live;
     if(!s->active)return;
     if(!s->failed && !s->records.error && af_holiday_fish_store(&s->records,s->wire,AF_HF_BYTES)) {
-        AFHFB *p=s->native_event;put32(p,s->event.size);native_person(p+4,&s->event.person);
+        AFHFB *p=s->native_event;put32(p,s->event.size);
+        if(!equal(&s->initial_person,&s->event.person,sizeof(s->initial_person)))
+            native_person(p+4,&s->event.person);
         put16(p+20,(unsigned short)s->event.position[0]);put16(p+22,(unsigned short)s->event.position[1]);
         p[24]=s->event.talk;p[25]=s->event.flag;
     }

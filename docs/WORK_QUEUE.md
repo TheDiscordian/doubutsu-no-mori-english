@@ -235,8 +235,8 @@ cartridge check and empty/mixed/all-supported browser comparison pass; the
 readiness mask stays zero and save/profile data is unchanged. Reuse the prepared
 batch at `build/v3-diary-category-work-01/event-items-prepared-03/`.
 
-The current proposal is ABI 333 at
-`build/v3-diary-category-work-01/fishing-live-installed-05/build-lock.json`.
+The current proposal is ABI 334 at
+`build/v3-diary-category-work-01/fishing-angler-installed-01/build-lock.json`.
 Harvest pickup connects the native ordinary-item search boundary `808BC1E0`,
 action-31 animation, and actual pocket insertion to the source removal counter.
 Full-pocket refusal retains the native animation and official donor message;
@@ -259,13 +259,12 @@ event/name/size/record providers are installed and checked. Reuse these provider
 the retained storage, and the current passing browser/offline comparison.
 The native angler map is retained at
 `build/v3-diary-category-work-01/fishing-native-map/angler/angler.asm`;
-do not restart that investigation. Its actual clip pointer is `80136F8C`, whereas
-the imported controller currently owns a private clip. Connect that lifecycle,
-the host's measurement/record/name and dialogue calls, then exercise-card
-menu/state handling and profile/save admission within this same task.
-Preserve the native herabuna identity and existing saved-name recovery when
-mapping all forty donor fish, including the additive brook trout at `2328`.
-Complete winner-mail delivery through the source record acknowledgement
+do not restart that investigation. The actual native clip at `80136F8C`, its
+imported lifecycle, and all eight host measurement/record/dialogue calls are now
+connected. Native herabuna and the additive brook trout remain distinct;
+legacy name recovery preserves saved identity keys. Reuse the passing host,
+current-cartridge, and browser/offline checks; no native fixture is restarted.
+Next complete winner-mail delivery through the source record acknowledgement
 path. Source inches and native centimetres require the
 behaviour choice, not a silent conversion of saved values. The countdown's
 shared clip and both controllers are installed; retain them while connecting

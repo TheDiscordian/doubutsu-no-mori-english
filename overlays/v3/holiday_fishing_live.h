@@ -5,11 +5,14 @@ typedef struct {
     int size;AFHFPerson person;short position[2];AFHFB talk,flag;
 } AFHFLiveEvent;
 typedef struct {
-    AFHolidayFish records;AFHFLiveEvent event;
+    AFHolidayFish records;AFHFLiveEvent event;AFHFPerson initial_person;
     AFHFB *native_event,*wire;unsigned int active,failed;
 } AFHFLive;
 extern AFHFLive af_hf_live;
 extern AFHFPerson af_hf_controller_person;
+extern AFHFTime af_hf_controller_clock;
+extern const AFHFB af_fishing_aliases[6368];
+extern const AFHFB *af_fishing_resolve(const AFHFB *,const AFHFB *,int);
 extern const AFHFTime af_hf_native_clock;
 extern const AFHFB *af_hf_native_player;
 extern const AFHFB af_hf_native_players[4][0xBD0];

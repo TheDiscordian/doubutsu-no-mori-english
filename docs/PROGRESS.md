@@ -31,9 +31,9 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
-The current proposal is ABI 333 at
-`build/v3-diary-category-work-01/fishing-live-installed-05/build-lock.json`, ROM SHA-256
-`2a75688eadbbf029e2a85c5883332ce35e2a7a9a6c4bc9b1ef01e080a6158204`.
+The current proposal is ABI 334 at
+`build/v3-diary-category-work-01/fishing-angler-installed-01/build-lock.json`, ROM SHA-256
+`7c062aaa5f804b15ce5c9bbed1e319c6f3bc9ba461bbd88af0f1bb8b4904eaab`.
 It contains 191 independently selectable development imports, including all nine
 fish and eight insects, and 100 inactive furniture profiles whose acquisition
 is pending, plus sixteen inactive diary cover profiles. The main lock and both
@@ -105,10 +105,11 @@ reach the new code; player deletion, capacity checks, migration, and town change
 include the records. Controller refreshes preserve this appended module and both
 packet references. The native event/name/size/record providers and complete
 official fishing dialogue are installed in the current proposal. The tournament
-host's clip/call connections, winner-mail delivery, measurement/calendar choices,
-and event activation remain unfinished.
+host's eight affected calls and the imported stall's clip lifecycle are connected.
+Winner-mail delivery, measurement/calendar choices, and event activation remain
+unfinished.
 
-The 2,992-byte provider module uses the existing fishing code reservation. It
+The 11,184-byte provider/host module uses the existing fishing code reservation. It
 converts native event records explicitly, preserves complete eight-character
 record names, formats both units, and retains records when a provider fails.
 All forty donor fish messages and their complete conversation branches form
@@ -125,6 +126,17 @@ The sanitized provider check and current-cartridge service/text/startup/retentio
 check pass; empty/mixed/all-191 browser/offline outputs agree. Unchanged storage
 and source-lifecycle evidence is retained. Fishing service admission remains
 closed, and this does not establish native tournament gameplay.
+
+The native host retains its original dialogue/demo/handover state machine.
+The imported clip maps all donor fish while keeping native herabuna `2301`
+distinct from brook trout `2328`; the native path remains the fallback when the
+imported stall is absent. Actual winner assignment captures the complete record.
+Removing the imported stall restores the previous native clip without clearing
+another owner's replacement. The accepted V2 alias table resolves legacy winner
+names, and display-only recovery preserves their original saved keys.
+The expanded sanitized host check and current-cartridge eight-call/relocation/
+alias/startup check pass. Empty/mixed/all-191 browser/offline outputs agree.
+Native gameplay is not newly executed; the fixture budget remains exhausted.
 
 Two sanitized host checks, the current-cartridge/storage/startup check, and a
 current-packet controller-refresh check pass. Empty/mixed/all-191 browser/offline

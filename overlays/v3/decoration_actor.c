@@ -15,7 +15,7 @@ static int ready(const AFDecorActorRecord *r) {
     if ((r->dependencies&AF_DECOR_HARVEST) && !s->pocket) return 0;
     if ((r->dependencies&AF_DECOR_FISH) && (!s->fish_save || !s->fish_size || !s->fish_npc_size ||
         !s->event_npc || !s->npc_name || !s->random_name || !s->fish_record ||
-        !s->message || !s->number || !s->string || !s->fish_enter || !s->fish_leave || !s->fish_message)) return 0;
+        !s->message || !s->number || !s->string || !s->fish_enter || !s->fish_leave || !s->fish_message || !s->fish_clip)) return 0;
     return 1;
 }
 void *af_decor_actor_descriptor(int profile) {
@@ -74,6 +74,10 @@ int af_decor_actor_call(ACTOR *a,GAME *game,unsigned int phase) {
     if (fishing && !af_decor_actor_services.fish_enter()) return 0;
     AFDecorDraw f=phase==0?r->ctor:phase==1?r->dtor:phase==2?r->init:r->move;
     if (f) f(a,game);
+    if ((r->dependencies&AF_DECOR_FISH) && phase<=1 && af_decor_actor_services.fish_clip) {
+        int connected=af_decor_actor_services.fish_clip(a,(int)phase);
+        if (!phase && !connected) {if(r->dtor)r->dtor(a,game);return 0;}
+    }
     /* Source controllers advance at 60 Hz, native actors at 30 Hz. Init
        already performs one movement step. Keep both ordered source steps,
        but never initialize twice or advance an actor deleted by step one. */

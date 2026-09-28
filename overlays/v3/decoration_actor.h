@@ -70,6 +70,7 @@ typedef struct {
     int (*fish_enter)(void);
     void (*fish_leave)(void);
     int (*fish_message)(int);
+    int (*fish_clip)(void *,int);
 } AFDecorActorServices;
 extern const AFDecorActorServices af_decor_actor_services;
 typedef struct {
@@ -127,6 +128,7 @@ _Static_assert(sizeof(aEANG_event_data_c)==32,"Normalized donor fishing record")
 _Static_assert(sizeof(aHTBL_Clip_c)==20,"Harvest interaction storage");
 _Static_assert(sizeof(AFDecorActorContext)<=0x100,"Owned controller context reservation");
 _Static_assert(__builtin_offsetof(AFDecorActorContext,private_view)==28,"Normalized player view location");
+_Static_assert(__builtin_offsetof(AFDecorActorContext,fishing)==56,"Source fishing clip location");
 _Static_assert(sizeof(AFDecorActorServices)<=0xF0,"Owned provider directory reservation");
 #endif
 #undef Common_Get

@@ -450,6 +450,8 @@ def install(base, prior, output, *, fishing_live=None):
         providers += [bindings['af_hf_native_window'],symbols['af_hf_live_number'],bindings['af_hf_native_string']]
         providers += [symbols['af_hf_live_'+n] for n in ('enter','leave','message')]
         struct.pack_into('>13I',data,SERVICES-CONTEXT+20,*providers)
+        if 'af_hf_clip_lifecycle' in symbols:
+            struct.pack_into('>I',data,SERVICES-CONTEXT+72,symbols['af_hf_clip_lifecycle'])
     changes, hooks = patch_owners(base,prior,report['code']['symbols'])
     raw = bytearray(prefix[:RAM-STATE_RAM])+bytearray(END-RAM)
     raw[RAM-STATE_RAM:RAM-STATE_RAM+len(code)] = code

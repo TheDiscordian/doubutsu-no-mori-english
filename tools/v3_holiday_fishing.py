@@ -191,7 +191,7 @@ def dialogue(base):
         source_files={p:sha256(s.encode()) for p,s in sources.items()},provenance_entries=credits)
 
 
-def prepare_live(base,prior,output):
+def prepare_live(base,prior,output,*,connect_angler=False):
     """Link all record/name/size/text providers against the installed storage."""
     from aflib import CODE_RAM,CODE_VROM
     from v3_furniture_effect_rigs import checked_native
@@ -201,7 +201,14 @@ def prepare_live(base,prior,output):
         raise ValueError('Live fishing readers require retained storage below their reservation')
     packet=fishing['packet'];raw=base[packet['physical']:packet['physical']+packet['bytes']]
     at=0x80734000-packet['ram']
-    if sha256(raw)!=packet['sha256'] or any(raw[at:-16]):
+    tail=bytearray(raw[at:-16])
+    if connect_angler:
+        installed=fishing['live']['loaded_code']
+        if (installed['ram']!=0x80734000 or installed['bytes']>0x3C00 or
+                sha256(tail[:installed['bytes']])!=installed['sha256']):
+            raise ValueError('Changed live provider refresh predecessor')
+        tail[:installed['bytes']]=bytes(installed['bytes'])
+    if sha256(raw)!=packet['sha256'] or any(tail):
         raise ValueError('Occupied fishing reader/state reservation')
     output.mkdir(parents=True,exist_ok=False)
     messages,choices,text=dialogue(base)
@@ -211,6 +218,16 @@ def prepare_live(base,prior,output):
     mapping+='const unsigned char af_hf_unit_text[2][16] = {'+','.join(
         '{'+','.join(str(c) for c in bytes.fromhex(value))+'}' for value in text['units'])+'};\n'
     generated=output/'text-map.c';write_new(generated,mapping.encode())
+    # Retain the accepted V2 alias recovery for native saves. This generated
+    # table remains an ignored game-derived resource, not a second name list.
+    from fishing_name import APPROVED,ALIASES_SHA
+    from npc_mail_names import unpack_aliases
+    names_at=APPROVED['symbols']['af_fishing_aliases']
+    names=by_vrom(base)[0x3B40000].extract(base)[names_at:names_at+6368]
+    unpack_aliases(names,ALIASES_SHA)
+    aliases=output/'legacy-names.c'
+    write_new(aliases,('const unsigned char af_fishing_aliases[6368]={'+
+        ','.join(str(b) for b in names)+'};\n').encode())
     native=(
         ('af_hf_native_event_area',0x8008033C,0x800804AC,'e3f773780ce82da3b43a46975c07e1c0c37815fbc95bca00f3b00ce8869adec3'),
         ('af_hf_native_event_npc',0x80082DA0,0x80082E40,'7320c27a330d9a1af4abd372c83a41c1bdc315ddab337547630c3472276339c1'),
@@ -226,15 +243,22 @@ def prepare_live(base,prior,output):
         af_hf_native_player=0x80136FD8,af_hf_native_players=0x80126EC0,
         af_hf_native_animals=0x80130DB8,af_hf_native_random=0x8002C9AC,
         af_hf_native_name=prior['villager_text']['code']['symbols']['af_v3_load_name'],
-        af_hf_native_string=0x8009D6D0)
+        af_hf_native_string=0x8009D6D0,af_fishing_native_set=0x8009D6D0,
+        af_hf_controller_clock=0x80705000,af_hf_source_clip=0x80705038,
+        af_hf_native_clip=0x80136F8C,af_hf_clip_state=0x80737FB0,
+        af_hf_native_continue=0x8009DBA4,af_hf_native_start_message=0x8007B5C0,
+        af_hf_native_message_number=0x8009DBB0,af_hf_native_number=0x800C43B8,
+        af_hf_native_halt=fishing['bindings']['af_v3_save_halt'])
     try:
         code,compiled=compile_part('holiday_fishing_live',output/'code',
-            extra_sources=(str(generated.relative_to(ROOT)),),link_symbols=bindings)
+            extra_sources=(str(generated.relative_to(ROOT)),str(aliases.relative_to(ROOT)),
+                'overlays/fishing/name.c','overlays/v3/holiday_fishing_angler.c'),link_symbols=bindings)
     except subprocess.CalledProcessError as error:raise ValueError(error.stderr) from error
     report=dict(text=text,code=compiled,bindings=bindings,
         native_functions=[dict(symbol=n,start=a,end=b,sha256=s) for n,a,b,s in native],
         installed=False,actors_active=False,native_execution_verified=False,
-        memory=dict(code=dict(ram=0x80734000,bytes=0x3C00),state=dict(ram=RAM+STATE+AFHF_BYTES,bytes=768)),
+        memory=dict(code=dict(ram=0x80734000,bytes=0x3C00),state=dict(ram=RAM+STATE+AFHF_BYTES,bytes=768),
+            clip=dict(ram=0x80737FB0,bytes=64)),legacy_names_sha256=ALIASES_SHA,
         pending=['controller enter/leave and native angler/clip bindings','winner mail',
             'measurement/calendar selection and activation'])
     write_new(output/'prepared.json',(json.dumps(report,indent=2)+'\n').encode())
@@ -246,18 +270,8 @@ def prepare_live(base,prior,output):
 AFHF_BYTES=176
 
 
-def install_live(base,prior,blob,core,output):
-    from aflib import CODE_RAM,CODE_VROM,u32
-    from v3_decoration_actor import install as controllers
-    from v3_camper_text import extend_bank
-    from v3_event_text import MESSAGE,TABLE,CHOICE_TABLE,patch_bounds
-    from v3_holiday_dialogue import check_provenance
-    del blob
-    if prior['equipment_resources']['holiday_fishing'].get('live'):
-        raise ValueError('Fishing live providers are already installed')
-    directory=output/'fishing-live'
-    live=prepare_live(base,prior,directory);text=live['text'];check_provenance(text)
-    equipment,changes,updates,writes=controllers(base,prior,output,fishing_live=live)
+def merge_controller_core(base,core,changes):
+    from aflib import CODE_VROM
     # The controller owns native descriptor hooks in the same core as the text
     # readers. Merge those edits into the shared buffer; a separate full-core
     # replacement would overwrite this installation's new reader bounds.
@@ -271,6 +285,21 @@ def install_live(base,prior,blob,core,output):
             if core[at:at+4] not in (before,after):
                 raise ValueError('Controller refresh conflicts with another native core edit')
             core[at:at+4]=after
+
+
+def install_live(base,prior,blob,core,output):
+    from aflib import CODE_RAM,u32
+    from v3_decoration_actor import install as controllers
+    from v3_camper_text import extend_bank
+    from v3_event_text import MESSAGE,TABLE,CHOICE_TABLE,patch_bounds
+    from v3_holiday_dialogue import check_provenance
+    del blob
+    if prior['equipment_resources']['holiday_fishing'].get('live'):
+        raise ValueError('Fishing live providers are already installed')
+    directory=output/'fishing-live'
+    live=prepare_live(base,prior,directory);text=live['text'];check_provenance(text)
+    equipment,changes,updates,writes=controllers(base,prior,output,fishing_live=live)
+    merge_controller_core(base,core,changes)
     if len(writes)!=1:raise ValueError('Controller refresh must retain the single holiday packet')
     resource,raw=writes[0];raw=bytearray(raw);fish=equipment['holiday_fishing'];packet=fish['packet']
     code=(directory/'code/code.bin').read_bytes();at=0x80734000-packet['ram']
@@ -337,6 +366,82 @@ def install_live(base,prior,blob,core,output):
     fish['pending']=['native angler/clip and winner-mail consumers',
         'measurement/calendar WebUI choice and event activation','connected native gameplay/save verification']
     controller['pending']=copy.deepcopy(fish['pending'])+['Harvest profile/save admission and exercise-card menus']
+    equipment['npc_extra']['sources'].update(live['sources'])
+    write_new(directory/'installed.json',(json.dumps(live,indent=2)+'\n').encode())
+    write_new(directory/'packet.bin',raw)
+    return equipment,changes,updates,[(resource,bytes(raw))]
+
+
+def angler_hooks(base,symbols):
+    """Change all eight host consumers together, retaining the complete owner."""
+    from shop_item_names import jump
+    from v3_npc_clothing import guard_incoming
+    files=by_vrom(base);vrom,reloc_vrom,ram=0x8B8FC0,0x8BA290,0x809D57D0
+    original=files[vrom].extract(base);old_rel=files[reloc_vrom].extract(base)
+    if (sha256(original)!='9fde230c54d1e9ffc4433fe044200cdd8e188f9e9dc58461c58d157311f01f7a' or
+            sha256(old_rel)!='b0f511d58bbff2bdf8a0b6a7d1f7bc57631e94c3072f1c1f2d7d310ae3e42572'):
+        raise ValueError('Changed complete native tournament host')
+    plans=(('continue',0x8009DBA4,(0x809D5FE8,0x809D60BC,0x809D6340,0x809D6558)),
+        ('start_message',0x8007B5C0,(0x809D67FC,)),('message_number',0x8009DBB0,(0x809D6188,)),
+        ('number',0x800C43B8,(0x809D6724,)),('winner',0x809D5CFC,(0x809D604C,)))
+    data=bytearray(original);reloc=bytearray(old_rel);sections=struct.unpack_from('>5I',reloc)
+    words=list(struct.unpack_from('>'+str(sections[4])+'I',reloc,20))
+    locations={sum(sections[:(w>>30)-1])+(w&0xFFFFFF):w for w in words}
+    hooks=[];deleted=[]
+    for name,target,addresses in plans:
+        call=jump(target,link=True)
+        actual=tuple(ram+at for at in range(0,sections[0],4) if struct.unpack_from('>I',data,at)[0]==call)
+        if actual!=addresses:raise ValueError('Changed complete host call set: '+name)
+        for address in addresses:
+            at=address-ram;guard_incoming(original,sections[0],ram,[(at,4)])
+            word=locations.get(at)
+            if (word is not None)!=(name=='winner') or (word is not None and word>>24!=0x44):
+                raise ValueError('Changed host call relocation: '+name)
+            if word is not None:deleted.append(word)
+            after=jump(symbols['af_hf_angler_'+name],link=True)
+            struct.pack_into('>I',data,at,after)
+            hooks.append(dict(name=name,address=address,before=call,after=after,removed_relocation=word))
+    kept=[w for w in words if w not in deleted]
+    struct.pack_into('>I',reloc,16,len(kept))
+    reloc[20:20+4*len(words)]=struct.pack('>'+str(len(kept))+'I',*kept)+bytes(4*len(deleted))
+    return {vrom:bytes(data),reloc_vrom:bytes(reloc)},dict(vrom=vrom,relocation_vrom=reloc_vrom,ram=ram,
+        hooks=hooks,input_sha256=sha256(original),input_relocation_sha256=sha256(old_rel),
+        output_sha256=sha256(data),output_relocation_sha256=sha256(reloc),removed_relocations=deleted)
+
+
+def install_angler(base,prior,blob,core,output):
+    from v3_decoration_actor import install as controllers
+    del blob
+    old=prior['equipment_resources']['holiday_fishing']['live']
+    if old.get('angler'):raise ValueError('Tournament host consumers are already connected')
+    directory=output/'fishing-angler'
+    live=prepare_live(base,prior,directory,connect_angler=True)
+    equipment,changes,updates,writes=controllers(base,prior,output,fishing_live=live)
+    merge_controller_core(base,core,changes)
+    owners,connection=angler_hooks(base,live['code']['symbols'])
+    if changes.keys()&owners.keys():raise ValueError('Overlapping tournament host changes')
+    changes.update(owners)
+    if len(writes)!=1:raise ValueError('Fishing connection requires one retained packet')
+    resource,data=writes[0];raw=bytearray(data);fish=equipment['holiday_fishing'];packet=fish['packet']
+    code=(directory/'code/code.bin').read_bytes();at=0x80734000-packet['ram']
+    raw[at:at+0x3C00]=code+bytes(0x3C00-len(code))
+    packet.update(sha256=sha256(raw),crc32=zlib.crc32(raw));resource['sha256']=packet['sha256']
+    equipment['holiday_state']['packet']=copy.deepcopy(packet)
+    for row in updates['physical_resources']:
+        if row['id']==packet['id']:row['sha256']=packet['sha256']
+    live.update(installed=True,services_installed=True,service_admission=False,angler=connection,
+        text=copy.deepcopy(old['text']),retired_duplicate=copy.deepcopy(old['retired_duplicate']),
+        loaded_code=dict(ram=0x80734000,bytes=len(code),sha256=sha256(code)),
+        sources={p:sha256((ROOT/p).read_bytes()) for p in (
+            'tools/v3_holiday_fishing.py','tools/v3_decoration_actor.py','overlays/v3/decoration_actor.c',
+            'overlays/v3/decoration_actor.h','overlays/v3/holiday_fishing_live.c','overlays/v3/holiday_fishing_live.h',
+            'overlays/v3/holiday_fishing_angler.c','overlays/v3/holiday_fishing_angler.h','overlays/fishing/name.c')})
+    live['pending']=['winner-mail delivery','measurement/calendar selection and event activation']
+    fish['live']=live;fish['pending']=live['pending']+['connected native gameplay/save verification']
+    controller=equipment['npc_extra']['events']['decorations']['controllers']
+    controller['preserved']=[r for r in controller['preserved'] if r['ram']!=RAM]
+    controller['preserved'].append(dict(ram=RAM,bytes=0x4000,sha256=sha256(raw[RAM-packet['ram']:at])))
+    controller['pending']=fish['pending']+['Harvest profile/save admission and exercise-card menus']
     equipment['npc_extra']['sources'].update(live['sources'])
     write_new(directory/'installed.json',(json.dumps(live,indent=2)+'\n').encode())
     write_new(directory/'packet.bin',raw)
