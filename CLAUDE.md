@@ -92,6 +92,11 @@ the experimental V3 publication hold does not apply to V2 fixes.
 - Defer percentage-tool maintenance unless it directly helps find untranslated
   text. Remaining English application, artwork, and concrete playtest defects
   take priority. Do not spend a work batch updating percentage reporting alone.
+- For GameCube importing progress, run `python3 tools/v3_import_progress.py` and
+  report its fresh combined content-weighted percentage, not the translation
+  percentage or an estimate of remaining work hours. All item categories and
+  villagers belong in this figure. See `docs/IMPORT_PROGRESS.md`; do not maintain
+  a separate completion checklist or substitute selectable counts for importing.
 - Prioritise complete English content and playable sections. Batch verification
   around meaningful changes; record difficult edge cases for the later bug pass
   instead of repeatedly attempting them while bulk implementation waits.
