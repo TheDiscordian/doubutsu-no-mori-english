@@ -2,6 +2,14 @@
 #define AF_V3_CONSOLE_STORAGE_H
 #include "save_codec.h"
 #include "save_compressed.h"
+#ifdef AF_V3_DIARY_STORAGE
+#define AF_CONSOLE_RAW AF_CZ_DIARY_RAW
+AFDiary *af_v3_diary_data(void);
+int af_v3_diary_measure(const af_save_u8 *bank,const af_save_u8 *state,const AFDiary *candidate);
+int af_v3_diary_preflight(const AFDiary *candidate);
+#else
+#define AF_CONSOLE_RAW AF_CZ_RAW
+#endif
 struct AFConsoleStorage {
     af_save_u32 magic,busy,town,ready;
     af_save_u8 players[AF_CZ_CONSOLE];

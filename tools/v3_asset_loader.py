@@ -68,7 +68,8 @@ def compile_part(part, out, extra_sources=(), defines=(), primary_source=None, l
     run('objcopy', '-O', 'binary', '-j', '.text', '-j', '.rodata',
         *(['-j', '.fallbacks'] if part=='scenery_bootstrap' else []), 'code.elf', 'code.bin')
     code = (out / 'code.bin').read_bytes()
-    entry, expected = {'clothing_batch': ('af_v3_roster_clothing_record', 0x8066E000),
+    entry, expected = {'diary_storage': ('af_v3_save_reset', 0x80670000),
+                       'clothing_batch': ('af_v3_roster_clothing_record', 0x8066E000),
                        'creature_travel': ('af_v3_creature_passport_save', 0x80655000),
                        'creature_ui': ('af_v3_creature_grid_item', 0x80654800),
                        'creature_save': ('af_v3_creature_profile_byte', 0x80654000),

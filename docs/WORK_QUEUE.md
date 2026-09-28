@@ -29,10 +29,15 @@ Fish/insect population and imported coastal movement have installed controls and
 runtime alternatives; other substantial differences still need real bindings.
 
 Current implementation task: complete the shared diary importing path for all
-sixteen donor styles (`2B00..2B0F`). Their catalogue models exist, but carried-item
-identity, inventory use, reading/writing, and persistent entries remain missing.
-Map those consumers once, then implement the connected category with the actual
-source behaviour. Do not count a displayed diary cover as a working diary.
+sixteen donor styles (`2B00..2B0F`). The complete 48 monthly pages, editor/access
+core, capacity admission, and shared save adapter are implemented in source and
+prepared for MIPS at `build/v3-diary-category-work-01/prepared-01/`. Sanitized
+edit/save/reload and source checks pass; this is not yet an installed diary UI.
+Resume at native inventory/interaction and calendar/editor bindings, following
+the [connected consumer map](../specs/V3_DIARIES.md#connected-consumer-map).
+Carried identity/artwork, date/event maintenance, official UI text, resident
+loading/dispatch, and selection remain required in this same category. Reuse
+the prepared core; do not restart the source/save audit or call covers playable.
 
 The room-representation review identifies sixteen player-saved design forms and
 nine museum fossil placeholders. Custom designs require a design editor and

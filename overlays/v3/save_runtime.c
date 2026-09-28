@@ -159,6 +159,20 @@ void af_v3_save_prepare(u8 *bank) {
     runtime->ready = 1;
 }
 
+#ifdef AF_V3_DIARY_STORAGE
+int af_v3_diary_preflight(const AFDiary *candidate) {
+    require_state();
+    u8 *bank=allocate(AF_SAVE_BANK);
+    if(!bank)return AF_SAVE_CAPACITY;
+    native_copy(live,bank,AF_SAVE_PAYLOAD);native_header(bank);
+    u32 id=(u32)bank[8]<<8|bank[9];
+    int result=runtime->ready && runtime->town!=id?AF_SAVE_BINDING:
+        af_v3_diary_measure(bank,runtime->working,candidate);
+    release(bank);
+    return result;
+}
+#endif
+
 void af_v3_save_commit(const u8 *bank, u8 *destination, u32 count) {
     require_state();
     if (!bank || destination != live || count != AF_SAVE_PAYLOAD) af_v3_save_halt(AF_SAVE_ARGUMENT);

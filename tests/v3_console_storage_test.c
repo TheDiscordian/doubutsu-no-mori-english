@@ -10,7 +10,7 @@ typedef unsigned int u32;
 struct AfSaveRuntime af_save_runtime;
 struct AFConsoleStorage af_console_storage;
 u8 af_save_current[AF_SAVE_PROFILE],af_save_live[AF_SAVE_PAYLOAD];
-u8 af_console_scratch[AF_CZ_RAW+16],af_console_players[4*0xBD0];
+u8 af_console_scratch[AF_CONSOLE_RAW+16],af_console_players[4*0xBD0];
 u32 af_console_hash[AF_CZ_HASH_WORDS+4],af_console_scratch_guard[4],af_console_hash_guard[4];
 static u8 chip[131072],allocation[65536],bank[65536],saved[65536],town_before[AF_SAVE_PAYLOAD];
 static u8 console_before[6528],decoded[AF_CZ_RAW],working_before[AF_SAVE_STATE];

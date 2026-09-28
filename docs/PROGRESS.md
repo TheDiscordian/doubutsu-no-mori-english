@@ -38,6 +38,19 @@ It contains 191 independently selectable development imports, including all nine
 fish and eight insects, and 100 inactive furniture profiles whose acquisition
 is pending. The main lock and both stable V2-14 deployments are unchanged.
 
+The active diary category has a source-bound core for all sixteen styles, with
+all 48 monthly pages, proportional editing/scrolling, owner/read-only/locked
+access, and transactional capacity checks. The shared save adapter retains the
+complete town, console progress, calendars, and pages within the existing two
+FlashRAM banks. Source and sanitized host checks pass, including 7,465 save-
+adapter assertions; the full MIPS module compiles to 17,571 bytes. Preparation
+is `build/v3-diary-category-work-01/prepared-01/`. Diary UI/interaction, calendar
+events, resident loading, and selection are not installed, so no new playable
+imports or cartridge completion is claimed. The [diary consumer map](../specs/V3_DIARIES.md)
+tracks the exact remaining path. Its planned format-eleven saves will require
+this or a newer compatible build; the current ABI-308 cartridge remains format
+nine and the user's saves are untouched.
+
 Both source artwork variants, school desk and bus stop, are installed through
 the ordinary shared importer. Complete original-N64 profile/model comparison
 establishes different geometry, with the original items retained. The 7,840
@@ -53,9 +66,8 @@ nine museum placeholders rather than treating them as fixed missing furniture.
 Their complete source consumers bind inventory, scan, and browser review data.
 Three focused tests cover classification, malformed-source rejection, and shared
 consumer behaviour. Adding the custom-design editor/saved-pattern feature to V3
-is an open scope choice; it does not block other importing work. The next connected
-category is all sixteen diaries, including actual reading, writing, and persistent
-entries. See [the representation contract](../specs/V3_ROOM_REPRESENTATIONS.md).
+is an open scope choice; it does not block the active diary category. See
+[the representation contract](../specs/V3_ROOM_REPRESENTATIONS.md).
 
 The complete clothing category is installed together. All eight distinct donor
 appearances use shared loading, official names/prices, player/NPC outfit readers,

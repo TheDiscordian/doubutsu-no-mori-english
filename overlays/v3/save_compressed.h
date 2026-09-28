@@ -28,4 +28,20 @@ int af_v3_save_compress(unsigned char *bank, unsigned int bank_bytes,
  * On failure scratch may change, but bank is never modified. */
 int af_v3_save_expand(const unsigned char *bank, unsigned int bank_bytes,
     unsigned char *scratch, unsigned int scratch_bytes);
+#ifdef AF_V3_DIARY_STORAGE
+#include "diary.h"
+enum { AF_CZ_DIARY_RAW=AF_CZ_RAW+AF_DIARY_BYTES };
+/* Format eleven adds all monthly pages and calendar/lock state without changing
+ * the canonical format-eight town. No device writes. Older envelopes migrate
+ * with empty diary pages; old readers reject format eleven. */
+int af_v3_save_compress_diary(unsigned char *bank,unsigned int bank_bytes,
+    const unsigned char *canonical,unsigned int canonical_bytes,
+    const unsigned char *console,unsigned int console_bytes,const AFDiary *diary,
+    unsigned int *hash,unsigned int hash_bytes);
+int af_v3_save_measure_diary(const unsigned char *canonical,unsigned int canonical_bytes,
+    const unsigned char *console,unsigned int console_bytes,const AFDiary *diary,
+    unsigned int *hash,unsigned int hash_bytes);
+int af_v3_save_expand_diary(const unsigned char *bank,unsigned int bank_bytes,
+    unsigned char *scratch,unsigned int scratch_bytes);
+#endif
 #endif
