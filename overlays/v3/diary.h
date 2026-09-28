@@ -16,6 +16,9 @@ enum {
 typedef unsigned char af_diary_u8;
 typedef unsigned int af_diary_u32;
 typedef struct { af_diary_u8 bytes[AF_DIARY_BYTES]; } AFDiary;
+typedef struct { unsigned short year; af_diary_u8 month,day; } AFDiaryDate;
+/* Special dates come from the game's existing date/event calculations. */
+typedef struct { af_diary_u8 town_day,harvest_month,harvest_day; } AFDiaryDates;
 typedef struct {
     af_diary_u8 text[AF_DIARY_PAGE], original[AF_DIARY_PAGE];
     unsigned short length,cursor,player,month,readonly,scroll;
@@ -49,4 +52,16 @@ int af_diary_scroll(AFDiaryDraft *,int delta,const af_diary_u8 *widths);
 typedef int (*AFDiaryCapacity)(void *,const AFDiary *);
 int af_diary_commit(AFDiary *,AFDiaryDraft *,AFDiary *scratch,
     const af_diary_u8 *widths,AFDiaryCapacity,void *);
+/* Atomically admit both the edited page and its privacy choice. */
+int af_diary_commit_locked(AFDiary *,AFDiaryDraft *,AFDiary *scratch,
+    const af_diary_u8 *widths,AFDiaryCapacity,void *,int locked);
+unsigned int af_diary_days(unsigned int year,unsigned int month);
+int af_diary_weekday(AFDiaryDate);
+int af_diary_calendar_refresh(AFDiary *,unsigned int player,AFDiaryDate,AFDiaryDates);
+int af_diary_calendar_visit(AFDiary *,unsigned int player,AFDiaryDate,AFDiaryDates);
+int af_diary_calendar_event(AFDiary *,unsigned int player,AFDiaryDate,AFDiaryDates,unsigned int event);
+/* 0: no mark, 1: played, 2: event attended; only the current twelve-month
+ * interval is eligible. This never erases or changes a monthly text page. */
+int af_diary_calendar_mark(const AFDiary *,unsigned int player,AFDiaryDate today,
+    AFDiaryDate selected,AFDiaryDates);
 #endif

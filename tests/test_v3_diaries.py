@@ -1,6 +1,7 @@
 """Complete diary category data and editing/save core; no native UI claim."""
 import copy
 import json
+import re
 from pathlib import Path
 import struct
 import subprocess
@@ -18,8 +19,42 @@ from tests.test_v3_save_compressed import canonical
 
 
 class DiaryTests(unittest.TestCase):
+    def test_calendar_against_actual_donor_code(self):
+        reference=ROOT/'local/ac-decomp/src/game'
+        for name in ('m_calendar.c','m_calendar_ovl.c'):
+            self.assertEqual(sha256((reference/name).read_bytes()),diaries.REFERENCES['src/game/'+name])
+        source=(reference/'m_calendar.c').read_text()
+        source+=(reference/'m_calendar_ovl.c').read_text().split('static void mDC_set_string',1)[0]
+        source=re.sub(r'^#include[^\n]*\n','',source,flags=re.M)
+        with tempfile.TemporaryDirectory(prefix='v3-diary-calendar-') as temp:
+            out=Path(temp)
+            (out/'reference-calendar.inc').write_text(source)
+            run=subprocess.run(['cc','-std=c11','-O1','-g','-Wall','-Wextra','-Werror',
+                '-fno-pie','-no-pie','-fsanitize=address,undefined','-fno-omit-frame-pointer',
+                '-I'+str(out),'-I'+str(ROOT/'overlays/v3'),'tests/v3_diary_calendar_test.c',
+                'overlays/v3/diary.c','overlays/v3/diary_calendar.c','-o',str(out/'check')],
+                cwd=ROOT,capture_output=True,text=True,timeout=30)
+            self.assertEqual(run.returncode,0,run.stdout+run.stderr)
+            run=subprocess.run([str(out/'check')],capture_output=True,text=True,timeout=30)
+            self.assertEqual(run.returncode,0,run.stdout+run.stderr)
+            print(run.stdout.strip())
+
+    def test_sanitized_connected_menu_and_native_surface_adapter(self):
+        with tempfile.TemporaryDirectory(prefix='v3-diary-menu-') as temp:
+            binary=Path(temp)/'check'
+            run=subprocess.run(['cc','-std=c11','-O1','-g','-Wall','-Wextra','-Werror',
+                '-fno-pie','-no-pie','-fsanitize=address,undefined','-fno-omit-frame-pointer',
+                '-ffunction-sections','-fdata-sections','-Wl,--gc-sections',
+                'tests/v3_diary_menu_test.c','overlays/v3/diary.c','overlays/v3/diary_calendar.c',
+                'overlays/v3/diary_menu.c','overlays/v3/diary_room.c','overlays/v3/room_carry.c',
+                '-o',str(binary)],cwd=ROOT,capture_output=True,text=True,timeout=30)
+            self.assertEqual(run.returncode,0,run.stdout+run.stderr)
+            run=subprocess.run([str(binary)],capture_output=True,text=True,timeout=30)
+            self.assertEqual(run.returncode,0,run.stdout+run.stderr)
+            print(run.stdout.strip())
+
     def test_prepared_mips_core_and_current_build_bindings(self):
-        output = ROOT/'build/v3-diary-category-work-01/prepared-01'
+        output = ROOT/'build/v3-diary-category-work-01/prepared-04'
         report = json.loads((output/'diaries.json').read_text())
         raw = (output/report['code_file']).read_bytes()
         self.assertEqual(sha256(raw),report['compiled']['sha256'])
@@ -32,7 +67,15 @@ class DiaryTests(unittest.TestCase):
         self.assertFalse(report['native_installed'])
         self.assertTrue(all(not r['selectable'] for r in report['rows']))
         from v3_furniture_install import inputs
-        _, prior = inputs(ROOT/report['base_lock'])
+        image, prior = inputs(ROOT/report['base_lock'])
+        self.assertEqual(diaries.native_contract(image),report['native_interaction'])
+        art=report['carried_artwork']
+        self.assertEqual(sha256((output/art['file']).read_bytes()),art['sha256'])
+        self.assertEqual(art['shared_styles'],16)
+        self.assertEqual(set(art['offsets']),{'material','geometry'})
+        self.assertEqual(report['ui_text'],diaries.ui_text(Source(
+            (ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+            (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())))
         self.assertEqual(prior['runtime_abi'],report['base_runtime_abi'])
         self.assertEqual(prior['save_codec']['format_version'],9)
         for name in ('af_v3_save_check_extended','af_v3_save_pack_extended'):

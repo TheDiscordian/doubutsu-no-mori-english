@@ -38,18 +38,26 @@ It contains 191 independently selectable development imports, including all nine
 fish and eight insects, and 100 inactive furniture profiles whose acquisition
 is pending. The main lock and both stable V2-14 deployments are unchanged.
 
-The active diary category has a source-bound core for all sixteen styles, with
-all 48 monthly pages, proportional editing/scrolling, owner/read-only/locked
-access, and transactional capacity checks. The shared save adapter retains the
-complete town, console progress, calendars, and pages within the existing two
-FlashRAM banks. Source and sanitized host checks pass, including 7,465 save-
-adapter assertions; the full MIPS module compiles to 17,571 bytes. Preparation
-is `build/v3-diary-category-work-01/prepared-01/`. Diary UI/interaction, calendar
-events, resident loading, and selection are not installed, so no new playable
-imports or cartridge completion is claimed. The [diary consumer map](../specs/V3_DIARIES.md)
-tracks the exact remaining path. Its planned format-eleven saves will require
-this or a newer compatible build; the current ABI-308 cartridge remains format
-nine and the user's saves are untouched.
+The active diary category has a source-bound calendar → read → edit → finish →
+privacy controller for all sixteen styles and all 48 monthly pages. Capacity
+admission covers the page and lock together; rejection keeps the draft and old
+saved contents. The actual surface A-tap adapter resolves the resident from the
+house owner ID and preserves native furniture handling when no selected diary
+is present. The shared carried model is converted, and official prompts plus
+project safety messages have per-text provenance. Preparation is
+`build/v3-diary-category-work-01/prepared-04/`; the linked MIPS save/calendar/menu
+core is 22,588 bytes. The calendar matches the donor C in focused host comparisons.
+The adapter and controller pass a combined sanitized host check across all styles,
+all player access modes, navigation, privacy, and rejected edits. These are not
+installed screens or ordinary gameplay results.
+
+The shared save adapter retains the complete town, console progress, calendars,
+and pages within the existing two FlashRAM banks. Native submenu/keyboard/art
+bindings, carried readers, live date/event callers, resident loading, and selection
+remain in the same [diary consumer map](../specs/V3_DIARIES.md). No new playable
+imports or cartridge completion is claimed. Planned format-eleven saves require
+this or a newer compatible build; ABI 308 remains format nine, both deployments
+remain V2-14, and the user's saves are untouched.
 
 Both source artwork variants, school desk and bus stop, are installed through
 the ordinary shared importer. Complete original-N64 profile/model comparison

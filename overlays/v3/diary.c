@@ -158,8 +158,8 @@ int af_diary_scroll(AFDiaryDraft *d,int delta,const u8 *widths) {
     if(next==d->scroll)return 0;
     d->scroll=(unsigned short)next;return AF_DIARY_OK;
 }
-int af_diary_commit(AFDiary *live,AFDiaryDraft *d,AFDiary *scratch,const u8 *widths,
-                    AFDiaryCapacity capacity,void *ctx) {
+static int commit(AFDiary *live,AFDiaryDraft *d,AFDiary *scratch,const u8 *widths,
+                    AFDiaryCapacity capacity,void *ctx,int locked) {
     AFDiaryLayout layout;
     if(!draft_valid(d) || !af_diary_valid(live) || !scratch || !capacity || !widths ||
        !separate(live,sizeof(*live),scratch,sizeof(*scratch)) ||
@@ -171,6 +171,18 @@ int af_diary_commit(AFDiary *live,AFDiaryDraft *d,AFDiary *scratch,const u8 *wid
     int status=af_diary_layout(d->text,d->length,d->cursor,widths,&layout);
     if(status!=AF_DIARY_OK)return status;
     copy(scratch,live,sizeof(*live));copy(page(scratch,d->player,d->month),d->text,AF_DIARY_PAGE);
+    if(locked>=0)calendar(scratch,d->player)[98]=(u8)locked;
     if(capacity(ctx,scratch)<0)return AF_DIARY_CAPACITY;
-    copy(p,d->text,AF_DIARY_PAGE);copy(d->original,d->text,AF_DIARY_PAGE);return AF_DIARY_OK;
+    copy(p,d->text,AF_DIARY_PAGE);copy(d->original,d->text,AF_DIARY_PAGE);
+    if(locked>=0)calendar(live,d->player)[98]=(u8)locked;
+    return AF_DIARY_OK;
+}
+int af_diary_commit(AFDiary *live,AFDiaryDraft *d,AFDiary *scratch,const u8 *widths,
+                    AFDiaryCapacity capacity,void *ctx) {
+    return commit(live,d,scratch,widths,capacity,ctx,-1);
+}
+int af_diary_commit_locked(AFDiary *live,AFDiaryDraft *d,AFDiary *scratch,const u8 *widths,
+                    AFDiaryCapacity capacity,void *ctx,int locked) {
+    if(locked!=0 && locked!=1)return AF_DIARY_ARGUMENT;
+    return commit(live,d,scratch,widths,capacity,ctx,locked);
 }

@@ -8,9 +8,10 @@ aliases, and complete diary consumers to the actual checked donor. The styles
 remain unavailable for selection until the complete native path is installed.
 A converted cover is not a working diary.
 
-The reading/editing/storage core and shared native-save adapter are implemented
-in source and compile for VR4300. Host checks cover the connected edit → capacity
-check → save → probe → reload path. They do not establish in-game UI operation,
+The calendar/reading/editing/storage controller and shared native-save adapter
+are implemented in source and compile for VR4300. Host checks cover room surface
+selection, calendar navigation, editing/privacy/capacity admission, and the
+save → probe → reload path. They do not establish in-game UI operation,
 native FlashRAM timing, ordinary gameplay, or hardware compatibility. ABI 308
 remains the current cartridge; this preparation does not change either patcher.
 
@@ -38,12 +39,56 @@ with a seven-row reading window and bounded scrolling. It retains the full
 `mCD_player_calendar_c` supplies 104 bytes per player: twelve played-day words,
 twelve event-day words, event flags, lock, reserved byte, year, month, and final
 padding. Calendar rollovers clear relevant **calendar markers**, not diary text.
-The source `m_calendar.c` defines the exact forward/backward-time, event, and
-year-change rules; native event/date integration remains required.
+The source `m_calendar.c` defines forward/backward-time, event, and year-change
+rules. `diary_calendar.c` implements them and the source calendar marker reader;
+native event/date integration remains required. Explicit owner refresh clears
+that owner's markers, not the current visitor's calendar. The source's internal
+`clear(-1)` must not accidentally erase a visitor when opening a stale house.
 
 Collection aliases are `30FC..3138` in steps of four. Ordinary room placement
 retains the carried diary identity instead of substituting a catalogue cover.
 Do not install those aliases as independently selectable furniture.
+
+## Interaction and screen controller
+
+`diary_room.c` follows `aMR_CheckDiaryOnMe`: a selected diary occupies a cell on
+the upper foreground layer of a surface actor. It reuses the installed carrying
+geometry for every surface size/rotation. The player's X **or** Z alignment must
+be within twelve world units of that cell's centre. Checking distance to the
+centre in both directions prevents normal edge interaction and is not the donor
+rule. All sixteen styles follow this same path.
+
+The checked native A-tap caller is `80942060`, calling `8093DB64` in the relocated
+My_Room owner. The source adapter preserves the existing message/demo and short-
+hold gates. Seven native updates retain the N64 interaction threshold. It checks
+upper then lower contacts, requires valid actors/profiles, and resolves the house
+owner by full personal ID using native `mPr_GetPrivateIdx`. Vacant houses and
+failed menu opening cannot accidentally activate the supporting furniture.
+The original controller handles non-diary interactions unchanged. Exact consumers,
+caller bytes, and the one removable relocation are bound in the preparation.
+The menu-open and selected-style exports still need real native bindings; no stub
+or unfinished hook is installed in the cartridge.
+
+`diary_menu.c` provides one transient controller for all covers:
+
+- Month selection spans eleven months before/after the current month. C-up
+  returns to the current month; B/Start exits.
+- Day selection uses the source C-button navigation and up/down cycling through
+  multiple events before changing weeks. The event provider must use the actual
+  game's schedule, not advertise unimplemented GameCube holidays.
+- The owner can enter editing with A/Start. Other residents only read unlocked
+  pages; A/B/Start returns those readers to the calendar.
+- Done opens the official Yes/Rewrite choice. B returns to the preserved draft.
+  Finishing opens the official privacy question; C-left/right selects Yes/No.
+- Privacy confirmation admits the page and lock together. Capacity rejection
+  shows an explicitly project-authored warning and returns to the intact draft.
+  Changed/corrupt source data returns to the calendar instead of overwriting it.
+
+Drawing, source transitions, sounds, and native keyboard ownership remain adapter
+work. Eight official prompt strings and three project-authored error strings are
+credited in `translations/provenance.json` under `v3/diary/`; preparation verifies
+each source location and encoded text. Month/day artwork and event labels remain
+part of the screen integration, not additional uncredited prose.
 
 ## Serialized diary state
 
@@ -99,12 +144,13 @@ This is a capacity check for the current town, not a proof that every possible
 future combination fits. Future town/console growth can still exceed FlashRAM;
 the existing pre-write failure gate remains. Do not claim that compression gives
 unlimited storage or that a synthetic vocabulary represents every player's text.
-The in-game rejection prompt and return-to-editor binding remain unfinished.
+The controller implements rejection and return-to-editor; the in-game warning
+renderer and native keyboard binding remain unfinished.
 
 ## Memory and prepared code
 
-`build/v3-diary-category-work-01/prepared-01/diaries.json` binds the complete
-17,571-byte code module to ABI 308 and current source hashes. Preparation uses
+`build/v3-diary-category-work-01/prepared-04/diaries.json` binds the complete
+22,588-byte save/calendar/menu module to ABI 308 and current source hashes. Preparation uses
 the existing Docker toolchain and checks the current report's RAM reservations.
 These are checked **planned** allocations, not installed startup reservations:
 
@@ -126,18 +172,27 @@ The prepared packet has no mutable globals or unresolved symbols.
 | Consumer | Current implementation / remaining work |
 | --- | --- |
 | Category identity/data | All sixteen donor IDs, names, prices, and aliases bound; additive native identity/readers still required |
-| Carried/collection artwork | Reuse prepared cover conversions; install the carried diary model and correct room/collection contexts |
-| Calendar entry | Bind the actual interaction caller, owner, selected month, calendar art, controls, played-day/event updates, and lock confirmation |
-| Reading/editing | Full buffer, access rules, commands, wrapping, scrolling, and transactional commit implemented; native keyboard/view/end-confirmation callers remain |
-| English UI | Extract official diary/calendar/lock resources and credit them in the single provenance catalogue; capacity-error wording needs an explicit authorship record |
+| Carried/collection artwork | Shared carried model converted with the general split material/geometry converter; reuse cover conversions and install correct room/collection contexts |
+| Calendar entry | Surface A-tap adapter, house-owner resolution, calendar controller/markers, and privacy implemented in source; native menu opening, event/date callers, and screen rendering remain |
+| Reading/editing | Full controller, access rules, wrapping, scrolling, and atomic page/privacy commit implemented; native keyboard/view ownership and source transitions remain |
+| English UI | Eight official prompts and three project errors extracted/credited/checked; month/day artwork and actual event labels remain in screen integration |
 | Persistence | Shared reset, clear, probe, pack, commit, forward migration, and preflight implemented/tested on host; startup loading and stable native dispatch still need installation |
 | Selection | Bind carried/display profile dependencies, catalogue/scoring, and independent/all choices only after the complete path is connected |
 | Verification | Run bounded combined current-ROM UI/save checks after integration; no separate style-by-style native scenarios |
 
-Resume this same connected category at native inventory/interaction and
-calendar/editor bindings. Reuse the prepared core and source catalogue, and
+Resume this same connected category at donor screen conversion and native
+submenu/keyboard bindings. Reuse the prepared core and source catalogue, and
 retain passing save evidence unless those paths change. Do not redirect to
 acquisition, gold-tree work, or replay exhausted creature/console fixtures.
+
+The native menu tables have no calendar/diary slots. Reuse an explicitly owned
+mode in an existing submenu rather than passing the donor indices 27/28 into
+the shorter native table. The accepted English editor remains the keyboard.
+The screen converter needs the donor's 2D combiners, geometry/render states, and
+inherited textures; the furniture converter correctly rejects those unsupported
+states. Do not flatten away unknown commands or substitute a generic screen.
+Current room/core disassembly is retained under
+`build/v3-diary-category-work-01/native-{room,core}-map/`; do not remap these callers.
 
 ## Focused evidence
 
@@ -155,3 +210,12 @@ console records compresses to 32,403 of 63,850 stream bytes. Incompressible inpu
 rejects before changing output. The changed compressor also passes the existing
 446-assertion envelope test, including the dense-town capacity and old-format
 round-trip checks. These are host/source/compiler checks, not hardware results.
+
+The focused calendar comparison compiles the actual donor calendar C and marker
+reader alongside the port. It covers forward/backward month changes, year resets,
+all attendance flag types, and day marks, with 24,420 matching comparisons.
+The connected menu/surface test uses every style, all four player identities,
+owner/read-only/locked access, month/day/event navigation, confirmation/privacy,
+and rejected edits. Native interaction fallbacks, vacant houses, failed menu
+opening, and disabled styles are included. The room adapter also compiles as a
+VR4300 object; its installed native execution is not claimed.
