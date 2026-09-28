@@ -78,7 +78,11 @@ int af_hf_live_enter(void) {
     if(!s->native_event)return 0;
     const AFHFB *p=s->native_event;
     s->event.size=(int)word(p);
-    if(s->event.size<0 || s->event.size>(s->records.units==AF_HF_INCHES?27:70))return 0;
+    if(af_hf_requested_units>AF_HF_INCHES || s->event.size<0 ||
+       s->event.size>(s->records.units==AF_HF_INCHES?27:70))return 0;
+    /* Never reinterpret an existing tournament or a pending winner. A new
+       setting starts only at an empty event with no saved records. */
+    if(!s->event.size)(void)af_holiday_fish_units(&s->records,af_hf_requested_units);
     af_holiday_fish_native_person(&s->event.person,p+4);
     s->event.position[0]=(short)half(p+20);s->event.position[1]=(short)half(p+22);
     s->event.talk=p[24];s->event.flag=p[25];

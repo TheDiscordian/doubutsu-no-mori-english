@@ -1,7 +1,9 @@
 """Shared event announcements and the checked native acre-transition lock."""
 import json
+import copy
 import re
 import struct
+import zlib
 
 from aflib import CODE_RAM,CODE_VROM,by_vrom,sha256
 from apply_translation import write_new
@@ -17,6 +19,8 @@ from v3_holiday_dialogue import credit,check_provenance
 from v3_password_policy import function
 
 FIRST=12380
+SOURCES=('tools/v3_holiday_scene.py','overlays/v3/holiday_demo.c','overlays/v3/holiday_demo.h',
+    'overlays/v3/holiday_demo.ld','tools/v3_asset_loader.py','tools/v3_furniture_install.py')
 REFERENCES={
     'src/game/m_demo.c':'71982f49f9380a7fe108595fe2ee18380a26c58c378006364f01c772650a1212',
     'src/game/m_player_lib.c':'76ef6299f5b1e1a1eef7ee783212e2c4db6d35db3c32db330723ece21ebca847',
@@ -151,3 +155,99 @@ def prepare(base,prior,source,output):
             after=compiled['symbols']['af_holiday_scene_demo_init']))
     write_new(output/'scene.json',(json.dumps(report,indent=2)+'\n').encode())
     return report
+
+
+DEMO_RAM,DEMO_STATE,DEMO_END=0x806FE000,0x806FFF80,0x806FFFC0
+DEMO_HOOKS=(
+    (0x8007B410,'talk_actor'),(0x8007B5C0,'message'),(0x8007B5F4,'actors'),
+    (0x8007B724,'set_zoom'),(0x8007B760,'get_zoom'),
+    (0x8007B79C,'set_name'),(0x8007B7DC,'get_name'),
+    (0x8007B818,'set_change_player'),(0x8007B854,'get_change_player'),
+    (0x8007B890,'set_return_wait'),(0x8007B8CC,'get_return_wait'),
+    (0x8007B908,'set_turn'),(0x8007B944,'get_turn'),
+    (0x8007B980,'colour'),(0x8007B9E0,'colour_pointer'),
+    (0x8007C924,'choose'),(0x8007CB50,'init'),(0x8007CBEC,'run'),
+    (0x8007CC9C,'main'),(0x8007CDD8,'request'),(0x8007D048,'busy'),
+    (0x800641CC,'camera_reverse'),(0x8006447C,'camera_counter'))
+
+
+def install_demo(base,prior,blob,core,output):
+    """Connect all additional announcement/speech consumers in one module."""
+    from v3_import_storage import jump
+    from v3_furniture_pipeline import Source
+    del blob
+    e=copy.deepcopy(prior['equipment_resources']);events=e['npc_extra']['events']
+    if events.get('demo') or not e['holiday_fishing']['live'].get('measurement_choice'):
+        raise ValueError('Unexpected shared announcement predecessor')
+    references={
+        'local/ac-decomp/src/game/m_demo.c':REFERENCES['src/game/m_demo.c'],
+        'local/ac-decomp/src/game/m_camera2.c':'053942e40b0cc7b4212302a2c51b50fa421446441b3b69f8124e22dbdfb4e6fc',
+        'local/ac-decomp/include/m_camera2.h':'ec7bc2f1efc05b14736ce3d169cf708b6d9e10d850ee37dee6f0625ad3f0b4a9',
+        'upstream/af/src/code/m_demo.c':'0000cb13810b84141b670fcedde07c38c4a96ce981994dd2ae18c76ffe9651dd',
+        'upstream/af/include/m_demo.h':'9332283a877036b8134c27004a688b61bbb61da47507298eeccfa895b60226a4'}
+    for path,digest in references.items():
+        if sha256((ROOT/path).read_bytes())!=digest:raise ValueError('Changed announcement reference: '+path)
+    guards=(
+        (0x8007B410,0x8007D128,'0d99af75437dc163779e8fbdd253190fd1f8c5433d0682015cbd5e752688256b'),
+        (0x80064178,0x800645B0,'c33dedd8189351005fd020e1125ea4f05c54420dd9511450d8eff436704c4aca'),
+        (0x800639A0,0x80063B1C,'17d11809f1f8a01506574f239f2c66430b09d0750f67498caef97c0730d405f1'),
+        (0x80062690,0x800626E4,'9256ea6485d63c94f5b12e375219bd28da898ef468480f50ace331964629be08'),
+        (0x8005EDD8,0x8005EDEC,'e9eeb7d88cacd79bbc33d22b594bad7a512a49e8998b78dc21a454a2edbe5bc4'),
+        (0x800B21F0,0x800B2244,'cf740072194ece5b8cd55e506b58773ef6abfcd53e4614efc2ff046b8901d17b'),
+        (0x80104A74,0x80104B58,'4206c14109b084495d46b0d6ae671a96c560e8ce13b6884dd49cca4855c24887'))
+    for a,b,digest in guards:
+        if sha256(core[a-CODE_RAM:b-CODE_RAM])!=digest:raise ValueError('Changed complete native demo/camera consumer')
+    table=struct.unpack_from('>14I',core,0x80104AAC-CODE_RAM)
+    if table[12]!=events['reserved']['native']['scene']['code']['symbols']['af_holiday_scene_demo_init']:
+        raise ValueError('Missing installed official announcement reader')
+    source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+        (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    names=('set_emsg2_default','wait_emsg2_start','wait_emsg2_end','set_speech_default',
+        'choice_demo_sub','choice_demo','init_demo','run_demo','main_proc','mDemo_Request',
+        'change_camera','Camera2_Inter_CounterProc','Camera2_Inter_set_reverse_mode')
+    donors=[]
+    for name in names:
+        offsets=[at for at,rows in source.functions.items() if any(n==name for n,_ in rows)]
+        if len(offsets)!=1:raise ValueError('Ambiguous complete announcement source: '+name)
+        _,row=source.function(offsets[0]);donors.append(row)
+    bindings=dict(af_hd_native_demo=0x80104A70,af_hd_state=DEMO_STATE,af_hd_game=0x8010EF90,
+        af_hd_common=0x80136EA0,af_hd_title_flags=0x80137684,
+        af_hd_checks=0x80104A74,af_hd_defaults=0x80104AAC,af_hd_starts=0x80104AE8,af_hd_ends=0x80104B20,
+        af_hd_title_demo=0x8007D90C,af_hd_trigger=0x80078DAC,af_hd_weight=0x8007C6C0,
+        af_hd_force_speak=0x800B21F0,af_hd_player=0x800B1C84,af_hd_camera=0x8007BA84,
+        af_hd_demo_type=0x8007BA4C,af_hd_emsg_colour=0x8007CB28,
+        af_hd_camera_angle=0x80063AA0,af_hd_camera_simple=0x800639A0,
+        af_hd_camera_inter=0x800641F8,af_hd_camera_normal=0x80062690,
+        af_hd_landmark=0x80089440,af_hd_origin=0x80088B3C,af_hd_goto=0x800C6C10,
+        af_hd_bgm_end=0x8005EDD8,memcpy=0x80034BF8,memset=0x8003B9B0)
+    directory=output/'holiday-demo';code,compiled=compile_part('holiday_demo',directory/'code',link_symbols=bindings)
+    p=e['holiday_state']['packet'];data=bytearray(base[p['physical']:p['physical']+p['bytes']])
+    at=DEMO_RAM-p['ram'];end=DEMO_END-p['ram']
+    transition=events['transition']['loaded_code']
+    if (sha256(data)!=p['sha256'] or p!=e['holiday_fishing']['packet'] or
+            transition['ram']+transition['bytes']>DEMO_RAM or len(code)>DEMO_STATE-DEMO_RAM or
+            any(data[at:end])):raise ValueError('Occupied or changed event-demo reservation')
+    data[at:at+len(code)]=code
+    hooks=[]
+    for address,name in DEMO_HOOKS:
+        symbol='af_holiday_demo_'+name;offset=address-CODE_RAM
+        before=bytes(core[offset:offset+8]);after=struct.pack('>2I',jump(compiled['symbols'][symbol]),0)
+        core[offset:offset+8]=after;hooks.append(dict(address=address,symbol=symbol,before=before.hex(),after=after.hex()))
+    previous=p['sha256'];p.update(sha256=sha256(data),crc32=zlib.crc32(data))
+    e['holiday_fishing']['packet']=copy.deepcopy(p)
+    records=copy.deepcopy(prior['physical_resources']);matches=[r for r in records if r['id']==p['id']]
+    if len(matches)!=1:raise ValueError('Ambiguous combined holiday physical packet')
+    matches[0]['sha256']=p['sha256']
+    stage=dict(installed=True,event_owners_enabled=False,native_execution_verified=False,
+        code=compiled,bindings=bindings,hooks=hooks,references=references,native_guards=guards,
+        source_functions=donors,types=dict(eventmsg2=14,speech=15),retained_native_types=list(range(14)),
+        state=dict(ram=DEMO_STATE,bytes=64,saved=False),saved_format_changed=False,additional_resident_bytes=0,
+        speech_camera=dict(native_interpolation_type=10,source_morph_ticks=14,native_morph_ticks=7,
+            source_return_flag=4,original_return_flag=2),
+        sources={p:sha256((ROOT/p).read_bytes()) for p in SOURCES},
+        pending=['Live transition read/commit, Groundhog producer, dedicated-owner dispatch, and event admission'])
+    events['demo']=stage;e['npc_extra']['sources'].update(stage['sources'])
+    events['decorations']['controllers']['preserved'].append(dict(ram=DEMO_RAM,bytes=len(code),sha256=sha256(code)))
+    write_new(directory/'installed.json',(json.dumps(stage,indent=2)+'\n').encode())
+    write_new(directory/'packet.bin',data)
+    return e,{},dict(physical_resources=records),[(dict(matches[0],previous_sha256=previous),bytes(data))]

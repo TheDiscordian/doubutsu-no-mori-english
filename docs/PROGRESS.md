@@ -31,9 +31,9 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
-The current proposal is ABI 335 at
-`build/v3-diary-category-work-01/fishing-mail-installed-01/build-lock.json`, ROM SHA-256
-`5e626622fa0098ae3cca4fb5d4bda13cfcae41639b0fa4d3044ca8093e1de69b`.
+The current proposal is ABI 337 at
+`build/v3-diary-category-work-01/event-demo-installed-03/build-lock.json`, ROM SHA-256
+`dd2000c78633c5a331922c1f39cf8802036cb0fbe4f32275dd90b3967153c721`.
 It contains 191 independently selectable development imports, including all nine
 fish and eight insects, and 100 inactive furniture profiles whose acquisition
 is pending, plus sixteen inactive diary cover profiles. The main lock and both
@@ -106,10 +106,10 @@ include the records. Controller refreshes preserve this appended module and both
 packet references. The native event/name/size/record providers and complete
 official fishing dialogue are installed in the current proposal. The tournament
 host's eight affected calls and the imported stall's clip lifecycle are connected.
-Winner-mail creation and delivery are connected. Measurement/calendar choices
-and event activation remain unfinished.
+Winner-mail creation and delivery are connected. The measurement binding is
+installed; calendar choice and event activation remain unfinished.
 
-The 13,776-byte provider/host/mail module uses the existing fishing code reservation. It
+The 13,808-byte provider/host/mail module uses the existing fishing code reservation. It
 converts native event records explicitly, preserves complete eight-character
 record names, formats both units, and retains records when a provider fails.
 All forty donor fish messages and their complete conversation branches form
@@ -153,6 +153,26 @@ routes, rejection/retry, and duplicate prevention pass. The current-cartridge
 connection/retention check and empty/mixed/all-191 browser/offline outputs pass.
 The native delivery hook remains behind fishing service admission; installation
 does not claim an active tournament or hardware verification.
+
+Tournament measurements use the shared behaviour-choice framework: N64
+centimetres or GameCube inches. An existing event or pending winner retains its
+stored units; a new choice applies only to an empty event with no pending
+records. The saved format and packet allocation are unchanged. The sanitized
+selection/retention check and current-cartridge binding/checksum check pass.
+The definition stays unavailable in the selector until tournament actors and
+mail delivery are admitted together; it is not a nonfunctional selectable toggle.
+The separate donor announcement/speech handover is installed in the same packet.
+The 3,728-byte module preserves all fourteen original demo identities and adds
+alternate announcement 14 and speech 15. Its 23 native connections include
+request priority, saved announcement/resume, speech readers, shrine/interpolated
+camera return, and actual return-door acceptance. A rejected return retains the
+announcement for retry. The original callback tables and unrelated code remain
+unchanged; no new allocation or saved format is needed.
+The focused sanitized host sequence and current-cartridge hooks/bounds/retention
+check pass, as does current empty/mixed/all-191 browser/offline composition.
+Native demo execution is not claimed. Live transition read/commit, the Groundhog
+state producer, dedicated-owner dispatch, and calendar selection/admission remain
+unfinished. Reuse completed fishing and demo paths; do not restart native fixtures.
 
 Two sanitized host checks, the current-cartridge/storage/startup check, and a
 current-packet controller-refresh check pass. Empty/mixed/all-191 browser/offline

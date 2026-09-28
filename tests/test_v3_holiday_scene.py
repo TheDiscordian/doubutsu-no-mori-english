@@ -25,6 +25,60 @@ CURRENT=ROOT/os.environ.get('V3_HOLIDAY_SCENE_BUILD','build/v3-diary-category-wo
 
 
 class HolidaySceneTests(unittest.TestCase):
+    def test_additional_installed_demo_connections(self):
+        import zlib
+        from v3_asset_loader import BLOB
+        from v3_holiday_scene import DEMO_RAM,DEMO_END,DEMO_STATE,DEMO_HOOKS
+        directory=ROOT/os.environ.get('V3_HOLIDAY_DEMO_BUILD',
+            'build/v3-diary-category-work-01/event-demo-installed-03')
+        image,r=inputs(directory/'build-lock.json');base,prior=inputs(directory/'base-lock.json')
+        e=r['equipment_resources'];stage=e['npc_extra']['events']['demo'];packet=e['holiday_state']['packet']
+        self.assertTrue(stage['installed']);self.assertFalse(stage['event_owners_enabled'])
+        self.assertFalse(stage['saved_format_changed']);self.assertEqual(stage['additional_resident_bytes'],0)
+        self.assertEqual(stage['types'],{'eventmsg2':14,'speech':15})
+        self.assertEqual(packet,e['holiday_fishing']['packet'])
+        raw=image[packet['physical']:packet['physical']+packet['bytes']]
+        old=base[packet['physical']:packet['physical']+packet['bytes']]
+        a,b=DEMO_RAM-packet['ram'],DEMO_END-packet['ram']
+        self.assertEqual(raw[:a],old[:a]);self.assertEqual(raw[b:],old[b:])
+        self.assertEqual(sha256(raw),packet['sha256']);self.assertEqual(zlib.crc32(raw),packet['crc32'])
+        self.assertEqual(sha256(raw[a:a+stage['code']['bytes']]),stage['code']['sha256'])
+        self.assertLessEqual(DEMO_RAM+stage['code']['bytes'],DEMO_STATE)
+        self.assertEqual(raw[DEMO_STATE-packet['ram']:b],bytes(64))
+        files=by_vrom(image);before=by_vrom(base);core=bytearray(files[CODE_VROM].extract(image))
+        self.assertEqual(len(stage['hooks']),len(DEMO_HOOKS))
+        for hook,(address,name) in zip(stage['hooks'],DEMO_HOOKS,strict=True):
+            self.assertEqual(hook['address'],address)
+            self.assertEqual(hook['symbol'],'af_holiday_demo_'+name)
+            at=address-CODE_RAM
+            self.assertEqual(core[at:at+8],bytes.fromhex(hook['after']))
+            self.assertEqual(u32(core,at),0x08000000|(stage['code']['symbols'][hook['symbol']]>>2&0x3FFFFFF))
+            core[at:at+8]=bytes.fromhex(hook['before'])
+        self.assertEqual(core,before[CODE_VROM].extract(base))
+        # Original tables still own the original modes and official announcement reader.
+        self.assertEqual(core[0x80104A74-CODE_RAM:0x80104B58-CODE_RAM],
+            before[CODE_VROM].extract(base)[0x80104A74-CODE_RAM:0x80104B58-CODE_RAM])
+        blob=files[BLOB].extract(image);symbols=e['surface_bootstrap']['code']['symbols']
+        at=e['blob_offset']+symbols['packets']-e['ram']+17*20
+        dest,address,size,crc,clear=struct.unpack_from('>5I',blob,at)
+        self.assertEqual((dest,address,size,clear),(packet['ram'],packet['physical']|0x80000000,packet['bytes'],0))
+        self.assertEqual(u32(blob,e['blob_offset']+crc-e['ram']),packet['crc32'])
+        self.assertEqual(r['save_codec']['format_version'],prior['save_codec']['format_version'])
+        self.assertEqual(r['save_runtime']['profile_hex'],prior['save_runtime']['profile_hex'])
+        self.assertEqual(files[MESSAGE].extract(image),before[MESSAGE].extract(base))
+        self.assertEqual(files[0x30A0000].extract(image),before[0x30A0000].extract(base))
+
+    def test_additional_announcement_speech_lifecycle(self):
+        with tempfile.TemporaryDirectory(prefix='v3-holiday-demo-') as temp:
+            out=Path(temp)
+            command=['cc','-std=c11','-O1','-g','-Wall','-Wextra','-Werror','-fno-pie','-no-pie',
+                '-fsanitize=address,undefined','-fno-omit-frame-pointer','-I'+str(ROOT/'overlays/v3'),
+                'tests/v3_holiday_demo_test.c','overlays/v3/holiday_demo.c','-o',str(out/'check')]
+            for cmd in (command,[str(out/'check')]):
+                r=subprocess.run(cmd,cwd=ROOT,capture_output=True,text=True,timeout=30)
+                self.assertEqual(r.returncode,0,r.stdout+r.stderr)
+                if r.stdout:print(r.stdout.strip())
+
     def test_complete_source_and_host_reader(self):
         base,_=inputs(BASE)
         source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),

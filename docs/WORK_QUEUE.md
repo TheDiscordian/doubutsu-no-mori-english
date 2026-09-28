@@ -235,8 +235,8 @@ cartridge check and empty/mixed/all-supported browser comparison pass; the
 readiness mask stays zero and save/profile data is unchanged. Reuse the prepared
 batch at `build/v3-diary-category-work-01/event-items-prepared-03/`.
 
-The current proposal is ABI 335 at
-`build/v3-diary-category-work-01/fishing-mail-installed-01/build-lock.json`.
+The current proposal is ABI 337 at
+`build/v3-diary-category-work-01/event-demo-installed-03/build-lock.json`.
 Harvest pickup connects the native ordinary-item search boundary `808BC1E0`,
 action-31 animation, and actual pocket insertion to the source removal counter.
 Full-pocket refusal retains the native animation and official donor message;
@@ -272,9 +272,12 @@ the real English catalogue/formatter and saved snapshot codec, retaining rewards
 on allocation/text/delivery failure and preventing duplicate delivery. Current
 cartridge and browser/offline checks pass. Keep this path installed; native
 delivery remains unverified and gated with the rest of fishing.
-Next connect measurement/calendar choices and live event admission. Source
-inches and native centimetres require the behaviour choice, not a silent
-conversion of saved values. The countdown's
+The measurement binding is installed in the shared choice framework. Existing
+events and pending winners retain their recorded units; selection changes apply
+only at an empty event without saved records. The focused sanitized check and
+current-cartridge binding/checksum check pass. The choice remains unavailable
+until the tournament and delivery service are admitted. Next connect shared
+scene/owner services and calendar choice/admission. The countdown's
 shared clip and both controllers are installed; retain them while connecting
 event activation. Native/source saved personal IDs differ (16 versus 20 bytes);
 do not cast them or send donor message IDs to native text readers. This is the
@@ -287,12 +290,23 @@ as donor meteor event 37.
 The [decoration contract](../specs/V3_DIARIES.md#shared-event-decoration-resources)
 identifies the checked resources and native consumer addresses.
 Continue checked actor/decoration/profile/effect identities and source/native
-ACTIVE status, actual present-demo/room-message and Groundhog state, climate/
-rhythm services, and the alternate event-message lifecycle. Connect the live
+ACTIVE status, actual present-demo/room-message and Groundhog state, and climate/
+rhythm services. Connect the live
 dedicated-owner calls using the installed common-state entry; do not activate
 callbacks with missing providers. The
 [transition contract](../specs/V3_DIARIES.md#shared-transition-and-native-scene-bridge)
 records completed native scene/return-state bindings and remaining consumers.
+The alternate announcement and speech lifecycle is installed at `806FE000`,
+using 3,728 bytes and 23 checked native entry points. Added modes 14/15 preserve
+the fourteen original identities and callback tables. Request priority,
+choice/init/run, saved announcement/resume, shrine and interpolated camera,
+event-busy filtering, speech readers, and successful/rejected return transitions
+are connected. Focused sanitized host and current-cartridge checks pass; current
+browser/offline empty/mixed/all-191 output agrees. Live Groundhog/fading-title
+producers and transition service admission remain unbound, so the additional
+modes do not claim an active imported event or native gameplay verification.
+Reuse the retained core map and installed transition reservation rather than
+reinvestigating native geometry, fishing mail, or existing announcement text.
 Include costume,
 exercise/card, Miko, race/participant behaviour, and the calendar choice in this
 same category; do not activate an owner with missing services. Preserve the

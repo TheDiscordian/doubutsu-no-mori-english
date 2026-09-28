@@ -269,6 +269,13 @@ def mail_contract(base,prior,output):
         (0x800B893C,0x800B8970,'23de0cc4a93d3e800bc8f9d5985078d0328af6e9509214c14cd42d9231ab1e67'),
         (0x800D5D6C,0x800D5D94,'44fc91e7fded215d5985deb610784d95ddc4b67d8964f7d45202640beed18557'))
     core=files[CODE_VROM].extract(base)
+    # A provider refresh retains the actual mail hook, restoring only its
+    # checked call word for comparison with the original complete caller.
+    if prior['equipment_resources']['holiday_fishing']['live'].get('mail'):
+        core=bytearray(core);hook=prior['equipment_resources']['holiday_fishing']['live']['mail']['hook']
+        at=hook['address']-CODE_RAM
+        if struct.unpack_from('>I',core,at)[0]!=hook['after']:raise ValueError('Changed installed winner-mail call')
+        struct.pack_into('>I',core,at,hook['before'])
     for a,b,digest in native:
         if sha256(core[a-CODE_RAM:b-CODE_RAM])!=digest:raise ValueError('Changed complete native mail consumer')
     module=files[0x2800000].extract(base);resident=(
@@ -314,6 +321,7 @@ def prepare_live(base,prior,output,*,connect_angler=False,connect_mail=False):
     mapping='const unsigned short af_hf_message_map[][2] = {'+','.join(
         '{'+str(n)+','+str(target)+'}' for n,target in text['mapping'].items())+'};\n'
     mapping+='const unsigned int af_hf_message_count = 74;\n'
+    mapping+='#ifndef AF_HF_UNITS\n#define AF_HF_UNITS 0\n#endif\nconst unsigned int af_hf_requested_units = AF_HF_UNITS;\n'
     mapping+='const unsigned char af_hf_unit_text[2][16] = {'+','.join(
         '{'+','.join(str(c) for c in bytes.fromhex(value))+'}' for value in text['units'])+'};\n'
     generated=output/'text-map.c';write_new(generated,mapping.encode())
@@ -523,14 +531,18 @@ def install_mail(base,prior,blob,core,output):
     return install_connections(base,prior,blob,core,output,mail=True)
 
 
-def install_connections(base,prior,blob,core,output,*,mail):
+def install_measurements(base,prior,blob,core,output):
+    return install_connections(base,prior,blob,core,output,mail=True,measurements=True)
+
+
+def install_connections(base,prior,blob,core,output,*,mail,measurements=False):
     from v3_decoration_actor import install as controllers
     from aflib import CODE_RAM,u32
     del blob
     old=prior['equipment_resources']['holiday_fishing']['live']
-    if (bool(old.get('angler'))!=mail or old.get('mail')):
+    if (bool(old.get('angler'))!=mail or bool(old.get('mail'))!=measurements or old.get('measurement_choice')):
         raise ValueError('Unexpected tournament connection predecessor')
-    directory=output/('fishing-mail' if mail else 'fishing-angler')
+    directory=output/('fishing-measurements' if measurements else 'fishing-mail' if mail else 'fishing-angler')
     live=prepare_live(base,prior,directory,connect_angler=True,connect_mail=mail)
     equipment,changes,updates,writes=controllers(base,prior,output,fishing_live=live)
     merge_controller_core(base,core,changes)
@@ -550,10 +562,11 @@ def install_connections(base,prior,blob,core,output,*,mail):
         connection.update(output_sha256=sha256(owner),rebound=True)
         owners={connection['vrom']:bytes(owner)}
         address=0x800A67DC;before=0x0C03575B
-        if u32(core,address-CODE_RAM)!=before:raise ValueError('Changed native notice completion call')
+        previous=old['mail']['hook']['after'] if measurements else before
+        if u32(core,address-CODE_RAM)!=previous:raise ValueError('Changed native notice completion call')
         after=0x0C000000|((live['code']['symbols']['af_hf_mail_notice']>>2)&0x3FFFFFF)
         struct.pack_into('>I',core,address-CODE_RAM,after)
-        live['mail'].update(installed=True,enabled=False,hook=dict(address=address,before=before,after=after),
+        live['mail'].update(installed=True,enabled=False,hook=dict(address=address,before=before,after=after,previous=previous),
             saved_layout_changed=False)
     else:
         owners,connection=angler_hooks(base,live['code']['symbols'])
@@ -574,8 +587,13 @@ def install_connections(base,prior,blob,core,output,*,mail):
             'tools/v3_holiday_fishing.py','tools/v3_decoration_actor.py','overlays/v3/decoration_actor.c',
             'overlays/v3/decoration_actor.h','overlays/v3/holiday_fishing_live.c','overlays/v3/holiday_fishing_live.h',
             'overlays/v3/holiday_fishing_angler.c','overlays/v3/holiday_fishing_angler.h','overlays/fishing/name.c',
-            'overlays/v3/holiday_fishing_mail.c','overlays/v3/holiday_fishing_mail.h')})
+            'overlays/v3/holiday_fishing_mail.c','overlays/v3/holiday_fishing_mail.h','tools/v3_creature_choices.py')})
     live['pending']=([] if mail else ['winner-mail delivery'])+['measurement/calendar selection and event activation']
+    if measurements:
+        from v3_creature_choices import FISHING_CHOICE
+        live['measurement_choice']=dict(FISHING_CHOICE,ram=live['code']['symbols']['af_hf_requested_units'],
+            default='N64',values=dict(N64=0,GameCube=1),saved_layout_changed=False)
+        live['pending']=['calendar selection and event activation']
     fish['live']=live;fish['pending']=live['pending']+['connected native gameplay/save verification']
     controller=equipment['npc_extra']['events']['decorations']['controllers']
     controller['preserved']=[r for r in controller['preserved'] if r['ram']!=RAM]

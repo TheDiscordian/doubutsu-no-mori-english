@@ -27,6 +27,7 @@ extern void af_hf_native_string(void *,int,const AFHFB *,int);
 extern const unsigned short af_hf_message_map[][2];
 extern const unsigned char af_hf_unit_text[2][16];
 extern const unsigned int af_hf_message_count;
+extern const unsigned int af_hf_requested_units;
 int af_hf_live_enter(void);
 int af_hf_records_enter(void);
 void af_hf_live_leave(void);

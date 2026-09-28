@@ -22,8 +22,11 @@ CHOICES=(
 INSECT_CHOICE=dict(id='insect-population',name='Insect population',binding='spawn_mode',
     symbol='af_v3_insect_spawn_mode',scope='Original and imported insects',
     description='N64 keeps two wild insect slots and its original population rules, adding selected species. GameCube uses eight wild slots, seasonal blending, habitat weights, and groups. Both keep a separate release slot.')
+FISHING_CHOICE=dict(id='tournament-measurements',name='Fishing tournament measurements',binding='requested_units',
+    symbol='af_hf_requested_units',scope='Fishing tournament measurements and records',
+    description='N64 measures tournament fish in centimetres; GameCube uses inches. An ongoing tournament or an undelivered winner keeps its recorded units. A new setting starts with an empty tournament and no pending records.')
 SAVE_NOTE=('These behaviour settings keep the same saved layout and imported identities. '
-    'Changing them changes population or movement rules; the saved seasonal state is retained. '
+    'Saved seasonal state and existing tournament measurements are retained. '
     'A native save/reload after switching settings is not yet verified.')
 
 
@@ -83,6 +86,22 @@ def options(image,report):
         at=start+row['ram']-p['ram']
         if image[at:at+4]!=bytes(4):raise ValueError('Changed pinned insect population default')
         result.append({**row,'offset':at,'before':image[at:at+4].hex()})
+    fishing=report.get('equipment_resources',{}).get('holiday_fishing',{})
+    live=fishing.get('live',{});row=live.get('measurement_choice')
+    if row:
+        p=fishing['packet'];start=p['physical'];code=live['loaded_code']
+        if (any(row.get(k)!=v for k,v in FISHING_CHOICE.items()) or row['default']!='N64' or
+                row['values']!={'N64':0,'GameCube':1} or
+                row['ram']!=live['code']['symbols'][row['symbol']] or
+                not code['ram']<=row['ram']<code['ram']+code['bytes'] or
+                sha256(image[start:start+p['bytes']])!=p['sha256']):
+            raise ValueError('Changed installed tournament measurement choice')
+        at=start+row['ram']-p['ram']
+        if image[at:at+4]!=bytes(4):raise ValueError('Changed pinned tournament measurement default')
+        # A prepared provider is not a selectable gameplay setting. Admit it
+        # only together with the connected tournament and its delivery service.
+        if live.get('service_admission') and live.get('actors_active') and live.get('mail',{}).get('enabled'):
+            result.append({**row,'offset':at,'before':image[at:at+4].hex()})
     return result
 
 
@@ -119,6 +138,13 @@ def checksum_fields(image,report):
         if u32(image,at)!=p['crc32'] or zlib.crc32(image[start:start+p['bytes']])!=p['crc32']:
             raise ValueError('Changed installed insect checksum')
         fields.append(dict(offset=at,before=image[at:at+4].hex(),start=start,length=p['bytes']))
+    fishing=e.get('holiday_fishing',{})
+    if fishing.get('live',{}).get('measurement_choice'):
+        p=fishing['packet'];ram=boot['symbols']['holiday_state_crc']
+        at=blob.pstart+e['blob_offset']+ram-e['ram'];start=p['physical']
+        if u32(image,at)!=p['crc32'] or zlib.crc32(image[start:start+p['bytes']])!=p['crc32']:
+            raise ValueError('Changed installed tournament checksum')
+        fields.append(dict(offset=at,before=image[at:at+4].hex(),start=start,length=p['bytes']))
     return fields
 
 
@@ -142,6 +168,17 @@ def update_report(image,blob,report,resolved):
         insects['compiled']['sha256']=sha256(packet[:insects['compiled']['bytes']])
         insects['physical_resource']['sha256']=p['sha256']
         resource=next(r for r in report['physical_resources'] if r['id']==insects['physical_resource']['id'])
+        resource['sha256']=p['sha256']
+    fishing=e.get('holiday_fishing',{});live=fishing.get('live',{});row=live.get('measurement_choice')
+    if row:
+        p=fishing['packet'];packet=image[p['physical']:p['physical']+p['bytes']]
+        value=resolved.get(row['id'],row['default'])
+        if u32(packet,row['ram']-p['ram'])!=row['values'][value]:raise ValueError('Lost tournament measurement setting')
+        row['resolved']=value;p.update(sha256=sha256(packet),crc32=zlib.crc32(packet))
+        code=live['loaded_code'];at=code['ram']-p['ram']
+        code['sha256']=sha256(packet[at:at+code['bytes']]);live['code']['sha256']=code['sha256']
+        e['holiday_state']['packet']=copy.deepcopy(p)
+        resource=next(r for r in report['physical_resources'] if r['id']==p['id'])
         resource['sha256']=p['sha256']
     e.update(sha256=sha256(ep),crc32=zlib.crc32(ep))
     for boot in (e['surface_bootstrap'],report['room_surfaces']['items']['bootstrap']):

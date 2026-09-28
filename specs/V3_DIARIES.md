@@ -1055,8 +1055,10 @@ Unrelated native fields and existing door padding are preserved.
 
 The native bridge still requires actual imported common-state providers. These
 must supply source/native ACTIVE identities, current acre and pool shape,
-present-demo and room-message gates, Groundhog state, climate/rhythm handling,
-and the alternate event-message lifecycle. Missing providers reject explicitly;
+present-demo and room-message gates, Groundhog state, and climate/rhythm handling.
+The alternate event-message lifecycle is installed as described below; its
+live transition read/commit and Groundhog producer remain unbound.
+Missing providers reject explicitly;
 native demo 13 is **not** treated as source event-message-2. No substitute owner,
 zero-filled gate, or no-op side effect is an implemented service.
 
@@ -1080,6 +1082,40 @@ missing-provider rejection. Native I/O, installed identities, and imported
 services are doubles. Total dynamic stack, in-game transitions, native diary
 gameplay, and hardware remain unverified. The exhausted native fixture budget is
 unchanged; no old build or fixture is replayed.
+
+### Additional announcement and speech lifecycle
+
+The ABI-337 proposal at `event-demo-installed-03/build-lock.json` installs the
+complete alternate announcement/speech dispatch in 3,728 bytes at `806FE000`.
+The owned transient state reserves `806FFF80..806FFFC0`; the original inner
+guard and the 272-KiB combined packet allocation remain unchanged. Saved format
+thirteen is unchanged. Native modes `0..13` retain their original meanings,
+and added modes 14/15 represent source EVENTMSG2/SPEECH. Priority compares their
+source meanings rather than the additive native numbers. The original four
+fourteen-entry callback tables remain unchanged; explicit added-mode dispatch
+and bounds checks prevent out-of-range table reads.
+
+Twenty-three guarded native entries bind choice/init/run/main/request, busy,
+speech properties/actors/colour/message, and camera reverse/countdown. The
+alternate announcement retains its request while speech runs, resumes afterward,
+waits for actual fading-title state, and commits return fades/BGM only after
+the native door transition succeeds. A rejected door retains the saved request.
+The source speech initializer and native actor fields are mapped explicitly.
+Source INTER2 uses the existing native interpolation primitive, retaining both
+slopes and positions; its fourteen 60-Hz ticks become seven 30-Hz ticks. An owned
+flag distinguishes its shrine-return countdown from original native reverse
+behaviour. No unsupported camera ID indexes the native camera directory.
+
+`tests/v3_holiday_demo_test.c` runs a focused sanitized sequence through all
+fourteen original dispatch modes, alternate announcement, speech, resume,
+rejected/successful return, native and added camera return, request bounds, and
+speech readers. Native I/O and callback tables are doubles. The current-cartridge
+check verifies all hooks, unchanged original tables and unrelated core bytes,
+code/state bounds, both packet references, startup CRC, and retained save/text
+resources. Current empty/mixed/all-191 browser/offline compositions agree.
+Native execution remains unverified; no emulator fixture is restarted. Actual
+transition read/commit, fading-title/Groundhog producers, and dedicated-owner
+dispatch must still be connected before admitting the imported events.
 
 ### Shared hourly activation and event-state lifetime
 
@@ -1422,8 +1458,8 @@ FlashRAM execution, and hardware are not verified. No native fixture is restarte
 
 ### Live providers and complete fishing dialogue
 
-The current ABI-335 proposal at `fishing-mail-installed-01/build-lock.json`
-installs the live providers and host bridge: 11,184 bytes at `80734000`, inside the existing
+The current ABI-337 proposal at `event-demo-installed-03/build-lock.json`
+retains the live providers and host/mail bridge: 13,808 bytes at `80734000`, inside the existing
 code reservation ending at `80737C00`. Its transient context occupies at most
 768 bytes at `80737CB0`, after the 176-byte saved wire block. The clip lifetime
 state reserves 64 bytes at `80737FB0`, without moving the outer guard.
@@ -1486,13 +1522,13 @@ Sanitized host checks cover lifetime ownership, native fallbacks, both units,
 record capture, message mapping, and name recovery. Current-cartridge checks
 cover all eight calls, relocation removal, complete retained host/text data,
 provider pointers, alias identity, and startup CRC. No native gameplay execution
-is claimed. Unit/calendar selection remains part of this same unfinished
+is claimed. Calendar selection remains part of this same unfinished
 category, with event admission still closed.
 
 ### Tournament winner mail
 
 The same provider module includes the complete winner-letter path and occupies
-13,776 bytes of its 15,360-byte reservation. `af_hf_records_enter` loads records
+13,808 bytes of its 15,360-byte reservation. `af_hf_records_enter` loads records
 without requiring a live event area or stall. Native notice completion at
 `800A67DC` calls the delivery wrapper, which retains the original `lbRTC_TimeCopy`
 and invokes mail processing only when fishing service bit 8 is admitted.

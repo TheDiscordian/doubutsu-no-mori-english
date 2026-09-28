@@ -91,6 +91,32 @@ static void source_random_top(void) {
     af_hf_live.event.size=af_hf_live_npc_size(12);
 }
 const AFHFClip af_hf_source_clip={source_message,source_random_top,af_hf_live_topname,af_hf_live_size};
+#ifdef AF_TEST_FISHING_UNITS
+static void measurement_cases(void) {
+    AFHFB number[16],saved[AF_HF_BYTES];
+    assert(af_hf_requested_units==AF_HF_INCHES);
+    af_holiday_fish_wire_reset(wire);memset(event,0,26);
+    assert(af_hf_live_enter() && af_hf_live.records.units==AF_HF_INCHES);
+    assert(af_hf_live_size(2)==21);
+    assert(af_hf_live_number(number,21,0x29E)==9 && !memcmp(number,"21 inches",9));
+    af_hf_live_leave();assert(wire[5]==AF_HF_INCHES);
+    /* A native tournament already in progress retains centimetres even when
+       its initial NPC score has no separate AFHF winner record. */
+    af_holiday_fish_wire_reset(wire);event[3]=64;
+    assert(af_hf_live_enter() && af_hf_live.records.units==AF_HF_CM);
+    assert(af_hf_live_number(number,64,0x29E)==5 && !memcmp(number,"64 cm",5));
+    AFHFPerson person;af_holiday_fish_native_person(&person,af_hf_native_player);
+    af_hf_live_record(&person,64);af_hf_live_leave();assert(wire[5]==AF_HF_CM);
+    memcpy(saved,wire,sizeof(saved));
+    /* A pending old winner prevents a new empty event from mixing units. */
+    memset(event,0,26);assert(af_hf_live_enter() && af_hf_live.records.units==AF_HF_CM);
+    af_hf_live_leave();assert(!memcmp(saved,wire,sizeof(saved)));
+    assert(af_holiday_fish_wire_clear_person(wire,af_hf_native_player));
+    assert(af_hf_live_enter() && af_hf_live.records.units==AF_HF_INCHES);
+    af_hf_live_leave();assert(wire[5]==AF_HF_INCHES);
+    puts("Tournament units: inches selected, existing event/records retained in centimetres, empty-event transition passes");
+}
+#endif
 #ifdef AF_TEST_FISHING_MAIL
 static void mail_cases(void);
 int main(int argc,char **argv) {
@@ -98,6 +124,9 @@ int main(int argc,char **argv) {
     assert(fread(af_mail_catalog_rom+0xA0000,1,326288,catalog)==326288);fclose(catalog);
 #else
 int main(void) {
+#endif
+#ifdef AF_TEST_FISHING_UNITS
+    measurement_cases();return 0;
 #endif
     af_holiday_fish_wire_reset(wire);
     memset(event+26,0xA5,6);assert(af_hf_live_enter());assert(!af_hf_live_enter());
@@ -125,7 +154,7 @@ int main(void) {
     af_hf_live.event.size=1;af_hf_live_leave();
     assert(!memcmp(old,wire,sizeof(old)) && !memcmp(old_event,event,32));fail_name=0;
     missing=1;assert(!af_hf_live_enter());missing=0;
-    af_holiday_fish_wire_reset(wire);wire[5]=AF_HF_INCHES;memset(event,0,26);
+    af_holiday_fish_wire_reset(wire);wire[5]=AF_HF_INCHES;memset(event,0,26);event[3]=21;
     assert(af_hf_live_enter());assert(af_hf_live_size(0)==9 && af_hf_live_size(2)==21);
     assert(af_hf_live_number(number,21,0x29E)==9 && !memcmp(number,"21 inches",9));
     assert(!af_hf_live_number(number,28,0x29E));af_hf_live_leave();
@@ -166,7 +195,7 @@ int main(void) {
         af_hf_live.records.fishRecord[i].pid.player_id==1)found++;
     assert(found==1);af_hf_live_leave();
     af_hf_native_clip->topname();assert(!memcmp(field[0],"Alex    ",8));
-    af_holiday_fish_wire_reset(wire);wire[5]=AF_HF_INCHES;memset(event,0,26);
+    af_holiday_fish_wire_reset(wire);wire[5]=AF_HF_INCHES;memset(event,0,26);event[3]=21;
     assert(af_hf_native_clip->size(2)==21);
     assert(af_hf_angler_number(number,21,0x29E)==9 && !memcmp(number,"21 inches",9));
     af_hf_native_clip->random_top();assert(event[3]>0 && event[3]<=27);

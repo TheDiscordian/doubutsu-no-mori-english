@@ -26,7 +26,7 @@ class HolidayFishingTests(unittest.TestCase):
         from v3_holiday_fishing import dialogue
         from v3_physical_resources import verify
         directory=ROOT/os.environ.get('V3_FISHING_LIVE_BUILD',
-            'build/v3-diary-category-work-01/fishing-mail-installed-01')
+            'build/v3-diary-category-work-01/fishing-measurements-installed-01')
         image,report=inputs(directory/'build-lock.json')
         base,prior=inputs(directory/'base-lock.json')
         equipment=report['equipment_resources'];fish=equipment['holiday_fishing']
@@ -121,13 +121,22 @@ class HolidayFishingTests(unittest.TestCase):
             self.assertTrue(mail['installed']);self.assertFalse(mail['enabled'])
             self.assertEqual(u32(core,hook['address']-CODE_RAM),hook['after'])
             self.assertEqual(hook['after'],0x0C000000|((sy['af_hf_mail_notice']>>2)&0x3FFFFFF))
-            self.assertEqual(u32(before[CODE_VROM].extract(base),hook['address']-CODE_RAM),hook['before'])
+            self.assertEqual(u32(before[CODE_VROM].extract(base),hook['address']-CODE_RAM),hook.get('previous',hook['before']))
             self.assertEqual([g['name'] for g in mail['groups']],['ftr_listLottery','ftr_listEvent'])
             self.assertEqual(len(mail['prizes']),103)
             self.assertEqual([r['template'] for r in mail['letters']],list(range(0x23E,0x242)))
             at=sy['af_hf_prizes']-packet['ram']
             self.assertEqual(struct.unpack_from('>103H',raw,at),tuple(r['item'] for r in mail['prizes']))
             self.assertEqual(files[0x30A0000].extract(image),before[0x30A0000].extract(base))
+        if 'measurement_choice' in live:
+            from v3_creature_choices import options,checksum_fields
+            row=live['measurement_choice']
+            self.assertEqual(u32(raw,row['ram']-packet['ram']),0)
+            self.assertEqual(row['values'],{'N64':0,'GameCube':1})
+            self.assertNotIn(row['id'],{r['id'] for r in options(image,report)})
+            checks=[r for r in checksum_fields(image,report) if r['start']==packet['physical']]
+            self.assertEqual(len(checks),1)
+            self.assertEqual(checks[0]['length'],packet['bytes'])
 
     def test_live_record_name_size_and_text_bridge(self):
         self.run_live(False)
@@ -135,10 +144,12 @@ class HolidayFishingTests(unittest.TestCase):
     def test_live_winner_mail_delivery(self):
         self.run_live(True)
 
-    def run_live(self,mail):
+    def test_live_measurement_selection_retains_existing_records(self):
+        self.run_live(False,units=True)
+
+    def run_live(self,mail,units=False):
         import json
-        prepared=ROOT/('build/v3-diary-category-work-01/fishing-mail-installed-01/fishing-mail' if mail else
-            'build/v3-diary-category-work-01/fishing-angler-installed-01/fishing-angler')
+        prepared=ROOT/'build/v3-diary-category-work-01/fishing-measurements-installed-01/fishing-measurements'
         report=json.loads((prepared/'prepared.json').read_bytes())
         self.assertEqual((report['text']['count'],report['text']['choice_count']),(74,7))
         self.assertEqual(len(report['text']['fish_messages']),40)
@@ -157,6 +168,7 @@ class HolidayFishingTests(unittest.TestCase):
                 'overlays/v3/holiday_fishing_angler.c','overlays/fishing/name.c',str(prepared/'legacy-names.c'),
                 'overlays/v3/diary_calendar.c',str(local),str(prepared/'text-map.c'),
                 '-o',str(out/'check')],[str(out/'check')]]
+            if units:commands[0][1:1]=['-DAF_TEST_FISHING_UNITS','-DAF_HF_UNITS=1']
             if mail:
                 from aflib import by_vrom
                 from v3_furniture_install import inputs

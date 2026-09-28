@@ -68,7 +68,8 @@ def compile_part(part, out, extra_sources=(), defines=(), primary_source=None, l
     run('objcopy', '-O', 'binary', '-j', '.text', '-j', '.rodata',
         *(['-j', '.fallbacks'] if part=='scenery_bootstrap' else []), 'code.elf', 'code.bin')
     code = (out / 'code.bin').read_bytes()
-    entry, expected = {'holiday_fishing_live': ('af_hf_live_enter', 0x80734000),
+    entry, expected = {'holiday_demo': ('af_holiday_demo_main', 0x806FE000),
+                      'holiday_fishing_live': ('af_hf_live_enter', 0x80734000),
                       'holiday_fishing': ('af_holiday_fish_reset', 0x80730000),
                       'holiday_pickup': ('af_holiday_pickup_try', 0x80707000),
                       'holiday_items': ('af_holiday_item_name', 0x80705600),
