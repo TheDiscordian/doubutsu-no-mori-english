@@ -1191,9 +1191,10 @@ destruction, and local interactions are installed through the shared lifecycle
 adapter below. Foreground mappings and radio effects are bound; the remaining
 interaction providers and activation are unfinished. Installed entries do not
 establish working decoration actors.
-The current proposal retains save format twelve and diary schema two. Compatible
-earlier saves migrate forward; V2 and format-eleven-or-earlier readers cannot
-load format-twelve saves. No profile bit, saved field, or patcher deployment changes.
+The current proposal uses save format thirteen and diary schema two, with the
+separate fishing block described below. Compatible earlier saves migrate forward;
+V2 and format-twelve-or-earlier readers cannot load new saves. No selection-profile
+bit or patcher deployment changes.
 
 `tools/v3_decoration_actor.py` follows the source call graph for every constructor,
 destructor, initializer, and actual movement callback. Its 70 complete functions
@@ -1378,6 +1379,47 @@ The same unfinished diary category still includes owner connections, native/sour
 ACTIVE resolution, scene-state services, actual attendance, and calendar choice.
 No native fixture is restarted, and the existing harness budget is retained.
 
+## Fishing records and connected storage
+
+`tools/v3_holiday_fishing.py` follows all local calls from nine record/size/date
+roots in the pinned donor `m_fishrecord.c`, retaining nineteen complete functions.
+The source holder, sorting, finalising, date comparisons, and random-size rules
+remain intact, including documented source quirks. Inches and centimetres are
+explicit state values; changing units with nonempty records rejects rather than
+silently reinterpreting saved measurements. Winner finalisation returns a delivery
+mask; acknowledgement removes a matching record only after actual mail succeeds.
+Native mail delivery and live actor/text providers remain unfinished.
+
+The `AFHF` version-one wire block is 176 bytes: a sixteen-byte header followed
+by five thirty-two-byte records. Header bytes 4–7 are version, units, count (5),
+and stride (32); bytes 8–15 are reserved zero. Each record contains an eight-byte
+player name, eight-byte town name, two big-endian sixteen-bit identity numbers,
+eight RTC bytes, and a big-endian signed size. Empty records are entirely zero.
+Native sixteen-byte personal identities are expanded explicitly, never cast onto
+twenty-byte source identities. Record validation checks dates, units, and size.
+
+ABI 332 at `fishing-storage-installed-04/build-lock.json` installs 15,488 bytes
+of core/storage code at `80730000`, with the live wire block at `80737C00`.
+The existing holiday startup descriptor loads the retained 240-KiB prefix plus
+the 32-KiB extension. All 28 original diary and directly linked holiday storage
+entries redirect to the new implementation, preserving caller addresses and
+every other prefix byte. Controller refresh preserves the appended fishing
+region, its guards, and both reports' packet references. The expanded-save
+workspace grows by 176 bytes; diary/page offsets and selection profiles do not.
+
+Save/reset, town migration, player deletion, decode validation, and diary edit
+capacity checks include the fishing snapshot. Legacy formats eleven/twelve are
+checked at their original stored length and CRC before empty fishing records are
+initialised. Format thirteen validates the entire diary-plus-fishing block before
+committing live state. Both native save-bank sizes remain unchanged.
+
+Two sanitized source/lifecycle and connected storage/migration checks pass.
+Current-cartridge checks cover redirects, complete prefix retention, guards,
+scratch bounds, and startup transfer/CRC. The refresh check exercises the actual
+installer using the retained compiled controller. Empty/mixed/all-191 browser
+and offline outputs agree. Native I/O is doubled; native fishing gameplay,
+FlashRAM execution, and hardware are not verified. No native fixture is restarted.
+
 ## Serialized diary state
 
 `AFDiary` is a 48,048-byte, endian-independent byte array:
@@ -1407,26 +1449,27 @@ New towns/reset initialize all pages to spaces. All covers access the same data.
 
 The optional `AF_V3_DIARY_STORAGE` build extends the shared compressor, retaining
 its old API for console-only envelopes. `AF_V3_HOLIDAY_STORAGE` writes format
-twelve with schema two. The payload contains:
+twelve with schema two; `AF_V3_FISHING_STORAGE` writes format thirteen. The payload contains:
 
 - The complete canonical format-eight, registry-five town: 65,536 bytes.
 - All four existing console records: 6,528 bytes.
 - The complete diary state: 48,048 bytes.
+- With fishing storage, the complete five-record block: 176 bytes.
 
-Decoded size is **120,112 bytes**. Stored size remains one 65,536-byte bank;
+Decoded size is **120,288 bytes** with fishing, or 120,112 without it. Stored size remains one 65,536-byte bank;
 both independent FlashRAM banks remain. The existing stream area, town header,
 town-ID mirror, native checksum, disk CRC, canonical CRC, and console CRC remain.
 Envelope word `F9A4` (header offset 36) contains the diary CRC in formats eleven
-and twelve; earlier envelopes retain zero there. Both require canonical format
+and twelve, and the diary-plus-fishing CRC in thirteen; earlier envelopes retain zero there. These require canonical format
 eight/registry five and the exact expanded size. Format eleven requires schema
-one; format twelve requires schema two. Unknown
+one; formats twelve and thirteen require schema two. Unknown
 formats, corrupted streams, padding, lengths, and checksum failures reject.
 
 `af_v3_save_expand_diary` reads existing supported compressed formats and
 initializes diary state when absent. Format-eleven migration validates all CRCs
 before upgrading the existing diary header, retaining pages and console progress.
 The canonical decoder still validates/migrates the complete town/profile.
-**New saves require this or a newer compatible V3 build; V2 and format-eleven-or-
+**New saves require this or a newer compatible V3 build; V2 and format-twelve-or-
 earlier V3 cannot load them. Preserve backups.** Only the experimental
 cartridge uses this format; the stable deployments and user's saves are untouched.
 
@@ -1456,8 +1499,9 @@ These are installed guarded allocations:
 | --- | ---: | --- |
 | `80670000` | `6000` hex, including end guard | Retained code and stable redirected entries |
 | `80676000` | 48,048 + 16 | Live diary state and guard |
-| `80682000` | 120,112 + 16 | Expanded save workspace and guard |
+| `80682000` | 120,288 + 16 | Expanded save workspace and guard |
 | `806F4000` | `8000` hex, including end guard | Holiday state, updated storage, and linked NPC lifecycle |
+| `80730000` | `8000` hex, including end guard | Fishing core/storage code and live records |
 
 The existing console records and compression hash workspace retain their
 allocations. The old decode buffer is not grown into neighbouring console/model

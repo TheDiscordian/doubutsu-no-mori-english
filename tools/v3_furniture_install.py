@@ -744,6 +744,10 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             import v3_holiday_items as equipment
             equipment_report,owner_changes,report_updates,physical_writes=equipment.install_pickup(
                 base,prior,blob,core,output)
+        elif not prior['equipment_resources'].get('holiday_fishing'):
+            import v3_holiday_fishing as equipment
+            equipment_report,owner_changes,report_updates,physical_writes=equipment.install(
+                base,prior,blob,core,output)
         else:
             import v3_holiday_motion as equipment
             equipment_report,owner_changes,report_updates,physical_writes=equipment.install(
@@ -1455,10 +1459,11 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         state_growth=(holiday_state['packet']['bytes']-
             prior['equipment_resources'].get('holiday_state',{}).get('packet',{}).get('bytes',0)) if holiday_state else 0
         event_items=equipment_report.get('holiday_items') and not prior['equipment_resources'].get('holiday_items')
+        fishing=equipment_report.get('holiday_fishing') and not prior['equipment_resources'].get('holiday_fishing')
         report['shared_runtime_refresh'].update(adapters=['holiday_actor_services'],artwork_changed=bool(decorations or event_items),
-            additional_resident_bytes=state_growth,
-            resource_allocations_changed=bool(new_state or npc['events'].get('reserved')),
-            saved_format_changed=bool(new_state),saved_profile_changed=False)
+            additional_resident_bytes=state_growth+(176 if fishing else 0),
+            resource_allocations_changed=bool(new_state or fishing or npc['events'].get('reserved')),
+            saved_format_changed=bool(new_state or fishing),saved_profile_changed=False)
         report['sources'].update(npc['sources'])
         report['native_test']=('pending dedicated/costume/exercise owners, calendar behaviour choice, actor activation, '
             'and connected diary gameplay/save verification' if holiday_state else

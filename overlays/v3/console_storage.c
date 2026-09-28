@@ -5,6 +5,9 @@ typedef af_save_u32 u32;
 typedef __UINTPTR_TYPE__ address;
 #define MAGIC 0x41464335u
 #define GUARD 0xAF4355DEu
+#ifdef AF_V3_FISHING_STORAGE
+extern u8 af_v3_fishing_state[AF_HF_BYTES];
+#endif
 #ifdef __mips__
 #define storage ((struct AFConsoleStorage *)0x804DC800u)
 #ifdef AF_V3_DIARY_STORAGE
@@ -71,6 +74,9 @@ static int external(const void *p,u32 n) {
 #ifdef AF_V3_DIARY_STORAGE
         && separate(p,n,diary,AF_DIARY_BYTES+16)
 #endif
+#ifdef AF_V3_FISHING_STORAGE
+        && separate(p,n,af_v3_fishing_state,AF_HF_BYTES)
+#endif
         ;
 }
 static int guards(void) {
@@ -84,6 +90,9 @@ static int guards(void) {
 #ifdef AF_V3_DIARY_STORAGE
     if(!af_diary_valid(diary))return 0;
 #endif
+#ifdef AF_V3_FISHING_STORAGE
+    if(!af_holiday_fish_wire_valid(af_v3_fishing_state))return 0;
+#endif
     return 1;
 }
 void af_v3_console_storage_reset(void) {
@@ -92,6 +101,9 @@ void af_v3_console_storage_reset(void) {
 #ifdef AF_V3_DIARY_STORAGE
     af_diary_reset(diary);
     for(u32 i=0;i<4;i++)diary_guard[i]=GUARD;
+#endif
+#ifdef AF_V3_FISHING_STORAGE
+    af_holiday_fish_wire_reset(af_v3_fishing_state);
 #endif
 }
 int af_v3_console_storage_valid(void) {return guards() && !storage->busy;}
@@ -117,11 +129,18 @@ static int expand(const u8 *bank,const u8 **logical) {
         || version==0x000B0680
 #ifdef AF_V3_HOLIDAY_STORAGE
         || version==0x000C0680
+#ifdef AF_V3_FISHING_STORAGE
+        || version==0x000D0680
+#endif
 #endif
 #endif
         )) {
 #ifdef AF_V3_DIARY_STORAGE
+#ifdef AF_V3_FISHING_STORAGE
+        int result=af_v3_save_expand_fishing(bank,AF_SAVE_BANK,scratch,AF_CONSOLE_RAW);
+#else
         int result=af_v3_save_expand_diary(bank,AF_SAVE_BANK,scratch,AF_CONSOLE_RAW);
+#endif
 #else
         int result=af_v3_save_expand(bank,AF_SAVE_BANK,scratch,AF_CZ_RAW);
 #endif
@@ -156,8 +175,16 @@ int af_v3_save_pack(u8 *bank,u32 size,const u8 *state) {
     AFDiary *candidate=(AFDiary *)(scratch+AF_CZ_RAW);
     if(storage->ready && storage->town!=id)af_diary_reset(candidate);
     else copy((u8 *)candidate,(const u8 *)diary,AF_DIARY_BYTES);
+#ifdef AF_V3_FISHING_STORAGE
+    u8 *fishing=scratch+AF_CZ_RAW+AF_DIARY_BYTES;
+    if(storage->ready && storage->town!=id)af_holiday_fish_wire_reset(fishing);
+    else copy(fishing,af_v3_fishing_state,AF_HF_BYTES);
+    result=af_v3_save_compress_fishing(bank,AF_SAVE_BANK,scratch,AF_CZ_BANK,
+        scratch+AF_CZ_BANK,AF_CZ_CONSOLE,(const u8 *)candidate,hash,AF_CZ_WORK_BYTES);
+#else
     result=af_v3_save_compress_diary(bank,AF_SAVE_BANK,scratch,AF_CZ_BANK,
         scratch+AF_CZ_BANK,AF_CZ_CONSOLE,candidate,hash,AF_CZ_WORK_BYTES);
+#endif
 #else
     result=af_v3_save_compress(bank,AF_SAVE_BANK,scratch,AF_CZ_BANK,
         scratch+AF_CZ_BANK,AF_CZ_CONSOLE,hash,AF_CZ_WORK_BYTES);
@@ -167,6 +194,9 @@ int af_v3_save_pack(u8 *bank,u32 size,const u8 *state) {
     copy(storage->players,scratch+AF_CZ_BANK,AF_CZ_CONSOLE);
 #ifdef AF_V3_DIARY_STORAGE
     copy((u8 *)diary,scratch+AF_CZ_RAW,AF_DIARY_BYTES);
+#endif
+#ifdef AF_V3_FISHING_STORAGE
+    copy(af_v3_fishing_state,scratch+AF_CZ_RAW+AF_DIARY_BYTES,AF_HF_BYTES);
 #endif
     storage->town=id;storage->ready=1;
     return leave(AF_SAVE_OK);
@@ -190,6 +220,10 @@ int af_v3_console_storage_commit(const u8 *bank,const u8 *profile,u8 *state,cons
     if(decoded==scratch)copy((u8 *)diary,scratch+AF_CZ_RAW,AF_DIARY_BYTES);
     else af_diary_reset(diary);
 #endif
+#ifdef AF_V3_FISHING_STORAGE
+    if(decoded==scratch)copy(af_v3_fishing_state,scratch+AF_CZ_RAW+AF_DIARY_BYTES,AF_HF_BYTES);
+    else af_holiday_fish_wire_reset(af_v3_fishing_state);
+#endif
     storage->town=town(decoded);storage->ready=1;*logical=decoded;
     return leave(result);
 }
@@ -199,6 +233,9 @@ u8 *af_v3_console_player_data(void) {
 }
 #ifdef AF_V3_DIARY_STORAGE
 AFDiary *af_v3_diary_data(void) {af_v3_require_save_state();return diary;}
+#ifdef AF_V3_FISHING_STORAGE
+u8 *af_v3_fishing_data(void) {af_v3_require_save_state();return af_v3_fishing_state;}
+#endif
 int af_v3_diary_measure(const u8 *bank,const u8 *state,const AFDiary *candidate) {
     if(!external(bank,AF_SAVE_BANK) || !external(state,AF_SAVE_STATE) ||
        !external(candidate,AF_DIARY_BYTES) || !af_diary_valid(candidate) ||
@@ -209,8 +246,15 @@ int af_v3_diary_measure(const u8 *bank,const u8 *state,const AFDiary *candidate)
     int result=canonical_pack(scratch,AF_SAVE_BANK,state);
     if(result!=AF_SAVE_OK)return leave(result);
     if(storage->ready && storage->town!=town(scratch))return leave(AF_SAVE_BINDING);
+#ifdef AF_V3_FISHING_STORAGE
+    copy(scratch+AF_CZ_RAW,(const u8 *)candidate,AF_DIARY_BYTES);
+    copy(scratch+AF_CZ_RAW+AF_DIARY_BYTES,af_v3_fishing_state,AF_HF_BYTES);
+    result=af_v3_save_measure_fishing(scratch,AF_CZ_BANK,storage->players,AF_CZ_CONSOLE,
+        scratch+AF_CZ_RAW,hash,AF_CZ_WORK_BYTES);
+#else
     result=af_v3_save_measure_diary(scratch,AF_CZ_BANK,storage->players,AF_CZ_CONSOLE,
         candidate,hash,AF_CZ_WORK_BYTES);
+#endif
     if(result==AF_CZ_SPACE)result=AF_SAVE_CAPACITY;
     else if(result<0)result=AF_SAVE_ARGUMENT;
     return leave(result);
@@ -227,6 +271,9 @@ void af_v3_console_player_clear(u8 *player) {
 #ifdef AF_V3_CREATURE_PROFILE
         extern void af_v3_creature_player_clear(u32);
         af_v3_creature_player_clear(slot);
+#endif
+#ifdef AF_V3_FISHING_STORAGE
+        if(!af_holiday_fish_wire_clear_person(af_v3_fishing_state,player))af_v3_save_halt(AF_SAVE_ARGUMENT);
 #endif
     }
     original_clear(player);

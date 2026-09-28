@@ -235,8 +235,8 @@ cartridge check and empty/mixed/all-supported browser comparison pass; the
 readiness mask stays zero and save/profile data is unchanged. Reuse the prepared
 batch at `build/v3-diary-category-work-01/event-items-prepared-03/`.
 
-The current proposal is ABI 331 at
-`build/v3-diary-category-work-01/event-pickup-installed-02/build-lock.json`.
+The current proposal is ABI 332 at
+`build/v3-diary-category-work-01/fishing-storage-installed-04/build-lock.json`.
 Harvest pickup connects the native ordinary-item search boundary `808BC1E0`,
 action-31 animation, and actual pocket insertion to the source removal counter.
 Full-pocket refusal retains the native animation and official donor message;
@@ -247,10 +247,17 @@ Empty/mixed/all-supported browser/offline composition passes. These connections
 stay installed; native gameplay and service admission are still unfinished.
 Reuse the [carried-item contract](../specs/V3_DIARIES.md#carried-event-items-and-player-connection).
 
-Next connect normalized fishing records and all forty message identities,
+The five-record fishing core and full save integration are installed, with
+28 stable-entry redirects and a retained 272-KiB startup packet. Host migration,
+capacity, player deletion, source lifecycle, current-cartridge connections, and
+current controller-refresh retention pass; native I/O remains doubled. New
+format-13 saves are not readable by V2 or format-12-or-earlier V3. Compatible
+older saves migrate forward, retaining town, console, and diary data.
+
+Next connect the actual fishing actor/record/name/size consumers and all forty message identities,
 exercise-card menu/state handling, and profile/save admission within this same
-task. The five-record fishing lifecycle includes holder selection, name/size
-display, and saved records; source inches and native centimetres require the
+task. Complete winner-mail delivery through the source record acknowledgement
+path. Source inches and native centimetres require the
 behaviour choice, not a silent conversion of saved values. The countdown's
 shared clip and both controllers are installed; retain them while connecting
 event activation. Native/source saved personal IDs differ (16 versus 20 bytes);

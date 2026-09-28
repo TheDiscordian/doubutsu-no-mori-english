@@ -31,9 +31,9 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
-The current proposal is ABI 331 at
-`build/v3-diary-category-work-01/event-pickup-installed-02/build-lock.json`, ROM SHA-256
-`d86387a198d37c9082cd264f03b18047bc79308aec6fc881e88db62d58ecccd6`.
+The current proposal is ABI 332 at
+`build/v3-diary-category-work-01/fishing-storage-installed-04/build-lock.json`, ROM SHA-256
+`f5ed27cd238f2236e36e8f4b2855a9558ece3bc0f8ddcef3768044dce91ace5f`.
 It contains 191 independently selectable development imports, including all nine
 fish and eight insects, and 100 inactive furniture profiles whose acquisition
 is pending, plus sixteen inactive diary cover profiles. The main lock and both
@@ -48,7 +48,7 @@ cleanup hooks preserve the NPC/balloon/campsite/original actor chains. Additive
 names `5F00..5F11` and profiles `CE..D8` are fixed independently of selections.
 The source controllers retain native actor layout and deletion semantics.
 
-The guarded holiday packet is 240 KiB. Its existing startup descriptor loads the
+The guarded holiday packet is 272 KiB. Its existing startup descriptor loads the
 10,952-byte lifecycle module and 1,536 bytes of owned state/profiles alongside the
 retained renderer, collision routines, binding directory, and complete artwork.
 No graphics are reconverted. Ordinary/scripted acre-transition predicates have
@@ -97,6 +97,22 @@ and unchanged save/profile data. Empty/mixed/all-191 browser/offline outputs agr
 Existing carried-item resource checks are retained, not replayed. No native
 fixture is restarted, and pickup gameplay has not been executed.
 
+The complete five-record fishing core and save integration are installed. The
+15,488-byte module includes the donor's holder, size, date, sorting, and finalising
+rules. A separate 176-byte record block preserves full eight-character identities
+without changing diary/page offsets. All 28 original/direct storage entry points
+reach the new code; player deletion, capacity checks, migration, and town changes
+include the records. Controller refreshes preserve this appended module and both
+packet references. Actual fishing actor/name/text consumers, winner-mail delivery,
+the measurement/calendar choices, and event activation remain unfinished.
+
+Two sanitized host checks, the current-cartridge/storage/startup check, and a
+current-packet controller-refresh check pass. Empty/mixed/all-191 browser/offline
+outputs agree. Native I/O is doubled; no native gameplay or FlashRAM execution is
+claimed. **New experimental saves use format 13. Compatible older saves migrate
+forward, but V2 and format-12-or-earlier V3 cannot load newly written saves.**
+Existing saves and both deployed patchers are untouched.
+
 The right fireworks stall uses the checked seven-entry projection bound. The
 renderer retains both donor shadow passes, independently selected digit textures,
 scrolling, joint colours, and frame-phase updates. Fishing-record/text consumers,
@@ -133,9 +149,9 @@ playable diary is claimed. Remaining work is the actual identity/scene-state/
 gate/climate/rhythm providers, alternate announcement lifecycle, live owner
 dispatch, event actors, and calendar choice. See the
 [transition contract](../specs/V3_DIARIES.md#shared-transition-and-native-scene-bridge).
-Format-twelve/profile compatibility is unchanged from ABI 322; native reload
-is not newly verified. Existing saves/builds and the native test budget are
-preserved. V2 and format-eleven-or-earlier V3 cannot load new format-twelve saves.
+Selection profiles are unchanged; the current format-13 compatibility boundary
+is stated above. Native reload is not newly verified. Existing saves/builds and
+the native test budget are preserved.
 
 The complete dedicated-owner code, native primitive adapter, and all shared
 event layouts are installed in the existing holiday packet. The placement
@@ -198,9 +214,9 @@ card conversation remain required. Installed code is not
 a claim that Tortimer or any diary is playable.
 
 The shared holiday state occupies the versioned diary header without moving any
-calendar or page. Format-12 saves preserve the full town, four players' console
+calendar or page. Current saves preserve the full town, four players' console
 progress, and all 48 pages. Compatible old saves migrate forward, including
-format eleven; V2 and format-eleven-or-earlier V3 cannot load new saves. Existing
+formats eleven and twelve; earlier readers cannot load new format-13 saves. Existing
 ROMs/saves and both stable patchers remain untouched. A sanitized connected host
 check covers actual edit/preflight, save/reload, migration, rejection by the old
 reader, date/quest state, and the calendar caller through actual planning/native

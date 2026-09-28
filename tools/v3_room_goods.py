@@ -300,6 +300,7 @@ def publish_bootstrap(equipment,blob,surface,output):
             (('PHYSICAL','physical'),('CRC','crc32'),('BYTES','bytes'),('RAM','ram')))
         extra+=(f'AF_NPC_EXTRA_INIT=0x{npc_extra["code"]["symbols"]["af_v3_npc_dma_init"]:X}u',)
     holiday_state=equipment.get('holiday_state')
+    fishing=equipment.get('holiday_fishing')
     if holiday_state:
         from v3_holiday_state import RAM as HOLIDAY_RAM,SIZE as HOLIDAY_SIZE
         p=holiday_state['packet']
@@ -334,11 +335,18 @@ def publish_bootstrap(equipment,blob,surface,output):
                         not 0<controllers['loaded_code']['bytes']<=ACTOR_END-ACTOR_RAM-16 or
                         controllers['data']['ram']!=CONTEXT or controllers['data']['bytes']!=DATA_END-CONTEXT or
                         ACTOR_RAM!=DRAW_END or controllers['original_packet']['bytes']!=size or
-                        p['id']!='holiday-decoration-actors-GAFE01-r0'):
+                        p['id']!=('holiday-fishing-GAFE01-r0' if fishing else 'holiday-decoration-actors-GAFE01-r0')):
                         raise ValueError('Changed complete decoration controller loading contract')
                     size=controllers['packet_bytes']
             elif p['id']!='holiday-transition-GAFE01-r0':
                 raise ValueError('Changed scene-transition physical identity')
+        if fishing:
+            from v3_holiday_fishing import RAM as FISHING_RAM,SIZE as FISHING_SIZE
+            if (not fishing.get('storage_installed') or fishing['packet']!=p or
+                    fishing['preserved_prefix_bytes']!=size or HOLIDAY_RAM+size!=FISHING_RAM or
+                    p['bytes']!=size+FISHING_SIZE or fishing['loaded_code']['ram']!=FISHING_RAM):
+                raise ValueError('Changed combined fishing startup packet')
+            size=p['bytes']
         if (not npc_extra or p['ram']!=HOLIDAY_RAM or p['bytes']!=size or p['physical']&15 or
                 p['storage']!='physical-ROM' or not 0x100000<=p['physical']<p['physical']+p['bytes']<=0x4000000):
             raise ValueError('Changed complete holiday-state startup packet')
@@ -371,3 +379,4 @@ def publish_bootstrap(equipment,blob,surface,output):
     if diaries:diaries['startup']=copy.deepcopy(goods['startup'])
     if npc_extra:npc_extra['startup']=copy.deepcopy(goods['startup'])
     if holiday_state:holiday_state['startup']=copy.deepcopy(goods['startup'])
+    if fishing:fishing['startup']=copy.deepcopy(goods['startup'])

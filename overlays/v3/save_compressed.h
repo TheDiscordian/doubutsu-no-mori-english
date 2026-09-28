@@ -46,5 +46,18 @@ int af_v3_save_measure_diary(const unsigned char *canonical,unsigned int canonic
     unsigned int *hash,unsigned int hash_bytes);
 int af_v3_save_expand_diary(const unsigned char *bank,unsigned int bank_bytes,
     unsigned char *scratch,unsigned int scratch_bytes);
+#ifdef AF_V3_FISHING_STORAGE
+#include "holiday_fishing.h"
+enum { AF_CZ_FISHING_EXTRA=AF_DIARY_BYTES+AF_HF_BYTES,
+       AF_CZ_FISHING_RAW=AF_CZ_RAW+AF_CZ_FISHING_EXTRA };
+/* Format thirteen appends a validated 176-byte AFHF record set after the
+ * unchanged diary. Extended inputs have AF_CZ_FISHING_EXTRA bytes; a plain
+ * AFDiary pointer is insufficient. Older envelopes acquire empty records. */
+int af_v3_save_compress_fishing(unsigned char *,unsigned int,const unsigned char *,unsigned int,
+    const unsigned char *,unsigned int,const unsigned char *,unsigned int *,unsigned int);
+int af_v3_save_measure_fishing(const unsigned char *,unsigned int,const unsigned char *,unsigned int,
+    const unsigned char *,unsigned int *,unsigned int);
+int af_v3_save_expand_fishing(const unsigned char *,unsigned int,unsigned char *,unsigned int);
+#endif
 #endif
 #endif

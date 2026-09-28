@@ -108,14 +108,19 @@ static int compress(u8 *bank,u32 bank_bytes,const u8 *canonical,u32 canonical_by
     const u32 sizes[5]={AF_CZ_BANK,AF_CZ_BANK,AF_CZ_CONSOLE,AF_CZ_WORK_BYTES,extra_bytes};
     const struct Input input={canonical,console,extra,extra_bytes};
     u32 i,j,checksum;int length;
-    if((!bank && !measure) || !canonical || !console || !hash || bank_bytes!=AF_CZ_BANK ||
+    if((!bank && !measure) || !canonical || !console || !hash || (extra_bytes && !extra) || bank_bytes!=AF_CZ_BANK ||
        canonical_bytes!=AF_CZ_BANK || console_bytes!=AF_CZ_CONSOLE ||
        hash_bytes!=AF_CZ_WORK_BYTES || ((address)hash&3))return AF_CZ_ARGUMENT;
     for(i=measure?1:0;i<(extra_bytes?5u:4u);i++)for(j=measure?1:0;j<i;j++)
         if(!disjoint(buffers[i],sizes[i],buffers[j],sizes[j]))return AF_CZ_ARGUMENT;
     if(!canonical_valid(canonical))return AF_CZ_FORMAT;
 #ifdef AF_V3_DIARY_STORAGE
-    if(extra_bytes && (extra_bytes!=AF_DIARY_BYTES || !af_diary_valid((const AFDiary *)extra) ||
+    int valid_extra=extra_bytes==AF_DIARY_BYTES;
+#ifdef AF_V3_FISHING_STORAGE
+    valid_extra |= extra_bytes==AF_CZ_FISHING_EXTRA;
+    if(extra_bytes==AF_CZ_FISHING_EXTRA && !af_holiday_fish_wire_valid(extra+AF_DIARY_BYTES))return AF_CZ_FORMAT;
+#endif
+    if(extra_bytes && (!valid_extra || !af_diary_valid((const AFDiary *)extra) ||
         word(canonical+PAYLOAD+4)!=0x00080680 || word(canonical+PAYLOAD+8)!=5))return AF_CZ_FORMAT;
 #ifdef AF_V3_HOLIDAY_STORAGE
     if(extra_bytes && extra[5]!=2)return AF_CZ_FORMAT;
@@ -135,6 +140,9 @@ static int compress(u8 *bank,u32 bank_bytes,const u8 *canonical,u32 canonical_by
 #else
     put(bank+PAYLOAD+4,extra_bytes?0x000B0680:word(canonical+PAYLOAD+4)+0x10000u);
 #endif
+#ifdef AF_V3_FISHING_STORAGE
+    if(extra_bytes==AF_CZ_FISHING_EXTRA)put(bank+PAYLOAD+4,0x000D0680);
+#endif
     put(bank+PAYLOAD+8,word(canonical+PAYLOAD+8));put(bank+PAYLOAD+12,AF_CZ_RAW+extra_bytes);
     put(bank+PAYLOAD+16,(u32)length);put(bank+PAYLOAD+20,1);
     put(bank+PAYLOAD+28,crc(canonical,AF_CZ_BANK,AF_CZ_BANK,0));
@@ -152,7 +160,7 @@ int af_v3_save_compress(u8 *bank,u32 bank_bytes,const u8 *canonical,u32 canonica
 }
 
 static int expand(const u8 *bank,u32 bank_bytes,u8 *scratch,u32 scratch_bytes,u32 extra_bytes) {
-    const u8 *e;u32 length,i,at=0,out=0,total,extended=0;
+    const u8 *e;u32 length,i,at=0,out=0,total,extended=0,stored_extra=0;
     if(!bank || !scratch || bank_bytes!=AF_CZ_BANK || scratch_bytes!=AF_CZ_RAW+extra_bytes ||
        !disjoint(bank,AF_CZ_BANK,scratch,scratch_bytes))return AF_CZ_ARGUMENT;
     e=bank+PAYLOAD;length=word(e+16);
@@ -164,13 +172,23 @@ static int expand(const u8 *bank,u32 bank_bytes,u8 *scratch,u32 scratch_bytes,u3
     version |= word(e+4)==0x00090680 && word(e+8)==5;
 #endif
 #ifdef AF_V3_DIARY_STORAGE
-    extended=extra_bytes==AF_DIARY_BYTES && word(e+4)==0x000B0680 && word(e+8)==5;
+    int diary_capacity=extra_bytes==AF_DIARY_BYTES;
+#ifdef AF_V3_FISHING_STORAGE
+    diary_capacity |= extra_bytes==AF_CZ_FISHING_EXTRA;
+#endif
+    extended=diary_capacity && word(e+4)==0x000B0680 && word(e+8)==5;
 #ifdef AF_V3_HOLIDAY_STORAGE
-    extended |= extra_bytes==AF_DIARY_BYTES && word(e+4)==0x000C0680 && word(e+8)==5;
+    extended |= diary_capacity && word(e+4)==0x000C0680 && word(e+8)==5;
+#endif
+    if(extended)stored_extra=AF_DIARY_BYTES;
+#ifdef AF_V3_FISHING_STORAGE
+    if(extra_bytes==AF_CZ_FISHING_EXTRA && word(e+4)==0x000D0680 && word(e+8)==5) {
+        extended=1;stored_extra=AF_CZ_FISHING_EXTRA;
+    }
 #endif
     version |= extended;
 #endif
-    total=AF_CZ_RAW+(extended?extra_bytes:0);
+    total=AF_CZ_RAW+stored_extra;
     if(!town(bank) || word(e)!=0x41465333 || !version ||
        word(e+12)!=total || !length || length>CAPACITY ||
        word(e+20)!=1 || (!extended && word(e+36)))return AF_CZ_FORMAT;
@@ -212,13 +230,21 @@ static int expand(const u8 *bank,u32 bank_bytes,u8 *scratch,u32 scratch_bytes,u3
     for(i=0;i<START;i++)if(i!=0x12 && i!=0x13 && scratch[i]!=bank[i])return AF_CZ_FORMAT;
 #ifdef AF_V3_DIARY_STORAGE
     if(extended) {
-        if(crc(scratch+AF_CZ_RAW,extra_bytes,extra_bytes,0)!=word(e+36))return AF_CZ_CHECKSUM;
+        if(crc(scratch+AF_CZ_RAW,stored_extra,stored_extra,0)!=word(e+36))return AF_CZ_CHECKSUM;
         if(!af_diary_valid((const AFDiary *)(scratch+AF_CZ_RAW)))return AF_CZ_FORMAT;
 #ifdef AF_V3_HOLIDAY_STORAGE
         if(scratch[AF_CZ_RAW+5]!=(word(e+4)==0x000B0680?1:2))return AF_CZ_FORMAT;
         if(af_diary_upgrade((AFDiary *)(scratch+AF_CZ_RAW))!=AF_DIARY_OK)return AF_CZ_FORMAT;
 #endif
     } else if(extra_bytes)af_diary_reset((AFDiary *)(scratch+AF_CZ_RAW));
+#ifdef AF_V3_FISHING_STORAGE
+    if(extra_bytes==AF_CZ_FISHING_EXTRA) {
+        u8 *fish=scratch+AF_CZ_RAW+AF_DIARY_BYTES;
+        if(stored_extra==AF_CZ_FISHING_EXTRA) {
+            if(!af_holiday_fish_wire_valid(fish))return AF_CZ_FORMAT;
+        } else af_holiday_fish_wire_reset(fish);
+    }
+#endif
 #endif
     return 0;
 }
@@ -240,4 +266,19 @@ int af_v3_save_measure_diary(const u8 *canonical,u32 canonical_bytes,const u8 *c
 int af_v3_save_expand_diary(const u8 *bank,u32 bank_bytes,u8 *scratch,u32 scratch_bytes) {
     return expand(bank,bank_bytes,scratch,scratch_bytes,AF_DIARY_BYTES);
 }
+#ifdef AF_V3_FISHING_STORAGE
+int af_v3_save_compress_fishing(u8 *bank,u32 bank_bytes,const u8 *canonical,u32 canonical_bytes,
+    const u8 *console,u32 console_bytes,const u8 *extended,u32 *hash,u32 hash_bytes) {
+    return compress(bank,bank_bytes,canonical,canonical_bytes,console,console_bytes,
+        extended,AF_CZ_FISHING_EXTRA,hash,hash_bytes,0);
+}
+int af_v3_save_measure_fishing(const u8 *canonical,u32 canonical_bytes,const u8 *console,u32 console_bytes,
+    const u8 *extended,u32 *hash,u32 hash_bytes) {
+    return compress(0,AF_CZ_BANK,canonical,canonical_bytes,console,console_bytes,
+        extended,AF_CZ_FISHING_EXTRA,hash,hash_bytes,1);
+}
+int af_v3_save_expand_fishing(const u8 *bank,u32 bank_bytes,u8 *scratch,u32 scratch_bytes) {
+    return expand(bank,bank_bytes,scratch,scratch_bytes,AF_CZ_FISHING_EXTRA);
+}
+#endif
 #endif

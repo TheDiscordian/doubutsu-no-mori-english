@@ -3,7 +3,12 @@
 #include "save_codec.h"
 #include "save_compressed.h"
 #ifdef AF_V3_DIARY_STORAGE
+#ifdef AF_V3_FISHING_STORAGE
+#define AF_CONSOLE_RAW AF_CZ_FISHING_RAW
+unsigned char *af_v3_fishing_data(void);
+#else
 #define AF_CONSOLE_RAW AF_CZ_DIARY_RAW
+#endif
 AFDiary *af_v3_diary_data(void);
 int af_v3_diary_measure(const af_save_u8 *bank,const af_save_u8 *state,const AFDiary *candidate);
 int af_v3_diary_preflight(const AFDiary *candidate);

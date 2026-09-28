@@ -369,13 +369,28 @@ def install(base, prior, output):
         raise ValueError('Complete decoration controllers overlap retained reserved RAM')
     old = equipment['holiday_state']['packet']
     prefix = base[old['physical']:old['physical']+old['bytes']]
-    if (old['ram']!=STATE_RAM or STATE_RAM+len(prefix)!=(END if installed else RAM) or
-            sha256(prefix)!=old['sha256'] or prefix[-16:]!=GUARD):
+    fishing = equipment.get('holiday_fishing')
+    packet_end, packet_guard = END if installed else RAM, GUARD
+    if fishing:
+        from v3_holiday_fishing import RAM as FISH_RAM, SIZE as FISH_SIZE, GUARD as FISH_GUARD
+        if (not installed or not fishing['storage_installed'] or fishing['packet']!=old or
+                fishing['preserved_prefix_bytes']!=END-STATE_RAM or FISH_RAM!=END or
+                old['id']!='holiday-fishing-GAFE01-r0'):
+            raise ValueError('Changed appended fishing storage owner')
+        packet_end, packet_guard = FISH_RAM+FISH_SIZE, FISH_GUARD
+        row=fishing['loaded_code'];at=row['ram']-STATE_RAM
+        if (row['ram']!=FISH_RAM or not 0<row['bytes']<=fishing['memory']['code']['bytes'] or
+                sha256(prefix[at:at+row['bytes']])!=row['sha256']):
+            raise ValueError('Changed appended fishing storage code')
+    if (old['ram']!=STATE_RAM or STATE_RAM+len(prefix)!=packet_end or
+            sha256(prefix)!=old['sha256'] or prefix[-16:]!=packet_guard or
+            prefix[(END if installed else RAM)-STATE_RAM-16:(END if installed else RAM)-STATE_RAM]!=GUARD):
         raise ValueError('Changed complete decoration packet')
     if installed:
         if (not installed['installed'] or installed['loaded_code']['ram']!=RAM or
                 installed['data']['ram']!=CONTEXT or installed['data']['bytes']!=DATA_END-CONTEXT or
-                installed['packet_bytes']!=END-STATE_RAM or old['id']!='holiday-decoration-actors-GAFE01-r0'):
+                installed['packet_bytes']!=END-STATE_RAM or
+                (not fishing and old['id']!='holiday-decoration-actors-GAFE01-r0')):
             raise ValueError('Changed owned controller refresh reservation')
         for part in ('loaded_code','data'):
             row=installed[part];at=row['ram']-STATE_RAM
@@ -383,7 +398,7 @@ def install(base, prior, output):
                 raise ValueError('Changed controller refresh predecessor')
         if not 0<installed['loaded_code']['bytes']<=END-RAM-16:
             raise ValueError('Changed controller code extent')
-        if any(prefix[RAM-STATE_RAM+installed['loaded_code']['bytes']:-16]):
+        if any(prefix[RAM-STATE_RAM+installed['loaded_code']['bytes']:END-STATE_RAM-16]):
             raise ValueError('Occupied controller refresh padding')
     elif (old['id']!='holiday-decoration-runtime-GAFE01-r0' or
             any(prefix[CONTEXT-STATE_RAM:DATA_END-STATE_RAM])):
@@ -411,6 +426,7 @@ def install(base, prior, output):
     raw[RAM-STATE_RAM:RAM-STATE_RAM+len(code)] = code
     raw[CONTEXT-STATE_RAM:DATA_END-STATE_RAM] = data
     raw[-16:] = GUARD
+    raw.extend(prefix[END-STATE_RAM:])
     resources = copy.deepcopy(prior['physical_resources'])
     if installed:
         physical.verify(base,resources)
@@ -423,15 +439,17 @@ def install(base, prior, output):
         resource = physical.allocate(base,resources,raw,'holiday-decoration-actors-GAFE01-r0');resources.append(resource)
         write_resource=resource
     equipment['holiday_state']['packet'] = dict(resource,ram=STATE_RAM,crc32=zlib.crc32(raw),
-        storage='physical-ROM',guard=GUARD.hex())
+        storage='physical-ROM',guard=packet_guard.hex())
+    if fishing:
+        fishing['packet'] = copy.deepcopy(equipment['holiday_state']['packet'])
     preserved = [dict(ram=a,bytes=b-a,sha256=sha256(prefix[a-STATE_RAM:b-STATE_RAM]))
-        for a,b in ((STATE_RAM,CONTEXT),(DATA_END,RAM))]
+        for a,b in ((STATE_RAM,CONTEXT),(DATA_END,RAM),(END,packet_end)) if a<b]
     report.update(installed=True,actors_active=False,profiles=profiles,hooks=hooks,
         original_packet=installed['original_packet'] if installed else old,input_packet=old,refresh=bool(installed),
         bound_services=['native ordinary/scripted acre-transition predicates',
             'native foreground markers for all eleven owners/eighteen variants',
             'native radio musical-note effect and source-rate request cadence'],
-        packet_ram=STATE_RAM,packet_bytes=len(raw),additional_resident_bytes=END-RAM,
+        packet_ram=STATE_RAM,packet_bytes=END-STATE_RAM,additional_resident_bytes=END-RAM,
         loaded_code=dict(ram=RAM,bytes=len(code),sha256=sha256(code)),
         data=dict(ram=CONTEXT,bytes=len(data),sha256=sha256(data)),preserved=preserved,
         pending=['fishing record/text consumers, Harvest fork item/player pickup',
