@@ -15,7 +15,7 @@ and twenty villagers. The explicit surface-selection proposal contains 147:
 three floors, and three wallpapers. A shirt's mannequin and a handheld's catalogue model
 are required representations, not extra selectable choices. This catalogue describes installed
 development content, not completed gameplay acceptance. Select-all means the
-installed catalogue, not every entry on the donor disc. Unimplemented identities
+supported installed catalogue, not every entry on the donor disc. Unimplemented identities
 are rejected rather than given substitutes.
 
 An empty selection returns the exact translation cartridge pinned by the
@@ -74,7 +74,14 @@ category supports individual selection, select/clear visible, and select all;
 default selection remains empty. Implemented representations are omitted from
 the unavailable-furniture queue because their parent is the user-facing choice.
 
-All choices reproduce the full proposal; no choices reproduce the exact pinned
+All choices reproduce the full proposal when every installed catalogue/scoring
+row is selectable. Proposals containing prepared diary rows instead bind a
+derived `all_selected_sha256`: both composers remove unavailable rows, preserve
+their disabled profiles, and retain their prepared resources. The browser plan's
+`pending_options` records cannot be selected or used to satisfy dependencies.
+The [diary binding](V3_DIARIES.md#selection-and-save-profile-binding) supplies the
+checked parent identities; no cover is an additional choice.
+No choices reproduce the exact pinned
 translation-only cartridge. The reward-enabled format-3 codec accepts equal or larger
 profiles and rejects a missing equipment bit without modifying destination state.
 Saves using these choices must not be loaded in V2 or an older profile without

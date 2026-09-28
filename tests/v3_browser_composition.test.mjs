@@ -84,6 +84,38 @@ test('all and empty reproduce their exact pins, without changing the supplied ar
   await assert.rejects(composeSelection(source, plan, []), /checksum mismatch/);
 });
 
+test('prepared diary rows stay unavailable and are removed even by select all', async () => {
+  const { plan, source } = await fixture(), v = new DataView(source.buffer), D = id('item', '2B00');
+  v.setUint32(0x102108, 0x08400000); v.setUint32(0x102110, 0x24050005);
+  v.setUint32(0x103010, 0x04000000);
+  const field = (offset, size) => ({ offset, before: hex(source.subarray(offset, offset + size)) });
+  plan.tables[0].before = hex(source.subarray(0x102100, 0x10210c));
+  plan.tables[0].rows.push({ id: D, hex: '08400000' });
+  plan.tables[0].counts[0].before = '24050005';
+  plan.pending_options = [{ id: D, name: 'Diary', kind: 'diary', selectable: false,
+    reason: 'Required gameplay is unfinished.', disable: [{ ...field(0x103010, 4), after: 'fc000000' }] }];
+  const checksums = data => {
+    const dv = new DataView(data.buffer);
+    for (const row of plan.crc32) dv.setUint32(row.offset, crc32(data.subarray(row.start, row.start + row.length)));
+    data.set(n64Checksum(data), 0x10);
+  };
+  checksums(source);
+  for (const row of plan.crc32) row.before = field(row.offset, 4).before;
+  plan.header.before = field(0x10, 8).before; plan.base_sha256 = await sha256(source);
+  const expected = source.slice(), ev = new DataView(expected.buffer);
+  ev.setUint32(0x102108, 0); ev.setUint32(0x102110, 0x24050004); ev.setUint32(0x103010, 0xfc000000);
+  checksums(expected); plan.all_selected_sha256 = await sha256(expected);
+  assert.throws(() => resolveSelection(plan, [D]), /Unknown or unimplemented/);
+  const { output } = await composeSelection(source, plan, [A, B, C]);
+  assert.deepEqual(output, expected);
+  const bad = clone(plan); bad.pending_options[0].selectable = true;
+  assert.throws(() => validatePlan(bad), /pending import/);
+  bad.pending_options[0].selectable = false; bad.pending_options[0].id = A;
+  assert.throws(() => validatePlan(bad), /pending import/);
+  bad.pending_options[0].id = D; bad.pending_options[0].disable[0].offset = plan.options[0].disable[0].offset;
+  assert.throws(() => validatePlan(bad), /Overlapping/);
+});
+
 test('missing, duplicate, and cyclic dependencies reject before composition', async () => {
   const { plan } = await fixture();
   for (const dependencies of [[A, A], ['missing'], [C]]) {

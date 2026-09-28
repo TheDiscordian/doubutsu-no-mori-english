@@ -69,8 +69,8 @@ failed menu opening cannot accidentally activate the supporting furniture.
 The original controller handles non-diary interactions unchanged. Exact consumers,
 caller bytes, and the one removable relocation are bound in the preparation.
 `diary_native.c` binds the menu-open and selected-style exports to actual native
-data and the compiled screen owner. The shared room hook is installed; diary
-selection remains disabled until carried-item handling is connected.
+data and the compiled screen owner. The shared room hook and carried-item handling
+are installed; selection remains disabled while required gameplay is unfinished.
 
 `diary_menu.c` provides one transient controller for all covers:
 
@@ -393,11 +393,11 @@ hardware evidence. No diary choices are enabled by this installation.
 | English UI | Official prompts, project errors, all screen textures, and native event labels extracted/credited/checked; native rendering remains unverified |
 | Persistence | Shared reset, clear, probe, pack, commit, forward migration, and preflight implemented/tested on host; startup and both stable/direct native dispatch installed; native UI/save verification remains |
 | Catalogue/scoring | All sixteen furniture-page records, donor framing/prices, scoring metadata, and upper-layer clutter exemption installed; native execution remains |
-| Selection | Bind carried/display profile dependencies and independent/all choices after participation is connected; profiles remain disabled |
+| Selection | All sixteen parent/cover/profile, catalogue, and scoring bindings implemented; browser/offline pending handling verified; choices remain disabled until required gameplay is connected |
 | Verification | Run bounded combined current-ROM UI/save checks after integration; no separate style-by-style native scenarios |
 
-Continue this same category with carried-ID save/profile and independent/all
-selection wiring, then connected native UI/save checks. Actual attendance
+Continue this same category with connected native UI/save checks. The carried-ID
+save/profile and independent/all selection bindings are implemented below. Actual attendance
 requires the shared Tortimer conversation path identified above; keep that
 remaining behaviour explicit rather than searching for a nonexistent native
 calendar caller. The category remains unfinished until that dependency works.
@@ -454,8 +454,45 @@ four-player collection routing, disabled/malformed records, the complete startup
 failure paths, and all four seasonal descriptor banks beyond 64 KiB. The connected
 surface/menu host check uses additive IDs. These checks do not establish ordinary
 native diary use, menu appearance, saving, or hardware behaviour. Diary choices
-remain disabled while participation, selection, and connected native checks
+remain disabled while participation, ready-choice activation, and connected native checks
 remain unfinished.
+
+### Selection and save-profile binding
+
+`tools/v3_diary_selection.py` binds all sixteen installed carried/cover pairs,
+complete sparse records, inverse parent metadata, immutable reader packet, and
+cover artwork. The single cover bit at byte `32 + floor((63 + style) / 8)` in the
+192-byte profile controls both representations. Native `2B00` retains its original
+path; neither a cover rotation nor a source ID becomes a separate saved identity.
+Unknown or changed identities, enabled pending profiles, and incomplete records
+reject. The existing canonical codec needs no new saved field or format.
+
+The shared resolver and catalogue/scoring generators support individual/all
+parent bindings. The authoritative selectable catalogue excludes unfinished
+diaries, and final composition rejects a caller-forged catalogue. Browser plans
+record these bindings under `pending_options`, never under selectable options.
+Their installed catalogue rows retain their exact source positions for input
+validation, then disappear when a supported profile is composed. Their scoring
+metadata is disabled unconditionally. Select all has an explicit derived output
+hash because the installation contains prepared but unavailable rows; it must
+not enable unfinished imports merely to reproduce the installation hash.
+
+For ABI 312, empty output is the pinned V2-14; all 191 supported development
+choices produce SHA-256
+`fb4737598dfc2849e687366f5d4038a43ecd450f98f2adf0ae32a9d073216afe`.
+The installation ROM and main build lock remain unchanged. Neither deployed
+patcher consumes this experimental plan.
+
+`tests/test_v3_diary_selection.py` checks all parent/profile bindings, complete
+category catalogue/scoring resolution, rejection of forged readiness, and three
+current browser/offline profiles. Its sanitized save check links the actual
+carried/cover readers, native selected-style resolver, canonical codec, and
+format-eleven adapter. Four players retain separate collection flags and pages
+through save/reset/reload; removing any selected style rejects without writing
+live state or the simulated device. The test uses an isolated host FlashRAM
+double and does not prove native UI use, native I/O timing, or hardware operation.
+Eleven browser-engine checks include unavailable selection, pending-row removal,
+overlapping writes, input preservation, and existing checksum/profile contracts.
 
 ### Shared room covers and catalogue
 

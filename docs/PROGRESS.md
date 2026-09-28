@@ -138,9 +138,20 @@ rebasing under sanitizers, actual catalogue/scoring/CRC/allocation bindings, and
 sanitized framing/prices/selection/clutter behaviour. These checks do not prove
 native rendering, ordinary diary use, save/reload, or hardware compatibility.
 
+The installed diary bindings connect every carried parent to its cover, single
+save-profile bit, catalogue ordering, and scoring. Browser and offline composition
+agree for empty, mixed, and all-supported selections on ABI 312. Prepared diaries
+remain unavailable, including under select all; inactive catalogue/scoring rows
+are removed from composed builds. The shared save/profile host check uses real
+carried readers, selected-style resolution, canonical codec, and format-eleven
+storage. It preserves independent ownership and pages for four players and
+rejects a missing style without changing live/save data. Two focused Python
+checks and eleven browser-engine checks pass. Native graphics and FlashRAM
+execution are not established by these host/device-double checks.
+
 The shared save adapter retains the complete town, console progress, calendars,
 and pages within the existing two FlashRAM banks. Actual participation callers,
-independent/all selection, and connected native UI/save verification remain in the same
+ready-choice activation, and connected native UI/save verification remain in the same
 [diary consumer map](../specs/V3_DIARIES.md). No diary choices are enabled yet.
 New format-eleven saves require this or a newer compatible build; earlier V3
 and V2 cannot load them. Both deployments remain V2-14, and the user's saves

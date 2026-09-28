@@ -55,6 +55,9 @@ def item_key(item):
 
 
 def furniture_key(row):
+    if row.get('representation') == 'diary':
+        from v3_diary_selection import catalogue_key
+        return catalogue_key(row)
     return item_key(furniture_source(row)[0])
 
 
@@ -251,7 +254,7 @@ def resolve(catalog, selected, *, behaviours=None, behaviour_options=None):
     furniture = [catalog[key] for key in sorted(enabled) if catalog[key]['kind']=='furniture']
     shirts = [catalog[key] for key in sorted(enabled) if catalog[key]['kind']=='clothing']
     displays = [{'item_id':row['display_item_id'], 'runtime_index':row['display_runtime_index']}
-                for row in catalog.values() if row['id'] in enabled and row['kind'] in ('clothing','equipment','fish','insect')]
+                for row in catalog.values() if row['id'] in enabled and row['kind'] in ('clothing','equipment','fish','insect','diary')]
     profile = profile_bytes(villagers, furniture+displays, [row['source_record'] for row in shirts])
     result={'format':'AFV3-LOCAL-SELECTION-1', 'donor':'GAFE01-r0',
         'registry_versions':{'villagers':1, 'furniture':1, 'clothing':CLOTHING_REGISTRY_VERSION, 'displays':1},
@@ -447,7 +450,7 @@ def scoring_selection(image, report, catalog, enabled):
     if entry.pend or sha256(data) != hr['output_sha256']:
         raise ValueError('Changed complete source scoring image')
     indices = {catalog[key]['runtime_index'] for key in enabled if catalog[key]['kind'] == 'furniture'}
-    indices |= {catalog[key]['display_runtime_index'] for key in enabled if catalog[key]['kind'] in ('clothing','equipment','fish','insect')}
+    indices |= {catalog[key]['display_runtime_index'] for key in enabled if catalog[key]['kind'] in ('clothing','equipment','fish','insect','diary')}
     writes, rows = [], []
     for row in hr['imports']:
         at = hr['metadata_address'] - hra.RAM + row['runtime_index'] * 4

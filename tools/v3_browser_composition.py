@@ -35,6 +35,15 @@ def rules(image, report):
     entries, slots = [], {}
     surfaces=report.get('room_surfaces',{}).get('optional_selection')
     creatures=report.get('equipment_resources',{}).get('creature_items',{}).get('optional_selection')
+    from v3_diary_selection import bindings as diary_bindings
+    pending = diary_bindings(image, report)
+    pending_slots = {row['display_runtime_index']: key for key, row in pending.items()}
+    pending_entries = {key: {k: row[k] for k in ('id','name','kind','selectable','reason')}
+                       for key, row in pending.items()}
+    for row in pending_entries.values():
+        row['disable'] = []
+    if pending.keys() & catalog.keys():
+        raise ValueError('An unfinished import is also selectable')
 
     def field(at, size):
         if type(at) is not int or not 0 <= at <= len(image) - size or size <= 0:
@@ -56,7 +65,7 @@ def rules(image, report):
                               'runtime_index': row['display_runtime_index']})
             shirts.append(row['source_record'])
             off.append(disable(blob.pstart + row['display_enable_offset'], 4))
-        elif row['kind']=='equipment':
+        elif row['kind'] in ('equipment','diary'):
             furniture.append({'item_id':row['display_item_id'],'runtime_index':row['display_runtime_index']})
         elif row['kind'] in ('fish','insect'):
             furniture.append({'item_id':row['display_item_id'],'runtime_index':row['display_runtime_index']})
@@ -89,7 +98,14 @@ def rules(image, report):
     for row in report['hra']['imports']:
         at = entry.pstart + report['hra']['metadata_address'] - hra.RAM + row['runtime_index'] * 4
         patch = scoring_by_offset.pop(at)
-        options[slots[row['runtime_index']]]['disable'].append(
+        index = row['runtime_index']
+        if index in slots:
+            target = options[slots[index]]
+        elif index in pending_slots:
+            target = pending_entries[pending_slots[index]]
+        else:
+            raise ValueError('Scoring row has no selectable or checked pending owner')
+        target['disable'].append(
             {key: patch[key] for key in ('offset', 'before', 'after')})
     if scoring_by_offset:
         raise ValueError('Unassigned scoring changes')
@@ -125,7 +141,9 @@ def rules(image, report):
             key = (composition.item_key(int(row['source_item_id'],16)) if kind in ('floor','wall') else
                    composition.furniture_key(row) if kind=='furniture' else
                    composition.item_key(int(row['donor_item_id'] if kind=='clothing' else row['parent_item_id'],16)))
-            if catalog[key]['kind'] != kind:
+            option = catalog.get(key, pending.get(key))
+            expected_kind = 'diary' if row.get('representation') == 'diary' else kind
+            if option is None or option['kind'] != expected_kind:
                 raise ValueError('Catalogue option has the wrong item class')
             members.append({'id': key, 'hex': before[start + i * width:start + (i + 1) * width].hex()})
         counts = []
@@ -154,7 +172,7 @@ def rules(image, report):
         crcs.append({**value, 'start': start, 'length': length})
     if struct.unpack_from('>2I', image, 0x10) != n64_checksum(image):
         raise ValueError('Changed source cartridge checksum')
-    return {'format': 'AFV3-BROWSER-COMPOSITION-1', 'donor': 'GAFE01-r0',
+    result = {'format': 'AFV3-BROWSER-COMPOSITION-1', 'donor': 'GAFE01-r0',
             'runtime_abi': report['runtime_abi'], 'base_sha256': sha256(image), 'base_size': len(image),
             'base_report_sha256': composition.REPORT_SHA,
             'stable_sha256': stable_sha, 'stable_size': stable_path.stat().st_size,
@@ -165,6 +183,14 @@ def rules(image, report):
             **({'behaviours':behaviours,'behaviour_save_note':SAVE_NOTE} if behaviours else {}),
             **({'creature_profile_hex':creatures['profile_hex']} if creatures else {}),
             **({'surface_profile_hex':surfaces['profile_hex']} if surfaces else {})}
+    if pending:
+        # The installation includes inactive prepared rows. "All" means every
+        # supported choice, not enabling those unfinished records to preserve a hash.
+        full = composition.resolve(catalog, list(catalog), behaviour_options=behaviours or None)
+        selected, _, _ = composition.compose(image, report, catalog, full)
+        result.update(pending_options=list(pending_entries.values()),
+                      all_selected_sha256=sha256(selected))
+    return result
 
 
 def review_catalogue(plan, report):
@@ -180,6 +206,7 @@ def review_catalogue(plan, report):
     installed = {int(row['id'].rsplit('/',1)[1], 16) for row in report['furniture']['imports'] + [report['speed_bag']]}
     scan = pipeline.scan(source, ROOT/'build/item-identity-megasheet.xlsx', installed)
     options = {row['id'] for row in plan['options']}
+    pending = {row['id']: row for row in plan.get('pending_options', [])}
     unavailable = []
     for row in scan['rows']:
         key = composition.item_key(int(row['item_id'], 16))
@@ -187,6 +214,8 @@ def review_catalogue(plan, report):
                   or row.get('profile',{}).get('creature_parent') or {})
         if key in options or parent.get('parent_id') in options:
             continue
+        if parent.get('parent_id') in pending:
+            continue  # The carried diary owns this cover; it is not a second item.
         if row['installed']:
             raise ValueError('Installed furniture is missing from the composition plan')
         unavailable.append({'id': key, 'name': row['name'] or 'Unnamed donor furniture',
@@ -200,6 +229,8 @@ def review_catalogue(plan, report):
         for key,reason in surface['optional_selection']['pending'].items():
             row=names[key]
             unavailable.append(dict(id=key,name=row['name'],kind=row['kind'],selectable=False,reason=reason+' is not implemented.'))
+    unavailable.extend({k: row[k] for k in ('id','name','kind','selectable','reason')}
+                       for row in pending.values())
     return {'format': 'AFV3-BROWSER-REVIEW-1', 'base_sha256': plan['base_sha256'],
             'scope': 'GAFE01-r0 3xxx and unresolved legacy furniture queue, not all donor items',
             'pipeline_version': pipeline.VERSION,

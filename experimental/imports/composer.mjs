@@ -42,7 +42,7 @@ export function validatePlan(plan) {
   for (const option of plan.options) {
     require(typeof option.id === 'string' && /^GAFE01-r0\/(item|villager)\/[0-9A-F]{4}$/.test(option.id) &&
       !options.has(option.id), 'Invalid or repeated import identity.');
-    require(['furniture', 'clothing', 'equipment', 'villager', 'floor', 'wall', 'fish', 'insect'].includes(option.kind) &&
+    require(['furniture', 'clothing', 'equipment', 'villager', 'floor', 'wall', 'fish', 'insect', 'diary'].includes(option.kind) &&
       option.id.includes(option.kind === 'villager' ? '/villager/' : '/item/'), 'Invalid import kind.');
     require(typeof option.name === 'string' && option.name.length > 0 && option.name.length <= 128,
       'Invalid import name.');
@@ -62,6 +62,22 @@ export function validatePlan(plan) {
     }
     options.set(option.id, option);
   }
+  const pending = new Set();
+  if (plan.pending_options !== undefined) {
+    array(plan.pending_options, 1, 2048); hash(plan.all_selected_sha256);
+    for (const row of plan.pending_options) {
+      require(typeof row.id === 'string' && /^GAFE01-r0\/item\/[0-9A-F]{4}$/.test(row.id) &&
+        !options.has(row.id) && !pending.has(row.id) && row.selectable === false &&
+        row.kind === 'diary' && typeof row.name === 'string' && row.name.length > 0 && row.name.length <= 128 &&
+        typeof row.reason === 'string' && row.reason.length > 0 && row.reason.length <= 1024,
+        'Invalid or selectable pending import.');
+      array(row.disable, 1, 16);
+      for (const patch of row.disable) {
+        const size = field(patch, 1, 4); hexSize(patch.after, size, size);
+      }
+      pending.add(row.id);
+    }
+  } else require(plan.all_selected_sha256 === undefined, 'Unexpected selected-output pin.');
   // A cyclic dependency is a malformed catalogue, not an excuse to loop or to
   // silently treat a set of broken options as self-sufficient.
   const visiting = new Set(), visited = new Set();
@@ -105,7 +121,7 @@ export function validatePlan(plan) {
     field(table, capacity * table.width, capacity * table.width);
     const seen = new Set();
     for (const row of table.rows) {
-      require(options.has(row.id) && !seen.has(row.id), 'Unknown or repeated catalogue member.');
+      require((options.has(row.id) || pending.has(row.id)) && !seen.has(row.id), 'Unknown or repeated catalogue member.');
       seen.add(row.id); hexSize(row.hex, table.width, table.width);
     }
     require(table.rows.map(row => row.hex).join('') + '00'.repeat((capacity - table.rows.length) * table.width) ===
@@ -227,6 +243,7 @@ export async function composeSelection(source, plan, requested, behaviours = {})
     // Check every declared field, including selected records that remain
     // untouched, before applying the first write to this private copy.
     const fields = [plan.profile, plan.header, ...plan.options.flatMap(row => row.disable),
+      ...(plan.pending_options || []).flatMap(row => row.disable),
       ...plan.tables.flatMap(row => [row, ...row.counts]), ...plan.crc32, ...(plan.behaviours || [])];
     for (const field of fields) {
       const before = bytes(field.before);
@@ -247,6 +264,9 @@ export async function composeSelection(source, plan, requested, behaviours = {})
     for (const option of plan.options) if (!enabled.has(option.id)) {
       for (const field of option.disable) write(field, bytes(field.after));
     }
+    for (const option of plan.pending_options || []) {
+      for (const field of option.disable) write(field, bytes(field.after));
+    }
     for (const table of plan.tables) {
       const selected = table.rows.filter(row => enabled.has(row.id));
       const packed = new Uint8Array(table.before.length / 2);
@@ -264,7 +284,8 @@ export async function composeSelection(source, plan, requested, behaviours = {})
   }
   const outputHash = await sha256(output);
   if (selection.enabled.length === plan.options.length && !selection.behaviours_changed)
-    require(outputHash === plan.base_sha256, 'All-selected output differs from the pinned cartridge.');
+    require(outputHash === (plan.all_selected_sha256 || plan.base_sha256),
+      'All-selected output differs from the pinned supported selection.');
   return { output, receipt: { format: 'AFV3-BROWSER-SELECTION-1', ...selection,
     profile_sha256: await sha256(bytes(selection.profile_hex)), output_sha256: outputHash,
     ...(selection.surface_profile_hex === undefined ? {} : {

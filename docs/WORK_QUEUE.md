@@ -62,8 +62,14 @@ scoring metadata are installed at `build/v3-diary-category-work-01/catalogue-03/
 The HRA upper-layer query exempts selected diaries from table clutter, retaining
 the donor's floor penalty and every other scoring query. Four focused room/art
 and catalogue/scoring cartridge/host checks pass across the two connected steps.
-Continue with carried-ID save/profile and selection wiring, then connected native
-UI/save verification, following the
+Carried-ID save/profile and selection bindings cover all sixteen styles. The
+shared resolvers bind each parent to its cover bit, catalogue row, and scoring
+record. The private browser plan retains these as unavailable, strips inactive
+catalogue/scoring rows from supported selections, and agrees with offline output
+for empty, mixed, and all-supported profiles. A sanitized host check connects the
+actual carried/cover readers to format-eleven save/reload and missing-profile
+rejection, preserving independent four-player ownership and diary pages.
+Continue with connected native UI/save verification, following the
 [connected consumer map](../specs/V3_DIARIES.md#connected-consumer-map).
 These are remaining consumers of this same category, not new per-style tasks.
 The donor's two attendance calls both require Tortimer conversations, including
