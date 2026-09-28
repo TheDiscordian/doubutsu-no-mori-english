@@ -1053,30 +1053,31 @@ before it. Return-door data, the additive event ID, title flags, manager skip,
 and wipe/fade fields are committed before rhythm capture, player warp, and BGM.
 Unrelated native fields and existing door padding are preserved.
 
-The native bridge still requires actual imported common-state providers. These
-must supply source/native ACTIVE identities, current acre and pool shape,
-applicable present-demo and room-message gates, and climate/rhythm handling.
+The native bridge binds the actual expanded event directory, complete installed
+decoration resolver, current acre and pool shape, applicable transition gates,
+and native room rhythm capture through `af_holiday_transition_live_fade`.
 Groundhog ceremony owner 7 is not in the 44 scheduled diary owners. Its source
 schedule is February 2, 7–8 a.m. (`020200070202000800000007`); diary attendance
 uses Tortimer owner 81, 9 a.m.–4 p.m. (`020200090202001000000051`). The alternate
 event-message lifecycle and prepared ceremony controller remain inactive
 preparation, not diary-attendance prerequisites. The scheduled-owner scene
-providers are installed in ABI 339 as described below; their identity/status
-graph and live dedicated-owner caller remain unbound.
+providers are installed as described below; the live dedicated-owner caller
+and its separate actor/profile/effect services remain unbound.
 Missing providers reject explicitly;
 native demo 13 is **not** treated as source event-message-2. No substitute owner,
 zero-filled gate, or no-op side effect is an implemented service.
 
-The linked module is 6,592 bytes, SHA-256
-`2c19448ef951fab59e98d602581629baa8a7b3fed029653449b7537ffbe0dc47`,
-with a 328-byte largest individual frame. It occupies `806FC000` within the
+The ABI-340 linked module at `event-transition-bound-02/` is 7,584 bytes, SHA-256
+`f39461f7b712e01b8adc4c6b75a447c908e4ca2a4f5bfd80f4ed4bb507371160`.
+It occupies `806FC000..806FDDA0` within the
 installed 16-KiB extension of the holiday packet, ending at `80700000`. The
 complete preceding 32 KiB and its guard are preserved, as is the original physical
 ROM resource. The replacement 48-KiB packet has a new physical allocation and
 final guard. Its actual startup descriptor transfers/checks/invalidates the
 whole packet. Every prepared native binding and source hash is checked before
-reuse; the module is not recompiled. Installed code does not activate incomplete
-owners. Remaining service providers and live manager dispatch stay unfinished,
+reuse. The checked refresh retains the rest of the current 272-KiB packet and
+the original `af_holiday_transition_run` entry. Installed code does not activate incomplete
+owners. Remaining actor/profile/effect providers and live manager dispatch stay unfinished,
 along with costume/exercise/Miko/race behaviour in this same diary category.
 
 `tests/test_v3_holiday_transition.py` runs one sanitized host check of the actual
@@ -1087,6 +1088,19 @@ missing-provider rejection. Native I/O, installed identities, and imported
 services are doubles. Total dynamic stack, in-game transitions, native diary
 gameplay, and hardware remain unverified. The exhausted native fixture budget is
 unchanged; no old build or fixture is replayed.
+
+The live status reader uses the installed directory's symbols, including the
+relocated index `804A2B00`, validates slot/type correspondence, and observes actual
+ACTIVE and ERROR flags. It never derives attendance or activity from a date.
+Original layouts use native `80081EEC` and `80082E40` with their complete original
+directory: native IDs remain native, including moon events 21/22. Priority
+positions merge both directories without translating original layout names.
+Original null layouts still mask later entries. Imported structures resolve
+through the already installed `af_decor_actor_resolve`; no duplicate identity
+list is maintained. The wrapper at `806FDA80` supplies the complete live fade
+provider. Source/host checks cover both layout paths, and the current cartridge
+check verifies provider addresses, preserved code/text/saves, bounds, and packet
+identity. Empty/mixed/all-191 browser/offline compositions agree.
 
 ### Additional announcement and speech lifecycle
 
@@ -1121,7 +1135,7 @@ check verifies all hooks, unchanged original tables and unrelated core bytes,
 code/state bounds, both packet references, startup CRC, and retained save/text
 resources. Current empty/mixed/all-191 browser/offline compositions agree.
 Native execution remains unverified; no emulator fixture is restarted. Actual
-identity/status binding and dedicated-owner dispatch must still be connected
+dedicated-owner dispatch must still be connected
 before admitting the scheduled imported events. The ceremony-only fading-title
 producer is outside those owners and stays inactive.
 
@@ -1144,9 +1158,8 @@ absent room owners, console requests, relocated capture calls, and commit order.
 The complete source climate functions verify the mainland equivalence. Cartridge
 checks retain the complete room code, packet guards, both physical references,
 startup CRC, official text, and format-13 profile. Native gameplay remains
-unverified. The source transition adapter requires an alternate-demo provider
-only when that actual branch is requested; this small change awaits the next
-transition-module refresh, while the current scene binder supplies the installed
+unverified. The installed transition adapter requires an alternate-demo provider
+only when that actual branch is requested; the scene binder supplies the installed
 alternate demo identity.
 
 ### Shared hourly activation and event-state lifetime

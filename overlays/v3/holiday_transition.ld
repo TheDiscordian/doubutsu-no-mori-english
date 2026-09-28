@@ -7,5 +7,5 @@ SECTIONS {
  .forbidden : { *(.data .data.* .bss .bss.* COMMON) }
  /DISCARD/ : { *(.reginfo .MIPS.abiflags .pdr .comment .gnu.attributes .note.*) }
  ASSERT(SIZEOF(.forbidden)==0, "Event transitions use explicit caller state")
- ASSERT(. <= 0x806FF000, "Event transition exceeds planned 12-KiB code range")
+ ASSERT(. <= 0x806FE000, "Event transition overlaps the installed announcement module")
 }

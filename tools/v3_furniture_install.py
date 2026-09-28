@@ -772,6 +772,10 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             import v3_holiday_scene as equipment
             equipment_report,owner_changes,report_updates,physical_writes=equipment.install_demo(
                 base,prior,blob,core,output,scene_services=True)
+        elif not current_events['transition'].get('native_scene_services_bound'):
+            import v3_holiday_transition as equipment
+            equipment_report,owner_changes,report_updates,physical_writes=equipment.install(
+                base,prior,blob,core,output)
         else:
             import v3_holiday_motion as equipment
             equipment_report,owner_changes,report_updates,physical_writes=equipment.install(

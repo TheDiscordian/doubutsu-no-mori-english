@@ -9,6 +9,11 @@ static unsigned int active[128],go_calls,geometry_calls,order_count;
 static int unresolved,blocked,gate_ok,go_ok=1,correct_position,status_missing;
 static char order[8];
 static AFHolidayDoor requested;
+static int original_priority=-1,original_result=2,original_calls;
+static int original_rank(void *c) {(void)c;return original_priority;}
+static int original_collision(void *c,int x,int z) {
+    (void)c;assert(x==7 && z==7);original_calls++;return original_result;
+}
 static int event_status(void *c,unsigned int donor,unsigned int mask) {
     (void)c;assert(donor<128 && mask==AF_HE_ACTIVE);return status_missing?-1:(int)(active[donor]&mask);
 }
@@ -208,7 +213,17 @@ int main(void) {
     assert(s.common.start_demo_request.type==13);
     s=fresh(&ops);active[1]=1;unresolved=1;unsigned int calls=go_calls;
     assert(af_holiday_transition_run(&s,1,1,4)==-1 && go_calls==calls && s.failed);
-    unresolved=0;memset(active,0,sizeof(active));ops.tempo=0;
+    unresolved=0;memset(active,0,sizeof(active));
+    ops.original_rank=original_rank;ops.original_collision=original_collision;
+    active[64]=1;original_priority=11; /* Native moons precede imported countdown. */
+    assert(af_holiday_transition_map(&s)==AF_HT_ORIGINAL_LAYOUT);
+    assert(af_holiday_transition_collision(&s,7,7)==2 && original_calls==1);
+    active[20]=1;assert(af_holiday_transition_map(&s)==20); /* Earlier source layout wins. */
+    memset(active,0,sizeof(active));active[1]=1;original_priority=6;original_result=0;
+    assert(af_holiday_transition_collision(&s,7,7)==0 && original_calls==2); /* Native null masks later maps. */
+    original_priority=17;assert(af_holiday_transition_collision(&s,7,7)==-1);
+    original_priority=-1;ops.original_rank=0;ops.original_collision=0;
+    memset(active,0,sizeof(active));ops.tempo=0;
     assert(af_holiday_transition_run(&s,20,1,4)==-1 && go_calls==calls);
     assert(geometry_calls);
     native_scene_check();

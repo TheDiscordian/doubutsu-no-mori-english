@@ -5,6 +5,7 @@ import sys
 import tempfile
 import unittest
 import re
+import os
 
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'tools'))
@@ -16,6 +17,61 @@ from v3_password_policy import function
 
 
 class HolidayTransitionTests(unittest.TestCase):
+    def test_bound_current_cartridge(self):
+        import zlib
+        from aflib import CODE_RAM,CODE_VROM,by_vrom,sha256
+        from v3_furniture_install import inputs
+        directory=ROOT/os.environ.get('V3_HOLIDAY_TRANSITION_BUILD',
+            'build/v3-diary-category-work-01/event-transition-bound-02')
+        image,r=inputs(directory/'build-lock.json');base,prior=inputs(directory/'base-lock.json')
+        e=r['equipment_resources'];events=e['npc_extra']['events'];stage=events['transition']
+        p=e['holiday_state']['packet'];self.assertEqual(p,e['holiday_fishing']['packet'])
+        self.assertTrue(stage['installed']);self.assertTrue(stage['native_scene_services_bound'])
+        self.assertFalse(stage['native_execution_verified'])
+        raw=image[p['physical']:p['physical']+p['bytes']];old=base[p['physical']:p['physical']+p['bytes']]
+        a,b=0x806FC000-p['ram'],0x806FE000-p['ram']
+        self.assertEqual(raw[:a],old[:a]);self.assertEqual(raw[b:],old[b:])
+        self.assertEqual(sha256(raw),p['sha256']);self.assertEqual(zlib.crc32(raw),p['crc32'])
+        code=stage['code'];self.assertLessEqual(code['bytes'],b-a)
+        self.assertEqual(sha256(raw[a:a+code['bytes']]),code['sha256'])
+        self.assertEqual(raw[a+code['bytes']:b],bytes(b-a-code['bytes']))
+        symbols=events['native_directory']['code']['symbols']
+        for name in ('af_holiday_native_type','af_holiday_native_days','af_holiday_native_index'):
+            self.assertEqual(stage['bindings'][name],symbols[name])
+            self.assertEqual(code['link_symbols'][name],symbols[name])
+        self.assertNotEqual(stage['bindings']['af_holiday_native_index'],0x8013A098)
+        self.assertEqual(stage['bindings']['af_decor_actor_resolve'],
+            events['decorations']['controllers']['code']['symbols']['af_decor_actor_resolve'])
+        self.assertEqual(stage['bindings']['af_holiday_scene_bind'],events['demo']['code']['symbols']['af_holiday_scene_bind'])
+        self.assertEqual(code['symbols']['af_holiday_transition_run'],0x806FC000)
+        self.assertIn('af_holiday_transition_live_fade',code['symbols'])
+        files=by_vrom(image);before=by_vrom(base);core=files[CODE_VROM].extract(image)
+        self.assertEqual(core,before[CODE_VROM].extract(base))
+        for row in stage['live']['native_functions']:
+            at=row['address']-CODE_RAM
+            self.assertEqual(sha256(core[at:at+row['bytes']]),row['sha256'])
+        self.assertEqual(r['save_codec']['format_version'],prior['save_codec']['format_version'])
+        self.assertEqual(r['save_runtime']['profile_hex'],prior['save_runtime']['profile_hex'])
+
+    def test_live_identity_binding(self):
+        from v3_holiday_native import identities
+        ids,_=identities()
+        with tempfile.TemporaryDirectory(prefix='v3-holiday-identities-') as temp:
+            target=Path(temp)/'check'
+            fixture='const unsigned char af_holiday_transition_maps[1496]={0};\n'
+            for name,data in (('af_holiday_native_ids',ids[:128]),('af_holiday_source_ids',ids[128:])):
+                fixture+='const unsigned char '+name+'[128]={'+','.join(map(str,data))+'};\n'
+            write_new(Path(temp)/'holiday-identity-data.h',fixture.encode())
+            command=['cc','-std=c11','-O1','-g','-Wall','-Wextra','-Werror','-fno-pie','-no-pie',
+                '-fsanitize=address,undefined','-fno-omit-frame-pointer','-ffunction-sections',
+                '-fdata-sections','-Wl,--gc-sections','-I'+str(ROOT/'overlays/v3'),'-I'+temp,
+                'tests/v3_holiday_identity_test.c','overlays/v3/holiday_transition_identity.c',
+                'overlays/v3/holiday_native.c','-o',str(target)]
+            for cmd in (command,[str(target)]):
+                result=subprocess.run(cmd,cwd=ROOT,capture_output=True,text=True,timeout=30)
+                self.assertEqual(result.returncode,0,result.stdout+result.stderr)
+                if result.stdout:print(result.stdout.strip())
+
     def test_live_scene_services(self):
         with tempfile.TemporaryDirectory(prefix='v3-holiday-scene-native-') as temp:
             target=Path(temp)/'check'

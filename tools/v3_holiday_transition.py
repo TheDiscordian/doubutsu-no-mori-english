@@ -4,6 +4,8 @@ import json
 from pathlib import Path
 import re
 import struct
+import copy
+import zlib
 
 from aflib import CODE_RAM,CODE_VROM,by_vrom,sha256
 from apply_translation import write_new
@@ -41,6 +43,11 @@ SCENE_NATIVE=(
     ('warp',0x800B3A48,0x800B3A60,'6eb3f1178d564e3a2ba3629cfbda5ecfd30af90316bfc86a3f853680cb7ef3fa'),
     ('bgm',0x8005EDC4,0x8005EDD8,'6b949eea80ff1df0f2d4d066720e183c832d0c6162041d859e6201dcc78990c9'))
 MEMORY_NATIVE=tuple(row for row in NATIVE_BLOCKS if row[0] in ('memcpy','memset'))
+SOURCES=('tools/v3_holiday_transition.py','overlays/v3/holiday_transition.c',
+    'overlays/v3/holiday_transition.h','overlays/v3/holiday_transition_source.h',
+    'overlays/v3/holiday_transition.ld','overlays/v3/holiday_transition_native.c',
+    'overlays/v3/holiday_transition_identity.c','overlays/v3/holiday_scene_native.h',
+    'tools/v3_asset_loader.py','tools/v3_furniture_install.py')
 
 
 def generate(source):
@@ -57,6 +64,10 @@ def generate(source):
         if len(matches)!=1:raise ValueError('Ambiguous complete transition source: '+name)
         _,row=source.function(matches[0]);receipts.append(row)
     bodies='\n\n'.join(parts)
+    anchor='event_type = mEvMN_GetEventTypeMap();'
+    if bodies.count(anchor)!=1:raise ValueError('Changed complete collision layout selector')
+    bodies=bodies.replace(anchor,anchor+'\n    if (event_type == AF_HT_ORIGINAL_LAYOUT)\n'
+        '        return af_holiday_transition_original(evmgr, block_ux, block_uz);')
     # Check both complete search tables against the actual relocated donor
     # data, not just the decompiled initializer's spelling.
     search=next(r for r in receipts if r['symbol']=='player_lap_check')
@@ -114,12 +125,21 @@ def generate(source):
         retained_groundhog_branch=True,retained_transition_gates=True)
 
 
-def prepare(output,build_lock):
+def prepare(output,build_lock=None,*,base=None,prior=None,refresh=False):
     output=output.resolve()
     if output.exists() or not output.is_relative_to(ROOT/'build'):raise ValueError('Use a fresh ignored preparation directory')
     from v3_furniture_install import inputs
     from v3_console_disk_install import reservations
-    base,prior=inputs(build_lock);core=by_vrom(base)[CODE_VROM].extract(base)
+    if build_lock:base,prior=inputs(build_lock)
+    core=bytearray(by_vrom(base)[CODE_VROM].extract(base))
+    events=prior['equipment_resources']['npc_extra']['events']
+    if refresh:
+        demo=events['demo']
+        if not demo.get('scene_services'):raise ValueError('Live transition needs installed scene services')
+        hook=next(h for h in demo['hooks'] if h['symbol']=='af_holiday_demo_busy')
+        at=hook['address']-CODE_RAM
+        if core[at:at+8]!=bytes.fromhex(hook['after']):raise ValueError('Changed installed demo busy entry')
+        core[at:at+8]=bytes.fromhex(hook['before'])
     for name,lo,hi,digest in (*NATIVE,*SCENE_NATIVE):
         if sha256(core[lo-CODE_RAM:hi-CODE_RAM])!=digest:
             raise ValueError('Changed complete native transition primitive: '+name)
@@ -135,7 +155,7 @@ def prepare(output,build_lock):
         raw=by_vrom(base)[vrom].extract(base)
         if sha256(raw[at-ram:at-ram+size])!=digest:
             raise ValueError('Changed complete native transition memory helper: '+name)
-    if any(a<0x80700000 and 0x806FC000<b for a,b in reservations(prior)):
+    if not refresh and any(a<0x80700000 and 0x806FC000<b for a,b in reservations(prior)):
         raise ValueError('Planned transition range overlaps an existing allocation')
     maps=prior['equipment_resources']['npc_extra']['events']['reserved']
     source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
@@ -149,24 +169,86 @@ def prepare(output,build_lock):
         af_holiday_transition_scene=0x80126EB4,af_holiday_transition_player=0x800B1C84,
         af_holiday_native_type=prior['equipment_resources']['npc_extra']['events']['native_directory']['code']['symbols']['af_holiday_native_type'])
     bindings.update({name:at for name,_,_,at,_,_ in MEMORY_NATIVE})
+    extra=(str(path.relative_to(ROOT)),'overlays/v3/holiday_transition_native.c')
+    live={}
+    if refresh:
+        # Retain the original layout directory, including the null Halloween
+        # entry and both separate native moon events. No source ID aliases it.
+        types=struct.unpack_from('>15I',core,0x80105030-CODE_RAM)
+        if types!=(11,12,10,8,7,9,13,3,20,2,16,21,22,6,14):
+            raise ValueError('Changed complete native layout priority')
+        if [r['event'] for r in maps['maps']]!=[32,20,15,13,12,14,49,1,29,54,35,43,56,64,3,7,37]:
+            raise ValueError('Changed complete source layout priority')
+        original_functions=(
+            (0x80081EEC,0x80081F5C,'6a9ff34c6ae1f461cdf45bf1de4192412565d35b95926df1ca46eda2b88f2220'),
+            (0x80082E40,0x80082F9C,'9dd69b66b9720bb0831b69efb3bc4b6abbc59c3463f743e19b32367f667a83b8'),
+            (0x80105030,0x80105624,'575346e9af4b9dbd5baaf81ce92580124d9840f62a30c04e9f8e6114bdd8091e'),
+            (0x8008930C,0x80089348,'9debc21ff1a4c34dc513d9fd0ce51e2101ca9224fd2a06cea0d1ade00310b59b'),
+            (0x80056E1C,0x80056E88,'8ebf0f4a4e623ecef92d2985d14ee3f8ae6054f4da7ce50c9fec974b14ffb6bf'))
+        original_receipts=[]
+        for a,b,digest in original_functions:
+            raw=core[a-CODE_RAM:b-CODE_RAM]
+            if sha256(raw)!=digest:raise ValueError('Changed complete native layout/state consumer: '+hex(a))
+            original_receipts.append(dict(address=a,bytes=b-a,sha256=digest))
+        maps_row=next(row for row in maps['resources'] if row['file'].endswith('/maps.bin'))
+        if maps_row['bytes']!=1496:raise ValueError('Changed complete live layout graph')
+        controllers=events['decorations']['controllers']
+        directory_symbols=events['native_directory']['code']['symbols']
+        bindings.update(af_holiday_native_days=directory_symbols['af_holiday_native_days'],
+            af_holiday_native_index=directory_symbols['af_holiday_native_index'],
+            af_holiday_transition_maps=maps_row['ram'],af_holiday_transition_native_map=0x80081EEC,
+            af_holiday_transition_native_collision=0x80082E40,
+            af_decor_actor_resolve=controllers['code']['symbols']['af_decor_actor_resolve'],
+            af_holiday_scene_bind=demo['code']['symbols']['af_holiday_scene_bind'])
+        extra+=('overlays/v3/holiday_transition_identity.c',)
+        live=dict(native_layout_types=list(types),native_functions=original_receipts,
+            original_collision_preserved=True,decoration_resolver_reused=True,
+            source_status_uses_native_directory=True,scene_services_bound=True)
     compiled,report=compile_part('holiday_transition',output/'code',
-        extra_sources=(str(path.relative_to(ROOT)),'overlays/v3/holiday_transition_native.c'),link_symbols=bindings)
+        extra_sources=extra,link_symbols=bindings)
     write_new(output/'code.bin',compiled)
     report=dict(code=report,contract=contract,generated_sha256=sha256(code.encode()),
         native_functions=(*NATIVE,*SCENE_NATIVE),native_fade_sha256=fade_digest,
         native_memory_helpers=MEMORY_NATIVE,
         bindings=bindings,input_rom_sha256=sha256(base),
-        installed=False,native_scene_bridge_compiled=True,native_scene_services_bound=False,
-        planned_code_range=[0x806FC000,0x806FF000],planned_packet_growth_bytes=0x4000,
-        pending=['Actual source-to-installed identities and ACTIVE status for original and imported layouts',
-            'Present-demo/room-message gates, climate/rhythm services, and source event-message-2 lifecycle',
-            'Common-state lifetime, packet loading, and live dedicated-owner dispatch'],
-        sources={p:sha256((ROOT/p).read_bytes()) for p in ('tools/v3_holiday_transition.py',
-            'overlays/v3/holiday_transition.c','overlays/v3/holiday_transition.h',
-            'overlays/v3/holiday_transition_source.h','overlays/v3/holiday_transition.ld',
-            'overlays/v3/holiday_transition_native.c')})
+        installed=False,native_scene_bridge_compiled=True,native_scene_services_bound=refresh,
+        live=live,planned_code_range=[0x806FC000,0x806FE000],planned_packet_growth_bytes=0 if refresh else 0x4000,
+        pending=['Live dedicated-owner dispatch and remaining actor services'] if refresh else [
+            'Actual source-to-installed identities and ACTIVE status for original and imported layouts',
+            'Native scene providers and live dedicated-owner dispatch'],
+        sources={p:sha256((ROOT/p).read_bytes()) for p in SOURCES})
     write_new(output/'transition.json',(json.dumps(report,indent=2)+'\n').encode())
     return report
+
+
+def install(base,prior,blob,core,output):
+    del blob,core
+    e=copy.deepcopy(prior['equipment_resources']);events=e['npc_extra']['events']
+    old=events['transition']
+    if old.get('native_scene_services_bound'):raise ValueError('Live transition is already bound')
+    directory=output/'holiday-transition'
+    prepared=prepare(directory,base=base,prior=prior,refresh=True)
+    code=(directory/'code.bin').read_bytes();p=e['holiday_state']['packet']
+    raw=bytearray(base[p['physical']:p['physical']+p['bytes']]);a=0x806FC000-p['ram'];b=0x806FE000-p['ram']
+    previous=old['loaded_code']
+    if (p!=e['holiday_fishing']['packet'] or sha256(raw)!=p['sha256'] or
+            previous['ram']!=0x806FC000 or previous['bytes']>b-a or len(code)>b-a or
+            sha256(raw[a:a+previous['bytes']])!=previous['sha256'] or any(raw[a+previous['bytes']:b])):
+        raise ValueError('Changed or occupied live transition reservation')
+    raw[a:b]=code+bytes(b-a-len(code))
+    old.update(prepared,installed=True,native_execution_verified=False,
+        prepared_directory=str(directory.relative_to(ROOT)),
+        loaded_code=dict(ram=0x806FC000,bytes=len(code),sha256=sha256(code)),additional_resident_bytes=0)
+    previous_digest=p['sha256'];p.update(sha256=sha256(raw),crc32=zlib.crc32(raw))
+    e['holiday_fishing']['packet']=copy.deepcopy(p)
+    resources=copy.deepcopy(prior['physical_resources']);matches=[r for r in resources if r['id']==p['id']]
+    if len(matches)!=1:raise ValueError('Ambiguous combined live transition packet')
+    matches[0]['sha256']=p['sha256']
+    events['decorations']['controllers']['preserved'].append(old['loaded_code'])
+    e['npc_extra']['sources'].update(old['sources'])
+    write_new(directory/'installed.json',(json.dumps(old,indent=2)+'\n').encode())
+    write_new(directory/'packet.bin',raw)
+    return e,{},dict(physical_resources=resources),[(dict(matches[0],previous_sha256=previous_digest),bytes(raw))]
 
 
 if __name__=='__main__':

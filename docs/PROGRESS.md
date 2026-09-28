@@ -31,9 +31,9 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
-The current proposal is ABI 339 at
-`build/v3-diary-category-work-01/event-scene-services-01/build-lock.json`, ROM SHA-256
-`9193244276f01595a90c2f3f3ecd338a11b0aaf4fb354af7fead27801c75b7ff`.
+The current proposal is ABI 340 at
+`build/v3-diary-category-work-01/event-transition-bound-02/build-lock.json`, ROM SHA-256
+`18f622d5526e5aa7d20b21a6c69bbf436e0d8f939f20da4f72cfd6d7b8bd2ff8`.
 It contains 191 independently selectable development imports, including all nine
 fish and eight insects, and 100 inactive furniture profiles whose acquisition
 is pending, plus sixteen inactive diary cover profiles. The main lock and both
@@ -176,8 +176,13 @@ state is committed only after scene acceptance. A focused sanitized check
 passes with native I/O doubled; source comparison confirms that all three
 mainland climate states retain the N64 mainland result. The current-cartridge
 check and empty/mixed/all-191 browser/offline comparison pass. Native gameplay
-is not claimed. Identity/status binding, dedicated-owner dispatch, and calendar
-selection/admission remain unfinished. The separate Groundhog ceremony is outside
+is not claimed. The 7,584-byte transition module binds these providers to the
+actual expanded event-status directory and existing eighteen-decoration resolver.
+All fifteen original N64 layouts retain their native collision reader and
+priority relative to the source layouts; both native moon events and the null
+Halloween layout keep their meanings. Focused source/host/current-cartridge and
+browser/offline checks pass. Dedicated-owner dispatch, remaining actor services,
+and calendar selection/admission remain unfinished. The separate Groundhog ceremony is outside
 those scheduled owners; its prepared controller stays inactive and does not
 block diary attendance.
 Reuse completed fishing and demo paths; do not restart native fixtures.

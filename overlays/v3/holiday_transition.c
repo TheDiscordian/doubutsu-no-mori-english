@@ -12,7 +12,12 @@ int af_holiday_transition_map(AFHolidayTransition *s) {
     AFHolidayMap m;
     /* This call validates the complete directory, including null records. */
     if(row(s,65535,&m)<0)return -1;
+    int original=s->ops->original_rank?s->ops->original_rank(s->context):-1;
+    if(original<-1 || original>=17 || (original>=0 && !s->ops->original_collision)) {
+        s->failed=1;return -1;
+    }
     for(u32 i=0;i<17;i++) {
+        if(original==(int)i)return AF_HT_ORIGINAL_LAYOUT;
         u32 donor=half(s->maps+16+i*20);
         int active=s->ops->status(s->context,donor,AF_HE_ACTIVE);
         if(active<0) {s->failed=1;return -1;}
@@ -52,6 +57,7 @@ int af_holiday_transition_ready(AFHolidayTransition *s) {
     s->failed=0;
     int donor=af_holiday_transition_map(s);AFHolidayMap m;
     if(s->failed)return 0;
+    if(donor==AF_HT_ORIGINAL_LAYOUT)return 1;
     if(donor<0 || row(s,donor,&m)==0)return 1;
     if(s->failed)return 0;
     for(u32 i=0;i<m.count;i++) {
@@ -63,4 +69,10 @@ int af_holiday_transition_ready(AFHolidayTransition *s) {
         }
     }
     return 1;
+}
+int af_holiday_transition_original(AFHolidayTransition *s,int x,int z) {
+    if(!s->ops->original_collision) {s->failed=1;return 0;}
+    int result=s->ops->original_collision(s->context,x,z);
+    if(result<0 || result>2) {s->failed=1;return 0;}
+    return result;
 }

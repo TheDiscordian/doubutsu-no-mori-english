@@ -289,11 +289,16 @@ Source/native layouts differ, and native moon events 21/22 must not be relabelle
 as donor meteor event 37.
 The [decoration contract](../specs/V3_DIARIES.md#shared-event-decoration-resources)
 identifies the checked resources and native consumer addresses.
-Continue checked actor/decoration/profile/effect identities and source/native
-ACTIVE status for the scheduled owners. Live transition read/commit, console
-request gating, and native room rhythm/gyroid capture are installed at
-`build/v3-diary-category-work-01/event-scene-services-01/build-lock.json`, ABI 339,
-ROM `9193244276f01595a90c2f3f3ecd338a11b0aaf4fb354af7fead27801c75b7ff`.
+Continue actor/profile/effect identities and live dedicated-owner dispatch for
+the scheduled owners. The complete live transition, including decoration
+identities, actual ACTIVE status, original-layout collision, scene read/commit,
+console request gating, and native room rhythm/gyroid capture, is installed at
+`build/v3-diary-category-work-01/event-transition-bound-02/build-lock.json`, ABI 340,
+ROM `18f622d5526e5aa7d20b21a6c69bbf436e0d8f939f20da4f72cfd6d7b8bd2ff8`.
+Use `af_holiday_transition_live_fade` from that module for the dedicated-owner
+fade provider. It binds the current relocated event index at `804A2B00`, not
+the original `8013A098` table. The `event-transition-bound-01` output is an
+inactive development artifact with the obsolete index binding; do not use it.
 Reuse the passing focused host/current-cartridge/browser checks. Connect the live
 dedicated-owner calls using the installed common-state entry; do not activate
 callbacks with missing providers. The
@@ -305,8 +310,8 @@ the fourteen original identities and callback tables. Request priority,
 choice/init/run, saved announcement/resume, shrine and interpolated camera,
 event-busy filtering, speech readers, and successful/rejected return transitions
 are connected. Focused sanitized host and current-cartridge checks pass; current
-browser/offline empty/mixed/all-191 output agrees. Transition service admission
-remains unbound, so the additional modes do not claim an active imported event
+browser/offline empty/mixed/all-191 output agrees. Live transition services are
+bound; dedicated-owner dispatch remains unfinished. The added modes do not claim an active imported event
 or native gameplay verification. Groundhog ceremony owner 7 is not among the
 44 scheduled diary owners. Diary attendance on that date uses the separate
 Tortimer owner 81, from 9 a.m. to 4 p.m.; the ceremony is from 7 to 8 a.m.

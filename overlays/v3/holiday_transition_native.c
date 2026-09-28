@@ -64,6 +64,14 @@ static int status(void *c,unsigned int donor,unsigned int mask) {
 static int identity(void *c,unsigned int source) {
     Scene *n=c;return n->services->resolve(n->services->context,source);
 }
+static int original_rank(void *c) {
+    Scene *n=c;const AFHolidayTransitionServices *s=n->services;
+    return s->original_rank?s->original_rank(s->context):-1;
+}
+static int original_collision(void *c,int x,int z) {
+    Scene *n=c;const AFHolidayTransitionServices *s=n->services;
+    return s->original_collision?s->original_collision(s->context,x,z):-1;
+}
 static int go(void *c,AFHolidayTransition *s,const AFHolidayDoor *door,int flags) {
     Scene *n=c;const AFHolidayTransitionServices *o=n->services;
     int type=s->common.start_demo_request.type;
@@ -111,7 +119,8 @@ int af_holiday_transition_native_fade(void *context,void *manager,unsigned int d
     if(!player)return -1;
     AFHolidayTransition view={0};Scene n={af_holiday_native_game,manager,native,&view,o};
     AFHolidayTransitionOps ops={.status=status,.resolve=identity,.go=go,.climate=climate,
-        .tempo=tempo,.warp=warp,.bgm=bgm,.correct=correct};
+        .tempo=tempo,.warp=warp,.bgm=bgm,.correct=correct,
+        .original_rank=original_rank,.original_collision=original_collision};
     af_holiday_transition_native_geometry(&ops);
     view.context=&n;view.ops=&ops;view.maps=o->maps;view.map_bytes=o->map_bytes;
     const int *w=manager;const unsigned char *common=af_holiday_transition_common;

@@ -1,7 +1,7 @@
 #ifndef AF_V3_HOLIDAY_TRANSITION_H
 #define AF_V3_HOLIDAY_TRANSITION_H
 #include "holiday_reserved.h"
-enum {AF_HT_SOURCE_STRUCTURE=5};
+enum {AF_HT_SOURCE_STRUCTURE=5,AF_HT_ORIGINAL_LAYOUT=128};
 typedef struct {float x,y,z;} AFHolidayPosition;
 typedef struct {short x,y,z;} AFHolidayShortPosition;
 typedef struct {
@@ -33,6 +33,10 @@ typedef struct {
     void (*warp)(void *,struct AFHolidayTransition *);
     void (*bgm)(void *);
     int (*correct)(void *);
+    /* Priority position of the original N64 layout, -1 for none, -2 for
+     * invalid state. Its names and collision remain in the native namespace. */
+    int (*original_rank)(void *);
+    int (*original_collision)(void *,int,int);
 } AFHolidayTransitionOps;
 /* A normalized, explicitly populated view, never a cast of either game's
  * differently laid-out ACTOR/GAME_PLAY/CommonData structures. */
@@ -75,6 +79,7 @@ int af_holiday_transition_count(AFHolidayTransition *,int index);
 int af_holiday_transition_unit(AFHolidayTransition *,unsigned short *,int *,int *,int donor,int index);
 int af_holiday_transition_structure(AFHolidayTransition *,int,int,unsigned short,int,int);
 int af_holiday_transition_ready(AFHolidayTransition *);
+int af_holiday_transition_original(AFHolidayTransition *,int,int);
 /* Fill all eight geometry operations from checked native functions, retaining
  * the caller's actual identity/status and transition-lifecycle operations. */
 int af_holiday_transition_native_geometry(AFHolidayTransitionOps *);
@@ -96,9 +101,14 @@ typedef struct {
     int (*alternate_demo)(void *);
     void (*climate)(void *,int);
     void (*tempo)(void *);
+    int (*original_rank)(void *);
+    int (*original_collision)(void *,int,int);
 } AFHolidayTransitionServices;
 /* Signature matches AFHolidayDedicatedServices.fade. Reads the actual N64
  * player/manager/common state and commits native scene/return state in order. */
 int af_holiday_transition_native_fade(void *,void *manager,unsigned int donor,
     unsigned int native,unsigned int title,unsigned int landmark);
+/* Complete native state/identity binding for scheduled owners. */
+int af_holiday_transition_bind(AFHolidayTransitionServices *);
+int af_holiday_transition_live_fade(void *,void *,unsigned int,unsigned int,unsigned int,unsigned int);
 #endif
