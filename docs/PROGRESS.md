@@ -31,9 +31,9 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
-The current proposal is ABI 313 at
-`build/v3-diary-category-work-01/tortimer-installed-03/build-lock.json`, ROM SHA-256
-`420aa20508dcba3bd0f586d493aaa9dcceb72b81550671344b6e3dce2d4d44db`.
+The current proposal is ABI 314 at
+`build/v3-diary-category-work-01/tortimer-services-03/build-lock.json`, ROM SHA-256
+`195c0a4da5bd05e39e2ea4ad34aa46cae58a287e9e998d3c4e49e8e3ae86a426`.
 It contains 191 independently selectable development imports, including all nine
 fish and eight insects, and 100 inactive furniture profiles whose acquisition
 is pending, plus sixteen inactive diary cover profiles. The main lock and both
@@ -140,7 +140,7 @@ native rendering, ordinary diary use, save/reload, or hardware compatibility.
 
 The installed diary bindings connect every carried parent to its cover, single
 save-profile bit, catalogue ordering, and scoring. Browser and offline composition
-agree for empty, mixed, and all-supported selections on ABI 313. Prepared diaries
+agree for empty, mixed, and all-supported selections on ABI 314. Prepared diaries
 remain unavailable, including under select all; inactive catalogue/scoring rows
 are removed from composed builds. The shared save/profile host check uses real
 carried readers, selected-style resolution, canonical codec, and format-eleven
@@ -170,7 +170,7 @@ visitors, full pockets, vacation callbacks/dates, and duplicate handover handlin
 are implemented together. Four focused host checks pass, including the complete
 donor conversation comparison and the donor calendar query comparison. The
 VR4300 controller compiles with explicit diary/reward/library link dependencies.
-It is not installed: Tortimer's actor/schedule, motion binding, official message
+It is not installed: Tortimer's actor/event owner, official message
 routing, native demo transport, and exercise-card route remain necessary.
 
 Tortimer's complete model and expressions are converted within the existing NPC
@@ -182,7 +182,7 @@ including current owner hooks and sanitized expression/bounds handling; the
 adapter compiles for VR4300. These components are installed through the shared
 registry and resource loader; native rendering is unverified.
 The [actor connection notes](../specs/V3_DIARIES.md#tortimer-artwork-and-native-actor-connection)
-identify the remaining lifecycle, cane-motion, schedule, and message/demo
+identify the remaining lifecycle, event scheduling, and message/demo
 consumers. Diary choices remain inactive; saves and V2 deployments are untouched.
 
 The full fifteen-state Tortimer movement controller connects to the existing
@@ -191,9 +191,11 @@ compares the complete donor think file and exercises request → conversation �
 attendance → delivery → resumed movement. The native lifecycle bridge supplies
 the checked N64 callbacks, actor fields, requests, and real demo-end/delivery
 signals. Both VR4300 objects are prepared at
-`build/v3-diary-category-work-01/tortimer-actor-03/`, not linked or installed.
-The remaining services include walking-only schedule and cadence, event owner,
-cane-animation binding, and English message transport.
+`build/v3-diary-category-work-01/tortimer-services-03/actor/`, not linked or installed.
+They call the installed walking-only and cane-animation exports. Timed pauses
+consume elapsed 60 Hz ticks rather than doubling in duration at native 30 Hz.
+The remaining services include the event owner, live world/reward data, and
+English message/demo transport.
 The actor needs 2,612 bytes; the ordinary NPC pool rejects sizes above 2,400,
 so it uses a separate guarded pool instead of growing the original nine slots.
 Diaries remain unavailable, and no native gameplay is claimed.
@@ -222,6 +224,23 @@ The saved format/profile is unchanged from the preceding diary proposal; native
 save compatibility is not newly tested. Format-eleven backward incompatibility
 with V2 and earlier V3 remains. The next work is the same actor-provider connection,
 not another allocation or artwork conversion pass.
+
+The installed shared motion adapter occupies 2,016 bytes inside the existing
+actor-code reservation. It preserves the native main/face animation and bank
+ownership, then initializes the complete cane channel and retains the donor's
+arm/mouth joint selection. Native wait/clap motions match all donor channels and
+controls. Walking keeps native collision/path/interruption handling while using
+the donor's walking-only probabilities and block-edge initialization. Ordinary
+NPCs use the original functions. No art, actor slots, saved format, or profile
+changes are required.
+
+Focused sanitized checks compare walking decisions and timer states with the
+actual donor C, including pause boundaries; they also cover cane arguments,
+block edges, and ordinary fallbacks. Installed hooks, relocations, trampoline,
+retained resources/guards, and current browser/offline composition pass. The
+controller and lifecycle bridge compile with the new bindings. These checks do
+not establish native animation, gameplay, or hardware behaviour. Diary choices
+remain unavailable until the event/conversation/exercise path is connected.
 
 Both source artwork variants, school desk and bus stop, are installed through
 the ordinary shared importer. Complete original-N64 profile/model comparison

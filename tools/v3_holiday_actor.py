@@ -96,6 +96,13 @@ def prepare(source,output,lock):
     if output.exists() or not output.is_relative_to(ROOT/'build'):raise ValueError('Use a fresh ignored actor output')
     report=discover(source);base,prior=inputs(lock)
     report['native']=native_contract(base)
+    motion=prior.get('equipment_resources',{}).get('npc_extra',{}).get('motion')
+    if motion:
+        owner=by_vrom(base)[0x8681F0].extract(base)
+        if sha256(owner)!=motion['owner_sha256']:raise ValueError('Changed installed holiday motion owner')
+        report['native'].update(motion_services=motion,
+            motion_indices_bound=True,walking_only_schedule_bound=True,
+            callback_cadence_verified=True,native_callback_cadence_executed=False)
     report['base_sha256']=sha256(base);report['base_abi']=prior['runtime_abi']
     output.mkdir(parents=True)
     report['kernel']=compile_kernel(output,name='holiday_actor')

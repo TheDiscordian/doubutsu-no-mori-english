@@ -245,6 +245,31 @@ static void connected(void) {
     assert(af_holiday_actor_set_think(&a,&o,15)==-1);
     e.event=8;e.field=4;assert(af_holiday_actor_think(&a,&w,&o)==-1);
 }
+static void elapsed(void) {
+    const unsigned states[]={9,13,14};
+    for(unsigned i=0;i<3;++i)for(unsigned ticks=1;ticks<=3;++ticks)
+        for(int timer=0;timer<=300;++timer) {
+            Env e={0},r;AFHolidayActor a={.ready=1};AFHolidayActorOps o=ops(&e);
+            AFHolidayWorld w={.diary=&diary};r=e;ref=&r;
+            assert(af_holiday_actor_set_think(&a,&o,states[i])==1);
+            aES2_setup_think_proc(&r.npc,NULL,states[i]);a.timer=r.npc.timer=timer;
+            assert(af_holiday_actor_think_elapsed(&a,&w,&o,ticks)==1);
+            for(unsigned t=0;t<ticks;++t)aES2_think_main_proc(&r.npc,NULL);
+            if(a.timer!=r.npc.timer || a.think!=r.npc.think_idx) {
+                fprintf(stderr,"timing state=%u ticks=%u start=%d: port=%d/%u donor=%d/%d\n",
+                    states[i],ticks,timer,a.timer,a.think,r.npc.timer,r.npc.think_idx);
+                assert(0);
+            }
+        }
+    Env e={0};AFHolidayActor a={.ready=1};AFHolidayActorOps o=ops(&e);
+    AFHolidayWorld w={.diary=&diary};
+    assert(af_holiday_actor_set_think(&a,&o,14)==1 && a.timer==300);
+    for(unsigned frame=0;frame<150;++frame)assert(af_holiday_actor_think_elapsed(&a,&w,&o,2)==1);
+    assert(a.timer==0);assert(af_holiday_actor_think_elapsed(&a,&w,&o,2)==1 && a.timer==299);
+    AFHolidayActor unchanged=a;
+    assert(af_holiday_actor_think_elapsed(&a,&w,&o,0)==-1 && !memcmp(&a,&unchanged,sizeof(a)));
+    assert(af_holiday_actor_think_elapsed(&a,&w,&o,256)==-1 && !memcmp(&a,&unchanged,sizeof(a)));
+}
 int main(int argc,char **argv) {
     assert(argc==2);FILE *f=fopen(argv[1],"rb");assert(f);
     table_bytes=fread(table,1,sizeof(table),f);assert(feof(f));fclose(f);
@@ -254,5 +279,5 @@ int main(int argc,char **argv) {
         scenario(0,event,field,0);
     for(unsigned event=101;event<=102;++event)for(unsigned bits=0;bits<32;++bits)
         scenario(0,event,0,bits);
-    connected();puts("holiday actor: complete donor think comparison and connected conversation/calendar/handover pass");
+    connected();elapsed();puts("holiday actor: donor think/timing comparison and connected conversation/calendar/handover pass");
 }

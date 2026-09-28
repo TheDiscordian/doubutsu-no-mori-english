@@ -12,10 +12,10 @@ The calendar/reading/editing/storage controller and shared native-save adapter
 are implemented in source and compile for VR4300. Host checks cover room surface
 selection, calendar navigation, editing/privacy/capacity admission, and the
 save → probe → reload path. They do not establish in-game UI operation,
-native FlashRAM timing, ordinary gameplay, or hardware compatibility. ABI 312
+native FlashRAM timing, ordinary gameplay, or hardware compatibility. ABI 314
 contains menus, resident packets, room/visit hooks, save dispatch, carried readers,
 complete room covers, and catalogue/scoring integration at
-`build/v3-diary-category-work-01/catalogue-03/`. Neither patcher changes.
+`build/v3-diary-category-work-01/tortimer-services-03/`. Neither patcher changes.
 
 ## Donor contract
 
@@ -374,9 +374,9 @@ These offsets are not the donor clip layout. The cane uses the donor's shared
 `aNPC_SUB_ANIM_TUE` channel and `cKF_ba_r_npc_1_tue1` (64-byte NPC motion record,
 donor animation index `F3`), not a static hand pose or an assumed identical native
 index. The registry, descriptor chaining, full voice, model, textures, and drawing
-adapter are installed. The full cane resource is resident; its native animation
-caller, event scheduling, official messages/demo transport, and exercise-card
-path remain unconnected. Reuse the installed resources and 28-event controller
+adapter are installed. The full cane resource and its native animation caller
+are installed. Event scheduling, official messages/demo transport, and the
+exercise-card path remain unconnected. Reuse the installed resources and 28-event controller
 while finishing those consumers; no diary selection is enabled.
 
 ### Additive actor allocation and complete resource loading
@@ -433,7 +433,52 @@ Start/end frames 1/29, repeat mode, morph -5, and null face/effect/audio program
 are retained. The resident header is `806EF348`; arrays use checked resident
 addresses. Non-null dependent programmes require explicit conversion and reject
 instead of being dropped. Ten shared converter checks pass, including unchanged
-ordinary keyframe outputs. The cane's runtime animation caller is still pending.
+ordinary keyframe outputs. The runtime caller uses the installed motion services
+described below.
+
+### Shared native motion services
+
+`--holiday-actor-services` connects the motion adapter through the shared builder,
+using the existing registry packet rather than allocating or converting more art.
+The current ABI-314 proposal is `build/v3-diary-category-work-01/tortimer-services-03/`.
+The 2,016-byte adapter begins at `806E6000`; the remainder of the actor-code
+reservation through `806EE000` is available for the event/conversation bridge.
+All packet bytes outside that code remain unchanged, including inactive profile
+flags, original registry code, complete cane data, and actor guards.
+
+The outdoor animation entry at `809749D0` dispatches through a scoped wrapper.
+Ordinary actors enter the original function through a checked prologue trampoline;
+the continuation is resolved from the live clip. For the owned Tortimer subtype
+three, the wrapper temporarily hides the unsupported native table index, retains
+all original main/face initialization and native bank reference counts, restores
+the subtype, and initializes keyframe `354` from the resident cane's full control
+record. Native joint tables match the donor: joints 18–21 use the cane channel,
+and 23–24 use the speaking channel when appropriate. The ordinary animation-bank
+references remain valid for playback and cleanup. Wait/clap indices 5/67 are
+verified against every donor keyframe array and control field, not inferred from
+matching index numbers.
+
+Walking uses native schedule four with scoped decision/init dispatch. The donor's
+six-of-ten walking branch cannot become running; fatigue, sleep, turn continuation,
+collision/range, destination attempts, interrupts, and request priority are
+preserved. Starting on a block edge refreshes home X/Z and block-centred bounds,
+retaining home height. Unexported helpers resolve relative to the live outdoor
+schedule export. Exactly two native relocations are removed for the replaced
+decision call and init-table entry; all others remain.
+
+The lifecycle controller reads `game_GameFrame` at `80145048` once per actual
+native think update. Timers use elapsed 60 Hz ticks, including the transition
+tick and residual time on repeated clapping, while native movement/collision and
+positioned audio still execute once per world update. GameCube initialization
+uses frame divisor one; N64 initialization uses two. Source/timer comparison
+checks this adaptation; native wall-clock execution is not claimed.
+
+The sanitized movement adapter is compared with the complete donor decision
+function. The existing complete donor-think comparison covers elapsed-tick wait
+and repeat boundaries, alongside the connected conversation/calendar/handover
+check. Current installed code/relocation/trampoline/guard/resource checks and
+empty/mixed/all-supported browser/offline composition pass. No additional native
+fixture is run, no diary is enabled, and no save format/profile changes.
 
 ### Connected holiday movement and lifecycle bridge
 
@@ -467,10 +512,11 @@ path, not merely enlarge the profile's size. Do not grow the nine original slots
 or write the new transient state beyond an original slot. The existing native
 free path also routes D/E identities through clip `10`.
 
-Preparation at `build/v3-diary-category-work-01/tortimer-actor-03/` contains the
+Preparation at `build/v3-diary-category-work-01/tortimer-services-03/actor/` contains the
 shared controller and native bridge, with maximum individual frames of 88 and
-144 bytes respectively. Their complete dynamic stack and native callback cadence
-remain unverified. `tools/v3_holiday_actor.py` checks all 37 complete donor actor
+144 bytes respectively. Their complete dynamic stack and native execution
+remain unverified. Cadence adaptation has source and host evidence above.
+`tools/v3_holiday_actor.py` checks all 37 complete donor actor
 functions, relocations, complete actor data, and current native request/think/
 schedule/constructor dependencies. The 15-state controller and the real
 conversation/calendar/reward functions pass one sanitized combined host check;
@@ -480,10 +526,11 @@ started and the exhausted diary title-fixture budget is unchanged.
 Five installation services remain explicit linker dependencies:
 `af_holiday_npc_bind`, `af_holiday_npc_world`, `af_holiday_npc_resources`,
 `af_holiday_npc_unregister`, and `af_holiday_npc_continue`. Binding must supply
-the actual event owner, complete English messages/demo transport, walking-only
-wandering, correct update cadence, full voice/cane resources, and checked actor
-allocation/registry. Ordinary N64 wandering can run; it is not a substitute for
-the donor's walking-only mode. The separate exercise/card route remains required.
+the actual event owner, live world/reward data, complete English messages/demo
+transport, cleanup, continuation, and validation of the active outdoor clip and
+full voice. The installed walking/cane/resource exports and elapsed-tick controller
+are reused; allocation and drawing are already connected. The separate
+exercise/card route remains required.
 These are remaining consumers of the same diary category, not new per-event
 tasks. Keep the existing art, draw, and conversation objects; link and install
 the connected path before enabling diary choices.

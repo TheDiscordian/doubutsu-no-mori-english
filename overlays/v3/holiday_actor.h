@@ -56,6 +56,8 @@ int af_holiday_actor_construct(AFHolidayActor *,const AFHolidayWorld *,unsigned 
 int af_holiday_actor_think_init(AFHolidayActor *,const AFHolidayActorOps *);
 int af_holiday_actor_set_think(AFHolidayActor *,const AFHolidayActorOps *,unsigned int);
 int af_holiday_actor_think(AFHolidayActor *,const AFHolidayWorld *,const AFHolidayActorOps *);
+/* Elapsed 60 Hz ticks: native actors still move once per world update. */
+int af_holiday_actor_think_elapsed(AFHolidayActor *,const AFHolidayWorld *,const AFHolidayActorOps *,unsigned int);
 int af_holiday_actor_request(AFHolidayActor *,const AFHolidayActorOps *);
 int af_holiday_actor_prepare(AFHolidayActor *,const AFHolidayWorld *,const AFHolidayActorOps *);
 int af_holiday_actor_start(AFHolidayActor *,const AFHolidayWorld *,const AFHolidayActorOps *);

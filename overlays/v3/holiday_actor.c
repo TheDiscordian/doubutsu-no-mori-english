@@ -68,8 +68,8 @@ int af_holiday_actor_think_init(AFHolidayActor *a,const AFHolidayActorOps *o) {
     o->weight(o->context,0xFE);o->hide_request(o->context,0);
     return af_holiday_actor_set_think(a,o,0);
 }
-int af_holiday_actor_think(AFHolidayActor *a,const AFHolidayWorld *w,const AFHolidayActorOps *o) {
-    if(!actor_valid(a) || !w || !valid(o))return -1;
+int af_holiday_actor_think_elapsed(AFHolidayActor *a,const AFHolidayWorld *w,const AFHolidayActorOps *o,u32 ticks) {
+    if(!actor_valid(a) || !w || !valid(o) || !ticks || ticks>255)return -1;
     void *c=o->context;AFHolidayMotion m;short p[3];
     o->demo_flags(c,0x800,0);
     switch(states[a->think][0]) {
@@ -119,15 +119,25 @@ int af_holiday_actor_think(AFHolidayActor *a,const AFHolidayWorld *w,const AFHol
             return af_holiday_actor_set_think(a,o,a->think-1);
         break;
     case 6:
-        if(a->timer>0)--a->timer;
-        else return af_holiday_actor_set_think(a,o,a->think>=13?6:a->think+1);
+        if(a->timer>=(int)ticks)a->timer-=ticks;
+        else {
+            if(a->timer>0)a->timer=0;
+            return af_holiday_actor_set_think(a,o,a->think>=13?6:a->think+1);
+        }
         break;
     case 7:
-        if(a->timer>0)--a->timer;
-        else if(af_holiday_actor_set_think(a,o,a->think)<0)return -1;
+        if(a->timer>=(int)ticks)a->timer-=ticks;
+        else {
+            u32 remaining=ticks-(a->timer>0?(u32)a->timer:0)-1;
+            if(af_holiday_actor_set_think(a,o,a->think)<0)return -1;
+            a->timer-=remaining;
+        }
         o->motion(c,&m);if(m.clapping)o->clap_sound(c);break;
     }
     return 1;
+}
+int af_holiday_actor_think(AFHolidayActor *a,const AFHolidayWorld *w,const AFHolidayActorOps *o) {
+    return af_holiday_actor_think_elapsed(a,w,o,1);
 }
 int af_holiday_actor_request(AFHolidayActor *a,const AFHolidayActorOps *o) {
     if(!actor_valid(a) || !valid(o))return -1;

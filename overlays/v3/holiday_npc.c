@@ -1,6 +1,7 @@
 /* Actual N64 NPC lifecycle/clip bridge. Actor registration and required services
  * must link together before any descriptor can expose these entry points. */
 #include "holiday_npc.h"
+#include "holiday_motion.h"
 #ifndef __mips__
 #error Native NPC bridge requires the checked o32 target
 #endif
@@ -81,7 +82,7 @@ void af_holiday_npc_ctor(AFHolidayNpc *a,void *game) {
     a->game=game;a->constructed=a->failed=0;a->actor=(AFHolidayActor){0};
     a->ops=(AFHolidayActorOps){0};a->world=(AFHolidayWorld){0};
     unsigned int gender;
-    if(!af_holiday_npc_bind(a) || !a->ops.motion ||
+    if(!af_holiday_motion_bind(a) || !af_holiday_npc_bind(a) || !a->ops.motion ||
             !af_holiday_npc_world(a,&a->world,&gender)) {fail(a);return;}
     if(FN(clip(0xBC),int,void *,void *)(a,game)!=1)return;
     if(af_holiday_actor_construct(&a->actor,&a->world,gender)<0) {fail(a);return;}
@@ -89,7 +90,7 @@ void af_holiday_npc_ctor(AFHolidayNpc *a,void *game) {
     /* Native ctor can invoke the registered schedule during construction. */
     a->constructed=1;
     FN(clip(0xC0),void,void *,void *,const Ctor *)(a,game,&data);
-    if(a->failed || !af_holiday_npc_resources(a)) {fail(a);return;}
+    if(a->failed || !af_holiday_npc_resources(a) || !af_holiday_motion_resources(a)) {fail(a);return;}
     WORD(a,0x8AC)=0xFFFFFFFFu;REAL(a,0x134)=1350.0f;
     void *player=FN(0x800B1C84u,void *,void *)(game);
     if(!player) {fail(a);return;}
@@ -123,7 +124,8 @@ void af_holiday_npc_think(AFHolidayNpc *a,void *game,int type) {
     if(!refresh(a,game))return;
     AFHolidayActorOps o=operations(a);
     int result=type==0?af_holiday_actor_think_init(&a->actor,&o):
-        type==1?af_holiday_actor_think(&a->actor,&a->world,&o):1;
+        type==1?af_holiday_actor_think_elapsed(&a->actor,&a->world,&o,
+            *(const volatile u8 *)0x80145048u):1;
     if(result<0)fail(a);
 }
 void af_holiday_npc_request(AFHolidayNpc *a,void *game) {
