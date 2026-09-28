@@ -640,8 +640,9 @@ Remaining owner connections share one category task:
   events except autumn fishing, then autumn fishing, January/February vacation,
   and morning exercise. Date occurrence alone is not native RUN/SHOW state.
 - Reuse the installed native event directory/campsite infrastructure: 128 index
-  entries, 64 today slots, and 80 manager references. The actual actor-owner
-  callbacks and schedule caller still need connection. Camper event 70 stays reserved.
+  entries, 64 today slots, and 80 manager references. Shared shrine/wandering
+  callbacks are connected; dedicated owners and the schedule caller still need
+  connection. Camper event 70 stays reserved.
 - Bind the installed shared shrine and wandering owners from `ac_event_manager.c`
   (`soncho_start/stop/in`, `sonchowandar_start/stop`) to native placement. New Year's, sports,
   cherry blossom, meteor, harvest moon, and Harvest Festival have event-specific
@@ -678,7 +679,7 @@ and validate it again. Unknown resource/reader changes still reject.
 the 812-byte `AFHE` source packet is at `806ED800`. The native directory bridge
 also uses this packet. No allocation, profile bit, saved format, or artwork
 changes. The current build is
-`build/v3-diary-category-work-01/tortimer-native-01/`, ABI 318.
+`build/v3-diary-category-work-01/tortimer-placement-02/`, ABI 319.
 
 `v3_holiday_events.py` derives all 49 relevant rows from the complete checked
 GAFE01 schedule and all 44 associated ownership records from the relocated
@@ -745,7 +746,9 @@ move those resident pointers. All other relocated bytes and the 29 existing
 owner controls are retained. The manager collector uses the current control
 pointer directly and tests capacity before its store; the taken branch's delay
 slot only calculates an index. Counts 80 and above cannot write past the list.
-The complete owner remains 40,048 bytes and its relocation allocation is unchanged.
+The storage-only owner prefix is 40,048 bytes; the connected placement directory
+extends it as described below while retaining this complete prefix except for
+the two control-base pairs and control count.
 
 `af_holiday_native_merge` validates the complete directory, source identities,
 unique plan rows, flags, and free-slot count before any mutation. Failed admission
@@ -759,8 +762,8 @@ explicit separate owner action, not an ordinary notification substitute.
 The compiled schedule bridge connects the installed source planner to this native
 insertion path. Its live caller remains unbound pending actual special dates,
 vacation state, calendar behaviour selection, and complete owner callbacks.
-Keep-bit capacity also needs verification before new owners call native keep
-services. Installing storage and the bridge does not activate actors or diary
+Imported keep flags have separately owned storage/reset; new owners never index
+unknown native keep-array padding. Installing storage and the bridge does not activate actors or diary
 choices, fabricate missing dates, or count scheduled events as attendance.
 
 Three focused checks pass in `tests/test_v3_holiday_native.py`: complete installed
@@ -771,6 +774,58 @@ delay execution. Host death notification is a double. Current browser/offline
 empty, mixed, and all-191 compositions agree. Maximum individual bridge frames
 are 608 bytes for scheduling and 600 for status snapshots, before callees;
 native stack use and gameplay remain unverified. No native fixture is attempted.
+
+### Native placement and shared event owners
+
+`holiday_placement.c` and its native adapter occupy 3,664 bytes at `806F1C00`.
+`holiday_owner.c` occupies 1,008 bytes at `806EC900`. Both use the existing
+64-KiB NPC packet; the artwork, movement, dialogue, world/reward, event kernels,
+actor pool, and guards are retained. Thirteen complete donor functions and the
+native field/manager dependencies are checked by `v3_holiday_placement.py`.
+
+The shared search preserves the three source fallback phases, deterministic
+source-ID seed, selected-shrine margin two, and wandering margin one. It excludes
+the native town's four actual landmarks; the N64 has no donor island dock to
+exclude. Native coordinate structures are `z,x`, including by-value parameters,
+not the donor's `x,z`. Real native field/collision/NPC functions supply candidate
+units and terrain. Appearance uses the donor's ordered 3×3 foreground/height-gap
+search, then the ordinary unit-search fallback, real ground flattening, and the
+NPC clip's actual nine-argument spawn function. No appearance in the entering
+acre returns two; actual spawn failure returns zero. STOP controls culling.
+Invalid coordinates reject before native terrain access. Overlay-private helpers
+resolve against the checked currently loaded manager, not its link-time address.
+
+The complete native event-owner directory has 73 rows: the 29 existing controls,
+including camper 70, followed by all 44 donor owners using fixed IDs 71..114.
+Both manager directory-base pairs and its control count refer to the new table.
+Copied original callbacks retain independent relocations; resident imported
+callbacks do not receive overlay relocation. Native clock/acre dispatch remains
+responsible for RUN and SHOW. The 21 shrine/wandering owners connect start,
+placement, appearance, stop, and culling through that native dispatch. No diary
+attendance comes from scheduling or spawning alone.
+
+Eight bytes at `806F1B80` hold imported keep flags indexed by `native_type - 71`.
+The complete native common-data reset at `80078A10..80078A88` retains its existing
+clear, preserved byte, field initializers, and private-info call, adding two
+inline stores to clear those eight bytes. It calls no early packet code. Original
+keep routines and storage remain unchanged. The fixed actor-name pair at
+`806F1B88` maps ordinary source D074 to D090; the D079 costume destination remains
+zero until its distinct actor is connected. A missing/inactive actor or dedicated
+callback rejects rather than substituting a different actor or returning success.
+The donor's `dpppp` alias is only a developer-arrow reader; real common placement
+storage owns actor position. No new debug-arrow subsystem is claimed.
+
+`tests/test_v3_holiday_placement.py` checks complete donor-search agreement under
+54 host conditions, all 21 shared owner paths, nearby search/spawn/culling,
+reservation and coordinate failures, actual compiled packet/linker bindings,
+complete native/camper relocation retention at two bases, allocation metadata,
+and execution of both original and changed common-reset instructions. Native I/O
+is doubled in host checks; native gameplay remains unverified. Current private
+browser/offline empty, mixed, and all-supported compositions agree. Saved format
+eleven and selection flags stay unchanged; all sixteen diary choices remain
+inactive. The live calendar caller, dedicated/costume/exercise actors, actual
+special-state persistence, remaining NPC lifecycle providers, and activation
+remain part of this same category task. No native fixture is restarted.
 
 ## Serialized diary state
 

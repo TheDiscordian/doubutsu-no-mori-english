@@ -961,6 +961,12 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             menu_resizes={r['vrom']:r for r in equipment_report['player_actions']['balloon_menu']['owner_resizes']}
             if set(menu_resizes)!={0x3950000,0x3960000} or not set(menu_resizes)<=set(owner_changes):
                 raise ValueError('Incomplete declared balloon-menu owner resize')
+        runtime_resizes=report_updates.get('runtime_owner_resizes',[])
+        runtime_by_vrom={r['vrom']:r for r in runtime_resizes}
+        if (len(runtime_by_vrom)!=len(runtime_resizes) or set(runtime_by_vrom)&set(menu_resizes)
+                or not set(runtime_by_vrom)<=set(owner_changes)):
+            raise ValueError('Conflicting or incomplete declared runtime owner resize')
+        menu_resizes.update(runtime_by_vrom)
         for vrom,data in owner_changes.items():
             entry=files[vrom]
             if vrom in growth_vroms:

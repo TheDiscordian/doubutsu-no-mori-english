@@ -160,17 +160,27 @@ back to donor identities. Its calendar caller and actor owners remain unbound.
 Three focused cartridge/host checks pass, including the actual changed MIPS
 capacity branch; browser/offline empty, mixed, and all-supported outputs agree.
 No native fixture is restarted and no diary becomes selectable.
-These components stay complete; live placement and actor binding remain
-unfinished. The remaining providers are `af_holiday_npc_bind`,
+Shared native placement and owner callbacks are installed in
+`build/v3-diary-category-work-01/tortimer-placement-02/`, ABI 319. All 21
+shrine/wandering owners use real field/collision/height/reservation/spawn/culling
+primitives through the native manager. The complete directory retains 29 existing
+controls and appends all 44 donor records; unfinished dedicated callbacks reject
+explicitly. Imported keep flags use eight reserved bytes, cleared inline by the
+native common-data reset, leaving original keep storage untouched. Focused
+sanitized donor/owner checks, current cartridge/relocation/reset checks, and
+browser/offline empty/mixed/all-supported composition pass. No native fixture
+is restarted. These components stay complete; actor activation remains unfinished.
+The remaining providers are `af_holiday_npc_bind`,
 `af_holiday_npc_event_world`, and `af_holiday_npc_unregister`. Connect the native
-event manager's owner callbacks to the installed event exports, bind actual
-special dates and vacation state, and supply native placement/culling and
-event-specific owners. The next consumer is the shared shrine/wandering placement
-path: port the donor's selected/free-unit search and margin rules, bind native
-placement reservation/show/culling, and retain actual error outcomes. Do not
-substitute the differently shaped native free-block helper or activate calendar
-rows without their owners. Verify keep-bit capacity and special-date persistence
-before binding the new owner IDs. Native actor-death notification at `800814B8..800815F0`
+event manager's remaining event-specific owners and calendar caller, bind actual
+special dates/vacation persistence, and finish the costume/exercise identities.
+The next consumer is the NPC lifecycle provider: bind actual event/field observations,
+shrine/runner positions, and cleanup using the installed directory and placement.
+`af_holiday_world_bind` already supplies `af_holiday_world_variant`; reuse it.
+The complete donor actor initializes `melody_inst` to zero and never assigns a
+nonzero value; preserve that actual contract rather than inventing a new melody
+state. Do not activate calendar rows without their actors or treat rejected
+dedicated callbacks as completed implementations. Native actor-death notification at `800814B8..800815F0`
 is callable through the destination-ID bridge;
 it updates matching placement coordinates, sets STOP, and schedules cleanup.
 The native world wrapper supplies the inventory/diary/reward fields; do not
@@ -231,7 +241,7 @@ work. Fix any identified game defect. This does not defer required creature
 behaviours or classify their gameplay as verified.
 
 Use the shared converter and current ABI-318 proposal:
-`build/v3-diary-category-work-01/tortimer-native-01/build-lock.json`.
+`build/v3-diary-category-work-01/tortimer-placement-02/build-lock.json`.
 ROM SHA-256: `77c953cf5ad3021d2ea56d4aa17547af7fc33e0e2b5792b42036ef1f8276fd22`.
 The two static variants use ordinary stock, catalogue/scoring, save-profile bits,
 and independent browser/offline selection. Their 7,840 artwork bytes are installed

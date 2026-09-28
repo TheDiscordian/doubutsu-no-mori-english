@@ -31,9 +31,9 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
-The current proposal is ABI 318 at
-`build/v3-diary-category-work-01/tortimer-native-01/build-lock.json`, ROM SHA-256
-`77c953cf5ad3021d2ea56d4aa17547af7fc33e0e2b5792b42036ef1f8276fd22`.
+The current proposal is ABI 319 at
+`build/v3-diary-category-work-01/tortimer-placement-02/build-lock.json`, ROM SHA-256
+`a1bcfd063babbfd9d43aae76ff99037459bcb9bc368f8ecb4bfe078097db0335`.
 It contains 191 independently selectable development imports, including all nine
 fish and eight insects, and 100 inactive furniture profiles whose acquisition
 is pending, plus sixteen inactive diary cover profiles. The main lock and both
@@ -56,16 +56,32 @@ and its readers are expanded together to 64 rows and 80 manager references. The
 camper retains its own event and uses the same expanded directory. The manager's
 capacity check precedes its write, fixing the original delay-slot overrun.
 All 44 donor owners have fixed additive IDs, with a transactional native insertion
-bridge and live status/cleanup mapping. The bridge does not manufacture ACTIVE,
-RUN, SHOW, or attendance from calendar dates. Its native schedule caller and
-actor-manager callbacks, actual special dates/vacation state, event-specific
-owners, and the separate exercise/card conversation remain required before activation. Installed
-code is not a claim that Tortimer or any diary is playable.
+bridge and live status/cleanup mapping. The native manager's 73-row directory
+retains all 29 native/camper controls and connects all 21 shared shrine/wandering
+owners to actual field, reservation, terrain, spawn, and culling services.
+The donor search order, shrine margins, and nearby height checks are preserved.
+Separate imported keep flags reset with native common state without extending
+an unknown native array. Dedicated callbacks explicitly reject while unfinished;
+Halloween does not substitute ordinary Tortimer for its costume actor.
+The native schedule caller, actual special dates/vacation state, event-specific
+actors, remaining NPC lifecycle providers, and separate exercise/card conversation
+remain required before activation. Installed code is not a claim that Tortimer
+or any diary is playable.
 
-Three focused current directory checks pass: installed readers and relocation/
+Three focused placement/owner checks pass: 54 comparisons with complete donor
+search functions and all 21 shared owner paths under sanitizers; current packet,
+callback relocation, retained components, and native allocation metadata; and
+execution of the changed common-reset instructions with both branch delay slots
+and native-state preservation. Native terrain/spawn calls are host doubles in the
+host check. The first owner-check attempt retained its deliberate reserve-failure
+setting; correcting that setup passes. Current browser/offline empty, mixed,
+and all-191 compositions agree. No native fixture is restarted. The connected
+path remains the same unfinished diary-category task, not a new release.
+
+Three retained directory checks pass: installed readers and relocation/
 resource retention; sanitized all-owner admission, capacity rejection, status,
 and cleanup; and execution of the changed MIPS capacity branch with delay-slot
-handling. Current browser/offline empty, mixed, and all-191 compositions agree.
+handling.
 The 1,360-byte bridge, 256-byte identity map, and expanded temporary storage use
 the existing packet. Save format eleven and all profile bits are unchanged.
 Older compatible saves retain forward migration; V2 and earlier V3 formats cannot

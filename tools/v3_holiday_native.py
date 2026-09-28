@@ -138,6 +138,9 @@ def patch_manager(base):
 
 
 def install(base,prior,blob,core,output):
+    if prior['equipment_resources']['npc_extra'].get('events',{}).get('native_directory'):
+        from v3_holiday_placement import install as install_placement
+        return install_placement(base,prior,blob,core,output)
     del blob
     equipment=copy.deepcopy(prior['equipment_resources']);npc=equipment['npc_extra']
     if not npc.get('events') or npc['events'].get('native_directory'):
