@@ -30,6 +30,28 @@ SOURCES = ('tools/v3_holiday_items.py', 'tools/v3_registry.py', 'tools/v3_item_c
     'overlays/v3/holiday_items.ld', 'overlays/v3/creature_icon.S', 'overlays/v3/item_categories.c',
     'translations/provenance.json')
 PREPARED = ROOT/'build/v3-diary-category-work-01/event-items-prepared-03'
+PICKUP_RAM = 0x80707000
+PICKUP_SOURCES = SOURCES+('overlays/v3/holiday_pickup.c','overlays/v3/holiday_pickup.S',
+    'overlays/v3/holiday_pickup.ld','overlays/v3/decoration_actor.h','tools/v3_holiday_dialogue.py',
+    'tools/v3_event_text.py','tools/v3_player_actions.py')
+PICKUP_NATIVE = (
+    ('af_holiday_pickup_find',0x800B80B4,0x800B8128,'a66e85096d846c37b6131dc4d5bb3b50fdde2ece121e1355c1c9bedb13bc1394'),
+    ('af_holiday_pickup_demo',0x8007CDD8,0x8007CF00,'e96b6e94b5d07e8749ca32ba0cb279ca01c1188c4253a273cb6014e6a03dc5c6'),
+    ('af_holiday_pickup_title',0x8007D90C,0x8007D91C,'f36a165b7d65a6ce4b7e25d3a9cc40585f08edd0738b8c924d75b3435c70690a'),
+    ('af_holiday_pickup_message',0x8007B5C0,0x8007B5F4,'b54b7ba3c3734fe633386c949511c81623090c04bb59d274a870d8f1be1af1ce'),
+    ('af_decor_native_player',0x800B1C84,0x800B1C90,'f680a77d022740add2a8ead09c6438223d596b51cd655775b7a7ec0c80725404'),
+    ('af_decor_native_ground',0x80071A08,0x80071AB8,'bb4e0020a3b25835f60ec899571268e482790d1741d23e271b52dbd0919ab750'))
+PICKUP_PLAYER = (
+    (0x808BBFD4,0x808BC2D8,'e8ec3959fdf4bf8186635be089341893be4dcbe0021478a3909d3b1728444c1d'),
+    (0x808C8218,0x808C82A8,'8152a6b5b04fc71330c6d3eb1b7a85cc5c0e1ac3f4404586fa7efe24de36886d'),
+    (0x808C82A8,0x808C843C,'23819c4260ccdc049b40d8f2081a37b5af75e17474fbe766a42ee67e5db7b451'),
+    (0x808B55E8,0x808B5644,'b445dc7600a6a02ca526606e53ce695404bbb140263b75ff6e7b648896d390a7'),
+    (0x808C0624,0x808C06AC,'bb9c5ed4b5282cc3895423b6f1b426b7518422320deabb1b2d765d86df218dd8'))
+GROUND_CLASSIFY = (
+    '91550b4337a04156de81bb91b881bc8d9eeba654d7401513a9fdaabe433d6218',
+    '8f3ff49f740614017caeb2a6f2edfd0fc8f16ba2899f7ddcd08027ba92d805c8',
+    'eec27835222c71d0524122d5b2a0ac6fcf3b9b42b3672859fb95e191c761b48e',
+    '75bf81404396388cb475e64b1dd63caea96e9e8b61e66d52208cea23bc567922')
 
 
 def records(source):
@@ -207,6 +229,157 @@ def install(base, prior, blob, core, module, output, directory=PREPARED):
     if attribution:write_new(output/'provenance.patch',attribution.encode())
     write_new(output/'holiday-items.json',(json.dumps(e['holiday_items'],indent=2)+'\n').encode())
     write_new(output/'holiday-items-packet.bin',raw)
+    return e,changes,dict(physical_resources=resources),[(dict(record,previous_sha256=packet['sha256']),bytes(raw))]
+
+
+def pickup_text(base, prior, output):
+    from v3_camper_text import donor,extend_bank
+    from v3_event_text import MESSAGE,TABLE,CHOICE_TABLE
+    from v3_holiday_dialogue import credit,check_provenance
+    from gc_text import decode_gc
+    from runtime_module import module_command_info
+    from textcodec import encode,tokenize
+    from textvalidate import expanded_bound
+    messages,_,decoder=donor();original=messages[0x3B59];info=module_command_info(base)
+    if sha256(original)!='79ed472283ad1d4bf0c54e700fad3701a266df73404ae4f8bf39ee1f624a42f5':
+        raise ValueError('Changed official Harvest full-pocket message')
+    data=encode(decode_gc(original,decoder),info);tokens=list(tokenize(data,info))
+    if (expanded_bound(data,info)>1024 or not tokens or tokens[-1].data!=b'\x7f\0' or
+            sum(t.kind=='cmd' and t.data[1]==0 for t in tokens)!=1 or
+            any(t.kind=='cmd' and t.data[1] not in (0,3,5) for t in tokens)):
+        raise ValueError('Unreviewed Harvest refusal control or buffer bound')
+    entry=credit('message:3060','message:3B59',original,data,
+        ['Native encoding; retain official wording, line breaks, colours, and pause'])
+    entry['locales']['en']['locator']=['tools/v3_holiday_items.py:pickup_text','N64/message/3060']
+    text=dict(first_id=0x3060,count=1,source_id=0x3B59,provenance_entries=[entry],
+        bytes=len(data),sha256=sha256(data),expanded_bound=expanded_bound(data,info),
+        choice_vrom=prior['import_storage']['choice_vrom'])
+    check_provenance(text)
+    files=by_vrom(base);cv=text['choice_vrom']
+    payload,table=extend_bank(files[MESSAGE].extract(base),files[TABLE].extract(base),[data],0x3060)
+    text['resources']=[]
+    for v,d in ((MESSAGE,payload),(TABLE,table),(cv,files[cv].extract(base)),(CHOICE_TABLE,files[CHOICE_TABLE].extract(base))):
+        name=f'pickup-text-{v:08X}.bin';write_new(output/name,d)
+        text['resources'].append(dict(vrom=v,file=name,bytes=len(d),sha256=sha256(d),
+            original_sha256=sha256(files[v].extract(base))))
+    return text
+
+
+def install_pickup(base,prior,blob,core,output):
+    from v3_equipment_runtime import PLAYER_RAM,PLAYER_VROM,PLAYER_RELOC
+    from v3_ground_categories import OWNERS
+    from v3_event_text import patch_bounds
+    from v3_import_storage import jump
+    from v3_npc_draw import relocation_offsets
+    from v3_npc_clothing import guard_incoming
+    from v3_holiday_state import RAM as STATE_RAM
+    from v3_decoration_actor import SERVICES,CONTEXT,DATA_END
+    import v3_physical_resources as physical
+    del blob
+    e=copy.deepcopy(prior['equipment_resources']);items=e['holiday_items']
+    if items.get('pickup') or items['ready_mask'] or items['selected']:
+        raise ValueError('Event pickup requires the complete inactive item batch, once')
+    packet=e['holiday_state']['packet'];p=packet['physical'];raw=bytearray(base[p:p+packet['bytes']])
+    if (sha256(raw)!=packet['sha256'] or sha256(raw[RAM-STATE_RAM:END-STATE_RAM])!=items['sha256'] or
+            any(raw[PICKUP_RAM-STATE_RAM:END-STATE_RAM])):
+        raise ValueError('Changed shared pickup reservation or retained item resources')
+    files=by_vrom(base);player=files[PLAYER_VROM].extract(base);rel=files[PLAYER_RELOC].extract(base)
+    # Player-action metadata predates the installed creature/UI consumers.
+    # Guard the complete current owner, not that earlier component's receipt.
+    input_player=sha256(player);input_reloc=sha256(rel)
+    if (input_player!='97577813f1e3fba1fdb6e28d4876fcbdfe6760b1c86e2f91eea9e1e4c785ba01' or
+            input_reloc!='1c750e3767eb8b4d8bb58079555fe32698a7cd7b47d2d1cd85e2b4e5adc89cad'):
+        raise ValueError('Changed complete player owner')
+    for a,b,digest in PICKUP_PLAYER:
+        if sha256(player[a-PLAYER_RAM:b-PLAYER_RAM])!=digest:raise ValueError('Changed complete native pickup consumer')
+    bindings={}
+    for symbol,a,b,digest in PICKUP_NATIVE:
+        if sha256(core[a-CODE_RAM:b-CODE_RAM])!=digest:raise ValueError('Changed native pickup dependency: '+symbol)
+        bindings[symbol]=a
+    controllers=e['npc_extra']['events']['decorations']['controllers'];previous=controllers['code']['symbols']
+    bindings.update(af_holiday_item_type=items['code']['symbols']['af_holiday_item_type'],
+        af_holiday_pickup_prior_resolve=previous['af_decor_actor_resolve'],af_decor_actor_context=CONTEXT,
+        af_holiday_pickup_active=0x80136FD8,af_holiday_pickup_player_ctor=0x80143900)
+    text=pickup_text(base,prior,output);text['hooks']=patch_bounds(core,text['first_id'],1)
+    code,compiled=compile_part('holiday_pickup',output/'holiday-pickup',
+        extra_sources=('overlays/v3/holiday_pickup.S',),defines=(f'AF_HOLIDAY_FORK_REFUSAL={text["first_id"]}',),
+        link_symbols=bindings)
+    if PICKUP_RAM+len(code)>END:raise ValueError('Pickup code overlaps retained models')
+    raw[PICKUP_RAM-STATE_RAM:PICKUP_RAM-STATE_RAM+len(code)]=code
+    source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+        (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    functions=[]
+    for at,name,n in ((0x16DBE0,'Player_actor_CheckAndRequest_main_pickup_all',0x45C),
+            (0x17D7CC,'Player_actor_request_main_pickup_jump',0xA0),
+            (0x17D86C,'Player_actor_setup_main_Pickup_jump',0x198),
+            (0x167240,'Player_actor_putin_item_layer2',0x58),
+            (0x174F10,'Player_actor_Refuse_pickup_demo_ct',0x9C)):
+        body,receipt=source.function(at)
+        if len(body)!=n or receipt['symbol']!=name:raise ValueError('Changed complete source pickup controller')
+        functions.append(receipt)
+    changes={};hooks=[];removed=[]
+    def patch_owner(vrom,rv,ram,plans):
+        data=bytearray(files[vrom].extract(base));reloc=bytearray(files[rv].extract(base))
+        sections=struct.unpack_from('>5I',reloc);words=list(struct.unpack_from('>'+str(sections[4])+'I',reloc,20))
+        locations={sum(sections[:(w>>30)-1])+(w&0xFFFFFF):w for w in words}
+        slots=relocation_offsets(reloc,len(data));deleted=[]
+        guard_incoming(data,sections[0],ram,[(address-ram,4) for address,_,_,_ in plans])
+        for address,before,target,internal in plans:
+            at=address-ram
+            if u32(data,at)!=before or ((at in slots)!=internal):raise ValueError('Changed pickup call/relocation')
+            if internal:
+                word=locations[at]
+                if word>>24!=0x44:raise ValueError('Pickup call is not a text JAL relocation')
+                deleted.append(word)
+            after=jump(target,link=True);struct.pack_into('>I',data,at,after)
+            hooks.append(dict(vrom=vrom,ram=ram,address=address,before=f'{before:08x}',after=f'{after:08x}',
+                removed_relocation=locations.get(at)))
+        kept=[w for w in words if w not in deleted];struct.pack_into('>I',reloc,16,len(kept))
+        reloc[20:20+len(words)*4]=struct.pack('>'+str(len(kept))+'I',*kept)+bytes(4*len(deleted))
+        changes[vrom]=bytes(data);changes[rv]=bytes(reloc)
+        removed.extend(dict(vrom=rv,word=w) for w in deleted)
+        return sha256(data),sha256(reloc),len(deleted)
+    symbols=compiled['symbols']
+    player_sha,rel_sha,count=patch_owner(PLAYER_VROM,PLAYER_RELOC,PLAYER_RAM,[
+        (0x808BC1E0,jump(0x800B1C84,link=True),symbols['af_holiday_pickup_entry'],False),
+        (0x808C8398,jump(0x808B55E8,link=True),symbols['af_holiday_pickup_insert'],True)])
+    e['player_actions'].update(owner_sha256=player_sha,relocation_sha256=rel_sha,
+        removed_relocations=e['player_actions']['removed_relocations']+count)
+    e['player_motion'].update(owner_sha256=player_sha,reloc_sha256=rel_sha)
+    for spec,digest,row in zip(OWNERS,GROUND_CLASSIFY,e['ground_categories']['owners']):
+        data=files[spec['vrom']].extract(base)
+        if sha256(data[0x5AE0:0x5E14])!=digest or u32(data,0x5D88)!=0x8FA400E8:
+            raise ValueError('Changed complete seasonal foreground loop')
+        image_sha,rel_sha,_=patch_owner(spec['vrom'],spec['reloc'],spec['ram'],[
+            (spec['ram']+0x5D84,jump(spec['ram']+0x5A6C,link=True),symbols['af_holiday_pickup_ground'],True)])
+        row.update(output_sha256=image_sha,output_reloc_sha256=rel_sha)
+    at=SERVICES-STATE_RAM
+    if struct.unpack_from('>5I',raw,at)!=(7,previous['af_decor_actor_demo'],previous['af_decor_actor_resolve'],
+            previous['af_decor_actor_effect'],0):raise ValueError('Changed decoration service directory')
+    struct.pack_into('>I',raw,at+8,symbols['af_holiday_pickup_resolve'])
+    struct.pack_into('>I',raw,at+16,symbols['af_holiday_pickup_pocket'])
+    # Providers are connected, but HARVEST admission remains closed until the
+    # event/item profile and saved-item validators are bound.
+    controllers['data']['sha256']=sha256(raw[CONTEXT-STATE_RAM:DATA_END-STATE_RAM])
+    items['sha256']=sha256(raw[RAM-STATE_RAM:END-STATE_RAM])
+    items['pickup']=dict(code=compiled,ram=PICKUP_RAM,bytes=len(code),hooks=hooks,removed_relocations=removed,
+        input_player_sha256=input_player,input_player_relocation_sha256=input_reloc,
+        native_player_functions=PICKUP_PLAYER,native_functions=PICKUP_NATIVE,source_functions=functions,
+        text=text,service_ready=7,source_tick_removal=2,ground_variants=4,installed=True,
+        saved_format_changed=False,native_execution_verified=False,
+        source_files={str(path.relative_to(ROOT)):sha256(path.read_bytes()) for path in (
+            ROOT/'local/ac-decomp/src/game/m_player_main_pickup_jump.c_inc',
+            ROOT/'local/ac-decomp/src/game/m_player_main_refuse_pickup.c_inc',
+            ROOT/'local/ac-decomp/src/bg_item/bg_item_common.c_inc')})
+    items['pending']=['event activation and exercise-card menu','profile/save admission','connected native gameplay']
+    controllers['pending']=['fishing record/text consumers and profile-gated Harvest admission',
+        'shared event activation, attendance, calendar choice, and native execution']
+    resources=copy.deepcopy(prior['physical_resources']);physical.verify(base,resources)
+    record=next(r for r in resources if r['id']==packet['id']);record['sha256']=sha256(raw)
+    e['holiday_state']['packet']=dict(packet,sha256=sha256(raw),crc32=zlib.crc32(raw))
+    e['npc_extra']['sources'].update({s:sha256((ROOT/s).read_bytes()) for s in PICKUP_SOURCES})
+    write_new(output/'holiday-pickup.json',(json.dumps(items['pickup'],indent=2)+'\n').encode())
+    write_new(output/'holiday-pickup-packet.bin',raw)
     return e,changes,dict(physical_resources=resources),[(dict(record,previous_sha256=packet['sha256']),bytes(raw))]
 
 

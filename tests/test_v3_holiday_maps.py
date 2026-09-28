@@ -13,6 +13,78 @@ from apply_translation import write_new
 
 
 class HolidayMapsTests(unittest.TestCase):
+    def test_connected_event_pickup_cartridge(self):
+        """Changed player/drawing/text connections, without a native fixture."""
+        import struct
+        import zlib
+        from aflib import by_vrom,CODE_RAM,CODE_VROM,sha256,u32
+        from v3_asset_loader import BLOB
+        from v3_furniture_install import inputs
+        from v3_holiday_items import PICKUP_RAM,RAM,END,PICKUP_PLAYER,GROUND_CLASSIFY
+        from v3_decoration_actor import SERVICES,CONTEXT,DATA_END,marker_consumers
+        from v3_ground_categories import OWNERS
+        from v3_equipment_runtime import PLAYER_RAM,PLAYER_VROM,PLAYER_RELOC
+        from v3_npc_draw import relocation_offsets
+        from v3_holiday_dialogue import check_provenance
+        current=ROOT/'build/v3-diary-category-work-01/event-pickup-installed-02'
+        image,r=inputs(current/'build-lock.json');base,prior=inputs(current/'base-lock.json')
+        e=r['equipment_resources'];items=e['holiday_items'];pickup=items['pickup']
+        p=e['holiday_state']['packet'];raw=image[p['physical']:p['physical']+p['bytes']]
+        old_p=prior['equipment_resources']['holiday_state']['packet']
+        old=base[old_p['physical']:old_p['physical']+old_p['bytes']]
+        self.assertEqual((p['physical'],p['bytes']),(old_p['physical'],old_p['bytes']))
+        self.assertEqual((sha256(raw),zlib.crc32(raw)),(p['sha256'],p['crc32']))
+        expected=bytearray(old);symbols=pickup['code']['symbols']
+        code=(current/'holiday-pickup/code.bin').read_bytes()
+        self.assertFalse(any(old[PICKUP_RAM-p['ram']:END-p['ram']]))
+        expected[PICKUP_RAM-p['ram']:PICKUP_RAM-p['ram']+len(code)]=code
+        for off,name in ((8,'resolve'),(16,'pocket')):
+            struct.pack_into('>I',expected,SERVICES+off-p['ram'],symbols['af_holiday_pickup_'+name])
+        self.assertEqual(raw,expected)
+        self.assertEqual(u32(raw,SERVICES-p['ram']),7)  # No premature Harvest activation.
+        self.assertEqual(sha256(raw[RAM-p['ram']:END-p['ram']]),items['sha256'])
+        self.assertEqual(sha256(raw[CONTEXT-p['ram']:DATA_END-p['ram']]),
+            e['npc_extra']['events']['decorations']['controllers']['data']['sha256'])
+        files=by_vrom(image);old_files=by_vrom(base)
+        normalized={}
+        self.assertEqual(len(pickup['hooks']),6)
+        for h in pickup['hooks']:
+            data=normalized.setdefault(h['vrom'],bytearray(files[h['vrom']].extract(image)))
+            at=h['address']-h['ram'];self.assertEqual(data[at:at+4].hex(),h['after'])
+            data[at:at+4]=bytes.fromhex(h['before'])
+        for v,data in normalized.items():self.assertEqual(data,old_files[v].extract(base))
+        for v,rv,ram in [(PLAYER_VROM,PLAYER_RELOC,PLAYER_RAM)]+[(s['vrom'],s['reloc'],s['ram']) for s in OWNERS]:
+            rel=files[rv].extract(image);old_rel=old_files[rv].extract(base)
+            n=u32(rel,16);old_n=u32(old_rel,16)
+            self.assertEqual(old_n-n,1)
+            removed=[d['word'] for d in pickup['removed_relocations'] if d['vrom']==rv]
+            words=list(struct.unpack_from('>'+str(old_n)+'I',old_rel,20))
+            self.assertEqual(list(struct.unpack_from('>'+str(n)+'I',rel,20)),[w for w in words if w not in removed])
+            self.assertEqual(rel[:16],old_rel[:16]);self.assertEqual(rel[20+4*old_n:],old_rel[20+4*old_n:])
+            slots=relocation_offsets(rel,len(normalized[v]))
+            for h in pickup['hooks']:
+                if h['vrom']==v:self.assertNotIn(h['address']-ram,slots)
+        for a,b,digest in PICKUP_PLAYER:
+            self.assertEqual(sha256(normalized[PLAYER_VROM][a-PLAYER_RAM:b-PLAYER_RAM]),digest)
+        for spec,digest in zip(OWNERS,GROUND_CLASSIFY):
+            self.assertEqual(sha256(normalized[spec['vrom']][0x5AE0:0x5E14]),digest)
+        check_provenance(pickup['text'])
+        self.assertEqual((pickup['text']['first_id'],pickup['text']['count']),(0x3060,1))
+        for row in pickup['text']['resources']:
+            self.assertEqual(sha256(files[row['vrom']].extract(image)),row['sha256'])
+        core=files[CODE_VROM].extract(image)
+        for h in pickup['text']['hooks']:self.assertEqual(u32(core,h['address']-CODE_RAM),h['after'])
+        self.assertEqual(len(marker_consumers(image,r)),3)
+        self.assertEqual((items['ready_mask'],items['selected']),(0,0))
+        self.assertEqual(r['save_codec'],prior['save_codec'])
+        self.assertEqual(r['save_runtime']['profile_hex'],prior['save_runtime']['profile_hex'])
+        blob=files[BLOB].extract(image);boot=e['surface_bootstrap']['code']
+        at=e['blob_offset']+boot['symbols']['packets']-e['ram']
+        dest,address,size,crc,clear=struct.unpack_from('>5I',blob,at+17*20)
+        self.assertEqual((dest,address,size),(p['ram'],p['physical']|0x80000000,p['bytes']))
+        self.assertEqual(u32(blob,e['blob_offset']+crc-e['ram']),zlib.crc32(raw))
+        self.assertFalse(pickup['native_execution_verified'])
+
     def test_connected_event_item_category_batch(self):
         """Current cartridge/data checks; no replay of native scenario fixtures."""
         import json

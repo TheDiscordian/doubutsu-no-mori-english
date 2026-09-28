@@ -1318,7 +1318,7 @@ current-cartridge check covers the complete records, icon branch, five reader
 hooks, both models, seasonal relocation/allocation changes, startup CRC, and
 save/profile preservation. Empty/mixed/all-191 browser/offline compositions agree.
 
-Remaining connected player consumers are mapped in
+The installed player consumers are mapped in
 `build/v3-diary-category-work-01/harvest-native-player/code.asm`:
 
 - Ordinary pickup controller: `808BBFD4..808BC2D8`. Its input/field/priority
@@ -1329,19 +1329,37 @@ Remaining connected player consumers are mapped in
   `D58/D5C/D60/D6C`. The native request has no donor knife/fork flag.
 - Table-pickup setup starts at `808C82A8`. Its non-furniture path calls
   `808B55E8` at `808C8398`; this inserts into the pocket through `808B5544`
-  and clears layer two through `8008AA98`. Harvest must set its two-source-tick
+  and clears layer two through `8008AA98`. Harvest sets its two-source-tick
   removal counter after actual insertion, not merely after a successful request.
 - Native matching-pocket search is `800B80B4`, with item and condition arguments.
-  Preserve the donor full-pocket refusal branch; do not substitute a generic
-  message while silently dropping the fork-specific behaviour.
+  The full-pocket branch reuses the complete native refusal constructor and
+  then selects the official fork-specific message.
 - All four source seasonal ground generators special-case knife/fork height
   through the actual collision height at its world position. Ordinary flat-item
   drawing alone does not place the fork correctly on the Harvest table.
 
 The installed source Htable controller already owns the exact three-direction
-search, 56-unit reach, fork placement, clip lifetime, and delayed removal. Bind
-its real pocket/player/ground consumers before enabling its readiness bit.
-Exercise-card menus/state handling and profile/save admission remain required.
+search, 56-unit reach, fork placement, clip lifetime, and delayed removal.
+`event-pickup-installed-02/build-lock.json` installs its player/ground connection
+in ABI 331. The 1,152-byte resident adapter at `80707000` preserves the original
+room/outdoor admission and native return frame. The completion wrapper checks
+the actual target pocket and unchanged active-player/clip identity before setting
+the two-source-tick counter. All four seasonal callers retain their original
+output routine, correcting only the fork's world-position height. Five internal
+call relocations are removed; unrelated instructions and relocations remain.
+The pocket and identity providers occupy the existing service directory, with
+the readiness mask still seven. Controller refreshes retain these providers and
+reject a moved underlying resolver until the pickup code is relinked.
+
+Official message `3B59` is installed as `3060`, with unchanged wording, controls,
+and source attribution in `translations/provenance.json`. The checked shared
+text installer relocates the complete four-file bank and extends both message
+bounds. The same holiday packet and startup descriptor retain their allocation.
+Exercise-card menus/state handling, profile/save admission, and event activation
+remain required before enabling Harvest. No new saved format or profile bit is
+introduced; format twelve still cannot be read by V2 or earlier V3 save readers.
+The focused current-cartridge check and empty/mixed/all-supported browser/offline
+comparison pass. Native pickup, rendering, and save/reload execution are unverified.
 
 The original native event-layout directory has fifteen types at `80105030` and
 fifteen pointers at `801055E8`. Its readers are `80081E60..80082168`; the existing

@@ -257,6 +257,11 @@ def marker_consumers(base,prior=None):
             at=hook['address']-start
             if body[at:at+8]!=bytes.fromhex(hook['after']):raise ValueError('Changed event category wrapper')
             body[at:at+8]=bytes.fromhex(hook['before']);wrappers.append(hook)
+        for hook in (prior or {}).get('equipment_resources',{}).get('holiday_items',{}).get('pickup',{}).get('hooks',[]):
+            if hook['vrom']!=vrom or not start<=hook['address']<end:continue
+            at=hook['address']-start
+            if body[at:at+4]!=bytes.fromhex(hook['after']):raise ValueError('Changed event pickup wrapper')
+            body[at:at+4]=bytes.fromhex(hook['before']);wrappers.append(hook)
         if sha256(body)!=digest: raise ValueError('Changed native marker consumer: '+purpose)
         rows.append(dict(purpose=purpose,vrom=vrom,ram=ram,start=start,end=end,sha256=digest,
             installed_sha256=installed_sha256,wrappers=wrappers))
@@ -390,6 +395,17 @@ def install(base, prior, output):
     # The installed renderer already records the verified complete source batch.
     art = json.loads((PREPARED/'art.json').read_bytes())
     data, profiles = actor_data(source,art,report['code'])
+    pickup=equipment.get('holiday_items',{}).get('pickup')
+    if pickup:
+        # The pickup resolver chains directly to this controller's resolver.
+        # Retain both installed providers; never replace them with null slots
+        # during a controller refresh. A moved target requires relinking.
+        old_symbols=installed['code']['symbols'];new_symbols=report['code']['symbols']
+        if new_symbols['af_decor_actor_resolve']!=old_symbols['af_decor_actor_resolve']:
+            raise ValueError('Controller refresh must relink the connected pickup resolver')
+        symbols=pickup['code']['symbols']
+        struct.pack_into('>I',data,SERVICES-CONTEXT+8,symbols['af_holiday_pickup_resolve'])
+        struct.pack_into('>I',data,SERVICES-CONTEXT+16,symbols['af_holiday_pickup_pocket'])
     changes, hooks = patch_owners(base,prior,report['code']['symbols'])
     raw = bytearray(prefix[:RAM-STATE_RAM])+bytearray(END-RAM)
     raw[RAM-STATE_RAM:RAM-STATE_RAM+len(code)] = code

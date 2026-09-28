@@ -739,6 +739,11 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             import v3_holiday_items as equipment
             equipment_report,owner_changes,report_updates,physical_writes=equipment.install(
                 base,prior,blob,core,module,output)
+        elif (prior['equipment_resources'].get('holiday_items') and
+                not prior['equipment_resources']['holiday_items'].get('pickup')):
+            import v3_holiday_items as equipment
+            equipment_report,owner_changes,report_updates,physical_writes=equipment.install_pickup(
+                base,prior,blob,core,output)
         else:
             import v3_holiday_motion as equipment
             equipment_report,owner_changes,report_updates,physical_writes=equipment.install(

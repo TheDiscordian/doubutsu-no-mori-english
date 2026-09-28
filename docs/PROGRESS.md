@@ -31,9 +31,9 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
-The current proposal is ABI 330 at
-`build/v3-diary-category-work-01/event-items-installed-03/build-lock.json`, ROM SHA-256
-`1e150244094be4b073a39d0df18fd1f80edc7335ccd66a0af14524a3e847b907`.
+The current proposal is ABI 331 at
+`build/v3-diary-category-work-01/event-pickup-installed-02/build-lock.json`, ROM SHA-256
+`d86387a198d37c9082cd264f03b18047bc79308aec6fc881e88db62d58ecccd6`.
 It contains 191 independently selectable development imports, including all nine
 fish and eight insects, and 100 inactive furniture profiles whose acquisition
 is pending, plus sixteen inactive diary cover profiles. The main lock and both
@@ -80,18 +80,27 @@ complete descriptor banks without moving scenery or existing artwork. The
 loaded holiday packet does not grow. All fourteen names have official-disc
 attribution in the single provenance catalogue.
 
-The item readiness mask is zero. Exercise-card menus, Harvest tabletop height
-and player pickup/completion, and profile/save admission remain unfinished;
-these resources do not add selectable or playable event items yet. Current
-cartridge checks cover all fourteen records, five reader hooks, the chained icon
-branch, both complete models, seasonal allocation/relocation changes, startup
-CRC, and unchanged save/profile data. The retained nine equipment preparations
-still match their source and compiled resources. No native fixture is restarted.
+Harvest pickup is connected to the actual ordinary-item search, native table
+animation, inventory insertion, and source controller's delayed removal. The
+counter advances only after the requested pocket contains the fork. A full
+inventory uses the native refusal animation and official GameCube message,
+credited in the single provenance catalogue. All four seasonal renderers use
+the actual tabletop collision height. The shared packet retains its allocation;
+the 1,152-byte adapter fits inside its existing reservation.
+
+The item readiness mask is zero. Exercise-card menus, event activation, and
+profile/save admission remain unfinished; no event item becomes selectable or
+playable from these installed connections alone. The current cartridge check
+covers all six changed player/seasonal calls, relocation removal, original
+fallbacks, text/bounds, provider pointers, startup CRC, retained packet resources,
+and unchanged save/profile data. Empty/mixed/all-191 browser/offline outputs agree.
+Existing carried-item resource checks are retained, not replayed. No native
+fixture is restarted, and pickup gameplay has not been executed.
 
 The right fireworks stall uses the checked seven-entry projection bound. The
 renderer retains both donor shadow passes, independently selected digit textures,
 scrolling, joint colours, and frame-phase updates. Fishing-record/text consumers,
-the Harvest player interaction, and event activation remain unfinished.
+Harvest profile/save admission, and event activation remain unfinished.
 Fishing/Harvest service admission remains closed; live event activation remains
 disconnected for the whole batch. Installed controllers do not make these events
 or diaries playable, and native gameplay/rendering have not been verified.

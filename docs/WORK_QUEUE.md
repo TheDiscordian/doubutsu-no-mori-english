@@ -235,13 +235,23 @@ cartridge check and empty/mixed/all-supported browser comparison pass; the
 readiness mask stays zero and save/profile data is unchanged. Reuse the prepared
 batch at `build/v3-diary-category-work-01/event-items-prepared-03/`.
 
-Next connect Harvest pickup at the native ordinary-item search boundary
-`808BC1E0`, retaining the existing action-31 table-pickup request/setup and
-actual pocket insertion. The complete native functions are mapped in the
-[carried-item contract](../specs/V3_DIARIES.md#carried-event-items-and-player-connection).
-Finish tabletop height, full-pocket dialogue, exercise-card menu/state handling,
-and profile/save admission. Continue normalized fishing records and all forty
-message identities within this same task. The countdown's
+The current proposal is ABI 331 at
+`build/v3-diary-category-work-01/event-pickup-installed-02/build-lock.json`.
+Harvest pickup connects the native ordinary-item search boundary `808BC1E0`,
+action-31 animation, and actual pocket insertion to the source removal counter.
+Full-pocket refusal retains the native animation and official donor message;
+all four seasonal ground owners apply tabletop collision height. The current
+cartridge check covers the six hooks/relocations, complete retained owners,
+text/bounds, services, packet/startup CRC, and unchanged save/profile data.
+Empty/mixed/all-supported browser/offline composition passes. These connections
+stay installed; native gameplay and service admission are still unfinished.
+Reuse the [carried-item contract](../specs/V3_DIARIES.md#carried-event-items-and-player-connection).
+
+Next connect normalized fishing records and all forty message identities,
+exercise-card menu/state handling, and profile/save admission within this same
+task. The five-record fishing lifecycle includes holder selection, name/size
+display, and saved records; source inches and native centimetres require the
+behaviour choice, not a silent conversion of saved values. The countdown's
 shared clip and both controllers are installed; retain them while connecting
 event activation. Native/source saved personal IDs differ (16 versus 20 bytes);
 do not cast them or send donor message IDs to native text readers. This is the

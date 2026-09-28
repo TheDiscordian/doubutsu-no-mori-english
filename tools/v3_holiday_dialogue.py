@@ -213,6 +213,11 @@ def install(base,prior,blob,core,output):
 
 def finish(image,base,prior,output,equipment):
     from v3_event_text import install as install_text
+    pickup=equipment.get('holiday_items',{}).get('pickup')
+    if pickup and not prior['equipment_resources'].get('holiday_items',{}).get('pickup'):
+        return install_text(image,base,output,pickup['text'],relocate=True,
+            physical_resources=prior['physical_resources'],
+            reserved_end=prior.get('resource_capacity',{}).get('reserved_physical_end',0))
     npc=equipment['npc_extra'];old=prior['equipment_resources']['npc_extra']
     if npc.get('dialogue') and not old.get('dialogue'):
         return install_text(image,base,output,npc['dialogue']['text'],relocate=True,
