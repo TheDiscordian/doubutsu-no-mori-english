@@ -449,12 +449,20 @@ class HolidayMapsTests(unittest.TestCase):
             native_data='#include "holiday-maps-data.h"\n'+'\n'.join('const unsigned char '+name+'[]={'+
                 ','.join(map(str,data))+'};' for name,data in arrays)+'\n'
             write_new(out/'holiday-native-data.h',native_data.encode())
+            from v3_holiday_active import owner_requirements
+            dependencies,needs=owner_requirements(report,owners,generated)
+            self.assertEqual(len(needs),14)
+            self.assertEqual({n['donor'] for n in needs},{o['type'] for o in owners['owners']})
+            write_new(out/'requirements.c',dependencies.encode())
+            write_new(out/'live-maps.c',('const unsigned char af_holiday_transition_maps[]={'+
+                ','.join(map(str,packet))+'};\n').encode())
             command=['cc','-std=c11','-O1','-g','-Wall','-Wextra','-Werror','-fno-pie','-no-pie',
                 '-fsanitize=address,undefined','-fno-omit-frame-pointer','-ffunction-sections',
                 '-fdata-sections','-Wl,--gc-sections','-I'+str(ROOT/'overlays/v3'),'-I'+str(out),
                 'tests/v3_holiday_dedicated_native_test.c',
-                *(f'overlays/v3/{s}.c' for s in ('holiday_reserved','holiday_native','holiday_events')),
-                str(out/'owners.c'),'-o',str(out/'native-check')]
+                *(f'overlays/v3/{s}.c' for s in ('holiday_reserved','holiday_native','holiday_events',
+                    'holiday_active','holiday_dispatch','holiday_dispatch_native')),
+                str(out/'owners.c'),str(out/'requirements.c'),str(out/'live-maps.c'),'-o',str(out/'native-check')]
             for cmd in (command,[str(out/'native-check')]):
                 result=subprocess.run(cmd,cwd=ROOT,capture_output=True,text=True,timeout=30)
                 self.assertEqual(result.returncode,0,result.stdout+result.stderr)

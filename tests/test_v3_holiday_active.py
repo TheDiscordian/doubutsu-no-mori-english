@@ -22,6 +22,63 @@ CURRENT=ROOT/os.environ.get('V3_HOLIDAY_ACTIVE_BUILD','build/v3-diary-category-w
 
 
 class HolidayActiveTests(unittest.TestCase):
+    def test_live_dispatch_cartridge(self):
+        """Only the current owner/packet changes; no old-build execution."""
+        import zlib
+        from v3_campsite_manager import VROM,RELOC,RAM as OWNER
+        current=ROOT/os.environ.get('V3_HOLIDAY_DISPATCH_BUILD',
+            'build/v3-diary-category-work-01/event-owner-connected-02')
+        image,r=inputs(current/'build-lock.json');base,prior=inputs(current/'base-lock.json')
+        e=r['equipment_resources'];old=prior['equipment_resources'];events=e['npc_extra']['events']
+        dispatch=events['dispatch'];symbols=dispatch['code']['symbols']
+        for name,start,stop,code in (
+                ('npc_extra',ADDRESS,COMMON,dispatch['code']),
+                ('holiday_state',0x806F8800,0x806FB200,dispatch['reserved_code'])):
+            p=e[name]['packet'];before=old[name]['packet']
+            data=image[p['physical']:p['physical']+p['bytes']]
+            expected=bytearray(base[before['physical']:before['physical']+before['bytes']])
+            self.assertEqual((p['ram'],p['physical'],p['bytes']),
+                (before['ram'],before['physical'],before['bytes']))
+            self.assertEqual((sha256(data),zlib.crc32(data)),(p['sha256'],p['crc32']))
+            a=start-p['ram'];b=stop-p['ram']
+            self.assertEqual(sha256(data[a:a+code['bytes']]),code['sha256'])
+            self.assertFalse(any(data[a+code['bytes']:b]))
+            expected[a:b]=data[a:b];self.assertEqual(data,expected)
+        self.assertEqual(e['holiday_fishing']['packet'],e['holiday_state']['packet'])
+        files=by_vrom(image);before=by_vrom(base)
+        self.assertEqual(files[CODE_VROM].extract(image),before[CODE_VROM].extract(base))
+        self.assertEqual(files[RELOC].extract(image),before[RELOC].extract(base))
+        actual=files[VROM].extract(image);expected=bytearray(before[VROM].extract(base))
+        hooks=dispatch['callbacks_bound'];self.assertEqual(len(hooks),48)
+        self.assertEqual(len({h['donor'] for h in hooks}),14)
+        names=('start','stop','in','out','behind')
+        for h in hooks:
+            at=h['address']-OWNER;self.assertEqual(u32(expected,at),h['before'])
+            self.assertEqual(h['after'],symbols['af_holiday_dedicated_'+names[h['phase']]])
+            struct.pack_into('>I',expected,at,h['after'])
+        self.assertEqual(actual,expected)
+        self.assertEqual(sha256(actual),r['campsite_manager']['output_sha256'])
+        p=e['npc_extra']['packet'];flag=p['physical']+e['npc_extra']['record']['flags_offset']
+        self.assertEqual(image[flag:flag+4],bytes(4))
+        self.assertEqual(r['save_codec'],prior['save_codec'])
+        self.assertEqual(r['save_runtime']['profile_hex'],prior['save_runtime']['profile_hex'])
+        self.assertTrue(events['active']['owner_dispatch_bound'])
+        self.assertFalse(events['active']['owner_services_bound'])
+        self.assertEqual(symbols['af_holiday_dedicated_native'],dispatch['reserved_code']['symbols']['af_holiday_dedicated_native'])
+        self.assertEqual(symbols['af_holiday_transition_live_fade'],events['transition']['code']['symbols']['af_holiday_transition_live_fade'])
+        self.assertEqual(symbols['af_holiday_native_index'],0x804A2B00)
+        self.assertEqual(dispatch['additional_resident_bytes'],0)
+        self.assertFalse(dispatch['native_execution_verified'])
+        # Both changed packets are transferred with their new checksum by the
+        # current startup directory; the shared fishing reference stays in sync.
+        blob=files[BLOB].extract(image);boot=e['surface_bootstrap']['code'];offset=e['blob_offset']-e['ram']
+        table=offset+boot['symbols']['packets']
+        rows=[struct.unpack_from('>5I',blob,table+20*i) for i in range(18)]
+        for name in ('npc_extra','holiday_state'):
+            p=e[name]['packet'];row=next(row for row in rows if row[0]==p['ram'])
+            self.assertEqual(row[1:3],(p['physical']|0x80000000,p['bytes']))
+            self.assertEqual(u32(blob,offset+row[3]),p['crc32'])
+
     def test_connected_hourly_source_and_host(self):
         source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
             (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())

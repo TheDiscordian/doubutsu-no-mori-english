@@ -776,6 +776,10 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             import v3_holiday_transition as equipment
             equipment_report,owner_changes,report_updates,physical_writes=equipment.install(
                 base,prior,blob,core,output)
+        elif not current_events.get('dispatch'):
+            import v3_holiday_active as equipment
+            equipment_report,owner_changes,report_updates,physical_writes=equipment.install_dispatch(
+                base,prior,blob,core,output)
         else:
             import v3_holiday_motion as equipment
             equipment_report,owner_changes,report_updates,physical_writes=equipment.install(

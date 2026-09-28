@@ -61,7 +61,13 @@ static iptr operation(void *c,u32 op,int donor,int a,int b,int id) {
     case AF_HD_STATUS:return af_holiday_native_check_status(type,a);
     case AF_HD_SET_STATUS:af_holiday_native_set_status(type,a);return 0;
     case AF_HD_CLEAR_STATUS:af_holiday_native_clear_status(type,a);return 0;
-    case AF_HD_FADE:return s->fade(s->context,n->manager,donor,type,a,b);
+    case AF_HD_FADE: {
+        int result=s->fade(s->context,n->manager,donor,type,a,b);
+        /* Source callbacks use this as a boolean. An adapter failure (-1)
+         * must not start the event, clear furniture, or acquire its keep bit. */
+        if(result<0 || result>1) {error(c,type);return 0;}
+        return result;
+    }
     case AF_HD_CLEAN:
         FN(n->owner+0x19D0,void,void *,u32)(n->manager,a);return 0;
     case AF_HD_FOREGROUND:case AF_HD_ACTOR: {

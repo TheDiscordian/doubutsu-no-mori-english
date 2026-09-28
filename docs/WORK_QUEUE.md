@@ -289,18 +289,24 @@ Source/native layouts differ, and native moon events 21/22 must not be relabelle
 as donor meteor event 37.
 The [decoration contract](../specs/V3_DIARIES.md#shared-event-decoration-resources)
 identifies the checked resources and native consumer addresses.
-Continue actor/profile/effect identities and live dedicated-owner dispatch for
-the scheduled owners. The complete live transition, including decoration
+Continue complete participant/controller/effect behaviours and their identities
+for the scheduled owners. All fourteen dedicated owners now have live manager
+callbacks, using the shared common-state entry and complete dependency preflight.
+The 85 requirements are generated from every layout variant and actual source
+profile/effect calls; absent providers reject before source mutations. Failed
+fade results also reject rather than becoming successful boolean values.
+The complete live transition, including decoration
 identities, actual ACTIVE status, original-layout collision, scene read/commit,
 console request gating, and native room rhythm/gyroid capture, is installed at
-`build/v3-diary-category-work-01/event-transition-bound-02/build-lock.json`, ABI 340,
-ROM `18f622d5526e5aa7d20b21a6c69bbf436e0d8f939f20da4f72cfd6d7b8bd2ff8`.
+`build/v3-diary-category-work-01/event-owner-connected-02/build-lock.json`, ABI 341,
+ROM `7a4f0af030414eb58138a98fafb8389825bd76275bc019cee8322d58fe8cde59`.
 Use `af_holiday_transition_live_fade` from that module for the dedicated-owner
 fade provider. It binds the current relocated event index at `804A2B00`, not
 the original `8013A098` table. The `event-transition-bound-01` output is an
 inactive development artifact with the obsolete index binding; do not use it.
-Reuse the passing focused host/current-cartridge/browser checks. Connect the live
-dedicated-owner calls using the installed common-state entry; do not activate
+Reuse the passing focused host/current-cartridge/browser checks. The current
+check covers all 48 changed native callback words, retained original/camper rows,
+code bounds, startup CRCs, and unchanged save/profile data. Do not activate
 callbacks with missing providers. The
 [transition contract](../specs/V3_DIARIES.md#shared-transition-and-native-scene-bridge)
 records completed native scene/return-state bindings and remaining consumers.
@@ -311,7 +317,7 @@ choice/init/run, saved announcement/resume, shrine and interpolated camera,
 event-busy filtering, speech readers, and successful/rejected return transitions
 are connected. Focused sanitized host and current-cartridge checks pass; current
 browser/offline empty/mixed/all-191 output agrees. Live transition services are
-bound; dedicated-owner dispatch remains unfinished. The added modes do not claim an active imported event
+bound, including dedicated-owner dispatch. The added modes do not claim an active imported event
 or native gameplay verification. Groundhog ceremony owner 7 is not among the
 44 scheduled diary owners. Diary attendance on that date uses the separate
 Tortimer owner 81, from 9 a.m. to 4 p.m.; the ceremony is from 7 to 8 a.m.
@@ -327,6 +333,13 @@ existing save format, resources, and native test budget. No fixture is restarted
 The race reader expects the mapped donor-15/id-8
 payload; the imported race owner still needs to produce it. Native event 10 is
 not a substitute for that owner.
+Retain the native controller comparison at
+`build/v3-diary-category-work-01/event-owner-native-map/`: race state begins with
+a native `u16`, but the source uses two byte fields; tug timing also differs.
+Both race versions use four laps. Do not reuse those controllers by profile
+number alone. Continue the complete moon/meteor effect family with the existing
+effect/model importer, then the remaining owner services; do not reconvert
+installed decorations or restart native fixtures.
 `af_holiday_world_bind` already supplies `af_holiday_world_variant`; reuse it.
 The complete donor actor initializes `melody_inst` to zero and never assigns a
 nonzero value; preserve that actual contract rather than inventing a new melody

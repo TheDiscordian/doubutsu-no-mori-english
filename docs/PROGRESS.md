@@ -31,13 +31,23 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
-The current proposal is ABI 340 at
-`build/v3-diary-category-work-01/event-transition-bound-02/build-lock.json`, ROM SHA-256
-`18f622d5526e5aa7d20b21a6c69bbf436e0d8f939f20da4f72cfd6d7b8bd2ff8`.
+The current proposal is ABI 341 at
+`build/v3-diary-category-work-01/event-owner-connected-02/build-lock.json`, ROM SHA-256
+`7a4f0af030414eb58138a98fafb8389825bd76275bc019cee8322d58fe8cde59`.
 It contains 191 independently selectable development imports, including all nine
 fish and eight insects, and 100 inactive furniture profiles whose acquisition
 is pending, plus sixteen inactive diary cover profiles. The main lock and both
 stable V2-14 deployments are unchanged.
+
+All fourteen dedicated event owners have live manager callbacks through the
+shared dispatcher and existing common state. Their 85 identity requirements
+come from every source layout variant and actual profile/effect calls. Missing
+participants, controllers, or effects reject the entire callback before scene
+mutation; the calendar stays inactive until those providers are implemented.
+A failed transition also rejects correctly instead of treating `-1` as success.
+Focused source/host and current-cartridge checks pass, as does current browser/
+offline empty, mixed, and all-191 composition. The native fixture budget remains
+exhausted; these checks do not claim in-game event execution or playable diaries.
 
 The complete eighteen-decoration event batch has installed constructors,
 initialization, movement, destruction, drawing, and collision. The generator
@@ -181,7 +191,7 @@ actual expanded event-status directory and existing eighteen-decoration resolver
 All fifteen original N64 layouts retain their native collision reader and
 priority relative to the source layouts; both native moon events and the null
 Halloween layout keep their meanings. Focused source/host/current-cartridge and
-browser/offline checks pass. Dedicated-owner dispatch, remaining actor services,
+browser/offline checks pass. Remaining actor and effect services,
 and calendar selection/admission remain unfinished. The separate Groundhog ceremony is outside
 those scheduled owners; its prepared controller stays inactive and does not
 block diary attendance.
@@ -226,9 +236,9 @@ Two focused source/host/current-cartridge checks pass, including the actual
 reset instructions, donor sports comparison, native cleanup, and startup
 descriptor. Empty, mixed, and all-supported browser/offline compositions agree.
 Native I/O and unfinished services are doubles; no in-game execution or newly
-playable diary is claimed. Remaining work is the actual identity/scene-state/
-gate/climate/rhythm providers, alternate announcement lifecycle, live owner
-dispatch, event actors, and calendar choice. See the
+playable diary is claimed. The scene/gate/climate/rhythm providers, alternate
+announcement lifecycle, and live owner dispatch are installed. Remaining work
+is participant/controller/effect behaviours and calendar choice/admission. See the
 [transition contract](../specs/V3_DIARIES.md#shared-transition-and-native-scene-bridge).
 Selection profiles are unchanged; the current format-13 compatibility boundary
 is stated above. Native reload is not newly verified. Existing saves/builds and
@@ -247,10 +257,9 @@ messages have individual source credits. Reviewed shrine wording is retained.
 Five focused checks pass: source/host announcement comparison, connected
 cartridge/startup bindings, shared native-pointer guards, complete owner/layout
 host dispatch, and current browser/offline empty/mixed/all-supported composition.
-Native I/O and unresolved identity/fade services are host doubles. No native
-fixture is restarted. No diary becomes selectable: checked content identities,
-the fade/escape-position path, imported common-state lifetime, live manager
-dispatch, costume/exercise actors, and calendar behaviour choice remain required.
+Native I/O is doubled in the host checks. No native fixture is restarted.
+No diary becomes selectable: participant/controller/effect identities and
+behaviours, costume/exercise actors, and calendar behaviour choice remain required.
 The [shared owner contract](../specs/V3_DIARIES.md#reserved-layouts-and-dedicated-owners)
 records the connected work. Saved format/profile and resident allocation are
 unchanged; gameplay and hardware verification remain open.

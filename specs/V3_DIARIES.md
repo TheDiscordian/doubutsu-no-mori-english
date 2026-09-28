@@ -919,6 +919,41 @@ The current-cartridge check verifies the new packet, retained data, all entry
 redirects, and startup descriptor/CRC. Browser/offline composition agrees for
 empty, mixed, and all-supported selections. No native fixture is restarted.
 
+### Connected dedicated-owner dispatcher
+
+`event-owner-connected-02/` (ABI 341) connects every non-null source callback
+for all fourteen dedicated owners: 48 native manager words. It retains all 29
+original/camper rows, null callbacks, and the manager relocation directory.
+The 2,384-byte active/dispatch module and 10,256-byte reserved-owner module fit
+their existing allocations; public active/map/common-state entries are retained.
+The holiday packet remains 272 KiB and saves remain format 13.
+
+`holiday_dispatch.c` preflights 85 name/profile/effect references generated from
+every reserved-layout variant and each source owner's actual helper calls. A
+missing dependency sets ERROR and rejects before the source callback can mutate
+keep bits, foreground, common state, or scene state. Installed decorations use
+their real ready-service mask; special NPCs require actual registry admission.
+Unimplemented participant/profile/effect identities return unavailable, not a
+same-number native substitute. `AF_HD_FADE` accepts only zero or one: a negative
+transition error must not become a successful source boolean.
+
+The source/host check executes the complete generated owners and real native
+adapter, dispatcher, common state, and binder with native I/O doubles. It covers
+all 341 placements, all fourteen callback paths, every missing dependency, and
+failed fade results. The cartridge check verifies callbacks, untouched manager
+data, code windows, packet references, startup checksums, and unchanged saved
+and selection records. Current empty/mixed/all-191 browser outputs match the
+offline composition. Native gameplay remains unverified; the exhausted fixture
+budget is unchanged. No diary/event is admitted by installing this dispatcher.
+
+The retained native controller disassembly is under
+`event-owner-native-map/{race,tug,newyear}/`. Race native state begins with one
+`u16`, while the donor uses two byte fields including added result bits. Both
+implementations run four laps. Tug shares the record shape but differs in
+per-frame speed and counter timing. Event IDs and native overlay layouts also
+differ. Complete behaviour adaptation is required before resolving their source
+profiles; profile-number substitution is not sufficient.
+
 ### Reserved layouts and dedicated owners
 
 `tools/v3_holiday_maps.py` converts the complete donor event-layout graph and
@@ -1061,8 +1096,8 @@ schedule is February 2, 7–8 a.m. (`020200070202000800000007`); diary attendanc
 uses Tortimer owner 81, 9 a.m.–4 p.m. (`020200090202001000000051`). The alternate
 event-message lifecycle and prepared ceremony controller remain inactive
 preparation, not diary-attendance prerequisites. The scheduled-owner scene
-providers are installed as described below; the live dedicated-owner caller
-and its separate actor/profile/effect services remain unbound.
+providers and the live dedicated-owner caller are installed. Separate
+participant/controller/effect services remain required.
 Missing providers reject explicitly;
 native demo 13 is **not** treated as source event-message-2. No substitute owner,
 zero-filled gate, or no-op side effect is an implemented service.
@@ -1077,7 +1112,7 @@ final guard. Its actual startup descriptor transfers/checks/invalidates the
 whole packet. Every prepared native binding and source hash is checked before
 reuse. The checked refresh retains the rest of the current 272-KiB packet and
 the original `af_holiday_transition_run` entry. Installed code does not activate incomplete
-owners. Remaining actor/profile/effect providers and live manager dispatch stay unfinished,
+owners. Remaining participant/controller/effect providers stay unfinished,
 along with costume/exercise/Miko/race behaviour in this same diary category.
 
 `tests/test_v3_holiday_transition.py` runs one sanitized host check of the actual
@@ -1134,9 +1169,10 @@ speech readers. Native I/O and callback tables are doubles. The current-cartridg
 check verifies all hooks, unchanged original tables and unrelated core bytes,
 code/state bounds, both packet references, startup CRC, and retained save/text
 resources. Current empty/mixed/all-191 browser/offline compositions agree.
-Native execution remains unverified; no emulator fixture is restarted. Actual
-dedicated-owner dispatch must still be connected
-before admitting the scheduled imported events. The ceremony-only fading-title
+Native execution remains unverified; no emulator fixture is restarted. The
+dedicated-owner dispatcher is connected, but its remaining participant/controller/
+effect providers must be completed before admitting the scheduled imported events.
+The ceremony-only fading-title
 producer is outside those owners and stays inactive.
 
 `holiday_scene_native.c` supplies signed native acre coordinates at `E4/E5`,

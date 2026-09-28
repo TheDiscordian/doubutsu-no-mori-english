@@ -1,6 +1,7 @@
 """Connect hourly event state, native reset lifetime, and dedicated-owner access."""
 import copy
 import json
+import re
 import struct
 import zlib
 
@@ -27,6 +28,163 @@ SOURCES=('tools/v3_holiday_active.py','overlays/v3/holiday_active.c',
     'tools/v3_asset_loader.py','tools/v3_furniture_install.py','tools/v3_room_goods.py')
 TRANSITION_PREPARED=ROOT/'build/v3-diary-category-work-01/transition-native-06'
 TRANSITION_RAM,TRANSITION_PACKET_END=0x806FC000,0x80700000
+DISPATCH_SOURCES=('overlays/v3/holiday_dispatch.c','overlays/v3/holiday_dispatch.h',
+    'overlays/v3/holiday_dispatch_native.c','overlays/v3/holiday_dedicated_native.c')
+
+
+def owner_requirements(maps,owners,generated):
+    """Derive the entire admission list from source layouts and callback calls."""
+    from v3_password_policy import function
+    rows=[];requirements=[]
+    for owner in owners['owners']:
+        donor=owner['type'];needed=set()
+        for row in maps['maps']:
+            if row['event']==donor:
+                for variant in row.get('layouts',[]):
+                    needed.update((0,str(actor['source_name'])) for actor in variant)
+        for name in owner['callbacks']:
+            if not name:continue
+            text=function(generated,name)
+            for callee,kind in (('make_control_actor_without_indoor',1),('make_effect',2),('delete_effect',2)):
+                for arg in re.findall(r'\b'+callee+r'\(([^()]*)\)',text):
+                    arg=arg.strip()
+                    if not re.fullmatch(r'(?:mAc_PROFILE_|eEC_EFFECT_)\w+',arg):
+                        raise ValueError('Unresolved complete owner identity expression: '+arg)
+                    needed.add((kind,arg))
+        entries=sorted(needed);start=len(requirements);requirements.extend(entries)
+        rows.append(dict(donor=donor,first=start,count=len(entries),
+            phases=sum(1<<i for i,n in enumerate(owner['callbacks']) if n),requirements=entries))
+    if len(rows)!=14 or len({r['donor'] for r in rows})!=14:
+        raise ValueError('Incomplete dedicated owner admission directory')
+    # The compiler evaluates the very same checked enums as the complete owner
+    # bodies. No independently maintained numeric profile/effect aliases.
+    enums=generated.split('#pragma GCC diagnostic push',1)[0].split('\n',1)[1]
+    code='#include "holiday_dispatch.h"\n'+enums
+    code+='const AFHolidayNeeds af_holiday_owner_needs[14]={\n'+''.join(
+        '{'+','.join(str(r[k]) for k in ('donor','first','count','phases'))+'},\n' for r in rows)+'};\n'
+    code+='const AFHolidayNeed af_holiday_identity_needs[]={\n'+''.join(
+        '{'+str(kind)+','+value+'},\n' for kind,value in requirements)+'};\n'
+    code+='const unsigned int af_holiday_identity_need_count='+str(len(requirements))+';\n'
+    return code,rows
+
+
+def install_dispatch(base,prior,blob,core,output):
+    """Connect all actual owner entries, guarding complete dependencies first."""
+    del blob,core
+    from v3_furniture_pipeline import Source
+    from v3_holiday_maps import owner_source,discover
+    from v3_campsite_manager import VROM,RELOC,RAM as OWNER
+    from v3_decoration_actor import SERVICES
+    from v3_registry import SPECIAL_NPCS
+    import v3_physical_resources as physical
+    equipment=copy.deepcopy(prior['equipment_resources']);npc=equipment['npc_extra'];events=npc['events']
+    if not events['transition'].get('native_scene_services_bound') or events.get('dispatch'):
+        raise ValueError('Dedicated dispatch requires complete live transitions, once')
+    if [(SPECIAL_NPCS[key]['donor_name'],SPECIAL_NPCS[key]['name']) for key in
+            ('GAFE01-r0/npc/ev-soncho2','GAFE01-r0/npc/ev-miko')]!=[(0xD074,0xD090),(0xD03D,0xD091)]:
+        raise ValueError('Changed fixed dedicated actor identities')
+    physical.verify(base,prior['physical_resources'])
+    source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+        (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    generated,owners=owner_source(source);maps=discover(source)
+    dependencies,requirements=owner_requirements(maps,owners,generated)
+    directory=output/'holiday-dispatch';directory.mkdir(parents=True)
+    for name,text,header in (('owners.c',generated,'holiday_dedicated_source.h'),
+            ('requirements.c',dependencies,'holiday_dispatch.h')):
+        write_new(directory/name,text.replace('"'+header+'"','"/source/overlays/v3/'+header+'"').encode())
+    reserved=events['reserved'];bindings=dict(reserved['native']['bindings'])
+    # Placement may have been refreshed since initial layout installation.
+    bindings['af_holiday_placement_native_show_id']=events['placement']['code']['symbols']['af_holiday_placement_native_show_id']
+    reserved_code,reserved_compiled=compile_part('holiday_reserved',directory/'reserved',
+        extra_sources=(str((directory/'owners.c').relative_to(ROOT)),
+            'overlays/v3/holiday_dedicated_native.c'),link_symbols=bindings)
+    old_reserved=copy.deepcopy(reserved['code'])
+    if reserved_compiled['symbols']['af_holiday_map_get']!=old_reserved['symbols']['af_holiday_map_get']:
+        raise ValueError('Moved retained shared layout entry')
+    active=events['active'];active_bindings=dict(active['bindings'])
+    active_bindings.update(af_holiday_dedicated_native=reserved_compiled['symbols']['af_holiday_dedicated_native'],
+        af_holiday_native_type=events['native_directory']['code']['symbols']['af_holiday_native_type'],
+        af_holiday_native_set_status=0x8007FDA8,
+        af_holiday_transition_live_fade=events['transition']['code']['symbols']['af_holiday_transition_live_fade'],
+        af_holiday_transition_maps=0x806FB800,
+        af_decor_actor_records=events['decorations']['controllers']['code']['symbols']['af_decor_actor_records'],
+        af_holiday_decoration_ready=SERVICES,af_v3_npc_extras=RAM+0xA000)
+    code,compiled=compile_part('holiday_active',directory/'code',link_symbols=active_bindings,
+        extra_sources=('overlays/v3/holiday_dispatch.c','overlays/v3/holiday_dispatch_native.c',
+            str((directory/'requirements.c').relative_to(ROOT))))
+    for name in ('af_holiday_active_update','af_holiday_dedicated_current'):
+        if compiled['symbols'][name]!=active['code']['symbols'][name]:
+            raise ValueError('Moved retained event-state entry: '+name)
+    records=copy.deepcopy(prior['physical_resources']);writes=[]
+    def replace_code(packet,address,limit,old,new):
+        data=bytearray(base[packet['physical']:packet['physical']+packet['bytes']]);start=address-packet['ram'];stop=limit-packet['ram']
+        if (sha256(data)!=packet['sha256'] or not 0<=start<stop<=len(data) or
+            old['bytes']>stop-start or len(new)>stop-start or
+            sha256(data[start:start+old['bytes']])!=old['sha256'] or any(data[start+old['bytes']:stop])):
+            raise ValueError('Changed or occupied shared owner code reservation')
+        data[start:stop]=new+bytes(stop-start-len(new));previous=packet['sha256']
+        packet.update(sha256=sha256(data),crc32=zlib.crc32(data))
+        matches=[r for r in records if r['id']==packet['id']]
+        if len(matches)!=1:raise ValueError('Ambiguous shared owner physical packet')
+        matches[0]['sha256']=packet['sha256'];writes.append((dict(matches[0],previous_sha256=previous),bytes(data)))
+        return data
+    p=equipment['holiday_state']['packet']
+    state=replace_code(p,0x806F8800,0x806FB200,old_reserved,reserved_code)
+    equipment['holiday_fishing']['packet']=copy.deepcopy(p)
+    npc_data=replace_code(npc['packet'],ADDRESS,COMMON,active['code'],code)
+    if npc_data[npc['record']['flags_offset']:npc['record']['flags_offset']+4]!=bytes(4):
+        raise ValueError('Cannot connect incomplete owners after activation')
+    # Retain all 29 original/camper rows and every null callback. Existing
+    # imported callback words are resident and must have no overlay relocation.
+    files=by_vrom(base);manager=copy.deepcopy(prior['campsite_manager'])
+    before=files[VROM].extract(base);rel=files[RELOC].extract(base);image=bytearray(before)
+    if sha256(before)!=manager['output_sha256'] or sha256(rel)!=manager['relocation_sha256']:
+        raise ValueError('Changed complete event manager')
+    relocation_words=set(struct.unpack_from('>'+str(struct.unpack_from('>I',rel,16)[0])+'I',rel,20))
+    rows=manager['holiday_owners']['rows'];hooks=[]
+    if len(rows)!=44 or manager['control_count']!=73:raise ValueError('Changed full owner directory')
+    names=('start','stop','in','out','behind')
+    for index,row in enumerate(rows):
+        offset=manager['table']-OWNER+(29+index)*32
+        current=list(struct.unpack_from('>8I',image,offset))
+        if current!=[row['native'],*row['callbacks'],0,0]:raise ValueError('Changed actual owner callback row')
+        if row['kind']!=4:continue
+        for phase,old in enumerate(row['callbacks']):
+            if not old:continue
+            at=offset+4+phase*4
+            if old!=events['placement']['owner_code']['symbols']['af_holiday_owner_unbound'] or (0x42000000|at) in relocation_words:
+                raise ValueError('Unexpected dedicated owner target or relocation')
+            new=compiled['symbols']['af_holiday_dedicated_'+names[phase]]
+            replace_checked(image,at,struct.pack('>I',old),struct.pack('>I',new))
+            row['callbacks'][phase]=new;hooks.append(dict(donor=row['donor'],phase=phase,address=OWNER+at,before=old,after=new))
+        row['dedicated_callbacks_bound']=True
+    manager['output_sha256']=sha256(image)
+    manager['holiday_owners']['all_dedicated_callbacks_bound']=True
+    active.update(code=compiled,bindings=active_bindings,owner_dispatch_bound=True,
+        owner_services_bound=False)
+    reserved.update(code=reserved_compiled,actor_owners_installed=False)
+    reserved['native']['bindings']=bindings
+    reserved['native']['remaining_providers']=['participant/controller/effect lifecycle bindings and calendar choice']
+    # Refresh the existing code receipt, not its independent graphics/resources.
+    loaded=dict(ram=0x806F8800,bytes=len(reserved_code),sha256=sha256(reserved_code))
+    for row in reserved['resources']:
+        if row['ram']==loaded['ram']:row.update(loaded)
+    events['decorations']['controllers']['preserved'].append(loaded)
+    sources={p:sha256((ROOT/p).read_bytes()) for p in (*SOURCES,*DISPATCH_SOURCES)}
+    reserved['sources'].update(sources)
+    report=dict(installed=True,callbacks_bound=hooks,requirements=requirements,
+        code=compiled,reserved_code=reserved_compiled,bindings=active_bindings,
+        generated_requirements_sha256=sha256(dependencies.encode()),
+        complete_dependency_preflight=True,negative_transition_is_failure=True,
+        actor_active=False,native_execution_verified=False,additional_resident_bytes=0,
+        saved_format_changed=False,sources=sources,
+        pending=['participant/controller/effect lifecycle bindings','calendar behaviour choice','actor and diary admission'])
+    events['dispatch']=report;events['placement']['dedicated_callbacks_bound']=True
+    npc['sources'].update(sources)
+    for name,data in (('npc-packet.bin',npc_data),('state-packet.bin',state)):
+        write_new(directory/name,data)
+    write_new(directory/'installed.json',(json.dumps(report,indent=2)+'\n').encode())
+    return equipment,{VROM:bytes(image)},dict(physical_resources=records,campsite_manager=manager),writes
 
 
 def donor_update(source):
