@@ -31,9 +31,9 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
-The current proposal is ABI 319 at
-`build/v3-diary-category-work-01/tortimer-placement-02/build-lock.json`, ROM SHA-256
-`a1bcfd063babbfd9d43aae76ff99037459bcb9bc368f8ecb4bfe078097db0335`.
+The current proposal is ABI 320 at
+`build/v3-diary-category-work-01/tortimer-observers-01/build-lock.json`, ROM SHA-256
+`869db1d26fdb9fb94131c49d879dd53e8f63387651b66dd6122a8fbef48ddaa7`.
 It contains 191 independently selectable development imports, including all nine
 fish and eight insects, and 100 inactive furniture profiles whose acquisition
 is pending, plus sixteen inactive diary cover profiles. The main lock and both
@@ -63,18 +63,23 @@ The donor search order, shrine margins, and nearby height checks are preserved.
 Separate imported keep flags reset with native common state without extending
 an unknown native array. Dedicated callbacks explicitly reject while unfinished;
 Halloween does not substitute ordinary Tortimer for its costume actor.
+NPC event/field observations, actual shrine lookup, mapped race-position reading,
+and cleanup are installed. The outdoor clip is checked against its live relocated
+owner before binding; imported New Year cleanup uses a separate reserved Miko
+profile and cannot remove native Miko. That imported actor remains unimplemented.
+Placement reads the shrine at manager offsets `22C/230`, not the pool at `214/218`.
 The native schedule caller, actual special dates/vacation state, event-specific
-actors, remaining NPC lifecycle providers, and separate exercise/card conversation
+actors, the event-world provider, lifecycle linking, and separate exercise/card conversation
 remain required before activation. Installed code is not a claim that Tortimer
 or any diary is playable.
 
-Three focused placement/owner checks pass: 54 comparisons with complete donor
-search functions and all 21 shared owner paths under sanitizers; current packet,
-callback relocation, retained components, and native allocation metadata; and
-execution of the changed common-reset instructions with both branch delay slots
-and native-state preservation. Native terrain/spawn calls are host doubles in the
-host check. The first owner-check attempt retained its deliberate reserve-failure
-setting; correcting that setup passes. Current browser/offline empty, mixed,
+Three current focused checks pass: all 44 mapped observation/cleanup paths and
+clip/resource rejection; 54 comparisons with complete donor search functions,
+the corrected native landmark decoder, and all 21 shared owners; and current
+packet/linker/relocation/resource retention. Host checks use address/undefined
+sanitizers; native shrine, save-record, actor-search, terrain, and spawn calls are
+doubles, not native execution. The unchanged common-reset instruction check is
+retained rather than replayed. Current browser/offline empty, mixed,
 and all-191 compositions agree. No native fixture is restarted. The connected
 path remains the same unfinished diary-category task, not a new release.
 

@@ -14,6 +14,7 @@ from v3_campsite_manager import RAM as OWNER,VROM,RELOC,METADATA,CONTROL_COUNT,C
 from v3_furniture_pipeline import Source
 from v3_npc_registry import RAM,SIZE
 from v3_import_storage import replace_checked
+from v3_registry import SPECIAL_NPCS,SPECIAL_NPC_REGISTRY_VERSION
 import v3_physical_resources as physical
 
 ADDRESS=0x806F1C00
@@ -66,7 +67,49 @@ SOURCES=('tools/v3_holiday_placement.py','overlays/v3/holiday_placement.h',
     'overlays/v3/holiday_placement.c','overlays/v3/holiday_placement_native.c',
     'overlays/v3/holiday_placement.ld','overlays/v3/holiday_owner.c','overlays/v3/holiday_owner.h',
     'overlays/v3/holiday_owner.ld','tools/v3_holiday_native.py','tools/v3_asset_loader.py',
-    'tools/v3_furniture_install.py')
+    'tools/v3_furniture_install.py','tools/v3_registry.py','overlays/v3/holiday_observers.h',
+    'overlays/v3/holiday_observers.c','overlays/v3/holiday_observers_native.c')
+
+OBSERVER_GUARDS=(
+    (0x8008E8E0,0x8008E9C4,'463b3e1be9378d1d109589fef6802e392a11a098648945ead553aee15f098e70'),
+    (0x8008033C,0x800804AC,'e3f773780ce82da3b43a46975c07e1c0c37815fbc95bca00f3b00ce8869adec3'),
+    (0x80058460,0x800584AC,'27b66e9064b9e9d3efdb4cabe6d1b0e787845ab758a9f765c8767b46d4e1b6b2'),
+    (0x800567E8,0x80056800,'d0772f05c1eea44df9220576f516b75782baa311d11196db4f5867de06305647'),
+)
+
+
+def observer_contract(source,base):
+    from v3_holiday_actor import REFERENCES as actor_references
+    from v3_holiday_talk import REFERENCES as talk_references
+    references={**actor_references,**talk_references}
+    for path,digest in references.items():
+        if sha256((ROOT/'local/ac-decomp'/path).read_bytes())!=digest:
+            raise ValueError('Changed complete holiday observation reference: '+path)
+    functions=[]
+    for name,at,size,digest in (
+        ('mFI_SetOyasiroPos',0x3AE58,236,'e134515a898734c793f753a91184db5d8bf4e0f38eb6d620a5dded30b5c9ad1e'),
+        ('aES2_look_runner',0x1B4F30,104,'1e9c5d955fc19e42fe7c171213b73fdef0f090dfc8f7d14f104cca90cdf47674'),
+        ('aES2_talk_end_chk',0x1B4CAC,172,'041d802ef8313165f280198b76e8ec5fc472612439338d85c1926fa9168b6bc8')):
+        code,row=source.function(at)
+        if row['symbol']!=name or len(code)!=size or sha256(code)!=digest:
+            raise ValueError('Changed complete holiday observation: '+name)
+        functions.append(row)
+    files=by_vrom(base);core=files[CODE_VROM].extract(base);npc=files[0x8681F0].extract(base)
+    for lo,hi,digest in OBSERVER_GUARDS:
+        if sha256(core[lo-CODE_RAM:hi-CODE_RAM])!=digest:
+            raise ValueError(f'Changed native holiday observer {lo:08X}')
+    if sha256(npc[0x80980D74-0x809735B0:0x80981018-0x809735B0])!=\
+            'd87ca4b8d4e1c2ffde698675544a37acb43fb3da28f4eb1b1db64a28c6636c1e':
+        raise ValueError('Changed complete outdoor clip constructor')
+    descriptor=struct.unpack_from('>8I',core,0x80101090-CODE_RAM)
+    if descriptor!=(0x8681F0,0x878550,0x809735B0,0x80994880,0,0x8098194C,0,0):
+        raise ValueError('Changed outdoor NPC overlay descriptor')
+    return dict(functions=functions,references=references,native_functions=OBSERVER_GUARDS,
+        native_descriptor=list(descriptor),clip_linked=0x80983A80,clip_bytes=0x11C,
+        shrine_landmark_offset=0x22C,runner_donor_type=15,runner_saved_id=8,
+        runner_active_flag=0x400,runner_position_offsets=[10,12],
+        melody_nonzero_assignments=0,registry_version=SPECIAL_NPC_REGISTRY_VERSION,
+        miko_reservation=SPECIAL_NPCS['GAFE01-r0/npc/ev-miko'],miko_actor_installed=False)
 
 
 def patch_reset(core):
@@ -181,21 +224,45 @@ def contract(source,base):
 def install(base,prior,blob,core,output):
     del blob
     equipment=copy.deepcopy(prior['equipment_resources']);npc=equipment['npc_extra'];events=npc['events']
-    if not events.get('native_directory') or events.get('placement'):
-        raise ValueError('Placement requires native directory without duplicate placement')
+    if not events.get('native_directory'):
+        raise ValueError('Placement requires native directory')
+    existing=events.get('placement')
+    if existing and existing.get('observers'):
+        raise ValueError('Current observation providers already installed')
     physical.verify(base,prior['physical_resources'])
     p=npc['packet'];data=bytearray(base[p['physical']:p['physical']+SIZE]);offset=ADDRESS-RAM
-    if (len(data)!=SIZE or sha256(data)!=p['sha256'] or any(data[offset:SIZE-16]) or
-            any(data[OWNER_CODE-RAM:0x9800]) or any(data[KEEP-RAM:NAMES-RAM+4])):
+    if len(data)!=SIZE or sha256(data)!=p['sha256']:
         raise ValueError('Changed holiday placement reservation')
+    old_data=bytes(data)
+    if existing:
+        for start,stop,record in ((offset,SIZE-16,existing['code']),
+                (OWNER_CODE-RAM,0x9800,existing['owner_code'])):
+            end=start+record['bytes']
+            if end>stop or sha256(data[start:end])!=record['sha256'] or any(data[end:stop]):
+                raise ValueError('Changed installed holiday code or free tail')
+            data[start:end]=bytes(end-start)
+        reset=existing['keep_reset'];at=reset['address']-CODE_RAM
+        if (sha256(core[at:at+reset['bytes']])!=reset['sha256'] or
+                data[KEEP-RAM:NAMES-RAM+4]!=bytes.fromhex('0000000000000000d0900000')):
+            raise ValueError('Changed native common reset or owner identity/state')
+    elif any(data[offset:SIZE-16]) or any(data[OWNER_CODE-RAM:0x9800]) or any(data[KEEP-RAM:NAMES-RAM+4]):
+        raise ValueError('Occupied holiday placement reservation')
     source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
         (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
-    checked=contract(source,base);bindings=dict(BINDINGS)
+    checked=contract(source,base);observers=observer_contract(source,base);bindings=dict(BINDINGS)
     bindings['af_holiday_native_type']=events['native_directory']['code']['symbols']['af_holiday_native_type']
     bindings['af_holiday_event_owner']=events['code']['symbols']['af_holiday_event_owner']
+    bindings.update({name:events['native_directory']['code']['symbols'][name] for name in (
+        'af_holiday_native_current','af_holiday_native_field','af_holiday_native_cleanup','af_holiday_native_notify')})
+    bindings.update(af_holiday_npc_descriptor=0x80101090,af_holiday_observers_shrine=0x8008E8E0,
+        af_holiday_observers_save=0x8008033C,af_holiday_native_find=0x80058460,
+        af_holiday_observers_delete=0x800567E8,
+        af_holiday_world_resources=npc['world']['code']['symbols']['af_holiday_world_resources'])
     directory=output/'holiday-placement'
     code,compiled=compile_part('holiday_placement',directory/'code',
-        extra_sources=('overlays/v3/holiday_placement_native.c',),link_symbols=bindings)
+        extra_sources=('overlays/v3/holiday_placement_native.c','overlays/v3/holiday_observers.c',
+            'overlays/v3/holiday_observers_native.c'),link_symbols=bindings,
+        defines=(f"AF_HOLIDAY_MIKO_PROFILE={SPECIAL_NPCS['GAFE01-r0/npc/ev-miko']['profile']}",))
     if len(code)>SIZE-16-offset:raise ValueError('Holiday placement exceeds checked packet')
     data[offset:offset+len(code)]=code
     owner_bindings={name:compiled['symbols'][name] for name in (
@@ -210,8 +277,22 @@ def install(base,prior,blob,core,output):
     if len(owner_code)>0x9800-(OWNER_CODE-RAM):raise ValueError('Holiday owner code exceeds packet')
     data[OWNER_CODE-RAM:OWNER_CODE-RAM+len(owner_code)]=owner_code
     struct.pack_into('>2H',data,NAMES-RAM,0xD090,0) # Costume identity is not an ordinary Tortimer alias.
-    reset=patch_reset(core)
-    owners,manager,resizes=patch_manager(base,prior,events,owner_compiled['symbols'],core)
+    if existing:
+        # Only link targets inside the refreshed code change. Preserve the real
+        # manager, callback addresses/relocations, allocation, and reset hook.
+        for name,value in existing['owner_code']['symbols'].items():
+            if name.startswith('af_holiday_owner_') and owner_compiled['symbols'][name]!=value:
+                raise ValueError('Refreshed owner moved an installed callback')
+        manager=copy.deepcopy(prior['campsite_manager']);owners={};resizes=[]
+        for vrom,key in ((VROM,'output_sha256'),(RELOC,'relocation_sha256')):
+            if sha256(by_vrom(base)[vrom].extract(base))!=manager[key]:
+                raise ValueError('Changed retained event manager')
+        allowed=set(range(offset,SIZE-16))|set(range(OWNER_CODE-RAM,0x9800))
+        if any(x!=y and i not in allowed for i,(x,y) in enumerate(zip(old_data,data))):
+            raise ValueError('Observation refresh changes unrelated NPC packet data')
+    else:
+        reset=patch_reset(core)
+        owners,manager,resizes=patch_manager(base,prior,events,owner_compiled['symbols'],core)
     replacement=next(copy.deepcopy(r) for r in prior['physical_resources'] if r['id']==p['id'])
     previous=p['sha256'];replacement['sha256']=sha256(data)
     records=[replacement if r['id']==replacement['id'] else copy.deepcopy(r) for r in prior['physical_resources']]
@@ -221,6 +302,9 @@ def install(base,prior,blob,core,output):
         installed=True,native_primitives_bound=True,owner_callbacks_bound=True,
         dedicated_callbacks_bound=False,costume_actor_bound=False,actor_active=False,
         native_execution_verified=False,saved_format_changed=False,additional_resident_bytes=0)
+    events['placement']['observers']=dict(contract=observers,bind_installed=True,unregister_installed=True,
+        event_world_bound=False,miko_actor_installed=False,runner_owner_installed=False,
+        native_execution_verified=False)
     npc['sources'].update({p:sha256((ROOT/p).read_bytes()) for p in SOURCES})
     write_new(directory/'placement.json',(json.dumps(events['placement'],indent=2)+'\n').encode())
     write_new(directory/'packet.bin',data)

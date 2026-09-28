@@ -1,4 +1,5 @@
 """Shared placement checks: donor search comparison and current cartridge only."""
+import json
 import os
 from pathlib import Path
 import subprocess
@@ -12,12 +13,12 @@ from aflib import CODE_RAM,CODE_VROM,by_vrom,sha256,u32
 from apply_translation import write_new
 from v3_furniture_install import inputs
 from v3_furniture_pipeline import Source
-from v3_holiday_placement import ADDRESS,OWNER_CODE,KEEP,NAMES,contract,patch_reset,patch_manager
+from v3_holiday_placement import ADDRESS,OWNER_CODE,KEEP,NAMES,contract,observer_contract,patch_reset,patch_manager
 from v3_holiday_native import identities
 from v3_holiday_events import discover,encode
 from v3_campsite_manager import RAM as OWNER,VROM,RELOC,METADATA
 
-OUT=ROOT/os.environ.get('V3_HOLIDAY_PLACEMENT','build/v3-diary-category-work-01/tortimer-placement-02')
+OUT=ROOT/os.environ.get('V3_HOLIDAY_PLACEMENT','build/v3-diary-category-work-01/tortimer-observers-01')
 
 
 class PlacementTests(unittest.TestCase):
@@ -54,6 +55,13 @@ class PlacementTests(unittest.TestCase):
         source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
             (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
         checked=contract(source,image);self.assertEqual(len(checked['functions']),13)
+        observers=observer_contract(source,image)
+        self.assertEqual(json.loads(json.dumps(observers)),placement['observers']['contract'])
+        self.assertEqual(observers['shrine_landmark_offset'],0x22C)
+        self.assertEqual(observers['miko_reservation']['profile'],0xCD)
+        for name in ('af_holiday_npc_bind','af_holiday_npc_unregister'):
+            self.assertTrue(ADDRESS<=code['symbols'][name]<ADDRESS+code['bytes'])
+        self.assertFalse(placement['observers']['event_world_bound'])
         base,prior=inputs(ROOT/'build/v3-diary-category-work-01/tortimer-native-01/build-lock.json')
         oldp=prior['equipment_resources']['npc_extra']['packet'];before=base[oldp['physical']:oldp['physical']+oldp['bytes']]
         owner=placement['owner_code'];oa=OWNER_CODE-p['ram'];oe=oa+owner['bytes']

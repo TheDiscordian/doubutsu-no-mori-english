@@ -12,10 +12,10 @@ The calendar/reading/editing/storage controller and shared native-save adapter
 are implemented in source and compile for VR4300. Host checks cover room surface
 selection, calendar navigation, editing/privacy/capacity admission, and the
 save → probe → reload path. They do not establish in-game UI operation,
-native FlashRAM timing, ordinary gameplay, or hardware compatibility. ABI 315
+native FlashRAM timing, ordinary gameplay, or hardware compatibility. ABI 320
 contains menus, resident packets, room/visit hooks, save dispatch, carried readers,
 complete room covers, and catalogue/scoring integration at
-`build/v3-diary-category-work-01/tortimer-dialogue-02/`. Neither patcher changes.
+`build/v3-diary-category-work-01/tortimer-observers-01/`. Neither patcher changes.
 
 ## Donor contract
 
@@ -578,10 +578,11 @@ conversation/calendar/reward functions pass one sanitized combined host check;
 the native bridge is compiler/source checked, not executed. No native fixture is
 started and the exhausted diary title-fixture budget is unchanged.
 
-Three installation services remain unresolved:
-`af_holiday_npc_bind`, `af_holiday_npc_event_world`, and
-`af_holiday_npc_unregister`. Binding must supply the actual event owner,
-special dates/vacation state, cleanup, and validation of the active outdoor clip.
+`af_holiday_npc_bind` and `af_holiday_npc_unregister` are installed in the shared
+placement/observation packet. The remaining installation service is
+`af_holiday_npc_event_world`, supplying actual special dates and saved vacation
+state. The prepared lifecycle still needs linking and activation after its
+required event owners work.
 The native world wrapper, saved reward bindings, and full-voice resource check
 are implemented below. The installed dialogue/continuation, walking/cane/resource
 exports, and elapsed-tick controller are reused; allocation and drawing are
@@ -679,7 +680,7 @@ and validate it again. Unknown resource/reader changes still reject.
 the 812-byte `AFHE` source packet is at `806ED800`. The native directory bridge
 also uses this packet. No allocation, profile bit, saved format, or artwork
 changes. The current build is
-`build/v3-diary-category-work-01/tortimer-placement-02/`, ABI 319.
+`build/v3-diary-category-work-01/tortimer-observers-01/`, ABI 320.
 
 `v3_holiday_events.py` derives all 49 relevant rows from the complete checked
 GAFE01 schedule and all 44 associated ownership records from the relocated
@@ -777,7 +778,8 @@ native stack use and gameplay remain unverified. No native fixture is attempted.
 
 ### Native placement and shared event owners
 
-`holiday_placement.c` and its native adapter occupy 3,664 bytes at `806F1C00`.
+`holiday_placement.c`, its native adapter, and the shared NPC observation/cleanup
+providers occupy 4,448 bytes at `806F1C00`.
 `holiday_owner.c` occupies 1,008 bytes at `806EC900`. Both use the existing
 64-KiB NPC packet; the artwork, movement, dialogue, world/reward, event kernels,
 actor pool, and guards are retained. Thirteen complete donor functions and the
@@ -787,8 +789,10 @@ The shared search preserves the three source fallback phases, deterministic
 source-ID seed, selected-shrine margin two, and wandering margin one. It excludes
 the native town's four actual landmarks; the N64 has no donor island dock to
 exclude. Native coordinate structures are `z,x`, including by-value parameters,
-not the donor's `x,z`. Real native field/collision/NPC functions supply candidate
-units and terrain. Appearance uses the donor's ordered 3×3 foreground/height-gap
+not the donor's `x,z`. The manager's shrine is at `22C/230`; `214/218` belongs to the pool.
+The shared checked decoder retains separate pool/station/shrine/home exclusions.
+Real native field/collision/NPC functions supply candidate units and terrain.
+Appearance uses the donor's ordered 3×3 foreground/height-gap
 search, then the ordinary unit-search fallback, real ground flattening, and the
 NPC clip's actual nine-argument spawn function. No appearance in the entering
 acre returns two; actual spawn failure returns zero. STOP controls culling.
@@ -826,6 +830,48 @@ eleven and selection flags stay unchanged; all sixteen diary choices remain
 inactive. The live calendar caller, dedicated/costume/exercise actors, actual
 special-state persistence, remaining NPC lifecycle providers, and activation
 remain part of this same category task. No native fixture is restarted.
+
+### Shared NPC observations and cleanup
+
+`holiday_observers.c` implements `af_holiday_npc_bind` and
+`af_holiday_npc_unregister` in the existing placement packet. The event and
+field readers call the installed native-directory mapping at their actual use
+sites; native events cannot masquerade as donor identities. The world adapter's
+existing reward-variant callback, motion, and dialogue services are reused.
+
+The real shrine helper is `8008E8E0..8008E9C4`: native block kind four, shrine
+foreground `5825` or dummy `F0EF`, and centre-position conversion. Its output
+is the source's intentional `x,z,y` short-array order. Race tracking reads mapped
+donor event 15, saved record eight, big-endian flag `0400`, and first-runner
+coordinates at offsets `0A/0C`. The imported race owner must supply that record;
+the original native race (event ten) does not satisfy this dependency.
+
+Ordinary cleanup uses the installed source-priority selector and mapped native
+death notification. New Year's special cleanup searches actor part three for
+the additive reserved Miko profile `CD`, name `D091`, instead of native profile
+`84`. The reservation is version two of `SPECIAL_NPCS`, not an installed Miko
+actor or claim of complete New Year ownership. The complete checked donor
+Tortimer actor initializes `melody_inst` to zero with no nonzero assignment;
+conditional restoration therefore performs no write.
+
+The native clip constructor at `80980D74..80981018` places its 284-byte table at
+linked `80983A80` inside the outdoor NPC owner's BSS. Metadata at `80101090`
+supplies the actual load address. Validation checks that allocation and the exact
+live table pointer before dereferencing, then checks eleven lifecycle/movement/
+draw entries against that relocated owner. Heap addresses or the indoor clip
+cannot satisfy the binding. Full actor/resource validation remains the existing
+world service, rather than a second model/voice checker.
+
+The installer refreshes only the checked placement/observation and owner code
+regions. Installed manager callbacks must keep their addresses; manager data,
+relocations, reset code, resource packets, guard words, save profiles, and artwork
+are retained. No additional resident allocation or save-format change is needed.
+Three focused current checks cover the corrected landmark decoder, all mapped
+observation/cleanup paths, clip bounds/rejection, source/native dependencies,
+and retained cartridge data. Native I/O is doubled in the sanitized host check.
+Browser/offline empty, mixed, and all-supported outputs agree. The next consumer
+is `af_holiday_npc_event_world`; calendar calling, saved special state, required
+dedicated/costume/exercise actors, and activation remain unfinished.
 
 ## Serialized diary state
 

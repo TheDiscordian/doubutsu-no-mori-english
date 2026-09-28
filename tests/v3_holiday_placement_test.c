@@ -74,6 +74,16 @@ int af_holiday_placement_native_show(void *m,unsigned int donor,AFHolidayBlock *
 }
 int af_holiday_placement_native_cull(unsigned int donor) {assert(af_holiday_native_type(donor)==(int)expected_type);return stopped;}
 int main(void) {
+    int raw_manager[0x248/4]={0};
+    raw_manager[0x1E8/4]=8;raw_manager[0x1EC/4]=7;
+    raw_manager[0x20C/4]=4;raw_manager[0x210/4]=5;
+    for(int i=0;i<4;i++) {raw_manager[0x214/4+i*3]=i+1;raw_manager[0x218/4+i*3]=i+2;}
+    unsigned char raw_clock[8]={29,0,13,20,0,6,7,234};AFHolidayField decoded;
+    assert(af_holiday_placement_field(raw_manager,raw_clock,&decoded));
+    assert(decoded.maximum.x==7 && decoded.maximum.z==8 && decoded.next.x==5 && decoded.next.z==4);
+    assert(decoded.shrine.x==4 && decoded.shrine.z==3 && decoded.exclusions==4);
+    assert(decoded.excluded[0].x==2 && decoded.excluded[0].z==1);
+    assert(decoded.month==6 && decoded.day==20 && decoded.hour==13 && decoded.second==29);
     AFHolidayField f={.maximum={8,7},.next={-1,-1},.shrine={3,2},
         .excluded={{2,1},{3,2},{4,3},{5,4},{6,5}},.exclusions=5,.month=6,.day=20,.hour=13,.second=29};
     AFHolidayPlacementOps o={0,outdoors,busy,other,unit,height,get,reserve,forward,flatten,spawn,error};

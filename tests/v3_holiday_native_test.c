@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "holiday_native.h"
+#include "holiday_observers.h"
 #include "holiday-native-data.h"
 
 AFHolidayNativeDay af_holiday_native_days[AF_HN_DAYS];
@@ -10,6 +11,66 @@ unsigned int af_holiday_native_count;
 static int notified=-1;
 static void *notified_actor;
 void af_holiday_native_death(int type,void *actor) {notified=type;notified_actor=actor;}
+static int valid_resources=1,valid_clip=1,have_runner,have_miko,deleted_miko;
+static unsigned char race[40];
+static int game,miko;
+int af_holiday_world_resources(AFHolidayNpc *a) {return a && valid_resources;}
+int af_holiday_observers_clip(void) {return valid_clip;}
+int af_holiday_observers_shrine(short p[3]) {p[0]=800;p[1]=1200;p[2]=-10;return 1;}
+const unsigned char *af_holiday_observers_save(int type,int id) {
+    assert(type==af_holiday_native_type(15) && type!=10 && id==8);return have_runner?race:0;
+}
+void *af_holiday_observers_find(void *g,short profile,int part) {
+    assert(g==&game && profile==AF_HOLIDAY_MIKO_PROFILE && profile!=0x84 && part==3);
+    return have_miko?&miko:0;
+}
+void af_holiday_observers_delete(void *a) {assert(a==&miko);deleted_miko++;}
+
+static void observations(void) {
+    AFHolidayNpc actor={.game=&game};
+    assert(!af_holiday_npc_bind(0));
+    valid_clip=0;assert(!af_holiday_npc_bind(&actor) && !actor.ops.event);valid_clip=1;
+    valid_resources=0;assert(!af_holiday_npc_bind(&actor));valid_resources=1;
+    assert(af_holiday_npc_bind(&actor) && actor.ops.context==&actor);
+    short p[3]={0};assert(actor.ops.shrine(&actor,p) && p[0]==800 && p[1]==1200 && p[2]==-10);
+    assert(!actor.ops.runner(&actor,p));have_runner=1;assert(!actor.ops.runner(&actor,p));
+    race[2]=4;race[10]=0xFF;race[11]=0x9C;race[12]=3;race[13]=0xE8;
+    assert(actor.ops.runner(&actor,p) && p[0]==-100 && p[1]==1000);
+    AFHolidayNpc unchanged=actor;actor.ops.restore_melody(&actor);
+    assert(!memcmp(&actor,&unchanged,sizeof(actor)));
+    /* Native events remain RUN/SHOW throughout. Only mapped imported events
+     * affect the actor, and scheduling without RUN never produces cleanup. */
+    for(unsigned int i=20;i<64;i++)af_holiday_native_days[i].status=AF_HE_EXIST;
+    assert(actor.ops.event(&actor)==255 && actor.ops.field_event(&actor)==3);
+    notified=-1;af_holiday_npc_unregister(&actor);assert(notified==-1);
+    unsigned int checked=0;
+    for(unsigned int i=20;i<64;i++) {
+        AFHolidayNativeDay *d=&af_holiday_native_days[i];d->status|=AF_HE_RUN|AF_HE_SHOW;
+        int expected=af_holiday_native_cleanup();
+        assert(actor.ops.event(&actor)==af_holiday_native_current());
+        assert(actor.ops.field_event(&actor)==af_holiday_native_field());
+        notified=-1;have_miko=1;deleted_miko=0;af_holiday_npc_unregister(&actor);
+        if(expected>=0)assert(notified==af_holiday_native_type((unsigned int)expected) && notified_actor==&actor);
+        else if(expected==-2) {
+            assert(notified==-1 && deleted_miko==1);have_miko=0;
+            af_holiday_npc_unregister(&actor);assert(deleted_miko==1);
+        } else assert(notified==-1 && !deleted_miko);
+        d->status=AF_HE_EXIST;checked++;
+    }
+    unsigned int descriptor[]={0x8681F0,0x878550,0x809735B0,0x80994880,0x801A0000,0,0,0};
+    unsigned int clip[0x11C/4]={0};
+    const unsigned int offsets[]={0,0xBC,0xC0,0xC4,0xCC,0xD0,0xE4,0xF8,0x108,0x10C,0x110};
+    const unsigned int linked[]={0x80980328,0x8097FC44,0x8097F520,0x8097F94C,0x8097F358,
+        0x80977AB0,0x8097866C,0x8097BF90,0x8097F0BC,0x809774A0,0x8097E7F4};
+    assert(af_holiday_observers_clip_address(descriptor)==0x801B04D0);
+    for(unsigned int i=0;i<11;i++)clip[offsets[i]/4]=descriptor[4]+linked[i]-descriptor[2];
+    assert(af_holiday_observers_clip_entries(descriptor[4],clip));
+    clip[0x108/4]+=4;assert(!af_holiday_observers_clip_entries(descriptor[4],clip));
+    descriptor[4]=0;assert(!af_holiday_observers_clip_address(descriptor));
+    descriptor[4]=0x807FFFF0;assert(!af_holiday_observers_clip_address(descriptor));
+    descriptor[4]=0x801A0001;assert(!af_holiday_observers_clip_address(descriptor));
+    printf("NPC observers: %u imported event paths, native isolation, shrine/runner, cleanup, and clip bounds pass.\n",checked);
+}
 
 static void reset(unsigned int natives) {
     memset(af_holiday_native_days,0,sizeof(af_holiday_native_days));
@@ -42,6 +103,7 @@ int main(void) {
     }
     assert(af_holiday_native_current()==255 && af_holiday_native_field()==3);
     assert(af_holiday_native_cleanup()==-1); /* Scheduled is not running. */
+    observations();
     unsigned int source=af_holiday_event_data[16+9];
     unsigned int type=(unsigned int)af_holiday_native_type(source);
     AFHolidayNativeDay *d=&af_holiday_native_days[af_holiday_native_index[type]];

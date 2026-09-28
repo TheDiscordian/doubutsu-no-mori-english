@@ -170,12 +170,24 @@ native common-data reset, leaving original keep storage untouched. Focused
 sanitized donor/owner checks, current cartridge/relocation/reset checks, and
 browser/offline empty/mixed/all-supported composition pass. No native fixture
 is restarted. These components stay complete; actor activation remains unfinished.
-The remaining providers are `af_holiday_npc_bind`,
-`af_holiday_npc_event_world`, and `af_holiday_npc_unregister`. Connect the native
+The current ABI-320 proposal at
+`build/v3-diary-category-work-01/tortimer-observers-01/build-lock.json` installs
+`af_holiday_npc_bind` and `af_holiday_npc_unregister` with checked live outdoor
+clip binding, event/field observations, actual shrine lookup, mapped race-state
+reading, and native cleanup. The field decoder uses shrine `22C/230`, not pool
+`214/218`. The imported Miko profile `CD`/name `D091` is reserved separately from
+native Miko but remains unimplemented; cleanup never deletes native profile `84`.
+Three focused current checks and empty/mixed/all-supported browser/offline
+composition pass. Native I/O is doubled; no emulator fixture is restarted.
+The remaining provider is `af_holiday_npc_event_world`. Connect the native
 event manager's remaining event-specific owners and calendar caller, bind actual
 special dates/vacation persistence, and finish the costume/exercise identities.
-The next consumer is the NPC lifecycle provider: bind actual event/field observations,
-shrine/runner positions, and cleanup using the installed directory and placement.
+The next consumer is the event-world provider: actual special dates and saved
+vacation state, shared with the native schedule caller. Then link the prepared
+NPC lifecycle against the installed exports; retain actor activation gates until
+the required event owners work. The race reader expects the mapped donor-15/id-8
+payload; the imported race owner still needs to produce it. Native event 10 is
+not a substitute for that owner.
 `af_holiday_world_bind` already supplies `af_holiday_world_variant`; reuse it.
 The complete donor actor initializes `melody_inst` to zero and never assigns a
 nonzero value; preserve that actual contract rather than inventing a new melody

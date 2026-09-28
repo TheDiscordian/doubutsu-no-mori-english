@@ -1,6 +1,17 @@
 /* Shared GAFE01 selected/free-acre placement and checkfgcol appearance. */
 #include "holiday_placement.h"
 _Static_assert(sizeof(AFHolidayPlace)==20,"Native placement size");
+int af_holiday_placement_field(const void *manager,const unsigned char rtc[8],AFHolidayField *f) {
+    if(!manager || !rtc || !f)return 0;
+    const int *words=manager;
+    f->maximum=(AFHolidayBlock){words[0x1E8/4],words[0x1EC/4]};
+    f->next=(AFHolidayBlock){words[0x20C/4],words[0x210/4]};
+    /* 214/218 is the pool (kind 8000), not the shrine (kind 4). */
+    f->shrine=(AFHolidayBlock){words[0x22C/4],words[0x230/4]};
+    f->exclusions=4;
+    for(unsigned int i=0;i<4;i++)f->excluded[i]=(AFHolidayBlock){words[0x214/4+i*3],words[0x218/4+i*3]};
+    f->month=rtc[5];f->day=rtc[3];f->hour=rtc[2];f->second=rtc[0];return 1;
+}
 static int equal(AFHolidayBlock a,AFHolidayBlock b) {return a.x==b.x && a.z==b.z;}
 static int block_valid(const AFHolidayField *f,AFHolidayBlock b) {
     return b.x>=0 && b.x<f->maximum.x && b.z>=0 && b.z<f->maximum.z;

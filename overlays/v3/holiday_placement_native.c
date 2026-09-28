@@ -24,7 +24,6 @@ extern AFHolidayPlace *af_holiday_native_reserve_place(int,u8);
 extern void af_holiday_native_set_status(int,int);
 extern int af_holiday_native_check_status(int,int);
 #define FN(at,ret,...) ((ret (*)(__VA_ARGS__))(at))
-#define WORD(p,at) (*(const int *)((const u8 *)(p)+(at)))
 
 typedef struct {void *manager;u32 owner;} Native;
 static int outdoors(void *c) {(void)c;return !(af_holiday_native_field_id()&0xF000);}
@@ -62,13 +61,7 @@ static int bind(Native *n,void *manager,AFHolidayField *f,AFHolidayPlacementOps 
     n->manager=manager;n->owner=d[4];
     /* Same four physical landmarks as native search_free_unit. The N64 town
      * has no donor island dock; no fake dock coordinates are supplied. */
-    f->maximum=(AFHolidayBlock){WORD(manager,0x1E8),WORD(manager,0x1EC)};
-    f->next=(AFHolidayBlock){WORD(manager,0x20C),WORD(manager,0x210)};
-    f->shrine=(AFHolidayBlock){WORD(manager,0x214),WORD(manager,0x218)};
-    f->exclusions=4;
-    for(u32 i=0;i<4;i++)f->excluded[i]=(AFHolidayBlock){WORD(manager,0x214+i*12),WORD(manager,0x218+i*12)};
-    f->month=af_holiday_native_rtc[5];f->day=af_holiday_native_rtc[3];
-    f->hour=af_holiday_native_rtc[2];f->second=af_holiday_native_rtc[0];
+    if(!af_holiday_placement_field(manager,af_holiday_native_rtc,f))return 0;
     *o=(AFHolidayPlacementOps){n,outdoors,busy,other,unit,height,get,reserve,forward,flatten,spawn,error};
     return 1;
 }

@@ -13,6 +13,7 @@ from apply_translation import write_new
 from v3_furniture_install import inputs
 from v3_holiday_events import encode
 from v3_holiday_native import DAYS,REFERENCES,IDS,OWNER,VROM,RELOC,identities,patch_core,patch_manager
+from v3_registry import SPECIAL_NPCS
 
 OUT=ROOT/os.environ.get('V3_HOLIDAY_NATIVE','build/v3-diary-category-work-01/tortimer-native-01')
 
@@ -64,7 +65,8 @@ class NativeDirectoryTests(unittest.TestCase):
             write_new(d/'holiday-native-data.h',data.encode())
             command=['cc','-std=c11','-O1','-g','-Wall','-Wextra','-Werror','-fno-pie','-no-pie',
                 '-fsanitize=address,undefined','-fno-omit-frame-pointer','-I'+str(ROOT/'overlays/v3'),
-                '-I'+str(d),'tests/v3_holiday_native_test.c','overlays/v3/holiday_native.c',
+                '-I'+str(d),f"-DAF_HOLIDAY_MIKO_PROFILE={SPECIAL_NPCS['GAFE01-r0/npc/ev-miko']['profile']}",
+                'tests/v3_holiday_native_test.c','overlays/v3/holiday_native.c','overlays/v3/holiday_observers.c',
                 'overlays/v3/holiday_events.c','overlays/v3/diary_calendar.c',
                 'overlays/v3/diary.c','-o',str(d/'check')]
             for cmd in (command,[str(d/'check')]):

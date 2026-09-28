@@ -29,6 +29,9 @@ typedef struct {
     void (*error)(void *,unsigned int);
 } AFHolidayPlacementOps;
 
+/* Decode the native manager, whose landmark order is pool/station/shrine/home. */
+int af_holiday_placement_field(const void *,const unsigned char rtc[8],AFHolidayField *);
+
 /* type/name are destination identities; source_seed preserves the donor's
  * deterministic free-acre selection despite additive IDs. */
 int af_holiday_placement_make(const AFHolidayField *,const AFHolidayPlacementOps *,
