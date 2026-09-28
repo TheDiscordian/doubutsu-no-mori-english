@@ -74,6 +74,23 @@ NATIVE_SERVICES={
     'mCoBG_SetPlussOffset':0x800739FC,'_Matrix_to_Mtx':0x800E139C,
     'osWritebackDCache':0x8002FE00,
     '_texture_z_light_fog_prim_npc':0x800BD5E8,'_texture_z_light_fog_prim_shadow':0x800BD510,
+    'af_hp_native_event_status':0x8007FF08,'af_hp_native_event_error':0x8007FDA8,
+    'af_hp_native_pool_variant':0x8008930C,'af_hp_native_sex':0x800AD104,
+    'af_hp_native_joint_initial':0x800821B0,'af_hp_native_joint_removed':0x800824A4,
+    'af_hp_native_joint_refill':0x8008256C,
+    'af_hp_native_structure':0x8008D574,
+    'xyz_t_add':0x8009A108,'mFI_BlockKind2BkNum':0x80089440,
+    'mFI_BkNum2BaseHeight':0x80089114,'Matrix_translate':0x800E0314,
+    'Matrix_scale':0x800E041C,'Matrix_RotateX':0x800E0500,
+    'Matrix_RotateY':0x800E0698,'Matrix_RotateZ':0x800E0834,
+    '_texture_z_light_fog_prim':0x800BD4E8,'_texture_z_light_fog_prim_xlu':0x800BD598,
+    'Setpos_HiliteReflect_init':0x800588B8,'Setpos_HiliteReflect_xlu_init':0x80058928,
+}
+WORLD_READERS={
+    'index':0x80081EA0,'active':0x80081EEC,'kind':0x80081F90,'all':0x80081FBC,
+    'count':0x80081FE8,'position':0x80082014,'named_position':0x800820B0,
+    'initial':0x80082450,'refill':0x800828AC,'name':0x80082BD8,'random':0x80082DA0,
+    'lap':0x80082E40,
 }
 
 
@@ -213,7 +230,7 @@ def generate(source):
         native_services_bound=False,native_execution_verified=False)
 
 
-def rope_artwork(source,out,generated):
+def rope_artwork(source,out,generated,reuse=None):
     """Use the same complete-model converter for the rope and its shadow."""
     vertex,size=source.symbol('tol_rope_1_v')
     if size!=60*16:raise ValueError('Changed complete rope vertex array')
@@ -223,7 +240,21 @@ def rope_artwork(source,out,generated):
         callback_adapter=dict(category='actor-model-assets'))
     prepared=prepare_models(source,descriptor)
     directory=out/'rope-art';directory.mkdir()
-    asset,models,records,_=compile_models(directory,prepared)
+    if reuse:
+        cached=json.loads((reuse/'prepared.json').read_text())
+        receipt=cached['rope'];asset=(reuse/'rope-art.bin').read_bytes()
+        if (cached['source_rel_sha256']!=sha256(source.rel) or
+                cached['source_symbols_sha256']!=sha256(source.symbols.encode()) or
+                sha256(asset)!=receipt['sha256'] or asset[:len(prepared[1])]!=prepared[1] or
+                (reuse/'rope-art/commands.c').read_text()!=prepared[5] or
+                receipt['resources']!=prepared[2]):
+            raise ValueError('Changed complete cached rope resources')
+        records=receipt['models'];models={r['layer']:r['native_offset'] for r in records}
+        if (set(models)!=set(prepared[4]) or any(sha256(asset[r['native_offset']:
+                r['native_offset']+r['bytes']])!=r['output_sha256'] for r in records)):
+            raise ValueError('Incomplete cached rope models')
+        write_new(directory/'commands.c',prepared[5].encode())
+    else:asset,models,records,_=compile_models(directory,prepared)
     offset=prepared[3][vertex]
     generated['rope-art.bin']=asset
     generated['rope-packet.S']=('.section .rodata.af_hp_rope_art,"a",@progbits\n.balign 16\n'
@@ -234,6 +265,247 @@ def rope_artwork(source,out,generated):
     return dict(bytes=len(asset),sha256=sha256(asset),resources=prepared[2],models=records,
         dynamic_vertex_offset=offset,dynamic_vertex_count=60,
         complete_collision=True,installed=False)
+
+
+def world(base,prior,source,generated):
+    """Bind uniforms and preserve every native shared placement reader body."""
+    from aflib import CODE_RAM,CODE_VROM
+    from v3_villager_defaults import TEXTURES,PALETTES
+    from v3_holiday_maps import REFERENCES
+    path='src/game/m_event_map_npc.c';text=(DONOR/path).read_bytes()
+    if sha256(text)!=REFERENCES[path]:raise ValueError('Changed shared participant-selection source')
+    cloth=prior['clothing']['batch'];prepared=ROOT/cloth['prepared_directory']/'art.json'
+    if sha256(prepared.read_bytes())!=cloth['prepared_sha256']:raise ValueError('Changed complete clothing correspondence')
+    rows=json.loads(prepared.read_text())['rows'];uniforms=[];files=by_vrom(base)
+    textures,palettes=(files[v].extract(base) for v in (TEXTURES,PALETTES))
+    for donor in (0x2414,0x2415):
+        r=next(r for r in rows if r['donor_item_id']==f'{donor:04X}')
+        if r['status']!='native-appearance' or len(r['native_candidates'])!=1:
+            raise ValueError('Participant uniform lacks verified native identity')
+        target=int(r['native_item_id'],16);index=target-0x2400
+        resource=textures[index*512:(index+1)*512]+palettes[index*32:(index+1)*32]
+        if sha256(resource)!=r['resource_sha256']:
+            raise ValueError('Changed complete installed participant uniform')
+        uniforms.append(dict(source=donor,native=target,name=r['name'],sha256=sha256(resource)))
+    generated['world-data.c']=('#include "holiday_participants.h"\nint af_hp_uniform(unsigned int source) {\n'
+        'switch(source){case 0:return 0;'+''.join(f'case {r["source"]}:return {r["native"]};' for r in uniforms)+
+        'default:return -1;}}\n')
+    core=files[CODE_VROM].extract(base)
+    directory=(ROOT/'upstream/af/linker_scripts/jp/symbol_addrs_code.txt').read_text()
+    starts=sorted({int(m[1],16) for m in re.finditer(r'= 0x([0-9A-F]+);[^\n]*type:func',directory)})
+    readers=[]
+    for name,at in WORLD_READERS.items():
+        end=next(p for p in starts if p>at);body=core[at-CODE_RAM:end-CODE_RAM]
+        readers.append(dict(name=name,start=at,end=end,sha256=sha256(body),entry_hex=body[:8].hex(),
+            replacement='af_hp_world_'+name,previous='af_hp_world_previous_'+name))
+    names=('mEvMN_GetNpcIdxRandom','mEvMN_ClearRemoveNpcJoint','mEvMN_SetNpcJointEvRandom')
+    functions=[source.function(next(p for p,rs in source.functions.items() if any(n==name for n,_ in rs)))[1]
+        for name in names]
+    return dict(source_reference=path,source_sha256=sha256(text),uniforms=uniforms,
+        native_reader_hooks=readers,selection_functions=functions,native_map_count=15,
+        source_map_count=17,original_readers_preserved=True,installed=False)
+
+
+def coin(source,base,prior,out,generated,reuse=None):
+    """Prepare the whole offering effect with shared art and sound conversion."""
+    from aflib import CODE_RAM,CODE_VROM
+    from v3_password_policy import function
+    from v3_sound_programs import prepare_triggers,register_triggers,installed_resource
+    from v3_villager_audio import read_audio_donor
+    from v3_creature_insect_effects import OWNERS as WATER
+    path='src/effect/ef_coin.c';raw=(DONOR/path).read_bytes()
+    if sha256(raw)!='fea3baecf1240effa5d0591a5f4caf5d50c15d41a884e8cc8e7f9b713edd0acf':
+        raise ValueError('Changed complete offering-coin source')
+    names=('eCoin_init','eCoin_GetFountainHeight','eCoin_ct','eCoin_mv','eCoin_dw')
+    functions=[];pieces=['#include "holiday_coin.h"','#pragma GCC diagnostic ignored "-Wunused-parameter"']
+    for name in names:
+        matches=[p for p,rs in source.functions.items() if any(n==name for n,_ in rs)]
+        if len(matches)!=1:raise ValueError('Missing complete offering function: '+name)
+        functions.append(source.function(matches[0])[1])
+        if name.endswith('_dw'):continue
+        body=clean(function(raw.decode(),name))
+        for before,after in (
+            ('eEC_CLIP->make_effect_proc','af_coin_create'),('eEC_CLIP->effect_make_proc','af_coin_request'),
+            ('eEC_CLIP->set_continious_env_proc','af_sky_continuous'),('sAdo_OngenTrgStart','af_coin_sound')):
+            body=body.replace(before,after)
+        # The source truncates then wraps its random 16-bit rotations.
+        body=body.replace('= RANDOM_F(65535);','= (s16)(int)RANDOM_F(65535);')
+        pieces.append(body)
+    pieces.extend((
+        'void af_coin_init(xyz_t p,int priority,s16 angle,GAME *g,u16 name,s16 a,s16 b) {',
+        ' if(af_sky_ready(g))eCoin_init(p,priority,angle,g,name,a,b);}',
+        'void af_coin_ct(RoomEffect *e,GAME *g,void *arg) {',
+        ' if(af_sky_ready(g))eCoin_ct(e,g,arg);else e->timer=0;}',
+        'void af_coin_mv(RoomEffect *e,GAME *g) {',
+        ' if(!af_sky_ready(g)){e->timer=0;return;}',
+        ' for(unsigned int i=0,n=af_hp_native_ticks;i<n;i++){',
+        '  if(i){if(e->timer<=1)break;--e->timer;} eCoin_mv(e,g);}}',
+        'void af_coin_dw(RoomEffect *e,GAME *g) {af_coin_draw(e,g);}',''))
+    generated['coin-source.c']='\n\n'.join(pieces)
+    at,n=source.symbol('iam_ef_coin');profile=source.raw('iam_ef_coin')
+    refs={p-at:r for (section,p),r in source.section_relocations.items() if section==5 and at<=p<at+n}
+    expected={i*4:(1,1,1,next(f['offset'] for f in functions if f['symbol']=='eCoin_'+role))
+        for i,role in enumerate(('init','ct','mv','dw'))}
+    if profile.hex()!='00000000000000000000000000000000fffe00ffc47a0cff' or refs!=expected:
+        raise ValueError('Changed complete offering profile')
+    # Preserve the actual two palette choices through the material-frame path.
+    at,n=source.symbol('eCoin_pal_table');pointers=source.pointers(at,n)
+    frames=[]
+    for i,name in enumerate(('ef_coin_gold_pal','ef_coin_silver_pal')):
+        p,size=source.symbol(name)
+        if n!=8 or size!=32 or pointers.get(at+i*4)!=p:raise ValueError('Changed full coin palette table')
+        frames.append(dict(symbol=name,donor_offset=p,bytes=size,source_sha256=sha256(source.raw(name))))
+    descriptor=dict(models={k:source.containing(source.symbol(name)[0],exact=True)
+        for k,name in (('opaque','ef_coin_model'),('translucent','ef_coin_modelT'))},
+        callback_adapter=dict(category='actor-model-assets',material_frames=[dict(kind='palette',
+            segment_address=0x08000000,frames=frames,selector=dict(input='effect-work',offset=5,mask=1))]))
+    prepared=prepare_models(source,descriptor);directory=out/'coin-art';directory.mkdir()
+    cached=json.loads((reuse/'prepared.json').read_bytes()) if reuse else {}
+    if 'coin' in cached:
+        art=cached['coin']['art'];asset=(reuse/'coin-art.bin').read_bytes()
+        if (cached['source_rel_sha256']!=sha256(source.rel) or art['resources']!=prepared[2] or
+                art['palette_frames']!=frames or sha256(asset)!=art['sha256'] or
+                asset[:len(prepared[1])]!=prepared[1] or
+                (reuse/'coin-art/commands.c').read_text()!=prepared[5]):
+            raise ValueError('Changed complete cached offering artwork')
+        model_rows=art['models'];models={r['layer']:r['native_offset'] for r in model_rows}
+        if set(models)!=set(prepared[4]) or any(sha256(asset[r['native_offset']:
+                r['native_offset']+r['bytes']])!=r['output_sha256'] for r in model_rows):
+            raise ValueError('Incomplete cached offering models')
+        write_new(directory/'commands.c',prepared[5].encode())
+    else:asset,models,model_rows,_=compile_models(directory,prepared)
+    generated['coin-art.bin']=asset
+    generated['coin-packet.S']=('.section .rodata.af_coin_art,"a",@progbits\n.balign 16\n'
+        '.globl af_coin_art\naf_coin_art:\n.incbin "coin-art.bin"\n')
+    generated['coin-art.c']=('#include "holiday_coin.h"\nconst u32 af_coin_models[2]={'
+        +','.join(hex(0x06000000+models[k]) for k in ('opaque','translucent'))+'};\n'
+        'const u32 af_coin_palettes[2]={'+','.join(str(prepared[3][r['donor_offset']]) for r in frames)+'};\n')
+    # Water identities are already verified by the complete insect importer.
+    files=by_vrom(base);water=[]
+    for eid,vrom,reloc,ram,digest,rel_digest in WATER[:2]:
+        if sha256(files[vrom].extract(base))!=digest or sha256(files[reloc].extract(base))!=rel_digest:
+            raise ValueError('Changed complete shared water effect')
+        water.append(dict(id=eid,vrom=vrom,reloc=reloc,ram=ram,sha256=digest,relocation_sha256=rel_digest))
+    resources,audio=prepare_triggers(base,prior,[0x466,0x467]);core=files[CODE_VROM].extract(base)
+    sequence,_,_=installed_resource(base,core,'seq',199)
+    previous=prior['equipment_resources']['furniture_audio']
+    counts={r['group']:r['previous_count'] for r in previous['tables']}
+    dol,_=read_audio_donor(ROOT/'local/gamecube/Animal Crossing (USA, Canada).ciso')
+    priority=core[0x80113B84-CODE_RAM:0x80113B84-CODE_RAM+128]
+    new_sequence,programs,tables=register_triggers(sequence,audio['programs'],resources['fragments'],counts,
+        priority,dol.read(0x800A9A90,128),previous=previous)
+    sound_ids={r['source_sound_word']:r['native_sound_word'] for r in programs}
+    generated['coin-audio.c']=('#include "holiday_coin.h"\nconst u16 af_coin_sounds[2]={'
+        +','.join(str(sound_ids[n]) for n in (0x466,0x467))+'};\n')
+    audio_files={'coin-font.bin':resources['font'],'coin-wave.bin':resources['wave'],
+        'coin-sequence.bin':new_sequence,**{'coin-'+n:d for n,d in resources['fragments'].items()}}
+    generated.update(audio_files)
+    audio.update(files={n:dict(bytes=len(d),sha256=sha256(d)) for n,d in audio_files.items()},
+        registered_programs=programs,registered_tables=tables,previous_sequence_sha256=sha256(sequence))
+    return dict(reference=path,reference_sha256=sha256(raw),functions=functions,
+        profile_sha256=sha256(profile),profile_relocations=refs,policy_hex=profile[16:].hex(),
+        source_id=118,native_id=119,art=dict(bytes=len(asset),sha256=sha256(asset),
+            models=model_rows,resources=prepared[2],palette_frames=frames),water=water,audio=audio,
+        installed=False,native_execution_verified=False,
+        landing_geometry='Complete source shrine-relative height; native shrine landing needs review')
+
+
+def hooks(base,prior,generated,readers):
+    """Extend the installed NPC chains and all shared event-map consumers."""
+    from aflib import CODE_RAM,CODE_VROM
+    from v3_camper_quest import OWNERS as SPAWN_OWNERS
+    from v3_import_storage import jump
+    from v3_npc_draw import relocation_offsets
+    files=by_vrom(base);core=files[CODE_VROM].extract(base)
+    links={};rows=[];trampolines=['.set noreorder','.set noat','.set nomacro','.text']
+    def exports(symbol):
+        found=set()
+        def visit(v):
+            if isinstance(v,dict):
+                if isinstance(v.get('symbols'),dict) and symbol in v['symbols']:
+                    found.add(v['symbols'][symbol])
+                for child in v.values():visit(child)
+            elif isinstance(v,list):
+                for child in v:visit(child)
+        visit(prior)
+        return found
+    def chained(vrom,ram,address,replacement,previous,symbol,kind,delay):
+        raw=files[vrom].extract(base);offset=address-ram
+        word,slot=struct.unpack_from('>2I',raw,offset)
+        target=(address+4)&0xF0000000 | (word&0x3FFFFFF)<<2
+        if word>>26!=(3 if kind=='call' else 2) or slot!=delay or target not in exports(symbol):
+            raise ValueError('Changed installed participant chain: '+symbol)
+        if previous in links and links[previous]!=target:
+            raise ValueError('NPC controllers disagree on shared profile dispatcher')
+        links[previous]=target
+        rows.append(dict(vrom=vrom,ram=ram,address=address,kind=kind,
+            before=raw[offset:offset+8].hex(),replacement=replacement,previous=previous,
+            previous_target=target,previous_export=symbol))
+    # Preserve both relocated table-address calculations and their HI/LO
+    # relocations. The existing resident camper helper handles every other ID.
+    for vrom,reloc,ram,old_hook,bias,*_ in SPAWN_OWNERS[:2]:
+        raw=files[vrom].extract(base);rel=files[reloc].extract(base);at=old_hook-ram
+        slots=relocation_offsets(rel,len(raw))
+        expected=(0x3C090000|((bias+0x8000)>>16),0x01284821,0x25290000|(bias&65535))
+        if struct.unpack_from('>3I',raw,at-8)!=expected or at not in slots or at-8 not in slots or at+4 in slots:
+            raise ValueError('Changed relocated shared NPC profile lookup')
+        chained(vrom,ram,old_hook+4,'af_hp_spawn_profile','af_hp_previous_spawn_profile',
+            'af_v3_camper_profile','call',0x27A40044)
+        rows[-1].update(relocation_vrom=reloc,relocation_sha256=sha256(rel),
+            retained_address_bias=bias,retained_pointer_hex=raw[at-8:at+4].hex())
+    profiles={r['name']+i:r['profile'] for r in PARTICIPANTS.values() for i in range(r['count'])}
+    if sorted(profiles)!=list(range(0xD0A0,0xD0AE)):
+        raise ValueError('Changed complete additional NPC role interval')
+    generated['spawn-data.c']=('#include "holiday_participants.h"\nconst s16 af_hp_spawn_profiles[14]={'
+        +','.join(str(profiles[n]) for n in sorted(profiles))+'};\n')
+    chained(0x8681F0,0x809735B0,0x809749D0,'af_hp_animation','af_hp_previous_animation',
+        'af_holiday_motion_animation','entry',0)
+    if {0x809749D0-0x809735B0,0x809749D4-0x809735B0}&relocation_offsets(
+            files[0x878550].extract(base),files[0x8681F0].size):
+        raise ValueError('Participant animation entry requires relocation')
+    chained(CODE_VROM,CODE_RAM,0x80057E4C,'af_hp_descriptor','af_hp_previous_descriptor',
+        'af_decor_actor_descriptor','call',0x00C02025)
+    chained(CODE_VROM,CODE_RAM,0x800583B8,'af_hp_free','af_hp_previous_free',
+        'af_v3_npc_extra_free','call',0)
+    entries=[dict(r,address=r['start'],kind='entry',vrom=CODE_VROM,ram=CODE_RAM,
+        before=r['entry_hex']) for r in readers]
+    entries += [dict(address=address,kind='entry',vrom=CODE_VROM,ram=CODE_RAM,
+        before=core[address-CODE_RAM:address-CODE_RAM+8].hex(),replacement=replacement,previous=previous)
+        for address,replacement,previous in (
+            (0x800AA14C,'af_hp_event_lookup','af_hp_previous_event'),
+            (0x800AA0B8,'af_hp_event_unregister','af_hp_previous_unregister'),
+            (0x800AA124,'af_hp_events_clear','af_hp_previous_clear'))]
+    for r in entries:
+        words=struct.unpack('>2I',bytes.fromhex(r['before']))
+        # These exact prefixes only copy integer registers, form constants, or
+        # store the caller frame. No PC-relative operation may be transplanted.
+        for word in words:
+            if word>>26 not in (0,9,12,15,43) or word>>26==0 and word&63 not in (0,2,3,33,37):
+                raise ValueError('Unsafe original participant-reader prologue')
+        trampolines.extend(('.balign 4','.globl '+r['previous'],r['previous']+':',
+            *(f'.word 0x{w:08X}' for w in words),f'.word 0x{jump(r["address"]+8):08X}','nop'))
+        rows.append(r)
+    generated['original-readers.S']='\n'.join(trampolines)+'\n'
+    return dict(rows=rows,bindings=links,role_profiles=profiles,
+        original_npc_tables_preserved=True,original_relocations_preserved=True,installed=False)
+
+
+def patch(base,prepared,symbols):
+    """Apply the prepared connected hooks without changing overlay lifetimes."""
+    from v3_import_storage import jump
+    if sha256(base)!=prepared['base_sha256']:raise ValueError('Participant hooks need their exact checked base')
+    files=by_vrom(base);changes={};receipts=[]
+    for row in prepared['hooks']['rows']:
+        vrom=row['vrom'];data=changes.setdefault(vrom,bytearray(files[vrom].extract(base)))
+        offset=row['address']-row['ram'];before=bytes.fromhex(row['before'])
+        target=symbols[row['replacement']]
+        if target&3 or not 0x80400000<=target<0x80800000 or data[offset:offset+len(before)]!=before:
+            raise ValueError('Changed participant hook bytes or resident destination')
+        after=struct.pack('>I',jump(target,link=row['kind']=='call'))
+        if row['kind']=='entry':after+=bytes(4)
+        data[offset:offset+len(after)]=after
+        receipts.append(dict(row,after=after.hex(),target=target))
+    return {v:bytes(data) for v,data in changes.items()},receipts
 
 
 def native_motions(source,base,generated):
@@ -417,9 +689,11 @@ def bindings(base,prior):
     directory='\n'.join((ROOT/'upstream/af/linker_scripts/jp'/name).read_text() for name in (
         'symbol_addrs_code.txt','symbol_addrs_libultra.txt','symbol_addrs_boot.txt'))
     starts=sorted({int(m[1],16) for m in re.finditer(r'= 0x([0-9A-F]+);[^\n]*type:func',directory)})
+    names={n:int(a,16) for n,a in re.findall(r'^(\w+) = 0x([0-9A-F]+);',directory,re.M)}
     files=by_vrom(base);rows=[]
     for name,at in NATIVE_SERVICES.items():
         if at not in starts:raise ValueError('Native service lacks exact symbol boundary: '+name)
+        if name in names and names[name]!=at:raise ValueError('Native service symbol disagrees with binding: '+name)
         end=next(p for p in starts if p>at)
         vrom,ram=(0x1060,0x80025C60) if at<CODE_RAM else (CODE_VROM,CODE_RAM)
         raw=files[vrom].extract(base)[at-ram:end-ram]
@@ -435,7 +709,9 @@ def bindings(base,prior):
     npc=prior['equipment_resources']['npc_extra']
     # Runtime exports remain tied to their installed packet, not hardcoded
     # guessed addresses. Locate each exact export once across existing owners.
-    for symbol in ('af_holiday_native_type','af_holiday_observers_clip'):
+    for symbol in ('af_holiday_native_type','af_holiday_observers_clip',
+                   'af_holiday_transition_maps','af_holiday_map_get','af_decor_actor_resolve',
+                   'af_sky_ready','af_sky_continuous','af_sky_adjust'):
         found=set()
         def visit(v):
             if isinstance(v,dict):
@@ -446,6 +722,7 @@ def bindings(base,prior):
         visit(npc)
         if len(found)!=1:raise ValueError('Missing or conflicting installed participant service: '+symbol)
         result[symbol]=found.pop()
+    result.update(af_sky_native_clip=0x80136F3C,af_effect_random=NATIVE_SERVICES['fqrand'])
     return result,rows
 
 
@@ -550,7 +827,7 @@ def dialogue(base,prior,generated):
                 ('choices.bin',cv,new_c,cb),('choice-table.bin',CHOICE_TABLE,new_ct,ct))])
 
 
-def prepare(output,lock):
+def prepare(output,lock,reuse=None):
     out=output.resolve()
     if out.exists() or not out.is_relative_to(ROOT/'build'):raise ValueError('Use a fresh ignored preparation')
     source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
@@ -558,12 +835,16 @@ def prepare(output,lock):
     from v3_furniture_install import inputs
     generated,report=generate(source);base,prior=inputs(lock)
     out.mkdir(parents=True)
-    report['rope']=rope_artwork(source,out,generated)
+    report['rope']=rope_artwork(source,out,generated,reuse)
     report['motions']=native_motions(source,base,generated)
     report['currency']=money(source,base,generated)
     report['dialogue']=dialogue(base,prior,generated)
     report['registry']=registry(base,report,generated)
+    report['world']=world(base,prior,source,generated)
+    report['hooks']=hooks(base,prior,generated,report['world']['native_reader_hooks'])
+    report['coin']=coin(source,base,prior,out,generated,reuse)
     links,report['native_functions']=bindings(base,prior)
+    links.update(report['hooks']['bindings'])
     report['bindings']=links
     report['base_sha256']=sha256(base);report['base_abi']=prior['runtime_abi']
     for name,body in generated.items():write_new(out/name,body if isinstance(body,bytes) else body.encode())
@@ -577,7 +858,9 @@ def prepare(output,lock):
         '-ffunction-sections','-fdata-sections','-fstack-usage','-Wall','-Wextra','-Werror',
         '-I/source/overlays/v3']
     files=[name for name in generated if name.endswith(('.c','.S'))]
-    files+=['/source/overlays/v3/holiday_participants_'+part+'.c' for part in ('native','registry','draw')]
+    files+=['/source/overlays/v3/holiday_participants_'+part+'.c' for part in ('native','registry','draw','world')]
+    files+=['/source/overlays/v3/holiday_participants_spawn.S']
+    files+=['/source/overlays/v3/holiday_coin.c']
     objects=[Path(name).stem+'.o' for name in files]
     if len(set(objects))!=len(objects):raise ValueError('Colliding connected compile units')
     run('gcc',*flags,'-I/out',*files)
@@ -589,6 +872,10 @@ def prepare(output,lock):
         'tools/v3_holiday_participants.py','overlays/v3/holiday_participants.h',
         'overlays/v3/holiday_participants_native.c','overlays/v3/holiday_participants_registry.c',
         'overlays/v3/holiday_participants_draw.c','tools/v3_registry.py',
+        'overlays/v3/holiday_participants_world.c',
+        'overlays/v3/holiday_participants_spawn.S',
+        'overlays/v3/holiday_coin.h','overlays/v3/holiday_coin.c',
+        'tools/v3_sound_programs.py','tools/v3_villager_audio.py','tools/v3_furniture_materials.py',
         'tools/v3_furniture_art.py','tools/v3_furniture_pipeline.py')}
     write_new(out/'prepared.json',(json.dumps(report,indent=2)+'\n').encode())
     return report
@@ -597,9 +884,10 @@ def prepare(output,lock):
 if __name__=='__main__':
     p=argparse.ArgumentParser(description=__doc__);p.add_argument('--output',type=Path,required=True)
     p.add_argument('--build-lock',type=Path,required=True)
+    p.add_argument('--reuse',type=Path,help='Reuse identical complete rope conversion from a prior preparation')
     args=p.parse_args()
     try:
-        result=prepare(args.output,args.build_lock)
+        result=prepare(args.output,args.build_lock,args.reuse)
     except subprocess.CalledProcessError as e:
         print(e.stderr);raise
     print(json.dumps(dict(family=len(result['family']),object=result['object'],

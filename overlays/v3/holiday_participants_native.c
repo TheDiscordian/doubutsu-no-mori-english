@@ -131,7 +131,8 @@ void sAdo_OngenPos(u32 owner,u32 source,xyz_t *p) {
 static int event(unsigned int donor,int id) {
     /* Each source record fits the native 32-byte save area. A source event/id
      * outside this family must not reach a same-number original event. */
-    if(!((donor==1 && id==7)||(donor==15 && id==8)||(donor==14 && id==9)))return -1;
+    if(!((donor==1 && (id==7 || id==15)) ||
+         (donor==15 && (id==8 || id==15)) || (donor==14 && (id==9 || id==15))))return -1;
     return af_holiday_native_type(donor);
 }
 int af_hp_native_resident_index(u16 name) {
@@ -209,4 +210,13 @@ void af_hp_motion_override(ACTOR *a) {
         void *skeleton=*(void **)(frame+0x18);
         af_holiday_keyframe_init(frame,skeleton,m,m->start,m->end,current,speed,m->morph,m->mode,0);
     }
+}
+
+extern void af_hp_previous_animation(ACTOR *,int,int);
+void af_hp_animation(ACTOR *a,int index,int talk) {
+    /* Chain the existing complete initializer, including Tortimer's cane.
+     * Hook the shared entry so default-animation calls receive the complete
+     * imported prayer motion too, not just explicit source clip calls. */
+    af_hp_previous_animation(a,index,talk);
+    af_hp_motion_override(a);
 }

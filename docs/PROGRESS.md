@@ -54,7 +54,7 @@ No native fixture is restarted, and these checks do not establish in-game
 rendering or make diaries selectable.
 
 The shared race, tug-of-war, and New Year participant module is prepared at
-`build/v3-diary-category-work-01/participants-prepared-14/`, not installed.
+`build/v3-diary-category-work-01/participants-prepared-20/`, not installed.
 All three controllers, five resident roles, and the rope compile together from
 245 complete donor functions. The preparation includes 279 official messages,
 two choices, offering payment, matched motions, the full prayer motion, tools,
@@ -62,9 +62,18 @@ and native effect/sound mappings. The complete deforming rope and shadow use
 the shared model converter. Fixed identities, ordinary NPC allocation, guarded
 callbacks, and deferred identity cleanup share one registry. A sanitized host
 check and 23 shared conversion checks pass; native gameplay remains unverified.
-Next connect the shared town-selection/placement readers, offering-coin effect,
-animation hook, and actual calendar admission. The current ROM, saved format,
-selectable imports, and patcher deployments remain unchanged.
+The complete town-selection/placement reader family and both NPC spawning
+routes have prepared hooks, preserving original/camper dispatch and the global
+prayer-animation chain. Native resident selection/refill algorithms and verified
+red/blue uniforms are reused. Collision includes the unspawned fifth New Year
+queue position without inventing a fifth actor. The complete offering coin,
+both palettes/models, and both sound programmes use the shared importers.
+The 51,423-byte MIPS object has no unresolved functions. New sanitized host
+placement and coin lifecycle/draw-command checks pass, as does the changed
+shared combiner check. Next install the module, text, effect, and audio as one
+connected cartridge change, then finish remaining admission/geometry consumers.
+The current ROM, saved format, selectable imports, and patcher deployments
+remain unchanged.
 
 All fourteen dedicated event owners have live manager callbacks through the
 shared dispatcher and existing common state. Their 85 identity requirements

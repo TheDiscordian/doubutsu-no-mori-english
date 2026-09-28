@@ -347,7 +347,7 @@ cartridge, and empty/mixed/all-191 composition checks pass. Continue the remaini
 controller/participant services using the retained native map; do not reconvert
 these effects or installed decorations, or restart native fixtures.
 The connected controller/participant preparation is
-`build/v3-diary-category-work-01/participants-prepared-14/`: three controllers,
+`build/v3-diary-category-work-01/participants-prepared-20/`: three controllers,
 five resident roles, rope, 279 official messages/two choices, offering payment,
 tools/sounds, 21 matching native motions, and the full donor prayer motion.
 All nine owners compile together; the rope retains all 60 deformable vertices,
@@ -357,13 +357,21 @@ NPC pool, wraps post-initialization callbacks, rejects double-assigned residents
 and retains retiring identities through destruction. Two source destructors
 handle missing event storage safely. A sanitized registry/lifetime check and
 23 shared converter checks pass. Preparation is not installation or gameplay.
-The exact next connection is the town's shared event-selection/placement reader
-family: use the retained native core map, mapped event area 15, the checked
-layout packet, and real resident records. Native helpers `800821B0`, `800824A4`,
-and `8008256C` retain the complete donor selection/removal/refill algorithms;
+The preparation includes twelve shared event-map hooks, original resident
+selection/removal/refill algorithms, real uniforms, both existing NPC/camper
+spawn extensions, descriptor/free/temporary-identity/reset chains, and the global
+prayer-animation hook. The complete coin uses shared model/audio conversion,
+retains both palettes and water subeffects, and adds no unresolved functions.
+Sanitized placement and coin lifecycle/draw-command checks pass. The exact next
+connection is installation of this entire prepared module, text, audio, and
+effect profile. Reuse its rope/coin models. Startup has nineteen entries and is
+full: combine the adjacent sky/participant packets while preserving the sky
+prefix/guard, rather than adding a twentieth entry or growing the unrelated
+holiday/fishing packet. Before activation, handle native NPC-manager area-15
+allocation failure and review the coin's source well-height against the actual
+N64 shrine. Actual calendar choice/admission remains unfinished. Native helpers
+`800821B0`, `800824A4`, and `8008256C` retain the complete donor algorithms;
 resident memories start at offset `10`, not the decomp header's `0C` annotation.
-Also bind descriptor/name/event lookup/free/reset hooks, the global prayer-motion
-hook, and the complete offering-coin effect before real calendar admission.
 Keep source `af_hp_available` off until dependencies and selection are connected.
 Do not replay the exhausted native fixture or reconvert unchanged rope/sky art.
 `af_holiday_world_bind` already supplies `af_holiday_world_variant`; reuse it.

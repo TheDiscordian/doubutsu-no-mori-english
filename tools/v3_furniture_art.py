@@ -26,6 +26,10 @@ CONVERTER_VERSION = 20
 # These use one texture and retain source alpha; none introduces TEXEL1,
 # noise, keying, or an unprovided external render dependency.
 TRANSLUCENT_COMBINERS = {
+    # Reflective materials keep shade-lit texture RGB, then primitive tint and
+    # caller-controlled alpha. Reflection coordinates come from geometry state.
+    (0xFC127E60,0xFF0FF3FF): ('TEXEL0','0','SHADE','0','0','0','0','TEXEL0',
+        'PRIMITIVE','0','COMBINED','0','COMBINED','0','PRIMITIVE','0'),
     # Event signs retain the donor's additive lighting and caller colours.
     (0xFC127FFF,0xFFFCF238): ('TEXEL0','0','SHADE','TEXEL0','0','0','0','TEXEL0',
         '0','0','0','COMBINED','0','0','0','COMBINED'),

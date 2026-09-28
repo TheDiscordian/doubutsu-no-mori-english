@@ -990,9 +990,9 @@ but missing participants/controllers keep owner admission inactive. Saved format
 ### Shared resident participants and controllers
 
 `tools/v3_holiday_participants.py` prepares the complete race, tug-of-war, and
-New Year family together. `participants-prepared-14/` contains three controllers,
+New Year family together. `participants-prepared-20/` contains three controllers,
 five NPC roles, and the required rope: 245 complete donor functions, checked
-profile relocations, and one 42,951-byte MIPS object including data/BSS. This is
+profile relocations, and one 51,423-byte MIPS object including data/BSS. This is
 uninstalled preparation, not an active event or a new cartridge.
 
 `tools/v3_registry.py` owns fixed profiles `D9..E1` and temporary resident names
@@ -1013,7 +1013,8 @@ explicitly credit those assistant adaptations. Merge those records into the
 single `translations/provenance.json` catalogue when installing the final IDs.
 Offering payment uses the complete source routines and native wallet/bag readers.
 Twenty-one motions match complete native keyframe arrays; the different prayer
-motion is converted completely. Its global native animation hook is required.
+motion is converted completely. Its prepared global native animation hook
+chains the existing ordinary/Tortimer initializer before the prayer override.
 Native face/effect/audio programmes remain attached to the reused motions.
 
 The shared graphics converter supports multiple bounded slices of one mutable
@@ -1022,7 +1023,14 @@ loads, 36 body triangles, and 22 shadow triangles. Complete source deformation
 reads mapped tug state; source construction/destruction updates all three
 collision units. Drawing checks matrix, vertex, and command space and retains
 the source's static-vertex fallback. No coin or other missing effect becomes a
-same-number native alias. The visible offering coin remains a required provider.
+same-number native alias. The offering coin uses source ID 118 and additive
+native ID 119, with the complete source lifecycle, two converted models, both
+gold/silver palettes, primitive-alpha fade, and reflection. Native reflection's
+48-byte opaque-tail allocation is checked even for translucent drawing.
+The shared sound importer prepares both complete programmes (`466`, `467`),
+their fonts/samples, dispatch entries, and priorities. No sound is played during
+verification. The source well-relative landing height requires an explicit
+geometry review at the native shrine before activation.
 
 Timers use elapsed native ticks; the tug controller executes its complete shared
 state update per tick, including its odd-length counter wrap. NPC physics and
@@ -1031,12 +1039,28 @@ host check covers all fourteen temporary bindings, duplicate rejection, callback
 replacement, cancellation, missing-state cleanup, and original fallbacks. All
 23 shared converter checks pass. Native services are doubles in the host check.
 
-Remaining connections are town event selection/placement, native descriptor and
-temporary-name readers/reset, the prayer-animation hook, offering-coin effect,
-and actual calendar admission. Native selection helpers `800821B0`, `800824A4`,
-and `8008256C` match the complete donor selection/removal/refill algorithms and
-can be reused with validated counts. Native resident stride is `528`, with
-memories at `10`; source-header offset comments are not layout evidence.
+Twelve prepared shared map hooks cover index/active/kind/counts, positions,
+resident selection/refill, names, random residents, and player collision.
+Virtual map indices `15..31` never enter the original fifteen-row table.
+Native selection helpers `800821B0`, `800824A4`, and `8008256C` retain the
+complete donor algorithms with validated counts and residents. Verified native
+clothing `2414/2415` supplies the red/blue uniforms. Both native NPC controllers'
+existing camper-profile extensions call one bounded `D0A0..D0AD` lookup and
+preserve the relocated original table pointer for every other identity.
+Temporary-identity lookup/unregister/reset and descriptor/free hooks preserve
+their installed predecessor chains. Original core entries use checked
+straight-line prologue trampolines. All 20 hook windows are prepared together.
+The fifth New Year queue position is used for collision, not a fifth resident
+or an alias to another actor. Sanitized host checks cover these reader paths
+and the generated coin's movement, landing/fade state, command submission,
+palette choice, and exhausted arenas. Native services remain test doubles.
+
+Remaining connections are cartridge installation, native NPC-manager area-15
+allocation-failure handling, shrine landing geometry, and actual calendar
+choice/admission. The nineteen-entry startup table is full; the adjacent sky
+and participant code must share one checked load without changing the retained
+holiday/fishing packet. Native resident stride is `528`, with memories at `10`;
+source-header offset comments are not layout evidence.
 The installed ABI remains 342, saved format remains 13, and both deployments
 stay on stable V2-14. No diary becomes selectable through this preparation.
 
