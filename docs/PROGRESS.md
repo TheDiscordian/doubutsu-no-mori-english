@@ -39,6 +39,20 @@ fish and eight insects, and 100 inactive furniture profiles whose acquisition
 is pending, plus sixteen inactive diary cover profiles. The main lock and both
 stable V2-14 deployments are unchanged.
 
+The shared collision/escape/fade path and native scene bridge are prepared at
+`build/v3-diary-category-work-01/transition-native-06/`, not installed. The complete
+source algorithms retain every layout's ACTIVE precedence, escape ordering,
+transition gate, and Groundhog branch. The native bridge handles announcement
+type mapping, rejected scene requests, return-door writes, and ordered warp/BGM
+calls. A focused sanitized host check passes, and the 6,592-byte MIPS module
+links against checked native functions. Native I/O and unfinished imported
+services are doubles; no in-game execution or newly playable diary is claimed.
+Remaining work is the actual identity/state/gate/climate/rhythm providers,
+alternate announcement lifecycle, packet loading, and live owner dispatch, plus
+the existing event-actor and calendar-choice requirements. See the
+[transition contract](../specs/V3_DIARIES.md#shared-transition-and-native-scene-bridge).
+Existing saves, the ABI-322 cartridge, and the native test budget are unchanged.
+
 The complete dedicated-owner code, native primitive adapter, and all shared
 event layouts are installed in the existing holiday packet. The placement
 adapter uses the checked `8010EF90` game-context pointer; its shared owner and

@@ -197,15 +197,17 @@ Placement uses `8010EF90`; the shared owner and saved-state lifecycle are
 relinked against all five placement exports, preserving public caller addresses.
 Reuse this installation, the unchanged art, and passing focused checks.
 
-Next connect the checked source-to-installed actor/decoration/profile/effect
-identities and the scene fade/escape-position path, then imported common-state
-lifetime and live manager dispatch. The title reader is complete, not the fade
-caller. The native `8095EC24` fade uses `8095E63C` escape search and `80082E40`
-layout collision; imported layouts need their actual identity-aware collision
-reader. Preserve source ACTIVE layout precedence, not Tortimer's field-category
-query, and retain the source present-demo/room-message gates and transition
-side effects. The [scene connection](../specs/V3_DIARIES.md#event-announcements-and-acre-lock)
-records exact completed bindings and remaining consumers. Include costume,
+The complete shared collision/escape/fade algorithms and native scene bridge
+are prepared at `build/v3-diary-category-work-01/transition-native-06/`, not
+installed. The source/host and MIPS checks pass; reuse these components. Next
+connect checked actor/decoration/profile/effect identities and source/native
+ACTIVE status, actual present-demo/room-message and Groundhog state, climate/
+rhythm services, and the alternate event-message lifecycle. Bind common-state
+lifetime and the live dedicated-owner calls while integrating the packet; do not
+activate callbacks with missing providers. The
+[transition contract](../specs/V3_DIARIES.md#shared-transition-and-native-scene-bridge)
+records completed native scene/return-state bindings and remaining consumers.
+Include costume,
 exercise/card, Miko, race/participant behaviour, and the calendar choice in this
 same category; do not activate an owner with missing services. Preserve the
 existing save format, resources, and native test budget. No fixture is restarted.

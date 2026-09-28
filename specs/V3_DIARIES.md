@@ -1023,14 +1023,58 @@ doubled; these are not executed in-game transition tests. Current empty, mixed,
 and all-supported browser/offline outputs agree, with 191 supported selections
 and every unfinished diary still unavailable.
 
-The next transition consumers remain the source `title_fade`, `player_lap_check`,
-and `mEvMN_CheckLapPlayer` paths. The native fade is `8095EC24..8095EDE4`; its
-escape search is `8095E63C..8095EC24`, using collision reader `80082E40`.
-The imported collision reader must follow the source layout directory's ACTIVE
-precedence and resolve decoration identities before calling structure-area
-tests. Tortimer's field-category query is not that layout selector. Retain
-source present-demo/room-message gates, climate/rhythm handling, and the actual
-return-door state; do not claim that replacing title text alone ports the fade.
+### Shared transition and native scene bridge
+
+`tools/v3_holiday_transition.py` prepares the complete shared collision, escape,
+and fade path at `build/v3-diary-category-work-01/transition-native-06/`. It compiles
+six whole donor functions, including `title_fade`, `player_lap_check`, and
+`mEvMN_CheckLapPlayer`, through an explicit normalized context. The two complete
+escape-offset arrays are checked against actual donor relocations and data:
+448 bytes for the two 28-position searches, and 96 bytes for fixed obstacles.
+The expanding search, near-gate fallback, five transition gates, and Groundhog
+branches are retained. Generated donor C remains ignored.
+
+The collision reader follows all seventeen source layout entries in ACTIVE
+order, including a null layout masking later active entries. Structure names
+belong to source type **5**, confirmed by the actual enum, not type 8. Every
+active structure must resolve to an installed identity before scene mutation.
+Eight checked native geometry functions provide acre/unit conversion, structure
+footprints, landmark lookup, police collision, NPC space, and nearby gates.
+
+`af_holiday_transition_native_fade` connects the generated fade to actual native
+player, manager, common, and scene state. The complete original fade at
+`8095EC24..8095EDE4`, the player accessor, and all directly bound native functions
+are guarded. Source announcement type 13 maps to native type 12. The request is
+written before `goto_other_scene`, even when that call rejects the transition.
+The player-position predicate is called **after** the scene request, not cached
+before it. Return-door data, the additive event ID, title flags, manager skip,
+and wipe/fade fields are committed before rhythm capture, player warp, and BGM.
+Unrelated native fields and existing door padding are preserved.
+
+The native bridge still requires actual imported common-state providers. These
+must supply source/native ACTIVE identities, current acre and pool shape,
+present-demo and room-message gates, Groundhog state, climate/rhythm handling,
+and the alternate event-message lifecycle. Missing providers reject explicitly;
+native demo 13 is **not** treated as source event-message-2. No substitute owner,
+zero-filled gate, or no-op side effect is an implemented service.
+
+The linked module is 6,592 bytes, SHA-256
+`2c19448ef951fab59e98d602581629baa8a7b3fed029653449b7537ffbe0dc47`,
+with a 328-byte largest individual frame. It is prepared for `806FC000`, within
+a checked but **not yet allocated/loaded** 16-KiB extension of the holiday packet.
+No cartridge installation or owner activation is claimed; ABI 322 remains the
+current cartridge. The next connected work is the remaining service providers,
+common-state lifetime, packet integration, and live manager dispatch. Retain the
+separate costume/exercise/Miko/race requirements of this same diary category.
+
+`tests/test_v3_holiday_transition.py` runs one sanitized host check of the actual
+generated functions and both native adapters. It covers every layout placement,
+ACTIVE/null precedence, escape/fallback, gates, ordinary and Groundhog doors,
+request rejection, post-request position changes, ordered native writes, and
+missing-provider rejection. Native I/O, installed identities, and imported
+services are doubles. Total dynamic stack, in-game transitions, native diary
+gameplay, and hardware remain unverified. The exhausted native fixture budget is
+unchanged; no old build or fixture is replayed.
 
 ## Serialized diary state
 
