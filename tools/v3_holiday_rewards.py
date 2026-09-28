@@ -97,7 +97,7 @@ def encode(description):
 
 def compile_kernel(output, *, name='holiday_rewards'):
     """Prepare a relocatable o32 kernel; do not invent a resident address."""
-    if name not in ('holiday_rewards','holiday_talk','password','password_policy'):raise ValueError('Unreviewed shared acquisition kernel')
+    if name not in ('holiday_rewards','holiday_talk','holiday_actor','holiday_npc','password','password_policy'):raise ValueError('Unreviewed shared acquisition kernel')
     compiler='/n64_toolchain/bin/mips64-elf-'
     docker=['docker','run','--rm','--network','none','--user',f'{os.getuid()}:{os.getgid()}',
         '-v',f'{ROOT}:/source:ro','-v',f'{output.resolve()}:/out','-w','/out','--entrypoint']
@@ -112,6 +112,16 @@ def compile_kernel(output, *, name='holiday_rewards'):
     expected=sorted(('af_diary_valid','af_diary_days','af_diary_calendar_event',
         'af_diary_calendar_event_check','af_v3_holiday_select','af_v3_holiday_commit',
         'memcpy')) if name=='holiday_talk' else []
+    if name=='holiday_actor':
+        expected=sorted(('af_diary_valid','af_diary_days','af_diary_calendar_refresh',
+            'af_diary_calendar_event_check','af_holiday_talk_prepare','af_holiday_talk_start',
+            'af_holiday_talk_step','memset'))
+    if name=='holiday_npc':
+        expected=sorted(('af_holiday_actor_construct','af_holiday_actor_think_init',
+            'af_holiday_actor_think','af_holiday_actor_request','af_holiday_actor_prepare',
+            'af_holiday_actor_start','af_holiday_actor_talk','af_holiday_npc_bind',
+            'af_holiday_npc_world','af_holiday_npc_resources','af_holiday_npc_unregister',
+            'af_holiday_npc_continue','memcpy','memset'))
     if imports!=expected:raise ValueError('Unexpected acquisition kernel dependencies: '+str(imports))
     return dict(format='ELF-o32-MIPS-big-endian',sha256=sha256((output/(name+'.o')).read_bytes()),
         compiler_image=IMAGE,flags=flags,linked=False,resident_address=None,imports=imports)

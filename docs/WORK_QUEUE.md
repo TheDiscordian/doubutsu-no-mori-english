@@ -96,10 +96,18 @@ adapter and both checked owner hooks are prepared at
 `build/v3-diary-category-work-01/tortimer-draw-04/`. They preserve the existing
 accessory path and the entire native texture preload without cropping source art.
 Six focused source/current-cartridge/host checks pass; native rendering is not
-verified. Next bind these prepared resources through the additive actor registry,
-voice and cane motion, native lifecycle/event scheduling, official messages, and
-demo transport to the shared controller; connect the separate exercise/card route
-too. The [native connection notes](../specs/V3_DIARIES.md#tortimer-artwork-and-native-actor-connection)
+verified. The complete fifteen-state movement controller connects to the shared
+conversation/calendar/handover controller at
+`build/v3-diary-category-work-01/tortimer-actor-03/`. Its native lifecycle bridge
+uses the actual N64 clip/field layout and real request/delivery/end signals;
+both objects compile, but required services and actor registration are unlinked.
+The combined donor-think and connected conversation host check passes. The
+2,612-byte native actor exceeds the native pool's 2,400-byte limit, so its
+additive allocation/free path must be installed together with its descriptor.
+Next bind the registry/allocation, full voice/cane, walking-only schedule and
+update cadence, event owner, English messages/demo transport, and separate
+exercise/card route. Reuse the prepared resources and controllers.
+The [native connection notes](../specs/V3_DIARIES.md#tortimer-artwork-and-native-actor-connection)
 retain the actual native clip map, not the differently laid-out donor structure.
 Do not turn these consumers into per-holiday implementation/test cycles or mark
 the category complete from the controller alone. Native UI/save verification

@@ -185,6 +185,19 @@ identify the remaining registry, lifecycle, voice, cane-motion, schedule, and
 message/demo consumers. The current ABI-312 ROM, inactive diary choices, saves,
 and V2 deployments remain unchanged. Native appearance is unverified.
 
+The full fifteen-state Tortimer movement controller connects to the existing
+conversation, diary attendance, and guarded delivery code. A combined host check
+compares the complete donor think file and exercises request → conversation →
+attendance → delivery → resumed movement. The native lifecycle bridge supplies
+the checked N64 callbacks, actor fields, requests, and real demo-end/delivery
+signals. Both VR4300 objects are prepared at
+`build/v3-diary-category-work-01/tortimer-actor-03/`, not linked or installed.
+The remaining services include the additive allocation/registry, walking-only
+schedule and cadence, event owner, voice/cane, and English message transport.
+The actor needs 2,612 bytes; the ordinary NPC pool rejects sizes above 2,400,
+so its allocation/free handling cannot be omitted. Diaries remain unavailable,
+and no native gameplay or new ROM is claimed.
+
 Both source artwork variants, school desk and bus stop, are installed through
 the ordinary shared importer. Complete original-N64 profile/model comparison
 establishes different geometry, with the original items retained. The 7,840

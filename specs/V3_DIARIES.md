@@ -378,6 +378,59 @@ event scheduling, official messages/demo transport, and the exercise-card path
 remain unconnected. Reuse the prepared model, textures, drawing adapter, and
 28-event controller while finishing those consumers; no diary selection is enabled.
 
+### Connected holiday movement and lifecycle bridge
+
+`holiday_actor.c` implements all fifteen Ev_Soncho2 think states against the
+existing conversation/calendar/reward controller. It preserves sports-field
+selection, active-runner tracking, shrine-relative turn/walk/wait routes, tug
+animation and positioned clapping, vacation deletion, and the countdown's
+captured-date correction. Request priority remains the native service's decision.
+Reward variants are chosen once for the actor; requesting/preparing dialogue does
+not grant an item or record attendance. Dialogue consumes RNG only in the donor's
+random branches. Ending a real demo restores the recorded movement state and
+the conditional melody-restoration callback. Construction refreshes the active
+resident's calendar only; source player `-1` does not mean all four players.
+Visitors leave resident calendars unchanged.
+
+`holiday_npc.c` supplies the N64 lifecycle and primitive callbacks through the
+live clip, rather than calling unrelocated overlay addresses. Native special
+think/schedule indices are 8/5; the donor's indices 9/6 are not passed through.
+Think and schedule callbacks live at `7A4` and `7C0`, interrupt flags at `7A8`,
+action/step at `7C5`/`7C6`, destination at `8BC`/`8C0`, and talk request at `91C`.
+The actual NPC0 delivery signal and native SPEAK/TALK checks reach the shared
+controller. Full-pocket or stale-profile delivery stays pending instead of
+silently completing. English message/continuation and handover transport remain
+required provider callbacks; the bridge does not pretend they are installed.
+
+The actor's complete o32 size is `A34` hex (2,612 bytes). Native
+`Actor_malloc_actor_class` sends D/E identities to clip `0C` without a heap
+fallback. That allocator at `80980830` rejects sizes above `960` hex (2,400
+bytes). Registration must therefore install a matching additive allocation/free
+path, not merely enlarge the profile's size. Do not grow the nine original slots
+or write the new transient state beyond an original slot. The existing native
+free path also routes D/E identities through clip `10`.
+
+Preparation at `build/v3-diary-category-work-01/tortimer-actor-03/` contains the
+shared controller and native bridge, with maximum individual frames of 88 and
+144 bytes respectively. Their complete dynamic stack and native callback cadence
+remain unverified. `tools/v3_holiday_actor.py` checks all 37 complete donor actor
+functions, relocations, complete actor data, and current native request/think/
+schedule/constructor dependencies. The 15-state controller and the real
+conversation/calendar/reward functions pass one sanitized combined host check;
+the native bridge is compiler/source checked, not executed. No native fixture is
+started and the exhausted diary title-fixture budget is unchanged.
+
+Five installation services remain explicit linker dependencies:
+`af_holiday_npc_bind`, `af_holiday_npc_world`, `af_holiday_npc_resources`,
+`af_holiday_npc_unregister`, and `af_holiday_npc_continue`. Binding must supply
+the actual event owner, complete English messages/demo transport, walking-only
+wandering, correct update cadence, full voice/cane resources, and checked actor
+allocation/registry. Ordinary N64 wandering can run; it is not a substitute for
+the donor's walking-only mode. The separate exercise/card route remains required.
+These are remaining consumers of the same diary category, not new per-event
+tasks. Keep the existing art, draw, and conversation objects; link and install
+the connected path before enabling diary choices.
+
 ## Serialized diary state
 
 `AFDiary` is a 48,048-byte, endian-independent byte array:
