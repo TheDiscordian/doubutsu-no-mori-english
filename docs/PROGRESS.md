@@ -51,9 +51,21 @@ The adapter and controller pass a combined sanitized host check across all style
 all player access modes, navigation, privacy, and rejected edits. These are not
 installed screens or ordinary gameplay results.
 
+The shared screen packet retains all twelve calendar/diary month labels, 31 day
+numbers, year digits, backgrounds, paper, controls, and prompt graphics. Preparation
+is `build/v3-diary-category-work-01/screen-04/`: 144,240 bytes, 148 shared resources,
+and 141 native drawing/loading lists. All 118 texture resources have individual
+official-source credits in the single provenance catalogue. The native drawing
+functions and full-page keyboard adapter compile for VR4300. The focused keyboard
+check covers proportional rows, full pages, Rewrite, ownership, and unchanged
+ordinary keyboard dispatch. The screen conversion checks complete resource/load
+bounds, caller tables, and rejection of missing state. These screens and hooks
+are not installed or visually verified; no new cartridge is claimed.
+
 The shared save adapter retains the complete town, console progress, calendars,
-and pages within the existing two FlashRAM banks. Native submenu/keyboard/art
-bindings, carried readers, live date/event callers, resident loading, and selection
+and pages within the existing two FlashRAM banks. Native submenu ownership,
+transitions and editor-hook installation, carried readers, live date/event
+callers, resident loading, and selection
 remain in the same [diary consumer map](../specs/V3_DIARIES.md). No new playable
 imports or cartridge completion is claimed. Planned format-eleven saves require
 this or a newer compatible build; ABI 308 remains format nine, both deployments

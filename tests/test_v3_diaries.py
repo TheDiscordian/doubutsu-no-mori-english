@@ -62,7 +62,12 @@ class DiaryTests(unittest.TestCase):
         self.assertLess(len(raw),0x6000-16)
         self.assertEqual(report['compiled']['symbols']['af_v3_save_reset'],0x80670000)
         self.assertEqual(report['planned_memory'],diaries.LAYOUT)
+        # The shared emitter adds a separate UI category without changing this
+        # compiled core. Verify current generated carried commands below, and
+        # verify only this category's provenance entries through ui_text.
+        derived={'tools/v3_furniture_art.py','translations/provenance.json'}
         for path, digest in report['sources'].items():
+            if path in derived:continue
             self.assertEqual(sha256((ROOT/path).read_bytes()),digest,path)
         self.assertFalse(report['native_installed'])
         self.assertTrue(all(not r['selectable'] for r in report['rows']))
@@ -76,6 +81,12 @@ class DiaryTests(unittest.TestCase):
         self.assertEqual(report['ui_text'],diaries.ui_text(Source(
             (ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
             (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())))
+        from v3_furniture_pipeline import prepare_material_pair
+        source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+            (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+        parts=[(name,*source.symbol(name)) for name in ('obj_item_diaryT_mat_model','obj_item_diaryT_gfx_model')]
+        prepared=prepare_material_pair(source,parts)
+        self.assertEqual(prepared[5],(output/'carried/commands.c').read_text())
         self.assertEqual(prior['runtime_abi'],report['base_runtime_abi'])
         self.assertEqual(prior['save_codec']['format_version'],9)
         for name in ('af_v3_save_check_extended','af_v3_save_pack_extended'):

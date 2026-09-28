@@ -84,11 +84,61 @@ or unfinished hook is installed in the cartridge.
   shows an explicitly project-authored warning and returns to the intact draft.
   Changed/corrupt source data returns to the calendar instead of overwriting it.
 
-Drawing, source transitions, sounds, and native keyboard ownership remain adapter
-work. Eight official prompt strings and three project-authored error strings are
+Native drawing functions and the full-page keyboard adapter are implemented and
+compile for VR4300. Submenu ownership, source transitions, sound/lifecycle
+bindings, and installation remain adapter work. Eight official prompt strings
+and three project-authored error strings are
 credited in `translations/provenance.json` under `v3/diary/`; preparation verifies
 each source location and encoded text. Month/day artwork and event labels remain
 part of the screen integration, not additional uncredited prose.
+
+### Screen and keyboard preparation
+
+`tools/v3_diary_screen.py` prepares one shared packet for every cover. Its current
+output is `build/v3-diary-category-work-01/screen-04/`: 144,240 bytes, SHA-256
+`c6ec72c0e2eb1c63a80d15b146597c8e53ddde7f026f45835c90ad37a3c9f531`.
+The 148 resources and 141 display/loading lists include every month, day number,
+year digit, calendar background, paper section, source control, and finish/privacy
+graphic. Caller-table receipts retain actual month order, shared palettes, colours,
+and month-label positioning. All 118 textures have individual official-source
+entries under `v3/diary/art/` in `translations/provenance.json`. An offset suffix
+distinguishes source textures with identical local symbol names.
+
+`v3_ui_art.py` extends conversion by render category, using the existing native
+command emitter and texture converters. UI contracts explicitly identify inherited
+textures/combiners and state-only lists. Complete sequences preserve shared vertex
+loads, native triangles, and packed Dolphin geometry. Unsupported state, unknown
+commands, missing source relocations, and unloaded vertex reads reject. Direct
+textures may use the full 4 KiB of TMEM; CI palettes keep their upper-half reservation.
+Two-texture button graphics retain separate colour and alpha tiles. Ordinary
+furniture defaults and its stricter material rules stay unchanged.
+
+`diary_draw.c` implements the native calendar, paper, confirmation, privacy, and
+warning draw paths with the converted packet. It preserves source matrices,
+colours, selection geometry, and prompt text. Graphics-space checks precede drawing;
+the source packet's segment binding is restored before returning. The native owner
+must provide the real projection/animation positions and actual event labels/day
+types. It must also connect the keyboard's cursor drawing; these functions are not
+an installed or visually verified screen. The compiled largest local frame is
+288 bytes; engine callees and the menu-thread stack remain installation checks.
+
+`diary_editor.c` adds mode six around the accepted English keyboard. Mode four
+initializes a bounded caller buffer before the adapter restores all 992 characters,
+31 proportional rows, and the preserved cursor. The new mode cannot index native
+five-entry handler tables. Existing modes pass to the previous implementation.
+Case/page/repeat/feedback input remains the accepted keyboard's implementation;
+diary commands, including Done, go to the shared transactional controller.
+Done opens confirmation without saving; Rewrite retains the draft. The owner
+passes an explicit resident session through editor `data3`, with matching submenu,
+owner, and input-buffer checks. Its native init/update hooks remain uninstalled.
+The largest compiled adapter frame is 240 bytes, before its diary callees.
+
+The screen builder can reuse a prepared packet when current complete resources,
+generated commands, source identities, and every compiled section agree. Metadata
+and renderer bindings do not force another graphics compilation. The prepared
+save core and carried model remain unchanged; current carried commands and relevant
+prompt provenance are checked directly rather than treating unrelated catalogue
+additions as a reason to rebuild the save module.
 
 ## Serialized diary state
 
@@ -173,23 +223,24 @@ The prepared packet has no mutable globals or unresolved symbols.
 | --- | --- |
 | Category identity/data | All sixteen donor IDs, names, prices, and aliases bound; additive native identity/readers still required |
 | Carried/collection artwork | Shared carried model converted with the general split material/geometry converter; reuse cover conversions and install correct room/collection contexts |
-| Calendar entry | Surface A-tap adapter, house-owner resolution, calendar controller/markers, and privacy implemented in source; native menu opening, event/date callers, and screen rendering remain |
-| Reading/editing | Full controller, access rules, wrapping, scrolling, and atomic page/privacy commit implemented; native keyboard/view ownership and source transitions remain |
-| English UI | Eight official prompts and three project errors extracted/credited/checked; month/day artwork and actual event labels remain in screen integration |
+| Calendar entry | Surface A-tap adapter, house-owner resolution, controller/markers, privacy, and native drawing implemented in source; native menu ownership/opening, event/date callers, and installation remain |
+| Reading/editing | Full controller, access rules, wrapping, scrolling, atomic page/privacy commit, native drawing, and keyboard adapter implemented; view ownership, cursor/overlay hooks, and source transitions remain |
+| English UI | Official prompts, project errors, and all screen textures extracted/credited/checked; actual native event labels remain in screen integration |
 | Persistence | Shared reset, clear, probe, pack, commit, forward migration, and preflight implemented/tested on host; startup loading and stable native dispatch still need installation |
 | Selection | Bind carried/display profile dependencies, catalogue/scoring, and independent/all choices only after the complete path is connected |
 | Verification | Run bounded combined current-ROM UI/save checks after integration; no separate style-by-style native scenarios |
 
-Resume this same connected category at donor screen conversion and native
-submenu/keyboard bindings. Reuse the prepared core and source catalogue, and
+Resume this same connected category at the owned HBOARD-mode constructor/move/
+draw/destructor, source transitions, and native editor hooks. Reuse the prepared
+core, screen packet, and source catalogue, and
 retain passing save evidence unless those paths change. Do not redirect to
 acquisition, gold-tree work, or replay exhausted creature/console fixtures.
 
 The native menu tables have no calendar/diary slots. Reuse an explicitly owned
 mode in an existing submenu rather than passing the donor indices 27/28 into
 the shorter native table. The accepted English editor remains the keyboard.
-The screen converter needs the donor's 2D combiners, geometry/render states, and
-inherited textures; the furniture converter correctly rejects those unsupported
+The UI converter retains the donor's 2D combiners, geometry/render states, and
+explicit inherited textures; the ordinary furniture mode still rejects unsupported
 states. Do not flatten away unknown commands or substitute a generic screen.
 Current room/core disassembly is retained under
 `build/v3-diary-category-work-01/native-{room,core}-map/`; do not remap these callers.

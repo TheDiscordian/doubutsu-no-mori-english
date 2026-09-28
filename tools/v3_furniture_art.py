@@ -794,7 +794,7 @@ def command_source(models, offsets):
         if not inherited:emit('gsDPPipeSync()')
         direct = next((bool(row.get('intensity') or row.get('rgba16') or row.get('ia8') or row.get('ia16'))
                        for row in model['rows'] if row['opcode']==0xFD),False)
-        if not inherited:
+        if not inherited and not model.get('native_ui'):
             emit('gsDPSetTextureLUT(G_TT_NONE)' if direct else 'gsDPSetTextureLUT(G_TT_RGBA16)')
         for row in model['rows']:
             op = row['opcode']
@@ -828,13 +828,15 @@ def command_source(models, offsets):
                 ia16=bool(row.get('ia16'))
                 i8=bool(row.get('i8'))
                 # Keep upper TMEM intact for CI palettes across mixed-format lists.
-                if (w*h*(4 if rgba16 or ia16 else 2 if ia8 or i8 else 1)//2 > 2048
+                ui = bool(model.get('native_ui'))
+                limit = 4096 if ui and (rgba16 or ia16 or ia8 or i8 or row.get('intensity')) else 2048
+                if (w*h*(4 if rgba16 or ia16 else 2 if ia8 or i8 else 1)//2 > limit
                         or i8 and not row.get('intensity')
                         or sum(map(bool,(rgba16,ia8,ia16,row.get('intensity'))))>1):
                     raise ValueError('Furniture texture exceeds shared TMEM capacity or has conflicting formats')
                 emit('gsDPPipeSync()')
                 wanted=bool(row.get('intensity') or rgba16 or ia8 or ia16)
-                if wanted!=direct:
+                if wanted!=direct or ui:
                     emit('gsDPSetTextureLUT(G_TT_NONE)' if wanted else 'gsDPSetTextureLUT(G_TT_RGBA16)')
                     direct=wanted
                 wrap_s, wrap_t, mask_s, mask_t = tile_fields((w, h), row.get('wrap_modes', (0, 0)))
@@ -868,6 +870,26 @@ def command_source(models, offsets):
                 shifts=row.get('tile_shifts',(shift,shift))
                 if len(shifts)!=2 or any(type(n) is not int or not 0<=n<=15 for n in shifts):
                     raise ValueError('Invalid native texture tile shifts')
+                if 'ui_tile' in row:
+                    tile,tmem=row['ui_tile'],row['ui_tmem']
+                    bits=16 if rgba16 or ia16 else 8 if ia8 or i8 else 4
+                    words=((w*bits+63)//64)*h
+                    if (not ui or type(tile) is not int or tile not in (0,1) or
+                            type(tmem) is not int or not 0<=tmem<=limit//8-words or
+                            (tile==0)!=(tmem==0)):
+                        raise ValueError('Invalid complete UI texture allocation')
+                    if bits==4:
+                        args=(f'{tmem}, {tile}, {fmt}, {w}, {h}, '+
+                              (f'0, 0, {w-1}, {h-1}, ' if w%16 else '')+
+                              f'{pal}, {wrap_s}, {wrap_t}, {mask_s}, {mask_t}, {shifts[0]}, {shifts[1]}')
+                        macro='gsDPLoadMultiTile_4b' if w%16 else 'gsDPLoadMultiBlock_4b'
+                    else:
+                        size='G_IM_SIZ_16b' if bits==16 else 'G_IM_SIZ_8b'
+                        args=(f'{tmem}, {tile}, {fmt}, {size}, {w}, {h}, 0, '
+                              f'{wrap_s}, {wrap_t}, {mask_s}, {mask_t}, {shifts[0]}, {shifts[1]}')
+                        macro='gsDPLoadMultiBlock'
+                    emit(f'{macro}(0x{texture:08X}, {args})',7)
+                    continue
                 if 'scroll_tile' in row:
                     tile,tmem=row['scroll_tile'],row['scroll_tmem']
                     if (rgba16 or ia8 or ia16 or i8 or type(tile) is not int or tile not in (0,1) or
@@ -957,6 +979,10 @@ def command_source(models, offsets):
                 # compare its complete words with the donor command.
                 emit('gsDPSetCombineLERP(0, 0, 0, TEXEL0, 0, 0, 0, TEXEL0, '
                      'PRIMITIVE, 0, COMBINED, 0, 0, 0, 0, COMBINED)')
+            elif op in (0xEF, 0xE7) and model.get('native_ui'):
+                from v3_ui_art import validate_state
+                validate_state(*row['words'])
+                a,b=row['words'];emit(f'{{{{0x{a:08X}, 0x{b:08X}}}}}')
             elif op in (0xFC, 0xE2, 0xFA, 0xFB, 0xD9, 0xDF, 0xF2):
                 # Only the explicitly decoded compatible F3DEX2 state/end
                 # commands reach here; Dolphin loads and packed triangles do not.
