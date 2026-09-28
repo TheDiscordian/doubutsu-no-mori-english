@@ -87,6 +87,26 @@ int af_diary_calendar_event(AFDiary *d,u32 player,AFDiaryDate now,AFDiaryDates d
     }
     return AF_DIARY_OK;
 }
+int af_diary_calendar_event_check(const AFDiary *d,u32 player,AFDiaryDate today,
+        AFDiaryDate selected,u32 event) {
+    if(!af_diary_valid(d) || player>4 || !date_valid(today) || !date_valid(selected) || event>255)
+        return AF_DIARY_ARGUMENT;
+    if(player==4)return 0;
+    int interval=((int)today.year-selected.year)*12+(int)today.month-selected.month;
+    if(interval<0 || interval>=12)return 0;
+    const u8 *c=cal(d,player);u32 flag;
+    switch(event) {
+    case 11:flag=1;break;
+    case 4:flag=2;break;
+    case 16:flag=4;break;
+    case 1:flag=8;break;
+    case 17:flag=selected.month==9?16u:(selected.month==10?32u:0u);break;
+    case 19:flag=64;break;
+    case 255:return 0;
+    default:return (word(c+48+4*(selected.month-1))>>(selected.day-1))&1u;
+    }
+    return (c[97]&flag)!=0;
+}
 int af_diary_calendar_mark(const AFDiary *d,u32 player,AFDiaryDate today,AFDiaryDate selected,AFDiaryDates dates) {
     if(player>=4 || !af_diary_valid(d) || !date_valid(today) || !date_valid(selected) ||
        !dates_valid(dates,selected))return AF_DIARY_ARGUMENT;

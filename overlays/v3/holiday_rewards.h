@@ -16,6 +16,10 @@ struct AfHolidayOps {
 };
 int af_v3_holiday_valid(const af_holiday_u8 *,af_holiday_u32);
 int af_v3_holiday_count(const af_holiday_u8 *,af_holiday_u32,af_holiday_u32,af_holiday_u32,const struct AfHolidayOps *);
+/* Select the actor's displayed item independently of already owning its trophy.
+   This is not permission to give it: commit still checks the saved receipt. */
+int af_v3_holiday_select(const af_holiday_u8 *,af_holiday_u32,af_holiday_u32,af_holiday_u32,
+    af_holiday_u32,const struct AfHolidayOps *,struct AfHolidayOffer *);
 /* roll is a bounded uniform index in count(), not an unchecked RNG word.
    Complete selections preserve donor variant order and distribution. */
 int af_v3_holiday_offer(const af_holiday_u8 *,af_holiday_u32,af_holiday_u32,af_holiday_u32,

@@ -261,6 +261,55 @@ overlapping holidays, birthdays, style selection, real entry, and guarded prefli
 Current linked menu/visit hooks and the donor-calendar comparison also pass.
 These checks do not execute native graphics, FlashRAM, or ordinary gameplay.
 
+### Shared Tortimer conversation and attendance
+
+`holiday_talk.c` connects the complete Ev_Soncho2 conversation state machine to
+the existing holiday selector/transaction kernel and real diary calendar storage.
+All 28 holiday event identities share this controller; Harvest Festival retains
+its distinct message base. First/repeat visits, claimed trophies, three random
+repeat messages, visitors, full pockets, and the actual handover signal retain
+the donor branches. The actor chooses its reward variant once; preparing a new
+conversation must reuse that variant, not reroll on each line or frame.
+
+Preparation only selects dialogue. The actual talk-init entry marks attendance
+using the actor's captured date and **donor** event ID. It does not map the donor
+ID into the unrelated N64 schedule. `af_diary_calendar_event_check` reads the
+same special flags and twelve-month interval as the donor, before talk-init
+changes them. Visitors cannot mark a resident's calendar or receive a resident's
+trophy. The separate exercise talk-init entry requires an explicit Tortimer
+identity; Copper and ordinary exercise villagers cannot mark attendance.
+
+January/February vacation branches retain their quest-start callback and the
+two dates seven/eight days after the actual RTC date. Missing lighthouse support
+rejects rather than pretending the quest is present. This controller does not
+install a lighthouse or the exercise-card conversation. Those actor dependencies
+remain required where their donor routes are used.
+
+The handover uses the existing checked item selection and receipt transaction.
+Changing players or removing the selected item cannot award or mark it. If
+pockets become full after the initial dialogue check, delivery rejects and
+retains the offer without awarding a trophy. Repeated delivery signals cannot
+give the same reward again. This is a no-loss platform guard, not a substituted
+event reward. Native demo transport still must apply message/continuation,
+listen/start, item/event name, handover, camera/turn, and actor-return actions.
+
+`tools/v3_holiday_talk.py` binds the complete donor talk functions, relocations,
+and pinned C references. The ordinary holiday preparation command compiles both
+the selector and controller. External diary/reward calls and compiler-generated
+`memcpy` remain explicit link dependencies, not guessed resident addresses.
+The current prepared objects and source receipts are in
+`build/v3-diary-category-work-01/tortimer-talk-03/`.
+Prepared objects do not install a Tortimer actor, event scheduling, artwork,
+message resources, or native demo transport, and enable no imports.
+
+The sanitized connected check compiles the complete donor talk file beside the
+port. Every holiday uses first/repeat/claimed/full-pocket/visitor branches and
+all three repeat-message outcomes; vacation dates, duplicate start/delivery,
+player/profile changes, and real calendar effects are checked together. The
+calendar query separately matches the actual donor calendar C, including all
+event IDs and out-of-window dates. Existing selector/handover checks pass for
+the changed shared selector. These are host results, not native conversations.
+
 ## Serialized diary state
 
 `AFDiary` is a 48,048-byte, endian-independent byte array:
@@ -548,6 +597,11 @@ No native UI execution, actual catalogue order delivery, save/reload, or hardwar
 verification is claimed.
 
 ## Focused evidence
+
+The current connected native attempt is [inconclusive before menu opening](../docs/checkpoints/V3_DIARY_NATIVE.md).
+Both allowed setup attempts are terminal; no title-fixture retry is pending.
+All four installed packets match and the initial native fault pointer is zero,
+but neither attempt reaches the menu, editor, save codec, or device I/O.
 
 `tests/test_v3_diaries.py` checks all sixteen source records and complete
 consumers, changed-source rejection, sanitized editing/access/atomic commit,

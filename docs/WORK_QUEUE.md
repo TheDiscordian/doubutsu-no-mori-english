@@ -69,7 +69,12 @@ catalogue/scoring rows from supported selections, and agrees with offline output
 for empty, mixed, and all-supported profiles. A sanitized host check connects the
 actual carried/cover readers to format-eleven save/reload and missing-profile
 rejection, preserving independent four-player ownership and diary pages.
-Continue with connected native UI/save verification, following the
+The connected native UI/save check is inconclusive before menu opening. Both
+allowed setup attempts are terminal: the first general allocation returns zero;
+the corrected title-context arena has no checked free space. Packet loading and
+the initial no-fault check pass, but the later menu/save steps are unexecuted.
+Keep the [bounded native result](checkpoints/V3_DIARY_NATIVE.md) open; do not
+restart the title fixture. Continue the same
 [connected consumer map](../specs/V3_DIARIES.md#connected-consumer-map).
 These are remaining consumers of this same category, not new per-style tasks.
 The donor's two attendance calls both require Tortimer conversations, including
@@ -78,6 +83,19 @@ not equivalent. The [diary contract](../specs/V3_DIARIES.md#native-dates-and-ent
 records both complete functions and calls. Attendance shares the required
 Tortimer event/conversation dependency with holiday gifts; it remains unfinished,
 without blocking the remaining diary integration or authorising a substitute.
+The shared Ev_Soncho2 conversation source now connects all 28 holiday branches,
+vacation start/date callbacks, actual-talk attendance, donor event-history queries,
+and guarded reward delivery. A single sanitized comparison against the complete
+donor talk file passes across first/repeat/claimed/visitor/full-pocket branches.
+The changed calendar query also matches the donor C, and the existing reward
+transaction check passes. The source controller is prepared at
+`build/v3-diary-category-work-01/tortimer-talk-03/`, not installed in the current
+cartridge. Next connect Tortimer's native actor lifecycle and
+event scheduling, its converted graphics/motions, official messages, and native
+demo transport to that controller; connect the separate exercise/card route too.
+Do not turn these consumers into per-holiday implementation/test cycles or mark
+the category complete from the controller alone. Native UI/save verification
+still belongs in the eventual assembled gameplay check.
 The source/identity, global readers, icon branch, collection hooks, category
 artwork, and room-ID rebind stay installed. Reuse these, the installed
 menus/storage, and prepared artwork; do not restart conversion.

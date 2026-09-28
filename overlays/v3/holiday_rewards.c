@@ -39,11 +39,11 @@ int af_v3_holiday_count(const u8 *data,u32 bytes,u32 event,u32 gender,const stru
     return available;
 }
 
-int af_v3_holiday_offer(const u8 *data,u32 bytes,u32 event,u32 gender,u32 roll,
+int af_v3_holiday_select(const u8 *data,u32 bytes,u32 event,u32 gender,u32 roll,
         const struct AfHolidayOps *ops,struct AfHolidayOffer *out) {
     u32 first,count;
-    if (!out || !ops || !ops->resolve || !ops->claimed ||
-            !range(data,bytes,event,gender,&first,&count) || ops->claimed(ops->context,event)!=0) return 0;
+    if (!out || !ops || !ops->resolve ||
+            !range(data,bytes,event,gender,&first,&count)) return 0;
     for (u32 i=0;i<count;++i) {
         u32 donor=half(data+240u+(first+i)*2u),item=ops->resolve(ops->context,donor);
         if (item>65535u) return 0;
@@ -53,6 +53,12 @@ int af_v3_holiday_offer(const u8 *data,u32 bytes,u32 event,u32 gender,u32 roll,
         }
     }
     return 0;
+}
+
+int af_v3_holiday_offer(const u8 *data,u32 bytes,u32 event,u32 gender,u32 roll,
+        const struct AfHolidayOps *ops,struct AfHolidayOffer *out) {
+    if (!ops || !ops->claimed || event>=28u || ops->claimed(ops->context,event)!=0) return 0;
+    return af_v3_holiday_select(data,bytes,event,gender,roll,ops,out);
 }
 
 int af_v3_holiday_commit(const u8 *data,u32 bytes,const struct AfHolidayOps *ops,const struct AfHolidayOffer *offer) {

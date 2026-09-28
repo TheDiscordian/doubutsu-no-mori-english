@@ -61,6 +61,10 @@ int af_diary_weekday(AFDiaryDate);
 int af_diary_calendar_refresh(AFDiary *,unsigned int player,AFDiaryDate,AFDiaryDates);
 int af_diary_calendar_visit(AFDiary *,unsigned int player,AFDiaryDate,AFDiaryDates);
 int af_diary_calendar_event(AFDiary *,unsigned int player,AFDiaryDate,AFDiaryDates,unsigned int event);
+/* Conversation query using DONOR event IDs, before talk-start marks attendance.
+ * Unlike the drawing query, this does not infer an event from its date. */
+int af_diary_calendar_event_check(const AFDiary *,unsigned int player,
+    AFDiaryDate today,AFDiaryDate selected,unsigned int donor_event);
 /* 0: no mark, 1: played, 2: event attended; only the current twelve-month
  * interval is eligible. This never erases or changes a monthly text page. */
 int af_diary_calendar_mark(const AFDiary *,unsigned int player,AFDiaryDate today,

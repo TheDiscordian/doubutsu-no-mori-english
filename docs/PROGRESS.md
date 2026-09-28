@@ -157,6 +157,24 @@ New format-eleven saves require this or a newer compatible build; earlier V3
 and V2 cannot load them. Both deployments remain V2-14, and the user's saves
 are untouched.
 
+The current diary native check stops before opening a menu. Both permitted
+setup attempts are terminal: the general allocation returns zero, and the
+corrected title-context arena has no free space. All four resident packets match
+the current ROM and its initial fault pointer is zero. Menu/editor/save execution
+remains unverified; the [recorded result](checkpoints/V3_DIARY_NATIVE.md) keeps
+those limits explicit without another title-fixture retry.
+
+The shared Tortimer conversation source connects all 28 holiday branches to
+calendar attendance and guarded reward delivery. First/repeat/claimed visits,
+visitors, full pockets, vacation callbacks/dates, and duplicate handover handling
+are implemented together. Four focused host checks pass, including the complete
+donor conversation comparison and the donor calendar query comparison. The
+VR4300 controller compiles with explicit diary/reward/library link dependencies.
+It is not installed: Tortimer's actor/schedule, graphics/motions, official message
+routing, native demo transport, and exercise-card route remain necessary.
+The current ABI-312 ROM, inactive diary choices, saves, and V2 deployments are
+unchanged by this source batch.
+
 Both source artwork variants, school desk and bus stop, are installed through
 the ordinary shared importer. Complete original-N64 profile/model comparison
 establishes different geometry, with the original items retained. The 7,840

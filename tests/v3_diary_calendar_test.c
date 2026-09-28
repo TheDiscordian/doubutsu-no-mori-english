@@ -76,9 +76,22 @@ int main(void) {
         for(int d=1;d<=lbRTC_GetDaysByMonth(now.year,now.month);d++) {
             AFDiaryDate selected={now.year,now.month,d};
             assert(af_diary_calendar_mark(&live,p,now,selected,dates)==mCD_make_icon(now.year,now.month,d,p));checks++;
+            static const unsigned events[]={0,1,4,11,16,17,19,27,101,103,255};
+            for(unsigned e=0;e<sizeof(events)/sizeof(events[0]);e++) {
+                assert(af_diary_calendar_event_check(&live,p,now,selected,events[e])==
+                    mCD_calendar_event_check(now.year,now.month,d,p,events[e]));
+            }
         }
         assert(record(p)[104]==' '); /* Rollover never clears or rewrites text. */
     }
     assert(af_diary_days(2000,2)==29 && af_diary_days(2100,2)==28);
+    AFDiaryDate today={2026,9,27};
+    for(int delta=-13;delta<=13;delta++) {
+        int month=2026*12+8+delta;AFDiaryDate selected={month/12,month%12+1,1};
+        reference_common.time.rtc_time=today;
+        for(int p=0;p<=4;p++)for(int event=0;event<=255;event++)
+            assert(af_diary_calendar_event_check(&live,p,today,selected,event)==
+                mCD_calendar_event_check(selected.year,selected.month,selected.day,p,event));
+    }
     printf("%d calendar comparisons against donor C pass\n",checks);return 0;
 }

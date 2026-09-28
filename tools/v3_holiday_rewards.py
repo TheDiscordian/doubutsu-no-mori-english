@@ -16,7 +16,9 @@ FUNCTIONS=(
     (0x1B4844,180,'a3129746c1e60b877ecd74ae82f6861db8ef00509f0f15bfebe097324683bacc'),
     (0x1B48F8,172,'adb99cc52df75acb980d5f865c3c20f9778e223011b86d6f0b00d59aeec0d699'))
 SOURCES=('tools/v3_holiday_rewards.py','tools/v3_furniture_pipeline.py',
-    'overlays/v3/holiday_rewards.c','overlays/v3/holiday_rewards.h')
+    'overlays/v3/holiday_rewards.c','overlays/v3/holiday_rewards.h',
+    'tools/v3_holiday_talk.py','overlays/v3/holiday_talk.c','overlays/v3/holiday_talk.h',
+    'overlays/v3/diary_calendar.c','overlays/v3/diary.h')
 
 
 def discover(source):
@@ -95,7 +97,7 @@ def encode(description):
 
 def compile_kernel(output, *, name='holiday_rewards'):
     """Prepare a relocatable o32 kernel; do not invent a resident address."""
-    if name not in ('holiday_rewards','password','password_policy'):raise ValueError('Unreviewed shared acquisition kernel')
+    if name not in ('holiday_rewards','holiday_talk','password','password_policy'):raise ValueError('Unreviewed shared acquisition kernel')
     compiler='/n64_toolchain/bin/mips64-elf-'
     docker=['docker','run','--rm','--network','none','--user',f'{os.getuid()}:{os.getgid()}',
         '-v',f'{ROOT}:/source:ro','-v',f'{output.resolve()}:/out','-w','/out','--entrypoint']
@@ -106,17 +108,24 @@ def compile_kernel(output, *, name='holiday_rewards'):
         check=True,capture_output=True,text=True,timeout=60)
     undefined=subprocess.run(docker+[compiler+'nm',IMAGE,'--undefined-only',name+'.o'],
         check=True,capture_output=True,text=True,timeout=30).stdout
-    if undefined.strip():raise ValueError('Acquisition kernel has unresolved external dependencies')
+    imports=sorted(line.split()[-1] for line in undefined.splitlines() if line.strip())
+    expected=sorted(('af_diary_valid','af_diary_days','af_diary_calendar_event',
+        'af_diary_calendar_event_check','af_v3_holiday_select','af_v3_holiday_commit',
+        'memcpy')) if name=='holiday_talk' else []
+    if imports!=expected:raise ValueError('Unexpected acquisition kernel dependencies: '+str(imports))
     return dict(format='ELF-o32-MIPS-big-endian',sha256=sha256((output/(name+'.o')).read_bytes()),
-        compiler_image=IMAGE,flags=flags,linked=False,resident_address=None)
+        compiler_image=IMAGE,flags=flags,linked=False,resident_address=None,imports=imports)
 
 
 def prepare(source,output):
+    from v3_holiday_talk import discover as talk
     output=output.resolve()
     if output.exists() or not output.is_relative_to(ROOT/'build'):raise ValueError('Use a fresh ignored holiday output')
     report=discover(source);data=encode(report)
     output.mkdir(parents=True);write_new(output/'holiday-rewards.bin',data)
     report['kernel']=compile_kernel(output)
+    report['conversation']=talk(source)
+    report['conversation']['kernel']=compile_kernel(output,name='holiday_talk')
     report.update(bytes=len(data),sha256=sha256(data),events=len(report['rows']),
         candidates=sum(len(r['source_items']) for r in report['rows']),
         sources={p:sha256((ROOT/p).read_bytes()) for p in SOURCES})
