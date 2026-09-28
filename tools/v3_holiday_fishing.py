@@ -191,7 +191,106 @@ def dialogue(base):
         source_files={p:sha256(s.encode()) for p,s in sources.items()},provenance_entries=credits)
 
 
-def prepare_live(base,prior,output,*,connect_angler=False):
+def mail_contract(base,prior,output):
+    """Map both complete donor prize lists and reuse the installed mail catalogue."""
+    from aflib import CODE_RAM,CODE_VROM
+    from audit_mail_templates import template_fields
+    from mail_catalog import parse,verify_registered,CLASSIC
+    from v3_furniture_pipeline import identity_rows
+    from v3_registry import furniture_identity
+    from v3_decoration_actor import SERVICES
+    source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+        (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    shop=(ROOT/'local/ac-decomp/src/game/m_shop.c').read_text()
+    expected={
+        'mSP_SelectFishginPresent':'aadeb3e5a9f7a41d75777a93a3de63beb956c4be384d319a91373c3c627f9841',
+        'mSP_CarryOutAlternativeRandomSelect':'15fd73bf250474f2402db4de16229687878bf8b6712ad23958169c59d47db111',
+        'mSP_CarryOutAlternativeRandomSelect_NoneNULL':'b633f9a88ca354822702f63e6709b6eb295cfbd3d7efce5e2ad5d9f5949e190f',
+        'mSP_GetNonePossessionItemCount_InList':'4ce4c71b600c80b4b7e104ddbb5fbdddd271fb94353ac28ca327e0e3d53018d9',
+        'mSP_GetNonePossessionItem_InList':'c9216d5362cbe212dcc7ccaf6249e57d81610094a68744ce38828668659cce43',
+        'mSP_GetNonePossessionItem_InLotteryFurniture':'27d86c09dbfe29bf3b1a98496cd3436989e23ff655414e5bf8f9d681ce6e48c0',
+        'mSP_GetNonePossessionItem_InEventFurniture':'544ad2446712c0396f014bffa210070535ffe15a833e4cbf74a95c0fc6f0d00e',
+        'mSP_SelectRandomItem_New':'cd155cda663d949e117e09d51663fc6be906cadc02c08f7144cd2e29979a55a7',
+        'mSP_CountElementInCommonList_collect':'1f5cbf83bc9ca7f5ebbd9085ce06e8e12afd0de4875446d928a5332a197ef1dc'}
+    if any(sha256(function(shop,n).encode())!=s for n,s in expected.items()):
+        raise ValueError('Changed complete tournament prize selection')
+    if sha256((ROOT/'local/ac-decomp/src/game/m_fishrecord.c').read_bytes())!=REFERENCES['src/game/m_fishrecord.c']:
+        raise ValueError('Changed complete winner-mail source')
+    groups=[]
+    for name,count in (('ftr_listLottery',36),('ftr_listEvent',67)):
+        raw=source.raw(name);items=struct.unpack('>'+str(len(raw)//2)+'H',raw)
+        if len(items)!=count+1 or items[-1] or 0 in items[:-1] or len(set(items))!=len(items):
+            raise ValueError('Incomplete tournament prize category')
+        groups.append(dict(name=name,items=items[:-1],sha256=sha256(raw)))
+    identities=identity_rows(ROOT/'build/item-identity-megasheet.xlsx',
+        extra_items={i for g in groups for i in g['items']})
+    records=[];limits=[0];prizes=[]
+    for group in groups:
+        for item in group['items']:
+            number,cells=identities[item];native=cells['C'];key=f'GAFE01-r0/item/{item:04X}'
+            if native=='-':
+                index,target=furniture_identity(item)
+                # The shared installed stock list identifies all nineteen added
+                # candidates. It is not a second manually maintained item map.
+                if not any(int(r['item_id'],16)==target for r in prior['shops']['imports']):
+                    raise ValueError('Uninstalled tournament prize: '+key)
+            else:
+                target=int(native,16);index=(target-0x1000)//4
+                if not 0x1000<=target<0x1ECC or target&3:
+                    raise ValueError('Invalid verified native prize identity')
+            prizes.append(target);records.append(dict(source_item=item,item=target,index=index,
+                worksheet_row=number,group=group['name'],optional=native=='-'))
+        limits.append(len(prizes))
+    if limits!=[0,36,103] or len(set(prizes))!=103:raise ValueError('Ambiguous complete tournament prizes')
+    generated=output/'prizes.c'
+    write_new(generated,('const unsigned short af_hf_prizes[]={'+','.join(map(str,prizes))+
+        '};\nconst unsigned short af_hf_prize_limits[]={0,36,103};\n').encode())
+    files=by_vrom(base);catalog=files[0x30A0000].extract(base)
+    if verify_registered(catalog)['catalog']!=4:raise ValueError('Missing immutable English mail catalogue')
+    _,banks=parse(catalog);credits={r['id']:r for r in json.loads((ROOT/'translations/provenance.json').read_bytes())['entries']}
+    letters=[]
+    for n in range(0x23E,0x242):
+        parts=[];fields=set()
+        for bank in CLASSIC:
+            part=banks[bank][n];key=f'GAFE01-r0/{bank}:{n:04X}'
+            if part is None or credits[key]['locales']['en']['credit']!='official':
+                raise ValueError('Missing complete official tournament letter/provenance')
+            fields.update(template_fields(part,extended_glyphs=True))
+            parts.append(dict(bank=bank,bytes=len(part),sha256=sha256(part),provenance=key))
+        if fields!={0}:raise ValueError('Changed tournament letter free-field contract')
+        letters.append(dict(template=n,parts=parts))
+    native=(
+        (0x800A65C4,0x800A680C,'78e9e4e3a3171de45bb016fe19cd070b059172510f4a99978002713e29abae60'),
+        (0x800B68E8,0x800B6AC8,'aaae1265c6f0091bc75766140bf98702e75abec8e3e88a2868863265fab9a83c'),
+        (0x80094BF4,0x80094C10,'38b7988cd8bb517b6904ecaa2845f73022f20e662a2e1bf82bd7ce0162424176'),
+        (0x8009C384,0x8009C3D0,'1d2ff0e947ac76c27913e319506be74da4cab34b6cee4db2703662a45ff758e1'),
+        (0x8009C534,0x8009C5A4,'db6019924a8091970902074d4e0399035fa8360beefede44eece4d0a529a82fd'),
+        (0x8009C67C,0x8009C69C,'a400c949f99131dd1a1cd3a9a6363728182d1d9a903f17e4eeda11c8adec1ab9'),
+        (0x800B893C,0x800B8970,'23de0cc4a93d3e800bc8f9d5985078d0328af6e9509214c14cd42d9231ab1e67'),
+        (0x800D5D6C,0x800D5D94,'44fc91e7fded215d5985deb610784d95ddc4b67d8964f7d45202640beed18557'))
+    core=files[CODE_VROM].extract(base)
+    for a,b,digest in native:
+        if sha256(core[a-CODE_RAM:b-CODE_RAM])!=digest:raise ValueError('Changed complete native mail consumer')
+    module=files[0x2800000].extract(base);resident=(
+        (0x80196B34,0x801974C8,'d4a58dcb2c2d6a930c2507ab1e7d55266645e777539fb34f18353941a1f3c202'),
+        (0x80198DD4,0x80198FDC,'f8195400ca28d8fa8d69a56dc2afdd7bd3ae11f5b1e9037e71112c4fb7458187'))
+    for a,b,digest in resident:
+        if sha256(module[a-0x801948E0:b-0x801948E0])!=digest:raise ValueError('Changed retained mail codec')
+    bindings=dict(af_hf_services_ready=SERVICES,af_hf_native_save=0x80126EA0,
+        af_hf_native_rare=0x80135C00,af_mail_generation_capital=0x80199F64,
+        af_hf_mail_alloc=0x8009BFC0,af_hf_mail_free=0x8009C040,af_hf_mail_clear=0x8009C384,
+        af_hf_mail_copy=0x8009C67C,af_hf_mail_timecopy=0x800D5D6C,af_hf_mail_house=0x80094BF4,
+        af_hf_mail_slot=0x8009C534,af_hf_mail_kept=0x800B68E8,af_hf_mail_receipt=0x800B6A3C,
+        af_hf_mail_selected=prior['collection']['code']['symbols']['af_v3_furniture_import_profile'],
+        af_hf_mail_owned=prior['collection']['code']['symbols']['af_v3_catalogue_owned'],
+        af_hf_mail_item_name=0x801969C8,af_mail_record_pack=0x80198DD4,af_mail_restore=0x80196C28)
+    return generated,bindings,dict(prizes=records,groups=groups,letters=letters,catalog_sha256=sha256(catalog),
+        source_selectors=expected,native=[dict(start=a,end=b,sha256=s) for a,b,s in native],
+        resident=[dict(start=a,end=b,sha256=s) for a,b,s in resident],
+        source_mail_sha256=REFERENCES['src/game/m_fishrecord.c'],native_execution_verified=False)
+
+
+def prepare_live(base,prior,output,*,connect_angler=False,connect_mail=False):
     """Link all record/name/size/text providers against the installed storage."""
     from aflib import CODE_RAM,CODE_VROM
     from v3_furniture_effect_rigs import checked_native
@@ -249,10 +348,16 @@ def prepare_live(base,prior,output,*,connect_angler=False):
         af_hf_native_continue=0x8009DBA4,af_hf_native_start_message=0x8007B5C0,
         af_hf_native_message_number=0x8009DBB0,af_hf_native_number=0x800C43B8,
         af_hf_native_halt=fishing['bindings']['af_v3_save_halt'])
+    extras=(str(generated.relative_to(ROOT)),str(aliases.relative_to(ROOT)),
+        'overlays/fishing/name.c','overlays/v3/holiday_fishing_angler.c')
+    mail=None
+    if connect_mail:
+        generated_prizes,mail_bindings,mail=mail_contract(base,prior,output)
+        bindings.update(mail_bindings)
+        extras+=(str(generated_prizes.relative_to(ROOT)),'overlays/v3/holiday_fishing_mail.c')
     try:
         code,compiled=compile_part('holiday_fishing_live',output/'code',
-            extra_sources=(str(generated.relative_to(ROOT)),str(aliases.relative_to(ROOT)),
-                'overlays/fishing/name.c','overlays/v3/holiday_fishing_angler.c'),link_symbols=bindings)
+            extra_sources=extras,link_symbols=bindings)
     except subprocess.CalledProcessError as error:raise ValueError(error.stderr) from error
     report=dict(text=text,code=compiled,bindings=bindings,
         native_functions=[dict(symbol=n,start=a,end=b,sha256=s) for n,a,b,s in native],
@@ -261,6 +366,7 @@ def prepare_live(base,prior,output,*,connect_angler=False):
             clip=dict(ram=0x80737FB0,bytes=64)),legacy_names_sha256=ALIASES_SHA,
         pending=['controller enter/leave and native angler/clip bindings','winner mail',
             'measurement/calendar selection and activation'])
+    if mail:report['mail']=mail
     write_new(output/'prepared.json',(json.dumps(report,indent=2)+'\n').encode())
     for label,rows in (('messages',messages),('choices',choices)):
         write_new(output/(label+'.json'),(json.dumps([d.hex() for d in rows])+'\n').encode())
@@ -410,15 +516,47 @@ def angler_hooks(base,symbols):
 
 
 def install_angler(base,prior,blob,core,output):
+    return install_connections(base,prior,blob,core,output,mail=False)
+
+
+def install_mail(base,prior,blob,core,output):
+    return install_connections(base,prior,blob,core,output,mail=True)
+
+
+def install_connections(base,prior,blob,core,output,*,mail):
     from v3_decoration_actor import install as controllers
+    from aflib import CODE_RAM,u32
     del blob
     old=prior['equipment_resources']['holiday_fishing']['live']
-    if old.get('angler'):raise ValueError('Tournament host consumers are already connected')
-    directory=output/'fishing-angler'
-    live=prepare_live(base,prior,directory,connect_angler=True)
+    if (bool(old.get('angler'))!=mail or old.get('mail')):
+        raise ValueError('Unexpected tournament connection predecessor')
+    directory=output/('fishing-mail' if mail else 'fishing-angler')
+    live=prepare_live(base,prior,directory,connect_angler=True,connect_mail=mail)
     equipment,changes,updates,writes=controllers(base,prior,output,fishing_live=live)
     merge_controller_core(base,core,changes)
-    owners,connection=angler_hooks(base,live['code']['symbols'])
+    if mail:
+        connection=copy.deepcopy(old['angler']);files=by_vrom(base)
+        owner=bytearray(files[connection['vrom']].extract(base))
+        relocation=files[connection['relocation_vrom']].extract(base)
+        if (sha256(owner)!=connection['output_sha256'] or
+                sha256(relocation)!=connection['output_relocation_sha256']):
+            raise ValueError('Changed installed tournament host')
+        for row in connection['hooks']:
+            at=row['address']-connection['ram']
+            if u32(owner,at)!=row['after']:raise ValueError('Changed tournament host call')
+            row['previous']=row['after']
+            row['after']=0x0C000000|((live['code']['symbols']['af_hf_angler_'+row['name']]>>2)&0x3FFFFFF)
+            struct.pack_into('>I',owner,at,row['after'])
+        connection.update(output_sha256=sha256(owner),rebound=True)
+        owners={connection['vrom']:bytes(owner)}
+        address=0x800A67DC;before=0x0C03575B
+        if u32(core,address-CODE_RAM)!=before:raise ValueError('Changed native notice completion call')
+        after=0x0C000000|((live['code']['symbols']['af_hf_mail_notice']>>2)&0x3FFFFFF)
+        struct.pack_into('>I',core,address-CODE_RAM,after)
+        live['mail'].update(installed=True,enabled=False,hook=dict(address=address,before=before,after=after),
+            saved_layout_changed=False)
+    else:
+        owners,connection=angler_hooks(base,live['code']['symbols'])
     if changes.keys()&owners.keys():raise ValueError('Overlapping tournament host changes')
     changes.update(owners)
     if len(writes)!=1:raise ValueError('Fishing connection requires one retained packet')
@@ -435,8 +573,9 @@ def install_angler(base,prior,blob,core,output):
         sources={p:sha256((ROOT/p).read_bytes()) for p in (
             'tools/v3_holiday_fishing.py','tools/v3_decoration_actor.py','overlays/v3/decoration_actor.c',
             'overlays/v3/decoration_actor.h','overlays/v3/holiday_fishing_live.c','overlays/v3/holiday_fishing_live.h',
-            'overlays/v3/holiday_fishing_angler.c','overlays/v3/holiday_fishing_angler.h','overlays/fishing/name.c')})
-    live['pending']=['winner-mail delivery','measurement/calendar selection and event activation']
+            'overlays/v3/holiday_fishing_angler.c','overlays/v3/holiday_fishing_angler.h','overlays/fishing/name.c',
+            'overlays/v3/holiday_fishing_mail.c','overlays/v3/holiday_fishing_mail.h')})
+    live['pending']=([] if mail else ['winner-mail delivery'])+['measurement/calendar selection and event activation']
     fish['live']=live;fish['pending']=live['pending']+['connected native gameplay/save verification']
     controller=equipment['npc_extra']['events']['decorations']['controllers']
     controller['preserved']=[r for r in controller['preserved'] if r['ram']!=RAM]

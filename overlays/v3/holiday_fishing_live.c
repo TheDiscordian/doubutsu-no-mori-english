@@ -59,15 +59,21 @@ static void native_person(AFHFB *out,const AFHFPerson *p) {
     af_hf_copy(out,p->player_name,6);af_hf_copy(out+6,p->land_name,6);
     put16(out+12,p->player_id);put16(out+14,p->land_id);
 }
-int af_hf_live_enter(void) {
+int af_hf_records_enter(void) {
     AFHFLive *s=&af_hf_live;
-    if(s->active || !af_hf_native_player)return 0;
+    if(s->active)return 0;
     af_hf_clear(s,sizeof(*s),0);
     s->wire=af_v3_fishing_data();
     if(!s->wire || !af_holiday_fish_load(&s->records,s->wire,AF_HF_BYTES,s->wire[5]) ||
        !af_holiday_fish_clock(&s->records,&af_hf_native_clock))return 0;
     s->records.services=(AFHFServices){random_value,player_index,event_npc,name,random_name};
     s->records.opaque=&s->records;
+    s->active=2;return 1;
+}
+int af_hf_live_enter(void) {
+    AFHFLive *s=&af_hf_live;
+    if(!af_hf_native_player || !af_hf_records_enter())return 0;
+    s->active=0;
     s->native_event=af_hf_native_event_area(af_hf_native_clock.month==6?20:2,0);
     if(!s->native_event)return 0;
     const AFHFB *p=s->native_event;
@@ -99,7 +105,9 @@ void af_hf_live_leave(void) {
     AFHFLive *s=&af_hf_live;
     if(!s->active)return;
     if(!s->failed && !s->records.error && af_holiday_fish_store(&s->records,s->wire,AF_HF_BYTES)) {
-        AFHFB *p=s->native_event;put32(p,s->event.size);
+        AFHFB *p=s->native_event;
+        if(!p) {s->active=0;return;}
+        put32(p,s->event.size);
         if(!equal(&s->initial_person,&s->event.person,sizeof(s->initial_person)))
             native_person(p+4,&s->event.person);
         put16(p+20,(unsigned short)s->event.position[0]);put16(p+22,(unsigned short)s->event.position[1]);

@@ -28,6 +28,7 @@ extern const unsigned short af_hf_message_map[][2];
 extern const unsigned char af_hf_unit_text[2][16];
 extern const unsigned int af_hf_message_count;
 int af_hf_live_enter(void);
+int af_hf_records_enter(void);
 void af_hf_live_leave(void);
 AFHFLiveEvent *af_hf_live_event(int,int);
 int af_hf_live_size(int),af_hf_live_npc_size(int),af_hf_live_event_npc(AFHFH *);

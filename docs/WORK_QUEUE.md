@@ -235,8 +235,8 @@ cartridge check and empty/mixed/all-supported browser comparison pass; the
 readiness mask stays zero and save/profile data is unchanged. Reuse the prepared
 batch at `build/v3-diary-category-work-01/event-items-prepared-03/`.
 
-The current proposal is ABI 334 at
-`build/v3-diary-category-work-01/fishing-angler-installed-01/build-lock.json`.
+The current proposal is ABI 335 at
+`build/v3-diary-category-work-01/fishing-mail-installed-01/build-lock.json`.
 Harvest pickup connects the native ordinary-item search boundary `808BC1E0`,
 action-31 animation, and actual pocket insertion to the source removal counter.
 Full-pocket refusal retains the native animation and official donor message;
@@ -264,9 +264,17 @@ imported lifecycle, and all eight host measurement/record/dialogue calls are now
 connected. Native herabuna and the additive brook trout remain distinct;
 legacy name recovery preserves saved identity keys. Reuse the passing host,
 current-cartridge, and browser/offline checks; no native fixture is restarted.
-Next complete winner-mail delivery through the source record acknowledgement
-path. Source inches and native centimetres require the
-behaviour choice, not a silent conversion of saved values. The countdown's
+Winner-mail delivery is installed through the actual native notice-completion
+call, both mailbox/post-office routes, and the record acknowledgement path.
+All four official templates and both complete prize lists use existing source
+credits and stable imported identities. The current sanitized check executes
+the real English catalogue/formatter and saved snapshot codec, retaining rewards
+on allocation/text/delivery failure and preventing duplicate delivery. Current
+cartridge and browser/offline checks pass. Keep this path installed; native
+delivery remains unverified and gated with the rest of fishing.
+Next connect measurement/calendar choices and live event admission. Source
+inches and native centimetres require the behaviour choice, not a silent
+conversion of saved values. The countdown's
 shared clip and both controllers are installed; retain them while connecting
 event activation. Native/source saved personal IDs differ (16 versus 20 bytes);
 do not cast them or send donor message IDs to native text readers. This is the

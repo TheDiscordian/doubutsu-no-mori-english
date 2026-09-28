@@ -1388,7 +1388,7 @@ remain intact, including documented source quirks. Inches and centimetres are
 explicit state values; changing units with nonempty records rejects rather than
 silently reinterpreting saved measurements. Winner finalisation returns a delivery
 mask; acknowledgement removes a matching record only after actual mail succeeds.
-Native winner-mail delivery remains unfinished.
+Native winner-mail delivery uses the connection described below.
 
 The `AFHF` version-one wire block is 176 bytes: a sixteen-byte header followed
 by five thirty-two-byte records. Header bytes 4–7 are version, units, count (5),
@@ -1422,7 +1422,7 @@ FlashRAM execution, and hardware are not verified. No native fixture is restarte
 
 ### Live providers and complete fishing dialogue
 
-The current ABI-334 proposal at `fishing-angler-installed-01/build-lock.json`
+The current ABI-335 proposal at `fishing-mail-installed-01/build-lock.json`
 installs the live providers and host bridge: 11,184 bytes at `80734000`, inside the existing
 code reservation ending at `80737C00`. Its transient context occupies at most
 768 bytes at `80737CB0`, after the 176-byte saved wire block. The clip lifetime
@@ -1486,8 +1486,53 @@ Sanitized host checks cover lifetime ownership, native fallbacks, both units,
 record capture, message mapping, and name recovery. Current-cartridge checks
 cover all eight calls, relocation removal, complete retained host/text data,
 provider pointers, alias identity, and startup CRC. No native gameplay execution
-is claimed. Winner-mail delivery and unit/calendar selection remain part of this
-same unfinished category, with event admission still closed.
+is claimed. Unit/calendar selection remains part of this same unfinished
+category, with event admission still closed.
+
+### Tournament winner mail
+
+The same provider module includes the complete winner-letter path and occupies
+13,776 bytes of its 15,360-byte reservation. `af_hf_records_enter` loads records
+without requiring a live event area or stall. Native notice completion at
+`800A67DC` calls the delivery wrapper, which retains the original `lbRTC_TimeCopy`
+and invokes mail processing only when fishing service bit 8 is admitted.
+
+The donor finalisation, date cleanup, sorting, and acknowledgement kernels remain
+unchanged. Both complete source prize lists map 36 lottery and 67 event candidates
+through the shared identity worksheet/registry. Nineteen optional candidates
+use the installed selection and per-player collection readers; native candidates
+use the original furniture collection bits at player offset `AF0`. The selector
+retains lottery/event random precedence, the uncollected preference, and the
+fallback's rare-item rejection. A one-item profile containing only the excluded
+rare item refuses delivery instead of spinning indefinitely.
+
+Letters `023E..0241` retain all three official text parts from immutable catalogue
+4 and their existing `GAFE01-r0/{super,mail,ps}:...` provenance entries. The only
+captured field is the complete sixteen-byte prize name, with the source's zero
+article flag. Existing snapshot packing and catalogue restoration validate the
+whole English letter before publication. Native metadata retains unread status,
+fishing mail type 9, deep-sea paper 15, the recipient, and the actual prize.
+The roughly five-KiB aligned generation workspace is temporary general-heap
+storage, not nested game-stack storage; the delivery function's MIPS frame is
+80 bytes. The saved record remains the existing 164-byte native mail.
+
+Home delivery verifies the house owner before finding one of ten mailbox slots.
+Post-office fallback checks its five-mail capacity and actual receipt result.
+The complete acknowledged fishing wire is prepared before either route writes
+mail, then published only on successful delivery. No fallible serialisation
+follows delivery. Full/rejected queues, allocation failure, or text failure leave
+the winner record pending. Successful records are cleared individually, so a
+later failure cannot duplicate an earlier delivery. Finalised records and letters
+remain in the existing save transaction; no save-format change is introduced.
+
+The expanded sanitized host check uses the real record codec, catalogue reader,
+formatter, and all four installed templates, doubling only native I/O. It covers
+home/post delivery, full queues, explicit receipt rejection, allocation/name/DMA
+failure, retry, and duplicate prevention. The current cartridge check verifies
+the notice hook, rebound tournament calls, unchanged relocation/text resources,
+complete candidate table, shared packet bounds, and startup CRC. Empty, mixed,
+and all-191 browser/offline outputs agree. No native gameplay or hardware result
+is claimed, and fishing service admission remains closed.
 
 ## Serialized diary state
 

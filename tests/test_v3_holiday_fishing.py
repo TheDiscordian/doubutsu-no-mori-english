@@ -26,7 +26,7 @@ class HolidayFishingTests(unittest.TestCase):
         from v3_holiday_fishing import dialogue
         from v3_physical_resources import verify
         directory=ROOT/os.environ.get('V3_FISHING_LIVE_BUILD',
-            'build/v3-diary-category-work-01/fishing-angler-installed-01')
+            'build/v3-diary-category-work-01/fishing-mail-installed-01')
         image,report=inputs(directory/'build-lock.json')
         base,prior=inputs(directory/'base-lock.json')
         equipment=report['equipment_resources'];fish=equipment['holiday_fishing']
@@ -98,14 +98,15 @@ class HolidayFishingTests(unittest.TestCase):
             at=row['address']-ram
             self.assertEqual(u32(host,at),row['after'])
             self.assertEqual(row['after'],0x0C000000|((sy['af_hf_angler_'+row['name']]>>2)&0x3FFFFFF))
-            struct.pack_into('>I',host,at,row['before'])
+            struct.pack_into('>I',host,at,row.get('previous',row['before']))
         self.assertEqual(host,old_host)
         rel=files[rv].extract(image);old_rel=before[rv].extract(base)
         count=u32(rel,16);old_count=u32(old_rel,16)
-        self.assertEqual(count,old_count-1)
+        rebound=connection.get('rebound',False)
+        self.assertEqual(count,old_count if rebound else old_count-1)
         words=struct.unpack_from('>'+str(old_count)+'I',old_rel,20)
         self.assertEqual(struct.unpack_from('>'+str(count)+'I',rel,20),
-                         tuple(w for w in words if w not in connection['removed_relocations']))
+                         tuple(words) if rebound else tuple(w for w in words if w not in connection['removed_relocations']))
         self.assertEqual(connection['removed_relocations'],[0x44000000|(0x809D604C-ram)])
         from fishing_name import APPROVED,ALIASES_SHA
         names_at=APPROVED['symbols']['af_fishing_aliases'];at=sy['af_fishing_aliases']-packet['ram']
@@ -115,10 +116,29 @@ class HolidayFishingTests(unittest.TestCase):
         self.assertEqual(bindings['af_hf_source_clip'],0x80705038)
         for pointer in struct.unpack_from('>4I',raw,sy['af_hf_bridge_clip']-packet['ram']):
             self.assertTrue(live['loaded_code']['ram']<=pointer<live['loaded_code']['ram']+live['loaded_code']['bytes'])
+        if 'mail' in live:
+            mail=live['mail'];hook=mail['hook']
+            self.assertTrue(mail['installed']);self.assertFalse(mail['enabled'])
+            self.assertEqual(u32(core,hook['address']-CODE_RAM),hook['after'])
+            self.assertEqual(hook['after'],0x0C000000|((sy['af_hf_mail_notice']>>2)&0x3FFFFFF))
+            self.assertEqual(u32(before[CODE_VROM].extract(base),hook['address']-CODE_RAM),hook['before'])
+            self.assertEqual([g['name'] for g in mail['groups']],['ftr_listLottery','ftr_listEvent'])
+            self.assertEqual(len(mail['prizes']),103)
+            self.assertEqual([r['template'] for r in mail['letters']],list(range(0x23E,0x242)))
+            at=sy['af_hf_prizes']-packet['ram']
+            self.assertEqual(struct.unpack_from('>103H',raw,at),tuple(r['item'] for r in mail['prizes']))
+            self.assertEqual(files[0x30A0000].extract(image),before[0x30A0000].extract(base))
 
     def test_live_record_name_size_and_text_bridge(self):
+        self.run_live(False)
+
+    def test_live_winner_mail_delivery(self):
+        self.run_live(True)
+
+    def run_live(self,mail):
         import json
-        prepared=ROOT/'build/v3-diary-category-work-01/fishing-angler-installed-01/fishing-angler'
+        prepared=ROOT/('build/v3-diary-category-work-01/fishing-mail-installed-01/fishing-mail' if mail else
+            'build/v3-diary-category-work-01/fishing-angler-installed-01/fishing-angler')
         report=json.loads((prepared/'prepared.json').read_bytes())
         self.assertEqual((report['text']['count'],report['text']['choice_count']),(74,7))
         self.assertEqual(len(report['text']['fish_messages']),40)
@@ -137,6 +157,15 @@ class HolidayFishingTests(unittest.TestCase):
                 'overlays/v3/holiday_fishing_angler.c','overlays/fishing/name.c',str(prepared/'legacy-names.c'),
                 'overlays/v3/diary_calendar.c',str(local),str(prepared/'text-map.c'),
                 '-o',str(out/'check')],[str(out/'check')]]
+            if mail:
+                from aflib import by_vrom
+                from v3_furniture_install import inputs
+                cartridge,_=inputs(prepared.parent/'build-lock.json')
+                catalog=out/'catalog.bin';write_new(catalog,by_vrom(cartridge)[0x30A0000].extract(cartridge))
+                commands[0][1:1]=['-DAF_TEST_FISHING_MAIL',str(prepared/'prizes.c'),
+                    'overlays/v3/holiday_fishing_mail.c','runtime/mail/record.c','runtime/mail/catalog.c',
+                    'runtime/mail/format.c','runtime/crc32.c','tests/mail_catalog_mock.c']
+                commands[1].append(str(catalog))
             for command in commands:
                 result=subprocess.run(command,cwd=ROOT,capture_output=True,text=True,timeout=30)
                 self.assertEqual(result.returncode,0,result.stdout+result.stderr)
