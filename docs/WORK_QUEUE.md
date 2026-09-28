@@ -100,13 +100,23 @@ verified. The complete fifteen-state movement controller connects to the shared
 conversation/calendar/handover controller at
 `build/v3-diary-category-work-01/tortimer-actor-03/`. Its native lifecycle bridge
 uses the actual N64 clip/field layout and real request/delivery/end signals;
-both objects compile, but required services and actor registration are unlinked.
+both objects compile, but required actor services are unlinked.
 The combined donor-think and connected conversation host check passes. The
 2,612-byte native actor exceeds the native pool's 2,400-byte limit, so its
-additive allocation/free path must be installed together with its descriptor.
-Next bind the registry/allocation, full voice/cane, walking-only schedule and
-update cadence, event owner, English messages/demo transport, and separate
-exercise/card route. Reuse the prepared resources and controllers.
+additive allocation/free path and descriptor are installed together at
+`build/v3-diary-category-work-01/tortimer-installed-03/`. The same build connects
+the complete model/texture banks, both renderers, full voice, checked external
+object transfers, and seventeen-packet startup. The guarded actor pool retains
+all original slots. The complete 912-byte cane motion is resident, including its
+64-byte control record; its animation caller is not bound. The actor profile
+stays inactive with unbound lifecycle callbacks. Four connected registry/build/
+host checks and ten shared motion checks pass. Browser/offline output agrees
+for empty, mixed, and all-supported selections; no diary becomes selectable.
+Next connect the five actor providers using this installed registry, especially
+the cane animation caller, walking-only schedule and update cadence, event owner,
+English messages/demo transport, and separate exercise/card route. Reuse the
+installed allocation/loading/drawing path and complete resources; do not rebuild
+them as separate tasks or restart the exhausted native title fixture.
 The [native connection notes](../specs/V3_DIARIES.md#tortimer-artwork-and-native-actor-connection)
 retain the actual native clip map, not the differently laid-out donor structure.
 Do not turn these consumers into per-holiday implementation/test cycles or mark
@@ -154,9 +164,9 @@ harness budget exhausted; no old fixture replay is authorised by this clothing
 work. Fix any identified game defect. This does not defer required creature
 behaviours or classify their gameplay as verified.
 
-Use the shared converter and current ABI-312 proposal:
-`build/v3-diary-category-work-01/catalogue-03/build-lock.json`.
-ROM SHA-256: `f61dd92710d80fc6197d754902abd7aedb45516effc9e3a1185d7a1acb976d0a`.
+Use the shared converter and current ABI-313 proposal:
+`build/v3-diary-category-work-01/tortimer-installed-03/build-lock.json`.
+ROM SHA-256: `420aa20508dcba3bd0f586d493aaa9dcceb72b81550671344b6e3dce2d4d44db`.
 The two static variants use ordinary stock, catalogue/scoring, save-profile bits,
 and independent browser/offline selection. Their 7,840 artwork bytes are installed
 together; neither native counterpart nor any existing imported object is replaced.

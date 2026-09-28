@@ -30,6 +30,27 @@ class MotionTests(unittest.TestCase):
         source.data = bytearray(self.source.data)
         return source
 
+    def test_complete_npc_motion_preserves_controls_and_all_arrays(self):
+        source=self.source;at=source.names['cKF_ba_r_npc_1_tue1'][0][0]
+        row=keyframes.npc_motion(source,at,joints=26)
+        self.assertEqual((row['keyed_channels'],row['constant_channels'],row['duration']),(54,27,29))
+        asset,report=keyframes.compile_animations(source,[row],address_base=0x806EF000)
+        self.assertEqual(len(asset),912);header=report['headers'][0]['native_offset']
+        self.assertEqual(report['headers'][0]['bytes'],64)
+        self.assertEqual(asset[header+16:header+64],source.data[at+16:at+64])
+        for array in report['arrays']:
+            offset,n=array['native_offset'],array['bytes'];original=array['donor_offset']
+            self.assertEqual(asset[offset:offset+n],source.data[original:original+n])
+        offsets={a['donor_offset']:a['native_offset'] for a in report['arrays']}
+        for i in range(4):
+            self.assertEqual(struct.unpack_from('>I',asset,header+i*4)[0],
+                0x806EF000+offsets[source.pointers(at,20)[at+i*4]])
+        changed=self.mutable_data();struct.pack_into('>I',changed.data,at+36,0x1234)
+        with self.assertRaisesRegex(ValueError,'programme'):keyframes.npc_motion(changed,at)
+        changed=self.mutable_data();struct.pack_into('>f',changed.data,at+20,float('nan'))
+        with self.assertRaisesRegex(ValueError,'controls'):keyframes.npc_motion(changed,at)
+        with self.assertRaisesRegex(ValueError,'complete size'):keyframes.animation(source,at)
+
     def test_complete_motion_sources_and_parent_bindings(self):
         self.assertEqual(len(self.motion['parents']), 79)
         self.assertEqual(len(self.motion['skeletons']), 20)

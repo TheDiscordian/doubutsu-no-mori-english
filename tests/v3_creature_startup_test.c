@@ -49,6 +49,9 @@
 #define AF_DIARY_ITEMS_PHYSICAL 0x03400000u
 #define AF_DIARY_ITEMS_CRC 216u
 #define AF_DIARY_ITEMS_BYTES 16u
+#define AF_NPC_EXTRA_PHYSICAL 0x03500000u
+#define AF_NPC_EXTRA_CRC 217u
+#define AF_NPC_EXTRA_BYTES 16u
 #include "../overlays/v3/surface_bootstrap.c"
 u32 af_test_surface_memory[4],af_test_goods_magic,af_test_carry_magic;
 unsigned char af_test_goods_code[16],af_test_carry_code[16],af_test_exercise_code[16];
@@ -58,10 +61,11 @@ unsigned char af_test_fish_world[16],af_test_insect_code[16];
 unsigned char af_test_clothing_code[16];
 unsigned char af_test_diary_storage[16],af_test_diary_ui[16],af_test_diary_art[16];
 unsigned char af_test_diary_items[16];
+unsigned char af_test_npc_extra[16];
 static void *addresses[]={af_test_surface_memory,af_test_goods_code,af_test_carry_code,
     af_test_exercise_code,af_test_console_code,af_test_console_images,af_test_console_disk,af_test_creature_code,
     af_test_creature_field,af_test_fish_world,af_test_insect_code,af_test_clothing_code,
-    af_test_diary_storage,af_test_diary_ui,af_test_diary_art,af_test_diary_items};
+    af_test_diary_storage,af_test_diary_ui,af_test_diary_art,af_test_diary_items,af_test_npc_extra};
 static u32 current,stage,fail_dma,fail_crc,init_calls;
 int af_surface_dma(void *p,u32 vrom,u32 n) {
     assert(stage==0 && current<12 && current!=10 && p==addresses[current] && vrom==101+current && n==16);
@@ -70,8 +74,8 @@ int af_surface_dma(void *p,u32 vrom,u32 n) {
 int af_surface_pi(u32 rom,void *p,u32 n) {
     u32 expected=current==10?AF_INSECT_PHYSICAL:
         current==12?AF_DIARY_STORAGE_PHYSICAL:current==13?AF_DIARY_UI_PHYSICAL:
-        current==14?AF_DIARY_ART_PHYSICAL:AF_DIARY_ITEMS_PHYSICAL;
-    assert(stage==0 && (current==10 || (current>=12 && current<16)) &&
+        current==14?AF_DIARY_ART_PHYSICAL:current==15?AF_DIARY_ITEMS_PHYSICAL:AF_NPC_EXTRA_PHYSICAL;
+    assert(stage==0 && (current==10 || (current>=12 && current<17)) &&
         p==addresses[current] && rom==expected && n==16);
     stage=1;return current+1==fail_dma;
 }
@@ -81,16 +85,17 @@ u32 af_surface_crc(const void *p,u32 n) {
 }
 void af_surface_writeback(void *p,u32 n) {assert(stage==2 && p==addresses[current] && n==16);stage=3;}
 void af_surface_invalidate(void *p,u32 n) {assert(stage==3 && p==addresses[current] && n==16);stage=0;current++;}
-int af_surface_prior_init(void) {assert(current==16 && !stage);init_calls++;return 1;}
+int af_surface_prior_init(void) {assert(current==17 && !stage);init_calls++;return 1;}
+int af_test_npc_extra_init(void) {assert(current==17 && !stage && !init_calls);return 1;}
 int main(void) {
     af_test_goods_magic=af_test_carry_magic=123;
     assert(af_v3_surface_init()==1 && init_calls==1);
     assert(!af_test_goods_magic && !af_test_carry_magic);
-    for(u32 i=1;i<=16;i++) {
+    for(u32 i=1;i<=17;i++) {
         current=stage=init_calls=0;fail_dma=i;fail_crc=0;
         assert(!af_v3_surface_init() && current==i-1 && stage==1 && !init_calls);
         current=stage=init_calls=0;fail_dma=0;fail_crc=i;
         assert(!af_v3_surface_init() && current==i-1 && stage==2 && !init_calls);
     }
-    puts("Shared sixteen-packet checked startup, physical transfer, and failure before execution: pass");
+    puts("Shared seventeen-packet checked startup, physical transfer, and failure before execution: pass");
 }

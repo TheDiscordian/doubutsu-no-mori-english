@@ -289,6 +289,16 @@ def publish_bootstrap(equipment,blob,surface,output):
             raise ValueError('Changed complete diary item startup packet')
         extra+=tuple(f'AF_DIARY_ITEMS_{label}=0x{p[key]:X}u' for label,key in
             (('PHYSICAL','physical'),('CRC','crc32'),('BYTES','bytes'),('RAM','ram')))
+    npc_extra=equipment.get('npc_extra')
+    if npc_extra:
+        from v3_npc_registry import RAM as NPC_RAM,SIZE as NPC_SIZE
+        p=npc_extra['packet']
+        if (p['ram']!=NPC_RAM or p['bytes']!=NPC_SIZE or p['physical']&15 or
+                p['storage']!='physical-ROM' or not 0x100000<=p['physical']<p['physical']+p['bytes']<=0x4000000):
+            raise ValueError('Changed complete additional NPC startup packet')
+        extra+=tuple(f'AF_NPC_EXTRA_{label}=0x{p[key]:X}u' for label,key in
+            (('PHYSICAL','physical'),('CRC','crc32'),('BYTES','bytes'),('RAM','ram')))
+        extra+=(f'AF_NPC_EXTRA_INIT=0x{npc_extra["code"]["symbols"]["af_v3_npc_dma_init"]:X}u',)
     boot,compiled=compile_part('surface_bootstrap',output/'goods_surface_bootstrap',defines=(
         'AF_V3_EDITABLE_CHECKSUMS=1',f'AF_SURFACE_ITEMS_VROM=0x{items["vrom"]:X}u',
         f'AF_SURFACE_ITEMS_CRC=0x{items["crc32"]:X}u',f'AF_SURFACE_ITEMS_BYTES=0x{items["bytes"]:X}u',
@@ -314,3 +324,4 @@ def publish_bootstrap(equipment,blob,surface,output):
     if clothing:clothing['startup']=copy.deepcopy(goods['startup'])
     if insects:insects['startup']=copy.deepcopy(goods['startup'])
     if diaries:diaries['startup']=copy.deepcopy(goods['startup'])
+    if npc_extra:npc_extra['startup']=copy.deepcopy(goods['startup'])

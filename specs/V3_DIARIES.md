@@ -340,16 +340,16 @@ offsets**, not CPU pointers. The actual bank comes from actor `+708` and the nat
 size, expressions, and command capacity, emits the current body/face bindings,
 and restores both opaque and translucent segment state. Ordinary NPCs take the
 unchanged accessory path. Native record generation retains donor flags, scale,
-collision dimensions, and full voice 281; assigning the actor and object-bank
-identities still belongs to the additive registry installation.
+collision dimensions, and full voice 281. The additive registry assigns `D090`,
+profile `CC`, and object banks 448/449 without reusing a native identity.
 
 `tools/v3_npc_stream_runtime.py` checks both complete current-ROM renderers and
 their existing accessory calls at `80978654` and `8099A2E0`. Only the JAL changes;
 the actor argument in the delay slot and both relocation tables remain. The
 prepared VR4300 object at `build/v3-diary-category-work-01/tortimer-draw-04/`
-has a 120-byte maximum local frame and one explicit unresolved dependency,
-`af_v3_npc_stream_record`. It is not linked or installed. No new native fixture
-is run and the existing diary test budget remains exhausted.
+has a 120-byte maximum local frame. The installed registry supplies its record
+lookup and links the adapter into both owners. No new native fixture is run and
+the existing diary test budget remains exhausted.
 
 Six focused source/current-cartridge/host checks pass: complete pixel and
 ordered-face preservation, texture-transfer bounds, native draw/config records,
@@ -373,10 +373,67 @@ Its constructor map in `build/disassembly/npc-animation/code.asm` provides:
 These offsets are not the donor clip layout. The cane uses the donor's shared
 `aNPC_SUB_ANIM_TUE` channel and `cKF_ba_r_npc_1_tue1` (64-byte NPC motion record,
 donor animation index `F3`), not a static hand pose or an assumed identical native
-index. Registry/descriptor chaining, full voice loading, this motion binding,
-event scheduling, official messages/demo transport, and the exercise-card path
-remain unconnected. Reuse the prepared model, textures, drawing adapter, and
-28-event controller while finishing those consumers; no diary selection is enabled.
+index. The registry, descriptor chaining, full voice, model, textures, and drawing
+adapter are installed. The full cane resource is resident; its native animation
+caller, event scheduling, official messages/demo transport, and exercise-card
+path remain unconnected. Reuse the installed resources and 28-event controller
+while finishing those consumers; no diary selection is enabled.
+
+### Additive actor allocation and complete resource loading
+
+The shared builder's `--npc-registry-art` path installs the actor registry,
+allocation/free, both drawing callers, complete model/texture banks, full voice,
+and checked startup together. Current preparation/build is
+`build/v3-diary-category-work-01/tortimer-installed-03/`, ABI 313. The 64-KiB
+packet occupies `806E4000..806F4000`; its code occupies 3,984 bytes. Registry,
+descriptor, profile, drawing, and stream records sit in its checked record area.
+Two actor slots start at `806F0000`, each with 16-byte ownership and tail guards,
+a 2,612-byte actor, and alignment padding, for a total stride of 2,656 bytes.
+Native allocation and cleanup stay unchanged for ordinary NPCs. New cleanup
+retains the actor body because the native caller reads its name after release,
+and handles the resident descriptor's loaded count exactly once. Profile drawing
+stays null until the native init installs the ctor's draw callback.
+
+`D090` and profile `CC` identify the donor's `D074` Ev_Soncho2. Native no-demo,
+tent, balloon, and camper reservations are retained. Runtime flags distinguish
+implemented and selected; both must be set before allocation. Both stay zero,
+and lifecycle fixups stay unresolved while the actor providers are unfinished.
+Installing the registry is not a completed actor, event, or diary import.
+
+Object banks 448/449 reference complete artwork at virtual `03FE0000`/`03FE4000`.
+Their physical extents are allocated by the existing guarded ROM allocator, not
+inside the nearly full item-data blob. The object-status bound, table, and main
+startup header all use capacity 450. Existing growth/selection data immediately
+after the table remains intact. Neither art conversion nor a DMA-directory row
+is duplicated or repurposed.
+
+`npc_dma.c` handles these registered ranges inside the ordinary DMA worker.
+The original sync/async request functions and completion notifications remain.
+The runtime hook replaces only the worker call at `80026A24`, preserving its
+delay slot. It is installed after the packet's complete transfer/CRC/cache
+verification, never placed in boot ROM where it could run before loading.
+Unknown requests follow the original processor. Crossing a bank, invalid RAM,
+misalignment, overflow, and physical-transfer failure take the native error
+path rather than acknowledging an unperformed transfer. Audio DMA is separate
+and unchanged. The physical reader, complete processor, and complete worker
+are checked against the current cartridge before installation.
+
+Startup loads seventeen packets in 644 of 688 reserved bytes and then enables
+the checked object dispatcher. Native startup/execution remains unverified.
+Four focused tests cover installed code/resources/CRCs, normal fallback,
+inactive/full/damaged allocation, matching cleanup, full voice, drawing records,
+whole/partial DMA and failed requests, and startup failure before execution.
+The existing private browser/offline check agrees for empty, mixed, and all 191
+supported choices on this build; diaries remain unavailable.
+
+The shared keyframe converter preserves the entire 64-byte NPC motion record,
+not just its 20-byte animation prefix. The cane's 26 joint flags, 54 key counts,
+108 key triples, and 27 constants occupy 912 aligned bytes with the header.
+Start/end frames 1/29, repeat mode, morph -5, and null face/effect/audio programmes
+are retained. The resident header is `806EF348`; arrays use checked resident
+addresses. Non-null dependent programmes require explicit conversion and reject
+instead of being dropped. Ten shared converter checks pass, including unchanged
+ordinary keyframe outputs. The cane's runtime animation caller is still pending.
 
 ### Connected holiday movement and lifecycle bridge
 
@@ -647,10 +704,10 @@ metadata is disabled unconditionally. Select all has an explicit derived output
 hash because the installation contains prepared but unavailable rows; it must
 not enable unfinished imports merely to reproduce the installation hash.
 
-For ABI 312, empty output is the pinned V2-14; all 191 supported development
+For ABI 313, empty output is the pinned V2-14; all 191 supported development
 choices produce SHA-256
-`fb4737598dfc2849e687366f5d4038a43ecd450f98f2adf0ae32a9d073216afe`.
-The installation ROM and main build lock remain unchanged. Neither deployed
+`f2e5c31a5b890ad1112bde72cc7b5da9a9f13e3a0547cf706fb63e5a5f8d81fc`.
+The main build lock remains unchanged. Neither deployed
 patcher consumes this experimental plan.
 
 `tests/test_v3_diary_selection.py` checks all parent/profile bindings, complete

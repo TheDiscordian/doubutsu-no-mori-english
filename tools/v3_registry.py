@@ -11,6 +11,15 @@ VILLAGERS = {
     231: 233, 232: 234, 233: 235, 234: 236, 235: 237,
 }
 
+# Special actors are not ordinary residents or individually selectable villagers.
+# Native profiles C9/CA/CB are the no-demo sentinel, summer tent, and balloon.
+# The existing camper mask uses D08F. These reservations do not enable spawning.
+SPECIAL_NPC_REGISTRY_VERSION = 1
+SPECIAL_NPCS = {
+    'GAFE01-r0/npc/ev-soncho2': dict(donor_name=0xD074, donor_profile=0xCC,
+        name=0xD090, profile=0xCC, model_bank=448, texture_bank=449),
+}
+
 # Reviewed furniture reservations. Values are runtime index, saved item
 # ID, and object VROM. Native 0..946 and the index-947 conversion sentinel stay
 # untouched. Holes are not supported items; future additions must be explicit.

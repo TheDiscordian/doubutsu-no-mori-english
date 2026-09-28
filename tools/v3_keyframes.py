@@ -4,6 +4,7 @@ These are shared format rules, not item/animation definitions. Graphics and
 action dispatch remain separate consumers; a converted rig is not gameplay.
 """
 import struct
+import math
 
 from aflib import sha256
 
@@ -22,7 +23,11 @@ def resource(source, address, *, size=None, pointers=False):
 
 
 def animation(source, address, *, joints=None):
-    raw, header = resource(source, address, size=20, pointers=True)
+    return _animation(source,address,joints=joints,record_bytes=20)
+
+
+def _animation(source,address,*,joints,record_bytes):
+    raw, header = resource(source, address, size=record_bytes, pointers=True)
     pointers = source.pointers(address, 20)
     if (raw[:16] != bytes(16) or address not in pointers
             or not set(pointers) <= {address+i*4 for i in range(4)}):
@@ -70,6 +75,30 @@ def animation(source, address, *, joints=None):
                 tracks=tracks, keyed_channels=keyed, constant_channels=3+3*count-keyed)
 
 
+def npc_motion(source,address,*,joints=None):
+    """A complete NPC motion embeds the keyframe plus 44 bytes of controls.
+
+    This form covers motions without separate face/effect/audio programmes,
+    including the cane. Dependent programmes reject rather than disappear.
+    The entire source suffix is retained, not replaced with default timing.
+    """
+    row=_animation(source,address,joints=joints,record_bytes=64)
+    raw=source.data[address:address+64]
+    if (source.pointers(address+20,44) or any(raw[at:at+4]!=bytes(4) for at in (36,44,56,60))):
+        raise ValueError('NPC motion requires explicit face/effect/audio programme conversion')
+    start,end,mode,morph=struct.unpack_from('>ffif',raw,20)
+    eye,eye_stop,mouth,mouth_stop,feel_frame,feel=(
+        *struct.unpack_from('>hh',raw,40),*struct.unpack_from('>hhhh',raw,48))
+    if (not all(math.isfinite(v) for v in (start,end,morph)) or mode not in (0,1) or
+            not 0<=start<=end<=row['duration'] or eye!=0 or mouth!=0 or eye_stop or mouth_stop or
+            feel_frame!=-1 or feel!=-1):
+        raise ValueError('Unsupported complete NPC motion controls')
+    row['npc']=dict(start=start,end=end,mode=mode,morph=morph,
+        eye_type=eye,eye_stop=eye_stop,mouth_type=mouth,mouth_stop=mouth_stop,
+        feel_frame=feel_frame,feel=feel,dependent_programmes=False)
+    return row
+
+
 def skeleton(source, address):
     raw, header = resource(source, address, size=8, pointers=True)
     pointers = source.pointers(address, 8)
@@ -112,14 +141,16 @@ def model_descriptor(rig, **fields):
     return dict(**fields, skeleton=rig, joint_models=bindings, models=models)
 
 
-def compile_animations(source, descriptions, *, start=0):
+def compile_animations(source, descriptions, *, start=0,address_base=SEGMENT):
     """Pack complete arrays once and relocate headers into one native object."""
-    if not descriptions or type(start) is not int or not 0 <= start < 0x1000000 or start % 16:
+    if (not descriptions or type(start) is not int or not 0 <= start < 0x1000000 or start % 16 or
+            type(address_base) is not int or address_base&15 or not 0<=address_base<=0xFFFFFFFF-start):
         raise ValueError('No checked animations or invalid object offset')
     checked = {}
     for row in descriptions:
         at = row['header']['donor_offset']
-        if at in checked or row != animation(source, at, joints=row['joints']):
+        describe=npc_motion if 'npc' in row else animation
+        if at in checked or row != describe(source, at, joints=row['joints']):
             raise ValueError('Duplicate or changed animation description')
         checked[at] = row
     output, offsets, arrays = bytearray(), {}, []
@@ -130,23 +161,24 @@ def compile_animations(source, descriptions, *, start=0):
         arrays.append(dict(**receipt, native_offset=offsets[at], output_sha256=sha256(raw)))
     headers, relocations = [], []
     for at, row in sorted(checked.items()):
-        raw, _ = resource(source, at, size=20, pointers=True)
+        raw, _ = resource(source, at, size=64 if 'npc' in row else 20, pointers=True)
         fixed = bytearray(raw)
         output.extend(bytes(-len(output)%4)); header_at = start+len(output)
         for i, label in enumerate(CHANNELS):
             if row['arrays'][label] is None:
                 continue
             target = offsets[row['arrays'][label]['donor_offset']]
-            struct.pack_into('>I', fixed, i*4, SEGMENT+target)
+            if address_base+target>0xFFFFFFFF:raise ValueError('Animation pointer overflows its address space')
+            struct.pack_into('>I', fixed, i*4, address_base+target)
             relocations.append(dict(offset=header_at+i*4, target_offset=target))
         output.extend(fixed)
         headers.append(dict(**row['header'], native_offset=header_at, output_sha256=sha256(fixed),
                             joints=row['joints'], duration=row['duration']))
     output.extend(bytes(-len(output)%16))
-    if start+len(output) >= 0x1000000:
+    if start+len(output) >= 0x1000000 or address_base+start+len(output)>0x100000000:
         raise ValueError('Animation object exceeds a segmented address range')
     return bytes(output), dict(arrays=arrays, headers=headers, relocations=relocations,
-                              segment=SEGMENT, runtime_installed=False)
+                              segment=address_base, runtime_installed=False)
 
 
 def compile_skeleton(source, description, model_offsets, *, start):

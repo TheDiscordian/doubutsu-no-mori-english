@@ -31,9 +31,9 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
-The current proposal is ABI 312 at
-`build/v3-diary-category-work-01/catalogue-03/build-lock.json`, ROM SHA-256
-`f61dd92710d80fc6197d754902abd7aedb45516effc9e3a1185d7a1acb976d0a`.
+The current proposal is ABI 313 at
+`build/v3-diary-category-work-01/tortimer-installed-03/build-lock.json`, ROM SHA-256
+`420aa20508dcba3bd0f586d493aaa9dcceb72b81550671344b6e3dce2d4d44db`.
 It contains 191 independently selectable development imports, including all nine
 fish and eight insects, and 100 inactive furniture profiles whose acquisition
 is pending, plus sixteen inactive diary cover profiles. The main lock and both
@@ -140,7 +140,7 @@ native rendering, ordinary diary use, save/reload, or hardware compatibility.
 
 The installed diary bindings connect every carried parent to its cover, single
 save-profile bit, catalogue ordering, and scoring. Browser and offline composition
-agree for empty, mixed, and all-supported selections on ABI 312. Prepared diaries
+agree for empty, mixed, and all-supported selections on ABI 313. Prepared diaries
 remain unavailable, including under select all; inactive catalogue/scoring rows
 are removed from composed builds. The shared save/profile host check uses real
 carried readers, selected-style resolution, canonical codec, and format-eleven
@@ -170,7 +170,7 @@ visitors, full pockets, vacation callbacks/dates, and duplicate handover handlin
 are implemented together. Four focused host checks pass, including the complete
 donor conversation comparison and the donor calendar query comparison. The
 VR4300 controller compiles with explicit diary/reward/library link dependencies.
-It is not installed: Tortimer's actor/schedule, graphics/motions, official message
+It is not installed: Tortimer's actor/schedule, motion binding, official message
 routing, native demo transport, and exercise-card route remain necessary.
 
 Tortimer's complete model and expressions are converted within the existing NPC
@@ -179,11 +179,11 @@ retains geometry, face choices, wrapping, and render state, and keeps the native
 4-KiB preload inside its bank. The native drawing adapter preserves ordinary
 NPC/accessory handling and restores graphics segments. Six focused checks pass,
 including current owner hooks and sanitized expression/bounds handling; the
-adapter compiles for VR4300. These components remain prepared, not installed.
+adapter compiles for VR4300. These components are installed through the shared
+registry and resource loader; native rendering is unverified.
 The [actor connection notes](../specs/V3_DIARIES.md#tortimer-artwork-and-native-actor-connection)
-identify the remaining registry, lifecycle, voice, cane-motion, schedule, and
-message/demo consumers. The current ABI-312 ROM, inactive diary choices, saves,
-and V2 deployments remain unchanged. Native appearance is unverified.
+identify the remaining lifecycle, cane-motion, schedule, and message/demo
+consumers. Diary choices remain inactive; saves and V2 deployments are untouched.
 
 The full fifteen-state Tortimer movement controller connects to the existing
 conversation, diary attendance, and guarded delivery code. A combined host check
@@ -192,11 +192,36 @@ attendance → delivery → resumed movement. The native lifecycle bridge suppli
 the checked N64 callbacks, actor fields, requests, and real demo-end/delivery
 signals. Both VR4300 objects are prepared at
 `build/v3-diary-category-work-01/tortimer-actor-03/`, not linked or installed.
-The remaining services include the additive allocation/registry, walking-only
-schedule and cadence, event owner, voice/cane, and English message transport.
+The remaining services include walking-only schedule and cadence, event owner,
+cane-animation binding, and English message transport.
 The actor needs 2,612 bytes; the ordinary NPC pool rejects sizes above 2,400,
-so its allocation/free handling cannot be omitted. Diaries remain unavailable,
-and no native gameplay or new ROM is claimed.
+so it uses a separate guarded pool instead of growing the original nine slots.
+Diaries remain unavailable, and no native gameplay is claimed.
+
+The shared actor installation connects descriptor/allocation/free, complete
+drawing in both NPC owners, full voice 281, and model/texture banks 448/449.
+The 64-KiB resident packet holds two 2,612-byte actors in guarded 2,656-byte slots,
+3,984 bytes of linked dispatch/drawing/loading code, and the complete 912-byte
+cane motion. Its lifecycle callbacks and readiness flags remain unset until the
+event/conversation providers are connected. Allocation rejects inactive records;
+cleanup preserves the native actor body and original NPC slots.
+
+The complete 13,584 artwork bytes use checked external physical-ROM storage and
+virtual banks `03FE0000`/`03FE4000`, keeping existing item storage intact. The
+ordinary DMA worker handles both sync/async object loads and retains its message
+notifications; its hook activates only after the resident packet passes startup
+verification. Audio DMA is unchanged. The seventeen-packet startup uses 644 of
+688 reserved bytes. Object capacity and the startup header agree at 450.
+
+Four focused build/host checks pass, covering complete resources/hooks/startup,
+allocation/free/guards, transfer bounds/failures, and original fallbacks. Ten
+shared keyframe checks pass, including all cane channels and its complete timing
+record. The current browser/offline comparison passes empty, mixed, and all 191
+supported choices while keeping all diaries inactive. No native fixture is run.
+The saved format/profile is unchanged from the preceding diary proposal; native
+save compatibility is not newly tested. Format-eleven backward incompatibility
+with V2 and earlier V3 remains. The next work is the same actor-provider connection,
+not another allocation or artwork conversion pass.
 
 Both source artwork variants, school desk and bus stop, are installed through
 the ordinary shared importer. Complete original-N64 profile/model comparison

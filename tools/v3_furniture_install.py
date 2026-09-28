@@ -665,7 +665,7 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
                     equipment_rigs=None, expand_storage=False, furniture_audio_art=None, furniture_profiles=None,
                     material_frames_art=None,scrolling_materials_art=None,room_surfaces_art=None,furniture_scoring=False,
                     password_runtime=None,password_editor=False,room_effects=None,furniture_capacity=False,console_storage=False,
-                    console_images=None,console_emulator=False,console_disk=None,creature_items=None,creature_field=None,creature_fish=False,creature_insects=None,clothing_batch=None,diaries=None,diary_items=False,diary_room_art=None,diary_catalogue=False):
+                    console_images=None,console_emulator=False,console_disk=None,creature_items=None,creature_field=None,creature_fish=False,creature_insects=None,clothing_batch=None,diaries=None,diary_items=False,diary_room_art=None,diary_catalogue=False,npc_registry_art=None):
     """Update shared readers; optionally install the shared held-resource adapter."""
     output=output.resolve()
     if output.exists() or not output.is_relative_to(ROOT/'build'):
@@ -720,13 +720,21 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
     if diary_catalogue:
         if resource_mode:raise ValueError('Install shared runtime updates in dependency order')
         resource_mode=True
+    if npc_registry_art is not None:
+        if resource_mode:raise ValueError('Install shared runtime updates in dependency order')
+        resource_mode=True
     if resource_mode:
         blob,reused=reuse_resource_tail(base,prior,old_blob)
         if not reused['reused_bytes'] and not reused.get('external_resources'):
             raise ValueError('Equipment integration requires the checked shared resource tail')
     parent_readers=bool(player_actions and prior.get('equipment_resources',{}).get('player_actions',{}).get('equipment_selection'))
     wrapped_names=bool(player_actions and prior.get('equipment_resources',{}).get('wrapped_presents'))
-    if diary_catalogue:
+    if npc_registry_art is not None:
+        import v3_npc_registry as equipment
+        equipment_report,owner_changes,report_updates,physical_writes=equipment.install(
+            base,prior,blob,core,output,npc_registry_art,lock)
+        display_report=prior['clothing']['display'];alias_report=prior['display_aliases']
+    elif diary_catalogue:
         import v3_diary_items as equipment
         equipment_report,owner_changes,report_updates,physical_writes=equipment.install_catalogue(base,prior,blob,core,output)
         display_report=prior['clothing']['display'];alias_report=prior['display_aliases']
@@ -1026,6 +1034,9 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
     old=prior['startup']
     defines=tuple(f[2:] if not f.startswith('-DAF_V3_ABI=') else f'AF_V3_ABI={abi}'
         for f in old['flags'] if f.startswith('-D'))
+    if 'object_capacity' in report_updates:
+        defines=tuple(f for f in defines if not f.startswith('AF_V3_OBJECT_CAPACITY='))
+        defines+=(f'AF_V3_OBJECT_CAPACITY={report_updates["object_capacity"]}',)
     if equipment_report:
         defines=tuple(f for f in defines if not f.startswith(('AF_V3_EQUIPMENT_VROM=','AF_V3_EQUIPMENT_CRC=',
                                                             'AF_V3_EQUIPMENT_BYTES=')))
@@ -1400,6 +1411,13 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
                 report['catalogue']['category_pool_bytes']-prior['catalogue'].get('category_pool_bytes',0))
         report['sources'].update(diary['sources'])
         report['native_test']='pending diary participation, selection, and connected gameplay/save verification'
+    if npc_registry_art is not None:
+        npc=equipment_report['npc_extra']
+        report['shared_runtime_refresh'].update(adapters=['npc_registry'],artwork_changed=True,
+            additional_resident_bytes=npc['packet']['bytes'],resource_allocations_changed=True,
+            saved_format_changed=False,saved_profile_changed=False)
+        report['sources'].update(npc['sources'])
+        report['native_test']='pending connected Tortimer event/conversation/animation providers and diary gameplay/save verification'
     if console_images is not None:
         images=equipment_report['console_images']
         report['shared_runtime_refresh'].update(adapters=['console_images'],
@@ -1506,6 +1524,8 @@ if __name__=='__main__':
         help='With --refresh-runtime, install complete donor themes, names, and source-mapped base-point categories')
     parser.add_argument('--diary-catalogue',action='store_true',
         help='With --refresh-runtime, connect all installed diary covers to catalogue previews and scoring metadata')
+    parser.add_argument('--npc-registry-art',type=Path,
+        help='With --refresh-runtime, connect complete prepared additional-NPC art, allocation, and rendering; actors remain inactive')
     parser.add_argument('--password-runtime',type=Path,
         help='With --refresh-runtime, link prepared password rules and live engine bindings without enabling delivery')
     parser.add_argument('--password-editor',action='store_true',
@@ -1562,6 +1582,7 @@ if __name__=='__main__':
     if args.room_surfaces_art and not args.refresh_runtime:parser.error('--room-surfaces-art requires --refresh-runtime')
     if args.furniture_scoring and not args.refresh_runtime:parser.error('--furniture-scoring requires --refresh-runtime')
     if args.diary_catalogue and not args.refresh_runtime:parser.error('--diary-catalogue requires --refresh-runtime')
+    if args.npc_registry_art is not None and not args.refresh_runtime:parser.error('--npc-registry-art requires --refresh-runtime')
     if args.password_runtime and not args.refresh_runtime:parser.error('--password-runtime requires --refresh-runtime')
     if args.password_editor and not args.refresh_runtime:parser.error('--password-editor requires --refresh-runtime')
     if args.room_effects and not args.refresh_runtime:parser.error('--room-effects requires --refresh-runtime')
@@ -1592,6 +1613,7 @@ if __name__=='__main__':
                             console_disk=args.console_disk,creature_items=args.creature_items,creature_field=args.creature_field,
                             creature_fish=args.creature_fish,creature_insects=args.creature_insects,clothing_batch=args.clothing_batch,
                             diaries=dict(zip(('core','ui','screen'),diary_paths)) if all(diary_paths) else None,
-                            diary_items=args.diary_items,diary_room_art=args.diary_room_art,diary_catalogue=args.diary_catalogue)
+                            diary_items=args.diary_items,diary_room_art=args.diary_room_art,diary_catalogue=args.diary_catalogue,
+                            npc_registry_art=args.npc_registry_art)
             if args.refresh_runtime else build(args.output,args.art,args.base_lock))
     print(json.dumps({k:result[k] for k in ('runtime_abi','output_sha256','patch_sha256')},indent=2))

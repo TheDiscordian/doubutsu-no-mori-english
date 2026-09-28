@@ -7,7 +7,7 @@ extern int af_surface_dma(void *,u32,u32);
 extern u32 af_surface_crc(const void *,u32);
 extern void af_surface_writeback(void *,u32),af_surface_invalidate(void *,u32);
 extern int af_surface_prior_init(void);
-#if defined(AF_INSECT_PHYSICAL) || defined(AF_DIARY_STORAGE_PHYSICAL)
+#if defined(AF_INSECT_PHYSICAL) || defined(AF_DIARY_STORAGE_PHYSICAL) || defined(AF_NPC_EXTRA_PHYSICAL)
 extern int af_surface_pi(u32,void *,u32);
 #endif
 
@@ -55,6 +55,9 @@ static const u32 diary_art_crc=AF_DIARY_ART_CRC;
 #ifdef AF_DIARY_ITEMS_PHYSICAL
 static const u32 diary_items_crc=AF_DIARY_ITEMS_CRC;
 #endif
+#ifdef AF_NPC_EXTRA_PHYSICAL
+static const u32 npc_extra_crc=AF_NPC_EXTRA_CRC;
+#endif
 
 #ifdef __mips__
 #define DEST(name,address) ((void *)(address))
@@ -68,6 +71,7 @@ extern unsigned char af_test_creature_code[],af_test_creature_field[],af_test_fi
 extern unsigned char af_test_insect_code[],af_test_clothing_code[];
 extern unsigned char af_test_diary_storage[],af_test_diary_ui[],af_test_diary_art[];
 extern unsigned char af_test_diary_items[];
+extern unsigned char af_test_npc_extra[];
 #define DEST(name,address) (af_test_##name)
 #define CLEAR(name,address) (&af_test_##name)
 #endif
@@ -121,12 +125,15 @@ static const struct StartupPacket packets[]={
 #ifdef AF_DIARY_ITEMS_PHYSICAL
     {DEST(diary_items,AF_DIARY_ITEMS_RAM),AF_DIARY_ITEMS_PHYSICAL|0x80000000u,AF_DIARY_ITEMS_BYTES,&diary_items_crc,0},
 #endif
+#ifdef AF_NPC_EXTRA_PHYSICAL
+    {DEST(npc_extra,AF_NPC_EXTRA_RAM),AF_NPC_EXTRA_PHYSICAL|0x80000000u,AF_NPC_EXTRA_BYTES,&npc_extra_crc,0},
+#endif
 };
 
 int af_v3_surface_init(void) {
     for (u32 i=0;i<sizeof(packets)/sizeof(*packets);i++) {
         const struct StartupPacket *p=packets+i;
-#if defined(AF_INSECT_PHYSICAL) || defined(AF_DIARY_STORAGE_PHYSICAL)
+#if defined(AF_INSECT_PHYSICAL) || defined(AF_DIARY_STORAGE_PHYSICAL) || defined(AF_NPC_EXTRA_PHYSICAL)
         int status=(p->source&0x80000000u)?
             af_surface_pi(p->source&0x7FFFFFFFu,p->destination,p->bytes):
             af_surface_dma(p->destination,p->source,p->bytes);
@@ -138,5 +145,13 @@ int af_v3_surface_init(void) {
         af_surface_invalidate(p->destination,p->bytes);
         if (p->clear) *p->clear=0;
     }
+#ifdef AF_NPC_EXTRA_PHYSICAL
+#ifdef __mips__
+    if(!((int (*)(void))AF_NPC_EXTRA_INIT)())return 0;
+#else
+    extern int af_test_npc_extra_init(void);
+    if(!af_test_npc_extra_init())return 0;
+#endif
+#endif
     return af_surface_prior_init();
 }
