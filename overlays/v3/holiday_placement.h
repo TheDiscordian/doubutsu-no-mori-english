@@ -44,5 +44,6 @@ int af_holiday_placement_show(const AFHolidayField *,const AFHolidayPlacementOps
 int af_holiday_placement_native_make(void *manager,unsigned int donor,unsigned int native_name,
     unsigned int donor_name,AFHolidayPlace **);
 int af_holiday_placement_native_show(void *manager,unsigned int donor,AFHolidayBlock *);
+int af_holiday_placement_native_show_id(void *manager,unsigned int donor,unsigned int id,AFHolidayBlock *);
 int af_holiday_placement_native_cull(unsigned int donor);
 #endif

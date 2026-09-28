@@ -919,6 +919,69 @@ The current-cartridge check verifies the new packet, retained data, all entry
 redirects, and startup descriptor/CRC. Browser/offline composition agrees for
 empty, mixed, and all-supported selections. No native fixture is restarted.
 
+### Reserved layouts and dedicated owners
+
+`tools/v3_holiday_maps.py` converts the complete donor event-layout graph and
+compiles all 14 dedicated owners through one native adapter. Preparation is
+`build/v3-diary-category-work-01/reserved-native-02/`; the actual cartridge remains
+ABI 321 at `tortimer-state-05`. No prepared owner is installed or enabled.
+
+The source directory contains 17 entries, including the explicit null Halloween
+map. Its 52 variants cover all seven pool shapes and 341 logical placements.
+Shared fishing layouts are deduplicated without removing logical entries.
+Every source pointer, relocation, resource extent, NPC mask, uniform, actor/
+decoration identity, and unit position is retained and checked. `AFHM` is a
+1,496-byte, big-endian packet with a 16-byte header and 20-byte directory rows;
+each placement is a source name followed by X/Z bytes. Source IDs are never
+implicitly treated as installed N64 IDs. Shrine layouts ignore pool shape;
+pool layouts reject an invalid shape instead of selecting another arrangement.
+
+The generator preserves 39 complete donor functions for the 14 owners, including
+the shared sports creation/deletion and culling functions. The only structural
+adaptation passes explicit context into the source's no-argument sports cleanup.
+Generated donor C stays in ignored build output with complete source/binary
+receipts. The committed compatibility layer routes primitive operations through
+caller-owned state; it does not cast donor manager/common structures onto N64.
+
+`holiday_dedicated_native.c` connects mapped status/keep operations, real native
+landmarks, reserved placement, foreground setup/removal, actor creation, effects,
+and both acre-entry paths. Five complete private owner functions and six complete
+core functions are checked before binding. Private calls resolve from the loaded
+manager descriptor rather than calling link-time overlay addresses. Missing
+identities reject explicitly. Strict foreground deletion retains placement and
+sets ERROR on failure; the donor's separate sports-cleanup variant clears its
+placement after the removal attempt. Those behaviours are not merged.
+
+The combined module is 10,304 bytes at `806F8800`; the map packet fits at
+`806FB800..806FBDD8`, below existing harvest dates and the packet guard. These
+are prepared destinations, not installed resources. The updated 4,480-byte
+placement module retains the shared search/observation implementation and adds
+an explicit placement-ID appearance entry. Its corrected game-context pointer
+is `8010EF90`, verified against both the native symbol and the signed-offset load
+at `8095E0D0`. The current ABI-321 module's `8011EF90` binding is wrong and remains
+behind the inactive actor gate. Installation must apply the correction and
+relink the shared owner and saved-state lifecycle; `maps.json` records all five
+affected public exports. Do not overwrite the placement code while retaining
+callers to moved function addresses.
+
+The adapter still requires checked installed identities, imported event-title
+transitions, the sports acre-transition lock and its player consumer, persistent
+imported common state, and live manager dispatch. The native title transition
+cannot safely receive additive event IDs while its text readers are unchanged.
+Control/effect identities must name their actual converted behaviour; a native
+counterpart's integer is not a completed imported controller. These requirements
+include costume, exercise/card, Miko, race-state production, event participants,
+and the specified calendar behaviour choice. No owner activation or diary
+selection is claimed until the connected path works.
+
+`tests/test_v3_holiday_maps.py` checks the complete layouts, all generated owner
+callbacks, actual adapter dispatch, distinct cleanup semantics, unavailable
+identities, indoor gates, malformed layouts, and native/source game-pointer
+agreement. The host check uses address/undefined sanitizers; native I/O and
+identity/title/player-lock providers are doubles. The MIPS build passes, with a
+160-byte largest new individual frame; total dynamic stack, native gameplay,
+and hardware remain unverified. The exhausted diary fixture is not restarted.
+
 ## Serialized diary state
 
 `AFDiary` is a 48,048-byte, endian-independent byte array:

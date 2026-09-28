@@ -55,7 +55,7 @@ OWNER_GUARDS=(
 )
 BINDINGS=dict(
     af_holiday_manager_descriptor=0x80101310,af_holiday_native_rtc=0x80136FBC,
-    af_holiday_native_clip=0x80136EEC,af_holiday_native_game=0x8011EF90,
+    af_holiday_native_clip=0x80136EEC,af_holiday_native_game=0x8010EF90,
     af_holiday_native_field_id=0x80087C88,af_holiday_native_bg_busy=0x80088F94,
     af_holiday_native_other=0x8008114C,af_holiday_native_unit=0x800AE110,
     af_holiday_native_collision=0x80089538,af_holiday_native_foreground=0x8008A33C,

@@ -190,11 +190,21 @@ readers cannot load new saves. Focused sanitized save/state/migration and curren
 cartridge checks pass; current browser/offline compositions agree.
 The native calendar caller uses this actual date/state provider and retains the
 existing camper/native dispatch. All four prepared profile callbacks are bound.
-The next consumers are the remaining event-specific owners and costume/exercise
-identities in the existing owner map, alongside the calendar behaviour choice.
-Complete these within the same category-wide path, retaining finished assets,
-conversations, placement, storage, and scheduling. Retain actor activation gates
-until the required event owners work. The race reader expects the mapped donor-15/id-8
+The complete event-specific owner callbacks, all shared reserved layouts, and
+their native primitive adapter are prepared together at
+`build/v3-diary-category-work-01/reserved-native-02/`. Reuse these resources and
+their passing sanitized checks. The next consumers are the checked source-to-
+installed actor/decoration/profile/effect identities, event-title/scene transition,
+sports acre-transition lock, and imported common-state lifetime/manager dispatch.
+Connect these to the prepared adapter, including the costume/exercise identities
+and calendar behaviour choice. Do not activate an owner whose required services
+are missing. This is the same diary-category task, not one task per event.
+The prepared placement module fixes the game-context pointer to `8010EF90`;
+ABI 321's inactive adapter still uses `8011EF90`. Install the corrected module
+and relink the shared owner and saved-state lifecycle against all five public
+exports recorded in `maps.json` before activation. Preserve the existing packet,
+save format, resources, and public entry callers. No native fixture is restarted.
+The race reader expects the mapped donor-15/id-8
 payload; the imported race owner still needs to produce it. Native event 10 is
 not a substitute for that owner.
 `af_holiday_world_bind` already supplies `af_holiday_world_variant`; reuse it.

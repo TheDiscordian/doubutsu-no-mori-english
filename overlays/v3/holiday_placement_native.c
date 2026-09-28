@@ -74,11 +74,14 @@ int af_holiday_placement_native_make(void *manager,u32 donor,u32 name,u32 donor_
     return af_holiday_placement_make(&f,&o,(u32)type,name,0x51,owner.kind,
         (int)(donor+donor_name+0x51),out);
 }
-int af_holiday_placement_native_show(void *manager,u32 donor,AFHolidayBlock *forward_block) {
+int af_holiday_placement_native_show_id(void *manager,u32 donor,u32 id,AFHolidayBlock *forward_block) {
     Native n;AFHolidayField f;AFHolidayPlacementOps o;
     int type=af_holiday_native_type(donor);
     if(type<0 || !bind(&n,manager,&f,&o))return 0;
-    return af_holiday_placement_show(&f,&o,(u32)type,0x51,forward_block);
+    return af_holiday_placement_show(&f,&o,(u32)type,id,forward_block);
+}
+int af_holiday_placement_native_show(void *manager,u32 donor,AFHolidayBlock *forward_block) {
+    return af_holiday_placement_native_show_id(manager,donor,0x51,forward_block);
 }
 int af_holiday_placement_native_cull(u32 donor) {
     int type=af_holiday_native_type(donor);

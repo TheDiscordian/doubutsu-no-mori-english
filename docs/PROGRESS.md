@@ -39,6 +39,21 @@ fish and eight insects, and 100 inactive furniture profiles whose acquisition
 is pending, plus sixteen inactive diary cover profiles. The main lock and both
 stable V2-14 deployments are unchanged.
 
+The remaining event-specific owners use one prepared adapter at
+`build/v3-diary-category-work-01/reserved-native-02/`. It carries the complete
+donor callbacks and layouts into native status, reserved placement, foreground
+setup/removal, actor creation, effects, and acre-entry handling. Both source
+cleanup variants are preserved. Focused sanitized host checks pass across all
+14 owners and 341 layout placements; native I/O and missing providers are doubles.
+The N64 compilation passes. This preparation is not installed: checked content
+identities, event-title transitions, the sports acre-transition lock, imported
+common-state lifetime, and manager dispatch remain to connect. No diary becomes
+selectable. The prepared placement module corrects its game-context binding to
+`8010EF90`; ABI 321 still contains the wrong `8011EF90` binding behind its inactive
+actor gate. Install that correction and relink its recorded callers together
+before activation. The [shared owner contract](../specs/V3_DIARIES.md#reserved-layouts-and-dedicated-owners)
+records the remaining connected work; no native fixture is restarted.
+
 The same diary category now has the connected holiday conversation, movement,
 calendar, and reward kernels installed with the actual native player/inventory/
 trophy bindings. All 65 donor reward candidates map to their installed records;
