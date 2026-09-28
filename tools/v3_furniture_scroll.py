@@ -258,6 +258,10 @@ def discover(source, name, at, functions):
 
 def bindings(adapter):
     """Expose only the complete model-local scroll dependency to the parser."""
+    if adapter.get('category')=='actor-model-assets':
+        # Complete actor discovery binds these against its drawing owner.
+        # parse_model checks segment, dimensions, texture order, and the call.
+        return adapter.get('model_scrolls',{})
     if adapter.get('category')=='dual-motion-scroll-rig-assets':
         rows=adapter['model_scrolls']
         if (sorted(r['segment'] for r in rows.values())!=[0x08000000,0x09000000,0x0A000000] or

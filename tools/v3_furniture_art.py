@@ -26,6 +26,13 @@ CONVERTER_VERSION = 19
 # These use one texture and retain source alpha; none introduces TEXEL1,
 # noise, keying, or an unprovided external render dependency.
 TRANSLUCENT_COMBINERS = {
+    # Event signs retain the donor's additive lighting and caller colours.
+    (0xFC127FFF,0xFFFCF238): ('TEXEL0','0','SHADE','TEXEL0','0','0','0','TEXEL0',
+        '0','0','0','COMBINED','0','0','0','COMBINED'),
+    (0xFC127E83,0xF5FCF238): ('TEXEL0','0','SHADE','TEXEL0','0','0','0','TEXEL0',
+        'SHADE','ENVIRONMENT','PRIMITIVE','COMBINED','0','0','0','COMBINED'),
+    (0xFC127E60,0xF5FCF378): ('TEXEL0','0','SHADE','TEXEL0','0','0','0','TEXEL0',
+        'PRIMITIVE','ENVIRONMENT','COMBINED','ENVIRONMENT','0','0','0','COMBINED'),
     # Creature fading: texture alpha is multiplied by the caller's environment
     # alpha, independently of primitive colour and second-cycle lighting.
     (0xFC119A04,0xFFFFFFF8): ('TEXEL0','0','PRIMITIVE','0','TEXEL0','0','ENVIRONMENT','0',
@@ -60,6 +67,8 @@ FRAME_BLEND_COMBINERS = {
 # Scrolling models supply every referenced tile, with the second cycle's texture
 # input retaining the second tile. Expressions match the donor model sources.
 SCROLL_COMBINERS = {
+    (0xFCFF95FF,0xFF0DFE3F): ('0','0','0','PRIMITIVE','TEXEL0','0','TEXEL1','0',
+        '0','0','0','COMBINED','COMBINED','0','PRIMITIVE','0'),
     # Both scrolling intensity layers contribute alpha; actor primitive alpha
     # fades the combined colony without replacing either complete texture.
     (0xFCFFE3FF,0xFF0DF43F): ('0','0','0','PRIMITIVE','1','0','TEXEL0','TEXEL1',
@@ -277,7 +286,7 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
                 campfire_body=False, fire_effect=0, school=False, static_materials=False,
                 palette_bindings=None, palette_fade=False, joint_matrices=0,
                 inherited_palette_slot=None, inherited_vertices=0, material_bindings=None, scrolling=None,
-                texture_bindings=None):
+                texture_bindings=None, vertex_bindings=None, independent_material_frames=False):
     """Decode supported static materials and explicit dynamic dependencies, never GX loads."""
     if not raw or len(raw) % 8 or sum(map(bool, (speed_bag, accessory, mirrored_s,
                                               garden, western, large_western, water, camping,
@@ -285,6 +294,12 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
         raise ValueError('Incomplete furniture display list')
     palette_bindings = {} if palette_bindings is None else palette_bindings
     texture_bindings={} if texture_bindings is None else texture_bindings
+    vertex_bindings={} if vertex_bindings is None else vertex_bindings
+    if vertex_bindings and (not static_materials or inherited_vertices or joint_matrices or
+            len(vertex_bindings)!=1 or any(address not in (0x08000000,0x09000000,0x0A000000)
+                or target!=vertex for address,target in vertex_bindings.items()) or
+            set(vertex_bindings)&(set(palette_bindings)|set(texture_bindings))):
+        raise ValueError('Invalid complete projected-vertex binding')
     if inherited_palette_slot is not None and (
             type(inherited_palette_slot) is not int or not 0 <= inherited_palette_slot <= 15
             or not static_materials or palette or palette_bindings or palette_fade):
@@ -297,14 +312,17 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
             or joint_matrices and not static_materials):
         raise ValueError('Joint matrices require a bounded shared skeleton material')
     material_bindings={} if material_bindings is None else material_bindings
-    if scrolling is not None and (not static_materials or material_bindings or palette_fade or palette_bindings or
+    if scrolling is not None and (not static_materials or material_bindings or palette_fade or
+            scrolling.get('segment') in palette_bindings or
             inherited_palette_slot is not None or set(scrolling)!={'segment','dimensions'} or
             scrolling['segment'] not in (0x08000000,0x09000000,0x0A000000) or
             not 1<=len(scrolling['dimensions'])<=2 or
             any(len(shape)!=2 or any(type(n) is not int or n<8 or n>64 or n&(n-1) for n in shape)
                 for shape in scrolling['dimensions'])):
         raise ValueError('Invalid complete scrolling-material binding')
-    if material_bindings and (not static_materials or palette_fade or palette_bindings or
+    if material_bindings and (not static_materials or palette_fade or
+            (palette_bindings and not independent_material_frames) or
+            set(material_bindings)&(set(palette_bindings)|set(vertex_bindings)) or
             inherited_palette_slot is not None or
             any(address not in (0x08000000,0x09000000) or kind not in ('texture','palette') or
                 type(target) is not int or target<0
@@ -312,21 +330,24 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
         raise ValueError('Invalid dynamic material-frame bindings')
     if palette_fade and (not static_materials or palette_bindings):
         raise ValueError('Palette fade requires the shared materials and no constant binding')
-    if palette_bindings and (not static_materials or not set(palette_bindings)<={0x08000000,0x09000000}
+    if palette_bindings and (not static_materials or not set(palette_bindings)<={0x08000000,0x09000000,0x0A000000}
                              or any(p not in palette for p in palette_bindings.values())):
         raise ValueError('Unsupported constant furniture palette binding')
     if texture_bindings and (not static_materials or material_bindings or palette_fade or scrolling or
             inherited_palette_slot is not None or not set(texture_bindings)<={0x08000000,0x09000000} or
             set(texture_bindings)&set(palette_bindings) or any(p not in textures for p in texture_bindings.values())):
         raise ValueError('Unsupported constant furniture texture binding')
-    result, used = [], set()
+    result, used, used_vertices = [], set(), set()
     at, loaded, first_vertex, material, have_palette = (
         0, inherited_vertices, 0, None, inherited_palette_slot is not None)
     material_wrap, material_direct = None, False
     vertex_cache = [None]*32
     fire_tiles, fire_scroll = 0, False
     scroll_tiles, scroll_call, scroll_tmem, scroll_format = 0, False, 0, None
-    frame_blend = (set(material_bindings)=={0x08000000,0x09000000} and
+    if independent_material_frames and (not material_bindings or
+            any(kind!='texture' for kind,_ in material_bindings.values())):
+        raise ValueError('Independent frames require complete texture banks')
+    frame_blend = (not independent_material_frames and set(material_bindings)=={0x08000000,0x09000000} and
                    all(kind=='texture' for kind,_ in material_bindings.values()))
     frame_tiles, frame_tmem, frame_combiner = 0, 0, False
     while at < len(raw):
@@ -357,6 +378,11 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
             if start+at+4 in pointers:
                 raise ValueError('Constant furniture texture binding also has a relocation')
             row.update(target=texture_bindings[b],bound_segment=b)
+        elif op == 0x01 and b in vertex_bindings:
+            if start+at+4 in pointers:
+                raise ValueError('Projected vertices also have a data relocation')
+            row.update(target=vertex_bindings[b],dynamic_vertices=b)
+            used_vertices.add(b)
         elif op in (0xF0, 0xFD, 0x01):
             fixup = start + at + 4
             if b or fixup not in pointers:
@@ -576,7 +602,7 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
             modes = ((0xC81049D8 if fire_effect == 1 else 0xC8104A50,) if fire_effect else
                 (0xC8104A50,) if water else ((0xC8112078, 0xC8113078)
                 if accessory else (0xC8113078, 0xC8104DD8)))
-            if static_materials: modes += (0xC8104A50,0xC81049D8)
+            if static_materials: modes += (0xC8104A50,0xC81049D8,0xC8104E50)
             if frame_blend or scrolling: modes += (0xC8104B50,)
             if a != 0xE200001C or b not in modes:
                 raise ValueError('Unsupported furniture render mode')
@@ -674,6 +700,8 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
         raise ValueError('Furniture model lacks triangles or termination')
     if used != set(pointers):
         raise ValueError('Unaccounted furniture data relocation')
+    if used_vertices != set(vertex_bindings):
+        raise ValueError('Unused projected-vertex binding')
     if fire_effect and (fire_tiles != 2 or not fire_scroll):
         raise ValueError('Incomplete two-texture fire effect')
     if scrolling and not scroll_call:raise ValueError('Unused dynamic scroll binding')
@@ -937,7 +965,12 @@ def command_source(models, offsets):
                 slot=row.get('vertex_slot',0)
                 if not 0 <= slot <= 32-row['count']:
                     raise ValueError('Native vertex load escapes the cache')
-                emit(f"gsSPVertex(0x{SEGMENT + target:08X}, {row['count']}, {slot})")
+                address=SEGMENT+target
+                if 'dynamic_vertices' in row:
+                    address=row['dynamic_vertices']
+                    if address not in (0x08000000,0x09000000,0x0A000000) or first:
+                        raise ValueError('Unreviewed projected vertex segment')
+                emit(f"gsSPVertex(0x{address:08X}, {row['count']}, {slot})")
             elif op == 0x0A:
                 triangles = row['triangles']
                 for i in range(0, len(triangles), 2):

@@ -26,6 +26,25 @@ import v3_feng_shui as feng
 
 
 class FormatTests(unittest.TestCase):
+    def test_projected_vertices_keep_caller_segment_and_reject_unsafe_bindings(self):
+        raw,pointers=fixture();raw=bytearray(raw)
+        loads=[p for p in range(0,len(raw),8) if raw[p]==1]
+        self.assertEqual(len(loads),1)
+        at=loads[0];target=pointers.pop(0x100+at+4)
+        struct.pack_into('>I',raw,at+4,0x08000000)
+        def parse(bindings=None,fixups=None,size=48):
+            return parse_model(raw,0x100,pointers if fixups is None else fixups,
+                (0x500,),{0x600:(32,32)},0x1000,size,static_materials=True,
+                vertex_bindings={0x08000000:target} if bindings is None else bindings)
+        rows=parse()
+        code,_=command_source({'opaque':{'rows':rows}},{0x500:0,0x600:32,0x1000:544})
+        self.assertIn('gsSPVertex(0x08000000, 3, 0)',code)
+        for bindings in ({},{0x07000000:target},{0x08000000:target+16}):
+            with self.assertRaises(ValueError):parse(bindings)
+        with self.assertRaises(ValueError):parse(size=32)
+        with self.assertRaisesRegex(ValueError,'also have a data relocation'):
+            parse(fixups={**pointers,0x100+at+4:target})
+
     def test_constant_texture_and_palette_bindings_preserve_native_resources(self):
         raw,pointers=fixture();raw=bytearray(raw)
         struct.pack_into('>I',raw,0x1C,0x09000000);pointers.pop(0x11C)

@@ -13,6 +13,61 @@ from apply_translation import write_new
 
 
 class HolidayMapsTests(unittest.TestCase):
+    def test_complete_decoration_batch_and_current_cartridge(self):
+        import json
+        import struct
+        from aflib import by_vrom, CODE_VROM, sha256
+        from v3_furniture_install import inputs
+        from v3_holiday_structures import Source, PREPARED, prepared_packet, plans, discover
+        source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+            (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+        data,art=prepared_packet(source,PREPARED)
+        current=ROOT/'build/v3-diary-category-work-01/decorations-installed-01'
+        image,report=inputs(current/'build-lock.json')
+        installed=report['equipment_resources']['npc_extra']['events']['decorations']
+        resource=installed['packet'];at=resource['physical']
+        self.assertEqual(image[at:at+resource['bytes']],data)
+        self.assertEqual(sha256(data),resource['sha256'])
+        self.assertEqual((len(art['bindings']),len(art['owners']),len(art['objects'])),(18,11,32))
+        self.assertFalse(installed['actors_installed']);self.assertFalse(installed['selectable'])
+        # Check newly emitted native commands against the complete parsed
+        # source, not merely a checksum produced by the same emitter.
+        batch,_=plans(source,discover(source))
+        for plan,obj in zip(batch,art['objects'],strict=True):
+            asset=data[obj['packet_offset']:obj['packet_offset']+obj['object_bytes']]
+            for model in obj['models']:
+                first=model['native_offset'];last=first+model['bytes']
+                words=list(struct.iter_unpack('>II',asset[first:last]))
+                parsed=plan['prepared'][4][model['layer']]['rows']
+                for op in (0xFC,0xE2):
+                    self.assertEqual([r for r in words if r[0]>>24==op],
+                        [tuple(r['words']) for r in parsed if r['opcode']==op])
+                dynamic=[r['dynamic_vertices'] for r in parsed if 'dynamic_vertices' in r]
+                self.assertEqual([b for a,b in words if a>>24==1 and b>>24==8],dynamic)
+                self.assertEqual(sum(2 if a>>24==6 else 1 if a>>24==5 else 0 for a,b in words),
+                    sum(len(r.get('triangles',[])) for r in parsed))
+                self.assertEqual(words[-1],(0xDF000000,0))
+        rigs=[r for r in art['objects'] if r['rig']]
+        self.assertEqual(len(rigs),2)
+        for row in rigs:
+            self.assertIn('animations',row['rig'])
+        digit=next(r for r in rigs if r['draw_context']['callback_adapter'].get('material_frames'))
+        frames=digit['draw_context']['callback_adapter']['material_frames']
+        self.assertEqual([r['segment_address'] for r in frames],[0x08000000,0x09000000])
+        self.assertEqual([len(r['frames']) for r in frames],[10,10])
+        self.assertEqual(len([r for r in digit['resources'] if r['kind']=='texture']),10)
+        corrected=[s for o in art['owners'].values() for s in o['shadows'] if s['source_count_exceeds_arrays']]
+        self.assertEqual([(s['source_count'],s['projection_count']) for s in corrected],[(10,7)])
+        # A resource-only stage changes no native owner, resident packet,
+        # saved field, or profile. Reading the predecessor is not executing it.
+        previous=ROOT/'build/v3-diary-category-work-01/state-transition-connected-01'
+        base,old=inputs(previous/'build-lock.json')
+        self.assertEqual(report['save_codec'],old['save_codec'])
+        self.assertEqual(by_vrom(image)[CODE_VROM].extract(image),by_vrom(base)[CODE_VROM].extract(base))
+        for key in ('npc_extra','holiday_state'):
+            p=old['equipment_resources'][key]['packet'];first=p['physical'];last=first+p['bytes']
+            self.assertEqual(image[first:last],base[first:last])
+
     def test_native_binding_contract(self):
         from v3_holiday_maps import native_contract
         from v3_furniture_install import inputs

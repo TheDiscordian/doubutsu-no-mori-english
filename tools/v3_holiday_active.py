@@ -73,6 +73,9 @@ def patch_core(core,entry):
 
 
 def install(base,prior,blob,core,output):
+    if prior['equipment_resources']['npc_extra']['events'].get('transition'):
+        from v3_holiday_structures import install as install_decorations
+        return install_decorations(base,prior,output)
     if prior['equipment_resources']['npc_extra']['events'].get('active'):
         return install_transition(base,prior,output)
     del blob

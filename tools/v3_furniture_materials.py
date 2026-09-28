@@ -103,7 +103,8 @@ def discover(source,name,at,functions):
 
 def bindings(adapter):
     """Require complete typed frame records before exposing dynamic segments."""
-    if adapter.get('category') not in (CATEGORY,RIG_CATEGORY,EFFECT_RIG_CATEGORY):return {}
+    if adapter.get('category')=='actor-model-assets' and not adapter.get('material_frames'):return {}
+    if adapter.get('category') not in (CATEGORY,RIG_CATEGORY,EFFECT_RIG_CATEGORY,'actor-model-assets'):return {}
     result={}
     for row in adapter['material_frames']:
         address=row['segment_address']

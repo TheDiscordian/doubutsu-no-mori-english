@@ -31,13 +31,31 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
-The current proposal is ABI 324 at
-`build/v3-diary-category-work-01/state-transition-connected-01/build-lock.json`, ROM SHA-256
-`f0ebfca14ccd00431ea75b402b52e79e2916cdfcb42f1a52a68626a48ad62408`.
+The current proposal is ABI 325 at
+`build/v3-diary-category-work-01/decorations-installed-01/build-lock.json`, ROM SHA-256
+`2e9b515dd7bfafbebd3b36d1fa974481e99798b8d84541a5b29492650a9edc9a`.
 It contains 191 independently selectable development imports, including all nine
 fish and eight insects, and 100 inactive furniture profiles whose acquisition
 is pending, plus sixteen inactive diary cover profiles. The main lock and both
 stable V2-14 deployments are unchanged.
+
+The complete eighteen-decoration event batch is converted and stored through
+the shared model pipeline: eleven source owners, both countdown rigs and their
+motions, every digit texture, seasonal palettes, and projected shadows. The
+135,520-byte cartridge resource includes twelve complete projection-flag arrays.
+One compiler invocation handles the entire batch; installation reuses its output.
+The right fireworks-stall descriptor records a bounded seven-vertex projection
+instead of the donor's ten reads from seven-entry arrays. Native owner behaviours,
+additive identity/loading/drawing, and event activation remain unfinished; these
+are stored resources, not newly playable events or diaries.
+
+Five focused changed-format/source/current-cartridge checks pass, covering
+complete compiled geometry, source colour expressions, dynamic vertices, digit
+banks, rig relocation, and retained native code/resident packets/save data.
+Current private browser/offline empty, mixed, and all-supported compositions agree.
+No native fixture or old build is executed. The
+[decoration contract](../specs/V3_DIARIES.md#shared-event-decoration-resources)
+records the actual source/native layout differences and the next connected owner.
 
 The shared hourly event path connects the donor sports-ending rules, original
 N64/camper activation and cleanup, and persistent transient sports state. Both

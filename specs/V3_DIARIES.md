@@ -1027,8 +1027,8 @@ and every unfinished diary still unavailable.
 
 `tools/v3_holiday_transition.py` prepares the complete shared collision, escape,
 and fade path at `build/v3-diary-category-work-01/transition-native-06/`. The same
-code is installed in the ABI-324 proposal at
-`build/v3-diary-category-work-01/state-transition-connected-01/`. It compiles
+code is installed in the ABI-325 proposal at
+`build/v3-diary-category-work-01/decorations-installed-01/`. It compiles
 six whole donor functions, including `title_fade`, `player_lap_check`, and
 `mEvMN_CheckLapPlayer`, through an explicit normalized context. The two complete
 escape-offset arrays are checked against actual donor relocations and data:
@@ -1116,6 +1116,68 @@ Both checks pass. Browser/offline output agrees for empty, mixed, and all-suppor
 selections. No native scene/event execution, hardware test, owner activation,
 or newly playable diary is claimed. Save format twelve and diary schema two
 remain unchanged; older V2/format-eleven readers cannot read these saves.
+
+### Shared event-decoration resources
+
+`tools/v3_holiday_structures.py` discovers every structure in the actual seventeen
+donor layouts through the complete 83-row `aSTR_setupActor_proc` directory. All
+eighteen names resolve to eleven complete actor profiles. Source callbacks,
+included drawing/movement files, shadow descriptors, and layout membership stay
+attached to the resulting records. The preparation at
+`build/v3-diary-category-work-01/decorations-01/` contains 32 deduplicated native
+objects, compiled together through the existing model converter.
+
+The batch retains both countdown skeletons and complete animations, both
+independently selected ten-frame digit banks, all seasonal palette selections,
+the two-layer scrolling spotlight, complete opaque/translucent streams, and
+projected shadows. Actual empty donor streams remain terminal returns. Shared
+format support binds projected vertices to the caller's segment, distinguishes
+independently selected textures from blended texture layers, and supports the
+separate segment-ten palette. Source colour expressions and native commands
+are compared in the focused check, including all triangles and model returns.
+
+The right fireworks stall's source shadow descriptor requests ten projections,
+but its vertex and adjustment arrays each contain seven entries. Its converted
+contract preserves both complete arrays and all model geometry, records the
+source count, and limits projection to seven entries. The native owner must
+consume `projection_count`, not repeat the source out-of-bounds loop. This is a
+bounds correction, not omitted artwork or a gameplay behaviour choice.
+
+The ordinary holiday-services refresh installs the prepared objects and twelve
+projection-flag arrays as `holiday-decorations-GAFE01-r0`: 135,520 bytes, SHA-256
+`89d6a15d6fb339273fefa0e03b77c4c2edcb29007262d19b4bcde9221c12593b`.
+It reconstructs and checks the prepared objects without compiling again. No
+resident reservation, actor callback, profile bit, saved field, or public patcher
+changes. Artwork storage does not establish working decoration actors. The
+current proposal retains save format twelve and diary schema two; ordinary
+native execution, reload, and hardware remain unverified.
+
+Continue the connected actor path through the existing structure owner:
+VROM `008CB690`, RAM `809E7ED0`, relocation `008CD350`. Its setup pointer at
+`809E93F8/809E9400` already calls `af_v3_campsite_structure_setup`; preserve that
+chain and campsite identity `5849`. Reuse the shared structure segment/instance
+allocation and checked complete resources. Port the real constructors, collision,
+movement, drawing, destruction, and interactions, including Harvest-table fork
+handling, radio/exercise participation, countdown control, and fishing ownership.
+Do not activate an actor with only artwork or alias it to a native actor with
+different event semantics.
+
+The original native event-layout directory has fifteen types at `80105030` and
+fifteen pointers at `801055E8`. Its readers are `80081E60..80082168`; the existing
+disassembly is `build/v3-diary-category-work-01/native-core-map/code.asm`.
+Native radio `582B` differs from donor `582C`; native fireworks stalls `582C/D`
+differ from donor `582D/E`. Native Goza `582A` is one picnic blanket, whereas
+donor `582A/B` are two tables. Several donor layouts add Tortimer or replace
+participants. Native moon owners 21 and 22 are distinct native calendar events;
+neither is a verified alias for donor meteor owner 37. Preserve the native graph
+for native events and use checked donor-to-destination identities for imported
+owners. Positional zipping or numeric passthrough would spawn unrelated objects.
+
+Five focused checks cover the new format paths and complete current cartridge
+resource. Private browser/offline empty, mixed, and all-191 compositions agree.
+The same unfinished diary category still includes owner connections, native/source
+ACTIVE resolution, scene-state services, actual attendance, and calendar choice.
+No native fixture is restarted, and the existing harness budget is retained.
 
 ## Serialized diary state
 

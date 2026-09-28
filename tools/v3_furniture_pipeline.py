@@ -806,6 +806,7 @@ def prepare_models(source, descriptor):
             for frame in frames['frames']:
                 palettes[frame['donor_offset']]=frame['symbol'],frame['bytes']
     bindings, used_bindings = descriptor.get('palette_bindings', {}), set()
+    vertex_bindings=descriptor.get('vertex_bindings',{})
     texture_bindings,used_textures=adapter.get('texture_bindings',{}),set()
     for label, (name, at, n) in descriptor['models'].items():
         model_vertices[label] = set(vertex_arrays) if inherited_vertices else set()
@@ -840,6 +841,9 @@ def prepare_models(source, descriptor):
                 elif op == 0xFD and b in texture_bindings:
                     if target is not None:raise ReviewRequired('relocated constant texture binding')
                     target=texture_bindings[b];used_textures.add(b)
+                elif op == 0x01 and b in vertex_bindings:
+                    if target is not None:raise ReviewRequired('Relocated projected vertex binding')
+                    target=vertex_bindings[b]
                 elif target is None or b: raise ReviewRequired('missing model dependency relocation')
                 symbol, start, size = source.containing(target, exact=op != 0x01)
                 if source.pointers(start, size): raise ReviewRequired('pointer-bearing texture or vertex array')
@@ -919,6 +923,8 @@ def prepare_models(source, descriptor):
                 palette_bindings=bindings, texture_bindings=texture_bindings, palette_fade=fading,
                 joint_matrices=matrices, inherited_palette_slot=inherited_palette,
                 inherited_vertices=inherited_vertices,
+                vertex_bindings=vertex_bindings,
+                independent_material_frames=adapter.get('independent_material_frames',False),
                 scrolling=scrolling.get(label),
                 material_bindings={address:(row['kind'],row['frames'][0]['donor_offset'])
                                    for address,row in material_frames.items()}))
