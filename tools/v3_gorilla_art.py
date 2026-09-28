@@ -40,8 +40,16 @@ def load_object(directory, rom, rel, symbols):
     return data, report
 
 
-def convert_commands(raw, start, pointers, vertex, vertex_bytes):
-    """Translate the reviewed gorilla subset, retaining partial vertex loads."""
+def convert_commands(raw, start, pointers, vertex, vertex_bytes, *,
+                     streamed_textures=None, matrix_count=12):
+    """Translate the shared NPC mesh form, retaining partial vertex loads.
+
+    Existing atlas callers retain their exact output. Streamed callers bind
+    every texture address and load it per material instead of trimming artwork
+    to fit the native 2-KiB atlas.
+    """
+    if not 1<=matrix_count<=26 or streamed_textures is not None and not streamed_textures:
+        raise ValueError('Invalid complete NPC texture/matrix bindings')
     # Decode the entire cache/face stream first so no unloaded vertex or missing
     # resource can reach generated native commands.
     decoded = faces(raw, donor=True, vertex_start=vertex, vertex_bytes=vertex_bytes,
@@ -49,10 +57,10 @@ def convert_commands(raw, start, pointers, vertex, vertex_bytes):
     values, count, state = ['    gsDPPipeSync(),'], 1, {}
     at, materials = 0, []
 
-    def emit(value):
+    def emit(value, words=1):
         nonlocal count
         values.append('    '+value+',')
-        count += 1
+        count += words
 
     while at < len(raw):
         a, b = struct.unpack_from('>II', raw, at)
@@ -61,32 +69,50 @@ def convert_commands(raw, start, pointers, vertex, vertex_bytes):
             width, height, fmt, depth = model_texture_shape(raw[at:at+8])
             pair, zero = struct.unpack_from('>II', raw, at+8)
             segment, source = b >> 24, b & 0xFFFFFF
-            expected = BODY_TILES.get(source) if segment == 11 else MUTABLE_TILES.get(segment)
+            expected = (streamed_textures.get(b) if streamed_textures is not None else
+                        BODY_TILES.get(source) if segment == 11 else MUTABLE_TILES.get(segment))
             if (expected is None or segment != 11 and source or expected[1:] != (width, height)
                     or fmt != 2 or depth or zero):
                 raise ValueError('Unreviewed gorilla texture identity or dimensions')
             palette = 14 if segment == 10 else 15
             modes = (pair >> 10 & 3, pair >> 8 & 3)
             if (pair != 0xD2F00000 | palette << 12 | modes[0] << 10 | modes[1] << 8
-                    or modes not in ((0, 0), (0, 2), (1, 1))
+                    or (any(v>2 for v in modes) if streamed_textures is not None else
+                        modes not in ((0, 0), (0, 2), (1, 1)))
                     or segment == 10 and modes != (1, 1)):
                 raise ValueError('Unreviewed gorilla palette, wrapping, or coordinate shifts')
             extent = ((width-1)*4, (height-1)*4)
             step = 16
             if at+24 <= len(raw) and u32(raw, at+16) >> 24 == 0xF2:
                 first, last = struct.unpack_from('>II', raw, at+16)
-                if first != 0xF2000000 or last not in (0x3C03C, 0x7C03C, 0xFC07C):
+                if first != 0xF2000000 or (last>>24 if streamed_textures is not None else
+                        last not in (0x3C03C, 0x7C03C, 0xFC07C)):
                     raise ValueError('Unreviewed gorilla explicit tile extent')
                 extent = last >> 12 & 4095, last & 4095
                 step += 8
             wrap = {0: 'G_TX_CLAMP', 1: 'G_TX_WRAP', 2: 'G_TX_MIRROR | G_TX_WRAP'}
-            emit('gsDPPipeSync()')
-            emit(f'gsDPSetTile(G_IM_FMT_CI, G_IM_SIZ_4b, {width//16}, {expected[0]//8}, '
-                 f'G_TX_RENDERTILE, {palette}, {wrap[modes[1]]}, {height.bit_length()-1}, 0, '
-                 f'{wrap[modes[0]]}, {width.bit_length()-1}, 0)')
-            emit(f'gsDPSetTileSize(G_TX_RENDERTILE, 0, 0, {extent[0]}, {extent[1]})')
-            materials.append({'source': b, 'tmem': expected[0], 'width': width, 'height': height,
-                              'palette': palette, 'wrap': modes, 'extent': extent})
+            command_offset=count*8
+            if streamed_textures is None:
+                emit('gsDPPipeSync()')
+                emit(f'gsDPSetTile(G_IM_FMT_CI, G_IM_SIZ_4b, {width//16}, {expected[0]//8}, '
+                     f'G_TX_RENDERTILE, {palette}, {wrap[modes[1]]}, {height.bit_length()-1}, 0, '
+                     f'{wrap[modes[0]]}, {width.bit_length()-1}, 0)')
+                emit(f'gsDPSetTileSize(G_TX_RENDERTILE, 0, 0, {extent[0]}, {extent[1]})')
+            else:
+                if expected[0]>>24 not in (7,8,9,10) or width&(width-1) or height&(height-1):
+                    raise ValueError('Unbounded streamed NPC texture or non-power-of-two tile')
+                # A material can follow triangles in the same list. Retire
+                # those primitives before replacing the texture in TMEM.
+                emit('gsDPPipeSync()')
+                command_offset=count*8
+                emit(f'gsDPLoadTextureBlock_4b(0x{expected[0]:08X}, G_IM_FMT_CI, '
+                     f'{width}, {height}, {palette}, {wrap[modes[0]]}, {wrap[modes[1]]}, '
+                     f'{width.bit_length()-1}, {height.bit_length()-1}, 0, 0)',7)
+                if extent!=((width-1)*4,(height-1)*4):
+                    emit(f'gsDPSetTileSize(G_TX_RENDERTILE, 0, 0, {extent[0]}, {extent[1]})')
+            materials.append({'source': b, 'tmem': expected[0] if streamed_textures is None else 0,
+                'width': width, 'height': height, 'palette': palette, 'wrap': modes, 'extent': extent,
+                **({'texture_address':expected[0],'command_offset':command_offset} if streamed_textures is not None else {})})
         elif op == 1:
             n, end = a >> 12 & 255, (a & 255)//2
             offset = pointers[start+at+4]-vertex
@@ -102,18 +128,29 @@ def convert_commands(raw, start, pointers, vertex, vertex_bytes):
                 else:
                     emit('gsSP1Triangle('+', '.join(map(str, (*triangles[i], 0)))+')')
         elif op == 0xDA:
-            if a != 0xDA380003 or b >> 24 != 13 or b & 63 or b & 0xFFFFFF >= 12*64:
-                raise ValueError('Gorilla matrix is outside the twelve visible-joint matrices')
+            if a != 0xDA380003 or b >> 24 != 13 or b & 63 or b & 0xFFFFFF >= matrix_count*64:
+                raise ValueError('NPC matrix is outside the available visible-joint matrices')
             emit(f'gsSPMatrix(0x{b:08X}, G_MTX_NOPUSH | G_MTX_LOAD | G_MTX_MODELVIEW)')
         elif op in (0xD7, 0xD9, 0xE2, 0xFC, 0xFA):
             expected = {0xD7: (0xD7000002, 0), 0xD9: (0xD9000000, 0x230405),
                         0xE2: (0xE200001C, 0xC8112078), 0xFC: (0xFC127E60, 0xFFFFF3F8),
                         0xFA: (0xFA000080, 0xFFFFFFFF)}[op]
-            if (a, b) != expected:
-                raise ValueError('Unreviewed gorilla render state')
+            allowed = {expected}
+            if streamed_textures is not None:
+                # Double-sided parts clear CULL_BACK; translucent-edge parts
+                # retain the donor's alpha-to-coverage bit. Both states use
+                # the same native F3DEX2/RDP fields as the ordinary NPC state.
+                if op == 0xD9:
+                    allowed.add((0xD9000000, 0x230005))
+                elif op == 0xE2:
+                    allowed.add((0xE200001C, 0xC8113078))
+            if (a, b) not in allowed:
+                raise ValueError(f'Unreviewed NPC render state {a:08X}/{b:08X}')
             # Repeated identical settings within one list have no intervening
             # command that changes that state. Every list still sets its own state.
             if state.get(op) != (a, b):
+                if streamed_textures is not None and op in (0xE2, 0xFC, 0xFA) and op in state:
+                    emit('gsDPPipeSync()')
                 if op == 0xD7:
                     emit('gsSPTexture(0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_ON)')
                 else:

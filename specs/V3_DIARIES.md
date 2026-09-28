@@ -310,6 +310,74 @@ calendar query separately matches the actual donor calendar C, including all
 event IDs and out-of-window dates. Existing selector/handover checks pass for
 the changed shared selector. These are host results, not native conversations.
 
+### Tortimer artwork and native actor connection
+
+The shared streamed-NPC converter prepares Tortimer's complete model at
+`build/v3-diary-category-work-01/tortimer-art-04/`: 9,456 model bytes and 4,128
+texture bytes, within the native `2800`/`1620` hex NPC buffers. All 325 vertices,
+256 ordered faces, 26 joints, 14 displayed parts, twelve body tiles, and eight
+eye expressions are retained. Donor draw rows 348, 354, 358, 365, and 373 share
+these exact resources. No character, native model, or original texture is replaced.
+
+`tools/v3_npc_stream_art.py` extends the existing mesh conversion rather than
+flattening the rig. Each material loads its complete CI4 texture. Body textures
+use segment seven; the current eye/mouth use segments eight/nine. Source mirror,
+wrap, explicit extents, alpha-to-coverage, and double-sided parts are retained.
+The mouth's reference to the later head matrix is valid: all CPU-generated
+matrices exist before the RSP executes the task. Pipe synchronization precedes
+each material replacement. Existing atlas conversion retains its checked output.
+
+Native drawing preloads **4 KiB**, not 2 KiB: `FD900000` and `F3000000/077FF000`
+describe 2,048 16-bit transfer units. The converted bank stores its palette first,
+body at offset 32, expressions next, and checked final padding. The entire native
+preload therefore stays within the bank without dropping any source pixels.
+Per-material loads replace that temporary atlas before the actual mesh draws.
+
+`npc_stream_draw.c` retains the six-argument skeleton ABI and chains through the
+installed accessory entry `80473100`. Its actor texture fields are **segment-six
+offsets**, not CPU pointers. The actual bank comes from actor `+708` and the native
+`game + 110 + slot * 54` object record. The adapter checks bank identity/readiness,
+size, expressions, and command capacity, emits the current body/face bindings,
+and restores both opaque and translucent segment state. Ordinary NPCs take the
+unchanged accessory path. Native record generation retains donor flags, scale,
+collision dimensions, and full voice 281; assigning the actor and object-bank
+identities still belongs to the additive registry installation.
+
+`tools/v3_npc_stream_runtime.py` checks both complete current-ROM renderers and
+their existing accessory calls at `80978654` and `8099A2E0`. Only the JAL changes;
+the actor argument in the delay slot and both relocation tables remain. The
+prepared VR4300 object at `build/v3-diary-category-work-01/tortimer-draw-04/`
+has a 120-byte maximum local frame and one explicit unresolved dependency,
+`af_v3_npc_stream_record`. It is not linked or installed. No new native fixture
+is run and the existing diary test budget remains exhausted.
+
+Six focused source/current-cartridge/host checks pass: complete pixel and
+ordered-face preservation, texture-transfer bounds, native draw/config records,
+both caller patches, all expression choices, ordinary fallback, original argument
+forwarding, insufficient-space rejection, and state restoration. The shared
+atlas converter's existing checked command output is unchanged. These checks
+do not prove native rendering, animation, conversation, or playable diaries.
+
+Continue the same category with the actual actor and event connection. The native
+NPC prefix is `93C` bytes; do not cast the donor's `994`-byte NPC onto it. The native
+clip pointer is at `80136EEC`, installed by `80980D74` in the retained NPC owner.
+Its constructor map in `build/disassembly/npc-animation/code.asm` provides:
+
+| Native clip offset | Consumer |
+| --- | --- |
+| `BC`, `C0`, `C4` | Birth check, constructor, destructor |
+| `C8`, `CC`, `D0`, `E4` | Save, init, move, draw |
+| `F8`, `FC`, `100` | Action request, head request, talk demo |
+| `104`, `108`, `10C` | Animation init, schedule change, destination position |
+
+These offsets are not the donor clip layout. The cane uses the donor's shared
+`aNPC_SUB_ANIM_TUE` channel and `cKF_ba_r_npc_1_tue1` (64-byte NPC motion record,
+donor animation index `F3`), not a static hand pose or an assumed identical native
+index. Registry/descriptor chaining, full voice loading, this motion binding,
+event scheduling, official messages/demo transport, and the exercise-card path
+remain unconnected. Reuse the prepared model, textures, drawing adapter, and
+28-event controller while finishing those consumers; no diary selection is enabled.
+
 ## Serialized diary state
 
 `AFDiary` is a 48,048-byte, endian-independent byte array:

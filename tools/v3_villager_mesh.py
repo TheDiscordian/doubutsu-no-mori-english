@@ -9,10 +9,11 @@ from title_assets import model_texture_shape
 from v3_villager_art import LAYOUTS, data_pointers, symbol_span
 
 
-def faces(raw, *, donor, vertex_start=0, vertex_bytes, pointers=None, start=0):
+def faces(raw, *, donor, vertex_start=0, vertex_bytes, pointers=None, start=0,
+          streamed=False):
     """Resolve both partial vertex caches, retaining each vertex's joint matrix."""
     cache, result, used = {}, [], set()
-    material, matrix, tile = None, None, None
+    material, matrix, tile, image = None, None, None, None
     at = 0
     while at+8 <= len(raw):
         a, b = struct.unpack_from('>II', raw, at)
@@ -48,14 +49,36 @@ def faces(raw, *, donor, vertex_start=0, vertex_bytes, pointers=None, start=0):
             pair, zero = struct.unpack_from('>II', raw, at+8)
             if pair >> 24 != 0xD2 or zero:
                 raise ValueError('Unsupported Dolphin tile pair')
-            material = (b, w, h, pair)
+            material = (b, w, h, pair, ((w-1)*4,(h-1)*4)) if streamed else (b,w,h,pair)
             step = 16
+        elif not donor and streamed and op == 0xFD:
+            if at+56>len(raw):raise ValueError('Truncated streamed NPC texture load')
+            words=list(struct.iter_unpack('>II',raw[at:at+56]))
+            render,mode=words[5]
+            width=1<<((mode>>4)&15);height=1<<((mode>>14)&15)
+            line=(width//2+7)//8
+            dxt=(2048+max(1,width//16)-1)//max(1,width//16)
+            if (a!=0xFD500000 or b>>24 not in (7,8,9) or b&7 or
+                    width<8 or height<1 or width*height//2>2048 or
+                    render!=0xF5400000|line<<9 or mode>>24 or
+                    words[1]!=(0xF5500000,0x07000000|(mode&0xFFFFF)) or
+                    words[2]!=(0xE6000000,0) or
+                    words[3]!=(0xF3000000,0x07000000|((width*height+3)//4-1)<<12|dxt) or
+                    words[4]!=(0xE7000000,0) or
+                    words[6]!=(0xF2000000,(width-1)*4<<12|(height-1)*4)):
+                raise ValueError('Invalid streamed NPC load, tile, or transfer bounds')
+            image=b;step=40
         elif not donor and op == 0xF5:
             if a >> 19 & 31 != 8 or b >> 24:
                 raise ValueError('Native species tile is not CI4 render tile zero')
-            tile = ((a & 511)*8, a, b)
+            if streamed and image is None:raise ValueError('NPC render tile has no streamed image')
+            tile = (image if streamed else (a & 511)*8, a, b)
         elif op == 0xF2:
-            if not donor:
+            if donor and streamed:
+                if material is None or a!=0xF2000000 or b>>24:
+                    raise ValueError('Invalid donor NPC explicit tile extent')
+                material=(*material[:4],(b>>12&4095,b&4095))
+            elif not donor:
                 if tile is None or a != 0xF2000000 or b >> 24:
                     raise ValueError('Unsupported native species tile extent')
                 material = (*tile, (b >> 12 & 4095)//4+1, (b & 4095)//4+1)

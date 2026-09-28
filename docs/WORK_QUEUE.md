@@ -90,9 +90,17 @@ donor talk file passes across first/repeat/claimed/visitor/full-pocket branches.
 The changed calendar query also matches the donor C, and the existing reward
 transaction check passes. The source controller is prepared at
 `build/v3-diary-category-work-01/tortimer-talk-03/`, not installed in the current
-cartridge. Next connect Tortimer's native actor lifecycle and
-event scheduling, its converted graphics/motions, official messages, and native
-demo transport to that controller; connect the separate exercise/card route too.
+cartridge. The complete model and expressions are converted at
+`build/v3-diary-category-work-01/tortimer-art-04/`; the bounded native drawing
+adapter and both checked owner hooks are prepared at
+`build/v3-diary-category-work-01/tortimer-draw-04/`. They preserve the existing
+accessory path and the entire native texture preload without cropping source art.
+Six focused source/current-cartridge/host checks pass; native rendering is not
+verified. Next bind these prepared resources through the additive actor registry,
+voice and cane motion, native lifecycle/event scheduling, official messages, and
+demo transport to the shared controller; connect the separate exercise/card route
+too. The [native connection notes](../specs/V3_DIARIES.md#tortimer-artwork-and-native-actor-connection)
+retain the actual native clip map, not the differently laid-out donor structure.
 Do not turn these consumers into per-holiday implementation/test cycles or mark
 the category complete from the controller alone. Native UI/save verification
 still belongs in the eventual assembled gameplay check.

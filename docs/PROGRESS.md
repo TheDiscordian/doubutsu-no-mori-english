@@ -172,8 +172,18 @@ donor conversation comparison and the donor calendar query comparison. The
 VR4300 controller compiles with explicit diary/reward/library link dependencies.
 It is not installed: Tortimer's actor/schedule, graphics/motions, official message
 routing, native demo transport, and exercise-card route remain necessary.
-The current ABI-312 ROM, inactive diary choices, saves, and V2 deployments are
-unchanged by this source batch.
+
+Tortimer's complete model and expressions are converted within the existing NPC
+buffers, with no discarded source pixels. The shared per-material texture path
+retains geometry, face choices, wrapping, and render state, and keeps the native
+4-KiB preload inside its bank. The native drawing adapter preserves ordinary
+NPC/accessory handling and restores graphics segments. Six focused checks pass,
+including current owner hooks and sanitized expression/bounds handling; the
+adapter compiles for VR4300. These components remain prepared, not installed.
+The [actor connection notes](../specs/V3_DIARIES.md#tortimer-artwork-and-native-actor-connection)
+identify the remaining registry, lifecycle, voice, cane-motion, schedule, and
+message/demo consumers. The current ABI-312 ROM, inactive diary choices, saves,
+and V2 deployments remain unchanged. Native appearance is unverified.
 
 Both source artwork variants, school desk and bus stop, are installed through
 the ordinary shared importer. Complete original-N64 profile/model comparison
