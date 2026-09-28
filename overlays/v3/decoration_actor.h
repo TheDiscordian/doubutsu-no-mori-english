@@ -69,6 +69,10 @@ typedef struct {
     void (*string)(mMsg_Window_c*,int,const u8*,int);
 } AFDecorActorServices;
 extern const AFDecorActorServices af_decor_actor_services;
+typedef struct {
+    void (*request)(int,xyz_t,int,s16,GAME*,u16,s16,s16);
+} AFDecorNativeEffectClip;
+extern AFDecorNativeEffectClip *af_decor_native_effect_clip;
 enum { AF_DECOR_DEMO=1,AF_DECOR_IDENTITIES=2,AF_DECOR_EFFECT=4,
        AF_DECOR_FISH=8,AF_DECOR_HARVEST=16 };
 int af_decor_actor_call(ACTOR*,GAME*,unsigned int);
@@ -79,6 +83,9 @@ u16 af_decor_source_name(ACTOR*);
 int af_decor_source_fg(u16,xyz_t,int);
 int af_decor_source_demo(int,ACTOR*);
 int af_decor_actor_demo(int,ACTOR*);
+int af_decor_actor_resolve(u16);
+void af_decor_actor_effect(int,xyz_t,int,s16,GAME*,u16,int,int);
+void af_decor_source_draw_tick(ACTOR*);
 extern int af_decor_native_demo(int,ACTOR*);
 void af_decor_source_collision(ACTOR*);
 void af_decor_source_move_install(ACTOR*,AFDecorDraw);

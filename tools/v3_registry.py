@@ -40,6 +40,18 @@ DECORATION_NAMES = {
     0x5838: 0x5F0C, 0x5839: 0x5F0D, 0x5845: 0x5F0E,
     0x5846: 0x5F0F, 0x5847: 0x5F10, 0x5848: 0x5F11,
 }
+# Existing foreground markers, verified against the matching native actor
+# initializers. Kago and Turi deliberately share a marker in both engines;
+# native ball-toss effects also consume that identity. F300/F301 are separate
+# transient Groundhog/Harvest markers, outside native and F200..F213 house
+# identities. They use the checked full-width field store and marker draw
+# exclusion; they are never ordinary item-table indices or selectable items.
+DECORATION_DUMMIES = {
+    0xF108: 0xF0F4, 0xF109: 0xF0F5, 0xF10A: 0xF0F6,
+    0xF10D: 0xF0F9, 0xF10E: 0xF0FA, 0xF10F: 0xF0FB,
+    0xF110: 0xF0FC, 0xF111: 0xF0FD,
+    0xF125: 0xF300, 0xF126: 0xF301,
+}
 
 # Reviewed furniture reservations. Values are runtime index, saved item
 # ID, and object VROM. Native 0..946 and the index-947 conversion sentinel stay

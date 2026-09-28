@@ -1205,7 +1205,7 @@ state occupies explicitly loaded storage. Unused one-argument donor callbacks
 receive typed adapters. An initializer cannot restore movement after deletion,
 and failed construction cannot destruct a different actor's shared clip.
 
-The lifecycle code at `8072A000` occupies 10,504 bytes. Context, service pointers,
+The lifecycle code at `8072A000` occupies 10,952 bytes. Context, service pointers,
 foreground-result storage, eleven native descriptors, and eleven profiles occupy
 1,536 bytes at `80705000`, inside checked previously unused space. Every source
 instance is `2DC` bytes; the adapter's compiled native view is `2D8`, with checked
@@ -1224,20 +1224,55 @@ resident descriptor's reference count. These four patches and the unchanged
 relocation file are checked against the current input cartridge.
 
 Native names `5F00..5F11` and profiles `CE..D8` are literal registry reservations.
-Readiness remains dependent on actual foreground/dummy mappings, radio effects,
-fishing storage/text, and Harvest inventory/pickup services. The native ordinary
+All eighteen variants resolve their source foreground identity through the same
+record directory. Native counterpart initializers establish `F108..F10A` to
+`F0F4..F0F6`, `F10D..F111` to `F0F9..F0FD`; Kago and Turi intentionally share
+`F111/F0FD`, also consumed by ball-toss effects. Turi's checked native owner is
+the translated VROM `03B40000`, not its displaced original DMA entry.
+Source Groundhog/Harvest `F125/F126` use separate `F300/F301` reservations,
+outside native and imported-house markers. The native `8008A81C..8008A960`
+field setter stores all sixteen bits and does not mark the persistent field
+dirty when the source initialization passes false. The native item-table reader
+at `800A5630` defaults outside item types one/two; the background field reader
+at `80913010` excludes types four and higher before item drawing. Complete
+function guards retain those contracts. Collision uses the installed source
+footprints, not a substituted native building. Unknown source identities reject.
+
+The source radio requests effect 32 with the same position, angle, and arguments
+as the native radio. Its adapter uses the actual effect clip at `80136F3C`,
+offset zero, and native radio identity `582B`. Native effect movement/lifetime
+are retained. The source request interval is 36 ticks versus 18 native ticks.
+Every controller therefore runs two ordered source movement steps per native
+update. Initialization writes its marker once and performs its source move,
+then the second step only if the actor remains alive. Destruction/creation are
+not doubled. Count02's draw changes the digit-flip state; its exact source tail
+is generated into the adapter for the second state step only after a successful
+draw. Geometry is submitted once, and culled/rejected draws advance neither step.
+
+Readiness remains dependent on fishing storage/text and Harvest inventory/pickup
+services. Live event activation is still disconnected. The native ordinary
 and scripted acre-transition predicates are bound. Donor `SCROLL3` belongs to
 boat boarding (`Player_actor_Set_ScrollDemo_forDemo_geton_boat_wade`); the N64
 engine and these imported resident houses introduce no such transition. That
 query returns false instead of indexing the shorter native demo enum. Boat
 travel, if implemented, needs its actual observation binding.
 
+`--refresh-runtime --holiday-actor-services` refreshes existing controllers as
+well as installing them initially. A refresh verifies the owned code, data,
+padding, packet hash/extent, and all four predecessor hooks. It replaces only
+the reserved controller code and owned state/profile regions, retaining the
+renderer and artwork. The existing physical resource is replaced only in the
+new output cartridge, with its predecessor hash checked by the shared builder.
+Descriptor/setup fallbacks still target the original NPC/campsite chain, never
+the overwritten version of this module. The startup descriptor receives the
+new CRC without growing the packet or changing saved data.
+
 The current proposal is
-`build/v3-diary-category-work-01/decoration-actors-installed-02/build-lock.json`.
+`build/v3-diary-category-work-01/decoration-services-installed-02/build-lock.json`.
 The focused lifecycle check covers all records/profiles, preserved code/artwork,
 exact native owner changes, startup CRC, and unchanged save/profile fields.
 Empty/mixed/all-191 private browser compositions match offline output. This is
-not a native execution test. Continue the remaining foreground and interaction
+not a native execution test. Continue the remaining fishing/Harvest interaction
 providers, then shared event activation, attendance, and calendar choice; do not
 replace an unfinished interaction with an unrelated native behaviour.
 

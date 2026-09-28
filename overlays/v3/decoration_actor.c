@@ -9,7 +9,7 @@ static const AFDecorActorRecord *record(const ACTOR *a) {
 static int ready(const AFDecorActorRecord *r) {
     if (!r || (r->dependencies&af_decor_actor_services.ready)!=r->dependencies) return 0;
     const AFDecorActorServices *s=&af_decor_actor_services;
-    if ((r->dependencies&AF_DECOR_IDENTITIES) && !s->resolve) return 0;
+    if ((r->dependencies&AF_DECOR_IDENTITIES) && (!s->resolve || !r->native_dummy)) return 0;
     if ((r->dependencies&AF_DECOR_DEMO) && !s->demo) return 0;
     if ((r->dependencies&AF_DECOR_EFFECT) && !s->effect) return 0;
     if ((r->dependencies&AF_DECOR_HARVEST) && !s->pocket) return 0;
@@ -72,6 +72,10 @@ int af_decor_actor_call(ACTOR *a,GAME *game,unsigned int phase) {
     if (phase!=1 && (!ready(r) || !clock_read() || !af_decor_native_player(game))) return 0;
     AFDecorDraw f=phase==0?r->ctor:phase==1?r->dtor:phase==2?r->init:r->move;
     if (f) f(a,game);
+    /* Source controllers advance at 60 Hz, native actors at 30 Hz. Init
+       already performs one movement step. Keep both ordered source steps,
+       but never initialize twice or advance an actor deleted by step one. */
+    if ((phase==2 || phase==3) && a->mv_proc && r->move) r->move(a,game);
     if (phase==0) *initialized=0x41464443u;
     else if (phase==1) *initialized=0;
     return 1;
@@ -88,7 +92,7 @@ void af_decor_actor_move(ACTOR *a,GAME *g) {
 }
 void af_decor_actor_draw(ACTOR *a,GAME *g) {
     const AFDecorActorRecord *r=record(a);
-    if (ready(r)) (void)af_decor_draw(a,g,r->source_name);
+    if (ready(r) && af_decor_draw(a,g,r->source_name)) af_decor_source_draw_tick(a);
 }
 u16 af_decor_source_name(ACTOR *a) { const AFDecorActorRecord *r=record(a);return r?r->source_name:0; }
 void af_decor_source_move_install(ACTOR *a,AFDecorDraw source_move) {
@@ -133,6 +137,23 @@ int af_decor_actor_demo(int source,ACTOR *a) {
        engine has no boat transition; do not pass 16 into its shorter enum.
        Imported resident houses do not add island/boat travel. */
     return 0;
+}
+int af_decor_actor_resolve(u16 source) {
+    if (!source || source==0xFFFF) return source;
+    for (u32 i=0;i<18;++i) {
+        const AFDecorActorRecord *r=af_decor_actor_records+i;
+        if (source==r->source_name) return r->native_name;
+        if (source==r->source_dummy && r->native_dummy) return r->native_dummy;
+    }
+    return -1;
+}
+void af_decor_actor_effect(int id,xyz_t pos,int priority,s16 angle,GAME *game,u16 name,int a,int b) {
+    /* The native aerobics radio uses this exact effect, angle, and arguments.
+       Its effect implementation already uses native-rate movement/lifetime;
+       only the source radio's request cadence needs the controller substeps. */
+    AFDecorNativeEffectClip *clip=af_decor_native_effect_clip;
+    if (id==32 && name==0x582C && a==1 && b==0 && game && clip && clip->request)
+        clip->request(32,pos,priority,angle,game,0x582B,1,0);
 }
 int af_decor_source_status(int source,int status) {
     int native=af_holiday_native_type(source);

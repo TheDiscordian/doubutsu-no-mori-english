@@ -21,15 +21,18 @@ class HolidayMapsTests(unittest.TestCase):
         from v3_asset_loader import BLOB
         from v3_furniture_install import inputs
         from v3_decoration_actor import RAM,END,CONTEXT,DATA_END,SERVICES,DESCRIPTORS,PROFILES
-        from v3_registry import DECORATION_NAMES,DECORATION_PROFILES
+        from v3_registry import DECORATION_NAMES,DECORATION_PROFILES,DECORATION_DUMMIES
         from v3_holiday_structures import source_bundle
         from v3_password_policy import function
-        current=ROOT/'build/v3-diary-category-work-01/decoration-actors-installed-02'
+        current=ROOT/'build/v3-diary-category-work-01/decoration-services-installed-02'
         image,report=inputs(current/'build-lock.json')
         base,prior=inputs(current/'base-lock.json')
         e=report['equipment_resources'];d=e['npc_extra']['events']['decorations'];c=d['controllers']
         p=e['holiday_state']['packet'];raw=image[p['physical']:p['physical']+p['bytes']]
-        original=c['original_packet'];old=base[original['physical']:original['physical']+original['bytes']]
+        original=c['input_packet'];old=base[original['physical']:original['physical']+original['bytes']]
+        self.assertTrue(c['refresh'])
+        self.assertEqual((p['physical'],p['bytes']),(original['physical'],original['bytes']))
+        self.assertEqual(len(report['physical_resources']),len(prior['physical_resources']))
         self.assertEqual(p['ram']+len(raw),END)
         self.assertEqual(zlib.crc32(raw),p['crc32'])
         self.assertEqual(sha256(raw),p['sha256'])
@@ -38,7 +41,7 @@ class HolidayMapsTests(unittest.TestCase):
             at=preserved['ram']-p['ram'];n=preserved['bytes']
             self.assertEqual(raw[at:at+n],old[at:at+n])
         self.assertEqual(raw[:CONTEXT-p['ram']],old[:CONTEXT-p['ram']])
-        self.assertEqual(raw[DATA_END-p['ram']:RAM-p['ram']],old[DATA_END-p['ram']:])
+        self.assertEqual(raw[DATA_END-p['ram']:RAM-p['ram']],old[DATA_END-p['ram']:RAM-p['ram']])
         for part in ('loaded_code','data'):
             a=c[part];offset=a['ram']-p['ram']
             self.assertEqual(sha256(raw[offset:offset+a['bytes']]),a['sha256'])
@@ -51,7 +54,9 @@ class HolidayMapsTests(unittest.TestCase):
             owner=c['owners'][r[3]]
             self.assertEqual(r[2],DECORATION_PROFILES[owner['owner']])
             self.assertEqual(r[6],owner['dependencies'])
-            self.assertTrue(r[6]&2)  # Every actor awaits the actual foreground mapping.
+            self.assertTrue(r[6]&2)
+            self.assertEqual(r[5],DECORATION_DUMMIES.get(r[4],0))
+            self.assertEqual(r[5],owner['native_dummy'])
             self.assertEqual(r[7:],tuple(s[owner['entries'][phase]] for phase in ('ctor','dtor','init','move')))
         for i,row in enumerate(c['profiles']):
             descriptor=struct.unpack_from('>8I',raw,DESCRIPTORS+i*32-p['ram'])
@@ -59,11 +64,26 @@ class HolidayMapsTests(unittest.TestCase):
             profile=struct.unpack_from('>HHIHH6I',raw,PROFILES+i*36-p['ram'])
             self.assertEqual(profile,(row['profile'],0,row['native_flags'],row['name'],3,0x2D8,
                 *(s['af_decor_actor_'+phase] for phase in ('ctor','dtor','init','draw')),0))
-        self.assertEqual(struct.unpack_from('>2I',raw,SERVICES-p['ram']),(1,s['af_decor_actor_demo']))
-        self.assertFalse(any(raw[SERVICES+8-p['ram']:SERVICES+0xF0-p['ram']]))
+        self.assertEqual(struct.unpack_from('>4I',raw,SERVICES-p['ram']),
+            (7,*(s['af_decor_actor_'+n] for n in ('demo','resolve','effect'))))
+        self.assertFalse(any(raw[SERVICES+16-p['ram']:SERVICES+0xF0-p['ram']]))
+        self.assertEqual(c['timing'],dict(source_hz=60,native_hz=30,movement_substeps=2,
+            draw_substeps=2,geometry_submissions=1))
+        # All marker mappings are bound; the remaining fishing/Harvest services
+        # are not represented as successful providers.
+        self.assertEqual(sum(bool(r[5]) for r in rows),18)
         # Inspect the changed cartridge and restore only declared patches for
         # comparison with its input. This never executes an older cartridge.
         files=by_vrom(image);basefiles=by_vrom(base)
+        for marker in c['native_markers']:
+            body=files[marker['vrom']].extract(image)
+            self.assertEqual(sha256(body),marker['sha256'])
+            self.assertEqual(u32(body,marker['address']-marker['ram']),0x34040000|marker['native'])
+        for row in c['marker_consumers']:
+            body=files[row['vrom']].extract(image)[row['start']-row['ram']:row['end']-row['ram']]
+            self.assertEqual(sha256(body),row['sha256'])
+        self.assertEqual(c['additive_markers'],dict(Ghog_Profile=dict(source=0xF125,native=0xF300),
+            Htable_Profile=dict(source=0xF126,native=0xF301)))
         for vrom in {h['vrom'] for h in c['hooks']}:
             changed=bytearray(files[vrom].extract(image))
             for h in c['hooks']:
@@ -88,6 +108,19 @@ class HolidayMapsTests(unittest.TestCase):
             self.assertEqual(sha256(generated),owner['generated_sha256'])
             self.assertIn(b'af_decor_source_move_install',generated)
             self.assertNotIn(b'mv_proc =',generated)
+            if owner['owner']=='Count02_Profile':
+                draw=function(text,'aCOU_actor_draw')
+                self.assertEqual(sha256(draw.encode()),owner['draw_tick_source_sha256'])
+                import re
+                tail=re.search(r'(\n    if \(actor->arg0 != actor->arg1\) \{.*\n    \})\n\}$',draw,re.S)[1]
+                self.assertEqual(sha256(tail.encode()),owner['draw_tick_tail_sha256'])
+                self.assertIn(tail.encode(),(current/'decoration-actors/registry.c').read_bytes())
+        # Refreshes retain the original fallback chain, rather than linking
+        # the new descriptor/setup back to the previous module at the same RAM.
+        self.assertEqual(s['af_decor_previous_descriptor'],
+            prior['equipment_resources']['npc_extra']['code']['symbols']['af_v3_npc_extra_descriptor'])
+        self.assertEqual(s['af_decor_previous_setup'],
+            prior['campsite_exterior']['code']['symbols']['af_v3_campsite_structure_setup'])
         self.assertEqual(report['save_codec'],prior['save_codec'])
         self.assertEqual(report['save_runtime']['profile_hex'],prior['save_runtime']['profile_hex'])
         boot=e['surface_bootstrap']['code'];blob=files[BLOB].extract(image)
