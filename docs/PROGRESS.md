@@ -31,35 +31,43 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
-The current proposal is ABI 326 at
-`build/v3-diary-category-work-01/decoration-draw-installed-04/build-lock.json`, ROM SHA-256
-`d8eb373100d45b072b1a9f3c2ffd5890425317a8a8773e2c112f295d29e6aa71`.
+The current proposal is ABI 327 at
+`build/v3-diary-category-work-01/decoration-actors-installed-02/build-lock.json`, ROM SHA-256
+`93632e33dc76e64f83ba6bccc130eae1fb977911afc297dacd3971d7720b5051`.
 It contains 191 independently selectable development imports, including all nine
 fish and eight insects, and 100 inactive furniture profiles whose acquisition
 is pending, plus sixteen inactive diary cover profiles. The main lock and both
 stable V2-14 deployments are unchanged.
 
-The complete eighteen-decoration event batch has installed source-derived draw
-controllers and collision routines. One shared native adapter connects all eleven
-owners to their complete converted objects, projected shadows, countdown rigs,
-four changing digit displays, and source footprints. All fifteen decorations with
-source collision initializers have those routines; the other three have none in
-the donor. The same startup transfer loads the 10,504-byte code, 1,700-byte binding
-directory, and unchanged 135,520-byte artwork bundle. The holiday packet occupies
-216 KiB, including 168 KiB of additional checked reserved RAM.
+The complete eighteen-decoration event batch has installed constructors,
+initialization, movement, destruction, drawing, and collision. The generator
+follows all eleven source owners' complete local controller calls, including
+countdown coordination, Harvest fork handling, radio effects, and fishing-record
+logic. Shared native setup uses the existing structure pool; descriptor and
+cleanup hooks preserve the NPC/balloon/campsite/original actor chains. Additive
+names `5F00..5F11` and profiles `CE..D8` are fixed independently of selections.
+The source controllers retain native actor layout and deletion semantics.
+
+The guarded holiday packet is 240 KiB. Its existing startup descriptor loads the
+10,504-byte lifecycle module and 1,536 bytes of owned state/profiles alongside the
+retained renderer, collision routines, binding directory, and complete artwork.
+No graphics are reconverted. Ordinary/scripted acre-transition predicates have
+native bindings; the absent boat-boarding transition is not sent to a native
+enum with a different meaning.
 
 The right fireworks stall uses the checked seven-entry projection bound. The
 renderer retains both donor shadow passes, independently selected digit textures,
-scrolling, joint colours, and frame-phase updates. Native constructors, additive
-identities, movement/destruction, actual interactions, and event activation remain
-unfinished. Installed drawing/collision entry points do not make these events or
-diaries playable, and native rendering has not been verified.
+scrolling, joint colours, and frame-phase updates. Foreground/dummy mappings,
+the native radio effect, fishing-record/text consumers, the Harvest fork item
+and player pickup, and event activation remain unfinished. Service admission
+keeps every decoration inactive. Installed controllers do not make these events
+or diaries playable, and native gameplay/rendering have not been verified.
 
-The focused current-cartridge resource/dispatch/startup check passes. It covers
-all eighteen draw bindings, fifteen collision bindings, full retained artwork,
-bounded projection, unchanged native code and save/profile data, and the actual
-expanded startup descriptor/CRC. Private browser/offline empty, mixed, and all-191
-compositions agree. Unchanged conversion evidence is retained, not replayed.
+The focused current-cartridge lifecycle/owner/startup check passes. It covers all
+eighteen records, eleven profiles, source-controller references, four exact native
+hook changes, retained resources, and unchanged save/profile data. Private
+browser/offline empty, mixed, and all-191 compositions agree. Unchanged conversion
+and renderer evidence is retained, not replayed.
 No native fixture or old build is executed. The
 [decoration contract](../specs/V3_DIARIES.md#shared-event-decoration-resources)
 records the actual source/native layout differences and the next connected owner.

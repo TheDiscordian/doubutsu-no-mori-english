@@ -210,14 +210,23 @@ All eleven complete source draw controllers and nine source collision initialize
 are compiled and installed together in the current proposal: eighteen drawing
 bindings and fifteen collision bindings. Both countdown rigs, digit frames,
 seasonal palettes, shadow passes, and projection flags have shared native drawing
-bindings. The holiday packet is 216 KiB; its existing startup descriptor loads
-the whole guarded packet. Current resource/dispatch/startup/save-preservation
-checks and empty/mixed/all-supported compositions pass. Reuse this installation.
-Next connect the actual constructors, movement/destruction, and interaction
-controllers to these shared drawing/collision entries and native structure
-setup/allocation. Preserve the existing campsite hook. This is the same unfinished
-category, not a new per-owner task: Harvest fork pickup, radio effects, countdown
-control, and fishing ownership all remain required. Native rendering is unverified.
+bindings. The current proposal at
+`build/v3-diary-category-work-01/decoration-actors-installed-02/build-lock.json`
+also installs all eleven owners' source constructors, movement, destruction, and
+local interactions through shared native setup and original structure allocation.
+The four owner patches preserve the existing actor/campsite chains and account
+for resident-descriptor cleanup. The 240-KiB holiday packet loads through the same
+startup descriptor. Current lifecycle/owner/startup/save-preservation and
+empty/mixed/all-supported composition checks pass. Reuse this installation.
+Next bind the actual foreground/dummy identities and the remaining controller
+providers: native radio effect, normalized fishing records and all forty message
+identities, and the full Harvest fork item/player pickup path. The countdown's
+shared clip and both controllers are installed; retain them while connecting
+event activation. Native/source saved personal IDs differ (16 versus 20 bytes);
+do not cast them or send donor message IDs to native text readers. This is the
+same unfinished category, not new per-owner tasks. Service admission remains
+closed, native rendering is unverified, and the native fixture budget stays
+exhausted. Do not restart it or rebuild unchanged prepared artwork.
 Source/native layouts differ, and native moon events 21/22 must not be relabelled
 as donor meteor event 37.
 The [decoration contract](../specs/V3_DIARIES.md#shared-event-decoration-resources)

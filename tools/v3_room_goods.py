@@ -313,6 +313,7 @@ def publish_bootstrap(equipment,blob,surface,output):
                 raise ValueError('Changed complete scene-transition packet contract')
             size=transition['packet_bytes']
             renderer=npc_extra['events'].get('decorations',{}).get('renderer')
+            controllers=npc_extra['events'].get('decorations',{}).get('controllers')
             if renderer:
                 from v3_decoration_draw import RAM as DRAW_RAM,ART as DRAW_ART,END as DRAW_END
                 if (not renderer['installed'] or renderer['packet_ram']!=HOLIDAY_RAM or
@@ -322,9 +323,20 @@ def publish_bootstrap(equipment,blob,surface,output):
                     not 0<renderer['loaded_code']['bytes']<=0x4000 or
                     renderer['artwork']['ram']!=DRAW_ART or
                     DRAW_ART+renderer['artwork']['bytes']>DRAW_END-16 or
-                    p['id']!='holiday-decoration-runtime-GAFE01-r0'):
+                    (not controllers and p['id']!='holiday-decoration-runtime-GAFE01-r0')):
                     raise ValueError('Changed complete decoration loading contract')
                 size=renderer['packet_bytes']
+                if controllers:
+                    from v3_decoration_actor import RAM as ACTOR_RAM,END as ACTOR_END,CONTEXT,DATA_END
+                    if (not controllers['installed'] or controllers['packet_ram']!=HOLIDAY_RAM or
+                        controllers['packet_bytes']!=ACTOR_END-HOLIDAY_RAM or
+                        controllers['loaded_code']['ram']!=ACTOR_RAM or
+                        not 0<controllers['loaded_code']['bytes']<=ACTOR_END-ACTOR_RAM-16 or
+                        controllers['data']['ram']!=CONTEXT or controllers['data']['bytes']!=DATA_END-CONTEXT or
+                        ACTOR_RAM!=DRAW_END or controllers['original_packet']['bytes']!=size or
+                        p['id']!='holiday-decoration-actors-GAFE01-r0'):
+                        raise ValueError('Changed complete decoration controller loading contract')
+                    size=controllers['packet_bytes']
             elif p['id']!='holiday-transition-GAFE01-r0':
                 raise ValueError('Changed scene-transition physical identity')
         if (not npc_extra or p['ram']!=HOLIDAY_RAM or p['bytes']!=size or p['physical']&15 or

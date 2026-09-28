@@ -68,7 +68,8 @@ def compile_part(part, out, extra_sources=(), defines=(), primary_source=None, l
     run('objcopy', '-O', 'binary', '-j', '.text', '-j', '.rodata',
         *(['-j', '.fallbacks'] if part=='scenery_bootstrap' else []), 'code.elf', 'code.bin')
     code = (out / 'code.bin').read_bytes()
-    entry, expected = {'decoration_draw': ('af_decor_draw', 0x80700000),
+    entry, expected = {'decoration_actor': ('af_decor_actor_call', 0x8072A000),
+                      'decoration_draw': ('af_decor_draw', 0x80700000),
                       'holiday_active': ('af_holiday_active_update', 0x806F3000),
                       'holiday_transition': ('af_holiday_transition_run', 0x806FC000),
                       'holiday_scene': ('af_holiday_scene_demo_init', 0x806FB200),

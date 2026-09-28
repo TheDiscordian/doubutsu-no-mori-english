@@ -13,6 +13,10 @@ typedef struct { u8 r,g,b,a; } rgba_t;
 typedef struct { u32 a,b; } Gfx;
 typedef struct { u32 words[16]; } Mtx;
 typedef struct { u8 bytes[16]; } Vtx;
+typedef struct AFDecorActor ACTOR;
+typedef struct AFDecorGame GAME;
+typedef struct AFDecorPlay GAME_PLAY;
+typedef struct AFDecorStructure STRUCTURE_ACTOR;
 typedef struct { u8 num_joints,num_shown_joints;u16 padding;void *joint_table; } cKF_Skeleton_R_c;
 typedef struct {
     struct { float start_frame,end_frame,max_frames,speed,current_frame;int mode; } frame_control;
@@ -20,18 +24,27 @@ typedef struct {
     u8 rest[0x70-0x18-sizeof(void*)];
 } cKF_SkeletonInfo_R_c;
 typedef struct { xyz_t position;s_xyz rotation;u16 padding; } AFDecorPosRot;
-typedef struct {
+struct AFDecorActor {
     u8 prefix[6];u16 npc_id;u8 before_home[4];AFDecorPosRot home;
-    u32 flags; s16 params,bank;AFDecorPosRot world;u8 rest[0x174-0x3C];
-} ACTOR;
-typedef struct {
+    u32 flags; s16 params,bank;AFDecorPosRot world;u8 before_shape[0xDC-0x3C];
+    struct { s_xyz rotation;u8 rest[0x48-6]; } shape_info;
+    u8 before_move[0x164-0x124];void (*mv_proc)(ACTOR*,GAME*);
+    u8 rest[0x174-0x164-sizeof(void*)];
+};
+struct AFDecorStructure {
     ACTOR actor_class;int keyframe_state;cKF_SkeletonInfo_R_c keyframe;
     int keyframe_saved_keyframe;s_xyz work_area[15],morph_area[15];
-    u32 action_proc;int _2A4,structure_type,structure_pal,request_type,action;
+    void (*action_proc)(STRUCTURE_ACTOR*,GAME_PLAY*);
+    int _2A4,structure_type,structure_pal,request_type,action;
     int arg0,arg1,arg2,arg3;float arg0_f,arg1_f,arg2_f,arg3_f;
-} STRUCTURE_ACTOR;
+};
 typedef STRUCTURE_ACTOR HTABLE_ACTOR;
-typedef STRUCTURE_ACTOR RADIO_ACTOR;
+typedef struct AFDecorRadio RADIO_ACTOR;
+struct AFDecorRadio {
+    ACTOR actor_class;u8 before_proc[0x2A0-0x174];
+    void (*proc)(RADIO_ACTOR*,GAME_PLAY*);u8 before_action[0x2B4-0x2A0-sizeof(void*)];
+    int current_action,next_action;u8 rest[0x2D8-0x2BC];
+};
 typedef struct { STRUCTURE_ACTOR structure_class; } MIKUJI_ACTOR,
     COUNT_ACTOR,TAMA_ACTOR,KAGO_ACTOR,TURI_ACTOR;
 typedef struct {
@@ -39,7 +52,8 @@ typedef struct {
     u8 before_xlu[8];Gfx *xlu;u8 *xlu_tail;
     u8 before_shadow[0x2C8-0x2A8-2*sizeof(void*)];Gfx *shadow;u8 *shadow_tail;
 } GRAPH;
-typedef struct { GRAPH *graph; } GAME;
+struct AFDecorGame { GRAPH *graph; };
+struct AFDecorPlay { GAME game; };
 typedef struct { u32 count;u8 *flags;float size;Vtx *vertices;Gfx *model; } bIT_ShadowData_c;
 typedef int (*AFDecorBefore)(GAME*,cKF_SkeletonInfo_R_c*,int,Gfx**,u8*,void*,s_xyz*,xyz_t*);
 typedef void (*AFDecorDraw)(ACTOR*,GAME*);
@@ -84,6 +98,9 @@ _Static_assert(__builtin_offsetof(GRAPH,shadow)==0x2C8,"Native shadow arena");
 _Static_assert(sizeof(AFDecorRecord)==24,"Decoration directory stride");
 _Static_assert(sizeof(ACTOR)==0x174,"Native actor prefix");
 _Static_assert(__builtin_offsetof(ACTOR,world)==0x28,"Native actor world position");
+_Static_assert(__builtin_offsetof(ACTOR,mv_proc)==0x164,"Native actor move callback");
+_Static_assert(sizeof(RADIO_ACTOR)==0x2D8,"Native radio allocation");
+_Static_assert(__builtin_offsetof(RADIO_ACTOR,next_action)==0x2B8,"Source radio timer in native actor");
 #endif
 #define NULL ((void*)0)
 #define TRUE 1

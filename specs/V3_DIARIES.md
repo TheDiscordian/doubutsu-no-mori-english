@@ -1156,8 +1156,9 @@ references and generated hashes in `decoration-draw/installed.json`.
 
 The native renderer occupies `80700000..80702908` (10,504 bytes), its descriptors
 occupy 1,700 bytes at `80704000`, and its unchanged artwork occupies 135,520 bytes
-at `80708000`. The guarded holiday packet ends at `8072A000`: 216 KiB total,
-168 KiB more reserved RAM. The complete prior 48-KiB prefix is retained. The
+at `80708000`. The renderer portion ends at `8072A000`. The lifecycle extension
+ends at `80730000`, making the complete guarded holiday packet 240 KiB. The
+complete prior 48-KiB prefix and renderer/artwork ranges are retained. The
 existing eighteenth startup descriptor transfers and checks the complete packet;
 no new DMA-directory slot or startup packet is required.
 
@@ -1186,21 +1187,59 @@ eighteen draw and fifteen collision bindings, bounded shadows, native-function r
 startup transfer/CRC, and unchanged save/profile data. Current private browser
 composition agrees with offline empty, mixed, and all-191 profiles. Native
 rendering and collision execution are not verified. Constructors, movement,
-destruction, actual interactions, additive identities, and activation remain
+destruction, and local interactions are installed through the shared lifecycle
+adapter below. Foreground mappings, interaction providers, and activation remain
 unfinished; installed entries do not establish working decoration actors.
 The current proposal retains save format twelve and diary schema two. Compatible
 earlier saves migrate forward; V2 and format-eleven-or-earlier readers cannot
 load format-twelve saves. No profile bit, saved field, or patcher deployment changes.
 
-Continue the connected actor path through the existing structure owner:
-VROM `008CB690`, RAM `809E7ED0`, relocation `008CD350`. Its setup pointer at
-`809E93F8/809E9400` already calls `af_v3_campsite_structure_setup`; preserve that
-chain and campsite identity `5849`. Reuse the shared structure segment/instance
-allocation and checked complete resources. Port the real constructors, collision,
-movement, drawing, destruction, and interactions, including Harvest-table fork
-handling, radio/exercise participation, countdown control, and fishing ownership.
-Do not activate an actor with only artwork or alias it to a native actor with
-different event semantics.
+`tools/v3_decoration_actor.py` follows the source call graph for every constructor,
+destructor, initializer, and actual movement callback. Its 70 complete functions
+include the shared countdown clip, radio effect emission, fishing-record/name
+operations and forty fish-message branches, and Harvest fork placement/search/
+cleanup. Generated source and complete function references remain in the ignored
+`decoration-actors/` report. Source variants resolve from the fixed registry,
+not destination-ID subtraction. Local constant tables are read-only; source clip
+state occupies explicitly loaded storage. Unused one-argument donor callbacks
+receive typed adapters. An initializer cannot restore movement after deletion,
+and failed construction cannot destruct a different actor's shared clip.
+
+The lifecycle code at `8072A000` occupies 10,504 bytes. Context, service pointers,
+foreground-result storage, eleven native descriptors, and eleven profiles occupy
+1,536 bytes at `80705000`, inside checked previously unused space. Every source
+instance is `2DC` bytes; the adapter's compiled native view is `2D8`, with checked
+field offsets and the existing native structure pool. Saved donor personal IDs
+are normalized 20-byte values, not casts of 16-byte N64 saved IDs. Source number
+strings retain the actual 16-byte buffer. These providers still require native
+bindings before fishing is admitted.
+
+The native structure owner is VROM `008CB690`, RAM `809E7ED0`, relocation
+`008CD350`. Its setup pointer at `809E93F8/809E9400` calls the new dispatcher,
+which preserves `af_v3_campsite_structure_setup` and campsite identity `5849` as
+its fallback. The descriptor call at `80057E4C` retains the existing NPC,
+balloon, campsite, and original descriptor chain. The structure release call at
+`800583D4` uses the actual native pool release and decrements only the new
+resident descriptor's reference count. These four patches and the unchanged
+relocation file are checked against the current input cartridge.
+
+Native names `5F00..5F11` and profiles `CE..D8` are literal registry reservations.
+Readiness remains dependent on actual foreground/dummy mappings, radio effects,
+fishing storage/text, and Harvest inventory/pickup services. The native ordinary
+and scripted acre-transition predicates are bound. Donor `SCROLL3` belongs to
+boat boarding (`Player_actor_Set_ScrollDemo_forDemo_geton_boat_wade`); the N64
+engine and these imported resident houses introduce no such transition. That
+query returns false instead of indexing the shorter native demo enum. Boat
+travel, if implemented, needs its actual observation binding.
+
+The current proposal is
+`build/v3-diary-category-work-01/decoration-actors-installed-02/build-lock.json`.
+The focused lifecycle check covers all records/profiles, preserved code/artwork,
+exact native owner changes, startup CRC, and unchanged save/profile fields.
+Empty/mixed/all-191 private browser compositions match offline output. This is
+not a native execution test. Continue the remaining foreground and interaction
+providers, then shared event activation, attendance, and calendar choice; do not
+replace an unfinished interaction with an unrelated native behaviour.
 
 The original native event-layout directory has fifteen types at `80105030` and
 fifteen pointers at `801055E8`. Its readers are `80081E60..80082168`; the existing

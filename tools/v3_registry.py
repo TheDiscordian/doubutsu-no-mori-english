@@ -23,6 +23,24 @@ SPECIAL_NPCS = {
         name=0xD091, profile=0xCD),
 }
 
+# Additive event structures retain the native structure allocation category.
+# Their source variants are separate identities, never positions in a selection.
+DECORATION_REGISTRY_VERSION = 1
+DECORATION_PROFILES = {
+    'Goza_Profile': 0xCE, 'Radio_Profile': 0xCF, 'Yatai_Profile': 0xD0,
+    'Mikuji_Profile': 0xD1, 'Count_Profile': 0xD2, 'Count02_Profile': 0xD3,
+    'Tama_Profile': 0xD4, 'Kago_Profile': 0xD5, 'Turi_Profile': 0xD6,
+    'Ghog_Profile': 0xD7, 'Htable_Profile': 0xD8,
+}
+DECORATION_NAMES = {
+    0x582A: 0x5F00, 0x582B: 0x5F01, 0x582C: 0x5F02,
+    0x582D: 0x5F03, 0x582E: 0x5F04, 0x5831: 0x5F05,
+    0x5832: 0x5F06, 0x5833: 0x5F07, 0x5834: 0x5F08,
+    0x5835: 0x5F09, 0x5836: 0x5F0A, 0x5837: 0x5F0B,
+    0x5838: 0x5F0C, 0x5839: 0x5F0D, 0x5845: 0x5F0E,
+    0x5846: 0x5F0F, 0x5847: 0x5F10, 0x5848: 0x5F11,
+}
+
 # Reviewed furniture reservations. Values are runtime index, saved item
 # ID, and object VROM. Native 0..946 and the index-947 conversion sentinel stay
 # untouched. Holes are not supported items; future additions must be explicit.

@@ -199,6 +199,9 @@ def native_bindings(base):
 
 
 def install(base,prior,output):
+    if prior['equipment_resources']['npc_extra']['events']['decorations'].get('renderer'):
+        from v3_decoration_actor import install as install_actors
+        return install_actors(base,prior,output)
     from v3_console_disk_install import reservations
     from v3_furniture_capacity import checked
     from v3_holiday_state import RAM as STATE_RAM,GUARD

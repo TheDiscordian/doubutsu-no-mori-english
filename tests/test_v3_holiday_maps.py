@@ -13,6 +13,94 @@ from apply_translation import write_new
 
 
 class HolidayMapsTests(unittest.TestCase):
+    def test_connected_decoration_lifecycles_and_native_owners(self):
+        import json
+        import struct
+        import zlib
+        from aflib import by_vrom,CODE_RAM,CODE_VROM,sha256,u32
+        from v3_asset_loader import BLOB
+        from v3_furniture_install import inputs
+        from v3_decoration_actor import RAM,END,CONTEXT,DATA_END,SERVICES,DESCRIPTORS,PROFILES
+        from v3_registry import DECORATION_NAMES,DECORATION_PROFILES
+        from v3_holiday_structures import source_bundle
+        from v3_password_policy import function
+        current=ROOT/'build/v3-diary-category-work-01/decoration-actors-installed-02'
+        image,report=inputs(current/'build-lock.json')
+        base,prior=inputs(current/'base-lock.json')
+        e=report['equipment_resources'];d=e['npc_extra']['events']['decorations'];c=d['controllers']
+        p=e['holiday_state']['packet'];raw=image[p['physical']:p['physical']+p['bytes']]
+        original=c['original_packet'];old=base[original['physical']:original['physical']+original['bytes']]
+        self.assertEqual(p['ram']+len(raw),END)
+        self.assertEqual(zlib.crc32(raw),p['crc32'])
+        self.assertEqual(sha256(raw),p['sha256'])
+        self.assertEqual(raw[-16:],b'AFHS'*4)
+        for preserved in c['preserved']:
+            at=preserved['ram']-p['ram'];n=preserved['bytes']
+            self.assertEqual(raw[at:at+n],old[at:at+n])
+        self.assertEqual(raw[:CONTEXT-p['ram']],old[:CONTEXT-p['ram']])
+        self.assertEqual(raw[DATA_END-p['ram']:RAM-p['ram']],old[DATA_END-p['ram']:])
+        for part in ('loaded_code','data'):
+            a=c[part];offset=a['ram']-p['ram']
+            self.assertEqual(sha256(raw[offset:offset+a['bytes']]),a['sha256'])
+        self.assertLessEqual(c['loaded_code']['bytes'],END-RAM-16)
+        s=c['code']['symbols'];at=s['af_decor_actor_records']-p['ram']
+        self.assertEqual(len(c['profiles']),11)
+        rows=list(struct.iter_unpack('>6H5I',raw[at:at+18*32]))
+        self.assertEqual({r[0]:r[1] for r in rows},DECORATION_NAMES)
+        for r in rows:
+            owner=c['owners'][r[3]]
+            self.assertEqual(r[2],DECORATION_PROFILES[owner['owner']])
+            self.assertEqual(r[6],owner['dependencies'])
+            self.assertTrue(r[6]&2)  # Every actor awaits the actual foreground mapping.
+            self.assertEqual(r[7:],tuple(s[owner['entries'][phase]] for phase in ('ctor','dtor','init','move')))
+        for i,row in enumerate(c['profiles']):
+            descriptor=struct.unpack_from('>8I',raw,DESCRIPTORS+i*32-p['ram'])
+            self.assertEqual(descriptor,(0,0,0,0,0,PROFILES+i*36,0,0))
+            profile=struct.unpack_from('>HHIHH6I',raw,PROFILES+i*36-p['ram'])
+            self.assertEqual(profile,(row['profile'],0,row['native_flags'],row['name'],3,0x2D8,
+                *(s['af_decor_actor_'+phase] for phase in ('ctor','dtor','init','draw')),0))
+        self.assertEqual(struct.unpack_from('>2I',raw,SERVICES-p['ram']),(1,s['af_decor_actor_demo']))
+        self.assertFalse(any(raw[SERVICES+8-p['ram']:SERVICES+0xF0-p['ram']]))
+        # Inspect the changed cartridge and restore only declared patches for
+        # comparison with its input. This never executes an older cartridge.
+        files=by_vrom(image);basefiles=by_vrom(base)
+        for vrom in {h['vrom'] for h in c['hooks']}:
+            changed=bytearray(files[vrom].extract(image))
+            for h in c['hooks']:
+                if h['vrom']!=vrom:continue
+                off=h['address']-h['ram'];after=bytes.fromhex(h['after'])
+                self.assertEqual(changed[off:off+len(after)],after)
+                changed[off:off+len(after)]=bytes.fromhex(h['before'])
+            self.assertEqual(changed,basefiles[vrom].extract(base))
+        self.assertEqual(files[0x008CD350].extract(image),basefiles[0x008CD350].extract(base))
+        core=files[CODE_VROM].extract(image)
+        for row in c['native_functions']:
+            # Actor_info_make_actor contains the intentional descriptor hook.
+            if row['symbol']=='Actor_info_make_actor':continue
+            self.assertEqual(sha256(core[row['start']-CODE_RAM:row['end']-CODE_RAM]),row['sha256'])
+        for i,owner in enumerate(c['owners']):
+            root=next(n for n in owner['references'] if n.endswith('.c'))
+            text,refs=source_bundle(ROOT/'local/ac-decomp'/root)
+            self.assertEqual(refs,owner['references'])
+            for name,digest in owner['source_functions'].items():
+                self.assertEqual(sha256(function(text,name).encode()),digest)
+            generated=(current/'decoration-actors'/f'owner-{i:02}.c').read_bytes()
+            self.assertEqual(sha256(generated),owner['generated_sha256'])
+            self.assertIn(b'af_decor_source_move_install',generated)
+            self.assertNotIn(b'mv_proc =',generated)
+        self.assertEqual(report['save_codec'],prior['save_codec'])
+        self.assertEqual(report['save_runtime']['profile_hex'],prior['save_runtime']['profile_hex'])
+        boot=e['surface_bootstrap']['code'];blob=files[BLOB].extract(image)
+        boot_ram=e['surface_bootstrap']['ram'];offset=e['blob_offset']+boot_ram-e['ram']
+        code=blob[offset:offset+boot['bytes']];s=boot['symbols']
+        self.assertEqual(sha256(code),boot['sha256'])
+        self.assertEqual(u32(code,s['holiday_state_crc']-boot_ram),p['crc32'])
+        self.assertEqual(struct.unpack_from('>5I',code,s['packets']-boot_ram+17*20),
+            (p['ram'],p['physical']|0x80000000,p['bytes'],s['holiday_state_crc'],0))
+        self.assertFalse(c['actors_active']);self.assertFalse(d['selectable'])
+        self.assertFalse(c['native_execution_verified']);self.assertFalse(c['services_bound'])
+        self.assertEqual(json.loads((current/'decoration-actors/installed.json').read_bytes()),c)
+
     def test_connected_decoration_render_collision_and_startup(self):
         import json
         import struct
