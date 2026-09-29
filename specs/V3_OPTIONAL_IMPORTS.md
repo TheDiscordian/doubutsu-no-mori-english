@@ -9,6 +9,13 @@ are off by default. Existing N64 villagers, items, locations, and the translatio
 remain available; importing means adding content, not silently replacing an
 existing villager or painting a new name onto an unrelated item.
 
+Able Sisters, the Museum building, custom designs, and comparable large new
+features are V4 work. V3 remains an item/villager import release with working
+item behaviours. Design-dependent sign boards and saved-pattern representations
+are explicitly deferred to V4, not counted as completed V3 imports. Importing
+ordinary fish, insects, fossils, and other items does not require adding the
+Museum building. Preserve their actual item behaviours within V3.
+
 Both deployed patchers serve stable V2-14, SHA-256
 `0e81d5c62548c3a759cc89d63eba0975b1c336a3a941211a3000e317b9243bf2`.
 The current experimental proposal pins this same V2-14 for empty selection.

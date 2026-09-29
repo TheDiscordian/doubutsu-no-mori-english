@@ -2,6 +2,14 @@
 
 ## Active: V3 optional GameCube imports
 
+V3 imports items and villagers with working behaviours. Able Sisters, the Museum
+building, custom designs, and comparable large features belong to V4. The
+unfinished design implementation is preserved on `v4/deferred-custom-designs`
+at `baded8ca`, with its checkpoint in `docs/checkpoints/V4_CUSTOM_DESIGNS.md`
+on that branch. It is not installed in V3. Design-dependent sign boards and
+saved-pattern forms remain deferred, not completed or selectable. Ordinary
+fish/insect/fossil imports remain V3 work; the Museum building is not required.
+
 ### Execution order
 
 1. Finish the importing pipelines, including working item behaviours as well as
@@ -30,10 +38,11 @@ runtime alternatives; other substantial differences still need real bindings.
 
 Current implementation task: finish the remaining carried-object and stationery
 imports through the shared category importers. The donor identity worksheet
-identifies orange paper (`2003`), sign board (`251E`), exercise card (`2523`,
+identifies orange paper (`2003`), exercise card (`2523`,
 including all thirteen stamped states), knife and fork (`2530`), coconut
 (`2807`), cedar sapling (`2901`), and spirit (`2D28`, including its instance
-states). Resolve each against actual native identities, then connect all matching
+states). Sign board (`251E`) is deferred with custom designs to V4; reuse its
+prepared resources then. Resolve each active family against actual native identities, then connect all matching
 readers, complete resources, behaviours, inventory/menu uses, persistence, and
 independent browser choices. Reuse the installed card/cutlery controls, actual
 exercise controller, shared item converters, and conditional runtime groups.
@@ -206,9 +215,10 @@ startup/patch checks, eight browser/offline profiles, and fault-free silent nati
 boot pass. Native boot checks the actual registry, DMA directory, and final packet
 guard; it does not establish Wisp gameplay or saving. Format-19 saves reject older
 readers; four-sheet saves require four-sheet mode. Carried-family admission remains
-off. Next connect sign-board designs/placement and verify the remaining actual
+off. Verify the remaining actual
 native item-type/menu routes, including existing card/cutlery consumers, then bind
-independent carried selections without making spirits depend on diary admission.
+independent carried selections without making spirits depend on diary admission
+or completed families depend on the deferred sign-board feature.
 The conversation fixture remains
 incomplete after two setup attempts; retain full sanitizer checks and do not
 retry it again in this batch. These source paths are not native gameplay proof.
@@ -259,9 +269,9 @@ remain unchanged. Detailed diary formats, native bindings, resources, and
 verification limits live in [the diary specification](../specs/V3_DIARIES.md).
 
 The room-representation review identifies sixteen player-saved design forms and
-nine museum fossil placeholders. Custom designs require a design editor and
-saved-pattern system; that feature's V3 scope is awaiting the user's choice,
-without blocking diary work. The fossil placeholders are museum scenery, not new
+nine museum fossil placeholders. Custom designs, their editor/saved-pattern
+system, Able Sisters, and the Museum building are V4 work and do not block V3
+item/villager imports. The fossil placeholders are museum scenery, not new
 collectibles. The ordinary importer installs both real donor artwork variants,
 school desk and bus stop, while retaining their N64 counterparts. See
 [the representation and variant contract](../specs/V3_ROOM_REPRESENTATIONS.md).

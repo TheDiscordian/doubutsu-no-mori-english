@@ -17,11 +17,15 @@ and destroy callbacks are empty; the DMA callback is not.
 
 Full support requires saved designs, editing and naming, ownership resolution,
 pattern rendering, wearing/umbrella interactions, and the related wall/floor
-representations. The N64 game does not supply the donor design system. Whether
-to add that feature to V3 is an open scope choice; no empty patterns or frozen
-substitutes are presented as implemented imports. Other importing work continues.
+representations. The N64 game does not supply the donor design system. Custom
+designs and Able Sisters belong to V4, including dependent sign boards and these
+saved-pattern forms. No empty patterns or frozen substitutes are presented as
+implemented imports. Other V3 item/villager importing work continues.
 
 ## Museum scenery
+
+The Museum building is V4 work. Ordinary collectible fossil, fish, and insect
+imports remain V3 work and do not require constructing that building.
 
 The complete `mMmd_museum_fossil_data` table and
 `mMmd_MuseumFossilProcess_MakeFgData` function distinguish 25 donated specimens

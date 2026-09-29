@@ -111,8 +111,14 @@ including the six-character registry, ten-bank directory, final packet guard,
 and absence of a faulted thread. Wisp interaction and native save/travel remain
 unverified; no hardware result is claimed. Format-19 saves cannot be read by
 format-18-or-earlier builds, and pack-mode saves still need pack mode. Existing
-ROMs, saves, and both deployed V2 patchers are unchanged. Continue sign-board
-placement/designs, remaining carried menu/type consumers, and independent selection.
+ROMs, saves, and both deployed V2 patchers are unchanged. Continue remaining
+carried menu/type consumers and independent selection, excluding sign boards.
+Able Sisters, the Museum building, custom designs, and comparable large features
+belong to V4. Unfinished design code is isolated on `v4/deferred-custom-designs`
+at `baded8ca`; its checkpoint there records prepared resources and the unresolved
+save-fixture failure. None of that code is installed in the active V3 build.
+Design-dependent imports remain deferred, not complete. Ordinary item behaviours
+and fish/insect/fossil imports remain V3 work.
 
 The active work is the importing pipelines: extraction, conversion, bulk
 installation, and working item behaviours, including item-specific behaviours.
@@ -1072,8 +1078,8 @@ The shared representation catalogue identifies sixteen saved-design forms and
 nine museum placeholders rather than treating them as fixed missing furniture.
 Their complete source consumers bind inventory, scan, and browser review data.
 Three focused tests cover classification, malformed-source rejection, and shared
-consumer behaviour. Adding the custom-design editor/saved-pattern feature to V3
-is an open scope choice; it does not block the active diary category. See
+consumer behaviour. The custom-design editor/saved-pattern feature belongs to
+V4 and does not block V3 imports. See
 [the representation contract](../specs/V3_ROOM_REPRESENTATIONS.md).
 
 The complete clothing category is installed together. All eight distinct donor
@@ -1310,7 +1316,7 @@ unchanged artwork. Passport travel requires compatible V3 creature profiles;
 V2 and older V3 readers do not understand its extension. Preserve Pak backups too.
 
 Continue with creature parent/native integration and the remaining legacy
-clothing, custom-design, and fossil representations, not resource reconversion
+clothing and collectible fossil representations, not deferred V4 custom designs, resource reconversion
 or obsolete test attempts. Complete genuine conversion/behaviour gaps.
 The two worksheet-mapped school-desk/bus-stop
 records require identity/artwork correspondence review, not automatic duplicate

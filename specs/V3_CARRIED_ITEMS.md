@@ -150,8 +150,7 @@ loader through its actual relocated constructor address.
 Continue the shared importing task without rescanning or recompiling these
 unchanged resources:
 
-1. Connect the remaining actual item interactions: sign-board placement/design
-   handling; card stamping/menu behaviour;
+1. Connect the remaining actual item interactions: card stamping/menu behaviour;
    Harvest cutlery interaction; actual Wisp event ownership. Spirit inventory
    transfer restrictions and field/capture/release use the installed
    shared category consumers below.
@@ -167,6 +166,14 @@ unchanged resources:
    empty-selection V2-14, and verify the changed readers and save/profile bounds.
    Acquisition follows primary importing. Gold-tree work remains required after
    primary imports, along with any unfinished golden-tool behaviour.
+
+Sign-board placement/design handling is deferred to V4 with custom designs and
+Able Sisters. Preserve prepared sign resources, but keep sign selection disabled;
+do not make the other six carried families depend on this deferred feature.
+The unfinished design code and its verification limits are preserved on
+`v4/deferred-custom-designs` at `baded8ca`, in
+`docs/checkpoints/V4_CUSTOM_DESIGNS.md`. The Museum building and comparable large
+new features also belong to V4; V3 imports items/villagers with working behaviours.
 
 ### Global stationery quantity choice
 
