@@ -122,7 +122,8 @@ def native_consumers(base,symbols):
     files=by_vrom(base);changes={};hooks=[]
     owners={0x741FB0:(0x80802AE0,0x743950),
             0x8D8EC0:(0x80A0A1F0,0x8D9FA0),
-            0x3E90000:(0x809BE720,0x3EA0000)}
+            0x3E90000:(0x809BE720,0x3EA0000),
+            0x3800000:(0x8095B8B0,0x3810000)}
     def patch(vrom,address,before,helper,kind):
         ram=CODE_RAM if vrom==CODE_VROM else owners[vrom][0]
         body=changes.setdefault(vrom,bytearray(files[vrom].extract(base)))
@@ -147,7 +148,8 @@ def native_consumers(base,symbols):
         (0x8D8EC0,0x80A0B1C0,0x80A0A240,'af_rw_shrine_ctor','pointer'),
         (0x8D8EC0,0x80A0B1C4,0x80A0A358,'af_rw_shrine_dtor','pointer'),
         (0x8D8EC0,0x80A0B264,0x80A0A7A4,'af_rw_shrine_talk','pointer'),
-        (0x8D8EC0,0x80A0A808,0x0C021342,'af_rw_field_condition','call')):
+        (0x8D8EC0,0x80A0A808,0x0C021342,'af_rw_field_condition','call'),
+        (0x3800000,0x809614C4,0x0C02A6F5,'af_rw_birthday_mail','call')):
         patch(vrom,address,before,helper,kind)
     relocation_evidence=[]
     for vrom,(ram,reloc) in owners.items():
@@ -484,11 +486,19 @@ def install(base,prior,blob,core,output,directory):
         redirects=redirects,installed_hooks=hooks,relocation_evidence=relocation_evidence,text=text,audio=audio,
         speech=dict(a['speech'],native_hooks_installed=True),native_execution_verified=False,selectable=False,
         pending=['independent golden tool selection','native golden reward and shovel acquisition checks'])
+    if 'af_rw_birthday_mode' in symbols:
+        from v3_creature_choices import BIRTHDAY_CHOICE
+        mode=symbols['af_rw_birthday_mode'];at=mode-packet['ram']
+        if not actor_code['ram']<=mode<actor_code['ram']+actor_code['bytes'] or raw[at:at+4]!=bytes(4):
+            raise ValueError('Missing owned N64-default birthday presentation setting')
+        report['birthday_choice']=dict(BIRTHDAY_CHOICE,ram=mode,default='N64',values=dict(N64=0,GameCube=1))
     q['rewards']=report;effects['golden_rewards']=dict(profiles=[122,123,124],code=connected['regions']['effects'])
     report['sources']={p:sha256((ROOT/p).read_bytes()) for p in
         (*a['sources'],*fx['sources'],'tools/v3_reward_install.py','overlays/v3/reward_events.ld',
          'tools/v3_holiday_participants_install.py','tools/v3_holiday_dialogue.py',
          'tools/v3_room_goods.py','tools/v3_furniture_install.py','tools/v3_npc_native.py','tools/v3_npc_registry.py')}
+    report['sources'].update({p:sha256((ROOT/p).read_bytes()) for p in
+        ('tools/v3_creature_choices.py','tools/v3_holiday_selection.py')})
     npc['sources'].update(report['sources']);d['sources'].update(report['sources'])
     updates={k:copy.deepcopy(prior[k]) for k in ('save_codec','clothing','room_surfaces')}
     updates['save_codec'].update(format_version=20,active_storage_code=copy.deepcopy(storage),card_storage_code=copy.deepcopy(storage))

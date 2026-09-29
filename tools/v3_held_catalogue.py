@@ -50,8 +50,32 @@ def refresh_selection(base,prior,blob,output):
     consumers (including paper and room surfaces) at their installed addresses.
     """
     equipment=copy.deepcopy(prior['equipment_resources'])
-    if equipment.get('golden_tools'):
-        raise ValueError('Golden tool selections are already connected; extend their reward providers')
+    extending=bool(equipment.get('golden_tools'))
+    rewards=equipment.get('carried_items',{}).get('quest',{}).get('rewards')
+    if extending:
+        if (not rewards or not rewards['installed'] or not rewards.get('birthday_choice') or
+                prior['save_codec']['format_version']!=20 or rewards['wire_version']!=7 or
+                rewards['text']['count']!=46 or rewards['storage']['symbols']['af_v3_card_state']!=0x807C9000 or
+                equipment['room_rigs']['effects']['controller']['count']!=125):
+            raise ValueError('Incomplete golden-tool gift, Shrine, dialogue, or birthday provider')
+        from v3_reward_bindings import LAYOUT
+        rp=rewards['packet'];raw=base[rp['physical']:rp['physical']+rp['bytes']]
+        if sha256(raw)!=rp['sha256']:raise ValueError('Changed complete golden reward startup packet')
+        if rewards['code']['ram']!=LAYOUT['actors']['ram'] or not rewards['speech']['native_hooks_installed']:
+            raise ValueError('Incomplete golden-tool owned actor or speech provider')
+        consumers={'af_rw_field_rank','af_rw_voice_spec','af_rw_voice_emit','af_rw_actors_destroy',
+            'af_rw_actors_init','af_rw_actors_move','af_rw_house_door','af_rw_shrine_ctor',
+            'af_rw_shrine_dtor','af_rw_shrine_talk','af_rw_field_condition','af_rw_birthday_mail'}
+        if {r['helper'] for r in rewards['installed_hooks']}!=consumers or len(rewards['installed_hooks'])!=13:
+            raise ValueError('Incomplete golden-tool native consumers')
+        current=by_vrom(base)
+        for hook in rewards['installed_hooks']:
+            body=current[hook['vrom']].extract(base)
+            if u32(body,hook['address']-hook['ram'])!=hook['after']:
+                raise ValueError('Changed installed golden-tool consumer')
+        for redirect in rewards['redirects']:
+            at=redirect['address']-rp['ram']
+            if raw[at:at+8]!=bytes.fromhex(redirect['after']):raise ValueError('Changed golden-tool registry/save redirect')
     actions=equipment['player_actions'];scene=equipment['scenery']
     required=('tool_controls','tool_motion','tool_transitions','shovel_effects',
               'rod_effects','net_capture','reward_actions','reward_controls',
@@ -86,12 +110,19 @@ def refresh_selection(base,prior,blob,output):
         at=resource['physical'];n=resource['bytes']
         if sha256(base[at:at+n])!=resource['sha256']:
             raise ValueError('Changed retained physical import resource')
-    equipment['golden_tools']=dict(format='AFV3-GOLDEN-TOOLS-1',
-        shared_behaviour_installed=True,ordinary_gameplay_verified=False,items={
-            'GAFE01-r0/item/2239':dict(pending=['collection-completion-mayor-gift']),
-            'GAFE01-r0/item/223A':dict(pending=['perfect-town-shrine-reward']),
-            'GAFE01-r0/item/223B':dict(pending=[],acquisition='shining-hole-golden-tree'),
-            'GAFE01-r0/item/223C':dict(pending=['collection-completion-mayor-gift'])})
+    if extending:
+        for item,acquisition in (('2239','collection-completion-mayor-gift'),
+                ('223A','perfect-town-shrine-reward'),('223C','collection-completion-mayor-gift')):
+            equipment['golden_tools']['items']['GAFE01-r0/item/'+item]=dict(pending=[],acquisition=acquisition)
+        equipment['carried_items']['quest']['rewards'].update(selectable=True,
+            pending=['native golden reward and shovel acquisition checks'])
+    else:
+        equipment['golden_tools']=dict(format='AFV3-GOLDEN-TOOLS-1',
+            shared_behaviour_installed=True,ordinary_gameplay_verified=False,items={
+                'GAFE01-r0/item/2239':dict(pending=['collection-completion-mayor-gift']),
+                'GAFE01-r0/item/223A':dict(pending=['perfect-town-shrine-reward']),
+                'GAFE01-r0/item/223B':dict(pending=[],acquisition='shining-hole-golden-tree'),
+                'GAFE01-r0/item/223C':dict(pending=['collection-completion-mayor-gift'])})
     ready,_=parent_readiness(equipment)
     visible=[r for r in equipment['catalogue']['imports']
              if f'GAFE01-r0/item/{r["parent_item_id"]}' in ready]
@@ -107,14 +138,17 @@ def refresh_selection(base,prior,blob,output):
             struct.unpack_from('>4I',rel)!=(len(data),0,0,0) or len(data)%16):
         raise ValueError('Changed installed catalogue ordering or relocation layout')
     table=data[start:start+64]+b''.join(struct.pack('>H',r['catalogue_index']) for r in visible)
-    capacity=64;size=capacity*2;new_at=len(data)
+    capacity=64;size=capacity*2;new_at=start if extending else len(data)
+    growth_bytes=0 if extending else size
     if (len(table)>size or new_at+size>0x10000 or
-            cat['conservative_pool_required']+size>cat['pool_reserved']):
+            cat['conservative_pool_required']+growth_bytes>cat['pool_reserved'] or
+            extending and (held['capacity']!=capacity or new_at+size!=len(data))):
         raise ValueError('Expanded held ordering exceeds the existing catalogue allocation')
     descriptor=struct.unpack_from('>4I',parent,catalogue.OWNER)
-    if descriptor!=(catalogue.VROM,catalogue.VROM+new_at,catalogue.RAM,catalogue.RAM+new_at):
+    if descriptor!=(catalogue.VROM,catalogue.VROM+len(data),catalogue.RAM,catalogue.RAM+len(data)):
         raise ValueError('Changed native catalogue owner bounds')
-    data.extend(table.ljust(size,b'\0'))
+    if extending:data[start:start+size]=table.ljust(size,b'\0')
+    else:data.extend(table.ljust(size,b'\0'))
     struct.pack_into('>I',data,catalogue.UMBRELLA_POINTER-catalogue.RAM,catalogue.RAM+new_at)
     struct.pack_into('>I',data,catalogue.UMBRELLA_COUNT-catalogue.RAM,len(table)//2)
     struct.pack_into('>I',rel,0,len(data))
@@ -122,10 +156,10 @@ def refresh_selection(base,prior,blob,output):
         catalogue.RAM,catalogue.RAM+len(data))
     held.update(imports=visible,total_rows=len(table)//2,table_address=catalogue.RAM+new_at,
         table_sha256=sha256(table),capacity=capacity,
-        retained_linked_table_address=catalogue.RAM+start)
+        retained_linked_table_address=held.get('retained_linked_table_address',catalogue.RAM+start))
     cat.update(bytes=len(data),output_sha256=sha256(data),relocation_sha256=sha256(rel),
-        conservative_pool_required=cat['conservative_pool_required']+size,
-        rounded_growth=cat['rounded_growth']+size)
+        conservative_pool_required=cat['conservative_pool_required']+growth_bytes,
+        rounded_growth=cat['rounded_growth']+growth_bytes)
     equipment['pocket_icons']['owner_sha256']=sha256(parent)
     selection_prior={**prior,'equipment_resources':equipment,'catalogue':cat}
     equipment,_,updates=select_installed(selection_prior,blob,extend=True)
@@ -136,13 +170,15 @@ def refresh_selection(base,prior,blob,output):
     updates['catalogue']=cat
     updates['physical_resources']=copy.deepcopy(prior['physical_resources'])
     from v3_furniture_install import relocate_resource_plan
-    _,growth=relocate_resource_plan(base,files,catalogue.VROM,bytes(data),
-        minimum_physical=0x100000,reservations=updates['physical_resources'],
-        append_only=False,allow_compressed=True)
-    updates['resource_growth']=[growth]
-    updates['save_warning']=(prior['save_warning']+' Golden-shovel profiles require the golden shovel '
-        'on reload; earlier builds without its selection reject these saves. '
-        'The format remains 19. Preserve separate test saves.')
+    updates['resource_growth']=[]
+    if not extending:
+        _,growth=relocate_resource_plan(base,files,catalogue.VROM,bytes(data),
+            minimum_physical=0x100000,reservations=updates['physical_resources'],
+            append_only=False,allow_compressed=True)
+        updates['resource_growth']=[growth]
+    updates['save_warning']=(prior['save_warning']+' Golden-tool profiles require their selected tools '
+        'on reload; builds without those selections reject these saves. '
+        f'The format remains {prior["save_codec"]["format_version"]}. Preserve separate test saves.')
     return equipment,{catalogue.VROM:bytes(data),catalogue.RELOC:bytes(rel),
                       catalogue.PARENT:bytes(parent)},updates
 

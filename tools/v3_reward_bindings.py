@@ -40,6 +40,9 @@ def layout(prior):
         scratch=dict(ram=scratch,retained_bytes=120352,bytes=120368))
 
 NATIVE = {
+    'af_rw_native_birthday_card':0x800A9A98,
+    'af_rw_native_birthday_mail':0x800A9BD4,
+    'af_rw_native_same_town':0x800951E4,
     'af_rw_native_spec_change':0x800FA92C,
     'af_rw_native_voice_emit':0x800F91FC,
     'af_rw_native_message': 0x8007B5C0,

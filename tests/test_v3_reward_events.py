@@ -10,9 +10,9 @@ import unittest
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'tools'))
 from aflib import sha256
-OUT=ROOT/os.environ.get('V3_REWARD_EVENTS','build/v3-reward-events-prepared-22')
-CONNECTED=ROOT/os.environ.get('V3_REWARD_CONNECTED','build/v3-rewards-connected-04')
-INSTALLED=ROOT/os.environ.get('V3_REWARD_INSTALLED','build/v3-golden-rewards-runtime-07')
+OUT=ROOT/os.environ.get('V3_REWARD_EVENTS','build/v3-reward-events-prepared-25')
+CONNECTED=ROOT/os.environ.get('V3_REWARD_CONNECTED','build/v3-rewards-connected-05')
+INSTALLED=ROOT/os.environ.get('V3_REWARD_INSTALLED','build/v3-golden-rewards-runtime-09')
 
 
 class RewardEventTests(unittest.TestCase):
@@ -72,8 +72,8 @@ class RewardEventTests(unittest.TestCase):
         base,_=inputs(ROOT/'build/v3-golden-tools-selection-03/build-lock.json')
         connected=json.loads((CONNECTED/'connected.json').read_bytes())
         changes,hooks,evidence=native_consumers(base,connected['symbols'])
-        self.assertEqual(len(hooks),12)
-        self.assertEqual([len(r['removed']) for r in evidence],[0,3,1])
+        self.assertEqual(len(hooks),13)
+        self.assertEqual([len(r['removed']) for r in evidence],[0,3,1,0])
         self.assertTrue(all(r['whole_loaded_images_checked'] for r in evidence))
         self.assertTrue({0x741FB0,0x8D8EC0,0x3E90000}<=changes.keys())
         self.assertTrue(connected['native_services_bound'])
@@ -101,12 +101,14 @@ class RewardEventTests(unittest.TestCase):
             target=Path(temp)/'check'
             command=['cc','-std=c11','-O1','-g','-Wall','-Wextra','-Werror','-fno-pie','-no-pie',
                 '-Wno-unused-variable','-fsanitize=address,undefined','-fno-omit-frame-pointer','-I'+str(OUT),'-Ioverlays/v3',
+                *('-D'+name+'=1' for name in ('AF_V3_CARRIED_PROFILE','AF_V3_CARRIED_QUEST',
+                    'AF_V3_PAPER_PACKS','AF_V3_CARRIED_NPC','AF_V3_GOLDEN_REWARD_STORAGE')),
                 'tests/v3_reward_birthday_test.c','-o',str(target)]
             for cmd in (command,[str(target)]):
                 run=subprocess.run(cmd,cwd=ROOT,capture_output=True,text=True,timeout=30)
                 self.assertEqual(run.returncode,0,run.stdout+run.stderr)
         report=json.loads((OUT/'prepared.json').read_text())
-        self.assertEqual(len(report['birthday']['functions']),3)
+        self.assertEqual(len(report['birthday']['functions']),4)
         self.assertEqual(report['birthday']['item']['item'],0x1D30)
         self.assertIn('present = AF_RW_BIRTHDAY_ITEM;',(OUT/'present_demo.c').read_text())
 
@@ -289,7 +291,7 @@ class InstalledRewardTests(unittest.TestCase):
             if row['kind']=='call':
                 previous=by_vrom(self.base)[row['vrom']].extract(self.base)
                 self.assertEqual(body[at+4:at+8],previous[at+4:at+8])
-        self.assertEqual(len(r['installed_hooks']),12)
+        self.assertEqual(len(r['installed_hooks']),13)
         self.assertEqual(e['diaries']['memory']['scratch']['bytes'],120368)
         self.assertEqual(struct.unpack_from('>4I',self.image,e['npc_extra']['packet']['physical']+0xA000),(0x41464E58,1,8,44))
         self.assertEqual(u32(files[CODE_VROM].extract(self.image),0x800FA9FC-CODE_RAM),0x0C03BBA9)

@@ -1,11 +1,11 @@
 # Golden-tool selection checkpoint
 
-Current development: ABI 371, saved format 20, on `v3/optional-imports`.
+Current development: ABI 372, saved format 20, on `v3/optional-imports`.
 Neither stable V2-14 patcher deployment changes.
 
-- Lock: `build/v3-golden-rewards-runtime-07/build-lock.json`.
-- ROM SHA-256: `324651ba1ab1e84564e6b4c32570de62c491ab7677896905ce0fd23fe989119b`.
-- UPS SHA-256: `6290c325ab666c1fee057779d2bea8a11d859526cfbbc26fc4e41e5bf1a88f4c`.
+- Lock: `build/v3-golden-tools-selection-05/build-lock.json`.
+- ROM SHA-256: `d037248ed512a0a8990c45f1cc6a5b18929f735e891dd50f8cd59af68b934288`.
+- UPS SHA-256: `f2da41010042834d0b43122403d9a870e75ab008c28d6007d49517eea7a11a36`.
 
 ## Connected path
 
@@ -24,8 +24,13 @@ the source-linked table and every old owner byte remain except its pointer and
 count. The existing native pointer relocation handles the new table. The owner
 descriptor and relocation extent grow by 128 bytes, using checked existing menu
 pool slack. No menu code or other category moves. Physical placement uses the
-shared checked owner-growth planner. The pending net, axe, and rod are excluded
-from both selection and completion counts.
+shared checked owner-growth planner. The current refresh admits all four tools
+independently through their installed complete reward providers. Net and
+rod use the source collection-completion mayor presentation; axe uses the native
+Shrine's perfect-town assessment and Farley handover. Only three profile bits,
+the existing ordering table, and its count change during this selection refresh.
+The complete catalogue owner keeps its dimensions, physical mapping, relocation
+extent, and menu pool. No additional artwork or resident allocation is required.
 
 This selection path retains the existing shovel resources. The connected reward
 batch below adds official dialogue, Farley, appearance effects, and saved fields.
@@ -58,6 +63,38 @@ saves require pack mode; carried-family requirements remain. Preserve separate
 test saves and their matching ROMs. Ordinary native save/restart and
 original-hardware compatibility are not claimed.
 
+## Current connected selection and native evidence
+
+`tests.test_v3_golden_rewards_selection` passes retained-code/resource checks,
+actual-provider rejection, and nine browser/offline profiles: empty, each of the
+four tools alone, birthday-only, birthday plus all tools, axe with paper packs,
+and all 217 development choices. The empty/default profile remains exact V2-14.
+An exported birthday-only composition also checks current report receipts;
+no tool or holiday selection is required to enable the birthday presentation.
+
+The global `birthday-presentation` setting defaults to N64: retain native
+birthday mail without a doorstep gift. GameCube uses the complete donor gift
+presentation when eligible, and the whole associated birthday-mail selector.
+Mail excludes the presenting villager and updates the saved giver/year for the
+actual recipient slot. Other player slots and the active gift context remain
+unchanged. Native mail construction/delivery and the original English letters
+remain authoritative. The setting is independently bound in both composers.
+
+`build/v3-golden-rewards-native-01/` passes 51 silent records on the current
+cartridge: complete loaded storage/reward/tree/held code, four actual tool
+selections, independent first-gift flags, four birthday records, invalid-year
+rejection, native shining-hole planting, growth to `0867`, and the complete
+golden-shovel drop/spent-tree record. Scratch guards, checkpoint restoration,
+startup readiness, and native fault checks pass.
+
+`build/v3-golden-rewards-native-storage-01/` passes 48 records through the actual
+MIPS format-20 pack/check/commit functions. The whole saved bank restores all four
+birthday records and first-gift flags. Removing the actual net profile bit rejects
+without changing the bank or owned reward state. The fixture borrows only the
+paused disposable machine's native save buffer; checkpoint restoration precedes
+resumed execution. No FlashRAM I/O, ordinary save/restart, conversation, full tree
+shake/pickup sequence, or hardware result is claimed. No setup retry is consumed.
+
 ## Installed reward batch
 
 ### Prepared reward owners and character artwork
@@ -65,14 +102,14 @@ original-hardware compatibility are not claimed.
 `tools/v3_holiday_participants.py --rewards` prepares all 70 donor functions
 across `present_demo`, `present_npc`, and `npc_hem` through the existing complete
 participant converter. The current output is
-`build/v3-reward-events-prepared-22/`: the relocatable MIPS object includes the
+`build/v3-reward-events-prepared-25/`: the relocatable MIPS object includes the
 native world, gift/state, resident-mask, registry, perfect-town, birthday-giver,
 and Shrine adapters, scene/house admission, official dialogue, and speech setting.
-It has 22,918 bytes of text, 168 bytes of data, and 2,620 bytes of BSS. Its SHA-256 is
-`178a16d4817942a597bc5e09b470e39ac88ccd23996fce1a6413c89a2c454f7c`.
-`build/v3-rewards-connected-04/` finally links this complete object with the
+It has 23,630 bytes of text, 168 bytes of data, and 2,632 bytes of BSS. Its SHA-256 is
+`cca4dddf8fa42e80f5818aea71f931778c0e5b69c0fdf28f799537b368c4e253`.
+`build/v3-rewards-connected-05/` finally links this complete object with the
 complete appearance-effect object. All services are bound. The actor packet is
-25,728 bytes at `807CD040`, and the effect packet is 5,248 bytes at `807D4040`.
+26,464 bytes at `807CD040`, and the effect packet is 5,248 bytes at `807D4040`.
 Both are installed in the current cartridge. The native NPC prefix is reused;
 donor world/private structures do not alias native memory.
 
@@ -164,7 +201,7 @@ overwrite the native eight-byte clip. Native callbacks resolve through the
 actor's loaded descriptor, not fixed overlay VMAs. Eligibility, deferred Farley
 spawning, house-exit admission, single-demo exclusion, real birthday calendar and
 giver/year state, and axe return are installed. The full native overlay images
-are compared at two relocated addresses; only twelve checked caller/table words
+are compared at two relocated addresses; only thirteen checked caller/table words
 change, and only four replaced local fixups are removed.
 
 Eighteen focused reward/storage/registry/mask/Shrine/birthday/voice and physical
@@ -184,18 +221,16 @@ catalogue. The expanding sound archive moves one complete tree artwork page and
 the complete tree startup packet. Only the checked page-address word changes in
 that packet; loaded code, artwork, and RAM identities remain unchanged. The
 shared writer validates the exact old/new resources and revised page directory.
-The development build has 214 choices. Net, axe, and rod remain excluded pending
-the connected selection step. Both V2 deployments remain unchanged.
+The development build has 217 choices. All four golden tools are independently
+selectable. Both V2 deployments remain unchanged.
 
 ### Next connected consumers
 
-Extend the same shared held importer to admit net, axe, and rod independently,
-using the installed complete reward providers and the existing catalogue
-reservation. Check real N64/GameCube behaviour choices, including the connected
-birthday path, rather than silently adding substantial unrelated behaviour.
-Then run the focused combined native gift/Shrine/shovel acquisition and
-save/reload checks. The native harness budget is thirty minutes for the batch,
-with one initial attempt and one corrected-setup retry; it is not started.
+Continue the existing acquisition queue with Nook's actual code input, result
+dialogue, and animated handover, using the installed complete password engine.
+Keep ordinary golden gift/Shrine conversations, complete tree shaking/pickup,
+and physical save/restart in the assembled-build verification scope. The current
+bounded native probes pass; do not restart their setup or replay unchanged code.
 Do not replay unchanged artwork/effect tests, reconvert resources, rebuild older
 cartridges, or restart an item audit. The lighthouse building remains outside V3
 and is not represented as implemented. Continue the existing completion queue

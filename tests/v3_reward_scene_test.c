@@ -91,7 +91,8 @@ int main(void) {
     assert(af_rw_owner_active(&rod,scene) && !af_rw_owner_active(&birth,scene));
     move();assert(make_count==2);leave();assert(!scene && !af_rw_demo_clip);
     fish=0;arm();assert(pending.type==aPRD_TYPE_GOLDEN_NET);enter();move();leave();
-    birthday_mode=1;arm();assert(pending.type==aPRD_TYPE_BIRTHDAY && !saved.year);
+    birthday_mode=1;arm();assert(pending.type==aPRD_TYPE_GOLDEN_NET && !saved.year);
+    af_rw_birthday_mode=1;arm();assert(pending.type==aPRD_TYPE_BIRTHDAY && !saved.year);
     enter();make_ok=0;move();assert(!saved.year && !saved.giver);
     make_ok=1;move();assert(saved.year==2026 && saved.giver==0xE015);
     assert(af_rw_owner_active(&birth,scene) && !af_rw_owner_active(&rod,scene));leave();
@@ -101,7 +102,10 @@ int main(void) {
     arbeit=0;friendship=0;arm();assert(pending.type==aPRD_TYPE_GOLDEN_NET);
     friendship=1;free_slot=-1;arm();assert(!pending.armed);free_slot=0;
     job=1;arm();assert(!pending.armed);job=0;
-    selected=0;arm();assert(!pending.armed);selected=15;
+    selected=0;af_rw_birthday_mode=0;arm();assert(!pending.armed);
+    af_rw_birthday_mode=1;arm();assert(pending.armed && pending.type==aPRD_TYPE_BIRTHDAY);
+    enter();af_rw_birthday_mode=0;move();assert(!pending.armed);leave();
+    selected=15;
     arm();enter();player=1;move();assert(!pending.armed);player=0;leave();
     arm();enter();mDemo_Set_talk_return_get_golden_axe_demo(1);
     talk=(ACTOR *)house;move();assert(!returns);

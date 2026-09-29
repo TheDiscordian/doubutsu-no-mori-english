@@ -21,12 +21,21 @@ typedef struct {int armed,type,player;u16 giver,year;} Pending;
 static Pending pending;
 static GAME *scene;
 static int expected=-1,starting,axe_return;
+volatile s32 af_rw_birthday_mode=0;
+
+static int birthday_enabled(void) {
+    int mode=af_rw_birthday_mode;
+    if(mode<0 || mode>1)af_v3_save_halt(-1);
+    return mode;
+}
 
 static int gifts_enabled(void) {
-    return af_v3_player_selected_equipment(0x2239)>=0 ||
+    int birthday=birthday_enabled();
+    return birthday || af_v3_player_selected_equipment(0x2239)>=0 ||
         af_v3_player_selected_equipment(0x223C)>=0;
 }
 static int birthday_eligible(void) {
+    if(!birthday_enabled())return 0;
     int player=af_rw_player();AFRewardBirthday birthday;
     const lbRTC_time_c *clock=af_cw_clock();
     if(player<0 || player>=4 || !af_rw_private() || !clock ||
@@ -90,7 +99,8 @@ static void gift_start(GAME *game) {
     if(!pending.armed || game!=scene || !af_rw_private() || af_rw_demo_clip ||
        !af_cw_player_actor(game) || !af_rw_npc_setup() || af_cw_handover_master())return;
     if(pending.player!=af_rw_player() || pending.year!=af_cw_clock()->year ||
-       mPr_GetPossessionItemIdx(af_rw_private(),0)<0 || !gifts_enabled()) {
+       mPr_GetPossessionItemIdx(af_rw_private(),0)<0 || !gifts_enabled() ||
+       (pending.type==aPRD_TYPE_BIRTHDAY && !birthday_enabled())) {
         pending=(Pending){0};return;
     }
     AFRewardBirthday before;

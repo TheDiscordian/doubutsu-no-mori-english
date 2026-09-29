@@ -106,10 +106,14 @@ def refresh_receipts(e, records, payloads):
         quest = carried.get('quest')
         if quest and quest['packet']['id'] in payloads:
             p = quest['packet']; data = payloads[p['id']]
-            for target in (carried['spawning'], carried['paper'].get('quantities'), quest.get('npc')):
+            for target in (carried['spawning'], carried['paper'].get('quantities'), quest.get('npc'), quest.get('rewards')):
                 if target:target['packet'] = copy.deepcopy(p)
             at = quest['ram']-p['ram']
             quest['code']['sha256'] = sha256(data[at:at+quest['code']['bytes']])
+            rewards=quest.get('rewards')
+            if rewards:
+                at=rewards['code']['ram']-p['ram']
+                rewards['code']['sha256']=sha256(data[at:at+rewards['code']['bytes']])
 
 
 def update_report(image, blob, report, selection):

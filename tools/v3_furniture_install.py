@@ -376,6 +376,18 @@ def place_resource_tail(base,prior,blob,resources,limit,*,reservations=(),placem
         elif external and not entry.pend and data==entry.extract(base):
             moved.append(dict(vrom=vrom,bytes=len(data),physical=entry.pstart,
                 storage='retained-external',sha256=sha256(data),original_sha256=sha256(data)))
+        elif external and not entry.pend and len(data)==entry.size:
+            # Data-only ordering changes fit the already checked complete
+            # external owner. Do not demand another cartridge-tail copy.
+            first=entry.pstart;end=first+entry.size
+            if (physical.overlaps(reservations,first,end) or
+                    any(e.pstart<end and first<(e.pend or e.pstart+e.size)
+                        for v,e in files.items() if v!=vrom and e.pstart!=0xFFFFFFFF)):
+                raise ValueError('External owner update overlaps another resource')
+            moved.append(dict(vrom=vrom,bytes=len(data),physical=first,
+                storage='checked-in-place-update',sha256=sha256(data),
+                original_sha256=sha256(entry.extract(base))))
+            writes[vrom]=data
         else:pending.append((vrom,data));writes[vrom]=data
     moved.extend(owner_tail_storage(base,files,pending,
         minimum_end=max(files[BLOB].pstart+len(blob),

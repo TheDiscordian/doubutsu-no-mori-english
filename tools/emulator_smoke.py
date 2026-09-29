@@ -266,7 +266,7 @@ class RSP:
             base, expected_code = verified_code
             if (type(base) is not int or base & 3 or type(expected_code) is not bytes
                     or not 4 <= len(expected_code) <= 0x20000 or len(expected_code) & 3
-                    or not 0x80000400 <= base <= 0x80400000-len(expected_code)
+                    or not 0x80000400 <= base <= getattr(self,'ram_end',0x80400000)-len(expected_code)
                     or not base <= address <= base+len(expected_code)-4
                     or (base < MODULE_RAM+RESERVATION and base+len(expected_code) > MODULE_RAM)):
                 raise ValueError('Invalid verified native code range')
@@ -905,6 +905,7 @@ def main():
             except subprocess.CalledProcessError as error:
                 raise ValueError('Initial screenshot failed: '+error.stderr.decode(errors='replace')) from error
         debug = connect_debugger(ares, args.port)
+        debug.ram_end = 0x80800000 if args.expansion_pak else 0x80400000
         results.append({"debug_features": debug.command("qSupported:multiprocess+")})
         keyboard = Keyboard(display)
         actions = json.loads(args.scenario.read_text()) if args.scenario else [
@@ -1431,6 +1432,14 @@ def main():
                     raise ValueError('V3 save-codec probes require an emulator checkpoint')
                 needs_checkpoint_restore = True
                 results.append(exercise(debug, args.rom, record))
+            if action.get('test_v3_golden_rewards') or action.get('test_v3_golden_rewards_storage'):
+                from v3_golden_rewards_smoke import exercise
+                if (not args.expansion_pak or not (out/'test.bs1').is_file() or
+                        args.seed_save or args.seed_state or args.allow_test_flash_write):
+                    raise ValueError('Golden reward probes require eight MiB, a checkpoint, and blank isolated storage')
+                needs_checkpoint_restore = True
+                results.append(exercise(debug,args.rom,record,
+                    save_transaction=bool(action.get('test_v3_golden_rewards_storage'))))
             if action.get('test_v3_furniture_pockets'):
                 from v3_furniture_pockets_smoke import exercise
                 if not (out/'test.bs1').is_file():

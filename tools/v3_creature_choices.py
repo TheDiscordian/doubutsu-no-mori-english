@@ -28,6 +28,9 @@ FISHING_CHOICE=dict(id='tournament-measurements',name='Fishing tournament measur
 PAPER_CHOICE=dict(id='paper-quantities',name='Paper quantities',binding='paper_mode',
     symbol='af_carried_paper_mode',scope='All original and imported stationery',
     description='N64 gives single sheets. GameCube gives four-sheet packs. This applies to all paper styles, shops, catalogue orders, gifts, and rewards. Packs can be split or combined, and writing a letter uses one sheet.')
+BIRTHDAY_CHOICE=dict(id='birthday-presentation',name='Birthday presentation',binding='birthday_mode',
+    symbol='af_rw_birthday_mode',scope='Birthday gift presentation and accompanying birthday mail',
+    description='N64 retains its birthday mail without a doorstep presentation. GameCube adds its villager gift presentation when the date, friendship, pocket space, and work eligibility allow it, and excludes the presenting villager from accompanying birthday mail. The annual giver and year are saved. This setting does not require a golden tool.')
 SAVE_NOTE=('These behaviour settings keep the same saved layout and imported identities. '
     'Saved seasonal state and existing tournament measurements are retained. '
     'A native save/reload after switching settings is not yet verified.')
@@ -84,6 +87,18 @@ def options(image,report):
             raise ValueError('Changed shared behaviour definition')
         at=start+row['ram']-p['ram']
         if image[at:at+4]!=bytes(4):raise ValueError('Changed pinned behaviour default')
+        result.append({**row,'offset':at,'before':image[at:at+4].hex()})
+    reward=report.get('equipment_resources',{}).get('carried_items',{}).get('quest',{}).get('rewards')
+    if reward and reward.get('birthday_choice'):
+        row=reward['birthday_choice'];p=reward['packet'];code=reward['code'];start=p['physical']
+        if (not reward['installed'] or any(row.get(k)!=v for k,v in BIRTHDAY_CHOICE.items()) or
+                row['default']!='N64' or row['values']!={'N64':0,'GameCube':1} or
+                row['ram']!=code['symbols'][row['symbol']] or
+                not code['ram']<=row['ram']<code['ram']+code['bytes'] or
+                sha256(image[start:start+p['bytes']])!=p['sha256']):
+            raise ValueError('Changed complete installed birthday presentation choice')
+        at=start+row['ram']-p['ram']
+        if image[at:at+4]!=bytes(4):raise ValueError('Changed pinned N64 birthday presentation default')
         result.append({**row,'offset':at,'before':image[at:at+4].hex()})
     insects=report.get('equipment_resources',{}).get('creature_insects')
     if insects and insects.get('behaviour_choice'):
@@ -229,6 +244,12 @@ def update_report(image,blob,report,resolved):
         e['carried_items']['quest']['packet']=copy.deepcopy(p)
         e['carried_items']['spawning']['packet']=copy.deepcopy(p)
         next(r for r in report['physical_resources'] if r['id']==p['id'])['sha256']=p['sha256']
+    reward=e.get('carried_items',{}).get('quest',{}).get('rewards')
+    if reward and reward.get('birthday_choice'):
+        row=reward['birthday_choice'];p=reward['packet'];value=resolved[row['id']]
+        packet=image[p['physical']:p['physical']+p['bytes']]
+        if u32(packet,row['ram']-p['ram'])!=row['values'][value]:raise ValueError('Lost birthday presentation choice')
+        row['resolved']=value
     for boot in (e['surface_bootstrap'],report['room_surfaces']['items']['bootstrap']):
         c=boot['code'];start=c['symbols']['af_v3_surface_init']-e['ram']
         c['sha256']=sha256(ep[start:start+c['bytes']])

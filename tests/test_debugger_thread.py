@@ -64,6 +64,19 @@ class ThreadDebugger(RSP):
 
 
 class DebuggerThreadTests(unittest.TestCase):
+    def test_expansion_calls_require_explicit_eight_mib_and_matching_code(self):
+        debug=ThreadDebugger();debug.pause_game_thread()
+        debug.code_base=0x807CD040
+        proof=(debug.code_base,debug.code_bytes)
+        with self.assertRaisesRegex(ValueError,'code range'):
+            debug.call('807CD040',[],verified_code=proof)
+        debug.ram_end=0x80800000
+        self.assertEqual(debug.call('807CD040',[],verified_code=proof)['return_value'],55)
+        with self.assertRaisesRegex(ValueError,'code range'):
+            debug.call('807FFFFC',[],verified_code=(0x807FFFFC,bytes(8)))
+        with self.assertRaisesRegex(ValueError,'Invalid test function'):
+            debug.call('807CD040',[])
+
     def test_verified_font_arguments_fit_the_existing_stack_guard(self):
         debug = ThreadDebugger()
         debug.pause_game_thread()

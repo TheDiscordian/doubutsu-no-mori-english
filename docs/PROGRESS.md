@@ -23,21 +23,24 @@ lock or publish experimental V3.
 
 ## Active development
 
-The current development proposal is ABI 371 / format 20 at
-`build/v3-golden-rewards-runtime-07/build-lock.json`. The golden shovel is
-independently selectable, connecting its existing shining-hole planting,
-gold-tree growth/drop, pickup/exchange, celebration, and saved-profile path.
-The held catalogue includes the shovel and reserves space for all four golden
-tools without recompiling models or changing existing catalogue code. The
-development catalogue has 214 entries; net, rod, and axe remain unavailable pending
-the connected selection step and native checks. Six retained browser/offline profiles
-agree, complete retained-resource checks pass, and current format-19 transaction
-checks retain the shovel and celebration flags for all four players. Missing
-shovel selection rejects the save before publication/writes. Native I/O is
-doubled; a complete ordinary acquisition run and hardware play are not verified.
-Retained ABI-370 boot verifies the selected profile and no faults. Shovel-profile
-saves require that option on reload, including when moving to another format-19
-build. See [the golden-tool checkpoint](checkpoints/V3_GOLDEN_TOOLS.md).
+The current development proposal is ABI 372 / format 20 at
+`build/v3-golden-tools-selection-05/build-lock.json`. All four golden tools are
+independently selectable: shovel through shining-hole planting and golden-tree
+growth/drop, net/rod through the collection-completion mayor presentation, and
+axe through the Shrine's perfect-town assessment and Farley handover.
+The catalogue admits the three additional tools within its existing allocation,
+without changing menu code, other categories, or retained artwork. There are
+217 development choices. Nine browser/offline profiles agree, including each
+tool alone and the independent birthday-only setting. N64 birthday mail is the
+default; GameCube adds the villager presentation and its associated giver/year
+mail policy, without requiring any tool.
+Two current silent native probes pass 51 and 48 records. They verify loaded
+code, real selected-tool lookup, four-player reward fields, shovel planting/growth
+records, and the complete native format-20 pack/check/commit round-trip.
+Missing net selection rejects without changing the bank or reward state.
+No physical save I/O, ordinary acquisition conversation, complete shake/pickup
+sequence, ordinary save/restart, or hardware play is claimed. See
+[the golden-tool checkpoint](checkpoints/V3_GOLDEN_TOOLS.md).
 
 Orange paper, exercise cards,
 knife and fork, coconut, cedar saplings, and spirits have independent selections
@@ -73,7 +76,9 @@ artwork/effect evidence is retained. House/scene entrance conditions, save
 redirects, effect/scene cleanup, all 46 official messages, and Farley's additional
 speech setting are installed. The complete tree startup packet and one artwork
 page move around checked sound-archive growth, preserving loaded resources.
-Independent net/axe/rod selection and combined native gameplay/save checks remain.
+Independent net/axe/rod selection and the birthday choice are connected. Bounded
+native state/save probes pass; ordinary conversations and physical save/restart
+remain part of assembled-build verification.
 The [golden-tool checkpoint](checkpoints/V3_GOLDEN_TOOLS.md#next-connected-consumers)
 records the mapped next connections. Format-19 and earlier builds cannot read
 format-20 saves; preserve separate test saves. Both deployed patchers remain V2-14.

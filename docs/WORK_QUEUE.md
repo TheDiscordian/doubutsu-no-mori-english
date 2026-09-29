@@ -36,8 +36,15 @@ Implement the actual alternatives and bind selections to the build receipt.
 Fish/insect population and imported coastal movement have installed controls and
 runtime alternatives; other substantial differences still need real bindings.
 
-Current implementation task: finish the four golden-tool behaviour/reward paths
-through the shared equipment importer, including the full golden-shovel route.
+Current implementation task: connect Nook's actual code-entry/result/animated
+gift path to the installed shared password engine, then admit every supported
+password-only furniture/surface record through the ordinary importer. Preserve
+the prepared codec, eligibility matrix, staged artwork, stable identities,
+donor result classes, name rules, three-gift limit, and one-insertion handover.
+Keep real unavailable delivery routes explicit; do not substitute shop stock.
+
+The four golden-tool behaviour/reward paths are connected through the shared
+equipment importer, including the golden-shovel tree route.
 The golden shovel's tree acquisition, rewards, selection, and catalogue are
 connected. Continue the shared collection-completion mayor gift director/NPC for
 net and rod (`ac_present_demo` / `ac_present_npc`), plus the Shrine/hem reward
@@ -53,7 +60,8 @@ The complete Shrine appearance effects, graphics, and audio are prepared, and
 real gift/state providers plus explicit format-20/wire-7 storage pass focused
 host save/migration checks. Registry, house/scene and Shrine entry points,
 storage redirects, teardown, official dialogue, and Farley's speech setting are
-installed. Continue independent tool selections and combined native checks in the
+installed. Independent tool selections, the real birthday setting, and bounded
+native reward/save checks pass in the
 [golden-tool checkpoint](checkpoints/V3_GOLDEN_TOOLS.md#next-connected-consumers).
 Do not reconvert those prepared resources or replay their unchanged tests.
 The carried-object/stationery batch has connected independent selections. Its donor identity worksheet
@@ -80,16 +88,17 @@ The policy and fixed pack identities are installed and selectable in development
 Do not mutate quantities during ordinary transfers or load. See the
 [stationery choice contract](../specs/V3_CARRIED_ITEMS.md#global-stationery-quantity-choice).
 
-The current proposal is ABI 371 / format 20 at
-`build/v3-golden-rewards-runtime-07/build-lock.json`, with 214 selectable development
-entries. The golden shovel is independently selectable; the other three tools
-remain unavailable pending connected selection and native checks. Shared held ordering has a
-64-entry capacity, preserving all existing catalogue code and other categories.
-Six current composition profiles agree. Current format-19 transaction checks
-retain the shovel and celebration flags for all four players and reject removal
-of its actual selection bit before publication/writes. Native I/O is doubled;
-ordinary acquisition and hardware play remain unverified. ABI-370 startup evidence
-is retained; the new reward cartridge's native harness is not started. Format-19
+The current proposal is ABI 372 / format 20 at
+`build/v3-golden-tools-selection-05/build-lock.json`, with 217 selectable development
+entries. All four golden tools are independently selectable. Shared held ordering
+keeps its 64-entry capacity, complete code, physical mapping, and other categories.
+Nine current browser/offline profiles agree, including each tool alone and
+GameCube birthday presentation without imports. N64 birthday mail is the default.
+Current silent native probes pass 51 reward/selection/tree records and 48 complete
+format-20 pack/check/commit records. Four birthday records and first-gift flags
+restore; missing net selection rejects without changing the bank or owned state.
+No physical save I/O, ordinary gift conversation, full shake/pickup sequence,
+ordinary save/restart, or hardware play is claimed. Format-19
 and earlier readers cannot load format-20 saves. See [the golden-tool checkpoint](checkpoints/V3_GOLDEN_TOOLS.md).
 
 The six carried parent choices remain independently selectable. Their masks are `7D`; the sign-board

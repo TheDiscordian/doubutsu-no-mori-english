@@ -23,6 +23,13 @@ _Static_assert(__builtin_offsetof(AFRewardMemory,friendship)==0x28,"Native frien
 _Static_assert(__builtin_offsetof(AFRewardAnimal,memories)==0x10,"Native animal memories");
 _Static_assert(sizeof(AFRewardAnimal)==0x528,"Native animal stride");
 AFRewardAnimal *af_rw_birthday_animals(void);
+typedef struct {u16 giver,year;} AFRewardBirthdayMailState;
+AFRewardBirthdayMailState *af_rw_birthday_mail_state(void);
+u16 af_rw_birthday_current_giver(void);
+int af_rw_birthday_same_town(AFRewardPersonalID *);
+int af_rw_birthday_source_mail(AFRewardPersonalID *,int);
+int af_rw_birthday_mail(AFRewardPersonalID *,int);
+int af_rw_native_birthday_card(AFRewardPersonalID *,int,AFRewardAnimalID *);
 int af_rw_birthday_friendship(void);
 u16 af_rw_birthday_choose(void);
 int af_rw_native_highest_friendship(AFRewardMemory *,int);

@@ -1278,11 +1278,12 @@ def prepare_reward_events(output,lock):
     generated['reward_clock_reference.c']='\n\n'.join(clock_pieces)+'\n'
     # Keep the whole source giver-choice functions. Only the save view and
     # equivalent native identity/memory services change at this boundary.
-    birthday_functions=[];birthday_pieces=['#include "reward_birthday_native.h"',
+    birthday_functions=[];birthday_pieces=['#include "reward_birthday_native.h"','#include <stddef.h>',
         '#define ANIMAL_NUM_MAX 15', '#define ANIMAL_MEMORY_NUM 7',
         '#define FALSE 0', '#define TRUE 1']
     for path,name in (
             ('src/game/m_npc.c','mNpc_CheckFriendship'),
+            ('src/game/m_npc.c','mNpc_SendEventBirthdayCard2'),
             ('src/actor/npc/ac_npc_p_sel2_talk.c_inc','aNPS2_chk_friendship_npc'),
             ('src/actor/npc/ac_npc_p_sel2_talk.c_inc','aNPS2_decide_birthday_npc')):
         raw=read(path,report['references'])
@@ -1296,7 +1297,12 @@ def prepare_reward_events(output,lock):
                 ('Save_Get(animals[0])','af_rw_birthday_animals()[0]'),
                 ('Save_Get(animals)','af_rw_birthday_animals()'),
                 ('&Now_Private->player_ID','(AFRewardPersonalID *)af_rw_private()'),
-                ('Common_Get(now_private)->birthday_present_npc','af_rw_birthday_giver()'),
+                ('Common_Get(now_private)->birthday_present_npc','af_rw_birthday_mail_state()->giver' if name=='mNpc_SendEventBirthdayCard2' else 'af_rw_birthday_current_giver()'),
+                ('Common_Get(now_private)->celebrated_birthday_year','af_rw_birthday_mail_state()->year'),
+                ('Common_Get(time.rtc_time).year','af_cw_clock()->year'),
+                ('mLd_CheckThisLand(pid->land_name, pid->land_id)','af_rw_birthday_same_town(pid)'),
+                ('mNpc_SendBirthdayCard','af_rw_native_birthday_card'),
+                ('mNpc_SendEventBirthdayCard2','af_rw_birthday_source_mail'),
                 ('mNpc_CheckFreeAnimalPersonalID','af_rw_native_free_animal'),
                 ('mNpc_GetHighestFriendshipIdx','af_rw_native_highest_friendship'),
                 ('mPr_CheckCmpPersonalID','af_rw_native_compare_player'),
@@ -1308,6 +1314,7 @@ def prepare_reward_events(output,lock):
         birthday_pieces.append(body)
         birthday_functions.append(dict(**source.function(matches[0])[1],
             source_sha256=sha256(original.encode()),adapted_sha256=sha256(body.encode())))
+    birthday_pieces.insert(1,'#define EMPTY_NO 0')
     generated['reward_birthday_source.c']='\n\n'.join(birthday_pieces)+'\n'
     # Extract the additional speech policy from the whole pinned donor engine.
     # Its sequence matches native setting 2; its per-voice volume/pitch do not.
