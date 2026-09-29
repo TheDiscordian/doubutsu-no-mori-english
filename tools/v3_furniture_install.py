@@ -1047,6 +1047,12 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
     if equipment_report and equipment_report.get('room_rigs',{}).get('music'):
         from v3_room_music import publish_owner
         publish_owner(base,prior,equipment_report,owner_changes)
+    if equipment_report and equipment_report.get('carried_items',{}).get('paper',{}).get('quantities'):
+        from v3_paged_dma import install as repair_paged_dma
+        physical_writes.extend(repair_paged_dma(base,blob,equipment_report,
+            report_updates['physical_resources'],output))
+    allocation_base=physical.retire_dma_copies(base,prior.get('physical_resources',[]),
+        report_updates['retired_dma_copies']) if report_updates.get('retired_dma_copies') else base
     if equipment_report and equipment_report.get('room_rigs',{}).get('embedded_engine'):
         from v3_furniture_motion import publish_embedded_dispatch,OWNER as room_owner
         publish_embedded_dispatch(base,prior,equipment_report,owner_changes)
@@ -1104,7 +1110,7 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
                     raise ValueError('Changed complete resource growth plan')
                 if row.get('relocated'):
                     start,end=row['physical'],row['physical']+row['bytes']
-                    if (start&15 or not 0<=start<end<=len(base) or any(base[start:end]) or
+                    if (start&15 or not 0<=start<end<=len(base) or any(allocation_base[start:end]) or
                             physical.overlaps(report_updates.get('physical_resources',prior.get('physical_resources',[])),start,end) or
                             any(e.pstart<end and start<(e.pend or e.pstart+e.size)
                                 for e in files.values() if e.pstart!=0xFFFFFFFF) or
@@ -1197,7 +1203,7 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         raise ValueError('Changed runtime startup reservation')
     module[STARTUP:CONFIG]=startup+bytes(CONFIG-STARTUP-len(startup))
     struct.pack_into('>4I',module,CONFIG,BLOB,0xC000,zlib.crc32(blob[:0xC000]),abi)
-    result=bytearray(base)
+    result=bytearray(allocation_base)
     if resource_mode:
         start=files[BLOB].pstart+len(old_blob);end=files[BLOB].pstart+len(blob)
         if (len(blob)<len(old_blob) or BLOB+len(blob)>limit or end>len(base) or any(base[start:end])
@@ -1626,6 +1632,13 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         if actions:
             report['shared_runtime_refresh']['additional_menu_bytes']=(carried['paper']['catalogue']['additional_menu_bytes']
                 if new_storage else actions['additional_menu_bytes'] if new_actions else 0)
+        paper=carried.get('paper',{}).get('quantities')
+        if paper and not previous_carried.get('paper',{}).get('quantities'):
+            report['shared_runtime_refresh']['adapters'].append('global_stationery_quantities')
+            report['shared_runtime_refresh'].update(resource_allocations_changed=True,
+                saved_format_changed=True,saved_profile_changed=False,
+                additional_resident_bytes=paper['additional_resident_bytes'],
+                additional_menu_bytes=paper['additional_menu_bytes'])
         report['sources'].update(carried['sources'])
         report['native_test']='pending connected carried-item menus, behaviours, persistence, and selection; readiness remains off'
     if holiday_actor_services:

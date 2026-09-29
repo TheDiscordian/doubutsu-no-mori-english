@@ -24,6 +24,29 @@ PREPARED=BUILD/'tree-effects'
 
 
 class PageTests(unittest.TestCase):
+    def test_physical_and_virtual_dma_routing(self):
+        from tests.test_v3_equipment_runtime import HostTests
+        HostTests.sanitized(self,'v3_resource_dma_test.c')
+
+    def test_retired_dma_copy_requires_complete_live_replacement(self):
+        import v3_physical_resources as physical
+        rom=bytearray(0x110000);old=0x101000;new=0x102000
+        rom[old:old+16]=b'A'*16;rom[new:new+32]=b'A'*16+b'B'*16
+        files={0:SimpleNamespace(pstart=new,pend=0,size=32)}
+        move=dict(previous_physical=old,previous_bytes=16,previous_sha256=sha256(b'A'*16),
+            physical=new,bytes=32,sha256=sha256(b'A'*16+b'B'*16),
+            relocated=True,retains_old_allocation=True)
+        with patch.object(physical,'by_vrom',return_value=files):
+            out=physical.retire_dma_copies(rom,[],[move])
+            self.assertEqual(out[old:old+16],bytes(16))
+            self.assertEqual(rom[old:old+16],b'A'*16)
+            self.assertEqual(out[new:new+32],rom[new:new+32])
+            for wrong in (dict(move,sha256='bad'),dict(move,previous_sha256='bad'),
+                    dict(move,relocated=False),dict(move,physical=new+32),
+                    dict(move,previous_physical=new)):
+                with self.assertRaises(ValueError):physical.retire_dma_copies(rom,[],[wrong])
+            with self.assertRaises(ValueError):physical.retire_dma_copies(rom,[],[move,move])
+
     def test_bounded_complete_page_loading(self):
         from tests.test_v3_equipment_runtime import HostTests
         HostTests.sanitized(self,'v3_paged_resource_test.c')

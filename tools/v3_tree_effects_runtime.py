@@ -29,7 +29,7 @@ SOURCES=('tools/v3_tree_effects.py','tools/v3_tree_effects_runtime.py','tools/v3
     'tools/v3_scenery.py','tools/v3_asset_loader.py','tools/v3_furniture_install.py','tools/v3_room_goods.py',
     'tools/v3_holiday_sky.py','tools/v3_physical_resources.py','tools/v3_room_effects.py',
     'overlays/v3/tree_effects.h','overlays/v3/tree_effects.c','overlays/v3/tree_effects.ld',
-    'overlays/v3/paged_resource.h',
+    'overlays/v3/paged_resource.h','overlays/v3/resource_dma.h',
     'overlays/v3/effect_loader.c','overlays/v3/surface_bootstrap.c')
 
 

@@ -484,7 +484,7 @@ def build(output, selected=(), *, select_all=False, behaviours=None):
         raise ValueError('Choose explicit identities or all installed development entries')
     image, report = inputs()
     catalog = catalogue(image, report)
-    from v3_creature_choices import options as behaviour_options,SAVE_NOTE
+    from v3_creature_choices import options as behaviour_options,save_note
     choices=behaviour_options(image,report)
     selection = resolve(catalog, list(catalog) if select_all else list(selected),
         behaviours=behaviours,behaviour_options=choices if choices or behaviours else None)
@@ -499,7 +499,7 @@ def build(output, selected=(), *, select_all=False, behaviours=None):
         'patch_sha256':sha256(patch), 'rom_bytes':len(result), 'writes':writes,
         'retains_unselected_resource_storage':blob is not None,
         'save_compatibility':'V2 baseline' if blob is None else save_compatibility(report)}
-    if choices:receipt['behaviour_save_note']=SAVE_NOTE
+    if choices:receipt['behaviour_save_note']=save_note(report)
     if blob is None:
         current = {'build':'v2-import-free', 'output_sha256':sha256(result), 'composition':receipt}
     else:

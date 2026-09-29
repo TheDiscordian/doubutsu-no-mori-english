@@ -26,7 +26,7 @@ lock or publish experimental V3.
 The shared stationery implementation has a global `paper-quantities` choice:
 N64 single sheets or GameCube four-sheet packs, across all original/imported
 styles and creation routes. N64 is the default. Preparation at
-`build/v3-paper-quantities-prepared-04/` contains the 6,176-byte shared
+`build/v3-paper-quantities-prepared-10/` contains the 6,304-byte shared
 reader/action/supply/catalogue module, 12,304-byte format-18/wire-5 save adapter,
 and complete letter/catalogue owners. Its checked resident extension is
 `807B4000..807BB000`; existing catalogue, food, and spirit code is not overwritten.
@@ -34,7 +34,7 @@ Native singles, orange states, and the native grab bags retain their IDs.
 Focused sanitized checks pass for both modes, invalid-mode rejection, all 65
 styles/quantities, split/merge/consumption, price/icon/name/ownership readers,
 independent original-paper support, and conservative saved-mode binding.
-Prepared native hooks connect random creation, style-aware exclusions, shop
+Installed native hooks connect random creation, style-aware exclusions, shop
 category, and catalogue order identities. Background-only selection retains
 its canonical style IDs. Catalogue previews retain native artwork/DMA while
 pricing the actual quantity; order identities carry that quantity to Nook's
@@ -44,11 +44,28 @@ actual format-18 compressed save transaction passes in both modes with native
 I/O doubled: partial quantities in all four players' saved pockets, migration
 from formats 14–17, retained diary/console/card state, older-reader rejection,
 and pack-mode incompatibility rejection before state publication or writes.
-These changes are not installed: shop-floor/display/interaction and fixed-gift
-consumers, reader/storage redirects, startup loading, and the checked
-offline/browser setting binding remain required. Ordinary native gameplay and
-save/reload are unverified. Pack-dependent saves reject single-sheet mode
+The complete policy is installed in ABI 367 at
+`build/v3-paper-quantities-installed-08/build-lock.json`. All three shop-floor
+consumers, five shop counters, loose-item drawing, and first-job creation/display
+use the shared policy without changing quantities during transfers. Public
+reader/catalogue/save exports redirect to the new code. The existing quest
+startup packet grows to 61,440 bytes; the startup table stays at 22 descriptors.
+Eight browser/offline profiles pass, including four-sheet mode with no content
+imports and exact V2-14 for an empty/default selection. Ordinary native gameplay
+and save/reload remain unverified. Pack-mode saves reject single-sheet mode
 rather than discard quantities.
+
+The current native boot check exposed and fixes an incorrect physical-ROM read
+in the shared scenery and tree-effect loaders. A bounded physical/virtual DMA
+adapter preserves all prepared artwork and existing public entries. The current
+ROM boots without a fault and loads the complete stationery module. Routing,
+bounds, and allocator reclamation checks pass. Only a recorded obsolete DMA
+copy is reclaimed in the new output, with both historical hashes and its live
+replacement checked; source ROMs remain intact. Detailed native paper-fixture
+results live under `build/v3-paper-quantities-native-03/`. The fixture's initial
+allocation and its one corrected-allocator retry both return null before any
+paper calls. No native paper gameplay result is claimed; the setup retry budget
+is spent. Continue the remaining connected consumers instead of repeating it.
 
 Wisp's complete actor compiles in `build/v3-carried-npc-connected-08/` with all
 retained participant/motion records, its official text, walk-only schedule,
@@ -59,9 +76,9 @@ selection branch. Every paper reward uses the same global quantity policy.
 The current preparation/source check passes. The conversation host fixture has
 not executed successfully; its two setup attempts are recorded as incomplete,
 and no further attempt is spent on that fixture in this batch. Actual linked
-paper policy, deferred weed clearing, voice-click lifecycle, both system sounds,
+paper-provider binding, deferred weed clearing, voice-click lifecycle, both system sounds,
 successful-save/travel cleanup, and full installation remain unfinished.
-The installed proposal remains ABI 366 / format 17, with Wisp disabled. No
+The installed proposal is ABI 367 / format 18, with Wisp disabled. No
 existing ROM, save, or deployed patcher is changed, and no native/hardware result
 is claimed for these prepared changes.
 
@@ -279,9 +296,9 @@ reconstruction, and seven browser/offline profiles. The resident allocation,
 format-17 save code, all artwork, and original controls are retained. The NPC
 is not registered or playable; no native gameplay or hardware result is claimed.
 
-The current proposal is ABI 366 at
-`build/v3-carried-field-work-01/quest-manager-03/build-lock.json`, ROM SHA-256
-`5ae6fe11ae14560c36c53da7f809c14949d26bb96fc8899e4edf69486d140fcc`.
+The current proposal is ABI 367 at
+`build/v3-paper-quantities-installed-08/build-lock.json`, ROM SHA-256
+`47e55a0d5a228205054381fb6d8942835ec47a1140212bcc96091e6d937ef700`.
 It contains 207 independently selectable development imports, including all
 sixteen diary styles, all nine fish, and eight insects. Another 100 furniture
 profiles await acquisition. The main lock and both stable V2-14 deployments

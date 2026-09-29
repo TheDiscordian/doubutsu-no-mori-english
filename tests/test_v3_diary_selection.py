@@ -69,6 +69,8 @@ class DiarySelectionTests(unittest.TestCase):
                          ('all-diaries', list(rows), {'holiday-calendar':'GameCube'}),
                          ('calendar-only', [], {'holiday-calendar':'GameCube'}),
                          ('tournament-only', [], {'tournament-measurements':'GameCube'})]
+        if any(r['id']=='paper-quantities' for r in choices):
+            profiles += [('paper-only', [], {'paper-quantities':'GameCube'})]
         for name, requested, behaviours in profiles:
             selection = composition.resolve(catalog, requested, behaviour_options=choices, behaviours=behaviours)
             result, _, _ = composition.compose(image, report, catalog, selection)
@@ -86,7 +88,7 @@ class DiarySelectionTests(unittest.TestCase):
                     from v3_holiday_selection import groups, active, checksum_fields
                     for g in groups(image, report):
                         on=active(g,selection['enabled'],selection['behaviours'])
-                        self.assertEqual(on, name!='unrelated')
+                        self.assertEqual(on, name not in ('unrelated','paper-only'))
                         for f in g['fields']:
                             self.assertEqual(int.from_bytes(result[f['offset']:f['offset']+4],'big'),
                                              f['enabled'] if on else f['disabled'])

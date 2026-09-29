@@ -44,16 +44,16 @@ installed tool behaviour and do not replay old tests to establish it again.
 Stationery has one global `paper-quantities` build choice: N64 single sheets or
 GameCube four-sheet packs, for every original/imported style and every paper
 creation route. Default to N64; do not force pack behaviour for Wisp or orange
-paper. Connect the common policy in `carried_paper.c` to shared item readers,
+paper. The common policy in `carried_paper.c` connects shared item readers,
 shop/catalogue/gift/reward creation, split/merge/letter use, quantity-aware prices,
-and saved-mode validation. Then bind the same checked setting in the offline
+and saved-mode validation. The same checked setting is bound in the offline
 and browser composers, including pack mode with no selected content imports.
-The policy source and fixed pack identities are not installed or selectable yet.
+The policy and fixed pack identities are installed and selectable in development.
 Do not mutate quantities during ordinary transfers or load. See the
 [stationery choice contract](../specs/V3_CARRIED_ITEMS.md#global-stationery-quantity-choice).
 
-The current proposal is ABI 366 at
-`build/v3-carried-field-work-01/quest-manager-03/build-lock.json`.
+The current proposal is ABI 367 at
+`build/v3-paper-quantities-installed-08/build-lock.json`.
 The complete `build/v3-carried-batch-prepared-05/` resources are installed without
 reconversion: seven parents, 26 states, fourteen icons, seven handover/police
 models, complete orange-paper artwork, official names, and prices. Additive
@@ -89,7 +89,8 @@ and original insect-habitat consumers cover palm and cedar together. Direct ceda
 planting and the four throw previews preserve original placement/consumption.
 Coconut eating has both complete resident models and the expanded food tables,
 including the retained native turnip entry. No artwork is recompiled or item
-enabled by these bindings. The shared tree code occupies 12,596 bytes of the
+enabled by these bindings. The shared tree code, including its checked DMA
+adapter, occupies 13,976 bytes of the
 checked 20-KiB `8077B000..80780000` reservation; food tables use 72 bytes of
 existing carried padding. Saved format and menu allocations are unchanged.
 Six focused tree checks, three food checks, and seven current browser/offline
@@ -166,17 +167,20 @@ The complete source-manager host check, 108 donor-search comparisons, current
 owner/relocation/resource/startup/patch checks, and seven browser/offline profiles
 pass. Wisp is still disabled because its NPC services are unfinished.
 
-The next concrete consumers are the global stationery choice's native
-shop-floor/display/interaction paths and fixed first-job gifts. Shared random
-generation, style-aware exclusions, catalogue order quantity/preview/price,
-and full format-18 save transactions are prepared and checked. Follow the
-[remaining consumer map](../specs/V3_CARRIED_ITEMS.md#stationery-consumer-map);
-do not restart the completed discovery. Install the connected modules and
-reader/storage redirects through the existing startup packet, then admit the
-checked offline/browser setting. Reuse `build/v3-paper-quantities-prepared-04/`, its
+The global stationery choice is installed across native shop-floor/display/
+interaction paths and fixed first-job gifts, shared random generation,
+style-aware exclusions, catalogue order quantity/preview/price, and format-18
+save transactions. Reader/storage redirects use the existing startup packet;
+the offline/browser setting supports pack-only profiles. Reuse
+`build/v3-paper-quantities-prepared-10/`, its
 `807B4000..807BB000` reservation, and its complete native/artwork references.
 Do not overwrite the live catalogue/food/interaction code in the old reader
 padding. Keep pack creation out of ordinary inventory moves and pickups.
+Eight browser/offline profiles pass, including paper-only. Current native boot
+and complete stationery-module loading pass after the shared physical-DMA fix.
+The native paper fixture's initial allocation and its corrected-allocator retry
+both return null before any paper calls. Its setup retry allowance is spent;
+record native gameplay/save-reload as unverified and do not repeat that harness.
 The remaining Wisp NPC services and sign-board designs/placement follow,
 including actual native item-type and menu routes for every family. The field-state bridge now
 has installed state and manager callers, but the unfinished NPC keeps the quest disabled.
@@ -189,10 +193,10 @@ participant importer retains all 48 actor functions from
 complete motion, 48 official messages, sixteen choices, 32 angry-name strings,
 official Wisp name, and all twenty external reward lists compile together.
 The two actor-local reward lists remain complete. These NPC changes are prepared,
-not installed in ABI 366. The current complete preparation check passes;
+not installed in ABI 367. The retained complete preparation check passes;
 unchanged registry evidence is retained. Its four undefined services are
 `af_cw_paper_stack`, `af_cw_clear_grass`, `mMsg_sound_set_voice_click`, and
-`sAdo_SysTrgStart`. The paper provider comes from the shared global policy,
+`sAdo_SysTrgStart`. Bind the paper provider to the installed shared global policy,
 not a Wisp-specific override. Deferred clearing needs its real field-renewal
 lifetime; voice-click needs both a native reader and reset, and sound mapping
 must cover both source `6B` and `16C`. Connect these and successful-save/travel

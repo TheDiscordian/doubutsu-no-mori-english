@@ -22,7 +22,7 @@ class CarriedNpcTests(unittest.TestCase):
         from aflib import by_vrom,CODE_VROM
         from v3_carried_runtime import paper_quantity_catalogue,paper_quantity_letter,paper_quantity_supply
         from v3_submenu_tables import Owner
-        out=ROOT/os.environ.get('V3_PAPER_QUANTITIES','build/v3-paper-quantities-prepared-04')
+        out=ROOT/os.environ.get('V3_PAPER_QUANTITIES','build/v3-paper-quantities-prepared-10')
         prepared=json.loads((out/'prepared.json').read_bytes())
         image,r=inputs(ROOT/'build/v3-carried-field-work-01/quest-manager-03/build-lock.json')
         self.assertEqual(prepared['base_sha256'],sha256(image))
@@ -51,6 +51,36 @@ class CarriedNpcTests(unittest.TestCase):
         self.assertEqual(prepared['choice']['default'],'N64')
         self.assertEqual(prepared['choice']['values'],{'N64':0,'GameCube':1})
         self.assertEqual((prepared['save_format'],prepared['wire_version']),(18,5))
+        import v3_paper_consumers as consumers
+        from shop_units import SHOPS,PRICE_BIASES
+        self.assertEqual(len(prepared['native_consumers']),8)
+        for row in prepared['native_consumers']:
+            vrom=row['vrom'];name=row['name']
+            owner=consumers.native_owner(files[vrom].extract(image),files[row['reloc']].extract(image),row['ram'],
+                address_constants=(PRICE_BIASES[vrom],) if vrom in PRICE_BIASES else ())
+            if name=='shop-floor':actual=consumers.shop_floor(owner)
+            elif name=='room-goods':actual=consumers.room_drawing(owner)
+            elif name=='first-job':actual=consumers.first_job(owner,symbols)
+            else:actual=consumers.shop_counter(owner,SHOPS[name[5:]])
+            self.assertEqual(actual,row['hooks'])
+            data,rel,receipt=owner.finish()
+            self.assertEqual(data,(out/(name+'.bin')).read_bytes())
+            self.assertEqual(rel,(out/(name+'-reloc.bin')).read_bytes())
+            self.assertEqual(receipt,row['owner'])
+
+    def test_stationery_temporary_lookup_registers(self):
+        from v3_paper_consumers import normalize
+        from tests.test_v3_house_markers import run_leaf
+        for register in (2,3,4):
+            words=normalize(register)+[0x03E00008,0]
+            for item in (*range(0x2000,0x2045),*range(0x2E3F,0x2F01),0,0x2400,0x2E00,0x2E01,0xFFFF):
+                seed=[0]+[0xABCDEF123400+i for i in range(1,32)]
+                seed[register]=item;seed[31]=0x12345678
+                expected=0x2000 if 0x2040<=item<0x2044 or 0x2E40<=item<0x2F00 else item
+                actual=run_leaf(words,0,seed)
+                self.assertEqual(actual[register],expected)
+                self.assertEqual([v for i,v in enumerate(actual) if i not in (1,register)],
+                    [v for i,v in enumerate(seed) if i not in (1,register)])
 
     def test_global_stationery_policy(self):
         from tests.test_v3_equipment_runtime import HostTests

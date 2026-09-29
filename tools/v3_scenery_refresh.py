@@ -437,6 +437,17 @@ def install(base,prior,blob,core,original,output,art_path):
         defines=('AF_V3_TREE_FELLING','AF_V3_SCENERY_FAMILIES','AF_V3_TREE_FAMILIES'),
         link_symbols={'af_carried_category':equipment['carried_items']['code']['symbols']['af_carried_category'],
             'af_scenery_runtime_ram':ram,'af_scenery_runtime_end':end})
+    if previous.get('physical_dma'):
+        # Installed tree-effect callers retain this absolute export. New
+        # scenery source dispatches physical reads directly, but must not erase
+        # the adapter while an unchanged effect packet still calls it.
+        adapter=previous['physical_dma'];at=adapter['ram']-ram;n=adapter['code']['bytes']
+        retained=old_code[at:at+n]
+        if len(code)>at or len(retained)!=n or sha256(retained)!=adapter['code']['sha256']:
+            raise ValueError('Shared tree refresh overlaps its retained physical DMA export')
+        code=code.ljust(at,b'\0')+retained
+        compiled.update(bytes=len(code),sha256=sha256(code),retained_physical_dma=adapter['code'])
+        compiled['symbols']['af_v3_paged_dma']=adapter['code']['symbols']['af_v3_paged_dma']
     reservation=previous['reservations'][0]
     if len(code)>capacity or code_at+len(code)>reservation['blob_offset']+reservation['bytes']:
         raise ValueError('Shared tree code exceeds existing owned reservation')

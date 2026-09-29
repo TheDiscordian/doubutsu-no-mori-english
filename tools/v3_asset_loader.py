@@ -85,7 +85,8 @@ def compile_part(part, out, extra_sources=(), defines=(), primary_source=None, l
     run('objcopy', '-O', 'binary', '-j', '.text', '-j', '.rodata',
         *(['-j', '.fallbacks'] if part=='scenery_bootstrap' else []), 'code.elf', 'code.bin')
     code = (out / 'code.bin').read_bytes()
-    entry, expected = {'carried_quest': ('af_cw_calendar_before_cleanup', 0x807B2000),
+    entry, expected = {'paged_dma': ('af_v3_paged_dma', (link_symbols or {}).get('AF_RESOURCE_DMA_RAM',0)),
+                      'carried_quest': ('af_cw_calendar_before_cleanup', 0x807B2000),
                       'creature_carried_spawns': ('af_carried_insect_spawn', 0x807AC000),
                       'tree_effects': ('af_tree_ready', 0x80780000),
                       'carried_interactions': ('af_carried_interaction_menu', 0x80772070),

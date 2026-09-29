@@ -8,8 +8,9 @@ from v3_player_actions import native_references
 
 
 class Owner:
-    def __init__(self,data,relocation,ram):
+    def __init__(self,data,relocation,ram,*,address_constants=()):
         self.original=bytes(data);self.data=bytearray(data);self.relocation=relocation;self.ram=ram
+        self.address_constants=tuple(address_constants)
         self.groups,self.absolute,rows,self.locations,_=native_references(
             data,relocation,expected_sections=(len(data),0,0,0))
         self.rows=list(rows);self.patches=[];self.tables=[]
@@ -74,9 +75,9 @@ class Owner:
         allowed={p['address']-self.ram+i for p in self.patches for i in range(4)}
         for base in (0x80200010,0x80348010):
             before=relocate_verified_data(Image(self.ram,len(self.original),struct.unpack_from('>5I',self.relocation)),
-                self.original,self.relocation,base)
+                self.original,self.relocation,base,address_constants=self.address_constants)
             after=relocate_verified_data(Image(self.ram,len(self.data),struct.unpack_from('>5I',relocation)),
-                self.data,relocation,base)
+                self.data,relocation,base,address_constants=self.address_constants)
             if any(a!=b and i not in allowed for i,(a,b) in enumerate(zip(before,after))):
                 raise ValueError('Submenu extension changes an unrelated native byte')
             for table in self.tables:

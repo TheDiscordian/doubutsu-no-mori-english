@@ -184,6 +184,8 @@ def prepare_paper_quantities(output,lock):
     from v3_submenu_tables import Owner
     from item_identity_sheet import SHEET_SHA,sheet_rows
     from v3_creature_choices import PAPER_CHOICE
+    import v3_paper_consumers as consumers
+    from shop_units import SHOPS,PRICE_BIASES
     output=output.resolve()
     if output.exists() or not output.is_relative_to(ROOT/'build'):
         raise ValueError('Use a fresh ignored stationery preparation')
@@ -209,6 +211,7 @@ def prepare_paper_quantities(output,lock):
     cat_links=d['paper']['catalogue']['code']['link_symbols']
     links=dict(old['link_symbols'],AF_CARRIED_LINK_RAM=lo,
         af_paper_original_select=lo+0x2800,af_paper_original_goods_exist=lo+0x2810,
+        af_paper_native_give=0x800B8B8C,af_paper_native_demo=0x8007B44C,
         af_paper_prior_shop_category=0x80000000|(u32(core,0x800C05E0-CODE_RAM)&0x3FFFFFF)<<2,
         af_carried_owned=cat_links['af_carried_owned'],
         af_carried_prior_catalogue_bit=cat_links['af_carried_prior_catalogue_bit'])
@@ -233,15 +236,32 @@ def prepare_paper_quantities(output,lock):
     ordering=paper_quantity_catalogue(catalogue,code['symbols'])
     cat_owner,cat_reloc,cat_receipt=catalogue.finish()
     write_new(output/'catalogue.bin',cat_owner);write_new(output/'catalogue-reloc.bin',cat_reloc)
+    native=[]
+    def adapt(name,vrom,reloc,ram,callback,descriptor):
+        owner=consumers.native_owner(files[vrom].extract(base),files[reloc].extract(base),ram,
+            address_constants=(PRICE_BIASES[vrom],) if vrom in PRICE_BIASES else ())
+        hooks=callback(owner);data,rel,receipt=owner.finish()
+        write_new(output/(name+'.bin'),data);write_new(output/(name+'-reloc.bin'),rel)
+        native.append(dict(name=name,vrom=vrom,reloc=reloc,ram=ram,descriptor=descriptor,
+            source=owner.source,owner=receipt,hooks=hooks))
+    adapt('shop-floor',0x848BF0,0x849AC0,0x80953E20,consumers.shop_floor,0x80101130)
+    from v3_shop_actors import OWNERS
+    for name,spec in SHOPS.items():
+        adapt('shop-'+name,spec.vrom,spec.relocation,spec.ram,
+            lambda owner,spec=spec:consumers.shop_counter(owner,spec),OWNERS[name][1])
+    room=prior['equipment_resources']['room_goods']['diary_room_art']
+    adapt('room-goods',room['vrom'],room['reloc'],0x80962A20,consumers.room_drawing,0x80101330)
+    adapt('first-job',0x3B20000,0x3B30000,0x809C7FF0,
+        lambda owner:consumers.first_job(owner,code['symbols']),0x80101970)
     paths=(*SOURCES,*STORAGE_SOURCES,'overlays/v3/carried_paper.h','overlays/v3/carried_paper.c',
-        'overlays/v3/carried_paper_supply.c','tools/v3_creature_choices.py')
+        'overlays/v3/carried_paper_supply.c','tools/v3_creature_choices.py','tools/v3_paper_consumers.py')
     report=dict(format='AFV3-PAPER-QUANTITIES-1',base_sha256=sha256(base),base_abi=prior['runtime_abi'],
         sources={p:sha256((ROOT/p).read_bytes()) for p in paths},worksheet_sha256=SHEET_SHA,
         choice=dict(PAPER_CHOICE,ram=code['symbols']['af_carried_paper_mode'],default='N64',values=dict(N64=0,GameCube=1)),
         code=code,storage=storage,ram=lo,end=hi,save_format=18,wire_version=5,
         letter=dict(style=style,owner=receipt),supply=supply,
-        catalogue=dict(ordering=ordering,owner=cat_receipt),installed=False,
-        pending=['remaining shop-floor/interaction and fixed-gift consumers','public reader/storage redirects and startup packet',
+        catalogue=dict(ordering=ordering,owner=cat_receipt),native_consumers=native,installed=False,
+        pending=['public reader/storage redirects and startup packet',
             'offline/browser behaviour binding','ordinary native gameplay and save/reload'])
     write_new(output/'prepared.json',(json.dumps(report,indent=2)+'\n').encode())
     return report
@@ -257,6 +277,9 @@ def install(base, prior, blob, core, module, output, directory):
                 return install_quest_state(base,prior,core,output,directory)
             if carried.get('quest') and not carried['quest'].get('manager'):
                 return install_quest_manager(base,prior,core,output,directory)
+            if carried.get('quest',{}).get('manager') and not carried['paper'].get('quantities'):
+                from v3_paper_install import install as install_paper
+                return install_paper(base,prior,core,output,directory)
             return install_interactions(base,prior,core,output,directory)
         if prior['equipment_resources']['carried_items'].get('eating'):
             return install_creature_field(base,prior,blob,output,directory)

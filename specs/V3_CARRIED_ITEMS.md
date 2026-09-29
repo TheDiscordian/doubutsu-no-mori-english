@@ -197,7 +197,7 @@ and a warning if the selected build cannot preserve the saved quantities.
 
 `prepare_paper_quantities(output, lock)` in `v3_carried_runtime.py` prepares the
 shared implementation from the checked current build. The complete preparation
-is `build/v3-paper-quantities-prepared-04/`: 6,176 reader/action/supply/catalogue
+is `build/v3-paper-quantities-prepared-10/`: 6,304 reader/action/supply/catalogue
 bytes at `807B4000`, 32 native-bridge bytes at `807B6800`, 12,304 save-adapter
 bytes at `807B7000`, a 13,344-byte letter owner with its complete 464-byte
 relocation, and a 64,128-byte catalogue owner. The reservation ends at `807BB000`.
@@ -228,19 +228,29 @@ mode rejects before output publication, adoption of live town/extension state,
 erasure, or writing. Diary, console, card, and ownership data remain intact.
 Ordinary native save/restart is not established by this host transaction check.
 
-Nothing in this preparation is installed in ABI 366. Remaining native
-shop/display/fixed-gift consumers, public reader/storage redirects, startup
-loading, and the checked offline/browser setting binding remain unfinished.
-The shared choice definition must not enter either composer's
-available options until both complete modes are installed. Both deployed V2
-patchers remain unchanged.
+The preparation is installed in ABI 367 at
+`build/v3-paper-quantities-installed-08/build-lock.json`. The existing quest
+packet extends from `807AC000` through `807BB000`, with the new `AFPQ` end guard;
+all 22 startup descriptors remain. Public reader, catalogue, and save entries
+redirect to the new complete modules. Both composers expose the checked mode
+word and refresh its containing startup CRC. Eight browser/offline profiles
+agree, including four-sheet mode without imports and exact V2-14 for the default
+empty profile. Both deployed V2 patchers remain unchanged.
+
+The ROM space planner reclaims only a recorded superseded furniture/audio DMA
+copy. Both complete historical hashes, the current live replacement, and absence
+of live overlaps are checked before clearing that copy in the output image.
+Source ROMs are never modified. Growing shop owners keep their DMA-directory
+indices but receive disjoint virtual extents; relocation preserves every original
+section and its BSS. The letter/catalogue menu allocations and complete loose-item
+owner sizes include all appended adapters.
 
 #### Stationery consumer map
 
 Use this map for the connected installation, retaining the complete current
 owners and prepared artwork. Creation is distinct from moving an existing item.
 
-- **Prepared shared creation:** `carried_paper_supply.c` wraps native seven-
+- **Installed shared creation:** `carried_paper_supply.c` wraps native seven-
   argument `mSP_SelectRandomItem_New` at `800BFCF0`. Original RNG, rarity, list
   loading, fallback, and exclusion logic remain intact. Only paper-category
   results get the global creation quantity. `800BF9B0` compares paper exclusion
@@ -248,7 +258,7 @@ owners and prepared artwork. Creation is distinct from moving an existing item.
   The two background-only calls at `800A90EC` and `800A938C` bypass creation
   through the preserved native selector bridge. `mNpc_GetPaperType` and mother-
   letter paper selectors return artwork styles, not newly obtained stationery.
-- **Prepared category and catalogue:** the current `800C05E0` shop-category
+- **Installed category and catalogue:** the current `800C05E0` shop-category
   chain gains paper-pack/orange recognition and delegates unrelated items.
   Catalogue row construction at `808A9578` chooses the actual order quantity
   for each stable style index, including orange index 67. The appended adapter
@@ -257,7 +267,7 @@ owners and prepared artwork. Creation is distinct from moving an existing item.
   native DMA a canonical style and prices the full actual quantity. The
   catalogue list feeds selected orders, Nook's quote/payment, and pending-mail
   attachments. Do not reapply creation while delivering an existing attachment.
-- **Remaining shop layout and rendering:** native shop-design owner
+- **Installed shop layout and rendering:** native shop-design owner
   `848BF0` / `80953E20` has paper ranges at `80953E78`, `8095488C`, and
   `80954BE0`, covering reserve positions, floor stock, and sold removal.
   The complete loose-item/shop drawing owner is managed by
@@ -265,31 +275,41 @@ owners and prepared artwork. Creation is distinct from moving an existing item.
   model table and loaded-pointer fixups. Its original paper row uses the
   `2000..2040` interval. All orange quantities and `2E40..2EFF` need the same
   native paper model without discarding the quantity stored in the world.
-- **Remaining shop interaction counters:** all five `shop_units.SHOPS` owners
+  All three floor branches and three temporary drawing queries now cover those
+  ranges. The expanded drawing owner retains all 50 model rows and resources.
+- **Installed shop interaction counters:** all five `shop_units.SHOPS` owners
   use `spec.handler` for item/count wording. The native high-byte/low-byte
   counter table cannot accept the new pack range or orange quantities directly.
-  Normalize the counter lookup, not the item being purchased/sold. Preserve
-  full-quantity pricing and retained non-paper branches. Existing generic
+  Local adapters normalize the counter lookup, not the purchased/sold item,
+  preserving full-quantity pricing and non-paper branches. Existing generic
   inventory setters must never become paper-creation hooks.
-- **Remaining fixed gifts:** source `ac_npc_rcn_guide2_talk.c_inc` has the
+- **Installed fixed gifts:** source `ac_npc_rcn_guide2_talk.c_inc` has the
   first-job stationery grant table in `aNRG2_set_possession` and its matching
   handover display table in `aNRG2_demo_start_wait_talk_proc`. Repeat-paper
-  requests use that same route. Connect native `Npc_Rcn_Guide2` creation and
-  handover to the shared policy; do not rewrite every `mPr_SetPossessionItem`
+  requests use that same route. The two native give calls and matching handover
+  display use the shared policy. Do not rewrite every `mPr_SetPossessionItem`
   or `mPr_SetFreePossessionItem` call, which also handles existing items.
-- **Remaining installation and selection:** redirect the retained reader,
-  catalogue, and save exports to the new shared module; extend the existing
-  quest startup packet rather than adding a twenty-third descriptor. Use the
-  same checked choice record for offline/browser resolution, including a
+- **Installed selection:** retained reader, catalogue, and save exports redirect
+  to the new shared module in the existing quest startup packet. The
+  same checked choice record serves offline/browser resolution, including a
   pack-only profile. Default/no-import output remains pinned V2-14. Public
   and local deployments remain V2 until the user's V3 approval.
 
 `test_global_stationery_policy` checks creation, stable catalogue indices,
 preview style/price, exclusion matching, actual-quantity readers, actions, and
 mode validation across all 65 styles. `test_stationery_native_consumer_preparation`
-checks current source identity, native hook guards, and complete letter/catalogue
-preservation at both relocation bases. These are prepared-code/host checks,
-not executed native purchasing, delivery, drawing, or hardware evidence.
+checks current source identity, native hook guards, all eight native consumers,
+and complete letter/catalogue preservation at both relocation bases. Temporary
+lookup-register checks cover all quantity identities and nearby unrelated IDs.
+These are prepared-code/host checks, not native purchasing or delivery evidence.
+
+Current native checks reach fault-free boot and match the entire new 6,304-byte
+resident module. The paper fixture cannot obtain its 86,016-byte isolated scratch
+allocation on the title screen: the first attempt calls the town allocator;
+its one retry uses the native overlay allocator and also returns null.
+No paper function or owner fixture executes. The setup retry allowance is spent;
+do not loop on this harness. Ordinary gameplay and native save/reload remain
+unverified. Results: `build/v3-paper-quantities-native-02/` and `-03/`.
 
 ### Inventory and hand actions
 

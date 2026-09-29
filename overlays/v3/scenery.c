@@ -1,4 +1,7 @@
 #include "scenery.h"
+#ifdef AF_V3_SCENERY_FAMILIES
+#include "resource_dma.h"
+#endif
 
 static int span(u32 at,u32 count,u32 stride,u32 size) {
     return at>=128u && !(at&3u) && at<=size && count<=(size-at)/stride;
@@ -132,7 +135,7 @@ static int load_bank(u8 *dest,const Scenery *c) {
         u32 pages[36];
         if((c->vrom&0xBC00000Fu)!=0x80000000u ||
            (c->vrom&0x3FFFFFFFu)>0x4000000u-sizeof(pages) ||
-           af_scenery_dma(pages,c->vrom&~0x40000000u,sizeof(pages)) ||
+           af_v3_resource_read(pages,c->vrom&~0x40000000u,sizeof(pages),af_scenery_dma) ||
            pages[0]!=0x41465047u || pages[1]!=c->bytes || pages[2]!=4096u ||
            !pages[3] || pages[3]>32u || pages[3]!=(c->bytes+4095u)/4096u)return 0;
         /* Validate every source extent before changing the destination. */
@@ -142,7 +145,7 @@ static int load_bank(u8 *dest,const Scenery *c) {
         }
         for(u32 i=0;i<pages[3];i++) {
             u32 n=c->bytes-i*4096u;if(n>4096u)n=4096u;
-            if(af_scenery_dma(dest+i*4096u,pages[i+4]|0x80000000u,n))return 0;
+            if(af_v3_resource_read(dest+i*4096u,pages[i+4]|0x80000000u,n,af_scenery_dma))return 0;
         }
         return 1;
     }

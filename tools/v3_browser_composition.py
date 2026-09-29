@@ -160,7 +160,7 @@ def rules(image, report):
         raise ValueError('Unassigned catalogue changes')
 
     from v3_surface_selection import checksum_fields
-    from v3_creature_choices import options as behaviour_options,checksum_fields as behaviour_checksums,SAVE_NOTE
+    from v3_creature_choices import options as behaviour_options,checksum_fields as behaviour_checksums,save_note
     from v3_creature_selection import checksum_fields as creature_checksums
     behaviours=behaviour_options(image,report)
     from v3_clothing_install import checksum_fields as clothing_checksums
@@ -184,7 +184,7 @@ def rules(image, report):
             'crc32': crcs, 'header': field(0x10, 8),
             'save_compatibility':composition.save_compatibility(report),
             **({'runtime_groups':groups} if groups else {}),
-            **({'behaviours':behaviours,'behaviour_save_note':SAVE_NOTE} if behaviours else {}),
+            **({'behaviours':behaviours,'behaviour_save_note':save_note(report)} if behaviours else {}),
             **({'creature_profile_hex':creatures['profile_hex']} if creatures else {}),
             **({'surface_profile_hex':surfaces['profile_hex']} if surfaces else {})}
     if pending or groups:

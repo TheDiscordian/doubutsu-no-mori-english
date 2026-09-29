@@ -1637,6 +1637,12 @@ def main():
                 needs_checkpoint_restore = True
                 results.append(exercise(debug, args.rom, record,
                                         remaining=action.get('camper_trade_remaining_only',False)))
+            if action.get('test_v3_paper_quantities'):
+                from v3_paper_smoke import exercise
+                if not (out/'test.bs1').is_file():
+                    raise ValueError('Stationery checks require an emulator checkpoint')
+                needs_checkpoint_restore = True
+                results.append(exercise(debug, args.rom, record))
             if action.get('test_v3_furniture_batch'):
                 from v3_furniture_batch_smoke import exercise
                 if not (out/'test.bs1').is_file():

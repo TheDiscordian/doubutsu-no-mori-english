@@ -443,7 +443,15 @@ def publish_bootstrap(equipment,blob,surface,output):
         p=carried_quest['packet']
         quest=equipment['carried_items'].get('quest')
         if (quest and quest['packet']!=p):raise ValueError('Quest owner must reuse the spirit startup packet')
-        if (not carried_quest['installed'] or p['ram']!=0x807AC000 or p['bytes']!=(0x8000 if quest else 0x2000) or
+        paper=equipment['carried_items'].get('paper',{}).get('quantities')
+        expected=0x8000 if quest else 0x2000
+        if paper:
+            if (not paper['installed'] or not quest or paper['packet']!=p or
+                    paper['ram']!=0x807B4000 or paper['end']!=0x807BB000 or
+                    paper['save_format']!=18 or paper['wire_version']!=5):
+                raise ValueError('Changed global stationery startup extension')
+            expected+=0x7000
+        if (not carried_quest['installed'] or p['ram']!=0x807AC000 or p['bytes']!=expected or
                 p['physical']&15 or p['storage']!='physical-ROM' or
                 not 0x100000<=p['physical']<p['physical']+p['bytes']<=0x4000000):
             raise ValueError('Changed complete carried-quest startup packet')

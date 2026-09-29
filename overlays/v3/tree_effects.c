@@ -1,6 +1,7 @@
 /* Native services for the complete generated tree-effect family. */
 #include "tree_effects.h"
 #include "paged_resource.h"
+#include "resource_dma.h"
 extern int af_tree_load(void),af_tree_native_term(void);
 extern volatile u32 af_tree_native_season;
 extern u8 *volatile af_tree_native_owner;
@@ -16,13 +17,16 @@ extern int af_tree_dma(void *,u32,u32);
 extern u32 af_tree_crc(const void *,u32);
 extern void af_tree_fault(const char *,const char *);
 static int art_ready;
+static int resource_dma(void *dest,u32 source,u32 bytes) {
+    return af_v3_resource_read(dest,source,bytes,af_tree_dma);
+}
 
 /* The complete AFPG page directory belongs to the CRC-checked startup packet.
  * Validate every cartridge extent before changing the reserved art region. */
 static int load_art(void) {
     if(art_ready)return 1;
     if(!af_v3_paged_read((u8 *)af_tree_art,0x24000u,af_tree_art_pages,40u,
-            af_tree_art_crc,af_tree_dma,af_tree_crc))return 0;
+            af_tree_art_crc,resource_dma,af_tree_crc))return 0;
     osWritebackDCache((void *)af_tree_art,0x24000u);art_ready=1;return 1;
 }
 

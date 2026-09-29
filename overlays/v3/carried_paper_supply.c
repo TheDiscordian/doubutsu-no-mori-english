@@ -5,6 +5,8 @@
 extern void af_paper_original_select(void *,AFCarryHalf *,int,AFCarryHalf *,int,int,int);
 extern int af_paper_original_goods_exist(AFCarryHalf *,int,AFCarryWord);
 extern int af_paper_prior_shop_category(AFCarryWord);
+extern int af_paper_native_give(void *,AFCarryHalf,int);
+extern void af_paper_native_demo(int,int,int);
 
 void af_carried_paper_select(void *game,AFCarryHalf *items,int count,
         AFCarryHalf *existing,int existing_count,int category,int list) {
@@ -30,4 +32,12 @@ int af_carried_paper_shop_category(AFCarryWord argument) {
     if(af_carried_paper_reserved(item))return af_carried_paper_packs_enabled()?1:-1;
     if(item-0x2040u<4u)return af_carried_paper_style(item)==64?1:-1;
     return af_paper_prior_shop_category(argument);
+}
+
+int af_carried_paper_first_job_give(void *player,AFCarryHalf item,int condition) {
+    return af_paper_native_give(player,af_carried_paper_create_item(item),condition);
+}
+
+void af_carried_paper_first_job_show(int order,int field,int item) {
+    af_paper_native_demo(order,field,af_carried_paper_create_item((AFCarryHalf)item));
 }

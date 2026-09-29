@@ -33,6 +33,15 @@ SAVE_NOTE=('These behaviour settings keep the same saved layout and imported ide
     'A native save/reload after switching settings is not yet verified.')
 
 
+def save_note(report):
+    paper=report.get('equipment_resources',{}).get('carried_items',{}).get('paper',{}).get('quantities')
+    if paper:
+        return ('Existing seasonal state and tournament measurements are retained. '
+            'A save written in four-sheet mode needs four-sheet mode to load again; '
+            'single-sheet mode rejects it without modifying the save. Keep a backup when changing settings.')
+    return SAVE_NOTE
+
+
 def install(base,prior,blob):
     e=copy.deepcopy(prior['equipment_resources']);fish=e['creature_fish'];world=fish['world']
     if not world.get('collection_ui_installed') or world.get('behaviour_choices'):
@@ -112,6 +121,18 @@ def options(image,report):
         row=selection['calendar'];p,at=location(report['equipment_resources'],row['ram'],4)
         if image[at:at+4]!=bytes(4):raise ValueError('Changed default holiday calendar')
         result.append({**row,'offset':at,'before':image[at:at+4].hex()})
+    paper=report.get('equipment_resources',{}).get('carried_items',{}).get('paper',{}).get('quantities')
+    if paper:
+        row=paper['choice'];p=paper['packet'];code=paper['code'];start=p['physical']
+        if (not paper['installed'] or any(row.get(k)!=v for k,v in PAPER_CHOICE.items()) or
+                row['default']!='N64' or row['values']!={'N64':0,'GameCube':1} or
+                row['ram']!=code['symbols'][row['symbol']] or
+                not paper['ram']<=row['ram']<paper['ram']+code['bytes'] or
+                sha256(image[start:start+p['bytes']])!=p['sha256']):
+            raise ValueError('Changed installed global stationery quantity choice')
+        at=start+row['ram']-p['ram']
+        if image[at:at+4]!=bytes(4):raise ValueError('Changed pinned stationery quantity default')
+        result.append({**row,'offset':at,'before':image[at:at+4].hex()})
     return result
 
 
@@ -155,6 +176,13 @@ def checksum_fields(image,report):
         if u32(image,at)!=p['crc32'] or zlib.crc32(image[start:start+p['bytes']])!=p['crc32']:
             raise ValueError('Changed installed tournament checksum')
         fields.append(dict(offset=at,before=image[at:at+4].hex(),start=start,length=p['bytes']))
+    paper=e.get('carried_items',{}).get('paper',{}).get('quantities')
+    if paper:
+        p=paper['packet'];ram=boot['symbols']['carried_quest_crc']
+        at=blob.pstart+e['blob_offset']+ram-e['ram'];start=p['physical']
+        if u32(image,at)!=p['crc32'] or zlib.crc32(image[start:start+p['bytes']])!=p['crc32']:
+            raise ValueError('Changed installed global stationery checksum')
+        fields.append(dict(offset=at,before=image[at:at+4].hex(),start=start,length=p['bytes']))
     return fields
 
 
@@ -191,6 +219,16 @@ def update_report(image,blob,report,resolved):
         resource=next(r for r in report['physical_resources'] if r['id']==p['id'])
         resource['sha256']=p['sha256']
     e.update(sha256=sha256(ep),crc32=zlib.crc32(ep))
+    paper=e.get('carried_items',{}).get('paper',{}).get('quantities')
+    if paper:
+        p=paper['packet'];packet=image[p['physical']:p['physical']+p['bytes']]
+        row=paper['choice'];value=resolved[row['id']]
+        if u32(packet,row['ram']-p['ram'])!=row['values'][value]:raise ValueError('Lost global stationery quantity setting')
+        row['resolved']=value;p.update(sha256=sha256(packet),crc32=zlib.crc32(packet))
+        start=paper['ram']-p['ram'];paper['code']['sha256']=sha256(packet[start:start+paper['code']['bytes']])
+        e['carried_items']['quest']['packet']=copy.deepcopy(p)
+        e['carried_items']['spawning']['packet']=copy.deepcopy(p)
+        next(r for r in report['physical_resources'] if r['id']==p['id'])['sha256']=p['sha256']
     for boot in (e['surface_bootstrap'],report['room_surfaces']['items']['bootstrap']):
         c=boot['code'];start=c['symbols']['af_v3_surface_init']-e['ram']
         c['sha256']=sha256(ep[start:start+c['bytes']])

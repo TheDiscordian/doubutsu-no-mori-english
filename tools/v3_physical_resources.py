@@ -26,6 +26,32 @@ def overlaps(records, start, end):
     return any(r['physical'] < end and start < r['physical']+r['bytes'] for r in records)
 
 
+def retire_dma_copies(rom,records,moves):
+    """Reclaim exact recorded old copies whose complete replacement is live.
+
+    This is not permission to overwrite arbitrary unmapped/nonzero data. Both
+    complete historical hashes must match, and the replacement must still be
+    contained in an uncompressed current DMA owner. Source ROMs remain intact.
+    """
+    verify(rom,records);files=list(by_vrom(rom).values());staged=bytearray(rom)
+    spans=[]
+    for move in moves:
+        first=move['previous_physical'];size=move['previous_bytes'];end=first+size
+        target=move['physical'];target_end=target+move['bytes']
+        live=[f for f in files if not f.pend and f.pstart<=target<target_end<=f.pstart+f.size]
+        if (move.get('relocated') is not True or move.get('retains_old_allocation') is not True or
+                move.get('previous_compressed_end') or len(live)!=1 or
+                not 0x100000<=first<end<=len(rom) or first&15 or size&15 or
+                move['bytes']<size or sha256(rom[first:end])!=move['previous_sha256'] or
+                sha256(rom[target:target_end])!=move['sha256'] or overlaps(records,first,end) or
+                any(a<end and first<b for a,b in spans) or
+                any(f.pstart<end and first<(f.pend or f.pstart+f.size)
+                    for f in files if f.pstart!=0xFFFFFFFF)):
+            raise ValueError('Old DMA copy lacks a checked live replacement or overlaps retained data')
+        spans.append((first,end));staged[first:end]=bytes(size)
+    return staged
+
+
 def retire_packet_copies(rom,prior,copies):
     """Reclaim declared old startup packets with a live replacement at the same RAM.
 

@@ -25,6 +25,15 @@ int af_carried_prior_owned(const unsigned char *player,unsigned item) {(void)pla
 unsigned char af_console_players[4*0xBD0],*af_test_carried_active;
 static unsigned selected_category,selected_count,prior_goods,prior_shop,preview_native;
 static unsigned short selection[68];
+static unsigned gift_item,shown_item;
+int af_paper_native_give(void *player,unsigned short item,int condition) {
+    assert(player==af_console_players && condition==2);gift_item=item;return 7;
+}
+void af_paper_native_demo(int order,int field,int item) {
+    assert(order==5 && !field);shown_item=(unsigned)item;
+}
+extern int af_carried_paper_first_job_give(void *,unsigned short,int);
+extern void af_carried_paper_first_job_show(int,int,int);
 void af_paper_original_select(void *game,unsigned short *items,int count,
         unsigned short *existing,int existing_count,int category,int list) {
     assert(game==&selected_count && existing==selection && existing_count==3 && list==8);
@@ -165,6 +174,13 @@ static void supply(void) {
     assert(af_carried_paper_shop_category(0x2EC5)==(TEST_PAPER_MODE==1?1:-1));
     assert(af_carried_paper_shop_category(0x2043)==1);
     assert(af_carried_paper_shop_category(0x2E00)==21 && prior_shop==0x2E00);
+    for(unsigned style=0;style<64;style++) {
+        assert(af_carried_paper_first_job_give(af_console_players,0x2000+style,2)==7);
+        af_carried_paper_first_job_show(5,0,0x2000+style);
+        assert(gift_item==af_carried_paper_obtain(0x2000+style) && shown_item==gift_item);
+    }
+    assert(af_carried_paper_first_job_give(af_console_players,0x2400,2)==7 && gift_item==0x2400);
+    af_carried_paper_first_job_show(5,0,0xFFFF);assert(shown_item==0xFFFF);
 }
 
 int main(void) {
