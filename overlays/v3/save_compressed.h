@@ -58,6 +58,19 @@ int af_v3_save_compress_fishing(unsigned char *,unsigned int,const unsigned char
 int af_v3_save_measure_fishing(const unsigned char *,unsigned int,const unsigned char *,unsigned int,
     const unsigned char *,unsigned int *,unsigned int);
 int af_v3_save_expand_fishing(const unsigned char *,unsigned int,unsigned char *,unsigned int);
+#ifdef AF_V3_CARD_STORAGE
+#include "holiday_cards.h"
+enum { AF_CZ_CARD_EXTRA=AF_CZ_FISHING_EXTRA+AF_HC_BYTES,
+       AF_CZ_CARD_RAW=AF_CZ_RAW+AF_CZ_CARD_EXTRA };
+/* Format fourteen appends four exercise-card attendance records after the
+ * unchanged diary and fishing bytes. Earlier saves acquire empty cards;
+ * readers limited to format thirteen reject this newer envelope. */
+int af_v3_save_compress_cards(unsigned char *,unsigned int,const unsigned char *,unsigned int,
+    const unsigned char *,unsigned int,const unsigned char *,unsigned int *,unsigned int);
+int af_v3_save_measure_cards(const unsigned char *,unsigned int,const unsigned char *,unsigned int,
+    const unsigned char *,unsigned int *,unsigned int);
+int af_v3_save_expand_cards(const unsigned char *,unsigned int,unsigned char *,unsigned int);
+#endif
 #endif
 #endif
 #endif

@@ -122,10 +122,10 @@ def expand(path,receipts):
     return re.sub(r'^\s*#include "([^"]+)"',include,text,flags=re.M)
 
 
-def constants(text,receipts):
+def constants(text,receipts,headers=CONSTANT_HEADERS):
     """Select complete source enums/macros, including their dependencies."""
     known={};blocks=[]
-    for header in CONSTANT_HEADERS:
+    for header in headers:
         raw=preprocess(read('include/'+header,receipts))
         for block in re.findall(r'\b(?:typedef\s+)?enum\b[^;{}]*\{[^{}]*\}\s*(?:\w+)?\s*;',raw,re.S):
             if block.startswith('typedef') and re.search(r'\}\s*;$',block):
@@ -137,6 +137,9 @@ def constants(text,receipts):
             if match[1].startswith('__'):continue
             known[match[1]]=match[0]
     needed=set(re.findall(r'\b\w+\b',text));chosen=[];definitions={}
+    # The furniture macro pastes its argument to _SOUTH. That resulting enum
+    # token is absent from the unexpanded source but still a real dependency.
+    needed.update(name+'_SOUTH' for name in re.findall(r'\bFTR_START\((\w+)\)',text))
     while True:
         added=[]
         for block,names in blocks:
@@ -158,10 +161,10 @@ def constants(text,receipts):
         '#define NULL ((void *)0)',*lines,*chosen,'#endif',''])
 
 
-def generate(source):
+def generate(source,*,family=FAMILY,reference_sha=REFERENCES_SHA,extra_headers=()):
     from v3_password_policy import function
     receipts={};modules={};headers=[];contracts=[]
-    for stem in FAMILY:
+    for stem in family:
         path='src/actor/'+('npc/' if '_npc' in stem else '')+'ac_'+stem+'.c'
         body=clean(expand(path,receipts))
         header=read('include/ac_'+stem+'.h',receipts)
@@ -201,10 +204,9 @@ def generate(source):
                 'i < (int)ARRAY_SIZE(tol_rope_1_v, Vtx)')
         body=body.replace('play->game_frame','af_hp_frame(play)')
         body=body.replace('&play->actor_info','af_hp_actor_info(play)')
-        # Three donor files declare a talk_request that has no definition or
-        # call; preserve every implemented function and remove only that unused
-        # prototype. GCC otherwise diagnoses the original declaration as dead.
-        for match in list(re.finditer(r'^static void (\w+_talk_request)\([^;{}]*\);',body,re.M)):
+        # Preserve every implemented function; remove only static prototypes
+        # with no definition or reference in their complete source unit.
+        for match in list(re.finditer(r'^static void (\w+)\([^;{}]*\);',body,re.M)):
             if len(re.findall(r'\b'+match[1]+r'\b',body))==1:
                 body=body.replace(match[0],'')
         modules[stem]=body
@@ -212,19 +214,22 @@ def generate(source):
             profile_offset=profile_at,profile_sha256=sha256(source.raw(profile)),
             profile_relocations=refs))
     header='\n'.join(headers)
-    source_constants=constants(header+'\n'+'\n'.join(modules.values()),receipts)
-    if sha256(json.dumps(receipts,sort_keys=True,separators=(',',':')).encode())!=REFERENCES_SHA:
+    source_constants=constants(header+'\n'+'\n'.join(modules.values()),receipts,CONSTANT_HEADERS+extra_headers)
+    if sha256(json.dumps(receipts,sort_keys=True,separators=(',',':')).encode())!=reference_sha:
         raise ValueError('Changed complete controller/participant source references')
     prelude=('#include "holiday_participants.h"\n#include "constants.h"\n'
         '#include "actors.h"\n#pragma GCC diagnostic ignored "-Wunused-parameter"\n')
     # Shared clips contain source-generated callbacks but never alias a native
     # clip with a different lifecycle or event record.
-    header+='\nextern aTKC_clip_c *af_hp_tokyoso_clip;\nextern aHTMD_clip_c *af_hp_hatumode_clip;\n'
+    clips=''
+    if 'tokyoso_control' in family:clips+='aTKC_clip_c *af_hp_tokyoso_clip;\n'
+    if 'hatumode_control' in family:clips+='aHTMD_clip_c *af_hp_hatumode_clip;\n'
+    header+='\n'+''.join('extern '+line+'\n' for line in clips.splitlines())
     generated={stem+'.c':prelude+body for stem,body in modules.items()}
     generated.update({'constants.h':source_constants,'actors.h':header})
     # One connected partial link resolves all source-to-source references.
     generated['clips.c']=('#include "holiday_participants.h"\n#include "actors.h"\n'
-        'aTKC_clip_c *af_hp_tokyoso_clip;\naHTMD_clip_c *af_hp_hatumode_clip;\n')
+        +clips)
     return generated,dict(format='AFV3-HOLIDAY-PARTICIPANTS-1',family=contracts,
         references=receipts,source_rel_sha256=sha256(source.rel),
         source_symbols_sha256=sha256(source.symbols.encode()),installed=False,
@@ -558,7 +563,7 @@ def patch(base,prepared,symbols):
     return {v:bytes(data) for v,data in changes.items()},receipts
 
 
-def native_motions(source,base,generated):
+def native_motions(source,base,generated,*,paired=()):
     """Resolve the whole family's reused animations by complete motion content."""
     from v3_keyframes import _animation,CHANNELS,npc_motion,compile_animations
     files=by_vrom(base);owner=files[0x8681F0].extract(base)
@@ -574,6 +579,23 @@ def native_motions(source,base,generated):
     needed=set(re.findall(r'\baNPC_ANIM_\w+','\n'.join(
         code for name,code in generated.items() if name.endswith('.c'))))
     needed.discard('aNPC_ANIM_NUM') # source-only "no animation" sentinel
+    needed.discard('aNPC_ANIM_SPEED_TYPE_FREE') # speed mode, not a motion
+    # Some source tables select a base motion plus a direction bit. Resolve
+    # both complete records and check native adjacency before retaining that
+    # arithmetic; replacing only the named base is not sufficient.
+    pairs=[]
+    if paired:
+        enum=clean((DONOR/'include/ac_npc_anim_def.h').read_text())
+        blocks=re.findall(r'enum\s*\{([^{}]+)\}',enum,re.S)
+        if len(blocks)!=1:raise ValueError('Changed complete NPC animation enum')
+        names=[n.strip() for n in blocks[0].split(',') if n.strip()]
+        if len(set(names))!=len(names) or any(not re.fullmatch(r'aNPC_ANIM_\w+',n) for n in names):
+            raise ValueError('NPC motion arithmetic requires the checked sequential enum')
+        for name in sorted(set(paired)):
+            index=names.index(name)
+            if name not in needed or names[index+1]=='aNPC_ANIM_NUM':
+                raise ValueError('Unreferenced or invalid paired NPC motion')
+            pair=(name,names[index+1]);pairs.append(pair);needed.update(pair)
     result=[]
     for name in sorted(needed):
         symbol='cKF_ba_r_npc_1_'+name.removeprefix('aNPC_ANIM_').lower()
@@ -621,6 +643,11 @@ def native_motions(source,base,generated):
                 source=desc,converted=packed,bytes=len(data),sha256=sha256(data),
                 native_face_effect_audio_programme_retained=True,override_required=True))
         else:raise ValueError('Missing or ambiguous complete native motion: '+name)
+    resolved={r['name']:r for r in result}
+    for first,second in pairs:
+        if resolved[second]['native']['index']!=resolved[first]['native']['index']+1:
+            raise ValueError('Native motion pair needs an explicit mapping: '+first)
+        resolved[first]['paired_successor']=second
     for name,code in list(generated.items()):
         if not name.endswith('.c'):continue
         for r in result:
@@ -776,9 +803,9 @@ def bindings(base,prior):
     return result,rows
 
 
-def dialogue(base,prior,generated):
+def dialogue(base,prior,generated,*,roots=None,map_symbol='af_hp_message',exercise_controls=False):
     """Convert every personality/role, including the full choice/branch closure."""
-    from gc_adapter import remove_redundant_article_suppression
+    from gc_adapter import remove_redundant_article_suppression,expand_random_message_ranges
     from gc_text import decode_gc
     from runtime_module import module_command_info
     from textcodec import encode,tokenize,LATIN
@@ -789,10 +816,12 @@ def dialogue(base,prior,generated):
     from v3_holiday_dialogue import credit
     # Complete personality strides from all five NPC ctor base-message tables.
     # Source receipts above pin those tables and every arithmetic selector.
-    roots={*range(6520,6592),*range(6605,6701),*range(7661,7769),4396,4397,4398}
+    if roots is None:roots={*range(6520,6592),*range(6605,6701),*range(7661,7769),4396,4397,4398}
+    roots=set(roots)
+    if not re.fullmatch(r'af_[a-z_]+',map_symbol):raise ValueError('Invalid dialogue export')
     messages,choices,decoder=donor();info=module_command_info(base)
-    pending=set(roots);ready={};selects=set();orders=set();edits={}
-    allowed={0,1,2,3,4,5,9,13,15,16,22,25,26,27,28,80,83,84,94}
+    pending=set(roots);ready={};selects=set();orders=set();edits={};ranges={}
+    allowed={0,1,2,3,4,5,9,13,15,16,19,20,21,22,25,26,27,28,80,83,84,94,103}
     # Adapt the actual N64 location, not the idiom "Well, ...". Exact source
     # substrings keep deliberate breaks and every command in place.
     shrine={
@@ -807,6 +836,18 @@ def dialogue(base,prior,generated):
         n=min(pending);pending.remove(n)
         if not 0<=n<len(messages):raise ValueError('Participant branch escapes donor bank')
         text,edits[n]=remove_redundant_article_suppression(decode_gc(messages[n],decoder))
+        text,ranges[n]=expand_random_message_ranges(text)
+        if exercise_controls and 0x3A2A<=n<0x3A32:
+            # The imported player controller recognises N64 C-button patterns,
+            # not a stick. Keep the complete official instruction and timing;
+            # change only the platform nouns/verbs and coloured span length.
+            if text.count('C Stick')!=1:raise ValueError('Changed official exercise control wording')
+            text=re.sub(r'\{cmd:7F50C3821E0[78]\}C Sticks?',
+                '{cmd:7F50C3821E09}C Buttons',text)
+            for before,after in (('Tilt that','Press those'),('Tilt your','Press your'),
+                    ('tilt that','press those'),('Work that','Work those'),('Lift it up','Press up')):
+                text=text.replace(before,after)
+            if 'C Stick' in text:raise ValueError('Unadapted exercise controller reference')
         if n in shrine:
             before,after=shrine[n]
             if text.count(before)!=1:raise ValueError('Changed official shrine-location adaptation')
@@ -848,6 +889,9 @@ def dialogue(base,prior,generated):
         adaptations=['Native encoding; retain official wording, line/page breaks, pauses, and demo orders',
             'Remap the complete participant message/choice graph to additive native IDs']
         if edits[n]:adaptations.append('Remove redundant article-suppression flags before native insertions')
+        if ranges[n]:adaptations.append('Expand inclusive random-message ranges to equivalent native random branches; retain every target')
+        if exercise_controls and 0x3A2A<=n<0x3A32:
+            adaptations.append('Assistant platform adaptation: N64 C Buttons replace C Stick; adapt press/work verbs and coloured span while preserving original directions, pauses, and page breaks')
         if n in shrine:adaptations.append('Assistant platform adaptation: '+repr(shrine[n][0])+
             ' → '+repr(shrine[n][1])+'; preserve the N64 shrine identity')
         row=credit(f'message:{mapping[n]:04X}',f'message:{n:04X}',messages[n],out,adaptations)
@@ -863,7 +907,7 @@ def dialogue(base,prior,generated):
     new_m,new_t=extend_bank(mb,tb,extra,first);new_c,new_ct=extend_bank(cb,ct,new_choices,cf)
     generated.update({'messages.bin':new_m,'message-table.bin':new_t,'choices.bin':new_c,'choice-table.bin':new_ct})
     generated['dialogue.c']=('#include "holiday_participants.h"\n'
-        'int af_hp_message(int source) {\n'
+        f'int {map_symbol}(int source) {{\n'
         ' static const u16 map[][2]={'+','.join('{'+str(n)+','+str(v)+'}' for n,v in mapping.items())+'};\n'
         ' unsigned int lo=0,hi=sizeof(map)/sizeof(map[0]);\n'
         ' while(lo<hi){unsigned int m=(lo+hi)/2; if(source<map[m][0])hi=m;'
@@ -871,10 +915,228 @@ def dialogue(base,prior,generated):
     return dict(first_id=first,count=len(extra),first_choice=cf,choice_count=len(new_choices),
         rows=rows,roots=sorted(roots),branch_added=sorted(ready.keys()-roots),mapping=mapping,
         choice_mapping=choice_map,npc_orders=sorted(orders),source_banks=DONOR_FILES,
+        random_ranges={n:r for n,r in ranges.items() if r},
         provenance_entries=credits,installed=False,max_expanded_bytes=max(r['expanded_bound'] for r in rows),
         resources=[dict(file=name,vrom=vrom,sha256=sha256(data),bytes=len(data),previous_sha256=sha256(previous))
             for name,vrom,data,previous in (('messages.bin',MESSAGE,new_m,mb),('message-table.bin',TABLE,new_t,tb),
                 ('choices.bin',cv,new_c,cb),('choice-table.bin',CHOICE_TABLE,new_ct,ct))])
+
+
+def prepare_exercise(output,lock):
+    """Compile the whole dancer/card family through the shared source importer.
+
+    Native services stay explicit unresolved symbols until their actual owners
+    are connected. No partial conversation, fake inventory, or native-number
+    event fallback is generated. Prepared donor code remains local.
+    """
+    from v3_password_policy import function
+    from v3_furniture_install import inputs
+    out=output.resolve()
+    if out.exists() or not out.is_relative_to(ROOT/'build'):raise ValueError('Use a fresh ignored preparation')
+    base,prior=inputs(lock)
+    source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+        (DONOR/'config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    generated,report=generate(source,family=('taisou_npc0',),
+        reference_sha='01c6e63a77a521b137be01f568ee6f76e74e5c4739439dfbde7106058d5d88f1',
+        extra_headers=('m_soncho.h','lb_rtc.h'))
+    raw=read('src/game/m_soncho.c',report['references'])
+    if sha256(raw.encode())!='86925ff50163654cf795045563d93fa9da6859e81c6c5cf5d4e42fcc9bf8bf11':
+        raise ValueError('Changed complete card conversation source')
+    names=re.findall(r'^(?:static|extern)\s+[^\n;{}=]+?\b(mSC_Radio_\w+|mSCR_talk_\w+)\([^;{}]*\)\s*\{',raw,re.M)
+    names.append('mSC_set_free_str_number')
+    functions=[];bodies=[]
+    for name in names:
+        matches=[p for p,rows in source.functions.items() if any(n==name for n,_ in rows)]
+        if len(matches)!=1:raise ValueError('Ambiguous complete exercise dependency: '+name)
+        functions.append(source.function(matches[0])[1]);bodies.append(clean(function(raw,name)))
+    generated['cards.c']='\n\n'.join(bodies)
+    font=read('src/game/m_font.c',report['references'])
+    if sha256(font.encode())!='89f63d09c6c6b5c71b9ec2b51ffe3cba9ef89ea89714cec9ad8bef015c2316de':
+        raise ValueError('Changed complete number formatter source')
+    number_functions=[];pieces=['#include "holiday_exercise.h"',
+        '#define CHAR_ZERO 48\n#define CHAR_SPACE 32\n#define CHAR_COMMA 44\n#define TRUE 1\n#define FALSE 0',
+        'static const u8 mFont_suji_data[10]="0123456789";']
+    for name in ('mMsg_CutLeftSpace','mFont_suji_check','mFont_UnintToString'):
+        matches=[p for p,rows in source.functions.items() if any(n==name for n,_ in rows)]
+        if len(matches)!=1:raise ValueError('Ambiguous complete number formatter: '+name)
+        number_functions.append(source.function(matches[0])[1]);pieces.append(clean(function(font,name)))
+    generated['numbers.c']='\n'.join(pieces)+'\n'
+    report['number_functions']=number_functions
+    # Constants are selected across both complete owners so actor and card
+    # arithmetic retain the same enum values and contiguous source item IDs.
+    extra=('m_soncho.h','lb_rtc.h','m_private.h','m_item_name.h','ac_handOverItem.h','m_field_info.h')
+    adapter='\n'.join((ROOT/f'overlays/v3/holiday_exercise_{part}.c').read_text()
+        for part in ('native','dialogue','world'))
+    generated['constants.h']=constants('\n'.join(generated.values())+'\n'+adapter,
+        report['references'],CONSTANT_HEADERS+extra)
+    prelude=('#include "holiday_exercise.h"\n#include "constants.h"\n#include "actors.h"\n#include <limits.h>\n'
+        '#pragma GCC diagnostic ignored "-Wunused-parameter"\n'
+        '#pragma GCC diagnostic ignored "-Wunused-variable"\n'
+        'typedef void (*mSCR_TALK_PROC)(TAISOU_NPC0_ACTOR *,GAME_PLAY *);\n'
+        'int mSC_Radio_Set_Talk_Proc(TAISOU_NPC0_ACTOR *);\n'
+        'void mSC_Radio_Talk_Proc(TAISOU_NPC0_ACTOR *,GAME_PLAY *);\n')
+    substitutions=(
+        ('Common_Get(now_private)','af_he_private()'),
+        ('Common_Get(player_no)','af_he_player()'),
+        ('Common_GetPointer(time.rtc_time)','af_he_clock()'),
+        ('Common_Get(time.rtc_time)','(*af_he_clock())'),
+        ('Common_Get(time.rtc_time.year)','af_he_clock()->year'),
+        ('Common_Get(time.rtc_time.month)','af_he_clock()->month'),
+        ('Common_Get(time.rtc_time.day)','af_he_clock()->day'),
+        ('Common_Get(clip).handOverItem_clip->master_actor','af_he_handover_master()'),
+        ('Common_Get(clip).handOverItem_clip->request_mode','af_he_handover_mode()'),
+        ('Common_Get(clip).handOverItem_clip->player_after_mode = 8;','af_he_handover_after(8);'),
+        ('play->game.frame_counter','af_he_frame(play)'),
+        ('play->block_table.block_x','af_he_block_x(play)'),
+        ('play->block_table.block_z','af_he_block_z(play)'),
+        ('NPC_CLIP->save_proc','af_he_npc_save'),
+        # Make the source's implicit unsigned conversion explicit for GCC.
+        ('diff < INT_MIN','diff < (u32)INT_MIN'),
+        ('mMsg_Get_msg_num(msg_win) == 0x342B','mMsg_Get_msg_num(msg_win) == af_he_message(0x342B)'),
+        ('mMsg_Get_msg_num(msg_win) == 0x3428','mMsg_Get_msg_num(msg_win) == af_he_message(0x3428)'),
+    )
+    for name in ('taisou_npc0.c','cards.c'):
+        body=re.sub(r'^#(?:include|pragma)[^\n]*\n','',generated[name],flags=re.M)
+        for before,after in substitutions:body=body.replace(before,after)
+        if 'Common_Get' in body or 'play->' in body:raise ValueError('Unadapted complete exercise context')
+        generated[name]=prelude+body+'\n'
+    # Wrap whole callbacks, not individual source statements. A native player
+    # cannot change halfway through a borrowed GC Private view; its card record
+    # is decoded/committed at each complete callback boundary.
+    body=generated['taisou_npc0.c']
+    callbacks=(('aTS0_set_talk_info','void','ACTOR *a','a','1','0'),
+        ('aTS0_talk_init','int','ACTOR *a,GAME *g','a,g','0','0'),
+        ('aTS0_talk_end_chk','int','ACTOR *a,GAME *g','a,g','0','result'))
+    for name,ret,args,call,first,end in callbacks:
+        original=function(body,name);renamed=original.replace(name+'(',name+'_source(',1)
+        wrapper=f'\nstatic {ret} {name}({args}) {{\n'
+        wrapper+=f' if(!af_he_begin(a,{first}))return'+(';' if ret=='void' else ' 0;')+'\n'
+        if ret=='void':wrapper+=f' {name}_source({call});(void)af_he_finish({end});\n'
+        else:wrapper+=f' int result={name}_source({call});return af_he_finish({end})?result:0;\n'
+        wrapper+='}\n';body=body.replace(original,renamed+wrapper)
+    generated['taisou_npc0.c']=body
+    for before,after,count in (
+        ('actor->delay_cnt--;','actor->delay_cnt = af_hp_countdown(actor->delay_cnt);',1),
+        ('nactorx->draw.frame_speed = 0.5f;',
+         'nactorx->draw.frame_speed = 0.5f * (f32)af_hp_elapsed();',1),
+        ('NPC_CLIP->move_proc(actorx, game);',
+         '((NPC_ACTOR *)actorx)->draw.frame_speed = 0.5f * (f32)af_hp_elapsed();\n        NPC_CLIP->move_proc(actorx, game);',1)):
+        if generated['taisou_npc0.c'].count(before)!=count:raise ValueError('Changed exercise elapsed-tick consumer')
+        generated['taisou_npc0.c']=generated['taisou_npc0.c'].replace(before,after)
+    report['timing']=dict(counter_offset=0xA0,animation_speed_per_tick=.5,
+        delay_uses_elapsed_ticks=True,npc_physics_once_per_update=True,native_execution_verified=False)
+    generated['clips.c']='#include "holiday_exercise.h"\n#include "actors.h"\n'
+    generated['layout.c']=('#include "holiday_exercise.h"\n#include "actors.h"\n'
+        '_Static_assert(sizeof(TAISOU_NPC0_ACTOR)<=2400,"Complete exercise native pool bound");\n'
+        'const unsigned int af_he_actor_bytes=sizeof(TAISOU_NPC0_ACTOR);\n')
+    sequence=re.search(r'static int animeSeqNo\[\]\s*=\s*\{([^{}]+)\}',generated['taisou_npc0.c'])
+    if not sequence:raise ValueError('Missing complete exercise animation table')
+    paired=re.findall(r'\baNPC_ANIM_\w+',sequence[1])
+    if len(paired)!=13:raise ValueError('Changed complete exercise action count')
+    report['motions']=native_motions(source,base,generated,paired=paired)
+    # Both exercise schedules, all six personalities, all four resident roles,
+    # and Copper. The separate complete Tortimer/card bank is already installed;
+    # preserve and reuse it instead of allocating another copy.
+    msg_table=re.search(r'static int msg_base\[\]\[mNpc_LOOKS_NUM\]\s*=\s*\{(.*?)\};',
+        generated['taisou_npc0.c'],re.S)
+    bases=[int(n,16) for n in re.findall(r'0x[0-9A-Fa-f]+',msg_table[1])] if msg_table else []
+    if len(bases)!=12:raise ValueError('Changed complete exercise personality table')
+    roots={n for start in bases for n in range(start+3,start+15)}|set(range(0x2665,0x266B))
+    report['dialogue']=dialogue(base,prior,generated,roots=roots,map_symbol='af_he_participant_message',exercise_controls=True)
+    # Only genuine complete-function bindings are resolved here. The remaining
+    # card/world/actor providers stay visible in the link report.
+    links,native_functions=bindings(base,prior)
+    direct={name:links[name] for name in ('Actor_delete','fqrand','none_proc1',
+        'mDemo_Check','mDemo_Request','mDemo_Set_ListenAble','mNpc_GetNpcLooks')}
+    direct.update(af_he_native_radio=0x800D21CC,af_he_native_status=0x8007FF08,
+        af_he_native_message=0x8007B5C0,af_he_native_continue=0x8009DBA4,
+        af_he_native_order=0x8007B44C,mDemo_Get_OrderValue=0x8007B49C,
+        mMsg_Get_base_window_p=0x8009D1F0,mMsg_Check_MainNormalContinue=0x8009E908,
+        mMsg_Get_msg_num=0x8009DBB0,mMsg_Set_LockContinue=0x8009E9E8,
+        mMsg_Unset_LockContinue=0x8009E9F8,lbRTC_IsEqualDate=0x800D5164,
+        af_he_native_item_string=0x8009D88C,af_he_native_town=0x800950D8,
+        af_he_native_sum=0x800B83D4,af_he_native_find=0x800B80B4,
+        af_he_native_set=0x800B8B08,af_he_native_give=0x800B8B8C)
+    from aflib import CODE_RAM,CODE_VROM
+    directory=(ROOT/'upstream/af/linker_scripts/jp/symbol_addrs_code.txt').read_text()
+    starts=sorted({int(a,16) for a in re.findall(r'= 0x([0-9A-F]+);[^\n]*type:func',directory)})
+    core=by_vrom(base)[CODE_VROM].extract(base);service_rows=[]
+    for name,address in direct.items():
+        if address<CODE_RAM:
+            service_rows.append(next(r for r in native_functions if r['name']==name));continue
+        if address not in starts:raise ValueError('Exercise service has no complete native boundary: '+name)
+        end=next(a for a in starts if a>address);body=core[address-CODE_RAM:end-CODE_RAM]
+        service_rows.append(dict(name=name,start=address,end=end,sha256=sha256(body)))
+    direct.update(af_hp_native_npc_clip=links['af_hp_native_npc_clip'],
+        af_hp_player_index=links['af_hp_player_index'],af_he_native_rtc=0x80136FBC,
+        # Existing installed text/name reader entries, not their old bodies.
+        af_he_native_free_string=0x8009D6D0,af_he_native_item_name=0x801969C8)
+    for symbol in ('af_hp_private','af_hp_owned','af_hp_npc_services','af_hp_countdown','af_hp_elapsed',
+            'af_holiday_native_type','af_holiday_native_notify','af_holiday_observers_clip',
+            'af_holiday_message','af_holiday_dialogue_data'):
+        found=set()
+        def collect(value):
+            if isinstance(value,dict):
+                if 'symbols' in value and symbol in value['symbols']:found.add(value['symbols'][symbol])
+                for v in value.values():collect(v)
+            elif isinstance(value,list):
+                for v in value:collect(v)
+        collect(prior['equipment_resources']['npc_extra'])
+        if len(found)!=1:raise ValueError('Exercise requires one installed provider: '+symbol)
+        direct[symbol]=found.pop()
+    direct['mMsg_Set_free_str']=direct['af_he_native_free_string']
+    # Exact native exercise loads/stores establish every new sparse NPC field.
+    native=by_vrom(base)[0x8C6D80].extract(base);native_ram=0x809E35B0
+    fields=((0x809E3E98,0x8C880188),(0x809E4000,0xE60001B8),
+        (0x809E3EEC,0xA48A072C),(0x809E3EF4,0xA48B072E),
+        (0x809E392C,0xA08E07C9),(0x809E41C0,0xAC8E07D0),
+        (0x809E4274,0xA088072A),(0x809E4278,0xE490073C),
+        (0x809E404C,0x8DC300A0),(0x809E427C,0x8CAB00A0),
+        (0x809E3658,0x8DD900C8),(0x809E402C,0x0C034873))
+    if any(struct.unpack_from('>I',native,at-native_ram)[0]!=word for at,word in fields):
+        raise ValueError('Changed exercise NPC native field reader')
+    out.mkdir(parents=True)
+    for name,body in generated.items():write_new(out/name,body if isinstance(body,bytes) else body.encode())
+    docker=['docker','run','--rm','--network','none','--user',f'{os.getuid()}:{os.getgid()}',
+        '-v',f'{ROOT}:/source:ro','-v',f'{out}:/out','-w','/out','--entrypoint']
+    def run(tool,*args):
+        return subprocess.run(docker+['/n64_toolchain/bin/mips64-elf-'+tool,IMAGE,*args],
+            text=True,capture_output=True,check=True,timeout=60).stdout
+    flags=['-c','-Os','-EB','-mabi=32','-march=vr4300','-mfix4300','-G0','-mno-abicalls',
+        '-fno-pic','-ffreestanding','-fno-builtin','-fno-common','-fno-stack-protector',
+        '-ffunction-sections','-fdata-sections','-fstack-usage','-Wall','-Wextra','-Werror',
+        '-I/source/overlays/v3','-I/out']
+    modules=[name for name in generated if name.endswith('.c')]
+    modules.append('/source/overlays/v3/holiday_exercise_native.c')
+    modules.append('/source/overlays/v3/holiday_exercise_dialogue.c')
+    modules.append('/source/overlays/v3/holiday_exercise_world.c')
+    run('gcc',*flags,*modules)
+    objects=[Path(name).stem+'.o' for name in modules]
+    run('ld','-EB','-r',*(f'--defsym={n}=0x{v:X}' for n,v in direct.items()),*objects,'-o','exercise.o')
+    storage_defines=[f for f in prior['equipment_resources']['diaries']['compiled']['flags'] if f.startswith('-D')]
+    storage_defines+=['-DAF_V3_HOLIDAY_STORAGE=1','-DAF_V3_FISHING_STORAGE=1','-DAF_V3_CARD_STORAGE=1']
+    storage=['holiday_cards','save_compressed','console_storage']
+    run('gcc',*flags,*storage_defines,*(f'/source/overlays/v3/{name}.c' for name in storage))
+    run('ld','-EB','-r',*(name+'.o' for name in storage),'-o','card-storage.o')
+    report.update(category='complete-exercise-card',card_functions=functions,
+        base_sha256=sha256(base),base_abi=prior['runtime_abi'],native_field_readers=fields,
+        native_field_owner_sha256=sha256(native),
+        bindings=direct,native_services=service_rows,
+        storage=dict(save_format=14,serialized_bytes=48,installed=False,
+            sha256=sha256((out/'card-storage.o').read_bytes()),size=run('size','card-storage.o'),
+            defines=storage_defines,unbound_services=run('nm','--undefined-only','card-storage.o').strip().splitlines()),
+        unbound_services=run('nm','--undefined-only','exercise.o').strip().splitlines(),
+        object=dict(sha256=sha256((out/'exercise.o').read_bytes()),compiler=IMAGE,flags=flags,
+            size=run('size','exercise.o'),linked=False),
+        sources={p:sha256((ROOT/p).read_bytes()) for p in ('tools/v3_holiday_participants.py',
+            'overlays/v3/holiday_participants.h','overlays/v3/holiday_exercise.h',
+            'overlays/v3/holiday_exercise_native.c','overlays/v3/holiday_exercise_dialogue.c',
+            'overlays/v3/holiday_exercise_world.c',
+            'overlays/v3/holiday_cards.c','overlays/v3/holiday_cards.h',
+            'overlays/v3/console_storage.c','overlays/v3/console_storage.h',
+            'overlays/v3/save_compressed.c','overlays/v3/save_compressed.h','tools/gc_adapter.py')})
+    write_new(out/'prepared.json',(json.dumps(report,indent=2)+'\n').encode())
+    return report
 
 
 def prepare(output,lock,reuse=None):
@@ -935,9 +1197,10 @@ if __name__=='__main__':
     p=argparse.ArgumentParser(description=__doc__);p.add_argument('--output',type=Path,required=True)
     p.add_argument('--build-lock',type=Path,required=True)
     p.add_argument('--reuse',type=Path,help='Reuse identical complete rope conversion from a prior preparation')
+    p.add_argument('--exercise',action='store_true',help='Prepare the complete exercise actor/card family using the same source importer')
     args=p.parse_args()
     try:
-        result=prepare(args.output,args.build_lock,args.reuse)
+        result=prepare_exercise(args.output,args.build_lock) if args.exercise else prepare(args.output,args.build_lock,args.reuse)
     except subprocess.CalledProcessError as e:
         print(e.stderr);raise
     print(json.dumps(dict(family=len(result['family']),object=result['object'],

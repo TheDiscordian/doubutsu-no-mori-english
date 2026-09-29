@@ -8,6 +8,28 @@ from textvalidate import FONT_PRESENTATION, compared_commands
 COMMAND = re.compile(r"\{cmd:([0-9A-Fa-f]+)\}")
 
 
+def expand_random_message_ranges(text):
+    """Lower GC's inclusive range to the identical native 2/3/4-way choice.
+
+    Both engines choose with get_random_timer. Every target is retained for
+    ordinary graph remapping; larger or reversed ranges require a real reader
+    and reject rather than silently losing branches.
+    """
+    edits=[]
+    def replace(match):
+        raw=bytes.fromhex(match[1])
+        if raw[:2]!=b'\x7f\x63':return match[0]
+        if len(raw)!=6:raise ValueError('Truncated random-message range')
+        first,last=int.from_bytes(raw[2:4],'big'),int.from_bytes(raw[4:6],'big')
+        count=last-first+1
+        if count not in (2,3,4):raise ValueError('Random-message range needs a runtime reader')
+        replacement=bytes((0x7f,17+count))+b''.join(n.to_bytes(2,'big') for n in range(first,last+1))
+        edits.append(dict(operation='expand_inclusive_random_message_range',first=first,last=last,
+            source=raw.hex(),replacement=replacement.hex()))
+        return '{cmd:'+replacement.hex().upper()+'}'
+    return COMMAND.sub(replace,text),edits
+
+
 def remove_redundant_article_suppression(text):
     """N64 insertion routines never prepend GameCube grammatical articles.
 

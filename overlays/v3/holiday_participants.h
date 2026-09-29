@@ -33,6 +33,7 @@ typedef struct {f32 start_frame,end_frame,max_frames,speed,current_frame;int mod
 union AFHPActor {
     u8 native[0x174];
     struct {u8 p_id[6];u16 npc_id;};
+    struct {u8 p_block[8];s8 block_x,block_z;};
     struct {u8 p_home[0xC];AFHPPos home;u32 state_bitfield;};
     struct {u8 p_world[0x28];AFHPPos world;};
     struct {u8 p_speed[0x68];xyz_t position_speed;f32 speed,gravity,max_velocity_y;};
@@ -45,13 +46,18 @@ union AFHPActor {
 union AFHPNpc {
     ACTOR actor_class;
     u8 native[0x93C];
-    struct {u8 p_draw[0x198];struct {
-        struct {struct {AFHPFrame frame_control;} keyframe;} main_animation;
-        u8 pad[0x704-0x198-sizeof(AFHPFrame)];int animation_id;
+    struct {u8 p_draw[0x184];struct {
+        u32 main_animation_frame;int main_animation_state;u8 pre_animation[12];
+        struct {struct {AFHPFrame frame_control;u8 pointers[8];f32 morph_counter;} keyframe;} main_animation;
+        u8 pad[0x704-0x198-sizeof(AFHPFrame)-12];int animation_id;
+        u8 pre_speed[0x72A-0x708];u8 anim_speed_type,loop_flag;
+        s16 effect_pattern,effect_type;u8 pre_frame_speed[12];f32 frame_speed;
     } draw;};
     struct {u8 p_think[0x7A4];struct {aNPC_THINK_PROC think_proc;u32 interrupt_flags;} think;};
     struct {u8 p_sched[0x7C0];struct {aNPC_SCHEDULE_PROC schedule_proc;} schedule;};
-    struct {u8 p_action[0x7C4];struct {u8 priority,idx,step,type;} action;};
+    struct {u8 p_action[0x7C4];struct {
+        u8 priority,idx,step,type,previous,act_obj;u8 pad[6];aNPC_THINK_PROC act_proc;
+    } action;};
     struct {u8 p_request[0x7D4];struct {u8 act_priority,act_idx,act_type,pad;u16 act_args[6];} request;};
     struct {u8 p_cond[0x7FD];struct {u8 hide_request,pad[14];u32 demo_flg;} __attribute__((packed)) condition_info;};
     struct {u8 p_hand[0x860];struct {ACTOR *item_actor_p;xyz_t pos;} right_hand;};
@@ -77,6 +83,14 @@ _Static_assert(sizeof(NPC_ACTOR)==0x93C,"Native NPC prefix");
 #define AF_HP_OFFSET(member,offset) _Static_assert(__builtin_offsetof(NPC_ACTOR,member)==offset,"Native " #member)
 AF_HP_OFFSET(draw.main_animation.keyframe.frame_control.mode,0x1AC);
 AF_HP_OFFSET(draw.animation_id,0x704);
+AF_HP_OFFSET(draw.main_animation_state,0x188);
+AF_HP_OFFSET(draw.main_animation.keyframe.morph_counter,0x1B8);
+AF_HP_OFFSET(draw.anim_speed_type,0x72A);
+AF_HP_OFFSET(draw.effect_pattern,0x72C);
+AF_HP_OFFSET(draw.effect_type,0x72E);
+AF_HP_OFFSET(draw.frame_speed,0x73C);
+AF_HP_OFFSET(action.act_obj,0x7C9);
+AF_HP_OFFSET(action.act_proc,0x7D0);
 AF_HP_OFFSET(think.think_proc,0x7A4);
 AF_HP_OFFSET(schedule.schedule_proc,0x7C0);
 AF_HP_OFFSET(request.act_args,0x7D8);

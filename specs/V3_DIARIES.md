@@ -1208,6 +1208,41 @@ match their reports. Existing sanitized allocation and rendering checks pass.
 Actor admission stays off; native execution and exercise/card integration are
 unfinished. The connected batch's harness budget remains exhausted.
 
+### Complete exercise/card source preparation
+
+`tools/v3_holiday_participants.py --exercise` prepares the complete exercise NPC
+source family, all seventeen radio-card functions, and the three complete donor
+number-formatting functions. `exercise-prepared-10/` compiles these together with
+native/world/dialogue adapters. All twenty motion dependencies match; eleven
+base/next pairs are explicitly checked for adjacent native indices. Physics runs
+once per update, source delays consume elapsed ticks, and the actor reads the
+actual native update counter at Game offset `A0`.
+
+The dialogue graph contains 158 official messages. Inclusive random-message
+ranges are lowered to the existing equivalent two/three/four-way native
+commands. Source instruction pages adapt C Stick to C Buttons with recorded
+provenance; pages, waits, and branch targets are preserved. Prepared provenance
+does not become an installed catalogue entry before message IDs are assigned.
+
+Native inventory calls use the validated actual player pointer, never the
+six-byte source radio-card view. Attendance retains the source Tortimer-only
+gate and existing diary/calendar calls. Actual handover modes and the six-role
+actor registry remain unbound; compiling these adapters does not make the actor
+playable. Admission stays off until every required provider is installed.
+
+Optional `AF_V3_CARD_STORAGE` adds a 48-byte endian-neutral `AFHC` record: a
+16-byte header and four eight-byte resident records containing date, stamp count,
+and reserved zeros. Saved format 14 covers this record in the existing CRC and
+initializes it when migrating earlier supported formats. Format 13 cannot read
+format 14. Player deletion, town switching, preflight, scratch bounds, and saved
+state use the shared storage path. Storage compiles, and the existing sanitized
+format-13 regression check passes; format-14 execution is not yet verified.
+The installed proposal remains format 13 without any allocation or save change.
+
+Continue the actual player/card handover, shared actor registration/lifecycle,
+and combined installation. Native fixture and new-harness budgets remain
+exhausted for this same connected diary category.
+
 ### Reserved layouts and dedicated owners
 
 `tools/v3_holiday_maps.py` converts the complete donor event-layout graph and

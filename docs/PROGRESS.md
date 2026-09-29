@@ -123,8 +123,16 @@ Current-ROM reader/startup checks and existing allocation/rendering host checks
 pass. Native execution is unverified. The combined packet is 102,352 bytes;
 the same nineteen startup descriptors and saved format remain in use.
 
-The next connected work is the exercise actor, card conversation, and actual
-attendance, including the existing player-exercise event predicate.
+The complete exercise actor and card conversation are source-prepared at
+`build/v3-diary-category-work-01/exercise-prepared-10/`: 34 actor functions,
+17 card functions, complete number formatting, 20 matched motions, and 158
+official messages. Checked adapters connect the real inventory, calendar
+attendance, radio, clock, and imported player-exercise event predicate. The
+four-player card storage and format-14 migration code compile, but neither the
+new save format nor this exercise module is installed. The existing format-13
+storage check passes; it does not validate format 14. Native execution remains
+unverified. Continue the actual player/card handover, shared actor registration,
+and connected installation; do not restart the exhausted native fixture.
 Actual calendar choice/admission follows the completed dependencies. No diary
 is selectable. Saved format 13 and both stable patcher deployments are unchanged.
 

@@ -18,6 +18,9 @@ static void *resolve(u32 address) {
 #endif
 #define FN(a,r,...) ((r (*)(__VA_ARGS__))resolve(a))
 #define STATE(p) ((AFExercise *)((u8 *)(p)+AF_EXERCISE_STATE_OFFSET))
+#ifdef AF_EXERCISE_IMPORTED_EVENTS
+extern int af_he_player_events(void);
+#endif
 
 unsigned int af_v3_exercise_native_clock(void) {
     return *(volatile u32 *)MEMORY(0x8014BDA0u);
@@ -40,7 +43,11 @@ int af_v3_exercise_native_able(void *actor) {
     /* Preserve GAFE01-r0's event-first condition, including its indoor
        restriction during an active aerobics event. Native calendar IDs differ. */
     if (FN(0x8007FF08u,int,int,int)(16,16) ||
-            FN(0x8007FF08u,int,int,int)(8,16)) {
+            FN(0x8007FF08u,int,int,int)(8,16)
+#ifdef AF_EXERCISE_IMPORTED_EVENTS
+            || af_he_player_events()
+#endif
+            ) {
         int bx,bz,px,pz;
         if (!FN(0x80089440u,int,int *,int *,int)(&bx,&bz,4)) return 0;
         /* Native xyz_t is passed by value (three floats), not by pointer. */

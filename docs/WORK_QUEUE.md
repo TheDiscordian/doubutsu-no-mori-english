@@ -412,8 +412,14 @@ registry. The complete packet is 102,352 bytes, retaining nineteen startup
 descriptors and saved format 13. Current installed-hook/startup checks and the
 existing allocation/rendering host checks pass; native execution is unverified.
 
-Continue the same batch with exercise's full actor, card conversation, and actual
-attendance path, including the existing player-exercise event predicate. Reuse
+Exercise preparation `exercise-prepared-10/` compiles the complete actor/card
+source, native inventory and actual attendance adapters, all 20 matched motions,
+158 official messages, and optional four-player card storage. Format 14 remains
+uninstalled; the unchanged installed format-13 storage check passes, not a
+format-14 round trip. The exact next consumers are player/card handover modes,
+shared actor registration and lifecycle, then connected storage/module/text
+installation and the existing player-exercise event predicate. Continue this
+same batch without a new harness or native fixture. Reuse
 the complete installed fortune actor and art without reconverting or retesting
 them. Bind actor pools,
 ordinary/profile lookup, placement identities, full voices, and cleanup together. Preserve each source
