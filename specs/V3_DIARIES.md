@@ -993,8 +993,8 @@ but missing participants/controllers keep owner admission inactive. Saved format
 New Year family together. `participants-prepared-26/` contains three controllers,
 five NPC roles, and the required rope: 245 complete donor functions, checked
 profile relocations, and a complete MIPS object including data/BSS. The linked
-51,872-byte module is installed at `8073C010..80748AB0`, retained in ABI 344,
-`build/v3-diary-category-work-01/special-art-installed-01/build-lock.json`.
+51,872-byte module is installed at `8073C010..80748AB0`, retained in ABI 345,
+`build/v3-diary-category-work-01/special-lifecycle-installed-02/build-lock.json`.
 Installation does not enable unfinished event admission.
 
 `tools/v3_registry.py` owns fixed profiles `D9..E1` and temporary resident names
@@ -1143,6 +1143,39 @@ initializer. Fixed-face rendering binds/restores only the body segment and
 rejects partial or inconsistent expression metadata. Focused sanitizer,
 complete pixel/face, and current-ROM bank/renderer checks pass; no native
 rendering or new actor lifecycle is claimed.
+
+### Shared appearance-variant lifecycle
+
+`AFV3-NPC-VARIANT-BATCH-1` uses the existing NPC installer and explicitly names
+each prepared appearance's source-equivalent actor family. The costume
+`D092/E2` shares all existing `Ev_Soncho2` constructor/destructor/init/save,
+movement, conversation, attendance, and cleanup callbacks. Its model, voice
+231, guarded 2,656-byte slot, and full draw/stream records remain separate from
+ordinary Tortimer. No costume conversation or per-item installer is invented.
+
+The common motion and world modules are refreshed at the end of the loaded
+participant packet. Their 15 and 30 public entries respectively retain the old
+addresses through verified eight-byte redirects; external callers do not need
+recompilation. Original code/resource hashes and function extents are checked
+before a redirect is written. The added 23,392-byte reservation includes both
+modules, records, actor storage, and a final `AFNV` guard. The combined startup
+packet is 91,664 bytes, using the same nineteenth descriptor. Actor flags remain
+zero, so installed lifecycle support does not prematurely admit the calendar.
+
+Both native NPC-controller spawn calls use a generated dispatcher for registered
+special names. The helper preserves every register except the existing `at/t1`
+scratch pair, writes the profile at `sp+56`, and chains the existing participant/
+camper/native path for other names. The wandering Halloween owner's separate
+name entry is `D092`, not an ordinary-Tortimer alias.
+
+The physical allocator extends the existing owned resource backwards into a
+verified zero-filled span. It checks all native and separate resource bounds,
+then records the exact previous location, size, and hash for the shared writer.
+The writer checks that predecessor and newly covered bytes before modifying
+the new cartridge. No input ROM or previous build is changed; no unverified
+obsolete region is reclaimed. Current-ROM callback/pool/redirect/spawn checks
+and existing sanitized shared movement/world checks pass. Native gameplay and
+the remaining shrine-attendant/exercise lifecycles are unverified/unfinished.
 
 ### Reserved layouts and dedicated owners
 

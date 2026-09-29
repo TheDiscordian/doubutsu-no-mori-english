@@ -14,11 +14,11 @@ af_holiday_native_give = 0x800B8B8C;
 memset = 0x8003B9B0;
 memcpy = 0x80034BF8;
 SECTIONS {
- . = 0x806E8000;
+ . = DEFINED(HOLIDAY_WORLD_BASE) ? HOLIDAY_WORLD_BASE : 0x806E8000;
  .text : { *(.text.af_holiday_world_bind) *(.text .text.*) . = ALIGN(16); }
  .rodata : { *(.rodata .rodata.*) . = ALIGN(16); }
  .forbidden : { *(.data .data.* .bss .bss.* COMMON) }
  /DISCARD/ : { *(.reginfo .MIPS.abiflags .pdr .comment .gnu.attributes .note.*) }
  ASSERT(SIZEOF(.forbidden) == 0, "Holiday world must not add hidden state")
- ASSERT(. <= 0x806EE000, "Holiday world/controller exceeds existing packet")
+ ASSERT(. <= (DEFINED(HOLIDAY_WORLD_BASE) ? HOLIDAY_WORLD_BASE+0x4000 : 0x806EE000), "Holiday world/controller exceeds existing packet")
 }

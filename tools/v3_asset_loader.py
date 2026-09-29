@@ -232,6 +232,8 @@ def compile_part(part, out, extra_sources=(), defines=(), primary_source=None, l
                        'shop_floor': ('af_v3_shop_floor_80953e54', BLOB_RAM + 0x7C00),
                        'hra': ('af_v3_hra_remaining', 0x80929C30),
                        'feng_shui': ('af_v3_feng_range', 0x80931780)}[part]
+    if part in ('holiday_motion','holiday_world'):
+        expected=(link_symbols or {}).get(part.upper()+'_BASE',expected)
     if symbols[entry] != expected:
         raise ValueError('V3 linker moved the public entry')
     write_new(out / 'code.asm', run('objdump', '-d', 'code.elf').encode())

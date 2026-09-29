@@ -361,6 +361,12 @@ def publish_bootstrap(equipment,blob,surface,output):
                         pc['ram']+pc['bytes']>0x807DA800):
                     raise ValueError('Changed connected participant startup packet')
                 sky_bytes+=pc['bytes']
+            variants=npc_extra.get('variants')
+            if variants:
+                if (not variants['installed'] or variants['ram']!=SKY_RAM+sky_bytes or
+                        variants['ram']+variants['bytes']>0x807DA800 or variants['bytes']&15):
+                    raise ValueError('Changed shared character-variant startup reservation')
+                sky_bytes+=variants['bytes']
             if (not sky.get('installed') or sp['ram']!=SKY_RAM or sp['bytes']!=sky_bytes or
                     sp['physical']&15 or sp['storage']!='physical-ROM' or
                     sky['loaded_code']['ram']!=SKY_RAM or not 0<sky['loaded_code']['bytes']<=SKY_END-SKY_RAM or

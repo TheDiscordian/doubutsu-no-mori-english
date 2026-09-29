@@ -346,9 +346,9 @@ callback loader uses its actual relocated code bounds. Focused source/host,
 cartridge, and empty/mixed/all-191 composition checks pass. Continue the remaining
 controller/participant services using the retained native map; do not reconvert
 these effects or installed decorations, or restart native fixtures.
-The connected controller/participant module is retained in ABI 344 at
-`build/v3-diary-category-work-01/special-art-installed-01/build-lock.json`
-(ROM SHA-256 `c0730e35aaa507267a4f18fd318e9f9cd5a83e0b67cc4ccb02f5b9d5c87f0089`),
+The connected controller/participant module is retained in ABI 345 at
+`build/v3-diary-category-work-01/special-lifecycle-installed-02/build-lock.json`
+(ROM SHA-256 `a8e29fc818b2d333bcaa1bd485f7b669945520191f92e9311ba1c1c70e878136`),
 using `build/v3-diary-category-work-01/participants-prepared-26/`: three controllers,
 five resident roles, rope, 279 official messages/two choices, offering payment,
 tools/sounds, 21 matching native motions, and the full donor prayer motion.
@@ -393,11 +393,22 @@ empty/all-supported/two-mixed-profile check in `special-art-browser-check-02/`,
 including cancellation and unknown-option rejection. Neither deployment changes.
 The current harness-construction budget is exhausted; no native fixture resumes.
 
-Next connect the special-character lifecycle batch to these installed resources:
-the costume uses the complete existing holiday controller, while the shrine
-attendant needs its full fortune-letter/payment path and exercise needs the
-complete card/attendance path. Bind actor pools, ordinary/profile lookup,
-placement identities, full voices, and cleanup together. Preserve each source
+The costume's complete shared holiday lifecycle, guarded actor slot, placement
+identity, full voice, and both native spawn callers are installed through
+`special-lifecycle-batch-01/`. Refreshed motion/world code keeps all 45 public
+entries valid through redirects. The appended 23,392 bytes share the original
+nineteenth startup descriptor; the combined packet is 91,664 bytes. Its owned
+physical record grows backwards into checked free space without retaining a
+duplicate full packet. Current-ROM structure checks pass, and existing sanitized
+movement/world checks pass against current code and current item records.
+No native execution or current lifecycle-stage browser pass is claimed.
+Keep all selection flags zero until the category's complete admission is bound.
+
+Continue the same special-character lifecycle batch: the shrine attendant needs
+its full fortune-letter/payment path and exercise needs the complete card/
+attendance path. Reuse `overlays/mail_generation/fortune_slip.c` and its installed
+English formatters rather than building another letter engine. Bind actor pools,
+ordinary/profile lookup, placement identities, full voices, and cleanup together. Preserve each source
 behaviour, including individual exceptions. Actual calendar choice/admission
 remains after its required providers, not a substitute for implementing them.
 Native helpers

@@ -107,10 +107,14 @@ int af_holiday_world_variant(void *context,u32 event,u32 gender,u32 *out) {
 }
 int af_holiday_world_resources(AFHolidayNpc *a) {
     const AFNpcExtra *r=af_v3_npc_extra_owned(a);
-    if(!r || r->flags!=3 || r->name!=0xD090 || r->profile!=0xCC ||
-            r->actor_bytes!=0xA34 || r->voice!=281 || r->model_bank!=448 ||
-            r->texture_bank!=449 || !r->draw || !r->stream ||
+    if(!r || r->flags!=3 || r->actor_bytes!=0xA34 || !r->draw || !r->stream ||
             r->stream->name!=r->name || r->stream->texture_bytes!=4128)return 0;
+    /* Both source appearances use the same complete Ev_Soncho2 controller.
+     * Keep their separately reserved model and full voice identities. */
+    if(!((r->name==0xD090 && r->profile==0xCC && r->voice==281 &&
+            r->model_bank==448 && r->texture_bank==449) ||
+         (r->name==0xD092 && r->profile==0xE2 && r->voice==231 &&
+            r->model_bank==452 && r->texture_bank==453)))return 0;
     return !a->failed;
 }
 int af_holiday_npc_resources(AFHolidayNpc *a) {
@@ -118,5 +122,5 @@ int af_holiday_npc_resources(AFHolidayNpc *a) {
     /* The native ctor's already-installed full-ID voice reader owns this field.
      * A mismatch means the constructor/resource path is wrong, not permission
      * to patch around an unverified actor layout. */
-    return *(const u32 *)((const u8 *)a+0x930)==281;
+    return *(const u32 *)((const u8 *)a+0x930)==af_v3_npc_extra_owned(a)->voice;
 }

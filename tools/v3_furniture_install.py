@@ -1180,9 +1180,13 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         first=row['physical'];end=first+row['bytes']
         if 'previous_sha256' in row:
             old=next((r for r in prior.get('physical_resources',[]) if r['id']==row['id']),None)
+            previous_first=row.get('previous_physical',first)
+            previous_size=row.get('previous_bytes',row['bytes']);previous_end=previous_first+previous_size
             if (old is None or (old['physical'],old['bytes'],old['sha256'])!=
-                    (first,row['bytes'],row['previous_sha256']) or
-                    sha256(result[first:end])!=row['previous_sha256']):
+                    (previous_first,previous_size,row['previous_sha256']) or
+                    not first<=previous_first<previous_end<=end or
+                    sha256(result[previous_first:previous_end])!=row['previous_sha256'] or
+                    any(result[first:previous_first]) or any(result[previous_end:end])):
                 raise ValueError('Changed declared physical-resource predecessor')
         elif any(result[first:end]):raise ValueError('Physical resource write overlaps changed cartridge bytes')
         if len(data)!=row['bytes'] or sha256(data)!=row['sha256']:
@@ -1488,7 +1492,8 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
     if npc_registry_art is not None:
         npc=equipment_report['npc_extra']
         report['shared_runtime_refresh'].update(adapters=['npc_registry'],artwork_changed=True,
-            additional_resident_bytes=0 if prior['equipment_resources'].get('npc_extra') else npc['packet']['bytes'],resource_allocations_changed=True,
+            additional_resident_bytes=(npc.get('variants',{}).get('additional_resident_bytes',0)
+                if prior['equipment_resources'].get('npc_extra') else npc['packet']['bytes']),resource_allocations_changed=True,
             saved_format_changed=False,saved_profile_changed=False)
         report['sources'].update(npc['sources'])
         report['native_test']='pending connected Tortimer event/conversation/animation providers and diary gameplay/save verification'

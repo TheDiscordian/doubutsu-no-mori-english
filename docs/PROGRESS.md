@@ -31,9 +31,9 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
-The current proposal is ABI 344 at
-`build/v3-diary-category-work-01/special-art-installed-01/build-lock.json`, ROM SHA-256
-`c0730e35aaa507267a4f18fd318e9f9cd5a83e0b67cc4ccb02f5b9d5c87f0089`.
+The current proposal is ABI 345 at
+`build/v3-diary-category-work-01/special-lifecycle-installed-02/build-lock.json`, ROM SHA-256
+`a8e29fc818b2d333bcaa1bd485f7b669945520191f92e9311ba1c1c70e878136`.
 It contains 191 independently selectable development imports, including all nine
 fish and eight insects, and 100 inactive furniture profiles whose acquisition
 is pending, plus sixteen inactive diary cover profiles. The main lock and both
@@ -100,9 +100,23 @@ claimed as a fresh pass. The current private browser export
 both mixed profiles; cancellation and unknown selections are rejected correctly.
 No native fixture is restarted.
 
-The next connected work is the complete special-character lifecycle batch:
-reuse the shared holiday controller for the costume, connect the shrine
-attendant's fortune letters/payment, and connect exercise/card attendance.
+The costume has installed allocation, callbacks, full voice, placement identity,
+and both spawn bindings through the same complete holiday controller as ordinary
+Tortimer. The variant batch appends refreshed shared movement/world modules and
+a guarded actor slot to the existing startup packet (91,664 bytes total).
+All 45 public entries retain their original addresses through checked redirects;
+ordinary resident/camper/participant spawning remains in the fallback chain.
+The shared physical allocator grows the owned packet into verified adjacent
+free space, retaining the original ROM. Current-ROM callbacks, redirects, pool
+guards, spawn hooks, packet hashes, and inactive selection flags pass structural
+checks. Existing sanitized movement and world checks pass using current code
+and current installed item records. Native execution remains unverified; the
+latest private browser pass above covers the preceding art-only build, not this
+new lifecycle addition. Do not replay it until the connected batch is ready.
+
+The next connected work is the rest of the special-character lifecycle batch:
+connect the shrine attendant's fortune letters/payment and exercise/card
+attendance, reusing the existing English fortune-slip generation adapter.
 Actual calendar choice/admission follows the completed dependencies. No diary
 is selectable. Saved format 13 and both stable patcher deployments are unchanged.
 

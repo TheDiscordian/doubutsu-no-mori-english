@@ -11,7 +11,8 @@ typedef __UINTPTR_TYPE__ uptr;
 #define REAL(a,o) (*(float *)((u8 *)(a)+(o)))
 static int owned(const void *a) {
     const AFNpcExtra *r=af_v3_npc_extra_owned(a);
-    return r && r->name==0xD090 && r->profile==0xCC && r->actor_bytes>=sizeof(AFHolidayNpc);
+    return r && ((r->name==0xD090 && r->profile==0xCC) ||
+        (r->name==0xD092 && r->profile==0xE2)) && r->actor_bytes>=sizeof(AFHolidayNpc);
 }
 static int walking(void *a) {
     if(!owned(a))return 0;

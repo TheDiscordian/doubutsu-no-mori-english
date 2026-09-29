@@ -217,6 +217,8 @@ def append_banks(base,prior,blob,entries):
 def install_art_batch(base,prior,blob,output,directory):
     """Install every prepared character's banks without claiming actor readiness."""
     raw=(directory/'batch.json').read_bytes();batch=json.loads(raw)
+    if batch.get('format')=='AFV3-NPC-VARIANT-BATCH-1':
+        return install_variant_batch(base,prior,output,batch,raw)
     if batch.get('format')!='AFV3-NPC-ART-BATCH-1' or not batch.get('records'):
         raise ValueError('Expected a complete additional character art batch')
     equipment=copy.deepcopy(prior['equipment_resources']);npc=equipment['npc_extra']
@@ -261,6 +263,140 @@ def install_art_batch(base,prior,blob,output,directory):
     write_new(work/'installed.json',(json.dumps(receipt,indent=2)+'\n').encode())
     write_new(work/'packet.bin',data)
     return equipment,{},dict(physical_resources=records,object_capacity=prior['object_capacity']+len(banks),asset=asset),writes
+
+
+def install_variant_batch(base,prior,output,batch,manifest):
+    """Share complete actor implementations across source-equivalent appearances.
+
+    Append code/data to the existing startup packet and redirect old public
+    entries. No caller, saved layout, native pool, or accepted artwork is replaced.
+    """
+    from v3_console_disk_install import reservations
+    from v3_holiday_placement import NAMES
+    equipment=copy.deepcopy(prior['equipment_resources']);npc=equipment['npc_extra']
+    if npc.get('variants') or not batch.get('records'):raise ValueError('Expected a new complete variant batch')
+    events=npc['events'];sky=events['sky'];participants=events['participants']
+    old_packet=copy.deepcopy(sky['packet']);prefix=base[old_packet['physical']:old_packet['physical']+old_packet['bytes']]
+    start=old_packet['ram']+old_packet['bytes']
+    if sha256(prefix)!=old_packet['sha256'] or participants['packet']!=old_packet:
+        raise ValueError('Changed complete participant packet before variant append')
+    packet=npc['packet'];original=base[packet['physical']:packet['physical']+packet['bytes']];data=bytearray(original)
+    if sha256(data)!=packet['sha256'] or struct.unpack_from('>4I',data,TABLE)!=(0x41464E58,1,1,44):
+        raise ValueError('Changed complete additional character registry')
+    if u32_local(data,TABLE+20):raise ValueError('Cannot extend an active unfinished holiday category')
+    work=output/'npc-variants';work.mkdir();members=[];names={npc['record']['identity']['name']:npc['record']['identity']['profile']}
+    for row in batch['records']:
+        identity=row['identity'];member=npc['prepared_characters'].get(identity)
+        if (not member or member['actor_installed'] or row['base']!='GAFE01-r0/npc/ev-soncho2' or
+                type(row['slots']) is not int or not 1<=row['slots']<=16 or
+                member['identity']!=SPECIAL_NPCS[identity] or
+                member['identity']['donor_profile']!=npc['record']['identity']['donor_profile']):
+            raise ValueError('Variant lacks prepared art or the complete shared actor implementation')
+        r=member['identity']
+        if r['name'] in names or r['profile'] in names.values():raise ValueError('Duplicate variant identity')
+        names[r['name']]=r['profile'];members.append((identity,member,row['slots']))
+    if 1+len(members)>8:raise ValueError('Variant batch exceeds shared actor registry')
+    # Preserve the native controllers' narrow at/t1 scratch-register ABI and
+    # profile result at sp+56. Unmatched names retain their original row pointer.
+    assembly=['.set noreorder','.set noat','.set nomacro','.text',
+        '.globl af_npc_variant_spawn','af_npc_variant_spawn:']
+    for i,(name,profile) in enumerate(sorted(names.items())):
+        assembly.extend((f'ori $at,$zero,{name}',f'bne $at,$v1,.Lnext{i}',' nop',
+            f'addiu $t1,$zero,{profile}','jr $ra',' sh $t1,0x56($sp)',f'.Lnext{i}:'))
+    previous=participants['code']['symbols']['af_hp_spawn_profile']
+    assembly.extend(('j af_npc_variant_previous_spawn',' nop'))
+    spawn=work/'spawn.S';write_new(spawn,('\n'.join(assembly)+'\n').encode())
+    appended=bytearray(0x5000);refreshed={}
+    for kind,at,old_at,limit,extra in (
+        ('motion',0,0x2000,0x1000,('overlays/v3/holiday_motion_native.c',
+            'overlays/v3/holiday_motion_original.S',str(spawn.relative_to(ROOT)))),
+        ('world',0x1000,0x4000,0x4000,('overlays/v3/holiday_rewards.c','overlays/v3/holiday_talk.c',
+            'overlays/v3/holiday_actor.c','overlays/v3/diary_calendar.c'))):
+        old=npc[kind]['code'];links=dict(old['link_symbols'])
+        links['HOLIDAY_'+kind.upper()+'_BASE']=start+at
+        if kind=='motion':links['af_npc_variant_previous_spawn']=previous
+        code,compiled=compile_part('holiday_'+kind,work/kind,link_symbols=links,extra_sources=extra)
+        if len(code)>limit or sha256(data[old_at:old_at+old['bytes']])!=old['sha256']:
+            raise ValueError('Changed or overflowing complete shared actor module')
+        appended[at:at+len(code)]=code;redirects=[]
+        symbols=old['symbols'];addresses=sorted(set(v for v in symbols.values() if RAM+old_at<=v<RAM+old_at+old['bytes']))
+        for name,address in symbols.items():
+            if not name.startswith('af_') or not RAM+old_at<=address<RAM+old_at+old['bytes']:continue
+            target=compiled['symbols'].get(name)
+            following=next((v for v in addresses if v>address),RAM+old_at+old['bytes'])
+            if target is None or not start+at<=target<start+at+len(code) or following-address<8:
+                raise ValueError('Cannot preserve complete actor public entry: '+name)
+            pos=address-RAM;before=bytes(data[pos:pos+8]);after=struct.pack('>2I',jump(target),0)
+            data[pos:pos+8]=after;redirects.append(dict(name=name,address=address,target=target,before=before.hex(),after=after.hex()))
+        old.update(sha256=sha256(data[old_at:old_at+old['bytes']]),variant_redirects=redirects)
+        refreshed[kind]=dict(ram=start+at,bytes=len(code),sha256=sha256(code),code=compiled,redirects=redirects)
+    installed=[];callbacks=npc['lifecycle']['code']['symbols']
+    for index,(identity,member,slots) in enumerate(members,1):
+        r=member['identity'];offset=len(appended);descriptor=start+offset;profile=descriptor+32
+        draw=profile+48;stream=draw+112;area=stream+48;stride=npc['record']['slot_stride']
+        chunk=bytearray(240+slots*stride)
+        struct.pack_into('>8I',chunk,0,0,0,0,0,0,profile,0,0)
+        struct.pack_into('>HHIHH6I',chunk,32,r['profile'],3<<8,0,r['name'],3,ACTOR_BYTES,
+            callbacks['af_holiday_npc_ctor'],callbacks['af_holiday_npc_dtor'],callbacks['af_holiday_npc_init'],0,
+            callbacks['af_holiday_npc_save'])
+        chunk[80:180]=bytes.fromhex(member['draw_hex']);chunk[192:228]=bytes.fromhex(member['stream_hex'])
+        for i in range(slots):
+            pos=240+i*stride
+            struct.pack_into('>4I',chunk,pos,0x41464E53,0,r['name'],r['profile'])
+            struct.pack_into('>4I',chunk,pos+stride-16,*([0x4E504347]*4))
+        at=TABLE+16+index*44
+        if any(data[at:at+44]):raise ValueError('Variant record overwrites retained registry data')
+        struct.pack_into('>HH9I2H',data,at,r['name'],r['profile'],0,ACTOR_BYTES,slots,stride,
+            area,descriptor,draw,stream,member['voice'],r['model_bank'],r['texture_bank'])
+        appended.extend(chunk)
+        member.update(actor_installed=True,active=False,descriptor=descriptor,profile=profile,
+            slots=slots,slot_stride=stride,pool_ram=area,flags_offset=at+4,
+            callback_family='Ev_Soncho2',actor_bytes=ACTOR_BYTES)
+        installed.append(identity)
+    struct.pack_into('>I',data,TABLE+8,1+len(members))
+    # This shared owner table explicitly distinguishes normal/costume placement.
+    for _,member,_ in members:
+        if member['identity']['donor_name']==0xD079:
+            at=NAMES-RAM+2
+            if data[at:at+2]!=bytes(2):raise ValueError('Changed costume owner identity')
+            struct.pack_into('>H',data,at,member['identity']['name'])
+    appended.extend(b'AFNV'*4);end=start+len(appended)
+    if end>0x807DA800 or any(a<end and start<b for a,b in reservations(prior)):
+        raise ValueError('Shared actor variants overlap retained native memory')
+    files=by_vrom(base);changes={};hooks=[];target=refreshed['motion']['code']['symbols']['af_npc_variant_spawn']
+    for hook in participants['installed_hooks']:
+        if hook['replacement']!='af_hp_spawn_profile':continue
+        vrom=hook['vrom'];owner=bytearray(files[vrom].extract(base));at=hook['address']-hook['ram']
+        before=bytes.fromhex(hook['after']);after=struct.pack('>I',jump(target,link=True))
+        if len(before)!=4 or owner[at:at+4]!=before:raise ValueError('Changed shared NPC spawn hook')
+        owner[at:at+4]=after;changes[vrom]=bytes(owner)
+        hooks.append(dict(hook,before=before.hex(),after=after.hex(),replacement='af_npc_variant_spawn'))
+    if len(hooks)!=2:raise ValueError('Incomplete shared NPC spawn binding')
+    combined=prefix+appended;records=copy.deepcopy(prior['physical_resources'])
+    write=physical.grow_backwards(base,records,old_packet['id'],combined)
+    fresh={k:write[k] for k in ('id','physical','bytes','sha256')}
+    records=[fresh if r['id']==old_packet['id'] else r for r in records]
+    new=dict(fresh,ram=old_packet['ram'],crc32=zlib.crc32(combined),storage='physical-ROM')
+    sky['packet']=copy.deepcopy(new);participants['packet']=copy.deepcopy(new)
+    previous_npc=packet['sha256'];packet.update(sha256=sha256(data),crc32=zlib.crc32(data))
+    record=next(r for r in records if r['id']==packet['id']);record['sha256']=sha256(data)
+    sources=(*SOURCES,'tools/v3_holiday_placement.py','tools/v3_asset_loader.py',
+        'overlays/v3/holiday_motion.c','overlays/v3/holiday_motion.ld',
+        'overlays/v3/holiday_world.c','overlays/v3/holiday_world.ld','tools/v3_physical_resources.py')
+    npc['sources'].update({p:sha256((ROOT/p).read_bytes()) for p in sources})
+    npc['variants']=dict(format=batch['format'],manifest_sha256=sha256(manifest),installed=True,
+        ram=start,bytes=len(appended),sha256=sha256(appended),guard='AFNV',modules=refreshed,
+        characters=installed,spawn_hooks=hooks,preserved_packet=old_packet,
+        additional_resident_bytes=len(appended),actor_admission_changed=False,
+        saved_format_changed=False,native_execution_verified=False)
+    write_new(work/'installed.json',(json.dumps(npc['variants'],indent=2)+'\n').encode())
+    write_new(work/'packet.bin',combined);write_new(work/'registry.bin',data)
+    return equipment,changes,dict(physical_resources=records),[(write,combined),
+        (dict(record,previous_sha256=previous_npc),bytes(data))]
+
+
+def u32_local(data,at):
+    return struct.unpack_from('>I',data,at)[0]
 
 
 def refresh_renderer(npc,data,output,base,changes):

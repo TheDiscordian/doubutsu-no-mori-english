@@ -26,6 +26,26 @@ def overlaps(records, start, end):
     return any(r['physical'] < end and start < r['physical']+r['bytes'] for r in records)
 
 
+def grow_backwards(rom,records,identity,data):
+    """Grow one owned resource into its preceding checked free space.
+
+    Return a replacement write; the original cartridge is never modified here.
+    The writer must verify the exact predecessor and the added zero-filled span.
+    """
+    verify(rom,records)
+    matches=[r for r in records if r['id']==identity]
+    if len(matches)!=1:raise ValueError('Ambiguous physical resource growth')
+    old=matches[0];end=old['physical']+old['bytes'];start=end-len(data)
+    if (not data or len(data)&15 or len(data)<=old['bytes'] or start<0x100000 or
+            any(rom[start:old['physical']]) or
+            overlaps([r for r in records if r['id']!=identity],start,end) or
+            any(e.pstart<end and start<(e.pend or e.pstart+e.size)
+                for e in by_vrom(rom).values() if e.pstart!=0xFFFFFFFF)):
+        raise ValueError('No checked adjacent space for complete physical resource growth')
+    return dict(id=identity,physical=start,bytes=len(data),sha256=sha256(data),
+        previous_physical=old['physical'],previous_bytes=old['bytes'],previous_sha256=old['sha256'])
+
+
 def allocate(rom, records, data, name, *, best_fit=False):
     verify(rom, records)
     if len(rom) != 0x4000000 or not data or len(data) & 15 or any(r['id'] == name for r in records):
