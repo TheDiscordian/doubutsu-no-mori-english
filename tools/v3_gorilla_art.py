@@ -153,8 +153,15 @@ def convert_commands(raw, start, pointers, vertex, vertex_bytes, *,
                     allowed.add((0xD9000000, 0x230005))
                 elif op == 0xE2:
                     allowed.add((0xE200001C, 0xC8113078))
-                elif op == 0xFA and a==0xFA000080:
-                    # Primitive RGBA is data, not a new rendering mode.
+                    # Source fogged translucent NPC surfaces (Wisp). Keep
+                    # blending/coverage and the actor-supplied environment alpha.
+                    allowed.add((0xE200001C, 0xC81049D8))
+                elif op == 0xFC:
+                    # TEXEL0*SHADE colour, PRIMITIVE*ENVIRONMENT alpha;
+                    # the second cycle retains the donor's LOD interpolation.
+                    allowed.add((0xFC123A0E, 0xFFFFFE38))
+                elif op == 0xFA and a>>8==0xFA0000:
+                    # Primitive RGBA and LOD fraction are data, not a new mode.
                     allowed.add((a,b))
             if (a, b) not in allowed:
                 raise ValueError(f'Unreviewed NPC render state {a:08X}/{b:08X}')

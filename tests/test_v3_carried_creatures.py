@@ -192,7 +192,7 @@ class InteractionCartridgeTests(unittest.TestCase):
         from v3_event_text import MESSAGE,TABLE
         from v3_physical_resources import verify
         from textbanks import Bank
-        out=ROOT/os.environ.get('V3_CARRIED_INTERACTIONS','build/v3-carried-field-work-01/interactions-04')
+        out=ROOT/os.environ.get('V3_CARRIED_INTERACTIONS','build/v3-carried-field-work-01/inventory-01')
         rom,report=inputs(out/'build-lock.json');base,prior=inputs(out/'base-lock.json')
         files,before=by_vrom(rom),by_vrom(base);e=report['equipment_resources'];d=e['carried_items']
         r=d['interactions'];p=d['packet'];old=prior['equipment_resources']['carried_items']
@@ -200,8 +200,9 @@ class InteractionCartridgeTests(unittest.TestCase):
         self.assertEqual((sha256(raw),zlib.crc32(raw)),(p['sha256'],p['crc32']))
         start=r['ram']-p['ram'];end=start+r['bytes'];restored=bytearray(raw)
         self.assertEqual(raw[start:end],(out/'carried-interactions/code.bin').read_bytes())
-        restored[start:end]=bytes(r['bytes'])
-        self.assertEqual(restored,base[old['packet']['physical']:old['packet']['physical']+old['packet']['bytes']])
+        original=base[old['packet']['physical']:old['packet']['physical']+old['packet']['bytes']]
+        restored[start:end]=original[start:end]
+        self.assertEqual(restored,original)
         for key in ('storage','ready_mask','selected_mask'):
             self.assertEqual(d[key],old[key])
         for v,row in ((0x3950000,r['tag']),(r['player']['vrom'],r['player'])):
@@ -217,8 +218,25 @@ class InteractionCartridgeTests(unittest.TestCase):
         extra,text=capture_text(base,source)
         prior_bank=Bank('prior',0,0,before[MESSAGE].extract(base),before[TABLE].extract(base)).entries()
         bank=Bank('current',0,0,files[MESSAGE].extract(rom),files[TABLE].extract(rom)).entries()
-        self.assertEqual(bank,prior_bank+extra);self.assertEqual(r['text']['rows'],text['rows'])
+        self.assertEqual(bank,prior_bank if r.get('refresh') else prior_bank+extra)
+        self.assertEqual(bank[text['first_id']:text['first_id']+len(extra)],extra)
+        self.assertEqual(r['text']['rows'],text['rows'])
         self.assertEqual(len(extra),6)
+        from aflib import CODE_RAM,CODE_VROM
+        from v3_carried_runtime import CARRIED_FILTERS,CARRIED_FILTER_SOURCES
+        core=files[CODE_VROM].extract(rom);old_core=before[CODE_VROM].extract(base)
+        self.assertEqual(len(r['inventory_filters']),len(CARRIED_FILTERS))
+        self.assertTrue({name for _,name,_ in CARRIED_FILTER_SOURCES}<={row['symbol'] for row in r['donors']})
+        for row in r['inventory_filters']:
+            self.assertEqual(u32(core,row['address']-CODE_RAM),r['code']['symbols'][row['symbol']])
+            self.assertEqual(u32(old_core,row['address']-CODE_RAM),row['before'])
+        changed={index for index,_,_ in CARRIED_FILTERS}
+        for index in range(17):
+            if index not in changed:
+                self.assertEqual(u32(core,0x8010DD38-CODE_RAM+index*4),
+                    u32(old_core,0x8010DD38-CODE_RAM+index*4))
+        mail=r['retained_mail'];tag=files[0x3950000].extract(rom);at=mail['address']-0x8086F310
+        self.assertEqual(sha256(tag[at:at+mail['bytes']]),mail['sha256'])
         for row in r['text']['resources']:
             self.assertEqual(sha256(files[row['vrom']].extract(rom)),row['sha256'])
         verify(rom,report['physical_resources'])
@@ -248,6 +266,57 @@ class InteractionCartridgeTests(unittest.TestCase):
             rows=split_placements(image,files,{1:bytes(0x1020),2:bytes(0x110),3:bytes(0x100)},[],0x200000)
         self.assertEqual([r['physical'] for r in rows],[0x300000,0x301020,0x400000])
         self.assertEqual(calls,[(0x100,dict(best_fit=True,minimum_physical=0x200000))])
+
+
+class CarriedEventPreparationTests(unittest.TestCase):
+    def test_complete_quest_source_and_translucent_art(self):
+        from v3_npc_stream_art import prepare
+        from v3_npc_stream_runtime import native_records
+        from v3_villager_mesh import faces
+        from tests.test_v3_islander_bodies import gx_pixel
+        source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+            (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+        directory=ROOT/'build/v3-carried-event-prepared-03'
+        report=json.loads((directory/'prepared.json').read_bytes())
+        owner,=report['family'];functions=owner['functions']+report['event_manager_functions']
+        self.assertEqual((len(owner['functions']),len(report['event_manager_functions'])),(48,4))
+        for row in functions:
+            self.assertEqual(json.loads(json.dumps(source.function(row['offset'])[1])),row)
+        for path,row in report['references'].items():
+            raw=(ROOT/'local/ac-decomp'/path).read_bytes()
+            self.assertEqual((len(raw),sha256(raw)),(row['bytes'],row['sha256']))
+        for name,digest in report['generated_sha256'].items():
+            self.assertEqual(sha256((directory/name).read_bytes()),digest)
+        obj=(directory/'carried-event.o').read_bytes()
+        self.assertEqual(obj[:6],b'\x7fELF\x01\x02')
+        self.assertEqual(struct.unpack_from('>H',obj,18)[0],8)
+        self.assertEqual(sha256(obj),report['object']['sha256'])
+        self.assertFalse(report['object']['linked']);self.assertFalse(report['installed'])
+        self.assertTrue(report['unbound_services'])
+        directory=ROOT/'build/v3-carried-wisp-art-01';r=json.loads((directory/'art.json').read_bytes())
+        p=prepare(source,349);model=(directory/'model.bin').read_bytes();texture=(directory/'texture.bin').read_bytes()
+        self.assertEqual((len(model),len(texture),r['triangles']),(6688,4128,186))
+        self.assertEqual((sha256(model),sha256(texture)),(r['model_sha256'],r['texture_sha256']))
+        self.assertEqual(texture,p['texture']);self.assertEqual(len(r['eye_offsets']),8)
+        self.assertEqual(len(r['mouth_offsets']),6);self.assertFalse(r['runtime_installed'])
+        self.assertEqual(native_records(source,r,0xDFFE,510,511)[2],249)
+        for row in r['resources']:
+            raw=source.data[row['source_offset']:row['source_offset']+row['bytes']]
+            for y in range(row['height']):
+                for x in range(row['width']):
+                    native=texture[row['offset']+(y*row['width']+x)//2]>>(0 if x&1 else 4)&15
+                    self.assertEqual(native,gx_pixel(raw,row['width'],x,y))
+        triangles=0
+        for row in r['models']:
+            raw=model[row['offset']:row['offset']+row['bytes']]
+            self.assertEqual(raw,(directory/'gbi'/(row['symbol']+'.bin')).read_bytes())
+            self.assertIn(bytes.fromhex('fc123a0efffffe38'),raw)
+            self.assertIn(bytes.fromhex('e200001cc81049d8'),raw)
+            primitive=source.raw(row['symbol'])[16:24]
+            self.assertEqual(primitive[0],0xFA)
+            self.assertIn(primitive,raw)
+            triangles+=len(faces(raw,donor=False,streamed=True,vertex_bytes=len(p['vertices'])))
+        self.assertEqual(triangles,186)
 
 
 if __name__=='__main__':unittest.main()

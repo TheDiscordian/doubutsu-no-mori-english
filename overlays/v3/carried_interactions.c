@@ -101,3 +101,22 @@ void af_carried_net_message(u8 *player,unsigned original) {
     }
     af_carried_prior_insect_message(player,original);
 }
+
+/* Source mSM inventory predicates: spirits cannot be sold, entrusted, given,
+ * or handed over for a quest. Exchange deliberately permits releasing spirits;
+ * sign boards cannot use that exchange route. The complete preceding filters
+ * retain protected-item, empty-slot, fish-water, and event-card rules. */
+#define FILTER(name,reject) \
+    extern int af_carried_prior_filter_##name(int,int); \
+    int af_carried_filter_##name(int slot,int argument) { \
+        if(!ACTIVE || (unsigned)slot>=15u)return 0; \
+        u32 item=H(ACTIVE,0x14+slot*2); \
+        if(reject)return 0; \
+        return af_carried_prior_filter_##name(slot,argument); \
+    }
+FILTER(entrust,item-0x2D28u<5u)
+FILTER(quest,item-0x2D28u<5u)
+FILTER(sell,item-0x2D28u<5u)
+FILTER(give,item-0x2D28u<5u)
+FILTER(take,item-0x2D28u<5u)
+FILTER(exchange,item==0x251Eu)

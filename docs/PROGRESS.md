@@ -108,15 +108,36 @@ unrelated items retain their native handlers. Five complete official GameCube
 catch messages and the donor's empty sixth record retain their wording, line
 breaks, colours, and pauses, with credits in the single source catalogue.
 The shared text allocator slides an index inside existing text-owned space when
-a bank grows, avoiding a needless large relocation. Capture/menu code occupies
-1,456 bytes of existing carried padding and adds no RAM or saved fields.
+a bank grows, avoiding a needless large relocation. Capture/menu code and
+inventory policy occupy 1,872 bytes of existing carried padding and add no RAM
+or saved fields.
 
 Focused source, sanitized lifecycle/drawing/interaction, current cartridge,
 relocation, complete text retention, 21 startup CRC, and patch checks pass.
 Seven current browser/offline profiles agree; empty selection remains V2-14.
 These are not native gameplay or hardware results. Actual Wisp event ownership,
-spirit transfer restrictions, sign-board designs/placement, and independent
+sign-board designs/placement, and independent
 carried selections remain unfinished; all seven family readiness bits stay off.
+
+Six native inventory routes enforce the source spirit and sign-board rules:
+spirits cannot be sold, entrusted, gifted, or submitted for a quest; they remain
+eligible for release during a full-pocket exchange. Sign boards cannot use that
+exchange route. Protected conditions, empty storage slots, card/cutlery rules,
+and native fish-water checks stay in the preceding complete filters. Mailing
+already rejects the insect category and retains its original function/callers.
+The shared interaction refresh reuses the existing allocation, artwork, dialogue,
+and saved format. Focused sanitized interaction and current cartridge checks,
+all 21 startup CRCs, UPS reconstruction, and seven browser/offline profiles pass.
+
+The shared character importer prepares Wisp's complete translucent model and
+expressions in `build/v3-carried-wisp-art-01/`: 6,688 model bytes, 4,128 texture
+bytes, 26 joints, and 186 triangles. All 48 actor functions and four event-manager
+functions compile for VR4300 in `build/v3-carried-event-prepared-03/`, retaining
+the complete conversations, rewards, fade/movement logic, acre selection, and
+cleanup. Native state/rendering accesses are explicit unresolved services, not
+successful placeholders. These prepared resources are not installed or playable.
+Continue by binding their scheduling, persistence, placement/spawning, native
+NPC services, official dialogue, and reward providers; reuse the prepared art.
 
 The shared carried-item importer installs the remaining seven parent families
 and all 26 states together, with readiness and selection still off. Its checked
@@ -157,9 +178,9 @@ rendering or gameplay/save verification. Remaining item-specific field behaviour
 and independent selection remain the same connected task. See
 [the carried-item contract](../specs/V3_CARRIED_ITEMS.md).
 
-The current proposal is ABI 362 at
-`build/v3-carried-field-work-01/interactions-04/build-lock.json`, ROM SHA-256
-`3b35d48e837d5e500ea040fa07290a8c6ba3afff60528c09038937f87cdffbdc`.
+The current proposal is ABI 363 at
+`build/v3-carried-field-work-01/inventory-01/build-lock.json`, ROM SHA-256
+`407c78762bc09c730a3939135f6c06b65edfd2753f45cd9355afbdf5d6489b4d`.
 It contains 207 independently selectable development imports, including all
 sixteen diary styles, all nine fish, and eight insects. Another 100 furniture
 profiles await acquisition. The main lock and both stable V2-14 deployments

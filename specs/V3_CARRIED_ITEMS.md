@@ -73,10 +73,10 @@ python3 tools/v3_furniture_pipeline.py convert --representation carried \
 
 ## Installed shared runtime
 
-The current development proposal is ABI 360 at
-`build/v3-tree-effects-work-01/installed-10/build-lock.json`.
+The current development proposal is ABI 363 at
+`build/v3-carried-field-work-01/inventory-01/build-lock.json`.
 Its ROM SHA-256 is
-`e73727b589bb498c6f0da667f9f50b2921a2877509cce5f7e9fcf797a05d4148`.
+`407c78762bc09c730a3939135f6c06b65edfd2753f45cd9355afbdf5d6489b4d`.
 This is an inactive carried integration, not a new playable-import claim.
 
 `v3_furniture_install.py --refresh-runtime --carried-items PATH` installs the
@@ -152,8 +152,8 @@ unchanged resources:
 
 1. Connect the remaining actual item interactions: sign-board placement/design
    handling; card stamping/menu behaviour;
-   Harvest cutlery interaction; spirit inventory transfer restrictions and
-   actual Wisp event ownership. Spirit field/capture/release uses the installed
+   Harvest cutlery interaction; actual Wisp event ownership. Spirit inventory
+   transfer restrictions and field/capture/release use the installed
    shared category consumers below.
    Coconut eating/planting, cedar planting/growth, and complete tree leaf/cut
    effects use the installed shared consumers.
@@ -325,7 +325,7 @@ It checks `RUN` and `ERROR` independently and exposes all five acre records.
 No installed event owner calls the bridge yet. Unbound means inactive, never an
 invented running event; event ownership remains required before selection.
 
-The 1,456-byte interaction adapter occupies `80772070..80772620`, inside carried
+The 1,872-byte interaction adapter occupies `80772070..807727C0`, inside carried
 padding after the food tables. Native menu selection at `80875834` retains the
 previous complete reader chain and uses release outdoors/catch-only indoors for
 spirits, preserving protected/multi-mark results. Both native release action
@@ -348,8 +348,47 @@ The shared text placer first packs displaced complete banks within existing
 text ownership, retaining buffered contents before overlapping moves; only a
 bank that no longer fits is allocated elsewhere. All old messages and choices
 remain intact. No new resident allocation, startup descriptor, owner allocation,
-or saved field is needed. The current ABI-362 artifact is
-`build/v3-carried-field-work-01/interactions-04/build-lock.json`.
+or saved field is needed. The current ABI-363 artifact is
+`build/v3-carried-field-work-01/inventory-01/build-lock.json`.
+
+Six native inventory predicate entries at `8010DD38` enforce the full source
+transfer policy through the existing card/cutlery chain. Entries 2/4/5/6/8
+(entrust, quest, sell, give, take) reject all five spirit states. Entry 13
+rejects sign boards but deliberately allows spirits to reach the native
+full-pocket release route. Original conditions, money restrictions, empty
+storage slots, and fish-water checks remain in their complete predecessors.
+Furniture and curator entries are retained. The complete native mailing
+function at `80870AC4` already rejects the insect category; its two event-item
+callers at `808760AC/80876348` remain intact.
+
+The same installer refreshes the checked interaction reservation and rebinds
+all existing native callbacks together. It verifies whole prior owners,
+normalizes the three player calls to their checked original bodies, retains
+relocation removals, and preserves the complete installed message bank. No
+new text allocation, art compilation, resident bytes, or saved field is needed.
+
+### Carried quest owner preparation
+
+`v3_holiday_participants.py --carried-event --build-lock PATH --output PATH`
+uses the shared complete actor importer for the event NPC source directory.
+It checks all 48 contiguous Wisp actor functions and four manager callbacks,
+including every included conversation/schedule source unit. The complete
+VR4300 object and its unresolved services are recorded in
+`build/v3-carried-event-prepared-03/`. Only platform drawing submission and
+state access are adapted; source logic for dialogue, rewards, roof choices,
+weed removal, fade/movement, five unique spirit acres, and cleanup is retained.
+Native field access, date/flags, scheduling, placement/spawning, text, rewards,
+and lifecycle services still need real bindings. The object is not installed,
+and an unresolved service is not a successful placeholder.
+
+`build/v3-carried-wisp-art-01/` contains the complete draw-index-349 artwork:
+6,688 model bytes, 4,128 texture bytes, 26 joints, five visible joints,
+186 triangles, eight eye frames, and six mouth frames. The shared streamed
+character converter retains source `FC123A0E/FFFFFE38` combining,
+`C81049D8` translucent blending, primitive alpha, and LOD fraction. Wisp's
+actor must supply the environment alpha through the real translucent renderer;
+preparation alone does not establish live fading or drawing. Existing texture
+and model limits are sufficient, without cropping or discarding resources.
 
 ## Verification and limits
 
@@ -399,7 +438,11 @@ and insect packets, all startup CRCs, full old/new text, and UPS reconstruction.
 The text-placement fixture covers moving a complete index within its original
 owned bank range. Seven current browser/offline profiles agree, including
 empty V2-14. No ordinary native capture, release, event gameplay, or hardware
-verification is claimed. Transfer restrictions and Wisp ownership remain open.
+verification is claimed. Focused interaction/current-cartridge checks also cover
+all six inventory predicates, retained native mailing, and refresh without
+duplicating dialogue. The source/art preparation check covers all 52 complete
+functions, the big-endian MIPS object, all texture pixels, all model triangles,
+and retained translucent state. Wisp ownership remains open.
 
 The current build uses saved format 16. Compatible older saves migrate forward;
 V2 and format-15-or-earlier V3 cannot read new saves. Profiles missing required

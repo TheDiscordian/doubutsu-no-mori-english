@@ -41,8 +41,8 @@ Do not make another per-item installer. Golden net/axe/shovel/rod still need
 their actual remaining consumers distinguished from acquisition; retain all
 installed tool behaviour and do not replay old tests to establish it again.
 
-The current proposal is ABI 362 at
-`build/v3-carried-field-work-01/interactions-04/build-lock.json`.
+The current proposal is ABI 363 at
+`build/v3-carried-field-work-01/inventory-01/build-lock.json`.
 The complete `build/v3-carried-batch-prepared-05/` resources are installed without
 reconversion: seven parents, 26 states, fourteen icons, seven handover/police
 models, complete orange-paper artwork, official names, and prices. Additive
@@ -105,16 +105,32 @@ native net stack handover, one-at-a-time release, and indoor/outdoor menus are
 installed through the shared carried/creature paths. Reuse
 `build/v3-carried-field-prepared-04/`; all ordinary insect resources and buffers
 remain installed. Tree startup padding holds the field code/art/tables;
-carried padding holds the 1,456-byte interaction code. No new RAM is allocated.
+carried padding holds the 1,872-byte interaction/policy code. No new RAM is allocated.
 Official count-specific catch dialogue and its empty tail are credited and
 installed without changing wording or timing. The native collection adapter
 continues to exclude spirits from museum/completion records.
 
-The next concrete consumers are spirit inventory transfer restrictions and the
-actual Wisp event owner, then sign-board designs/placement, including actual
+Source spirit transfer restrictions and sign-board exchange rejection are
+installed in six native inventory filters. Original protected/empty-slot,
+card/cutlery, and fish-water policies remain delegated; mailing already rejects
+spirits by category. The shared refresh retains dialogue and all allocations.
+Focused sanitized checks, current cartridge preservation/relocation/startup/UPS
+checks, and seven browser/offline profiles pass. Do not replay unchanged checks.
+
+The next concrete consumer is the actual Wisp event owner, then sign-board
+designs/placement, including actual
 native item-type and menu routes for every family. The field code has a real
 event-state binding API, but no event owner calls it yet; an unbound event is
-inactive, not a fake running quest. Shared paper/spirit splitting/merging,
+inactive, not a fake running quest. Reuse `build/v3-carried-wisp-art-01/` for the
+complete 26-joint translucent model and every facial texture. The existing
+participant importer prepares all 48 actor functions plus four manager
+callbacks at `build/v3-carried-event-prepared-03/`. Continue from its explicit
+unbound services: weekly scheduling and saved date/flags, native NPC lifecycle
+and drawing, manager placement and field-spawn selection, official dialogue,
+and complete reward/cleanup routes. Keep source `ghost_start/stop/in`, its five
+unique acres, and saved/scene lifetime intact. Ordinary save/travel also removes
+spirits in the donor; connect the actual transaction modes, not unconditional
+deletion on a failed save. Shared paper/spirit splitting/merging,
 confirmed letter consumption, and paper collection/catalogue are installed;
 do not rebuild those or the prepared artwork without a relevant defect. Reuse
 the installed event/card/cutlery controls. Independent selections stay part of

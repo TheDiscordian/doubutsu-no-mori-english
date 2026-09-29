@@ -9,6 +9,19 @@ typedef unsigned u32;
 #define H(p,o) (*(u16 *)((u8 *)(p)+(o)))
 static u32 inventory[64],player[1024],caught[160],submenu[64],tag[24],menu[32];
 static int overlay,enabled=1,slot=4,prior_menu,returned,closed,released,original_release,put_slot,put_item,last_message,prior_message;
+static int filter_calls,filter_argument,filter_slot,filter_kind,filter_result;
+#define FILTER(name,index) \
+    extern int af_carried_filter_##name(int,int); \
+    int af_carried_prior_filter_##name(int i,int argument) { \
+        filter_calls++;filter_slot=i;filter_argument=argument;filter_kind=index; \
+        return filter_result; \
+    }
+FILTER(entrust,0)
+FILTER(quest,1)
+FILTER(sell,2)
+FILTER(give,3)
+FILTER(take,4)
+FILTER(exchange,5)
 u8 *af_test_carried_interaction_active=(u8 *)inventory,af_test_carried_interaction_field;
 extern int af_carried_interaction_menu(void *,u32,int),af_carried_net_slot(void *);
 extern void af_carried_release(void *,void *),af_carried_net_put(int,u32,void *),af_carried_net_message(u8 *,unsigned);
@@ -87,6 +100,26 @@ int main(void) {
     }
     reset();W(player,0xF24)=38;af_carried_net_message((u8 *)player,123);assert(prior_message==123);
     af_carried_net_put(0,0x2D26,NULL);assert(put_item==0x2D26 && put_slot==0);
+    int (*filters[])(int,int)={af_carried_filter_entrust,af_carried_filter_quest,
+        af_carried_filter_sell,af_carried_filter_give,af_carried_filter_take,af_carried_filter_exchange};
+    const u16 items[]={0,0x1000,0x2040,0x2043,0x2100,0x2308,0x251D,0x251E,0x251F,
+        0x2523,0x252F,0x2530,0x2807,0x290A,0x2D27,0x2D28,0x2D29,0x2D2A,0x2D2B,0x2D2C,0x2D2D,0xFFFF};
+    for(unsigned i=0;i<sizeof(items)/sizeof(*items);i++)for(int kind=0;kind<6;kind++)
+        for(int cond=0;cond<4;cond++)for(int accepted=0;accepted<2;accepted++) {
+            reset();H(inventory,0x14+slot*2)=items[i];W(inventory,0x34)=(u32)cond<<(slot*2);
+            filter_result=accepted;filter_calls=0;
+            int denied=kind==5?items[i]==0x251E:(u32)items[i]-0x2D28u<5u;
+            assert(filters[kind](slot,0x2308)==(denied?0:accepted));
+            assert(filter_calls==!denied);
+            if(!denied)assert(filter_slot==slot && filter_argument==0x2308 && filter_kind==kind);
+        }
+    for(int kind=0;kind<6;kind++) {
+        filter_calls=0;
+        assert(!filters[kind](-1,0) && !filters[kind](15,0));
+        af_test_carried_interaction_active=NULL;assert(!filters[kind](0,0));
+        af_test_carried_interaction_active=(u8 *)inventory;assert(!filter_calls);
+    }
     puts("Carried interactions: complete stacks, protected menus, release, and official message selection pass.");
+    puts("Carried inventory: source transfer restrictions and every retained predecessor result pass.");
     return 0;
 }

@@ -172,11 +172,12 @@ def constants(text,receipts,headers=CONSTANT_HEADERS):
         '#define NULL ((void *)0)',*lines,*chosen,'#endif',''])
 
 
-def generate(source,*,family=FAMILY,reference_sha=REFERENCES_SHA,extra_headers=()):
+def generate(source,*,family=FAMILY,reference_sha=REFERENCES_SHA,extra_headers=(),draw_adapters=None):
     from v3_password_policy import function
     receipts={};modules={};headers=[];contracts=[]
     for stem in family:
-        path='src/actor/'+('npc/' if '_npc' in stem else '')+'ac_'+stem+'.c'
+        directory='npc/event/' if stem.startswith('ev_') else 'npc/' if '_npc' in stem else ''
+        path='src/actor/'+directory+'ac_'+stem+'.c'
         body=clean(expand(path,receipts))
         header=read('include/ac_'+stem+'.h',receipts)
         header=re.sub(r'^\s*#include[^\n]*','',header,flags=re.M)
@@ -217,6 +218,13 @@ def generate(source,*,family=FAMILY,reference_sha=REFERENCES_SHA,extra_headers=(
         offsets={f['offset'] for f in functions}
         if offsets!={p for p in source.functions if min(offsets)<=p<=max(offsets)}:
             raise ValueError('Incomplete contiguous source actor function set: '+stem)
+        adapters=[]
+        for name,replacement in (draw_adapters or {}).items():
+            if name not in names:continue
+            original=function(body,name)
+            body=body.replace(original,replacement)
+            adapters.append(dict(function=name,source_sha256=sha256(original.encode()),
+                native_sha256=sha256(replacement.encode())))
         if stem=='rope':
             # Preserve complete collision and deformation code. Only the GX
             # command submission is replaced by bounded native drawing.
@@ -235,7 +243,8 @@ def generate(source,*,family=FAMILY,reference_sha=REFERENCES_SHA,extra_headers=(
         modules[stem]=body
         contracts.append(dict(name=stem,profile=profile,functions=functions,
             profile_offset=profile_at,profile_sha256=sha256(source.raw(profile)),
-            profile_relocations=refs,source_only_stripped=stripped))
+            profile_relocations=refs,source_only_stripped=stripped,
+            **(dict(drawing_adapters=adapters) if adapters else {})))
     header='\n'.join(headers)
     source_constants=constants(header+'\n'+'\n'.join(modules.values()),receipts,CONSTANT_HEADERS+extra_headers)
     if sha256(json.dumps(receipts,sort_keys=True,separators=(',',':')).encode())!=reference_sha:
@@ -1072,6 +1081,122 @@ def optional_card_source(body):
         '    if (optional >= 0) return optional;\n')
 
 
+def prepare_carried_event(output,lock):
+    """Prepare the complete carried-creature quest through the shared importer.
+
+    Every source function and all three source units remain checked. Native
+    fields, renderer submission, and persistent state are explicit dependencies;
+    partial linking never enables a quest with missing world services.
+    """
+    from v3_furniture_install import inputs
+    from v3_password_policy import function
+    out=output.resolve()
+    if out.exists() or not out.is_relative_to(ROOT/'build'):
+        raise ValueError('Use a fresh ignored carried-event preparation')
+    base,prior=inputs(lock)
+    source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+        (DONOR/'config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    generated,report=generate(source,family=('ev_ghost',),
+        reference_sha='d33770129eac2b5f8aee947b3b4e41da7512cd36089e8bec4e3a3a062b62ba39',
+        extra_headers=('lb_rtc.h','m_time.h','m_private.h','m_item_name.h','m_shop.h',
+            'm_house.h','m_field_info.h','m_string.h'),
+        draw_adapters={'aEGH_actor_draw':
+            'static void aEGH_actor_draw(ACTOR *a,GAME *g) {af_cw_draw(a,g,((EV_GHOST_ACTOR *)a)->alpha);}'})
+    body=generated['ev_ghost.c'].replace('#include "holiday_participants.h"','#include "carried_event.h"')
+    substitutions=(
+        ('Common_GetPointer(time.rtc_time)','af_cw_clock()'),
+        ('Common_Get(now_private)','af_cw_private()'),
+        ('Common_Get(player_no)','af_cw_player()'),
+        ('Common_Get(time.now_sec)','af_cw_seconds()'),
+        ('Common_Get(clip).handOverItem_clip->master_actor','af_cw_handover_master()'),
+        ('(*Common_Get(clip).npc_clip->chg_schedule_proc)','af_cw_change_schedule'),
+        ('Common_Get(clip).npc_clip','NPC_CLIP'),
+        ('ghost->npc_class.schedule.type','af_cw_schedule((ACTOR *)ghost)'),
+        ('ghost->npc_class.talk_info.melody_inst','(*af_cw_melody((ACTOR *)ghost))'),
+        ('actorx->actor_specific','(*af_cw_actor_specific(actorx))'),
+        ('actorx->shape_info.draw_shadow','(*af_cw_shadow(actorx))'),
+        ('ghost->npc_class.actor_class.scale.','af_cw_scale((ACTOR *)ghost)->'),
+        ('GET_PLAYER_ACTOR(play)->actor_class.','af_cw_player_actor(play)->'),
+        ('Save_Get(event_save_common).ghost_day = 0;','af_cw_finish_hunt();'),
+        ('Save_Set(clear_grass, TRUE);','af_cw_clear_grass(TRUE);'),
+    )
+    adaptations=[]
+    for original,native in substitutions:
+        count=body.count(original)
+        if not count:raise ValueError('Changed complete carried-event platform access: '+original)
+        body=body.replace(original,native);adaptations.append(dict(source=original,native=native,count=count))
+    # Native homes and player flags have different layouts. Preserve the source
+    # paint-pending policy in a required service, without casting a donor home.
+    roof=function(body,'aEGH_select_roof')
+    changed=roof.replace('  mHm_hs_c* home = Save_GetPointer(homes[arrange_idx]);','')
+    writes=('      home->outlook_pal = ghost->roof_pal;\n\n      \n'
+        '      if ((af_cw_private()->state_flags & mPr_FLAG_UPDATE_OUTLOOK_PENDING) == 0) {\n'
+        '        home->next_outlook_pal = ghost->roof_pal;\n      }')
+    if changed.count(writes)!=1:
+        raise ValueError('Changed complete source roof paint-pending policy')
+    changed=changed.replace(writes,'      af_cw_set_roof(arrange_idx, ghost->roof_pal);')
+    adaptations.append(dict(function='aEGH_select_roof',source_sha256=sha256(roof.encode()),
+        native_sha256=sha256(changed.encode()),policy='Retain scheduled paint when updating the current roof colour'))
+    body=body.replace(roof,changed)
+    if re.search(r'\b(?:Common_Get|Common_GetPointer|Save_Get|Save_GetPointer|Save_Set)\(',body):
+        raise ValueError('Unmapped carried-event native state access')
+    generated['ev_ghost.c']=body
+    raw=read('src/actor/ac_event_manager.c',report['references'])
+    if sha256(raw.encode())!='bb6f890571e68532d6edd8b741acc4975051b192f69b06a3863223552e2efe55':
+        raise ValueError('Changed complete carried-event manager source')
+    manager=[];contracts=[]
+    for at,name,digest in (
+        (0xB0870,'ghost_start','8a0fc4feb050ad26c1eb30a742bbadf615621203787f9e1365cafa078593c4b2'),
+        (0xB0A90,'ghost_delete_hitodama','a387d5db67cd99d0be42b1454eda9befbdb00440b5f418be389c0991584a0b7a'),
+        (0xB0B28,'ghost_stop','88ae7bdcebab37c5b70e5fe859e1e591b45b47eb8b25d8de87b22d10c2b691fa'),
+        (0xB0B90,'ghost_in','66671da3e945b38298a9c4893cc779e2c909cc7ac0a57a728a8aede429272f3f')):
+        _,receipt=source.function(at)
+        if receipt['symbol']!=name or receipt['sha256']!=digest:
+            raise ValueError('Changed complete carried event-manager function: '+name)
+        contracts.append(receipt);manager.append(clean(function(raw,name)))
+    manager='\n\n'.join(manager)
+    for original,native in (*substitutions,('Now_Private','af_cw_private()'),
+            ('ctrl->type','af_cw_event_type(ctrl)'),('wpppp','(*af_cw_placement())')):
+        if original in manager:
+            adaptations.append(dict(unit='manager',source=original,native=native,count=manager.count(original)))
+            manager=manager.replace(original,native)
+    sentinel=re.search(r'^#define aEvMgr_SHOW_ACTOR_RESULT_NOT_SHOWN[^\n]*',raw,re.M)
+    if not sentinel:raise ValueError('Missing source acre-entry sentinel')
+    manager=sentinel[0]+'\n'+manager
+    for name in ('start','stop','in'):
+        manager+=f'\nint af_cw_source_{name}(void *m,void *c) {{return ghost_{name}(m,c);}}\n'
+    generated['manager.c']=('#include "carried_event.h"\n#include "constants.h"\n'
+        '#pragma GCC diagnostic ignored "-Wunused-parameter"\n'+manager)
+    extra=('lb_rtc.h','m_time.h','m_private.h','m_item_name.h','m_shop.h',
+        'm_house.h','m_field_info.h','m_string.h')
+    generated['constants.h']=constants('\n'.join(v for k,v in generated.items() if k!='constants.h'),
+        report['references'],CONSTANT_HEADERS+extra)
+    out.mkdir(parents=True)
+    for name,text in generated.items():write_new(out/name,text.encode())
+    docker=['docker','run','--rm','--network','none','--user',f'{os.getuid()}:{os.getgid()}',
+        '-v',f'{ROOT}:/source:ro','-v',f'{out}:/out','-w','/out','--entrypoint']
+    def run(tool,*args):
+        return subprocess.run(docker+['/n64_toolchain/bin/mips64-elf-'+tool,IMAGE,*args],
+            text=True,capture_output=True,check=True,timeout=60).stdout
+    flags=['-c','-Os','-EB','-mabi=32','-march=vr4300','-mfix4300','-G0','-mno-abicalls',
+        '-fno-pic','-ffreestanding','-fno-builtin','-fno-common','-fno-stack-protector',
+        '-ffunction-sections','-fdata-sections','-fstack-usage','-Wall','-Wextra','-Werror',
+        '-Wno-unused-variable','-Wno-unused-but-set-variable','-Wno-parentheses',
+        '-I/source/overlays/v3','-I/out']
+    run('gcc',*flags,'ev_ghost.c','manager.c')
+    run('ld','-EB','-r','ev_ghost.o','manager.o','-o','carried-event.o')
+    report.update(format='AFV3-CARRIED-EVENT-1',base_abi=prior['runtime_abi'],base_sha256=sha256(base),
+        platform_adaptations=adaptations,event_manager_functions=contracts,
+        generated_sha256={name:sha256(text.encode()) for name,text in generated.items()},
+        unbound_services=run('nm','--undefined-only','carried-event.o').strip().splitlines(),
+        object=dict(sha256=sha256((out/'carried-event.o').read_bytes()),compiler=IMAGE,
+            flags=flags,size=run('size','carried-event.o'),linked=False),
+        sources={p:sha256((ROOT/p).read_bytes()) for p in ('tools/v3_holiday_participants.py',
+            'overlays/v3/holiday_participants.h','overlays/v3/carried_event.h')})
+    write_new(out/'prepared.json',(json.dumps(report,indent=2)+'\n').encode())
+    return report
+
+
 def prepare_exercise(output,lock):
     """Compile the whole dancer/card family through the shared source importer.
 
@@ -1647,10 +1772,12 @@ if __name__=='__main__':
     p.add_argument('--reuse',type=Path,help='Reuse identical complete rope conversion from a prior preparation')
     p.add_argument('--exercise',action='store_true',help='Prepare the complete exercise actor/card family using the same source importer')
     p.add_argument('--festivals',action='store_true',help='Prepare all remaining ordinary festival participant families together')
+    p.add_argument('--carried-event',action='store_true',help='Prepare the complete carried-creature quest owner')
     args=p.parse_args()
-    if args.exercise and args.festivals:p.error('Select one complete participant family')
+    if sum((args.exercise,args.festivals,args.carried_event))>1:p.error('Select one complete participant family')
     try:
-        result=(prepare_festivals(args.output,args.build_lock) if args.festivals else
+        result=(prepare_carried_event(args.output,args.build_lock) if args.carried_event else
+            prepare_festivals(args.output,args.build_lock) if args.festivals else
             prepare_exercise(args.output,args.build_lock) if args.exercise else prepare(args.output,args.build_lock,args.reuse))
     except subprocess.CalledProcessError as e:
         print(e.stderr);raise
