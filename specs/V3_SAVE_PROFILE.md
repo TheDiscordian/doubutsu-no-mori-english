@@ -2,6 +2,15 @@
 
 ## Implemented boundary
 
+The carried-item variant uses compressed format 16, retaining canonical format
+eight, registry five, and the existing 48-byte card extension. All seven carried
+families have independent required-profile bits; four players have independent
+orange-paper ownership. Native short catalogue arrays are not enlarged or
+overwritten. Compatible earlier saves migrate forward; V2 and format-15-or-
+earlier V3 cannot read these saves. See the current
+[carried save/collection contract](V3_CARRIED_ITEMS.md#saved-profiles-collection-and-catalogue)
+for actual byte assignments, installed consumers, and verification limits.
+
 The surface-enabled variant uses the [format-4 surface extension](V3_SURFACE_SAVE.md),
 with separate selection and four-player ownership after all existing records.
 It migrates valid NAFJ and format-1/2/3 banks. Older formats cannot load its saves.

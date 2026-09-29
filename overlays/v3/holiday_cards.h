@@ -18,4 +18,13 @@ int af_holiday_cards_bind(unsigned char *,unsigned int);
 #ifdef AF_V3_EVENT_ITEM_PROFILE
 unsigned int af_holiday_cards_enabled(void);
 #endif
+#ifdef AF_V3_CARRIED_PROFILE
+/* Version three keeps the same 48-byte owned allocation. Header byte 8 holds
+ * all seven required families; bytes 9..12 hold independent paper ownership.
+ * Card stamps remain at their original offsets. */
+unsigned int af_carried_save_enabled(void);
+int af_carried_save_profile(const unsigned char *,unsigned int,unsigned int);
+int af_carried_save_bind(unsigned char *,unsigned int,unsigned int);
+int af_carried_paper_collect(unsigned char *,unsigned int,unsigned int);
+#endif
 #endif

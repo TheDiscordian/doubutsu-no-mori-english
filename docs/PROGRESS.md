@@ -51,20 +51,28 @@ paper/spirit merging with overflow retained in hand, and one-sheet consumption
 only on confirmed letter creation. Native hand movement, ticket handling,
 protected-item conditions, and original paper remain intact. All existing menu
 words and cancellation positions are reused; four additional menus share one
-handler. The code fits the installed reservation without resident growth; the
-menu pool grows by 512 bytes.
-Eight focused current-build checks pass, including sanitized readers/stack
-actions/ground construction, complete letter resources/tables, actual native
-call bindings and hand relocation, retained creature readers, allocation
-rejection, and seven browser/offline selection comparisons. These are not native
-rendering or gameplay/save verification. Catalogue/collection and saved profiles,
-remaining item-specific behaviours, and independent selection remain the same
-connected task. See
+handler. The action code fits its installed reservation.
+All seven carried families have saved-profile requirements in the existing
+48-byte card extension. Four independent paper-ownership bytes share that owned
+allocation without changing native save arrays or card-stamp offsets. Native
+collection calls and the catalogue use this ownership; orange paper has one
+four-sheet catalogue entry and both complete preview models. All 64 original
+styles, native editor resources, and unrelated catalogue pages remain intact.
+Thirty public save entries redirect to the complete format-16 adapter. Missing
+required families reject loading before changing live town or output state;
+format-14/15 migration retains card stamps, diary pages, and console records.
+
+Focused sanitized save/collection/catalogue checks, current cartridge/resource
+bindings, all twenty startup checksums, allocation bounds, patch reconstruction,
+and seven browser/offline comparisons pass. Existing reader/stack/letter/ground
+checks remain retained for unchanged code and artwork. These are not native
+rendering or gameplay/save verification. Remaining item-specific field behaviours
+and independent selection remain the same connected task. See
 [the carried-item contract](../specs/V3_CARRIED_ITEMS.md).
 
-The current proposal is ABI 354 at
-`build/v3-carried-runtime-work-01/actions-connected-03/build-lock.json`, ROM SHA-256
-`01c8fef734cb681a35e84fff5284486ae97c8592ebb26c47ca92ad8900803074`.
+The current proposal is ABI 355 at
+`build/v3-carried-runtime-work-01/storage-connected-06/build-lock.json`, ROM SHA-256
+`3494ba7a2519718166b20e5b592c47b3a3ebe13a01a34adb8378685fdaab21c5`.
 It contains 207 independently selectable development imports, including all
 sixteen diary styles, all nine fish, and eight insects. Another 100 furniture
 profiles await acquisition. The main lock and both stable V2-14 deployments
@@ -89,9 +97,9 @@ the ordinary 28-event reward table. All 66 mapped identities use actual installe
 profile/metadata checks, including the carried diary IDs.
 
 The connected 20,240-byte world/card module uses 52 checked redirects and one
-shared exercise context. Existing artwork, animations, actors, and saved format
-15 remain intact. The unchanged 64,064-byte festival code prefix shares a
-94,240-byte startup packet with carried resources; twenty descriptors still
+shared exercise context. Existing artwork, animations, and actors remain intact.
+The unchanged 64,064-byte festival code prefix shares a 105,904-byte startup
+packet with carried resources and the save adapter; twenty descriptors still
 fit the 676-byte bootstrap. Current resource hashes, redirects,
 all startup spans/checksums, source batches, and patch reconstruction pass.
 Focused source/sanitized-host checks cover disabled gifts, actual attendance,
@@ -105,8 +113,10 @@ and source hashes pass. Native diary UI/save and activated festival gameplay
 remain unverified. The exhausted native fixture stays closed. The remaining
 importing work is the carried-object/stationery group and any unfinished golden
 tool behaviour; acquisition and the required gold-tree work follow primary imports.
-Saved format 15 is unchanged, but older profiles lacking selected diary styles
-cannot load saves requiring them. V2 and format-14-or-earlier V3 remain incompatible.
+Saved format 16 migrates compatible earlier saves forward. V2 and
+format-15-or-earlier V3 cannot load new saves. Removing required imports,
+including any carried family or selected diary style, rejects loading. Preserve
+backups; ordinary native save/reload remains unverified.
 
 The complete moon/meteor effect family is installed: moon reflection, meteor
 emitter, moving trail, and sparkle. Complete source lifecycles, native drawing,

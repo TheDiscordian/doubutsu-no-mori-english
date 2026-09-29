@@ -41,33 +41,44 @@ Do not make another per-item installer. Golden net/axe/shovel/rod still need
 their actual remaining consumers distinguished from acquisition; retain all
 installed tool behaviour and do not replay old tests to establish it again.
 
-The current proposal is ABI 354 at
-`build/v3-carried-runtime-work-01/actions-connected-03/build-lock.json`.
+The current proposal is ABI 355 at
+`build/v3-carried-runtime-work-01/storage-connected-06/build-lock.json`.
 The complete `build/v3-carried-batch-prepared-05/` resources are installed without
 reconversion: seven parents, 26 states, fourteen icons, seven handover/police
 models, complete orange-paper artwork, official names, and prices. Additive
 identities, six shared readers, qualified ground categories, and the native
 letter drawing/colour/constructor path are connected. Cedar's category 48 keeps
 the diary-specific source-17 mapping at 44. Ready/selected masks remain zero;
-none of these seven families is newly playable. The importer adds 30,176 resident
-bytes without another startup descriptor and 1,280 menu-pool bytes in total.
+none of these seven families is newly playable. The carried integration adds
+41,840 resident bytes without another startup descriptor and 1,984 menu-pool
+bytes in total.
 The connected inventory path supplies four multi-sheet menus, one-sheet pickup,
 paper/spirit merging with overflow, and confirmed one-sheet letter consumption.
 Native hand animation, original items, ticket stacks, and protected conditions
 remain unchanged. The action extension uses the existing resident reservation.
 
-Next connect collection/catalogue and canonical saved identities/profile
-requirements across the batch, then the remaining actual field consumers:
-planting/eating, sign designs/placement, and spirit capture/release. Shared
-paper/spirit splitting/merging and confirmed letter consumption are installed;
+Collection/catalogue and saved profiles are connected. The existing 48-byte
+card extension holds all seven required families and four paper-ownership bytes;
+card stamps, diaries, console records, and all original paper remain intact.
+The native catalogue has one additional four-sheet entry, complete resident
+models, actual collection-bit dispatch, and its original preview framing.
+Format-14/15 migration and missing-family rejection run through the actual save
+transaction with native I/O doubled. Thirty stable save entries redirect to the
+new adapter; two existing collection entries use the shared carried path.
+
+Next finish the remaining actual field consumers: planting/eating, sign
+designs/placement, and spirit capture/release, including actual native item-type
+and menu routes for every family. Shared paper/spirit splitting/merging,
+confirmed letter consumption, and paper collection/catalogue are installed;
 do not rebuild those or the prepared artwork without a relevant defect. Reuse
 the installed event/card/cutlery controls. Independent selections stay part of
-the same task. The native tag, core, letter, and hand disassemblies in
+the same task. The native tag, core, letter, hand, and catalogue disassemblies in
 `build/v3-carried-runtime-work-01/` are already available;
 do not repeat them. All prepared artwork and passing unchanged checks remain
-reusable. Seven carried-runtime checks and the seven-profile browser/offline
-comparison pass; native rendering, item interactions, and persistence remain
-unverified. The consumer map, resource contract, and focused checks are in
+reusable. Focused current save/profile/collection/catalogue and resource checks,
+allocation bounds, and the seven-profile browser/offline comparison pass. Retain
+unchanged reader/action evidence; native rendering, item interactions, and
+persistence remain unverified. The consumer map and focused checks are in
 [carried-item imports](../specs/V3_CARRIED_ITEMS.md).
 
 All sixteen diary styles have connected importing and selection in ABI 352:
@@ -93,9 +104,10 @@ budget, or equate selection checks with native gameplay. Keep these cases for
 the assembled current-build gameplay pass. Ordinary diary shop stock belongs
 with acquisition.
 
-Saved format 15 remains unchanged. Keep backups: saves requiring selected diary
-styles cannot load in older profiles lacking those styles, and V2/format-14-or-
-earlier V3 cannot load format-15 saves. The main lock and both V2-14 deployments
+Saved format 16 requires this or a newer compatible build. Compatible older saves
+migrate forward; removing a required carried family or diary style rejects the
+save. V2 and format-15-or-earlier V3 cannot read new saves. Keep backups.
+The main lock and both V2-14 deployments
 remain unchanged. Detailed diary formats, native bindings, resources, and
 verification limits live in [the diary specification](../specs/V3_DIARIES.md).
 

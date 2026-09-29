@@ -10,6 +10,13 @@ extern u8 af_v3_fishing_state[AF_HF_BYTES];
 #endif
 #ifdef AF_V3_CARD_STORAGE
 extern u8 af_v3_card_state[AF_HC_BYTES];
+#ifdef AF_V3_CARRIED_PROFILE
+#define cards_profile(p) af_carried_save_profile(p,af_holiday_cards_enabled(),af_carried_save_enabled())
+#define cards_bind(p) af_carried_save_bind(p,af_holiday_cards_enabled(),af_carried_save_enabled())
+#else
+#define cards_profile(p) af_holiday_cards_profile(p,af_holiday_cards_enabled())
+#define cards_bind(p) af_holiday_cards_bind(p,af_holiday_cards_enabled())
+#endif
 #define extended_expand af_v3_save_expand_cards
 #define extended_compress af_v3_save_compress_cards
 #define extended_measure af_v3_save_measure_cards
@@ -108,7 +115,10 @@ static int guards(void) {
 #endif
 #ifdef AF_V3_CARD_STORAGE
     if(!af_holiday_cards_valid(af_v3_card_state))return 0;
-#ifdef AF_V3_EVENT_ITEM_PROFILE
+#ifdef AF_V3_CARRIED_PROFILE
+    if(af_v3_card_state[4]!=3 || af_v3_card_state[8]!=af_carried_save_enabled() ||
+       !cards_profile(af_v3_card_state))return 0;
+#elif defined(AF_V3_EVENT_ITEM_PROFILE)
     if(af_v3_card_state[4]!=2 || af_v3_card_state[7]!=af_holiday_cards_enabled())return 0;
 #endif
 #endif
@@ -127,7 +137,7 @@ void af_v3_console_storage_reset(void) {
 #ifdef AF_V3_CARD_STORAGE
     af_holiday_cards_reset(af_v3_card_state);
 #ifdef AF_V3_EVENT_ITEM_PROFILE
-    (void)af_holiday_cards_bind(af_v3_card_state,af_holiday_cards_enabled());
+    (void)cards_bind(af_v3_card_state);
 #endif
 #endif
 }
@@ -161,6 +171,9 @@ static int expand(const u8 *bank,const u8 **logical) {
 #ifdef AF_V3_EVENT_ITEM_PROFILE
         || version==0x000F0680
 #endif
+#ifdef AF_V3_CARRIED_PROFILE
+        || version==0x00100680
+#endif
 #endif
 #endif
 #endif
@@ -178,8 +191,7 @@ static int expand(const u8 *bank,const u8 **logical) {
         if(result<0)return result==AF_CZ_FORMAT?AF_SAVE_FORMAT:
             result==AF_CZ_ARGUMENT?AF_SAVE_ARGUMENT:AF_SAVE_CRC;
 #ifdef AF_V3_EVENT_ITEM_PROFILE
-        if(!af_holiday_cards_profile(scratch+AF_CZ_RAW+AF_CZ_FISHING_EXTRA,
-                af_holiday_cards_enabled()))return AF_SAVE_PROFILE_MISSING;
+        if(!cards_profile(scratch+AF_CZ_RAW+AF_CZ_FISHING_EXTRA))return AF_SAVE_PROFILE_MISSING;
 #endif
         *logical=scratch;
     }
@@ -219,7 +231,7 @@ int af_v3_save_pack(u8 *bank,u32 size,const u8 *state) {
     if(storage->ready && storage->town!=id)af_holiday_cards_reset(cards);
     else copy(cards,af_v3_card_state,AF_HC_BYTES);
 #ifdef AF_V3_EVENT_ITEM_PROFILE
-    if(!af_holiday_cards_bind(cards,af_holiday_cards_enabled()))return leave(AF_SAVE_PROFILE_MISSING);
+    if(!cards_bind(cards))return leave(AF_SAVE_PROFILE_MISSING);
 #endif
 #endif
     result=extended_compress(bank,AF_SAVE_BANK,scratch,AF_CZ_BANK,
@@ -274,7 +286,7 @@ int af_v3_console_storage_commit(const u8 *bank,const u8 *profile,u8 *state,cons
     if(decoded==scratch)copy(af_v3_card_state,scratch+AF_CZ_RAW+AF_CZ_FISHING_EXTRA,AF_HC_BYTES);
     else af_holiday_cards_reset(af_v3_card_state);
 #ifdef AF_V3_EVENT_ITEM_PROFILE
-    (void)af_holiday_cards_bind(af_v3_card_state,af_holiday_cards_enabled());
+    (void)cards_bind(af_v3_card_state);
 #endif
 #endif
     storage->town=town(decoded);storage->ready=1;*logical=decoded;

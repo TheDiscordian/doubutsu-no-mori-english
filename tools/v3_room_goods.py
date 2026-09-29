@@ -399,8 +399,14 @@ def publish_bootstrap(equipment,blob,surface,output):
                 carried=equipment.get('carried_items')
                 if carried:
                     extension=festivals.get('carried_packet_extension',{})
+                    storage=carried.get('storage')
+                    carried_end=0x80778000
+                    if storage:
+                        if storage['ram']!=carried_end or storage['bytes']!=storage['code']['bytes']:
+                            raise ValueError('Changed carried save owner reservation')
+                        carried_end+=storage['bytes']+16
                     if (carried['packet']!=fp or extension.get('previous_bytes')!=expected_bytes or
-                            extension.get('end')!=0x80778000 or fp['ram']+fp['bytes']!=extension['end'] or
+                            extension.get('end')!=carried_end or fp['ram']+fp['bytes']!=extension['end'] or
                             carried['ram']!=0x80771000 or carried['table_ram']!=0x80773800 or
                             carried['state_count']!=26 or carried['parent_count']!=7):
                         raise ValueError('Changed carried-item extension of the shared startup packet')

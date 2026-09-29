@@ -337,7 +337,7 @@ def reuse_resource_tail(base, prior, old_blob):
         retained_prefix_sha256=sha256(old_blob[:first]),retired_resources=copy.deepcopy(moves))
 
 
-def place_resource_tail(base,prior,blob,resources,limit,*,reservations=()):
+def place_resource_tail(base,prior,blob,resources,limit,*,reservations=(),placements=()):
     """Keep regenerated owners outside item storage when the common tail fills.
 
     Preserve their DMA identities and complete contents. Reclaimed item storage
@@ -348,7 +348,7 @@ def place_resource_tail(base,prior,blob,resources,limit,*,reservations=()):
     old_bytes=files[BLOB].size;after=len(blob)
     for vrom in order:after=((after+15)&~15)+len(resources[vrom])
     external=prior.get('automatic_furniture',{}).get('resource_tail_padding') is not None
-    if not external and old_bytes<=after<=limit-BLOB:
+    if not placements and not external and old_bytes<=after<=limit-BLOB:
         moves=[]
         for vrom in order:
             data=resources[vrom];blob.extend(bytes(-len(blob)%16));at=len(blob);blob.extend(data)
@@ -362,7 +362,18 @@ def place_resource_tail(base,prior,blob,resources,limit,*,reservations=()):
     for vrom in order:
         entry=files[vrom];data=resources[vrom]
         if not data:raise ValueError('Empty regenerated resource')
-        if external and not entry.pend and data==entry.extract(base):
+        plans=[r for r in placements if r['vrom']==vrom]
+        if plans:
+            if len(plans)!=1:raise ValueError('Duplicate regenerated owner placement')
+            plan=plans[0]
+            if (plan['bytes']!=len(data) or plan['sha256']!=sha256(data) or
+                    plan['previous_bytes']!=entry.size or plan['previous_sha256']!=sha256(entry.extract(base))):
+                raise ValueError('Changed complete regenerated owner placement')
+            moved.append(dict(vrom=vrom,bytes=len(data),physical=plan['physical'],
+                storage='checked-zero-gap' if plan.get('relocated') else 'checked-in-place-append',
+                sha256=plan['sha256'],original_sha256=plan['previous_sha256']))
+            writes[vrom]=data
+        elif external and not entry.pend and data==entry.extract(base):
             moved.append(dict(vrom=vrom,bytes=len(data),physical=entry.pstart,
                 storage='retained-external',sha256=sha256(data),original_sha256=sha256(data)))
         else:pending.append((vrom,data));writes[vrom]=data
@@ -740,7 +751,7 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         import v3_carried_runtime as equipment
         equipment_report,owner_changes,report_updates,physical_writes=equipment.install(
             base,prior,blob,core,module,output,carried_items)
-        display_report=prior['clothing']['display'];alias_report=prior['display_aliases']
+        display_report=report_updates.get('clothing',prior['clothing'])['display'];alias_report=prior['display_aliases']
     elif holiday_actor_services:
         current_events=prior['equipment_resources'].get('npc_extra',{}).get('events',{})
         if holiday_participants is not None:
@@ -1111,7 +1122,8 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         tail_resources={v:owner_changes.get(v,files[v].extract(base))
             for v in (catalogue.VROM,catalogue.RELOC,shops.VROM)}
         moved,tail_writes,tail_padding=place_resource_tail(base,prior,blob,tail_resources,limit,
-            reservations=report_updates.get('physical_resources',prior.get('physical_resources',[]))+growth)
+            reservations=report_updates.get('physical_resources',prior.get('physical_resources',[]))+growth,
+            placements=[r for r in growth if r['vrom'] in tail_resources])
         external=[(v,d) for v,d in external if v not in tail_resources]
         owner_moves=owner_tail_storage(base,files,external,
             minimum_end=max([files[BLOB].pstart+len(blob)]+[r['physical']+r['bytes'] for r in growth+moved]),
@@ -1119,7 +1131,8 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         owner_moves.extend(dict(vrom=r['vrom'],bytes=r['bytes'],physical=r['physical'],
             storage='checked-zero-gap' if r.get('relocated') else 'checked-in-place-append',
             sha256=r['sha256'],original_sha256=r['previous_sha256'],
-            **({'target_vrom':r['target_vrom']} if 'target_vrom' in r else {})) for r in growth)
+            **({'target_vrom':r['target_vrom']} if 'target_vrom' in r else {})) for r in growth
+            if r['vrom'] not in {m['vrom'] for m in moved})
     if equipment_report and equipment_report.get('furniture_melody_audio'):
         from v3_furniture_melody import rebind_wave_header
         rebind_wave_header(equipment_report,core)
@@ -1543,10 +1556,14 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
     if carried_items is not None:
         carried=equipment_report['carried_items']
         actions=carried.get('actions')
+        storage=carried.get('storage')
         report['shared_runtime_refresh'].update(adapters=['carried_items'],artwork_changed=not bool(actions),
-            additional_resident_bytes=0 if actions else carried['additional_resident_bytes'],resource_allocations_changed=True,
-            saved_format_changed=False,saved_profile_changed=False,changed_owner_moves=owner_moves)
-        if actions:report['shared_runtime_refresh']['additional_menu_bytes']=actions['additional_menu_bytes']
+            additional_resident_bytes=storage['additional_resident_bytes'] if storage else 0 if actions else carried['additional_resident_bytes'],
+            resource_allocations_changed=True,saved_format_changed=bool(storage),saved_profile_changed=bool(storage),
+            changed_owner_moves=owner_moves)
+        if actions:
+            report['shared_runtime_refresh']['additional_menu_bytes']=(carried['paper']['catalogue']['additional_menu_bytes']
+                if storage else actions['additional_menu_bytes'])
         report['sources'].update(carried['sources'])
         report['native_test']='pending connected carried-item menus, behaviours, persistence, and selection; readiness remains off'
     if holiday_actor_services:

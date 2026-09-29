@@ -25,6 +25,11 @@ SOURCES=('tools/v3_carried_runtime.py','tools/v3_carried_items.py','tools/v3_cat
     'overlays/v3/carried_items.c','overlays/v3/carried_items.h',
     'overlays/v3/carried_items.ld','overlays/v3/creature_icon.S',
     'overlays/v3/item_categories.c','overlays/v3/ground_categories.c','translations/provenance.json')
+STORAGE_SOURCES=('overlays/v3/console_storage.c','overlays/v3/console_storage.h',
+    'overlays/v3/save_compressed.c','overlays/v3/save_compressed.h',
+    'overlays/v3/holiday_cards.c','overlays/v3/holiday_cards.h',
+    'overlays/v3/holiday_item_storage.ld','overlays/v3/carried_collection.c',
+    'overlays/v3/carried_catalogue.c','overlays/v3/carried_catalogue.ld')
 
 
 def native_identities(core):
@@ -74,6 +79,8 @@ def letter_window(base,core,menu,paper,symbols):
 
 def install(base, prior, blob, core, module, output, directory):
     if prior['equipment_resources'].get('carried_items'):
+        if prior['equipment_resources']['carried_items'].get('actions'):
+            return install_storage(base,prior,blob,core,output,directory)
         return install_actions(base,prior,blob,core,output,directory)
     from v3_carried_items import FORMAT,records,pocket_icons,paper_art
     from v3_item_categories import discover,checked_art
@@ -354,3 +361,171 @@ def install_actions(base,prior,blob,core,output,directory):
     write_new(output/'carried-packet.bin',raw)
     return e,changes,dict(physical_resources=resources,runtime_owner_resizes=resizes,
         resource_growth=growth),[(dict(resource,previous_sha256=old['sha256']),bytes(raw))]
+
+
+def install_storage(base,prior,blob,core,output,directory):
+    """Connect all carried profiles and paper collection in the actual save path."""
+    from v3_console_disk_install import reservations
+    from v3_holiday_selection import refresh_receipts
+    import v3_physical_resources as physical
+    e=copy.deepcopy(prior['equipment_resources']);d=e['carried_items'];old=d['packet']
+    if (d.get('storage') or not d.get('actions') or d['ready_mask'] or d['selected_mask'] or
+            directory.resolve()!=ROOT/d['prepared']):
+        raise ValueError('Carried storage requires the checked inactive action integration')
+    raw=bytearray(base[old['physical']:old['physical']+old['bytes']])
+    if (sha256(raw)!=old['sha256'] or old['ram']+len(raw)!=END or raw[-16:]!=GUARD or
+            sha256(raw[RAM-old['ram']:])!=d['sha256']):
+        raise ValueError('Changed complete carried predecessor')
+    storage=e['holiday_items']['controls']['storage'];previous=copy.deepcopy(storage['code'])
+    prefix_packet=e['npc_extra']['events']['sky']['packet']
+    prefix_sha=prefix_packet['sha256']
+    prefix=bytearray(base[prefix_packet['physical']:prefix_packet['physical']+prefix_packet['bytes']])
+    at=storage['ram']-prefix_packet['ram']
+    if (sha256(prefix)!=prefix_packet['sha256'] or
+            sha256(prefix[at:at+storage['bytes']])!=previous['sha256'] or
+            storage['save_format']!=15 or storage['wire_version']!=2):
+        raise ValueError('Changed complete predecessor save owner')
+    clothing=copy.deepcopy(prior['clothing']);hooks=clothing['display']['readers']['collection_hooks']
+    links=dict(previous['link_symbols'],AF_HI_STORAGE_RAM=END)
+    for kind,h in zip(('record','owned'),hooks):
+        links['af_carried_prior_'+kind]=h['target']
+    for name in ('af_carried_category','af_carried_reserved'):
+        links[name]=d['code']['symbols'][name]
+    code,compiled=compile_part('holiday_item_storage',output/'carried-storage',
+        primary_source='overlays/v3/console_storage.c',
+        extra_sources=('overlays/v3/save_compressed.c','overlays/v3/holiday_cards.c',
+            'overlays/v3/carried_collection.c'),
+        defines=tuple(f[2:] for f in previous['flags'] if f.startswith('-D'))+('AF_V3_CARRIED_PROFILE=1',),
+        link_symbols=links)
+    end=END+len(code)+16
+    if end>0x807DA800 or any(a<end and END<b for a,b in reservations(prior)):
+        raise ValueError('Carried save owner overlaps retained memory')
+    cat_ram=RAM+d['code']['bytes']
+    cat_links=dict(AF_CARRIED_CATALOGUE_RAM=cat_ram,af_carried_owned=compiled['symbols']['af_carried_owned'],
+        af_carried_prior_catalogue_bit=prior['room_surfaces']['menu']['code']['symbols']['af_v3_surface_catalogue_bit'])
+    for name in ('af_carried_category','af_carried_price'):cat_links[name]=d['code']['symbols'][name]
+    cat_code,cat_compiled=compile_part('carried_catalogue',output/'carried-catalogue',link_symbols=cat_links)
+    cat_start=cat_ram-old['ram']
+    if cat_ram+len(cat_code)>TABLE or any(raw[cat_start:cat_start+len(cat_code)]):
+        raise ValueError('Catalogue adapter overlaps installed carried code or records')
+    raw[cat_start:cat_start+len(cat_code)]=cat_code
+    redirects=[];symbols=previous['symbols']
+    bounds=sorted({v for v in symbols.values() if storage['ram']<=v<storage['ram']+storage['bytes']})
+    for name,address in sorted(symbols.items()):
+        if (not name.startswith(('af_v3_','af_holiday_cards_')) or
+                not storage['ram']<=address<storage['ram']+storage['bytes']):continue
+        target=compiled['symbols'].get(name)
+        stop=next((a for a in bounds if a>address),storage['ram']+storage['bytes'])
+        if target is None or not END<=target<end-16 or stop-address<8:
+            raise ValueError('Missing or short public save entry: '+name)
+        offset=address-prefix_packet['ram'];before=bytes(prefix[offset:offset+8])
+        after=struct.pack('>2I',jump(target),0);prefix[offset:offset+8]=after
+        redirects.append(dict(name=name,address=address,target=target,before=before.hex(),after=after.hex()))
+    if len(redirects)!=30:raise ValueError('Changed public save/profile entry inventory')
+    collection=[]
+    for kind,h in zip(('record','owned'),hooks):
+        offset=h['entry']-0x80460000;before=bytes.fromhex(h['after'])
+        if not 0<=offset<=len(blob)-8 or blob[offset:offset+8]!=before:
+            raise ValueError('Changed collection reader predecessor: '+kind)
+        target=compiled['symbols']['af_carried_'+kind];after=struct.pack('>2I',jump(target),0)
+        blob[offset:offset+8]=after
+        collection.append(dict(kind=kind,address=h['entry'],prior=h['target'],target=target,
+            before=before.hex(),after=after.hex()))
+        h.update(carried_prior_target=h['target'],target=target,after=after.hex())
+    raw.extend(code);raw.extend(GUARD)
+    resources=copy.deepcopy(prior['physical_resources'])
+    try:replacement=physical.grow_backwards(base,resources,old['id'],bytes(raw))
+    except ValueError as error:
+        if str(error)!='No checked adjacent space for complete physical resource growth':raise
+        replacement=physical.allocate(base,resources,bytes(raw),'carried-save-GAFE01-r0',best_fit=True)
+    resource={k:replacement[k] for k in ('id','physical','bytes','sha256')}
+    if resource['id']==old['id']:
+        resources[resources.index(next(r for r in resources if r['id']==old['id']))]=resource
+    else:resources.append(resource)
+    festival=e['npc_extra']['events']['festivals']
+    festival['packet']=dict(resource,ram=old['ram'],crc32=zlib.crc32(raw),storage='physical-ROM')
+    extension=festival['carried_packet_extension']
+    extension.update(end=end,bytes=len(raw)-extension['previous_bytes'])
+    refresh_receipts(e,resources,{prefix_packet['id']:prefix,resource['id']:raw})
+    storage['sha256']=storage['code']['sha256']=sha256(prefix[at:at+storage['bytes']])
+    storage.update(carried_profile_redirects=redirects,active_code=copy.deepcopy(compiled),
+        save_format=16,wire_version=3)
+    e['console_storage'].update(save_format=16,card_runtime=copy.deepcopy(compiled))
+    d.update(bytes=end-RAM,sha256=sha256(raw[RAM-old['ram']:]),saved_format_changed=True,
+        sources={s:sha256((ROOT/s).read_bytes()) for s in (*SOURCES,*STORAGE_SOURCES)},
+        pending=['remaining field/gameplay behaviours','independent optional selection',
+            'native gameplay/save verification'])
+    d['storage']=dict(code=compiled,ram=END,bytes=len(code),sha256=sha256(code),end=end,
+        previous_code=previous,redirects=redirects,collection_hooks=collection,
+        save_format=16,wire_version=3,required_family_mask=127,paper_ownership_offset=9,
+        retained_card_state=storage['retained_card_state'],retained_scratch=storage['retained_scratch'],
+        additional_resident_bytes=end-END,native_save_reload_verified=False)
+    changes,cat,resizes,growth=paper_catalogue(base,prior,e,core,cat_compiled,resources)
+    updates={k:copy.deepcopy(prior[k]) for k in ('save_codec','room_surfaces')}
+    updates['clothing']=clothing
+    updates['save_codec'].update(format_version=16,active_storage_code=copy.deepcopy(compiled),
+        card_storage_code=copy.deepcopy(compiled))
+    clothing['save_extension'].update(format_version=16,active_storage_code=copy.deepcopy(compiled))
+    clothing['save_extension']['legacy_formats_read']=list(dict.fromkeys(
+        [*clothing['save_extension']['legacy_formats_read'],'AFS3-v15']))
+    updates['room_surfaces']['save']['disk_format_version']=16
+    updates['save_warning']=('Format-16 experimental saves require this or a newer compatible build. '
+        'Compatible older saves migrate forward. Removing required imports, including any carried-item '
+        'family, rejects the save. V2 and format-15-or-earlier V3 cannot load new saves. Keep backups. '
+        'Native carried-item gameplay and save/reload remain unverified.')
+    updates['physical_resources']=resources
+    updates.update(catalogue=cat,runtime_owner_resizes=resizes,resource_growth=growth)
+    prefix_resource=next(r for r in resources if r['id']==prefix_packet['id'])
+    write_new(output/'carried-items.json',(json.dumps(d,indent=2)+'\n').encode())
+    write_new(output/'carried-packet.bin',raw)
+    return e,changes,updates,[(dict(prefix_resource,previous_sha256=prefix_sha),bytes(prefix)),
+        (replacement,bytes(raw))]
+
+
+def paper_catalogue(base,prior,e,core,compiled,resources):
+    """Extend native paper rows/drawing without rebuilding unrelated catalogues."""
+    from v3_submenu_tables import Owner,resize
+    from v3_catalogue import VROM,RELOC,RAM as CAT_RAM,PARENT
+    from v3_furniture_install import relocate_resource_plan
+    files=by_vrom(base);cat=copy.deepcopy(prior['catalogue']);d=e['carried_items']
+    owner=Owner(files[VROM].extract(base),files[RELOC].extract(base),CAT_RAM)
+    if sha256(owner.original)!=cat['output_sha256'] or sha256(owner.relocation)!=cat['relocation_sha256']:
+        raise ValueError('Changed complete catalogue owner')
+    descriptor,table=0x808AF7CC,0x808AF580
+    if (owner.original[descriptor-CAT_RAM:descriptor-CAT_RAM+8]!=struct.pack('>2I',table,64) or
+            owner.original[table-CAT_RAM:table-CAT_RAM+128]!=struct.pack('>64H',*range(64)) or
+            owner.locations.get(descriptor-CAT_RAM)!=0x42000000|(descriptor-CAT_RAM)):
+        raise ValueError('Changed complete original paper catalogue')
+    appended=owner.append(struct.pack('>65H',*range(64),67))
+    owner.patch(descriptor,table,appended);owner.patch(descriptor+4,64,65)
+    paper=d['paper'];binding=paper['bindings'][0]
+    for address,label in ((0x808AE880,'background'),(0x808AE980,'lines')):
+        target=(PAPER&0x1FFFFFFF)+paper['offsets'][binding[label]]
+        owner.table(address,64,4,struct.pack('>I',target),pointer_offsets=(),expected_references=1)
+    # The surface bridge already supplies the relocated original bit reader in
+    # a2; redirect only its permanent tail call, preserving both relocations.
+    entry=cat['code']['symbols']['af_v3_catalogue_bit']
+    owner.patch(entry+8,jump(compiled['link_symbols']['af_carried_prior_catalogue_bit']),
+        jump(compiled['symbols']['af_carried_catalogue_bit']))
+    owner.patch(0x808A6B80,jump(0x808A6730,link=True),
+        jump(compiled['symbols']['af_carried_paper_init'],link=True),remove_relocation=True)
+    data,reloc,receipt=owner.finish();menu=bytearray(files[PARENT].extract(base))
+    allocation=resize(menu,core,vrom=VROM,ram=CAT_RAM,offset=0x2C90,
+        before=len(owner.original),after=len(data))
+    d['menu_allocations'].append(allocation);e['pocket_icons']['owner_sha256']=sha256(menu)
+    d['paper']['catalogue']=dict(receipt,descriptor=descriptor,list_address=appended,
+        rows=65,native_rows=64,additional_index=67,additional_item=0x2043,
+        drawing_style=64,vrom=VROM,reloc=RELOC,ram=CAT_RAM,
+        code=compiled,
+        additional_menu_bytes=allocation['additional_pool_bytes'],native_rendering_verified=False)
+    cat.update(bytes=len(data),output_sha256=sha256(data),relocation_bytes=len(reloc),relocation_sha256=sha256(reloc))
+    start=entry-CAT_RAM;cat['code']['sha256']=sha256(data[start:start+cat['code']['bytes']])
+    changes={VROM:data,RELOC:reloc,PARENT:bytes(menu)}
+    resizes=[dict(vrom=v,previous_bytes=files[v].size,previous_sha256=sha256(files[v].extract(base)),
+        bytes=len(raw),sha256=sha256(raw)) for v,raw in changes.items() if len(raw)!=files[v].size]
+    growth=[]
+    for row in resizes:
+        v=row['vrom'];_,record=relocate_resource_plan(base,files,v,changes[v],minimum_physical=0x100000,
+            reservations=resources+growth,append_only=False,allow_compressed=True)
+        growth.append(record)
+    return changes,cat,resizes,growth

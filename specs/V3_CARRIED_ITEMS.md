@@ -73,10 +73,10 @@ python3 tools/v3_furniture_pipeline.py convert --representation carried \
 
 ## Installed shared runtime
 
-The current development proposal is ABI 354 at
-`build/v3-carried-runtime-work-01/actions-connected-03/build-lock.json`.
+The current development proposal is ABI 355 at
+`build/v3-carried-runtime-work-01/storage-connected-06/build-lock.json`.
 Its ROM SHA-256 is
-`01c8fef734cb681a35e84fff5284486ae97c8592ebb26c47ca92ad8900803074`.
+`3494ba7a2519718166b20e5b592c47b3a3ebe13a01a34adb8378685fdaab21c5`.
 This is an inactive carried integration, not a new playable-import claim.
 
 `v3_furniture_install.py --refresh-runtime --carried-items PATH` installs the
@@ -113,8 +113,8 @@ ground bitmap at `804AA250` preserves source category 17's diary mapping and
 adds cedar independently. Only the common descriptor constructor is redirected;
 the four existing seasonal entry wrappers and scenery remain unchanged.
 
-The loaded packet extends the unchanged 64,064-byte festival prefix to 94,240
-bytes and ends at `80778000`, adding 30,176 resident bytes. It uses the same
+The loaded packet extends the unchanged 64,064-byte festival prefix to 105,904
+bytes and ends at `8077AD90`, adding 41,840 resident bytes. It uses the same
 startup slot: twenty descriptors, 676 of 688 bootstrap bytes. The builder checks
 the prior packet, every resource, memory spans, physical placement, and guards.
 The complete original cartridge/save files are never overwritten.
@@ -145,21 +145,17 @@ loader through its actual relocated constructor address.
 Continue the shared importing task without rescanning or recompiling these
 unchanged resources:
 
-1. Connect collection/catalogue and saved-profile consumers to the installed
-   shared quantities and fixed identities. The current tag owner is `03950000`,
-   linked at `8086F310`. Its native letter
-   collection call at `808734F8` uses `2000 + saved style`; style 64 needs the
-   new collection/profile path, not the original short catalogue bitset.
-2. Connect the remaining actual item interactions: sign-board placement/design
+1. Connect the remaining actual item interactions: sign-board placement/design
    handling; card stamping/menu behaviour;
    Harvest cutlery interaction; coconut eating/planting and tree behaviour;
    cedar planting/growth; spirit capture/release and field behaviour.
    Preserve the installed event/card/cutlery paths. Item-specific behaviour is
    part of importing, not an exception to defer automatically.
-3. Extend canonical saved identities, parent-owned profiles, and paper collection/
-   catalogue bindings for the whole batch. Reuse format-15 card/cutlery fields;
-   drawing support alone does not establish safe persistence or consumption.
-4. Bind independent parent selections in both experimental composers, preserve
+2. Verify actual native item-type/menu routes across all families. The shared
+   registry's drawing categories do not themselves widen native type switches.
+   Reuse the installed inventory, collection, catalogue, and save adapters;
+   do not rescan the unchanged native owners or recompile prepared artwork.
+3. Bind independent parent selections in both experimental composers, preserve
    empty-selection V2-14, and verify the changed readers and save/profile bounds.
    Acquisition follows primary importing. Gold-tree work remains required after
    primary imports, along with any unfinished golden-tool behaviour.
@@ -195,8 +191,8 @@ Only the letter confirmation branch's inventory-setter call at `80889434` uses
 the paper-consumption adapter. It subtracts one sheet from all four imported
 quantities; a singleton clears its slot. Original paper keeps the original
 setter, and cancel/rewrite branches are unchanged. This preserves letter timing
-and the installed complete editor. Paper collection/catalogue and compatible
-saved-profile validation remain required before enabling the family.
+and the installed complete editor. Collection, catalogue, and saved-profile
+validation share the installed identity path below.
 
 The action code preserves the entire preceding reader prefix and every public
 entry, fitting the existing reservation with no added resident bytes. The tag
@@ -204,6 +200,64 @@ owner grows to 45,744 bytes and adds 512 menu-pool bytes. Allocation validation
 checks successive descriptors for the same owner before comparing the final
 descriptor with the actual parent; an earlier allocation is not mistaken for
 the current one. All seven readiness/selection bits stay zero.
+
+### Saved profiles, collection, and catalogue
+
+The complete 11,648-byte save adapter occupies `80778000..8077AD80`, followed
+by a 16-byte guard. Thirty public entries in the preceding save owner redirect
+to it, including card access/clear, compression, load validation, live commit,
+save preparation, and diary capacity checks. Earlier callers retain their
+addresses. Canonical town format eight, registry five, the original FlashRAM
+banks, and the 120,336-byte scratch plus its 16-byte guard remain unchanged.
+
+The compressed envelope is format 16. Its existing 48-byte `AFHC` allocation
+uses wire version three, retaining every card-stamp record at `16 + player*8`:
+
+| Header offset | Meaning |
+| --- | --- |
+| 4 | Wire version 3 |
+| 7 | Required exercise-card/cutlery bits, matching carried bits 2/3 |
+| 8 | Seven required carried-family bits in the shared registry order |
+| 9..12 | One orange-paper ownership bit for each of four players |
+| 13..15 | Reserved zero |
+
+Current selection validates the entire `AFCP` header, readiness, mask bounds,
+and agreement with the existing event-item selection. Required selections are
+conservative: discarding an item does not remove its dependency. Ownership
+without paper selection, unknown bits, invalid records, or missing required
+families fail before live state/output commit or device writes. Valid format-14
+and format-15 records migrate with empty paper ownership, preserving attendance,
+diaries, fishing, and console data. Adding supported selections preserves
+ownership; removing a required family rejects the save. Player deletion clears
+only that player's paper ownership and card stamps. Card updates preserve paper.
+
+The existing native record/owned entries use `carried_collection.c`. All four
+paper quantities share the same saved style; other reserved carried identities
+never reach short native catalogue arrays. Original identities delegate through
+the complete existing reader chain. Nonresident ownership queries return false;
+an attempted nonresident record retains the existing save-error boundary rather
+than crediting a resident. This is not new carried-item passport support.
+
+The native letter collection call at `808734F8` supplies `2000 + style`;
+style 64 consequently reaches the same ownership path. The catalogue has one
+additional entry, index 67/item `2043`, for a four-sheet pack. The `B78` paper
+bitset query uses separate ownership for that entry, never reading past the
+native eight-byte array. All original 64 indices retain native/debug behaviour;
+other pages retain the installed surface/furniture reader.
+
+The 320-byte catalogue adapter fits at `80771EE0..80772020`, inside existing
+carried-code padding. The actual paper-initializer call at `808A6B80` skips DMA
+only for selected imported paper, uses style 64, the original `-93` height and
+`0.28` scale, and the quantity's checked source price. Unrelated paper invokes
+the complete relocated native initializer. Both original 64-entry model tables
+gain the full resident background/line model. The original drawing function and
+its mask/material commands remain intact. The catalogue owner is 63,888 bytes;
+its relocation is 736 bytes, and its menu-pool allowance grows by 704 bytes.
+The shared resource planner consumes each checked catalogue placement once,
+preserving source resources instead of allocating duplicate copies.
+
+These changes add no new translated wording. All prepared artwork is retained;
+the new requirements are not used to enable incomplete field behaviours.
 
 ## Verification and limits
 
@@ -228,9 +282,19 @@ all-supported, unrelated, one-diary, all-diaries, calendar-only, and tournament-
 profiles. Empty remains exactly V2-14. The ROM checksum and reconstructed UPS
 also pass the ordinary builder checks.
 
-The current build preserves saved format 15 and the existing selected profile.
-V2 and format-14-or-earlier V3 cannot read format-15 saves; older profiles missing
-selected diary styles remain incompatible. No ordinary save/reload, native
+`tests/test_v3_carried_storage.py` covers the changed actual save transaction with
+native I/O doubled: all seven missing-family cases, unchanged output/live state
+on rejection, format-14/15 migration, four-player ownership and deletion,
+retained card/diary/console state, and old-reader rejection. Sanitized real
+carried readers cover all paper quantities, catalogue ownership/preview fields,
+and disabled/native delegation. Current cartridge checks verify all thirty
+redirects, collection/caller bindings, both complete preview tables, original
+owner preservation, full packet contents/checksums, and patch reconstruction.
+The current seven-profile browser/offline comparison and allocation chain pass.
+
+The current build uses saved format 16. Compatible older saves migrate forward;
+V2 and format-15-or-earlier V3 cannot read new saves. Profiles missing required
+carried families or diary styles remain incompatible. No ordinary save/reload, native
 letter rendering, or carried-item gameplay is claimed. Ready/selected masks stay
 zero until the missing consumers are connected. Both stable V2-14 deployments
 and the main build lock remain unchanged. Native diary/creature fixture budgets
