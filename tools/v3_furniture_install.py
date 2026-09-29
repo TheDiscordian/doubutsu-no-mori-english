@@ -1611,6 +1611,10 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             if not previous_carried.get('interactions'):
                 report['shared_runtime_refresh']['resource_allocations_changed']=True
             report['shared_runtime_refresh']['adapters'].append('carried_interactions')
+        if carried.get('spawning') and not previous_carried.get('spawning'):
+            report['shared_runtime_refresh']['adapters'].append('carried_creature_spawning')
+            report['shared_runtime_refresh'].update(resource_allocations_changed=True,
+                additional_resident_bytes=carried['spawning']['additional_resident_bytes'])
         if actions:
             report['shared_runtime_refresh']['additional_menu_bytes']=(carried['paper']['catalogue']['additional_menu_bytes']
                 if new_storage else actions['additional_menu_bytes'] if new_actions else 0)

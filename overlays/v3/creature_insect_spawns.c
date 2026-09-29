@@ -126,6 +126,16 @@ static int available(const InsectHabitat *h,unsigned area) {
     for (unsigned z=2;z<14;z++) for (unsigned x=2;x<14;x++) if (site(h,area,x,z,1)) return 1;
     return 0;
 }
+static int invalid_actor(unsigned actor,unsigned area) {
+#ifdef AF_INSECT_CARRIED_SPAWNS
+    /* Only the quest's explicit flying row admits type 40. Ordinary calendar
+     * decoding still rejects it; no month or population choice creates Wisp. */
+    return actor>41 || (actor==40 && area!=3);
+#else
+    (void)area;
+    return actor>41 || actor==40;
+#endif
+}
 int af_v3_insect_spawn_choose(SpawnPlan *plan,const InsectHabitat *h,int rank,int native,
                               SpawnRandom random,void *ctx) {
     static const float rates[]={.5f,.75f,.875f,1,1,1,1};
@@ -133,8 +143,11 @@ int af_v3_insect_spawn_choose(SpawnPlan *plan,const InsectHabitat *h,int rank,in
             !h->deposits || !random || (native!=0 && native!=1) || (h->block&0x400000u)) return -1;
     for (unsigned i=0;i<plan->count;i++) {
         SpawnRow row=plan->rows[i];
-        if (row.actor>41 || row.actor==40 || row.area>13 ||
+        if (invalid_actor(row.actor,row.area) || row.area>13 ||
                 (row.actor==41)!=(row.area==13) || !(row.weight>=0 && row.weight<=255)) return -1;
+#ifdef AF_INSECT_CARRIED_SPAWNS
+        if (row.actor==40 && (native || plan->count!=1 || row.weight!=100.0f)) return -1;
+#endif
     }
     int food=0;
     for (unsigned area=0;area<14;area++) {
@@ -192,7 +205,7 @@ int af_v3_insect_spawn_group(const SpawnRow *row,const InsectHabitat *h,
                              InsectCreate create,void *ctx,int *last_result) {
     if (last_result) *last_result=0;
     if (!row || !h || !h->foreground || !h->collision || !random || !create ||
-            !packet(data,bytes) || row->actor>41 || row->actor==40 || row->area>13) return -1;
+            !packet(data,bytes) || invalid_actor(row->actor,row->area) || row->area>13) return -1;
     if (row->actor==41 || row->area>=12) return 0;
     SpawnU16 sites[12]={0};unsigned count=0;
     for (unsigned z=2;z<14;z++) for (unsigned x=2;x<14;x++) if (site(h,row->area,x,z,0)) {

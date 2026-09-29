@@ -80,6 +80,9 @@ def letter_window(base,core,menu,paper,symbols):
 def install(base, prior, blob, core, module, output, directory):
     if prior['equipment_resources'].get('carried_items'):
         if prior['equipment_resources']['carried_items'].get('field_creatures'):
+            carried=prior['equipment_resources']['carried_items']
+            if carried.get('interactions') and not carried.get('spawning'):
+                return install_creature_spawns(base,prior,output,directory)
             return install_interactions(base,prior,core,output,directory)
         if prior['equipment_resources']['carried_items'].get('eating'):
             return install_creature_field(base,prior,blob,output,directory)
@@ -731,6 +734,104 @@ def install_creature_field(base,prior,blob,output,directory):
     return e,{v:bytes(owner),r:bytes(rel)},dict(physical_resources=records),[
         (dict(resource,previous_sha256=previous_sha),bytes(updated)),
         (dict(tree_record,previous_sha256=tree_previous['sha256']),bytes(tree_raw))]
+
+
+def install_creature_spawns(base,prior,output,directory):
+    """Connect the actual carried-creature acre-entry consumer.
+
+    Retain the complete installed ordinary manager and its behavioural choice.
+    This does not enable a quest whose separate owner is still unfinished.
+    """
+    from aflib import CODE_VROM,verified_rom
+    from v3_creature_spawns import insect_calendars
+    from v3_creature_field import named_table
+    from v3_console_disk_install import reservations
+    import v3_physical_resources as physical
+    e=copy.deepcopy(prior['equipment_resources']);d=e['carried_items']
+    if (directory.resolve()!=ROOT/d['prepared'] or d.get('spawning') or
+            not d.get('interactions') or d['ready_mask'] or d['selected_mask']):
+        raise ValueError('Quest spawning requires the installed inactive carried batch')
+    tree=e['scenery']['tree_effects'];previous=tree['packet']
+    tree_data=base[previous['physical']:previous['physical']+previous['bytes']]
+    ram,limit,end=0x807AC000,0x807ADFF0,0x807AE000
+    if any(a<end and ram<b for a,b in reservations(prior)):
+        raise ValueError('Quest code overlaps a retained Expansion Pak allocation')
+    if sha256(tree_data)!=previous['sha256']:
+        raise ValueError('Changed complete tree/carried startup packet')
+    raw=bytearray(end-ram);raw[-16:]=b'AFCQ'*4
+    insect=e['creature_insects'];old=insect['packet']
+    if sha256(base[old['physical']:old['physical']+old['bytes']])!=old['sha256']:
+        raise ValueError('Changed complete retained insect manager/services')
+    field=d['field_creatures'];code=field['code'];offset=code['ram']-previous['ram']
+    if sha256(tree_data[offset:offset+code['bytes']])!=code['sha256']:
+        raise ValueError('Changed complete carried creature state providers')
+    source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+        (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    calendar,contract=insect_calendars(source)
+    candidates=dict(insect['compiled']['symbols'])
+    candidates.update(fqrand=0x8002C9AC,memset=0x8003B9B0,
+        mCoBG_CheckWaterAttribute=0x8007620C,mCoBG_CheckHole_OrgAttr=0x8065AAE0)
+    hole=old['physical']+0x8065AAE0-old['ram']
+    if sha256(base[hole:hole+60])!='957704e5de4500b31fe7004475edf23cb7e39755bc0c939888010836327afdc3':
+        raise ValueError('Changed complete retained native-terrain adapter')
+    candidates.update({n:code['symbols'][n] for n in
+        ('af_carried_spirit_common','af_carried_spirit_running','af_carried_creature_enabled')})
+    calendar_at=candidates['af_insect_calendar']-old['ram']
+    if base[old['physical']+calendar_at:old['physical']+calendar_at+len(calendar)]!=calendar:
+        raise ValueError('Changed complete retained insect calendar/group sizes')
+    row,row_source=named_table(source,'l_hitodama_time_table',8)
+    if row!=struct.pack('>IBBH',40,3,100,0):
+        raise ValueError('Changed complete donor spirit spawn row')
+    files=by_vrom(base);original=verified_rom((ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes())
+    native=by_vrom(original)[CODE_VROM].extract(original)
+    current=files[CODE_VROM].extract(base)
+    at,end=0x80089440-CODE_RAM,0x80089538-CODE_RAM
+    if current[at:end]!=native[at:end] or len(current[at:end])!=end-at:
+        raise ValueError('Changed complete native lake lookup')
+    candidates['af_carried_find_block']=0x80089440
+    candidates['af_holiday_calendar_status']=e['npc_extra']['events']['calendar']['code']['symbols']['af_holiday_calendar_status']
+    compiled_data,compiled=compile_part('creature_carried_spawns',output/'carried-spawns',
+        extra_sources=('overlays/v3/creature_insect_spawns.c',),
+        defines=('AF_INSECT_CARRIED','AF_INSECT_CARRIED_SPAWNS'),symbol_candidates=candidates)
+    if ram+len(compiled_data)>limit:raise ValueError('Quest spawn code exceeds its checked reservation')
+    manager=insect['manager'];vrom,reloc,owner_ram=0x821B40,0x8240D0,0x8092A030
+    owner=bytearray(files[vrom].extract(base));rel=files[reloc].extract(base)
+    address=0x8092AF0C;pos=address-owner_ram
+    before=struct.pack('>2I',jump(candidates['af_v3_insect_spawn']),0)
+    after=struct.pack('>2I',jump(compiled['symbols']['af_carried_insect_spawn']),0)
+    if (owner[pos:pos+8]!=before or
+            sha256(owner)!='235ba58583f0c644b6c6c28c1dc8c6c17e4c1f8f129ddb5639aaae07a706d69e' or
+            sha256(rel)!=manager['reloc_sha256']):
+        raise ValueError('Changed complete installed acre-entry manager')
+    owner[pos:pos+8]=after
+    raw[:len(compiled_data)]=compiled_data
+    records=copy.deepcopy(prior['physical_resources'])
+    resource=physical.allocate(base,records,raw,'carried-quest-GAFE01-r0',best_fit=True)
+    records.append(resource)
+    packet=dict(resource,ram=ram,storage='physical-ROM',crc32=zlib.crc32(raw))
+    manager.update(owner_sha256=sha256(owner),target=compiled['symbols']['af_carried_insect_spawn'],
+        after=after.hex(),installed=True)
+    functions={r['symbol']:r for r in contract['source_functions']}
+    source_names=('aSOI_check_hitodama_block_data','aSOI_check_countdown_event',
+        'aSOI_check_hitodama_set_block','aSOI_ins_make_hitodama_range_data',
+        'aSOI_ins_renew_check_range_table','aSOI_ins_decide_insect','aSOI_ins_make','aSOI_insect_set')
+    receipt=dict(ram=ram,bytes=len(compiled_data),code=compiled,
+        packet=copy.deepcopy(packet),source_row=row_source,
+        source_functions=[functions[n] for n in source_names],calendar_sha256=sha256(calendar),
+        native_lake_lookup=dict(address=at+CODE_RAM,end=end+CODE_RAM,sha256=sha256(current[at:end])),
+        owner=dict(vrom=vrom,reloc=reloc,ram=owner_ram,previous_sha256=sha256(files[vrom].extract(base)),
+            sha256=sha256(owner),reloc_sha256=sha256(rel),address=address,before=before.hex(),after=after.hex()),
+        additional_resident_bytes=len(raw),saved_format_changed=False,native_gameplay_verified=False,
+        installed=True,selectable=False,pending=['actual Wisp event owner','independent carried selection'])
+    d['spawning']=receipt
+    paths=('tools/v3_asset_loader.py','tools/v3_carried_runtime.py','tools/v3_creature_spawns.py',
+        'overlays/v3/creature_carried_spawns.c','overlays/v3/creature_carried_spawns.ld',
+        'overlays/v3/creature_insect_spawns.c','overlays/v3/creature_insect_spawns.h',
+        'tools/v3_room_goods.py','overlays/v3/surface_bootstrap.c')
+    d['sources'].update({s:sha256((ROOT/s).read_bytes()) for s in paths})
+    write_new(output/'carried-spawns.json',(json.dumps(receipt,indent=2)+'\n').encode())
+    return e,{vrom:bytes(owner)},dict(physical_resources=records),[
+        (resource,bytes(raw))]
 
 
 CARRIED_MESSAGE_FIRST=13082

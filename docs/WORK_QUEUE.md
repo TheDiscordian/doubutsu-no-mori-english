@@ -41,8 +41,8 @@ Do not make another per-item installer. Golden net/axe/shovel/rod still need
 their actual remaining consumers distinguished from acquisition; retain all
 installed tool behaviour and do not replay old tests to establish it again.
 
-The current proposal is ABI 363 at
-`build/v3-carried-field-work-01/inventory-01/build-lock.json`.
+The current proposal is ABI 364 at
+`build/v3-carried-field-work-01/spawning-05/build-lock.json`.
 The complete `build/v3-carried-batch-prepared-05/` resources are installed without
 reconversion: seven parents, 26 states, fourteen icons, seven handover/police
 models, complete orange-paper artwork, official names, and prices. Additive
@@ -117,7 +117,18 @@ spirits by category. The shared refresh retains dialogue and all allocations.
 Focused sanitized checks, current cartridge preservation/relocation/startup/UPS
 checks, and seven browser/offline profiles pass. Do not replay unchanged checks.
 
-The next concrete consumer is the actual Wisp event owner, then sign-board
+The actual insect acre-entry manager has its quest dispatch installed. It uses
+the bound RUN/ERROR status, selected carried identity, active hunt, all five acre
+records, and the full shared habitat/group-creation rules. Nonquest populations
+keep the existing native/imported manager and chosen policy. Countdown lake
+relocation retains the donor's random order and duplicate checks. Code uses
+4,496 bytes in the guarded 8-KiB `807AC000..807AE000` packet; all preceding
+resources and saved format 16 remain unchanged. The 22-packet startup fits in
+676 bytes. Sanitized event/spawn and ordinary-population checks, current cartridge
+retention/startup/patch checks, and seven browser/offline profiles pass. Do not
+rebuild the spirit/tree artwork or repeat these unchanged checks.
+
+The next concrete consumer remains the actual Wisp event owner, then sign-board
 designs/placement, including actual
 native item-type and menu routes for every family. The field code has a real
 event-state binding API, but no event owner calls it yet; an unbound event is
@@ -126,11 +137,14 @@ complete 26-joint translucent model and every facial texture. The existing
 participant importer prepares all 48 actor functions plus four manager
 callbacks at `build/v3-carried-event-prepared-03/`. Continue from its explicit
 unbound services: weekly scheduling and saved date/flags, native NPC lifecycle
-and drawing, manager placement and field-spawn selection, official dialogue,
+and drawing, manager placement and the installed field-state bridge, official dialogue,
 and complete reward/cleanup routes. Keep source `ghost_start/stop/in`, its five
 unique acres, and saved/scene lifetime intact. Ordinary save/travel also removes
 spirits in the donor; connect the actual transaction modes, not unconditional
-deletion on a failed save. Shared paper/spirit splitting/merging,
+deletion on a failed save. Reuse or extend the guarded quest packet for the
+owner rather than adding another startup descriptor; only twelve bootstrap
+bytes remain. Preserve native event IDs 0..114 when assigning the new owner.
+Shared paper/spirit splitting/merging,
 confirmed letter consumption, and paper collection/catalogue are installed;
 do not rebuild those or the prepared artwork without a relevant defect. Reuse
 the installed event/card/cutlery controls. Independent selections stay part of

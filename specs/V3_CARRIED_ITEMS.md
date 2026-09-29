@@ -73,10 +73,10 @@ python3 tools/v3_furniture_pipeline.py convert --representation carried \
 
 ## Installed shared runtime
 
-The current development proposal is ABI 363 at
-`build/v3-carried-field-work-01/inventory-01/build-lock.json`.
+The current development proposal is ABI 364 at
+`build/v3-carried-field-work-01/spawning-05/build-lock.json`.
 Its ROM SHA-256 is
-`407c78762bc09c730a3939135f6c06b65edfd2753f45cd9355afbdf5d6489b4d`.
+`fcce21b65a4c90e5c42fbb59b5b5bec67d5877513c673b1c1c648387aa7b039f`.
 This is an inactive carried integration, not a new playable-import claim.
 
 `v3_furniture_install.py --refresh-runtime --carried-items PATH` installs the
@@ -119,8 +119,8 @@ are connected. Independent selection remains unfinished. See
 
 The loaded packet extends the unchanged 64,064-byte festival prefix to 105,904
 bytes and ends at `8077AD90`, adding 41,840 resident bytes. It uses the same
-startup slot. Including the independent tree-effects code packet, the startup
-has 21 descriptors and occupies 656 of 688 bootstrap bytes. The builder checks
+startup slot. Including the independent tree-effects and quest packets, the startup
+has 22 descriptors and occupies 676 of 688 bootstrap bytes. The builder checks
 the prior packet, every resource, memory spans, physical placement, and guards.
 The complete original cartridge/save files are never overwritten.
 
@@ -348,8 +348,7 @@ The shared text placer first packs displaced complete banks within existing
 text ownership, retaining buffered contents before overlapping moves; only a
 bank that no longer fits is allocated elsewhere. All old messages and choices
 remain intact. No new resident allocation, startup descriptor, owner allocation,
-or saved field is needed. The current ABI-363 artifact is
-`build/v3-carried-field-work-01/inventory-01/build-lock.json`.
+or saved field is needed for these capture/release bindings.
 
 Six native inventory predicate entries at `8010DD38` enforce the full source
 transfer policy through the existing card/cutlery chain. Entries 2/4/5/6/8
@@ -369,6 +368,30 @@ new text allocation, art compilation, resident bytes, or saved field is needed.
 
 ### Carried quest owner preparation
 
+The native acre-entry call at `8092AF0C` uses `af_carried_insect_spawn` in the
+guarded `807AC000..807AE000` quest packet. The complete code is 4,496 bytes;
+the shared startup loads and checks all 8 KiB. Its original body and relocation
+remain unchanged apart from the two-instruction dispatch. The existing ordinary
+manager remains the fallback, including its saved season and selected population
+policy. No ordinary calendar gains a spirit entry.
+
+Only a selected spirit family with bound RUN status, no ERROR, an active hunt,
+and a matching one of the five quest acres enters the quest path. Wild insects,
+colonies, offing/island rules, the complete habitat/rank/food filters, group sizes,
+native tile positioning, and real creation failure remain in the shared code.
+The source's countdown rule moves a lake spirit before ordinary acre spawning,
+retaining its random draw order, whole lake-row/column avoidance, and 0/2/4 acre
+duplicate check. The existing calendar observer handles native/imported countdown
+identity; no donor event number indexes a native table directly.
+
+The installer checks the full native manager and lake lookup, existing insect
+packet, complete source calendar and spawn row, retained terrain helper, all
+memory reservations, and physical resource allocation. Tree/page directories,
+field resources, old insect code, saved fields, and all preceding physical
+packets remain unchanged. A nonquest acre delegates before applying quest-only
+checks. This connects the spawning consumer, not the missing event owner.
+No owner yet calls the field-state bridge, so the quest remains inactive.
+
 `v3_holiday_participants.py --carried-event --build-lock PATH --output PATH`
 uses the shared complete actor importer for the event NPC source directory.
 It checks all 48 contiguous Wisp actor functions and four manager callbacks,
@@ -377,8 +400,9 @@ VR4300 object and its unresolved services are recorded in
 `build/v3-carried-event-prepared-03/`. Only platform drawing submission and
 state access are adapted; source logic for dialogue, rewards, roof choices,
 weed removal, fade/movement, five unique spirit acres, and cleanup is retained.
-Native field access, date/flags, scheduling, placement/spawning, text, rewards,
-and lifecycle services still need real bindings. The object is not installed,
+Native field access, date/flags, scheduling, placement, text, rewards,
+and lifecycle services still need real owner bindings. The spawning consumer
+above is installed and waits for that owner's real state. The object is not installed,
 and an unresolved service is not a successful placeholder.
 
 `build/v3-carried-wisp-art-01/` contains the complete draw-index-349 artwork:
@@ -443,6 +467,15 @@ all six inventory predicates, retained native mailing, and refresh without
 duplicating dialogue. The source/art preparation check covers all 52 complete
 functions, the big-endian MIPS object, all texture pixels, all model triangles,
 and retained translucent state. Wisp ownership remains open.
+
+The focused quest-spawn check executes the actual state bridge and shared spawn
+algorithms with sanitized native-service doubles: inactive/error/selection
+states, all five acres, ordinary delegation, occupied acres/colonies, rank and
+food filtering, creation failure, and countdown relocation. Current cartridge
+checks retain every preceding physical resource, verify the one native dispatch
+and unchanged relocation, all 22 startup CRCs, and UPS reconstruction. The current
+seven-profile browser/offline comparison passes with empty selection still
+V2-14. These checks do not establish ordinary event gameplay or hardware results.
 
 The current build uses saved format 16. Compatible older saves migrate forward;
 V2 and format-15-or-earlier V3 cannot read new saves. Profiles missing required

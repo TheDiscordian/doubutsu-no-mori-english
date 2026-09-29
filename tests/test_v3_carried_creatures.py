@@ -99,6 +99,26 @@ class CarriedCreatureTests(unittest.TestCase):
             self.assertEqual(result.returncode,0,result.stderr)
             self.assertIn('Carried interactions:',result.stdout)
 
+    def test_event_bound_field_spawning(self):
+        from v3_creature_spawns import insect_calendars
+        data,_=insect_calendars(self.source)
+        with tempfile.TemporaryDirectory(prefix='af-carried-spawns-') as temporary:
+            directory=Path(temporary);exe=directory/'spawns'
+            (directory/'calendar.inc').write_text(','.join(str(v) for v in data))
+            result=subprocess.run(['cc','-std=c11','-O1','-g','-fno-pie','-no-pie',
+                '-fsanitize=address,undefined','-fno-sanitize-recover=all','-Wall','-Wextra','-Werror',
+                '-ffunction-sections','-fdata-sections','-Wl,--gc-sections',
+                '-DAF_INSECT_CARRIED','-DAF_INSECT_CARRIED_SPAWNS',
+                '-I'+str(ROOT/'overlays/v3'),'-I'+str(directory),
+                *(str(ROOT/'overlays/v3'/f'{n}.c') for n in
+                  ('creature_carried','creature_carried_spawns','creature_insect_spawns')),
+                str(ROOT/'tests/v3_carried_spawns_test.c'),'-o',str(exe)],
+                capture_output=True,text=True,timeout=60)
+            self.assertEqual(result.returncode,0,result.stderr)
+            result=subprocess.run([str(exe)],capture_output=True,text=True,timeout=15)
+            self.assertEqual(result.returncode,0,result.stderr)
+            self.assertIn('Carried spawning:',result.stdout)
+
 
 class CartridgeTests(unittest.TestCase):
     @classmethod
@@ -181,6 +201,55 @@ class CartridgeTests(unittest.TestCase):
             self.assertEqual(before[at:at+8].hex(),redirect['before'])
             restored[at:at+8]=bytes.fromhex(redirect['before'])
         self.assertEqual(restored,before)
+
+
+class SpawnCartridgeTests(unittest.TestCase):
+    def test_connected_manager_retained_resources_and_startup(self):
+        from aflib import apply_ups
+        from v3_asset_loader import BLOB
+        from v3_furniture_install import inputs
+        from v3_physical_resources import verify
+        out=ROOT/os.environ.get('V3_CARRIED_SPAWNING','build/v3-carried-field-work-01/spawning-05')
+        rom,report=inputs(out/'build-lock.json');base,prior=inputs(out/'base-lock.json')
+        files,old=by_vrom(rom),by_vrom(base);e=report['equipment_resources'];d=e['carried_items']
+        r=d['spawning'];p=r['packet'];raw=rom[p['physical']:p['physical']+p['bytes']]
+        self.assertEqual((len(raw),sha256(raw),zlib.crc32(raw)),(0x2000,p['sha256'],p['crc32']))
+        self.assertEqual(raw[:r['bytes']],(out/'carried-spawns/code.bin').read_bytes())
+        self.assertFalse(any(raw[r['bytes']:-16]));self.assertEqual(raw[-16:],b'AFCQ'*4)
+        for key in ('field_creatures','storage','ready_mask','selected_mask','interactions','packet'):
+            self.assertEqual(d[key],prior['equipment_resources']['carried_items'][key])
+        self.assertEqual(e['scenery'],prior['equipment_resources']['scenery'])
+        for key in ('save_runtime','save_codec','translation_baseline'):
+            self.assertEqual(report[key],prior[key])
+        row=r['owner'];owner=bytearray(files[row['vrom']].extract(rom));at=row['address']-row['ram']
+        self.assertEqual(owner[at:at+8].hex(),row['after'])
+        self.assertEqual(sha256(owner),row['sha256'])
+        owner[at:at+8]=bytes.fromhex(row['before'])
+        self.assertEqual(owner,old[row['vrom']].extract(base))
+        self.assertEqual(files[row['reloc']].extract(rom),old[row['reloc']].extract(base))
+        self.assertEqual(r['code']['symbols']['af_v3_insect_spawn'],
+            e['creature_insects']['compiled']['symbols']['af_v3_insect_spawn'])
+        for name in ('af_v3_insect_spawn_choose','af_v3_insect_spawn_group'):
+            self.assertTrue(r['ram']<=r['code']['symbols'][name]<r['ram']+r['bytes'])
+        for previous in prior['physical_resources']:
+            current=next(v for v in report['physical_resources'] if v['id']==previous['id'])
+            self.assertEqual(current,previous)
+            a,n=current['physical'],current['bytes'];self.assertEqual(rom[a:a+n],base[a:a+n])
+        verify(rom,report['physical_resources'])
+        blob=files[BLOB].extract(rom);boot=e['surface_bootstrap']['code']
+        start=e['blob_offset']+boot['symbols']['packets']-e['ram']
+        self.assertEqual(boot['packet_count'],22);self.assertLessEqual(boot['bytes'],688)
+        loaded=[]
+        for i in range(boot['packet_count']):
+            address,src,n,crc=struct.unpack_from('>4I',blob,start+i*16);loaded.append((address,src,n))
+            if src&0x80000000:data=rom[src&0x7FFFFFFF:(src&0x7FFFFFFF)+n]
+            else:
+                owner=next(f for f in files.values() if f.vstart<=src<src+n<=f.vend)
+                data=owner.extract(rom)[src-owner.vstart:src-owner.vstart+n]
+            self.assertEqual(zlib.crc32(data),u32(blob,e['blob_offset']+crc-e['ram']))
+        self.assertEqual(loaded.count((p['ram'],p['physical']|0x80000000,p['bytes'])),1)
+        self.assertEqual(apply_ups((ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes(),
+            (out/'asset-loader.ups').read_bytes()),rom)
 
 
 class InteractionCartridgeTests(unittest.TestCase):

@@ -438,6 +438,15 @@ def publish_bootstrap(equipment,blob,surface,output):
             carried_field['packet']!=tree_effects['packet'] or carried_field['ram']!=0x80784000 or
             carried_field['bytes']!=0x3000 or carried_field['additional_resident_bytes']):
         raise ValueError('Changed shared carried field/tree startup packet')
+    carried_quest=equipment.get('carried_items',{}).get('spawning')
+    if carried_quest:
+        p=carried_quest['packet']
+        if (not carried_quest['installed'] or p['ram']!=0x807AC000 or p['bytes']!=0x2000 or
+                p['physical']&15 or p['storage']!='physical-ROM' or
+                not 0x100000<=p['physical']<p['physical']+p['bytes']<=0x4000000):
+            raise ValueError('Changed complete carried-quest startup packet')
+        extra+=tuple(f'AF_CARRIED_QUEST_{label}=0x{p[key]:X}u' for label,key in
+            (('PHYSICAL','physical'),('CRC','crc32'),('BYTES','bytes'),('RAM','ram')))
     boot,compiled=compile_part('surface_bootstrap',output/'goods_surface_bootstrap',defines=(
         'AF_V3_EDITABLE_CHECKSUMS=1',f'AF_SURFACE_ITEMS_VROM=0x{items["vrom"]:X}u',
         f'AF_SURFACE_ITEMS_CRC=0x{items["crc32"]:X}u',f'AF_SURFACE_ITEMS_BYTES=0x{items["bytes"]:X}u',

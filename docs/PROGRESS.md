@@ -178,9 +178,27 @@ rendering or gameplay/save verification. Remaining item-specific field behaviour
 and independent selection remain the same connected task. See
 [the carried-item contract](../specs/V3_CARRIED_ITEMS.md).
 
-The current proposal is ABI 363 at
-`build/v3-carried-field-work-01/inventory-01/build-lock.json`, ROM SHA-256
-`407c78762bc09c730a3939135f6c06b65edfd2753f45cd9355afbdf5d6489b4d`.
+The actual acre-entry manager dispatches selected quest spirits through Wisp's
+five assigned acres and the complete shared habitat/group-creation path.
+Unbound, stopped, errored, disabled, or unrelated-acre quests retain the installed
+ordinary insect manager and its N64/GameCube population choice. Wild occupancy,
+colonies, field rank, candy/trash suppression, native positioning, creation
+failure, and the donor's countdown lake relocation are preserved. Ordinary
+calendar decoding still rejects spirit type 40.
+
+The 4,496-byte code occupies a guarded 8-KiB quest packet at
+`807AC000..807AE000`. Existing tree/page directories, all artwork, insect program
+buffers, event state, and saved fields are unchanged. The shared startup loads
+22 packets using 676 of its 688 reserved bytes. Focused sanitized quest-state,
+five-acre, countdown, and unchanged ordinary-population checks pass, along with
+the actual cartridge caller/resource checks, all startup CRCs, patch
+reconstruction, and seven browser/offline profiles. These are not native
+gameplay or hardware results. The missing Wisp owner still leaves the quest
+inactive; all seven carried readiness/selection bits remain zero.
+
+The current proposal is ABI 364 at
+`build/v3-carried-field-work-01/spawning-05/build-lock.json`, ROM SHA-256
+`fcce21b65a4c90e5c42fbb59b5b5bec67d5877513c673b1c1c648387aa7b039f`.
 It contains 207 independently selectable development imports, including all
 sixteen diary styles, all nine fish, and eight insects. Another 100 furniture
 profiles await acquisition. The main lock and both stable V2-14 deployments
