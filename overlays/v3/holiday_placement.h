@@ -37,6 +37,10 @@ int af_holiday_placement_field(const void *,const unsigned char rtc[8],AFHoliday
 int af_holiday_placement_make(const AFHolidayField *,const AFHolidayPlacementOps *,
     unsigned int type,unsigned int name,unsigned int id,unsigned int kind,int source_seed,
     AFHolidayPlace **);
+/* Source owners have different edge margins. Share the complete search rather
+ * than silently substituting the ordinary wandering owner's one-unit margin. */
+int af_holiday_placement_make_adjust(const AFHolidayField *,const AFHolidayPlacementOps *,
+    unsigned int,unsigned int,unsigned int,unsigned int,int,int,AFHolidayPlace **);
 /* 0: actual failed spawn; 1: appeared; 2: no appearance in this acre. */
 int af_holiday_placement_show(const AFHolidayField *,const AFHolidayPlacementOps *,
     unsigned int type,unsigned int id,AFHolidayBlock *forward_block);
@@ -46,4 +50,6 @@ int af_holiday_placement_native_make(void *manager,unsigned int donor,unsigned i
 int af_holiday_placement_native_show(void *manager,unsigned int donor,AFHolidayBlock *);
 int af_holiday_placement_native_show_id(void *manager,unsigned int donor,unsigned int id,AFHolidayBlock *);
 int af_holiday_placement_native_cull(unsigned int donor);
+int af_holiday_placement_native_free(void *,unsigned int,unsigned int,unsigned int,int,int,AFHolidayPlace **);
+int af_holiday_placement_native_show_type(void *,unsigned int,unsigned int,AFHolidayBlock *);
 #endif

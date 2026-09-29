@@ -7,6 +7,7 @@ SECTIONS {
    KEEP(*(.text.af_cw_get_save .text.af_cw_reserve_save .text.af_cw_get_common .text.af_cw_reserve_common))
    KEEP(*(.text.af_cw_check_keep .text.af_cw_set_keep .text.af_cw_clear_keep))
    KEEP(*(.text.af_cw_finish_hunt .text.af_cw_placement))
+   KEEP(*(.text.af_cw_manager_start .text.af_cw_manager_stop .text.af_cw_manager_in .text.af_cw_manager_out))
    *(.text .text.*) . = ALIGN(16);
  }
  .rodata : { *(.rodata .rodata.*) . = ALIGN(16); }

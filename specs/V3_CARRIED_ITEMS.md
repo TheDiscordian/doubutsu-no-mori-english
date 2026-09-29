@@ -73,10 +73,10 @@ python3 tools/v3_furniture_pipeline.py convert --representation carried \
 
 ## Installed shared runtime
 
-The current development proposal is ABI 365 at
-`build/v3-carried-field-work-01/quest-state-02/build-lock.json`.
+The current development proposal is ABI 366 at
+`build/v3-carried-field-work-01/quest-manager-03/build-lock.json`.
 Its ROM SHA-256 is
-`35eee187c3bdae0d211cd329b63292bca7a21c1f3010d3743c87791dfd317ee3`.
+`5ae6fe11ae14560c36c53da7f809c14949d26bb96fc8899e4edf69486d140fcc`.
 This is an inactive carried integration, not a new playable-import claim.
 
 `v3_furniture_install.py --refresh-runtime --carried-items PATH` installs the
@@ -389,7 +389,7 @@ packet, complete source calendar and spawn row, retained terrain helper, all
 memory reservations, and physical resource allocation. Tree/page directories,
 field resources, and old insect code remain unchanged. A nonquest acre delegates before applying quest-only
 checks. This connects the spawning consumer, not the missing event owner.
-The installed quest-state services below call the field-state bridge; NPC/manager
+The installed quest-state and manager services below call the field-state bridge; NPC
 admission remains off, so the quest stays inactive.
 
 `v3_holiday_participants.py --carried-event --build-lock PATH --output PATH`
@@ -400,9 +400,10 @@ VR4300 object and its unresolved services are recorded in
 `build/v3-carried-event-prepared-03/`. Only platform drawing submission and
 state access are adapted; source logic for dialogue, rewards, roof choices,
 weed removal, fade/movement, five unique spirit acres, and cleanup is retained.
-Native field access, placement, text, rewards,
+Native NPC field access, text, rewards,
 and lifecycle services still need real owner bindings. Date/flags, scheduling,
-common-state ownership, and the spawning consumer are installed. The prepared actor object is not installed,
+common-state ownership, complete manager callbacks, placement, and the spawning
+consumer are installed. The prepared NPC actor object is not installed,
 and an unresolved service is not a successful placeholder.
 
 `build/v3-carried-wisp-art-01/` contains the complete draw-index-349 artwork:
@@ -449,7 +450,7 @@ before output, live state, or cartridge saves are changed.
 
 The shared startup packet spans `807AC000..807B4000`: the complete existing
 8-KiB spawn prefix, save code at `807AE000` (12,032 bytes), quest code at
-`807B2000` (2,128 bytes), owned state at `807B3F00`, and a final guard. The
+`807B2000` (7,168 bytes including its complete manager), owned state at `807B3F00`, and a final guard. The
 old spawn guard remains intact. Thirty-six public entries in the previous
 storage module redirect to the new save code, including direct collection
 consumers and earlier redirect chains. All other packet content is retained.
@@ -458,9 +459,74 @@ event/state startup copies are reclaimed only after verifying their complete
 live replacement and its installed startup transfer. Original ROMs are never
 modified; all current resources are retained.
 
-Availability stays zero until the actual NPC/manager, translucent rendering,
-placement, complete official conversations, rewards, and cleanup paths are
+Availability stays zero until the actual NPC, translucent rendering,
+complete official conversations, rewards, and save/travel cleanup paths are
 connected. This is an installed state/save path, not a playable Wisp claim.
+
+### Connected event manager and remaining NPC bindings
+
+The importer compiles the complete checked `manager.c` from
+`build/v3-carried-event-prepared-03/` into the same quest module, without
+reconverting artwork or recompiling the unrelated 48 NPC functions. Source
+save/common/keep accesses bind to the installed `af_cw_*` services. The native
+control directory gains row 115 with start, stop, in, and out callbacks; the
+preceding 73 rows retain their positions, pointers, and relocations. The owner
+and its descriptor grow by 32 bytes. The shared 80-reference allocation already
+covers all 74 controls. Resident callbacks never relocate with this owner.
+
+The source manager chooses five distinct acres, retains their random draw order,
+resumes the current player's hunt only on the matching saved date, and keeps
+the returned-spirit branch. Event stop removes every normal-condition spirit
+stack through the native inventory API while preserving protected conditions
+and unrelated pockets. This is event-end cleanup, not the still-required
+successful-save/travel cleanup. Source appearance results distinguish absent,
+appeared, and not-in-this-acre; the actual native placement record supplies a
+successful result, not the source's developer-display pointer. Culling observes
+native STOP status.
+
+The shared placement API accepts the source edge margin explicitly. Ordinary
+wandering and shrine owners keep their one-/two-tile margins; Wisp uses five.
+The deterministic seed uses source event/name/area IDs even though the spawned
+NPC name is additive. The existing native descriptor, landmark, collision,
+foreground, height-gap, reserve/reuse, forward-acre, flattening, and spawn
+adapters remain the shared implementation.
+
+The remaining NPC connection uses these existing components together:
+
+- Source `Ev_Ghost_Profile` is profile `B7`, name `D06F`, size 2,480 bytes. The
+  fixed additional reservation is name `D0CD`, profile `F0`, model bank 456,
+  and texture bank 457. `build/v3-carried-wisp-art-01/` supplies every model and
+  facial texture; reuse the shared streamed renderer.
+- Extend the existing five-record special-character registry and 22-owner
+  participant registry, retaining all records. The new owner needs independent
+  spirit-family admission: the global participant gate belongs to diary
+  holidays and must not become a spirit prerequisite. Reuse the checked NPC
+  services and callback/slot lifetimes, with source event 114 routed to native 115.
+- The source renderer adds pipe-sync and white environment colour with the
+  current alpha to the translucent command stream, then invokes ordinary NPC
+  drawing. Retain that sequence and stream-space checks. Source motion
+  `GSTWAIT1` / default 126 needs the shared imported-motion provider, not a
+  same-number native animation. The NPC's native parameter field is signed
+  16-bit at `24`; `carried_event.h` declares the correct pointer type.
+- The source actor's explicit platform dependencies remain in its existing
+  `prepared.json`. Reuse installed festival/native bindings for ordinary
+  conversation, demo, inventory, and field functions where their contracts
+  match; provide real schedule/field/roof/weed and message mappings where
+  they differ. Preserve all 22 source reward-list categories, including the
+  two actor-local gyroid/umbrella lists, with mapped selected-item support.
+- Import the complete official conversations and angry-name strings through
+  the existing text/provenance pipeline. Actor registration, name/voice/art
+  banks, rendering/motion, conversation/reward behaviour, and save/travel
+  cleanup must all connect before enabling the spirit selection.
+
+The focused source-manager check covers five distinct acres, repeated starts,
+same-player/date restoration, returned spirits, appearance sentinels, culling,
+event-end cleanup, protected conditions, and disabled admission. The shared
+placement fixture compares 108 cases to the complete donor search, including
+margin five. Current cartridge checks cover the exact new row, two relocation
+bases, unchanged controls, all retained resources, the complete save/spawn prefix,
+22 startup CRCs, and UPS reconstruction. Seven browser/offline profiles agree.
+These are host/build results, not native gameplay or hardware verification.
 
 ## Verification and limits
 

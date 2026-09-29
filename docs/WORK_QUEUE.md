@@ -41,8 +41,8 @@ Do not make another per-item installer. Golden net/axe/shovel/rod still need
 their actual remaining consumers distinguished from acquisition; retain all
 installed tool behaviour and do not replay old tests to establish it again.
 
-The current proposal is ABI 365 at
-`build/v3-carried-field-work-01/quest-state-02/build-lock.json`.
+The current proposal is ABI 366 at
+`build/v3-carried-field-work-01/quest-manager-03/build-lock.json`.
 The complete `build/v3-carried-batch-prepared-05/` resources are installed without
 reconversion: seven parents, 26 states, fourteen icons, seven handover/police
 models, complete orange-paper artwork, official names, and prices. Additive
@@ -133,7 +133,7 @@ selection, seven-day eligibility, midnight-to-4am hours, native saved area 54,
 and common-area lifetime marker 55 use additive native event 115. The complete
 44-byte common record has an owned allocation; the native 40-byte slot is only
 its lifetime marker. The existing spirit bridge binds to the actual daily status.
-The 12,032-byte save adapter and 2,128-byte state module share the expanded
+The 12,032-byte save adapter and 7,168-byte combined state/manager module share the expanded
 32-KiB quest packet, retaining the complete spawning prefix and all artwork.
 Thirty-six public save entries redirect to format 17 / card wire 4. Hunt date
 bytes 13/14 occupy the existing 48-byte save extension; native save arrays and
@@ -143,16 +143,28 @@ Three focused sanitized/current-cartridge checks and seven browser/offline
 profiles pass. No native gameplay or hardware result is claimed. Availability
 and all carried readiness/selection bits remain off.
 
-The next concrete consumer is Wisp's NPC/manager integration, then sign-board
+The complete source manager callbacks are installed in native control row 115.
+All 73 existing controls and their relocated callbacks remain intact; the new
+row adds 32 bytes to the on-demand owner, with no additional resident allocation.
+Source five-acre selection, same-player/day hunt restoration, returned-spirit
+state, appearance sentinels, culling, and normal-condition pocket cleanup are
+connected. The shared free-acre placement preserves the donor's five-tile edge
+margin and seed; it does not use the ordinary one-tile wandering margin.
+Native placement remains authoritative even when the source debug alias is empty.
+The complete source-manager host check, 108 donor-search comparisons, current
+owner/relocation/resource/startup/patch checks, and seven browser/offline profiles
+pass. Wisp is still disabled because its NPC services are unfinished.
+
+The next concrete consumer is Wisp's NPC integration, then sign-board
 designs/placement, including actual
 native item-type and menu routes for every family. The field-state bridge now
-has an installed caller, but the unfinished NPC/manager keeps the quest disabled.
+has installed state and manager callers, but the unfinished NPC keeps the quest disabled.
 Reuse `build/v3-carried-wisp-art-01/` for the
 complete 26-joint translucent model and every facial texture. The existing
 participant importer prepares all 48 actor functions plus four manager
 callbacks at `build/v3-carried-event-prepared-03/`. Continue from its explicit
 unbound services: native NPC lifecycle
-and drawing, manager placement/callbacks, official dialogue,
+and drawing, official dialogue,
 and complete reward/cleanup routes. Keep source `ghost_start/stop/in`, its five
 unique acres, and saved/scene lifetime intact. Ordinary save/travel also removes
 spirits in the donor; connect the actual transaction modes, not unconditional
@@ -160,13 +172,17 @@ deletion on a failed save. Reuse or extend the guarded quest packet for the
 owner rather than adding another startup descriptor; only twelve bootstrap
 bytes remain. Native event IDs 0..114 are preserved; Wisp owns 115.
 Reuse the installed quest state/save services and prepared complete actor source.
-Bind the manager's source save/common/keep calls to `af_cw_*`; the native common
+The manager's source save/common/keep calls bind to `af_cw_*`; the native common
 marker invalidates private state on scene reset. Continue full NPC/name/profile,
-translucent renderer, free-acre placement with donor adjustment 5, dialogue,
+translucent renderer, dialogue,
 reward filtering, and successful-save/travel cleanup. The prepared actor's
-`af_cw_actor_specific` provider must use native signed-16-bit actor storage, not
-the current unbound byte-pointer declaration. Do not replay the completed date,
-state, save, spawning, or artwork checks without a relevant change.
+`af_cw_actor_specific` declaration now uses native signed-16-bit actor storage;
+its provider still needs the actual native field binding. The fixed reservation is
+source profile `B7`, native name `D0CD`, native profile `F0`, and banks 456/457.
+Extend the shared participant registry with an independent spirit-family gate;
+do not make spirits depend on diary selection or enable diary events implicitly.
+Use the binding map in the carried-item specification. Do not replay the completed
+date, state, save, manager, spawning, or artwork checks without a relevant change.
 Shared paper/spirit splitting/merging,
 confirmed letter consumption, and paper collection/catalogue are installed;
 do not rebuild those or the prepared artwork without a relevant defect. Reuse

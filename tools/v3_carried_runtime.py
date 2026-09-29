@@ -85,6 +85,8 @@ def install(base, prior, blob, core, module, output, directory):
                 return install_creature_spawns(base,prior,output,directory)
             if carried.get('spawning') and not carried.get('quest'):
                 return install_quest_state(base,prior,core,output,directory)
+            if carried.get('quest') and not carried['quest'].get('manager'):
+                return install_quest_manager(base,prior,core,output,directory)
             return install_interactions(base,prior,core,output,directory)
         if prior['equipment_resources']['carried_items'].get('eating'):
             return install_creature_field(base,prior,blob,output,directory)
@@ -968,6 +970,103 @@ def install_quest_state(base,prior,core,output,directory):
     prefix_resource=next(r for r in resources if r['id']==prefix_packet['id'])
     write_new(output/'carried-quest.json',(json.dumps(d['quest'],indent=2)+'\n').encode())
     return e,{},updates,[(dict(prefix_resource,previous_sha256=prefix_sha),bytes(prefix)),(replacement,bytes(raw))]
+
+
+def install_quest_manager(base,prior,core,output,directory):
+    """Connect the complete source quest manager through shared placement."""
+    from types import SimpleNamespace
+    from npc_mail_show import relocate_verified_data
+    from v3_campsite_manager import RAM as owner_ram,VROM,RELOC,METADATA,CONTROL_COUNT
+    from v3_registry import SPECIAL_NPCS
+    e=copy.deepcopy(prior['equipment_resources']);d=e['carried_items'];q=d['quest'];p=q['packet']
+    if (directory.resolve()!=ROOT/d['prepared'] or q.get('manager') or q['available'] or
+            d['ready_mask'] or d['selected_mask'] or p!=d['spawning']['packet']):
+        raise ValueError('Quest manager requires the installed inactive state/save path')
+    raw=bytearray(base[p['physical']:p['physical']+p['bytes']]);start=q['ram']-p['ram']
+    if (sha256(raw)!=p['sha256'] or sha256(raw[start:start+q['bytes']])!=q['code']['sha256'] or
+            any(raw[start+q['bytes']:0x807B3F00-p['ram']]) or raw[-16:]!=b'AFCQ'*4):
+        raise ValueError('Changed complete quest code or reserved padding')
+    prepared=ROOT/'build/v3-carried-event-prepared-03'
+    manifest=json.loads((prepared/'prepared.json').read_bytes())
+    for name,digest in manifest['generated_sha256'].items():
+        if sha256((prepared/name).read_bytes())!=digest:raise ValueError('Changed complete prepared quest source')
+    for path,record in manifest['references'].items():
+        data=(ROOT/'local/ac-decomp'/path).read_bytes()
+        if len(data)!=record['bytes'] or sha256(data)!=record['sha256']:raise ValueError('Changed quest donor reference')
+    identity=SPECIAL_NPCS['GAFE01-r0/npc/ev-ghost']
+    source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+        (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    profile=source.raw('Ev_Ghost_Profile')
+    if struct.unpack('>HHIHH6I',profile)!=(identity['donor_profile'],4<<8,0,identity['donor_name'],3,2480,0,0,0,0,0):
+        raise ValueError('Changed complete source quest NPC profile')
+    events=e['npc_extra']['events'];candidates=dict(q['code']['symbols'])
+    candidates.update(events['placement']['bindings'])
+    bindings=events['festivals']['bindings']
+    candidates.update({name:bindings[name] for name in ('mPr_GetPossessionItemIdxWithCond','mPr_SetPossessionItem')})
+    candidates.update(af_cw_native_private=bindings['af_hp_private'],af_cw_native_player=bindings['af_hp_player_index'])
+    defs=('AF_V3_CARRIED_PROFILE=1','AF_V3_CARRIED_QUEST=1',f'AF_CW_NATIVE_NAME=0x{identity["name"]:X}',
+        'mEv_get_save_area=af_cw_get_save','mEv_reserve_save_area=af_cw_reserve_save',
+        'mEv_get_common_area=af_cw_get_common','mEv_reserve_common_area=af_cw_reserve_common',
+        'mEv_check_keep=af_cw_check_keep','mEv_set_keep=af_cw_set_keep','mEv_clear_keep=af_cw_clear_keep')
+    code,compiled=compile_part('carried_quest',output/'carried-quest-manager',
+        extra_sources=('overlays/v3/holiday_native.c','overlays/v3/carried_manager.c',
+            'overlays/v3/holiday_placement.c','overlays/v3/holiday_placement_native.c',
+            str((prepared/'manager.c').relative_to(ROOT))),
+        defines=defs,include_dirs=('overlays/v3',str(prepared.relative_to(ROOT))),symbol_candidates=candidates)
+    if q['ram']+len(code)>q['state']['ram']:raise ValueError('Complete quest manager overlaps saved state')
+    raw[start:0x807B3F00-p['ram']]=code.ljust(0x807B3F00-q['ram'],b'\0')
+    # The current native control table is at the complete owner's tail. Append
+    # one resident-callback row; all existing pointers/relocations stay in place.
+    files=by_vrom(base);old=files[VROM].extract(base);oldrel=files[RELOC].extract(base)
+    manager=copy.deepcopy(prior['campsite_manager']);table=manager['table'];count=manager['control_count']
+    head=struct.unpack_from('>5I',oldrel)
+    if (count!=73 or table-owner_ram+count*32!=len(old) or u32(old,CONTROL_COUNT-owner_ram)!=count or
+            sha256(old)!=manager['output_sha256'] or sha256(oldrel)!=manager['relocation_sha256'] or
+            head[:4]!=(len(old),0,0,0) or manager['today_pointer_capacity']<count+1):
+        raise ValueError('Changed complete native event-control directory')
+    callbacks=[compiled['symbols']['af_cw_manager_'+name] for name in ('start','stop','in','out')]
+    data=bytearray(old);struct.pack_into('>I',data,CONTROL_COUNT-owner_ram,count+1)
+    data.extend(struct.pack('>8I',115,*callbacks,0,0,0))
+    reloc=bytearray(oldrel);struct.pack_into('>I',reloc,0,len(data))
+    if len(data)+len(reloc)>0xC000 or VROM+len(data)>RELOC or owner_ram+len(data)>0x809670B0:
+        raise ValueError('Complete Wisp control exceeds native owner allocation')
+    for address in (0x801A0010,0x802F8010):
+        before=relocate_verified_data(SimpleNamespace(ram=owner_ram,resident_bytes=len(old),sections=head),old,oldrel,address)
+        after=relocate_verified_data(SimpleNamespace(ram=owner_ram,resident_bytes=len(data),
+            sections=(len(data),0,0,0,head[4])),bytes(data),bytes(reloc),address)
+        allowed=range(CONTROL_COUNT-owner_ram,CONTROL_COUNT-owner_ram+4)
+        if (any(a!=b and i not in allowed for i,(a,b) in enumerate(zip(before,after))) or
+                after[len(old):]!=data[len(old):]):
+            raise ValueError('Wisp owner changes unrelated relocated code or resident callbacks')
+    at=METADATA-CODE_RAM
+    if core[at:at+16]!=struct.pack('>4I',VROM,VROM+len(old),owner_ram,owner_ram+len(old)):
+        raise ValueError('Changed complete native event-owner descriptor')
+    core[at:at+16]=struct.pack('>4I',VROM,VROM+len(data),owner_ram,owner_ram+len(data))
+    resizes=[dict(vrom=VROM,previous_bytes=len(old),previous_sha256=sha256(old),bytes=len(data),sha256=sha256(data))]
+    manager.update(table_bytes=(count+1)*32,control_count=count+1,bytes=len(data),output_sha256=sha256(data),
+        relocation_sha256=sha256(reloc),on_demand_growth=manager['on_demand_growth']+32)
+    changes={VROM:bytes(data),RELOC:bytes(reloc)}
+    q.update(code=compiled,bytes=len(code),availability_address=compiled['symbols']['af_cw_available'])
+    q['manager']=dict(source=str(prepared.relative_to(ROOT)),source_functions=manifest['event_manager_functions'],
+        generated_sha256=manifest['generated_sha256']['manager.c'],identity=identity,
+        vrom=VROM,reloc=RELOC,ram=owner_ram,table=table,control_count=count+1,callbacks=callbacks,
+        previous_sha256=sha256(old),sha256=sha256(data),relocation_sha256=sha256(reloc),
+        original_controls_retained=count,margin=5,additional_resident_bytes=0,additional_owner_bytes=32,
+        native_gameplay_verified=False,installed=True,npc_registered=False)
+    manager['carried_owner']=copy.deepcopy(q['manager'])
+    q['pending']=['native NPC lifecycle/drawing and identity registration','official dialogue and full reward/cleanup routes',
+        'independent carried selection']
+    paths=('tools/v3_carried_runtime.py','tools/v3_registry.py','tools/v3_furniture_install.py',
+        'overlays/v3/carried_quest.ld','overlays/v3/carried_manager.c','overlays/v3/carried_event.h',
+        'overlays/v3/holiday_placement.c','overlays/v3/holiday_placement.h','overlays/v3/holiday_placement_native.c')
+    d['sources'].update({s:sha256((ROOT/s).read_bytes()) for s in paths})
+    before=p['sha256'];p.update(sha256=sha256(raw),crc32=zlib.crc32(raw))
+    d['spawning']['packet']=copy.deepcopy(p)
+    resources=copy.deepcopy(prior['physical_resources'])
+    resource=next(r for r in resources if r['id']==p['id']);resource['sha256']=p['sha256']
+    write_new(output/'carried-quest-manager.json',(json.dumps(q['manager'],indent=2)+'\n').encode())
+    return e,changes,dict(physical_resources=resources,campsite_manager=manager,runtime_owner_resizes=resizes),[
+        (dict(resource,previous_sha256=before),bytes(raw))]
 
 
 CARRIED_MESSAGE_FIRST=13082

@@ -1620,6 +1620,9 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             report['shared_runtime_refresh'].update(resource_allocations_changed=True,
                 saved_format_changed=True,saved_profile_changed=False,
                 additional_resident_bytes=carried['quest']['additional_resident_bytes'])
+        if carried.get('quest',{}).get('manager') and not previous_carried.get('quest',{}).get('manager'):
+            report['shared_runtime_refresh']['adapters'].append('carried_quest_manager')
+            report['shared_runtime_refresh']['additional_owner_bytes']=32
         if actions:
             report['shared_runtime_refresh']['additional_menu_bytes']=(carried['paper']['catalogue']['additional_menu_bytes']
                 if new_storage else actions['additional_menu_bytes'] if new_actions else 0)

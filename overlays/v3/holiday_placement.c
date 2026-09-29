@@ -48,7 +48,12 @@ static int search(const AFHolidayField *f,const AFHolidayPlacementOps *o,unsigne
 }
 int af_holiday_placement_make(const AFHolidayField *f,const AFHolidayPlacementOps *o,
         unsigned int type,unsigned int name,unsigned int id,unsigned int kind,int seed,AFHolidayPlace **out) {
+    return af_holiday_placement_make_adjust(f,o,type,name,id,kind,kind==AF_HE_WANDER?1:2,seed,out);
+}
+int af_holiday_placement_make_adjust(const AFHolidayField *f,const AFHolidayPlacementOps *o,
+        unsigned int type,unsigned int name,unsigned int id,unsigned int kind,int adjust,int seed,AFHolidayPlace **out) {
     if(!out || !valid(f,o,type,id) || name>65535 || seed<0 || seed>0x20000 ||
+       adjust<0 || adjust>7 ||
        (kind!=AF_HE_SHRINE && kind!=AF_HE_WANDER && kind!=AF_HE_HALLOWEEN))return -1;
     *out=0;
     if(!o->outdoors(o->context))return 0;
@@ -56,7 +61,7 @@ int af_holiday_placement_make(const AFHolidayField *f,const AFHolidayPlacementOp
     if(!place) {
         AFHolidayPlace candidate={f->shrine,{0,0},name,1};
         if((kind!=AF_HE_WANDER && !block_valid(f,candidate.block)) ||
-           !search(f,o,type,&candidate,kind==AF_HE_WANDER,kind==AF_HE_WANDER?1:2,seed)) {
+           !search(f,o,type,&candidate,kind==AF_HE_WANDER,adjust,seed)) {
             o->error(o->context,type);return -1;
         }
         place=o->reserve(o->context,type,id);

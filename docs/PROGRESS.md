@@ -205,8 +205,9 @@ lifetime of a native common-area marker; the real daily status supplies the
 spirit field bridge. Saved quest flags use native area 54. The town-wide hunt
 date uses two owned bytes in the existing 48-byte extension, not native padding.
 
-The 12,032-byte save adapter and 2,128-byte quest-state module extend the existing
-quest startup packet to 32 KiB. All 22 startup descriptors still fit in 676 bytes.
+The 12,032-byte save adapter and 7,168-byte combined quest-state/manager module
+occupy the existing 32-KiB quest startup packet. All 22 startup descriptors still
+fit in 676 bytes.
 Thirty-six public storage/profile entries redirect to format 17 / card wire 4;
 compatible format-14/15/16 records migrate forward, retaining diary pages,
 console data, stamps, and paper ownership. Two obsolete event startup copies
@@ -217,13 +218,28 @@ Three focused checks pass for sanitized source dates and event-state lifetime,
 actual save transactions with native I/O doubled, current code/caller/resource
 bindings, all startup CRCs, and patch reconstruction. Browser/offline composition
 agrees for seven profiles, including exact empty V2-14. Native gameplay,
-save/reload, and hardware remain unverified. Wisp's NPC/manager, placement,
-dialogue, and complete reward/cleanup services are still required: availability
+save/reload, and hardware remain unverified. Wisp's NPC,
+dialogue, and complete reward/save-travel cleanup services are still required: availability
 and all carried readiness/selection bits remain zero.
 
-The current proposal is ABI 365 at
-`build/v3-carried-field-work-01/quest-state-02/build-lock.json`, ROM SHA-256
-`35eee187c3bdae0d211cd329b63292bca7a21c1f3010d3743c87791dfd317ee3`.
+The complete Wisp source manager connects the five unique spirit acres,
+same-player/date hunt restoration, returned-spirit state, native acre entry,
+culling, and event-end cleanup of normal-condition spirit pockets. Protected
+items remain untouched. Its additive event-control row retains all 73 existing
+controls and adds only 32 on-demand bytes. Shared placement uses Wisp's actual
+five-tile edge margin and source seed. Its result comes from native placement
+storage, independently of the source's debug pointer. NPC identity reservations
+are fixed and inactive: `D0CD`, profile `F0`, banks 456/457.
+
+The source-manager host check and 108 complete donor-search comparisons pass,
+along with current owner/relocation/resource checks, 22 startup CRCs, patch
+reconstruction, and seven browser/offline profiles. The resident allocation,
+format-17 save code, all artwork, and original controls are retained. The NPC
+is not registered or playable; no native gameplay or hardware result is claimed.
+
+The current proposal is ABI 366 at
+`build/v3-carried-field-work-01/quest-manager-03/build-lock.json`, ROM SHA-256
+`5ae6fe11ae14560c36c53da7f809c14949d26bb96fc8899e4edf69486d140fcc`.
 It contains 207 independently selectable development imports, including all
 sixteen diary styles, all nine fish, and eight insects. Another 100 furniture
 profiles await acquisition. The main lock and both stable V2-14 deployments

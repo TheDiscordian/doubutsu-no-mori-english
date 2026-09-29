@@ -90,14 +90,16 @@ int main(void) {
     EVENT_MANAGER_ACTOR manager={{f.maximum},f.excluded[0],f.excluded[1],f.excluded[2],f.excluded[3],f.excluded[4]};
     aEvMgr_event_ctrl_c ctrl={80};rtc=(lbRTC_time_c){6,20,29,13};
     unsigned int comparisons=0;
+    for(int margin=1;margin<=5;margin+=4)
     for(int wandering=0;wandering<2;wandering++)for(busy_mode=0;busy_mode<3;busy_mode++)
     for(other_mode=0;other_mode<3;other_mode++)for(unit_mode=0;unit_mode<3;unit_mode++) {
         AFHolidayBlock b=f.shrine,u={0,0};attempt=0;
-        int reference=wandering?search_free_unit(&manager,&ctrl,&b,&u,1,0xD123):
+        int reference=wandering?search_free_unit(&manager,&ctrl,&b,&u,margin,0xD123):
             search_select_unit(&manager,&ctrl,&b,&u,2);
         int reference_attempts=attempt;attempt=0;stored=0;errors=0;
         AFHolidayPlace *result=0;
-        int got=af_holiday_placement_make(&f,&o,80,0xD090,0x51,wandering?AF_HE_WANDER:AF_HE_SHRINE,0xD123,&result);
+        int got=af_holiday_placement_make_adjust(&f,&o,80,0xD090,0x51,
+            wandering?AF_HE_WANDER:AF_HE_SHRINE,wandering?margin:2,0xD123,&result);
         assert((got==1)==(reference!=0));assert(attempt==reference_attempts);
         if(reference)assert(result==&place && place.block.x==b.x && place.block.z==b.z &&
             place.unit.x==u.x && place.unit.z==u.z && place.name==0xD090 && place.flags==1 && !errors);

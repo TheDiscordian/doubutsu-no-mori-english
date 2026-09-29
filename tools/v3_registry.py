@@ -14,7 +14,7 @@ VILLAGERS = {
 # Special actors are not ordinary residents or individually selectable villagers.
 # Native profiles C9/CA/CB are the no-demo sentinel, summer tent, and balloon.
 # The existing camper mask uses D08F. These reservations do not enable spawning.
-SPECIAL_NPC_REGISTRY_VERSION = 4
+SPECIAL_NPC_REGISTRY_VERSION = 5
 SPECIAL_NPCS = {
     'GAFE01-r0/npc/ev-soncho2': dict(donor_name=0xD074, donor_profile=0xCC,
         name=0xD090, profile=0xCC, model_bank=448, texture_bank=449),
@@ -28,6 +28,8 @@ SPECIAL_NPCS = {
         name=0xD0AE, profile=0xE3, model_bank=454, texture_bank=455, draw_index=316),
     'GAFE01-r0/npc/exercise-tortimer': dict(donor_name=0xD078, donor_profile=0x93,
         name=0xD0B3, profile=0xE5, model_bank=448, texture_bank=449, draw_index=358),
+    'GAFE01-r0/npc/ev-ghost': dict(donor_name=0xD06F, donor_profile=0xB7,
+        name=0xD0CD, profile=0xF0, model_bank=456, texture_bank=457, draw_index=349),
 }
 
 # Shared event actors are resident villagers in temporary roles, not additional
