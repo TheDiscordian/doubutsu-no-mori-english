@@ -31,20 +31,32 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
-The shared carried-item importer prepares the remaining seven parent families
-and all 26 source states together. Its current resource bundle is
-`build/v3-carried-batch-prepared-05/`: fourteen pocket icons, seven complete
-handover/police models, full orange-paper background/lines, official names,
-and source prices. Checked resource reuse avoids recompiling existing artwork;
-event-item icons use the same shared converter without changing their output.
-Additive native IDs, remaining readers/behaviours, saved profiles, and selection
-are still the connected implementation task. This preparation does not enable
-new imports or change the current ROM. See
+The shared carried-item importer installs the remaining seven parent families
+and all 26 states together, with readiness and selection still off. Its checked
+`build/v3-carried-batch-prepared-05/` resources supply fourteen pocket icons,
+seven handover/police models, full orange-paper background/lines, official names,
+and source prices without graphics recompilation. Fixed additive IDs preserve
+all native paper and flower identities. Name/type/price/display/pocket/icon
+readers delegate unrelated items through the existing reader chain. Cedar has
+its own ground category, distinct from diaries; spirits do not acquire an
+invented dropped-cage model.
+
+The native letter window has the additional complete orange-paper models and
+official text colour, preserving all 64 original styles and the existing editor.
+Its shared constructor normalizes all four imported quantities to one paper
+style; physical graphics pointers avoid overwriting the native DMA buffer.
+The shared seasonal bitmap, startup, and enlarged menu allocations are connected.
+Seven focused current-build checks pass, including sanitized readers/ground
+construction, complete letter resources/tables, retained creature readers,
+allocation rejection, and seven browser/offline selection comparisons. These
+are not native rendering or gameplay/save verification. Inventory actions,
+paper consumption/stacking/catalogue, item-specific behaviours, saved profiles,
+and independent selection remain the same connected task. See
 [the carried-item contract](../specs/V3_CARRIED_ITEMS.md).
 
-The current proposal is ABI 352 at
-`build/v3-diary-category-work-01/admission-connected-04/build-lock.json`, ROM SHA-256
-`ae407cb96340de70dc69e7d93cb2bb0969c6577a186a84615f24ceee9066ec94`.
+The current proposal is ABI 353 at
+`build/v3-carried-runtime-work-01/readers-connected-12/build-lock.json`, ROM SHA-256
+`a76fc718d82567fd313fc4d9a4ea916ae210b0fdaefeae2faedbdcd72aa36aa9`.
 It contains 207 independently selectable development imports, including all
 sixteen diary styles, all nine fish, and eight insects. Another 100 furniture
 profiles await acquisition. The main lock and both stable V2-14 deployments
@@ -70,8 +82,9 @@ profile/metadata checks, including the carried diary IDs.
 
 The connected 20,240-byte world/card module uses 52 checked redirects and one
 shared exercise context. Existing artwork, animations, actors, and saved format
-15 remain intact. The festival startup packet contains 64,064 bytes; twenty
-descriptors still fit the 676-byte bootstrap. Current resource hashes, redirects,
+15 remain intact. The unchanged 64,064-byte festival code prefix shares a
+94,240-byte startup packet with carried resources; twenty descriptors still
+fit the 676-byte bootstrap. Current resource hashes, redirects,
 all startup spans/checksums, source batches, and patch reconstruction pass.
 Focused source/sanitized-host checks cover disabled gifts, actual attendance,
 visitor isolation, selected handovers, and official greeting field requirements.

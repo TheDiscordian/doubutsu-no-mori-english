@@ -375,8 +375,10 @@ def publish_bootstrap(equipment,blob,surface,output):
             for batch in npc_extra.get('source_batches',[]):
                 if batch.get('packet_id'):
                     separate=npc_extra['events'].get('festivals')
-                    if (not separate or batch['packet_id']!=separate['packet']['id'] or
-                            any(batch[k]!=separate['packet'][k] for k in ('ram','bytes','sha256'))):
+                    carried=equipment.get('carried_items')
+                    source_packet=carried['previous_packet'] if carried else separate['packet'] if separate else {}
+                    if (not separate or batch['packet_id']!=source_packet['id'] or
+                            any(batch[k]!=source_packet[k] for k in ('ram','bytes','sha256'))):
                         raise ValueError('Changed separately loaded source-character batch')
                     continue
                 if (not batch['installed'] or batch['ram']!=SKY_RAM+sky_bytes or
@@ -393,8 +395,18 @@ def publish_bootstrap(equipment,blob,surface,output):
             festivals=npc_extra['events'].get('festivals')
             if festivals:
                 fp=festivals['packet']
+                expected_bytes=festivals['bytes']
+                carried=equipment.get('carried_items')
+                if carried:
+                    extension=festivals.get('carried_packet_extension',{})
+                    if (carried['packet']!=fp or extension.get('previous_bytes')!=expected_bytes or
+                            extension.get('end')!=0x80778000 or fp['ram']+fp['bytes']!=extension['end'] or
+                            carried['ram']!=0x80771000 or carried['table_ram']!=0x80773800 or
+                            carried['state_count']!=26 or carried['parent_count']!=7):
+                        raise ValueError('Changed carried-item extension of the shared startup packet')
+                    expected_bytes+=extension['bytes']
                 if (not festivals['installed'] or fp['ram']!=SKY_RAM+sky_bytes or
-                        fp['bytes']!=festivals['bytes'] or fp['ram']+fp['bytes']>0x807DA800 or
+                        fp['bytes']!=expected_bytes or fp['ram']+fp['bytes']>0x807DA800 or
                         fp['physical']&15 or fp['bytes']&15 or fp['storage']!='physical-ROM' or
                         not 0x100000<=fp['physical']<fp['physical']+fp['bytes']<=0x4000000):
                     raise ValueError('Changed separately loaded complete festival packet')

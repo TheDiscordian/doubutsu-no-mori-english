@@ -31,6 +31,15 @@ u8 *af_v3_ground_prepare(u32 variant) {
     const Ground *row=config+variant;
     u8 *owner=owner_base(row);
     if (!owner) return 0;
+#ifdef AF_V3_GROUND_CATEGORY_FLAGS
+#ifdef __mips__
+    const u32 *flags=(const u32 *)(uptr)AF_V3_GROUND_CATEGORY_FLAGS;
+#else
+    extern u32 af_test_ground_flags[4];
+    const u32 *flags=af_test_ground_flags;
+#endif
+    if(flags[0]!=0x41464742u || flags[1]!=AF_V3_CATEGORY_COUNT || flags[3]&~0xFFFu)return 0;
+#endif
     /* The old NONE sentinel lies inside the expanded range. Its start index
        can be nonzero, so it needs a real descriptor with no drawing lists. */
     u32 *empty=(u32 *)(owner+row->parts-32u);
@@ -40,9 +49,15 @@ u8 *af_v3_ground_prepare(u32 variant) {
     for (u32 i=0;i<row->count*2u;i++)
         table[i]=i<row->original_count*2u ? old[i] : (i&1u) ? 0 : (u32)(uptr)empty;
     u32 *part=(u32 *)(owner+row->parts);
+#ifdef AF_V3_GROUND_CATEGORY_FLAGS
+    for(u32 category=27u;category<AF_V3_CATEGORY_COUNT;category++) {
+        u32 bit=category-27u;
+        if(!(flags[2u+(bit>>5)]&(1u<<(bit&31u))))continue;
+#else
     for (u32 source=0;source<53u;source++) {
         u32 category=mapping[source];
         if (!category) continue;
+#endif
         /* Immutable configuration is validated before it enters the cartridge. */
         for (u32 i=0;i<13u;i++) part[i]=0;
         part[0]=(u32)(uptr)(part+8);
@@ -61,6 +76,7 @@ u8 *af_v3_ground_prepare(u32 variant) {
     return owner;
 }
 
+#ifndef AF_V3_GROUND_PREPARE_ONLY
 static void construct(void *actor, void *game, u32 variant) {
     u8 *owner=af_v3_ground_prepare(variant);
     if (!owner) return;
@@ -74,3 +90,4 @@ void af_v3_ground_cherry(void *actor, void *game) { construct(actor,game,0); }
 void af_v3_ground_winter(void *actor, void *game) { construct(actor,game,1); }
 void af_v3_ground_xmas(void *actor, void *game) { construct(actor,game,2); }
 void af_v3_ground_ordinary(void *actor, void *game) { construct(actor,game,3); }
+#endif

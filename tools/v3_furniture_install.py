@@ -666,7 +666,7 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
                     equipment_rigs=None, expand_storage=False, furniture_audio_art=None, furniture_profiles=None,
                     material_frames_art=None,scrolling_materials_art=None,room_surfaces_art=None,furniture_scoring=False,
                     password_runtime=None,password_editor=False,room_effects=None,furniture_capacity=False,console_storage=False,
-                    console_images=None,console_emulator=False,console_disk=None,creature_items=None,creature_field=None,creature_fish=False,creature_insects=None,clothing_batch=None,diaries=None,diary_items=False,diary_room_art=None,diary_catalogue=False,npc_registry_art=None,holiday_actor_services=False,holiday_participants=None):
+                    console_images=None,console_emulator=False,console_disk=None,creature_items=None,creature_field=None,creature_fish=False,creature_insects=None,clothing_batch=None,diaries=None,diary_items=False,diary_room_art=None,diary_catalogue=False,npc_registry_art=None,holiday_actor_services=False,holiday_participants=None,carried_items=None):
     """Update shared readers; optionally install the shared held-resource adapter."""
     output=output.resolve()
     if output.exists() or not output.is_relative_to(ROOT/'build'):
@@ -727,13 +727,21 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
     if holiday_actor_services:
         if resource_mode:raise ValueError('Install shared runtime updates in dependency order')
         resource_mode=True
+    if carried_items is not None:
+        if resource_mode:raise ValueError('Install shared runtime updates in dependency order')
+        resource_mode=True
     if resource_mode:
         blob,reused=reuse_resource_tail(base,prior,old_blob)
         if not reused['reused_bytes'] and not reused.get('external_resources'):
             raise ValueError('Equipment integration requires the checked shared resource tail')
     parent_readers=bool(player_actions and prior.get('equipment_resources',{}).get('player_actions',{}).get('equipment_selection'))
     wrapped_names=bool(player_actions and prior.get('equipment_resources',{}).get('wrapped_presents'))
-    if holiday_actor_services:
+    if carried_items is not None:
+        import v3_carried_runtime as equipment
+        equipment_report,owner_changes,report_updates,physical_writes=equipment.install(
+            base,prior,blob,core,module,output,carried_items)
+        display_report=prior['clothing']['display'];alias_report=prior['display_aliases']
+    elif holiday_actor_services:
         current_events=prior['equipment_resources'].get('npc_extra',{}).get('events',{})
         if holiday_participants is not None:
             import v3_holiday_participants_install as equipment
@@ -1532,6 +1540,13 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             saved_format_changed=False,saved_profile_changed=False)
         report['sources'].update(npc['sources'])
         report['native_test']='pending connected Tortimer event/conversation/animation providers and diary gameplay/save verification'
+    if carried_items is not None:
+        carried=equipment_report['carried_items']
+        report['shared_runtime_refresh'].update(adapters=['carried_items'],artwork_changed=True,
+            additional_resident_bytes=carried['additional_resident_bytes'],resource_allocations_changed=True,
+            saved_format_changed=False,saved_profile_changed=False,changed_owner_moves=owner_moves)
+        report['sources'].update(carried['sources'])
+        report['native_test']='pending connected carried-item menus, behaviours, persistence, and selection; readiness remains off'
     if holiday_actor_services:
         npc=equipment_report['npc_extra']
         decorations=npc['events'].get('decorations') and not prior['equipment_resources']['npc_extra']['events'].get('decorations')
@@ -1637,6 +1652,8 @@ if __name__=='__main__':
         help='Install a checked complete participant preparation with --holiday-actor-services')
     parser.add_argument('--clothing-batch',type=Path,
         help='With --refresh-runtime, install the complete prepared clothing category')
+    parser.add_argument('--carried-items',type=Path,
+        help='With --refresh-runtime, connect the prepared shared carried-item resources and readers')
     parser.add_argument('--diary-core',type=Path,help='Prepared shared diary save/controller directory')
     parser.add_argument('--diary-ui',type=Path,help='Prepared diary native UI and menu hooks directory')
     parser.add_argument('--diary-screen',type=Path,help='Prepared complete diary screen artwork directory')
@@ -1771,6 +1788,7 @@ if __name__=='__main__':
     if args.creature_fish and not args.refresh_runtime:parser.error('--creature-fish requires --refresh-runtime')
     if args.creature_insects is not None and not args.refresh_runtime:parser.error('--creature-insects requires --refresh-runtime')
     if args.clothing_batch is not None and not args.refresh_runtime:parser.error('--clothing-batch requires --refresh-runtime')
+    if args.carried_items is not None and not args.refresh_runtime:parser.error('--carried-items requires --refresh-runtime')
     result=(refresh_runtime(args.output,args.base_lock,equipment_art=args.equipment_art,player_motion=args.player_motion,
                             equipment_kinds=args.equipment_kinds,player_actions=args.player_actions,
                             item_category_art=args.item_category_art,ground_categories=args.ground_categories,
@@ -1790,6 +1808,6 @@ if __name__=='__main__':
                             diaries=dict(zip(('core','ui','screen'),diary_paths)) if all(diary_paths) else None,
                             diary_items=args.diary_items,diary_room_art=args.diary_room_art,diary_catalogue=args.diary_catalogue,
                             npc_registry_art=args.npc_registry_art,holiday_actor_services=args.holiday_actor_services,
-                            holiday_participants=args.holiday_participants)
+                            holiday_participants=args.holiday_participants,carried_items=args.carried_items)
             if args.refresh_runtime else build(args.output,args.art,args.base_lock))
     print(json.dumps({k:result[k] for k in ('runtime_abi','output_sha256','patch_sha256')},indent=2))

@@ -234,6 +234,18 @@ HOLIDAY_ITEMS = {item: item for item in range(0x2523, 0x2531)}
 # slots available within the installed 71-entry renderer capacity.
 HOLIDAY_ITEM_CATEGORIES = {47: 45, 52: 47}
 
+# Additive carried identities are stable across selections. Native paper has
+# sixty-four single-sheet identities; preserve 2000..203F, including native
+# 2003. Native 2901 is a flower, so the imported cedar follows all ten plants.
+CARRIED_ITEM_REGISTRY_VERSION = 1
+CARRIED_ITEMS = {0x2003+64*i:0x2040+i for i in range(4)} | {
+    0x251E:0x251E,0x2807:0x2807,0x2901:0x290A,
+} | HOLIDAY_ITEMS | {i:i for i in range(0x2D28,0x2D2D)}
+CARRIED_PAPER_STYLE = 64
+# Shared source category 17 also describes a diary. Keep that established
+# mapping; carried records can select a separate native model for the seedling.
+CARRIED_ITEM_CATEGORIES = {17:48,18:51,19:46,28:50,44:49,47:45,52:47}
+
 
 def diary_parent_identity(donor_item):
     if type(donor_item) is not int or donor_item not in DIARY_PARENTS:

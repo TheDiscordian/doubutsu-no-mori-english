@@ -25,6 +25,15 @@ extern int af_test_category_selected(u32), af_test_category_original(u32);
 
 int af_v3_equipment_category(u32 argument) {
     u32 item=(u16)argument, index=item-0x2224u;
+#ifdef AF_V3_CARRIED_CATEGORY_QUERY
+#ifdef __mips__
+    int carried=((int (*)(u32))AF_V3_CARRIED_CATEGORY_QUERY)(item);
+#else
+    extern int af_carried_category(u32);
+    int carried=af_carried_category(item);
+#endif
+    if(carried>=0)return carried;
+#endif
 #ifdef AF_V3_HOLIDAY_CATEGORY_QUERY
     if(item-0x2523u<14u) {
 #ifdef __mips__

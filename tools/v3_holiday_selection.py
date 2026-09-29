@@ -99,6 +99,9 @@ def refresh_receipts(e, records, payloads):
         calendar = events['calendar']; at = calendar['ram']-prefix['ram']
         calendar['code']['sha256'] = sha256(data[at:at+calendar['code']['bytes']])
     e['holiday_state']['packet'] = copy.deepcopy(e['holiday_fishing']['packet'])
+    carried = e.get('carried_items')
+    if carried:
+        carried['packet'] = copy.deepcopy(events['festivals']['packet'])
 
 
 def update_report(image, blob, report, selection):

@@ -6,14 +6,21 @@
 Ground af_test_ground_config[4];
 u8 af_test_ground_mapping[53], *af_test_ground_owners[4];
 u32 af_test_ground_materials[71], af_test_ground_geometry[71];
+u32 af_test_ground_flags[4];
 static u32 storage[4][0x6000], calls;
 void af_test_ground_constructor(void *actor, void *game, u32 variant) {
     assert(actor==(void *)1 && game==(void *)2 && variant<4); ++calls;
 }
 int main(void) {
-    const u8 sources[]={17,19,33,37,38,39,40,41,42,43};
-    for (u32 i=0;i<sizeof(sources);i++) {
-        u32 category=27+sources[i];mapping[sources[i]]=category;
+#ifdef AF_V3_GROUND_CATEGORY_FLAGS
+    const u8 categories[]={44,45,46,47,48,49,50,60,64,65,66,67,68,69,70};
+    af_test_ground_flags[0]=0x41464742;af_test_ground_flags[1]=71;
+#else
+    const u8 categories[]={44,46,60,64,65,66,67,68,69,70};
+#endif
+    for (u32 i=0;i<sizeof(categories);i++) {
+        u32 category=categories[i];mapping[category-27]=category;
+        af_test_ground_flags[2+(category-27)/32]|=1u<<((category-27)%32);
         materials[category]=0x4AA600+816*i+608;
         geometry[category]=0x4AA600+816*i+792;
     }
@@ -31,14 +38,14 @@ int main(void) {
         assert(!memcmp(table,old,native*8));
         for (u32 i=native;i<total;i++) {
             u32 match=0;
-            for (u32 s=0;s<sizeof(sources);s++) match|=i==r->type_base+27+sources[s];
+            for (u32 s=0;s<sizeof(categories);s++) match|=i==r->type_base+categories[s];
             assert(table[i*2]!=0);
             if (!match) assert(table[i*2]==(u32)(uptr)(owner+r->parts-32));
             assert(table[i*2+1]==(match?0x00010000u:0));
         }
         for (u32 i=0;i<8;i++) assert(!((u32 *)(owner+r->parts-32))[i]);
-        for (u32 i=0;i<sizeof(sources);i++,part+=13) {
-            u32 category=27+sources[i];
+        for (u32 i=0;i<sizeof(categories);i++,part+=13) {
+            u32 category=categories[i];
             assert(table[(r->type_base+category)*2]==(u32)(uptr)part);
             assert(part[0]==(u32)(uptr)(part+8) && part[1]==1 && part[2]==(u32)(uptr)(part+12));
             for (u32 j=3;j<8;j++) assert(!part[j]);
@@ -47,6 +54,12 @@ int main(void) {
             assert(part[12]==(u32)(uptr)(part+10));
         }
         assert(storage[variant][0]==0xA5A5A5A5 && part[0]==0xA5A5A5A5);
+#ifdef AF_V3_GROUND_CATEGORY_FLAGS
+        /* Spirit has handover art, not an invented ground descriptor. */
+        assert(table[(r->type_base+51)*2]==(u32)(uptr)(owner+r->parts-32));
+        af_test_ground_flags[0]^=1;assert(!af_v3_ground_prepare(variant));af_test_ground_flags[0]^=1;
+        af_test_ground_flags[3]|=0x1000;assert(!af_v3_ground_prepare(variant));af_test_ground_flags[3]&=~0x1000u;
+#endif
         /* Appended descriptors may lie above 64 KiB. Retained scenery between
          * the category table and the new bank must remain untouched. */
         for(u32 i=0x800;i<r->parts-32;i++)assert(owner[i]==0xA5);

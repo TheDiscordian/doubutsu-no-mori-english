@@ -58,27 +58,38 @@ def rebase_art(data,row,ram):
     """Use segment-zero physical resources, independent of caller segment six."""
     if ram%16 or not 0x80400000<=ram<ram+len(data)<=0x80800000:
         raise ValueError('Category artwork outside reserved Expansion Pak memory')
-    result=bytearray(data);resources={r['native_offset']:r for r in row['resources']};fixes=[]
+    result=bytearray(data);resources={r['native_offset']:r for r in row['resources']};fixes=[];used=set()
     for model in row['compiled_models']:
         start=model['native_offset'];end=start+model['bytes']
         for at in range(start,end,8):
             op=data[at]
             if op not in (0x01,0xFD):continue
             pointer=u32(data,at+4);resource=resources.get(pointer&0xFFFFFF)
-            # LoadBlock uses a 16-bit transfer for CI4 too. Texture format,
-            # not the transfer width, distinguishes the RGBA palette load.
-            kind='vertices' if op==1 else 'palette' if (u32(data,at)>>21)&7==0 else 'texture'
-            if pointer>>24!=6 or resource is None or resource['kind']!=kind:
+            offset=pointer&0xFFFFFF
+            if resource is None and op==1:
+                matches=[r for r in resources.values() if r['kind']=='vertices' and
+                    r['native_offset']<=offset<r['native_offset']+r['bytes']]
+                resource=matches[0] if len(matches)==1 else None
+            # RGBA can describe either a texture or a palette. The checked
+            # resource inventory distinguishes them; transfer width alone cannot.
+            kind=resource['kind'] if resource else None
+            if (pointer>>24!=6 or resource is None or
+                    (op==1 and kind!='vertices') or
+                    (op==0xFD and (kind not in ('texture','palette') or
+                        kind=='palette' and (u32(data,at)>>21)&7!=0))):
                 raise ValueError('Unbound category vertex/texture/palette pointer')
-            target=(ram&0x1FFFFFFF)+resource['native_offset']
+            if op==1 and (offset%16 or offset+16*((u32(data,at)>>12)&255)>resource['native_offset']+resource['bytes']):
+                raise ValueError('Category vertex slice exceeds its complete resource')
+            target=(ram&0x1FFFFFFF)+offset
             struct.pack_into('>I',result,at+4,target)
             fixes.append(dict(offset=at+4,before=pointer,after=target,resource_kind=kind))
-    if {f['before']&0xFFFFFF for f in fixes}!=set(resources):
+            used.add(resource['native_offset'])
+    if used!=set(resources):
         raise ValueError('Category rebasing misses a complete resource')
     return bytes(result),fixes
 
 
-def append_categories(base, equipment, blob, core, output, artwork, *, query_defines=()):
+def append_categories(base, equipment, blob, core, output, artwork, *, query_defines=(),qualified=False):
     """Bind a complete additive category batch without moving existing art.
 
     Artwork must already have checked resident addresses. Fixed empty category
@@ -108,16 +119,35 @@ def append_categories(base, equipment, blob, core, output, artwork, *, query_def
     used_native={r['native_category'] for r in c['objects']}
     for row in artwork:
         source,native=row['source_category'],row['native_category']
-        if (not 0<source<53 or not NATIVE_COUNT<=native<count or
-                source in used_source or native in used_native or data[c['map_offset']+16+source]):
+        mapped=row.get('source_mapping',True)
+        if (not 0<source<53 or not NATIVE_COUNT<=native<count or native in used_native or
+                (not mapped and not qualified) or mapped and
+                (source in used_source or data[c['map_offset']+16+source])):
             raise ValueError('Additive category overwrites a used or invalid slot')
         used_source.add(source);used_native.add(native)
         for table in c['tables']:
             pos=table['offset']+native*4
             if u32(data,pos):raise ValueError('Category destination contains retained graphics')
             struct.pack_into('>I',data,pos,(row['ram']&0x1FFFFFFF)+row['model_offsets'][table['role']])
-        data[c['map_offset']+16+source]=native
-        c['objects'].append(dict(row,handover_police_installed=True,ground_installed=True,runtime_installed=True))
+        if mapped:data[c['map_offset']+16+source]=native
+        c['objects'].append(dict(row,handover_police_installed=True,
+            ground_installed=row.get('ground_installed',True),runtime_installed=True))
+    if qualified:
+        # Additional native categories may share a donor type (seedling/diary),
+        # or lack a direct ground form (spirit). Keep the original source map;
+        # an explicit native-category bitmap drives only ground descriptors.
+        offset=c['map_offset']+80
+        if c.get('ground_bitmap') or any(data[offset:offset+16]):
+            raise ValueError('Ground-category bitmap replaces retained data')
+        bits=[0,0]
+        for row in c['objects']:
+            if row['ground_installed']:
+                bit=row['native_category']-NATIVE_COUNT
+                bits[bit>>5]|=1<<(bit&31)
+        raw=struct.pack('>4I',0x41464742,count,*bits);data[offset:offset+16]=raw
+        c['ground_bitmap']=dict(ram=e['ram']+offset,offset=offset,bytes=16,sha256=sha256(raw),
+            categories=[r['native_category'] for r in c['objects'] if r['ground_installed']])
+        c['map_bytes']=96
     for table in c['tables']:
         table['sha256']=sha256(data[table['offset']:table['offset']+table['bytes']])
     c.update(code=compiled,map_sha256=sha256(data[c['map_offset']:c['map_offset']+c['map_bytes']]))

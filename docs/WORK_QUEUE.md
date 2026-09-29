@@ -41,17 +41,27 @@ Do not make another per-item installer. Golden net/axe/shovel/rod still need
 their actual remaining consumers distinguished from acquisition; retain all
 installed tool behaviour and do not replay old tests to establish it again.
 
-The complete source-resource batch is prepared at
-`build/v3-carried-batch-prepared-05/`: seven parents, 26 states, fourteen pocket
-icons, seven handover/police models, full orange-paper background/line art,
-official names, and source prices. The general importer handles the batch with
-`--representation carried`; complete category and paper resources are reusable.
-Do not reconvert them. Next resolve additive native IDs and connect the existing
-shared item-reader/profile path to these records, retaining the native paper and
-flower identities. Source category 17's diary override must not catch cedar.
-Continue through all actual item interactions and optional selection as one
-task; prepared resources are not playable imports. The consumer map, resource
-contract, and focused checks are in
+The current proposal is ABI 353 at
+`build/v3-carried-runtime-work-01/readers-connected-12/build-lock.json`.
+The complete `build/v3-carried-batch-prepared-05/` resources are installed without
+reconversion: seven parents, 26 states, fourteen icons, seven handover/police
+models, complete orange-paper artwork, official names, and prices. Additive
+identities, six shared readers, qualified ground categories, and the native
+letter drawing/colour/constructor path are connected. Cedar's category 48 keeps
+the diary-specific source-17 mapping at 44. Ready/selected masks remain zero;
+none of these seven families is newly playable. The importer adds 30,176 resident
+bytes without another startup descriptor and 768 menu-pool bytes.
+
+Next connect the inventory action/hand paths across the batch: paper/spirit
+splitting and merging, letter creation/consumption and collection/catalogue,
+planting/eating, sign designs/placement, and spirit capture/release. Reuse the
+installed event/card/cutlery controls. Bind saved identities/profile requirements
+and independent selections as part of the same task. The native tag, core, and
+letter disassemblies in `build/v3-carried-runtime-work-01/` are already available;
+do not repeat them. All prepared artwork and passing unchanged checks remain
+reusable. Six carried-runtime checks and the seven-profile browser/offline
+comparison pass; native rendering, item interactions, and persistence remain
+unverified. The consumer map, resource contract, and focused checks are in
 [carried-item imports](../specs/V3_CARRIED_ITEMS.md).
 
 All sixteen diary styles have connected importing and selection in ABI 352:

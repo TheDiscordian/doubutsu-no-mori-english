@@ -3,7 +3,10 @@
 .set noat
 .set gp=64
 .text
-#ifdef AF_HOLIDAY_ICON
+#ifdef AF_CARRIED_ICON
+#define ICON_HOOK af_carried_icon_hook
+#define ICON_QUERY af_carried_icon
+#elif defined(AF_HOLIDAY_ICON)
 #define ICON_HOOK af_holiday_icon_hook
 #define ICON_QUERY af_holiday_item_icon
 #elif defined(AF_DIARY_ICON)
@@ -16,7 +19,27 @@
 .globl ICON_HOOK
 .type ICON_HOOK,@function
 ICON_HOOK:
-#ifdef AF_HOLIDAY_ICON
+#ifdef AF_CARRIED_ICON
+    /* Inline reserved identities before touching any caller registers. A zero
+       lookup for a reserved item must not fall into native short tables. */
+    addiu $t9,$s0,-0x2040
+    sltiu $t9,$t9,4
+    bnez $t9,query
+    addiu $t9,$s0,-0x251E
+    beqz $t9,query
+    addiu $t9,$s0,-0x2523
+    sltiu $t9,$t9,14
+    bnez $t9,query
+    addiu $t9,$s0,-0x2807
+    beqz $t9,query
+    addiu $t9,$s0,-0x290A
+    beqz $t9,query
+    addiu $t9,$s0,-0x2D28
+    sltiu $t9,$t9,5
+    beqz $t9,native
+    nop
+query:
+#elif defined(AF_HOLIDAY_ICON)
     addiu $t9,$s0,-0x2523
     sltiu $t9,$t9,14
     beqz $t9,native
@@ -113,7 +136,10 @@ creature:
     jr $t9
     nop
 native:
-#ifdef AF_HOLIDAY_ICON
+#ifdef AF_CARRIED_ICON
+    j af_carried_prior_icon
+    nop
+#elif defined(AF_HOLIDAY_ICON)
     j af_holiday_prior_icon
     nop
 #elif defined(AF_DIARY_ICON)

@@ -85,6 +85,11 @@ def encode(rows):
 
 def native_contract(core,prior):
     normalized=bytearray(core);proof=[]
+    for hook in prior.get('equipment_resources',{}).get('carried_items',{}).get('hooks',[]):
+        if hook['kind'] not in ('display','pocket'):continue
+        at=hook['address']-CODE_RAM
+        if normalized[at:at+8].hex()!=hook['after']:raise ValueError('Changed outer carried conversion wrapper')
+        normalized[at:at+8]=bytes.fromhex(hook['before'])
     for hook in prior.get('equipment_resources',{}).get('holiday_items',{}).get('hooks',[]):
         if hook['kind'] not in ('display','pocket'):continue
         at=hook['address']-CODE_RAM
@@ -252,16 +257,21 @@ def checked(base,report,source):
         owner,origin=(module,MODULE_RAM) if hook['address']>=MODULE_RAM else (core,CODE_RAM)
         target=code['symbols'][hook['symbol']]
         expected=struct.pack('>2I',jump(target),0)
-        diary=report['equipment_resources'].get('diary_items')
-        if diary:
-            outer=next((h for h in diary['hooks'] if h['address']==hook['address']),None)
-            if (outer is None or outer['prior']!=target or outer['before']!=expected.hex() or
-                    outer['symbol']!='af_diary_item_'+hook['kind'] or
-                    outer['target']!=diary['code']['symbols'][outer['symbol']] or
-                    not diary['packet']['ram']<=outer['target']<diary['packet']['ram']+diary['code']['bytes']):
-                raise ValueError('Changed connected diary/creature dispatch chain')
+        previous=target
+        for key,prefix in (('diary_items','af_diary_item_'),('holiday_items','af_holiday_item_'),
+                           ('carried_items','af_carried_')):
+            wrapper=report['equipment_resources'].get(key)
+            if not wrapper:continue
+            outer=next((h for h in wrapper['hooks'] if h['address']==hook['address']),None)
+            origin_ram=wrapper['ram'] if 'ram' in wrapper else wrapper['packet']['ram']
+            if (outer is None or outer['prior']!=previous or outer['before']!=expected.hex() or
+                    outer['symbol']!=prefix+hook['kind'] or
+                    outer['target']!=wrapper['code']['symbols'][outer['symbol']] or
+                    not origin_ram<=outer['target']<origin_ram+wrapper['code']['bytes']):
+                raise ValueError('Changed connected carried/creature dispatch chain: '+key)
             expected=struct.pack('>2I',jump(outer['target']),0)
-            if outer['after']!=expected.hex():raise ValueError('Changed diary hook receipt')
+            if outer['after']!=expected.hex():raise ValueError('Changed outer carried hook receipt')
+            previous=outer['target']
         if (hook['target']!=target or not RAM<=target<RAM+code['bytes'] or
                 owner[hook['address']-origin:hook['address']-origin+8]!=expected):
             raise ValueError('Changed connected native creature hook')

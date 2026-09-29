@@ -89,7 +89,23 @@ def checked(base, report):
         retained=dict(address=POOL_WORD,before=int(patches[POOL_WORD]['before'],16)-initial_extra,
             after=int(patches[POOL_WORD]['after'],16)-initial_extra)
         in_chain=retained in chain
-        actual_bound=bound+delta
+        # Event menus append after the diary/catalogue pool. Validate every
+        # actual allocation record rather than treating the earlier bound as final.
+        tail_word=int(patches[POOL_WORD]['after'],16)+delta
+        equipment=report.get('equipment_resources',{})
+        controls=equipment.get('holiday_items',{}).get('controls')
+        allocations=(controls['metadata'] if controls else [])+equipment.get('carried_items',{}).get('menu_allocations',[])
+        if allocations:
+            parent=files[0x7749C0].extract(base)
+            for row in allocations:
+                patch=row['pool_patch'];growth=row['additional_pool_bytes']
+                if (patch!=dict(address=POOL_WORD,before=tail_word,after=tail_word+growth) or
+                        growth<0 or growth%64 or (tail_word^(tail_word+growth))&0xFFFF8000 or
+                        parent[row['offset']:row['offset']+32].hex()!=row['after']):
+                    raise ValueError('Broken event-menu submenu allocation chain')
+                tail_word=patch['after']
+        later_extra=tail_word-(int(patches[POOL_WORD]['after'],16)+delta)
+        actual_bound=bound+delta+later_extra
         if (set(patches) != {0x800C4AFC, POOL_WORD} or
                 (int(patches[POOL_WORD]['after' if in_chain else 'before'],16)+delta != word) or
                 bound-hooks['previous_pool_bound'] != hooks['additional_pool_bytes'] or
@@ -99,7 +115,7 @@ def checked(base, report):
                 u32(core,0x800C4AFC-CODE_RAM)!=0x3C0E0000|((actual_bound+0x8000)>>16) or
                 u32(core,POOL_WORD-CODE_RAM)!=0x25CE0000|(actual_bound&0xFFFF)):
             raise ValueError('Broken diary submenu allocation binding')
-        word = int(patches[POOL_WORD]['after'], 16)+delta
+        word = tail_word
     if u32(files[CODE_VROM].extract(base), POOL_WORD-CODE_RAM) != word:
         raise ValueError('Model previews lack their complete submenu allocation')
     hook = pool['hook']
