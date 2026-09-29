@@ -85,23 +85,36 @@ def grow_backwards(rom,records,identity,data):
         previous_physical=old['physical'],previous_bytes=old['bytes'],previous_sha256=old['sha256'])
 
 
-def allocate(rom, records, data, name, *, best_fit=False):
+def allocate(rom, records, data, name, *, best_fit=False, minimum_physical=0x100000, excluded_spans=()):
     verify(rom, records)
-    if len(rom) != 0x4000000 or not data or len(data) & 15 or any(r['id'] == name for r in records):
+    if (len(rom) != 0x4000000 or not data or len(data) & 15 or any(r['id'] == name for r in records)
+            or type(minimum_physical) is not int or not 0x100000<=minimum_physical<=len(rom)):
         raise ValueError('Physical resource needs complete aligned data and a new identity')
     # Allocate downward from the cartridge end. Shared owner appends keep their
     # ordinary lower tail and explicitly skip these independent reservations.
     occupied = [(e.pstart, e.pend or e.pstart+e.size) for e in by_vrom(rom).values()
                 if e.pstart != 0xFFFFFFFF]
     occupied += [(r['physical'], r['physical']+r['bytes']) for r in records]
+    for first,last in excluded_spans:
+        if type(first) is not int or type(last) is not int or not 0<=first<last<=len(rom):
+            raise ValueError('Invalid pending cartridge extent')
+        occupied.append((first,last))
+    # Native DMA aliases and a pending expanded owner can overlap. A reverse
+    # gap walk must first merge them, or a nested row exposes its parent's live
+    # bytes as a false gap before the parent is reached.
+    merged=[]
+    for first,last in sorted(occupied):
+        if merged and first<=merged[-1][1]:merged[-1]=(merged[-1][0],max(last,merged[-1][1]))
+        else:merged.append((first,last))
+    occupied=merged
     limit = len(rom); candidates=[];gaps=[]
     for first, last in sorted(occupied, reverse=True)+[(0, 0)]:
-        if limit>max(last,0x100000):gaps.append((max(last,0x100000),limit))
+        if limit>max(last,minimum_physical):gaps.append((max(last,minimum_physical),limit))
         start = (limit-len(data)) & ~15
-        if start >= max(last, 0x100000) and not any(rom[start:limit]):
+        if start >= max(last, minimum_physical) and not any(rom[start:limit]):
             row=dict(id=name, physical=start, bytes=len(data), sha256=sha256(data))
             if not best_fit:return row
-            candidates.append((limit-max(last,0x100000),row))
+            candidates.append((limit-max(last,minimum_physical),row))
         limit = min(limit, first)
     if candidates:return min(candidates,key=lambda pair:pair[0])[1]
     # An unreferenced gap can contain an old nonzero resource at its end while

@@ -571,14 +571,23 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
             row.update(count=count, first_vertex=first_vertex)
             if slot: row['vertex_slot'] = slot
             vertex_cache[slot:slot+count] = range(first_vertex,first_vertex+count)
-        elif op == 0x0A:
+        elif op == 0x0A or static_materials and op in (5,6):
             if not loaded or material is None or fire_effect and not fire_scroll or scrolling and not scroll_call:
                 raise ValueError('Furniture triangles lack vertices or a material')
-            count = (a >> 17 & 127) + 1
-            size = (1 + (max(0, count - 3) + 3) // 4) * 8
-            if at + size > len(raw):
-                raise ValueError('Furniture triangles escape the display list')
-            row['triangles'] = packed(raw[at:at + size], 32 if joint_matrices else loaded)
+            limit=32 if joint_matrices else loaded
+            if op==0x0A:
+                count = (a >> 17 & 127) + 1
+                size = (1 + (max(0, count - 3) + 3) // 4) * 8
+                if at + size > len(raw):
+                    raise ValueError('Furniture triangles escape the display list')
+                row['triangles'] = packed(raw[at:at + size],limit)
+            else:
+                if op==5 and b or op==6 and b&0xFF000000:
+                    raise ValueError('Invalid native model triangle flags')
+                indices=[tuple(word>>shift&255 for shift in (16,8,0)) for word in ((a,) if op==5 else (a,b))]
+                if any(i%2 or i//2>=limit for tri in indices for i in tri):
+                    raise ValueError('Native model triangle escapes loaded vertices')
+                row.update(opcode=0x0A,triangles=[tuple(i//2 for i in tri) for tri in indices]);size=8
             if joint_matrices:
                 if any(vertex_cache[v] is None for t in row['triangles'] for v in t):
                     raise ValueError('Skeleton triangle reads an unloaded vertex-cache slot')
@@ -602,6 +611,12 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
             if static_materials: modes += ((0xFC309C04,0x5FFEF7F8),(0xFC309604,0x5FFEFFF8),
                                      (0xFC30FE04,0x5FFEFDF8),(0xFC3217FF,0xFFFFFE38),
                                      (0xFC30FE04,0x5FFEF3F8),(0xFC327FFF,0xFFFFFC38),
+                                     # Tree effects preserve caller-controlled
+                                     # fade/lighting, including Christmas lights.
+                                     # Emit these compatible combiner words intact.
+                                     (0xFC127E60,0xFF1BF3FB),(0xFC30FFFF,0xFF1BF23B),
+                                     (0xFC121660,0xFFFFFFF8),(0xFC119604,0xFFFFFFF8),
+                                     (0xFC1217FF,0xFFFFFE38),
                                      # Texture RGB multiplied by the caller's
                                      # primitive colour; texture alpha, then
                                      # pass COMBINED through the second cycle.
@@ -623,7 +638,7 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
             modes = ((0xC81049D8 if fire_effect == 1 else 0xC8104A50,) if fire_effect else
                 (0xC8104A50,) if water else ((0xC8112078, 0xC8113078)
                 if accessory else (0xC8113078, 0xC8104DD8)))
-            if static_materials: modes += (0xC8104A50,0xC81049D8,0xC8104E50)
+            if static_materials: modes += (0xC8104A50,0xC81049D8,0xC8104E50,0xC8104B50)
             if frame_blend or scrolling: modes += (0xC8104B50,)
             if a != 0xE200001C or b not in modes:
                 raise ValueError('Unsupported furniture render mode')

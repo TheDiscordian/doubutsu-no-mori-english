@@ -63,10 +63,35 @@ Three focused food checks pass for complete tables, retained native code,
 relocation, source rejection, packet bounds, startup checksums, and patch
 reconstruction. Browser/offline outputs agree for seven current profiles;
 empty selection remains V2-14. These are not native rendering/gameplay or
-hardware results. Remaining leaf/cut effects and independent admission keep
-palm/cedar unavailable. Continue with the retained complete resources at
+hardware results. Independent admission still keeps palm/cedar unavailable.
+Retain the complete resources at
 `build/v3-carried-trees-prepared-02/` and the
 [tree-family contract](../specs/V3_SCENERY.md#palm-and-cedar-dependencies).
+
+The complete tree-effect family is installed through one shared conversion and
+runtime path: fourteen seasonal tables, 63 skeletons, 105 motions, 122 models,
+eleven sprites, and all 42 palette frames. The native tree actor and all four
+player shake/axe callers use these resources. Two additive particle profiles
+preserve the original shrub/snow effects and all nine existing imported effects.
+Source timing runs at two donor ticks per native update; joint workspaces have
+room for the root plus every joint, with double-buffered matrices retained.
+
+The guarded `80780000..807AC000` reservation adds 180,224 resident bytes. A
+32-KiB code/configuration packet loads at startup; 36 complete art pages share
+35 checked physical blocks and load before tree-actor construction. The full
+resource CRC is checked before use. The shared cartridge allocator merges
+overlapping mappings and protects pending owners before finding free gaps.
+No live resource, original artwork, or save field is replaced to make room.
+The native actor/controller allowance increases by 184 bytes; the replaced
+native actor no longer allocates its separate seasonal art heap.
+
+Eleven focused conversion, MIPS linkage, sanitized page-reader, allocation,
+owner/relocation, profile-retention, startup, and patch checks pass. The current
+cartridge agrees across seven browser/offline profiles, including exact empty
+V2-14. The 21-packet bootstrap occupies 656 of its 688 reserved bytes. Native
+effect rendering/gameplay and hardware remain unverified. Continue the same
+carried-item task with sign-board and spirit field consumers, then independent
+admission; do not reconvert the tree artwork or replay unchanged checks.
 
 The shared carried-item importer installs the remaining seven parent families
 and all 26 states together, with readiness and selection still off. Its checked
@@ -107,9 +132,9 @@ rendering or gameplay/save verification. Remaining item-specific field behaviour
 and independent selection remain the same connected task. See
 [the carried-item contract](../specs/V3_CARRIED_ITEMS.md).
 
-The current proposal is ABI 359 at
-`build/v3-carried-runtime-work-01/field-actions-01/build-lock.json`, ROM SHA-256
-`7736c5cf54fb76620554c2c30d75e3dcd19845de26bc3f8991bf07cc073bf129`.
+The current proposal is ABI 360 at
+`build/v3-tree-effects-work-01/installed-10/build-lock.json`, ROM SHA-256
+`e73727b589bb498c6f0da667f9f50b2921a2877509cce5f7e9fcf797a05d4148`.
 It contains 207 independently selectable development imports, including all
 sixteen diary styles, all nine fish, and eight insects. Another 100 furniture
 profiles await acquisition. The main lock and both stable V2-14 deployments

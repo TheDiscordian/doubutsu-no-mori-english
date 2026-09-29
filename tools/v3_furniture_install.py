@@ -640,7 +640,7 @@ def append_resource_plan(base,files,vrom,data,relocatable,*,target_vrom=None):
     return changes,record
 
 
-def relocate_resource_plan(base,files,vrom,data,*,minimum_physical,target_vrom=None,reservations=(),append_only=True,allow_compressed=False):
+def relocate_resource_plan(base,files,vrom,data,*,minimum_physical,target_vrom=None,reservations=(),append_only=True,allow_compressed=False,excluded_spans=()):
     """Keep a whole growing resource in verified zero, unmapped cartridge space.
 
     Logical identity is retained unless the caller declares a new virtual base.
@@ -654,8 +654,10 @@ def relocate_resource_plan(base,files,vrom,data,*,minimum_physical,target_vrom=N
             type(destination) is not int or destination&15 or not 0<=destination<destination+len(data)<=0x100000000 or
             any(e.vstart<destination+len(data) and destination<e.vend for v,e in files.items() if v!=vrom)):
         raise ValueError('Relocation needs a complete non-overlapping resource')
+    if any(type(a) is not int or type(b) is not int or not 0<=a<b<=len(base) for a,b in excluded_spans):
+        raise ValueError('Invalid pending cartridge extent')
     occupied=sorted([(e.pstart,e.pend or e.pstart+e.size) for e in files.values() if e.pstart!=0xFFFFFFFF]+
-        [(r['physical'],r['physical']+r['bytes']) for r in reservations])
+        [(r['physical'],r['physical']+r['bytes']) for r in reservations]+list(excluded_spans))
     cursor=minimum_physical
     for first,last in occupied+[(len(base),len(base))]:
         start=(cursor+15)&~15
@@ -667,6 +669,24 @@ def relocate_resource_plan(base,files,vrom,data,*,minimum_physical,target_vrom=N
             if entry.pend:record['previous_compressed_end']=entry.pend
             return {vrom:data},record
         cursor=max(cursor,last)
+    if not len(data)&15:
+        # A gap may contain retired nonzero bytes before a usable zero span.
+        # Use the same checked allocator as physical packets, retaining the
+        # caller's lower bound and every live/pending reservation.
+        pending=[dict(id=f'owner-reservation-{i}',physical=r['physical'],bytes=r['bytes'],
+            sha256=r['sha256']) for i,r in enumerate(reservations)]
+        staged=bytearray(base)
+        # Pending owners have not been written yet. Their zero storage is still
+        # occupied, so verify its present digest while excluding the full span.
+        for r in pending:r['sha256']=sha256(staged[r['physical']:r['physical']+r['bytes']])
+        allocated=physical.allocate(staged,pending,data,'relocated-owner',best_fit=True,
+            minimum_physical=max(0x100000,minimum_physical),excluded_spans=excluded_spans)
+        record=dict(vrom=vrom,physical=allocated['physical'],previous_physical=entry.pstart,
+            previous_bytes=entry.size,bytes=len(data),previous_sha256=sha256(before),sha256=sha256(data),
+            relocated_blockers=[],relocated=True,retains_old_allocation=True)
+        if destination!=vrom:record['target_vrom']=destination
+        if entry.pend:record['previous_compressed_end']=entry.pend
+        return {vrom:data},record
     raise ValueError('No verified zero cartridge gap for complete resource growth')
 
 
@@ -976,7 +996,11 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         equipment_report,owner_changes=equipment.install(base,prior,blob,core,original,output)
     elif scenery_art is not None:
         import v3_scenery_runtime as equipment
-        if prior['equipment_resources'].get('scenery'):
+        if json.loads((scenery_art/'art.json').read_bytes()).get('format')=='AFV3-TREE-EFFECT-ASSETS-1':
+            from v3_tree_effects_runtime import install as install_tree_effects
+            equipment_report,owner_changes,report_updates,physical_writes=install_tree_effects(
+                base,prior,blob,core,output,scenery_art)
+        elif prior['equipment_resources'].get('scenery'):
             from v3_scenery_refresh import install as refresh_scenery
             equipment_report,owner_changes,report_updates,physical_writes=refresh_scenery(
                 base,prior,blob,core,original,output,scenery_art)
@@ -1382,6 +1406,10 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
                 additional_resident_bytes=equipment_report['scenery']['additional_fixed_resident_bytes']-
                     prior.get('equipment_resources',{}).get('scenery',{}).get('additional_fixed_resident_bytes',0),
                 additional_scene_resident_bytes=equipment_report['scenery']['additional_scene_resident_bytes'])
+            tree_effects=equipment_report['scenery'].get('tree_effects')
+            if tree_effects and not prior['equipment_resources']['scenery'].get('tree_effects'):
+                report['shared_runtime_refresh']['adapters'].append('complete_tree_effects')
+                report['sources'].update(tree_effects['sources'])
         if scenery_gameplay:
             daily=equipment_report['scenery'].get('daily_growth')
             contents=equipment_report['scenery'].get('hidden_contents')

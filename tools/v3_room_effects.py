@@ -352,13 +352,16 @@ def rebind_profiles(effects, blob, symbols,*,code_bounds=(0x804C8000,0x804CC000)
         if len(old)!=64 or (row.get('sha256') and sha256(old)!=row['sha256']) or (
                 not row.get('sha256') and any(old)):
             raise ValueError('Changed complete installed effect profile')
-        if row.get('callback_owner') in ('holiday-sky','holiday-participants'):
+        if row.get('callback_owner') in ('holiday-sky','holiday-participants','tree-effects'):
             # Independent startup-loaded callbacks do not move when the room
             # packet is relinked. Still validate the whole packet, not just skip it.
             from v3_holiday_sky import profile_packet
             bounds={}
             if row['callback_owner']=='holiday-participants':
                 bounds['code_bounds']=effects['participants']['code']['code_bounds']
+            elif row['callback_owner']=='tree-effects':
+                code=effects['tree_effects']['code'];start=code['symbols']['af_tree_ready']
+                bounds['code_bounds']=(start,start+code['bytes'])
             if old!=profile_packet(row['callbacks'],row['policy_hex'],**bounds):
                 raise ValueError('Changed complete resident sky-effect profile')
             continue

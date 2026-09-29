@@ -423,6 +423,16 @@ def publish_bootstrap(equipment,blob,surface,output):
             raise ValueError('Changed complete holiday-state startup packet')
         extra+=tuple(f'AF_HOLIDAY_STATE_{label}=0x{p[key]:X}u' for label,key in
             (('PHYSICAL','physical'),('CRC','crc32'),('BYTES','bytes'),('RAM','ram')))
+    tree_effects=equipment.get('scenery',{}).get('tree_effects')
+    if tree_effects:
+        from v3_tree_effects_runtime import RAM as TREE_RAM,ART_RAM as TREE_END
+        p=tree_effects['packet']
+        if (not tree_effects['installed'] or p['ram']!=TREE_RAM or p['bytes']!=TREE_END-TREE_RAM or
+                p['physical']&15 or p['storage']!='physical-ROM' or
+                not 0x100000<=p['physical']<p['physical']+p['bytes']<=0x4000000):
+            raise ValueError('Changed complete tree-effect startup packet')
+        extra+=tuple(f'AF_TREE_EFFECTS_{label}=0x{p[key]:X}u' for label,key in
+            (('PHYSICAL','physical'),('CRC','crc32'),('BYTES','bytes'),('RAM','ram')))
     boot,compiled=compile_part('surface_bootstrap',output/'goods_surface_bootstrap',defines=(
         'AF_V3_EDITABLE_CHECKSUMS=1',f'AF_SURFACE_ITEMS_VROM=0x{items["vrom"]:X}u',
         f'AF_SURFACE_ITEMS_CRC=0x{items["crc32"]:X}u',f'AF_SURFACE_ITEMS_BYTES=0x{items["bytes"]:X}u',

@@ -7,7 +7,7 @@ extern int af_surface_dma(void *,u32,u32);
 extern u32 af_surface_crc(const void *,u32);
 extern void af_surface_writeback(void *,u32),af_surface_invalidate(void *,u32);
 extern int af_surface_prior_init(void);
-#if defined(AF_INSECT_PHYSICAL) || defined(AF_DIARY_STORAGE_PHYSICAL) || defined(AF_NPC_EXTRA_PHYSICAL)
+#if defined(AF_INSECT_PHYSICAL) || defined(AF_DIARY_STORAGE_PHYSICAL) || defined(AF_NPC_EXTRA_PHYSICAL) || defined(AF_TREE_EFFECTS_PHYSICAL)
 extern int af_surface_pi(u32,void *,u32);
 #endif
 
@@ -67,6 +67,9 @@ static const u32 holiday_sky_crc=AF_HOLIDAY_SKY_CRC;
 #ifdef AF_HOLIDAY_FESTIVALS_PHYSICAL
 static const u32 holiday_festivals_crc=AF_HOLIDAY_FESTIVALS_CRC;
 #endif
+#ifdef AF_TREE_EFFECTS_PHYSICAL
+static const u32 tree_effects_crc=AF_TREE_EFFECTS_CRC;
+#endif
 
 #ifdef __mips__
 #define DEST(name,address) ((void *)(address))
@@ -84,6 +87,7 @@ extern unsigned char af_test_npc_extra[];
 extern unsigned char af_test_holiday_state[];
 extern unsigned char af_test_holiday_sky[];
 extern unsigned char af_test_holiday_festivals[];
+extern unsigned char af_test_tree_effects[];
 #define DEST(name,address) (af_test_##name)
 #define CLEAR(name,address) (&af_test_##name)
 #endif
@@ -148,11 +152,14 @@ static const struct StartupPacket packets[]={
 #ifdef AF_HOLIDAY_FESTIVALS_PHYSICAL
     {DEST(holiday_festivals,AF_HOLIDAY_FESTIVALS_RAM),AF_HOLIDAY_FESTIVALS_PHYSICAL|0x80000000u,AF_HOLIDAY_FESTIVALS_BYTES,&holiday_festivals_crc},
 #endif
+#ifdef AF_TREE_EFFECTS_PHYSICAL
+    {DEST(tree_effects,AF_TREE_EFFECTS_RAM),AF_TREE_EFFECTS_PHYSICAL|0x80000000u,AF_TREE_EFFECTS_BYTES,&tree_effects_crc},
+#endif
 };
 
 int af_v3_surface_init(void) {
     for (const struct StartupPacket *p=packets;p<packets+sizeof(packets)/sizeof(*packets);p++) {
-#if defined(AF_INSECT_PHYSICAL) || defined(AF_DIARY_STORAGE_PHYSICAL) || defined(AF_NPC_EXTRA_PHYSICAL)
+#if defined(AF_INSECT_PHYSICAL) || defined(AF_DIARY_STORAGE_PHYSICAL) || defined(AF_NPC_EXTRA_PHYSICAL) || defined(AF_TREE_EFFECTS_PHYSICAL)
         int status=(p->source&0x80000000u)?
             af_surface_pi(p->source&0x7FFFFFFFu,p->destination,p->bytes):
             af_surface_dma(p->destination,p->source,p->bytes);
@@ -162,13 +169,15 @@ int af_v3_surface_init(void) {
         if (status || af_surface_crc(p->destination,p->bytes)!=*(volatile const u32 *)p->crc) return 0;
         af_surface_writeback(p->destination,p->bytes);
         af_surface_invalidate(p->destination,p->bytes);
+    }
+    /* These transient flags are consumed only by the initialization chain
+     * below. Reset once after all packets pass, not in every transfer. */
 #ifdef AF_ROOM_GOODS_VROM
-        if (p->destination==DEST(goods_code,0x804D9000u)) *CLEAR(goods_magic,0x804DC000u)=0;
+    *CLEAR(goods_magic,0x804DC000u)=0;
 #endif
 #ifdef AF_ROOM_CARRY_VROM
-        if (p->destination==DEST(carry_code,0x804DA000u)) *CLEAR(carry_magic,0x804DC400u)=0;
+    *CLEAR(carry_magic,0x804DC400u)=0;
 #endif
-    }
 #ifdef AF_NPC_EXTRA_PHYSICAL
 #ifdef __mips__
     extern int af_surface_npc_init(void);

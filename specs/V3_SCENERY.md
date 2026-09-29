@@ -106,8 +106,9 @@ artwork, and reuses the allocations for subsequent behaviour changes.
 
 Planting/eating, growth and death, fruit regeneration, cedar regional rules,
 collision/digging, cutting/shaking, hidden contents, and original insect habitats
-have installed consumers. The remaining leaf/cut effects and independent
-selection still prevent enabling the families. Reuse the installed shared
+have installed consumers. Complete leaf/cut effects are installed through the
+shared category below; independent selection still prevents enabling the
+families. Reuse the installed shared
 tree consumers and source tables. Sign and spirit field behaviours remain
 part of the same importing task.
 
@@ -174,6 +175,80 @@ addresses and loads/verifies the relocated packet. No additional startup
 descriptor, actor allocation, artwork copy, saved format, or import choice is
 introduced. The room allocator checks actual interval overlap instead of
 assuming scenery must sit below room code.
+
+### Complete tree effects
+
+`--representation scenery --category tree-effects --assets-only` converts the
+whole donor actor/particle dependency family together. The checked reusable
+bundle is `build/v3-tree-effects-prepared-01/`: fourteen fifteen-entry seasonal
+tables, 63 skeletons, 105 full-channel motions, 122 models, eleven sprites, and
+152 complete resources. The model converter accepts the verified native triangle
+commands and fade/light combiners without dropping vertices, material states,
+or animation channels. The original shrub particle remains native; its separate
+live palette is not replaced with a tree palette.
+
+The same runtime refresh installs this bundle:
+
+```sh
+python3 tools/v3_furniture_install.py --refresh-runtime \
+  --scenery-art build/v3-tree-effects-prepared-01 \
+  --base-lock build/v3-carried-runtime-work-01/field-actions-01/build-lock.json \
+  --output build/NEW-TREE-EFFECT-INSTALL
+```
+
+The native effect-background owner at `008E46A0` retains its original code,
+including the native collision fallback. Its four profile callbacks use the
+complete source-derived actor, and its allocation grows from 3,312 to 3,400
+bytes. Six work/morph vectors accommodate root translation plus all five joints;
+each of the three effect slots retains two six-matrix buffers. Evicting a full
+slot clears old family/impact state. Small-tree particles use the requesting
+family without changing an active slot's animation.
+
+Four calls in the player owner, at `808BA290`, `808BA344`, `808CA610`, and
+`808D188C`, use one selected-family dispatcher. The original dispatcher remains
+intact for native trees. All four changed JAL relocations and the actor's four
+callback relocations are removed; other instructions and relocations remain.
+Palm, cedar, gold, Christmas, and small-tree variants use actual installed rules.
+Complete source motion, leaf emission, collision, fading, and lifetime updates
+run at two donor ticks per native update. Matrix-buffer alternation retains the
+native frame counter. Seasonal palettes preserve all fourteen frames per family.
+
+Additional particle profiles 120/121 bind the donor leaf/sapling callbacks and
+their actual `FFFE/00FF/44480000` death policy. The controller retains all 111
+original and nine prior imported effects, its 80-element active pool, and twelve
+code slots. Its loader checks room, sky, participant, and tree callback ranges
+separately. Subsequent room-code refreshes retain the independent tree profiles.
+
+Code occupies 13,344 bytes inside a 32-KiB startup packet at `80780000`. Its
+checked `AFPG` directory at `80787000` describes 36 full 4-KiB pages at
+`80788000..807AC000`; identical pages share physical storage. Complete compiled
+art and palettes occupy 132,960 bytes; padding and the final `AFTE` guard remain
+inside the reserved packet. Every source span validates before the first page
+write, and the full destination CRC validates before actor construction.
+Construction does not depend on the effect controller having initialized first.
+No startup descriptor points into unloaded code. All 21 ordinary startup packets
+fit the 656-byte bootstrap; the separate seasonal-scene lazy loader is unchanged.
+
+Cartridge allocation merges overlapping DMA mappings, excludes complete pending
+owner extents, and uses only verified zero spans outside live resources. Complete
+compressed owners may relocate without changing their logical identities. The
+cartridge adds 180,224 resident bytes and a conservative 184-byte actor/controller
+allowance; the replaced actor's native seasonal-art heap is no longer allocated.
+Original ROMs, existing build outputs, saved format 16, and import readiness are
+unchanged.
+
+The current integration is ABI 360 at
+`build/v3-tree-effects-work-01/installed-10/`, ROM SHA-256
+`e73727b589bb498c6f0da667f9f50b2921a2877509cce5f7e9fcf797a05d4148`.
+Eleven focused tests in `tests/test_v3_tree_effects.py` cover complete conversion
+and cached reuse, MIPS bindings, joint workspace, paged loading/failures,
+overlapping-allocation rejection, installed pointers, relocation at two bases,
+retained profiles, all startup checksums, and patch reconstruction. Seven current
+browser/offline profiles agree, with exact V2-14 for empty selection. Unchanged
+checks are retained when only build receipts change and ROM/patch hashes agree.
+Native rendering, ordinary tree interactions, and hardware remain unverified.
+Independent carried selection and golden-shovel acquisition remain separate
+unfinished consumers; this installation does not enable incomplete imports.
 
 ## Complete source graph
 

@@ -41,8 +41,8 @@ Do not make another per-item installer. Golden net/axe/shovel/rod still need
 their actual remaining consumers distinguished from acquisition; retain all
 installed tool behaviour and do not replay old tests to establish it again.
 
-The current proposal is ABI 359 at
-`build/v3-carried-runtime-work-01/field-actions-01/build-lock.json`.
+The current proposal is ABI 360 at
+`build/v3-tree-effects-work-01/installed-10/build-lock.json`.
 The complete `build/v3-carried-batch-prepared-05/` resources are installed without
 reconversion: seven parents, 26 states, fourteen icons, seven handover/police
 models, complete orange-paper artwork, official names, and prices. Additive
@@ -85,16 +85,23 @@ Six focused tree checks, three food checks, and seven current browser/offline
 profiles pass. No new native or hardware result is claimed; retain passing
 evidence for unchanged consumers.
 
-The next concrete consumer is the complete tree leaf/cut-effect family and its
-native seasonal callers. Reuse the existing effect/rig/model converters and
-installed tree rules; do not repeat planting, daily growth, or food-table work.
-Map complete donor effect variants and native limits before binding a new index.
-Never substitute ordinary-tree art for a missing imported effect. Independent
-selections remain in this same carried-item task. See
+The complete tree leaf/cut-effect family and its native player callers are
+installed. Fourteen full seasonal tables share 63 skeletons, 105 motions,
+122 models, eleven sprites, and three complete palette banks. The native actor
+has six joint vectors and six matrices per buffer; all four player call sites
+use the selected family while preserving the original dispatcher. Additional
+effects 120/121 retain every original and previously imported profile.
+The 180,224-byte guarded reservation uses one startup code packet and checked
+fragmented art pages; no resource is omitted to fit the cartridge. All 21 startup
+CRCs fit the 656-byte bootstrap. Eleven focused checks and seven current
+browser/offline profiles pass; native rendering/gameplay remains unverified.
+Reuse `build/v3-tree-effects-prepared-01/` and the installed callbacks. Do not
+repeat tree preparation, planting, daily growth, food tables, or passing tests.
+See
 [the tree-family contract](../specs/V3_SCENERY.md#palm-and-cedar-dependencies).
 
-Finish the remaining actual field consumers: tree effects, sign
-designs/placement, and spirit capture/release, including actual native item-type
+The next concrete consumers are sign-board designs/placement and spirit
+capture/release, including actual native item-type
 and menu routes for every family. Shared paper/spirit splitting/merging,
 confirmed letter consumption, and paper collection/catalogue are installed;
 do not rebuild those or the prepared artwork without a relevant defect. Reuse

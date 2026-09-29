@@ -73,10 +73,10 @@ python3 tools/v3_furniture_pipeline.py convert --representation carried \
 
 ## Installed shared runtime
 
-The current development proposal is ABI 359 at
-`build/v3-carried-runtime-work-01/field-actions-01/build-lock.json`.
+The current development proposal is ABI 360 at
+`build/v3-tree-effects-work-01/installed-10/build-lock.json`.
 Its ROM SHA-256 is
-`7736c5cf54fb76620554c2c30d75e3dcd19845de26bc3f8991bf07cc073bf129`.
+`e73727b589bb498c6f0da667f9f50b2921a2877509cce5f7e9fcf797a05d4148`.
 This is an inactive carried integration, not a new playable-import claim.
 
 `v3_furniture_install.py --refresh-runtime --carried-items PATH` installs the
@@ -113,13 +113,14 @@ ground bitmap at `804AA250` preserves source category 17's diary mapping and
 adds cedar independently. The common descriptor constructor uses the complete
 seasonal allocation, including the installed gold/palm/cedar drawing banks.
 Their shared table, four actor index arrays, and local stack are sized together;
-growth, planting, collision, shaking, and cutting consumers are connected;
-leaf/cut effects and independent selection remain unfinished. See
+growth, planting, collision, shaking, cutting, and complete leaf/cut effects
+are connected. Independent selection remains unfinished. See
 [shared seasonal scenery](V3_SCENERY.md#palm-and-cedar-dependencies).
 
 The loaded packet extends the unchanged 64,064-byte festival prefix to 105,904
 bytes and ends at `8077AD90`, adding 41,840 resident bytes. It uses the same
-startup slot: twenty descriptors, 676 of 688 bootstrap bytes. The builder checks
+startup slot. Including the independent tree-effects code packet, the startup
+has 21 descriptors and occupies 656 of 688 bootstrap bytes. The builder checks
 the prior packet, every resource, memory spans, physical placement, and guards.
 The complete original cartridge/save files are never overwritten.
 
@@ -151,9 +152,9 @@ unchanged resources:
 
 1. Connect the remaining actual item interactions: sign-board placement/design
    handling; card stamping/menu behaviour;
-   Harvest cutlery interaction; complete palm/cedar leaf/cut effects;
-   spirit capture/release and field behaviour. Coconut eating/planting and
-   cedar planting/growth use the installed shared consumers below.
+   Harvest cutlery interaction; spirit capture/release and field behaviour.
+   Coconut eating/planting, cedar planting/growth, and complete tree leaf/cut
+   effects use the installed shared consumers.
    Preserve the installed event/card/cutlery paths. Item-specific behaviour is
    part of importing, not an exception to defer automatically.
 2. Verify actual native item-type/menu routes across all families. The shared

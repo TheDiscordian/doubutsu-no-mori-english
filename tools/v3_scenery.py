@@ -107,6 +107,9 @@ def palettes(source, functions, family='gold'):
 
 
 def discover(source, category='gold-tree'):
+    if category=='tree-effects':
+        from v3_tree_effects import discover as effects
+        return effects(source)
     if category not in ('gold-tree','carried-trees'): raise ValueError('Unsupported scenery dependency category')
     carried=category=='carried-trees'
     functions = consumers(source)
@@ -277,6 +280,9 @@ def discover(source, category='gold-tree'):
 
 
 def convert(source, output, selected=(), *, category='gold-tree', reuse_assets=()):
+    if category=='tree-effects':
+        from v3_tree_effects import convert as effects
+        return effects(source,output,selected,reuse_assets=reuse_assets)
     if selected: raise ValueError('Scenery dependencies are whole categories, not selectable items')
     inventory = discover(source, category)
     cache={}
