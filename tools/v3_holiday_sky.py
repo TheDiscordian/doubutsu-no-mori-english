@@ -149,7 +149,7 @@ def artwork(source,bank,directory):
     return bank,code,dict(objects=objects,moon_scroll=evw,scroll_functions=helpers)
 
 
-def native_bindings(base):
+def native_bindings(base, extra_mapping=None):
     text='\n'.join((ROOT/f'upstream/af/linker_scripts/jp/symbol_addrs_{part}.txt').read_text()
         for part in ('code','boot','libultra'))
     symbols={n:int(a,16) for n,a in re.findall(r'^(\w+) = 0x([0-9A-Fa-f]+);',text,re.M)}
@@ -159,6 +159,10 @@ def native_bindings(base):
         '_Matrix_to_Mtx','osWritebackDCache','_texture_z_light_fog_prim_xlu','Lib_SegmentedToVirtual')}
     mapping.update(af_effect_random='fqrand',af_sky_player='get_player_actor_withoutCheck',
         mFI_BkNum2BaseHeight='func_80089114_jp',af_sky_title_demo='mEv_CheckTitleDemo',memcpy='memcpy')
+    if extra_mapping:
+        if any(name in mapping and mapping[name]!=target for name,target in extra_mapping.items()):
+            raise ValueError('Conflicting native effect service binding')
+        mapping.update(extra_mapping)
     core=by_vrom(base)[CODE_VROM].extract(base);link={};receipts=[]
     for name,target in mapping.items():
         lo=symbols[target];hi=next(a for a in functions if a>lo)

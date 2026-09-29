@@ -5,7 +5,12 @@
  * offsets are repurposed. Slot ownership follows the existing town/player
  * save transaction and player-clear hook. */
 enum { AF_HC_BYTES=48,AF_HC_PLAYERS=4,AF_HC_STAMPS=12 };
-#ifdef AF_V3_CARRIED_NPC
+#ifdef AF_V3_GOLDEN_REWARD_STORAGE
+#ifndef AF_V3_CARRIED_NPC
+#error Golden reward storage requires the complete carried NPC format
+#endif
+enum { AF_HC_CARRIED_WIRE=7 };
+#elif defined(AF_V3_CARRIED_NPC)
 #if !defined(AF_V3_PAPER_PACKS) || !defined(AF_V3_CARRIED_QUEST)
 #error Carried NPC storage requires the shared stationery and hunt formats
 #endif
@@ -49,6 +54,19 @@ int af_carried_quest_set_day(unsigned char *,unsigned int);
  * one of header byte 15. The actual field renewal consumes the reward. */
 int af_carried_quest_weeds(const unsigned char *);
 int af_carried_quest_set_weeds(unsigned char *,unsigned int);
+#ifdef AF_V3_GOLDEN_REWARD_STORAGE
+/* Wire seven assigns the three explicit spare bytes in every card row.
+ * Byte five holds a 0..100 celebrated-year code (zero means never), with
+ * rod/net town-first flags in its high bit for rows zero/one. Bytes six/seven
+ * hold the native resident giver, or zero when no gift is pending. Stamp
+ * updates preserve these fields; player deletion preserves town-first flags.
+ * Format twenty owns this interpretation; old readers reject it. */
+typedef struct {unsigned short giver,year;} AFRewardBirthday;
+int af_reward_first_present(const unsigned char *,unsigned int);
+int af_reward_mark_first_present(unsigned char *,unsigned int);
+int af_reward_birthday_get(const unsigned char *,unsigned int,AFRewardBirthday *);
+int af_reward_birthday_set(unsigned char *,unsigned int,const AFRewardBirthday *);
+#endif
 #endif
 #endif
 #endif

@@ -34,6 +34,10 @@ extern int af_v17_expand_cards(const u8 *,u32,u8 *,u32);
 extern int af_v18_compress_cards(u8 *,u32,const u8 *,u32,const u8 *,u32,const u8 *,u32 *,u32);
 extern int af_v18_expand_cards(const u8 *,u32,u8 *,u32);
 #endif
+#ifdef AF_V3_GOLDEN_REWARD_STORAGE
+extern int af_v19_compress_cards(u8 *,u32,const u8 *,u32,const u8 *,u32,const u8 *,u32 *,u32);
+extern int af_v19_expand_cards(const u8 *,u32,u8 *,u32);
+#endif
 void af_carried_prior_record(u32 item) {prior_record=item;}
 int af_carried_prior_owned(const u8 *player,u32 item) {(void)player;prior_owned=item;return 17;}
 int af_carried_event_type(u32 item) {(void)item;return 0;}
@@ -82,9 +86,34 @@ int main(void) {
     CHECK(af_carried_quest_set_weeds(af_v3_card_data(),1));
     CHECK(!af_carried_quest_set_weeds(af_v3_card_data(),2));
 #endif
+#ifdef AF_V3_GOLDEN_REWARD_STORAGE
+    CHECK(!af_reward_first_present(af_v3_card_data(),3));
+    CHECK(af_reward_mark_first_present(af_v3_card_data(),1));
+    CHECK(af_reward_first_present(af_v3_card_data(),3)==1);
+    CHECK(af_reward_mark_first_present(af_v3_card_data(),2));
+    CHECK(af_reward_first_present(af_v3_card_data(),3)==3);
+    CHECK(!af_reward_mark_first_present(af_v3_card_data(),4));
+    for(u32 slot=0;slot<4;slot++) {
+        AFRewardBirthday gift={(u16)(0xE000+slot),(u16)(2026+slot)},got;
+        CHECK(af_reward_birthday_get(af_v3_card_data(),slot,&got) && !got.giver && !got.year);
+        CHECK(af_reward_birthday_set(af_v3_card_data(),slot,&gift));
+    }
+    const AFRewardBirthday invalid[]={{0xE000,0},{0xEFFF,2026},{0xD090,2026},{0,1999},{0,2100}};
+    memcpy(card_before,af_v3_card_data(),AF_HC_BYTES);
+    for(u32 i=0;i<sizeof(invalid)/sizeof(*invalid);i++) {
+        CHECK(!af_reward_birthday_set(af_v3_card_data(),0,invalid+i));
+        CHECK(!memcmp(card_before,af_v3_card_data(),AF_HC_BYTES));
+    }
+#endif
     for(u32 p=0;p<4;p++) {
         AFHolidayCard card={{2026,7,27},p+1};
         CHECK(af_holiday_cards_set(af_v3_card_data(),p,&card));
+#ifdef AF_V3_GOLDEN_REWARD_STORAGE
+        AFRewardBirthday gift;
+        CHECK(af_reward_birthday_get(af_v3_card_data(),p,&gift));
+        CHECK(gift.giver==0xE000+p && gift.year==2026+p);
+        CHECK(af_reward_first_present(af_v3_card_data(),3)==3);
+#endif
         af_test_carried_active=af_console_players+p*0xBD0;
         CHECK(!af_carried_owned(af_test_carried_active,0x2040));
         af_carried_record(0x2040+p);
@@ -123,9 +152,24 @@ int main(void) {
 #ifdef AF_V3_CARRIED_NPC
     CHECK(af_v18_expand_cards(saved,65536,expanded,sizeof(expanded))==AF_CZ_FORMAT);
 #endif
+#ifdef AF_V3_GOLDEN_REWARD_STORAGE
+    CHECK(af_v19_expand_cards(saved,65536,expanded,sizeof(expanded))==AF_CZ_FORMAT);
+#endif
     CHECK(af_v3_save_expand_cards(saved,65536,expanded,sizeof(expanded))==0);
     CHECK(!memcmp(expanded+AF_CZ_RAW+AF_CZ_FISHING_EXTRA,card_before,AF_HC_BYTES));
     CHECK(af_holiday_cards_clear(af_v3_card_data(),2));
+#ifdef AF_V3_GOLDEN_REWARD_STORAGE
+    for(u32 slot=0;slot<4;slot++) {
+        AFRewardBirthday gift;
+        CHECK(af_reward_birthday_get(af_v3_card_data(),slot,&gift));
+        CHECK(gift.giver==(slot==2?0:0xE000+slot) && gift.year==(slot==2?0:2026+slot));
+    }
+    CHECK(af_reward_first_present(af_v3_card_data(),3)==3);
+    u8 clearing[AF_HC_BYTES];memcpy(clearing,af_v3_card_data(),sizeof(clearing));
+    CHECK(af_holiday_cards_clear(clearing,0));
+    CHECK(af_holiday_cards_clear(clearing,1));
+    CHECK(af_reward_first_present(clearing,3)==3);
+#endif
 #ifdef AF_V3_CARRIED_QUEST
     CHECK(af_carried_quest_day(af_v3_card_data())==0x021D);
 #endif
@@ -207,6 +251,9 @@ int main(void) {
     for(u32 version=1;version<AF_HC_CARRIED_WIRE;version++) {
         memcpy(cards,card_before,AF_HC_BYTES);cards[4]=version;cards[7]=version==2?3:0;
         memset(cards+8,0,8);
+#ifdef AF_V3_GOLDEN_REWARD_STORAGE
+        for(u32 slot=0;slot<4;slot++)memset(cards+16+slot*8+5,0,3);
+#endif
 #ifdef AF_V3_CARRIED_QUEST
         if(version==3) {cards[7]=3;cards[8]=127;cards[9]=1;cards[12]=1;}
 #endif
@@ -226,6 +273,10 @@ int main(void) {
         if(version==5)size=af_v18_compress_cards(bank,65536,expanded,65536,
             expanded+65536,6528,expanded+AF_CZ_RAW,af_console_hash,AF_CZ_WORK_BYTES);
 #endif
+#ifdef AF_V3_GOLDEN_REWARD_STORAGE
+        if(version==6)size=af_v19_compress_cards(bank,65536,expanded,65536,
+            expanded+65536,6528,expanded+AF_CZ_RAW,af_console_hash,AF_CZ_WORK_BYTES);
+#endif
         CHECK(size>0 && bank[0xF985]==13+version);
         CHECK(af_v3_save_check(bank,65536,af_save_current,0)>0);
         af_v3_save_commit(bank,af_save_live,AF_SAVE_PAYLOAD);
@@ -237,7 +288,16 @@ int main(void) {
 #ifdef AF_V3_CARRIED_QUEST
         CHECK(!af_carried_quest_day(af_v3_card_data()));
 #endif
+#ifdef AF_V3_GOLDEN_REWARD_STORAGE
+        CHECK(!af_reward_first_present(af_v3_card_data(),3));
+        for(u32 slot=0;slot<4;slot++) {
+            AFRewardBirthday gift;
+            CHECK(!memcmp(af_v3_card_data()+16+slot*8,card_before+16+slot*8,5));
+            CHECK(af_reward_birthday_get(af_v3_card_data(),slot,&gift) && !gift.giver && !gift.year);
+        }
+#else
         CHECK(!memcmp(af_v3_card_data()+16,card_before+16,32));
+#endif
         CHECK(!memcmp(&diary_before,af_v3_diary_data(),AF_DIARY_BYTES));
         CHECK(!memcmp(console_before,af_console_storage.players,6528));
     }

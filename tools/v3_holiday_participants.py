@@ -1131,15 +1131,20 @@ def prepare_reward_events(output,lock):
         extra_headers=headers)
     substitutions=(
         ('#include "holiday_participants.h"','#include "reward_event.h"'),
+        ('Now_Private->birthday_present_npc = EMPTY_NO','af_rw_birthday_clear()'),
         ('Common_Get(time.rtc_time.month)','af_rw_month()'),
         ('Common_Get(time.rtc_time.day)','af_rw_day()'),
         ('Now_Private->birthday.month','af_rw_birthday_month()'),
         ('Now_Private->birthday.day','af_rw_birthday_day()'),
-        ('Now_Private->birthday_present_npc','(*af_rw_birthday_present())'),
+        ('Now_Private->birthday_present_npc','af_rw_birthday_giver()'),
         ('Common_Get(player_no)','af_rw_player()'),
         ('Common_Get(weather)','af_rw_weather()'),
         ('Common_Get(hem_visible)','(*af_rw_hem_visible())'),
-        ('Save_Get(first_present)','(*af_rw_first_present())'),
+        ('Save_Get(first_present) |= present_type','af_rw_first_present_mark(present_type)'),
+        ('Save_Get(first_present)','af_rw_first_present_get()'),
+        ('mSC_trophy_get','af_rw_trophy_get'),
+        ('mSC_trophy_set','af_rw_trophy_set'),
+        ('mPr_SetFreePossessionItem','af_rw_insert'),
         ('Now_Private','af_rw_private()'),
         ('play->block_table.block_x','af_rw_block_x(play)'),
         ('play->block_table.block_z','af_rw_block_z(play)'),
@@ -1174,6 +1179,36 @@ def prepare_reward_events(output,lock):
     generated['present_npc.c']=generated['present_npc.c'].replace(before,after)
     adaptations.append(dict(source=before,native=after,count=1,donor_function=entry,
         reason='Wait for handover completion instead of inserting the same gift again'))
+    for stem,old,new in (
+        ('present_npc',
+         '        aNPC_DEMO_GIVE_ITEM(item, aHOI_REQUEST_PUTAWAY, present);\n'
+         '        af_rw_insert(af_rw_private(), item, item_cond);',
+         '        if (!af_rw_insert(af_rw_private(), item, item_cond)) return;\n'
+         '        aNPC_DEMO_GIVE_ITEM(item, aHOI_REQUEST_PUTAWAY, present);'),
+        ('npc_hem',
+         '    mDemo_Set_msg_num(MSG_HEM_GOLD_AXE1);\n'
+         '    af_rw_insert(af_rw_private(), ITM_GOLDEN_AXE, mPr_ITEM_COND_NORMAL);',
+         '    if (!af_rw_insert(af_rw_private(), ITM_GOLDEN_AXE, mPr_ITEM_COND_NORMAL)) return;\n'
+         '    ((NPC_HEM_ACTOR*)actor)->reward_ready = TRUE;\n'
+         '    mDemo_Set_msg_num(MSG_HEM_GOLD_AXE1);')):
+        if generated[stem+'.c'].count(old)!=1:raise ValueError('Changed gift transaction boundary: '+stem)
+        generated[stem+'.c']=generated[stem+'.c'].replace(old,new)
+        adaptations.append(dict(source=old,native=new,count=1,
+            reason='A refused native insertion cannot advance handover or mark a trophy'))
+    for old,new in (
+        ('    u8 trans_flag;\n','    u8 trans_flag;\n    u8 reward_ready;\n'),
+        ('        actor->actor.schedule.schedule_proc = aNHM_schedule_proc;',
+         '        actor->reward_ready = FALSE;\n'
+         '        actor->actor.schedule.schedule_proc = aNHM_schedule_proc;'),
+        ('    hem->talk_timer--;',
+         '    if (!hem->reward_ready) {\n'
+         '        aNHM_set_force_talk_info_talk_request(actorx);\n'
+         '        if (!hem->reward_ready) return FALSE;\n'
+         '    }\n    hem->talk_timer--;')):
+        if generated['npc_hem.c'].count(old)!=1:raise ValueError('Changed Shrine gift acknowledgement')
+        generated['npc_hem.c']=generated['npc_hem.c'].replace(old,new)
+        adaptations.append(dict(source=old,native=new,count=1,
+            reason='Retry refused Shrine insertion before enabling the timed handover'))
     for stem in family:
         if re.search(r'\b(?:Common_Get|Common_GetPointer|Save_Get|Save_GetPointer|Save_Set)\(',generated[stem+'.c']):
             raise ValueError('Unmapped native state in complete reward owner: '+stem)
@@ -1192,14 +1227,37 @@ def prepare_reward_events(output,lock):
         '-Wno-unused-variable','-Wno-unused-but-set-variable','-Wno-parentheses',
         '-I/source/overlays/v3','-I/out']
     run('gcc',*flags,*(stem+'.c' for stem in family))
-    run('ld','-EB','-r',*(stem+'.o' for stem in family),'-o','reward-events.o')
+    state_flags=tuple('-D'+n+'=1' for n in ('AF_V3_CARRIED_PROFILE','AF_V3_CARRIED_QUEST',
+        'AF_V3_PAPER_PACKS','AF_V3_CARRIED_NPC','AF_V3_GOLDEN_REWARD_STORAGE'))
+    run('gcc',*flags,*state_flags,'/source/overlays/v3/reward_state_native.c')
+    run('ld','-EB','-r',*(stem+'.o' for stem in family),'reward_state_native.o','-o','reward-events.o')
+    from v3_asset_loader import compile_part
+    previous=prior['equipment_resources']['carried_items']['quest']['npc']
+    retained=previous['storage']
+    storage_bytes,storage=compile_part('holiday_item_storage',out/'storage',
+        primary_source='overlays/v3/console_storage.c',
+        extra_sources=('overlays/v3/save_compressed.c','overlays/v3/holiday_cards.c',
+                       'overlays/v3/carried_collection.c'),
+        defines=tuple(f[2:] for f in retained['flags'] if f.startswith('-D'))+
+            ('AF_V3_GOLDEN_REWARD_STORAGE=1',),link_symbols=retained['link_symbols'])
+    if len(storage_bytes)>previous['storage_end']-previous['storage_ram']:
+        raise ValueError('Complete reward storage exceeds the retained reservation')
     report.update(format='AFV3-REWARD-EVENTS-1',base_abi=prior['runtime_abi'],base_sha256=sha256(base),
         platform_adaptations=adaptations,generated_sha256={n:sha256(t.encode()) for n,t in generated.items()},
         unbound_services=run('nm','--undefined-only','reward-events.o').strip().splitlines(),
         object=dict(sha256=sha256((out/'reward-events.o').read_bytes()),compiler=IMAGE,
             flags=flags,size=run('size','reward-events.o'),linked=False),
+        native_state=dict(source='overlays/v3/reward_state_native.c',flags=state_flags,
+            object_sha256=sha256((out/'reward_state_native.o').read_bytes()),
+            storage_wire=7,save_format=20,installed=False,storage=storage,
+            retained_storage_bounds=[previous['storage_ram'],previous['storage_end']],
+            unchanged_state_bytes=48,unchanged_scratch_bytes=120352,
+            pending=['relocate connected storage and redirect existing public entries',
+                     'bind reward native state providers to connected storage']),
         sources={p:sha256((ROOT/p).read_bytes()) for p in ('tools/v3_holiday_participants.py',
-            'overlays/v3/holiday_participants.h','overlays/v3/carried_event.h','overlays/v3/reward_event.h')})
+            'overlays/v3/holiday_participants.h','overlays/v3/carried_event.h','overlays/v3/reward_event.h',
+            'overlays/v3/reward_state_native.c','overlays/v3/holiday_cards.h','overlays/v3/holiday_cards.c',
+            'overlays/v3/save_compressed.c','overlays/v3/console_storage.c')})
     write_new(out/'prepared.json',(json.dumps(report,indent=2)+'\n').encode())
     return report
 
@@ -2285,11 +2343,14 @@ if __name__=='__main__':
     p.add_argument('--festivals',action='store_true',help='Prepare all remaining ordinary festival participant families together')
     p.add_argument('--carried-event',action='store_true',help='Prepare the complete carried-creature quest owner')
     p.add_argument('--rewards',action='store_true',help='Prepare the shared gift director, gift NPC, and Shrine spirit')
+    p.add_argument('--reward-effects',action='store_true',help='Prepare all Shrine appearance effects through shared converters')
     p.add_argument('--connect-carried-event',type=Path,help='Connect a checked complete carried actor to shared NPC services')
     args=p.parse_args()
-    if sum((args.exercise,args.festivals,args.carried_event,args.rewards,bool(args.connect_carried_event)))>1:p.error('Select one complete participant family')
+    if sum((args.exercise,args.festivals,args.carried_event,args.rewards,args.reward_effects,bool(args.connect_carried_event)))>1:p.error('Select one complete participant family')
     try:
+        from v3_reward_effects import prepare as prepare_reward_effects
         result=(connect_carried_event(args.output,args.build_lock,args.connect_carried_event) if args.connect_carried_event else
+            prepare_reward_effects(args.output,args.build_lock,args.reuse) if args.reward_effects else
             prepare_reward_events(args.output,args.build_lock) if args.rewards else
             prepare_carried_event(args.output,args.build_lock) if args.carried_event else
             prepare_festivals(args.output,args.build_lock) if args.festivals else

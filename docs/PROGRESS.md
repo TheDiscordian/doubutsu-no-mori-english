@@ -59,8 +59,12 @@ The golden-tool reward family has complete MIPS source preparation for the gift
 director, gift NPC, and Shrine spirit. Focused host checks preserve one gift per
 handover for both net and rod. Farley's complete model/texture/voice also passes
 the shared artwork conversion checks, including the source fade material.
-These resources are not installed or selectable; native providers, entrance
-conditions, effects, official messages, and combined gameplay/save checks remain.
+The complete Shrine sphere/sparkle/ground-light effects, artwork, and audio are
+prepared. Real native gift/state providers and proposed format-20/wire-7 storage
+pass focused four-player transaction/migration checks, with source handovers
+blocked on refused insertion. These resources are not installed or selectable;
+registry/entrance conditions, storage redirects, effect/scene cleanup, official
+messages, and combined gameplay/save checks remain.
 The [golden-tool checkpoint](checkpoints/V3_GOLDEN_TOOLS.md#next-connected-consumers)
 records the mapped next connections. The current ROM and deployed patchers do
 not change for this preparation.

@@ -49,8 +49,10 @@ gold-tree leaf/cut effects rather than doing another asset conversion pass.
 The complete three-owner reward source family is prepared and MIPS-compiled,
 with single-insertion handover checks passing for net and rod. Farley's complete
 model, texture, and voice conversion passes through the shared NPC importer.
-Neither preparation is installed; continue the native providers, Shrine
-appearance effects, and house-exit/Shrine entry points mapped in the
+The complete Shrine appearance effects, graphics, and audio are prepared, and
+real gift/state providers plus explicit format-20/wire-7 storage pass focused
+host save/migration checks. They are not installed. Continue the connected
+registry, entry points, storage redirects, and scene cleanup mapped in the
 [golden-tool checkpoint](checkpoints/V3_GOLDEN_TOOLS.md#next-connected-consumers).
 Do not reconvert those prepared resources or replay their unchanged tests.
 The carried-object/stationery batch has connected independent selections. Its donor identity worksheet

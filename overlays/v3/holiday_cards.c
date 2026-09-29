@@ -24,6 +24,9 @@ int af_holiday_cards_valid(const u8 *data) {
         && data[4]!=5
 #ifdef AF_V3_CARRIED_NPC
         && data[4]!=6
+#ifdef AF_V3_GOLDEN_REWARD_STORAGE
+        && data[4]!=7
+#endif
 #endif
 #endif
 #endif
@@ -53,7 +56,7 @@ int af_holiday_cards_valid(const u8 *data) {
 #ifdef AF_V3_PAPER_PACKS
         if(data[4]==5 && data[15]>1)return 0;
 #ifdef AF_V3_CARRIED_NPC
-        if(data[4]==6 && (data[15]>3 || ((data[15]&2) && !(data[8]&64))))return 0;
+        if(data[4]>=6 && (data[15]>3 || ((data[15]&2) && !(data[8]&64))))return 0;
 #endif
 #endif
 #endif
@@ -61,7 +64,15 @@ int af_holiday_cards_valid(const u8 *data) {
 #endif
     for(unsigned int i=0;i<4;i++) {
         const u8 *p=data+16+i*8;AFHolidayCard c=decode(p);
-        if(!valid(&c) || p[5] || p[6] || p[7])return 0;
+        if(!valid(&c))return 0;
+#ifdef AF_V3_GOLDEN_REWARD_STORAGE
+        if(data[4]==7) {
+            unsigned year=p[5]&127u,giver=(unsigned)p[6]*256+p[7];
+            if(year>100 || (i>=2 && (p[5]&128u)) ||
+               (giver && (!year || giver>>12!=14 || giver==0xEFFF)))return 0;
+        } else
+#endif
+        if(p[5] || p[6] || p[7])return 0;
     }
     return 1;
 }
@@ -78,13 +89,24 @@ int af_holiday_cards_set(u8 *data,unsigned int slot,const AFHolidayCard *card) {
     if(slot>=4 || !card || !valid(card) || !af_holiday_cards_valid(data))return 0;
     u8 *p=data+16+slot*8;AFHolidayCard c=*card;
     p[0]=c.last_date.year>>8;p[1]=c.last_date.year;p[2]=c.last_date.month;
-    p[3]=c.last_date.day;p[4]=c.days;p[5]=p[6]=p[7]=0;return 1;
+    p[3]=c.last_date.day;p[4]=c.days;
+#ifdef AF_V3_GOLDEN_REWARD_STORAGE
+    if(data[4]!=7)
+#endif
+    p[5]=p[6]=p[7]=0;
+    return 1;
 }
 int af_holiday_cards_clear(u8 *data,unsigned int slot) {
     const AFHolidayCard empty={{0,0,0},0};
     if(!af_holiday_cards_set(data,slot,&empty))return 0;
 #ifdef AF_V3_CARRIED_PROFILE
     if(data[4]>=3)data[9+slot]=0;
+#ifdef AF_V3_GOLDEN_REWARD_STORAGE
+    if(data[4]==7) {
+        u8 *p=data+16+slot*8;
+        p[5]&=128u;p[6]=p[7]=0;
+    }
+#endif
 #endif
     return 1;
 }
@@ -143,13 +165,42 @@ int af_carried_quest_set_day(u8 *data,unsigned int day) {
 }
 #ifdef AF_V3_CARRIED_NPC
 int af_carried_quest_weeds(const u8 *data) {
-    if(!af_holiday_cards_valid(data) || data[4]!=6 || !(data[8]&64))return -1;
+    if(!af_holiday_cards_valid(data) || data[4]<6 || !(data[8]&64))return -1;
     return (data[15]>>1)&1;
 }
 int af_carried_quest_set_weeds(u8 *data,unsigned int pending) {
     if(pending>1 || af_carried_quest_weeds(data)<0)return 0;
     data[15]=(u8)((data[15]&1u)|(pending<<1));return 1;
 }
+#ifdef AF_V3_GOLDEN_REWARD_STORAGE
+int af_reward_first_present(const u8 *data,unsigned int mask) {
+    if(mask>3 || !af_holiday_cards_valid(data) || data[4]!=7)return -1;
+    unsigned flags=(data[21]>>7)|((unsigned)(data[29]>>7)<<1);
+    return flags&mask;
+}
+int af_reward_mark_first_present(u8 *data,unsigned int mask) {
+    if(af_reward_first_present(data,mask)<0)return 0;
+    if(mask&1)data[21]|=128u;
+    if(mask&2)data[29]|=128u;
+    return 1;
+}
+int af_reward_birthday_get(const u8 *data,unsigned int slot,AFRewardBirthday *out) {
+    if(slot>=4 || !out || !af_holiday_cards_valid(data) || data[4]!=7)return 0;
+    const u8 *p=data+16+slot*8;
+    out->giver=(unsigned)p[6]*256+p[7];
+    out->year=(p[5]&127u)?1999u+(p[5]&127u):0;
+    return 1;
+}
+int af_reward_birthday_set(u8 *data,unsigned int slot,const AFRewardBirthday *gift) {
+    if(!gift || slot>=4 || !af_holiday_cards_valid(data) || data[4]!=7 ||
+       (gift->year && (gift->year<2000 || gift->year>2099)) ||
+       (gift->giver && (!gift->year || gift->giver>>12!=14 || gift->giver==0xEFFF)))return 0;
+    u8 *p=data+16+slot*8;
+    p[5]=(u8)((p[5]&128u)|(gift->year?gift->year-1999u:0));
+    p[6]=gift->giver>>8;p[7]=gift->giver;
+    return 1;
+}
+#endif
 #endif
 #endif
 #endif

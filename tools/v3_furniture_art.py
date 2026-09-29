@@ -57,6 +57,13 @@ TRANSLUCENT_COMBINERS = {
         'COMBINED','0','SHADE','0','0','0','0','COMBINED'),
     (0xFCFF9DFF,0xFFFDFE38): ('0','0','0','PRIMITIVE','TEXEL0','0','PRIM_LOD_FRAC','0',
         '0','0','0','COMBINED','0','0','0','COMBINED'),
+    # Shrine sphere: interpolated primitive/environment RGB and texture alpha,
+    # followed by the caller's LOD-fraction alpha. Ground light retains the
+    # source alpha subtraction and environment multiplier on its single tile.
+    (0xFC3097FF,0x5F1AFE3F): ('PRIMITIVE','ENVIRONMENT','TEXEL0','ENVIRONMENT',
+        'TEXEL0','0','PRIMITIVE','0','0','0','0','COMBINED','COMBINED','0','PRIM_LOD_FRAC','0'),
+    (0xFCFF9BFF,0xFFFDBE38): ('0','0','0','PRIMITIVE','TEXEL0','PRIMITIVE','ENVIRONMENT','0',
+        '0','0','0','COMBINED','0','0','0','COMBINED'),
 }
 
 # Two independently animated intensity textures interpolate their alpha using
