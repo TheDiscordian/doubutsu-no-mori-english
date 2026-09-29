@@ -23,19 +23,19 @@ lock or publish experimental V3.
 
 ## Active development
 
-The current development proposal is ABI 370 / format 19 at
-`build/v3-golden-tools-selection-03/build-lock.json`. The golden shovel is
+The current development proposal is ABI 371 / format 20 at
+`build/v3-golden-rewards-runtime-07/build-lock.json`. The golden shovel is
 independently selectable, connecting its existing shining-hole planting,
 gold-tree growth/drop, pickup/exchange, celebration, and saved-profile path.
 The held catalogue includes the shovel and reserves space for all four golden
 tools without recompiling models or changing existing catalogue code. The
-development catalogue has 214 entries; net, rod, and axe remain unavailable until
-their mayor/Shrine conversations are connected. Six browser/offline profiles
+development catalogue has 214 entries; net, rod, and axe remain unavailable pending
+the connected selection step and native checks. Six retained browser/offline profiles
 agree, complete retained-resource checks pass, and current format-19 transaction
 checks retain the shovel and celebration flags for all four players. Missing
 shovel selection rejects the save before publication/writes. Native I/O is
 doubled; a complete ordinary acquisition run and hardware play are not verified.
-Silent current boot verifies the selected profile and no faults. Shovel-profile
+Retained ABI-370 boot verifies the selected profile and no faults. Shovel-profile
 saves require that option on reload, including when moving to another format-19
 build. See [the golden-tool checkpoint](checkpoints/V3_GOLDEN_TOOLS.md).
 
@@ -60,7 +60,7 @@ director, gift NPC, and Shrine spirit. Focused host checks preserve one gift per
 handover for both net and rod. Farley's complete model/texture/voice also passes
 the shared artwork conversion checks, including the source fade material.
 The complete Shrine sphere/sparkle/ground-light effects, artwork, and audio are
-prepared. Real native gift/state providers and proposed format-20/wire-7 storage
+installed. Real native gift/state providers and installed format-20/wire-7 storage
 pass focused four-player transaction/migration checks, with source handovers
 blocked on refused insertion. The preparation retains every existing registry
 owner, adds distinct birthday/Farley/mayor roles, and uses verified native
@@ -68,13 +68,15 @@ friendship fields for the whole-source birthday giver choice. Separate Shrine
 state preserves its native assessment and resolves original callbacks through
 the loaded actor descriptor. The saved perfect-town streak follows the whole
 source date rules in a checked 64-byte record and relocated storage packet.
-Ten current focused checks pass; unchanged artwork/effect evidence is retained.
-These resources are not installed or selectable;
-house/scene entrance conditions, storage redirects, effect/scene cleanup, official
-messages, and combined gameplay/save checks remain.
+Eighteen focused host checks and two installed-cartridge checks pass; unchanged
+artwork/effect evidence is retained. House/scene entrance conditions, save
+redirects, effect/scene cleanup, all 46 official messages, and Farley's additional
+speech setting are installed. The complete tree startup packet and one artwork
+page move around checked sound-archive growth, preserving loaded resources.
+Independent net/axe/rod selection and combined native gameplay/save checks remain.
 The [golden-tool checkpoint](checkpoints/V3_GOLDEN_TOOLS.md#next-connected-consumers)
-records the mapped next connections. The current ROM and deployed patchers do
-not change for this preparation.
+records the mapped next connections. Format-19 and earlier builds cannot read
+format-20 saves; preserve separate test saves. Both deployed patchers remain V2-14.
 
 The shared stationery implementation has a global `paper-quantities` choice:
 N64 single sheets or GameCube four-sheet packs, across all original/imported

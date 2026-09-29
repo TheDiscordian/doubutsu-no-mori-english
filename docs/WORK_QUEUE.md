@@ -46,13 +46,14 @@ celebration timing; use the installed participant and reward services. Do not
 substitute shop stock or letters. The current inventory has no other unresolved
 V3 item identity; the sign board belongs to V4 Able Sisters. Retain installed
 gold-tree leaf/cut effects rather than doing another asset conversion pass.
-The complete three-owner reward source family is prepared and MIPS-compiled,
+The complete three-owner reward source family is installed and finally linked,
 with single-insertion handover checks passing for net and rod. Farley's complete
 model, texture, and voice conversion passes through the shared NPC importer.
 The complete Shrine appearance effects, graphics, and audio are prepared, and
 real gift/state providers plus explicit format-20/wire-7 storage pass focused
-host save/migration checks. They are not installed. Continue the connected
-registry, entry points, storage redirects, and scene cleanup mapped in the
+host save/migration checks. Registry, house/scene and Shrine entry points,
+storage redirects, teardown, official dialogue, and Farley's speech setting are
+installed. Continue independent tool selections and combined native checks in the
 [golden-tool checkpoint](checkpoints/V3_GOLDEN_TOOLS.md#next-connected-consumers).
 Do not reconvert those prepared resources or replay their unchanged tests.
 The carried-object/stationery batch has connected independent selections. Its donor identity worksheet
@@ -79,16 +80,17 @@ The policy and fixed pack identities are installed and selectable in development
 Do not mutate quantities during ordinary transfers or load. See the
 [stationery choice contract](../specs/V3_CARRIED_ITEMS.md#global-stationery-quantity-choice).
 
-The current proposal is ABI 370 at
-`build/v3-golden-tools-selection-03/build-lock.json`, with 214 selectable development
+The current proposal is ABI 371 / format 20 at
+`build/v3-golden-rewards-runtime-07/build-lock.json`, with 214 selectable development
 entries. The golden shovel is independently selectable; the other three tools
-remain unavailable pending their conversations. Shared held ordering has a
+remain unavailable pending connected selection and native checks. Shared held ordering has a
 64-entry capacity, preserving all existing catalogue code and other categories.
 Six current composition profiles agree. Current format-19 transaction checks
 retain the shovel and celebration flags for all four players and reject removal
 of its actual selection bit before publication/writes. Native I/O is doubled;
-ordinary acquisition and hardware play remain unverified. The current silent
-boot passes. See [the golden-tool checkpoint](checkpoints/V3_GOLDEN_TOOLS.md).
+ordinary acquisition and hardware play remain unverified. ABI-370 startup evidence
+is retained; the new reward cartridge's native harness is not started. Format-19
+and earlier readers cannot load format-20 saves. See [the golden-tool checkpoint](checkpoints/V3_GOLDEN_TOOLS.md).
 
 The six carried parent choices remain independently selectable. Their masks are `7D`; the sign-board
 bit stays off. Card/cutlery selections activate their existing holiday providers

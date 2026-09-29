@@ -14,6 +14,7 @@ AFRewardShrine *af_rw_shrine(void);
 void *af_rw_private(void);
 int af_rw_month(void),af_rw_day(void),af_rw_player(void),af_rw_weather(void);
 int af_rw_birthday_month(void),af_rw_birthday_day(void);
+int af_rw_calendar_clean(void);
 u16 *af_rw_birthday_present(void);
 u8 *af_rw_first_present(void);
 u16 af_rw_birthday_giver(void);
@@ -76,4 +77,8 @@ void af_rw_shrine_talk(ACTOR *,GAME *),af_rw_shrine_step(GAME *);
 int af_rw_shrine_active(GAME *);
 __UINTPTR_TYPE__ af_rw_shrine_entry(const ACTOR *,u32);
 void af_rw_continue_message(void *,int);
+void af_rw_house_door(void *,int,ACTOR *);
+void af_rw_actors_init(GAME *,void *,void *),af_rw_actors_move(GAME *,void *);
+void af_rw_actors_destroy(void *,GAME *);
+__UINTPTR_TYPE__ af_rw_house_entry(const ACTOR *);
 #endif

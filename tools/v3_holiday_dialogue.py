@@ -213,6 +213,11 @@ def install(base,prior,blob,core,output):
 
 def finish(image,base,prior,output,equipment,*,physical_resources=None):
     from v3_event_text import install as install_text
+    rewards=equipment.get('carried_items',{}).get('quest',{}).get('rewards')
+    if rewards and not prior['equipment_resources'].get('carried_items',{}).get('quest',{}).get('rewards'):
+        if physical_resources is None:raise ValueError('Reward text needs the current complete physical plan')
+        return install_text(image,base,output,rewards['text'],relocate=True,physical_resources=physical_resources,
+            reserved_end=prior['resource_capacity']['reserved_physical_end'])
     carried=equipment.get('carried_items',{}).get('quest',{}).get('npc')
     if carried and not prior['equipment_resources'].get('carried_items',{}).get('quest',{}).get('npc'):
         if physical_resources is None:raise ValueError('Carried NPC text needs the current complete physical plan')

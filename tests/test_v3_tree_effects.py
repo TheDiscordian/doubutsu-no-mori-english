@@ -24,6 +24,26 @@ PREPARED=BUILD/'tree-effects'
 
 
 class PageTests(unittest.TestCase):
+    def test_owner_gap_fallback_reserves_growing_dma_alias_and_partial_extent(self):
+        import v3_physical_resources as physical
+        from v3_furniture_install import relocate_resource_plan
+        rom=bytearray(b'X'*0x4000000);rom[0x108080:0x1080A0]=bytes(32)
+        owner=SimpleNamespace(pstart=0x100000,pend=0,size=32,vstart=0x1000,vend=0x1020,
+            extract=lambda image:bytes(image[0x100000:0x100020]))
+        files={0x1000:owner};data=b'R'*32
+        # One planned extent overlaps its own installed DMA prefix, and one
+        # complete DMA image has a length that is not a packet multiple.
+        reservations=[dict(physical=0x100000,bytes=40,sha256='pending'),
+                      dict(physical=0x108080,bytes=8,sha256='pending')]
+        with patch.object(physical,'by_vrom',return_value=files):
+            changes,row=relocate_resource_plan(rom,files,0x1000,data,
+                minimum_physical=0x100000,reservations=reservations[:1],append_only=False)
+            self.assertEqual(row['physical'],0x108080)
+            self.assertEqual(changes,{0x1000:data})
+            with self.assertRaisesRegex(ValueError,'space'):
+                relocate_resource_plan(rom,files,0x1000,data,minimum_physical=0x100000,
+                    reservations=reservations,append_only=False)
+
     def test_physical_and_virtual_dma_routing(self):
         from tests.test_v3_equipment_runtime import HostTests
         HostTests.sanitized(self,'v3_resource_dma_test.c')

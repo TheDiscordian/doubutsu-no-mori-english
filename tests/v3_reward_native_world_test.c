@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "../overlays/v3/reward_world_native.c"
+const volatile u8 af_rw_native_cheated=1;
 static _Alignas(16) u8 game_data[0x2300],private_data[0xBD0];
 static NPC_ACTOR npc;
 static ACTOR player,tool_actor;
@@ -38,6 +39,7 @@ void af_rw_effect_request(int id,xyz_t p,int prio,s16 angle,void *g,u16 item,s16
 }
 void af_rw_effect_kill(int id,u16 item) {assert(item==0xD0CF);kills++;last_effect=id;}
 int main(void) {
+    assert(!af_rw_calendar_clean());
     assert(sizeof(__UINTPTR_TYPE__)>=4 && (__UINTPTR_TYPE__)save<=0xFFFFFFFFu);
     clip_data[0xC8/4]=(u32)(__UINTPTR_TYPE__)save;
     game_data[0xE4]=2;game_data[0xE5]=3;

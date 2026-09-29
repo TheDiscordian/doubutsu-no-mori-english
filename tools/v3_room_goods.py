@@ -457,6 +457,18 @@ def publish_bootstrap(equipment,blob,surface,output):
                     npc['save_format']!=19 or npc['wire_version']!=6 or npc['end']>0x807DA800):
                 raise ValueError('Changed complete carried NPC startup extension')
             expected=npc['end']-p['ram']
+        rewards=quest.get('rewards') if quest else None
+        if rewards:
+            from v3_reward_bindings import LAYOUT
+            reward_end=LAYOUT['pools']['ram']+LAYOUT['pools']['bytes']
+            if (not npc or not rewards['installed'] or rewards['packet']!=p or
+                    rewards['ram']!=LAYOUT['state']['ram'] or rewards['end']!=reward_end or
+                    rewards['save_format']!=20 or rewards['wire_version']!=7 or
+                    rewards['storage']['symbols']['af_v3_card_state']!=LAYOUT['state']['ram'] or
+                    rewards['storage']['symbols']['AF_HI_STORAGE_RAM']!=LAYOUT['storage']['ram'] or
+                    equipment['diaries']['memory']['scratch']['bytes']!=120368):
+                raise ValueError('Changed complete golden reward startup extension')
+            expected=reward_end-p['ram']
         if (not carried_quest['installed'] or p['ram']!=0x807AC000 or p['bytes']!=expected or
                 p['physical']&15 or p['storage']!='physical-ROM' or
                 not 0x100000<=p['physical']<p['physical']+p['bytes']<=0x4000000):

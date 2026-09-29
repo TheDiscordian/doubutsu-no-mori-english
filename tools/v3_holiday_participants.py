@@ -887,7 +887,7 @@ def bindings(base,prior,*,extra=None):
 
 
 def dialogue(base,prior,generated,*,roots=None,map_symbol='af_hp_message',exercise_controls=False,
-        festival_controls=False,carried_controls=False):
+        festival_controls=False,carried_controls=False,reward_controls=False):
     """Convert every personality/role, including the full choice/branch closure."""
     from gc_adapter import remove_redundant_article_suppression,expand_random_message_ranges
     from gc_text import decode_gc
@@ -917,6 +917,11 @@ def dialogue(base,prior,generated,*,roots=None,map_symbol='af_hp_message',exerci
         # capitalization command, and the countdown's genuine timed ending.
         # Preserve the source timer and NPC order; do not turn it into A-to-close.
         allowed.update((29,37,38,39,40,48,88,117));terminals.add(88)
+    if reward_controls:
+        # Golden gifts use native town-name insertion (0x2F). Farley's whole
+        # speech brackets its cursor pacing with the installed English runtime's
+        # 0x72/0x73 commands; preserve both and every pause inside that span.
+        allowed.update((47,114,115))
     # Adapt the actual N64 location, not the idiom "Well, ...". Exact source
     # substrings keep deliberate breaks and every command in place.
     shrine={
@@ -968,7 +973,8 @@ def dialogue(base,prior,generated,*,roots=None,map_symbol='af_hp_message',exerci
         if (not tokens or tokens[-1].kind!='cmd' or tokens[-1].data[1] not in terminals or
                 sum(t.kind=='cmd' and t.data[1] in terminals for t in tokens)!=1 or unknown or
                 any(t.kind!='cmd' and (t.kind!='text' or t.data[0] not in
-                    LATIN|{0xCD}|({0x90} if festival_controls else set())) for t in tokens) or
+                    LATIN|{0xCD}|({0x90} if festival_controls else set())|
+                    ({0x2F} if reward_controls else set())) for t in tokens) or
                 expanded_bound(data,info)>1024):
             raise ValueError(f'Unreviewed participant text/control/buffer: {n:04X}, operations {unknown}')
         ready[n]=data
@@ -1303,6 +1309,30 @@ def prepare_reward_events(output,lock):
         birthday_functions.append(dict(**source.function(matches[0])[1],
             source_sha256=sha256(original.encode()),adapted_sha256=sha256(body.encode())))
     generated['reward_birthday_source.c']='\n\n'.join(birthday_pieces)+'\n'
+    # Extract the additional speech policy from the whole pinned donor engine.
+    # Its sequence matches native setting 2; its per-voice volume/pitch do not.
+    path=DONOR/'src/static/jaudio_NES/game/game64.c_inc';voice_source=path.read_bytes()
+    if sha256(voice_source)!='65dbe25f27ecbc9b2c75c6696426948cee4bfbb14ba69acc31b0cd1b28d727ea':
+        raise ValueError('Changed whole donor speech engine')
+    voice_body=function(voice_source.decode().replace('\nvoid Na_VoiceSe(',
+        '\nextern void Na_VoiceSe('),'Na_VoiceSe')
+    policy=re.search(r'case 9: \{\s*(sou_voice_se\[0\]._08.*?)\n\s*\} break;',voice_body,re.S)
+    values=re.findall(r'sou_voice_se\[([01])\]._(08|14) = ([0-9.]+)f;',policy[1]) if policy else []
+    if values!=[('0','08','0.7'),('1','08','0.7'),('0','14','0.65'),('1','14','0.65')]:
+        raise ValueError('Changed complete additional speech parameters')
+    spec_body=function(voice_source.decode(),'Na_SpecChange')
+    if not re.search(r'case 2:.*?case 9: \{\s*sou_now_voice_seq = 1;\s*'
+            r'NA_COMMAND_AUDIO_START_SEQ\(VOICE_GROUP, 243, 0\);',spec_body,re.S):
+        raise ValueError('Changed additional speech sequence policy')
+    generated['reward_voice_parameters.c']=('#include "reward_event.h"\n'
+        'const f32 af_rw_voice_parameters[2]={'+values[0][2]+'f,'+values[2][2]+'f};\n')
+    from v3_villager_audio import read_audio_donor
+    dol,_=read_audio_donor(ROOT/'local/gamecube/Animal Crossing (USA, Canada).ciso')
+    speech=dict(source_sha256=sha256(voice_source),parameters=[float(values[0][2]),float(values[2][2])],
+        native_voice_stride=0x24,native_volume_offset=8,native_pitch_offset=0x14,
+        donor_functions=[dict(name=name,address=at,bytes=n,sha256=sha256(dol.read(at,n)))
+            for name,at,n in (('Na_VoiceSe',0x80011F20,0xEE4),('Na_SpecChange',0x80013F90,0xCC))],
+        source_setting=9,native_sequence_setting=2,native_hooks_installed=False)
     from v3_item_destinations import destinations
     birthday_item=destinations(base,prior,[0x1DB0],lock=lock)
     if len(birthday_item)!=1 or birthday_item[0]['item']!=0x1D30:
@@ -1319,8 +1349,12 @@ def prepare_reward_events(output,lock):
         report['references'],CONSTANT_HEADERS+headers)
     generated['constants.h']+='\n#undef SP_NPC_HEM\n#define SP_NPC_HEM 0xD0CF\n'
     generated['constants.h']+='\n#define AF_RW_BIRTHDAY_ITEM 0x1D30\n'
+    roots={0x319F+6*looks+i for looks in range(6) for i in range(3)}
+    roots.update((0x31C3,0x31C7,0x31C5,0x31C9,0x2C50,0x2C51))
+    gift_dialogue=dialogue(base,prior,generated,roots=roots,map_symbol='af_rw_message',
+        carried_controls=True,reward_controls=True)
     out.mkdir(parents=True)
-    for name,body in generated.items():write_new(out/name,body.encode())
+    for name,body in generated.items():write_new(out/name,body if isinstance(body,bytes) else body.encode())
     docker=['docker','run','--rm','--network','none','--user',f'{os.getuid()}:{os.getgid()}',
         '-v',f'{ROOT}:/source:ro','-v',f'{out}:/out','-w','/out','--entrypoint']
     def run(tool,*args):
@@ -1332,6 +1366,8 @@ def prepare_reward_events(output,lock):
         '-Wno-unused-variable','-Wno-unused-but-set-variable','-Wno-parentheses',
         '-I/source/overlays/v3','-I/out']
     run('gcc',*flags,*(stem+'.c' for stem in family),'reward_field_source.c','reward_birthday_source.c')
+    run('gcc',*flags,'dialogue.c','/source/overlays/v3/reward_dialogue_native.c',
+        'reward_voice_parameters.c','/source/overlays/v3/reward_voice_native.c')
     state_flags=tuple('-D'+n+'=1' for n in ('AF_V3_CARRIED_PROFILE','AF_V3_CARRIED_QUEST',
         'AF_V3_PAPER_PACKS','AF_V3_CARRIED_NPC','AF_V3_GOLDEN_REWARD_STORAGE'))
     run('gcc',*flags,*state_flags,'/source/overlays/v3/reward_state_native.c',
@@ -1342,6 +1378,7 @@ def prepare_reward_events(output,lock):
     run('gcc',*flags,*state_flags,*registry_flags,'reward_registry.c',
         '/source/overlays/v3/reward_masks_native.c','/source/overlays/v3/reward_shrine_native.c',
         '/source/overlays/v3/reward_shrine_owner.c',
+        '/source/overlays/v3/reward_scene_native.c','/source/overlays/v3/reward_house_owner.c',
         '/source/overlays/v3/holiday_participants_registry.c',
         '/source/overlays/v3/holiday_participants_services.c',
         '/source/overlays/v3/carried_npc.c','/source/overlays/v3/holiday_participants_spawn.S')
@@ -1350,6 +1387,9 @@ def prepare_reward_events(output,lock):
         'reward_birthday_native.o','reward_birthday_source.o',
         'reward_registry.o','holiday_participants_registry.o','holiday_participants_services.o',
         'carried_npc.o','holiday_participants_spawn.o','reward_masks_native.o','reward_shrine_native.o','reward_shrine_owner.o',
+        'reward_scene_native.o','reward_house_owner.o',
+        'dialogue.o','reward_dialogue_native.o',
+        'reward_voice_parameters.o','reward_voice_native.o',
         '-o','reward-unbound.o')
     from v3_asset_loader import compile_part
     previous=prior['equipment_resources']['carried_items']['quest']['npc']
@@ -1378,7 +1418,8 @@ def prepare_reward_events(output,lock):
             native_memory_offset=0x10,native_friendship_offset=0x28,
             native_memory_stride=0xB0,native_animal_stride=0x528,
             acquisition_installed=False),
-        platform_adaptations=adaptations,generated_sha256={n:sha256(t.encode()) for n,t in generated.items()},
+        dialogue=gift_dialogue,speech=speech,platform_adaptations=adaptations,
+        generated_sha256={n:sha256(t if isinstance(t,bytes) else t.encode()) for n,t in generated.items()},
         unbound_services=run('nm','--undefined-only','reward-events.o').strip().splitlines(),
         object=dict(sha256=sha256((out/'reward-events.o').read_bytes()),compiler=IMAGE,
             flags=flags,size=run('size','reward-events.o'),linked=False),
@@ -1402,6 +1443,9 @@ def prepare_reward_events(output,lock):
             'overlays/v3/reward_birthday_native.c','overlays/v3/reward_birthday_native.h',
             'overlays/v3/reward_shrine_native.c',
             'overlays/v3/reward_shrine_owner.c',
+            'overlays/v3/reward_scene_native.c','overlays/v3/reward_house_owner.c',
+            'overlays/v3/reward_dialogue_native.c',
+            'overlays/v3/reward_voice_native.c',
             'overlays/v3/holiday_cards.h','overlays/v3/holiday_cards.c',
             'overlays/v3/save_compressed.c','overlays/v3/console_storage.c')})
     write_new(out/'prepared.json',(json.dumps(report,indent=2)+'\n').encode())

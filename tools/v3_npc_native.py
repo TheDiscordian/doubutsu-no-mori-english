@@ -62,10 +62,12 @@ def identities(base,members):
     credits={r['id']:r for r in catalogue['entries']}
     data=bytearray(struct.pack('>4I',0x41464E49,1,len(members),16));rows=[]
     for identity,r in sorted(members.items()):
-        found=[(sex,index,sound) for name,sex,index,sound in struct.iter_unpack('>HHII',raw) if name==r['donor_name']]
+        source_name=r.get('identity_source',r['donor_name'])
+        found=[(sex,index,sound) for name,sex,index,sound in struct.iter_unpack('>HHII',raw) if name==source_name]
         if len(found)!=1:raise ValueError('Missing or ambiguous donor character identity')
         sex,index,sound=found[0];original=strings[index];text=decode_gc(original,decoder);encoded=encode(text,info)
-        if not 1<=len(encoded)<=8 or any(c not in LATIN for c in encoded) or sex>2 or sound>4:
+        if (not 1<=len(encoded)<=8 or any(c not in LATIN for c in encoded) or sex>2 or
+                sound>4 and not (identity=='GAFE01-r0/npc/hem' and sound==9)):
             raise ValueError('Invalid complete special-character name or speech identity')
         encoded=encoded.ljust(8,b' ');credit=credits.get(identity+'/name',{}).get('locales',{}).get('en',{})
         if (credit.get('credit')!='official' or credit.get('encoded_sha256')!=sha256(encoded) or
@@ -74,7 +76,8 @@ def identities(base,members):
             raise ValueError('Missing official character-name provenance: '+identity)
         data.extend(struct.pack('>HHI8s',r['name'],sex,sound,encoded))
         rows.append(dict(identity=identity,name=r['name'],donor_name=r['donor_name'],sex=sex,
-            sound_spec=sound,string_id=index,text=text,source_sha256=sha256(original),encoded_sha256=sha256(encoded)))
+            identity_source=source_name,sound_spec=sound,string_id=index,text=text,
+            source_sha256=sha256(original),encoded_sha256=sha256(encoded)))
     if len(data)>144:raise ValueError('Special-character identity directory exceeds its reservation')
     return bytes(data),rows
 

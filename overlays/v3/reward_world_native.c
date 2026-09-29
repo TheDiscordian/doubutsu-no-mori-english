@@ -5,6 +5,7 @@
 #include "reward_event.h"
 #include "constants.h"
 extern const s16 af_rw_native_weather;
+extern const volatile u8 af_rw_native_cheated;
 extern const u32 *volatile af_hp_native_npc_clip;
 extern const AFHPTools *volatile af_hp_native_tools;
 extern int af_holiday_observers_clip(void);
@@ -17,6 +18,7 @@ extern void af_rw_effect_request(int,xyz_t,int,s16,void *,u16,s16,s16);
 extern void af_rw_effect_kill(int,u16);
 
 mDemo_Clip_c *af_rw_demo_clip;
+int af_rw_calendar_clean(void) {return af_rw_native_cheated==0;}
 int af_rw_block_x(GAME_PLAY *g) {return g?((const s8 *)g)[0xE4]:-1;}
 int af_rw_block_z(GAME_PLAY *g) {return g?((const s8 *)g)[0xE5]:-1;}
 u8 *af_rw_menu_refuse(GAME_PLAY *g) {return g?(u8 *)g+0x1D9E:0;}

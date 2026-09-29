@@ -160,7 +160,7 @@ def install_banks(base,prior,blob,art_directory):
         directory=art_directory,model_bank=448,texture_bank=449)])
 
 
-def append_banks(base,prior,blob,entries):
+def append_banks(base,prior,blob,entries,*,excluded_spans=()):
     """Append a complete batch using its fixed, independently reserved banks.
 
     The existing helper contains later voice/audio edits. Retain those bytes;
@@ -205,7 +205,8 @@ def append_banks(base,prior,blob,entries):
         if any(e['vrom']<vrom+len(data) and vrom<e['vrom']+e['bytes'] for e in old_banks):
             raise ValueError('New NPC bank overlaps a retained additional bank')
         suffix='GAFE01-r0' if bank<450 else identity.replace('/','-')
-        row=physical.allocate(staging,physical_rows,data,'npc-'+kind+'-'+suffix,best_fit=True);physical_rows.append(row)
+        row=physical.allocate(staging,physical_rows,data,'npc-'+kind+'-'+suffix,best_fit=True,
+            excluded_spans=excluded_spans);physical_rows.append(row)
         staging[row['physical']:row['physical']+len(data)]=data;writes.append((row,data))
         struct.pack_into('>2I',blob,0x1000+bank*8,vrom,vrom+len(data))
         records.append(dict(row,bank=bank,kind=kind,vrom=vrom,native_buffer_bytes=limit,identity=identity))

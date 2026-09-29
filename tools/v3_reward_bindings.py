@@ -40,6 +40,10 @@ def layout(prior):
         scratch=dict(ram=scratch,retained_bytes=120352,bytes=120368))
 
 NATIVE = {
+    'af_rw_native_spec_change':0x800FA92C,
+    'af_rw_native_voice_emit':0x800F91FC,
+    'af_rw_native_message': 0x8007B5C0,
+    'af_rw_native_continue': 0x8009DBA4,
     'Actor_info_fgName_search': 0x800584E0,
     'mNpc_GetNpcLooks': 0x800AD084,
     'af_rw_native_wait': 0x800B2414,
@@ -57,6 +61,10 @@ NATIVE = {
     'af_rw_native_highest_friendship': 0x800A74A0,
     'af_rw_native_compare_player': 0x800B7A00,
     'af_rw_native_free_animal': 0x800A69C8,
+    'mEv_CheckRealArbeit': 0x8007D5D4,
+    'af_rw_native_actors_init': 0x80056E88,
+    'af_rw_native_actors_move': 0x80057304,
+    'af_rw_native_actors_destroy': 0x80057274,
 }
 
 
@@ -64,6 +72,16 @@ def resolve(base, prior, storage):
     """Reuse current complete service providers and pin each native body."""
     from v3_holiday_participants import bindings
     links, native = bindings(base, prior, extra=NATIVE)
+    from aflib import CODE_RAM,CODE_VROM
+    core=by_vrom(base)[CODE_VROM].extract(base)
+    # The native complete speech bodies identify the shared spec and the two
+    # 36-byte alternating voice records; these are not donor memory aliases.
+    observed={0x800FA9FC:0x0C03BBA9,0x800FAA00:0xAC2B3840,
+        0x800F9340:0x3C038011,0x800F9348:0x24633CF4,
+        0x800F934C:0xE4600008,0x800F9350:0xE460002C,
+        0x800F9354:0xE46C0014,0x800F935C:0xE46C0038}
+    if any(struct.unpack_from('>I',core,at-CODE_RAM)[0]!=word for at,word in observed.items()):
+        raise ValueError('Changed native speech record layout')
     # These complete native Shrine bodies remain loaded by its original
     # descriptor. Wrapper hooks change its callers/table, not its body entries.
     directory=(ROOT/'upstream/af/linker_scripts/jp/symbol_addrs_overlays.txt').read_text()
@@ -78,6 +96,22 @@ def resolve(base, prior, storage):
         if len(raw)!=end-start:raise ValueError('Truncated native Shrine callback')
         native.append(dict(name=name,start=start,end=end,vrom=0x8D8EC0,ram=0x80A0A1F0,
             sha256=sha256(raw),binding='actor-owned loaded descriptor, never an absolute VMA call'))
+    # Observe the complete native clock-editor and reset callbacks. The former
+    # compares year/month/day/hour/minute and sets Save's real cheated byte;
+    # the latter clears that same byte after its normal acknowledgement.
+    for name,vrom,ram,start,checks in (
+            ('native_clock_edited_flag',0x78AE30,0x808831A0,0x80883308,
+                {0x80883390:0x3C018013,0x808833D8:0xA0386734}),
+            ('native_reset_clock_flag_clear',0x96C3A0,0x80AAC230,0x80AAC76C,
+                {0x80AAC7B0:0x3C018013,0x80AAC7B4:0xA0206734})):
+        if start not in starts:raise ValueError('Incomplete native clock callback')
+        end=next(a for a in starts if a>start)
+        data=by_vrom(base)[vrom].extract(base)
+        if any(struct.unpack_from('>I',data,at-ram)[0]!=word for at,word in checks.items()):
+            raise ValueError('Changed native saved clock-edit flag')
+        native.append(dict(name=name,start=start,end=end,vrom=vrom,ram=ram,
+            sha256=sha256(data[start-ram:end-ram]),binding='observation only',
+            observed_saved_byte=0x80136734))
     equipment = prior['equipment_resources']
     carried = equipment['carried_items']['quest']['npc']
     # Registry-owned exports are rebuilt together. Binding any of them to the
@@ -96,6 +130,9 @@ def resolve(base, prior, storage):
     links.update(af_rw_native_weather=0x8013740C,
         af_hp_native_animals=0x80130DB8, af_hp_native_tools=0x80136F40,
         af_hp_native_shrine=0x80136F70)
+    links.update(af_rw_native_scene=0x80126EB4,af_rw_native_demo_profile=0x80137656,
+        af_rw_native_cheated=0x80136734,af_rw_native_voice_spec=0x80113840,
+        af_rw_native_voices=0x80113CF4)
     # Wisp's translated message resolver cannot translate gift/Shrine messages.
     for name in owned | {'mDemo_Set_msg_num'}:
         links.pop(name, None)

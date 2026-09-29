@@ -74,7 +74,11 @@ def install(base,prior,blob,core,output,directory):
     from v3_room_rig_runtime import packet_layout
     from v3_sound_programs import install_audio_resources,permanent_budget
     import v3_physical_resources as physical
-    directory=directory.resolve();raw=(directory/'prepared.json').read_bytes();prepared=json.loads(raw)
+    directory=directory.resolve()
+    if (directory/'connected.json').is_file():
+        from v3_reward_install import install as install_rewards
+        return install_rewards(base,prior,blob,core,output,directory)
+    raw=(directory/'prepared.json').read_bytes();prepared=json.loads(raw)
     if not directory.is_relative_to(ROOT/'build') or prepared['base_sha256']!=sha256(base):
         raise ValueError('Participants need their checked current preparation')
     for path,digest in prepared['sources'].items():

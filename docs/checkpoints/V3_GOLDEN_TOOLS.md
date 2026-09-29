@@ -1,11 +1,11 @@
 # Golden-tool selection checkpoint
 
-Current development: ABI 370, saved format 19, on `v3/optional-imports`.
+Current development: ABI 371, saved format 20, on `v3/optional-imports`.
 Neither stable V2-14 patcher deployment changes.
 
-- Lock: `build/v3-golden-tools-selection-03/build-lock.json`.
-- ROM SHA-256: `7be05ea348e1244edbf6f10f9f086b32e77b5e491483cd0c8d38963bc017db82`.
-- UPS SHA-256: `7201884a46e51f097252561f04274e79a7e35babf744dcc1dd0196a44ac0ab03`.
+- Lock: `build/v3-golden-rewards-runtime-07/build-lock.json`.
+- ROM SHA-256: `324651ba1ab1e84564e6b4c32570de62c491ab7677896905ce0fd23fe989119b`.
+- UPS SHA-256: `6290c325ab666c1fee057779d2bea8a11d859526cfbbc26fc4e41e5bf1a88f4c`.
 
 ## Connected path
 
@@ -27,7 +27,8 @@ pool slack. No menu code or other category moves. Physical placement uses the
 shared checked owner-growth planner. The pending net, axe, and rod are excluded
 from both selection and completion counts.
 
-No English wording changes, new donor assets, or new saved fields are introduced.
+This selection path retains the existing shovel resources. The connected reward
+batch below adds official dialogue, Farley, appearance effects, and saved fields.
 
 ## Evidence
 
@@ -50,26 +51,29 @@ No English wording changes, new donor assets, or new saved fields are introduced
 
 ## Save compatibility
 
-Format remains 19. Saves written with the shovel selected require that selection
-on reload; earlier builds without its admission reject them. Existing compatible
-profiles migrate forward by adding the option. Four-sheet saves still require
-four-sheet mode, and carried-family requirements remain. Use separate test saves;
-ordinary native save/restart and original-hardware compatibility are not claimed.
+The current format is 20/wire 7. Compatible format-19 and earlier saves migrate
+forward. Format-19 and earlier builds, including ABI 370 and V2, cannot read
+format-20 saves. Shovel-profile saves require the shovel selection, and four-sheet
+saves require pack mode; carried-family requirements remain. Preserve separate
+test saves and their matching ROMs. Ordinary native save/restart and
+original-hardware compatibility are not claimed.
 
-## Remaining in this batch
+## Installed reward batch
 
 ### Prepared reward owners and character artwork
 
 `tools/v3_holiday_participants.py --rewards` prepares all 70 donor functions
 across `present_demo`, `present_npc`, and `npc_hem` through the existing complete
 participant converter. The current output is
-`build/v3-reward-events-prepared-17/`: the relocatable MIPS object includes the
+`build/v3-reward-events-prepared-22/`: the relocatable MIPS object includes the
 native world, gift/state, resident-mask, registry, perfect-town, birthday-giver,
-and Shrine adapters. It has 19,926 bytes of text, 164 bytes of data,
-and 2,592 bytes of BSS. Its SHA-256 is
-`02d92ad82977edc81b73626917e79893659bcb537168f77ebb32a5e053e2df79`.
-Eight dialogue/effect/scene services remain explicit undefined symbols;
-these actors are not finally linked or installed. The native NPC prefix is reused;
+and Shrine adapters, scene/house admission, official dialogue, and speech setting.
+It has 22,918 bytes of text, 168 bytes of data, and 2,620 bytes of BSS. Its SHA-256 is
+`178a16d4817942a597bc5e09b470e39ac88ccd23996fce1a6413c89a2c454f7c`.
+`build/v3-rewards-connected-04/` finally links this complete object with the
+complete appearance-effect object. All services are bound. The actor packet is
+25,728 bytes at `807CD040`, and the effect packet is 5,248 bytes at `807D4040`.
+Both are installed in the current cartridge. The native NPC prefix is reused;
 donor world/private structures do not alias native memory.
 
 The gift NPC enters the existing end waiter after inserting its gift. The
@@ -99,7 +103,12 @@ texture colour multiplied by primitive colour, with texture alpha multiplied
 by environment alpha. The source fade is retained, not replaced with an opaque
 material. The existing complete-art checker verifies every texture pixel,
 triangle orientation, shared display-list block, native draw record, and voice.
-No character identity, actor, or artwork bank is installed by this preparation.
+The installed native character registry has eight rows. Farley owns banks
+458/459, and gift Tortimer reuses complete banks 448/449. Both descriptors use the
+new shared callbacks and distinct owned pools. Farley's official name and
+speech setting 9 are installed; the native male sequence retains the source
+volume 0.7 and pitch 0.65 on both alternating voices. Other speech settings
+delegate to the unchanged complete native functions.
 
 ### Complete appearance effects and explicit reward storage
 
@@ -114,13 +123,14 @@ helper's allocation. The ground-light and sphere colour formats extend the
 shared material converter, not an item-specific substitute. The effect object
 has 5,200 bytes of text, four bytes of data, and 22 bytes of BSS; SHA-256
 `b68b80b46e96aa66d3afad1e72c4813d6bf4cac1b0df0c01341ad424de4163fd`.
-Scene teardown must call `af_rw_effect_reset` before the native light list is
-freed; this hook is not installed yet.
+The installed scene teardown calls `af_rw_effect_reset` before the native light
+list is freed. The full effect directory has fourteen additions, preserving all
+eleven existing profiles and their separate callback bounds.
 
 The reward preparation includes a 14,320-byte complete save adapter under
 `storage/`, within a checked new 16-KiB reservation at `807C9040`. It cannot
 overwrite the retained adapter at `807BB000`; existing public entries must
-redirect to the new complete adapter. Proposed format 20/wire 7
+redirect to the new complete adapter. Installed format 20/wire 7
 explicitly assigns the three spare bytes of each existing 48-byte card record.
 They store each player's birthday giver and celebrated year, plus independent
 town-first rod/net flags. Stamp updates preserve the new fields; player clearing
@@ -132,7 +142,8 @@ resets on backward clocks or non-perfect assessment, and clamps at fifteen days.
 The checked scratch reservation grows from 120,352 to 120,368 bytes; native
 Private layout does not grow. Old formats read exactly the legacy 48 bytes,
 then initialise the new tail. Format-19 and earlier saves migrate forward; old readers reject format-20
-saves. Format 20 is prepared, not the format of the current ABI-370 ROM.
+saves. All public save/card/carried callers redirect to the new adapter; the old
+48-byte record and storage allocation remain intact.
 
 Real gift providers use selected-species completion, selected tool readiness,
 the native inventory insertion, and the existing trophy flags 28–31. A refused
@@ -144,18 +155,20 @@ functions use native memories at `animal+10`, stride `B0`, and friendship byte
 The source Donkey Kong gift `1DB0` maps through the shared identity resolver to
 its native counterpart `1D30`.
 
-The shared registry preparation retains all 23 installed owners and adds four
+The installed shared registry retains all 23 existing owners and adds four
 reward roles, with 19 resident masks and 28 live slots. Birthday residents and
 gift Tortimer use distinct native construction paths; no false calendar records
 are allocated for gifts. The native Shrine keeps its complete assessment,
 apologies, model, and drawing. Separate appearance state and its own clip do not
 overwrite the native eight-byte clip. Native callbacks resolve through the
-actor's loaded descriptor, not fixed overlay VMAs. Eligibility and deferred
-Farley spawning are prepared, but their native hooks and final scene admission
-are not installed.
+actor's loaded descriptor, not fixed overlay VMAs. Eligibility, deferred Farley
+spawning, house-exit admission, single-demo exclusion, real birthday calendar and
+giver/year state, and axe return are installed. The full native overlay images
+are compared at two relocated addresses; only twelve checked caller/table words
+change, and only four replaced local fixups are removed.
 
-Ten current focused reward/storage/registry/mask/Shrine/birthday/loader checks
-pass in `tests.test_v3_reward_events`. Retained artwork, effect, audio, and
+Eighteen focused reward/storage/registry/mask/Shrine/birthday/voice and physical
+allocator checks pass, plus two complete installed-cartridge checks. Retained artwork, effect, audio, and
 format-19 evidence is not replayed. The checks
 cover complete source callbacks, every converted model texture/vertex/triangle,
 reused artwork, source audio receipts, visibility/light lifetimes, drawing
@@ -164,43 +177,26 @@ format-20 save transaction, all prior wire migrations, and rejection before
 writes. The birthday fixture retains the source's unused local with the same
 warning exclusion as the MIPS compile. Native services are doubled; native conversations and save/restart are
 not claimed. The unchanged Farley artwork evidence remains valid.
-ABI 370, its format-19 cartridge, and both V2 deployments remain unchanged.
-These preparations do not make the other tools selectable.
+The current cartridge contains all 46 official gift/Shrine messages and their
+complete branch closure. It retains all source pauses, orders, and the musical
+note glyph; no replacement wording is authored. Provenance remains in the single
+catalogue. The expanding sound archive moves one complete tree artwork page and
+the complete tree startup packet. Only the checked page-address word changes in
+that packet; loaded code, artwork, and RAM identities remain unchanged. The
+shared writer validates the exact old/new resources and revised page directory.
+The development build has 214 choices. Net, axe, and rod remain excluded pending
+the connected selection step. Both V2 deployments remain unchanged.
 
 ### Next connected consumers
 
-Connect the full donor collection-completion gift director and NPC for both net
-and rod, and the perfect-town Shrine/hem conversation for the axe. Reuse the
-installed native NPC services, item handovers, reward requests, trophy state,
-celebration callbacks, artwork, and official text. Preserve actual donor event
-priorities and native town geometry. Expand selections through the same shared
-held importer when these providers work. Keep the golden shovel's native
-acquisition/rendering check open without repeating passed component checks.
-
-The mapped remaining connections are:
-
-- House-exit demo selection in donor `ac_npc_p_sel2_talk.c_inc`, NPC mask/spawn,
-  native house positions, and active-demo exclusion. Reuse selected-species
-  completion from `af_v3_creature_complete`, not all unselected donor species.
-- Bind the prepared format-20/wire-7 adapter through the shared public save
-  entries and bind the real gift/state providers to it. Reuse the prepared
-  record assignment and passing migration tests; do not invent another storage
-  format for these same fields. Connect the prepared birthday-giver selection
-  to actual eligibility, year/giver state, and house/scene entry.
-  The complete source retains birthday/lighthouse branches; the lighthouse
-  building is outside V3 and must not be silently represented as implemented.
-- Connect the prepared reward-family trophy/insertion providers; preserve the
-  exercise actor's separate 0–27 provider and Wisp's separate handover admission.
-- Shrine perfect-town eligibility, axe handover/demo return, and all three
-  appearance effects from `ef_make_hem.c`: sphere, sparkles, and ground light.
-  Install the prepared complete effects, artwork, sounds, profile directory,
-  loader bounds, and scene-owned light cleanup. Preserve the visibility
-  transition and source tick rate; do not reconvert the prepared resources.
-- Bind the prepared spirit artwork through the existing additional-character
-  registry, retaining complete source callbacks, native services, and fade.
-  Prepared identities are profiles F1–F4, names D0CE–D0D0, and banks 458–459;
-  the checked preparation rejects collisions. Farley and gift Tortimer extend
-  the six complete additional-character rows to eight. Reuse installed full
-  Tortimer artwork and the checked Farley conversion; do not reconvert either.
-- Apply official gift/Shrine messages through the single provenance catalogue,
-  then connect optional selections and focused combined gameplay/save checks.
+Extend the same shared held importer to admit net, axe, and rod independently,
+using the installed complete reward providers and the existing catalogue
+reservation. Check real N64/GameCube behaviour choices, including the connected
+birthday path, rather than silently adding substantial unrelated behaviour.
+Then run the focused combined native gift/Shrine/shovel acquisition and
+save/reload checks. The native harness budget is thirty minutes for the batch,
+with one initial attempt and one corrected-setup retry; it is not started.
+Do not replay unchanged artwork/effect tests, reconvert resources, rebuild older
+cartridges, or restart an item audit. The lighthouse building remains outside V3
+and is not represented as implemented. Continue the existing completion queue
+after this connected category passes its bounded verification.

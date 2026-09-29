@@ -33,7 +33,8 @@ SPECIAL_NPCS = {
     'GAFE01-r0/npc/hem': dict(donor_name=0xD08E, donor_profile=0xF2,
         name=0xD0CF, profile=0xF3, model_bank=458, texture_bank=459, draw_index=380),
     'GAFE01-r0/npc/present-tortimer': dict(donor_name=0xD073, donor_profile=0xC7,
-        name=0xD0D0, profile=0xF4, model_bank=448, texture_bank=449, draw_index=354),
+        name=0xD0D0, profile=0xF4, model_bank=448, texture_bank=449, draw_index=354,
+        identity_source=0xD06E),
 }
 
 # The gift resident shares the complete gift callbacks, not Tortimer's artwork.

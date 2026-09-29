@@ -41,8 +41,12 @@ def relocate_art_pages(image,records,equipment,first,end,*,excluded_spans=()):
     pages={r['id']:r for r in art['physical_resources']}
     blockers=[r for r in records if r['physical']<end and first<r['physical']+r['bytes']]
     if not blockers:return image,records,[],[]
-    if any(pages.get(r['id'])!=r for r in blockers):
+    packet_row=next((r for r in records if r['id']==packet['id']),None)
+    parent_blocked=packet_row in blockers
+    if any(pages.get(r['id'])!=r and r!=packet_row for r in blockers):
         raise ValueError('Resource growth encounters non-page physical ownership')
+    if parent_blocked and any(packet_row[k]!=packet[k] for k in ('physical','bytes','sha256')):
+        raise ValueError('Changed complete tree startup owner')
     raw=bytearray(image[packet['physical']:packet['physical']+packet['bytes']])
     at=art['directory_ram']-packet['ram'];addresses=art['page_addresses']
     expected=struct.pack('>'+str(5+len(addresses))+'I',0x41465047,art['bytes'],4096,
@@ -53,7 +57,9 @@ def relocate_art_pages(image,records,equipment,first,end,*,excluded_spans=()):
             zlib.crc32(payload)!=art['crc32']):
         raise ValueError('Changed complete paged artwork or directory')
     staged=bytearray(image);records=copy.deepcopy(records);writes=[];moves=[];remap={}
+    original_packet=bytes(raw)
     for old in blockers:
+        if old==packet_row:continue
         data=bytes(staged[old['physical']:old['physical']+old['bytes']])
         new=physical.allocate(staged,records,data,old['id']+'-relocation',best_fit=True,
             excluded_spans=(*excluded_spans,(first,end)))
@@ -66,9 +72,21 @@ def relocate_art_pages(image,records,equipment,first,end,*,excluded_spans=()):
     art['physical_resources']=[pages[r['id']] for r in art['physical_resources']]
     struct.pack_into('>'+str(len(addresses))+'I',raw,at+16,*art['page_addresses'])
     old_sha=packet['sha256'];packet.update(sha256=sha256(raw),crc32=zlib.crc32(raw))
-    row=next(r for r in records if r['id']==packet['id']);row['sha256']=packet['sha256']
+    row=next(r for r in records if r['id']==packet['id'])
+    if parent_blocked:
+        old=dict(row)
+        new=physical.allocate(staged,records,bytes(raw),old['id']+'-relocation',best_fit=True,
+            excluded_spans=(*excluded_spans,(first,end)))
+        new['id']=old['id'];records[records.index(row)]=new
+        edits=[dict(offset=at+16+i*4,before=original_packet[at+16+i*4:at+20+i*4].hex(),
+                    after=raw[at+16+i*4:at+20+i*4].hex())
+               for i in range(len(addresses)) if addresses[i]!=art['page_addresses'][i]]
+        moves.append(dict(previous=old,replacement=dict(new),tree_directory_edits=edits))
+        staged[old['physical']:old['physical']+old['bytes']]=bytes(old['bytes'])
+        packet['physical']=new['physical'];writes.append((new,bytes(raw)))
+    else:
+        row['sha256']=packet['sha256'];writes.append((dict(row,previous_sha256=old_sha),bytes(raw)))
     staged[packet['physical']:packet['physical']+packet['bytes']]=raw
-    writes.append((dict(row,previous_sha256=old_sha),bytes(raw)))
     field=equipment.get('carried_items',{}).get('field_creatures')
     if field:
         if field['packet']['id']!=packet['id'] or field['packet']['sha256']!=old_sha:

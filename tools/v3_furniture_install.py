@@ -673,14 +673,14 @@ def relocate_resource_plan(base,files,vrom,data,*,minimum_physical,target_vrom=N
         # A gap may contain retired nonzero bytes before a usable zero span.
         # Use the same checked allocator as physical packets, retaining the
         # caller's lower bound and every live/pending reservation.
-        pending=[dict(id=f'owner-reservation-{i}',physical=r['physical'],bytes=r['bytes'],
-            sha256=r['sha256']) for i,r in enumerate(reservations)]
-        staged=bytearray(base)
-        # Pending owners have not been written yet. Their zero storage is still
-        # occupied, so verify its present digest while excluding the full span.
-        for r in pending:r['sha256']=sha256(staged[r['physical']:r['physical']+r['bytes']])
-        allocated=physical.allocate(staged,pending,data,'relocated-owner',best_fit=True,
-            minimum_physical=max(0x100000,minimum_physical),excluded_spans=excluded_spans)
+        # These are pending extents, not installed physical packets. A growing
+        # in-place DMA owner overlaps its own live prefix, and complete DMA
+        # images need not have packet-aligned lengths. Reserve the full spans
+        # through the allocator's explicit extent API rather than pretending
+        # they are already installed independent packets.
+        pending=tuple((r['physical'],r['physical']+r['bytes']) for r in reservations)
+        allocated=physical.allocate(base,[],data,'relocated-owner',best_fit=True,
+            minimum_physical=max(0x100000,minimum_physical),excluded_spans=(*excluded_spans,*pending))
         record=dict(vrom=vrom,physical=allocated['physical'],previous_physical=entry.pstart,
             previous_bytes=entry.size,bytes=len(data),previous_sha256=sha256(before),sha256=sha256(data),
             relocated_blockers=[],relocated=True,retains_old_allocation=True)
@@ -1061,10 +1061,28 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         for move in report_updates['relocated_physical_resources']:
             old,new=move['previous'],move['replacement']
             first=old['physical'];end=first+old['bytes']
+            replacement_data=next((data for row,data in physical_writes if row==new),None)
+            expected_payload=bytearray(allocation_base[first:end])
+            edits=move.get('tree_directory_edits',[])
+            if edits:
+                tree=equipment_report['scenery']['tree_effects'];art=tree['art_packet']
+                directory=art['directory_ram']-tree['packet']['ram']+16
+                if old['id']!=tree['packet']['id'] or new['physical']!=tree['packet']['physical']:
+                    raise ValueError('Relocated directory is not the complete tree startup owner')
+                seen=set()
+                for edit in edits:
+                    at=edit['offset'];index=(at-directory)//4
+                    before,after=bytes.fromhex(edit['before']),bytes.fromhex(edit['after'])
+                    if (at in seen or at<directory or (at-directory)%4 or
+                            index>=len(art['page_addresses']) or len(before)!=4 or len(after)!=4 or
+                            expected_payload[at:at+4]!=before or
+                            after!=struct.pack('>I',art['page_addresses'][index])):
+                        raise ValueError('Changed checked tree page-directory relocation')
+                    expected_payload[at:at+4]=after;seen.add(at)
             if (old not in prior['physical_resources'] or new not in report_updates['physical_resources'] or
-                    old['id']!=new['id'] or old['bytes']!=new['bytes'] or old['sha256']!=new['sha256'] or
+                    old['id']!=new['id'] or old['bytes']!=new['bytes'] or
                     sha256(allocation_base[first:end])!=old['sha256'] or
-                    not any(row==new and sha256(data)==old['sha256'] for row,data in physical_writes) or
+                    replacement_data is None or replacement_data!=expected_payload or sha256(replacement_data)!=new['sha256'] or
                     physical.overlaps(report_updates['physical_resources'],first,end) or
                     any(e.pstart<end and first<(e.pend or e.pstart+e.size)
                         for e in files.values() if e.pstart!=0xFFFFFFFF)):
@@ -1719,6 +1737,12 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
                 additional_resident_bytes=carried_npc['additional_resident_bytes'],
                 resource_allocations_changed=True,saved_format_changed=True)
             report['native_test']='pending carried-family selection and ordinary Wisp gameplay/save/travel verification'
+        rewards=equipment_report.get('carried_items',{}).get('quest',{}).get('rewards')
+        if rewards and not prior['equipment_resources'].get('carried_items',{}).get('quest',{}).get('rewards'):
+            report['shared_runtime_refresh'].update(adapters=['golden_rewards'],artwork_changed=True,
+                additional_resident_bytes=rewards['packet']['bytes']-rewards['preserved_packet']['bytes']+16,
+                resource_allocations_changed=True,saved_format_changed=True)
+            report['native_test']='pending independent golden-tool selection and native gift, Shrine, shovel, and save/reload checks'
     if console_images is not None:
         images=equipment_report['console_images']
         report['shared_runtime_refresh'].update(adapters=['console_images'],
