@@ -1175,7 +1175,38 @@ The writer checks that predecessor and newly covered bytes before modifying
 the new cartridge. No input ROM or previous build is changed; no unverified
 obsolete region is reclaimed. Current-ROM callback/pool/redirect/spawn checks
 and existing sanitized shared movement/world checks pass. Native gameplay and
-the remaining shrine-attendant/exercise lifecycles are unverified/unfinished.
+the exercise lifecycle remain unverified/unfinished.
+
+### Shared native-controller and identity readers
+
+`AFV3-NPC-NATIVE-BATCH-1` installs complete verified native actor images under
+additive identities through the same registry installer. Provider records name
+the full image/relocation hashes, instance size, profile, and event-notification
+remaps. The shrine attendant uses the existing English 8,048-byte fortune actor,
+not a replacement letter implementation. Its 77 relocations retain all internal
+callbacks and the existing resident English formatters. Native actor `D03D/84`
+stays untouched; the imported actor is `D091/CD`, using banks 450/451 and voice
+243. Its 2,400-byte instance has a separate guarded 2,432-byte slot. Payment,
+retry, refund, save, and destruction retain the accepted implementation.
+The native New Year death notification changes from native event 3 to donor
+event 1 through `af_holiday_native_notify`, never a same-number event alias.
+
+All three special names come from the complete donor `l_sp_actor_name` directory
+and verified English string bank: Katrina at `0207`, ordinary/costume Tortimer
+at `04E3`. Individual credits live only in `translations/provenance.json`.
+The common identity directory is at `806EE400`; bounded full-name/actor-name
+readers retain existing villager fallbacks. Native sex and speech-spec readers
+have checked return bridges at `806EE4A0/E4B0`. Speech spec 2 is distinct from
+the full model voice. Both spawn callers use the registry table, preserving
+the narrow native register/result contract and participant/camper fallback.
+
+ABI 346 at `special-native-installed-01/` has a 102,352-byte combined packet,
+using the same nineteenth startup descriptor. The 10,688-byte appended native
+controller/storage area ends in `AFNN`; the registry code fits its existing
+8 KiB reservation. Current cartridge identity/spawn hooks and startup hashes
+match their reports. Existing sanitized allocation and rendering checks pass.
+Actor admission stays off; native execution and exercise/card integration are
+unfinished. The connected batch's harness budget remains exhausted.
 
 ### Reserved layouts and dedicated owners
 

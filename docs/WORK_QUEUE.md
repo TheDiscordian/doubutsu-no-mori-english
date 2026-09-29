@@ -346,9 +346,9 @@ callback loader uses its actual relocated code bounds. Focused source/host,
 cartridge, and empty/mixed/all-191 composition checks pass. Continue the remaining
 controller/participant services using the retained native map; do not reconvert
 these effects or installed decorations, or restart native fixtures.
-The connected controller/participant module is retained in ABI 345 at
-`build/v3-diary-category-work-01/special-lifecycle-installed-02/build-lock.json`
-(ROM SHA-256 `a8e29fc818b2d333bcaa1bd485f7b669945520191f92e9311ba1c1c70e878136`),
+The connected controller/participant module is retained in ABI 346 at
+`build/v3-diary-category-work-01/special-native-installed-01/build-lock.json`
+(ROM SHA-256 `80effbabf648db1dc1016503102565521a2770ad6022d8af0ac7d9985bc38f87`),
 using `build/v3-diary-category-work-01/participants-prepared-26/`: three controllers,
 five resident roles, rope, 279 official messages/two choices, offering payment,
 tools/sounds, 21 matching native motions, and the full donor prayer motion.
@@ -404,10 +404,18 @@ movement/world checks pass against current code and current item records.
 No native execution or current lifecycle-stage browser pass is claimed.
 Keep all selection flags zero until the category's complete admission is bound.
 
-Continue the same special-character lifecycle batch: the shrine attendant needs
-its full fortune-letter/payment path and exercise needs the complete card/
-attendance path. Reuse `overlays/mail_generation/fortune_slip.c` and its installed
-English formatters rather than building another letter engine. Bind actor pools,
+The shrine attendant's complete English fortune-letter/payment actor is installed
+with its additive identity, guarded pool, native callbacks, and mapped New Year
+cleanup. The shared identity readers supply official names, sex, and speech
+metadata for all three new special characters; both spawn callers now read the
+registry. The complete packet is 102,352 bytes, retaining nineteen startup
+descriptors and saved format 13. Current installed-hook/startup checks and the
+existing allocation/rendering host checks pass; native execution is unverified.
+
+Continue the same batch with exercise's full actor, card conversation, and actual
+attendance path, including the existing player-exercise event predicate. Reuse
+the complete installed fortune actor and art without reconverting or retesting
+them. Bind actor pools,
 ordinary/profile lookup, placement identities, full voices, and cleanup together. Preserve each source
 behaviour, including individual exceptions. Actual calendar choice/admission
 remains after its required providers, not a substitute for implementing them.

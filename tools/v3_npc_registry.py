@@ -214,9 +214,12 @@ def append_banks(base,prior,blob,entries):
     return records,asset,physical_rows,writes,staging
 
 
-def install_art_batch(base,prior,blob,output,directory):
+def install_art_batch(base,prior,blob,output,directory,*,core=None,module=None):
     """Install every prepared character's banks without claiming actor readiness."""
     raw=(directory/'batch.json').read_bytes();batch=json.loads(raw)
+    if batch.get('format')=='AFV3-NPC-NATIVE-BATCH-1':
+        from v3_npc_native import install_batch
+        return install_batch(base,prior,output,batch,raw,core=core,module=module)
     if batch.get('format')=='AFV3-NPC-VARIANT-BATCH-1':
         return install_variant_batch(base,prior,output,batch,raw)
     if batch.get('format')!='AFV3-NPC-ART-BATCH-1' or not batch.get('records'):
@@ -399,7 +402,7 @@ def u32_local(data,at):
     return struct.unpack_from('>I',data,at)[0]
 
 
-def refresh_renderer(npc,data,output,base,changes):
+def refresh_renderer(npc,data,output,base,changes,*,extra_sources=(),link_symbols=None):
     """Refresh the common character renderer in its existing code reservation.
 
     Registry/actor callers retain their public entries. The two native drawing
@@ -410,8 +413,8 @@ def refresh_renderer(npc,data,output,base,changes):
     if (len(data)!=SIZE or sha256(data)!=npc['packet']['sha256'] or
             sha256(data[:old['bytes']])!=old['sha256'] or any(data[old['bytes']:0x2000])):
         raise ValueError('Changed shared NPC code reservation')
-    code,compiled=compile_part('npc_registry',output,link_symbols=old['link_symbols'],
-        extra_sources=('overlays/v3/npc_stream_draw.c','overlays/v3/npc_dma.c'))
+    code,compiled=compile_part('npc_registry',output,link_symbols=link_symbols or old['link_symbols'],
+        extra_sources=('overlays/v3/npc_stream_draw.c','overlays/v3/npc_dma.c',*extra_sources))
     for name,address in old['symbols'].items():
         if name.startswith('af_') and RAM<=address<RAM+0x2000 and name not in (
                 'af_v3_npc_dma_request','af_v3_npc_dma_init','af_v3_npc_stream_draw'):
@@ -435,14 +438,14 @@ def refresh_renderer(npc,data,output,base,changes):
     return bytes(data)
 
 
-def install(base,prior,blob,core,output,art_directory,lock):
+def install(base,prior,blob,core,output,art_directory,lock,*,module=None):
     """Connect guarded memory, banks, renderers, and cleanup in the shared build.
 
     The record remains inactive until event/conversation services bind its actor
     callbacks. Merely installing its resources cannot enable unfinished gameplay.
     """
     if prior['equipment_resources'].get('npc_extra'):
-        return install_art_batch(base,prior,blob,output,art_directory)
+        return install_art_batch(base,prior,blob,output,art_directory,core=core,module=module)
     prepared=prepare(lock,art_directory,output/'npc-registry')
     equipment=copy.deepcopy(prior['equipment_resources'])
     if equipment.get('npc_extra'):raise ValueError('Additional NPC registry already installed')

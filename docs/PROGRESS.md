@@ -31,9 +31,9 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
-The current proposal is ABI 345 at
-`build/v3-diary-category-work-01/special-lifecycle-installed-02/build-lock.json`, ROM SHA-256
-`a8e29fc818b2d333bcaa1bd485f7b669945520191f92e9311ba1c1c70e878136`.
+The current proposal is ABI 346 at
+`build/v3-diary-category-work-01/special-native-installed-01/build-lock.json`, ROM SHA-256
+`80effbabf648db1dc1016503102565521a2770ad6022d8af0ac7d9985bc38f87`.
 It contains 191 independently selectable development imports, including all nine
 fish and eight insects, and 100 inactive furniture profiles whose acquisition
 is pending, plus sixteen inactive diary cover profiles. The main lock and both
@@ -114,9 +114,17 @@ and current installed item records. Native execution remains unverified; the
 latest private browser pass above covers the preceding art-only build, not this
 new lifecycle addition. Do not replay it until the connected batch is ready.
 
-The next connected work is the rest of the special-character lifecycle batch:
-connect the shrine attendant's fortune letters/payment and exercise/card
-attendance, reusing the existing English fortune-slip generation adapter.
+The shrine attendant's complete English fortune actor is installed under its
+additive identity, including payment/refund, letter generation, save/destruction,
+and mapped New Year cleanup. The original native actor remains unchanged.
+All three special identities have official GameCube names and metadata through
+shared readers; both spawn callers use the registry rather than per-name hooks.
+Current-ROM reader/startup checks and existing allocation/rendering host checks
+pass. Native execution is unverified. The combined packet is 102,352 bytes;
+the same nineteen startup descriptors and saved format remain in use.
+
+The next connected work is the exercise actor, card conversation, and actual
+attendance, including the existing player-exercise event predicate.
 Actual calendar choice/admission follows the completed dependencies. No diary
 is selectable. Saved format 13 and both stable patcher deployments are unchanged.
 

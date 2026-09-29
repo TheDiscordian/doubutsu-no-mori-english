@@ -797,7 +797,7 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
     elif npc_registry_art is not None:
         import v3_npc_registry as equipment
         equipment_report,owner_changes,report_updates,physical_writes=equipment.install(
-            base,prior,blob,core,output,npc_registry_art,lock)
+            base,prior,blob,core,output,npc_registry_art,lock,module=module)
         display_report=prior['clothing']['display'];alias_report=prior['display_aliases']
     elif diary_catalogue:
         import v3_diary_items as equipment
@@ -1492,7 +1492,8 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
     if npc_registry_art is not None:
         npc=equipment_report['npc_extra']
         report['shared_runtime_refresh'].update(adapters=['npc_registry'],artwork_changed=True,
-            additional_resident_bytes=(npc.get('variants',{}).get('additional_resident_bytes',0)
+            additional_resident_bytes=(npc.get('events',{}).get('sky',{}).get('packet',{}).get('bytes',0)-
+                prior['equipment_resources']['npc_extra'].get('events',{}).get('sky',{}).get('packet',{}).get('bytes',0)
                 if prior['equipment_resources'].get('npc_extra') else npc['packet']['bytes']),resource_allocations_changed=True,
             saved_format_changed=False,saved_profile_changed=False)
         report['sources'].update(npc['sources'])

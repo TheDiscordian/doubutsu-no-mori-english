@@ -367,6 +367,11 @@ def publish_bootstrap(equipment,blob,surface,output):
                         variants['ram']+variants['bytes']>0x807DA800 or variants['bytes']&15):
                     raise ValueError('Changed shared character-variant startup reservation')
                 sky_bytes+=variants['bytes']
+            for batch in npc_extra.get('native_batches',[]):
+                if (not batch['installed'] or batch['ram']!=SKY_RAM+sky_bytes or
+                        batch['ram']+batch['bytes']>0x807DA800 or batch['bytes']&15):
+                    raise ValueError('Changed shared native-character startup reservation')
+                sky_bytes+=batch['bytes']
             if (not sky.get('installed') or sp['ram']!=SKY_RAM or sp['bytes']!=sky_bytes or
                     sp['physical']&15 or sp['storage']!='physical-ROM' or
                     sky['loaded_code']['ram']!=SKY_RAM or not 0<sky['loaded_code']['bytes']<=SKY_END-SKY_RAM or
