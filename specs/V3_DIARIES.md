@@ -1280,7 +1280,7 @@ Branching messages still receive remapped additive identities. There are 372
 reused records and 186 new records; the single provenance catalogue supplies all
 credits. These figures describe dialogue records, not completed diary imports.
 
-The current festival packet is 43,824 bytes at `80760FE0`, directly after the
+The festival actor region is 43,824 bytes at `80760FE0`, directly after the
 167,904-byte sky/participant/exercise/calendar prefix in RAM. Physical ROM
 storage is separate to avoid another full duplicate in fragmented space.
 Twenty sixteen-byte startup descriptors and their checksum words fit in a
@@ -1288,6 +1288,47 @@ Twenty sixteen-byte startup descriptors and their checksum words fit in a
 checked before native initialization. An obsolete 102,352-byte prefix copy is
 reclaimed only after validating its loaded replacement. Format 15 and profile
 bits are unchanged. Admission remains off until event/diary selection is bound.
+
+### Optional gifts and connected conversations
+
+`tools/v3_holiday_world.py:install_optional` installs the ordinary world/talk
+controller and full exercise-card conversation together, retaining all source
+artwork and animations. The module occupies 20,240 bytes at `8076BB10`, with
+52 checked public redirects from both preceding controllers. The complete
+festival packet is 64,064 bytes and retains the same startup descriptor. Its
+loaded zero-initialised exercise context is shared by begin/finish, inventory,
+dialogue, and cleanup; old callbacks cannot retain a separate borrowed player.
+
+An ordinary event with no selected gift uses its official first repeat message
+without an item-name field or delivery order. Toy Day uses its second repeat,
+since the first still promises a gift. The actual talk-init still records
+attendance; preparation, scheduling, and actor presence never do. The no-gift
+conversation does not mark a trophy, consume an item, or award a placeholder.
+Visitors retain the same prohibition on changing resident diaries. All selected
+gift branches preserve the complete original conversation and guarded handover.
+
+Summer aerobics uses official message `3429` when either exercise cards or the
+radio prize is excluded. Otherwise its full card/stamp/reward controller runs.
+Ordinary sports-day exercise shares the event-specific no-gift greeting rule.
+Existing entries in `translations/provenance.json` credit every reused message;
+no replacement prose is introduced. The source importer's single
+`optional_card_source` adaptation is used by both full preparation and refresh.
+
+The destination table is a counted, sorted set of checked source/native/profile
+records. Its 66 entries include the summer aerobics prize `1FCC` → `3C48`,
+which is not a member of the ordinary 28-event reward table. The complete source
+card controller and a compiled assertion establish that prize identity.
+Header length, ordering, kind, inverse diary parent, profile enable word, and
+metadata enable byte are checked before resolution. The table fits its original
+NPC packet reservation, so no actor layout or saved format changes.
+
+Focused host checks execute the actual ordinary world/talk/calendar/reward
+functions for excluded gifts, all resident slots, visitors, and selected
+handovers. Existing complete donor talk/actor comparisons pass. Current-ROM
+checks verify the loaded ranges, redirects, guards, source-batch hashes, and all
+twenty startup checksums. Browser/offline empty, mixed, and all-supported
+compositions agree. These results do not establish native exercise execution,
+event activation, or diary UI/save operation. Those consumers remain explicit.
 
 ### Reserved layouts and dedicated owners
 

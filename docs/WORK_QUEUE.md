@@ -442,7 +442,7 @@ layout. Its context is 492 bytes inside the existing reservation. The adjacent
 diary browsing years do not access the lunar table. The choice stays unexposed.
 All ten hanami, moon/meteor, countdown, ball-toss, and Harvest actor units are
 installed through the existing shared participant importer. The preparation is
-`festivals-prepared-04/`; the current proposal is `festivals-installed-06/`.
+`festivals-prepared-04/`; the current proposal is `selection-connected-05/`.
 The complete shared registry has 22 owners and 68 stable-entry redirects.
 All 558 official messages are mapped, reusing 372 identical credited records and
 adding 186. The complete three added motions preserve expression programmes.
@@ -450,9 +450,27 @@ The 43,824-byte festival packet and retained 167,904-byte prefix use twenty
 compact startup descriptors in the existing reservation. Current resource/CRC,
 redirect, guard, unchanged-save-format, conversion, and startup checks pass.
 Native festival/diary execution remains unverified.
+The installed optional-dialogue module connects both complete conversation
+controllers to selected-only gifts, while retaining actual-talk attendance when
+gifts are excluded. Summer aerobics uses the official morning greeting when
+cards or the radio prize are excluded; otherwise the full source card controller
+runs. The 66-entry checked destination map includes the radio's real `1FCC` →
+`3C48` handover. All 52 public redirects share one exercise context. The module
+adds 20,240 bytes inside the existing separately loaded festival packet, now
+64,064 bytes; startup remains twenty descriptors/676 bytes and saved format 15.
+Current-ROM packet/CRC/redirect/source-batch checks, focused source/host checks,
+and current empty/mixed/all-supported browser/offline compositions pass.
+Do not repeat these checks for unchanged code or reopen a native fixture.
 The exact next consumers are complete actor/service admission and
 diary/behaviour selection. Keep this connected category task; do not restart
 per-actor conversion or the exhausted native fixture.
+The current binary identity check finds all participant/profile/decoration
+requirements installed except unused New Year collision position `D05C` in the
+old dispatcher list. The pending source-derived refresh below removes that
+non-spawned requirement. The five special-character flags, participant gate,
+and fishing/Harvest service admission remain off. Validate and bind those gates
+to actual diary/holiday selection and the calendar setting together; do not
+enable every event for an unrelated fish/villager-only profile.
 The pending dispatcher refresh derives actual spawn requirements from resident
 counts and complete callback/helper calls. Its source excludes the unused fifth
 New Year and countdown queue positions from actor requirements while retaining

@@ -16,6 +16,9 @@ struct AfHolidayOps {
 };
 int af_v3_holiday_valid(const af_holiday_u8 *,af_holiday_u32);
 int af_v3_holiday_count(const af_holiday_u8 *,af_holiday_u32,af_holiday_u32,af_holiday_u32,const struct AfHolidayOps *);
+/* Official standalone event conversation when every gift is excluded. Zero
+   rejects an unknown event. No gift receipt or item-name insertion is implied. */
+af_holiday_u32 af_v3_holiday_chat(af_holiday_u32);
 /* Select the actor's displayed item independently of already owning its trophy.
    This is not permission to give it: commit still checks the saved receipt. */
 int af_v3_holiday_select(const af_holiday_u8 *,af_holiday_u32,af_holiday_u32,af_holiday_u32,

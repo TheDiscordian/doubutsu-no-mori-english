@@ -101,6 +101,21 @@ int mPr_SetFreePossessionItem(void *view,u16 item,int condition) {
     return n;
 }
 u8 mSC_get_soncho_event(void) {return (u8)af_holiday_native_current();}
+int af_he_optional_message(int event) {
+    if(!current() || event<0) {af_he_fault();return 0;}
+    if(event==mSC_SPECIAL_EVENT_MORNING_AEROBICS) {
+        /* The complete card conversation remains unchanged when selected.
+         * Without either cards or their radio prize, use the official morning
+         * greeting, not an impossible fourteen-stamp promise. */
+        return af_he_item(ITM_EXCERCISE_CARD00)>0 &&
+            af_he_item(FTR_START(FTR_RADIO_TEST))>0?-1:0x3429;
+    }
+    struct AfHolidayOps ops={.resolve=af_holiday_world_resolve};
+    u32 gender=((const u8 *)context.native)[0x10];
+    int count=af_v3_holiday_count(af_holiday_reward_data,370,(u32)event,gender,&ops);
+    if(count<0) {af_he_fault();return 0;}
+    return count?-1:(int)af_v3_holiday_chat((u32)event);
+}
 int mSC_trophy_get(int event) {
     if(!current() || context.player>=4 || event<0 || event>=28) {af_he_fault();return 1;}
     int n=af_v3_reward_flag((u32)context.player,0,(u32)event,0);

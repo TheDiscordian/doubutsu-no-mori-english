@@ -68,12 +68,33 @@ int main(int argc,char **argv) {
     load(argv[2],af_holiday_metadata,sizeof(af_holiday_metadata));
     reset(0);assert(bind()==0);
     /* Installed candidates remain inactive; supplying a map does not select them. */
-    for(unsigned int i=0;i<65;++i) {
+    unsigned int candidate_count=half(af_holiday_destination_data+6);
+    for(unsigned int i=0;i<candidate_count;++i) {
         const unsigned char *r=af_holiday_destination_data+16+i*8;
         assert(af_holiday_world_resolve(&npc,half(r))==0);
     }
+    /* A diary-only profile can attend every event without importing its gift.
+     * No item string, handover, fake receipt, or RNG call is needed. Visitors
+     * still cannot write a resident's diary. */
+    for(unsigned int p=0;p<5;++p)for(unsigned int event=0;event<28;++event) {
+        reset(p);bind();unsigned int variant=99;AFHolidayAction action;
+        assert(af_holiday_world_variant(&npc,event,0,&variant) && variant==0 && !rng_calls);
+        AFDiary snapshot=diary;
+        assert(af_holiday_talk_prepare(&npc.actor.talk,&npc.world,event,npc.world.today,
+            0,variant,0,&action)>0);
+        assert(action.message==af_v3_holiday_chat(event) && action.effects==AF_HOLIDAY_MESSAGE);
+        assert(!memcmp(&snapshot,&diary,sizeof(diary)));
+        assert(af_holiday_talk_start(&npc.actor.talk,&npc.world,&action)>0);
+        assert(action.effects==AF_HOLIDAY_BEGIN);
+        if(p==4)assert(!memcmp(&snapshot,&diary,sizeof(diary)));
+        else assert(af_diary_calendar_event_check(&diary,p,npc.world.today,npc.world.today,event)==(event==17?0:1));
+        assert(af_holiday_talk_step(&npc.actor.talk,&npc.world,1,1,1,&action)>0);
+        assert(action.effects==AF_HOLIDAY_END && !gives && !last_item && !rng_calls);
+        for(unsigned int owner=0;owner<4;++owner)assert(!af_v3_reward_flag(owner,0,event,0));
+    }
+    reset(0);bind();
     /* Exercise the actual shared records for every candidate, not invented IDs. */
-    for(unsigned int i=0;i<65;++i) {
+    for(unsigned int i=0;i<candidate_count;++i) {
         const unsigned char *r=af_holiday_destination_data+16+i*8;
         unsigned int donor=half(r),item=half(r+2),slot=half(r+4)-1024;
         af_holiday_profiles[slot][7]=af_holiday_metadata[slot][7]=1;
@@ -91,6 +112,7 @@ int main(int argc,char **argv) {
     }
     assert(af_holiday_world_resolve(&npc,0x1FC0)==0x3C94);
     assert(af_holiday_world_resolve(&npc,0x2B00)==0x2B10);
+    if(candidate_count==66)assert(af_holiday_world_resolve(&npc,0x1FCC)==0x3C48);
     assert(!af_holiday_world_resolve(&npc,0x10000));
     /* All 28 events, every actual reward variant, both gender branches. */
     unsigned int handovers=0;

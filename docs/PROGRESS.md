@@ -31,13 +31,34 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
-The current proposal is ABI 350 at
-`build/v3-diary-category-work-01/festivals-installed-06/build-lock.json`, ROM SHA-256
-`aebd85e0027529acb2a7168056c3b12d82aa3d9dc6eb855a624c491276a88069`.
+The current proposal is ABI 351 at
+`build/v3-diary-category-work-01/selection-connected-05/build-lock.json`, ROM SHA-256
+`d1cffb0734696ac5c58fb79b40fc5b2d6d6b4f7e954fed41fbb32419a4403020`.
 It contains 191 independently selectable development imports, including all nine
 fish and eight insects, and 100 inactive furniture profiles whose acquisition
 is pending, plus sixteen inactive diary cover profiles. The main lock and both
 stable V2-14 deployments are unchanged.
+
+The ordinary and exercise conversation paths support profiles without selected
+holiday gifts. Actual Tortimer conversations still record attendance, using
+existing official standalone dialogue without promising excluded items or
+writing a trophy receipt. Selected gifts retain their complete source handover;
+the summer exercise-card conversation requires selected cards and its radio
+prize. The shared checked gift map includes the aerobics radio, which is outside
+the ordinary 28-event reward table. All 66 mapped identities use actual installed
+profile/metadata checks, including the carried diary IDs.
+
+The connected 20,240-byte world/card module uses 52 checked redirects and one
+shared exercise context. Existing artwork, animations, actors, and saved format
+15 remain intact. The festival startup packet contains 64,064 bytes; twenty
+descriptors still fit the 676-byte bootstrap. Current resource hashes, redirects,
+all startup spans/checksums, source batches, and patch reconstruction pass.
+Focused source/sanitized-host checks cover disabled gifts, actual attendance,
+visitor isolation, selected handovers, and official greeting field requirements.
+Current browser/offline empty, mixed, and all-supported outputs agree; empty is
+exactly V2-14. Exercise execution, event activation, and native diary UI/save
+remain unverified. Complete actor/service admission and diary/calendar selection
+remain the next consumers of this same category; no new native fixture is needed.
 
 The complete moon/meteor effect family is installed: moon reflection, meteor
 emitter, moving trail, and sparkle. Complete source lifecycles, native drawing,

@@ -4,6 +4,13 @@ typedef af_holiday_u8 u8;
 typedef af_holiday_u32 u32;
 static u32 half(const u8 *p) { return (u32)p[0]*256u+p[1]; }
 
+u32 af_v3_holiday_chat(u32 event) {
+    if(event>=28)return 0;
+    /* The first repeat is standalone except on Toy Day, where it still
+     * promises a present. Its second repeat is the official cold-day chat. */
+    return (event==27?0x3391u:0x3280u+event*10u)+(event==25?7u:6u);
+}
+
 int af_v3_holiday_valid(const u8 *data,u32 bytes) {
     if (!data || bytes<16u || data[0]!='A' || data[1]!='F' || data[2]!='H' || data[3]!='G' ||
             half(data+4)!=1 || half(data+6)!=28 || half(data+8)>128 || !half(data+8) ||

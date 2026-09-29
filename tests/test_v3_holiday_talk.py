@@ -48,3 +48,19 @@ class TalkTests(unittest.TestCase):
                 cwd=ROOT,capture_output=True,text=True,timeout=30)
             self.assertEqual(run.returncode,0,run.stdout+run.stderr)
             print(run.stdout.strip())
+
+    def test_optional_greetings_are_complete_official_standalone_messages(self):
+        from v3_camper_text import donor
+        from gc_text import decode_gc
+        messages,_,decoder=donor()
+        for event in range(28):
+            number=(0x3391 if event==27 else 0x3280+event*10)+(7 if event==25 else 6)
+            text=decode_gc(messages[number],decoder)
+            # These are existing credited dialogue records. They need no item,
+            # caller-supplied field, branch, choice, or handover continuation.
+            import re
+            commands=re.findall(r'\{cmd:7F([0-9A-F]{2})([0-9A-F]*)\}',text)
+            self.assertEqual(commands[-1],('00',''))
+            for command,args in commands:
+                self.assertIn(command,('00','02','03','04','09','1A','2F'))
+                if command=='09':self.assertTrue(args.startswith('00'))

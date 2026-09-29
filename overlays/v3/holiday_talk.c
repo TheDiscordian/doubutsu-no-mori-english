@@ -12,7 +12,8 @@ static int bound(const AFHolidayTalk *t,const AFHolidayWorld *w) {
     return t && valid(w) && t->player==w->player && t->prepared==1 &&
         t->active<=1 && t->phase<=AF_HOLIDAY_WAIT && t->date.day &&
         t->date.day<=af_diary_days(t->date.year,t->date.month) &&
-        ((t->event<28 && t->event==t->offer.event && t->offer.item) ||
+        ((t->event<28 && ((t->event==t->offer.event && t->offer.item) ||
+          (t->phase==AF_HOLIDAY_WAIT && !t->offer.item && !t->offer.source_item))) ||
          t->event==101 || t->event==102);
 }
 static u32 message(u32 event,u32 index) {
@@ -46,10 +47,17 @@ int af_holiday_talk_prepare(AFHolidayTalk *t,const AFHolidayWorld *w,u32 event,
         a.message=event==101?0x33F4u:0x340Bu;
         if(after)a.message+=6+repeat;else next.phase=AF_HOLIDAY_LIGHTHOUSE;
     } else {
-        if(!w->items.claimed || !w->items.give || !w->items.mark || !w->free_slots ||
-           !af_v3_holiday_select(w->rewards,w->reward_bytes,event,gender,variant,
-                &w->items,&next.offer))return AF_DIARY_ARGUMENT;
-        if(w->player==4) {
+        if(!w->items.claimed || !w->items.give || !w->items.mark || !w->free_slots)
+            return AF_DIARY_ARGUMENT;
+        int available=af_v3_holiday_count(w->rewards,w->reward_bytes,event,gender,&w->items);
+        if(available<0 || (available && !af_v3_holiday_select(w->rewards,w->reward_bytes,
+                event,gender,variant,&w->items,&next.offer)))return AF_DIARY_ARGUMENT;
+        if(!available) {
+            /* Keep the actual-talk attendance call, but never invent an item,
+             * claim a trophy, or enter a handover for an excluded reward. */
+            if(variant)return AF_DIARY_ARGUMENT;
+            a.message=af_v3_holiday_chat(event);
+        } else if(w->player==4) {
             a.message=message(event,9);next.phase=AF_HOLIDAY_VISITOR;
         } else {
             int claimed=w->items.claimed(w->items.context,event);

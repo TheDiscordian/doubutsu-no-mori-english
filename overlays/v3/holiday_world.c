@@ -17,10 +17,11 @@ static int resident(AFHolidayNpc *a) {
 }
 static int map_valid(void) {
     const u8 *p=af_holiday_destination_data;
-    if(word(p)!=0x41464857u || half(p+4)!=1 || half(p+6)!=65 ||
-            half(p+8)!=8 || half(p+10)!=536 || word(p+12))return 0;
+    u32 count=half(p+6);
+    if(word(p)!=0x41464857u || half(p+4)!=1 || count<65 || count>128 ||
+            half(p+8)!=8 || half(p+10)!=16+count*8 || word(p+12))return 0;
     u32 previous=0;
-    for(u32 i=0;i<65;++i) {
+    for(u32 i=0;i<count;++i) {
         const u8 *r=p+16+i*8;u32 source=half(r),item=half(r+2),index=half(r+4),kind=half(r+6);
         if(source<=previous || index<1024 || index>=2048 || kind>1)return 0;
         if(kind) {
@@ -33,7 +34,7 @@ static int map_valid(void) {
 u32 af_holiday_world_resolve(void *context,u32 donor) {
     (void)context;
     if(donor>65535 || !map_valid())return 0;
-    u32 low=0,high=65;
+    u32 low=0,high=half(af_holiday_destination_data+6);
     while(low<high) {
         u32 mid=low+(high-low)/2;const u8 *r=af_holiday_destination_data+16+mid*8;
         u32 source=half(r);
@@ -98,7 +99,11 @@ int af_holiday_world_variant(void *context,u32 event,u32 gender,u32 *out) {
     if(!a || a->failed || !out || gender>1 || !identity(a->world.player))return 0;
     if(event==101 || event==102) {*out=0;return 1;}
     int count=af_v3_holiday_count(a->world.rewards,a->world.reward_bytes,event,gender,&a->world.items);
-    if(count<=0 || !a->ops.random)return 0;
+    if(count<0)return 0;
+    /* Disabling every gift does not disable the festival or its diary entry.
+     * The conversation selects an official no-gift greeting in this case. */
+    if(!count) {*out=0;return 1;}
+    if(!a->ops.random)return 0;
     /* Fixed/gender-selected rewards consume no RNG in the original. */
     const u8 *row=a->world.rewards+16+event*8;
     u32 selected=row[4]==1?a->ops.random(a,(u32)count):0;

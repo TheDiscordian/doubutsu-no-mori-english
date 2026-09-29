@@ -35,7 +35,8 @@ def texture_slot(donor_index):
     return OBJECT_COUNT + slot, TEXTURE_BASE + slot * TEXTURE_STRIDE
 
 
-def compile_part(part, out, extra_sources=(), defines=(), primary_source=None, link_symbols=None):
+def compile_part(part, out, extra_sources=(), defines=(), primary_source=None, link_symbols=None,
+                 include_dirs=(), symbol_candidates=None):
     out.mkdir(parents=True, exist_ok=False)
     docker = ['docker', 'run', '--rm', '--network', 'none', '--user', f'{os.getuid()}:{os.getgid()}',
               '-v', f'{ROOT}:/source:ro', '-v', f'{out.resolve()}:/out', '-w', '/out', '--entrypoint']
@@ -47,6 +48,11 @@ def compile_part(part, out, extra_sources=(), defines=(), primary_source=None, l
              '-fno-stack-protector', '-ffunction-sections', '-fdata-sections', '-fstack-usage',
              '-Wall', '-Wextra', '-Werror']
     flags += ['-D' + define for define in defines]
+    for directory in include_dirs:
+        path=(ROOT/directory).resolve()
+        if not path.is_relative_to(ROOT) or not path.is_dir():
+            raise ValueError('Compiler include directory must belong to the project')
+        flags.append('-I/source/'+str(path.relative_to(ROOT)))
     if part in ('catalogue', 'hra', 'feng_shui', 'campsite_manager', 'camper_greeting', 'camper_trade', 'effect_loader'):
         flags += ['-fno-merge-constants', '-mno-explicit-relocs', '-mno-split-addresses']
     objects = []
@@ -54,6 +60,16 @@ def compile_part(part, out, extra_sources=(), defines=(), primary_source=None, l
         obj = 'code.o' if i == 0 else f'extra{i}.o'
         run('gcc', *flags, f'/source/{source}', '-o', obj)
         objects.append(obj)
+    if symbol_candidates is not None:
+        # Resolve only genuine external references. Passing a complete previous
+        # symbol table as --defsym would silently override newly compiled code.
+        defined=set();undefined=set()
+        for obj in objects:
+            defined.update(line.split()[-1] for line in run('nm','--defined-only','--extern-only',obj).splitlines())
+            undefined.update(line.split()[-1] for line in run('nm','--undefined-only',obj).splitlines())
+        link_symbols=dict(link_symbols or {})
+        for name in sorted(undefined-defined-link_symbols.keys()):
+            if name in symbol_candidates:link_symbols[name]=symbol_candidates[name]
     bindings=[]
     for name,value in (link_symbols or {}).items():
         if not name.replace('_','').isalnum() or not isinstance(value,int) or not 0<=value<=0xFFFFFFFF:
@@ -69,7 +85,8 @@ def compile_part(part, out, extra_sources=(), defines=(), primary_source=None, l
     run('objcopy', '-O', 'binary', '-j', '.text', '-j', '.rodata',
         *(['-j', '.fallbacks'] if part=='scenery_bootstrap' else []), 'code.elf', 'code.bin')
     code = (out / 'code.bin').read_bytes()
-    entry, expected = {'holiday_calendar': ('af_holiday_calendar_mode', (link_symbols or {}).get('AF_HCAL_LINK_RAM',0)),
+    entry, expected = {'holiday_selection': ('af_holiday_world_bind', (link_symbols or {}).get('AF_HS_LINK_RAM',0)),
+                      'holiday_calendar': ('af_holiday_calendar_mode', (link_symbols or {}).get('AF_HCAL_LINK_RAM',0)),
                       'holiday_item_storage': ('af_v3_console_storage_reset', (link_symbols or {}).get('AF_HI_STORAGE_RAM',0)),
                       'holiday_item_menu': ('af_hi_menu_type', (link_symbols or {}).get('AF_HI_LINK_RAM',0)),
                       'holiday_sky': ('af_sky_ready', 0x80738000),
@@ -245,6 +262,9 @@ def compile_part(part, out, extra_sources=(), defines=(), primary_source=None, l
               'toolchain': IMAGE, 'flags': flags,
               'stack_usage': ''.join(p.read_text() for p in sorted(out.glob('*.su')))}
     if link_symbols: report['link_symbols']=link_symbols
+    if part=='holiday_selection':
+        report['functions']=[line.split()[-1] for line in run('nm','--defined-only','--extern-only','code.elf').splitlines()
+            if line.split()[1]=='T']
     if part == 'villager':
         run('objcopy', '-O', 'binary', '-j', '.defaults', 'code.elf', 'defaults.bin')
         defaults = (out / 'defaults.bin').read_bytes()

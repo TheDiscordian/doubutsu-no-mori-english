@@ -111,6 +111,7 @@ def compile_kernel(output, *, name='holiday_rewards'):
     imports=sorted(line.split()[-1] for line in undefined.splitlines() if line.strip())
     expected=sorted(('af_diary_valid','af_diary_days','af_diary_calendar_event',
         'af_diary_calendar_event_check','af_v3_holiday_select','af_v3_holiday_commit',
+        'af_v3_holiday_count','af_v3_holiday_chat',
         'memcpy')) if name=='holiday_talk' else []
     if name=='holiday_actor':
         expected=sorted(('af_diary_valid','af_diary_days','af_diary_calendar_refresh',

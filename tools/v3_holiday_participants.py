@@ -1062,6 +1062,16 @@ def exercise_registry(base,prior,generated):
         owner_count=12,resident_count=18,live_count=24,enabled=False),links
 
 
+def optional_card_source(body):
+    """Retain the full card controller; excluded gifts use ordinary event chat."""
+    marker='\n    taisou_actor->talk_proc = mSCR_TALK_9;\n'
+    if body.count(marker)!=1 or 'af_he_optional_message' in body:
+        raise ValueError('Changed complete exercise conversation entry')
+    return 'int af_he_optional_message(int);\n'+body.replace(marker,marker+
+        '    int optional = af_he_optional_message(taisou_actor->soncho_event);\n'
+        '    if (optional >= 0) return optional;\n')
+
+
 def prepare_exercise(output,lock):
     """Compile the whole dancer/card family through the shared source importer.
 
@@ -1090,6 +1100,7 @@ def prepare_exercise(output,lock):
         if len(matches)!=1:raise ValueError('Ambiguous complete exercise dependency: '+name)
         functions.append(source.function(matches[0])[1]);bodies.append(clean(function(raw,name)))
     generated['cards.c']='\n\n'.join(bodies)
+    generated['cards.c']=optional_card_source(generated['cards.c'])
     font=read('src/game/m_font.c',report['references'])
     if sha256(font.encode())!='89f63d09c6c6b5c71b9ec2b51ffe3cba9ef89ea89714cec9ad8bef015c2316de':
         raise ValueError('Changed complete number formatter source')
@@ -1256,9 +1267,9 @@ def prepare_exercise(output,lock):
         'af_hp_native_structure')})
     direct.update(retained_profiles)
     equipment=prior['equipment_resources'];npc=equipment['npc_extra']
-    world=npc.get('variants',{}).get('modules',{}).get('world',npc['world'])['code']['symbols']
+    world=npc.get('optional_dialogue',npc.get('variants',{}).get('modules',{}).get('world',npc['world']))['code']['symbols']
     for name in ('af_diary_calendar_event','af_diary_calendar_event_check','af_holiday_reward_data',
-            'af_holiday_world_resolve','af_v3_holiday_count','af_diary_days',
+            'af_holiday_world_resolve','af_v3_holiday_count','af_v3_holiday_chat','af_diary_days',
             'af_v3_holiday_select','af_v3_reward_flag'):
         direct[name]=world[name]
     direct['af_holiday_item_display']=equipment['holiday_items']['code']['symbols']['af_holiday_item_display']
