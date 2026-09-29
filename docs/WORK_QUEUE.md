@@ -346,9 +346,9 @@ callback loader uses its actual relocated code bounds. Focused source/host,
 cartridge, and empty/mixed/all-191 composition checks pass. Continue the remaining
 controller/participant services using the retained native map; do not reconvert
 these effects or installed decorations, or restart native fixtures.
-The connected controller/participant module is retained in ABI 347 at
-`build/v3-diary-category-work-01/exercise-installed-06/build-lock.json`
-(ROM SHA-256 `b87afbf58fa39fade6a9771c5a114520cb25b09cced3984d7295db1dc763cf9b`),
+The connected controller/participant module is retained in ABI 348 at
+`build/v3-diary-category-work-01/event-controls-installed-06/build-lock.json`
+(ROM SHA-256 `e8c3b6618a93b13eef787a1730cf8237ce72970a0d80aa5e13f849404a62755f`),
 using `build/v3-diary-category-work-01/participants-prepared-26/`: three controllers,
 five resident roles, rope, 279 official messages/two choices, offering payment,
 tools/sounds, 21 matching native motions, and the full donor prayer motion.
@@ -423,6 +423,15 @@ Current physical-resource/packet checks, all 82 redirects, player hooks, ninetee
 startup entries and referenced CRC, and inactive gates pass. Native gameplay
 and format-14 save/reload remain unverified. New saves require format 14; older
 compatible saves have forward migration, but older V3/V2 cannot read new saves.
+The complete carried card/cutlery controls and save/profile admission are
+installed together. Shared action/warning tables, deletion, both mailing calls,
+and all eight applicable inventory filters preserve original fallbacks.
+Format 15 uses the existing card header for two family-requirement bits; all 27
+existing card/save entries redirect to the complete new adapter. No state or
+scratch allocation grows. Current-ROM structure/CRC checks and existing
+compression/fishing host checks pass; new format-15 execution remains unverified.
+Do not use the intermediate menu-only `event-controls-installed-04/` build.
+New saves cannot be read by V2 or format-14-or-earlier V3; keep backups.
 The exact next consumers are calendar behaviour selection, complete actor/service
 admission, and diary selection. Continue this same batch without a new harness
 or native fixture. Reuse

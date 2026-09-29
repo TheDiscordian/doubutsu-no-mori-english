@@ -739,6 +739,11 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             import v3_holiday_participants_install as equipment
             equipment_report,owner_changes,report_updates,physical_writes=equipment.install(
                 base,prior,blob,core,output,holiday_participants)
+        elif (current_events.get('exercise') and
+                not prior['equipment_resources']['holiday_items'].get('controls')):
+            import v3_holiday_items as equipment
+            equipment_report,owner_changes,report_updates,physical_writes=equipment.install_controls(
+                base,prior,blob,core,output)
         elif (current_events.get('decorations',{}).get('controllers') and
                 not prior['equipment_resources'].get('holiday_items')):
             import v3_holiday_items as equipment
@@ -1524,6 +1529,8 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         sky=npc['events'].get('sky') and not prior['equipment_resources']['npc_extra']['events'].get('sky')
         participants=npc['events'].get('participants') and not prior['equipment_resources']['npc_extra']['events'].get('participants')
         exercise=npc['events'].get('exercise') and not prior['equipment_resources']['npc_extra']['events'].get('exercise')
+        item_controls=(equipment_report.get('holiday_items',{}).get('controls')
+            if not prior['equipment_resources'].get('holiday_items',{}).get('controls') else None)
         report['shared_runtime_refresh'].update(adapters=['holiday_actor_services'],artwork_changed=bool(decorations or event_items or sky or participants or exercise),
             additional_resident_bytes=state_growth+(176 if fishing else 0)+(npc['events']['sky']['additional_resident_bytes'] if sky else 0)+(npc['events']['participants']['additional_resident_bytes'] if participants else 0)+(npc['events']['exercise']['additional_resident_bytes'] if exercise else 0),
             resource_allocations_changed=bool(new_state or fishing or npc['events'].get('reserved')),
@@ -1535,6 +1542,11 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             'and connected diary gameplay/save verification')
         if exercise:
             report['native_test']='pending calendar behaviour choice/admission and connected diary/exercise gameplay/save verification'
+        if item_controls:
+            report['shared_runtime_refresh']['additional_resident_bytes']+=item_controls['additional_resident_bytes']
+            report['shared_runtime_refresh']['resource_allocations_changed']=True
+            report['shared_runtime_refresh']['saved_format_changed']=True
+            report['native_test']='pending calendar choice/admission and connected diary/event gameplay/save verification'
     if console_images is not None:
         images=equipment_report['console_images']
         report['shared_runtime_refresh'].update(adapters=['console_images'],

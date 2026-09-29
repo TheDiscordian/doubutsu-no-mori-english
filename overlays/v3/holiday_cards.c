@@ -12,7 +12,9 @@ static AFHolidayCard decode(const u8 *p) {
 int af_holiday_cards_valid(const u8 *data) {
     static const u8 header[16]={'A','F','H','C',1,4,8,0,0,0,0,0,0,0,0,0};
     if(!data)return 0;
-    for(unsigned int i=0;i<16;i++)if(data[i]!=header[i])return 0;
+    if(data[4]!=1 && data[4]!=2)return 0;
+    if(data[7] & ~(data[4]==2?3u:0u))return 0;
+    for(unsigned int i=0;i<16;i++)if(i!=4 && i!=7 && data[i]!=header[i])return 0;
     for(unsigned int i=0;i<4;i++) {
         const u8 *p=data+16+i*8;AFHolidayCard c=decode(p);
         if(!valid(&c) || p[5] || p[6] || p[7])return 0;
@@ -37,3 +39,21 @@ int af_holiday_cards_set(u8 *data,unsigned int slot,const AFHolidayCard *card) {
 int af_holiday_cards_clear(u8 *data,unsigned int slot) {
     const AFHolidayCard empty={{0,0,0},0};return af_holiday_cards_set(data,slot,&empty);
 }
+int af_holiday_cards_profile(const u8 *data,unsigned int enabled) {
+    return enabled<=3 && af_holiday_cards_valid(data) && !(data[7]&~enabled);
+}
+int af_holiday_cards_bind(u8 *data,unsigned int enabled) {
+    if(!af_holiday_cards_profile(data,enabled))return 0;
+    data[4]=2;data[7]=(u8)enabled;return 1;
+}
+#ifdef AF_V3_EVENT_ITEM_PROFILE
+unsigned int af_holiday_cards_enabled(void) {
+#ifdef __mips__
+    const volatile unsigned int *h=(const volatile unsigned int *)0x80705E00u;
+    return h[0]==0x41464849u && h[1]==2 && h[2]==14 && h[3]<=3?h[3]:~0u;
+#else
+    extern unsigned int af_test_event_item_profile;
+    return af_test_event_item_profile;
+#endif
+}
+#endif

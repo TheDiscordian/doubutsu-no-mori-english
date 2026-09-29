@@ -1699,6 +1699,41 @@ replace an unfinished interaction with an unrelated native behaviour.
 
 ### Carried event items and player connection
 
+The shared `holiday_item_menu.c` policy covers every card state `2523..252F`
+and cutlery `2530`. Additive native menu types 45/46 provide the official
+Grab/Throw Away/Quit and Yes/Quit flows. B retains the native final-option
+cancellation. Deletion uses the native six-tick shrink renderer and clears only
+the chosen pocket's scale state. Wrapped/quest conditions and other items retain
+the original selector/delete paths. Both mailing eligibility callers reject
+these items; warning rows 16/17 provide their official English refusal text.
+Entrust, quest, sell, give, take, furniture storage, exchange, and curator filters
+share the restriction. Original functions remain the predecessors; unrelated
+item semantics are not reimplemented.
+
+`v3_submenu_tables.Owner` appends complete tables, moves every checked HI/LO
+reference, retains original label objects, and preserves original contents at
+two relocation bases. The tag and warning allocation descriptors and shared
+menu arena grow together. Source text comes from the supplied donor's actual
+label/warning symbols and has five records in `translations/provenance.json`.
+
+The connected format-15 save adapter retains the 48-byte `AFHC` record and
+120,352-byte scratch. `AFHC` version two uses header byte 7 for required support:
+bit 0 is exercise cards, bit 1 is Harvest cutlery. Unknown bits reject.
+Compatible old records migrate forward; a saved requirement missing from the
+current ready mask returns `AF_SAVE_PROFILE_MISSING` before committing loaded
+state. Requirements persist independently of stamp counts and item disposal.
+All 27 card/storage exports retain their previous addresses through checked
+redirects. Format-14-or-earlier V3 and V2 cannot read new format-15 saves.
+
+The current installation is `event-controls-installed-06/`, ABI 348. Its
+155,136-byte packet contains the complete retained participant family, a
+1,728-byte menu adapter, and a 10,256-byte storage adapter; it retains nineteen
+startup descriptors. Current-ROM redirect/prefix/CRC checks and existing
+compression/fishing-storage host checks pass. Those host checks do not exercise
+the new format-15 path; native controls and persistence remain unverified.
+Card/cutlery readiness and actor admission remain off pending the connected
+calendar choice and category admission. Neither deployment changes.
+
 `tools/v3_holiday_items.py` prepares all thirteen exercise-card stamp states
 (`2523..252F`) and knife and fork (`2530`) as one complete batch. These are two
 item families, not fourteen proposed independent selector options. Their

@@ -383,6 +383,188 @@ def install_pickup(base,prior,blob,core,output):
     return e,changes,dict(physical_resources=resources),[(dict(record,previous_sha256=packet['sha256']),bytes(raw))]
 
 
+CONTROL_SOURCES = SOURCES+('tools/v3_submenu_tables.py','overlays/v3/holiday_item_menu.c',
+    'overlays/v3/holiday_item_menu.ld','overlays/v3/holiday_item_storage.ld',
+    'overlays/v3/holiday_cards.c','overlays/v3/holiday_cards.h','overlays/v3/console_storage.c',
+    'overlays/v3/save_compressed.c')
+CONTROL_FILTERS = ((2,'entrust',0x800C5640),(4,'unrestricted',0),(5,'sell',0x800C543C),
+    (6,'give',0x800C54A8),(8,'take',0x800C54F4),(9,'furniture',0x800C53B8),
+    (13,'exchange',0x800C56AC),(15,'unrestricted',0))
+
+
+def control_text(source):
+    definitions=(('discard','mTG_tag_word_suteru',b'Throw Away      '),
+        ('confirm','mTG_tag_word_dump_item',b'Yes             '),
+        ('mail','wr_You_cant_mail',b"You can't mail"),
+        ('card','wr_an_exercise_card',b'an exercise card!'),
+        ('cutlery','wr_this_item',b'this item!'))
+    texts={};credits=[]
+    for key,symbol,expected in definitions:
+        raw=source.raw(symbol);text=raw[:16] if key in ('discard','confirm') else raw
+        if text!=expected:raise ValueError('Changed complete official event item control: '+symbol)
+        texts[key]=text
+        credits.append(dict(id='v3/ui/event-items/'+key,native_sha256=None,locales=dict(en=dict(
+            credit='official',locator=['tools/v3_holiday_items.py:install_controls',
+                'N64/tag/event-items' if key in ('discard','confirm') else 'N64/inventory-warning/event-items'],
+            source=dict(source='user-supplied GAFE01 revision 0 disc',reference_resource='foresta.rel',
+                reference_symbol=symbol,data_offset=f'{source.symbol(symbol)[0]:08X}',reference_sha256=sha256(text)),
+            human_review='not_recorded',encoded_sha256=sha256(text)))))
+    return texts,credits
+
+
+def control_storage(prior,e,prefix,ram,start,output):
+    """Extend the existing save owner, preserving every public entry and buffer."""
+    from v3_import_storage import jump
+    exercise=e['npc_extra']['events']['exercise'];previous=copy.deepcopy(exercise['code'])
+    symbols=previous['symbols'];links=copy.deepcopy(e['holiday_fishing']['bindings'])
+    links.update(AF_HI_STORAGE_RAM=start,af_v3_card_state=symbols['af_v3_card_state'])
+    links.update({n:e['holiday_fishing']['code']['symbols'][n] for n in (
+        'af_holiday_fish_wire_clear_person','af_holiday_fish_wire_reset','af_holiday_fish_wire_valid')})
+    defines=[flag[2:] for flag in e['diaries']['compiled']['flags'] if flag.startswith('-D')]
+    defines+=['AF_V3_HOLIDAY_STORAGE=1','AF_V3_FISHING_STORAGE=1','AF_V3_CARD_STORAGE=1','AF_V3_EVENT_ITEM_PROFILE=1']
+    code,compiled=compile_part('holiday_item_storage',output/'holiday-item-storage',
+        primary_source='overlays/v3/console_storage.c',defines=defines,
+        extra_sources=('overlays/v3/save_compressed.c','overlays/v3/holiday_cards.c'),link_symbols=links)
+    bounds=sorted(set(v for v in symbols.values() if previous['code_bounds'][0]<=v<previous['code_bounds'][1]))
+    redirects=[]
+    for name in previous['functions']:
+        if not name.startswith(('af_v3_','af_holiday_cards_')):continue
+        target=compiled['symbols'].get(name);address=symbols[name]
+        if target is None or not start<=target<start+len(code):
+            raise ValueError('Missing complete carried-item save entry: '+name)
+        end=next((a for a in bounds if a>address),previous['code_bounds'][1])
+        if end-address<8:raise ValueError('Save entry is too short to preserve: '+name)
+        at=address-ram;before=bytes(prefix[at:at+8]);after=struct.pack('>2I',jump(target),0)
+        prefix[at:at+8]=after
+        redirects.append(dict(name=name,address=address,target=target,before=before.hex(),after=after.hex()))
+    if len(redirects)!=27:raise ValueError('Changed complete shared card/save entry inventory')
+    at=exercise['loaded_code']['ram']-ram
+    exercise['code']['sha256']=exercise['loaded_code']['sha256']=sha256(prefix[at:at+previous['bytes']])
+    exercise['sha256']=sha256(prefix[exercise['ram']-ram:exercise['ram']-ram+exercise['bytes']])
+    exercise['event_item_profile_redirects']=redirects
+    for batch in e['npc_extra']['source_batches']:
+        batch['sha256']=sha256(prefix[batch['ram']-ram:batch['ram']-ram+batch['bytes']])
+    e['console_storage'].update(save_format=15,card_runtime=copy.deepcopy(compiled))
+    updates={k:copy.deepcopy(prior[k]) for k in ('save_codec','clothing','room_surfaces')}
+    updates['save_codec'].update(format_version=15,active_storage_code=copy.deepcopy(compiled),card_storage_code=copy.deepcopy(compiled))
+    updates['clothing']['save_extension'].update(format_version=15,active_storage_code=copy.deepcopy(compiled))
+    updates['clothing']['save_extension']['legacy_formats_read']=list(dict.fromkeys(
+        [*updates['clothing']['save_extension']['legacy_formats_read'],'AFS3-v14']))
+    updates['room_surfaces']['save']['disk_format_version']=15
+    updates['save_warning']=('Format-15 experimental saves require this or a newer compatible build. '
+        'Compatible older saves migrate forward. Saves require their exercise-card and Harvest-cutlery '
+        'support even after changing selections. V2 and format-14-or-earlier V3 cannot load new saves. '
+        'Keep backups. Native event/diary gameplay and save/reload remain unverified.')
+    return code,dict(code=compiled,ram=start,bytes=len(code),sha256=sha256(code),redirects=redirects,
+        save_format=15,wire_version=2,profile_bits=dict(exercise_cards=1,harvest_cutlery=2),
+        retained_card_state=exercise['card_state'],retained_scratch=exercise['scratch'],
+        native_save_reload_verified=False),updates
+
+
+def install_controls(base,prior,blob,core,output):
+    from v3_submenu_tables import Owner,resize
+    from v3_console_disk_install import reservations
+    from v3_import_storage import jump
+    from v3_holiday_dialogue import check_provenance
+    from font import WIDTH_TABLE
+    import v3_physical_resources as physical
+    del blob
+    e=copy.deepcopy(prior['equipment_resources']);events=e['npc_extra']['events'];items=e['holiday_items']
+    if not events.get('exercise') or items.get('controls') or items['ready_mask']:
+        raise ValueError('Event controls require the complete exercise family and inactive carried items')
+    files=by_vrom(base);source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+        (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    texts,credits=control_text(source);check_provenance(dict(provenance_entries=credits))
+    old=events['sky']['packet'];prefix=bytearray(base[old['physical']:old['physical']+old['bytes']])
+    start=old['ram']+len(prefix)
+    if sha256(prefix)!=old['sha256'] or start&15:
+        raise ValueError('Changed loaded event packet')
+    links=dict(AF_HI_LINK_RAM=start,af_hi_prior_menu=e['player_actions']['balloon_menu']['code']['symbols']['af_v3_balloon_menu_type'],
+        af_holiday_item_display=items['code']['symbols']['af_holiday_item_display'])
+    for index,name,entry in CONTROL_FILTERS:
+        if u32(core,0x8010DD38-CODE_RAM+index*4)!=entry:
+            raise ValueError('Changed inventory policy predecessor: '+name)
+        if entry:links['af_hi_prior_'+name]=entry
+    code,compiled=compile_part('holiday_item_menu',output/'holiday-item-controls',
+        defines=('AF_HI_MENU=45','AF_HI_CONFIRM=46','AF_HI_WARNING=16'),link_symbols=links)
+    if (start+len(code)+16>0x807DA800 or any(a<start+len(code)+16 and start<b for a,b in reservations(prior))):
+        raise ValueError('Carried event controls overlap retained resident memory')
+    symbols=compiled['symbols'];tag=Owner(files[0x3950000].extract(base),files[0x3960000].extract(base),0x8086F310)
+    warn=Owner(files[0x3E00000].extract(base),files[0x3E10000].extract(base),0x80896B20)
+    current=e['player_actions']['balloon_menu'];table=tag.ram+current['table_offset']
+    # The balloon receipt describes its installation stage. Later creature and
+    # carried-item readers change this owner; bind the complete current owner.
+    if (current['table_bytes']!=45*8 or
+            sha256(tag.original)!='c0c42e78184355a0cc85179bfdce9fc896262439a27f08036e99feca6313f671' or
+            sha256(tag.relocation)!='4ae33b33b55e3cb4ad3989be5dd83df46160688e4ad5cf8059d70b9d6cb5a55a' or
+            sha256(warn.original)!='cff7740a4eb805bcc387719a1fdce245975f53121100ca5144d4b4e60b3efb76' or
+            sha256(warn.relocation)!='1817107221c39d9170137e2e7c8650a5110d61e05e4e1e7497b6a26f7b112ed3'):
+        raise ValueError('Changed complete current inventory action table')
+    p=u32(tag.data,table-tag.ram+8);grab,_,quit_word=struct.unpack_from('>3I',tag.data,p-tag.ram)
+    if tag.data[grab-tag.ram:grab-tag.ram+16]!=b'Grab            ' or tag.data[quit_word-tag.ram:quit_word-tag.ram+16]!=b'Quit            ':
+        raise ValueError('Changed translated native Grab/Quit objects')
+    toss=tag.append(texts['discard']+struct.pack('>I',symbols['af_hi_confirm']))
+    yes=tag.append(texts['confirm']+struct.pack('>I',symbols['af_hi_discard']))
+    menu_words=tag.append(struct.pack('>3I',grab,toss,quit_word),pointers=(0,4,8))
+    confirm_words=tag.append(struct.pack('>2I',yes,quit_word),pointers=(0,4))
+    tag.table(table,45,8,struct.pack('>4I',menu_words,3,confirm_words,2),expected_references=16)
+    for at,before,symbol,relocated in (
+            (0x80875834,jump(links['af_hi_prior_menu'],link=True),'af_hi_menu_type',False),
+            (0x808760AC,jump(0x80870AC4,link=True),'af_hi_mail_allowed',True),
+            (0x80876348,jump(0x80870AC4,link=True),'af_hi_mail_allowed',True),
+            (0x80876170,jump(0x80871570,link=True),'af_hi_mail_warning',True),
+            (0x80877064,jump(0x80876B18,link=True),'af_hi_delete_tick',True)):
+        tag.patch(at,before,jump(symbols[symbol],link=True),remove_relocation=relocated)
+    widths=core[WIDTH_TABLE:WIDTH_TABLE+256];warning_rows=bytearray()
+    for key in ('card','cutlery'):
+        lines=bytearray()
+        for text,y in ((texts['mail'],40.0),(texts[key],24.0)):
+            span=sum(12-widths[c] for c in text)
+            if not 0<span<=208:raise ValueError('Official event warning exceeds its native frame')
+            address=warn.append(text+b'\0')
+            lines.extend(struct.pack('>ffII',120-span/2,y,address,len(text)))
+        address=warn.append(lines,pointers=(8,24))
+        warning_rows.extend(struct.pack('>IIff',address,2,1.0,1.0))
+    warn.table(0x80897728,16,16,warning_rows,expected_references=1)
+    tag_data,tag_reloc,tag_report=tag.finish();warning_data,warning_reloc,warning_report=warn.finish()
+    parent=bytearray(files[0x7749C0].extract(base));metadata=[]
+    for vrom,ram,offset,before,after in ((0x3950000,tag.ram,0x2CB0,len(tag.original),len(tag_data)),
+            (0x3E00000,warn.ram,0x2C10,len(warn.original),len(warning_data))):
+        metadata.append(resize(parent,core,vrom=vrom,ram=ram,offset=offset,before=before,after=after))
+    filter_hooks=[]
+    for index,name,entry in CONTROL_FILTERS:
+        at=0x8010DD38+index*4;target=symbols['af_hi_filter_'+name]
+        struct.pack_into('>I',core,at-CODE_RAM,target)
+        filter_hooks.append(dict(address=at,before=entry,after=target))
+    changes={0x3950000:tag_data,0x3960000:tag_reloc,0x3E00000:warning_data,0x3E10000:warning_reloc,0x7749C0:bytes(parent)}
+    storage,save,updates=control_storage(prior,e,prefix,old['ram'],start+len(code),output)
+    extra=code+storage+b'AFHI'*4
+    if start+len(extra)>0x807DA800 or any(a<start+len(extra) and start<b for a,b in reservations(prior)):
+        raise ValueError('Connected carried controls/storage overlap retained memory')
+    combined=bytes(prefix)+extra;records=copy.deepcopy(prior['physical_resources'])
+    allocation=physical.grow_backwards(base,records,old['id'],combined)
+    fresh={k:allocation[k] for k in ('id','physical','bytes','sha256')}
+    records=[fresh if r['id']==old['id'] else r for r in records]
+    packet=dict(fresh,ram=old['ram'],crc32=zlib.crc32(combined),storage='physical-ROM')
+    for family in ('sky','participants','exercise'):events[family]['packet']=copy.deepcopy(packet)
+    e['npc_extra'].setdefault('source_batches',[]).append(dict(installed=True,ram=start,
+        bytes=len(extra),sha256=sha256(extra),category='carried-event-controls'))
+    sources={p:sha256((ROOT/p).read_bytes()) for p in CONTROL_SOURCES}
+    report=dict(format='AFV3-HOLIDAY-ITEM-CONTROLS-1',code=compiled,
+        loaded_code=dict(ram=start,bytes=len(code),sha256=sha256(code)),packet=packet,
+        previous_packet=old,previous_prefix_bytes=len(prefix),storage=save,tag=tag_report,warning=warning_report,
+        metadata=metadata,filter_hooks=filter_hooks,provenance_entries=credits,
+        additional_resident_bytes=len(extra),installed=True,admission_changed=False,
+        saved_format_changed=True,native_execution_verified=False,sources=sources)
+    items['controls']=report;items['pending']=['calendar/event activation','connected native gameplay']
+    e['npc_extra']['sources'].update(sources)
+    resized=[dict(vrom=v,previous_bytes=files[v].size,previous_sha256=sha256(files[v].extract(base)),
+        bytes=len(data),sha256=sha256(data)) for v,data in changes.items() if len(data)!=files[v].size]
+    write_new(output/'holiday-item-controls/installed.json',(json.dumps(report,indent=2)+'\n').encode())
+    updates.update(physical_resources=records,runtime_owner_resizes=resized,saved_format_changed=True)
+    return e,changes,updates,[(allocation,combined)]
+
+
 if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser(description=__doc__)
