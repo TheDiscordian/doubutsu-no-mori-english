@@ -1542,9 +1542,11 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         report['native_test']='pending connected Tortimer event/conversation/animation providers and diary gameplay/save verification'
     if carried_items is not None:
         carried=equipment_report['carried_items']
-        report['shared_runtime_refresh'].update(adapters=['carried_items'],artwork_changed=True,
-            additional_resident_bytes=carried['additional_resident_bytes'],resource_allocations_changed=True,
+        actions=carried.get('actions')
+        report['shared_runtime_refresh'].update(adapters=['carried_items'],artwork_changed=not bool(actions),
+            additional_resident_bytes=0 if actions else carried['additional_resident_bytes'],resource_allocations_changed=True,
             saved_format_changed=False,saved_profile_changed=False,changed_owner_moves=owner_moves)
+        if actions:report['shared_runtime_refresh']['additional_menu_bytes']=actions['additional_menu_bytes']
         report['sources'].update(carried['sources'])
         report['native_test']='pending connected carried-item menus, behaviours, persistence, and selection; readiness remains off'
     if holiday_actor_services:

@@ -73,10 +73,10 @@ python3 tools/v3_furniture_pipeline.py convert --representation carried \
 
 ## Installed shared runtime
 
-The current development proposal is ABI 353 at
-`build/v3-carried-runtime-work-01/readers-connected-12/build-lock.json`.
+The current development proposal is ABI 354 at
+`build/v3-carried-runtime-work-01/actions-connected-03/build-lock.json`.
 Its ROM SHA-256 is
-`a76fc718d82567fd313fc4d9a4ea916ae210b0fdaefeae2faedbdcd72aa36aa9`.
+`01c8fef734cb681a35e84fff5284486ae97c8592ebb26c47ca92ad8900803074`.
 This is an inactive carried integration, not a new playable-import claim.
 
 `v3_furniture_install.py --refresh-runtime --carried-items PATH` installs the
@@ -99,7 +99,7 @@ therefore retained, not overwritten or reinterpreted as a donor quantity.
 The checked ten-entry native plant table also remains unchanged. Registry
 destinations do not depend on selection order.
 
-Code occupies `80771000..80771940`; the 864-byte table starts at `80773800`.
+Code occupies `80771000..80771EE0`; the 864-byte table starts at `80773800`.
 The eight-word header identifies 26 records of 32 bytes and separate seven-bit
 readiness/selection masks, both zero. Names, categories, base prices, room/pocket
 conversions, icons, and quantity helpers use the same bounded record lookup.
@@ -145,17 +145,15 @@ loader through its actual relocated constructor address.
 Continue the shared importing task without rescanning or recompiling these
 unchanged resources:
 
-1. Connect native inventory action/hand consumers to the installed state helpers,
-   including paper/spirit split/merge and letter consumption. The source
-   `mTG_1catch_proc`, `mHD_prepare_drop_paper`, `mHD_prepare_drop_wisp`, and
-   `mTG_select_tag_decide_item_normal` describe the shared interactions. The
-   current tag owner is `03950000`, linked at `8086F310`. Its native letter
+1. Connect collection/catalogue and saved-profile consumers to the installed
+   shared quantities and fixed identities. The current tag owner is `03950000`,
+   linked at `8086F310`. Its native letter
    collection call at `808734F8` uses `2000 + saved style`; style 64 needs the
    new collection/profile path, not the original short catalogue bitset.
 2. Connect the remaining actual item interactions: sign-board placement/design
    handling; card stamping/menu behaviour;
    Harvest cutlery interaction; coconut eating/planting and tree behaviour;
-   cedar planting/growth; spirit split/merge/catch/release and field behaviour.
+   cedar planting/growth; spirit capture/release and field behaviour.
    Preserve the installed event/card/cutlery paths. Item-specific behaviour is
    part of importing, not an exception to defer automatically.
 3. Extend canonical saved identities, parent-owned profiles, and paper collection/
@@ -166,6 +164,47 @@ unchanged resources:
    Acquisition follows primary importing. Gold-tree work remains required after
    primary imports, along with any unfinished golden-tool behaviour.
 
+### Inventory and hand actions
+
+The same `--carried-items` route continues the inactive installed batch without
+reconverting resources. `carried_actions.c` maps quantities through the registry,
+not donor paper-ID arithmetic. Complete pinned donor functions describe the
+menu, single pickup, both stack merges, hand drop, and confirmed letter saving.
+
+The tag owner gains four menus, indices `47..50`, for outdoor paper, outdoor
+paper with burial available, the player's room, and other interiors. Counts are
+`5/6/5/4`. Every existing word, handler, and final `Quit` position remains; the
+additional `Grab One` word reuses existing English and binds the shared splitter.
+The predecessor still supplies gift/quest restrictions and ordinary field rules.
+The actual menu call at `80875834` uses the new adapter. Single sheets retain
+their native menus; ticket menus and their handlers remain unchanged.
+
+The native hand call at `8087B184` redirects to the shared paper/spirit merge
+adapter. Its matching JAL relocation is removed; every other hand instruction,
+relocation, data field, and BSS size is preserved. Both source and target must
+be ordinary items of the same selected family, below that family's stack limit.
+The original drop routine performs the actual swap/animation and refresh:
+the combined stack goes into the pocket, overflow remains in hand, and a full
+stack or unrelated item follows the unchanged native exchange path. The common
+single-pickup handler fills native hand fields and decrements the pocket without
+passing a donor quantity into native ticket arithmetic. Spirit field interaction
+and its eventual menu admission remain pending; stack helpers alone do not
+make spirits usable.
+
+Only the letter confirmation branch's inventory-setter call at `80889434` uses
+the paper-consumption adapter. It subtracts one sheet from all four imported
+quantities; a singleton clears its slot. Original paper keeps the original
+setter, and cancel/rewrite branches are unchanged. This preserves letter timing
+and the installed complete editor. Paper collection/catalogue and compatible
+saved-profile validation remain required before enabling the family.
+
+The action code preserves the entire preceding reader prefix and every public
+entry, fitting the existing reservation with no added resident bytes. The tag
+owner grows to 45,744 bytes and adds 512 menu-pool bytes. Allocation validation
+checks successive descriptors for the same owner before comparing the final
+descriptor with the actual parent; an earlier allocation is not mistaken for
+the current one. All seven readiness/selection bits stay zero.
+
 ## Verification and limits
 
 `tests/test_v3_carried_items.py` covers complete state discovery, official names,
@@ -175,10 +214,16 @@ recursive models, changed price code, invalid offsets, or unknown UI state.
 Existing source-category and UI-state rejection checks cover the changed shared
 converters. No emulator, old candidate, or hardware test is implied.
 
-`tests/test_v3_carried_runtime.py` supplies six focused checks for the current
+`tests/test_v3_carried_runtime.py` supplies seven focused checks for the current
 cartridge's full packet/records/artwork, original identities and reader chains,
 seasonal descriptors, native letter tables, interior vertex bounds, and sanitized
-state/constructor readers. The existing browser/offline comparison passes empty,
+state/constructor/stack-action readers. It checks every paper/spirit stack-count
+pair, protected and unrelated items, single-sheet consumption, menu contexts,
+actual installed callers, and retention of the hand's native sections/relocations.
+The host relocation model explicitly accounts for the original hand's indexed
+money-table base (`808742A8 + 2100*4`), binding both instructions and its complete
+four-entry table; it does not permit arbitrary out-of-owner pointers.
+The existing browser/offline comparison passes empty,
 all-supported, unrelated, one-diary, all-diaries, calendar-only, and tournament-only
 profiles. Empty remains exactly V2-14. The ROM checksum and reconstructed UPS
 also pass the ordinary builder checks.

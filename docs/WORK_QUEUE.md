@@ -41,8 +41,8 @@ Do not make another per-item installer. Golden net/axe/shovel/rod still need
 their actual remaining consumers distinguished from acquisition; retain all
 installed tool behaviour and do not replay old tests to establish it again.
 
-The current proposal is ABI 353 at
-`build/v3-carried-runtime-work-01/readers-connected-12/build-lock.json`.
+The current proposal is ABI 354 at
+`build/v3-carried-runtime-work-01/actions-connected-03/build-lock.json`.
 The complete `build/v3-carried-batch-prepared-05/` resources are installed without
 reconversion: seven parents, 26 states, fourteen icons, seven handover/police
 models, complete orange-paper artwork, official names, and prices. Additive
@@ -50,16 +50,22 @@ identities, six shared readers, qualified ground categories, and the native
 letter drawing/colour/constructor path are connected. Cedar's category 48 keeps
 the diary-specific source-17 mapping at 44. Ready/selected masks remain zero;
 none of these seven families is newly playable. The importer adds 30,176 resident
-bytes without another startup descriptor and 768 menu-pool bytes.
+bytes without another startup descriptor and 1,280 menu-pool bytes in total.
+The connected inventory path supplies four multi-sheet menus, one-sheet pickup,
+paper/spirit merging with overflow, and confirmed one-sheet letter consumption.
+Native hand animation, original items, ticket stacks, and protected conditions
+remain unchanged. The action extension uses the existing resident reservation.
 
-Next connect the inventory action/hand paths across the batch: paper/spirit
-splitting and merging, letter creation/consumption and collection/catalogue,
-planting/eating, sign designs/placement, and spirit capture/release. Reuse the
-installed event/card/cutlery controls. Bind saved identities/profile requirements
-and independent selections as part of the same task. The native tag, core, and
-letter disassemblies in `build/v3-carried-runtime-work-01/` are already available;
+Next connect collection/catalogue and canonical saved identities/profile
+requirements across the batch, then the remaining actual field consumers:
+planting/eating, sign designs/placement, and spirit capture/release. Shared
+paper/spirit splitting/merging and confirmed letter consumption are installed;
+do not rebuild those or the prepared artwork without a relevant defect. Reuse
+the installed event/card/cutlery controls. Independent selections stay part of
+the same task. The native tag, core, letter, and hand disassemblies in
+`build/v3-carried-runtime-work-01/` are already available;
 do not repeat them. All prepared artwork and passing unchanged checks remain
-reusable. Six carried-runtime checks and the seven-profile browser/offline
+reusable. Seven carried-runtime checks and the seven-profile browser/offline
 comparison pass; native rendering, item interactions, and persistence remain
 unverified. The consumer map, resource contract, and focused checks are in
 [carried-item imports](../specs/V3_CARRIED_ITEMS.md).

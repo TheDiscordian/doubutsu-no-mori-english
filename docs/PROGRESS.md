@@ -46,17 +46,25 @@ official text colour, preserving all 64 original styles and the existing editor.
 Its shared constructor normalizes all four imported quantities to one paper
 style; physical graphics pointers avoid overwriting the native DMA buffer.
 The shared seasonal bitmap, startup, and enlarged menu allocations are connected.
-Seven focused current-build checks pass, including sanitized readers/ground
-construction, complete letter resources/tables, retained creature readers,
-allocation rejection, and seven browser/offline selection comparisons. These
-are not native rendering or gameplay/save verification. Inventory actions,
-paper consumption/stacking/catalogue, item-specific behaviours, saved profiles,
-and independent selection remain the same connected task. See
+The shared inventory path includes multi-sheet menus, one-at-a-time pickup,
+paper/spirit merging with overflow retained in hand, and one-sheet consumption
+only on confirmed letter creation. Native hand movement, ticket handling,
+protected-item conditions, and original paper remain intact. All existing menu
+words and cancellation positions are reused; four additional menus share one
+handler. The code fits the installed reservation without resident growth; the
+menu pool grows by 512 bytes.
+Eight focused current-build checks pass, including sanitized readers/stack
+actions/ground construction, complete letter resources/tables, actual native
+call bindings and hand relocation, retained creature readers, allocation
+rejection, and seven browser/offline selection comparisons. These are not native
+rendering or gameplay/save verification. Catalogue/collection and saved profiles,
+remaining item-specific behaviours, and independent selection remain the same
+connected task. See
 [the carried-item contract](../specs/V3_CARRIED_ITEMS.md).
 
-The current proposal is ABI 353 at
-`build/v3-carried-runtime-work-01/readers-connected-12/build-lock.json`, ROM SHA-256
-`a76fc718d82567fd313fc4d9a4ea916ae210b0fdaefeae2faedbdcd72aa36aa9`.
+The current proposal is ABI 354 at
+`build/v3-carried-runtime-work-01/actions-connected-03/build-lock.json`, ROM SHA-256
+`01c8fef734cb681a35e84fff5284486ae97c8592ebb26c47ca92ad8900803074`.
 It contains 207 independently selectable development imports, including all
 sixteen diary styles, all nine fish, and eight insects. Another 100 furniture
 profiles await acquisition. The main lock and both stable V2-14 deployments

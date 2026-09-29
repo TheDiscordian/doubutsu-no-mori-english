@@ -19,7 +19,7 @@ from v3_furniture_install import inputs
 from v3_registry import CARRIED_ITEMS,CARRIED_ITEM_CATEGORIES
 import v3_physical_resources as physical
 
-OUT=ROOT/os.environ.get('V3_CARRIED_RUNTIME','build/v3-carried-runtime-work-01/readers-connected-12')
+OUT=ROOT/os.environ.get('V3_CARRIED_RUNTIME','build/v3-carried-runtime-work-01/actions-connected-03')
 
 class CarriedRuntimeTests(unittest.TestCase):
     @classmethod
@@ -33,7 +33,7 @@ class CarriedRuntimeTests(unittest.TestCase):
         raw=image[p['physical']:p['physical']+p['bytes']]
         physical.verify(image,r['physical_resources'])
         self.assertEqual((sha256(raw),zlib.crc32(raw)),(p['sha256'],p['crc32']))
-        self.assertEqual(raw[:old['bytes']],base[old['physical']:old['physical']+old['bytes']])
+        self.assertEqual(sha256(raw[:old['bytes']]),old['sha256'])
         self.assertEqual(p['ram']+len(raw),END);self.assertEqual(raw[-16:],GUARD)
         self.assertEqual(sha256(raw[RAM-p['ram']:]),d['sha256'])
         self.assertEqual(sha256(raw[RAM-p['ram']:RAM-p['ram']+d['code']['bytes']]),d['code']['sha256'])
@@ -93,8 +93,9 @@ class CarriedRuntimeTests(unittest.TestCase):
         d=self.report['equipment_resources']['carried_items'];paper=d['paper'];r=paper['letter_window']
         files=by_vrom(self.image);old=by_vrom(self.base)
         data=files[r['vrom']].extract(self.image);before=old[r['vrom']].extract(self.base)
-        self.assertEqual(sha256(data),r['owner_sha256'])
-        self.assertEqual(sha256(files[r['reloc']].extract(self.image)),r['relocation_sha256'])
+        current=d.get('actions',{}).get('letter',r)
+        self.assertEqual(sha256(data),current['owner_sha256'])
+        self.assertEqual(sha256(files[r['reloc']].extract(self.image)),current['relocation_sha256'])
         self.assertEqual(len(r['tables']),3)
         for table in r['tables']:
             at=table['address']-r['ram'];start=table['original']-r['ram']
@@ -106,8 +107,68 @@ class CarriedRuntimeTests(unittest.TestCase):
                 (PAPER&0x1FFFFFFF)+paper['offsets'][binding[kind]])
         at=r['tables'][2]['address']-r['ram']+256
         self.assertEqual(list(data[at:at+4]),binding['text_rgba'])
-        allowed={p['address']-r['ram']+i for p in r['patches'] for i in range(4)}
+        allowed={p['address']-r['ram']+i for p in r['patches']+current['patches'] for i in range(4)}
         self.assertTrue(all(a==b or i in allowed for i,(a,b) in enumerate(zip(data,before))))
+
+    def test_shared_stack_actions_have_real_callers_and_preserve_native_owners(self):
+        from catalogue_names import Image
+        from npc_mail_show import relocate_verified_data
+        from v3_import_storage import jump
+        d=self.report['equipment_resources']['carried_items'];a=d.get('actions')
+        if not a:self.skipTest('Current build predates the shared inventory-action connection')
+        files,old=by_vrom(self.image),by_vrom(self.base)
+        symbols=d['code']['symbols'];p=d['packet'];raw=self.image[p['physical']:p['physical']+p['bytes']]
+        start=RAM-p['ram'];previous=a['code_previous']
+        self.assertEqual(sha256(raw[start:start+previous['bytes']]),previous['sha256'])
+        self.assertLessEqual(d['code']['bytes'],TABLE-RAM)
+        tag=files[0x3950000].extract(self.image);r=a['tag'];ram=0x8086F310
+        self.assertEqual(sha256(tag),r['owner_sha256'])
+        table=r['tables'][0];self.assertEqual((table['original_count'],table['count']),(47,51))
+        self.assertEqual(u32(tag,0x80875834-ram),jump(symbols['af_carried_menu_type'],link=True))
+        for i,menu in enumerate(a['menus']):
+            self.assertEqual(menu['index'],47+i)
+            self.assertEqual(struct.unpack_from('>II',tag,table['address']-ram+8*menu['index']),
+                (menu['address'],len(menu['words'])))
+            self.assertEqual(menu['words'][-1],0x80879898)
+            self.assertEqual(tag[menu['words'][1]-ram:menu['words'][1]-ram+16],b'Grab One        ')
+            self.assertEqual(u32(tag,menu['words'][1]-ram+16),symbols['af_carried_grab_one'])
+        self.assertEqual([len(m['words']) for m in a['menus']],[5,6,5,4])
+        letter=files[0x3B60000].extract(self.image)
+        self.assertEqual(u32(letter,0x80889434-0x80888E90),jump(symbols['af_carried_consume_paper'],link=True))
+        hand=a['hand'];data=files[hand['vrom']].extract(self.image);before=old[hand['vrom']].extract(self.base)
+        reloc=files[hand['reloc']].extract(self.image);old_reloc=old[hand['reloc']].extract(self.base)
+        self.assertEqual((sha256(data),sha256(reloc)),(hand['owner_sha256'],hand['relocation_sha256']))
+        at=hand['address']-hand['ram']
+        self.assertEqual(u32(data,at),jump(symbols['af_carried_drop_stack'],link=True))
+        self.assertEqual(data[:at]+data[at+4:],before[:at]+before[at+4:])
+        self.assertEqual(reloc[:16],old_reloc[:16]);self.assertEqual(u32(reloc,16),u32(old_reloc,16)-1)
+        # The complete native money reader deliberately biases its table base
+        # by ITM_MONEY_START*4 before indexing by the full 0x2100..0x2103 ID.
+        # This is the sole out-of-owner HI/LO constant, not an escaped pointer.
+        from v3_player_actions import native_references
+        groups,_,_,_,_=native_references(before,old_reloc,expected_sections=(8864,272,80,768))
+        outside=[(hand['ram']+hi,hand['ram']+lo,value) for hi,refs in groups.items() for lo,value in refs
+            if not hand['ram']<=value<hand['ram']+len(before)+768]
+        self.assertEqual(outside,[(0x8087AE54,0x8087AE80,0x808742A8)])
+        self.assertEqual(struct.unpack_from('>4I',before,0x808742A8+0x2100*4-hand['ram']),
+            (1000,10000,30000,100))
+        for base in (0x80200010,0x80348010):
+            b=relocate_verified_data(Image(hand['ram'],len(before)+u32(old_reloc,12),struct.unpack_from('>5I',old_reloc)),before,old_reloc,base,
+                address_constants=(0x808742A8,))
+            n=relocate_verified_data(Image(hand['ram'],len(data)+u32(reloc,12),struct.unpack_from('>5I',reloc)),data,reloc,base,
+                address_constants=(0x808742A8,))
+            self.assertEqual(n[:at]+n[at+4:],b[:at]+b[at+4:])
+            self.assertEqual(u32(n,at),jump(symbols['af_carried_drop_stack'],link=True))
+        # Every actual imported action has its retained complete donor function.
+        self.assertEqual({r['symbol'] for r in a['donors']},{'mTG_1catch_proc','mTG_select_tag_decide_item_normal',
+            'mHD_prepare_drop_paper','mHD_prepare_drop_wisp','mHD_drop_item2','mBD_move_Obey'})
+        self.assertEqual(a['additional_resident_bytes'],0)
+        from v3_furniture_capacity import checked
+        broken=copy.deepcopy(self.report)
+        allocation=broken['equipment_resources']['carried_items']['menu_allocations'][-1]
+        # A later resize must start at the exact previous descriptor.
+        bad=bytearray.fromhex(allocation['before']);bad[7]^=16;allocation['before']=bad.hex()
+        with self.assertRaisesRegex(ValueError,'allocation chain'):checked(self.image,broken)
 
     def test_shared_rebasing_retains_interior_vertices_and_rejects_overruns(self):
         from v3_category_runtime import rebase_art

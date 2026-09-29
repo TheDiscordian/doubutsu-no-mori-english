@@ -97,13 +97,18 @@ def checked(base, report):
         allocations=(controls['metadata'] if controls else [])+equipment.get('carried_items',{}).get('menu_allocations',[])
         if allocations:
             parent=files[0x7749C0].extract(base)
+            descriptors={}
             for row in allocations:
                 patch=row['pool_patch'];growth=row['additional_pool_bytes']
                 if (patch!=dict(address=POOL_WORD,before=tail_word,after=tail_word+growth) or
                         growth<0 or growth%64 or (tail_word^(tail_word+growth))&0xFFFF8000 or
-                        parent[row['offset']:row['offset']+32].hex()!=row['after']):
+                        len(bytes.fromhex(row['before']))!=32 or len(bytes.fromhex(row['after']))!=32 or
+                        (row['offset'] in descriptors and descriptors[row['offset']]!=row['before'])):
                     raise ValueError('Broken event-menu submenu allocation chain')
+                descriptors[row['offset']]=row['after']
                 tail_word=patch['after']
+            if any(parent[offset:offset+32].hex()!=value for offset,value in descriptors.items()):
+                raise ValueError('Broken event-menu submenu allocation chain')
         later_extra=tail_word-(int(patches[POOL_WORD]['after'],16)+delta)
         actual_bound=bound+delta+later_extra
         if (set(patches) != {0x800C4AFC, POOL_WORD} or

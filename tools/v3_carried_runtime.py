@@ -21,7 +21,7 @@ GUARD=b'AFV3CARRIEDGUARD'
 SOURCES=('tools/v3_carried_runtime.py','tools/v3_carried_items.py','tools/v3_category_runtime.py','tools/v3_asset_loader.py',
     'tools/v3_item_categories.py','tools/v3_registry.py','tools/v3_furniture_install.py',
     'tools/v3_room_goods.py','tools/v3_creature_items.py','tools/v3_holiday_selection.py','tools/v3_submenu_tables.py',
-    'tools/v3_furniture_capacity.py','overlays/v3/carried_menu.c',
+    'tools/v3_furniture_capacity.py','overlays/v3/carried_menu.c','overlays/v3/carried_actions.c',
     'overlays/v3/carried_items.c','overlays/v3/carried_items.h',
     'overlays/v3/carried_items.ld','overlays/v3/creature_icon.S',
     'overlays/v3/item_categories.c','overlays/v3/ground_categories.c','translations/provenance.json')
@@ -73,6 +73,8 @@ def letter_window(base,core,menu,paper,symbols):
 
 
 def install(base, prior, blob, core, module, output, directory):
+    if prior['equipment_resources'].get('carried_items'):
+        return install_actions(base,prior,blob,core,output,directory)
     from v3_carried_items import FORMAT,records,pocket_icons,paper_art
     from v3_item_categories import discover,checked_art
     from v3_category_runtime import rebase_art,append_categories
@@ -228,3 +230,127 @@ def install(base, prior, blob, core, module, output, directory):
     write_new(output/'carried-packet.bin',raw)
     return e,changes,dict(physical_resources=resources,runtime_owner_resizes=resizes,
         resource_growth=growth),[(replacement,bytes(raw))]
+
+
+ACTION_SOURCES=(
+    (0x287138,'mTG_1catch_proc','f4630352fe9abfdaa30c012642a1808ad92d08c7b2b55b1271fb001c37ff4c0d'),
+    (0x28A884,'mTG_select_tag_decide_item_normal','279e89153d01784f41aeb7e602f1f5709482240ec4042ab471a39e16f89b529c'),
+    (0x26DC70,'mHD_prepare_drop_paper','dda8e1cb9c8d5008205b9a9aa729dee1c330b07df24af16b021ba9cc0fee569a'),
+    (0x26DB74,'mHD_prepare_drop_wisp','e55621c1c295fc1c5c6178f344f401ac82de9110e887d61cff0d10266930a715'),
+    (0x26DD84,'mHD_drop_item2','a01981cdb2e32bc70b64ad11faf837f5bfa21d388507ab12b214490461fce696'),
+    (0x255034,'mBD_move_Obey','676cb429a71ca6b3488c21944927704136cabcf4a59fce103e7647a13ea4a8f7'))
+
+
+def install_actions(base,prior,blob,core,output,directory):
+    """Continue the installed shared batch, without recompiling any artwork."""
+    from v3_submenu_tables import Owner,resize
+    from v3_furniture_install import relocate_resource_plan
+    from v3_npc_draw import relocation_offsets
+    from v3_furniture_icon import VROM as MENU
+    import v3_physical_resources as physical
+    del blob
+    e=copy.deepcopy(prior['equipment_resources']);d=e['carried_items'];old=d['packet']
+    if d.get('actions') or d['ready_mask'] or d['selected_mask'] or directory.resolve()!=ROOT/d['prepared']:
+        raise ValueError('Carried actions require the checked inactive prepared batch')
+    raw=bytearray(base[old['physical']:old['physical']+old['bytes']]);start=RAM-old['ram']
+    previous=d['code']
+    if (sha256(raw)!=old['sha256'] or raw[-16:]!=GUARD or old['ram']+len(raw)!=END or
+            sha256(raw[start:])!=d['sha256'] or
+            sha256(raw[start:start+previous['bytes']])!=previous['sha256'] or
+            any(raw[start+previous['bytes']:TABLE-old['ram']])):
+        raise ValueError('Changed complete carried packet or code reservation')
+    source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+        (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    donors=[]
+    for at,name,digest in ACTION_SOURCES:
+        _,receipt=source.function(at)
+        if receipt['symbol']!=name or receipt['sha256']!=digest:
+            raise ValueError('Changed complete donor stack/action function: '+name)
+        donors.append(receipt)
+    controls=e['holiday_items']['controls'];links=dict(previous['link_symbols'])
+    links['af_carried_prior_menu']=controls['code']['symbols']['af_hi_menu_type']
+    first=controls['tag']['tables'][0]['count']
+    if first!=47:raise ValueError('Changed complete native action-menu count')
+    code,compiled=compile_part('carried_items',output/'carried-items',
+        extra_sources=('overlays/v3/creature_icon.S','overlays/v3/ground_categories.c',
+            'overlays/v3/carried_menu.c','overlays/v3/carried_actions.c'),
+        defines=tuple(f[2:] for f in previous['flags'] if f.startswith('-D'))+
+            (f'AF_CARRIED_PAPER_MENUS={first}',),link_symbols=links)
+    if (len(code)>TABLE-RAM or code[:previous['bytes']]!=raw[start:start+previous['bytes']] or
+            any(compiled['symbols'].get(k)!=v for k,v in previous['symbols'].items() if k.startswith('af_'))):
+        raise ValueError('Carried action extension moves or changes a retained reader')
+    symbols=compiled['symbols'];raw[start:TABLE-old['ram']]=code.ljust(TABLE-RAM,b'\0')
+    files=by_vrom(base);tag=Owner(files[0x3950000].extract(base),files[0x3960000].extract(base),0x8086F310)
+    if (sha256(tag.original)!=controls['tag']['owner_sha256'] or
+            sha256(tag.relocation)!=controls['tag']['relocation_sha256']):
+        raise ValueError('Changed current complete native action owner')
+    table=controls['tag']['tables'][0]['address'];extra=bytearray();menus=[]
+    grab_one=tag.append(tag.original[0x8087999C-tag.ram:0x808799AC-tag.ram]+
+        struct.pack('>I',symbols['af_carried_grab_one']))
+    if tag.data[grab_one-tag.ram:grab_one-tag.ram+16]!=b'Grab One        ':
+        raise ValueError('Changed complete translated native stack action')
+    # Reuse every existing word, handler, and cancellation position. The one
+    # additional choice uses the new shared splitter, not the native ticket code.
+    for index in (3,4,15,17):
+        pointer,count=struct.unpack_from('>II',tag.original,table-tag.ram+index*8)
+        words=list(struct.unpack_from('>'+str(count)+'I',tag.original,pointer-tag.ram))
+        if words[0]!=0x80879834 or words[1]!=0x80879848 or words[-1]!=0x80879898:
+            raise ValueError('Changed complete paper-menu word order')
+        words.insert(1,grab_one)
+        address=tag.append(struct.pack('>'+str(len(words))+'I',*words),
+            pointers=tuple(range(0,len(words)*4,4)))
+        extra.extend(struct.pack('>II',address,len(words)))
+        menus.append(dict(index=first+len(menus),original_index=index,words=words,address=address))
+    tag.table(table,first,8,bytes(extra),expected_references=16)
+    tag.patch(0x80875834,jump(links['af_carried_prior_menu'],link=True),
+        jump(symbols['af_carried_menu_type'],link=True))
+    tag_data,tag_reloc,tag_receipt=tag.finish()
+    letter=Owner(files[0x3B60000].extract(base),files[0x3B70000].extract(base),0x80888E90)
+    binding=d['paper']['letter_window']
+    if (sha256(letter.original)!=binding['owner_sha256'] or sha256(letter.relocation)!=binding['relocation_sha256']):
+        raise ValueError('Changed complete extended stationery window')
+    letter.patch(0x80889434,jump(0x800B8B08,link=True),jump(symbols['af_carried_consume_paper'],link=True))
+    letter_data,letter_reloc,letter_receipt=letter.finish()
+    # Hand still uses its native text/data/BSS sections, unlike flattened tag and
+    # letter owners. Preserve all sizes and remove only the redirected JAL fixup.
+    hand=bytearray(files[0x7829E0].extract(base));rel=bytearray(files[0x784DE0].extract(base))
+    if (sha256(hand)!='bec1d8b6c099be250fafc9031e8b1b59079eec8c0f13ec06cf1d33b519de8097' or
+            sha256(rel)!='9f37119751663b60db3d6b5eae64143f3b862b4fdd2b751d08d701bdb689a972'):
+        raise ValueError('Changed complete current hand owner')
+    at=0x8087B184-0x8087A330;slots=relocation_offsets(rel,len(hand))
+    count=u32(rel,16);words=list(struct.unpack_from('>'+str(count)+'I',rel,20));word=0x44000000|at
+    if at not in slots or word not in words or u32(hand,at)!=jump(0x8087AC90,link=True):
+        raise ValueError('Changed hand stack/drop call or relocation')
+    before=u32(hand,at);after=jump(symbols['af_carried_drop_stack'],link=True)
+    struct.pack_into('>I',hand,at,after);words.remove(word);struct.pack_into('>I',rel,16,len(words))
+    rel[20:20+count*4]=struct.pack('>'+str(len(words))+'I',*words)+bytes(4)
+    parent=bytearray(files[MENU].extract(base))
+    allocation=resize(parent,core,vrom=0x3950000,ram=tag.ram,offset=0x2CB0,
+        before=len(tag.original),after=len(tag_data))
+    d['menu_allocations'].append(allocation);e['pocket_icons']['owner_sha256']=sha256(parent)
+    changes={0x3950000:tag_data,0x3960000:tag_reloc,0x3B60000:letter_data,0x3B70000:letter_reloc,
+        0x7829E0:bytes(hand),0x784DE0:bytes(rel),MENU:bytes(parent)}
+    resizes=[dict(vrom=v,previous_bytes=files[v].size,previous_sha256=sha256(files[v].extract(base)),
+        bytes=len(data),sha256=sha256(data)) for v,data in changes.items() if len(data)!=files[v].size]
+    resources=copy.deepcopy(prior['physical_resources']);resource=dict(id=old['id'],physical=old['physical'],
+        bytes=len(raw),sha256=sha256(raw))
+    if resource['id'] not in {r['id'] for r in resources}:raise ValueError('Missing owned carried physical packet')
+    resources[resources.index(next(r for r in resources if r['id']==old['id']))]=resource
+    packet=dict(resource,ram=old['ram'],crc32=zlib.crc32(raw),storage='physical-ROM')
+    growth=[]
+    for row in resizes:
+        v=row['vrom'];_,record=relocate_resource_plan(base,files,v,changes[v],minimum_physical=0x100000,
+            reservations=resources+growth,append_only=False,allow_compressed=True)
+        growth.append(record)
+    e['npc_extra']['events']['festivals']['packet']=packet
+    d.update(code=compiled,sha256=sha256(raw[start:]),packet=packet,
+        sources={s:sha256((ROOT/s).read_bytes()) for s in SOURCES})
+    d['actions']=dict(donors=donors,menus=menus,tag=tag_receipt,letter=letter_receipt,
+        hand=dict(vrom=0x7829E0,reloc=0x784DE0,ram=0x8087A330,address=0x8087B184,
+            before=before,after=after,removed_relocation=word,owner_sha256=sha256(hand),relocation_sha256=sha256(rel)),
+        code_previous=previous,additional_resident_bytes=0,additional_menu_bytes=allocation['additional_pool_bytes'],
+        native_execution_verified=False)
+    write_new(output/'carried-items.json',(json.dumps(d,indent=2)+'\n').encode())
+    write_new(output/'carried-packet.bin',raw)
+    return e,changes,dict(physical_resources=resources,runtime_owner_resizes=resizes,
+        resource_growth=growth),[(dict(resource,previous_sha256=old['sha256']),bytes(raw))]

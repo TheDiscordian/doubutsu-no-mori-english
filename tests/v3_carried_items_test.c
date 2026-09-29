@@ -4,6 +4,8 @@
 #include <string.h>
 #include "../overlays/v3/carried_items.c"
 #include "../overlays/v3/carried_menu.c"
+#define AF_CARRIED_PAPER_MENUS 47
+#include "../overlays/v3/carried_actions.c"
 
 u32 af_test_carried_header[8+8*AF_CARRY_COUNT];
 static u32 calls,event_mask;
@@ -14,6 +16,130 @@ void *af_test_carried_menu_pointer(void *p,u32 at) {
     assert(0);return 0;
 }
 void af_test_carried_board_original(void *p) {assert(p==&submenu_token);++load_calls;}
+static u32 action_player[300],action_hand[200],action_tag[90];
+u8 *af_test_carried_action_active=(u8 *)action_player;
+static int action_slot,prior_menu,return_calls,refresh_calls,sounds,drop_calls,ordinary_drops,set_calls;
+void *af_test_carried_action_pointer(void *p,u32 at) {
+    if(p==&submenu_token && at==0x2C)return &overlay_token;
+    if(p==&overlay_token && at==0x106D0)return action_tag;
+    if(p==&overlay_token && at==0x106D4)return action_hand;
+    assert(0);return 0;
+}
+int af_carried_prior_menu(void *sub,u32 item,int slot) {
+    assert(sub==&submenu_token);(void)item;(void)slot;return prior_menu;
+}
+static int slot_stub(void *tag) {assert(tag==(u8 *)action_tag+8);return action_slot;}
+static int return_stub(void *sub,int type,int mode) {
+    assert(sub==&submenu_token && !type && !mode);++return_calls;return 1;
+}
+static void refresh_stub(void *sub) {assert(sub==&submenu_token);++refresh_calls;}
+static void sound_stub(int id) {assert(id==0x33);++sounds;}
+static void drop_stub(void *sub,void *tag,u16 *target,void *mail) {
+    assert(sub==&submenu_token && tag==action_tag && !mail);++drop_calls;
+    u16 rest=*target;*target=H(action_hand,0x23C);H(action_hand,0x23C)=rest;
+}
+static void ordinary_drop_stub(void *sub,void *tag,u16 *target,int slot) {
+    assert(slot==action_slot);++ordinary_drops;drop_stub(sub,tag,target,0);
+}
+static void set_stub(void *player,int slot,u32 item,int cond) {
+    assert(player==action_player && (u32)slot<15u);++set_calls;
+    H(player,0x14+slot*2)=item;
+    W(player,0x34)=(W(player,0x34)&~(3u<<(slot*2)))|((u32)cond<<(slot*2));
+}
+void *af_test_carried_action_function(u32 at) {
+    switch(at) {
+        case 0x8086F910:return slot_stub;
+        case 0x8086F4AC:return return_stub;
+        case 0x8086FD3C:return refresh_stub;
+        case 0x800D1A9C:return sound_stub;
+        case 0x8087A94C:return drop_stub;
+        case 0x8087AC90:return ordinary_drop_stub;
+        case 0x800B8B08:return set_stub;
+        default:assert(0);return 0;
+    }
+}
+
+static void stack_actions(void) {
+    memset(action_player,0,sizeof(action_player));memset(action_hand,0,sizeof(action_hand));
+    header[4]=header[5]=127;event_mask=3;action_slot=7;
+    const int original[]={3,4,15,17};
+    for(u32 q=1;q<=4;q++)for(int context=0;context<4;context++) {
+        prior_menu=original[context];
+        assert(af_carried_menu_type(&submenu_token,0x203F+q,7)==(q>1?47+context:prior_menu));
+        assert(af_carried_menu_type(&submenu_token,0x2003,7)==prior_menu);
+        W(action_player,0x34)=1u<<14;
+        assert(af_carried_menu_type(&submenu_token,0x203F+q,7)==prior_menu);
+        W(action_player,0x34)=0;header[5]=0;
+        assert(af_carried_menu_type(&submenu_token,0x203F+q,7)==prior_menu);header[5]=127;
+    }
+    for(prior_menu=0;prior_menu<47;prior_menu++) {
+        if(prior_menu==3 || prior_menu==4 || prior_menu==15 || prior_menu==17)continue;
+        assert(af_carried_menu_type(&submenu_token,0x2043,7)==prior_menu);
+    }
+    for(u32 family=0;family<2;family++) {
+        u32 parent=family?0x2D28:0x2040,max=family?5:4;
+        for(u32 a=1;a<=max;a++)for(u32 b=1;b<=max;b++) {
+            u16 *target=(u16 *)((u8 *)action_player+0x14+action_slot*2);
+            *target=parent+b-1;H(action_hand,0x23C)=parent+a-1;
+            int previous=ordinary_drops;
+            af_carried_drop_stack(&submenu_token,action_tag,target,action_slot);
+            if(a<max && b<max) {
+                assert(ordinary_drops==previous);
+                assert(*target==parent+(a+b>max?max:a+b)-1);
+                assert(H(action_hand,0x23C)==(a+b>max?parent+a+b-max-1:0));
+            } else {
+                assert(ordinary_drops==previous+1);
+                assert(*target==parent+a-1 && H(action_hand,0x23C)==parent+b-1);
+            }
+        }
+        for(u32 q=2;q<=max;q++) {
+            H(action_player,0x14+14)=parent+q-1;H(action_hand,0x23C)=0;
+            u32 player_before[300];memcpy(player_before,action_player,sizeof(player_before));
+            af_carried_grab_one(&submenu_token,0);
+            assert(H(action_hand,0x23C)==parent && H(action_hand,0x23A)==2);
+            assert(!W(action_hand,0x2E4) && ((u8 *)action_hand)[0x2E8]==0);
+            assert(((u8 *)action_hand)[0x2E9]==7 && ((u8 *)action_hand)[0x2EB]==0);
+            H(player_before,0x14+14)=parent+q-2;
+            assert(!memcmp(player_before,action_player,sizeof(player_before)));
+        }
+    }
+    assert(return_calls==7 && refresh_calls==7 && sounds==7);
+    /* Independent families and protected targets must never merge. */
+    for(u32 mode=0;mode<4;mode++) {
+        H(action_player,0x22)=mode==0?0x2D28:0x2040;H(action_hand,0x23C)=0x2040;
+        W(action_player,0x34)=mode==1?2u<<14:0;W(action_hand,0x2E4)=mode==2?1:0;
+        if(mode==3)header[5]=0;
+        int previous=ordinary_drops;
+        af_carried_drop_stack(&submenu_token,action_tag,(u16 *)((u8 *)action_player+0x22),7);
+        assert(ordinary_drops==previous+1);header[5]=127;
+    }
+    W(action_player,0x34)=W(action_hand,0x2E4)=0;
+    for(u32 q=1;q<=4;q++) {
+        H(action_player,0x22)=0x203F+q;
+        af_carried_consume_paper(action_player,7,0,0);
+        assert(H(action_player,0x22)==(q==1?0:0x203Eu+q));
+    }
+    for(u32 style=0;style<64;style++) {
+        H(action_player,0x22)=0x2000+style;af_carried_consume_paper(action_player,7,0,0);
+        assert(!H(action_player,0x22));
+    }
+    H(action_player,0x22)=0x2043;header[5]=0;
+    af_carried_consume_paper(action_player,7,0,0);assert(H(action_player,0x22)==0x2043);
+    assert(set_calls==68);header[5]=127;
+    /* Occupied hands, singletons, protected pockets, and invalid slots do not
+     * split or alter the adjacent player record. */
+    for(u32 mode=0;mode<5;mode++) {
+        action_slot=mode==4?15:7;H(action_player,0x22)=mode==1?0x2040:0x2043;
+        H(action_hand,0x23C)=mode==0?0x2001:0;W(action_player,0x34)=mode==2?2u<<14:0;
+        if(mode==3)header[5]=0;
+        u32 saved_player[300],saved_hand[200];
+        memcpy(saved_player,action_player,sizeof(saved_player));memcpy(saved_hand,action_hand,sizeof(saved_hand));
+        af_carried_grab_one(&submenu_token,0);
+        assert(!memcmp(saved_player,action_player,sizeof(saved_player)));
+        assert(!memcmp(saved_hand,action_hand,sizeof(saved_hand)));header[5]=127;
+    }
+    puts("Paper/spirit stack merging and splitting, protected-item delegation, native menu contexts, and confirmed one-sheet consumption pass");
+}
 int af_carried_prior_name(u8 *out,u32 capacity,u32 item) {
     (void)out;(void)capacity;(void)item;++calls;return 7;
 }
@@ -99,6 +225,7 @@ int main(int argc,char **argv) {
     af_carried_board_load(0);assert(load_calls==64);
     board[0x31]=3;af_carried_board_load(&submenu_token);assert(load_calls==65);
     assert(board_words[0xB8/4]==0xA5A5A5A5);
+    stack_actions();
     puts("Complete carried families, quantity readers, independent admission, predecessor delegation, and bounds pass");
     puts("All native paper loaders delegate; imported quantity/style normalization and resident artwork preserve adjacent letter fields");
 }
