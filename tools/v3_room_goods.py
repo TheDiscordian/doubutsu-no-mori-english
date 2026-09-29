@@ -441,7 +441,9 @@ def publish_bootstrap(equipment,blob,surface,output):
     carried_quest=equipment.get('carried_items',{}).get('spawning')
     if carried_quest:
         p=carried_quest['packet']
-        if (not carried_quest['installed'] or p['ram']!=0x807AC000 or p['bytes']!=0x2000 or
+        quest=equipment['carried_items'].get('quest')
+        if (quest and quest['packet']!=p):raise ValueError('Quest owner must reuse the spirit startup packet')
+        if (not carried_quest['installed'] or p['ram']!=0x807AC000 or p['bytes']!=(0x8000 if quest else 0x2000) or
                 p['physical']&15 or p['storage']!='physical-ROM' or
                 not 0x100000<=p['physical']<p['physical']+p['bytes']<=0x4000000):
             raise ValueError('Changed complete carried-quest startup packet')

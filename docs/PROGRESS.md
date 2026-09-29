@@ -186,9 +186,9 @@ colonies, field rank, candy/trash suppression, native positioning, creation
 failure, and the donor's countdown lake relocation are preserved. Ordinary
 calendar decoding still rejects spirit type 40.
 
-The 4,496-byte code occupies a guarded 8-KiB quest packet at
-`807AC000..807AE000`. Existing tree/page directories, all artwork, insect program
-buffers, event state, and saved fields are unchanged. The shared startup loads
+The 4,496-byte spawning code occupies the retained 8-KiB prefix at
+`807AC000..807AE000` of the expanded quest packet. Existing tree/page directories,
+all artwork, and insect program buffers are unchanged. The shared startup loads
 22 packets using 676 of its 688 reserved bytes. Focused sanitized quest-state,
 five-acre, countdown, and unchanged ordinary-population checks pass, along with
 the actual cartridge caller/resource checks, all startup CRCs, patch
@@ -196,9 +196,34 @@ reconstruction, and seven browser/offline profiles. These are not native
 gameplay or hardware results. The missing Wisp owner still leaves the quest
 inactive; all seven carried readiness/selection bits remain zero.
 
-The current proposal is ABI 364 at
-`build/v3-carried-field-work-01/spawning-05/build-lock.json`, ROM SHA-256
-`fcce21b65a4c90e5c42fbb59b5b5bec67d5877513c673b1c1c648387aa7b039f`.
+Wisp's source hunt calendar and native event-state services are installed in the
+same guarded quest packet as spirit spawning. The donor's two-to-four-day
+rescheduling, seven-day eligibility, year/leap handling, and midnight-to-4am
+window use additive native event 115 without renumbering existing events.
+The complete 44-byte common record occupies owned memory and follows the
+lifetime of a native common-area marker; the real daily status supplies the
+spirit field bridge. Saved quest flags use native area 54. The town-wide hunt
+date uses two owned bytes in the existing 48-byte extension, not native padding.
+
+The 12,032-byte save adapter and 2,128-byte quest-state module extend the existing
+quest startup packet to 32 KiB. All 22 startup descriptors still fit in 676 bytes.
+Thirty-six public storage/profile entries redirect to format 17 / card wire 4;
+compatible format-14/15/16 records migrate forward, retaining diary pages,
+console data, stamps, and paper ownership. Two obsolete event startup copies
+with verified live replacements provide cartridge space in the new output only.
+All current artwork, tree/spirit code, and other physical resources are retained.
+
+Three focused checks pass for sanitized source dates and event-state lifetime,
+actual save transactions with native I/O doubled, current code/caller/resource
+bindings, all startup CRCs, and patch reconstruction. Browser/offline composition
+agrees for seven profiles, including exact empty V2-14. Native gameplay,
+save/reload, and hardware remain unverified. Wisp's NPC/manager, placement,
+dialogue, and complete reward/cleanup services are still required: availability
+and all carried readiness/selection bits remain zero.
+
+The current proposal is ABI 365 at
+`build/v3-carried-field-work-01/quest-state-02/build-lock.json`, ROM SHA-256
+`35eee187c3bdae0d211cd329b63292bca7a21c1f3010d3743c87791dfd317ee3`.
 It contains 207 independently selectable development imports, including all
 sixteen diary styles, all nine fish, and eight insects. Another 100 furniture
 profiles await acquisition. The main lock and both stable V2-14 deployments
@@ -239,8 +264,8 @@ and source hashes pass. Native diary UI/save and activated festival gameplay
 remain unverified. The exhausted native fixture stays closed. The remaining
 importing work is the carried-object/stationery group and any unfinished golden
 tool behaviour; acquisition and the required gold-tree work follow primary imports.
-Saved format 16 migrates compatible earlier saves forward. V2 and
-format-15-or-earlier V3 cannot load new saves. Removing required imports,
+Saved format 17 migrates compatible earlier saves forward. V2 and
+format-16-or-earlier V3 cannot load new saves. Removing required imports,
 including any carried family or selected diary style, rejects loading. Preserve
 backups; ordinary native save/reload remains unverified.
 

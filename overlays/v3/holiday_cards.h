@@ -5,6 +5,11 @@
  * offsets are repurposed. Slot ownership follows the existing town/player
  * save transaction and player-clear hook. */
 enum { AF_HC_BYTES=48,AF_HC_PLAYERS=4,AF_HC_STAMPS=12 };
+#ifdef AF_V3_CARRIED_QUEST
+enum { AF_HC_CARRIED_WIRE=4 };
+#else
+enum { AF_HC_CARRIED_WIRE=3 };
+#endif
 typedef struct {AFDiaryDate last_date;unsigned char days;} AFHolidayCard;
 int af_holiday_cards_valid(const unsigned char *);
 void af_holiday_cards_reset(unsigned char *);
@@ -26,5 +31,11 @@ unsigned int af_carried_save_enabled(void);
 int af_carried_save_profile(const unsigned char *,unsigned int,unsigned int);
 int af_carried_save_bind(unsigned char *,unsigned int,unsigned int);
 int af_carried_paper_collect(unsigned char *,unsigned int,unsigned int);
+#ifdef AF_V3_CARRIED_QUEST
+/* The town-wide hunt date has no year in the donor. It survives player clear
+ * and belongs to the selected spirit family, not an exercise-card slot. */
+int af_carried_quest_day(const unsigned char *);
+int af_carried_quest_set_day(unsigned char *,unsigned int);
+#endif
 #endif
 #endif

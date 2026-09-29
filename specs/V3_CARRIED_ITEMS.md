@@ -73,10 +73,10 @@ python3 tools/v3_furniture_pipeline.py convert --representation carried \
 
 ## Installed shared runtime
 
-The current development proposal is ABI 364 at
-`build/v3-carried-field-work-01/spawning-05/build-lock.json`.
+The current development proposal is ABI 365 at
+`build/v3-carried-field-work-01/quest-state-02/build-lock.json`.
 Its ROM SHA-256 is
-`fcce21b65a4c90e5c42fbb59b5b5bec67d5877513c673b1c1c648387aa7b039f`.
+`35eee187c3bdae0d211cd329b63292bca7a21c1f3010d3743c87791dfd317ee3`.
 This is an inactive carried integration, not a new playable-import claim.
 
 `v3_furniture_install.py --refresh-runtime --carried-items PATH` installs the
@@ -369,8 +369,8 @@ new text allocation, art compilation, resident bytes, or saved field is needed.
 ### Carried quest owner preparation
 
 The native acre-entry call at `8092AF0C` uses `af_carried_insect_spawn` in the
-guarded `807AC000..807AE000` quest packet. The complete code is 4,496 bytes;
-the shared startup loads and checks all 8 KiB. Its original body and relocation
+retained `807AC000..807AE000` prefix of the quest packet. The complete code is
+4,496 bytes; the shared startup checks the whole expanded packet. Its original body and relocation
 remain unchanged apart from the two-instruction dispatch. The existing ordinary
 manager remains the fallback, including its saved season and selected population
 policy. No ordinary calendar gains a spirit entry.
@@ -387,10 +387,10 @@ identity; no donor event number indexes a native table directly.
 The installer checks the full native manager and lake lookup, existing insect
 packet, complete source calendar and spawn row, retained terrain helper, all
 memory reservations, and physical resource allocation. Tree/page directories,
-field resources, old insect code, saved fields, and all preceding physical
-packets remain unchanged. A nonquest acre delegates before applying quest-only
+field resources, and old insect code remain unchanged. A nonquest acre delegates before applying quest-only
 checks. This connects the spawning consumer, not the missing event owner.
-No owner yet calls the field-state bridge, so the quest remains inactive.
+The installed quest-state services below call the field-state bridge; NPC/manager
+admission remains off, so the quest stays inactive.
 
 `v3_holiday_participants.py --carried-event --build-lock PATH --output PATH`
 uses the shared complete actor importer for the event NPC source directory.
@@ -400,9 +400,9 @@ VR4300 object and its unresolved services are recorded in
 `build/v3-carried-event-prepared-03/`. Only platform drawing submission and
 state access are adapted; source logic for dialogue, rewards, roof choices,
 weed removal, fade/movement, five unique spirit acres, and cleanup is retained.
-Native field access, date/flags, scheduling, placement, text, rewards,
-and lifecycle services still need real owner bindings. The spawning consumer
-above is installed and waits for that owner's real state. The object is not installed,
+Native field access, placement, text, rewards,
+and lifecycle services still need real owner bindings. Date/flags, scheduling,
+common-state ownership, and the spawning consumer are installed. The prepared actor object is not installed,
 and an unresolved service is not a successful placeholder.
 
 `build/v3-carried-wisp-art-01/` contains the complete draw-index-349 artwork:
@@ -413,6 +413,54 @@ character converter retains source `FC123A0E/FFFFFE38` combining,
 actor must supply the environment alpha through the real translucent renderer;
 preparation alone does not establish live fading or drawing. Existing texture
 and model limits are sufficient, without cropping or discarding resources.
+
+## Installed hunt and save ownership
+
+`carried_quest.c` maps source event 114 to additive native event 115. Original
+native events 0..114 keep their identities. The native daily planner calls the
+existing holiday/camper chain first, preserving its return value and job gate.
+The hunt then follows `m_event.c`'s weekly Wisp scheduling: retain dates inside
+`[today-7,today+4]`, otherwise draw a date two to four days ahead; install the
+event when its date falls inside `[today-7,today]`. Month/year wrap and leap
+years use the shared complete calendar. The row covers hours 0..3 inclusive;
+planning sets EXIST only, never RUN, ACTIVE, or SHOW. The checked directory
+append rejects damaged/full indexes before modifying any row. Both native daily
+cleanup bounds include the new event, while the original donor-holiday mapping
+remains unchanged.
+
+Saved area 54 contains the donor's eight-byte angry-name/flags/renew-date record.
+Common area 55 is a native 40-byte lifetime marker, not a truncated GameCube
+record. The complete 44-byte temporary record and keep/placement state occupy
+56 owned bytes at `807B3F00`. All native area lookups map the source ID explicitly
+and require an existing daily row and selected, available quest. Losing the
+native marker invalidates the private record and field binding. Binding uses
+the actual native row's status address, so the spirit path observes real
+RUN/ERROR flags. The separate keep word avoids indexing native bit arrays with
+the additional event ID.
+
+The source's town-wide yearless hunt date is stored as month/day at offsets
+13/14 of the existing 48-byte card extension. Wire 4 validates the date and
+requires the spirit family. It retains the family mask, four paper ownership
+bytes, and all stamp records. Player deletion does not clear this town-wide
+date. Format 17 carries wire 4; formats 14, 15, and 16 migrate through the actual
+save transaction, preserving existing data and starting the new hunt date at
+zero. Earlier readers reject format 17. Missing required families reject loading
+before output, live state, or cartridge saves are changed.
+
+The shared startup packet spans `807AC000..807B4000`: the complete existing
+8-KiB spawn prefix, save code at `807AE000` (12,032 bytes), quest code at
+`807B2000` (2,128 bytes), owned state at `807B3F00`, and a final guard. The
+old spawn guard remains intact. Thirty-six public entries in the previous
+storage module redirect to the new save code, including direct collection
+consumers and earlier redirect chains. All other packet content is retained.
+The bootstrap remains 22 descriptors / 676 bytes. Two documented obsolete
+event/state startup copies are reclaimed only after verifying their complete
+live replacement and its installed startup transfer. Original ROMs are never
+modified; all current resources are retained.
+
+Availability stays zero until the actual NPC/manager, translucent rendering,
+placement, complete official conversations, rewards, and cleanup paths are
+connected. This is an installed state/save path, not a playable Wisp claim.
 
 ## Verification and limits
 
@@ -477,8 +525,20 @@ and unchanged relocation, all 22 startup CRCs, and UPS reconstruction. The curre
 seven-profile browser/offline comparison passes with empty selection still
 V2-14. These checks do not establish ordinary event gameplay or hardware results.
 
-The current build uses saved format 16. Compatible older saves migrate forward;
-V2 and format-15-or-earlier V3 cannot read new saves. Profiles missing required
+`tests/test_v3_carried_quest.py` exercises the actual planner and directory/state
+services with native allocation/clock doubles, covering date expiry, inclusive
+windows, leap/year wrap, random bounds, complete common-record lifetime,
+allocation failure, disabled selections, and atomic directory rejection. Its
+current cartridge check covers the entire retained spawn prefix and save packet,
+all 36 redirects, exact native caller changes, all retained physical resources,
+the owned state/guard, 22 startup CRCs, and UPS reconstruction. The extended
+storage test covers format-17 persistence, format-14/15/16 migration, old-reader
+rejection, player deletion, all seven missing families, and unchanged output
+on rejection. Seven current browser/offline profiles agree. Native gameplay
+and ordinary save/reload are not inferred from these checks.
+
+The current build uses saved format 17. Compatible older saves migrate forward;
+V2 and format-16-or-earlier V3 cannot read new saves. Profiles missing required
 carried families or diary styles remain incompatible. No ordinary save/reload, native
 letter rendering, or carried-item gameplay is claimed. Ready/selected masks stay
 zero until the missing consumers are connected. Both stable V2-14 deployments

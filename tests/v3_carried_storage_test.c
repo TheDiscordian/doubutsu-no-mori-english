@@ -21,6 +21,10 @@ extern int af_carried_owned(const u8 *,u32);
 extern int af_old_compress_cards(u8 *,u32,const u8 *,u32,const u8 *,u32,const u8 *,u32 *,u32);
 extern int af_old_expand_cards(const u8 *,u32,u8 *,u32);
 extern int af_v14_compress_cards(u8 *,u32,const u8 *,u32,const u8 *,u32,const u8 *,u32 *,u32);
+#ifdef AF_V3_CARRIED_QUEST
+extern int af_v16_compress_cards(u8 *,u32,const u8 *,u32,const u8 *,u32,const u8 *,u32 *,u32);
+extern int af_v16_expand_cards(const u8 *,u32,u8 *,u32);
+#endif
 void af_carried_prior_record(u32 item) {prior_record=item;}
 int af_carried_prior_owned(const u8 *player,u32 item) {(void)player;prior_owned=item;return 17;}
 int af_carried_event_type(u32 item) {(void)item;return 0;}
@@ -36,7 +40,15 @@ static void profile(u32 mask) {
 int main(void) {
     profile(127);init();fill_console();
     CHECK(AF_CONSOLE_RAW+16==120352 && af_carried_save_enabled()==127);
-    CHECK(af_v3_card_data()[4]==3 && af_v3_card_data()[7]==3 && af_v3_card_data()[8]==127);
+    CHECK(af_v3_card_data()[4]==AF_HC_CARRIED_WIRE && af_v3_card_data()[7]==3 && af_v3_card_data()[8]==127);
+#ifdef AF_V3_CARRIED_QUEST
+    CHECK(af_carried_quest_day(af_v3_card_data())==0);
+    CHECK(af_carried_quest_set_day(af_v3_card_data(),0x021D));
+    CHECK(!af_carried_quest_set_day(af_v3_card_data(),0x021E));
+    CHECK(!af_carried_quest_set_day(af_v3_card_data(),0x0D01));
+    CHECK(!af_carried_quest_set_day(af_v3_card_data(),0x0100));
+    CHECK(af_carried_quest_day(af_v3_card_data())==0x021D);
+#endif
     for(u32 p=0;p<4;p++) {
         AFHolidayCard card={{2026,7,27},p+1};
         CHECK(af_holiday_cards_set(af_v3_card_data(),p,&card));
@@ -66,12 +78,18 @@ int main(void) {
     for(u32 i=0;i<14;i++){af_carried_record(0x2523+i);CHECK(!af_carried_owned(af_console_players,0x2523+i));}
     CHECK(prior_record==0x2003 && !af_carried_owned(af_console_players+1,0x2040));
     memcpy(card_before,af_v3_card_data(),AF_HC_BYTES);diary_before=*af_v3_diary_data();
-    CHECK(af_v3_save_sync()==0 && chip[0xF985]==16);
+    CHECK(af_v3_save_sync()==0 && chip[0xF985]==AF_HC_CARRIED_WIRE+13);
     memcpy(saved,chip,65536);u32 writes_before=writes,erases_before=erases;
     CHECK(af_old_expand_cards(saved,65536,expanded,sizeof(expanded))==AF_CZ_FORMAT);
+#ifdef AF_V3_CARRIED_QUEST
+    CHECK(af_v16_expand_cards(saved,65536,expanded,sizeof(expanded))==AF_CZ_FORMAT);
+#endif
     CHECK(af_v3_save_expand_cards(saved,65536,expanded,sizeof(expanded))==0);
     CHECK(!memcmp(expanded+AF_CZ_RAW+AF_CZ_FISHING_EXTRA,card_before,AF_HC_BYTES));
     CHECK(af_holiday_cards_clear(af_v3_card_data(),2));
+#ifdef AF_V3_CARRIED_QUEST
+    CHECK(af_carried_quest_day(af_v3_card_data())==0x021D);
+#endif
     CHECK(!af_v3_card_data()[11] && af_v3_card_data()[10] && af_v3_card_data()[12]);
     AFHolidayCard cleared;CHECK(af_holiday_cards_get(af_v3_card_data(),2,&cleared) && !cleared.days);
     CHECK(af_v3_save_read(bank,0)==1 && !af_v3_card_data()[11]);
@@ -97,18 +115,28 @@ int main(void) {
     /* Build old wire formats using the same codec's old configuration, never an
      * old ROM. Migration retains all card stamps and initializes only new bits. */
     u8 *cards=expanded+AF_CZ_RAW+AF_CZ_FISHING_EXTRA;
-    for(u32 version=1;version<=2;version++) {
+    for(u32 version=1;version<AF_HC_CARRIED_WIRE;version++) {
         memcpy(cards,card_before,AF_HC_BYTES);cards[4]=version;cards[7]=version==2?3:0;
         memset(cards+8,0,8);
+#ifdef AF_V3_CARRIED_QUEST
+        if(version==3) {cards[7]=3;cards[8]=127;cards[9]=1;cards[12]=1;}
+#endif
         int size=version==2 ? af_old_compress_cards(bank,65536,expanded,65536,
             expanded+65536,6528,expanded+AF_CZ_RAW,af_console_hash,AF_CZ_WORK_BYTES) :
             af_v14_compress_cards(bank,65536,expanded,65536,
             expanded+65536,6528,expanded+AF_CZ_RAW,af_console_hash,AF_CZ_WORK_BYTES);
+#ifdef AF_V3_CARRIED_QUEST
+        if(version==3)size=af_v16_compress_cards(bank,65536,expanded,65536,
+            expanded+65536,6528,expanded+AF_CZ_RAW,af_console_hash,AF_CZ_WORK_BYTES);
+#endif
         CHECK(size>0 && bank[0xF985]==13+version);
         CHECK(af_v3_save_check(bank,65536,af_save_current,0)>0);
         af_v3_save_commit(bank,af_save_live,AF_SAVE_PAYLOAD);
-        CHECK(af_v3_card_data()[4]==3 && af_v3_card_data()[8]==127);
-        for(u32 p=0;p<4;p++)CHECK(!af_v3_card_data()[9+p]);
+        CHECK(af_v3_card_data()[4]==AF_HC_CARRIED_WIRE && af_v3_card_data()[8]==127);
+        for(u32 p=0;p<4;p++)CHECK(af_v3_card_data()[9+p]==(version==3 && (p==0 || p==3)));
+#ifdef AF_V3_CARRIED_QUEST
+        CHECK(!af_carried_quest_day(af_v3_card_data()));
+#endif
         CHECK(!memcmp(af_v3_card_data()+16,card_before+16,32));
         CHECK(!memcmp(&diary_before,af_v3_diary_data(),AF_DIARY_BYTES));
         CHECK(!memcmp(console_before,af_console_storage.players,6528));
@@ -139,6 +167,6 @@ int main(void) {
         af_test_carried_profile[i]=before;
     }
     af_test_event_item_profile=0;CHECK(af_carried_save_enabled()==0xFFFFFFFF);
-    printf("Format-16 save transaction, all seven profile removals, format-14/15 migration, four-player paper ownership/clear, retained diary/console/card state, and rejection before write pass. Native I/O is doubled.\n");
+    printf("Format-%u save transaction, all seven profile removals, prior-format migration, four-player paper ownership/clear, retained diary/console/card state, and rejection before write pass. Native I/O is doubled.\n",AF_HC_CARRIED_WIRE+13);
     return 0;
 }

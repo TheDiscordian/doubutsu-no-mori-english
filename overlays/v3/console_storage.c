@@ -116,7 +116,7 @@ static int guards(void) {
 #ifdef AF_V3_CARD_STORAGE
     if(!af_holiday_cards_valid(af_v3_card_state))return 0;
 #ifdef AF_V3_CARRIED_PROFILE
-    if(af_v3_card_state[4]!=3 || af_v3_card_state[8]!=af_carried_save_enabled() ||
+    if(af_v3_card_state[4]!=AF_HC_CARRIED_WIRE || af_v3_card_state[8]!=af_carried_save_enabled() ||
        !cards_profile(af_v3_card_state))return 0;
 #elif defined(AF_V3_EVENT_ITEM_PROFILE)
     if(af_v3_card_state[4]!=2 || af_v3_card_state[7]!=af_holiday_cards_enabled())return 0;
@@ -173,6 +173,9 @@ static int expand(const u8 *bank,const u8 **logical) {
 #endif
 #ifdef AF_V3_CARRIED_PROFILE
         || version==0x00100680
+#ifdef AF_V3_CARRIED_QUEST
+        || version==0x00110680
+#endif
 #endif
 #endif
 #endif

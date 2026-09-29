@@ -21,6 +21,8 @@ int af_holiday_native_type(unsigned int donor);
  * before writing anything. ACTIVE is deliberately left to the native hourly/
  * acre update; planning cannot manufacture RUN, SHOW, or attendance. */
 int af_holiday_native_merge(const AFHolidayDay *,unsigned int);
+/* Additional non-calendar owners use the same checked native directory. */
+int af_holiday_native_append(unsigned int,unsigned int,unsigned int,unsigned int);
 int af_holiday_native_schedule(const AFHolidayClock *);
 int af_holiday_native_snapshot(AFHolidayDay *,unsigned int capacity);
 unsigned int af_holiday_native_current(void);

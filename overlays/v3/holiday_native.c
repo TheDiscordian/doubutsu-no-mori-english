@@ -22,6 +22,18 @@ static int directory(void) {
     }
     return count==af_holiday_native_count;
 }
+int af_holiday_native_append(unsigned int type,unsigned int hours,unsigned int begin,unsigned int end) {
+    if(type>=128 || hours>>24 || begin>65535 || end>65535 || !directory())return -1;
+    unsigned int slot=af_holiday_native_index[type];
+    if(slot==255) {
+        for(slot=0;slot<AF_HN_DAYS && af_holiday_native_days[slot].type!=~0u;slot++);
+        if(slot==AF_HN_DAYS)return -2;
+        af_holiday_native_days[slot]=(AFHolidayNativeDay){type,0,0,0,0,0};
+        af_holiday_native_index[type]=slot;++af_holiday_native_count;
+    }
+    AFHolidayNativeDay *day=af_holiday_native_days+slot;
+    day->hours|=hours;day->begin=begin;day->end=end;day->status|=AF_HE_EXIST;return 1;
+}
 int af_holiday_native_merge(const AFHolidayDay *plan,unsigned int count) {
     unsigned char slots[AF_HE_CAPACITY];
     unsigned int next=0;

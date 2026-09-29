@@ -15,20 +15,30 @@ int af_holiday_cards_valid(const u8 *data) {
     if(data[4]!=1 && data[4]!=2
 #ifdef AF_V3_CARRIED_PROFILE
         && data[4]!=3
+#ifdef AF_V3_CARRIED_QUEST
+        && data[4]!=4
+#endif
 #endif
         )return 0;
     if(data[7] & ~(data[4]>=2?3u:0u))return 0;
     for(unsigned int i=0;i<16;i++) {
         if(i==4 || i==7)continue;
 #ifdef AF_V3_CARRIED_PROFILE
-        if(data[4]==3 && i>=8 && i<=12)continue;
+        if(data[4]>=3 && i>=8 && i<=12)continue;
+#ifdef AF_V3_CARRIED_QUEST
+        if(data[4]==4 && (i==13 || i==14))continue;
+#endif
 #endif
         if(data[i]!=header[i])return 0;
     }
 #ifdef AF_V3_CARRIED_PROFILE
-    if(data[4]==3) {
+    if(data[4]>=3) {
         if(data[8]>127 || ((data[8]>>2)&3)!=data[7])return 0;
         for(unsigned int i=9;i<13;i++)if(data[i] & ~(data[8]&1u))return 0;
+#ifdef AF_V3_CARRIED_QUEST
+        if(data[4]==4 && (data[13] || data[14]) &&
+           (!(data[8]&64) || !data[14] || data[14]>af_diary_days(2000,data[13])))return 0;
+#endif
     }
 #endif
     for(unsigned int i=0;i<4;i++) {
@@ -56,7 +66,7 @@ int af_holiday_cards_clear(u8 *data,unsigned int slot) {
     const AFHolidayCard empty={{0,0,0},0};
     if(!af_holiday_cards_set(data,slot,&empty))return 0;
 #ifdef AF_V3_CARRIED_PROFILE
-    if(data[4]==3)data[9+slot]=0;
+    if(data[4]>=3)data[9+slot]=0;
 #endif
     return 1;
 }
@@ -66,7 +76,7 @@ int af_holiday_cards_profile(const u8 *data,unsigned int enabled) {
 int af_holiday_cards_bind(u8 *data,unsigned int enabled) {
     if(!af_holiday_cards_profile(data,enabled))return 0;
 #ifdef AF_V3_CARRIED_PROFILE
-    if(data[4]==3)return data[7]==enabled;
+    if(data[4]>=3)return data[7]==enabled;
 #endif
     data[4]=2;data[7]=(u8)enabled;return 1;
 }
@@ -85,17 +95,28 @@ unsigned int af_carried_save_enabled(void) {
 }
 int af_carried_save_profile(const u8 *data,unsigned int events,unsigned int enabled) {
     if(enabled>127 || ((enabled>>2)&3)!=events || !af_holiday_cards_profile(data,events))return 0;
-    return data[4]!=3 || !(data[8]&~enabled);
+    return data[4]<3 || !(data[8]&~enabled);
 }
 int af_carried_save_bind(u8 *data,unsigned int events,unsigned int enabled) {
     if(!af_carried_save_profile(data,events,enabled))return 0;
-    data[4]=3;data[7]=(u8)events;data[8]=(u8)enabled;return 1;
+    data[4]=AF_HC_CARRIED_WIRE;data[7]=(u8)events;data[8]=(u8)enabled;return 1;
 }
 int af_carried_paper_collect(u8 *data,unsigned int slot,unsigned int mark) {
-    if(slot>=4 || mark>1 || !af_holiday_cards_valid(data) || data[4]!=3 || !(data[8]&1))return -1;
+    if(slot>=4 || mark>1 || !af_holiday_cards_valid(data) || data[4]<3 || !(data[8]&1))return -1;
     if(mark)data[9+slot]=1;
     return data[9+slot];
 }
+#ifdef AF_V3_CARRIED_QUEST
+int af_carried_quest_day(const u8 *data) {
+    if(!af_holiday_cards_valid(data) || data[4]!=4 || !(data[8]&64))return -1;
+    return (unsigned int)data[13]*256u+data[14];
+}
+int af_carried_quest_set_day(u8 *data,unsigned int day) {
+    if(af_carried_quest_day(data)<0 || day>65535 ||
+       (day && (!(day&255) || (day&255)>af_diary_days(2000,day>>8))))return 0;
+    data[13]=day>>8;data[14]=day;return 1;
+}
+#endif
 #endif
 #ifdef AF_V3_EVENT_ITEM_PROFILE
 unsigned int af_holiday_cards_enabled(void) {

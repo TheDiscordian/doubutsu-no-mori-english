@@ -83,6 +83,8 @@ def install(base, prior, blob, core, module, output, directory):
             carried=prior['equipment_resources']['carried_items']
             if carried.get('interactions') and not carried.get('spawning'):
                 return install_creature_spawns(base,prior,output,directory)
+            if carried.get('spawning') and not carried.get('quest'):
+                return install_quest_state(base,prior,core,output,directory)
             return install_interactions(base,prior,core,output,directory)
         if prior['equipment_resources']['carried_items'].get('eating'):
             return install_creature_field(base,prior,blob,output,directory)
@@ -832,6 +834,140 @@ def install_creature_spawns(base,prior,output,directory):
     write_new(output/'carried-spawns.json',(json.dumps(receipt,indent=2)+'\n').encode())
     return e,{vrom:bytes(owner)},dict(physical_resources=records),[
         (resource,bytes(raw))]
+
+
+def install_quest_state(base,prior,core,output,directory):
+    """Bind source hunt scheduling and real saved/common event ownership.
+
+    Reuse the spirit packet's startup descriptor and all prepared resources.
+    Admission remains off until the complete NPC/manager path is connected.
+    """
+    from v3_console_disk_install import reservations
+    from v3_holiday_selection import refresh_receipts
+    import v3_physical_resources as physical
+    e=copy.deepcopy(prior['equipment_resources']);d=e['carried_items']
+    if (directory.resolve()!=ROOT/d['prepared'] or d.get('quest') or not d.get('spawning') or
+            d['ready_mask'] or d['selected_mask']):
+        raise ValueError('Quest ownership requires the installed inactive spirit path')
+    old=d['spawning']['packet'];ram=0x807AC000;save_ram=0x807AE000;end=0x807B4000
+    raw=bytearray(base[old['physical']:old['physical']+old['bytes']])
+    if (old['ram']!=ram or len(raw)!=0x2000 or sha256(raw)!=old['sha256'] or
+            raw[-16:]!=b'AFCQ'*4 or any(a<end and save_ram<b for a,b in reservations(prior))):
+        raise ValueError('Changed quest packet or overlapping extension')
+    raw.extend(bytes(end-ram-len(raw)));raw[-16:]=b'AFCQ'*4
+    storage=d['storage'];previous=copy.deepcopy(storage['code'])
+    prefix_packet=d['packet'];prefix_sha=prefix_packet['sha256']
+    prefix=bytearray(base[prefix_packet['physical']:prefix_packet['physical']+prefix_packet['bytes']])
+    at=storage['ram']-prefix_packet['ram']
+    if (sha256(prefix)!=prefix_sha or storage['save_format']!=16 or storage['wire_version']!=3 or
+            sha256(prefix[at:at+storage['bytes']])!=previous['sha256']):
+        raise ValueError('Changed complete format-16 save owner')
+    links=dict(previous['link_symbols'],AF_HI_STORAGE_RAM=save_ram)
+    saved,compiled=compile_part('holiday_item_storage',output/'carried-quest-storage',
+        primary_source='overlays/v3/console_storage.c',
+        extra_sources=('overlays/v3/save_compressed.c','overlays/v3/holiday_cards.c',
+            'overlays/v3/carried_collection.c'),
+        defines=tuple(f[2:] for f in previous['flags'] if f.startswith('-D'))+('AF_V3_CARRIED_QUEST=1',),
+        link_symbols=links)
+    if len(saved)>0x4000:raise ValueError('Complete quest save adapter exceeds its reservation')
+    raw[save_ram-ram:save_ram-ram+len(saved)]=saved
+    redirects=[];symbols=previous['symbols'];lo,hi=storage['ram'],storage['ram']+storage['bytes']
+    bounds=sorted({v for v in symbols.values() if lo<=v<hi})
+    for name,address in sorted(symbols.items()):
+        if not name.startswith(('af_v3_','af_holiday_cards_','af_carried_')) or not lo<=address<hi:continue
+        target=compiled['symbols'].get(name);stop=next((v for v in bounds if v>address),hi)
+        if target is None or not save_ram<=target<save_ram+len(saved) or stop-address<8:
+            raise ValueError('Missing or short public carried save entry: '+name)
+        offset=address-prefix_packet['ram'];before=bytes(prefix[offset:offset+8])
+        after=struct.pack('>2I',jump(target),0);prefix[offset:offset+8]=after
+        redirects.append(dict(name=name,address=address,target=target,before=before.hex(),after=after.hex()))
+    if len(redirects)!=36:raise ValueError('Changed complete public carried save entry inventory')
+    native=[]
+    for first,last,digest in (
+        (0x80080080,0x80080200,'bf96a81786bddfa774c104c56d1d5f6c5b9b8e316471578860fa6debfd12ae40'),
+        (0x8008033C,0x800804AC,'e3f773780ce82da3b43a46975c07e1c0c37815fbc95bca00f3b00ce8869adec3'),
+        (0x800807E0,0x800808E0,'8eca4f6b67ca12f625f5ed69e1549c62e94e3f3cb766d2e61c8e3465a7cb7c73'),
+        (0x800808E0,0x80080968,'c16bebef24cdc9944d87a0f77e2a3416582fba5e71cfef191b549043a96c9579')):
+        if sha256(core[first-CODE_RAM:last-CODE_RAM])!=digest:
+            raise ValueError('Changed native saved/common event service')
+        native.append(dict(address=first,end=last,sha256=digest))
+    candidates=dict(compiled['symbols'])
+    candidates.update(af_cw_state=0x807B3F00,af_cw_native_rtc=0x80136FBC,fqrand=0x8002C9AC,
+        af_cw_prior_calendar_before_cleanup=e['holiday_state']['code']['symbols']['af_holiday_calendar_before_cleanup'],
+        af_cw_native_get_save=0x8008033C,af_cw_native_reserve_save=0x80080080,
+        af_cw_native_get_common=0x800808E0,af_cw_native_reserve_common=0x800807E0,
+        af_holiday_native_days=0x806F1500,af_holiday_native_index=0x804A2B00,
+        af_holiday_native_count=0x80104F98,
+        af_carried_quantity=d['code']['symbols']['af_carried_quantity'],
+        af_carried_spirit_event_bind=d['field_creatures']['code']['symbols']['af_carried_spirit_event_bind'])
+    quest,owner=compile_part('carried_quest',output/'carried-quest-state',
+        extra_sources=('overlays/v3/holiday_native.c',),
+        defines=('AF_V3_CARRIED_PROFILE=1','AF_V3_CARRIED_QUEST=1'),symbol_candidates=candidates)
+    raw[0x807B2000-ram:0x807B2000-ram+len(quest)]=quest
+    patches=[]
+    for address,before,after in (
+        (0x8007F630,struct.pack('>2I',jump(candidates['af_cw_prior_calendar_before_cleanup'],link=True),0),
+         struct.pack('>2I',jump(owner['symbols']['af_cw_calendar_before_cleanup'],link=True),0)),
+        (0x8007F640,struct.pack('>I',0x24110073),struct.pack('>I',0x24110074)),
+        (0x8007F660,struct.pack('>I',0x24110073),struct.pack('>I',0x24110074))):
+        offset=address-CODE_RAM
+        if core[offset:offset+len(before)]!=before:raise ValueError('Changed daily event owner caller')
+        core[offset:offset+len(after)]=after
+        patches.append(dict(address=address,before=before.hex(),after=after.hex()))
+    resources=copy.deepcopy(prior['physical_resources']);retired=[]
+    try:replacement=physical.grow_backwards(base,resources,old['id'],bytes(raw))
+    except ValueError as error:
+        if str(error)!='No checked adjacent space for complete physical resource growth':raise
+        # These retained predecessor copies have already been replaced by the
+        # larger fishing/state packet. Verify their actual startup replacement
+        # before reclaiming their physical space in the new output only.
+        events=e['npc_extra']['events']
+        staged,resources,retired=physical.retire_packet_copies(base,prior,(
+            (events['transition']['original_packet'],e['holiday_fishing']['packet']),
+            (events['decorations']['renderer']['original_packet'],e['holiday_fishing']['packet'])))
+        resources=copy.deepcopy(resources)
+        replacement=physical.allocate(staged,resources,bytes(raw),'carried-quest-state-GAFE01-r0',best_fit=True)
+    resource={k:replacement[k] for k in ('id','physical','bytes','sha256')}
+    if resource['id']==old['id']:
+        resources[resources.index(next(r for r in resources if r['id']==old['id']))]=resource
+    else:resources.append(resource)
+    packet=dict(resource,ram=ram,crc32=zlib.crc32(raw),storage='physical-ROM')
+    d['spawning']['packet']=copy.deepcopy(packet)
+    refresh_receipts(e,resources,{prefix_packet['id']:prefix})
+    storage['sha256']=storage['code']['sha256']=sha256(prefix[at:at+storage['bytes']])
+    storage.update(active_code=copy.deepcopy(compiled),quest_redirects=redirects,save_format=17,wire_version=4)
+    e['holiday_items']['controls']['storage'].update(active_code=copy.deepcopy(compiled),save_format=17,wire_version=4)
+    e['console_storage'].update(save_format=17,card_runtime=copy.deepcopy(compiled))
+    d['sha256']=sha256(prefix[RAM-prefix_packet['ram']:])
+    d['saved_format_changed']=True
+    d['quest']=dict(packet=copy.deepcopy(packet),code=owner,ram=0x807B2000,bytes=len(quest),
+        storage=compiled,storage_ram=save_ram,redirects=redirects,core_patches=patches,native_services=native,
+        state=dict(ram=0x807B3F00,bytes=56,common_bytes=44,native_marker_bytes=40),
+        saved_event=dict(native_type=115,source_type=114,area=54,bytes=8),
+        save_format=17,wire_version=4,date_offset=13,additional_resident_bytes=len(raw)-old['bytes'],
+        availability_address=owner['symbols']['af_cw_available'],available=False,
+        native_gameplay_verified=False,native_save_reload_verified=False,
+        pending=['native NPC lifecycle/drawing','manager placement and callbacks',
+            'official dialogue and full reward/cleanup routes','independent carried selection'])
+    paths=(*STORAGE_SOURCES,'overlays/v3/holiday_native.c','overlays/v3/holiday_native.h',
+        'overlays/v3/carried_quest.c','overlays/v3/carried_quest.h','overlays/v3/carried_quest.ld',
+        'tools/v3_carried_runtime.py','tools/v3_asset_loader.py','tools/v3_furniture_install.py','tools/v3_room_goods.py')
+    d['sources'].update({s:sha256((ROOT/s).read_bytes()) for s in paths})
+    updates={k:copy.deepcopy(prior[k]) for k in ('save_codec','clothing','room_surfaces')}
+    updates['save_codec'].update(format_version=17,active_storage_code=copy.deepcopy(compiled),
+        card_storage_code=copy.deepcopy(compiled))
+    ext=updates['clothing']['save_extension'];ext.update(format_version=17,active_storage_code=copy.deepcopy(compiled))
+    ext['legacy_formats_read']=list(dict.fromkeys([*ext['legacy_formats_read'],'AFS3-v16']))
+    updates['room_surfaces']['save']['disk_format_version']=17
+    updates['save_warning']=('Format-17 experimental saves require this or a newer compatible build. '
+        'Compatible older saves migrate forward. Removing required imports rejects loading. '
+        'V2 and format-16-or-earlier V3 cannot load new saves. Keep backups. '
+        'Native carried-item gameplay and save/reload remain unverified.')
+    updates['physical_resources']=resources
+    updates['retired_physical_resources']=retired
+    prefix_resource=next(r for r in resources if r['id']==prefix_packet['id'])
+    write_new(output/'carried-quest.json',(json.dumps(d['quest'],indent=2)+'\n').encode())
+    return e,{},updates,[(dict(prefix_resource,previous_sha256=prefix_sha),bytes(prefix)),(replacement,bytes(raw))]
 
 
 CARRIED_MESSAGE_FIRST=13082

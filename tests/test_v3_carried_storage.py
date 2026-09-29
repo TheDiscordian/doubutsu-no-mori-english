@@ -18,6 +18,12 @@ OUT=ROOT/os.environ.get('V3_CARRIED_RUNTIME','build/v3-carried-runtime-work-01/s
 
 class CarriedStorageTests(unittest.TestCase):
     def test_save_transaction_and_native_collection(self):
+        self.save_transaction(False)
+
+    def test_quest_save_transaction_and_migration(self):
+        self.save_transaction(True)
+
+    def save_transaction(self,quest):
         with tempfile.TemporaryDirectory(prefix='v3-carried-storage-') as temp:
             out=Path(temp)
             flags=['-std=c11','-O1','-g','-Wall','-Wextra','-Werror','-fno-pie','-no-pie',
@@ -30,14 +36,18 @@ class CarriedStorageTests(unittest.TestCase):
                 '-c','overlays/v3/save_codec.c','-o',str(out/'codec.o')]]
             entries=('compress','expand','compress_diary','measure_diary','expand_diary',
                 'compress_fishing','measure_fishing','expand_fishing','compress_cards','measure_cards','expand_cards')
-            for name,extra in (('old',['-DAF_V3_EVENT_ITEM_PROFILE=1']),('v14',[])):
+            versions=[('old',['-DAF_V3_EVENT_ITEM_PROFILE=1']),('v14',[])]
+            if quest:versions.append(('v16',['-DAF_V3_EVENT_ITEM_PROFILE=1','-DAF_V3_CARRIED_PROFILE=1']))
+            for name,extra in versions:
                 commands.append(['cc',*flags,*extra,*(f'-Daf_v3_save_{s}=af_{name}_{s}' for s in entries),
                     '-c','overlays/v3/save_compressed.c','-o',str(out/(name+'.o'))])
             commands.extend([['cc',*flags,'-DAF_V3_EVENT_ITEM_PROFILE=1','-DAF_V3_CARRIED_PROFILE=1',
+                *(['-DAF_V3_CARRIED_QUEST=1'] if quest else []),
                 '-DAF_V3_CONSOLE_STORAGE=1','-Wl,--gc-sections','tests/v3_carried_storage_test.c',
                 *(f'overlays/v3/{s}.c' for s in ('save_runtime','console_storage','save_compressed',
                     'diary','diary_calendar','holiday_fishing','holiday_cards','carried_items','carried_collection')),
-                str(out/'codec.o'),str(out/'old.o'),str(out/'v14.o'),'-o',str(out/'check')],
+                str(out/'codec.o'),str(out/'old.o'),str(out/'v14.o'),
+                *([str(out/'v16.o')] if quest else []),'-o',str(out/'check')],
                 [str(out/'check')]])
             for command in commands:
                 result=subprocess.run(command,cwd=ROOT,capture_output=True,text=True,timeout=30)

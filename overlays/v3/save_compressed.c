@@ -124,7 +124,7 @@ static int compress(u8 *bank,u32 bank_bytes,const u8 *canonical,u32 canonical_by
     has_fishing |= extra_bytes==AF_CZ_CARD_EXTRA;
     if(extra_bytes==AF_CZ_CARD_EXTRA && !af_holiday_cards_valid(extra+AF_CZ_FISHING_EXTRA))return AF_CZ_FORMAT;
 #ifdef AF_V3_CARRIED_PROFILE
-    if(extra_bytes==AF_CZ_CARD_EXTRA && extra[AF_CZ_FISHING_EXTRA+4]!=3)return AF_CZ_FORMAT;
+    if(extra_bytes==AF_CZ_CARD_EXTRA && extra[AF_CZ_FISHING_EXTRA+4]!=AF_HC_CARRIED_WIRE)return AF_CZ_FORMAT;
 #elif defined(AF_V3_EVENT_ITEM_PROFILE)
     if(extra_bytes==AF_CZ_CARD_EXTRA && extra[AF_CZ_FISHING_EXTRA+4]!=2)return AF_CZ_FORMAT;
 #endif
@@ -156,7 +156,11 @@ static int compress(u8 *bank,u32 bank_bytes,const u8 *canonical,u32 canonical_by
 #ifdef AF_V3_CARD_STORAGE
     if(extra_bytes==AF_CZ_CARD_EXTRA)put(bank+PAYLOAD+4,
 #ifdef AF_V3_CARRIED_PROFILE
+#ifdef AF_V3_CARRIED_QUEST
+        0x00110680
+#else
         0x00100680
+#endif
 #elif defined(AF_V3_EVENT_ITEM_PROFILE)
         0x000F0680
 #else
@@ -218,6 +222,9 @@ static int expand(const u8 *bank,u32 bank_bytes,u8 *scratch,u32 scratch_bytes,u3
 #endif
 #ifdef AF_V3_CARRIED_PROFILE
             || word(e+4)==0x00100680
+#ifdef AF_V3_CARRIED_QUEST
+            || word(e+4)==0x00110680
+#endif
 #endif
             ) && word(e+8)==5) {
         extended=1;stored_extra=AF_CZ_CARD_EXTRA;
@@ -287,7 +294,8 @@ static int expand(const u8 *bank,u32 bank_bytes,u8 *scratch,u32 scratch_bytes,u3
         u8 *cards=scratch+AF_CZ_RAW+AF_CZ_FISHING_EXTRA;
         if(stored_extra==AF_CZ_CARD_EXTRA) {
             if(!af_holiday_cards_valid(cards))return AF_CZ_FORMAT;
-            if(cards[4]!=(word(e+4)==0x00100680?3:word(e+4)==0x000F0680?2:1))return AF_CZ_FORMAT;
+            if(cards[4]!=(word(e+4)==0x00110680?4:word(e+4)==0x00100680?3:
+                         word(e+4)==0x000F0680?2:1))return AF_CZ_FORMAT;
         } else af_holiday_cards_reset(cards);
     }
 #endif
