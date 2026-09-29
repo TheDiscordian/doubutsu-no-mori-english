@@ -4,6 +4,7 @@
 #include <string.h>
 #include "carried_paper.h"
 #include "holiday_cards.h"
+#include "../overlays/v3/carried_catalogue.c"
 #ifndef TEST_PAPER_MODE
 #error Supply a concrete ROM-build mode
 #endif
@@ -22,6 +23,25 @@ int af_carried_event_type(unsigned item) {(void)item;return 0;}
 void af_carried_prior_record(unsigned item) {recorded=item;}
 int af_carried_prior_owned(const unsigned char *player,unsigned item) {(void)player;owned=item;return 1;}
 unsigned char af_console_players[4*0xBD0],*af_test_carried_active;
+static unsigned selected_category,selected_count,prior_goods,prior_shop,preview_native;
+static unsigned short selection[68];
+void af_paper_original_select(void *game,unsigned short *items,int count,
+        unsigned short *existing,int existing_count,int category,int list) {
+    assert(game==&selected_count && existing==selection && existing_count==3 && list==8);
+    selected_category=category;selected_count++;
+    if(items && count>0)memcpy(items,selection,(unsigned)count*2);
+}
+int af_paper_original_goods_exist(unsigned short *items,int count,unsigned item) {
+    prior_goods++;
+    for(int i=0;items && i<count;i++)if(items[i]==(unsigned short)item)return 1;
+    return 0;
+}
+int af_paper_prior_shop_category(unsigned item) {prior_shop=item;return 21;}
+int af_carried_prior_catalogue_bit(const u32 *bits,int index,NativeBit native) {return native(bits,index);}
+int af_carried_owned(const unsigned char *,unsigned);
+void af_test_carried_paper_init(PaperPreview *p,unsigned item) {
+    preview_native=item;p->style=item-0x2000;p->price=40;p->type=1;
+}
 static unsigned char cards[48];
 unsigned af_test_carried_profile[8],af_test_event_item_profile;
 unsigned char *af_v3_card_data(void) {return cards;}
@@ -103,6 +123,50 @@ static void actions(void) {
     }
 }
 
+static void supply(void) {
+    unsigned short generated[68];
+    for(unsigned i=0;i<64;i++)selection[i]=0x2000+i;
+    selection[64]=0x2043;selection[65]=0;selection[66]=0xFFFF;selection[67]=0x1008;
+    af_carried_paper_select(&selected_count,generated,68,selection,3,1,8);
+    assert(selected_count==1 && selected_category==1);
+    for(unsigned style=0;style<65;style++) {
+        unsigned q=af_carried_paper_obtain(style==64?0x2040:0x2000+style);
+        assert(generated[style]==q);
+        assert(af_carried_paper_catalogue_item(style==64?67:style)==q);
+        assert(selection[style]==(style==64?0x2043:0x2000+style));
+        if(TEST_PAPER_MODE<2) {
+            PaperPreview p;memset(&p,0xAB,sizeof(p));preview_native=0;
+            af_carried_paper_init(&p,q);
+            assert(p.style==style && p.type==1 && p.price==(TEST_PAPER_MODE?160u:40u));
+            if(style<64)assert(preview_native==0x2000+style);
+            else assert(!preview_native && p.buffer==0xABABABAB);
+        }
+    }
+    assert(!generated[65] && generated[66]==0xFFFF && generated[67]==0x1008);
+    assert(!af_carried_paper_catalogue_item(64) && !af_carried_paper_catalogue_item(66));
+    assert(!af_carried_paper_catalogue_item(68));
+    af_carried_paper_select(&selected_count,generated,68,selection,3,0,8);
+    assert(selected_count==2 && !selected_category && !memcmp(generated,selection,sizeof(selection)));
+    af_carried_paper_select(&selected_count,0,0,selection,3,1,8);
+    assert(selected_count==3);
+    unsigned short existing[]={0x2EC5,0x2E87,0x2042,0x1008};
+    unsigned short before[4];memcpy(before,existing,sizeof(before));
+    for(unsigned style=0;style<65;style++) {
+        unsigned item=style<64?0x2000+style:0x2040;
+        int wanted=TEST_PAPER_MODE==1 && (style==5 || style==7 || style==64);
+        unsigned old=prior_goods;
+        assert(af_carried_paper_goods_exist(existing,4,item)==wanted);
+        assert(prior_goods==old+(TEST_PAPER_MODE!=1));
+    }
+    assert(!memcmp(existing,before,sizeof(before)));
+    assert(af_carried_paper_goods_exist(existing,4,0x1008)==1);
+    assert(!af_carried_paper_goods_exist(0,4,0x2005));
+    assert(!af_carried_paper_goods_exist(existing,-1,0x2005));
+    assert(af_carried_paper_shop_category(0x2EC5)==(TEST_PAPER_MODE==1?1:-1));
+    assert(af_carried_paper_shop_category(0x2043)==1);
+    assert(af_carried_paper_shop_category(0x2E00)==21 && prior_shop==0x2E00);
+}
+
 int main(void) {
     unsigned *h=af_test_carried_header;
     h[0]=0x41464350;h[1]=1;h[2]=AF_CARRY_COUNT;h[3]=sizeof(AFCarryItem);
@@ -153,7 +217,7 @@ int main(void) {
         assert(af_carried_paper_obtain(0x203F+q)==(TEST_PAPER_MODE==1?0x2043:TEST_PAPER_MODE==0?0x2040:0));
         assert(af_cw_paper_stack(0x203F+q,q)==af_carried_paper_obtain(0x2040));
     }
-    actions();
+    actions();supply();
     for(unsigned i=0;i<65536;i++)if(!(i>=0x2000 && i<0x2044) && !af_carried_paper_reserved(i)) {
         assert(af_carried_paper_style(i)<0 && !af_carried_paper_quantity(i));
         assert(!af_carried_paper_obtain(i) && !af_cw_paper_stack(i,4));

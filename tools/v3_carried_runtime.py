@@ -104,6 +104,74 @@ def paper_quantity_letter(owner):
         original_single_styles=64,imported_style=64,native_pack_states=192)
 
 
+def paper_quantity_catalogue(owner,symbols):
+    """Order the chosen quantity, keeping the native preview's style and DMA.
+
+    The order list is the shared input to the preview, Nook's quote, the pending
+    order, and the delivered attachment. Do not inflate quantities in mail I/O.
+    """
+    if owner.ram!=0x808A6100:raise ValueError('Changed stationery catalogue owner')
+    # Preserve every caller-saved integer register across the new C call. Its
+    # argument and result replace the original t1/t2 calculation only; the
+    # original store is performed before resuming the common row-count path.
+    regs=(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,24,25,31)
+    offsets={r:32+8*i for i,r in enumerate(regs)};frame=176
+    words=[0x27BD0000|((-frame)&65535),0x96090000]
+    words.extend(0xFFA00000|r<<16|offsets[r] for r in regs)
+    words.extend((0x00004010,0xFFA80010,0x00004012,0xFFA80018,
+        0x01202025,jump(symbols['af_carried_paper_catalogue_item'],link=True),0,
+        0xFFA20000|offsets[10],0xA6220000,
+        0xDFA80010,0x01000011,0xDFA80018,0x01000013))
+    words.extend(0xDFA00000|r<<16|offsets[r] for r in regs)
+    words.extend((jump(0x808A95B0),0x27BD0000|frame))
+    address=owner.append(struct.pack('>'+str(len(words))+'I',*words))
+    owner.rows.append(0x44000000|(address-owner.ram+(len(words)-2)*4))
+    owner.patch(0x808A9578,0x96090000,jump(address))
+    owner.patch(0x808A957C,0x252A2000,0)
+    owner.rows.append(0x44000000|(0x808A9578-owner.ram))
+    # The native preview dispatcher uses the high item byte, not item category.
+    # Its s1 keeps the full pack identity for price/init; only v0's style-family
+    # selector is normalized. at is scratch in this block already.
+    select=(0x2641D1C0,0x2C2100C0,0x10200002,0x32420F00,
+        0x00001025,jump(0x808A6B74),0x00021203)
+    dispatch=owner.append(struct.pack('>7I',*select))
+    owner.rows.append(0x44000000|(dispatch-owner.ram+20))
+    owner.patch(0x808A6B6C,0x32420F00,jump(dispatch))
+    owner.patch(0x808A6B70,0x00021203,0)
+    owner.rows.append(0x44000000|(0x808A6B6C-owner.ram))
+    return dict(row_address=address,row_bytes=len(words)*4,dispatch=dispatch,
+        row_entry=0x808A9578,row_resume=0x808A95B0,dispatch_entry=0x808A6B6C,
+        quantity=symbols['af_carried_paper_catalogue_item'],
+        consumers=['preview and price','order selection','Nook quote/payment','pending order attachment'])
+
+
+def paper_quantity_supply(core,symbols,bridge_ram):
+    """Checked shared native hooks; background selection is not paper creation."""
+    bridges=bytearray();patches=[];entries=[]
+    def patch(address,before,after):
+        at=address-CODE_RAM
+        if core[at:at+len(before)]!=before:raise ValueError(f'Changed paper caller {address:08X}')
+        core[at:at+len(after)]=after
+        patches.append(dict(address=address,before=before.hex(),after=after.hex()))
+    for entry,words,original,handler in (
+        (0x800BFCF0,(0x27BDFF90,0xAFB50034),'af_paper_original_select','af_carried_paper_select'),
+        (0x800BF9B0,(0xAFA60008,0x30C6FFFF),'af_paper_original_goods_exist','af_carried_paper_goods_exist')):
+        address=bridge_ram+len(bridges)
+        if symbols[original]!=address:raise ValueError('Changed shared stationery bridge binding')
+        bridges.extend(struct.pack('>4I',*words,jump(entry+8),0))
+        patch(entry,struct.pack('>2I',*words),struct.pack('>2I',jump(symbols[handler]),0))
+        entries.append(dict(entry=entry,bridge=address,handler=symbols[handler]))
+    # Both complete native random-background readers keep canonical single IDs.
+    # They never obtain inventory stationery, regardless of the build setting.
+    for address in (0x800A90EC,0x800A938C):
+        patch(address,struct.pack('>I',jump(0x800BFCF0,link=True)),
+            struct.pack('>I',jump(symbols['af_paper_original_select'],link=True)))
+    before=struct.pack('>2I',jump(symbols['af_paper_prior_shop_category']),0)
+    patch(0x800C05E0,before,struct.pack('>2I',jump(symbols['af_carried_paper_shop_category']),0))
+    return bytes(bridges),dict(bridges=entries,ram=bridge_ram,bytes=len(bridges),
+        sha256=sha256(bridges),core_patches=patches,background_only=[0x800A90EC,0x800A938C])
+
+
 def prepare_paper_quantities(output,lock):
     """Prepare the complete shared readers/actions/save policy, not a new ROM.
 
@@ -130,17 +198,26 @@ def prepare_paper_quantities(output,lock):
     native={int(r['C'],16) for _,r in sheet_rows(sheet,'Items') if len(r.get('C',''))==4}
     if native.intersection(range(0x2E40,0x2F00)):
         raise ValueError('Paper packs would replace an original identity')
-    files=by_vrom(base);core=files[CODE_VROM].extract(base)
+    files=by_vrom(base);core=bytearray(files[CODE_VROM].extract(base))
     pointer=u32(core,0x8010B334-CODE_RAM+14*4)
     if pointer!=0x8010B32C or core[pointer-CODE_RAM:pointer-CODE_RAM+4]!=b'\x11\x11\0\0':
         raise ValueError('Changed native grab-bag identities beside paper-pack reservation')
     old=d['code'];output.mkdir(parents=True)
     extras=('overlays/v3/creature_icon.S','overlays/v3/ground_categories.c',
-        'overlays/v3/carried_menu.c','overlays/v3/carried_actions.c','overlays/v3/carried_paper.c')
+        'overlays/v3/carried_menu.c','overlays/v3/carried_actions.c','overlays/v3/carried_paper.c',
+        'overlays/v3/carried_paper_supply.c','overlays/v3/carried_catalogue.c')
+    cat_links=d['paper']['catalogue']['code']['link_symbols']
+    links=dict(old['link_symbols'],AF_CARRIED_LINK_RAM=lo,
+        af_paper_original_select=lo+0x2800,af_paper_original_goods_exist=lo+0x2810,
+        af_paper_prior_shop_category=0x80000000|(u32(core,0x800C05E0-CODE_RAM)&0x3FFFFFF)<<2,
+        af_carried_owned=cat_links['af_carried_owned'],
+        af_carried_prior_catalogue_bit=cat_links['af_carried_prior_catalogue_bit'])
     data,code=compile_part('carried_items',output/'readers',extra_sources=extras,
         defines=tuple(f[2:] for f in old['flags'] if f.startswith('-D'))+('AF_V3_PAPER_PACKS=1',),
-        link_symbols=dict(old['link_symbols'],AF_CARRIED_LINK_RAM=lo))
-    if lo+len(data)>save_ram:raise ValueError('Paper readers exceed their reserved extension')
+        link_symbols=links)
+    if len(data)>0x2800:raise ValueError('Paper readers exceed their reserved extension')
+    bridges,supply=paper_quantity_supply(core,code['symbols'],lo+0x2800)
+    write_new(output/'supply-bridges.bin',bridges)
     previous=d['quest']['storage'];links=dict(previous['link_symbols'],AF_HI_STORAGE_RAM=save_ram)
     for key in ('af_carried_category','af_carried_reserved'):links[key]=code['symbols'][key]
     saved,storage=compile_part('holiday_item_storage',output/'storage',
@@ -152,15 +229,20 @@ def prepare_paper_quantities(output,lock):
     letter=Owner(files[0x3B60000].extract(base),files[0x3B70000].extract(base),0x80888E90)
     style=paper_quantity_letter(letter);owner,reloc,receipt=letter.finish()
     write_new(output/'letter.bin',owner);write_new(output/'letter-reloc.bin',reloc)
+    catalogue=Owner(files[0x3970000].extract(base),files[0x3980000].extract(base),0x808A6100)
+    ordering=paper_quantity_catalogue(catalogue,code['symbols'])
+    cat_owner,cat_reloc,cat_receipt=catalogue.finish()
+    write_new(output/'catalogue.bin',cat_owner);write_new(output/'catalogue-reloc.bin',cat_reloc)
     paths=(*SOURCES,*STORAGE_SOURCES,'overlays/v3/carried_paper.h','overlays/v3/carried_paper.c',
-        'tools/v3_creature_choices.py')
+        'overlays/v3/carried_paper_supply.c','tools/v3_creature_choices.py')
     report=dict(format='AFV3-PAPER-QUANTITIES-1',base_sha256=sha256(base),base_abi=prior['runtime_abi'],
         sources={p:sha256((ROOT/p).read_bytes()) for p in paths},worksheet_sha256=SHEET_SHA,
         choice=dict(PAPER_CHOICE,ram=code['symbols']['af_carried_paper_mode'],default='N64',values=dict(N64=0,GameCube=1)),
         code=code,storage=storage,ram=lo,end=hi,save_format=18,wire_version=5,
-        letter=dict(style=style,owner=receipt),installed=False,
-        pending=['paper creation and price/delivery callers','public reader/storage redirects and startup packet',
-            'complete saved-bank transaction check','offline/browser behaviour binding'])
+        letter=dict(style=style,owner=receipt),supply=supply,
+        catalogue=dict(ordering=ordering,owner=cat_receipt),installed=False,
+        pending=['remaining shop-floor/interaction and fixed-gift consumers','public reader/storage redirects and startup packet',
+            'offline/browser behaviour binding','ordinary native gameplay and save/reload'])
     write_new(output/'prepared.json',(json.dumps(report,indent=2)+'\n').encode())
     return report
 

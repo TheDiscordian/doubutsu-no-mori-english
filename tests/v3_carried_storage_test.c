@@ -25,6 +25,11 @@ extern int af_v14_compress_cards(u8 *,u32,const u8 *,u32,const u8 *,u32,const u8
 extern int af_v16_compress_cards(u8 *,u32,const u8 *,u32,const u8 *,u32,const u8 *,u32 *,u32);
 extern int af_v16_expand_cards(const u8 *,u32,u8 *,u32);
 #endif
+#ifdef AF_V3_PAPER_PACKS
+const u32 af_carried_paper_mode=TEST_PAPER_MODE;
+extern int af_v17_compress_cards(u8 *,u32,const u8 *,u32,const u8 *,u32,const u8 *,u32 *,u32);
+extern int af_v17_expand_cards(const u8 *,u32,u8 *,u32);
+#endif
 void af_carried_prior_record(u32 item) {prior_record=item;}
 int af_carried_prior_owned(const u8 *player,u32 item) {(void)player;prior_owned=item;return 17;}
 int af_carried_event_type(u32 item) {(void)item;return 0;}
@@ -39,6 +44,15 @@ static void profile(u32 mask) {
 }
 int main(void) {
     profile(127);init();fill_console();
+#ifdef AF_V3_PAPER_PACKS
+    /* Native saved pockets retain every quantity, including partial packs.
+     * This is the real town payload, not only a helper's returned item ID. */
+    for(u32 player=0;player<4;player++)for(u32 slot=0;slot<15;slot++) {
+        u32 item=af_carried_paper_with_quantity(0x2000+player*15+slot,
+            TEST_PAPER_MODE?slot%4+1:1),at=0x20+player*0xBD0+0x14+slot*2;
+        af_save_live[at]=item>>8;af_save_live[at+1]=item;
+    }
+#endif
     CHECK(AF_CONSOLE_RAW+16==120352 && af_carried_save_enabled()==127);
     CHECK(af_v3_card_data()[4]==AF_HC_CARRIED_WIRE && af_v3_card_data()[7]==3 && af_v3_card_data()[8]==127);
 #ifdef AF_V3_CARRIED_QUEST
@@ -84,6 +98,9 @@ int main(void) {
 #ifdef AF_V3_CARRIED_QUEST
     CHECK(af_v16_expand_cards(saved,65536,expanded,sizeof(expanded))==AF_CZ_FORMAT);
 #endif
+#ifdef AF_V3_PAPER_PACKS
+    CHECK(af_v17_expand_cards(saved,65536,expanded,sizeof(expanded))==AF_CZ_FORMAT);
+#endif
     CHECK(af_v3_save_expand_cards(saved,65536,expanded,sizeof(expanded))==0);
     CHECK(!memcmp(expanded+AF_CZ_RAW+AF_CZ_FISHING_EXTRA,card_before,AF_HC_BYTES));
     CHECK(af_holiday_cards_clear(af_v3_card_data(),2));
@@ -97,6 +114,33 @@ int main(void) {
     CHECK(!memcmp(card_before,af_v3_card_data(),AF_HC_BYTES));
     CHECK(!memcmp(&diary_before,af_v3_diary_data(),AF_DIARY_BYTES));
     CHECK(!memcmp(console_before,af_console_storage.players,6528));
+#ifdef AF_V3_PAPER_PACKS
+    CHECK(af_v3_card_data()[15]==TEST_PAPER_MODE);
+    for(u32 player=0;player<4;player++)for(u32 slot=0;slot<15;slot++) {
+        u32 at=0x20+player*0xBD0+0x14+slot*2;
+        CHECK(((u32)af_save_live[at]<<8|af_save_live[at+1])==af_carried_paper_with_quantity(
+            0x2000+player*15+slot,TEST_PAPER_MODE?slot%4+1:1));
+    }
+    /* A syntactically valid pack save must fail transactionally in singles
+     * mode, before output publication, state adoption, erasure, or writing. */
+    if(!TEST_PAPER_MODE) {
+        u8 *mode=expanded+AF_CZ_RAW+AF_CZ_FISHING_EXTRA+15;*mode=1;
+        CHECK(af_v3_save_compress_cards(bank,65536,expanded,65536,expanded+65536,
+            6528,expanded+AF_CZ_RAW,af_console_hash,AF_CZ_WORK_BYTES)>0);
+        memcpy(town_before,af_save_live,AF_SAVE_PAYLOAD);
+        memset(snapshot,0xA7,sizeof(snapshot));
+        const u8 *logical=(const u8 *)1;
+        CHECK(af_v3_save_check(bank,65536,af_save_current,snapshot)==AF_SAVE_PROFILE_MISSING);
+        CHECK(af_v3_console_storage_commit(bank,af_save_current,snapshot,&logical)==AF_SAVE_PROFILE_MISSING);
+        CHECK(logical==(const u8 *)1);
+        for(u32 i=0;i<sizeof(snapshot);i++)CHECK(snapshot[i]==0xA7);
+        CHECK(!memcmp(town_before,af_save_live,AF_SAVE_PAYLOAD));
+        CHECK(!memcmp(card_before,af_v3_card_data(),AF_HC_BYTES));
+        CHECK(!memcmp(&diary_before,af_v3_diary_data(),AF_DIARY_BYTES));
+        CHECK(!memcmp(console_before,af_console_storage.players,6528));
+        CHECK(writes==writes_before && erases==erases_before);*mode=0;
+    }
+#endif
     /* Every removed family fails before publishing output or changing live data. */
     for(u32 bit=0;bit<7;bit++) {
         profile(127u^(1u<<bit));CHECK(af_v3_save_reset()==1);
@@ -129,10 +173,17 @@ int main(void) {
         if(version==3)size=af_v16_compress_cards(bank,65536,expanded,65536,
             expanded+65536,6528,expanded+AF_CZ_RAW,af_console_hash,AF_CZ_WORK_BYTES);
 #endif
+#ifdef AF_V3_PAPER_PACKS
+        if(version==4)size=af_v17_compress_cards(bank,65536,expanded,65536,
+            expanded+65536,6528,expanded+AF_CZ_RAW,af_console_hash,AF_CZ_WORK_BYTES);
+#endif
         CHECK(size>0 && bank[0xF985]==13+version);
         CHECK(af_v3_save_check(bank,65536,af_save_current,0)>0);
         af_v3_save_commit(bank,af_save_live,AF_SAVE_PAYLOAD);
         CHECK(af_v3_card_data()[4]==AF_HC_CARRIED_WIRE && af_v3_card_data()[8]==127);
+#ifdef AF_V3_PAPER_PACKS
+        CHECK(af_v3_card_data()[15]==TEST_PAPER_MODE);
+#endif
         for(u32 p=0;p<4;p++)CHECK(af_v3_card_data()[9+p]==(version==3 && (p==0 || p==3)));
 #ifdef AF_V3_CARRIED_QUEST
         CHECK(!af_carried_quest_day(af_v3_card_data()));

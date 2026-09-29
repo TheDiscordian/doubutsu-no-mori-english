@@ -18,6 +18,40 @@ from v3_furniture_pipeline import Source
 
 
 class CarriedNpcTests(unittest.TestCase):
+    def test_stationery_native_consumer_preparation(self):
+        from aflib import by_vrom,CODE_VROM
+        from v3_carried_runtime import paper_quantity_catalogue,paper_quantity_letter,paper_quantity_supply
+        from v3_submenu_tables import Owner
+        out=ROOT/os.environ.get('V3_PAPER_QUANTITIES','build/v3-paper-quantities-prepared-04')
+        prepared=json.loads((out/'prepared.json').read_bytes())
+        image,r=inputs(ROOT/'build/v3-carried-field-work-01/quest-manager-03/build-lock.json')
+        self.assertEqual(prepared['base_sha256'],sha256(image))
+        self.assertEqual(prepared['base_abi'],r['runtime_abi'])
+        self.assertFalse(prepared['installed'])
+        for path,digest in prepared['sources'].items():
+            self.assertEqual(sha256((ROOT/path).read_bytes()),digest,path)
+        files=by_vrom(image);core=bytearray(files[CODE_VROM].extract(image))
+        symbols=prepared['code']['symbols']
+        bridges,supply=paper_quantity_supply(core,symbols,prepared['ram']+0x2800)
+        self.assertEqual(bridges,(out/'supply-bridges.bin').read_bytes())
+        self.assertEqual(supply,prepared['supply'])
+        self.assertEqual(len(supply['core_patches']),5)
+        self.assertEqual(supply['background_only'],[0x800A90EC,0x800A938C])
+        with self.assertRaisesRegex(ValueError,'Changed paper caller'):
+            paper_quantity_supply(core,symbols,prepared['ram']+0x2800)
+        for name,vrom,reloc,ram,adapt in (
+                ('letter',0x3B60000,0x3B70000,0x80888E90,paper_quantity_letter),
+                ('catalogue',0x3970000,0x3980000,0x808A6100,
+                    lambda owner:paper_quantity_catalogue(owner,symbols))):
+            owner=Owner(files[vrom].extract(image),files[reloc].extract(image),ram)
+            adapt(owner);data,rel,receipt=owner.finish()
+            self.assertEqual(data,(out/(name+'.bin')).read_bytes())
+            self.assertEqual(rel,(out/(name+'-reloc.bin')).read_bytes())
+            self.assertEqual(receipt,prepared[name]['owner'])
+        self.assertEqual(prepared['choice']['default'],'N64')
+        self.assertEqual(prepared['choice']['values'],{'N64':0,'GameCube':1})
+        self.assertEqual((prepared['save_format'],prepared['wire_version']),(18,5))
+
     def test_global_stationery_policy(self):
         from tests.test_v3_equipment_runtime import HostTests
         for mode in (0,1,2):
@@ -27,6 +61,7 @@ class CarriedNpcTests(unittest.TestCase):
                 '-DAF_V3_EVENT_ITEM_PROFILE=1','-DAF_CARRIED_PAPER_MENUS=47',
                 f'-DTEST_PAPER_MODE={mode}'),extra=(
                 'overlays/v3/carried_paper.c','overlays/v3/carried_items.c',
+                'overlays/v3/carried_paper_supply.c',
                 'overlays/v3/carried_collection.c','overlays/v3/holiday_cards.c',
                 'overlays/v3/diary.c','overlays/v3/diary_calendar.c','overlays/v3/carried_actions.c'))
 

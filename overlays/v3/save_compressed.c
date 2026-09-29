@@ -299,7 +299,7 @@ static int expand(const u8 *bank,u32 bank_bytes,u8 *scratch,u32 scratch_bytes,u3
         u8 *cards=scratch+AF_CZ_RAW+AF_CZ_FISHING_EXTRA;
         if(stored_extra==AF_CZ_CARD_EXTRA) {
             if(!af_holiday_cards_valid(cards))return AF_CZ_FORMAT;
-            if(cards[4]!=(word(e+4)==0x00110680?4:word(e+4)==0x00100680?3:
+            if(cards[4]!=(word(e+4)==0x00120680?5:word(e+4)==0x00110680?4:word(e+4)==0x00100680?3:
                          word(e+4)==0x000F0680?2:1))return AF_CZ_FORMAT;
         } else af_holiday_cards_reset(cards);
     }

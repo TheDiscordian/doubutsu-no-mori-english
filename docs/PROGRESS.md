@@ -26,19 +26,29 @@ lock or publish experimental V3.
 The shared stationery implementation has a global `paper-quantities` choice:
 N64 single sheets or GameCube four-sheet packs, across all original/imported
 styles and creation routes. N64 is the default. Preparation at
-`build/v3-paper-quantities-prepared-02/` contains the 5,216-byte shared reader/action
-module, 12,272-byte format-18/wire-5 save adapter, and complete letter owner with
-full-ID style normalization. Its checked resident extension is
+`build/v3-paper-quantities-prepared-04/` contains the 6,176-byte shared
+reader/action/supply/catalogue module, 12,304-byte format-18/wire-5 save adapter,
+and complete letter/catalogue owners. Its checked resident extension is
 `807B4000..807BB000`; existing catalogue, food, and spirit code is not overwritten.
 Native singles, orange states, and the native grab bags retain their IDs.
 Focused sanitized checks pass for both modes, invalid-mode rejection, all 65
 styles/quantities, split/merge/consumption, price/icon/name/ownership readers,
 independent original-paper support, and conservative saved-mode binding.
-MIPS compilation and letter-owner preservation/relocation checks pass. These
-changes are not installed: paper creation, shop/catalogue price and delivery
-callers, reader/storage redirects, startup loading, complete saved-bank testing,
-and the checked offline/browser setting binding remain required. Pack-dependent
-saves will reject single-sheet mode rather than discard quantities.
+Prepared native hooks connect random creation, style-aware exclusions, shop
+category, and catalogue order identities. Background-only selection retains
+its canonical style IDs. Catalogue previews retain native artwork/DMA while
+pricing the actual quantity; order identities carry that quantity to Nook's
+quote and pending delivery, without changing mail-transfer semantics.
+MIPS compilation and complete owner preservation/relocation checks pass. The
+actual format-18 compressed save transaction passes in both modes with native
+I/O doubled: partial quantities in all four players' saved pockets, migration
+from formats 14–17, retained diary/console/card state, older-reader rejection,
+and pack-mode incompatibility rejection before state publication or writes.
+These changes are not installed: shop-floor/display/interaction and fixed-gift
+consumers, reader/storage redirects, startup loading, and the checked
+offline/browser setting binding remain required. Ordinary native gameplay and
+save/reload are unverified. Pack-dependent saves reject single-sheet mode
+rather than discard quantities.
 
 Wisp's complete actor compiles in `build/v3-carried-npc-connected-08/` with all
 retained participant/motion records, its official text, walk-only schedule,

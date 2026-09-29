@@ -37,6 +37,20 @@ AFCarryHalf af_carried_paper_obtain(AFCarryWord item) {
     if(mode>1)return 0;
     return af_carried_paper_with_quantity(item,mode?4u:1u);
 }
+AFCarryHalf af_carried_paper_catalogue_item(AFCarryWord index) {
+    /* Catalogue indices are stable style/collection identities, not quantities.
+     * Index 67 is the existing additive orange catalogue row. */
+    if(index<64u)return af_carried_paper_obtain(0x2000u+index);
+    if(index==67u)return af_carried_paper_obtain(0x2040u);
+    return 0;
+}
+AFCarryHalf af_carried_paper_create_item(AFCarryWord item) {
+    /* Only creation callers use this adapter. Inventory setters and native mail
+     * attachment transfers must retain the exact existing item/quantity. */
+    if(item-0x2000u<68u || af_carried_paper_reserved(item))
+        return af_carried_paper_obtain(item);
+    return (AFCarryHalf)item;
+}
 AFCarryHalf af_cw_paper_stack(AFCarryHalf item,unsigned source_quantity) {
     if(!source_quantity || source_quantity>4)return 0;
     return af_carried_paper_obtain(item);

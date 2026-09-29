@@ -1,6 +1,9 @@
 /* Additive stationery uses the full resident artwork and independent saved
  * ownership. Original catalogue pages retain their complete native paths. */
 #include "carried_items.h"
+#ifdef AF_V3_PAPER_PACKS
+#include "carried_paper.h"
+#endif
 typedef unsigned char u8;
 typedef unsigned short u16;
 typedef unsigned int u32;
@@ -29,14 +32,26 @@ extern void af_test_carried_paper_init(PaperPreview *,u32);
 #endif
 int af_carried_catalogue_bit(const u32 *bits,int index,NativeBit native) {
     if(active && (const u8 *)bits==active+0xB78 && (u32)index>=64u) {
-        /* Catalogue offers one four-sheet pack. Other quantities share the
-         * collection identity but are not duplicate catalogue entries. */
+        /* One stable row per style. The quantity choice is applied when the
+         * catalogue constructs its orderable item list, not its ownership bit. */
         return index==67 && af_carried_owned(active,0x2043u);
     }
     return af_carried_prior_catalogue_bit(bits,index,native);
 }
 void af_carried_paper_init(PaperPreview *p,u32 argument) {
     u32 item=(u16)argument;
+#ifdef AF_V3_PAPER_PACKS
+    if(af_carried_paper_reserved(item)) {
+        if(!p)return;
+        if(!af_carried_paper_packs_enabled()) {
+            p->type=5;p->price=0;return;
+        }
+        /* Native DMA/model/style readers receive a canonical single. The
+         * displayed price describes the actual orderable quantity instead. */
+        original(p,0x2000u+(u32)af_carried_paper_style(item));
+        p->price=af_carried_price(item);return;
+    }
+#endif
     if(item-0x2040u>=4u) {original(p,argument);return;}
     if(!p)return;
     p->price=0;p->profile=0;p->segment_offset=0;p->type=5;

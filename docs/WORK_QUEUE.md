@@ -166,10 +166,14 @@ The complete source-manager host check, 108 donor-search comparisons, current
 owner/relocation/resource/startup/patch checks, and seven browser/offline profiles
 pass. Wisp is still disabled because its NPC services are unfinished.
 
-The next concrete consumer is the global stationery choice: wire the prepared
-reader/action/save modules and full-ID letter-style hook into the current ROM,
-connect creation/price/delivery callers for all styles, then admit the checked
-offline/browser setting. Reuse `build/v3-paper-quantities-prepared-02/`, its
+The next concrete consumers are the global stationery choice's native
+shop-floor/display/interaction paths and fixed first-job gifts. Shared random
+generation, style-aware exclusions, catalogue order quantity/preview/price,
+and full format-18 save transactions are prepared and checked. Follow the
+[remaining consumer map](../specs/V3_CARRIED_ITEMS.md#stationery-consumer-map);
+do not restart the completed discovery. Install the connected modules and
+reader/storage redirects through the existing startup packet, then admit the
+checked offline/browser setting. Reuse `build/v3-paper-quantities-prepared-04/`, its
 `807B4000..807BB000` reservation, and its complete native/artwork references.
 Do not overwrite the live catalogue/food/interaction code in the old reader
 padding. Keep pack creation out of ordinary inventory moves and pickups.

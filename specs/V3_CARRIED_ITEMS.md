@@ -197,9 +197,10 @@ and a warning if the selected build cannot preserve the saved quantities.
 
 `prepare_paper_quantities(output, lock)` in `v3_carried_runtime.py` prepares the
 shared implementation from the checked current build. The complete preparation
-is `build/v3-paper-quantities-prepared-02/`: 5,216 reader/action bytes at
-`807B4000`, 12,272 save-adapter bytes at `807B7000`, and a 13,344-byte letter owner
-with its complete 464-byte relocation. The reservation ends at `807BB000`.
+is `build/v3-paper-quantities-prepared-04/`: 6,176 reader/action/supply/catalogue
+bytes at `807B4000`, 32 native-bridge bytes at `807B6800`, 12,304 save-adapter
+bytes at `807B7000`, a 13,344-byte letter owner with its complete 464-byte
+relocation, and a 64,128-byte catalogue owner. The reservation ends at `807BB000`.
 The source identity worksheet and actual native group-14 table retain the two
 grab bags at `2E00/2E01`; the pack reservation starts at `2E40`.
 Existing reader padding is occupied by live catalogue, food, and spirit code,
@@ -220,15 +221,75 @@ or card stamps. Binding retains required mode conservatively; a pack-dependent
 save rejects single-sheet mode without modifying the record. Older supported
 records can bind forward. Formats 17 and earlier cannot read new format-18
 saves. Focused sanitized checks cover the actual policy/readers/actions and
-header/profile migration, but not the complete compressed save transaction or
-ordinary save/restart. Keep these distinctions in the eventual handoff.
+the complete compressed save transaction with native I/O doubled. Both modes
+retain partial quantities in all four players' native saved pockets. Formats
+14–17 migrate forward; the older codecs reject format 18. Incompatible pack
+mode rejects before output publication, adoption of live town/extension state,
+erasure, or writing. Diary, console, card, and ownership data remain intact.
+Ordinary native save/restart is not established by this host transaction check.
 
-Nothing in this preparation is installed in ABI 366. Native creation, price,
-and delivery callers; public reader/storage redirects; startup loading; full
-saved-bank verification; and the checked offline/browser setting binding remain
-unfinished. The shared choice definition must not enter either composer's
+Nothing in this preparation is installed in ABI 366. Remaining native
+shop/display/fixed-gift consumers, public reader/storage redirects, startup
+loading, and the checked offline/browser setting binding remain unfinished.
+The shared choice definition must not enter either composer's
 available options until both complete modes are installed. Both deployed V2
 patchers remain unchanged.
+
+#### Stationery consumer map
+
+Use this map for the connected installation, retaining the complete current
+owners and prepared artwork. Creation is distinct from moving an existing item.
+
+- **Prepared shared creation:** `carried_paper_supply.c` wraps native seven-
+  argument `mSP_SelectRandomItem_New` at `800BFCF0`. Original RNG, rarity, list
+  loading, fallback, and exclusion logic remain intact. Only paper-category
+  results get the global creation quantity. `800BF9B0` compares paper exclusion
+  entries by style without mutating the caller's saved stock/inventory.
+  The two background-only calls at `800A90EC` and `800A938C` bypass creation
+  through the preserved native selector bridge. `mNpc_GetPaperType` and mother-
+  letter paper selectors return artwork styles, not newly obtained stationery.
+- **Prepared category and catalogue:** the current `800C05E0` shop-category
+  chain gains paper-pack/orange recognition and delegates unrelated items.
+  Catalogue row construction at `808A9578` chooses the actual order quantity
+  for each stable style index, including orange index 67. The appended adapter
+  retains integer registers and HI/LO. The preview-family selector at
+  `808A6B6C` recognises the pack reservation; the shared preview adapter gives
+  native DMA a canonical style and prices the full actual quantity. The
+  catalogue list feeds selected orders, Nook's quote/payment, and pending-mail
+  attachments. Do not reapply creation while delivering an existing attachment.
+- **Remaining shop layout and rendering:** native shop-design owner
+  `848BF0` / `80953E20` has paper ranges at `80953E78`, `8095488C`, and
+  `80954BE0`, covering reserve positions, floor stock, and sold removal.
+  The complete loose-item/shop drawing owner is managed by
+  `equipment_resources.room_goods.diary_room_art`; reuse its existing expanded
+  model table and loaded-pointer fixups. Its original paper row uses the
+  `2000..2040` interval. All orange quantities and `2E40..2EFF` need the same
+  native paper model without discarding the quantity stored in the world.
+- **Remaining shop interaction counters:** all five `shop_units.SHOPS` owners
+  use `spec.handler` for item/count wording. The native high-byte/low-byte
+  counter table cannot accept the new pack range or orange quantities directly.
+  Normalize the counter lookup, not the item being purchased/sold. Preserve
+  full-quantity pricing and retained non-paper branches. Existing generic
+  inventory setters must never become paper-creation hooks.
+- **Remaining fixed gifts:** source `ac_npc_rcn_guide2_talk.c_inc` has the
+  first-job stationery grant table in `aNRG2_set_possession` and its matching
+  handover display table in `aNRG2_demo_start_wait_talk_proc`. Repeat-paper
+  requests use that same route. Connect native `Npc_Rcn_Guide2` creation and
+  handover to the shared policy; do not rewrite every `mPr_SetPossessionItem`
+  or `mPr_SetFreePossessionItem` call, which also handles existing items.
+- **Remaining installation and selection:** redirect the retained reader,
+  catalogue, and save exports to the new shared module; extend the existing
+  quest startup packet rather than adding a twenty-third descriptor. Use the
+  same checked choice record for offline/browser resolution, including a
+  pack-only profile. Default/no-import output remains pinned V2-14. Public
+  and local deployments remain V2 until the user's V3 approval.
+
+`test_global_stationery_policy` checks creation, stable catalogue indices,
+preview style/price, exclusion matching, actual-quantity readers, actions, and
+mode validation across all 65 styles. `test_stationery_native_consumer_preparation`
+checks current source identity, native hook guards, and complete letter/catalogue
+preservation at both relocation bases. These are prepared-code/host checks,
+not executed native purchasing, delivery, drawing, or hardware evidence.
 
 ### Inventory and hand actions
 

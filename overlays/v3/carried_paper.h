@@ -12,6 +12,11 @@ int af_carried_paper_style(AFCarryWord);
 AFCarryWord af_carried_paper_quantity(AFCarryWord);
 AFCarryHalf af_carried_paper_with_quantity(AFCarryWord,AFCarryWord);
 AFCarryHalf af_carried_paper_obtain(AFCarryWord);
+AFCarryHalf af_carried_paper_catalogue_item(AFCarryWord);
+AFCarryHalf af_carried_paper_create_item(AFCarryWord);
+void af_carried_paper_select(void *,AFCarryHalf *,int,AFCarryHalf *,int,int,int);
+int af_carried_paper_goods_exist(AFCarryHalf *,int,AFCarryWord);
+int af_carried_paper_shop_category(AFCarryWord);
 AFCarryHalf af_cw_paper_stack(AFCarryHalf,unsigned);
 int af_carried_paper_reserved(AFCarryWord);
 #endif

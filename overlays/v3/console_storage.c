@@ -175,6 +175,9 @@ static int expand(const u8 *bank,const u8 **logical) {
         || version==0x00100680
 #ifdef AF_V3_CARRIED_QUEST
         || version==0x00110680
+#ifdef AF_V3_PAPER_PACKS
+        || version==0x00120680
+#endif
 #endif
 #endif
 #endif
