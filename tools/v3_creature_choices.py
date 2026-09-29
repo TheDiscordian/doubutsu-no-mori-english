@@ -102,6 +102,13 @@ def options(image,report):
         # only together with the connected tournament and its delivery service.
         if live.get('service_admission') and live.get('actors_active') and live.get('mail',{}).get('enabled'):
             result.append({**row,'offset':at,'before':image[at:at+4].hex()})
+    from v3_holiday_selection import location, groups
+    selection=report.get('equipment_resources',{}).get('npc_extra',{}).get('events',{}).get('selection')
+    if selection:
+        groups(image,report)  # Bind the actual installed admission, not only a label.
+        row=selection['calendar'];p,at=location(report['equipment_resources'],row['ram'],4)
+        if image[at:at+4]!=bytes(4):raise ValueError('Changed default holiday calendar')
+        result.append({**row,'offset':at,'before':image[at:at+4].hex()})
     return result
 
 

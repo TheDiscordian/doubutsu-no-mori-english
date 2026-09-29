@@ -2202,12 +2202,12 @@ hardware evidence. No diary choices are enabled by this installation.
 | --- | --- |
 | Category identity/data | Fixed `2B10..2B1F` destinations preserve native `2B00`; shared names/prices/types, placement/pickup, and collection record/check readers installed |
 | Carried/collection artwork | Shared pocket icon and ground/police/handover model installed; all sixteen distinct room/catalogue covers installed once and shared between consumers |
-| Calendar entry | Surface A-tap uses additive carried IDs; owner/player resolution, dates/events/birthdays, drawing, owned menu, and visit hook installed; actual participation callers remain |
+| Calendar entry | Surface A-tap uses additive carried IDs; owner/player resolution, dates/events/birthdays, drawing, owned menu, visit hook, and actual participation callers are installed |
 | Reading/editing | Controller, ownership, wrapping/scrolling, cursor, keyboard child, confirmation/privacy, transitions, atomic commit, overlays/DMA/arena installed; native execution remains |
 | English UI | Official prompts, project errors, all screen textures, and native event labels extracted/credited/checked; native rendering remains unverified |
 | Persistence | Shared reset, clear, probe, pack, commit, forward migration, and preflight implemented/tested on host; startup and both stable/direct native dispatch installed; native UI/save verification remains |
 | Catalogue/scoring | All sixteen furniture-page records, donor framing/prices, scoring metadata, and upper-layer clutter exemption installed; native execution remains |
-| Selection | All sixteen parent/cover/profile, catalogue, and scoring bindings implemented; browser/offline pending handling verified; choices remain disabled until required gameplay is connected |
+| Selection | All sixteen styles selectable; parent/cover/profile, metadata, catalogue/scoring, and conditional event admission share the browser/offline plan |
 | Verification | Run bounded combined current-ROM UI/save checks after integration; no separate style-by-style native scenarios |
 
 Continue this same category with connected native UI/save checks. The carried-ID
@@ -2282,24 +2282,41 @@ Unknown or changed identities, enabled pending profiles, and incomplete records
 reject. The existing canonical codec needs no new saved field or format.
 
 The shared resolver and catalogue/scoring generators support individual/all
-parent bindings. The authoritative selectable catalogue excludes unfinished
-diaries, and final composition rejects a caller-forged catalogue. Browser plans
-record these bindings under `pending_options`, never under selectable options.
-Their installed catalogue rows retain their exact source positions for input
-validation, then disappear when a supported profile is composed. Their scoring
-metadata is disabled unconditionally. Select all has an explicit derived output
-hash because the installation contains prepared but unavailable rows; it must
-not enable unfinished imports merely to reproduce the installation hash.
+parent bindings. The current complete category is selectable; unfinished older
+preparations retain the checked `pending_options` path. Final composition rejects
+a caller-forged catalogue. A diary owns its profile enable word, metadata byte,
+saved bit, catalogue entry, and scoring entry. Excluding it removes all five;
+neither its cover nor one rotation is an independent option.
 
-For ABI 313, empty output is the pinned V2-14; all 191 supported development
-choices produce SHA-256
-`f2e5c31a5b890ad1112bde72cc7b5da9a9f13e3a0547cf706fb63e5a5f8d81fc`.
-The main build lock remains unchanged. Neither deployed
-patcher consumes this experimental plan.
+`tools/v3_holiday_selection.py` connects the installed category to the complete
+holiday providers. Installation validates the five special-character descriptors,
+22 participant records, eighteen decoration controllers, complete service
+directory, and all 83 actual owner requirements before admission. The dispatcher
+retains collision-only coordinates without inventing actors for them. Both
+Tortimer appearances retain their native constructor-installed drawing callback.
+
+The generated `runtime_groups` plan activates the shared providers when any
+diary is selected or the user explicitly chooses a GameCube calendar/tournament
+setting. Unrelated imports leave the original events active. Each group declares
+fixed imported identities, behaviour conditions, and checked on/off words; the
+browser has no separate item allowlist. Both composers update the NPC, event,
+and equipment startup checksums in dependency order. Changing the N64/GameCube
+calendar changes actual dates, not just labels. Gifts remain independently
+selected: attendance never requires enabling every gift. Ordinary shop stock
+and full gameplay verification remain separate work.
+
+The current lock is in `docs/PROGRESS.md`. Empty output is the pinned V2-14;
+all supported selections retain the complete current proposal. Neither deployed
+patcher consumes this experimental plan. Format 15 is unchanged; saves using a
+diary require its style in the loading profile. Older profiles lacking those
+styles reject them, and V2/format-14-or-earlier V3 cannot load format-15 saves.
 
 `tests/test_v3_diary_selection.py` checks all parent/profile bindings, complete
-category catalogue/scoring resolution, rejection of forged readiness, and three
-current browser/offline profiles. Its sanitized save check links the actual
+category catalogue/scoring resolution, rejection of forged readiness, and seven
+current browser/offline profiles: empty, all, unrelated, one diary, all diaries,
+calendar only, and tournament only. Activation words, metadata, saved bits,
+catalogue rows, and changed packet checksums are checked together. Its retained
+sanitized save check links the actual
 carried/cover readers, native selected-style resolver, canonical codec, and
 format-eleven adapter. Four players retain separate collection flags and pages
 through save/reset/reload; removing any selected style rejects without writing

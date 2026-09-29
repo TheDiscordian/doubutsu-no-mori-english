@@ -739,6 +739,11 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             import v3_holiday_participants_install as equipment
             equipment_report,owner_changes,report_updates,physical_writes=equipment.install(
                 base,prior,blob,core,output,holiday_participants)
+        elif (prior['equipment_resources']['npc_extra'].get('optional_dialogue') and
+                not current_events.get('selection')):
+            import v3_holiday_selection as equipment
+            equipment_report,owner_changes,report_updates,physical_writes=equipment.install(
+                base,prior,blob,core,output)
         elif (current_events.get('festivals') and
                 not prior['equipment_resources']['npc_extra'].get('optional_dialogue')):
             import v3_holiday_world as equipment
@@ -1547,6 +1552,8 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             additional_resident_bytes=state_growth+(176 if fishing else 0)+(npc['events']['sky']['additional_resident_bytes'] if sky else 0)+(npc['events']['participants']['additional_resident_bytes'] if participants else 0)+(npc['events']['exercise']['additional_resident_bytes'] if exercise else 0),
             resource_allocations_changed=bool(new_state or fishing or npc['events'].get('reserved')),
             saved_format_changed=bool(new_state or fishing or exercise),saved_profile_changed=False)
+        if npc['events'].get('selection') and not prior['equipment_resources']['npc_extra']['events'].get('selection'):
+            report['shared_runtime_refresh']['saved_profile_changed']=True
         report['sources'].update(npc['sources'])
         report['native_test']=('pending dedicated/costume/exercise owners, calendar behaviour choice, actor activation, '
             'and connected diary gameplay/save verification' if holiday_state else
@@ -1574,6 +1581,8 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             report['shared_runtime_refresh']['additional_resident_bytes']+=optional['additional_resident_bytes']
             report['shared_runtime_refresh']['resource_allocations_changed']=True
             report['native_test']='pending event/service activation, diary selection, and connected native gameplay/save verification'
+        if npc['events'].get('selection'):
+            report['native_test']='pending native diary UI/save and activated festival gameplay verification'
     if console_images is not None:
         images=equipment_report['console_images']
         report['shared_runtime_refresh'].update(adapters=['console_images'],

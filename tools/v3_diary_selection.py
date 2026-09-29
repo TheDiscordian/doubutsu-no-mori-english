@@ -27,13 +27,15 @@ def catalogue_key(row):
 def bindings(image, report):
     """One shared bit/enable word controls a carried style and all cover rotations.
 
-    These are prepared bindings, not selectable choices. Promotion requires the
-    remaining gameplay implementation, not merely changing a report boolean.
+    Prepared bindings stay unavailable until the installed event admission,
+    item records, and saved profile are connected together.
     """
     d = report.get('equipment_resources', {}).get('diary_items')
     if not d or not d.get('catalogue'):
         return {}
-    if (d['format'] != 'AFV3-DIARY-ITEMS-1' or d['selected'] != 0 or
+    from v3_holiday_selection import groups
+    admitted = bool(groups(image, report))
+    if (d['format'] != 'AFV3-DIARY-ITEMS-1' or d['selected'] != (16 if admitted else 0) or
             len(d['rows']) != 16 or len(d['profiles']) != 16):
         raise ValueError('Changed inactive diary category contract')
     files = by_vrom(image)
@@ -52,17 +54,17 @@ def bindings(image, report):
         at = ROWS+slot*80; metadata = blob[ITEMS+slot*32:ITEMS+(slot+1)*32]
         byte, mask = 32+slot//8, 1 << (slot & 7)
         cat = covers.get(f'{cover:04X}')
-        if (not cat or catalogue_key(cat) != r['id'] or r['ready'] is not False or
-                r['selected'] is not False or profile['selected'] is not False or
+        if (not cat or catalogue_key(cat) != r['id'] or r['ready'] is not admitted or
+                r['selected'] is not admitted or profile['selected'] is not admitted or
                 profile['item_id'] != r['display_item_id'] or
                 profile['parent_item_id'] != r['item_id'] or profile['runtime_index'] != index or
                 profile['profile_ram'] != ROWS_RAM+slot*80+8 or
-                struct.unpack_from('>HHI', blob, at) != (index, cover, 0) or
+                struct.unpack_from('>HHI', blob, at) != (index, cover, int(admitted)) or
                 blob[at+8:at+76].hex() != profile['profile_hex'] or any(blob[at+76:at+80]) or
                 sha256(blob[at:at+80]) != profile['profile_record_sha256'] or
                 sha256(metadata) != profile['item_record_sha256'] or
                 int.from_bytes(metadata[28:30], 'big') != diary_parent_identity(0x2B00+style) or
-                blob[0x20+byte] & mask):
+                metadata[7] != int(admitted) or bool(blob[0x20+byte] & mask) != admitted):
             raise ValueError('Changed inactive diary carried/display/save binding')
         owner = next((f for f in files.values() if
             f.vstart <= profile['object_vrom'] < profile['object_vrom']+profile['object_bytes'] <= f.vend), None)
@@ -74,6 +76,7 @@ def bindings(image, report):
         result[r['id']] = dict(id=r['id'], name=r['name'], kind='diary', item_id=r['item_id'],
             display_item_id=r['display_item_id'], display_runtime_index=index,
             dependencies=[], enable_offset=at+4, enable_bytes=4,
+            metadata_enable_offset=ITEMS+slot*32+7,
             enable_ram=ROWS_RAM+slot*80+4, profile_byte=byte, profile_mask=mask,
-            selectable=False, reason=PENDING)
+            selectable=admitted, reason='' if admitted else PENDING)
     return result

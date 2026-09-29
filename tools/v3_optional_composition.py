@@ -193,6 +193,10 @@ def catalogue(image, report):
     creatures=creature_options(blob,report)
     if result.keys()&creatures.keys():raise ValueError('Creature identity collides with another import')
     result.update(creatures)
+    from v3_diary_selection import bindings as diary_bindings
+    diaries = {k:r for k,r in diary_bindings(image, report).items() if r['selectable']}
+    if result.keys() & diaries.keys():raise ValueError('Diary identity collides with another import')
+    result.update(diaries)
     for row in report['villager_text']['imports']:
         donor = int(row['id'].rsplit('/', 1)[1], 16)
         actor = villager_actor(donor)
@@ -227,8 +231,8 @@ def catalogue(image, report):
     # installs them. Its catalogue must cover its actual installed records only.
     expected = ({row['id'] for row in report['villager_text']['imports']} |
                 {row['id'] for row in furniture_rows} |
-                {item_key(int(row['donor_item_id'], 16)) for row in report['clothing']['imports']} | held.keys() | surfaces.keys() | creatures.keys())
-    if (set(result) != expected or len(result) != len(VILLAGERS)+len(furniture_rows)+len(report['clothing']['imports'])+len(held)+len(surfaces)+len(creatures)):
+                {item_key(int(row['donor_item_id'], 16)) for row in report['clothing']['imports']} | held.keys() | surfaces.keys() | creatures.keys() | diaries.keys())
+    if (set(result) != expected or len(result) != len(VILLAGERS)+len(furniture_rows)+len(report['clothing']['imports'])+len(held)+len(surfaces)+len(creatures)+len(diaries)):
         raise ValueError('Incomplete or duplicated installed development catalogue')
     return dict(sorted(result.items()))
 
@@ -389,13 +393,19 @@ def compose(image, report, catalog, selection):
                 len(value) == 4 and (offset in (STATIC_ROWS + slot * 80 + 4 for slot in range(STATIC_COUNT)) or
                     offset in {r['enable_offset'] for r in catalog.values() if r['kind'] in ('floor','wall')} or
                     offset in {r['carried_enable_offset'] for r in catalog.values() if r['kind'] in ('fish','insect')}) or
-                len(value)==1 and offset in {r['enable_offset'] for r in catalog.values() if r['kind']=='clothing'}):
+                len(value)==1 and (offset in {r['enable_offset'] for r in catalog.values() if r['kind']=='clothing'} or
+                    offset in {r['metadata_enable_offset'] for r in catalog.values() if r['kind']=='diary'})):
             raise ValueError('Selection field escapes reviewed resident enable words')
         change(files[BLOB].pstart+offset, value, label)
     prefix(0x20, bytes.fromhex(selection['profile_hex']), 'complete saved import profile')
     for row in choices:
         change(row['offset'],struct.pack('>I',row['values'][values[row['id']]]),'behaviour: '+row['id'])
     enabled = set(selection['enabled'])
+    from v3_holiday_selection import groups as event_groups, active as event_active, checksum_fields as event_checksums
+    for group in event_groups(image, report):
+        on = event_active(group, enabled, values)
+        for field in group['fields']:
+            change(field['offset'], struct.pack('>I', field['enabled'] if on else field['disabled']), group['id'])
     for key, row in catalog.items():
         active = int(key in enabled)
         prefix(row['enable_offset'], active.to_bytes(row['enable_bytes'], 'big'), key)
@@ -403,6 +413,8 @@ def compose(image, report, catalog, selection):
             prefix(row['town_flag_offset'], bytes((active,)), key+' town eligibility')
         if row['kind']=='clothing':
             prefix(row['display_enable_offset'], active.to_bytes(4, 'big'), key+' mannequin')
+        if row['kind']=='diary':
+            prefix(row['metadata_enable_offset'], bytes((active,)), key+' diary metadata')
         if row['kind'] in ('fish','insect'):
             prefix(row['carried_enable_offset'],active.to_bytes(4,'big'),key+' carried creature')
     catalogue_writes, _ = catalogue_selection(image, report, enabled)
@@ -412,7 +424,7 @@ def compose(image, report, catalog, selection):
     from v3_surface_selection import checksum_fields
     from v3_creature_selection import checksum_fields as creature_checksums
     from v3_clothing_install import checksum_fields as clothing_checksums
-    for field in clothing_checksums(image,report)+creature_checksums(image,report)+behaviour_checksums(image,report)+checksum_fields(image,report):
+    for field in clothing_checksums(image,report)+creature_checksums(image,report)+behaviour_checksums(image,report)+event_checksums(image,report)+checksum_fields(image,report):
         intermediate=apply_writes(image,writes);at=field['start']
         change(field['offset'],struct.pack('>I',zlib.crc32(intermediate[at:at+field['length']])),
             'selected resource CRC')
@@ -587,6 +599,8 @@ def build(output, selected=(), *, select_all=False, behaviours=None):
         if choices:
             from v3_creature_choices import update_report as update_behaviours
             update_behaviours(result,blob,current,selection['behaviours'])
+        from v3_holiday_selection import update_report as update_events
+        update_events(result,blob,current,selection)
         if 'creature_profile_hex' in selection:
             from v3_creature_selection import update_report as update_creatures
             update_creatures(blob,current,selection)

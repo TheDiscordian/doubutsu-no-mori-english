@@ -36,7 +36,7 @@ def rules(image, report):
     surfaces=report.get('room_surfaces',{}).get('optional_selection')
     creatures=report.get('equipment_resources',{}).get('creature_items',{}).get('optional_selection')
     from v3_diary_selection import bindings as diary_bindings
-    pending = diary_bindings(image, report)
+    pending = {k:r for k,r in diary_bindings(image, report).items() if not r['selectable']}
     pending_slots = {row['display_runtime_index']: key for key, row in pending.items()}
     pending_entries = {key: {k: row[k] for k in ('id','name','kind','selectable','reason')}
                        for key, row in pending.items()}
@@ -67,6 +67,7 @@ def rules(image, report):
             off.append(disable(blob.pstart + row['display_enable_offset'], 4))
         elif row['kind'] in ('equipment','diary'):
             furniture.append({'item_id':row['display_item_id'],'runtime_index':row['display_runtime_index']})
+            if row['kind']=='diary':off.append(disable(blob.pstart+row['metadata_enable_offset'],1))
         elif row['kind'] in ('fish','insect'):
             furniture.append({'item_id':row['display_item_id'],'runtime_index':row['display_runtime_index']})
             off.append(disable(blob.pstart+row['carried_enable_offset'],4))
@@ -163,7 +164,9 @@ def rules(image, report):
     from v3_creature_selection import checksum_fields as creature_checksums
     behaviours=behaviour_options(image,report)
     from v3_clothing_install import checksum_fields as clothing_checksums
-    crcs = clothing_checksums(image,report)+creature_checksums(image,report)+behaviour_checksums(image,report)+checksum_fields(image,report)
+    from v3_holiday_selection import groups as event_groups, checksum_fields as event_checksums
+    groups = event_groups(image, report)
+    crcs = clothing_checksums(image,report)+creature_checksums(image,report)+behaviour_checksums(image,report)+event_checksums(image,report)+checksum_fields(image,report)
     for at, start, length in ((blob.pstart + 0xF8, blob.pstart + composition.PACKAGE, composition.PACKAGE_SIZE),
                               (module.pstart + composition.CONFIG + 8, blob.pstart, composition.PREFIX_SIZE)):
         value = field(at, 4)
@@ -180,16 +183,17 @@ def rules(image, report):
             'options': entries, 'profile': field(blob.pstart + 0x20, 192), 'tables': packed,
             'crc32': crcs, 'header': field(0x10, 8),
             'save_compatibility':composition.save_compatibility(report),
+            **({'runtime_groups':groups} if groups else {}),
             **({'behaviours':behaviours,'behaviour_save_note':SAVE_NOTE} if behaviours else {}),
             **({'creature_profile_hex':creatures['profile_hex']} if creatures else {}),
             **({'surface_profile_hex':surfaces['profile_hex']} if surfaces else {})}
-    if pending:
+    if pending or groups:
         # The installation includes inactive prepared rows. "All" means every
         # supported choice, not enabling those unfinished records to preserve a hash.
         full = composition.resolve(catalog, list(catalog), behaviour_options=behaviours or None)
         selected, _, _ = composition.compose(image, report, catalog, full)
-        result.update(pending_options=list(pending_entries.values()),
-                      all_selected_sha256=sha256(selected))
+        result.update(all_selected_sha256=sha256(selected))
+        if pending:result['pending_options']=list(pending_entries.values())
     return result
 
 

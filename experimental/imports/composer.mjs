@@ -77,7 +77,7 @@ export function validatePlan(plan) {
       }
       pending.add(row.id);
     }
-  } else require(plan.all_selected_sha256 === undefined, 'Unexpected selected-output pin.');
+  } else if (plan.all_selected_sha256 !== undefined) hash(plan.all_selected_sha256);
   // A cyclic dependency is a malformed catalogue, not an excuse to loop or to
   // silently treat a set of broken options as self-sufficient.
   const visiting = new Set(), visited = new Set();
@@ -142,6 +142,27 @@ export function validatePlan(plan) {
     require(row.values && Object.keys(row.values).length === 2 && row.values.N64 === 0 && row.values.GameCube === 1 &&
       row.default === 'N64', 'Unsupported behaviour choices.');
     field(row, 4, 4); require(row.before === '00000000', 'Changed behaviour default.');
+  }
+  const groupIds = new Set();
+  if (plan.runtime_groups !== undefined) array(plan.runtime_groups, 1, 32);
+  for (const group of plan.runtime_groups || []) {
+    require(typeof group.id === 'string' && /^[a-z][a-z0-9-]{0,63}$/.test(group.id) && !groupIds.has(group.id),
+      'Invalid or repeated runtime group.');
+    groupIds.add(group.id);
+    array(group.any_imports, 0, 2048); array(group.any_behaviours, 0, 32); array(group.fields, 1, 64);
+    require(group.any_imports.length + group.any_behaviours.length > 0 &&
+      new Set(group.any_imports).size === group.any_imports.length && group.any_imports.every(id => options.has(id)),
+      'Unknown or repeated runtime dependency.');
+    for (const condition of group.any_behaviours) {
+      const setting = (plan.behaviours || []).find(row => row.id === condition.id);
+      require(setting && Object.hasOwn(setting.values, condition.value) && condition.value !== setting.default,
+        'Unavailable runtime behaviour dependency.');
+    }
+    for (const row of group.fields) {
+      field(row, 4, 4); integer(row.enabled, 0, 0xffffffff); integer(row.disabled, 0, 0xffffffff);
+      require(parseInt(row.before, 16) === row.enabled && row.enabled !== row.disabled,
+        'Changed shared runtime activation.');
+    }
   }
   for (const row of plan.crc32) {
     field(row, 4, 4); integer(row.length, 1, MAX);
@@ -244,6 +265,7 @@ export async function composeSelection(source, plan, requested, behaviours = {})
     // untouched, before applying the first write to this private copy.
     const fields = [plan.profile, plan.header, ...plan.options.flatMap(row => row.disable),
       ...(plan.pending_options || []).flatMap(row => row.disable),
+      ...(plan.runtime_groups || []).flatMap(row => row.fields),
       ...plan.tables.flatMap(row => [row, ...row.counts]), ...plan.crc32, ...(plan.behaviours || [])];
     for (const field of fields) {
       const before = bytes(field.before);
@@ -260,6 +282,14 @@ export async function composeSelection(source, plan, requested, behaviours = {})
     for (const row of plan.behaviours || []) {
       const value = new Uint8Array(4); view(value).setUint32(0, row.values[selection.behaviours[row.id]]);
       write(row, value);
+    }
+    for (const group of plan.runtime_groups || []) {
+      const active = group.any_imports.some(id => enabled.has(id)) ||
+        group.any_behaviours.some(row => selection.behaviours?.[row.id] === row.value);
+      for (const row of group.fields) {
+        const value = new Uint8Array(4); view(value).setUint32(0, active ? row.enabled : row.disabled);
+        write(row, value);
+      }
     }
     for (const option of plan.options) if (!enabled.has(option.id)) {
       for (const field of option.disable) write(field, bytes(field.after));

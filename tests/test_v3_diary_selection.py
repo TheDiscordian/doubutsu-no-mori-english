@@ -25,7 +25,8 @@ class DiarySelectionTests(unittest.TestCase):
         rows = bindings(image, report)
         self.assertEqual(len(rows), 16)
         catalog = composition.catalogue(image, report)
-        self.assertFalse(rows.keys() & catalog.keys())
+        admitted = all(r['selectable'] for r in rows.values())
+        self.assertEqual(rows.keys() & catalog.keys(), rows.keys() if admitted else set())
         # Exercise the shared resolver on installed bindings, without claiming
         # readiness or bypassing compose's authoritative selectable catalogue.
         all_bits = bytearray(192)
@@ -41,11 +42,12 @@ class DiarySelectionTests(unittest.TestCase):
         self.assertEqual({catalogue_key(r) for r in selected_cat['imports']}, set(rows))
         _, selected_scores = composition.scoring_selection(image, report, rows, set(rows))
         self.assertEqual({r['runtime_index'] for r in selected_scores}, set(range(1087,1103)))
-        with self.assertRaisesRegex(ValueError, 'unimplemented'):
-            composition.resolve(catalog, list(rows))
-        forged = {**catalog, **rows}
-        with self.assertRaisesRegex(ValueError, 'actual installed bindings'):
-            composition.compose(image, report, forged, composition.resolve(forged, list(rows)))
+        if not admitted:
+            with self.assertRaisesRegex(ValueError, 'unimplemented'):
+                composition.resolve(catalog, list(rows))
+            forged = {**catalog, **rows}
+            with self.assertRaisesRegex(ValueError, 'actual installed bindings'):
+                composition.compose(image, report, forged, composition.resolve(forged, list(rows)))
         corrupted = copy.deepcopy(report)
         corrupted['equipment_resources']['diary_items']['profiles'][0]['parent_item_id']='2B00'
         with self.assertRaisesRegex(ValueError, 'binding'):
@@ -55,23 +57,45 @@ class DiarySelectionTests(unittest.TestCase):
             wrong = dict(cat, selection_id='GAFE01-r0/item/30FC')
             with self.assertRaises(ValueError):catalogue_key(wrong)
         plan = browser.rules(image, report)
-        self.assertEqual({r['id'] for r in plan['pending_options']}, set(rows))
-        self.assertTrue(all(not r['selectable'] for r in plan['pending_options']))
+        self.assertEqual({r['id'] for r in plan.get('pending_options', [])}, set() if admitted else set(rows))
+        self.assertTrue(all(not r['selectable'] for r in plan.get('pending_options', [])))
         cases = []
         from v3_creature_choices import options
         choices = options(image, report)
-        for name, requested in (('empty', []), ('all-supported', list(catalog)),
-                                ('mixed', ['GAFE01-r0/villager/00EB', 'GAFE01-r0/item/2320'])):
-            selection = composition.resolve(catalog, requested, behaviour_options=choices)
+        profiles = [('empty', [], {}), ('all-supported', list(catalog), {}),
+                    ('unrelated', ['GAFE01-r0/villager/00EB', 'GAFE01-r0/item/2320'], {})]
+        if admitted:
+            profiles += [('one-diary', [next(iter(rows))], {}),
+                         ('all-diaries', list(rows), {'holiday-calendar':'GameCube'}),
+                         ('calendar-only', [], {'holiday-calendar':'GameCube'}),
+                         ('tournament-only', [], {'tournament-measurements':'GameCube'})]
+        for name, requested, behaviours in profiles:
+            selection = composition.resolve(catalog, requested, behaviour_options=choices, behaviours=behaviours)
             result, _, _ = composition.compose(image, report, catalog, selection)
-            if requested:
+            if requested or selection.get('behaviours_changed'):
                 blob = by_vrom(result)[composition.BLOB].extract(result)
                 for r in rows.values():
-                    self.assertEqual(blob[r['enable_offset']:r['enable_offset']+4], bytes(4))
-                    self.assertFalse(blob[0x20+r['profile_byte']] & r['profile_mask'])
+                    on = r['id'] in selection['enabled']
+                    self.assertEqual(blob[r['enable_offset']:r['enable_offset']+4], int(on).to_bytes(4,'big'))
+                    self.assertEqual(bool(blob[0x20+r['profile_byte']] & r['profile_mask']), on)
+                    self.assertEqual(blob[r['metadata_enable_offset']], int(on))
                 _, cat = composition.catalogue_selection(image, report, set(selection['enabled']))
-                self.assertFalse(any(r.get('representation')=='diary' for r in cat['imports']))
-            cases.append(dict(name=name, requested=requested, selection=selection, sha256=sha256(result)))
+                self.assertEqual({catalogue_key(r) for r in cat['imports'] if r.get('representation')=='diary'},
+                                 set(rows)&set(selection['enabled']))
+                if admitted:
+                    from v3_holiday_selection import groups, active, checksum_fields
+                    for g in groups(image, report):
+                        on=active(g,selection['enabled'],selection['behaviours'])
+                        self.assertEqual(on, name!='unrelated')
+                        for f in g['fields']:
+                            self.assertEqual(int.from_bytes(result[f['offset']:f['offset']+4],'big'),
+                                             f['enabled'] if on else f['disabled'])
+                    import zlib
+                    from v3_creature_choices import checksum_fields as behaviour_checksums
+                    for f in checksum_fields(image,report)+behaviour_checksums(image,report):
+                        self.assertEqual(int.from_bytes(result[f['offset']:f['offset']+4],'big'),
+                                         zlib.crc32(result[f['start']:f['start']+f['length']]))
+            cases.append(dict(name=name, requested=requested, behaviours=behaviours, selection=selection, sha256=sha256(result)))
         self.assertEqual(plan['all_selected_sha256'], cases[1]['sha256'])
         with tempfile.TemporaryDirectory(prefix='v3-diary-selection-') as temp:
             fixture = Path(temp)/'fixture.json'
