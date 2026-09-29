@@ -23,18 +23,37 @@ lock or publish experimental V3.
 
 ## Active development
 
-Wisp's complete actor compiles with the extended shared NPC registry, independent
-spirit-family admission, native field access, translucent submission, and full
-idle/blink animation in `build/v3-carried-npc-connected-03/`. All 22 existing
-participant records and three resident motions are retained. The prepared text
-contains 48 official messages, sixteen choices, 32 angry-name strings, and the
-official character name, credited in the single provenance catalogue. The
-twenty external reward lists retain all 839 entries; the two local lists remain
-in the actor. Three focused sanitized/preparation checks and provenance validation
-pass. World/schedule, message/handover, reward filtering, and save/travel cleanup
-are still unfinished. This is prepared integration, not a newly playable NPC or
-an updated cartridge: the installed proposal remains ABI 366, with Wisp disabled.
-No saves or deployed patcher files are changed.
+The shared stationery implementation has a global `paper-quantities` choice:
+N64 single sheets or GameCube four-sheet packs, across all original/imported
+styles and creation routes. N64 is the default. Preparation at
+`build/v3-paper-quantities-prepared-02/` contains the 5,216-byte shared reader/action
+module, 12,272-byte format-18/wire-5 save adapter, and complete letter owner with
+full-ID style normalization. Its checked resident extension is
+`807B4000..807BB000`; existing catalogue, food, and spirit code is not overwritten.
+Native singles, orange states, and the native grab bags retain their IDs.
+Focused sanitized checks pass for both modes, invalid-mode rejection, all 65
+styles/quantities, split/merge/consumption, price/icon/name/ownership readers,
+independent original-paper support, and conservative saved-mode binding.
+MIPS compilation and letter-owner preservation/relocation checks pass. These
+changes are not installed: paper creation, shop/catalogue price and delivery
+callers, reader/storage redirects, startup loading, complete saved-bank testing,
+and the checked offline/browser setting binding remain required. Pack-dependent
+saves will reject single-sheet mode rather than discard quantities.
+
+Wisp's complete actor compiles in `build/v3-carried-npc-connected-08/` with all
+retained participant/motion records, its official text, walk-only schedule,
+weed counts, roof-colour writes, item mapping, and guarded handovers. All 22
+reward lists retain 998 candidates; 1,000 destination mappings include the two
+source fallback items. Disabled imports are filtered before either reward
+selection branch. Every paper reward uses the same global quantity policy.
+The current preparation/source check passes. The conversation host fixture has
+not executed successfully; its two setup attempts are recorded as incomplete,
+and no further attempt is spent on that fixture in this batch. Actual linked
+paper policy, deferred weed clearing, voice-click lifecycle, both system sounds,
+successful-save/travel cleanup, and full installation remain unfinished.
+The installed proposal remains ABI 366 / format 17, with Wisp disabled. No
+existing ROM, save, or deployed patcher is changed, and no native/hardware result
+is claimed for these prepared changes.
 
 The active work is the importing pipelines: extraction, conversion, bulk
 installation, and working item behaviours, including item-specific behaviours.

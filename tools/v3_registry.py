@@ -244,6 +244,10 @@ CARRIED_ITEMS = {0x2003+64*i:0x2040+i for i in range(4)} | {
     0x251E:0x251E,0x2807:0x2807,0x2901:0x290A,
 } | HOLIDAY_ITEMS | {i:i for i in range(0x2D28,0x2D2D)}
 CARRIED_PAPER_STYLE = 64
+# Additional quantities for all native paper styles; existing singles and the
+# four orange-paper identities never move when a build setting changes.
+CARRIED_NATIVE_PAPER_PACK_FIRST = 0x2E40
+CARRIED_NATIVE_PAPER_PACK_COUNT = 64 * 3
 # Shared source category 17 also describes a diary. Keep that established
 # mapping; carried records can select a separate native model for the seedling.
 CARRIED_ITEM_CATEGORIES = {17:48,18:51,19:46,28:50,44:49,47:45,52:47}

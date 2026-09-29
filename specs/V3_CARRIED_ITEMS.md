@@ -168,6 +168,68 @@ unchanged resources:
    Acquisition follows primary importing. Gold-tree work remains required after
    primary imports, along with any unfinished golden-tool behaviour.
 
+### Global stationery quantity choice
+
+`paper-quantities` is one ROM-build setting for **all original and imported
+stationery**, independent of the orange-paper and spirit inclusion checkboxes.
+The default is `N64` (single sheets); `GameCube` creates four-sheet packs.
+The same choice governs shops, catalogue purchases and delivery, gifts, event
+rewards, and other paper-creation routes. It is not a Wisp-only conversion.
+No-import/default builds retain the exact translation-only baseline; a pack-only
+build requires the shared stationery runtime without enabling unrelated imports.
+
+Existing native singles `2000..203F` and imported orange states `2040..2043`
+retain their identities. Additional native-style quantities use the fixed
+`2E40..2EFF` reservation: three rows of 64 styles for quantities two, three,
+and four. This is a destination reservation, not a source GameCube ID range.
+The builder must verify its absence from original identities before installation.
+Names, colours, ownership, and letter backgrounds always resolve to the style;
+prices and pocket icons resolve to the actual quantity. Do not multiply a pack
+again when picking it up, swapping it, attaching it to mail, or loading a save.
+`carried_paper.c` separates creation policy from quantity-preserving operations.
+
+Pack mode includes the shared grab-one, merge/overflow, and confirmed one-sheet
+letter-consumption paths for every style. Native and imported paper must use
+the same rules. Shop/catalogue descriptions and prices must describe what is
+actually delivered. Existing packs are never silently discarded or converted
+to a single sheet on load. A mode change needs explicit saved-profile validation
+and a warning if the selected build cannot preserve the saved quantities.
+
+`prepare_paper_quantities(output, lock)` in `v3_carried_runtime.py` prepares the
+shared implementation from the checked current build. The complete preparation
+is `build/v3-paper-quantities-prepared-02/`: 5,216 reader/action bytes at
+`807B4000`, 12,272 save-adapter bytes at `807B7000`, and a 13,344-byte letter owner
+with its complete 464-byte relocation. The reservation ends at `807BB000`.
+The source identity worksheet and actual native group-14 table retain the two
+grab bags at `2E00/2E01`; the pack reservation starts at `2E40`.
+Existing reader padding is occupied by live catalogue, food, and spirit code,
+so expanded code must use the new checked reservation rather than overwrite it.
+
+Shared name, category, price, display, pocket, icon, collection, menu, splitting,
+merging, and confirmed letter-consumption readers have both modes in source.
+Original paper does not depend on selecting orange stationery. The native letter
+constructor maps the complete inventory ID at `8088A3BC` before storing a style
+byte. Its 32-byte appended adapter preserves the live registers and normalizes
+all native-style quantities to `0..63`; the existing orange loader keeps style
+64. Resolving only the low byte would confuse some packs with orange paper.
+Owner preservation and relocation at both existing test bases pass.
+
+The prepared save adapter writes envelope format 18 and AFHC wire 5. The same
+48-byte extension records pack mode in byte 15 without moving dates, ownership,
+or card stamps. Binding retains required mode conservatively; a pack-dependent
+save rejects single-sheet mode without modifying the record. Older supported
+records can bind forward. Formats 17 and earlier cannot read new format-18
+saves. Focused sanitized checks cover the actual policy/readers/actions and
+header/profile migration, but not the complete compressed save transaction or
+ordinary save/restart. Keep these distinctions in the eventual handoff.
+
+Nothing in this preparation is installed in ABI 366. Native creation, price,
+and delivery callers; public reader/storage redirects; startup loading; full
+saved-bank verification; and the checked offline/browser setting binding remain
+unfinished. The shared choice definition must not enter either composer's
+available options until both complete modes are installed. Both deployed V2
+patchers remain unchanged.
+
 ### Inventory and hand actions
 
 The same `--carried-items` route continues the inactive installed batch without
@@ -532,12 +594,14 @@ These are host/build results, not native gameplay or hardware verification.
 
 `v3_holiday_participants.py --connect-carried-event PATH --build-lock PATH
 --output PATH` reuses the complete prepared actor and reference hashes. The
-current output is `build/v3-carried-npc-connected-03/`, based on ABI 366. It
+current output is `build/v3-carried-npc-connected-08/`, based on ABI 366. It
 compiles every actor function with the shared registry, NPC services, event-save
 routing, translucent draw service, imported-motion provider, and text mapping.
-The native actor is 2,392 bytes. The object contains 16,169 text/constant bytes,
-2,104 data bytes, and 2,214 BSS bytes. It is not installed: 24 actual world,
-schedule, message/handover, and reward service dependencies remain undefined.
+The native actor is 2,392 bytes. The object contains 27,805 text/constant bytes,
+2,104 data bytes, and 2,222 BSS bytes. It is not installed: the global paper
+policy, deferred weed clearing, voice-click lifecycle, and system sound services
+remain actual undefined dependencies. Successful-save/travel cleanup and full
+character/registry installation are also required.
 No successful placeholder fills a missing consumer.
 
 The shared registry has 23 owners, eighteen temporary resident slots, and 25
@@ -562,9 +626,11 @@ curve and all 64 header bytes are retained. The shared converter accepts its
 ordinary blinking sequence with an unused `-1` stop frame, while still rejecting
 a stopped eye that would index an invalid texture. The new motion table keeps
 all three installed festival motion pointers without reconverting them. Source
-default animation 126 is explicitly mapped to 382 too. Native WANDER does not
-implement the source WALK_WANDER walk-only choice; that schedule consumer still
-requires the real behaviour, not a same-number or approximate fallback.
+default animation 126 is explicitly mapped to 382 too. The prepared walk-only
+schedule preserves source 60% walk / 40% wait decisions, fatigue/sleep checks,
+turning, pitfall interruption, and block-edge initialization. Native SPECIAL
+holds the callback; donor WALK_WANDER is not passed as an out-of-range native
+schedule index. The original Wisp SPECIAL callback remains recoverable.
 
 The complete official message closure is source `2ED3..2F02`, mapped to native
 `3320..334F`; sixteen choices start at 524. No branch escapes that closure.
@@ -578,14 +644,31 @@ line/page boundary, colour change, or timing command is altered.
 
 All twenty external reward lists are compiled in bulk, retaining 839 source
 entries and their terminators; the actor's gyroid and umbrella lists remain
-complete. Runtime supported/selected-item filtering and donor-to-native mapping
-must cover all 22 categories, including the all-collected random fallback.
-Disabled imports cannot be awarded under their donor numeric identities.
+complete. The shared destination resolver maps all 998 candidates and the two
+source fallback fruits through installed import records and the pinned native
+identity worksheet. Runtime selected-item filtering covers both uncollected
+and all-collected branches. Clothes and umbrellas retain the donor's always-
+uncollected treatment. All paper rewards, including orange paper, use the
+global quantity choice. Disabled donor identities never become native rewards.
+
+Native message/item-name providers use the source closure and the already-mapped
+destination; they do not accidentally use another participant's resolver or
+translate an item twice. The actual NPC1 demo-order type is five. A refused
+spirit handover does not consume pockets or advance orders, and failed reward
+insertion does not advance the conversation. Handover requires the admitted
+Wisp actor, local player, actual TALK state, and live handover service. Weed
+queries cover the complete saved town/current field. Roof changes write native
+current colour at `24`, preserving the unrelated ordered-upgrade colour at `25`.
 
 `tests/test_v3_carried_npc.py` checks the changed shared admission/lifecycle with
 diary admission both off and on, native field widths, translucent command bounds,
 retained-family lifecycle, complete source/programme retention, official message
-closure/bounds/credits, and the twenty source lists. Three focused checks pass.
+closure/bounds/credits, and the twenty source lists. The current complete source/
+preparation check passes; unchanged registry checks retain their earlier evidence.
+The new conversation fixture has two unsuccessful compile/link setup attempts
+and no executed behavioural result. Its corrected source extracts the complete
+functions under test without weakening ASan global checks; do not spend another
+attempt on it in this batch. No successful conversation test is claimed.
 The existing quest manager, artwork, save packet, and cartridges are unchanged;
 no native gameplay, new ROM, or hardware result is claimed by this preparation.
 

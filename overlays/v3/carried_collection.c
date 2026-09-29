@@ -1,6 +1,9 @@
 /* Native collection calls share the same bounded additive identities as the
  * inventory readers. Never let a new paper index address the native bitset. */
 #include "carried_items.h"
+#ifdef AF_V3_PAPER_PACKS
+#include "carried_paper.h"
+#endif
 #include "holiday_cards.h"
 #include "save_codec.h"
 typedef unsigned char u8;
@@ -23,6 +26,13 @@ static u32 slot(const u8 *player) {
 }
 void af_carried_record(u32 argument) {
     u32 item=(unsigned short)argument;
+#ifdef AF_V3_PAPER_PACKS
+    if(af_carried_paper_reserved(item)) {
+        if(af_carried_paper_packs_enabled())
+            af_carried_prior_record(0x2000u+(unsigned)af_carried_paper_style(item));
+        return;
+    }
+#endif
     if(!af_carried_reserved(item)) {af_carried_prior_record(argument);return;}
     if(item-0x2040u>=4 || af_carried_category(item)!=49)return;
     u32 player=slot(active);
@@ -30,6 +40,10 @@ void af_carried_record(u32 argument) {
     if(af_carried_paper_collect(af_v3_card_data(),player,1)<0)af_v3_save_halt(AF_SAVE_CATALOGUE_INVALID);
 }
 int af_carried_owned(const u8 *player,u32 item) {
+#ifdef AF_V3_PAPER_PACKS
+    if(af_carried_paper_reserved(item))return af_carried_paper_packs_enabled()?
+        af_carried_prior_owned(player,0x2000u+(unsigned)af_carried_paper_style(item)):0;
+#endif
     if(!af_carried_reserved(item))return af_carried_prior_owned(player,item);
     u32 index=slot(player);
     if(item-0x2040u>=4 || index==4 || af_carried_category(item)!=49)return 0;

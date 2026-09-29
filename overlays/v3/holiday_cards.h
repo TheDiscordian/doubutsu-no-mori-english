@@ -5,7 +5,9 @@
  * offsets are repurposed. Slot ownership follows the existing town/player
  * save transaction and player-clear hook. */
 enum { AF_HC_BYTES=48,AF_HC_PLAYERS=4,AF_HC_STAMPS=12 };
-#ifdef AF_V3_CARRIED_QUEST
+#ifdef AF_V3_PAPER_PACKS
+enum { AF_HC_CARRIED_WIRE=5 };
+#elif defined(AF_V3_CARRIED_QUEST)
 enum { AF_HC_CARRIED_WIRE=4 };
 #else
 enum { AF_HC_CARRIED_WIRE=3 };

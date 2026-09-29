@@ -1,4 +1,7 @@
 #include "holiday_cards.h"
+#ifdef AF_V3_PAPER_PACKS
+#include "carried_paper.h"
+#endif
 typedef unsigned char u8;
 static int valid(const AFHolidayCard *c) {
     AFDiaryDate d=c->last_date;
@@ -17,6 +20,9 @@ int af_holiday_cards_valid(const u8 *data) {
         && data[4]!=3
 #ifdef AF_V3_CARRIED_QUEST
         && data[4]!=4
+#ifdef AF_V3_PAPER_PACKS
+        && data[4]!=5
+#endif
 #endif
 #endif
         )return 0;
@@ -26,7 +32,10 @@ int af_holiday_cards_valid(const u8 *data) {
 #ifdef AF_V3_CARRIED_PROFILE
         if(data[4]>=3 && i>=8 && i<=12)continue;
 #ifdef AF_V3_CARRIED_QUEST
-        if(data[4]==4 && (i==13 || i==14))continue;
+        if(data[4]>=4 && (i==13 || i==14))continue;
+#ifdef AF_V3_PAPER_PACKS
+        if(data[4]==5 && i==15)continue;
+#endif
 #endif
 #endif
         if(data[i]!=header[i])return 0;
@@ -36,8 +45,11 @@ int af_holiday_cards_valid(const u8 *data) {
         if(data[8]>127 || ((data[8]>>2)&3)!=data[7])return 0;
         for(unsigned int i=9;i<13;i++)if(data[i] & ~(data[8]&1u))return 0;
 #ifdef AF_V3_CARRIED_QUEST
-        if(data[4]==4 && (data[13] || data[14]) &&
+        if(data[4]>=4 && (data[13] || data[14]) &&
            (!(data[8]&64) || !data[14] || data[14]>af_diary_days(2000,data[13])))return 0;
+#ifdef AF_V3_PAPER_PACKS
+        if(data[4]==5 && data[15]>1)return 0;
+#endif
 #endif
     }
 #endif
@@ -95,10 +107,17 @@ unsigned int af_carried_save_enabled(void) {
 }
 int af_carried_save_profile(const u8 *data,unsigned int events,unsigned int enabled) {
     if(enabled>127 || ((enabled>>2)&3)!=events || !af_holiday_cards_profile(data,events))return 0;
+#ifdef AF_V3_PAPER_PACKS
+    unsigned mode=*(const volatile AFCarryWord *)&af_carried_paper_mode;
+    if(mode>1 || (data[4]==5 && data[15] && !mode))return 0;
+#endif
     return data[4]<3 || !(data[8]&~enabled);
 }
 int af_carried_save_bind(u8 *data,unsigned int events,unsigned int enabled) {
     if(!af_carried_save_profile(data,events,enabled))return 0;
+#ifdef AF_V3_PAPER_PACKS
+    data[15]=(u8)*(const volatile AFCarryWord *)&af_carried_paper_mode;
+#endif
     data[4]=AF_HC_CARRIED_WIRE;data[7]=(u8)events;data[8]=(u8)enabled;return 1;
 }
 int af_carried_paper_collect(u8 *data,unsigned int slot,unsigned int mark) {
@@ -108,7 +127,7 @@ int af_carried_paper_collect(u8 *data,unsigned int slot,unsigned int mark) {
 }
 #ifdef AF_V3_CARRIED_QUEST
 int af_carried_quest_day(const u8 *data) {
-    if(!af_holiday_cards_valid(data) || data[4]!=4 || !(data[8]&64))return -1;
+    if(!af_holiday_cards_valid(data) || data[4]<4 || !(data[8]&64))return -1;
     return (unsigned int)data[13]*256u+data[14];
 }
 int af_carried_quest_set_day(u8 *data,unsigned int day) {

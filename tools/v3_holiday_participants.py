@@ -1219,6 +1219,54 @@ def prepare_carried_event(output,lock):
     return report
 
 
+def carried_conversation(body):
+    """Retain complete source flow, with selection and transaction boundaries."""
+    changes=(
+        ('if (mSP_CollectCheck(*list) == FALSE) {',
+         'if (af_cw_reward_supported(*list) && mSP_CollectCheck(*list) == FALSE) {',2),
+        ('    (*list_num)++;','    if (af_cw_reward_supported(*list)) (*list_num)++;',1),
+        ('item = item_list[i][selected_idx];','item = af_cw_reward_at(selected_idx, item_list[i]);',1),
+        ('      mPlib_request_main_give_type1((GAME*)play, ITM_SPIRIT0, 7, FALSE, FALSE);',
+         '      if (!mPlib_request_main_give_type1((GAME*)play, ITM_SPIRIT0, 7, FALSE, FALSE)) break;',1),
+        ('    mDemo_Set_OrderValue(mDemo_ORDER_NPC1, 0, ghost->give_item);',
+         '    if (!mPr_SetFreePossessionItem(af_cw_private(), ghost->give_item, mPr_ITEM_COND_NORMAL)) return;\n'
+         '    mDemo_Set_OrderValue(mDemo_ORDER_NPC1, 0, ghost->give_item);',1),
+        ('    mPr_SetFreePossessionItem(af_cw_private(), ghost->give_item, mPr_ITEM_COND_NORMAL);\n','',1),
+    )
+    for original,replacement,count in changes:
+        if body.count(original)!=count:raise ValueError('Changed complete carried conversation: '+original)
+        body=body.replace(original,replacement)
+    return body
+
+
+def carried_reward_data(base,prior,source,rewards,generated,*,lock):
+    from v3_item_destinations import destinations
+    from v3_room_aliases import discover
+    from v3_clothing_batch import representations
+    from v3_creature_items import source_records
+    values=set();receipts=[]
+    for row in rewards:
+        raw=source.raw(row['symbol'])
+        values.update(struct.unpack('>'+str(len(raw)//2)+'H',raw))
+    # These are the two actor-local lists referenced by its complete reward
+    # directory. The umbrella symbol also occurs in unrelated source objects.
+    for symbol,at,size,count in (('list_haniwa',0x531E0,0x100,127),('umbrella_list',0x532E0,0x42,32)):
+        if source.containing(at,exact=True)!=(symbol,at,size):raise ValueError('Changed actor-local reward table')
+        raw=source.data[at:at+size];items=struct.unpack('>'+str(size//2)+'H',raw)
+        if len(items)!=count+1 or items[-1] or not all(items[:-1]):raise ValueError('Incomplete actor-local rewards')
+        values.update(items);receipts.append(dict(symbol=symbol,offset=at,bytes=size,count=count,sha256=sha256(raw)))
+    values.discard(0);values.update((0x2800,0x2803)) # source apple/peach fallbacks
+    aliases={int(r['display_item_id'],16) for r in discover(source)['rows']}|set(representations(source))
+    aliases.update(int(r['source_display_item_id'],16) for r in source_records(source)[0])
+    if aliases&values:raise ValueError('Reward list requires a carried/display conversion')
+    rows=destinations(base,prior,values,lock=lock)
+    generated['reward-map.c']=('#include "carried_event.h"\n'
+        'typedef struct {u16 source,item;u8 quantity,pad[3];} Reward;\n'
+        f'const u32 af_cw_reward_count={len(rows)};\nconst Reward af_cw_rewards[]={{'+
+        ','.join('{'+f'{r["source_item"]},{r["item"]},{r["quantity"]},{{0,0,0}}'+'}' for r in rows)+'};\n')
+    return dict(rows=rows,local_lists=receipts,runtime_selection='installed carried item-type reader')
+
+
 def connect_carried_event(output,lock,directory):
     """Reuse the complete actor and extend shared NPC/text/motion services.
 
@@ -1256,8 +1304,8 @@ def connect_carried_event(output,lock,directory):
     actor=generated['ev_ghost.c']
     before='ghost->npc_class.talk_info.default_animation = 126;'
     if actor.count(before)!=1:raise ValueError('Changed complete ghost default animation')
-    generated['ev_ghost.c']=actor.replace(before,
-        'ghost->npc_class.talk_info.default_animation = aNPC_ANIM_GSTWAIT1;')
+    generated['ev_ghost.c']=carried_conversation(actor.replace(before,
+        'ghost->npc_class.talk_info.default_animation = aNPC_ANIM_GSTWAIT1;'))
     motions=native_motions(source,base,generated,import_missing=True)
     imported=[r for r in motions if r.get('imported')]
     if len(motions)!=1 or len(imported)!=1 or motions[0]['native']['index']!=382:
@@ -1339,6 +1387,7 @@ def connect_carried_event(output,lock,directory):
         reward_code.append('mActor_name_t '+name+'[]={'+','.join(map(str,values))+'};')
         rewards.append(dict(symbol=name,bytes=len(data),count=values.index(0),source_sha256=sha256(data)))
     generated['reward-lists.c']='\n'.join(reward_code)+'\n'
+    reward_map=carried_reward_data(base,prior,source,rewards,generated,lock=lock)
     constants=generated['constants.h']
     if not constants.endswith('#endif\n'):raise ValueError('Changed complete actor constant guard')
     generated['constants.h']=constants[:-7]+(
@@ -1346,6 +1395,7 @@ def connect_carried_event(output,lock,directory):
         '#define aNPC_CT_SCHED_TYPE_SPECIAL 5\n#define mEv_actor_dying_message af_cw_dying\n#endif\n')
     links=dict(previous['bindings']);links.update(previous['code']['symbols']);links.update(quest['code']['symbols'])
     links.update(equipment['carried_items']['code']['symbols'])
+    links.update(equipment['carried_items']['storage']['code']['symbols'])
     # Never inherit a different family's message or item resolver merely because
     # it exports the same source name. These consumers require quest mappings.
     forbidden=('mDemo_Set_msg_num','mMsg_Set_continue_msg_num','mDemo_Set_OrderValue',
@@ -1358,7 +1408,19 @@ def connect_carried_event(output,lock,directory):
     symbols=(ROOT/'upstream/af/linker_scripts/jp/symbol_addrs_code.txt').read_text()
     native_names={n:int(a,16) for n,a in re.findall(r'^(\w+) = 0x([0-9A-F]+);',symbols,re.M)}
     for name in ('mHS_get_arrange_idx','mTM_set_renew_time'):links[name]=native_names[name]
-    units=('carried_npc','holiday_participants_registry','holiday_participants_services',
+    links.update(af_cw_native_message=0x8007B5C0,af_cw_native_continue=0x8009DBA4,
+        af_cw_native_order=0x8007B44C,af_cw_native_item_name=0x801969C8,
+        af_cw_native_item_string=0x8009D88C,mMsg_Set_LockContinue=0x8009E9E8,
+        mMsg_Unset_LockContinue=0x8009E9F8,af_cw_native_player_actor=0x800B1C84,
+        af_cw_native_request_give=0x800B25F4,af_cw_native_handover=0x80136F34,
+        af_cw_native_give=0x800B8B8C,af_cw_native_unit=0x800885A8,
+        af_cw_native_foreground=0x8012D148,af_cw_native_homes=0x8012A428,
+        af_cw_native_field_ready=native_names['mFI_CheckFieldData'],
+        af_cw_native_field_width=native_names['mFI_GetBlockXMax'],
+        af_cw_native_field_height=native_names['mFI_GetBlockZMax'],
+        af_cw_native_acre=native_names['mFI_BkNumtoUtFGTop'])
+    units=('carried_npc','carried_rewards','carried_dialogue','carried_handover','carried_schedule','carried_field',
+        'holiday_participants_registry','holiday_participants_services',
         'holiday_participants_storage','holiday_participants_spawn','holiday_festival_motion')
     out.mkdir(parents=True)
     for name,data in generated.items():write_new(out/name,data if isinstance(data,bytes) else data.encode())
@@ -1376,13 +1438,15 @@ def connect_carried_event(output,lock,directory):
     undefined={line.split()[-1] for line in run('nm','--undefined-only','unbound.o').splitlines()}
     bindings={n:links[n] for n in sorted(undefined&links.keys())}
     run('ld','-EB','-r',*(f'--defsym={n}=0x{v:X}' for n,v in bindings.items()),'unbound.o','-o','carried-npc.o')
-    paths=['tools/v3_holiday_participants.py','tools/v3_keyframes.py',
-        'overlays/v3/carried_event.h','overlays/v3/holiday_participants.h','overlays/v3/room_rigs.h',
+    paths=['tools/v3_holiday_participants.py','tools/v3_keyframes.py','tools/v3_item_destinations.py',
+        'overlays/v3/carried_event.h','overlays/v3/carried_paper.h','overlays/v3/carried_items.h',
+        'overlays/v3/holiday_participants.h','overlays/v3/room_rigs.h',
         'tools/v3_registry.py']+['overlays/v3/'+n+('.S' if n.endswith('_spawn') else '.c') for n in units]
     report=dict(old,format='AFV3-CARRIED-NPC-1',base_abi=prior['runtime_abi'],base_sha256=sha256(base),
         source_prepared=str(directory.relative_to(ROOT)),identity=identity,motions=motions,retained_motions=retained,
         registry=dict(rows=rows,owner_count=23,resident_count=18,live_count=25,independent_gate=True),
         dialogue=text,strings=fields,name=dict(sex=sex,index=index,sound=sound),bindings=bindings,reward_lists=rewards,
+        reward_destinations=reward_map,
         unbound_services=run('nm','--undefined-only','carried-npc.o').strip().splitlines(),
         generated_sha256={n:sha256((out/n).read_bytes()) for n in generated},
         sources={n:sha256((ROOT/n).read_bytes()) for n in paths},

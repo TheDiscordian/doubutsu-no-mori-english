@@ -25,6 +25,9 @@ INSECT_CHOICE=dict(id='insect-population',name='Insect population',binding='spaw
 FISHING_CHOICE=dict(id='tournament-measurements',name='Fishing tournament measurements',binding='requested_units',
     symbol='af_hf_requested_units',scope='Fishing tournament measurements and records',
     description='N64 measures tournament fish in centimetres; GameCube uses inches. An ongoing tournament or an undelivered winner keeps its recorded units. A new setting starts with an empty tournament and no pending records.')
+PAPER_CHOICE=dict(id='paper-quantities',name='Paper quantities',binding='paper_mode',
+    symbol='af_carried_paper_mode',scope='All original and imported stationery',
+    description='N64 gives single sheets. GameCube gives four-sheet packs. This applies to all paper styles, shops, catalogue orders, gifts, and rewards. Packs can be split or combined, and writing a letter uses one sheet.')
 SAVE_NOTE=('These behaviour settings keep the same saved layout and imported identities. '
     'Saved seasonal state and existing tournament measurements are retained. '
     'A native save/reload after switching settings is not yet verified.')

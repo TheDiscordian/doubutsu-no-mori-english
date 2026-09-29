@@ -41,6 +41,17 @@ Do not make another per-item installer. Golden net/axe/shovel/rod still need
 their actual remaining consumers distinguished from acquisition; retain all
 installed tool behaviour and do not replay old tests to establish it again.
 
+Stationery has one global `paper-quantities` build choice: N64 single sheets or
+GameCube four-sheet packs, for every original/imported style and every paper
+creation route. Default to N64; do not force pack behaviour for Wisp or orange
+paper. Connect the common policy in `carried_paper.c` to shared item readers,
+shop/catalogue/gift/reward creation, split/merge/letter use, quantity-aware prices,
+and saved-mode validation. Then bind the same checked setting in the offline
+and browser composers, including pack mode with no selected content imports.
+The policy source and fixed pack identities are not installed or selectable yet.
+Do not mutate quantities during ordinary transfers or load. See the
+[stationery choice contract](../specs/V3_CARRIED_ITEMS.md#global-stationery-quantity-choice).
+
 The current proposal is ABI 366 at
 `build/v3-carried-field-work-01/quest-manager-03/build-lock.json`.
 The complete `build/v3-carried-batch-prepared-05/` resources are installed without
@@ -155,23 +166,33 @@ The complete source-manager host check, 108 donor-search comparisons, current
 owner/relocation/resource/startup/patch checks, and seven browser/offline profiles
 pass. Wisp is still disabled because its NPC services are unfinished.
 
-The next concrete consumer is Wisp's NPC integration, then sign-board
-designs/placement, including actual
-native item-type and menu routes for every family. The field-state bridge now
+The next concrete consumer is the global stationery choice: wire the prepared
+reader/action/save modules and full-ID letter-style hook into the current ROM,
+connect creation/price/delivery callers for all styles, then admit the checked
+offline/browser setting. Reuse `build/v3-paper-quantities-prepared-02/`, its
+`807B4000..807BB000` reservation, and its complete native/artwork references.
+Do not overwrite the live catalogue/food/interaction code in the old reader
+padding. Keep pack creation out of ordinary inventory moves and pickups.
+The remaining Wisp NPC services and sign-board designs/placement follow,
+including actual native item-type and menu routes for every family. The field-state bridge now
 has installed state and manager callers, but the unfinished NPC keeps the quest disabled.
 Reuse `build/v3-carried-wisp-art-01/` for the
 complete 26-joint translucent model and every facial texture. The existing
 participant importer retains all 48 actor functions from
 `build/v3-carried-event-prepared-03/`. Continue from the connected preparation at
-`build/v3-carried-npc-connected-03/`, not from another source audit. Its shared
+`build/v3-carried-npc-connected-08/`, not from another source audit. Its shared
 23-owner registry, independent spirit gate, native field/drawing services,
 complete motion, 48 official messages, sixteen choices, 32 angry-name strings,
 official Wisp name, and all twenty external reward lists compile together.
 The two actor-local reward lists remain complete. These NPC changes are prepared,
-not installed in ABI 366. Three focused preparation/host checks pass.
-The remaining 24 undefined services in its `prepared.json` identify world/schedule,
-message/handover, and reward consumers. Connect those and the full reward/cleanup
-routes, then install the character banks, names, shared registry redirects,
+not installed in ABI 366. The current complete preparation check passes;
+unchanged registry evidence is retained. Its four undefined services are
+`af_cw_paper_stack`, `af_cw_clear_grass`, `mMsg_sound_set_voice_click`, and
+`sAdo_SysTrgStart`. The paper provider comes from the shared global policy,
+not a Wisp-specific override. Deferred clearing needs its real field-renewal
+lifetime; voice-click needs both a native reader and reset, and sound mapping
+must cover both source `6B` and `16C`. Connect these and successful-save/travel
+cleanup, then install the character banks, names, shared registry redirects,
 dialogue, and full owner together. Keep source `ghost_start/stop/in`, its five
 unique acres, and saved/scene lifetime intact. Ordinary save/travel also removes
 spirits in the donor; connect the actual transaction modes, not unconditional
@@ -189,11 +210,13 @@ its provider uses native offset `24`. Melody storage is a native signed word at
 source profile `B7`, native name `D0CD`, native profile `F0`, and banks 456/457.
 The compiled shared participant registry has an independent spirit-family gate;
 install it without making spirits depend on diary selection or enabling diary
-events implicitly. Native SPECIAL is 4, but source WALK_WANDER (5) has distinct
-walk-only decision rules absent from native WANDER: finish that actual behaviour,
-not a numeric substitution. Reuse the retained NPC disassemblies. All 22 reward
-categories need supported/selected-item filtering in both uncollected and
-all-collected branches; a disabled donor ID must never enter native inventory.
+events implicitly. The prepared walk-only schedule preserves the source
+60% walk / 40% wait decision, block-edge initialization, and fatigue/sleep rules
+through native SPECIAL callbacks rather than an invalid native schedule index.
+All 22 reward categories have supported/selected-item filtering in both
+uncollected and all-collected branches. The conversation fixture remains
+incomplete after two setup attempts; retain full sanitizer checks and do not
+retry it again in this batch. These source paths are not native gameplay proof.
 Use the binding map in the carried-item specification. Do not replay the completed
 date, state, save, manager, spawning, or artwork checks without a relevant change.
 Shared paper/spirit splitting/merging,

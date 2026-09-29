@@ -156,7 +156,9 @@ static int compress(u8 *bank,u32 bank_bytes,const u8 *canonical,u32 canonical_by
 #ifdef AF_V3_CARD_STORAGE
     if(extra_bytes==AF_CZ_CARD_EXTRA)put(bank+PAYLOAD+4,
 #ifdef AF_V3_CARRIED_PROFILE
-#ifdef AF_V3_CARRIED_QUEST
+#ifdef AF_V3_PAPER_PACKS
+        0x00120680
+#elif defined(AF_V3_CARRIED_QUEST)
         0x00110680
 #else
         0x00100680
@@ -224,6 +226,9 @@ static int expand(const u8 *bank,u32 bank_bytes,u8 *scratch,u32 scratch_bytes,u3
             || word(e+4)==0x00100680
 #ifdef AF_V3_CARRIED_QUEST
             || word(e+4)==0x00110680
+#ifdef AF_V3_PAPER_PACKS
+            || word(e+4)==0x00120680
+#endif
 #endif
 #endif
             ) && word(e+8)==5) {

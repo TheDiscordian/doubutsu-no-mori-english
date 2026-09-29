@@ -1,6 +1,9 @@
 /* One bounded reader/state path for complete carried families. Selection stays
  * off until all gameplay and persistence consumers are connected. */
 #include "carried_items.h"
+#ifdef AF_V3_PAPER_PACKS
+#include "carried_paper.h"
+#endif
 typedef AFCarryByte u8;
 typedef AFCarryHalf u16;
 typedef AFCarryWord u32;
@@ -16,6 +19,9 @@ extern u16 af_carried_prior_display(u32),af_carried_prior_pocket(u32);
 extern int af_carried_event_type(u32);
 
 int af_carried_reserved(u32 item) {
+#ifdef AF_V3_PAPER_PACKS
+    if(af_carried_paper_reserved(item))return 1;
+#endif
     return item-0x2040u<4u || item==0x251Eu || item-0x2523u<14u ||
         item==0x2807u || item==0x290Au || item-0x2D28u<5u;
 }
@@ -40,6 +46,10 @@ static const AFCarryItem *find(u32 item) {
     return 0;
 }
 int af_carried_name(u8 *out,u32 capacity,u32 item) {
+#ifdef AF_V3_PAPER_PACKS
+    if(af_carried_paper_reserved(item))return af_carried_paper_packs_enabled()?
+        af_carried_prior_name(out,capacity,0x2000u+(unsigned)af_carried_paper_style(item)):0;
+#endif
     if(!af_carried_reserved(item))return af_carried_prior_name(out,capacity,item);
     const AFCarryItem *r=find(item);
     if(!out || capacity<16u || !r)return 0;
@@ -48,6 +58,9 @@ int af_carried_name(u8 *out,u32 capacity,u32 item) {
 }
 /* -1 means an unrelated identity; zero is a reserved but unavailable import. */
 int af_carried_category(u32 item) {
+#ifdef AF_V3_PAPER_PACKS
+    if(af_carried_paper_reserved(item))return af_carried_paper_packs_enabled()?17:0;
+#endif
     if(!af_carried_reserved(item))return -1;
     const AFCarryItem *r=find(item);return r ? r->category : 0;
 }
@@ -57,27 +70,59 @@ int af_carried_type(u32 argument) {
 }
 u32 af_carried_price(u32 argument) {
     u32 item=(u16)argument;
+#ifdef AF_V3_PAPER_PACKS
+    if(af_carried_paper_reserved(item))return af_carried_paper_packs_enabled()?
+        af_carried_prior_price(0x2000u+(unsigned)af_carried_paper_style(item))*af_carried_paper_quantity(item):0;
+#endif
     if(!af_carried_reserved(item))return af_carried_prior_price(argument);
     const AFCarryItem *r=find(item);return r ? r->price : 0;
 }
 u16 af_carried_display(u32 argument) {
     u32 item=(u16)argument;
+#ifdef AF_V3_PAPER_PACKS
+    if(af_carried_paper_reserved(item))return af_carried_paper_packs_enabled()?(u16)item:0;
+#endif
     if(!af_carried_reserved(item))return af_carried_prior_display(argument);
     return find(item) ? item : 0;
 }
 u16 af_carried_pocket(u32 argument) {
     u32 item=(u16)argument;
+#ifdef AF_V3_PAPER_PACKS
+    if(af_carried_paper_reserved(item))return af_carried_paper_packs_enabled()?(u16)item:0;
+#endif
     if(!af_carried_reserved(item))return af_carried_prior_pocket(argument);
     return find(item) ? item : 0;
 }
 u32 af_carried_icon(u32 item) {
+#ifdef AF_V3_PAPER_PACKS
+    if(af_carried_paper_reserved(item)) {
+        if(!af_carried_paper_packs_enabled() || header[0]!=0x41464350u || header[1]!=1u ||
+            header[2]!=AF_CARRY_COUNT || header[3]!=sizeof(AFCarryItem))return 0;
+        /* Quantity icons are common art, not permission to import orange
+         * stationery. A pack-only profile must not require that checkbox. */
+        unsigned state=af_carried_paper_quantity(item)-1u;
+        const AFCarryItem *rows=(const AFCarryItem *)(header+8);
+        for(unsigned i=0;i<AF_CARRY_COUNT;i++)if(rows[i].family==0 && rows[i].state==state &&
+            rows[i].icon>=AF_CARRY_ICON && rows[i].icon<AF_CARRY_ICON_END &&
+            (rows[i].icon-AF_CARRY_ICON)%576u==0)return rows[i].icon;
+        return 0;
+    }
+#endif
     const AFCarryItem *r=find(item);return r ? r->icon : 0;
 }
 u32 af_carried_quantity(u32 item) {
+#ifdef AF_V3_PAPER_PACKS
+    if(item-0x2000u<64u || af_carried_paper_reserved(item))
+        return af_carried_paper_packs_enabled()?af_carried_paper_quantity(item):0;
+#endif
     const AFCarryItem *r=find(item);
     return r && (r->family==0u || r->family==6u) ? r->state+1u : 0;
 }
 u16 af_carried_with_quantity(u32 item,u32 quantity) {
+#ifdef AF_V3_PAPER_PACKS
+    if(item-0x2000u<64u || af_carried_paper_reserved(item))return af_carried_paper_packs_enabled()?
+        af_carried_paper_with_quantity(item,quantity):0;
+#endif
     const AFCarryItem *r=find(item);
     if(!r || (r->family!=0u && r->family!=6u) || !quantity ||
        quantity>(r->family==0u ? 4u : 5u))return 0;

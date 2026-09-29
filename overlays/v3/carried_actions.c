@@ -3,6 +3,9 @@
  * their original paths. Source quantities are translated through the registry,
  * never through the donor's incompatible paper-ID arithmetic. */
 #include "carried_items.h"
+#ifdef AF_V3_PAPER_PACKS
+#include "carried_paper.h"
+#endif
 typedef AFCarryByte u8;
 typedef AFCarryHalf u16;
 typedef AFCarryWord u32;
@@ -41,9 +44,19 @@ static u32 condition(void *player,int slot) {
 __attribute__((aligned(16))) int af_carried_menu_type(void *submenu,u32 item,int slot) {
     /* The predecessor includes presents/quests, room rules, burial eligibility,
      * existing event items, furniture, balloons, and creatures. */
-    int result=af_carried_prior_menu(submenu,item,slot);
+    u32 menu_item=item;
+#ifdef AF_V3_PAPER_PACKS
+    if(af_carried_paper_reserved(item) && af_carried_paper_packs_enabled())
+        menu_item=0x2000u+(unsigned)af_carried_paper_style(item);
+#endif
+    int result=af_carried_prior_menu(submenu,menu_item,slot);
     if(!ACTIVE || (u32)slot>=15u || condition(ACTIVE,slot) ||
-            item-0x2040u>=4u || af_carried_quantity(item)<2u)return result;
+#ifdef AF_V3_PAPER_PACKS
+            !af_carried_paper_packs_enabled() || af_carried_paper_style(item)<0 ||
+#else
+            item-0x2040u>=4u ||
+#endif
+            af_carried_quantity(item)<2u)return result;
     switch(result) {
         case 3:return AF_CARRIED_PAPER_MENUS;
         case 4:return AF_CARRIED_PAPER_MENUS+1;
@@ -77,6 +90,12 @@ void af_carried_drop_stack(void *submenu,void *tag,u16 *target,int slot) {
             !W(hand,0x2E4) && !condition(ACTIVE,slot)) {
         u32 held=H(hand,0x23C),a=af_carried_quantity(held),b=af_carried_quantity(*target);
         u32 max=held-0x2040u<4u?4u:5u;
+#ifdef AF_V3_PAPER_PACKS
+        if(af_carried_paper_style(held)>=0) {
+            max=4u;
+            if(!af_carried_paper_packs_enabled())a=0;
+        }
+#endif
         if(a && b && a<max && b<max &&
                 af_carried_with_quantity(held,1)==af_carried_with_quantity(*target,1)) {
             u32 total=a+b,overflow=total>max?total-max:0;
@@ -99,7 +118,11 @@ void af_carried_consume_paper(void *player,int slot,u32 replacement,int cond) {
      * comes here. Preserve all ordinary setter/ownership/condition behaviour. */
     if(player && (u32)slot<15u && !replacement && !cond && !condition(player,slot)) {
         u32 item=H(player,0x14+2*slot);
-        if(item-0x2040u<4u) {
+        if(item-0x2040u<4u
+#ifdef AF_V3_PAPER_PACKS
+            || af_carried_paper_reserved(item)
+#endif
+        ) {
             u32 quantity=af_carried_quantity(item);
             if(!quantity)return;
             if(quantity>1) {

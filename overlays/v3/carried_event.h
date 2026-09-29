@@ -44,6 +44,8 @@ int mFI_Wpos2BlockNum(int *,int *,xyz_t),mHS_get_arrange_idx(int);
 void mString_Load_StringFromRom(u8 *,unsigned,int);
 int mSP_CollectCheck(u16),mPr_SetFreePossessionItem(void *,u16,int);
 u16 mRmTp_FtrItemNo2Item1ItemNo(u16,int);
+u16 af_cw_reward_native(u16),af_cw_reward_at(int,const u16 *);
+int af_cw_reward_supported(u16);
 void mIN_copy_name_str(u8 *,u16);
 int mIN_get_item_article(u16);
 mMsg_Window_c *mMsg_Get_base_window_p(void);

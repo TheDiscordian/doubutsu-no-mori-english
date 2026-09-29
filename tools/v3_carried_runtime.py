@@ -8,7 +8,7 @@ import json
 import struct
 import zlib
 
-from aflib import CODE_RAM,by_vrom,sha256,u32
+from aflib import CODE_RAM,CODE_VROM,by_vrom,sha256,u32
 from apply_translation import write_new
 from v3_asset_loader import ROOT,MODULE_RAM,compile_part
 from v3_furniture_pipeline import Source
@@ -75,6 +75,94 @@ def letter_window(base,core,menu,paper,symbols):
     resizes=[dict(vrom=v,previous_bytes=files[v].size,previous_sha256=sha256(files[v].extract(base)),
         bytes=len(d),sha256=sha256(d)) for v,d in changes.items() if len(d)!=files[v].size]
     return changes,receipt,[metadata],resizes
+
+
+def paper_quantity_letter(owner):
+    """Normalize a complete pocket identity before the native style-byte store.
+
+    The byte alone is ambiguous: a native-style pack can have the same low byte
+    as orange paper. Preserve the full ID in t9 and perform the mapping here,
+    before the complete existing letter constructor and background loader.
+    """
+    from v3_registry import CARRIED_NATIVE_PAPER_PACK_FIRST,CARRIED_NATIVE_PAPER_PACK_COUNT
+    if (owner.ram!=0x80888E90 or CARRIED_NATIVE_PAPER_PACK_FIRST!=0x2E40 or
+            CARRIED_NATIVE_PAPER_PACK_COUNT!=192 or
+            u32(owner.original,0x8088A3B0-owner.ram)!=0x97190014 or
+            u32(owner.original,0x8088A3B4-owner.ram)!=0x2401FFFF):
+        raise ValueError('Changed native full stationery identity or register contract')
+    # t9 is the full item; t3 is the style result. The replaced path already has
+    # at=-1. Every other live register and the original native write remain.
+    words=(0x272BD1C0,0x2D6100C0,0x14200002,0x316B003F,
+        0x272BE000,0xA20B0031,jump(0x8088A3C4),0x2401FFFF)
+    address=owner.append(struct.pack('>8I',*words))
+    owner.rows.append(0x44000000|(address-owner.ram+24))
+    owner.patch(0x8088A3BC,0x272BE000,jump(address))
+    owner.patch(0x8088A3C0,0xA20B0031,0)
+    owner.rows.append(0x44000000|(0x8088A3BC-owner.ram))
+    return dict(address=address,bytes=32,sha256=sha256(struct.pack('>8I',*words)),
+        entry=0x8088A3BC,resume=0x8088A3C4,full_item_register='t9',
+        original_single_styles=64,imported_style=64,native_pack_states=192)
+
+
+def prepare_paper_quantities(output,lock):
+    """Prepare the complete shared readers/actions/save policy, not a new ROM.
+
+    Existing code padding holds live catalogue, food, and creature services.
+    Relocate the expanded readers and storage into a checked quest extension;
+    never overwrite those consumers to fit the new common stationery states.
+    """
+    from v3_furniture_install import inputs
+    from v3_console_disk_install import reservations
+    from v3_submenu_tables import Owner
+    from item_identity_sheet import SHEET_SHA,sheet_rows
+    from v3_creature_choices import PAPER_CHOICE
+    output=output.resolve()
+    if output.exists() or not output.is_relative_to(ROOT/'build'):
+        raise ValueError('Use a fresh ignored stationery preparation')
+    base,prior=inputs(lock);d=prior['equipment_resources']['carried_items']
+    if not d.get('quest',{}).get('manager') or d.get('paper',{}).get('quantities'):
+        raise ValueError('Paper policy requires the current shared carried baseline')
+    lo,save_ram,hi=0x807B4000,0x807B7000,0x807BB000
+    if any(a<hi and lo<b for a,b in reservations(prior)):
+        raise ValueError('Stationery preparation overlaps retained resident code/data')
+    sheet=ROOT/'build/item-identity-megasheet.xlsx'
+    if sha256(sheet.read_bytes())!=SHEET_SHA:raise ValueError('Changed stationery identity worksheet')
+    native={int(r['C'],16) for _,r in sheet_rows(sheet,'Items') if len(r.get('C',''))==4}
+    if native.intersection(range(0x2E40,0x2F00)):
+        raise ValueError('Paper packs would replace an original identity')
+    files=by_vrom(base);core=files[CODE_VROM].extract(base)
+    pointer=u32(core,0x8010B334-CODE_RAM+14*4)
+    if pointer!=0x8010B32C or core[pointer-CODE_RAM:pointer-CODE_RAM+4]!=b'\x11\x11\0\0':
+        raise ValueError('Changed native grab-bag identities beside paper-pack reservation')
+    old=d['code'];output.mkdir(parents=True)
+    extras=('overlays/v3/creature_icon.S','overlays/v3/ground_categories.c',
+        'overlays/v3/carried_menu.c','overlays/v3/carried_actions.c','overlays/v3/carried_paper.c')
+    data,code=compile_part('carried_items',output/'readers',extra_sources=extras,
+        defines=tuple(f[2:] for f in old['flags'] if f.startswith('-D'))+('AF_V3_PAPER_PACKS=1',),
+        link_symbols=dict(old['link_symbols'],AF_CARRIED_LINK_RAM=lo))
+    if lo+len(data)>save_ram:raise ValueError('Paper readers exceed their reserved extension')
+    previous=d['quest']['storage'];links=dict(previous['link_symbols'],AF_HI_STORAGE_RAM=save_ram)
+    for key in ('af_carried_category','af_carried_reserved'):links[key]=code['symbols'][key]
+    saved,storage=compile_part('holiday_item_storage',output/'storage',
+        primary_source='overlays/v3/console_storage.c',
+        extra_sources=('overlays/v3/save_compressed.c','overlays/v3/holiday_cards.c','overlays/v3/carried_collection.c'),
+        defines=tuple(f[2:] for f in previous['flags'] if f.startswith('-D'))+('AF_V3_PAPER_PACKS=1',),
+        link_symbols=links,symbol_candidates=code['symbols'])
+    if save_ram+len(saved)>hi:raise ValueError('Paper storage exceeds its reserved extension')
+    letter=Owner(files[0x3B60000].extract(base),files[0x3B70000].extract(base),0x80888E90)
+    style=paper_quantity_letter(letter);owner,reloc,receipt=letter.finish()
+    write_new(output/'letter.bin',owner);write_new(output/'letter-reloc.bin',reloc)
+    paths=(*SOURCES,*STORAGE_SOURCES,'overlays/v3/carried_paper.h','overlays/v3/carried_paper.c',
+        'tools/v3_creature_choices.py')
+    report=dict(format='AFV3-PAPER-QUANTITIES-1',base_sha256=sha256(base),base_abi=prior['runtime_abi'],
+        sources={p:sha256((ROOT/p).read_bytes()) for p in paths},worksheet_sha256=SHEET_SHA,
+        choice=dict(PAPER_CHOICE,ram=code['symbols']['af_carried_paper_mode'],default='N64',values=dict(N64=0,GameCube=1)),
+        code=code,storage=storage,ram=lo,end=hi,save_format=18,wire_version=5,
+        letter=dict(style=style,owner=receipt),installed=False,
+        pending=['paper creation and price/delivery callers','public reader/storage redirects and startup packet',
+            'complete saved-bank transaction check','offline/browser behaviour binding'])
+    write_new(output/'prepared.json',(json.dumps(report,indent=2)+'\n').encode())
+    return report
 
 
 def install(base, prior, blob, core, module, output, directory):
