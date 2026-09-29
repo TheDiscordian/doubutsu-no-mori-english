@@ -582,7 +582,7 @@ class Source:
         receipts[0]['calls']=calls
         return bytes(output),pointers,receipts
 
-    def model_sequence(self, parts):
+    def model_sequence(self, parts, *, expand_calls=False):
         """Join ordered state/geometry lists, removing only intermediate returns."""
         joined=bytearray();pointers={};receipts=[]
         for i,(name,at,n) in enumerate(parts):
@@ -594,9 +594,16 @@ class Source:
             fixes=self.pointers(at,n)
             if any(p>=at+n-8 for p in fixes):
                 raise ReviewRequired('relocated model sequence return')
-            receipts.append(dict(symbol=name,donor_offset=at,bytes=n,sha256=sha256(raw),
-                                 joined_offset=len(joined)))
-            pointers.update({len(joined)+p-at:target for p,target in fixes.items()})
+            graph=None;origin=at
+            if expand_calls:
+                raw,fixes,graph=self.model_graph((name,at,n))
+                if graph:origin=0
+            if graph:
+                receipts.extend(dict(r,joined_offset=r['joined_offset']+len(joined)) for r in graph)
+            else:
+                receipts.append(dict(symbol=name,donor_offset=at,bytes=n,sha256=sha256(raw),
+                                     joined_offset=len(joined)))
+            pointers.update({len(joined)+p-origin:target for p,target in fixes.items()})
             joined.extend(raw[:-8] if i<len(parts)-1 else raw)
         if not receipts:raise ReviewRequired('empty model sequence')
         return bytes(joined),pointers,receipts
@@ -1833,8 +1840,8 @@ def main():
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--select', action='append', default=[], help='Canonical donor ID; defaults to all supported new furniture')
     parser.add_argument('--category', help='Restrict to a discovered shared category, without an item list')
-    parser.add_argument('--representation', choices=('furniture','handheld','scenery','audio','rewards','lifecycle','surfaces','console','creatures','clothing'), default='furniture',
-                        help='Discover furniture, equipment, scenery, audio, rewards, lifecycles, surfaces, console games, creatures, or clothing')
+    parser.add_argument('--representation', choices=('furniture','handheld','scenery','audio','rewards','lifecycle','surfaces','console','creatures','clothing','carried'), default='furniture',
+                        help='Discover furniture, equipment, scenery, audio, rewards, lifecycles, surfaces, console games, creatures, clothing, or carried items')
     parser.add_argument('--donor-disc', type=Path, default=ROOT/'local/gamecube/Animal Crossing (USA, Canada).ciso',
                         help='Verified English GameCube disc for console-game preparation')
     parser.add_argument('--assets-only', action='store_true',
@@ -1844,6 +1851,9 @@ def main():
         help='Reuse a verified artwork bundle without recompilation; repeat for multiple bundles')
     args = parser.parse_args(); output = args.output.resolve()
     if args.assets_only and args.command != 'convert': parser.error('--assets-only requires convert')
+    if args.representation=='carried' and (args.command=='import' or args.select or args.category
+            or args.command=='convert' and not args.assets_only):
+        parser.error('Carried preparation retains complete state families; use convert --assets-only')
     if args.representation=='clothing' and (args.select
             or args.category not in (None,'clothing-appearances')
             or args.command=='convert' and not args.assets_only):
@@ -1860,14 +1870,27 @@ def main():
             or args.command=='convert' and not args.assets_only):
         parser.error('Creature preparation retains the complete field-frame category; use convert --assets-only')
     if args.category and args.command == 'scan': parser.error('--category requires convert or import')
-    if args.reuse_assets and (args.command=='scan' or args.representation not in ('furniture','surfaces','clothing')):
-        parser.error('--reuse-assets requires furniture/clothing convert/import or surface preparation')
+    if args.reuse_assets and (args.command=='scan' or args.representation not in ('furniture','surfaces','clothing','carried')):
+        parser.error('--reuse-assets requires furniture/clothing convert/import or surface/carried preparation')
     if args.representation in ('handheld','scenery','audio','rewards','surfaces') and (args.command == 'import' or
             args.command == 'convert' and not args.assets_only):
         parser.error('This representation requires convert --assets-only; runtime integration is unfinished')
     if output.exists() or not output.is_relative_to(ROOT/'build'): raise ValueError('Use a fresh ignored build path')
     source = Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
                     (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    if args.representation=='carried':
+        import v3_optional_composition as composition
+        from v3_carried_items import discover as discover_carried,prepare as prepare_carried
+        composition.use_build_lock(args.base_lock)
+        image,base_report=composition.inputs();installed=composition.catalogue(image,base_report)
+        worksheet=ROOT/'build/item-identity-megasheet.xlsx'
+        if args.command=='scan':
+            report=discover_carried(source,worksheet,installed)
+            output.parent.mkdir(parents=True,exist_ok=True)
+            write_new(output,(json.dumps(report,indent=2)+'\n').encode())
+        else:report=prepare_carried(source,worksheet,output,installed,args.reuse_assets)
+        print(json.dumps({k:report[k] for k in ('parent_count','state_count','runtime_installed','selectable')}))
+        return
     if args.representation=='clothing':
         if args.command=='import':
             from v3_furniture_install import refresh_runtime

@@ -75,6 +75,18 @@ stale furniture-table names do not create independent item identities. The
 [clothing contract](V3_CLOTHING_IMPORTS.md) records prepared resources and the
 remaining connected runtime work. Preparation does not enable new choices.
 
+### Carried-item state families and stationery
+
+`--representation carried` prepares the complete remaining worksheet-discovered
+paper/miscellaneous/food/plant/insect families through shared category and UI
+converters. Quantity, stamp, and spirit-count states stay with their parent.
+Complete source names, prices, icons, handover/police models, seasonal bindings,
+and stationery backgrounds accompany each batch. Missing direct-ground models
+stay explicit; preparation never grants runtime eligibility. `--reuse-assets`
+accepts checked category directories or complete carried bundles. See
+[the carried-item contract](V3_CARRIED_ITEMS.md) for the current resource bundle
+and connected native readers/behaviours still required.
+
 ### Profile-owned creature resources
 
 Saved player designs and museum placeholders use the shared

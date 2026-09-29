@@ -31,6 +31,17 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
+The shared carried-item importer prepares the remaining seven parent families
+and all 26 source states together. Its current resource bundle is
+`build/v3-carried-batch-prepared-05/`: fourteen pocket icons, seven complete
+handover/police models, full orange-paper background/lines, official names,
+and source prices. Checked resource reuse avoids recompiling existing artwork;
+event-item icons use the same shared converter without changing their output.
+Additive native IDs, remaining readers/behaviours, saved profiles, and selection
+are still the connected implementation task. This preparation does not enable
+new imports or change the current ROM. See
+[the carried-item contract](../specs/V3_CARRIED_ITEMS.md).
+
 The current proposal is ABI 352 at
 `build/v3-diary-category-work-01/admission-connected-04/build-lock.json`, ROM SHA-256
 `ae407cb96340de70dc69e7d93cb2bb0969c6577a186a84615f24ceee9066ec94`.

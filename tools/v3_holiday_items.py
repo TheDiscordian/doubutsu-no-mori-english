@@ -25,7 +25,7 @@ TABLES = {
     'itemName_etc': (784, '41e671ca45dd43ac8a54f8e71ff4b55b947d52b80cd97bae9fb40e5fc7edc07f'),
     'item1_5_tableNo': (49, '682d400251d20485243dcd4f8b77235f5b4d1ce43fe1e6c19ae814ead87fbb39'),
 }
-SOURCES = ('tools/v3_holiday_items.py', 'tools/v3_registry.py', 'tools/v3_item_categories.py', 'tools/v3_category_runtime.py',
+SOURCES = ('tools/v3_holiday_items.py', 'tools/v3_carried_items.py', 'tools/v3_registry.py', 'tools/v3_item_categories.py', 'tools/v3_category_runtime.py',
     'tools/v3_furniture_install.py', 'tools/v3_asset_loader.py', 'overlays/v3/holiday_items.c',
     'overlays/v3/holiday_items.ld', 'overlays/v3/creature_icon.S', 'overlays/v3/item_categories.c',
     'translations/provenance.json')
@@ -86,34 +86,18 @@ def records(source):
 
 
 def pocket_icons(source, rows):
-    from title_assets import pack4, untile
-    from v3_villager_art import native_palette
-    a, n = source.symbol('item_tex_data_table$779')
-    t, size = source.symbol('etc_tex_table$768'); refs = source.pointers(t, size)
-    if (n != 64 or source.pointers(a, n).get(a+5*4) != t or size != 49*8 or
-            source.data[t:t+size] != bytes(size) or set(refs) != set(range(t, t+size, 4))):
+    from v3_carried_items import pocket_icons as shared_icons
+    if any(int(r['donor_item_id'],16)>>8!=0x25 for r in rows):
+        raise ValueError('Event pocket icons require miscellaneous item identities')
+    data,receipt=shared_icons(source,rows,ram=ICON)
+    if len(receipt['tables'])!=1:raise ValueError('Incomplete event pocket-icon family')
+    table=receipt['tables'][0];t,size=source.symbol('etc_tex_table$768')
+    if (table['offset'],table['bytes'])!=(t,size) or size!=49*8:
         raise ValueError('Changed complete miscellaneous pocket-icon binding')
-    pairs = {}; data = bytearray(); bindings = []
-    for row in rows:
-        index = int(row['donor_item_id'], 16) & 255
-        pair = tuple(refs[t+8*index+4*lane] for lane in range(2))
-        if pair not in pairs:
-            offset = len(data); data.extend(struct.pack('>2I', ICON+offset+32, ICON+offset+64)+bytes(24))
-            resources = []
-            for lane, at in enumerate(pair):
-                symbol, _, width = source.containing(at, exact=True); raw = source.raw(symbol)
-                if width != (32, 512)[lane] or source.pointers(at, width):
-                    raise ValueError('Unsupported complete event item icon')
-                converted = native_palette(raw) if lane == 0 else pack4(untile(raw, 32, 32, 4))
-                resources.append(dict(symbol=symbol, source_offset=at, source_sha256=sha256(raw),
-                    offset=len(data), bytes=width, sha256=sha256(converted)))
-                data.extend(converted)
-            pairs[pair] = dict(offset=offset, address=ICON+offset, resources=resources)
-        bindings.append(dict(item_id=row['item_id'], **pairs[pair]))
     if ICON+len(data) > ART:
         raise ValueError('Event item icons exceed shared reservation')
-    return bytes(data), dict(table=t, table_bytes=size, pointers=refs, bindings=bindings,
-        unique_icons=len(pairs), width=32, height=32, format_native='CI4/RGBA5551')
+    return data,dict(table=t,table_bytes=size,pointers=table['pointers'],bindings=receipt['bindings'],
+        **{k:receipt[k] for k in ('unique_icons','width','height','format_native')})
 
 
 def prepare(source, directory):

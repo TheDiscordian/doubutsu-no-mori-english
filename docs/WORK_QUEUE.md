@@ -41,6 +41,19 @@ Do not make another per-item installer. Golden net/axe/shovel/rod still need
 their actual remaining consumers distinguished from acquisition; retain all
 installed tool behaviour and do not replay old tests to establish it again.
 
+The complete source-resource batch is prepared at
+`build/v3-carried-batch-prepared-05/`: seven parents, 26 states, fourteen pocket
+icons, seven handover/police models, full orange-paper background/line art,
+official names, and source prices. The general importer handles the batch with
+`--representation carried`; complete category and paper resources are reusable.
+Do not reconvert them. Next resolve additive native IDs and connect the existing
+shared item-reader/profile path to these records, retaining the native paper and
+flower identities. Source category 17's diary override must not catch cedar.
+Continue through all actual item interactions and optional selection as one
+task; prepared resources are not playable imports. The consumer map, resource
+contract, and focused checks are in
+[carried-item imports](../specs/V3_CARRIED_ITEMS.md).
+
 All sixteen diary styles have connected importing and selection in ABI 352:
 `build/v3-diary-category-work-01/admission-connected-04/build-lock.json`.
 Carried IDs `2B10..2B1F` preserve native `2B00`; each style shares its cover's

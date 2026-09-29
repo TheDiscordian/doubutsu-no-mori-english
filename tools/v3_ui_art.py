@@ -19,12 +19,16 @@ COMBINERS = {
     (0xFCFFFFFF,0xFFFDF6FB):0, (0xFCFFFFFF,0xFFFCF438):2,
     (0xFC30FFFF,0x5FFEF238):1, (0xFC12FFFF,0x3FFDF238):1,
     (0xFCFFB3FF,0xFF65FEFF):1, (0xFC30FE61,0x55FEF379):1,
+    # Letter-frame setup: texture times shade, texture alpha, one tile.
+    (0xFC127E24,0xFFFFF3F9):1,
 }
-RENDER_MODES = {0x0C1841C8,0x0C184240,0x0C192048,0x00504240,0x00552048}
+RENDER_MODES = {0x0C1841C8,0x0C184240,0x0C192048,0x00504240,0x00552048,
+                0x0F0A4000}  # Letter background: G_RM_OPA_SURF / SURF2.
 GEOMETRY = {(0xD9000000,0x00200404),(0xD9000000,0x00200004),
-            (0xD9FFFFFF,0x00200004),(0xD9F0F9FE,0)}
+            (0xD9FFFFFF,0x00200004),(0xD9F0F9FE,0),(0xD9000000,0x00210405)}
 OTHER_MODES = {(0xEF182C10,0x0C184241),(0xEF18AC10,0x0C184340),
-    (0xEF08AC10,0x00504340),(0xEF082C10,0x00553048),(0xEF18ACF0,0x0C193048)}
+    (0xEF08AC10,0x00504340),(0xEF082C10,0x00553048),(0xEF18ACF0,0x0C193048),
+    (0xEF08AC10,0x00504240)}
 FORMATS = {(2,0):'CI4',(4,0):'I4',(4,1):'I8',(0,2):'RGBA16',
            (3,1):'IA8',(3,2):'IA16'}
 
@@ -34,6 +38,7 @@ def validate_state(a,b):
     valid = ((op==0xFC and (a,b) in COMBINERS) or
         (op==0xE2 and a==0xE200001C and b in RENDER_MODES) or
         (op==0xEF and (a,b) in OTHER_MODES) or
+        (op==0xE3 and (a,b)==(0xE3001001,0)) or  # G_TT_NONE for letter lines.
         (op==0xD9 and (a,b) in GEOMETRY) or
         (op==0xE7 and (a,b)==(0xE7000000,0)) or
         (op==0xFA and a&0xFFFFFF00==0xFA000000) or
@@ -92,7 +97,7 @@ class Packet:
         """
         if label in self.models or not parts:raise ValueError('Duplicate or empty UI model')
         roots=[(n,*self.source.symbol(n)) if isinstance(n,str) else tuple(n) for n in parts]
-        raw,pointers,receipts=self.source.model_sequence(roots)
+        raw,pointers,receipts=self.source.model_sequence(roots,expand_calls=True)
         rows=[];used=set();cache=[None]*32;current_vertex=None
         textures=[];tmem=0;have_palette=bool(palette)
         if texture is not None:

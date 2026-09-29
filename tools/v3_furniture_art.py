@@ -1038,7 +1038,7 @@ def command_source(models, offsets):
                 # compare its complete words with the donor command.
                 emit('gsDPSetCombineLERP(0, 0, 0, TEXEL0, 0, 0, 0, TEXEL0, '
                      'PRIMITIVE, 0, COMBINED, 0, 0, 0, 0, COMBINED)')
-            elif op in (0xEF, 0xE7) and model.get('native_ui'):
+            elif op in (0xEF, 0xE7, 0xE3) and model.get('native_ui'):
                 from v3_ui_art import validate_state
                 validate_state(*row['words'])
                 a,b=row['words'];emit(f'{{{{0x{a:08X}, 0x{b:08X}}}}}')

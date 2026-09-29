@@ -13,7 +13,7 @@ from v3_asset_loader import ROOT,BLOB,compile_part
 from v3_equipment_runtime import RAM,GUARD
 from v3_furniture_pipeline import Source,prepare_material_pair
 from v3_import_storage import END,jump
-from v3_item_categories import discover
+from v3_item_categories import discover,checked_art
 from v3_player_actions import native_references
 
 CODE,MAP,TABLE,ART,SIZE=0x7000,0x7200,0x7300,0x7600,0xA000
@@ -46,24 +46,7 @@ def prepared(source,path,*,parent_records=None):
         if reference is None or category in assets:raise ValueError('Unknown or duplicate prepared category')
         if any(row[k]!=json.loads(json.dumps(v)) for k,v in reference.items()):
             raise ValueError('Changed complete category source relationships')
-        profile,body,resources,_,models,commands,sections=prepare_material_pair(source,reference['models'])
-        file=(path/row['object_file']).resolve()
-        if file.parent!=path:raise ValueError('Category object escapes prepared directory')
-        data=file.read_bytes();cursor=(len(body)+7)&~7
-        if (row['profile']!=json.loads(json.dumps(profile)) or row['resources']!=resources
-                or len(data)!=row['object_bytes'] or sha256(data)!=row['object_sha256']
-                or data[:len(body)]!=body or len(row['compiled_models'])!=2
-                or (path/f'category-{category:02X}'/'commands.c').read_text()!=commands):
-            raise ValueError('Changed complete prepared category artwork')
-        for model,(label,n) in zip(row['compiled_models'],sections):
-            if (model['layer']!=label or model['native_offset']!=cursor or model['bytes']!=n
-                    or row['model_offsets'].get(label)!=cursor
-                    or model['source_sha256']!=models[label]['source_sha256']
-                    or model['output_sha256']!=sha256(data[cursor:cursor+n])):
-                raise ValueError('Changed split category display lists')
-            cursor+=n
-        if set(row['model_offsets'])!={'material','geometry'} or any(data[cursor:]):
-            raise ValueError('Unexpected category data after complete display lists')
+        data,_=checked_art(source,path,row)
         assets[category]=data;rows.append(copy.deepcopy(row))
     if set(assets)!=set(by_type):raise ValueError('Incomplete prepared shared category set')
     return assets,sorted(rows,key=lambda r:r['source_category']),dict(

@@ -29,7 +29,7 @@ FUNCTIONS=(
 PENDING='Native seasonal ground, police, and handover table/array integration is required; no item is enabled.'
 
 
-def discover(source, parent_records=None):
+def discover(source, parent_records=None, *, require_ground=True):
     functions=[]
     for at,n,digest in FUNCTIONS:
         raw,receipt=source.function(at)
@@ -41,9 +41,9 @@ def discover(source, parent_records=None):
     bindings=source.pointers(main,64)
     if parent_records is None:
         types=source.raw('item1_2_tableNo');type_at,_=source.symbol('item1_2_tableNo')
-        if (len(types)!=92 or sha256(types)!='d07c0e001d578fc1bb754c8b24ad7eb782c6bf94ba1ddff2b2c3239f97767975'
-                or bindings.get(main+8)!=type_at):
+        if len(types)!=92 or sha256(types)!='d07c0e001d578fc1bb754c8b24ad7eb782c6bf94ba1ddff2b2c3239f97767975':
             raise ValueError('Changed complete equipment categories')
+        if bindings.get(main+8)!=type_at:raise ValueError('Changed complete equipment category binding')
         parent_records=[r for r in equipment(source)['rows'] if int(r['item_id'],16)>=0x2224]
     tables=[]
     for role in ('mode_DL_table','vtx_DL_table'):
@@ -109,8 +109,11 @@ def discover(source, parent_records=None):
                     category_base=(entry-at)//8-category,part_offset=part,part_hex=raw.hex(),
                     list_table=lists,list_offset=one,list_hex=source.data[one:one+8].hex(),
                     callback=callback[3],display_lists=dl,flags_hex=flags.hex()))
-            if len(matches)!=1:raise ValueError('Missing or ambiguous seasonal category descriptor')
+            if len(matches)>1 or require_ground and not matches:
+                raise ValueError('Missing or ambiguous seasonal category descriptor')
             descriptors.extend(matches)
+        if descriptors and len(descriptors)!=4:
+            raise ValueError('Incomplete seasonal category descriptor family')
         prepared=prepare_material_pair(source,parts)
         _,body,resources,_,models,_,sections=prepared
         rows.append(dict(source_category=category,parent_item_ids=[r['item_id'] for r in users],
@@ -126,22 +129,71 @@ def discover(source, parent_records=None):
         native_tables_installed=False,logical_imports_added=0)
 
 
-def convert(source,output,selected=(),*,parent_records=None):
-    inventory=discover(source,parent_records);requested=set(selected)
+def checked_art(source, path, row):
+    """Validate reusable commands/resources independently of their item parents."""
+    path=path.resolve()
+    parts=[tuple(part) for part in row['models']]
+    prepared=prepare_material_pair(source,parts)
+    profile,body,resources,_,models,commands,sections=prepared
+    file=(path/row['object_file']).resolve()
+    if file.parent!=path:raise ValueError('Category object escapes prepared directory')
+    data=file.read_bytes();cursor=(len(body)+7)&~7
+    if (row['profile']!=json.loads(json.dumps(profile)) or row['resources']!=resources
+            or len(data)!=row['object_bytes'] or sha256(data)!=row['object_sha256']
+            or data[:len(body)]!=body or len(row['compiled_models'])!=2
+            or (path/f'category-{row["source_category"]:02X}'/'commands.c').read_text()!=commands):
+        raise ValueError('Changed complete prepared category artwork')
+    for model,(label,n) in zip(row['compiled_models'],sections):
+        if (model['layer']!=label or model['native_offset']!=cursor or model['bytes']!=n
+                or row['model_offsets'].get(label)!=cursor
+                or model['source_sha256']!=models[label]['source_sha256']
+                or model['output_sha256']!=sha256(data[cursor:cursor+n])):
+            raise ValueError('Changed split category display lists')
+        cursor+=n
+    if set(row['model_offsets'])!={'material','geometry'} or any(data[cursor:]):
+        raise ValueError('Unexpected category data after complete display lists')
+    return data,prepared
+
+
+def convert(source,output,selected=(),*,parent_records=None,require_ground=True,reuse_assets=()):
+    inventory=discover(source,parent_records,require_ground=require_ground);requested=set(selected)
     available={item for row in inventory['rows'] for item in row['parent_item_ids']}
     if requested-available:raise ValueError('Unknown or original-only item-category selection')
     rows=[r for r in inventory['rows'] if not requested or requested.intersection(r['parent_item_ids'])]
+    cache={}
+    for path in reuse_assets:
+        path=path.resolve();report=json.loads((path/'art.json').read_bytes())
+        if (report.get('format')!='AFV3-ITEM-CATEGORY-PREPARED-ASSETS-1' or report.get('version')!=1
+                or report['source_rel_sha256']!=inventory['source_rel_sha256']
+                or report['source_symbols_sha256']!=inventory['source_symbols_sha256']):
+            raise ValueError('Changed reusable category format/source')
+        for row in report['objects']:
+            if row['source_category'] not in {r['source_category'] for r in rows}:continue
+            asset,prepared=checked_art(source,path,row)
+            key=row['source_category']
+            if key in cache and cache[key][1]!=asset:
+                raise ValueError('Conflicting reusable category artwork')
+            cache[key]=(row,asset,prepared,path)
     output.mkdir(parents=True,exist_ok=False);objects=[]
     for row in rows:
         key=f'category-{row["source_category"]:02X}';directory=output/key;directory.mkdir()
-        prepared=prepare_material_pair(source,row['models'])
-        asset,locations,models,sequence=compile_models(directory,prepared)
+        cached=cache.get(row['source_category'])
+        if cached:
+            prior,asset,prepared,path=cached
+            if list(map(tuple,prior['models']))!=row['models']:
+                raise ValueError('Reusable category has different complete models')
+            locations,models,sequence=prior['model_offsets'],prior['compiled_models'],None
+            write_new(directory/'commands.c',prepared[5].encode())
+        else:
+            prepared=prepare_material_pair(source,row['models'])
+            asset,locations,models,sequence=compile_models(directory,prepared)
         if sequence is not None or len(asset)!=row['object_bytes']:
             raise ValueError('Category compilation disagrees with complete preflight')
         filename=key+'.n64obj.bin';write_new(output/filename,asset)
         objects.append(dict(**row,profile=prepared[0],resources=prepared[2],compiled_models=models,
-            model_offsets=locations,object_file=filename,object_sha256=sha256(asset)))
-        print(json.dumps(dict(converted=key,parents=len(row['parents']),bytes=len(asset))),flush=True)
+            model_offsets=locations,object_file=filename,object_sha256=sha256(asset),
+            **({'reused_from':str(path)} if cached else {})))
+        print(json.dumps(dict(converted=key,parents=len(row['parents']),bytes=len(asset),reused=bool(cached))),flush=True)
     report=dict(format='AFV3-ITEM-CATEGORY-PREPARED-ASSETS-1',version=1,
         source_rel_sha256=inventory['source_rel_sha256'],source_symbols_sha256=inventory['source_symbols_sha256'],
         objects=objects,runtime_installed=False,selectable=False,pending_reason=PENDING)
