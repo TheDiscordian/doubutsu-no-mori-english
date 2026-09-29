@@ -6,6 +6,7 @@ source receipts stay local. Preparation does not enable unfinished actors.
 import argparse
 import json
 import os
+import posixpath
 from pathlib import Path
 import re
 import struct
@@ -21,6 +22,11 @@ from v3_registry import PARTICIPANTS,PARTICIPANT_REGISTRY_VERSION
 DONOR=ROOT/'local/ac-decomp'
 FAMILY=('tokyoso_control','tunahiki_control','hatumode_control',
     'tokyoso_npc0','tokyoso_npc1','tunahiki_npc0','tunahiki_npc1','hatumode_npc0','rope')
+FESTIVAL_FAMILY=tuple(f'{name}_npc{i}' for name in
+    ('hanami','tukimi','countdown','tamaire','harvest') for i in (0,1))
+FESTIVAL_HEADERS=('m_soncho.h','lb_rtc.h','m_field_info.h','m_font.h','m_player_lib.h',
+    'm_time.h','m_land_h.h','m_random_field_h.h')
+FESTIVAL_REFERENCES_SHA='5fe64f38fd7a3111c3cbf25f3e57555030781974cc89d5062ab00bb097de4580'
 CONSTANT_HEADERS=('types.h','ac_npc.h','ac_npc_anim_def.h','m_actor.h','m_event.h',
     'm_name_table.h','m_player.h','m_npc.h','m_npc_personal_id.h','m_choice.h',
     'm_msg.h','m_msg_enum.h','m_demo.h',
@@ -118,6 +124,11 @@ def expand(path,receipts):
         child=match[1]
         if child.startswith('../src/actor/'):
             return expand(child[3:],receipts)
+        if child.endswith('.c_inc'):
+            target=posixpath.normpath(posixpath.join(posixpath.dirname(path),child))
+            if not target.startswith('src/actor/'):
+                raise ValueError('Actor source include escapes its source directory')
+            return expand(target,receipts)
         return ''
     return re.sub(r'^\s*#include "([^"]+)"',include,text,flags=re.M)
 
@@ -181,7 +192,19 @@ def generate(source,*,family=FAMILY,reference_sha=REFERENCES_SHA,extra_headers=(
         if not all(i in refs for i in (16,20,24,28)):
             raise ValueError('Incomplete actor callback directory')
         anchor=refs[16][3]
-        names=re.findall(r'^static\s+[^\n;{}=]+?\b(\w+)\([^;{}]*\)\s*\{',body,re.M)
+        # A few complete owners expose a callback without static linkage.
+        # Include those definitions too; retain the contiguous-function check.
+        names=re.findall(r'^[A-Za-z_][^\n;{}=]*?\b(\w+)\([^;{}]*\)\s*\{',body,re.M)
+        stripped=[]
+        if 'unused_stripped' in names:
+            # The decomp marks this unreferenced data-only placeholder; it is
+            # not a function in the supplied binary. Never omit a real symbol.
+            name='unused_stripped'
+            if len(re.findall(r'\b'+name+r'\b',body))!=1 or any(
+                    any(n==name for n,_ in rows) for rows in source.functions.values()):
+                raise ValueError('A stripped-source placeholder is actually referenced')
+            dead=function(body,name);stripped.append(dict(name=name,sha256=sha256(dead.encode())))
+            body=body.replace(dead,'');names.remove(name)
         candidates={n:[at for at,rows in source.functions.items() if any(name==n for name,_ in rows)] for n in names}
         if any(not v for v in candidates.values()):
             raise ValueError('Missing complete actor function: '+stem)
@@ -212,7 +235,7 @@ def generate(source,*,family=FAMILY,reference_sha=REFERENCES_SHA,extra_headers=(
         modules[stem]=body
         contracts.append(dict(name=stem,profile=profile,functions=functions,
             profile_offset=profile_at,profile_sha256=sha256(source.raw(profile)),
-            profile_relocations=refs))
+            profile_relocations=refs,source_only_stripped=stripped))
     header='\n'.join(headers)
     source_constants=constants(header+'\n'+'\n'.join(modules.values()),receipts,CONSTANT_HEADERS+extra_headers)
     if sha256(json.dumps(receipts,sort_keys=True,separators=(',',':')).encode())!=reference_sha:
@@ -563,7 +586,7 @@ def patch(base,prepared,symbols):
     return {v:bytes(data) for v,data in changes.items()},receipts
 
 
-def native_motions(source,base,generated,*,paired=()):
+def native_motions(source,base,generated,*,paired=(),import_missing=False):
     """Resolve the whole family's reused animations by complete motion content."""
     from v3_keyframes import _animation,CHANNELS,npc_motion,compile_animations
     files=by_vrom(base);owner=files[0x8681F0].extract(base)
@@ -596,7 +619,7 @@ def native_motions(source,base,generated,*,paired=()):
             if name not in needed or names[index+1]=='aNPC_ANIM_NUM':
                 raise ValueError('Unreferenced or invalid paired NPC motion')
             pair=(name,names[index+1]);pairs.append(pair);needed.update(pair)
-    result=[]
+    result=[];imported=[]
     for name in sorted(needed):
         symbol='cKF_ba_r_npc_1_'+name.removeprefix('aNPC_ANIM_').lower()
         at,_=source.symbol(symbol);desc=_animation(source,at,joints=26,record_bytes=64)
@@ -642,7 +665,46 @@ def native_motions(source,base,generated,*,paired=()):
             result.append(dict(name=name,native=dict(index=index,address=p,header_sha256=sha256(raw)),
                 source=desc,converted=packed,bytes=len(data),sha256=sha256(data),
                 native_face_effect_audio_programme_retained=True,override_required=True))
+        elif not matches and import_missing:
+            from v3_keyframes import npc_expression_motion
+            # Source enum positions are stable under the pinned donor. Keep
+            # imported IDs outside every original table; their runtime reader
+            # is mandatory before this family can be enabled.
+            enum=clean((DONOR/'include/ac_npc_anim_def.h').read_text())
+            blocks=re.findall(r'enum\s*\{([^{}]+)\}',enum,re.S)
+            if len(blocks)!=1:raise ValueError('Changed complete motion identity enum')
+            names=[n.strip() for n in blocks[0].split(',') if n.strip()]
+            if any(not re.fullmatch(r'aNPC_ANIM_\w+',n) for n in names):
+                raise ValueError('Motion identities are not a sequential donor enum')
+            desc=npc_expression_motion(source,at,joints=26)
+            effect=desc['npc_expressions']['source_effect']
+            if effect!=-1:
+                # The actual native sitting-clap record has the same happy
+                # expression effect at the same frame. Other source effects
+                # require their own real mapping, not a numeric fallback.
+                original=native(rows[74][0],64)
+                if effect!=3 or struct.unpack_from('>2h',original,52)!=(2,3):
+                    raise ValueError('Unmapped imported NPC expression effect')
+            row=dict(name=name,native=dict(index=0x100+names.index(name)),source=desc,
+                imported=True,runtime_reader_required=True,native_expression_effect=effect)
+            imported.append(row);result.append(row)
         else:raise ValueError('Missing or ambiguous complete native motion: '+name)
+    if imported:
+        data,packed=compile_animations(source,[r['source'] for r in imported],address_base=0)
+        lines=['.section .rodata.af_hg_motions,"a",@progbits','.balign 16',
+            '.global af_hg_motion_data','af_hg_motion_data:'];cursor=0
+        for r in packed['relocations']:
+            pos=r['offset']
+            if pos>cursor:lines.append(f'.incbin "festival-motions.bin", {cursor}, {pos-cursor}')
+            lines.append(f'.word af_hg_motion_data + {r["target_offset"]}');cursor=pos+4
+        lines.append(f'.incbin "festival-motions.bin", {cursor}, {len(data)-cursor}')
+        headers={r['donor_offset']:r for r in packed['headers']}
+        lines+=['.global af_hg_motions','af_hg_motions:',f'.word {len(imported)}']
+        for r in imported:
+            offset=headers[r['source']['header']['donor_offset']]['native_offset']
+            lines.append(f'.word {r["native"]["index"]}, af_hg_motion_data + {offset}')
+            r.update(header_offset=offset,packet_sha256=sha256(data))
+        generated['festival-motions.bin']=data;generated['festival-motions.S']='\n'.join(lines)+'\n'
     resolved={r['name']:r for r in result}
     for first,second in pairs:
         if resolved[second]['native']['index']!=resolved[first]['native']['index']+1:
@@ -758,7 +820,7 @@ def registry(base,report,generated):
         timing_native_execution_verified=False)
 
 
-def bindings(base,prior):
+def bindings(base,prior,*,extra=None):
     """Resolve the shared native services without pretending missing ones exist."""
     from aflib import CODE_RAM,CODE_VROM
     # Every service body is retained in the preparation receipt, using complete
@@ -768,7 +830,8 @@ def bindings(base,prior):
     starts=sorted({int(m[1],16) for m in re.finditer(r'= 0x([0-9A-F]+);[^\n]*type:func',directory)})
     names={n:int(a,16) for n,a in re.findall(r'^(\w+) = 0x([0-9A-F]+);',directory,re.M)}
     files=by_vrom(base);rows=[]
-    for name,at in NATIVE_SERVICES.items():
+    services=dict(NATIVE_SERVICES,**(extra or {}))
+    for name,at in services.items():
         if at not in starts:raise ValueError('Native service lacks exact symbol boundary: '+name)
         if name in names and names[name]!=at:raise ValueError('Native service symbol disagrees with binding: '+name)
         end=next(p for p in starts if p>at)
@@ -776,7 +839,7 @@ def bindings(base,prior):
         raw=files[vrom].extract(base)[at-ram:end-ram]
         if len(raw)!=end-at or end-at<8:raise ValueError('Incomplete native service body: '+name)
         rows.append(dict(name=name,start=at,end=end,vrom=vrom,ram=ram,sha256=sha256(raw)))
-    result=dict(NATIVE_SERVICES,af_hp_native_npc_clip=0x80136EEC,
+    result=dict(services,af_hp_native_npc_clip=0x80136EEC,
         af_hp_native_shrine=0x80136F70,af_hp_players=0x80126EC0,
         af_hp_native_tools=0x80136F40,af_hp_native_effects=0x80136F3C,
         af_hp_native_animals=0x80130DB8,af_hp_native_ticks=0x80145048,
@@ -803,7 +866,8 @@ def bindings(base,prior):
     return result,rows
 
 
-def dialogue(base,prior,generated,*,roots=None,map_symbol='af_hp_message',exercise_controls=False):
+def dialogue(base,prior,generated,*,roots=None,map_symbol='af_hp_message',exercise_controls=False,
+        festival_controls=False):
     """Convert every personality/role, including the full choice/branch closure."""
     from gc_adapter import remove_redundant_article_suppression,expand_random_message_ranges
     from gc_text import decode_gc
@@ -822,6 +886,12 @@ def dialogue(base,prior,generated,*,roots=None,map_symbol='af_hp_message',exerci
     messages,choices,decoder=donor();info=module_command_info(base)
     pending=set(roots);ready={};selects=set();orders=set();edits={};ranges={}
     allowed={0,1,2,3,4,5,9,13,15,16,19,20,21,22,25,26,27,28,80,83,84,94,103}
+    terminals={0,1}
+    if festival_controls:
+        # Native time/date/name fields, random-number insertion, the existing
+        # capitalization command, and the countdown's genuine timed ending.
+        # Preserve the source timer and NPC order; do not turn it into A-to-close.
+        allowed.update((29,37,38,39,40,48,88,117));terminals.add(88)
     # Adapt the actual N64 location, not the idiom "Well, ...". Exact source
     # substrings keep deliberate breaks and every command in place.
     shrine={
@@ -854,9 +924,10 @@ def dialogue(base,prior,generated,*,roots=None,map_symbol='af_hp_message',exerci
             text=text.replace(before,after)
         data=encode(text,info);tokens=list(tokenize(data,info))
         unknown={t.data[1] for t in tokens if t.kind=='cmd'}-allowed
-        if (not tokens or tokens[-1].data not in (b'\x7f\0',b'\x7f\1') or
-                sum(t.kind=='cmd' and t.data[1] in (0,1) for t in tokens)!=1 or unknown or
-                any(t.kind!='cmd' and (t.kind!='text' or t.data[0] not in LATIN|{0xCD}) for t in tokens) or
+        if (not tokens or tokens[-1].kind!='cmd' or tokens[-1].data[1] not in terminals or
+                sum(t.kind=='cmd' and t.data[1] in terminals for t in tokens)!=1 or unknown or
+                any(t.kind!='cmd' and (t.kind!='text' or t.data[0] not in
+                    LATIN|{0xCD}|({0x90} if festival_controls else set())) for t in tokens) or
                 expanded_bound(data,info)>1024):
             raise ValueError(f'Unreviewed participant text/control/buffer: {n:04X}, operations {unknown}')
         ready[n]=data
@@ -865,7 +936,8 @@ def dialogue(base,prior,generated,*,roots=None,map_symbol='af_hp_message',exerci
             op=t.data[1]
             if op==9:
                 index,value=t.data[2],int.from_bytes(t.data[3:],'big')
-                if not (index==0 and value in {*range(1,24),255} or index==1 and value in (2,10,14) or index==9 and value==1):
+                if not (index==0 and value in {*range(1,24),255} or index==1 and value in (2,10,14) or
+                        index==9 and value==1 or festival_controls and index==7 and value==1):
                     raise ValueError(f'Unreviewed participant NPC order: {n:04X} / {index}:{value}')
                 orders.add((index,value))
             if 14<=op<=24:
@@ -874,8 +946,25 @@ def dialogue(base,prior,generated,*,roots=None,map_symbol='af_hp_message',exerci
                 else:selects.update(refs)
     files=by_vrom(base);cv=prior['import_storage']['choice_vrom']
     mb,tb,cb,ct=(files[p].extract(base) for p in (MESSAGE,TABLE,cv,CHOICE_TABLE))
-    first=len(Bank('message',0,0,mb,tb).entries());cf=len(Bank('select',0,0,cb,ct).entries())
-    mapping={n:first+i for i,n in enumerate(sorted(ready))}
+    existing=Bank('message',0,0,mb,tb).entries()
+    first=len(existing);cf=len(Bank('select',0,0,cb,ct).entries())
+    # Reuse complete officially credited leaf records, never merely matching
+    # visible wording. Control bytes, name fields, pauses, and endings must all
+    # match; branching records still receive their remapped additive identity.
+    reuse={};credited={}
+    if festival_controls:
+        catalogue=json.loads((ROOT/'translations/provenance.json').read_bytes())
+        credited={r['id']:r for r in catalogue['entries']}
+        for i,data in enumerate(existing):
+            row=credited.get(f'message:{i:04X}',{}).get('locales',{}).get('en',{})
+            if row.get('credit')=='official' and row.get('encoded_sha256')==sha256(data):
+                reuse.setdefault(data,i)
+    mapping={};appended=0
+    for n,data in sorted(ready.items()):
+        target=reuse.get(data)
+        if target is not None and not any(t.kind=='cmd' and 14<=t.data[1]<=24 for t in tokenize(data,info)):
+            mapping[n]=target
+        else:mapping[n]=first+appended;appended+=1
     choice_map={n:cf+i for i,n in enumerate(sorted(selects))}
     extra=[];new_choices=[];rows=[];credits=[]
     for n,data in sorted(ready.items()):
@@ -885,7 +974,11 @@ def dialogue(base,prior,generated,*,roots=None,map_symbol='af_hp_message',exerci
                 refs=mapping if t.data[1]<=21 else choice_map
                 for at in range(2,len(t.data),2):
                     struct.pack_into('>H',out,t.offset+at,refs[int.from_bytes(t.data[at:at+2],'big')])
-        out=bytes(out);extra.append(out)
+        out=bytes(out)
+        reused=mapping[n]<first
+        if reused:
+            if out!=existing[mapping[n]]:raise ValueError('Reused participant message differs from installed text')
+        else:extra.append(out)
         adaptations=['Native encoding; retain official wording, line/page breaks, pauses, and demo orders',
             'Remap the complete participant message/choice graph to additive native IDs']
         if edits[n]:adaptations.append('Remove redundant article-suppression flags before native insertions')
@@ -895,9 +988,10 @@ def dialogue(base,prior,generated,*,roots=None,map_symbol='af_hp_message',exerci
         if n in shrine:adaptations.append('Assistant platform adaptation: '+repr(shrine[n][0])+
             ' → '+repr(shrine[n][1])+'; preserve the N64 shrine identity')
         row=credit(f'message:{mapping[n]:04X}',f'message:{n:04X}',messages[n],out,adaptations)
-        row['locales']['en']['locator'][0]='tools/v3_holiday_participants.py:dialogue';credits.append(row)
+        row['locales']['en']['locator'][0]='tools/v3_holiday_participants.py:dialogue'
+        credits.append(credited[f'message:{mapping[n]:04X}'] if reused else row)
         rows.append(dict(donor_id=n,id=mapping[n],sha256=sha256(out),bytes=len(out),
-            expanded_bound=expanded_bound(out,info)))
+            expanded_bound=expanded_bound(out,info),reused_existing=reused))
     for n,target in choice_map.items():
         data=encode(decode_gc(choices[n],decoder),info)
         if not 1<=len(data)<=20 or any(c not in LATIN for c in data):raise ValueError('Invalid participant choice')
@@ -1260,6 +1354,226 @@ def prepare_exercise(output,lock):
     return report
 
 
+def festival_registry(prior,report,generated):
+    """One expanded registry retains every installed role and callback body."""
+    from v3_registry import EXERCISE_PARTICIPANTS,FESTIVAL_PARTICIPANTS
+    events=prior['equipment_resources']['npc_extra']['events']
+    old=events['participants'];exercise=events['exercise']
+    if set(FESTIVAL_PARTICIPANTS)!=set(FESTIVAL_FAMILY) or len(old['registry']['rows'])!=9:
+        raise ValueError('Incomplete retained or new participant group')
+    rows=[dict(r,kind=0) for r in old['registry']['rows']]
+    rows.extend(dict(r,event=35,save=13,part=3,donor_profile='Taisou_Npc0_Profile',
+        flags=exercise['registry']['native_flags']) for r in EXERCISE_PARTICIPANTS)
+    links={r['donor_profile']:old['code']['symbols'][r['donor_profile']] for r in rows[:9]}
+    links['Taisou_Npc0_Profile']=exercise['code']['symbols']['Taisou_Npc0_Profile']
+    links['af_hp_available']=old['code']['symbols']['af_hp_available']
+    new=[]
+    for family in report['family']:
+        stem=family['name'];r=FESTIVAL_PARTICIPANTS[stem]
+        new.append(dict(r,stem=stem,kind=2,part=3,flags=0,donor_profile=family['profile']))
+    rows.extend(new)
+    code=['#include "holiday_festival.h"','#include "actors.h"','#include "constants.h"']
+    code.extend('extern const ACTOR_PROFILE '+name+';' for name in links if name!='af_hp_available')
+    code.append('const AFHPRecord af_hp_records[AF_HP_OWNER_COUNT]={')
+    for r in rows:
+        code.append('{'+','.join(str(r[k]) for k in ('source','name','profile','event','save','count','part','kind'))+
+            ',&'+r['donor_profile']+','+str(r['flags'])+'},')
+    code.append('};')
+    mapping={r['source']+i:r['name']+i for r in new for i in range(r['count'])}
+    constants=generated['constants.h'];overrides=[]
+    for match in re.finditer(r'^#define (SP_NPC_EV_\w+) \(SP_NPC_START \+ (\d+)\)',constants,re.M):
+        source=0xD000+int(match[2])
+        if source in mapping:overrides.append(f'#undef {match[1]}\n#define {match[1]} 0x{mapping[source]:04X}')
+    if not overrides or not constants.endswith('#endif\n'):
+        raise ValueError('Missing complete festival role constants')
+    generated['constants.h']=constants[:-7]+'\n'.join(overrides)+'\n#endif\n'
+    for name,event in (('CHERRY_BLOSSOM_FESTIVAL',20),('HARVEST_MOON_FESTIVAL',43),
+            ('METEOR_SHOWER',37),('NEW_YEARS_EVE_COUNTDOWN',64),('SPORTS_FAIR_BALL_TOSS',12),
+            ('HARVEST_FESTIVAL',56)):
+        code.append(f'_Static_assert(mEv_EVENT_{name}=={event},"Source event {name}");')
+    generated['registry.c']='\n'.join(code)+'\n'
+    profiles={r['name']+i:r['profile'] for r in rows for i in range(r['count'])}
+    if sorted(profiles)!=list(range(0xD0A0,0xD0CD)):
+        raise ValueError('Incomplete contiguous participant spawn identities')
+    generated['spawn-data.c']=('#include "holiday_participants.h"\nconst s16 af_hp_spawn_profiles[45]={'
+        +','.join(str(profiles[n]) for n in sorted(profiles))+'};\n')
+    return dict(rows=rows,records=new,name_mapping=mapping,retained_profiles=links,
+        owner_count=22,resident_count=18,live_count=24,enabled=False),links
+
+
+def festival_bindings(base,prior):
+    """Bind existing complete services and pin the native motion/tool readers."""
+    symbols=(ROOT/'upstream/af/linker_scripts/jp/symbol_addrs_code.txt').read_text()
+    native_names={n:int(a,16) for n,a in re.findall(r'^(\w+) = 0x([0-9A-F]+);',symbols,re.M)}
+    extra={name:native_names[name] for name in ('Actor_info_fgName_search','mDemo_Check_SpeakerAble',
+        'mDemo_Get_OrderValue','mDemo_Set_OrderValue','mMsg_Get_base_window_p','mFI_GetPuleIdx',
+        'mFI_Wpos2BlockNum','mFI_BkNum2WposXZ','search_position_angleY','chase_angle')}
+    extra['af_hg_native_segment']=0x8009ADA8
+    links,services=bindings(base,prior,extra=extra)
+    events=prior['equipment_resources']['npc_extra']['events'];p=events['participants'];e=events['exercise']
+    for name in ('af_he_block_x','af_he_block_z','af_he_clock','af_he_npc_save',
+            'af_he_native_free_string','mFont_UnintToString','af_he_forget'):
+        links[name]=e['code']['symbols'][name]
+    for name in ('af_hp_actor_info','af_hp_countdown','af_hp_uniform',
+            'af_hp_native_resident_index','af_hp_native_resident_valid','af_hp_private'):
+        links[name]=p['code']['symbols'][name]
+    for name,address in e['bindings'].items():
+        if name.startswith(('af_hp_previous_','af_hp_world_previous_')):links[name]=address
+    links['af_v3_npc_extra_owned']=e['bindings']['af_v3_npc_extra_owned']
+    links.update(gamePT=0x8010EF90,af_load_display_name=0x80196044,
+        af_hg_previous_animation=p['code']['symbols']['af_hp_animation'])
+    files=by_vrom(base)
+    checks=(
+        (0x8C1B30,0x809DE340,((0x809DE50C,0x24040026),(0x809DE510,0x24050003))),
+        (0x8C4300,0x809E0B10,((0x809E0F74,0x2404002B),(0x809E115C,0x2404002B))),
+        (0x8C4F70,0x809E1780,((0x809E1934,0x24040023),(0x809E1938,0x24050003),
+            (0x809E1DF0,0x24040059))),
+        (0x9474F0,0x80A87260,((0x80A87500,0x00002825),(0x80A87568,0x00002825),
+            (0x80A87D48,0x2404005C),(0x80A87E3C,0x8D1900FC))),
+    )
+    for vrom,ram,words in checks:
+        data=files[vrom].extract(base)
+        if any(struct.unpack_from('>I',data,a-ram)[0]!=w for a,w in words):
+            raise ValueError('Changed native festival service consumer')
+    if files[0x9474F0].extract(base)[0x80A884F8-0x80A87260:0x80A884FC-0x80A87260]!=bytes((41,40,43,42)):
+        raise ValueError('Changed complete native ball-toss tool table')
+    if files[0x8C1B30].extract(base)[0x809DEB30-0x809DE340:0x809DEB34-0x809DE340]!=bytes((0x2F,0x31,0x32,0x33)):
+        raise ValueError('Changed complete native clap-sound table')
+    owner=files[0x8681F0].extract(base);ram=0x809735B0
+    if struct.unpack_from('>3i',owner,0x809821A4-ram)!=(-1,232,233):
+        raise ValueError('Changed native hand sub-animation directory')
+    spans=((0x80974270,0x809746BC),(0x809747BC,0x809749D0),(0x809749D8,0x80974CFC),
+        (0x80981974,0x809820CC),(0x809821A4,0x809821B0))
+    motion=dict(native_vrom=0x8681F0,native_ram=ram,
+        helpers=[dict(start=a,end=b,sha256=sha256(owner[a-ram:b-ram])) for a,b in spans],
+        original_animation_entry=owner[0x809749D0-ram:0x809749D8-ram].hex(),
+        hand_types=[0,1,2],mouth_info=234,retained_bank_release=True,complete_expressions=True)
+    return links,dict(native_services=services,native_consumers=checks,motion=motion)
+
+
+def prepare_festivals(output,lock):
+    """Convert all remaining ordinary festival actor bodies together.
+
+    Existing NPC resources, exercise storage, and source services stay shared.
+    An unresolved provider is reported by the partial link, not replaced by
+    a dummy implementation or admitted to the calendar.
+    """
+    from v3_furniture_install import inputs
+    out=output.resolve()
+    if out.exists() or not out.is_relative_to(ROOT/'build'):
+        raise ValueError('Use a fresh ignored preparation')
+    base,prior=inputs(lock)
+    source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+        (DONOR/'config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    generated,report=generate(source,family=FESTIVAL_FAMILY,
+        reference_sha=FESTIVAL_REFERENCES_SHA,extra_headers=FESTIVAL_HEADERS)
+    # Direct source field views are admitted against actual native consumers,
+    # including the tool's work2 word and the two independent hand pointers.
+    readers=(
+        (0x8C3210,0x809DFA20,((0x809DFE18,0x260207EC),
+            (0x809DFE64,0xA20807E6),(0x809DFE68,0xA20907E7))),
+        (0x8C4F70,0x809E1780,((0x809E1BDC,0x84F808CC),(0x809E1BD0,0x90EE0910))),
+        (0x9474F0,0x80A87260,((0x80A8739C,0x8CC70848),(0x80A874B8,0x8CC30860),
+            (0x80A8751C,0xAC6A01C4),(0x80A87584,0xAC6801C4))))
+    files=by_vrom(base)
+    for vrom,ram,words in readers:
+        data=files[vrom].extract(base)
+        if any(struct.unpack_from('>I',data,address-ram)[0]!=word for address,word in words):
+            raise ValueError('Changed native festival field consumer')
+    report['native_field_readers']=readers
+    substitutions=(
+        ('#include "holiday_participants.h"','#include "holiday_festival.h"'),
+        ('NPC_CLIP->save_proc','af_he_npc_save'),
+        ('NPC_CLIP->set_head_request_act_proc','af_hg_head'),
+        ('Common_Get(time.now_sec)','af_hg_seconds()'),
+        ('Common_Get(time.rtc_time.year)','af_he_clock()->year'),
+        ('Common_Get(time.rtc_time.min)','af_he_clock()->min'),
+        ('play->block_table.block_x','af_he_block_x(play)'),
+        ('play->block_table.block_z','af_he_block_z(play)'),
+        ('&play->game','play'),
+        ('&((GAME_PLAY*)gamePT)->actor_info','af_hp_actor_info(gamePT)'),
+        ('actor->timer--;','actor->timer = af_hp_countdown(actor->timer);'),
+        ('actor->fire_delay--;','actor->fire_delay = af_hp_countdown(actor->fire_delay);'),
+    )
+    for name,body in list(generated.items()):
+        if not name.endswith('.c'):continue
+        for before,after in substitutions:body=body.replace(before,after)
+        if 'Common_Get' in body or 'play->' in body:
+            raise ValueError('Unadapted complete festival context: '+name)
+        generated[name]=body
+    # Public service spellings remain confined to these new source units. Older
+    # participant code and its already-installed bindings are not recompiled.
+    adapter={
+        'mDemo_Set_msg_num':'af_hg_message',
+        'af_hp_continue_message':'af_hg_continue_message',
+        'mEv_check_status':'af_hg_event_status','mEv_set_status':'af_hg_event_set',
+        'mNpc_GetSameEventNpc':'af_hg_event_resident',
+        'mNpc_GetNpcWorldName':'af_hg_world_name','mMsg_Set_free_str':'af_hg_free_string',
+        'af_hp_tools_clip':'(&af_hg_tools_services)',
+        'eEC_CLIP':'(&af_hg_effect_services)','sAdo_OngenPos':'af_hg_sound',
+    }
+    # Undefine the shared macros only after their original declarations.
+    overrides='\n'.join('#undef '+a+'\n#define '+a+' '+b for a,b in adapter.items())+'\n'
+    for name in FESTIVAL_FAMILY:
+        key=name+'.c';marker='#include "actors.h"\n'
+        generated[key]=generated[key].replace(marker,marker+overrides+
+            '#pragma GCC diagnostic ignored "-Wunused-variable"\n'
+            '#pragma GCC diagnostic ignored "-Wmissing-field-initializers"\n',1)
+        generated[key]=generated[key].replace(
+            '(((mActor_name_t)(actorx->npc_id - SP_NPC_EV_TAMAIRE_1) >> 1) & 1 ^ 1)',
+            '((((mActor_name_t)(actorx->npc_id - SP_NPC_EV_TAMAIRE_1) >> 1) & 1) ^ 1)')
+    report['motions']=native_motions(source,base,generated,import_missing=True)
+    report['registry'],retained=festival_registry(prior,report,generated)
+    links,report['native_bindings']=festival_bindings(base,prior)
+    links.update(retained)
+    roots={*range(6430,6520),*range(0x1EA1,0x1EFB),*range(0x3F37,0x3F91),
+        *range(7507,7633),*range(7769,7841)}
+    roots.update(n for first in (15512,15543,15419,15450,15481,15574) for n in range(first,first+12))
+    roots.update(n for first in (0x3CA4,0x3CC3,0x3C47,0x3C66,0x3C85,0x3CE2) for n in range(first,first+3))
+    report['dialogue']=dialogue(base,prior,generated,roots=roots,map_symbol='af_hg_message_index',festival_controls=True)
+    for stem in FESTIVAL_FAMILY:
+        body=generated[stem+'.c'];types=re.findall(r'\bsizeof\((\w+_ACTOR)\)',body)
+        types=sorted(set(types))
+        if len(types)!=1:raise ValueError('Missing complete festival actor size: '+stem)
+        body+=f'\n_Static_assert(sizeof({types[0]})<=2400,"Native pool bound: {stem}");\n'
+        body+=f'const unsigned int af_hg_bytes_{stem}=sizeof({types[0]});\n'
+        generated[stem+'.c']=body
+    out.mkdir(parents=True)
+    for name,body in generated.items():
+        write_new(out/name,body if isinstance(body,bytes) else body.encode())
+    docker=['docker','run','--rm','--network','none','--user',f'{os.getuid()}:{os.getgid()}',
+        '-v',f'{ROOT}:/source:ro','-v',f'{out}:/out','-w','/out','--entrypoint']
+    def run(tool,*args):
+        return subprocess.run(docker+['/n64_toolchain/bin/mips64-elf-'+tool,IMAGE,*args],
+            text=True,capture_output=True,check=True,timeout=60).stdout
+    flags=['-c','-Os','-EB','-mabi=32','-march=vr4300','-mfix4300','-G0','-mno-abicalls',
+        '-fno-pic','-ffreestanding','-fno-builtin','-fno-common','-fno-stack-protector',
+        '-ffunction-sections','-fdata-sections','-fstack-usage','-Wall','-Wextra','-Werror',
+        '-I/source/overlays/v3','-I/out','-DAF_HP_EXERCISE_REGISTRY','-DAF_HP_FESTIVAL_REGISTRY']
+    modules=[name for name in generated if name.endswith(('.c','.S'))]
+    modules.extend('/source/overlays/v3/holiday_festival_'+part+'.c' for part in ('native','motion'))
+    modules.extend('/source/overlays/v3/holiday_participants_'+part+'.c'
+        for part in ('registry','services','storage','world'))
+    modules.append('/source/overlays/v3/holiday_participants_spawn.S')
+    run('gcc',*flags,*modules)
+    run('ld','-EB','-r',*(f'--defsym={n}=0x{v:X}' for n,v in links.items()),
+        *(Path(name).stem+'.o' for name in modules),'-o','festivals.o')
+    report.update(category='complete-festival-participants',base_sha256=sha256(base),
+        base_abi=prior['runtime_abi'],bindings=links,
+        unbound_services=run('nm','--undefined-only','festivals.o').strip().splitlines(),
+        object=dict(sha256=sha256((out/'festivals.o').read_bytes()),compiler=IMAGE,flags=flags,
+            size=run('size','festivals.o'),linked=False),
+        sources={p:sha256((ROOT/p).read_bytes()) for p in (
+            'tools/v3_holiday_participants.py','overlays/v3/holiday_festival.h',
+            'overlays/v3/holiday_festival_native.c','overlays/v3/holiday_festival_motion.c',
+            'overlays/v3/holiday_participants_registry.c','overlays/v3/holiday_participants_services.c',
+            'overlays/v3/holiday_participants_storage.c','overlays/v3/holiday_participants_world.c',
+            'overlays/v3/holiday_participants_spawn.S','overlays/v3/holiday_participants.h',
+            'tools/v3_keyframes.py','tools/v3_registry.py')})
+    write_new(out/'prepared.json',(json.dumps(report,indent=2)+'\n').encode())
+    return report
+
+
 def prepare(output,lock,reuse=None):
     out=output.resolve()
     if out.exists() or not out.is_relative_to(ROOT/'build'):raise ValueError('Use a fresh ignored preparation')
@@ -1321,9 +1635,12 @@ if __name__=='__main__':
     p.add_argument('--build-lock',type=Path,required=True)
     p.add_argument('--reuse',type=Path,help='Reuse identical complete rope conversion from a prior preparation')
     p.add_argument('--exercise',action='store_true',help='Prepare the complete exercise actor/card family using the same source importer')
+    p.add_argument('--festivals',action='store_true',help='Prepare all remaining ordinary festival participant families together')
     args=p.parse_args()
+    if args.exercise and args.festivals:p.error('Select one complete participant family')
     try:
-        result=prepare_exercise(args.output,args.build_lock) if args.exercise else prepare(args.output,args.build_lock,args.reuse)
+        result=(prepare_festivals(args.output,args.build_lock) if args.festivals else
+            prepare_exercise(args.output,args.build_lock) if args.exercise else prepare(args.output,args.build_lock,args.reuse))
     except subprocess.CalledProcessError as e:
         print(e.stderr);raise
     print(json.dumps(dict(family=len(result['family']),object=result['object'],

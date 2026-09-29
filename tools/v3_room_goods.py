@@ -373,6 +373,12 @@ def publish_bootstrap(equipment,blob,surface,output):
                     raise ValueError('Changed shared native-character startup reservation')
                 sky_bytes+=batch['bytes']
             for batch in npc_extra.get('source_batches',[]):
+                if batch.get('packet_id'):
+                    separate=npc_extra['events'].get('festivals')
+                    if (not separate or batch['packet_id']!=separate['packet']['id'] or
+                            any(batch[k]!=separate['packet'][k] for k in ('ram','bytes','sha256'))):
+                        raise ValueError('Changed separately loaded source-character batch')
+                    continue
                 if (not batch['installed'] or batch['ram']!=SKY_RAM+sky_bytes or
                         batch['ram']+batch['bytes']>0x807DA800 or batch['bytes']&15):
                     raise ValueError('Changed complete source-character startup reservation')
@@ -384,6 +390,16 @@ def publish_bootstrap(equipment,blob,surface,output):
                 raise ValueError('Changed complete sky-effect startup packet')
             extra+=tuple(f'AF_HOLIDAY_SKY_{label}=0x{sp[key]:X}u' for label,key in
                 (('PHYSICAL','physical'),('CRC','crc32'),('BYTES','bytes'),('RAM','ram')))
+            festivals=npc_extra['events'].get('festivals')
+            if festivals:
+                fp=festivals['packet']
+                if (not festivals['installed'] or fp['ram']!=SKY_RAM+sky_bytes or
+                        fp['bytes']!=festivals['bytes'] or fp['ram']+fp['bytes']>0x807DA800 or
+                        fp['physical']&15 or fp['bytes']&15 or fp['storage']!='physical-ROM' or
+                        not 0x100000<=fp['physical']<fp['physical']+fp['bytes']<=0x4000000):
+                    raise ValueError('Changed separately loaded complete festival packet')
+                extra+=tuple(f'AF_HOLIDAY_FESTIVALS_{label}=0x{fp[key]:X}u' for label,key in
+                    (('PHYSICAL','physical'),('CRC','crc32'),('BYTES','bytes'),('RAM','ram')))
         if (not npc_extra or p['ram']!=HOLIDAY_RAM or p['bytes']!=size or p['physical']&15 or
                 p['storage']!='physical-ROM' or not 0x100000<=p['physical']<p['physical']+p['bytes']<=0x4000000):
             raise ValueError('Changed complete holiday-state startup packet')
@@ -396,6 +412,9 @@ def publish_bootstrap(equipment,blob,surface,output):
         f'AF_ROOM_GOODS_BYTES=0x{packet["bytes"]:X}u',*extra),link_symbols=(
             {'af_surface_npc_init':npc_extra['code']['symbols']['af_v3_npc_dma_init']} if npc_extra else None))
     if len(boot)>BOOT_END-BOOT:raise ValueError('Combined surface/goods startup exceeds its reservation')
+    compiled['packet_stride']=16
+    compiled['packet_count']=2+sum(name.endswith('_BYTES') for name in
+        (define.split('=',1)[0] for define in extra))
     begin,end=BOOT-equipment['ram'],BOOT_END-equipment['ram']
     previous=items['bootstrap']['code']
     if (sha256(module[begin:begin+previous['bytes']])!=previous['sha256'] or

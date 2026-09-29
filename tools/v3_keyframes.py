@@ -99,6 +99,44 @@ def npc_motion(source,address,*,joints=None):
     return row
 
 
+def npc_expression_motion(source,address,*,joints=None):
+    """Complete NPC curves with fixed eye/mouth programmes and scalar effects.
+
+    Preserve all sixty-four control bytes and every expression frame. Separate
+    effect/audio programmes still require their own converter. The installer
+    must map nonnegative source effect identities before native admission.
+    """
+    row=_animation(source,address,joints=joints,record_bytes=64)
+    raw=source.data[address:address+64];pointers=source.pointers(address+20,44)
+    if set(pointers)-{address+36,address+44}:
+        raise ValueError('NPC expression motion has unsupported dependent programmes')
+    if any(raw[at:at+4]!=bytes(4) for at in (36,44,56,60)):
+        raise ValueError('NPC expression motion has unexpected pointer storage')
+    start,end,mode,morph=struct.unpack_from('>ffif',raw,20)
+    eye,eye_stop,mouth,mouth_stop,feel_frame,feel=(
+        *struct.unpack_from('>hh',raw,40),*struct.unpack_from('>hhhh',raw,48))
+    if (not all(math.isfinite(v) for v in (start,end,morph)) or mode not in (0,1) or
+            not 0<=start<=end<=row['duration'] or eye not in (-1,0,1,2) or
+            mouth not in (-1,0,1,2) or not -1<=eye_stop<8 or not -1<=mouth_stop<8 or
+            feel_frame < -1 or feel < -1):
+        raise ValueError('Unsupported complete NPC expression controls')
+    expressions={}
+    for label,offset in (('eye',36),('mouth',44)):
+        if address+offset not in pointers:
+            if (eye_stop if label=='eye' else mouth_stop)<0:
+                raise ValueError('Negative fixed expression without a frame programme')
+            continue
+        data,receipt=resource(source,pointers[address+offset])
+        if len(data)<row['duration'] or any(value>7 for value in data):
+            raise ValueError('Incomplete or unrepresentable NPC expression programme')
+        expressions[label]=receipt
+    row['npc_expressions']=dict(start=start,end=end,mode=mode,morph=morph,
+        eye_type=eye,eye_stop=eye_stop,mouth_type=mouth,mouth_stop=mouth_stop,
+        feel_frame=feel_frame,source_effect=feel,programmes=expressions,
+        native_effect_mapping_required=feel>=0)
+    return row
+
+
 def skeleton(source, address):
     raw, header = resource(source, address, size=8, pointers=True)
     pointers = source.pointers(address, 8)
@@ -149,19 +187,23 @@ def compile_animations(source, descriptions, *, start=0,address_base=SEGMENT):
     checked = {}
     for row in descriptions:
         at = row['header']['donor_offset']
-        describe=npc_motion if 'npc' in row else animation
+        describe=(npc_expression_motion if 'npc_expressions' in row else
+            npc_motion if 'npc' in row else animation)
         if at in checked or row != describe(source, at, joints=row['joints']):
             raise ValueError('Duplicate or changed animation description')
         checked[at] = row
     output, offsets, arrays = bytearray(), {}, []
-    for at in sorted({r['donor_offset'] for row in checked.values() for r in row['arrays'].values() if r}):
+    resources={r['donor_offset'] for row in checked.values() for r in row['arrays'].values() if r}
+    resources.update(r['donor_offset'] for row in checked.values()
+        for r in row.get('npc_expressions',{}).get('programmes',{}).values())
+    for at in sorted(resources):
         raw, receipt = resource(source, at)
         output.extend(bytes(-len(output)%4)); offsets[at] = start+len(output)
         output.extend(raw)
         arrays.append(dict(**receipt, native_offset=offsets[at], output_sha256=sha256(raw)))
     headers, relocations = [], []
     for at, row in sorted(checked.items()):
-        raw, _ = resource(source, at, size=64 if 'npc' in row else 20, pointers=True)
+        raw, _ = resource(source, at, size=64 if 'npc' in row or 'npc_expressions' in row else 20, pointers=True)
         fixed = bytearray(raw)
         output.extend(bytes(-len(output)%4)); header_at = start+len(output)
         for i, label in enumerate(CHANNELS):
@@ -171,6 +213,13 @@ def compile_animations(source, descriptions, *, start=0,address_base=SEGMENT):
             if address_base+target>0xFFFFFFFF:raise ValueError('Animation pointer overflows its address space')
             struct.pack_into('>I', fixed, i*4, address_base+target)
             relocations.append(dict(offset=header_at+i*4, target_offset=target))
+        for label,offset in (('eye',36),('mouth',44)):
+            programme=row.get('npc_expressions',{}).get('programmes',{}).get(label)
+            if programme:
+                target=offsets[programme['donor_offset']]
+                if address_base+target>0xFFFFFFFF:raise ValueError('Expression pointer overflows its address space')
+                struct.pack_into('>I',fixed,offset,address_base+target)
+                relocations.append(dict(offset=header_at+offset,target_offset=target))
         output.extend(fixed)
         headers.append(dict(**row['header'], native_offset=header_at, output_sha256=sha256(fixed),
                             joints=row['joints'], duration=row['duration']))

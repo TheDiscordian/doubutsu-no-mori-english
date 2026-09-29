@@ -1534,6 +1534,8 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         sky=npc['events'].get('sky') and not prior['equipment_resources']['npc_extra']['events'].get('sky')
         participants=npc['events'].get('participants') and not prior['equipment_resources']['npc_extra']['events'].get('participants')
         exercise=npc['events'].get('exercise') and not prior['equipment_resources']['npc_extra']['events'].get('exercise')
+        festivals=(npc['events'].get('festivals')
+            if not prior['equipment_resources']['npc_extra']['events'].get('festivals') else None)
         item_controls=(equipment_report.get('holiday_items',{}).get('controls')
             if not prior['equipment_resources'].get('holiday_items',{}).get('controls') else None)
         report['shared_runtime_refresh'].update(adapters=['holiday_actor_services'],artwork_changed=bool(decorations or event_items or sky or participants or exercise),
@@ -1547,6 +1549,11 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             'and connected diary gameplay/save verification')
         if exercise:
             report['native_test']='pending calendar behaviour choice/admission and connected diary/exercise gameplay/save verification'
+        if festivals:
+            report['shared_runtime_refresh']['additional_resident_bytes']+=festivals['additional_resident_bytes']
+            report['shared_runtime_refresh']['resource_allocations_changed']=True
+            report['shared_runtime_refresh']['artwork_changed']=True
+            report['native_test']='pending complete actor/service admission, diary selection, and connected festival/diary gameplay/save verification'
         if item_controls:
             report['shared_runtime_refresh']['additional_resident_bytes']+=item_controls['additional_resident_bytes']
             report['shared_runtime_refresh']['resource_allocations_changed']=True

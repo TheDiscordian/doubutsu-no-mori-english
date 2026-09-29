@@ -41,8 +41,12 @@ def retire_packet_copies(rom,prior,copies):
     at=e['blob_offset']+boot['symbols']['packets']-e['ram']
     # This API belongs to the installed shared nineteen-packet owner. Refuse an
     # unrelated startup shape instead of interpreting arbitrary words as rows.
-    if boot['bytes']!=688:raise ValueError('Changed complete startup packet reader')
-    live=[struct.unpack_from('>5I',blob,at+i*20)[:3] for i in range(19)]
+    stride=boot.get('packet_stride',20);count=boot.get('packet_count',19)
+    if (stride not in (16,20) or not 1<=count<=32 or
+            (stride==20 and boot['bytes']!=688) or
+            not 0<=boot['symbols']['packets']-0x804A8D40<=boot['bytes']-count*stride):
+        raise ValueError('Changed complete startup packet reader')
+    live=[struct.unpack_from('>3I',blob,at+i*stride) for i in range(count)]
     retired=[];seen=set()
     for old,current in copies:
         row=next((r for r in records if r['id']==old['id']),None)

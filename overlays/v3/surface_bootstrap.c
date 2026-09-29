@@ -64,6 +64,9 @@ static const u32 holiday_state_crc=AF_HOLIDAY_STATE_CRC;
 #ifdef AF_HOLIDAY_SKY_PHYSICAL
 static const u32 holiday_sky_crc=AF_HOLIDAY_SKY_CRC;
 #endif
+#ifdef AF_HOLIDAY_FESTIVALS_PHYSICAL
+static const u32 holiday_festivals_crc=AF_HOLIDAY_FESTIVALS_CRC;
+#endif
 
 #ifdef __mips__
 #define DEST(name,address) ((void *)(address))
@@ -80,6 +83,7 @@ extern unsigned char af_test_diary_items[];
 extern unsigned char af_test_npc_extra[];
 extern unsigned char af_test_holiday_state[];
 extern unsigned char af_test_holiday_sky[];
+extern unsigned char af_test_holiday_festivals[];
 #define DEST(name,address) (af_test_##name)
 #define CLEAR(name,address) (&af_test_##name)
 #endif
@@ -88,59 +92,61 @@ struct StartupPacket {
     void *destination;
     u32 source,bytes;
     const u32 *crc;
-    volatile u32 *clear;
 };
 static const struct StartupPacket packets[]={
-    {DEST(surface_memory,0x804BC000u),AF_SURFACE_ITEMS_VROM,AF_SURFACE_ITEMS_BYTES,&af_v3_surface_crc_expected,0},
+    {DEST(surface_memory,0x804BC000u),AF_SURFACE_ITEMS_VROM,AF_SURFACE_ITEMS_BYTES,&af_v3_surface_crc_expected},
 #ifdef AF_ROOM_GOODS_VROM
-    {DEST(goods_code,0x804D9000u),AF_ROOM_GOODS_VROM,AF_ROOM_GOODS_BYTES,&goods_crc,CLEAR(goods_magic,0x804DC000u)},
+    {DEST(goods_code,0x804D9000u),AF_ROOM_GOODS_VROM,AF_ROOM_GOODS_BYTES,&goods_crc},
 #endif
 #ifdef AF_ROOM_CARRY_VROM
-    {DEST(carry_code,0x804DA000u),AF_ROOM_CARRY_VROM,AF_ROOM_CARRY_BYTES,&carry_crc,CLEAR(carry_magic,0x804DC400u)},
+    {DEST(carry_code,0x804DA000u),AF_ROOM_CARRY_VROM,AF_ROOM_CARRY_BYTES,&carry_crc},
 #endif
 #ifdef AF_PLAYER_EXERCISE_VROM
-    {DEST(exercise_code,0x804CE000u),AF_PLAYER_EXERCISE_VROM,AF_PLAYER_EXERCISE_BYTES,&exercise_crc,0},
+    {DEST(exercise_code,0x804CE000u),AF_PLAYER_EXERCISE_VROM,AF_PLAYER_EXERCISE_BYTES,&exercise_crc},
 #endif
 #ifdef AF_CONSOLE_STORAGE_VROM
-    {DEST(console_code,0x804DE200u),AF_CONSOLE_STORAGE_VROM,AF_CONSOLE_STORAGE_BYTES,&storage_crc,0},
+    {DEST(console_code,0x804DE200u),AF_CONSOLE_STORAGE_VROM,AF_CONSOLE_STORAGE_BYTES,&storage_crc},
 #endif
 #ifdef AF_CONSOLE_IMAGES_VROM
-    {DEST(console_images,0x804F9020u),AF_CONSOLE_IMAGES_VROM,AF_CONSOLE_IMAGES_BYTES,&images_crc,0},
+    {DEST(console_images,0x804F9020u),AF_CONSOLE_IMAGES_VROM,AF_CONSOLE_IMAGES_BYTES,&images_crc},
 #endif
 #ifdef AF_CONSOLE_DISK_VROM
-    {DEST(console_disk,0x80630000u),AF_CONSOLE_DISK_VROM,AF_CONSOLE_DISK_BYTES,&disk_crc,0},
+    {DEST(console_disk,0x80630000u),AF_CONSOLE_DISK_VROM,AF_CONSOLE_DISK_BYTES,&disk_crc},
 #endif
 #ifdef AF_CREATURE_ITEMS_VROM
-    {DEST(creature_code,0x804FF100u),AF_CREATURE_ITEMS_VROM,AF_CREATURE_ITEMS_BYTES,&af_v3_creature_items_crc_expected,0},
+    {DEST(creature_code,0x804FF100u),AF_CREATURE_ITEMS_VROM,AF_CREATURE_ITEMS_BYTES,&af_v3_creature_items_crc_expected},
 #endif
 #ifdef AF_CREATURE_FIELD_VROM
-    {DEST(creature_field,0x80647000u),AF_CREATURE_FIELD_VROM,AF_CREATURE_FIELD_BYTES,&field_crc,0},
+    {DEST(creature_field,0x80647000u),AF_CREATURE_FIELD_VROM,AF_CREATURE_FIELD_BYTES,&field_crc},
 #endif
 #ifdef AF_FISH_WORLD_VROM
-    {DEST(fish_world,0x8064A000u),AF_FISH_WORLD_VROM,AF_FISH_WORLD_BYTES,&af_v3_fish_world_crc_expected,0},
+    {DEST(fish_world,0x8064A000u),AF_FISH_WORLD_VROM,AF_FISH_WORLD_BYTES,&af_v3_fish_world_crc_expected},
 #endif
 #ifdef AF_INSECT_PHYSICAL
-    {DEST(insect_code,AF_INSECT_RAM),AF_INSECT_PHYSICAL|0x80000000u,AF_INSECT_BYTES,&af_v3_insect_crc_expected,0},
+    {DEST(insect_code,AF_INSECT_RAM),AF_INSECT_PHYSICAL|0x80000000u,AF_INSECT_BYTES,&af_v3_insect_crc_expected},
 #endif
 #ifdef AF_CLOTHING_VROM
-    {DEST(clothing_code,AF_CLOTHING_RAM),AF_CLOTHING_VROM,AF_CLOTHING_BYTES,&af_v3_clothing_crc_expected,0},
+    {DEST(clothing_code,AF_CLOTHING_RAM),AF_CLOTHING_VROM,AF_CLOTHING_BYTES,&af_v3_clothing_crc_expected},
 #endif
 #ifdef AF_DIARY_STORAGE_PHYSICAL
-    {DEST(diary_storage,AF_DIARY_STORAGE_RAM),AF_DIARY_STORAGE_PHYSICAL|0x80000000u,AF_DIARY_STORAGE_BYTES,&diary_storage_crc,0},
-    {DEST(diary_ui,AF_DIARY_UI_RAM),AF_DIARY_UI_PHYSICAL|0x80000000u,AF_DIARY_UI_BYTES,&diary_ui_crc,0},
-    {DEST(diary_art,AF_DIARY_ART_RAM),AF_DIARY_ART_PHYSICAL|0x80000000u,AF_DIARY_ART_BYTES,&diary_art_crc,0},
+    {DEST(diary_storage,AF_DIARY_STORAGE_RAM),AF_DIARY_STORAGE_PHYSICAL|0x80000000u,AF_DIARY_STORAGE_BYTES,&diary_storage_crc},
+    {DEST(diary_ui,AF_DIARY_UI_RAM),AF_DIARY_UI_PHYSICAL|0x80000000u,AF_DIARY_UI_BYTES,&diary_ui_crc},
+    {DEST(diary_art,AF_DIARY_ART_RAM),AF_DIARY_ART_PHYSICAL|0x80000000u,AF_DIARY_ART_BYTES,&diary_art_crc},
 #endif
 #ifdef AF_DIARY_ITEMS_PHYSICAL
-    {DEST(diary_items,AF_DIARY_ITEMS_RAM),AF_DIARY_ITEMS_PHYSICAL|0x80000000u,AF_DIARY_ITEMS_BYTES,&diary_items_crc,0},
+    {DEST(diary_items,AF_DIARY_ITEMS_RAM),AF_DIARY_ITEMS_PHYSICAL|0x80000000u,AF_DIARY_ITEMS_BYTES,&diary_items_crc},
 #endif
 #ifdef AF_NPC_EXTRA_PHYSICAL
-    {DEST(npc_extra,AF_NPC_EXTRA_RAM),AF_NPC_EXTRA_PHYSICAL|0x80000000u,AF_NPC_EXTRA_BYTES,&npc_extra_crc,0},
+    {DEST(npc_extra,AF_NPC_EXTRA_RAM),AF_NPC_EXTRA_PHYSICAL|0x80000000u,AF_NPC_EXTRA_BYTES,&npc_extra_crc},
 #endif
 #ifdef AF_HOLIDAY_STATE_PHYSICAL
-    {DEST(holiday_state,AF_HOLIDAY_STATE_RAM),AF_HOLIDAY_STATE_PHYSICAL|0x80000000u,AF_HOLIDAY_STATE_BYTES,&holiday_state_crc,0},
+    {DEST(holiday_state,AF_HOLIDAY_STATE_RAM),AF_HOLIDAY_STATE_PHYSICAL|0x80000000u,AF_HOLIDAY_STATE_BYTES,&holiday_state_crc},
 #endif
 #ifdef AF_HOLIDAY_SKY_PHYSICAL
-    {DEST(holiday_sky,AF_HOLIDAY_SKY_RAM),AF_HOLIDAY_SKY_PHYSICAL|0x80000000u,AF_HOLIDAY_SKY_BYTES,&holiday_sky_crc,0},
+    {DEST(holiday_sky,AF_HOLIDAY_SKY_RAM),AF_HOLIDAY_SKY_PHYSICAL|0x80000000u,AF_HOLIDAY_SKY_BYTES,&holiday_sky_crc},
+#endif
+#ifdef AF_HOLIDAY_FESTIVALS_PHYSICAL
+    {DEST(holiday_festivals,AF_HOLIDAY_FESTIVALS_RAM),AF_HOLIDAY_FESTIVALS_PHYSICAL|0x80000000u,AF_HOLIDAY_FESTIVALS_BYTES,&holiday_festivals_crc},
 #endif
 };
 
@@ -156,7 +162,12 @@ int af_v3_surface_init(void) {
         if (status || af_surface_crc(p->destination,p->bytes)!=*(volatile const u32 *)p->crc) return 0;
         af_surface_writeback(p->destination,p->bytes);
         af_surface_invalidate(p->destination,p->bytes);
-        if (p->clear) *p->clear=0;
+#ifdef AF_ROOM_GOODS_VROM
+        if (p->destination==DEST(goods_code,0x804D9000u)) *CLEAR(goods_magic,0x804DC000u)=0;
+#endif
+#ifdef AF_ROOM_CARRY_VROM
+        if (p->destination==DEST(carry_code,0x804DA000u)) *CLEAR(carry_magic,0x804DC400u)=0;
+#endif
     }
 #ifdef AF_NPC_EXTRA_PHYSICAL
 #ifdef __mips__

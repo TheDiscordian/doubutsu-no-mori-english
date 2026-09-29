@@ -31,9 +31,9 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
-The current proposal is ABI 349 at
-`build/v3-diary-category-work-01/calendar-connected-07/build-lock.json`, ROM SHA-256
-`4dba5be99af745e89a9d729f3a9e87377ee0922506be31d74297be9b4bc4d37f`.
+The current proposal is ABI 350 at
+`build/v3-diary-category-work-01/festivals-installed-06/build-lock.json`, ROM SHA-256
+`aebd85e0027529acb2a7168056c3b12d82aa3d9dc6eb855a624c491276a88069`.
 It contains 191 independently selectable development imports, including all nine
 fish and eight insects, and 100 inactive furniture profiles whose acquisition
 is pending, plus sixteen inactive diary cover profiles. The main lock and both
@@ -165,8 +165,32 @@ is unchanged. Current physical-resource/startup checks and compilation pass.
 The existing connected calendar/attendance host check passes the changed
 scheduler's donor route; native execution and the alternative route are not
 claimed. The setting remains unexposed while actor admission is unfinished.
-Continue the remaining shared participant families and complete actor/service
-admission in this same category, then expose the setting and diary selection. Do not restart the
+The remaining five ordinary festival families are installed together from
+`festivals-prepared-04/`: ten complete cherry-blossom, moon/meteor, countdown,
+ball-toss, and Harvest actor implementations. All 558 official English messages
+are mapped, including 125 timed endings. Complete encoded equality and existing
+official credits allow reuse of 372 installed records; 186 additional records
+have credits in the same provenance catalogue. No wording, page breaks, or
+timing is shortened to fit storage.
+
+One 22-owner registry supplies all old and new participants through 68 checked
+public-entry redirects. Native head movement, clocks, resident names, tools,
+effects, and sound calls are bound. Three complete additional motions retain
+their curves and eye/mouth/feeling programmes, with ordinary hand/mouth bank
+release preserved. The native animation entry retains the existing fallback.
+The 43,824-byte festival packet loads separately beside the 167,904-byte prefix
+at contiguous RAM addresses. Compact startup descriptors fit all twenty packets
+in 676 bytes inside the existing 688-byte reservation. One verified obsolete
+102,352-byte packet is reclaimed only in the new output image; original files
+and saves remain untouched. No save-format or profile change is introduced.
+
+Ten shared keyframe checks, six provenance checks, and the existing sanitized
+startup check pass. Current-ROM verification covers all physical resources,
+twenty packet CRCs, 68 redirects, native motion hook/unchanged relocations, actor
+bounds, packet guards, and inactive admission. The builder reconstructs the ROM
+from its UPS patch. These are not native gameplay or hardware results.
+Continue complete actor/service admission in this same category, then expose
+the setting and diary selection. Do not restart the
 exhausted native fixture or new-harness budget. No diary is selectable, and both
 stable V2-14 patcher deployments remain unchanged.
 

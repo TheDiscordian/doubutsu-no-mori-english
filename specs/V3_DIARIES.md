@@ -1256,6 +1256,39 @@ gameplay or persistence checks. Continue calendar behaviour selection and comple
 actor/service admission, then diary selection. Native fixture and new-harness
 budgets remain exhausted for this same connected diary category.
 
+### Complete ordinary festival participants
+
+`tools/v3_holiday_participants.py --festivals` converts all ten remaining
+ordinary actor units together, following every source include and function.
+Their fixed profiles are `E6..EF`, names `D0B4..D0CC`; the full shared registry
+contains 22 owners, 18 resident slots, and 24 live actor slots. The original
+registry and exercise public functions redirect into this one state pool.
+Existing native callbacks, special actors, and imported profiles retain stable
+entry addresses. The existing animation implementation remains the native/prayer
+fallback; it is not redirected into itself.
+
+Three unmatched full NPC motions use virtual IDs 328–330. Conversion preserves
+the complete 64-byte motion header, all curves, eye/mouth programmes, and feeling
+frame/type. The native initializer intercepts these IDs before the original bank
+directory. Native hand motions 232/233 and talking mouth 234 retain normal bank
+reference acquisition/release; imported main motions use bank index `-1`.
+
+All 558 official source messages are mapped, including timed endings and NPC
+sound orders. The shared converter reuses a leaf message only when its complete
+encoded bytes match an installed record with matching official provenance.
+Branching messages still receive remapped additive identities. There are 372
+reused records and 186 new records; the single provenance catalogue supplies all
+credits. These figures describe dialogue records, not completed diary imports.
+
+The current festival packet is 43,824 bytes at `80760FE0`, directly after the
+167,904-byte sky/participant/exercise/calendar prefix in RAM. Physical ROM
+storage is separate to avoid another full duplicate in fragmented space.
+Twenty sixteen-byte startup descriptors and their checksum words fit in a
+676-byte loader inside the existing 688-byte reservation. Both transfers are
+checked before native initialization. An obsolete 102,352-byte prefix copy is
+reclaimed only after validating its loaded replacement. Format 15 and profile
+bits are unchanged. Admission remains off until event/diary selection is bound.
+
 ### Reserved layouts and dedicated owners
 
 `tools/v3_holiday_maps.py` converts the complete donor event-layout graph and
@@ -1726,7 +1759,7 @@ All 27 card/storage exports retain their previous addresses through checked
 redirects. Format-14-or-earlier V3 and V2 cannot read new format-15 saves.
 
 The controls installation is retained in `calendar-connected-07/`, ABI 349. Its
-155,136-byte packet contains the complete retained participant family, a
+155,136-byte controls prefix contains the complete retained participant family, a
 1,728-byte menu adapter, and a 10,256-byte storage adapter; it retains nineteen
 startup descriptors. Current-ROM redirect/prefix/CRC checks and existing
 compression/fishing-storage host checks pass. Those host checks do not exercise

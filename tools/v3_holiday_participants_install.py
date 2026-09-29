@@ -19,12 +19,13 @@ SOURCES=('tools/v3_holiday_participants_install.py','overlays/v3/holiday_partici
 SOURCES+=('tools/v3_room_effects.py','tools/v3_holiday_sky.py')
 SOURCES+=('tools/v3_holiday_active.py','overlays/v3/holiday_dispatch_native.c')
 SOURCES+=('tools/v3_npc_registry.py','overlays/v3/npc_stream_draw.c')
+SOURCES+=('overlays/v3/surface_bootstrap.c',)
 
 
 def link(directory,prepared,output,*,object_name='participants',ram=RAM):
     """Link the checked prepared object, retaining every function and asset."""
     output.mkdir()
-    if object_name not in ('participants','exercise') or ram&15 or not RAM<=ram<0x807DA800:
+    if object_name not in ('participants','exercise','festivals') or ram&15 or not RAM<=ram<0x807DA800:
         raise ValueError('Invalid shared participant object/address')
     raw=(directory/(object_name+'.o')).read_bytes()
     if prepared['object']['sha256']!=sha256(raw) or prepared['unbound_services']:
@@ -80,6 +81,8 @@ def install(base,prior,blob,core,output,directory):
         if sha256((ROOT/path).read_bytes())!=digest:raise ValueError('Changed participant preparation source: '+path)
     if prepared.get('category')=='complete-exercise-card':
         return install_exercise(base,prior,blob,core,output,directory,prepared)
+    if prepared.get('category')=='complete-festival-participants':
+        return install_festivals(base,prior,blob,core,output,directory,prepared)
     equipment=copy.deepcopy(prior['equipment_resources']);npc=equipment['npc_extra'];events=npc['events']
     if not events.get('sky') or events.get('participants'):raise ValueError('Participants need the complete sky baseline')
     work=output/'holiday-participants';work.mkdir();data,code=link(directory,prepared,work/'linked')
@@ -450,6 +453,128 @@ def install_exercise(base,prior,blob,core,output,directory,prepared):
     write_new(work/'installed.json',(json.dumps(report,indent=2)+'\n').encode())
     write_new(work/'packet.bin',combined);write_new(work/'registry.bin',registry)
     return e,{},updates,writes
+
+
+def install_festivals(base,prior,blob,core,output,directory,prepared):
+    """Extend the one resident registry with all five complete festival families."""
+    del blob
+    from v3_console_disk_install import reservations
+    from v3_event_text import patch_bounds
+    from v3_holiday_dialogue import check_provenance
+    from v3_import_storage import jump
+    from v3_npc_draw import relocation_offsets
+    import v3_physical_resources as physical
+    e=copy.deepcopy(prior['equipment_resources']);npc=e['npc_extra'];events=npc['events']
+    if events.get('festivals') or not events.get('calendar') or prior['save_codec']['format_version']!=15:
+        raise ValueError('Festival participants need the current complete calendar proposal')
+    work=output/'holiday-festivals';work.mkdir()
+    old=copy.deepcopy(events['sky']['packet']);start=old['ram']+old['bytes']
+    prefix=bytearray(base[old['physical']:old['physical']+old['bytes']])
+    if sha256(prefix)!=old['sha256'] or any(events[k]['packet']!=old for k in ('participants','exercise','calendar')):
+        raise ValueError('Changed shared calendar/participant packet')
+    data,compiled=link(directory,prepared,work/'linked',object_name='festivals',ram=start)
+    symbols=compiled['symbols'];functions=set(compiled['functions'])-{'af_hp_packet_start'}
+    sizes={r['stem']:u32(data,symbols['af_hg_bytes_'+r['stem']]-start)
+        for r in prepared['registry']['records']}
+    if len(sizes)!=10 or any(not 0x93C<=n<=2400 for n in sizes.values()):
+        raise ValueError('Complete festival actor exceeds the shared native allocation')
+    gate=symbols['af_hp_available']-old['ram']
+    if not 0<=gate<=len(prefix)-4 or u32(prefix,gate):
+        raise ValueError('Cannot replace an active participant registry')
+    # All existing callbacks must reach this same registry/state. Retain entry
+    # addresses used by native hooks, imported profiles, and special actors.
+    # The previous animation function is deliberately not redirected: it is
+    # the fallback for native motions and the previously imported prayer.
+    redirects=[]
+    for family in ('participants','exercise'):
+        previous=events[family]['code'];lo,hi=previous['code_bounds']
+        offset=lo-old['ram']
+        if sha256(prefix[offset:offset+previous['bytes']])!=previous['sha256']:
+            raise ValueError('Changed retained registry module: '+family)
+        addresses=sorted(set(v for v in previous['symbols'].values() if lo<=v<hi))
+        for name,address in previous['symbols'].items():
+            if (name not in functions or not lo<=address<hi or
+                    not (name.startswith('af_hp_') or name in ('mEv_get_save_area','mEv_reserve_save_area'))):continue
+            end=next((v for v in addresses if v>address),hi)
+            if end-address<8:raise ValueError('Registry entry is too short for a redirect: '+name)
+            at=address-old['ram'];before=bytes(prefix[at:at+8]);target=symbols[name]
+            after=struct.pack('>2I',jump(target),0);prefix[at:at+8]=after
+            redirects.append(dict(owner=family,name=name,address=address,target=target,
+                before=before.hex(),after=after.hex()))
+        required={'af_hp_owned','af_hp_identity','af_hp_event_lookup','af_hp_resident_bind',
+            'af_hp_descriptor','af_hp_spawn_profile','af_hp_world_name','af_hp_events_clear','af_hp_free'}
+        if not required<={r['name'] for r in redirects if r['owner']==family}:
+            raise ValueError('Incomplete shared registry redirect: '+family)
+        previous.update(sha256=sha256(prefix[offset:offset+previous['bytes']]),
+            festival_redirects=[r for r in redirects if r['owner']==family])
+        events[family]['loaded_code']['sha256']=previous['sha256']
+        if 'ram' in events[family] and 'bytes' in events[family]:
+            at=events[family]['ram']-old['ram']
+            events[family]['sha256']=sha256(prefix[at:at+events[family]['bytes']])
+    extra=data+b'AFHF'*4;end=start+len(extra)
+    if end>0x807DA800 or any(a<end and start<b for a,b in reservations(prior)):
+        raise ValueError('Complete festival packet overlaps retained resident memory')
+    # Fragmented ROM space cannot hold another full combined copy. Reclaim
+    # the verified obsolete prefix and load the appended code separately at
+    # its contiguous RAM address through the shared startup descriptor loop.
+    obsolete=next(r for r in prior['physical_resources'] if r['id']=='holiday-sky-participants-GAFE01-r0')
+    staged,records,retired=physical.retire_packet_copies(base,prior,((dict(obsolete,ram=old['ram']),old),))
+    retained=next(r for r in records if r['id']==old['id'])
+    if any(retained[k]!=old[k] for k in ('physical','bytes','sha256')):
+        raise ValueError('Changed complete festival packet predecessor')
+    allocation=physical.allocate(staged,records,extra,'holiday-festivals-GAFE01-r0',best_fit=True)
+    fresh=copy.deepcopy(allocation);records.append(fresh)
+    packet=dict(fresh,ram=start,crc32=zlib.crc32(extra),storage='physical-ROM')
+    prefix_record=dict(retained,sha256=sha256(prefix))
+    records=[prefix_record if r['id']==old['id'] else r for r in records]
+    prefix_packet=dict(old,sha256=sha256(prefix),crc32=zlib.crc32(prefix))
+    for family in ('sky','participants','exercise','calendar'):events[family]['packet']=copy.deepcopy(prefix_packet)
+    # Complete motion/expression handling belongs at the shared native NPC
+    # initializer, before its ordinary 234-entry bank directory is consulted.
+    files=by_vrom(base);vrom,reloc,ram=0x8681F0,0x878550,0x809735B0
+    native=bytearray(files[vrom].extract(base));fixups=files[reloc].extract(base)
+    at=0x809749D0;before=jump(events['participants']['code']['symbols']['af_hp_animation'])
+    if (u32(native,at-ram)!=before or u32(native,at+4-ram)!=0 or
+            {at-ram,at+4-ram}&relocation_offsets(fixups,len(native))):
+        raise ValueError('Changed native animation redirect/relocations')
+    if prepared['bindings']['af_hg_previous_animation']!=events['participants']['code']['symbols']['af_hp_animation']:
+        raise ValueError('Festival motion fallback would not retain existing motions')
+    original_sha=sha256(native);after=jump(symbols['af_hg_animation'])
+    struct.pack_into('>I',native,at-ram,after)
+    native_report=dict(vrom=vrom,reloc=reloc,ram=ram,original_sha256=original_sha,
+        owner_sha256=sha256(native),relocation_sha256=sha256(fixups),bytes=len(native),
+        patches=[dict(address=at,before=before,after=after)],relocations_unchanged=True)
+    text=copy.deepcopy(prepared['dialogue']);check_provenance(text)
+    if text['choice_count']:raise ValueError('Festival choice expansion requires an explicit native bound')
+    text.update(choice_vrom=prior['import_storage']['choice_vrom'],
+        hooks=patch_bounds(core,text['first_id'],text['count']),installed=True)
+    for row in text['resources']:
+        payload=(directory/row['file']).read_bytes()
+        if len(payload)!=row['bytes'] or sha256(payload)!=row['sha256']:
+            raise ValueError('Changed complete festival dialogue')
+        row['original_sha256']=row.pop('previous_sha256')
+        name='holiday-festivals/'+row['file'];write_new(output/name,payload);row['file']=name
+    report=dict(format='AFV3-FESTIVAL-PARTICIPANTS-1',installed=True,code=compiled,
+        bindings=prepared['bindings'],registry=prepared['registry'],actor_bytes=sizes,
+        ram=start,bytes=len(extra),sha256=sha256(extra),
+        loaded_code=dict(ram=start,bytes=len(data),sha256=sha256(data)),
+        prepared=str(directory.relative_to(ROOT)),prepared_sha256=sha256((directory/'prepared.json').read_bytes()),
+        redirects=redirects,text=text,motions=prepared['motions'],native_animation=native_report,
+        packet=packet,previous_packet=old,additional_resident_bytes=len(extra),
+        native_services_bound=True,actor_admission_changed=False,saved_format_changed=False,
+        native_execution_verified=False,sources=copy.deepcopy(prepared['sources']))
+    report['sources'].update({p:sha256((ROOT/p).read_bytes()) for p in SOURCES})
+    npc['sources'].update(report['sources']);events['festivals']=report
+    for batch in npc.get('source_batches',[]):
+        pos=batch['ram']-old['ram']
+        if 0<=pos and pos+batch['bytes']<=len(prefix):batch['sha256']=sha256(prefix[pos:pos+batch['bytes']])
+    npc.setdefault('source_batches',[]).append(dict(installed=True,ram=start,bytes=len(extra),
+        sha256=sha256(extra),category='festival-participants',packet_id=packet['id']))
+    write_new(work/'installed.json',(json.dumps(report,indent=2)+'\n').encode())
+    write_new(work/'packet.bin',extra)
+    write_new(work/'retained-prefix.bin',prefix)
+    return e,{vrom:native,reloc:fixups},dict(physical_resources=records,
+        retired_physical_resources=retired),[(dict(prefix_record,previous_sha256=old['sha256']),bytes(prefix)),(allocation,extra)]
 
 
 def finish(image,base,prior,output,equipment):

@@ -346,8 +346,8 @@ callback loader uses its actual relocated code bounds. Focused source/host,
 cartridge, and empty/mixed/all-191 composition checks pass. Continue the remaining
 controller/participant services using the retained native map; do not reconvert
 these effects or installed decorations, or restart native fixtures.
-The connected controller/participant module is retained in ABI 349 at
-`build/v3-diary-category-work-01/calendar-connected-07/build-lock.json`
+The connected controller/participant module is retained in ABI 350 at
+`build/v3-diary-category-work-01/festivals-installed-06/build-lock.json`
 (ROM SHA-256 `4dba5be99af745e89a9d729f3a9e87377ee0922506be31d74297be9b4bc4d37f`),
 using `build/v3-diary-category-work-01/participants-prepared-26/`: three controllers,
 five resident roles, rope, 279 official messages/two choices, offering payment,
@@ -440,10 +440,19 @@ Attendance uses actual source-event flags, not scheduled dates. The 12,768-byte
 addition fits the existing event packet, with no new startup entry or saved
 layout. Its context is 492 bytes inside the existing reservation. The adjacent
 diary browsing years do not access the lunar table. The choice stays unexposed.
-The exact next consumers are the remaining shared hanami, moon-viewing,
-countdown, ball-toss, and Harvest participant families, followed by complete
-actor/service admission and diary/behaviour selection. Extend the existing
-participant importer for the complete batch; do not create per-actor scripts.
+All ten hanami, moon/meteor, countdown, ball-toss, and Harvest actor units are
+installed through the existing shared participant importer. The preparation is
+`festivals-prepared-04/`; the current proposal is `festivals-installed-06/`.
+The complete shared registry has 22 owners and 68 stable-entry redirects.
+All 558 official messages are mapped, reusing 372 identical credited records and
+adding 186. The complete three added motions preserve expression programmes.
+The 43,824-byte festival packet and retained 167,904-byte prefix use twenty
+compact startup descriptors in the existing reservation. Current resource/CRC,
+redirect, guard, unchanged-save-format, conversion, and startup checks pass.
+Native festival/diary execution remains unverified.
+The exact next consumers are complete actor/service admission and
+diary/behaviour selection. Keep this connected category task; do not restart
+per-actor conversion or the exhausted native fixture.
 The dedicated preflight also lists the unspawned fifth New Year position; retain
 its existing collision semantics without inventing a fifth resident actor.
 Continue this same batch without a new harness or native fixture. Reuse

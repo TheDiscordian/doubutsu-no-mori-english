@@ -36,8 +36,10 @@ union AFHPActor {
     struct {u8 p_block[8];s8 block_x,block_z;};
     struct {u8 p_home[0xC];AFHPPos home;u32 state_bitfield;};
     struct {u8 p_world[0x28];AFHPPos world;};
+    struct {u8 p_eye[0x48];AFHPPos eye;};
     struct {u8 p_speed[0x68];xyz_t position_speed;f32 speed,gravity,max_velocity_y;};
     struct {u8 p_bg[0x98];struct {struct {u32 before:15,unit_attribute:6,after:11;} result;} bg_collision_check;};
+    struct {u8 p_drawn[0xB5];u8 drawn;};
     struct {u8 p_player[0xB6];s16 player_angle_y;f32 player_distance_xz_sq,player_distance_xz,player_distance_y;};
     struct {u8 p_weight[0xD6];struct {u8 weight;} status_data;};
     struct {u8 p_shape[0xDC];struct {s_xyz rotation;} shape_info;};
@@ -58,17 +60,22 @@ union AFHPNpc {
     struct {u8 p_action[0x7C4];struct {
         u8 priority,idx,step,type,previous,act_obj;u8 pad[6];aNPC_THINK_PROC act_proc;
     } action;};
-    struct {u8 p_request[0x7D4];struct {u8 act_priority,act_idx,act_type,pad;u16 act_args[6];} request;};
+    struct {u8 p_request[0x7D4];struct {
+        u8 act_priority,act_idx,act_type,pad;u16 act_args[6];
+        u8 umb_flag,unknown,head_priority,head_type;ACTOR *head_target;xyz_t head_pos;
+    } request;};
     struct {u8 p_cond[0x7FD];struct {u8 hide_request,pad[14];u32 demo_flg;} __attribute__((packed)) condition_info;};
     struct {u8 p_hand[0x860];struct {ACTOR *item_actor_p;xyz_t pos;} right_hand;};
+    struct {u8 p_left_hand[0x848];struct {ACTOR *item_actor_p;xyz_t pos;} left_hand;};
     struct {u8 p_head[0x876];struct {u8 lock_flag;} head;};
     struct {u8 p_ignore[0x8AC];int palActorIgnoreTimer;struct {
         struct {f32 max_speed,acceleration,deceleration;} speed;
-        f32 dst_pos_x,dst_pos_z;u8 pad[24];s16 mv_angl,mv_add_angl;
+        f32 dst_pos_x,dst_pos_z,avoid_pos_x,avoid_pos_z;s16 move_timer;
+        u8 pad[14];s16 mv_angl,mv_add_angl;
     } movement;};
     struct {u8 p_collision[0x8F0];struct {
         struct {u8 pad[14];struct {struct {s16 radius;u8 tail[10];} pipe;} attribute;u8 alignment[2];} pipe;
-        f32 radius;u8 flag,check_kind,turn_flag;
+        f32 radius;union {u8 flag,collision_flag;};u8 check_kind,turn_flag;
     } collision;};
     struct {u8 p_talk[0x91C];struct {
         aNPC_TALK_REQUEST_PROC talk_request_proc;
@@ -94,11 +101,16 @@ AF_HP_OFFSET(action.act_proc,0x7D0);
 AF_HP_OFFSET(think.think_proc,0x7A4);
 AF_HP_OFFSET(schedule.schedule_proc,0x7C0);
 AF_HP_OFFSET(request.act_args,0x7D8);
+AF_HP_OFFSET(request.head_priority,0x7E6);
+AF_HP_OFFSET(request.head_pos,0x7EC);
 AF_HP_OFFSET(condition_info.demo_flg,0x80C);
 AF_HP_OFFSET(right_hand.item_actor_p,0x860);
+AF_HP_OFFSET(left_hand.item_actor_p,0x848);
 AF_HP_OFFSET(right_hand.pos,0x864);
 AF_HP_OFFSET(movement.dst_pos_x,0x8BC);
+AF_HP_OFFSET(movement.move_timer,0x8CC);
 AF_HP_OFFSET(movement.mv_add_angl,0x8DE);
+AF_HP_OFFSET(collision.collision_flag,0x910);
 AF_HP_OFFSET(collision.check_kind,0x911);
 AF_HP_OFFSET(talk_info.default_animation,0x92C);
 #undef AF_HP_OFFSET
@@ -198,7 +210,12 @@ typedef struct {
 } AFHPRecord;
 typedef struct {u16 event_name,texture,resident,cloth;u8 exists,used;u16 pad;} AFHPResident;
 enum {AF_HP_SPECIAL=1,AF_HP_NO_SAVE=2};
-#ifdef AF_HP_EXERCISE_REGISTRY
+#ifdef AF_HP_FESTIVAL_REGISTRY
+/* More role identities do not create more town residents. The same eighteen
+ * temporary slots and twenty-four live slots cover the native fifteen-person
+ * population, controllers, and separately allocated special characters. */
+enum {AF_HP_OWNER_COUNT=22,AF_HP_RESIDENT_COUNT=18,AF_HP_LIVE_COUNT=24};
+#elif defined(AF_HP_EXERCISE_REGISTRY)
 enum {AF_HP_OWNER_COUNT=12,AF_HP_RESIDENT_COUNT=18,AF_HP_LIVE_COUNT=24};
 #else
 enum {AF_HP_OWNER_COUNT=9,AF_HP_RESIDENT_COUNT=14,AF_HP_LIVE_COUNT=18};

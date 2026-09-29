@@ -56,6 +56,21 @@ EXERCISE_PARTICIPANTS = (
     dict(profile=0xE5,name=0xD0B3,source=0xD078,count=1,kind=3),
 )
 
+# Each complete five-role group remains contiguous for donor role arithmetic.
+# Moon viewing and meteor showers intentionally share the same five owners.
+FESTIVAL_PARTICIPANTS = {
+    'hanami_npc0': dict(profile=0xE6,name=0xD0B4,source=0xD032,count=4,event=20,save=20),
+    'hanami_npc1': dict(profile=0xE7,name=0xD0B8,source=0xD036,count=1,event=20,save=20),
+    'tukimi_npc0': dict(profile=0xE8,name=0xD0B9,source=0xD03F,count=1,event=43,save=37),
+    'tukimi_npc1': dict(profile=0xE9,name=0xD0BA,source=0xD040,count=4,event=43,save=37),
+    'countdown_npc0': dict(profile=0xEA,name=0xD0BE,source=0xD044,count=1,event=64,save=64),
+    'countdown_npc1': dict(profile=0xEB,name=0xD0BF,source=0xD045,count=4,event=64,save=64),
+    'tamaire_npc0': dict(profile=0xEC,name=0xD0C3,source=0xD053,count=1,event=12,save=12),
+    'tamaire_npc1': dict(profile=0xED,name=0xD0C4,source=0xD054,count=4,event=12,save=12),
+    'harvest_npc0': dict(profile=0xEE,name=0xD0C8,source=0xD082,count=4,event=56,save=56),
+    'harvest_npc1': dict(profile=0xEF,name=0xD0CC,source=0xD086,count=1,event=56,save=56),
+}
+
 # Additive event structures retain the native structure allocation category.
 # Their source variants are separate identities, never positions in a selection.
 DECORATION_REGISTRY_VERSION = 1
