@@ -601,7 +601,11 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
                 (0xFC127E60, 0xFFFFF3F8), (0xFC11FE04, 0xFFFFF3F8)))
             if static_materials: modes += ((0xFC309C04,0x5FFEF7F8),(0xFC309604,0x5FFEFFF8),
                                      (0xFC30FE04,0x5FFEFDF8),(0xFC3217FF,0xFFFFFE38),
-                                     (0xFC30FE04,0x5FFEF3F8),(0xFC327FFF,0xFFFFFC38))
+                                     (0xFC30FE04,0x5FFEF3F8),(0xFC327FFF,0xFFFFFC38),
+                                     # Texture RGB multiplied by the caller's
+                                     # primitive colour; texture alpha, then
+                                     # pass COMBINED through the second cycle.
+                                     (0xFC11FFFF,0xFFFFF238))
             # FC327FFF/FFFFFC38 multiplies primitive RGB by shade, sets
             # alpha to one, then passes the combined result through cycle two.
             # It has no texture dependency; explicit texture-off commands stay.

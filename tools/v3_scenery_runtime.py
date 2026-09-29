@@ -14,6 +14,8 @@ from v3_scenery import discover, palettes, SEASONS
 
 MAGIC = 0x41465343
 HEADER_BYTES = 128
+LIGHT_VROM,LIGHT_OFFSET,LIGHT_BYTES=0x7FAEB0,0x7D58,556
+LIGHT_SHA256='3623ac2471fc39adbecc9ea6854949d05ea78400e007836a07a928c7d4c2be25'
 BOOT_RAM, BOOT_END = 0x804ADC90, 0x804ADFF0
 RUNTIME_RAM, RUNTIME_END = 0x804B5000, 0x804B6000
 SOURCES = ('tools/v3_scenery_runtime.py', 'tools/v3_scenery.py',
@@ -33,16 +35,22 @@ def prepared(source, path):
     """Validate every prepared relationship/resource, without recompiling art."""
     path = path.resolve()
     raw = (path/'art.json').read_bytes(); art = json.loads(raw)
-    expected = json.loads(json.dumps(discover(source)))
+    category=art.get('category','gold-tree')
+    expected = json.loads(json.dumps(discover(source,category)))
     if (art.get('format') != 'AFV3-SCENERY-PREPARED-ASSETS-1' or art.get('version') != 1
             or any(art.get(k) != v for k, v in expected.items()
-                   if k not in ('format', 'objects', 'palettes'))):
+                   if k not in ('format', 'objects', 'palettes', 'pending_reason'))):
         raise ValueError('Changed complete prepared scenery/source graph')
-    palette, bank = palettes(source, expected['functions'])
-    if art['palettes'] != dict(palette, object_file='seasonal-palettes.rgba16.bin'):
-        raise ValueError('Changed scenery palette relationships')
-    if (path/art['palettes']['object_file']).read_bytes() != bank:
-        raise ValueError('Changed complete scenery palette bank')
+    banks={};carried=category=='carried-trees'
+    for family in (('palm','cedar') if carried else ('gold',)):
+        palette,bank=palettes(source,expected['functions'],family)
+        filename=(family+'-' if carried else '')+'seasonal-palettes.rgba16.bin'
+        actual=art['palettes'][family] if carried else art['palettes']
+        if actual!=dict(palette,object_file=filename):
+            raise ValueError('Changed scenery palette relationships')
+        if (path/filename).read_bytes()!=bank:
+            raise ValueError('Changed complete scenery palette bank')
+        banks[family]=bank
     reference = {r['key']: r for r in expected['objects']}
     assets = {}
     for row in art['objects']:
@@ -71,7 +79,7 @@ def prepared(source, path):
             raise ValueError('Unexpected scenery display data')
         assets[key] = data
     if assets.keys() != reference.keys(): raise ValueError('Incomplete prepared scenery objects')
-    return art, assets, bank, dict(art_report_sha256=sha256(raw),
+    return art, assets, banks if carried else banks['gold'], dict(art_report_sha256=sha256(raw),
         source_rel_sha256=sha256(source.rel), source_symbols_sha256=sha256(source.symbols.encode()))
 
 
@@ -94,7 +102,49 @@ class Bank:
         getattr(self, kind).append(at)
 
 
-def pack_bank(art, assets, palette_data, season, palette_wrapper):
+def native_lights(base):
+    """The complete native Xmas callback implements the donor light colours."""
+    from aflib import by_vrom
+    owner=by_vrom(base)[LIGHT_VROM].extract(base)
+    raw=owner[LIGHT_OFFSET:LIGHT_OFFSET+LIGHT_BYTES]
+    if len(raw)!=LIGHT_BYTES or sha256(raw)!=LIGHT_SHA256:
+        raise ValueError('Changed complete native coloured-light callback')
+    return dict(vrom=LIGHT_VROM,offset=LIGHT_OFFSET,bytes=LIGHT_BYTES,sha256=LIGHT_SHA256,
+        draw_position_stride=72,matrix_offset=0,info_offset=64,next_offset=68,cull_offset=70,
+        colour_info_offset=2,colours=['FFFF64FF','64FFFFFF','FF64FFFF'])
+
+
+def merge_categories(bundles):
+    """One seasonal bank owns all enabled tree families; reuse complete art."""
+    objects={};assets={};banks={};palettes_by_family={};descriptors=[];bindings=[];aliases={}
+    for art,data,palette_data,_ in bundles:
+        category=art['category']
+        if category=='gold-tree':
+            palette_data={'gold':palette_data};palettes_by_family['gold']=art['palettes']
+        elif category=='carried-trees':palettes_by_family.update(art['palettes'])
+        else:raise ValueError('Unsupported prepared tree category')
+        for family,palette in palette_data.items():
+            if family in banks:raise ValueError('Duplicate tree family')
+            banks[family]=palette
+        for row in art['objects']:
+            if row['key'] in objects and (objects[row['key']]!=row or assets[row['key']]!=data[row['key']]):
+                raise ValueError('Conflicting complete tree resources')
+            objects[row['key']]=row;assets[row['key']]=data[row['key']]
+        for row in art['descriptors']:
+            family=row.get('family','gold');selected={'gold':0x223B,'palm':0x2807,'cedar':0x290A}[family]
+            descriptors.append(dict(row,family=family,selected_item=selected,flags=row.get('flags',0)))
+        bindings.extend(art['bindings'])
+        for row in art.get('model_aliases',[]):
+            at=row['source']['donor_offset']
+            if at in aliases and aliases[at]!=row:raise ValueError('Conflicting tree source aliases')
+            aliases[at]=row
+    if set(banks)!={'gold','palm','cedar'} or len({r['key'] for r in descriptors})!=len(descriptors):
+        raise ValueError('Incomplete or duplicate shared tree families')
+    return dict(category='tree-families',descriptors=descriptors,bindings=bindings,
+        objects=list(objects.values()),palettes=palettes_by_family,model_aliases=list(aliases.values())),assets,banks
+
+
+def pack_bank(art, assets, palette_data, season, palette_wrapper, *, light_loop=0):
     """Pack one complete season; native table indices are assigned at loading."""
     if season not in SEASONS: raise ValueError('Unknown scenery season')
     descriptors = [r for r in art['descriptors'] if r['season']==season]
@@ -102,12 +152,28 @@ def pack_bank(art, assets, palette_data, season, palette_wrapper):
     used = {d['object'] for r in descriptors for d in
             r['body']+([r['shadow']['draw']] if r['shadow'] else [])}
     objects = {r['key']:r for r in art['objects'] if r['key'] in used}
-    if len(descriptors)!=10 or len(bindings)!=14 or len(objects)!=19:
+    multi=art['category'] in ('carried-trees','tree-families')
+    expected=(32 if season=='xmas' else 31,41) if art['category']=='tree-families' else (
+        (22 if season=='xmas' else 21,27) if multi else (10,14))
+    if (len(descriptors),len(bindings))!=expected or (not multi and len(objects)!=19):
         raise ValueError('Incomplete seasonal scenery category')
-    bank = Bank(); pal = bank.put(palette_data,16); active = bank.put(bytes(32),16)
-    terms = bank.put(bytes(art['palettes']['term_indices']))
+    if multi and (not isinstance(palette_wrapper,dict) or (season=='xmas')!=bool(light_loop)):
+        raise ValueError('Missing complete shared palette/light callback bindings')
+    bank = Bank();active_slots={}
+    if multi:
+        palette_rows=[]
+        for family,palette in art['palettes'].items():
+            slot=palette['palette_slot'];raw=palette_data[family]
+            if len(raw)!=448 or slot in active_slots:raise ValueError('Invalid shared tree palettes')
+            data_at=bank.put(raw,16);active_at=bank.put(bytes(32),16)
+            terms_at=bank.put(bytes(palette['term_indices']))
+            palette_rows.append((data_at,active_at,terms_at,slot));active_slots[slot]=active_at
+        pal=bank.put(b''.join(struct.pack('>4I',*r) for r in palette_rows));active=terms=0
+    else:
+        pal=bank.put(palette_data,16);active=bank.put(bytes(32),16)
+        terms=bank.put(bytes(art['palettes']['term_indices']));active_slots[8]=active
     trampoline = bank.put(bytes(16),16)
-    objects_at, model_targets, object_receipts = {}, {}, []
+    objects_at, model_targets, model_contracts, object_receipts = {}, {}, {}, []
     for key,row in objects.items():
         data = assets[key]; at = bank.put(data,16); objects_at[key] = at
         resources = {r['native_offset']:r for r in row['resources']}; used_resources=set()
@@ -136,23 +202,25 @@ def pack_bank(art, assets, palette_data, season, palette_wrapper):
         if used_resources!=set(resources): raise ValueError('Unconsumed scenery object resource')
         for label,offset in row['model_offsets'].items():
             target=at+offset
-            if label=='material' and not external:
+            slot=row['render_context'].get('palette_slot')
+            if label=='material' and slot is not None:
                 # One caller-independent palette load before the complete material.
-                wrapper=bank.put(palette_wrapper,8)
-                for loc,value in ((4,active),(52,target)):
+                wrapper=bank.put(palette_wrapper[slot] if multi else palette_wrapper,8)
+                for loc,value in ((4,active_slots[slot]),(52,target)):
                     bank.pointer(wrapper+loc,value,'gpu')
                 target=wrapper
             donor=row['profile']['models'][label][1]
+            model=next(m for m in row['compiled_models'] if m['layer']==label)
+            contract=(model['source_sha256'],label,slot if label=='material' else bool(external))
             if donor in model_targets and model_targets[donor]!=target:
-                # Repeated geometry can be shared by several material pairs.
-                old=model_targets[donor]
-                n=next(m['bytes'] for m in row['compiled_models'] if m['layer']==label)
-                if label!='geometry' or bytes(bank.data[old:old+n])!=bytes(bank.data[target:target+n]):
-                    # Pointer offsets differ for otherwise identical vertex arrays;
-                    # retain the first complete model, already source-validated.
-                    if label!='geometry': raise ValueError('Conflicting scenery model binding')
-            else: model_targets[donor]=target
+                # Identical source commands can have different packed resource
+                # offsets. Caller-owned shadow vertices remain per descriptor.
+                if contract!=model_contracts[donor]:raise ValueError('Conflicting scenery model binding')
+            else:model_targets[donor]=target;model_contracts[donor]=contract
         object_receipts.append(dict(key=key,offset=at,bytes=len(data),source_sha256=sha256(data)))
+    for alias in art.get('model_aliases',[]):
+        if alias['target'] in model_targets:
+            model_targets[alias['source']['donor_offset']]=model_targets[alias['target']]
     display_tables={}; draws={}; descriptor_targets={}; descriptor_receipts=[]
     for row in descriptors:
         table=row['display_table']; donor=table['donor_offset']
@@ -167,7 +235,9 @@ def pack_bank(art, assets, palette_data, season, palette_wrapper):
             shadow=draw not in row['body']
             if identity not in draws:
                 at=bank.put(struct.pack('>IBBH',0,draw['material_index'],draw['geometry_index'],0))
-                bank.callbacks.append((at,int(shadow))); draws[identity]=at
+                kind=2 if draw.get('callback_kind')=='coloured-lights' else int(shadow)
+                if kind==2 and (season!='xmas' or not light_loop):raise ValueError('Unbound tree light callback')
+                bank.callbacks.append((at,kind)); draws[identity]=at
         lists=bank.put(bytes(len(row['body'])*4))
         for i,draw in enumerate(row['body']): bank.pointer(lists+i*4,draws[draw['donor_offset']])
         at=bank.put(bytes(32)); descriptor_targets[row['key']]=at
@@ -192,23 +262,33 @@ def pack_bank(art, assets, palette_data, season, palette_wrapper):
             pointers.append(positions[raw])
         types.append((int(row['foreground_id'],16),list(descriptor_targets).index(row['descriptor']),pointers))
     type_at=bank.put(bytes(len(types)*16))
+    selectors=[]
     for i,(fg,index,pointers) in enumerate(sorted(types)):
         at=type_at+i*16;struct.pack_into('>IHH',bank.data,at,fg,0,index)
         for j,target in enumerate(pointers): bank.pointer(at+8+j*4,target)
+        if multi:
+            family=descriptors[index]['family']
+            selectors.append({'gold':0x223B,'palm':0x2807,'cedar':0x290A}[family])
+    selection_at=bank.put(struct.pack('>'+str(len(selectors))+'I',*selectors)) if multi else 0
     rows=bank.put(bytes(len(descriptors)*8))
-    for i,at in enumerate(descriptor_targets.values()): bank.pointer(rows+i*8,at)
+    for i,at in enumerate(descriptor_targets.values()):
+        bank.pointer(rows+i*8,at)
+        struct.pack_into('>I',bank.data,rows+i*8+4,descriptors[i].get('flags',0))
     cpu=bank.put(struct.pack('>'+str(len(bank.cpu))+'I',*sorted(bank.cpu)))
     gpu=bank.put(struct.pack('>'+str(len(bank.gpu))+'I',*sorted(bank.gpu)))
     callbacks=bank.put(b''.join(struct.pack('>II',*r) for r in sorted(bank.callbacks)))
     bank.data.extend(bytes(-len(bank.data)%16))
-    header=(MAGIC,1,len(bank.data),0,cpu,len(bank.cpu),gpu,len(bank.gpu),callbacks,len(bank.callbacks),
+    header=(MAGIC,2 if multi else 1,len(bank.data),0,cpu,len(bank.cpu),gpu,len(bank.gpu),callbacks,len(bank.callbacks),
             rows,len(descriptors),type_at,len(types),pal,active,terms,trampoline)
+    if multi:header+= (0,len(palette_rows),selection_at,light_loop)
     struct.pack_into('>'+str(len(header))+'I',bank.data,0,*header)
     receipt=dict(season=season,bytes=len(bank.data),sha256=sha256(bank.data),objects=object_receipts,
         descriptors=descriptor_receipts,foreground_ids=[f'{fg:04X}' for fg,_,_ in sorted(types)],
         cpu_fixups=len(bank.cpu),gpu_fixups=len(bank.gpu),callback_fixups=len(bank.callbacks),
         palette_offset=pal,active_palette_offset=active,trampoline_offset=trampoline,
-        descriptor_table_offset=rows,type_table_offset=type_at)
+        descriptor_table_offset=rows,type_table_offset=type_at,
+        **(dict(palettes=[dict(zip(('palette_offset','active_palette_offset','terms_offset','slot'),r)) for r in palette_rows],
+                selection_offset=selection_at,selected_items=selectors,light_loop=light_loop) if multi else {}))
     return bytes(bank.data),receipt
 
 

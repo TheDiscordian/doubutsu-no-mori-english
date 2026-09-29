@@ -11,7 +11,7 @@ import struct
 
 from aflib import sha256, u32
 from apply_translation import write_new
-from v3_furniture_pipeline import prepare_material_pair, compile_models
+from v3_furniture_pipeline import prepare_material_pair, assemble_models, compile_commands_batch
 from v3_villager_art import native_palette
 
 SEASONS = ('cherry', 'ordinary', 'winter', 'xmas')
@@ -79,12 +79,20 @@ def consumers(source):
     return result
 
 
-def palettes(source, functions):
-    at, _ = source.symbol('mFM_obj_gold_01_pal_dol')
+PALETTE_FAMILIES={
+    'gold':('mFM_obj_gold_01_pal_dol',8,'7dc04db285cb3e84a94e36bb526c1f7cb79e24f31c243608989e351de824408c'),
+    'cedar':('mFM_obj_tree_01_pal_dol',6,'146737e408c76a241fbcf1e5a7c448e4754427257f332b524a30c77a6eb4680e'),
+    'palm':('mFM_obj_palm_01_pal',7,'1afe79ba75c0a23b0d8c479ec5cef70a8be89eae4cff495bf3d45a61da9f928c'),
+}
+
+
+def palettes(source, functions, family='gold'):
+    name,slot,digest=PALETTE_FAMILIES[family]
+    at, _ = source.symbol(name)
     bank = resource(source, at, size=14*32)
     term, _ = source.symbol('tree_pal_idx_table$821')
     selector = resource(source, term, size=18*4)
-    if (bank['sha256'] != '7dc04db285cb3e84a94e36bb526c1f7cb79e24f31c243608989e351de824408c'
+    if (bank['sha256'] != digest
             or selector['sha256'] != '94f144ce4977b3a23f8efd947f308123f6998eb114a13db7b750c6815568c639'):
         raise ValueError('Changed seasonal palette bank or term selector')
     targets = {r[3] for r in functions['mFM_SetFGPal'][0]['relocations'].values() if r[2] == 5}
@@ -95,37 +103,64 @@ def palettes(source, functions):
     raw = source.data[at:at+bank['bytes']]
     converted = b''.join(native_palette(raw[i:i+32]) for i in range(0, len(raw), 32))
     return dict(bank=bank, selector=selector, term_indices=indices,
-                palette_slot=8, palette_count=14, output_sha256=sha256(converted)), converted
+                palette_slot=slot, palette_count=14, output_sha256=sha256(converted)), converted
 
 
 def discover(source, category='gold-tree'):
-    if category != 'gold-tree': raise ValueError('Unsupported scenery dependency category')
+    if category not in ('gold-tree','carried-trees'): raise ValueError('Unsupported scenery dependency category')
+    carried=category=='carried-trees'
     functions = consumers(source)
-    palette, _ = palettes(source, functions)
+    families=('palm','cedar') if carried else ('gold',)
+    banks={family:palettes(source,functions,family)[0] for family in families}
+    palette=banks if carried else banks['gold']
     tables = sorted(source.names['draw_part_table_a'])
     if len(tables) != 4: raise ValueError('Missing seasonal scenery owners')
     objects, descriptors, bindings, table_receipts = {}, [], [], []
+    model_aliases={}
 
-    def draw_list(at, dl, variant, shadow=None):
+    def draw_list(at, dl, variant, family, shadow=None):
         name, _, n = source.containing(at, exact=True)
         expected = functions['bg_item_common_s_draw_loop_type1' if shadow else
                              'bg_item_common_draw_loop_type1'][variant]['offset']
+        actual=source.relocations.get(at)
+        light=carried and not shadow and variant==3 and family=='cedar' and actual!= (1,True,1,expected)
+        if light:
+            target=actual[3] if actual else -1
+            raw,receipt=source.function(target)
+            if (receipt['symbol']!='bXI_draw_loop_type1_xtree' or len(raw)!=476
+                    or sha256(raw)!='19cf7ccd6fc757d3e31b4096b85b674c8ef19e8374534d9adeb71eddd0824362'):
+                raise ValueError('Unsupported seasonal tree drawing callback')
+            functions['bXI_draw_loop_type1_xtree']=[receipt]
+            expected=target
         if (n != 8 or u32(source.data, at) or source.data[at+6:at+8] != bytes(2)
-                or source.relocations.get(at) != (1, True, 1, expected)
+                or actual != (1, True, 1, expected)
                 or any(at < p < at+8 for p in source.relocations)):
             raise ValueError('Unsupported scenery drawing callback or list fields')
         mi, gi = source.data[at+4:at+6]
         if mi*4 not in dl or gi*4 not in dl or mi == gi:
             raise ValueError('Scenery display index exceeds complete table')
         parts = [source.containing(dl[i*4], exact=True) for i in (mi, gi)]
-        context = {'external_vertices':shadow} if shadow else {'palette_slot':palette['palette_slot']}
+        material=source.data[parts[0][1]:parts[0][1]+parts[0][2]]
+        own_palette=any(material[p]==0xF0 for p in range(0,len(material),8))
+        context = {'external_vertices':shadow} if shadow else {} if light or own_palette else {'palette_slot':banks[family]['palette_slot']}
+        if carried and 'palette_slot' in context:
+            # Saplings can share the other tree family's palette. Follow the
+            # actual material slot, not the descriptor's family name.
+            slots={u32(material,p)>>12&15 for p in range(0,len(material),8) if material[p]==0xD2}
+            if len(slots)!=1 or not slots<={bank['palette_slot'] for bank in banks.values()}:
+                raise ValueError('Unsupported tree material palette dependency')
+            context['palette_slot']=next(iter(slots))
         key = f'model-{parts[0][1]:08X}-{parts[1][1]:08X}'
+        # Different growth stages reuse shadow commands but supply distinct
+        # adjusted vertex arrays. Preserve each complete caller-owned array.
+        if carried and shadow: key+=f'-v{shadow[1]:08X}'
         row = dict(key=key, models=parts, render_context=context)
         if key in objects and objects[key] != row:
             raise ValueError('Conflicting scenery caller bindings')
         objects[key] = row
         return dict(symbol=name, donor_offset=at, callback=expected,
-                    material_index=mi, geometry_index=gi, object=key)
+                    material_index=mi, geometry_index=gi, object=key,
+                    **(dict(callback_kind='coloured-lights' if light else 'shadow' if shadow else 'body') if carried else {}))
 
     for variant, (season, owner, table) in enumerate(zip(SEASONS, TYPE_OWNERS, tables, strict=True)):
         root, length = table
@@ -137,16 +172,19 @@ def discover(source, category='gold-tree'):
         selected, display_usage = {}, {}
         for loc, part in sorted(roots.items()):
             name, _, size = source.containing(part, exact=True)
-            if not name.startswith('gold_tree'): continue
-            if not re.fullmatch(r'gold_tree(00[0-4]|000_dead|_stump00[1-4])_part', name):
-                raise ValueError('Unsupported gold-tree descriptor category')
-            if size != 32 or source.data[loc+4:loc+8] != bytes(4):
+            family=next((f for f in families if name.startswith('gold_tree' if f=='gold' else f)),None)
+            if family is None: continue
+            pattern=(r'(palm|cedar)(00[0-4]|000_dead|004_cc|004_light|_stump00[1-4])_part' if carried
+                else r'gold_tree(00[0-4]|000_dead|_stump00[1-4])_part')
+            if not re.fullmatch(pattern, name):raise ValueError('Unsupported tree descriptor category')
+            flags=u32(source.data,loc+4)
+            if size != 32 or flags not in ((0,0x10000) if carried else (0,)):
                 raise ValueError('Unsupported scenery descriptor fields or flags')
             refs = source.pointers(part, size)
             count, shadow_count = u32(source.data, part+4), u32(source.data, part+12)
             shadow_length = struct.unpack_from('>f', source.data, part+20)[0]
             fields = {part, part+8} | ({part+16, part+24, part+28} if shadow_count else set())
-            if (set(refs) != fields or count not in (1, 2) or shadow_count not in (0, 4)
+            if (set(refs) != fields or count not in ((1,2,3) if carried else (1,2)) or shadow_count not in (0, 4)
                     or not math.isfinite(shadow_length) or not 0 <= shadow_length <= 60
                     or not shadow_count and any(source.data[part+12:part+32])
                     or any(u32(source.data, p) for p in refs)):
@@ -163,23 +201,43 @@ def discover(source, category='gold-tree'):
             key = f'{season}/{name}'
             row = dict(key=key, season=season, descriptor=resource(source, part, pointers=True),
                        table_index=(loc-root)//8, display_table=dl, list_table=lists,
-                       body=[draw_list(p, targets, variant) for _,p in sorted(lists['pointers'].items())],
-                       shadow=None)
+                       body=[draw_list(p, targets, variant,family) for _,p in sorted(lists['pointers'].items())],
+                       shadow=None,**(dict(family=family,flags=flags) if carried else {}))
             if shadow_count:
                 vertices = resource(source, refs[part+16], size=shadow_count*16)
                 fix = resource(source, refs[part+24], size=shadow_count)
                 if any(v not in (0, 1) for v in bytes.fromhex(fix['hex'])):
                     raise ValueError('Unsupported scenery shadow adjustment')
                 external = source.containing(refs[part+16], exact=True)
-                row['shadow'] = dict(draw=draw_list(refs[part+28], targets, variant, external),
+                row['shadow'] = dict(draw=draw_list(refs[part+28], targets, variant,family,external),
                                      vertices=vertices, fix=fix, length=shadow_length)
             for draw in row['body'] + ([row['shadow']['draw']] if row['shadow'] else []):
                 usage[1].update((draw['material_index']*4, draw['geometry_index']*4))
             selected[row['table_index']] = key
             descriptors.append(row)
-        if len(selected) != 10: raise ValueError('Incomplete gold-tree scenery descriptors')
-        if any(expected != used for expected, used in display_usage.values()):
-            raise ValueError('Unconsumed scenery display-list dependency')
+        if len(selected) != (22 if carried and variant==3 else 21 if carried else 10):
+            raise ValueError('Incomplete shared tree scenery descriptors')
+        for table,(expected,used) in display_usage.items():
+            # Cedar retains two unused shadow pairs in its complete table.
+            # Keep those entries by proving that their commands and every
+            # relocation equal a consumed model, not by discarding resources.
+            for index in sorted(expected-used):
+                target=source.relocations[table+index][3]
+                alias=resource(source,target,pointers=True)
+                matches=[]
+                for offset in sorted(used):
+                    candidate=source.relocations[table+offset][3]
+                    original=resource(source,candidate,pointers=True)
+                    if (alias['bytes']==original['bytes'] and alias['sha256']==original['sha256']
+                            and {p-target:v for p,v in alias['pointers'].items()}==
+                                {p-candidate:v for p,v in original['pointers'].items()}):
+                        matches.append(candidate)
+                if not carried or not matches:
+                    raise ValueError('Unconsumed scenery display-list dependency')
+                value=dict(source=alias,target=matches[0])
+                if target in model_aliases and model_aliases[target]!=value:
+                    raise ValueError('Conflicting scenery model alias')
+                model_aliases[target]=value
         for suffix, first, size in (('', 0, 131*12), ('2', 0x800, 106*12)):
             at, _ = source.symbol('typeData_table_'+owner+suffix)
             receipt = resource(source, at, size=size, pointers=True)
@@ -200,7 +258,7 @@ def discover(source, category='gold-tree'):
                 bindings.append(dict(season=season, foreground_id=f'{first+i:04X}',
                     type_row_offset=entry, descriptor=selected[draw_type], positions=positions))
     identities = [{r['foreground_id'] for r in bindings if r['season']==season} for season in SEASONS]
-    if any(len(ids) != 14 or ids != identities[0] for ids in identities):
+    if any(len(ids) != (27 if carried else 14) or ids != identities[0] for ids in identities):
         raise ValueError('Incomplete or inconsistent seasonal foreground bindings')
     for row in objects.values():
         prepared = prepare_material_pair(source, row['models'], render_context=row['render_context'])
@@ -210,30 +268,58 @@ def discover(source, category='gold-tree'):
         source_rel_sha256=sha256(source.rel), source_symbols_sha256=sha256(source.symbols.encode()),
         functions=functions, tables=table_receipts, palettes=palette, bindings=bindings,
         descriptors=descriptors, objects=list(objects.values()),
+        **(dict(model_aliases=list(model_aliases.values())) if carried else {}),
         counts=dict(seasons=4, foreground_ids=len(identities[0]), descriptors=len(descriptors),
                     model_pairs=len(objects), object_bytes=sum(r['object_bytes'] for r in objects.values())),
-        runtime_installed=False, selectable=False, logical_imports_added=0, pending_reason=PENDING)
+        runtime_installed=False, selectable=False, logical_imports_added=0,
+        pending_reason=('Prepared palm/cedar resources; seasonal owner allocation, full planting/growth/tree '
+                        'behaviours, and independent carried-item selection still require integration.' if carried else PENDING))
 
 
-def convert(source, output, selected=(), *, category='gold-tree'):
+def convert(source, output, selected=(), *, category='gold-tree', reuse_assets=()):
     if selected: raise ValueError('Scenery dependencies are whole categories, not selectable items')
     inventory = discover(source, category)
+    cache={}
+    if reuse_assets:
+        from v3_scenery_runtime import prepared as checked_prepared
+        for directory in reuse_assets:
+            art,assets,_,_=checked_prepared(source,directory)
+            for row in art['objects']:
+                value=(row,assets[row['key']])
+                if row['key'] in cache and cache[row['key']]!=value:
+                    raise ValueError('Conflicting prepared scenery cache')
+                cache[row['key']]=value
     output.mkdir(parents=True, exist_ok=False)
-    objects = []
+    plans=[];jobs=[]
     for row in inventory['objects']:
         directory = output/row['key']; directory.mkdir()
         prepared = prepare_material_pair(source, row['models'], render_context=row['render_context'])
-        asset, offsets, models, sequence = compile_models(directory, prepared)
+        commands=directory/'commands.c';write_new(commands,prepared[5].encode())
+        reused=cache.get(row['key'])
+        if reused:
+            if any(reused[0].get(k)!=v for k,v in json.loads(json.dumps(row)).items()):
+                raise ValueError('Changed prepared scenery cache relationship')
+        else:jobs.append((row['key'],commands,prepared[6]))
+        plans.append((row,prepared,reused))
+    compiled=compile_commands_batch(output/'compiled',jobs)
+    objects = []
+    for row,prepared,reused in plans:
+        sections=({m['layer']:reused[1][m['native_offset']:m['native_offset']+m['bytes']]
+                   for m in reused[0]['compiled_models']} if reused else compiled[row['key']])
+        asset, offsets, models, sequence = assemble_models(prepared,sections)
         if sequence is not None or len(asset) != row['object_bytes']:
             raise ValueError('Scenery compilation differs from complete preflight')
         filename = row['key']+'.n64obj.bin'; write_new(output/filename, asset)
         objects.append(dict(**row, profile=prepared[0], resources=prepared[2], compiled_models=models,
                             model_offsets=offsets, object_file=filename, object_sha256=sha256(asset)))
         print(json.dumps(dict(converted=row['key'], bytes=len(asset))), flush=True)
-    palette, data = palettes(source, inventory['functions'])
-    filename = 'seasonal-palettes.rgba16.bin'; write_new(output/filename, data)
+    converted={}
+    for family in (('palm','cedar') if category=='carried-trees' else ('gold',)):
+        palette,data=palettes(source,inventory['functions'],family)
+        filename=(family+'-' if category=='carried-trees' else '')+'seasonal-palettes.rgba16.bin'
+        write_new(output/filename,data);converted[family]=dict(palette,object_file=filename)
     report = dict(inventory, format='AFV3-SCENERY-PREPARED-ASSETS-1', version=1,
-                  objects=objects, palettes=dict(palette, object_file=filename))
+                  objects=objects, palettes=converted if category=='carried-trees' else converted['gold'])
     write_new(output/'inventory.json', (json.dumps(inventory, indent=2)+'\n').encode())
     write_new(output/'art.json', (json.dumps(report, indent=2)+'\n').encode())
     return report

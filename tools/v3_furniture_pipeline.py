@@ -1869,9 +1869,10 @@ def main():
             or args.category not in (None,'creature-field-frames')
             or args.command=='convert' and not args.assets_only):
         parser.error('Creature preparation retains the complete field-frame category; use convert --assets-only')
-    if args.category and args.command == 'scan': parser.error('--category requires convert or import')
-    if args.reuse_assets and (args.command=='scan' or args.representation not in ('furniture','surfaces','clothing','carried')):
-        parser.error('--reuse-assets requires furniture/clothing convert/import or surface/carried preparation')
+    if args.category and args.command == 'scan' and args.representation != 'scenery':
+        parser.error('--category requires convert or import outside scenery')
+    if args.reuse_assets and (args.command=='scan' or args.representation not in ('furniture','surfaces','clothing','carried','scenery')):
+        parser.error('--reuse-assets requires furniture/clothing convert/import or surface/carried/scenery preparation')
     if args.representation in ('handheld','scenery','audio','rewards','surfaces') and (args.command == 'import' or
             args.command == 'convert' and not args.assets_only):
         parser.error('This representation requires convert --assets-only; runtime integration is unfinished')
@@ -1952,11 +1953,11 @@ def main():
         from v3_scenery import discover as scan_scenery, convert as convert_scenery
         if args.command == 'scan':
             if args.select: parser.error('Scenery dependencies are not selectable items')
-            report = scan_scenery(source); output.parent.mkdir(parents=True, exist_ok=True)
+            report = scan_scenery(source,category=args.category or 'gold-tree'); output.parent.mkdir(parents=True, exist_ok=True)
             write_new(output, (json.dumps(report, indent=2)+'\n').encode())
             print(json.dumps(report['counts']))
         else:
-            report = convert_scenery(source, output, args.select, category=args.category or 'gold-tree')
+            report = convert_scenery(source, output, args.select, category=args.category or 'gold-tree',reuse_assets=args.reuse_assets)
             print(json.dumps(report['counts']))
         return
     if args.representation == 'handheld':

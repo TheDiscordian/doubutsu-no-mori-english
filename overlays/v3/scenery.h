@@ -9,10 +9,14 @@ typedef struct {
 } Scenery;
 _Static_assert(sizeof(Scenery)==48,"Scenery configuration stride");
 enum { MAGIC, VERSION, BYTES, READY, CPU, CPU_N, GPU, GPU_N, CALLBACK, CALLBACK_N,
-       ROWS, ROW_N, TYPES, TYPE_N, PALETTES, ACTIVE, TERMS, TRAMPOLINE, TERM };
+       ROWS, ROW_N, TYPES, TYPE_N, PALETTES, ACTIVE, TERMS, TRAMPOLINE, TERM,
+       PALETTE_N, SELECTIONS, LIGHT_LOOP };
 extern const Scenery af_v3_scenery_config[4];
 extern u8 *af_v3_ground_prepare(u32);
 extern int af_v3_player_selected_equipment(u32);
+#ifdef AF_V3_SCENERY_FAMILIES
+extern int af_carried_category(u32);
+#endif
 extern int af_scenery_dma(void *,u32,u32);
 extern u32 af_scenery_crc(const void *,u32);
 extern void af_scenery_writeback(void *,u32);

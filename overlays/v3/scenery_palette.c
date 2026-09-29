@@ -6,3 +6,11 @@ Gfx scenery_palette[] __attribute__((section(".palette"))) = {
     gsSPDisplayList((Gfx *)0x02000000),
     gsSPEndDisplayList(),
 };
+#define FAMILY_PALETTE(slot) \
+Gfx scenery_palette##slot[] __attribute__((section(".palette" #slot))) = { \
+    gsDPLoadTLUT_pal16(slot, (void *)0x01000000), \
+    gsSPDisplayList((Gfx *)0x02000000), \
+    gsSPEndDisplayList(), \
+};
+FAMILY_PALETTE(6)
+FAMILY_PALETTE(7)

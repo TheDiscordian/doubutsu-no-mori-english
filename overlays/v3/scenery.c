@@ -9,11 +9,18 @@ static void palette(u8 *bank) {
     int term=af_scenery_term();
     if ((u32)term>=18u) term=0;
     if (h[TERM]==(u32)term) return;
-    u8 *dest=bank+h[ACTIVE];
-    const u8 *src=bank+h[PALETTES]+32u*bank[h[TERMS]+(u32)term];
-    for (u32 i=0;i<32u;i++) dest[i]=src[i];
+    u32 count=h[VERSION]==2u ? h[PALETTE_N] : 1u;
+    for (u32 index=0;index<count;index++) {
+        const u32 *r=(const u32 *)(bank+h[PALETTES]+index*16u);
+        u32 data=h[VERSION]==2u ? r[0] : h[PALETTES];
+        u32 active=h[VERSION]==2u ? r[1] : h[ACTIVE];
+        u32 terms=h[VERSION]==2u ? r[2] : h[TERMS];
+        u8 *dest=bank+active;
+        const u8 *src=bank+data+32u*bank[terms+(u32)term];
+        for (u32 i=0;i<32u;i++) dest[i]=src[i];
+        af_scenery_writeback(dest,32);
+    }
     h[TERM]=(u32)term;
-    af_scenery_writeback(dest,32);
 }
 
 static void body(void *graph,void *gfx,void *list,void *positions,void *table,u32 variant) {
@@ -40,12 +47,35 @@ int af_v3_scenery_relocate(u8 *owner,u32 variant) {
     if (!owner || variant>=4u) return 0;
     const Scenery *c=af_v3_scenery_config+variant;
     u8 *bank=owner+c->bank_offset;u32 *h=(u32 *)bank;
-    if (h[MAGIC]!=0x41465343u || h[VERSION]!=1u || h[BYTES]!=c->bytes || h[READY]
-            || h[ROW_N]!=10u || h[TYPE_N]!=14u || c->first_index>=c->table_count
+    int multi=h[VERSION]==2u;
+#ifndef AF_V3_SCENERY_FAMILIES
+    if (multi) return 0;
+#endif
+    if (h[MAGIC]!=0x41465343u || (h[VERSION]!=1u && !multi) || h[BYTES]!=c->bytes || h[READY]
+            || (!multi && (h[ROW_N]!=10u || h[TYPE_N]!=14u))
+            || (multi && !((h[ROW_N]==31u+(variant==2u) && h[TYPE_N]==41u) ||
+                          (h[ROW_N]==21u+(variant==2u) && h[TYPE_N]==27u)))
+            || c->first_index>=c->table_count
             || h[ROW_N]>c->table_count-c->first_index
             || !span(h[ROWS],h[ROW_N],8,c->bytes) || !span(h[TYPES],h[TYPE_N],16,c->bytes)
-            || !span(h[PALETTES],14,32,c->bytes) || !span(h[ACTIVE],1,32,c->bytes)
-            || !span(h[TERMS],18,1,c->bytes) || !span(h[TRAMPOLINE],1,16,c->bytes)) return 0;
+            || !span(h[TRAMPOLINE],1,16,c->bytes)) return 0;
+    if (multi) {
+        if (h[PALETTE_N]!=(h[TYPE_N]==41u?3u:2u) ||
+            !span(h[PALETTES],h[PALETTE_N],16,c->bytes) ||
+            !span(h[SELECTIONS],h[TYPE_N],4,c->bytes) ||
+            (variant==2u ? h[LIGHT_LOOP]!=0x7D58u || h[LIGHT_LOOP]+556u>c->bank_offset : h[LIGHT_LOOP]!=0u)) return 0;
+    }
+    u32 seen_slots=0;
+    for (u32 i=0;i<(multi?h[PALETTE_N]:1u);i++) {
+        const u32 *r=(const u32 *)(bank+h[PALETTES]+i*16u);
+        u32 data=multi?r[0]:h[PALETTES],active=multi?r[1]:h[ACTIVE],terms=multi?r[2]:h[TERMS];
+        if (!span(data,14,32,c->bytes) || !span(active,1,32,c->bytes) ||
+            !span(terms,18,1,c->bytes) || (multi &&
+                (r[3]<6u || r[3]>8u || (seen_slots&(1u<<r[3]))))) return 0;
+        if (multi) seen_slots|=1u<<r[3];
+        for (u32 j=0;j<18u;j++) if (bank[terms+j]>=14u) return 0;
+    }
+    if (multi && seen_slots!=(h[TYPE_N]==41u?0x1C0u:0xC0u)) return 0;
     for (u32 k=CPU;k<=CALLBACK;k+=2u) {
         u32 stride=k==CALLBACK?8u:4u;
         if (!span(h[k],h[k+1],stride,c->bytes)) return 0;
@@ -54,15 +84,21 @@ int af_v3_scenery_relocate(u8 *owner,u32 variant) {
             u32 at=fix[i*(stride/4u)];
             if (!span(at,1,4,c->bytes) || at<=last) return 0;
             last=at;
-            if (k==CALLBACK) { if (fix[i*2u+1u]>1u || *(u32 *)(bank+at)) return 0; }
+            if (k==CALLBACK) {
+                u32 kind=fix[i*2u+1u];
+                if (kind>(multi?2u:1u) || (kind==2u && !h[LIGHT_LOOP]) || *(u32 *)(bank+at)) return 0;
+            }
             else if (!span(*(u32 *)(bank+at),1,1,c->bytes)) return 0;
         }
     }
-    for (u32 i=0;i<18u;i++) if (bank[h[TERMS]+i]>=14u) return 0;
     for (u32 i=0;i<h[TYPE_N];i++) {
         const u32 *row=(const u32 *)(bank+h[TYPES]+16u*i);
         if (row[0]>65535u || row[1]>=h[ROW_N]
                 || (i && row[0]<=row[-4])) return 0;
+        if (multi) {
+            u32 selected=((const u32 *)(bank+h[SELECTIONS]))[i];
+            if (selected!=0x223Bu && selected!=0x2807u && selected!=0x290Au) return 0;
+        }
     }
     for (u32 k=CPU;k<=GPU;k+=2u) {
         const u32 *fix=(const u32 *)(bank+h[k]);
@@ -72,7 +108,8 @@ int af_v3_scenery_relocate(u8 *owner,u32 variant) {
     }
     const u32 *callbacks=(const u32 *)(bank+h[CALLBACK]);
     for (u32 i=0;i<h[CALLBACK_N];i++)
-        *(u32 *)(bank+callbacks[2u*i])=callbacks[2u*i+1u] ?
+        *(u32 *)(bank+callbacks[2u*i])=callbacks[2u*i+1u]==2u ?
+            (u32)(uptr)(owner+h[LIGHT_LOOP]) : callbacks[2u*i+1u] ?
             (u32)(uptr)(owner+c->shadow_loop) : (u32)(uptr)bodies[variant];
     u32 *table=(u32 *)(owner+c->table_offset+c->first_index*8u);
     const u32 *rows=(const u32 *)(bank+h[ROWS]);
@@ -113,7 +150,14 @@ static void classify(u32 item,void *result,void *collision,void *types,u32 varia
     for (u32 i=0;i<h[TYPE_N];i++) {
         const u8 *row=bank+h[TYPES]+16u*i;
         if (*(const u32 *)row!=item) continue;
-        if (af_v3_player_selected_equipment(0x223Bu)>=0) {
+        int selected;
+#ifdef AF_V3_SCENERY_FAMILIES
+        u32 selector=h[VERSION]==2u ? ((const u32 *)(bank+h[SELECTIONS]))[i] : 0x223Bu;
+        selected=selector==0x223Bu ? af_v3_player_selected_equipment(selector)>=0 : af_carried_category(selector)>0;
+#else
+        selected=af_v3_player_selected_equipment(0x223Bu)>=0;
+#endif
+        if (selected) {
             for (u32 j=0;j<12u;j++) ((u8 *)result)[j]=row[4u+j];
             return;
         }

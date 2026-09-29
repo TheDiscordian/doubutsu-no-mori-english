@@ -31,6 +31,16 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
+Palm and cedar scenery is prepared together through the shared converter:
+27 foreground identities, all four seasons, growth/death/stumps, coconuts, and
+Christmas lights. Complete gold/palm/cedar banks and the extended palette/selection
+loader are prepared, with four focused checks and MIPS compilation passing.
+The existing native Christmas-light callback is reusable. Shared seasonal
+table/index allocation and actual field behaviours still need connection;
+this source work does not change the ABI-355 cartridge or enable either item.
+Reuse `build/v3-carried-trees-prepared-02/` and the
+[tree-family preparation](../specs/V3_SCENERY.md#palm-and-cedar-dependencies).
+
 The shared carried-item importer installs the remaining seven parent families
 and all 26 states together, with readiness and selection still off. Its checked
 `build/v3-carried-batch-prepared-05/` resources supply fourteen pocket icons,

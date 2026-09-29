@@ -24,6 +24,90 @@ item selection, and unknown categories reject. Neither this adapter nor its
 output edits a cartridge, save, build lock, or served patcher. Furniture and
 equipment installers reject the distinct scenery bundle format.
 
+## Palm and cedar dependencies
+
+The shared converter also supports `--category carried-trees`, preparing both
+families together. `build/v3-carried-trees-prepared-02/` contains 27 foreground
+identities per season, 85 complete descriptors, 67 material/geometry pairs, and
+124,160 artwork bytes. This covers every growth stage, dead sapling, stump,
+coconut-bearing palm, hidden-content cedar, and Christmas-light cedar. Identities
+are `0070..007A`, `0082`, and `0854..0862`; these extend beyond the native tables.
+Preparation and loader code do not make coconut or cedar selectable.
+
+```sh
+python3 tools/v3_furniture_pipeline.py scan --representation scenery \
+  --category carried-trees --output build/NEW-TREE-INVENTORY.json
+python3 tools/v3_furniture_pipeline.py convert --representation scenery \
+  --category carried-trees --assets-only \
+  --reuse-assets build/v3-carried-trees-prepared-02 \
+  --output build/NEW-TREE-ART
+```
+
+Missing artwork compiles in one shared compiler batch. Checked prepared artwork
+can be reused without a compiler; descriptive pending-work text is not an asset
+identity. The complete source graph, callbacks, palette banks, vertices, textures,
+commands, and output hashes still require agreement. Gold-tree resources remain
+reusable without reconversion.
+
+The source palette slots, not family names, determine material bindings: some
+cedar sapling materials use the palm palette. Both complete fourteen-palette banks
+and the eighteen-term selector are preserved. Each shadow retains its actual
+caller-owned vertices, including three cedar sizes sharing one command pair.
+Four unreferenced cedar shadow commands remain in their source table through
+aliases with identical complete commands and relocation targets. No missing
+command or resource is replaced with a blank entry. Descriptor flags are retained
+individually because they differ across seasons.
+
+`merge_categories` combines checked gold, palm, and cedar artwork into one bank
+per season. Version-two banks retain 41 foreground identities and 31 descriptors
+(32 in Xmas), all three palette banks, and independent selector IDs `223B`,
+`2807`, and `290A`. The three ordinary seasonal banks are 105,216 bytes each;
+Xmas is 106,640 bytes. Packed preparation is in
+`build/v3-carried-runtime-work-01/tree-banks-01/`. Every source table entry,
+shadow, palette, and pointer fixup has a complete binding.
+
+The cedar lights use the donor's texture/primitive-colour combiner. The native
+Xmas owner already supplies the matching full callback at offset `7D58`, 556
+bytes, SHA-256
+`3623ac2471fc39adbecc9ea6854949d05ea78400e007836a07a928c7d4c2be25`.
+It reads the existing 72-byte draw-position nodes and colour state, emits yellow,
+cyan, or magenta lights, and restores white colour and normal geometry/combiner
+state. `native_lights` checks the complete current callback. No replacement
+renderer or new light-record allocation is needed.
+
+The loader validates the full bank before writes, updates every seasonal palette,
+retains descriptor flags, binds the native light callback only in Xmas, and gates
+each family through its actual item selector. Version-one banks remain supported.
+The complete shared runtime compiles to 10,484 bytes within its existing
+12-KiB reservation at
+`build/v3-carried-runtime-work-01/tree-runtime-02/`; that compilation uses the
+retained gold configuration and is not an installed tree-family cartridge.
+
+### Remaining connection and verification
+
+The current cartridge remains ABI 355. Its ground tables have 107/108 entries
+and insufficient free slots for these additional descriptors. Extend the shared
+table, all four per-actor index arrays, and the native temporary stack arrays
+together. Preserve the common matrix nodes and Xmas light records. Update the
+ground/scenery configurations and checked allocation descriptors; account for
+the later diary/carried descriptor allocations instead of trusting the older
+gold bank's end as the current owner size. Then install the prepared banks and
+rebind the existing shared runtime callers in one refresh.
+
+Complete planting/eating, growth and death, fruit regeneration, cedar regional
+rules, collision/digging, cutting/shaking, hidden contents, field habitats, and
+the required effects before enabling the families. Reuse the installed shared
+tree consumers and source tables. Sign and spirit field behaviours and independent
+carried-family composition remain part of the same importing task.
+
+`tests/test_v3_carried_trees.py` covers the full source graph and artwork, packed
+dependencies, all three palette banks, retained descriptor flags, native light
+binding, every family-selection combination, and rejection before mutation.
+Four focused checks pass; the changed version-one loader host check also passes.
+The prepared-bundle reuse run launches no compiler. These checks and MIPS
+compilation do not establish native rendering, gameplay, saving, or hardware
+compatibility. No old ROM or exhausted native fixture needs a replay.
+
 ## Complete source graph
 
 The pinned GAFE01-r0 REL and symbols remain mandatory. Source owner order is

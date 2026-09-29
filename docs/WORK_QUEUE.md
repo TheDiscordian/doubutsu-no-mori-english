@@ -66,7 +66,15 @@ Format-14/15 migration and missing-family rejection run through the actual save
 transaction with native I/O doubled. Thirty stable save entries redirect to the
 new adapter; two existing collection entries use the shared carried path.
 
-Next finish the remaining actual field consumers: planting/eating, sign
+The complete palm/cedar art and combined seasonal banks are prepared through
+the shared scenery importer. Reuse `build/v3-carried-trees-prepared-02/`; do not
+reconvert gold or either new family. The next concrete connection is shared
+seasonal table/index/stack allocation, followed by the actual field consumers
+and independent selections in this same carried-item task. The extended loader
+and its focused checks are prepared, not installed. See
+[the tree-family contract](../specs/V3_SCENERY.md#palm-and-cedar-dependencies).
+
+Finish the remaining actual field consumers: planting/eating, sign
 designs/placement, and spirit capture/release, including actual native item-type
 and menu routes for every family. Shared paper/spirit splitting/merging,
 confirmed letter consumption, and paper collection/catalogue are installed;
