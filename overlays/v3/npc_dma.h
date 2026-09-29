@@ -1,7 +1,7 @@
 #ifndef AF_V3_NPC_DMA_H
 #define AF_V3_NPC_DMA_H
 typedef struct {unsigned int start,end,physical;} AFNpcDmaRow;
-typedef struct {unsigned int magic,version,count,stride;AFNpcDmaRow rows[8];} AFNpcDma;
+typedef struct {unsigned int magic,version,count,stride;AFNpcDmaRow rows[16];} AFNpcDma;
 typedef struct {
     unsigned int vrom;void *vram;unsigned int bytes;
     const char *filename;unsigned int line,unused;void *queue,*message;

@@ -169,7 +169,7 @@ def append_banks(base,prior,blob,entries):
     """
     capacity=prior['object_capacity'];end=capacity+len(entries)*2
     wanted=sorted(e[k] for e in entries for k in ('model_bank','texture_bank'))
-    if (not entries or not 448<=capacity<end<=456 or wanted!=list(range(capacity,end)) or
+    if (not entries or not 448<=capacity<end<=458 or wanted!=list(range(capacity,end)) or
             struct.unpack_from('>I',blob,12)[0]!=capacity):
         raise ValueError('Changed additional NPC object-table capacity')
     start=prior['asset']['symbols']['af_v3_object_status']-BLOB_RAM
@@ -195,7 +195,11 @@ def append_banks(base,prior,blob,entries):
         data=(directory/(kind+'.bin')).read_bytes()
         if (len(data)!=art[kind+'_bytes'] or sha256(data)!=art[kind+'_sha256'] or
                 len(data)>limit or len(data)&15):raise ValueError('Invalid complete additional NPC '+kind)
-        vrom=0x03FE0000+(bank-448)*0x4000
+        # The original eight additional banks end before the extended audio
+        # archive at 04000000..04800000. Keep those published identities and
+        # reserve subsequent banks beyond the complete audio reservation.
+        vrom=(0x03FE0000+(bank-448)*0x4000 if bank<456 else
+              0x04800000+(bank-456)*0x4000)
         if any(e.vstart<vrom+len(data) and vrom<e.vend for e in files.values()):
             raise ValueError('New NPC bank overlaps existing virtual resource')
         if any(e['vrom']<vrom+len(data) and vrom<e['vrom']+e['bytes'] for e in old_banks):

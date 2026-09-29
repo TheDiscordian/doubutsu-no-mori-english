@@ -67,7 +67,7 @@ allocation and its one corrected-allocator retry both return null before any
 paper calls. No native paper gameplay result is claimed; the setup retry budget
 is spent. Continue the remaining connected consumers instead of repeating it.
 
-Wisp's complete actor links in `build/v3-carried-npc-connected-10/` with all
+Wisp's complete actor is installed from `build/v3-carried-npc-connected-13/` with all
 retained participant/motion records, its official text, walk-only schedule,
 weed counts, roof-colour writes, item mapping, and guarded handovers. All 22
 reward lists retain 998 candidates; 1,000 destination mappings include the two
@@ -82,20 +82,37 @@ and message-initialization reset; the original selector retains silent mode.
 The deferred weed reward covers the saved town at outdoor field renewal,
 suppresses regrowth during that renewal, and retains the source notification
 deferral. Its pending bit survives hunt-date cleanup and player deletion.
-Prepared format-19/wire-6 storage is 12,592 bytes at `807BB000`; the complete
-32,864-byte NPC links at `807BF000..807C7060`, including initialized BSS and guard.
-There are no unresolved actor services. These modules are not installed.
+Installed format-19/wire-6 storage is 12,592 bytes at `807BB000`; the complete
+37,616-byte NPC/service module links at `807BF000..807C82F0`, including BSS and
+guard. Its descriptor and guarded actor pool end at `807C8D70`. There are no
+unresolved actor services. The shared registry redirects retain all prior
+participants; Wisp's two complete character banks use `04800000/04804000`, outside
+the expanded audio reservation. The native transfer reader supports all ten banks.
 Focused sanitized world/voice checks, current source/audio retention checks,
 fourteen shared sound-parser/allocation checks, and the format-19 save transaction
 in both paper modes pass. Native I/O is doubled in the save test; forward
 migration from formats 14–18 and older-reader rejection are covered.
-Successful-save/travel spirit cleanup and full cartridge installation remain
-unfinished. The conversation host fixture has
+Successful-save/travel cleanup stages spirit removal in write buffers and only
+clears live pockets after full success. Native error paths that also return `1`
+do not count as success; allocation, FlashRAM, and Controller Pak failures retain
+live items. Automatic player-load/reset-guard saves keep spirits. The departure
+writer accepts native private snapshots by complete identity and retains imported
+fish/insect records. Sanitized transaction/transfer checks and complete cartridge
+resource, hook, relocation, startup-CRC, and patch-reconstruction checks pass.
+The audio append moves three complete tree-art pages through their checked table;
+every art byte and old sound remains. Eight current browser/offline profiles agree,
+including pack-only and exact V2-14 for an empty/default selection.
+The conversation host fixture has
 not executed successfully; its two setup attempts are recorded as incomplete,
 and no further attempt is spent on that fixture in this batch.
-The installed proposal is ABI 367 / format 18, with Wisp disabled. No
-existing ROM, save, or deployed patcher is changed, and no native/hardware result
-is claimed for these prepared changes.
+The installed proposal is ABI 368 / format 19, with carried-family selection
+still disabled. Its silent native boot passes at `build/v3-carried-npc-boot-01/`,
+including the six-character registry, ten-bank directory, final packet guard,
+and absence of a faulted thread. Wisp interaction and native save/travel remain
+unverified; no hardware result is claimed. Format-19 saves cannot be read by
+format-18-or-earlier builds, and pack-mode saves still need pack mode. Existing
+ROMs, saves, and both deployed V2 patchers are unchanged. Continue sign-board
+placement/designs, remaining carried menu/type consumers, and independent selection.
 
 The active work is the importing pipelines: extraction, conversion, bulk
 installation, and working item behaviours, including item-specific behaviours.
@@ -311,9 +328,9 @@ reconstruction, and seven browser/offline profiles. The resident allocation,
 format-17 save code, all artwork, and original controls are retained. The NPC
 is not registered or playable; no native gameplay or hardware result is claimed.
 
-The current proposal is ABI 367 at
-`build/v3-paper-quantities-installed-08/build-lock.json`, ROM SHA-256
-`47e55a0d5a228205054381fb6d8942835ec47a1140212bcc96091e6d937ef700`.
+The current proposal is ABI 368 at
+`build/v3-carried-npc-installed-08/build-lock.json`, ROM SHA-256
+`b0e1c41ad0af74c499be9dc5d34e0a6594421baf3d7a830f3cb54b0d9ef9a6b0`.
 It contains 207 independently selectable development imports, including all
 sixteen diary styles, all nine fish, and eight insects. Another 100 furniture
 profiles await acquisition. The main lock and both stable V2-14 deployments

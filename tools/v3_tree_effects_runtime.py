@@ -33,6 +33,53 @@ SOURCES=('tools/v3_tree_effects.py','tools/v3_tree_effects_runtime.py','tools/v3
     'overlays/v3/effect_loader.c','overlays/v3/surface_bootstrap.c')
 
 
+def relocate_art_pages(image,records,equipment,first,end,*,excluded_spans=()):
+    """Move complete checked art pages that obstruct a growing ROM resource."""
+    import v3_physical_resources as physical
+    physical.verify(image,records)
+    effect=equipment['scenery']['tree_effects'];art=effect['art_packet'];packet=effect['packet']
+    pages={r['id']:r for r in art['physical_resources']}
+    blockers=[r for r in records if r['physical']<end and first<r['physical']+r['bytes']]
+    if not blockers:return image,records,[],[]
+    if any(pages.get(r['id'])!=r for r in blockers):
+        raise ValueError('Resource growth encounters non-page physical ownership')
+    raw=bytearray(image[packet['physical']:packet['physical']+packet['bytes']])
+    at=art['directory_ram']-packet['ram'];addresses=art['page_addresses']
+    expected=struct.pack('>'+str(5+len(addresses))+'I',0x41465047,art['bytes'],4096,
+        len(addresses),*addresses,art['crc32'])
+    payload=b''.join(image[a:a+4096] for a in addresses)
+    if (sha256(raw)!=packet['sha256'] or raw[at:at+len(expected)]!=expected or
+            len(payload)!=art['bytes'] or sha256(payload)!=art['sha256'] or
+            zlib.crc32(payload)!=art['crc32']):
+        raise ValueError('Changed complete paged artwork or directory')
+    staged=bytearray(image);records=copy.deepcopy(records);writes=[];moves=[];remap={}
+    for old in blockers:
+        data=bytes(staged[old['physical']:old['physical']+old['bytes']])
+        new=physical.allocate(staged,records,data,old['id']+'-relocation',best_fit=True,
+            excluded_spans=(*excluded_spans,(first,end)))
+        new['id']=old['id'];records[records.index(old)]=new
+        staged[old['physical']:old['physical']+old['bytes']]=bytes(old['bytes'])
+        staged[new['physical']:new['physical']+new['bytes']]=data
+        writes.append((new,data));moves.append(dict(previous=dict(old),replacement=dict(new)))
+        remap[old['physical']]=new['physical'];pages[old['id']]=new
+    art['page_addresses']=[remap.get(a,a) for a in addresses]
+    art['physical_resources']=[pages[r['id']] for r in art['physical_resources']]
+    struct.pack_into('>'+str(len(addresses))+'I',raw,at+16,*art['page_addresses'])
+    old_sha=packet['sha256'];packet.update(sha256=sha256(raw),crc32=zlib.crc32(raw))
+    row=next(r for r in records if r['id']==packet['id']);row['sha256']=packet['sha256']
+    staged[packet['physical']:packet['physical']+packet['bytes']]=raw
+    writes.append((dict(row,previous_sha256=old_sha),bytes(raw)))
+    field=equipment.get('carried_items',{}).get('field_creatures')
+    if field:
+        if field['packet']['id']!=packet['id'] or field['packet']['sha256']!=old_sha:
+            raise ValueError('Changed shared field/tree page owner')
+        field['packet']=copy.deepcopy(packet)
+    if b''.join(staged[a:a+4096] for a in art['page_addresses'])!=payload:
+        raise ValueError('Relocation loses complete paged artwork')
+    physical.verify(staged,records)
+    return staged,records,writes,moves
+
+
 def read(name):
     data=(ROOT/'local/ac-decomp'/name).read_bytes()
     if sha256(data)!=REFERENCES[name]:raise ValueError('Changed complete tree-effect source: '+name)

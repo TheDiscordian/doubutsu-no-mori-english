@@ -1277,6 +1277,104 @@ def carried_reward_data(base,prior,source,rewards,generated,*,lock):
     return dict(rows=rows,local_lists=receipts,runtime_selection='installed carried item-type reader')
 
 
+def carried_save_services(base,prior,generated,links):
+    """Bind real save modes and success paths, retaining the native writers."""
+    from aflib import CODE_RAM,CODE_VROM,u32
+    from v3_import_storage import jump
+    files=by_vrom(base);core=files[CODE_VROM].extract(base)
+    travel=prior['equipment_resources']['creature_fish']['world']['creature_travel']['code']['symbols']
+    for name in ('af_pak_set_kind','af_pak_read','af_pak_write','af_pak_check_private',
+                 'af_pak_clear_private','af_pak_clear_animal','af_v3_creature_profile_byte',
+                 'af_v3_require_save_state','af_v3_save_halt'):
+        links[name]=travel[name]
+    prepare=u32(core,0x80096260-CODE_RAM)
+    if prepare!=0x0C11A54A:raise ValueError('Changed stable complete-bank preparation entry')
+    links['af_v3_save_prepare']=0x80000000|((prepare&0x3FFFFFF)<<2)
+    entry=core[0x800965F4-CODE_RAM:0x800965FC-CODE_RAM]
+    if entry.hex()!='27bdffd8afbf001c':raise ValueError('Changed complete native save dispatcher')
+    generated['save-bridges.S']=('.set noreorder\n.section .text.af_cw_save_bridge,"ax",@progbits\n'
+        '.balign 4\n.globl af_cw_prior_save_step\naf_cw_prior_save_step:\n.word '+
+        ','.join(hex(w) for w in (*struct.unpack('>2I',entry),jump(0x800965FC),0))+'\n')
+    rows=[]
+    for vrom,ram,address,before,target,kind in (
+        (CODE_VROM,CODE_RAM,0x800965F4,entry,'af_cw_save_step','entry'),
+        (CODE_VROM,CODE_RAM,0x80096260,struct.pack('>I',prepare),'af_cw_save_prepare','call'),
+        (CODE_VROM,CODE_RAM,0x800793B8,struct.pack('>2I',jump(travel['af_v3_creature_passport_save']),0),
+            'af_v3_creature_passport_save','entry'),
+        (0x7486E0,0x80829470,0x80829584,bytes.fromhex('0c023df2'),'af_cw_save_sync','call'),
+        (0x7486E0,0x80829470,0x80829664,bytes.fromhex('0c023df2'),'af_cw_save_sync','call')):
+        data=files[vrom].extract(base);at=address-ram
+        if data[at:at+len(before)]!=before:raise ValueError('Changed native save consumer: '+hex(address))
+        rows.append(dict(vrom=vrom,ram=ram,address=address,before=before.hex(),target=target,kind=kind))
+    # The first machine loads a player and writes the reset guard. The second
+    # owns save/exit and travel; its mode 1 preserves an active play session.
+    if struct.unpack_from('>9I',core,0x8010767C-CODE_RAM)!=(
+            0x80095FE0,0x800961B8,0x80096228,0x800962A8,0x80096330,
+            0x800963B8,0x80096440,0x80096524,0x800965A8):
+        raise ValueError('Changed complete save/travel state machine')
+    return dict(hooks=rows,state_ram=0x80107634,success_state=8,success_result=1,
+        preserve_session_mode=1,end_session_mode=0,reset_guard_prepare=0x80095874,
+        player_selection_prepare=0x8008FBA0,private_snapshot_ram=0x801407C0,
+        reset_code_offset=0xAE0,native_save_owner_sha256=sha256(core[0x80095FE0-CODE_RAM:0x800966D8-CODE_RAM]),
+        native_execution_tested=False)
+
+
+def extend_carried_services(output,lock,directory,prepared):
+    """Extend the checked complete actor object without rebuilding its assets."""
+    import copy
+    from v3_furniture_install import inputs
+    from apply_translation import write_new
+    out=output.resolve();base,prior=inputs(lock)
+    if (out.exists() or not out.is_relative_to(ROOT/'build') or prepared.get('save_services') or
+            prepared['base_sha256']!=sha256(base) or prepared['unbound_services']):
+        raise ValueError('Use an unchanged complete NPC preparation and fresh output')
+    for name,digest in prepared['sources'].items():
+        if name!='tools/v3_holiday_participants.py' and sha256((ROOT/name).read_bytes())!=digest:
+            raise ValueError('Changed retained NPC source: '+name)
+    original=(directory/'carried-npc.o').read_bytes()
+    if sha256(original)!=prepared['object']['sha256']:raise ValueError('Changed complete prepared NPC object')
+    generated={}
+    for name,digest in prepared['generated_sha256'].items():
+        raw=(directory/name).read_bytes()
+        if sha256(raw)!=digest:raise ValueError('Changed retained complete NPC resource: '+name)
+        generated[name]=raw
+    links=dict(prepared['bindings']);services=carried_save_services(base,prior,generated,links)
+    links.update(prior['equipment_resources']['npc_extra']['code']['symbols'])
+    out.mkdir(parents=True)
+    for name,data in generated.items():write_new(out/name,data if isinstance(data,bytes) else data.encode())
+    # Copy the prepared storage, not a second compilation of unchanged codecs.
+    (out/'storage').mkdir()
+    storage=(directory/'storage/code.bin').read_bytes()
+    if sha256(storage)!=prepared['storage']['sha256']:raise ValueError('Changed complete prepared storage')
+    write_new(out/'storage/code.bin',storage)
+    docker=['docker','run','--rm','--network','none','--user',f'{os.getuid()}:{os.getgid()}',
+        '-v',f'{ROOT}:/source:ro','-v',f'{out}:/out','-w','/out','--entrypoint']
+    def run(tool,*args):
+        return subprocess.run(docker+['/n64_toolchain/bin/mips64-elf-'+tool,IMAGE,*args],
+            text=True,capture_output=True,check=True,timeout=60).stdout
+    flags=prepared['object']['flags']+['-DAF_V3_CLOTHING_PROFILE=1','-DAF_V3_REWARD_PROFILE=1',
+        '-DAF_V3_SURFACE_PROFILE=1','-DAF_V3_CREATURE_PROFILE=1']
+    paths=('overlays/v3/carried_save.c','overlays/v3/creature_travel.c','overlays/v3/npc_dma.c')
+    run('gcc',*flags,*(('/source/'+p) for p in paths),'save-bridges.S')
+    run('ld','-EB','-r','/source/'+str(directory.relative_to(ROOT))+'/carried-npc.o',
+        'carried_save.o','creature_travel.o','npc_dma.o','save-bridges.o','-o','unbound.o')
+    undefined={line.split()[-1] for line in run('nm','--undefined-only','unbound.o').splitlines()}
+    bindings={**prepared['bindings'],**{n:links[n] for n in sorted(undefined&links.keys())}}
+    run('ld','-EB','-r',*(f'--defsym={n}=0x{v:X}' for n,v in bindings.items()),'unbound.o','-o','carried-npc.o')
+    report=copy.deepcopy(prepared)
+    report.update(bindings=bindings,save_services=services,
+        reused_complete_object=dict(directory=str(directory.relative_to(ROOT)),sha256=sha256(original)),
+        generated_sha256={n:sha256((out/n).read_bytes()) for n in generated},
+        unbound_services=run('nm','--undefined-only','carried-npc.o').strip().splitlines(),
+        object=dict(sha256=sha256((out/'carried-npc.o').read_bytes()),compiler=IMAGE,flags=flags,
+            size=run('size','carried-npc.o'),linked=False))
+    report['sources'].update({p:sha256((ROOT/p).read_bytes()) for p in (*paths,
+        'tools/v3_holiday_participants.py','overlays/v3/save_runtime.h','overlays/v3/save_codec.h',
+        'overlays/v3/npc_dma.h')})
+    write_new(out/'prepared.json',(json.dumps(report,indent=2)+'\n').encode())
+    return report
+
+
 def connect_carried_event(output,lock,directory):
     """Reuse the complete actor and extend shared NPC/text/motion services.
 
@@ -1298,6 +1396,8 @@ def connect_carried_event(output,lock,directory):
     if out.exists() or not out.is_relative_to(ROOT/'build') or not directory.is_relative_to(ROOT/'build'):
         raise ValueError('Use a fresh ignored connected participant output and checked preparation')
     base,prior=inputs(lock);old=json.loads((directory/'prepared.json').read_bytes())
+    if old['format']=='AFV3-CARRIED-NPC-1':
+        return extend_carried_services(output,lock,directory,old)
     if old['format']!='AFV3-CARRIED-EVENT-1' or [r['name'] for r in old['family']]!=['ev_ghost']:
         raise ValueError('Expected the complete carried-quest source')
     for name,digest in old['generated_sha256'].items():
@@ -1457,8 +1557,10 @@ def connect_carried_event(output,lock,directory):
         af_cw_native_field_width=native_names['mFI_GetBlockXMax'],
         af_cw_native_field_height=native_names['mFI_GetBlockZMax'],
         af_cw_native_acre=native_names['mFI_BkNumtoUtFGTop'])
+    save_services=carried_save_services(base,prior,generated,links)
+    links.update(equipment['npc_extra']['code']['symbols'])
     units=('carried_npc','carried_rewards','carried_dialogue','carried_handover','carried_schedule','carried_field',
-        'carried_voice','carried_world',
+        'carried_voice','carried_world','carried_save','creature_travel','npc_dma',
         'holiday_participants_registry','holiday_participants_services',
         'holiday_participants_storage','holiday_participants_spawn','holiday_festival_motion')
     out.mkdir(parents=True)
@@ -1483,7 +1585,8 @@ def connect_carried_event(output,lock,directory):
         return subprocess.run(docker+['/n64_toolchain/bin/mips64-elf-'+tool,IMAGE,*args],
             text=True,capture_output=True,check=True,timeout=60).stdout
     flags=old['object']['flags']+['-DAF_HP_EXERCISE_REGISTRY=1','-DAF_HP_FESTIVAL_REGISTRY=1','-DAF_HP_CARRIED_REGISTRY=1',
-        '-DAF_V3_CARRIED_PROFILE=1','-DAF_V3_CARRIED_QUEST=1','-DAF_V3_PAPER_PACKS=1','-DAF_V3_CARRIED_NPC=1']
+        '-DAF_V3_CARRIED_PROFILE=1','-DAF_V3_CARRIED_QUEST=1','-DAF_V3_PAPER_PACKS=1','-DAF_V3_CARRIED_NPC=1',
+        '-DAF_V3_CLOTHING_PROFILE=1','-DAF_V3_REWARD_PROFILE=1','-DAF_V3_SURFACE_PROFILE=1','-DAF_V3_CREATURE_PROFILE=1']
     files=[n for n in generated if n.endswith(('.c','.S'))]+[
         '/source/overlays/v3/'+n+('.S' if n.endswith('_spawn') else '.c') for n in units]
     run('gcc',*flags,*files)
@@ -1493,7 +1596,7 @@ def connect_carried_event(output,lock,directory):
     bindings={n:links[n] for n in sorted(undefined&links.keys())}
     run('ld','-EB','-r',*(f'--defsym={n}=0x{v:X}' for n,v in bindings.items()),'unbound.o','-o','carried-npc.o')
     paths=['tools/v3_holiday_participants.py','tools/v3_keyframes.py','tools/v3_item_destinations.py',
-        'overlays/v3/carried_event.h','overlays/v3/carried_paper.h','overlays/v3/carried_items.h',
+        'overlays/v3/carried_event.h','overlays/v3/carried_paper.h','overlays/v3/carried_items.h','overlays/v3/npc_dma.h',
         'overlays/v3/holiday_participants.h','overlays/v3/room_rigs.h',
         'tools/v3_registry.py','tools/v3_sound_programs.py','tools/v3_villager_audio.py',
         'overlays/v3/console_storage.c','overlays/v3/console_storage.h','overlays/v3/save_compressed.c',
@@ -1503,7 +1606,7 @@ def connect_carried_event(output,lock,directory):
         source_prepared=str(directory.relative_to(ROOT)),identity=identity,motions=motions,retained_motions=retained,
         registry=dict(rows=rows,owner_count=23,resident_count=18,live_count=25,independent_gate=True),
         dialogue=text,strings=fields,name=dict(sex=sex,index=index,sound=sound),bindings=bindings,reward_lists=rewards,
-        reward_destinations=reward_map,audio=audio,voice_hooks=voice_hooks,world_hooks=world_hooks,
+        reward_destinations=reward_map,audio=audio,voice_hooks=voice_hooks,world_hooks=world_hooks,save_services=save_services,
         storage=storage,storage_ram=save_ram,storage_end=save_end,save_format=19,wire_version=6,
         unbound_services=run('nm','--undefined-only','carried-npc.o').strip().splitlines(),
         generated_sha256={n:sha256((out/n).read_bytes()) for n in generated},

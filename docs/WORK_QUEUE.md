@@ -52,8 +52,8 @@ The policy and fixed pack identities are installed and selectable in development
 Do not mutate quantities during ordinary transfers or load. See the
 [stationery choice contract](../specs/V3_CARRIED_ITEMS.md#global-stationery-quantity-choice).
 
-The current proposal is ABI 367 at
-`build/v3-paper-quantities-installed-08/build-lock.json`.
+The current proposal is ABI 368 at
+`build/v3-carried-npc-installed-08/build-lock.json`.
 The complete `build/v3-carried-batch-prepared-05/` resources are installed without
 reconversion: seven parents, 26 states, fourteen icons, seven handover/police
 models, complete orange-paper artwork, official names, and prices. Additive
@@ -181,53 +181,35 @@ and complete stationery-module loading pass after the shared physical-DMA fix.
 The native paper fixture's initial allocation and its corrected-allocator retry
 both return null before any paper calls. Its setup retry allowance is spent;
 record native gameplay/save-reload as unverified and do not repeat that harness.
-The remaining Wisp NPC services and sign-board designs/placement follow,
-including actual native item-type and menu routes for every family. The field-state bridge now
-has installed state and manager callers, but the unfinished NPC keeps the quest disabled.
-Reuse `build/v3-carried-wisp-art-01/` for the
-complete 26-joint translucent model and every facial texture. The existing
-participant importer retains all 48 actor functions from
-`build/v3-carried-event-prepared-03/`. Continue from the connected preparation at
-`build/v3-carried-npc-connected-10/`, not from another source audit. Its shared
-23-owner registry, independent spirit gate, native field/drawing services,
-complete motion, 48 official messages, sixteen choices, 32 angry-name strings,
-official Wisp name, and all twenty external reward lists compile together.
-The two actor-local reward lists remain complete. These NPC changes are prepared,
-not installed in ABI 367. The complete actor links with no undefined services.
-Its paper provider binds to the installed global setting. The prepared voice
-hooks cover initialization and the native animal-voice predicate. The shared
-sound importer retains both source `6B` and `16C`, including the first sound's
-two layers and a checked unused shared priority slot for the second. Deferred
-weed clearing uses the real field-renewal caller and grass-growth call; format
-19/wire 6 persists its independent pending bit. Reuse its 12,592-byte storage
-module at `807BB000` and 32,864-byte linked actor at `807BF000..807C7060`.
-Current source/audio retention, sanitized world/voice, shared audio parser/slot,
-and both paper-mode save transactions pass; native I/O is doubled.
-Connect successful-save/travel cleanup, then install the character banks,
-names, shared registry redirects, both voice hooks, field hooks, audio resources,
-format-19 save redirects, priority change, startup/checksum updates,
-dialogue, and full owner together. Keep source `ghost_start/stop/in`, its five
-unique acres, and saved/scene lifetime intact. Ordinary save/travel also removes
-spirits in the donor; connect the actual transaction modes, not unconditional
-deletion on a failed save. Reuse or extend the guarded quest packet for the
-owner rather than adding another startup descriptor; only twelve bootstrap
-bytes remain. Native event IDs 0..114 are preserved; Wisp owns 115.
-Reuse the installed quest state/save services and prepared complete actor source.
-The manager's source save/common/keep calls bind to `af_cw_*`; the native common
-marker invalidates private state on scene reset. Continue full NPC/name/profile,
-translucent renderer, dialogue,
-reward filtering, and successful-save/travel cleanup. The prepared actor's
-`af_cw_actor_specific` declaration now uses native signed-16-bit actor storage;
-its provider uses native offset `24`. Melody storage is a native signed word at
-`930`, not the donor's short or a byte. The fixed reservation is
-source profile `B7`, native name `D0CD`, native profile `F0`, and banks 456/457.
-The compiled shared participant registry has an independent spirit-family gate;
-install it without making spirits depend on diary selection or enabling diary
-events implicitly. The prepared walk-only schedule preserves the source
-60% walk / 40% wait decision, block-edge initialization, and fatigue/sleep rules
-through native SPECIAL callbacks rather than an invalid native schedule index.
-All 22 reward categories have supported/selected-item filtering in both
-uncollected and all-collected branches. The conversation fixture remains
+Wisp's complete NPC, official dialogue, audio, shared registry, and successful-save/
+travel cleanup are installed in the current proposal. Reuse preparation
+`build/v3-carried-npc-connected-13/` and artwork `build/v3-carried-wisp-art-01/`;
+do not rebuild the retained actor, model, textures, motions, or sounds. All 48
+actor functions, 23 registry owners, 48 messages, sixteen choices, 32 angry-name
+strings, and 22 complete reward lists remain. The paper provider uses the global
+choice. Voice reset/predicate hooks, field renewal/growth hooks, format-19/wire-6
+storage, native save-mode handling, and Controller Pak snapshot identities are
+connected. Only a successful final save state removes live spirits; failed saves
+and automatic player-loading/reset-guard saves retain them. Source native I/O is
+doubled in focused transaction tests, not claimed as executed on hardware.
+
+The expanded quest packet is 118,128 bytes at `807AC000..807C8D70`; its 12,592-byte
+storage is at `807BB000`, and 37,616-byte actor/service module at `807BF000`.
+Twenty-two startup descriptors remain. Fixed identities are native event 115,
+name `D0CD`, profile `F0`, and banks 456/457. The new logical bank range starts
+at `04800000`, beyond the complete audio reservation. Three complete tree-art
+pages move to allow the 9,232-byte audio append; hashes and all directory readers
+remain checked. The shared character transfer reader supports the ten banks.
+
+Sanitized cleanup/transfer checks, current full-resource/redirect/relocation/
+startup/patch checks, eight browser/offline profiles, and fault-free silent native
+boot pass. Native boot checks the actual registry, DMA directory, and final packet
+guard; it does not establish Wisp gameplay or saving. Format-19 saves reject older
+readers; four-sheet saves require four-sheet mode. Carried-family admission remains
+off. Next connect sign-board designs/placement and verify the remaining actual
+native item-type/menu routes, including existing card/cutlery consumers, then bind
+independent carried selections without making spirits depend on diary admission.
+The conversation fixture remains
 incomplete after two setup attempts; retain full sanitizer checks and do not
 retry it again in this batch. These source paths are not native gameplay proof.
 Use the binding map in the carried-item specification. Do not replay the completed

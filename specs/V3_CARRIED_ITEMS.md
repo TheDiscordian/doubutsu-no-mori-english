@@ -675,14 +675,15 @@ These are host/build results, not native gameplay or hardware verification.
 
 `v3_holiday_participants.py --connect-carried-event PATH --build-lock PATH
 --output PATH` reuses the complete prepared actor and reference hashes. The
-current output is `build/v3-carried-npc-connected-10/`, based on ABI 367. It
+current output is `build/v3-carried-npc-connected-13/`, based on ABI 367. It
 compiles every actor function with the shared registry, NPC services, event-save
 routing, translucent draw service, imported-motion provider, and text mapping.
-The native actor is 2,392 bytes. The object contains 28,485 text/constant bytes,
-2,104 data bytes, and 2,226 BSS bytes. All services are bound. The shared linker
-retains the entire 32,864-byte packet at `807BF000..807C7060`, including BSS and
-guard. It is not installed: successful-save/travel cleanup and full
-character/registry/field/audio/storage installation remain required.
+The native actor is 2,392 bytes. The object contains 33,192 text/constant bytes,
+2,104 data bytes, and 2,262 BSS bytes. All services are bound. The shared linker
+retains the entire 37,616-byte module at `807BF000..807C82F0`, including BSS and
+guard. The descriptor and guarded actor pool extend to `807C8D70`. Full
+character/registry/field/audio/storage installation uses ABI 368 at
+`build/v3-carried-npc-installed-08/build-lock.json`.
 No successful placeholder fills a missing consumer.
 
 The source paper adapter binds to the installed global quantity provider at its
@@ -708,15 +709,51 @@ consumes the flag only outside event-notification deferral. The complete native
 renewal retains seasonal clearing, snowmen, trees, and other growth. Player
 deletion and clearing the hunt date do not cancel the reward.
 
-Prepared format 19 uses AFHC wire 6 without enlarging its 48-byte state. Header
+Installed format 19 uses AFHC wire 6 without enlarging its 48-byte state. Header
 byte 15 retains paper mode in bit zero and uses bit one for pending clearing;
 the latter requires the spirit family. The shared save adapter is 12,592 bytes
 at `807BB000`, inside a 16-KiB reservation ending at `807BF000`. Both paper
 modes pass the real compressed save transaction with native I/O doubled,
 pending-reward retention, migration from formats 14–18, and older-reader
 rejection. Format-19 saves need this or a newer compatible build; format-18
-and earlier readers reject them. This is prepared storage, not the installed
-ABI-367/format-18 cartridge or a claim of native save/reload.
+and earlier readers reject them. Four-sheet saves still require pack mode.
+This is not a claim of ordinary native save/reload.
+
+`carried_save.c` stages deletion of all five spirit identities in the active
+player's copied inventory. Native save/exit entry `800965F4` distinguishes kind
+1/3, mode 0 from the intermediate mode 1. Only pre-call state 8 and return 1
+mean full success; error states also return 1. Entry `80096260` prepares the
+staged buffer. Player-load/reset-guard preparation at `80095874` is untouched.
+Both explicit save-menu calls at `80829584/80829664` use the complete-bank
+write contract and clear live pockets only after all 512 pages succeed. Ordinary
+save checks do not confuse allocation, FlashRAM, or Controller Pak failure with
+completion. The private reset word remains at offset `AE0`.
+
+The native departure path passes a temporary private copy at `801407C0` to the
+passport writer. The shared creature adapter resolves that copy by its complete
+16-byte identity against residents or the validated visitor. It retains creature
+selection/collection data, complete passport checksums, and rejection before
+writes. Combined town/Pak transactions defer live cleanup until the outer success;
+standalone successful passport writes clear their passed private record. Sanitized
+checks exercise both modes, false-success error states, failed allocation/erase/
+pages/Pak writes, snapshots, visitors, and disabled-family behaviour.
+
+The two new object banks keep indices 456/457, but use logical addresses
+`04800000/04804000` outside the audio archive's `04000000..04800000` reservation.
+The shared transfer table holds ten banks; its reader supports sixteen within
+the existing 256-byte directory reservation. Both old DMA entries redirect to
+the new reader after every startup packet loads. Registry, lifecycle, and save
+redirects modify checked function entries, never state or linker boundary symbols.
+The entire audio program/font/wave batch is installed. Its 9,232-byte append
+relocates three complete 4-KiB tree-art pages, retaining their full hashes and
+updating the paged directory and startup CRC. No artwork or sound is dropped.
+
+Current cartridge checks cover all changed hooks, complete resources, text
+credits, retained module bytes, 22 startup packets, and patch reconstruction.
+Eight browser/offline profiles agree. Silent native boot checks the six-character
+registry, ten-bank directory, final packet guard, and absence of a faulted thread.
+Carried-family admission stays off pending the category's remaining consumers
+and independent selection. Native Wisp interaction and save/travel are unverified.
 
 The shared registry has 23 owners, eighteen temporary resident slots, and 25
 live slots. Its 22 retained rows and source callback addresses remain intact.
@@ -725,8 +762,8 @@ checks, independently of diary admission. Descriptor identity, construction,
 callback admission, destruction after selection loss, and retained-family
 lifecycle use the same implementation. The spawn table extends through `D0CD`;
 Wisp's saved-area calls route to the installed quest owner, not the older holiday
-event map. Installation still needs to redirect the existing registry exports
-so all actors use one state allocation.
+event map. Installed registry exports redirect so all actors use one state
+allocation.
 
 Native actor parameters are signed shorts at `24`; scale begins at `5C`, and
 shadow enable is at `108`. Melody is a signed word at `930`, as shown by native

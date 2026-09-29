@@ -18,6 +18,104 @@ from v3_furniture_pipeline import Source
 
 
 class CarriedNpcTests(unittest.TestCase):
+    def test_expanded_character_dma(self):
+        from tests.test_v3_equipment_runtime import HostTests
+        HostTests.sanitized(self,'v3_npc_dma_test.c',defines=('-I'+str(ROOT/'overlays/v3'),),
+            extra=('overlays/v3/npc_dma.c',))
+
+    def test_installed_actor_resources_and_consumers(self):
+        from aflib import by_vrom,CODE_VROM,u32,apply_ups
+        from v3_asset_loader import BLOB
+        from v3_npc_registry import TABLE,DMA
+        from v3_sound_programs import installed_resource
+        import v3_physical_resources as physical
+        import zlib
+        out=ROOT/os.environ.get('V3_CARRIED_NPC_INSTALLED','build/v3-carried-npc-installed-08')
+        image,r=inputs(out/'build-lock.json');base,prior=inputs(out/'base-lock.json')
+        e=r['equipment_resources'];d=e['carried_items'];q=d['quest'];npc=q['npc'];p=q['packet']
+        files=by_vrom(image);oldfiles=by_vrom(base)
+        raw=image[p['physical']:p['physical']+p['bytes']]
+        self.assertTrue(npc['installed']);self.assertFalse(npc['selectable'])
+        self.assertTrue(q['manager']['npc_registered'])
+        self.assertFalse(npc['native_execution_verified']);self.assertEqual(npc['unbound_services'],[])
+        self.assertEqual((q['save_format'],q['wire_version']),(19,6))
+        self.assertEqual(r['save_codec']['format_version'],19)
+        self.assertEqual((d['ready_mask'],d['selected_mask']),(0,0))
+        self.assertEqual(u32(raw,q['availability_address']-p['ram']),0)
+        self.assertEqual(p,d['spawning']['packet']);self.assertEqual(p,d['paper']['quantities']['packet'])
+        self.assertEqual(raw[-16:],b'AFCN'*4)
+        self.assertLessEqual(p['ram']+len(raw),0x807DA800)
+        for code,ram in ((npc['code'],npc['ram']),(q['storage'],q['storage_ram'])):
+            at=ram-p['ram'];self.assertEqual(sha256(raw[at:at+code['bytes']]),code['sha256'])
+        registry=e['npc_extra'];rp=registry['packet']
+        reg=image[rp['physical']:rp['physical']+rp['bytes']]
+        self.assertEqual(struct.unpack_from('>4I',reg,TABLE),(0x41464E58,1,6,44))
+        self.assertEqual(struct.unpack_from('>4I',reg,DMA),(0x41464E44,1,10,12))
+        self.assertEqual(u32(reg,TABLE+16+5*44+4),0)
+        self.assertEqual(r['object_capacity'],458)
+        for bank in registry['banks']:
+            data=image[bank['physical']:bank['physical']+bank['bytes']]
+            self.assertEqual(sha256(data),bank['sha256'])
+            self.assertFalse(any(f.vstart<bank['vrom']+len(data) and bank['vrom']<f.vend for f in files.values()))
+        self.assertEqual([b['vrom'] for b in registry['banks'][-2:]],[0x04800000,0x04804000])
+        # Every changed function entry reaches the new module, and restoring
+        # only those entries preserves all other bytes of the prior modules.
+        modules={name:(registry['events'][name]['code'],registry['events'][name]['packet'],
+            prior['equipment_resources']['npc_extra']['events'][name]['code']['code_bounds'][0])
+            for name in ('participants','exercise','festivals')}
+        oldq=prior['equipment_resources']['carried_items']['quest']
+        modules.update(storage=(oldq['storage'],p,oldq['storage_ram']),
+            **{'character-dma':(prior['equipment_resources']['npc_extra']['code'],rp,rp['ram'])})
+        for name,(code,packet,ram) in modules.items():
+            at=packet['physical']+ram-packet['ram'];actual=bytearray(image[at:at+code['bytes']])
+            oldp=oldq['packet'] if name=='storage' else prior['equipment_resources']['npc_extra']['packet'] if name=='character-dma' else prior['equipment_resources']['npc_extra']['events'][name]['packet']
+            for h in npc['redirects']:
+                if h['owner']!=name:continue
+                offset=h['address']-ram;self.assertEqual(actual[offset:offset+8].hex(),h['after'])
+                actual[offset:offset+8]=bytes.fromhex(h['before'])
+            before=oldp['physical']+ram-oldp['ram']
+            self.assertEqual(actual,base[before:before+code['bytes']],name)
+        for hook in npc['installed_hooks']:
+            at=hook['address']-hook['ram'];n=len(bytes.fromhex(hook['after']))
+            self.assertEqual(files[hook['vrom']].extract(image)[at:at+n].hex(),hook['after'])
+            self.assertEqual(oldfiles[hook['vrom']].extract(base)[at:at+n].hex(),hook['before'])
+        self.assertEqual(npc['save_services']['success_state'],8)
+        self.assertEqual(npc['save_services']['preserve_session_mode'],1)
+        for row in npc['text']['resources']:
+            self.assertEqual(sha256(files[row['vrom']].extract(image)),row['sha256'])
+        self.assertEqual((npc['text']['count'],npc['text']['choice_count']),(48,16))
+        self.assertEqual(len(npc['text']['provenance_entries']),97)
+        core=files[CODE_VROM].extract(image)
+        for kind,key in (('seq','sequence'),('bank','font'),('wave','wave')):
+            record=npc['audio'][key];audio,_,_=installed_resource(image,core,kind,record['index'])
+            self.assertEqual(sha256(audio),record['sha256'])
+        art=e['scenery']['tree_effects']['art_packet']
+        self.assertEqual(sha256(b''.join(image[a:a+4096] for a in art['page_addresses'])),art['sha256'])
+        self.assertEqual(art['sha256'],prior['equipment_resources']['scenery']['tree_effects']['art_packet']['sha256'])
+        self.assertEqual(len(r['relocated_physical_resources']),3)
+        physical.verify(image,r['physical_resources'])
+        blob=files[BLOB].extract(image);boot=e['surface_bootstrap']['code']
+        at=e['blob_offset']+boot['symbols']['packets']-e['ram'];loaded=[]
+        self.assertEqual((boot['packet_count'],boot['packet_stride']),(22,16))
+        self.assertLessEqual(boot['bytes'],688)
+        for i in range(22):
+            ram,address,size,crc=struct.unpack_from('>4I',blob,at+16*i);loaded.append((ram,address,size))
+            if address&0x80000000:data=image[address&0x7FFFFFFF:(address&0x7FFFFFFF)+size]
+            else:
+                f=next(f for f in files.values() if f.vstart<=address<f.vend)
+                data=f.extract(image)[address-f.vstart:address-f.vstart+size]
+            self.assertEqual(zlib.crc32(data),u32(blob,e['blob_offset']+crc-e['ram']))
+        self.assertIn((p['ram'],p['physical']|0x80000000,p['bytes']),loaded)
+        self.assertEqual(apply_ups((ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes(),
+            (out/'asset-loader.ups').read_bytes()),image)
+
+    def test_success_only_save_and_passport_cleanup(self):
+        from tests.test_v3_equipment_runtime import HostTests
+        HostTests.sanitized(self,'v3_carried_save_test.c',defines=(
+            '-DAF_V3_CLOTHING_PROFILE=1','-DAF_V3_REWARD_PROFILE=1',
+            '-DAF_V3_SURFACE_PROFILE=1','-DAF_V3_CREATURE_PROFILE=1',
+            '-DAF_V3_CARRIED_NPC=1'),extra=('overlays/v3/carried_save.c',))
+
     def test_deferred_field_reward(self):
         from tests.test_v3_equipment_runtime import HostTests
         HostTests.sanitized(self,'v3_carried_world_test.c',defines=(
@@ -35,7 +133,7 @@ class CarriedNpcTests(unittest.TestCase):
     def test_complete_sound_batch_preserves_other_groups_and_programs(self):
         from aflib import CODE_RAM,CODE_VROM,by_vrom
         import v3_sound_programs as sounds
-        out=ROOT/os.environ.get('V3_CARRIED_NPC','build/v3-carried-npc-connected-10')
+        out=ROOT/os.environ.get('V3_CARRIED_NPC','build/v3-carried-npc-connected-13')
         prepared=json.loads((out/'prepared.json').read_bytes());audio=prepared['audio']
         base,prior=inputs(ROOT/'build/v3-paper-quantities-installed-08/build-lock.json')
         core=by_vrom(base)[CODE_VROM].extract(base)
@@ -177,7 +275,7 @@ class CarriedNpcTests(unittest.TestCase):
         from textvalidate import expanded_bound
         from runtime_module import module_command_info
         from textbanks import Bank
-        out=ROOT/os.environ.get('V3_CARRIED_NPC','build/v3-carried-npc-connected-10')
+        out=ROOT/os.environ.get('V3_CARRIED_NPC','build/v3-carried-npc-connected-13')
         r=json.loads((out/'prepared.json').read_bytes())
         base,prior=inputs(ROOT/'build/v3-paper-quantities-installed-08/build-lock.json')
         self.assertEqual(r['base_sha256'],sha256(base))

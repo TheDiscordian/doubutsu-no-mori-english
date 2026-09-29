@@ -17,11 +17,13 @@ extern volatile u32 af_npc_dma_worker[2];
 #endif
 static int valid(void) {
     const AFNpcDma *t=&af_v3_npc_dma;
-    if(t->magic!=0x41464E44 || t->version!=1 || !t->count || t->count>8 || t->stride!=12)return 0;
+    if(t->magic!=0x41464E44 || t->version!=1 || !t->count || t->count>16 || t->stride!=12)return 0;
     for(u32 i=0;i<t->count;++i) {
         const AFNpcDmaRow *r=t->rows+i;
-        if((r->start|r->end|r->physical)&15u || r->start<0x03FE0000u ||
-                r->start>=r->end || r->end>0x04000000u || r->physical<0x100000u ||
+        int reserved=(r->start>=0x03FE0000u && r->end<=0x04000000u) ||
+            (r->start>=0x04800000u && r->end<=0x048E0000u);
+        if((r->start|r->end|r->physical)&15u || !reserved ||
+                r->start>=r->end || r->physical<0x100000u ||
                 r->physical>0x04000000u-(r->end-r->start))return 0;
         for(u32 j=0;j<i;++j)if(t->rows[j].start<r->end && r->start<t->rows[j].end)return 0;
     }

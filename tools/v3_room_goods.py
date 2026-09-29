@@ -451,6 +451,12 @@ def publish_bootstrap(equipment,blob,surface,output):
                     paper['save_format']!=18 or paper['wire_version']!=5):
                 raise ValueError('Changed global stationery startup extension')
             expected+=0x7000
+        npc=quest.get('npc') if quest else None
+        if npc:
+            if (not npc['installed'] or npc['packet']!=p or npc['ram']!=0x807BF000 or
+                    npc['save_format']!=19 or npc['wire_version']!=6 or npc['end']>0x807DA800):
+                raise ValueError('Changed complete carried NPC startup extension')
+            expected=npc['end']-p['ram']
         if (not carried_quest['installed'] or p['ram']!=0x807AC000 or p['bytes']!=expected or
                 p['physical']&15 or p['storage']!='physical-ROM' or
                 not 0x100000<=p['physical']<p['physical']+p['bytes']<=0x4000000):

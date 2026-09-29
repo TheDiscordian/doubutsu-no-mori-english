@@ -1053,6 +1053,20 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             report_updates['physical_resources'],output))
     allocation_base=physical.retire_dma_copies(base,prior.get('physical_resources',[]),
         report_updates['retired_dma_copies']) if report_updates.get('retired_dma_copies') else base
+    if report_updates.get('relocated_physical_resources'):
+        allocation_base=bytearray(allocation_base)
+        for move in report_updates['relocated_physical_resources']:
+            old,new=move['previous'],move['replacement']
+            first=old['physical'];end=first+old['bytes']
+            if (old not in prior['physical_resources'] or new not in report_updates['physical_resources'] or
+                    old['id']!=new['id'] or old['bytes']!=new['bytes'] or old['sha256']!=new['sha256'] or
+                    sha256(allocation_base[first:end])!=old['sha256'] or
+                    not any(row==new and sha256(data)==old['sha256'] for row,data in physical_writes) or
+                    physical.overlaps(report_updates['physical_resources'],first,end) or
+                    any(e.pstart<end and first<(e.pend or e.pstart+e.size)
+                        for e in files.values() if e.pstart!=0xFFFFFFFF)):
+                raise ValueError('Changed complete physical-page relocation')
+            allocation_base[first:end]=bytes(old['bytes'])
     if equipment_report and equipment_report.get('room_rigs',{}).get('embedded_engine'):
         from v3_furniture_motion import publish_embedded_dispatch,OWNER as room_owner
         publish_embedded_dispatch(base,prior,equipment_report,owner_changes)
@@ -1692,6 +1706,12 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             report['native_test']='pending event/service activation, diary selection, and connected native gameplay/save verification'
         if npc['events'].get('selection'):
             report['native_test']='pending native diary UI/save and activated festival gameplay verification'
+        carried_npc=equipment_report.get('carried_items',{}).get('quest',{}).get('npc')
+        if carried_npc and not prior['equipment_resources'].get('carried_items',{}).get('quest',{}).get('npc'):
+            report['shared_runtime_refresh'].update(adapters=['carried_npc'],artwork_changed=True,
+                additional_resident_bytes=carried_npc['additional_resident_bytes'],
+                resource_allocations_changed=True,saved_format_changed=True)
+            report['native_test']='pending carried-family selection and ordinary Wisp gameplay/save/travel verification'
     if console_images is not None:
         images=equipment_report['console_images']
         report['shared_runtime_refresh'].update(adapters=['console_images'],

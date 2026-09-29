@@ -79,6 +79,8 @@ def install(base,prior,blob,core,output,directory):
         raise ValueError('Participants need their checked current preparation')
     for path,digest in prepared['sources'].items():
         if sha256((ROOT/path).read_bytes())!=digest:raise ValueError('Changed participant preparation source: '+path)
+    if prepared.get('format')=='AFV3-CARRIED-NPC-1':
+        return install_carried(base,prior,blob,core,output,directory,prepared)
     if prepared.get('category')=='complete-exercise-card':
         return install_exercise(base,prior,blob,core,output,directory,prepared)
     if prepared.get('category')=='complete-festival-participants':
@@ -576,6 +578,280 @@ def install_festivals(base,prior,blob,core,output,directory,prepared):
     write_new(work/'retained-prefix.bin',prefix)
     return e,{vrom:native,reloc:fixups},dict(physical_resources=records,
         retired_physical_resources=retired),[(dict(prefix_record,previous_sha256=old['sha256']),bytes(prefix)),(allocation,extra)]
+
+
+def install_carried(base,prior,blob,core,output,directory,prepared):
+    """Install the complete carried NPC through the existing character pipeline."""
+    from v3_console_disk_install import reservations
+    from v3_event_text import patch_bounds
+    from v3_holiday_dialogue import check_provenance
+    from v3_holiday_selection import refresh_receipts
+    from v3_npc_registry import TABLE,DMA,append_banks
+    from v3_npc_native import identities,IDENTITIES
+    from v3_npc_stream_runtime import native_records
+    from v3_npc_draw import relocation_offsets
+    from v3_furniture_pipeline import Source
+    from v3_furniture_install import relocate_resource_plan
+    from v3_import_storage import jump
+    from v3_registry import SPECIAL_NPCS,SPECIAL_NPC_REGISTRY_VERSION
+    from v3_sound_programs import install_audio_resources,permanent_budget
+    from catalogue_names import Image
+    from npc_mail_show import relocate_verified_data
+    import v3_physical_resources as physical
+    e=copy.deepcopy(prior['equipment_resources']);d=e['carried_items'];q=d['quest']
+    npc=e['npc_extra'];events=npc['events'];old=copy.deepcopy(q['packet']);files=by_vrom(base)
+    if (q.get('npc') or not prepared.get('save_services') or prior['save_codec']['format_version']!=18 or
+            old!=d['spawning']['packet'] or old!=d['paper']['quantities']['packet'] or
+            old['ram']+old['bytes']!=prepared['storage_ram']):
+        raise ValueError('Complete carried NPC requires the installed global stationery proposal')
+    work=output/'carried-npc';work.mkdir()
+    start=prepared['storage_end'];data,compiled=link(directory,prepared,work/'linked',object_name='carried-npc',ram=start)
+    symbols=compiled['symbols'];actor_bytes=u32(data,symbols['af_cw_actor_bytes']-start)
+    if actor_bytes!=2392:raise ValueError('Changed complete carried NPC allocation')
+    identity='GAFE01-r0/npc/ev-ghost';r=SPECIAL_NPCS[identity]
+    art_dir=ROOT/'build/v3-carried-wisp-art-01';art_raw=(art_dir/'art.json').read_bytes();art=json.loads(art_raw)
+    if prepared['identity']!=r or art['draw_index']!=r['draw_index']:
+        raise ValueError('Changed complete carried NPC identity/artwork')
+    source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+        (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    draw,stream,voice=native_records(source,art,r['name'],r['model_bank'],r['texture_bank'])
+    profile=source.raw('Ev_Ghost_Profile')
+    if len(profile)!=36 or struct.unpack_from('>HH',profile)!=(r['donor_profile'],4<<8):
+        raise ValueError('Changed complete source carried NPC profile')
+    # The previously installed smaller quest packets have a checked live
+    # replacement. Reuse their cartridge space without touching any source ROM.
+    retired=[];staged=base;records=copy.deepcopy(prior['physical_resources'])
+    obsolete=[r for r in records if r['id'] in ('carried-quest-GAFE01-r0','carried-quest-state-GAFE01-r0')]
+    if obsolete:
+        staged,records,retired=physical.retire_packet_copies(base,prior,
+            tuple((dict(row,ram=old['ram']),old) for row in obsolete))
+    staged_prior=copy.deepcopy(prior);staged_prior['physical_resources']=records
+    banks,asset,records,writes,staged=append_banks(staged,staged_prior,blob,[dict(r,identity=identity,directory=art_dir)])
+    registry_packet=npc['packet'];registry=bytearray(base[registry_packet['physical']:registry_packet['physical']+registry_packet['bytes']])
+    if sha256(registry)!=registry_packet['sha256'] or struct.unpack_from('>4I',registry,TABLE)!=(0x41464E58,1,5,44):
+        raise ValueError('Changed complete retained special-character registry')
+    appended=bytearray(data);descriptor=start+len(appended);profile_at=descriptor+32
+    stride=((actor_bytes+15)&~15)+32;chunk=bytearray(240+stride)
+    callbacks=[symbols['af_hp_'+name] for name in ('ctor','dtor','step','draw','save')]
+    struct.pack_into('>8I',chunk,0,0,0,0,0,0,profile_at,0,0)
+    struct.pack_into('>HHIHH6I',chunk,32,r['profile'],3<<8,u32(profile,4),r['name'],3,actor_bytes,*callbacks)
+    chunk[80:180]=draw;chunk[192:228]=stream
+    struct.pack_into('>4I',chunk,240,0x41464E53,0,r['name'],r['profile'])
+    chunk[-16:]=b'NPCG'*4;appended.extend(chunk);appended.extend(b'AFCN'*4)
+    end=start+len(appended)
+    if end>0x807DA800 or any(a<end and prepared['storage_ram']<b for a,b in reservations(prior)):
+        raise ValueError('Complete carried actor/storage overlaps retained memory')
+    row_at=TABLE+16+5*44
+    if any(registry[row_at:row_at+44]):raise ValueError('Carried NPC overwrites a retained registry row')
+    struct.pack_into('>HH9I2H',registry,row_at,r['name'],r['profile'],0,actor_bytes,1,stride,
+        descriptor+240,descriptor,descriptor+80,descriptor+192,voice,r['model_bank'],r['texture_bank'])
+    struct.pack_into('>I',registry,TABLE+8,6)
+    members={'GAFE01-r0/npc/ev-soncho2':npc['record']['identity']}
+    members.update({k:v['identity'] for k,v in npc['prepared_characters'].items() if v['actor_installed']})
+    previous_names,_=identities(base,members)
+    if registry[IDENTITIES:IDENTITIES+144]!=previous_names.ljust(144,b'\0'):
+        raise ValueError('Changed retained official character names')
+    members[identity]=r;names,name_rows=identities(base,members)
+    registry[IDENTITIES:IDENTITIES+144]=names.ljust(144,b'\0')
+    old_banks=npc['banks'];dma=struct.pack('>4I',0x41464E44,1,len(old_banks),12)+b''.join(
+        struct.pack('>3I',b['vrom'],b['vrom']+b['bytes'],b['physical']) for b in old_banks)
+    if registry[DMA:DMA+len(dma)]!=dma or any(registry[DMA+len(dma):DMA+len(dma)+len(banks)*12]):
+        raise ValueError('Changed retained complete character DMA directory')
+    struct.pack_into('>I',registry,DMA+8,len(old_banks)+len(banks))
+    for i,b in enumerate(banks,len(old_banks)):
+        struct.pack_into('>3I',registry,DMA+16+i*12,b['vrom'],b['vrom']+b['bytes'],b['physical'])
+    npc['banks']+=banks
+    npc['prepared_characters'][identity]=dict(identity=r,registry_version=SPECIAL_NPC_REGISTRY_VERSION,
+        art=str(art_dir.relative_to(ROOT)),art_sha256=sha256(art_raw),draw_hex=draw.hex(),stream_hex=stream.hex(),
+        voice=voice,model_bytes=art['model_bytes'],texture_bytes=art['texture_bytes'],banks_installed=True,
+        actor_installed=True,active=False,selectable=False,native_execution_verified=False,actor_bytes=actor_bytes,
+        descriptor=descriptor,profile=profile_at,slots=1,slot_stride=stride,pool_ram=descriptor+240,
+        flags_offset=row_at+4,callback_family='Ev_Ghost')
+    raw=bytearray(base[old['physical']:old['physical']+old['bytes']])
+    if sha256(raw)!=old['sha256'] or raw[-16:]!=b'AFPQ'*4:raise ValueError('Changed retained quest prefix')
+    raw.extend(bytes(start-old['ram']-len(raw)));raw.extend(appended)
+    storage=prepared['storage'];storage_ram=prepared['storage_ram'];storage_data=(directory/'storage/code.bin').read_bytes()
+    if sha256(storage_data)!=storage['sha256'] or len(storage_data)>start-storage_ram:
+        raise ValueError('Changed complete carried NPC storage')
+    raw[storage_ram-old['ram']:storage_ram-old['ram']+len(storage_data)]=storage_data
+    payloads={registry_packet['id']:registry};redirects=[]
+    def redirect(label,packet,previous,origin,target,target_origin,prefixes):
+        body=raw if packet['id']==old['id'] else payloads.setdefault(packet['id'],
+            bytearray(base[packet['physical']:packet['physical']+packet['bytes']]))
+        lo=origin;hi=origin+previous['bytes'];at=lo-packet['ram']
+        if sha256(body[at:at+previous['bytes']])!=previous['sha256']:
+            raise ValueError('Changed complete public module: '+label)
+        code_end=previous.get('code_bounds',(lo,hi))[1]
+        target_end=target.get('code_bounds',(target_origin,target_origin+target['bytes']))[1]
+        markers={'af_hp_packet_start','af_hp_code_end','af_hp_bss_start','af_hp_bss_end','af_hp_packet_end'}
+        entries=sorted(set(a for a in previous['symbols'].values() if lo<=a<code_end))
+        for name,address in previous['symbols'].items():
+            if not lo<=address<code_end or name in markers or not name.startswith(prefixes):continue
+            dest=target['symbols'].get(name)
+            if dest is None or not target_origin<=dest<target_end:continue
+            following=next((a for a in entries if a>address),code_end)
+            if following-address<8:raise ValueError('Short retained public entry: '+name)
+            pos=address-packet['ram'];before=bytes(body[pos:pos+8]);after=struct.pack('>2I',jump(dest),0)
+            body[pos:pos+8]=after
+            redirects.append(dict(owner=label,name=name,address=address,target=dest,before=before.hex(),after=after.hex()))
+        previous['sha256']=sha256(body[at:at+previous['bytes']])
+    for family in ('participants','exercise','festivals'):
+        previous=events[family]['code']
+        redirect(family,events[family]['packet'],previous,previous['code_bounds'][0],compiled,start,
+            ('af_hp_','mEv_get_save_area','mEv_reserve_save_area'))
+        # World-map placement remains in its complete installed owner. Wisp
+        # uses the quest manager's five-acre placement, while all lifecycle and
+        # temporary-resident operations must share this expanded registry.
+        required={'af_hp_owned','af_hp_identity','af_hp_descriptor','af_hp_free',
+            'af_hp_event_lookup','af_hp_resident_bind','af_hp_events_clear'}
+        if not required<={r['name'] for r in redirects if r['owner']==family}:
+            raise ValueError('Incomplete retained participant redirect: '+family)
+        events[family]['loaded_code']['sha256']=previous['sha256']
+    redirect('storage',old,q['storage'],q['storage_ram'],storage,storage_ram,
+        ('af_v3_','af_holiday_cards_','af_carried_'))
+    redirect('character-dma',registry_packet,npc['code'],registry_packet['ram'],compiled,start,
+        ('af_v3_npc_dma_init','af_v3_npc_dma_request'))
+    if {h['name'] for h in redirects if h['owner']=='character-dma'}!={
+            'af_v3_npc_dma_init','af_v3_npc_dma_request'}:
+        raise ValueError('Incomplete expanded character transfer reader')
+    replacement=physical.allocate(staged,records,bytes(raw),'carried-npc-GAFE01-r0',best_fit=True)
+    records.append(replacement);staged[replacement['physical']:replacement['physical']+len(raw)]=raw
+    packet=dict(replacement,ram=old['ram'],crc32=zlib.crc32(raw),storage='physical-ROM')
+    writes.append((replacement,bytes(raw)))
+    q['storage_previous']=q['storage'];q.update(storage=copy.deepcopy(storage),storage_ram=storage_ram,save_format=19,wire_version=6)
+    for owner in (q,d['spawning'],d['paper']['quantities']):owner['packet']=copy.deepcopy(packet)
+    for saved in (d['storage'],e['holiday_items']['controls']['storage']):
+        saved.update(active_code=copy.deepcopy(storage),save_format=19,wire_version=6)
+    e['console_storage'].update(save_format=19,card_runtime=copy.deepcopy(storage))
+    changes={};hooks=[]
+    def patch_owner(vrom,ram,address,before,after):
+        body=core if vrom==CODE_VROM else changes.setdefault(vrom,bytearray(files[vrom].extract(base)))
+        at=address-ram
+        if body[at:at+len(before)]!=before:raise ValueError('Changed complete NPC consumer: '+hex(address))
+        body[at:at+len(after)]=after
+        hooks.append(dict(vrom=vrom,ram=ram,address=address,before=before.hex(),after=after.hex()))
+    for hook in prepared['voice_hooks']:
+        patch_owner(CODE_VROM,CODE_RAM,hook['address'],bytes.fromhex(hook['before']),
+            struct.pack('>2I',jump(symbols[hook['target']]),0))
+    for hook in prepared['save_services']['hooks']:
+        after=struct.pack('>I',jump(symbols[hook['target']],link=hook['kind']=='call'))
+        if hook['kind']=='entry':after+=bytes(4)
+        patch_owner(hook['vrom'],hook['ram'],hook['address'],bytes.fromhex(hook['before']),after)
+    for hook in prepared['world_hooks']:
+        patch_owner(hook['vrom'],hook['ram'],hook['address'],struct.pack('>I',hook['before']),
+            struct.pack('>I',jump(symbols[hook['target']],link=True)))
+    vrom,reloc,ram=0x8681F0,0x878550,0x809735B0
+    patch_owner(vrom,ram,0x809749D0,struct.pack('>2I',jump(events['festivals']['code']['symbols']['af_hg_animation']),0),
+        struct.pack('>2I',jump(symbols['af_hg_animation']),0))
+    # Remove only the replaced local grass call's relocation. Original section
+    # sizes, BSS, all other fixups, and every unrelated loaded byte stay intact.
+    growth=e['scenery']['daily_growth'];gv,gr= growth['vrom'],growth['reloc']
+    relocation=files[gr].extract(base);sections=struct.unpack_from('>5I',relocation)
+    fixups=list(struct.unpack_from('>'+str(sections[4])+'I',relocation,20));removed=[]
+    for h in hooks:
+        if h['vrom']!=gv:continue
+        relative=h['address']-growth['ram'];word=0x44000000|relative
+        if word not in fixups:raise ValueError('Missing original local grass-call relocation')
+        fixups.remove(word);removed.append(relative)
+    fixed=(struct.pack('>5I',*sections[:4],len(fixups))+struct.pack('>'+str(len(fixups))+'I',*fixups)+
+        bytes(len(relocation)-24-len(fixups)*4)+struct.pack('>I',len(relocation)))
+    for load in (0x80200010,0x80348010):
+        before=relocate_verified_data(Image(growth['ram'],sum(sections[:4]),sections),files[gv].extract(base),relocation,load)
+        after=relocate_verified_data(Image(growth['ram'],sum(sections[:4]),(*sections[:4],len(fixups))),changes[gv],fixed,load)
+        allowed={a+i for a in removed for i in range(4)}
+        if any(x!=y and i not in allowed for i,(x,y) in enumerate(zip(before,after))):
+            raise ValueError('Field reward changes unrelated relocated code or BSS')
+    changes[gr]=fixed;growth.update(output_sha256=sha256(changes[gv]),relocation_sha256=sha256(fixed))
+    for h in hooks:
+        if h['vrom'] in (0x7486E0,vrom) and h['address']-h['ram'] in relocation_offsets(
+                files[0x749200 if h['vrom']==0x7486E0 else reloc].extract(base),files[h['vrom']].size):
+            raise ValueError('Save/animation resident hook retains an unexpected relocation')
+    text=copy.deepcopy(prepared['dialogue']);check_provenance(text)
+    text.update(choice_vrom=prior['import_storage']['choice_vrom'],hooks=patch_bounds(core,text['first_id'],text['count']),installed=True)
+    at=0x80065544-CODE_RAM;before=0x2A010000|text['first_choice'];after=before+text['choice_count']
+    if u32(core,at)!=before:raise ValueError('Changed complete choice bound')
+    struct.pack_into('>I',core,at,after);text['hooks'].append(dict(address=at+CODE_RAM,before=before,after=after))
+    for row in text['resources']:
+        value=(directory/row['file']).read_bytes()
+        if len(value)!=row['bytes'] or sha256(value)!=row['sha256']:raise ValueError('Changed complete NPC dialogue')
+        row['original_sha256']=row.pop('previous_sha256');name='carried-npc/'+row['file']
+        write_new(output/name,value);row['file']=name
+    audio=copy.deepcopy(prepared['audio'])
+    from v3_sound_programs import audio_archive,installed_resource
+    from v3_tree_effects_runtime import relocate_art_pages
+    wave_owner=audio_archive(base,core,'wave')
+    old_wave,_,_=installed_resource(base,core,'wave',audio['wave_index'])
+    waves=(directory/'carried-wave.bin').read_bytes()
+    wave_end=wave_owner.pstart+wave_owner.size
+    staged,records,page_writes,page_moves=relocate_art_pages(staged,records,e,wave_end,
+        wave_end+len(waves)-len(old_wave),
+        excluded_spans=((files[BLOB].pstart,files[BLOB].pstart+len(blob)),))
+    writes.extend(page_writes)
+    audio_prior=copy.deepcopy(prior);audio_prior['physical_resources']=records
+    seq,font,wave,audio_changes,audio_growth,heap_growth,heap_patches,budget,fire=install_audio_resources(
+        staged,audio_prior,blob,core,(directory/'carried-sequence.bin').read_bytes(),
+        dict(font=(directory/'carried-font.bin').read_bytes(),wave=waves),audio)
+    if set(changes)&set(audio_changes):raise ValueError('NPC owner and audio updates overlap')
+    changes.update(audio_changes);moves=[audio_growth] if audio_growth else []
+    for v,value in changes.items():
+        if files[v].pend:
+            _,row=relocate_resource_plan(staged,files,v,value,minimum_physical=files[BLOB].pstart+len(blob),
+                reservations=records+moves,append_only=False,allow_compressed=True)
+            moves.append(row)
+    shared=e['sound_programs'];shared.update(previous_sequence=copy.deepcopy(shared['sequence']),sequence=seq,
+        before_budget=budget,after_budget=permanent_budget(core),native_synthesis_tested=False)
+    shared.setdefault('trigger_batches',[]).append(dict(programs=audio['registered_programs'],tables=audio['registered_tables']))
+    for key in ('furniture_audio','furniture_level_audio'):
+        if key in e:e[key].update(sequence=copy.deepcopy(seq),font=copy.deepcopy(font),wave=copy.deepcopy(wave),
+            after_budget=copy.deepcopy(shared['after_budget']))
+    trigger=e['furniture_audio'];trigger.update(
+        programs=sorted(trigger['programs']+audio['registered_programs'],key=lambda r:r['source_sound_word']),
+        tables=audio['registered_tables'],layout=audio['layout'],
+        priority_table_sha256=sha256(core[0x80113B84-CODE_RAM:0x80113B84-CODE_RAM+128]))
+    audio.update(installed=True,sequence=seq,font=font,wave=wave,heap_growth=heap_growth,heap_patches=heap_patches)
+    refresh_receipts(e,records,payloads)
+    # Festival packet also carries later item modules. Keep its complete owner
+    # checksum and every retained module receipt current after the redirects.
+    fp=events['festivals']['packet'];fbody=payloads[fp['id']]
+    for family in ('festivals',):
+        report=events[family];pos=report['ram']-fp['ram']
+        report['sha256']=sha256(fbody[pos:pos+report['bytes']])
+    previous_packet=d['previous_packet']
+    prefix=fbody[:previous_packet['bytes']]
+    previous_packet.update(sha256=sha256(prefix),crc32=zlib.crc32(prefix))
+    for batch in npc.get('source_batches',[]):
+        for p in (events['sky']['packet'],fp):
+            if p['id'] in payloads and p['ram']<=batch['ram']<batch['ram']+batch['bytes']<=p['ram']+p['bytes']:
+                at=batch['ram']-p['ram'];batch['sha256']=sha256(payloads[p['id']][at:at+batch['bytes']])
+    for p in (registry_packet,events['sky']['packet'],fp):
+        previous=next(r for r in prior['physical_resources'] if r['id']==p['id'])
+        row=next(r for r in records if r['id']==p['id'])
+        writes.append((dict(row,previous_sha256=previous['sha256']),bytes(payloads[p['id']])))
+    report=dict(prepared,installed=True,code=compiled,ram=start,bytes=len(appended),end=end,
+        sha256=sha256(appended),loaded_code=dict(ram=start,bytes=len(data),sha256=sha256(data)),
+        packet=copy.deepcopy(packet),preserved_packet=old,redirects=redirects,installed_hooks=hooks,
+        text=text,audio=audio,identities=name_rows,art=str(art_dir.relative_to(ROOT)),
+        prepared=str(directory.relative_to(ROOT)),additional_resident_bytes=end-prepared['storage_ram'],
+        native_execution_verified=False,selectable=False,pending=['carried-family selection','ordinary gameplay and save/travel'])
+    report['sources'].update({p:sha256((ROOT/p).read_bytes()) for p in
+        (*SOURCES,'tools/v3_holiday_selection.py','tools/v3_tree_effects_runtime.py')})
+    q['npc']=report
+    q['manager']['npc_registered']=True
+    q['pending']=['remaining carried-family consumers and independent selection',
+        'ordinary Wisp gameplay and native save/travel verification']
+    npc['sources'].update(report['sources']);d['sources'].update(report['sources'])
+    updates={k:copy.deepcopy(prior[k]) for k in ('save_codec','clothing','room_surfaces')}
+    updates['save_codec'].update(format_version=19,active_storage_code=copy.deepcopy(storage),card_storage_code=copy.deepcopy(storage))
+    ext=updates['clothing']['save_extension'];ext.update(format_version=19,active_storage_code=copy.deepcopy(storage))
+    ext['legacy_formats_read']=list(dict.fromkeys([*ext['legacy_formats_read'],'AFS3-v18']))
+    updates['room_surfaces']['save']['disk_format_version']=19
+    updates.update(asset=asset,object_capacity=prior['object_capacity']+len(banks),physical_resources=records,
+        retired_physical_resources=retired,relocated_physical_resources=page_moves,resource_growth=moves,fire_sound=fire,
+        save_warning='Format-19 experimental saves require this or a newer compatible build. Compatible older saves migrate forward. '
+        'Four-sheet saves still require four-sheet mode. V2 and format-18-or-earlier V3 cannot read these saves. Keep backups.')
+    write_new(work/'installed.json',(json.dumps(report,indent=2)+'\n').encode())
+    write_new(work/'packet.bin',raw)
+    return e,changes,updates,writes
 
 
 def finish(image,base,prior,output,equipment):

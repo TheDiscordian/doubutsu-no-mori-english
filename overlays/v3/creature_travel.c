@@ -31,6 +31,9 @@ extern void af_pak_set_kind(void *,unsigned);
 extern int af_pak_read(void *,void *),af_pak_write(void *,const void *);
 extern int af_pak_check_private(const u8 *);
 extern void af_pak_clear_private(u8 *),af_pak_clear_animal(u8 *);
+#ifdef AF_V3_CARRIED_NPC
+extern void af_cw_passport_stage(u8 *),af_cw_passport_complete(u8 *,int);
+#endif
 
 static void copy(u8 *d,const u8 *s,unsigned n) {for (unsigned i=0;i<n;i++) d[i]=s[i];}
 static int equal(const u8 *a,const u8 *b,unsigned n) {
@@ -115,13 +118,24 @@ void af_v3_creature_passport_clear(u8 *p) {
 int af_v3_creature_passport_save(u8 *priv,const u8 *animal,void *info) {
     if (!priv || !animal || !af_pak_check_private(priv)) return 0;
     unsigned n=player(priv);struct Visitor v;
+#ifdef AF_V3_CARRIED_NPC
+    /* The native departure writer passes a private snapshot at 801407C0,
+     * not the live resident/visitor pointer. Resolve its complete identity;
+     * do not confuse that legitimate snapshot with an unbound visitor. */
+    if(n==4)for(unsigned i=0;i<4;i++)
+        if(equal(priv,players+i*PRIVATE,16)) {n=i;break;}
+#endif
     copy(v.identity,priv,16);
     if (n<4) {
         af_v3_require_save_state();
         copy(v.profile,state->working+AF_SAVE_CREATURE_OFFSET,4);
         copy(v.collected,state->working+AF_SAVE_CREATURE_OFFSET+4+n*4,4);
     } else {
+#ifdef AF_V3_CARRIED_NPC
+        if (!visitor_matches(foreign) || !equal(priv,foreign,16)) return 0;
+#else
         if (!visitor_matches(priv)) return 0;
+#endif
         copy(v.profile,visitor.profile,4);copy(v.collected,visitor.collected,4);
     }
     /* The passport can carry fish in pockets or letters without a catch event.
@@ -131,8 +145,15 @@ int af_v3_creature_passport_save(u8 *priv,const u8 *animal,void *info) {
     if (!valid_bits(v.profile,v.collected) || !supported(v.profile)) return 0;
     /* Validate before modifying a staged passport or starting any Pak I/O. */
     copy(passport+8,priv,PRIVATE);copy(passport+0xBD8,animal,0x528);
+#ifdef AF_V3_CARRIED_NPC
+    af_cw_passport_stage(passport+8);
+#endif
     pack(passport,&v);seal(passport);af_pak_set_kind(info,0);
-    return af_pak_write(info,passport);
+    int result=af_pak_write(info,passport);
+#ifdef AF_V3_CARRIED_NPC
+    af_cw_passport_complete(priv,result);
+#endif
+    return result;
 }
 
 int af_v3_creature_passport_load(u8 *priv,u8 *animal,void *info) {
