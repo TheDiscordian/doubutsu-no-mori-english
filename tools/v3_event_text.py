@@ -138,6 +138,35 @@ def patch_bounds(core,first=FIRST,count=4):
     return patches
 
 
+def split_placements(image,files,loaded,physical_resources,reserved_end):
+    """Grow inside the banks' existing ownership; move only displaced banks.
+
+    Message data and its index are separate native DMA resources. They do not
+    need to remain adjacent. This avoids relocating megabytes when only a small
+    index blocks an additive text update.
+    """
+    from v3_physical_resources import allocate
+    owned=sorted((files[v].pstart,files[v].pstart+files[v].size) for v in loaded)
+    runs=[]
+    for lo,hi in owned:
+        if runs and lo<runs[-1][1]:raise ValueError('Overlapping original text banks')
+        if runs and lo==runs[-1][1]:runs[-1]=(runs[-1][0],hi)
+        else:runs.append((lo,hi))
+    scratch=bytearray(image);placements=[];reservations=list(physical_resources)
+    for v,data in sorted(loaded.items(),key=lambda pair:len(pair[1]),reverse=True):
+        lo=files[v].pstart;hi=lo+len(data)
+        if (any(a<=lo<hi<=b for a,b in runs) and
+                not any(r['physical']<hi and lo<r['physical']+r['bytes'] for r in placements)):
+            target=lo
+        else:
+            row=allocate(scratch,reservations,data,f'English-text-{v:08X}',best_fit=True)
+            target=row['physical']
+            if target<reserved_end:raise ValueError('Relocated text overlaps reserved imports')
+            scratch[target:target+len(data)]=data;reservations.append(row)
+        placements.append(dict(vrom=v,bytes=len(data),physical=target,sha256=sha256(data)))
+    return sorted(placements,key=lambda r:r['vrom'])
+
+
 def install(image,base,output,text,*,relocate=False,physical_resources=(),reserved_end=0):
     """Repack the four-file text region, retaining virtual reader identities.
 
@@ -160,38 +189,32 @@ def install(image,base,output,text,*,relocate=False,physical_resources=(),reserv
             raise ValueError('Changed event text resource')
         if any(v<e.vend and e.vstart<v+len(data) for key,e in files.items() if key not in moving):
             raise ValueError('Expanded event text virtual range overlaps another resource')
+        if image[entry.pstart:entry.pstart+entry.size]!=entry.extract(base):
+            raise ValueError('Text bank already modified by another adapter')
         loaded[v]=data;placements.append(dict(vrom=v,bytes=len(data),physical=cursor,sha256=sha256(data)))
         cursor+=len(data)
     if any(a['vrom']<b['vrom']+b['bytes'] and b['vrom']<a['vrom']+a['bytes']
            for i,a in enumerate(placements) for b in placements[i+1:]):
         raise ValueError('Expanded text resources overlap each other virtually')
     old_end=max(files[v].pstart+files[v].size for v in moving)
-    can_grow=(cursor<=len(image) and cursor>=old_end and not any(image[old_end:cursor]) and
+    contiguous=all(files[a['vrom']].pstart+files[a['vrom']].size==files[b['vrom']].pstart
+        for a,b in zip(ordered,ordered[1:]))
+    can_grow=(contiguous and cursor<=len(image) and cursor>=old_end and not any(image[old_end:cursor]) and
         not any(e.pstart<cursor and start<(e.pend or e.pstart+e.size) for v,e in files.items()
             if v not in moving and e.pstart!=0xFFFFFFFF) and
         not any(r['physical']<cursor and start<r['physical']+r['bytes'] for r in physical_resources))
     if relocate and not can_grow:
-        from v3_physical_resources import allocate
-        region=b''.join(loaded[row['vrom']] for row in ordered)
-        allocation=allocate(image,physical_resources,region,'relocated-English-text')
-        if allocation['physical']<reserved_end:
-            raise ValueError('Relocated text overlaps the reserved import growth range')
-        delta=allocation['physical']-start
-        for row in placements:row['physical']+=delta
-        text['physical_relocation']=dict(previous_start=start,previous_end=old_end,**allocation)
+        placements=split_placements(image,files,loaded,physical_resources,reserved_end)
+        text['physical_relocation']=dict(strategy='independent-native-banks',
+            previous=[dict(vrom=v,physical=files[v].pstart,bytes=files[v].size) for v in loaded],
+            moved_bytes=sum(r['bytes'] for r in placements if r['physical']!=files[r['vrom']].pstart))
     elif not can_grow:
         raise ValueError('Event text physical growth overlaps another resource')
     elif relocate:
         if start<reserved_end:raise ValueError('Text growth overlaps reserved imports')
         text['physical_growth']=dict(start=start,previous_end=old_end,end=cursor,bytes=cursor-old_end)
-    # Every overwritten pre-existing byte belongs to one of these four files.
-    covered=start
-    for row in ordered:
-        e=files[row['vrom']]
-        if e.pstart!=covered:raise ValueError('Text region has undeclared gaps/owners')
-        if image[e.pstart:e.pstart+e.size]!=e.extract(base):
-            raise ValueError('Text region already modified by another adapter')
-        covered+=e.size
+    # All old bytes were checked before moving any bank. Copy from the loaded
+    # buffers, so growing messages may safely cover a displaced old index.
     before=bytes(image[DMA_START:DMA_END]);expected=bytearray(before)
     for row in placements:
         v=row['vrom'];at=DMA_START+files[v].index*16

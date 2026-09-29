@@ -30,7 +30,8 @@ def text_records(image,report):
     """
     records=copy.deepcopy(report.get('resource_capacity',{}).get('resources',[]))
     equipment=report.get('equipment_resources',{})
-    text=(equipment.get('holiday_fishing',{}).get('live',{}).get('text') or
+    text=(equipment.get('npc_extra',{}).get('events',{}).get('participants',{}).get('dialogue') or
+          equipment.get('holiday_fishing',{}).get('live',{}).get('text') or
           equipment.get('npc_extra',{}).get('dialogue',{}).get('text'))
     if not text:return records
     files=by_vrom(image);core=files[CODE_VROM].extract(image)

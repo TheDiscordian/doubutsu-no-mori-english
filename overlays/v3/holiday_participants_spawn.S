@@ -26,3 +26,21 @@ af_hp_spawn_profile:
      sh $t1, 0x56($sp)
 1:  j af_hp_previous_spawn_profile
      nop
+
+/* Native NPC-manager area-15 allocation. The checked call replaces the store
+ * at 80A23C5C; its delay slot keeps v1=255 for successful initialization.
+ * s0 is the event-info pointer and v0 is the allocation result. On failure,
+ * reset the native uninitialized sentinel and return through the original
+ * false-result epilogue, 0x5c bytes after this call's return address. */
+.globl af_hp_manager_alloc
+af_hp_manager_alloc:
+    bne $v0, $zero, 2f
+     sw $v0, 0($s0)
+    addiu $t0, $zero, 70
+    sw $t0, 4($s0)
+    addiu $t0, $zero, -1
+    sw $t0, 8($s0)
+    addu $v1, $zero, $zero
+    addiu $ra, $ra, 0x5c
+2:  jr $ra
+     nop

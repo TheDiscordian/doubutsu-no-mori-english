@@ -213,6 +213,10 @@ def install(base,prior,blob,core,output):
 
 def finish(image,base,prior,output,equipment):
     from v3_event_text import install as install_text
+    if (equipment.get('npc_extra',{}).get('events',{}).get('participants') and
+            not prior['equipment_resources']['npc_extra']['events'].get('participants')):
+        from v3_holiday_participants_install import finish as finish_participants
+        return finish_participants(image,base,prior,output,equipment)
     fishing=equipment.get('holiday_fishing',{}).get('live')
     if fishing and not prior['equipment_resources'].get('holiday_fishing',{}).get('live'):
         retired=fishing['retired_duplicate'];at=retired['physical'];end=at+retired['bytes']

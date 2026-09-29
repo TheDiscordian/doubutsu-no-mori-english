@@ -485,6 +485,21 @@ def hooks(base,prior,generated,readers):
         trampolines.extend(('.balign 4','.globl '+r['previous'],r['previous']+':',
             *(f'.word 0x{w:08X}' for w in words),f'.word 0x{jump(r["address"]+8):08X}','nop'))
         rows.append(r)
+    # The complete native manager has the same initial/refill distinction as
+    # the donor, but dereferences a failed area-15 allocation. Guard that exact
+    # store without preallocating (which would incorrectly select refill).
+    vrom,reloc,ram=0x8EA970,0x8ED0E0,0x80A22EB0
+    native=files[vrom].extract(base);at=0x80A23C5C-ram
+    body=native[0x80A23BDC-ram:0x80A23CD8-ram]
+    digest='9b572e9e44fa9b287d28ac186061252d5ebeef0327b17d98e7e726000eab3117'
+    if (len(body)!=252 or sha256(body)!=digest or
+            {at,at+4}&relocation_offsets(files[reloc].extract(base),len(native))):
+        raise ValueError('Changed complete native event allocation/selection function')
+    rows.append(dict(vrom=vrom,ram=ram,address=ram+at,kind='call',
+        before=native[at:at+8].hex(),replacement='af_hp_manager_alloc',
+        native_function=dict(address=0x80A23BDC,bytes=len(body),sha256=digest),
+        failure_return=0x80A23CC0,relocation_vrom=reloc,
+        relocation_sha256=sha256(files[reloc].extract(base))))
     generated['original-readers.S']='\n'.join(trampolines)+'\n'
     return dict(rows=rows,bindings=links,role_profiles=profiles,
         original_npc_tables_preserved=True,original_relocations_preserved=True,installed=False)

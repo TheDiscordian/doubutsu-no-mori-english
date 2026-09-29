@@ -346,8 +346,10 @@ callback loader uses its actual relocated code bounds. Focused source/host,
 cartridge, and empty/mixed/all-191 composition checks pass. Continue the remaining
 controller/participant services using the retained native map; do not reconvert
 these effects or installed decorations, or restart native fixtures.
-The connected controller/participant preparation is
-`build/v3-diary-category-work-01/participants-prepared-20/`: three controllers,
+The connected controller/participant module is installed in ABI 343 at
+`build/v3-diary-category-work-01/participants-installed-03/build-lock.json`
+(ROM SHA-256 `1c67f5d201cbede26a8d7b7778b7bcd16036d309d929cf4d7c3ef855c3af37ef`),
+using `build/v3-diary-category-work-01/participants-prepared-23/`: three controllers,
 five resident roles, rope, 279 official messages/two choices, offering payment,
 tools/sounds, 21 matching native motions, and the full donor prayer motion.
 All nine owners compile together; the rope retains all 60 deformable vertices,
@@ -356,20 +358,25 @@ registry reserves `D9..E1` and temporary names `D0A0..D0AD`, uses the existing
 NPC pool, wraps post-initialization callbacks, rejects double-assigned residents,
 and retains retiring identities through destruction. Two source destructors
 handle missing event storage safely. A sanitized registry/lifetime check and
-23 shared converter checks pass. Preparation is not installation or gameplay.
-The preparation includes twelve shared event-map hooks, original resident
+23 shared converter checks pass; native gameplay remains unverified.
+The installed module includes twelve shared event-map hooks, original resident
 selection/removal/refill algorithms, real uniforms, both existing NPC/camper
 spawn extensions, descriptor/free/temporary-identity/reset chains, and the global
 prayer-animation hook. The complete coin uses shared model/audio conversion,
 retains both palettes and water subeffects, and adds no unresolved functions.
-Sanitized placement and coin lifecycle/draw-command checks pass. The exact next
-connection is installation of this entire prepared module, text, audio, and
-effect profile. Reuse its rope/coin models. Startup has nineteen entries and is
-full: combine the adjacent sky/participant packets while preserving the sky
-prefix/guard, rather than adding a twentieth entry or growing the unrelated
-holiday/fishing packet. Before activation, handle native NPC-manager area-15
-allocation failure and review the coin's source well-height against the actual
-N64 shrine. Actual calendar choice/admission remains unfinished. Native helpers
+Sanitized placement and coin lifecycle/draw-command checks pass. The entire
+51,440-byte module, official text, audio, and coin effect profile are installed
+together. The adjacent sky/participant packet is 67,840 bytes and shares the
+existing nineteenth startup descriptor, preserving the original sky prefix and
+holiday/fishing packet. All 21 hooks are installed, including the native
+NPC-manager area-15 allocation guard. Failure returns false and resets the
+manager for retry; success retains the original initial/refill distinction.
+The shared text installer moves only the message index, and shared audio
+storage reuses checked superseded allocations. Current-cartridge, changed
+profile-loader, and private browser/offline empty/mixed/all-supported checks
+pass. The next consumers are the source coin's landing geometry at the native
+shrine, remaining participant providers, and actual calendar choice/admission.
+Native helpers
 `800821B0`, `800824A4`, and `8008256C` retain the complete donor algorithms;
 resident memories start at offset `10`, not the decomp header's `0C` annotation.
 Keep source `af_hp_available` off until dependencies and selection are connected.

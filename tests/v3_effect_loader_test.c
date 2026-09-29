@@ -31,6 +31,9 @@ int main(void) {
 #ifdef AF_EFFECT_SKY_START
         if(i>=AF_EFFECT_ROOM_COUNT)base=AF_EFFECT_SKY_START;
 #endif
+#ifdef AF_EFFECT_PARTICIPANT_START
+        if(i>=AF_EFFECT_ROOM_COUNT+AF_EFFECT_SKY_COUNT)base=AF_EFFECT_PARTICIPANT_START;
+#endif
         for(u32 k=0;k<4;k++)body[k]=base+256+k*64;
         af_v3_effect_profile_load(v,v+32,(void *)0x80700000,(void *)0x80700020,out+4);
         assert(!memcmp(out+4,body,32));
@@ -62,6 +65,18 @@ int main(void) {
         if(!setjmp(fault)) {
             af_v3_effect_profile_load(v,v+32,(void *)0x80700000,(void *)0x80700020,out+4);
             assert(!"Wrong callback packet accepted");
+        }
+    }
+#endif
+#ifdef AF_EFFECT_PARTICIPANT_START
+    for(volatile int i=0;i<4;i++) {
+        volatile u32 v=AF_EFFECT_PROFILES+(AF_EFFECT_ROOM_COUNT+AF_EFFECT_SKY_COUNT)*64;
+        for(u32 k=0;k<4;k++)body[k]=AF_EFFECT_PARTICIPANT_START+256+k*64;
+        body[0]=i==0?AF_EFFECT_CODE_START:i==1?AF_EFFECT_SKY_START:
+            i==2?AF_EFFECT_PARTICIPANT_END:AF_EFFECT_PARTICIPANT_START+1;
+        if(!setjmp(fault)) {
+            af_v3_effect_profile_load(v,v+32,(void *)0x80700000,(void *)0x80700020,out+4);
+            assert(!"Wrong participant callback range accepted");
         }
     }
 #endif

@@ -629,7 +629,7 @@ def append_resource_plan(base,files,vrom,data,relocatable,*,target_vrom=None):
     return changes,record
 
 
-def relocate_resource_plan(base,files,vrom,data,*,minimum_physical,target_vrom=None,reservations=(),append_only=True):
+def relocate_resource_plan(base,files,vrom,data,*,minimum_physical,target_vrom=None,reservations=(),append_only=True,allow_compressed=False):
     """Keep a whole growing resource in verified zero, unmapped cartridge space.
 
     Logical identity is retained unless the caller declares a new virtual base.
@@ -639,7 +639,7 @@ def relocate_resource_plan(base,files,vrom,data,*,minimum_physical,target_vrom=N
     """
     entry=files[vrom];before=entry.extract(base)
     destination=vrom if target_vrom is None else target_vrom
-    if (entry.pend or not data or append_only and (len(data)<=len(before) or data[:len(before)]!=before) or
+    if ((entry.pend and (not allow_compressed or append_only)) or not data or append_only and (len(data)<=len(before) or data[:len(before)]!=before) or
             type(destination) is not int or destination&15 or not 0<=destination<destination+len(data)<=0x100000000 or
             any(e.vstart<destination+len(data) and destination<e.vend for v,e in files.items() if v!=vrom)):
         raise ValueError('Relocation needs a complete non-overlapping resource')
@@ -653,6 +653,7 @@ def relocate_resource_plan(base,files,vrom,data,*,minimum_physical,target_vrom=N
                 previous_bytes=entry.size,bytes=len(data),previous_sha256=sha256(before),sha256=sha256(data),
                 relocated_blockers=[],relocated=True,retains_old_allocation=True)
             if destination!=vrom:record['target_vrom']=destination
+            if entry.pend:record['previous_compressed_end']=entry.pend
             return {vrom:data},record
         cursor=max(cursor,last)
     raise ValueError('No verified zero cartridge gap for complete resource growth')
@@ -665,7 +666,7 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
                     equipment_rigs=None, expand_storage=False, furniture_audio_art=None, furniture_profiles=None,
                     material_frames_art=None,scrolling_materials_art=None,room_surfaces_art=None,furniture_scoring=False,
                     password_runtime=None,password_editor=False,room_effects=None,furniture_capacity=False,console_storage=False,
-                    console_images=None,console_emulator=False,console_disk=None,creature_items=None,creature_field=None,creature_fish=False,creature_insects=None,clothing_batch=None,diaries=None,diary_items=False,diary_room_art=None,diary_catalogue=False,npc_registry_art=None,holiday_actor_services=False):
+                    console_images=None,console_emulator=False,console_disk=None,creature_items=None,creature_field=None,creature_fish=False,creature_insects=None,clothing_batch=None,diaries=None,diary_items=False,diary_room_art=None,diary_catalogue=False,npc_registry_art=None,holiday_actor_services=False,holiday_participants=None):
     """Update shared readers; optionally install the shared held-resource adapter."""
     output=output.resolve()
     if output.exists() or not output.is_relative_to(ROOT/'build'):
@@ -734,7 +735,11 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
     wrapped_names=bool(player_actions and prior.get('equipment_resources',{}).get('wrapped_presents'))
     if holiday_actor_services:
         current_events=prior['equipment_resources'].get('npc_extra',{}).get('events',{})
-        if (current_events.get('decorations',{}).get('controllers') and
+        if holiday_participants is not None:
+            import v3_holiday_participants_install as equipment
+            equipment_report,owner_changes,report_updates,physical_writes=equipment.install(
+                base,prior,blob,core,output,holiday_participants)
+        elif (current_events.get('decorations',{}).get('controllers') and
                 not prior['equipment_resources'].get('holiday_items')):
             import v3_holiday_items as equipment
             equipment_report,owner_changes,report_updates,physical_writes=equipment.install(
@@ -1166,9 +1171,6 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
     if creature_fish and equipment_report:
         from v3_creature_ui import finish as finish_creature_text
         result=finish_creature_text(result,base,prior,output,equipment_report)
-    if holiday_actor_services and equipment_report:
-        from v3_holiday_dialogue import finish as finish_holiday_text
-        result=finish_holiday_text(result,base,prior,output,equipment_report)
     installed=by_vrom(result)
     for vrom,data in owner_changes.items():
         target=next((r.get('target_vrom',vrom) for r in owner_moves if r['vrom']==vrom),vrom)
@@ -1186,6 +1188,9 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         if len(data)!=row['bytes'] or sha256(data)!=row['sha256']:
             raise ValueError('Changed complete physical-resource replacement')
         result[first:end]=data
+    if holiday_actor_services and equipment_report:
+        from v3_holiday_dialogue import finish as finish_holiday_text
+        result=finish_holiday_text(result,base,prior,output,equipment_report)
     if creature_insects is not None:
         result=equipment.finish(result,base,prior,output,equipment_report,report_updates['physical_resources'])
     physical.verify(result,report_updates.get('physical_resources',prior.get('physical_resources',[])))
@@ -1497,8 +1502,9 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         event_items=equipment_report.get('holiday_items') and not prior['equipment_resources'].get('holiday_items')
         fishing=equipment_report.get('holiday_fishing') and not prior['equipment_resources'].get('holiday_fishing')
         sky=npc['events'].get('sky') and not prior['equipment_resources']['npc_extra']['events'].get('sky')
-        report['shared_runtime_refresh'].update(adapters=['holiday_actor_services'],artwork_changed=bool(decorations or event_items or sky),
-            additional_resident_bytes=state_growth+(176 if fishing else 0)+(npc['events']['sky']['additional_resident_bytes'] if sky else 0),
+        participants=npc['events'].get('participants') and not prior['equipment_resources']['npc_extra']['events'].get('participants')
+        report['shared_runtime_refresh'].update(adapters=['holiday_actor_services'],artwork_changed=bool(decorations or event_items or sky or participants),
+            additional_resident_bytes=state_growth+(176 if fishing else 0)+(npc['events']['sky']['additional_resident_bytes'] if sky else 0)+(npc['events']['participants']['additional_resident_bytes'] if participants else 0),
             resource_allocations_changed=bool(new_state or fishing or npc['events'].get('reserved')),
             saved_format_changed=bool(new_state or fishing),saved_profile_changed=False)
         report['sources'].update(npc['sources'])
@@ -1556,6 +1562,8 @@ if __name__=='__main__':
     mode.add_argument('--art',type=Path)
     mode.add_argument('--refresh-runtime',action='store_true')
     parser.add_argument('--base-lock',type=Path,default=LOCK)
+    parser.add_argument('--holiday-participants',type=Path,
+        help='Install a checked complete participant preparation with --holiday-actor-services')
     parser.add_argument('--clothing-batch',type=Path,
         help='With --refresh-runtime, install the complete prepared clothing category')
     parser.add_argument('--diary-core',type=Path,help='Prepared shared diary save/controller directory')
@@ -1677,6 +1685,8 @@ if __name__=='__main__':
     if args.diary_catalogue and not args.refresh_runtime:parser.error('--diary-catalogue requires --refresh-runtime')
     if args.npc_registry_art is not None and not args.refresh_runtime:parser.error('--npc-registry-art requires --refresh-runtime')
     if args.holiday_actor_services and not args.refresh_runtime:parser.error('--holiday-actor-services requires --refresh-runtime')
+    if args.holiday_participants is not None and not args.holiday_actor_services:
+        parser.error('--holiday-participants requires --holiday-actor-services')
     if args.password_runtime and not args.refresh_runtime:parser.error('--password-runtime requires --refresh-runtime')
     if args.password_editor and not args.refresh_runtime:parser.error('--password-editor requires --refresh-runtime')
     if args.room_effects and not args.refresh_runtime:parser.error('--room-effects requires --refresh-runtime')
@@ -1708,6 +1718,7 @@ if __name__=='__main__':
                             creature_fish=args.creature_fish,creature_insects=args.creature_insects,clothing_batch=args.clothing_batch,
                             diaries=dict(zip(('core','ui','screen'),diary_paths)) if all(diary_paths) else None,
                             diary_items=args.diary_items,diary_room_art=args.diary_room_art,diary_catalogue=args.diary_catalogue,
-                            npc_registry_art=args.npc_registry_art,holiday_actor_services=args.holiday_actor_services)
+                            npc_registry_art=args.npc_registry_art,holiday_actor_services=args.holiday_actor_services,
+                            holiday_participants=args.holiday_participants)
             if args.refresh_runtime else build(args.output,args.art,args.base_lock))
     print(json.dumps({k:result[k] for k in ('runtime_abi','output_sha256','patch_sha256')},indent=2))

@@ -28,8 +28,10 @@ SOURCES=('tools/v3_holiday_sky.py','overlays/v3/holiday_sky.h','overlays/v3/holi
     'overlays/v3/effect_loader.c','tools/v3_room_goods.py','tools/v3_furniture_install.py')
 
 
-def profile_packet(callbacks,policy_hex):
-    if (len(callbacks)!=4 or any(type(p)!=int or p&3 or not RAM<=p<END for p in callbacks) or
+def profile_packet(callbacks,policy_hex,*,code_bounds=(RAM,END)):
+    low,high=code_bounds
+    if (not 0x80400000<=low<high<=0x80800000 or
+            len(callbacks)!=4 or any(type(p)!=int or p&3 or not low<=p<high for p in callbacks) or
             policy_hex not in ('005000ffc47a0cff','ffff00ffc47a0cff','fffe00ffc47a0cff','ffff00ff44480000')):
         raise ValueError('Invalid complete resident sky-effect profile')
     data=struct.pack('>4I',*callbacks)+bytes.fromhex(policy_hex)

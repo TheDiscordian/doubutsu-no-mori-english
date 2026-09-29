@@ -14,6 +14,9 @@ extern void af_effect_fault(const char *,const char *);
 #ifndef AF_EFFECT_ROOM_COUNT
 #define AF_EFFECT_ROOM_COUNT AF_EFFECT_COUNT
 #endif
+#ifndef AF_EFFECT_SKY_COUNT
+#define AF_EFFECT_SKY_COUNT (AF_EFFECT_COUNT-AF_EFFECT_ROOM_COUNT)
+#endif
 #ifdef __mips__
 #define effect_room_loader (*(int (**volatile)(void))0x804B1E08u)
 #else
@@ -38,10 +41,15 @@ void af_v3_effect_profile_load(u32 first,u32 last,void *ram,void *ram_end,void *
         if (!effect_room_loader || !effect_room_loader()) invalid();
     }
 #ifdef AF_EFFECT_SKY_START
-    else {
+    else if ((first-AF_EFFECT_PROFILES)/64u<AF_EFFECT_ROOM_COUNT+AF_EFFECT_SKY_COUNT) {
         /* This complete code packet is checked and loaded at startup. It is
          * independent of the lazily loaded room callbacks. */
         low=AF_EFFECT_SKY_START;high=AF_EFFECT_SKY_END;
+    }
+#endif
+#ifdef AF_EFFECT_PARTICIPANT_START
+    else {
+        low=AF_EFFECT_PARTICIPANT_START;high=AF_EFFECT_PARTICIPANT_END;
     }
 #else
     else invalid();

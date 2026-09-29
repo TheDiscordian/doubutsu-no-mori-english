@@ -1153,14 +1153,79 @@ def register_triggers(sequence,programs,fragments,counts,native_priority,source_
     return bytes(result),rows,list(tables.values())
 
 
+def reuse_audio_storage(image,prior,blob,code,payloads):
+    """Reuse verified audio-only allocations when the shared import tail is full.
+
+    The current sequence/font and a superseded sequence are the only eligible
+    owners. Check all native audio headers before repacking; no other live
+    sound may reference these allocations. Keep full allocation receipts so
+    later batches can reuse the same space without accumulating copies.
+    """
+    from v3_resource_capacity import checked_limit
+    files=by_vrom(image);origin=files[BLOB].pstart
+    if BLOB+((len(blob)+15)&~15)+sum((len(d)+15)&~15 for d in payloads.values())<=checked_limit(image,prior):
+        return {}
+    shared=prior['equipment_resources']['sound_programs']
+    previous=prior['equipment_resources']['furniture_audio']
+    if set(payloads)!={('seq',199),('bank',previous['font']['index'])}:
+        raise ValueError('Reusable audio requires the current shared sequence and font')
+    candidates=[];current=[]
+    for kind,index,key in (('seq',199,'sequence'),('bank',previous['font']['index'],'font')):
+        row=previous[key];data,_,physical=installed_resource(image,code,kind,index)
+        if row['index']!=index or row['physical']!=physical or row['sha256']!=sha256(data):
+            raise ValueError('Changed current reusable audio resource')
+        current.append((physical,physical+len(data),kind,index))
+        allocation=row.get('allocation',dict(physical=physical,bytes=len(data),sha256=sha256(data)))
+        if not allocation['physical']<=physical<physical+len(data)<=allocation['physical']+allocation['bytes']:
+            raise ValueError('Current audio escapes its reusable allocation')
+        candidates.append(allocation)
+    old=shared.get('previous_sequence')
+    if (old and not any(r['physical']<old['physical']+old['bytes'] and old['physical']<r['physical']+r['bytes']
+            for r in candidates) and sha256(image[old['physical']:old['physical']+old['bytes']])==old['sha256']):
+        candidates.append(old)
+    arenas=[]
+    for row in sorted(candidates,key=lambda r:r['physical']):
+        lo,n=row['physical'],row['bytes'];hi=lo+n
+        if (lo&15 or n&15 or not origin<=lo<hi<=origin+len(blob) or
+                sha256(image[lo:hi])!=row['sha256'] or blob[lo-origin:hi-origin]!=image[lo:hi]):
+            raise ValueError('Changed reusable audio allocation')
+        if arenas and lo<arenas[-1][1]:raise ValueError('Overlapping audio allocation receipts')
+        if arenas and lo==arenas[-1][1]:arenas[-1]=(arenas[-1][0],hi)
+        else:arenas.append((lo,hi))
+    for kind,base in NATIVE_HEADERS.items():
+        count=struct.unpack_from('>H',code,base-CODE_RAM)[0]
+        for index in range(count):
+            header=header_entry(lambda at,n:span(code,at-CODE_RAM,n),base,index)
+            if not u32(header,4) or header[8]!=2:continue
+            data,_,lo=installed_resource(image,code,kind,index);hi=lo+len(data)
+            if (any(a<hi and lo<b for a,b in arenas) and
+                    (lo,hi,kind,index) not in current):
+                raise ValueError('Reusable audio is still referenced by another native header')
+    chosen={};available=list(arenas)
+    for key,data in sorted(payloads.items(),key=lambda pair:len(pair[1]),reverse=True):
+        fits=[(b-a,i,a,b) for i,(a,b) in enumerate(available) if b-a>=len(data)]
+        if not fits:raise ValueError('Complete audio resources exceed checked reusable allocations')
+        _,index,lo,hi=min(fits);available.pop(index)
+        padded=data+bytes(hi-lo-len(data));at=lo-origin
+        blob[at:at+len(padded)]=padded
+        chosen[key]=dict(blob_offset=at,allocation=dict(physical=lo,bytes=hi-lo,
+            sha256=sha256(padded),previous_sha256=sha256(image[lo:hi])))
+    return chosen
+
+
 def install_audio_resources(image,prior,blob,code,new_sequence,resources,audio):
     """Store complete shared SFX resources for trigger and looping categories."""
     from v3_furniture_install import append_resource_plan,relocate_resource_plan
     files=by_vrom(image)
     before_budget=permanent_budget(code)
+    storage=reuse_audio_storage(image,prior,blob,code,
+        {('seq',199):new_sequence,('bank',audio['font_index']):resources['font']})
     def store(kind,index,data,*,count=None):
         old,header,_=installed_resource(image,code,kind,index)
-        blob.extend(bytes(-len(blob)%16));at=len(blob);blob.extend(data)
+        allocated=storage.get((kind,index))
+        if allocated:at=allocated['blob_offset']
+        else:
+            blob.extend(bytes(-len(blob)%16));at=len(blob);blob.extend(data)
         physical=files[BLOB].pstart+at;new_header=bytearray(header)
         struct.pack_into('>2I',new_header,0,(physical-files[NATIVE_VROMS[kind]].pstart)&0xFFFFFFFF,len(data))
         if count is not None:new_header[12]=count
@@ -1168,7 +1233,7 @@ def install_audio_resources(image,prior,blob,code,new_sequence,resources,audio):
         code[address-CODE_RAM:address-CODE_RAM+16]=new_header
         return dict(index=index,blob_offset=at,physical=physical,vrom=BLOB+at,bytes=len(data),
             sha256=sha256(data),header_address=address,header_before=header.hex(),header_after=new_header.hex(),
-            previous_sha256=sha256(old))
+            previous_sha256=sha256(old),**({'allocation':allocated['allocation']} if allocated else {}))
     seq=store('seq',199,new_sequence)
     bank=store('bank',audio['font_index'],resources['font'],count=audio['layout']['instrument_count'])
     wave,header,physical=installed_resource(image,code,'wave',audio['wave_index'])

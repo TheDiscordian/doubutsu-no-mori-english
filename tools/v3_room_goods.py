@@ -351,7 +351,17 @@ def publish_bootstrap(equipment,blob,surface,output):
         if sky:
             from v3_holiday_sky import RAM as SKY_RAM,END as SKY_END,PACKET_END
             sp=sky['packet']
-            if (not sky.get('installed') or sp['ram']!=SKY_RAM or sp['bytes']!=PACKET_END-SKY_RAM or
+            participants=npc_extra['events'].get('participants')
+            sky_bytes=PACKET_END-SKY_RAM
+            if participants:
+                pc=participants['loaded_code']
+                if (not participants['installed'] or participants['packet']!=sp or pc['ram']!=PACKET_END or
+                        participants['preserved_prefix_bytes']!=sky_bytes or
+                        participants['preserved_sky_packet']['bytes']!=sky_bytes or
+                        pc['ram']+pc['bytes']>0x807DA800):
+                    raise ValueError('Changed connected participant startup packet')
+                sky_bytes+=pc['bytes']
+            if (not sky.get('installed') or sp['ram']!=SKY_RAM or sp['bytes']!=sky_bytes or
                     sp['physical']&15 or sp['storage']!='physical-ROM' or
                     sky['loaded_code']['ram']!=SKY_RAM or not 0<sky['loaded_code']['bytes']<=SKY_END-SKY_RAM or
                     sky['guard_ram']!=SKY_END):

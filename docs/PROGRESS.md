@@ -31,9 +31,9 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
-The current proposal is ABI 342 at
-`build/v3-diary-category-work-01/sky-installed-05/build-lock.json`, ROM SHA-256
-`7cdc6a1e0a87618a9bfedc0ac4571b982215e4063c83352f21cb1c645daf7fe0`.
+The current proposal is ABI 343 at
+`build/v3-diary-category-work-01/participants-installed-03/build-lock.json`, ROM SHA-256
+`1c67f5d201cbede26a8d7b7778b7bcd16036d309d929cf4d7c3ef855c3af37ef`.
 It contains 191 independently selectable development imports, including all nine
 fish and eight insects, and 100 inactive furniture profiles whose acquisition
 is pending, plus sixteen inactive diary cover profiles. The main lock and both
@@ -53,8 +53,8 @@ holiday participants/controllers and calendar admission remain unfinished.
 No native fixture is restarted, and these checks do not establish in-game
 rendering or make diaries selectable.
 
-The shared race, tug-of-war, and New Year participant module is prepared at
-`build/v3-diary-category-work-01/participants-prepared-20/`, not installed.
+The shared race, tug-of-war, and New Year participant module is installed in the
+current proposal, using `build/v3-diary-category-work-01/participants-prepared-23/`.
 All three controllers, five resident roles, and the rope compile together from
 245 complete donor functions. The preparation includes 279 official messages,
 two choices, offering payment, matched motions, the full prayer motion, tools,
@@ -63,17 +63,24 @@ the shared model converter. Fixed identities, ordinary NPC allocation, guarded
 callbacks, and deferred identity cleanup share one registry. A sanitized host
 check and 23 shared conversion checks pass; native gameplay remains unverified.
 The complete town-selection/placement reader family and both NPC spawning
-routes have prepared hooks, preserving original/camper dispatch and the global
+routes have installed hooks, preserving original/camper dispatch and the global
 prayer-animation chain. Native resident selection/refill algorithms and verified
 red/blue uniforms are reused. Collision includes the unspawned fifth New Year
 queue position without inventing a fifth actor. The complete offering coin,
 both palettes/models, and both sound programmes use the shared importers.
-The 51,423-byte MIPS object has no unresolved functions. New sanitized host
-placement and coin lifecycle/draw-command checks pass, as does the changed
-shared combiner check. Next install the module, text, effect, and audio as one
-connected cartridge change, then finish remaining admission/geometry consumers.
-The current ROM, saved format, selectable imports, and patcher deployments
-remain unchanged.
+The linked 51,440-byte module and original sky prefix share one 67,840-byte
+startup packet, retaining the nineteen-entry bootstrap and holiday/fishing
+packet. All 21 hooks, dialogue, source coin profile, both sound programmes,
+and full artwork are installed together. A native NPC-manager guard handles
+failed event storage allocation without losing initial/refill semantics or
+dereferencing a null pointer. Text storage moves only the 50,976-byte message
+index; verified obsolete audio storage is reused instead of adding copies.
+Current-cartridge, changed profile-loader, and browser/offline empty/mixed/
+all-supported checks pass. Source/host placement and coin lifecycle/drawing
+evidence is retained. Native execution remains unverified. Shrine landing
+geometry, remaining event providers, and actual calendar choice/admission are
+still unfinished; no diary is selectable. Saved format 13 and both stable
+patcher deployments remain unchanged.
 
 All fourteen dedicated event owners have live manager callbacks through the
 shared dispatcher and existing common state. Their 85 identity requirements

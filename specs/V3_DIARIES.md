@@ -990,10 +990,12 @@ but missing participants/controllers keep owner admission inactive. Saved format
 ### Shared resident participants and controllers
 
 `tools/v3_holiday_participants.py` prepares the complete race, tug-of-war, and
-New Year family together. `participants-prepared-20/` contains three controllers,
+New Year family together. `participants-prepared-23/` contains three controllers,
 five NPC roles, and the required rope: 245 complete donor functions, checked
-profile relocations, and one 51,423-byte MIPS object including data/BSS. This is
-uninstalled preparation, not an active event or a new cartridge.
+profile relocations, and a complete MIPS object including data/BSS. The linked
+51,440-byte module is installed at `8073C010..80748900` in ABI 343,
+`build/v3-diary-category-work-01/participants-installed-03/build-lock.json`.
+Installation does not enable unfinished event admission.
 
 `tools/v3_registry.py` owns fixed profiles `D9..E1` and temporary resident names
 `D0A0..D0AD`. The five role types fit the existing 2,400-byte NPC allocation;
@@ -1027,7 +1029,7 @@ same-number native alias. The offering coin uses source ID 118 and additive
 native ID 119, with the complete source lifecycle, two converted models, both
 gold/silver palettes, primitive-alpha fade, and reflection. Native reflection's
 48-byte opaque-tail allocation is checked even for translucent drawing.
-The shared sound importer prepares both complete programmes (`466`, `467`),
+The shared sound importer installs both complete programmes (`466`, `467`),
 their fonts/samples, dispatch entries, and priorities. No sound is played during
 verification. The source well-relative landing height requires an explicit
 geometry review at the native shrine before activation.
@@ -1049,20 +1051,49 @@ existing camper-profile extensions call one bounded `D0A0..D0AD` lookup and
 preserve the relocated original table pointer for every other identity.
 Temporary-identity lookup/unregister/reset and descriptor/free hooks preserve
 their installed predecessor chains. Original core entries use checked
-straight-line prologue trampolines. All 20 hook windows are prepared together.
+straight-line prologue trampolines. All 21 hook windows are installed together.
 The fifth New Year queue position is used for collision, not a fifth resident
 or an alias to another actor. Sanitized host checks cover these reader paths
 and the generated coin's movement, landing/fade state, command submission,
 palette choice, and exhausted arenas. Native services remain test doubles.
 
-Remaining connections are cartridge installation, native NPC-manager area-15
-allocation-failure handling, shrine landing geometry, and actual calendar
-choice/admission. The nineteen-entry startup table is full; the adjacent sky
-and participant code must share one checked load without changing the retained
-holiday/fishing packet. Native resident stride is `528`, with memories at `10`;
-source-header offset comments are not layout evidence.
-The installed ABI remains 342, saved format remains 13, and both deployments
-stay on stable V2-14. No diary becomes selectable through this preparation.
+The native NPC-manager allocation guard replaces the store at `80A23C5C`.
+The complete checked function is `80A23BDC..80A23CD8`; its failed allocation
+otherwise reaches an immediate write through null. Success preserves the store
+and all five initial `FF` slots. Failure clears the pointer, resets type to the
+native uninitialized sentinel `70` and map index to `-1`, and returns false
+through the original epilogue at `80A23CC0`. No event area is preallocated, so
+initial selection and existing-area refill remain distinct. The manager's
+unchanged relocation file is retained with its complete moved owner.
+
+The nineteen-entry startup table loads the adjacent sky and participant code
+as one checked 67,840-byte packet. The full original sky prefix/guard and the
+unrelated holiday/fishing packet remain unchanged. BSS is zero-filled inside
+the packet. The effect loader checks room, sky, and participant callbacks
+against three actual code ranges. Shared text storage moves only the
+50,976-byte index and grows messages into that index's former allocation;
+native virtual identities are unchanged. The shared audio allocator verifies
+every current native sound header before reusing the superseded sequence and
+current sequence/font allocations; complete allocation receipts permit reuse
+by later batches. No sound is truncated or given substitute samples.
+
+Current-cartridge and changed sanitized profile-loader checks pass. Private
+browser/offline empty, all-supported, villager/seasonal, and equipment profiles
+agree; neither served patcher is updated. Native execution remains unverified.
+Remaining consumers are shrine landing geometry, the other required event
+providers, and actual calendar choice/admission. Native resident stride is
+`528`, with memories at `10`; source-header offset comments are not layout
+evidence. Saved format remains 13, and both deployments stay on stable V2-14.
+No diary becomes selectable through this installation.
+
+The retained native shrine and NPC-manager disassemblies are under
+`participant-shrine-native/` and `participant-manager-native/` in the same
+ignored work directory. Native New Year control `80A8DD3C..80A8DDE4` uses the
+same offering position as the donor (`shrine.x + 20`, `shrine.z + 85`). This
+establishes the approach point, not the coin's landing height. The native
+shrine shifts its actor by `+20` on X, while the donor also shifts Z by `-19`;
+do not infer matching geometry from their shared role. The structure clip's
+resource index 22 is not global object-table index 22.
 
 ### Reserved layouts and dedicated owners
 
