@@ -59,7 +59,8 @@ def compile_part(part, out, extra_sources=(), defines=(), primary_source=None, l
         if not name.replace('_','').isalnum() or not isinstance(value,int) or not 0<=value<=0xFFFFFFFF:
             raise ValueError('Invalid checked linker binding')
         bindings.append(f'--defsym={name}=0x{value:X}')
-    run('ld', '-EB', *bindings, *(['--emit-relocs'] if part in ('catalogue', 'hra', 'feng_shui', 'campsite_manager', 'camper_greeting', 'camper_trade', 'effect_loader') else []),
+    run('ld', '-EB', *bindings, *(['--gc-sections'] if part=='holiday_calendar' else []),
+        *(['--emit-relocs'] if part in ('catalogue', 'hra', 'feng_shui', 'campsite_manager', 'camper_greeting', 'camper_trade', 'effect_loader') else []),
         '-T', f'/source/overlays/v3/{part}.ld', '-o', 'code.elf', *objects)
     if run('nm', '--undefined-only', 'code.elf').strip():
         raise ValueError('Unresolved V3 loader symbol')
@@ -68,7 +69,8 @@ def compile_part(part, out, extra_sources=(), defines=(), primary_source=None, l
     run('objcopy', '-O', 'binary', '-j', '.text', '-j', '.rodata',
         *(['-j', '.fallbacks'] if part=='scenery_bootstrap' else []), 'code.elf', 'code.bin')
     code = (out / 'code.bin').read_bytes()
-    entry, expected = {'holiday_item_storage': ('af_v3_console_storage_reset', (link_symbols or {}).get('AF_HI_STORAGE_RAM',0)),
+    entry, expected = {'holiday_calendar': ('af_holiday_calendar_mode', (link_symbols or {}).get('AF_HCAL_LINK_RAM',0)),
+                      'holiday_item_storage': ('af_v3_console_storage_reset', (link_symbols or {}).get('AF_HI_STORAGE_RAM',0)),
                       'holiday_item_menu': ('af_hi_menu_type', (link_symbols or {}).get('AF_HI_LINK_RAM',0)),
                       'holiday_sky': ('af_sky_ready', 0x80738000),
                       'holiday_demo': ('af_holiday_demo_main', 0x806FE000),

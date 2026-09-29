@@ -44,6 +44,15 @@ typedef struct {
  * Output remains untouched for malformed input or insufficient capacity. */
 int af_holiday_event_plan(const unsigned char *,unsigned int,const AFHolidayClock *,
     AFHolidayDay *,unsigned int capacity);
+/* Same daily planner, with resolved start/end dates for selected source rows.
+ * Zero pairs retain the donor rule. Nonzero pairs include the original hour
+ * flags in the low byte and Gregorian month/day in the high halfword. */
+int af_holiday_event_plan_dates(const unsigned char *,unsigned int,const AFHolidayClock *,
+    AFHolidayDay *,unsigned int capacity,const unsigned int dates[49][2]);
+/* One resolved range, zero for an unavailable lunar date in the adjacent
+ * diary browsing years, or -1 for malformed inputs. */
+int af_holiday_event_dates(const AFHolidayClock *,const unsigned char row[12],
+    unsigned int dates[2]);
 int af_holiday_event_owner(const unsigned char *,unsigned int,unsigned int,AFHolidayOwner *);
 unsigned int af_holiday_event_current(const unsigned char *,unsigned int,const AFHolidayDay *,unsigned int);
 unsigned int af_holiday_event_field(const AFHolidayDay *,unsigned int);

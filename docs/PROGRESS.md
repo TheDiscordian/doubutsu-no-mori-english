@@ -31,9 +31,9 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
-The current proposal is ABI 348 at
-`build/v3-diary-category-work-01/event-controls-installed-06/build-lock.json`, ROM SHA-256
-`e8c3b6618a93b13eef787a1730cf8237ce72970a0d80aa5e13f849404a62755f`.
+The current proposal is ABI 349 at
+`build/v3-diary-category-work-01/calendar-connected-07/build-lock.json`, ROM SHA-256
+`4dba5be99af745e89a9d729f3a9e87377ee0922506be31d74297be9b4bc4d37f`.
 It contains 191 independently selectable development imports, including all nine
 fish and eight insects, and 100 inactive furniture profiles whose acquisition
 is pending, plus sixteen inactive diary cover profiles. The main lock and both
@@ -152,8 +152,21 @@ V3 cannot load new saves. Preserve backups. Current-ROM hooks, packet bounds,
 startup CRC, and inactive gates pass. Six provenance checks and the two existing
 compression/fishing-storage host checks pass; they do not execute the new
 format-15 path. Native menu execution and format-15 save/reload remain unverified.
-Continue calendar behaviour selection and complete actor/service
-admission in this same category, then diary selection. Do not restart the
+The shared calendar implementation connects both N64 and GameCube dates to
+live scheduling, diary labels, and real saved attendance. N64-only celebrations
+remain, and GC-only holidays supplement either setting. Corresponding original
+controllers are excluded when imported owners take responsibility; ordinary
+native status readers observe the imported event. No actor save-area layouts
+are aliased. Browsing the adjacent years preserves Gregorian dates without
+reading outside the lunar table. The added code and guard occupy 12,768 bytes,
+with a 492-byte diary context inside its existing reservation. The combined
+event packet is 167,904 bytes; startup still has nineteen entries, and format 15
+is unchanged. Current physical-resource/startup checks and compilation pass.
+The existing connected calendar/attendance host check passes the changed
+scheduler's donor route; native execution and the alternative route are not
+claimed. The setting remains unexposed while actor admission is unfinished.
+Continue the remaining shared participant families and complete actor/service
+admission in this same category, then expose the setting and diary selection. Do not restart the
 exhausted native fixture or new-harness budget. No diary is selectable, and both
 stable V2-14 patcher deployments remain unchanged.
 

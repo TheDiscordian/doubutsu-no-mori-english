@@ -2,7 +2,7 @@
 #include "diary_events.h"
 
 static unsigned int md(AFDiaryDate d) {return (unsigned int)d.month*256+d.day;}
-static int endpoint(AFDiaryDate *out,unsigned int word,AFDiaryDate selected) {
+int af_diary_event_endpoint(AFDiaryDate *out,unsigned int word,AFDiaryDate selected) {
     unsigned int month=word>>24,day=(word>>16)&255;
     if(month==50)month=selected.month;
     if(month>=80) {
@@ -40,9 +40,9 @@ static int endpoint(AFDiaryDate *out,unsigned int word,AFDiaryDate selected) {
 static int occurs(const AFDiaryEventRule *rule,AFDiaryDate date) {
     const unsigned int *row=af_diary_event_master[rule->row];
     AFDiaryDate start,end;
-    if(row[2]!=rule->type || !endpoint(&start,row[0],date))return 0;
+    if(row[2]!=rule->type || !af_diary_event_endpoint(&start,row[0],date))return 0;
     if(rule->single)return md(date)==md(start);
-    if(!endpoint(&end,row[1],date))return 0;
+    if(!af_diary_event_endpoint(&end,row[1],date))return 0;
     unsigned int a=md(start),b=md(end),now=md(date);
     return a<=b?(now>=a && now<=b):(now>=a || now<=b);
 }
@@ -52,6 +52,7 @@ int af_diary_events_month(AFDiaryEventMonth *cache,unsigned int year,unsigned in
     if(cache->valid && cache->year==year && cache->month==month &&
        cache->birthday_month==birth_month && cache->birthday_day==birth_day)return AF_DIARY_OK;
     cache->valid=0;cache->year=year;cache->month=month;
+    cache->calendar_mode=0;cache->special=(AFDiaryDates){0,0,0};
     cache->birthday_month=birth_month;cache->birthday_day=birth_day;
     for(unsigned int day=1;day<=31;day++) {
         unsigned int n=0;

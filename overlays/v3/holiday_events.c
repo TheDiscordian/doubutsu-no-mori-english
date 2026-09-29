@@ -21,6 +21,14 @@ static int clock_valid(const AFHolidayClock *c) {
         c->vernal_day>=19 && c->vernal_day<=21 && c->autumnal_day>=21 &&
         c->autumnal_day<=23 && c->vacation_available<=1;
 }
+static int browsing_clock_valid(const AFHolidayClock *c) {
+    if(clock_valid(c))return 1;
+    if(!c || (c->date.year!=1999 && c->date.year!=2033) ||
+       c->special.harvest_month || c->special.harvest_day)return 0;
+    AFHolidayClock checked=*c;
+    checked.special.harvest_month=9;checked.special.harvest_day=1;
+    return clock_valid(&checked);
+}
 static u32 weekday(const AFHolidayClock *c,u32 month,u32 encoded) {
     u32 week=(encoded>>3)&7,target=encoded&7,day=0,last=af_diary_days(c->date.year,month);
     int first=af_diary_weekday((AFDiaryDate){c->date.year,month,1});
@@ -64,7 +72,33 @@ static u32 decode(const AFHolidayClock *c,const u8 *raw,u32 equinox,u32 *hour) {
 static int range(u32 now,u32 start,u32 end) {
     return start>end?(now>=start || now<=end):(now>=start && now<=end);
 }
-int af_holiday_event_plan(const u8 *p,u32 n,const AFHolidayClock *c,AFHolidayDay *out,u32 capacity) {
+int af_holiday_event_dates(const AFHolidayClock *c,const u8 row[12],u32 dates[2]) {
+    if(!browsing_clock_valid(c) || !row || !dates || be16(row+8))return -1;
+    u32 type=be16(row+10),adjust=0,h1,h2;
+    if(!c->special.harvest_month && (type==42 || (row[0]|row[4])&0x40))return 0;
+    if(type==11 || type==82 || type==41 || type==96 || (type>=12 && type<=16) || type==111)
+        adjust=row[0]==3?c->vernal_day:row[0]==9?c->autumnal_day:0;
+    u8 changed[12];for(u32 i=0;i<12;i++)changed[i]=row[i];
+    if(type==10 || type==40) {
+        u32 day=type==10?c->vernal_day:c->autumnal_day;
+        changed[1]=day-10;changed[5]=day-1;
+    } else if(type==42) {
+        AFDiaryDate end={c->date.year,c->special.harvest_month,c->special.harvest_day};
+        for(u32 i=1;i<=7;i++) {
+            if(!--end.day) {
+                if(!--end.month) {--end.year;end.month=12;}
+                end.day=af_diary_days(end.year,end.month);
+            }
+            if(i==1) {changed[4]=end.month;changed[5]=end.day;}
+        }
+        changed[0]=end.month;changed[1]=end.day;
+    }
+    u32 a=decode(c,changed,adjust,&h1),b=decode(c,changed+4,adjust,&h2);
+    if(!a || !b || (h1&31)>23 || (h2&31)>23)return -1;
+    dates[0]=(a<<16)|h1;dates[1]=(b<<16)|h2;return 1;
+}
+int af_holiday_event_plan_dates(const u8 *p,u32 n,const AFHolidayClock *c,AFHolidayDay *out,
+        u32 capacity,const u32 dates[49][2]) {
     if(!packet(p,n) || !clock_valid(c) || !out || capacity>AF_HE_CAPACITY)return -1;
     if(c->working)return 0;
     AFHolidayDay days[AF_HE_CAPACITY];u32 count=0,equinox=0,preferred=255;
@@ -74,13 +108,22 @@ int af_holiday_event_plan(const u8 *p,u32 n,const AFHolidayClock *c,AFHolidayDay
         if(be16(r+8) || type>=128)return -1;
         if((type==4 || type==5) && !c->vacation_available)continue;
         if((type==90 || type==102) && preferred!=255)continue;
-        if(type==11 || type==82 || type==41 || type==96) {
+        int mapped=dates && (dates[i][0] || dates[i][1]);
+        if(!mapped && (type==11 || type==82 || type==41 || type==96)) {
             u32 month=(type==11 || type==82)?3:9;
             u32 day=month==3?c->vernal_day:c->autumnal_day;
             if(c->date.month!=month || c->date.day!=day)continue;
             equinox=adjust=day;
-        } else if(type>=12 && type<=16) {if(!equinox)continue;adjust=equinox;}
-        u32 start=decode(c,r,adjust,&h1),end=decode(c,r+4,adjust,&h2);
+        } else if(!mapped && type>=12 && type<=16) {if(!equinox)continue;adjust=equinox;}
+        u32 start,end;
+        if(mapped) {
+            start=dates[i][0]>>16;end=dates[i][1]>>16;
+            h1=dates[i][0]&255;h2=dates[i][1]&255;
+            if((dates[i][0]|dates[i][1])&0xFF00u || (h1|h2)&0x20u ||
+               (start>>8)<1 || (start>>8)>12 || (end>>8)<1 || (end>>8)>12 ||
+               (start&255)>af_diary_days(c->date.year,start>>8) ||
+               (end&255)>af_diary_days(c->date.year,end>>8))return -1;
+        } else {start=decode(c,r,adjust,&h1);end=decode(c,r+4,adjust,&h2);}
         if(!start || !end)return -1;
         if(!range(today,start,end))continue;
         if(type==89 || type==101)preferred=type;
@@ -105,6 +148,9 @@ int af_holiday_event_plan(const u8 *p,u32 n,const AFHolidayClock *c,AFHolidayDay
     }
     for(u32 i=0;i<count;i++)out[i]=days[i];
     return (int)count;
+}
+int af_holiday_event_plan(const u8 *p,u32 n,const AFHolidayClock *c,AFHolidayDay *out,u32 capacity) {
+    return af_holiday_event_plan_dates(p,n,c,out,capacity,0);
 }
 int af_holiday_event_owner(const u8 *p,u32 n,u32 type,AFHolidayOwner *out) {
     if(!packet(p,n) || !out)return -1;

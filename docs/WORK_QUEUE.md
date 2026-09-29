@@ -346,9 +346,9 @@ callback loader uses its actual relocated code bounds. Focused source/host,
 cartridge, and empty/mixed/all-191 composition checks pass. Continue the remaining
 controller/participant services using the retained native map; do not reconvert
 these effects or installed decorations, or restart native fixtures.
-The connected controller/participant module is retained in ABI 348 at
-`build/v3-diary-category-work-01/event-controls-installed-06/build-lock.json`
-(ROM SHA-256 `e8c3b6618a93b13eef787a1730cf8237ce72970a0d80aa5e13f849404a62755f`),
+The connected controller/participant module is retained in ABI 349 at
+`build/v3-diary-category-work-01/calendar-connected-07/build-lock.json`
+(ROM SHA-256 `4dba5be99af745e89a9d729f3a9e87377ee0922506be31d74297be9b4bc4d37f`),
 using `build/v3-diary-category-work-01/participants-prepared-26/`: three controllers,
 five resident roles, rope, 279 official messages/two choices, offering payment,
 tools/sounds, 21 matching native motions, and the full donor prayer motion.
@@ -432,9 +432,21 @@ scratch allocation grows. Current-ROM structure/CRC checks and existing
 compression/fishing host checks pass; new format-15 execution remains unverified.
 Do not use the intermediate menu-only `event-controls-installed-04/` build.
 New saves cannot be read by V2 or format-14-or-earlier V3; keep backups.
-The exact next consumers are calendar behaviour selection, complete actor/service
-admission, and diary selection. Continue this same batch without a new harness
-or native fixture. Reuse
+The shared calendar implementation binds live scheduling and diary dates to
+the same N64/GameCube choice. It preserves native-only celebrations, adds
+GC-only holidays in either mode, excludes duplicate original controllers,
+and maps ordinary original status readers to their imported counterparts.
+Attendance uses actual source-event flags, not scheduled dates. The 12,768-byte
+addition fits the existing event packet, with no new startup entry or saved
+layout. Its context is 492 bytes inside the existing reservation. The adjacent
+diary browsing years do not access the lunar table. The choice stays unexposed.
+The exact next consumers are the remaining shared hanami, moon-viewing,
+countdown, ball-toss, and Harvest participant families, followed by complete
+actor/service admission and diary/behaviour selection. Extend the existing
+participant importer for the complete batch; do not create per-actor scripts.
+The dedicated preflight also lists the unspawned fifth New Year position; retain
+its existing collision semantics without inventing a fifth resident actor.
+Continue this same batch without a new harness or native fixture. Reuse
 the complete installed fortune actor and art without reconverting or retesting
 them. Bind actor pools,
 ordinary/profile lookup, placement identities, full voices, and cleanup together. Preserve each source

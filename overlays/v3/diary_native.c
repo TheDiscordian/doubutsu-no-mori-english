@@ -1,5 +1,8 @@
 /* Actual resident menu entry, clock/player data, and save-capacity admission. */
 #include "diary_native.h"
+#ifdef AF_DIARY_HOLIDAYS
+#include "holiday_calendar.h"
+#endif
 #define CANDIDATE_GUARD 0xAF445941u
 const unsigned int af_diary_native_context_bytes=sizeof(AFDiaryNative);
 _Static_assert(sizeof(AFDiaryNative)<=0x6F0,"Diary context exceeds guarded state reservation");
@@ -21,7 +24,13 @@ unsigned short af_diary_native_selected(void) {
 static int prepare_calendar(AFDiaryNative *c,AFDiaryDate date,unsigned int owner) {
     if(!c || owner>=4)return AF_DIARY_ARGUMENT;
     const unsigned char *player=af_diary_native_players[owner];
-    int result=af_diary_events_month(&c->calendar,date.year,date.month,player[0xA92],player[0xA93]);
+    int result=
+#ifdef AF_DIARY_HOLIDAYS
+        af_holiday_diary_month
+#else
+        af_diary_events_month
+#endif
+        (&c->calendar,date.year,date.month,player[0xA92],player[0xA93]);
     c->calendar_error=result<0?result:0;return result;
 }
 static unsigned int event_count(void *context,AFDiaryDate date,unsigned int owner) {
@@ -33,7 +42,20 @@ static unsigned int event_count(void *context,AFDiaryDate date,unsigned int owne
 static int calendar(void *context,const AFDiaryMenu *menu,AFDiaryDraw *draw) {
     AFDiaryNative *c=context;
     if(prepare_calendar(c,menu->selected,menu->owner)!=AF_DIARY_OK)return c->calendar_error;
-    return af_diary_events_draw(&c->calendar,menu,c->live,draw);
+    return
+#ifdef AF_DIARY_HOLIDAYS
+        af_holiday_diary_draw
+#else
+        af_diary_events_draw
+#endif
+        (&c->calendar,menu,c->live,draw);
+}
+static int special_dates(AFDiaryDate date,AFDiaryDates *out) {
+#ifdef AF_DIARY_HOLIDAYS
+    return af_holiday_diary_dates(date,out);
+#else
+    (void)date;*out=(AFDiaryDates){0,0,0};return 1;
+#endif
 }
 static int capacity(void *context,const AFDiary *candidate) {
     AFDiaryNative *c=context;
@@ -57,9 +79,10 @@ int af_diary_native_open(void *game,int owner) {
         c->widths[i]=width;
     }
     for(unsigned int i=0;i<4;i++)af_diary_native_candidate_guard[i]=CANDIDATE_GUARD;
+    AFDiaryDates dates;if(!special_dates(now(),&dates))return 0;
     AFDiaryMenuAccess access={c->live,&af_diary_native_candidate,c->widths,capacity,c,event_count};
     return af_diary_screen_open(&af_diary_native_screen,submenu,&access,viewer,owner,
-        now(),(AFDiaryDates){0,0,0},af_diary_native_art,calendar);
+        now(),dates,af_diary_native_art,calendar);
 }
 int af_diary_native_visit(void) {
     if(af_diary_native_player>=4 || !af_diary_native_selected())return AF_DIARY_UNCHANGED;
@@ -71,7 +94,8 @@ int af_diary_native_visit(void) {
         (unsigned int)c[offset+2]<<8|c[offset+3];
     if((unsigned int)c[100]*256+c[101]==date.year && c[102]==date.month && (played&mask))
         return AF_DIARY_UNCHANGED;
-    return af_diary_calendar_visit(live,af_diary_native_player,date,(AFDiaryDates){0,0,0});
+    AFDiaryDates dates;if(!special_dates(date,&dates))return AF_DIARY_ARGUMENT;
+    return af_diary_calendar_visit(live,af_diary_native_player,date,dates);
 }
 int af_diary_native_live_player(int player) {
     int result=af_diary_native_live_check(player);

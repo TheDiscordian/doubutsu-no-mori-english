@@ -744,6 +744,11 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             import v3_holiday_items as equipment
             equipment_report,owner_changes,report_updates,physical_writes=equipment.install_controls(
                 base,prior,blob,core,output)
+        elif (prior['equipment_resources'].get('holiday_items',{}).get('controls') and
+                not current_events.get('calendar')):
+            import v3_holiday_calendar as equipment
+            equipment_report,owner_changes,report_updates,physical_writes=equipment.install(
+                base,prior,blob,core,output)
         elif (current_events.get('decorations',{}).get('controllers') and
                 not prior['equipment_resources'].get('holiday_items')):
             import v3_holiday_items as equipment
@@ -1547,6 +1552,11 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
             report['shared_runtime_refresh']['resource_allocations_changed']=True
             report['shared_runtime_refresh']['saved_format_changed']=True
             report['native_test']='pending calendar choice/admission and connected diary/event gameplay/save verification'
+        calendar=npc['events'].get('calendar')
+        if calendar and not prior['equipment_resources']['npc_extra']['events'].get('calendar'):
+            report['shared_runtime_refresh']['additional_resident_bytes']+=calendar['additional_resident_bytes']
+            report['shared_runtime_refresh']['resource_allocations_changed']=True
+            report['native_test']='pending complete actor/service and choice admission, diary selection, and connected gameplay/save verification'
     if console_images is not None:
         images=equipment_report['console_images']
         report['shared_runtime_refresh'].update(adapters=['console_images'],

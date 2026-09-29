@@ -1725,7 +1725,7 @@ state. Requirements persist independently of stamp counts and item disposal.
 All 27 card/storage exports retain their previous addresses through checked
 redirects. Format-14-or-earlier V3 and V2 cannot read new format-15 saves.
 
-The current installation is `event-controls-installed-06/`, ABI 348. Its
+The controls installation is retained in `calendar-connected-07/`, ABI 349. Its
 155,136-byte packet contains the complete retained participant family, a
 1,728-byte menu adapter, and a 10,256-byte storage adapter; it retains nineteen
 startup descriptors. Current-ROM redirect/prefix/CRC checks and existing

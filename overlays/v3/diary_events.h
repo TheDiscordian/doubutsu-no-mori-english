@@ -11,6 +11,8 @@ typedef struct {
     unsigned short year;
     unsigned char month,birthday_month,birthday_day,valid;
     unsigned char counts[31],events[31][AF_DIARY_EVENT_MAX];
+    unsigned char calendar_mode;
+    AFDiaryDates special;
 } AFDiaryEventMonth;
 extern const AFDiaryEventRule af_diary_event_rules[AF_DIARY_EVENT_BIRTHDAY];
 extern const AFDiaryEventLabel af_diary_event_labels[AF_DIARY_EVENT_COUNT];
@@ -18,6 +20,7 @@ extern const unsigned int af_diary_event_master[81][3];
 /* Actual native conversion, with the year passed explicitly. Never temporarily
  * change the live clock to browse a calendar. */
 extern int af_diary_native_lunar(AFDiaryDate *,const AFDiaryDate *);
+int af_diary_event_endpoint(AFDiaryDate *,unsigned int,AFDiaryDate);
 int af_diary_events_month(AFDiaryEventMonth *,unsigned int year,unsigned int month,
     unsigned int birthday_month,unsigned int birthday_day);
 int af_diary_events_draw(const AFDiaryEventMonth *,const AFDiaryMenu *,
