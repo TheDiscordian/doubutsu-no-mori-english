@@ -176,7 +176,7 @@ def generate(source,*,family=FAMILY,reference_sha=REFERENCES_SHA,extra_headers=(
     from v3_password_policy import function
     receipts={};modules={};headers=[];contracts=[]
     for stem in family:
-        directory='npc/event/' if stem.startswith('ev_') else 'npc/' if '_npc' in stem else ''
+        directory='npc/event/' if stem.startswith('ev_') else 'npc/' if '_npc' in stem or stem.startswith('npc_') else ''
         path='src/actor/'+directory+'ac_'+stem+'.c'
         body=clean(expand(path,receipts))
         header=read('include/ac_'+stem+'.h',receipts)
@@ -248,7 +248,8 @@ def generate(source,*,family=FAMILY,reference_sha=REFERENCES_SHA,extra_headers=(
     header='\n'.join(headers)
     source_constants=constants(header+'\n'+'\n'.join(modules.values()),receipts,CONSTANT_HEADERS+extra_headers)
     if sha256(json.dumps(receipts,sort_keys=True,separators=(',',':')).encode())!=reference_sha:
-        raise ValueError('Changed complete controller/participant source references')
+        raise ValueError('Changed complete controller/participant source references: '+
+            sha256(json.dumps(receipts,sort_keys=True,separators=(',',':')).encode()))
     prelude=('#include "holiday_participants.h"\n#include "constants.h"\n'
         '#include "actors.h"\n#pragma GCC diagnostic ignored "-Wunused-parameter"\n')
     # Shared clips contain source-generated callbacks but never alias a native
@@ -1111,6 +1112,96 @@ def optional_card_source(body):
     return 'int af_he_optional_message(int);\n'+body.replace(marker,marker+
         '    int optional = af_he_optional_message(taisou_actor->soncho_event);\n'
         '    if (optional >= 0) return optional;\n')
+
+
+def prepare_reward_events(output,lock):
+    """Convert the complete connected golden-tool gift owners as one family."""
+    from v3_furniture_install import inputs
+    out=output.resolve()
+    if out.exists() or not out.is_relative_to(ROOT/'build'):
+        raise ValueError('Use a fresh ignored reward-event preparation')
+    base,prior=inputs(lock)
+    source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+        (DONOR/'config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    family=('present_demo','present_npc','npc_hem')
+    headers=('m_soncho.h','m_private.h','m_item_name.h','m_house.h','m_submenu.h',
+             'ac_handOverItem.h','m_kankyo.h')
+    generated,report=generate(source,family=family,
+        reference_sha='b944033494a98afee09bcf72398729743881f0da6fd97f73ebe0316f8f5b0565',
+        extra_headers=headers)
+    substitutions=(
+        ('#include "holiday_participants.h"','#include "reward_event.h"'),
+        ('Common_Get(time.rtc_time.month)','af_rw_month()'),
+        ('Common_Get(time.rtc_time.day)','af_rw_day()'),
+        ('Now_Private->birthday.month','af_rw_birthday_month()'),
+        ('Now_Private->birthday.day','af_rw_birthday_day()'),
+        ('Now_Private->birthday_present_npc','(*af_rw_birthday_present())'),
+        ('Common_Get(player_no)','af_rw_player()'),
+        ('Common_Get(weather)','af_rw_weather()'),
+        ('Common_Get(hem_visible)','(*af_rw_hem_visible())'),
+        ('Save_Get(first_present)','(*af_rw_first_present())'),
+        ('Now_Private','af_rw_private()'),
+        ('play->block_table.block_x','af_rw_block_x(play)'),
+        ('play->block_table.block_z','af_rw_block_z(play)'),
+        ('play->submenu.start_refuse','(*af_rw_menu_refuse(play))'),
+        ('NPC_CLIP->save_proc','af_rw_npc_save'),
+        ('CLIP(npc_clip)->setupActor_proc','af_rw_npc_setup()'),
+        ('actor->npc_class.right_hand.umbrella_type','af_rw_umbrella(&actor->npc_class)'),
+        ('actor->npc_class.draw.sub_anim_type','(*af_rw_sub_animation(&actor->npc_class))'),
+        ('nactorx->npc_info.animal != NULL','af_rw_is_resident(nactorx)'),
+        ('aHOI_CLIP->master_actor','af_cw_handover_master()'),
+        ('aHOI_TRANSFER_DONE()','(af_cw_handover_master() == NULL)'),
+    )
+    adaptations=[]
+    for original,native in substitutions:
+        count=0
+        for stem in family:
+            name=stem+'.c';n=generated[name].count(original);count+=n
+            generated[name]=generated[name].replace(original,native)
+        if not count:raise ValueError('Changed complete reward-event access: '+original)
+        adaptations.append(dict(source=original,native=native,count=count))
+    # The actual donor also selects index zero here, not merely its decomp.
+    # That re-enters insertion while NPC0's handover order is still two. Move
+    # to the source's existing completion waiter after the first transaction.
+    raw,entry=source.function(0x2179A0)
+    if (entry['symbol']!='aPST_present_send_start_wait_talk_proc' or
+            entry['sha256']!='df4360dcdd7f6ea5212360e6f8c28ada8813e57505a34c2cf64dda750757bc06' or
+            struct.unpack_from('>I',raw,0x13C)[0]!=0x38800000):
+        raise ValueError('Changed source gift handover transition')
+    before='aPST_change_talk_proc(actor, aPST_TALK_PRESENT_SEND_START_WAIT);'
+    after='aPST_change_talk_proc(actor, aPST_TALK_PRESENT_SEND_END_WAIT);'
+    if generated['present_npc.c'].count(before)!=1:raise ValueError('Ambiguous gift completion transition')
+    generated['present_npc.c']=generated['present_npc.c'].replace(before,after)
+    adaptations.append(dict(source=before,native=after,count=1,donor_function=entry,
+        reason='Wait for handover completion instead of inserting the same gift again'))
+    for stem in family:
+        if re.search(r'\b(?:Common_Get|Common_GetPointer|Save_Get|Save_GetPointer|Save_Set)\(',generated[stem+'.c']):
+            raise ValueError('Unmapped native state in complete reward owner: '+stem)
+    generated['constants.h']=constants('\n'.join(v for k,v in generated.items() if k!='constants.h'),
+        report['references'],CONSTANT_HEADERS+headers)
+    out.mkdir(parents=True)
+    for name,body in generated.items():write_new(out/name,body.encode())
+    docker=['docker','run','--rm','--network','none','--user',f'{os.getuid()}:{os.getgid()}',
+        '-v',f'{ROOT}:/source:ro','-v',f'{out}:/out','-w','/out','--entrypoint']
+    def run(tool,*args):
+        return subprocess.run(docker+['/n64_toolchain/bin/mips64-elf-'+tool,IMAGE,*args],
+            text=True,capture_output=True,check=True,timeout=60).stdout
+    flags=['-c','-Os','-EB','-mabi=32','-march=vr4300','-mfix4300','-G0','-mno-abicalls',
+        '-fno-pic','-ffreestanding','-fno-builtin','-fno-common','-fno-stack-protector',
+        '-ffunction-sections','-fdata-sections','-fstack-usage','-Wall','-Wextra','-Werror',
+        '-Wno-unused-variable','-Wno-unused-but-set-variable','-Wno-parentheses',
+        '-I/source/overlays/v3','-I/out']
+    run('gcc',*flags,*(stem+'.c' for stem in family))
+    run('ld','-EB','-r',*(stem+'.o' for stem in family),'-o','reward-events.o')
+    report.update(format='AFV3-REWARD-EVENTS-1',base_abi=prior['runtime_abi'],base_sha256=sha256(base),
+        platform_adaptations=adaptations,generated_sha256={n:sha256(t.encode()) for n,t in generated.items()},
+        unbound_services=run('nm','--undefined-only','reward-events.o').strip().splitlines(),
+        object=dict(sha256=sha256((out/'reward-events.o').read_bytes()),compiler=IMAGE,
+            flags=flags,size=run('size','reward-events.o'),linked=False),
+        sources={p:sha256((ROOT/p).read_bytes()) for p in ('tools/v3_holiday_participants.py',
+            'overlays/v3/holiday_participants.h','overlays/v3/carried_event.h','overlays/v3/reward_event.h')})
+    write_new(out/'prepared.json',(json.dumps(report,indent=2)+'\n').encode())
+    return report
 
 
 def prepare_carried_event(output,lock):
@@ -2193,11 +2284,13 @@ if __name__=='__main__':
     p.add_argument('--exercise',action='store_true',help='Prepare the complete exercise actor/card family using the same source importer')
     p.add_argument('--festivals',action='store_true',help='Prepare all remaining ordinary festival participant families together')
     p.add_argument('--carried-event',action='store_true',help='Prepare the complete carried-creature quest owner')
+    p.add_argument('--rewards',action='store_true',help='Prepare the shared gift director, gift NPC, and Shrine spirit')
     p.add_argument('--connect-carried-event',type=Path,help='Connect a checked complete carried actor to shared NPC services')
     args=p.parse_args()
-    if sum((args.exercise,args.festivals,args.carried_event,bool(args.connect_carried_event)))>1:p.error('Select one complete participant family')
+    if sum((args.exercise,args.festivals,args.carried_event,args.rewards,bool(args.connect_carried_event)))>1:p.error('Select one complete participant family')
     try:
         result=(connect_carried_event(args.output,args.build_lock,args.connect_carried_event) if args.connect_carried_event else
+            prepare_reward_events(args.output,args.build_lock) if args.rewards else
             prepare_carried_event(args.output,args.build_lock) if args.carried_event else
             prepare_festivals(args.output,args.build_lock) if args.festivals else
             prepare_exercise(args.output,args.build_lock) if args.exercise else prepare(args.output,args.build_lock,args.reuse))

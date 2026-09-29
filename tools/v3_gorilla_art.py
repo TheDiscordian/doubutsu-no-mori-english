@@ -160,6 +160,10 @@ def convert_commands(raw, start, pointers, vertex, vertex_bytes, *,
                     # TEXEL0*SHADE colour, PRIMITIVE*ENVIRONMENT alpha;
                     # the second cycle retains the donor's LOD interpolation.
                     allowed.add((0xFC123A0E, 0xFFFFFE38))
+                    # Source hem_1: shaded texture colour, multiplied by
+                    # primitive colour in cycle two; texture alpha fades by
+                    # environment alpha. Keep the caller-controlled fade.
+                    allowed.add((0xFC121A60, 0xFFFFFFF8))
                 elif op == 0xFA and a>>8==0xFA0000:
                     # Primitive RGBA and LOD fraction are data, not a new mode.
                     allowed.add((a,b))

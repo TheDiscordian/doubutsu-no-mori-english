@@ -46,6 +46,13 @@ celebration timing; use the installed participant and reward services. Do not
 substitute shop stock or letters. The current inventory has no other unresolved
 V3 item identity; the sign board belongs to V4 Able Sisters. Retain installed
 gold-tree leaf/cut effects rather than doing another asset conversion pass.
+The complete three-owner reward source family is prepared and MIPS-compiled,
+with single-insertion handover checks passing for net and rod. Farley's complete
+model, texture, and voice conversion passes through the shared NPC importer.
+Neither preparation is installed; continue the native providers, Shrine
+appearance effects, and house-exit/Shrine entry points mapped in the
+[golden-tool checkpoint](checkpoints/V3_GOLDEN_TOOLS.md#next-connected-consumers).
+Do not reconvert those prepared resources or replay their unchanged tests.
 The carried-object/stationery batch has connected independent selections. Its donor identity worksheet
 identifies orange paper (`2003`), exercise card (`2523`,
 including all thirteen stamped states), knife and fork (`2530`), coconut

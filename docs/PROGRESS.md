@@ -55,6 +55,16 @@ Carried-family saves require the selected families and cannot load in builds
 without their admission, including ABI 368. Four-sheet saves require pack mode.
 See [the selection checkpoint](checkpoints/V3_CARRIED_SELECTION.md).
 
+The golden-tool reward family has complete MIPS source preparation for the gift
+director, gift NPC, and Shrine spirit. Focused host checks preserve one gift per
+handover for both net and rod. Farley's complete model/texture/voice also passes
+the shared artwork conversion checks, including the source fade material.
+These resources are not installed or selectable; native providers, entrance
+conditions, effects, official messages, and combined gameplay/save checks remain.
+The [golden-tool checkpoint](checkpoints/V3_GOLDEN_TOOLS.md#next-connected-consumers)
+records the mapped next connections. The current ROM and deployed patchers do
+not change for this preparation.
+
 The shared stationery implementation has a global `paper-quantities` choice:
 N64 single sheets or GameCube four-sheet packs, across all original/imported
 styles and creation routes. N64 is the default. Preparation at

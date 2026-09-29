@@ -21,12 +21,20 @@ OUTPUT=ROOT/'build/v3-diary-category-work-01/tortimer-art-04'
 
 class StreamedNpc(unittest.TestCase):
     def test_current_special_art_batch(self):
+        root=ROOT/'build/v3-diary-category-work-01'
+        self.check_art_batch(((root/'special-miko-art-04',299,274,243,8),
+            (root/'special-costume-art-02',359,213,231,0)))
+
+    def test_reward_spirit_complete_art(self):
+        self.check_art_batch(((ROOT/'build/v3-reward-farley-art-01',380,287,284,0),))
+        commands=(ROOT/'build/v3-reward-farley-art-01/commands.c').read_text()
+        self.assertIn('0xFC121A60, 0xFFFFFFF8',commands)
+
+    def check_art_batch(self,cases):
         source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
             (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
-        cases=(('special-miko-art-04',299,274,243,8),('special-costume-art-02',359,213,231,0))
-        for folder,index,count,voice,eyes in cases:
+        for directory,index,count,voice,eyes in cases:
             with self.subTest(index=index):
-                directory=ROOT/'build/v3-diary-category-work-01'/folder
                 r=json.loads((directory/'art.json').read_text());p=prepare(source,index)
                 model=(directory/'model.bin').read_bytes();texture=(directory/'texture.bin').read_bytes()
                 self.assertEqual((sha256(model),sha256(texture)),(r['model_sha256'],r['texture_sha256']))
