@@ -21,10 +21,12 @@ SOURCES+=('tools/v3_holiday_active.py','overlays/v3/holiday_dispatch_native.c')
 SOURCES+=('tools/v3_npc_registry.py','overlays/v3/npc_stream_draw.c')
 
 
-def link(directory,prepared,output):
+def link(directory,prepared,output,*,object_name='participants',ram=RAM):
     """Link the checked prepared object, retaining every function and asset."""
     output.mkdir()
-    raw=(directory/'participants.o').read_bytes()
+    if object_name not in ('participants','exercise') or ram&15 or not RAM<=ram<0x807DA800:
+        raise ValueError('Invalid shared participant object/address')
+    raw=(directory/(object_name+'.o')).read_bytes()
     if prepared['object']['sha256']!=sha256(raw) or prepared['unbound_services']:
         raise ValueError('Incomplete prepared participant module')
     docker=['docker','run','--rm','--network','none','--user',f'{os.getuid()}:{os.getgid()}',
@@ -36,22 +38,26 @@ def link(directory,prepared,output):
         return result.stdout
     # Restate absolute bindings at final link: partial-link absolute symbols
     # otherwise lose the sign extension needed by MIPS R_MIPS_26 relocations.
-    run('ld','-EB','-T','/source/overlays/v3/holiday_participants.ld',
+    run('ld','-EB',f'--defsym=AF_HP_LINK_RAM=0x{ram:X}',
+        '-T','/source/overlays/v3/holiday_participants.ld',
         *(f'--defsym={n}=0x{v:X}' for n,v in prepared['bindings'].items()),
-        '/source/'+str(directory.relative_to(ROOT))+'/participants.o',
+        '/source/'+str(directory.relative_to(ROOT))+'/'+object_name+'.o',
         '-Map','participants.map','-o','participants.elf')
     if run('nm','--undefined-only','participants.elf').strip():raise ValueError('Unlinked participant service')
-    symbols={n:int(a,16) for a,k,n in (s.split() for s in run('nm','--defined-only','participants.elf').splitlines())}
+    defined=[s.split() for s in run('nm','--defined-only','participants.elf').splitlines()]
+    symbols={n:int(a,16) for a,k,n in defined}
     run('objcopy','-O','binary','participants.elf','participants.bin')
     data=(output/'participants.bin').read_bytes();s=symbols
-    if (s['af_hp_packet_start']!=RAM or s['af_hp_packet_end']!=RAM+len(data) or
-            not RAM<s['af_hp_code_end']<=s['af_hp_bss_start']<s['af_hp_bss_end'] or
-            any(data[s['af_hp_bss_start']-RAM:s['af_hp_bss_end']-RAM]) or
-            data[-16:]!=b'AFHP'*4 or u32(data,s['af_hp_available']-RAM)!=0):
+    if (s['af_hp_packet_start']!=ram or s['af_hp_packet_end']!=ram+len(data) or
+            not ram<s['af_hp_code_end']<=s['af_hp_bss_start']<s['af_hp_bss_end'] or
+            any(data[s['af_hp_bss_start']-ram:s['af_hp_bss_end']-ram]) or
+            data[-16:]!=b'AFHP'*4 or
+            (object_name=='participants' and u32(data,s['af_hp_available']-ram)!=0)):
         raise ValueError('Changed participant code/state/admission bounds')
     write_new(output/'participants.asm',run('objdump','-d','participants.elf').encode())
     return data,dict(bytes=len(data),sha256=sha256(data),symbols=symbols,toolchain=IMAGE,
-        code_bounds=[RAM,s['af_hp_code_end']],bss_bounds=[s['af_hp_bss_start'],s['af_hp_bss_end']])
+        functions=[n for a,k,n in defined if k=='T' and ram<=int(a,16)<s['af_hp_code_end']],
+        code_bounds=[ram,s['af_hp_code_end']],bss_bounds=[s['af_hp_bss_start'],s['af_hp_bss_end']])
 
 
 def install(base,prior,blob,core,output,directory):
@@ -72,6 +78,8 @@ def install(base,prior,blob,core,output,directory):
         raise ValueError('Participants need their checked current preparation')
     for path,digest in prepared['sources'].items():
         if sha256((ROOT/path).read_bytes())!=digest:raise ValueError('Changed participant preparation source: '+path)
+    if prepared.get('category')=='complete-exercise-card':
+        return install_exercise(base,prior,blob,core,output,directory,prepared)
     equipment=copy.deepcopy(prior['equipment_resources']);npc=equipment['npc_extra'];events=npc['events']
     if not events.get('sky') or events.get('participants'):raise ValueError('Participants need the complete sky baseline')
     work=output/'holiday-participants';work.mkdir();data,code=link(directory,prepared,work/'linked')
@@ -198,6 +206,250 @@ def install(base,prior,blob,core,output,directory):
     npc['sources'].update(report['sources']);effects['sources'].update(report['sources'])
     events['participants']=report
     return equipment,changes,dict(physical_resources=records,resource_growth=growth,fire_sound=fire),[(fresh,combined),dispatch_write]
+
+
+def install_exercise(base,prior,blob,core,output,directory,prepared):
+    """Install the whole exercise family, shared registry, art, text, and saves."""
+    from v3_console_disk_install import reservations
+    from v3_event_text import patch_bounds
+    from v3_holiday_dialogue import check_provenance
+    from v3_npc_registry import RAM as NPC_RAM,TABLE,DMA,DRAW,STREAM,append_banks
+    from v3_npc_native import identities,IDENTITIES
+    from v3_npc_stream_runtime import native_records
+    from v3_registry import SPECIAL_NPCS,SPECIAL_NPC_REGISTRY_VERSION
+    from v3_furniture_pipeline import Source
+    from v3_villager_art import DRAW_BASE,DRAW_STRIDE
+    from v3_import_storage import jump
+    import v3_physical_resources as physical
+    e=copy.deepcopy(prior['equipment_resources']);npc=e['npc_extra'];events=npc['events']
+    if events.get('exercise') or prior['save_codec']['format_version']!=13:
+        raise ValueError('Exercise needs the current complete format-thirteen proposal')
+    work=output/'holiday-exercise';work.mkdir()
+    old_packet=copy.deepcopy(events['sky']['packet']);start=old_packet['ram']+old_packet['bytes']
+    prefix=bytearray(base[old_packet['physical']:old_packet['physical']+old_packet['bytes']])
+    if sha256(prefix)!=old_packet['sha256'] or events['participants']['packet']!=old_packet:
+        raise ValueError('Changed retained complete participant packet')
+    code,compiled=link(directory,prepared,work/'linked',object_name='exercise',ram=start)
+    symbols=compiled['symbols'];appended=bytearray(code)
+    actor_bytes=u32(code,symbols['af_he_actor_bytes']-start)
+    if actor_bytes!=2400:raise ValueError('Changed complete exercise native actor size')
+    gate=symbols['af_hp_available']-old_packet['ram']
+    if not 0<=gate<len(prefix)-4 or u32(prefix,gate):raise ValueError('Cannot replace an active participant registry')
+    memory=e['diaries']['memory']['scratch'];scratch_end=memory['ram']+memory['bytes']
+    if memory!={'ram':0x80682000,'bytes':120304} or any(
+            a<scratch_end+48 and scratch_end<b for a,b in reservations(prior)):
+        raise ValueError('Card scratch extension overlaps existing memory')
+
+    # Both obsolete packets are documented predecessors with live, larger
+    # replacements. Reclaim only those checked copies in the output cartridge.
+    staged,records,retired=physical.retire_packet_copies(base,prior,(
+        (events['participants']['preserved_sky_packet'],old_packet),
+        (events['decorations']['controllers']['original_packet'],e['holiday_state']['packet'])))
+    art_manifest=(directory/'art-batch.json').read_bytes();art_rows=json.loads(art_manifest)
+    expected={'GAFE01-r0/npc/exercise-copper','GAFE01-r0/npc/exercise-tortimer'}
+    if len(art_rows)!=2 or {r['identity'] for r in art_rows}!=expected:
+        raise ValueError('Exercise requires both complete special-character resources')
+    source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+        (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    members={'GAFE01-r0/npc/ev-soncho2':npc['record']['identity']}
+    members.update({k:v['identity'] for k,v in npc['prepared_characters'].items() if v['actor_installed']})
+    new_banks=[];characters=[]
+    for row in art_rows:
+        identity=row['identity'];reservation=SPECIAL_NPCS[identity];art_dir=(ROOT/row['art']).resolve()
+        if not art_dir.is_relative_to(ROOT/'build') or identity in members:raise ValueError('Invalid new exercise character')
+        art_raw=(art_dir/'art.json').read_bytes();art=json.loads(art_raw)
+        index=reservation['draw_index'];canonical=art['draw_index'];table=source.raw('npc_draw_data_tbl')
+        if (index not in art.get('source_aliases',[canonical]) or
+                table[index*DRAW_STRIDE:(index+1)*DRAW_STRIDE]!=table[canonical*DRAW_STRIDE:(canonical+1)*DRAW_STRIDE] or
+                {p-(DRAW_BASE+index*DRAW_STRIDE):v for p,v in source.pointers(DRAW_BASE+index*DRAW_STRIDE,DRAW_STRIDE).items()}!=
+                {p-(DRAW_BASE+canonical*DRAW_STRIDE):v for p,v in source.pointers(DRAW_BASE+canonical*DRAW_STRIDE,DRAW_STRIDE).items()}):
+            raise ValueError('Wrong complete exercise artwork identity')
+        for kind in ('model','texture'):
+            data=(art_dir/(kind+'.bin')).read_bytes()
+            if len(data)!=art[kind+'_bytes'] or sha256(data)!=art[kind+'_sha256']:
+                raise ValueError('Changed complete exercise artwork')
+            bank=reservation[kind+'_bank']
+            if bank<prior['object_capacity']:
+                found=[b for b in npc['banks'] if b['bank']==bank]
+                if len(found)!=1 or found[0]['sha256']!=sha256(data) or found[0]['bytes']!=len(data):
+                    raise ValueError('Reused character bank differs from complete source artwork')
+        if reservation['model_bank']>=prior['object_capacity']:
+            new_banks.append(dict(identity=identity,directory=art_dir,**reservation))
+        if reservation['model_bank']<prior['object_capacity']:
+            # Reuse the already-installed complete draw record too. Its
+            # converter revision need not match later unrelated converter work.
+            original=npc['record'];packet=npc['packet'];at=packet['physical']
+            draw=base[at+DRAW:at+DRAW+100];stream=base[at+STREAM:at+STREAM+36]
+            if (reservation['model_bank']!=original['identity']['model_bank'] or
+                    reservation['texture_bank']!=original['identity']['texture_bank'] or
+                    sha256(draw)!=original['draw_sha256'] or sha256(stream)!=original['stream_sha256'] or
+                    sha256(table[index*DRAW_STRIDE:(index+1)*DRAW_STRIDE])!=art['donor_draw_sha256']):
+                raise ValueError('Changed reused complete character drawing record')
+            stream=struct.pack('>H',reservation['name'])+stream[2:];voice=original['voice']
+        else:
+            draw,stream,voice=native_records(source,art,reservation['name'],reservation['model_bank'],reservation['texture_bank'])
+        characters.append((identity,reservation,draw,stream,voice,art_dir,art_raw,art))
+        members[identity]=reservation
+    staged_prior=copy.deepcopy(prior);staged_prior['physical_resources']=records
+    banks,asset,records,writes,staged=append_banks(staged,staged_prior,blob,new_banks)
+    packet=npc['packet'];original=base[packet['physical']:packet['physical']+packet['bytes']]
+    registry=bytearray(original)
+    if sha256(registry)!=packet['sha256'] or struct.unpack_from('>4I',registry,TABLE)!=(0x41464E58,1,3,44):
+        raise ValueError('Changed complete special-character registry')
+    if any(u32(registry,TABLE+20+i*44) for i in range(3)):raise ValueError('Cannot extend active special characters')
+    for index,(identity,r,draw,stream,voice,art_dir,art_raw,art) in enumerate(characters,3):
+        at=len(appended);descriptor=start+at;profile=descriptor+32
+        draw_at=descriptor+80;stream_at=descriptor+192;area=descriptor+240
+        stride=((actor_bytes+15)&~15)+32;chunk=bytearray(240+stride)
+        struct.pack_into('>8I',chunk,0,0,0,0,0,0,profile,0,0)
+        callbacks=[symbols['af_hp_'+name] for name in ('ctor','dtor','step','draw','save')]
+        struct.pack_into('>HHIHH6I',chunk,32,r['profile'],3<<8,prepared['registry']['native_flags'],
+            r['name'],3,actor_bytes,*callbacks)
+        chunk[80:180]=draw;chunk[192:228]=stream
+        struct.pack_into('>4I',chunk,240,0x41464E53,0,r['name'],r['profile'])
+        struct.pack_into('>4I',chunk,len(chunk)-16,*([0x4E504347]*4))
+        offset=TABLE+16+index*44
+        if any(registry[offset:offset+44]):raise ValueError('Exercise overwrites an existing special row')
+        struct.pack_into('>HH9I2H',registry,offset,r['name'],r['profile'],0,actor_bytes,1,stride,
+            area,descriptor,draw_at,stream_at,voice,r['model_bank'],r['texture_bank'])
+        appended.extend(chunk)
+        npc['prepared_characters'][identity]=dict(identity=r,registry_version=SPECIAL_NPC_REGISTRY_VERSION,
+            art=str(art_dir.relative_to(ROOT)),art_sha256=sha256(art_raw),draw_hex=draw.hex(),stream_hex=stream.hex(),
+            voice=voice,model_bytes=art['model_bytes'],texture_bytes=art['texture_bytes'],banks_installed=True,
+            actor_installed=True,active=False,selectable=False,native_execution_verified=False,actor_bytes=actor_bytes,
+            descriptor=descriptor,profile=profile,slots=1,slot_stride=stride,pool_ram=area,flags_offset=offset+4,
+            callback_family='Taisou_Npc0')
+    struct.pack_into('>I',registry,TABLE+8,5)
+    identity_data,identity_rows=identities(base,members)
+    old_members={k:v for k,v in members.items() if k not in expected};old_identities,_=identities(base,old_members)
+    if registry[IDENTITIES:IDENTITIES+len(old_identities)]!=old_identities or any(
+            registry[IDENTITIES+len(old_identities):IDENTITIES+144]):
+        raise ValueError('Changed complete installed identity directory')
+    registry[IDENTITIES:IDENTITIES+144]=identity_data.ljust(144,b'\0')
+    old_banks=npc['banks'];old_dma=struct.pack('>4I',0x41464E44,1,len(old_banks),12)+b''.join(
+        struct.pack('>3I',b['vrom'],b['vrom']+b['bytes'],b['physical']) for b in old_banks)
+    if registry[DMA:DMA+len(old_dma)]!=old_dma or any(registry[DMA+len(old_dma):DMA+len(old_dma)+len(banks)*12]):
+        raise ValueError('Changed complete character transfer table')
+    struct.pack_into('>I',registry,DMA+8,len(old_banks)+len(banks))
+    for i,b in enumerate(banks,len(old_banks)):
+        struct.pack_into('>3I',registry,DMA+16+i*12,b['vrom'],b['vrom']+b['bytes'],b['physical'])
+    npc['banks']+=banks
+
+    # Every existing public registry and save entry keeps its address. Never
+    # redirect data symbols or the exercise-specific dialogue/death adapters.
+    functions=set(compiled['functions']);redirects=[]
+    buffers={old_packet['id']:prefix,npc['packet']['id']:registry}
+    def redirect(label,owner,old,wanted):
+        data=buffers.setdefault(owner['id'],bytearray(base[owner['physical']:owner['physical']+owner['bytes']]))
+        origin=owner['ram'];addresses=sorted(set(v for v in old['symbols'].values()
+            if origin<=v<origin+owner['bytes']))
+        for name,address in old['symbols'].items():
+            target=symbols.get(name)
+            if name not in functions or not wanted(name) or not origin<=address<origin+owner['bytes']:continue
+            end=next((v for v in addresses if v>address),origin+owner['bytes'])
+            if end-address<8:raise ValueError('Public entry is too short for a checked redirect: '+name)
+            offset=address-origin;before=bytes(data[offset:offset+8]);after=struct.pack('>2I',jump(target),0)
+            data[offset:offset+8]=after
+            redirects.append(dict(owner=label,name=name,address=address,target=target,before=before.hex(),after=after.hex()))
+    participants=events['participants']
+    redirect('participants',old_packet,participants['code'],lambda n:n.startswith('af_hp_') or n in ('mEv_get_save_area','mEv_reserve_save_area'))
+    for label,owner,old in (('diary',e['diaries']['packets']['storage'],e['diaries']['compiled']),
+            ('holiday',e['holiday_state']['packet'],e['holiday_state']['code']),
+            ('fishing',e['holiday_fishing']['packet'],e['holiday_fishing']['code'])):
+        redirect(label,owner,old,lambda n:n.startswith('af_v3_'))
+    needed={'af_v3_save_check','af_v3_save_pack','af_v3_console_storage_reset','af_v3_console_storage_commit',
+        'af_v3_console_storage_valid','af_v3_console_player_clear','af_v3_diary_measure'}
+    for label in ('diary','holiday','fishing'):
+        if not needed<={r['name'] for r in redirects if r['owner']==label}:raise ValueError('Incomplete format-14 save callers')
+    for label,owner,old in (('diary',e['diaries']['packets']['storage'],e['diaries']['compiled']),
+            ('holiday',e['holiday_state']['packet'],e['holiday_state']['code']),
+            ('fishing',e['holiday_fishing']['packet'],e['holiday_fishing']['code']),
+            ('participants',old_packet,participants['code'])):
+        data=buffers[owner['id']]
+        origin=old['code_bounds'][0] if 'code_bounds' in old else (
+            0x80730000 if label=='fishing' else owner['ram'])
+        pos=origin-owner['ram']
+        old.update(sha256=sha256(data[pos:pos+old['bytes']]),exercise_redirects=[r for r in redirects if r['owner']==label])
+    appended.extend(b'AFHX'*4);end=start+len(appended)
+    if end>0x807DA800 or any(a<end and start<b for a,b in reservations(prior)):
+        raise ValueError('Complete exercise packet overlaps retained native memory')
+    combined=bytes(prefix+appended)
+    allocation=physical.allocate(staged,records,combined,'holiday-exercise-GAFE01-r0',best_fit=True)
+    records.append(allocation);writes.append((allocation,combined))
+    fresh=dict(allocation,ram=old_packet['ram'],crc32=zlib.crc32(combined),storage='physical-ROM')
+    events['sky']['packet']=copy.deepcopy(fresh);participants['packet']=copy.deepcopy(fresh)
+    participants['loaded_code']['sha256']=participants['code']['sha256']
+    for owner in (npc['packet'],e['diaries']['packets']['storage'],e['holiday_state']['packet']):
+        data=bytes(buffers[owner['id']]);previous=owner['sha256'];owner.update(sha256=sha256(data),crc32=zlib.crc32(data))
+        row=next(r for r in records if r['id']==owner['id']);row['sha256']=owner['sha256']
+        writes.append((dict(row,previous_sha256=previous),data))
+    e['holiday_fishing']['packet']=copy.deepcopy(e['holiday_state']['packet'])
+    e['holiday_fishing']['loaded_code']['sha256']=e['holiday_fishing']['code']['sha256']
+    npc['lifecycle']['code']=copy.deepcopy(e['holiday_state']['code'])
+    # Keep the complete installed player controller and all callback addresses.
+    # Only its two existing calendar calls gain the imported RUN condition.
+    player=e['player_motion']['exercise']['native'];pp=player['packet'];pc=player['code']
+    begin=pp['blob_offset'];player_code=bytearray(blob[begin:begin+pp['bytes']])
+    if sha256(player_code)!=pp['sha256'] or sha256(player_code[:pc['bytes']])!=pc['sha256']:
+        raise ValueError('Changed complete player exercise controller')
+    entry=pc['symbols']['af_v3_exercise_native_able']
+    end_entry=min(v for v in pc['symbols'].values() if v>entry)
+    # The compiler shares $s0 between two jalr calls, loading the callee with
+    # lui/ori. Keep both complete calls and their event arguments unchanged.
+    callee=symbols['af_he_player_status']
+    edits=((0x1F8,0x3C108007,0x3C100000|(callee>>16)),
+           (0x208,0x3610FF08,0x36100000|(callee&65535)))
+    if (entry!=pp['ram']+0x1DC or end_entry!=pp['ram']+0x2D4 or
+            sha256(player_code[0x1DC:0x2D4])!='620af9596ac9ca9a9a23bd0ef95b0b605a0c76f5bd01add1eb90506bb030d35d' or
+            any(u32(player_code,i)!=word for i,word in
+                ((0x20C,0x0200F809),(0x210,0x24040010),(0x288,0x0200F809),(0x28C,0x24040008))) or
+            any(u32(player_code,i)!=before for i,before,after in edits)):
+        raise ValueError('Changed complete player exercise event checks')
+    player_hooks=[]
+    for i,before,after in edits:
+        struct.pack_into('>I',player_code,i,after)
+        player_hooks.append(dict(address=pp['ram']+i,before=before,after=after,delay_slot_preserved=True))
+    blob[begin:begin+pp['bytes']]=player_code
+    pp.update(sha256=sha256(player_code),crc32=zlib.crc32(player_code))
+    pc['sha256']=sha256(player_code[:pc['bytes']])
+    player['imported_event_hooks']=player_hooks
+    memory['bytes']+=48
+    text=copy.deepcopy(prepared['dialogue']);check_provenance(text)
+    text.update(choice_vrom=prior['import_storage']['choice_vrom'],hooks=patch_bounds(core,text['first_id'],text['count']),installed=True)
+    for row in text['resources']:
+        data=(directory/row['file']).read_bytes()
+        if len(data)!=row['bytes'] or sha256(data)!=row['sha256']:raise ValueError('Changed complete exercise text')
+        row['original_sha256']=row.pop('previous_sha256')
+        name='holiday-exercise/'+row['file'];write_new(output/name,data);row['file']=name
+    report=dict(format='AFV3-EXERCISE-CARD-1',installed=True,code=compiled,bindings=prepared['bindings'],
+        ram=start,bytes=len(appended),sha256=sha256(appended),loaded_code=dict(ram=start,bytes=len(code),sha256=sha256(code)),
+        prepared=str(directory.relative_to(ROOT)),prepared_sha256=sha256((directory/'prepared.json').read_bytes()),
+        art_manifest_sha256=sha256(art_manifest),registry=prepared['registry'],identities=identity_rows,
+        characters=sorted(expected),redirects=redirects,text=text,packet=copy.deepcopy(fresh),
+        saved_format_changed=True,save_format=14,card_state=dict(ram=symbols['af_v3_card_state'],bytes=48),
+        scratch=copy.deepcopy(memory),additional_resident_bytes=len(appended)+48,
+        actor_admission_changed=False,native_execution_verified=False,sources=copy.deepcopy(prepared['sources']))
+    report['player_event_hooks']=player_hooks
+    report['sources'].update({p:sha256((ROOT/p).read_bytes()) for p in SOURCES})
+    npc['sources'].update(report['sources'])
+    npc.setdefault('source_batches',[]).append(dict(installed=True,ram=start,bytes=len(appended),sha256=sha256(appended),category='exercise-card'))
+    events['exercise']=report
+    e['console_storage'].update(save_format=14,diary_runtime=copy.deepcopy(e['diaries']['compiled']),
+        fishing_runtime=copy.deepcopy(e['holiday_fishing']['code']),card_runtime=copy.deepcopy(compiled))
+    updates={k:copy.deepcopy(prior[k]) for k in ('save_runtime','save_codec','clothing','room_surfaces')}
+    updates['save_runtime']['diary_runtime_code']=copy.deepcopy(e['diaries']['compiled'])
+    updates['save_codec'].update(format_version=14,active_storage_code=copy.deepcopy(compiled),card_storage_code=copy.deepcopy(compiled),
+        holiday_state_code=copy.deepcopy(e['holiday_state']['code']),fishing_storage_code=copy.deepcopy(e['holiday_fishing']['code']))
+    updates['clothing']['save_extension'].update(format_version=14,active_storage_code=copy.deepcopy(compiled))
+    updates['clothing']['save_extension']['legacy_formats_read']=list(dict.fromkeys(
+        [*updates['clothing']['save_extension']['legacy_formats_read'],'AFS3-v13']))
+    updates['room_surfaces']['save']['disk_format_version']=14
+    updates.update(physical_resources=records,retired_physical_resources=retired,asset=asset,
+        object_capacity=prior['object_capacity']+len(banks),saved_format_changed=True,
+        save_warning='Format-14 experimental saves require this or a newer compatible build. Compatible older saves migrate forward; exercise-card records start empty. V2 and format-13-or-earlier V3 cannot load new saves. Preserve backups. Native diary/exercise gameplay and save/reload remain unverified.')
+    write_new(work/'installed.json',(json.dumps(report,indent=2)+'\n').encode())
+    write_new(work/'packet.bin',combined);write_new(work/'registry.bin',registry)
+    return e,{},updates,writes
 
 
 def finish(image,base,prior,output,equipment):

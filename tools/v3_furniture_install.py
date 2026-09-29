@@ -1176,6 +1176,19 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         target=next((r.get('target_vrom',vrom) for r in owner_moves if r['vrom']==vrom),vrom)
         if installed[target].extract(result)!=data:
             raise ValueError('Shared runtime loses a complete changed owner')
+    # Superseded startup copies are reclaimed only in the newly built image.
+    # The category planner verifies their live replacement; this writer checks
+    # the exact original records again before making the space reusable.
+    for retired in report_updates.get('retired_physical_resources',[]):
+        old=next((r for r in prior.get('physical_resources',[]) if r['id']==retired['id']),None)
+        first=retired['physical'];end=first+retired['bytes']
+        if (old is None or any(old[k]!=retired[k] for k in ('physical','bytes','sha256')) or
+                any(r['id']==retired['id'] for r in report_updates['physical_resources']) or
+                sha256(result[first:end])!=retired['sha256'] or
+                any(e.pstart<end and first<(e.pend or e.pstart+e.size)
+                    for e in installed.values() if e.pstart!=0xFFFFFFFF)):
+            raise ValueError('Changed obsolete physical packet before reuse')
+        result[first:end]=bytes(retired['bytes'])
     for row,data in physical_writes:
         first=row['physical'];end=first+row['bytes']
         if 'previous_sha256' in row:
@@ -1194,7 +1207,8 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         result[first:end]=data
     if holiday_actor_services and equipment_report:
         from v3_holiday_dialogue import finish as finish_holiday_text
-        result=finish_holiday_text(result,base,prior,output,equipment_report)
+        result=finish_holiday_text(result,base,prior,output,equipment_report,
+            physical_resources=report_updates.get('physical_resources',prior.get('physical_resources',[])))
     if creature_insects is not None:
         result=equipment.finish(result,base,prior,output,equipment_report,report_updates['physical_resources'])
     physical.verify(result,report_updates.get('physical_resources',prior.get('physical_resources',[])))
@@ -1509,15 +1523,18 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         fishing=equipment_report.get('holiday_fishing') and not prior['equipment_resources'].get('holiday_fishing')
         sky=npc['events'].get('sky') and not prior['equipment_resources']['npc_extra']['events'].get('sky')
         participants=npc['events'].get('participants') and not prior['equipment_resources']['npc_extra']['events'].get('participants')
-        report['shared_runtime_refresh'].update(adapters=['holiday_actor_services'],artwork_changed=bool(decorations or event_items or sky or participants),
-            additional_resident_bytes=state_growth+(176 if fishing else 0)+(npc['events']['sky']['additional_resident_bytes'] if sky else 0)+(npc['events']['participants']['additional_resident_bytes'] if participants else 0),
+        exercise=npc['events'].get('exercise') and not prior['equipment_resources']['npc_extra']['events'].get('exercise')
+        report['shared_runtime_refresh'].update(adapters=['holiday_actor_services'],artwork_changed=bool(decorations or event_items or sky or participants or exercise),
+            additional_resident_bytes=state_growth+(176 if fishing else 0)+(npc['events']['sky']['additional_resident_bytes'] if sky else 0)+(npc['events']['participants']['additional_resident_bytes'] if participants else 0)+(npc['events']['exercise']['additional_resident_bytes'] if exercise else 0),
             resource_allocations_changed=bool(new_state or fishing or npc['events'].get('reserved')),
-            saved_format_changed=bool(new_state or fishing),saved_profile_changed=False)
+            saved_format_changed=bool(new_state or fishing or exercise),saved_profile_changed=False)
         report['sources'].update(npc['sources'])
         report['native_test']=('pending dedicated/costume/exercise owners, calendar behaviour choice, actor activation, '
             'and connected diary gameplay/save verification' if holiday_state else
             'pending native calendar caller, dedicated/costume/exercise owners, actor activation, '
             'and connected diary gameplay/save verification')
+        if exercise:
+            report['native_test']='pending calendar behaviour choice/admission and connected diary/exercise gameplay/save verification'
     if console_images is not None:
         images=equipment_report['console_images']
         report['shared_runtime_refresh'].update(adapters=['console_images'],

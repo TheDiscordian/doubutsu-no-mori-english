@@ -190,12 +190,19 @@ void af_hp_motion_override(ACTOR *);
 /* Native registry uses complete generated callbacks and the ordinary NPC pool.
  * Descriptor/registration hooks must be installed together before activation. */
 typedef struct {
-    u16 source_name,name,profile,event;u8 save,count,part,pad;
+    /* NO_SAVE owners use save as a second schedule identity, not a save-area
+     * number. Their shared map area remains the ordinary area 15. */
+    u16 source_name,name,profile,event;u8 save,count,part,kind;
     const ACTOR_PROFILE *source;
     u32 native_flags;
 } AFHPRecord;
 typedef struct {u16 event_name,texture,resident,cloth;u8 exists,used;u16 pad;} AFHPResident;
+enum {AF_HP_SPECIAL=1,AF_HP_NO_SAVE=2};
+#ifdef AF_HP_EXERCISE_REGISTRY
+enum {AF_HP_OWNER_COUNT=12,AF_HP_RESIDENT_COUNT=18,AF_HP_LIVE_COUNT=24};
+#else
 enum {AF_HP_OWNER_COUNT=9,AF_HP_RESIDENT_COUNT=14,AF_HP_LIVE_COUNT=18};
+#endif
 extern const AFHPRecord af_hp_records[AF_HP_OWNER_COUNT];
 extern const u32 af_hp_available;
 int af_hp_identity(unsigned int,unsigned int);

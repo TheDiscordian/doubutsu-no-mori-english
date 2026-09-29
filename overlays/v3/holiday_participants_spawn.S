@@ -12,7 +12,11 @@ af_hp_spawn_profile:
     sltu $at, $v1, $at
     bne $at, $zero, 1f
      nop
+#ifdef AF_HP_EXERCISE_REGISTRY
+    ori $at, $zero, 0xd0b4
+#else
     ori $at, $zero, 0xd0ae
+#endif
     sltu $at, $v1, $at
     beq $at, $zero, 1f
      nop

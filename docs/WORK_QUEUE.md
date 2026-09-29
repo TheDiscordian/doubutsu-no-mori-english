@@ -346,9 +346,9 @@ callback loader uses its actual relocated code bounds. Focused source/host,
 cartridge, and empty/mixed/all-191 composition checks pass. Continue the remaining
 controller/participant services using the retained native map; do not reconvert
 these effects or installed decorations, or restart native fixtures.
-The connected controller/participant module is retained in ABI 346 at
-`build/v3-diary-category-work-01/special-native-installed-01/build-lock.json`
-(ROM SHA-256 `80effbabf648db1dc1016503102565521a2770ad6022d8af0ac7d9985bc38f87`),
+The connected controller/participant module is retained in ABI 347 at
+`build/v3-diary-category-work-01/exercise-installed-06/build-lock.json`
+(ROM SHA-256 `b87afbf58fa39fade6a9771c5a114520cb25b09cced3984d7295db1dc763cf9b`),
 using `build/v3-diary-category-work-01/participants-prepared-26/`: three controllers,
 five resident roles, rope, 279 official messages/two choices, offering payment,
 tools/sounds, 21 matching native motions, and the full donor prayer motion.
@@ -412,14 +412,20 @@ registry. The complete packet is 102,352 bytes, retaining nineteen startup
 descriptors and saved format 13. Current installed-hook/startup checks and the
 existing allocation/rendering host checks pass; native execution is unverified.
 
-Exercise preparation `exercise-prepared-10/` compiles the complete actor/card
-source, native inventory and actual attendance adapters, all 20 matched motions,
-158 official messages, and optional four-player card storage. Format 14 remains
-uninstalled; the unchanged installed format-13 storage check passes, not a
-format-14 round trip. The exact next consumers are player/card handover modes,
-shared actor registration and lifecycle, then connected storage/module/text
-installation and the existing player-exercise event predicate. Continue this
-same batch without a new harness or native fixture. Reuse
+Exercise preparation `exercise-prepared-16/` is installed in the current proposal:
+complete actor/card source, native inventory and attendance, all 20 matched motions,
+158 credited official messages, native handover modes 7/8, four-player card
+storage, all six actor roles, and both player-control event calls. The shared
+registry retains the earlier race/tug/New Year roles and separates special from
+ordinary allocation. Complete Copper art uses 454/455; Tortimer reuses 448/449.
+The 35,424-byte code and guarded slots share a 143,136-byte startup packet.
+Current physical-resource/packet checks, all 82 redirects, player hooks, nineteen
+startup entries and referenced CRC, and inactive gates pass. Native gameplay
+and format-14 save/reload remain unverified. New saves require format 14; older
+compatible saves have forward migration, but older V3/V2 cannot read new saves.
+The exact next consumers are calendar behaviour selection, complete actor/service
+admission, and diary selection. Continue this same batch without a new harness
+or native fixture. Reuse
 the complete installed fortune actor and art without reconverting or retesting
 them. Bind actor pools,
 ordinary/profile lookup, placement identities, full voices, and cleanup together. Preserve each source

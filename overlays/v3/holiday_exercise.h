@@ -20,6 +20,8 @@ u32 af_he_frame(GAME *);
 int af_he_player_events(void);
 int af_he_message(int);
 int af_he_begin(ACTOR *,int),af_he_finish(int);
+ACTOR *af_he_talk_actor(void);
+void af_he_forget(ACTOR *);
 void *af_he_handover_master(void);
 int af_he_handover_mode(void);
 void af_he_handover_after(int);

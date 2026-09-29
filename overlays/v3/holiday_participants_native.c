@@ -53,38 +53,6 @@ extern const AFHPMotion af_hp_prayer_motion;
 extern void af_holiday_keyframe_init(void *,void *,const void *,f32,f32,f32,f32,f32,int,void *);
 
 #define FN(word,ret,...) ((ret (*)(__VA_ARGS__))(word))
-static u32 clip(unsigned int offset) {return af_hp_native_npc_clip[offset/4];}
-static int live(void) {return af_hp_native_npc_clip && af_holiday_observers_clip();}
-static int birth(ACTOR *a,GAME *g) {
-    return live() && af_hp_admit(a,g) && FN(clip(0xBC),int,ACTOR *,GAME *)(a,g)==1;
-}
-static void ctor(ACTOR *a,GAME *g,const aNPC_ct_data_c *source) {
-    if(!live() || !source || source->schedule!=aNPC_CT_SCHED_TYPE_SPECIAL) {
-        Actor_delete(a);return;
-    }
-    aNPC_ct_data_c data=*source;
-    data.schedule=4; /* native SPECIAL, not donor WALK_WANDER */
-    if(!af_hp_npc_callbacks(a,&data)) {Actor_delete(a);return;}
-    FN(clip(0xC0),void,ACTOR *,GAME *,const aNPC_ct_data_c *)(a,g,&data);
-    af_hp_constructed(a);
-}
-static void dtor(ACTOR *a,GAME *g) {if(live())FN(clip(0xC4),void,ACTOR *,GAME *)(a,g);}
-static void init(ACTOR *a,GAME *g) {if(live())FN(clip(0xCC),void,ACTOR *,GAME *)(a,g);}
-static void move(ACTOR *a,GAME *g) {if(live())FN(clip(0xD0),void,ACTOR *,GAME *)(a,g);}
-static void draw(ACTOR *a,GAME *g) {if(live())FN(clip(0xE4),void,ACTOR *,GAME *)(a,g);}
-static int think(NPC_ACTOR *a,GAME_PLAY *g,int which,int phase) {
-    if(!live() || (which!=-1 && which!=aNPC_THINK_SPECIAL) || phase<0 || phase>2)return 0;
-    return FN(clip(0x110),int,NPC_ACTOR *,GAME_PLAY *,int,int)(a,g,which<0?-1:8,phase);
-}
-static void destination(NPC_ACTOR *a,f32 x,f32 z) {
-    if(live())FN(clip(0x10C),void,NPC_ACTOR *,f32,f32)(a,x,z);
-}
-/* The generated constants supply checked native animation identities, including
- * direct default-animation writes. Do not perform a second index conversion. */
-static void animation(ACTOR *a,int id,int reset) {
-    if(live())FN(clip(0x104),void,ACTOR *,int,int)(a,id,reset);
-}
-const AFHPNpcServices af_hp_npc_services={birth,ctor,dtor,init,move,draw,animation,think,destination};
 
 static ACTOR *tool(int kind,int mode,ACTOR *parent,GAME *game,int argument,void *bank) {
     const AFHPTools *t=af_hp_native_tools;
@@ -128,13 +96,6 @@ void sAdo_OngenPos(u32 owner,u32 source,xyz_t *p) {
     if(p && (source==0x2F || source==0x31))af_hp_native_continuous(owner,(u16)source,p);
 }
 
-static int event(unsigned int donor,int id) {
-    /* Each source record fits the native 32-byte save area. A source event/id
-     * outside this family must not reach a same-number original event. */
-    if(!((donor==1 && (id==7 || id==15)) ||
-         (donor==15 && (id==8 || id==15)) || (donor==14 && (id==9 || id==15))))return -1;
-    return af_holiday_native_type(donor);
-}
 int af_hp_native_resident_index(u16 name) {
     return (name>>12)==14?af_hp_native_find_resident(af_hp_native_animals,name,15):-1;
 }
@@ -142,12 +103,6 @@ int af_hp_native_resident_valid(int index,u16 name) {
     if(index<0 || index>=15 || name>>12!=14)return 0;
     const u8 *p=af_hp_native_animals[index];
     return *(const u16 *)p==name && p[11]<6 && !af_hp_native_free_resident((void *)p);
-}
-void *mEv_get_save_area(int donor,int id) {
-    int native=event(donor,id);return native<0?0:af_hp_native_get_save(native,id);
-}
-void *mEv_reserve_save_area(int donor,int id) {
-    int native=event(donor,id);return native<0?0:af_hp_native_reserve_save(native,id);
 }
 void mEv_actor_dying_message(int donor,ACTOR *a) {
     int native=af_holiday_native_type(donor);

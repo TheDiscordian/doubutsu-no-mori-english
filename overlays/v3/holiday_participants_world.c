@@ -37,8 +37,11 @@ static int native_index(int event) {
 }
 static int enabled(unsigned int event) {
     if(!af_hp_available)return 0;
-    for(unsigned int i=0;i<AF_HP_OWNER_COUNT;i++)
-        if(af_hp_records[i].event==event && af_hp_records[i].part==7)return 1;
+    for(unsigned int i=0;i<AF_HP_OWNER_COUNT;i++) {
+        const AFHPRecord *r=af_hp_records+i;
+        if(r->part==7 && r->event==event)return 1;
+        if((r->kind&AF_HP_NO_SAVE) && (r->event==event || r->save==event))return 1;
+    }
     return 0;
 }
 static int layout(int index,int slot,AFHolidayMap *out) {

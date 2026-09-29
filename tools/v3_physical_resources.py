@@ -26,6 +26,41 @@ def overlaps(records, start, end):
     return any(r['physical'] < end and start < r['physical']+r['bytes'] for r in records)
 
 
+def retire_packet_copies(rom,prior,copies):
+    """Reclaim declared old startup packets with a live replacement at the same RAM.
+
+    Each copy names its retained predecessor receipt and current replacement.
+    Both hashes and RAM extents are checked, and the actual installed startup
+    table must load the replacement, never the obsolete physical copy.
+    """
+    import struct
+    from v3_asset_loader import BLOB
+    records=prior['physical_resources'];verify(rom,records)
+    e=prior['equipment_resources'];boot=e['surface_bootstrap']['code']
+    blob=by_vrom(rom)[BLOB].extract(rom)
+    at=e['blob_offset']+boot['symbols']['packets']-e['ram']
+    # This API belongs to the installed shared nineteen-packet owner. Refuse an
+    # unrelated startup shape instead of interpreting arbitrary words as rows.
+    if boot['bytes']!=688:raise ValueError('Changed complete startup packet reader')
+    live=[struct.unpack_from('>5I',blob,at+i*20)[:3] for i in range(19)]
+    retired=[];seen=set()
+    for old,current in copies:
+        row=next((r for r in records if r['id']==old['id']),None)
+        if (row is None or row['id'] in seen or any(row[k]!=old[k] for k in ('physical','bytes','sha256')) or
+                sha256(rom[current['physical']:current['physical']+current['bytes']])!=current['sha256'] or
+                not current['ram']<=old['ram']<old['ram']+old['bytes']<=current['ram']+current['bytes'] or
+                (current['ram'],current['physical']|0x80000000,current['bytes']) not in live or
+                any((physical&0x7FFFFFFF)<old['physical']+old['bytes'] and
+                    old['physical']<(physical&0x7FFFFFFF)+size for _,physical,size in live)):
+            raise ValueError('Old physical packet still has an active or unchecked owner')
+        seen.add(row['id']);retired.append(dict(row,replaced_by=current['id'],ram=old['ram']))
+    staged=bytearray(rom)
+    for row in retired:staged[row['physical']:row['physical']+row['bytes']]=bytes(row['bytes'])
+    retained=[r for r in records if r['id'] not in seen]
+    verify(staged,retained)
+    return staged,retained,retired
+
+
 def grow_backwards(rom,records,identity,data):
     """Grow one owned resource into its preceding checked free space.
 

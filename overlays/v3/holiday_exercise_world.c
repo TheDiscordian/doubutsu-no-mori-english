@@ -26,6 +26,15 @@ static int current(void) {
     return context.open && !context.failed && context.actor &&
         af_he_player()==context.player && af_hp_private()==context.native;
 }
+ACTOR *af_he_talk_actor(void) {return current()?context.actor:0;}
+void af_he_forget(ACTOR *actor) {
+    /* Actor storage can be reused after scene cleanup. No later occupant may
+     * inherit a previous conversation's borrowed player/card context. */
+    if(context.actor==actor) {
+        context.actor=0;context.native=0;context.failed=0;context.open=0;
+        context.player=-1;context.inserted=0;
+    }
+}
 int af_he_begin(ACTOR *actor,int first) {
     int player=af_he_player();AFHPPrivate *native=af_hp_private();
     if(!actor || !af_hp_owned(actor) || !native || player<0 || player>4)return 0;

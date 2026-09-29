@@ -38,6 +38,12 @@ int af_he_player_events(void) {
     return mEv_check_status(mEv_EVENT_MORNING_AEROBICS,mEv_STATUS_RUN) ||
         mEv_check_status(mEv_EVENT_SPORTS_FAIR_AEROBICS,mEv_STATUS_RUN);
 }
+int af_he_player_status(int native,int mask) {
+    /* Existing player controls keep both original calendar checks. The added
+     * event is considered only at those same RUN queries, not for all events. */
+    return af_he_native_status(native,mask) ||
+        (mask==mEv_STATUS_RUN && (native==8 || native==16) && af_he_player_events());
+}
 int sAdos_GetRadioCounter(Radio_c *counter) {
     return counter?af_he_native_radio(counter):-1;
 }

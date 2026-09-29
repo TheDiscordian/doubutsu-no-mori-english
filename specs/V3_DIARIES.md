@@ -1208,11 +1208,11 @@ match their reports. Existing sanitized allocation and rendering checks pass.
 Actor admission stays off; native execution and exercise/card integration are
 unfinished. The connected batch's harness budget remains exhausted.
 
-### Complete exercise/card source preparation
+### Complete exercise/card installation
 
 `tools/v3_holiday_participants.py --exercise` prepares the complete exercise NPC
 source family, all seventeen radio-card functions, and the three complete donor
-number-formatting functions. `exercise-prepared-10/` compiles these together with
+number-formatting functions. `exercise-prepared-16/` compiles these together with
 native/world/dialogue adapters. All twenty motion dependencies match; eleven
 base/next pairs are explicitly checked for adjacent native indices. Physics runs
 once per update, source delays consume elapsed ticks, and the actor reads the
@@ -1221,27 +1221,40 @@ actual native update counter at Game offset `A0`.
 The dialogue graph contains 158 official messages. Inclusive random-message
 ranges are lowered to the existing equivalent two/three/four-way native
 commands. Source instruction pages adapt C Stick to C Buttons with recorded
-provenance; pages, waits, and branch targets are preserved. Prepared provenance
-does not become an installed catalogue entry before message IDs are assigned.
+provenance; pages, waits, and branch targets are preserved. All 158 messages and
+both special-character names have records in `translations/provenance.json`.
 
 Native inventory calls use the validated actual player pointer, never the
 six-byte source radio-card view. Attendance retains the source Tortimer-only
-gate and existing diary/calendar calls. Actual handover modes and the six-role
-actor registry remain unbound; compiling these adapters does not make the actor
-playable. Admission stays off until every required provider is installed.
+gate and existing diary/calendar calls. Native handover modes 7/8 use the real
+clip at `80136F34`, player TALK context, accepted request result, and return-state
+signal. Rejected/busy requests do not advance the source conversation. Destruction
+clears its borrowed player context. One twelve-owner registry retains earlier
+participants and adds Copper, four ordinary residents, and exercise Tortimer.
+Special actors use guarded slots; ordinary residents keep the native pool.
+Both original player exercise checks retain their calls and arguments, with a
+checked callee redirect adding the imported RUN observations.
 
 Optional `AF_V3_CARD_STORAGE` adds a 48-byte endian-neutral `AFHC` record: a
 16-byte header and four eight-byte resident records containing date, stamp count,
 and reserved zeros. Saved format 14 covers this record in the existing CRC and
 initializes it when migrating earlier supported formats. Format 13 cannot read
 format 14. Player deletion, town switching, preflight, scratch bounds, and saved
-state use the shared storage path. Storage compiles, and the existing sanitized
-format-13 regression check passes; format-14 execution is not yet verified.
-The installed proposal remains format 13 without any allocation or save change.
+state use the shared storage path. The installed proposal writes format 14;
+format-14 native execution and save/reload are not yet verified.
 
-Continue the actual player/card handover, shared actor registration/lifecycle,
-and combined installation. Native fixture and new-harness budgets remain
-exhausted for this same connected diary category.
+`exercise-installed-06/` installs the 35,424-byte module at `80750FD0`, all
+158 messages, Copper's complete banks 454/455, and two guarded actor slots.
+Tortimer's checked source aliases and installed banks 448/449 are reused without
+reconversion. The combined 143,136-byte packet retains nineteen startup entries.
+Checked obsolete physical startup copies provide ROM space only after the
+actual bootstrap proves their replacements are live. Earlier ROMs are untouched.
+Shared scratch grows by 48 bytes to 120,352 bytes. All 82 public registry/save
+redirects preserve existing callers. Current-ROM packet/resource/bounds, redirect,
+player-hook, startup CRC, and inactive-gate checks pass; these are not native
+gameplay or persistence checks. Continue calendar behaviour selection and complete
+actor/service admission, then diary selection. Native fixture and new-harness
+budgets remain exhausted for this same connected diary category.
 
 ### Reserved layouts and dedicated owners
 

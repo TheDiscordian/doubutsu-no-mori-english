@@ -2,6 +2,10 @@
  * villagers retain their own pools, resource loader, clothing, voice, and saves.
  * This is not the static special-character/artwork registry. */
 #include "holiday_participants.h"
+#ifdef AF_HP_EXERCISE_REGISTRY
+#include "npc_registry.h"
+extern int af_holiday_native_type(unsigned int),af_hp_native_event_status(int,int);
+#endif
 typedef struct {u32 vrom,end,ram,ram_end,loaded;ACTOR_PROFILE *profile;u32 filename;u16 allocation;u8 count,pad;} Descriptor;
 typedef struct {ACTOR_PROFILE profile;Descriptor descriptor;} Owner;
 static Owner owners[AF_HP_OWNER_COUNT];
@@ -39,6 +43,13 @@ static int identity(const ACTOR *actor) {
     if(index<0)return -1;
     const AFHPRecord *r=&af_hp_records[index];
     if(r->count?name_index(actor->npc_id)!=index:actor->npc_id!=0)return -1;
+#ifdef AF_HP_EXERCISE_REGISTRY
+    if(r->kind&AF_HP_SPECIAL) {
+        const AFNpcExtra *extra=af_v3_npc_extra_owned(actor);
+        return extra && extra->flags==3 && extra->profile==r->profile &&
+            *(const void *const *)((const u8 *)actor+0x170)==extra->descriptor?index:-1;
+    }
+#endif
     /* The native actor owns this exact resident descriptor. */
     if(*(const void *const *)((const u8 *)actor+0x170)!=&owners[index].descriptor)return -1;
     return index;
@@ -98,7 +109,7 @@ int af_hp_resident_bind(u16 source,u16 npc,u16 cloth) {
     if(!af_hp_available)return -1;
     for(unsigned int i=0;i<AF_HP_OWNER_COUNT;i++) {
         const AFHPRecord *p=af_hp_records+i;
-        if(p->count && source>=p->source_name && source-p->source_name<p->count) {
+        if(p->count && !(p->kind&AF_HP_SPECIAL) && source>=p->source_name && source-p->source_name<p->count) {
             r=p;role=source-p->source_name;break;
         }
     }
@@ -122,7 +133,7 @@ int af_hp_name_profile(u16 name) {
 }
 static int ready(const AFHPRecord *r) {
     if(!r->source || !r->source->ctor || !r->source->dtor ||
-       !r->source->move || !r->source->draw || r->pad || !r->event ||
+       !r->source->move || !r->source->draw || (r->kind&~3u) || !r->event ||
        r->source->actor_bytes<sizeof(ACTOR) || r->source->actor_bytes>2400)return 0;
     return r->count?(r->part==3 && r->source->actor_bytes>=sizeof(NPC_ACTOR)):
         r->part==7 || (r->part==4 && r->source->actor_bytes==sizeof(ACTOR));
@@ -148,6 +159,7 @@ void *af_hp_descriptor(int profile) {
     if(index<0)return af_hp_previous_descriptor(profile);
     const AFHPRecord *r=af_hp_records+index;Owner *o=owners+index;
     if(!ready(r))return 0;
+    if(r->kind&AF_HP_SPECIAL)return af_hp_previous_descriptor(profile);
     if(!o->descriptor.profile) {
         o->profile=(ACTOR_PROFILE){r->profile,r->part,r->native_flags,r->name,3,
             r->source->actor_bytes,af_hp_ctor,af_hp_dtor,af_hp_step,af_hp_draw,af_hp_save};
@@ -159,8 +171,16 @@ int af_hp_admit(ACTOR *a,GAME *g) {
     int index=identity(a);
     if(!af_hp_available || !g || index<0 || !ready(af_hp_records+index))return 0;
     const AFHPRecord *r=af_hp_records+index;
-    if(!mEv_get_save_area(r->event,r->save))return 0;
-    if(r->count) {
+    if(r->kind&AF_HP_NO_SAVE) {
+#ifdef AF_HP_EXERCISE_REGISTRY
+        int a=af_holiday_native_type(r->event),b=af_holiday_native_type(r->save);
+        if(!((a>=0 && af_hp_native_event_status(a,16)) ||
+                (b>=0 && af_hp_native_event_status(b,16))))return 0;
+#else
+        return 0;
+#endif
+    } else if(!mEv_get_save_area(r->event,r->save))return 0;
+    if(r->count && !(r->kind&AF_HP_SPECIAL)) {
         AFHPResident *e=resident(a->npc_id);
         if(!e || retiring[e-residents] ||
                 !af_hp_native_resident_valid(af_hp_native_resident_index(e->resident),e->resident))return 0;
@@ -178,9 +198,12 @@ void af_hp_ctor(ACTOR *a,GAME *g) {
     *slot=(Live){.actor=a};
     /* Some complete source constructors dereference a failed reservation. Admit
      * only after the actual native save area exists, before any source call. */
-    void *area=mEv_get_save_area(r->event,r->save);
-    if(!area)area=mEv_reserve_save_area(r->event,r->save);
-    if(!area || !af_hp_admit(a,g)) {Actor_delete(a);return;}
+    if(!(r->kind&AF_HP_NO_SAVE)) {
+        void *area=mEv_get_save_area(r->event,r->save);
+        if(!area)area=mEv_reserve_save_area(r->event,r->save);
+        if(!area) {Actor_delete(a);return;}
+    }
+    if(!af_hp_admit(a,g)) {Actor_delete(a);return;}
     r->source->ctor(a,g);
     if(!r->count)slot->constructed=1;
     else if(!slot->constructed)Actor_delete(a);
@@ -194,7 +217,7 @@ void af_hp_dtor(ACTOR *a,GAME *g) {
         live[i]=(Live){0};break;
     }
     if(!r->count && owners[index].descriptor.count)--owners[index].descriptor.count;
-    AFHPResident *e=r->count?resident(a->npc_id):0;
+    AFHPResident *e=r->count && !(r->kind&AF_HP_SPECIAL)?resident(a->npc_id):0;
     if(e && retiring[e-residents]) {retiring[e-residents]=0;*e=(AFHPResident){0};}
     /* Failed admission never entered the NPC constructor. Native deletion
      * still releases the allocation and object references through its caller. */
@@ -213,7 +236,8 @@ void af_hp_save(ACTOR *a,GAME *g) {
 }
 void af_hp_free(ACTOR *a) {
     int i=identity(a);
-    if(i>=0 && af_hp_records[i].count && owners[i].descriptor.count)--owners[i].descriptor.count;
+    if(i>=0 && af_hp_records[i].count && !(af_hp_records[i].kind&AF_HP_SPECIAL) &&
+            owners[i].descriptor.count)--owners[i].descriptor.count;
     af_hp_previous_free(a);
 }
 int af_hp_countdown(int value) {

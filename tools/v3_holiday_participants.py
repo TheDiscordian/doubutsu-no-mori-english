@@ -922,6 +922,52 @@ def dialogue(base,prior,generated,*,roots=None,map_symbol='af_hp_message',exerci
                 ('choices.bin',cv,new_c,cb),('choice-table.bin',CHOICE_TABLE,new_ct,ct))])
 
 
+def exercise_registry(base,prior,generated):
+    """Extend the existing complete registry, retaining installed controllers.
+
+    Residents and special characters share lifetime/callback services. Only
+    allocation/artwork differ, as declared by the shared row kind.
+    """
+    from v3_registry import EXERCISE_PARTICIPANTS
+    old=prior['equipment_resources']['npc_extra']['events']['participants']
+    rows=old['registry']['rows']
+    if len(rows)!=9 or {r['stem'] for r in rows}!=set(PARTICIPANTS):
+        raise ValueError('Changed complete retained participant registry')
+    image=by_vrom(base)[0x8C6D80].extract(base)
+    raw=image[0x809E4708-0x809E35B0:0x809E4708-0x809E35B0+36]
+    profile,part,flags,name,bank,size=struct.unpack_from('>HHIHHI',raw)
+    if (profile,part,bank,size)!=(0x93,3<<8,3,0x950):raise ValueError('Changed complete native exercise profile')
+    code=['#include "holiday_exercise.h"','#include "actors.h"','#include "constants.h"']
+    links={r['donor_profile']:old['code']['symbols'][r['donor_profile']] for r in rows}
+    code.extend('extern const ACTOR_PROFILE '+n+';' for n in links)
+    code.append('const AFHPRecord af_hp_records[AF_HP_OWNER_COUNT]={')
+    for r in rows:
+        code.append('{'+','.join(str(r[k]) for k in ('source','name','profile','event','save','count','part'))+
+            ',0,&'+r['donor_profile']+','+str(r['flags'])+'},')
+    for r in EXERCISE_PARTICIPANTS:
+        code.append('{'+','.join(str(r[k]) for k in ('source','name','profile'))+
+            ',mEv_EVENT_MORNING_AEROBICS,mEv_EVENT_SPORTS_FAIR_AEROBICS,'+
+            f'{r["count"]},3,{r["kind"]},&Taisou_Npc0_Profile,{flags}'+'},')
+    code.append('};')
+    links['af_hp_available']=old['code']['symbols']['af_hp_available']
+    generated['registry.c']='\n'.join(code)+'\n'
+    mapping={r['source']+i:r['name']+i for r in EXERCISE_PARTICIPANTS for i in range(r['count'])}
+    constants=generated['constants.h'];overrides=[]
+    for match in re.finditer(r'^#define (SP_NPC_EV_TAISOU_\d+|SP_NPC_SONCHO_D078) \(SP_NPC_START \+ (\d+)\)',constants,re.M):
+        source=0xD000+int(match[2])
+        if source in mapping:overrides.append(f'#undef {match[1]}\n#define {match[1]} 0x{mapping[source]:04X}')
+    if len(overrides)!=3 or not constants.endswith('#endif\n'):
+        raise ValueError('Incomplete exercise name arithmetic/attendance identity remapping')
+    generated['constants.h']=constants[:-7]+'\n'.join(overrides)+'\n#endif\n'
+    profiles={r['name']+i:r['profile'] for r in (*rows,*EXERCISE_PARTICIPANTS) for i in range(r['count'])}
+    if sorted(profiles)!=list(range(0xD0A0,0xD0B4)):raise ValueError('Noncontiguous complete participant spawn directory')
+    generated['spawn-data.c']=('#include "holiday_participants.h"\nconst s16 af_hp_spawn_profiles[20]={'
+        +','.join(str(profiles[n]) for n in sorted(profiles))+'};\n')
+    return dict(records=list(EXERCISE_PARTICIPANTS),name_mapping=mapping,retained_profiles=links,
+        original_profile=profile,native_profile_sha256=sha256(raw),native_flags=flags,
+        owner_count=12,resident_count=18,live_count=24,enabled=False),links
+
+
 def prepare_exercise(output,lock):
     """Compile the whole dancer/card family through the shared source importer.
 
@@ -966,7 +1012,8 @@ def prepare_exercise(output,lock):
     # arithmetic retain the same enum values and contiguous source item IDs.
     extra=('m_soncho.h','lb_rtc.h','m_private.h','m_item_name.h','ac_handOverItem.h','m_field_info.h')
     adapter='\n'.join((ROOT/f'overlays/v3/holiday_exercise_{part}.c').read_text()
-        for part in ('native','dialogue','world'))
+        for part in ('native','dialogue','world','handover'))
+    adapter+='\n'+(ROOT/'overlays/v3/holiday_participants_services.c').read_text()
     generated['constants.h']=constants('\n'.join(generated.values())+'\n'+adapter,
         report['references'],CONSTANT_HEADERS+extra)
     prelude=('#include "holiday_exercise.h"\n#include "constants.h"\n#include "actors.h"\n#include <limits.h>\n'
@@ -1015,6 +1062,17 @@ def prepare_exercise(output,lock):
         else:wrapper+=f' int result={name}_source({call});return af_he_finish({end})?result:0;\n'
         wrapper+='}\n';body=body.replace(original,renamed+wrapper)
     generated['taisou_npc0.c']=body
+    # A rejected native request is retryable. The donor ignores its declared
+    # return value, but advancing orders on rejection would wait forever for a
+    # handover that never started. Keep each complete source callback intact.
+    for mode in (7,8):
+        call=f'mPlib_request_main_give_type1((GAME*)play, ITM_EXCERCISE_CARD00, {mode}, FALSE, FALSE)'
+        if generated['cards.c'].count(call+';')!=1:raise ValueError('Changed complete card handover request')
+        generated['cards.c']=generated['cards.c'].replace(call+';',f'if (!{call}) return;')
+    destructor=function(generated['taisou_npc0.c'],'aTS0_actor_dt')
+    marker='af_he_forget(actorx);'
+    replacement=destructor[:destructor.rfind('}')]+marker+'\n}'
+    generated['taisou_npc0.c']=generated['taisou_npc0.c'].replace(destructor,replacement)
     for before,after,count in (
         ('actor->delay_cnt--;','actor->delay_cnt = af_hp_countdown(actor->delay_cnt);',1),
         ('nactorx->draw.frame_speed = 0.5f;',
@@ -1026,14 +1084,16 @@ def prepare_exercise(output,lock):
     report['timing']=dict(counter_offset=0xA0,animation_speed_per_tick=.5,
         delay_uses_elapsed_ticks=True,npc_physics_once_per_update=True,native_execution_verified=False)
     generated['clips.c']='#include "holiday_exercise.h"\n#include "actors.h"\n'
-    generated['layout.c']=('#include "holiday_exercise.h"\n#include "actors.h"\n'
+    generated['layout.c']=('#include "holiday_exercise.h"\n#include "actors.h"\n#include "holiday_cards.h"\n'
         '_Static_assert(sizeof(TAISOU_NPC0_ACTOR)<=2400,"Complete exercise native pool bound");\n'
-        'const unsigned int af_he_actor_bytes=sizeof(TAISOU_NPC0_ACTOR);\n')
+        'const unsigned int af_he_actor_bytes=sizeof(TAISOU_NPC0_ACTOR);\n'
+        'u8 af_v3_card_state[AF_HC_BYTES];\n')
     sequence=re.search(r'static int animeSeqNo\[\]\s*=\s*\{([^{}]+)\}',generated['taisou_npc0.c'])
     if not sequence:raise ValueError('Missing complete exercise animation table')
     paired=re.findall(r'\baNPC_ANIM_\w+',sequence[1])
     if len(paired)!=13:raise ValueError('Changed complete exercise action count')
     report['motions']=native_motions(source,base,generated,paired=paired)
+    report['registry'],retained_profiles=exercise_registry(base,prior,generated)
     # Both exercise schedules, all six personalities, all four resident roles,
     # and Copper. The separate complete Tortimer/card bank is already installed;
     # preserve and reuse it instead of allocating another copy.
@@ -1056,7 +1116,9 @@ def prepare_exercise(output,lock):
         mMsg_Unset_LockContinue=0x8009E9F8,lbRTC_IsEqualDate=0x800D5164,
         af_he_native_item_string=0x8009D88C,af_he_native_town=0x800950D8,
         af_he_native_sum=0x800B83D4,af_he_native_find=0x800B80B4,
-        af_he_native_set=0x800B8B08,af_he_native_give=0x800B8B8C)
+        af_he_native_set=0x800B8B08,af_he_native_give=0x800B8B8C,
+        af_he_native_player=0x800B1C84,af_he_native_request_give=0x800B25F4,
+        memcpy=0x80034BF8)
     from aflib import CODE_RAM,CODE_VROM
     directory=(ROOT/'upstream/af/linker_scripts/jp/symbol_addrs_code.txt').read_text()
     starts=sorted({int(a,16) for a in re.findall(r'= 0x([0-9A-F]+);[^\n]*type:func',directory)})
@@ -1069,11 +1131,12 @@ def prepare_exercise(output,lock):
         service_rows.append(dict(name=name,start=address,end=end,sha256=sha256(body)))
     direct.update(af_hp_native_npc_clip=links['af_hp_native_npc_clip'],
         af_hp_player_index=links['af_hp_player_index'],af_he_native_rtc=0x80136FBC,
+        af_he_native_handover=0x80136F34,
         # Existing installed text/name reader entries, not their old bodies.
         af_he_native_free_string=0x8009D6D0,af_he_native_item_name=0x801969C8)
-    for symbol in ('af_hp_private','af_hp_owned','af_hp_npc_services','af_hp_countdown','af_hp_elapsed',
+    for symbol in ('af_hp_private',
             'af_holiday_native_type','af_holiday_native_notify','af_holiday_observers_clip',
-            'af_holiday_message','af_holiday_dialogue_data'):
+            'af_holiday_message','af_holiday_dialogue_data','af_v3_npc_extra_owned'):
         found=set()
         def collect(value):
             if isinstance(value,dict):
@@ -1084,6 +1147,37 @@ def prepare_exercise(output,lock):
         collect(prior['equipment_resources']['npc_extra'])
         if len(found)!=1:raise ValueError('Exercise requires one installed provider: '+symbol)
         direct[symbol]=found.pop()
+    previous=prior['equipment_resources']['npc_extra']['events']['participants']
+    for name,address in previous['code']['symbols'].items():
+        if (name.startswith('af_hp_previous_') or name.startswith('af_hp_world_previous_') or
+                name in ('af_hp_native_resident_index','af_hp_native_resident_valid','af_hp_uniform',
+                    'af_decor_actor_resolve','af_holiday_map_get')):
+            direct[name]=address
+    for name in ('af_hp_native_events','af_hp_native_ticks','af_hp_native_animals','af_holiday_transition_maps'):
+        direct[name]=previous['code']['symbols'][name]
+    direct.update({name:address for name,address in NATIVE_SERVICES.items() if name in (
+        'af_hp_native_get_save','af_hp_native_reserve_save','af_hp_native_event_status',
+        'af_hp_native_event_error','af_hp_native_pool_variant','af_hp_native_sex',
+        'af_hp_native_joint_initial','af_hp_native_joint_removed','af_hp_native_joint_refill',
+        'af_hp_native_structure')})
+    direct.update(retained_profiles)
+    equipment=prior['equipment_resources'];npc=equipment['npc_extra']
+    world=npc.get('variants',{}).get('modules',{}).get('world',npc['world'])['code']['symbols']
+    for name in ('af_diary_calendar_event','af_diary_calendar_event_check','af_holiday_reward_data',
+            'af_holiday_world_resolve','af_v3_holiday_count','af_diary_days',
+            'af_v3_holiday_select','af_v3_reward_flag'):
+        direct[name]=world[name]
+    direct['af_holiday_item_display']=equipment['holiday_items']['code']['symbols']['af_holiday_item_display']
+    direct['af_holiday_state_dates']=equipment['holiday_state']['code']['symbols']['af_holiday_state_dates']
+    direct['af_holiday_native_current']=npc['events']['native_directory']['code']['symbols']['af_holiday_native_current']
+    holiday=equipment['holiday_state'];fishing=equipment['holiday_fishing']
+    direct.update({n:holiday['code']['symbols'][n] for n in
+        ('af_diary_reset','af_diary_valid','af_diary_upgrade','af_diary_player_clear')})
+    direct.update({n:holiday['bindings'][n] for n in ('af_v3_require_save_state',
+        'af_v3_save_halt','af_v3_save_check_extended','af_v3_save_pack_extended','af_v3_creature_player_clear')})
+    direct.update({n:fishing['code']['symbols'][n] for n in
+        ('af_holiday_fish_wire_clear_person','af_holiday_fish_wire_reset','af_holiday_fish_wire_valid')})
+    direct['af_v3_fishing_state']=fishing['bindings']['af_v3_fishing_state']
     direct['mMsg_Set_free_str']=direct['af_he_native_free_string']
     # Exact native exercise loads/stores establish every new sparse NPC field.
     native=by_vrom(base)[0x8C6D80].extract(base);native_ram=0x809E35B0
@@ -1095,6 +1189,18 @@ def prepare_exercise(output,lock):
         (0x809E3658,0x8DD900C8),(0x809E402C,0x0C034873))
     if any(struct.unpack_from('>I',native,at-native_ram)[0]!=word for at,word in fields):
         raise ValueError('Changed exercise NPC native field reader')
+    handover=by_vrom(base)[0x858A50].extract(base)
+    handover_fields=((0x80964080,0x8C426F34),(0x80964088,0x8C4E0010),
+        (0x80964094,0xA045000C),(0x80963F80,0xAD190014),
+        (0x80963F9C,0xA58B000E),(0x80963FA8,0x24010007),
+        (0x80963FB0,0x24010008),(0x80963FC4,0xA1B0000D),
+        (0x8096411C,0xADE4001C))
+    if any(struct.unpack_from('>I',handover,at-0x80963DC0)[0]!=word for at,word in handover_fields):
+        raise ValueError('Changed native card handover layout or supported modes')
+    give_fields=((0x800B2614,0x8C470CF0),(0x800B2618,0x24010040),
+        (0x800B2628,0x8C450D10),(0x800B2670,0x8C5911D4))
+    if any(struct.unpack_from('>I',core,at-CODE_RAM)[0]!=word for at,word in give_fields):
+        raise ValueError('Changed native give request player context')
     out.mkdir(parents=True)
     for name,body in generated.items():write_new(out/name,body if isinstance(body,bytes) else body.encode())
     docker=['docker','run','--rm','--network','none','--user',f'{os.getuid()}:{os.getgid()}',
@@ -1105,11 +1211,15 @@ def prepare_exercise(output,lock):
     flags=['-c','-Os','-EB','-mabi=32','-march=vr4300','-mfix4300','-G0','-mno-abicalls',
         '-fno-pic','-ffreestanding','-fno-builtin','-fno-common','-fno-stack-protector',
         '-ffunction-sections','-fdata-sections','-fstack-usage','-Wall','-Wextra','-Werror',
-        '-I/source/overlays/v3','-I/out']
+        '-I/source/overlays/v3','-I/out','-DAF_HP_EXERCISE_REGISTRY=1']
     modules=[name for name in generated if name.endswith('.c')]
     modules.append('/source/overlays/v3/holiday_exercise_native.c')
     modules.append('/source/overlays/v3/holiday_exercise_dialogue.c')
     modules.append('/source/overlays/v3/holiday_exercise_world.c')
+    modules.append('/source/overlays/v3/holiday_exercise_handover.c')
+    modules.extend('/source/overlays/v3/holiday_participants_'+part+'.c'
+        for part in ('registry','services','storage','world'))
+    modules.append('/source/overlays/v3/holiday_participants_spawn.S')
     run('gcc',*flags,*modules)
     objects=[Path(name).stem+'.o' for name in modules]
     run('ld','-EB','-r',*(f'--defsym={n}=0x{v:X}' for n,v in direct.items()),*objects,'-o','exercise.o')
@@ -1118,9 +1228,16 @@ def prepare_exercise(output,lock):
     storage=['holiday_cards','save_compressed','console_storage']
     run('gcc',*flags,*storage_defines,*(f'/source/overlays/v3/{name}.c' for name in storage))
     run('ld','-EB','-r',*(name+'.o' for name in storage),'-o','card-storage.o')
+    # One connected object supplies the actual card-state getter, codec, and
+    # runtime. Final installation must redirect every existing save caller and
+    # extend scratch before this format can be used.
+    run('ld','-EB','-r',*(f'--defsym={n}=0x{v:X}' for n,v in direct.items()),
+        *objects,'card-storage.o','-o','exercise.o')
     report.update(category='complete-exercise-card',card_functions=functions,
         base_sha256=sha256(base),base_abi=prior['runtime_abi'],native_field_readers=fields,
         native_field_owner_sha256=sha256(native),
+        handover=dict(native_sha256=sha256(handover),native_field_readers=handover_fields,
+            give_field_readers=give_fields,retry_rejected_request=True,native_execution_verified=False),
         bindings=direct,native_services=service_rows,
         storage=dict(save_format=14,serialized_bytes=48,installed=False,
             sha256=sha256((out/'card-storage.o').read_bytes()),size=run('size','card-storage.o'),
@@ -1132,6 +1249,10 @@ def prepare_exercise(output,lock):
             'overlays/v3/holiday_participants.h','overlays/v3/holiday_exercise.h',
             'overlays/v3/holiday_exercise_native.c','overlays/v3/holiday_exercise_dialogue.c',
             'overlays/v3/holiday_exercise_world.c',
+            'overlays/v3/holiday_exercise_handover.c',
+            'overlays/v3/holiday_participants_registry.c','overlays/v3/holiday_participants_services.c',
+            'overlays/v3/holiday_participants_storage.c','overlays/v3/holiday_participants_world.c',
+            'overlays/v3/holiday_participants_spawn.S','tools/v3_registry.py',
             'overlays/v3/holiday_cards.c','overlays/v3/holiday_cards.h',
             'overlays/v3/console_storage.c','overlays/v3/console_storage.h',
             'overlays/v3/save_compressed.c','overlays/v3/save_compressed.h','tools/gc_adapter.py')})
@@ -1170,7 +1291,8 @@ def prepare(output,lock,reuse=None):
         '-ffunction-sections','-fdata-sections','-fstack-usage','-Wall','-Wextra','-Werror',
         '-I/source/overlays/v3']
     files=[name for name in generated if name.endswith(('.c','.S'))]
-    files+=['/source/overlays/v3/holiday_participants_'+part+'.c' for part in ('native','registry','draw','world')]
+    files+=['/source/overlays/v3/holiday_participants_'+part+'.c'
+        for part in ('native','registry','services','storage','draw','world')]
     files+=['/source/overlays/v3/holiday_participants_spawn.S']
     files+=['/source/overlays/v3/holiday_coin.c']
     objects=[Path(name).stem+'.o' for name in files]
@@ -1183,6 +1305,7 @@ def prepare(output,lock,reuse=None):
     report['sources']={p:sha256((ROOT/p).read_bytes()) for p in (
         'tools/v3_holiday_participants.py','overlays/v3/holiday_participants.h',
         'overlays/v3/holiday_participants_native.c','overlays/v3/holiday_participants_registry.c',
+        'overlays/v3/holiday_participants_services.c','overlays/v3/holiday_participants_storage.c',
         'overlays/v3/holiday_participants_draw.c','tools/v3_registry.py',
         'overlays/v3/holiday_participants_world.c',
         'overlays/v3/holiday_participants_spawn.S',

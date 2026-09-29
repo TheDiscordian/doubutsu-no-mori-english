@@ -1,7 +1,7 @@
 OUTPUT_ARCH(mips)
 ENTRY(af_hp_descriptor)
 SECTIONS {
- . = 0x8073C010;
+ . = DEFINED(AF_HP_LINK_RAM) ? AF_HP_LINK_RAM : 0x8073C010;
  af_hp_packet_start = .;
  .text : { *(.text .text.*) . = ALIGN(16); }
  af_hp_code_end = .;

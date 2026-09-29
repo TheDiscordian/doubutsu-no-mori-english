@@ -14,7 +14,7 @@ VILLAGERS = {
 # Special actors are not ordinary residents or individually selectable villagers.
 # Native profiles C9/CA/CB are the no-demo sentinel, summer tent, and balloon.
 # The existing camper mask uses D08F. These reservations do not enable spawning.
-SPECIAL_NPC_REGISTRY_VERSION = 3
+SPECIAL_NPC_REGISTRY_VERSION = 4
 SPECIAL_NPCS = {
     'GAFE01-r0/npc/ev-soncho2': dict(donor_name=0xD074, donor_profile=0xCC,
         name=0xD090, profile=0xCC, model_bank=448, texture_bank=449),
@@ -24,6 +24,10 @@ SPECIAL_NPCS = {
     # The Halloween owner uses the pumpkin model/voice, not ordinary Tortimer.
     'GAFE01-r0/npc/ev-soncho2-costume': dict(donor_name=0xD079, donor_profile=0xCC,
         name=0xD092, profile=0xE2, model_bank=452, texture_bank=453, draw_index=359),
+    'GAFE01-r0/npc/exercise-copper': dict(donor_name=0xD04E, donor_profile=0x93,
+        name=0xD0AE, profile=0xE3, model_bank=454, texture_bank=455, draw_index=316),
+    'GAFE01-r0/npc/exercise-tortimer': dict(donor_name=0xD078, donor_profile=0x93,
+        name=0xD0B3, profile=0xE5, model_bank=448, texture_bank=449, draw_index=358),
 }
 
 # Shared event actors are resident villagers in temporary roles, not additional
@@ -42,6 +46,15 @@ PARTICIPANTS = {
     'rope': dict(profile=0xE1, event=14, save=9, name=0, source=0, count=0),
 }
 PARTICIPANT_ROPE_PROFILE = 0xE1
+
+# One complete controller serves all six exercise roles. The first five remain
+# contiguous for source role arithmetic; Tortimer remains outside that range.
+# These reservations alone do not enable the owners or claim ready artwork.
+EXERCISE_PARTICIPANTS = (
+    dict(profile=0xE3,name=0xD0AE,source=0xD04E,count=1,kind=3),
+    dict(profile=0xE4,name=0xD0AF,source=0xD04F,count=4,kind=2),
+    dict(profile=0xE5,name=0xD0B3,source=0xD078,count=1,kind=3),
+)
 
 # Additive event structures retain the native structure allocation category.
 # Their source variants are separate identities, never positions in a selection.
