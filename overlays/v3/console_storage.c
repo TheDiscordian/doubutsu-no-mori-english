@@ -17,9 +17,16 @@ extern u8 af_v3_card_state[AF_HC_BYTES];
 #define cards_profile(p) af_holiday_cards_profile(p,af_holiday_cards_enabled())
 #define cards_bind(p) af_holiday_cards_bind(p,af_holiday_cards_enabled())
 #endif
+#ifdef AF_V3_DESIGN_STORAGE
+extern AFDesigns af_v3_design_state;
+#define extended_expand af_v3_save_expand_designs
+#define extended_compress af_v3_save_compress_designs
+#define extended_measure af_v3_save_measure_designs
+#else
 #define extended_expand af_v3_save_expand_cards
 #define extended_compress af_v3_save_compress_cards
 #define extended_measure af_v3_save_measure_cards
+#endif
 #else
 #define extended_expand af_v3_save_expand_fishing
 #define extended_compress af_v3_save_compress_fishing
@@ -97,10 +104,16 @@ static int external(const void *p,u32 n) {
 #ifdef AF_V3_CARD_STORAGE
         && separate(p,n,af_v3_card_state,AF_HC_BYTES)
 #endif
+#ifdef AF_V3_DESIGN_STORAGE
+        && separate(p,n,&af_v3_design_state,sizeof(af_v3_design_state))
+#endif
         ;
 }
 static int guards(void) {
     if(storage->magic!=MAGIC)return 0;
+#ifdef AF_V3_DESIGN_STORAGE
+    if((address)scratch&31 || !af_design_valid(&af_v3_design_state))return 0;
+#endif
     for(u32 i=0;i<4;i++)if(storage->guard[i]!=GUARD ||
         scratch_guard[i]!=GUARD || hash_guard[i]!=GUARD
 #ifdef AF_V3_DIARY_STORAGE
@@ -127,6 +140,9 @@ static int guards(void) {
 void af_v3_console_storage_reset(void) {
     zero((u8 *)storage,sizeof(*storage));storage->magic=MAGIC;
     for(u32 i=0;i<4;i++)storage->guard[i]=scratch_guard[i]=hash_guard[i]=GUARD;
+#ifdef AF_V3_DESIGN_STORAGE
+    if(af_design_reset(&af_v3_design_state,af_design_templates)!=AF_DESIGN_OK)af_v3_save_halt(AF_SAVE_ARGUMENT);
+#endif
 #ifdef AF_V3_DIARY_STORAGE
     af_diary_reset(diary);
     for(u32 i=0;i<4;i++)diary_guard[i]=GUARD;
@@ -179,6 +195,9 @@ static int expand(const u8 *bank,const u8 **logical) {
         || version==0x00120680
 #ifdef AF_V3_CARRIED_NPC
         || version==0x00130680
+#ifdef AF_V3_DESIGN_STORAGE
+        || version==0x00140680
+#endif
 #endif
 #endif
 #endif
@@ -243,6 +262,13 @@ int af_v3_save_pack(u8 *bank,u32 size,const u8 *state) {
     if(!cards_bind(cards))return leave(AF_SAVE_PROFILE_MISSING);
 #endif
 #endif
+#ifdef AF_V3_DESIGN_STORAGE
+    zero(scratch+AF_CZ_CARD_RAW,AF_CZ_DESIGN_OFFSET-AF_CZ_CARD_EXTRA);
+    AFDesigns *designs=(AFDesigns *)(scratch+AF_CZ_RAW+AF_CZ_DESIGN_OFFSET);
+    if(storage->ready && storage->town!=id) {
+        if(af_design_reset(designs,af_design_templates)!=AF_DESIGN_OK)return leave(AF_SAVE_ARGUMENT);
+    } else copy((u8 *)designs,(const u8 *)&af_v3_design_state,AF_DESIGN_BYTES);
+#endif
     result=extended_compress(bank,AF_SAVE_BANK,scratch,AF_CZ_BANK,
         scratch+AF_CZ_BANK,AF_CZ_CONSOLE,(const u8 *)candidate,hash,AF_CZ_WORK_BYTES);
 #else
@@ -264,6 +290,9 @@ int af_v3_save_pack(u8 *bank,u32 size,const u8 *state) {
 #endif
 #ifdef AF_V3_CARD_STORAGE
     copy(af_v3_card_state,scratch+AF_CZ_RAW+AF_CZ_FISHING_EXTRA,AF_HC_BYTES);
+#endif
+#ifdef AF_V3_DESIGN_STORAGE
+    copy((u8 *)&af_v3_design_state,scratch+AF_CZ_RAW+AF_CZ_DESIGN_OFFSET,AF_DESIGN_BYTES);
 #endif
     storage->town=id;storage->ready=1;
     return leave(AF_SAVE_OK);
@@ -298,6 +327,10 @@ int af_v3_console_storage_commit(const u8 *bank,const u8 *profile,u8 *state,cons
     (void)cards_bind(af_v3_card_state);
 #endif
 #endif
+#ifdef AF_V3_DESIGN_STORAGE
+    if(decoded==scratch)copy((u8 *)&af_v3_design_state,scratch+AF_CZ_RAW+AF_CZ_DESIGN_OFFSET,AF_DESIGN_BYTES);
+    else if(af_design_reset(&af_v3_design_state,af_design_templates)!=AF_DESIGN_OK)af_v3_save_halt(AF_SAVE_ARGUMENT);
+#endif
     storage->town=town(decoded);storage->ready=1;*logical=decoded;
     return leave(result);
 }
@@ -307,6 +340,9 @@ u8 *af_v3_console_player_data(void) {
 }
 #ifdef AF_V3_DIARY_STORAGE
 AFDiary *af_v3_diary_data(void) {af_v3_require_save_state();return diary;}
+#ifdef AF_V3_DESIGN_STORAGE
+AFDesigns *af_v3_design_data(void) {af_v3_require_save_state();return &af_v3_design_state;}
+#endif
 #ifdef AF_V3_FISHING_STORAGE
 u8 *af_v3_fishing_data(void) {af_v3_require_save_state();return af_v3_fishing_state;}
 #endif
@@ -329,12 +365,39 @@ int af_v3_diary_measure(const u8 *bank,const u8 *state,const AFDiary *candidate)
 #ifdef AF_V3_CARD_STORAGE
     copy(scratch+AF_CZ_RAW+AF_CZ_FISHING_EXTRA,af_v3_card_state,AF_HC_BYTES);
 #endif
+#ifdef AF_V3_DESIGN_STORAGE
+    zero(scratch+AF_CZ_CARD_RAW,AF_CZ_DESIGN_OFFSET-AF_CZ_CARD_EXTRA);
+    copy(scratch+AF_CZ_RAW+AF_CZ_DESIGN_OFFSET,(const u8 *)&af_v3_design_state,AF_DESIGN_BYTES);
+#endif
     result=extended_measure(scratch,AF_CZ_BANK,storage->players,AF_CZ_CONSOLE,
         scratch+AF_CZ_RAW,hash,AF_CZ_WORK_BYTES);
 #else
     result=af_v3_save_measure_diary(scratch,AF_CZ_BANK,storage->players,AF_CZ_CONSOLE,
         candidate,hash,AF_CZ_WORK_BYTES);
 #endif
+    if(result==AF_CZ_SPACE)result=AF_SAVE_CAPACITY;
+    else if(result<0)result=AF_SAVE_ARGUMENT;
+    return leave(result);
+}
+#endif
+#ifdef AF_V3_DESIGN_STORAGE
+int af_v3_design_measure(const u8 *bank,const u8 *state,const AFDesigns *candidate) {
+    if(!external(bank,AF_SAVE_BANK) || !external(state,AF_SAVE_STATE) ||
+       !external(candidate,AF_DESIGN_BYTES) || !af_design_valid(candidate) ||
+       !separate(candidate,AF_DESIGN_BYTES,bank,AF_SAVE_BANK) ||
+       !separate(candidate,AF_DESIGN_BYTES,state,AF_SAVE_STATE) ||
+       !separate(bank,AF_SAVE_BANK,state,AF_SAVE_STATE) || !enter())return AF_SAVE_ARGUMENT;
+    copy(scratch,bank,AF_SAVE_BANK);
+    int result=canonical_pack(scratch,AF_SAVE_BANK,state);
+    if(result!=AF_SAVE_OK)return leave(result);
+    if(storage->ready && storage->town!=town(scratch))return leave(AF_SAVE_BINDING);
+    copy(scratch+AF_CZ_RAW,(const u8 *)diary,AF_DIARY_BYTES);
+    copy(scratch+AF_CZ_RAW+AF_DIARY_BYTES,af_v3_fishing_state,AF_HF_BYTES);
+    copy(scratch+AF_CZ_RAW+AF_CZ_FISHING_EXTRA,af_v3_card_state,AF_HC_BYTES);
+    zero(scratch+AF_CZ_CARD_RAW,AF_CZ_DESIGN_OFFSET-AF_CZ_CARD_EXTRA);
+    copy(scratch+AF_CZ_RAW+AF_CZ_DESIGN_OFFSET,(const u8 *)candidate,AF_DESIGN_BYTES);
+    result=extended_measure(scratch,AF_CZ_BANK,storage->players,AF_CZ_CONSOLE,
+        scratch+AF_CZ_RAW,hash,AF_CZ_WORK_BYTES);
     if(result==AF_CZ_SPACE)result=AF_SAVE_CAPACITY;
     else if(result<0)result=AF_SAVE_ARGUMENT;
     return leave(result);
@@ -357,6 +420,9 @@ void af_v3_console_player_clear(u8 *player) {
 #endif
 #ifdef AF_V3_CARD_STORAGE
         if(!af_holiday_cards_clear(af_v3_card_state,slot))af_v3_save_halt(AF_SAVE_ARGUMENT);
+#endif
+#ifdef AF_V3_DESIGN_STORAGE
+        if(af_design_reset_player(&af_v3_design_state,slot,af_design_templates)!=AF_DESIGN_OK)af_v3_save_halt(AF_SAVE_ARGUMENT);
 #endif
     }
     original_clear(player);

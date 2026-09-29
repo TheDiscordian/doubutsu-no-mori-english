@@ -70,6 +70,24 @@ int af_v3_save_compress_cards(unsigned char *,unsigned int,const unsigned char *
 int af_v3_save_measure_cards(const unsigned char *,unsigned int,const unsigned char *,unsigned int,
     const unsigned char *,unsigned int *,unsigned int);
 int af_v3_save_expand_cards(const unsigned char *,unsigned int,unsigned char *,unsigned int);
+#ifdef AF_V3_DESIGN_STORAGE
+#ifndef AF_V3_CARRIED_NPC
+#error Custom design storage requires the complete carried NPC save format
+#endif
+#include "carried_designs.h"
+/* Format twenty appends all 32 patterns and their independent menu order.
+ * Pad to a cache-line boundary; do not overlay native private/save padding.
+ * Earlier envelopes migrate with the actual donor templates. */
+enum { AF_CZ_DESIGN_OFFSET=(AF_CZ_CARD_EXTRA+31)&~31,
+       AF_CZ_DESIGN_EXTRA=AF_CZ_DESIGN_OFFSET+AF_DESIGN_BYTES,
+       AF_CZ_DESIGN_RAW=AF_CZ_RAW+AF_CZ_DESIGN_EXTRA };
+extern const AFDesign af_design_templates[8];
+int af_v3_save_compress_designs(unsigned char *,unsigned int,const unsigned char *,unsigned int,
+    const unsigned char *,unsigned int,const unsigned char *,unsigned int *,unsigned int);
+int af_v3_save_measure_designs(const unsigned char *,unsigned int,const unsigned char *,unsigned int,
+    const unsigned char *,unsigned int *,unsigned int);
+int af_v3_save_expand_designs(const unsigned char *,unsigned int,unsigned char *,unsigned int);
+#endif
 #endif
 #endif
 #endif

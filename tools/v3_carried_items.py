@@ -252,3 +252,133 @@ def prepare(source, worksheet, output, installed=(), reuse_assets=()):
     report['sources']={path:sha256((ROOT/path).read_bytes()) for path in SOURCES}
     write_new(output/'items.json',(json.dumps(report,indent=2)+'\n').encode())
     return report
+
+
+def design_field_art(source):
+    """Complete placed-object models with live, not baked-in, design bindings."""
+    from v3_furniture_pipeline import prepare_models
+    frames=[]
+    for kind,segment,names in (
+        ('palette',0x08000000,['hakushi_pal']+[f'needlework{i}_pal' for i in range(16)]),
+        ('texture',0x09000000,['hakushi_tex'])):
+        rows=[]
+        for name in names:
+            at,n=source.symbol(name)
+            if n!=(32 if kind=='palette' else 512) or source.pointers(at,n):
+                raise ValueError('Changed complete custom-design material')
+            rows.append(dict(symbol=name,donor_offset=at,bytes=n))
+        frames.append(dict(kind=kind,segment_address=segment,frames=rows,
+            selector='live player design or blank sign'))
+    descriptor=dict(kind='custom-design-field-models',models={
+        label:(name,*source.symbol(name)) for label,name in (
+            ('pattern','write_model'),('ordinary','obj_sign_s_model'),
+            ('winter','obj_sign_w_model'),('shadow','obj_kanban_shadowT_model'))},
+        callback_adapter=dict(category='actor-model-assets',material_frames=frames),
+        vertex_bindings={0x0A000000:source.symbol('obj_kanban_shadow_v')[0]})
+    return prepare_models(source,descriptor)
+
+
+def design_defaults(source, disc_path):
+    """Read the actual four templates and complete palette/name providers.
+
+    Only the first four 512-byte blocks of my_original.bin are design images.
+    The donor initializer never reads its unrelated trailing archive bytes.
+    Empty slots use mNW_InitOriginalData, not the overwritten plain-cloth names.
+    """
+    from gamecube import Disc,rarc_files
+    from v3_import_catalog import DONOR_FILES,DECODER_SHA
+    from v3_villager_text import read_text_donor
+    from textbanks import Bank
+    from gc_text import decoder_tables,decode_gc
+    from textcodec import ENCODE,LATIN
+    first=read_text_donor(disc_path)
+    with Disc(disc_path) as disc:
+        entries=[e for e in disc.files() if e['path']=='forest_2nd.arc']
+        size,digest=DONOR_FILES['forest_2nd.arc']
+        if disc.header[:8]!=b'GAFE01\0\0' or len(entries)!=1 or entries[0]['size']!=size:
+            raise ValueError('Custom designs require the complete GAFE01-r0 archive')
+        raw=disc.read(entries[0]['offset'],size)
+        if sha256(raw)!=digest:raise ValueError('Changed custom-design donor archive')
+    members=dict(rarc_files(first));second=dict(rarc_files(raw))
+    original=second['data/my_original.bin']
+    if len(original)!=11712 or sha256(original)!='2109ff2ac7682fce001e79b52b56f9c9db2326633760a42790b8cbcba2d7e1e6':
+        raise ValueError('Changed complete custom-design template resource')
+    decoder=ROOT/'local/ac-decomp/tools/msg_tool.py'
+    if sha256(decoder.read_bytes())!=DECODER_SHA:raise ValueError('Changed official design-name decoder')
+    strings=Bank('string',0,0,members['data/string_data.bin'],members['data/string_data_table.bin']).entries()
+    tables=decoder_tables(decoder);initial_palettes=source.raw('pal_table$400')
+    blank=source.raw('name$543')
+    if initial_palettes!=bytes((0,8,7,7,0,0,0,0)) or blank!=b'blank           ':
+        raise ValueError('Changed source design initialization')
+    at,n=source.symbol('mNW_needlework_pallet_table');refs=source.pointers(at,n)
+    if (n!=64 or source.data[at:at+n]!=bytes(n) or
+            refs!={at+4*i:source.symbol(f'needlework{i}_pal')[0] for i in range(16)}):
+        raise ValueError('Incomplete design palette directory')
+    templates=bytearray();credits=[]
+    for i in range(8):
+        name=strings[0x6DF+i] if i<4 else blank
+        text=decode_gc(name,tables).rstrip(' ')
+        encoded=bytes(ENCODE[c] for c in text)
+        if not 0<len(encoded)<=16 or any(c not in LATIN for c in encoded):
+            raise ValueError('Unrepresentable complete design name')
+        encoded=encoded.ljust(16,b' ')
+        texture=pack4(untile(original[i*512:(i+1)*512],32,32,4)) if i<4 else bytes([255])*512
+        templates.extend(encoded+bytes((initial_palettes[i],))+bytes(15)+texture)
+        if i<5:
+            key=f'v3/carried/design/name/{i}'
+            credits.append(dict(id=key,native_sha256=None,locales=dict(en=dict(
+                credit='official',locator=['tools/v3_carried_items.py:design_defaults',key],
+                source=dict(source='user-supplied GAFE01 revision 0 disc',
+                    reference_id=f'string:{0x6DF+i:04X}' if i<4 else 'REL:name$543',
+                    reference_sha256=sha256(name)),
+                adaptations=['Native encoding and field padding; unchanged official wording'],
+                human_review='not_recorded',encoded_sha256=sha256(encoded)))))
+    return bytes(templates),dict(players=4,designs_per_player=8,record_bytes=544,
+        texture_bytes=512,palette_count=16,width=32,height=32,
+        archive_sha256=sha256(raw),template_member='data/my_original.bin',
+        template_member_bytes=len(original),template_member_sha256=sha256(original),
+        consumed_template_bytes=2048,palette_indices=list(initial_palettes),
+        palette_directory=dict(offset=at,bytes=n,pointers=refs),
+        provenance_entries=credits)
+
+
+def prepare_design_fields(source, disc_path, output):
+    """Shared carried category dependency; no admission or native hook claims."""
+    from v3_furniture_pipeline import compile_models
+    from text_provenance import validate
+    from v3_asset_loader import compile_part
+    output=output.resolve()
+    if not output.is_relative_to(ROOT/'build'):raise ValueError('Design assets must remain in ignored build output')
+    prepared=design_field_art(source);templates,defaults=design_defaults(source,disc_path)
+    catalogue=json.loads((ROOT/'translations/provenance.json').read_bytes());validate(catalogue)
+    indexed={r['id']:r for r in catalogue['entries']}
+    if any(indexed.get(r['id'])!=r for r in defaults['provenance_entries']):
+        raise ValueError('Custom-design names require their exact single-catalogue credits')
+    output.mkdir(parents=True,exist_ok=False)
+    data,offsets,models,_=compile_models(output,prepared)
+    code,compiled=compile_part('carried_designs',output/'services',
+        link_symbols={'AF_CARRIED_DESIGN_RAM':0x807C9000})
+    write_new(output/'field.bin',data);write_new(output/'templates.bin',templates)
+    functions={}
+    for at,labels in source.functions.items():
+        names=[name for name,_ in labels if name.startswith('aSIGN_') or
+               name.startswith('mNW_') and 0x59644<=at<0x59CD4]
+        if names:
+            _,receipt=source.function(at);functions[names[0]]=receipt
+    if len([name for name in functions if name.startswith('aSIGN_')])!=31:
+        raise ValueError('Incomplete placed-design actor consumer map')
+    report=dict(format='AFV3-CARRIED-DESIGN-FIELDS-1',source_rel_sha256=sha256(source.rel),
+        source_symbols_sha256=sha256(source.symbols.encode()),
+        art=dict(file='field.bin',bytes=len(data),sha256=sha256(data),offsets=offsets,
+            resources=prepared[2],models=models,descriptor=prepared[0]),
+        defaults=dict(defaults,file='templates.bin',bytes=len(templates),sha256=sha256(templates)),
+        services=dict(compiled,file='services/code.bin',ram=0x807C9000,
+            saved_bytes=17440,installed=False),
+        functions=functions,runtime_installed=False,selectable=False,
+        pending=['native placement, collision, pickup, renderer, and interaction callbacks',
+            'design selector and pixel-editor menu integration',
+            'complete town/save/travel transaction integration','independent sign-board selection'])
+    report['sources']={p:sha256((ROOT/p).read_bytes()) for p in (*SOURCES,
+        'overlays/v3/carried_designs.c','overlays/v3/carried_designs.h','overlays/v3/carried_designs.ld')}
+    write_new(output/'designs.json',(json.dumps(report,indent=2)+'\n').encode())
+    return report

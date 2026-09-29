@@ -32064,6 +32064,121 @@
           "encoded_sha256": "4393f52a40d0c86f94e5df01c5d1143f346119d03c641381a351fec6b4a9c492"
         }
       }
+    },
+    {
+      "id": "v3/carried/design/name/0",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_carried_items.py:design_defaults",
+            "v3/carried/design/name/0"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "string:06DF",
+            "reference_sha256": "6954557bcdecfafe2079ba2a7859218c5f3d0d049ad01862bf0eb84c7d18c799"
+          },
+          "adaptations": [
+            "Native encoding and field padding; unchanged official wording"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "057d3ceb4d731329e5d2a7f3c598c9360455c9aed58d1f5c710316056d553503"
+        }
+      }
+    },
+    {
+      "id": "v3/carried/design/name/1",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_carried_items.py:design_defaults",
+            "v3/carried/design/name/1"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "string:06E0",
+            "reference_sha256": "7ca5ddcd9b83996bcc5eeae0eda26062812846dd67ccb8813a341ac635b9e3c9"
+          },
+          "adaptations": [
+            "Native encoding and field padding; unchanged official wording"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "825afb149ae870b9381f8e4efea15973a013ff4d940b1e25c64c085d5c0efc58"
+        }
+      }
+    },
+    {
+      "id": "v3/carried/design/name/2",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_carried_items.py:design_defaults",
+            "v3/carried/design/name/2"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "string:06E1",
+            "reference_sha256": "e7d46cecc04e1c4bdcffabfb92a8129b5e17b130fb8cccdf8d326be2c3a865d8"
+          },
+          "adaptations": [
+            "Native encoding and field padding; unchanged official wording"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "e7d46cecc04e1c4bdcffabfb92a8129b5e17b130fb8cccdf8d326be2c3a865d8"
+        }
+      }
+    },
+    {
+      "id": "v3/carried/design/name/3",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_carried_items.py:design_defaults",
+            "v3/carried/design/name/3"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "string:06E2",
+            "reference_sha256": "d7187dd011bec73f4bf517c501e7314e09f2dd4ef71264d73b0b6d47fb5bb26e"
+          },
+          "adaptations": [
+            "Native encoding and field padding; unchanged official wording"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "d7187dd011bec73f4bf517c501e7314e09f2dd4ef71264d73b0b6d47fb5bb26e"
+        }
+      }
+    },
+    {
+      "id": "v3/carried/design/name/4",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_carried_items.py:design_defaults",
+            "v3/carried/design/name/4"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "REL:name$543",
+            "reference_sha256": "4636b88c311d7dde336bc8ad9cf89faf384b087562ed6127f6d3cd95058247af"
+          },
+          "adaptations": [
+            "Native encoding and field padding; unchanged official wording"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "4636b88c311d7dde336bc8ad9cf89faf384b087562ed6127f6d3cd95058247af"
+        }
+      }
     }
   ]
 }

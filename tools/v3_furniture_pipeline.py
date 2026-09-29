@@ -19,12 +19,12 @@ from item_identity_sheet import SHEET_SHA, sheet_rows
 from map_artwork import compile_commands, compile_commands_batch
 from title_assets import model_texture_shape, pack4, rgb5a3, untile
 from v3_asset_loader import ROOT
-from v3_furniture_art import SEGMENT, command_source, parse_model, verify_sources
+from v3_furniture_art import SEGMENT, command_source, parse_model, verify_sources, native_texture_block
 from v3_registry import FURNITURE, LEGACY_FURNITURE, furniture_identity, furniture_source_index
 from v3_room_aliases import discover as room_aliases, pending_reason as room_alias_reason
 from v3_villager_art import native_palette, normalise_vertex_flags
 
-VERSION = 38
+VERSION = 39
 PENDING_MOVE_CATEGORY = 'static-models-pending-move'
 PENDING_SEQUENCE_CATEGORY = 'constant-model-sequence-pending-lifecycle'
 SELECTED_PALETTE_CATEGORY = 'selected-palette-fade-assets'
@@ -781,6 +781,7 @@ def prepare_models(source, descriptor):
     This function supplies artwork, never gameplay or installation eligibility.
     """
     palettes, textures, vertex_arrays, raw_models, model_vertices = {}, {}, {}, {}, {}
+    texture_layouts={}
     context = descriptor.get('render_context', {})
     if set(context) - {'palette_slot', 'external_vertices'}:
         raise ReviewRequired('Unknown inherited render context')
@@ -863,7 +864,12 @@ def prepare_models(source, descriptor):
                     if size != 32: raise ReviewRequired('palette is not sixteen colours')
                     palettes[start] = (symbol, size)
                 elif op == 0xFD:
-                    w, h, fmt, bits = model_texture_shape(raw[position:position+8])
+                    linear=not a&(1<<18)
+                    w,h,fmt,bits=(native_texture_block(raw,position)[0] if linear else
+                                  model_texture_shape(raw[position:position+8]))
+                    if start in texture_layouts and texture_layouts[start]!=linear:
+                        raise ReviewRequired('Texture has conflicting native/Dolphin layouts')
+                    texture_layouts[start]=linear
                     if ((fmt,bits) not in ((2,0),(4,0),(4,1),(0,2),(3,1),(3,2))
                             or w*h*(4<<bits)//8 != size or size>2048):
                         raise ReviewRequired('texture is not complete TMEM-sized CI4/I4/I8/IA8/IA16/RGBA16')
@@ -876,6 +882,9 @@ def prepare_models(source, descriptor):
                                 frame_at in textures and textures[frame_at][2:]!=(w,h,fmt,bits)):
                             raise ReviewRequired('material frames have inconsistent texture layouts')
                         textures[frame_at]=(frame_name,frame_size,w,h,fmt,bits)
+                        if linear:raise ReviewRequired('Native texture block cannot use Dolphin frame bindings')
+                        if texture_layouts.get(frame_at,False):raise ReviewRequired('Mixed texture frame layouts')
+                        texture_layouts[frame_at]=False
                 else:
                     if inherited_vertices:
                         raise ReviewRequired('Model overwrites its inherited vertex contract')
@@ -909,11 +918,12 @@ def prepare_models(source, descriptor):
             source_sha256=sha256(raw), output_sha256=sha256(converted), **details))
     for at, (name, n) in sorted(palettes.items()): add(at, name, n, native_palette, kind='palette')
     for at, (name, n, w, h, fmt, bits) in sorted(textures.items()):
-        add(at, name, n, lambda data, w=w, h=h, bits=bits, fmt=fmt:
-            native_rgba16(data,w,h) if (fmt,bits)==(0,2) else native_ia16(data,w,h) if bits==2
+        add(at, name, n, lambda data, w=w, h=h, bits=bits, fmt=fmt, linear=texture_layouts[at]:
+            data if linear else native_rgba16(data,w,h) if (fmt,bits)==(0,2) else native_ia16(data,w,h) if bits==2
             else untile(data,w,h,8) if (fmt,bits)==(4,1) else native_ia8(data,w,h) if bits==1
             else pack4(untile(data,w,h,4)),
-            kind='texture',width=w,height=h,format={(2,0):'CI4',(4,0):'I4',(4,1):'I8',(0,2):'RGBA16',(3,1):'IA8',(3,2):'IA16'}[fmt,bits])
+            kind='texture',width=w,height=h,format={(2,0):'CI4',(4,0):'I4',(4,1):'I8',(0,2):'RGBA16',(3,1):'IA8',(3,2):'IA16'}[fmt,bits],
+            **({'source_layout':'N64-row-major'} if texture_layouts[at] else {}))
     for vertex, (name, n) in vertex_arrays.items():
         add(vertex, name, n, lambda data: normalise_vertex_flags(data)[0], kind='vertices')
     models = {}
@@ -1851,9 +1861,13 @@ def main():
         help='Reuse a verified artwork bundle without recompilation; repeat for multiple bundles')
     args = parser.parse_args(); output = args.output.resolve()
     if args.assets_only and args.command != 'convert': parser.error('--assets-only requires convert')
-    if args.representation=='carried' and (args.command=='import' or args.select or args.category
+    if args.representation=='carried' and (args.command=='import' or args.select or
+            args.category not in (None,'custom-design-fields')
             or args.command=='convert' and not args.assets_only):
         parser.error('Carried preparation retains complete state families; use convert --assets-only')
+    if args.representation=='carried' and args.category=='custom-design-fields' and (
+            args.command!='convert' or args.reuse_assets):
+        parser.error('Custom-design fields use convert --assets-only; reuse the complete prepared category when installing')
     if args.representation=='clothing' and (args.select
             or args.category not in (None,'clothing-appearances')
             or args.command=='convert' and not args.assets_only):
@@ -1880,6 +1894,12 @@ def main():
     source = Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
                     (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
     if args.representation=='carried':
+        if args.category=='custom-design-fields':
+            from v3_carried_items import prepare_design_fields
+            report=prepare_design_fields(source,args.donor_disc,output)
+            print(json.dumps(dict(art_bytes=report['art']['bytes'],templates=8,
+                runtime_installed=False,selectable=False)))
+            return
         import v3_optional_composition as composition
         from v3_carried_items import discover as discover_carried,prepare as prepare_carried
         composition.use_build_lock(args.base_lock)

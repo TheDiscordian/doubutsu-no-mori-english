@@ -20,7 +20,7 @@ from v3_import_catalog import DONOR, REL_SHA, ROOT, SYMBOLS_SHA, read_donor
 from v3_villager_art import data_pointers, native_palette, normalise_vertex_flags, symbol_span
 
 SEGMENT = 0x06000000
-CONVERTER_VERSION = 20
+CONVERTER_VERSION = 21
 
 # Complete compatible RDP expressions, selected by material commands, not IDs.
 # These use one texture and retain source alpha; none introduces TEXEL1,
@@ -288,6 +288,35 @@ def scalar_profile(pilot):
                        0, pilot.lighting_map, pilot.contact_action, 0, 0)
 
 
+def native_texture_block(raw, at=0):
+    """Decode a complete native I4 block load, including its actual DMA bounds.
+
+    Unlike Dolphin FD/D2 pairs, these commands reference row-major N64 texels.
+    Preserve the original tile state instead of untiling the image a second time.
+    Unknown formats and partial/offset/multitile loads remain unsupported.
+    """
+    if at < 0 or at % 8 or at+56 > len(raw):
+        raise ValueError('Incomplete native texture block')
+    words=list(struct.iter_unpack('>II',raw[at:at+56]))
+    (image,_),(load,load_fields),sync,block,pipe,(render,fields),(extent,ends)=words
+    w=((ends>>12)&4095)//4+1;h=(ends&4095)//4+1
+    masks=(fields>>4&15,fields>>14&15)
+    modes=(fields>>8&3,fields>>18&3)
+    # I4 block loads use 16-bit transfer units, then a 4-bit rendering tile.
+    if (image!=0xFD900000 or load!=0xF5900000 or
+            sync!=(0xE6000000,0) or pipe!=(0xE7000000,0) or
+            extent!=0xF2000000 or ends&0xFF003003 or
+            not 16<=w<=256 or not 1<=h<=256 or w&(w-1) or h&(h-1) or
+            w*h//2>2048 or render!=0xF5800000|(w//16)<<9 or
+            fields&0xFF000000 or fields&0x3C0F or
+            any(mode==3 for mode in modes) or
+            masks!=(w.bit_length()-1,h.bit_length()-1) or
+            load_fields!=0x07000000|(fields&0x000FFFFF) or
+            block!=(0xF3000000,0x07000000|((w*h//4-1)<<12)|((2048+w//16-1)//(w//16)))):
+        raise ValueError('Unsupported native I4 texture block or DMA extent')
+    return (w,h,4,0),words
+
+
 def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *, speed_bag=False,
                 accessory=False, mirrored_s=False, garden=False, western=False,
                 large_western=False, water=False, camping=False, tent=False,
@@ -424,6 +453,15 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
             if water or fire_effect or a != 0xF08F4010 or (not dynamic_palette and row['target'] not in allowed_palettes):
                 raise ValueError('Unsupported furniture palette load')
             have_palette = True
+        elif op == 0xFD and not a&(1<<18) and static_materials:
+            shape,words=native_texture_block(raw,at)
+            if (framed_texture or 'bound_segment' in row or row['target'] not in textures or
+                    shape[:2]!=textures[row['target']] or
+                    any(start+at+8<=p<start+at+56 for p in pointers)):
+                raise ValueError('Native texture block has inconsistent resources')
+            row.update(shape=shape[:2],intensity=True,native_block=words)
+            material=row['target'];material_direct=True;material_wrap=None
+            at+=48
         elif op == 0xFD:
             shape = model_texture_shape(raw[at:at + 8])
             target = row['target']
@@ -596,6 +634,9 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
                 row['global_triangles'] = [tuple(v + first_vertex for v in t) for t in row['triangles']]
             row['material'] = material
             at += size - 8
+        elif static_materials and op in (0xE7,0xE3):
+            if (a,b) not in ((0xE7000000,0),(0xE3001001,0)):
+                raise ValueError('Unsupported native material synchronization or LUT state')
         elif op == 0xFC:
             # Two-cycle unlit CI4: cycle one passes texture RGBA through;
             # cycle two multiplies RGB by primitive colour and preserves alpha.
@@ -887,6 +928,14 @@ def command_source(models, offsets):
                 emit(f"gsDPLoadTLUT_pal16(15, 0x{palette:08X})", 6)
             elif op == 0xFD:
                 texture=row.get('dynamic_texture',SEGMENT+offsets[row['target']])
+                if 'native_block' in row:
+                    words=[tuple(word) for word in row['native_block']]
+                    shape,_=native_texture_block(b''.join(struct.pack('>II',*word) for word in words))
+                    if shape[:2]!=tuple(row['shape']) or 'dynamic_texture' in row or not row.get('intensity'):
+                        raise ValueError('Changed native texture block compiler input')
+                    for i,(a,b) in enumerate(words):
+                        emit(f'{{{{0x{a:08X}, 0x{texture if i==0 else b:08X}}}}}')
+                    continue
                 if 'dynamic_texture' in row and texture not in (0x08000000,0x09000000):
                     raise ValueError('Unreviewed dynamic texture segment')
                 w, h = row['shape']
@@ -1063,6 +1112,10 @@ def command_source(models, offsets):
             elif op in (0xEF, 0xE7, 0xE3) and model.get('native_ui'):
                 from v3_ui_art import validate_state
                 validate_state(*row['words'])
+                a,b=row['words'];emit(f'{{{{0x{a:08X}, 0x{b:08X}}}}}')
+            elif op in (0xE7,0xE3):
+                if tuple(row['words']) not in ((0xE7000000,0),(0xE3001001,0)):
+                    raise ValueError('Changed native material synchronization or LUT state')
                 a,b=row['words'];emit(f'{{{{0x{a:08X}, 0x{b:08X}}}}}')
             elif op in (0xFC, 0xE2, 0xFA, 0xFB, 0xD9, 0xDF, 0xF2):
                 # Only the explicitly decoded compatible F3DEX2 state/end

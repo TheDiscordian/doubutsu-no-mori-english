@@ -5,7 +5,13 @@
 #ifdef AF_V3_DIARY_STORAGE
 #ifdef AF_V3_FISHING_STORAGE
 #ifdef AF_V3_CARD_STORAGE
+#ifdef AF_V3_DESIGN_STORAGE
+#define AF_CONSOLE_RAW AF_CZ_DESIGN_RAW
+AFDesigns *af_v3_design_data(void);
+int af_v3_design_measure(const af_save_u8 *,const af_save_u8 *,const AFDesigns *);
+#else
 #define AF_CONSOLE_RAW AF_CZ_CARD_RAW
+#endif
 unsigned char *af_v3_card_data(void);
 #else
 #define AF_CONSOLE_RAW AF_CZ_FISHING_RAW
