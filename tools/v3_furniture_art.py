@@ -620,7 +620,10 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
                                      # Texture RGB multiplied by the caller's
                                      # primitive colour; texture alpha, then
                                      # pass COMBINED through the second cycle.
-                                     (0xFC11FFFF,0xFFFFF238))
+                                     (0xFC11FFFF,0xFFFFF238),
+                                     # Primitive RGB and texture alpha,
+                                     # passed through the second cycle.
+                                     (0xFCFFFFFF,0xFFFDF238))
             # FC327FFF/FFFFFC38 multiplies primitive RGB by shade, sets
             # alpha to one, then passes the combined result through cycle two.
             # It has no texture dependency; explicit texture-off commands stay.
@@ -638,7 +641,7 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
             modes = ((0xC81049D8 if fire_effect == 1 else 0xC8104A50,) if fire_effect else
                 (0xC8104A50,) if water else ((0xC8112078, 0xC8113078)
                 if accessory else (0xC8113078, 0xC8104DD8)))
-            if static_materials: modes += (0xC8104A50,0xC81049D8,0xC8104E50,0xC8104B50)
+            if static_materials: modes += (0xC8104A50,0xC81049D8,0xC8104E50,0xC8104B50,0xC81045D8)
             if frame_blend or scrolling: modes += (0xC8104B50,)
             if a != 0xE200001C or b not in modes:
                 raise ValueError('Unsupported furniture render mode')

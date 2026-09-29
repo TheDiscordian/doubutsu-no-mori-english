@@ -41,8 +41,8 @@ Do not make another per-item installer. Golden net/axe/shovel/rod still need
 their actual remaining consumers distinguished from acquisition; retain all
 installed tool behaviour and do not replay old tests to establish it again.
 
-The current proposal is ABI 360 at
-`build/v3-tree-effects-work-01/installed-10/build-lock.json`.
+The current proposal is ABI 362 at
+`build/v3-carried-field-work-01/interactions-04/build-lock.json`.
 The complete `build/v3-carried-batch-prepared-05/` resources are installed without
 reconversion: seven parents, 26 states, fourteen icons, seven handover/police
 models, complete orange-paper artwork, official names, and prices. Additive
@@ -100,9 +100,21 @@ repeat tree preparation, planting, daily growth, food tables, or passing tests.
 See
 [the tree-family contract](../specs/V3_SCENERY.md#palm-and-cedar-dependencies).
 
-The next concrete consumers are sign-board designs/placement and spirit
-capture/release, including actual native item-type
-and menu routes for every family. Shared paper/spirit splitting/merging,
+The complete spirit field program, models, animation, lighting/destruction,
+native net stack handover, one-at-a-time release, and indoor/outdoor menus are
+installed through the shared carried/creature paths. Reuse
+`build/v3-carried-field-prepared-04/`; all ordinary insect resources and buffers
+remain installed. Tree startup padding holds the field code/art/tables;
+carried padding holds the 1,456-byte interaction code. No new RAM is allocated.
+Official count-specific catch dialogue and its empty tail are credited and
+installed without changing wording or timing. The native collection adapter
+continues to exclude spirits from museum/completion records.
+
+The next concrete consumers are spirit inventory transfer restrictions and the
+actual Wisp event owner, then sign-board designs/placement, including actual
+native item-type and menu routes for every family. The field code has a real
+event-state binding API, but no event owner calls it yet; an unbound event is
+inactive, not a fake running quest. Shared paper/spirit splitting/merging,
 confirmed letter consumption, and paper collection/catalogue are installed;
 do not rebuild those or the prepared artwork without a relevant defect. Reuse
 the installed event/card/cutlery controls. Independent selections stay part of
@@ -110,7 +122,8 @@ the same task. The native tag, core, letter, hand, and catalogue disassemblies i
 `build/v3-carried-runtime-work-01/` are already available;
 do not repeat them. All prepared artwork and passing unchanged checks remain
 reusable. Focused current save/profile/collection/catalogue and resource checks,
-allocation bounds, and the seven-profile browser/offline comparison pass. Retain
+allocation bounds, complete new dialogue, native caller/relocation retention,
+and the current seven-profile browser/offline comparison pass. Retain
 unchanged reader/action evidence; native rendering, item interactions, and
 persistence remain unverified. The consumer map and focused checks are in
 [carried-item imports](../specs/V3_CARRIED_ITEMS.md).

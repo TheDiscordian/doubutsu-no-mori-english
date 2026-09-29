@@ -2,11 +2,14 @@
  * Engine outputs are observed here, not claimed as native engine verification.
  */
 #include "creature_insects.h"
+#ifdef AF_INSECT_CARRIED
+#include "creature_carried.h"
+#endif
 #include <assert.h>
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
-struct GAME { int unused; };
+struct GAME { u32 data[0x1C80/4]; };
 static GAME game;
 static AfInsectController controller;
 static PLAYER_ACTOR player;
@@ -78,7 +81,7 @@ void af_insect_position_integrate(ACTOR *a) {
 }
 
 static aINS_INSECT_ACTOR *start(unsigned n,int release) {
-    assert(n<8);
+    assert(n<AF_IMPORTED_INSECT_COUNT);
     aINS_INSECT_ACTOR *i=controller.insects+n%AF_INSECT_SLOTS;
     memset(i,0,sizeof(*i));
     memset(i->col_pipe,0xA5,sizeof(i->col_pipe));
@@ -174,7 +177,7 @@ static void bounds(void) {
     assert(!af_v3_insect_init(NULL,&game));
     assert(!af_v3_insect_tick(NULL,&game));
     aINS_INSECT_ACTOR *i=start(0,0),before;
-    for (int n=-1;n<=41;n++) if (n<32 || n>39) {
+    for (int n=-1;n<=41;n++) if (n<32 || n>=32+(int)AF_IMPORTED_INSECT_COUNT) {
         i->type=n;before=*i;
         assert(!af_v3_insect_init(i,&game) && !af_v3_insect_tick(i,&game));
         assert(!memcmp(i,&before,sizeof(*i)));
@@ -190,8 +193,83 @@ static void bounds(void) {
     assert(af_v3_insect_init(i,&game)==0); /* still an out-of-range identity */
     i->type=32;assert(af_v3_insect_init(i,&game)==-1);
 }
+#ifdef AF_INSECT_CARRIED
+static int lights_created,lights_deleted;
+static AfInsectPointLight *live_light;
+int af_insect_pipe_destroy(GAME *g,void *pipe) {(void)g;(void)pipe;return 0;}
+unsigned af_carried_quantity(unsigned item) {return item==ITM_SPIRIT0;}
+float search_position_distanceXZ(const xyz_t *a,const xyz_t *b) {
+    return sqrtf(SQ(a->x-b->x)+SQ(a->z-b->z));
+}
+s16 search_position_angleY(const xyz_t *a,const xyz_t *b) {return atans_table(b->z-a->z,b->x-a->x);}
+void add_calc_short_angle2(s16 *v,s16 target,float rate,s16 maximum,s16 minimum) {
+    (void)minimum;
+    int step=(int)((s16)(target-*v)*rate);
+    if (step>maximum) step=maximum;
+    if (step< -maximum) step= -maximum;
+    *v=(s16)(*v+step);
+}
+void Light_point_ct(AfInsectPointLight *light,s16 x,s16 y,s16 z,u8 r,u8 g,u8 b,s16 radius) {
+    *light=(AfInsectPointLight){1,0,x,y,z,r,g,b,0,radius};
+}
+void *Global_light_list_new(GAME *g,void *context,AfInsectPointLight *light) {
+    assert(g==&game && context==(u8 *)&game+0x1C60);
+    assert(!live_light);live_light=light;lights_created++;
+    return &lights_created;
+}
+void Global_light_list_delete(void *context,void *node) {
+    assert(context==(u8 *)&game+0x1C60 && node==&lights_created);
+    assert(live_light);live_light=NULL;lights_deleted++;
+}
+
+static void carried_spirit(void) {
+    AfSpiritCommon common;memset(&common,0,sizeof(common));
+    volatile u16 status=0x10;
+    af_carried_spirit_event_bind(&common,&status);
+    assert(af_carried_spirit_running() && af_carried_spirit_common()==&common);
+    status=0x30;assert(!af_carried_spirit_running());status=0x10;
+    game.data[0xA0/4]=10;
+    aINS_INSECT_ACTOR *i=start(8,0);
+    assert(common.hitodama_block_data.block_x[0]==255 && common.hitodama_block_data.block_z[0]==255);
+    assert(common.hitodama_block_data.block_x[1]==0);
+    assert(i->type==40 && i->item==ITM_SPIRIT0 && i->action==2);
+    assert(i->bg_type==2 && af_insect_extra(i)->bg_range==20.0f);
+    assert(af_v3_insect_catch_range(i)==8.0f && af_carried_creature_enabled(40));
+    assert(!af_carried_creature_enabled(39) && !af_carried_creature_enabled(41));
+    assert(af_carried_game_frame(&game)==20);
+    advance(i);assert(environment_calls==2 && i->action==2 && i->_1E0==1.0f);
+    assert(i->tools_actor.actor_class.position_speed.y!=0 && !lights_created);
+    /* Held spirits retain animated glowing frames, then escape/fade. */
+    i->tools_actor.init_matrix=1;away=1;
+    advance(i);assert(lights_created==1 && i->light_flag==2);
+    assert(i->point_light.red==120 && i->point_light.green==255 && i->point_light.blue==180);
+    assert(i->point_light.radius>=25 && i->point_light.radius<=40);
+    caught=(uintptr_t)i;advance(i);
+    assert(i->action==1 && i->insect_flags.bit_1 && i->insect_flags.bit_2 && i->life_time==0);
+    caught=0;away=0;i->tools_actor.init_matrix=0;
+    for (unsigned n=0;n<41;n++) advance(i);
+    assert(i->insect_flags.destruct && !i->alpha0);
+    af_carried_insect_light_delete(i,&game);
+    af_carried_insect_light_delete(i,&game);
+    assert(lights_deleted==1 && !live_light && !i->light_flag && !i->light_list);
+    /* Ending the real event makes an uncaught spirit escape too. */
+    i=start(8,0);status=0;advance(i);
+    assert(i->action==1 && i->insect_flags.bit_2);
+    af_carried_insect_light_delete(i,&game);
+    /* A released spirit creates its own light and cannot be recaptured. */
+    status=0x10;i=start(8,1);assert(i->action==0 && i->insect_flags.bit_1);
+    advance(i);assert(i->light_list && af_v3_insect_catch_range(i)==0);
+    af_carried_insect_light_delete(i,&game);
+    af_carried_spirit_event_bind(NULL,NULL);
+    assert(!af_carried_spirit_running() && !af_carried_spirit_common());
+    puts("Carried spirit: complete movement, event expiry, held/release light lifecycle, and bounds pass");
+}
+#endif
 int main(void) {
     category_release();digging_and_rocks();trees_and_flowers();water_and_mosquito();bounds();
     puts("Eight species: source behaviour, shared stepping, interactions, and bounds pass");
+#ifdef AF_INSECT_CARRIED
+    carried_spirit();
+#endif
     return 0;
 }

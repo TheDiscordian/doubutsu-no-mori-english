@@ -79,6 +79,10 @@ def letter_window(base,core,menu,paper,symbols):
 
 def install(base, prior, blob, core, module, output, directory):
     if prior['equipment_resources'].get('carried_items'):
+        if prior['equipment_resources']['carried_items'].get('field_creatures'):
+            return install_interactions(base,prior,core,output,directory)
+        if prior['equipment_resources']['carried_items'].get('eating'):
+            return install_creature_field(base,prior,blob,output,directory)
         if prior['equipment_resources']['carried_items'].get('storage'):
             return install_field_actions(base,prior,output,directory)
         if prior['equipment_resources']['carried_items'].get('actions'):
@@ -601,6 +605,273 @@ def install_field_actions(base,prior,output,directory):
     write_new(output/'carried-items.json',(json.dumps(d,indent=2)+'\n').encode())
     return e,{0x785700:owner_new,0x7898C0:rel_new,hand['vrom']:bytes(hand_data)},dict(physical_resources=records),[
         (dict(resource,previous_sha256=before_sha),bytes(raw))]
+
+
+def install_creature_field(base,prior,blob,output,directory):
+    """Extend the installed creature category using its checked carried batch."""
+    from v3_creature_field import discover
+    from v3_furniture_pipeline import prepare_models
+    from v3_npc_draw import relocation_offsets
+    e=copy.deepcopy(prior['equipment_resources']);d=e['carried_items']
+    directory=directory.resolve();prepared=json.loads((directory/'linked.json').read_bytes());linked=prepared['linked']
+    ram,art_ram,table_ram,info_ram,end=0x80784000,0x80786400,0x80786A00,0x80786C00,0x80787000
+    tree=e['scenery']['tree_effects'];tree_packet=tree['packet'];tree_previous=copy.deepcopy(tree_packet)
+    tree_raw=bytearray(base[tree_packet['physical']:tree_packet['physical']+tree_packet['bytes']])
+    code=(directory/linked['file']).read_bytes()
+    if (prepared['format']!='AFV3-CARRIED-CREATURES-1' or linked['base_sha256']!=sha256(base) or
+            linked['ram']!=ram or linked['limit']!=art_ram or len(code)!=linked['bytes'] or
+            sha256(code)!=linked['sha256'] or ram+len(code)>art_ram or
+            d.get('field_creatures') or d['ready_mask'] or d['selected_mask'] or
+            tree_packet['ram']!=0x80780000 or tree_packet['bytes']!=0x8000 or
+            tree['code']['bytes']>0x4000 or sha256(tree_raw)!=tree_packet['sha256'] or
+            any(tree_raw[0x4000:0x7000])):
+        raise ValueError('Changed complete inactive carried field preparation or reservation')
+    for path,digest in prepared['compiled']['runtime_sources'].items():
+        if sha256((ROOT/path).read_bytes())!=digest:raise ValueError('Stale carried field runtime: '+path)
+    source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+        (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    inventory=discover(source,carried_rows=d['rows'])
+    if prepared['field']['inventory']!=json.loads(json.dumps(inventory)):
+        raise ValueError('Changed complete carried field identity')
+    row,=prepared['field']['objects'];part=prepare_models(source,row['descriptor'])
+    art=bytearray((directory/'field'/row['object_file']).read_bytes())
+    if (row['item_id']!='2D28' or len(art)!=row['object_bytes'] or sha256(art)!=row['object_sha256'] or
+            row['resources']!=part[2] or art[:len(part[1])]!=part[1] or len(art)>0xC00):
+        raise ValueError('Changed complete carried creature resources')
+    field=e['creature_field'];old_insects=e['creature_insects'];oldp=old_insects['packet']
+    before=base[oldp['physical']:oldp['physical']+oldp['bytes']];updated=bytearray(before)
+    if sha256(before)!=linked['predecessor']['sha256'] or sha256(before)!=oldp['sha256']:
+        raise ValueError('Changed retained insect owner')
+    redirects=[]
+    for r in linked['required_redirects']:
+        at=r['previous']-oldp['ram'];original=before[at:at+8]
+        after=struct.pack('>2I',jump(r['target']),0)
+        if len(original)!=8:raise ValueError('Invalid complete carried reader redirect')
+        updated[at:at+8]=after;redirects.append(dict(r,before=original.hex(),after=after.hex()))
+    old_resource=old_insects['physical_resource'];previous_sha=old_resource['sha256']
+    records=copy.deepcopy(prior['physical_resources'])
+    resource=next(r for r in records if r['id']==old_resource['id'])
+    resource['sha256']=sha256(updated);old_insects['physical_resource']=copy.deepcopy(resource)
+    oldp.update(sha256=sha256(updated),crc32=zlib.crc32(updated))
+    old_insects['compiled']['sha256']=sha256(updated[:old_insects['compiled']['bytes']])
+    packet=bytearray(end-ram);packet[:len(code)]=code
+    existing=[r for r in field['rows'] if r['category']=='insect']
+    start=max(r['end'] for r in existing);offset=(start&0xFFFFFF)+8
+    for model in row['models']:
+        a=model['native_offset'];n=model['bytes']
+        if sha256(art[a:a+n])!=model['output_sha256']:raise ValueError('Changed complete carried model commands')
+        for at in range(a,a+n,8):
+            first,target=struct.unpack_from('>2I',art,at)
+            if first>>24 in (1,0xFD,0xDE):
+                if target>>24!=6 or target&0xFFFFFF>=len(art):raise ValueError('Unbounded carried graphics pointer')
+                struct.pack_into('>I',art,at+4,target+offset)
+    packet[art_ram-ram:art_ram-ram+len(art)]=art
+    frames=[0x06000000+offset+o for o in row['frame_offsets']]
+    frame_ram=table_ram+3*41*4
+    packet[frame_ram-ram:frame_ram-ram+16]=struct.pack('>4I',*frames)
+    additions=(start,0x06000000+offset+len(art),frame_ram);tables=[]
+    p=field['packet'];original_field=blob[p['blob_offset']:p['blob_offset']+p['bytes']]
+    if sha256(original_field)!=p['sha256']:raise ValueError('Changed complete existing field tables')
+    for i,(name,value) in enumerate(zip(('insect-starts','insect-ends','insect-models'),additions,strict=True)):
+        old=next(t for t in field['tables'] if t['name']==name);at=old['ram']-p['ram']
+        data=original_field[at:at+old['bytes']]
+        if len(data)!=160 or sha256(data)!=old['sha256']:raise ValueError('Changed complete native/imported insect table')
+        target=table_ram+i*41*4;data+=struct.pack('>I',value)
+        packet[target-ram:target-ram+len(data)]=data
+        tables.append(dict(name=name,ram=target,bytes=len(data),sha256=sha256(data),previous=old['ram']))
+    vrom=0x113D000+offset
+    struct.pack_into('>8I',packet,info_ram-ram,0x41464351,vrom,len(art),art_ram,frames[0],frames[2],0,0)
+    packet[-16:]=b'AFCARRIEDFIELD!!'
+    files=by_vrom(base);v,r,owner_ram=0x8DEEC0,0x8E0870,0x80A10210
+    owner=bytearray(files[v].extract(base));rel=bytearray(files[r].extract(base));locations=relocation_offsets(rel,len(owner))
+    patches=[];removed=[]
+    def patch(address,before,after,*,relocated=False):
+        at=address-owner_ram
+        if u32(owner,at)!=before or ((at in locations)!=relocated):
+            raise ValueError(f'Changed carried creature field caller at {address:08X}')
+        struct.pack_into('>I',owner,at,after);patches.append(dict(address=address,before=before,after=after))
+        if relocated:removed.append(0x44000000|at)
+    original_receipt=next(x for x in field['owners'] if x['name']=='insect')
+    for i,(hi,lo) in enumerate(((0x80A10370,0x80A1038C),(0x80A10374,0x80A10394),(0x80A1145C,0x80A1146C))):
+        for address,half in ((hi,(tables[i]['ram']+0x8000)>>16),(lo,tables[i]['ram']&65535)):
+            old=next(x for x in original_receipt['patches'] if x['address']==address)['after']
+            patch(address,old,(old&0xFFFF0000)|(half&65535))
+    symbols=linked['symbols']
+    patch(0x80A103D0,jump(field['compiled']['symbols']['af_v3_creature_graphics_load'],link=True),
+        jump(symbols['af_carried_creature_graphics_load'],link=True))
+    for address in (0x80A115C8,0x80A115F4,0x80A1162C):
+        patch(address,jump(0x80A11264,link=True),jump(symbols['af_carried_insect_draw'],link=True),relocated=True)
+    patch(0x80A10494,0x27BDFFE8,jump(symbols['af_carried_insect_destruct']))
+    patch(0x80A10498,0xAFBF0014,0)
+    count=u32(rel,16);words=list(struct.unpack_from('>'+str(count)+'I',rel,20))
+    for word in removed:
+        if words.count(word)!=1:raise ValueError('Missing native carried drawing relocation')
+        words.remove(word)
+    struct.pack_into('>I',rel,16,len(words));rel[20:20+count*4]=struct.pack('>'+str(len(words))+'I',*words)+bytes(4*len(removed))
+    tree_raw[ram-tree_packet['ram']:end-tree_packet['ram']]=packet
+    tree_record=next(r for r in records if r['id']==tree_packet['id'])
+    tree_record['sha256']=sha256(tree_raw)
+    tree_packet.update(sha256=sha256(tree_raw),crc32=zlib.crc32(tree_raw))
+    receipt=dict(prepared=str(directory.relative_to(ROOT)),prepared_sha256=sha256((directory/'linked.json').read_bytes()),
+        code=dict(linked,installed=True),packet=copy.deepcopy(tree_packet),previous_packet=tree_previous,
+        ram=ram,bytes=len(packet),sha256=sha256(packet),
+        art=dict(ram=art_ram,bytes=len(art),sha256=sha256(art),vrom=vrom,source_sha256=row['object_sha256']),
+        tables=tables,frames=frames,info_ram=info_ram,redirects=redirects,
+        owner=dict(vrom=v,reloc=r,ram=owner_ram,previous_sha256=sha256(files[v].extract(base)),
+            sha256=sha256(owner),relocation_sha256=sha256(rel),patches=patches,removed_relocations=removed),
+        additional_resident_bytes=0,reused_startup_padding_bytes=len(packet),
+        native_gameplay_verified=False,installed=True,selectable=False,
+        pending=['spirit capture/release menu and stack-aware net handover',
+            'bind the actual Wisp event owner', 'independent carried selection'])
+    d['field_creatures']=receipt
+    paths=(*SOURCES,*prepared['compiled']['runtime_sources'],'tools/v3_creature_insects.py','tools/v3_creature_field.py',
+        'overlays/v3/creature_carried.h','overlays/v3/creature_insects.h','tools/v3_room_goods.py','overlays/v3/surface_bootstrap.c')
+    d['sources']={s:sha256((ROOT/s).read_bytes()) for s in paths}
+    write_new(output/'carried-field.json',(json.dumps(receipt,indent=2)+'\n').encode())
+    return e,{v:bytes(owner),r:bytes(rel)},dict(physical_resources=records),[
+        (dict(resource,previous_sha256=previous_sha),bytes(updated)),
+        (dict(tree_record,previous_sha256=tree_previous['sha256']),bytes(tree_raw))]
+
+
+CARRIED_MESSAGE_FIRST=13082
+
+
+def capture_text(base,source):
+    """Retain complete official capture dialogue, including the unused tail."""
+    from gc_text import decode_gc
+    from runtime_module import module_command_info
+    from textcodec import encode,tokenize
+    from textvalidate import expanded_bound
+    from v3_camper_text import donor
+    bank,_,decoder=donor();info=module_command_info(base);extra=[];rows=[];credits=[]
+    for index,source_id in enumerate(range(0x2F03,0x2F09)):
+        original=bank[source_id];data=encode(decode_gc(original,decoder),info)
+        tokens=list(tokenize(data,info));bound=expanded_bound(data,info)
+        if (not tokens or tokens[-1].data!=bytes((0x7F,0 if index==5 else 1)) or bound>1024 or
+                any(t.kind=='cmd' and t.data[1] not in (0,1,3,5) for t in tokens) or
+                sum(t.kind=='cmd' and t.data[1] in (0,1) for t in tokens)!=1):
+            raise ValueError('Changed complete carried capture message commands')
+        target=CARRIED_MESSAGE_FIRST+index;extra.append(data)
+        rows.append(dict(id=target,source_id=source_id,sha256=sha256(data),source_sha256=sha256(original),
+            bytes=len(data),expanded_bound=bound))
+        credits.append(dict(id=f'message:{target:04X}',native_sha256=None,locales=dict(en=dict(
+            credit='official',locator=['tools/v3_carried_runtime.py:capture_text',f'N64/message/{target:04X}'],
+            source=dict(source='user-supplied GAFE01 revision 0 disc',reference_id=f'message:{source_id:04X}',
+                reference_sha256=sha256(original)),
+            adaptations=['Native encoding; retain official wording, line/page breaks, pauses, colours, and empty final record'],
+            human_review='not_recorded',encoded_sha256=sha256(data)))))
+    return extra,dict(first_id=CARRIED_MESSAGE_FIRST,count=len(extra),rows=rows,provenance_entries=credits)
+
+
+def install_interactions(base,prior,core,output,directory):
+    """Connect the category's remaining native menu/net consumers together."""
+    from v3_submenu_tables import Owner
+    from v3_equipment_runtime import PLAYER_VROM,PLAYER_RELOC,PLAYER_RAM
+    from v3_creature_fish import rewrite
+    from v3_balloon_release import menu_field_address
+    from v3_camper_text import extend_bank
+    from v3_event_text import MESSAGE,TABLE as MESSAGE_TABLE,CHOICE_TABLE,patch_bounds
+    from text_provenance import validate
+    e=copy.deepcopy(prior['equipment_resources']);d=e['carried_items'];p=d['packet']
+    if (d.get('interactions') or d['ready_mask'] or d['selected_mask'] or
+            directory.resolve()!=ROOT/d['prepared']):
+        raise ValueError('Carried interactions require the checked inactive category')
+    raw=bytearray(base[p['physical']:p['physical']+p['bytes']]);start=0x80772070-p['ram'];end=TABLE-p['ram']
+    if sha256(raw)!=p['sha256'] or any(raw[start:end]):
+        raise ValueError('Changed carried interaction reservation')
+    source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+        (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    donors=[]
+    for at,name,digest in (
+        (0x6BAD0,'mPlib_Get_space_putin_item_forHITODAMA','d6f1d8abebdcf9651f2dcbe02425c2e679425160a1def4c7e3b76d7736d9baf9'),
+        (0x18386C,'Player_actor_Pull_net_demo_ct','8f79e4469656483e8012c73ca3d0a9ea4b0e125adb7038a4286a7c400304824a'),
+        (0x183E7C,'Player_actor_setup_main_Notice_net','c8fcc50ea6e62db2d9cc58201b8daadfed563c76c955f1b1c99a4309df0dd4e5'),
+        (0x287580,'mTG_release_proc','82abe20de0c744371c40da79fef7011e43605f7866e1a733c564ad2775817ab2'),
+        ACTION_SOURCES[1]):
+        _,r=source.function(at)
+        if r['symbol']!=name or r['sha256']!=digest:raise ValueError('Changed complete carried interaction source')
+        donors.append(r)
+    extra,text=capture_text(base,source)
+    provenance=json.loads((ROOT/'translations/provenance.json').read_bytes());validate(provenance)
+    indexed={r['id']:r for r in provenance['entries']}
+    if any(indexed.get(r['id'])!=r for r in text['provenance_entries']):
+        raise ValueError('Missing complete official capture-text provenance')
+    files=by_vrom(base);tag=Owner(files[0x3950000].extract(base),files[0x3960000].extract(base),0x8086F310)
+    player=files[PLAYER_VROM].extract(base);rel=files[PLAYER_RELOC].extract(base)
+    native=[]
+    for at,size,digest in (
+        (0x808CD4D4,240,'3a1e1ec1ad507749fb33a226b801b1094a41a92f04aaa33e23bc947b29103891'),
+        (0x808B5584,104,'15b715e025943f86f35b030aedb3f7a300cc978748c1a17220e98378665e5334'),
+        (0x808CCFDC,328,'23858e8fe9b0e123779291b41e0b580582e49d155a0bce1f108d9e7ba3719cf5')):
+        # The message body already contains the retained full-name/UI adapter.
+        data=player[at-PLAYER_RAM:at-PLAYER_RAM+size]
+        if sha256(data)!=digest:raise ValueError(f'Changed complete carried native consumer {at:08X}')
+        native.append(dict(address=at,bytes=size,sha256=digest))
+    ui=e['creature_fish']['world']['ui']['code']['symbols']
+    links={n:d['code']['symbols'][n] for n in ('af_carried_quantity','af_carried_with_quantity')}
+    links.update(af_carried_prior_action_menu=d['code']['symbols']['af_carried_menu_type'],
+        af_carried_prior_insect_message=ui['af_v3_creature_insect_message'],af_carried_set_message=0x8007B5C0)
+    code,compiled=compile_part('carried_interactions',output/'carried-interactions',
+        extra_sources=('overlays/v3/carried_interactions.S',),link_symbols=links,
+        defines=(f'AF_CARRIED_FIELD_ADDRESS=0x{menu_field_address(tag.original):08X}u',
+            f'AF_CARRIED_SPIRIT_MESSAGE_FIRST={CARRIED_MESSAGE_FIRST}u'))
+    if len(code)>end-start:raise ValueError('Carried interaction code exceeds existing padding')
+    symbols=compiled['symbols'];raw[start:start+len(code)]=code
+    tag.patch(0x80875834,jump(links['af_carried_prior_action_menu'],link=True),
+        jump(symbols['af_carried_interaction_menu'],link=True))
+    release=[tag.ram+i for i in range(0,len(tag.original),4) if u32(tag.original,i)==0x808739B0]
+    if release!=[0x80878C80,0x808799E8]:raise ValueError('Changed complete native release consumers')
+    for address in release:
+        at=address-tag.ram;word=0x42000000|at
+        if tag.locations.get(at)!=word:raise ValueError('Missing native release pointer relocation')
+        tag.patch(address,0x808739B0,symbols['af_carried_release']);tag.rows.remove(word)
+    tag_data,tag_rel,tag_report=tag.finish()
+    if len(tag_rel)>len(tag.relocation) or len(tag_data)!=len(tag.original):
+        raise ValueError('Carried interactions unexpectedly resize the native menu')
+    tag_rel=tag_rel[:-4]+bytes(len(tag.relocation)-len(tag_rel))+struct.pack('>I',len(tag.relocation))
+    tag_report['relocation_sha256']=sha256(tag_rel)
+    windows=[
+        (0x808CD518,(jump(0x800B3780,link=True),),(jump(symbols['af_carried_net_slot'],link=True),)),
+        (0x808CD548,(jump(0x808B5584,link=True),),(jump(symbols['af_carried_net_put'],link=True),)),
+        (0x808CD070,(jump(ui['af_v3_creature_insect_message_call'],link=True),),
+            (jump(symbols['af_carried_net_message_call'],link=True),))]
+    player_data,player_rel,player_report=rewrite(player,rel,PLAYER_RAM,{},windows)
+    payload,table=extend_bank(files[MESSAGE].extract(base),files[MESSAGE_TABLE].extract(base),extra,CARRIED_MESSAGE_FIRST)
+    choices=prior['import_storage']['choice_vrom'];text['choice_vrom']=choices;text['resources']=[]
+    for v,data in ((MESSAGE,payload),(MESSAGE_TABLE,table),(choices,files[choices].extract(base)),
+            (CHOICE_TABLE,files[CHOICE_TABLE].extract(base))):
+        filename=f'carried-text-{v:08X}.bin';write_new(output/filename,data)
+        text['resources'].append(dict(vrom=v,file=filename,bytes=len(data),sha256=sha256(data),
+            original_sha256=sha256(files[v].extract(base))))
+    text['bounds']=patch_bounds(core,CARRIED_MESSAGE_FIRST,len(extra))
+    records=copy.deepcopy(prior['physical_resources']);resource=next(r for r in records if r['id']==p['id'])
+    old_sha=p['sha256'];resource['sha256']=sha256(raw);p.update(sha256=sha256(raw),crc32=zlib.crc32(raw))
+    d['sha256']=sha256(raw[RAM-p['ram']:])
+    e['npc_extra']['events']['festivals']['packet']=copy.deepcopy(p)
+    receipt=dict(code=compiled,ram=0x80772070,bytes=len(code),sha256=sha256(code),
+        donors=donors,native_consumers=native,tag=tag_report,
+        player=dict(player_report,vrom=PLAYER_VROM,reloc=PLAYER_RELOC,ram=PLAYER_RAM),text=text,
+        additional_resident_bytes=0,native_gameplay_verified=False)
+    d['interactions']=receipt
+    d['field_creatures']['pending']=['spirit inventory transfer restrictions',
+        'bind the actual Wisp event owner','independent carried selection']
+    paths=(*d['sources'],'tools/v3_creature_ui.py','tools/v3_event_text.py','overlays/v3/carried_interactions.c',
+        'overlays/v3/carried_interactions.S','overlays/v3/carried_interactions.ld')
+    d['sources']={s:sha256((ROOT/s).read_bytes()) for s in paths}
+    write_new(output/'carried-interactions.json',(json.dumps(receipt,indent=2)+'\n').encode())
+    return e,{0x3950000:tag_data,0x3960000:tag_rel,PLAYER_VROM:player_data,PLAYER_RELOC:player_rel},\
+        dict(physical_resources=records),[(dict(resource,previous_sha256=old_sha),bytes(raw))]
+
+
+def finish(image,base,prior,output,equipment):
+    before=prior['equipment_resources'].get('carried_items',{}).get('interactions')
+    now=equipment['carried_items'].get('interactions')
+    if now and not before:
+        from v3_event_text import install as install_text
+        return install_text(image,base,output,now['text'],relocate=True,
+            physical_resources=prior['physical_resources'],
+            reserved_end=prior.get('resource_capacity',{}).get('reserved_physical_end',0))
+    return image
 
 
 def paper_catalogue(base,prior,e,core,compiled,resources):

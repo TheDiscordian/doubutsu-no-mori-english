@@ -30,6 +30,8 @@ PROGRAMS = (
     ('dango','aIDG',11,'86599c9c18f49aa8855bb628cc08f611b39635afeddf709f98f1ddc2bb25c84f'),
     ('ka','aIKA',10,'d46aa8b6a6835c05a9c71d9e96b4d1c5b2fb193fa0c73350a7a1c5cd2a208c08'),
 )
+CARRIED_PROGRAMS=(('hitodama','aIHD',8,
+    'b3e7c0eab765fab1909a8a050e7fe6141a6237aa4e3e8ed4d4b50fba6c7ce0f2'),)
 RUNTIME=('creature_insects','creature_insect_state','creature_insect_environment',
          'creature_insect_engine','creature_insect_collision','creature_insect_spawns',
          'creature_insect_manager','creature_insect_colony','creature_insect_colony_draw',
@@ -356,7 +358,7 @@ def colony_assets(source,cache):
     return asset,report
 
 
-def rewrite(text):
+def rewrite(text, *, carried=False):
     """Only known ABI expressions change; retain complete source actions."""
     changes={}
     def sub(label,pattern,replacement):
@@ -379,6 +381,20 @@ def rewrite(text):
     sub('game_base',r'&play->game','(GAME *)play')
     sub('net_state',r'mPlib_get_player_actor_main_index\(game\) != mPlayer_INDEX_PUTAWAY_NET',
         '!af_insect_putting_net_away(game)')
+    if carried:
+        sub('absolute_float',r'\bfabsf\b','af_carried_absf')
+        sub('base_frame',r'game->frame_counter','af_carried_game_frame(game)')
+        sub('net_state_equal',r'mPlib_get_player_actor_main_index\(game\) == mPlayer_INDEX_PUTAWAY_NET',
+            'af_insect_putting_net_away(game)')
+        sub('light_context',r'&play->global_light','af_carried_insect_light_context(game)')
+        sub('spirit_event_type',r'\bmEv_gst_common_c\b','AfSpiritCommon')
+        sub('spirit_event_common',r'mEv_get_common_area\(mEv_EVENT_GHOST, 55\)',
+            'af_carried_spirit_common()')
+        sub('spirit_event_status',r'mEv_check_status\(mEv_EVENT_GHOST, mEv_STATUS_RUN\)',
+            'af_carried_spirit_running()')
+        sub('spirit_event_acres',r'\bmEv_GHOST_HITODAMA_NUM\b','5')
+        if re.search(r'\bmEv_|->global_light|->frame_counter|mPlib_get_player_actor_main_index',text):
+            raise ValueError('Unconverted carried-creature event/light access')
     # Native pointers remain 32-bit. Host fixtures retain full pointer identity.
     sub('pointer_identity',r'\(u32\)(actorx|actor)\b',r'(uintptr_t)\1')
     sub('pointer_local',r'\bu32 (label|catch_label)\b',r'uintptr_t \1')
@@ -387,7 +403,191 @@ def rewrite(text):
         rest=re.sub(r'af_insect_extra\(insect\)->ut_[xz]','',text)
         if re.search(r'Common_Get|->block_table|->game_frame|eEC_CLIP|#include|->ut_[xz]',rest):
             raise ValueError('Unconverted GameCube platform access')
-    return '#include "creature_insects.h"\n'+text,changes
+    header='creature_carried.h' if carried else 'creature_insects.h'
+    return '#include "'+header+'"\n'+text,changes
+
+
+def program_source(source,program,*,carried=False):
+    """Bind every complete function once, shared by ordinary and quest insects."""
+    name,prefix,kind,digest=program
+    path=ROOT/f'local/ac-decomp/src/actor/ac_ins_{name}.c'
+    data=path.read_bytes()
+    if sha256(data)!=digest:raise ValueError('Changed pinned insect source: '+name)
+    text=data.decode();converted,edits=rewrite(text,carried=carried)
+    definitions=re.findall(r'\b(?:static|extern)\s+\w+\s+('+prefix+r'_\w+)\([^;]*?\)\s*\{',text)
+    functions=[]
+    for function in definitions:
+        addresses=[at for at,names in source.functions.items() if any(n==function for n,_ in names)]
+        if len(addresses)!=1:raise ValueError('Unbound complete donor function: '+function)
+        functions.append(source.function(addresses[0])[1])
+    if prefix+'_actor_init' not in definitions or prefix+'_actor_move' not in definitions:
+        raise ValueError('Missing insect lifecycle')
+    actual={n for names in source.functions.values() for n,_ in names if n.startswith(prefix+'_')}
+    if actual!=set(definitions):raise ValueError('Incomplete source insect behaviour unit')
+    encoded=converted.encode()
+    return encoded,dict(name=name,kind=kind,source_file=str(path.relative_to(ROOT)),
+        source_sha256=digest,generated_sha256=sha256(encoded),functions=functions,platform_edits=edits)
+
+
+def prepare_carried(source,output,rows,*,reuse=None):
+    """Prepare the carried creature category without rebuilding installed bugs."""
+    from v3_creature_field import convert
+    art=convert(source,output/'field',carried_rows=rows,reuse=reuse)
+    programs=[]
+    expected={r['program_type'] for r in art['objects']}
+    if expected!={p[2] for p in CARRIED_PROGRAMS}:
+        raise ValueError('Unresolved complete carried creature program')
+    for program in CARRIED_PROGRAMS:
+        data,receipt=program_source(source,program,carried=True)
+        receipt['species']=[r['source_index'] for r in art['objects'] if r['program_type']==program[2]]
+        write_new(output/(receipt['name']+'.c'),data)
+        programs.append(receipt)
+    report=dict(format='AFV3-CARRIED-CREATURES-1',field=art,programs=programs,
+        source_substeps=2,native_actor_bytes=0x280,installed=False,selectable=False,
+        pending=['native field tables, billboard drawing, controller and light bindings',
+            'actual spirit capture/release menus and stack-aware net handover',
+            'Wisp event state and independent carried selection'])
+    write_new(output/'carried-creatures.json',(json.dumps(report,indent=2)+'\n').encode())
+    return report
+
+
+def compile_carried(output,report):
+    """Compile the complete category extension, retaining unresolved services.
+
+    Existing insect programs/buffers are linked at their checked installed
+    addresses by the eventual installer, not copied or regenerated here.
+    """
+    flags=['-Os','-EB','-mabi=32','-march=vr4300','-mfix4300','-G0','-mno-abicalls',
+        '-fno-pic','-ffreestanding','-fno-builtin','-fno-common','-fno-stack-protector',
+        '-ffunction-sections','-fdata-sections','-fstack-usage','-Wall','-Wextra','-Werror',
+        '-DAF_INSECT_CARRIED','-DAF_INSECT_REUSE_BUFFERS','-I/source/overlays/v3']
+    commands=['set -eu'];objects=[]
+    inputs=[(p['name'],p['name']+'.c',True) for p in report['programs']]
+    runtime=('creature_carried','creature_carried_draw','creature_insects','creature_insect_state',
+             'creature_insect_environment','creature_insect_pool')
+    inputs += [(n,'/source/overlays/v3/'+n+'.c',False) for n in runtime]
+    for name,path,donor in inputs:
+        objects.append(name+'.o')
+        commands.append(shlex.join(['/n64_toolchain/bin/mips64-elf-gcc',*flags,
+            *(['-Wno-unused-variable','-Wno-unused-parameter'] if donor else []),
+            '-c',path,'-o',name+'.o']))
+    commands.append(shlex.join(['/n64_toolchain/bin/mips64-elf-ld','-EB','-r',*objects,
+        '-o','carried-creatures.o']))
+    commands.append('/n64_toolchain/bin/mips64-elf-nm --undefined-only carried-creatures.o')
+    docker=['docker','run','--rm','--network','none','--user',f'{os.getuid()}:{os.getgid()}',
+        '-v',f'{ROOT}:/source:ro','-v',f'{output.resolve()}:/out','-w','/out',
+        '--entrypoint','/bin/sh',IMAGE,'-c','\n'.join(commands)]
+    result=subprocess.run(docker,capture_output=True,text=True,timeout=60)
+    if result.returncode:raise ValueError('Carried creature compiler failed:\n'+result.stderr)
+    report['compiled']=dict(file='carried-creatures.o',
+        sha256=sha256((output/'carried-creatures.o').read_bytes()),flags=flags,toolchain=IMAGE,
+        runtime_sources={f'overlays/v3/{n}.c':sha256((ROOT/f'overlays/v3/{n}.c').read_bytes()) for n in runtime},
+        unbound_engine_adapters=[line.split()[-1] for line in result.stdout.splitlines()])
+    write_new(output/'compiled.json',(json.dumps(report,indent=2)+'\n').encode())
+    return report
+
+
+def link_carried(image,prior,output,report,ram,limit):
+    """Bind complete code to retained insect services and checked native bodies.
+
+    This prepares installation; it does not redirect active cartridge callers.
+    The old program buffers are reused, not allocated a second time.
+    """
+    if ram&15 or limit&15 or not 0x80400000<=ram<limit<=0x80800000:
+        raise ValueError('Invalid carried creature link reservation')
+    tree=prior['equipment_resources']['scenery']['tree_effects'];tree_packet=tree['packet']
+    retained_tree=image[tree_packet['physical']:tree_packet['physical']+tree_packet['bytes']]
+    if (ram!=0x80784000 or limit!=0x80786400 or tree_packet['ram']!=0x80780000 or
+            tree_packet['bytes']!=0x8000 or tree['code']['bytes']>0x4000 or
+            sha256(retained_tree)!=tree_packet['sha256'] or any(retained_tree[0x4000:0x7000])):
+        raise ValueError('Carried creature code requires checked unused tree startup padding')
+    old=prior['equipment_resources']['creature_insects'];p=old['packet']
+    raw=image[p['physical']:p['physical']+p['bytes']]
+    if sha256(raw)!=p['sha256']:raise ValueError('Changed installed complete insect packet')
+    retained=ROOT/old['prepared_directory'];local='/source/'+str(retained.relative_to(ROOT))
+    docker=['docker','run','--rm','--network','none','--user',f'{os.getuid()}:{os.getgid()}',
+        '-v',f'{ROOT}:/source:ro','-v',f'{output.resolve()}:/out','-w','/out','--entrypoint','/bin/sh',IMAGE,'-c']
+    commands=[shlex.join(['/n64_toolchain/bin/mips64-elf-objcopy','-O','binary',
+        '-j','.text','-j','.rodata','-j','.data',local+'/programs.elf','retained-code.bin']),
+        shlex.join(['/n64_toolchain/bin/mips64-elf-nm','-S','--defined-only',local+'/programs.elf'])]
+    result=subprocess.run([*docker,'set -eu\n'+'\n'.join(commands)],capture_output=True,text=True,timeout=60)
+    if result.returncode:raise ValueError(result.stderr)
+    code=(output/'retained-code.bin').read_bytes()
+    if len(code)>old['compiled']['bss_start']-p['ram']:
+        raise ValueError('Retained insect symbols exceed the installed executable')
+    symbols={};sizes={}
+    for line in result.stdout.splitlines():
+        fields=line.split();symbols[fields[-1]]=int(fields[0],16)
+        if len(fields)==4:sizes[fields[-1]]=int(fields[1],16)
+    buffer=symbols['programs'];buffer_size=6*0x1C00
+    if not old['compiled']['bss_start']<=buffer<buffer+buffer_size<=p['ram']+old['compiled']['bytes']:
+        raise ValueError('Retained native program buffers escape their allocation')
+    symbols.update(af_insect_retained_program_buffers=buffer,
+        af_carried_quantity=prior['equipment_resources']['carried_items']['code']['symbols']['af_carried_quantity'],
+        af_carried_prior_graphics_load=prior['equipment_resources']['creature_field']['compiled']['symbols']['af_v3_creature_graphics_load'],
+        af_carried_field_info=0x80786C00,af_carried_segments=0x801458A0)
+    native={'Global_light_list_delete':0x8009BBEC,'Global_light_list_new':0x8009BB8C,
+        'Light_point_ct':0x8009B23C,'add_calc_short_angle2':0x8009A974,'sqrtf':0x80033470,
+        'search_position_angleY':0x8009A2F8,'search_position_distanceXZ':0x8009A2B0,
+        'af_carried_matrix_put':0x800E0284,'af_carried_matrix_position':0x800E141C,
+        'af_carried_matrix_translate':0x800E0314,'af_carried_matrix_scale':0x800E041C,
+        'af_carried_matrix_x':0x800E0500,'af_carried_matrix_y':0x800E0698,'af_carried_matrix_z':0x800E0834,
+        'af_carried_matrix_new':0x800E13C4,'af_carried_shadow':0x80059A94,'af_carried_fault':0x80029AB4,
+        'memcpy':0x80034BF8}
+    original=verified_rom((ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes())
+    before_files,current_files=by_vrom(original),by_vrom(image)
+    definitions=''.join((ROOT/f'upstream/af/linker_scripts/jp/symbol_addrs_{part}.txt').read_text()
+        for part in ('boot','code','libultra'))
+    starts=sorted({int(x,16) for x in re.findall(r'= (0x[0-9A-Fa-f]+); //[^\n]*\btype:func',definitions)})
+    checked=[]
+    for name,start in native.items():
+        if start not in starts:raise ValueError('Unknown native carried creature function')
+        end=next(at for at in starts if at>start)
+        vrom,base=(0x1060,0x80025C60) if start<CODE_RAM else (CODE_VROM,CODE_RAM)
+        a=before_files[vrom].extract(original)[start-base:end-base]
+        b=current_files[vrom].extract(image)[start-base:end-base]
+        if not a or a!=b:raise ValueError('Changed complete native service: '+name)
+        checked.append(dict(symbol=name,address=start,end=end,sha256=sha256(a)))
+    symbols.update(native)
+    needed=report['compiled']['unbound_engine_adapters']
+    missing=set(needed)-symbols.keys()
+    if missing:raise ValueError('Unbound carried creature services: '+', '.join(sorted(missing)))
+    bindings={n:symbols[n] for n in needed}
+    retained_functions=[]
+    def retain(name,address):
+        if not p['ram']<=address<p['ram']+len(code):return
+        size=sizes.get(name,0);at=address-p['ram']
+        if not size or at+size>len(code) or code[at:at+size]!=raw[at:at+size]:
+            raise ValueError('Changed complete retained insect function: '+name)
+        retained_functions.append(dict(symbol=name,address=address,bytes=size,sha256=sha256(raw[at:at+size])))
+    for name,address in bindings.items():retain(name,address)
+    commands=[shlex.join(['/n64_toolchain/bin/mips64-elf-ld','-EB',
+        f'--defsym=AF_INSECT_RAM={ram}',f'--defsym=AF_INSECT_LIMIT={limit}',
+        *[f'--defsym={n}={v}' for n,v in bindings.items()],
+        '-T','/source/overlays/v3/creature_insects.ld','carried-creatures.o','-o','carried-creatures.elf']),
+        '/n64_toolchain/bin/mips64-elf-objcopy -O binary -j .text -j .rodata -j .data carried-creatures.elf carried-code.bin',
+        '/n64_toolchain/bin/mips64-elf-nm --defined-only --extern-only carried-creatures.elf']
+    result=subprocess.run([*docker,'set -eu\n'+'\n'.join(commands)],capture_output=True,text=True,timeout=60)
+    if result.returncode:raise ValueError(result.stderr)
+    entries=[line.split() for line in result.stdout.splitlines()]
+    linked={n:int(a,16) for a,k,n in entries}
+    functions={n for a,k,n in entries if k=='T'}
+    redirects=[]
+    for name,address in linked.items():
+        if ram<=address<limit and name in symbols and name in functions:
+            retain(name,symbols[name])
+            redirects.append(dict(symbol=name,previous=symbols[name],target=address))
+    data=(output/'carried-code.bin').read_bytes();end=linked['af_insect_runtime_end'];bss=linked['af_insect_bss_start']
+    if len(data)>bss-ram or not ram<bss<=end<=limit:raise ValueError('Invalid carried runtime sections')
+    data+=bytes(end-ram-len(data));write_new(output/'carried-runtime.bin',data)
+    report['linked']=dict(ram=ram,limit=limit,bytes=len(data),bss_start=bss,sha256=sha256(data),
+        file='carried-runtime.bin',symbols=linked,bindings=bindings,native_services=checked,
+        retained_program_buffers=dict(ram=buffer,bytes=buffer_size),
+        retained_functions=retained_functions,required_redirects=redirects,
+        predecessor=dict(ram=p['ram'],bytes=p['bytes'],sha256=p['sha256']),
+        base_sha256=sha256(image),installed=False)
+    write_new(output/'linked.json',(json.dumps(report,indent=2)+'\n').encode())
+    return report
 
 
 def generate(source,output,native):
@@ -408,24 +608,11 @@ def generate(source,output,native):
     if kinds!=[3,12,9,13,11,13,11,10]:
         raise ValueError('Changed donor insect program dispatch')
     programs=[]; generated={}
-    for name,prefix,kind,digest in PROGRAMS:
-        path=ROOT/f'local/ac-decomp/src/actor/ac_ins_{name}.c'
-        data=path.read_bytes()
-        if sha256(data)!=digest: raise ValueError('Changed pinned insect source: '+name)
-        text=data.decode();converted,edits=rewrite(text)
-        functions=[]
-        definitions=re.findall(r'\b(?:static|extern)\s+\w+\s+('+prefix+r'_\w+)\([^;]*?\)\s*\{',text)
-        for function in definitions:
-            addresses=[at for at,names in source.functions.items() if any(n==function for n,_ in names)]
-            if len(addresses)!=1: raise ValueError('Unbound complete donor function: '+function)
-            functions.append(source.function(addresses[0])[1])
-        if prefix+'_actor_init' not in definitions or prefix+'_actor_move' not in definitions:
-            raise ValueError('Missing insect lifecycle')
-        generated[name+'.c']=converted.encode()
-        programs.append(dict(name=name,kind=kind,source_file=str(path.relative_to(ROOT)),
-            source_sha256=digest,generated_sha256=sha256(generated[name+'.c']),
-            functions=functions,platform_edits=edits,
-            species=[r['source_index'] for r,k in zip(rows,kinds,strict=True) if k==kind]))
+    for program in PROGRAMS:
+        data,receipt=program_source(source,program)
+        generated[receipt['name']+'.c']=data
+        receipt['species']=[r['source_index'] for r,k in zip(rows,kinds,strict=True) if k==program[2]]
+        programs.append(receipt)
     output.mkdir(parents=True,exist_ok=False)
     for name,data in generated.items():write_new(output/name,data)
     art,colony=colony_assets(source,output.parent/'colony-assets')
@@ -559,13 +746,32 @@ def main():
     parser.add_argument('--base-lock',type=Path,required=True)
     parser.add_argument('--link-ram',type=lambda x:int(x,0))
     parser.add_argument('--link-limit',type=lambda x:int(x,0))
+    parser.add_argument('--carried-items',type=Path,
+        help='Prepare only field creatures from the installed carried bundle; reuse all ordinary insects')
+    parser.add_argument('--reuse-field',type=Path,help='Reuse the complete checked field objects without compiling graphics')
     args=parser.parse_args()
     if (args.link_ram is None)!=(args.link_limit is None):parser.error('Supply both link bounds')
+    if args.reuse_field and not args.carried_items:parser.error('--reuse-field requires --carried-items')
     from v3_furniture_install import inputs
     image,prior=inputs(args.base_lock)
-    native=native_contract(image,prior)
     source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
                   (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    if args.carried_items:
+        from v3_carried_items import records
+        carried=prior['equipment_resources']['carried_items']
+        if args.carried_items.resolve()!=ROOT/carried['prepared']:
+            raise ValueError('Carried field preparation does not match the installed bundle')
+        prepared=json.loads((args.carried_items/'items.json').read_bytes())
+        rows,receipt=records(source,ROOT/'build/item-identity-megasheet.xlsx',prepared['installed_imports'])
+        if prepared['rows']!=rows or any(prepared[k]!=json.loads(json.dumps(v)) for k,v in receipt.items()):
+            raise ValueError('Changed complete carried source identity')
+        report=compile_carried(args.output,prepare_carried(source,args.output,rows,reuse=args.reuse_field))
+        if args.link_ram is not None:
+            report=link_carried(image,prior,args.output,report,args.link_ram,args.link_limit)
+        print(json.dumps(dict(programs=len(report['programs']),field=report['field']['counts'],
+            unbound_engine_adapters=report['compiled']['unbound_engine_adapters'],installed=False),indent=2))
+        return
+    native=native_contract(image,prior)
     from v3_creature_insect_audio import write_prepared
     report=generate(source,args.output,native)
     report['field_audio']=write_prepared(image,prior,source,args.output/'field-audio')

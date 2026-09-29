@@ -90,8 +90,33 @@ owner/relocation, profile-retention, startup, and patch checks pass. The current
 cartridge agrees across seven browser/offline profiles, including exact empty
 V2-14. The 21-packet bootstrap occupies 656 of its 688 reserved bytes. Native
 effect rendering/gameplay and hardware remain unverified. Continue the same
-carried-item task with sign-board and spirit field consumers, then independent
+carried-item task with the remaining sign-board/spirit consumers and independent
 admission; do not reconvert the tree artwork or replay unchanged checks.
+
+The shared creature importer includes the complete spirit field behaviour:
+all fifteen donor functions, both full billboard models, four animation entries,
+native lighting, held animation, escape, and light cleanup on scene teardown.
+The existing insect controller/buffers are reused. Code, artwork, and the three
+expanded 41-entry tables fit checked padding inside the tree startup packet;
+the original tree code/page directory and all forty preceding insect entries
+remain intact. This adds no resident allocation or startup descriptor.
+
+The connected capture path merges into a non-full spirit stack before using an
+empty pocket. Release removes one spirit, retains the rest, and requests the
+native release animation. Indoor menus prohibit cage placement; protected and
+unrelated items retain their native handlers. Five complete official GameCube
+catch messages and the donor's empty sixth record retain their wording, line
+breaks, colours, and pauses, with credits in the single source catalogue.
+The shared text allocator slides an index inside existing text-owned space when
+a bank grows, avoiding a needless large relocation. Capture/menu code occupies
+1,456 bytes of existing carried padding and adds no RAM or saved fields.
+
+Focused source, sanitized lifecycle/drawing/interaction, current cartridge,
+relocation, complete text retention, 21 startup CRC, and patch checks pass.
+Seven current browser/offline profiles agree; empty selection remains V2-14.
+These are not native gameplay or hardware results. Actual Wisp event ownership,
+spirit transfer restrictions, sign-board designs/placement, and independent
+carried selections remain unfinished; all seven family readiness bits stay off.
 
 The shared carried-item importer installs the remaining seven parent families
 and all 26 states together, with readiness and selection still off. Its checked
@@ -132,9 +157,9 @@ rendering or gameplay/save verification. Remaining item-specific field behaviour
 and independent selection remain the same connected task. See
 [the carried-item contract](../specs/V3_CARRIED_ITEMS.md).
 
-The current proposal is ABI 360 at
-`build/v3-tree-effects-work-01/installed-10/build-lock.json`, ROM SHA-256
-`e73727b589bb498c6f0da667f9f50b2921a2877509cce5f7e9fcf797a05d4148`.
+The current proposal is ABI 362 at
+`build/v3-carried-field-work-01/interactions-04/build-lock.json`, ROM SHA-256
+`3b35d48e837d5e500ea040fa07290a8c6ba3afff60528c09038937f87cdffbdc`.
 It contains 207 independently selectable development imports, including all
 sixteen diary styles, all nine fish, and eight insects. Another 100 furniture
 profiles await acquisition. The main lock and both stable V2-14 deployments

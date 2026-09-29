@@ -48,8 +48,24 @@ def frame_roots(source, pointer, category):
     return frames, receipt
 
 
-def discover(source):
-    parents, identity = source_records(source)
+def discover(source, *, carried_rows=None):
+    if carried_rows is None:
+        parents, identity = source_records(source)
+    else:
+        # Quest creatures use the same complete frame/program tables, but are
+        # not museum insects or cage furniture. Quantity states share a parent.
+        from v3_registry import CARRIED_ITEMS
+        parents=[]
+        for row in carried_rows:
+            item=int(row['donor_item_id'],16)
+            if item>>8!=0x2D or row['state_index']:
+                continue
+            if item not in CARRIED_ITEMS or item<0x2D28:
+                raise ValueError('Unknown additional carried-creature identity')
+            parents.append(dict(source_index=item&255,category='insect',
+                item_id=f'{CARRIED_ITEMS[item]:04X}',source_item_id=f'{item:04X}',
+                display_item_id=None,name=row['name']))
+        identity=dict(rel_sha256=sha256(source.rel),symbols_sha256=sha256(source.symbols.encode()))
     tables = {}; fish = []
     for address in FISH_TABLES:
         _, receipt = table(source,address,45*4,'aGYO_displayList')
@@ -116,17 +132,36 @@ def discover(source):
                             object_bytes=sum(r['object_bytes'] for r in rows)))
 
 
-def convert(source, output):
-    inventory = discover(source)
+def convert(source, output, *, carried_rows=None, reuse=None):
+    inventory = discover(source,carried_rows=carried_rows)
     prepared = {r['item_id']:prepare_models(source,r['descriptor']) for r in inventory['rows']}
     output.mkdir(parents=True,exist_ok=False)
-    jobs = []
+    jobs = []; compiled={}
+    previous=json.loads((reuse/'art.json').read_bytes()) if reuse else None
+    if previous and (previous['format']!=FORMAT or
+            previous['inventory']!=json.loads(json.dumps(inventory))):
+        raise ValueError('Reusable field objects do not match the complete source category')
     for item, part in prepared.items():
         directory = output/item; directory.mkdir()
         command_file = directory/'commands.c'; write_new(command_file,part[5].encode())
-        jobs.append((item,command_file,part[6]))
+        if previous:
+            row=next(r for r in previous['objects'] if r['item_id']==item)
+            old=(reuse/row['object_file']).read_bytes()
+            if (sha256(old)!=row['object_sha256'] or len(old)!=row['object_bytes'] or
+                    old[:len(part[1])]!=part[1] or row['resources']!=part[2] or
+                    (reuse/item/'commands.c').read_text()!=part[5]):
+                raise ValueError('Changed reusable complete field model')
+            code={m['layer']:old[m['native_offset']:m['native_offset']+m['bytes']] for m in row['models']}
+            if any(sha256(code[m['layer']])!=m['output_sha256'] for m in row['models']):
+                raise ValueError('Changed reusable field display list')
+            assembled,offsets,models,_=assemble_models(part,code)
+            if assembled!=old or offsets!=row['model_offsets'] or models!=row['models']:
+                raise ValueError('Reusable field assembly does not match complete resources')
+            compiled[item]=code
+        else:
+            jobs.append((item,command_file,part[6]))
     # One container invocation for the complete category, not one per species.
-    compiled = compile_commands_batch(output/'compiled',jobs)
+    if jobs:compiled.update(compile_commands_batch(output/'compiled',jobs))
     objects = []
     for row in inventory['rows']:
         item = row['item_id']; part = prepared[item]

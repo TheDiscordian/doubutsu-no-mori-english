@@ -154,12 +154,19 @@ def split_placements(image,files,loaded,physical_resources,reserved_end):
         else:runs.append((lo,hi))
     scratch=bytearray(image);placements=[];reservations=list(physical_resources)
     for v,data in sorted(loaded.items(),key=lambda pair:len(pair[1]),reverse=True):
-        lo=files[v].pstart;hi=lo+len(data)
-        if (any(a<=lo<hi<=b for a,b in runs) and
-                not any(r['physical']<hi and lo<r['physical']+r['bytes'] for r in placements)):
-            target=lo
-        else:
-            row=allocate(scratch,reservations,data,f'English-text-{v:08X}',best_fit=True)
+        # Preserve the original position when possible; a grown message bank
+        # may otherwise displace its index by only a few hundred bytes. Pack
+        # that complete index inside the checked old text ownership before
+        # looking for an entirely separate large free block. All bank contents
+        # are already buffered, so overlapping old/new positions are safe.
+        candidates=[files[v].pstart,*[a for a,_ in runs],
+            *[r['physical']+r['bytes'] for r in placements]]
+        target=next((lo for lo in candidates if lo%16==0 and
+            any(a<=lo<lo+len(data)<=b for a,b in runs) and
+            not any(r['physical']<lo+len(data) and lo<r['physical']+r['bytes'] for r in placements)),None)
+        if target is None:
+            row=allocate(scratch,reservations,data,f'English-text-{v:08X}',best_fit=True,
+                minimum_physical=max(0x100000,reserved_end))
             target=row['physical']
             if target<reserved_end:raise ValueError('Relocated text overlaps reserved imports')
             scratch[target:target+len(data)]=data;reservations.append(row)

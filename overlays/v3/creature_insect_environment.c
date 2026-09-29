@@ -79,14 +79,16 @@ void af_insect_environment(aINS_INSECT_ACTOR *insect,GAME *game) {
 static void destruct(aINS_INSECT_ACTOR *insect,GAME *game) {
     if (!insect->exist_flag) return;
     insect->exist_flag=0;
-    /* None of the additions owns the native firefly light. */
+#ifdef AF_INSECT_CARRIED
+    af_carried_insect_light_delete(insect,game);
+#endif
     af_insect_pipe_destroy(game,insect->col_pipe);
 }
 
 /* Hook before the old slot update/cull: 0 = execute original instructions;
  * 1 = this added slot is handled; -1 = invalid added-slot ownership. */
 int af_v3_insect_slot(aINS_INSECT_ACTOR *insect,GAME *game) {
-    if (!insect || (unsigned)insect->type-32u>=8) return 0;
+    if (!insect || (unsigned)insect->type-32u>=AF_IMPORTED_INSECT_COUNT) return 0;
     if (!game || !af_insect_extra(insect)) return -1;
     if (insect->exist_flag!=1) return 1;
     ACTOR *actor=(ACTOR *)insect;

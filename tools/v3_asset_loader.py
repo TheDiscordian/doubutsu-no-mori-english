@@ -86,6 +86,7 @@ def compile_part(part, out, extra_sources=(), defines=(), primary_source=None, l
         *(['-j', '.fallbacks'] if part=='scenery_bootstrap' else []), 'code.elf', 'code.bin')
     code = (out / 'code.bin').read_bytes()
     entry, expected = {'tree_effects': ('af_tree_ready', 0x80780000),
+                      'carried_interactions': ('af_carried_interaction_menu', 0x80772070),
                       'carried_items': ('af_carried_name', 0x80771000),
                       'carried_catalogue': ('af_carried_catalogue_bit', (link_symbols or {}).get('AF_CARRIED_CATALOGUE_RAM',0)),
                       'holiday_selection': ('af_holiday_world_bind', (link_symbols or {}).get('AF_HS_LINK_RAM',0)),

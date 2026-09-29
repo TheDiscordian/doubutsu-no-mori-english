@@ -3,12 +3,22 @@
 #include "creature_insect_manager.h"
 static AfInsectController *pool;
 static void (*native_setup)(AfInsectInit *,int);
+#ifdef AF_INSECT_REUSE_BUFFERS
+extern u8 af_insect_retained_program_buffers[AF_INSECT_SLOTS-3][0x1C00];
+#define programs af_insect_retained_program_buffers
+#else
 static u8 programs[AF_INSECT_SLOTS-3][0x1C00] __attribute__((aligned(16)));
+#endif
 
 static ACTOR *make(AfInsectInit *init,int release) {
     unsigned mode=*(const volatile u32 *)&af_v3_insect_spawn_mode;
     if (!pool || !native_setup || pool->native_bank<0 || !init || !init->game ||
-            mode>1 || (release!=0 && release!=1) || (unsigned)init->type>=40) return NULL;
+            mode>1 || (release!=0 && release!=1) || (unsigned)init->type>=32+AF_IMPORTED_INSECT_COUNT) return NULL;
+#ifdef AF_INSECT_CARRIED
+    if (init->type>=40) {
+        if (!af_carried_creature_enabled(init->type)) return NULL;
+    } else
+#endif
     if (init->type>=32) {
         unsigned bit=(unsigned)init->type-32+9;
         if (!(af_v3_creature_profile_byte(bit/8)&(1u<<(bit&7)))) return NULL;

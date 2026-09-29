@@ -1241,6 +1241,9 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
     if creature_fish and equipment_report:
         from v3_creature_ui import finish as finish_creature_text
         result=finish_creature_text(result,base,prior,output,equipment_report)
+    if carried_items is not None and equipment_report:
+        from v3_carried_runtime import finish as finish_carried_text
+        result=finish_carried_text(result,base,prior,output,equipment_report)
     installed=by_vrom(result)
     for vrom,data in owner_changes.items():
         target=next((r.get('target_vrom',vrom) for r in owner_moves if r['vrom']==vrom),vrom)
@@ -1594,11 +1597,19 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         previous_carried=prior['equipment_resources'].get('carried_items',{})
         new_storage=storage and not previous_carried.get('storage')
         new_actions=actions and not previous_carried.get('actions')
+        new_field=carried.get('field_creatures') and not previous_carried.get('field_creatures')
         report['shared_runtime_refresh'].update(adapters=['carried_items'],artwork_changed=not bool(actions),
             additional_resident_bytes=storage['additional_resident_bytes'] if new_storage else 0 if actions else carried['additional_resident_bytes'],
             resource_allocations_changed=not bool(previous_carried.get('storage')),
             saved_format_changed=bool(new_storage),saved_profile_changed=bool(new_storage),
             changed_owner_moves=owner_moves)
+        if new_field:
+            report['shared_runtime_refresh'].update(artwork_changed=True,resource_allocations_changed=True,
+                additional_resident_bytes=carried['field_creatures']['additional_resident_bytes'])
+            report['shared_runtime_refresh']['adapters'].append('carried_creature_field')
+        if carried.get('interactions') and not previous_carried.get('interactions'):
+            report['shared_runtime_refresh']['resource_allocations_changed']=True
+            report['shared_runtime_refresh']['adapters'].append('carried_interactions')
         if actions:
             report['shared_runtime_refresh']['additional_menu_bytes']=(carried['paper']['catalogue']['additional_menu_bytes']
                 if new_storage else actions['additional_menu_bytes'] if new_actions else 0)

@@ -152,7 +152,9 @@ unchanged resources:
 
 1. Connect the remaining actual item interactions: sign-board placement/design
    handling; card stamping/menu behaviour;
-   Harvest cutlery interaction; spirit capture/release and field behaviour.
+   Harvest cutlery interaction; spirit inventory transfer restrictions and
+   actual Wisp event ownership. Spirit field/capture/release uses the installed
+   shared category consumers below.
    Coconut eating/planting, cedar planting/growth, and complete tree leaf/cut
    effects use the installed shared consumers.
    Preserve the installed event/card/cutlery paths. Item-specific behaviour is
@@ -189,9 +191,9 @@ The original drop routine performs the actual swap/animation and refresh:
 the combined stack goes into the pocket, overflow remains in hand, and a full
 stack or unrelated item follows the unchanged native exchange path. The common
 single-pickup handler fills native hand fields and decrements the pocket without
-passing a donor quantity into native ticket arithmetic. Spirit field interaction
-and its eventual menu admission remain pending; stack helpers alone do not
-make spirits usable.
+passing a donor quantity into native ticket arithmetic. Spirit field/capture/
+release consumers are installed below; actual event ownership and independent
+admission remain pending.
 
 Only the letter confirmation branch's inventory-setter call at `80889434` uses
 the paper-consumption adapter. It subtracts one sheet from all four imported
@@ -296,6 +298,59 @@ handling, angles, and animation. Source-based growth, actual coastal/elevation
 conditions, death, regeneration, collision, and shaking/cutting share the
 [tree-family contract](V3_SCENERY.md#connected-family-behaviours).
 
+### Carried creatures and native capture/release
+
+The same field/program converters accept carried-category records without
+assigning museum or furniture identities. The complete prepared source and
+artwork are in `build/v3-carried-field-prepared-04/`: fifteen pinned `aIHD`
+functions and both complete spirit models, 1,440 bytes with four animation
+entries (`a,a,b,b`). Native light fields retain the original `0x280` actor size.
+The shared update keeps source floating velocity, two donor ticks per native
+update, net-held animation, escape/fade, and light cleanup on actor destruction
+and scene teardown. All eight preceding imported insect programs are retained.
+
+The 7,536-byte linked field code begins at `80784000`; artwork begins at
+`80786400`. Three 41-entry field tables begin at `80786A00`, followed by four
+frame pointers and the checked eight-word resource descriptor at `80786C00`.
+The `80784000..80787000` span occupies verified padding in the existing tree
+startup packet, retaining the original tree code and page directory. The loader
+copies the complete spirit resource into the existing native field buffer;
+the draw adapter uses the native held transform, billboard, and translucent
+command arena. Other insects delegate to the complete relocated native helper.
+Twenty-one stable insect entries redirect to the shared extended lifecycle.
+The original extra program buffers are reused, not allocated again.
+
+The event bridge accepts the real 44-byte ghost common state and event status.
+It checks `RUN` and `ERROR` independently and exposes all five acre records.
+No installed event owner calls the bridge yet. Unbound means inactive, never an
+invented running event; event ownership remains required before selection.
+
+The 1,456-byte interaction adapter occupies `80772070..80772620`, inside carried
+padding after the food tables. Native menu selection at `80875834` retains the
+previous complete reader chain and uses release outdoors/catch-only indoors for
+spirits, preserving protected/multi-mark results. Both native release action
+pointers use the shared handler; the original handler remains available for
+unrelated items. Release decrements a spirit stack by one, keeps the native menu
+closing/animation path, and requests insect type 40. Spirits never gain a cage.
+
+The two actual net calls at `808CD518/808CD548` use stack-aware pocket selection
+and item insertion. A compatible ordinary stack wins before an empty slot;
+protected or full stacks are not overwritten. The complete native insertion
+routine performs the mutation. Existing collection/last-catch adapters exclude
+type 40. The catch-message bridge at `808CD070` selects the donor's message by
+the first ordinary spirit stack already carried, or the initial message when
+none is present. Original creatures retain their complete message adapter.
+
+Messages `331A..331F` preserve official donor `2F03..2F08`: five count-specific
+messages and the source's empty final record. The single provenance catalogue
+credits each record. No words, line breaks, pauses, or colours are rewritten.
+The shared text placer first packs displaced complete banks within existing
+text ownership, retaining buffered contents before overlapping moves; only a
+bank that no longer fits is allocated elsewhere. All old messages and choices
+remain intact. No new resident allocation, startup descriptor, owner allocation,
+or saved field is needed. The current ABI-362 artifact is
+`build/v3-carried-field-work-01/interactions-04/build-lock.json`.
+
 ## Verification and limits
 
 `tests/test_v3_carried_items.py` covers complete state discovery, official names,
@@ -334,6 +389,17 @@ bindings/rejection, all food entries, unchanged native instructions, relocation
 at two bases, complete packet/artwork/save retention, startup CRCs, and patch
 reconstruction. Current seven-profile browser/offline outputs agree. These
 checks do not execute an ordinary eating animation or native save cycle.
+
+`tests/test_v3_carried_creatures.py` checks complete source/model preparation,
+sanitized full spirit lifecycle and retained eight-species behaviour, both
+billboard poses while held/free, native loader delegation, stack-aware net
+handover, protected menus, one-at-a-time release, and official message selection.
+Changed-cartridge checks cover exact caller/relocation changes, retained tree
+and insect packets, all startup CRCs, full old/new text, and UPS reconstruction.
+The text-placement fixture covers moving a complete index within its original
+owned bank range. Seven current browser/offline profiles agree, including
+empty V2-14. No ordinary native capture, release, event gameplay, or hardware
+verification is claimed. Transfer restrictions and Wisp ownership remain open.
 
 The current build uses saved format 16. Compatible older saves migrate forward;
 V2 and format-15-or-earlier V3 cannot read new saves. Profiles missing required

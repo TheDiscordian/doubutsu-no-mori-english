@@ -54,7 +54,7 @@ int af_v3_insect_event(int action,int x,int z) {
 }
 
 float af_v3_insect_catch_range(const aINS_INSECT_ACTOR *insect) {
-    if (!insect || (unsigned)insect->type-32u>=8) return -1.0f;
+    if (!insect || (unsigned)insect->type-32u>=AF_IMPORTED_INSECT_COUNT) return -1.0f;
     /* All eight use the donor's ordinary 8-unit range. A source action sets
      * bit_1 while uncatchable (hidden tree insects, escape, dive, or drowning). */
     return insect->insect_flags.bit_1?0.0f:8.0f;

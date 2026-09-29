@@ -3,11 +3,14 @@
 #include "creature_insect_engine.h"
 
 int af_v3_insect_init(aINS_INSECT_ACTOR *insect,GAME *game) {
-    static const mActor_proc init[8]={
+    static const mActor_proc init[AF_IMPORTED_INSECT_COUNT]={
         aITT_actor_init,aIKR_actor_init,aIAB_actor_init,aIMN_actor_init,
-        aIDG_actor_init,aIMN_actor_init,aIDG_actor_init,aIKA_actor_init
+        aIDG_actor_init,aIMN_actor_init,aIDG_actor_init,aIKA_actor_init,
+#ifdef AF_INSECT_CARRIED
+        aIHD_actor_init
+#endif
     };
-    if (!insect || (unsigned)insect->type-32u>=8) return 0;
+    if (!insect || (unsigned)insect->type-32u>=AF_IMPORTED_INSECT_COUNT) return 0;
     AfInsectExtra *extra=af_insect_extra(insect);
     if (!extra) return -1;
     extra->ut_x=extra->ut_z=-1;
@@ -30,13 +33,13 @@ void af_v3_insect_position(ACTOR *actor) {
     chase_f(&actor->speed,insect->target_speed,insect->speed_step*0.5f);
     actor->position_speed.x=actor->speed*sin_s(actor->world.angle.y);
     actor->position_speed.z=actor->speed*cos_s(actor->world.angle.y);
-    if (insect->type!=aINS_INSECT_TYPE_MOSQUITO)
+    if (insect->type!=aINS_INSECT_TYPE_MOSQUITO && insect->type!=aINS_INSECT_TYPE_SPIRIT)
         chase_f(&actor->position_speed.y,actor->max_velocity_y,actor->gravity*0.5f);
     af_insect_position_integrate(actor);
 }
 
 int af_v3_insect_tick(aINS_INSECT_ACTOR *insect,GAME *game) {
-    if (!insect || (unsigned)insect->type-32u>=8) return 0;
+    if (!insect || (unsigned)insect->type-32u>=AF_IMPORTED_INSECT_COUNT) return 0;
     ACTOR *actor=(ACTOR *)insect;
     if (!insect->move_proc || !actor->mv_proc || !af_insect_extra(insect)) return -1;
     /* GC bodies have both half-speed floating increments and 60-Hz integer

@@ -73,6 +73,12 @@ struct ACTOR {
 typedef struct { ACTOR actor_class; } PLAYER_ACTOR;
 typedef void (*aINS_MOVE_PROC)(ACTOR *);
 typedef void (*aINS_ACTION_PROC)(ACTOR *,GAME *);
+typedef struct {
+    u8 type,padding;
+    s16 x,y,z;
+    u8 red,green,blue,glow;
+    s16 radius;
+} AfInsectPointLight;
 typedef struct aINS_INSECT_ACTOR {
     struct { ACTOR actor_class; u8 work[0x44]; int init_matrix; u8 tail[0xC]; } tools_actor;
     int exist_flag,type;
@@ -93,7 +99,10 @@ typedef struct aINS_INSECT_ACTOR {
     f32 f32_work0,f32_work1,f32_work2,f32_work3;
     void *native_program;
     int alpha0,alpha1,alpha2;
-    u8 native_light[0x1C];
+    AfInsectPointLight point_light;
+    void *light_list;
+    int light_flag;
+    s16 light_counter,light_step;
 } aINS_INSECT_ACTOR;
 
 /* Source-only fields do not occupy native collider/object/light storage. */
@@ -153,6 +162,7 @@ void sAdo_OngenPos(u32,u32,xyz_t *),sAdo_OngenTrgStart(u32,xyz_t *);
 #define DEG2SHORT_ANGLE2(x) ((int)((x)*(65536.0f/360.0f)))
 #define DEG2SHORT_ANGLE3(x) ((x)*(65536.0f/360.0f))
 #define RANDOM_F(x) (fqrand()*(x))
+#define RANDOM(x) ((int)RANDOM_F(x))
 #define RANDOM_CENTER_F(x) ((fqrand()-0.5f)*(x))
 #define GET_PLAYER_ACTOR(g) af_insect_player((GAME *)(g))
 #define GET_PLAYER_ACTOR_GAME_ACTOR(g) ((ACTOR *)af_insect_player((GAME *)(g)))
@@ -181,10 +191,18 @@ enum { aINS_PL_ACT_NONE,aINS_PL_ACT_REFLECT_AXE,aINS_PL_ACT_REFLECT_SCOOP,
 enum { aINS_INSECT_TYPE_LADYBUG=24,aINS_INSECT_TYPE_SPOTTED_LADYBUG,aINS_INSECT_TYPE_MANTIS,
        aINS_INSECT_TYPE_SNAIL=32,aINS_INSECT_TYPE_MOLE_CRICKET,aINS_INSECT_TYPE_POND_SKATER,
        aINS_INSECT_TYPE_BAGWORM,aINS_INSECT_TYPE_PILL_BUG,aINS_INSECT_TYPE_SPIDER,
-       aINS_INSECT_TYPE_ANT,aINS_INSECT_TYPE_MOSQUITO };
+       aINS_INSECT_TYPE_ANT,aINS_INSECT_TYPE_MOSQUITO,aINS_INSECT_TYPE_SPIRIT };
 enum { ITM_INSECT24=0x2D18,ITM_INSECT25,ITM_INSECT26,
        ITM_INSECT32=0x2D20,ITM_INSECT33,ITM_INSECT34,ITM_INSECT35,
-       ITM_INSECT36,ITM_INSECT37,ITM_INSECT38,ITM_INSECT39 };
+       ITM_INSECT36,ITM_INSECT37,ITM_INSECT38,ITM_INSECT39,ITM_SPIRIT0 };
+#ifdef AF_INSECT_CARRIED
+#define AF_IMPORTED_INSECT_COUNT 9u
+void aIHD_actor_init(ACTOR *,GAME *);
+int af_carried_creature_enabled(int);
+void af_carried_insect_light_delete(aINS_INSECT_ACTOR *,GAME *);
+#else
+#define AF_IMPORTED_INSECT_COUNT 8u
+#endif
 enum { NA_SE_25=0x25,NA_SE_26=0x26,NA_SE_MOLE_CRICKET_HIDE=0x44,
        NA_SE_MOLE_CRICKET_OUT=0x45,NA_SE_6A=0x6A,NA_SE_KA_BUZZ=0xCF,NA_SE_438=0x438 };
 enum { eEC_EFFECT_TURI_HAMON=69,eEC_EFFECT_TURI_MIZU=70,eEC_EFFECT_DIG_MUD=84 };
@@ -228,6 +246,12 @@ AF_OFFSET(aINS_INSECT_ACTOR,s32_work0,0x234);
 AF_OFFSET(aINS_INSECT_ACTOR,f32_work0,0x244);
 AF_OFFSET(aINS_INSECT_ACTOR,native_program,0x254);
 AF_OFFSET(aINS_INSECT_ACTOR,alpha0,0x258);
+_Static_assert(sizeof(AfInsectPointLight)==14,"native point light size");
+AF_OFFSET(aINS_INSECT_ACTOR,point_light,0x264);
+AF_OFFSET(aINS_INSECT_ACTOR,light_list,0x274);
+AF_OFFSET(aINS_INSECT_ACTOR,light_flag,0x278);
+AF_OFFSET(aINS_INSECT_ACTOR,light_counter,0x27C);
+AF_OFFSET(aINS_INSECT_ACTOR,light_step,0x27E);
 #undef AF_OFFSET
 #endif
 #endif
