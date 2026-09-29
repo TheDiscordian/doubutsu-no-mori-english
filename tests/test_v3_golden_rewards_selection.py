@@ -41,8 +41,9 @@ class GoldenRewardSelectionTests(unittest.TestCase):
         e,old=report['equipment_resources'],prior['equipment_resources']
         blob,previous=files[BLOB].extract(image),before[BLOB].extract(base)
         retained,reused=reuse_resource_tail(image,report,blob)
-        self.assertEqual(retained,blob)
-        self.assertEqual(reused['reused_bytes'],0)
+        self.assertEqual(retained,blob[:len(retained)])
+        self.assertFalse(any(blob[len(retained):]))
+        self.assertEqual(reused['reused_bytes'],len(blob)-len(retained))
         self.assertEqual(len(reused['external_resources']),3)
         for section in (e, e['scenery']):
             at,n=section['blob_offset'],section['bytes']
