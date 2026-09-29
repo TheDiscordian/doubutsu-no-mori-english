@@ -78,21 +78,28 @@ renderer or new light-record allocation is needed.
 The loader validates the full bank before writes, updates every seasonal palette,
 retains descriptor flags, binds the native light callback only in Xmas, and gates
 each family through its actual item selector. Version-one banks remain supported.
-The complete shared runtime compiles to 10,484 bytes within its existing
-12-KiB reservation at
-`build/v3-carried-runtime-work-01/tree-runtime-02/`; that compilation uses the
-retained gold configuration and is not an installed tree-family cartridge.
+The installed shared runtime occupies 10,888 bytes within its existing 12-KiB
+reservation. `build/v3-carried-runtime-work-01/trees-connected-05/` contains the
+current ABI-356 cartridge and its complete checked configuration.
 
 ### Remaining connection and verification
 
-The current cartridge remains ABI 355. Its ground tables have 107/108 entries
-and insufficient free slots for these additional descriptors. Extend the shared
-table, all four per-actor index arrays, and the native temporary stack arrays
-together. Preserve the common matrix nodes and Xmas light records. Update the
-ground/scenery configurations and checked allocation descriptors; account for
-the later diary/carried descriptor allocations instead of trusting the older
-gold bank's end as the current owner size. Then install the prepared banks and
-rebind the existing shared runtime callers in one refresh.
+The shared table, all four per-actor index arrays, native temporary stack, and
+ground/scenery configurations are installed together. The tables contain 140
+entries, or 139 for winter. The complete bank descriptors occupy the appended
+range starting at 108, or 107 for winter. Native matrix nodes and Xmas light
+records remain in place. Each actor gains 256 bytes; the temporary stack frame
+is 328 bytes. Owner allocations are 149,024/149,168/151,632/148,960 bytes in
+native cherry/winter/Xmas/ordinary order. Including actor growth, additional
+active-scene memory is 72,512 bytes, or 73,936 for Xmas; fixed resident memory
+does not grow. Native scene-memory/gameplay acceptance remains unverified.
+
+All installed seasonal, daily, world, player, field-insect, and camera bindings
+target the refreshed exports. The newer insect shake adapter remains in the call
+chain; its data-held bee-query pointer and startup checksum are rebound too.
+Other instructions, initialized resources, and relocation ordering are retained.
+The same refresh accepts already-installed families, verifies their complete
+artwork, and reuses the allocations for subsequent behaviour changes.
 
 Complete planting/eating, growth and death, fruit regeneration, cedar regional
 rules, collision/digging, cutting/shaking, hidden contents, field habitats, and
@@ -103,10 +110,15 @@ carried-family composition remain part of the same importing task.
 `tests/test_v3_carried_trees.py` covers the full source graph and artwork, packed
 dependencies, all three palette banks, retained descriptor flags, native light
 binding, every family-selection combination, and rejection before mutation.
-Four focused checks pass; the changed version-one loader host check also passes.
-The prepared-bundle reuse run launches no compiler. These checks and MIPS
-compilation do not establish native rendering, gameplay, saving, or hardware
-compatibility. No old ROM or exhausted native fixture needs a replay.
+The prepared graph/artwork checks remain retained. Five changed-path checks pass
+for the installed allocation/relocation, complete bank reconstruction, all moved
+callers, startup checksums, page-reader bounds, and refresh reuse. Seven current
+browser/offline profiles agree, including exact empty-selection V2-14. The final
+source-pinned build reproduces the tested cartridge SHA-256
+`b14f36b68fa27b69c8b195330bbc8bf8008eec7e41581d9b1b34e1e1859228e6`;
+unchanged checks are not rerun just for the build-directory change. These checks
+and MIPS compilation do not establish native rendering, gameplay, saving, or
+hardware compatibility. No old ROM or exhausted native fixture needs a replay.
 
 ## Complete source graph
 
@@ -159,23 +171,40 @@ it does not reconvert the models or add individual-item definitions.
 
 ```sh
 python3 tools/v3_furniture_install.py --refresh-runtime \
-  --scenery-art build/v3-scenery-gold-tree-01 \
-  --base-lock build/v3-shared-balloon-menu-04/build-lock.json \
-  --output build/scenery-runtime
+  --scenery-art build/v3-carried-trees-prepared-02 \
+  --base-lock build/v3-carried-runtime-work-01/trees-connected-05/build-lock.json \
+  --output build/NEW-SCENERY-RUNTIME
 ```
 
-Each seasonal owner owns one 32,864-byte bank appended to its BSS. The nineteen
-objects retain complete vertices, textures, material/geometry lists, descriptors,
-position arrays, and adjusted-shadow dependencies. Three cartridge banks cover
-the four owners; Xmas shares winter. Verified retired module copies supply
-cartridge storage, with explicit live reservations preventing subsequent reuse.
-The import blob and its DMA identity do not grow or overlap English choices.
+Each seasonal owner owns one complete bank in its BSS: 105,216 bytes for cherry,
+ordinary, and winter, and 106,640 for Xmas. All vertices, textures,
+material/geometry lists, descriptors, position arrays, and adjusted-shadow
+dependencies remain complete. The shared category constructor owns the moved
+table and held-item descriptors after that bank. Original initialized data is
+unchanged; no actor matrix node or Christmas-light record is moved.
+
+The four banks deduplicate to 63 pages, up to 4 KiB each, in a 250,832-byte
+physical cartridge resource including four 144-byte page directories.
+A directory has magic `AFPG`,
+full bank length, page size 4096, page count, and up to 32 physical page addresses.
+The scenery configuration tags this directory with bit 30, while bit 31 selects
+the existing native physical-DMA reader. The loader strips bit 30, validates all
+source extents before destination writes, transfers each page including its
+complete final partial page, and checks the reconstructed bank's original CRC.
+Ordinary unpaged banks retain the existing loading path.
+
+Allocation checks every live DMA mapping and declared physical reservation.
+When a free gap contains retired nonzero data, only aligned, entirely zero spans
+within that gap qualify; neither retired data nor zero padding inside a live
+resource is overwritten. The bank packet fits one such verified span. Existing
+retired-module reservations continue to protect the shared code. The import blob
+and its DMA identity do not grow or overlap English choices.
 
 The equipment module retains its size and guards. Its
 `804ADC90..804ADFEF` range contains an 848-byte bootstrap and native fallback
 stubs, bounded before the retained guard at `804ADFF0`. A four-byte cache word
 at `804ADFEC` starts clear in the startup-loaded module. The bootstrap transfers
-and verifies the 9,788-byte shared code packet into the reserved
+and verifies the 10,888-byte shared code packet into the reserved
 `804B5000..804B7FFF` range, flushes the instruction cache, and records the verified
 CRC. Constructors then prepare the native/held table and load the active scenery
 bank. Tree queries can load the same packet before any seasonal actor exists;
@@ -187,36 +216,36 @@ to the assistant in the single text catalogue.
 The bank's 128-byte header records separate CPU, graphics, and callback fixups;
 all pointers are offsets before loading. CPU pointers acquire the owner's
 address; graphics pointers become physical segment-zero addresses. Callback
-roles bind to the loaded owner's original shadow loop and the shared body
+roles bind to the loaded owner's original shadow/light loops and the shared body
 wrapper. No heap address persists between scene loads. Complete fixup bounds
 are checked before relocation. Graphics retain source order and slot-eight
 palette selection. The body wrapper follows the native eighteen-term calendar,
-refreshing the active 32-byte palette when needed before calling the original
-body loop. Caller-adjusted shadow vertices are not replaced by static vertices.
+refreshing all three active 32-byte palettes when needed before calling the
+original body loop. Caller-adjusted shadow vertices are not replaced by static
+vertices.
 
-Ten previously unused descriptor slots hold the category: `65..74` for cherry,
-ordinary, and Xmas, and `64..73` for winter. Original rows, the NONE sentinel,
-all installed held-item rows, actor sizes, stack frames, and existing copy
-capacities remain intact. Further category expansion must respect the scenery
-owner records' reserved slots; zero category-map entries are not blanket proof
-that those drawing indices remain free. Native foreground tables contain 112
-low and 84 environmental rows. All fourteen imported IDs lie outside those
-existing ranges; no original scenery identity is replaced.
+The category constructor preserves original rows, the NONE sentinel, and all
+installed held-item rows. The shared resize updates the drawing table references,
+copy count, all four appended actor index arrays, and every affected stack
+argument together. Further category expansion must respect the scenery owner
+records' reserved slots; zero category-map entries are not blanket proof that
+those drawing indices remain free. Native foreground tables contain 112 low and
+84 environmental rows. All 41 imported IDs lie outside those existing ranges;
+no original scenery identity is replaced.
 
 The owner-local classification entry preserves the native routine through a
-cache-flushed trampoline. Selected golden-shovel profiles resolve the complete
-new type/position records. Original items call the native routine, retaining the
+cache-flushed trampoline. Selected family profiles resolve the complete new
+type/position records; palm and cedar require their actual carried-item admission.
+Original items call the native routine, retaining the
 held-category hooks. Disabled imported foreground IDs resolve the native empty
 row rather than indexing beyond a native table. Save/profile restrictions still
 apply; this fallback does not authorise removing imports from a saved world.
 
-The explicit ABI-158 proposal is `build/v3-shared-tree-sparkle-02/build-lock.json`.
-It uses a 12,288-byte fixed reservation and 32,864 bytes per loaded seasonal owner.
-All existing 128 experimental choices and format-3 saves remain unchanged.
-The main ABI-109 lock and both served V2 patchers stay unchanged. Component tests
-cover native loading, all seasonal type bindings, actual body-list generation,
-guards, and restoration; rendered appearance and ordinary gameplay are not
-claimed.
+The current proposal uses a 12,288-byte fixed reservation. Its 207 existing
+experimental choices and format-16 saves remain unchanged. Palm and cedar are
+not enabled by installing their renderer. The main build lock and both served
+V2-14 deployments stay unchanged. Rendered appearance and ordinary gameplay are
+not claimed; the remaining connected behaviour work is listed above.
 
 ## Shared planting and tree-state rules
 

@@ -41,8 +41,8 @@ Do not make another per-item installer. Golden net/axe/shovel/rod still need
 their actual remaining consumers distinguished from acquisition; retain all
 installed tool behaviour and do not replay old tests to establish it again.
 
-The current proposal is ABI 355 at
-`build/v3-carried-runtime-work-01/storage-connected-06/build-lock.json`.
+The current proposal is ABI 356 at
+`build/v3-carried-runtime-work-01/trees-connected-05/build-lock.json`.
 The complete `build/v3-carried-batch-prepared-05/` resources are installed without
 reconversion: seven parents, 26 states, fourteen icons, seven handover/police
 models, complete orange-paper artwork, official names, and prices. Additive
@@ -66,12 +66,24 @@ Format-14/15 migration and missing-family rejection run through the actual save
 transaction with native I/O doubled. Thirty stable save entries redirect to the
 new adapter; two existing collection entries use the shared carried path.
 
-The complete palm/cedar art and combined seasonal banks are prepared through
-the shared scenery importer. Reuse `build/v3-carried-trees-prepared-02/`; do not
-reconvert gold or either new family. The next concrete connection is shared
-seasonal table/index/stack allocation, followed by the actual field consumers
-and independent selections in this same carried-item task. The extended loader
-and its focused checks are prepared, not installed. See
+The complete palm/cedar art, combined banks, and shared seasonal renderer are
+installed. Reuse `build/v3-carried-trees-prepared-02/`; do not reconvert gold or
+either new family. Table/index/stack allocation, palette loading, native lights,
+all existing tree callers, and the intervening insect shake adapter are connected.
+Identical bank pages share checked physical storage; full bank CRCs and relocation
+validation remain. The shared refresh reuses current allocations and resources.
+Five focused checks and seven browser/offline profiles pass; no new native or
+hardware result is claimed. Retain that evidence for unchanged consumers.
+
+The next concrete work is the connected family behaviour path: extend the shared
+source growth/stump/burial rules, daily growth/death/neighbour/thinning and actual
+coastal/elevation conditions, collision/digging, shaking/cutting, hidden contents,
+camera limits, and habitats for palm and cedar together. Connect the actual
+coconut eating/planting and cedar planting menu/animation consumers, not merely
+their drawing categories. The donor rules are in `m_name_table.c`,
+`m_all_grow_ovl.c`, and `bg_item_common.c_inc`; their pinned tables and retained
+native consumers are already mapped by the shared scenery adapter. Independent
+selections remain in this same carried-item task. See
 [the tree-family contract](../specs/V3_SCENERY.md#palm-and-cedar-dependencies).
 
 Finish the remaining actual field consumers: planting/eating, sign

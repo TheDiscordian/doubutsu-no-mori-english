@@ -19,6 +19,8 @@ LIGHT_SHA256='3623ac2471fc39adbecc9ea6854949d05ea78400e007836a07a928c7d4c2be25'
 BOOT_RAM, BOOT_END = 0x804ADC90, 0x804ADFF0
 RUNTIME_RAM, RUNTIME_END = 0x804B5000, 0x804B6000
 SOURCES = ('tools/v3_scenery_runtime.py', 'tools/v3_scenery.py',
+           'tools/v3_scenery_refresh.py', 'tools/v3_ground_categories.py',
+           'tools/v3_physical_resources.py',
            'overlays/v3/scenery.h', 'overlays/v3/scenery.c',
            'overlays/v3/scenery.ld', 'overlays/v3/scenery_bootstrap.c',
            'overlays/v3/scenery_bootstrap.ld', 'overlays/v3/scenery_palette.c',

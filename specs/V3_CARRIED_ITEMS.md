@@ -73,10 +73,10 @@ python3 tools/v3_furniture_pipeline.py convert --representation carried \
 
 ## Installed shared runtime
 
-The current development proposal is ABI 355 at
-`build/v3-carried-runtime-work-01/storage-connected-06/build-lock.json`.
+The current development proposal is ABI 356 at
+`build/v3-carried-runtime-work-01/trees-connected-05/build-lock.json`.
 Its ROM SHA-256 is
-`3494ba7a2519718166b20e5b592c47b3a3ebe13a01a34adb8378685fdaab21c5`.
+`b14f36b68fa27b69c8b195330bbc8bf8008eec7e41581d9b1b34e1e1859228e6`.
 This is an inactive carried integration, not a new playable-import claim.
 
 `v3_furniture_install.py --refresh-runtime --carried-items PATH` installs the
@@ -110,8 +110,11 @@ existing event reader's matching selection, preserving its controls.
 Fourteen icons occupy `80774000..80775F80`; four newly needed handover models
 start at `80776000`, while sign/card/cutlery reuse their existing models. The
 ground bitmap at `804AA250` preserves source category 17's diary mapping and
-adds cedar independently. Only the common descriptor constructor is redirected;
-the four existing seasonal entry wrappers and scenery remain unchanged.
+adds cedar independently. The common descriptor constructor uses the complete
+seasonal allocation, including the installed gold/palm/cedar drawing banks.
+Their shared table, four actor index arrays, and local stack are sized together;
+actual palm/cedar field behaviour remains unfinished. See
+[shared seasonal scenery](V3_SCENERY.md#palm-and-cedar-dependencies).
 
 The loaded packet extends the unchanged 64,064-byte festival prefix to 105,904
 bytes and ends at `8077AD90`, adding 41,840 resident bytes. It uses the same

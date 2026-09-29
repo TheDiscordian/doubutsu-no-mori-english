@@ -124,11 +124,37 @@ int af_v3_scenery_relocate(u8 *owner,u32 variant) {
     return 1;
 }
 
+static int load_bank(u8 *dest,const Scenery *c) {
+#ifdef AF_V3_SCENERY_FAMILIES
+    if(c->vrom&0x40000000u) {
+        /* Bit 30 is the scenery-only page-table tag. Native physical DMA uses
+           bit 31; never pass the page-table tag into that reader. */
+        u32 pages[36];
+        if((c->vrom&0xBC00000Fu)!=0x80000000u ||
+           (c->vrom&0x3FFFFFFFu)>0x4000000u-sizeof(pages) ||
+           af_scenery_dma(pages,c->vrom&~0x40000000u,sizeof(pages)) ||
+           pages[0]!=0x41465047u || pages[1]!=c->bytes || pages[2]!=4096u ||
+           !pages[3] || pages[3]>32u || pages[3]!=(c->bytes+4095u)/4096u)return 0;
+        /* Validate every source extent before changing the destination. */
+        for(u32 i=0;i<pages[3];i++) {
+            u32 n=c->bytes-i*4096u;if(n>4096u)n=4096u;
+            if((pages[i+4]&15u) || pages[i+4]<0x100000u || pages[i+4]>0x4000000u-n)return 0;
+        }
+        for(u32 i=0;i<pages[3];i++) {
+            u32 n=c->bytes-i*4096u;if(n>4096u)n=4096u;
+            if(af_scenery_dma(dest+i*4096u,pages[i+4]|0x80000000u,n))return 0;
+        }
+        return 1;
+    }
+#endif
+    return !af_scenery_dma(dest,c->vrom,c->bytes);
+}
+
 void af_v3_scenery_construct(void *actor,void *game,u32 variant) {
     if (variant>=4u) return;
     const Scenery *c=af_v3_scenery_config+variant;
     u8 *owner=af_v3_ground_prepare(variant);
-    if (!owner || af_scenery_dma(owner+c->bank_offset,c->vrom,c->bytes)
+    if (!owner || !load_bank(owner+c->bank_offset,c)
             || af_scenery_crc(owner+c->bank_offset,c->bytes)!=c->crc
             || !af_v3_scenery_relocate(owner,variant)) {
         af_scenery_fault("V3 scenery", "Invalid scene resource");return;

@@ -7,6 +7,7 @@
 const Scenery af_v3_scenery_config[4]={CONFIG(0),CONFIG(1),CONFIG(2),CONFIG(3)};
 static u32 owners[4][9232],source[1024],calls,faults,fallbacks,drawers;
 static u32 selected;
+static u32 recipe[36],page_reads;
 static int term;
 u8 *af_test_scenery_owners[4];
 u8 *af_v3_ground_prepare(u32 v) { return af_test_scenery_owners[v]; }
@@ -16,6 +17,8 @@ int af_carried_category(u32 item) {
     return selected&(item==0x2807u?2u:4u) ? 50 : 0;
 }
 int af_scenery_dma(void *dest,u32 vrom,u32 n) {
+    if(vrom==0x80300000u) { assert(n==sizeof(recipe));memcpy(dest,recipe,n);return 0; }
+    if(vrom==0x80100000u) { assert(n<=sizeof(source));memcpy(dest,source,n);page_reads++;return 0; }
     assert(vrom==0x2200000 && n==4096);memcpy(dest,source,n);return 0;
 }
 u32 af_scenery_crc(const void *p,u32 n) { assert(p && n==4096);return 1234; }
@@ -88,5 +91,23 @@ int main(void) {
         assert(!af_v3_scenery_relocate((u8 *)owners[2],2));assert(!memcmp(before,bank,sizeof(before)));
     }
     assert(drawers==72);
+    /* The installed page reader reconstructs shared pages and a partial tail.
+       Invalid source ranges reject before the first destination DMA. */
+    Scenery paged=af_v3_scenery_config[0];paged.vrom=0xC0300000u;paged.bytes=4112;
+    u8 rebuilt[4112+16];memset(rebuilt,0xA5,sizeof(rebuilt));
+    recipe[0]=0x41465047;recipe[1]=4112;recipe[2]=4096;recipe[3]=2;
+    recipe[4]=recipe[5]=0x100000;
+    assert(load_bank(rebuilt,&paged));assert(page_reads==2);
+    assert(!memcmp(rebuilt,source,4096) && !memcmp(rebuilt+4096,source,16));
+    for(u32 i=4112;i<sizeof(rebuilt);i++)assert(rebuilt[i]==0xA5);
+    const u32 bad_pages[][2]={{0,0},{1,4096},{2,2048},{3,0},{3,33},{4,0x100004},
+        {5,0xFFFF0},{4,0x3FFFFF0},{5,0x4000000}};
+    for(u32 i=0;i<sizeof(bad_pages)/sizeof(*bad_pages);i++) {
+        u32 pos=bad_pages[i][0],saved=recipe[pos];recipe[pos]=bad_pages[i][1];
+        memset(rebuilt,0xA5,sizeof(rebuilt));page_reads=0;
+        assert(!load_bank(rebuilt,&paged) && !page_reads);
+        for(u32 j=0;j<sizeof(rebuilt);j++)assert(rebuilt[j]==0xA5);
+        recipe[pos]=saved;
+    }
     puts("Shared tree palettes, descriptors, native lights, independent selections, and rejection bounds pass");
 }

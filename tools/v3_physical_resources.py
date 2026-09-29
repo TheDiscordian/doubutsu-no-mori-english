@@ -94,13 +94,26 @@ def allocate(rom, records, data, name, *, best_fit=False):
     occupied = [(e.pstart, e.pend or e.pstart+e.size) for e in by_vrom(rom).values()
                 if e.pstart != 0xFFFFFFFF]
     occupied += [(r['physical'], r['physical']+r['bytes']) for r in records]
-    limit = len(rom); candidates=[]
+    limit = len(rom); candidates=[];gaps=[]
     for first, last in sorted(occupied, reverse=True)+[(0, 0)]:
+        if limit>max(last,0x100000):gaps.append((max(last,0x100000),limit))
         start = (limit-len(data)) & ~15
         if start >= max(last, 0x100000) and not any(rom[start:limit]):
             row=dict(id=name, physical=start, bytes=len(data), sha256=sha256(data))
             if not best_fit:return row
             candidates.append((limit-max(last,0x100000),row))
         limit = min(limit, first)
+    if candidates:return min(candidates,key=lambda pair:pair[0])[1]
+    # An unreferenced gap can contain an old nonzero resource at its end while
+    # still containing usable zero-filled space. Search only verified gaps,
+    # never zero padding inside a live DMA file or declared physical resource.
+    import re
+    for first,last in gaps:
+        for match in re.finditer(b'\0{16,}',rom[first:last]):
+            low=(first+match.start()+15)&~15;high=(first+match.end())&~15
+            if high-low<len(data):continue
+            row=dict(id=name,physical=high-len(data),bytes=len(data),sha256=sha256(data))
+            if not best_fit:return row
+            candidates.append((high-low,row))
     if candidates:return min(candidates,key=lambda pair:pair[0])[1]
     raise ValueError('No checked cartridge space for the complete physical resource')

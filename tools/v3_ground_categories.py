@@ -182,6 +182,71 @@ def patch_owner(owner,rel,spec,capacity,refs,symbols):
         removed_relocations=[removed],output_sha256=sha256(data),output_reloc_sha256=sha256(relocation))
 
 
+def resize_installed(owner,rel,spec,capacity):
+    """Resize every consumer of an installed seasonal drawing table together.
+
+    Common actor state, matrix nodes, and Xmas light records do not move. Only
+    the four appended index arrays and the drawing function's local array grow.
+    Existing relocation order is retained, including the table HI/LO pairs.
+    """
+    old=spec['capacity'];total=capacity['count'];previous=old['count']
+    if (sha256(owner)!=spec['output_sha256'] or sha256(rel)!=spec['output_reloc_sha256'] or
+            not previous<total<=255 or (total-previous)%4 or
+            capacity['actor_bytes']!=spec['actor']+total*8 or
+            capacity['index_offset']!=spec['actor'] or capacity['index_stride']!=total*2 or
+            capacity['stack_bytes']!=176+2*(total-spec['count']) or
+            capacity['bss_bytes']!=capacity['resident_bytes']-len(owner) or
+            capacity['table_offset']<len(owner)):
+        raise ValueError('Changed installed seasonal capacity contract')
+    groups,absolute,_,_,_=native_references(owner,rel,
+        expected_sections=tuple(spec['sections'][:3])+(old['bss_bytes'],))
+    target=spec['ram']+old['table_offset']
+    pairs=[(h,l) for h,ls in groups.items() for l,p in ls if p==target]
+    if (sorted(pairs)!=sorted(map(tuple,spec['refs'])) or
+            any(target<=p<target+previous*8 for p in absolute.values()) or
+            any(target<p<target+previous*8 for ls in groups.values() for _,p in ls)):
+        raise ValueError('Changed complete installed seasonal table references')
+    data=bytearray(owner);patches=[]
+    def patch(at,before,after):
+        if u32(data,at)!=before:
+            raise ValueError(f'Changed installed seasonal capacity {spec["role"]}+{at:04X}')
+        struct.pack_into('>I',data,at,after)
+        patches.append(dict(offset=at,before=before,after=after))
+    table=spec['ram']+capacity['table_offset']
+    for hi,lo in pairs:
+        patch(hi,u32(owner,hi),(u32(owner,hi)&0xFFFF0000)|((table+0x8000)>>16))
+        patch(lo,u32(owner,lo),(u32(owner,lo)&0xFFFF0000)|(table&65535))
+    before_delta=2*(previous-spec['count']);delta=2*(total-spec['count'])
+    for at,word in ((0x5E1C,0xAFA700BC),(0x5E5C,0x8FAE00BC),(0x5E60,0x8FAF00C0),
+                    (0x5E68,0xAFA500B4),(0x5E78,0x8FA500B4)):
+        patch(at,word+before_delta,word+delta)
+    winter=spec['role']=='winter'
+    for at,before,after in (
+            (0x5E14,0x27BD0000|(-old['stack_bytes']&65535),0x27BD0000|(-capacity['stack_bytes']&65535)),
+            (0x5E2C,0x29010000|previous,0x29010000|total),
+            (0x5E98 if winter else 0x5E84,0x24040000|previous,0x24040000|total),
+            (0x5EE8 if winter else 0x5EC8,0x27BD0000|old['stack_bytes'],0x27BD0000|capacity['stack_bytes']),
+            (spec['sections'][0]+12,old['actor_bytes'],capacity['actor_bytes'])):
+        patch(at,before,after)
+    if spec['role']=='ordinary':
+        patch(0x80914E40-spec['ram'],0x24040000|previous,0x24040000|total)
+        for at,word in ((0x80914E4C,0x24A30000),(0x80914E54,0x24630000),(0x80914E64,0x24630000)):
+            patch(at-spec['ram'],word|old['index_stride'],word|capacity['index_stride'])
+    elif spec['role'] in ('cherry','winter'):
+        starts=(0x808F3AE0,0x808F3AF4,0x808F3B0C,0x808F3B18) if not winter else (
+            0x808FEAFC,0x808FEB10,0x808FEB24,0x808FEB30)
+        for i,at in enumerate(starts):
+            patch(at-spec['ram'],0x34210000|((spec['actor']+i*old['index_stride'])&65535),
+                  0x34210000|((spec['actor']+i*capacity['index_stride'])&65535))
+        patch((0x808FEAD0 if winter else 0x808F3AFC)-spec['ram'],0x24050000|previous,0x24050000|total)
+    else:
+        # Xmas's initial count is in its already-installed shared stub. Its
+        # caller updates that stub along with the owner-local stride here.
+        patch(0x80909B24-spec['ram'],0x27FF0000|old['index_stride'],0x27FF0000|capacity['index_stride'])
+    relocation=bytearray(rel);struct.pack_into('>I',relocation,12,capacity['bss_bytes'])
+    return bytes(data),bytes(relocation),patches
+
+
 def install(base,prior,blob,core,original,output):
     old=prior['equipment_resources'];categories=old['item_categories']
     position=old['blob_offset'];module=bytearray(blob[position:position+old['bytes']])

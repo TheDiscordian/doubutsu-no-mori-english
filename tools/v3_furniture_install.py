@@ -976,7 +976,12 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         equipment_report,owner_changes=equipment.install(base,prior,blob,core,original,output)
     elif scenery_art is not None:
         import v3_scenery_runtime as equipment
-        equipment_report,owner_changes=equipment.install(base,prior,blob,core,original,output,scenery_art)
+        if prior['equipment_resources'].get('scenery'):
+            from v3_scenery_refresh import install as refresh_scenery
+            equipment_report,owner_changes,report_updates,physical_writes=refresh_scenery(
+                base,prior,blob,core,original,output,scenery_art)
+        else:
+            equipment_report,owner_changes=equipment.install(base,prior,blob,core,original,output,scenery_art)
     elif scenery_gameplay:
         import v3_scenery_runtime as equipment
         equipment_report,owner_changes=equipment.install_gameplay(base,prior,blob,core,original,output)
@@ -1374,7 +1379,8 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         if scenery_art is not None:
             report['shared_runtime_refresh']['adapters'].append('seasonal_scenery')
             report['shared_runtime_refresh'].update(artwork_changed=True,resource_allocations_changed=True,
-                additional_resident_bytes=equipment_report['scenery']['additional_fixed_resident_bytes'],
+                additional_resident_bytes=equipment_report['scenery']['additional_fixed_resident_bytes']-
+                    prior.get('equipment_resources',{}).get('scenery',{}).get('additional_fixed_resident_bytes',0),
                 additional_scene_resident_bytes=equipment_report['scenery']['additional_scene_resident_bytes'])
         if scenery_gameplay:
             daily=equipment_report['scenery'].get('daily_growth')
