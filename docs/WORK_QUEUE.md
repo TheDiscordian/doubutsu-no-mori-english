@@ -453,8 +453,13 @@ Native festival/diary execution remains unverified.
 The exact next consumers are complete actor/service admission and
 diary/behaviour selection. Keep this connected category task; do not restart
 per-actor conversion or the exhausted native fixture.
-The dedicated preflight also lists the unspawned fifth New Year position; retain
-its existing collision semantics without inventing a fifth resident actor.
+The pending dispatcher refresh derives actual spawn requirements from resident
+counts and complete callback/helper calls. Its source excludes the unused fifth
+New Year and countdown queue positions from actor requirements while retaining
+every layout/collision coordinate (83 required identities instead of 85).
+The existing installed dispatcher still has the earlier list; install this
+refresh with the connected admission changes, not as another isolated ROM.
+Do not invent actors for collision-only positions.
 Continue this same batch without a new harness or native fixture. Reuse
 the complete installed fortune actor and art without reconverting or retesting
 them. Bind actor pools,

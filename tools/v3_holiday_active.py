@@ -32,16 +32,37 @@ DISPATCH_SOURCES=('overlays/v3/holiday_dispatch.c','overlays/v3/holiday_dispatch
     'overlays/v3/holiday_dispatch_native.c','overlays/v3/holiday_dedicated_native.c')
 
 
-def owner_requirements(maps,owners,generated):
+def owner_requirements(maps,owners,generated,*,include_collision_positions=False):
     """Derive the entire admission list from source layouts and callback calls."""
     from v3_password_policy import function
     rows=[];requirements=[]
     for owner in owners['owners']:
-        donor=owner['type'];needed=set()
+        donor=owner['type'];needed=set();collision_only=[]
+        local={r['symbol'] for r in owners['functions']}
+        todo={n for n in owner['callbacks'] if n};seen=set();bodies=[]
+        while todo:
+            name=todo.pop();seen.add(name);body=function(generated,name);bodies.append(body)
+            todo.update(set(re.findall(r'\b(\w+)\s*\(',body))&local-seen)
+        reserved=[]
+        for body in bodies:
+            reserved.extend(re.findall(r'\bmake_(?:actor|FG)_in_reserved_block\(\s*evmgr\s*,\s*ctrl\s*,\s*([^,]+),',body))
         for row in maps['maps']:
             if row['event']==donor:
-                for variant in row.get('layouts',[]):
-                    needed.update((0,str(actor['source_name'])) for actor in variant)
+                for variant_index,variant in enumerate(row.get('layouts',[])):
+                    for slot,actor in enumerate(variant):
+                        # A resident-labelled collision position beyond the
+                        # actual resident count is not an actor to spawn. The
+                        # source callback must independently prove that no
+                        # reserved-actor/foreground call uses that slot.
+                        unused=(slot>=row['normal_npcs'] and row['npc_flags']&(1<<slot)
+                            and actor['source_name']>>12==13 and reserved and
+                            all(re.fullmatch(r'\d+',a.strip()) for a in reserved) and
+                            slot not in {int(a) for a in reserved})
+                        if unused:
+                            collision_only.append(dict(variant=variant_index,slot=slot,
+                                source_name=actor['source_name'],source_resident_count=row['normal_npcs']))
+                        if include_collision_positions or not unused:
+                            needed.add((0,str(actor['source_name'])))
         for name in owner['callbacks']:
             if not name:continue
             text=function(generated,name)
@@ -54,6 +75,7 @@ def owner_requirements(maps,owners,generated):
         entries=sorted(needed);start=len(requirements);requirements.extend(entries)
         rows.append(dict(donor=donor,first=start,count=len(entries),
             phases=sum(1<<i for i,n in enumerate(owner['callbacks']) if n),requirements=entries))
+        if collision_only and not include_collision_positions:rows[-1]['collision_only']=collision_only
     if len(rows)!=14 or len({r['donor'] for r in rows})!=14:
         raise ValueError('Incomplete dedicated owner admission directory')
     # The compiler evaluates the very same checked enums as the complete owner
@@ -75,10 +97,13 @@ def refresh_dispatch(base,npc,records,directory,bindings,defines):
     source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
         (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
     generated,owners=owner_source(source)
-    dependencies,_=owner_requirements(discover(source),owners,generated)
+    maps=discover(source)
+    dependencies,requirements=owner_requirements(maps,owners,generated)
     events=npc['events'];active=events['active']
     if sha256(dependencies.encode())!=events['dispatch']['generated_requirements_sha256']:
-        raise ValueError('Changed complete owner dependency graph')
+        legacy,_=owner_requirements(maps,owners,generated,include_collision_positions=True)
+        if sha256(legacy.encode())!=events['dispatch']['generated_requirements_sha256']:
+            raise ValueError('Changed complete owner dependency graph')
     directory.mkdir()
     path=directory/'requirements.c'
     write_new(path,dependencies.replace('"holiday_dispatch.h"',
@@ -103,7 +128,8 @@ def refresh_dispatch(base,npc,records,directory,bindings,defines):
     if len(matches)!=1:raise ValueError('Ambiguous shared owner physical packet')
     matches[0]['sha256']=packet['sha256']
     active.update(code=compiled,bindings=links)
-    events['dispatch'].update(code=compiled,bindings=links,provider_defines=list(defines))
+    events['dispatch'].update(code=compiled,bindings=links,provider_defines=list(defines),
+        requirements=requirements,generated_requirements_sha256=sha256(dependencies.encode()))
     return (dict(matches[0],previous_sha256=previous),bytes(data))
 
 
