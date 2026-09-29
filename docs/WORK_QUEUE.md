@@ -89,7 +89,7 @@ Do not mutate quantities during ordinary transfers or load. See the
 [stationery choice contract](../specs/V3_CARRIED_ITEMS.md#global-stationery-quantity-choice).
 
 The current proposal is ABI 372 / format 20 at
-`build/v3-golden-tools-selection-05/build-lock.json`, with 217 selectable development
+`build/v3-golden-tools-selection-06/build-lock.json`, with 217 selectable development
 entries. All four golden tools are independently selectable. Shared held ordering
 keeps its 64-entry capacity, complete code, physical mapping, and other categories.
 Nine current browser/offline profiles agree, including each tool alone and

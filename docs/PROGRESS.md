@@ -24,7 +24,7 @@ lock or publish experimental V3.
 ## Active development
 
 The current development proposal is ABI 372 / format 20 at
-`build/v3-golden-tools-selection-05/build-lock.json`. All four golden tools are
+`build/v3-golden-tools-selection-06/build-lock.json`. All four golden tools are
 independently selectable: shovel through shining-hole planting and golden-tree
 growth/drop, net/rod through the collection-completion mayor presentation, and
 axe through the Shrine's perfect-town assessment and Farley handover.

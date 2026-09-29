@@ -13,14 +13,14 @@ ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'tools'))
 from aflib import by_vrom,sha256,u32
 from v3_asset_loader import BLOB
-from v3_furniture_install import inputs
+from v3_furniture_install import inputs,reuse_resource_tail
 from v3_held_catalogue import parent_readiness,refresh_selection
 from v3_creature_choices import options as behaviour_options
 import v3_catalogue as catalogue
 import v3_optional_composition as composition
 import v3_browser_composition as browser
 
-OUT=ROOT/os.environ.get('V3_GOLDEN_REWARDS_SELECTION','build/v3-golden-tools-selection-05')
+OUT=ROOT/os.environ.get('V3_GOLDEN_REWARDS_SELECTION','build/v3-golden-tools-selection-06')
 TOOLS=tuple('GAFE01-r0/item/'+item for item in ('2239','223A','223B','223C'))
 
 
@@ -40,6 +40,10 @@ class GoldenRewardSelectionTests(unittest.TestCase):
                              base[r['physical']:r['physical']+r['bytes']],r['id'])
         e,old=report['equipment_resources'],prior['equipment_resources']
         blob,previous=files[BLOB].extract(image),before[BLOB].extract(base)
+        retained,reused=reuse_resource_tail(image,report,blob)
+        self.assertEqual(retained,blob)
+        self.assertEqual(reused['reused_bytes'],0)
+        self.assertEqual(len(reused['external_resources']),3)
         for section in (e, e['scenery']):
             at,n=section['blob_offset'],section['bytes']
             self.assertEqual(blob[at:at+n],previous[at:at+n])

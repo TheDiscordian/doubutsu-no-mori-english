@@ -3,7 +3,7 @@
 Current development: ABI 372, saved format 20, on `v3/optional-imports`.
 Neither stable V2-14 patcher deployment changes.
 
-- Lock: `build/v3-golden-tools-selection-05/build-lock.json`.
+- Lock: `build/v3-golden-tools-selection-06/build-lock.json`.
 - ROM SHA-256: `d037248ed512a0a8990c45f1cc6a5b18929f735e891dd50f8cd59af68b934288`.
 - UPS SHA-256: `f2da41010042834d0b43122403d9a870e75ab008c28d6007d49517eea7a11a36`.
 
@@ -31,6 +31,9 @@ Shrine's perfect-town assessment and Farley handover. Only three profile bits,
 the existing ordering table, and its count change during this selection refresh.
 The complete catalogue owner keeps its dimensions, physical mapping, relocation
 extent, and menu pool. No additional artwork or resident allocation is required.
+The external-owner update keeps physical addresses separate from the reusable
+padding offset. The next-build reuse check passes; the corrected receipt does
+not change the ROM or either retained native result.
 
 This selection path retains the existing shovel resources. The connected reward
 batch below adds official dialogue, Farley, appearance effects, and saved fields.
