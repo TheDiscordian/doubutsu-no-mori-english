@@ -38,9 +38,14 @@ runtime alternatives; other substantial differences still need real bindings.
 
 Current implementation task: finish the four golden-tool behaviour/reward paths
 through the shared equipment importer, including the full golden-shovel route.
-The current inventory has no other unresolved V3 item identity; the sign board
-belongs to V4 Able Sisters. Retain installed gold-tree leaf/cut effects and
-finish ordinary acquisition, not another asset conversion pass.
+The golden shovel's tree acquisition, rewards, selection, and catalogue are
+connected. Continue the shared collection-completion mayor gift director/NPC for
+net and rod (`ac_present_demo` / `ac_present_npc`), plus the Shrine/hem reward
+conversation for the axe. Preserve donor priority, handover, trophy, and
+celebration timing; use the installed participant and reward services. Do not
+substitute shop stock or letters. The current inventory has no other unresolved
+V3 item identity; the sign board belongs to V4 Able Sisters. Retain installed
+gold-tree leaf/cut effects rather than doing another asset conversion pass.
 The carried-object/stationery batch has connected independent selections. Its donor identity worksheet
 identifies orange paper (`2003`), exercise card (`2523`,
 including all thirteen stamped states), knife and fork (`2530`), coconut
@@ -65,9 +70,18 @@ The policy and fixed pack identities are installed and selectable in development
 Do not mutate quantities during ordinary transfers or load. See the
 [stationery choice contract](../specs/V3_CARRIED_ITEMS.md#global-stationery-quantity-choice).
 
-The current proposal is ABI 369 at
-`build/v3-carried-selection-03/build-lock.json`. Six carried parent choices bring
-the selectable development catalogue to 213. Their masks are `7D`; the sign-board
+The current proposal is ABI 370 at
+`build/v3-golden-tools-selection-03/build-lock.json`, with 214 selectable development
+entries. The golden shovel is independently selectable; the other three tools
+remain unavailable pending their conversations. Shared held ordering has a
+64-entry capacity, preserving all existing catalogue code and other categories.
+Six current composition profiles agree. Current format-19 transaction checks
+retain the shovel and celebration flags for all four players and reject removal
+of its actual selection bit before publication/writes. Native I/O is doubled;
+ordinary acquisition and hardware play remain unverified. The current silent
+boot passes. See [the golden-tool checkpoint](checkpoints/V3_GOLDEN_TOOLS.md).
+
+The six carried parent choices remain independently selectable. Their masks are `7D`; the sign-board
 bit stays off. Card/cutlery selections activate their existing holiday providers
 without requiring diaries. Spirit selection binds quest availability and Wisp's
 actual character-allocation flags independently of diary/event choices.

@@ -29,7 +29,7 @@ class CarriedStorageTests(unittest.TestCase):
     def test_quest_reward_save_transaction_and_migration(self):
         for mode in (0,1):self.save_transaction(True,mode,rewards=True)
 
-    def save_transaction(self,quest,paper=None,*,rewards=False):
+    def save_transaction(self,quest,paper=None,*,rewards=False,golden=None):
         with tempfile.TemporaryDirectory(prefix='v3-carried-storage-') as temp:
             out=Path(temp)
             flags=['-std=c11','-O1','-g','-Wall','-Wextra','-Werror','-fno-pie','-no-pie',
@@ -37,6 +37,9 @@ class CarriedStorageTests(unittest.TestCase):
                 *('-D'+name+'=1' for name in ('AF_V3_CLOTHING_PROFILE','AF_V3_REWARD_PROFILE',
                     'AF_V3_SURFACE_PROFILE','AF_V3_CREATURE_PROFILE','AF_V3_INSECT_SEASONS',
                     'AF_V3_DIARY_STORAGE','AF_V3_HOLIDAY_STORAGE','AF_V3_FISHING_STORAGE','AF_V3_CARD_STORAGE'))]
+            if golden is not None:
+                flags += [f'-DTEST_GOLDEN_PROFILE_BYTE={golden["profile_byte"]}',
+                          f'-DTEST_GOLDEN_PROFILE_MASK={golden["profile_mask"]}']
             commands=[['cc',*flags,'-Daf_v3_save_check=af_console_canonical_check',
                 '-Daf_v3_save_pack=af_console_canonical_pack','-Daf_v3_save_collect=af_console_canonical_collect',
                 '-c','overlays/v3/save_codec.c','-o',str(out/'codec.o')]]

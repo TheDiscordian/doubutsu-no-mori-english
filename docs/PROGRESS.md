@@ -23,19 +23,34 @@ lock or publish experimental V3.
 
 ## Active development
 
-The current development proposal is ABI 369 / format 19 at
-`build/v3-carried-selection-03/build-lock.json`. Orange paper, exercise cards,
+The current development proposal is ABI 370 / format 19 at
+`build/v3-golden-tools-selection-03/build-lock.json`. The golden shovel is
+independently selectable, connecting its existing shining-hole planting,
+gold-tree growth/drop, pickup/exchange, celebration, and saved-profile path.
+The held catalogue includes the shovel and reserves space for all four golden
+tools without recompiling models or changing existing catalogue code. The
+development catalogue has 214 entries; net, rod, and axe remain unavailable until
+their mayor/Shrine conversations are connected. Six browser/offline profiles
+agree, complete retained-resource checks pass, and current format-19 transaction
+checks retain the shovel and celebration flags for all four players. Missing
+shovel selection rejects the save before publication/writes. Native I/O is
+doubled; a complete ordinary acquisition run and hardware play are not verified.
+Silent current boot verifies the selected profile and no faults. Shovel-profile
+saves require that option on reload, including when moving to another format-19
+build. See [the golden-tool checkpoint](checkpoints/V3_GOLDEN_TOOLS.md).
+
+Orange paper, exercise cards,
 knife and fork, coconut, cedar saplings, and spirits have independent selections
-through the shared offline/browser composers, bringing the development catalogue
-to 213 options. State variants stay with their parent; the sign board stays off.
+through the shared offline/browser composers. State variants stay with their
+parent; the sign board stays off.
 Card/cutlery choices activate their installed holiday providers without requiring
 diaries. Spirits independently activate the quest service and Wisp's actual
 character allocation. Existing art, code, and saves are not reconstructed or
 overwritten. Eleven composition profiles and complete resource-preservation
 checks pass. Silent native boot verifies the actual carried/event masks, Wisp
 allocation/service flags, packet guard, and absence of faults; ordinary gameplay
-and native save/reload remain unverified. The remaining V3 item identities are
-the four golden tools; continue their shared behaviour/reward/acquisition paths.
+and native save/reload remain unverified. Continue the remaining shared golden-tool
+reward/acquisition paths without replaying unchanged tests.
 Carried-family saves require the selected families and cannot load in builds
 without their admission, including ABI 368. Four-sheet saves require pack mode.
 See [the selection checkpoint](checkpoints/V3_CARRIED_SELECTION.md).

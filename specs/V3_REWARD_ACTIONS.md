@@ -1,5 +1,15 @@
 # V3 shared golden-tool reward actions
 
+## Current selection and acquisition
+
+The golden shovel is selectable through the shared held importer. Its shining-hole
+planting, golden-tree growth/drop, collection/exchange, celebration, catalogue,
+and saved-profile consumers are connected. The net and rod still require the
+collection-completion mayor gift director/NPC, and the axe requires the
+perfect-town Shrine/hem conversation. Their options remain disabled. See the
+[current checkpoint](../docs/checkpoints/V3_GOLDEN_TOOLS.md) for the build,
+resource-preservation checks, save restrictions, and verification limits.
+
 ## Registered behaviour
 
 The shared `--refresh-runtime --player-actions` stage follows reward persistence.
@@ -206,9 +216,9 @@ Ordinary acquisition still requires the source collection-completion event
 director/NPC support, perfect-town reward conversation, and gold-tree growth/drop
 route. Collection and normal-drop/empty-hand/bury/fish/insect exchange consumers
 are installed, along with balloon exchange and fall/release continuation.
-The ordinary balloon inventory option remains required.
-These are required gameplay integration, not replaced
-with shop stock or arbitrary letters. The four golden-tool choices remain
-disabled. This stage adds no English text; existing source credits remain in
-the single provenance catalogue. Format-3 save/profile restrictions continue
-unchanged; both served V2 patchers and the main lock remain untouched.
+The ordinary balloon inventory option is installed.
+Missing reward conversations are required gameplay integration, not replaced
+with shop stock or arbitrary letters. The net, rod, and axe choices remain
+disabled; the shovel is independently selectable. Existing source credits remain
+in the single provenance catalogue. The current format-19 profile restrictions
+apply; both served V2 patchers remain untouched.

@@ -1043,7 +1043,10 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         if 'clothing' in report_updates:display_report=report_updates['clothing']['display']
     elif held_selection:
         import v3_held_catalogue as equipment
-        equipment_report,owner_changes,report_updates=equipment.select_installed(prior,blob)
+        if prior['equipment_resources'].get('optional_selection'):
+            equipment_report,owner_changes,report_updates=equipment.refresh_selection(base,prior,blob,output)
+        else:
+            equipment_report,owner_changes,report_updates=equipment.select_installed(prior,blob)
     if equipment_report and equipment_report.get('room_rigs',{}).get('music'):
         from v3_room_music import publish_owner
         publish_owner(base,prior,equipment_report,owner_changes)

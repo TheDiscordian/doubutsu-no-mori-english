@@ -57,6 +57,16 @@ int main(void) {
         af_save_live[at]=item>>8;af_save_live[at+1]=item;
     }
 #endif
+#ifdef TEST_GOLDEN_PROFILE_BYTE
+    af_save_current[TEST_GOLDEN_PROFILE_BYTE]|=TEST_GOLDEN_PROFILE_MASK;
+    CHECK(af_v3_save_reset()==1);
+    fill_console();
+    for(u32 player=0;player<4;player++) {
+        u32 at=0x20+player*0xBD0+0x14+14*2;
+        af_save_live[at]=0x22;af_save_live[at+1]=0x3B;
+        af_save_runtime.working[AF_SAVE_REWARD_OFFSET+player*12+8]=8;
+    }
+#endif
     CHECK(AF_CONSOLE_RAW+16==120352 && af_carried_save_enabled()==127);
     CHECK(af_v3_card_data()[4]==AF_HC_CARRIED_WIRE && af_v3_card_data()[7]==3 && af_v3_card_data()[8]==127);
 #ifdef AF_V3_CARRIED_QUEST
@@ -133,6 +143,13 @@ int main(void) {
 #endif
     for(u32 player=0;player<4;player++)for(u32 slot=0;slot<15;slot++) {
         u32 at=0x20+player*0xBD0+0x14+slot*2;
+#ifdef TEST_GOLDEN_PROFILE_BYTE
+        if(slot==14) {
+            CHECK(af_save_live[at]==0x22 && af_save_live[at+1]==0x3B);
+            CHECK(af_save_runtime.working[AF_SAVE_REWARD_OFFSET+player*12+8]==8);
+            continue;
+        }
+#endif
         CHECK(((u32)af_save_live[at]<<8|af_save_live[at+1])==af_carried_paper_with_quantity(
             0x2000+player*15+slot,TEST_PAPER_MODE?slot%4+1:1));
     }
@@ -155,6 +172,19 @@ int main(void) {
         CHECK(!memcmp(console_before,af_console_storage.players,6528));
         CHECK(writes==writes_before && erases==erases_before);*mode=0;
     }
+#endif
+#ifdef TEST_GOLDEN_PROFILE_BYTE
+    af_save_current[TEST_GOLDEN_PROFILE_BYTE]&=~TEST_GOLDEN_PROFILE_MASK;
+    memset(snapshot,0xA7,sizeof(snapshot));
+    const u8 *golden_logical=(const u8 *)1;
+    CHECK(af_v3_save_check(saved,65536,af_save_current,snapshot)==AF_SAVE_PROFILE_MISSING);
+    CHECK(af_v3_console_storage_commit(saved,af_save_current,snapshot,&golden_logical)==AF_SAVE_PROFILE_MISSING);
+    CHECK(golden_logical==(const u8 *)1);
+    for(u32 i=0;i<sizeof(snapshot);i++)CHECK(snapshot[i]==0xA7);
+    CHECK(writes==writes_before && erases==erases_before);
+    af_save_current[TEST_GOLDEN_PROFILE_BYTE]|=TEST_GOLDEN_PROFILE_MASK;
+    CHECK(af_v3_save_check(saved,65536,af_save_current,snapshot)==1);
+    puts("Golden shovel and celebration flags survive all four players' save transactions; removing its actual profile bit rejects before publication/writes.");
 #endif
     /* Every removed family fails before publishing output or changing live data. */
     for(u32 bit=0;bit<7;bit++) {

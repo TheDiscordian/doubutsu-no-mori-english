@@ -31,10 +31,120 @@ SOURCES+=('tools/v3_handheld_items.py','tools/v3_inventory_equipment.py',
 def parent_readiness(equipment):
     """Keep completed passive categories separate from pending active rewards."""
     ready=set();pending={}
+    rewards=equipment.get('golden_tools',{}).get('items',{})
     for row in equipment['player_actions']['equipment_selection']['rows']:
         if row['passive']:ready.add(row['id'])
+        elif row['id'] in rewards:
+            missing=rewards[row['id']]['pending']
+            if missing:pending[row['id']]=missing
+            else:ready.add(row['id'])
         else:pending[row['id']]=['tool-acquisition','reward-demo']
     return ready,pending
+
+
+def refresh_selection(base,prior,blob,output):
+    """Admit completed tool paths without rebuilding their retained resources.
+
+    Catalogue ordering is data, not executable code. Give the shared held
+    category its full 64-entry capacity once, retaining all other catalogue
+    consumers (including paper and room surfaces) at their installed addresses.
+    """
+    equipment=copy.deepcopy(prior['equipment_resources'])
+    if equipment.get('golden_tools'):
+        raise ValueError('Golden tool selections are already connected; extend their reward providers')
+    actions=equipment['player_actions'];scene=equipment['scenery']
+    required=('tool_controls','tool_motion','tool_transitions','shovel_effects',
+              'rod_effects','net_capture','reward_actions','reward_controls',
+              'reward_messages','reward_pickup','reward_exchange','reward_state')
+    if any(not actions.get(key) for key in required):
+        raise ValueError('Golden selection requires the complete shared tool/reward runtime')
+    if (not actions['reward_actions']['action_callbacks_installed'] or
+            not actions['reward_controls']['persistent_settlement_installed'] or
+            not actions['reward_pickup']['collection_tails_installed'] or
+            not actions['reward_exchange']['normal_drop_empty_hand_bury_fish_insect_installed'] or
+            not actions['reward_exchange']['balloon_release_installed'] or
+            not scene['tree_effects']['installed'] or
+            not scene['tree_states']['planting_conversion_installed'] or
+            not scene['tree_states']['growth_and_stumps_installed'] or
+            not scene['tree_states']['planting_effect_installed'] or
+            not scene['tree_states']['shake_drop_installed'] or
+            not scene['player_queries']['felling_installed'] or
+            not all(scene.get(k) for k in ('daily_growth','hidden_contents','world_queries',
+                                         'field_insects','felling_camera','physical_dma'))):
+        raise ValueError('Incomplete golden-tool collection, tree, or celebration consumer')
+    # Bind the installed shared rules, not an old stage's pending booleans.
+    rules=scene['families']['behaviour'];gold=rules['gold']
+    if ((gold['plant_item'],gold['hole'],gold['first'],gold['count'],gold['selected_item'])
+            !=(0x2202,0x5D,0x863,6,0x223B) or
+            [0x867,0x223B,0x868,1] not in rules['drops'] or
+            scene['families']['selectors']!=[0x223B,0x2807,0x290A]):
+        raise ValueError('Changed complete golden-shovel planting/growth/drop identity')
+    at=scene['blob_offset'];code=blob[at:at+scene['bytes']]
+    if sha256(code)!=scene['sha256'] or sha256(code)!=scene['code']['sha256']:
+        raise ValueError('Changed installed shared tree code')
+    for resource in prior['physical_resources']:
+        at=resource['physical'];n=resource['bytes']
+        if sha256(base[at:at+n])!=resource['sha256']:
+            raise ValueError('Changed retained physical import resource')
+    equipment['golden_tools']=dict(format='AFV3-GOLDEN-TOOLS-1',
+        shared_behaviour_installed=True,ordinary_gameplay_verified=False,items={
+            'GAFE01-r0/item/2239':dict(pending=['collection-completion-mayor-gift']),
+            'GAFE01-r0/item/223A':dict(pending=['perfect-town-shrine-reward']),
+            'GAFE01-r0/item/223B':dict(pending=[],acquisition='shining-hole-golden-tree'),
+            'GAFE01-r0/item/223C':dict(pending=['collection-completion-mayor-gift'])})
+    ready,_=parent_readiness(equipment)
+    visible=[r for r in equipment['catalogue']['imports']
+             if f'GAFE01-r0/item/{r["parent_item_id"]}' in ready]
+    visible.sort(key=lambda r:r['donor_position'])
+    files=by_vrom(base);cat=copy.deepcopy(prior['catalogue']);held=cat['handheld']
+    data=bytearray(files[catalogue.VROM].extract(base));rel=bytearray(files[catalogue.RELOC].extract(base))
+    parent=bytearray(files[catalogue.PARENT].extract(base))
+    start=held['table_address']-catalogue.RAM;old_size=held['total_rows']*2
+    if (sha256(data)!=cat['output_sha256'] or sha256(rel)!=cat['relocation_sha256'] or
+            sha256(data[start:start+old_size])!=held['table_sha256'] or
+            u32(data,catalogue.UMBRELLA_POINTER-catalogue.RAM)!=held['table_address'] or
+            u32(data,catalogue.UMBRELLA_COUNT-catalogue.RAM)!=held['total_rows'] or
+            struct.unpack_from('>4I',rel)!=(len(data),0,0,0) or len(data)%16):
+        raise ValueError('Changed installed catalogue ordering or relocation layout')
+    table=data[start:start+64]+b''.join(struct.pack('>H',r['catalogue_index']) for r in visible)
+    capacity=64;size=capacity*2;new_at=len(data)
+    if (len(table)>size or new_at+size>0x10000 or
+            cat['conservative_pool_required']+size>cat['pool_reserved']):
+        raise ValueError('Expanded held ordering exceeds the existing catalogue allocation')
+    descriptor=struct.unpack_from('>4I',parent,catalogue.OWNER)
+    if descriptor!=(catalogue.VROM,catalogue.VROM+new_at,catalogue.RAM,catalogue.RAM+new_at):
+        raise ValueError('Changed native catalogue owner bounds')
+    data.extend(table.ljust(size,b'\0'))
+    struct.pack_into('>I',data,catalogue.UMBRELLA_POINTER-catalogue.RAM,catalogue.RAM+new_at)
+    struct.pack_into('>I',data,catalogue.UMBRELLA_COUNT-catalogue.RAM,len(table)//2)
+    struct.pack_into('>I',rel,0,len(data))
+    struct.pack_into('>4I',parent,catalogue.OWNER,catalogue.VROM,catalogue.VROM+len(data),
+        catalogue.RAM,catalogue.RAM+len(data))
+    held.update(imports=visible,total_rows=len(table)//2,table_address=catalogue.RAM+new_at,
+        table_sha256=sha256(table),capacity=capacity,
+        retained_linked_table_address=catalogue.RAM+start)
+    cat.update(bytes=len(data),output_sha256=sha256(data),relocation_sha256=sha256(rel),
+        conservative_pool_required=cat['conservative_pool_required']+size,
+        rounded_growth=cat['rounded_growth']+size)
+    equipment['pocket_icons']['owner_sha256']=sha256(parent)
+    selection_prior={**prior,'equipment_resources':equipment,'catalogue':cat}
+    equipment,_,updates=select_installed(selection_prior,blob,extend=True)
+    equipment['scenery'].update(selectable=True,acquisition_installed=True)
+    equipment['scenery']['tree_states']['choices_enabled']=1
+    for key in ('reward_pickup','reward_exchange'):
+        equipment['player_actions'][key]['tree_acquisition_installed']=True
+    updates['catalogue']=cat
+    updates['physical_resources']=copy.deepcopy(prior['physical_resources'])
+    from v3_furniture_install import relocate_resource_plan
+    _,growth=relocate_resource_plan(base,files,catalogue.VROM,bytes(data),
+        minimum_physical=0x100000,reservations=updates['physical_resources'],
+        append_only=False,allow_compressed=True)
+    updates['resource_growth']=[growth]
+    updates['save_warning']=(prior['save_warning']+' Golden-shovel profiles require the golden shovel '
+        'on reload; earlier builds without its selection reject these saves. '
+        'The format remains 19. Preserve separate test saves.')
+    return equipment,{catalogue.VROM:bytes(data),catalogue.RELOC:bytes(rel),
+                      catalogue.PARENT:bytes(parent)},updates
 
 
 def select_installed(prior,blob,*,extend=False):

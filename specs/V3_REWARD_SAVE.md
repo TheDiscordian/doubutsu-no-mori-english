@@ -97,9 +97,12 @@ private clearing at `800B7ADC` uses the shared wrapper; foreign private pointers
 retain the existing fallback behaviour without clearing another player's flags.
 
 The [shared reward actions](V3_REWARD_ACTIONS.md) register the callback with both
-celebration variants and connect their request/wait paths. Source scene/NPC/tree
-acquisition remains required. The four golden-tool options stay disabled; this stage adds no choices
-or translation text. The single provenance catalogue remains unchanged.
+celebration variants and connect their request/wait paths. The golden shovel's
+tree acquisition and optional selection are connected. Net, rod, and axe options
+remain disabled pending their source reward conversations. The reward fields
+retain this layout inside current format-19 saves; selected profiles must include
+the shovel when reloading a save written with it. The single provenance catalogue
+remains unchanged.
 
 ## Verification
 
