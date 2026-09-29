@@ -611,7 +611,7 @@ def native_motions(source,base,generated,*,paired=(),import_missing=False):
     needed=set(re.findall(r'\baNPC_ANIM_\w+','\n'.join(
         code for name,code in generated.items() if name.endswith('.c'))))
     needed.discard('aNPC_ANIM_NUM') # source-only "no animation" sentinel
-    needed.discard('aNPC_ANIM_SPEED_TYPE_FREE') # speed mode, not a motion
+    needed={n for n in needed if not n.startswith('aNPC_ANIM_SPEED_TYPE_')}
     # Some source tables select a base motion plus a direction bit. Resolve
     # both complete records and check native adjacency before retaining that
     # arithmetic; replacing only the named base is not sufficient.
@@ -876,7 +876,7 @@ def bindings(base,prior,*,extra=None):
 
 
 def dialogue(base,prior,generated,*,roots=None,map_symbol='af_hp_message',exercise_controls=False,
-        festival_controls=False):
+        festival_controls=False,carried_controls=False):
     """Convert every personality/role, including the full choice/branch closure."""
     from gc_adapter import remove_redundant_article_suppression,expand_random_message_ranges
     from gc_text import decode_gc
@@ -893,9 +893,14 @@ def dialogue(base,prior,generated,*,roots=None,map_symbol='af_hp_message',exerci
     roots=set(roots)
     if not re.fullmatch(r'af_[a-z_]+',map_symbol):raise ValueError('Invalid dialogue export')
     messages,choices,decoder=donor();info=module_command_info(base)
-    pending=set(roots);ready={};selects=set();orders=set();edits={};ranges={}
+    pending=set(roots);ready={};selects=set();orders=set();edits={};ranges={};colours={}
     allowed={0,1,2,3,4,5,9,13,15,16,19,20,21,22,25,26,27,28,80,83,84,94,103}
     terminals={0,1}
+    if carried_controls:
+        # Wisp uses all four roof-colour choices, ordinary hour/minute/item
+        # insertions, sad/angry/happy window styles, and native line scaling.
+        # 0x75 is the installed English capitalization operation.
+        allowed.update((14,17,18,23,24,33,34,46,49,50,75,76,77,78,90,117))
     if festival_controls:
         # Native time/date/name fields, random-number insertion, the existing
         # capitalization command, and the countdown's genuine timed ending.
@@ -931,7 +936,23 @@ def dialogue(base,prior,generated,*,roots=None,map_symbol='af_hp_message',exerci
             before,after=shrine[n]
             if text.count(before)!=1:raise ValueError('Changed official shrine-location adaptation')
             text=text.replace(before,after)
-        data=encode(text,info);tokens=list(tokenize(data,info))
+        data=encode(text,info)
+        if carried_controls and expanded_bound(data,info)>1024:
+            # Source repeats the identical colour at most line starts. Remove
+            # only an already-active colour with nothing intervening except
+            # literal text/newlines or pauses. Every other command invalidates
+            # the cache, including page clears, insertions, and NPC orders.
+            # No words, line breaks, waits, or page boundaries are changed.
+            active=None;compact=bytearray();removed=0
+            for token in tokenize(data,info):
+                if token.kind=='cmd':
+                    if token.data[1]==5:
+                        if active==token.data:removed+=1;continue
+                        active=token.data
+                    elif token.data[1]!=3:active=None
+                compact.extend(token.data)
+            data=bytes(compact);colours[n]=removed
+        tokens=list(tokenize(data,info))
         unknown={t.data[1] for t in tokens if t.kind=='cmd'}-allowed
         if (not tokens or tokens[-1].kind!='cmd' or tokens[-1].data[1] not in terminals or
                 sum(t.kind=='cmd' and t.data[1] in terminals for t in tokens)!=1 or unknown or
@@ -992,6 +1013,7 @@ def dialogue(base,prior,generated,*,roots=None,map_symbol='af_hp_message',exerci
             'Remap the complete participant message/choice graph to additive native IDs']
         if edits[n]:adaptations.append('Remove redundant article-suppression flags before native insertions')
         if ranges[n]:adaptations.append('Expand inclusive random-message ranges to equivalent native random branches; retain every target')
+        if colours.get(n):adaptations.append('Remove redundant already-active colour commands between literal text and pauses; retain all colour changes, line/page breaks, and timing')
         if exercise_controls and 0x3A2A<=n<0x3A32:
             adaptations.append('Assistant platform adaptation: N64 C Buttons replace C Stick; adapt press/work verbs and coloured span while preserving original directions, pauses, and page breaks')
         if n in shrine:adaptations.append('Assistant platform adaptation: '+repr(shrine[n][0])+
@@ -1018,7 +1040,7 @@ def dialogue(base,prior,generated,*,roots=None,map_symbol='af_hp_message',exerci
     return dict(first_id=first,count=len(extra),first_choice=cf,choice_count=len(new_choices),
         rows=rows,roots=sorted(roots),branch_added=sorted(ready.keys()-roots),mapping=mapping,
         choice_mapping=choice_map,npc_orders=sorted(orders),source_banks=DONOR_FILES,
-        random_ranges={n:r for n,r in ranges.items() if r},
+        random_ranges={n:r for n,r in ranges.items() if r},redundant_colours={n:c for n,c in colours.items() if c},
         provenance_entries=credits,installed=False,max_expanded_bytes=max(r['expanded_bound'] for r in rows),
         resources=[dict(file=name,vrom=vrom,sha256=sha256(data),bytes=len(data),previous_sha256=sha256(previous))
             for name,vrom,data,previous in (('messages.bin',MESSAGE,new_m,mb),('message-table.bin',TABLE,new_t,tb),
@@ -1193,6 +1215,179 @@ def prepare_carried_event(output,lock):
             flags=flags,size=run('size','carried-event.o'),linked=False),
         sources={p:sha256((ROOT/p).read_bytes()) for p in ('tools/v3_holiday_participants.py',
             'overlays/v3/holiday_participants.h','overlays/v3/carried_event.h')})
+    write_new(out/'prepared.json',(json.dumps(report,indent=2)+'\n').encode())
+    return report
+
+
+def connect_carried_event(output,lock,directory):
+    """Reuse the complete actor and extend shared NPC/text/motion services.
+
+    This is the same participant compiler and registry, not a second actor
+    framework. Missing world/reward services remain genuine undefined symbols;
+    the shared installer refuses such an object rather than enabling stubs.
+    """
+    from v3_furniture_install import inputs
+    from v3_registry import SPECIAL_NPCS
+    from v3_holiday_dialogue import STRING_FILES,credit
+    from v3_camper_text import donor
+    from gc_text import decode_gc
+    from runtime_module import module_command_info
+    from textcodec import encode,LATIN
+    from textbanks import Bank
+    out=output.resolve();directory=directory.resolve()
+    if out.exists() or not out.is_relative_to(ROOT/'build') or not directory.is_relative_to(ROOT/'build'):
+        raise ValueError('Use a fresh ignored connected participant output and checked preparation')
+    base,prior=inputs(lock);old=json.loads((directory/'prepared.json').read_bytes())
+    if old['format']!='AFV3-CARRIED-EVENT-1' or [r['name'] for r in old['family']]!=['ev_ghost']:
+        raise ValueError('Expected the complete carried-quest source')
+    for name,digest in old['generated_sha256'].items():
+        if sha256((directory/name).read_bytes())!=digest:raise ValueError('Changed prepared actor source: '+name)
+    for name,r in old['references'].items():
+        data=(DONOR/name).read_bytes()
+        if len(data)!=r['bytes'] or sha256(data)!=r['sha256']:raise ValueError('Changed actor reference: '+name)
+    equipment=prior['equipment_resources'];events=equipment['npc_extra']['events']
+    previous=events['festivals'];quest=equipment['carried_items']['quest']
+    if not quest.get('manager') or previous['registry']['owner_count']!=22:
+        raise ValueError('Quest NPC requires the complete retained manager and participant registry')
+    source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+        (DONOR/'config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    identity=SPECIAL_NPCS['GAFE01-r0/npc/ev-ghost']
+    generated={n:(directory/n).read_text() for n in ('ev_ghost.c','actors.h','constants.h')}
+    actor=generated['ev_ghost.c']
+    before='ghost->npc_class.talk_info.default_animation = 126;'
+    if actor.count(before)!=1:raise ValueError('Changed complete ghost default animation')
+    generated['ev_ghost.c']=actor.replace(before,
+        'ghost->npc_class.talk_info.default_animation = aNPC_ANIM_GSTWAIT1;')
+    motions=native_motions(source,base,generated,import_missing=True)
+    imported=[r for r in motions if r.get('imported')]
+    if len(motions)!=1 or len(imported)!=1 or motions[0]['native']['index']!=382:
+        raise ValueError('Changed full ghost motion identity')
+    # Extend the installed full-motion table without reconverting any retained
+    # festival animation. Existing resident motion pointers remain unchanged.
+    packet=previous['packet'];raw=base[packet['physical']:packet['physical']+packet['bytes']]
+    if sha256(raw)!=packet['sha256']:raise ValueError('Changed retained full participant packet')
+    at=previous['code']['symbols']['af_hg_motions']-packet['ram']
+    count=struct.unpack_from('>I',raw,at)[0]
+    retained=[struct.unpack_from('>II',raw,at+4+8*i) for i in range(count)]
+    expected=[r for r in previous['motions'] if r.get('imported')]
+    if count!=len(expected) or {a for a,b in retained}&{r['native']['index'] for r in imported}:
+        raise ValueError('Duplicate or changed resident motion identities')
+    for r,(index,pointer) in zip(expected,retained):
+        if (index!=r['native']['index'] or pointer!=previous['code']['symbols']['af_hg_motion_data']+r['header_offset']):
+            raise ValueError('Changed retained complete motion pointer')
+    table='af_hg_motions:\n.word 1\n'
+    assembly=generated['festival-motions.S']
+    if assembly.count(table)!=1:raise ValueError('Changed complete motion table format')
+    generated['festival-motions.S']=assembly.replace(table,f'af_hg_motions:\n.word {count+1}\n')+''.join(
+        f'.word {index}, 0x{pointer:X}\n' for index,pointer in retained)
+    # Every original callback and profile remains at its already linked address.
+    rows=[dict(r) for r in previous['registry']['rows']]
+    rows.append(dict(source=identity['donor_name'],name=identity['name'],profile=identity['profile'],
+        event=114,save=54,count=1,part=3,kind=1,flags=0,donor_profile='Ev_Ghost_Profile'))
+    lines=['#include "carried_event.h"','#include "actors.h"',
+        '_Static_assert(sizeof(EV_GHOST_ACTOR)==2392,"Complete native ghost allocation");',
+        'const u32 af_cw_actor_bytes=sizeof(EV_GHOST_ACTOR);']
+    lines+=['extern const ACTOR_PROFILE '+r['donor_profile']+';' for r in rows[:-1]]
+    lines+=['const AFHPRecord af_hp_records[AF_HP_OWNER_COUNT]={']
+    lines+=['{'+','.join(str(r[k]) for k in ('source','name','profile','event','save','count','part','kind'))+
+        ',&'+r['donor_profile']+','+str(r['flags'])+'},' for r in rows]
+    generated['registry.c']='\n'.join(lines+['};'])+'\n'
+    profiles={r['name']+i:r['profile'] for r in rows for i in range(r['count'])}
+    if sorted(profiles)!=list(range(0xD0A0,0xD0CE)):raise ValueError('Incomplete participant spawn identities')
+    generated['spawn-data.c']=('#include "holiday_participants.h"\nconst s16 af_hp_spawn_profiles[46]={'
+        +','.join(str(profiles[n]) for n in sorted(profiles))+'};\n')
+    text=dialogue(base,prior,generated,roots=range(0x2ED3,0x2F03),map_symbol='af_cw_message',carried_controls=True)
+    _,_,decoder=donor();info=module_command_info(base)
+    location=ROOT/'build/gamecube/files/forest_1st.arc.unpacked/data'
+    string_files={name:(location/name).read_bytes() for name in STRING_FILES}
+    if any(sha256(data)!=STRING_FILES[name] for name,data in string_files.items()):
+        raise ValueError('Changed official carried-quest free strings')
+    strings=Bank('strings',0,0,string_files['string_data.bin'],string_files['string_data_table.bin']).entries()
+    fields=[];encoded_fields=[];credits=text['provenance_entries']
+    name_rows=[(sex,index,sound) for name,sex,index,sound in struct.iter_unpack('>HHII',source.raw('l_sp_actor_name'))
+        if name==identity['donor_name']]
+    if len(name_rows)!=1:raise ValueError('Missing official quest NPC name')
+    sex,index,sound=name_rows[0]
+    for n,width,key in [(n,16,f'v3/carried/ghost/angry-name/{n-0x62E:02d}') for n in range(0x62E,0x64E)]+[
+            (index,8,'GAFE01-r0/npc/ev-ghost/name')]:
+        original=strings[n];value=encode(decode_gc(original,decoder),info)
+        if not 1<=len(value)<=width or any(c not in LATIN for c in value):
+            raise ValueError('Invalid complete official quest name')
+        data=value.ljust(width,b' ')
+        provenance=credit(key,f'string:{n:04X}',original,data,
+            ['Native encoding and field padding; unchanged official wording'])
+        provenance['locales']['en']['locator'][0]='tools/v3_holiday_participants.py:connect_carried_event'
+        credits.append(provenance)
+        fields.append(dict(id=key,source_id=n,bytes=width,sha256=sha256(data)))
+        if width==16:encoded_fields.append(data)
+    generated['strings.c']=('#include "carried_event.h"\n'
+        'const u8 af_cw_angry_names[32][16]={'+','.join('{'+','.join(map(str,b))+'}' for b in encoded_fields)+'};\n')
+    # All twenty external reward lists share the same source record format.
+    # The two actor-local lists (gyroids/umbrellas) remain in the complete source.
+    # Keep donor identities here; runtime filtering/mapping must precede awards.
+    rewards=[];reward_code=['#include "carried_event.h"']
+    lists=[prefix+suffix for prefix,suffixes in (
+        ('ftr_list',('A','B','C','Event','Lottery')),('carpet_list',('A','B','C','Event')),
+        ('wall_list',('A','B','C','Event')),('cloth_list',('A','B','C','Event')),
+        ('binsen_list',('A','B','C'))) for suffix in suffixes]
+    for name in lists:
+        data=source.raw(name)
+        if len(data)%2:raise ValueError('Misaligned complete reward list: '+name)
+        values=struct.unpack('>'+str(len(data)//2)+'H',data)
+        if not values or not values[0] or 0 not in values or any(values[values.index(0):]):
+            raise ValueError('Missing terminator or lost reward-list tail: '+name)
+        reward_code.append('mActor_name_t '+name+'[]={'+','.join(map(str,values))+'};')
+        rewards.append(dict(symbol=name,bytes=len(data),count=values.index(0),source_sha256=sha256(data)))
+    generated['reward-lists.c']='\n'.join(reward_code)+'\n'
+    constants=generated['constants.h']
+    if not constants.endswith('#endif\n'):raise ValueError('Changed complete actor constant guard')
+    generated['constants.h']=constants[:-7]+(
+        f'#undef SP_NPC_EV_GHOST\n#define SP_NPC_EV_GHOST 0x{identity["name"]:X}\n'
+        '#define aNPC_CT_SCHED_TYPE_SPECIAL 5\n#define mEv_actor_dying_message af_cw_dying\n#endif\n')
+    links=dict(previous['bindings']);links.update(previous['code']['symbols']);links.update(quest['code']['symbols'])
+    links.update(equipment['carried_items']['code']['symbols'])
+    # Never inherit a different family's message or item resolver merely because
+    # it exports the same source name. These consumers require quest mappings.
+    forbidden=('mDemo_Set_msg_num','mMsg_Set_continue_msg_num','mDemo_Set_OrderValue',
+        'mIN_copy_name_str','mIN_get_item_article','mString_Load_StringFromRom')
+    for name in forbidden:links.pop(name,None)
+    links.update(mChoice_Get_ChoseNum=links['af_hp_choice_index'],
+        mChoice_Get_base_window_p=links['af_hp_choice_window'],
+        mMsg_Check_MainNormalContinue=links['af_hp_message_continue'],
+        mEv_get_common_area=links['af_cw_get_common'])
+    symbols=(ROOT/'upstream/af/linker_scripts/jp/symbol_addrs_code.txt').read_text()
+    native_names={n:int(a,16) for n,a in re.findall(r'^(\w+) = 0x([0-9A-F]+);',symbols,re.M)}
+    for name in ('mHS_get_arrange_idx','mTM_set_renew_time'):links[name]=native_names[name]
+    units=('carried_npc','holiday_participants_registry','holiday_participants_services',
+        'holiday_participants_storage','holiday_participants_spawn','holiday_festival_motion')
+    out.mkdir(parents=True)
+    for name,data in generated.items():write_new(out/name,data if isinstance(data,bytes) else data.encode())
+    docker=['docker','run','--rm','--network','none','--user',f'{os.getuid()}:{os.getgid()}',
+        '-v',f'{ROOT}:/source:ro','-v',f'{out}:/out','-w','/out','--entrypoint']
+    def run(tool,*args):
+        return subprocess.run(docker+['/n64_toolchain/bin/mips64-elf-'+tool,IMAGE,*args],
+            text=True,capture_output=True,check=True,timeout=60).stdout
+    flags=old['object']['flags']+['-DAF_HP_EXERCISE_REGISTRY=1','-DAF_HP_FESTIVAL_REGISTRY=1','-DAF_HP_CARRIED_REGISTRY=1']
+    files=[n for n in generated if n.endswith(('.c','.S'))]+[
+        '/source/overlays/v3/'+n+('.S' if n.endswith('_spawn') else '.c') for n in units]
+    run('gcc',*flags,*files)
+    objects=[Path(n).stem+'.o' for n in files]
+    run('ld','-EB','-r',*objects,'-o','unbound.o')
+    undefined={line.split()[-1] for line in run('nm','--undefined-only','unbound.o').splitlines()}
+    bindings={n:links[n] for n in sorted(undefined&links.keys())}
+    run('ld','-EB','-r',*(f'--defsym={n}=0x{v:X}' for n,v in bindings.items()),'unbound.o','-o','carried-npc.o')
+    paths=['tools/v3_holiday_participants.py','tools/v3_keyframes.py',
+        'overlays/v3/carried_event.h','overlays/v3/holiday_participants.h','overlays/v3/room_rigs.h',
+        'tools/v3_registry.py']+['overlays/v3/'+n+('.S' if n.endswith('_spawn') else '.c') for n in units]
+    report=dict(old,format='AFV3-CARRIED-NPC-1',base_abi=prior['runtime_abi'],base_sha256=sha256(base),
+        source_prepared=str(directory.relative_to(ROOT)),identity=identity,motions=motions,retained_motions=retained,
+        registry=dict(rows=rows,owner_count=23,resident_count=18,live_count=25,independent_gate=True),
+        dialogue=text,strings=fields,name=dict(sex=sex,index=index,sound=sound),bindings=bindings,reward_lists=rewards,
+        unbound_services=run('nm','--undefined-only','carried-npc.o').strip().splitlines(),
+        generated_sha256={n:sha256((out/n).read_bytes()) for n in generated},
+        sources={n:sha256((ROOT/n).read_bytes()) for n in paths},
+        object=dict(sha256=sha256((out/'carried-npc.o').read_bytes()),compiler=IMAGE,flags=flags,
+            size=run('size','carried-npc.o'),linked=False),installed=False)
     write_new(out/'prepared.json',(json.dumps(report,indent=2)+'\n').encode())
     return report
 
@@ -1773,10 +1968,12 @@ if __name__=='__main__':
     p.add_argument('--exercise',action='store_true',help='Prepare the complete exercise actor/card family using the same source importer')
     p.add_argument('--festivals',action='store_true',help='Prepare all remaining ordinary festival participant families together')
     p.add_argument('--carried-event',action='store_true',help='Prepare the complete carried-creature quest owner')
+    p.add_argument('--connect-carried-event',type=Path,help='Connect a checked complete carried actor to shared NPC services')
     args=p.parse_args()
-    if sum((args.exercise,args.festivals,args.carried_event))>1:p.error('Select one complete participant family')
+    if sum((args.exercise,args.festivals,args.carried_event,bool(args.connect_carried_event)))>1:p.error('Select one complete participant family')
     try:
-        result=(prepare_carried_event(args.output,args.build_lock) if args.carried_event else
+        result=(connect_carried_event(args.output,args.build_lock,args.connect_carried_event) if args.connect_carried_event else
+            prepare_carried_event(args.output,args.build_lock) if args.carried_event else
             prepare_festivals(args.output,args.build_lock) if args.festivals else
             prepare_exercise(args.output,args.build_lock) if args.exercise else prepare(args.output,args.build_lock,args.reuse))
     except subprocess.CalledProcessError as e:

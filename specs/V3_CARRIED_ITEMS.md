@@ -491,7 +491,7 @@ NPC name is additive. The existing native descriptor, landmark, collision,
 foreground, height-gap, reserve/reuse, forward-acre, flattening, and spawn
 adapters remain the shared implementation.
 
-The remaining NPC connection uses these existing components together:
+The NPC connection uses these existing components together:
 
 - Source `Ev_Ghost_Profile` is profile `B7`, name `D06F`, size 2,480 bytes. The
   fixed additional reservation is name `D0CD`, profile `F0`, model bank 456,
@@ -527,6 +527,67 @@ margin five. Current cartridge checks cover the exact new row, two relocation
 bases, unchanged controls, all retained resources, the complete save/spawn prefix,
 22 startup CRCs, and UPS reconstruction. Seven browser/offline profiles agree.
 These are host/build results, not native gameplay or hardware verification.
+
+### Connected NPC preparation
+
+`v3_holiday_participants.py --connect-carried-event PATH --build-lock PATH
+--output PATH` reuses the complete prepared actor and reference hashes. The
+current output is `build/v3-carried-npc-connected-03/`, based on ABI 366. It
+compiles every actor function with the shared registry, NPC services, event-save
+routing, translucent draw service, imported-motion provider, and text mapping.
+The native actor is 2,392 bytes. The object contains 16,169 text/constant bytes,
+2,104 data bytes, and 2,214 BSS bytes. It is not installed: 24 actual world,
+schedule, message/handover, and reward service dependencies remain undefined.
+No successful placeholder fills a missing consumer.
+
+The shared registry has 23 owners, eighteen temporary resident slots, and 25
+live slots. Its 22 retained rows and source callback addresses remain intact.
+The new source-event-114 owner uses its own availability and selected-spirit
+checks, independently of diary admission. Descriptor identity, construction,
+callback admission, destruction after selection loss, and retained-family
+lifecycle use the same implementation. The spawn table extends through `D0CD`;
+Wisp's saved-area calls route to the installed quest owner, not the older holiday
+event map. Installation still needs to redirect the existing registry exports
+so all actors use one state allocation.
+
+Native actor parameters are signed shorts at `24`; scale begins at `5C`, and
+shadow enable is at `108`. Melody is a signed word at `930`, as shown by native
+initialization stores and voice readers, rather than the source short or the
+earlier unbound byte declaration. The draw service checks available translucent
+command space, emits pipe sync and white environment colour with the source
+alpha, and invokes the shared NPC renderer.
+
+Source `GSTWAIT1` uses additive motion ID 382. Its complete 26-joint, 65-frame
+curve and all 64 header bytes are retained. The shared converter accepts its
+ordinary blinking sequence with an unused `-1` stop frame, while still rejecting
+a stopped eye that would index an invalid texture. The new motion table keeps
+all three installed festival motion pointers without reconverting them. Source
+default animation 126 is explicitly mapped to 382 too. Native WANDER does not
+implement the source WALK_WANDER walk-only choice; that schedule consumer still
+requires the real behaviour, not a same-number or approximate fallback.
+
+The complete official message closure is source `2ED3..2F02`, mapped to native
+`3320..334F`; sixteen choices start at 524. No branch escapes that closure.
+All 32 angry-name strings and the Wisp name are retained, with 97 exact source
+credits in `translations/provenance.json`. The long introduction `2EE4` repeats
+the same colour between literal lines. Removing ten already-active colour
+commands lowers its conservative expanded bound from 1,073 to 1,023 bytes.
+Every other command invalidates colour reuse except pauses, so page clears,
+insertions, and NPC orders retain their explicit colour commands. No wording,
+line/page boundary, colour change, or timing command is altered.
+
+All twenty external reward lists are compiled in bulk, retaining 839 source
+entries and their terminators; the actor's gyroid and umbrella lists remain
+complete. Runtime supported/selected-item filtering and donor-to-native mapping
+must cover all 22 categories, including the all-collected random fallback.
+Disabled imports cannot be awarded under their donor numeric identities.
+
+`tests/test_v3_carried_npc.py` checks the changed shared admission/lifecycle with
+diary admission both off and on, native field widths, translucent command bounds,
+retained-family lifecycle, complete source/programme retention, official message
+closure/bounds/credits, and the twenty source lists. Three focused checks pass.
+The existing quest manager, artwork, save packet, and cartridges are unchanged;
+no native gameplay, new ROM, or hardware result is claimed by this preparation.
 
 ## Verification and limits
 

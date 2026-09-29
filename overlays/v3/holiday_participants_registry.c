@@ -13,6 +13,11 @@ static AFHPResident residents[AF_HP_RESIDENT_COUNT];
 static u8 retiring[AF_HP_RESIDENT_COUNT];
 typedef struct {ACTOR *actor;u8 constructed;mActor_proc move,draw;} Live;
 static Live live[AF_HP_LIVE_COUNT];
+#ifndef AF_HP_CARRIED_REGISTRY
+static int af_hp_owner_enabled(const AFHPRecord *record) {
+    (void)record;return af_hp_available!=0;
+}
+#endif
 extern void *af_hp_previous_descriptor(int);
 extern AFHPResident *af_hp_previous_event(u16);
 extern void af_hp_previous_unregister(u16),af_hp_previous_clear(void);
@@ -106,10 +111,10 @@ void af_hp_events_clear(void) {
 }
 int af_hp_resident_bind(u16 source,u16 npc,u16 cloth) {
     const AFHPRecord *r=0;unsigned int role=0;
-    if(!af_hp_available)return -1;
     for(unsigned int i=0;i<AF_HP_OWNER_COUNT;i++) {
         const AFHPRecord *p=af_hp_records+i;
-        if(p->count && !(p->kind&AF_HP_SPECIAL) && source>=p->source_name && source-p->source_name<p->count) {
+        if(af_hp_owner_enabled(p) && p->count && !(p->kind&AF_HP_SPECIAL) &&
+           source>=p->source_name && source-p->source_name<p->count) {
             r=p;role=source-p->source_name;break;
         }
     }
@@ -142,12 +147,11 @@ int af_hp_identity(unsigned int kind,unsigned int source) {
     /* Event preflight runs before resident selection or actor construction.
      * Resolve the installed identity, not a currently spawned instance. The
      * category selection/dependency gate still rejects unfinished admission. */
-    if(!af_hp_available)return -1;
-    if(kind==2)return source==118?119:-1;
+    if(kind==2)return af_hp_available && source==118?119:-1;
     if(kind>1 || source>65535)return -1;
     for(unsigned int i=0;i<AF_HP_OWNER_COUNT;i++) {
         const AFHPRecord *r=af_hp_records+i;
-        if(!ready(r))continue;
+        if(!af_hp_owner_enabled(r) || !ready(r))continue;
         if(kind==1 && r->source->source_profile==(int)source)return r->profile;
         if(kind==0 && r->count && source>=r->source_name && source-r->source_name<r->count)
             return r->name+source-r->source_name;
@@ -169,7 +173,7 @@ void *af_hp_descriptor(int profile) {
 }
 int af_hp_admit(ACTOR *a,GAME *g) {
     int index=identity(a);
-    if(!af_hp_available || !g || index<0 || !ready(af_hp_records+index))return 0;
+    if(!g || index<0 || !af_hp_owner_enabled(af_hp_records+index) || !ready(af_hp_records+index))return 0;
     const AFHPRecord *r=af_hp_records+index;
     if(r->kind&AF_HP_NO_SAVE) {
 #ifdef AF_HP_EXERCISE_REGISTRY
@@ -191,7 +195,7 @@ void af_hp_ctor(ACTOR *a,GAME *g) {
     int index=identity(a);
     if(index<0) {Actor_delete(a);return;}
     const AFHPRecord *r=af_hp_records+index;
-    if(!af_hp_available || !g || !ready(r)) {Actor_delete(a);return;}
+    if(!af_hp_owner_enabled(r) || !g || !ready(r)) {Actor_delete(a);return;}
     Live *slot=0;
     for(unsigned int i=0;i<AF_HP_LIVE_COUNT;i++)if(!live[i].actor) {slot=live+i;break;}
     if(!slot) {Actor_delete(a);return;}

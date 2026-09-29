@@ -29783,6 +29783,2287 @@
     {"id":"message:331C","native_sha256":null,"locales":{"en":{"credit":"official","locator":["tools/v3_carried_runtime.py:capture_text","N64/message/331C"],"source":{"source":"user-supplied GAFE01 revision 0 disc","reference_id":"message:2F05","reference_sha256":"8c81a03fe2bd08a2a83d0696ea276b04ba5cf238bd903b098bc742b0d575eba7"},"adaptations":["Native encoding; retain official wording, line/page breaks, pauses, colours, and empty final record"],"human_review":"not_recorded","encoded_sha256":"8c81a03fe2bd08a2a83d0696ea276b04ba5cf238bd903b098bc742b0d575eba7"}}},
     {"id":"message:331D","native_sha256":null,"locales":{"en":{"credit":"official","locator":["tools/v3_carried_runtime.py:capture_text","N64/message/331D"],"source":{"source":"user-supplied GAFE01 revision 0 disc","reference_id":"message:2F06","reference_sha256":"3741165650c6409858d2cc7c350be4983f694541d769f0b7929a3ca5a6a06c15"},"adaptations":["Native encoding; retain official wording, line/page breaks, pauses, colours, and empty final record"],"human_review":"not_recorded","encoded_sha256":"3741165650c6409858d2cc7c350be4983f694541d769f0b7929a3ca5a6a06c15"}}},
     {"id":"message:331E","native_sha256":null,"locales":{"en":{"credit":"official","locator":["tools/v3_carried_runtime.py:capture_text","N64/message/331E"],"source":{"source":"user-supplied GAFE01 revision 0 disc","reference_id":"message:2F07","reference_sha256":"305669397a70376131ed6e332db2e821b7a210b2c71666b54ec28353ca4b61d6"},"adaptations":["Native encoding; retain official wording, line/page breaks, pauses, colours, and empty final record"],"human_review":"not_recorded","encoded_sha256":"305669397a70376131ed6e332db2e821b7a210b2c71666b54ec28353ca4b61d6"}}},
-    {"id":"message:331F","native_sha256":null,"locales":{"en":{"credit":"official","locator":["tools/v3_carried_runtime.py:capture_text","N64/message/331F"],"source":{"source":"user-supplied GAFE01 revision 0 disc","reference_id":"message:2F08","reference_sha256":"9f3a060c00e96dbd2bf5cb77506048f22667fb11cd4d5e3c20993685fc805646"},"adaptations":["Native encoding; retain official wording, line/page breaks, pauses, colours, and empty final record"],"human_review":"not_recorded","encoded_sha256":"9f3a060c00e96dbd2bf5cb77506048f22667fb11cd4d5e3c20993685fc805646"}}}
+    {"id":"message:331F","native_sha256":null,"locales":{"en":{"credit":"official","locator":["tools/v3_carried_runtime.py:capture_text","N64/message/331F"],"source":{"source":"user-supplied GAFE01 revision 0 disc","reference_id":"message:2F08","reference_sha256":"9f3a060c00e96dbd2bf5cb77506048f22667fb11cd4d5e3c20993685fc805646"},"adaptations":["Native encoding; retain official wording, line/page breaks, pauses, colours, and empty final record"],"human_review":"not_recorded","encoded_sha256":"9f3a060c00e96dbd2bf5cb77506048f22667fb11cd4d5e3c20993685fc805646"}}},
+    {
+      "id": "message:3320",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:dialogue",
+            "message:3320"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "message:2ED3",
+            "reference_sha256": "46d2a2d733ae6517ade303415c1fc844af20f508fd09961d8bc6034e684e9547"
+          },
+          "adaptations": [
+            "Native encoding; retain official wording, line/page breaks, pauses, and demo orders",
+            "Remap the complete participant message/choice graph to additive native IDs"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "46d2a2d733ae6517ade303415c1fc844af20f508fd09961d8bc6034e684e9547"
+        }
+      }
+    },
+    {
+      "id": "message:3321",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:dialogue",
+            "message:3321"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "message:2ED4",
+            "reference_sha256": "57e626bd4676c94a07637b4e3751433f9c544ec82297c8e83ad81d87370090a1"
+          },
+          "adaptations": [
+            "Native encoding; retain official wording, line/page breaks, pauses, and demo orders",
+            "Remap the complete participant message/choice graph to additive native IDs"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "57e626bd4676c94a07637b4e3751433f9c544ec82297c8e83ad81d87370090a1"
+        }
+      }
+    },
+    {
+      "id": "message:3322",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:dialogue",
+            "message:3322"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "message:2ED5",
+            "reference_sha256": "07adab0c0917bd2e0f9e33c2a06730419474531a8876723192bd8a55da93242a"
+          },
+          "adaptations": [
+            "Native encoding; retain official wording, line/page breaks, pauses, and demo orders",
+            "Remap the complete participant message/choice graph to additive native IDs"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "07adab0c0917bd2e0f9e33c2a06730419474531a8876723192bd8a55da93242a"
+        }
+      }
+    },
+    {
+      "id": "message:3323",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:dialogue",
+            "message:3323"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "message:2ED6",
+            "reference_sha256": "2a64ad8c96b3ef66c0c5d4435f20d22be6b5b11e725078e2ebca2cfc5db8a32e"
+          },
+          "adaptations": [
+            "Native encoding; retain official wording, line/page breaks, pauses, and demo orders",
+            "Remap the complete participant message/choice graph to additive native IDs"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "2a64ad8c96b3ef66c0c5d4435f20d22be6b5b11e725078e2ebca2cfc5db8a32e"
+        }
+      }
+    },
+    {
+      "id": "message:3324",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:dialogue",
+            "message:3324"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "message:2ED7",
+            "reference_sha256": "da23e17d4d19632e02610df92d69bd0b3132f0a6c920a13779b6997b7eff3dfd"
+          },
+          "adaptations": [
+            "Native encoding; retain official wording, line/page breaks, pauses, and demo orders",
+            "Remap the complete participant message/choice graph to additive native IDs"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "da23e17d4d19632e02610df92d69bd0b3132f0a6c920a13779b6997b7eff3dfd"
+        }
+      }
+    },
+    {
+      "id": "message:3325",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:dialogue",
+            "message:3325"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "message:2ED8",
+            "reference_sha256": "5c05348e211e13cdc43f05dc5234093a09185a8c2727869d3c6a175987554a62"
+          },
+          "adaptations": [
+            "Native encoding; retain official wording, line/page breaks, pauses, and demo orders",
+            "Remap the complete participant message/choice graph to additive native IDs"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "5c05348e211e13cdc43f05dc5234093a09185a8c2727869d3c6a175987554a62"
+        }
+      }
+    },
+    {
+      "id": "message:3326",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:dialogue",
+            "message:3326"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "message:2ED9",
+            "reference_sha256": "eebbc536bdacacc75a77208cb91b83d1aa402beb3e30c552590c28bc9f2f00b1"
+          },
+          "adaptations": [
+            "Native encoding; retain official wording, line/page breaks, pauses, and demo orders",
+            "Remap the complete participant message/choice graph to additive native IDs"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "eebbc536bdacacc75a77208cb91b83d1aa402beb3e30c552590c28bc9f2f00b1"
+        }
+      }
+    },
+    {
+      "id": "message:3327",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:dialogue",
+            "message:3327"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "message:2EDA",
+            "reference_sha256": "18eda8dc8a4d9470fcd176434ea7d2fe97692e0c853ca7b4bb96970f40ded11e"
+          },
+          "adaptations": [
+            "Native encoding; retain official wording, line/page breaks, pauses, and demo orders",
+            "Remap the complete participant message/choice graph to additive native IDs"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "18eda8dc8a4d9470fcd176434ea7d2fe97692e0c853ca7b4bb96970f40ded11e"
+        }
+      }
+    },
+    {
+      "id": "message:3328",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:dialogue",
+            "message:3328"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "message:2EDB",
+            "reference_sha256": "8699693af6856f2680f761aae10612f811540888398b7211ff27c336bade7388"
+          },
+          "adaptations": [
+            "Native encoding; retain official wording, line/page breaks, pauses, and demo orders",
+            "Remap the complete participant message/choice graph to additive native IDs"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "8699693af6856f2680f761aae10612f811540888398b7211ff27c336bade7388"
+        }
+      }
+    },
+    {
+      "id": "message:3329",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:dialogue",
+            "message:3329"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "message:2EDC",
+            "reference_sha256": "1c914c784b6423ee3552690b352e9549769da770a4f769ecaba0d7e81a4322e7"
+          },
+          "adaptations": [
+            "Native encoding; retain official wording, line/page breaks, pauses, and demo orders",
+            "Remap the complete participant message/choice graph to additive native IDs"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "1c914c784b6423ee3552690b352e9549769da770a4f769ecaba0d7e81a4322e7"
+        }
+      }
+    },
+    {
+      "id": "message:332A",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:dialogue",
+            "message:332A"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "message:2EDD",
+            "reference_sha256": "3aba7d38a301e4179ef97195ddd05a07c279fade6e4a158568dae35d694b08dd"
+          },
+          "adaptations": [
+            "Native encoding; retain official wording, line/page breaks, pauses, and demo orders",
+            "Remap the complete participant message/choice graph to additive native IDs"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "3aba7d38a301e4179ef97195ddd05a07c279fade6e4a158568dae35d694b08dd"
+        }
+      }
+    },
+    {
+      "id": "message:332B",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:dialogue",
+            "message:332B"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "message:2EDE",
+            "reference_sha256": "f848b1f7fdffdf240ef27daea3220d49af2d1f3876669f886b4fd344c5eba53b"
+          },
+          "adaptations": [
+            "Native encoding; retain official wording, line/page breaks, pauses, and demo orders",
+            "Remap the complete participant message/choice graph to additive native IDs"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "f848b1f7fdffdf240ef27daea3220d49af2d1f3876669f886b4fd344c5eba53b"
+        }
+      }
+    },
+    {
+      "id": "message:332C",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:dialogue",
+            "message:332C"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "message:2EDF",
+            "reference_sha256": "c88c80d2716c80712e97a3188d975e7e4e5986b07e520b15ef5687d7394b711b"
+          },
+          "adaptations": [
+            "Native encoding; retain official wording, line/page breaks, pauses, and demo orders",
+            "Remap the complete participant message/choice graph to additive native IDs"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "c88c80d2716c80712e97a3188d975e7e4e5986b07e520b15ef5687d7394b711b"
+        }
+      }
+    },
+    {
+      "id": "message:332D",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:dialogue",
+            "message:332D"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "message:2EE0",
+            "reference_sha256": "1746c6cd0cc78f1762169049ccb1e17519a6a1148d724fea15991cf41782ad5a"
+          },
+          "adaptations": [
+            "Native encoding; retain official wording, line/page breaks, pauses, and demo orders",
+            "Remap the complete participant message/choice graph to additive native IDs"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "1746c6cd0cc78f1762169049ccb1e17519a6a1148d724fea15991cf41782ad5a"
+        }
+      }
+    },
+    {
+      "id": "message:332E",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:dialogue",
+            "message:332E"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "message:2EE1",
+            "reference_sha256": "bc260322b81db4fb44ef3e5c5918c2544728041a9d8fefe400a11be37ce0a9c9"
+          },
+          "adaptations": [
+            "Native encoding; retain official wording, line/page breaks, pauses, and demo orders",
+            "Remap the complete participant message/choice graph to additive native IDs"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "bc260322b81db4fb44ef3e5c5918c2544728041a9d8fefe400a11be37ce0a9c9"
+        }
+      }
+    },
+    {
+      "id": "message:332F",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:dialogue",
+            "message:332F"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "message:2EE2",
+            "reference_sha256": "85d826390c0730d40522de8a13074d51761243129bc8aaa1cdd588d5cb2f8bda"
+          },
+          "adaptations": [
+            "Native encoding; retain official wording, line/page breaks, pauses, and demo orders",
+            "Remap the complete participant message/choice graph to additive native IDs"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "85d826390c0730d40522de8a13074d51761243129bc8aaa1cdd588d5cb2f8bda"
+        }
+      }
+    },
+    {
+      "id": "message:3330",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:dialogue",
+            "message:3330"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "message:2EE3",
+            "reference_sha256": "fa397d8b60232003d070c1a6e32998d691aedd3b39f0aa0d447594df0773615f"
+          },
+          "adaptations": [
+            "Native encoding; retain official wording, line/page breaks, pauses, and demo orders",
+            "Remap the complete participant message/choice graph to additive native IDs"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "fa397d8b60232003d070c1a6e32998d691aedd3b39f0aa0d447594df0773615f"
+        }
+      }
+    },
+    {
+      "id": "message:3331",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:dialogue",
+            "message:3331"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "message:2EE4",
+            "reference_sha256": "c802a5f0d58cf9ddf6555e29be6d06a1795a2256fbfae1e0644915b0f89b0c13"
+          },
+          "adaptations": [
+            "Native encoding; retain official wording, line/page breaks, pauses, and demo orders",
+            "Remap the complete participant message/choice graph to additive native IDs",
+            "Remove redundant already-active colour commands between literal text and pauses; retain all colour changes, line/page breaks, and timing"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "cc2b0bdf7065e56407f40acc53e844d243d6153b291b2f42b679353b639aabaa"
+        }
+      }
+    },
+    {
+      "id": "message:3332",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:dialogue",
+            "message:3332"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "message:2EE5",
+            "reference_sha256": "38590fff80c923c5b0f381477b439043ff784ae33ebbe214c3383167323a7959"
+          },
+          "adaptations": [
+            "Native encoding; retain official wording, line/page breaks, pauses, and demo orders",
+            "Remap the complete participant message/choice graph to additive native IDs"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "38590fff80c923c5b0f381477b439043ff784ae33ebbe214c3383167323a7959"
+        }
+      }
+    },
+    {
+      "id": "message:3333",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:dialogue",
+            "message:3333"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "message:2EE6",
+            "reference_sha256": "bbcb7313eabf676068f49685baf85e391d83dde33274b4b232883e8ffbfade85"
+          },
+          "adaptations": [
+            "Native encoding; retain official wording, line/page breaks, pauses, and demo orders",
+            "Remap the complete participant message/choice graph to additive native IDs"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "bbcb7313eabf676068f49685baf85e391d83dde33274b4b232883e8ffbfade85"
+        }
+      }
+    },
+    {
+      "id": "message:3334",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:dialogue",
+            "message:3334"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "message:2EE7",
+            "reference_sha256": "828bc5873a4d2b9845f3b25feb565967bfd996afd38d56eaf16246f5a36e03e7"
+          },
+          "adaptations": [
+            "Native encoding; retain official wording, line/page breaks, pauses, and demo orders",
+            "Remap the complete participant message/choice graph to additive native IDs"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "828bc5873a4d2b9845f3b25feb565967bfd996afd38d56eaf16246f5a36e03e7"
+        }
+      }
+    },
+    {
+      "id": "message:3335",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:dialogue",
+            "message:3335"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "message:2EE8",
+            "reference_sha256": "30f63e4afa351d9cd4613f90587279da48e6540653de57819d4c1be722c1eaf9"
+          },
+          "adaptations": [
+            "Native encoding; retain official wording, line/page breaks, pauses, and demo orders",
+            "Remap the complete participant message/choice graph to additive native IDs"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "30f63e4afa351d9cd4613f90587279da48e6540653de57819d4c1be722c1eaf9"
+        }
+      }
+    },
+    {
+      "id": "message:3336",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:dialogue",
+            "message:3336"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "message:2EE9",
+            "reference_sha256": "bfca34d231d6c4ecb4a71202dbcc950207432397aad7354749027b606bb8f0d6"
+          },
+          "adaptations": [
+            "Native encoding; retain official wording, line/page breaks, pauses, and demo orders",
+            "Remap the complete participant message/choice graph to additive native IDs"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "bfca34d231d6c4ecb4a71202dbcc950207432397aad7354749027b606bb8f0d6"
+        }
+      }
+    },
+    {
+      "id": "message:3337",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:dialogue",
+            "message:3337"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "message:2EEA",
+            "reference_sha256": "f3583c258e03f5f2abfddc6b1fe7c624c6065b608a4b2ba151ee9b0311bd165f"
+          },
+          "adaptations": [
+            "Native encoding; retain official wording, line/page breaks, pauses, and demo orders",
+            "Remap the complete participant message/choice graph to additive native IDs"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "f3583c258e03f5f2abfddc6b1fe7c624c6065b608a4b2ba151ee9b0311bd165f"
+        }
+      }
+    },
+    {
+      "id": "message:3338",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:dialogue",
+            "message:3338"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "message:2EEB",
+            "reference_sha256": "9cf5644d6664493dc5c9e2dde86273ea0e207a37eba2f95e06abdea28c725b0d"
+          },
+          "adaptations": [
+            "Native encoding; retain official wording, line/page breaks, pauses, and demo orders",
+            "Remap the complete participant message/choice graph to additive native IDs"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "9cf5644d6664493dc5c9e2dde86273ea0e207a37eba2f95e06abdea28c725b0d"
+        }
+      }
+    },
+    {
+      "id": "message:3339",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:dialogue",
+            "message:3339"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "message:2EEC",
+            "reference_sha256": "8fc3945542d6a99cf4dde00cbc4eacbdf2c1fdd5c502415c91ba960895d2a31a"
+          },
+          "adaptations": [
+            "Native encoding; retain official wording, line/page breaks, pauses, and demo orders",
+            "Remap the complete participant message/choice graph to additive native IDs"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "8fc3945542d6a99cf4dde00cbc4eacbdf2c1fdd5c502415c91ba960895d2a31a"
+        }
+      }
+    },
+    {
+      "id": "message:333A",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:dialogue",
+            "message:333A"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "message:2EED",
+            "reference_sha256": "1eeab97c1de5f271a2975c4222a13f795ca848634f68ef7e81a6e3a831b278fb"
+          },
+          "adaptations": [
+            "Native encoding; retain official wording, line/page breaks, pauses, and demo orders",
+            "Remap the complete participant message/choice graph to additive native IDs"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "1eeab97c1de5f271a2975c4222a13f795ca848634f68ef7e81a6e3a831b278fb"
+        }
+      }
+    },
+    {
+      "id": "message:333B",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:dialogue",
+            "message:333B"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "message:2EEE",
+            "reference_sha256": "ae8ea129155a1163568240cc20f86af5ec6b695905fd2d8a214a64321c483076"
+          },
+          "adaptations": [
+            "Native encoding; retain official wording, line/page breaks, pauses, and demo orders",
+            "Remap the complete participant message/choice graph to additive native IDs"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "ae8ea129155a1163568240cc20f86af5ec6b695905fd2d8a214a64321c483076"
+        }
+      }
+    },
+    {
+      "id": "message:333C",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:dialogue",
+            "message:333C"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "message:2EEF",
+            "reference_sha256": "27438206c953a95136716e78eb8bced2b84d3cbc5daa4e4d1637e4a2ec243fb7"
+          },
+          "adaptations": [
+            "Native encoding; retain official wording, line/page breaks, pauses, and demo orders",
+            "Remap the complete participant message/choice graph to additive native IDs"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "27438206c953a95136716e78eb8bced2b84d3cbc5daa4e4d1637e4a2ec243fb7"
+        }
+      }
+    },
+    {
+      "id": "message:333D",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:dialogue",
+            "message:333D"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "message:2EF0",
+            "reference_sha256": "830b19545d5dd69d15f3a55cc70f461d37416a1858443277ea220840c092fe1e"
+          },
+          "adaptations": [
+            "Native encoding; retain official wording, line/page breaks, pauses, and demo orders",
+            "Remap the complete participant message/choice graph to additive native IDs"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "0427f6c69867c090a88d40d00f59d3ffb435b2a3d936378f7078bab88eddd1ec"
+        }
+      }
+    },
+    {
+      "id": "message:333E",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:dialogue",
+            "message:333E"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "message:2EF1",
+            "reference_sha256": "7e64272d6173c13e4b5987d13b1bc985f8f8f888f5e827cfc2d502a9b2cc0d34"
+          },
+          "adaptations": [
+            "Native encoding; retain official wording, line/page breaks, pauses, and demo orders",
+            "Remap the complete participant message/choice graph to additive native IDs"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "efd265501b6e349f0c463c67a4b8e7bca109862347da5aa28e726b1a17241f3f"
+        }
+      }
+    },
+    {
+      "id": "message:333F",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:dialogue",
+            "message:333F"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "message:2EF2",
+            "reference_sha256": "4bb9b03696833357d2519d4087b25c0dd07300815ede6b0e4df6643fcb053bf6"
+          },
+          "adaptations": [
+            "Native encoding; retain official wording, line/page breaks, pauses, and demo orders",
+            "Remap the complete participant message/choice graph to additive native IDs"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "79ee598ba821dac1e412e7d166847ba5832888bd6e2ee5435804c0b35e95f3d4"
+        }
+      }
+    },
+    {
+      "id": "message:3340",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:dialogue",
+            "message:3340"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "message:2EF3",
+            "reference_sha256": "a004febd48f35418135e672afd51c15632bd635e76b9c29ad079721df451a5b0"
+          },
+          "adaptations": [
+            "Native encoding; retain official wording, line/page breaks, pauses, and demo orders",
+            "Remap the complete participant message/choice graph to additive native IDs"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "6d6b76db30a387a0bfddd2010b229144416dfa07a34652d1eb2b5e9c3c4037a2"
+        }
+      }
+    },
+    {
+      "id": "message:3341",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:dialogue",
+            "message:3341"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "message:2EF4",
+            "reference_sha256": "37128761dad83fad2a90abb518b6b40aa73832fe3d7588fecd8483e131bfcac8"
+          },
+          "adaptations": [
+            "Native encoding; retain official wording, line/page breaks, pauses, and demo orders",
+            "Remap the complete participant message/choice graph to additive native IDs"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "0b2b2284804c8dd5d7174e76ffbfc7a578abbce8195c07f7b2023229296d3068"
+        }
+      }
+    },
+    {
+      "id": "message:3342",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:dialogue",
+            "message:3342"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "message:2EF5",
+            "reference_sha256": "bd0b6e5a75e1fd667ee624e44ea7a0aba52a243b65caf7ad93220d38c6d225e4"
+          },
+          "adaptations": [
+            "Native encoding; retain official wording, line/page breaks, pauses, and demo orders",
+            "Remap the complete participant message/choice graph to additive native IDs"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "1372e362d882baa56762cb1398b6f073ac955456d5af8f72adc24ba78a20dc2d"
+        }
+      }
+    },
+    {
+      "id": "message:3343",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:dialogue",
+            "message:3343"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "message:2EF6",
+            "reference_sha256": "40b21363fe3f4abf3e609b9a50a8ea09529f953f263f41ccfd0dcbd9a794b9af"
+          },
+          "adaptations": [
+            "Native encoding; retain official wording, line/page breaks, pauses, and demo orders",
+            "Remap the complete participant message/choice graph to additive native IDs"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "a38e1ea0054281e0ebe473177bafb1c961f4bb1e5cc4d8bfb8a9795d8b6a0c52"
+        }
+      }
+    },
+    {
+      "id": "message:3344",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:dialogue",
+            "message:3344"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "message:2EF7",
+            "reference_sha256": "990c7359c84a08a5810882980d522252ba8ca42e25da4cfebb4d8e1ae4b2fc30"
+          },
+          "adaptations": [
+            "Native encoding; retain official wording, line/page breaks, pauses, and demo orders",
+            "Remap the complete participant message/choice graph to additive native IDs"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "c7b69fc6def2862708c3e8c0e9965c3dac0bdcbefc85b359fd38e1e246428ce8"
+        }
+      }
+    },
+    {
+      "id": "message:3345",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:dialogue",
+            "message:3345"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "message:2EF8",
+            "reference_sha256": "9f39e403d21fef0351096efd7670b3daf8c4c18fd36b7ddb6a8171d9d401afd2"
+          },
+          "adaptations": [
+            "Native encoding; retain official wording, line/page breaks, pauses, and demo orders",
+            "Remap the complete participant message/choice graph to additive native IDs"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "4acf5337957e9e18544d4f4dd1fa55912750efa57182787b846c87dd7702e551"
+        }
+      }
+    },
+    {
+      "id": "message:3346",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:dialogue",
+            "message:3346"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "message:2EF9",
+            "reference_sha256": "60bb955b8fc697c3cb7babed1b4ec6cd56c4331217b5b49eb1486a24262de351"
+          },
+          "adaptations": [
+            "Native encoding; retain official wording, line/page breaks, pauses, and demo orders",
+            "Remap the complete participant message/choice graph to additive native IDs",
+            "Remove redundant article-suppression flags before native insertions"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "45c124f0999ad0bd22384a858d5fef9246c19751a97550ca63bd48c74db5c07a"
+        }
+      }
+    },
+    {
+      "id": "message:3347",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:dialogue",
+            "message:3347"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "message:2EFA",
+            "reference_sha256": "d6692968dc0f4d50932e1d5fe31aafd21c33c0025b2e49500e5489f2ce521edb"
+          },
+          "adaptations": [
+            "Native encoding; retain official wording, line/page breaks, pauses, and demo orders",
+            "Remap the complete participant message/choice graph to additive native IDs"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "b8e05d4485f13e5b07c94b7834a1397212a240a1e21d710fa417745f961bf649"
+        }
+      }
+    },
+    {
+      "id": "message:3348",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:dialogue",
+            "message:3348"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "message:2EFB",
+            "reference_sha256": "325f11722d09b12af031b90a80b7a06f4d222427bff1443f20156b9891e25821"
+          },
+          "adaptations": [
+            "Native encoding; retain official wording, line/page breaks, pauses, and demo orders",
+            "Remap the complete participant message/choice graph to additive native IDs"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "325f11722d09b12af031b90a80b7a06f4d222427bff1443f20156b9891e25821"
+        }
+      }
+    },
+    {
+      "id": "message:3349",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:dialogue",
+            "message:3349"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "message:2EFC",
+            "reference_sha256": "d13a054ab89f9f2423c2c0e0cdd88d13e91f90b32e87bf0fdb021782d3d786de"
+          },
+          "adaptations": [
+            "Native encoding; retain official wording, line/page breaks, pauses, and demo orders",
+            "Remap the complete participant message/choice graph to additive native IDs"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "88a6735d60ff560a187dc28a5e9366839694144624d3c5f2cbd3f8d9588172b0"
+        }
+      }
+    },
+    {
+      "id": "message:334A",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:dialogue",
+            "message:334A"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "message:2EFD",
+            "reference_sha256": "da46b006db6bff352323153131e03bd4087fb508fd02d502e1c4bc6ef39c569f"
+          },
+          "adaptations": [
+            "Native encoding; retain official wording, line/page breaks, pauses, and demo orders",
+            "Remap the complete participant message/choice graph to additive native IDs"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "eea8d7bddc65f41478ef7c36b6b9a7092d5edb484a41d055f4cfee7bff6a4e27"
+        }
+      }
+    },
+    {
+      "id": "message:334B",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:dialogue",
+            "message:334B"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "message:2EFE",
+            "reference_sha256": "091be1d21b460abd5dadcde1de8e0f5b75a3e991d24498f4d47bb31fe18ce518"
+          },
+          "adaptations": [
+            "Native encoding; retain official wording, line/page breaks, pauses, and demo orders",
+            "Remap the complete participant message/choice graph to additive native IDs"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "358d1d4c52c44532377608423c4386601dc97359106149b4aa89bf57215aab0b"
+        }
+      }
+    },
+    {
+      "id": "message:334C",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:dialogue",
+            "message:334C"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "message:2EFF",
+            "reference_sha256": "f728c1e4c7ea423610cda4851c7df6e144abd4557bcb8aef2180e51bcc3ff0a3"
+          },
+          "adaptations": [
+            "Native encoding; retain official wording, line/page breaks, pauses, and demo orders",
+            "Remap the complete participant message/choice graph to additive native IDs"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "e0aa8904c51aab64d24bb6e19396fb42d1aa8b40107aab6e7a41dc8279d297d0"
+        }
+      }
+    },
+    {
+      "id": "message:334D",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:dialogue",
+            "message:334D"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "message:2F00",
+            "reference_sha256": "9f3a060c00e96dbd2bf5cb77506048f22667fb11cd4d5e3c20993685fc805646"
+          },
+          "adaptations": [
+            "Native encoding; retain official wording, line/page breaks, pauses, and demo orders",
+            "Remap the complete participant message/choice graph to additive native IDs"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "9f3a060c00e96dbd2bf5cb77506048f22667fb11cd4d5e3c20993685fc805646"
+        }
+      }
+    },
+    {
+      "id": "message:334E",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:dialogue",
+            "message:334E"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "message:2F01",
+            "reference_sha256": "9f3a060c00e96dbd2bf5cb77506048f22667fb11cd4d5e3c20993685fc805646"
+          },
+          "adaptations": [
+            "Native encoding; retain official wording, line/page breaks, pauses, and demo orders",
+            "Remap the complete participant message/choice graph to additive native IDs"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "9f3a060c00e96dbd2bf5cb77506048f22667fb11cd4d5e3c20993685fc805646"
+        }
+      }
+    },
+    {
+      "id": "message:334F",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:dialogue",
+            "message:334F"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "message:2F02",
+            "reference_sha256": "9f3a060c00e96dbd2bf5cb77506048f22667fb11cd4d5e3c20993685fc805646"
+          },
+          "adaptations": [
+            "Native encoding; retain official wording, line/page breaks, pauses, and demo orders",
+            "Remap the complete participant message/choice graph to additive native IDs"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "9f3a060c00e96dbd2bf5cb77506048f22667fb11cd4d5e3c20993685fc805646"
+        }
+      }
+    },
+    {
+      "id": "select:020C",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:dialogue",
+            "select:020C"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "select:00A1",
+            "reference_sha256": "ba19e9c3d5f49882ddaafed4f286a8a81491150426d321179270e27e74a89097"
+          },
+          "adaptations": [
+            "Native encoding; unchanged official choice"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "ba19e9c3d5f49882ddaafed4f286a8a81491150426d321179270e27e74a89097"
+        }
+      }
+    },
+    {
+      "id": "select:020D",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:dialogue",
+            "select:020D"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "select:00A2",
+            "reference_sha256": "78e7771b8b46e11ddb34ba48887e1330525215f96d94778980d1186e6f09f6b4"
+          },
+          "adaptations": [
+            "Native encoding; unchanged official choice"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "78e7771b8b46e11ddb34ba48887e1330525215f96d94778980d1186e6f09f6b4"
+        }
+      }
+    },
+    {
+      "id": "select:020E",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:dialogue",
+            "select:020E"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "select:00A3",
+            "reference_sha256": "19dd83f117525b931fccdafe808aaa6939af792ee549f359eff13fac0d622f5d"
+          },
+          "adaptations": [
+            "Native encoding; unchanged official choice"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "19dd83f117525b931fccdafe808aaa6939af792ee549f359eff13fac0d622f5d"
+        }
+      }
+    },
+    {
+      "id": "select:020F",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:dialogue",
+            "select:020F"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "select:00A4",
+            "reference_sha256": "0812aa4d1fe245dc73a2c0f0e06968d61e119793bdcb3c083b8faab743da0c42"
+          },
+          "adaptations": [
+            "Native encoding; unchanged official choice"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "0812aa4d1fe245dc73a2c0f0e06968d61e119793bdcb3c083b8faab743da0c42"
+        }
+      }
+    },
+    {
+      "id": "select:0210",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:dialogue",
+            "select:0210"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "select:00A5",
+            "reference_sha256": "d486dfbd5fb578340bccbdd0a662527eab38550648d5f44517e5ac71b8824703"
+          },
+          "adaptations": [
+            "Native encoding; unchanged official choice"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "d486dfbd5fb578340bccbdd0a662527eab38550648d5f44517e5ac71b8824703"
+        }
+      }
+    },
+    {
+      "id": "select:0211",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:dialogue",
+            "select:0211"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "select:00A6",
+            "reference_sha256": "450ff99cfe0b61f466d98dd893a668a994325e3871ba6ab7114c99a842ba951d"
+          },
+          "adaptations": [
+            "Native encoding; unchanged official choice"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "450ff99cfe0b61f466d98dd893a668a994325e3871ba6ab7114c99a842ba951d"
+        }
+      }
+    },
+    {
+      "id": "select:0212",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:dialogue",
+            "select:0212"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "select:00A7",
+            "reference_sha256": "ec7d56a01607001e6401366417c5e2eb00ffa0df17ca1a9a831e0b32c8f11bf7"
+          },
+          "adaptations": [
+            "Native encoding; unchanged official choice"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "ec7d56a01607001e6401366417c5e2eb00ffa0df17ca1a9a831e0b32c8f11bf7"
+        }
+      }
+    },
+    {
+      "id": "select:0213",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:dialogue",
+            "select:0213"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "select:00A8",
+            "reference_sha256": "7d465fb9b9314846b72698017691e756af05e0a548e347a3b7c54ca5b85270de"
+          },
+          "adaptations": [
+            "Native encoding; unchanged official choice"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "7d465fb9b9314846b72698017691e756af05e0a548e347a3b7c54ca5b85270de"
+        }
+      }
+    },
+    {
+      "id": "select:0214",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:dialogue",
+            "select:0214"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "select:00A9",
+            "reference_sha256": "bd38ed7732402b1a93261916c5906016cdccd1a9600b3864208246f6a3299bd0"
+          },
+          "adaptations": [
+            "Native encoding; unchanged official choice"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "bd38ed7732402b1a93261916c5906016cdccd1a9600b3864208246f6a3299bd0"
+        }
+      }
+    },
+    {
+      "id": "select:0215",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:dialogue",
+            "select:0215"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "select:00AA",
+            "reference_sha256": "c6cfe6e4f129a34671d10c1bbe158eff05197d388727e331951b0ec2637c194e"
+          },
+          "adaptations": [
+            "Native encoding; unchanged official choice"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "c6cfe6e4f129a34671d10c1bbe158eff05197d388727e331951b0ec2637c194e"
+        }
+      }
+    },
+    {
+      "id": "select:0216",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:dialogue",
+            "select:0216"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "select:00AB",
+            "reference_sha256": "3495e757855a5c678addcf32516274e2962d0572f065378dba689e22168f28dd"
+          },
+          "adaptations": [
+            "Native encoding; unchanged official choice"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "3495e757855a5c678addcf32516274e2962d0572f065378dba689e22168f28dd"
+        }
+      }
+    },
+    {
+      "id": "select:0217",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:dialogue",
+            "select:0217"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "select:00AC",
+            "reference_sha256": "18f285592896ec8ead1b69d90ee4080300ba8dc31665a6ad97550c8f81b15502"
+          },
+          "adaptations": [
+            "Native encoding; unchanged official choice"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "18f285592896ec8ead1b69d90ee4080300ba8dc31665a6ad97550c8f81b15502"
+        }
+      }
+    },
+    {
+      "id": "select:0218",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:dialogue",
+            "select:0218"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "select:00E0",
+            "reference_sha256": "1043458fb07ac525fec28db22fcea4d7df07b93402a37f4c24f7ec4e4fd8bdad"
+          },
+          "adaptations": [
+            "Native encoding; unchanged official choice"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "1043458fb07ac525fec28db22fcea4d7df07b93402a37f4c24f7ec4e4fd8bdad"
+        }
+      }
+    },
+    {
+      "id": "select:0219",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:dialogue",
+            "select:0219"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "select:01D6",
+            "reference_sha256": "01c66a76d0d690a64a8aca92f691eb386d22c7a9363eef00cce1f5f11a2f0621"
+          },
+          "adaptations": [
+            "Native encoding; unchanged official choice"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "01c66a76d0d690a64a8aca92f691eb386d22c7a9363eef00cce1f5f11a2f0621"
+        }
+      }
+    },
+    {
+      "id": "select:021A",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:dialogue",
+            "select:021A"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "select:01D7",
+            "reference_sha256": "d50a703ef8dad986bec961c40251885fe1885ed3bc90c9b1ab523b032924cb21"
+          },
+          "adaptations": [
+            "Native encoding; unchanged official choice"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "d50a703ef8dad986bec961c40251885fe1885ed3bc90c9b1ab523b032924cb21"
+        }
+      }
+    },
+    {
+      "id": "select:021B",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:dialogue",
+            "select:021B"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "select:01D8",
+            "reference_sha256": "6da784c7193538e0ca77e39f89d06ea1c54ff9863ceb8bee10bda6a95f793f10"
+          },
+          "adaptations": [
+            "Native encoding; unchanged official choice"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "6da784c7193538e0ca77e39f89d06ea1c54ff9863ceb8bee10bda6a95f793f10"
+        }
+      }
+    },
+    {
+      "id": "v3/carried/ghost/angry-name/00",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:connect_carried_event",
+            "v3/carried/ghost/angry-name/00"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "string:062E",
+            "reference_sha256": "de5cfc17302cf5ea667d76b7d00cae54faaa25816db21579f9c57c77df6236fc"
+          },
+          "adaptations": [
+            "Native encoding and field padding; unchanged official wording"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "bb008a621b6f0f68a4a352bdd6109ec8808abef79f9e5bbe3e1fef9514d531d0"
+        }
+      }
+    },
+    {
+      "id": "v3/carried/ghost/angry-name/01",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:connect_carried_event",
+            "v3/carried/ghost/angry-name/01"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "string:062F",
+            "reference_sha256": "d916f9957a93d0f744a0f70005ab193362c201eb1f3caef18fc3bd0e7c682b80"
+          },
+          "adaptations": [
+            "Native encoding and field padding; unchanged official wording"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "7710a98bffe2495f11f79d6031ab0de946ed0281798de6028137e7996af472e6"
+        }
+      }
+    },
+    {
+      "id": "v3/carried/ghost/angry-name/02",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:connect_carried_event",
+            "v3/carried/ghost/angry-name/02"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "string:0630",
+            "reference_sha256": "25ff52bf0966399e81b909acf7286ec6a255706523d4fff4927bf6133bbeb6a0"
+          },
+          "adaptations": [
+            "Native encoding and field padding; unchanged official wording"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "2fda7ae907107e2d3b9987a0e9f5f8a8e2bab4043fbaa41c5e7e2494db59c00b"
+        }
+      }
+    },
+    {
+      "id": "v3/carried/ghost/angry-name/03",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:connect_carried_event",
+            "v3/carried/ghost/angry-name/03"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "string:0631",
+            "reference_sha256": "b870ac097db8f8f58ab021a30ebed8152674de93d4f89a6fa4e52765adf46500"
+          },
+          "adaptations": [
+            "Native encoding and field padding; unchanged official wording"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "e2d3b28055ca1a84a7109faa1322e01b0f13823f8c55fff5b6605d70994db40c"
+        }
+      }
+    },
+    {
+      "id": "v3/carried/ghost/angry-name/04",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:connect_carried_event",
+            "v3/carried/ghost/angry-name/04"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "string:0632",
+            "reference_sha256": "b7489356fad11c81a2ffd323c6b0ceea3dea053e5852a8748e133df712e32936"
+          },
+          "adaptations": [
+            "Native encoding and field padding; unchanged official wording"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "b7489356fad11c81a2ffd323c6b0ceea3dea053e5852a8748e133df712e32936"
+        }
+      }
+    },
+    {
+      "id": "v3/carried/ghost/angry-name/05",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:connect_carried_event",
+            "v3/carried/ghost/angry-name/05"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "string:0633",
+            "reference_sha256": "3bf2d7d8e98af45a5edf5b6572ad1aeb3b86cdcfdfe7acef6c9cde7156b3ffad"
+          },
+          "adaptations": [
+            "Native encoding and field padding; unchanged official wording"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "40da445f087bb32898a7663343e0326abf2dd8d90618531419e0768c2683c92c"
+        }
+      }
+    },
+    {
+      "id": "v3/carried/ghost/angry-name/06",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:connect_carried_event",
+            "v3/carried/ghost/angry-name/06"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "string:0634",
+            "reference_sha256": "86308079e1887586c720366403ad4b890e407843d3181630ebb88fee11446ae3"
+          },
+          "adaptations": [
+            "Native encoding and field padding; unchanged official wording"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "c3ac570b59bb8f2915da46896946409c1598ff0dfa28e5a2fdabf0a7e7938e98"
+        }
+      }
+    },
+    {
+      "id": "v3/carried/ghost/angry-name/07",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:connect_carried_event",
+            "v3/carried/ghost/angry-name/07"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "string:0635",
+            "reference_sha256": "c1070ba41bfaca3ba08ebecca39f391f7c1fcb20089e61ddf77ee7fb4a4dab2e"
+          },
+          "adaptations": [
+            "Native encoding and field padding; unchanged official wording"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "4d3d3727bef38fca1eb0e80825a1e1320ef60180587ed6d2e85312ba33428977"
+        }
+      }
+    },
+    {
+      "id": "v3/carried/ghost/angry-name/08",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:connect_carried_event",
+            "v3/carried/ghost/angry-name/08"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "string:0636",
+            "reference_sha256": "dfe3e1728ea1779d8b350207b1cbc16ebede326e967371b2a86cdcb76338ef57"
+          },
+          "adaptations": [
+            "Native encoding and field padding; unchanged official wording"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "e51aec526187d83aa0b654edb84e47d1dabcda92054ac8dd8818ae670f75ab2d"
+        }
+      }
+    },
+    {
+      "id": "v3/carried/ghost/angry-name/09",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:connect_carried_event",
+            "v3/carried/ghost/angry-name/09"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "string:0637",
+            "reference_sha256": "bfa943b56c23e9db2da4c9c9ed634d4c131ad7df85b58736f5d6d57b957af18f"
+          },
+          "adaptations": [
+            "Native encoding and field padding; unchanged official wording"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "91be9b2c138b2d21adeef03259d1ffeebcabb4e512e8e7841cde5461a7ab7547"
+        }
+      }
+    },
+    {
+      "id": "v3/carried/ghost/angry-name/10",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:connect_carried_event",
+            "v3/carried/ghost/angry-name/10"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "string:0638",
+            "reference_sha256": "9c56e9e51de172404c9501975a8ebf4c6c4e289562de04b1d338e7e9abc07dd0"
+          },
+          "adaptations": [
+            "Native encoding and field padding; unchanged official wording"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "675082c19b711afaee3095546bb99fbc3edaf47e60be419fcbc7fbab8c1f7b22"
+        }
+      }
+    },
+    {
+      "id": "v3/carried/ghost/angry-name/11",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:connect_carried_event",
+            "v3/carried/ghost/angry-name/11"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "string:0639",
+            "reference_sha256": "6f64282cf5b8b59a8d6250812c56fe3afdc60b2ac18bc728e9cb75c0275db303"
+          },
+          "adaptations": [
+            "Native encoding and field padding; unchanged official wording"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "9d8c6c23245a8f778c575e5e566438e94711c6464ff590f2ce7f304867596fa4"
+        }
+      }
+    },
+    {
+      "id": "v3/carried/ghost/angry-name/12",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:connect_carried_event",
+            "v3/carried/ghost/angry-name/12"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "string:063A",
+            "reference_sha256": "105b847fb9fbbe1e247f6bdc99a5da6a26d374dd4b78c331007899ca75eab5dd"
+          },
+          "adaptations": [
+            "Native encoding and field padding; unchanged official wording"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "958d539804bc9eea8ce066019b1548e2f54f9f31e11772a22dfcbd891f961077"
+        }
+      }
+    },
+    {
+      "id": "v3/carried/ghost/angry-name/13",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:connect_carried_event",
+            "v3/carried/ghost/angry-name/13"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "string:063B",
+            "reference_sha256": "637eee9d2c86fc4503953150f1b0c262598fad5090f690ada30757e2f9b9ad82"
+          },
+          "adaptations": [
+            "Native encoding and field padding; unchanged official wording"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "637eee9d2c86fc4503953150f1b0c262598fad5090f690ada30757e2f9b9ad82"
+        }
+      }
+    },
+    {
+      "id": "v3/carried/ghost/angry-name/14",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:connect_carried_event",
+            "v3/carried/ghost/angry-name/14"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "string:063C",
+            "reference_sha256": "0393734f365c45a8d718e433a545671efd251cffa3da11497ca52ca9e785f050"
+          },
+          "adaptations": [
+            "Native encoding and field padding; unchanged official wording"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "0393734f365c45a8d718e433a545671efd251cffa3da11497ca52ca9e785f050"
+        }
+      }
+    },
+    {
+      "id": "v3/carried/ghost/angry-name/15",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:connect_carried_event",
+            "v3/carried/ghost/angry-name/15"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "string:063D",
+            "reference_sha256": "a8120cc0c91cad72bab8aa5db1ba55f372708ae277304863ddb371e57478cd22"
+          },
+          "adaptations": [
+            "Native encoding and field padding; unchanged official wording"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "cda8408922180264d0a93d9af3b7b3456c94c1e13bbfbcc4ae8a228dd80bf3e4"
+        }
+      }
+    },
+    {
+      "id": "v3/carried/ghost/angry-name/16",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:connect_carried_event",
+            "v3/carried/ghost/angry-name/16"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "string:063E",
+            "reference_sha256": "92cef83118a18c76480827f11c48eed10e8dd343a3811eb6c8008a9326d066ed"
+          },
+          "adaptations": [
+            "Native encoding and field padding; unchanged official wording"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "0f8e462d4c1d6fed9a7088e60bb5b514e71a589692095f111e5a54833fc17332"
+        }
+      }
+    },
+    {
+      "id": "v3/carried/ghost/angry-name/17",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:connect_carried_event",
+            "v3/carried/ghost/angry-name/17"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "string:063F",
+            "reference_sha256": "4af7948a950d08b1c076623fe70f1be23db9b9c35f946c24c3003d046c59a895"
+          },
+          "adaptations": [
+            "Native encoding and field padding; unchanged official wording"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "4af7948a950d08b1c076623fe70f1be23db9b9c35f946c24c3003d046c59a895"
+        }
+      }
+    },
+    {
+      "id": "v3/carried/ghost/angry-name/18",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:connect_carried_event",
+            "v3/carried/ghost/angry-name/18"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "string:0640",
+            "reference_sha256": "379f10621f4b3148e0a95a9937686ba2283971bc9e2f64bffb6ca45dd326d9d9"
+          },
+          "adaptations": [
+            "Native encoding and field padding; unchanged official wording"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "379f10621f4b3148e0a95a9937686ba2283971bc9e2f64bffb6ca45dd326d9d9"
+        }
+      }
+    },
+    {
+      "id": "v3/carried/ghost/angry-name/19",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:connect_carried_event",
+            "v3/carried/ghost/angry-name/19"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "string:0641",
+            "reference_sha256": "7857d22c5bbc26df4ece6d85f32f29db82e5be224e4eabf55215c5edc19730eb"
+          },
+          "adaptations": [
+            "Native encoding and field padding; unchanged official wording"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "0637c1fa3c77f37594dc1da352d322e26c80777642982bb0d68a993ef5813659"
+        }
+      }
+    },
+    {
+      "id": "v3/carried/ghost/angry-name/20",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:connect_carried_event",
+            "v3/carried/ghost/angry-name/20"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "string:0642",
+            "reference_sha256": "95f07add546454287aa07fd848f2ec40aa35ae7a50fb61d5ca7b5c28ce221863"
+          },
+          "adaptations": [
+            "Native encoding and field padding; unchanged official wording"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "beb39490dd8fac15b96845281e76eac8b445ed71d68aa346daa0615674fec74b"
+        }
+      }
+    },
+    {
+      "id": "v3/carried/ghost/angry-name/21",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:connect_carried_event",
+            "v3/carried/ghost/angry-name/21"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "string:0643",
+            "reference_sha256": "833b57b502664a2449639aa0541f4864afe8a955fc80bed1151f57fdb736e0b7"
+          },
+          "adaptations": [
+            "Native encoding and field padding; unchanged official wording"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "ac806e3c55bfe0d2bae6d22fbb869560befdd6ca9b9e2dcb18fbd7c2c02311af"
+        }
+      }
+    },
+    {
+      "id": "v3/carried/ghost/angry-name/22",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:connect_carried_event",
+            "v3/carried/ghost/angry-name/22"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "string:0644",
+            "reference_sha256": "251e99044c47073ad8cc68f1b33f2574feceb6603ae61d724a408f5713fff9aa"
+          },
+          "adaptations": [
+            "Native encoding and field padding; unchanged official wording"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "251e99044c47073ad8cc68f1b33f2574feceb6603ae61d724a408f5713fff9aa"
+        }
+      }
+    },
+    {
+      "id": "v3/carried/ghost/angry-name/23",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:connect_carried_event",
+            "v3/carried/ghost/angry-name/23"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "string:0645",
+            "reference_sha256": "39ab372499328352481693bbfd063eaf080b26bef2974e6cea98e687fddcd986"
+          },
+          "adaptations": [
+            "Native encoding and field padding; unchanged official wording"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "2d75c2253b194e5965f3e9856a3827b57dc5fc843b17e5ec47f3eb82bf8db276"
+        }
+      }
+    },
+    {
+      "id": "v3/carried/ghost/angry-name/24",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:connect_carried_event",
+            "v3/carried/ghost/angry-name/24"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "string:0646",
+            "reference_sha256": "d67737f9a98a0702fdac32ce71196813f86959876aca4f4fba99a063c1ab14b2"
+          },
+          "adaptations": [
+            "Native encoding and field padding; unchanged official wording"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "460ba73812fab7666fc4d9982486112d757b67c0177c2bf91d189df6024ff6c5"
+        }
+      }
+    },
+    {
+      "id": "v3/carried/ghost/angry-name/25",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:connect_carried_event",
+            "v3/carried/ghost/angry-name/25"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "string:0647",
+            "reference_sha256": "07fe1f0b6c1424c44e2198d8f85fadba9336c6318ff52396b01a4a7c4b5de273"
+          },
+          "adaptations": [
+            "Native encoding and field padding; unchanged official wording"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "e69c71d1def9dcd52c06fb81ca3296c0fd4c3b4a266c1733f7f1385a72cddc67"
+        }
+      }
+    },
+    {
+      "id": "v3/carried/ghost/angry-name/26",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:connect_carried_event",
+            "v3/carried/ghost/angry-name/26"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "string:0648",
+            "reference_sha256": "dc2ef35f277649b33b2bf419f36aa56f70dc9de5adaeff64650e267fc6fd2fa3"
+          },
+          "adaptations": [
+            "Native encoding and field padding; unchanged official wording"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "788ae22a581f6b813fbd07fdccf4b91f951f63ca26321202213de4f335bda9a4"
+        }
+      }
+    },
+    {
+      "id": "v3/carried/ghost/angry-name/27",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:connect_carried_event",
+            "v3/carried/ghost/angry-name/27"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "string:0649",
+            "reference_sha256": "53613de324e03afefad4b7eae224b357c57c6eab693eff72aaa599641c397e91"
+          },
+          "adaptations": [
+            "Native encoding and field padding; unchanged official wording"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "8036f64cbc2c764b6b5157d0963474eda59f864d1d274183d06688842da59103"
+        }
+      }
+    },
+    {
+      "id": "v3/carried/ghost/angry-name/28",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:connect_carried_event",
+            "v3/carried/ghost/angry-name/28"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "string:064A",
+            "reference_sha256": "a3627af461181b41d6a5b8e86ab46ea3976eb6191bbcd3071ea127e3b1fdf942"
+          },
+          "adaptations": [
+            "Native encoding and field padding; unchanged official wording"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "a3627af461181b41d6a5b8e86ab46ea3976eb6191bbcd3071ea127e3b1fdf942"
+        }
+      }
+    },
+    {
+      "id": "v3/carried/ghost/angry-name/29",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:connect_carried_event",
+            "v3/carried/ghost/angry-name/29"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "string:064B",
+            "reference_sha256": "d6d3e7d87f0047c49efc69473a6ac8f7c36a5576b169b0caca4cf6a94fbb36e3"
+          },
+          "adaptations": [
+            "Native encoding and field padding; unchanged official wording"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "b6967270be880fdebce203cb58e36e6e0612429fdea1ceebe0b28c4adb2dde6c"
+        }
+      }
+    },
+    {
+      "id": "v3/carried/ghost/angry-name/30",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:connect_carried_event",
+            "v3/carried/ghost/angry-name/30"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "string:064C",
+            "reference_sha256": "cc87ac61d5d69c3d7fe506cd700d27dc854d7564b15bda6ccd1dda52f4f46a04"
+          },
+          "adaptations": [
+            "Native encoding and field padding; unchanged official wording"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "c5f6873a0cc153c7bfad68e1d2b86ac3902638371a0f0e0b219ea4897f9f98a5"
+        }
+      }
+    },
+    {
+      "id": "v3/carried/ghost/angry-name/31",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:connect_carried_event",
+            "v3/carried/ghost/angry-name/31"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "string:064D",
+            "reference_sha256": "2dd6ba8ec695b37bb79326294e44c5b00014a0b049904d2b59750254c28fa12a"
+          },
+          "adaptations": [
+            "Native encoding and field padding; unchanged official wording"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "ad78e0ac82e7aa35231468c913b3b3256e0b12480af1512e1a603d7acd25602d"
+        }
+      }
+    },
+    {
+      "id": "GAFE01-r0/npc/ev-ghost/name",
+      "native_sha256": null,
+      "locales": {
+        "en": {
+          "credit": "official",
+          "locator": [
+            "tools/v3_holiday_participants.py:connect_carried_event",
+            "GAFE01-r0/npc/ev-ghost/name"
+          ],
+          "source": {
+            "source": "user-supplied GAFE01 revision 0 disc",
+            "reference_id": "string:04E8",
+            "reference_sha256": "af3c5d7c08fbc5312b7bbbb8aec56cbd4869632e04228f9f5c6507fcc443c212"
+          },
+          "adaptations": [
+            "Native encoding and field padding; unchanged official wording"
+          ],
+          "human_review": "not_recorded",
+          "encoded_sha256": "4393f52a40d0c86f94e5df01c5d1143f346119d03c641381a351fec6b4a9c492"
+        }
+      }
+    }
   ]
 }

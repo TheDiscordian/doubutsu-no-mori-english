@@ -23,6 +23,19 @@ lock or publish experimental V3.
 
 ## Active development
 
+Wisp's complete actor compiles with the extended shared NPC registry, independent
+spirit-family admission, native field access, translucent submission, and full
+idle/blink animation in `build/v3-carried-npc-connected-03/`. All 22 existing
+participant records and three resident motions are retained. The prepared text
+contains 48 official messages, sixteen choices, 32 angry-name strings, and the
+official character name, credited in the single provenance catalogue. The
+twenty external reward lists retain all 839 entries; the two local lists remain
+in the actor. Three focused sanitized/preparation checks and provenance validation
+pass. World/schedule, message/handover, reward filtering, and save/travel cleanup
+are still unfinished. This is prepared integration, not a newly playable NPC or
+an updated cartridge: the installed proposal remains ABI 366, with Wisp disabled.
+No saves or deployed patcher files are changed.
+
 The active work is the importing pipelines: extraction, conversion, bulk
 installation, and working item behaviours, including item-specific behaviours.
 There is no blanket postponement of item-specific work. Acquisition systems

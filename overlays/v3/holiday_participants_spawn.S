@@ -12,7 +12,9 @@ af_hp_spawn_profile:
     sltu $at, $v1, $at
     bne $at, $zero, 1f
      nop
-#ifdef AF_HP_FESTIVAL_REGISTRY
+#ifdef AF_HP_CARRIED_REGISTRY
+    ori $at, $zero, 0xd0ce
+#elif defined(AF_HP_FESTIVAL_REGISTRY)
     ori $at, $zero, 0xd0cd
 #elif defined(AF_HP_EXERCISE_REGISTRY)
     ori $at, $zero, 0xd0b4

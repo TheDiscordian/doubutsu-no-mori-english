@@ -161,11 +161,18 @@ native item-type and menu routes for every family. The field-state bridge now
 has installed state and manager callers, but the unfinished NPC keeps the quest disabled.
 Reuse `build/v3-carried-wisp-art-01/` for the
 complete 26-joint translucent model and every facial texture. The existing
-participant importer prepares all 48 actor functions plus four manager
-callbacks at `build/v3-carried-event-prepared-03/`. Continue from its explicit
-unbound services: native NPC lifecycle
-and drawing, official dialogue,
-and complete reward/cleanup routes. Keep source `ghost_start/stop/in`, its five
+participant importer retains all 48 actor functions from
+`build/v3-carried-event-prepared-03/`. Continue from the connected preparation at
+`build/v3-carried-npc-connected-03/`, not from another source audit. Its shared
+23-owner registry, independent spirit gate, native field/drawing services,
+complete motion, 48 official messages, sixteen choices, 32 angry-name strings,
+official Wisp name, and all twenty external reward lists compile together.
+The two actor-local reward lists remain complete. These NPC changes are prepared,
+not installed in ABI 366. Three focused preparation/host checks pass.
+The remaining 24 undefined services in its `prepared.json` identify world/schedule,
+message/handover, and reward consumers. Connect those and the full reward/cleanup
+routes, then install the character banks, names, shared registry redirects,
+dialogue, and full owner together. Keep source `ghost_start/stop/in`, its five
 unique acres, and saved/scene lifetime intact. Ordinary save/travel also removes
 spirits in the donor; connect the actual transaction modes, not unconditional
 deletion on a failed save. Reuse or extend the guarded quest packet for the
@@ -177,10 +184,16 @@ marker invalidates private state on scene reset. Continue full NPC/name/profile,
 translucent renderer, dialogue,
 reward filtering, and successful-save/travel cleanup. The prepared actor's
 `af_cw_actor_specific` declaration now uses native signed-16-bit actor storage;
-its provider still needs the actual native field binding. The fixed reservation is
+its provider uses native offset `24`. Melody storage is a native signed word at
+`930`, not the donor's short or a byte. The fixed reservation is
 source profile `B7`, native name `D0CD`, native profile `F0`, and banks 456/457.
-Extend the shared participant registry with an independent spirit-family gate;
-do not make spirits depend on diary selection or enable diary events implicitly.
+The compiled shared participant registry has an independent spirit-family gate;
+install it without making spirits depend on diary selection or enabling diary
+events implicitly. Native SPECIAL is 4, but source WALK_WANDER (5) has distinct
+walk-only decision rules absent from native WANDER: finish that actual behaviour,
+not a numeric substitution. Reuse the retained NPC disassemblies. All 22 reward
+categories need supported/selected-item filtering in both uncollected and
+all-collected branches; a disabled donor ID must never enter native inventory.
 Use the binding map in the carried-item specification. Do not replay the completed
 date, state, save, manager, spawning, or artwork checks without a relevant change.
 Shared paper/spirit splitting/merging,

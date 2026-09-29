@@ -210,7 +210,11 @@ typedef struct {
 } AFHPRecord;
 typedef struct {u16 event_name,texture,resident,cloth;u8 exists,used;u16 pad;} AFHPResident;
 enum {AF_HP_SPECIAL=1,AF_HP_NO_SAVE=2};
-#ifdef AF_HP_FESTIVAL_REGISTRY
+#ifdef AF_HP_CARRIED_REGISTRY
+enum {AF_HP_OWNER_COUNT=23,AF_HP_RESIDENT_COUNT=18,AF_HP_LIVE_COUNT=25};
+/* A new family must not inherit another family's selection requirement. */
+int af_hp_owner_enabled(const AFHPRecord *);
+#elif defined(AF_HP_FESTIVAL_REGISTRY)
 /* More role identities do not create more town residents. The same eighteen
  * temporary slots and twenty-four live slots cover the native fifteen-person
  * population, controllers, and separately allocated special characters. */

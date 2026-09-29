@@ -123,8 +123,14 @@ def npc_expression_motion(source,address,*,joints=None):
     expressions={}
     for label,offset in (('eye',36),('mouth',44)):
         if address+offset not in pointers:
-            if (eye_stop if label=='eye' else mouth_stop)<0:
-                raise ValueError('Negative fixed expression without a frame programme')
+            sequence=eye if label=='eye' else mouth
+            stop=eye_stop if label=='eye' else mouth_stop
+            # Positive sequences use the native random-blink/talking tables;
+            # -1 is a valid unused stop frame, not a missing fixed programme.
+            # Mouth -1 falls back to neutral when not talking. A stopped eye,
+            # in contrast, actually indexes its stop texture and must be valid.
+            if sequence<0 or (label=='eye' and sequence==0 and stop<0):
+                raise ValueError('Invalid unprogrammed NPC expression sequence/stop')
             continue
         data,receipt=resource(source,pointers[address+offset])
         if len(data)<row['duration'] or any(value>7 for value in data):
