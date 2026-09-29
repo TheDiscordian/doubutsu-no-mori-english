@@ -156,7 +156,9 @@ static int compress(u8 *bank,u32 bank_bytes,const u8 *canonical,u32 canonical_by
 #ifdef AF_V3_CARD_STORAGE
     if(extra_bytes==AF_CZ_CARD_EXTRA)put(bank+PAYLOAD+4,
 #ifdef AF_V3_CARRIED_PROFILE
-#ifdef AF_V3_PAPER_PACKS
+#ifdef AF_V3_CARRIED_NPC
+        0x00130680
+#elif defined(AF_V3_PAPER_PACKS)
         0x00120680
 #elif defined(AF_V3_CARRIED_QUEST)
         0x00110680
@@ -228,6 +230,9 @@ static int expand(const u8 *bank,u32 bank_bytes,u8 *scratch,u32 scratch_bytes,u3
             || word(e+4)==0x00110680
 #ifdef AF_V3_PAPER_PACKS
             || word(e+4)==0x00120680
+#ifdef AF_V3_CARRIED_NPC
+            || word(e+4)==0x00130680
+#endif
 #endif
 #endif
 #endif
@@ -299,7 +304,7 @@ static int expand(const u8 *bank,u32 bank_bytes,u8 *scratch,u32 scratch_bytes,u3
         u8 *cards=scratch+AF_CZ_RAW+AF_CZ_FISHING_EXTRA;
         if(stored_extra==AF_CZ_CARD_EXTRA) {
             if(!af_holiday_cards_valid(cards))return AF_CZ_FORMAT;
-            if(cards[4]!=(word(e+4)==0x00120680?5:word(e+4)==0x00110680?4:word(e+4)==0x00100680?3:
+            if(cards[4]!=(word(e+4)==0x00130680?6:word(e+4)==0x00120680?5:word(e+4)==0x00110680?4:word(e+4)==0x00100680?3:
                          word(e+4)==0x000F0680?2:1))return AF_CZ_FORMAT;
         } else af_holiday_cards_reset(cards);
     }

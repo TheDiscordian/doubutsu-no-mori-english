@@ -675,15 +675,48 @@ These are host/build results, not native gameplay or hardware verification.
 
 `v3_holiday_participants.py --connect-carried-event PATH --build-lock PATH
 --output PATH` reuses the complete prepared actor and reference hashes. The
-current output is `build/v3-carried-npc-connected-08/`, based on ABI 366. It
+current output is `build/v3-carried-npc-connected-10/`, based on ABI 367. It
 compiles every actor function with the shared registry, NPC services, event-save
 routing, translucent draw service, imported-motion provider, and text mapping.
-The native actor is 2,392 bytes. The object contains 27,805 text/constant bytes,
-2,104 data bytes, and 2,222 BSS bytes. It is not installed: the global paper
-policy, deferred weed clearing, voice-click lifecycle, and system sound services
-remain actual undefined dependencies. Successful-save/travel cleanup and full
-character/registry installation are also required.
+The native actor is 2,392 bytes. The object contains 28,485 text/constant bytes,
+2,104 data bytes, and 2,226 BSS bytes. All services are bound. The shared linker
+retains the entire 32,864-byte packet at `807BF000..807C7060`, including BSS and
+guard. It is not installed: successful-save/travel cleanup and full
+character/registry/field/audio/storage installation remain required.
 No successful placeholder fills a missing consumer.
+
+The source paper adapter binds to the installed global quantity provider at its
+checked symbol, not a separate Wisp rule. `carried_voice.c` keeps click mode in
+owned state and hooks native message initialization (`8009E6F8`) and the
+animal-voice predicate (`8009F7CC`). Original prologues and fallback logic stay
+in complete bridges. Resetting at message initialization preserves the source's
+set-click-before-appear order. The native voice selector retains the player's
+silent preference. Donor sound words `6B` and `16C` map to `6F` and `175` through
+the shared complete-program converter. The first has two parallel layers;
+timing is per layer, not the sum. Priority index 117 is unused in every native
+and imported group and changes from 40 to 70 for the new program. Existing
+programs and priorities remain unchanged. The generic allocator validates both
+73-entry walking groups and every expanded trigger group before reserving a
+shared priority; missing group evidence fails closed.
+
+`carried_world.c` queues weed clearing in town storage rather than an ephemeral
+event slot. Its native bindings are field renewal at `800561FC`, growth at
+`80AB5188`, scene number at `80126EB4`, notification state at `80137922`, and
+the loaded growth owner at `80100C5C`. At outdoor renewal it clears only IDs
+8–10 across all thirty saved acres, skips weed regrowth for that renewal, and
+consumes the flag only outside event-notification deferral. The complete native
+renewal retains seasonal clearing, snowmen, trees, and other growth. Player
+deletion and clearing the hunt date do not cancel the reward.
+
+Prepared format 19 uses AFHC wire 6 without enlarging its 48-byte state. Header
+byte 15 retains paper mode in bit zero and uses bit one for pending clearing;
+the latter requires the spirit family. The shared save adapter is 12,592 bytes
+at `807BB000`, inside a 16-KiB reservation ending at `807BF000`. Both paper
+modes pass the real compressed save transaction with native I/O doubled,
+pending-reward retention, migration from formats 14–18, and older-reader
+rejection. Format-19 saves need this or a newer compatible build; format-18
+and earlier readers reject them. This is prepared storage, not the installed
+ABI-367/format-18 cartridge or a claim of native save/reload.
 
 The shared registry has 23 owners, eighteen temporary resident slots, and 25
 live slots. Its 22 retained rows and source callback addresses remain intact.

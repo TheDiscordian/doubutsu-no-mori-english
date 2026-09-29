@@ -344,12 +344,36 @@ def world(base,prior,source,generated):
         source_map_count=17,original_readers_preserved=True,installed=False)
 
 
-def coin(source,base,prior,out,generated,reuse=None):
-    """Prepare the whole offering effect with shared art and sound conversion."""
+def trigger_audio(base,prior,generated,*,prefix,words,symbol,header):
+    """Prepare a whole participant sound batch through the shared converter."""
     from aflib import CODE_RAM,CODE_VROM
-    from v3_password_policy import function
     from v3_sound_programs import prepare_triggers,register_triggers,installed_resource
     from v3_villager_audio import read_audio_donor
+    resources,audio=prepare_triggers(base,prior,words);core=by_vrom(base)[CODE_VROM].extract(base)
+    sequence,_,_=installed_resource(base,core,'seq',199)
+    previous=prior['equipment_resources']['furniture_audio']
+    counts={r['group']:r['previous_count'] for r in previous['tables']}
+    dol,_=read_audio_donor(ROOT/'local/gamecube/Animal Crossing (USA, Canada).ciso')
+    priority=core[0x80113B84-CODE_RAM:0x80113B84-CODE_RAM+128]
+    priority_changes=[]
+    new_sequence,programs,tables=register_triggers(sequence,audio['programs'],resources['fragments'],counts,
+        priority,dol.read(0x800A9A90,128),previous=previous,
+        priority_changes=priority_changes if set(counts)=={0,1,4,5} else None)
+    sound_ids={r['source_sound_word']:r['native_sound_word'] for r in programs}
+    generated[prefix+'-audio.c']=(f'#include "{header}"\nconst u16 {symbol}[{len(words)}]={{'
+        +','.join(str(sound_ids[n]) for n in words)+'};\n')
+    audio_files={prefix+'-font.bin':resources['font'],prefix+'-wave.bin':resources['wave'],
+        prefix+'-sequence.bin':new_sequence,**{prefix+'-'+n:d for n,d in resources['fragments'].items()}}
+    generated.update(audio_files)
+    audio.update(files={n:dict(bytes=len(d),sha256=sha256(d)) for n,d in audio_files.items()},
+        registered_programs=programs,registered_tables=tables,previous_sequence_sha256=sha256(sequence),
+        **({'priority_changes':priority_changes} if priority_changes else {}))
+    return audio
+
+
+def coin(source,base,prior,out,generated,reuse=None):
+    """Prepare the whole offering effect with shared art and sound conversion."""
+    from v3_password_policy import function
     from v3_creature_insect_effects import OWNERS as WATER
     path='src/effect/ef_coin.c';raw=(DONOR/path).read_bytes()
     if sha256(raw)!='fea3baecf1240effa5d0591a5f4caf5d50c15d41a884e8cc8e7f9b713edd0acf':
@@ -439,22 +463,8 @@ def coin(source,base,prior,out,generated,reuse=None):
         if sha256(files[vrom].extract(base))!=digest or sha256(files[reloc].extract(base))!=rel_digest:
             raise ValueError('Changed complete shared water effect')
         water.append(dict(id=eid,vrom=vrom,reloc=reloc,ram=ram,sha256=digest,relocation_sha256=rel_digest))
-    resources,audio=prepare_triggers(base,prior,[0x466,0x467]);core=files[CODE_VROM].extract(base)
-    sequence,_,_=installed_resource(base,core,'seq',199)
-    previous=prior['equipment_resources']['furniture_audio']
-    counts={r['group']:r['previous_count'] for r in previous['tables']}
-    dol,_=read_audio_donor(ROOT/'local/gamecube/Animal Crossing (USA, Canada).ciso')
-    priority=core[0x80113B84-CODE_RAM:0x80113B84-CODE_RAM+128]
-    new_sequence,programs,tables=register_triggers(sequence,audio['programs'],resources['fragments'],counts,
-        priority,dol.read(0x800A9A90,128),previous=previous)
-    sound_ids={r['source_sound_word']:r['native_sound_word'] for r in programs}
-    generated['coin-audio.c']=('#include "holiday_coin.h"\nconst u16 af_coin_sounds[2]={'
-        +','.join(str(sound_ids[n]) for n in (0x466,0x467))+'};\n')
-    audio_files={'coin-font.bin':resources['font'],'coin-wave.bin':resources['wave'],
-        'coin-sequence.bin':new_sequence,**{'coin-'+n:d for n,d in resources['fragments'].items()}}
-    generated.update(audio_files)
-    audio.update(files={n:dict(bytes=len(d),sha256=sha256(d)) for n,d in audio_files.items()},
-        registered_programs=programs,registered_tables=tables,previous_sequence_sha256=sha256(sequence))
+    audio=trigger_audio(base,prior,generated,prefix='coin',words=(0x466,0x467),
+        symbol='af_coin_sounds',header='holiday_coin.h')
     return dict(reference=path,reference_sha256=sha256(raw),functions=functions,
         profile_sha256=sha256(profile),profile_relocations=refs,policy_hex=profile[16:].hex(),
         source_id=118,native_id=119,art=dict(bytes=len(asset),sha256=sha256(asset),
@@ -1282,6 +1292,8 @@ def connect_carried_event(output,lock,directory):
     from runtime_module import module_command_info
     from textcodec import encode,LATIN
     from textbanks import Bank
+    from aflib import CODE_RAM,CODE_VROM
+    from v3_import_storage import jump
     out=output.resolve();directory=directory.resolve()
     if out.exists() or not out.is_relative_to(ROOT/'build') or not directory.is_relative_to(ROOT/'build'):
         raise ValueError('Use a fresh ignored connected participant output and checked preparation')
@@ -1388,6 +1400,26 @@ def connect_carried_event(output,lock,directory):
         rewards.append(dict(symbol=name,bytes=len(data),count=values.index(0),source_sha256=sha256(data)))
     generated['reward-lists.c']='\n'.join(reward_code)+'\n'
     reward_map=carried_reward_data(base,prior,source,rewards,generated,lock=lock)
+    audio=trigger_audio(base,prior,generated,prefix='carried',words=(0x6B,0x16C),
+        symbol='af_cw_system_sounds',header='carried_event.h')
+    core=by_vrom(base)[CODE_VROM].extract(base);voice_hooks=[]
+    bridge=['.set noreorder','.section .text.af_cw_voice_bridges,"ax",@progbits','.balign 4']
+    for address,original,target,prior_entry in (
+        (0x8009E6F8,'27bdffe0afb00018','af_cw_message_init','af_cw_prior_message_init'),
+        (0x8009F7CC,'27bdffe8afbf0014','af_cw_sound_animal','af_cw_prior_sound_animal')):
+        entry=core[address-CODE_RAM:address-CODE_RAM+8]
+        if entry.hex()!=original:raise ValueError('Changed native dialogue sound/reset entry')
+        bridge+=['.globl '+prior_entry,prior_entry+':',
+            '.word '+','.join(hex(w) for w in (*struct.unpack('>2I',entry),jump(address+8),0))]
+        voice_hooks.append(dict(address=address,before=original,target=target,original=prior_entry))
+    generated['voice-bridges.S']='\n'.join(bridge)+'\n'
+    world_hooks=[];growth=equipment['scenery']['daily_growth'];files=by_vrom(base)
+    for vrom,address,ram,original,target in (
+        (CODE_VROM,0x800561FC,CODE_RAM,0x0040F809,'af_cw_renew_field'),
+        (growth['vrom'],0x80AB5188,growth['ram'],0x0C2AD2E4,'af_cw_grow_grass')):
+        if struct.unpack_from('>I',files[vrom].extract(base),address-ram)[0]!=original:
+            raise ValueError('Changed native field renewal/weed growth call')
+        world_hooks.append(dict(vrom=vrom,ram=ram,address=address,before=original,target=target))
     constants=generated['constants.h']
     if not constants.endswith('#endif\n'):raise ValueError('Changed complete actor constant guard')
     generated['constants.h']=constants[:-7]+(
@@ -1396,6 +1428,9 @@ def connect_carried_event(output,lock,directory):
     links=dict(previous['bindings']);links.update(previous['code']['symbols']);links.update(quest['code']['symbols'])
     links.update(equipment['carried_items']['code']['symbols'])
     links.update(equipment['carried_items']['storage']['code']['symbols'])
+    paper=equipment['carried_items']['paper'].get('quantities')
+    if paper and paper['installed']:
+        links['af_cw_paper_stack']=paper['code']['symbols']['af_cw_paper_stack']
     # Never inherit a different family's message or item resolver merely because
     # it exports the same source name. These consumers require quest mappings.
     forbidden=('mDemo_Set_msg_num','mMsg_Set_continue_msg_num','mDemo_Set_OrderValue',
@@ -1409,6 +1444,9 @@ def connect_carried_event(output,lock,directory):
     native_names={n:int(a,16) for n,a in re.findall(r'^(\w+) = 0x([0-9A-F]+);',symbols,re.M)}
     for name in ('mHS_get_arrange_idx','mTM_set_renew_time'):links[name]=native_names[name]
     links.update(af_cw_native_message=0x8007B5C0,af_cw_native_continue=0x8009DBA4,
+        af_cw_native_system_sound=native_names['sAdo_SysTrgStart'],
+        af_cw_native_scene=0x80126EB4,af_cw_native_notification=0x80137922,
+        af_cw_native_grow_owner=0x80100C5C,
         af_cw_native_order=0x8007B44C,af_cw_native_item_name=0x801969C8,
         af_cw_native_item_string=0x8009D88C,mMsg_Set_LockContinue=0x8009E9E8,
         mMsg_Unset_LockContinue=0x8009E9F8,af_cw_native_player_actor=0x800B1C84,
@@ -1420,16 +1458,32 @@ def connect_carried_event(output,lock,directory):
         af_cw_native_field_height=native_names['mFI_GetBlockZMax'],
         af_cw_native_acre=native_names['mFI_BkNumtoUtFGTop'])
     units=('carried_npc','carried_rewards','carried_dialogue','carried_handover','carried_schedule','carried_field',
+        'carried_voice','carried_world',
         'holiday_participants_registry','holiday_participants_services',
         'holiday_participants_storage','holiday_participants_spawn','holiday_festival_motion')
     out.mkdir(parents=True)
+    from v3_asset_loader import compile_part
+    from v3_console_disk_install import reservations
+    save_ram,save_end=0x807BB000,0x807BF000
+    if any(a<save_end and save_ram<b for a,b in reservations(prior)):
+        raise ValueError('Quest reward storage overlaps existing code/state')
+    previous_storage=quest['storage']
+    storage_data,storage=compile_part('holiday_item_storage',out/'storage',
+        primary_source='overlays/v3/console_storage.c',
+        extra_sources=('overlays/v3/save_compressed.c','overlays/v3/holiday_cards.c','overlays/v3/carried_collection.c'),
+        defines=tuple(f[2:] for f in previous_storage['flags'] if f.startswith('-D'))+('AF_V3_CARRIED_NPC=1',),
+        link_symbols=dict(previous_storage['link_symbols'],AF_HI_STORAGE_RAM=save_ram),
+        symbol_candidates=links)
+    if len(storage_data)>save_end-save_ram:raise ValueError('Quest reward save adapter exceeds its reservation')
+    links.update({n:storage['symbols'][n] for n in ('af_carried_quest_weeds','af_carried_quest_set_weeds')})
     for name,data in generated.items():write_new(out/name,data if isinstance(data,bytes) else data.encode())
     docker=['docker','run','--rm','--network','none','--user',f'{os.getuid()}:{os.getgid()}',
         '-v',f'{ROOT}:/source:ro','-v',f'{out}:/out','-w','/out','--entrypoint']
     def run(tool,*args):
         return subprocess.run(docker+['/n64_toolchain/bin/mips64-elf-'+tool,IMAGE,*args],
             text=True,capture_output=True,check=True,timeout=60).stdout
-    flags=old['object']['flags']+['-DAF_HP_EXERCISE_REGISTRY=1','-DAF_HP_FESTIVAL_REGISTRY=1','-DAF_HP_CARRIED_REGISTRY=1']
+    flags=old['object']['flags']+['-DAF_HP_EXERCISE_REGISTRY=1','-DAF_HP_FESTIVAL_REGISTRY=1','-DAF_HP_CARRIED_REGISTRY=1',
+        '-DAF_V3_CARRIED_PROFILE=1','-DAF_V3_CARRIED_QUEST=1','-DAF_V3_PAPER_PACKS=1','-DAF_V3_CARRIED_NPC=1']
     files=[n for n in generated if n.endswith(('.c','.S'))]+[
         '/source/overlays/v3/'+n+('.S' if n.endswith('_spawn') else '.c') for n in units]
     run('gcc',*flags,*files)
@@ -1441,12 +1495,16 @@ def connect_carried_event(output,lock,directory):
     paths=['tools/v3_holiday_participants.py','tools/v3_keyframes.py','tools/v3_item_destinations.py',
         'overlays/v3/carried_event.h','overlays/v3/carried_paper.h','overlays/v3/carried_items.h',
         'overlays/v3/holiday_participants.h','overlays/v3/room_rigs.h',
-        'tools/v3_registry.py']+['overlays/v3/'+n+('.S' if n.endswith('_spawn') else '.c') for n in units]
+        'tools/v3_registry.py','tools/v3_sound_programs.py','tools/v3_villager_audio.py',
+        'overlays/v3/console_storage.c','overlays/v3/console_storage.h','overlays/v3/save_compressed.c',
+        'overlays/v3/holiday_cards.c','overlays/v3/holiday_cards.h','overlays/v3/carried_collection.c']+[
+        'overlays/v3/'+n+('.S' if n.endswith('_spawn') else '.c') for n in units]
     report=dict(old,format='AFV3-CARRIED-NPC-1',base_abi=prior['runtime_abi'],base_sha256=sha256(base),
         source_prepared=str(directory.relative_to(ROOT)),identity=identity,motions=motions,retained_motions=retained,
         registry=dict(rows=rows,owner_count=23,resident_count=18,live_count=25,independent_gate=True),
         dialogue=text,strings=fields,name=dict(sex=sex,index=index,sound=sound),bindings=bindings,reward_lists=rewards,
-        reward_destinations=reward_map,
+        reward_destinations=reward_map,audio=audio,voice_hooks=voice_hooks,world_hooks=world_hooks,
+        storage=storage,storage_ram=save_ram,storage_end=save_end,save_format=19,wire_version=6,
         unbound_services=run('nm','--undefined-only','carried-npc.o').strip().splitlines(),
         generated_sha256={n:sha256((out/n).read_bytes()) for n in generated},
         sources={n:sha256((ROOT/n).read_bytes()) for n in paths},

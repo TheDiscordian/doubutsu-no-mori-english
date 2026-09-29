@@ -27,12 +27,37 @@ def trigger_program(sequence, origin, limit):
     """
     data=span(sequence,origin,limit-origin)
     if (not 0<=origin<limit<=min(len(sequence),65536) or len(data)<11 or
-            data[0]!=0xEB or data[1]>3 or data[2]>125 or data[3]!=0x88 or
-            struct.unpack_from('>H',data,4)[0]!=origin+7 or data[6]!=255):
+            data[0]!=0xEB or data[1]>3 or data[2]>125):
         raise ValueError('Unsupported complete trigger channel')
-    at=7;pointers=[4];envelope=None;decay=None;events=[]
+    header=3;layers=[];pointers=[]
+    while header<len(data) and data[header]!=255:
+        if data[header]!=0x88+len(layers) or len(layers)>=4:
+            raise ValueError('Unsupported complete trigger layer directory')
+        pointers.append(header+1)
+        layers.append(struct.unpack('>H',span(data,header+1,2))[0]-origin)
+        header+=3
+    if not layers or span(data,header,1)!=b'\xFF' or layers[0]!=header+1 or layers!=sorted(set(layers)):
+        raise ValueError('Invalid complete trigger layer addresses')
+    descriptions=[];events=[];commands=[]
+    for first,end in zip(layers,[*layers[1:],len(data)],strict=True):
+        desc=trigger_layer(data,origin,first,end)
+        pointers.extend(desc.pop('pointers'));commands.extend(desc.pop('commands'));events.extend(desc['events'])
+        descriptions.append(desc)
+    envelope=next((d['envelope'] for d in descriptions if d['envelope'] is not None),None)
+    decay=next((d['decay'] for d in descriptions if d['envelope'] is not None),None)
+    return dict(origin=origin,bytes=len(data),sha256=sha256(data),selector=data[1],instrument=data[2],
+        pointers=pointers,envelope=envelope,envelope_bytes=sum(d['envelope_bytes'] for d in descriptions),
+        decay=decay,events=events,duration=max(d['duration'] for d in descriptions),
+        **({'commands':commands} if commands else {}),
+        **({'layers':descriptions} if len(layers)>1 else {}))
+
+
+def trigger_layer(data,origin,first,end):
+    """Parse a full layer plus its owned envelope; retain its independent timing."""
+    if not 0<=first<end<=len(data):raise ValueError('Trigger layer exceeds its complete owner')
+    at=first;pointers=[];envelope=None;decay=None;events=[]
     commands=[]
-    while at<len(data) and data[at]!=255:
+    while at<end and data[at]!=255:
         start=at;op=data[at];at+=1
         if op==0xCB:
             if envelope is not None:raise ValueError('Multiple trigger envelopes are not supported')
@@ -66,17 +91,17 @@ def trigger_program(sequence, origin, limit):
         velocity=span(data,at,1)[0];at+=1
         if velocity>127:raise ValueError('Invalid trigger velocity')
         events.append(dict(offset=start,note=op&63,duration=duration,velocity=velocity))
-    if not any('note' in e for e in events) or span(data,at,1)!=b'\xFF':
+    if at>=end or not any('note' in e for e in events) or span(data,at,1)!=b'\xFF':
         raise ValueError('Unterminated or empty trigger layer')
     at+=1;envelope_bytes=0
     if envelope is not None:
-        if not at<=envelope<len(data) or any(data[at:envelope]):
+        if not at<=envelope<end or any(data[at:envelope]):
             raise ValueError('Unaccounted trigger layer bytes')
         envelope_bytes=len(extended_envelope(data,envelope,minimum_steps=1));at=envelope+envelope_bytes
-    if len(data)-at>15 or any(data[at:]):raise ValueError('Unaccounted complete trigger tail')
-    return dict(origin=origin,bytes=len(data),sha256=sha256(data),selector=data[1],instrument=data[2],
-        pointers=pointers,envelope=envelope,envelope_bytes=envelope_bytes,decay=decay,events=events,
-        duration=sum(e['duration'] for e in events),**({'commands':commands} if commands else {}))
+    if not 0<=end-at<=15 or any(data[at:end]):raise ValueError('Unaccounted complete trigger tail')
+    return dict(offset=first,bytes=end-first,pointers=pointers,envelope=envelope,
+        envelope_bytes=envelope_bytes,decay=decay,events=events,commands=commands,
+        duration=sum(e['duration'] for e in events))
 
 
 def bind_trigger(data,description,offset,selector,instrument_index,*,instrument_map=None):
@@ -1072,12 +1097,25 @@ def grow_permanent_heap(code):
     return growth,patches
 
 
-def register_triggers(sequence,programs,fragments,counts,native_priority,source_priority,*,previous=None):
+def register_triggers(sequence,programs,fragments,counts,native_priority,source_priority,*,previous=None,
+                      priority_changes=None):
     """Extend whole dispatch tables while preserving shared cross-group priorities."""
     if (len(native_priority)!=128 or len(source_priority)!=128 or not {1,4}<=set(counts)<= {0,1,4,5} or
             any(type(n) is not int or not 0<n<=128 for n in counts.values())):
         raise ValueError('Unsupported complete trigger dispatch contract')
     result=bytearray(sequence);tables={};rows=[];used=set();retained={}
+    priorities=bytearray(native_priority)
+    if priority_changes is not None:
+        # Every group shares the 128-entry priority table. Slots may change
+        # only beyond every native group and with no imported user in ANY
+        # group. Native walking groups have 73 entries at these fixed tables;
+        # all expanded trigger groups must be represented by the caller.
+        if (priority_changes or set(counts)!={0,1,4,5} or
+                struct.unpack('>2H',span(sequence,0x18C,4))!=(0x2ED8,0x2F6A)):
+            raise ValueError('Incomplete cross-group priority reservation')
+        for at in (0x2ED8,0x2F6A):
+            if any(p>=len(sequence) for p in struct.unpack('>73H',span(sequence,at,146))):
+                raise ValueError('Changed complete walking-group bounds')
     if previous is not None:
         retained={r['source_sound_word']:r for r in previous['programs']}
         if len(retained)!=len(previous['programs']):raise ValueError('Duplicate retained source trigger')
@@ -1136,7 +1174,15 @@ def register_triggers(sequence,programs,fragments,counts,native_priority,source_
                     span(sequence,old['offset'],old['bytes'])!=bound):
                 raise ValueError('Reused trigger differs from complete current source')
             rows.append(copy.deepcopy(old));continue
-        available=[i for i in range(count,128) if native_priority[i]==priority and (group,i) not in used]
+        available=[i for i in range(count,128) if priorities[i]==priority and (group,i) not in used]
+        if not available and priority_changes is not None:
+            occupied={slot[1] for slot in used if isinstance(slot,tuple)}
+            vacant=[i for i in range(max(73,*counts.values()),128) if i not in occupied]
+            if vacant:
+                target=vacant[0]
+                priority_changes.append(dict(address=0x80113B84+target,
+                    before=bytes((priorities[target],)).hex(),after=bytes((priority,)).hex()))
+                priorities[target]=priority;available=[target]
         if not available:raise ValueError('No vacant native trigger with matching source priority')
         target=index if index in available else available[0];used.add((group,target))
         native_word=(source_word&0x8000)|(group<<8)|target
@@ -1217,6 +1263,12 @@ def install_audio_resources(image,prior,blob,code,new_sequence,resources,audio):
     """Store complete shared SFX resources for trigger and looping categories."""
     from v3_furniture_install import append_resource_plan,relocate_resource_plan
     files=by_vrom(image)
+    for patch in audio.get('priority_changes',[]):
+        at=patch['address']-CODE_RAM
+        before=bytes.fromhex(patch['before']);after=bytes.fromhex(patch['after'])
+        if (len(before)!=1 or len(after)!=1 or not 0x80113B84<=patch['address']<0x80113C04 or
+                code[at:at+1]!=before):raise ValueError('Changed reserved sound priority')
+        code[at:at+1]=after
     before_budget=permanent_budget(code)
     storage=reuse_audio_storage(image,prior,blob,code,
         {('seq',199):new_sequence,('bank',audio['font_index']):resources['font']})

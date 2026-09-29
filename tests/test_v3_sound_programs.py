@@ -105,6 +105,69 @@ class CreatureAudioTests(unittest.TestCase):
 
 
 class ProgramTests(unittest.TestCase):
+    def test_new_priorities_require_slots_unused_across_every_group(self):
+        sequence=bytearray(0x3000);sequence[0]=255
+        counts={0:81,1:106,4:78,5:45}
+        for group,at in enumerate((0x200,0x300,0x2ED8,0x2F6A,0x400,0x500)):
+            struct.pack_into('>H',sequence,0x188+group*2,at)
+        raw=bytes.fromhex('eb0102880007ff600c5aff')
+        description=sounds.trigger_program(raw,0,len(raw))
+        programs=[dict(sound_word=word,fragment_file='tone',fragment_origin=0,
+            bytes=len(raw),sha256=sha256(raw),native_selector=1,native_instrument=2,
+            source_program=description) for word in (0x101,0x402)]
+        native=bytes([40]*128);source=bytearray(native);source[1]=70;source[2]=80
+        with self.assertRaisesRegex(ValueError,'matching source priority'):
+            sounds.register_triggers(sequence,programs,{'tone':raw},counts,native,source)
+        patches=[]
+        converted,rows,tables=sounds.register_triggers(sequence,programs,{'tone':raw},counts,
+            native,source,priority_changes=patches)
+        self.assertEqual([r['native_sound_word'] for r in rows],[0x16A,0x46B])
+        self.assertEqual(patches,[dict(address=0x80113BEE,before='28',after='46'),
+            dict(address=0x80113BEF,before='28',after='50')])
+        priorities=bytearray(native)
+        for patch in patches:priorities[patch['address']-0x80113B84]=int(patch['after'],16)
+        self.assertEqual(priorities[:106],native[:106])
+        # Subsequent batches see every old user, including users in another
+        # group, before claiming a different shared priority.
+        source[3]=90;next_program=dict(programs[0],sound_word=0x503);more=[]
+        _,added,_=sounds.register_triggers(converted,[next_program],{'tone':raw},counts,
+            priorities,source,previous=dict(programs=rows,tables=tables),priority_changes=more)
+        self.assertEqual(added[0]['native_sound_word'],0x56C)
+        self.assertEqual(more,[dict(address=0x80113BF0,before='28',after='5a')])
+        with self.assertRaisesRegex(ValueError,'cross-group'):
+            sounds.register_triggers(sequence,programs,{'tone':raw},{1:106,4:78},
+                native,source,priority_changes=[])
+        changed=sequence.copy();changed[0x18C]^=1
+        with self.assertRaisesRegex(ValueError,'cross-group'):
+            sounds.register_triggers(changed,programs,{'tone':raw},counts,
+                native,source,priority_changes=[])
+
+    def test_parallel_trigger_layers_relocate_with_independent_timing(self):
+        # Two synthetic layers, including an instrument override and a complete
+        # envelope owned by the first layer. Parallel durations must not add.
+        raw=bytearray.fromhex('eb010288000a89001affcb00128064063cff00017d00ffff0000c607c004500928ff')
+        description=sounds.trigger_program(raw,0,len(raw))
+        self.assertEqual(description['duration'],13)
+        self.assertEqual([r['duration'] for r in description['layers']],[6,13])
+        self.assertEqual(description['pointers'],[4,7,11])
+        bound=sounds.bind_trigger(raw,description,0x4200,1,12,instrument_map={7:13})
+        actual=sounds.trigger_program(bytes(0x4200)+bound,0x4200,0x4200+len(bound))
+        self.assertEqual(actual['events'],description['events'])
+        self.assertEqual(actual['layers'],description['layers'])
+        self.assertEqual(actual['commands'],[dict(offset=26,opcode=0xC6,instrument=13)])
+        restored=bytearray(bound);restored[1:3]=raw[1:3];restored[27]=7
+        for at in description['pointers']:restored[at:at+2]=raw[at:at+2]
+        self.assertEqual(restored,raw)
+        # Reject duplicate/out-of-order headers, truncated layers, pointers into
+        # another layer, and a terminator stolen from the next layer's bytes.
+        for at,value in ((6,0x88),(8,10),(8,17),(8,34),(12,26),(16,0xC0)):
+            broken=raw.copy();broken[at]=value
+            with self.subTest(at=at,value=value),self.assertRaises(ValueError):
+                sounds.trigger_program(broken,0,len(broken))
+        for length in range(len(raw)):
+            with self.subTest(length=length),self.assertRaises(ValueError):
+                sounds.trigger_program(raw[:length],0,length)
+
     def test_continuous_note_with_timed_rest_loop_preserves_all_commands(self):
         raw=bytearray.fromhex('880004ffc609cb0000c0c45f807830c08520fb000f')
         raw.extend(bytes(len(raw)&1));envelope=len(raw)

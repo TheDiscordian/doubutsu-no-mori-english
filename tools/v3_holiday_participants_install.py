@@ -25,7 +25,7 @@ SOURCES+=('overlays/v3/surface_bootstrap.c',)
 def link(directory,prepared,output,*,object_name='participants',ram=RAM):
     """Link the checked prepared object, retaining every function and asset."""
     output.mkdir()
-    if object_name not in ('participants','exercise','festivals') or ram&15 or not RAM<=ram<0x807DA800:
+    if object_name not in ('participants','exercise','festivals','carried-npc') or ram&15 or not RAM<=ram<0x807DA800:
         raise ValueError('Invalid shared participant object/address')
     raw=(directory/(object_name+'.o')).read_bytes()
     if prepared['object']['sha256']!=sha256(raw) or prepared['unbound_services']:
@@ -142,7 +142,8 @@ def install(base,prior,blob,core,output,directory):
         if key in equipment:equipment[key].update(sequence=copy.deepcopy(seq),font=copy.deepcopy(bank),
             wave=copy.deepcopy(wave),after_budget=copy.deepcopy(shared['after_budget']))
     trigger=equipment['furniture_audio'];trigger.update(
-        programs=sorted(trigger['programs']+programs,key=lambda r:r['source_sound_word']),tables=tables,layout=audio['layout'])
+        programs=sorted(trigger['programs']+programs,key=lambda r:r['source_sound_word']),tables=tables,layout=audio['layout'],
+        priority_table_sha256=sha256(core[0x80113B84-CODE_RAM:0x80113B84-CODE_RAM+128]))
     audio.update(installed=True,sequence=seq,font=bank,wave=wave,heap_growth=heap_growth,heap_patches=heap_patches)
     room=equipment['room_rigs'];effects=room['effects'];old_controller=effects['controller']
     if old_controller['count']!=119 or [r['id'] for r in effects['profiles']]!=list(range(111,119)):

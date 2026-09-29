@@ -5,7 +5,12 @@
  * offsets are repurposed. Slot ownership follows the existing town/player
  * save transaction and player-clear hook. */
 enum { AF_HC_BYTES=48,AF_HC_PLAYERS=4,AF_HC_STAMPS=12 };
-#ifdef AF_V3_PAPER_PACKS
+#ifdef AF_V3_CARRIED_NPC
+#if !defined(AF_V3_PAPER_PACKS) || !defined(AF_V3_CARRIED_QUEST)
+#error Carried NPC storage requires the shared stationery and hunt formats
+#endif
+enum { AF_HC_CARRIED_WIRE=6 };
+#elif defined(AF_V3_PAPER_PACKS)
 enum { AF_HC_CARRIED_WIRE=5 };
 #elif defined(AF_V3_CARRIED_QUEST)
 enum { AF_HC_CARRIED_WIRE=4 };
@@ -38,6 +43,13 @@ int af_carried_paper_collect(unsigned char *,unsigned int,unsigned int);
  * and belongs to the selected spirit family, not an exercise-card slot. */
 int af_carried_quest_day(const unsigned char *);
 int af_carried_quest_set_day(unsigned char *,unsigned int);
+#ifdef AF_V3_CARRIED_NPC
+/* Town reward state outlives calendar/event-slot cleanup and player deletion.
+ * Wire six keeps the paper mode in bit zero and pending weed clearing in bit
+ * one of header byte 15. The actual field renewal consumes the reward. */
+int af_carried_quest_weeds(const unsigned char *);
+int af_carried_quest_set_weeds(unsigned char *,unsigned int);
+#endif
 #endif
 #endif
 #endif

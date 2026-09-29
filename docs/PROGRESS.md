@@ -67,17 +67,32 @@ allocation and its one corrected-allocator retry both return null before any
 paper calls. No native paper gameplay result is claimed; the setup retry budget
 is spent. Continue the remaining connected consumers instead of repeating it.
 
-Wisp's complete actor compiles in `build/v3-carried-npc-connected-08/` with all
+Wisp's complete actor links in `build/v3-carried-npc-connected-10/` with all
 retained participant/motion records, its official text, walk-only schedule,
 weed counts, roof-colour writes, item mapping, and guarded handovers. All 22
 reward lists retain 998 candidates; 1,000 destination mappings include the two
 source fallback items. Disabled imports are filtered before either reward
-selection branch. Every paper reward uses the same global quantity policy.
-The current preparation/source check passes. The conversation host fixture has
+selection branch. Every paper reward binds to the installed global quantity
+provider. The complete two-layer first-encounter sound and disappearance sound retain their
+donor programs, instruments, samples, timing, and priorities through the shared
+audio converter. One unused cross-group priority slot supports the latter without
+changing any existing sound. Click-voice mode has both a native predicate hook
+and message-initialization reset; the original selector retains silent mode.
+
+The deferred weed reward covers the saved town at outdoor field renewal,
+suppresses regrowth during that renewal, and retains the source notification
+deferral. Its pending bit survives hunt-date cleanup and player deletion.
+Prepared format-19/wire-6 storage is 12,592 bytes at `807BB000`; the complete
+32,864-byte NPC links at `807BF000..807C7060`, including initialized BSS and guard.
+There are no unresolved actor services. These modules are not installed.
+Focused sanitized world/voice checks, current source/audio retention checks,
+fourteen shared sound-parser/allocation checks, and the format-19 save transaction
+in both paper modes pass. Native I/O is doubled in the save test; forward
+migration from formats 14–18 and older-reader rejection are covered.
+Successful-save/travel spirit cleanup and full cartridge installation remain
+unfinished. The conversation host fixture has
 not executed successfully; its two setup attempts are recorded as incomplete,
-and no further attempt is spent on that fixture in this batch. Actual linked
-paper-provider binding, deferred weed clearing, voice-click lifecycle, both system sounds,
-successful-save/travel cleanup, and full installation remain unfinished.
+and no further attempt is spent on that fixture in this batch.
 The installed proposal is ABI 367 / format 18, with Wisp disabled. No
 existing ROM, save, or deployed patcher is changed, and no native/hardware result
 is claimed for these prepared changes.

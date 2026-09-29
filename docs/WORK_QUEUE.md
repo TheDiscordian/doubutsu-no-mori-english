@@ -188,19 +188,24 @@ Reuse `build/v3-carried-wisp-art-01/` for the
 complete 26-joint translucent model and every facial texture. The existing
 participant importer retains all 48 actor functions from
 `build/v3-carried-event-prepared-03/`. Continue from the connected preparation at
-`build/v3-carried-npc-connected-08/`, not from another source audit. Its shared
+`build/v3-carried-npc-connected-10/`, not from another source audit. Its shared
 23-owner registry, independent spirit gate, native field/drawing services,
 complete motion, 48 official messages, sixteen choices, 32 angry-name strings,
 official Wisp name, and all twenty external reward lists compile together.
 The two actor-local reward lists remain complete. These NPC changes are prepared,
-not installed in ABI 367. The retained complete preparation check passes;
-unchanged registry evidence is retained. Its four undefined services are
-`af_cw_paper_stack`, `af_cw_clear_grass`, `mMsg_sound_set_voice_click`, and
-`sAdo_SysTrgStart`. Bind the paper provider to the installed shared global policy,
-not a Wisp-specific override. Deferred clearing needs its real field-renewal
-lifetime; voice-click needs both a native reader and reset, and sound mapping
-must cover both source `6B` and `16C`. Connect these and successful-save/travel
-cleanup, then install the character banks, names, shared registry redirects,
+not installed in ABI 367. The complete actor links with no undefined services.
+Its paper provider binds to the installed global setting. The prepared voice
+hooks cover initialization and the native animal-voice predicate. The shared
+sound importer retains both source `6B` and `16C`, including the first sound's
+two layers and a checked unused shared priority slot for the second. Deferred
+weed clearing uses the real field-renewal caller and grass-growth call; format
+19/wire 6 persists its independent pending bit. Reuse its 12,592-byte storage
+module at `807BB000` and 32,864-byte linked actor at `807BF000..807C7060`.
+Current source/audio retention, sanitized world/voice, shared audio parser/slot,
+and both paper-mode save transactions pass; native I/O is doubled.
+Connect successful-save/travel cleanup, then install the character banks,
+names, shared registry redirects, both voice hooks, field hooks, audio resources,
+format-19 save redirects, priority change, startup/checksum updates,
 dialogue, and full owner together. Keep source `ghost_start/stop/in`, its five
 unique acres, and saved/scene lifetime intact. Ordinary save/travel also removes
 spirits in the donor; connect the actual transaction modes, not unconditional

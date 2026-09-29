@@ -30,6 +30,10 @@ const u32 af_carried_paper_mode=TEST_PAPER_MODE;
 extern int af_v17_compress_cards(u8 *,u32,const u8 *,u32,const u8 *,u32,const u8 *,u32 *,u32);
 extern int af_v17_expand_cards(const u8 *,u32,u8 *,u32);
 #endif
+#ifdef AF_V3_CARRIED_NPC
+extern int af_v18_compress_cards(u8 *,u32,const u8 *,u32,const u8 *,u32,const u8 *,u32 *,u32);
+extern int af_v18_expand_cards(const u8 *,u32,u8 *,u32);
+#endif
 void af_carried_prior_record(u32 item) {prior_record=item;}
 int af_carried_prior_owned(const u8 *player,u32 item) {(void)player;prior_owned=item;return 17;}
 int af_carried_event_type(u32 item) {(void)item;return 0;}
@@ -62,6 +66,11 @@ int main(void) {
     CHECK(!af_carried_quest_set_day(af_v3_card_data(),0x0D01));
     CHECK(!af_carried_quest_set_day(af_v3_card_data(),0x0100));
     CHECK(af_carried_quest_day(af_v3_card_data())==0x021D);
+#endif
+#ifdef AF_V3_CARRIED_NPC
+    CHECK(!af_carried_quest_weeds(af_v3_card_data()));
+    CHECK(af_carried_quest_set_weeds(af_v3_card_data(),1));
+    CHECK(!af_carried_quest_set_weeds(af_v3_card_data(),2));
 #endif
     for(u32 p=0;p<4;p++) {
         AFHolidayCard card={{2026,7,27},p+1};
@@ -101,6 +110,9 @@ int main(void) {
 #ifdef AF_V3_PAPER_PACKS
     CHECK(af_v17_expand_cards(saved,65536,expanded,sizeof(expanded))==AF_CZ_FORMAT);
 #endif
+#ifdef AF_V3_CARRIED_NPC
+    CHECK(af_v18_expand_cards(saved,65536,expanded,sizeof(expanded))==AF_CZ_FORMAT);
+#endif
     CHECK(af_v3_save_expand_cards(saved,65536,expanded,sizeof(expanded))==0);
     CHECK(!memcmp(expanded+AF_CZ_RAW+AF_CZ_FISHING_EXTRA,card_before,AF_HC_BYTES));
     CHECK(af_holiday_cards_clear(af_v3_card_data(),2));
@@ -115,7 +127,10 @@ int main(void) {
     CHECK(!memcmp(&diary_before,af_v3_diary_data(),AF_DIARY_BYTES));
     CHECK(!memcmp(console_before,af_console_storage.players,6528));
 #ifdef AF_V3_PAPER_PACKS
-    CHECK(af_v3_card_data()[15]==TEST_PAPER_MODE);
+    CHECK((af_v3_card_data()[15]&1)==TEST_PAPER_MODE);
+#ifdef AF_V3_CARRIED_NPC
+    CHECK(af_carried_quest_weeds(af_v3_card_data())==1);
+#endif
     for(u32 player=0;player<4;player++)for(u32 slot=0;slot<15;slot++) {
         u32 at=0x20+player*0xBD0+0x14+slot*2;
         CHECK(((u32)af_save_live[at]<<8|af_save_live[at+1])==af_carried_paper_with_quantity(
@@ -175,6 +190,10 @@ int main(void) {
 #endif
 #ifdef AF_V3_PAPER_PACKS
         if(version==4)size=af_v17_compress_cards(bank,65536,expanded,65536,
+            expanded+65536,6528,expanded+AF_CZ_RAW,af_console_hash,AF_CZ_WORK_BYTES);
+#endif
+#ifdef AF_V3_CARRIED_NPC
+        if(version==5)size=af_v18_compress_cards(bank,65536,expanded,65536,
             expanded+65536,6528,expanded+AF_CZ_RAW,af_console_hash,AF_CZ_WORK_BYTES);
 #endif
         CHECK(size>0 && bank[0xF985]==13+version);

@@ -26,7 +26,10 @@ class CarriedStorageTests(unittest.TestCase):
     def test_paper_mode_save_transaction_and_migration(self):
         for mode in (0,1):self.save_transaction(True,mode)
 
-    def save_transaction(self,quest,paper=None):
+    def test_quest_reward_save_transaction_and_migration(self):
+        for mode in (0,1):self.save_transaction(True,mode,rewards=True)
+
+    def save_transaction(self,quest,paper=None,*,rewards=False):
         with tempfile.TemporaryDirectory(prefix='v3-carried-storage-') as temp:
             out=Path(temp)
             flags=['-std=c11','-O1','-g','-Wall','-Wextra','-Werror','-fno-pie','-no-pie',
@@ -43,12 +46,15 @@ class CarriedStorageTests(unittest.TestCase):
             if quest:versions.append(('v16',['-DAF_V3_EVENT_ITEM_PROFILE=1','-DAF_V3_CARRIED_PROFILE=1']))
             if paper is not None:versions.append(('v17',['-DAF_V3_EVENT_ITEM_PROFILE=1',
                 '-DAF_V3_CARRIED_PROFILE=1','-DAF_V3_CARRIED_QUEST=1']))
+            if rewards:versions.append(('v18',['-DAF_V3_EVENT_ITEM_PROFILE=1',
+                '-DAF_V3_CARRIED_PROFILE=1','-DAF_V3_CARRIED_QUEST=1','-DAF_V3_PAPER_PACKS=1']))
             for name,extra in versions:
                 commands.append(['cc',*flags,*extra,*(f'-Daf_v3_save_{s}=af_{name}_{s}' for s in entries),
                     '-c','overlays/v3/save_compressed.c','-o',str(out/(name+'.o'))])
             commands.extend([['cc',*flags,'-DAF_V3_EVENT_ITEM_PROFILE=1','-DAF_V3_CARRIED_PROFILE=1',
                 *(['-DAF_V3_CARRIED_QUEST=1'] if quest else []),
                 *(['-DAF_V3_PAPER_PACKS=1',f'-DTEST_PAPER_MODE={paper}'] if paper is not None else []),
+                *(['-DAF_V3_CARRIED_NPC=1',str(out/'v18.o')] if rewards else []),
                 '-DAF_V3_CONSOLE_STORAGE=1','-Wl,--gc-sections','tests/v3_carried_storage_test.c',
                 *(f'overlays/v3/{s}.c' for s in ('save_runtime','console_storage','save_compressed',
                     'diary','diary_calendar','holiday_fishing','holiday_cards','carried_items','carried_collection')),

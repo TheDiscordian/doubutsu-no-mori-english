@@ -22,6 +22,9 @@ int af_holiday_cards_valid(const u8 *data) {
         && data[4]!=4
 #ifdef AF_V3_PAPER_PACKS
         && data[4]!=5
+#ifdef AF_V3_CARRIED_NPC
+        && data[4]!=6
+#endif
 #endif
 #endif
 #endif
@@ -34,7 +37,7 @@ int af_holiday_cards_valid(const u8 *data) {
 #ifdef AF_V3_CARRIED_QUEST
         if(data[4]>=4 && (i==13 || i==14))continue;
 #ifdef AF_V3_PAPER_PACKS
-        if(data[4]==5 && i==15)continue;
+        if(data[4]>=5 && i==15)continue;
 #endif
 #endif
 #endif
@@ -49,6 +52,9 @@ int af_holiday_cards_valid(const u8 *data) {
            (!(data[8]&64) || !data[14] || data[14]>af_diary_days(2000,data[13])))return 0;
 #ifdef AF_V3_PAPER_PACKS
         if(data[4]==5 && data[15]>1)return 0;
+#ifdef AF_V3_CARRIED_NPC
+        if(data[4]==6 && (data[15]>3 || ((data[15]&2) && !(data[8]&64))))return 0;
+#endif
 #endif
 #endif
     }
@@ -109,14 +115,14 @@ int af_carried_save_profile(const u8 *data,unsigned int events,unsigned int enab
     if(enabled>127 || ((enabled>>2)&3)!=events || !af_holiday_cards_profile(data,events))return 0;
 #ifdef AF_V3_PAPER_PACKS
     unsigned mode=*(const volatile AFCarryWord *)&af_carried_paper_mode;
-    if(mode>1 || (data[4]==5 && data[15] && !mode))return 0;
+    if(mode>1 || (data[4]>=5 && (data[15]&1) && !mode))return 0;
 #endif
     return data[4]<3 || !(data[8]&~enabled);
 }
 int af_carried_save_bind(u8 *data,unsigned int events,unsigned int enabled) {
     if(!af_carried_save_profile(data,events,enabled))return 0;
 #ifdef AF_V3_PAPER_PACKS
-    data[15]=(u8)*(const volatile AFCarryWord *)&af_carried_paper_mode;
+    data[15]=(u8)((data[15]&2u)|*(const volatile AFCarryWord *)&af_carried_paper_mode);
 #endif
     data[4]=AF_HC_CARRIED_WIRE;data[7]=(u8)events;data[8]=(u8)enabled;return 1;
 }
@@ -135,6 +141,16 @@ int af_carried_quest_set_day(u8 *data,unsigned int day) {
        (day && (!(day&255) || (day&255)>af_diary_days(2000,day>>8))))return 0;
     data[13]=day>>8;data[14]=day;return 1;
 }
+#ifdef AF_V3_CARRIED_NPC
+int af_carried_quest_weeds(const u8 *data) {
+    if(!af_holiday_cards_valid(data) || data[4]!=6 || !(data[8]&64))return -1;
+    return (data[15]>>1)&1;
+}
+int af_carried_quest_set_weeds(u8 *data,unsigned int pending) {
+    if(pending>1 || af_carried_quest_weeds(data)<0)return 0;
+    data[15]=(u8)((data[15]&1u)|(pending<<1));return 1;
+}
+#endif
 #endif
 #endif
 #ifdef AF_V3_EVENT_ITEM_PROFILE

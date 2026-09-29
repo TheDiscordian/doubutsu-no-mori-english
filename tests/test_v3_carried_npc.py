@@ -18,6 +18,59 @@ from v3_furniture_pipeline import Source
 
 
 class CarriedNpcTests(unittest.TestCase):
+    def test_deferred_field_reward(self):
+        from tests.test_v3_equipment_runtime import HostTests
+        HostTests.sanitized(self,'v3_carried_world_test.c',defines=(
+            '-I'+str(ROOT/'overlays/v3'),'-DAF_V3_EVENT_ITEM_PROFILE=1',
+            '-DAF_V3_CARRIED_PROFILE=1','-DAF_V3_CARRIED_QUEST=1',
+            '-DAF_V3_PAPER_PACKS=1','-DAF_V3_CARRIED_NPC=1'),extra=(
+                'overlays/v3/carried_world.c','overlays/v3/holiday_cards.c',
+                'overlays/v3/diary_calendar.c','overlays/v3/diary.c'))
+
+    def test_voice_lifetime_and_mapped_system_sounds(self):
+        from tests.test_v3_equipment_runtime import HostTests
+        HostTests.sanitized(self,'v3_carried_voice_test.c',defines=(
+            '-I'+str(ROOT/'overlays/v3'),),extra=('overlays/v3/carried_voice.c',))
+
+    def test_complete_sound_batch_preserves_other_groups_and_programs(self):
+        from aflib import CODE_RAM,CODE_VROM,by_vrom
+        import v3_sound_programs as sounds
+        out=ROOT/os.environ.get('V3_CARRIED_NPC','build/v3-carried-npc-connected-10')
+        prepared=json.loads((out/'prepared.json').read_bytes());audio=prepared['audio']
+        base,prior=inputs(ROOT/'build/v3-paper-quantities-installed-08/build-lock.json')
+        core=by_vrom(base)[CODE_VROM].extract(base)
+        original,_,_=sounds.installed_resource(base,core,'seq',199)
+        sequence=(out/'carried-sequence.bin').read_bytes()
+        priority=bytearray(core[0x80113B84-CODE_RAM:0x80113B84-CODE_RAM+128])
+        old=prior['equipment_resources']['furniture_audio'];rows=audio['registered_programs']
+        self.assertEqual([r['source_sound_word'] for r in rows],[0x6B,0x16C])
+        self.assertEqual(len(rows[0]['source_program']['layers']),2)
+        self.assertEqual([r['trigger_priority'] for r in rows],[70,70])
+        self.assertEqual(audio['priority_changes'],[dict(address=0x80113BF9,before='28',after='46')])
+        for patch in audio['priority_changes']:
+            index=patch['address']-0x80113B84
+            self.assertGreaterEqual(index,max(73,*(r['previous_count'] for r in old['tables'])))
+            self.assertNotIn(index,[r['native_sound_word']&255 for r in old['programs']])
+            priority[index]=int(patch['after'],16)
+        for row in old['programs']:
+            self.assertEqual(sequence[row['offset']:row['offset']+row['bytes']],
+                original[row['offset']:row['offset']+row['bytes']])
+        for group,at in ((2,0x2ED8),(3,0x2F6A)):
+            self.assertEqual(sequence[0x188+group*2:0x18A+group*2],original[0x188+group*2:0x18A+group*2])
+            self.assertEqual(sequence[at:at+146],original[at:at+146])
+        combined=dict(old,programs=old['programs']+rows,tables=audio['registered_tables'])
+        again,added,tables=sounds.register_triggers(sequence,[],{},
+            {r['group']:r['previous_count'] for r in old['tables']},priority,bytes(128),previous=combined)
+        self.assertEqual(again,sequence);self.assertEqual(added,[])
+        self.assertEqual(tables,audio['registered_tables'])
+        for name,row in audio['files'].items():
+            data=(out/name).read_bytes()
+            self.assertEqual((len(data),sha256(data)),(row['bytes'],row['sha256']))
+        for row in rows:
+            actual=sounds.trigger_program(sequence,row['offset'],row['offset']+row['bytes'])
+            self.assertEqual(actual['events'],row['source_program']['events'])
+            self.assertEqual(actual.get('layers'),row['source_program'].get('layers'))
+
     def test_stationery_native_consumer_preparation(self):
         from aflib import by_vrom,CODE_VROM
         from v3_carried_runtime import paper_quantity_catalogue,paper_quantity_letter,paper_quantity_supply
@@ -124,14 +177,14 @@ class CarriedNpcTests(unittest.TestCase):
         from textvalidate import expanded_bound
         from runtime_module import module_command_info
         from textbanks import Bank
-        out=ROOT/os.environ.get('V3_CARRIED_NPC','build/v3-carried-npc-connected-08')
+        out=ROOT/os.environ.get('V3_CARRIED_NPC','build/v3-carried-npc-connected-10')
         r=json.loads((out/'prepared.json').read_bytes())
-        base,prior=inputs(ROOT/'build/v3-carried-field-work-01/quest-manager-03/build-lock.json')
+        base,prior=inputs(ROOT/'build/v3-paper-quantities-installed-08/build-lock.json')
         self.assertEqual(r['base_sha256'],sha256(base))
         for name,digest in r['generated_sha256'].items():self.assertEqual(sha256((out/name).read_bytes()),digest,name)
         self.assertEqual(sha256((out/'carried-npc.o').read_bytes()),r['object']['sha256'])
         for name,digest in r['sources'].items():self.assertEqual(sha256((ROOT/name).read_bytes()),digest,name)
-        self.assertTrue(r['unbound_services']);self.assertFalse(r['installed'])
+        self.assertFalse(r['unbound_services']);self.assertFalse(r['installed'])
         old=prior['equipment_resources']['npc_extra']['events']['festivals']
         self.assertEqual(r['registry']['rows'][:-1],old['registry']['rows'])
         self.assertEqual(r['registry']['rows'][-1]['profile'],0xF0)
@@ -172,7 +225,11 @@ class CarriedNpcTests(unittest.TestCase):
         self.assertEqual((by_source[0x20C0]['item'],by_source[0x20C0]['quantity']),(0x2000,4))
         self.assertEqual((by_source[0x20C3]['item'],by_source[0x20C3]['quantity']),(0x2043,1))
         self.assertTrue(all(row['item']<0x3000 for row in mapped if row['evidence']=='pinned native counterpart'))
-        self.assertIn('af_cw_paper_stack',' '.join(r['unbound_services']))
+        self.assertEqual(r['unbound_services'],[])
+        self.assertEqual((r['save_format'],r['wire_version']),(19,6))
+        self.assertEqual(sha256((out/'storage/code.bin').read_bytes()),r['storage']['sha256'])
+        self.assertEqual(r['bindings']['af_cw_paper_stack'],prior['equipment_resources']['carried_items'][
+            'paper']['quantities']['code']['symbols']['af_cw_paper_stack'])
         bad=copy.copy(rel);raw=bytearray(rel.data);struct.pack_into('>h',raw,at+40,0);bad.data=bytes(raw)
         with self.assertRaisesRegex(ValueError,'expression'):npc_expression_motion(bad,at,joints=26)
 
