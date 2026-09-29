@@ -346,10 +346,10 @@ callback loader uses its actual relocated code bounds. Focused source/host,
 cartridge, and empty/mixed/all-191 composition checks pass. Continue the remaining
 controller/participant services using the retained native map; do not reconvert
 these effects or installed decorations, or restart native fixtures.
-The connected controller/participant module is installed in ABI 343 at
-`build/v3-diary-category-work-01/participants-installed-03/build-lock.json`
-(ROM SHA-256 `1c67f5d201cbede26a8d7b7778b7bcd16036d309d929cf4d7c3ef855c3af37ef`),
-using `build/v3-diary-category-work-01/participants-prepared-23/`: three controllers,
+The connected controller/participant module is retained in ABI 344 at
+`build/v3-diary-category-work-01/special-art-installed-01/build-lock.json`
+(ROM SHA-256 `c0730e35aaa507267a4f18fd318e9f9cd5a83e0b67cc4ccb02f5b9d5c87f0089`),
+using `build/v3-diary-category-work-01/participants-prepared-26/`: three controllers,
 five resident roles, rope, 279 official messages/two choices, offering payment,
 tools/sounds, 21 matching native motions, and the full donor prayer motion.
 All nine owners compile together; the rope retains all 60 deformable vertices,
@@ -363,19 +363,43 @@ The installed module includes twelve shared event-map hooks, original resident
 selection/removal/refill algorithms, real uniforms, both existing NPC/camper
 spawn extensions, descriptor/free/temporary-identity/reset chains, and the global
 prayer-animation hook. The complete coin uses shared model/audio conversion,
-retains both palettes and water subeffects, and adds no unresolved functions.
+retains both palettes and source vertical motion, and adds no unresolved functions.
+Its landing uses the loaded native shrine and both seasonal offering-box meshes;
+the solid box has no water splash. Four elevations and twenty launch angles pass
+the sanitized trajectory check. The dispatcher binds all participant identities
+only when the complete category is admitted.
 Sanitized placement and coin lifecycle/draw-command checks pass. The entire
-51,440-byte module, official text, audio, and coin effect profile are installed
-together. The adjacent sky/participant packet is 67,840 bytes and shares the
+51,872-byte module, official text, audio, and coin effect profile are installed
+together. The adjacent sky/participant packet is 68,272 bytes and shares the
 existing nineteenth startup descriptor, preserving the original sky prefix and
 holiday/fishing packet. All 21 hooks are installed, including the native
 NPC-manager area-15 allocation guard. Failure returns false and resets the
 manager for retry; success retains the original initial/refill distinction.
 The shared text installer moves only the message index, and shared audio
-storage reuses checked superseded allocations. Current-cartridge, changed
-profile-loader, and private browser/offline empty/mixed/all-supported checks
-pass. The next consumers are the source coin's landing geometry at the native
-shrine, remaining participant providers, and actual calendar choice/admission.
+storage reuses checked superseded allocations. Retain passing unchanged
+profile-loader and placement evidence. The shared converter installs complete
+New Year attendant and pumpkin-costume art through one bank batch, with no new
+resident allocation: `special-miko-art-04/`, `special-costume-art-02/`, and
+`special-art-batch-01/`. Fixed banks are 450–453; ordinary Tortimer art and banks
+are retained. Both native drawing callers use the refreshed shared renderer.
+The conversion/pixel and sanitized fixed-face checks pass, as do current-ROM
+bank/transfer/render-call/admission/save-profile checks. The inherited
+participant-stage test expects files and a relocation receipt belonging to the
+initial installation, so it does not finish against the later art-only build.
+Do not spend another batch repairing/replaying that fixture; preserve the
+bounded result and test changed consumers when their implementation is ready.
+The private browser export `special-art-browser-02/` passes the existing
+empty/all-supported/two-mixed-profile check in `special-art-browser-check-02/`,
+including cancellation and unknown-option rejection. Neither deployment changes.
+The current harness-construction budget is exhausted; no native fixture resumes.
+
+Next connect the special-character lifecycle batch to these installed resources:
+the costume uses the complete existing holiday controller, while the shrine
+attendant needs its full fortune-letter/payment path and exercise needs the
+complete card/attendance path. Bind actor pools, ordinary/profile lookup,
+placement identities, full voices, and cleanup together. Preserve each source
+behaviour, including individual exceptions. Actual calendar choice/admission
+remains after its required providers, not a substitute for implementing them.
 Native helpers
 `800821B0`, `800824A4`, and `8008256C` retain the complete donor algorithms;
 resident memories start at offset `10`, not the decomp header's `0C` annotation.

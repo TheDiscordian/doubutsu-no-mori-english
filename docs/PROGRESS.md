@@ -31,9 +31,9 @@ selection; pending rewards must not displace unfinished conversion categories.
 The code-entry keyboard is parked, incomplete source work. Its attempted build
 stops on resource preservation before producing a ROM; it is not installed.
 
-The current proposal is ABI 343 at
-`build/v3-diary-category-work-01/participants-installed-03/build-lock.json`, ROM SHA-256
-`1c67f5d201cbede26a8d7b7778b7bcd16036d309d929cf4d7c3ef855c3af37ef`.
+The current proposal is ABI 344 at
+`build/v3-diary-category-work-01/special-art-installed-01/build-lock.json`, ROM SHA-256
+`c0730e35aaa507267a4f18fd318e9f9cd5a83e0b67cc4ccb02f5b9d5c87f0089`.
 It contains 191 independently selectable development imports, including all nine
 fish and eight insects, and 100 inactive furniture profiles whose acquisition
 is pending, plus sixteen inactive diary cover profiles. The main lock and both
@@ -54,7 +54,7 @@ No native fixture is restarted, and these checks do not establish in-game
 rendering or make diaries selectable.
 
 The shared race, tug-of-war, and New Year participant module is installed in the
-current proposal, using `build/v3-diary-category-work-01/participants-prepared-23/`.
+current proposal, using `build/v3-diary-category-work-01/participants-prepared-26/`.
 All three controllers, five resident roles, and the rope compile together from
 245 complete donor functions. The preparation includes 279 official messages,
 two choices, offering payment, matched motions, the full prayer motion, tools,
@@ -68,19 +68,43 @@ prayer-animation chain. Native resident selection/refill algorithms and verified
 red/blue uniforms are reused. Collision includes the unspawned fifth New Year
 queue position without inventing a fifth actor. The complete offering coin,
 both palettes/models, and both sound programmes use the shared importers.
-The linked 51,440-byte module and original sky prefix share one 67,840-byte
+The linked 51,872-byte module and original sky prefix share one 68,272-byte
 startup packet, retaining the nineteen-entry bootstrap and holiday/fishing
 packet. All 21 hooks, dialogue, source coin profile, both sound programmes,
 and full artwork are installed together. A native NPC-manager guard handles
 failed event storage allocation without losing initial/refill semantics or
 dereferencing a null pointer. Text storage moves only the 50,976-byte message
 index; verified obsolete audio storage is reused instead of adding copies.
-Current-cartridge, changed profile-loader, and browser/offline empty/mixed/
-all-supported checks pass. Source/host placement and coin lifecycle/drawing
-evidence is retained. Native execution remains unverified. Shrine landing
-geometry, remaining event providers, and actual calendar choice/admission are
-still unfinished; no diary is selectable. Saved format 13 and both stable
-patcher deployments remain unchanged.
+The offering trajectory targets the actual native shrine box, using the loaded
+shrine's position and both seasonal meshes. Source vertical motion, palettes,
+sounds, and fade are retained; the water splash is removed from the solid box.
+Sanitized trajectory checks pass across four elevations and twenty launch angles.
+The participant name/profile/effect resolver is installed in the shared event
+dispatcher, with admission still off. Source/host placement and unchanged
+profile-loader evidence is retained. Native execution remains unverified.
+
+The shared character converter and bank installer handle the New Year attendant
+and Halloween costume together. Their complete models/textures are installed
+in fixed banks 450–453, retaining ordinary Tortimer's 448/449. Clamped
+non-power-of-two textures, fixed faces without expression textures, primitive
+colours, and lossless shared drawing commands use the common converter. Both
+models retain every face and texel; the larger model fits the original buffer
+without cropping. The refreshed renderer is bound in both native NPC owners.
+Current-ROM checks verify all six banks, transfer entries, renderer calls,
+participant bindings, and unchanged actor admission/save profile. Focused
+conversion and sanitized drawing checks pass. The inherited participant-stage
+test does not complete against the later art-only stage because its original
+stage files/relocation receipt are absent; its accepted earlier evidence is not
+claimed as a fresh pass. The current private browser export
+`special-art-browser-02/` matches offline output for empty, all-supported, and
+both mixed profiles; cancellation and unknown selections are rejected correctly.
+No native fixture is restarted.
+
+The next connected work is the complete special-character lifecycle batch:
+reuse the shared holiday controller for the costume, connect the shrine
+attendant's fortune letters/payment, and connect exercise/card attendance.
+Actual calendar choice/admission follows the completed dependencies. No diary
+is selectable. Saved format 13 and both stable patcher deployments are unchanged.
 
 All fourteen dedicated event owners have live manager callbacks through the
 shared dispatcher and existing common state. Their 85 identity requirements

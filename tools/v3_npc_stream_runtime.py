@@ -39,7 +39,8 @@ def native_records(source,art,name,model_bank,texture_bank):
     if len(row)!=DRAW_STRIDE or sha256(row)!=art['donor_draw_sha256']:
         raise ValueError('Changed donor streamed draw record')
     if (row[0x5F:0x62]!=bytes(3) or row[0x68:]!=bytes.fromhex('ffffffff') or
-            len(art['eye_offsets'])!=8 or len(art['mouth_offsets']) not in (0,6) or
+            len(art['eye_offsets']) not in (0,8) or len(art['mouth_offsets']) not in (0,6) or
+            not art['eye_offsets'] and art['mouth_offsets'] or
             art['body_offset']+4096>art['texture_bytes'] or art['texture_bytes']>0x1620):
         raise ValueError('Unbound streamed NPC flags, accessory, or complete texture bank')
     offsets=art['eye_offsets']+art['mouth_offsets']
@@ -48,12 +49,13 @@ def native_records(source,art,name,model_bank,texture_bank):
     draw=bytearray(100)
     struct.pack_into('>HHIII',draw,0,model_bank,texture_bank,art['skeleton'],
         0x06000000+art['body_offset'],0x06000000)
-    for i,offset in enumerate(offsets):struct.pack_into('>I',draw,16+i*4,0x06000000+offset)
+    for first,values in ((16,art['eye_offsets']),(48,art['mouth_offsets'])):
+        for i,offset in enumerate(values):struct.pack_into('>I',draw,first+i*4,0x06000000+offset)
     # Temporary native atlas eye/mouth loads may share TMEM zero: the streamed
     # lists load every actual material afterwards. Clothing is not referenced.
     draw[0x54:0x5F]=row[0x54:0x5F];draw[0x5F]=255;draw[0x60:]=row[0x64:0x68]
     stream=struct.pack('>18H',name,art['texture_bytes'],art['body_offset'],len(art['mouth_offsets']),
-        *art['eye_offsets'],*(art['mouth_offsets'] or [0]*6))
+        *(art['eye_offsets'] or [0]*8),*(art['mouth_offsets'] or [0]*6))
     voice=struct.unpack_from('>H',row,0x62)[0]
     return bytes(draw),stream,voice
 

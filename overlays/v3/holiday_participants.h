@@ -184,6 +184,7 @@ typedef struct {u16 event_name,texture,resident,cloth;u8 exists,used;u16 pad;} A
 enum {AF_HP_OWNER_COUNT=9,AF_HP_RESIDENT_COUNT=14,AF_HP_LIVE_COUNT=18};
 extern const AFHPRecord af_hp_records[AF_HP_OWNER_COUNT];
 extern const u32 af_hp_available;
+int af_hp_identity(unsigned int,unsigned int);
 void *af_hp_descriptor(int);
 AFHPResident *af_hp_event_lookup(u16);
 int af_hp_resident_bind(u16,u16,u16);

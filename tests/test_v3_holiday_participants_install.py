@@ -29,7 +29,7 @@ class ParticipantInstallTests(unittest.TestCase):
         from v3_resource_capacity import checked_limit
         from v3_sound_programs import installed_resource,reuse_audio_storage
         from v3_room_effects import restore_controller,rebind_profiles
-        directory=ROOT/os.environ.get('V3_PARTICIPANTS_BUILD','build/v3-diary-category-work-01/participants-installed-03')
+        directory=ROOT/os.environ.get('V3_PARTICIPANTS_BUILD','build/v3-diary-category-work-01/participants-installed-06')
         image,report=inputs(directory/'build-lock.json');base,prior=inputs(directory/'base-lock.json')
         files=by_vrom(image);original=by_vrom(base);core=files[CODE_VROM].extract(image)
         e=report['equipment_resources'];events=e['npc_extra']['events'];r=events['participants'];p=r['packet']

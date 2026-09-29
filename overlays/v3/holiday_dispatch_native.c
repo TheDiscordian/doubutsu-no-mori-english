@@ -16,13 +16,22 @@ extern const unsigned int af_holiday_decoration_ready;
 #ifdef AF_HOLIDAY_SKY
 extern int af_sky_identity(unsigned int);
 #endif
+#ifdef AF_HOLIDAY_PARTICIPANTS
+extern int af_hp_identity(unsigned int,unsigned int);
+#endif
 #ifdef __mips__
 _Static_assert(sizeof(Decoration)==32,"Installed decoration record stride");
 #endif
 static int resolve(void *context,unsigned int kind,unsigned int source) {
     (void)context;
 #ifdef AF_HOLIDAY_SKY
-    if(kind==AF_HD_EFFECT_ID)return af_sky_identity(source);
+    if(kind==AF_HD_EFFECT_ID) {
+        int id=af_sky_identity(source);if(id>=0)return id;
+    }
+#endif
+#ifdef AF_HOLIDAY_PARTICIPANTS
+    int participant=af_hp_identity(kind,source);
+    if(participant>=0)return participant;
 #endif
     if(kind!=AF_HD_NAME || source>65535)return -1;
     for(unsigned int i=0;i<18;i++) {

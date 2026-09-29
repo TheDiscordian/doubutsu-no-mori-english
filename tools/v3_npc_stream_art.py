@@ -27,8 +27,8 @@ def prepare(source,index):
         raise ValueError('NPC draw index leaves the verified donor table')
     at=DRAW_BASE+index*DRAW_STRIDE;row=table[index*DRAW_STRIDE:(index+1)*DRAW_STRIDE]
     links=source.pointers(at,DRAW_STRIDE)
-    if not {at+4,at+8,at+12,*range(at+16,at+48,4)}<=set(links):
-        raise ValueError('NPC lacks a complete skeleton, body, palette, or eight eyes')
+    if not {at+4,at+8,at+12}<=set(links):
+        raise ValueError('NPC lacks a complete skeleton, body, or palette')
     skeleton_at=links[at+4];name,_,size=source.containing(skeleton_at,exact=True)
     skeleton=source.raw(name);joint_count,visible=skeleton[:2]
     if size!=8 or not 1<=visible<=joint_count<=26 or skeleton[2:]!=bytes(6):
@@ -85,7 +85,9 @@ def prepare(source,index):
         for i in range(count):
             p=at+first+i*4
             if p not in links:
-                if kind=='mouth' and not any(at+first+j*4 in links for j in range(count)):return []
+                if not any(at+first+j*4 in links for j in range(count)):
+                    if any(row[first:first+count*4]):raise ValueError('Unbound NPC expression pointers')
+                    return []
                 raise ValueError('Partial NPC expression set')
             label,address,n=source.containing(links[p],exact=True)
             raw=source.raw(label)
@@ -95,7 +97,8 @@ def prepare(source,index):
                 offset=offset,source_sha256=sha256(raw),sha256=sha256(out),width=32,height=16))
         return result
     eye_offsets=expressions(16,8,'eye');mouth_offsets=expressions(48,6,'mouth')
-    if set(links)!={at+4,at+8,at+12,*range(at+16,at+48,4),
+    if not eye_offsets and mouth_offsets:raise ValueError('Unsupported mouth-only NPC material')
+    if set(links)!={at+4,at+8,at+12,*(range(at+16,at+48,4) if eye_offsets else []),
             *(range(at+48,at+72,4) if mouth_offsets else ())}:
         raise ValueError('Unhandled NPC draw-record resource')
     body=source.raw(body_name);converted=bytearray(body_size);used=bytearray(body_size)
@@ -103,7 +106,7 @@ def prepare(source,index):
     for pointer,(w,h) in sorted(tiles.items()):
         segment,offset=pointer>>24,pointer&0xFFFFFF;n=w*h//2
         if segment in (8,9):
-            if offset or (w,h)!=(32,16) or segment==9 and not mouth_offsets:
+            if offset or (w,h)!=(32,16) or not (eye_offsets if segment==8 else mouth_offsets):
                 raise ValueError('Mesh references an absent or partial facial expression')
             bindings[pointer]=(pointer,w,h);continue
         if offset+n>body_size or any(used[offset:offset+n]):
@@ -142,15 +145,71 @@ def prepare(source,index):
             =={p-at:t for p,t in links.items()}])
 
 
+def pack_lists(vertices,records,compiled,joint_bytes):
+    """Intern repeated state commands only when the complete model needs it.
+
+    Each replacement is an ordinary returning F3DEX2 display-list call. No
+    vertex, matrix, material load, triangle, or final state is removed.
+    """
+    data=bytearray(vertices);shared=[];blocks={}
+    streams={r['symbol']:[(raw[i:i+8],i) for i in range(0,len(raw),8)]
+        for r in records for raw in (compiled[r['symbol']],)}
+    required=len(vertices)+sum(len(compiled[r['symbol']]) for r in records)+joint_bytes+8
+    while (required+15)&~15>MODEL_LIMIT:
+        groups={}
+        for name,commands in streams.items():
+            for begin in range(len(commands)):
+                payload=b''
+                for end in range(begin,len(commands)):
+                    command=commands[end][0]
+                    # No geometry, matrix, texture transfer, or nested calls.
+                    if command[0] not in (0xE7,0xD7,0xE2,0xFC,0xFA,0xD9):break
+                    payload+=command
+                    if end>begin:groups.setdefault(payload,[]).append((name,begin))
+        best=None
+        for payload,positions in groups.items():
+            selected=[];ends={};count=len(payload)//8
+            for name,begin in positions:
+                if begin>=ends.get(name,0):
+                    selected.append((name,begin));ends[name]=begin+count
+            saving=len(selected)*(len(payload)-8)-(len(payload)+8)
+            if saving>0 and (best is None or saving>best[0]):best=(saving,payload,selected)
+        if best is None:break
+        saving,payload,positions=best;at=len(data);target=0x06000000+at
+        blocks[target]=payload;stored=payload+bytes.fromhex('df00000000000000');data.extend(stored)
+        shared.append(dict(offset=at,bytes=len(stored),sha256=sha256(stored),
+            users=[name for name,_ in positions]))
+        for name,begin in reversed(positions):
+            commands=streams[name];origin=commands[begin][1]
+            commands[begin:begin+len(payload)//8]=[(struct.pack('>II',0xDE000000,target),origin)]
+        required-=saving
+    offsets={}
+    for row in records:
+        original=compiled[row['symbol']];commands=streams[row['symbol']]
+        raw=b''.join(command for command,_ in commands);expanded=b'';calls=[]
+        for i,(command,origin) in enumerate(commands):
+            target=u32(command,4)
+            if command[0]==0xDE and target in blocks:
+                expanded+=blocks[target];calls.append(dict(offset=i*8,target=target,original_offset=origin))
+            else:expanded+=command
+        if expanded!=original:raise ValueError('Shared NPC commands change the original stream')
+        if calls:
+            row.update(unfactored_bytes=len(original),unfactored_sha256=sha256(original),shared_calls=calls)
+            relocated={origin:i*8 for i,(_,origin) in enumerate(commands)}
+            for material in row['materials']:material['command_offset']=relocated[material['command_offset']]
+        offsets[row['donor_offset']]=len(data)
+        row.update(offset=len(data),bytes=len(raw),sha256=sha256(raw));data.extend(raw)
+    return data,offsets,shared
+
+
 def build(source,index,output):
     output=output.resolve()
     if output.exists() or not output.is_relative_to(ROOT/'build'):raise ValueError('Use a fresh ignored NPC output')
     prepared=prepare(source,index);output.mkdir(parents=True)
     write_new(output/'commands.c',prepared['source'].encode())
     compiled=compile_commands(output/'gbi',output/'commands.c',prepared['sections'])
-    model=bytearray(prepared['vertices']);offsets={}
     for r in prepared['records']:
-        data=compiled[r['symbol']];offsets[r['donor_offset']]=len(model)
+        data=compiled[r['symbol']]
         original=source.raw(r['symbol'])
         donor=faces(original,donor=True,streamed=True,vertex_start=prepared['vertex_start'],
             vertex_bytes=prepared['vertex_bytes'],start=r['donor_offset'],
@@ -163,11 +222,12 @@ def build(source,index,output):
             wrap={0:2,1:0,2:1}
             if (not any(nf==df[i:]+df[:i] for i in range(3)) or target!=image or
                     (tile>>9&511)*8!=w//2 or mode>>20&15!=pair>>12&15 or
-                    (1<<(mode>>4&15),1<<(mode>>14&15))!=(w,h) or
+                    (mode>>4&15,mode>>14&15)!=tuple(
+                        size.bit_length()-1 if not size&(size-1) else 0 for size in (w,h)) or
                     ((nw-1)*4,(nh-1)*4)!=extent or
                     (mode>>8&3,mode>>18&3)!=(wrap[pair>>10&3],wrap[pair>>8&3])):
                 raise ValueError('Converted NPC changes a face, joint matrix, or texture binding')
-        r.update(offset=len(model),sha256=sha256(data));model.extend(data)
+    model,offsets,shared=pack_lists(prepared['vertices'],prepared['records'],compiled,len(prepared['joints']))
     joint_offset=len(model);joints=bytearray(prepared['joints'])
     for p,target in prepared['joint_links'].items():
         struct.pack_into('>I',joints,p-prepared['joints_at'],0x06000000+offsets[target])
@@ -185,6 +245,7 @@ def build(source,index,output):
         model_limit=MODEL_LIMIT,texture_limit=TEXTURE_LIMIT,body_offset=prepared['body_offset'],
         body_bytes=prepared['body_bytes'],eye_offsets=prepared['eye_offsets'],mouth_offsets=prepared['mouth_offsets'],
         resources=prepared['resources'],models=prepared['records'],runtime_installed=False,
+        shared_command_blocks=shared,
         animations_installed=False,selectable=False,
         sources={p:sha256((ROOT/p).read_bytes()) for p in ('tools/v3_npc_stream_art.py',
             'tools/v3_gorilla_art.py','tools/v3_villager_mesh.py','tools/v3_villager_art.py',

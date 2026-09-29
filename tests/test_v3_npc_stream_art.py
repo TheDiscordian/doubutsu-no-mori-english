@@ -20,6 +20,53 @@ from tests.test_v3_islander_bodies import gx_pixel
 OUTPUT=ROOT/'build/v3-diary-category-work-01/tortimer-art-04'
 
 class StreamedNpc(unittest.TestCase):
+    def test_current_special_art_batch(self):
+        source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+            (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+        cases=(('special-miko-art-04',299,274,243,8),('special-costume-art-02',359,213,231,0))
+        for folder,index,count,voice,eyes in cases:
+            with self.subTest(index=index):
+                directory=ROOT/'build/v3-diary-category-work-01'/folder
+                r=json.loads((directory/'art.json').read_text());p=prepare(source,index)
+                model=(directory/'model.bin').read_bytes();texture=(directory/'texture.bin').read_bytes()
+                self.assertEqual((sha256(model),sha256(texture)),(r['model_sha256'],r['texture_sha256']))
+                self.assertEqual(texture,p['texture']);self.assertLessEqual(len(model),0x2800)
+                self.assertEqual(len(r['eye_offsets']),eyes)
+                draw,stream,actual_voice=native_records(source,r,0xDFFE,510,511)
+                self.assertEqual(actual_voice,voice)
+                if not eyes:
+                    self.assertEqual(draw[16:84],bytes(68));self.assertEqual(stream[8:],bytes(28))
+                for resource in r['resources']:
+                    raw=source.data[resource['source_offset']:resource['source_offset']+resource['bytes']]
+                    at=resource['offset'];w=resource['width'];h=resource['height']
+                    for y in range(h):
+                        for x in range(w):
+                            self.assertEqual(texture[at+y*w//2+x//2]>>(0 if x&1 else 4)&15,gx_pixel(raw,w,x,y))
+                blocks={0x06000000+b['offset']:b for b in r['shared_command_blocks']}
+                faces_count=0
+                for row in r['models']:
+                    raw=model[row['offset']:row['offset']+row['bytes']];expanded=b''
+                    for at in range(0,len(raw),8):
+                        command=raw[at:at+8];target=struct.unpack_from('>I',command,4)[0]
+                        if command[0]==0xDE:
+                            block=blocks[target];part=model[block['offset']:block['offset']+block['bytes']]
+                            self.assertEqual(sha256(part),block['sha256'])
+                            self.assertEqual(part[-8:],bytes.fromhex('df00000000000000'))
+                            expanded+=part[:-8]
+                        else:expanded+=command
+                    self.assertEqual(expanded,(directory/'gbi'/(row['symbol']+'.bin')).read_bytes())
+                    native=faces(expanded,donor=False,streamed=True,vertex_bytes=len(p['vertices']))
+                    original=source.raw(row['symbol'])
+                    donor=faces(original,donor=True,streamed=True,vertex_bytes=len(p['vertices']),
+                        vertex_start=p['vertex_start'],start=row['donor_offset'],
+                        pointers=source.pointers(row['donor_offset'],len(original)))
+                    self.assertEqual(len(native),len(donor));faces_count+=len(native)
+                    for (nf,_),(df,_) in zip(native,donor):
+                        self.assertTrue(any(nf==df[i:]+df[:i] for i in range(3)))
+                    for material in row['materials']:
+                        self.assertEqual(raw[material['command_offset']],0xFD)
+                self.assertEqual(faces_count,count)
+
     def test_current_native_hook_retains_both_complete_renderers(self):
         from aflib import by_vrom
         base,_=inputs(ROOT/'build/v3-diary-category-work-01/catalogue-03/build-lock.json')

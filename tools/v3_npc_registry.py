@@ -156,18 +156,27 @@ def prepare(lock,art_directory,output):
 
 
 def install_banks(base,prior,blob,art_directory):
-    """Append complete art and extend only the two reserved table entries.
+    return append_banks(base,prior,blob,[dict(identity='GAFE01-r0/npc/ev-soncho2',
+        directory=art_directory,model_bank=448,texture_bank=449)])
+
+
+def append_banks(base,prior,blob,entries):
+    """Append a complete batch using its fixed, independently reserved banks.
 
     The existing helper contains later voice/audio edits. Retain those bytes;
     change only its verified object-status bound and the matching blob header.
     The shared builder compiles the corresponding startup capacity together.
     """
-    if prior['object_capacity']!=448 or struct.unpack_from('>I',blob,12)[0]!=448:
+    capacity=prior['object_capacity'];end=capacity+len(entries)*2
+    wanted=sorted(e[k] for e in entries for k in ('model_bank','texture_bank'))
+    if (not entries or not 448<=capacity<end<=456 or wanted!=list(range(capacity,end)) or
+            struct.unpack_from('>I',blob,12)[0]!=capacity):
         raise ValueError('Changed additional NPC object-table capacity')
     start=prior['asset']['symbols']['af_v3_object_status']-BLOB_RAM
-    if blob[start:start+16]!=bytes.fromhex('00063c0000073c032ce301c01060002b'):
+    expected=struct.pack('>4I',0x00063C00,0x00073C03,0x2CE30000|capacity,0x1060002B)
+    if blob[start:start+16]!=expected:
         raise ValueError('Changed complete native object-status bounds prefix')
-    if any(blob[0x1E00:0x1E10]):raise ValueError('New NPC banks overwrite existing table data')
+    if any(blob[0x1000+capacity*8:0x1000+end*8]):raise ValueError('New NPC banks overwrite existing table data')
     files=by_vrom(base);boot=files[0x1060].extract(base)
     contracts=((0x80026500,0x800266C4,PI_SHA),
         (0x800269E4,0x80026A64,'62a632b542b21e2894e796994d446f63a77723f7c97f3ded2d9fbfd6c0d0cdb9'),
@@ -175,26 +184,119 @@ def install_banks(base,prior,blob,art_directory):
     for a,b,digest in contracts:
         if sha256(boot[a-0x80025C60:b-0x80025C60])!=digest:
             raise ValueError('Changed complete native NPC transfer consumer')
-    art=json.loads((art_directory/'art.json').read_bytes());records=[]
+    records=[];resources=[]
+    for entry in entries:
+        directory=entry['directory'];art=json.loads((directory/'art.json').read_bytes())
+        for kind,limit in (('model',0x2800),('texture',0x1620)):
+            resources.append((kind,entry[kind+'_bank'],limit,directory,art,entry['identity']))
     staging=bytearray(base);physical_rows=copy.deepcopy(prior.get('physical_resources',[]));writes=[]
-    for kind,bank,limit in (('model',448,0x2800),('texture',449,0x1620)):
-        data=(art_directory/(kind+'.bin')).read_bytes()
+    old_banks=prior.get('equipment_resources',{}).get('npc_extra',{}).get('banks',[])
+    for kind,bank,limit,directory,art,identity in sorted(resources,key=lambda row:row[1]):
+        data=(directory/(kind+'.bin')).read_bytes()
         if (len(data)!=art[kind+'_bytes'] or sha256(data)!=art[kind+'_sha256'] or
                 len(data)>limit or len(data)&15):raise ValueError('Invalid complete additional NPC '+kind)
         vrom=0x03FE0000+(bank-448)*0x4000
         if any(e.vstart<vrom+len(data) and vrom<e.vend for e in files.values()):
             raise ValueError('New NPC bank overlaps existing virtual resource')
-        row=physical.allocate(staging,physical_rows,data,'npc-'+kind+'-GAFE01-r0');physical_rows.append(row)
+        if any(e['vrom']<vrom+len(data) and vrom<e['vrom']+e['bytes'] for e in old_banks):
+            raise ValueError('New NPC bank overlaps a retained additional bank')
+        suffix='GAFE01-r0' if bank<450 else identity.replace('/','-')
+        row=physical.allocate(staging,physical_rows,data,'npc-'+kind+'-'+suffix,best_fit=True);physical_rows.append(row)
         staging[row['physical']:row['physical']+len(data)]=data;writes.append((row,data))
         struct.pack_into('>2I',blob,0x1000+bank*8,vrom,vrom+len(data))
-        records.append(dict(row,bank=bank,kind=kind,vrom=vrom,native_buffer_bytes=limit))
-    struct.pack_into('>I',blob,12,450);struct.pack_into('>I',blob,start+8,0x2CE301C2)
+        records.append(dict(row,bank=bank,kind=kind,vrom=vrom,native_buffer_bytes=limit,identity=identity))
+    struct.pack_into('>I',blob,12,end);struct.pack_into('>I',blob,start+8,0x2CE30000|end)
     asset=copy.deepcopy(prior['asset'])
     asset['sha256']=sha256(blob[0x100:0x100+asset['bytes']])
-    asset['flags']=[f.replace('AF_V3_OBJECT_CAPACITY=448','AF_V3_OBJECT_CAPACITY=450') for f in asset['flags']]
-    asset['npc_capacity_patch']=dict(address=BLOB_RAM+start+8,before='2ce301c0',after='2ce301c2',
+    asset['flags']=[f.replace(f'AF_V3_OBJECT_CAPACITY={capacity}',f'AF_V3_OBJECT_CAPACITY={end}') for f in asset['flags']]
+    asset['npc_capacity_patch']=dict(address=BLOB_RAM+start+8,before=f'{0x2CE30000|capacity:08x}',after=f'{0x2CE30000|end:08x}',
         previous_sha256=prior['asset']['sha256'],retained_existing_hooks=True)
     return records,asset,physical_rows,writes,staging
+
+
+def install_art_batch(base,prior,blob,output,directory):
+    """Install every prepared character's banks without claiming actor readiness."""
+    raw=(directory/'batch.json').read_bytes();batch=json.loads(raw)
+    if batch.get('format')!='AFV3-NPC-ART-BATCH-1' or not batch.get('records'):
+        raise ValueError('Expected a complete additional character art batch')
+    equipment=copy.deepcopy(prior['equipment_resources']);npc=equipment['npc_extra']
+    if not npc.get('renderer_capabilities',{}).get('absent_expressions'):
+        raise ValueError('Additional art needs the complete shared character renderer')
+    source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+        (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    prepared=npc.setdefault('prepared_characters',{});entries=[];receipts=[]
+    for row in batch['records']:
+        identity=row['identity']
+        if identity not in SPECIAL_NPCS or identity in prepared:
+            raise ValueError('Unknown or already prepared additional character')
+        reservation=SPECIAL_NPCS[identity];art_directory=(ROOT/row['art']).resolve()
+        if not art_directory.is_relative_to(ROOT/'build'):raise ValueError('Character artwork must stay local')
+        art_raw=(art_directory/'art.json').read_bytes();art=json.loads(art_raw)
+        if art['draw_index']!=reservation['draw_index']:raise ValueError('Character artwork identity mismatch')
+        draw,stream,voice=native_records(source,art,reservation['name'],reservation['model_bank'],reservation['texture_bank'])
+        prepared[identity]=dict(identity=reservation,registry_version=SPECIAL_NPC_REGISTRY_VERSION,
+            art=str(art_directory.relative_to(ROOT)),art_sha256=sha256(art_raw),draw_hex=draw.hex(),
+            stream_hex=stream.hex(),voice=voice,model_bytes=art['model_bytes'],texture_bytes=art['texture_bytes'],
+            banks_installed=True,actor_installed=False,selectable=False,native_execution_verified=False)
+        entries.append(dict(identity=identity,directory=art_directory,**reservation));receipts.append(identity)
+    banks,asset,records,writes,staging=append_banks(base,prior,blob,entries)
+    old=copy.deepcopy(npc['packet']);data=bytearray(base[old['physical']:old['physical']+old['bytes']])
+    old_banks=npc['banks'];all_banks=old_banks+banks
+    expected=struct.pack('>4I',0x41464E44,1,len(old_banks),12)+b''.join(
+        struct.pack('>3I',b['vrom'],b['vrom']+b['bytes'],b['physical']) for b in old_banks)
+    if (sha256(data)!=old['sha256'] or data[DMA:DMA+len(expected)]!=expected or
+            any(data[DMA+len(expected):DMA+16+len(all_banks)*12])):
+        raise ValueError('Changed complete shared character transfer directory')
+    struct.pack_into('>I',data,DMA+8,len(all_banks))
+    for i,b in enumerate(banks,len(old_banks)):
+        struct.pack_into('>3I',data,DMA+16+i*12,b['vrom'],b['vrom']+b['bytes'],b['physical'])
+    npc['banks']=all_banks;npc['packet'].update(sha256=sha256(data),crc32=zlib.crc32(data))
+    record=next(r for r in records if r['id']==old['id']);record['sha256']=sha256(data)
+    writes.append((dict(record,previous_sha256=old['sha256']),bytes(data)))
+    receipt=dict(format=batch['format'],manifest_sha256=sha256(raw),characters=receipts,
+        banks=banks,additional_resident_bytes=0,actor_admission_changed=False,saved_format_changed=False)
+    npc.setdefault('art_batches',[]).append(receipt)
+    npc['sources'].update({p:sha256((ROOT/p).read_bytes()) for p in SOURCES})
+    work=output/'npc-art-batch';work.mkdir()
+    write_new(work/'installed.json',(json.dumps(receipt,indent=2)+'\n').encode())
+    write_new(work/'packet.bin',data)
+    return equipment,{},dict(physical_resources=records,object_capacity=prior['object_capacity']+len(banks),asset=asset),writes
+
+
+def refresh_renderer(npc,data,output,base,changes):
+    """Refresh the common character renderer in its existing code reservation.
+
+    Registry/actor callers retain their public entries. The two native drawing
+    callers are rebound together. The shared startup publisher reads the
+    refreshed DMA initializer from this same code report.
+    """
+    old=npc['code'];data=bytearray(data)
+    if (len(data)!=SIZE or sha256(data)!=npc['packet']['sha256'] or
+            sha256(data[:old['bytes']])!=old['sha256'] or any(data[old['bytes']:0x2000])):
+        raise ValueError('Changed shared NPC code reservation')
+    code,compiled=compile_part('npc_registry',output,link_symbols=old['link_symbols'],
+        extra_sources=('overlays/v3/npc_stream_draw.c','overlays/v3/npc_dma.c'))
+    for name,address in old['symbols'].items():
+        if name.startswith('af_') and RAM<=address<RAM+0x2000 and name not in (
+                'af_v3_npc_dma_request','af_v3_npc_dma_init','af_v3_npc_stream_draw'):
+            if compiled['symbols'].get(name)!=address:
+                raise ValueError('Moved shared NPC reader without rebinding: '+name)
+    files=by_vrom(base)
+    before=struct.pack('>I',jump(old['symbols']['af_v3_npc_stream_draw'],link=True))
+    after=struct.pack('>I',jump(compiled['symbols']['af_v3_npc_stream_draw'],link=True))
+    for hook in npc['render_hooks']:
+        vrom=hook['vrom'];owner=bytearray(changes.get(vrom,files[vrom].extract(base)))
+        at=hook['call']-hook['ram']
+        if owner[at:at+8]!=before+bytes.fromhex(hook['delay_slot']):
+            raise ValueError('Changed installed complete NPC drawing call')
+        owner[at:at+4]=after;changes[vrom]=bytes(owner)
+        hook.update(previous_call=before.hex(),installed_call=after.hex())
+    data[:0x2000]=code+bytes(0x2000-len(code))
+    npc['code']=compiled;npc['packet'].update(sha256=sha256(data),crc32=zlib.crc32(data))
+    npc['renderer_capabilities']=dict(absent_expressions=True,clamped_non_power_of_two_tiles=True,
+        shared_model_commands=True,installed=True,native_execution_verified=False)
+    npc['sources'].update({p:sha256((ROOT/p).read_bytes()) for p in SOURCES})
+    return bytes(data)
 
 
 def install(base,prior,blob,core,output,art_directory,lock):
@@ -203,6 +305,8 @@ def install(base,prior,blob,core,output,art_directory,lock):
     The record remains inactive until event/conversation services bind its actor
     callbacks. Merely installing its resources cannot enable unfinished gameplay.
     """
+    if prior['equipment_resources'].get('npc_extra'):
+        return install_art_batch(base,prior,blob,output,art_directory)
     prepared=prepare(lock,art_directory,output/'npc-registry')
     equipment=copy.deepcopy(prior['equipment_resources'])
     if equipment.get('npc_extra'):raise ValueError('Additional NPC registry already installed')

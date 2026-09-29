@@ -9,7 +9,7 @@ extern volatile const u8 af_hp_native_ticks;
 extern volatile u32 af_hp_native_segments[16];
 void af_hp_coin(xyz_t,int,s16,GAME *,u16,s16,s16);
 RoomEffect *af_coin_create(s16,xyz_t,xyz_t *,GAME *,void *,u16,int,s16,s16);
-void af_coin_request(int,xyz_t,int,s16,GAME *,u16,s16,s16);
+int af_coin_fit(RoomEffect *,GAME *);
 void af_coin_sound(u32,xyz_t *);
 void af_coin_draw(RoomEffect *,GAME *);
 void xyz_t_add(xyz_t *,xyz_t *,xyz_t *);

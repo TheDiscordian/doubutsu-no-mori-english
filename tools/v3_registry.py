@@ -14,13 +14,16 @@ VILLAGERS = {
 # Special actors are not ordinary residents or individually selectable villagers.
 # Native profiles C9/CA/CB are the no-demo sentinel, summer tent, and balloon.
 # The existing camper mask uses D08F. These reservations do not enable spawning.
-SPECIAL_NPC_REGISTRY_VERSION = 2
+SPECIAL_NPC_REGISTRY_VERSION = 3
 SPECIAL_NPCS = {
     'GAFE01-r0/npc/ev-soncho2': dict(donor_name=0xD074, donor_profile=0xCC,
         name=0xD090, profile=0xCC, model_bank=448, texture_bank=449),
     # Separate event ownership from native Miko; no actor/resources enabled yet.
     'GAFE01-r0/npc/ev-miko': dict(donor_name=0xD03D, donor_profile=0x84,
-        name=0xD091, profile=0xCD),
+        name=0xD091, profile=0xCD, model_bank=450, texture_bank=451, draw_index=299),
+    # The Halloween owner uses the pumpkin model/voice, not ordinary Tortimer.
+    'GAFE01-r0/npc/ev-soncho2-costume': dict(donor_name=0xD079, donor_profile=0xCC,
+        name=0xD092, profile=0xE2, model_bank=452, texture_bank=453, draw_index=359),
 }
 
 # Shared event actors are resident villagers in temporary roles, not additional

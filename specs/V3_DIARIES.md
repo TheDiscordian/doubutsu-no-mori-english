@@ -990,11 +990,11 @@ but missing participants/controllers keep owner admission inactive. Saved format
 ### Shared resident participants and controllers
 
 `tools/v3_holiday_participants.py` prepares the complete race, tug-of-war, and
-New Year family together. `participants-prepared-23/` contains three controllers,
+New Year family together. `participants-prepared-26/` contains three controllers,
 five NPC roles, and the required rope: 245 complete donor functions, checked
 profile relocations, and a complete MIPS object including data/BSS. The linked
-51,440-byte module is installed at `8073C010..80748900` in ABI 343,
-`build/v3-diary-category-work-01/participants-installed-03/build-lock.json`.
+51,872-byte module is installed at `8073C010..80748AB0`, retained in ABI 344,
+`build/v3-diary-category-work-01/special-art-installed-01/build-lock.json`.
 Installation does not enable unfinished event admission.
 
 `tools/v3_registry.py` owns fixed profiles `D9..E1` and temporary resident names
@@ -1031,8 +1031,8 @@ gold/silver palettes, primitive-alpha fade, and reflection. Native reflection's
 48-byte opaque-tail allocation is checked even for translucent drawing.
 The shared sound importer installs both complete programmes (`466`, `467`),
 their fonts/samples, dispatch entries, and priorities. No sound is played during
-verification. The source well-relative landing height requires an explicit
-geometry review at the native shrine before activation.
+verification. Contact uses the actual native shrine geometry described below,
+not the donor's well-relative height or water splash.
 
 Timers use elapsed native ticks; the tug controller executes its complete shared
 state update per tick, including its odd-length counter wrap. NPC physics and
@@ -1067,7 +1067,7 @@ initial selection and existing-area refill remain distinct. The manager's
 unchanged relocation file is retained with its complete moved owner.
 
 The nineteen-entry startup table loads the adjacent sky and participant code
-as one checked 67,840-byte packet. The full original sky prefix/guard and the
+as one checked 68,272-byte packet. The full original sky prefix/guard and the
 unrelated holiday/fishing packet remain unchanged. BSS is zero-filled inside
 the packet. The effect loader checks room, sky, and participant callbacks
 against three actual code ranges. Shared text storage moves only the
@@ -1077,11 +1077,12 @@ every current native sound header before reusing the superseded sequence and
 current sequence/font allocations; complete allocation receipts permit reuse
 by later batches. No sound is truncated or given substitute samples.
 
-Current-cartridge and changed sanitized profile-loader checks pass. Private
-browser/offline empty, all-supported, villager/seasonal, and equipment profiles
-agree; neither served patcher is updated. Native execution remains unverified.
-Remaining consumers are shrine landing geometry, the other required event
-providers, and actual calendar choice/admission. Native resident stride is
+Retain unchanged profile-loader and placement evidence. The current shared
+dispatcher resolves all fourteen temporary names, all nine profiles, and coin
+118→119 only when `af_hp_available` is enabled; installation leaves it zero.
+Current-ROM bank/render/dispatch binding checks pass. Native execution remains
+unverified. Remaining consumers are the other required event providers and
+actual calendar choice/admission. Native resident stride is
 `528`, with memories at `10`; source-header offset comments are not layout
 evidence. Saved format remains 13, and both deployments stay on stable V2-14.
 No diary becomes selectable through this installation.
@@ -1093,7 +1094,55 @@ same offering position as the donor (`shrine.x + 20`, `shrine.z + 85`). This
 establishes the approach point, not the coin's landing height. The native
 shrine shifts its actor by `+20` on X, while the donor also shifts Z by `-19`;
 do not infer matching geometry from their shared role. The structure clip's
-resource index 22 is not global object-table index 22.
+resource index 22 is not global object-table index 22. Both seasonal meshes in
+the guarded structure archive place the box at X `[-20,20]`, Y `[0,17.5]`, and
+Z `[42.5,60]` relative to the loaded shrine actor. Profile `5C` belongs to actor
+part zero. The coin adapter finds that actor through `80058460`, rather than
+using the block-base height or shrine foreground helper's zero Y. It retains
+the complete source vertical motion and computes the exact discrete falling
+contact tick, targeting Z `52.5` and a bounded X variation. Contact requires
+descent; the retained sink/fade ends inside the solid box without a water effect.
+Four ground elevations and twenty source launch angles pass the sanitized check.
+The complete resource hashes and adaptation record live in the prepared coin
+report; native visual execution remains unverified.
+
+### Shared special-character art batch
+
+`v3_npc_stream_art.py` converts the entire skeleton, geometry, body/palette, and
+expression sets through the common model converter. Clamped non-power-of-two
+tiles use zero wrap masks with their actual load/extent dimensions; non-power-
+of-two repeating textures remain rejected. Expressions are either complete
+(eight eyes, optionally six mouths) or absent; a partial set or mesh reference
+to a missing expression is invalid. Primitive colours are preserved.
+
+For models exceeding the fixed `2800`-byte native buffer, repeated static state
+commands share returning F3DEX2 display lists. Geometry, matrices, texture
+transfers, and nested calls are not factored. Expanding each shared call must
+reproduce the original converted command stream exactly, and material offsets
+are relocated with it. The resulting model still must fit the same buffer.
+
+The New Year attendant (draw 299, full voice 243) retains 366 vertices and 274
+faces in 10,208 model bytes. The Halloween costume (draw 359, full voice 231)
+retains 288 vertices and 213 faces in 8,048 bytes, with no expression textures.
+Each has a complete 4,128-byte texture bank. Both retain the native four-KiB
+preload bounds. The costume is not ordinary Tortimer's model or voice.
+
+The batch manifest passed through `--npc-registry-art` assigns only fixed
+registry banks, never selection order: 450/451 for `D091/CD`, 452/453 for
+`D092/E2`. The common bank installer checks the original object-status bound,
+native transfer consumers, virtual and physical overlap, full asset hashes,
+and the unused shared transfer-directory entries. Object capacity becomes 454;
+the existing DMA directory contains six banks. Ordinary 448/449 and all actor
+records/pools are unchanged. Draw/stream records are prepared for lifecycle
+installation, not inserted as falsely playable actors.
+
+The 4,112-byte shared registry/renderer stays within its existing reservation.
+Both native NPC skeleton callers bind its current entry, preserving their delay
+slots and existing accessory chain. The startup compiler uses the refreshed DMA
+initializer. Fixed-face rendering binds/restores only the body segment and
+rejects partial or inconsistent expression metadata. Focused sanitizer,
+complete pixel/face, and current-ROM bank/renderer checks pass; no native
+rendering or new actor lifecycle is claimed.
 
 ### Reserved layouts and dedicated owners
 

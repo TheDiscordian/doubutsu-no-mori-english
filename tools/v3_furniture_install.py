@@ -1488,7 +1488,7 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
     if npc_registry_art is not None:
         npc=equipment_report['npc_extra']
         report['shared_runtime_refresh'].update(adapters=['npc_registry'],artwork_changed=True,
-            additional_resident_bytes=npc['packet']['bytes'],resource_allocations_changed=True,
+            additional_resident_bytes=0 if prior['equipment_resources'].get('npc_extra') else npc['packet']['bytes'],resource_allocations_changed=True,
             saved_format_changed=False,saved_profile_changed=False)
         report['sources'].update(npc['sources'])
         report['native_test']='pending connected Tortimer event/conversation/animation providers and diary gameplay/save verification'

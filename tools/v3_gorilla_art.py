@@ -99,15 +99,24 @@ def convert_commands(raw, start, pointers, vertex, vertex_bytes, *,
                      f'{wrap[modes[0]]}, {width.bit_length()-1}, 0)')
                 emit(f'gsDPSetTileSize(G_TX_RENDERTILE, 0, 0, {extent[0]}, {extent[1]})')
             else:
-                if expected[0]>>24 not in (7,8,9,10) or width&(width-1) or height&(height-1):
-                    raise ValueError('Unbounded streamed NPC texture or non-power-of-two tile')
+                # Clamped source tiles need not be powers of two. Disable
+                # masking on that axis and retain its exact load/edge extent;
+                # wrapping/mirroring still requires a representable period.
+                masks=[]
+                for size,mode in zip((width,height),modes):
+                    if size&(size-1):
+                        if mode!=0:raise ValueError('Non-power-of-two NPC repeat period')
+                        masks.append(0)
+                    else:masks.append(size.bit_length()-1)
+                if expected[0]>>24 not in (7,8,9,10) or width<8 or width%8 or width*height//2>2048:
+                    raise ValueError('Unbounded streamed NPC texture')
                 # A material can follow triangles in the same list. Retire
                 # those primitives before replacing the texture in TMEM.
                 emit('gsDPPipeSync()')
                 command_offset=count*8
                 emit(f'gsDPLoadTextureBlock_4b(0x{expected[0]:08X}, G_IM_FMT_CI, '
                      f'{width}, {height}, {palette}, {wrap[modes[0]]}, {wrap[modes[1]]}, '
-                     f'{width.bit_length()-1}, {height.bit_length()-1}, 0, 0)',7)
+                     f'{masks[0]}, {masks[1]}, 0, 0)',7)
                 if extent!=((width-1)*4,(height-1)*4):
                     emit(f'gsDPSetTileSize(G_TX_RENDERTILE, 0, 0, {extent[0]}, {extent[1]})')
             materials.append({'source': b, 'tmem': expected[0] if streamed_textures is None else 0,
@@ -144,6 +153,9 @@ def convert_commands(raw, start, pointers, vertex, vertex_bytes, *,
                     allowed.add((0xD9000000, 0x230005))
                 elif op == 0xE2:
                     allowed.add((0xE200001C, 0xC8113078))
+                elif op == 0xFA and a==0xFA000080:
+                    # Primitive RGBA is data, not a new rendering mode.
+                    allowed.add((a,b))
             if (a, b) not in allowed:
                 raise ValueError(f'Unreviewed NPC render state {a:08X}/{b:08X}')
             # Repeated identical settings within one list have no intervening

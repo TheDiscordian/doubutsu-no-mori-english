@@ -55,11 +55,19 @@ def faces(raw, *, donor, vertex_start=0, vertex_bytes, pointers=None, start=0,
             if at+56>len(raw):raise ValueError('Truncated streamed NPC texture load')
             words=list(struct.iter_unpack('>II',raw[at:at+56]))
             render,mode=words[5]
-            width=1<<((mode>>4)&15);height=1<<((mode>>14)&15)
+            # The load's final tile extent gives the exact dimensions even
+            # when a clamped axis is unmasked (for example 32x24 or 48x32).
+            last=words[6][1]
+            width=((last>>12)&4095)//4+1;height=(last&4095)//4+1
+            masks=(mode>>4&15,mode>>14&15);modes=(mode>>8&3,mode>>18&3)
+            if any(mask!=(size.bit_length()-1 if not size&(size-1) else 0) or
+                    size&(size-1) and repeat!=2
+                    for size,mask,repeat in zip((width,height),masks,modes)):
+                raise ValueError('Invalid streamed NPC mask or repeat period')
             line=(width//2+7)//8
             dxt=(2048+max(1,width//16)-1)//max(1,width//16)
             if (a!=0xFD500000 or b>>24 not in (7,8,9) or b&7 or
-                    width<8 or height<1 or width*height//2>2048 or
+                    width<8 or width%8 or height<1 or width*height//2>2048 or
                     render!=0xF5400000|line<<9 or mode>>24 or
                     words[1]!=(0xF5500000,0x07000000|(mode&0xFFFFF)) or
                     words[2]!=(0xE6000000,0) or

@@ -17,6 +17,8 @@ SOURCES=('tools/v3_holiday_participants_install.py','overlays/v3/holiday_partici
     'tools/v3_room_goods.py','overlays/v3/effect_loader.c','tools/v3_resource_capacity.py',
     'tools/v3_furniture_install.py','tools/v3_holiday_dialogue.py')
 SOURCES+=('tools/v3_room_effects.py','tools/v3_holiday_sky.py')
+SOURCES+=('tools/v3_holiday_active.py','overlays/v3/holiday_dispatch_native.c')
+SOURCES+=('tools/v3_npc_registry.py','overlays/v3/npc_stream_draw.c')
 
 
 def link(directory,prepared,output):
@@ -181,10 +183,21 @@ def install(base,prior,blob,core,output,directory):
     effects.update(profiles=profiles,controller=controller,additional_scene_bytes=controller['additional_scene_bytes'],
         participants=dict(installed=True,profiles=[119],code=code))
     report['coin'].update(installed=True,profile=profiles[-1],unique=unique[118])
+    from v3_holiday_active import refresh_dispatch
+    dispatch_write=refresh_dispatch(base,npc,records,work/'owner-dispatch',
+        dict(af_hp_identity=code['symbols']['af_hp_identity']),
+        ('AF_HOLIDAY_SKY','AF_HOLIDAY_PARTICIPANTS'))
+    from v3_npc_registry import refresh_renderer
+    npc_data=refresh_renderer(npc,dispatch_write[1],work/'npc-renderer',base,changes)
+    dispatch_write[0]['sha256']=npc['packet']['sha256']
+    next(r for r in records if r['id']==npc['packet']['id'])['sha256']=npc['packet']['sha256']
+    dispatch_write=(dispatch_write[0],npc_data)
+    events['dispatch']['participants_bound']=True
+    report['dispatcher_bound']=True
     report['sources'].update({p:sha256((ROOT/p).read_bytes()) for p in SOURCES})
     npc['sources'].update(report['sources']);effects['sources'].update(report['sources'])
     events['participants']=report
-    return equipment,changes,dict(physical_resources=records,resource_growth=growth,fire_sound=fire),[(fresh,combined)]
+    return equipment,changes,dict(physical_resources=records,resource_growth=growth,fire_sound=fire),[(fresh,combined),dispatch_write]
 
 
 def finish(image,base,prior,output,equipment):

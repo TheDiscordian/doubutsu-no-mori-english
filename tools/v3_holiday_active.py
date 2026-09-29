@@ -68,6 +68,45 @@ def owner_requirements(maps,owners,generated):
     return code,rows
 
 
+def refresh_dispatch(base,npc,records,directory,bindings,defines):
+    """Bind installed provider categories without replacing event owners/art."""
+    from v3_furniture_pipeline import Source
+    from v3_holiday_maps import owner_source,discover
+    source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+        (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    generated,owners=owner_source(source)
+    dependencies,_=owner_requirements(discover(source),owners,generated)
+    events=npc['events'];active=events['active']
+    if sha256(dependencies.encode())!=events['dispatch']['generated_requirements_sha256']:
+        raise ValueError('Changed complete owner dependency graph')
+    directory.mkdir()
+    path=directory/'requirements.c'
+    write_new(path,dependencies.replace('"holiday_dispatch.h"',
+        '"/source/overlays/v3/holiday_dispatch.h"').encode())
+    links=dict(active['bindings'],**bindings)
+    code,compiled=compile_part('holiday_active',directory/'code',link_symbols=links,
+        defines=defines,extra_sources=('overlays/v3/holiday_dispatch.c',
+            'overlays/v3/holiday_dispatch_native.c',str(path.relative_to(ROOT))))
+    for name in ('af_holiday_active_update','af_holiday_dedicated_current',
+            *('af_holiday_dedicated_'+phase for phase in ('start','stop','in','out','behind'))):
+        if compiled['symbols'][name]!=active['code']['symbols'][name]:
+            raise ValueError('Moved retained active event dispatcher entry: '+name)
+    packet=npc['packet'];data=bytearray(base[packet['physical']:packet['physical']+packet['bytes']])
+    at,limit=ADDRESS-packet['ram'],COMMON-packet['ram'];old=active['code']
+    if (sha256(data)!=packet['sha256'] or not 0<=at<limit<=len(data) or
+            sha256(data[at:at+old['bytes']])!=old['sha256'] or
+            any(data[at+old['bytes']:limit]) or len(code)>limit-at):
+        raise ValueError('Changed shared owner code reservation')
+    data[at:limit]=code+bytes(limit-at-len(code));previous=packet['sha256']
+    packet.update(sha256=sha256(data),crc32=zlib.crc32(data))
+    matches=[r for r in records if r['id']==packet['id']]
+    if len(matches)!=1:raise ValueError('Ambiguous shared owner physical packet')
+    matches[0]['sha256']=packet['sha256']
+    active.update(code=compiled,bindings=links)
+    events['dispatch'].update(code=compiled,bindings=links,provider_defines=list(defines))
+    return (dict(matches[0],previous_sha256=previous),bytes(data))
+
+
 def install_dispatch(base,prior,blob,core,output):
     """Connect all actual owner entries, guarding complete dependencies first."""
     del blob,core

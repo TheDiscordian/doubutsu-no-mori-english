@@ -7,7 +7,10 @@
 static int deleted,ctor_count,dtor_count,init_count,move_count,draw_count,free_count;
 static int previous_event,previous_clear,previous_unregister,area_present=1;
 static u8 area[128];
-const u32 af_hp_available=1;
+#ifndef AF_HP_TEST_AVAILABLE
+#define AF_HP_TEST_AVAILABLE 1
+#endif
+const u32 af_hp_available=AF_HP_TEST_AVAILABLE;
 const volatile u8 af_hp_native_ticks=2;
 AFHPResident af_hp_native_events[5];
 static aNPC_ct_data_c callbacks;
@@ -20,7 +23,7 @@ static void ctor(ACTOR *a,GAME *g) {
 }
 static void dtor(ACTOR *a,GAME *g) {(void)a;(void)g;++dtor_count;}
 static void init(ACTOR *a,GAME *g) {(void)a;(void)g;++init_count;}
-static const ACTOR_PROFILE source={.actor_bytes=2400,.ctor=ctor,.dtor=dtor,.move=init,.draw=draw};
+static const ACTOR_PROFILE source={.source_profile=0x71,.actor_bytes=2400,.ctor=ctor,.dtor=dtor,.move=init,.draw=draw};
 const AFHPRecord af_hp_records[AF_HP_OWNER_COUNT]={
     {0,0,0xD9,15,8,0,7,0,&source,16},
     {0,0,0xDA,14,9,0,7,0,&source,16},
@@ -52,6 +55,13 @@ static void actor(u8 *storage,u16 profile,u16 name,Descriptor *owner) {
     memcpy(storage+0x170,&owner,sizeof owner);++owner->count;
 }
 int main(void) {
+    if(!AF_HP_TEST_AVAILABLE) {
+        assert(af_hp_identity(0,0xD02D)==-1 && af_hp_identity(1,0x71)==-1 && af_hp_identity(2,118)==-1);
+        return 0;
+    }
+    assert(af_hp_identity(1,0x71)==0xD9 && af_hp_identity(2,118)==119);
+    assert(af_hp_identity(0,0xD05C)==-1 && af_hp_identity(1,0x72)==-1);
+    assert(af_hp_identity(2,70)==-1 && af_hp_identity(3,118)==-1);
     assert(af_hp_descriptor(7)==(void *)(uintptr_t)0x1234);
     assert(af_hp_name_profile(0xD0A0)==0xDC && af_hp_name_profile(0xD0AD)==0xE0);
     assert(af_hp_name_profile(0xD0AE)==-1 && af_hp_name_profile(0xD010)==-1);
@@ -63,6 +73,7 @@ int main(void) {
     memset(af_hp_native_events,0,sizeof af_hp_native_events);
     int slot=0;
     for(unsigned int r=0;r<AF_HP_OWNER_COUNT;r++)for(int i=0;i<af_hp_records[r].count;i++,slot++) {
+        assert(af_hp_identity(0,af_hp_records[r].source_name+i)==af_hp_records[r].name+i);
         assert(af_hp_resident_bind(af_hp_records[r].source_name+i,0xE000+slot,0)==af_hp_records[r].name+i);
     }
     assert(slot==14);

@@ -127,6 +127,22 @@ static int ready(const AFHPRecord *r) {
     return r->count?(r->part==3 && r->source->actor_bytes>=sizeof(NPC_ACTOR)):
         r->part==7 || (r->part==4 && r->source->actor_bytes==sizeof(ACTOR));
 }
+int af_hp_identity(unsigned int kind,unsigned int source) {
+    /* Event preflight runs before resident selection or actor construction.
+     * Resolve the installed identity, not a currently spawned instance. The
+     * category selection/dependency gate still rejects unfinished admission. */
+    if(!af_hp_available)return -1;
+    if(kind==2)return source==118?119:-1;
+    if(kind>1 || source>65535)return -1;
+    for(unsigned int i=0;i<AF_HP_OWNER_COUNT;i++) {
+        const AFHPRecord *r=af_hp_records+i;
+        if(!ready(r))continue;
+        if(kind==1 && r->source->source_profile==(int)source)return r->profile;
+        if(kind==0 && r->count && source>=r->source_name && source-r->source_name<r->count)
+            return r->name+source-r->source_name;
+    }
+    return -1;
+}
 void *af_hp_descriptor(int profile) {
     int index=profile_index(profile);
     if(index<0)return af_hp_previous_descriptor(profile);

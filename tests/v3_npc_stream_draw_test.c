@@ -79,6 +79,20 @@ int main(void) {
     known=0;mode=0;
     af_v3_npc_stream_draw(game,a+0x198,opa,callback,callback,a);
     assert(calls==51 && graph.p==opa+1 && graph.xp==xlu+1);
+    /* Fixed-face costume models have no eye/mouth expressions. Preserve
+     * that absence rather than loading a fake eye at the palette pointer. */
+    known=1;memset(row.eyes,0,sizeof row.eyes);memset(a+0x754,0,8*4);
+    graph.p=opa;graph.xp=xlu;a[0x710]=255;
+    af_v3_npc_stream_draw(game,a+0x198,opa,callback,callback,a);
+    assert(calls==52 && graph.p==opa+3 && graph.xp==xlu+3);
+    assert(opa[0].a==0xDB06001C && opa[0].b==0x500020);
+    assert(opa[2].a==0xDB06001C && opa[2].b==af_npc_stream_segments[7]);
+    row.eyes[1]=0x820;graph.p=opa;graph.xp=xlu;
+    af_v3_npc_stream_draw(game,a+0x198,opa,callback,callback,a);
+    assert(calls==52 && graph.p==opa && graph.xp==xlu);
+    row.eyes[1]=0;*(u32 *)(a+0x754)=0x06000820;
+    af_v3_npc_stream_draw(game,a+0x198,opa,callback,callback,a);
+    assert(calls==52 && graph.p==opa && graph.xp==xlu);
     puts("complete expressions, native fallback, argument forwarding, bounds, and segment restoration pass");
     return 0;
 }

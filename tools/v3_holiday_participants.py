@@ -85,6 +85,7 @@ NATIVE_SERVICES={
     'Matrix_RotateY':0x800E0698,'Matrix_RotateZ':0x800E0834,
     '_texture_z_light_fog_prim':0x800BD4E8,'_texture_z_light_fog_prim_xlu':0x800BD598,
     'Setpos_HiliteReflect_init':0x800588B8,'Setpos_HiliteReflect_xlu_init':0x80058928,
+    'af_coin_native_find':0x80058460,
 }
 WORLD_READERS={
     'index':0x80081EA0,'active':0x80081EEC,'kind':0x80081F90,'all':0x80081FBC,
@@ -325,11 +326,25 @@ def coin(source,base,prior,out,generated,reuse=None):
         if name.endswith('_dw'):continue
         body=clean(function(raw.decode(),name))
         for before,after in (
-            ('eEC_CLIP->make_effect_proc','af_coin_create'),('eEC_CLIP->effect_make_proc','af_coin_request'),
+            ('eEC_CLIP->make_effect_proc','af_coin_create'),
             ('eEC_CLIP->set_continious_env_proc','af_sky_continuous'),('sAdo_OngenTrgStart','af_coin_sound')):
             body=body.replace(before,after)
         # The source truncates then wraps its random 16-bit rotations.
         body=body.replace('= RANDOM_F(65535);','= (s16)(int)RANDOM_F(65535);')
+        if name=='eCoin_ct':
+            body=body.replace('af_coin_sound(0x466,',
+                'if(!af_coin_fit(effect,game)){effect->timer=0;return;}\n    af_coin_sound(0x466,')
+        if name=='eCoin_mv':
+            # The native shrine is a solid offering box, not the donor's well.
+            # Preserve the throw/rotation/fade, but contact only while falling
+            # and omit the donor's water-only splash child.
+            body=body.replace('if (effect->position.y <= effect->offset.x)',
+                'if (effect->velocity.y < 0 && effect->position.y <= effect->offset.x)')
+            body=body.replace('xyz_t pos = effect->position;', '').replace('pos.y = effect->offset.x;', '')
+            splash=('eEC_CLIP->effect_make_proc(eEC_EFFECT_TURI_MIZU, pos, effect->prio, 0, '
+                'game, (u16)effect->item_name, 0, 0);')
+            if body.count(splash)!=1:raise ValueError('Changed complete source offering contact')
+            body=body.replace(splash,'')
         pieces.append(body)
     pieces.extend((
         'void af_coin_init(xyz_t p,int priority,s16 angle,GAME *g,u16 name,s16 a,s16 b) {',
@@ -380,7 +395,8 @@ def coin(source,base,prior,out,generated,reuse=None):
     generated['coin-art.c']=('#include "holiday_coin.h"\nconst u32 af_coin_models[2]={'
         +','.join(hex(0x06000000+models[k]) for k in ('opaque','translucent'))+'};\n'
         'const u32 af_coin_palettes[2]={'+','.join(str(prepared[3][r['donor_offset']]) for r in frames)+'};\n')
-    # Water identities are already verified by the complete insect importer.
+    # Retain the existing water receipts, but this solid shrine does not emit
+    # the source well's splash. Other native water users remain untouched.
     files=by_vrom(base);water=[]
     for eid,vrom,reloc,ram,digest,rel_digest in WATER[:2]:
         if sha256(files[vrom].extract(base))!=digest or sha256(files[reloc].extract(base))!=rel_digest:
@@ -407,7 +423,26 @@ def coin(source,base,prior,out,generated,reuse=None):
         source_id=118,native_id=119,art=dict(bytes=len(asset),sha256=sha256(asset),
             models=model_rows,resources=prepared[2],palette_frames=frames),water=water,audio=audio,
         installed=False,native_execution_verified=False,
-        landing_geometry='Complete source shrine-relative height; native shrine landing needs review')
+        landing_geometry=shrine_geometry(base),water_subeffect=False,
+        platform_adaptations=['Contact the loaded N64 shrine offering box while descending',
+            'Retarget horizontal flight to the native box, retaining source vertical acceleration',
+            'Omit the wishing-well splash at the solid offering box'])
+
+
+def shrine_geometry(base):
+    """Guard the actual native models and actor that define coin contact."""
+    files=by_vrom(base);rows=[]
+    for vrom,size,digest in (
+        (0xD5E000,611456,'23f68c1a4c9d9bb7ab964a3140aad35f8606ae5ee751dc224839abdeb6cd0d7f'),
+        (0xDF4000,752,'a4f33bb4c76cb8c8ebb9df0232e15ccf381ba386b7eed358132b2fb0051a4446'),
+        (0x8D8EC0,4320,'e36125d69b517b6507384872e8784a1bfd8ee6e4885f1b643e71a2aab2c2e10d')):
+        raw=files[vrom].extract(base)
+        if len(raw)!=size or sha256(raw)!=digest:raise ValueError('Changed native shrine coin geometry')
+        rows.append(dict(vrom=vrom,bytes=size,sha256=digest))
+    return dict(native_resources=rows,structure_index=22,profile=0x5C,part=0,
+        actor_position_offset=0x28,model_scale=.01,box_x=[-20,20],box_y=[0,17.5],box_z=[42.5,60],
+        landing_z=52.5,descending_only=True,actual_loaded_actor_height=True,
+        native_execution_verified=False)
 
 
 def hooks(base,prior,generated,readers):

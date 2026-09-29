@@ -50,10 +50,14 @@ void af_v3_npc_stream_draw(void *game,void *skeleton,void *matrices,
     const u8 *bank=(const u8 *)game+0x110+slot*0x54;
     if(*(const short *)bank<=0 || *(const u32 *)(bank+0x10)<row->texture_bytes)return;
     u32 palette=*(const u32 *)(bank+4),eye=npc[0x710],mouth=npc[0x71C];
+    int eyes=!!row->eyes[0];
+    for(unsigned int i=0;i<8;i++)if(!!row->eyes[i]!=eyes)return;
+    if(!eyes && row->mouth_count)return;
     if((palette&7u) || palette<0x80000000u || palette>0x80800000u-row->texture_bytes ||
-            eye>=8u || (row->mouth_count && mouth>=row->mouth_count))return;
-    u32 offsets[3]={row->body_offset,row->eyes[eye],0};
-    unsigned int n=row->mouth_count?3:2;
+            (eyes && eye>=8u) || (row->mouth_count && mouth>=row->mouth_count))return;
+    u32 offsets[3]={row->body_offset,eyes?row->eyes[eye]:0,0};
+    unsigned int n=row->mouth_count?3:eyes?2:1;
+    if(!eyes)for(unsigned int i=0;i<8;i++)if(*(const u32 *)(npc+0x754+4*i))return;
     if(n==3)offsets[2]=row->mouths[mouth];
     u32 addresses[3],saved[3];
     for(unsigned int i=0;i<n;++i) {

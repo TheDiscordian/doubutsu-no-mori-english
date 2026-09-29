@@ -10,13 +10,18 @@ const u8 af_coin_art[2048]={0};
 const u32 af_coin_models[2]={0x06000400,0x06000500},af_coin_palettes[2]={0,32};
 const u16 af_coin_sounds[2]={0x478,0x479};
 static int requests,created,sounds,reflections,transforms,writes;
-static int last_id,last_sound,ready=1;
+static int last_id,last_sound,ready=1,shrine_present=1;
+static float random_value=.25f;
+static AFSkyPlayer shrine;
 static RoomEffect effect;
 void af_coin_init(xyz_t,int,s16,GAME *,u16,s16,s16);
 void af_coin_ct(RoomEffect *,GAME *,void *),af_coin_mv(RoomEffect *,GAME *);
 int af_sky_ready(void *g) {return g && ready;}
-float af_effect_random(void) {return .25f;}
-float fqrand(void) {return .25f;}
+float af_effect_random(void) {return random_value;}
+float fqrand(void) {return random_value;}
+AFSkyPlayer *af_coin_native_find(void *info,s16 profile,int part) {
+    assert(info && profile==0x5C && part==0);return shrine_present?&shrine:0;
+}
 float sin_s(s16 x) {return sinf(x*(6.283185307179586f/65536));}
 float cos_s(s16 x) {return cosf(x*(6.283185307179586f/65536));}
 int mFI_BlockKind2BkNum(int *x,int *z,u32 kind) {assert(kind==4);*x=*z=1;return 1;}
@@ -77,21 +82,40 @@ static void draw_check(RoomEffect *e,RoomRigGame *game,int xlu) {
     }
 }
 int main(void) {
-    RoomRigGraphics graphics={0};RoomRigGame game={.gfx=&graphics};xyz_t p={10,80,20};
+    RoomRigGraphics graphics={0};RoomRigGame game={.gfx=&graphics};xyz_t p={10,80,105};
+    shrine.actor_class.world.position=(xyz_t){10,80,20};
     af_hp_coin(p,1,0,&game,0,0,0);assert(requests==1 && last_id==119);
     af_coin_init(p,1,0,&game,0,0,0);
     assert(created==1 && sounds==1 && last_sound==0x478 && effect.timer==100);
-    assert(effect.position.x==19 && effect.position.y==91 && effect.position.z==5);
-    assert(effect.offset.x==51 && effect.offset.y==46.5f && effect.acceleration.y==-.2f);
+    assert(effect.position.x==19 && effect.position.y==91 && effect.position.z==90);
+    assert(effect.offset.x==97.5f && effect.offset.y==93 && effect.acceleration.y==-.2f);
     float vy=effect.velocity.y;af_coin_mv(&effect,&game);
     assert(fabsf(effect.velocity.y-(vy-.4f))<.00001f && !effect.specific[0]);
     for(int i=0;i<80 && !effect.specific[0];i++) {--effect.timer;af_coin_mv(&effect,&game);}
-    assert(effect.specific[0] && sounds==2 && last_sound==0x479 && last_id==70 && requests==2);
+    assert(effect.specific[0] && sounds==2 && last_sound==0x479 && last_id==119 && requests==1);
+    assert(effect.position.x>-10 && effect.position.x<30 && fabsf(effect.position.z-72.5f)<.001f);
     assert(effect.timer==299 || effect.timer==300);
     for(int i=0;i<20;i++) {--effect.timer;af_coin_mv(&effect,&game);}
-    assert(effect.position.y==46.5f && effect.velocity.y==0 && !effect.specific[1] && !effect.specific[3]);
+    assert(effect.position.y==93 && effect.velocity.y==0 && !effect.specific[1] && !effect.specific[3]);
     draw_check(&effect,&game,0);draw_check(&effect,&game,1);assert(writes==2 && reflections==2);
+    /* The real actor height is independent of the field block's base. All
+     * source random angles must land inside both seasonal box meshes. */
+    for(int level=0;level<4;level++)for(int r=0;r<20;r++) {
+        random_value=r/20.0f;shrine.actor_class.world.position.y=level*120.0f;
+        p.y=shrine.actor_class.world.position.y;
+        int before=sounds;af_coin_init(p,1,0,&game,0,0,0);
+        assert(effect.timer==100 && sounds==before+1);
+        af_coin_mv(&effect,&game);assert(!effect.specific[0]);
+        for(int i=0;i<60 && !effect.specific[0];i++) {--effect.timer;af_coin_mv(&effect,&game);}
+        assert(effect.specific[0] && sounds==before+2 && requests==1);
+        assert(effect.position.x>-10 && effect.position.x<30 && fabsf(effect.position.z-72.5f)<.001f);
+        assert(effect.position.y<=p.y+17.5f && effect.position.y>=p.y+17.3f);
+    }
+    shrine_present=0;int before=sounds;af_coin_init(p,1,0,&game,0,0,0);
+    assert(effect.timer==0 && sounds==before);
+    shrine_present=1;p.z=-100;af_coin_init(p,1,0,&game,0,0,0);
+    assert(effect.timer==0 && sounds==before);
     ready=0;af_hp_coin(p,1,0,&game,0,0,0);af_coin_mv(&effect,&game);
-    assert(requests==2 && effect.timer==0);
+    assert(requests==1 && effect.timer==0);
     return 0;
 }
