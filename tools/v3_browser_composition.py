@@ -57,7 +57,7 @@ def rules(image, report):
         villagers = [row] if row['kind'] == 'villager' else []
         furniture = [row] if row['kind'] == 'furniture' else []
         shirts = []
-        off = [disable(blob.pstart + row['enable_offset'], row['enable_bytes'])]
+        off = [] if row['kind']=='carried' else [disable(blob.pstart + row['enable_offset'], row['enable_bytes'])]
         if row['kind'] == 'villager':
             off.append(disable(blob.pstart + row['town_flag_offset'], 1))
         elif row['kind'] == 'clothing':
@@ -80,6 +80,7 @@ def rules(image, report):
         entries.append({'id': key, 'name': row['name'], 'kind': row['kind'],
                         'dependencies': row['dependencies'], 'profile_hex': profile.hex(),
                         'disable': off})
+        if row['kind']=='carried':entries[-1]['carried_mask']=row['carried_mask']
         if row.get('native_artwork_variant'):
             entries[-1]['native_artwork_variant']=row['native_artwork_variant']
         if surfaces:
@@ -166,7 +167,9 @@ def rules(image, report):
     from v3_clothing_install import checksum_fields as clothing_checksums
     from v3_holiday_selection import groups as event_groups, checksum_fields as event_checksums
     groups = event_groups(image, report)
-    crcs = clothing_checksums(image,report)+creature_checksums(image,report)+behaviour_checksums(image,report)+event_checksums(image,report)+checksum_fields(image,report)
+    from v3_carried_selection import masks as carried_masks, checksum_fields as carried_checksums
+    masks=carried_masks(image,report)
+    crcs = clothing_checksums(image,report)+creature_checksums(image,report)+behaviour_checksums(image,report)+event_checksums(image,report)+carried_checksums(image,report)+checksum_fields(image,report)
     for at, start, length in ((blob.pstart + 0xF8, blob.pstart + composition.PACKAGE, composition.PACKAGE_SIZE),
                               (module.pstart + composition.CONFIG + 8, blob.pstart, composition.PREFIX_SIZE)):
         value = field(at, 4)
@@ -184,6 +187,7 @@ def rules(image, report):
             'crc32': crcs, 'header': field(0x10, 8),
             'save_compatibility':composition.save_compatibility(report),
             **({'runtime_groups':groups} if groups else {}),
+            **({'selection_masks':masks} if masks else {}),
             **({'behaviours':behaviours,'behaviour_save_note':save_note(report)} if behaviours else {}),
             **({'creature_profile_hex':creatures['profile_hex']} if creatures else {}),
             **({'surface_profile_hex':surfaces['profile_hex']} if surfaces else {})}

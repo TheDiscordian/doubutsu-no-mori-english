@@ -17,8 +17,8 @@ and destroy callbacks are empty; the DMA callback is not.
 
 Full support requires saved designs, editing and naming, ownership resolution,
 pattern rendering, wearing/umbrella interactions, and the related wall/floor
-representations. The N64 game does not supply the donor design system. Custom
-designs and Able Sisters belong to V4, including dependent sign boards and these
+representations. The N64 game does not supply the donor design system. Able
+Sisters, including its custom-design system, belongs to V4 with dependent sign boards and these
 saved-pattern forms. No empty patterns or frozen substitutes are presented as
 implemented imports. Other V3 item/villager importing work continues.
 

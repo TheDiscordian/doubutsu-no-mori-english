@@ -42,11 +42,11 @@ export function validatePlan(plan) {
   for (const option of plan.options) {
     require(typeof option.id === 'string' && /^GAFE01-r0\/(item|villager)\/[0-9A-F]{4}$/.test(option.id) &&
       !options.has(option.id), 'Invalid or repeated import identity.');
-    require(['furniture', 'clothing', 'equipment', 'villager', 'floor', 'wall', 'fish', 'insect', 'diary'].includes(option.kind) &&
+    require(['furniture', 'clothing', 'equipment', 'villager', 'floor', 'wall', 'fish', 'insect', 'diary', 'carried'].includes(option.kind) &&
       option.id.includes(option.kind === 'villager' ? '/villager/' : '/item/'), 'Invalid import kind.');
     require(typeof option.name === 'string' && option.name.length > 0 && option.name.length <= 128,
       'Invalid import name.');
-    array(option.dependencies, 0, 2048); array(option.disable, 1, 16);
+    array(option.dependencies, 0, 2048); array(option.disable, option.kind === 'carried' ? 0 : 1, 16);
     hexSize(option.profile_hex, 192, 192);
     if (surfaces) hexSize(option.surface_profile_hex, 64, 64);
     if (creatures) hexSize(option.creature_profile_hex, 4, 4);
@@ -54,7 +54,15 @@ export function validatePlan(plan) {
     require(isCreature ? creatures && bytes(option.creature_profile_hex).some(n => n) :
       !creatures || !bytes(option.creature_profile_hex).some(n => n), 'Wrong-category creature profile.');
     const isSurface = ['floor', 'wall'].includes(option.kind);
-    require(isSurface ? surfaces && bytes(option.surface_profile_hex).some(n => n) && !bytes(option.profile_hex).some(n => n) :
+    const isCarried = option.kind === 'carried';
+    if (isCarried) {
+      integer(option.carried_mask, 1, 127);
+      require(!(option.carried_mask & (option.carried_mask - 1)) && !option.disable.length,
+        'Invalid carried-family identity.');
+    } else require(option.carried_mask === undefined, 'Wrong-category carried identity.');
+    require(isCarried ? !bytes(option.profile_hex).some(n => n) &&
+      (!surfaces || !bytes(option.surface_profile_hex).some(n => n)) :
+      isSurface ? surfaces && bytes(option.surface_profile_hex).some(n => n) && !bytes(option.profile_hex).some(n => n) :
       bytes(option.profile_hex).some(n => n) && (!surfaces || !bytes(option.surface_profile_hex).some(n => n)),
       'Import has an empty or wrong-category save profile.');
     for (const row of option.disable) {
@@ -144,6 +152,27 @@ export function validatePlan(plan) {
     field(row, 4, 4); require(row.before === '00000000', 'Changed behaviour default.');
   }
   const groupIds = new Set();
+  const carriedBits = new Set();
+  for (const option of options.values()) if (option.kind === 'carried') {
+    require(!carriedBits.has(option.carried_mask), 'Duplicate carried-family identity.');
+    carriedBits.add(option.carried_mask);
+  }
+  if (plan.selection_masks !== undefined) array(plan.selection_masks, 1, 32);
+  const maskOwners = new Set();
+  for (const row of plan.selection_masks || []) {
+    field(row, 4, 4); array(row.members, 1, 32);
+    let full = 0; const members = new Set();
+    for (const member of row.members) {
+      require(options.get(member.id)?.kind === 'carried' && !members.has(member.id),
+        'Unknown or duplicate masked selection.');
+      integer(member.mask, 1, 0x7fffffff);
+      require(!(full & member.mask), 'Overlapping selection mask bits.');
+      full |= member.mask; members.add(member.id); maskOwners.add(member.id);
+    }
+    require(parseInt(row.before, 16) === full, 'Changed complete selection mask.');
+  }
+  for (const option of options.values()) if (option.kind === 'carried')
+    require(maskOwners.has(option.id), 'Carried option has no installed selection field.');
   if (plan.runtime_groups !== undefined) array(plan.runtime_groups, 1, 32);
   for (const group of plan.runtime_groups || []) {
     require(typeof group.id === 'string' && /^[a-z][a-z0-9-]{0,63}$/.test(group.id) && !groupIds.has(group.id),
@@ -216,6 +245,8 @@ export function resolveSelection(plan, requested, behaviours = {}) {
       .map(([key, parents]) => [key, [...parents].sort()])), profile_hex: hex(profile),
     ...(plan.surface_profile_hex === undefined ? {} : { surface_profile_hex: hex(surfaceProfile) }),
     ...(plan.creature_profile_hex === undefined ? {} : { creature_profile_hex: hex(creatureProfile) }),
+    ...(plan.selection_masks === undefined ? {} : { carried_mask:
+      [...enabled].reduce((mask, id) => mask | (options.get(id).carried_mask || 0), 0) }),
     ...(plan.behaviours === undefined ? {} : { behaviours: resolved,
       behaviours_changed: rows.some(row => resolved[row.id] !== row.default) }) };
 }
@@ -266,6 +297,7 @@ export async function composeSelection(source, plan, requested, behaviours = {})
     const fields = [plan.profile, plan.header, ...plan.options.flatMap(row => row.disable),
       ...(plan.pending_options || []).flatMap(row => row.disable),
       ...(plan.runtime_groups || []).flatMap(row => row.fields),
+      ...(plan.selection_masks || []),
       ...plan.tables.flatMap(row => [row, ...row.counts]), ...plan.crc32, ...(plan.behaviours || [])];
     for (const field of fields) {
       const before = bytes(field.before);
@@ -293,6 +325,10 @@ export async function composeSelection(source, plan, requested, behaviours = {})
     }
     for (const option of plan.options) if (!enabled.has(option.id)) {
       for (const field of option.disable) write(field, bytes(field.after));
+    }
+    for (const row of plan.selection_masks || []) {
+      const mask = row.members.reduce((value, member) => enabled.has(member.id) ? value | member.mask : value, 0);
+      const value = new Uint8Array(4); view(value).setUint32(0, mask); write(row, value);
     }
     for (const option of plan.pending_options || []) {
       for (const field of option.disable) write(field, bytes(field.after));

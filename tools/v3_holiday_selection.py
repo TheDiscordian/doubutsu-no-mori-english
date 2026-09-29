@@ -19,7 +19,8 @@ CALENDAR = dict(id='holiday-calendar', name='Holiday calendar', binding='calenda
 def packets(e):
     n = e['npc_extra']
     return [n['packet'], e['holiday_fishing']['packet'], n['events']['sky']['packet'],
-            n['events']['festivals']['packet']]
+            n['events']['festivals']['packet']]+(
+            [e['carried_items']['quest']['packet']] if e.get('carried_items', {}).get('quest') else [])
 
 
 def location(e, ram, size):
@@ -102,6 +103,13 @@ def refresh_receipts(e, records, payloads):
     carried = e.get('carried_items')
     if carried:
         carried['packet'] = copy.deepcopy(events['festivals']['packet'])
+        quest = carried.get('quest')
+        if quest and quest['packet']['id'] in payloads:
+            p = quest['packet']; data = payloads[p['id']]
+            for target in (carried['spawning'], carried['paper'].get('quantities'), quest.get('npc')):
+                if target:target['packet'] = copy.deepcopy(p)
+            at = quest['ram']-p['ram']
+            quest['code']['sha256'] = sha256(data[at:at+quest['code']['bytes']])
 
 
 def update_report(image, blob, report, selection):

@@ -73,11 +73,11 @@ python3 tools/v3_furniture_pipeline.py convert --representation carried \
 
 ## Installed shared runtime
 
-The current development proposal is ABI 366 at
-`build/v3-carried-field-work-01/quest-manager-03/build-lock.json`.
+The current development proposal is ABI 369 at
+`build/v3-carried-selection-03/build-lock.json`.
 Its ROM SHA-256 is
-`5ae6fe11ae14560c36c53da7f809c14949d26bb96fc8899e4edf69486d140fcc`.
-This is an inactive carried integration, not a new playable-import claim.
+`297eea5aededf42081b59f50cc0b20e83b4367f2c1ec601a315297c15cf2ac9f`.
+Six V3 families are independently selectable; ordinary gameplay remains unverified.
 
 `v3_furniture_install.py --refresh-runtime --carried-items PATH` installs the
 complete checked bundle through the existing guarded runtime builder. It
@@ -101,7 +101,7 @@ destinations do not depend on selection order.
 
 Code occupies `80771000..80771EE0`; the 864-byte table starts at `80773800`.
 The eight-word header identifies 26 records of 32 bytes and separate seven-bit
-readiness/selection masks, both zero. Names, categories, base prices, room/pocket
+readiness/selection masks, both `7D` in the complete proposal. Names, categories, base prices, room/pocket
 conversions, icons, and quantity helpers use the same bounded record lookup.
 Unrelated identities delegate to the existing readers. Disabled reserved IDs
 never index the short native tables. Card/cutlery admission also requires the
@@ -114,7 +114,7 @@ adds cedar independently. The common descriptor constructor uses the complete
 seasonal allocation, including the installed gold/palm/cedar drawing banks.
 Their shared table, four actor index arrays, and local stack are sized together;
 growth, planting, collision, shaking, cutting, and complete leaf/cut effects
-are connected. Independent selection remains unfinished. See
+are connected. Independent selection is installed. See
 [shared seasonal scenery](V3_SCENERY.md#palm-and-cedar-dependencies).
 
 The loaded packet extends the unchanged 64,064-byte festival prefix to 105,904
@@ -150,8 +150,8 @@ loader through its actual relocated constructor address.
 Continue the shared importing task without rescanning or recompiling these
 unchanged resources:
 
-1. Connect the remaining actual item interactions: card stamping/menu behaviour;
-   Harvest cutlery interaction; actual Wisp event ownership. Spirit inventory
+1. Preserve installed card stamping/menu behaviour, Harvest cutlery interaction,
+   and actual Wisp event ownership. Spirit inventory
    transfer restrictions and field/capture/release use the installed
    shared category consumers below.
    Coconut eating/planting, cedar planting/growth, and complete tree leaf/cut
@@ -162,13 +162,14 @@ unchanged resources:
    registry's drawing categories do not themselves widen native type switches.
    Reuse the installed inventory, collection, catalogue, and save adapters;
    do not rescan the unchanged native owners or recompile prepared artwork.
-3. Bind independent parent selections in both experimental composers, preserve
-   empty-selection V2-14, and verify the changed readers and save/profile bounds.
+3. Preserve independent parent selections in both experimental composers and
+   empty-selection V2-14. Their shared masks, providers, and resource checks are
+   documented in [the selection checkpoint](../docs/checkpoints/V3_CARRIED_SELECTION.md).
    Acquisition follows primary importing. Gold-tree work remains required after
    primary imports, along with any unfinished golden-tool behaviour.
 
-Sign-board placement/design handling is deferred to V4 with custom designs and
-Able Sisters. Preserve prepared sign resources, but keep sign selection disabled;
+Sign-board placement/design handling belongs to the V4 Able Sisters feature,
+including its custom-design system. Preserve prepared sign resources, but keep sign selection disabled;
 do not make the other six carried families depend on this deferred feature.
 The unfinished design code and its verification limits are preserved on
 `v4/deferred-custom-designs` at `baded8ca`, in
@@ -759,8 +760,8 @@ Current cartridge checks cover all changed hooks, complete resources, text
 credits, retained module bytes, 22 startup packets, and patch reconstruction.
 Eight browser/offline profiles agree. Silent native boot checks the six-character
 registry, ten-bank directory, final packet guard, and absence of a faulted thread.
-Carried-family admission stays off pending the category's remaining consumers
-and independent selection. Native Wisp interaction and save/travel are unverified.
+Six carried families have independent admission in the current proposal.
+Native Wisp interaction and save/travel are unverified.
 
 The shared registry has 23 owners, eighteen temporary resident slots, and 25
 live slots. Its 22 retained rows and source callback addresses remain intact.
@@ -905,10 +906,10 @@ rejection, player deletion, all seven missing families, and unchanged output
 on rejection. Seven current browser/offline profiles agree. Native gameplay
 and ordinary save/reload are not inferred from these checks.
 
-The current build uses saved format 17. Compatible older saves migrate forward;
-V2 and format-16-or-earlier V3 cannot read new saves. Profiles missing required
+The current build uses saved format 19. Compatible older saves migrate forward;
+V2 and format-18-or-earlier V3 cannot read new saves. Profiles missing required
 carried families or diary styles remain incompatible. No ordinary save/reload, native
-letter rendering, or carried-item gameplay is claimed. Ready/selected masks stay
-zero until the missing consumers are connected. Both stable V2-14 deployments
+letter rendering, or carried-item gameplay is claimed. The complete proposal's
+ready/selected masks are `7D`; composers retain only selected families. Both stable V2-14 deployments
 and the main build lock remain unchanged. Native diary/creature fixture budgets
 stay exhausted; this work does not restart them or clear their uncertainty.

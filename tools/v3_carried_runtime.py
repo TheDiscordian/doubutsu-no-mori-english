@@ -280,6 +280,9 @@ def install(base, prior, blob, core, module, output, directory):
             if carried.get('quest',{}).get('manager') and not carried['paper'].get('quantities'):
                 from v3_paper_install import install as install_paper
                 return install_paper(base,prior,core,output,directory)
+            if carried.get('quest',{}).get('npc',{}).get('installed'):
+                from v3_carried_selection import install as install_selection
+                return install_selection(base,prior,output,directory)
             return install_interactions(base,prior,core,output,directory)
         if prior['equipment_resources']['carried_items'].get('eating'):
             return install_creature_field(base,prior,blob,output,directory)

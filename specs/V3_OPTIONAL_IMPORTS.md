@@ -9,7 +9,7 @@ are off by default. Existing N64 villagers, items, locations, and the translatio
 remain available; importing means adding content, not silently replacing an
 existing villager or painting a new name onto an unrelated item.
 
-Able Sisters, the Museum building, custom designs, and comparable large new
+Able Sisters (including its custom-design system), the Museum building, and comparable large new
 features are V4 work. V3 remains an item/villager import release with working
 item behaviours. Design-dependent sign boards and saved-pattern representations
 are explicitly deferred to V4, not counted as completed V3 imports. Importing

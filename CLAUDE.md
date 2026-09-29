@@ -11,7 +11,7 @@ memory requirement; permission to use eight MiB does not itself change heap boun
 
 V3 adds optional GameCube villagers and items to the translated game. Read
 `specs/V3_OPTIONAL_IMPORTS.md` and the active V3 queue before import work.
-Able Sisters, the Museum building, custom designs, and comparable large new
+Able Sisters (including its custom-design system), the Museum building, and comparable large new
 features belong to V4, not V3. Keep design-dependent imports explicitly deferred;
 do not expand the item/villager import task into building those facilities.
 Ordinary item behaviours, including fish/insects/fossils, remain V3 import work.

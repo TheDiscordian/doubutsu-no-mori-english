@@ -1655,6 +1655,10 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
                 additional_menu_bytes=paper['additional_menu_bytes'])
         report['sources'].update(carried['sources'])
         report['native_test']='pending connected carried-item menus, behaviours, persistence, and selection; readiness remains off'
+        if carried.get('optional_selection'):
+            report['shared_runtime_refresh']['adapters'].append('carried_selection')
+            report['shared_runtime_refresh']['saved_profile_changed']=True
+            report['native_test']='six carried families selectable; ordinary combined gameplay/save verification remains pending'
     if holiday_actor_services:
         npc=equipment_report['npc_extra']
         decorations=npc['events'].get('decorations') and not prior['equipment_resources']['npc_extra']['events'].get('decorations')

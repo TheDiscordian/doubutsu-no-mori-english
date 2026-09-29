@@ -2,8 +2,8 @@
 
 ## Active: V3 optional GameCube imports
 
-V3 imports items and villagers with working behaviours. Able Sisters, the Museum
-building, custom designs, and comparable large features belong to V4. The
+V3 imports items and villagers with working behaviours. Able Sisters (including
+its custom-design system), the Museum building, and comparable large features belong to V4. The
 unfinished design implementation is preserved on `v4/deferred-custom-designs`
 at `baded8ca`, with its checkpoint in `docs/checkpoints/V4_CUSTOM_DESIGNS.md`
 on that branch. It is not installed in V3. Design-dependent sign boards and
@@ -36,15 +36,19 @@ Implement the actual alternatives and bind selections to the build receipt.
 Fish/insect population and imported coastal movement have installed controls and
 runtime alternatives; other substantial differences still need real bindings.
 
-Current implementation task: finish the remaining carried-object and stationery
-imports through the shared category importers. The donor identity worksheet
+Current implementation task: finish the four golden-tool behaviour/reward paths
+through the shared equipment importer, including the full golden-shovel route.
+The current inventory has no other unresolved V3 item identity; the sign board
+belongs to V4 Able Sisters. Retain installed gold-tree leaf/cut effects and
+finish ordinary acquisition, not another asset conversion pass.
+The carried-object/stationery batch has connected independent selections. Its donor identity worksheet
 identifies orange paper (`2003`), exercise card (`2523`,
 including all thirteen stamped states), knife and fork (`2530`), coconut
 (`2807`), cedar sapling (`2901`), and spirit (`2D28`, including its instance
 states). Sign board (`251E`) is deferred with custom designs to V4; reuse its
-prepared resources then. Resolve each active family against actual native identities, then connect all matching
-readers, complete resources, behaviours, inventory/menu uses, persistence, and
-independent browser choices. Reuse the installed card/cutlery controls, actual
+prepared resources then. Fixed native identities, complete resources, shared readers,
+behaviours, inventory/menu uses, persistence, and independent browser choices
+are installed for the six V3 carried families. Reuse the installed card/cutlery controls, actual
 exercise controller, shared item converters, and conditional runtime groups.
 Do not make another per-item installer. Golden net/axe/shovel/rod still need
 their actual remaining consumers distinguished from acquisition; retain all
@@ -61,15 +65,25 @@ The policy and fixed pack identities are installed and selectable in development
 Do not mutate quantities during ordinary transfers or load. See the
 [stationery choice contract](../specs/V3_CARRIED_ITEMS.md#global-stationery-quantity-choice).
 
-The current proposal is ABI 368 at
-`build/v3-carried-npc-installed-08/build-lock.json`.
+The current proposal is ABI 369 at
+`build/v3-carried-selection-03/build-lock.json`. Six carried parent choices bring
+the selectable development catalogue to 213. Their masks are `7D`; the sign-board
+bit stays off. Card/cutlery selections activate their existing holiday providers
+without requiring diaries. Spirit selection binds quest availability and Wisp's
+actual character-allocation flags independently of diary/event choices.
+Eleven browser/offline profiles agree, including each family alone, both paper
+modes, pack-only, all-supported, and exact empty V2-14. Complete retained resource
+checks pass. See [the selection checkpoint](checkpoints/V3_CARRIED_SELECTION.md).
+Silent native boot verifies the carried masks, Wisp allocation/service flags,
+and packet guard without faults. Native gameplay/save verification remains open;
+do not repeat unchanged checks.
 The complete `build/v3-carried-batch-prepared-05/` resources are installed without
 reconversion: seven parents, 26 states, fourteen icons, seven handover/police
 models, complete orange-paper artwork, official names, and prices. Additive
 identities, six shared readers, qualified ground categories, and the native
 letter drawing/colour/constructor path are connected. Cedar's category 48 keeps
-the diary-specific source-17 mapping at 44. Ready/selected masks remain zero;
-none of these seven families is newly playable. The carried integration adds
+the diary-specific source-17 mapping at 44. Six families are selectable in
+development; sign boards remain deferred with Able Sisters. The carried integration adds
 41,840 resident bytes without another startup descriptor and 1,984 menu-pool
 bytes in total.
 The connected inventory path supplies four multi-sheet menus, one-sheet pickup,
@@ -162,7 +176,7 @@ card/diary/console records retain their layouts. Two checked obsolete startup
 copies are reclaimed only in the new output ROM; all source ROMs are preserved.
 Three focused sanitized/current-cartridge checks and seven browser/offline
 profiles pass. No native gameplay or hardware result is claimed. Availability
-and all carried readiness/selection bits remain off.
+and carried selection use the independent current-proposal bindings above.
 
 The complete source manager callbacks are installed in native control row 115.
 All 73 existing controls and their relocated callbacks remain intact; the new
@@ -174,7 +188,7 @@ margin and seed; it does not use the ordinary one-tile wandering margin.
 Native placement remains authoritative even when the source debug alias is empty.
 The complete source-manager host check, 108 donor-search comparisons, current
 owner/relocation/resource/startup/patch checks, and seven browser/offline profiles
-pass. Wisp is still disabled because its NPC services are unfinished.
+pass. Wisp's installed NPC services are activated by spirit selection.
 
 The global stationery choice is installed across native shop-floor/display/
 interaction paths and fixed first-job gifts, shared random generation,
@@ -214,11 +228,10 @@ Sanitized cleanup/transfer checks, current full-resource/redirect/relocation/
 startup/patch checks, eight browser/offline profiles, and fault-free silent native
 boot pass. Native boot checks the actual registry, DMA directory, and final packet
 guard; it does not establish Wisp gameplay or saving. Format-19 saves reject older
-readers; four-sheet saves require four-sheet mode. Carried-family admission remains
-off. Verify the remaining actual
-native item-type/menu routes, including existing card/cutlery consumers, then bind
-independent carried selections without making spirits depend on diary admission
-or completed families depend on the deferred sign-board feature.
+readers; four-sheet saves require four-sheet mode. Six-family admission and
+independent selection are connected. Preserve installed card/cutlery consumers,
+independent Wisp admission, and the deferred sign-board bit. Native menu/gameplay
+checks remain part of the assembled-build pass, not a reason to rebuild resources.
 The conversation fixture remains
 incomplete after two setup attempts; retain full sanitizer checks and do not
 retry it again in this batch. These source paths are not native gameplay proof.
@@ -269,8 +282,8 @@ remain unchanged. Detailed diary formats, native bindings, resources, and
 verification limits live in [the diary specification](../specs/V3_DIARIES.md).
 
 The room-representation review identifies sixteen player-saved design forms and
-nine museum fossil placeholders. Custom designs, their editor/saved-pattern
-system, Able Sisters, and the Museum building are V4 work and do not block V3
+nine museum fossil placeholders. Able Sisters, including its editor/saved-pattern
+system, and the Museum building are V4 work and do not block V3
 item/villager imports. The fossil placeholders are museum scenery, not new
 collectibles. The ordinary importer installs both real donor artwork variants,
 school desk and bus stop, while retaining their N64 counterparts. See

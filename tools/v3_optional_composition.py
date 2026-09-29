@@ -197,6 +197,10 @@ def catalogue(image, report):
     diaries = {k:r for k,r in diary_bindings(image, report).items() if r['selectable']}
     if result.keys() & diaries.keys():raise ValueError('Diary identity collides with another import')
     result.update(diaries)
+    from v3_carried_selection import options as carried_options
+    carried = carried_options(image, report)
+    if result.keys() & carried.keys():raise ValueError('Carried identity collides with another import')
+    result.update(carried)
     for row in report['villager_text']['imports']:
         donor = int(row['id'].rsplit('/', 1)[1], 16)
         actor = villager_actor(donor)
@@ -231,8 +235,8 @@ def catalogue(image, report):
     # installs them. Its catalogue must cover its actual installed records only.
     expected = ({row['id'] for row in report['villager_text']['imports']} |
                 {row['id'] for row in furniture_rows} |
-                {item_key(int(row['donor_item_id'], 16)) for row in report['clothing']['imports']} | held.keys() | surfaces.keys() | creatures.keys() | diaries.keys())
-    if (set(result) != expected or len(result) != len(VILLAGERS)+len(furniture_rows)+len(report['clothing']['imports'])+len(held)+len(surfaces)+len(creatures)+len(diaries)):
+                {item_key(int(row['donor_item_id'], 16)) for row in report['clothing']['imports']} | held.keys() | surfaces.keys() | creatures.keys() | diaries.keys() | carried.keys())
+    if (set(result) != expected or len(result) != len(VILLAGERS)+len(furniture_rows)+len(report['clothing']['imports'])+len(held)+len(surfaces)+len(creatures)+len(diaries)+len(carried)):
         raise ValueError('Incomplete or duplicated installed development catalogue')
     return dict(sorted(result.items()))
 
@@ -286,6 +290,9 @@ def resolve(catalog, selected, *, behaviours=None, behaviour_options=None):
         bits=creature_profile([catalog[k] for k in enabled if catalog[k]['kind'] in ('fish','insect')])
         result.update(creature_profile_hex=bits.hex(),creature_profile_sha256=sha256(bits))
         result['registry_versions']['creatures']=1
+    if any(r['kind']=='carried' for r in catalog.values()):
+        result['carried_mask']=sum(catalog[k]['carried_mask'] for k in enabled if catalog[k]['kind']=='carried')
+        result['registry_versions']['carried']=1
     return result
 
 
@@ -406,7 +413,12 @@ def compose(image, report, catalog, selection):
         on = event_active(group, enabled, values)
         for field in group['fields']:
             change(field['offset'], struct.pack('>I', field['enabled'] if on else field['disabled']), group['id'])
+    from v3_carried_selection import masks as carried_masks, checksum_fields as carried_checksums
+    for field in carried_masks(image, report):
+        value=sum(r['mask'] for r in field['members'] if r['id'] in enabled)
+        change(field['offset'], struct.pack('>I', value), 'selected carried family mask')
     for key, row in catalog.items():
+        if row['kind']=='carried':continue
         active = int(key in enabled)
         prefix(row['enable_offset'], active.to_bytes(row['enable_bytes'], 'big'), key)
         if row['kind']=='villager':
@@ -424,7 +436,7 @@ def compose(image, report, catalog, selection):
     from v3_surface_selection import checksum_fields
     from v3_creature_selection import checksum_fields as creature_checksums
     from v3_clothing_install import checksum_fields as clothing_checksums
-    for field in clothing_checksums(image,report)+creature_checksums(image,report)+behaviour_checksums(image,report)+event_checksums(image,report)+checksum_fields(image,report):
+    for field in clothing_checksums(image,report)+creature_checksums(image,report)+behaviour_checksums(image,report)+event_checksums(image,report)+carried_checksums(image,report)+checksum_fields(image,report):
         intermediate=apply_writes(image,writes);at=field['start']
         change(field['offset'],struct.pack('>I',zlib.crc32(intermediate[at:at+field['length']])),
             'selected resource CRC')
@@ -601,6 +613,8 @@ def build(output, selected=(), *, select_all=False, behaviours=None):
             update_behaviours(result,blob,current,selection['behaviours'])
         from v3_holiday_selection import update_report as update_events
         update_events(result,blob,current,selection)
+        from v3_carried_selection import update_report as update_carried
+        update_carried(result,current,selection['enabled'])
         if 'creature_profile_hex' in selection:
             from v3_creature_selection import update_report as update_creatures
             update_creatures(blob,current,selection)

@@ -7,6 +7,17 @@ import { sha256 } from '../web/core.mjs';
 const fixture = JSON.parse(readFileSync(process.argv[2]));
 const base = new Uint8Array(readFileSync(fixture.base)), stable = new Uint8Array(readFileSync(fixture.stable));
 const results = [];
+if (fixture.plan.selection_masks) {
+  const malformed = structuredClone(fixture.plan);
+  malformed.selection_masks[0].members[1].mask = malformed.selection_masks[0].members[0].mask;
+  assert.throws(() => resolveSelection(malformed, []), /mask/i);
+  const missing = structuredClone(fixture.plan);
+  delete missing.selection_masks;
+  assert.throws(() => resolveSelection(missing, []), /selection field/i);
+  const forged = structuredClone(fixture.plan);
+  forged.selection_masks[0].members[0].id = 'GAFE01-r0/item/251E';
+  assert.throws(() => resolveSelection(forged, []), /masked selection/i);
+}
 if (fixture.plan.behaviours?.length) {
   const setting = fixture.plan.behaviours[0].id;
   for (const invalid of [{ unknown: 'N64' }, { [setting]: 'Unknown' }, { [setting]: 1 }, null, []]) {
@@ -36,6 +47,10 @@ for (const row of fixture.cases) {
     assert.equal(resolution.creature_profile_hex, row.selection.creature_profile_hex, row.name);
     assert.equal(receipt.creature_profile_hex, row.selection.creature_profile_hex, row.name);
     assert.equal(receipt.creature_profile_sha256, row.selection.creature_profile_sha256, row.name);
+  }
+  if (row.selection.carried_mask !== undefined) {
+    assert.equal(resolution.carried_mask, row.selection.carried_mask, row.name);
+    assert.equal(receipt.carried_mask, row.selection.carried_mask, row.name);
   }
   assert.equal(Buffer.from(output.subarray(0x10, 0x18)).toString('hex'), Buffer.from(n64Checksum(output)).toString('hex'));
   const restored = output.slice();

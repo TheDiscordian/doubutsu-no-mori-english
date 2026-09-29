@@ -23,6 +23,23 @@ lock or publish experimental V3.
 
 ## Active development
 
+The current development proposal is ABI 369 / format 19 at
+`build/v3-carried-selection-03/build-lock.json`. Orange paper, exercise cards,
+knife and fork, coconut, cedar saplings, and spirits have independent selections
+through the shared offline/browser composers, bringing the development catalogue
+to 213 options. State variants stay with their parent; the sign board stays off.
+Card/cutlery choices activate their installed holiday providers without requiring
+diaries. Spirits independently activate the quest service and Wisp's actual
+character allocation. Existing art, code, and saves are not reconstructed or
+overwritten. Eleven composition profiles and complete resource-preservation
+checks pass. Silent native boot verifies the actual carried/event masks, Wisp
+allocation/service flags, packet guard, and absence of faults; ordinary gameplay
+and native save/reload remain unverified. The remaining V3 item identities are
+the four golden tools; continue their shared behaviour/reward/acquisition paths.
+Carried-family saves require the selected families and cannot load in builds
+without their admission, including ABI 368. Four-sheet saves require pack mode.
+See [the selection checkpoint](checkpoints/V3_CARRIED_SELECTION.md).
+
 The shared stationery implementation has a global `paper-quantities` choice:
 N64 single sheets or GameCube four-sheet packs, across all original/imported
 styles and creation routes. N64 is the default. Preparation at
@@ -105,15 +122,14 @@ including pack-only and exact V2-14 for an empty/default selection.
 The conversation host fixture has
 not executed successfully; its two setup attempts are recorded as incomplete,
 and no further attempt is spent on that fixture in this batch.
-The installed proposal is ABI 368 / format 19, with carried-family selection
-still disabled. Its silent native boot passes at `build/v3-carried-npc-boot-01/`,
+The retained ABI-368 / format-19 provider boot passes at `build/v3-carried-npc-boot-01/`,
 including the six-character registry, ten-bank directory, final packet guard,
 and absence of a faulted thread. Wisp interaction and native save/travel remain
 unverified; no hardware result is claimed. Format-19 saves cannot be read by
 format-18-or-earlier builds, and pack-mode saves still need pack mode. Existing
-ROMs, saves, and both deployed V2 patchers are unchanged. Continue remaining
-carried menu/type consumers and independent selection, excluding sign boards.
-Able Sisters, the Museum building, custom designs, and comparable large features
+ROMs, saves, and both deployed V2 patchers are unchanged. Independent selections
+are connected in the current proposal above; keep gameplay verification explicit.
+Able Sisters (including its custom-design system), the Museum building, and comparable large features
 belong to V4. Unfinished design code is isolated on `v4/deferred-custom-designs`
 at `baded8ca`; its checkpoint there records prepared resources and the unresolved
 save-fixture failure. None of that code is installed in the active V3 build.
