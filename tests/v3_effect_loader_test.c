@@ -34,6 +34,12 @@ int main(void) {
 #ifdef AF_EFFECT_PARTICIPANT_START
         if(i>=AF_EFFECT_ROOM_COUNT+AF_EFFECT_SKY_COUNT)base=AF_EFFECT_PARTICIPANT_START;
 #endif
+#ifdef AF_EFFECT_TREE_START
+        if(i>=AF_EFFECT_ROOM_COUNT+AF_EFFECT_SKY_COUNT+AF_EFFECT_PARTICIPANT_COUNT)base=AF_EFFECT_TREE_START;
+#endif
+#ifdef AF_EFFECT_REWARD_START
+        if(i>=AF_EFFECT_ROOM_COUNT+AF_EFFECT_SKY_COUNT+AF_EFFECT_PARTICIPANT_COUNT+AF_EFFECT_TREE_COUNT)base=AF_EFFECT_REWARD_START;
+#endif
         for(u32 k=0;k<4;k++)body[k]=base+256+k*64;
         af_v3_effect_profile_load(v,v+32,(void *)0x80700000,(void *)0x80700020,out+4);
         assert(!memcmp(out+4,body,32));
@@ -77,6 +83,24 @@ int main(void) {
         if(!setjmp(fault)) {
             af_v3_effect_profile_load(v,v+32,(void *)0x80700000,(void *)0x80700020,out+4);
             assert(!"Wrong participant callback range accepted");
+        }
+    }
+#endif
+#ifdef AF_EFFECT_REWARD_START
+    /* Every callback in each added family must belong to that family's packet,
+     * including a lower bound, an exclusive upper bound, and alignment. */
+    const u32 starts[]={AF_EFFECT_TREE_START,AF_EFFECT_REWARD_START};
+    const u32 ends[]={AF_EFFECT_TREE_END,AF_EFFECT_REWARD_END};
+    for(volatile unsigned family=0;family<2;family++)for(volatile unsigned bad=0;bad<4;bad++) {
+        volatile u32 index=AF_EFFECT_ROOM_COUNT+AF_EFFECT_SKY_COUNT+AF_EFFECT_PARTICIPANT_COUNT;
+        if(family)index+=AF_EFFECT_TREE_COUNT;
+        volatile u32 v=AF_EFFECT_PROFILES+index*64;
+        for(u32 k=0;k<4;k++)body[k]=starts[family]+256+k*64;
+        body[bad]=bad==0?AF_EFFECT_CODE_START:bad==1?starts[family]-4:
+            bad==2?ends[family]:starts[family]+1;
+        if(!setjmp(fault)) {
+            af_v3_effect_profile_load(v,v+32,(void *)0x80700000,(void *)0x80700020,out+4);
+            assert(!"Wrong tree/reward callback range accepted");
         }
     }
 #endif

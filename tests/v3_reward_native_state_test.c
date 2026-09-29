@@ -4,11 +4,20 @@
 #include <stdio.h>
 #include <string.h>
 #include "../overlays/v3/reward_state_native.c"
+#include "../overlays/v3/reward_field_native.c"
+#include "reward_field_source.c"
+#include "reward_clock_reference.c"
 static u8 player_data[4][0xBD0],cards[AF_HC_BYTES],trophies[4];
 static int slot,admitted=15,complete[2],give_result=1,gives,last_condition;
 static u16 last_item;
 static lbRTC_time_c clock_data={.year=2026,.month=9,.day=29};
 static jmp_buf failure;
+static int native_rank=6,native_sets,native_conditions;
+void af_rw_native_rank_set(void) {native_sets++;}
+int af_rw_native_rank_get(void) {return native_rank;}
+int af_rw_native_rank_condition(int *rank,int *x,int *z) {
+    native_conditions++;*rank=native_rank;*x=2;*z=3;return 3;
+}
 u32 af_test_carried_profile[8]={0x41464350,1,26,32,127,127,0,0};
 u32 af_test_event_item_profile=3;
 const u32 af_carried_paper_mode=1;
@@ -63,6 +72,43 @@ int main(void) {
         assert(!af_rw_insert(player_data[(slot+1)%4],0x1000,1));
     }
     slot=0;complete[0]=complete[1]=1;
+    AFRewardGoodField streak;
+    af_rw_field_rank();assert(native_sets==1 && !mFAs_CheckGoodField());
+    assert(af_reward_good_field_get(cards,&streak) && !streak.days && streak.rtc[3]==29);
+    clock_data.hour=23;af_rw_field_rank();assert(!mFAs_CheckGoodField());
+    /* Repeated calls, seconds, and an equal clock cannot count another day. */
+    for(unsigned i=0;i<100;i++)af_rw_field_rank();
+    assert(af_reward_good_field_get(cards,&streak) && !streak.days && !streak.rtc[2]);
+    clock_data.day=30;clock_data.hour=0;af_rw_field_rank();
+    assert(af_reward_good_field_get(cards,&streak) && streak.days==1);
+    clock_data.month=10;clock_data.day=14;af_rw_field_rank();assert(mFAs_CheckGoodField());
+    clock_data.day=20;af_rw_field_rank();assert(af_reward_good_field_get(cards,&streak) && streak.days==15);
+    clock_data.day=19;af_rw_field_rank();assert(!mFAs_CheckGoodField());
+    assert(af_reward_good_field_get(cards,&streak) && !streak.days && streak.rtc[3]==19);
+    clock_data.month=11;af_rw_field_rank();assert(mFAs_CheckGoodField());
+    native_rank=5;int rank=-1,x=-1,z=-1;
+    assert(af_rw_field_condition(&rank,&x,&z)==3 && rank==5 && x==2 && z==3 && native_conditions==1);
+    assert(af_reward_good_field_get(cards,&streak) && !streak.days);
+    for(unsigned i=0;i<8;i++)assert(!streak.rtc[i]);
+    assert(af_rw_field_condition(0,&x,&z)==-1 && native_conditions==1);
+    native_rank=6;clock_data=(lbRTC_time_c){.year=2028,.month=2,.day=28};af_rw_field_rank();
+    clock_data.month=3;clock_data.day=1;af_rw_field_rank();
+    assert(af_reward_good_field_get(cards,&streak) && streak.days==2);
+    AFRewardGoodField before_streak=streak;
+    assert(af_holiday_cards_clear(cards,3) && af_reward_good_field_get(cards,&streak));
+    assert(!memcmp(streak.rtc,before_streak.rtc,8) && streak.days==before_streak.days);
+    admitted=1;clock_data.day=16;af_rw_field_rank();
+    assert(af_reward_good_field_get(cards,&streak) && streak.days==2);
+    admitted=15;af_rw_field_rank();assert(mFAs_CheckGoodField());
+    mFAs_ClearGoodField();assert(!mFAs_CheckGoodField());
+    assert(af_reward_good_field_get(cards,&streak) && !streak.days);
+    const AFRewardGoodField invalid_fields[]={{{0},1},{{0,0,0,30,0,2,7,234},0},
+        {{0,0,24,29,0,9,7,234},0},{{0,0,0,29,7,9,7,234},0},{{0,0,0,29,0,9,7,234},16}};
+    for(unsigned i=0;i<sizeof(invalid_fields)/sizeof(*invalid_fields);i++) {
+        u8 saved_cards[AF_HC_BYTES];memcpy(saved_cards,cards,sizeof(cards));
+        assert(!af_reward_good_field_set(cards,invalid_fields+i) && !memcmp(saved_cards,cards,sizeof(cards)));
+    }
+    for(unsigned i=60;i<64;i++) {cards[i]=1;assert(!af_holiday_cards_valid(cards));cards[i]=0;}
     assert(mSM_CHECK_ALL_FISH_GET() && mSM_CHECK_ALL_INSECT_GET());
     admitted=4;assert(!mSM_CHECK_ALL_FISH_GET() && !mSM_CHECK_ALL_INSECT_GET());
     admitted=15;complete[1]=0;assert(mSM_CHECK_ALL_FISH_GET() && !mSM_CHECK_ALL_INSECT_GET());
@@ -74,5 +120,5 @@ int main(void) {
     slot=4;assert(af_rw_trophy_get(28) && !af_rw_insert(0,0x2239,0));
     assert(!mSM_CHECK_ALL_FISH_GET() && !mSM_CHECK_ALL_INSECT_GET());
     *af_rw_hem_visible()=1;af_rw_reward_reset();assert(!*af_rw_hem_visible() && !recipient && !inserted);
-    puts("Native reward providers: four players, town-first flags, retained birthday year, selected collections, refused insertion, and trophy acknowledgement pass.");
+    puts("Native reward providers: four players, town-first flags, birthday year, selected collections, refused insertion, trophy acknowledgement, whole-source perfect-town streak, leap days, backward clocks, and player clearing pass.");
 }

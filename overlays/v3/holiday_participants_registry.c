@@ -13,7 +13,7 @@ static AFHPResident residents[AF_HP_RESIDENT_COUNT];
 static u8 retiring[AF_HP_RESIDENT_COUNT];
 typedef struct {ACTOR *actor;u8 constructed;mActor_proc move,draw;} Live;
 static Live live[AF_HP_LIVE_COUNT];
-#ifndef AF_HP_CARRIED_REGISTRY
+#if !defined(AF_HP_CARRIED_REGISTRY) && !defined(AF_HP_REWARD_REGISTRY)
 static int af_hp_owner_enabled(const AFHPRecord *record) {
     (void)record;return af_hp_available!=0;
 }
@@ -138,7 +138,8 @@ int af_hp_name_profile(u16 name) {
 }
 static int ready(const AFHPRecord *r) {
     if(!r->source || !r->source->ctor || !r->source->dtor ||
-       !r->source->move || !r->source->draw || (r->kind&~3u) || !r->event ||
+       !r->source->move || !r->source->draw || (r->kind&~7u) ||
+       ((r->kind&AF_HP_REWARD)?(r->event || r->save || (r->kind&AF_HP_NO_SAVE)):!r->event) ||
        r->source->actor_bytes<sizeof(ACTOR) || r->source->actor_bytes>2400)return 0;
     return r->count?(r->part==3 && r->source->actor_bytes>=sizeof(NPC_ACTOR)):
         r->part==7 || (r->part==4 && r->source->actor_bytes==sizeof(ACTOR));
@@ -175,7 +176,13 @@ int af_hp_admit(ACTOR *a,GAME *g) {
     int index=identity(a);
     if(!g || index<0 || !af_hp_owner_enabled(af_hp_records+index) || !ready(af_hp_records+index))return 0;
     const AFHPRecord *r=af_hp_records+index;
-    if(r->kind&AF_HP_NO_SAVE) {
+    if(r->kind&AF_HP_REWARD) {
+#ifdef AF_HP_REWARD_REGISTRY
+        if(!af_rw_owner_active(r,g))return 0;
+#else
+        return 0;
+#endif
+    } else if(r->kind&AF_HP_NO_SAVE) {
 #ifdef AF_HP_EXERCISE_REGISTRY
         int a=af_holiday_native_type(r->event),b=af_holiday_native_type(r->save);
         if(!((a>=0 && af_hp_native_event_status(a,16)) ||
@@ -202,7 +209,7 @@ void af_hp_ctor(ACTOR *a,GAME *g) {
     *slot=(Live){.actor=a};
     /* Some complete source constructors dereference a failed reservation. Admit
      * only after the actual native save area exists, before any source call. */
-    if(!(r->kind&AF_HP_NO_SAVE)) {
+    if(!(r->kind&(AF_HP_NO_SAVE|AF_HP_REWARD))) {
         void *area=mEv_get_save_area(r->event,r->save);
         if(!area)area=mEv_reserve_save_area(r->event,r->save);
         if(!area) {Actor_delete(a);return;}

@@ -209,8 +209,12 @@ typedef struct {
     u32 native_flags;
 } AFHPRecord;
 typedef struct {u16 event_name,texture,resident,cloth;u8 exists,used;u16 pad;} AFHPResident;
-enum {AF_HP_SPECIAL=1,AF_HP_NO_SAVE=2};
-#ifdef AF_HP_CARRIED_REGISTRY
+enum {AF_HP_SPECIAL=1,AF_HP_NO_SAVE=2,AF_HP_REWARD=4};
+#ifdef AF_HP_REWARD_REGISTRY
+enum {AF_HP_OWNER_COUNT=27,AF_HP_RESIDENT_COUNT=19,AF_HP_LIVE_COUNT=28};
+int af_hp_owner_enabled(const AFHPRecord *);
+int af_rw_owner_enabled(const AFHPRecord *),af_rw_owner_active(const AFHPRecord *,GAME *);
+#elif defined(AF_HP_CARRIED_REGISTRY)
 enum {AF_HP_OWNER_COUNT=23,AF_HP_RESIDENT_COUNT=18,AF_HP_LIVE_COUNT=25};
 /* A new family must not inherit another family's selection requirement. */
 int af_hp_owner_enabled(const AFHPRecord *);

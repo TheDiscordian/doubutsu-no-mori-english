@@ -4,23 +4,23 @@
 /* Independent, endian-neutral records. No native Private padding or diary
  * offsets are repurposed. Slot ownership follows the existing town/player
  * save transaction and player-clear hook. */
-enum { AF_HC_BYTES=48,AF_HC_PLAYERS=4,AF_HC_STAMPS=12 };
+enum { AF_HC_LEGACY_BYTES=48,AF_HC_PLAYERS=4,AF_HC_STAMPS=12 };
 #ifdef AF_V3_GOLDEN_REWARD_STORAGE
 #ifndef AF_V3_CARRIED_NPC
 #error Golden reward storage requires the complete carried NPC format
 #endif
-enum { AF_HC_CARRIED_WIRE=7 };
+enum { AF_HC_BYTES=64,AF_HC_CARRIED_WIRE=7 };
 #elif defined(AF_V3_CARRIED_NPC)
 #if !defined(AF_V3_PAPER_PACKS) || !defined(AF_V3_CARRIED_QUEST)
 #error Carried NPC storage requires the shared stationery and hunt formats
 #endif
-enum { AF_HC_CARRIED_WIRE=6 };
+enum { AF_HC_BYTES=48,AF_HC_CARRIED_WIRE=6 };
 #elif defined(AF_V3_PAPER_PACKS)
-enum { AF_HC_CARRIED_WIRE=5 };
+enum { AF_HC_BYTES=48,AF_HC_CARRIED_WIRE=5 };
 #elif defined(AF_V3_CARRIED_QUEST)
-enum { AF_HC_CARRIED_WIRE=4 };
+enum { AF_HC_BYTES=48,AF_HC_CARRIED_WIRE=4 };
 #else
-enum { AF_HC_CARRIED_WIRE=3 };
+enum { AF_HC_BYTES=48,AF_HC_CARRIED_WIRE=3 };
 #endif
 typedef struct {AFDiaryDate last_date;unsigned char days;} AFHolidayCard;
 int af_holiday_cards_valid(const unsigned char *);
@@ -66,6 +66,12 @@ int af_reward_first_present(const unsigned char *,unsigned int);
 int af_reward_mark_first_present(unsigned char *,unsigned int);
 int af_reward_birthday_get(const unsigned char *,unsigned int,AFRewardBirthday *);
 int af_reward_birthday_set(unsigned char *,unsigned int,const AFRewardBirthday *);
+/* The owned sixteen-byte tail stores the source town-wide perfect streak:
+ * RTC bytes 48..55, big-endian count 56..59, and zero reserved bytes 60..63.
+ * The original 48-byte card rows keep their offsets and their contents. */
+typedef struct {unsigned char rtc[8];unsigned int days;} AFRewardGoodField;
+int af_reward_good_field_get(const unsigned char *,AFRewardGoodField *);
+int af_reward_good_field_set(unsigned char *,const AFRewardGoodField *);
 #endif
 #endif
 #endif

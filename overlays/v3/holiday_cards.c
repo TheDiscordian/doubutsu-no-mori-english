@@ -12,6 +12,15 @@ static int valid(const AFHolidayCard *c) {
 static AFHolidayCard decode(const u8 *p) {
     return (AFHolidayCard){{(unsigned short)((unsigned int)p[0]*256+p[1]),p[2],p[3]},p[4]};
 }
+#ifdef AF_V3_GOLDEN_REWARD_STORAGE
+static int good_field_valid(const AFRewardGoodField *s) {
+    const u8 *t=s->rtc;unsigned year=(unsigned)t[6]*256+t[7],any=0;
+    for(unsigned i=0;i<8;i++)any|=t[i];
+    return !any?!s->days:year>=2000 && year<=2099 && t[5]>=1 && t[5]<=12 &&
+        t[3]>=1 && t[3]<=af_diary_days(year,t[5]) && t[2]<24 && t[1]<60 && t[0]<60 &&
+        t[4]<7 && s->days<=15;
+}
+#endif
 int af_holiday_cards_valid(const u8 *data) {
     static const u8 header[16]={'A','F','H','C',1,4,8,0,0,0,0,0,0,0,0,0};
     if(!data)return 0;
@@ -74,6 +83,14 @@ int af_holiday_cards_valid(const u8 *data) {
 #endif
         if(p[5] || p[6] || p[7])return 0;
     }
+#ifdef AF_V3_GOLDEN_REWARD_STORAGE
+    if(data[4]==7) {
+        AFRewardGoodField s;
+        for(unsigned i=0;i<8;i++)s.rtc[i]=data[48+i];
+        s.days=(unsigned)data[56]<<24|(unsigned)data[57]<<16|(unsigned)data[58]<<8|data[59];
+        if(!good_field_valid(&s) || data[60] || data[61] || data[62] || data[63])return 0;
+    }
+#endif
     return 1;
 }
 void af_holiday_cards_reset(u8 *data) {
@@ -143,6 +160,9 @@ int af_carried_save_profile(const u8 *data,unsigned int events,unsigned int enab
 }
 int af_carried_save_bind(u8 *data,unsigned int events,unsigned int enabled) {
     if(!af_carried_save_profile(data,events,enabled))return 0;
+#ifdef AF_V3_GOLDEN_REWARD_STORAGE
+    if(data[4]<7)for(unsigned i=AF_HC_LEGACY_BYTES;i<AF_HC_BYTES;i++)data[i]=0;
+#endif
 #ifdef AF_V3_PAPER_PACKS
     data[15]=(u8)((data[15]&2u)|*(const volatile AFCarryWord *)&af_carried_paper_mode);
 #endif
@@ -198,6 +218,19 @@ int af_reward_birthday_set(u8 *data,unsigned int slot,const AFRewardBirthday *gi
     u8 *p=data+16+slot*8;
     p[5]=(u8)((p[5]&128u)|(gift->year?gift->year-1999u:0));
     p[6]=gift->giver>>8;p[7]=gift->giver;
+    return 1;
+}
+int af_reward_good_field_get(const u8 *data,AFRewardGoodField *out) {
+    if(!out || !af_holiday_cards_valid(data) || data[4]!=7)return 0;
+    for(unsigned i=0;i<8;i++)out->rtc[i]=data[48+i];
+    out->days=(unsigned)data[56]<<24|(unsigned)data[57]<<16|(unsigned)data[58]<<8|data[59];
+    return 1;
+}
+int af_reward_good_field_set(u8 *data,const AFRewardGoodField *value) {
+    if(!value || !good_field_valid(value) || !af_holiday_cards_valid(data) || data[4]!=7)return 0;
+    AFRewardGoodField s=*value;
+    for(unsigned i=0;i<8;i++)data[48+i]=s.rtc[i];
+    data[56]=s.days>>24;data[57]=s.days>>16;data[58]=s.days>>8;data[59]=s.days;
     return 1;
 }
 #endif

@@ -32,7 +32,7 @@ def profile_packet(callbacks,policy_hex,*,code_bounds=(RAM,END)):
     low,high=code_bounds
     if (not 0x80400000<=low<high<=0x80800000 or
             len(callbacks)!=4 or any(type(p)!=int or p&3 or not low<=p<high for p in callbacks) or
-            policy_hex not in ('005000ffc47a0cff','ffff00ffc47a0cff','fffe00ffc47a0cff','ffff00ff44480000','fffe00ff44480000')):
+            policy_hex not in ('005000ffc47a0cff','ffff00ffc47a0cff','fffe00ffc47a0cff','ffff00ff44480000','fffe00ff44480000','00c300ffc47a0cff')):
         raise ValueError('Invalid complete resident sky-effect profile')
     data=struct.pack('>4I',*callbacks)+bytes.fromhex(policy_hex)
     return data+struct.pack('>2I',zlib.crc32(data),0x41464550)+struct.pack('>5I',0,32,0,0,0)+bytes(8)+struct.pack('>I',32)

@@ -169,7 +169,7 @@ def append_banks(base,prior,blob,entries):
     """
     capacity=prior['object_capacity'];end=capacity+len(entries)*2
     wanted=sorted(e[k] for e in entries for k in ('model_bank','texture_bank'))
-    if (not entries or not 448<=capacity<end<=458 or wanted!=list(range(capacity,end)) or
+    if (not entries or not 448<=capacity<end<=460 or wanted!=list(range(capacity,end)) or
             struct.unpack_from('>I',blob,12)[0]!=capacity):
         raise ValueError('Changed additional NPC object-table capacity')
     start=prior['asset']['symbols']['af_v3_object_status']-BLOB_RAM

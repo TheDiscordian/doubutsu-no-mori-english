@@ -63,12 +63,13 @@ ordinary native save/restart and original-hardware compatibility are not claimed
 `tools/v3_holiday_participants.py --rewards` prepares all 70 donor functions
 across `present_demo`, `present_npc`, and `npc_hem` through the existing complete
 participant converter. The current output is
-`build/v3-reward-events-prepared-06/`: the relocatable MIPS object includes the
-real native gift/state adapters and has 7,256 bytes of text, 164 bytes of data,
-and 17 bytes of BSS. Its SHA-256 is
-`e97dedac8d508df886cca67618ce1bad10607941d680cd3504f49ca0ec13c29b`.
-World, NPC, dialogue, and storage bindings remain explicit undefined symbols;
-these actors are not linked or installed. The native NPC prefix is reused;
+`build/v3-reward-events-prepared-17/`: the relocatable MIPS object includes the
+native world, gift/state, resident-mask, registry, perfect-town, birthday-giver,
+and Shrine adapters. It has 19,926 bytes of text, 164 bytes of data,
+and 2,592 bytes of BSS. Its SHA-256 is
+`02d92ad82977edc81b73626917e79893659bcb537168f77ebb32a5e053e2df79`.
+Eight dialogue/effect/scene services remain explicit undefined symbols;
+these actors are not finally linked or installed. The native NPC prefix is reused;
 donor world/private structures do not alias native memory.
 
 The gift NPC enters the existing end waiter after inserting its gift. The
@@ -116,30 +117,52 @@ has 5,200 bytes of text, four bytes of data, and 22 bytes of BSS; SHA-256
 Scene teardown must call `af_rw_effect_reset` before the native light list is
 freed; this hook is not installed yet.
 
-The reward preparation includes a 13,504-byte complete save adapter under
-`storage/`, within the retained 16-KiB reservation. Proposed format 20/wire 7
+The reward preparation includes a 14,320-byte complete save adapter under
+`storage/`, within a checked new 16-KiB reservation at `807C9040`. It cannot
+overwrite the retained adapter at `807BB000`; existing public entries must
+redirect to the new complete adapter. Proposed format 20/wire 7
 explicitly assigns the three spare bytes of each existing 48-byte card record.
 They store each player's birthday giver and celebrated year, plus independent
 town-first rod/net flags. Stamp updates preserve the new fields; player clearing
 removes that player's birthday fields without removing town-first flags.
-The existing 120,352-byte scratch reservation and native Private layout do not
-grow. Format-19 and earlier saves migrate forward; old readers reject format-20
+An additional sixteen-byte tail retains the source perfect-town clock/streak,
+making the owned record 64 bytes at `807C9000`. Player clearing preserves this
+town state. The whole source counter advances only across forward dates,
+resets on backward clocks or non-perfect assessment, and clamps at fifteen days.
+The checked scratch reservation grows from 120,352 to 120,368 bytes; native
+Private layout does not grow. Old formats read exactly the legacy 48 bytes,
+then initialise the new tail. Format-19 and earlier saves migrate forward; old readers reject format-20
 saves. Format 20 is prepared, not the format of the current ABI-370 ROM.
 
 Real gift providers use selected-species completion, selected tool readiness,
 the native inventory insertion, and the existing trophy flags 28–31. A refused
 insertion cannot start handover, advance the gift callback, or mark a trophy.
 Marking requires acknowledgement of that player's successful gift insertion.
-The birthday clear preserves the celebrated year. These providers do not yet
-create the birthday giver, admit actors, or implement the Shrine eligibility.
+The birthday clear preserves the celebrated year. The whole donor giver-choice
+functions use native memories at `animal+10`, stride `B0`, and friendship byte
+`28`, verified against complete native routines rather than stale header comments.
+The source Donkey Kong gift `1DB0` maps through the shared identity resolver to
+its native counterpart `1D30`.
 
-Eight focused checks pass across `tests.test_v3_reward_events`, the current
-format-19 shared storage fixture, and the shared material-format check. They
+The shared registry preparation retains all 23 installed owners and adds four
+reward roles, with 19 resident masks and 28 live slots. Birthday residents and
+gift Tortimer use distinct native construction paths; no false calendar records
+are allocated for gifts. The native Shrine keeps its complete assessment,
+apologies, model, and drawing. Separate appearance state and its own clip do not
+overwrite the native eight-byte clip. Native callbacks resolve through the
+actor's loaded descriptor, not fixed overlay VMAs. Eligibility and deferred
+Farley spawning are prepared, but their native hooks and final scene admission
+are not installed.
+
+Ten current focused reward/storage/registry/mask/Shrine/birthday/loader checks
+pass in `tests.test_v3_reward_events`. Retained artwork, effect, audio, and
+format-19 evidence is not replayed. The checks
 cover complete source callbacks, every converted model texture/vertex/triangle,
 reused artwork, source audio receipts, visibility/light lifetimes, drawing
 capacity, net/rod/axe transactions, four-player reward providers, the actual
 format-20 save transaction, all prior wire migrations, and rejection before
-writes. Native services are doubled; native conversations and save/restart are
+writes. The birthday fixture retains the source's unused local with the same
+warning exclusion as the MIPS compile. Native services are doubled; native conversations and save/restart are
 not claimed. The unchanged Farley artwork evidence remains valid.
 ABI 370, its format-19 cartridge, and both V2 deployments remain unchanged.
 These preparations do not make the other tools selectable.
@@ -162,7 +185,8 @@ The mapped remaining connections are:
 - Bind the prepared format-20/wire-7 adapter through the shared public save
   entries and bind the real gift/state providers to it. Reuse the prepared
   record assignment and passing migration tests; do not invent another storage
-  format for these same fields. Complete the real birthday-giver selection.
+  format for these same fields. Connect the prepared birthday-giver selection
+  to actual eligibility, year/giver state, and house/scene entry.
   The complete source retains birthday/lighthouse branches; the lighthouse
   building is outside V3 and must not be silently represented as implemented.
 - Connect the prepared reward-family trophy/insertion providers; preserve the
@@ -174,7 +198,9 @@ The mapped remaining connections are:
   transition and source tick rate; do not reconvert the prepared resources.
 - Bind the prepared spirit artwork through the existing additional-character
   registry, retaining complete source callbacks, native services, and fade.
-  Profiles F1–F3, names D0CE–D0CF, and banks 458–459 were inspected as potential
-  free identities, but are not yet reserved. Recheck before reserving them.
+  Prepared identities are profiles F1–F4, names D0CE–D0D0, and banks 458–459;
+  the checked preparation rejects collisions. Farley and gift Tortimer extend
+  the six complete additional-character rows to eight. Reuse installed full
+  Tortimer artwork and the checked Farley conversion; do not reconvert either.
 - Apply official gift/Shrine messages through the single provenance catalogue,
   then connect optional selections and focused combined gameplay/save checks.

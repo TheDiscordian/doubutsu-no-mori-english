@@ -14,7 +14,7 @@ VILLAGERS = {
 # Special actors are not ordinary residents or individually selectable villagers.
 # Native profiles C9/CA/CB are the no-demo sentinel, summer tent, and balloon.
 # The existing camper mask uses D08F. These reservations do not enable spawning.
-SPECIAL_NPC_REGISTRY_VERSION = 5
+SPECIAL_NPC_REGISTRY_VERSION = 6
 SPECIAL_NPCS = {
     'GAFE01-r0/npc/ev-soncho2': dict(donor_name=0xD074, donor_profile=0xCC,
         name=0xD090, profile=0xCC, model_bank=448, texture_bank=449),
@@ -30,6 +30,19 @@ SPECIAL_NPCS = {
         name=0xD0B3, profile=0xE5, model_bank=448, texture_bank=449, draw_index=358),
     'GAFE01-r0/npc/ev-ghost': dict(donor_name=0xD06F, donor_profile=0xB7,
         name=0xD0CD, profile=0xF0, model_bank=456, texture_bank=457, draw_index=349),
+    'GAFE01-r0/npc/hem': dict(donor_name=0xD08E, donor_profile=0xF2,
+        name=0xD0CF, profile=0xF3, model_bank=458, texture_bank=459, draw_index=380),
+    'GAFE01-r0/npc/present-tortimer': dict(donor_name=0xD073, donor_profile=0xC7,
+        name=0xD0D0, profile=0xF4, model_bank=448, texture_bank=449, draw_index=354),
+}
+
+# The gift resident shares the complete gift callbacks, not Tortimer's artwork.
+# These scene-owned identities have no calendar event or event-save allocation.
+REWARD_PARTICIPANTS = {
+    'present_demo': dict(profile=0xF1,name=0,source=0,count=0,event=0,save=0,kind=4),
+    'present_npc': dict(profile=0xF2,name=0xD0CE,source=0xD073,count=1,event=0,save=0,kind=4),
+    'npc_hem': dict(profile=0xF3,name=0xD0CF,source=0xD08E,count=1,event=0,save=0,kind=5),
+    'present_tortimer': dict(profile=0xF4,name=0xD0D0,source=0xD073,count=1,event=0,save=0,kind=5),
 }
 
 # Shared event actors are resident villagers in temporary roles, not additional

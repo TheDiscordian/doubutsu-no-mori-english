@@ -71,7 +71,7 @@ int main(void) {
         af_save_runtime.working[AF_SAVE_REWARD_OFFSET+player*12+8]=8;
     }
 #endif
-    CHECK(AF_CONSOLE_RAW+16==120352 && af_carried_save_enabled()==127);
+    CHECK(AF_CONSOLE_RAW+16==120304+AF_HC_BYTES && af_carried_save_enabled()==127);
     CHECK(af_v3_card_data()[4]==AF_HC_CARRIED_WIRE && af_v3_card_data()[7]==3 && af_v3_card_data()[8]==127);
 #ifdef AF_V3_CARRIED_QUEST
     CHECK(af_carried_quest_day(af_v3_card_data())==0);
@@ -87,6 +87,9 @@ int main(void) {
     CHECK(!af_carried_quest_set_weeds(af_v3_card_data(),2));
 #endif
 #ifdef AF_V3_GOLDEN_REWARD_STORAGE
+    AFRewardGoodField good={{5,4,3,29,2,9,7,234},15},got_good;
+    CHECK(af_reward_good_field_set(af_v3_card_data(),&good));
+    CHECK(af_reward_good_field_get(af_v3_card_data(),&got_good) && got_good.days==15 && !memcmp(got_good.rtc,good.rtc,8));
     CHECK(!af_reward_first_present(af_v3_card_data(),3));
     CHECK(af_reward_mark_first_present(af_v3_card_data(),1));
     CHECK(af_reward_first_present(af_v3_card_data(),3)==1);
@@ -142,18 +145,18 @@ int main(void) {
     memcpy(card_before,af_v3_card_data(),AF_HC_BYTES);diary_before=*af_v3_diary_data();
     CHECK(af_v3_save_sync()==0 && chip[0xF985]==AF_HC_CARRIED_WIRE+13);
     memcpy(saved,chip,65536);u32 writes_before=writes,erases_before=erases;
-    CHECK(af_old_expand_cards(saved,65536,expanded,sizeof(expanded))==AF_CZ_FORMAT);
+    CHECK(af_old_expand_cards(saved,65536,expanded,sizeof(expanded)-AF_HC_BYTES+AF_HC_LEGACY_BYTES)==AF_CZ_FORMAT);
 #ifdef AF_V3_CARRIED_QUEST
-    CHECK(af_v16_expand_cards(saved,65536,expanded,sizeof(expanded))==AF_CZ_FORMAT);
+    CHECK(af_v16_expand_cards(saved,65536,expanded,sizeof(expanded)-AF_HC_BYTES+AF_HC_LEGACY_BYTES)==AF_CZ_FORMAT);
 #endif
 #ifdef AF_V3_PAPER_PACKS
-    CHECK(af_v17_expand_cards(saved,65536,expanded,sizeof(expanded))==AF_CZ_FORMAT);
+    CHECK(af_v17_expand_cards(saved,65536,expanded,sizeof(expanded)-AF_HC_BYTES+AF_HC_LEGACY_BYTES)==AF_CZ_FORMAT);
 #endif
 #ifdef AF_V3_CARRIED_NPC
-    CHECK(af_v18_expand_cards(saved,65536,expanded,sizeof(expanded))==AF_CZ_FORMAT);
+    CHECK(af_v18_expand_cards(saved,65536,expanded,sizeof(expanded)-AF_HC_BYTES+AF_HC_LEGACY_BYTES)==AF_CZ_FORMAT);
 #endif
 #ifdef AF_V3_GOLDEN_REWARD_STORAGE
-    CHECK(af_v19_expand_cards(saved,65536,expanded,sizeof(expanded))==AF_CZ_FORMAT);
+    CHECK(af_v19_expand_cards(saved,65536,expanded,sizeof(expanded)-AF_HC_BYTES+AF_HC_LEGACY_BYTES)==AF_CZ_FORMAT);
 #endif
     CHECK(af_v3_save_expand_cards(saved,65536,expanded,sizeof(expanded))==0);
     CHECK(!memcmp(expanded+AF_CZ_RAW+AF_CZ_FISHING_EXTRA,card_before,AF_HC_BYTES));
@@ -169,6 +172,7 @@ int main(void) {
     CHECK(af_holiday_cards_clear(clearing,0));
     CHECK(af_holiday_cards_clear(clearing,1));
     CHECK(af_reward_first_present(clearing,3)==3);
+    CHECK(af_reward_good_field_get(clearing,&got_good) && got_good.days==15 && !memcmp(got_good.rtc,good.rtc,8));
 #endif
 #ifdef AF_V3_CARRIED_QUEST
     CHECK(af_carried_quest_day(af_v3_card_data())==0x021D);
@@ -253,6 +257,7 @@ int main(void) {
         memset(cards+8,0,8);
 #ifdef AF_V3_GOLDEN_REWARD_STORAGE
         for(u32 slot=0;slot<4;slot++)memset(cards+16+slot*8+5,0,3);
+        memset(cards+AF_HC_LEGACY_BYTES,0xA5,AF_HC_BYTES-AF_HC_LEGACY_BYTES);
 #endif
 #ifdef AF_V3_CARRIED_QUEST
         if(version==3) {cards[7]=3;cards[8]=127;cards[9]=1;cards[12]=1;}
@@ -281,6 +286,10 @@ int main(void) {
         CHECK(af_v3_save_check(bank,65536,af_save_current,0)>0);
         af_v3_save_commit(bank,af_save_live,AF_SAVE_PAYLOAD);
         CHECK(af_v3_card_data()[4]==AF_HC_CARRIED_WIRE && af_v3_card_data()[8]==127);
+#ifdef AF_V3_GOLDEN_REWARD_STORAGE
+        CHECK(af_reward_good_field_get(af_v3_card_data(),&got_good) && !got_good.days);
+        for(unsigned i=0;i<8;i++)CHECK(!got_good.rtc[i]);
+#endif
 #ifdef AF_V3_PAPER_PACKS
         CHECK(af_v3_card_data()[15]==TEST_PAPER_MODE);
 #endif

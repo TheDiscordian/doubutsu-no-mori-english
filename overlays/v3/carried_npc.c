@@ -10,6 +10,9 @@ extern void af_hp_native_dying(int,ACTOR *);
 
 int af_hp_owner_enabled(const AFHPRecord *record) {
     if(!record)return 0;
+#ifdef AF_HP_REWARD_REGISTRY
+    if(record->kind&AF_HP_REWARD)return af_rw_owner_enabled(record);
+#endif
     if(record->event==114)
         return *(const volatile u32 *)&af_cw_available==1 && af_carried_quantity(0x2D28)==1;
     return af_hp_available!=0;

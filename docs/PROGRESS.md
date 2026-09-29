@@ -62,8 +62,15 @@ the shared artwork conversion checks, including the source fade material.
 The complete Shrine sphere/sparkle/ground-light effects, artwork, and audio are
 prepared. Real native gift/state providers and proposed format-20/wire-7 storage
 pass focused four-player transaction/migration checks, with source handovers
-blocked on refused insertion. These resources are not installed or selectable;
-registry/entrance conditions, storage redirects, effect/scene cleanup, official
+blocked on refused insertion. The preparation retains every existing registry
+owner, adds distinct birthday/Farley/mayor roles, and uses verified native
+friendship fields for the whole-source birthday giver choice. Separate Shrine
+state preserves its native assessment and resolves original callbacks through
+the loaded actor descriptor. The saved perfect-town streak follows the whole
+source date rules in a checked 64-byte record and relocated storage packet.
+Ten current focused checks pass; unchanged artwork/effect evidence is retained.
+These resources are not installed or selectable;
+house/scene entrance conditions, storage redirects, effect/scene cleanup, official
 messages, and combined gameplay/save checks remain.
 The [golden-tool checkpoint](checkpoints/V3_GOLDEN_TOOLS.md#next-connected-consumers)
 records the mapped next connections. The current ROM and deployed patchers do

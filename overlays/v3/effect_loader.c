@@ -20,6 +20,14 @@ extern void af_effect_fault(const char *,const char *);
 #ifndef AF_EFFECT_PARTICIPANT_COUNT
 #define AF_EFFECT_PARTICIPANT_COUNT (AF_EFFECT_COUNT-AF_EFFECT_ROOM_COUNT-AF_EFFECT_SKY_COUNT)
 #endif
+#ifndef AF_EFFECT_TREE_COUNT
+#define AF_EFFECT_TREE_COUNT (AF_EFFECT_COUNT-AF_EFFECT_ROOM_COUNT-AF_EFFECT_SKY_COUNT-AF_EFFECT_PARTICIPANT_COUNT)
+#endif
+#ifndef AF_EFFECT_REWARD_COUNT
+#define AF_EFFECT_REWARD_COUNT 0
+#endif
+_Static_assert(AF_EFFECT_ROOM_COUNT+AF_EFFECT_SKY_COUNT+AF_EFFECT_PARTICIPANT_COUNT+
+    AF_EFFECT_TREE_COUNT+AF_EFFECT_REWARD_COUNT==AF_EFFECT_COUNT,"Complete effect callback ranges");
 #ifdef __mips__
 #define effect_room_loader (*(int (**volatile)(void))0x804B1E08u)
 #else
@@ -56,10 +64,16 @@ void af_v3_effect_profile_load(u32 first,u32 last,void *ram,void *ram_end,void *
     }
 #endif
 #ifdef AF_EFFECT_TREE_START
-    else {low=AF_EFFECT_TREE_START;high=AF_EFFECT_TREE_END;}
-#else
-    else invalid();
+    else if ((first-AF_EFFECT_PROFILES)/64u<AF_EFFECT_ROOM_COUNT+AF_EFFECT_SKY_COUNT+AF_EFFECT_PARTICIPANT_COUNT+AF_EFFECT_TREE_COUNT) {
+        low=AF_EFFECT_TREE_START;high=AF_EFFECT_TREE_END;
+    }
 #endif
+#ifdef AF_EFFECT_REWARD_START
+    else if ((first-AF_EFFECT_PROFILES)/64u<AF_EFFECT_COUNT) {
+        low=AF_EFFECT_REWARD_START;high=AF_EFFECT_REWARD_END;
+    }
+#endif
+    else invalid();
 #ifdef __mips__
     if ((uptr)destination<0x80000000u || (uptr)destination>0x80800000u-32u) invalid();
 #endif

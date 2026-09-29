@@ -12,6 +12,8 @@ static u16 last_item;
 static void *handover;
 static int window,private_data;
 static u8 first_present;
+static unsigned ticks=1;
+int af_hp_countdown(int value) {return value>0 && (unsigned)value>ticks?value-(int)ticks:0;}
 void none_proc1(void) {}
 void *af_rw_private(void) {return &private_data;}
 void *af_cw_handover_master(void) {return handover;}
@@ -56,6 +58,7 @@ void mFAs_ClearGoodField(void) {clears++;}
 void mDemo_Set_talk_return_get_golden_axe_demo(int yes) {assert(yes);returns++;}
 static int unexpected(void) {assert(0);return 0;}
 void af_rw_npc_save(ACTOR *a,GAME *g) {unexpected();}
+void af_rw_release_gift_mask(ACTOR *a) {unexpected();}
 int mDemo_Request(int type,ACTOR *a,void (*f)(ACTOR *)) {return unexpected();}
 int mDemo_Check(int type,ACTOR *a) {return unexpected();}
 void mDemo_Set_ListenAble(void) {}
@@ -66,7 +69,7 @@ int af_rw_weather(void) {return unexpected();}
 u8 *af_rw_menu_refuse(GAME *g) {unexpected();return NULL;}
 void Actor_delete(ACTOR *a) {unexpected();}
 u16 af_rw_umbrella(NPC_ACTOR *a) {return unexpected();}
-int *af_rw_sub_animation(NPC_ACTOR *a) {unexpected();return NULL;}
+u8 *af_rw_sub_animation(NPC_ACTOR *a) {unexpected();return NULL;}
 int mNpc_GetNpcLooks(ACTOR *a) {return unexpected();}
 void mDemo_Set_msg_num(int n) {assert(n==MSG_HEM_GOLD_AXE1);messages++;}
 float fqrand(void) {return unexpected();}
@@ -108,7 +111,14 @@ int main(void) {
     assert(!hem.reward_ready && hem.talk_timer==90 && !inserts && !messages && !marks && !clears && !returns && !orders);
     refuse=0;assert(!aNHM_talk_init((ACTOR *)&hem,0));
     assert(hem.reward_ready && hem.talk_timer==89 && inserts==1 && messages==1 && marks==1 && clears==1 && returns==1);
-    for(unsigned i=0;i<88;i++)assert(!aNHM_talk_init((ACTOR *)&hem,0));
+    for(unsigned i=0;i<100;i++)aNHM_set_force_talk_info_talk_request((ACTOR *)&hem);
+    assert(inserts==1 && marks==1 && messages==1 && clears==1 && returns==1);
+    ticks=0;
+    for(unsigned i=0;i<10;i++)assert(!aNHM_talk_init((ACTOR *)&hem,0));
+    assert(hem.talk_timer==89);
+    ticks=2;
+    for(unsigned i=0;i<44;i++)assert(!aNHM_talk_init((ACTOR *)&hem,0));
+    assert(hem.talk_timer==1);
     assert(aNHM_talk_init((ACTOR *)&hem,0));
     assert(inserts==1 && !orders && hem.talk_proc==aNHM_trans_demo_start_wait_talk_proc);
     handover=&hem;hem.talk_proc(&hem,0);

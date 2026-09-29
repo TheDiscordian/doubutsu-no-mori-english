@@ -1117,6 +1117,7 @@ def optional_card_source(body):
 def prepare_reward_events(output,lock):
     """Convert the complete connected golden-tool gift owners as one family."""
     from v3_furniture_install import inputs
+    from v3_password_policy import function
     out=output.resolve()
     if out.exists() or not out.is_relative_to(ROOT/'build'):
         raise ValueError('Use a fresh ignored reward-event preparation')
@@ -1125,9 +1126,9 @@ def prepare_reward_events(output,lock):
         (DONOR/'config/GAFE01_00/foresta/symbols.txt').read_bytes())
     family=('present_demo','present_npc','npc_hem')
     headers=('m_soncho.h','m_private.h','m_item_name.h','m_house.h','m_submenu.h',
-             'ac_handOverItem.h','m_kankyo.h')
+             'ac_handOverItem.h','m_kankyo.h','m_field_assessment.h','lb_rtc.h')
     generated,report=generate(source,family=family,
-        reference_sha='b944033494a98afee09bcf72398729743881f0da6fd97f73ebe0316f8f5b0565',
+        reference_sha='488d035c69c669dd87fe9766fd8e3b6d9e2c4d0f95a463d92d444a3f0b2012fd',
         extra_headers=headers)
     substitutions=(
         ('#include "holiday_participants.h"','#include "reward_event.h"'),
@@ -1197,6 +1198,9 @@ def prepare_reward_events(output,lock):
             reason='A refused native insertion cannot advance handover or mark a trophy'))
     for old,new in (
         ('    u8 trans_flag;\n','    u8 trans_flag;\n    u8 reward_ready;\n'),
+        ('static void aNHM_set_force_talk_info_talk_request(ACTOR* actor) {\n',
+         'static void aNHM_set_force_talk_info_talk_request(ACTOR* actor) {\n'
+         '    if (((NPC_HEM_ACTOR*)actor)->reward_ready) return;\n'),
         ('        actor->actor.schedule.schedule_proc = aNHM_schedule_proc;',
          '        actor->reward_ready = FALSE;\n'
          '        actor->actor.schedule.schedule_proc = aNHM_schedule_proc;'),
@@ -1204,16 +1208,117 @@ def prepare_reward_events(output,lock):
          '    if (!hem->reward_ready) {\n'
          '        aNHM_set_force_talk_info_talk_request(actorx);\n'
          '        if (!hem->reward_ready) return FALSE;\n'
-         '    }\n    hem->talk_timer--;')):
+         '    }\n    hem->talk_timer = af_hp_countdown(hem->talk_timer);')):
         if generated['npc_hem.c'].count(old)!=1:raise ValueError('Changed Shrine gift acknowledgement')
         generated['npc_hem.c']=generated['npc_hem.c'].replace(old,new)
         adaptations.append(dict(source=old,native=new,count=1,
-            reason='Retry refused Shrine insertion before enabling the timed handover'))
+            reason='Retry refused Shrine insertion before the source-tick-counted handover'))
     for stem in family:
         if re.search(r'\b(?:Common_Get|Common_GetPointer|Save_Get|Save_GetPointer|Save_Set)\(',generated[stem+'.c']):
             raise ValueError('Unmapped native state in complete reward owner: '+stem)
+    # The full gift family retains its lighthouse source for the facility
+    # port, but V3 cannot arm those branches or link nonexistent world services.
+    name='present_demo.c';body=generated[name]
+    begin=body.index('    } else if (mSC_LightHouse_Event_Check(')
+    end=body.index('    } else {',begin)
+    body=body[:begin]+'    }\n#ifdef AF_V4_LIGHTHOUSE_REWARDS\n    '+body[begin+6:end]+ \
+        '    }\n#endif\n    else {'+body[end+12:]
+    body=body.replace('SP_NPC_PRESENT_NPC','af_rw_present_name()')
+    generated[name]=body
+    name='present_npc.c';body=generated[name]
+    begin=body.index('                case aPRD_TYPE_SONCHO_VACATION0_CONTRIBUTED:',
+        body.index('static void aPST_set_talk_info'))
+    end=body.index('\n            }',begin)
+    body=body[:begin]+'#ifdef AF_V4_LIGHTHOUSE_REWARDS\n'+body[begin:end]+'\n#endif'+body[end:]
+    old='static void aPST_actor_dt(ACTOR* actorx, GAME* game) {\n'
+    if body.count(old)!=1:raise ValueError('Changed complete gift mask destructor')
+    generated[name]=body.replace(old,old+'    af_rw_release_gift_mask(actorx);\n')
+    adaptations.append(dict(source='lighthouse reward branches',native='AF_V4_LIGHTHOUSE_REWARDS',
+        reason='The lighthouse facility is outside V3; no success-returning substitutes'))
+    # Retain the complete donor streak routine, not a guessed counter that
+    # advances on every visit. Its eight-byte RTC and int are explicitly owned.
+    field_path=DONOR/'src/game/m_field_assessment.c'
+    if sha256(field_path.read_bytes())!='c982c9ff760f82f56599c2874ecd52fc9db36bc0bab172e63ec6d8909c19abaf':
+        raise ValueError('Changed whole donor perfect-town streak source')
+    field_names=('mFAs_ClearGoodField_common','mFAs_ClearGoodField','mFAs_CheckGoodField','mFAs_SetGoodField')
+    field_functions=[];field_pieces=['#include "reward_event.h"','#include "constants.h"',
+        'typedef AFRewardField mFAs_GoodField_c;',
+        'static const lbRTC_time_c af_rw_clear_clock={0};']
+    for name in field_names:
+        matches=[at for at,rows in source.functions.items() if any(n==name for n,_ in rows)]
+        if len(matches)!=1:raise ValueError('Incomplete perfect-field source: '+name)
+        field_functions.append(source.function(matches[0])[1])
+        body=function(field_path.read_text(),name)
+        body=body.replace('Save_GetPointer(good_field)','af_rw_good_field()')
+        body=body.replace('Save_Get(good_field.perfect_day_streak)','af_rw_good_field()->perfect_day_streak')
+        body=body.replace('Common_GetPointer(time.rtc_time)','af_cw_clock()')
+        body=body.replace('mTM_rtcTime_clear_code','af_rw_clear_clock').replace('mTM_AreTimesEqual','af_rw_times_equal')
+        if name=='mFAs_SetGoodField':body=body.replace('static void mFAs_SetGoodField(','void af_rw_record_rank(')
+        if name in ('mFAs_ClearGoodField','mFAs_SetGoodField'):
+            if not body.endswith('}'):raise ValueError('Changed source streak function ending')
+            body=body[:-1]+'    af_rw_flush_good_field();\n}'
+        if re.search(r'\b(?:Common_Get|Common_GetPointer|Save_Get|Save_GetPointer)\(',body):
+            raise ValueError('Unbound perfect-field source state')
+        field_pieces.append(body)
+    generated['reward_field_source.c']='\n\n'.join(field_pieces)+'\n'
+    # These whole donor clock routines are a host-test reference only. MIPS
+    # binds their complete, layout-equivalent native RTC counterparts.
+    clock_path=DONOR/'src/lb_rtc.c';clock_functions=[]
+    clock_pieces=['#include "reward_event.h"','#include "constants.h"']
+    for name in ('lbRTC_IsOverTime','lbRTC_GetIntervalDays','lbRTC_TimeCopy'):
+        matches=[at for at,rows in source.functions.items() if any(n==name for n,_ in rows)]
+        if len(matches)!=1:raise ValueError('Missing whole donor RTC function: '+name)
+        clock_functions.append(source.function(matches[0])[1]);clock_pieces.append(function(clock_path.read_text(),name))
+    generated['reward_clock_reference.c']='\n\n'.join(clock_pieces)+'\n'
+    # Keep the whole source giver-choice functions. Only the save view and
+    # equivalent native identity/memory services change at this boundary.
+    birthday_functions=[];birthday_pieces=['#include "reward_birthday_native.h"',
+        '#define ANIMAL_NUM_MAX 15', '#define ANIMAL_MEMORY_NUM 7',
+        '#define FALSE 0', '#define TRUE 1']
+    for path,name in (
+            ('src/game/m_npc.c','mNpc_CheckFriendship'),
+            ('src/actor/npc/ac_npc_p_sel2_talk.c_inc','aNPS2_chk_friendship_npc'),
+            ('src/actor/npc/ac_npc_p_sel2_talk.c_inc','aNPS2_decide_birthday_npc')):
+        raw=read(path,report['references'])
+        matches=[at for at,rows in source.functions.items() if any(n==name for n,_ in rows)]
+        if len(matches)!=1:raise ValueError('Missing whole birthday giver function: '+name)
+        original=function(raw,name)
+        body=original
+        for before,after in (
+                ('PersonalID_c','AFRewardPersonalID'),('Animal_c','AFRewardAnimal'),
+                ('Save_Get(animals[max_idx])','af_rw_birthday_animals()[max_idx]'),
+                ('Save_Get(animals[0])','af_rw_birthday_animals()[0]'),
+                ('Save_Get(animals)','af_rw_birthday_animals()'),
+                ('&Now_Private->player_ID','(AFRewardPersonalID *)af_rw_private()'),
+                ('Common_Get(now_private)->birthday_present_npc','af_rw_birthday_giver()'),
+                ('mNpc_CheckFreeAnimalPersonalID','af_rw_native_free_animal'),
+                ('mNpc_GetHighestFriendshipIdx','af_rw_native_highest_friendship'),
+                ('mPr_CheckCmpPersonalID','af_rw_native_compare_player'),
+                ('static int aNPS2_chk_friendship_npc','int af_rw_birthday_friendship'),
+                ('static mActor_name_t aNPS2_decide_birthday_npc','u16 af_rw_birthday_choose')):
+            body=body.replace(before,after)
+        if re.search(r'\b(?:Common_Get|Save_Get)\(',body):
+            raise ValueError('Unbound birthday giver state')
+        birthday_pieces.append(body)
+        birthday_functions.append(dict(**source.function(matches[0])[1],
+            source_sha256=sha256(original.encode()),adapted_sha256=sha256(body.encode())))
+    generated['reward_birthday_source.c']='\n\n'.join(birthday_pieces)+'\n'
+    from v3_item_destinations import destinations
+    birthday_item=destinations(base,prior,[0x1DB0],lock=lock)
+    if len(birthday_item)!=1 or birthday_item[0]['item']!=0x1D30:
+        raise ValueError('Changed native birthday console identity')
+    old='present = FTR_START(FTR_FAMICOM_COMMON02);'
+    if generated['present_demo.c'].count(old)!=1:
+        raise ValueError('Changed source birthday present')
+    generated['present_demo.c']=generated['present_demo.c'].replace(old,
+        'present = AF_RW_BIRTHDAY_ITEM;')
+    from v3_reward_bindings import registry as reward_registry,resolve as reward_bindings,layout as reward_layout
+    generated['reward_registry.c'],registry_report=reward_registry(base,prior,source)
+    memory=reward_layout(prior)
     generated['constants.h']=constants('\n'.join(v for k,v in generated.items() if k!='constants.h'),
         report['references'],CONSTANT_HEADERS+headers)
+    generated['constants.h']+='\n#undef SP_NPC_HEM\n#define SP_NPC_HEM 0xD0CF\n'
+    generated['constants.h']+='\n#define AF_RW_BIRTHDAY_ITEM 0x1D30\n'
     out.mkdir(parents=True)
     for name,body in generated.items():write_new(out/name,body.encode())
     docker=['docker','run','--rm','--network','none','--user',f'{os.getuid()}:{os.getgid()}',
@@ -1226,11 +1331,26 @@ def prepare_reward_events(output,lock):
         '-ffunction-sections','-fdata-sections','-fstack-usage','-Wall','-Wextra','-Werror',
         '-Wno-unused-variable','-Wno-unused-but-set-variable','-Wno-parentheses',
         '-I/source/overlays/v3','-I/out']
-    run('gcc',*flags,*(stem+'.c' for stem in family))
+    run('gcc',*flags,*(stem+'.c' for stem in family),'reward_field_source.c','reward_birthday_source.c')
     state_flags=tuple('-D'+n+'=1' for n in ('AF_V3_CARRIED_PROFILE','AF_V3_CARRIED_QUEST',
         'AF_V3_PAPER_PACKS','AF_V3_CARRIED_NPC','AF_V3_GOLDEN_REWARD_STORAGE'))
-    run('gcc',*flags,*state_flags,'/source/overlays/v3/reward_state_native.c')
-    run('ld','-EB','-r',*(stem+'.o' for stem in family),'reward_state_native.o','-o','reward-events.o')
+    run('gcc',*flags,*state_flags,'/source/overlays/v3/reward_state_native.c',
+        '/source/overlays/v3/reward_world_native.c','/source/overlays/v3/reward_field_native.c',
+        '/source/overlays/v3/reward_birthday_native.c')
+    registry_flags=('-DAF_HP_REWARD_REGISTRY=1','-DAF_HP_CARRIED_REGISTRY=1',
+        '-DAF_HP_EXERCISE_REGISTRY=1')
+    run('gcc',*flags,*state_flags,*registry_flags,'reward_registry.c',
+        '/source/overlays/v3/reward_masks_native.c','/source/overlays/v3/reward_shrine_native.c',
+        '/source/overlays/v3/reward_shrine_owner.c',
+        '/source/overlays/v3/holiday_participants_registry.c',
+        '/source/overlays/v3/holiday_participants_services.c',
+        '/source/overlays/v3/carried_npc.c','/source/overlays/v3/holiday_participants_spawn.S')
+    run('ld','-EB','-r',*(stem+'.o' for stem in family),'reward_state_native.o',
+        'reward_world_native.o','reward_field_native.o','reward_field_source.o',
+        'reward_birthday_native.o','reward_birthday_source.o',
+        'reward_registry.o','holiday_participants_registry.o','holiday_participants_services.o',
+        'carried_npc.o','holiday_participants_spawn.o','reward_masks_native.o','reward_shrine_native.o','reward_shrine_owner.o',
+        '-o','reward-unbound.o')
     from v3_asset_loader import compile_part
     previous=prior['equipment_resources']['carried_items']['quest']['npc']
     retained=previous['storage']
@@ -1239,10 +1359,25 @@ def prepare_reward_events(output,lock):
         extra_sources=('overlays/v3/save_compressed.c','overlays/v3/holiday_cards.c',
                        'overlays/v3/carried_collection.c'),
         defines=tuple(f[2:] for f in retained['flags'] if f.startswith('-D'))+
-            ('AF_V3_GOLDEN_REWARD_STORAGE=1',),link_symbols=retained['link_symbols'])
-    if len(storage_bytes)>previous['storage_end']-previous['storage_ram']:
-        raise ValueError('Complete reward storage exceeds the retained reservation')
+            ('AF_V3_GOLDEN_REWARD_STORAGE=1',),link_symbols=dict(retained['link_symbols'],
+                AF_HI_STORAGE_RAM=memory['components']['storage']['ram'],
+                af_v3_card_state=memory['components']['state']['ram']))
+    if len(storage_bytes)>memory['components']['storage']['bytes']:
+        raise ValueError('Complete reward storage exceeds its checked reservation')
+    links,native_bindings=reward_bindings(base,prior,storage)
+    undefined={line.split()[-1] for line in run('nm','--undefined-only','reward-unbound.o').splitlines()}
+    linked={n:links[n] for n in sorted(undefined&links.keys())}
+    run('ld','-EB','-r',*(f'--defsym={n}=0x{v:X}' for n,v in linked.items()),
+        'reward-unbound.o','-o','reward-events.o')
     report.update(format='AFV3-REWARD-EVENTS-1',base_abi=prior['runtime_abi'],base_sha256=sha256(base),
+        registry=registry_report,bindings=linked,native_bindings=native_bindings,memory=memory,
+        perfect_field=dict(functions=field_functions,clock_reference_functions=clock_functions,
+            source_sha256=sha256(field_path.read_bytes()),clock_source_sha256=sha256(clock_path.read_bytes()),
+            source_state_bytes=12,owned_state_tail_bytes=16,native_hooks_installed=False),
+        birthday=dict(functions=birthday_functions,item=birthday_item[0],
+            native_memory_offset=0x10,native_friendship_offset=0x28,
+            native_memory_stride=0xB0,native_animal_stride=0x528,
+            acquisition_installed=False),
         platform_adaptations=adaptations,generated_sha256={n:sha256(t.encode()) for n,t in generated.items()},
         unbound_services=run('nm','--undefined-only','reward-events.o').strip().splitlines(),
         object=dict(sha256=sha256((out/'reward-events.o').read_bytes()),compiler=IMAGE,
@@ -1251,12 +1386,23 @@ def prepare_reward_events(output,lock):
             object_sha256=sha256((out/'reward_state_native.o').read_bytes()),
             storage_wire=7,save_format=20,installed=False,storage=storage,
             retained_storage_bounds=[previous['storage_ram'],previous['storage_end']],
-            unchanged_state_bytes=48,unchanged_scratch_bytes=120352,
+            storage_bounds=[memory['components']['storage']['ram'],
+                memory['components']['storage']['ram']+memory['components']['storage']['bytes']],
+            state_ram=memory['components']['state']['ram'],
+            retained_state_bytes=48,state_bytes=64,retained_scratch_bytes=120352,scratch_bytes=120368,
             pending=['relocate connected storage and redirect existing public entries',
                      'bind reward native state providers to connected storage']),
         sources={p:sha256((ROOT/p).read_bytes()) for p in ('tools/v3_holiday_participants.py',
+            'tools/v3_reward_bindings.py','tools/v3_registry.py',
+            'overlays/v3/holiday_participants_registry.c','overlays/v3/holiday_participants_services.c',
+            'overlays/v3/holiday_participants_spawn.S','overlays/v3/carried_npc.c',
             'overlays/v3/holiday_participants.h','overlays/v3/carried_event.h','overlays/v3/reward_event.h',
-            'overlays/v3/reward_state_native.c','overlays/v3/holiday_cards.h','overlays/v3/holiday_cards.c',
+            'overlays/v3/reward_state_native.c','overlays/v3/reward_world_native.c','overlays/v3/reward_field_native.c',
+            'overlays/v3/reward_masks_native.c',
+            'overlays/v3/reward_birthday_native.c','overlays/v3/reward_birthday_native.h',
+            'overlays/v3/reward_shrine_native.c',
+            'overlays/v3/reward_shrine_owner.c',
+            'overlays/v3/holiday_cards.h','overlays/v3/holiday_cards.c',
             'overlays/v3/save_compressed.c','overlays/v3/console_storage.c')})
     write_new(out/'prepared.json',(json.dumps(report,indent=2)+'\n').encode())
     return report

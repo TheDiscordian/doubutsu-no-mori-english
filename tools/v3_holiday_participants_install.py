@@ -25,7 +25,7 @@ SOURCES+=('overlays/v3/surface_bootstrap.c',)
 def link(directory,prepared,output,*,object_name='participants',ram=RAM):
     """Link the checked prepared object, retaining every function and asset."""
     output.mkdir()
-    if object_name not in ('participants','exercise','festivals','carried-npc') or ram&15 or not RAM<=ram<0x807DA800:
+    if object_name not in ('participants','exercise','festivals','carried-npc','reward-events') or ram&15 or not RAM<=ram<0x807DA800:
         raise ValueError('Invalid shared participant object/address')
     raw=(directory/(object_name+'.o')).read_bytes()
     if prepared['object']['sha256']!=sha256(raw) or prepared['unbound_services']:
