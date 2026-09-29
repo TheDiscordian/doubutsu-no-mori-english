@@ -1,4 +1,4 @@
-"""Complete palm/cedar preparation and shared seasonal loading, not gameplay."""
+"""Shared tree resources, installed consumers, and source/host behaviour checks."""
 import copy
 import json
 import os
@@ -22,13 +22,17 @@ import tests.test_v3_furniture_pipeline as art_helper
 
 ART=ROOT/'build/v3-carried-trees-prepared-02'
 BANKS=ROOT/'build/v3-carried-runtime-work-01/tree-banks-01'
-BUILD=ROOT/os.environ.get('V3_CARRIED_TREES','build/v3-carried-runtime-work-01/trees-connected-05')
+BUILD=ROOT/os.environ.get('V3_CARRIED_TREES','build/v3-carried-runtime-work-01/tree-behaviours-04')
 
 
 class HostTests(unittest.TestCase):
     sanitized=host_helper.HostTests.sanitized
     def test_shared_palettes_light_callback_selection_and_rejection(self):
         self.sanitized('v3_tree_families_test.c')
+
+    def test_connected_tree_family_behaviours(self):
+        self.sanitized('v3_tree_behaviours_test.c',extra=(str((BUILD/'scenery-config.c').relative_to(ROOT)),),
+            defines=('-DAF_V3_TREE_FAMILIES','-DAF_V3_TREE_FELLING','-DAF_V3_SCENERY_FAMILIES'))
 
 
 class TreeTests(unittest.TestCase):
@@ -126,7 +130,12 @@ class CartridgeTests(unittest.TestCase):
     def test_full_seasonal_bank_reconstruction_and_physical_ownership(self):
         p=self.scene['families']['packet']
         self.assertEqual(sha256(self.rom[p['physical']:p['physical']+p['bytes']]),p['sha256'])
-        self.assertEqual(self.base[p['physical']:p['physical']+p['bytes']],bytes(p['bytes']))
+        retained=self.prior['equipment_resources']['scenery'].get('families',{}).get('packet')
+        if retained:
+            self.assertEqual(p,retained)
+            self.assertEqual(self.base[p['physical']:p['physical']+p['bytes']],
+                             self.rom[p['physical']:p['physical']+p['bytes']])
+        else:self.assertEqual(self.base[p['physical']:p['physical']+p['bytes']],bytes(p['bytes']))
         self.assertLess(p['bytes'],sum(b['bytes'] for b in self.scene['banks']))
         sources=set()
         for bank in self.scene['banks']:
@@ -214,9 +223,55 @@ class CartridgeTests(unittest.TestCase):
                 raw=file.extract(self.rom)[vrom-file.vstart:vrom-file.vstart+n]
             self.assertEqual(zlib.crc32(raw),u32(self.blob,self.e['blob_offset']+crc-self.e['ram']),hex(ram))
         self.assertEqual(self.report['save_runtime']['profile_hex'],self.prior['save_runtime']['profile_hex'])
-        self.assertEqual(self.e['carried_items'],self.prior['equipment_resources']['carried_items'])
+        carried=copy.deepcopy(self.e['carried_items']);prior=copy.deepcopy(self.prior['equipment_resources']['carried_items'])
+        carried['actions'].pop('tag');prior['actions'].pop('tag')
+        self.assertEqual(carried,prior)
         self.assertFalse(new['families']['field_behaviours_complete'])
-        self.assertLessEqual(new['bytes'],12288)
+        self.assertLessEqual(new['bytes'],new['additional_fixed_resident_bytes'])
+
+    def test_complete_family_constants_region_bindings_and_runtime_reservation(self):
+        from v3_scenery_refresh import family_contract
+        from v3_console_disk_install import reservations
+        from v3_import_storage import jump
+        source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+            (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+        bundles=[runtime.prepared(source,ROOT/self.scene['art_directory']),runtime.prepared(source,ART)]
+        art,_,_=runtime.merge_categories(bundles)
+        evidence=family_contract(source,self.rom,self.files[CODE_VROM].extract(self.rom),art,self.scene)
+        self.assertEqual(json.loads(json.dumps(evidence)),self.scene['families']['behaviour'])
+        code=(BUILD/'scenery/code.bin').read_bytes();symbols=self.scene['code']['symbols'];ram=self.scene['ram']
+        self.assertEqual(code,self.blob[self.scene['blob_offset']:self.scene['blob_offset']+self.scene['bytes']])
+        for name,fmt,expected in (('drops','84H',sum((tuple(r) for r in evidence['drops']),())),
+                ('cuts','46H',sum((tuple(r) for r in evidence['cuts']),())),
+                ('camera_masks','12I',sum((tuple(r) for r in evidence['camera_masks']),()))):
+            self.assertEqual(struct.unpack_from('>'+fmt,code,symbols['af_v3_tree_'+name]-ram),expected)
+        for i,r in enumerate(evidence['carried']):
+            expected=tuple(r['fields'])+sum((tuple(p) for p in r['growth']),())+(0,)*(16-len(r['growth'])*2)+tuple(r['stumps'])
+            self.assertEqual(struct.unpack_from('>8H16h4H',code,symbols['af_v3_tree_carried_rules']-ram+56*i),expected)
+        self.assertEqual(symbols['af_tree_block_position'],0x80088B3C)
+        self.assertEqual(symbols['af_tree_ground_height'],0x80071B78)
+        self.assertEqual(symbols['af_v3_scenery_construct'],ram)
+        self.assertEqual(self.scene['memory'],dict(ram=0x8077B000,bytes=20480))
+        other=copy.deepcopy(self.report);other['equipment_resources'].pop('scenery')
+        self.assertFalse(any(a<ram+20480 and ram<b for a,b in reservations(other)))
+        for row in self.scene['owners']:
+            data=self.files[row['vrom']].extract(self.rom)
+            self.assertEqual(u32(data,0x26B8),jump(symbols['af_v3_tree_drop_table'],link=True))
+            self.assertEqual(u32(data,0x26BC),0x97A4005A) # exact tree argument, not a substitute ID
+            self.assertEqual(u32(data,0x2064),jump(symbols['af_v3_tree_plant_preview'],link=True))
+            self.assertEqual(u32(data,0x206C),0xA6020010) # actual drop display-item field
+        planting=self.scene['families']['planting_menu'];data=self.files[planting['vrom']].extract(self.rom)
+        self.assertEqual(sha256(data),self.e['carried_items']['actions']['tag']['owner_sha256'])
+        at=planting['address']-planting['ram'];target=symbols['af_v3_tree_plant_seed']
+        self.assertEqual(struct.unpack_from('>6I',data,at),
+            (0x3C190000|((target+0x8000)>>16),0x27390000|(target&65535),
+             jump(self.scene['bootstrap']['symbols']['af_v3_tree_query_dispatch'],link=True),
+             0x00402025,0x00402825,0x8FA4003C))
+        self.assertEqual(self.files[0x3960000].extract(self.rom),self.before[0x3960000].extract(self.base))
+        damaged=copy.copy(source);damaged.rel=bytearray(source.rel)
+        damaged.rel[source.sections[1][0]+0x1A04C4]^=1
+        with self.assertRaisesRegex(ValueError,'region rule'):
+            family_contract(damaged,self.rom,self.files[CODE_VROM].extract(self.rom),art,self.scene)
 
     def test_subsequent_shared_refresh_reuses_complete_art_and_allocations(self):
         import v3_scenery_refresh as refresh

@@ -4,7 +4,7 @@
 typedef struct {
     u16 *around[4];
     int cap,days,flower_days;
-    int preserved[3];
+    int spoil,block_x,block_z;
     int x,z;
 } GrowInfo;
 #ifdef __mips__
@@ -24,9 +24,6 @@ extern void native_reset(u16 *,u8 *,u8 *,u16 *);
 extern void native_thin(u16 *,u16 *,int,int);
 #endif
 extern float af_scenery_random(void);
-static int selected(void) { return af_v3_player_selected_equipment(af_v3_tree_rule.selected_item)>=0; }
-static int gold(u32 item) { return item-af_v3_tree_rule.first<af_v3_tree_rule.count; }
-static int hidden(u32 item) { return item-af_v3_tree_rule.hidden_first<af_v3_tree_rule.hidden_count; }
 static int native_tree(u32 item) {
     return item-0x800u<0x3cu || item-0x84fu<5u || item-0x5eu<4u || item==0x69u;
 }
@@ -45,20 +42,22 @@ static u16 *neighbour(u16 *item,GrowInfo *info,int x,int z,u32 direction) {
     }
 }
 int af_v3_tree_near(u16 *item,GrowInfo *info,int x,int z) {
-    if (!selected()) return native_near(item,info,x,z);
-    int imported=*item==af_v3_tree_rule.first;
+    if (!trees_selected()) return native_near(item,info,x,z);
+    const TreeRule *r=tree_rule(*item);
+    int imported=r && *item==r->first;
     if (!imported && !native_sapling(*item)) return native_near(item,info,x,z);
     int odd=(x^z)&1;
     for (u32 i=0;i<4;++i) {
         u16 *p=neighbour(item,info,x,z,i);
         if (!p) continue;
         u32 value=*p;
-        int stump=value-af_v3_tree_rule.stumps[3]<4u;
-        int tree=gold(value) || hidden(value);
-        int sapling=value==af_v3_tree_rule.first;
+        const TreeRule *n=tree_rule(value);
+        int stump=n && tree_stump(n,value);
+        int tree=n && (tree_live(n,value) || tree_hidden(n,value));
+        int sapling=n && value==n->first;
         if (imported) { stump|=value-1u<4u;tree|=native_tree(value);sapling|=native_sapling(value); }
         if (stump || (tree && (odd || !sapling))) {
-            *item=imported?af_v3_tree_daily_config.dead:af_v3_tree_daily_config.native_dead;
+            *item=imported?(u16)(r->first+r->count):af_v3_tree_daily_config.native_dead;
             /* The donor's even-cell branch returns true after killing. Its
                subsequent family check leaves the dead sapling unchanged. */
             return imported && !odd;
@@ -67,42 +66,73 @@ int af_v3_tree_near(u16 *item,GrowInfo *info,int x,int z) {
     return imported ? 1 : native_near(item,info,x,z);
 }
 int af_v3_tree_daily_plant(u16 *item,GrowInfo *info) {
-    const TreeDaily *d=&af_v3_tree_daily_config;
-    if ((!gold(*item) && *item!=d->dead) || !selected()) return native_plant(item,info);
-    if (info->cap==-1 || *item==d->dead) *item=0;
-    else if (info->cap==0) *item=d->dead;
-    else if (af_v3_tree_near(item,info,info->x,info->z) && gold(*item) && info->days>0)
-        *item=(u16)af_v3_tree_grow(*item,info->days-1,info->cap);
+    const TreeRule *r=tree_rule(*item);
+    if (!r || (u32)(*item-r->first)>r->count) return native_plant(item,info);
+    u16 dead=(u16)(r->first+r->count);
+    if (info->cap==-1 || *item==dead) *item=0;
+    else if (info->cap==0) *item=dead;
+    else if (af_v3_tree_near(item,info,info->x,info->z) && tree_live(r,*item)) {
+#ifdef AF_V3_TREE_FAMILIES
+        int allowed=1;
+        if (r->unused==1) allowed=info->block_z==6;
+        if (r->unused==2) {
+            /* The donor checks each cell's ground height, including cliffs,
+               not the acre's nominal height or the player's current position. */
+            extern int af_tree_block_position(float *,float *,int,int);
+            extern float af_tree_ground_height(TreePosition,float);
+            TreePosition p={0,0,0};
+            af_tree_block_position(&p.x,&p.z,info->block_x,info->block_z);
+            p.x+=20.0f+40.0f*info->x;p.z+=20.0f+40.0f*info->z;
+            allowed=af_tree_ground_height(p,0.0f)>=100.0f;
+        }
+        if (!allowed) *item=dead;
+        else
+#endif
+        if (info->days>0) *item=(u16)af_v3_tree_grow(*item,info->days-1,info->cap);
+    }
     return 1;
 }
 void af_v3_tree_set_info(u16 *bits,u16 *items) {
     native_set(bits,items);
-    if (selected()) for (u32 i=0;i<256;++i)
-        if (items[i]==af_v3_tree_rule.first) bits[i/16]|=(u16)(1u<<(i%16));
+    for (u32 i=0;i<256;++i) {
+        const TreeRule *r=tree_rule(items[i]);
+        if (r && items[i]==r->first) bits[i/16]|=(u16)(1u<<(i%16));
+    }
 }
 void af_v3_tree_reset_info(u16 *bits,u8 *normal,u8 *other,u16 *items) {
-    if (selected()) for (u32 i=0;i<256;++i)
-        if (items[i]==af_v3_tree_daily_config.dead) bits[i/16]&=(u16)~(1u<<(i%16));
+    u8 cedars=0;
+    for (u32 i=0;i<256;++i) if (bits[i/16]&(1u<<(i%16))) {
+        const TreeRule *r=tree_rule(items[i]);
+        if (r && items[i]==r->first+r->count) bits[i/16]&=(u16)~(1u<<(i%16));
+        else if (r && r->unused==2 && tree_live(r,items[i])) ++cedars;
+    }
     native_reset(bits,normal,other,items);
+    /* Native counting puts cedar candidates in 'other'. Move that exact count
+       to normal, retaining native dead/empty handling and eight-bit wrapping. */
+    *normal=(u8)(*normal+cedars);*other=(u8)(*other-cedars);
 }
 static void kill(u16 *items,u16 *bits,int *normal,int *other) {
     int ordinary=*normal>0;
     int *count=ordinary?normal:other;
     int choice=(int)(af_scenery_random()*(float)*count);
     for (u32 i=0;i<256;++i) if (bits[i/16]&(1u<<(i%16))) {
-        if (ordinary!=(items[i]-0x800u<5u)) continue;
+        const TreeRule *r=tree_rule(items[i]);
+        if (ordinary!=(items[i]-0x800u<5u || (r && r->unused==2 && tree_live(r,items[i])))) continue;
         if (choice<=0) {
             bits[i/16]&=(u16)~(1u<<(i%16));
-            items[i]=gold(items[i])?af_v3_tree_daily_config.dead:af_v3_tree_daily_config.native_dead;
+            items[i]=r?(u16)(r->first+r->count):af_v3_tree_daily_config.native_dead;
             --*count;break;
         }
         --choice;
     }
 }
 void af_v3_tree_thin(u16 *items,u16 *bits,int normal,int other) {
-    if (!selected()) { native_thin(items,bits,normal,other);return; }
+    if (!trees_selected()) { native_thin(items,bits,normal,other);return; }
     u8 trees=0,remaining=(u8)(normal+other);
-    for (u32 i=0;i<256;++i) if (native_tree(items[i]) || gold(items[i]) || hidden(items[i])) ++trees;
+    for (u32 i=0;i<256;++i) {
+        const TreeRule *r=tree_rule(items[i]);
+        if (native_tree(items[i]) || (r && (tree_live(r,items[i]) || tree_hidden(r,items[i])))) ++trees;
+    }
     int excess=(int)trees-(int)af_v3_tree_daily_config.limit;
     while (excess>0 && remaining) { kill(items,bits,&normal,&other);--excess;--remaining; }
 }

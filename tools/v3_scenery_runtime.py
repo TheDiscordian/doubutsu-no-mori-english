@@ -20,7 +20,7 @@ BOOT_RAM, BOOT_END = 0x804ADC90, 0x804ADFF0
 RUNTIME_RAM, RUNTIME_END = 0x804B5000, 0x804B6000
 SOURCES = ('tools/v3_scenery_runtime.py', 'tools/v3_scenery.py',
            'tools/v3_scenery_refresh.py', 'tools/v3_ground_categories.py',
-           'tools/v3_physical_resources.py',
+           'tools/v3_physical_resources.py', 'tools/v3_room_rig_runtime.py',
            'overlays/v3/scenery.h', 'overlays/v3/scenery.c',
            'overlays/v3/scenery.ld', 'overlays/v3/scenery_bootstrap.c',
            'overlays/v3/scenery_bootstrap.ld', 'overlays/v3/scenery_palette.c',

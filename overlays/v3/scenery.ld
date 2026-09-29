@@ -13,17 +13,21 @@ af_scenery_native_change = 0x80055EF8;
 af_v3_native_tree_grow = 0x804ADFC0;
 af_v3_native_tree_stump = 0x804ADFD0;
 af_tree_field_units = 0x8008A410;
+af_tree_block_position = 0x80088B3C;
+af_tree_ground_height = 0x80071B78;
 af_scenery_effect_clip = 0x80136F3C;
 af_scenery_game = 0x8010EF90;
 af_scenery_commit = 0x8008AA24;
+PROVIDE(af_scenery_runtime_ram = 0x804B5000);
+PROVIDE(af_scenery_runtime_end = 0x804B8000);
 SECTIONS
 {
-    . = 0x804B5000;
+    . = af_scenery_runtime_ram;
     .text : { *(.text.af_v3_scenery_construct) *(.text .text.*) }
     .rodata : { *(.rodata .rodata.*) }
     .data : { *(.data .data.*) }
     .bss (NOLOAD) : { *(.bss .bss.* COMMON) }
-    ASSERT(. <= 0x804B8000, "Scenery runtime exceeds its reservation")
+    ASSERT(. <= af_scenery_runtime_end, "Scenery runtime exceeds its reservation")
     ASSERT(SIZEOF(.data)==0 && SIZEOF(.bss)==0, "Unexpected scenery global state")
     /DISCARD/ : { *(.comment .note.* .reginfo .MIPS.abiflags .pdr .gnu.attributes) }
 }

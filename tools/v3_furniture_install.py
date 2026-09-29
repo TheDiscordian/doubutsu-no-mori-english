@@ -1563,13 +1563,17 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         carried=equipment_report['carried_items']
         actions=carried.get('actions')
         storage=carried.get('storage')
+        previous_carried=prior['equipment_resources'].get('carried_items',{})
+        new_storage=storage and not previous_carried.get('storage')
+        new_actions=actions and not previous_carried.get('actions')
         report['shared_runtime_refresh'].update(adapters=['carried_items'],artwork_changed=not bool(actions),
-            additional_resident_bytes=storage['additional_resident_bytes'] if storage else 0 if actions else carried['additional_resident_bytes'],
-            resource_allocations_changed=True,saved_format_changed=bool(storage),saved_profile_changed=bool(storage),
+            additional_resident_bytes=storage['additional_resident_bytes'] if new_storage else 0 if actions else carried['additional_resident_bytes'],
+            resource_allocations_changed=not bool(previous_carried.get('storage')),
+            saved_format_changed=bool(new_storage),saved_profile_changed=bool(new_storage),
             changed_owner_moves=owner_moves)
         if actions:
             report['shared_runtime_refresh']['additional_menu_bytes']=(carried['paper']['catalogue']['additional_menu_bytes']
-                if storage else actions['additional_menu_bytes'])
+                if new_storage else actions['additional_menu_bytes'] if new_actions else 0)
         report['sources'].update(carried['sources'])
         report['native_test']='pending connected carried-item menus, behaviours, persistence, and selection; readiness remains off'
     if holiday_actor_services:

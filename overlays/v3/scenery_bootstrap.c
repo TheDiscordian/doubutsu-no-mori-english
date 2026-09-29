@@ -1,8 +1,11 @@
 #include "scenery.h"
+#ifndef AF_SCENERY_RAM
+#define AF_SCENERY_RAM 0x804B5000u
+#endif
 /* This code is in the already loaded equipment package, not in the packet it
    transfers. The cache word starts clear in the startup-loaded module. */
 static __attribute__((noinline,used)) int load(void) {
-    void *code=(void *)0x804B5000u;
+    void *code=(void *)AF_SCENERY_RAM;
 #ifdef AF_V3_SCENERY_TREES
     volatile u32 *ready=(volatile u32 *)0x804ADFECu;
     if (*ready==AF_SCENERY_CRC) return 1;
@@ -41,7 +44,7 @@ __asm__(".set noreorder\n.section .text.af_v3_tree_world_dispatch,\"ax\"\n"
         "jr $t9\naddiu $sp,$sp,32\n1:\njr $ra\naddiu $sp,$sp,32\n.set reorder\n");
 #endif
 void af_v3_scenery_boot(void *actor,void *game,u32 variant) {
-    if (load()) ((void (*)(void *,void *,u32))0x804B5000u)(actor,game,variant);
+    if (load()) ((void (*)(void *,void *,u32))AF_SCENERY_RAM)(actor,game,variant);
 }
 void af_v3_scenery_cherry(void *a,void *b) { af_v3_scenery_boot(a,b,0); }
 void af_v3_scenery_winter(void *a,void *b) { af_v3_scenery_boot(a,b,1); }

@@ -1148,7 +1148,8 @@ def extend(base,prior,blob,core,original,output,directories):
     old=prior['equipment_resources'];runtime=old['room_rigs'];start=old['blob_offset']
     module=blob[start:start+old['bytes']];scenery=old['scenery']
     if (sha256(module)!=old['sha256'] or EQUIPMENT_RAM+old['bytes']>PACKET_RAM or
-            scenery['ram']+scenery['additional_fixed_resident_bytes']>PACKET_RAM or
+            (scenery['ram']<PACKET_RAM+PACKET_BYTES and
+             scenery['ram']+scenery['additional_fixed_resident_bytes']>PACKET_RAM) or
             PACKET_RAM+PACKET_BYTES>prior['furniture']['bank_pool']['start'] or
             module[VTABLE-EQUIPMENT_RAM:VTABLE-EQUIPMENT_RAM+20]!=bytes.fromhex(runtime['vtable_hex'])):
         raise ValueError('Changed room module/vtable or occupied packet reservation')

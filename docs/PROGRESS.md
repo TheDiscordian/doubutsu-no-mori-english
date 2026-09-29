@@ -36,7 +36,8 @@ The shared importer reuses every prepared model, palette, growth/death/stump
 appearance, coconut, and Christmas light. Drawing tables have 139/140 entries;
 all four appended actor index arrays and the temporary stack grow together.
 Native matrix nodes and Christmas-light state remain in place. The shared
-10,888-byte runtime fits its existing 12-KiB reservation. Additional active-scene
+12,596-byte runtime occupies the checked 20-KiB reservation at
+`8077B000..80780000`, outside the carried/save packet. Additional active-scene
 memory is 72,512 bytes, or 73,936 in Xmas, including the larger actor.
 
 The complete seasonal banks share identical 4-KiB pages: 250,832 cartridge bytes
@@ -46,12 +47,25 @@ resources. Existing planting, daily, world, player, insect, and camera callers
 are rebound together; the insect shake notification remains intact. The refresh
 route can reuse these banks and allocations for subsequent behaviour changes.
 
-Five focused allocation, relocation, page-loader, retained-code, startup, and
-refresh-reuse checks pass. Browser/offline outputs agree for seven profiles;
+Growth/death, fruit regeneration, mixed-family neighbours, thinning, hidden
+contents, collision/digging, shaking/cutting, player targeting, camera limits,
+field clearing, and the original on-tree insect habitat now share the complete
+gold/palm/cedar rules. Palms use the coastal acre row; cedars use each cell's
+actual terrain height. Cedar planting and all four seasonal throw previews
+retain native placement, animation, consumption, and flower handling.
+Coconut eating uses both complete resident drawing lists through nine-entry
+food tables; original foods and turnips retain their native artwork and animation.
+The 72-byte food tables use existing padding, with no added allocation.
+
+Six focused tree checks pass for sanitized family behaviour, source/native
+bindings, allocation, relocation, page loading, startup, and refresh reuse.
+Three focused food checks pass for complete tables, retained native code,
+relocation, source rejection, packet bounds, startup checksums, and patch
+reconstruction. Browser/offline outputs agree for seven current profiles;
 empty selection remains V2-14. These are not native rendering/gameplay or
-hardware results. Palm/cedar field behaviours and their parent-item interactions
-remain unfinished; neither family is selectable. Continue those shared consumers
-using `build/v3-carried-trees-prepared-02/` and the
+hardware results. Remaining leaf/cut effects and independent admission keep
+palm/cedar unavailable. Continue with the retained complete resources at
+`build/v3-carried-trees-prepared-02/` and the
 [tree-family contract](../specs/V3_SCENERY.md#palm-and-cedar-dependencies).
 
 The shared carried-item importer installs the remaining seven parent families
@@ -93,9 +107,9 @@ rendering or gameplay/save verification. Remaining item-specific field behaviour
 and independent selection remain the same connected task. See
 [the carried-item contract](../specs/V3_CARRIED_ITEMS.md).
 
-The current proposal is ABI 356 at
-`build/v3-carried-runtime-work-01/trees-connected-05/build-lock.json`, ROM SHA-256
-`b14f36b68fa27b69c8b195330bbc8bf8008eec7e41581d9b1b34e1e1859228e6`.
+The current proposal is ABI 359 at
+`build/v3-carried-runtime-work-01/field-actions-01/build-lock.json`, ROM SHA-256
+`7736c5cf54fb76620554c2c30d75e3dcd19845de26bc3f8991bf07cc073bf129`.
 It contains 207 independently selectable development imports, including all
 sixteen diary styles, all nine fish, and eight insects. Another 100 furniture
 profiles await acquisition. The main lock and both stable V2-14 deployments

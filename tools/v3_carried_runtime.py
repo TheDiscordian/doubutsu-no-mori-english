@@ -79,6 +79,8 @@ def letter_window(base,core,menu,paper,symbols):
 
 def install(base, prior, blob, core, module, output, directory):
     if prior['equipment_resources'].get('carried_items'):
+        if prior['equipment_resources']['carried_items'].get('storage'):
+            return install_field_actions(base,prior,output,directory)
         if prior['equipment_resources']['carried_items'].get('actions'):
             return install_storage(base,prior,blob,core,output,directory)
         return install_actions(base,prior,blob,core,output,directory)
@@ -480,6 +482,125 @@ def install_storage(base,prior,blob,core,output,directory):
     write_new(output/'carried-packet.bin',raw)
     return e,changes,updates,[(dict(prefix_resource,previous_sha256=prefix_sha),bytes(prefix)),
         (replacement,bytes(raw))]
+
+
+def food_tables(source,owner,relocation,art,ram):
+    """Extend the complete inventory food category, retaining native animation."""
+    from v3_player_actions import native_references
+    origin=0x8087D480
+    donors=[]
+    for at,n,digest in (
+            (0x2725C0,696,'bb1a5b2bd58b5bd3c91c52d36c7628b7282fae2ed0c946951af35359d0267b96'),
+            (0x26E17C,420,'ceeb4f2f9800be098509529e66734dbc1005001c4dfaed478b662d849b7197fd')):
+        raw,receipt=source.function(at)
+        if len(raw)!=n or sha256(raw)!=digest:raise ValueError('Changed complete source eating consumer')
+        donors.append(receipt)
+    if sha256(owner[0x8087E628-origin:0x8087E980-origin])!='339a6921992f11cdbe9ce6556e87a2bb6090e53ad7d291e5a6bfe796cf6b8afb':
+        raise ValueError('Changed complete native food animation/drawing')
+    sections=struct.unpack_from('>5I',relocation)
+    if sections[:3]!=(15664,1008,160):raise ValueError('Changed native inventory sections')
+    groups,absolute,rows,locations,_=native_references(owner,relocation,expected_sections=sections[:4])
+    patched=bytearray(owner);data=bytearray();tables=[];removed=set();patches=[]
+    for role,source_at,targets,native,checksum in (
+            ('material',0x80118,(8980576,8992672,8997600,8996896,8994080,8991968,None,8985536,8989856),
+             0x808814B0,'31f52e5b6fe5f42ee60e45f135cef0679ff8c758647d6b047100ba670dc2b318'),
+            ('geometry',0x8013C,(8980648,8992744,8997672,8996968,8994152,8992040,8984192,8985608,8989928),
+             0x808814D0,'6ffda60cc26ca41f2095f9d46131120e1be2d9746a50abe5af8ebdcb5664c608')):
+        name,at,n=source.containing(source_at,exact=True)
+        pointers={p-at:r for p,r in source.relocations.items() if at<=p<at+n}
+        expected={i*4:(1,True,5,p) for i,p in enumerate(targets) if p is not None}
+        if n!=36 or any(source.data[at:at+n]) or pointers!=expected:
+            raise ValueError('Changed complete donor food drawing table')
+        models=[m for m in art['compiled_models'] if m['layer']==role]
+        if len(models)!=1 or models[0]['source_parts'][0]['donor_offset']!=targets[7]:
+            raise ValueError('Food drawer does not use the complete installed carried model')
+        model=models[0];target=(art['ram']+model['native_offset'])&0x1FFFFFFF
+        old=owner[native-origin:native-origin+32]
+        if sha256(old)!=checksum or any(native-origin+i in locations for i in range(0,32,4)):
+            raise ValueError('Changed complete native food drawing table')
+        # Donor order: seven original foods, coconut, then the original turnip.
+        # Keep every original segmented pointer and the null candy material.
+        raw=old[:28]+struct.pack('>I',target)+old[28:];address=ram+len(data)
+        pairs=[]
+        for hi,lows in groups.items():
+            if any(native<=value<native+32 for _,value in lows):
+                if any(value!=native for _,value in lows):raise ValueError('Shared or interior food reference')
+                pairs.extend((hi,lo) for lo,_ in lows)
+        if len(pairs)!=1 or any(native<=p<native+32 for p in absolute.values()):
+            raise ValueError('Changed complete food table-reference inventory')
+        for hi,lo in pairs:
+            for p,half in ((hi,(address+0x8000)>>16),(lo,address&65535)):
+                before=u32(patched,p);after=before&0xFFFF0000|half
+                if p in removed:raise ValueError('Overlapping food table references')
+                struct.pack_into('>I',patched,p,after);removed.add(p)
+                patches.append(dict(address=origin+p,before=before,after=after))
+        data.extend(raw)
+        tables.append(dict(role=role,source_symbol=name,source_offset=at,source_bytes=n,
+            source_pointers=pointers,native=native,native_sha256=checksum,ram=address,
+            bytes=len(raw),sha256=sha256(raw),count=9,model=target))
+    rel=bytearray(relocation);kept=[r for r in rows if r not in {locations[p] for p in removed}]
+    if len(rows)-len(kept)!=4:raise ValueError('Incomplete food reference relocation removal')
+    struct.pack_into('>I',rel,16,len(kept))
+    rel[20:-4]=struct.pack('>'+str(len(kept))+'I',*kept)+bytes(len(rel)-24-len(kept)*4)
+    return bytes(patched),bytes(rel),bytes(data),dict(donors=donors,tables=tables,patches=patches,
+        removed_relocations=[locations[p] for p in sorted(removed)],native_function_sha256=
+        '339a6921992f11cdbe9ce6556e87a2bb6090e53ad7d291e5a6bfe796cf6b8afb')
+
+
+def install_field_actions(base,prior,output,directory):
+    """Connect carried field consumers using existing resident resources."""
+    from v3_holiday_selection import refresh_receipts
+    from v3_npc_draw import relocation_offsets
+    e=copy.deepcopy(prior['equipment_resources']);d=e['carried_items'];packet=d['packet']
+    if (d.get('eating') or d['ready_mask'] or d['selected_mask'] or
+            directory.resolve()!=ROOT/d['prepared']):
+        raise ValueError('Field actions require the checked inactive carried batch')
+    files=by_vrom(base);iv=e['inventory_preview'];hand=d['actions']['hand']
+    owner,rel=files[0x785700].extract(base),files[0x7898C0].extract(base)
+    hand_data=bytearray(files[hand['vrom']].extract(base));hand_rel=files[hand['reloc']].extract(base)
+    raw=bytearray(base[packet['physical']:packet['physical']+packet['bytes']])
+    if (sha256(owner)!=iv['owner_sha256'] or sha256(rel)!=iv['relocation_sha256'] or
+            sha256(hand_data)!=hand['owner_sha256'] or sha256(hand_rel)!=hand['relocation_sha256'] or
+            sha256(raw)!=packet['sha256'] or sha256(raw[RAM-packet['ram']:])!=d['sha256']):
+        raise ValueError('Changed complete inventory/hand/carried resource')
+    source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+        (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    art=next(r for r in d['artwork'] if r['source_category']==28)
+    offset=art['ram']-packet['ram']
+    if sha256(raw[offset:offset+art['object_bytes']])!=art['installed_sha256']:
+        raise ValueError('Changed complete installed food artwork')
+    cat=d['paper']['catalogue']['code'];ram=(cat['link_symbols']['AF_CARRIED_CATALOGUE_RAM']+cat['bytes']+15)&~15
+    owner_new,rel_new,tables,receipt=food_tables(source,owner,rel,art,ram)
+    at=ram-packet['ram']
+    if ram+len(tables)>TABLE or any(raw[at:at+len(tables)]):
+        raise ValueError('Food tables overlap carried code/records')
+    raw[at:at+len(tables)]=tables
+    # Native fruit indexing already supplies 7 for coconut. Move only the
+    # turnip branch to slot 8; preserve drop/consumption, clothes, and equipment.
+    at=0x8087B2C0-hand['ram'];before=0x24190007;after=0x24190008
+    native_hand=hand_data[0x8087B07C-hand['ram']:0x8087B5D4-hand['ram']]
+    if (sha256(native_hand)!='339fb73d846ee3d87e0aa8d6d91c28fa3bb4bcddb353dff017961ffd8da1d630' or
+            u32(hand_data,at)!=before or at in relocation_offsets(hand_rel,len(hand_data)) or
+            hand_data[at+24:at+28]!=bytes.fromhex('a13903de')):
+        raise ValueError('Changed complete native turnip food-index binding')
+    struct.pack_into('>I',hand_data,at,after)
+    receipt.update(ram=ram,bytes=len(tables),sha256=sha256(tables),coconut_index=7,turnip_index=8,
+        inventory_vrom=0x785700,inventory_reloc=0x7898C0,inventory_ram=0x8087D480,
+        original_owner_sha256=sha256(owner),owner_sha256=sha256(owner_new),relocation_sha256=sha256(rel_new),
+        hand_patch=dict(address=hand['ram']+at,before=before,after=after),
+        native_hand_sha256=sha256(native_hand),
+        hand_previous_sha256=sha256(files[hand['vrom']].extract(base)),
+        hand_sha256=sha256(hand_data),native_gameplay_verified=False,additional_resident_bytes=0)
+    iv.update(owner_sha256=sha256(owner_new),relocation_sha256=sha256(rel_new))
+    hand['owner_sha256']=sha256(hand_data)
+    records=copy.deepcopy(prior['physical_resources']);before_sha=packet['sha256']
+    refresh_receipts(e,records,{packet['id']:raw})
+    d.update(eating=receipt,sha256=sha256(raw[RAM-packet['ram']:]),
+        sources={s:sha256((ROOT/s).read_bytes()) for s in (*SOURCES,*STORAGE_SOURCES)})
+    resource=next(r for r in records if r['id']==packet['id'])
+    write_new(output/'carried-items.json',(json.dumps(d,indent=2)+'\n').encode())
+    return e,{0x785700:owner_new,0x7898C0:rel_new,hand['vrom']:bytes(hand_data)},dict(physical_resources=records),[
+        (dict(resource,previous_sha256=before_sha),bytes(raw))]
 
 
 def paper_catalogue(base,prior,e,core,compiled,resources):

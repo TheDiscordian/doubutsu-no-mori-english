@@ -78,9 +78,11 @@ renderer or new light-record allocation is needed.
 The loader validates the full bank before writes, updates every seasonal palette,
 retains descriptor flags, binds the native light callback only in Xmas, and gates
 each family through its actual item selector. Version-one banks remain supported.
-The installed shared runtime occupies 10,888 bytes within its existing 12-KiB
-reservation. `build/v3-carried-runtime-work-01/trees-connected-05/` contains the
-current ABI-356 cartridge and its complete checked configuration.
+The installed shared runtime occupies 12,596 bytes within the checked 20-KiB
+reservation at `8077B000..80780000`. Its complete compiled configuration is in
+`build/v3-carried-runtime-work-01/tree-behaviours-04/`; the current ABI-359
+proposal at `build/v3-carried-runtime-work-01/field-actions-01/` retains this
+same tree code and adds the parent's food-drawing consumer.
 
 ### Remaining connection and verification
 
@@ -91,8 +93,9 @@ range starting at 108, or 107 for winter. Native matrix nodes and Xmas light
 records remain in place. Each actor gains 256 bytes; the temporary stack frame
 is 328 bytes. Owner allocations are 149,024/149,168/151,632/148,960 bytes in
 native cherry/winter/Xmas/ordinary order. Including actor growth, additional
-active-scene memory is 72,512 bytes, or 73,936 for Xmas; fixed resident memory
-does not grow. Native scene-memory/gameplay acceptance remains unverified.
+active-scene memory is 72,512 bytes, or 73,936 for Xmas. The shared code reservation
+is 20 KiB, independent of those scene allocations. Native scene-memory/gameplay
+acceptance remains unverified.
 
 All installed seasonal, daily, world, player, field-insect, and camera bindings
 target the refreshed exports. The newer insect shake adapter remains in the call
@@ -101,24 +104,76 @@ Other instructions, initialized resources, and relocation ordering are retained.
 The same refresh accepts already-installed families, verifies their complete
 artwork, and reuses the allocations for subsequent behaviour changes.
 
-Complete planting/eating, growth and death, fruit regeneration, cedar regional
-rules, collision/digging, cutting/shaking, hidden contents, field habitats, and
-the required effects before enabling the families. Reuse the installed shared
-tree consumers and source tables. Sign and spirit field behaviours and independent
-carried-family composition remain part of the same importing task.
+Planting/eating, growth and death, fruit regeneration, cedar regional rules,
+collision/digging, cutting/shaking, hidden contents, and original insect habitats
+have installed consumers. The remaining leaf/cut effects and independent
+selection still prevent enabling the families. Reuse the installed shared
+tree consumers and source tables. Sign and spirit field behaviours remain
+part of the same importing task.
 
 `tests/test_v3_carried_trees.py` covers the full source graph and artwork, packed
 dependencies, all three palette banks, retained descriptor flags, native light
 binding, every family-selection combination, and rejection before mutation.
-The prepared graph/artwork checks remain retained. Five changed-path checks pass
-for the installed allocation/relocation, complete bank reconstruction, all moved
-callers, startup checksums, page-reader bounds, and refresh reuse. Seven current
-browser/offline profiles agree, including exact empty-selection V2-14. The final
-source-pinned build reproduces the tested cartridge SHA-256
-`b14f36b68fa27b69c8b195330bbc8bf8008eec7e41581d9b1b34e1e1859228e6`;
-unchanged checks are not rerun just for the build-directory change. These checks
+The prepared graph/artwork checks remain retained. Six changed-path checks pass
+for sanitized family behaviours, installed allocation/relocation, complete bank
+reconstruction, moved callers, startup checksums, page-reader bounds, and refresh
+reuse. These run on `tree-behaviours-03`; the source-pinned refresh preserves the
+identical compiled code and game consumers, changing the build ABI/checksum
+metadata. The current food integration also checks complete scenery retention.
+Seven current browser/offline profiles agree, including exact empty-selection
+V2-14. Unchanged checks are not rerun just for a build-directory change. These checks
 and MIPS compilation do not establish native rendering, gameplay, saving, or
 hardware compatibility. No old ROM or exhausted native fixture needs a replay.
+
+### Connected family behaviours
+
+The three selected families share 56-byte rules containing eight signed growth
+records and four stump identities. Gold retains its six states; palm supplies
+all eight growth/fruit-regeneration states and cedar all five growth states.
+Dead saplings, hidden-content states, and Christmas-light cedar are explicit.
+No actual foreground or saved item is replaced with a substitute identity.
+
+Daily growth uses original `GrowInfo` fields, including block and cell positions.
+Palms require coastal block row six. Cedar checks the actual cell's terrain
+height against 100, matching the donor's upper-layer condition. The native
+block-to-world and ground-height helpers are bound in full; cell centres use
+the native 40-unit spacing. These conditions also apply with zero elapsed days.
+Death/clearing, cap and elapsed-day semantics, adjacent-acre neighbours, parity,
+fruit regeneration, eight-bit counters, and normal-tree-first thinning retain
+their source rules. Cedar candidates belong with ordinary trees for thinning.
+
+Hidden contents retain all four complete three-family donor tables. Mature cedar
+and spent gold trees participate alongside native trees; palm fruit and the
+shovel-bearing gold stage are not refill candidates. Drop lookup has all 21
+records but exposes the extended span only for the actual selected tree.
+The original 13-row span remains for native/unselected trees. All 23 cut-count
+records bind selected families without changing native counters or saved IDs.
+Original landing, randomness, placement, effect dispatch, and foreground commits
+stay in their existing native callers.
+
+Collision uses complete temporary units with the matching native dimensions,
+checking exclusions against the real ID first. Digging, NPC walkability, solid
+and shakeable targets, bee detection, stump acceptance, field clearing, and
+camera masks share the same selected-family rules. Camera masks derive from
+all four source descriptor sets, including Christmas lights. The original
+on-tree insect predicate includes appropriate mature/hidden cedar and gold
+states, not palms or bee trees; imported palm-dwelling insects keep their own
+installed habitat callbacks.
+
+Direct cedar planting replaces only `80872978..8087298F` in the tag owner with
+the seed resolver through the existing resident lazy gate. Its complete native
+action, incoming branches, and relocation absence are checked. All four
+seasonal drop-preview blocks at offset `2064`, 44 bytes each, call the shared
+preview resolver. Native flower bags, ordinary saplings, coconut display,
+placement, warnings, angles, sound, and inventory consumption remain intact.
+
+The high-memory reservation ends before `80780000` and is checked against every
+other installed allocation. The preceding carried/save packet ends at
+`8077AD90`. The existing 848-byte bootstrap retains its cache and fallback
+addresses and loads/verifies the relocated packet. No additional startup
+descriptor, actor allocation, artwork copy, saved format, or import choice is
+introduced. The room allocator checks actual interval overlap instead of
+assuming scenery must sit below room code.
 
 ## Complete source graph
 
@@ -172,7 +227,7 @@ it does not reconvert the models or add individual-item definitions.
 ```sh
 python3 tools/v3_furniture_install.py --refresh-runtime \
   --scenery-art build/v3-carried-trees-prepared-02 \
-  --base-lock build/v3-carried-runtime-work-01/trees-connected-05/build-lock.json \
+  --base-lock build/v3-carried-runtime-work-01/field-actions-01/build-lock.json \
   --output build/NEW-SCENERY-RUNTIME
 ```
 
@@ -204,8 +259,8 @@ The equipment module retains its size and guards. Its
 `804ADC90..804ADFEF` range contains an 848-byte bootstrap and native fallback
 stubs, bounded before the retained guard at `804ADFF0`. A four-byte cache word
 at `804ADFEC` starts clear in the startup-loaded module. The bootstrap transfers
-and verifies the 10,888-byte shared code packet into the reserved
-`804B5000..804B7FFF` range, flushes the instruction cache, and records the verified
+and verifies the 12,596-byte shared code packet into the reserved
+`8077B000..8077FFFF` range, flushes the instruction cache, and records the verified
 CRC. Constructors then prepare the native/held table and load the active scenery
 bank. Tree queries can load the same packet before any seasonal actor exists;
 later calls reuse it without repeating the transfer. A missing
@@ -241,7 +296,7 @@ held-category hooks. Disabled imported foreground IDs resolve the native empty
 row rather than indexing beyond a native table. Save/profile restrictions still
 apply; this fallback does not authorise removing imports from a saved world.
 
-The current proposal uses a 12,288-byte fixed reservation. Its 207 existing
+The current proposal uses a 20,480-byte fixed reservation. Its 207 existing
 experimental choices and format-16 saves remain unchanged. Palm and cedar are
 not enabled by installing their renderer. The main build lock and both served
 V2-14 deployments stay unchanged. Rendered appearance and ordinary gameplay are

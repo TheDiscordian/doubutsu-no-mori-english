@@ -41,8 +41,8 @@ Do not make another per-item installer. Golden net/axe/shovel/rod still need
 their actual remaining consumers distinguished from acquisition; retain all
 installed tool behaviour and do not replay old tests to establish it again.
 
-The current proposal is ABI 356 at
-`build/v3-carried-runtime-work-01/trees-connected-05/build-lock.json`.
+The current proposal is ABI 359 at
+`build/v3-carried-runtime-work-01/field-actions-01/build-lock.json`.
 The complete `build/v3-carried-batch-prepared-05/` resources are installed without
 reconversion: seven parents, 26 states, fourteen icons, seven handover/police
 models, complete orange-paper artwork, official names, and prices. Additive
@@ -72,21 +72,28 @@ either new family. Table/index/stack allocation, palette loading, native lights,
 all existing tree callers, and the intervening insect shake adapter are connected.
 Identical bank pages share checked physical storage; full bank CRCs and relocation
 validation remain. The shared refresh reuses current allocations and resources.
-Five focused checks and seven browser/offline profiles pass; no new native or
-hardware result is claimed. Retain that evidence for unchanged consumers.
+The shared growth/stump/burial, daily growth/death/neighbour/thinning,
+coastal/elevation, collision/digging, shake/cut, hidden-content, camera, player,
+and original insect-habitat consumers cover palm and cedar together. Direct cedar
+planting and the four throw previews preserve original placement/consumption.
+Coconut eating has both complete resident models and the expanded food tables,
+including the retained native turnip entry. No artwork is recompiled or item
+enabled by these bindings. The shared tree code occupies 12,596 bytes of the
+checked 20-KiB `8077B000..80780000` reservation; food tables use 72 bytes of
+existing carried padding. Saved format and menu allocations are unchanged.
+Six focused tree checks, three food checks, and seven current browser/offline
+profiles pass. No new native or hardware result is claimed; retain passing
+evidence for unchanged consumers.
 
-The next concrete work is the connected family behaviour path: extend the shared
-source growth/stump/burial rules, daily growth/death/neighbour/thinning and actual
-coastal/elevation conditions, collision/digging, shaking/cutting, hidden contents,
-camera limits, and habitats for palm and cedar together. Connect the actual
-coconut eating/planting and cedar planting menu/animation consumers, not merely
-their drawing categories. The donor rules are in `m_name_table.c`,
-`m_all_grow_ovl.c`, and `bg_item_common.c_inc`; their pinned tables and retained
-native consumers are already mapped by the shared scenery adapter. Independent
+The next concrete consumer is the complete tree leaf/cut-effect family and its
+native seasonal callers. Reuse the existing effect/rig/model converters and
+installed tree rules; do not repeat planting, daily growth, or food-table work.
+Map complete donor effect variants and native limits before binding a new index.
+Never substitute ordinary-tree art for a missing imported effect. Independent
 selections remain in this same carried-item task. See
 [the tree-family contract](../specs/V3_SCENERY.md#palm-and-cedar-dependencies).
 
-Finish the remaining actual field consumers: planting/eating, sign
+Finish the remaining actual field consumers: tree effects, sign
 designs/placement, and spirit capture/release, including actual native item-type
 and menu routes for every family. Shared paper/spirit splitting/merging,
 confirmed letter consumption, and paper collection/catalogue are installed;

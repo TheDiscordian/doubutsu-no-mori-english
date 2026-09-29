@@ -217,4 +217,112 @@ class CarriedRuntimeTests(unittest.TestCase):
                 result=subprocess.run([str(target),*args],capture_output=True,text=True,timeout=30)
                 self.assertEqual(result.returncode,0,result.stdout+result.stderr);print(result.stdout.strip())
 
+class FoodTests(unittest.TestCase):
+    """Current food consumer changes; do not replay the earlier menu fixture."""
+    @classmethod
+    def setUpClass(cls):
+        cls.out=ROOT/os.environ.get('V3_CARRIED_FOOD','build/v3-carried-runtime-work-01/field-actions-01')
+        cls.image,cls.report=inputs(cls.out/'build-lock.json')
+        cls.base,cls.prior=inputs(cls.out/'base-lock.json')
+        cls.files,cls.before=by_vrom(cls.image),by_vrom(cls.base)
+
+    def test_complete_food_tables_native_indices_and_unchanged_animation(self):
+        from types import SimpleNamespace
+        from npc_mail_show import relocate_verified_data
+        e=self.report['equipment_resources'];d=e['carried_items'];food=d['eating'];p=d['packet']
+        raw=self.image[p['physical']:p['physical']+p['bytes']]
+        inventory=self.files[food['inventory_vrom']].extract(self.image)
+        old=self.before[food['inventory_vrom']].extract(self.base)
+        rel=self.files[food['inventory_reloc']].extract(self.image)
+        old_rel=self.before[food['inventory_reloc']].extract(self.base)
+        restored=bytearray(inventory);origin=food['inventory_ram']
+        for patch in food['patches']:
+            at=patch['address']-origin;self.assertEqual(u32(restored,at),patch['after'])
+            struct.pack_into('>I',restored,at,patch['before'])
+        self.assertEqual(restored,old)
+        self.assertEqual(sha256(inventory),e['inventory_preview']['owner_sha256'])
+        self.assertEqual(sha256(rel),e['inventory_preview']['relocation_sha256'])
+        count=u32(old_rel,16);records=struct.unpack_from('>'+str(count)+'I',old_rel,20)
+        self.assertEqual(struct.unpack_from('>'+str(count-4)+'I',rel,20),
+            tuple(r for r in records if r not in food['removed_relocations']))
+        self.assertEqual(rel[:16],old_rel[:16])
+        for table in food['tables']:
+            at=table['ram']-p['ram'];native=table['native']-origin
+            values=struct.unpack_from('>9I',raw,at);original=struct.unpack_from('>8I',old,native)
+            self.assertEqual(values[:7],original[:7]);self.assertEqual(values[8],original[7])
+            self.assertEqual(values[7],table['model']);self.assertLess(values[7],0x800000)
+            self.assertEqual(sha256(raw[at:at+36]),table['sha256'])
+        self.assertEqual((food['coconut_index'],food['turnip_index']),(7,8))
+        for address in (0x80200010,0x80348010):
+            def relocated(data,reloc):
+                sections=struct.unpack_from('>5I',reloc)
+                return relocate_verified_data(SimpleNamespace(ram=origin,resident_bytes=sum(sections[:4]),
+                    sections=sections),data,reloc,address)
+            current,previous=relocated(inventory,rel),relocated(old,old_rel)
+            allowed={r['address']-origin+i for r in food['patches'] for i in range(4)}
+            self.assertTrue(all(a==b or i in allowed for i,(a,b) in enumerate(zip(current,previous))))
+            for table,pair in zip(food['tables'],((0x8087E918,0x8087E91C),(0x8087E954,0x8087E968))):
+                hi,lo=(u32(current,p-origin) for p in pair);low=struct.unpack('>h',struct.pack('>H',lo&65535))[0]
+                self.assertEqual(((hi&65535)<<16)+low,table['ram'])
+        hand=d['actions']['hand'];data=bytearray(self.files[hand['vrom']].extract(self.image))
+        patch=food['hand_patch'];at=patch['address']-hand['ram']
+        self.assertEqual(u32(data,at),0x24190008);struct.pack_into('>I',data,at,patch['before'])
+        self.assertEqual(data,self.before[hand['vrom']].extract(self.base))
+        self.assertEqual(self.files[hand['reloc']].extract(self.image),self.before[hand['reloc']].extract(self.base))
+
+    def test_packet_bounds_artwork_save_retention_and_startup(self):
+        from aflib import apply_ups
+        e=self.report['equipment_resources'];d=e['carried_items'];p=d['packet'];food=d['eating']
+        old=self.prior['equipment_resources']['carried_items'];op=old['packet']
+        raw=self.image[p['physical']:p['physical']+p['bytes']]
+        self.assertEqual((p['physical'],p['bytes'],p['ram']),(op['physical'],op['bytes'],op['ram']))
+        restored=bytearray(raw);at=food['ram']-p['ram'];restored[at:at+food['bytes']]=bytes(food['bytes'])
+        self.assertEqual(restored,self.base[op['physical']:op['physical']+op['bytes']])
+        self.assertEqual(sha256(raw),p['sha256']);self.assertEqual(sha256(raw[RAM-p['ram']:]),d['sha256'])
+        self.assertEqual(raw[-16:],GUARD);self.assertLessEqual(food['ram']+food['bytes'],TABLE)
+        for key in ('artwork','paper','storage','rows','ready_mask','selected_mask'):
+            self.assertEqual(d[key],old[key])
+        self.assertEqual(e['scenery'],self.prior['equipment_resources']['scenery'])
+        self.assertEqual(self.report['save_codec'],self.prior['save_codec'])
+        refresh=self.report['shared_runtime_refresh']
+        self.assertFalse(refresh['saved_format_changed']);self.assertFalse(refresh['saved_profile_changed'])
+        self.assertEqual(refresh['additional_resident_bytes'],0);self.assertEqual(refresh['additional_menu_bytes'],0)
+        blob=self.files[BLOB].extract(self.image);boot=e['surface_bootstrap']['code']
+        at=e['blob_offset']+boot['symbols']['packets']-e['ram']
+        for i in range(boot['packet_count']):
+            ram,vrom,n,crc=struct.unpack_from('>4I',blob,at+i*boot['packet_stride'])
+            if vrom&0x80000000:data=self.image[vrom&0x7FFFFFFF:(vrom&0x7FFFFFFF)+n]
+            else:
+                f=next(f for f in self.files.values() if f.vstart<=vrom<vrom+n<=f.vend)
+                data=f.extract(self.image)[vrom-f.vstart:vrom-f.vstart+n]
+            self.assertEqual(zlib.crc32(data),u32(blob,e['blob_offset']+crc-e['ram']))
+        physical.verify(self.image,self.report['physical_resources'])
+        for path,digest in d['sources'].items():self.assertEqual(sha256((ROOT/path).read_bytes()),digest,path)
+        self.assertEqual(apply_ups((ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes(),
+            (self.out/'asset-loader.ups').read_bytes()),self.image)
+
+    def test_complete_source_bindings_and_changed_consumer_rejection(self):
+        from v3_carried_runtime import food_tables
+        from v3_furniture_pipeline import Source
+        source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+            (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+        d=self.report['equipment_resources']['carried_items'];food=d['eating']
+        art=next(r for r in d['artwork'] if r['source_category']==28)
+        owner=self.before[food['inventory_vrom']].extract(self.base)
+        rel=self.before[food['inventory_reloc']].extract(self.base)
+        data,new_rel,tables,receipt=food_tables(source,owner,rel,art,food['ram'])
+        self.assertEqual(data,self.files[food['inventory_vrom']].extract(self.image))
+        self.assertEqual(new_rel,self.files[food['inventory_reloc']].extract(self.image))
+        for key,value in receipt.items():self.assertEqual(json.loads(json.dumps(value)),food[key])
+        self.assertEqual(sha256(tables),food['sha256'])
+        damaged=copy.copy(source);damaged.rel=bytearray(source.rel)
+        damaged.rel[source.sections[1][0]+0x2725C0]^=1
+        with self.assertRaisesRegex(ValueError,'source eating'):food_tables(damaged,owner,rel,art,food['ram'])
+        damaged=bytearray(owner);damaged[0x8087E628-food['inventory_ram']]^=1
+        with self.assertRaisesRegex(ValueError,'native food'):food_tables(source,damaged,rel,art,food['ram'])
+        damaged=copy.copy(source);damaged.relocations=dict(source.relocations)
+        damaged.relocations[0x80118+28]=(1,True,5,8989856)
+        with self.assertRaisesRegex(ValueError,'donor food'):food_tables(damaged,owner,rel,art,food['ram'])
+
+
 if __name__=='__main__':unittest.main()

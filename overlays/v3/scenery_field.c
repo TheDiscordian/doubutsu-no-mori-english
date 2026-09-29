@@ -5,9 +5,8 @@
 void af_v3_tree_clear(u16 *cell) {
     u32 item=*cell;
     int native=item-0x800u<0x3cu || item-0x84fu<5u;
-    int gold=item-af_v3_tree_rule.first<af_v3_tree_rule.count &&
-        af_v3_player_selected_equipment(af_v3_tree_rule.selected_item)>=0;
-    if (native || gold) *cell=0;
+    const TreeRule *r=tree_rule(item);
+    if (native || (r && tree_live(r,item))) *cell=0;
 }
 
 int af_v3_tree_insect_match(u32 item,u32 minimum,u32 maximum) {
@@ -15,9 +14,10 @@ int af_v3_tree_insect_match(u32 item,u32 minimum,u32 maximum) {
     if (item>=minimum && item<=maximum) return 1;
     /* Native tree requests use exactly TREE..TREE. Do not broaden flower,
        empty-ground, or any other range into tree habitat. Bee trees exclude. */
-    return minimum==0x804u && maximum==0x804u &&
-        (item==0x867u || item==0x868u || item==0x7fu || item==0x80u) &&
-        af_v3_player_selected_equipment(af_v3_tree_rule.selected_item)>=0;
+    const TreeRule *r=tree_rule(item);
+    return minimum==0x804u && maximum==0x804u && r && r->unused!=1 &&
+        ((tree_live(r,item) && r->growth[item-r->first][1]==4) ||
+         item-r->hidden_first<2u || (r->unused==2 && item==0x82u));
 }
 
 int af_v3_tree_insect_scan(u32 minimum,u32 maximum,const u16 *cells,int width,int height) {

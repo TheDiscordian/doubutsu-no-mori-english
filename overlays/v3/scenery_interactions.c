@@ -3,20 +3,26 @@
 typedef struct { const TreeDrop *begin,*end; } TreeDropSpan;
 static const TreeDropSpan drop_spans[2]={
     {af_v3_tree_drops,af_v3_tree_drops+13},
+#ifdef AF_V3_TREE_FAMILIES
+    {af_v3_tree_drops,af_v3_tree_drops+21}};
+const TreeDropSpan *af_v3_tree_drop_table(u32 tree) {
+    return drop_spans+(tree_rule((u16)tree)!=0);
+}
+#else
     {af_v3_tree_drops,af_v3_tree_drops+17}};
-static int interaction_selected(void) {
-    return af_v3_player_selected_equipment(af_v3_tree_rule.selected_item)>=0;
-}
 const TreeDropSpan *af_v3_tree_drop_table(void) {
-    return drop_spans+interaction_selected();
+    return drop_spans+trees_selected();
 }
+#endif
 int af_v3_tree_is_bee(u32 item) {
     item&=65535;
-    return item==0x5e || (item==af_v3_tree_rule.hidden_first+2u && interaction_selected());
+    const TreeRule *r=tree_rule(item);
+    return item==0x5e || (r && r->hidden_count && item==r->hidden_first+2u);
 }
 u32 af_v3_tree_drop_item(u32 tree,u32 item) {
     tree&=65535;item&=65535;
-    if (tree==0x69 || (tree==af_v3_tree_rule.hidden_first && interaction_selected())) {
+    const TreeRule *r=tree_rule(tree);
+    if (tree==0x69 || (r && r->hidden_count && tree==r->hidden_first)) {
 #ifdef __mips__
         const u8 *player=*(const u8 **)0x80136FD8u;
         if (player[0xA8E]==4) return 0x2100;
@@ -38,11 +44,11 @@ static void cut_attributes(int bx,int bz,u8 *attributes,u32 variant) {
 #else
     af_test_tree_cut_native(bx,bz,attributes,variant);
 #endif
-    if (!interaction_selected()) return;
+    if (!trees_selected()) return;
     const u16 *cells=af_tree_field_units(bx*16,bz*16);
     if (!cells) return;
-    for (u32 i=0;i<256;++i)
-        for (u32 j=0;j<8;++j)
+    for (u32 i=0;i<256;++i) if (tree_rule(cells[i]))
+        for (u32 j=0;j<TREE_CUTS;++j)
             if (cells[i]==af_v3_tree_cuts[j][0]) {
                 attributes[i]=(u8)af_v3_tree_cuts[j][1];break;
             }

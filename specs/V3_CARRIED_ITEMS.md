@@ -73,10 +73,10 @@ python3 tools/v3_furniture_pipeline.py convert --representation carried \
 
 ## Installed shared runtime
 
-The current development proposal is ABI 356 at
-`build/v3-carried-runtime-work-01/trees-connected-05/build-lock.json`.
+The current development proposal is ABI 359 at
+`build/v3-carried-runtime-work-01/field-actions-01/build-lock.json`.
 Its ROM SHA-256 is
-`b14f36b68fa27b69c8b195330bbc8bf8008eec7e41581d9b1b34e1e1859228e6`.
+`7736c5cf54fb76620554c2c30d75e3dcd19845de26bc3f8991bf07cc073bf129`.
 This is an inactive carried integration, not a new playable-import claim.
 
 `v3_furniture_install.py --refresh-runtime --carried-items PATH` installs the
@@ -113,7 +113,8 @@ ground bitmap at `804AA250` preserves source category 17's diary mapping and
 adds cedar independently. The common descriptor constructor uses the complete
 seasonal allocation, including the installed gold/palm/cedar drawing banks.
 Their shared table, four actor index arrays, and local stack are sized together;
-actual palm/cedar field behaviour remains unfinished. See
+growth, planting, collision, shaking, and cutting consumers are connected;
+leaf/cut effects and independent selection remain unfinished. See
 [shared seasonal scenery](V3_SCENERY.md#palm-and-cedar-dependencies).
 
 The loaded packet extends the unchanged 64,064-byte festival prefix to 105,904
@@ -150,8 +151,9 @@ unchanged resources:
 
 1. Connect the remaining actual item interactions: sign-board placement/design
    handling; card stamping/menu behaviour;
-   Harvest cutlery interaction; coconut eating/planting and tree behaviour;
-   cedar planting/growth; spirit capture/release and field behaviour.
+   Harvest cutlery interaction; complete palm/cedar leaf/cut effects;
+   spirit capture/release and field behaviour. Coconut eating/planting and
+   cedar planting/growth use the installed shared consumers below.
    Preserve the installed event/card/cutlery paths. Item-specific behaviour is
    part of importing, not an exception to defer automatically.
 2. Verify actual native item-type/menu routes across all families. The shared
@@ -262,6 +264,37 @@ preserving source resources instead of allocating duplicate copies.
 These changes add no new translated wording. All prepared artwork is retained;
 the new requirements are not used to enable incomplete field behaviours.
 
+### Food and planting interactions
+
+The same carried-item refresh extends the complete inventory food category.
+The source `mIV_pl_food_item_draw` and `mHD_open_end_proc_item_type3` functions,
+both nine-entry drawing tables, native food drawer, and actual hand-index
+consumer are checked. Both complete coconut lists reuse the installed category
+28 artwork, with physical segment-zero pointers. No graphics are reconverted.
+
+Two nine-entry tables occupy `80772020..80772068`, after catalogue code and
+before carried records. Original foods keep indices zero through six, including
+the null candy material. Coconut uses source index seven; the original turnip
+moves to eight. Four inventory reference instructions point to these resident
+tables, and their four internal relocations are removed in place. Only the
+turnip index constant changes in the hand owner. Food scale, matrix/position,
+frame timing, consumption, clothing/equipment branches, original segmented
+artwork, inventory BSS, and owner allocations remain intact.
+
+Packet/checksum receipts share the existing loaded resource; the tables consume
+72 bytes of checked zero padding and no additional resident or menu allocation.
+Saved format 16, readiness, and selection remain unchanged. Disabled reserved
+items still fail the existing item-admission checks; these tables do not make an
+incomplete tree family selectable.
+
+The shared scenery adapter owns coconut/cedar burial and direct cedar planting.
+The original tag action retains its search, placement, warnings, consumption,
+sound, and close-window flow; its six-word seed conversion calls the resident
+lazy-loading gate. All four seasonal throw previews preserve native flower
+handling, angles, and animation. Source-based growth, actual coastal/elevation
+conditions, death, regeneration, collision, and shaking/cutting share the
+[tree-family contract](V3_SCENERY.md#connected-family-behaviours).
+
 ## Verification and limits
 
 `tests/test_v3_carried_items.py` covers complete state discovery, official names,
@@ -294,6 +327,12 @@ and disabled/native delegation. Current cartridge checks verify all thirty
 redirects, collection/caller bindings, both complete preview tables, original
 owner preservation, full packet contents/checksums, and patch reconstruction.
 The current seven-profile browser/offline comparison and allocation chain pass.
+
+Three focused `FoodTests` in `tests/test_v3_carried_runtime.py` verify source
+bindings/rejection, all food entries, unchanged native instructions, relocation
+at two bases, complete packet/artwork/save retention, startup CRCs, and patch
+reconstruction. Current seven-profile browser/offline outputs agree. These
+checks do not execute an ordinary eating animation or native save cycle.
 
 The current build uses saved format 16. Compatible older saves migrate forward;
 V2 and format-15-or-earlier V3 cannot read new saves. Profiles missing required

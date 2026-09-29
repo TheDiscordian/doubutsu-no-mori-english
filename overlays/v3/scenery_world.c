@@ -6,19 +6,18 @@ _Static_assert(__builtin_offsetof(TreeUnit,item)==46,"Native collision item offs
 extern int af_v3_tree_column_native(void *,const TreeUnit *,int,u32,u32);
 extern int af_v3_tree_dig_native(const u16 *,u32,u32,u32);
 extern int af_v3_tree_npc_native(u32);
-static int world_selected(void) {
-    return af_v3_player_selected_equipment(af_v3_tree_rule.selected_item)>=0;
-}
 static u16 geometry_item(u16 item) {
-    u32 stage=item-af_v3_tree_rule.first;
-    if (stage>0 && stage<af_v3_tree_rule.count) return (u16)(0x800+(stage<4?stage:4));
-    if ((u32)(item-af_v3_tree_rule.hidden_first)<af_v3_tree_rule.hidden_count) return 0x804;
-    if ((u32)(item-af_v3_tree_rule.stumps[3])<4u) return (u16)(item-af_v3_tree_rule.stumps[3]+1);
+    const TreeRule *r=tree_rule(item);
+    if (!r) return item;
+    u32 stage=item-r->first;
+    if (stage>0 && stage<r->count) return (u16)(0x800+r->growth[stage][1]);
+    if (tree_hidden(r,item)) return 0x804;
+    if (tree_stump(r,item)) return (u16)(item-r->stumps[3]+1);
     return item;
 }
 int af_v3_tree_column(void *column,const TreeUnit *unit,int grounded,u32 minimum,u32 maximum) {
     u16 item=unit->item,mapped=geometry_item(item);
-    if (mapped!=item && world_selected()) {
+    if (mapped!=item) {
         /* Native callers exclude an inclusive item range, not the donor's
            callback/coordinate pair. Test the real ID before geometry mapping. */
         if (item>=(u16)minimum && item<=(u16)maximum) return 0;
@@ -31,12 +30,13 @@ int af_v3_tree_column(void *column,const TreeUnit *unit,int grounded,u32 minimum
     return af_v3_tree_column_native(column,unit,grounded,minimum,maximum);
 }
 int af_v3_tree_dig(const u16 *item,u32 x,u32 y,u32 z) {
-    if ((*item==af_v3_tree_rule.first || *item==af_v3_tree_daily_config.dead ||
-            (u32)(*item-af_v3_tree_rule.stumps[3])<4u) && world_selected()) return 1;
+    const TreeRule *r=tree_rule(*item);
+    if (r && (*item==r->first || *item==r->first+r->count || tree_stump(r,*item))) return 1;
     return af_v3_tree_dig_native(item,x,y,z);
 }
 int af_v3_tree_npc(u32 item) {
-    if ((u16)item==af_v3_tree_rule.first && world_selected()) return 1;
+    const TreeRule *r=tree_rule((u16)item);
+    if (r && (u16)item==r->first) return 1;
     return af_v3_tree_npc_native(item);
 }
 #ifdef __mips__
