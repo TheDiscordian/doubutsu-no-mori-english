@@ -43,7 +43,7 @@ class ImportScopeTests(unittest.TestCase):
     def test_regular_choices_follow_actual_installed_pools_and_all_villagers_remain(self):
         offered = requested_options(self.catalog, self.report)
         self.assertEqual(sum(self.catalog[k]['kind'] == 'villager' for k in offered), 20)
-        pool = {r['item_id'] for r in self.report['shops']['imports'] if r['group'] in (0, 1, 2, 5)}
+        pool = {r['item_id'] for r in self.report['shops']['imports'] if r['group'] in (0, 1, 2, 3, 5)}
         self.assertEqual({r['item_id'] for k,r in self.catalog.items()
                           if r['kind'] == 'furniture' and k in offered},
                          pool & {r['item_id'] for r in self.catalog.values() if r['kind'] == 'furniture'})
@@ -83,6 +83,52 @@ class ImportScopeTests(unittest.TestCase):
         self.assertTrue(all(not availability(self.catalog, bad)[key]['selectable'] for key in golden))
         self.assertTrue(all(self.states[key]['selectable'] for key in self.catalog
                             if self.catalog[key]['kind'] == 'equipment' and key not in golden))
+
+    def test_native_redd_consumes_group_three_without_imported_event_providers(self):
+        from aflib import by_vrom
+        # Complete retail initializer, retaining the checked English mail-return
+        # gate correction; no holiday-provider code is needed to generate stock.
+        manager = by_vrom(self.image)[0x3800000].extract(self.image)
+        start, end, ram = 0x8095C09C, 0x8095C264, 0x8095B8B0
+        routine = bytearray(manager[start-ram:end-ram])
+        self.assertEqual(sha256(routine), '34a608591329ec90dd188697f0edc0707854a4167d2dc9d68b9999b7846849e4')
+        self.assertEqual(struct.unpack_from('>I', routine, 0x8095C24C-start)[0], 0)
+        struct.pack_into('>I', routine, 0x8095C24C-start, 0x24020001)
+        self.assertEqual(sha256(routine), '535e47fa896d5dfba8972b1857cbfb2e96d2cfdfb808c944ac4377ccc878d0f8')
+        for group_at, call_at in ((0x8095C198,0x8095C1AC), (0x8095C1D8,0x8095C1EC), (0x8095C224,0x8095C238)):
+            self.assertEqual(struct.unpack_from('>I',routine,group_at-start)[0],0x24020003)
+            self.assertEqual(struct.unpack_from('>2I',routine,call_at-start),(0x0C02FF3C,0xAFA20018))
+        redd = [composer.furniture_key(r) for r in self.report['shops']['imports'] if r['group']==3]
+        self.assertEqual(len(redd),12)
+        self.assertTrue(all(self.states[k]['selectable'] for k in redd))
+        self.assertTrue(all(g['forced_disabled'] for g in self.plan['runtime_groups']))
+
+    def test_stock_composition_removes_every_unselected_import_and_preserves_native_lists(self):
+        from aflib import by_vrom
+        from v3_shops import VROM
+        from v3_surface_stock import list_items
+        tables = composer.furniture_stock_tables(self.image,self.report,self.catalog)
+        data = by_vrom(self.image)[VROM].extract(self.image)
+        pointers = struct.unpack_from('>12I',data,self.report['shops']['table_offset'])
+        for selected in (set(), {t['rows'][-1]['id'] for t in tables}, set(self.catalog)):
+            writes = composer.furniture_stock_selection(self.image,self.report,self.catalog,selected)
+            result = composer.apply_writes(self.image,writes)
+            changed = by_vrom(result)[VROM].extract(result)
+            for table in tables:
+                group = table['group']; before = list_items(data,pointers[group]&0xFFFFFF)
+                native = before[:-len(table['rows'])]
+                expected = native + [int(r['hex'],16) for r in table['rows'] if r['id'] in selected]
+                self.assertEqual(list_items(changed,pointers[group]&0xFFFFFF),expected)
+            allowed = {i for t in tables for i in range(t['offset'],t['offset']+len(t['before'])//2)}
+            self.assertTrue(all(i in allowed or a==b for i,(a,b) in enumerate(zip(self.image,result))))
+        bad = copy.deepcopy(self.report)
+        bad['shops']['imports'][0]['group']=0
+        with self.assertRaisesRegex(ValueError,'native prefix'):
+            composer.furniture_stock_tables(self.image,bad,self.catalog)
+        bad = copy.deepcopy(self.report)
+        bad['shops']['descriptor']+=4
+        with self.assertRaisesRegex(ValueError,'descriptor'):
+            composer.furniture_stock_tables(self.image,bad,self.catalog)
 
     def test_unavailable_acquisition_and_behaviour_settings_reject_before_composition(self):
         rejected = [k for k,s in self.states.items() if not s['selectable']]
@@ -131,8 +177,10 @@ class ImportScopeTests(unittest.TestCase):
         fish = next(k for k in offered if self.catalog[k]['kind'] == 'fish')
         surface = next(k for k in offered if self.catalog[k]['kind'] == 'floor')
         golden = list(self.report['equipment_resources']['golden_tools']['items'])
+        redd = [composer.furniture_key(r) for r in self.report['shops']['imports'] if r['group']==3]
         profiles = [('empty', []), ('regular-all', offered), ('all-villagers', villagers),
                     ('regular-furniture', [normal]), ('diary-and-creature', [diary, fish, surface]),
+                    ('redd-stock', redd), ('one-redd-item', redd[-1:]),
                     *((key.rsplit('/',1)[-1], [key]) for key in golden)]
         cases = []
         for name, requested in profiles:

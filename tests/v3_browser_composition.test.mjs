@@ -107,6 +107,25 @@ test('all and empty reproduce their exact pins, without changing the supplied ar
   await assert.rejects(composeSelection(source, plan, []), /checksum mismatch/);
 });
 
+test('terminated stock suffixes pack without count fields and preserve native neighbours', async () => {
+  const { plan, source } = await fixture(), v = new DataView(source.buffer);
+  source.set(fromHex('100010043100310400001008'), 0x103200);
+  plan.tables.push({ offset: 0x103204, before: '31003104', width: 2,
+    rows: [{ id: A, hex: '3100' }, { id: B, hex: '3104' }], counts: [] });
+  source.set(n64Checksum(source), 0x10);
+  plan.header.before = hex(source.subarray(0x10, 0x18));
+  plan.base_sha256 = await sha256(source);
+  for (const [requested, expected] of [[[A], '31000000'], [[B], '31040000'], [[C], '31040000']]) {
+    const { output } = await composeSelection(source, plan, requested);
+    assert.equal(hex(output.subarray(0x103204, 0x103208)), expected);
+    assert.equal(hex(output.subarray(0x103200, 0x103204)), '10001004');
+    assert.equal(hex(output.subarray(0x103208, 0x10320c)), '00001008');
+  }
+  const { output } = await composeSelection(source, plan, [A, C]);
+  assert.deepEqual(output, source);
+  assert.equal(v.getUint16(0x103208), 0);
+});
+
 test('prepared diary rows stay unavailable and are removed even by select all', async () => {
   const { plan, source } = await fixture(), v = new DataView(source.buffer), D = id('item', '2B00');
   v.setUint32(0x102108, 0x08400000); v.setUint32(0x102110, 0x24050005);

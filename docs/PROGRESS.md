@@ -37,13 +37,21 @@ existing-system reward routes individually. See the
 ### Current import selections and verification
 
 Browser and offline builds default to the V3 pipeline scope. Both offer all
-twenty villagers and 139 independent item choices. Two exclusive
+twenty villagers and 151 independent item choices. Two exclusive
 starting-outfit resources follow their villagers as dependencies, not standalone
-item choices. Select all requests 159 choices and includes those two resources.
+item choices. Select all requests 171 choices and includes those two resources.
 Actual checked stock tables determine regular furniture, clothing, and surfaces;
 the remaining item categories use their installed native acquisition paths.
 Seven furniture choices use the existing native lottery, with checked donor
 membership and retained native selection code. They require no new event provider.
+Twelve more use native Redd stock group three. Its complete initializer retains
+all three calls to the native selector and differs from retail only at the
+checked English-mail return gate. The source list name does not make these
+holiday-provider items. Both composers pack only selected additions into all
+six installed furniture stock groups, retaining every native list prefix,
+pointer, terminator, RNG instruction, and resource allocation. Profile enable
+bits alone do not filter this native selector. Mutation checks reject altered
+membership and descriptors; ordinary Redd shopping remains unverified.
 The current filter leaves items outside its admitted acquisition categories
 unavailable; this is implemented selection behaviour, not proof that every
 excluded reward requires V4. Review those exclusions against existing-system
@@ -56,18 +64,19 @@ not enable the optional holiday, Wisp, birthday, or savings-account providers.
 Unavailable behaviour controls are hidden without a blanket V4 classification.
 
 The checked private browser export is
-`build/v3-import-pipeline-browser-06/build.json`, pinned to the repaired ABI-389
-cartridge. Seven current-cartridge scope/browser-equivalence tests pass, covering
-four independent golden tools and rejection of missing providers. Nine actual
+`build/v3-import-pipeline-browser-07/build.json`, pinned to the repaired ABI-389
+cartridge. Nine current-cartridge scope/browser-equivalence tests pass, covering
+complete Redd stock routing, selected-only furniture lists, four independent
+golden tools, and rejection of missing providers. Eleven actual
 browser/offline profiles match. The
 current headless Chromium worker check at
-`build/v3-import-pipeline-worker-04/results.json` reads actual game files and
+`build/v3-import-pipeline-worker-05/results.json` reads actual game files and
 matches offline hashes for empty, all-available, villager/regular-item, and
 equipment-subset selections, with cancellation and invalid-input rejection.
 The current interface check passes at
-`build/v3-import-pipeline-interface-06/results.json`, including independent
+`build/v3-import-pipeline-interface-07/results.json`, including independent
 selection/dependencies, keyboard controls, unavailable-review data, and download
-lifecycle checks. Twelve focused JavaScript checks pass with Node's
+lifecycle checks. Thirteen focused JavaScript checks pass with Node's
 `--experimental-global-webcrypto` flag.
 <!-- Verification work record: the initial Node invocation lacks the required
 Web Crypto flag and fails before crypto-dependent assertions; the corrected
@@ -76,11 +85,11 @@ Empty selection returns exact V2-14. No game files are uploaded; the temporary
 check servers are stopped. The export is unserved.
 
 The all-available offline profile is
-`build/v3-import-pipeline-profile-07/profile.json`; UPS reconstruction passes.
+`build/v3-import-pipeline-profile-08/profile.json`; UPS reconstruction passes.
 ROM SHA-256:
-`c7e99d7282043cd3108d1fabc5e6b9e7397b30e0bae9233d5fc7fa28be17d581`.
+`cd4502635f1641fb29814b6430856b27adbc0e53dce562b77fa3816e03d5652c`.
 UPS SHA-256:
-`e4e817eeead9870f6be59b852350b5f22b5e79f629eee65cbb74777c15b1bb88`.
+`a182a0a947bab51491261fae1d9d271387d319715d1ccea79bf9a2eca854b1cc`.
 It retains ABI 389, format 21/wire 7, eight-MiB RAM, and FlashRAM. V2 and
 format-20-or-earlier V3 readers cannot read these saves; preserve separate saves
 and backups. Supported older saves migrate forward. Browser composition does
@@ -101,9 +110,10 @@ CRC, decompression, all three saved-record CRCs, canonical selected profiles,
 zero unused padding, and the preserved imported fan. Five focused scene/save
 tests pass, including that actual written-chip check. This verifies this town's
 ordinary save/restart, not every item behaviour, synchronous writing,
-diary-preflight execution, or hardware. The current 159-choice profile extends
-that selection with four golden tools, retaining the same ABI-389 runtime,
-physical resources, and save format. It has not repeated ordinary save/reload.
+diary-preflight execution, or hardware. The current 171-choice profile extends
+that selection with four golden tools and twelve native Redd items, retaining
+the same ABI-389 runtime, complete artwork, and save format while correcting
+selected-only furniture stock data. It has not repeated ordinary save/reload.
 The native format-20 golden reward/state and shovel-rule evidence remains at
 `build/v3-golden-rewards-native-01/results.json` and
 `build/v3-golden-rewards-native-storage-01/results.json`; those results do not

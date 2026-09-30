@@ -32,7 +32,7 @@ on selection order. Resource compaction is not part of composition.
 
 The experimental browser modules live under `experimental/imports/`, outside
 the deployed `web/` tree. Exports go to a fresh ignored `build/` directory and
-remain unserved. Both V2 patchers, recipes, services, and the Pages allowlist
+remain unserved. The deployed patcher, local preview, recipes, and Pages allowlist
 stay unchanged until the user tests V3 and explicitly approves the switch.
 
 ## Shared equipment selections
@@ -107,6 +107,23 @@ removal; do not mutate a previously expanded dependency result. Browser plans
 also reject cyclic dependencies and two options owning the same saved bit.
 
 ## Checked cartridge writes
+
+### Furniture stock
+
+Both composers pack selected additive furniture into the complete installed
+native stock lists before the cartridge is built. The offline generator checks
+the full resource hash, descriptor, all twelve pointers, complete retail lists,
+and every appended identity against the catalogue. It preserves native prefixes
+and the original suffix allocation, zeros unused additions, and retains the
+terminator. Browser rules consume these same two-byte table rows without count
+fields; native selection counts entries to the terminator. No runtime allocator,
+RNG, rarity code, save format, artwork, or stable identity changes.
+
+Profile bits and room enable words alone do not filter the native furniture
+selector. Existing selected-only surface filtering does not cover furniture.
+Ordinary A/B/C stock, Redd stock group three, and lottery group five are admitted
+by the pipeline policy. Group four requires the actual seasonal replacement
+consumer rather than assuming its list name supplies an acquisition route.
 
 ### Surface category
 

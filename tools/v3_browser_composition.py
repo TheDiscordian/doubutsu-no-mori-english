@@ -159,6 +159,7 @@ def rules(image, report, *, scope='development'):
                        **({'capacity':capacity} if capacity!=len(rows) else {})})
     if len(table_writes) != len(packed) + sum(len(row['counts']) for row in packed):
         raise ValueError('Unassigned catalogue changes')
+    packed.extend(composition.furniture_stock_tables(image, report, catalog))
 
     from v3_surface_selection import checksum_fields
     from v3_creature_choices import options as behaviour_options,checksum_fields as behaviour_checksums,save_note

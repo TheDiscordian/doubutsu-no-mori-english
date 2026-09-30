@@ -325,6 +325,72 @@ def apply_writes(source, writes):
     return bytes(result)
 
 
+def furniture_stock_tables(image, report, catalog):
+    """Bind additive stock suffixes to the complete original native lists."""
+    from aflib import CODE_RAM, CODE_VROM
+    from v3_shops import VROM, TABLE, SOURCE_SHA
+    from v3_surface_stock import list_items
+    files = by_vrom(image)
+    entry = files[VROM]
+    data = entry.extract(image)
+    stock = report['shops']
+    if entry.pend or len(data) != stock['bytes'] or sha256(data) != stock['output_sha256']:
+        raise ValueError('Changed complete furniture stock resource')
+    core = files[CODE_VROM].extract(image)
+    if struct.unpack_from('>3I', core, stock['descriptor'] - CODE_RAM) != (
+            VROM, VROM + len(data), 0x6000000 + stock['table_offset']):
+        raise ValueError('Changed furniture stock descriptor')
+    native = verified_rom((ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes())
+    original = by_vrom(native)[VROM].extract(native)
+    if sha256(original) != SOURCE_SHA:
+        raise ValueError('Changed original furniture stock lists')
+    pointers = struct.unpack_from('>12I', data, stock['table_offset'])
+    old_pointers = struct.unpack_from('>12I', original, TABLE)
+    imports = stock['imports']
+    if len({r['item_id'] for r in imports}) != len(imports) or any(r['group'] not in range(6) for r in imports):
+        raise ValueError('Invalid additive furniture stock membership')
+    tables = []
+    for group, (pointer, old_pointer) in enumerate(zip(pointers, old_pointers)):
+        if not old_pointer:
+            if pointer:
+                raise ValueError('Changed empty native furniture stock group')
+            continue
+        start = pointer & 0xFFFFFF
+        if pointer >> 24 != 6 or not 0 <= start < stock['table_offset']:
+            raise ValueError('Furniture stock pointer escapes complete lists')
+        native_ids = list_items(original[:TABLE], old_pointer & 0xFFFFFF)
+        rows = sorted((r for r in imports if r['group'] == group), key=lambda r:r['item_id'])
+        ids = native_ids + [int(r['item_id'], 16) for r in rows]
+        if list_items(data[:stock['table_offset']], start) != ids:
+            raise ValueError('Furniture stock differs from native prefix and checked imports')
+        if not rows:
+            continue
+        members = []
+        for row in rows:
+            key = furniture_key(row)
+            if key not in catalog or catalog[key]['kind'] != 'furniture' or catalog[key]['item_id'] != row['item_id']:
+                raise ValueError('Furniture stock has no matching selection identity')
+            members.append(dict(id=key, hex=row['item_id'].lower()))
+        at = start + 2 * len(native_ids)
+        before = data[at:at + 2 * len(rows)].hex()
+        if before != ''.join(r['hex'] for r in members):
+            raise ValueError('Changed additive furniture stock suffix')
+        tables.append(dict(offset=entry.pstart + at, before=before, width=2,
+            rows=members, counts=[], group=group))
+    return tables
+
+
+def furniture_stock_selection(image, report, catalog, enabled):
+    writes = []
+    for table in furniture_stock_tables(image, report, catalog):
+        after = ''.join(r['hex'] for r in table['rows'] if r['id'] in enabled)
+        after += '00' * ((len(table['before']) - len(after)) // 2)
+        if after != table['before']:
+            writes.append(dict(offset=table['offset'], before=table['before'], after=after,
+                purpose='selected furniture stock group ' + str(table['group'])))
+    return writes
+
+
 def catalogue_selection(image, report, enabled):
     """Pack selected appended rows without changing native order or identities."""
     from v3_catalogue import VROM, RAM
@@ -452,6 +518,7 @@ def compose(image, report, catalog, selection):
             prefix(row['carried_enable_offset'],active.to_bytes(4,'big'),key+' carried creature')
     catalogue_writes, _ = catalogue_selection(image, report, enabled)
     writes.extend(catalogue_writes)
+    writes.extend(furniture_stock_selection(image, report, catalog, enabled))
     scoring_writes, _ = scoring_selection(image, report, catalog, enabled)
     writes.extend(scoring_writes)
     from v3_surface_selection import checksum_fields
@@ -546,6 +613,11 @@ def build(output, selected=(), *, select_all=False, behaviours=None, scope='v3-p
             composition=receipt, native_test='not executed for this composed profile',
             new_villager_ids_enabled=any(catalog[key]['kind']=='villager' for key in selection['enabled']))
         current['save_runtime'].update(profile_hex=selection['profile_hex'], profile_sha256=selection['profile_sha256'])
+        from v3_shops import VROM as STOCK_VROM
+        current['shops'].update(selected_only=True,
+            output_sha256=sha256(by_vrom(result)[STOCK_VROM].extract(result)))
+        for row in current['shops']['imports']:
+            row['selected_for_profile'] = furniture_key(row) in selection['enabled']
         actors = []
         for row in current['villager_text']['imports']:
             active = row['id'] in selection['enabled']

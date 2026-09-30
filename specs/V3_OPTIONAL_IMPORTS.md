@@ -543,10 +543,12 @@ ordinary gameplay or original-hardware acceptance.
 
 ### V4: preserved post-office account and source mail experiment
 
-This system is outside V3. Do not continue its mail, account, reward, or profile
-controls to complete the import pipeline. Special items remain unavailable for
-import until their acquisition is implemented in V4. The following describes
-preserved experimental resources, not V3 requirements.
+The new savings-account system is outside V3. Do not continue its account or
+milestone controls to complete the import pipeline. Its dependent items should
+remain unavailable until that acquisition exists. Mail and rewards fitting
+existing systems are evaluated separately and are not automatically V4 work.
+The following describes preserved experimental resources, not authorisation
+to resume the savings-account feature.
 
 The complete donor banking/Pelly frontend, source April talk controller, and
 format-21 saved-town owner have a bounded combined native link. The separate
@@ -606,7 +608,7 @@ are disclosed, not silently enabled as unrelated additions.
 Changing a selection or input invalidates old results. Cancellation releases the
 worker and download URLs. Equivalent selection sets produce the same profile
 and cartridge regardless of click order. The source files remain untouched.
-Keep both deployments of the one patcher on stable V2 until the user has tested V3 and
+Keep the deployed patcher and ordinary local preview on stable V2 until the user has tested V3 and
 explicitly approved the switch. A verified playtest handoff alone is not approval.
 
 ## Delivery order and acceptance

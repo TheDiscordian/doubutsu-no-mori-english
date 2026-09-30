@@ -147,7 +147,7 @@ export function validatePlan(plan) {
     require(fullCreature[2] < 2 && fullCreature[3] === 0, 'Invalid creature saved identity range.');
   }
   for (const table of plan.tables) {
-    integer(table.width, 1, 16); array(table.rows, 1, 2048); array(table.counts, 1, 16);
+    integer(table.width, 1, 16); array(table.rows, 1, 2048); array(table.counts, 0, 16);
     const capacity = table.capacity ?? table.rows.length; integer(capacity, table.rows.length, 2048);
     field(table, capacity * table.width, capacity * table.width);
     const seen = new Set();

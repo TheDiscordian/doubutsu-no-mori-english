@@ -20,8 +20,10 @@ def availability(catalog, report):
     """Use the checked cartridge's actual pool membership for every category."""
     # Group five is the existing native lottery, with checked donor lottery
     # membership and retained native selection code. No new feature is needed.
-    # Event/train membership alone does not establish each item's specific route.
-    shops = {r['item_id'] for r in report['shops']['imports'] if r['group'] in (0, 1, 2, 5)}
+    # Native Redd initialization selects group three for all three stock slots.
+    # Group four still needs the existing fixed-ID seasonal stock adapter;
+    # membership in the donor's train-named list does not install that route.
+    shops = {r['item_id'] for r in report['shops']['imports'] if r['group'] in (0, 1, 2, 3, 5)}
     shirts = {item for group in report['clothing']['stock']['groups']
               for item in group['items']}
     surfaces = {r['id'] for group in report.get('room_surfaces', {}).get('stock', {}).get('resources', [])
